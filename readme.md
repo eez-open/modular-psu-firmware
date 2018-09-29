@@ -7,8 +7,8 @@ The contributors are listed in CONTRIB.TXT. This project uses the GPL v3 license
 EEZ psu-firmware uses the [C4.1 (Collective Code Construction Contract)](http://rfc.zeromq.org/spec:22) process for contributions.
 To report an issue, use the [EEZ modular-psu-firmware issue](https://github.com/eez-open/modular-psu-firmware/issues) tracker.
 
-_If you consider to join us in software development please check first if anything from this [list](https://github.com/eez-open/psu-firmware/milestone/6) you found interesting._
-
 ## Introduction
 
-Work in progress ...
+Work in progress ... 
+
+_For existing Programmable Power supply (EEZ H24005) firmware visit [psu-firmware](https://github.com/eez-open/psu-firmware) repository._
