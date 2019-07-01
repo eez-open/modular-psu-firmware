@@ -12,3 +12,19 @@ To report an issue, use the [EEZ modular-psu-firmware issue](https://github.com/
 Work in progress ... 
 
 _For existing Programmable Power supply (EEZ H24005) firmware visit [psu-firmware](https://github.com/eez-open/psu-firmware) repository._
+
+## Build
+
+### Emscripten
+
+```
+source ~/emsdk/emsdk_env.sh
+
+export EMSCRIPTEN=/path/to/emsdk/fastcomp/emscripten
+
+mkdir /path/to/modular-psu-firmware/build/emscripten
+
+cd /path/to/modular-psu-firmware/build/emscripten
+
+cmake -DCMAKE_TOOLCHAIN_FILE=../../cmake/Emscripten.cmake -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" ../..
+```

@@ -1,0 +1,167 @@
+/*
+ * EEZ PSU Firmware
+ * Copyright (C) 2016-present, Envox d.o.o.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <eez/apps/psu/psu.h>
+
+#include <string.h>
+
+#include <eez/apps/psu/devices.h>
+
+#include <eez/apps/psu/eeprom.h>
+
+#if OPTION_SD_CARD
+#include <eez/apps/psu/sd_card.h>
+#endif
+
+#if OPTION_ETHERNET
+#include <eez/apps/psu/ethernet.h>
+#endif
+
+#include <eez/apps/psu/datetime.h>
+#include <eez/apps/psu/rtc.h>
+#include <eez/apps/psu/temp_sensor.h>
+#include <eez/apps/psu/fan.h>
+
+namespace eez {
+namespace psu {
+namespace devices {
+
+#define TEMP_SENSOR(NAME, QUES_REG_BIT, SCPI_ERROR) \
+    { #NAME " temp", true, &temp_sensor::sensors[temp_sensor::NAME].g_testResult }
+
+#define CHANNEL(INDEX) \
+    { "CH" #INDEX " IOEXP", true, &(Channel::get(INDEX - 1).ioexp.g_testResult) }, \
+    { "CH" #INDEX " DAC", true, &(Channel::get(INDEX - 1).dac.g_testResult) }, \
+	{ "CH" #INDEX " ADC", true, &(Channel::get(INDEX - 1).adc.g_testResult) }
+
+Device devices[] = {
+#if OPTION_EXT_EEPROM
+    { "EEPROM", OPTION_EXT_EEPROM, &eeprom::g_testResult },
+#else
+    { "EEPROM", 0, 0 },
+#endif
+
+#if OPTION_SD_CARD
+    { "SD card", OPTION_SD_CARD, &sd_card::g_testResult },
+#else
+    { "SD card", 0, 0 },
+#endif
+
+#if OPTION_ETHERNET
+    { "Ethernet", 1, &ethernet::g_testResult },
+#else
+    { "Ethernet", 0, 0 },
+#endif
+
+#if OPTION_EXT_RTC
+    { "RTC", OPTION_EXT_RTC, &rtc::g_testResult },
+#else
+    { "RTC", 0, 0 },
+#endif
+
+    { "DateTime", true, &datetime::g_testResult },
+
+#if OPTION_BP
+    { "BP option", OPTION_BP, &bp::g_testResult },
+#else
+    { "BP option", 0, 0 },
+#endif
+
+    { "Fan", OPTION_FAN, &fan::g_testResult },
+
+    TEMP_SENSORS
+};
+
+#undef TEMP_SENSOR
+#undef CHANNEL
+
+int numDevices = sizeof(devices) / sizeof(Device);
+
+bool anyFailed() {
+    for (int i = 0; i < numDevices; ++i) {
+        Device &device = devices[i];
+        if (device.testResult != 0 && *device.testResult == TEST_FAILED) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+#define APPEND_CHAR(C)                                                                             \
+    nextIndex = index + 1;                                                                         \
+    if (nextIndex > MAX_LENGTH)                                                                    \
+        break;                                                                                     \
+    *(result + index) = C;                                                                         \
+    index = nextIndex;
+
+#define APPEND_STRING(S)                                                                           \
+    str = S;                                                                                       \
+    strLength = strlen(str);                                                                       \
+    nextIndex = index + strLength;                                                                 \
+    if (nextIndex > MAX_LENGTH)                                                                    \
+        break;                                                                                     \
+    strncpy(result + index, str, strLength);                                                       \
+    index = nextIndex
+
+char *getSelfTestResultString() {
+    const int MAX_LENGTH = 255;
+    char *result = (char *)malloc(MAX_LENGTH + 1);
+    int index = 0;
+    int nextIndex;
+    const char *str;
+    int strLength;
+
+    for (int deviceIndex = 0; deviceIndex < numDevices; ++deviceIndex) {
+        Device &device = devices[deviceIndex];
+        if (device.testResult && *device.testResult == TEST_FAILED) {
+            if (index > 0) {
+                APPEND_CHAR('\n');
+            }
+            APPEND_CHAR('-');
+            APPEND_CHAR(' ');
+            APPEND_STRING(device.deviceName);
+            APPEND_CHAR(' ');
+            APPEND_STRING(getTestResultString(*device.testResult));
+        }
+    }
+
+    *(result + index) = 0;
+
+    return result;
+}
+
+const char *getInstalledString(bool installed) {
+    if (installed)
+        return "installed";
+    return "not installed";
+}
+
+const char *getTestResultString(TestResult g_testResult) {
+    if (g_testResult == TEST_OK)
+        return "passed";
+    if (g_testResult == TEST_SKIPPED)
+        return "skipped";
+    if (g_testResult == TEST_WARNING)
+        return "warning";
+    return "failed";
+}
+
+} // namespace devices
+} // namespace psu
+} // namespace eez

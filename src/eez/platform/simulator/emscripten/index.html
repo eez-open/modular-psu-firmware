@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>EEZ Modular Firmware Simulator</title>
+
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+    crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/1.19.1/css/jquery.terminal.min.css"
+    integrity="sha256-Wmou2jG6hKDZfedC0GE/DU10CZmRLYFbwKWDXTAt52s=" crossorigin="anonymous" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/1.19.1/js/jquery.terminal.min.js" integrity="sha256-eC2LikcRx0UbkV/d/her4358nTQP0AxRJczIwO6Rso8="
+    crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="main.css" />
+</head>
+
+<body>
+  <div id="content">
+    <div id="header">
+      <div id='title'>EEZ Modular Firmware Simulator</div>
+      <div id='spinner'></div>
+      <div id="status">Downloading...</div>
+      <div>
+        <progress value="0" max="100" id="progress" hidden=1></progress>
+      </div>
+    </div>
+
+    <div id="canvas-container">
+      <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    </div>
+
+    <div id="output"></div>
+
+    <div id="footer">
+      Copyright (C) 2018
+      <a href="https://www.envox.hr" target="_blank">Envox d.o.o.</a> |
+      <a href="http://emscripten.org" target="_blank">Powered by Emscripten</a>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+  <script async type="text/javascript" src="modular-psu-firmware.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,76 @@
+/*
+ * EEZ Generic Firmware
+ * Copyright (C) 2018-present, Envox d.o.o.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <eez/gui/widgets/text.h>
+
+#include <eez/gui/draw.h>
+#include <eez/gui/gui.h>
+#include <eez/util.h>
+
+namespace eez {
+namespace gui {
+
+void TextWidget_draw(const WidgetCursor &widgetCursor) {
+    const Widget *widget = widgetCursor.widget;
+    DECL_WIDGET_STYLE(style, widget);
+
+    widgetCursor.currentState->size = sizeof(WidgetState);
+    widgetCursor.currentState->flags.blinking = isBlinkTime() && styleIsBlink(style);
+    widgetCursor.currentState->data =
+        widget->data ? data::get(widgetCursor.cursor, widget->data) : 0;
+
+    bool refresh =
+        !widgetCursor.previousState ||
+        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
+        widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
+        widgetCursor.previousState->data != widgetCursor.currentState->data ||
+        widgetCursor.previousState->backgroundColor != widgetCursor.currentState->backgroundColor;
+
+    if (refresh) {
+        DECL_STYLE(activeStyle, widget->activeStyle);
+        DECL_WIDGET_SPECIFIC(TextWidget, display_string_widget, widget);
+
+        if (widget->data) {
+            if (widgetCursor.currentState->data.isString()) {
+                drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,
+                         widgetCursor.y, (int)widget->w, (int)widget->h, style, activeStyle,
+                         widgetCursor.currentState->flags.active,
+                         widgetCursor.currentState->flags.blinking,
+                         display_string_widget->flags.ignoreLuminosity, nullptr);
+            } else {
+                char text[64];
+                widgetCursor.currentState->data.toText(text, sizeof(text));
+                drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                         style, activeStyle, widgetCursor.currentState->flags.active,
+                         widgetCursor.currentState->flags.blinking,
+                         display_string_widget->flags.ignoreLuminosity, nullptr);
+            }
+        } else {
+            DECL_STRING(text, display_string_widget->text);
+            drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                     style, activeStyle, widgetCursor.currentState->flags.active,
+                     widgetCursor.currentState->flags.blinking,
+                     display_string_widget->flags.ignoreLuminosity, nullptr);
+        }
+
+        g_painted = true;
+    }
+}
+
+} // namespace gui
+} // namespace eez

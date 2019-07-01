@@ -1,0 +1,4 @@
+.vscode
+build
+modular-psu-firmware.eez-project-ui-state
+src/third_party/stm32/Debug
