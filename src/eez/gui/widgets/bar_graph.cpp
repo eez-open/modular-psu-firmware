@@ -154,7 +154,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                 widgetCursor.currentState->data.toText(valueText, sizeof(valueText));
                 wText = display::measureStr(valueText, -1, font, w);
 
-                int padding = textStyle.padding_horizontal;
+                int padding = textStyle.padding_left;
                 wText += padding;
 
                 if (pValue + wText <= d) {
@@ -256,7 +256,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                 widgetCursor.currentState->data.toText(valueText, sizeof(valueText));
                 hText = font.getHeight();
 
-                int padding = textStyle.padding_vertical;
+                int padding = textStyle.padding_top;
                 hText += padding;
 
                 if (pValue + hText <= d) {

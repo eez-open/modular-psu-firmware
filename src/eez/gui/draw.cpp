@@ -1,6 +1,4 @@
-/* : ay::ay::ay::ay::ay::ay::ay::y::lay::ay::y::ay::splay::adisplay::
-                                     : ay::ay::ay::y::play::ay::ay::ay::ay::ay:: ::ay::ay::ay::y::
-                                           lay::ay::ay::ay::ay::ay::ay::ay::y::play::ay::y:: ::
+/*
 * EEZ Generic Firmware
 * Copyright (C) 2015-present, Envox d.o.o.
 *
@@ -70,19 +68,18 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
     int y2 = y + h - 1;
 
     int borderRadius = style->border_radius;
-    int borderSize = style->border_size;
-    if (borderSize > 0) {
+    if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
         display::setColor(style->border_color);
-        if (borderSize == 1 && borderRadius == 0) {
+        if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
             display::drawRect(x1, y1, x2, y2);
         } else {
             display::fillRect(x1, y1, x2, y2, style->border_radius);
-            borderRadius = MAX(borderRadius - borderSize, 0);
+			borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
         }
-        x1 += borderSize;
-        y1 += borderSize;
-        x2 -= borderSize;
-        y2 -= borderSize;
+        x1 += style->border_size_left;
+        y1 += style->border_size_top;
+        x2 -= style->border_size_right;
+        y2 -= style->border_size_bottom;
     }
 
     font::Font font = styleGetFont(style);
@@ -92,9 +89,9 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
 
     int x_offset;
     if (styleIsHorzAlignLeft(style))
-        x_offset = x1 + style->padding_horizontal;
+        x_offset = x1 + style->padding_left;
     else if (styleIsHorzAlignRight(style))
-        x_offset = x2 - style->padding_horizontal - width;
+        x_offset = x2 - style->padding_left - width;
     else
         x_offset = x1 + ((x2 - x1 + 1) - width) / 2;
     if (x_offset < 0)
@@ -102,9 +99,9 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
 
     int y_offset;
     if (styleIsVertAlignTop(style))
-        y_offset = y1 + style->padding_vertical;
+        y_offset = y1 + style->padding_top;
     else if (styleIsVertAlignBottom(style))
-        y_offset = y2 - style->padding_vertical - height;
+        y_offset = y2 - style->padding_top - height;
     else
         y_offset = y1 + ((y2 - y1 + 1) - height) / 2;
     if (y_offset < 0)
@@ -150,20 +147,19 @@ void drawMultilineText(const char *text, int x, int y, int w, int h, const Style
     int y2 = y + h - 1;
 
     int borderRadius = style->border_radius;
-    int borderSize = style->border_size;
-    if (borderSize > 0) {
+	if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
         display::setColor(style->border_color);
-        if (borderSize == 1 && borderRadius == 0) {
+		if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
             display::drawRect(x1, y1, x2, y2);
         } else {
             display::fillRect(x1, y1, x2, y2, style->border_radius);
-            borderRadius = MAX(borderRadius - borderSize, 0);
+			borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
         }
-        x1 += borderSize;
-        y1 += borderSize;
-        x2 -= borderSize;
-        y2 -= borderSize;
-    }
+		x1 += style->border_size_left;
+		y1 += style->border_size_top;
+		x2 -= style->border_size_right;
+		y2 -= style->border_size_bottom;
+	}
 
     font::Font font = styleGetFont(style);
     int height = (int)(0.9 * font.getHeight());
@@ -190,10 +186,10 @@ void drawMultilineText(const char *text, int x, int y, int w, int h, const Style
         display::setColor(style->color);
     }
 
-    x1 += style->padding_horizontal;
-    x2 -= style->padding_horizontal;
-    y1 += style->padding_vertical;
-    y2 -= style->padding_vertical;
+    x1 += style->padding_left;
+    x2 -= style->padding_right;
+    y1 += style->padding_top;
+    y2 -= style->padding_bottom;
 
     x = x1;
     y = y1;
@@ -255,24 +251,28 @@ void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, 
     int x2 = x + w - 1;
     int y2 = y + h - 1;
 
-    int borderSize = style->border_size;
-    if (borderSize > 0) {
-        display::setColor(style->border_color);
-        display::drawRect(x1, y1, x2, y2);
-        x1++;
-        y1++;
-        x2--;
-        y2--;
-    }
+	if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
+		display::setColor(style->border_color);
+		if (style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) {
+			display::drawRect(x1, y1, x2, y2);
+		}
+		else {
+			display::fillRect(x1, y1, x2, y2, 0);
+		}
+		x1 += style->border_size_left;
+		y1 += style->border_size_top;
+		x2 -= style->border_size_right;
+		y2 -= style->border_size_bottom;
+	}
 
     int width = bitmapWidth;
     int height = bitmapHeight;
 
     int x_offset;
     if (styleIsHorzAlignLeft(style))
-        x_offset = x1 + style->padding_horizontal;
+        x_offset = x1 + style->padding_left;
     else if (styleIsHorzAlignRight(style))
-        x_offset = x2 - style->padding_horizontal - width;
+        x_offset = x2 - style->padding_right - width;
     else
         x_offset = x1 + ((x2 - x1) - width) / 2;
     if (x_offset < 0)
@@ -280,9 +280,9 @@ void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, 
 
     int y_offset;
     if (styleIsVertAlignTop(style))
-        y_offset = y1 + style->padding_vertical;
+        y_offset = y1 + style->padding_top;
     else if (styleIsVertAlignBottom(style))
-        y_offset = y2 - style->padding_vertical - height;
+        y_offset = y2 - style->padding_bottom - height;
     else
         y_offset = y1 + ((y2 - y1) - height) / 2;
     if (y_offset < 0)
@@ -339,20 +339,19 @@ void drawRectangle(int x, int y, int w, int h, const Style *style, const Style *
         int y2 = y + h - 1;
 
         int borderRadius = style->border_radius;
-        int borderSize = style->border_size;
-        if (borderSize > 0) {
+		if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
             display::setColor(style->border_color);
-            if (borderSize == 1 && borderRadius == 0) {
+			if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
                 display::drawRect(x1, y1, x2, y2);
             } else {
                 display::fillRect(x1, y1, x2, y2, style->border_radius);
-                borderRadius = MAX(borderRadius - borderSize, 0);
+				borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
             }
-            x1 += borderSize;
-            y1 += borderSize;
-            x2 -= borderSize;
-            y2 -= borderSize;
-        }
+			x1 += style->border_size_left;
+			y1 += style->border_size_top;
+			x2 -= style->border_size_right;
+			y2 -= style->border_size_bottom;
+		}
 
         uint16_t color =
             active ? (activeStyle ? activeStyle->color : style->background_color) : style->color;

@@ -46,16 +46,9 @@ Install [Visual Studio Community 2017](https://visualstudio.microsoft.com/downlo
 
 Use git to clone https://github.com/eez-open/modular-psu-firmware.
 
-Create folder `\path\to\modular-psu-firmware\build\windows'.
+Execute `cmake.bat`.
 
-From command line:
-
-```
-cd \path\to\modular-psu-firmware\build\windows
-cmake ..\..
-```
-
-Visual Studio solution is created in `\path\to\modular-psu-firmware\build\windows'.
+Visual Studio solution is created in `\path\to\modular-psu-firmware\build\win32'.
 
 ### STM32 firmware
 

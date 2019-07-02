@@ -77,13 +77,18 @@ struct Style {
     uint16_t flags;
     uint16_t background_color;
     uint16_t color;
-    uint16_t border_size;
+    uint8_t border_size_top;
+    uint8_t border_size_right;
+    uint8_t border_size_bottom;
+    uint8_t border_size_left;
     uint16_t border_radius;
     uint16_t border_color;
     uint8_t font;
     uint8_t opacity; // 0 - 255
-    uint8_t padding_horizontal;
-    uint8_t padding_vertical;
+    uint8_t padding_top;
+    uint8_t padding_right;
+    uint8_t padding_bottom;
+    uint8_t padding_left;
 };
 
 typedef List Styles;

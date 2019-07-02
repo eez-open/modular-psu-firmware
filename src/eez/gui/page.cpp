@@ -159,7 +159,7 @@ void SelectFromEnumPage::refresh() {
     font::Font font = styleGetFont(itemStyle);
 
     // calculate geometry
-    itemHeight = itemStyle->padding_vertical + font.getHeight() + itemStyle->padding_vertical;
+    itemHeight = itemStyle->padding_left + font.getHeight() + itemStyle->padding_right;
     itemWidth = 0;
 
     int i;
@@ -174,17 +174,17 @@ void SelectFromEnumPage::refresh() {
         }
     }
 
-    itemWidth = itemStyle->padding_horizontal + itemWidth + itemStyle->padding_horizontal;
+    itemWidth = itemStyle->padding_left + itemWidth + itemStyle->padding_right;
 
     numItems = i;
 
-    width = containerStyle->padding_horizontal + itemWidth + containerStyle->padding_horizontal;
+    width = containerStyle->padding_left + itemWidth + containerStyle->padding_right;
     if (width > display::getDisplayWidth()) {
         width = display::getDisplayWidth();
     }
 
     height =
-        containerStyle->padding_vertical + numItems * itemHeight + containerStyle->padding_vertical;
+        containerStyle->padding_top + numItems * itemHeight + containerStyle->padding_bottom;
     if (height > display::getDisplayHeight()) {
         height = display::getDisplayHeight();
     }
@@ -238,8 +238,8 @@ void SelectFromEnumPage::selectEnumItem() {
 void SelectFromEnumPage::getItemPosition(int itemIndex, int &xItem, int &yItem) {
     const Style *containerStyle = getSelectFromEnumContainerStyle();
 
-    xItem = x + containerStyle->padding_horizontal;
-    yItem = y + containerStyle->padding_vertical + itemIndex * itemHeight;
+    xItem = x + containerStyle->padding_left;
+    yItem = y + containerStyle->padding_top + itemIndex * itemHeight;
 }
 
 void SelectFromEnumPage::getItemLabel(int itemIndex, char *text, int count) {
