@@ -49,21 +49,21 @@ void ListWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor
         OBJ_OFFSET childWidgetOffset = listWidget->item_widget;
 
         if (listWidget->listType == LIST_TYPE_VERTICAL) {
-            DECL_WIDGET(childWidget, childWidgetOffset);
             if (yOffset < widget->h) {
                 enumWidget(childWidgetOffset, x + xOffset, y + yOffset, cursor, previousState,
                            currentState, callback);
-                yOffset += childWidget->h;
+				DECL_WIDGET(childWidget, childWidgetOffset);
+				yOffset += childWidget->h;
             } else {
                 // TODO: add vertical scroll
                 break;
             }
         } else {
-            DECL_WIDGET(childWidget, childWidgetOffset);
             if (xOffset < widget->w) {
                 enumWidget(childWidgetOffset, x + xOffset, y + yOffset, cursor, previousState,
                            currentState, callback);
-                xOffset += childWidget->w;
+				DECL_WIDGET(childWidget, childWidgetOffset);
+				xOffset += childWidget->w;
             } else {
                 // TODO: add horizontal scroll
                 break;
