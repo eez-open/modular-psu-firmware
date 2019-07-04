@@ -43,19 +43,25 @@ inline OBJ_OFFSET getPageOffset(int pageID) {
     return getListItemOffset(g_document->pages, pageID, sizeof(Widget));
 }
 
-#define DECL_WIDGET_STYLE(var, widget) DECL_STYLE(var, transformStyle(widget))
-#define DECL_STYLE(var, styleID)                                                                   \
-    const Style *var =                                                                             \
-        (styleID) ? (const Style *)((uint8_t *)g_styles + getStyleOffset(styleID)) : nullptr
+#define DECL_WIDGET_STYLE(var, widget) \
+    DECL_STYLE(var, transformStyle(widget))
 
-#define DECL_WIDGET(var, widgetOffset)                                                             \
+#define DECL_STYLE(var, styleID) \
+    const Style *var = (styleID) ? (const Style *)((uint8_t *)g_styles + getStyleOffset(styleID)) : nullptr
+
+#define DECL_WIDGET(var, widgetOffset) \
     const Widget *var = (const Widget *)((uint8_t *)g_document + (widgetOffset))
-#define DECL_WIDGET_SPECIFIC(type, var, widget)                                                    \
+
+#define DECL_WIDGET_SPECIFIC(type, var, widget) \
     const type *var = (const type *)((uint8_t *)g_document + (widget)->specific)
-#define DECL_STRING(var, offset) const char *var = (const char *)((uint8_t *)g_document + (offset))
-#define DECL_BITMAP(var, offset)                                                                   \
+
+#define DECL_STRING(var, offset) \
+    const char *var = (const char *)((uint8_t *)g_document + (offset))
+
+#define DECL_BITMAP(var, offset) \
     const Bitmap *var = (const Bitmap *)((uint8_t *)g_document + (offset))
-#define DECL_STRUCT_WITH_OFFSET(Struct, var, offset)                                               \
+
+#define DECL_STRUCT_WITH_OFFSET(Struct, var, offset) \
     const Struct *var = (const Struct *)((uint8_t *)g_document + (offset))
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -24,8 +24,8 @@ namespace eez {
 namespace gui {
 
 struct ToggleButtonWidget {
-    OBJ_OFFSET text1;
-    OBJ_OFFSET text2;
+    OBJ_OFFSET text1; // OBJ_OFFSET
+    OBJ_OFFSET text2; // OBJ_OFFSET
 };
 
 void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor);

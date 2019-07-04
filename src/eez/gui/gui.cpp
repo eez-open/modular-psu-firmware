@@ -185,14 +185,10 @@ void action_internal_select_enum_item() {
     ((SelectFromEnumPage *)g_appContext->getActivePage())->selectEnumItem();
 }
 
-void action_internal_show_previous_page() {
-    popPage();
-}
-
 static ActionExecFunc g_internalActionExecFunctions[] = {
     0,
     action_internal_select_enum_item,
-    action_internal_show_previous_page,
+    dialogYes
 };
 
 bool isInternalAction(int actionId) {
@@ -255,7 +251,7 @@ static void doUnlockFrontPanel() {
     popPage();
 
     if (psu::persist_conf::lockFrontPanel(false)) {
-        infoMessageP("Front panel is unlocked!");
+        infoMessage("Front panel is unlocked!");
     }
 }
 
@@ -266,7 +262,7 @@ static void checkPasswordToUnlockFrontPanel() {
 
 void lockFrontPanel() {
     if (psu::persist_conf::lockFrontPanel(true)) {
-        infoMessageP("Front panel is locked!");
+        infoMessage("Front panel is locked!");
     }
 }
 
@@ -275,7 +271,7 @@ void unlockFrontPanel() {
         checkPasswordToUnlockFrontPanel();
     } else {
         if (psu::persist_conf::lockFrontPanel(false)) {
-            infoMessageP("Front panel is unlocked!");
+            infoMessage("Front panel is unlocked!");
         }
     }
 }

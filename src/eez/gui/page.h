@@ -32,12 +32,13 @@ class Page {
 
     virtual bool onEncoder(int counter);
     virtual bool onEncoderClicked();
+
+    virtual int getDirty();
 };
 
 class SetPage : public Page {
   public:
     virtual void edit();
-    virtual int getDirty() = 0;
     virtual void set() = 0;
     virtual void discard();
 
@@ -50,14 +51,29 @@ class SetPage : public Page {
 
 class InternalPage : public Page {
   public:
-    virtual void refresh() = 0;
-    virtual bool updatePage() = 0;
-    virtual WidgetCursor findWidget(int x, int y) = 0;
+    virtual void refresh() = 0; // repaint page
+    virtual bool updatePage() = 0; // repaint page if changed, returns true if painted
+	  virtual WidgetCursor findWidget(int x, int y) = 0;
 
     int x;
     int y;
     int width;
     int height;
+
+  protected:
+	Widget widget;
+};
+
+class InfoPage : public InternalPage {
+  public:
+	  InfoPage(const char *message, void (*callback)());
+
+    void refresh();
+    bool updatePage();
+    WidgetCursor findWidget(int x, int y);
+
+  private:
+	  const char *message;
 };
 
 class SelectFromEnumPage : public InternalPage {
@@ -91,8 +107,6 @@ class SelectFromEnumPage : public InternalPage {
     int numItems;
     int itemWidth;
     int itemHeight;
-
-    Widget widget;
 
     bool isDisabled(int i);
 

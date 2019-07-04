@@ -24,7 +24,7 @@ namespace eez {
 namespace gui {
 
 struct MultilineTextWidget {
-    OBJ_OFFSET text;
+    OBJ_OFFSET text; // OBJ_OFFSET
 };
 
 void MultilineTextWidget_draw(const WidgetCursor &widgetCursor);

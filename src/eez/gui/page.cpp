@@ -16,35 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+
 #include <eez/gui/page.h>
 
-#include <string.h>
+#include <eez/util.h>
 
 #include <eez/gui/draw.h>
 #include <eez/gui/gui.h>
+#include <eez/gui/app_context.h>
 #include <eez/modules/mcu/display.h>
 
 using namespace eez::mcu;
 
 namespace eez {
 namespace gui {
-
-////////////////////////////////////////////////////////////////////////////////
-
-const Style *getSelectFromEnumContainerStyle() {
-    DECL_STYLE(style, STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
-    return style;
-}
-
-const Style *getSelectFromEnumItemStyle() {
-    DECL_STYLE(style, STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
-    return style;
-}
-
-const Style *getSelectFromEnumDisabledItemStyle() {
-    DECL_STYLE(style, STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);
-    return style;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -57,6 +43,10 @@ bool Page::onEncoder(int counter) {
 
 bool Page::onEncoderClicked() {
     return false;
+}
+
+int Page::getDirty() {
+    return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,6 +65,69 @@ void SetPage::setValue(float value) {
 
 void SetPage::discard() {
     popPage();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+InfoPage::InfoPage(const char *message_, void (*callback_)()) : message(message_) {
+    g_appContext->m_dialogYesCallback = callback_;
+}
+
+void InfoPage::refresh() {
+    DECL_STYLE(style, STYLE_ID_INFO_ALERT);
+
+    font::Font font = styleGetFont(style);
+
+    int textWidth = display::measureStr(message, -1, font, 0);
+    int textHeight = font.getHeight();
+
+    width = style->border_size_left + style->padding_left + 
+        textWidth + 
+        style->padding_right + style->border_size_right;
+
+    height = style->border_size_top + style->padding_top + 
+        textHeight + 
+        style->padding_bottom + style->border_size_bottom;
+
+	x = g_appContext->x + (g_appContext->width - width) / 2;
+	y = g_appContext->y + (g_appContext->height - height) / 2;
+
+    int x1 = x;
+    int y1 = y;
+    int x2 = x + width - 1;
+    int y2 = y + height - 1;
+
+    int borderRadius = style->border_radius;
+    if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
+        display::setColor(style->border_color);
+        if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
+            display::drawRect(x, y, x2, y2);
+        } else {
+            display::fillRect(x1, y1, x2, y2, style->border_radius);
+			borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
+        }
+        x1 += style->border_size_left;
+        y1 += style->border_size_top;
+        x2 -= style->border_size_right;
+        y2 -= style->border_size_bottom;
+    }
+
+    // draw background
+    display::setColor(style->background_color);
+    display::fillRect(x1, y1, x2, y2, borderRadius);
+
+    // draw text message
+    display::setColor(style->color);
+    display::drawStr(message, -1, x1 + style->padding_left, y1 + style->padding_top, x1, y1, x2, y2, font);
+}
+
+bool InfoPage::updatePage() {
+    return false;
+}
+
+WidgetCursor InfoPage::findWidget(int x, int y) {
+	widget.action = ACTION_ID_INTERNAL_DIALOG_YES;
+	return WidgetCursor(nullptr, 0, &widget, x, y, -1, 0, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,9 +205,9 @@ void SelectFromEnumPage::findPagePosition() {
 }
 
 void SelectFromEnumPage::refresh() {
-    const Style *containerStyle = getSelectFromEnumContainerStyle();
-    const Style *itemStyle = getSelectFromEnumItemStyle();
-    const Style *disabledItemStyle = getSelectFromEnumDisabledItemStyle();
+    DECL_STYLE(containerStyle, STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
+    DECL_STYLE(itemStyle, STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
+    DECL_STYLE(disabledItemStyle, STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);
 
     font::Font font = styleGetFont(itemStyle);
 
@@ -236,7 +289,7 @@ void SelectFromEnumPage::selectEnumItem() {
 }
 
 void SelectFromEnumPage::getItemPosition(int itemIndex, int &xItem, int &yItem) {
-    const Style *containerStyle = getSelectFromEnumContainerStyle();
+    DECL_STYLE(containerStyle, STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
 
     xItem = x + containerStyle->padding_left;
     yItem = y + containerStyle->padding_top + itemIndex * itemHeight;

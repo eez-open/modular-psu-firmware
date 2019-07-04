@@ -41,7 +41,8 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, Lis
     auto savedWidget = widgetCursor.widget;
 
     for (uint32_t index = 0; index < widgets.count; ++index) {
-		widgetCursor.widgetOffset = getListItemOffset(widgets, index, sizeof(Widget));
+		auto widgetOffset = getListItemOffset(widgets, index, sizeof(Widget));
+		widgetCursor.widgetOffset = widgetOffset;
 
 		// TODO optimize this
 		DECL_WIDGET(widget, widgetCursor.widgetOffset);

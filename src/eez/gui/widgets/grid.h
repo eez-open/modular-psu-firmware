@@ -24,7 +24,7 @@ namespace eez {
 namespace gui {
 
 struct GridWidget {
-    OBJ_OFFSET item_widget;
+    OBJ_OFFSET item_widget; // OBJ_OFFSET
 };
 
 void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);

@@ -127,20 +127,8 @@ void longAlertMessage(int alertPageId, data::Value message, data::Value message2
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void infoMessage(data::Value value, void (*ok_callback)()) {
-    alertMessage(PAGE_ID_INFO_ALERT, value, ok_callback);
-}
-
-void infoMessageP(const char *message, void (*ok_callback)()) {
-    alertMessage(PAGE_ID_INFO_ALERT, data::Value(message), ok_callback);
-}
-
-void longInfoMessage(data::Value value1, data::Value value2, void (*ok_callback)()) {
-    longAlertMessage(PAGE_ID_INFO_LONG_ALERT, value1, value2, ok_callback);
-}
-
-void longInfoMessageP(const char *message1, const char *message2, void (*ok_callback)()) {
-    longInfoMessage(data::Value(message1), data::Value(message2), ok_callback);
+void infoMessage(const char *message, void (*callback)()) {
+    pushPage(INTERNAL_PAGE_ID_INFO, new InfoPage(message, callback));
 }
 
 void toastMessageP(const char *message1, const char *message2, const char *message3,

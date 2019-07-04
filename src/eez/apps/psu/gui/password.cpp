@@ -80,7 +80,7 @@ static void onRetypeNewPasswordOk(char *text) {
     }
 
     // success
-    infoMessageP("Password changed!", popPage);
+    infoMessage("Password changed!", popPage);
 }
 
 static void onNewPasswordOk(char *text) {

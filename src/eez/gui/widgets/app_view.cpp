@@ -41,7 +41,14 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
         DECL_WIDGET(page, getPageOffset(appContext->getActivePageId()));
         DECL_WIDGET_STYLE(style, page);
         mcu::display::setColor(style->background_color);
-        mcu::display::fillRect(widgetCursor.x + page->x, widgetCursor.y + page->y, page->x + page->w - 1, page->y + page->h - 1);
+
+		appContext->x = widgetCursor.x + page->x;
+		appContext->y = widgetCursor.y + page->y;
+
+		appContext->width = page->w;
+		appContext->height = page->h;
+
+		mcu::display::fillRect(appContext->x, appContext->y, appContext->x + page->w - 1, appContext->y + page->h - 1);
 
         g_painted = true;
     }

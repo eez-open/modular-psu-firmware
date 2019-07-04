@@ -496,7 +496,7 @@ void ChSettingsListsPage::set() {
 
             profile::saveImmediately();
 
-            infoMessageP("Lists changed!", popPage);
+            infoMessage("Lists changed!", popPage);
         } else {
             errorMessageP("List lengths are not equivalent!");
         }

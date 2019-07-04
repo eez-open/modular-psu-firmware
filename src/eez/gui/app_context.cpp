@@ -63,7 +63,8 @@ void AppContext::stateManagment() {
     // remove toast message after period of time
     uint32_t inactivityPeriod = psu::idle::getGuiAndEncoderInactivityPeriod();
     if (getActivePageId() == PAGE_ID_TOAST3_ALERT ||
-        getActivePageId() == PAGE_ID_ERROR_TOAST_ALERT) {
+        getActivePageId() == PAGE_ID_ERROR_TOAST_ALERT || 
+        getActivePageId() == INTERNAL_PAGE_ID_INFO) {
         if (inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
             dialogOk();
             return;
@@ -97,7 +98,7 @@ bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
 
         if (isFrontPanelLocked()) {
             int activePageId = getActivePageId();
-            if (activePageId == PAGE_ID_INFO_ALERT || activePageId == PAGE_ID_ERROR_ALERT ||
+            if (activePageId == PAGE_ID_ERROR_ALERT ||
                 activePageId == PAGE_ID_KEYPAD ||
                 activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO ||
                 activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {

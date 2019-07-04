@@ -25,8 +25,8 @@ namespace gui {
 
 struct UpDownWidget {
     uint16_t buttonsStyle;
-    OBJ_OFFSET downButtonText;
-    OBJ_OFFSET upButtonText;
+    OBJ_OFFSET downButtonText; // OBJ_OFFSET
+    OBJ_OFFSET upButtonText; // OBJ_OFFSET
 };
 
 void UpDownWidget_draw(const WidgetCursor &widgetCursor);

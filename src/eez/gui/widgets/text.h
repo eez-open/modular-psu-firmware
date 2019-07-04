@@ -28,7 +28,7 @@ struct TextFlags {
 };
 
 struct TextWidget {
-    OBJ_OFFSET text;
+    OBJ_OFFSET text; // OBJ_OFFSET
     TextFlags flags;
 };
 

@@ -73,7 +73,7 @@ void UserProfilesPage::toggleIsAutoRecallLocation() {
 void UserProfilesPage::recall() {
     if (g_selectedProfileLocation > 0 && profile::isValid(g_selectedProfileLocation)) {
         if (profile::recall(g_selectedProfileLocation)) {
-            infoMessageP("Profile parameters loaded");
+            infoMessage("Profile parameters loaded");
         } else {
             errorMessageP("Failed!");
         }
@@ -82,7 +82,7 @@ void UserProfilesPage::recall() {
 
 void UserProfilesPage::onSaveFinish(char *remark, void (*callback)()) {
     if (profile::saveAtLocation(g_selectedProfileLocation, remark)) {
-        infoMessageP("Current parameters saved", callback);
+        infoMessage("Current parameters saved", callback);
     } else {
         errorMessageP("EEPROM save failed!");
     }
@@ -116,7 +116,7 @@ void UserProfilesPage::save() {
 void UserProfilesPage::onDeleteProfileYes() {
     if (g_selectedProfileLocation > 0 && profile::isValid(g_selectedProfileLocation)) {
         if (profile::deleteLocation(g_selectedProfileLocation)) {
-            infoMessageP("Profile deleted");
+            infoMessage("Profile deleted");
         } else {
             errorMessageP("Failed!");
         }
@@ -131,7 +131,7 @@ void UserProfilesPage::deleteProfile() {
 
 void UserProfilesPage::onEditRemarkOk(char *newRemark) {
     if (profile::setName(g_selectedProfileLocation, newRemark, strlen(newRemark))) {
-        infoMessageP("Remark changed", popPage);
+        infoMessage("Remark changed", popPage);
     } else {
         errorMessageP("Failed!", popPage);
     }

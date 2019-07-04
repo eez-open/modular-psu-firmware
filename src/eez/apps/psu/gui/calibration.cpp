@@ -277,7 +277,7 @@ void nextStep() {
 void save() {
     if (calibration::save()) {
         calibration::stop();
-        infoMessageP("Calibration data saved!", popPage);
+        infoMessage("Calibration data saved!", popPage);
     } else {
         errorMessageP("Save failed!");
     }

@@ -70,7 +70,7 @@ struct Bitmap {
 
 struct List {
     uint32_t count;
-    OBJ_OFFSET first;
+    OBJ_OFFSET first; // OBJ_OFFSET
 };
 
 struct Style {
@@ -89,6 +89,10 @@ struct Style {
     uint8_t padding_right;
     uint8_t padding_bottom;
     uint8_t padding_left;
+	uint8_t margin_top;
+	uint8_t margin_right;
+	uint8_t margin_bottom;
+	uint8_t margin_left;
 };
 
 typedef List Styles;
@@ -103,12 +107,11 @@ struct Widget {
     int16_t h;
     uint16_t style;
     uint16_t activeStyle;
-    OBJ_OFFSET specific;
+    OBJ_OFFSET specific; // OBJ_OFFSET
 };
 
 struct PageWidget {
     List widgets;
-    uint8_t closePageIfTouchedOutside;
 };
 
 struct Document {
@@ -116,7 +119,7 @@ struct Document {
 };
 
 struct Theme {
-    OBJ_OFFSET name;
+    OBJ_OFFSET name; // OBJ_OFFSET
     List colors;
 };
 

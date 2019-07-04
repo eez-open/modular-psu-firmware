@@ -173,7 +173,7 @@ void showMainPage() {
 }
 
 void action_show_main_page() {
-	SetPage *page = (SetPage *)getActivePage();
+	Page *page = getActivePage();
 	if (page && page->getDirty()) {
 		areYouSureWithMessage(g_discardMessage, showMainPage);
 	}
@@ -410,7 +410,7 @@ void discard() {
 }
 
 void action_discard() {
-	SetPage *page = (SetPage *)getActivePage();
+	Page *page = getActivePage();
 	if (page && page->getDirty()) {
 		areYouSureWithMessage(g_discardMessage, discard);
 	}
@@ -864,6 +864,7 @@ void action_select_theme() {
 }
 
 void action_test() {
+    infoMessage("Hello, world!");
 }
 
 } // namespace gui

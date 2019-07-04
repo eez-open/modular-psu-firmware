@@ -35,7 +35,12 @@ struct PageOnStack {
 };
 
 class AppContext {
-  public:
+public:
+	int x;
+	int y;
+	int width;
+	int height;
+
     AppContext();
 
     // TODO these should be private

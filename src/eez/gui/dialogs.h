@@ -44,10 +44,7 @@ const char *getTextMessage();
 uint8_t getTextMessageVersion();
 
 void infoMessage(data::Value value, void (*ok_callback)() = 0);
-void infoMessageP(const char *message, void (*ok_callback)() = 0);
-
-void longInfoMessage(data::Value value1, data::Value value2, void (*ok_callback)() = 0);
-void longInfoMessageP(const char *message1, const char *message2, void (*ok_callback)() = 0);
+void infoMessage(const char *message, void (*ok_callback)() = 0);
 
 void toastMessageP(const char *message1, const char *message2, const char *message3,
                    void (*ok_callback)() = 0);

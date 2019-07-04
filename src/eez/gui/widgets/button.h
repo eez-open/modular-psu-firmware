@@ -24,7 +24,7 @@ namespace eez {
 namespace gui {
 
 struct ButtonWidget {
-    OBJ_OFFSET text;
+    OBJ_OFFSET text; // OBJ_OFFSET
     uint16_t enabled;
     uint16_t disabledStyle;
 };
