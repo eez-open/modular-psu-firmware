@@ -25,6 +25,12 @@
 namespace eez {
 namespace gui {
 
+void ToggleButtonWidget_fixPointers(Widget *widget) {
+    ToggleButtonWidget *toggleButtonWidget = (ToggleButtonWidget *)widget->specific;
+    toggleButtonWidget->text1 = (const char *)((uint8_t *)g_document + (uint32_t)toggleButtonWidget->text1);
+    toggleButtonWidget->text2 = (const char *)((uint8_t *)g_document + (uint32_t)toggleButtonWidget->text2);
+}
+
 void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
@@ -38,12 +44,11 @@ void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.enabled != widgetCursor.currentState->flags.enabled;
 
     if (refresh) {
-        DECL_WIDGET_SPECIFIC(ToggleButtonWidget, toggle_button_widget, widget);
-        DECL_STRING(text, widgetCursor.currentState->flags.enabled ? toggle_button_widget->text2
-                                                                   : toggle_button_widget->text1);
-        DECL_WIDGET_STYLE(style, widget);
-        drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                 nullptr, widgetCursor.currentState->flags.active, false, false, nullptr);
+        const ToggleButtonWidget *toggle_button_widget = (const ToggleButtonWidget *)widget->specific;
+        const Style* style = getWidgetStyle(widget);
+        drawText(widgetCursor.currentState->flags.enabled ? toggle_button_widget->text2 : toggle_button_widget->text1, -1, 
+			widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
+            nullptr, widgetCursor.currentState->flags.active, false, false, nullptr);
 
         g_painted = true;
     }

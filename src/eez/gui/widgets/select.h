@@ -24,9 +24,10 @@ namespace eez {
 namespace gui {
 
 struct SelectWidget {
-    List widgets;
+    WidgetList widgets;
 };
 
+void SelectWidget_fixPointers(Widget *widget);
 void SelectWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 } // namespace gui

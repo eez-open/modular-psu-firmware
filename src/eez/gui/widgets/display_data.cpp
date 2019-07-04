@@ -29,13 +29,12 @@ namespace gui {
 
 void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    DECL_WIDGET_SPECIFIC(DisplayDataWidget, display_data_widget, widget);
+    const DisplayDataWidget *display_data_widget = (const DisplayDataWidget *)widget->specific;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
 
-    DECL_STYLE(style, widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle
-                                                               : widget->style);
+	const Style *style = getStyle(widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->style);
 
     widgetCursor.currentState->flags.blinking =
         isBlinkTime() && data::isBlinking(widgetCursor.cursor, widget->data);

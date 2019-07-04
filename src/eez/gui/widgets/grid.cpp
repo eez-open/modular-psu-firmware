@@ -23,6 +23,12 @@
 namespace eez {
 namespace gui {
 
+void GridWidget_fixPointers(Widget *widget) {
+    GridWidget *gridWidget = (GridWidget *)widget->specific;
+	gridWidget->item_widget = (Widget *)((uint8_t *)g_document + (uint32_t)gridWidget->item_widget);
+    Widget_fixPointers(gridWidget->item_widget);
+}
+
 void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
@@ -39,18 +45,14 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
         ++widgetCursor.currentState;
     }
 
-	auto savedWidgetOffset = widgetCursor.widgetOffset;
 	auto savedWidget = widgetCursor.widget;
 
     auto parentWidget = savedWidget;
 
-    DECL_WIDGET_SPECIFIC(GridWidget, gridWidget, widgetCursor.widget);
-    OBJ_OFFSET childWidgetOffset = gridWidget->item_widget;
+    const GridWidget *gridWidget = (const GridWidget *)widgetCursor.widget->specific;
 
-    widgetCursor.widgetOffset = childWidgetOffset;
+	const Widget *childWidget = gridWidget->item_widget;
 
-    // TODO optimize this
-    DECL_WIDGET(childWidget, widgetCursor.widgetOffset);
     widgetCursor.widget = childWidget;
 
 	auto savedX = widgetCursor.x;
@@ -92,7 +94,6 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	widgetCursor.x = savedX;
 	widgetCursor.y = savedY;
 
-	widgetCursor.widgetOffset = savedWidgetOffset;
     widgetCursor.widget = savedWidget;
 
     if (widgetCursor.currentState) {

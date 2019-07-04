@@ -56,8 +56,6 @@ namespace gui {
 #define WIDGET_TYPE_LIST_GRAPH 18
 #define WIDGET_TYPE_APP_VIEW 19
 
-typedef uint32_t OBJ_OFFSET;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Bitmap {
@@ -66,11 +64,6 @@ struct Bitmap {
     int16_t bpp;
     int16_t reserved;
     const uint8_t pixels[1];
-};
-
-struct List {
-    uint32_t count;
-    OBJ_OFFSET first; // OBJ_OFFSET
 };
 
 struct Style {
@@ -95,7 +88,12 @@ struct Style {
 	uint8_t margin_left;
 };
 
-typedef List Styles;
+struct StyleList {
+    uint32_t count;
+    Style *first;
+};
+
+void StyleList_fixPointers(StyleList &styleList);
 
 struct Widget {
     uint8_t type;
@@ -107,25 +105,50 @@ struct Widget {
     int16_t h;
     uint16_t style;
     uint16_t activeStyle;
-    OBJ_OFFSET specific; // OBJ_OFFSET
+    void *specific;
 };
 
+void Widget_fixPointers(Widget *widget);
+
+struct WidgetList {
+    uint32_t count;
+    Widget *first;
+};
+
+void WidgetList_fixPointers(WidgetList &widgetList);
+
 struct PageWidget {
-    List widgets;
+    WidgetList widgets;
 };
 
 struct Document {
-    List pages;
+    WidgetList pages;
 };
+
+struct ColorList {
+    uint32_t count;
+    uint16_t *first;
+};
+
+void ColorList_fixPointers(ColorList &colorList);
 
 struct Theme {
-    OBJ_OFFSET name; // OBJ_OFFSET
-    List colors;
+    const char *name;
+    ColorList colors;
 };
 
+void Theme_fixPointers(Theme *theme);
+
+struct ThemeList {
+    uint32_t count;
+    Theme *first;
+};
+
+void ThemeList_fixPointers(ThemeList &themeList);
+
 struct Colors {
-    List themes;
-    List colors;
+    ThemeList themes;
+    ColorList colors;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +173,6 @@ class AppContext;
 
 struct WidgetCursor {
     AppContext *appContext;
-    OBJ_OFFSET widgetOffset;
     const Widget *widget;
     int16_t x;
     int16_t y;
@@ -159,15 +181,15 @@ struct WidgetCursor {
     WidgetState *currentState;
 
     WidgetCursor() 
-		: appContext(nullptr), widgetOffset(0), widget(nullptr), x(0), y(0),
+		: appContext(nullptr), widget(nullptr), x(0), y(0),
 		previousState(nullptr), currentState(nullptr)
 	{
     }
 
-    WidgetCursor(AppContext *appContext_, OBJ_OFFSET widgetOffset_, const Widget *widget_, int x_, int y_,
+    WidgetCursor(AppContext *appContext_, const Widget *widget_, int x_, int y_,
                  const data::Cursor &cursor_, WidgetState *previousState_,
                  WidgetState *currentState_)
-        : appContext(appContext_), widgetOffset(widgetOffset_), widget(widget_), x(x_), y(y_), cursor(cursor_),
+        : appContext(appContext_), widget(widget_), x(x_), y(y_), cursor(cursor_),
           previousState(previousState_), currentState(currentState_) {
     }
 
@@ -178,8 +200,7 @@ struct WidgetCursor {
     }
 
     bool operator!=(const WidgetCursor &rhs) const {
-        return appContext != rhs.appContext || widget != rhs.widget || x != rhs.x || y != rhs.y ||
-               cursor != rhs.cursor;
+        return appContext != rhs.appContext || widget != rhs.widget || x != rhs.x || y != rhs.y || cursor != rhs.cursor;
     }
 
     bool operator==(const WidgetCursor &rhs) const {

@@ -28,9 +28,10 @@ namespace gui {
 
 struct ListWidget {
     uint8_t listType; // LIST_TYPE_VERTICAL or LIST_TYPE_HORIZONTAL
-    OBJ_OFFSET item_widget; // OBJ_OFFSET
+    Widget *item_widget;
 };
 
+void ListWidget_fixPointers(Widget *widget);
 void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 } // namespace gui

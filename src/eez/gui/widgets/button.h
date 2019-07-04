@@ -24,11 +24,12 @@ namespace eez {
 namespace gui {
 
 struct ButtonWidget {
-    OBJ_OFFSET text; // OBJ_OFFSET
+    const char *text;
     uint16_t enabled;
     uint16_t disabledStyle;
 };
 
+void ButtonWidget_fixPointers(Widget *widget);
 void ButtonWidget_draw(const WidgetCursor &widgetCursor);
 
 } // namespace gui

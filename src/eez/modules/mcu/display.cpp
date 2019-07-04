@@ -49,10 +49,10 @@ uint32_t g_themeColorsCount;
 uint16_t *g_colors;
 
 void onThemeChanged() {
-	Theme* theme = (Theme *)((uint8_t *)g_colorsData + g_colorsData->themes.first + psu::persist_conf::devConf2.selectedThemeIndex * sizeof(Theme));
-	g_themeColors = (uint16_t *)((uint8_t *)g_colorsData + theme->colors.first);
+	Theme* theme = g_colorsData->themes.first + psu::persist_conf::devConf2.selectedThemeIndex;
+	g_themeColors = theme->colors.first;
 	g_themeColorsCount = theme->colors.count;
-	g_colors = (uint16_t *)((uint8_t *)g_colorsData + g_colorsData->colors.first);
+	g_colors = g_colorsData->colors.first;
 }
 
 void onLuminocityChanged() {

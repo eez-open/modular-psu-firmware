@@ -27,9 +27,14 @@
 namespace eez {
 namespace gui {
 
+void ButtonWidget_fixPointers(Widget *widget) {
+    ButtonWidget *buttonWidget = (ButtonWidget *)widget->specific;
+    buttonWidget->text = (const char *)((uint8_t *)g_document + (uint32_t)buttonWidget->text);
+}
+
 void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    DECL_WIDGET_SPECIFIC(ButtonWidget, button_widget, widget);
+    const ButtonWidget *button_widget = (const ButtonWidget *)widget->specific;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.enabled =
@@ -48,9 +53,7 @@ void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         if (widget->data) {
-            DECL_STYLE(style, widgetCursor.currentState->flags.enabled
-                                  ? widget->style
-                                  : button_widget->disabledStyle);
+			const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : button_widget->disabledStyle);
 
             if (widgetCursor.currentState->data.isString()) {
                 drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,
@@ -58,17 +61,13 @@ void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
                          widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr);
             } else {
-                DECL_STRING(text, button_widget->text);
-                drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                drawText(button_widget->text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                          style, nullptr, widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr);
             }
         } else {
-            DECL_STRING(text, button_widget->text);
-            DECL_STYLE(style, widgetCursor.currentState->flags.enabled
-                                  ? widget->style
-                                  : button_widget->disabledStyle);
-            drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+			const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : button_widget->disabledStyle);
+            drawText(button_widget->text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                      style, nullptr, widgetCursor.currentState->flags.active,
                      widgetCursor.currentState->flags.blinking, false, nullptr);
         }

@@ -201,9 +201,9 @@ void ScaleWidget_draw(const WidgetCursor &widgetCursor) {
         float min = data::getMin(widgetCursor.cursor, widget->data).getFloat();
         float max = data::getMax(widgetCursor.cursor, widget->data).getFloat();
 
-        DECL_WIDGET_STYLE(style, widget);
+        const Style* style = getWidgetStyle(widget);
 
-        DECL_WIDGET_SPECIFIC(ScaleWidget, scale_widget, widget);
+        const ScaleWidget *scale_widget = (const ScaleWidget *)widget->specific;
 
         bool vertical = scale_widget->needle_position == SCALE_NEEDLE_POSITION_LEFT ||
                         scale_widget->needle_position == SCALE_NEEDLE_POSITION_RIGHT;

@@ -24,7 +24,7 @@ namespace eez {
 namespace gui {
 
 struct LayoutViewWidgetSpecific {
-    int16_t layout;
+    int16_t layout; // page ID
 };
 
 void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);

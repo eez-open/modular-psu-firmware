@@ -23,6 +23,12 @@
 namespace eez {
 namespace gui {
 
+void ListWidget_fixPointers(Widget *widget) {
+    ListWidget *listWidget = (ListWidget *)widget->specific;
+    listWidget->item_widget = (Widget *)((uint8_t *)g_document + (uint32_t)listWidget->item_widget);
+    Widget_fixPointers(listWidget->item_widget);
+}
+
 void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
@@ -39,18 +45,13 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
         ++widgetCursor.currentState;
     }
 
-	auto savedWidgetOffset = widgetCursor.widgetOffset;
     auto savedWidget = widgetCursor.widget;
 
     auto parentWidget = savedWidget;
 
-    DECL_WIDGET_SPECIFIC(ListWidget, listWidget, widgetCursor.widget);
-    OBJ_OFFSET childWidgetOffset = listWidget->item_widget;
+    const ListWidget *listWidget = (const ListWidget *)widgetCursor.widget->specific;
 
-    widgetCursor.widgetOffset = childWidgetOffset;
-
-    // TODO optimize this
-    DECL_WIDGET(childWidget, widgetCursor.widgetOffset);
+    const Widget *childWidget = listWidget->item_widget;
     widgetCursor.widget = childWidget;
 
 	auto savedX = widgetCursor.x;
@@ -94,7 +95,6 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	widgetCursor.x = savedX;
 	widgetCursor.y = savedY;
 
-	widgetCursor.widgetOffset = savedWidgetOffset;
     widgetCursor.widget = savedWidget;
 
     if (widgetCursor.currentState) {

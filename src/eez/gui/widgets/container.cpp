@@ -23,7 +23,12 @@
 namespace eez {
 namespace gui {
 
-void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, List widgets) {
+void ContainerWidget_fixPointers(Widget *widget) {
+    ContainerWidget *containerWidget = (ContainerWidget *)widget->specific;
+    WidgetList_fixPointers(containerWidget->widgets);
+}
+
+void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const WidgetList &widgets) {
     auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
 
@@ -37,16 +42,10 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, Lis
     if (widgetCursor.currentState)
         ++widgetCursor.currentState;
 
-    auto savedWidgetOffset = widgetCursor.widgetOffset;
     auto savedWidget = widgetCursor.widget;
 
     for (uint32_t index = 0; index < widgets.count; ++index) {
-		auto widgetOffset = getListItemOffset(widgets, index, sizeof(Widget));
-		widgetCursor.widgetOffset = widgetOffset;
-
-		// TODO optimize this
-		DECL_WIDGET(widget, widgetCursor.widgetOffset);
-		widgetCursor.widget = widget;
+		widgetCursor.widget = widgets.first + index;
 
         enumWidget(widgetCursor, callback);
 
@@ -60,7 +59,6 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, Lis
 			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
     }
 
-    widgetCursor.widgetOffset = savedWidgetOffset;
     widgetCursor.widget = savedWidget;
 
     if (widgetCursor.currentState) {
@@ -72,7 +70,7 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, Lis
 }
 
 void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    DECL_WIDGET_SPECIFIC(ContainerWidget, container, widgetCursor.widget);
+    const ContainerWidget *container = (const ContainerWidget *)widgetCursor.widget->specific;
     enumContainer(widgetCursor, callback, container->widgets);
 }
 

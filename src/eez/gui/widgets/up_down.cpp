@@ -34,9 +34,15 @@ enum UpDownWidgetSegment {
 UpDownWidgetSegment g_segment;
 WidgetCursor g_selectedWidget;
 
+void UpDownWidget_fixPointers(Widget *widget) {
+    UpDownWidget *upDownWidget = (UpDownWidget *)widget->specific;
+    upDownWidget->downButtonText = (const char *)((uint8_t *)g_document + (uint32_t)upDownWidget->downButtonText);
+    upDownWidget->upButtonText = (const char *)((uint8_t *)g_document + (uint32_t)upDownWidget->upButtonText);
+}
+
 void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    DECL_WIDGET_SPECIFIC(UpDownWidget, upDownWidget, widget);
+    const UpDownWidget *upDownWidget = (const UpDownWidget *)widget->specific;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
@@ -48,13 +54,12 @@ void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->data != widgetCursor.currentState->data;
 
     if (refresh) {
-        DECL_STRING(downButtonText, upDownWidget->downButtonText);
-        DECL_STYLE(buttonsStyle, upDownWidget->buttonsStyle);
+        const Style *buttonsStyle = getStyle(upDownWidget->buttonsStyle);
 
         font::Font buttonsFont = styleGetFont(buttonsStyle);
         int buttonWidth = buttonsFont.getHeight();
 
-        drawText(downButtonText, -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
+        drawText(upDownWidget->downButtonText, -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
                  buttonsStyle, nullptr,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
@@ -62,13 +67,12 @@ void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
 
         char text[64];
         widgetCursor.currentState->data.toText(text, sizeof(text));
-        DECL_STYLE(style, widget->style);
+        const Style *style = getStyle(widget->style);
         drawText(text, -1, widgetCursor.x + buttonWidth, widgetCursor.y,
                  (int)(widget->w - 2 * buttonWidth), (int)widget->h, style, nullptr, false, false,
                  false, nullptr);
 
-        DECL_STRING(upButtonText, upDownWidget->upButtonText);
-        drawText(upButtonText, -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
+        drawText(upDownWidget->upButtonText, -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
                  buttonWidth, (int)widget->h, buttonsStyle, nullptr,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,

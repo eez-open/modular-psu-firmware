@@ -46,9 +46,8 @@ int calcValuePosInBarGraphWidget(data::Value &value, float min, float max, int d
     return p;
 }
 
-void drawLineInBarGraphWidget(const BarGraphWidget *barGraphWidget, int p, OBJ_OFFSET lineStyle,
-                              int x, int y, int w, int h) {
-    DECL_STYLE(style, lineStyle);
+void drawLineInBarGraphWidget(const BarGraphWidget *barGraphWidget, int p, uint16_t lineStyleID, int x, int y, int w, int h) {
+    const Style *style = getStyle(lineStyleID);
 
     display::setColor(style->color);
     if (barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_LEFT_RIGHT) {
@@ -66,7 +65,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
     bool fullScale = true;
 
     const Widget *widget = widgetCursor.widget;
-    DECL_WIDGET_SPECIFIC(BarGraphWidget, barGraphWidget, widget);
+    const BarGraphWidget *barGraphWidget = (const BarGraphWidget *)widget->specific;
 
     widgetCursor.currentState->size = sizeof(BarGraphWidgetState);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
@@ -125,13 +124,13 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
             }
         }
 
-        DECL_WIDGET_STYLE(style, widget);
+        const Style* style = getWidgetStyle(widget);
 
         Style textStyle;
 
         uint16_t inverseColor;
         if (barGraphWidget->textStyle) {
-            DECL_STYLE(textStyleInner, barGraphWidget->textStyle);
+            const Style *textStyleInner = getStyle(barGraphWidget->textStyle);
             memcpy(&textStyle, textStyleInner, sizeof(Style));
 
             inverseColor = textStyle.background_color;

@@ -25,10 +25,10 @@ namespace eez {
 namespace gui {
 
 void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    DECL_WIDGET_SPECIFIC(LayoutViewWidgetSpecific, layoutViewSpecific, widgetCursor.widget);
+    const LayoutViewWidgetSpecific *layoutViewSpecific = (const LayoutViewWidgetSpecific *)widgetCursor.widget->specific;
 	if (layoutViewSpecific->layout != -1) {
-		DECL_WIDGET(layout, getPageOffset(layoutViewSpecific->layout));
-		DECL_WIDGET_SPECIFIC(PageWidget, layoutSpecific, layout);
+		Widget *layout = g_document->pages.first + layoutViewSpecific->layout;
+		const PageWidget *layoutSpecific = (const PageWidget *)layout->specific;
 		enumContainer(widgetCursor, callback, layoutSpecific->widgets);
 	}
 }

@@ -65,6 +65,30 @@ bool g_isActiveWidget;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+typedef void (*FixWidgetPointersFunction)(Widget *widget);
+static FixWidgetPointersFunction g_fixWidgetPointersFunctions[] = {
+    nullptr,                         // WIDGET_TYPE_NONE
+    ContainerWidget_fixPointers,     // WIDGET_TYPE_CONTAINER
+    ListWidget_fixPointers,          // WIDGET_TYPE_LIST
+    GridWidget_fixPointers,          // WIDGET_TYPE_GRID
+    SelectWidget_fixPointers,        // WIDGET_TYPE_SELECT
+    nullptr,                         // WIDGET_TYPE_DISPLAY_DATA
+    TextWidget_fixPointers,          // WIDGET_TYPE_TEXT
+    MultilineTextWidget_fixPointers, // WIDGET_TYPE_MULTILINE_TEXT
+    nullptr,                         // WIDGET_TYPE_RECTANGLE
+    nullptr,                         // WIDGET_TYPE_BITMAP
+    ButtonWidget_fixPointers,        // WIDGET_TYPE_BUTTON
+    ToggleButtonWidget_fixPointers,  // WIDGET_TYPE_TOGGLE_BUTTON
+    nullptr,                         // WIDGET_TYPE_BUTTON_GROUP
+    nullptr,                         // WIDGET_TYPE_SCALE
+    nullptr,                         // WIDGET_TYPE_BAR_GRAPH
+    nullptr,                         // WIDGET_TYPE_LAYOUT_VIEW
+    nullptr,                         // WIDGET_TYPE_YT_GRAPH
+    UpDownWidget_fixPointers,        // WIDGET_TYPE_UP_DOWN
+    nullptr,                         // WIDGET_TYPE_LIST_GRAPH
+    nullptr,                         // WIDGET_TYPE_APP_VIEW
+};
+
 typedef void (*EnumFunctionType)(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 static EnumFunctionType g_enumWidgetFunctions[] = {
     nullptr,               // WIDGET_TYPE_NONE
@@ -138,6 +162,15 @@ OnTouchFunctionType g_onTouchFunctions[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void Widget_fixPointers(Widget *widget) {
+    widget->specific = (void *)((uint8_t *)g_document + (uint32_t)widget->specific);
+    if (g_fixWidgetPointersFunctions[widget->type]) {
+        g_fixWidgetPointersFunctions[widget->type](widget);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->size = sizeof(WidgetState);
 
@@ -152,8 +185,8 @@ void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->data != widgetCursor.currentState->data;
 
     if (refresh) {
-        DECL_WIDGET_STYLE(style, widget);
-        DECL_STYLE(activeStyle, widget->activeStyle);
+        const Style* style = getWidgetStyle(widget);
+		const Style* activeStyle = getStyle(widget->activeStyle);
 
         if (activeStyle) {
             drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
@@ -225,33 +258,17 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback)
     		g_foundWidget.appContext = g_appContext;
     	}
     } else {
-		auto savedWidgetOffset = widgetCursor.widgetOffset;
 		auto savedWidget = widgetCursor.widget;
-
-		widgetCursor.widgetOffset = getPageOffset(g_appContext->getActivePageId());
-
-		// TODO optimize this
-		DECL_WIDGET(widget, widgetCursor.widgetOffset);
-		widgetCursor.widget = widget;
-        
+		widgetCursor.widget = g_document->pages.first + g_appContext->getActivePageId();
 		enumWidget(widgetCursor, callback);
-
-		widgetCursor.widgetOffset = savedWidgetOffset;
 		widgetCursor.widget = savedWidget;
     }
 }
 
 void enumWidgets(EnumWidgetsCallback callback) {
 	WidgetCursor widgetCursor;
-
 	widgetCursor.appContext = g_appContext;
-
-	widgetCursor.widgetOffset = getPageOffset(g_appContext->getActivePageId());
-
-	// TODO optimize this
-	DECL_WIDGET(widget, widgetCursor.widgetOffset);
-	widgetCursor.widget = widget;
-
+	widgetCursor.widget = g_document->pages.first + g_appContext->getActivePageId();
 	enumWidget(widgetCursor, callback);
 }
 

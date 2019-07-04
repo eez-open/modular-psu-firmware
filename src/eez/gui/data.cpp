@@ -167,14 +167,6 @@ void SIZE_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
-bool compare_ASSET_OBJ_OFFSET_value(const Value &a, const Value &b) {
-    return a.getUInt32() == b.getUInt32();
-}
-
-void ASSET_OBJ_OFFSET_value_to_text(const Value &value, char *text, int count) {
-    text[0] = 0;
-}
-
 bool compare_POINTER_value(const Value &a, const Value &b) {
     return a.getVoidPointer() == b.getVoidPointer();
 }
@@ -188,16 +180,14 @@ void POINTER_value_to_text(const Value &value, char *text, int count) {
 static CompareValueFunction g_compareBuiltInValueFunctions[] = {
     compare_NONE_value,       compare_INT_value,  compare_FLOAT_value,
     compare_STR_value,        compare_ENUM_value, compare_SCPI_ERROR_value,
-    compare_PERCENTAGE_value, compare_SIZE_value, compare_ASSET_OBJ_OFFSET_value,
-    compare_POINTER_value
+    compare_PERCENTAGE_value, compare_SIZE_value, compare_POINTER_value
 
 };
 
 static ValueToTextFunction g_builtInValueToTextFunctions[] = {
     NONE_value_to_text,       INT_value_to_text,  FLOAT_value_to_text,
     STR_value_to_text,        ENUM_value_to_text, SCPI_ERROR_value_to_text,
-    PERCENTAGE_value_to_text, SIZE_value_to_text, ASSET_OBJ_OFFSET_value_to_text,
-    POINTER_value_to_text
+    PERCENTAGE_value_to_text, SIZE_value_to_text, POINTER_value_to_text
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -544,8 +534,7 @@ void data_slot_module_type(DataOperationEnum operation, Cursor &cursor, Value &v
 
 void data_selected_theme(DataOperationEnum operation, Cursor &cursor, Value &value) {
 	if (operation == data::DATA_OPERATION_GET) {
-		Theme* theme = (Theme *)((uint8_t *)g_colorsData + g_colorsData->themes.first + psu::persist_conf::devConf2.selectedThemeIndex * sizeof(Theme));
-		value = (const char *)((uint8_t *)g_colorsData + theme->name);
+		value = g_colorsData->themes.first[psu::persist_conf::devConf2.selectedThemeIndex].name;
 	}
 }
 

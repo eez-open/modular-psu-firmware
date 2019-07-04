@@ -114,7 +114,7 @@ void ButtonGroupWidget_draw(const WidgetCursor &widgetCursor) {
             ((ButtonGroupWidgetState *)widgetCursor.currentState)->labels;
 
     if (refresh) {
-        DECL_WIDGET_STYLE(style, widget);
+        const Style* style = getWidgetStyle(widget);
         drawButtons(widget, widgetCursor.x, widgetCursor.y, style,
                     widgetCursor.currentState->data.getInt(), labels, count);
 

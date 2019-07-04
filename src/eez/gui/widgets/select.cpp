@@ -26,6 +26,11 @@
 namespace eez {
 namespace gui {
 
+void SelectWidget_fixPointers(Widget *widget) {
+    SelectWidget *selectWidget = (SelectWidget *)widget->specific;
+    WidgetList_fixPointers(selectWidget->widgets);
+}
+
 void SelectWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
@@ -51,23 +56,15 @@ void SelectWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback)
         ++widgetCursor.currentState;
     }
 
-	auto savedWidgetOffset = widgetCursor.widgetOffset;
     auto savedWidget = widgetCursor.widget;
 
-	int index = indexValue.getInt();
-	DECL_WIDGET_SPECIFIC(ContainerWidget, containerWidget, widgetCursor.widget);
+	const ContainerWidget *containerWidget = (const ContainerWidget *)widgetCursor.widget->specific;
 	
-	widgetCursor.widgetOffset = getListItemOffset(containerWidget->widgets, index, sizeof(Widget));
-
-    // TODO optimize this
-    DECL_WIDGET(widget, widgetCursor.widgetOffset);
-    widgetCursor.widget = widget;
+    widgetCursor.widget = containerWidget->widgets.first + indexValue.getInt();
 
     enumWidget(widgetCursor, callback);
 
-	widgetCursor.widgetOffset = savedWidgetOffset;
     widgetCursor.widget = savedWidget;
-
 
     if (widgetCursor.currentState) {
         savedCurrentState->size = sizeof(WidgetState) + widgetCursor.currentState->size;

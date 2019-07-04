@@ -25,10 +25,11 @@ namespace gui {
 
 struct UpDownWidget {
     uint16_t buttonsStyle;
-    OBJ_OFFSET downButtonText; // OBJ_OFFSET
-    OBJ_OFFSET upButtonText; // OBJ_OFFSET
+    const char *downButtonText;
+	const char *upButtonText;
 };
 
+void UpDownWidget_fixPointers(Widget *widget);
 void UpDownWidget_draw(const WidgetCursor &widgetCursor);
 void UpDownWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 

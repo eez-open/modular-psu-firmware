@@ -24,10 +24,11 @@ namespace eez {
 namespace gui {
 
 struct ToggleButtonWidget {
-    OBJ_OFFSET text1; // OBJ_OFFSET
-    OBJ_OFFSET text2; // OBJ_OFFSET
+    const char *text1;
+	const char *text2;
 };
 
+void ToggleButtonWidget_fixPointers(Widget *widget);
 void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor);
 
 } // namespace gui

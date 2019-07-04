@@ -104,10 +104,10 @@ void drawYTGraph(const WidgetCursor &widgetCursor, const Widget *widget, int sta
 
 void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    DECL_WIDGET_SPECIFIC(YTGraphWidget, ytGraphWidget, widget);
-    DECL_WIDGET_STYLE(style, widget);
-    DECL_STYLE(y1Style, ytGraphWidget->y1Style);
-    DECL_STYLE(y2Style, ytGraphWidget->y2Style);
+    YTGraphWidget *ytGraphWidget = (YTGraphWidget *)widget->specific;
+    const Style* style = getWidgetStyle(widget);
+	const Style* y1Style = getStyle(ytGraphWidget->y1Style);
+	const Style* y2Style = getStyle(ytGraphWidget->y2Style);
 
     widgetCursor.currentState->size = sizeof(YTGraphWidgetState);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);

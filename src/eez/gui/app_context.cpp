@@ -112,7 +112,7 @@ bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
         }
 
         if (widget->type == WIDGET_TYPE_BUTTON) {
-            DECL_WIDGET_SPECIFIC(ButtonWidget, buttonWidget, widget);
+            const ButtonWidget *buttonWidget = (const ButtonWidget *)widget->specific;
             if (!data::get(widgetCursor.cursor, buttonWidget->enabled).getInt()) {
                 g_appContext = saved;
                 return false;
@@ -357,15 +357,14 @@ bool AppContext::updatePage(int pageId, bool repaint, WidgetCursor &widgetCursor
         }
         painted = ((InternalPage *)g_appContext->getActivePage())->updatePage();
     } else {
-        OBJ_OFFSET pageOffset = getPageOffset(pageId);
-        DECL_WIDGET(page, pageOffset);
+		Widget *page = g_document->pages.first + pageId;
 
 		auto savedPreviousState = widgetCursor.previousState;
 
         if (repaint) {
             // clear background
 
-            DECL_WIDGET_STYLE(style, page);
+            const Style* style = getWidgetStyle(page);
             mcu::display::setColor(style->background_color);
 
             mcu::display::fillRect(
@@ -381,15 +380,12 @@ bool AppContext::updatePage(int pageId, bool repaint, WidgetCursor &widgetCursor
         bool saved = g_painted;
         g_painted = false;
 
-		auto savedWidgetOffset = widgetCursor.widgetOffset;
 		auto savedWidget = widgetCursor.widget;
 
-        widgetCursor.widgetOffset = pageOffset;
         widgetCursor.widget = page;
 
         enumWidget(widgetCursor, drawWidgetCallback);
 
-		widgetCursor.widgetOffset = savedWidgetOffset;
 		widgetCursor.widget = savedWidget;
 
 		widgetCursor.previousState = savedPreviousState;
@@ -417,8 +413,7 @@ void getPageRect(int pageId, Page *page, int &x, int &y, int &w, int &h) {
 		w = ((InternalPage *)page)->width;
 		h = ((InternalPage *)page)->height;
 	} else {
-		OBJ_OFFSET pageOffset = getPageOffset(pageId);
-		DECL_WIDGET(page, pageOffset);
+		Widget *page = g_document->pages.first + pageId;
 		x = page->x;
 		y = page->y;
 		w = page->w;

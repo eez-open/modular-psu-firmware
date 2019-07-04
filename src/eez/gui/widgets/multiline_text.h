@@ -24,9 +24,10 @@ namespace eez {
 namespace gui {
 
 struct MultilineTextWidget {
-    OBJ_OFFSET text; // OBJ_OFFSET
+    const char *text;
 };
 
+void MultilineTextWidget_fixPointers(Widget *widget);
 void MultilineTextWidget_draw(const WidgetCursor &widgetCursor);
 
 } // namespace gui

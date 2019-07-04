@@ -24,45 +24,18 @@ namespace eez {
 namespace gui {
 
 extern Document *g_document;
-extern Styles *g_styles;
+extern StyleList *g_styles;
 extern uint8_t *g_fontsData;
 extern uint8_t *g_bitmapsData;
 extern Colors *g_colorsData;
 
 void decompressAssets();
 
-inline OBJ_OFFSET getListItemOffset(const List &list, int index, int listItemSize) {
-    return list.first + index * listItemSize;
+inline const Style *getStyle(int styleID) {
+    return g_styles->first + styleID - 1;
 }
 
-inline OBJ_OFFSET getStyleOffset(int styleID) {
-    return getListItemOffset(*g_styles, styleID - 1, sizeof(Style));
-}
-
-inline OBJ_OFFSET getPageOffset(int pageID) {
-    return getListItemOffset(g_document->pages, pageID, sizeof(Widget));
-}
-
-#define DECL_WIDGET_STYLE(var, widget) \
-    DECL_STYLE(var, transformStyle(widget))
-
-#define DECL_STYLE(var, styleID) \
-    const Style *var = (styleID) ? (const Style *)((uint8_t *)g_styles + getStyleOffset(styleID)) : nullptr
-
-#define DECL_WIDGET(var, widgetOffset) \
-    const Widget *var = (const Widget *)((uint8_t *)g_document + (widgetOffset))
-
-#define DECL_WIDGET_SPECIFIC(type, var, widget) \
-    const type *var = (const type *)((uint8_t *)g_document + (widget)->specific)
-
-#define DECL_STRING(var, offset) \
-    const char *var = (const char *)((uint8_t *)g_document + (offset))
-
-#define DECL_BITMAP(var, offset) \
-    const Bitmap *var = (const Bitmap *)((uint8_t *)g_document + (offset))
-
-#define DECL_STRUCT_WITH_OFFSET(Struct, var, offset) \
-    const Struct *var = (const Struct *)((uint8_t *)g_document + (offset))
+const Style *getWidgetStyle(const Widget *widget);
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -26,6 +26,11 @@
 namespace eez {
 namespace gui {
 
+void MultilineTextWidget_fixPointers(Widget *widget) {
+    MultilineTextWidget *multilineTextWidget = (MultilineTextWidget *)widget->specific;
+    multilineTextWidget->text = (const char *)((uint8_t *)g_document + (uint32_t)multilineTextWidget->text);
+}
+
 void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
@@ -39,7 +44,7 @@ void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->data != widgetCursor.currentState->data;
 
     if (refresh) {
-        DECL_WIDGET_STYLE(style, widget);
+        const Style* style = getWidgetStyle(widget);
 
         if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
@@ -54,9 +59,8 @@ void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
                                   widgetCursor.currentState->flags.active);
             }
         } else {
-            DECL_WIDGET_SPECIFIC(MultilineTextWidget, display_string_widget, widget);
-            DECL_STRING(text, display_string_widget->text);
-            drawMultilineText(text, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            const MultilineTextWidget *display_string_widget = (const MultilineTextWidget *)widget->specific;
+            drawMultilineText(display_string_widget->text, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                               style, nullptr, widgetCursor.currentState->flags.active);
         }
 

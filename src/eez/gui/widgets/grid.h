@@ -24,9 +24,10 @@ namespace eez {
 namespace gui {
 
 struct GridWidget {
-    OBJ_OFFSET item_widget; // OBJ_OFFSET
+    Widget *item_widget;
 };
 
+void GridWidget_fixPointers(Widget *widget);
 void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 } // namespace gui

@@ -172,9 +172,8 @@ void Keypad::appendChar(char c) {
 }
 
 void Keypad::key() {
-    DECL_WIDGET_SPECIFIC(TextWidget, textWidget, getFoundWidgetAtDown().widget);
-    DECL_STRING(text, textWidget->text);
-    key(text[0]);
+    const TextWidget *textWidget = (const TextWidget *)getFoundWidgetAtDown().widget->specific;
+    key(textWidget->text[0]);
 }
 
 void Keypad::key(char ch) {

@@ -25,9 +25,14 @@
 namespace eez {
 namespace gui {
 
+void TextWidget_fixPointers(Widget *widget) {
+    TextWidget *textWidget = (TextWidget *)widget->specific;
+    textWidget->text = (const char *)((uint8_t *)g_document + (uint32_t)textWidget->text);
+}
+
 void TextWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    DECL_WIDGET_STYLE(style, widget);
+    const Style* style = getWidgetStyle(widget);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.blinking = isBlinkTime() && styleIsBlink(style);
@@ -42,8 +47,8 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->backgroundColor != widgetCursor.currentState->backgroundColor;
 
     if (refresh) {
-        DECL_STYLE(activeStyle, widget->activeStyle);
-        DECL_WIDGET_SPECIFIC(TextWidget, display_string_widget, widget);
+        const Style *activeStyle = getStyle(widget->activeStyle);
+        const TextWidget *display_string_widget = (const TextWidget *)widget->specific;
 
         if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
@@ -61,8 +66,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                          display_string_widget->flags.ignoreLuminosity, nullptr);
             }
         } else {
-            DECL_STRING(text, display_string_widget->text);
-            drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            drawText(display_string_widget->text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                      style, activeStyle, widgetCursor.currentState->flags.active,
                      widgetCursor.currentState->flags.blinking,
                      display_string_widget->flags.ignoreLuminosity, nullptr);

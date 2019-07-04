@@ -34,8 +34,8 @@ void RectangleWidget_draw(const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         const Widget *widget = widgetCursor.widget;
-        DECL_WIDGET_SPECIFIC(RectangleWidget, rectangle_widget, widget);
-        DECL_WIDGET_STYLE(style, widget);
+        const RectangleWidget *rectangle_widget = (const RectangleWidget *)widget->specific;
+        const Style* style = getWidgetStyle(widget);
         drawRectangle(
             widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, nullptr,
             rectangle_widget->flags.invertColors ? !widgetCursor.currentState->flags.active

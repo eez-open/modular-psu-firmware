@@ -37,8 +37,8 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
     if (refresh) {
-        DECL_WIDGET_SPECIFIC(BitmapWidget, display_bitmap_widget, widget);
-        DECL_WIDGET_STYLE(style, widget);
+        BitmapWidget *display_bitmap_widget = (BitmapWidget *)widget->specific;
+        const Style* style = getWidgetStyle(widget);
 
         Bitmap *bitmap = nullptr;
 
@@ -73,7 +73,7 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
         }
 
         if (bitmap) {
-            DECL_STYLE(activeStyle, widget->activeStyle);
+			const Style *activeStyle = getStyle(widget->activeStyle);
 
             drawBitmap((uint16_t *)&bitmap->pixels[0], bitmap->bpp, bitmap->w, bitmap->h,
                        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,

@@ -24,11 +24,11 @@ namespace eez {
 namespace gui {
 
 struct ContainerWidget {
-    List widgets;
+    WidgetList widgets;
 };
 
-void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, List widgets);
-
+void ContainerWidget_fixPointers(Widget *widget);
+void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const WidgetList &widgets);
 void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 } // namespace gui

@@ -33,11 +33,11 @@ namespace gui {
 
 void ListGraphWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    DECL_WIDGET_SPECIFIC(ListGraphWidget, listGraphWidget, widget);
-    DECL_WIDGET_STYLE(style, widget);
-    DECL_STYLE(y1Style, listGraphWidget->y1Style);
-    DECL_STYLE(y2Style, listGraphWidget->y2Style);
-    DECL_STYLE(cursorStyle, listGraphWidget->cursorStyle);
+    const ListGraphWidget *listGraphWidget = (const ListGraphWidget *)widget->specific;
+    const Style* style = getWidgetStyle(widget);
+	const Style* y1Style = getStyle(listGraphWidget->y1Style);
+	const Style* y2Style = getStyle(listGraphWidget->y2Style);
+	const Style* cursorStyle = getStyle(listGraphWidget->cursorStyle);
 
     widgetCursor.currentState->size = sizeof(ListGraphWidgetState);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
@@ -189,7 +189,7 @@ void ListGraphWidget_draw(const WidgetCursor &widgetCursor) {
 void ListGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
         const Widget *widget = widgetCursor.widget;
-        DECL_WIDGET_SPECIFIC(ListGraphWidget, listGraphWidget, widget);
+        const ListGraphWidget *listGraphWidget = (const ListGraphWidget *)widget->specific;
 
         if (touchEvent.x < widgetCursor.x || touchEvent.x >= widgetCursor.x + (int)widget->w) {
             return;

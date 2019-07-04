@@ -74,7 +74,7 @@ InfoPage::InfoPage(const char *message_, void (*callback_)()) : message(message_
 }
 
 void InfoPage::refresh() {
-    DECL_STYLE(style, STYLE_ID_INFO_ALERT);
+    const Style *style = getStyle(STYLE_ID_INFO_ALERT);
 
     font::Font font = styleGetFont(style);
 
@@ -127,7 +127,7 @@ bool InfoPage::updatePage() {
 
 WidgetCursor InfoPage::findWidget(int x, int y) {
 	widget.action = ACTION_ID_INTERNAL_DIALOG_YES;
-	return WidgetCursor(nullptr, 0, &widget, x, y, -1, 0, 0);
+	return WidgetCursor(nullptr, &widget, x, y, -1, 0, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -205,9 +205,9 @@ void SelectFromEnumPage::findPagePosition() {
 }
 
 void SelectFromEnumPage::refresh() {
-    DECL_STYLE(containerStyle, STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
-    DECL_STYLE(itemStyle, STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
-    DECL_STYLE(disabledItemStyle, STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);
+    const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
+	const Style *itemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
+	const Style *disabledItemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);
 
     font::Font font = styleGetFont(itemStyle);
 
@@ -275,7 +275,7 @@ WidgetCursor SelectFromEnumPage::findWidget(int x, int y) {
         		widget.action = ACTION_ID_INTERNAL_SELECT_ENUM_ITEM;
         		widget.data = (uint16_t)i;
         		// TODO can't leave nullptr here
-        		return WidgetCursor(nullptr, 0, &widget, x, y, -1, 0, 0);
+        		return WidgetCursor(nullptr, &widget, x, y, -1, 0, 0);
         	}
         }
     }
@@ -289,7 +289,7 @@ void SelectFromEnumPage::selectEnumItem() {
 }
 
 void SelectFromEnumPage::getItemPosition(int itemIndex, int &xItem, int &yItem) {
-    DECL_STYLE(containerStyle, STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
+    const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
 
     xItem = x + containerStyle->padding_left;
     yItem = y + containerStyle->padding_top + itemIndex * itemHeight;

@@ -28,10 +28,11 @@ struct TextFlags {
 };
 
 struct TextWidget {
-    OBJ_OFFSET text; // OBJ_OFFSET
+    const char *text;
     TextFlags flags;
 };
 
+void TextWidget_fixPointers(Widget *widget);
 void TextWidget_draw(const WidgetCursor &widgetCursor);
 
 } // namespace gui
