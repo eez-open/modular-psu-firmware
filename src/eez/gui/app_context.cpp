@@ -346,8 +346,7 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool AppContext::updatePage(int pageId, bool repaint, int x, int y, data::Cursor &cursor,
-                            WidgetState *previousState, WidgetState *currentState) {
+bool AppContext::updatePage(int pageId, bool repaint, WidgetCursor &widgetCursor) {
 
     bool painted;
 
@@ -358,25 +357,41 @@ bool AppContext::updatePage(int pageId, bool repaint, int x, int y, data::Cursor
         painted = ((InternalPage *)g_appContext->getActivePage())->updatePage();
     } else {
         OBJ_OFFSET pageOffset = getPageOffset(pageId);
+        DECL_WIDGET(page, pageOffset);
+
+		auto savedPreviousState = widgetCursor.previousState;
 
         if (repaint) {
             // clear background
-            DECL_WIDGET(page, pageOffset);
 
             DECL_WIDGET_STYLE(style, page);
             mcu::display::setColor(style->background_color);
 
-            mcu::display::fillRect(x + page->x, y + page->y, x + page->x + page->w - 1,
-                                   y + page->y + page->h - 1);
+            mcu::display::fillRect(
+				widgetCursor.x + page->x,
+				widgetCursor.y + page->y, 
+				widgetCursor.x + page->x + page->w - 1,
+				widgetCursor.y + page->y + page->h - 1);
 
             // if there is no previous state then all content will be refreshed
-            previousState = 0;
+			widgetCursor.previousState = 0;
         }
 
         bool saved = g_painted;
         g_painted = false;
 
-        enumWidget(pageOffset, x, y, cursor, previousState, currentState, drawWidgetCallback);
+		auto savedWidgetOffset = widgetCursor.widgetOffset;
+		auto savedWidget = widgetCursor.widget;
+
+        widgetCursor.widgetOffset = pageOffset;
+        widgetCursor.widget = page;
+
+        enumWidget(widgetCursor, drawWidgetCallback);
+
+		widgetCursor.widgetOffset = savedWidgetOffset;
+		widgetCursor.widget = savedWidget;
+
+		widgetCursor.previousState = savedPreviousState;
 
         painted = g_painted;
         if (!g_painted) {
@@ -410,8 +425,7 @@ void getPageRect(int pageId, Page *page, int &x, int &y, int &w, int &h) {
 	}
 }
 
-void AppContext::updateAppView(int x, int y, data::Cursor &cursor, WidgetState *previousState,
-                               WidgetState *currentState) {
+void AppContext::updateAppView(WidgetCursor &widgetCursor) {
     if (m_activePageId == INTERNAL_PAGE_ID_NONE) {
         return;
     }
@@ -436,21 +450,25 @@ void AppContext::updateAppView(int x, int y, data::Cursor &cursor, WidgetState *
 
     bool repaint = false;
 
+	auto savedPreviousState = widgetCursor.previousState;
+	auto savedCurrentState = widgetCursor.currentState;
+
     for (++i; i < m_pageNavigationStackPointer; i++) {
-        repaint =
-            updatePage(m_pageNavigationStack[i].pageId, m_pageNavigationStack[i].repaint || repaint,
-                       x, y, cursor, previousState, currentState);
+        repaint = updatePage(m_pageNavigationStack[i].pageId, m_pageNavigationStack[i].repaint || repaint, widgetCursor);
         m_pageNavigationStack[i].repaint = false;
 
-        if (previousState) {
-            previousState = nextWidgetState(previousState);
+		// TODO move this to WidgetCursor
+        if (widgetCursor.previousState) {
+			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
         }
-        if (currentState)
-            currentState = nextWidgetState(currentState);
+        if (widgetCursor.currentState)
+			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
     }
 
-    updatePage(m_activePageId, m_repaintActivePage || repaint, x, y, cursor, previousState,
-               currentState);
+	widgetCursor.previousState = savedPreviousState;
+	widgetCursor.currentState = savedCurrentState;
+
+    updatePage(m_activePageId, m_repaintActivePage || repaint, widgetCursor);
     m_repaintActivePage = false;
 }
 

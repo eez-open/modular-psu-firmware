@@ -51,6 +51,8 @@ using namespace eez::psu::gui;
 namespace eez {
 namespace gui {
 
+static const char *g_discardMessage = "All changes will be lost.";
+
 void action_channel_toggle_output() {
     channelToggleOutput();
 }
@@ -163,11 +165,21 @@ void action_stand_by() {
 }
 
 void action_show_previous_page() {
-    popPage();
+	popPage();
+}
+
+void showMainPage() {
+	showPage(PAGE_ID_MAIN);
 }
 
 void action_show_main_page() {
-    showPage(PAGE_ID_MAIN);
+	SetPage *page = (SetPage *)getActivePage();
+	if (page && page->getDirty()) {
+		areYouSureWithMessage(g_discardMessage, showMainPage);
+	}
+	else {
+		showMainPage();
+	}
 }
 
 void action_show_event_queue() {
@@ -181,10 +193,6 @@ void action_show_channel_settings() {
 
 void action_show_sys_settings() {
     showPage(PAGE_ID_SYS_SETTINGS);
-}
-
-void action_show_sys_settings2() {
-    showPage(PAGE_ID_SYS_SETTINGS2);
 }
 
 void action_show_sys_settings_trigger() {
@@ -397,8 +405,18 @@ void action_set() {
     ((SetPage *)getActivePage())->set();
 }
 
+void discard() {
+	((SetPage *)getActivePage())->discard();
+}
+
 void action_discard() {
-    ((SetPage *)getActivePage())->discard();
+	SetPage *page = (SetPage *)getActivePage();
+	if (page && page->getDirty()) {
+		areYouSureWithMessage(g_discardMessage, discard);
+	}
+	else {
+		discard();
+	}
 }
 
 void action_edit_field() {
@@ -843,7 +861,9 @@ void onSetSelectedThemeIndex(uint8_t value) {
 
 void action_select_theme() {
     pushSelectFromEnumPage(themesEnumDefinition, persist_conf::devConf2.selectedThemeIndex, NULL, onSetSelectedThemeIndex);
+}
 
+void action_test() {
 }
 
 } // namespace gui

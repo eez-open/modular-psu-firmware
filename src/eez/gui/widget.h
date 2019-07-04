@@ -147,6 +147,7 @@ class AppContext;
 
 struct WidgetCursor {
     AppContext *appContext;
+    OBJ_OFFSET widgetOffset;
     const Widget *widget;
     int16_t x;
     int16_t y;
@@ -154,13 +155,16 @@ struct WidgetCursor {
     WidgetState *previousState;
     WidgetState *currentState;
 
-    WidgetCursor() : widget(nullptr) {
+    WidgetCursor() 
+		: appContext(nullptr), widgetOffset(0), widget(nullptr), x(0), y(0),
+		previousState(nullptr), currentState(nullptr)
+	{
     }
 
-    WidgetCursor(AppContext *appContext_, const Widget *widget_, int x_, int y_,
+    WidgetCursor(AppContext *appContext_, OBJ_OFFSET widgetOffset_, const Widget *widget_, int x_, int y_,
                  const data::Cursor &cursor_, WidgetState *previousState_,
                  WidgetState *currentState_)
-        : appContext(appContext_), widget(widget_), x(x_), y(y_), cursor(cursor_),
+        : appContext(appContext_), widgetOffset(widgetOffset_), widget(widget_), x(x_), y(y_), cursor(cursor_),
           previousState(previousState_), currentState(currentState_) {
     }
 
@@ -188,11 +192,7 @@ struct WidgetCursor {
 
 typedef void (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
 void enumWidgets(EnumWidgetsCallback callback);
-void enumWidgets(WidgetState *previousState, WidgetState *currentState,
-                 EnumWidgetsCallback callback);
-void enumWidgets(int16_t x, int16_t y, data::Cursor &cursor,
-                WidgetState *previousState, WidgetState *currentState,
-                EnumWidgetsCallback callback);                
+void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);                
 
 WidgetCursor findWidget(int16_t x, int16_t y);
 
@@ -201,9 +201,7 @@ typedef void (*OnTouchFunctionType)(const WidgetCursor &widgetCursor, Event &tou
 extern OnTouchFunctionType g_onTouchFunctions[];
 
 WidgetState *nextWidgetState(WidgetState *p);
-void enumWidget(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                WidgetState *previousState, WidgetState *currentState,
-                EnumWidgetsCallback callback);
+void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 extern bool g_painted;
 extern bool g_isActiveWidget;

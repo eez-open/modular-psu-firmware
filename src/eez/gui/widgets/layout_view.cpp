@@ -24,15 +24,12 @@
 namespace eez {
 namespace gui {
 
-void LayoutViewWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                           WidgetState *previousState, WidgetState *currentState,
-                           EnumWidgetsCallback callback) {
-    DECL_WIDGET(widget, widgetOffset);
-    DECL_WIDGET_SPECIFIC(LayoutViewWidgetSpecific, layoutViewSpecific, widget);
+void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+    DECL_WIDGET_SPECIFIC(LayoutViewWidgetSpecific, layoutViewSpecific, widgetCursor.widget);
 	if (layoutViewSpecific->layout != -1) {
 		DECL_WIDGET(layout, getPageOffset(layoutViewSpecific->layout));
 		DECL_WIDGET_SPECIFIC(PageWidget, layoutSpecific, layout);
-		enumContainer(x, y, cursor, previousState, currentState, callback, layoutSpecific->widgets);
+		enumContainer(widgetCursor, callback, layoutSpecific->widgets);
 	}
 }
 

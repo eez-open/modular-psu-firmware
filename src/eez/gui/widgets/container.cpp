@@ -23,45 +23,56 @@
 namespace eez {
 namespace gui {
 
-void enumContainer(int16_t x, int16_t y, data::Cursor &cursor, WidgetState *previousState,
-                   WidgetState *currentState, EnumWidgetsCallback callback, List widgets) {
-    WidgetState *savedCurrentState = currentState;
+void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, List widgets) {
+    auto savedCurrentState = widgetCursor.currentState;
+	auto savedPreviousState = widgetCursor.previousState;
 
     WidgetState *endOfContainerInPreviousState = 0;
-    if (previousState)
-        endOfContainerInPreviousState = nextWidgetState(previousState);
+    if (widgetCursor.previousState)
+        endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
 
     // move to the first child widget state
-    if (previousState)
-        ++previousState;
-    if (currentState)
-        ++currentState;
+    if (widgetCursor.previousState)
+        ++widgetCursor.previousState;
+    if (widgetCursor.currentState)
+        ++widgetCursor.currentState;
+
+    auto savedWidgetOffset = widgetCursor.widgetOffset;
+    auto savedWidget = widgetCursor.widget;
 
     for (uint32_t index = 0; index < widgets.count; ++index) {
-        OBJ_OFFSET childWidgetOffset = getListItemOffset(widgets, index, sizeof(Widget));
-        enumWidget(childWidgetOffset, x, y, cursor, previousState, currentState, callback);
+		widgetCursor.widgetOffset = getListItemOffset(widgets, index, sizeof(Widget));
 
-        if (previousState) {
-            previousState = nextWidgetState(previousState);
-            if (previousState >= endOfContainerInPreviousState)
-                previousState = 0;
+		// TODO optimize this
+		DECL_WIDGET(widget, widgetCursor.widgetOffset);
+		widgetCursor.widget = widget;
+
+        enumWidget(widgetCursor, callback);
+
+        if (widgetCursor.previousState) {
+			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
+            if (widgetCursor.previousState >= endOfContainerInPreviousState)
+				widgetCursor.previousState = 0;
         }
 
-        if (currentState)
-            currentState = nextWidgetState(currentState);
+        if (widgetCursor.currentState)
+			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
     }
 
-    if (currentState) {
-        savedCurrentState->size = ((uint8_t *)currentState) - ((uint8_t *)savedCurrentState);
+    widgetCursor.widgetOffset = savedWidgetOffset;
+    widgetCursor.widget = savedWidget;
+
+    if (widgetCursor.currentState) {
+        savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
     }
+
+	widgetCursor.currentState = savedCurrentState;
+	widgetCursor.previousState = savedPreviousState;
 }
 
-void ContainerWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                          WidgetState *previousState, WidgetState *currentState,
-                          EnumWidgetsCallback callback) {
-    DECL_WIDGET(widget, widgetOffset);
-    DECL_WIDGET_SPECIFIC(ContainerWidget, container, widget);
-    enumContainer(x, y, cursor, previousState, currentState, callback, container->widgets);
+void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+    DECL_WIDGET_SPECIFIC(ContainerWidget, container, widgetCursor.widget);
+    enumContainer(widgetCursor, callback, container->widgets);
 }
 
 } // namespace gui

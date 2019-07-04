@@ -179,10 +179,10 @@ struct Tune {
 };
 
 Tune g_tunes[4] = {
-	{ clickTune, 1.3 },
-	{ beepTune, 1.3 },
-	{ powerUpTune, 1.3 },
-	{ powerDownTune, 0.75 },
+	{ clickTune, 1.3f },
+	{ beepTune, 1.3f },
+	{ powerUpTune, 1.3f },
+	{ powerDownTune, 0.75f },
 };
 
 int g_iNextTuneToPlay = -1;

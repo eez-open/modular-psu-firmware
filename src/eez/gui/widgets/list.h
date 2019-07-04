@@ -31,9 +31,7 @@ struct ListWidget {
     OBJ_OFFSET item_widget;
 };
 
-void ListWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                     WidgetState *previousState, WidgetState *currentState,
-                     EnumWidgetsCallback callback);
+void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 } // namespace gui
 } // namespace eez

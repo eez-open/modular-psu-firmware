@@ -65,9 +65,7 @@ bool g_isActiveWidget;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-typedef void (*EnumFunctionType)(OBJ_OFFSET widgetOffset, int16_t x, int16_t y,
-                                 data::Cursor &cursor, WidgetState *previousState,
-                                 WidgetState *currentState, EnumWidgetsCallback callback);
+typedef void (*EnumFunctionType)(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 static EnumFunctionType g_enumWidgetFunctions[] = {
     nullptr,               // WIDGET_TYPE_NONE
     ContainerWidget_enum,  // WIDGET_TYPE_CONTAINER
@@ -193,15 +191,9 @@ WidgetState *nextWidgetState(WidgetState *p) {
     return (WidgetState *)(((uint8_t *)p) + p->size);
 }
 
-void enumWidget(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                WidgetState *previousState, WidgetState *currentState,
-                EnumWidgetsCallback callback) {
-    DECL_WIDGET(widget, widgetOffset);
-
-    x += widget->x;
-    y += widget->y;
-
-    WidgetCursor widgetCursor(g_appContext, widget, x, y, cursor, previousState, currentState);
+void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+	widgetCursor.x += widgetCursor.widget->x;
+	widgetCursor.y += widgetCursor.widget->y;
 
     bool savedIsActiveWidget;
     if (callback == drawWidgetCallback) {
@@ -211,21 +203,21 @@ void enumWidget(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cur
 
     callback(widgetCursor);
 
-    if (g_enumWidgetFunctions[widget->type]) {
-        g_enumWidgetFunctions[widget->type](widgetOffset, x, y, cursor, previousState, currentState,
-                                            callback);
+    if (g_enumWidgetFunctions[widgetCursor.widget->type]) {
+        g_enumWidgetFunctions[widgetCursor.widget->type](widgetCursor, callback);
     }
 
     if (callback == drawWidgetCallback) {
         g_isActiveWidget = savedIsActiveWidget;
     }
+
+	widgetCursor.x -= widgetCursor.widget->x;
+	widgetCursor.y -= widgetCursor.widget->y;
 }
 
 void findWidgetStep(const WidgetCursor &widgetCursor);
 
-void enumWidgets(int16_t x, int16_t y, data::Cursor &cursor,
-                WidgetState *previousState, WidgetState *currentState,
-                EnumWidgetsCallback callback) 
+void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) 
 {
     if (g_appContext->isActivePageInternal()) {
     	if (callback == findWidgetStep) {
@@ -233,20 +225,34 @@ void enumWidgets(int16_t x, int16_t y, data::Cursor &cursor,
     		g_foundWidget.appContext = g_appContext;
     	}
     } else {
-        enumWidget(getPageOffset(g_appContext->getActivePageId()), x, y, cursor, previousState,
-                    currentState, callback);
+		auto savedWidgetOffset = widgetCursor.widgetOffset;
+		auto savedWidget = widgetCursor.widget;
+
+		widgetCursor.widgetOffset = getPageOffset(g_appContext->getActivePageId());
+
+		// TODO optimize this
+		DECL_WIDGET(widget, widgetCursor.widgetOffset);
+		widgetCursor.widget = widget;
+        
+		enumWidget(widgetCursor, callback);
+
+		widgetCursor.widgetOffset = savedWidgetOffset;
+		widgetCursor.widget = savedWidget;
     }
 }
 
-void enumWidgets(WidgetState *previousState, WidgetState *currentState,
-                 EnumWidgetsCallback callback) {
-    data::Cursor cursor;
-    enumWidget(getPageOffset(g_appContext->getActivePageId()), 0, 0, cursor, previousState,
-               currentState, callback);
-}
-
 void enumWidgets(EnumWidgetsCallback callback) {
-    enumWidgets(0, 0, callback);
+	WidgetCursor widgetCursor;
+
+	widgetCursor.appContext = g_appContext;
+
+	widgetCursor.widgetOffset = getPageOffset(g_appContext->getActivePageId());
+
+	// TODO optimize this
+	DECL_WIDGET(widget, widgetCursor.widgetOffset);
+	widgetCursor.widget = widget;
+
+	enumWidget(widgetCursor, callback);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

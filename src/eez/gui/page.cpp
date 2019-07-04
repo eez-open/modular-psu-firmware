@@ -222,7 +222,7 @@ WidgetCursor SelectFromEnumPage::findWidget(int x, int y) {
         		widget.action = ACTION_ID_INTERNAL_SELECT_ENUM_ITEM;
         		widget.data = (uint16_t)i;
         		// TODO can't leave nullptr here
-        		return WidgetCursor(nullptr, &widget, x, y, -1, 0, 0);
+        		return WidgetCursor(nullptr, 0, &widget, x, y, -1, 0, 0);
         	}
         }
     }

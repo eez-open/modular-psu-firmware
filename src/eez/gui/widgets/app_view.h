@@ -25,9 +25,7 @@ namespace gui {
 
 void AppViewWidget_draw(const WidgetCursor &widgetCursor);
 
-void AppViewWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                        WidgetState *previousState, WidgetState *currentState,
-                        EnumWidgetsCallback callback);
+void AppViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 } // namespace gui
 } // namespace eez

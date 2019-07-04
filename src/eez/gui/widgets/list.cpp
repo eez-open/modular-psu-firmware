@@ -23,68 +23,88 @@
 namespace eez {
 namespace gui {
 
-void ListWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                     WidgetState *previousState, WidgetState *currentState,
-                     EnumWidgetsCallback callback) {
-    DECL_WIDGET(widget, widgetOffset);
-    WidgetState *savedCurrentState = currentState;
-
+void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+	auto savedCurrentState = widgetCursor.currentState;
+	auto savedPreviousState = widgetCursor.previousState;
+	
     WidgetState *endOfContainerInPreviousState = 0;
-    if (previousState)
-        endOfContainerInPreviousState = nextWidgetState(previousState);
+    if (widgetCursor.previousState)
+        endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
 
     // move to the first child widget state
-    if (previousState)
-        ++previousState;
-    if (currentState)
-        ++currentState;
+    if (widgetCursor.previousState) {
+        ++widgetCursor.previousState;
+    }
+    if (widgetCursor.currentState) {
+        ++widgetCursor.currentState;
+    }
 
-    int xOffset = 0;
-    int yOffset = 0;
-    int count = data::count(widget->data);
+	auto savedWidgetOffset = widgetCursor.widgetOffset;
+    auto savedWidget = widgetCursor.widget;
+
+    auto parentWidget = savedWidget;
+
+    DECL_WIDGET_SPECIFIC(ListWidget, listWidget, widgetCursor.widget);
+    OBJ_OFFSET childWidgetOffset = listWidget->item_widget;
+
+    widgetCursor.widgetOffset = childWidgetOffset;
+
+    // TODO optimize this
+    DECL_WIDGET(childWidget, widgetCursor.widgetOffset);
+    widgetCursor.widget = childWidget;
+
+	auto savedX = widgetCursor.x;
+	auto savedY = widgetCursor.y;
+
+    int offset = 0;
+    int count = data::count(parentWidget->data);
     for (int index = 0; index < count; ++index) {
-        data::select(cursor, widget->data, index);
-
-        DECL_WIDGET_SPECIFIC(ListWidget, listWidget, widget);
-        OBJ_OFFSET childWidgetOffset = listWidget->item_widget;
+        data::select(widgetCursor.cursor, parentWidget->data, index);
 
         if (listWidget->listType == LIST_TYPE_VERTICAL) {
-            if (yOffset < widget->h) {
-                enumWidget(childWidgetOffset, x + xOffset, y + yOffset, cursor, previousState,
-                           currentState, callback);
-				DECL_WIDGET(childWidget, childWidgetOffset);
-				yOffset += childWidget->h;
+            if (offset < parentWidget->h) {
+				widgetCursor.y = savedY + offset;
+                enumWidget(widgetCursor, callback);
+				offset += childWidget->h;
             } else {
                 // TODO: add vertical scroll
                 break;
             }
         } else {
-            if (xOffset < widget->w) {
-                enumWidget(childWidgetOffset, x + xOffset, y + yOffset, cursor, previousState,
-                           currentState, callback);
-				DECL_WIDGET(childWidget, childWidgetOffset);
-				xOffset += childWidget->w;
+            if (offset < parentWidget->w) {
+				widgetCursor.x = savedX + offset;
+				enumWidget(widgetCursor, callback);
+				offset += childWidget->w;
             } else {
                 // TODO: add horizontal scroll
                 break;
             }
         }
 
-        if (previousState) {
-            previousState = nextWidgetState(previousState);
-            if (previousState >= endOfContainerInPreviousState)
-                previousState = 0;
+        if (widgetCursor.previousState) {
+			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
+            if (widgetCursor.previousState >= endOfContainerInPreviousState)
+				widgetCursor.previousState = 0;
         }
 
-        if (currentState)
-            currentState = nextWidgetState(currentState);
+        if (widgetCursor.currentState)
+			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
     }
 
-    if (currentState) {
-        savedCurrentState->size = ((uint8_t *)currentState) - ((uint8_t *)savedCurrentState);
+	widgetCursor.x = savedX;
+	widgetCursor.y = savedY;
+
+	widgetCursor.widgetOffset = savedWidgetOffset;
+    widgetCursor.widget = savedWidget;
+
+    if (widgetCursor.currentState) {
+        savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
     }
 
-    data::select(cursor, widget->data, -1);
+    data::select(widgetCursor.cursor, widgetCursor.widget->data, -1);
+
+	widgetCursor.currentState = savedCurrentState;
+	widgetCursor.previousState = savedPreviousState;
 }
 
 } // namespace gui

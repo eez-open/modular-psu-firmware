@@ -27,12 +27,9 @@ struct ContainerWidget {
     List widgets;
 };
 
-void enumContainer(int16_t x, int16_t y, data::Cursor &cursor, WidgetState *previousState,
-                   WidgetState *currentState, EnumWidgetsCallback callback, List widgets);
+void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, List widgets);
 
-void ContainerWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                          WidgetState *previousState, WidgetState *currentState,
-                          EnumWidgetsCallback callback);
+void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 } // namespace gui
 } // namespace eez

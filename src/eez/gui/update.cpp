@@ -42,8 +42,13 @@ void updateScreen() {
     g_previousState = g_currentState;
     g_currentState = (WidgetState *)(&g_stateBuffer[getCurrentStateBufferIndex() == 0 ? 1 : 0][0]);
 
-    data::Cursor cursor;
-    g_appContext->updateAppView(0, 0, cursor, g_previousState, g_currentState);
+	WidgetCursor widgetCursor;
+
+	widgetCursor.appContext = g_appContext;
+	widgetCursor.previousState = g_previousState;
+	widgetCursor.currentState = g_currentState;
+
+    g_appContext->updateAppView(widgetCursor);
 
     // if (g_painted) {
     //     static uint32_t g_paintedCounter = 0;

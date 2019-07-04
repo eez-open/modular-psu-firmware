@@ -23,41 +23,54 @@
 namespace eez {
 namespace gui {
 
-void GridWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                     WidgetState *previousState, WidgetState *currentState,
-                     EnumWidgetsCallback callback) {
-    DECL_WIDGET(widget, widgetOffset);
-
-    WidgetState *savedCurrentState = currentState;
+void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+	auto savedCurrentState = widgetCursor.currentState;
+	auto savedPreviousState = widgetCursor.previousState;
 
     WidgetState *endOfContainerInPreviousState = 0;
-    if (previousState)
-        endOfContainerInPreviousState = nextWidgetState(previousState);
+    if (widgetCursor.previousState)
+        endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
 
     // move to the first child widget state
-    if (previousState)
-        ++previousState;
-    if (currentState)
-        ++currentState;
+    if (widgetCursor.previousState) {
+        ++widgetCursor.previousState;
+    }
+    if (widgetCursor.currentState) {
+        ++widgetCursor.currentState;
+    }
+
+	auto savedWidgetOffset = widgetCursor.widgetOffset;
+	auto savedWidget = widgetCursor.widget;
+
+    auto parentWidget = savedWidget;
+
+    DECL_WIDGET_SPECIFIC(GridWidget, gridWidget, widgetCursor.widget);
+    OBJ_OFFSET childWidgetOffset = gridWidget->item_widget;
+
+    widgetCursor.widgetOffset = childWidgetOffset;
+
+    // TODO optimize this
+    DECL_WIDGET(childWidget, widgetCursor.widgetOffset);
+    widgetCursor.widget = childWidget;
+
+	auto savedX = widgetCursor.x;
+	auto savedY = widgetCursor.y;
 
     int xOffset = 0;
     int yOffset = 0;
-    int count = data::count(widget->data);
+    int count = data::count(parentWidget->data);
     for (int index = 0; index < count; ++index) {
-        data::select(cursor, widget->data, index);
+        data::select(widgetCursor.cursor, parentWidget->data, index);
 
-        DECL_WIDGET_SPECIFIC(GridWidget, gridWidget, widget);
-        OBJ_OFFSET childWidgetOffset = gridWidget->item_widget;
+		widgetCursor.x = savedX + xOffset;
+		widgetCursor.y = savedY + yOffset;
 
-        enumWidget(childWidgetOffset, x + xOffset, y + yOffset, cursor, previousState, currentState,
-                   callback);
-
-        DECL_WIDGET(childWidget, childWidgetOffset);
-
-        if (xOffset + childWidget->w < widget->w) {
+		enumWidget(widgetCursor, callback);
+		
+        if (xOffset + childWidget->w < parentWidget->w) {
             xOffset += childWidget->w;
         } else {
-            if (yOffset + childWidget->h < widget->h) {
+            if (yOffset + childWidget->h < parentWidget->h) {
                 yOffset += childWidget->h;
                 xOffset = 0;
             } else {
@@ -66,21 +79,30 @@ void GridWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor
             }
         }
 
-        if (previousState) {
-            previousState = nextWidgetState(previousState);
-            if (previousState >= endOfContainerInPreviousState)
-                previousState = 0;
+        if (widgetCursor.previousState) {
+			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
+            if (widgetCursor.previousState >= endOfContainerInPreviousState)
+				widgetCursor.previousState = 0;
         }
 
-        if (currentState)
-            currentState = nextWidgetState(currentState);
+        if (widgetCursor.currentState)
+			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
     }
 
-    if (currentState) {
-        savedCurrentState->size = ((uint8_t *)currentState) - ((uint8_t *)savedCurrentState);
+	widgetCursor.x = savedX;
+	widgetCursor.y = savedY;
+
+	widgetCursor.widgetOffset = savedWidgetOffset;
+    widgetCursor.widget = savedWidget;
+
+    if (widgetCursor.currentState) {
+        savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
     }
 
-    data::select(cursor, widget->data, -1);
+    data::select(widgetCursor.cursor, widgetCursor.widget->data, -1);
+
+	widgetCursor.currentState = savedCurrentState;
+	widgetCursor.previousState = savedPreviousState;
 }
 
 } // namespace gui

@@ -100,8 +100,7 @@ class AppContext {
 
     void markForRefreshAppView();
 
-    void updateAppView(int x, int y, data::Cursor &cursor, WidgetState *previousState,
-                       WidgetState *currentState);
+    void updateAppView(WidgetCursor &widgetCursor);
 
   protected:
     virtual int getMainPageId() = 0;
@@ -120,8 +119,7 @@ class AppContext {
     void doShowPage(int index, Page *page = 0);
     void setPage(int pageId);
 
-    bool updatePage(int pageId, bool repaint, int x, int y, data::Cursor &cursor,
-                    WidgetState *previousState, WidgetState *currentState);
+    bool updatePage(int pageId, bool repaint, WidgetCursor &widgetCursor);
 }; // namespace gui
 
 extern AppContext *g_appContext;

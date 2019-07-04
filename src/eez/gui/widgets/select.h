@@ -27,9 +27,7 @@ struct SelectWidget {
     List widgets;
 };
 
-void SelectWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                       WidgetState *previousState, WidgetState *currentState,
-                       EnumWidgetsCallback callback);
+void SelectWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 } // namespace gui
 } // namespace eez

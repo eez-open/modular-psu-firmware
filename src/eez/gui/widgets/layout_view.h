@@ -27,9 +27,7 @@ struct LayoutViewWidgetSpecific {
     int16_t layout;
 };
 
-void LayoutViewWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                           WidgetState *previousState, WidgetState *currentState,
-                           EnumWidgetsCallback callback);
+void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 } // namespace gui
 } // namespace eez

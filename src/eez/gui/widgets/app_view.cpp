@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
+
 #include <eez/gui/widgets/app_view.h>
 
 #include <eez/gui/app_context.h>
@@ -30,8 +32,7 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
 
     const Widget *widget = widgetCursor.widget;
     Value appContextValue;
-    g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor,
-                                            appContextValue);
+    g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
     bool refresh = !widgetCursor.previousState;
@@ -40,32 +41,31 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
         DECL_WIDGET(page, getPageOffset(appContext->getActivePageId()));
         DECL_WIDGET_STYLE(style, page);
         mcu::display::setColor(style->background_color);
-        mcu::display::fillRect(widgetCursor.x + page->x, widgetCursor.y + page->y,
-                               page->x + page->w - 1, page->y + page->h - 1);
+        mcu::display::fillRect(widgetCursor.x + page->x, widgetCursor.y + page->y, page->x + page->w - 1, page->y + page->h - 1);
 
         g_painted = true;
     }
 }
 
-void AppViewWidget_enum(OBJ_OFFSET widgetOffset, int16_t x, int16_t y, data::Cursor &cursor,
-                        WidgetState *previousState, WidgetState *currentState,
-                        EnumWidgetsCallback callback) {
-    DECL_WIDGET(widget, widgetOffset);
-
+void AppViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     Value appContextValue;
-    g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET, cursor, appContextValue);
+    g_dataOperationsFunctions[widgetCursor.widget->data](data::DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
-    AppContext *saved = g_appContext;
+    assert(g_appContext == widgetCursor.appContext);
+    auto savedAppContext = widgetCursor.appContext;
+    
+    widgetCursor.appContext = appContext;
     g_appContext = appContext;
 
     if (callback == drawWidgetCallback) {
-        g_appContext->updateAppView(x, y, cursor, previousState, currentState);
+        g_appContext->updateAppView(widgetCursor);
     } else {
-		enumWidgets(x, y, cursor, previousState,currentState, callback);
+		enumWidgets(widgetCursor, callback);
     }
 
-    g_appContext = saved;
+    widgetCursor.appContext = savedAppContext;
+    g_appContext = savedAppContext;
 }
 
 } // namespace gui
