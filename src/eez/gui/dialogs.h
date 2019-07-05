@@ -43,19 +43,15 @@ void clearTextMessage();
 const char *getTextMessage();
 uint8_t getTextMessageVersion();
 
-void infoMessage(data::Value value, void (*ok_callback)() = 0);
 void infoMessage(const char *message, void (*ok_callback)() = 0);
+void infoMessage(const char *message1, const char *message2, void(*ok_callback)() = 0);
+void toastMessage(const char *message1, const char *message2, const char *message3, void (*callback)() = 0);
+void errorMessage(const char *message, void (*callback)() = 0);
+void errorMessage(const char *message1, const char *message2, void (*callback)() = 0);
+void errorMessage(data::Value value, void (*callback)() = 0);
 
-void toastMessageP(const char *message1, const char *message2, const char *message3,
-                   void (*ok_callback)() = 0);
-
-void errorMessageP(const char *message, void (*ok_callback)() = 0);
-void errorMessageWithAction(int errorPageId, data::Value value, void (*ok_callback)(),
-                            void (*action)(int param), const char *actionLabel, int actionParam);
+void errorMessageWithAction(data::Value value, void (*ok_callback)(), void (*action)(int param), const char *actionLabel, int actionParam);
 void errorMessageAction();
-
-void longErrorMessage(data::Value value1, data::Value value2, void (*ok_callback)() = 0);
-void longErrorMessageP(const char *message1, const char *message2, void (*ok_callback)() = 0);
 
 void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(),
                  void (*no_callback)(), void (*cancel_callback)());

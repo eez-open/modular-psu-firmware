@@ -46,7 +46,7 @@ static void checkPasswordOkCallback(char *text) {
         g_checkPasswordOkCallback();
     } else {
         // entered password doesn't match,
-        errorMessageP("Invalid password!", popPage);
+        errorMessage("Invalid password!", popPage);
     }
 }
 
@@ -61,7 +61,7 @@ static void onRetypeNewPasswordOk(char *text) {
     size_t textLen = strlen(text);
     if (strlen(g_newPassword) != textLen || strncmp(g_newPassword, text, textLen) != 0) {
         // retyped new password doesn't match
-        errorMessageP("Password doesn't match!", popPage);
+        errorMessage("Password doesn't match!", popPage);
         return;
     }
 
@@ -75,7 +75,7 @@ static void onRetypeNewPasswordOk(char *text) {
 
     if (!isChanged) {
         // failed to save changed password
-        errorMessageP("Failed to change password!", popPage);
+        errorMessage("Failed to change password!", popPage);
         return;
     }
 
@@ -97,9 +97,9 @@ static void onNewPasswordOk(char *text) {
     if (!isOk) {
         // invalid password, return to keypad
         if (err == SCPI_ERROR_PASSWORD_TOO_SHORT || err == SCPI_ERROR_PASSWORD_TOO_SHORT) {
-            errorMessageP("Password too short!");
+            errorMessage("Password too short!");
         } else {
-            errorMessageP("Password too long!");
+            errorMessage("Password too long!");
         }
         return;
     }

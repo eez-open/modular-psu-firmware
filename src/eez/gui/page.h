@@ -64,16 +64,30 @@ class InternalPage : public Page {
 	Widget widget;
 };
 
-class InfoPage : public InternalPage {
-  public:
-	  InfoPage(const char *message, void (*callback)());
+enum AlertMessageType {
+    INFO_ALERT,
+    TOAST_ALERT,
+    ERROR_ALERT
+};
+
+class AlertMessagePage : public InternalPage {
+public:
+    AlertMessagePage(AlertMessageType type, const char *message1, void (*callback)());
+    AlertMessagePage(AlertMessageType type, data::Value message1Value, void(*callback)());
+    AlertMessagePage(AlertMessageType type, const char *message1, const char *message2, void(*callback)());
+    AlertMessagePage(AlertMessageType type, const char *message1, const char *message2, const char *message3, void(*callback)());
 
     void refresh();
     bool updatePage();
     WidgetCursor findWidget(int x, int y);
 
-  private:
-	  const char *message;
+private:
+    AlertMessageType type;
+
+    const char *message1;
+    data::Value message1Value;
+    const char *message2;
+    const char *message3;
 };
 
 class SelectFromEnumPage : public InternalPage {

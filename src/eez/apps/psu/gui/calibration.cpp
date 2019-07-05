@@ -175,7 +175,7 @@ void onSetOk(float value) {
         popPage();
         nextStep();
     } else {
-        errorMessageP("Value out of range!");
+        errorMessage("Value out of range!");
     }
 }
 
@@ -279,7 +279,7 @@ void save() {
         calibration::stop();
         infoMessage("Calibration data saved!", popPage);
     } else {
-        errorMessageP("Save failed!");
+        errorMessage("Save failed!");
     }
 }
 

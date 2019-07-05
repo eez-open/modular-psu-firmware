@@ -107,61 +107,43 @@ uint8_t getTextMessageVersion() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void alertMessage(int alertPageId, data::Value message, void (*ok_callback)()) {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, message, 0);
-
-    g_appContext->m_dialogYesCallback = ok_callback;
-
-    pushPage(alertPageId);
-
-    if (alertPageId == PAGE_ID_ERROR_ALERT) {
-        sound::playBeep();
-    }
-}
-
-void longAlertMessage(int alertPageId, data::Value message, data::Value message2,
-                      void (*ok_callback)()) {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE_2, message2, 0);
-    alertMessage(alertPageId, message, ok_callback);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void infoMessage(const char *message, void (*callback)()) {
-    pushPage(INTERNAL_PAGE_ID_INFO, new InfoPage(message, callback));
+    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(INFO_ALERT, message, callback));
 }
 
-void toastMessageP(const char *message1, const char *message2, const char *message3,
-                   void (*ok_callback)()) {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE_3, message3, 0);
-    longAlertMessage(PAGE_ID_TOAST3_ALERT, message1, message2, ok_callback);
+void infoMessage(const char *message1, const char *message2, void(*callback)()) {
+    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(INFO_ALERT, message1, message2, callback));
 }
 
-////////////////////////////////////////////////////////////////////////////////
+void toastMessage(const char *message1, const char *message2, const char *message3, void (*callback)()) {
+    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(TOAST_ALERT, message1, message2, message3, callback));
+}
 
-void errorMessageP(const char *message, void (*ok_callback)()) {
-    alertMessage(PAGE_ID_ERROR_ALERT, data::Value(message), ok_callback);
+void errorMessage(const char *message, void (*callback)()) {
+    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(ERROR_ALERT, message, callback));
     sound::playBeep();
 }
 
-void longErrorMessage(data::Value value1, data::Value value2, void (*ok_callback)()) {
-    longAlertMessage(PAGE_ID_ERROR_LONG_ALERT, value1, value2, ok_callback);
+void errorMessage(const char *message1, const char *message2, void (*callback)()) {
+    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(ERROR_ALERT, message1, message2, callback));
+    sound::playBeep();
 }
 
-void longErrorMessageP(const char *message1, const char *message2, void (*ok_callback)()) {
-    longErrorMessage(data::Value(message1), data::Value(message2), ok_callback);
+void errorMessage(data::Value value, void (*callback)()) {
+    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(ERROR_ALERT, value, callback));
+    sound::playBeep();
 }
 
-void errorMessageWithAction(int errorPageId, data::Value value, void (*ok_callback)(),
+void errorMessageWithAction(data::Value value, void (*ok_callback)(),
                             void (*action)(int param), const char *actionLabel, int actionParam) {
-    if (action) {
-        g_appContext->m_errorMessageAction = action;
-        data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE_2, actionLabel, 0);
-        g_appContext->m_errorMessageActionParam = actionParam;
-        errorPageId = PAGE_ID_ERROR_ALERT_WITH_ACTION;
-    }
+    g_appContext->m_errorMessageAction = action;
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE_2, actionLabel, 0);
+    g_appContext->m_errorMessageActionParam = actionParam;
 
-    alertMessage(errorPageId, value, ok_callback);
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, value, 0);
+    g_appContext->m_dialogYesCallback = ok_callback;
+    pushPage(PAGE_ID_ERROR_ALERT_WITH_ACTION);
+
     sound::playBeep();
 }
 

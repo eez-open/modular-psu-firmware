@@ -50,7 +50,7 @@ namespace display {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const char *TITLE = "Generic Firmware OS Simulator";
+static const char *TITLE = "EEZ Modular Firmware Simulator";
 static const char *ICON = "eez.png";
 
 static SDL_Window *g_mainWindow;

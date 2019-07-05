@@ -69,24 +69,58 @@ void SetPage::discard() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-InfoPage::InfoPage(const char *message_, void (*callback_)()) : message(message_) {
+AlertMessagePage::AlertMessagePage(AlertMessageType type_, const char *message1_, void (*callback_)()) 
+    : type(type_), message1(message1_), message2(nullptr), message3(nullptr) 
+{
     g_appContext->m_dialogYesCallback = callback_;
 }
 
-void InfoPage::refresh() {
-    const Style *style = getStyle(STYLE_ID_INFO_ALERT);
+AlertMessagePage::AlertMessagePage(AlertMessageType type_, data::Value message1Value_, void (*callback_)()) 
+    : type(type_), message1(nullptr), message1Value(message1Value_), message2(nullptr), message3(nullptr)
+{
+    g_appContext->m_dialogYesCallback = callback_;
+}
+
+AlertMessagePage::AlertMessagePage(AlertMessageType type_, const char *message1_, const char *message2_, void(*callback_)()) 
+    : type(type_), message1(message1_), message2(message2_), message3(nullptr)
+{
+    g_appContext->m_dialogYesCallback = callback_;
+}
+
+AlertMessagePage::AlertMessagePage(AlertMessageType type_, const char *message1_, const char *message2_, const char *message3_, void(*callback_)()) 
+    : type(type_), message1(message1_), message2(message2_), message3(message3_)
+{
+    g_appContext->m_dialogYesCallback = callback_;
+}
+
+void AlertMessagePage::refresh() {
+    const Style *style = getStyle(
+        type == INFO_ALERT ? STYLE_ID_INFO_ALERT : 
+        type == TOAST_ALERT ? STYLE_ID_TOAST_ALERT : 
+        STYLE_ID_ERROR_ALERT);
 
     font::Font font = styleGetFont(style);
 
-    int textWidth = display::measureStr(message, -1, font, 0);
+    const char *message1 = this->message1;
+    char message1TextBuffer[256];
+    if (message1 == nullptr) {
+        message1Value.toText(message1TextBuffer, sizeof(message1TextBuffer));
+        message1 = message1TextBuffer;
+    }
+
+    int minTextWidth = g_appContext->width / 2;
+    int textWidth1 = display::measureStr(message1, -1, font, 0);
+    int textWidth2 = message2 ? display::measureStr(message2, -1, font, 0) : 0;
+    int textWidth3 = message3 ? display::measureStr(message3, -1, font, 0) : 0;
+    int textWidth = MAX(minTextWidth, MAX(MAX(textWidth1, textWidth2), textWidth3));
     int textHeight = font.getHeight();
 
     width = style->border_size_left + style->padding_left + 
-        textWidth + 
+        textWidth +
         style->padding_right + style->border_size_right;
 
     height = style->border_size_top + style->padding_top + 
-        textHeight + 
+        (message3 ? 3 : message2 ? 2 : 1) * textHeight + 
         style->padding_bottom + style->border_size_bottom;
 
 	x = g_appContext->x + (g_appContext->width - width) / 2;
@@ -118,14 +152,32 @@ void InfoPage::refresh() {
 
     // draw text message
     display::setColor(style->color);
-    display::drawStr(message, -1, x1 + style->padding_left, y1 + style->padding_top, x1, y1, x2, y2, font);
+
+    display::drawStr(message1, -1, 
+        x1 + style->padding_left + (textWidth - textWidth1) / 2, 
+        y1 + style->padding_top, 
+        x1, y1, x2, y2, font);
+
+    if (message2) {
+        display::drawStr(message2, -1, 
+            x1 + style->padding_left + (textWidth - textWidth2) / 2, 
+            y1 + style->padding_top + textHeight, 
+            x1, y1, x2, y2, font);
+    }
+
+    if (message3) {
+        display::drawStr(message3, -1, 
+            x1 + style->padding_left + (textWidth - textWidth2) / 2, 
+            y1 + style->padding_top + 2 * textHeight, 
+            x1, y1, x2, y2, font);
+    }
 }
 
-bool InfoPage::updatePage() {
+bool AlertMessagePage::updatePage() {
     return false;
 }
 
-WidgetCursor InfoPage::findWidget(int x, int y) {
+WidgetCursor AlertMessagePage::findWidget(int x, int y) {
 	widget.action = ACTION_ID_INTERNAL_DIALOG_YES;
 	return WidgetCursor(nullptr, &widget, x, y, -1, 0, 0);
 }

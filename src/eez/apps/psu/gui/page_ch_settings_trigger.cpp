@@ -280,7 +280,7 @@ void ChSettingsListsPage::doValueSet(float value) {
                     if (eez::greater(value * m_currentList[i],
                                      channel_dispatcher::getPowerMaxLimit(*g_channel),
                                      getPrecision(UNIT_WATT))) {
-                        errorMessageP("Power limit exceeded");
+                        errorMessage("Power limit exceeded");
                         return;
                     }
                 }
@@ -297,7 +297,7 @@ void ChSettingsListsPage::doValueSet(float value) {
                     if (eez::greater(value * m_voltageList[i],
                                      channel_dispatcher::getPowerMaxLimit(*g_channel),
                                      getPrecision(UNIT_WATT))) {
-                        errorMessageP("Power limit exceeded");
+                        errorMessage("Power limit exceeded");
                         return;
                     }
                 }
@@ -312,7 +312,7 @@ void ChSettingsListsPage::doValueSet(float value) {
 
         if (eez::greater(power, channel_dispatcher::getPowerMaxLimit(*g_channel),
                          getPrecision(UNIT_WATT))) {
-            errorMessageP("Power limit exceeded");
+            errorMessage("Power limit exceeded");
             return;
         }
     }
@@ -498,7 +498,7 @@ void ChSettingsListsPage::set() {
 
             infoMessage("Lists changed!", popPage);
         } else {
-            errorMessageP("List lengths are not equivalent!");
+            errorMessage("List lengths are not equivalent!");
         }
     }
 }

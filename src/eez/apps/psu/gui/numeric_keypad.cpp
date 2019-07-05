@@ -525,7 +525,7 @@ void NumericKeypad::ok() {
                 m_state = START;
                 m_keypadText[0] = 0;
             } else {
-                errorMessageP("Invalid IP address format!");
+                errorMessage("Invalid IP address format!");
             }
 
             return;

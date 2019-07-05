@@ -56,7 +56,7 @@ void UserProfilesPage::showProfile() {
 void UserProfilesPage::toggleAutoRecall() {
     bool enable = persist_conf::isProfileAutoRecallEnabled() ? false : true;
     if (!persist_conf::enableProfileAutoRecall(enable)) {
-        errorMessageP("Failed!");
+        errorMessage("Failed!");
     }
 }
 
@@ -65,7 +65,7 @@ void UserProfilesPage::toggleIsAutoRecallLocation() {
         if (persist_conf::setProfileAutoRecallLocation(g_selectedProfileLocation)) {
             profile::load(g_selectedProfileLocation, &profile);
         } else {
-            errorMessageP("Failed!");
+            errorMessage("Failed!");
         }
     }
 }
@@ -75,7 +75,7 @@ void UserProfilesPage::recall() {
         if (profile::recall(g_selectedProfileLocation)) {
             infoMessage("Profile parameters loaded");
         } else {
-            errorMessageP("Failed!");
+            errorMessage("Failed!");
         }
     }
 }
@@ -84,7 +84,7 @@ void UserProfilesPage::onSaveFinish(char *remark, void (*callback)()) {
     if (profile::saveAtLocation(g_selectedProfileLocation, remark)) {
         infoMessage("Current parameters saved", callback);
     } else {
-        errorMessageP("EEPROM save failed!");
+        errorMessage("EEPROM save failed!");
     }
 }
 
@@ -118,7 +118,7 @@ void UserProfilesPage::onDeleteProfileYes() {
         if (profile::deleteLocation(g_selectedProfileLocation)) {
             infoMessage("Profile deleted");
         } else {
-            errorMessageP("Failed!");
+            errorMessage("Failed!");
         }
     }
 }
@@ -133,7 +133,7 @@ void UserProfilesPage::onEditRemarkOk(char *newRemark) {
     if (profile::setName(g_selectedProfileLocation, newRemark, strlen(newRemark))) {
         infoMessage("Remark changed", popPage);
     } else {
-        errorMessageP("Failed!", popPage);
+        errorMessage("Failed!", popPage);
     }
 }
 

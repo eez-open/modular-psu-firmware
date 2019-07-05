@@ -113,7 +113,7 @@ void PsuAppContext::stateManagment() {
     //
     if (g_rprogAlarm) {
         g_rprogAlarm = false;
-        longErrorMessage("Max. remote prog. voltage exceeded.", "Please remove it immediately!");
+        errorMessage("Max. remote prog. voltage exceeded.", "Please remove it immediately!");
     }
 
     // show startup wizard
@@ -420,48 +420,28 @@ void changePowerLimit(int iChannel) {
 }
 
 void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_callback)()) {
-    int errorPageId = PAGE_ID_ERROR_ALERT;
-    void (*action)(int param) = 0;
-    const char *actionLabel = 0;
-    int actionParam = 0;
-
     if (value.getType() == VALUE_TYPE_SCPI_ERROR) {
-
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
-
         if (value.getScpiError() == SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED) {
-            if (channel_dispatcher::getULimit(channel) <
-                channel_dispatcher::getUMaxLimit(channel)) {
-                action = changeVoltageLimit;
-                actionLabel = "Change voltage limit";
-                actionParam = iChannel;
-            } else {
-                errorPageId = PAGE_ID_ERROR_TOAST_ALERT;
+            if (channel_dispatcher::getULimit(channel) < channel_dispatcher::getUMaxLimit(channel)) {
+                errorMessageWithAction(value, ok_callback, changeVoltageLimit, "Change voltage limit", iChannel);
+                return;
             }
         } else if (value.getScpiError() == SCPI_ERROR_CURRENT_LIMIT_EXCEEDED) {
-            if (channel_dispatcher::getILimit(channel) <
-                channel_dispatcher::getIMaxLimit(channel)) {
-                action = changeCurrentLimit;
-                actionLabel = "Change current limit";
-                actionParam = iChannel;
-            } else {
-                errorPageId = PAGE_ID_ERROR_TOAST_ALERT;
+            if (channel_dispatcher::getILimit(channel) < channel_dispatcher::getIMaxLimit(channel)) {
+                errorMessageWithAction(value, ok_callback, changeCurrentLimit, "Change current limit", iChannel);
+                return;
             }
         } else if (value.getScpiError() == SCPI_ERROR_POWER_LIMIT_EXCEEDED) {
-            if (channel_dispatcher::getPowerLimit(channel) <
-                channel_dispatcher::getPowerMaxLimit(channel)) {
-                action = changePowerLimit;
-                actionLabel = "Change power limit";
-                actionParam = iChannel;
-            } else {
-                errorPageId = PAGE_ID_ERROR_TOAST_ALERT;
+            if (channel_dispatcher::getPowerLimit(channel) < channel_dispatcher::getPowerMaxLimit(channel)) {
+                errorMessageWithAction(value, ok_callback, changePowerLimit, "Change power limit", iChannel);
+                return;
             }
         }
     }
 
-    errorMessageWithAction(errorPageId, value, ok_callback, action, actionLabel, actionParam);
-    sound::playBeep();
+    errorMessage(value, ok_callback);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -688,7 +668,7 @@ void channelToggleOutput() {
     Channel &channel =
         Channel::get(getFoundWidgetAtDown().cursor.i >= 0 ? getFoundWidgetAtDown().cursor.i : 0);
     if (channel_dispatcher::isTripped(channel)) {
-        errorMessageP("Channel is tripped!");
+        errorMessage("Channel is tripped!");
     } else {
         bool triggerModeEnabled =
             channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||

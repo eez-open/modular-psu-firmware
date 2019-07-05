@@ -214,7 +214,7 @@ void SysSettingsDateTimePage::checkTestNtpServerStatus() {
             SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getActivePage();
             page->doSet();
         } else {
-            errorMessageP("Unable to connect to NTP server!");
+            errorMessage("Unable to connect to NTP server!");
         }
     }
 }
@@ -240,12 +240,12 @@ void SysSettingsDateTimePage::set() {
 void SysSettingsDateTimePage::doSet() {
     if (!ntpEnabled) {
         if (!datetime::isValidDate(uint8_t(dateTime.year - 2000), dateTime.month, dateTime.day)) {
-            errorMessageP("Invalid date!");
+            errorMessage("Invalid date!");
             return;
         }
 
         if (!datetime::isValidTime(dateTime.hour, dateTime.minute, dateTime.second)) {
-            errorMessageP("Invalid time!");
+            errorMessage("Invalid time!");
             popPage();
             return;
         }
@@ -334,7 +334,7 @@ void SysSettingsEthernetPage::editScpiPort() {
 void SysSettingsEthernetPage::onSetMacAddress(char *value) {
     uint8_t macAddress[6];
     if (!parseMacAddress(value, strlen(value), macAddress)) {
-        errorMessageP("Invalid MAC address!");
+        errorMessage("Invalid MAC address!");
         return;
     }
 
@@ -361,7 +361,7 @@ void SysSettingsEthernetPage::set() {
     if (getDirty()) {
         if (persist_conf::setEthernetSettings(m_enabled, m_dhcpEnabled, m_ipAddress, m_dns,
                                               m_gateway, m_subnetMask, m_scpiPort, m_macAddress)) {
-            infoMessage("Turn off and on power or press reset to apply changes!", popPage);
+            infoMessage("Turn off and on power or", "press reset to apply changes!", popPage);
         }
     }
 }
