@@ -33,6 +33,8 @@ namespace eez {
 namespace mcu {
 namespace display {
 
+bool g_painted;
+
 uint16_t g_fc, g_bc;
 uint8_t g_opacity = 255;
 
@@ -187,7 +189,7 @@ void adjustColor(uint16_t &c) {
 	c = (chNew << 8) | clNew;
 }
 
-uint16_t getColorFromIndex(uint16_t color) {
+uint16_t getColor16FromIndex(uint16_t color) {
 	return color < g_themeColorsCount ? g_themeColors[color] : g_colors[color - g_themeColorsCount];
 }
 
@@ -196,8 +198,13 @@ void setColor(uint8_t r, uint8_t g, uint8_t b) {
 	adjustColor(g_fc);
 }
 
+void setColor16(uint16_t color) {
+    g_fc = color;
+    adjustColor(g_fc);
+}
+
 void setColor(uint16_t color, bool ignoreLuminocity) {
-    g_fc = getColorFromIndex(color);
+    g_fc = getColor16FromIndex(color);
 	adjustColor(g_fc);
 }
 
@@ -211,7 +218,7 @@ void setBackColor(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 void setBackColor(uint16_t color, bool ignoreLuminocity) {
-	g_bc = getColorFromIndex(color);
+	g_bc = getColor16FromIndex(color);
 	adjustColor(g_bc);
 }
 

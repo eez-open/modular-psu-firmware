@@ -181,8 +181,6 @@ void ListGraphWidget_draw(const WidgetCursor &widgetCursor) {
                 xPrev = x2;
             }
         }
-
-        g_painted = true;
     }
 }
 

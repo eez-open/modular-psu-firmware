@@ -49,8 +49,6 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
 		appContext->height = page->h;
 
 		mcu::display::fillRect(appContext->x, appContext->y, appContext->x + page->w - 1, appContext->y + page->h - 1);
-
-        g_painted = true;
     }
 }
 

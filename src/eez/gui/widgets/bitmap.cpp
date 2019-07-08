@@ -79,8 +79,6 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
                        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
                        activeStyle, widgetCursor.currentState->flags.active);
         }
-
-        g_painted = true;
     }
 }
 

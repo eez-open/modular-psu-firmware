@@ -41,8 +41,6 @@ void RectangleWidget_draw(const WidgetCursor &widgetCursor) {
             rectangle_widget->flags.invertColors ? !widgetCursor.currentState->flags.active
                                                  : widgetCursor.currentState->flags.active,
             rectangle_widget->flags.ignoreLuminosity);
-
-        g_painted = true;
     }
 }
 

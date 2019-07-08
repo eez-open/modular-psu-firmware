@@ -49,11 +49,6 @@ void updateScreen() {
 	widgetCursor.currentState = g_currentState;
 
     g_appContext->updateAppView(widgetCursor);
-
-    // if (g_painted) {
-    //     static uint32_t g_paintedCounter = 0;
-    //     DebugTrace("painted %d", ++g_paintedCounter);
-    // }
 }
 
 } // namespace gui

@@ -77,10 +77,13 @@ void onEncoder(int tickCount, int counter, bool clicked);
 ////////////////////////////////////////////////////////////////////////////////
 
 PsuAppContext::PsuAppContext() {
-    showPage(PAGE_ID_MAIN);
 }
 
 void PsuAppContext::stateManagment() {
+    if (getActivePageId() == INTERNAL_PAGE_ID_NONE) {
+        showPage(PAGE_ID_MAIN);
+    }
+
     AppContext::stateManagment();
 
     // TODO move this to some other place
@@ -428,17 +431,26 @@ void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_ca
         Channel &channel = Channel::get(iChannel);
         if (value.getScpiError() == SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED) {
             if (channel_dispatcher::getULimit(channel) < channel_dispatcher::getUMaxLimit(channel)) {
-                errorMessageWithAction(value, ok_callback, changeVoltageLimit, "Change voltage limit", iChannel);
+                if (ok_callback) {
+                    ok_callback();
+                }
+                errorMessageWithAction(value, changeVoltageLimit, "Change voltage limit", iChannel);
                 return;
             }
         } else if (value.getScpiError() == SCPI_ERROR_CURRENT_LIMIT_EXCEEDED) {
             if (channel_dispatcher::getILimit(channel) < channel_dispatcher::getIMaxLimit(channel)) {
-                errorMessageWithAction(value, ok_callback, changeCurrentLimit, "Change current limit", iChannel);
+                if (ok_callback) {
+                    ok_callback();
+                }
+                errorMessageWithAction(value, changeCurrentLimit, "Change current limit", iChannel);
                 return;
             }
         } else if (value.getScpiError() == SCPI_ERROR_POWER_LIMIT_EXCEEDED) {
             if (channel_dispatcher::getPowerLimit(channel) < channel_dispatcher::getPowerMaxLimit(channel)) {
-                errorMessageWithAction(value, ok_callback, changePowerLimit, "Change power limit", iChannel);
+                if (ok_callback) {
+                    ok_callback();
+                }
+                errorMessageWithAction(value, changePowerLimit, "Change power limit", iChannel);
                 return;
             }
         }

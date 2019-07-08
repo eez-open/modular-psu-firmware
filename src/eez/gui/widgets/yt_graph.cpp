@@ -49,11 +49,16 @@ void drawYTGraph(const WidgetCursor &widgetCursor, const Widget *widget, int sta
                  int xGraphOffset, int graphWidth, uint16_t data1, float min1, float max1,
                  uint16_t data1Color, uint16_t data2, float min2, float max2, uint16_t data2Color,
                  uint16_t color, uint16_t backgroundColor) {
+
+    uint16_t color16 = display::getColor16FromIndex(color);
+    uint16_t data1Color16 = display::getColor16FromIndex(data1Color);
+    uint16_t data2Color16 = display::getColor16FromIndex(data2Color);
+
     for (int position = startPosition; position < endPosition; ++position) {
         if (position < graphWidth) {
             int x = widgetCursor.x + xGraphOffset + position;
 
-            display::setColor(color);
+            display::setColor16(color16);
             display::drawVLine(x, widgetCursor.y, widget->h - 1);
 
             int y1 = getYValue(widgetCursor, widget, data1, min1, max1, position);
@@ -66,17 +71,17 @@ void drawYTGraph(const WidgetCursor &widgetCursor, const Widget *widget, int sta
 
             if (abs(y1Prev - y1) <= 1 && abs(y2Prev - y2) <= 1) {
                 if (y1 == y2) {
-                    display::setColor(position % 2 ? data2Color : data1Color);
+                    display::setColor16(position % 2 ? data2Color16 : data1Color16);
                     display::drawPixel(x, widgetCursor.y + y1);
                 } else {
-                    display::setColor(data1Color);
+                    display::setColor16(data1Color16);
                     display::drawPixel(x, widgetCursor.y + y1);
 
-                    display::setColor(data2Color);
+                    display::setColor16(data2Color16);
                     display::drawPixel(x, widgetCursor.y + y2);
                 }
             } else {
-                display::setColor(data1Color);
+                display::setColor16(data1Color16);
                 if (abs(y1Prev - y1) <= 1) {
                     display::drawPixel(x, widgetCursor.y + y1);
                 } else {
@@ -87,7 +92,7 @@ void drawYTGraph(const WidgetCursor &widgetCursor, const Widget *widget, int sta
                     }
                 }
 
-                display::setColor(data2Color);
+                display::setColor16(data2Color16);
                 if (abs(y2Prev - y2) <= 1) {
                     display::drawPixel(x, widgetCursor.y + y2);
                 } else {
@@ -124,8 +129,6 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
         display::setColor(color);
         display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1,
                           widgetCursor.y + (int)widget->h - 1);
-
-        g_painted = true;
     }
 
     int textWidth = 62; // TODO this is hardcoded value
@@ -141,8 +144,6 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
         drawText(text, -1, widgetCursor.x, widgetCursor.y, textWidth, textHeight, y1Style, nullptr,
                  widgetCursor.currentState->flags.active, false, false, nullptr);
-
-        g_painted = true;
     }
 
     // draw second value text
@@ -156,8 +157,6 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
         drawText(text, -1, widgetCursor.x, widgetCursor.y + textHeight, textWidth, textHeight,
                  y2Style, nullptr, widgetCursor.currentState->flags.active, false, false, nullptr);
-
-        g_painted = true;
     }
 
     // draw graph
@@ -189,8 +188,6 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
         }
         endPosition = currentHistoryValuePosition;
     }
-
-    g_painted = true;
 
     if (startPosition < endPosition) {
         drawYTGraph(

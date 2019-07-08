@@ -187,7 +187,7 @@ void processTouchEvent(EventType type) {
             // deactivate active widget and make sure screen is updated
             m_activeWidget = 0;
             updateScreen();
-            mcu::display::sync(true);
+            mcu::display::sync();
         }
     }
 

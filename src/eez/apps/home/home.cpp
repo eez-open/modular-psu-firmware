@@ -46,7 +46,6 @@ HomeAppContext g_homeAppContext;
 ////////////////////////////////////////////////////////////////////////////////
 
 HomeAppContext::HomeAppContext() {
-    showPage(PAGE_ID_WELCOME);
 }
 
 void HomeAppContext::stateManagment() {
@@ -161,8 +160,6 @@ void HomeAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEv
 
         eez::mcu::display::setColor(255, 255, 255);
         eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
-
-        g_painted = true;
     }
 #endif
 

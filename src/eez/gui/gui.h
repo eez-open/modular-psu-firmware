@@ -29,7 +29,8 @@
 
 enum InternalActionsEnum {
     ACTION_ID_INTERNAL_SELECT_ENUM_ITEM = -1,
-    ACTION_ID_INTERNAL_DIALOG_YES = -2
+    ACTION_ID_INTERNAL_DIALOG_YES = -2,
+    ACTION_ID_INTERNAL_TOAST_ACTION = -3
 };
 
 namespace eez {

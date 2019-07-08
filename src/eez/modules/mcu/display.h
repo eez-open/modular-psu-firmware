@@ -28,7 +28,7 @@ namespace mcu {
 namespace display {
 
 bool onSystemStateChanged();
-void sync(bool painted);
+void sync();
 
 void turnOn(bool withoutTransition = false);
 void turnOff();
@@ -57,10 +57,15 @@ extern uint8_t g_opacity;
 
 extern gui::font::Font g_font;
 
+extern bool g_painted;
+
 int getDisplayWidth();
 int getDisplayHeight();
 
+uint16_t getColor16FromIndex(uint16_t color);
+
 void setColor(uint8_t r, uint8_t g, uint8_t b);
+void setColor16(uint16_t color16);
 void setColor(uint16_t color, bool ignoreLuminocity = false);
 uint16_t getColor();
 

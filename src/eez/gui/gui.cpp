@@ -86,7 +86,7 @@ void oneIter();
 void mainLoop(const void *) {
 #ifdef __EMSCRIPTEN__
     if (g_animationState.enabled) {
-        mcu::display::sync(true);
+        mcu::display::sync();
     } else {
         oneIter();
     }
@@ -98,8 +98,7 @@ void mainLoop(const void *) {
 }
 
 void oneIter() {
-    mcu::display::sync(g_painted);
-    g_painted = false;
+    mcu::display::sync();
 
     g_wasBlinkTime = g_isBlinkTime;
     g_isBlinkTime = (micros() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME &&
@@ -188,7 +187,8 @@ void action_internal_select_enum_item() {
 static ActionExecFunc g_internalActionExecFunctions[] = {
     0,
     action_internal_select_enum_item,
-    dialogYes
+    dialogYes,
+    ToastMessagePage::executeAction
 };
 
 bool isInternalAction(int actionId) {

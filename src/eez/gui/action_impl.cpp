@@ -629,10 +629,6 @@ void action_ch_settings_adv_view_edit_ytview_rate() {
     ((ChSettingsAdvViewPage *)getActivePage())->editYTViewRate();
 }
 
-void action_error_alert_action() {
-    errorMessageAction();
-}
-
 void action_sys_settings_encoder_toggle_confirmation_mode() {
     #if OPTION_ENCODER
     ((SysSettingsEncoderPage *)getActivePage())->toggleConfirmationMode();

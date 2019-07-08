@@ -60,7 +60,6 @@ static int g_findWidgetAtX;
 static int g_findWidgetAtY;
 static WidgetCursor g_foundWidget;
 
-bool g_painted = true;
 bool g_isActiveWidget;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,8 +196,6 @@ void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
             drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
                           nullptr, !widgetCursor.currentState->flags.active, false);
         }
-
-        g_painted = true;
     }
 }
 
@@ -255,13 +252,26 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback)
     if (g_appContext->isActivePageInternal()) {
     	if (callback == findWidgetStep) {
     		g_foundWidget = ((InternalPage *)g_appContext->getActivePage())->findWidget(g_findWidgetAtX, g_findWidgetAtY);
-    	}
-    } else {
-		auto savedWidget = widgetCursor.widget;
-		widgetCursor.widget = g_document->pages.first + g_appContext->getActivePageId();
-		enumWidget(widgetCursor, callback);
-		widgetCursor.widget = savedWidget;
+            if (g_foundWidget) {
+                return;
+            }
+
+            // pass click through if active page is toast page and clicked outside
+            bool passThrough = g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE;
+
+            // clicked outside internal page, close internal page
+            popPage();
+
+            if (!passThrough) {
+                return;
+            }
+        }
     }
+
+    auto savedWidget = widgetCursor.widget;
+    widgetCursor.widget = g_document->pages.first + g_appContext->getActivePageId();
+    enumWidget(widgetCursor, callback);
+    widgetCursor.widget = savedWidget;
 }
 
 void enumWidgets(EnumWidgetsCallback callback) {
@@ -299,17 +309,23 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
 
 WidgetCursor findWidget(int16_t x, int16_t y) {
     if (g_appContext->isActivePageInternal()) {
-        return ((InternalPage *)g_appContext->getActivePage())->findWidget(x, y);
-    } else {
-        g_foundWidget = 0;
+        WidgetCursor widgetCursor = ((InternalPage *)g_appContext->getActivePage())->findWidget(x, y);
 
-        g_findWidgetAtX = x;
-        g_findWidgetAtY = y;
-
-        enumWidgets(findWidgetStep);
-
-        return g_foundWidget;
+        if (!widgetCursor && g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
+            popPage();
+        } else {
+            return widgetCursor;
+        }
     }
+
+    g_foundWidget = 0;
+
+    g_findWidgetAtX = x;
+    g_findWidgetAtY = y;
+
+    enumWidgets(findWidgetStep);
+
+    return g_foundWidget;
 }
 
 } // namespace gui

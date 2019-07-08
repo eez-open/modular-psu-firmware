@@ -45,13 +45,11 @@ uint8_t getTextMessageVersion();
 
 void infoMessage(const char *message);
 void infoMessage(const char *message1, const char *message2);
-void toastMessage(const char *message1, const char *message2, const char *message3);
 void errorMessage(const char *message);
 void errorMessage(const char *message1, const char *message2);
+void errorMessage(const char *message1, const char *message2, const char *message3);
 void errorMessage(data::Value value);
-
-void errorMessageWithAction(data::Value value, void (*ok_callback)(), void (*action)(int param), const char *actionLabel, int actionParam);
-void errorMessageAction();
+void errorMessageWithAction(data::Value value, void (*action)(int param), const char *actionLabel, int actionParam);
 
 void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(),
                  void (*no_callback)(), void (*cancel_callback)());

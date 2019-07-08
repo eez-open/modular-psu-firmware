@@ -49,8 +49,6 @@ void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor) {
         drawText(widgetCursor.currentState->flags.enabled ? toggle_button_widget->text2 : toggle_button_widget->text1, -1, 
 			widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
             nullptr, widgetCursor.currentState->flags.active, false, false, nullptr);
-
-        g_painted = true;
     }
 }
 

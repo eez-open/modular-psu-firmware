@@ -347,8 +347,6 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                                          w, h);
             }
         }
-
-        g_painted = true;
     }
 }
 

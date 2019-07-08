@@ -112,55 +112,35 @@ void pushToastMessage(ToastMessagePage *toastMessage) {
 }
 
 void infoMessage(const char *message) {
-    pushToastMessage(new ToastMessagePage(INFO_ALERT, message));
+    pushToastMessage(new ToastMessagePage(INFO_TOAST, message));
 }
 
 void infoMessage(const char *message1, const char *message2) {
-    pushToastMessage(new ToastMessagePage(INFO_ALERT, message1, message2));
-}
-
-void toastMessage(const char *message1, const char *message2, const char *message3) {
-    pushToastMessage(new ToastMessagePage(TOAST_ALERT, message1, message2, message3));
+    pushToastMessage(new ToastMessagePage(INFO_TOAST, message1, message2));
 }
 
 void errorMessage(const char *message) {
-    pushToastMessage(new ToastMessagePage(ERROR_ALERT, message));
+    pushToastMessage(new ToastMessagePage(ERROR_TOAST, message));
     sound::playBeep();
 }
 
 void errorMessage(const char *message1, const char *message2) {
-    pushToastMessage(new ToastMessagePage(ERROR_ALERT, message1, message2));
+    pushToastMessage(new ToastMessagePage(ERROR_TOAST, message1, message2));
     sound::playBeep();
 }
 
+void errorMessage(const char *message1, const char *message2, const char *message3) {
+    pushToastMessage(new ToastMessagePage(ERROR_TOAST, message1, message2, message3));
+    sound::playBeep();
+}
 void errorMessage(data::Value value) {
-    pushToastMessage(new ToastMessagePage(ERROR_ALERT, value));
+    pushToastMessage(new ToastMessagePage(ERROR_TOAST, value));
     sound::playBeep();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-void errorMessageWithAction(data::Value value, void (*ok_callback)(),
-                            void (*action)(int param), const char *actionLabel, int actionParam) {
-    g_appContext->m_errorMessageAction = action;
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE_2, actionLabel, 0);
-    g_appContext->m_errorMessageActionParam = actionParam;
-
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, value, 0);
-    g_appContext->m_dialogYesCallback = ok_callback;
-    pushPage(PAGE_ID_ERROR_ALERT_WITH_ACTION);
-
+void errorMessageWithAction(data::Value value, void (*action)(int param), const char *actionLabel, int actionParam) {
+    pushToastMessage(new ToastMessagePage(ERROR_TOAST, value, action, actionLabel, actionParam));
     sound::playBeep();
-}
-
-void errorMessageAction() {
-    popPage();
-
-    if (g_appContext->m_dialogYesCallback) {
-        g_appContext->m_dialogYesCallback();
-    }
-
-    g_appContext->m_errorMessageAction(g_appContext->m_errorMessageActionParam);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

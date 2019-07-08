@@ -238,8 +238,6 @@ void ScaleWidget_draw(const WidgetCursor &widgetCursor) {
 
         g_appContext->onScaleUpdated(widget->data, vertical, vertical ? widget->w : widget->h,
                                      (max - min) * f);
-
-        g_painted = true;
     }
 }
 

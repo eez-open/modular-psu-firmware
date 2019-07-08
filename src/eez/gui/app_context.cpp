@@ -18,6 +18,8 @@
 
 #include <eez/gui/app_context.h>
 
+#include <eez/modules/mcu/display.h>
+
 // TODO this must be removed from here
 #include <eez/apps/psu/psu.h>
 
@@ -67,14 +69,6 @@ void AppContext::stateManagment() {
             dialogOk();
             return;
         }
-    }
-
-    // show next page
-    if (m_nextShowPageId != INTERNAL_PAGE_ID_NONE) {
-        if (m_nextShowPageId != m_activePageId) {
-            setPage(m_nextShowPageId);
-        }
-        m_nextShowPageId = INTERNAL_PAGE_ID_NONE;
     }
 }
 
@@ -282,7 +276,7 @@ bool AppContext::isPageActiveOrOnStack(int pageId) {
 }
 
 void AppContext::showPage(int pageId) {
-    m_nextShowPageId = pageId;
+    setPage(pageId);
 }
 
 void AppContext::pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint8_t currentValue,
@@ -344,17 +338,14 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool AppContext::updatePage(int pageId, bool repaint, WidgetCursor &widgetCursor) {
-
-    bool painted;
-
-    if (isPageInternal(pageId)) {
+void AppContext::updatePage(bool repaint, WidgetCursor &widgetCursor) {
+    if (isPageInternal(m_activePageId)) {
         if (repaint) {
             ((InternalPage *)g_appContext->getActivePage())->refresh();
         }
-        painted = ((InternalPage *)g_appContext->getActivePage())->updatePage();
+        ((InternalPage *)g_appContext->getActivePage())->updatePage();
     } else {
-		Widget *page = g_document->pages.first + pageId;
+		Widget *page = g_document->pages.first + m_activePageId;
 
 		auto savedPreviousState = widgetCursor.previousState;
 
@@ -374,9 +365,6 @@ bool AppContext::updatePage(int pageId, bool repaint, WidgetCursor &widgetCursor
 			widgetCursor.previousState = 0;
         }
 
-        bool saved = g_painted;
-        g_painted = false;
-
 		auto savedWidget = widgetCursor.widget;
 
         widgetCursor.widget = page;
@@ -386,14 +374,7 @@ bool AppContext::updatePage(int pageId, bool repaint, WidgetCursor &widgetCursor
 		widgetCursor.widget = savedWidget;
 
 		widgetCursor.previousState = savedPreviousState;
-
-        painted = g_painted;
-        if (!g_painted) {
-            g_painted = saved;
-        }
     }
-
-    return painted;
 }
 
 bool pageContained(int xPageAbove, int yPageAbove, int wPageAbove, int hPageAbove,
@@ -443,8 +424,21 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 
     bool repaint = false;
 
+    int activePageIdSaved = m_activePageId;
+    Page *activePageSaved = m_activePage;
+
     for (++i; i < m_pageNavigationStackPointer; i++) {
-        repaint = updatePage(m_pageNavigationStack[i].pageId, m_pageNavigationStack[i].repaint || repaint, widgetCursor);
+
+        bool paintedSaved = mcu::display::g_painted;
+        mcu::display::g_painted = false;
+        
+        m_activePageId = m_pageNavigationStack[i].pageId;
+        m_activePage = m_pageNavigationStack[i].page;
+        updatePage(m_pageNavigationStack[i].repaint || repaint, widgetCursor);
+        
+        repaint = mcu::display::g_painted;
+        mcu::display::g_painted = paintedSaved;
+
         m_pageNavigationStack[i].repaint = false;
 
         if (widgetCursor.previousState) {
@@ -454,7 +448,9 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
     }
 
-    updatePage(m_activePageId, m_repaintActivePage || repaint, widgetCursor);
+    m_activePageId = activePageIdSaved;
+    m_activePage = activePageSaved;
+    updatePage(m_repaintActivePage || repaint, widgetCursor);
     m_repaintActivePage = false;
 }
 

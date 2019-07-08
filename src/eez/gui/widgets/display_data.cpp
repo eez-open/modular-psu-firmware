@@ -58,8 +58,6 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
                  nullptr, widgetCursor.currentState->flags.active,
                  widgetCursor.currentState->flags.blinking, false,
                  &widgetCursor.currentState->backgroundColor);
-
-        g_painted = true;
     }
 }
 

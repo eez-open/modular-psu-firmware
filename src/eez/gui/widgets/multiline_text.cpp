@@ -63,8 +63,6 @@ void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
             drawMultilineText(display_string_widget->text, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                               style, nullptr, widgetCursor.currentState->flags.active);
         }
-
-        g_painted = true;
     }
 }
 

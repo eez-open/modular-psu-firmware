@@ -30,7 +30,6 @@ namespace settings {
 SettingsAppContext g_settingsAppContext;
 
 SettingsAppContext::SettingsAppContext() {
-    showPage(PAGE_ID_SYS_SETTINGS);
 }
 
 int SettingsAppContext::getMainPageId() {

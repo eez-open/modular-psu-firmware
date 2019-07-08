@@ -71,8 +71,6 @@ void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
                      style, nullptr, widgetCursor.currentState->flags.active,
                      widgetCursor.currentState->flags.blinking, false, nullptr);
         }
-
-        g_painted = true;
     }
 }
 

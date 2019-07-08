@@ -227,7 +227,6 @@ extern OnTouchFunctionType g_onTouchFunctions[];
 WidgetState *nextWidgetState(WidgetState *p);
 void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
-extern bool g_painted;
 extern bool g_isActiveWidget;
 void drawWidgetCallback(const WidgetCursor &widgetCursor);
 

@@ -52,7 +52,7 @@ class SetPage : public Page {
 class InternalPage : public Page {
   public:
     virtual void refresh() = 0; // repaint page
-    virtual bool updatePage() = 0; // repaint page if changed, returns true if painted
+    virtual void updatePage() = 0;
 	  virtual WidgetCursor findWidget(int x, int y) = 0;
 
     int x;
@@ -64,30 +64,35 @@ class InternalPage : public Page {
 	Widget widget;
 };
 
-enum AlertMessageType {
-    INFO_ALERT,
-    TOAST_ALERT,
-    ERROR_ALERT
+enum ToastType {
+    INFO_TOAST,
+    ERROR_TOAST
 };
 
 class ToastMessagePage : public InternalPage {
 public:
-    ToastMessagePage(AlertMessageType type, const char *message1);
-    ToastMessagePage(AlertMessageType type, data::Value message1Value);
-    ToastMessagePage(AlertMessageType type, const char *message1, const char *message2);
-    ToastMessagePage(AlertMessageType type, const char *message1, const char *message2, const char *message3);
+    ToastMessagePage(ToastType type, const char *message1);
+    ToastMessagePage(ToastType type, data::Value message1Value);
+    ToastMessagePage(ToastType type, const char *message1, const char *message2);
+    ToastMessagePage(ToastType type, const char *message1, const char *message2, const char *message3);
+    ToastMessagePage(ToastType type, data::Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam);
 
     void refresh();
-    bool updatePage();
+    void updatePage();
     WidgetCursor findWidget(int x, int y);
 
+    static void executeAction();
+
 private:
-    AlertMessageType type;
+    ToastType type;
 
     const char *message1;
     data::Value message1Value;
     const char *message2;
     const char *message3;
+
+    Widget actionWidget;
+    bool actionWidgetIsActive;
 };
 
 class SelectFromEnumPage : public InternalPage {
@@ -97,8 +102,10 @@ class SelectFromEnumPage : public InternalPage {
     SelectFromEnumPage(void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), 
                        uint8_t currentValue_, bool (*disabledCallback_)(uint8_t value), void (*onSet_)(uint8_t));
 
+    void init();
+
     void refresh();
-    bool updatePage();
+    void updatePage();
     WidgetCursor findWidget(int x, int y);
 
     void selectEnumItem();
@@ -106,6 +113,12 @@ class SelectFromEnumPage : public InternalPage {
   private:
     const data::EnumItem *enumDefinition;
     void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value);
+
+    int numItems;
+    int itemWidth;
+    int itemHeight;
+
+    bool dirty;
 
     uint8_t getValue(int i);
     const char *getLabel(int i);
@@ -117,10 +130,6 @@ class SelectFromEnumPage : public InternalPage {
 	void findPagePosition();
 
     const WidgetCursor &widgetCursorAtTouchDown;
-
-    int numItems;
-    int itemWidth;
-    int itemHeight;
 
     bool isDisabled(int i);
 

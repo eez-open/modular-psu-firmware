@@ -77,8 +77,6 @@ void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
                  false, false, nullptr);
-
-        g_painted = true;
     }
 }
 

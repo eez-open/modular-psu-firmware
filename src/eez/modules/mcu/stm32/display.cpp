@@ -385,8 +385,10 @@ void animate() {
     }
 }
 
-void sync(bool painted) {
-    if (painted) {
+void sync() {
+    if (g_painted) {
+        g_painted = false;
+
         if (g_animationState.enabled) {
             animate();
         }
@@ -478,6 +480,8 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
 void drawPixel(int x, int y) {
     DMA2D_WAIT;
     *(g_buffer + y * DISPLAY_WIDTH + x) = g_fc;
+
+    g_painted = true;
 }
 
 void drawRect(int x1, int y1, int x2, int y2) {
@@ -492,6 +496,8 @@ void drawRect(int x1, int y1, int x2, int y2) {
     drawHLine(x1, y2, x2 - x1);
     drawVLine(x1, y1, y2 - y1);
     drawVLine(x2, y1, y2 - y1);
+
+    g_painted = true;
 }
 
 void fillRect(int x1, int y1, int x2, int y2, int r) {
@@ -512,18 +518,26 @@ void fillRect(int x1, int y1, int x2, int y2, int r) {
             drawHLine(x1 + r - rx, y1 + r - ry, rx);
         }
     }
+
+    g_painted = true;
 }
 
 void drawHLine(int x, int y, int l) {
     fillRect(x, y, x + l, y);
+
+    g_painted = true;
 }
 
 void drawVLine(int x, int y, int l) {
     fillRect(x, y, x, y + l);
+
+    g_painted = true;
 }
 
 void drawBitmap(int x, int y, int sx, int sy, void *data, int bpp) {
     bitBlt(data, bpp, 0, g_buffer, x, y, sx, sy);
+
+    g_painted = true;
 }
 
 void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,
@@ -543,6 +557,8 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
             x += drawGlyph(x, y, clip_x1, clip_y1, clip_x2, clip_y2, encoding);
         }
     }
+
+    g_painted = true;
 }
 
 } // namespace display

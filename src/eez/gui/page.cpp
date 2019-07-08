@@ -69,30 +69,41 @@ void SetPage::discard() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-ToastMessagePage::ToastMessagePage(AlertMessageType type_, const char *message1_) 
-    : type(type_), message1(message1_), message2(nullptr), message3(nullptr) 
+ToastMessagePage::ToastMessagePage(ToastType type_, const char *message1_) 
+    : type(type_), message1(message1_), message2(nullptr), message3(nullptr)
 {
+    actionWidget.action = 0;
 }
 
-ToastMessagePage::ToastMessagePage(AlertMessageType type_, data::Value message1Value_) 
+ToastMessagePage::ToastMessagePage(ToastType type_, data::Value message1Value_) 
     : type(type_), message1(nullptr), message1Value(message1Value_), message2(nullptr), message3(nullptr)
 {
+    actionWidget.action = 0;
 }
 
-ToastMessagePage::ToastMessagePage(AlertMessageType type_, const char *message1_, const char *message2_) 
+ToastMessagePage::ToastMessagePage(ToastType type_, const char *message1_, const char *message2_) 
     : type(type_), message1(message1_), message2(message2_), message3(nullptr)
 {
+    actionWidget.action = 0;
 }
 
-ToastMessagePage::ToastMessagePage(AlertMessageType type_, const char *message1_, const char *message2_, const char *message3_) 
+ToastMessagePage::ToastMessagePage(ToastType type_, const char *message1_, const char *message2_, const char *message3_) 
     : type(type_), message1(message1_), message2(message2_), message3(message3_)
 {
+    actionWidget.action = 0;
+}
+
+ToastMessagePage::ToastMessagePage(ToastType type_, data::Value message1Value_, void (*action)(int param), const char *actionLabel, int actionParam) 
+    : type(type_), message1(nullptr), message1Value(message1Value_), message2(actionLabel), message3(nullptr), actionWidgetIsActive(false)
+{
+    actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION;
+    g_appContext->m_toastAction = action;
+    g_appContext->m_toastActionParam = actionParam;
 }
 
 void ToastMessagePage::refresh() {
     const Style *style = getStyle(
-        type == INFO_ALERT ? STYLE_ID_INFO_ALERT : 
-        type == TOAST_ALERT ? STYLE_ID_TOAST_ALERT : 
+        type == INFO_TOAST ? STYLE_ID_INFO_ALERT : 
         STYLE_ID_ERROR_ALERT);
 
     font::Font font = styleGetFont(style);
@@ -116,7 +127,7 @@ void ToastMessagePage::refresh() {
         style->padding_right + style->border_size_right;
 
     height = style->border_size_top + style->padding_top + 
-        (message3 ? 3 : message2 ? 2 : 1) * textHeight + 
+        ((message3 || actionWidget.action) ? 3 : message2 ? 2 : 1) * textHeight +
         style->padding_bottom + style->border_size_bottom;
 
 	x = g_appContext->x + (g_appContext->width - width) / 2;
@@ -155,10 +166,41 @@ void ToastMessagePage::refresh() {
         x1, y1, x2, y2, font);
 
     if (message2) {
-        display::drawStr(message2, -1, 
-            x1 + style->padding_left + (textWidth - textWidth2) / 2, 
-            y1 + style->padding_top + textHeight, 
-            x1, y1, x2, y2, font);
+        if (actionWidget.action) {
+            const Style *activeStyle = getStyle(STYLE_ID_ERROR_ALERT_BUTTON);
+            
+            actionWidget.x = x1 + style->padding_left;
+            actionWidget.y = y1 + style->padding_top + textHeight + style->padding_top;
+            actionWidget.w = x2 - x1 - style->padding_left - style->padding_right;
+            actionWidget.h = textHeight;
+            
+            if (actionWidgetIsActive) {
+                display::setColor(activeStyle->color);
+
+                display::fillRect(
+                    actionWidget.x,
+                    actionWidget.y,
+                    actionWidget.x + actionWidget.w - 1,
+                    actionWidget.y + actionWidget.h - 1,
+                    0);
+
+                display::setBackColor(activeStyle->color);
+                display::setColor(activeStyle->background_color);
+            } else {
+                display::setBackColor(activeStyle->background_color);
+                display::setColor(activeStyle->color);
+            }
+
+            display::drawStr(message2, -1, 
+                actionWidget.x + (textWidth - textWidth2) / 2, actionWidget.y, 
+                x1, y1, x2, y2, font);
+        }
+        else {
+            display::drawStr(message2, -1,
+                x1 + style->padding_left + (textWidth - textWidth2) / 2,
+                y1 + style->padding_top + textHeight,
+                x1, y1, x2, y2, font);
+        }
     }
 
     if (message3) {
@@ -169,13 +211,28 @@ void ToastMessagePage::refresh() {
     }
 }
 
-bool ToastMessagePage::updatePage() {
-    return false;
+void ToastMessagePage::updatePage() {
+    if (actionWidgetIsActive != isActiveWidget(WidgetCursor(g_appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0))) {
+        actionWidgetIsActive = !actionWidgetIsActive;
+        refresh();
+    }
 }
 
 WidgetCursor ToastMessagePage::findWidget(int x, int y) {
-	widget.action = ACTION_ID_INTERNAL_DIALOG_YES;
-	return WidgetCursor(g_appContext, &widget, x, y, -1, 0, 0);
+    if (x >= this->x && x < this->x + width && y >= this->y && y < this->y + height) {
+        if (actionWidget.action && x >= actionWidget.x && x < actionWidget.x + actionWidget.w && y >= actionWidget.y && y < actionWidget.y + actionWidget.h) {
+            return WidgetCursor(g_appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0);
+        }
+        widget.action = ACTION_ID_INTERNAL_DIALOG_YES;
+        return WidgetCursor(g_appContext, &widget, x, y, -1, 0, 0);
+    }
+    
+    return WidgetCursor();
+}
+
+void ToastMessagePage::executeAction() {
+    popPage();
+    g_appContext->m_toastAction(g_appContext->m_toastActionParam);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -187,6 +244,7 @@ SelectFromEnumPage::SelectFromEnumPage(const data::EnumItem *enumDefinition_, ui
 	  currentValue(currentValue_), disabledCallback(disabledCallback_), onSet(onSet_),
 	  widgetCursorAtTouchDown(getFoundWidgetAtDown())
 {
+    init();
 }
 
 SelectFromEnumPage::SelectFromEnumPage(void (*enumDefinitionFunc_)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), 
@@ -195,6 +253,47 @@ SelectFromEnumPage::SelectFromEnumPage(void (*enumDefinitionFunc_)(data::DataOpe
 	  currentValue(currentValue_), disabledCallback(disabledCallback_), onSet(onSet_),
 	  widgetCursorAtTouchDown(getFoundWidgetAtDown())
 {
+    init();
+}
+
+void SelectFromEnumPage::init() {
+    const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
+    const Style *itemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
+
+    font::Font font = styleGetFont(itemStyle);
+
+    // calculate geometry
+    itemHeight = itemStyle->padding_left + font.getHeight() + itemStyle->padding_right;
+    itemWidth = 0;
+
+    int i;
+
+    char text[64];
+
+    for (i = 0; getLabel(i); ++i) {
+        getItemLabel(i, text, sizeof(text));
+        int width = display::measureStr(text, -1, font);
+        if (width > itemWidth) {
+            itemWidth = width;
+        }
+    }
+
+    numItems = i;
+
+    itemWidth = itemStyle->padding_left + itemWidth + itemStyle->padding_right;
+
+    width = containerStyle->padding_left + itemWidth + containerStyle->padding_right;
+    if (width > display::getDisplayWidth()) {
+        width = display::getDisplayWidth();
+    }
+
+    height =
+        containerStyle->padding_top + numItems * itemHeight + containerStyle->padding_bottom;
+    if (height > display::getDisplayHeight()) {
+        height = display::getDisplayHeight();
+    }
+
+    findPagePosition();
 }
 
 uint8_t SelectFromEnumPage::getValue(int i) {
@@ -225,31 +324,16 @@ bool SelectFromEnumPage::isDisabled(int i) {
 
 void SelectFromEnumPage::findPagePosition() {
 	x = widgetCursorAtTouchDown.x;
-	y = widgetCursorAtTouchDown.y + widgetCursorAtTouchDown.widget->h;
-	if (x + width <= display::getDisplayWidth() && y + height <= display::getDisplayHeight()) {
-		return;
+    int right = g_appContext->x + g_appContext->width - 10;
+    if (x + width > right) {
+        x = right - width;
 	}
 
-	x = widgetCursorAtTouchDown.x + widgetCursorAtTouchDown.widget->w - width;
-	y = widgetCursorAtTouchDown.y + widgetCursorAtTouchDown.widget->h;
-	if (x + width <= display::getDisplayWidth() && y + height <= display::getDisplayHeight()) {
-		return;
+    y = widgetCursorAtTouchDown.y + widgetCursorAtTouchDown.widget->h;
+    int bottom = g_appContext->y + g_appContext->height - 10;
+    if (y + height > bottom) {
+        y = bottom - height;
 	}
-
-	x = widgetCursorAtTouchDown.x;
-	y = widgetCursorAtTouchDown.y - height;
-	if (x + width <= display::getDisplayWidth() && y + height <= display::getDisplayHeight()) {
-		return;
-	}
-
-	x = widgetCursorAtTouchDown.x + widgetCursorAtTouchDown.widget->w - width;
-	y = widgetCursorAtTouchDown.y - height;
-	if (x + width <= display::getDisplayWidth() && y + height <= display::getDisplayHeight()) {
-		return;
-	}
-
-	x = (display::getDisplayWidth() - width) / 2;
-	y = (display::getDisplayHeight() - height) / 2;
 }
 
 void SelectFromEnumPage::refresh() {
@@ -259,45 +343,13 @@ void SelectFromEnumPage::refresh() {
 
     font::Font font = styleGetFont(itemStyle);
 
-    // calculate geometry
-    itemHeight = itemStyle->padding_left + font.getHeight() + itemStyle->padding_right;
-    itemWidth = 0;
-
-    int i;
-
-    char text[64];
-
-    for (i = 0; getLabel(i); ++i) {
-        getItemLabel(i, text, sizeof(text));
-        int width = display::measureStr(text, -1, font);
-        if (width > itemWidth) {
-            itemWidth = width;
-        }
-    }
-
-    itemWidth = itemStyle->padding_left + itemWidth + itemStyle->padding_right;
-
-    numItems = i;
-
-    width = containerStyle->padding_left + itemWidth + containerStyle->padding_right;
-    if (width > display::getDisplayWidth()) {
-        width = display::getDisplayWidth();
-    }
-
-    height =
-        containerStyle->padding_top + numItems * itemHeight + containerStyle->padding_bottom;
-    if (height > display::getDisplayHeight()) {
-        height = display::getDisplayHeight();
-    }
-
-	findPagePosition();
-
     // draw background
     display::setColor(containerStyle->background_color);
     display::fillRect(x, y, x + width - 1, y + height - 1);
 
     // draw labels
-    for (i = 0; getLabel(i); ++i) {
+    char text[64];
+    for (int i = 0; getLabel(i); ++i) {
         int xItem, yItem;
         getItemPosition(i, xItem, yItem);
 
@@ -306,10 +358,14 @@ void SelectFromEnumPage::refresh() {
                  isDisabled(i) ? disabledItemStyle : itemStyle, nullptr, false, false, false,
                  nullptr);
     }
+
+    dirty = false;
 }
 
-bool SelectFromEnumPage::updatePage() {
-    return false;
+void SelectFromEnumPage::updatePage() {
+    if (dirty) {
+        refresh();
+    }
 }
 
 WidgetCursor SelectFromEnumPage::findWidget(int x, int y) {
@@ -320,9 +376,11 @@ WidgetCursor SelectFromEnumPage::findWidget(int x, int y) {
         getItemPosition(i, xItem, yItem);
         if (!isDisabled(i)) {
         	if (x >= xItem && x < xItem + itemWidth && y >= yItem && y < yItem + itemHeight) {
+                currentValue = getValue(i);
+                dirty = true;
+
         		widget.action = ACTION_ID_INTERNAL_SELECT_ENUM_ITEM;
         		widget.data = (uint16_t)i;
-        		// TODO can't leave nullptr here
         		return WidgetCursor(g_appContext, &widget, x, y, -1, 0, 0);
         	}
         }

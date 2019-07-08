@@ -71,8 +71,6 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                      widgetCursor.currentState->flags.blinking,
                      display_string_widget->flags.ignoreLuminosity, nullptr);
         }
-
-        g_painted = true;
     }
 }
 

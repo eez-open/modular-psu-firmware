@@ -47,12 +47,12 @@ public:
     uint32_t m_showPageTime;
     char m_textMessage[32 + 1];
     uint8_t m_textMessageVersion;
-    void (*m_errorMessageAction)(int param);
     void (*m_dialogYesCallback)();
     void (*m_dialogNoCallback)();
     void (*m_dialogCancelCallback)();
     void (*m_dialogLaterCallback)();
-    int m_errorMessageActionParam;
+    void(*m_toastAction)(int param);
+    int m_toastActionParam;
     void (*m_checkAsyncOperationStatus)();
 
     virtual void stateManagment();
@@ -119,12 +119,11 @@ public:
     int m_previousPageId = INTERNAL_PAGE_ID_NONE;
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
-    int m_nextShowPageId = INTERNAL_PAGE_ID_NONE;
 
     void doShowPage(int index, Page *page = 0);
     void setPage(int pageId);
 
-    bool updatePage(int pageId, bool repaint, WidgetCursor &widgetCursor);
+    void updatePage(bool repaint, WidgetCursor &widgetCursor);
 }; // namespace gui
 
 extern AppContext *g_appContext;
