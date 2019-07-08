@@ -443,23 +443,16 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 
     bool repaint = false;
 
-	auto savedPreviousState = widgetCursor.previousState;
-	auto savedCurrentState = widgetCursor.currentState;
-
     for (++i; i < m_pageNavigationStackPointer; i++) {
         repaint = updatePage(m_pageNavigationStack[i].pageId, m_pageNavigationStack[i].repaint || repaint, widgetCursor);
         m_pageNavigationStack[i].repaint = false;
 
-		// TODO move this to WidgetCursor
         if (widgetCursor.previousState) {
 			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
         }
         if (widgetCursor.currentState)
 			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
     }
-
-	widgetCursor.previousState = savedPreviousState;
-	widgetCursor.currentState = savedCurrentState;
 
     updatePage(m_activePageId, m_repaintActivePage || repaint, widgetCursor);
     m_repaintActivePage = false;
