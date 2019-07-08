@@ -69,31 +69,27 @@ void SetPage::discard() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-AlertMessagePage::AlertMessagePage(AlertMessageType type_, const char *message1_, void (*callback_)()) 
+ToastMessagePage::ToastMessagePage(AlertMessageType type_, const char *message1_) 
     : type(type_), message1(message1_), message2(nullptr), message3(nullptr) 
 {
-    g_appContext->m_dialogYesCallback = callback_;
 }
 
-AlertMessagePage::AlertMessagePage(AlertMessageType type_, data::Value message1Value_, void (*callback_)()) 
+ToastMessagePage::ToastMessagePage(AlertMessageType type_, data::Value message1Value_) 
     : type(type_), message1(nullptr), message1Value(message1Value_), message2(nullptr), message3(nullptr)
 {
-    g_appContext->m_dialogYesCallback = callback_;
 }
 
-AlertMessagePage::AlertMessagePage(AlertMessageType type_, const char *message1_, const char *message2_, void(*callback_)()) 
+ToastMessagePage::ToastMessagePage(AlertMessageType type_, const char *message1_, const char *message2_) 
     : type(type_), message1(message1_), message2(message2_), message3(nullptr)
 {
-    g_appContext->m_dialogYesCallback = callback_;
 }
 
-AlertMessagePage::AlertMessagePage(AlertMessageType type_, const char *message1_, const char *message2_, const char *message3_, void(*callback_)()) 
+ToastMessagePage::ToastMessagePage(AlertMessageType type_, const char *message1_, const char *message2_, const char *message3_) 
     : type(type_), message1(message1_), message2(message2_), message3(message3_)
 {
-    g_appContext->m_dialogYesCallback = callback_;
 }
 
-void AlertMessagePage::refresh() {
+void ToastMessagePage::refresh() {
     const Style *style = getStyle(
         type == INFO_ALERT ? STYLE_ID_INFO_ALERT : 
         type == TOAST_ALERT ? STYLE_ID_TOAST_ALERT : 
@@ -173,13 +169,13 @@ void AlertMessagePage::refresh() {
     }
 }
 
-bool AlertMessagePage::updatePage() {
+bool ToastMessagePage::updatePage() {
     return false;
 }
 
-WidgetCursor AlertMessagePage::findWidget(int x, int y) {
+WidgetCursor ToastMessagePage::findWidget(int x, int y) {
 	widget.action = ACTION_ID_INTERNAL_DIALOG_YES;
-	return WidgetCursor(nullptr, &widget, x, y, -1, 0, 0);
+	return WidgetCursor(g_appContext, &widget, x, y, -1, 0, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -327,7 +323,7 @@ WidgetCursor SelectFromEnumPage::findWidget(int x, int y) {
         		widget.action = ACTION_ID_INTERNAL_SELECT_ENUM_ITEM;
         		widget.data = (uint16_t)i;
         		// TODO can't leave nullptr here
-        		return WidgetCursor(nullptr, &widget, x, y, -1, 0, 0);
+        		return WidgetCursor(g_appContext, &widget, x, y, -1, 0, 0);
         	}
         }
     }

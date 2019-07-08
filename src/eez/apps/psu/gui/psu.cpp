@@ -371,7 +371,8 @@ static int g_iChannelSetLimit;
 void onSetVoltageLimit(float limit) {
     Channel &channel = Channel::get(g_iChannelSetLimit);
     channel_dispatcher::setVoltageLimit(channel, limit);
-    infoMessage("Voltage limit changed!", popPage);
+    popPage();
+    infoMessage("Voltage limit changed!");
 }
 
 void changeVoltageLimit(int iChannel) {
@@ -388,7 +389,8 @@ void changeVoltageLimit(int iChannel) {
 void onSetCurrentLimit(float limit) {
     Channel &channel = Channel::get(g_iChannelSetLimit);
     channel_dispatcher::setCurrentLimit(channel, limit);
-    infoMessage("Current limit changed!", popPage);
+    popPage();
+    infoMessage("Current limit changed!");
 }
 
 void changeCurrentLimit(int iChannel) {
@@ -405,7 +407,8 @@ void changeCurrentLimit(int iChannel) {
 void onSetPowerLimit(float limit) {
     Channel &channel = Channel::get(g_iChannelSetLimit);
     channel_dispatcher::setPowerLimit(channel, limit);
-    infoMessage("Power limit changed!", popPage);
+    popPage();
+    infoMessage("Power limit changed!");
 }
 
 void changePowerLimit(int iChannel) {
@@ -441,7 +444,8 @@ void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_ca
         }
     }
 
-    errorMessage(value, ok_callback);
+    ok_callback();
+    errorMessage(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

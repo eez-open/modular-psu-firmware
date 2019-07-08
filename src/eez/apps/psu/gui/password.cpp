@@ -46,7 +46,8 @@ static void checkPasswordOkCallback(char *text) {
         g_checkPasswordOkCallback();
     } else {
         // entered password doesn't match,
-        errorMessage("Invalid password!", popPage);
+        popPage();
+        errorMessage("Invalid password!");
     }
 }
 
@@ -61,7 +62,8 @@ static void onRetypeNewPasswordOk(char *text) {
     size_t textLen = strlen(text);
     if (strlen(g_newPassword) != textLen || strncmp(g_newPassword, text, textLen) != 0) {
         // retyped new password doesn't match
-        errorMessage("Password doesn't match!", popPage);
+        popPage();
+        errorMessage("Password doesn't match!");
         return;
     }
 
@@ -73,14 +75,15 @@ static void onRetypeNewPasswordOk(char *text) {
         isChanged = persist_conf::changeCalibrationPassword(g_newPassword, strlen(g_newPassword));
     }
 
-    if (!isChanged) {
-        // failed to save changed password
-        errorMessage("Failed to change password!", popPage);
-        return;
-    }
+    popPage();
 
-    // success
-    infoMessage("Password changed!", popPage);
+    if (isChanged) {
+        // success
+        infoMessage("Password changed!");
+    } else{
+        // failed to save changed password
+        errorMessage("Failed to change password!");
+    }
 }
 
 static void onNewPasswordOk(char *text) {

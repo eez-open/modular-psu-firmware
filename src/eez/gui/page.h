@@ -70,12 +70,12 @@ enum AlertMessageType {
     ERROR_ALERT
 };
 
-class AlertMessagePage : public InternalPage {
+class ToastMessagePage : public InternalPage {
 public:
-    AlertMessagePage(AlertMessageType type, const char *message1, void (*callback)());
-    AlertMessagePage(AlertMessageType type, data::Value message1Value, void(*callback)());
-    AlertMessagePage(AlertMessageType type, const char *message1, const char *message2, void(*callback)());
-    AlertMessagePage(AlertMessageType type, const char *message1, const char *message2, const char *message3, void(*callback)());
+    ToastMessagePage(AlertMessageType type, const char *message1);
+    ToastMessagePage(AlertMessageType type, data::Value message1Value);
+    ToastMessagePage(AlertMessageType type, const char *message1, const char *message2);
+    ToastMessagePage(AlertMessageType type, const char *message1, const char *message2, const char *message3);
 
     void refresh();
     bool updatePage();

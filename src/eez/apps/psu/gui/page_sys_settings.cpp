@@ -280,7 +280,8 @@ void SysSettingsDateTimePage::doSet() {
         event_queue::pushEvent(event_queue::EVENT_INFO_SYSTEM_DATE_TIME_CHANGED);
     }
 
-    infoMessage("Date and time settings saved!", popPage);
+    popPage();
+    infoMessage("Date and time settings saved!");
     return;
 }
 
@@ -361,7 +362,8 @@ void SysSettingsEthernetPage::set() {
     if (getDirty()) {
         if (persist_conf::setEthernetSettings(m_enabled, m_dhcpEnabled, m_ipAddress, m_dns,
                                               m_gateway, m_subnetMask, m_scpiPort, m_macAddress)) {
-            infoMessage("Turn off and on power or", "press reset to apply changes!", popPage);
+            popPage();
+            infoMessage("Turn off and on power or", "press reset to apply changes!");
         }
     }
 }
@@ -550,12 +552,14 @@ void SysSettingsAuxOtpPage::setParams() {
     temperature::sensors[temp_sensor::AUX].prot_conf.delay = delay.getFloat();
 
     profile::save();
-    infoMessage("Aux temp. protection changed!", popPage);
+    popPage();
+    infoMessage("Aux temp. protection changed!");
 }
 
 void SysSettingsAuxOtpPage::clear() {
     temperature::sensors[temp_sensor::AUX].clearProtection();
-    infoMessage("Cleared!", popPage);
+    popPage();
+    infoMessage("Cleared!");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -606,7 +610,8 @@ int SysSettingsEncoderPage::getDirty() {
 void SysSettingsEncoderPage::set() {
     if (getDirty()) {
         persist_conf::setEncoderSettings(confirmationMode, movingSpeedDown, movingSpeedUp);
-        infoMessage("Encoder settings changed!", popPage);
+        popPage();
+        infoMessage("Encoder settings changed!");
     }
 }
 
@@ -677,7 +682,8 @@ void SysSettingsTriggerPage::set() {
 
         persist_conf::saveDevice2();
 
-        infoMessage("Trigger settings saved!", popPage);
+        popPage();
+        infoMessage("Trigger settings saved!");
     }
 }
 
@@ -741,7 +747,8 @@ void SysSettingsIOPinsPage::set() {
 		persist_conf::devConf2.ioPins[2].function = m_function[3];
 
         if (persist_conf::saveDevice2()) {
-            infoMessage("Digital I/O pin settings saved!", popPage);
+            popPage();
+            infoMessage("Digital I/O pin settings saved!");
         }
 
         io_pins::refresh();
@@ -777,7 +784,8 @@ int SysSettingsSerialPage::getDirty() {
 void SysSettingsSerialPage::set() {
     if (getDirty()) {
         if (persist_conf::setSerialSettings(m_enabled, m_baudIndex, m_parity)) {
-            infoMessage("Serial settings saved!", popPage);
+            popPage();
+            infoMessage("Serial settings saved!");
         }
     }
 }

@@ -107,32 +107,38 @@ uint8_t getTextMessageVersion() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void infoMessage(const char *message, void (*callback)()) {
-    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(INFO_ALERT, message, callback));
+void pushToastMessage(ToastMessagePage *toastMessage) {
+    pushPage(INTERNAL_PAGE_ID_TOAST_MESSAGE, toastMessage);
 }
 
-void infoMessage(const char *message1, const char *message2, void(*callback)()) {
-    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(INFO_ALERT, message1, message2, callback));
+void infoMessage(const char *message) {
+    pushToastMessage(new ToastMessagePage(INFO_ALERT, message));
 }
 
-void toastMessage(const char *message1, const char *message2, const char *message3, void (*callback)()) {
-    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(TOAST_ALERT, message1, message2, message3, callback));
+void infoMessage(const char *message1, const char *message2) {
+    pushToastMessage(new ToastMessagePage(INFO_ALERT, message1, message2));
 }
 
-void errorMessage(const char *message, void (*callback)()) {
-    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(ERROR_ALERT, message, callback));
+void toastMessage(const char *message1, const char *message2, const char *message3) {
+    pushToastMessage(new ToastMessagePage(TOAST_ALERT, message1, message2, message3));
+}
+
+void errorMessage(const char *message) {
+    pushToastMessage(new ToastMessagePage(ERROR_ALERT, message));
     sound::playBeep();
 }
 
-void errorMessage(const char *message1, const char *message2, void (*callback)()) {
-    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(ERROR_ALERT, message1, message2, callback));
+void errorMessage(const char *message1, const char *message2) {
+    pushToastMessage(new ToastMessagePage(ERROR_ALERT, message1, message2));
     sound::playBeep();
 }
 
-void errorMessage(data::Value value, void (*callback)()) {
-    pushPage(INTERNAL_PAGE_ID_INFO, new AlertMessagePage(ERROR_ALERT, value, callback));
+void errorMessage(data::Value value) {
+    pushToastMessage(new ToastMessagePage(ERROR_ALERT, value));
     sound::playBeep();
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 void errorMessageWithAction(data::Value value, void (*ok_callback)(),
                             void (*action)(int param), const char *actionLabel, int actionParam) {

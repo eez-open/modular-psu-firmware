@@ -43,12 +43,12 @@ void clearTextMessage();
 const char *getTextMessage();
 uint8_t getTextMessageVersion();
 
-void infoMessage(const char *message, void (*ok_callback)() = 0);
-void infoMessage(const char *message1, const char *message2, void(*ok_callback)() = 0);
-void toastMessage(const char *message1, const char *message2, const char *message3, void (*callback)() = 0);
-void errorMessage(const char *message, void (*callback)() = 0);
-void errorMessage(const char *message1, const char *message2, void (*callback)() = 0);
-void errorMessage(data::Value value, void (*callback)() = 0);
+void infoMessage(const char *message);
+void infoMessage(const char *message1, const char *message2);
+void toastMessage(const char *message1, const char *message2, const char *message3);
+void errorMessage(const char *message);
+void errorMessage(const char *message1, const char *message2);
+void errorMessage(data::Value value);
 
 void errorMessageWithAction(data::Value value, void (*ok_callback)(), void (*action)(int param), const char *actionLabel, int actionParam);
 void errorMessageAction();

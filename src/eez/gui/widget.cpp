@@ -255,7 +255,6 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback)
     if (g_appContext->isActivePageInternal()) {
     	if (callback == findWidgetStep) {
     		g_foundWidget = ((InternalPage *)g_appContext->getActivePage())->findWidget(g_findWidgetAtX, g_findWidgetAtY);
-    		g_foundWidget.appContext = g_appContext;
     	}
     } else {
 		auto savedWidget = widgetCursor.widget;

@@ -62,7 +62,7 @@ void AppContext::stateManagment() {
 
     // remove alert message after period of time
     uint32_t inactivityPeriod = psu::idle::getGuiAndEncoderInactivityPeriod();
-    if (getActivePageId() == INTERNAL_PAGE_ID_INFO) {
+    if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
         if (inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
             dialogOk();
             return;

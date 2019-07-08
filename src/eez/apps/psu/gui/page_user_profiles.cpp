@@ -82,7 +82,8 @@ void UserProfilesPage::recall() {
 
 void UserProfilesPage::onSaveFinish(char *remark, void (*callback)()) {
     if (profile::saveAtLocation(g_selectedProfileLocation, remark)) {
-        infoMessage("Current parameters saved", callback);
+        callback();
+        infoMessage("Current parameters saved");
     } else {
         errorMessage("EEPROM save failed!");
     }
@@ -130,10 +131,12 @@ void UserProfilesPage::deleteProfile() {
 }
 
 void UserProfilesPage::onEditRemarkOk(char *newRemark) {
+    popPage();
+
     if (profile::setName(g_selectedProfileLocation, newRemark, strlen(newRemark))) {
-        infoMessage("Remark changed", popPage);
+        infoMessage("Remark changed");
     } else {
-        errorMessage("Failed!", popPage);
+        errorMessage("Failed!");
     }
 }
 

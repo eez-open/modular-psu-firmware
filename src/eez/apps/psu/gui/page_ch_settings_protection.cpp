@@ -39,7 +39,8 @@ namespace gui {
 void ChSettingsProtectionPage::clear() {
     channel_dispatcher::clearProtection(*g_channel);
 
-    infoMessage("Cleared!", g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS_PROT]);
+    g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS_PROT]();
+    infoMessage("Cleared!");
 }
 
 void onClearAndDisableYes() {
@@ -47,7 +48,8 @@ void onClearAndDisableYes() {
     channel_dispatcher::disableProtection(*g_channel);
     profile::save();
 
-    infoMessage("Cleared and disabled!", g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS_PROT]);
+    g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS_PROT]();
+    infoMessage("Cleared and disabled!");
 }
 
 void ChSettingsProtectionPage::clearAndDisable() {
@@ -64,11 +66,9 @@ int ChSettingsProtectionSetPage::getDirty() {
 
 void ChSettingsProtectionSetPage::onSetFinish(bool showInfo) {
     profile::save();
+    g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS_PROT]();
     if (showInfo) {
-        infoMessage("Protection params changed!",
-                     g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS_PROT]);
-    } else {
-        g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS_PROT]();
+        infoMessage("Protection params changed!");
     }
 }
 

@@ -105,7 +105,8 @@ void selectTouchCalibrationPoint() {
         if (success) {
             yesNoDialog(g_yesNoPageId, "Save changes?", dialogYes, dialogNo, dialogCancel);
         } else {
-            toastMessage("Received data is invalid due to", "imprecise pointing or", "communication problem!", startCalibration);
+            startCalibration();
+            toastMessage("Received data is invalid due to", "imprecise pointing or", "communication problem!");
         }
     }
 }
