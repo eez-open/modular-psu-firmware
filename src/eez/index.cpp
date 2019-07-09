@@ -85,66 +85,92 @@ int g_numApplications = sizeof(g_applications) / sizeof(ApplicationInfo);
 
 namespace gui {
 
-Page *createPageFromId(int pageId) {
+static SelfTestResultPage g_SelfTestResultPage;
+static EventQueuePage g_EventQueuePage;
+static ChSettingsProtectionPage g_ChSettingsProtectionPage;
+static ChSettingsOvpProtectionPage g_ChSettingsOvpProtectionPage;
+static ChSettingsOcpProtectionPage g_ChSettingsOcpProtectionPage;
+static ChSettingsOppProtectionPage g_ChSettingsOppProtectionPage;
+static ChSettingsOtpProtectionPage g_ChSettingsOtpProtectionPage;
+static ChSettingsAdvRemotePage g_ChSettingsAdvRemotePage;
+static ChSettingsAdvRangesPage g_ChSettingsAdvRangesPage;
+static ChSettingsAdvTrackingPage g_ChSettingsAdvTrackingPage;
+static ChSettingsAdvCouplingPage g_ChSettingsAdvCouplingPage;
+static ChSettingsAdvViewPage g_ChSettingsAdvViewPage;
+static ChSettingsTriggerPage g_ChSettingsTriggerPage;
+static ChSettingsListsPage g_ChSettingsListsPage;
+static SysSettingsDateTimePage g_SysSettingsDateTimePage;
+static SysSettingsEthernetPage g_SysSettingsEthernetPage;
+static SysSettingsEthernetStaticPage g_SysSettingsEthernetStaticPage;
+static SysSettingsProtectionsPage g_SysSettingsProtectionsPage;
+static SysSettingsTriggerPage g_SysSettingsTriggerPage;
+static SysSettingsIOPinsPage g_SysSettingsIOPinsPage;
+static SysSettingsAuxOtpPage g_SysSettingsAuxOtpPage;
+static SysSettingsSoundPage g_SysSettingsSoundPage;
+static SysSettingsEncoderPage g_SysSettingsEncoderPage;
+static SysSettingsSerialPage g_SysSettingsSerialPage;
+static UserProfilesPage g_UserProfilesPage;
+
+Page *getPageFromId(int pageId) {
     switch (pageId) {
     case PAGE_ID_SELF_TEST_RESULT:
-        return new SelfTestResultPage();
+        return &g_SelfTestResultPage;
     case PAGE_ID_EVENT_QUEUE:
-        return new EventQueuePage();
+        return &g_EventQueuePage;
     case PAGE_ID_CH_SETTINGS_PROT:
-        return new ChSettingsProtectionPage();
+        return &g_ChSettingsProtectionPage;
     case PAGE_ID_CH_SETTINGS_PROT_OVP:
-        return new ChSettingsOvpProtectionPage();
+        return &g_ChSettingsOvpProtectionPage;
     case PAGE_ID_CH_SETTINGS_PROT_OCP:
-        return new ChSettingsOcpProtectionPage();
+        return &g_ChSettingsOcpProtectionPage;
     case PAGE_ID_CH_SETTINGS_PROT_OPP:
-        return new ChSettingsOppProtectionPage();
+        return &g_ChSettingsOppProtectionPage;
     case PAGE_ID_CH_SETTINGS_PROT_OTP:
-        return new ChSettingsOtpProtectionPage();
+        return &g_ChSettingsOtpProtectionPage;
     case PAGE_ID_CH_SETTINGS_ADV_REMOTE:
-        return new ChSettingsAdvRemotePage();
+        return &g_ChSettingsAdvRemotePage;
     case PAGE_ID_CH_SETTINGS_ADV_RANGES:
-        return new ChSettingsAdvRangesPage();
+        return &g_ChSettingsAdvRangesPage;
     case PAGE_ID_CH_SETTINGS_ADV_TRACKING:
-        return new ChSettingsAdvTrackingPage();
+        return &g_ChSettingsAdvTrackingPage;
     case PAGE_ID_CH_SETTINGS_ADV_COUPLING:
     case PAGE_ID_CH_SETTINGS_ADV_COUPLING_INFO:
-        return new ChSettingsAdvCouplingPage();
+        return &g_ChSettingsAdvCouplingPage;
     case PAGE_ID_CH_SETTINGS_ADV_VIEW:
-        return new ChSettingsAdvViewPage();
+        return &g_ChSettingsAdvViewPage;
     case PAGE_ID_CH_SETTINGS_TRIGGER:
-        return new ChSettingsTriggerPage();
+        return &g_ChSettingsTriggerPage;
     case PAGE_ID_CH_SETTINGS_LISTS:
-        return new ChSettingsListsPage();
+        return &g_ChSettingsListsPage;
     case PAGE_ID_SYS_SETTINGS_DATE_TIME:
-        return new SysSettingsDateTimePage();
+        return &g_SysSettingsDateTimePage;
 #if OPTION_ETHERNET
     case PAGE_ID_SYS_SETTINGS_ETHERNET:
-        return new SysSettingsEthernetPage();
+        return &g_SysSettingsEthernetPage;
     case PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC:
-        return new SysSettingsEthernetStaticPage();
+        return &g_SysSettingsEthernetStaticPage;
 #endif
     case PAGE_ID_SYS_SETTINGS_PROTECTIONS:
-        return new SysSettingsProtectionsPage();
+        return &g_SysSettingsProtectionsPage;
     case PAGE_ID_SYS_SETTINGS_TRIGGER:
-        return new SysSettingsTriggerPage();
+        return &g_SysSettingsTriggerPage;
     case PAGE_ID_SYS_SETTINGS_IO:
-        return new SysSettingsIOPinsPage();
+        return &g_SysSettingsIOPinsPage;
     case PAGE_ID_SYS_SETTINGS_AUX_OTP:
-        return new SysSettingsAuxOtpPage();
+        return &g_SysSettingsAuxOtpPage;
     case PAGE_ID_SYS_SETTINGS_SOUND:
-        return new SysSettingsSoundPage();
+        return &g_SysSettingsSoundPage;
 #if OPTION_ENCODER
     case PAGE_ID_SYS_SETTINGS_ENCODER:
-        return new SysSettingsEncoderPage();
+        return &g_SysSettingsEncoderPage;
 #endif
     case PAGE_ID_SYS_SETTINGS_SERIAL:
-        return new SysSettingsSerialPage();
+        return &g_SysSettingsSerialPage;
     case PAGE_ID_USER_PROFILES:
     case PAGE_ID_USER_PROFILES2:
     case PAGE_ID_USER_PROFILE_0_SETTINGS:
     case PAGE_ID_USER_PROFILE_SETTINGS:
-        return new UserProfilesPage();
+        return &g_UserProfilesPage;
     }
 
     return nullptr;

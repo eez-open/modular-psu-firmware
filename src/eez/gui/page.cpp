@@ -37,6 +37,9 @@ namespace gui {
 void Page::pageWillAppear() {
 }
 
+void Page::pageWillDisappear() {
+}
+
 bool Page::onEncoder(int counter) {
     return false;
 }
@@ -340,8 +343,6 @@ void SelectFromEnumPage::refresh() {
     const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
 	const Style *itemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
 	const Style *disabledItemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);
-
-    font::Font font = styleGetFont(itemStyle);
 
     // draw background
     display::setColor(containerStyle->background_color);

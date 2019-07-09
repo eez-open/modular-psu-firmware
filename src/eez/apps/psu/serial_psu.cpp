@@ -37,17 +37,8 @@ long g_bauds[] = { 4800, 9600, 19200, 38400, 57600, 115200 };
 size_t g_baudsSize = sizeof(g_bauds) / sizeof(long);
 
 size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
-    size_t written = 0;
-
-    if (serial::g_testResult == TEST_OK) {
-        for (size_t i = 0; i < len; i += CONF_SERIAL_BUFFER_SIZE) {
-            int size = MIN(CONF_SERIAL_BUFFER_SIZE, len - i);
-            SERIAL_PORT.write(data + i, size);
-            written += size;
-        }
-    }
-
-    return written;
+    SERIAL_PORT.write(data, len);
+    return len;
 }
 
 scpi_result_t SCPI_Flush(scpi_t *context) {

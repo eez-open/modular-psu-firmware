@@ -58,7 +58,7 @@ class ChSettingsAdvTrackingPage : public Page {
 
 class ChSettingsAdvViewPage : public SetPage {
   public:
-    ChSettingsAdvViewPage();
+    void pageWillAppear();
 
     void editDisplayValue1();
     void editDisplayValue2();

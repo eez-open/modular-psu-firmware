@@ -32,7 +32,7 @@ namespace gui {
 
 class SysSettingsDateTimePage : public SetPage {
   public:
-    SysSettingsDateTimePage();
+    void pageWillAppear();
 
     void edit();
     void setValue(float value);
@@ -79,7 +79,7 @@ class SysSettingsEthernetPage : public SetPage {
     friend class SysSettingsEthernetStaticPage;
 
   public:
-    SysSettingsEthernetPage();
+    void pageWillAppear();
 
     void toggle();
     void toggleDhcp();
@@ -123,7 +123,7 @@ class SysSettingsEthernetPage : public SetPage {
 
 class SysSettingsEthernetStaticPage : public SetPage {
   public:
-    SysSettingsEthernetStaticPage();
+    void pageWillAppear();
 
     void editIpAddress();
     void editDns();
@@ -162,7 +162,7 @@ class SysSettingsProtectionsPage : public Page {
 
 class SysSettingsAuxOtpPage : public SetPage {
   public:
-    SysSettingsAuxOtpPage();
+    void pageWillAppear();
 
     int getDirty();
     void set();
@@ -206,7 +206,7 @@ class SysSettingsSoundPage : public Page {
 
 class SysSettingsEncoderPage : public SetPage {
   public:
-    SysSettingsEncoderPage();
+    void pageWillAppear();
 
     void toggleConfirmationMode();
 
@@ -227,7 +227,7 @@ class SysSettingsEncoderPage : public SetPage {
 
 class SysSettingsTriggerPage : public SetPage {
   public:
-    SysSettingsTriggerPage();
+    void pageWillAppear();
 
     void selectSource();
     void editDelay();
@@ -251,7 +251,7 @@ class SysSettingsTriggerPage : public SetPage {
 
 class SysSettingsIOPinsPage : public SetPage {
   public:
-    SysSettingsIOPinsPage();
+    void pageWillAppear();
 
     void togglePolarity();
     void selectFunction();
@@ -273,7 +273,7 @@ class SysSettingsIOPinsPage : public SetPage {
 
 class SysSettingsSerialPage : public SetPage {
   public:
-    SysSettingsSerialPage();
+    void pageWillAppear();
 
     void toggle();
     void selectParity();

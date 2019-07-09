@@ -44,9 +44,6 @@ static uint8_t g_newTriggerMode;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-ChSettingsTriggerPage::ChSettingsTriggerPage() {
-}
-
 void ChSettingsTriggerPage::onFinishTriggerModeSet() {
     trigger::abort();
     channel_dispatcher::setVoltageTriggerMode(*g_channel, (TriggerMode)g_newTriggerMode);
@@ -181,7 +178,10 @@ float ChSettingsListsPage::m_currentList[MAX_LIST_LENGTH];
 
 float ChSettingsListsPage::m_dwellList[MAX_LIST_LENGTH];
 
-ChSettingsListsPage::ChSettingsListsPage() : m_listVersion(0), m_iCursor(0) {
+void ChSettingsListsPage::pageWillAppear() {
+    m_listVersion = 0;
+    m_iCursor = 0;
+
     float *dwellList = list::getDwellList(*g_channel, &m_dwellListLength);
     memcpy(m_dwellList, dwellList, m_dwellListLength * sizeof(float));
 

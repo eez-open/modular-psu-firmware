@@ -250,22 +250,24 @@ void findWidgetStep(const WidgetCursor &widgetCursor);
 void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) 
 {
     if (g_appContext->isActivePageInternal()) {
-    	if (callback == findWidgetStep) {
-    		g_foundWidget = ((InternalPage *)g_appContext->getActivePage())->findWidget(g_findWidgetAtX, g_findWidgetAtY);
-            if (g_foundWidget) {
-                return;
-            }
+    	if (callback != findWidgetStep) {
+    		return;
+    	}
 
-            // pass click through if active page is toast page and clicked outside
-            bool passThrough = g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE;
+		g_foundWidget = ((InternalPage *)g_appContext->getActivePage())->findWidget(g_findWidgetAtX, g_findWidgetAtY);
+		if (g_foundWidget) {
+			return;
+		}
 
-            // clicked outside internal page, close internal page
-            popPage();
+		// pass click through if active page is toast page and clicked outside
+		bool passThrough = g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE;
 
-            if (!passThrough) {
-                return;
-            }
-        }
+		// clicked outside internal page, close internal page
+		popPage();
+
+		if (!passThrough) {
+			return;
+		}
     }
 
     auto savedWidget = widgetCursor.widget;

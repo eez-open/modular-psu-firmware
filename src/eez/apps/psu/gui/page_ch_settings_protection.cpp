@@ -157,7 +157,7 @@ void ChSettingsProtectionSetPage::editDelay() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-ChSettingsOvpProtectionPage::ChSettingsOvpProtectionPage() {
+void ChSettingsOvpProtectionPage::pageWillAppear() {
     origState = state = g_channel->prot_conf.flags.u_state ? 1 : 0;
 
     origLimit = limit =
@@ -197,7 +197,7 @@ void ChSettingsOvpProtectionPage::setParams(bool checkLoad) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-ChSettingsOcpProtectionPage::ChSettingsOcpProtectionPage() {
+void ChSettingsOcpProtectionPage::pageWillAppear() {
     origState = state = g_channel->prot_conf.flags.i_state ? 1 : 0;
 
     origLimit = limit =
@@ -231,7 +231,7 @@ void ChSettingsOcpProtectionPage::setParams(bool checkLoad) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-ChSettingsOppProtectionPage::ChSettingsOppProtectionPage() {
+void ChSettingsOppProtectionPage::pageWillAppear() {
     origState = state = g_channel->prot_conf.flags.p_state ? 1 : 0;
 
     origLimit = limit =
@@ -275,7 +275,7 @@ void ChSettingsOppProtectionPage::setParams(bool checkLoad) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-ChSettingsOtpProtectionPage::ChSettingsOtpProtectionPage() {
+void ChSettingsOtpProtectionPage::pageWillAppear() {
 #if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
     EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     origState = state = temperature::getChannelSensorState(g_channel) ? 1 : 0;

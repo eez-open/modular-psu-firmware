@@ -32,7 +32,7 @@ extern Device devices[];
 extern int numDevices;
 
 bool anyFailed();
-char *getSelfTestResultString();
+void getSelfTestResultString(char *, int MAX_LENGTH);
 
 const char *getInstalledString(bool installed);
 const char *getTestResultString(TestResult g_testResult);

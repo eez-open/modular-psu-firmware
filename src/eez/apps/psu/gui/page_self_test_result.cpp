@@ -28,12 +28,14 @@ namespace eez {
 namespace psu {
 namespace gui {
 
+const int MAX_LENGTH = 255;
+char SelfTestResultPage::m_selfTestResult[MAX_LENGTH + 1];
+
 void SelfTestResultPage::pageWillAppear() {
-	m_selfTestResult = devices::getSelfTestResultString();
+	devices::getSelfTestResultString(m_selfTestResult, MAX_LENGTH);
 }
 
 void SelfTestResultPage::pageDidDisappear() {
-	free(m_selfTestResult);
 }
 
 }

@@ -119,9 +119,7 @@ bool anyFailed() {
     strncpy(result + index, str, strLength);                                                       \
     index = nextIndex
 
-char *getSelfTestResultString() {
-    const int MAX_LENGTH = 255;
-    char *result = (char *)malloc(MAX_LENGTH + 1);
+void getSelfTestResultString(char *result, int MAX_LENGTH) {
     int index = 0;
     int nextIndex;
     const char *str;
@@ -142,8 +140,6 @@ char *getSelfTestResultString() {
     }
 
     *(result + index) = 0;
-
-    return result;
 }
 
 const char *getInstalledString(bool installed) {

@@ -31,8 +31,6 @@ namespace gui {
 
 class ChSettingsTriggerPage : public Page {
   public:
-    ChSettingsTriggerPage();
-
     void editTriggerMode();
 
     void editVoltageTriggerValue();
@@ -59,7 +57,7 @@ class ChSettingsTriggerPage : public Page {
 
 class ChSettingsListsPage : public SetPage {
   public:
-    ChSettingsListsPage();
+    void pageWillAppear();
 
     void previousPage();
     void nextPage();

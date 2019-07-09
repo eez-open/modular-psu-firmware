@@ -49,7 +49,7 @@ namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SysSettingsDateTimePage::SysSettingsDateTimePage() {
+void SysSettingsDateTimePage::pageWillAppear() {
 #if OPTION_ETHERNET
     ntpEnabled = origNtpEnabled = persist_conf::isNtpEnabled();
     strcpy(ntpServer, persist_conf::devConf2.ntpServer);
@@ -289,7 +289,7 @@ void SysSettingsDateTimePage::doSet() {
 
 #if OPTION_ETHERNET
 
-SysSettingsEthernetPage::SysSettingsEthernetPage() {
+void SysSettingsEthernetPage::pageWillAppear() {
     m_enabledOrig = m_enabled = persist_conf::isEthernetEnabled();
     m_dhcpEnabledOrig = m_dhcpEnabled = persist_conf::isEthernetDhcpEnabled();
     m_ipAddressOrig = m_ipAddress = persist_conf::devConf2.ethernetIpAddress;
@@ -370,7 +370,7 @@ void SysSettingsEthernetPage::set() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SysSettingsEthernetStaticPage::SysSettingsEthernetStaticPage() {
+void SysSettingsEthernetStaticPage::pageWillAppear() {
     SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPreviousPage();
 
     m_ipAddressOrig = m_ipAddress = page->m_ipAddress;
@@ -470,7 +470,7 @@ void SysSettingsProtectionsPage::toggleForceDisablingAllOutputsOnPowerUp() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SysSettingsAuxOtpPage::SysSettingsAuxOtpPage() {
+void SysSettingsAuxOtpPage::pageWillAppear() {
     origState = state = temperature::sensors[temp_sensor::AUX].prot_conf.state ? 1 : 0;
 
     origLevel = level =
@@ -592,7 +592,7 @@ void SysSettingsSoundPage::toggleClickSound() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SysSettingsEncoderPage::SysSettingsEncoderPage() {
+void SysSettingsEncoderPage::pageWillAppear() {
     origConfirmationMode = confirmationMode = persist_conf::devConf2.flags.encoderConfirmationMode;
     origMovingSpeedDown = movingSpeedDown = persist_conf::devConf2.encoderMovingSpeedDown;
     origMovingSpeedUp = movingSpeedUp = persist_conf::devConf2.encoderMovingSpeedUp;
@@ -619,7 +619,7 @@ void SysSettingsEncoderPage::set() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SysSettingsTriggerPage::SysSettingsTriggerPage() {
+void SysSettingsTriggerPage::pageWillAppear() {
     m_sourceOrig = m_source = trigger::getSource();
     m_delayOrig = m_delay = trigger::getDelay();
     m_initiateContinuouslyOrig = m_initiateContinuously =
@@ -689,18 +689,18 @@ void SysSettingsTriggerPage::set() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SysSettingsIOPinsPage::SysSettingsIOPinsPage() {
-        m_polarityOrig[0] = m_polarity[0] = (io_pins::Polarity)persist_conf::devConf2.ioPins[0].polarity;
-        m_functionOrig[0] = m_function[0] = (io_pins::Function)persist_conf::devConf2.ioPins[0].function;
+void SysSettingsIOPinsPage::pageWillAppear() {
+    m_polarityOrig[0] = m_polarity[0] = (io_pins::Polarity)persist_conf::devConf2.ioPins[0].polarity;
+    m_functionOrig[0] = m_function[0] = (io_pins::Function)persist_conf::devConf2.ioPins[0].function;
 
-        m_polarityOrig[1] = m_polarity[1] = (io_pins::Polarity)persist_conf::devConf2.ioPinInput2.polarity;
-        m_functionOrig[1] = m_function[1] = (io_pins::Function)persist_conf::devConf2.ioPinInput2.function;
+    m_polarityOrig[1] = m_polarity[1] = (io_pins::Polarity)persist_conf::devConf2.ioPinInput2.polarity;
+    m_functionOrig[1] = m_function[1] = (io_pins::Function)persist_conf::devConf2.ioPinInput2.function;
 
-        m_polarityOrig[2] = m_polarity[2] = (io_pins::Polarity)persist_conf::devConf2.ioPins[1].polarity;
-        m_functionOrig[2] = m_function[2] = (io_pins::Function)persist_conf::devConf2.ioPins[1].function;
+    m_polarityOrig[2] = m_polarity[2] = (io_pins::Polarity)persist_conf::devConf2.ioPins[1].polarity;
+    m_functionOrig[2] = m_function[2] = (io_pins::Function)persist_conf::devConf2.ioPins[1].function;
 
-        m_polarityOrig[3] = m_polarity[3] = (io_pins::Polarity)persist_conf::devConf2.ioPins[2].polarity;
-        m_functionOrig[3] = m_function[3] = (io_pins::Function)persist_conf::devConf2.ioPins[2].function;
+    m_polarityOrig[3] = m_polarity[3] = (io_pins::Polarity)persist_conf::devConf2.ioPins[2].polarity;
+    m_functionOrig[3] = m_function[3] = (io_pins::Function)persist_conf::devConf2.ioPins[2].function;
 }
 
 void SysSettingsIOPinsPage::togglePolarity() {
@@ -757,7 +757,7 @@ void SysSettingsIOPinsPage::set() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SysSettingsSerialPage::SysSettingsSerialPage() {
+void SysSettingsSerialPage::pageWillAppear() {
     m_enabledOrig = m_enabled = persist_conf::isSerialEnabled();
     m_baudIndexOrig = m_baudIndex = persist_conf::getSerialBaudIndex();
     m_parityOrig = m_parity = (serial::Parity)persist_conf::getSerialParity();

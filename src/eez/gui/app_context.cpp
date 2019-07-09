@@ -179,7 +179,7 @@ void AppContext::onPageChanged() {
 void AppContext::doShowPage(int index, Page *page) {
     // delete current page
     if (m_activePage) {
-        delete m_activePage;
+        m_activePage->pageWillDisappear();
     }
 
     m_previousPageId = m_activePageId;
@@ -189,7 +189,7 @@ void AppContext::doShowPage(int index, Page *page) {
     if (page) {
         m_activePage = page;
     } else {
-        m_activePage = createPageFromId(m_activePageId);
+        m_activePage = getPageFromId(m_activePageId);
     }
 
     if (m_activePage) {
@@ -209,7 +209,7 @@ void AppContext::setPage(int pageId) {
     // delete stack
     for (int i = 0; i < m_pageNavigationStackPointer; ++i) {
         if (m_pageNavigationStack[i].page) {
-            delete m_pageNavigationStack[i].page;
+            m_pageNavigationStack[i].page->pageWillDisappear();
         }
     }
     m_pageNavigationStackPointer = 0;
@@ -230,7 +230,7 @@ void AppContext::pushPage(int pageId, Page *page) {
 
             // delete page on the bottom
             if (m_pageNavigationStack[0].page) {
-                delete m_pageNavigationStack[0].page;
+                m_pageNavigationStack[0].page->pageWillDisappear();
             }
 
             // move stack one down

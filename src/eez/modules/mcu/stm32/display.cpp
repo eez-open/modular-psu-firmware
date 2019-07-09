@@ -55,6 +55,9 @@ static bool g_isOn;
 
 static uint16_t *g_buffer;
 
+static bool g_takeScreenshot;
+static int g_screenshotY;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #define DMA2D_WAIT while (HAL_DMA2D_PollForTransfer(&hdma2d, 1000) != HAL_OK)
@@ -386,6 +389,11 @@ void animate() {
 }
 
 void sync() {
+    if (g_takeScreenshot) {
+    	bitBlt(g_buffer, (uint16_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    	g_takeScreenshot = false;
+    }
+
     if (g_painted) {
         g_painted = false;
 
@@ -398,7 +406,6 @@ void sync() {
                                            ? (uint16_t *)VRAM_BUFFER2_START_ADDRESS
                                            : (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
         bitBlt(g_buffer, g_newBufferAddress, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-
         // wait for VSYNC
         while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS))
             ;
@@ -422,6 +429,42 @@ int getDisplayWidth() {
 
 int getDisplayHeight() {
     return DISPLAY_HEIGHT;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void screanshotBegin() {
+	g_takeScreenshot = true;
+	do {
+		HAL_Delay(1);
+	} while (g_takeScreenshot);
+
+	g_screenshotY = 272 - 1;
+}
+
+bool screanshotGetLine(uint8_t *line) {
+    if (g_screenshotY < 0) {
+        return false;
+    }
+
+    uint16_t *src = ((uint16_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS) + g_screenshotY * getDisplayWidth();
+    uint8_t *dst = line;
+
+    int n = 480;
+    while (n--) {
+    	uint16_t color = *src++;
+
+    	*dst++ = COLOR_TO_B(color);
+		*dst++ = COLOR_TO_G(color);
+    	*dst++ = COLOR_TO_R(color);
+    }
+
+    --g_screenshotY;
+
+    return true;
+}
+
+void screanshotEnd() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////

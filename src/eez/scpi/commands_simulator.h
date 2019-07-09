@@ -46,6 +46,7 @@
     SCPI_COMMAND("DISPlay[:WINdow]:TEXT?", scpi_cmd_displayWindowTextQ) \
     SCPI_COMMAND("DISPlay[:WINdow][:STATe]", scpi_cmd_displayWindowState) \
     SCPI_COMMAND("DISPlay[:WINdow][:STATe]?", scpi_cmd_displayWindowStateQ) \
+    SCPI_COMMAND("DISPlay:DATA?", scpi_cmd_displayDataQ) \
     SCPI_COMMAND("INITiate:CONTinuous", scpi_cmd_initiateContinuous) \
     SCPI_COMMAND("INITiate:CONTinuous?", scpi_cmd_initiateContinuousQ) \
     SCPI_COMMAND("INITiate[:IMMediate]", scpi_cmd_initiateImmediate) \

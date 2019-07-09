@@ -30,7 +30,7 @@ class SelfTestResultPage : public Page {
     void pageWillAppear();
     void pageDidDisappear();
 
-    char *m_selfTestResult;
+    static char m_selfTestResult[];
 };
 
 } // namespace gui

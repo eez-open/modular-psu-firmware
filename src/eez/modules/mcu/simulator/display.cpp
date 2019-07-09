@@ -41,6 +41,8 @@
 
 #include "texture.h"
 
+#include <eez/apps/home/home.h>
+
 using namespace eez::gui;
 using namespace eez::home;
 
@@ -65,6 +67,9 @@ static uint32_t *g_frontPanelBuffer2;
 static uint32_t *g_frontPanelBuffer3;
 
 static uint16_t g_x, g_y, g_x1, g_y1, g_x2, g_y2;
+
+static uint8_t *g_screenshotBuffer;
+static int g_screenshotY;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -443,6 +448,45 @@ static void setPixel(uint16_t color) {
     ((uint8_t *)&pixel)[3] = 255;
     setPixel(pixel);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+void screanshotBegin() {
+    g_screenshotBuffer = new uint8_t[480 * 272 * 3];
+
+    uint8_t *src = (uint8_t *)(g_frontPanelBuffer + home::g_homeAppContext.y * g_frontPanelWidth + home::g_homeAppContext.x);
+    uint8_t *dst = g_screenshotBuffer;
+
+    int srcAdvance = (g_frontPanelWidth - 480) * 4;
+
+    for (int y = 0; y < 272; y++) {
+        for (int x = 0; x < 480; x++) {
+            *dst++ = *src++;
+            *dst++ = *src++;
+            *dst++ = *src++;
+            src++;
+        }
+        src += srcAdvance;
+    }
+
+    g_screenshotY = 272 - 1;
+}
+
+bool screanshotGetLine(uint8_t *line) {
+    if (g_screenshotY < 0) {
+        return false;
+    }
+    memcpy(line, g_screenshotBuffer + g_screenshotY * 480 * 3, 480 * 3);
+    --g_screenshotY;
+    return true;
+}
+
+void screanshotEnd() {
+    delete g_screenshotBuffer;
+    g_screenshotBuffer = nullptr;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 static void doDrawGlyph(const gui::font::Glyph &glyph, int x_glyph, int y_glyph, int width,
                         int height, int offset, int iStartByte) {

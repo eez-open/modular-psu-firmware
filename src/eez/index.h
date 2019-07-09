@@ -55,7 +55,7 @@ namespace gui {
 
 class Page;
 
-Page *createPageFromId(int pageId);
+Page *getPageFromId(int pageId);
 
 } // namespace gui
 
