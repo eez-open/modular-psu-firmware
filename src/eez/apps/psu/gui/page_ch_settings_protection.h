@@ -74,7 +74,7 @@ class ChSettingsProtectionSetPage : public SetPage {
 
 class ChSettingsOvpProtectionPage : public ChSettingsProtectionSetPage {
   public:
-    void pageWillAppear();
+    void pageAlloc();
 
   protected:
     void setParams(bool checkLoad);
@@ -85,7 +85,7 @@ class ChSettingsOvpProtectionPage : public ChSettingsProtectionSetPage {
 
 class ChSettingsOcpProtectionPage : public ChSettingsProtectionSetPage {
   public:
-    void pageWillAppear();
+    void pageAlloc();
 
   protected:
     void setParams(bool checkLoad);
@@ -96,7 +96,7 @@ class ChSettingsOcpProtectionPage : public ChSettingsProtectionSetPage {
 
 class ChSettingsOppProtectionPage : public ChSettingsProtectionSetPage {
   public:
-    void pageWillAppear();
+    void pageAlloc();
 
   protected:
     void setParams(bool checkLoad);
@@ -107,7 +107,7 @@ class ChSettingsOppProtectionPage : public ChSettingsProtectionSetPage {
 
 class ChSettingsOtpProtectionPage : public ChSettingsProtectionSetPage {
   public:
-    void pageWillAppear();
+    void pageAlloc();
 
   protected:
     void setParams(bool checkLoad);

@@ -28,8 +28,10 @@ class Page {
     virtual ~Page() {
     }
 
+    virtual void pageAlloc();
+    virtual void pageFree();
+
     virtual void pageWillAppear();
-    virtual void pageWillDisappear();
 
     virtual bool onEncoder(int counter);
     virtual bool onEncoderClicked();

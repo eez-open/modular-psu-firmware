@@ -28,7 +28,6 @@ namespace gui {
 class SelfTestResultPage : public Page {
   public:
     void pageWillAppear();
-    void pageDidDisappear();
 
     static char m_selfTestResult[];
 };

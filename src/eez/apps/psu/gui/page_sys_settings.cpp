@@ -49,7 +49,7 @@ namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void SysSettingsDateTimePage::pageWillAppear() {
+void SysSettingsDateTimePage::pageAlloc() {
 #if OPTION_ETHERNET
     ntpEnabled = origNtpEnabled = persist_conf::isNtpEnabled();
     strcpy(ntpServer, persist_conf::devConf2.ntpServer);
@@ -289,7 +289,7 @@ void SysSettingsDateTimePage::doSet() {
 
 #if OPTION_ETHERNET
 
-void SysSettingsEthernetPage::pageWillAppear() {
+void SysSettingsEthernetPage::pageAlloc() {
     m_enabledOrig = m_enabled = persist_conf::isEthernetEnabled();
     m_dhcpEnabledOrig = m_dhcpEnabled = persist_conf::isEthernetDhcpEnabled();
     m_ipAddressOrig = m_ipAddress = persist_conf::devConf2.ethernetIpAddress;
@@ -370,7 +370,7 @@ void SysSettingsEthernetPage::set() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void SysSettingsEthernetStaticPage::pageWillAppear() {
+void SysSettingsEthernetStaticPage::pageAlloc() {
     SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPreviousPage();
 
     m_ipAddressOrig = m_ipAddress = page->m_ipAddress;
@@ -470,7 +470,7 @@ void SysSettingsProtectionsPage::toggleForceDisablingAllOutputsOnPowerUp() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void SysSettingsAuxOtpPage::pageWillAppear() {
+void SysSettingsAuxOtpPage::pageAlloc() {
     origState = state = temperature::sensors[temp_sensor::AUX].prot_conf.state ? 1 : 0;
 
     origLevel = level =
@@ -592,7 +592,7 @@ void SysSettingsSoundPage::toggleClickSound() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void SysSettingsEncoderPage::pageWillAppear() {
+void SysSettingsEncoderPage::pageAlloc() {
     origConfirmationMode = confirmationMode = persist_conf::devConf2.flags.encoderConfirmationMode;
     origMovingSpeedDown = movingSpeedDown = persist_conf::devConf2.encoderMovingSpeedDown;
     origMovingSpeedUp = movingSpeedUp = persist_conf::devConf2.encoderMovingSpeedUp;
@@ -619,7 +619,7 @@ void SysSettingsEncoderPage::set() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void SysSettingsTriggerPage::pageWillAppear() {
+void SysSettingsTriggerPage::pageAlloc() {
     m_sourceOrig = m_source = trigger::getSource();
     m_delayOrig = m_delay = trigger::getDelay();
     m_initiateContinuouslyOrig = m_initiateContinuously =
@@ -689,7 +689,7 @@ void SysSettingsTriggerPage::set() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void SysSettingsIOPinsPage::pageWillAppear() {
+void SysSettingsIOPinsPage::pageAlloc() {
     m_polarityOrig[0] = m_polarity[0] = (io_pins::Polarity)persist_conf::devConf2.ioPins[0].polarity;
     m_functionOrig[0] = m_function[0] = (io_pins::Function)persist_conf::devConf2.ioPins[0].function;
 
@@ -757,7 +757,7 @@ void SysSettingsIOPinsPage::set() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void SysSettingsSerialPage::pageWillAppear() {
+void SysSettingsSerialPage::pageAlloc() {
     m_enabledOrig = m_enabled = persist_conf::isSerialEnabled();
     m_baudIndexOrig = m_baudIndex = persist_conf::getSerialBaudIndex();
     m_parityOrig = m_parity = (serial::Parity)persist_conf::getSerialParity();

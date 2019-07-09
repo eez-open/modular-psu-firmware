@@ -17,6 +17,8 @@
  */
 
 #if OPTION_DISPLAY
+#include <assert.h>
+
 #include <eez/apps/psu/psu.h>
 
 #include <ctype.h>
@@ -44,6 +46,18 @@ namespace eez {
 namespace psu {
 namespace gui {
 
+static NumericKeypad g_keypadsPool[1];
+
+NumericKeypad* getFreeKeypad() {
+    for (unsigned int i = 0; i < sizeof (g_keypadsPool) / sizeof(NumericKeypad); ++i) {
+        if (g_keypadsPool[i].m_isFree) {
+            return &g_keypadsPool[i];
+        }
+    }
+    assert(false);
+    return nullptr;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Keypad *getActiveKeypad() {
@@ -66,16 +80,22 @@ Keypad *getActiveKeypad() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Keypad::Keypad() {
+void Keypad::pageAlloc() {
+    m_isFree = false;
+}
+
+void Keypad::pageFree() {
+    m_isFree = true;
+}
+
+void Keypad::init(const char *label_) {
     m_label[0] = 0;
     m_keypadText[0] = 0;
     m_okCallback = 0;
     m_cancelCallback = 0;
     m_isUpperCase = false;
     m_isPassword = false;
-}
 
-void Keypad::init(const char *label_) {
     if (label_) {
         strcpy(m_label, label_);
     } else {
@@ -148,14 +168,14 @@ void Keypad::start(const char *label, const char *text, int maxChars_, bool isPa
 
 void Keypad::startPush(const char *label, const char *text, int maxChars_, bool isPassword_,
                        void (*ok)(char *), void (*cancel)()) {
-    Keypad *page = new Keypad();
+    Keypad *page = getFreeKeypad();
     page->start(label, text, maxChars_, isPassword_, ok, cancel);
     pushPage(PAGE_ID_KEYPAD, page);
 }
 
 void Keypad::startReplace(const char *label, const char *text, int maxChars_, bool isPassword_,
                           void (*ok)(char *), void (*cancel)()) {
-    Keypad *page = new Keypad();
+    Keypad *page = getFreeKeypad();
     page->start(label, text, maxChars_, isPassword_, ok, cancel);
     replacePage(PAGE_ID_KEYPAD, page);
 }

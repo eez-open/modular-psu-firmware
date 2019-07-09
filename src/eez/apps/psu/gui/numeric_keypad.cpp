@@ -17,7 +17,7 @@
  */
 
 #if OPTION_DISPLAY
-
+#include <assert.h>
 #include <math.h>
 
 #include <eez/apps/psu/psu.h>
@@ -41,6 +41,18 @@
 namespace eez {
 namespace psu {
 namespace gui {
+
+static NumericKeypad g_numericKeypadsPool[1];
+
+NumericKeypad* getFreeNumericKeypad() {
+    for (unsigned int i = 0; i < sizeof (g_numericKeypadsPool) / sizeof(NumericKeypad); ++i) {
+        if (g_numericKeypadsPool[i].m_isFree) {
+            return &g_numericKeypadsPool[i];
+        }
+    }
+    assert(false);
+    return nullptr;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -120,7 +132,7 @@ void NumericKeypad::init(const char *label, const data::Value &value, NumericKey
 NumericKeypad *NumericKeypad::start(const char *label, const data::Value &value,
                                     NumericKeypadOptions &options, void (*okFloat)(float),
                                     void (*okUint32)(uint32_t), void (*cancel)()) {
-    NumericKeypad *page = new NumericKeypad();
+    NumericKeypad *page = getFreeNumericKeypad();
 
     page->init(label, value, options, okFloat, okUint32, cancel);
 

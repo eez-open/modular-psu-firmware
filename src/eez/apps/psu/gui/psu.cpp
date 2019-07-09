@@ -456,7 +456,10 @@ void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_ca
         }
     }
 
-    ok_callback();
+    if (ok_callback) {
+        ok_callback();
+    }
+
     errorMessage(value);
 }
 

@@ -28,7 +28,10 @@ namespace gui {
 
 class Keypad : public eez::gui::Page {
   public:
-    Keypad();
+    bool m_isFree = true;
+
+    void pageAlloc();
+    void pageFree();
 
     static void startPush(const char *label, const char *text, int maxChars, bool isPassword,
                           void (*ok)(char *), void (*cancel)());

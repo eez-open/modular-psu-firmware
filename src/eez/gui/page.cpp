@@ -34,10 +34,13 @@ namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Page::pageWillAppear() {
+void Page::pageAlloc() {
 }
 
-void Page::pageWillDisappear() {
+void Page::pageFree() {
+}
+
+void Page::pageWillAppear() {
 }
 
 bool Page::onEncoder(int counter) {

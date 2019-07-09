@@ -25,6 +25,7 @@
 #include <eez/system.h>
 
 #ifndef EEZ_PLATFORM_SIMULATOR
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 

@@ -21,7 +21,7 @@
 #include <eez/gui/page.h>
 using namespace eez::gui;
 
-#define LIST_ITEMS_PER_PAGE 4
+#define LIST_ITEMS_PER_PAGE 5
 #define INF_TEXT "\x91"
 #define EMPTY_VALUE "\x92"
 
@@ -57,7 +57,7 @@ class ChSettingsTriggerPage : public Page {
 
 class ChSettingsListsPage : public SetPage {
   public:
-    void pageWillAppear();
+    void pageAlloc();
 
     void previousPage();
     void nextPage();

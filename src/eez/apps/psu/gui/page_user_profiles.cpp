@@ -38,7 +38,7 @@ namespace gui {
 
 int g_selectedProfileLocation;
 
-void UserProfilesPage::pageWillAppear() {
+void UserProfilesPage::pageAlloc() {
     if (getActivePageId() == PAGE_ID_USER_PROFILE_0_SETTINGS ||
         getActivePageId() == PAGE_ID_USER_PROFILE_SETTINGS) {
         profile::load(g_selectedProfileLocation, &profile);

@@ -35,9 +35,6 @@ void SelfTestResultPage::pageWillAppear() {
 	devices::getSelfTestResultString(m_selfTestResult, MAX_LENGTH);
 }
 
-void SelfTestResultPage::pageDidDisappear() {
-}
-
 }
 }
 } // namespace eez::psu::gui

@@ -23,7 +23,7 @@
 #include <eez/modules/mcu/display.h>
 
 #define CONF_GUI_PAGE_NAVIGATION_STACK_SIZE 5
-#define CONF_MAX_STATE_SIZE 5000
+#define CONF_MAX_STATE_SIZE 6000
 
 namespace eez {
 namespace gui {

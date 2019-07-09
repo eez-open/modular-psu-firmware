@@ -116,7 +116,7 @@ void ChSettingsAdvTrackingPage::toggleTrackingMode() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ChSettingsAdvViewPage::pageWillAppear() {
+void ChSettingsAdvViewPage::pageAlloc() {
     origDisplayValue1 = displayValue1 = g_channel->flags.displayValue1;
     origDisplayValue2 = displayValue2 = g_channel->flags.displayValue2;
     origYTViewRate = ytViewRate = g_channel->ytViewRate;
