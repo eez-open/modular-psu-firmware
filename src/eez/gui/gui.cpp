@@ -92,6 +92,7 @@ void mainLoop(const void *) {
     }
 #else
     while (1) {
+        osDelay(1);
         oneIter();
     }
 #endif

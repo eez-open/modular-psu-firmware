@@ -24,6 +24,7 @@
 #include <eez/gui/dialogs.h>
 #include <eez/gui/gui.h>
 #include <eez/modules/mcu/display.h>
+#include <eez/system.h>
 #endif
 
 namespace eez {
@@ -223,6 +224,7 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
     uint8_t line[480 * 3];
     while (mcu::display::screanshotGetLine(line)) {
         SCPI_ResultArbitraryBlockData(context, line, sizeof(line));
+        osDelay(1);
     }
 
     mcu::display::screanshotEnd();

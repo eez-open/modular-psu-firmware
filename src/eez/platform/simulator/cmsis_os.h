@@ -7,6 +7,7 @@ typedef enum {
 } osStatus;
 
 typedef enum {
+    osPriorityBelowNormal   = -1,
     osPriorityNormal = 0,
     osPriorityAboveNormal = 1
 } osPriority;

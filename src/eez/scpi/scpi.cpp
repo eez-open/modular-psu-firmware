@@ -61,6 +61,7 @@ void mainLoop(const void *) {
     oneIter();
 #else
     while (1) {
+        osDelay(10);
         oneIter();
     }
 #endif
@@ -74,8 +75,6 @@ void oneIter() {
 #if OPTION_ETHERNET
     psu::ethernet::tick(tick_usec);
 #endif
-
-    delay(1);
 }
 
 

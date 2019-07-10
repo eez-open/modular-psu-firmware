@@ -422,6 +422,7 @@ void animate() {
 void sync() {
     if (g_takeScreenshot) {
     	bitBlt(g_buffer, (uint16_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+        DMA2D_WAIT;
     	g_takeScreenshot = false;
     }
 
@@ -463,7 +464,7 @@ int getDisplayHeight() {
 void screanshotBegin() {
 	g_takeScreenshot = true;
 	do {
-		HAL_Delay(1);
+		osDelay(1);
 	} while (g_takeScreenshot);
 
 	g_screenshotY = 272 - 1;
