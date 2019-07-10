@@ -177,6 +177,11 @@ bool init() {
 }
 
 void turnOn(bool withoutTransition) {
+    g_frontPanelBuffer1 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
+    g_frontPanelBuffer2 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
+    g_frontPanelBuffer3 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
+
+    g_frontPanelBuffer = g_frontPanelBuffer1;
 }
 
 void turnOff() {
@@ -187,20 +192,6 @@ bool isOn() {
 }
 
 void updateBrightness() {
-}
-
-bool onSystemStateChanged() {
-    if (g_systemState == SystemState::BOOTING) {
-        if (g_systemStatePhase == 0) {
-            g_frontPanelBuffer1 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
-            g_frontPanelBuffer2 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
-            g_frontPanelBuffer3 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
-
-            g_frontPanelBuffer = g_frontPanelBuffer1;
-        }
-    }
-
-    return true;
 }
 
 void updateScreen(uint32_t *buffer) {

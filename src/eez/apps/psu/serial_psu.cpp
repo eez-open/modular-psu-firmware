@@ -97,9 +97,6 @@ scpi_t g_scpiContext;
 
 static bool g_isConnected;
 
-static int g_ignoreInputAtStart = 2;
-static uint32_t g_ignoreInputAtStartTick;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 UARTClass::UARTModes getConfig() {
@@ -156,17 +153,6 @@ void init() {
 
 void tick(uint32_t tick_usec) {
     if (g_testResult == TEST_OK) {
-    	// ignore input at start for 3 seconds
-    	if (g_ignoreInputAtStart == 2) {
-    		g_ignoreInputAtStartTick = tick_usec;
-    		g_ignoreInputAtStart = 1;
-    	} else if (g_ignoreInputAtStart == 1) {
-        	int32_t diff = tick_usec - g_ignoreInputAtStartTick;
-        	if (diff > 3000000) {
-        		g_ignoreInputAtStart = 0;
-        	}
-    	}
-
         bool isConnected = (bool)SERIAL_PORT;
 
         if (isConnected != g_isConnected) {
@@ -186,9 +172,7 @@ void tick(uint32_t tick_usec) {
                 for (size_t i = 0; i < n; ++i) {
                     buffer[i] = (char)SERIAL_PORT.read();
                 }
-                if (!g_ignoreInputAtStart) {
-                	input(g_scpiContext, buffer, n);
-                }
+                input(g_scpiContext, buffer, n);
             }
         }
     }

@@ -217,15 +217,15 @@ void executeAction(int actionId) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void showWelcomePage() {
-	home::g_homeAppContext.showPage(PAGE_ID_WELCOME);
+	home::g_homeAppContext.showPageOnNextIter(PAGE_ID_WELCOME);
 }
 
 void showStandbyPage() {
-	home::g_homeAppContext.showPage(PAGE_ID_STANDBY);
+	home::g_homeAppContext.showPageOnNextIter(PAGE_ID_STANDBY);
 }
 
 void showEnteringStandbyPage() {
-	home::g_homeAppContext.showPage(PAGE_ID_ENTERING_STANDBY);
+	home::g_homeAppContext.showPageOnNextIter(PAGE_ID_ENTERING_STANDBY);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

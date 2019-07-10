@@ -67,8 +67,6 @@ uint32_t vramOffset(uint16_t *vram, int x, int y) {
 }
 
 void fillRect(uint16_t *src, int x, int y, int width, int height, uint16_t color) {
-    DMA2D_WAIT;
-
     hdma2d.Init.Mode = DMA2D_R2M;
     hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
     hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
@@ -80,6 +78,7 @@ void fillRect(uint16_t *src, int x, int y, int width, int height, uint16_t color
     pcolorBGRA[2] = COLOR_TO_R(color);
     pcolorBGRA[3] = 255;
 
+    DMA2D_WAIT;
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_Start(&hdma2d, colorBGRA, vramOffset(src, x, y), width, height);
 }
@@ -87,15 +86,13 @@ void fillRect(uint16_t *src, int x, int y, int width, int height, uint16_t color
 void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x, int y, int width,
             int height) {
 //    if (srcBpp == 32) {
-//        DMA2D_WAIT;
 //        hdma2d.Init.Mode = DMA2D_R2M;
 //        hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
 //        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+//        DMA2D_WAIT;
 //        HAL_DMA2D_Init(&hdma2d);
 //        HAL_DMA2D_Start(&hdma2d, 0xFF5c5c5c, VRAM_BUFFER3_START_ADDRESS, width, height);
 //    }
-//
-//    DMA2D_WAIT;
 //
 //    hdma2d.Init.Mode = srcBpp == 32 ? DMA2D_M2M_BLEND : DMA2D_M2M_PFC;
 //    hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
@@ -118,6 +115,7 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
 //        hdma2d.LayerCfg[1].InputAlpha = 0;
 //    }
 //
+//    DMA2D_WAIT;
 //    HAL_DMA2D_Init(&hdma2d);
 //    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
 //    if (srcBpp == 32) {
@@ -129,15 +127,13 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
 //    }
 //
 //    if (srcBpp == 32) {
-//        DMA2D_WAIT;
 //        hdma2d.Init.Mode = DMA2D_R2M;
 //        hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
 //        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+//        DMA2D_WAIT;
 //        HAL_DMA2D_Init(&hdma2d);
 //        HAL_DMA2D_Start(&hdma2d, 0xFF5c5c5c, VRAM_BUFFER3_START_ADDRESS, width, height);
 //    }
-
-    DMA2D_WAIT;
 
     hdma2d.Init.Mode = srcBpp == 32 ? DMA2D_M2M_BLEND : DMA2D_M2M_PFC;
     hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
@@ -163,6 +159,8 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
 
     auto dstOffset = vramOffset(dst, x, y);
 
+    DMA2D_WAIT;
+
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
     if (srcBpp == 32) {
@@ -174,8 +172,6 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
 }
 
 void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
-    DMA2D_WAIT;
-
     hdma2d.Init.Mode = DMA2D_M2M;
     hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
     hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
@@ -185,14 +181,14 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
     hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
     hdma2d.LayerCfg[1].InputAlpha = 0;
 
+    DMA2D_WAIT;
+
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
     HAL_DMA2D_Start(&hdma2d, (uint32_t)vramOffset(src, x, y), vramOffset(dst, x, y), width, height);
 }
 
 void bitBltA8Init(uint16_t color) {
-    DMA2D_WAIT;
-
     // initialize everything except lineOffset
 
     hdma2d.Init.Mode = DMA2D_M2M_BLEND;
@@ -218,16 +214,18 @@ void bitBltA8Init(uint16_t color) {
     hdma2d.LayerCfg[1].InputAlpha = colorBGRA;
     hdma2d.LayerCfg[1].InputOffset = 0;
 
+    DMA2D_WAIT;
+
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 0);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
 }
 
 void bitBltA8(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int width, int height) {
-    DMA2D_WAIT;
-
     uint32_t lineOffset = DISPLAY_WIDTH - width;
     uint32_t dst = vramOffset(g_buffer, x, y);
+
+    DMA2D_WAIT;
 
     // initialize lineOffset
     WRITE_REG(hdma2d.Instance->OOR, lineOffset);
@@ -277,16 +275,6 @@ bool isOn() {
 void updateBrightness() {
     uint32_t max = __HAL_TIM_GET_AUTORELOAD(&htim12);
     __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, psu::persist_conf::devConf2.displayBrightness * max / 20);
-}
-
-bool onSystemStateChanged() {
-    if (g_systemState == SystemState::BOOTING) {
-        if (g_systemStatePhase == 0) {
-            turnOn();
-        }
-    }
-
-    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -425,8 +413,7 @@ void animate() {
         DMA2D_WAIT;
 
         // wait for VSYNC
-        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS))
-            ;
+        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS));
 
         HAL_LTDC_SetAddress(&hltdc, (uint32_t)bufferAnim, 0);
     }
@@ -450,18 +437,14 @@ void sync() {
                                            ? (uint16_t *)VRAM_BUFFER2_START_ADDRESS
                                            : (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
         bitBlt(g_buffer, g_newBufferAddress, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-        // wait for VSYNC
-        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS))
-            ;
 
-        // show current video buffer
-        HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
+        DMA2D_WAIT;
+
+        LTDC_LAYER(&hltdc, 0)->CFBAR = (uint32_t)g_buffer;
+		LTDC->SRCR = LTDC_SRCR_VBR;
+		while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)); // wait for VSYNC
 
         g_buffer = g_newBufferAddress;
-    } else {
-        // wait for VSYNC
-        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS))
-            ;
     }
 }
 

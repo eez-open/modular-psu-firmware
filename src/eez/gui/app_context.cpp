@@ -49,9 +49,16 @@ AppContext *g_appContext;
 ////////////////////////////////////////////////////////////////////////////////
 
 AppContext::AppContext() {
+    m_activePageId = INTERNAL_PAGE_ID_NONE;
 }
 
+
 void AppContext::stateManagment() {
+    if (m_setPageIdOnNextIter) {
+        setPage(m_pageIdToSetOnNextIter);
+        m_setPageIdOnNextIter = false;
+    }
+
     // update throbber in progress info
     uint32_t tickCount = micros();
     if (getActivePageId() == PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
@@ -277,6 +284,11 @@ bool AppContext::isPageActiveOrOnStack(int pageId) {
 
 void AppContext::showPage(int pageId) {
     setPage(pageId);
+}
+
+void AppContext::showPageOnNextIter(int pageId) {
+    m_setPageIdOnNextIter = true;
+    m_pageIdToSetOnNextIter = pageId;
 }
 
 void AppContext::pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint8_t currentValue,

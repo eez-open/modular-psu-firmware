@@ -58,6 +58,7 @@ public:
     virtual void stateManagment();
 
     void showPage(int pageId);
+    void showPageOnNextIter(int pageId);
     void pushPage(int pageId, Page *page = 0);
     void popPage();
 
@@ -119,6 +120,9 @@ public:
     int m_previousPageId = INTERNAL_PAGE_ID_NONE;
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
+
+    bool m_setPageIdOnNextIter;
+    int m_pageIdToSetOnNextIter;
 
     void doShowPage(int index, Page *page = 0);
     void setPage(int pageId);

@@ -444,14 +444,19 @@ set(header_eez_platform_simulator
 list (APPEND header_files ${header_eez_platform_simulator})
 source_group("eez\\platform\\simulator" FILES ${src_eez_platform_simulator} ${header_eez_platform_simulator})
 
+set(src_eez_scpi
+    src/eez/scpi/scpi.cpp
+) 
+list (APPEND src_files ${src_eez_scpi})
 set(header_eez_scpi
     src/eez/scpi/commands.h
     src/eez/scpi/commands_simulator.h
     src/eez/scpi/commands_stm32.h
+    src/eez/scpi/scpi.h
     src/eez/scpi/scpi_user_config.h
 ) 
 list (APPEND header_files ${header_eez_scpi})
-source_group("eez\\scpi" FILES ${header_eez_scpi})
+source_group("eez\\scpi" FILES ${src_eez_scpi} ${header_eez_scpi})
 
 set(src_third_party_scpi
     src/third_party/libscpi/src/error.c

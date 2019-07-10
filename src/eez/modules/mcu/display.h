@@ -27,7 +27,6 @@ namespace eez {
 namespace mcu {
 namespace display {
 
-bool onSystemStateChanged();
 void sync();
 
 void turnOn(bool withoutTransition = false);

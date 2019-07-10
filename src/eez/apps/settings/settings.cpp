@@ -30,6 +30,7 @@ namespace settings {
 SettingsAppContext g_settingsAppContext;
 
 SettingsAppContext::SettingsAppContext() {
+    showPageOnNextIter(getMainPageId());
 }
 
 int SettingsAppContext::getMainPageId() {

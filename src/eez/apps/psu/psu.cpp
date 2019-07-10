@@ -791,17 +791,10 @@ void tick() {
 
     profile::tick(tick_usec);
 
-    serial::tick(tick_usec);
-
     datetime::tick(tick_usec);
 
 #if OPTION_ETHERNET
-    if (g_mainLoopCounter % 2 == 0) {
-        // tick ethernet every other time
-        ethernet::tick(tick_usec);
-    } else {
-        ntp::tick(tick_usec);
-    }
+    ntp::tick(tick_usec);
 #endif
 
 	sound::tick();

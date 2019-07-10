@@ -24,6 +24,7 @@
 #include <eez/gui/gui.h>
 #include <eez/modules/mcu/display.h>
 #include <eez/modules/mcu/touch.h>
+#include <eez/scpi/scpi.h>
 
 #include <eez/gui/document.h>
 
@@ -48,13 +49,13 @@ namespace eez {
 
 OnSystemStateChangedCallback g_onSystemStateChangedCallbacks[] = {
     // modules
-    mcu::display::onSystemStateChanged,
 #if OPTION_ETHERNET
     mcu::ethernet::onSystemStateChanged,
 #endif    
     mcu::touch::onSystemStateChanged,
     // subsystems
     gui::onSystemStateChanged,
+    scpi::onSystemStateChanged,
     // applications
     psu::onSystemStateChanged,
 };

@@ -77,13 +77,10 @@ void onEncoder(int tickCount, int counter, bool clicked);
 ////////////////////////////////////////////////////////////////////////////////
 
 PsuAppContext::PsuAppContext() {
+    showPageOnNextIter(getMainPageId());
 }
 
 void PsuAppContext::stateManagment() {
-    if (getActivePageId() == INTERNAL_PAGE_ID_NONE) {
-        showPage(PAGE_ID_MAIN);
-    }
-
     AppContext::stateManagment();
 
     // TODO move this to some other place
