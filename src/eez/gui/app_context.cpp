@@ -134,18 +134,20 @@ bool AppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
 
 int AppContext::transformStyle(const Widget *widget) {
     if (isFrontPanelLocked()) {
-        if (widget->style == STYLE_ID_BOTTOM_BUTTON) {
-            if (widget->action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
-                return STYLE_ID_BOTTOM_BUTTON_DISABLED;
+        if (widget->action) {
+            if (widget->style == STYLE_ID_BOTTOM_BUTTON) {
+                if (widget->action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
+                    return STYLE_ID_BOTTOM_BUTTON_DISABLED;
+                }
+            } else if (widget->style == STYLE_ID_EDIT_S) {
+                return STYLE_ID_DEFAULT_S;
+            } else if (widget->style == STYLE_ID_MON_VALUE) {
+                return STYLE_ID_DEFAULT;
+            } else if (widget->style == STYLE_ID_CHANNEL_OFF) {
+                return STYLE_ID_CHANNEL_OFF_DISABLED;
+            } else if (widget->style == STYLE_ID_EDIT_VALUE_ACTIVE_S_RIGHT) {
+                return STYLE_ID_EDIT_VALUE_S_RIGHT;
             }
-        } else if (widget->style == STYLE_ID_EDIT_S) {
-            return STYLE_ID_DEFAULT_S;
-        } else if (widget->style == STYLE_ID_MON_VALUE) {
-            return STYLE_ID_DEFAULT;
-        } else if (widget->style == STYLE_ID_CHANNEL_OFF) {
-            return STYLE_ID_CHANNEL_OFF_DISABLED;
-        } else if (widget->style == STYLE_ID_EDIT_VALUE_ACTIVE_S_RIGHT) {
-            return STYLE_ID_EDIT_VALUE_S_RIGHT;
         }
     }
 
@@ -360,6 +362,7 @@ void AppContext::updatePage(bool repaint, WidgetCursor &widgetCursor) {
 		Widget *page = g_document->pages.first + m_activePageId;
 
 		auto savedPreviousState = widgetCursor.previousState;
+        auto savedWidget = widgetCursor.widget;
 
         if (repaint) {
             // clear background
@@ -377,14 +380,11 @@ void AppContext::updatePage(bool repaint, WidgetCursor &widgetCursor) {
 			widgetCursor.previousState = 0;
         }
 
-		auto savedWidget = widgetCursor.widget;
-
         widgetCursor.widget = page;
 
         enumWidget(widgetCursor, drawWidgetCallback);
 
 		widgetCursor.widget = savedWidget;
-
 		widgetCursor.previousState = savedPreviousState;
     }
 }

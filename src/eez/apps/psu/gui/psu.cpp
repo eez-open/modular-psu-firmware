@@ -117,8 +117,7 @@ void PsuAppContext::stateManagment() {
     }
 
     // show startup wizard
-    if (!isFrontPanelLocked() && activePageId == PAGE_ID_MAIN &&
-        int32_t(tickCount - getShowPageTime()) >= 50000L) {
+    if (!isFrontPanelLocked() && activePageId == PAGE_ID_MAIN && int32_t(tickCount - getShowPageTime()) >= 50000L) {
         if (showSetupWizardQuestion()) {
             return;
         }

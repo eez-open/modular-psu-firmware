@@ -177,11 +177,13 @@ bool init() {
 }
 
 void turnOn(bool withoutTransition) {
-    g_frontPanelBuffer1 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
-    g_frontPanelBuffer2 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
-    g_frontPanelBuffer3 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
+    if (!g_frontPanelBuffer) {
+        g_frontPanelBuffer1 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
+        g_frontPanelBuffer2 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
+        g_frontPanelBuffer3 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
 
-    g_frontPanelBuffer = g_frontPanelBuffer1;
+        g_frontPanelBuffer = g_frontPanelBuffer1;
+    }
 }
 
 void turnOff() {

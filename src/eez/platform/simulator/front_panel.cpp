@@ -46,7 +46,7 @@ AppContext &getRootAppContext() {
 ////////////////////////////////////////////////////////////////////////////////
 
 FrontPanelAppContext::FrontPanelAppContext() {
-    showPage(PAGE_ID_FRONT_PANEL);
+    showPageOnNextIter(PAGE_ID_FRONT_PANEL);
 }
 
 int FrontPanelAppContext::getMainPageId() {
