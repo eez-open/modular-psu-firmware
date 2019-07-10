@@ -86,14 +86,56 @@ void fillRect(uint16_t *src, int x, int y, int width, int height, uint16_t color
 
 void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x, int y, int width,
             int height) {
-    if (srcBpp == 32) {
-        DMA2D_WAIT;
-        hdma2d.Init.Mode = DMA2D_R2M;
-        hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
-        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
-        HAL_DMA2D_Init(&hdma2d);
-        HAL_DMA2D_Start(&hdma2d, 0xFF5c5c5c, VRAM_BUFFER3_START_ADDRESS, width, height);
-    }
+//    if (srcBpp == 32) {
+//        DMA2D_WAIT;
+//        hdma2d.Init.Mode = DMA2D_R2M;
+//        hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
+//        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+//        HAL_DMA2D_Init(&hdma2d);
+//        HAL_DMA2D_Start(&hdma2d, 0xFF5c5c5c, VRAM_BUFFER3_START_ADDRESS, width, height);
+//    }
+//
+//    DMA2D_WAIT;
+//
+//    hdma2d.Init.Mode = srcBpp == 32 ? DMA2D_M2M_BLEND : DMA2D_M2M_PFC;
+//    hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+//    hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+//
+//    if (srcBpp == 32) {
+//        hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - width;
+//        hdma2d.LayerCfg[0].InputColorMode = DMA2D_OUTPUT_ARGB8888;
+//        hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+//        hdma2d.LayerCfg[0].InputAlpha = 0;
+//
+//        hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
+//        hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_ARGB8888;
+//        hdma2d.LayerCfg[1].AlphaMode = DMA2D_COMBINE_ALPHA;
+//        hdma2d.LayerCfg[1].InputAlpha = g_opacity;
+//    } else {
+//        hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
+//        hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_RGB565;
+//        hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+//        hdma2d.LayerCfg[1].InputAlpha = 0;
+//    }
+//
+//    HAL_DMA2D_Init(&hdma2d);
+//    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
+//    if (srcBpp == 32) {
+//        HAL_DMA2D_ConfigLayer(&hdma2d, 0);
+//        HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t)src, VRAM_BUFFER3_START_ADDRESS,
+//                                vramOffset(dst, x, y), width, height);
+//    } else {
+//        HAL_DMA2D_Start(&hdma2d, (uint32_t)src, vramOffset(dst, x, y), width, height);
+//    }
+//
+//    if (srcBpp == 32) {
+//        DMA2D_WAIT;
+//        hdma2d.Init.Mode = DMA2D_R2M;
+//        hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
+//        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+//        HAL_DMA2D_Init(&hdma2d);
+//        HAL_DMA2D_Start(&hdma2d, 0xFF5c5c5c, VRAM_BUFFER3_START_ADDRESS, width, height);
+//    }
 
     DMA2D_WAIT;
 
@@ -103,14 +145,15 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
 
     if (srcBpp == 32) {
         hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - width;
-        hdma2d.LayerCfg[0].InputColorMode = DMA2D_OUTPUT_ARGB8888;
+        hdma2d.LayerCfg[0].InputColorMode = DMA2D_OUTPUT_RGB565;
         hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
         hdma2d.LayerCfg[0].InputAlpha = 0;
 
         hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
         hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_ARGB8888;
-        hdma2d.LayerCfg[1].AlphaMode = DMA2D_COMBINE_ALPHA;
-        hdma2d.LayerCfg[1].InputAlpha = g_opacity;
+        hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+        hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
+        hdma2d.LayerCfg[1].InputAlpha = 0;
     } else {
         hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
         hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_RGB565;
@@ -118,14 +161,15 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
         hdma2d.LayerCfg[1].InputAlpha = 0;
     }
 
+    auto dstOffset = vramOffset(dst, x, y);
+
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
     if (srcBpp == 32) {
         HAL_DMA2D_ConfigLayer(&hdma2d, 0);
-        HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t)src, VRAM_BUFFER3_START_ADDRESS,
-                                vramOffset(dst, x, y), width, height);
+        HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t)src, dstOffset, dstOffset, width, height);
     } else {
-        HAL_DMA2D_Start(&hdma2d, (uint32_t)src, vramOffset(dst, x, y), width, height);
+        HAL_DMA2D_Start(&hdma2d, (uint32_t)src, dstOffset, width, height);
     }
 }
 
