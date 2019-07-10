@@ -36,7 +36,7 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
     AppContext *appContext = appContextValue.getAppContext();
 
     bool refresh = !widgetCursor.previousState;
-    if (refresh) {
+    if (refresh && !appContext->isActivePageInternal()) {
         // clear background
 		Widget *page = g_document->pages.first + appContext->getActivePageId();
         const Style* style = getWidgetStyle(page);
