@@ -54,6 +54,11 @@ FileInfo::FileInfo() {
 #endif
 }
 
+SdFatResult FileInfo::fstat(const char *filePath) {
+    Directory dir;
+    return dir.findFirst(filePath, *this);
+}
+
 std::string getRealPath(const char *path) {
     std::string realPath;
 

@@ -388,7 +388,7 @@ set(header_eez_libs_sd_fat
     src/eez/libs/sd_fat/sd_fat.h
 )
 list (APPEND header_files ${header_eez_libs_sd_fat})
-source_group("eez\\lz4\\libs" FILES ${src_eez_libs_sd_fat} ${header_eez_libs_sd_fat})
+source_group("eez\\libs\\sd_fat" FILES ${src_eez_libs_sd_fat} ${header_eez_libs_sd_fat})
 
 set(src_eez_modules_bp3c
     src/eez/modules/bp3c/relays.cpp
