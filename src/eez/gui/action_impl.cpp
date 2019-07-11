@@ -823,7 +823,7 @@ void action_simulator_load() {
 	options.flags.signButtonEnabled = false;
 	options.flags.dotButtonEnabled = true;
 	options.flags.option1ButtonEnabled = true;
-	options.option1ButtonText = "DISC";
+	options.option1ButtonText = "Off";
 	options.option1 = onSimulatorDisconnectLoad;
 
 	NumericKeypad::start(
