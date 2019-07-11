@@ -35,6 +35,8 @@
 #include <eez/gui/dialogs.h>
 #endif
 
+#include <eez/system.h>
+
 namespace eez {
 namespace psu {
 namespace scpi {
@@ -122,8 +124,6 @@ void catalogCallback(void *param, const char *name, const char *type, size_t siz
     sprintf(buffer + position, "%lu", (unsigned long)size);
 
     SCPI_ResultText(context, buffer);
-
-    tick();
 }
 
 scpi_result_t scpi_cmd_mmemoryCatalogQ(scpi_t *context) {
@@ -206,12 +206,11 @@ void uploadCallback(void *param, const void *buffer, int size) {
 
     if (buffer == NULL) {
         SCPI_ResultArbitraryBlockHeader(context, size);
-        return;
+    } else {
+        SCPI_ResultArbitraryBlockData(context, buffer, size);
     }
 
-    SCPI_ResultArbitraryBlockData(context, buffer, size);
-
-    tick();
+    osDelay(1);
 }
 #endif
 

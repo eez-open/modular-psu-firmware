@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
+
 #include <eez/gui/app_context.h>
 
 #include <eez/modules/mcu/display.h>
@@ -50,10 +52,27 @@ AppContext *g_appContext;
 
 AppContext::AppContext() {
     m_activePageId = INTERNAL_PAGE_ID_NONE;
+    m_pushProgressPage = false;
+    m_popProgressPage = false;
+    m_setPageIdOnNextIter = false;
 }
 
 
 void AppContext::stateManagment() {
+    if (m_pushProgressPage) {
+        data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage), 0);
+        g_appContext->m_dialogCancelCallback = m_progressAbortCallback;
+        pushPage(PAGE_ID_PROGRESS);
+        m_pushProgressPage = false;
+    }
+
+    if (m_popProgressPage) {
+        if (getActivePageId() == PAGE_ID_PROGRESS) {
+            popPage();
+        }
+        m_popProgressPage = false;
+    }
+
     if (m_setPageIdOnNextIter) {
         setPage(m_pageIdToSetOnNextIter);
         m_setPageIdOnNextIter = false;
@@ -103,6 +122,7 @@ bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
                 g_appContext = saved;
                 return true;
             }
+            
             if (widget->action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
                 g_appContext = saved;
                 return false;
@@ -436,7 +456,7 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 
     bool repaint = false;
 
-    int activePageIdSaved = m_activePageId;
+    m_activePageIdSaved = m_activePageId;
     Page *activePageSaved = m_activePage;
 
     for (++i; i < m_pageNavigationStackPointer; i++) {
@@ -460,10 +480,39 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
     }
 
-    m_activePageId = activePageIdSaved;
+    m_activePageId = m_activePageIdSaved;
+    m_activePageIdSaved = INTERNAL_PAGE_ID_NONE;
     m_activePage = activePageSaved;
     updatePage(m_repaintActivePage || repaint, widgetCursor);
     m_repaintActivePage = false;
+}
+
+void AppContext::showProgressPage(const char *message, void (*abortCallback)()) {
+    m_progressMessage = message;
+    m_progressAbortCallback = abortCallback;
+    m_pushProgressPage = true;
+}
+
+bool AppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) {
+    if (totalSize > 0) {
+        g_progress = data::Value((int)round((processedSoFar * 1.0f / totalSize) * 100.0f), VALUE_TYPE_PERCENTAGE);
+    } else {
+        g_progress = data::Value((uint32_t)processedSoFar, VALUE_TYPE_SIZE);
+    }
+
+    if (m_pushProgressPage) {
+        return true;
+    }
+
+    if (m_activePageId == PAGE_ID_PROGRESS || m_activePageIdSaved == PAGE_ID_PROGRESS) {
+        return true;
+    }
+
+    return false;
+}
+
+void AppContext::hideProgressPage() {
+    m_popProgressPage = true;
 }
 
 } // namespace gui

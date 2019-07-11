@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <stdlib.h>
+
 #include <eez/gui/gui.h>
 #include <eez/gui/page.h>
 #include <eez/modules/mcu/display.h>
@@ -108,12 +110,17 @@ public:
 
     void updateAppView(WidgetCursor &widgetCursor);
 
+    void showProgressPage(const char *message, void (*abortCallback)());
+    bool updateProgressPage(size_t processedSoFar, size_t totalSize);
+    void hideProgressPage();
+
   protected:
     virtual int getMainPageId() = 0;
     virtual void onPageChanged();
 
     //
     int m_activePageId = INTERNAL_PAGE_ID_NONE;
+    int m_activePageIdSaved;
     Page *m_activePage = nullptr;
     bool m_repaintActivePage;
 
@@ -123,6 +130,12 @@ public:
 
     bool m_setPageIdOnNextIter;
     int m_pageIdToSetOnNextIter;
+
+    bool m_pushProgressPage;
+    const char *m_progressMessage;
+    void (*m_progressAbortCallback)();
+
+    bool m_popProgressPage;
 
     void doShowPage(int index, Page *page = 0);
     void setPage(int pageId);

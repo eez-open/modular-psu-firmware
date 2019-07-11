@@ -29,6 +29,10 @@ FileInfo::FileInfo() {
     memset(&m_fno, 0, sizeof(m_fno));
 }
 
+SdFatResult FileInfo::fstat(const char *filePath) {
+    return (SdFatResult)f_stat(filePath, &m_fno);
+}
+
 FileInfo::operator bool() {
     return m_fno.fname[0] ? true : false;
 }

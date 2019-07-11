@@ -121,7 +121,7 @@ void FileInfo::getName(char *name, size_t size) {
 
 size_t FileInfo::getSize() {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    return (size_t)((m_ffd.nFileSizeHigh * (MAXDWORD + 1)) + m_ffd.nFileSizeLow);
+    return (size_t)((m_ffd.nFileSizeHigh * ((uint64_t)MAXDWORD + 1)) + m_ffd.nFileSizeLow);
 #else
     struct stat stbuf;
     stat(m_dirent->d_name, &stbuf);

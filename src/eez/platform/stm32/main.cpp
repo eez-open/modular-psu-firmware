@@ -39,12 +39,18 @@
 
 #include <dwt_stm32_delay.h>
 
+#include "FreeRTOS.h"
+
 #include <eez/system.h>
 
 #include <eez/platform/stm32/bsp_sdram.h>
 #include <eez/platform/stm32/defines.h>
 
 extern "C" void SystemClock_Config(void);
+
+extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName ) {
+    while (true) {}
+}
 
 int main(int argc, char **argv) {
     HAL_Init();

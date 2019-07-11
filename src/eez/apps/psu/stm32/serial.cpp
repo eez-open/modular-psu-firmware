@@ -47,7 +47,7 @@ int UARTClass::write(const char *buffer, int size) {
             return size;
         }
 
-        eez::delay(1);
+        osDelay(1);
     }
 
     return 0;

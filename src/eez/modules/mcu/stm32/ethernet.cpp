@@ -66,7 +66,7 @@ bool onSystemStateChanged() {
 #define MAX_DHCP_TRIES  4
 
 static void mainLoop(const void *) {
-	delay(2000);
+	osDelay(2000);
     MX_LWIP_Init();
     netif_set_hostname(&gnetif, "EEZ-DIB");
 
@@ -77,10 +77,10 @@ static void mainLoop(const void *) {
         	struct dhcp *dhcp;
         	dhcp = (struct dhcp *)netif_get_client_data(&gnetif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
         	if (dhcp->tries > MAX_DHCP_TRIES){
-        		delay(250);
+        		osDelay(250);
 		    }
         }
-        delay(250);
+        osDelay(250);
     }
 
     struct netconn *conn, *newconn;

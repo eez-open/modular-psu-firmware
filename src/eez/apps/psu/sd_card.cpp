@@ -313,6 +313,8 @@ bool upload(const char *filePath, void *param,
     return result;
 }
 
+static File file;
+
 bool download(const char *filePath, bool truncate, const void *buffer, size_t size, int *err) {
     if (sd_card::g_testResult != TEST_OK) {
         if (err)
@@ -320,21 +322,24 @@ bool download(const char *filePath, bool truncate, const void *buffer, size_t si
         return false;
     }
 
-    File file;
-    if (!file.open(filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-        if (err)
-            *err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
-        return false;
-    }
+    if (truncate) {
+    	if (!file.open(filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+    		if (err)
+    			*err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
+    		return false;
+    	}
 
-    if (truncate && !file.truncate(0)) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
-        return false;
+    	if (truncate && !file.truncate(0)) {
+    		if (err)
+    			*err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    		return false;
+    	}
     }
 
     size_t written = file.write((const uint8_t *)buffer, size);
-    file.close();
+
+
+    //file.close();
 
     if (written != size) {
         if (err)
@@ -433,8 +438,6 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
         if (size < CHUNK_SIZE) {
             break;
         }
-
-        tick();
     }
 
     sourceFile.close();
@@ -543,9 +546,8 @@ bool getDate(const char *filePath, uint8_t &year, uint8_t &month, uint8_t &day, 
         return false;
     }
 
-    Directory dir;
     FileInfo fileInfo;
-    if (dir.findFirst(filePath, fileInfo) != SD_FAT_RESULT_OK) {
+    if (fileInfo.fstat(filePath) != SD_FAT_RESULT_OK) {
         if (err)
             *err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
         return false;
@@ -563,9 +565,8 @@ bool getTime(const char *filePath, uint8_t &hour, uint8_t &minute, uint8_t &seco
         return false;
     }
 
-    Directory dir;
     FileInfo fileInfo;
-    if (dir.findFirst(filePath, fileInfo) != SD_FAT_RESULT_OK) {
+    if (fileInfo.fstat(filePath) != SD_FAT_RESULT_OK) {
         if (err)
             *err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
         return false;

@@ -36,8 +36,6 @@ namespace eez {
 namespace psu {
 namespace scpi {
 
-bool g_busy;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 #define SCPI_COMMAND(P, C) scpi_result_t C(scpi_t *context);
@@ -93,14 +91,10 @@ void input(scpi_t &context, const char *str, size_t size) {
         }
     }
 
-    g_busy = true;
-
     int result = SCPI_Input(&context, str, size);
     if (result == -1) {
         onBufferOverrun(context);
     }
-
-    g_busy = false;
 }
 
 void printError(int_fast16_t err) {

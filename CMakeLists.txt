@@ -39,6 +39,8 @@ else()
     add_definitions(-DOPTION_ETHERNET=1)
 endif()
 
+add_definitions(-DOPTION_SD_CARD=1)
+
 add_definitions(-DEEZ_PLATFORM_SIMULATOR)
 
 if(WIN32)
@@ -376,7 +378,17 @@ set(header_eez_libs_lz4
     src/eez/libs/lz4/lz4.h
 )
 list (APPEND header_files ${header_eez_libs_lz4})
-source_group("eez\\lz4\\libs" FILES ${src_eez_libs_lz4} ${header_eez_libs_lz4})
+source_group("eez\\libs\\lz4" FILES ${src_eez_libs_lz4} ${header_eez_libs_lz4})
+
+set(src_eez_libs_sd_fat
+    src/eez/libs/sd_fat/simulator/sd_fat.cpp
+)
+list (APPEND src_files ${src_eez_libs_sd_fat})
+set(header_eez_libs_sd_fat
+    src/eez/libs/sd_fat/sd_fat.h
+)
+list (APPEND header_files ${header_eez_libs_sd_fat})
+source_group("eez\\lz4\\libs" FILES ${src_eez_libs_sd_fat} ${header_eez_libs_sd_fat})
 
 set(src_eez_modules_bp3c
     src/eez/modules/bp3c/relays.cpp

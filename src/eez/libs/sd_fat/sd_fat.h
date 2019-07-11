@@ -73,6 +73,8 @@ enum SdFatResult {
 struct FileInfo {
     FileInfo();
 
+    SdFatResult fstat(const char *filePath);
+
     operator bool(); // fname[0]
     bool isDirectory();
     void getName(char *name, size_t size);
