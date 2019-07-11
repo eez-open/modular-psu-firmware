@@ -135,8 +135,8 @@ void drawYTGraphWithScrolling(const WidgetCursor &widgetCursor, const Widget *wi
     int endX = widgetCursor.x + xGraphOffset + numPositions;
     int startX = endX - numPointsToDraw;
 
-    int valuePositionLoop = (previousHistoryValuePosition + 1) % numPositions;
-    int previousValuePositionLoop = valuePositionLoop;
+    int previousValuePositionLoop = previousHistoryValuePosition % numPositions;
+    int valuePositionLoop = (previousValuePositionLoop + 1) % numPositions;
     for (int x = startX; x < endX; x++) {
         display::setColor16(color16);
         display::drawVLine(x, widgetCursor.y, widget->h - 1);
@@ -204,8 +204,7 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         // draw background
-        uint16_t color =
-            widgetCursor.currentState->flags.active ? style->color : style->background_color;
+        uint16_t color = widgetCursor.currentState->flags.active ? style->color : style->background_color;
         display::setColor(color);
         display::fillRect(
             widgetCursor.x, 
@@ -218,26 +217,17 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     int textHeight = widget->h / 2;
 
     // draw first value text
-    bool refreshText = !widgetCursor.previousState ||
-                       widgetCursor.previousState->data != widgetCursor.currentState->data;
-
-    if (refresh || refreshText) {
+    if (refresh || !widgetCursor.previousState || widgetCursor.previousState->data != widgetCursor.currentState->data) {
         char text[64];
         widgetCursor.currentState->data.toText(text, sizeof(text));
-
         drawText(text, -1, widgetCursor.x, widgetCursor.y, textWidth, textHeight, y1Style, nullptr,
                  widgetCursor.currentState->flags.active, false, false, nullptr);
     }
 
     // draw second value text
-    refreshText = !widgetCursor.previousState ||
-                  ((YTGraphWidgetState *)widgetCursor.previousState)->y2Data !=
-                      ((YTGraphWidgetState *)widgetCursor.currentState)->y2Data;
-
-    if (refresh || refreshText) {
+    if (refresh || !widgetCursor.previousState || ((YTGraphWidgetState *)widgetCursor.previousState)->y2Data != ((YTGraphWidgetState *)widgetCursor.currentState)->y2Data) {
         char text[64];
         ((YTGraphWidgetState *)widgetCursor.currentState)->y2Data.toText(text, sizeof(text));
-
         drawText(text, -1, widgetCursor.x, widgetCursor.y + textHeight, textWidth, textHeight,
                  y2Style, nullptr, widgetCursor.currentState->flags.active, false, false, nullptr);
     }
@@ -246,7 +236,10 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     int graphWidth = widget->w - textWidth;
     int numHistoryValues = g_appContext->getNumHistoryValues(widget->data);
     int currentHistoryValuePosition =
-            g_appContext->getCurrentHistoryValuePosition(widgetCursor.cursor, widget->data);
+            g_appContext->getCurrentHistoryValuePosition(widgetCursor.cursor, widget->data) - 1;
+    if (currentHistoryValuePosition < 0) {
+        currentHistoryValuePosition = numHistoryValues - 1;
+    }
 
     ((YTGraphWidgetState *)widgetCursor.currentState)->position = currentHistoryValuePosition;
 
@@ -259,8 +252,7 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : 0;
 
     int previousHistoryValuePosition = widgetCursor.previousState ?
-        ((YTGraphWidgetState *)widgetCursor.previousState)->position :
-        currentHistoryValuePosition + 1;
+        ((YTGraphWidgetState *)widgetCursor.previousState)->position : (currentHistoryValuePosition + 1) % numHistoryValues;
 
     if (previousHistoryValuePosition != currentHistoryValuePosition) {
         if (1) {
