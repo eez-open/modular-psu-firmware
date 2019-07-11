@@ -32,6 +32,7 @@ struct YTGraphWidget {
 struct YTGraphWidgetState {
     WidgetState genericState;
     data::Value y2Data;
+    uint16_t position;
 };
 
 void YTGraphWidget_draw(const WidgetCursor &widgetCursor);

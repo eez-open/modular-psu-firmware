@@ -56,28 +56,15 @@ void hideAsyncOperationInProgress() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void showProgressPage(const char *message, void (*abortCallback)()) {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message), 0);
-    g_appContext->m_dialogCancelCallback = abortCallback;
-    pushPage(PAGE_ID_PROGRESS);
+    psu::gui::g_psuAppContext.showProgressPage(message, abortCallback);
 }
 
 bool updateProgressPage(size_t processedSoFar, size_t totalSize) {
-    if (getActivePageId() == PAGE_ID_PROGRESS) {
-        if (totalSize > 0) {
-            g_progress = data::Value((int)round((processedSoFar * 1.0f / totalSize) * 100.0f),
-                                     VALUE_TYPE_PERCENTAGE);
-        } else {
-            g_progress = data::Value((uint32_t)processedSoFar, VALUE_TYPE_SIZE);
-        }
-        return true;
-    }
-    return false;
+    return psu::gui::g_psuAppContext.updateProgressPage(processedSoFar, totalSize);
 }
 
 void hideProgressPage() {
-    if (getActivePageId() == PAGE_ID_PROGRESS) {
-        popPage();
-    }
+    psu::gui::g_psuAppContext.hideProgressPage();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

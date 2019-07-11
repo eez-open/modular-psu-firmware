@@ -306,7 +306,7 @@ void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, 
     if (x_offset <= right && y_offset + height <= y2)
         display::fillRect(x_offset, y_offset + height, right, y2);
 
-        // draw bitmap
+    // draw bitmap
     uint8_t savedOpacity = display::getOpacity();
 
     if (active) {

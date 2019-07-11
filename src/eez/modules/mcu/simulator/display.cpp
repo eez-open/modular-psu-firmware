@@ -617,6 +617,21 @@ void drawVLine(int x, int y, int l) {
     g_painted = true;
 }
 
+void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
+    uint32_t *frontPanelBuffer = g_frontPanelBuffer == g_frontPanelBuffer1 ? g_frontPanelBuffer2 : g_frontPanelBuffer1;
+    
+    setXY(dstx, dsty, dstx + x2 - x1, dsty + y2 - y1);
+    for (int y = y1; y <= y2; y++) {
+        for (int x = x1; x <= x2; x++) {
+            uint8_t *src = (uint8_t *)(g_frontPanelBuffer + y * g_frontPanelWidth + x);
+            uint16_t color = RGB_TO_COLOR(src[2], src[1], src[0]);
+            setPixel(color);
+        }
+    }
+
+    g_painted = true;
+}
+
 void drawBitmap(int x, int y, int sx, int sy, void *data, int bpp) {
     if (bpp == 32) {
         setXY(x, y, x + sx - 1, y + sy - 1);

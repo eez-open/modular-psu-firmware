@@ -188,6 +188,23 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
     HAL_DMA2D_Start(&hdma2d, (uint32_t)vramOffset(src, x, y), vramOffset(dst, x, y), width, height);
 }
 
+void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, int dstx, int dsty) {
+    hdma2d.Init.Mode = DMA2D_M2M;
+    hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+    hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+
+    hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - width;
+    hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_RGB565;
+    hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+    hdma2d.LayerCfg[1].InputAlpha = 0;
+
+    DMA2D_WAIT;
+
+    HAL_DMA2D_Init(&hdma2d);
+    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
+    HAL_DMA2D_Start(&hdma2d, (uint32_t)vramOffset(src, x, y), vramOffset(dst, dstx, dsty), width, height);
+}
+
 void bitBltA8Init(uint16_t color) {
     // initialize everything except lineOffset
 
@@ -441,9 +458,10 @@ void sync() {
 
         DMA2D_WAIT;
 
-        LTDC_LAYER(&hltdc, 0)->CFBAR = (uint32_t)g_buffer;
-		LTDC->SRCR = LTDC_SRCR_VBR;
-		while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)); // wait for VSYNC
+        // wait for VSYNC
+        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {}
+
+		HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
 
         g_buffer = g_newBufferAddress;
     }
@@ -601,6 +619,19 @@ void drawHLine(int x, int y, int l) {
 
 void drawVLine(int x, int y, int l) {
     fillRect(x, y, x, y + l);
+
+    g_painted = true;
+}
+
+void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
+    uint16_t * bufferOld;
+    if (g_buffer == (uint16_t *)VRAM_BUFFER1_START_ADDRESS) {
+        bufferOld = (uint16_t *)VRAM_BUFFER2_START_ADDRESS;
+    } else {
+        bufferOld = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
+    }
+
+    bitBlt(g_buffer, bufferOld, x1, y1, x2-x1+1, y2-y1+1, dstx, dsty);
 
     g_painted = true;
 }

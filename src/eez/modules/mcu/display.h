@@ -84,6 +84,7 @@ void drawRect(int x1, int y1, int x2, int y2);
 void fillRect(int x1, int y1, int x2, int y2, int radius = 0);
 void drawHLine(int x, int y, int l);
 void drawVLine(int x, int y, int l);
+void bitBlt(int x1, int y1, int x2, int y2, int x, int y);
 void drawBitmap(int x, int y, int sx, int sy, void *data, int bpp);
 void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,
              int clip_y2, gui::font::Font &font);

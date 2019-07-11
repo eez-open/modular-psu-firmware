@@ -797,11 +797,12 @@ void Channel::tick(uint32_t tick_usec) {
     }
 #endif
 
+    // update history values
+    auto uMonLast = roundPrec(u.mon_last, getPrecisionFromNumSignificantDecimalDigits(VOLTAGE_NUM_SIGNIFICANT_DECIMAL_DIGITS));
+    auto iMonLast = roundPrec(i.mon_last, getPrecisionFromNumSignificantDecimalDigits(CURRENT_NUM_SIGNIFICANT_DECIMAL_DIGITS));
     if (historyPosition == -1) {
-        uHistory[0] = roundPrec(u.mon_last, getPrecisionFromNumSignificantDecimalDigits(
-                                                VOLTAGE_NUM_SIGNIFICANT_DECIMAL_DIGITS));
-        iHistory[0] = roundPrec(i.mon_last, getPrecisionFromNumSignificantDecimalDigits(
-                                                CURRENT_NUM_SIGNIFICANT_DECIMAL_DIGITS));
+        uHistory[0] = uMonLast;
+        iHistory[0] = iMonLast;
         for (int i = 1; i < CHANNEL_HISTORY_SIZE; ++i) {
             uHistory[i] = 0;
             iHistory[i] = 0;
@@ -811,19 +812,12 @@ void Channel::tick(uint32_t tick_usec) {
         historyLastTick = tick_usec;
     } else {
         uint32_t ytViewRateMicroseconds = (int)round(ytViewRate * 1000000L);
-
         while (tick_usec - historyLastTick >= ytViewRateMicroseconds) {
-            uHistory[historyPosition] =
-                roundPrec(u.mon_last, getPrecisionFromNumSignificantDecimalDigits(
-                                          VOLTAGE_NUM_SIGNIFICANT_DECIMAL_DIGITS));
-            iHistory[historyPosition] =
-                roundPrec(i.mon_last, getPrecisionFromNumSignificantDecimalDigits(
-                                          CURRENT_NUM_SIGNIFICANT_DECIMAL_DIGITS));
-
+            uHistory[historyPosition] = uMonLast;
+            iHistory[historyPosition] = iMonLast;
             if (++historyPosition == CHANNEL_HISTORY_SIZE) {
                 historyPosition = 0;
             }
-
             historyLastTick += ytViewRateMicroseconds;
         }
     }
