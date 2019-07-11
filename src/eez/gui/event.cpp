@@ -24,6 +24,7 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/touch.h>
 #include <eez/gui/update.h>
+#include <eez/gui/dialogs.h>
 #include <eez/system.h>
 
 // TODO this must be removed from here
@@ -31,6 +32,8 @@
 
 #include <eez/apps/psu/idle.h>
 #include <eez/apps/psu/persist_conf.h>
+
+#include <eez/apps/home/home.h>
 //
 
 #define CONF_GUI_LONG_TOUCH_TIMEOUT 1000000L        // 1s
@@ -113,6 +116,14 @@ void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
     } else if (touchEvent.type == EVENT_TYPE_EXTRA_LONG_TOUCH) {
         // start touch screen calibration in case of really long touch
         showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
+    } else {
+        Widget *page = g_document->pages.first + activePageId;
+		const PageWidget *pageSpecific = (const PageWidget *)page->specific;
+        if (pageSpecific->closePageIfTouchedOutside) {
+            if (!pointInsideRect(touchEvent.x, touchEvent.y, page->x, page->y, page->w, page->h)) {
+                popPage();
+            }
+        }
     }
 
     g_appContext->onPageTouch(foundWidget, touchEvent);
@@ -178,6 +189,12 @@ void processTouchEvent(EventType type) {
         m_onTouchFunction = getTouchFunction(m_foundWidgetAtDown);
 
         if (!m_onTouchFunction) {
+            if (isFrontPanelLocked()) {
+                auto savedAppContext = g_appContext;
+                g_appContext = &home::g_homeAppContext;
+                errorMessage("Front panel is locked!");                
+                g_appContext = savedAppContext;
+            }
             m_onTouchFunction = onPageTouch;
         }
     }

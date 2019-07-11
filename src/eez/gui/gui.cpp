@@ -108,6 +108,12 @@ void oneIter() {
     touch::tick();
 
     g_appContext = &getRootAppContext();
+
+    g_appContext->x = 0;
+    g_appContext->y = 0;
+    g_appContext->width = mcu::display::getDisplayWidth();
+    g_appContext->height = mcu::display::getDisplayWidth();
+
     eventHandling();
     stateManagment();
     updateScreen();

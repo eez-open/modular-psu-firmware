@@ -119,6 +119,7 @@ void WidgetList_fixPointers(WidgetList &widgetList);
 
 struct PageWidget {
     WidgetList widgets;
+    uint8_t closePageIfTouchedOutside;
 };
 
 struct Document {
