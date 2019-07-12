@@ -92,13 +92,13 @@ class ChSettingsListsPage : public SetPage {
 
     int m_listVersion;
 
-    static float m_voltageList[MAX_LIST_LENGTH];
+    float m_voltageList[MAX_LIST_LENGTH];
     uint16_t m_voltageListLength;
 
-    static float m_currentList[MAX_LIST_LENGTH];
+    float m_currentList[MAX_LIST_LENGTH];
     uint16_t m_currentListLength;
 
-    static float m_dwellList[MAX_LIST_LENGTH];
+    float m_dwellList[MAX_LIST_LENGTH];
     uint16_t m_dwellListLength;
 
     int m_iCursor;

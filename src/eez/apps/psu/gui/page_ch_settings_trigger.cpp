@@ -172,12 +172,6 @@ void ChSettingsTriggerPage::editListCount() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-float ChSettingsListsPage::m_voltageList[MAX_LIST_LENGTH];
-
-float ChSettingsListsPage::m_currentList[MAX_LIST_LENGTH];
-
-float ChSettingsListsPage::m_dwellList[MAX_LIST_LENGTH];
-
 void ChSettingsListsPage::pageAlloc() {
     m_listVersion = 0;
     m_iCursor = 0;
