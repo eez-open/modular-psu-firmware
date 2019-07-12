@@ -44,7 +44,7 @@ static bool g_saveProfile = false;
 ////////////////////////////////////////////////////////////////////////////////
 
 void tick(uint32_t tickCount) {
-    if (persist_conf::devConf.flags.profileAutoRecallEnabled) {
+    if (persist_conf::devConf.flags.profileAutoRecallEnabled && persist_conf::devConf.profile_auto_recall_location == 0) {
         if (g_saveProfile && !list::isActive() && !calibration::isEnabled() && idle::isIdle()) {
             DebugTrace("Profile 0 saved!");
             saveAtLocation(0);
