@@ -43,8 +43,12 @@ static bool g_saveProfile = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool isAutoSaveAllowed() {
+    return persist_conf::devConf.flags.profileAutoRecallEnabled && persist_conf::devConf.profile_auto_recall_location == 0;
+}
+
 void tick(uint32_t tickCount) {
-    if (persist_conf::devConf.flags.profileAutoRecallEnabled && persist_conf::devConf.profile_auto_recall_location == 0) {
+    if (isAutoSaveAllowed()) {
         if (g_saveProfile && !list::isActive() && !calibration::isEnabled() && idle::isIdle()) {
             DebugTrace("Profile 0 saved!");
             saveAtLocation(0);
@@ -289,7 +293,7 @@ void save() {
 }
 
 void saveImmediately() {
-    if (persist_conf::devConf.flags.profileAutoRecallEnabled) {
+    if (isAutoSaveAllowed()) {
         DebugTrace("Profile 0 saved!");
         saveAtLocation(0);
         g_saveProfile = false;
