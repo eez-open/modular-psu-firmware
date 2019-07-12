@@ -174,7 +174,9 @@ bool exists(const char *dirPath, int *err) {
 
 bool catalog(const char *dirPath, void *param,
              void (*callback)(void *param, const char *name, const char *type, size_t size),
-             int *err) {
+             int *numFiles, int *err) {
+    *numFiles = 0;
+
     if (sd_card::g_testResult != TEST_OK) {
         if (err)
             *err = SCPI_ERROR_MASS_STORAGE_ERROR;
@@ -183,7 +185,7 @@ bool catalog(const char *dirPath, void *param,
 
     Directory dir;
     FileInfo fileInfo;
-    if (dir.findFirst(dirPath, "*.*", fileInfo) != SD_FAT_RESULT_OK) {
+    if (dir.findFirst(dirPath, "*", fileInfo) != SD_FAT_RESULT_OK) {
         // TODO better error handling
         if (err)
             *err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
@@ -195,6 +197,7 @@ bool catalog(const char *dirPath, void *param,
         fileInfo.getName(name, MAX_PATH_LENGTH);
 
         if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0) {
+            (*numFiles)++;
             if (fileInfo.isDirectory()) {
                 callback(param, name, "FOLD", fileInfo.getSize());
             } else if (endsWith(name, LIST_EXT)) {
@@ -225,7 +228,7 @@ bool catalogLength(const char *dirPath, size_t *length, int *err) {
 
     Directory dir;
     FileInfo fileInfo;
-    if (dir.findFirst(dirPath, "*.*", fileInfo) != SD_FAT_RESULT_OK) {
+    if (dir.findFirst(dirPath, "*", fileInfo) != SD_FAT_RESULT_OK) {
         // TODO better error handling
         if (err)
             *err = SCPI_ERROR_FILE_NAME_NOT_FOUND;

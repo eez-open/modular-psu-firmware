@@ -134,12 +134,17 @@ scpi_result_t scpi_cmd_mmemoryCatalogQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
+    int numFiles;
     int err;
-    if (!sd_card::catalog(dirPath, context, catalogCallback, &err)) {
+    if (!sd_card::catalog(dirPath, context, catalogCallback, &numFiles, &err)) {
         if (err != 0) {
             SCPI_ErrorPush(context, err);
         }
         return SCPI_RES_ERR;
+    }
+
+    if (numFiles == 0) {
+    	SCPI_ResultText(context, "");
     }
 
     return SCPI_RES_OK;

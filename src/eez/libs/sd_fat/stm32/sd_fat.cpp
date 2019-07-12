@@ -185,7 +185,9 @@ void File::sync() {
 
 void File::print(float value, int numDecimalDigits) {
     // TODO: test this
-    f_printf(&m_file, "%.*f", numDecimalDigits, value);
+    char buffer[32];
+    sprintf(buffer, "%.*f", numDecimalDigits, value);
+    write((uint8_t *)buffer, strlen(buffer));
 }
 
 void File::print(char value) {
@@ -199,6 +201,9 @@ bool SdFat::begin() {
 }
 
 bool SdFat::exists(const char *path) {
+    if (strcmp(path, "/") == 0) {
+        return true;
+    }
     FILINFO fno;
     return f_stat(path, &fno) == FR_OK;
 }

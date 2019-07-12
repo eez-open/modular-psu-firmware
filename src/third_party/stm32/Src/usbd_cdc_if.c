@@ -281,32 +281,35 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-	if (hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED) {
-	   return USBD_FAIL;
-	}
+  if (hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED) {
+    return USBD_FAIL;
+  }
 
-	if (((Buf == NULL) || (Len == NULL)) || (*Len <= 0)) {
-	   return USBD_FAIL;
-	}
+  if (((Buf == NULL) || (Len == NULL)) || (*Len <= 0)) {
+    return USBD_FAIL;
+  }
 
-	uint8_t result = USBD_OK;
-	do {
-		result = USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-	} while(result != USBD_OK);
+  uint8_t result = USBD_OK;
+  do {
+    result = USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+  } while(result != USBD_OK);
 
-	do {
-	   result = USBD_CDC_ReceivePacket(&hUsbDeviceFS);
-	} while(result != USBD_OK);
+  do {
+    result = USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  } while(result != USBD_OK);
 
-	uint32_t len = *Len;
-	while (len--) {
-	  if (g_serialQueue.overflow) {
-		  return USBD_FAIL;
-	  }
-      queue_push(&g_serialQueue, *Buf++);
-	}
+  uint32_t len = *Len;
+  while (len--) {
+    for (int i = 0; i < 10 && g_serialQueue.overflow; i++) {
+      osDelay(0);
+    }
+    if (g_serialQueue.overflow) {
+      return USBD_BUSY;
+    }
+    queue_push(&g_serialQueue, *Buf++);
+  }
 
-	return (USBD_OK);
+  return (USBD_OK);
   /* USER CODE END 6 */
 }
 
@@ -327,11 +330,12 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
   /* USER CODE BEGIN 7 */
   USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
 
-  for (int i = 0; i < 5 && hcdc->TxState != 0; i++) {
-    osDelay(1);
+  for (int i = 0; (i < 10 || g_serialLineState) && hcdc->TxState != 0; i++) {
+    osDelay(0);
   }
 
   if (hcdc->TxState != 0){
+    osDelay(0);
     return USBD_BUSY;
   }
 

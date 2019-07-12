@@ -43,7 +43,7 @@ bool makeParentDir(const char *filePath);
 bool exists(const char *dirPath, int *err);
 bool catalog(const char *dirPath, void *param,
              void (*callback)(void *param, const char *name, const char *type, size_t size),
-             int *err);
+			 int *numFiles, int *err);
 bool catalogLength(const char *dirPath, size_t *length, int *err);
 bool upload(const char *filePath, void *param,
             void (*callback)(void *param, const void *buffer, int size), int *err);
