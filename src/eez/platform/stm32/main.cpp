@@ -48,10 +48,6 @@
 
 extern "C" void SystemClock_Config(void);
 
-extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName ) {
-    while (true) {}
-}
-
 int main(int argc, char **argv) {
     HAL_Init();
 

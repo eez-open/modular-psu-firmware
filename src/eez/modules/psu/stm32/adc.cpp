@@ -132,7 +132,9 @@ bool AnalogDigitalConverter::test() {
 void AnalogDigitalConverter::tick(uint32_t tick_usec) {
     if (start_reg0) {
     	// int ready = !HAL_GPIO_ReadPin(SPI2_IRQ_GPIO_Port, SPI2_IRQ_Pin)
+
     	int ready;
+
     	if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
         	uint8_t gpioa = channel.ioexp.readGpio();
     		ready = !(gpioa & 0b00010000);
@@ -140,13 +142,25 @@ void AnalogDigitalConverter::tick(uint32_t tick_usec) {
         	uint8_t gpiob = channel.ioexp.readGpioB();
     		ready = !(gpiob & 0b10000000);
     	}
+
+    	// int ready = tick_usec - start_time > 10000;
+
     	if (ready) {
 			int16_t adc_data = read();
+
+			static int counter = 0;
+			if (start_reg0 == ADC_REG0_READ_I_MON && adc_data > 3276) {
+				++counter;
+				taskENTER_CRITICAL();
+				delay(500);
+				taskEXIT_CRITICAL();
+			}
+
 			channel.eventAdcData(adc_data);
 
-	#ifdef DEBUG
+#ifdef DEBUG
 			debug::g_adcCounter.inc();
-	#endif
+#endif
 		}
     }
 }
@@ -165,6 +179,8 @@ void AnalogDigitalConverter::start(uint8_t reg0) {
         spi::select(channel.slotIndex, spi::CHIP_ADC);
         spi::transfer(channel.slotIndex, data, result, 3);
         spi::deselect(channel.slotIndex);
+
+        // start_time = micros();
     }
 }
 
