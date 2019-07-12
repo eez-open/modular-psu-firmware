@@ -23,6 +23,11 @@
 namespace eez {
 namespace gui {
 
+enum {
+    YT_GRAPH_UPDATE_METHOD_SCROLL,
+    YT_GRAPH_UPDATE_METHOD_SCAN_LINE
+};
+
 struct YTGraphWidget {
     uint16_t y1Style;
     uint16_t y2Data;
@@ -33,6 +38,7 @@ struct YTGraphWidgetState {
     WidgetState genericState;
     data::Value y2Data;
     uint16_t position;
+    uint8_t ytGraphUpdateMethod;
 };
 
 void YTGraphWidget_draw(const WidgetCursor &widgetCursor);

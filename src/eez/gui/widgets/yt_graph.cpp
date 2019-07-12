@@ -26,6 +26,9 @@
 #include <eez/modules/mcu/display.h>
 #include <eez/util.h>
 
+#include <eez/apps/psu/psu.h>
+#include <eez/apps/psu/persist_conf.h>
+
 using namespace eez::mcu;
 
 #define CONF_GUI_YT_GRAPH_BLANK_PIXELS_AFTER_CURSOR 10
@@ -117,7 +120,16 @@ void drawYTGraphWithScrolling(const WidgetCursor &widgetCursor, const Widget *wi
     uint16_t data1Color16 = display::getColor16FromIndex(data1Color);
     uint16_t data2Color16 = display::getColor16FromIndex(data2Color);
 
+#if 0
+    // prevent using bitBlt
+    int numPointsToDraw = numPositions;
+    previousHistoryValuePosition = currentHistoryValuePosition;
+#else
     int numPointsToDraw = currentHistoryValuePosition - previousHistoryValuePosition;
+    if (numPointsToDraw < 0) {
+        numPointsToDraw += numPositions;
+    }
+
     if (numPointsToDraw < 0) {
         numPointsToDraw += numPositions;
     }
@@ -131,21 +143,30 @@ void drawYTGraphWithScrolling(const WidgetCursor &widgetCursor, const Widget *wi
             widgetCursor.x + xGraphOffset,
             widgetCursor.y);
     }
+#endif
 
     int endX = widgetCursor.x + xGraphOffset + numPositions;
     int startX = endX - numPointsToDraw;
 
-    int previousValuePositionLoop = previousHistoryValuePosition % numPositions;
-    int valuePositionLoop = (previousValuePositionLoop + 1) % numPositions;
+    int valuePositionLoop = (previousHistoryValuePosition + 1) % numPositions;
+
+    int y1Prev, y2Prev;
+
+    if (numPointsToDraw < numPositions) {
+        y1Prev = getYValue(widgetCursor, widget, data1, min1, max1, previousHistoryValuePosition);
+        y2Prev = getYValue(widgetCursor, widget, data2, min2, max2, previousHistoryValuePosition);
+    }
+    else {
+        y1Prev = getYValue(widgetCursor, widget, data1, min1, max1, valuePositionLoop);
+        y2Prev = getYValue(widgetCursor, widget, data2, min2, max2, valuePositionLoop);
+    }
+
     for (int x = startX; x < endX; x++) {
         display::setColor16(color16);
         display::drawVLine(x, widgetCursor.y, widget->h - 1);
 
         int y1 = getYValue(widgetCursor, widget, data1, min1, max1, valuePositionLoop);
-        int y1Prev = getYValue(widgetCursor, widget, data1, min1, max1, previousValuePositionLoop);
-
         int y2 = getYValue(widgetCursor, widget, data2, min2, max2, valuePositionLoop);
-        int y2Prev = getYValue(widgetCursor, widget, data2, min2, max2, previousValuePositionLoop);
 
         if (abs(y1Prev - y1) <= 1 && abs(y2Prev - y2) <= 1) {
             if (y1 == y2) {
@@ -182,8 +203,10 @@ void drawYTGraphWithScrolling(const WidgetCursor &widgetCursor, const Widget *wi
             }
         }
 
-        previousValuePositionLoop = valuePositionLoop;
         valuePositionLoop = (valuePositionLoop + 1) % numPositions;
+
+        y1Prev = y1;
+        y2Prev = y2;
     }
 }
 
@@ -242,6 +265,7 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     }
 
     ((YTGraphWidgetState *)widgetCursor.currentState)->position = currentHistoryValuePosition;
+    ((YTGraphWidgetState *)widgetCursor.currentState)->ytGraphUpdateMethod = psu::persist_conf::devConf2.ytGraphUpdateMethod;
 
     float min1 = data::getMin(widgetCursor.cursor, widget->data).getFloat();
     float max1 = data::getLimit(widgetCursor.cursor, widget->data).getFloat();
@@ -251,11 +275,15 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
     int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : 0;
 
-    int previousHistoryValuePosition = widgetCursor.previousState ?
-        ((YTGraphWidgetState *)widgetCursor.previousState)->position : (currentHistoryValuePosition + 1) % numHistoryValues;
+    int previousHistoryValuePosition = 
+        widgetCursor.previousState && 
+        ((YTGraphWidgetState *)widgetCursor.previousState)->ytGraphUpdateMethod == 
+            ((YTGraphWidgetState *)widgetCursor.currentState)->ytGraphUpdateMethod ?
+        ((YTGraphWidgetState *)widgetCursor.previousState)->position : 
+        (currentHistoryValuePosition + 1) % numHistoryValues;
 
     if (previousHistoryValuePosition != currentHistoryValuePosition) {
-        if (1) {
+        if (psu::persist_conf::devConf2.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
             // a new way of drawing yt graph using scrolling
             drawYTGraphWithScrolling(
                 widgetCursor, widget, previousHistoryValuePosition, currentHistoryValuePosition, numHistoryValues,

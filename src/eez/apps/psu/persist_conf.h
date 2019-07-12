@@ -133,7 +133,8 @@ struct DeviceConfiguration2 {
     uint8_t displayBackgroundLuminosityStep;
     IOPin ioPinInput2;
 	uint8_t selectedThemeIndex;
-    uint8_t reserverd[22];
+    uint8_t ytGraphUpdateMethod;
+    uint8_t reserverd[21];
 };
 
 static const uint16_t PROFILE_VERSION = 8;

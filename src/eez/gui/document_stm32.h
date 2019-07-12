@@ -1051,4 +1051,4 @@ enum PagesEnum {
     PAGE_ID_MINIMIZED_APP_VIEW = 83
 };
 
-extern const uint8_t assets[137906];
+extern const uint8_t assets[137900];

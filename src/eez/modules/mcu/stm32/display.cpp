@@ -437,6 +437,8 @@ void animate() {
 }
 
 void sync() {
+    DMA2D_WAIT;
+
     if (g_takeScreenshot) {
     	bitBlt(g_buffer, (uint16_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
         DMA2D_WAIT;
@@ -450,19 +452,16 @@ void sync() {
             animate();
         }
 
-        // copy current video buffer to the new one
-        uint16_t *g_newBufferAddress = g_buffer == (uint16_t *)VRAM_BUFFER1_START_ADDRESS
-                                           ? (uint16_t *)VRAM_BUFFER2_START_ADDRESS
-                                           : (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
-        bitBlt(g_buffer, g_newBufferAddress, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-
-        DMA2D_WAIT;
-
         // wait for VSYNC
         while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {}
 
 		HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
 
+        // copy current video buffer to the new one
+        uint16_t *g_newBufferAddress = g_buffer == (uint16_t *)VRAM_BUFFER1_START_ADDRESS
+                                           ? (uint16_t *)VRAM_BUFFER2_START_ADDRESS
+                                           : (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
+        bitBlt(g_buffer, g_newBufferAddress, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
         g_buffer = g_newBufferAddress;
     }
 }
@@ -631,7 +630,7 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
         bufferOld = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
     }
 
-    bitBlt(g_buffer, bufferOld, x1, y1, x2-x1+1, y2-y1+1, dstx, dsty);
+    bitBlt(bufferOld, g_buffer, x1, y1, x2-x1+1, y2-y1+1, dstx, dsty);
 
     g_painted = true;
 }

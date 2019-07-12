@@ -72,7 +72,7 @@ scpi_result_t scpi_cmd_displayView(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (param < 1 || param > 4) {
+    if (param < 1 || param > 5) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }

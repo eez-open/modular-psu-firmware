@@ -42,6 +42,8 @@ using namespace eez::mcu::display;
 
 #include <eez/apps/psu/trigger.h>
 
+#include <eez/gui/widgets/yt_graph.h>
+
 #define NUM_CHANNELS_VIEW_MODES 4
 
 namespace eez {
@@ -499,13 +501,32 @@ int getProfileAutoRecallLocation() {
 }
 
 void toggleChannelsViewMode() {
-    devConf.flags.channelsViewMode = (devConf.flags.channelsViewMode + 1) % NUM_CHANNELS_VIEW_MODES;
-    saveDevice();
+    if (devConf.flags.channelsViewMode == 3 && devConf2.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCAN_LINE) {
+        setChannelsViewMode(0);
+    } else {
+        setChannelsViewMode(devConf.flags.channelsViewMode + 1);
+    }
 }
 
 void setChannelsViewMode(unsigned int channelsViewMode) {
-    devConf.flags.channelsViewMode = channelsViewMode;
-    saveDevice();
+    uint8_t ytGraphUpdateMethod = devConf2.ytGraphUpdateMethod;
+    
+    if (channelsViewMode == 4) {
+        channelsViewMode = 3;
+        ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCAN_LINE;
+    } else if (channelsViewMode == 3) {
+        ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCROLL;
+    }
+
+    if (channelsViewMode != devConf.flags.channelsViewMode) {
+        devConf.flags.channelsViewMode = channelsViewMode;
+        saveDevice();
+    }
+
+    if (ytGraphUpdateMethod != devConf2.ytGraphUpdateMethod) {
+        devConf2.ytGraphUpdateMethod = ytGraphUpdateMethod;
+        saveDevice();
+    }
 }
 
 void loadChannelCalibration(Channel &channel) {
