@@ -33,24 +33,8 @@ void UARTClass::end() {
 }
 
 int UARTClass::write(const char *buffer, int size) {
-    for (int i = 0; i < 10; ++i) {
-
-#ifdef STM32F429xx
-        uint8_t result = CDC_Transmit_HS((uint8_t *)buffer, (uint16_t)size);
-#endif
-
-#ifdef STM32F769xx
-        uint8_t result = CDC_Transmit_FS((uint8_t *)buffer, (uint16_t)size);
-#endif
-
-        if (result != USBD_BUSY) {
-            return size;
-        }
-
-        osDelay(1);
-    }
-
-    return 0;
+    CDC_Transmit_FS((uint8_t *)buffer, (uint16_t)size);
+    return size;
 }
 
 int UARTClass::print(const char *data) {
