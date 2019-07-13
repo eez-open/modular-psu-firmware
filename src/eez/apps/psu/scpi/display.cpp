@@ -224,7 +224,7 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
     uint8_t line[480 * 3];
     while (mcu::display::screanshotGetLine(line)) {
         SCPI_ResultArbitraryBlockData(context, line, sizeof(line));
-        osDelay(1);
+        osDelay(0);
     }
 
     mcu::display::screanshotEnd();

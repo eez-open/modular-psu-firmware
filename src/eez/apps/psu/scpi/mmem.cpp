@@ -215,7 +215,7 @@ void uploadCallback(void *param, const void *buffer, int size) {
         SCPI_ResultArbitraryBlockData(context, buffer, size);
     }
 
-    osDelay(1);
+    osDelay(0);
 }
 #endif
 

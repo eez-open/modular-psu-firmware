@@ -481,7 +481,7 @@ int getDisplayHeight() {
 void screanshotBegin() {
 	g_takeScreenshot = true;
 	do {
-		osDelay(1);
+		osDelay(0);
 	} while (g_takeScreenshot);
 
 	g_screenshotY = 272 - 1;

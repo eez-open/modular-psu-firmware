@@ -84,7 +84,7 @@ void boot() {
 
 #if !defined(__EMSCRIPTEN__)
     while (!g_shutdown) {
-        osDelay(1);
+        osDelay(0);
     }
 
     setSystemState(SHUTING_DOWN);
