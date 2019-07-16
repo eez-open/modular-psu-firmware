@@ -617,6 +617,8 @@ class Channel {
     float VOLTAGE_GND_OFFSET; // [V], (1375 / 65535) * (40V | 50V)
     float CURRENT_GND_OFFSET; // [A]
 
+    int reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionValue &cpv);
+
     void clearProtectionConf();
     void protectionEnter(ProtectionValue &cpv);
     void protectionCheck(ProtectionValue &cpv);

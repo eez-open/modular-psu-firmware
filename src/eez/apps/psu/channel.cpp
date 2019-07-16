@@ -22,14 +22,8 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include <eez/apps/psu/serial_psu.h>
 #include <eez/system.h>
-#if OPTION_ETHERNET
-#include <eez/apps/psu/ethernet.h>
-#endif
-#if (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                         \
-     EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12) &&                                       \
-    OPTION_WATCHDOG
+#if OPTION_WATCHDOG
 #include <eez/apps/psu/watchdog.h>
 #endif
 #include <eez/apps/psu/board.h>
@@ -44,13 +38,15 @@
 #include <eez/apps/psu/profile.h>
 #include <eez/apps/psu/trigger.h>
 #include <eez/modules/psu/adc.h>
+#include <eez/scpi/regs.h>
 #include <eez/sound.h>
 #include <eez/index.h>
 
 namespace eez {
-namespace psu {
 
 using namespace scpi;
+
+namespace psu {
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -405,12 +401,20 @@ void Channel::set(uint8_t slotIndex_, uint8_t boardRevision_, float U_MIN_, floa
     updateCcAndCvSwitch();
 }
 
+int Channel::reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionValue &cpv) {
+    if (IS_OVP_VALUE(this, cpv))
+        return QUES_ISUM_OVP;
+    if (IS_OCP_VALUE(this, cpv))
+        return QUES_ISUM_OCP;
+    return QUES_ISUM_OPP;
+}
+
 void Channel::protectionEnter(ProtectionValue &cpv) {
     channel_dispatcher::outputEnable(*this, false);
 
     cpv.flags.tripped = 1;
 
-    int bit_mask = reg_get_ques_isum_bit_mask_for_channel_protection_value(this, cpv);
+    int bit_mask = reg_get_ques_isum_bit_mask_for_channel_protection_value(cpv);
     setQuesBits(bit_mask, true);
 
     int16_t eventId = event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + 3 * (index - 1);
@@ -1493,25 +1497,11 @@ void Channel::disableProtection() {
 }
 
 void Channel::setQuesBits(int bit_mask, bool on) {
-    if (serial::g_testResult == TEST_OK) {
-        reg_set_ques_isum_bit(&serial::g_scpiContext, this, bit_mask, on);
-    }
-#if OPTION_ETHERNET
-    if (ethernet::g_testResult == TEST_OK) {
-        reg_set_ques_isum_bit(&ethernet::g_scpiContext, this, bit_mask, on);
-    }
-#endif
+    reg_set_ques_isum_bit(this->index - 1, bit_mask, on);
 }
 
 void Channel::setOperBits(int bit_mask, bool on) {
-    if (serial::g_testResult == TEST_OK) {
-        reg_set_oper_isum_bit(&serial::g_scpiContext, this, bit_mask, on);
-    }
-#if OPTION_ETHERNET
-    if (ethernet::g_testResult == TEST_OK) {
-        reg_set_oper_isum_bit(&ethernet::g_scpiContext, this, bit_mask, on);
-    }
-#endif
+    reg_set_oper_isum_bit(this->index - 1, bit_mask, on);
 }
 
 const char *Channel::getCvModeStr() {

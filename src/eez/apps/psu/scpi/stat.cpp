@@ -21,6 +21,9 @@
 #include <eez/apps/psu/scpi/psu.h>
 
 namespace eez {
+
+using namespace scpi;
+
 namespace psu {
 namespace scpi {
 

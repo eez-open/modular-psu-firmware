@@ -23,7 +23,7 @@
 #include <eez/apps/psu/list_program.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/apps/psu/profile.h>
-#include <eez/apps/psu/scpi/regs.h>
+#include <eez/scpi/regs.h>
 #include <eez/apps/psu/trigger.h>
 #include <eez/system.h>
 
@@ -214,7 +214,7 @@ void onTriggerFinished(Channel &channel) {
             channel_dispatcher::setVoltage(channel, 0);
             channel_dispatcher::setCurrent(channel, 0);
             channel_dispatcher::outputEnable(channel, false);
-            schedulePowerDown();
+            scheduleChangePowerState(false);
             break;
         }
     }

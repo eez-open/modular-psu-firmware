@@ -25,6 +25,11 @@
 #if OPTION_ETHERNET
 #include <eez/apps/psu/ethernet.h>
 #endif
+#include <eez/apps/psu/event_queue.h>
+#include <eez/apps/psu/scpi/psu.h>
+
+using namespace eez::psu;
+using namespace eez::psu::scpi;
 
 namespace eez {
 namespace scpi {
@@ -44,9 +49,13 @@ osThreadDef(g_scpiTask, mainLoop, osPriorityNormal, 0, 1024);
 #pragma GCC diagnostic pop
 #endif
 
+osMessageQDef(g_scpiMessageQueue, SCPI_QUEUE_SIZE, uint32_t);
+osMessageQId g_scpiMessageQueueId;
+
 bool onSystemStateChanged() {
     if (eez::g_systemState == eez::SystemState::BOOTING) {
         if (eez::g_systemStatePhase == 0) {
+            g_scpiMessageQueueId = osMessageCreate(osMessageQ(g_scpiMessageQueue), NULL);
             g_scpiTaskHandle = osThreadCreate(osThread(g_scpiTask), nullptr);
         }
     }
@@ -61,22 +70,62 @@ void mainLoop(const void *) {
     oneIter();
 #else
     while (1) {
-        osDelay(10);
         oneIter();
     }
 #endif
 }
 
 void oneIter() {
-    uint32_t tick_usec = micros();
+    osEvent event = osMessageGet(g_scpiMessageQueueId, osWaitForever);
+    if (event.status == osEventMessage) {
+    	uint32_t message = event.value.v;
+    	uint32_t target = SCPI_QUEUE_MESSAGE_TARGET(message);
+    	uint32_t type = SCPI_QUEUE_MESSAGE_TYPE(message);
+    	uint32_t param = SCPI_QUEUE_MESSAGE_PARAM(message);
+        if (target == SCPI_QUEUE_MESSAGE_TARGET_SERIAL) {
+            serial::onQueueMessage(type, param);
+        }
+#if OPTION_ETHERNET
+        else {
+            ethernet::onQueueMessage(type, param);
+        }
+#endif        
+    }
+}
 
-    psu::serial::tick(tick_usec);
+void resetContext(scpi_t *context) {
+    scpi_psu_t *psuContext = (scpi_psu_t *)context->user_context;
+    psuContext->selected_channel_index = 1;
+#if OPTION_SD_CARD
+    psuContext->currentDirectory[0] = 0;
+#endif
+    SCPI_ErrorClear(context);
+}
+
+void resetContext() {
+    // SYST:ERR:COUN? 0
+    if (serial::g_testResult == TEST_OK) {
+        scpi::resetContext(&serial::g_scpiContext);
+    }
 
 #if OPTION_ETHERNET
-    psu::ethernet::tick(tick_usec);
+    if (ethernet::g_testResult == TEST_OK) {
+        scpi::resetContext(&ethernet::g_scpiContext);
+    }
 #endif
 }
 
+void generateError(int error) {
+    if (serial::g_testResult == TEST_OK) {
+        SCPI_ErrorPush(&serial::g_scpiContext, error);
+    }
+#if OPTION_ETHERNET
+    if (ethernet::g_testResult == TEST_OK) {
+        SCPI_ErrorPush(&ethernet::g_scpiContext, error);
+    }
+#endif
+    event_queue::pushEvent(error);
+}
 
 }
 }

@@ -21,7 +21,7 @@
 #include <eez/apps/psu/channel_dispatcher.h>
 #include <eez/apps/psu/event_queue.h>
 #include <eez/apps/psu/list_program.h>
-#include <eez/apps/psu/scpi/regs.h>
+#include <eez/scpi/regs.h>
 #include <eez/apps/psu/temperature.h>
 #include <eez/apps/psu/trigger.h>
 #include <eez/system.h>

@@ -21,7 +21,7 @@
 #include <scpi/scpi.h>
 
 #include <eez/apps/psu/scpi/params.h>
-#include <eez/apps/psu/scpi/regs.h>
+#include <eez/scpi/regs.h>
 
 namespace eez {
 namespace psu {
@@ -51,8 +51,6 @@ void onBufferOverrun(scpi_t &context);
 void printError(int_fast16_t err);
 
 void resultChoiceName(scpi_t *context, scpi_choice_def_t *choice, int tag);
-
-void resetContext(scpi_t *context);
 
 } // namespace scpi
 } // namespace psu

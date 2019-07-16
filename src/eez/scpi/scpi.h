@@ -16,10 +16,32 @@
 * along with this program.  If not, see http://www.gnu.org/licenses.
 */
 
+#pragma once
+
+#include <cmsis_os.h>
+
 namespace eez {
 namespace scpi {
 
 bool onSystemStateChanged();
+
+void resetContext();
+void generateError(int error);
+
+extern osMessageQId g_scpiMessageQueueId;
+
+#define SCPI_QUEUE_SIZE 10
+
+#define SCPI_QUEUE_MESSAGE_TARGET_SERIAL 0
+#define SCPI_QUEUE_MESSAGE_TARGET_ETHERNET 1
+
+#define SCPI_QUEUE_MESSAGE(target, type, param) (((target) << 31) | ((param) << 4) | (type))
+#define SCPI_QUEUE_MESSAGE_TARGET(message) ((message) & 0x80000000L ? 1 : 0)
+#define SCPI_QUEUE_MESSAGE_TYPE(message) ((message) & 0xF)
+#define SCPI_QUEUE_MESSAGE_PARAM(param) (((message) & 0x7FFFFFFF) >> 4)
+
+#define SCPI_QUEUE_SERIAL_MESSAGE(type, param) SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_SERIAL, type, param)
+#define SCPI_QUEUE_ETHERNET_MESSAGE(type, param) SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_ETHERNET, type, param)
 
 }
 }

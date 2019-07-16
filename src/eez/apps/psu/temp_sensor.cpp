@@ -19,7 +19,7 @@
 #include <eez/apps/psu/psu.h>
 
 #include <eez/index.h>
-#include <eez/apps/psu/scpi/regs.h>
+#include <eez/scpi/regs.h>
 #include <eez/apps/psu/temp_sensor.h>
 
 #if defined(EEZ_PLATFORM_STM32)

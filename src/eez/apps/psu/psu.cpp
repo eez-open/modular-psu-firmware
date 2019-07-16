@@ -74,7 +74,12 @@
 #include <eez/modules/mcu/encoder.h>
 #endif
 
+#include <eez/scpi/scpi.h>
+
 namespace eez {
+
+using namespace scpi;
+
 namespace psu {
 
 using namespace scpi;
@@ -87,7 +92,7 @@ static uint32_t g_powerDownTime;
 
 static MaxCurrentLimitCause g_maxCurrentLimitCause;
 
-static bool g_powerDownOnNextTick;
+static int g_changePowerStateOnNextTick; // -1: do not change, 0: change to power down, 1: change to power up
 
 RLState g_rlState = RL_STATE_LOCAL;
 
@@ -100,8 +105,6 @@ ontime::Counter g_powerOnTimeCounter(ontime::ON_TIME_COUNTER_POWER);
 ////////////////////////////////////////////////////////////////////////////////
 
 static bool testShield();
-
-static void psuRegSet(scpi_psu_reg_name_t name, scpi_reg_val_t val);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -260,100 +263,82 @@ bool test() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void regSet(scpi_reg_name_t name, scpi_reg_val_t val) {
-    if (serial::g_testResult == TEST_OK) {
-        SCPI_RegSet(&serial::g_scpiContext, name, val);
-    }
-#if OPTION_ETHERNET
-    if (ethernet::g_testResult == TEST_OK) {
-        SCPI_RegSet(&ethernet::g_scpiContext, name, val);
-    }
-#endif
-}
-
 static bool psuReset() {
     // *ESE 0
-    regSet(SCPI_REG_ESE, 0);
+    scpi_reg_set(SCPI_REG_ESE, 0);
 
     // *SRE 0
-    regSet(SCPI_REG_SRE, 0);
+    scpi_reg_set(SCPI_REG_SRE, 0);
 
     // *STB 0
-    regSet(SCPI_REG_STB, 0);
+    scpi_reg_set(SCPI_REG_STB, 0);
 
     // *ESR 0
-    regSet(SCPI_REG_ESR, 0);
+    scpi_reg_set(SCPI_REG_ESR, 0);
 
     // STAT:OPER[:EVEN] 0
-    regSet(SCPI_REG_OPER, 0);
+    scpi_reg_set(SCPI_REG_OPER, 0);
 
     // STAT:OPER:COND 0
-    psuRegSet(SCPI_PSU_REG_OPER_COND, 0);
+    reg_set(SCPI_PSU_REG_OPER_COND, 0);
 
     // STAT:OPER:ENAB 0
-    regSet(SCPI_REG_OPERE, 0);
+    scpi_reg_set(SCPI_REG_OPERE, 0);
 
     // STAT:OPER:INST[:EVEN] 0
-    psuRegSet(SCPI_PSU_REG_OPER_INST_EVENT, 0);
+    reg_set(SCPI_PSU_REG_OPER_INST_EVENT, 0);
 
     // STAT:OPER:INST:COND 0
-    psuRegSet(SCPI_PSU_REG_OPER_INST_COND, 0);
+    reg_set(SCPI_PSU_REG_OPER_INST_COND, 0);
 
     // STAT:OPER:INST:ENAB 0
-    psuRegSet(SCPI_PSU_REG_OPER_INST_ENABLE, 0);
+    reg_set(SCPI_PSU_REG_OPER_INST_ENABLE, 0);
 
     // STAT:OPER:INST:ISUM[:EVEN] 0
-    psuRegSet(SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1, 0);
-    psuRegSet(SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT2, 0);
+    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1, 0);
+    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT2, 0);
 
     // STAT:OPER:INST:ISUM:COND 0
-    psuRegSet(SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1, 0);
-    psuRegSet(SCPI_PSU_CH_REG_OPER_INST_ISUM_COND2, 0);
+    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1, 0);
+    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_COND2, 0);
 
     // STAT:OPER:INST:ISUM:ENAB 0
-    psuRegSet(SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1, 0);
-    psuRegSet(SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2, 0);
+    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1, 0);
+    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2, 0);
 
     // STAT:QUES[:EVEN] 0
-    regSet(SCPI_REG_QUES, 0);
+    scpi_reg_set(SCPI_REG_QUES, 0);
 
     // STAT:QUES:COND 0
-    psuRegSet(SCPI_PSU_REG_QUES_COND, 0);
+    reg_set(SCPI_PSU_REG_QUES_COND, 0);
 
     // STAT:QUES:ENAB 0
-    regSet(SCPI_REG_QUESE, 0);
+    scpi_reg_set(SCPI_REG_QUESE, 0);
 
     // STAT:QUES:INST[:EVEN] 0
-    psuRegSet(SCPI_PSU_REG_QUES_INST_EVENT, 0);
+    reg_set(SCPI_PSU_REG_QUES_INST_EVENT, 0);
 
     // STAT:QUES:INST:COND 0
-    psuRegSet(SCPI_PSU_REG_QUES_INST_COND, 0);
+    reg_set(SCPI_PSU_REG_QUES_INST_COND, 0);
 
     // STAT:QUES:INST:ENAB 0
-    psuRegSet(SCPI_PSU_REG_QUES_INST_ENABLE, 0);
+    reg_set(SCPI_PSU_REG_QUES_INST_ENABLE, 0);
 
     // STAT:QUES:INST:ISUM[:EVEN] 0
-    psuRegSet(SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1, 0);
-    psuRegSet(SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT2, 0);
+    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1, 0);
+    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT2, 0);
 
     // STAT:QUES:INST:ISUM:COND 0
-    psuRegSet(SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1, 0);
-    psuRegSet(SCPI_PSU_CH_REG_QUES_INST_ISUM_COND2, 0);
+    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1, 0);
+    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_COND2, 0);
 
     // STAT:OPER:INST:ISUM:ENAB 0
-    psuRegSet(SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1, 0);
-    psuRegSet(SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE2, 0);
+    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1, 0);
+    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE2, 0);
 
-    // SYST:ERR:COUN? 0
-    if (serial::g_testResult == TEST_OK) {
-        scpi::resetContext(&serial::g_scpiContext);
-    }
+    eez::scpi::resetContext();
 
 #if OPTION_ETHERNET
-    if (ethernet::g_testResult == TEST_OK) {
-        scpi::resetContext(&ethernet::g_scpiContext);
-    }
-
     ntp::reset();
 #endif
 
@@ -558,7 +543,7 @@ bool powerUp() {
 #endif
 
     // turn on Power On (PON) bit of ESE register
-    setEsrBits(ESR_PON);
+    reg_set_esr_bits(ESR_PON);
 
     event_queue::pushEvent(event_queue::EVENT_INFO_POWER_UP);
 
@@ -630,14 +615,17 @@ bool changePowerState(bool up) {
 
         g_bootTestSuccess = true;
 
+        // auto recall channels parameters from profile
+        profile::Parameters profile;
+        int location;
+        auto x = loadAutoRecallProfile(&profile, &location);
+
         if (!powerUp()) {
             return false;
         }
 
         // auto recall channels parameters from profile
-        profile::Parameters profile;
-        int location;
-        if (loadAutoRecallProfile(&profile, &location)) {
+        if (x) {
             for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
                 memcpy(&temperature::sensors[i].prot_conf, profile.temp_prot + i,
                        sizeof(temperature::ProtectionConfiguration));
@@ -665,8 +653,8 @@ bool changePowerState(bool up) {
     return true;
 }
 
-void schedulePowerDown() {
-    g_powerDownOnNextTick = true;
+void scheduleChangePowerState(bool up) {
+    g_changePowerStateOnNextTick = up ? 1 : 0;
 }
 
 void powerDownBySensor() {
@@ -726,9 +714,9 @@ void onProtectionTripped() {
 void tick() {
     ++g_mainLoopCounter;
 
-    if (g_powerDownOnNextTick) {
-        g_powerDownOnNextTick = false;
-        powerDownBySensor();
+    if (g_changePowerStateOnNextTick != -1) {
+        changePowerState(g_changePowerStateOnNextTick ? true : false);
+        g_changePowerStateOnNextTick = -1;
     }
 
     uint32_t tick_usec = micros();
@@ -809,60 +797,16 @@ void tick() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void psuRegSet(scpi_psu_reg_name_t name, scpi_reg_val_t val) {
-    if (serial::g_testResult == TEST_OK) {
-        reg_set(&serial::g_scpiContext, name, val);
-    }
-#if OPTION_ETHERNET
-    if (ethernet::g_testResult == TEST_OK) {
-        reg_set(&ethernet::g_scpiContext, name, val);
-    }
-#endif
-}
-
-void setEsrBits(int bit_mask) {
-    if (serial::g_testResult == TEST_OK) {
-        SCPI_RegSetBits(&serial::g_scpiContext, SCPI_REG_ESR, bit_mask);
-    }
-#if OPTION_ETHERNET
-    if (ethernet::g_testResult == TEST_OK) {
-        SCPI_RegSetBits(&ethernet::g_scpiContext, SCPI_REG_ESR, bit_mask);
-    }
-#endif
-}
-
 void setQuesBits(int bit_mask, bool on) {
-    if (serial::g_testResult == TEST_OK) {
-        reg_set_ques_bit(&serial::g_scpiContext, bit_mask, on);
-    }
-#if OPTION_ETHERNET
-    if (ethernet::g_testResult == TEST_OK) {
-        reg_set_ques_bit(&ethernet::g_scpiContext, bit_mask, on);
-    }
-#endif
+    reg_set_ques_bit(bit_mask, on);
 }
 
 void setOperBits(int bit_mask, bool on) {
-    if (serial::g_testResult == TEST_OK) {
-        reg_set_oper_bit(&serial::g_scpiContext, bit_mask, on);
-    }
-#if OPTION_ETHERNET
-    if (ethernet::g_testResult == TEST_OK) {
-        reg_set_oper_bit(&ethernet::g_scpiContext, bit_mask, on);
-    }
-#endif
+    reg_set_oper_bit(bit_mask, on);
 }
 
 void generateError(int16_t error) {
-    if (serial::g_testResult == TEST_OK) {
-        SCPI_ErrorPush(&serial::g_scpiContext, error);
-    }
-#if OPTION_ETHERNET
-    if (ethernet::g_testResult == TEST_OK) {
-        SCPI_ErrorPush(&ethernet::g_scpiContext, error);
-    }
-#endif
-    event_queue::pushEvent(error);
+    eez::scpi::generateError(error);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
