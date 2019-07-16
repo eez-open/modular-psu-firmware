@@ -65,8 +65,6 @@ See BSP_SD_ErrorCallback() and BSP_SD_AbortCallback() below
  * BSP_SD_Init() elsewhere in the application.
  */
 /* USER CODE BEGIN disableSDInit */
-#undef SD_TIMEOUT
-#define SD_TIMEOUT 10 * 1000
 /* #define DISABLE_SD_INIT */
 /* USER CODE END disableSDInit */
 
