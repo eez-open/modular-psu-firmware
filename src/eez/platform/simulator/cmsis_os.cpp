@@ -105,3 +105,51 @@ uint32_t osKernelSysTick() {
     return micros;
 #endif    
 }
+
+osMessageQId osMessageCreate(osMessageQId queue_id, osThreadId thread_id) {
+    queue_id->tail = 0;
+    queue_id->head = 0;
+    queue_id->overflow = 0;
+    return queue_id;
+}
+
+osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec) {
+    while (queue_id->tail == queue_id->head) {
+        osDelay(0);
+        if (millisec == 0) {
+            return {
+                osOK,
+                0
+            };
+        }
+    }
+    uint16_t tail = queue_id->tail + 1;
+    if (tail >= queue_id->numElements) {
+        tail = 0;
+    }
+    queue_id->tail = tail;
+    uint32_t info = ((uint32_t *)queue_id->data)[tail];
+    if (queue_id->overflow) {
+        queue_id->overflow = 0;
+    }
+    return {
+        osEventMessage,
+        info
+    };
+}
+
+osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec) {
+    while (queue_id->overflow) {
+        osDelay(0);
+    }
+    uint16_t head = queue_id->head + 1;
+    if (head >= queue_id->numElements) {
+        head = 0;
+    }
+    ((uint32_t *)queue_id->data)[head] = info;
+    queue_id->head = head;
+    if (queue_id->head == queue_id->tail) {
+        queue_id->overflow = 1;
+    }
+    return osOK; 
+}

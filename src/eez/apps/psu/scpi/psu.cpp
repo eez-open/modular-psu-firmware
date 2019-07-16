@@ -103,16 +103,16 @@ void printError(int_fast16_t err) {
     if (serial::g_testResult == TEST_OK) {
         char errorOutputBuffer[256];
 
-        SERIAL_PORT.print("**ERROR");
+        Serial.print("**ERROR");
 
         char datetime_buffer[20] = { 0 };
         if (datetime::getDateTimeAsString(datetime_buffer)) {
             sprintf(errorOutputBuffer, " [%s]", datetime_buffer);
-            SERIAL_PORT.print(errorOutputBuffer);
+            Serial.print(errorOutputBuffer);
         }
 
         sprintf(errorOutputBuffer, ": %d,\"%s\"", (int16_t)err, SCPI_ErrorTranslate(err));
-        SERIAL_PORT.println(errorOutputBuffer);
+        Serial.println(errorOutputBuffer);
     }
 
 #if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
@@ -139,18 +139,6 @@ void resultChoiceName(scpi_t *context, scpi_choice_def_t *choice, int tag) {
             break;
         }
     }
-}
-
-void resetContext(scpi_t *context) {
-    scpi_psu_t *psuContext = (scpi_psu_t *)context->user_context;
-
-    psuContext->selected_channel_index = 1;
-
-#if OPTION_SD_CARD
-    psuContext->currentDirectory[0] = 0;
-#endif
-
-    SCPI_ErrorClear(context);
 }
 
 } // namespace scpi

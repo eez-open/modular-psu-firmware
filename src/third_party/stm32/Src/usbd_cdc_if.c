@@ -23,6 +23,7 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
+#include <assert.h>
 #include "cmsis_os.h"
 /* USER CODE END INCLUDE */
 
@@ -39,9 +40,9 @@ USBD_CDC_LineCodingTypeDef LineCoding =
     0x00,   /* parity - none*/
     0x08    /* nb. of bits 8*/
   };
-Queue g_serialQueue;
 uint8_t g_serialLineState;
-
+extern void notifySerialLineStateChanged(uint8_t serialLineState);
+extern void notifySerialInput(uint8_t *buffer, uint32_t length);
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -74,8 +75,8 @@ uint8_t g_serialLineState;
 /* USER CODE BEGIN PRIVATE_DEFINES */
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
-#define APP_RX_DATA_SIZE  1024
-#define APP_TX_DATA_SIZE  1024
+#define APP_RX_DATA_SIZE  2048
+#define APP_TX_DATA_SIZE  2048
 /* USER CODE END PRIVATE_DEFINES */
 
 /**
@@ -164,8 +165,6 @@ USBD_CDC_ItfTypeDef USBD_Interface_fops_FS =
 static int8_t CDC_Init_FS(void)
 {
   /* USER CODE BEGIN 3 */
-    queue_init(&g_serialQueue);
-
   /* Set Application Buffers */
   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, 0);
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS);
@@ -245,11 +244,11 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
         pbuf[4] = LineCoding.format;
         pbuf[5] = LineCoding.paritytype;
         pbuf[6] = LineCoding.datatype;
-
     break;
 
     case CDC_SET_CONTROL_LINE_STATE:
       g_serialLineState = pbuf[2];
+      notifySerialLineStateChanged(g_serialLineState);
     break;
 
     case CDC_SEND_BREAK:
@@ -289,25 +288,7 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
     return USBD_FAIL;
   }
 
-  uint8_t result = USBD_OK;
-  do {
-    result = USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-  } while(result != USBD_OK);
-
-  do {
-    result = USBD_CDC_ReceivePacket(&hUsbDeviceFS);
-  } while(result != USBD_OK);
-
-  uint32_t len = *Len;
-  while (len--) {
-    for (int i = 0; i < 10 && g_serialQueue.overflow; i++) {
-      osDelay(0);
-    }
-    if (g_serialQueue.overflow) {
-      return USBD_BUSY;
-    }
-    queue_push(&g_serialQueue, *Buf++);
-  }
+  notifySerialInput(Buf, *Len);
 
   return (USBD_OK);
   /* USER CODE END 6 */
@@ -334,13 +315,15 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
     osDelay(0);
   }
 
-  if (hcdc->TxState != 0){
-    osDelay(0);
-    return USBD_BUSY;
+  if (hcdc->TxState == 0){
+    assert(Len <= APP_TX_DATA_SIZE);
+    memcpy(UserTxBufferFS, Buf, Len);
+    USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, Len);
+    result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+  } else {
+    result = USBD_BUSY;
   }
 
-  USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
-  result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
   /* USER CODE END 7 */
   return result;
 }

@@ -25,6 +25,9 @@
 #define CONF_CHUNK_SIZE CONF_SERIAL_BUFFER_SIZE
 
 namespace eez {
+
+using namespace scpi;
+    
 namespace psu {
 
 using namespace scpi;
@@ -37,7 +40,7 @@ long g_bauds[] = { 4800, 9600, 19200, 38400, 57600, 115200 };
 size_t g_baudsSize = sizeof(g_bauds) / sizeof(long);
 
 size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
-    SERIAL_PORT.write(data, len);
+    Serial.write(data, len);
     return len;
 }
 
@@ -65,7 +68,7 @@ scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_
         } else {
             sprintf(errorOutputBuffer, "**CTRL %02x: 0x%X (%d)\r\n", ctrl, val, val);
         }
-        SERIAL_PORT.println(errorOutputBuffer);
+        Serial.println(errorOutputBuffer);
     }
 
     return SCPI_RES_OK;
@@ -75,7 +78,7 @@ scpi_result_t SCPI_Reset(scpi_t *context) {
     if (serial::g_testResult == TEST_OK) {
         char errorOutputBuffer[256];
         strcpy(errorOutputBuffer, "**Reset\r\n");
-        SERIAL_PORT.println(errorOutputBuffer);
+        Serial.println(errorOutputBuffer);
     }
 
     return reset() ? SCPI_RES_OK : SCPI_RES_ERR;
@@ -118,7 +121,7 @@ UARTClass::UARTModes getConfig() {
 
 void init() {
     if (g_testResult == TEST_OK) {
-        SERIAL_PORT.end();
+        Serial.end();
     }
 
     if (!persist_conf::isSerialEnabled()) {
@@ -126,23 +129,14 @@ void init() {
         return;
     }
 
-    SERIAL_PORT.begin(persist_conf::getBaudFromIndex(persist_conf::getSerialBaudIndex()),
+    Serial.begin(persist_conf::getBaudFromIndex(persist_conf::getSerialBaudIndex()),
                       getConfig());
 
-#if CONF_WAIT_SERIAL && !CONF_SERIAL_USE_NATIVE_USB_PORT
-    while (!SERIAL_PORT)
-        ;
-#endif
-
-    while (SERIAL_PORT.available()) {
-        SERIAL_PORT.read();
-    }
-
 #ifdef EEZ_PLATFORM_SIMULATOR
-    SERIAL_PORT.print("EEZ PSU software simulator ver. ");
-    SERIAL_PORT.println(FIRMWARE);
+    Serial.print("EEZ PSU software simulator ver. ");
+    Serial.println(FIRMWARE);
 #else
-    SERIAL_PORT.println("EEZ PSU serial com ready");
+    Serial.println("EEZ PSU serial com ready");
 #endif
 
     scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer,
@@ -151,30 +145,21 @@ void init() {
     g_testResult = TEST_OK;
 }
 
-void tick(uint32_t tick_usec) {
-    if (g_testResult == TEST_OK) {
-        bool isConnected = (bool)SERIAL_PORT;
-
+void onQueueMessage(uint32_t type, uint32_t param) {
+    if (type == SERIAL_LINE_STATE_CHANGED) {
+        bool isConnected = param ? true : false;
         if (isConnected != g_isConnected) {
             g_isConnected = isConnected;
             if (g_isConnected) {
                 scpi::emptyBuffer(g_scpiContext);
             }
         }
-
-        if (g_isConnected) {
-            size_t n = SERIAL_PORT.available();
-            if (n > 0) {
-                char buffer[CONF_CHUNK_SIZE];
-                if (n > CONF_CHUNK_SIZE) {
-                    n = CONF_CHUNK_SIZE;
-                }
-                for (size_t i = 0; i < n; ++i) {
-                    buffer[i] = (char)SERIAL_PORT.read();
-                }
-                input(g_scpiContext, buffer, n);
-            }
-        }
+    } else if (type == SERIAL_INPUT_AVAILABLE) {
+        uint8_t *buffer;
+        uint32_t length;
+        Serial.getInputBuffer(param, &buffer, &length);
+        input(g_scpiContext, (const char *)buffer, length);
+        Serial.releaseInputBuffer();
     }
 }
 

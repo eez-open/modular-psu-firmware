@@ -16,20 +16,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/apps/psu/psu.h>
-
 #include <stdio.h>
 #include <string.h>
 
+#include <eez/apps/psu/psu.h>
+#include <eez/apps/psu/serial_psu.h>
 #include <eez/apps/psu/simulator/serial.h>
 
+#include <eez/scpi/scpi.h>
+using namespace eez::scpi;
+
 UARTClass Serial;
-UARTClass SerialUSB;
+
+uint8_t g_serialInputChars[SCPI_QUEUE_SIZE + 1];
+int g_serialInputCharPosition = 0;
 
 void UARTClass::begin(unsigned long baud, UARTModes config) {
 }
 
 void UARTClass::end() {
+}
+
+void UARTClass::put(int ch) {
+    g_serialInputChars[g_serialInputCharPosition] = ch;
+    
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_SERIAL_MESSAGE(SERIAL_INPUT_AVAILABLE, g_serialInputCharPosition), osWaitForever);
+    
+    g_serialInputCharPosition = (g_serialInputCharPosition + 1) % (SCPI_QUEUE_SIZE + 1);
+}
+
+void UARTClass::getInputBuffer(int bufferPosition, uint8_t **buffer, uint32_t *length) {
+    *buffer = &g_serialInputChars[bufferPosition];
+    *length = 1;
+}
+
+void UARTClass::releaseInputBuffer() {
 }
 
 int UARTClass::write(const char *buffer, int size) {
@@ -60,21 +81,4 @@ int UARTClass::print(float value, int numDigits) {
 int UARTClass::println(float value, int numDigits) {
     // TODO numDigits
     return printf("%f\n", value);
-}
-
-int UARTClass::available(void) {
-    return input.size();
-}
-
-int UARTClass::read(void) {
-    int ch = input.front();
-    input.pop();
-    return ch;
-}
-
-void UARTClass::put(int ch) {
-    input.push(ch);
-}
-
-void UARTClass::flush() {
 }

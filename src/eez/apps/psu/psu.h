@@ -26,16 +26,16 @@
 
 #include <eez/apps/psu/ontime.h>
 
-#if CONF_SERIAL_USE_NATIVE_USB_PORT
-#define SERIAL_PORT SerialUSB
-#else
-#define SERIAL_PORT Serial
-#endif
-
 /// Namespace for the everything from the EEZ.
 namespace eez {
 
-enum TestResult { TEST_FAILED = 0, TEST_OK = 1, TEST_SKIPPED = 2, TEST_WARNING = 3 };
+enum TestResult { 
+    TEST_FAILED, 
+    TEST_OK, 
+    TEST_CONNECTING, 
+    TEST_SKIPPED, 
+    TEST_WARNING 
+};
 
 /// PSU firmware.
 namespace psu {
@@ -59,7 +59,6 @@ void onProtectionTripped();
 
 void tick();
 
-void setEsrBits(int bit_mask);
 void setQuesBits(int bit_mask, bool on);
 void setOperBits(int bit_mask, bool on);
 

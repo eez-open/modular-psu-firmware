@@ -19,17 +19,48 @@
 #include "usbd_cdc_if.h"
 
 #include <eez/apps/psu/psu.h>
-
+#include <eez/apps/psu/serial_psu.h>
 #include <eez/apps/psu/stm32/serial.h>
 #include <eez/system.h>
 
+#include <eez/scpi/scpi.h>
+using namespace eez::scpi;
+
 UARTClass Serial;
-UARTClass SerialUSB;
+
+uint8_t *g_buffer;
+uint32_t g_length;
+
+////////////////////////////////////////////////////////////////////////////////
+
+extern "C" void notifySerialLineStateChanged(uint8_t serialLineState) {
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_SERIAL_MESSAGE(SERIAL_LINE_STATE_CHANGED, serialLineState), osWaitForever);
+}
+
+extern "C" void notifySerialInput(uint8_t *buffer, uint32_t length) {
+	g_buffer = buffer;
+	g_length = length;
+	osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_SERIAL_MESSAGE(SERIAL_INPUT_AVAILABLE, 0), osWaitForever);
+	return;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 void UARTClass::begin(unsigned long baud, UARTModes config) {
 }
 
 void UARTClass::end() {
+}
+
+extern USBD_HandleTypeDef hUsbDeviceFS;
+
+void UARTClass::getInputBuffer(int bufferPosition, uint8_t **buffer, uint32_t *length) {
+    *buffer = g_buffer;
+    *length = g_length;
+}
+
+void UARTClass::releaseInputBuffer() {
+	USBD_CDC_ReceivePacket(&hUsbDeviceFS);
 }
 
 int UARTClass::write(const char *buffer, int size) {
@@ -79,23 +110,4 @@ int UARTClass::println(IPAddress ipAddress) {
         sprintf(buffer, "%d.%d.%d.%d\n", ipAddress._address.bytes[0], ipAddress._address.bytes[1],
                 ipAddress._address.bytes[2], ipAddress._address.bytes[3]);
     return write(buffer, size);
-}
-
-UARTClass::operator bool() {
-    return g_serialLineState ? true : false;
-}
-
-int UARTClass::available(void) {
-    return queue_available(&g_serialQueue);
-}
-
-int UARTClass::read(void) {
-    uint8_t data;
-    if (queue_pop(&g_serialQueue, &data)) {
-        return (int)data;
-    }
-    return -1;
-}
-
-void UARTClass::flush() {
 }

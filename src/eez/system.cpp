@@ -16,9 +16,16 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <eez/system.h>
+#include <stdio.h>
 
+#include <eez/system.h>
 #include <eez/index.h>
+
+#include <eez/apps/psu/psu.h>
+#include <eez/apps/psu/serial_psu.h>
+#include <eez/scpi/scpi.h>
+using namespace eez::psu::serial;
+using namespace eez::scpi;
 
 namespace eez {
 
@@ -42,6 +49,12 @@ osThreadDef(g_mainTask, mainTask, osPriorityNormal, 0, 1024);
 
 osThreadId g_mainTaskHandle;
 
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
+void consoleInputTask(const void *);
+osThreadDef(g_consoleInputTask, consoleInputTask, osPriorityNormal, 0, 1024);
+osThreadId g_consoleInputTaskHandle;
+#endif
+
 void setSystemState(SystemState systemState) {
     g_systemState = systemState;
 
@@ -62,6 +75,10 @@ void setSystemState(SystemState systemState) {
 
         g_systemStatePhase++;
     }
+
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
+    g_consoleInputTaskHandle = osThreadCreate(osThread(g_consoleInputTask), nullptr);
+#endif
 }
 
 void mainTask(const void *) {
@@ -77,16 +94,30 @@ void mainTask(const void *) {
 #endif
 }
 
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
+void consoleInputTask(const void *) {
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_SERIAL_MESSAGE(SERIAL_LINE_STATE_CHANGED, 1), osWaitForever);
+
+    while (1) {
+        int ch = getchar();
+        if (ch == EOF) {
+            break;
+        }
+        Serial.put(ch);
+    }
+}
+#endif
+
 void boot() {
     g_mainTaskHandle = osThreadCreate(osThread(g_mainTask), nullptr);
+
     // mainTask(nullptr);
     osKernelStart();
 
-#if !defined(__EMSCRIPTEN__)
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
     while (!g_shutdown) {
-        osDelay(0);
+        osDelay(100);
     }
-
     setSystemState(SHUTING_DOWN);
 #endif
 }

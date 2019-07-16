@@ -4,6 +4,7 @@
 
 typedef enum {
     osOK = 0,
+    osEventMessage = 0x10
 } osStatus;
 
 typedef enum {
@@ -69,3 +70,38 @@ osStatus osDelay(uint32_t millisec);
 uint32_t osKernelSysTick(void);
 
 extern uint32_t osKernelSysTickFrequency;
+
+//
+
+#define osWaitForever     0xFFFFFFFF
+
+struct osEvent {
+    osStatus status;
+    union  {
+        uint32_t v;
+    } value;
+};
+
+// Message Queue
+
+struct MessageQueue {
+    void *data;
+    uint8_t numElements;
+    volatile uint16_t tail;
+    volatile uint16_t head;
+    volatile uint8_t overflow;
+};
+
+typedef MessageQueue *osMessageQId;
+
+#define osMessageQDef(name, numElements, ElementType) \
+    static ElementType name##Data[numElements];       \
+    static MessageQueue name = {                      \
+        (void *)&name##Data[0],                       \
+        numElements                                   \
+    }
+#define osMessageQ(name) (&name)
+
+osMessageQId osMessageCreate(osMessageQId queue_id, osThreadId thread_id);
+osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec);
+osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec);

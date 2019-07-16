@@ -28,7 +28,11 @@ extern TestResult g_testResult;
 extern scpi_t g_scpiContext;
 
 void init();
-void tick(uint32_t tick_usec);
+
+#define SERIAL_INPUT_AVAILABLE 1
+#define SERIAL_LINE_STATE_CHANGED 2
+
+void onQueueMessage(uint32_t type, uint32_t param);
 
 bool isConnected();
 
@@ -44,7 +48,6 @@ enum Parity {
     PARITY_MARK,
     PARITY_SPACE
 };
-
 
 }
 }

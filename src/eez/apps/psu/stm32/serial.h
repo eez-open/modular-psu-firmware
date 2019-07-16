@@ -41,6 +41,10 @@ public:
 
     void begin(unsigned long baud, UARTModes config = Mode_8N1);
     void end();
+
+    void getInputBuffer(int bufferPosition, uint8_t **buffer, uint32_t *length);
+    void releaseInputBuffer();
+
     int write(const char *buffer, int size);
     int print(const char *data);
     int println(const char *data);
@@ -49,11 +53,6 @@ public:
     int print(float value, int numDigits);
     int println(float value, int numDigits);
     int println(IPAddress ipAddress);
-    operator bool();
-    int available(void);
-    int read(void);
-    void flush(void);
 };
 
 extern UARTClass Serial;
-extern UARTClass SerialUSB;

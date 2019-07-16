@@ -45,7 +45,7 @@ void Trace(const char *format, ...) {
 
     char buffer[896];
     vsnprintf(buffer, 896, format, args);
-    SERIAL_PORT.write(buffer, strlen(buffer));
+    Serial.write(buffer, strlen(buffer));
 
     va_end(args);
 }

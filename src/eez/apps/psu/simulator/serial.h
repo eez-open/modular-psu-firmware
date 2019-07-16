@@ -41,6 +41,12 @@ public:
 
     void begin(unsigned long baud, UARTModes config = Mode_8N1);
     void end();
+
+    void put(int ch);
+
+    void getInputBuffer(int bufferPosition, uint8_t **buffer, uint32_t *length);
+    void releaseInputBuffer();
+
     int write(const char *buffer, int size);
     int print(const char *data);
     int println(const char *data);
@@ -48,16 +54,6 @@ public:
     int println(int value);
     int print(float value, int numDigits);
     int println(float value, int numDigits);
-    operator bool() { return true; }
-    int available(void);
-    int read(void);
-    void flush(void);
-
-    void put(int ch);
-
-private:
-    std::queue<int> input;
 };
 
 extern UARTClass Serial;
-extern UARTClass SerialUSB;

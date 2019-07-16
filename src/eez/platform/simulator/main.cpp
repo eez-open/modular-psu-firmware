@@ -7,7 +7,7 @@
 #include <eez/apps/psu/serial_psu.h>
 
 void eez_serial_put(int ch) {
-    SERIAL_PORT.put(ch);
+    Serial.put(ch);
 }
 
 extern void eez_system_tick();

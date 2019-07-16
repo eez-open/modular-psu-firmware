@@ -209,10 +209,10 @@ scpi_result_t scpi_cmd_debugMeasureVoltage(scpi_t *context) {
         int16_t adc_data = channel->adc.read();
         channel->eventAdcData(adc_data, false);
 
-        SERIAL_PORT.print((int)debug::g_uMon[channel->index - 1].get());
-        SERIAL_PORT.print(" ");
-        SERIAL_PORT.print(channel->u.mon_last, 5);
-        SERIAL_PORT.println("V");
+        Serial.print((int)debug::g_uMon[channel->index - 1].get());
+        Serial.print(" ");
+        Serial.print(channel->u.mon_last, 5);
+        Serial.println("V");
 
         int32_t diff = micros() - tickCount;
         if (diff < 48000L) {
@@ -254,10 +254,10 @@ scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
         int16_t adc_data = channel->adc.read();
         channel->eventAdcData(adc_data, false);
 
-        SERIAL_PORT.print((int)debug::g_iMon[channel->index - 1].get());
-        SERIAL_PORT.print(" ");
-        SERIAL_PORT.print(channel->i.mon_last, 5);
-        SERIAL_PORT.println("A");
+        Serial.print((int)debug::g_iMon[channel->index - 1].get());
+        Serial.print(" ");
+        Serial.print(channel->i.mon_last, 5);
+        Serial.println("A");
 
         int32_t diff = micros() - tickCount;
         if (diff < 48000L) {
