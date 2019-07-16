@@ -22,6 +22,8 @@
 
 #include <scpi/scpi.h>
 
+#include <eez/scpi/scpi.h>
+
 #include <eez/apps/psu/channel_dispatcher.h>
 #include <eez/apps/psu/list_program.h>
 #include <eez/apps/psu/trigger.h>
@@ -34,6 +36,9 @@
 #define CONF_COUNTER_THRESHOLD_IN_SECONDS 5
 
 namespace eez {
+
+using namespace scpi;
+
 namespace psu {
 namespace list {
 
@@ -203,8 +208,16 @@ int checkLimits(int iChannel) {
     return 0;
 }
 
-bool loadList(Channel &channel, const char *filePath, int *err) {
+bool loadList(int iChannel, const char *filePath, int *err) {
 #if OPTION_SD_CARD
+    if (osThreadGetId() != g_scpiTaskHandle) {
+        strcpy(&g_listFilePath[iChannel][0], filePath);
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LOAD_LIST, iChannel), osWaitForever);
+        return true;
+    }
+
+    Channel &channel = Channel::get(iChannel);
+
     if (sd_card::g_testResult != TEST_OK) {
         *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
@@ -325,8 +338,16 @@ bool loadList(Channel &channel, const char *filePath, int *err) {
 #endif
 }
 
-bool saveList(Channel &channel, const char *filePath, int *err) {
+bool saveList(int iChannel, const char *filePath, int *err) {
 #if OPTION_SD_CARD
+    if (osThreadGetId() != g_scpiTaskHandle) {
+        strcpy(&g_listFilePath[iChannel][0], filePath);
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST, iChannel), osWaitForever);
+        return true;
+    }
+
+    Channel &channel = Channel::get(iChannel);
+
     if (sd_card::g_testResult != TEST_OK) {
         *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;

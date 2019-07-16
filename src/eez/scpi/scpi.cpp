@@ -21,6 +21,7 @@
 #include <eez/system.h>
 
 #include <eez/apps/psu/psu.h>
+#include <eez/apps/psu/list_program.h>
 #include <eez/apps/psu/serial_psu.h>
 #if OPTION_ETHERNET
 #include <eez/apps/psu/ethernet.h>
@@ -43,7 +44,7 @@ osThreadId g_scpiTaskHandle;
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #endif
 
-osThreadDef(g_scpiTask, mainLoop, osPriorityNormal, 0, 1024);
+osThreadDef(g_scpiTask, mainLoop, osPriorityNormal, 0, 4096);
 
 #if defined(EEZ_PLATFORM_STM32)
 #pragma GCC diagnostic pop
@@ -51,6 +52,8 @@ osThreadDef(g_scpiTask, mainLoop, osPriorityNormal, 0, 1024);
 
 osMessageQDef(g_scpiMessageQueue, SCPI_QUEUE_SIZE, uint32_t);
 osMessageQId g_scpiMessageQueueId;
+
+char g_listFilePath[CH_MAX][MAX_PATH_LENGTH];
 
 bool onSystemStateChanged() {
     if (eez::g_systemState == eez::SystemState::BOOTING) {
@@ -86,10 +89,17 @@ void oneIter() {
             serial::onQueueMessage(type, param);
         }
 #if OPTION_ETHERNET
-        else {
+        else if (target == SCPI_QUEUE_MESSAGE_TARGET_ETHERNET) {
             ethernet::onQueueMessage(type, param);
         }
-#endif        
+#endif  
+        else if (target == SCPI_QUEUE_MESSAGE_TARGET_NONE) {
+            if (type == SCPI_QUEUE_MESSAGE_TYPE_LOAD_LIST) {
+                eez::psu::list::loadList(param, &g_listFilePath[param][0], nullptr);
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST) {
+                eez::psu::list::saveList(param, &g_listFilePath[param][0], nullptr);
+            }
+        }      
     }
 }
 

@@ -667,7 +667,7 @@ scpi_result_t scpi_cmd_mmemoryLoadList(scpi_t *context) {
     }
 
     int err;
-    if (!list::loadList(*channel, filePath, &err)) {
+    if (!list::loadList(channel->index - 1, filePath, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -705,7 +705,7 @@ scpi_result_t scpi_cmd_mmemoryStoreList(scpi_t *context) {
     addExtension(filePath, LIST_EXT);
 
     int err;
-    if (!list::saveList(*channel, filePath, &err)) {
+    if (!list::saveList(channel->index - 1, filePath, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }

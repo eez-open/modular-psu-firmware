@@ -12,18 +12,21 @@
 
 #ifdef __EMSCRIPTEN__
 #define MAX_THREADS 100
-
-static struct {
+struct Thread {
     const osThreadDef_t *thread_def;
     void *argument;
-} g_threads[MAX_THREADS];
+};
+
+static Thread g_threads[MAX_THREADS];
+Thread *g_currentThread;
 #endif
 
 osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *argument) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
     DWORD threadId;
-    return CreateThread(NULL, thread_def->stacksize, (LPTHREAD_START_ROUTINE)thread_def->pthread,
+    CreateThread(NULL, thread_def->stacksize, (LPTHREAD_START_ROUTINE)thread_def->pthread,
                         argument, 0, &threadId);
+    return threadId;
 #elif defined(__EMSCRIPTEN__)
     for (int i = 0; i < MAX_THREADS; ++i) {
         if (!g_threads[i].thread_def) {
@@ -41,10 +44,21 @@ osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *argument) {
 #endif    
 }
 
+osThreadId osThreadGetId() {
+#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
+    return GetCurrentThreadId();
+#elif defined(__EMSCRIPTEN__)
+    return g_currentThread;
+#else
+    return pthread_self();
+#endif    
+}
+
 #ifdef __EMSCRIPTEN__
 void eez_system_tick() {
     for (int i = 0; i < MAX_THREADS; ++i) {
         if (g_threads[i].thread_def) {
+            g_currentThread = &g_threads[i];
             g_threads[i].thread_def->pthread(g_threads[i].argument);
         }
     }

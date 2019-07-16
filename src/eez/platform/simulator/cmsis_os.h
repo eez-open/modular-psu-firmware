@@ -38,7 +38,7 @@ typedef struct os_thread_def {
     const osThreadDef_t os_thread_def_##name = { #name, (os_thread_func_##name), (priority),       \
                                                  (instances), (stacksz) }
 
-typedef void *osThreadId;
+typedef uint32_t osThreadId;
 #else
 
 #include <pthread.h>
@@ -62,6 +62,8 @@ typedef pthread_t osThreadId;
 #define osThread(name) &os_thread_def_##name
 
 osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *argument);
+
+osThreadId osThreadGetId();
 
 osStatus osKernelStart(void);
 

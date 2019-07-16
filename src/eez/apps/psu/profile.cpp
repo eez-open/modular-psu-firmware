@@ -145,7 +145,7 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
                 char filePath[MAX_PATH_LENGTH];
                 getChannelProfileListFilePath(channel, location, filePath);
                 int err;
-                if (list::loadList(channel, filePath, &err)) {
+                if (list::loadList(channel.index - 1, filePath, &err)) {
                     if (location == 0) {
                         list::setListsChanged(channel, false);
                     }
@@ -384,7 +384,7 @@ void fillProfile(Parameters *pProfile, int location, const char *name,
                 char filePath[MAX_PATH_LENGTH];
                 getChannelProfileListFilePath(channel, location, filePath);
                 if (list::areListLengthsEquivalent(channel)) {
-                    list::saveList(channel, filePath, NULL);
+                    list::saveList(channel.index - 1, filePath, NULL);
                     profile.channels[i].flags.listSaved = 1;
                 } else {
                     sd_card::deleteFile(filePath, NULL);

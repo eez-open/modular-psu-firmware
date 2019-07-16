@@ -40,6 +40,11 @@ osThreadDef(g_psuTask, mainLoop, osPriorityNormal, 0, 1024);
 
 osThreadId g_psuTaskHandle;
 
+#define PSU_QUEUE_SIZE 10
+
+osMessageQDef(g_psuMessageQueue, PSU_QUEUE_SIZE, uint32_t);
+osMessageQId g_psuMessageQueueId;
+
 bool onSystemStateChanged() {
     if (g_systemState == eez::SystemState::BOOTING) {
         if (g_systemStatePhase == 0) {
@@ -48,6 +53,7 @@ bool onSystemStateChanged() {
 #endif
             boot();
 
+            g_psuMessageQueueId = osMessageCreate(osMessageQ(g_psuMessageQueue), NULL);
             g_psuTaskHandle = osThreadCreate(osThread(g_psuTask), nullptr);
         }
     }
@@ -69,7 +75,19 @@ void mainLoop(const void *) {
 }
 
 void oneIter() {
-    tick();
+    osEvent event = osMessageGet(g_psuMessageQueueId, 0);
+    if (event.status == osEventMessage) {
+    	uint32_t message = event.value.v;
+    	uint32_t type = PSU_QUEUE_MESSAGE_TYPE(message);
+    	uint32_t param = PSU_QUEUE_MESSAGE_PARAM(message);
+        if (type == PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE) {
+            changePowerState(param ? true : false);
+        } else if (type == PSU_QUEUE_MESSAGE_TYPE_RESET) {
+            reset();
+        }
+    } else {
+        tick();
+    }
 }
 
 } // namespace psu

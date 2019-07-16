@@ -55,8 +55,8 @@ bool areVoltageAndCurrentListLengthsEquivalent(Channel &channel);
 
 int checkLimits(int iChannel);
 
-bool loadList(Channel &channel, const char *filePath, int *err);
-bool saveList(Channel &channel, const char *filePath, int *err);
+bool loadList(int iChannel, const char *filePath, int *err);
+bool saveList(int iChannel, const char *filePath, int *err);
 
 void executionStart(Channel &channel);
 

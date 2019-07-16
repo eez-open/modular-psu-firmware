@@ -316,8 +316,6 @@ bool upload(const char *filePath, void *param,
     return result;
 }
 
-static File file;
-
 bool download(const char *filePath, bool truncate, const void *buffer, size_t size, int *err) {
     if (sd_card::g_testResult != TEST_OK) {
         if (err)
@@ -325,24 +323,24 @@ bool download(const char *filePath, bool truncate, const void *buffer, size_t si
         return false;
     }
 
-    if (truncate) {
-    	if (!file.open(filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-    		if (err)
-    			*err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
-    		return false;
-    	}
+    File file;
 
-    	if (truncate && !file.truncate(0)) {
-    		if (err)
-    			*err = SCPI_ERROR_MASS_STORAGE_ERROR;
-    		return false;
-    	}
-    }
+    if (!file.open(filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+		if (err)
+			*err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
+		return false;
+	}
+
+	if (truncate && !file.truncate(0)) {
+		file.close();
+		if (err)
+			*err = SCPI_ERROR_MASS_STORAGE_ERROR;
+		return false;
+	}
 
     size_t written = file.write((const uint8_t *)buffer, size);
 
-
-    //file.close();
+    file.close();
 
     if (written != size) {
         if (err)

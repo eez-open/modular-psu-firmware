@@ -214,7 +214,7 @@ void onTriggerFinished(Channel &channel) {
             channel_dispatcher::setVoltage(channel, 0);
             channel_dispatcher::setCurrent(channel, 0);
             channel_dispatcher::outputEnable(channel, false);
-            scheduleChangePowerState(false);
+            changePowerState(false);
             break;
         }
     }

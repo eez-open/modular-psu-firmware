@@ -20,6 +20,9 @@
 
 #include <cmsis_os.h>
 
+#include <eez/apps/psu/conf.h>
+#include <eez/apps/psu/conf_advanced.h>
+
 namespace eez {
 namespace scpi {
 
@@ -28,20 +31,27 @@ bool onSystemStateChanged();
 void resetContext();
 void generateError(int error);
 
+extern osThreadId g_scpiTaskHandle;
 extern osMessageQId g_scpiMessageQueueId;
 
 #define SCPI_QUEUE_SIZE 10
 
-#define SCPI_QUEUE_MESSAGE_TARGET_SERIAL 0
-#define SCPI_QUEUE_MESSAGE_TARGET_ETHERNET 1
+#define SCPI_QUEUE_MESSAGE_TARGET_NONE 0
+#define SCPI_QUEUE_MESSAGE_TARGET_SERIAL 1
+#define SCPI_QUEUE_MESSAGE_TARGET_ETHERNET 2
 
-#define SCPI_QUEUE_MESSAGE(target, type, param) (((target) << 31) | ((param) << 4) | (type))
-#define SCPI_QUEUE_MESSAGE_TARGET(message) ((message) & 0x80000000L ? 1 : 0)
+#define SCPI_QUEUE_MESSAGE(target, type, param) (((target) << 30) | ((param) << 4) | (type))
+#define SCPI_QUEUE_MESSAGE_TARGET(message) ((message) >> 30)
 #define SCPI_QUEUE_MESSAGE_TYPE(message) ((message) & 0xF)
-#define SCPI_QUEUE_MESSAGE_PARAM(param) (((message) & 0x7FFFFFFF) >> 4)
+#define SCPI_QUEUE_MESSAGE_PARAM(param) (((message) & 0x3FFFFFFF) >> 4)
 
 #define SCPI_QUEUE_SERIAL_MESSAGE(type, param) SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_SERIAL, type, param)
 #define SCPI_QUEUE_ETHERNET_MESSAGE(type, param) SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_ETHERNET, type, param)
+
+#define SCPI_QUEUE_MESSAGE_TYPE_LOAD_LIST 1
+#define SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST 2
+
+extern char g_listFilePath[CH_MAX][MAX_PATH_LENGTH];
 
 }
 }

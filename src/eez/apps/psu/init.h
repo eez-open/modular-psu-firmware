@@ -18,9 +18,22 @@
 
 #pragma once
 
+#include <cmsis_os.h>
+
 namespace eez {
 namespace psu {
 
 bool onSystemStateChanged();
+
+extern osThreadId g_psuTaskHandle;
+extern osMessageQId g_psuMessageQueueId;
+
+#define PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE 1
+#define PSU_QUEUE_MESSAGE_TYPE_RESET 2
+
+#define PSU_QUEUE_MESSAGE(type, param) (((param) << 4) | (type))
+#define PSU_QUEUE_MESSAGE_TYPE(message) ((message) & 0xF)
+#define PSU_QUEUE_MESSAGE_PARAM(param) ((message) >> 4)
+
 }
 } // namespace eez

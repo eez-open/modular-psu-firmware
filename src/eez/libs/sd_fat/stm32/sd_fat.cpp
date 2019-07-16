@@ -184,7 +184,6 @@ void File::sync() {
 }
 
 void File::print(float value, int numDecimalDigits) {
-    // TODO: test this
     char buffer[32];
     sprintf(buffer, "%.*f", numDecimalDigits, value);
     write((uint8_t *)buffer, strlen(buffer));

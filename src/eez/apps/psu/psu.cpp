@@ -20,6 +20,7 @@
 
 #include <eez/system.h>
 
+#include <eez/apps/psu/init.h>
 #include <eez/apps/psu/serial_psu.h>
 
 #if OPTION_ETHERNET
@@ -91,8 +92,6 @@ static bool g_testPowerUpDelay = false;
 static uint32_t g_powerDownTime;
 
 static MaxCurrentLimitCause g_maxCurrentLimitCause;
-
-static int g_changePowerStateOnNextTick; // -1: do not change, 0: change to power down, 1: change to power up
 
 RLState g_rlState = RL_STATE_LOCAL;
 
@@ -602,6 +601,11 @@ bool isPowerUp() {
 }
 
 bool changePowerState(bool up) {
+    if (osThreadGetId() != g_psuTaskHandle) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE, up ? 1 : 0), osWaitForever);
+        return true;
+    }
+
     if (up == g_powerIsUp)
         return true;
 
@@ -618,14 +622,14 @@ bool changePowerState(bool up) {
         // auto recall channels parameters from profile
         profile::Parameters profile;
         int location;
-        auto x = loadAutoRecallProfile(&profile, &location);
+        auto recall = loadAutoRecallProfile(&profile, &location);
 
         if (!powerUp()) {
             return false;
         }
 
         // auto recall channels parameters from profile
-        if (x) {
+        if (recall) {
             for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
                 memcpy(&temperature::sensors[i].prot_conf, profile.temp_prot + i,
                        sizeof(temperature::ProtectionConfiguration));
@@ -653,10 +657,6 @@ bool changePowerState(bool up) {
     return true;
 }
 
-void scheduleChangePowerState(bool up) {
-    g_changePowerStateOnNextTick = up ? 1 : 0;
-}
-
 void powerDownBySensor() {
     if (g_powerIsUp) {
 #if OPTION_DISPLAY
@@ -680,6 +680,11 @@ void powerDownBySensor() {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool reset() {
+    if (osThreadGetId() != g_psuTaskHandle) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_RESET, 0), osWaitForever);
+        return true;
+    }
+
     if (psuReset()) {
         profile::save();
         return true;
@@ -713,11 +718,6 @@ void onProtectionTripped() {
 
 void tick() {
     ++g_mainLoopCounter;
-
-    if (g_changePowerStateOnNextTick != -1) {
-        changePowerState(g_changePowerStateOnNextTick ? true : false);
-        g_changePowerStateOnNextTick = -1;
-    }
 
     uint32_t tick_usec = micros();
 
