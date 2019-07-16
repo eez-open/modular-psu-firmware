@@ -66,7 +66,7 @@ void AnalogDigitalConverter::init() {
     data[0] = ADC_RESET;
     spi::transfer(channel.slotIndex, data, result, 1);
 
-    delayMicroseconds(100);
+    delay(1);
 
     data[0] = ADC_WR3S1;
     data[1] = getReg1Val();
