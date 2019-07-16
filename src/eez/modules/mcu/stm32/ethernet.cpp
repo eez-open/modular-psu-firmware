@@ -251,7 +251,7 @@ void releaseInputBuffer() {
 }
 
 int writeBuffer(const char *buffer, uint32_t length) {
-	netconn_write(g_tcpClientConnection, (void *)buffer, (uint16_t)length, NETCONN_NOCOPY);
+	netconn_write(g_tcpClientConnection, (void *)buffer, (uint16_t)length, NETCONN_COPY);
     return length;
 }
 

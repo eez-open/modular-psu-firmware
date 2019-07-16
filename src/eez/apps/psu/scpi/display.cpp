@@ -173,8 +173,6 @@ scpi_result_t scpi_cmd_displayWindowTextClear(scpi_t *context) {
 #endif
 }
 
-uint8_t g_line[10][480 * 3];
-
 scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_DISPLAY
@@ -223,10 +221,9 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
 
     mcu::display::screanshotBegin();
 
-    int i = 0;
-    while (mcu::display::screanshotGetLine(g_line[i])) {
-        SCPI_ResultArbitraryBlockData(context, g_line[i], sizeof(g_line[i]));
-        i = (i + 1) % 10;
+    uint8_t line[480 * 3];
+    while (mcu::display::screanshotGetLine(line)) {
+        SCPI_ResultArbitraryBlockData(context, line, sizeof(line));
     }
 
     mcu::display::screanshotEnd();
