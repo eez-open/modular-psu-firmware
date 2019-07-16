@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <memory.h>
 
 #include <lwip.h>
 #include <api.h>
@@ -32,6 +33,13 @@
 
 #include <eez/modules/mcu/ethernet.h>
 
+#include <eez/apps/psu/psu.h>
+#include <eez/apps/psu/ethernet.h>
+using namespace eez::psu::ethernet;
+
+#include <eez/scpi/scpi.h>
+using namespace eez::scpi;
+
 extern struct netif gnetif;
 
 namespace eez {
@@ -40,171 +48,211 @@ namespace ethernet {
 
 static void mainLoop(const void *);
 
-#if defined(EEZ_PLATFORM_STM32)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wwrite-strings"
-#endif
+
 osThreadDef(g_ethernetTask, mainLoop, osPriorityNormal, 0, 1024);
 
-#if defined(EEZ_PLATFORM_STM32)
 #pragma GCC diagnostic pop
-#endif
+
+osMessageQDef(g_ethernetMessageQueue, 5, uint32_t);
+osMessageQId(g_ethernetMessageQueueId);
 
 static osThreadId g_ethernetTaskHandle;
 
 bool onSystemStateChanged() {
     if (g_systemState == SystemState::BOOTING) {
-        if (g_systemStatePhase == 0) {
+        if (eez::g_systemStatePhase == 0) {
+        	g_ethernetMessageQueueId = osMessageCreate(osMessageQ(g_ethernetMessageQueue), NULL);
+            return false;
+        } else if (eez::g_systemStatePhase == 1) {
             g_ethernetTaskHandle = osThreadCreate(osThread(g_ethernetTask), nullptr);
-            assert(g_ethernetTaskHandle != NULL);
         }
     }
 
     return true;
 }
 
-#define MAX_DHCP_TRIES  4
+enum {
+	QUEUE_MESSAGE_CONNECT,
+	QUEUE_MESSAGE_CREATE_TCP_SERVER,
+	QUEUE_MESSAGE_ACCEPT_CLIENT,
+	QUEUE_MESSAGE_CLIENT_MESSAGE
+};
+
+enum ConnectionState {
+    CONNECTION_STATE_INITIALIZED = 0,
+    CONNECTION_STATE_CONNECTED = 1,
+    CONNECTION_STATE_CONNECTING = 2,
+    CONNECTION_STATE_BEGIN_SERVER = 3,
+    CONNECTION_STATE_CLIENT_AVAILABLE = 4,
+    CONNECTION_STATE_DATA_AVAILABLE = 5
+};
+
+static ConnectionState g_connectionState = CONNECTION_STATE_INITIALIZED;
+static uint16_t g_port;
+struct netconn *g_tcpListenConnection;
+struct netconn *g_tcpClientConnection;
+static struct netbuf *g_inbuf;
+
+static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t len) {
+	switch (evt) {
+	case NETCONN_EVT_RCVPLUS:
+		if (conn == g_tcpListenConnection) {
+			osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_ACCEPT_CLIENT, osWaitForever);
+		} else if (conn == g_tcpClientConnection) {
+			osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_INPUT_AVAILABLE, 0), osWaitForever);
+		}
+		break;
+
+	case NETCONN_EVT_RCVMINUS:
+		osDelay(0);
+		break;
+
+	case NETCONN_EVT_SENDPLUS:
+		osDelay(0);
+		break;
+
+	case NETCONN_EVT_SENDMINUS:
+		osDelay(0);
+		break;
+
+	case NETCONN_EVT_ERROR:
+		osDelay(0);
+		break;
+	}
+}
 
 static void mainLoop(const void *) {
-	osDelay(2000);
-    MX_LWIP_Init();
-    netif_set_hostname(&gnetif, "EEZ-DIB");
+	while (1) {
+		osEvent event = osMessageGet(g_ethernetMessageQueueId, osWaitForever);
+		if (event.status == osEventMessage) {
+			switch (event.value.v) {
+			case QUEUE_MESSAGE_CONNECT:
+				{
+					MX_LWIP_Init();
+					netif_set_hostname(&gnetif, "EEZ-DIB");
+					while(!dhcp_supplied_address(&gnetif)) {
+						osDelay(10);
+					}
+					g_connectionState = CONNECTION_STATE_CONNECTED;
+					osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 1), osWaitForever);
+				}
+			    break;
 
-    while(1) {
-        if (dhcp_supplied_address(&gnetif)) {
-            break;
-        } else {
-        	struct dhcp *dhcp;
-        	dhcp = (struct dhcp *)netif_get_client_data(&gnetif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
-        	if (dhcp->tries > MAX_DHCP_TRIES){
-        		osDelay(250);
-		    }
-        }
-        osDelay(250);
-    }
+			case QUEUE_MESSAGE_CREATE_TCP_SERVER:
+				g_tcpListenConnection = netconn_new_with_callback(NETCONN_TCP, netconnCallback);
+				if (g_tcpListenConnection == nullptr) {
+					break;
+				}
 
-    struct netconn *conn, *newconn;
-    err_t err, accept_err;
-    struct netbuf *buf;
-    void *data;
-    u16_t len;
-    err_t recv_err;
+				// Is this required?
+				// netconn_set_nonblocking(conn, 1);
 
-    /* Create a new connection identifier. */
-    conn = netconn_new(NETCONN_TCP);
+				if (netconn_bind(g_tcpListenConnection, nullptr, g_port) != ERR_OK) {
+					netconn_delete(g_tcpListenConnection);
+					break;
+				}
 
-    if (conn != NULL) {
-        /* Bind connection to well known port number 7. */
-        err = netconn_bind(conn, NULL, 7);
+				netconn_listen(g_tcpListenConnection);
+				break;
 
-        if (err == ERR_OK) {
-            /* Tell connection to go into listening mode. */
-            netconn_listen(conn);
+			case QUEUE_MESSAGE_ACCEPT_CLIENT:
+				{
+					struct netconn *newConnection;
+					if (netconn_accept(g_tcpListenConnection, &newConnection) == ERR_OK) {
+						if (g_tcpClientConnection) {
+							// there is a client already connected, close this connection
+							netconn_close(newConnection);
+							netconn_delete(newConnection);
+						} else {
+							// connection with the client established
+							g_tcpClientConnection = newConnection;
+							osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_CONNECTED, 0), osWaitForever);
+						}
+					}
+				}
+				break;
+			}
+		}
+	}
+}
 
-            while (1) {
-                /* Grab new connection. */
-                accept_err = netconn_accept(conn, &newconn);
+////////////////////////////////////////////////////////////////////////////////
 
-                /* Process the new connection. */
-                if (accept_err == ERR_OK) {
-                    while (( recv_err = netconn_recv(newconn, &buf)) == ERR_OK) {
-                        do {
-                        netbuf_data(buf, &data, &len);
-                        netconn_write(newconn, data, len, NETCONN_COPY);
+void begin(uint8_t *mac, uint8_t *, uint8_t *, uint8_t *, uint8_t *) {
+	g_connectionState = CONNECTION_STATE_CONNECTING;
+	osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_CONNECT, osWaitForever);
+}
 
-                        } while (netbuf_next(buf) >= 0);
+IPAddress localIP() {
+    return IPAddress(gnetif.ip_addr.addr);
+}
 
-                        netbuf_delete(buf);
-                    }
+IPAddress subnetMask() {
+    return IPAddress(gnetif.netmask.addr);
+}
 
-                    /* Close connection and discard connection identifier. */
-                    netconn_close(newconn);
-                    netconn_delete(newconn);
-                }
-            }
-        } else {
-            netconn_delete(newconn);
-            printf(" can not bind TCP netconn");
-        }
+IPAddress gatewayIP() {
+    return IPAddress(gnetif.gw.addr);
+}
+
+IPAddress dnsServerIP() {
+    return IPAddress();
+}
+
+void beginServer(uint16_t port) {
+    g_port = port;
+    osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_CREATE_TCP_SERVER, osWaitForever);
+}
+
+void getInputBuffer(int bufferPosition, char **buffer, uint32_t *length) {
+	if (netconn_recv(g_tcpClientConnection, &g_inbuf) != ERR_OK) {
+		goto fail1;
+	}
+
+	if (netconn_err(g_tcpClientConnection) != ERR_OK) {
+		goto fail2;
+	}
+
+	uint8_t* data;
+	u16_t dataLength;
+	netbuf_data(g_inbuf, (void**)&data, &dataLength);
+
+    if (dataLength > 0) {
+    	*buffer = (char *)data;
+    	*length = dataLength;
     } else {
-        printf("can not create TCP netconn");
+        netbuf_delete(g_inbuf);
+        g_inbuf = nullptr;
+    	*buffer = nullptr;
+    	*length = 0;
     }
+
+    return;
+
+fail2:
+	netbuf_delete(g_inbuf);
+	g_inbuf = nullptr;
+
+fail1:
+	netconn_close(g_tcpClientConnection);
+	netconn_delete(g_tcpClientConnection);
+	g_tcpClientConnection = nullptr;
+	osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_DISCONNECTED, 0), osWaitForever);
+
+	*buffer = nullptr;
+	length = 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-EthernetModule Ethernet;
-
-bool EthernetModule::begin(uint8_t *mac, uint8_t *, uint8_t *, uint8_t *, uint8_t *) {
-    return true;
+void releaseInputBuffer() {
+	netbuf_delete(g_inbuf);
+	g_inbuf = nullptr;
 }
 
-uint8_t EthernetModule::maintain() {
-    return 0;
-}
-
-IPAddress EthernetModule::localIP() {
-    return IPAddress();
-}
-
-IPAddress EthernetModule::subnetMask() {
-    return IPAddress();
-}
-
-IPAddress EthernetModule::gatewayIP() {
-    return IPAddress();
-}
-
-IPAddress EthernetModule::dnsServerIP() {
-    return IPAddress();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void EthernetServer::init(int port_) {
-    port = port_;
-    client = true;
-}
-
-void EthernetServer::begin() {
-}
-
-EthernetClient EthernetServer::available() {
-    return EthernetClient();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-EthernetClient::EthernetClient() : valid(false) {
-}
-
-EthernetClient::EthernetClient(bool valid_) : valid(valid_) {
-}
-
-bool EthernetClient::connected() {
-    return false;
-}
-
-EthernetClient::operator bool() {
-    return false;
-}
-
-size_t EthernetClient::available() {
-    return 0;
-}
-
-size_t EthernetClient::read(uint8_t *buffer, size_t buffer_size) {
-    return 0;
-}
-
-size_t EthernetClient::write(const char *buffer, size_t buffer_size) {
-    return 0;
-}
-
-void EthernetClient::flush() {
-}
-
-void EthernetClient::stop() {
+int writeBuffer(const char *buffer, uint32_t length) {
+	netconn_write(g_tcpClientConnection, (void *)buffer, (uint16_t)length, NETCONN_NOCOPY);
+    return length;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,6 +269,7 @@ int EthernetUDP::beginPacket(const char *host, uint16_t port) {
 }
 
 size_t EthernetUDP::write(const uint8_t *buffer, size_t size) {
+
     return 0;
 }
 

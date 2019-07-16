@@ -30,7 +30,6 @@
 #include "cmsis_os.h"
 /* Within 'USER CODE' section, code will be kept by default at each generation */
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 
 /* Private define ------------------------------------------------------------*/
@@ -43,6 +42,57 @@
 #define IFNAME1 't'
 
 /* USER CODE BEGIN 1 */
+
+// mvladic: Without this patch it works really slow and unreliable!!!
+// https://community.st.com/s/question/0D50X00009XkYKOSA3/problem-with-slow-response-from-lwip-to-incoming-data-on-stm32f7
+
+/*
+  @Note: The DMARxDscrTab and DMATxDscrTab must be declared in a device non cacheable memory region
+         In this example they are declared in the first 256 Byte of SRAM2 memory, so this
+         memory region is configured by MPU as a device memory.
+
+         In this example the ETH buffers are located in the SRAM2 with MPU configured as normal
+         not cacheable memory.
+
+         Please refer to MPU_Config() in main.c file.
+ */
+#if defined ( __CC_ARM   )
+ETH_DMADescTypeDef  DMARxDscrTab[ETH_RXBUFNB] __attribute__((at(0x2004C000)));/* Ethernet Rx DMA Descriptors */
+
+ETH_DMADescTypeDef  DMATxDscrTab[ETH_TXBUFNB] __attribute__((at(0x2004C080)));/* Ethernet Tx DMA Descriptors */
+
+uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE] __attribute__((at(0x2004C100))); /* Ethernet Receive Buffers */
+
+uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __attribute__((at(0x2004D8D0))); /* Ethernet Transmit Buffers */
+
+#elif defined ( __ICCARM__ ) /*!< IAR Compiler */
+  #pragma data_alignment=4
+
+#pragma location=0x2004C000
+__no_init ETH_DMADescTypeDef  DMARxDscrTab[ETH_RXBUFNB];/* Ethernet Rx DMA Descriptors */
+
+#pragma location=0x2004C080
+__no_init ETH_DMADescTypeDef  DMATxDscrTab[ETH_TXBUFNB];/* Ethernet Tx DMA Descriptors */
+
+#pragma location=0x2004C100
+__no_init uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE]; /* Ethernet Receive Buffers */
+
+#pragma location=0x2004D8D0
+__no_init uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE]; /* Ethernet Transmit Buffers */
+
+#elif defined ( __GNUC__ ) /*!< GNU Compiler */
+
+ETH_DMADescTypeDef  DMARxDscrTab[ETH_RXBUFNB] __attribute__((section(".RxDecripSection")));/* Ethernet Rx DMA Descriptors */
+
+ETH_DMADescTypeDef  DMATxDscrTab[ETH_TXBUFNB] __attribute__((section(".TxDescripSection")));/* Ethernet Tx DMA Descriptors */
+
+uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE] __attribute__((section(".RxarraySection"))); /* Ethernet Receive Buffers */
+
+uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __attribute__((section(".TxarraySection"))); /* Ethernet Transmit Buffers */
+
+#endif
+
+// mvladic: Patch end
 
 /* USER CODE END 1 */
 
@@ -216,7 +266,7 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
 }
 
 /* USER CODE BEGIN 4 */
-
+extern void getMacAddress(uint8_t macAddr[]);
 /* USER CODE END 4 */
 
 /*******************************************************************************
@@ -254,7 +304,7 @@ static void low_level_init(struct netif *netif)
   heth.Init.MediaInterface = ETH_MEDIA_INTERFACE_MII;
 
   /* USER CODE BEGIN MACADDRESS */
-    
+  getMacAddress(MACAddr);
   /* USER CODE END MACADDRESS */
 
   hal_eth_init_status = HAL_ETH_Init(&heth);

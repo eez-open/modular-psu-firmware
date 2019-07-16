@@ -24,6 +24,13 @@
 
 #include <eez/modules/mcu/ethernet.h>
 
+#include <eez/apps/psu/psu.h>
+#include <eez/apps/psu/ethernet.h>
+using namespace eez::psu::ethernet;
+
+#include <eez/scpi/scpi.h>
+using namespace eez::scpi;
+
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
 #undef INPUT
 #undef OUTPUT
@@ -54,9 +61,34 @@ namespace eez {
 namespace mcu {
 namespace ethernet {
 
+#define INPUT_BUFFER_SIZE 1024
+
+static uint16_t g_port;
+static char g_inputBuffer[INPUT_BUFFER_SIZE];
+static uint32_t g_inputBufferLength;
+
+static void mainLoop(const void *);    
+
+osThreadDef(g_ethernetTask, mainLoop, osPriorityNormal, 0, 1024);
+static osThreadId g_ethernetTaskHandle;
+
+osMessageQDef(g_ethernetMessageQueue, 5, uint32_t);
+osMessageQId(g_ethernetMessageQueueId);
+
 bool onSystemStateChanged() {
+    if (eez::g_systemState == eez::SystemState::BOOTING) {
+        if (eez::g_systemStatePhase == 0) {
+        	g_ethernetMessageQueueId = osMessageCreate(osMessageQ(g_ethernetMessageQueue), NULL);
+            return false;
+        } else if (eez::g_systemStatePhase == 1) {
+            g_ethernetTaskHandle = osThreadCreate(osThread(g_ethernetTask), nullptr);
+        }
+    }
+
     return true;
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 bool bind(int port);
 bool client_available();
@@ -266,8 +298,7 @@ int available() {
     if (client_socket == INVALID_SOCKET)
         return 0;
 
-    char buffer[1000];
-    int iResult = ::recv(client_socket, buffer, 1000, MSG_PEEK);
+    int iResult = ::recv(client_socket, g_inputBuffer, INPUT_BUFFER_SIZE, MSG_PEEK);
     if (iResult > 0) {
         return iResult;
     }
@@ -383,83 +414,89 @@ void stop() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-EthernetModule Ethernet;
+enum {
+	QUEUE_MESSAGE_CONNECT,
+	QUEUE_MESSAGE_CREATE_TCP_SERVER,
+	QUEUE_MESSAGE_ACCEPT_CLIENT,
+	QUEUE_MESSAGE_CLIENT_MESSAGE
+};
 
-bool EthernetModule::begin(uint8_t *mac, uint8_t *, uint8_t *, uint8_t *, uint8_t *) {
-    delay(500);
-    return true;
-}
+void mainLoop(const void *) {
+    bool wasConnected = false;
 
-uint8_t EthernetModule::maintain() {
-    return 0;
-}
+	while (1) {
+		osEvent event = osMessageGet(g_ethernetMessageQueueId, 0);
+		if (event.status == osEventMessage) {
+			switch (event.value.v) {
+			case QUEUE_MESSAGE_CONNECT:
+                osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 1), osWaitForever);
+			    break;
 
-IPAddress EthernetModule::localIP() {
-    return IPAddress();
-}
-
-IPAddress EthernetModule::subnetMask() {
-    return IPAddress();
-}
-
-IPAddress EthernetModule::gatewayIP() {
-    return IPAddress();
-}
-
-IPAddress EthernetModule::dnsServerIP() {
-    return IPAddress();
+			case QUEUE_MESSAGE_CREATE_TCP_SERVER:
+                bind(g_port);
+                break;
+            }
+		} else {
+            if (wasConnected) {
+                if (connected()) {
+                    if (!g_inputBufferLength && available()) {
+                        g_inputBufferLength = read(g_inputBuffer, INPUT_BUFFER_SIZE);
+                        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_INPUT_AVAILABLE, 0), osWaitForever);        
+                    }
+                } else {
+                    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_DISCONNECTED, 0), osWaitForever);    
+                    wasConnected = false;
+                }
+            } else {
+                if (client_available()) {
+                    wasConnected = true;
+                    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_CONNECTED, 0), osWaitForever);
+                }
+            }
+        }
+	}    
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void EthernetServer::init(int port_) {
-    port = port_;
-    client = true;
+void begin(uint8_t *mac, uint8_t *, uint8_t *, uint8_t *, uint8_t *) {
+    osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_CONNECT, osWaitForever);
 }
 
-void EthernetServer::begin() {
-    bind_result = mcu::ethernet::bind(port);
+IPAddress localIP() {
+    return IPAddress();
 }
 
-EthernetClient EthernetServer::available() {
-    if (!bind_result)
-        return EthernetClient();
-    return client;
+IPAddress subnetMask() {
+    return IPAddress();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-EthernetClient::EthernetClient() : valid(false) {
+IPAddress gatewayIP() {
+    return IPAddress();
 }
 
-EthernetClient::EthernetClient(bool valid_) : valid(valid_) {
+IPAddress dnsServerIP() {
+    return IPAddress();
 }
 
-bool EthernetClient::connected() {
-    return mcu::ethernet::connected();
+void beginServer(uint16_t port) {
+    g_port = port;
+    osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_CREATE_TCP_SERVER, osWaitForever);
 }
 
-EthernetClient::operator bool() {
-    return valid && mcu::ethernet::client_available();
+void getInputBuffer(int bufferPosition, char **buffer, uint32_t *length) {
+    *buffer = g_inputBuffer;
+    *length = g_inputBufferLength;
 }
 
-size_t EthernetClient::available() {
-    return mcu::ethernet::available();
+void releaseInputBuffer() {
+    g_inputBufferLength = 0;
 }
 
-size_t EthernetClient::read(uint8_t *buffer, size_t buffer_size) {
-    return mcu::ethernet::read((char *)buffer, (int)buffer_size);
-}
-
-size_t EthernetClient::write(const char *buffer, size_t buffer_size) {
-    return mcu::ethernet::write(buffer, (int)buffer_size);
-}
-
-void EthernetClient::flush() {
-}
-
-void EthernetClient::stop() {
-    mcu::ethernet::stop();
+int writeBuffer(const char *buffer, uint32_t length) {
+    int numWritten = write(buffer, length);
+    osDelay(1);
+    return numWritten;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

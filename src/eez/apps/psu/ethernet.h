@@ -30,12 +30,19 @@ extern scpi_t g_scpiContext;
 void init();
 bool test();
 
-void tick(uint32_t tick_usec);
+#define ETHERNET_CONNECTED 1
+#define ETHERNET_CLIENT_CONNECTED 2
+#define ETHERNET_CLIENT_DISCONNECTED 3
+#define ETHERNET_INPUT_AVAILABLE 4
+
+void onQueueMessage(uint32_t type, uint32_t param);
 
 uint32_t getIpAddress();
 
 bool isConnected();
 
+// this function is called when ethernet settings are changed,
+// and it should reconnect to the ethernet with these settings
 void update();
 
 } // namespace ethernet

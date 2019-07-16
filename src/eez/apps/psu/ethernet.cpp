@@ -34,6 +34,9 @@
 #define CONF_CHECK_DHCP_LEASE_SEC 60
 
 namespace eez {
+
+using namespace scpi;
+
 namespace psu {
 
 using namespace scpi;
@@ -42,29 +45,23 @@ namespace ethernet {
 
 TestResult g_testResult = TEST_FAILED;
 
-using namespace eez::mcu::ethernet;
-
-static EthernetServer g_server;
-
 static bool g_isConnected = false;
-static EthernetClient g_activeClient;
-// static uint32_t g_lastCheckDhcpLeaseTime;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-size_t ethernet_client_write(EthernetClient &client, const char *data, size_t len) {
-    size_t size = client.write(data, len);
+size_t ethernet_client_write(const char *data, size_t len) {
+    size_t size = eez::mcu::ethernet::writeBuffer(data, len);
     return size;
 }
 
-size_t ethernet_client_write_str(EthernetClient &client, const char *str) {
-    return ethernet_client_write(client, str, strlen(str));
+size_t ethernet_client_write_str(const char *str) {
+    return ethernet_client_write(str, strlen(str));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
-    return ethernet_client_write(g_activeClient, data, len);
+    return ethernet_client_write(data, len);
 }
 
 scpi_result_t SCPI_Flush(scpi_t *context) {
@@ -76,7 +73,7 @@ int SCPI_Error(scpi_t *context, int_fast16_t err) {
         char errorOutputBuffer[256];
         sprintf(errorOutputBuffer, "**ERROR: %d,\"%s\"\r\n", (int16_t)err,
                 SCPI_ErrorTranslate(err));
-        ethernet_client_write(g_activeClient, errorOutputBuffer, strlen(errorOutputBuffer));
+        ethernet_client_write(errorOutputBuffer, strlen(errorOutputBuffer));
 
         if (err == SCPI_ERROR_INPUT_BUFFER_OVERRUN) {
             scpi::onBufferOverrun(*context);
@@ -94,7 +91,7 @@ scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_
         sprintf(outputBuffer, "**CTRL %02x: 0x%X (%d)\r\n", ctrl, val, val);
     }
 
-    ethernet_client_write(g_activeClient, outputBuffer, strlen(outputBuffer));
+    ethernet_client_write(outputBuffer, strlen(outputBuffer));
 
     return SCPI_RES_OK;
 }
@@ -102,7 +99,7 @@ scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_
 scpi_result_t SCPI_Reset(scpi_t *context) {
     char errorOutputBuffer[256];
     strcpy(errorOutputBuffer, "**Reset\r\n");
-    ethernet_client_write(g_activeClient, errorOutputBuffer, strlen(errorOutputBuffer));
+    ethernet_client_write(errorOutputBuffer, strlen(errorOutputBuffer));
 
     return reset() ? SCPI_RES_OK : SCPI_RES_ERR;
 }
@@ -129,9 +126,8 @@ void init() {
         return;
     }
 
-    bool result;
     if (persist_conf::isEthernetDhcpEnabled()) {
-        result = Ethernet.begin(persist_conf::devConf2.ethernetMacAddress);
+        eez::mcu::ethernet::begin(persist_conf::devConf2.ethernetMacAddress);
     } else {
         uint8_t ipAddress[4];
         ipAddressToArray(persist_conf::devConf2.ethernetIpAddress, ipAddress);
@@ -145,31 +141,10 @@ void init() {
         uint8_t subnetMask[4];
         ipAddressToArray(persist_conf::devConf2.ethernetIpAddress, ipAddress);
 
-        Ethernet.begin(persist_conf::devConf2.ethernetMacAddress, ipAddress, dns, gateway, subnetMask);
-
-        result = 1;
+        eez::mcu::ethernet::begin(persist_conf::devConf2.ethernetMacAddress, ipAddress, dns, gateway, subnetMask);
     }
 
-    if (!result) {
-        g_testResult = TEST_WARNING;
-        DebugTrace("Ethernet not connected!");
-        event_queue::pushEvent(event_queue::EVENT_WARNING_ETHERNET_NOT_CONNECTED);
-
-        return;
-    }
-
-    g_server.init(persist_conf::devConf2.ethernetScpiPort);
-
-    g_server.begin();
-
-    g_testResult = TEST_OK;
-
-    DebugTrace("Listening on port %d", (int)persist_conf::devConf2.ethernetScpiPort);
-
-    scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer,
-               SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
-
-    // g_lastCheckDhcpLeaseTime = micros();
+    g_testResult = TEST_CONNECTING;
 }
 
 bool test() {
@@ -180,59 +155,40 @@ bool test() {
     return g_testResult != TEST_FAILED;
 }
 
-void tick(uint32_t tick_usec) {
-    if (g_testResult != TEST_OK) {
-        return;
-    }
-
-    // This code is commented because DHCP lease renewal blocks main thread for 5 or more seconds.
-    // if (persist_conf::devConf2.flags.ethernetDhcpEnabled) {
-    //    int32_t diff = tick_usec - g_lastCheckDhcpLeaseTime;
-    //    if (diff > CONF_CHECK_DHCP_LEASE_SEC * 1000000L) {
-    //        // DebugTrace("DHCP lease check");
-    //        g_lastCheckDhcpLeaseTime = tick_usec;
-    //        watchdog::disable();
-    //        Ethernet.maintain();
-    //        watchdog::enable();
-    //    }
-    //}
-
-    if (g_isConnected) {
-        if (!g_activeClient.connected()) {
-            g_isConnected = false;
-            g_activeClient = EthernetClient();
-            DebugTrace("Ethernet client lost!");
-        }
-    }
-
-    EthernetClient client = g_server.available();
-
-    if (client) {
-        if (!g_isConnected) {
-            client.flush();
-            g_activeClient = client;
-            g_isConnected = true;
-            scpi::emptyBuffer(g_scpiContext);
-            DebugTrace("A new ethernet client detected!");
+void onQueueMessage(uint32_t type, uint32_t param) {
+    if (type == ETHERNET_CONNECTED) {
+        bool isConnected = param ? true : false;
+        if (!isConnected) {
+            g_testResult = TEST_WARNING;
+            DebugTrace("Ethernet not connected!");
+            event_queue::pushEvent(event_queue::EVENT_WARNING_ETHERNET_NOT_CONNECTED);
+            return;
         }
 
-        size_t size;
-        while ((size = client.available()) > 0) {
-            uint8_t *msg = (uint8_t *)malloc(size);
-            size = client.read(msg, size);
-            if (client == g_activeClient) {
-                input(g_scpiContext, (const char *)msg, size);
-            } else {
-                ethernet_client_write_str(client, "**ERROR: another client already connected\r\n");
-                DebugTrace("Another client detected and ignored!");
-            }
-            free(msg);
+        g_testResult = TEST_OK;
+
+        eez::mcu::ethernet::beginServer(persist_conf::devConf2.ethernetScpiPort);
+        DebugTrace("Listening on port %d", (int)persist_conf::devConf2.ethernetScpiPort);
+        scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer,
+                SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
+    } else if (type == ETHERNET_CLIENT_CONNECTED) {
+        g_isConnected = true;
+        scpi::emptyBuffer(g_scpiContext);
+    } else if (type == ETHERNET_CLIENT_DISCONNECTED) {
+        g_isConnected = false;
+    } else if (type == ETHERNET_INPUT_AVAILABLE) {
+        char *buffer;
+        uint32_t length;
+        eez::mcu::ethernet::getInputBuffer(param, &buffer, &length);
+        if (buffer && length) {
+            input(g_scpiContext, (const char *)buffer, length);
+            eez::mcu::ethernet::releaseInputBuffer();
         }
     }
 }
 
 uint32_t getIpAddress() {
-    return Ethernet.localIP();
+    return eez::mcu::ethernet::localIP();
 }
 
 bool isConnected() {
@@ -240,15 +196,7 @@ bool isConnected() {
 }
 
 void update() {
-    if (g_isConnected) {
-        if (g_activeClient.connected()) {
-            g_activeClient.stop();
-            g_activeClient = EthernetClient();
-        }
-        g_isConnected = false;
-    }
-
-    g_testResult = TEST_WARNING;
+    // TODO
 }
 
 } // namespace ethernet

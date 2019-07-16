@@ -246,3 +246,5 @@ bool isSdLocked();
 } // namespace persist_conf
 } // namespace psu
 } // namespace eez
+
+extern "C" void getMacAddress(uint8_t macAddress[]);

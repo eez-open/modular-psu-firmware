@@ -24,70 +24,38 @@ namespace ethernet {
 
 bool onSystemStateChanged();
 
-class IPAddress {
-private:
+struct IPAddress {
+    IPAddress() {
+      _address.dword = 0;
+    }
+
+    IPAddress(uint32_t dwordAddress) {
+      _address.dword = dwordAddress;
+    }
+
     union {
         uint8_t bytes[4]; // IPv4 address
         uint32_t dword;
     } _address;
 
-public:
     operator uint32_t() const {
         return _address.dword;
     };
 };
 
-/// Arduino Ethernet object simulator
-class EthernetModule {
-  public:
-    bool begin(uint8_t *mac, uint8_t *ipAddress = 0, uint8_t *dns = 0, uint8_t *gateway = 0,
-               uint8_t *subnetMask = 0);
-    uint8_t maintain();
+void begin(uint8_t *mac, uint8_t *ipAddress = 0, uint8_t *dns = 0, uint8_t *gateway = 0, uint8_t *subnetMask = 0);
 
-    IPAddress localIP();
-    IPAddress subnetMask();
-    IPAddress gatewayIP();
-    IPAddress dnsServerIP();
-};
+IPAddress localIP();
+IPAddress subnetMask();
+IPAddress gatewayIP();
+IPAddress dnsServerIP();
 
-extern EthernetModule Ethernet;
+void beginServer(uint16_t port);
 
-class EthernetClient {
-  public:
-    EthernetClient();
-    EthernetClient(bool valid);
+void getInputBuffer(int bufferPosition, char **buffer, uint32_t *length);
+void releaseInputBuffer();
 
-    operator bool();
-    bool operator==(EthernetClient &other) {
-        return true;
-    }
-
-    bool connected();
-
-    size_t available();
-    size_t read(uint8_t *, size_t);
-    size_t write(const char *data, size_t len);
-    void flush();
-
-    void stop();
-
-  private:
-    bool valid;
-};
-
-class EthernetServer {
-  public:
-    void init(int port);
-
-    void begin();
-    EthernetClient available();
-
-  private:
-    bool bind_result;
-    int port;
-    EthernetClient client;
-};
-
+int writeBuffer(const char *buffer, uint32_t length);
 
 class EthernetUDP {
 public:
@@ -99,6 +67,7 @@ public:
     int read(unsigned char* buffer, size_t len);
     int parsePacket();
 };
+
 }
 }
 } // namespace eez::mcu::ethernet

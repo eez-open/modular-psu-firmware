@@ -1040,3 +1040,7 @@ bool isSdLocked() {
 } // namespace persist_conf
 } // namespace psu
 } // namespace eez
+
+extern "C" void getMacAddress(uint8_t macAddress[]) {
+    memcpy(macAddress, eez::psu::persist_conf::devConf2.ethernetMacAddress, 6);
+}
