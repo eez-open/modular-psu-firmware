@@ -74,8 +74,10 @@ void HomeAppContext::stateManagment() {
 
     // turn the screen off if power is down
     if (!psu::isPowerUp()) {
-        showPage(INTERNAL_PAGE_ID_NONE);
-        eez::mcu::display::turnOff();
+    	if (getActivePageId() != INTERNAL_PAGE_ID_NONE) {
+    		showPage(INTERNAL_PAGE_ID_NONE);
+    		eez::mcu::display::turnOff();
+    	}
         return;
     }
 

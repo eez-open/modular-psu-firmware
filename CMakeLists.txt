@@ -234,7 +234,6 @@ set(src_eez_apps_psu_scpi
     src/eez/apps/psu/scpi/outp.cpp
     src/eez/apps/psu/scpi/params.cpp
     src/eez/apps/psu/scpi/psu.cpp
-    src/eez/apps/psu/scpi/regs.cpp
     src/eez/apps/psu/scpi/sense.cpp
     src/eez/apps/psu/scpi/simu.cpp
     src/eez/apps/psu/scpi/sour.cpp
@@ -246,7 +245,6 @@ list (APPEND src_files ${src_eez_apps_psu_scpi})
 set(header_eez_apps_psu_scpi
     src/eez/apps/psu/scpi/params.h
     src/eez/apps/psu/scpi/psu.h
-    src/eez/apps/psu/scpi/regs.h
 )
 list (APPEND header_files ${header_eez_apps_psu_scpi})
 source_group("eez\\apps\\psu\\scpi" FILES ${src_eez_apps_psu_scpi} ${header_eez_apps_psu_scpi})
@@ -457,6 +455,7 @@ list (APPEND header_files ${header_eez_platform_simulator})
 source_group("eez\\platform\\simulator" FILES ${src_eez_platform_simulator} ${header_eez_platform_simulator})
 
 set(src_eez_scpi
+    src/eez/scpi/regs.cpp
     src/eez/scpi/scpi.cpp
 ) 
 list (APPEND src_files ${src_eez_scpi})
@@ -464,6 +463,7 @@ set(header_eez_scpi
     src/eez/scpi/commands.h
     src/eez/scpi/commands_simulator.h
     src/eez/scpi/commands_stm32.h
+    src/eez/scpi/regs.h
     src/eez/scpi/scpi.h
     src/eez/scpi/scpi_user_config.h
 ) 

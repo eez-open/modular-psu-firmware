@@ -55,6 +55,7 @@ AppContext::AppContext() {
     m_pushProgressPage = false;
     m_popProgressPage = false;
     m_setPageIdOnNextIter = false;
+    m_isTopPage = true;
 }
 
 
@@ -305,7 +306,9 @@ bool AppContext::isPageActiveOrOnStack(int pageId) {
 }
 
 void AppContext::showPage(int pageId) {
-    setPage(pageId);
+	if (pageId != getActivePageId()) {
+		setPage(pageId);
+	}
 }
 
 void AppContext::showPageOnNextIter(int pageId) {
@@ -316,12 +319,14 @@ void AppContext::showPageOnNextIter(int pageId) {
 void AppContext::pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint8_t currentValue,
                                         bool (*disabledCallback)(uint8_t value),
                                         void (*onSet)(uint8_t)) {
-    pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, new SelectFromEnumPage(enumDefinition, currentValue, disabledCallback, onSet));
+	m_selectFromEnumPage.init(enumDefinition, currentValue, disabledCallback, onSet);
+    pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &m_selectFromEnumPage);
 }
 
 void AppContext::pushSelectFromEnumPage(void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
                                         uint8_t currentValue, bool (*disabledCallback)(uint8_t value), void (*onSet)(uint8_t)) {
-    pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, new SelectFromEnumPage(enumDefinitionFunc, currentValue, disabledCallback, onSet));
+	m_selectFromEnumPage.init(enumDefinitionFunc, currentValue, disabledCallback, onSet);
+    pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &m_selectFromEnumPage);
 }
 
 void AppContext::markForRefreshAppView() {
@@ -459,6 +464,8 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
     m_activePageIdSaved = m_activePageId;
     Page *activePageSaved = m_activePage;
 
+    m_isTopPage = false;
+
     for (++i; i < m_pageNavigationStackPointer; i++) {
 
         bool paintedSaved = mcu::display::g_painted;
@@ -479,6 +486,8 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
         if (widgetCursor.currentState)
 			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
     }
+
+    m_isTopPage = true;
 
     m_activePageId = m_activePageIdSaved;
     m_activePageIdSaved = INTERNAL_PAGE_ID_NONE;

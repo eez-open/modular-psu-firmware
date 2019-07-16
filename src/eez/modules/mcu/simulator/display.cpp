@@ -177,20 +177,34 @@ bool init() {
 }
 
 void turnOn(bool withoutTransition) {
-    if (!g_frontPanelBuffer) {
+    if (!isOn()) {
         g_frontPanelBuffer1 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
         g_frontPanelBuffer2 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
         g_frontPanelBuffer3 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
 
         g_frontPanelBuffer = g_frontPanelBuffer1;
+
+        refreshScreen();
     }
 }
 
+void updateScreen(uint32_t *buffer);
+
 void turnOff() {
+    if (isOn()) {
+        setColor(0, 0, 0);
+        fillRect(g_homeAppContext.x, g_homeAppContext.y, 
+            g_homeAppContext.x + g_homeAppContext.width - 1, g_homeAppContext.y + g_homeAppContext.height - 1);
+        updateScreen(g_frontPanelBuffer);
+        delete g_frontPanelBuffer1;
+        delete g_frontPanelBuffer2;
+        delete g_frontPanelBuffer3;
+        g_frontPanelBuffer = nullptr;
+    }
 }
 
 bool isOn() {
-    return true;
+    return g_frontPanelBuffer != nullptr;
 }
 
 void updateBrightness() {
@@ -357,7 +371,7 @@ void animate() {
 }
 
 void sync() {
-    if (g_painted) {
+    if (isOn() && g_painted) {
         g_painted = false;
 
         if (g_mainWindow == nullptr) {

@@ -100,10 +100,10 @@ private:
 
 class SelectFromEnumPage : public InternalPage {
   public:
-    SelectFromEnumPage(const data::EnumItem *enumDefinition_, uint8_t currentValue_,
-                       bool (*disabledCallback_)(uint8_t value), void (*onSet_)(uint8_t));
-    SelectFromEnumPage(void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), 
-                       uint8_t currentValue_, bool (*disabledCallback_)(uint8_t value), void (*onSet_)(uint8_t));
+    void init(const data::EnumItem *enumDefinition_, uint8_t currentValue_,
+    		bool (*disabledCallback_)(uint8_t value), void (*onSet_)(uint8_t));
+    void init(void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
+    		uint8_t currentValue_, bool (*disabledCallback_)(uint8_t value), void (*onSet_)(uint8_t));
 
     void init();
 
@@ -131,8 +131,6 @@ class SelectFromEnumPage : public InternalPage {
     void (*onSet)(uint8_t);
 
 	void findPagePosition();
-
-    const WidgetCursor &widgetCursorAtTouchDown;
 
     bool isDisabled(int i);
 

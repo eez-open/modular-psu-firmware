@@ -243,22 +243,27 @@ void ToastMessagePage::executeAction() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SelectFromEnumPage::SelectFromEnumPage(const data::EnumItem *enumDefinition_, uint8_t currentValue_,
-                                       bool (*disabledCallback_)(uint8_t value),
-                                       void (*onSet_)(uint8_t))
-    : enumDefinition(enumDefinition_), enumDefinitionFunc(NULL),
-	  currentValue(currentValue_), disabledCallback(disabledCallback_), onSet(onSet_),
-	  widgetCursorAtTouchDown(getFoundWidgetAtDown())
+void SelectFromEnumPage::init(const data::EnumItem *enumDefinition_, uint8_t currentValue_,
+		bool (*disabledCallback_)(uint8_t value), void (*onSet_)(uint8_t))
 {
-    init();
+	enumDefinition = enumDefinition_;
+	enumDefinitionFunc = NULL;
+	currentValue = currentValue_;
+	disabledCallback = disabledCallback_;
+	onSet = onSet_;
+
+	init();
 }
 
-SelectFromEnumPage::SelectFromEnumPage(void (*enumDefinitionFunc_)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), 
-                                       uint8_t currentValue_, bool (*disabledCallback_)(uint8_t value), void (*onSet_)(uint8_t))
-    : enumDefinition(NULL), enumDefinitionFunc(enumDefinitionFunc_),
-	  currentValue(currentValue_), disabledCallback(disabledCallback_), onSet(onSet_),
-	  widgetCursorAtTouchDown(getFoundWidgetAtDown())
+void SelectFromEnumPage::init(void (*enumDefinitionFunc_)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
+		uint8_t currentValue_, bool (*disabledCallback_)(uint8_t value), void (*onSet_)(uint8_t))
 {
+	enumDefinition = NULL;
+	enumDefinitionFunc = enumDefinitionFunc_;
+	currentValue = currentValue_;
+	disabledCallback = disabledCallback_;
+	onSet = onSet_;
+
     init();
 }
 
@@ -329,6 +334,7 @@ bool SelectFromEnumPage::isDisabled(int i) {
 }
 
 void SelectFromEnumPage::findPagePosition() {
+	const WidgetCursor &widgetCursorAtTouchDown = getFoundWidgetAtDown();
 	x = widgetCursorAtTouchDown.x;
     int right = g_appContext->x + g_appContext->width - 10;
     if (x + width > right) {

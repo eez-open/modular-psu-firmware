@@ -437,6 +437,10 @@ void animate() {
 }
 
 void sync() {
+    if (!g_isOn) {
+        return;
+    }
+
     DMA2D_WAIT;
 
     if (g_takeScreenshot) {

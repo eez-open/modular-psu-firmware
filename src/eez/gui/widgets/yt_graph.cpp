@@ -120,30 +120,31 @@ void drawYTGraphWithScrolling(const WidgetCursor &widgetCursor, const Widget *wi
     uint16_t data1Color16 = display::getColor16FromIndex(data1Color);
     uint16_t data2Color16 = display::getColor16FromIndex(data2Color);
 
-#if 0
-    // prevent using bitBlt
-    int numPointsToDraw = numPositions;
-    previousHistoryValuePosition = currentHistoryValuePosition;
-#else
-    int numPointsToDraw = currentHistoryValuePosition - previousHistoryValuePosition;
-    if (numPointsToDraw < 0) {
-        numPointsToDraw += numPositions;
-    }
+    int numPointsToDraw;
+	if (previousHistoryValuePosition == -1) {
+		// prevent using bitBlt
+		numPointsToDraw = numPositions;
+		previousHistoryValuePosition = currentHistoryValuePosition;
+	} else {
+		numPointsToDraw = currentHistoryValuePosition - previousHistoryValuePosition;
+		if (numPointsToDraw < 0) {
+			numPointsToDraw += numPositions;
+		}
 
-    if (numPointsToDraw < 0) {
-        numPointsToDraw += numPositions;
-    }
+		if (numPointsToDraw < 0) {
+			numPointsToDraw += numPositions;
+		}
 
-    if (numPointsToDraw < numPositions) {
-        display::bitBlt(
-            widgetCursor.x + xGraphOffset + numPointsToDraw, 
-            widgetCursor.y, 
-            widgetCursor.x + xGraphOffset + numPositions - 1,
-            widgetCursor.y + widgetCursor.widget->h - 1, 
-            widgetCursor.x + xGraphOffset,
-            widgetCursor.y);
-    }
-#endif
+		if (numPointsToDraw < numPositions) {
+			display::bitBlt(
+				widgetCursor.x + xGraphOffset + numPointsToDraw,
+				widgetCursor.y,
+				widgetCursor.x + xGraphOffset + numPositions - 1,
+				widgetCursor.y + widgetCursor.widget->h - 1,
+				widgetCursor.x + xGraphOffset,
+				widgetCursor.y);
+		}
+	}
 
     int endX = widgetCursor.x + xGraphOffset + numPositions;
     int startX = endX - numPointsToDraw;
@@ -278,11 +279,10 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     int previousHistoryValuePosition = 
         widgetCursor.previousState && 
         ((YTGraphWidgetState *)widgetCursor.previousState)->ytGraphUpdateMethod == 
-            ((YTGraphWidgetState *)widgetCursor.currentState)->ytGraphUpdateMethod ?
-        ((YTGraphWidgetState *)widgetCursor.previousState)->position : 
-        (currentHistoryValuePosition + 1) % numHistoryValues;
+            ((YTGraphWidgetState *)widgetCursor.currentState)->ytGraphUpdateMethod && g_appContext->isActivePageTopPage() ?
+        ((YTGraphWidgetState *)widgetCursor.previousState)->position : -1;
 
-    if (previousHistoryValuePosition != currentHistoryValuePosition) {
+    if (previousHistoryValuePosition != currentHistoryValuePosition || previousHistoryValuePosition == -1) {
         if (psu::persist_conf::devConf2.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
             // a new way of drawing yt graph using scrolling
             drawYTGraphWithScrolling(
@@ -293,7 +293,9 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
                 widgetCursor.currentState->flags.active ? style->background_color : style->color);
         }
         else {
-            // an old way of drawing yt graph which draws graph from left to right in a loop with moving vertical line
+        	if (previousHistoryValuePosition == -1) {
+        		previousHistoryValuePosition = (currentHistoryValuePosition + 1) % numHistoryValues;
+        	}
 
             int startPosition;
             int endPosition;

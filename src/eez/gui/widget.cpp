@@ -270,6 +270,10 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback)
 		}
     }
 
+    if (g_appContext->getActivePageId() == INTERNAL_PAGE_ID_NONE) {
+        return;
+    }
+
     auto savedWidget = widgetCursor.widget;
     widgetCursor.widget = g_document->pages.first + g_appContext->getActivePageId();
     enumWidget(widgetCursor, callback);
@@ -277,6 +281,9 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback)
 }
 
 void enumWidgets(EnumWidgetsCallback callback) {
+	if (g_appContext->getActivePageId() == INTERNAL_PAGE_ID_NONE) {
+		return;
+	}
 	WidgetCursor widgetCursor;
 	widgetCursor.appContext = g_appContext;
 	widgetCursor.widget = g_document->pages.first + g_appContext->getActivePageId();

@@ -67,6 +67,9 @@ public:
     int getActivePageId();
     Page *getActivePage();
     bool isActivePage(int pageId);
+    bool isActivePageTopPage() {
+    	return m_isTopPage;
+    }
 
     bool isActivePageInternal();
     InternalPage *getActivePageInternal() {
@@ -120,6 +123,7 @@ public:
 
     //
     int m_activePageId = INTERNAL_PAGE_ID_NONE;
+    bool m_isTopPage;
     int m_activePageIdSaved;
     Page *m_activePage = nullptr;
     bool m_repaintActivePage;
@@ -136,6 +140,8 @@ public:
     void (*m_progressAbortCallback)();
 
     bool m_popProgressPage;
+
+    SelectFromEnumPage m_selectFromEnumPage;
 
     void doShowPage(int index, Page *page = 0);
     void setPage(int pageId);
