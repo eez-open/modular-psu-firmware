@@ -45,10 +45,10 @@ struct ChannelFlags {
     unsigned i_triggerMode : 2;
     unsigned currentRangeSelectionMode: 2;
     unsigned autoSelectCurrentRange: 1;
-    unsigned listSaved: 1;
+    unsigned reserved3: 1;
     unsigned triggerOutputState: 1;
     unsigned triggerOnListStop: 3;
-    unsigned reserved3: 6;
+    unsigned reserved4: 6;
 };
 
 /// Channel parameters stored in profile.
@@ -94,7 +94,12 @@ struct Parameters {
     temperature::ProtectionConfiguration temp_prot[temp_sensor::MAX_NUM_TEMP_SENSORS];
 };
 
-void tick(uint32_t tick_usec);
+// auto save support
+extern bool g_profileDirty;
+bool enableSave(bool enable);
+void save(bool immediately = false);
+
+void tick();
 
 void recallChannelsFromProfile(Parameters *profile, int location);
 bool recallFromProfile(Parameters *profile, int location);
@@ -104,11 +109,8 @@ bool recallFromFile(const char *filePath, int *err);
 bool load(int location, Parameters *profile);
 
 void getSaveName(const Parameters *profile, char *name);
+bool saveAtLocation(int location, const char *name = nullptr);
 
-bool enableSave(bool enable);
-void save();
-void saveImmediately();
-bool saveAtLocation(int location, const char *name = 0);
 bool saveToFile(const char *filePath, int *err);
 
 bool deleteLocation(int location);

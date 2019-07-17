@@ -601,10 +601,11 @@ bool isPowerUp() {
 }
 
 bool changePowerState(bool up) {
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE, up ? 1 : 0), osWaitForever);
-        return true;
-    }
+//    if (osThreadGetId() != g_psuTaskHandle) {
+//        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE, up ? 1 : 0), osWaitForever);
+//        osDelay(1000);
+//        return up == g_powerIsUp;
+//    }
 
     if (up == g_powerIsUp)
         return true;
@@ -643,7 +644,7 @@ bool changePowerState(bool up) {
         eez::gui::showEnteringStandbyPage();
 #endif
         g_powerIsUp = false;
-        profile::saveImmediately();
+        profile::save(true);
         g_powerIsUp = true;
 
         profile::enableSave(false);
@@ -668,7 +669,7 @@ void powerDownBySensor() {
         }
 
         g_powerIsUp = false;
-        profile::saveImmediately();
+        profile::save(true);
         g_powerIsUp = true;
 
         profile::enableSave(false);
@@ -776,8 +777,6 @@ void tick() {
     list::tick(tick_usec);
 
     event_queue::tick(tick_usec);
-
-    profile::tick(tick_usec);
 
     datetime::tick(tick_usec);
 

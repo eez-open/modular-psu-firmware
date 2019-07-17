@@ -236,7 +236,8 @@ enum DataEnum {
     DATA_ID_FOREGROUND_APPLICATION = 234,
     DATA_ID_FOREGROUND_APPLICATION_TITLE = 235,
     DATA_ID_TOUCH_CALIBRATION_POINT = 236,
-    DATA_ID_SELECTED_THEME = 237
+    DATA_ID_SELECTED_THEME = 237,
+    DATA_ID_PROFILE_DIRTY = 238
 };
 
 void data_edit_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -476,6 +477,7 @@ void data_foreground_application(DataOperationEnum operation, Cursor &cursor, Va
 void data_foreground_application_title(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_touch_calibration_point(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_selected_theme(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_profile_dirty(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -1051,4 +1053,4 @@ enum PagesEnum {
     PAGE_ID_MINIMIZED_APP_VIEW = 83
 };
 
-extern const uint8_t assets[138024];
+extern const uint8_t assets[138050];

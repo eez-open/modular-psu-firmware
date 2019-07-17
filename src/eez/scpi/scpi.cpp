@@ -27,6 +27,7 @@
 #include <eez/apps/psu/ethernet.h>
 #endif
 #include <eez/apps/psu/event_queue.h>
+#include <eez/apps/psu/profile.h>
 #include <eez/apps/psu/scpi/psu.h>
 
 using namespace eez::psu;
@@ -79,7 +80,7 @@ void mainLoop(const void *) {
 }
 
 void oneIter() {
-    osEvent event = osMessageGet(g_scpiMessageQueueId, osWaitForever);
+    osEvent event = osMessageGet(g_scpiMessageQueueId, 0);
     if (event.status == osEventMessage) {
     	uint32_t message = event.value.v;
     	uint32_t target = SCPI_QUEUE_MESSAGE_TARGET(message);
@@ -94,12 +95,15 @@ void oneIter() {
         }
 #endif  
         else if (target == SCPI_QUEUE_MESSAGE_TARGET_NONE) {
-            if (type == SCPI_QUEUE_MESSAGE_TYPE_LOAD_LIST) {
-                eez::psu::list::loadList(param, &g_listFilePath[param][0], nullptr);
-            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST) {
-                eez::psu::list::saveList(param, &g_listFilePath[param][0], nullptr);
+            if (type == SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST) {
+                int err;
+                if (!eez::psu::list::saveList(param, &g_listFilePath[param][0], &err)) {
+                    generateError(err);
+                }
             }
         }      
+    } else {
+        profile::tick();
     }
 }
 

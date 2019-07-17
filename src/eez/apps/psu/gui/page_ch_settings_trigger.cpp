@@ -488,7 +488,7 @@ void ChSettingsListsPage::set() {
             list::setVoltageList(*g_channel, m_voltageList, m_voltageListLength);
             list::setCurrentList(*g_channel, m_currentList, m_currentListLength);
 
-            profile::saveImmediately();
+            profile::save();
 
             popPage();
             infoMessage("Lists changed!");

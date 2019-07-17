@@ -95,17 +95,8 @@ static const uint8_t REG_VALUES[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-IOExpander::IOExpander(Channel &channel_) : channel(channel_)
-{
+IOExpander::IOExpander(Channel &channel_) : channel(channel_) {
     g_testResult = TEST_SKIPPED;
-
-    if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
-    	gpioa = DCP405_REG_VALUE_GPIOA;
-    	gpiob = DCP405_REG_VALUE_GPIOB;
-    } else {
-    	gpioa = DCP505_REG_VALUE_GPIOA;
-    	gpiob = DCP505_REG_VALUE_GPIOB;
-    }
 }
 
 void IOExpander::init() {
@@ -127,6 +118,14 @@ void IOExpander::init() {
     	}
 
     	write(reg, value);
+    }
+
+    if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
+    	gpioa = DCP405_REG_VALUE_GPIOA;
+    	gpiob = DCP405_REG_VALUE_GPIOB;
+    } else {
+    	gpioa = DCP505_REG_VALUE_GPIOA;
+    	gpiob = DCP505_REG_VALUE_GPIOB;
     }
 }
 

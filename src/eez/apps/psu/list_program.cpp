@@ -210,12 +210,6 @@ int checkLimits(int iChannel) {
 
 bool loadList(int iChannel, const char *filePath, int *err) {
 #if OPTION_SD_CARD
-    if (osThreadGetId() != g_scpiTaskHandle) {
-        strcpy(&g_listFilePath[iChannel][0], filePath);
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LOAD_LIST, iChannel), osWaitForever);
-        return true;
-    }
-
     Channel &channel = Channel::get(iChannel);
 
     if (sd_card::g_testResult != TEST_OK) {
@@ -468,17 +462,18 @@ void tick(uint32_t tick_usec) {
     debug::g_listTickDuration.tick(tick_usec);
 #endif
 
-    g_active = false;
+    bool active = false;
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
         if (g_execution[i].counter >= 0) {
             if (channel_dispatcher::isTripped(channel)) {
+                g_active = false;
                 abort();
                 return;
             }
 
-            g_active = true;
+            active = true;
 
             uint32_t tickCount;
             if (g_execution[i].currentTotalDwellTime > CONF_COUNTER_THRESHOLD_IN_SECONDS) {
@@ -520,6 +515,7 @@ void tick(uint32_t tick_usec) {
 
                     int err;
                     if (!setListValue(channel, g_execution[i].it, &err)) {
+                        g_active = false;
                         generateError(err);
                         abort();
                         return;
@@ -548,6 +544,8 @@ void tick(uint32_t tick_usec) {
             g_execution[i].lastTickCount = tickCount;
         }
     }
+
+    g_active = active;
 }
 
 bool isActive() {

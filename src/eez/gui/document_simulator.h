@@ -241,7 +241,8 @@ enum DataEnum {
     DATA_ID_SLOT_MODULE_TYPE = 239,
     DATA_ID_SIMULATOR_LOAD_STATE = 240,
     DATA_ID_SIMULATOR_LOAD = 241,
-    DATA_ID_SELECTED_THEME = 242
+    DATA_ID_SELECTED_THEME = 242,
+    DATA_ID_PROFILE_DIRTY = 243
 };
 
 void data_edit_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -486,6 +487,7 @@ void data_slot_module_type(DataOperationEnum operation, Cursor &cursor, Value &v
 void data_simulator_load_state(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_simulator_load(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_selected_theme(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_profile_dirty(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -1069,4 +1071,4 @@ enum PagesEnum {
     PAGE_ID_MINIMIZED_APP_VIEW = 85
 };
 
-extern const uint8_t assets[201960];
+extern const uint8_t assets[202035];

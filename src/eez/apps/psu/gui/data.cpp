@@ -2514,6 +2514,13 @@ void data_profile_channel_output_state(data::DataOperationEnum operation, data::
     }
 }
 
+void data_profile_dirty(data::DataOperationEnum operation, data::Cursor &cursor,
+                                       data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = profile::g_profileDirty ? 1 : 0;
+    }
+}
+
 void data_ethernet_installed(data::DataOperationEnum operation, data::Cursor &cursor,
                              data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
