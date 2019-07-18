@@ -121,16 +121,14 @@ SdFatResult Directory::findNext(FileInfo &fileInfo) {
 ////////////////////////////////////////////////////////////////////////////////
 
 File::File() {
-    memset(&m_file, 0, sizeof(m_file));
 }
 
 bool File::open(const char *path, uint8_t mode) {
-    FRESULT result = f_open(&m_file, path, mode);
-    return result == FR_OK;
+	FRESULT result = f_open(&m_file, path, mode);
+	return result == FR_OK;
 }
 
 File::~File() {
-    close();
 }
 
 void File::close() {
@@ -174,9 +172,36 @@ int File::read(void *buf, uint16_t nbyte) {
 }
 
 size_t File::write(const uint8_t *buf, size_t size) {
-    UINT bw;
-    auto result = f_write(&m_file, buf, size, &bw);
-    return result == FR_OK ? bw : 0;
+	size_t unalignedLength = 4 - (((uint32_t)buf) & 3);
+	if (unalignedLength > 0) {
+		uint8_t unalignedBuffer[4];
+		for (size_t i = 0; i < unalignedLength; i ++) {
+			unalignedBuffer[i] = buf[i];
+		}
+
+		UINT bw;
+		auto result = f_write(&m_file, unalignedBuffer, unalignedLength, &bw);
+
+		if (result != FR_OK || bw != unalignedLength) {
+			return 0;
+		}
+
+		buf += unalignedLength;
+		size -= unalignedLength;
+
+		if (size == 0) {
+            osDelay(5); // TODO
+			return unalignedLength;
+		}
+	}
+
+	UINT bw;
+	auto result = f_write(&m_file, buf, size, &bw);
+
+    // TODO
+    osDelay(5);
+
+	return result == FR_OK ? bw + unalignedLength  : 0;
 }
 
 void File::sync() {

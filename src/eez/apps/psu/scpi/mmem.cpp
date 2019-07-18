@@ -269,7 +269,9 @@ void startDownloading() {
 }
 
 void finishDownloading(int16_t eventId) {
-    if (eventId != event_queue::EVENT_INFO_FILE_DOWNLOAD_SUCCEEDED) {
+	sd_card::downloadFinished();
+
+	if (eventId != event_queue::EVENT_INFO_FILE_DOWNLOAD_SUCCEEDED) {
         sd_card::deleteFile(g_downloadFilePath, 0);
     }
     event_queue::pushEvent(eventId);

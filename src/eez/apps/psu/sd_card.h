@@ -48,6 +48,7 @@ bool catalogLength(const char *dirPath, size_t *length, int *err);
 bool upload(const char *filePath, void *param,
             void (*callback)(void *param, const void *buffer, int size), int *err);
 bool download(const char *filePath, bool truncate, const void *buffer, size_t size, int *err);
+void downloadFinished();
 bool moveFile(const char *sourcePath, const char *destinationPath, int *err);
 bool copyFile(const char *sourcePath, const char *destinationPath, int *err);
 bool deleteFile(const char *filePath, int *err);
