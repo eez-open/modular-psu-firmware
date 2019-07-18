@@ -46,10 +46,10 @@ namespace eez {
 namespace psu {
 namespace gui {
 
-static NumericKeypad g_keypadsPool[1];
+static Keypad g_keypadsPool[1];
 
-NumericKeypad* getFreeKeypad() {
-    for (unsigned int i = 0; i < sizeof (g_keypadsPool) / sizeof(NumericKeypad); ++i) {
+Keypad* getFreeKeypad() {
+    for (unsigned int i = 0; i < sizeof (g_keypadsPool) / sizeof(Keypad); ++i) {
         if (g_keypadsPool[i].m_isFree) {
             return &g_keypadsPool[i];
         }
