@@ -93,7 +93,7 @@ void AppContext::stateManagment() {
     uint32_t inactivityPeriod = psu::idle::getGuiAndEncoderInactivityPeriod();
     if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
         if (inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
-            dialogOk();
+            popPage();
             return;
         }
     }
