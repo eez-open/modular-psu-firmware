@@ -2907,12 +2907,7 @@ void data_channel_list_count(data::DataOperationEnum operation, data::Cursor &cu
 
 void data_channel_lists(data::DataOperationEnum operation, data::Cursor &cursor,
                         data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
-        if (page) {
-            value = data::Value(page->m_listVersion);
-        }
-    } else if (operation == data::DATA_OPERATION_COUNT) {
+    if (operation == data::DATA_OPERATION_COUNT) {
         value = LIST_ITEMS_PER_PAGE;
     } else if (operation == data::DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);

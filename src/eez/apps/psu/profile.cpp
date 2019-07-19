@@ -318,7 +318,7 @@ void doSave() {
 }
 
 void save(bool immediately) {
-    if (g_saveEnabled) {
+    if (g_saveEnabled && isAutoSaveAllowed()) {
         if (immediately) {
             doSave();
             g_profileDirty = false;
@@ -329,7 +329,7 @@ void save(bool immediately) {
 }
 
 void tick() {
-    if (g_profileDirty && isAutoSaveAllowed() && !list::isActive() && !calibration::isEnabled() && idle::isIdle()) {
+    if (g_profileDirty && !list::isActive() && !calibration::isEnabled() && idle::isIdle()) {
         doSave();
         g_profileDirty = false;
     }
@@ -365,6 +365,7 @@ bool recall(int location) {
         if (persist_conf::loadProfile(location, &profile) && profile.flags.isValid) {
             if (persist_conf::saveProfile(0, &profile)) {
                 if (recallFromProfile(&profile, location)) {
+                    save();
                     event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_PROFILE_0 + location);
                     return true;
                 } else {
