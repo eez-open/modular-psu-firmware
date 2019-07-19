@@ -299,4 +299,4 @@
 #define CONF_DLOG_SYNC_FILE_TIME 10 // 10 seconds
 
 /// Size of serial port output buffer
-#define CONF_SERIAL_BUFFER_SIZE 512
+#define CONF_SERIAL_BUFFER_SIZE 1024
