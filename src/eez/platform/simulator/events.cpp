@@ -21,6 +21,7 @@
 #include <SDL.h>
 
 #include <eez/system.h>
+#include <eez/modules/mcu/encoder.h>
 
 namespace eez {
 namespace platform {
@@ -33,13 +34,12 @@ int g_mouseButton1DownY;
 bool g_mouseButton1IsPressed;
 
 void readEvents() {
-    // int yMouseWheel = 0;
-    // bool mouseButton2IsUp = false;
+    int yMouseWheel = 0;
+    bool mouseButton2IsUp = false;
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN ||
-            event.type == SDL_MOUSEBUTTONUP) {
+        if (event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
             if (event.button.button == 1) {
                 SDL_GetMouseState(&g_mouseX, &g_mouseY);
                 if (event.type == SDL_MOUSEBUTTONDOWN) {
@@ -52,11 +52,11 @@ void readEvents() {
             }
             if (event.button.button == 2) {
                 if (event.type == SDL_MOUSEBUTTONUP) {
-                    // mouseButton2IsUp = true;
+                    mouseButton2IsUp = true;
                 }
             }
         } else if (event.type == SDL_MOUSEWHEEL) {
-            // yMouseWheel += event.wheel.y;
+            yMouseWheel += event.wheel.y;
         }
 
         if (event.type == SDL_QUIT) {
@@ -64,7 +64,7 @@ void readEvents() {
         }
     }
 
-    // mcu::encoder::write(yMouseWheel, mouseButton2IsUp);
+    mcu::encoder::write(yMouseWheel, mouseButton2IsUp);
 }
 
 } // namespace simulator
