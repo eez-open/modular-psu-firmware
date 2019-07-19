@@ -47,6 +47,10 @@ void UserProfilesPage::pageAlloc() {
     }
 }
 
+void UserProfilesPage::pageFree() {
+    g_selectedProfileLocation = -1;
+}
+
 void UserProfilesPage::showProfile() {
     g_selectedProfileLocation = getFoundWidgetAtDown().cursor.i;
     pushPage(g_selectedProfileLocation == 0 ? PAGE_ID_USER_PROFILE_0_SETTINGS

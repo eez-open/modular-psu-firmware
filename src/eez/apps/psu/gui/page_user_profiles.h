@@ -31,6 +31,7 @@ extern int g_selectedProfileLocation;
 class UserProfilesPage : public Page {
   public:
     void pageAlloc();
+    void pageFree();
 
     void showProfile();
 
