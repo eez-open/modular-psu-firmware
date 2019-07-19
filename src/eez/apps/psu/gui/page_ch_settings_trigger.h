@@ -68,7 +68,6 @@ class ChSettingsListsPage : public SetPage {
 
     int getDirty();
     void set();
-    void discard();
 
     bool onEncoder(int counter);
     bool onEncoderClicked();

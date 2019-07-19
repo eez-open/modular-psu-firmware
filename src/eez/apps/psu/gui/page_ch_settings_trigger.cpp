@@ -498,14 +498,6 @@ void ChSettingsListsPage::set() {
     }
 }
 
-void ChSettingsListsPage::discard() {
-    if (getDirty()) {
-        areYouSureWithMessage("You have unsaved changes!", popPage);
-    } else {
-        popPage();
-    }
-}
-
 bool ChSettingsListsPage::onEncoder(int counter) {
 #if OPTION_ENCODER
     mcu::encoder::enableAcceleration(true);
