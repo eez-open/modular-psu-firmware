@@ -334,6 +334,8 @@
     SCPI_COMMAND("DEBUg:FAN:PID", scpi_cmd_debugFanPid) \
     SCPI_COMMAND("DEBUg:FAN:PID?", scpi_cmd_debugFanPidQ) \
     SCPI_COMMAND("DEBUg:CSV?", scpi_cmd_debugCsvQ) \
+    SCPI_COMMAND("DEBUg:IOEXp", scpi_cmd_debugIoexp) \
+    SCPI_COMMAND("DEBUg:IOEXp?", scpi_cmd_debugIoexpQ) \
     SCPI_COMMAND("SYSTem:DATE:CLEar", scpi_cmd_systemDateClear) \
     SCPI_COMMAND("SYSTem:TIME:CLEar", scpi_cmd_systemTimeClear) \
     SCPI_COMMAND("SYSTem:SERial", scpi_cmd_systemSerial) \
