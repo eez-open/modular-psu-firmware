@@ -134,6 +134,7 @@ void AnalogDigitalConverter::tick(uint32_t tick_usec) {
     	// int ready = !HAL_GPIO_ReadPin(SPI2_IRQ_GPIO_Port, SPI2_IRQ_Pin)
     	int ready;
     	if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
+            // DCP405_IO_BIT_IN_ADC_DRDY
         	uint8_t gpioa = channel.ioexp.readGpio();
     		ready = !(gpioa & 0b00010000);
     	} else {
