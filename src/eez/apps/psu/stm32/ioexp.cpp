@@ -203,8 +203,25 @@ uint8_t IOExpander::readGpioB() {
 	return read(REG_GPIOB);
 }
 
+int IOExpander::getBitDirection(int bit) {
+    uint8_t dir;
+    if (bit < 8) {
+        dir = g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_REG_VALUE_IODIRA : DCP505_REG_VALUE_IODIRA;
+    } else {
+        dir = g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_REG_VALUE_IODIRB : DCP505_REG_VALUE_IODIRB;
+        bit -= 8;
+    }
+    return dir & (1 << bit) ? 1 : 0;
+}
+
 bool IOExpander::testBit(int io_bit) {
-    uint8_t value = readGpio();
+    uint8_t value;
+    if (io_bit < 8) {
+        value = readGpio();
+    } else {
+        value = readGpioB();
+        io_bit -= 8;
+    }
     return value & (1 << io_bit) ? true : false;
 }
 

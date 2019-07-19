@@ -71,6 +71,7 @@ class IOExpander {
     uint8_t readGpio();
     uint8_t readGpioB();
 
+    int getBitDirection(int io_bit); // 0: output, 1: input
     bool testBit(int io_bit);
     void changeBit(int io_bit, bool set);
 

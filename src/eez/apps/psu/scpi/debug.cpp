@@ -350,6 +350,79 @@ scpi_result_t scpi_cmd_debugCsvQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
+#ifdef DEBUG
+    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
+    uint8_t ch = psu_context->selected_channel_index;
+    Channel *channel = &Channel::get(ch - 1);
+
+    int32_t bit;
+    if (!SCPI_ParamInt(context, &bit, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    if (bit < 0 || bit > 15) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t direction;
+    if (!SCPI_ParamInt(context, &direction, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    if (direction != channel->ioexp.getBitDirection(bit)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    bool state;
+    if (!SCPI_ParamBool(context, &state, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    channel->ioexp.changeBit(bit, state);
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif // DEBUG
+}
+
+scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
+#ifdef DEBUG
+    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
+    uint8_t ch = psu_context->selected_channel_index;
+    Channel *channel = &Channel::get(ch - 1);
+
+    int32_t bit;
+    if (!SCPI_ParamInt(context, &bit, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    if (bit < 0 || bit > 15) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t direction;
+    if (!SCPI_ParamInt(context, &direction, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    if (direction != channel->ioexp.getBitDirection(bit)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    bool state = channel->ioexp.testBit(bit);
+
+    SCPI_ResultBool(context, state);
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif // DEBUG
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez
