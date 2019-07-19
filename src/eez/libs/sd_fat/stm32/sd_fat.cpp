@@ -190,18 +190,26 @@ size_t File::write(const uint8_t *buf, size_t size) {
 		size -= unalignedLength;
 
 		if (size == 0) {
-            osDelay(5); // TODO
 			return unalignedLength;
 		}
 	}
 
-	UINT bw;
-	auto result = f_write(&m_file, buf, size, &bw);
+	static const int CHUNK_SIZE = 512;
 
-    // TODO
-    osDelay(5);
+	for (size_t i = 0; i < size; i += CHUNK_SIZE) {
+		auto btw = size - i;
+		if (btw > CHUNK_SIZE) {
+			btw = CHUNK_SIZE;
+		}
+		UINT bw;
+		auto result = f_write(&m_file, buf, btw, &bw);
+		if (result != FR_OK || bw != btw) {
+			return 0;
+		}
+		buf += CHUNK_SIZE;
+	}
 
-	return result == FR_OK ? bw + unalignedLength  : 0;
+	return size + unalignedLength;
 }
 
 void File::sync() {
