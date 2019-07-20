@@ -113,6 +113,8 @@ bool saveAtLocation(int location, const char *name = nullptr);
 
 bool saveToFile(const char *filePath, int *err);
 
+void deleteProfileLists(int location);
+
 bool deleteLocation(int location);
 bool deleteAll();
 

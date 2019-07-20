@@ -31,8 +31,12 @@
 #if OPTION_SD_CARD
 #include <eez/apps/psu/sd_card.h>
 #endif
+#include <eez/scpi/scpi.h>
 
 namespace eez {
+
+using namespace scpi;
+
 namespace psu {
 namespace profile {
 
@@ -111,6 +115,15 @@ void deleteProfileList(Channel &channel, int location) {
         // TODO more specific error
         generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
     }
+}
+
+void deleteProfileLists(int location) {
+#if OPTION_SD_CARD
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel &channel = Channel::get(i);
+        deleteProfileList(channel, location);
+    }
+#endif
 }
 
 #endif
@@ -537,12 +550,11 @@ bool deleteLocation(int location) {
         }
         result = persist_conf::saveProfile(location, &profile);
 
-#if OPTION_SD_CARD
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel &channel = Channel::get(i);
-            deleteProfileList(channel, location);
-        }
-#endif
+    if (osThreadGetId() != g_scpiTaskHandle) {
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DELETE_PROFILE_LISTS, location), osWaitForever);
+        return true;
+    }
+
     }
     return result;
 }

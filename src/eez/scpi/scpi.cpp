@@ -100,6 +100,8 @@ void oneIter() {
                 if (!eez::psu::list::saveList(param, &g_listFilePath[param][0], &err)) {
                     generateError(err);
                 }
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_DELETE_PROFILE_LISTS) {
+                profile::deleteProfileLists(param);
             }
         }      
     } else {
