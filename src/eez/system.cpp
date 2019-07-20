@@ -18,6 +18,12 @@
 
 #include <stdio.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <usb_device.h>
+#include <sdmmc.h>
+#include <fatfs.h>
+#endif
+
 #include <eez/system.h>
 #include <eez/index.h>
 
@@ -87,6 +93,15 @@ void mainTask(const void *) {
         setSystemState(BOOTING);
     }
 #else
+
+#if defined(EEZ_PLATFORM_STM32)
+    MX_USB_DEVICE_Init();
+#if OPTION_SD_CARD
+    MX_SDMMC1_SD_Init();
+    MX_FATFS_Init();
+#endif
+#endif
+
     setSystemState(BOOTING);
     while (1) {
         osDelay(1000);
