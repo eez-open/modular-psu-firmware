@@ -60,6 +60,11 @@ void getChannelProfileListFilePath(Channel &channel, int location, char *filePat
 }
 
 void loadProfileList(Parameters &profile, Channel &channel, int location) {
+    if (sd_card::g_testResult != TEST_OK) {
+    	generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
+        return;
+    }
+
     char filePath[MAX_PATH_LENGTH];
     getChannelProfileListFilePath(channel, location, filePath);
 
@@ -119,6 +124,11 @@ void deleteProfileList(Channel &channel, int location) {
 
 void deleteProfileLists(int location) {
 #if OPTION_SD_CARD
+    if (sd_card::g_testResult != TEST_OK) {
+    	generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
+        return;
+    }
+
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
         deleteProfileList(channel, location);
