@@ -2719,6 +2719,22 @@ void data_sys_rl_state(data::DataOperationEnum operation, data::Cursor &cursor,
     }
 }
 
+void data_sys_sound_enabled(data::DataOperationEnum operation, data::Cursor &cursor,
+    data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        if (!persist_conf::isSoundEnabled() && !persist_conf::isClickSoundEnabled()) {
+            // both disabled
+            value = 0;
+        } else if (persist_conf::isSoundEnabled() || persist_conf::isClickSoundEnabled()) {
+            // both enabled
+            value = 1;
+        } else {
+            // mixed
+            value = 2;
+        }
+    }
+}
+
 void data_sys_sound_is_enabled(data::DataOperationEnum operation, data::Cursor &cursor,
                                data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
