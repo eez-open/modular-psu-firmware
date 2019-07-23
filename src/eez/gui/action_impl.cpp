@@ -269,6 +269,7 @@ void action_show_edit_mode_slider_help() {
 }
 
 void action_show_ch_settings_prot() {
+    selectChannel();
     showPage(PAGE_ID_CH_SETTINGS_PROT);
 }
 

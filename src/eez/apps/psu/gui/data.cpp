@@ -162,6 +162,10 @@ Value MakeValue(float value, Unit unit, int channelIndex, bool extendedPrecision
     return Value(value, unit, getNumSignificantDecimalDigits(unit, channelIndex, extendedPrecision), extendedPrecision);
 }
 
+Value MakeValue(float value, FloatPart floatPart, Unit unit, int channelIndex, bool extendedPrecision) {
+    return Value(value, floatPart, unit, getNumSignificantDecimalDigits(unit, channelIndex, extendedPrecision), extendedPrecision);
+}
+
 Value MakeValueListValue(const Value *values) {
     Value value;
     value.type_ = VALUE_TYPE_VALUE_LIST;
@@ -581,6 +585,24 @@ bool compare_FLOAT_LIST_value(const Value &a, const Value &b) {
 void FLOAT_LIST_value_to_text(const Value &value, char *text, int count) {
 }
 
+bool compare_CHANNEL_TITLE_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
+    Channel &channel = Channel::get(value.getInt());
+    snprintf(text, count - 1, "%s #%d", channel.getBoardName(), channel.index);
+}
+
+bool compare_CHANNEL_SHORT_TITLE_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void CHANNEL_SHORT_TITLE_value_to_text(const Value &value, char *text, int count) {
+    Channel &channel = Channel::get(value.getInt());
+    snprintf(text, count - 1, "#%d", channel.index);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 } // namespace gui
@@ -622,7 +644,9 @@ CompareValueFunction g_compareUserValueFunctions[] = { compare_LESS_THEN_MIN_FLO
                                                        compare_SERIAL_BAUD_INDEX_value,
                                                        compare_DLOG_STATUS_value,
                                                        compare_VALUE_LIST_value,
-                                                       compare_FLOAT_LIST_value };
+                                                       compare_FLOAT_LIST_value,
+                                                       compare_CHANNEL_TITLE_value,
+                                                       compare_CHANNEL_SHORT_TITLE_value };
 
 ValueToTextFunction g_userValueToTextFunctions[] = { LESS_THEN_MIN_FLOAT_value_to_text,
                                                      GREATER_THEN_MAX_FLOAT_value_to_text,
@@ -656,7 +680,9 @@ ValueToTextFunction g_userValueToTextFunctions[] = { LESS_THEN_MIN_FLOAT_value_t
                                                      SERIAL_BAUD_INDEX_value_to_text,
                                                      DLOG_STATUS_value_to_text,
                                                      VALUE_LIST_value_to_text,
-                                                     FLOAT_LIST_value_to_text };
+                                                     FLOAT_LIST_value_to_text,
+                                                     CHANNEL_TITLE_value_to_text,
+                                                     CHANNEL_SHORT_TITLE_value_to_text };
 
 } // namespace data
 } // namespace gui
@@ -744,6 +770,10 @@ using namespace eez::psu;
 namespace eez {
 namespace gui {
 
+void data_none(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    value = Value();
+}
+
 void data_edit_enabled(data::DataOperationEnum operation, data::Cursor &cursor,
                        data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
@@ -764,7 +794,7 @@ void data_edit_enabled(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_channels(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
-        value = CH_NUM;
+        value = CH_MAX;
     }
 }
 
@@ -773,7 +803,7 @@ void data_channel_status(data::DataOperationEnum operation, data::Cursor &cursor
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
-        int channelStatus = channel.index > CH_NUM ? 0 : (channel.isOk() ? 1 : 2);
+        int channelStatus = channel.isInstalled() ? (channel.isOk() ? 1 : 2) : 0;
         value = channelStatus;
     }
 }
@@ -878,6 +908,24 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     }
 }
 
+void data_channel_u_mon_a(data::DataOperationEnum operation, data::Cursor &cursor,
+    data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (operation == data::DATA_OPERATION_GET) {
+        value = MakeValue(channel_dispatcher::getUMon(channel), FloatPart::FLOAT_PART_A, UNIT_VOLT, iChannel);
+    }
+}
+
+void data_channel_u_mon_b(data::DataOperationEnum operation, data::Cursor &cursor,
+    data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (operation == data::DATA_OPERATION_GET) {
+        value = MakeValue(channel_dispatcher::getUMon(channel), FloatPart::FLOAT_PART_B, UNIT_VOLT, iChannel);
+    }
+}
+
 void data_channel_u_mon_dac(data::DataOperationEnum operation, data::Cursor &cursor,
                             data::Value &value) {
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
@@ -937,6 +985,33 @@ void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor &cursor
     }
 }
 
+void data_channel_u_edit_a(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (operation == data::DATA_OPERATION_GET) {
+        bool focused = (g_focusCursor == cursor || channel_dispatcher::isCoupled()) && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = MakeValue(g_focusEditValue.getFloat(), FLOAT_PART_A, UNIT_VOLT, iChannel);
+        } else {
+            value = MakeValue(channel_dispatcher::getUSet(channel), FLOAT_PART_A, UNIT_VOLT, iChannel);
+        }
+    }
+}
+
+void data_channel_u_edit_b(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (operation == data::DATA_OPERATION_GET) {
+        bool focused = (g_focusCursor == cursor || channel_dispatcher::isCoupled()) && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = MakeValue(g_focusEditValue.getFloat(), FLOAT_PART_B, UNIT_VOLT, iChannel);
+        }
+        else {
+            value = MakeValue(channel_dispatcher::getUSet(channel), FLOAT_PART_B, UNIT_VOLT, iChannel);
+        }
+    }
+}
+
 void data_channel_i_set(data::DataOperationEnum operation, data::Cursor &cursor,
                         data::Value &value) {
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
@@ -985,6 +1060,24 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         int position = value.getInt();
         value =
             MakeValue(channel_dispatcher::getIMonHistory(channel, position), UNIT_AMPER, iChannel);
+    }
+}
+
+void data_channel_i_mon_a(data::DataOperationEnum operation, data::Cursor &cursor,
+    data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (operation == data::DATA_OPERATION_GET) {
+        value = MakeValue(channel_dispatcher::getIMon(channel), FLOAT_PART_A, UNIT_AMPER, iChannel);
+    }
+}
+
+void data_channel_i_mon_b(data::DataOperationEnum operation, data::Cursor &cursor,
+    data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (operation == data::DATA_OPERATION_GET) {
+        value = MakeValue(channel_dispatcher::getIMon(channel), FLOAT_PART_B, UNIT_AMPER, iChannel);
     }
 }
 
@@ -1047,6 +1140,33 @@ void data_channel_i_edit(data::DataOperationEnum operation, data::Cursor &cursor
     }
 }
 
+void data_channel_i_edit_a(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (operation == data::DATA_OPERATION_GET) {
+        bool focused = (g_focusCursor == cursor || channel_dispatcher::isCoupled()) && g_focusDataId == DATA_ID_CHANNEL_I_EDIT;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = MakeValue(g_focusEditValue.getFloat(), FLOAT_PART_A, UNIT_AMPER, iChannel);
+        } else {
+            value = MakeValue(channel_dispatcher::getISet(channel), FLOAT_PART_A, UNIT_AMPER, iChannel);
+        }
+    }
+}
+
+void data_channel_i_edit_b(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (operation == data::DATA_OPERATION_GET) {
+        bool focused = (g_focusCursor == cursor || channel_dispatcher::isCoupled()) && g_focusDataId == DATA_ID_CHANNEL_I_EDIT;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = MakeValue(g_focusEditValue.getFloat(), FLOAT_PART_B, UNIT_AMPER, iChannel);
+        }
+        else {
+            value = MakeValue(channel_dispatcher::getISet(channel), FLOAT_PART_B, UNIT_AMPER, iChannel);
+        }
+    }
+}
+
 void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
                         data::Value &value) {
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
@@ -1066,6 +1186,24 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
                               channel_dispatcher::getIMonHistory(channel, value.getInt()),
                               getPrecision(UNIT_WATT));
         value = MakeValue(pMon, UNIT_WATT, iChannel);
+    }
+}
+
+void data_channel_p_mon_a(data::DataOperationEnum operation, data::Cursor &cursor,
+    data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (operation == data::DATA_OPERATION_GET) {
+        value = MakeValue(getChannelSnapshot(channel).pMon, FLOAT_PART_A, UNIT_WATT, iChannel);
+    }
+}
+
+void data_channel_p_mon_b(data::DataOperationEnum operation, data::Cursor &cursor,
+    data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (operation == data::DATA_OPERATION_GET) {
+        value = MakeValue(getChannelSnapshot(channel).pMon, FLOAT_PART_B, UNIT_WATT, iChannel);
     }
 }
 
@@ -1439,6 +1577,22 @@ void data_channel_short_label(data::DataOperationEnum operation, data::Cursor &c
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         value = data::Value(iChannel + 1, VALUE_TYPE_CHANNEL_SHORT_LABEL);
+    }
+}
+
+void data_channel_title(data::DataOperationEnum operation, data::Cursor &cursor,
+    data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_TITLE);
+    }
+}
+
+void data_channel_short_title(data::DataOperationEnum operation, data::Cursor &cursor,
+    data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE);
     }
 }
 
@@ -1854,13 +2008,44 @@ void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::
     }
 }
 
-void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::Cursor &cursor,
-                                       data::Value &value) {
+void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        ChSettingsProtectionSetPage *page =
-            (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
+        ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
         if (page) {
             value = page->limit;
+        } else {
+            int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+            Channel &channel = Channel::get(iChannel);
+            value = MakeValue(channel.p_limit, UNIT_WATT, iChannel);
+        }
+    }
+}
+
+void data_channel_protection_opp_limit_a(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
+        if (page) {
+            value = page->limit;
+            value = MakeValue(page->limit.getFloat(), FLOAT_PART_A, UNIT_WATT, g_channel->index - 1);
+        } else {
+            int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+            Channel &channel = Channel::get(iChannel);
+            value = MakeValue(channel.p_limit, FLOAT_PART_A, UNIT_WATT, iChannel);
+        }
+    }
+}
+
+void data_channel_protection_opp_limit_b(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
+        if (page) {
+            value = page->limit;
+            value = MakeValue(page->limit.getFloat(), FLOAT_PART_B, UNIT_WATT, g_channel->index - 1);
+        }
+        else {
+            int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+            Channel &channel = Channel::get(iChannel);
+            value = MakeValue(channel.p_limit, FLOAT_PART_B, UNIT_WATT, iChannel);
         }
     }
 }
@@ -2725,7 +2910,7 @@ void data_sys_sound_enabled(data::DataOperationEnum operation, data::Cursor &cur
         if (!persist_conf::isSoundEnabled() && !persist_conf::isClickSoundEnabled()) {
             // both disabled
             value = 0;
-        } else if (persist_conf::isSoundEnabled() || persist_conf::isClickSoundEnabled()) {
+        } else if (persist_conf::isSoundEnabled() && persist_conf::isClickSoundEnabled()) {
             // both enabled
             value = 1;
         } else {

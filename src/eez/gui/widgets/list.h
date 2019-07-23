@@ -29,6 +29,7 @@ namespace gui {
 struct ListWidget {
     uint8_t listType; // LIST_TYPE_VERTICAL or LIST_TYPE_HORIZONTAL
     Widget *item_widget;
+    uint8_t gap;
 };
 
 void ListWidget_fixPointers(Widget *widget);

@@ -68,7 +68,6 @@ void mainLoop(const void *) {
     oneIter();
 #else
     while (1) {
-        osDelay(0);
         oneIter();
     }
 #endif

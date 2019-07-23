@@ -403,7 +403,7 @@ void sync() {
 
 #ifndef __EMSCRIPTEN__
     // sync
-    delay(1000 / 60);
+    osDelay(1000 / 60);
 #endif
 }
 

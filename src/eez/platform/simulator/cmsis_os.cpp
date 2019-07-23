@@ -129,7 +129,7 @@ osMessageQId osMessageCreate(osMessageQId queue_id, osThreadId thread_id) {
 
 osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec) {
     while (queue_id->tail == queue_id->head) {
-        osDelay(0);
+        osDelay(millisec == 0 ? 1 : millisec);
         if (millisec == 0) {
             return {
                 osOK,

@@ -94,6 +94,12 @@ bool compare_FLOAT_value(const Value &a, const Value &b) {
                  getPrecisionFromNumSignificantDecimalDigits(aNumSignificantDecimalDigits));
 }
 
+int findStartOfB(char *text) {
+    int i;
+    for (i = 0; text[i] && (text[i] == '-' || (text[i] >= '0' && text[i] <= '9')); i++);
+    return i;
+}
+
 void FLOAT_value_to_text(const Value &value, char *text, int count) {
     float fValue;
     Unit unit;
@@ -110,6 +116,18 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
     }
 
     strcat(text, getUnitName(unit));
+
+    if (value.isFloatPartA()) {
+        int i = findStartOfB(text);
+        text[i] = 0;
+    } else if (value.isFloatPartB()) {
+        int i = findStartOfB(text);
+        int j;
+        for (j = 0; text[i]; j++, i++) {
+            text[j] = text[i];
+        }
+        text[j] = 0;
+    }
 }
 
 bool compare_STR_value(const Value &a, const Value &b) {

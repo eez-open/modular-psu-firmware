@@ -6,6 +6,7 @@
 
 using eez::gui::data::EnumItem;
 using eez::gui::data::Value;
+using eez::gui::data::FloatPart;
 
 namespace eez {
 namespace gui {
@@ -69,10 +70,13 @@ enum UserValueType {
     VALUE_TYPE_SERIAL_BAUD_INDEX,
     VALUE_TYPE_DLOG_STATUS,
     VALUE_TYPE_VALUE_LIST,
-    VALUE_TYPE_FLOAT_LIST
+    VALUE_TYPE_FLOAT_LIST,
+    VALUE_TYPE_CHANNEL_TITLE,
+    VALUE_TYPE_CHANNEL_SHORT_TITLE
 };
 
 Value MakeValue(float value, Unit unit, int channelIndex = -1, bool extendedPrecision = false);
+Value MakeValue(float value, FloatPart floatPart, Unit unit, int channelIndex = -1, bool extendedPrecision = false);
 Value MakeValueListValue(const Value *values);
 Value MakeFloatListValue(float *pFloat);
 Value MakeEventValue(eez::psu::event_queue::Event *e);

@@ -50,9 +50,14 @@ namespace psu {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const char *CH_BOARD_REVISION_NAMES[] = { "DCP505_R1B3", "DCP405_R1B1" };
+static const char *CH_BOARD_NAMES[] = { "None", "DCP505", "DCP405", "DCM220" };
 
-uint16_t CH_BOARD_REVISION_FEATURES[] = {
+static const char *CH_BOARD_REVISION_NAMES[] = { "None", "DCP505_R1B3", "DCP405_R1B1", "DCM220_R1B1" };
+
+static uint16_t CH_BOARD_REVISION_FEATURES[] = {
+    // CH_BOARD_REVISION_NONE
+    0,
+
     // CH_BOARD_REVISION_DCP505_R1B3
     CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE | CH_FEATURE_DPROG |
     CH_FEATURE_RPROG | CH_FEATURE_RPOL,
@@ -60,6 +65,10 @@ uint16_t CH_BOARD_REVISION_FEATURES[] = {
     // CH_BOARD_REVISION_DCP405_R1B1
     CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE | CH_FEATURE_DPROG |
     CH_FEATURE_RPROG | CH_FEATURE_RPOL,
+
+    // CH_BOARD_REVISION_DCM220_R1B1
+    CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE | CH_FEATURE_DPROG |
+    CH_FEATURE_RPROG | CH_FEATURE_RPOL
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -514,6 +523,9 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Channel::init() {
+    if (!isInstalled()) {
+        return;
+    }
     bool last_save_enabled = profile::enableSave(false);
 
     ioexp.init();
@@ -524,6 +536,10 @@ void Channel::init() {
 }
 
 void Channel::onPowerDown() {
+    if (!isInstalled()) {
+        return;
+    }
+
     bool last_save_enabled = profile::enableSave(false);
 
     outputEnable(false);
@@ -538,6 +554,10 @@ void Channel::onPowerDown() {
 }
 
 void Channel::reset() {
+    if (!isInstalled()) {
+        return;
+    }
+
     flags.outputEnabled = 0;
     flags.dpOn = 0;
     flags.senseEnabled = 0;
@@ -667,6 +687,10 @@ void Channel::clearProtectionConf() {
 }
 
 bool Channel::test() {
+    if (!isInstalled()) {
+        return true;
+    }
+
     bool last_save_enabled = profile::enableSave(false);
 
     flags.powerOk = 0;
@@ -685,6 +709,10 @@ bool Channel::test() {
     profile::save();
 
     return isOk();
+}
+
+bool Channel::isInstalled() {
+    return boardRevision != CH_BOARD_REVISION_NONE;
 }
 
 bool Channel::isPowerOk() {
@@ -1511,6 +1539,10 @@ const char *Channel::getCvModeStr() {
         return "CC";
     else
         return "UR";
+}
+
+const char *Channel::getBoardName() {
+    return CH_BOARD_NAMES[boardRevision];
 }
 
 const char *Channel::getBoardRevisionName() {

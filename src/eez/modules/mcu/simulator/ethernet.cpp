@@ -425,7 +425,7 @@ void mainLoop(const void *) {
     bool wasConnected = false;
 
 	while (1) {
-		osEvent event = osMessageGet(g_ethernetMessageQueueId, 0);
+        osEvent event = osMessageGet(g_ethernetMessageQueueId, 0);
 		if (event.status == osEventMessage) {
 			switch (event.value.v) {
 			case QUEUE_MESSAGE_CONNECT:

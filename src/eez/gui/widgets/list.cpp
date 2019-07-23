@@ -66,7 +66,7 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
             if (offset < parentWidget->h) {
 				widgetCursor.y = savedY + offset;
                 enumWidget(widgetCursor, callback);
-				offset += childWidget->h;
+				offset += childWidget->h + listWidget->gap;
             } else {
                 // TODO: add vertical scroll
                 break;
@@ -75,7 +75,7 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
             if (offset < parentWidget->w) {
 				widgetCursor.x = savedX + offset;
 				enumWidget(widgetCursor, callback);
-				offset += childWidget->w;
+				offset += childWidget->w + listWidget->gap;
             } else {
                 // TODO: add horizontal scroll
                 break;

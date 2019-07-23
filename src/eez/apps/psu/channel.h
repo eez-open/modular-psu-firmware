@@ -385,6 +385,9 @@ class Channel {
     /// Test the channel.
     bool test();
 
+    /// Is channel installed?
+    bool isInstalled();
+
     /// Is channel power ok (state of PWRGOOD bit in IO Expander)?
     bool isPowerOk();
 
@@ -496,6 +499,9 @@ class Channel {
 
     /// Remap current value to ADC data value (use calibration if configured).
     int16_t remapCurrentToAdcData(float value);
+
+    /// Returns name of the board of this channel.
+    const char *getBoardName();
 
     /// Returns name of the board revison of this channel.
     const char *getBoardRevisionName();

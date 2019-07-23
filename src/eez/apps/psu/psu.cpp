@@ -140,22 +140,26 @@ void init() {
 
     bp3c::relays::init();
 
-    int channelIndex = 0;
     for (int i = 0; i < CH_MAX; i++) {
         uint16_t value;
         if (!dcpX05::eeprom::read(i, (uint8_t *)&value, 2, (uint16_t)0)) {
             g_slots[i].moduleType = MODULE_TYPE_NONE;
+            channels[i].set(i, CH_BOARD_REVISION_NONE, CH_PARAMS_NONE);
         } else if (value == 405) {
             g_slots[i].moduleType = MODULE_TYPE_DCP405;
-            channels[channelIndex++].set(i, CH_BOARD_REVISION_DCP405_R1B1, CH_PARAMS_40V_5A);
+            channels[i].set(i, CH_BOARD_REVISION_DCP405_R1B1, CH_PARAMS_40V_5A);
         } else if (value == 505) {
             g_slots[i].moduleType = MODULE_TYPE_DCP505;
-            channels[channelIndex++].set(i, CH_BOARD_REVISION_DCP505_R1B3, CH_PARAMS_50V_5A);
+            channels[i].set(i, CH_BOARD_REVISION_DCP505_R1B3, CH_PARAMS_50V_5A);
+        } else if (value == 220) {
+            g_slots[i].moduleType = MODULE_TYPE_DCM220;
+            channels[i].set(i, CH_BOARD_REVISION_DCM220_R1B1, CH_PARAMS_20V_4A);
         } else {
             g_slots[i].moduleType = MODULE_TYPE_NONE;
+            channels[i].set(i, CH_BOARD_REVISION_NONE, CH_PARAMS_NONE);
         }
     }
-    CH_NUM = channelIndex;
+    CH_NUM = CH_MAX;
 
     g_powerOnTimeCounter.init();
     for (int i = 0; i < CH_NUM; i++) {

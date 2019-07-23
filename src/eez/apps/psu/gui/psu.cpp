@@ -153,8 +153,11 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
         return false;
     }
 
-    return (widgetCursor.cursor == -1 || widgetCursor.cursor == g_focusCursor) &&
-           widgetCursor.widget->data == g_focusDataId;
+    return (widgetCursor.cursor == -1 || widgetCursor.cursor == g_focusCursor) && (widgetCursor.widget->data == g_focusDataId
+        || ((widgetCursor.widget->data == DATA_ID_CHANNEL_U_EDIT_A || widgetCursor.widget->data == DATA_ID_CHANNEL_U_EDIT_B) 
+                && g_focusDataId == DATA_ID_CHANNEL_U_EDIT)
+        || ((widgetCursor.widget->data == DATA_ID_CHANNEL_I_EDIT_A || widgetCursor.widget->data == DATA_ID_CHANNEL_I_EDIT_B) 
+                && g_focusDataId == DATA_ID_CHANNEL_I_EDIT));
 }
 
 bool PsuAppContext::isAutoRepeatAction(int action) {
@@ -251,7 +254,8 @@ Value PsuAppContext::getHistoryValue(const Cursor &cursor, uint16_t id, int posi
 
 bool isChannelCalibrationsDone() {
     for (int i = 0; i < CH_NUM; ++i) {
-        if (!Channel::get(i).isCalibrationExists()) {
+        Channel &channel = Channel::get(i);
+        if (channel.isInstalled() && channel.isOk() && !channel.isCalibrationExists()) {
             return false;
         }
     }

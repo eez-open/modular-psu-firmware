@@ -35,7 +35,7 @@ void SelectWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback)
 	auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
 
-    data::Value indexValue = widgetCursor.widget->data > 0 ? data::get(widgetCursor.cursor, widgetCursor.widget->data) : 0;
+    data::Value indexValue = data::get(widgetCursor.cursor, widgetCursor.widget->data);
     if (indexValue.getType() == VALUE_TYPE_NONE) {
         indexValue = data::Value(0);
     }

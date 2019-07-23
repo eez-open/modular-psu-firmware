@@ -31,6 +31,7 @@ extern int g_numOnSystemStateChangedCallbacks;
 static const uint8_t MODULE_TYPE_NONE = 0;
 static const uint8_t MODULE_TYPE_DCP505 = 1;
 static const uint8_t MODULE_TYPE_DCP405 = 2;
+static const uint8_t MODULE_TYPE_DCM220 = 3;
 
 struct SlotInfo {
     uint8_t moduleType; // MODULE_TYPE_...

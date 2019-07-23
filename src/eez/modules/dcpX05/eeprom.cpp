@@ -87,8 +87,9 @@ bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t addr
     return true;
 #endif
 
-	buffer[0] = 405 & 0xff;
-	buffer[1] = 405 >> 8;
+    buffer[0] = 405 & 0xff;
+    buffer[1] = 405 >> 8;
+
     return true;
 }
 
