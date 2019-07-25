@@ -65,9 +65,45 @@ void initEditValue() {
 void enter(int tabIndex) {
 #if OPTION_ENCODER
     if (!isActive()) {
-        if (!g_appContext->isFocusWidget(getFoundWidgetAtDown()) ||
-            g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (!g_appContext->isFocusWidget(getFoundWidgetAtDown()) || g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             setFocusCursor(getFoundWidgetAtDown().cursor, getFoundWidgetAtDown().widget->data);
+            return;
+        }
+
+        gui::selectChannel();
+
+        if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT) {
+            changeVoltageLimit(g_channel->index - 1);
+            return;
+        } 
+        
+        if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT) {
+            changeCurrentLimit(g_channel->index - 1);
+            return;
+        }
+        
+        if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT) {
+            changePowerLimit(g_channel->index - 1);
+            return;
+        }
+        
+        if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL) {
+            changePowerTripLevel(g_channel->index - 1);
+            return;
+        }
+        
+        if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL) {
+            changeTemperatureTripLevel(g_channel->index - 1);
+            return;
+        }
+        
+        if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY) {
+            changePowerTripDelay(g_channel->index - 1);
+            return;
+        }
+        
+        if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY) {
+            changeTemperatureTripDelay(g_channel->index - 1);
             return;
         }
     }

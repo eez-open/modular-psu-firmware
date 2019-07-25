@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+
 #include <eez/gui/widgets/display_data.h>
 
 #include <eez/gui/app_context.h>
@@ -27,6 +29,17 @@
 namespace eez {
 namespace gui {
 
+int findStartOfFraction(char *text) {
+    int i;
+    for (i = 0; text[i] && (text[i] == '-' || (text[i] >= '0' && text[i] <= '9')); i++);
+    return i;
+}
+
+int findStartOfUnit(char *text, int i) {
+    for (i = 0; text[i] && (text[i] == '-' || (text[i] >= '0' && text[i] <= '9') || text[i] == '.'); i++);
+    return i;
+}
+
 void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const DisplayDataWidget *display_data_widget = (const DisplayDataWidget *)widget->specific;
@@ -35,6 +48,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
 
 	const Style *style = getStyle(widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->style);
+    const Style *activeStyle = getStyle(widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->activeStyle);
 
     widgetCursor.currentState->flags.blinking =
         isBlinkTime() && data::isBlinking(widgetCursor.cursor, widget->data);
@@ -54,8 +68,30 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
         char text[64];
         widgetCursor.currentState->data.toText(text, sizeof(text));
 
-        drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                 nullptr, widgetCursor.currentState->flags.active,
+        char *start = text;
+
+        if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER) {
+            int i = findStartOfFraction(text);
+            text[i] = 0;
+        } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION) {
+            int i = findStartOfFraction(text);
+            start = text + i;
+        } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
+            int i = findStartOfFraction(text);
+            int k = findStartOfUnit(text, i);
+            if (i < k) {
+                start = text + i;
+                text[k] = 0;
+            } else {
+                strcpy(text, ".00");
+            }
+        } else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
+            int i = findStartOfUnit(text, 0);
+            start = text + i;
+        }
+
+        drawText(start, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                 style, activeStyle, widgetCursor.currentState->flags.active,
                  widgetCursor.currentState->flags.blinking, false,
                  &widgetCursor.currentState->backgroundColor);
     }

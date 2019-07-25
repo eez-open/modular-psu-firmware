@@ -46,6 +46,14 @@ extern data::Value g_focusEditValue;
 void setFocusCursor(const data::Cursor &cursor, uint16_t dataId);
 bool isFocusChanged();
 
+void changeVoltageLimit(int iChannel);
+void changeCurrentLimit(int iChannel);
+void changePowerLimit(int iChannel);
+void changePowerTripLevel(int iChannel);
+void changePowerTripDelay(int iChannel);
+void changeTemperatureTripLevel(int iChannel);
+void changeTemperatureTripDelay(int iChannel);
+
 void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_callback)() = 0);
 
 class PsuAppContext : public AppContext {

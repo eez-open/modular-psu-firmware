@@ -153,11 +153,7 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
         return false;
     }
 
-    return (widgetCursor.cursor == -1 || widgetCursor.cursor == g_focusCursor) && (widgetCursor.widget->data == g_focusDataId
-        || ((widgetCursor.widget->data == DATA_ID_CHANNEL_U_EDIT_A || widgetCursor.widget->data == DATA_ID_CHANNEL_U_EDIT_B) 
-                && g_focusDataId == DATA_ID_CHANNEL_U_EDIT)
-        || ((widgetCursor.widget->data == DATA_ID_CHANNEL_I_EDIT_A || widgetCursor.widget->data == DATA_ID_CHANNEL_I_EDIT_B) 
-                && g_focusDataId == DATA_ID_CHANNEL_I_EDIT));
+    return (widgetCursor.cursor == -1 || widgetCursor.cursor == g_focusCursor) && widgetCursor.widget->data == g_focusDataId;
 }
 
 bool PsuAppContext::isAutoRepeatAction(int action) {
@@ -348,81 +344,151 @@ bool showSetupWizardQuestion() {
     return false;
 }
 
-void changeLimit(Channel &channel, const data::Value &value, float minLimit, float maxLimit,
-                 float defLimit, void (*onSetLimit)(float)) {
+static int g_iChannelSetValue;
+
+void changeValue(Channel &channel, const data::Value &value, float minValue, float maxValue, float defValue, void (*onSetValue)(float)) {
     NumericKeypadOptions options;
 
     options.channelIndex = channel.index;
 
     options.editValueUnit = value.getUnit();
 
-    options.min = minLimit;
-    options.max = maxLimit;
-    options.def = defLimit;
+    options.min = minValue;
+    options.max = maxValue;
+    options.def = defValue;
 
     options.enableMaxButton();
     options.enableDefButton();
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, value, options, onSetLimit, 0, 0);
+    NumericKeypad::start(0, value, options, onSetValue, 0, 0);
 }
 
-// TODO find a better way to pass this argument to onSet[Voltahe|Current|Power]Limit function
-static int g_iChannelSetLimit;
-
 void onSetVoltageLimit(float limit) {
-    Channel &channel = Channel::get(g_iChannelSetLimit);
+    Channel &channel = Channel::get(g_iChannelSetValue);
     channel_dispatcher::setVoltageLimit(channel, limit);
     popPage();
     infoMessage("Voltage limit changed!");
 }
 
 void changeVoltageLimit(int iChannel) {
-    g_iChannelSetLimit = iChannel;
+    g_iChannelSetValue = iChannel;
     Channel &channel = Channel::get(iChannel);
     float minLimit = channel_dispatcher::getUMin(channel);
     float maxLimit = channel_dispatcher::getUMax(channel);
     float defLimit = channel_dispatcher::getUMax(channel);
-    changeLimit(channel,
+    changeValue(channel,
                 MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT, channel.index - 1),
                 minLimit, maxLimit, defLimit, onSetVoltageLimit);
 }
 
 void onSetCurrentLimit(float limit) {
-    Channel &channel = Channel::get(g_iChannelSetLimit);
+    Channel &channel = Channel::get(g_iChannelSetValue);
     channel_dispatcher::setCurrentLimit(channel, limit);
     popPage();
     infoMessage("Current limit changed!");
 }
 
 void changeCurrentLimit(int iChannel) {
-    g_iChannelSetLimit = iChannel;
+    g_iChannelSetValue = iChannel;
     Channel &channel = Channel::get(iChannel);
     float minLimit = channel_dispatcher::getIMin(channel);
     float maxLimit = channel_dispatcher::getIMax(channel);
     float defLimit = channel_dispatcher::getIMax(channel);
-    changeLimit(channel,
+    changeValue(channel,
                 MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER, channel.index - 1),
                 minLimit, maxLimit, defLimit, onSetCurrentLimit);
 }
 
 void onSetPowerLimit(float limit) {
-    Channel &channel = Channel::get(g_iChannelSetLimit);
+    Channel &channel = Channel::get(g_iChannelSetValue);
     channel_dispatcher::setPowerLimit(channel, limit);
     popPage();
     infoMessage("Power limit changed!");
 }
 
 void changePowerLimit(int iChannel) {
-    g_iChannelSetLimit = iChannel;
+    g_iChannelSetValue = iChannel;
     Channel &channel = Channel::get(iChannel);
     float minLimit = channel_dispatcher::getPowerMinLimit(channel);
     float maxLimit = channel_dispatcher::getPowerMaxLimit(channel);
     float defLimit = channel_dispatcher::getPowerDefaultLimit(channel);
-    changeLimit(channel,
+    changeValue(channel,
                 MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT, channel.index - 1),
                 minLimit, maxLimit, defLimit, onSetPowerLimit);
+}
+
+void onSetPowerTripLevel(float level) {
+    Channel &channel = Channel::get(g_iChannelSetValue);
+    channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, level, channel.prot_conf.p_delay);
+    popPage();
+    infoMessage("Power protection level changed!");
+}
+
+void changePowerTripLevel(int iChannel) {
+    g_iChannelSetValue = iChannel;
+    Channel &channel = Channel::get(iChannel);
+    float minLevel = channel_dispatcher::getOppMinLevel(channel);
+    float maxLevel = channel_dispatcher::getOppMaxLevel(channel);
+    float defLevel = channel_dispatcher::getOppDefaultLevel(channel);
+    changeValue(channel,
+        MakeValue(channel_dispatcher::getPowerProtectionLevel(channel), UNIT_WATT, channel.index - 1),
+        minLevel, maxLevel, defLevel, onSetPowerTripLevel);
+}
+
+void onSetPowerTripDelay(float delay) {
+    Channel &channel = Channel::get(g_iChannelSetValue);
+    channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, channel_dispatcher::getPowerProtectionLevel(channel), delay);
+    popPage();
+    infoMessage("Power protection delay changed!");
+}
+
+void changePowerTripDelay(int iChannel) {
+    g_iChannelSetValue = iChannel;
+    Channel &channel = Channel::get(iChannel);
+    float minDelay = channel.OPP_MIN_DELAY;
+    float maxDelay = channel.OPP_MAX_DELAY;
+    float defaultDelay = channel.OPP_DEFAULT_DELAY;
+    changeValue(channel,
+        MakeValue(channel.prot_conf.p_delay, UNIT_SECOND, channel.index - 1),
+        minDelay, maxDelay, defaultDelay, onSetPowerTripDelay);
+}
+
+void onSetTemperatureTripLevel(float level) {
+    Channel &channel = Channel::get(g_iChannelSetValue);
+    channel_dispatcher::setOtpParameters(channel, temperature::getChannelSensorState(&channel) ? 1 : 0, level, temperature::getChannelSensorDelay(&channel));
+    popPage();
+    infoMessage("Temperature protection level changed!");
+}
+
+void changeTemperatureTripLevel(int iChannel) {
+    g_iChannelSetValue = iChannel;
+    Channel &channel = Channel::get(iChannel);
+    float minLevel = OTP_AUX_MIN_LEVEL;
+    float maxLevel = OTP_AUX_MAX_LEVEL;
+    float defLevel = OTP_AUX_DEFAULT_LEVEL;
+    changeValue(channel,
+        MakeValue(temperature::getChannelSensorLevel(&channel), UNIT_CELSIUS, channel.index - 1),
+        minLevel, maxLevel, defLevel, onSetTemperatureTripLevel);
+}
+
+void onSetTemperatureTripDelay(float delay) {
+    Channel &channel = Channel::get(g_iChannelSetValue);
+    channel_dispatcher::setOtpParameters(channel, temperature::getChannelSensorState(&channel) ? 1 : 0, temperature::getChannelSensorLevel(&channel), delay);
+    popPage();
+    infoMessage("Temperature protection delay changed!");
+}
+
+void changeTemperatureTripDelay(int iChannel) {
+    g_iChannelSetValue = iChannel;
+    Channel &channel = Channel::get(iChannel);
+    float minDelay = OTP_AUX_MIN_DELAY;
+    float maxDelay = OTP_AUX_MAX_DELAY;
+    float defaultDelay = OTP_CH_DEFAULT_DELAY;
+    changeValue(channel,
+        MakeValue(temperature::getChannelSensorDelay(&channel), UNIT_SECOND),
+        minDelay, maxDelay, defaultDelay, onSetTemperatureTripDelay);
 }
 
 void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_callback)()) {
@@ -490,16 +556,20 @@ bool isEncoderEnabledForWidget(const Widget *widget) {
     return widget->action == ACTION_ID_EDIT;
 }
 
-bool isEnabledFocusCursor(data::Cursor &cursor, uint16_t dataId) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
-    if (iChannel < 0 || iChannel >= CH_NUM) {
-    	return false;
+static bool g_focusCursorIsEnabled;
+
+void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
+    if (isEncoderEnabledForWidget(widgetCursor.widget)) {
+        if (g_focusCursor == widgetCursor.cursor && g_focusDataId == widgetCursor.widget->data) {
+            g_focusCursorIsEnabled = true;
+        }
     }
-    Channel &channel = Channel::get(iChannel);
-    return channel.isOk() &&
-           (channel_dispatcher::getVoltageTriggerMode(channel) == TRIGGER_MODE_FIXED ||
-            trigger::isIdle()) &&
-           !(dataId == DATA_ID_CHANNEL_U_EDIT && channel.isRemoteProgrammingEnabled());
+}
+
+bool isEnabledFocusCursor(data::Cursor &cursor, uint16_t dataId) {
+    g_focusCursorIsEnabled = false;
+    enumWidgets(isEnabledFocusCursorStep);
+    return g_focusCursorIsEnabled;
 }
 
 void isEncoderEnabledInActivePageCheckWidget(const WidgetCursor &widgetCursor) {
@@ -515,30 +585,35 @@ bool isEncoderEnabledInActivePage() {
     return g_isEncoderEnabledInActivePage;
 }
 
-void moveToNextFocusCursor() {
-    data::Cursor newCursor = g_focusCursor;
-    uint16_t newDataId = g_focusDataId;
+static int g_findNextFocusCursorState = 0; 
+static data::Cursor g_nextFocusCursor = Cursor(0);
+static uint16_t g_nextFocusDataId = DATA_ID_CHANNEL_U_EDIT;
 
-    for (int i = 0; i < CH_NUM * 2; ++i) {
-        if (newDataId == DATA_ID_CHANNEL_U_EDIT) {
-            newDataId = DATA_ID_CHANNEL_I_EDIT;
-        } else {
-            if (channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
-                newCursor.i = 0;
-            } else {
-                newCursor.i = (newCursor.i + 1) % CH_NUM;
-            }
-            newDataId = DATA_ID_CHANNEL_U_EDIT;
+void findNextFocusCursor(const WidgetCursor &widgetCursor) {
+    if (isEncoderEnabledForWidget(widgetCursor.widget)) {
+        if (g_findNextFocusCursorState == 0) {
+            g_nextFocusCursor = widgetCursor.cursor;
+            g_nextFocusDataId = widgetCursor.widget->data;
+            g_findNextFocusCursorState = 1;
         }
 
-        if (isEnabledFocusCursor(newCursor, newDataId)) {
-            setFocusCursor(newCursor, newDataId);
-            if (edit_mode::isActive()) {
-                edit_mode::update();
+        if (g_findNextFocusCursorState == 1) {
+            if (g_focusCursor == widgetCursor.cursor && g_focusDataId == widgetCursor.widget->data) {
+                g_findNextFocusCursorState = 2;
             }
-            return;
+        } else if (g_findNextFocusCursorState == 2) {
+            g_nextFocusCursor = widgetCursor.cursor;
+            g_nextFocusDataId = widgetCursor.widget->data;
+            g_findNextFocusCursorState = 3;
         }
     }
+}
+
+void moveToNextFocusCursor() {
+    g_findNextFocusCursorState = 0;
+    enumWidgets(findNextFocusCursor);
+    g_focusCursor = g_nextFocusCursor;
+    g_focusDataId = g_nextFocusDataId;
 }
 
 bool onEncoderConfirmation() {
@@ -575,8 +650,7 @@ void onEncoder(int tickCount, int counter, bool clicked) {
 
         if (isEncoderEnabledInActivePage()) {
             data::Value value;
-            if (persist_conf::devConf2.flags.encoderConfirmationMode &&
-                g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (persist_conf::devConf2.flags.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
                 value = g_focusEditValue;
             } else {
                 value = data::getEditValue(g_focusCursor, g_focusDataId);
@@ -596,13 +670,11 @@ void onEncoder(int tickCount, int counter, bool clicked) {
             }
 
             if (persist_conf::devConf2.flags.encoderConfirmationMode) {
-                g_focusEditValue =
-                    MakeValue(newValue, value.getUnit(), g_focusCursor.i > 0 ? g_focusCursor.i : 0);
+                g_focusEditValue = MakeValue(newValue, value.getUnit(), g_focusCursor.i > 0 ? g_focusCursor.i : 0);
                 g_focusEditValueChangedTime = micros();
             } else {
                 int16_t error;
-                if (!data::set(g_focusCursor, g_focusDataId,
-                               MakeValue(newValue, value.getUnit(), g_focusCursor.i), &error)) {
+                if (!data::set(g_focusCursor, g_focusDataId, MakeValue(newValue, value.getUnit(), g_focusCursor.i), &error)) {
                     psuErrorMessage(g_focusCursor, data::MakeScpiErrorValue(error));
                 }
             }
@@ -615,6 +687,7 @@ void onEncoder(int tickCount, int counter, bool clicked) {
                 return;
             }
         }
+
 #if defined(EEZ_PLATFORM_SIMULATOR)
         if (activePageId == PAGE_ID_NUMERIC_KEYPAD2) {
             if (((NumericKeypad *)getActiveKeypad())->onEncoder(counter)) {

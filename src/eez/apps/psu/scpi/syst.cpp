@@ -568,7 +568,7 @@ scpi_result_t scpi_cmd_systemChannelModelQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultText(context, channel->getBoardRevisionName());
+    SCPI_ResultText(context, channel->getBoardAndRevisionName());
 
     return SCPI_RES_OK;
 }

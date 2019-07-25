@@ -51,9 +51,9 @@ namespace psu {
 ////////////////////////////////////////////////////////////////////////////////
 
 static const char *CH_BOARD_NAMES[] = { "None", "DCP505", "DCP405", "DCM220" };
-
-static const char *CH_BOARD_REVISION_NAMES[] = { "None", "DCP505_R1B3", "DCP405_R1B1", "DCM220_R1B1" };
-
+static const char *CH_REVISION_NAMES[] = { "None", "R1B3", "R1B1", "R1B1" };
+static const char *CH_BOARD_AND_REVISION_NAMES[] = { "None", "DCP505_R1B3", "DCP405_R1B1", "DCM220_R1B1" };
+    
 static uint16_t CH_BOARD_REVISION_FEATURES[] = {
     // CH_BOARD_REVISION_NONE
     0,
@@ -1545,8 +1545,12 @@ const char *Channel::getBoardName() {
     return CH_BOARD_NAMES[boardRevision];
 }
 
-const char *Channel::getBoardRevisionName() {
-    return CH_BOARD_REVISION_NAMES[boardRevision];
+const char *Channel::getRevisionName() {
+    return CH_REVISION_NAMES[boardRevision];
+}
+
+const char *Channel::getBoardAndRevisionName() {
+    return CH_BOARD_AND_REVISION_NAMES[boardRevision];
 }
 
 uint16_t Channel::getFeatures() {

@@ -40,8 +40,7 @@ using namespace eez::home;
 namespace eez {
 namespace gui {
 
-void data_applications(data::DataOperationEnum operation, data::Cursor &cursor,
-                       data::Value &value) {
+void data_applications(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
         value = g_numApplications;
     }

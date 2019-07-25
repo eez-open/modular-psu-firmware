@@ -53,11 +53,6 @@ struct EnumItem {
 
 extern const data::EnumItem *g_enumDefinitions[];
 
-enum FloatPart {
-    FLOAT_PART_A = 0x20,
-    FLOAT_PART_B = 0x40
-};
-
 enum ValueOptions {
     VALUE_OPTIONS_NUM_SIGNIFICANT_DECIMAL_DIGITS_MASK = 0x0F,
     VALUE_OPTIONS_EXTENDED_PRECISION = 0x10
@@ -107,15 +102,6 @@ struct Value {
               (numSignificantDecimalDigits & VALUE_OPTIONS_NUM_SIGNIFICANT_DECIMAL_DIGITS_MASK) |
               (extendedPrecision ? VALUE_OPTIONS_EXTENDED_PRECISION : 0)),
           unit_(unit), float_(value) {
-    }
-
-    Value(float value, FloatPart floatPart, Unit unit = UNIT_UNKNOWN, int numSignificantDecimalDigits = 0,
-        bool extendedPrecision = false)
-        : type_(VALUE_TYPE_FLOAT),
-        options_(
-        (numSignificantDecimalDigits & VALUE_OPTIONS_NUM_SIGNIFICANT_DECIMAL_DIGITS_MASK) |
-            (extendedPrecision ? VALUE_OPTIONS_EXTENDED_PRECISION : 0) | floatPart),
-        unit_(unit), float_(value) {
     }
 
     Value(void *value, ValueType type) : type_(type), pVoid_(value) {
@@ -207,9 +193,6 @@ struct Value {
     void toText(char *text, int count) const;
     void formatFloatValue(float &value, Unit &unit, int &numSignificantDecimalDigits) const;
 
-    bool isFloatPartA() const { return (options_ & FLOAT_PART_A) != 0; }
-    bool isFloatPartB() const { return (options_ & FLOAT_PART_B) != 0; }
-
   public:
     ValueType type_;
     uint8_t options_;
@@ -291,12 +274,15 @@ enum DataOperationEnum {
 	DATA_OPERATION_GET_LABEL,
     DATA_OPERATION_COUNT,
     DATA_OPERATION_SELECT,
+    DATA_OPERATION_SET_CONTEXT,
     DATA_OPERATION_IS_BLINKING,
     DATA_OPERATION_SET
 };
 
 int count(uint16_t id);
 void select(Cursor &cursor, uint16_t id, int index);
+
+void setContext(Cursor &cursor, uint16_t id);
 
 int getFloatListLength(uint16_t id);
 float *getFloatList(uint16_t id);

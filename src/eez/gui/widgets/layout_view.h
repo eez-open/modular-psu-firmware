@@ -25,6 +25,7 @@ namespace gui {
 
 struct LayoutViewWidgetSpecific {
     int16_t layout; // page ID
+    uint16_t context; // data ID
 };
 
 void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);

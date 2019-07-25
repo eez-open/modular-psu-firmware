@@ -23,8 +23,17 @@
 namespace eez {
 namespace gui {
 
+enum {
+    DISPLAY_OPTION_ALL = 0,
+    DISPLAY_OPTION_INTEGER = 1,
+    DISPLAY_OPTION_FRACTION = 2,
+    DISPLAY_OPTION_FRACTION_AND_UNIT = 3,
+    DISPLAY_OPTION_UNIT = 4
+};
+
 struct DisplayDataWidget {
     uint16_t focusStyle;
+    uint8_t displayOption;
 };
 
 void DisplayDataWidget_draw(const WidgetCursor &widgetCursor);

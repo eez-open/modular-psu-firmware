@@ -278,13 +278,11 @@ class Channel {
 
     uint8_t boardRevision;
 
-  private:
     float U_MIN;
     float U_DEF;
     float U_MAX;
     float U_MAX_CONF;
 
-  public:
     float U_MIN_STEP;
     float U_DEF_STEP;
     float U_MAX_STEP;
@@ -298,13 +296,11 @@ class Channel {
     float OVP_DEFAULT_DELAY;
     float OVP_MAX_DELAY;
 
-  private:
     float I_MIN;
     float I_DEF;
     float I_MAX;
     float I_MAX_CONF;
 
-  public:
     float I_MIN_STEP;
     float I_DEF_STEP;
     float I_MAX_STEP;
@@ -503,8 +499,11 @@ class Channel {
     /// Returns name of the board of this channel.
     const char *getBoardName();
 
-    /// Returns name of the board revison of this channel.
-    const char *getBoardRevisionName();
+    /// Returns name of the revison of this channel.
+    const char *getRevisionName();
+    
+    /// Returns name of the board and revison of this channel.
+    const char *getBoardAndRevisionName();
 
     /// Returns features present (check ChannelFeatures) in board revision of this channel.
     uint16_t getFeatures();

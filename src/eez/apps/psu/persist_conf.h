@@ -58,7 +58,12 @@ struct DeviceFlags {
     unsigned isClickSoundEnabled : 1;
     unsigned ch1CalEnabled : 1;
     unsigned ch2CalEnabled : 1;
-    unsigned reserved : 16;
+    unsigned channelsViewModeInMax : 3;
+    unsigned channelsIsMaxView : 1;
+    unsigned channelMax: 2;
+    unsigned channelSmall1 : 2;
+    unsigned channelSmall2 : 2;
+    unsigned reserved : 6;
 };
 
 /// Device configuration block.
@@ -182,8 +187,12 @@ bool isProfileAutoRecallEnabled();
 bool setProfileAutoRecallLocation(int location);
 int getProfileAutoRecallLocation();
 
-void toggleChannelsViewMode();
 void setChannelsViewMode(unsigned int viewMode);
+void setChannelsViewModeInMax(unsigned int viewModeInMax);
+
+void toggleChannelsViewMode();
+
+void toggleChannelsMaxView(int channelIndex); // channelIndex starts from 1
 
 void loadChannelCalibration(Channel &channel);
 bool saveChannelCalibration(Channel &channel);

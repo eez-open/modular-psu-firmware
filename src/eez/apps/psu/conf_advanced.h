@@ -226,7 +226,7 @@
 
 /// Number of history values shown in YT diagram. This value must be the same as
 /// the width of YT widget.
-#define CHANNEL_HISTORY_SIZE 140
+#define CHANNEL_HISTORY_SIZE 352
 
 #define GUI_YT_VIEW_RATE_DEFAULT 0.1f
 #define GUI_YT_VIEW_RATE_MIN 0.01f

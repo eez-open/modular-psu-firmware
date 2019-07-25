@@ -281,7 +281,7 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback)
 }
 
 void enumWidgets(EnumWidgetsCallback callback) {
-	if (g_appContext->getActivePageId() == INTERNAL_PAGE_ID_NONE) {
+	if (g_appContext->getActivePageId() <= INTERNAL_PAGE_ID_NONE) {
 		return;
 	}
 	WidgetCursor widgetCursor;

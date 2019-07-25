@@ -45,6 +45,7 @@ using namespace eez::mcu::display;
 #include <eez/gui/widgets/yt_graph.h>
 
 #define NUM_CHANNELS_VIEW_MODES 3
+#define NUM_CHANNELS_VIEW_MODES_IN_MAX 3    
 
 namespace eez {
 namespace psu {
@@ -499,16 +500,94 @@ int getProfileAutoRecallLocation() {
     return devConf.profile_auto_recall_location;
 }
 
-void toggleChannelsViewMode() {
-    setChannelsViewMode(devConf.flags.channelsViewMode + 1);
-}
-
 void setChannelsViewMode(unsigned int channelsViewMode) {
     channelsViewMode = (channelsViewMode + 1) % NUM_CHANNELS_VIEW_MODES;
     if (channelsViewMode != devConf.flags.channelsViewMode) {
         devConf.flags.channelsViewMode = channelsViewMode;
         saveDevice();
     }
+}
+
+void setChannelsViewModeInMax(unsigned int channelsViewModeInMax) {
+    channelsViewModeInMax = (channelsViewModeInMax + 1) % NUM_CHANNELS_VIEW_MODES_IN_MAX;
+    if (channelsViewModeInMax != devConf.flags.channelsViewModeInMax) {
+        devConf.flags.channelsViewModeInMax = channelsViewModeInMax;
+        saveDevice();
+    }
+}
+
+void toggleChannelsViewMode() {
+    if (devConf.flags.channelsIsMaxView) {
+        setChannelsViewModeInMax(devConf.flags.channelsViewModeInMax + 1);
+    } else {
+        setChannelsViewMode(devConf.flags.channelsViewMode + 1);
+    }
+}
+
+void toggleChannelsMaxView(int channelIndex) {
+#if 1
+    // method 1: always the same order of small channels
+    if (devConf.flags.channelsIsMaxView) {
+        if (channelIndex == devConf.flags.channelMax) {
+            devConf.flags.channelsIsMaxView = 0;
+        } else {
+            devConf.flags.channelMax = channelIndex;
+        }
+    } else {
+        devConf.flags.channelsIsMaxView = 1;
+        devConf.flags.channelMax = channelIndex;
+    }
+    
+    if (devConf.flags.channelsIsMaxView) {
+        if (devConf.flags.channelMax == 1) {
+            devConf.flags.channelSmall1 = 2;
+            devConf.flags.channelSmall2 = 3;
+        } else if (devConf.flags.channelMax == 2) {
+            devConf.flags.channelSmall1 = 1;
+            devConf.flags.channelSmall2 = 3;
+        } else {
+            devConf.flags.channelSmall1 = 1;
+            devConf.flags.channelSmall2 = 2;
+        }
+    }
+#else
+    // method 2: swap max and small channel
+    if (devConf.flags.channelsIsMaxView) {
+        if (channelIndex == devConf.flags.channelMax) {
+            devConf.flags.channelsIsMaxView = 0;
+        } else {
+            if (devConf.flags.channelSmall1 == channelIndex) {
+                devConf.flags.channelSmall1 = devConf.flags.channelMax;
+            } else {
+                devConf.flags.channelSmall2 = devConf.flags.channelMax;
+            }
+            devConf.flags.channelMax = channelIndex;
+        }
+    } else {
+        devConf.flags.channelsIsMaxView = 1;
+        if (devConf.flags.channelMax != channelIndex) {
+            if (devConf.flags.channelSmall1 == channelIndex) {
+                devConf.flags.channelSmall1 = devConf.flags.channelMax;
+            } else if (devConf.flags.channelSmall2 == channelIndex) {
+                devConf.flags.channelSmall2 = devConf.flags.channelMax;
+            }
+            else {
+                if (channelIndex == 1) {
+                    devConf.flags.channelSmall1 = 2;
+                    devConf.flags.channelSmall2 = 3;
+                } else if (channelIndex == 2) {
+                    devConf.flags.channelSmall1 = 1;
+                    devConf.flags.channelSmall2 = 3;
+                } else {
+                    devConf.flags.channelSmall1 = 1;
+                    devConf.flags.channelSmall2 = 2;
+                }
+            }
+            devConf.flags.channelMax = channelIndex;
+        }
+    }
+#endif
+    saveDevice();
 }
 
 void loadChannelCalibration(Channel &channel) {

@@ -17,6 +17,7 @@
 */
 
 #include <eez/gui/dialogs.h>
+#include <eez/gui/gui.h>
 #include <eez/apps/home/touch_calibration.h>
 
 #include <eez/apps/home/home.h>
@@ -482,6 +483,15 @@ void action_profile_edit_remark() {
 
 void action_toggle_channels_view_mode() {
     persist_conf::toggleChannelsViewMode();
+}
+
+void action_toggle_channels_max_view() {
+    selectChannel();
+    persist_conf::toggleChannelsMaxView(g_channel->index);
+    showMainPage();
+}
+
+void action_set_channels_default_view() {
 }
 
 void action_ethernet_toggle() {
