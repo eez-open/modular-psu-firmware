@@ -646,7 +646,6 @@ class Channel {
 
     void setCcMode(bool cc_mode);
     void setCvMode(bool cv_mode);
-    void updateCcAndCvSwitch();
 
     void executeOutputEnable(bool enable);
     void doOutputEnable(bool enable);

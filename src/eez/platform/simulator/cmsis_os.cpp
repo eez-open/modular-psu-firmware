@@ -129,6 +129,12 @@ osMessageQId osMessageCreate(osMessageQId queue_id, osThreadId thread_id) {
 
 osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec) {
     while (queue_id->tail == queue_id->head) {
+#ifdef __EMSCRIPTEN__
+        return {
+            osOK,
+            0
+        };
+#else
         osDelay(millisec == 0 ? 1 : millisec);
         if (millisec == 0) {
             return {
@@ -136,6 +142,7 @@ osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec) {
                 0
             };
         }
+#endif
     }
     uint16_t tail = queue_id->tail + 1;
     if (tail >= queue_id->numElements) {

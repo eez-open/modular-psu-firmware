@@ -407,7 +407,6 @@ void Channel::set(uint8_t slotIndex_, uint8_t boardRevision_, float U_MIN_, floa
 
     flags.cvMode = 0;
     flags.ccMode = 0;
-    updateCcAndCvSwitch();
 }
 
 int Channel::reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionValue &cpv) {
@@ -1020,16 +1019,9 @@ void Channel::adcDataIsReady(int16_t data, bool startAgain) {
     }
 }
 
-void Channel::updateCcAndCvSwitch() {
-}
-
 void Channel::setCcMode(bool cc_mode) {
-    cc_mode = cc_mode && isOutputEnabled();
-
     if (cc_mode != flags.ccMode) {
         flags.ccMode = cc_mode;
-
-        updateCcAndCvSwitch();
 
         setOperBits(OPER_ISUM_CC, cc_mode);
         setQuesBits(QUES_ISUM_VOLT, cc_mode);
@@ -1041,12 +1033,8 @@ void Channel::setCcMode(bool cc_mode) {
 }
 
 void Channel::setCvMode(bool cv_mode) {
-    cv_mode = cv_mode && isOutputEnabled();
-
     if (cv_mode != flags.cvMode) {
         flags.cvMode = cv_mode;
-
-        updateCcAndCvSwitch();
 
         setOperBits(OPER_ISUM_CV, cv_mode);
         setQuesBits(QUES_ISUM_CURR, cv_mode);

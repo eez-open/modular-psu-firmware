@@ -73,7 +73,7 @@ void updateValues(Channel &channel) {
 
     g_uMon[i] = 0;
     g_iMon[i] = 0;
-    simulator::setCV(channel.index - 1, false);
+    simulator::setCV(channel.index - 1, true);
     simulator::setCC(channel.index - 1, false);
 }
 
@@ -90,6 +90,8 @@ bool AnalogDigitalConverter::test() {
 }
 
 void AnalogDigitalConverter::tick(uint32_t tick_usec) {
+    updateValues(channel);
+
     if (start_reg0) {
         int16_t adc_data = read();
         channel.eventAdcData(adc_data);
@@ -104,8 +106,6 @@ void AnalogDigitalConverter::start(uint8_t reg0) {
 }
 
 int16_t AnalogDigitalConverter::read() {
-    updateValues(channel);
-
     if (start_reg0 == AnalogDigitalConverter::ADC_REG0_READ_U_MON) {
         return g_uMon[channel.index - 1];
     }
