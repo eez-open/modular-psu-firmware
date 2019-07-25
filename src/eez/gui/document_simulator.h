@@ -1006,8 +1006,7 @@ enum StylesEnum {
     STYLE_ID_SET_VALUE_FOCUS_BALANCED = 111,
     STYLE_ID_FRONT_PANEL_DEFAULT = 112,
     STYLE_ID_DEFAULT_3 = 113,
-    STYLE_ID_ENCODER_CURSOR = 114,
-    STYLE_ID_BUTTON_BGND = 115
+    STYLE_ID_ENCODER_CURSOR = 114
 };
 
 enum PagesEnum {
@@ -1115,4 +1114,4 @@ enum PagesEnum {
     PAGE_ID_DCP405_SMALL = 101
 };
 
-extern const uint8_t assets[274176];
+extern const uint8_t assets[274181];
