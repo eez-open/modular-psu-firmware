@@ -161,6 +161,7 @@ bool init() {
     if ((IMG_Init(imgFlags) & imgFlags) != imgFlags) {
         printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
     } else {
+#if !defined(__EMSCRIPTEN__)
         // Set icon
         SDL_Surface *iconSurface = IMG_Load(getFullPath("images", ICON).c_str());
         if (!iconSurface) {
@@ -169,6 +170,7 @@ bool init() {
             SDL_SetWindowIcon(g_mainWindow, iconSurface);
             SDL_FreeSurface(iconSurface);
         }
+#endif
     }
 
     SDL_ShowWindow(g_mainWindow);
