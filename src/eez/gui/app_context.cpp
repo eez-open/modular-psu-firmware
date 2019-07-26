@@ -467,10 +467,11 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
     m_isTopPage = false;
 
     for (++i; i < m_pageNavigationStackPointer; i++) {
-
         bool paintedSaved = mcu::display::g_painted;
         mcu::display::g_painted = false;
         
+        widgetCursor.cursor = Cursor();
+
         m_activePageId = m_pageNavigationStack[i].pageId;
         m_activePage = m_pageNavigationStack[i].page;
         updatePage(m_pageNavigationStack[i].repaint || repaint, widgetCursor);
@@ -488,6 +489,8 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
     }
 
     m_isTopPage = true;
+
+    widgetCursor.cursor = Cursor();
 
     m_activePageId = m_activePageIdSaved;
     m_activePageIdSaved = INTERNAL_PAGE_ID_NONE;
