@@ -59,6 +59,7 @@ namespace gui {
 static int g_findWidgetAtX;
 static int g_findWidgetAtY;
 static WidgetCursor g_foundWidget;
+static int g_distanceToFoundWidget;
 
 bool g_isActiveWidget;
 
@@ -299,19 +300,40 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
     //     return;
     // }
 
-    bool inside = g_findWidgetAtX >= widgetCursor.x &&
-                  g_findWidgetAtX < widgetCursor.x + widget->w &&
-                  g_findWidgetAtY >= widgetCursor.y && g_findWidgetAtY < widgetCursor.y + widget->h;
+    static const int MIN_SIZE = 40;
+        
+    int x = widgetCursor.x;
+    int w = widget->w;
+    if (w < MIN_SIZE) {
+        x = x - (MIN_SIZE - w) / 2;
+        w = MIN_SIZE;
+    }
 
+    int y = widgetCursor.y;
+    int h = widget->h;
+    if (h < MIN_SIZE) {
+        y = y - (MIN_SIZE - h) / 2;
+        h = MIN_SIZE;
+    }
+
+    bool inside = g_findWidgetAtX >= x && g_findWidgetAtX < x + w && g_findWidgetAtY >= y && g_findWidgetAtY < y + h;
     if (inside && (widget->type == WIDGET_TYPE_APP_VIEW || getTouchFunction(widgetCursor))) {
-        g_foundWidget = widgetCursor;
 
-        // if found widget is AppView, make sure we set right AppContext
-        if (widget->type == WIDGET_TYPE_APP_VIEW) {
-            Value appContextValue;
-            g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET,
-                                                    (Cursor &)widgetCursor.cursor, appContextValue);
-            g_foundWidget.appContext = appContextValue.getAppContext();
+        int dx = g_findWidgetAtX - x;
+        int dy = g_findWidgetAtY - y;
+        int distance = dx * dx + dy * dy;
+
+        if (!g_foundWidget || distance <= g_distanceToFoundWidget) {
+            g_foundWidget = widgetCursor;
+            g_distanceToFoundWidget = distance;
+
+            // if found widget is AppView, make sure we set right AppContext
+            if (widget->type == WIDGET_TYPE_APP_VIEW) {
+                Value appContextValue;
+                g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET,
+                    (Cursor &)widgetCursor.cursor, appContextValue);
+                g_foundWidget.appContext = appContextValue.getAppContext();
+            }
         }
     }
 }
