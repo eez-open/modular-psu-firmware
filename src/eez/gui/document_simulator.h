@@ -1104,4 +1104,4 @@ enum PagesEnum {
     PAGE_ID_DCP405_SMALL = 101
 };
 
-extern const uint8_t assets[273870];
+extern const uint8_t assets[273875];
