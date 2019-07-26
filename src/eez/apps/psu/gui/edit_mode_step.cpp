@@ -54,6 +54,25 @@ static const Value CONF_GUI_I_STEPS[] = { data::Value(0.5f, UNIT_UNKNOWN, 2),
                                           data::Value(0.05f, UNIT_UNKNOWN, 2),
                                           data::Value(0.01f, UNIT_UNKNOWN, 2) };
 
+static const Value CONF_GUI_P_STEPS[] = { data::Value(10.0f, UNIT_UNKNOWN, 2),
+                                          data::Value(5.0f, UNIT_UNKNOWN, 2),
+                                          data::Value(2.0f, UNIT_UNKNOWN, 2),
+                                          data::Value(1.0f, UNIT_UNKNOWN, 2),
+                                          data::Value(0.5f, UNIT_UNKNOWN, 2) };
+
+static const Value CONF_GUI_TEMP_STEPS[] = { data::Value(20.0f, UNIT_UNKNOWN, 0),
+                                             data::Value(10.0f, UNIT_UNKNOWN, 0),
+                                             data::Value(5.0f, UNIT_UNKNOWN, 0),
+                                             data::Value(2.0f, UNIT_UNKNOWN, 0),
+                                             data::Value(1.0f, UNIT_UNKNOWN, 0) };
+
+static const Value CONF_GUI_TIME_STEPS[] = { data::Value(30, UNIT_UNKNOWN, 0),
+                                             data::Value(20, UNIT_UNKNOWN, 0),
+                                             data::Value(10, UNIT_UNKNOWN, 0),
+                                             data::Value(5, UNIT_UNKNOWN, 0),
+                                             data::Value(1, UNIT_UNKNOWN, 0) };
+
+
 static int g_stepIndex[CH_MAX][2];
 
 static const int DEFAULT_INDEX = 3;
@@ -63,25 +82,41 @@ static int g_startPos;
 
 float getStepValue() {
     if (edit_mode::getUnit() == UNIT_VOLT) {
-        return CONF_GUI_U_STEPS[getStepIndex()].getFloat();
+        return getStepValues()[getStepIndex()].getFloat();
     } else {
-        return CONF_GUI_I_STEPS[getStepIndex()].getFloat();
+        return getStepValues()[getStepIndex()].getFloat();
     }
 }
 
 int getStepValuesCount() {
     if (edit_mode::getUnit() == UNIT_VOLT) {
         return sizeof(CONF_GUI_U_STEPS) / sizeof(Value);
-    } else {
+    } else if (edit_mode::getUnit() == UNIT_AMPER) {
         return sizeof(CONF_GUI_I_STEPS) / sizeof(Value);
+    } else if (edit_mode::getUnit() == UNIT_WATT) {
+        return sizeof(CONF_GUI_P_STEPS) / sizeof(Value);
+    } else if (edit_mode::getUnit() == UNIT_CELSIUS) {
+        return sizeof(CONF_GUI_TEMP_STEPS) / sizeof(Value);
+    } else if (edit_mode::getUnit() == UNIT_SECOND) {
+        return sizeof(CONF_GUI_TIME_STEPS) / sizeof(Value);
+    } else {
+        return sizeof(CONF_GUI_U_STEPS) / sizeof(Value);
     }
 }
 
 const data::Value *getStepValues() {
     if (edit_mode::getUnit() == UNIT_VOLT) {
         return CONF_GUI_U_STEPS;
-    } else {
+    } else if (edit_mode::getUnit() == UNIT_AMPER) {
         return CONF_GUI_I_STEPS;
+    } else if (edit_mode::getUnit() == UNIT_WATT) {
+        return CONF_GUI_P_STEPS;
+    } else if (edit_mode::getUnit() == UNIT_CELSIUS) {
+        return CONF_GUI_TEMP_STEPS;
+    } else if (edit_mode::getUnit() == UNIT_SECOND) {
+        return CONF_GUI_TIME_STEPS;
+    } else {
+        return CONF_GUI_U_STEPS;
     }
 }
 
