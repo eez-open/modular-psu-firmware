@@ -1817,6 +1817,32 @@ void data_cal_ch_i1_max(data::DataOperationEnum operation, data::Cursor &cursor,
     }
 }
 
+void data_channel_protection_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        Channel &channel = Channel::get(iChannel);
+
+        bool ovp = channel_dispatcher::isOvpTripped(channel);
+        bool ocp = channel_dispatcher::isOcpTripped(channel);
+        bool opp = channel_dispatcher::isOppTripped(channel);
+        bool otp = channel_dispatcher::isOtpTripped(channel);
+
+        if (!ovp && !ocp && !opp && !otp) {
+            value = 0;
+        } else if (ovp && !ocp && !opp && !otp) {
+            value = 1;
+        } else if (!ovp && ocp && !opp && !otp) {
+            value = 2;
+        } else if (!ovp && !ocp && opp && !otp) {
+            value = 3;
+        } else if (!ovp && !ocp && !opp && otp) {
+            value = 4;
+        } else {
+            value = 5;
+        }
+    }
+}
+
 void data_channel_protection_ovp_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
