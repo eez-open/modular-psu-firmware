@@ -157,6 +157,8 @@ void nonInteractiveSet() {
     int16_t error;
     if (!data::set(g_focusCursor, g_focusDataId, g_editValue, &error)) {
         psuErrorMessage(g_focusCursor, data::MakeScpiErrorValue(error));
+    } else {
+        popPage();
     }
 }
 
