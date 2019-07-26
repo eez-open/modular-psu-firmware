@@ -20,11 +20,15 @@
 
 #if OPTION_DISPLAY
 
+#include <eez/gui/gui.h>
 #include <eez/apps/psu/gui/edit_mode.h>
 #include <eez/apps/psu/gui/edit_mode_keypad.h>
 #include <eez/apps/psu/gui/numeric_keypad.h>
 
 namespace eez {
+
+using namespace gui;
+
 namespace psu {
 namespace gui {
 namespace edit_mode_keypad {
@@ -35,11 +39,12 @@ NumericKeypad *g_keypad;
 ////////////////////////////////////////////////////////////////////////////////
 
 void onKeypadOk(float value) {
-    edit_mode::setValue(value);
+    if (edit_mode::setValue(value)) {
+        popPage();
+    }
 }
 
-void enter(Channel &channel, const eez::gui::data::Value &editValue,
-           const eez::gui::data::Value &minValue, eez::gui::data::Value &maxValue) {
+void enter(Channel &channel, const eez::gui::data::Value &editValue, const eez::gui::data::Value &minValue, eez::gui::data::Value &maxValue) {
     g_keypad = &g_theKeypad;
 
     NumericKeypadOptions options;

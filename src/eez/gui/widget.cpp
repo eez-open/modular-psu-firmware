@@ -248,8 +248,7 @@ void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
 void findWidgetStep(const WidgetCursor &widgetCursor);
 
-void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) 
-{
+void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     if (g_appContext->isActivePageInternal()) {
     	if (callback != findWidgetStep) {
     		return;
@@ -316,22 +315,24 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
         h = MIN_SIZE;
     }
 
-    bool inside = g_findWidgetAtX >= x && g_findWidgetAtX < x + w && g_findWidgetAtY >= y && g_findWidgetAtY < y + h;
+    bool inside = 
+        g_findWidgetAtX >= x && g_findWidgetAtX < x + w && 
+        g_findWidgetAtY >= y && g_findWidgetAtY < y + h;
+
     if (inside && (widget->type == WIDGET_TYPE_APP_VIEW || getTouchFunction(widgetCursor))) {
 
-        int dx = g_findWidgetAtX - x;
-        int dy = g_findWidgetAtY - y;
+        int dx = g_findWidgetAtX - (x + w / 2);
+        int dy = g_findWidgetAtY - (y + h / 2);
         int distance = dx * dx + dy * dy;
 
-        if (!g_foundWidget || distance <= g_distanceToFoundWidget) {
+        if (!g_foundWidget || distance <= g_distanceToFoundWidget || g_foundWidget.widget->type == WIDGET_TYPE_APP_VIEW) {
             g_foundWidget = widgetCursor;
             g_distanceToFoundWidget = distance;
 
             // if found widget is AppView, make sure we set right AppContext
             if (widget->type == WIDGET_TYPE_APP_VIEW) {
                 Value appContextValue;
-                g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET,
-                    (Cursor &)widgetCursor.cursor, appContextValue);
+                g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, appContextValue);
                 g_foundWidget.appContext = appContextValue.getAppContext();
             }
         }

@@ -546,8 +546,7 @@ void NumericKeypad::ok() {
 
             if (!isNaN(m_options.min) && less(value, m_options.min, m_startValue.getUnit(), m_options.channelIndex)) {
                 psuErrorMessage(0, MakeLessThenMinMessageValue(m_options.min, m_startValue));
-            } else if (!isNaN(m_options.max) && greater(value, m_options.max, m_startValue.getUnit(),
-                               m_options.channelIndex)) {
+            } else if (!isNaN(m_options.max) && greater(value, m_options.max, m_startValue.getUnit(), m_options.channelIndex)) {
                 psuErrorMessage(0, MakeGreaterThenMaxMessageValue(m_options.max, m_startValue));
             } else {
                 m_okFloatCallback(value);

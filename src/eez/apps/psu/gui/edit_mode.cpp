@@ -75,33 +75,33 @@ void enter(int tabIndex) {
         if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT) {
             changeVoltageLimit(g_channel->index - 1);
             return;
-        } 
-        
+        }
+
         if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT) {
             changeCurrentLimit(g_channel->index - 1);
             return;
         }
-        
+
         if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT) {
             changePowerLimit(g_channel->index - 1);
             return;
         }
-        
+
         if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL) {
             changePowerTripLevel(g_channel->index - 1);
             return;
         }
-        
+
         if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL) {
             changeTemperatureTripLevel(g_channel->index - 1);
             return;
         }
-        
+
         if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY) {
             changePowerTripDelay(g_channel->index - 1);
             return;
         }
-        
+
         if (getFoundWidgetAtDown().widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY) {
             changeTemperatureTripDelay(g_channel->index - 1);
             return;
@@ -207,82 +207,107 @@ bool setValue(float value_) {
     return true;
 }
 
-void getInfoText(int part, char *infoText) {
-    // channel 0 u part 0
-    // channel 0 u part 1
-    // channel 0 u part 2
-    // channel 0 i part 0
-    // channel 0 i part 1
-    // channel 0 i part 2
-    // channel 1 u part 0
-    // channel 1 u part 1
-    // channel 1 u part 2
-    // channel 1 i part 0
-    // channel 1 i part 1
-    // channel 1 i part 2
-    // ...
+int getInfoTextPartIndex(data::Cursor &cursor, uint16_t dataId) {
+    int dataIdIndex;
+    
+    if (dataId == DATA_ID_CHANNEL_U_SET || dataId == DATA_ID_CHANNEL_U_EDIT) {
+        dataIdIndex = 0;
+    } else if (dataId == DATA_ID_CHANNEL_I_SET || dataId == DATA_ID_CHANNEL_I_EDIT) {
+        dataIdIndex = 1;
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT) {
+        dataIdIndex = 2;
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT) {
+        dataIdIndex = 3;
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT) {
+        dataIdIndex = 4;
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL) {
+        dataIdIndex = 5;
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY) {
+        dataIdIndex = 6;
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL) {
+        dataIdIndex = 7;
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY) {
+        dataIdIndex = 8;
+    } else {
+        dataIdIndex = 9;
+    }
 
-    int iChannel = part / 6;
+    return g_focusCursor.i * 10 + dataIdIndex;
+}
 
-    part %= 6;
+void getInfoText(int partIndex, char *infoText) {
+    int iChannel = partIndex / 10;
+
+    int dataIdIndex = partIndex % 10;
 
     int dataId;
-    if (part / 3 == 0) {
+    const char *dataName;
+    const char *unitName;
+    int numSignificantDecimalDigits = 2;
+    if (dataIdIndex == 0) {
         dataId = DATA_ID_CHANNEL_U_EDIT;
-    } else {
+        dataName = "Voltage";
+        unitName = "V";
+    } else if (dataIdIndex == 1) {
         dataId = DATA_ID_CHANNEL_I_EDIT;
-    }
-
-    part %= 3;
-
-    Channel &channel = Channel::get(iChannel);
-    if (dataId == DATA_ID_CHANNEL_I_EDIT) {
-        if (part == 0 || part == 1) {
-            if (channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
-                strcpy(infoText, "Set current");
-            } else {
-                sprintf(infoText, "Set Ch%d current", channel.index);
-            }
-        } else {
-            *infoText = 0;
-        }
-
-        if (part == 0) {
-            strcat(infoText, " ");
-        }
-
-        if (part == 0 || part == 2) {
-            strcat(infoText, "[");
-            strcatFloat(infoText, g_minValue.getFloat(), 2);
-            strcat(infoText, "-");
-            strcatCurrent(infoText, channel_dispatcher::getILimit(Channel::get(g_focusCursor.i)),
-                          2);
-            strcat(infoText, "]");
-        }
+        dataName = "Current";
+        unitName = "A";
+    } else if (dataIdIndex == 2) {
+        dataId = DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT;
+        dataName = "OVP Limit";
+        unitName = "V";
+    } else if (dataIdIndex == 3) {
+        dataId = DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT;
+        dataName = "OCP Limit";
+        unitName = "A";
+    } else if (dataIdIndex == 4) {
+        dataId = DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT;
+        dataName = "OPP Limit";
+        unitName = "W";
+    } else if (dataIdIndex == 5) {
+        dataId = DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL;
+        dataName = "OPP Level";
+        unitName = "W";
+    } else if (dataIdIndex == 6) {
+        dataId = DATA_ID_CHANNEL_PROTECTION_OPP_DELAY;
+        dataName = "OPP Delay";
+        unitName = "s";
+        numSignificantDecimalDigits = 0;
+    } else if (dataIdIndex == 7) {
+        dataId = DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL;
+        dataName = "OTP Level";
+        unitName = "oC";
+        numSignificantDecimalDigits = 0;
+    } else if (dataIdIndex == 8) {
+        dataId = DATA_ID_CHANNEL_PROTECTION_OTP_DELAY;
+        dataName = "OTP Delay";
+        unitName = "s";
+        numSignificantDecimalDigits = 0;
     } else {
-        if (part == 0 || part == 1) {
-            if (channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
-                strcpy(infoText, "Set voltage");
-            } else {
-                sprintf(infoText, "Set Ch%d voltage", channel.index);
-            }
-        } else {
-            *infoText = 0;
-        }
-
-        if (part == 0) {
-            strcat(infoText, " ");
-        }
-
-        if (part == 0 || part == 2) {
-            strcat(infoText, "[");
-            strcatFloat(infoText, g_minValue.getFloat(), 2);
-            strcat(infoText, "-");
-            strcatVoltage(infoText, channel_dispatcher::getULimit(Channel::get(g_focusCursor.i)),
-                          2);
-            strcat(infoText, "]");
-        }
+        dataId = DATA_ID_NONE;
+        dataName = "Unknown";
+        unitName = "";
     }
+
+    data::Cursor cursor(iChannel);
+    float minValue = data::getMin(cursor, dataId).getFloat();
+    float maxValue = (dataId == DATA_ID_CHANNEL_U_EDIT || dataId == DATA_ID_CHANNEL_I_EDIT) ?
+        data::getLimit(cursor, dataId).getFloat() : data::getMax(cursor, dataId).getFloat();
+
+    if (channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
+        strcpy(infoText, "Set ");
+    } else {
+        sprintf(infoText, "Set Ch%d ", iChannel + 1);
+    }
+
+    strcat(infoText, dataName);
+
+    strcat(infoText, " [");
+    strcatFloat(infoText, minValue, numSignificantDecimalDigits);
+    strcat(infoText, "-");
+    strcatFloat(infoText, maxValue, numSignificantDecimalDigits);
+    strcat(infoText, unitName);
+    strcat(infoText, "]");
 }
 
 } // namespace edit_mode

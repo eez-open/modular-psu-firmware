@@ -881,14 +881,11 @@ void data_channel_u_set(data::DataOperationEnum operation, data::Cursor &cursor,
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
     } else if (operation == data::DATA_OPERATION_SET) {
-        if (!psu::between(value.getFloat(), channel_dispatcher::getUMin(channel),
-                          channel_dispatcher::getUMax(channel), UNIT_VOLT, iChannel)) {
+        if (!psu::between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel), UNIT_VOLT, iChannel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
-        } else if (psu::greater(value.getFloat(), channel_dispatcher::getULimit(channel), UNIT_VOLT,
-                                iChannel)) {
+        } else if (psu::greater(value.getFloat(), channel_dispatcher::getULimit(channel), UNIT_VOLT, iChannel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
-        } else if (psu::greater(value.getFloat() * channel_dispatcher::getISetUnbalanced(channel),
-                                channel_dispatcher::getPowerLimit(channel), UNIT_WATT, iChannel)) {
+        } else if (psu::greater(value.getFloat() * channel_dispatcher::getISetUnbalanced(channel), channel_dispatcher::getPowerLimit(channel), UNIT_WATT, iChannel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {
             channel_dispatcher::setVoltage(channel, value.getFloat());
@@ -910,8 +907,7 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT, iChannel);
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
         int position = value.getInt();
-        value =
-            MakeValue(channel_dispatcher::getUMonHistory(channel, position), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMonHistory(channel, position), UNIT_VOLT, iChannel);
     }
 }
 
@@ -938,12 +934,10 @@ void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor &cursor
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        bool focused = (g_focusCursor == cursor || channel_dispatcher::isCoupled()) &&
-                       g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
+        bool focused = (g_focusCursor == cursor || channel_dispatcher::isCoupled()) && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
-        } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD &&
-                   edit_mode_keypad::g_keypad->isEditing()) {
+        } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
             value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT, iChannel);
@@ -959,14 +953,11 @@ void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor &cursor
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
     } else if (operation == data::DATA_OPERATION_SET) {
-        if (!psu::between(value.getFloat(), channel_dispatcher::getUMin(channel),
-                          channel_dispatcher::getUMax(channel), UNIT_VOLT, iChannel)) {
+        if (!psu::between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel), UNIT_VOLT, iChannel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
-        } else if (psu::greater(value.getFloat(), channel_dispatcher::getULimit(channel), UNIT_VOLT,
-                                iChannel)) {
+        } else if (psu::greater(value.getFloat(), channel_dispatcher::getULimit(channel), UNIT_VOLT,  iChannel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
-        } else if (psu::greater(value.getFloat() * channel_dispatcher::getISetUnbalanced(channel),
-                                channel_dispatcher::getPowerLimit(channel), UNIT_WATT, iChannel)) {
+        } else if (psu::greater(value.getFloat() * channel_dispatcher::getISetUnbalanced(channel), channel_dispatcher::getPowerLimit(channel), UNIT_WATT, iChannel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {
             channel_dispatcher::setVoltage(channel, value.getFloat());
@@ -1269,25 +1260,7 @@ void data_edit_unit(data::DataOperationEnum operation, data::Cursor &cursor, dat
 
 void data_edit_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int editInfoPartOffset =
-            g_focusCursor.i * 6 + (g_focusDataId == DATA_ID_CHANNEL_U_EDIT ? 0 : 1) * 3;
-        value = data::Value(0 + editInfoPartOffset, VALUE_TYPE_EDIT_INFO);
-    }
-}
-
-void data_edit_info1(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        int editInfoPartOffset =
-            g_focusCursor.i * 6 + (g_focusDataId == DATA_ID_CHANNEL_U_EDIT ? 0 : 1) * 3;
-        value = data::Value(1 + editInfoPartOffset, VALUE_TYPE_EDIT_INFO);
-    }
-}
-
-void data_edit_info2(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        int editInfoPartOffset =
-            g_focusCursor.i * 6 + (g_focusDataId == DATA_ID_CHANNEL_U_EDIT ? 0 : 1) * 3;
-        value = data::Value(2 + editInfoPartOffset, VALUE_TYPE_EDIT_INFO);
+        value = data::Value(edit_mode::getInfoTextPartIndex(g_focusCursor, g_focusDataId), VALUE_TYPE_EDIT_INFO);
     }
 }
 

@@ -612,8 +612,10 @@ void findNextFocusCursor(const WidgetCursor &widgetCursor) {
 void moveToNextFocusCursor() {
     g_findNextFocusCursorState = 0;
     enumWidgets(findNextFocusCursor);
-    g_focusCursor = g_nextFocusCursor;
-    g_focusDataId = g_nextFocusDataId;
+    if (g_findNextFocusCursorState > 0) {
+        g_focusCursor = g_nextFocusCursor;
+        g_focusDataId = g_nextFocusDataId;
+    }
 }
 
 bool onEncoderConfirmation() {
