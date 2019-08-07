@@ -325,7 +325,7 @@ void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, 
         display::setOpacity(style->opacity);
     }
 
-    display::drawBitmap(x_offset, y_offset, width, height, bitmapPixels, bpp);
+    display::drawBitmap(bitmapPixels, bpp, width, x_offset, y_offset, width, height);
 
     display::setOpacity(savedOpacity);
 }

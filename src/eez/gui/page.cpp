@@ -75,6 +75,45 @@ void SetPage::discard() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+InternalPage::InternalPage() {
+    shadowIsDrawn = false;
+}
+
+void InternalPage::drawShadow() {
+    if (shadowIsDrawn) {
+        return;
+    }
+
+    int x1 = x;
+    int y1 = y;
+    int x2 = x + width - 1;
+    int y2 = y + height - 1;
+
+	// BITMAP_ID_RECTANGLE_TRANSPARENT_SHADOW
+	// 480 x 339
+	// 16, 21, 29, 19
+
+    auto bitmap = (Bitmap *)(g_bitmapsData + ((uint32_t *)g_bitmapsData)[BITMAP_ID_RECTANGLE_TRANSPARENT_SHADOW - 1]);
+
+    auto bitmapPixels = (uint32_t *)&bitmap->pixels[0];
+
+    display::drawBitmap(bitmapPixels, 32, bitmap->w, x1 - 19, y1 - 16, (x1 + x2) / 2 - (x1 - 19) + 1, 16);
+    display::drawBitmap(bitmapPixels + 480 - (x2 + 21 - ((x1 + x2) / 2 + 1) + 1), 32, bitmap->w, (x1 + x2) / 2 + 1, y1 - 16, x2 + 21 - ((x1 + x2) / 2 + 1) + 1, 16);
+
+    display::drawBitmap(bitmapPixels + 16 * bitmap->w, 32, bitmap->w, x1 - 19, y1, 19, (y1 + y2) / 2 - y1 + 1);
+    display::drawBitmap(bitmapPixels + (339 - 29 - (y2 - ((y1 + y2) / 2 + 1) + 1)) * bitmap->w, 32, bitmap->w, x1 - 19, (y1 + y2) / 2 + 1, 19, y2 - ((y1 + y2) / 2 + 1) + 1);
+
+    display::drawBitmap(bitmapPixels + 16 * bitmap->w + 480 - 21, 32, bitmap->w, x2 + 1, y1, 21, (y1 + y2) / 2 - y1 + 1);
+    display::drawBitmap(bitmapPixels + (339 - 29 - (y2 - ((y1 + y2) / 2 + 1) + 1)) * bitmap->w + 480 - 21, 32, bitmap->w, x2 + 1, (y1 + y2) / 2 + 1, 21, y2 - ((y1 + y2) / 2 + 1) + 1);
+
+    display::drawBitmap(bitmapPixels + (339 - 29) * bitmap->w, 32, bitmap->w, x1 - 19, y2 + 1, (x1 + x2) / 2 - (x1 - 19) + 1, 29);
+    display::drawBitmap(bitmapPixels + (339 - 29) * bitmap->w + 480 - (x2 + 21 - ((x1 + x2) / 2 + 1) + 1), 32, bitmap->w, (x1 + x2) / 2 + 1, y2 + 1, x2 + 21 - ((x1 + x2) / 2 + 1) + 1, 29);
+
+    shadowIsDrawn = true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 ToastMessagePage::ToastMessagePage(ToastType type_, const char *message1_) 
     : type(type_), message1(message1_), message2(nullptr), message3(nullptr)
 {
@@ -143,6 +182,8 @@ void ToastMessagePage::refresh() {
     int y1 = y;
     int x2 = x + width - 1;
     int y2 = y + height - 1;
+
+    drawShadow();
 
     int borderRadius = style->border_radius;
     if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
@@ -305,6 +346,8 @@ void SelectFromEnumPage::init() {
     }
 
     findPagePosition();
+
+    shadowIsDrawn = false;
 }
 
 uint8_t SelectFromEnumPage::getValue(int i) {
@@ -336,19 +379,21 @@ bool SelectFromEnumPage::isDisabled(int i) {
 void SelectFromEnumPage::findPagePosition() {
 	const WidgetCursor &widgetCursorAtTouchDown = getFoundWidgetAtDown();
 	x = widgetCursorAtTouchDown.x;
-    int right = g_appContext->x + g_appContext->width - 10;
+    int right = g_appContext->x + g_appContext->width - 22;
     if (x + width > right) {
         x = right - width;
 	}
 
     y = widgetCursorAtTouchDown.y + widgetCursorAtTouchDown.widget->h;
-    int bottom = g_appContext->y + g_appContext->height - 10;
+    int bottom = g_appContext->y + g_appContext->height - 30;
     if (y + height > bottom) {
         y = bottom - height;
 	}
 }
 
 void SelectFromEnumPage::refresh() {
+    drawShadow();
+
     const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
 	const Style *itemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
 	const Style *disabledItemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);

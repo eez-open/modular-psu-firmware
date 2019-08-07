@@ -66,25 +66,75 @@ uint32_t vramOffset(uint16_t *vram, int x, int y) {
     return (uint32_t)(vram + y * DISPLAY_WIDTH + x);
 }
 
-void fillRect(uint16_t *src, int x, int y, int width, int height, uint16_t color) {
-    hdma2d.Init.Mode = DMA2D_R2M;
-    hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
-    hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
-
-    uint32_t colorBGRA;
-    uint8_t *pcolorBGRA = (uint8_t *)&colorBGRA;
-    pcolorBGRA[0] = COLOR_TO_B(color);
-    pcolorBGRA[1] = COLOR_TO_G(color);
-    pcolorBGRA[2] = COLOR_TO_R(color);
-    pcolorBGRA[3] = 255;
-
-    DMA2D_WAIT;
-    HAL_DMA2D_Init(&hdma2d);
-    HAL_DMA2D_Start(&hdma2d, colorBGRA, vramOffset(src, x, y), width, height);
+uint32_t vramOffset(uint32_t *vram, int x, int y) {
+    return (uint32_t)(vram + y * DISPLAY_WIDTH + x);
 }
 
-void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x, int y, int width,
-            int height) {
+void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color) {
+	if (g_opacity == 255) {
+		hdma2d.Init.Mode = DMA2D_R2M;
+		hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+		hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+
+		uint32_t colorBGRA;
+		uint8_t *pcolorBGRA = (uint8_t *)&colorBGRA;
+		pcolorBGRA[0] = COLOR_TO_B(color);
+		pcolorBGRA[1] = COLOR_TO_G(color);
+		pcolorBGRA[2] = COLOR_TO_R(color);
+		pcolorBGRA[3] = 255;
+
+		DMA2D_WAIT;
+		HAL_DMA2D_Init(&hdma2d);
+		HAL_DMA2D_Start(&hdma2d, colorBGRA, vramOffset(dst, x, y), width, height);
+	} else {
+		// fill aux. buffer with BGRA color
+		auto auxBuffer = (uint32_t *)VRAM_BUFFER3_START_ADDRESS;
+
+		hdma2d.Init.Mode = DMA2D_R2M;
+		hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
+		hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+
+		uint32_t colorBGRA;
+		uint8_t *pcolorBGRA = (uint8_t *)&colorBGRA;
+		pcolorBGRA[0] = COLOR_TO_B(color);
+		pcolorBGRA[1] = COLOR_TO_G(color);
+		pcolorBGRA[2] = COLOR_TO_R(color);
+		pcolorBGRA[3] = g_opacity;
+
+		auto auxBufferOffset = vramOffset(auxBuffer, x, y);
+
+		DMA2D_WAIT;
+		HAL_DMA2D_Init(&hdma2d);
+		HAL_DMA2D_Start(&hdma2d, colorBGRA, auxBufferOffset, width, height);
+
+		// blend aux. buffer with dst buffer
+	    hdma2d.Init.Mode = DMA2D_M2M_BLEND;
+	    hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+	    hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+
+		hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - width;
+		hdma2d.LayerCfg[0].InputColorMode = DMA2D_OUTPUT_RGB565;
+		hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+		hdma2d.LayerCfg[0].InputAlpha = 0;
+
+		hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - width;
+		hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_ARGB8888;
+		hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+		hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
+		hdma2d.LayerCfg[1].InputAlpha = 0;
+
+	    auto dstOffset = vramOffset(dst, x, y);
+
+	    DMA2D_WAIT;
+
+	    HAL_DMA2D_Init(&hdma2d);
+	    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
+		HAL_DMA2D_ConfigLayer(&hdma2d, 0);
+		HAL_DMA2D_BlendingStart(&hdma2d, auxBufferOffset, dstOffset, dstOffset, width, height);
+	}
+}
+
+void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x, int y, int width, int height) {
 //    if (srcBpp == 32) {
 //        hdma2d.Init.Mode = DMA2D_R2M;
 //        hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
@@ -639,9 +689,8 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
     g_painted = true;
 }
 
-void drawBitmap(int x, int y, int sx, int sy, void *data, int bpp) {
-    bitBlt(data, bpp, 0, g_buffer, x, y, sx, sy);
-
+void drawBitmap(void *bitmapData, int bitmapBpp, int bitmapWidth, int x, int y, int width, int height) {
+    bitBlt(bitmapData, bitmapBpp, bitmapWidth - width, g_buffer, x, y, width, height);
     g_painted = true;
 }
 

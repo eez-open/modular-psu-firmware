@@ -54,6 +54,8 @@ class SetPage : public Page {
 
 class InternalPage : public Page {
   public:
+    InternalPage();
+
     virtual void refresh() = 0; // repaint page
     virtual void updatePage() = 0;
 	  virtual WidgetCursor findWidget(int x, int y) = 0;
@@ -64,7 +66,9 @@ class InternalPage : public Page {
     int height;
 
   protected:
-	Widget widget;
+	  Widget widget;
+    bool shadowIsDrawn;
+    void drawShadow();
 };
 
 enum ToastType {
@@ -130,7 +134,7 @@ class SelectFromEnumPage : public InternalPage {
     bool (*disabledCallback)(uint8_t value);
     void (*onSet)(uint8_t);
 
-	void findPagePosition();
+    void findPagePosition();
 
     bool isDisabled(int i);
 

@@ -648,26 +648,30 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
     g_painted = true;
 }
 
-void drawBitmap(int x, int y, int sx, int sy, void *data, int bpp) {
-    if (bpp == 32) {
-        setXY(x, y, x + sx - 1, y + sy - 1);
+void drawBitmap(void *bitmapData, int bitmapBpp, int bitmapWidth, int x, int y, int width, int height) {
+    if (bitmapBpp == 32) {
+        setXY(x, y, x + width - 1, y + height - 1);
 
         uint32_t pixel;
         uint8_t *pixelAlpha = ((uint8_t *)&pixel) + 3;
 
-        uint32_t *p = (uint32_t *)data;
-        uint32_t *end = p + sx * sy;
-        while (p < end) {
-            pixel = *p++;
-            *pixelAlpha = *pixelAlpha * g_opacity / 255;
-            setPixel(blendColor(pixel, *getDst()));
+        uint32_t *p = (uint32_t *)bitmapData;
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                pixel = *p++;
+                *pixelAlpha = *pixelAlpha * g_opacity / 255;
+                setPixel(blendColor(pixel, *getDst()));
+            }
+            p += bitmapWidth - width;
         }
     } else {
-        setXY(x, y, x + sx - 1, y + sy - 1);
-        uint16_t *p = (uint16_t *)data;
-        uint16_t *end = p + sx * sy;
-        while (p < end) {
-            setPixel(*p++);
+        setXY(x, y, x + width - 1, y + height - 1);
+        uint16_t *p = (uint16_t *)bitmapData;
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                setPixel(*p++);
+            }
+            p += bitmapWidth - width;
         }
     }
 
