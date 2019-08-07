@@ -62,6 +62,8 @@
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/system/arch"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../libscpi/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/port&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;"/>
@@ -172,6 +174,8 @@
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/system/arch"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../libscpi/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/port&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;"/>
@@ -233,6 +237,7 @@
 						<entry excluding="third_party" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
 						<entry excluding="gui/document_stm32.cpp|gui/document_simulator.cpp|libs/sd_fat/simulator|modules/psu/simulator|modules/mcu/simulator|apps/psu/simulator|apps/psu/platform/simulator|platform/simulator" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libscpi"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 					</sourceEntries>
 				</configuration>
@@ -302,6 +307,8 @@
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/system/arch"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../libscpi/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/port&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;"/>
@@ -410,6 +417,8 @@
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/system/arch"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../libscpi/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/port&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;"/>
