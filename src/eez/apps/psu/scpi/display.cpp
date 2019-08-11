@@ -89,7 +89,7 @@ scpi_result_t scpi_cmd_displayView(scpi_t *context) {
 scpi_result_t scpi_cmd_displayViewQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_DISPLAY
-    SCPI_ResultInt(context, persist_conf::devConf.flags.channelsViewMode + 1);
+    SCPI_ResultInt(context, persist_conf::getChannelsViewMode() + 1);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

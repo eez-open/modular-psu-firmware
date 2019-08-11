@@ -20,8 +20,6 @@
 
 #include <eez/gui/app_context.h>
 
-#include <eez/modules/mcu/display.h>
-
 // TODO this must be removed from here
 #include <eez/apps/psu/psu.h>
 
@@ -33,6 +31,7 @@
 
 #include <eez/gui/assets.h>
 #include <eez/gui/dialogs.h>
+#include <eez/gui/draw.h>
 #include <eez/gui/gui.h>
 #include <eez/gui/touch.h>
 #include <eez/gui/widgets/button.h>
@@ -391,9 +390,15 @@ void AppContext::updatePage(bool repaint, WidgetCursor &widgetCursor) {
 
         if (repaint) {
             // clear background
-
             const Style* style = getWidgetStyle(page);
             mcu::display::setColor(style->background_color);
+
+            if (page->x > 0) {
+                drawShadow(widgetCursor.x + page->x,
+                    widgetCursor.y + page->y,
+                    widgetCursor.x + page->x + page->w - 1,
+                    widgetCursor.y + page->y + page->h - 1);
+            }
 
             mcu::display::fillRect(
 				widgetCursor.x + page->x,

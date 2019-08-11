@@ -37,6 +37,7 @@
     SCPI_COMMAND("DIAGnostic[:INFOrmation]:FAN?", scpi_cmd_diagnosticInformationFanQ) \
     SCPI_COMMAND("DIAGnostic[:INFOrmation]:PROTection?", scpi_cmd_diagnosticInformationProtectionQ) \
     SCPI_COMMAND("DIAGnostic[:INFOrmation]:TEST?", scpi_cmd_diagnosticInformationTestQ) \
+    SCPI_COMMAND("DIAGnostic[:INFOrmation]:REGS?", scpi_cmd_diagnosticInformationRegsQ) \
     SCPI_COMMAND("DISPlay:BRIGhtness", scpi_cmd_displayBrightness) \
     SCPI_COMMAND("DISPlay:BRIGhtness?", scpi_cmd_displayBrightnessQ) \
     SCPI_COMMAND("DISPlay:VIEW", scpi_cmd_displayView) \
@@ -336,6 +337,7 @@
     SCPI_COMMAND("DEBUg:CSV?", scpi_cmd_debugCsvQ) \
     SCPI_COMMAND("DEBUg:IOEXp", scpi_cmd_debugIoexp) \
     SCPI_COMMAND("DEBUg:IOEXp?", scpi_cmd_debugIoexpQ) \
+    SCPI_COMMAND("DEBUg:PYTHon?", scpi_cmd_debugPythonQ) \
     SCPI_COMMAND("SYSTem:DATE:CLEar", scpi_cmd_systemDateClear) \
     SCPI_COMMAND("SYSTem:TIME:CLEar", scpi_cmd_systemTimeClear) \
     SCPI_COMMAND("SYSTem:SERial", scpi_cmd_systemSerial) \

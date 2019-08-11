@@ -40,5 +40,7 @@ void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, 
 void drawRectangle(int x, int y, int w, int h, const Style *style, const Style *activeStyle,
                    bool active, bool ignoreLuminocity);
 
+void drawShadow(int x1, int y1, int x2, int y2);
+
 } // namespace gui
 } // namespace eez

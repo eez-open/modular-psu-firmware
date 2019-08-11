@@ -595,9 +595,10 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
 
     int width;
     if (x_glyph + glyph.width - 1 > clip_x2) {
-        // glyph doesn't fit, don't paint it
-        return glyph.dx;
-        // width = clip_x2 - x_glyph + 1;
+        // // glyph doesn't fit, don't paint it
+        // return glyph.dx;
+
+    	width = clip_x2 - x_glyph + 1;
     } else {
         width = glyph.width;
     }

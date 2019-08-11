@@ -246,7 +246,14 @@ enum DataEnum {
     DATA_ID_PROFILE_DIRTY = 244,
     DATA_ID_CHANNEL_TITLE = 245,
     DATA_ID_CHANNEL_SHORT_TITLE = 246,
-    DATA_ID_CHANNEL_LONG_TITLE = 247
+    DATA_ID_CHANNEL_LONG_TITLE = 247,
+    DATA_ID_SCRIPTS = 248,
+    DATA_ID_SCRIPT_NAME = 249,
+    DATA_ID_SCRIPTS_PAGE_MODE = 250,
+    DATA_ID_SCRIPTS_MULTIPLE_PAGES = 251,
+    DATA_ID_SCRIPTS_PREVIOUS_PAGE_ENABLED = 252,
+    DATA_ID_SCRIPTS_NEXT_PAGE_ENABLED = 253,
+    DATA_ID_SCRIPTS_PAGE_INFO = 254
 };
 
 void data_none(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -497,6 +504,13 @@ void data_profile_dirty(DataOperationEnum operation, Cursor &cursor, Value &valu
 void data_channel_title(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_channel_short_title(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_channel_long_title(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_scripts(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_script_name(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_scripts_page_mode(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_scripts_multiple_pages(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_scripts_previous_page_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_scripts_next_page_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_scripts_page_info(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -676,7 +690,13 @@ enum ActionsEnum {
     ACTION_ID_OPEN_APPLICATION = 170,
     ACTION_ID_SHOW_HOME = 171,
     ACTION_ID_SELECT_THEME = 172,
-    ACTION_ID_TOGGLE_CHANNELS_MAX_VIEW = 173
+    ACTION_ID_TOGGLE_CHANNELS_MAX_VIEW = 173,
+    ACTION_ID_SHOW_SCRIPTS = 174,
+    ACTION_ID_START_SCRIPT = 175,
+    ACTION_ID_SET_SCRIPTS_PAGE_MODE_SCRIPTS = 176,
+    ACTION_ID_SET_SCRIPTS_PAGE_MODE_SHELL = 177,
+    ACTION_ID_SCRIPTS_PREVIOUS_PAGE = 178,
+    ACTION_ID_SCRIPTS_NEXT_PAGE = 179
 };
 
 void action_channel_toggle_output();
@@ -852,27 +872,33 @@ void action_open_application();
 void action_show_home();
 void action_select_theme();
 void action_toggle_channels_max_view();
+void action_show_scripts();
+void action_start_script();
+void action_set_scripts_page_mode_scripts();
+void action_set_scripts_page_mode_shell();
+void action_scripts_previous_page();
+void action_scripts_next_page();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
 enum FontsEnum {
     FONT_ID_NONE = 0,
-    FONT_ID_OSWALD38 = 1,
-    FONT_ID_OSWALD14 = 2,
-    FONT_ID_OSWALD24 = 3,
-    FONT_ID_WEB_HOSTING_HUB24 = 4,
-    FONT_ID_HEYDINGS14 = 5,
-    FONT_ID_OSWALD48 = 6,
-    FONT_ID_OSWALD20 = 7
+    FONT_ID_SHADOW = 1,
+    FONT_ID_OSWALD38 = 2,
+    FONT_ID_OSWALD14 = 3,
+    FONT_ID_OSWALD24 = 4,
+    FONT_ID_WEB_HOSTING_HUB24 = 5,
+    FONT_ID_HEYDINGS14 = 6,
+    FONT_ID_OSWALD48 = 7,
+    FONT_ID_OSWALD20 = 8
 };
 
 enum BitmapsEnum {
     BITMAP_ID_NONE = 0,
     BITMAP_ID_PSU_ICON = 1,
     BITMAP_ID_SETTINGS_ICON = 2,
-    BITMAP_ID_RECTANGLE_TRANSPARENT_SHADOW = 3,
-    BITMAP_ID_LOGO = 4,
-    BITMAP_ID_BP_COUPLED = 5
+    BITMAP_ID_LOGO = 3,
+    BITMAP_ID_BP_COUPLED = 4
 };
 
 enum StylesEnum {
@@ -986,7 +1012,8 @@ enum StylesEnum {
     STYLE_ID_SET_VALUE_FOCUS_BALANCED = 107,
     STYLE_ID_DEFAULT_3 = 108,
     STYLE_ID_ENCODER_CURSOR = 109,
-    STYLE_ID_BUTTON_BGND = 110
+    STYLE_ID_BUTTON_BGND = 110,
+    STYLE_ID_PROT_ACTIVE = 111
 };
 
 enum PagesEnum {
@@ -1082,14 +1109,17 @@ enum PagesEnum {
     PAGE_ID_GUI_TMPL_OUTPUT_COUPLINGS = 89,
     PAGE_ID_DCP405_DEFAULT_NUMERIC = 90,
     PAGE_ID_DCP405_DEFAULT_VERT_BAR = 91,
-    PAGE_ID_DCP405_DEFAULT_HORZ_BAR = 92,
-    PAGE_ID_DCP405_DEFAULT_VERT_OFF = 93,
-    PAGE_ID_DCP405_DEFAULT_HORZ_OFF = 94,
-    PAGE_ID_CHANNELS_DEFAULT_NUMERIC = 95,
-    PAGE_ID_CHANNELS_DEFAULT_VERT_BAR = 96,
-    PAGE_ID_CHANNELS_DEFAULT_HORZ_BAR = 97,
-    PAGE_ID_DCP405_MAX = 98,
-    PAGE_ID_DCP405_SMALL = 99
+    PAGE_ID_DCP405_DEFAULT_VERT_OFF = 92,
+    PAGE_ID_DCP405_DEFAULT_HORZ_BAR = 93,
+    PAGE_ID_DCP405_DEFAULT_YT = 94,
+    PAGE_ID_DCP405_DEFAULT_HORZ_OFF = 95,
+    PAGE_ID_CHANNELS_DEFAULT_NUMERIC = 96,
+    PAGE_ID_CHANNELS_DEFAULT_VERT_BAR = 97,
+    PAGE_ID_CHANNELS_DEFAULT_HORZ_BAR = 98,
+    PAGE_ID_CHANNELS_DEFAULT_YT = 99,
+    PAGE_ID_DCP405_MAX = 100,
+    PAGE_ID_DCP405_SMALL = 101,
+    PAGE_ID_SCRIPTS = 102
 };
 
-extern const uint8_t assets[256115];
+extern const uint8_t assets[212650];

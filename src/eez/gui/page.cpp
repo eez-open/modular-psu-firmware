@@ -84,30 +84,7 @@ void InternalPage::drawShadow() {
         return;
     }
 
-    int x1 = x;
-    int y1 = y;
-    int x2 = x + width - 1;
-    int y2 = y + height - 1;
-
-	// BITMAP_ID_RECTANGLE_TRANSPARENT_SHADOW
-	// 480 x 339
-	// 16, 21, 29, 19
-
-    auto bitmap = (Bitmap *)(g_bitmapsData + ((uint32_t *)g_bitmapsData)[BITMAP_ID_RECTANGLE_TRANSPARENT_SHADOW - 1]);
-
-    auto bitmapPixels = (uint32_t *)&bitmap->pixels[0];
-
-    display::drawBitmap(bitmapPixels, 32, bitmap->w, x1 - 19, y1 - 16, (x1 + x2) / 2 - (x1 - 19) + 1, 16);
-    display::drawBitmap(bitmapPixels + 480 - (x2 + 21 - ((x1 + x2) / 2 + 1) + 1), 32, bitmap->w, (x1 + x2) / 2 + 1, y1 - 16, x2 + 21 - ((x1 + x2) / 2 + 1) + 1, 16);
-
-    display::drawBitmap(bitmapPixels + 16 * bitmap->w, 32, bitmap->w, x1 - 19, y1, 19, (y1 + y2) / 2 - y1 + 1);
-    display::drawBitmap(bitmapPixels + (339 - 29 - (y2 - ((y1 + y2) / 2 + 1) + 1)) * bitmap->w, 32, bitmap->w, x1 - 19, (y1 + y2) / 2 + 1, 19, y2 - ((y1 + y2) / 2 + 1) + 1);
-
-    display::drawBitmap(bitmapPixels + 16 * bitmap->w + 480 - 21, 32, bitmap->w, x2 + 1, y1, 21, (y1 + y2) / 2 - y1 + 1);
-    display::drawBitmap(bitmapPixels + (339 - 29 - (y2 - ((y1 + y2) / 2 + 1) + 1)) * bitmap->w + 480 - 21, 32, bitmap->w, x2 + 1, (y1 + y2) / 2 + 1, 21, y2 - ((y1 + y2) / 2 + 1) + 1);
-
-    display::drawBitmap(bitmapPixels + (339 - 29) * bitmap->w, 32, bitmap->w, x1 - 19, y2 + 1, (x1 + x2) / 2 - (x1 - 19) + 1, 29);
-    display::drawBitmap(bitmapPixels + (339 - 29) * bitmap->w + 480 - (x2 + 21 - ((x1 + x2) / 2 + 1) + 1), 32, bitmap->w, (x1 + x2) / 2 + 1, y2 + 1, x2 + 21 - ((x1 + x2) / 2 + 1) + 1, 29);
+    gui::drawShadow(x, y, x + width - 1, y + height - 1);
 
     shadowIsDrawn = true;
 }

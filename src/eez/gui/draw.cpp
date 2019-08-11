@@ -360,5 +360,60 @@ void drawRectangle(int x, int y, int w, int h, const Style *style, const Style *
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static const int T = 4;
+static const int R = 7;
+static const int B = 10;
+static const int L = 7;
+
+static const int W = 20;
+static const int H = 20;
+
+void drawShadowGlyph(char glyph, int x, int y, int xClip = -1, int yClip = -1) {
+    if (xClip == -1) {
+        xClip = x + W - 1;
+    }
+    if (yClip == -1) {
+        yClip = y + H - 1;
+    }
+    font::Font font(g_fontsData + ((uint32_t *)g_fontsData)[FONT_ID_SHADOW - 1]);
+    eez::mcu::display::drawStr(&glyph, 1, x, y, x, y, xClip, yClip, font);
+}
+
+void drawShadow(int x1, int y1, int x2, int y2) {
+    mcu::display::setColor(64, 64, 64);
+
+    int left = x1 - L;
+    int top = y1 - T;
+
+    int right = x2 + R - (W - 1);
+    int bottom = y2 + B - (H - 1);
+
+    drawShadowGlyph(32, left, top);
+
+    for (int x = left + W; x < right; x += W) {
+        drawShadowGlyph(33, x, top, right - 1);
+    }
+
+    drawShadowGlyph(34, right, top);
+
+    for (int y = top + H; y < bottom; y += H) {
+        drawShadowGlyph(35, left, y, -1, bottom - 1);
+    }
+
+    for (int y = top + H; y < bottom; y += H) {
+        drawShadowGlyph(36, right, y, -1, bottom - 1);
+    }
+
+    drawShadowGlyph(37, left, bottom);
+
+    for (int x = left + W; x < right; x += W) {
+        drawShadowGlyph(38, x, bottom, right - 1);
+    }
+
+    drawShadowGlyph(39, right, bottom);
+}
+
 } // namespace gui
 } // namespace eez
