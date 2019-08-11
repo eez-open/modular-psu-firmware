@@ -119,5 +119,8 @@ int16_t AnalogDigitalConverter::read() {
     }
 }
 
+void AnalogDigitalConverter::readAllRegisters(uint8_t registers[]) {
+}
+
 } // namespace psu
 } // namespace eez

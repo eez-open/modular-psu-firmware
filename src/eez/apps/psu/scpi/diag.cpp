@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/system.h>
+
 #include <eez/apps/psu/psu.h>
 
 #include <stdio.h>
@@ -398,6 +400,71 @@ scpi_result_t scpi_cmd_diagnosticInformationFanQ(scpi_t *context) {
 #else
     SCPI_ResultInt(context, -1);
 #endif
+
+    return SCPI_RES_OK;
+}
+
+static uint8_t g_ioexpRegisters[CH_MAX][32];
+static uint8_t g_adcRegisters[CH_MAX][4];
+
+void diagCallback() {
+    for (int i = 0; i < CH_MAX; i++) {
+        Channel& channel = Channel::get(i);
+        if (channel.isInstalled()) {
+        	channel.ioexp.readAllRegisters(&g_ioexpRegisters[i][0]);
+        	channel.adc.readAllRegisters(&g_adcRegisters[i][0]);
+        }
+    }
+}
+
+scpi_result_t scpi_cmd_diagnosticInformationRegsQ(scpi_t *context) {
+    g_diagCallback = diagCallback;
+    while (g_diagCallback) {
+    	osDelay(1);
+    }
+
+    char buffer[2048];
+
+    buffer[0] = 0;
+
+    for (int i = 0; i < CH_MAX; i++) {
+        Channel& channel = Channel::get(i);
+        if (channel.isInstalled()) {
+			sprintf(buffer + strlen(buffer), "CH%d:\n", i + 1);
+
+			sprintf(buffer + strlen(buffer), "\tIOEXP:\n");
+			sprintf(buffer + strlen(buffer), "\t\tIODIRA   %X\n", (int)g_ioexpRegisters[i][0]);
+			sprintf(buffer + strlen(buffer), "\t\tIODIRB   %X\n", (int)g_ioexpRegisters[i][1]);
+			sprintf(buffer + strlen(buffer), "\t\tIPOLA    %X\n", (int)g_ioexpRegisters[i][2]);
+			sprintf(buffer + strlen(buffer), "\t\tIPOLB    %X\n", (int)g_ioexpRegisters[i][3]);
+			sprintf(buffer + strlen(buffer), "\t\tGPINTENA %X\n", (int)g_ioexpRegisters[i][4]);
+			sprintf(buffer + strlen(buffer), "\t\tGPINTENB %X\n", (int)g_ioexpRegisters[i][5]);
+			sprintf(buffer + strlen(buffer), "\t\tDEFVALA  %X\n", (int)g_ioexpRegisters[i][6]);
+			sprintf(buffer + strlen(buffer), "\t\tDEFVALB  %X\n", (int)g_ioexpRegisters[i][7]);
+			sprintf(buffer + strlen(buffer), "\t\tINTCONA  %X\n", (int)g_ioexpRegisters[i][8]);
+			sprintf(buffer + strlen(buffer), "\t\tINTCONB  %X\n", (int)g_ioexpRegisters[i][9]);
+			sprintf(buffer + strlen(buffer), "\t\tIOCON    %X\n", (int)g_ioexpRegisters[i][10]);
+			sprintf(buffer + strlen(buffer), "\t\tIOCON    %X\n", (int)g_ioexpRegisters[i][11]);
+			sprintf(buffer + strlen(buffer), "\t\tGPPUA    %X\n", (int)g_ioexpRegisters[i][12]);
+			sprintf(buffer + strlen(buffer), "\t\tGPPUB    %X\n", (int)g_ioexpRegisters[i][13]);
+			sprintf(buffer + strlen(buffer), "\t\tINTFA    %X\n", (int)g_ioexpRegisters[i][14]);
+			sprintf(buffer + strlen(buffer), "\t\tINTFB    %X\n", (int)g_ioexpRegisters[i][15]);
+			sprintf(buffer + strlen(buffer), "\t\tINTCAPA  %X\n", (int)g_ioexpRegisters[i][16]);
+			sprintf(buffer + strlen(buffer), "\t\tINTCAPB  %X\n", (int)g_ioexpRegisters[i][17]);
+			sprintf(buffer + strlen(buffer), "\t\tGPIOA    %X\n", (int)g_ioexpRegisters[i][18]);
+			sprintf(buffer + strlen(buffer), "\t\tGPIOB    %X\n", (int)g_ioexpRegisters[i][19]);
+			sprintf(buffer + strlen(buffer), "\t\tOLATA    %X\n", (int)g_ioexpRegisters[i][20]);
+			sprintf(buffer + strlen(buffer), "\t\tOLATB    %X\n", (int)g_ioexpRegisters[i][21]);
+
+			sprintf(buffer + strlen(buffer), "\tADC:\n");
+			sprintf(buffer + strlen(buffer), "\t\tREG0     %X\n", (int)g_adcRegisters[i][0]);
+			sprintf(buffer + strlen(buffer), "\t\tREG1     %X\n", (int)g_adcRegisters[i][1]);
+			sprintf(buffer + strlen(buffer), "\t\tREG2     %X\n", (int)g_adcRegisters[i][2]);
+			sprintf(buffer + strlen(buffer), "\t\tREG3     %X\n", (int)g_adcRegisters[i][3]);
+        }
+    }
+
+    SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
 }

@@ -187,5 +187,29 @@ int16_t AnalogDigitalConverter::read() {
     return (int16_t)((dmsb << 8) | dlsb);
 }
 
+void AnalogDigitalConverter::readAllRegisters(uint8_t registers[]) {
+    uint8_t data[5];
+    uint8_t result[5];
+
+    data[0] = ADC_RD4S0;
+    data[1] = 0;
+    data[2] = 0;
+    data[3] = 0;
+    data[4] = 0;
+
+    spi::select(channel.slotIndex, spi::CHIP_ADC);
+    spi::transfer(channel.slotIndex, data, result, 5);
+    spi::deselect(channel.slotIndex);
+
+    registers[0] = result[1];
+    registers[1] = result[2];
+    registers[2] = result[3];
+    registers[3] = result[4];
+
+    if (start_reg0) {
+    	start(start_reg0);
+    }
+}
+
 } // namespace psu
 } // namespace eez
