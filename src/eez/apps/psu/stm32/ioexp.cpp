@@ -150,7 +150,11 @@ bool IOExpander::test() {
 
             if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
                 if (reg == REG_IODIRA) {
-                    expectedValue = DCP405_REG_VALUE_IODIRA;
+                    if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
+                        expectedValue = DCP405_REG_VALUE_IODIRA;
+                    } else {
+                        expectedValue = DCP405_R2B5_REG_VALUE_IODIRA;
+                    }
                 } else if (reg == REG_IODIRB) {
                     expectedValue = DCP405_REG_VALUE_IODIRB;
                 }
