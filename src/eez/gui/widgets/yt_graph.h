@@ -37,7 +37,9 @@ struct YTGraphWidget {
 struct YTGraphWidgetState {
     WidgetState genericState;
     data::Value y2Data;
-    uint16_t position;
+    uint8_t iChannel;
+    uint16_t historyValuePosition;
+    uint16_t scanLinePosition;
     uint8_t ytGraphUpdateMethod;
 };
 

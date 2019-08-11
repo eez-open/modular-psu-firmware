@@ -44,8 +44,18 @@ using namespace eez::mcu::display;
 
 #include <eez/gui/widgets/yt_graph.h>
 
-#define NUM_CHANNELS_VIEW_MODES 3
-#define NUM_CHANNELS_VIEW_MODES_IN_MAX 3    
+#define NUM_CHANNELS_VIEW_MODES 4
+
+#define CHANNELS_VIEW_MODE_NUMERIC   0
+#define CHANNELS_VIEW_MODE_HORZ_BAR  1
+#define CHANNELS_VIEW_MODE_VERT_BAR  2
+#define CHANNELS_VIEW_MODE_YT        3
+
+#define NUM_CHANNELS_VIEW_MODES_IN_MAX 3
+
+#define CHANNELS_VIEW_MODE_IN_MAX_NUMERIC   0
+#define CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR  1
+#define CHANNELS_VIEW_MODE_IN_MAX_YT        2
 
 namespace eez {
 namespace psu {
@@ -210,6 +220,9 @@ void loadDevice() {
         if (devConf.flags.channelsViewMode < 0 || devConf.flags.channelsViewMode >= NUM_CHANNELS_VIEW_MODES) {
             devConf.flags.channelsViewMode = 0;
         }
+        if (devConf.flags.channelsViewModeInMax < 0 || devConf.flags.channelsViewModeInMax >= NUM_CHANNELS_VIEW_MODES_IN_MAX) {
+            devConf.flags.channelsViewModeInMax = 0;
+        }
 
         if (devConf.header.version < 9) {
             devConf.flags.ch1CalEnabled = 1;
@@ -280,6 +293,7 @@ void loadDevice2() {
         if (devConf2.header.version < 10) {
             devConf2.displayBackgroundLuminosityStep = DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT;
         }
+
 #if OPTION_DISPLAY
         onLuminocityChanged();
 #endif
@@ -501,18 +515,59 @@ int getProfileAutoRecallLocation() {
 }
 
 void setChannelsViewMode(unsigned int channelsViewMode) {
-    channelsViewMode = (channelsViewMode + 1) % NUM_CHANNELS_VIEW_MODES;
+    uint8_t ytGraphUpdateMethod = devConf2.ytGraphUpdateMethod;
+
+    if (channelsViewMode == CHANNELS_VIEW_MODE_YT) {
+        ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCROLL;
+    } else if (channelsViewMode == CHANNELS_VIEW_MODE_YT + 1) {
+        if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
+            channelsViewMode = CHANNELS_VIEW_MODE_YT;
+            ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCAN_LINE;
+        } else {
+            channelsViewMode = CHANNELS_VIEW_MODE_NUMERIC;
+        }
+    }
+
     if (channelsViewMode != devConf.flags.channelsViewMode) {
         devConf.flags.channelsViewMode = channelsViewMode;
         saveDevice();
     }
+
+    if (ytGraphUpdateMethod != devConf2.ytGraphUpdateMethod) {
+        devConf2.ytGraphUpdateMethod = ytGraphUpdateMethod;
+        saveDevice2();
+    }
+}
+
+unsigned int getChannelsViewMode() {
+    if (devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_YT && devConf2.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCAN_LINE) {
+        return CHANNELS_VIEW_MODE_YT + 1;
+    }
+    return devConf.flags.channelsViewMode;
 }
 
 void setChannelsViewModeInMax(unsigned int channelsViewModeInMax) {
-    channelsViewModeInMax = (channelsViewModeInMax + 1) % NUM_CHANNELS_VIEW_MODES_IN_MAX;
+    uint8_t ytGraphUpdateMethod = devConf2.ytGraphUpdateMethod;
+
+    if (channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT) {
+        ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCROLL;
+    } else if (channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT + 1) {
+        if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
+            channelsViewModeInMax = CHANNELS_VIEW_MODE_IN_MAX_YT;
+            ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCAN_LINE;
+        } else {
+            channelsViewModeInMax = CHANNELS_VIEW_MODE_IN_MAX_NUMERIC;
+        }
+    }
+
     if (channelsViewModeInMax != devConf.flags.channelsViewModeInMax) {
         devConf.flags.channelsViewModeInMax = channelsViewModeInMax;
         saveDevice();
+    }
+
+    if (ytGraphUpdateMethod != devConf2.ytGraphUpdateMethod) {
+        devConf2.ytGraphUpdateMethod = ytGraphUpdateMethod;
+        saveDevice2();
     }
 }
 

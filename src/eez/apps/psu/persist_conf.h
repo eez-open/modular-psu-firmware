@@ -188,6 +188,7 @@ bool setProfileAutoRecallLocation(int location);
 int getProfileAutoRecallLocation();
 
 void setChannelsViewMode(unsigned int viewMode);
+unsigned int getChannelsViewMode();
 void setChannelsViewModeInMax(unsigned int viewModeInMax);
 
 void toggleChannelsViewMode();
