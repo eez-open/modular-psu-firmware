@@ -189,14 +189,6 @@ Value MakeEventValue(event_queue::Event *e) {
     return value;
 }
 
-Value MakePageInfoValue(uint8_t pageIndex, uint8_t numPages) {
-    Value value;
-    value.pairOfUint8_.first = pageIndex;
-    value.pairOfUint8_.second = numPages;
-    value.type_ = VALUE_TYPE_PAGE_INFO;
-    return value;
-}
-
 Value MakeLessThenMinMessageValue(float float_, const Value &value_) {
     Value value;
     if (value_.getType() == VALUE_TYPE_INT) {
@@ -257,14 +249,6 @@ void printTime(uint32_t time, char *text, int count) {
 
 event_queue::Event *getEventFromValue(const Value &value) {
     return (event_queue::Event *)value.getVoidPointer();
-}
-
-uint8_t getPageIndexFromValue(const Value &value) {
-    return value.getFirstUInt8();
-}
-
-uint8_t getNumPagesFromValue(const Value &value) {
-    return value.getSecondUInt8();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -376,17 +360,6 @@ void EVENT_value_to_text(const Value &value, char *text, int count) {
                  event_queue::getEventMessage(getEventFromValue(value)));
     }
 
-    text[count - 1] = 0;
-}
-
-bool compare_PAGE_INFO_value(const Value &a, const Value &b) {
-    return getPageIndexFromValue(a) == getPageIndexFromValue(b) &&
-           getNumPagesFromValue(a) == getNumPagesFromValue(b);
-}
-
-void PAGE_INFO_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "Page #%d of %d", getPageIndexFromValue(value) + 1,
-             getNumPagesFromValue(value));
     text[count - 1] = 0;
 }
 
@@ -628,7 +601,6 @@ CompareValueFunction g_compareUserValueFunctions[] = { compare_LESS_THEN_MIN_FLO
                                                        compare_GREATER_THEN_MAX_INT_value,
                                                        compare_GREATER_THEN_MAX_TIME_ZONE_value,
                                                        compare_EVENT_value,
-                                                       compare_PAGE_INFO_value,
                                                        compare_ON_TIME_COUNTER_value,
                                                        compare_COUNTDOWN_value,
                                                        compare_TIME_ZONE_value,
@@ -665,7 +637,6 @@ ValueToTextFunction g_userValueToTextFunctions[] = { LESS_THEN_MIN_FLOAT_value_t
                                                      GREATER_THEN_MAX_INT_value_to_text,
                                                      GREATER_THEN_MAX_TIME_ZONE_value_to_text,
                                                      EVENT_value_to_text,
-                                                     PAGE_INFO_value_to_text,
                                                      ON_TIME_COUNTER_value_to_text,
                                                      COUNTDOWN_value_to_text,
                                                      TIME_ZONE_value_to_text,

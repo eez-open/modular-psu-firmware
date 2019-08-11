@@ -28,6 +28,27 @@
 #include <eez/apps/psu/watchdog.h>
 #include <eez/system.h>
 
+extern "C" {
+#include "py/compile.h"
+#include "py/runtime.h"
+
+void do_str(const char *src, mp_parse_input_kind_t input_kind) {
+    nlr_buf_t nlr;
+    if (nlr_push(&nlr) == 0) {
+        mp_lexer_t *lex = mp_lexer_new_from_str_len(MP_QSTR__lt_stdin_gt_, src, strlen(src), 0);
+        qstr source_name = lex->source_name;
+        mp_parse_tree_t parse_tree = mp_parse(lex, input_kind);
+        mp_obj_t module_fun = mp_compile(&parse_tree, source_name, MP_EMIT_OPT_NONE, true);
+        mp_call_function_0(module_fun);
+        nlr_pop();
+    } else {
+        // uncaught exception
+        mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
+    }
+}
+
+}
+
 namespace eez {
 namespace psu {
 
@@ -415,6 +436,23 @@ scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
     bool state = channel->ioexp.testBit(bit);
 
     SCPI_ResultBool(context, state);
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif // DEBUG
+}
+
+scpi_result_t scpi_cmd_debugPythonQ(scpi_t *context) {
+#ifdef DEBUG
+    mp_init();
+    do_str("print('hello world!', list(x+1 for x in range(10)), end='eol\\n')", MP_PARSE_SINGLE_INPUT);
+    do_str("for i in range(10):\n  print(i)", MP_PARSE_FILE_INPUT);
+    do_str("print(1)\nprint(2)\nprint(3", MP_PARSE_FILE_INPUT);
+    mp_deinit();
+
+    SCPI_ResultText(context, "1");
 
     return SCPI_RES_OK;
 #else

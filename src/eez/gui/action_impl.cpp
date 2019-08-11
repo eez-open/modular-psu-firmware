@@ -45,6 +45,8 @@
 #include <eez/apps/psu/gui/password.h>
 #include <eez/apps/psu/gui/data.h>
 
+#include <eez/scripting.h>
+
 using namespace eez::gui;
 using namespace eez::psu;
 using namespace eez::psu::gui;
@@ -300,42 +302,52 @@ void action_show_ch_settings_prot_otp() {
 }
 
 void action_show_ch_settings_trigger() {
+    selectChannel();
     showPage(PAGE_ID_CH_SETTINGS_TRIGGER);
 }
 
 void action_show_ch_settings_lists() {
+    selectChannel();
     pushPage(PAGE_ID_CH_SETTINGS_LISTS);
 }
 
 void action_show_ch_settings_adv() {
+    selectChannel();
     showPage(PAGE_ID_CH_SETTINGS_ADV);
 }
 
 void action_show_ch_settings_adv_remote() {
+    selectChannel();
     showPage(PAGE_ID_CH_SETTINGS_ADV_REMOTE);
 }
 
 void action_show_ch_settings_adv_ranges() {
+    selectChannel();
     showPage(PAGE_ID_CH_SETTINGS_ADV_RANGES);
 }
 
 void action_show_ch_settings_adv_tracking() {
+    selectChannel();
     showPage(PAGE_ID_CH_SETTINGS_ADV_TRACKING);
 }
 
 void action_show_ch_settings_adv_coupling() {
+    selectChannel();
     showPage(PAGE_ID_CH_SETTINGS_ADV_COUPLING);
 }
 
 void action_show_ch_settings_adv_view() {
+    selectChannel();
     pushPage(PAGE_ID_CH_SETTINGS_ADV_VIEW);
 }
 
 void action_show_ch_settings_info() {
+    selectChannel();
     showPage(PAGE_ID_CH_SETTINGS_INFO);
 }
 
 void action_show_ch_settings_info_cal() {
+    selectChannel();
     pushPage(PAGE_ID_SYS_SETTINGS_CAL_CH);
 }
 
@@ -871,6 +883,30 @@ void action_select_theme() {
 
 void action_test() {
     infoMessage("Hello, world!");
+}
+
+void action_show_scripts() {
+    pushPage(PAGE_ID_SCRIPTS);
+}
+
+void action_start_script() {
+    // TODO
+}
+
+void action_set_scripts_page_mode_scripts() {
+    scripting::g_scriptsPageMode = scripting::SCRIPTS_PAGE_MODE_SCRIPTS;
+}
+
+void action_set_scripts_page_mode_shell() {
+    scripting::g_scriptsPageMode = scripting::SCRIPTS_PAGE_MODE_SHELL;
+}
+
+void action_scripts_previous_page() {
+    scripting::g_currentPageIndex--;
+}
+
+void action_scripts_next_page() {
+    scripting::g_currentPageIndex++;
 }
 
 } // namespace gui

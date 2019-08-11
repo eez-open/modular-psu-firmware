@@ -29,6 +29,7 @@
 #include <eez/gui/dialogs.h>
 #include <eez/gui/document.h>
 #include <eez/gui/gui.h>
+#include <eez/scripting.h>
 #include <eez/system.h>
 #include <eez/util.h>
 #include <eez/index.h>
@@ -175,20 +176,42 @@ void POINTER_value_to_text(const Value &value, char *text, int count) {
     text[0] = 0;
 }
 
+bool compare_PAGE_INFO_value(const Value &a, const Value &b) {
+    return getPageIndexFromValue(a) == getPageIndexFromValue(b) &&
+           getNumPagesFromValue(a) == getNumPagesFromValue(b);
+}
+
+void PAGE_INFO_value_to_text(const Value &value, char *text, int count) {
+    snprintf(text, count - 1, "Page #%d of %d", getPageIndexFromValue(value) + 1,
+             getNumPagesFromValue(value));
+    text[count - 1] = 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static CompareValueFunction g_compareBuiltInValueFunctions[] = {
     compare_NONE_value,       compare_INT_value,  compare_FLOAT_value,
     compare_STR_value,        compare_ENUM_value, compare_SCPI_ERROR_value,
-    compare_PERCENTAGE_value, compare_SIZE_value, compare_POINTER_value
-
+    compare_PERCENTAGE_value, compare_SIZE_value, compare_POINTER_value,
+    compare_PAGE_INFO_value
 };
 
 static ValueToTextFunction g_builtInValueToTextFunctions[] = {
     NONE_value_to_text,       INT_value_to_text,  FLOAT_value_to_text,
     STR_value_to_text,        ENUM_value_to_text, SCPI_ERROR_value_to_text,
-    PERCENTAGE_value_to_text, SIZE_value_to_text, POINTER_value_to_text
+    PERCENTAGE_value_to_text, SIZE_value_to_text, POINTER_value_to_text,
+    PAGE_INFO_value_to_text
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
+uint8_t getPageIndexFromValue(const Value &value) {
+    return value.getFirstUInt8();
+}
+
+uint8_t getNumPagesFromValue(const Value &value) {
+    return value.getSecondUInt8();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -204,6 +227,14 @@ Value MakeScpiErrorValue(int16_t errorCode) {
     Value value;
     value.int16_ = errorCode;
     value.type_ = VALUE_TYPE_SCPI_ERROR;
+    return value;
+}
+
+Value MakePageInfoValue(uint8_t pageIndex, uint8_t numPages) {
+    Value value;
+    value.pairOfUint8_.first = pageIndex;
+    value.pairOfUint8_.second = numPages;
+    value.type_ = VALUE_TYPE_PAGE_INFO;
     return value;
 }
 
@@ -541,6 +572,48 @@ void data_selected_theme(DataOperationEnum operation, Cursor &cursor, Value &val
 	if (operation == data::DATA_OPERATION_GET) {
 		value = g_colorsData->themes.first[psu::persist_conf::devConf2.selectedThemeIndex].name;
 	}
+}
+
+void data_scripts(DataOperationEnum operation, Cursor &cursor, Value &value) {
+    if (operation == data::DATA_OPERATION_COUNT) {
+        value = scripting::getNumScriptsInCurrentPage();
+    }
+}
+
+void data_script_name(DataOperationEnum operation, Cursor &cursor, Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = scripting::getScriptName(cursor.i);
+    }
+}
+
+void data_scripts_page_mode(DataOperationEnum operation, Cursor &cursor, Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = scripting::g_scriptsPageMode;
+    }
+}
+
+void data_scripts_multiple_pages(DataOperationEnum operation, Cursor &cursor, Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = scripting::getNumPages() > 1 ? 1 : 0;
+    }
+}
+
+void data_scripts_previous_page_enabled(DataOperationEnum operation, Cursor &cursor, Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = scripting::g_currentPageIndex > 0 ? 1 : 0;
+    }
+}
+
+void data_scripts_next_page_enabled(DataOperationEnum operation, Cursor &cursor, Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = scripting::g_currentPageIndex < scripting::getNumPages() - 1 ? 1 : 0;
+    }
+}
+
+void data_scripts_page_info(DataOperationEnum operation, Cursor &cursor, Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = data::MakePageInfoValue(scripting::g_currentPageIndex, scripting::getNumPages());
+    }
 }
 
 } // namespace gui

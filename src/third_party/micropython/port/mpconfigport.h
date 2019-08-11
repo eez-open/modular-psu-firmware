@@ -58,12 +58,50 @@ typedef int32_t mp_int_t; // must be pointer size
 typedef uint32_t mp_uint_t; // must be pointer size
 typedef long mp_off_t;
 
-// dummy print
-#define MP_PLAT_PRINT_STRN(str, len) (void)0
+#define MP_PLAT_PRINT_STRN(str, len) ((void)mp_hal_stdout_tx_strn(str, len))
 
 // extra built in names to add to the global namespace
 #define MICROPY_PORT_BUILTINS \
     { MP_ROM_QSTR(MP_QSTR_open), MP_ROM_PTR(&mp_builtin_open_obj) },
 
 // We need to provide a declaration/definition of alloca()
+#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
+
+#include <malloc.h>
+#define MP_ENDIANNESS_LITTLE 1
+
+#define NORETURN                    __declspec(noreturn)
+#define MP_WEAK
+#define MP_NOINLINE                 __declspec(noinline)
+#define MP_LIKELY(x)                (x)
+#define MP_UNLIKELY(x)              (x)
+#define MICROPY_PORT_CONSTANTS      { "dummy", 0 } //can't have zero-sized array
+#ifdef _WIN64
+#define MP_SSIZE_MAX                _I64_MAX
+#else
+#define MP_SSIZE_MAX                _I32_MAX
+#endif
+
+// CL specific definitions
+
+#ifndef __cplusplus
+#define restrict
+#define inline                      __inline
+#define alignof(t)                  __alignof(t)
+#endif
+#define PATH_MAX                    MICROPY_ALLOC_PATH_MAX
+#define S_ISREG(m)                  (((m) & S_IFMT) == S_IFREG)
+#define S_ISDIR(m)                  (((m) & S_IFMT) == S_IFDIR)
+#ifdef _WIN64
+#define SSIZE_MAX                   _I64_MAX
+typedef __int64                     ssize_t;
+#else
+#define SSIZE_MAX                   _I32_MAX
+typedef int                         ssize_t;
+#endif
+typedef mp_off_t                    off_t;
+
+
+#else
 #include <alloca.h>
+#endif

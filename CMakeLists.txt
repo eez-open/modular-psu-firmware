@@ -62,6 +62,9 @@ include_directories(
     src/eez/scpi
 
     src/third_party/libscpi/inc
+    src/third_party/micropython
+    src/third_party/micropython/port
+    src/third_party/micropython/port/win32
 )
 
 set(src_files)
@@ -70,6 +73,7 @@ set(header_files)
 set(src_eez
     src/eez/debug.cpp
     src/eez/index.cpp
+    src/eez/scripting.cpp
     src/eez/sound.cpp
     src/eez/system.cpp
     src/eez/unit.cpp
@@ -79,6 +83,7 @@ list (APPEND src_files ${src_eez})
 set(header_eez
     src/eez/debug.h
     src/eez/index.h
+    src/eez/scripting.h
     src/eez/sound.h
     src/eez/system.h
     src/eez/unit.h
@@ -498,6 +503,216 @@ set(header_third_party_scpi
 )
 list (APPEND header_files ${header_third_party_scpi})
 source_group("third_party\\scpi" FILES ${src_third_party_scpi} ${header_third_party_scpi})
+
+set(src_third_party_micropython_extmod
+    src/third_party/micropython/extmod/virtpin.c
+)
+list (APPEND src_files ${src_third_party_micropython_extmod})
+set(header_third_party_micropython_extmod
+    src/third_party/micropython/extmod/virtpin.h
+)
+list (APPEND header_files ${header_third_party_micropython_extmod})
+source_group("third_party\\micropython\\extmod" FILES ${src_third_party_micropython_extmod} ${header_third_party_micropython_extmod})
+
+set(src_third_party_micropython_port
+    src/third_party/micropython/port/main.c
+    src/third_party/micropython/port/mphalport.c
+)
+list (APPEND src_files ${src_third_party_micropython_port})
+set(header_third_party_micropython_port
+    src/third_party/micropython/port/mpconfigport.h
+    src/third_party/micropython/port/mphalport.h
+    src/third_party/micropython/port/qstrdefsport.h
+)
+list (APPEND header_files ${header_third_party_micropython_port})
+source_group("third_party\\micropython\\port" FILES ${src_third_party_micropython_port} ${header_third_party_micropython_port})
+
+set(header_third_party_micropython_port_genhdr
+    src/third_party/micropython/port/genhdr/moduledefs.h
+    src/third_party/micropython/port/genhdr/mpversion.h
+    src/third_party/micropython/port/genhdr/qstrdefs.generated.h
+)
+list (APPEND header_files ${header_third_party_micropython_port_genhdr})
+source_group("third_party\\micropython\\port\\genhdr" FILES ${header_third_party_micropython_port_genhdr})
+
+set(src_third_party_micropython_py
+    src/third_party/micropython/py/argcheck.c
+    src/third_party/micropython/py/asmarm.c
+    src/third_party/micropython/py/asmbase.c
+    src/third_party/micropython/py/asmthumb.c
+    src/third_party/micropython/py/asmx64.c
+    src/third_party/micropython/py/asmx86.c
+    src/third_party/micropython/py/asmxtensa.c
+    src/third_party/micropython/py/bc.c
+    src/third_party/micropython/py/binary.c
+    src/third_party/micropython/py/builtinevex.c
+    src/third_party/micropython/py/builtinhelp.c
+    src/third_party/micropython/py/builtinimport.c
+    src/third_party/micropython/py/compile.c
+    src/third_party/micropython/py/emitbc.c
+    src/third_party/micropython/py/emitcommon.c
+    src/third_party/micropython/py/emitglue.c
+    src/third_party/micropython/py/emitinlinethumb.c
+    src/third_party/micropython/py/emitinlinextensa.c
+    src/third_party/micropython/py/emitnarm.c
+    src/third_party/micropython/py/emitnative.c
+    src/third_party/micropython/py/emitnthumb.c
+    src/third_party/micropython/py/emitnx64.c
+    src/third_party/micropython/py/emitnx86.c
+    src/third_party/micropython/py/emitnxtensa.c
+    src/third_party/micropython/py/formatfloat.c
+    src/third_party/micropython/py/frozenmod.c
+    src/third_party/micropython/py/gc.c
+    src/third_party/micropython/py/lexer.c
+    src/third_party/micropython/py/malloc.c
+    src/third_party/micropython/py/map.c
+    src/third_party/micropython/py/modarray.c
+    src/third_party/micropython/py/modbuiltins.c
+    src/third_party/micropython/py/modcmath.c
+    src/third_party/micropython/py/modcollections.c
+    src/third_party/micropython/py/modgc.c
+    src/third_party/micropython/py/modio.c
+    src/third_party/micropython/py/modmath.c
+    src/third_party/micropython/py/modmicropython.c
+    src/third_party/micropython/py/modstruct.c
+    src/third_party/micropython/py/modsys.c
+    src/third_party/micropython/py/modthread.c
+    src/third_party/micropython/py/moduerrno.c
+    src/third_party/micropython/py/mpprint.c
+    src/third_party/micropython/py/mpstate.c
+    src/third_party/micropython/py/mpz.c
+    src/third_party/micropython/py/nativeglue.c
+    src/third_party/micropython/py/nlr.c
+    src/third_party/micropython/py/nlrsetjmp.c
+    src/third_party/micropython/py/nlrthumb.c
+    src/third_party/micropython/py/nlrx64.c
+    src/third_party/micropython/py/nlrx86.c
+    src/third_party/micropython/py/nlrxtensa.c
+    src/third_party/micropython/py/objarray.c
+    src/third_party/micropython/py/objattrtuple.c
+    src/third_party/micropython/py/objbool.c
+    src/third_party/micropython/py/objboundmeth.c
+    src/third_party/micropython/py/obj.c
+    src/third_party/micropython/py/objcell.c
+    src/third_party/micropython/py/objclosure.c
+    src/third_party/micropython/py/objcomplex.c
+    src/third_party/micropython/py/objdeque.c
+    src/third_party/micropython/py/objdict.c
+    src/third_party/micropython/py/objenumerate.c
+    src/third_party/micropython/py/objexcept.c
+    src/third_party/micropython/py/objfilter.c
+    src/third_party/micropython/py/objfloat.c
+    src/third_party/micropython/py/objfun.c
+    src/third_party/micropython/py/objgenerator.c
+    src/third_party/micropython/py/objgetitemiter.c
+    src/third_party/micropython/py/objint.c
+    src/third_party/micropython/py/objint_longlong.c
+    src/third_party/micropython/py/objint_mpz.c
+    src/third_party/micropython/py/objlist.c
+    src/third_party/micropython/py/objmap.c
+    src/third_party/micropython/py/objmodule.c
+    src/third_party/micropython/py/objnamedtuple.c
+    src/third_party/micropython/py/objnone.c
+    src/third_party/micropython/py/objobject.c
+    src/third_party/micropython/py/objpolyiter.c
+    src/third_party/micropython/py/objproperty.c
+    src/third_party/micropython/py/objrange.c
+    src/third_party/micropython/py/objreversed.c
+    src/third_party/micropython/py/objset.c
+    src/third_party/micropython/py/objsingleton.c
+    src/third_party/micropython/py/objslice.c
+    src/third_party/micropython/py/objstr.c
+    src/third_party/micropython/py/objstringio.c
+    src/third_party/micropython/py/objstrunicode.c
+    src/third_party/micropython/py/objtuple.c
+    src/third_party/micropython/py/objtype.c
+    src/third_party/micropython/py/objzip.c
+    src/third_party/micropython/py/opmethods.c
+    src/third_party/micropython/py/parse.c
+    src/third_party/micropython/py/parsenumbase.c
+    src/third_party/micropython/py/parsenum.c
+    src/third_party/micropython/py/persistentcode.c
+    src/third_party/micropython/py/pystack.c
+    src/third_party/micropython/py/qstr.c
+    src/third_party/micropython/py/reader.c
+    src/third_party/micropython/py/repl.c
+    src/third_party/micropython/py/runtime.c
+    src/third_party/micropython/py/runtime_utils.c
+    src/third_party/micropython/py/scheduler.c
+    src/third_party/micropython/py/scope.c
+    src/third_party/micropython/py/sequence.c
+    src/third_party/micropython/py/showbc.c
+    src/third_party/micropython/py/smallint.c
+    src/third_party/micropython/py/stackctrl.c
+    src/third_party/micropython/py/stream.c
+    src/third_party/micropython/py/unicode.c
+    src/third_party/micropython/py/vm.c
+    src/third_party/micropython/py/vstr.c
+    src/third_party/micropython/py/warning.c
+)
+list (APPEND src_files ${src_third_party_micropython_py})
+set(header_third_party_micropython_py
+    src/third_party/micropython/py/asmarm.h
+    src/third_party/micropython/py/asmbase.h
+    src/third_party/micropython/py/asmthumb.h
+    src/third_party/micropython/py/asmx64.h
+    src/third_party/micropython/py/asmx86.h
+    src/third_party/micropython/py/asmxtensa.h
+    src/third_party/micropython/py/bc0.h
+    src/third_party/micropython/py/bc.h
+    src/third_party/micropython/py/binary.h
+    src/third_party/micropython/py/builtin.h
+    src/third_party/micropython/py/compile.h
+    src/third_party/micropython/py/emitglue.h
+    src/third_party/micropython/py/emit.h
+    src/third_party/micropython/py/formatfloat.h
+    src/third_party/micropython/py/frozenmod.h
+    src/third_party/micropython/py/gc.h
+    src/third_party/micropython/py/grammar.h
+    src/third_party/micropython/py/lexer.h
+    src/third_party/micropython/py/misc.h
+    src/third_party/micropython/py/mpconfig.h
+    src/third_party/micropython/py/mperrno.h
+    src/third_party/micropython/py/mphal.h
+    src/third_party/micropython/py/mpprint.h
+    src/third_party/micropython/py/mpstate.h
+    src/third_party/micropython/py/mpthread.h
+    src/third_party/micropython/py/mpz.h
+    src/third_party/micropython/py/nlr.h
+    src/third_party/micropython/py/objarray.h
+    src/third_party/micropython/py/objexcept.h
+    src/third_party/micropython/py/objfun.h
+    src/third_party/micropython/py/objgenerator.h
+    src/third_party/micropython/py/obj.h
+    src/third_party/micropython/py/objint.h
+    src/third_party/micropython/py/objlist.h
+    src/third_party/micropython/py/objmodule.h
+    src/third_party/micropython/py/objnamedtuple.h
+    src/third_party/micropython/py/objstr.h
+    src/third_party/micropython/py/objstringio.h
+    src/third_party/micropython/py/objtuple.h
+    src/third_party/micropython/py/objtype.h
+    src/third_party/micropython/py/parse.h
+    src/third_party/micropython/py/parsenumbase.h
+    src/third_party/micropython/py/parsenum.h
+    src/third_party/micropython/py/persistentcode.h
+    src/third_party/micropython/py/pystack.h
+    src/third_party/micropython/py/qstrdefs.h
+    src/third_party/micropython/py/qstr.h
+    src/third_party/micropython/py/reader.h
+    src/third_party/micropython/py/repl.h
+    src/third_party/micropython/py/ringbuf.h
+    src/third_party/micropython/py/runtime0.h
+    src/third_party/micropython/py/runtime.h
+    src/third_party/micropython/py/scope.h
+    src/third_party/micropython/py/smallint.h
+    src/third_party/micropython/py/stackctrl.h
+    src/third_party/micropython/py/stream.h
+    src/third_party/micropython/py/unicode.h
+    src/third_party/micropython/py/vmentrytable.h
+)
+list (APPEND header_files ${header_third_party_micropython_py})
+source_group("third_party\\micropython\\py" FILES ${src_third_party_micropython_py} ${header_third_party_micropython_py})
 
 add_executable(modular-psu-firmware ${src_files} ${header_files})
 

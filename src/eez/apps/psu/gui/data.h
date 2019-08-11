@@ -47,7 +47,6 @@ enum UserValueType {
     VALUE_TYPE_GREATER_THEN_MAX_INT,
     VALUE_TYPE_GREATER_THEN_MAX_TIME_ZONE,
     VALUE_TYPE_EVENT,
-    VALUE_TYPE_PAGE_INFO,
     VALUE_TYPE_ON_TIME_COUNTER,
     VALUE_TYPE_COUNTDOWN,
     VALUE_TYPE_TIME_ZONE,
@@ -79,7 +78,6 @@ Value MakeValue(float value, Unit unit, int channelIndex = -1, bool extendedPrec
 Value MakeValueListValue(const Value *values);
 Value MakeFloatListValue(float *pFloat);
 Value MakeEventValue(eez::psu::event_queue::Event *e);
-Value MakePageInfoValue(uint8_t pageIndex, uint8_t numPages);
 Value MakeLessThenMinMessageValue(float float_, const Value &value_);
 Value MakeGreaterThenMaxMessageValue(float float_, const Value &value_);
 Value MakeMacAddressValue(uint8_t *macAddress);

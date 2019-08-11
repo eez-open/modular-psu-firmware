@@ -34,6 +34,7 @@ enum BuiltInValueType {
     VALUE_TYPE_PERCENTAGE,
     VALUE_TYPE_SIZE,
     VALUE_TYPE_POINTER,
+    VALUE_TYPE_PAGE_INFO,
     VALUE_TYPE_USER,
 };
 
@@ -216,12 +217,16 @@ struct Value {
 
 Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition);
 Value MakeScpiErrorValue(int16_t errorCode);
+Value MakePageInfoValue(uint8_t pageIndex, uint8_t numPages);
 
 typedef bool (*CompareValueFunction)(const Value &a, const Value &b);
 typedef void (*ValueToTextFunction)(const Value &value, char *text, int count);
 
 extern CompareValueFunction g_compareUserValueFunctions[];
 extern ValueToTextFunction g_userValueToTextFunctions[];
+
+uint8_t getPageIndexFromValue(const Value &value);
+uint8_t getNumPagesFromValue(const Value &value);
 
 ////////////////////////////////////////////////////////////////////////////////
 
