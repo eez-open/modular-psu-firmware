@@ -57,6 +57,8 @@ static const uint8_t DCP505_REG_VALUE_IODIRB   = 0B11110000; //
 static const uint8_t DCP405_REG_VALUE_IODIRA   = 0B00011111; // pins 0, 1, 2, 3 and 4 are inputs (set to 1)
 static const uint8_t DCP405_REG_VALUE_IODIRB   = 0B00000000; //
 
+static const uint8_t DCP405_R2B5_REG_VALUE_IODIRA = 0B00111111; // pins 0, 1, 2, 3, 4 and 5 are inputs (set to 1)
+
 static const uint8_t REG_VALUE_IPOLA    = 0B00000000; // no pin is inverted
 static const uint8_t REG_VALUE_IPOLB    = 0B00000000; // no pin is inverted
 static const uint8_t REG_VALUE_GPINTENA = 0B00000000; // no interrupts
@@ -107,7 +109,11 @@ void IOExpander::init() {
 
     	if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
         	if (reg == REG_IODIRA) {
-        		value = DCP405_REG_VALUE_IODIRA;
+                if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
+        		    value = DCP405_REG_VALUE_IODIRA;
+                } else {
+                    value = DCP405_R2B5_REG_VALUE_IODIRA;
+                }
         	} else if (reg == REG_IODIRB) {
         		value = DCP405_REG_VALUE_IODIRB;
         	} else if (reg == REG_GPIOA) {
@@ -136,39 +142,37 @@ bool IOExpander::test() {
 
     const uint8_t N_REGS = sizeof(REG_VALUES) / 3;
     for (int i = 0; i < N_REGS; i++) {
-		if (REG_VALUES[3 * i + 2]) {
-			uint8_t reg = REG_VALUES[3 * i];
-			uint8_t value = read(reg);
+        if (REG_VALUES[3 * i + 2]) {
+            uint8_t reg = REG_VALUES[3 * i];
+            uint8_t value = read(reg);
 
-			uint8_t expectedValue = REG_VALUES[3 * i + 1];
+            uint8_t expectedValue = REG_VALUES[3 * i + 1];
 
-			if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
-				if (reg == REG_IODIRA) {
-					expectedValue = DCP405_REG_VALUE_IODIRA;
-				} else if (reg == REG_IODIRB) {
-					expectedValue = DCP405_REG_VALUE_IODIRB;
-				}
-			}
+            if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
+                if (reg == REG_IODIRA) {
+                    expectedValue = DCP405_REG_VALUE_IODIRA;
+                } else if (reg == REG_IODIRB) {
+                    expectedValue = DCP405_REG_VALUE_IODIRB;
+                }
+            }
 
-			if (value != expectedValue) {
-				DebugTrace("Ch%d IO expander reg check failure: reg=%d, expected=%d, got=%d",
-						channel.index, (int)REG_VALUES[3 * i], (int)expectedValue, (int)value);
+            if (value != expectedValue) {
+                DebugTrace("Ch%d IO expander reg check failure: reg=%d, expected=%d, got=%d",
+                        channel.index, (int)REG_VALUES[3 * i], (int)expectedValue, (int)value);
 
-				g_testResult = TEST_FAILED;
-				break;
-			}
-		}
-     }
+                g_testResult = TEST_FAILED;
+                break;
+            }
+        }
+    }
 
      if (g_testResult == TEST_OK) {
  #if !CONF_SKIP_PWRGOOD_TEST
-         channel.flags.powerOk = testBit(IO_BIT_IN_PWRGOOD);
-         if (!channel.flags.powerOk) {
-             DebugTrace("Ch%d power fault", channel.index);
-             generateError(SCPI_ERROR_CH1_FAULT_DETECTED - (channel.index - 1));
-         }
- #else
-         channel.flags.powerOk = 1;
+        channel.flags.powerOk = testBit(IO_BIT_IN_PWRGOOD);
+        if (!channel.flags.powerOk) {
+            DebugTrace("Ch%d power fault", channel.index);
+            generateError(SCPI_ERROR_CH1_FAULT_DETECTED - (channel.index - 1));
+        }
  #endif
      } else {
          channel.flags.powerOk = 0;
@@ -273,6 +277,12 @@ void IOExpander::write(uint8_t reg, uint8_t val) {
     spi::select(channel.slotIndex, spi::CHIP_IOEXP);
     spi::transfer(channel.slotIndex, data, result, 3);
     spi::deselect(channel.slotIndex);
+}
+
+void IOExpander::readAllRegisters(uint8_t registers[]) {
+    for (int i = 0; i < 22; i++) {
+        registers[i] = read(i);
+    }
 }
 
 }

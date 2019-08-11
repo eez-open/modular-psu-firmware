@@ -585,7 +585,7 @@ class Channel {
     void setTriggerOnListStop(TriggerOnListStop value);
 
     bool hasSupportForCurrentDualRange() const {
-        return boardRevision == CH_BOARD_REVISION_DCP405_R1B1;
+        return boardRevision == CH_BOARD_REVISION_DCP405_R1B1 || boardRevision == CH_BOARD_REVISION_DCP405_R2B5;
     }
     void setCurrentRangeSelectionMode(CurrentRangeSelectionMode mode);
     CurrentRangeSelectionMode getCurrentRangeSelectionMode() {

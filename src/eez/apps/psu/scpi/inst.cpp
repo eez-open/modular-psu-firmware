@@ -295,9 +295,16 @@ scpi_result_t scpi_cmd_instrumentDisplayYtRateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentMemory(scpi_t *context) {
-    // TODO migrate to generic firmware
+    int32_t ch;
+
+    if (!SCPI_ParamChoice(context, channel_choice, &ch, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
     int32_t address;
     if (!SCPI_ParamInt32(context, &address, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_MISSING_PARAMETER);
         return SCPI_RES_ERR;
     }
     if (address < 0 || address > 4095) {
@@ -307,6 +314,7 @@ scpi_result_t scpi_cmd_instrumentMemory(scpi_t *context) {
 
     int32_t size;
     if (!SCPI_ParamInt32(context, &size, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_MISSING_PARAMETER);
         return SCPI_RES_ERR;
     }
     if (size != 1 && size != 2 && size != 4) {
@@ -316,6 +324,7 @@ scpi_result_t scpi_cmd_instrumentMemory(scpi_t *context) {
 
     int32_t value;
     if (!SCPI_ParamInt32(context, &value, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_MISSING_PARAMETER);
         return SCPI_RES_ERR;
     }
     if ((size == 1 && (value < 0 || value > 255)) ||
@@ -324,8 +333,7 @@ scpi_result_t scpi_cmd_instrumentMemory(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    uint8_t slotIndex = Channel::get(psu_context->selected_channel_index - 1).slotIndex;
+    uint8_t slotIndex = Channel::get(ch - 1).slotIndex;
 
     if (!dcpX05::eeprom::write(slotIndex, (const uint8_t *)&value, size, (uint16_t)address)) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);

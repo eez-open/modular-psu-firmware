@@ -51,7 +51,9 @@ class IOExpander {
     static const uint8_t DCP405_IO_BIT_IN_ADC_DRDY = 4;
 
     static const uint8_t DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA = 5;
+    static const uint8_t DCP405_R2B5_IO_BIT_IN_OVP_CTRL = 5;
     static const uint8_t DCP405_IO_BIT_OUT_CURRENT_RANGE_500MA = 6;
+    static const uint8_t DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA = 6;
     static const uint8_t DCP405_IO_BIT_OUT_CURRENT_RANGE_5A = 7;
 
     static const uint8_t DCP405_IO_BIT_OUT_OVP_ENABLE = 12;
@@ -74,6 +76,8 @@ class IOExpander {
     int getBitDirection(int io_bit); // 0: output, 1: input
     bool testBit(int io_bit);
     void changeBit(int io_bit, bool set);
+
+    void readAllRegisters(uint8_t registers[]);
 
   private:
     Channel &channel;

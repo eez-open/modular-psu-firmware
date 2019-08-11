@@ -87,6 +87,8 @@ extern RLState g_rlState;
 
 extern bool g_rprogAlarm;
 
+extern void (*g_diagCallback)();
+
 } // namespace psu
 } // namespace eez
 

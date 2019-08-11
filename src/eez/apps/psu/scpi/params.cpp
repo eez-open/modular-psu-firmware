@@ -28,7 +28,7 @@ namespace scpi {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static scpi_choice_def_t channel_choice[] = {
+scpi_choice_def_t channel_choice[] = {
     { "CH1", 1 }, { "CH2", 2 }, { "CH3", 3 }, SCPI_CHOICE_LIST_END /* termination of option list */
 };
 

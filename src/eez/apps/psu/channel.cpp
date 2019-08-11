@@ -50,9 +50,9 @@ namespace psu {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const char *CH_BOARD_NAMES[] = { "None", "DCP505", "DCP405", "DCM220" };
-static const char *CH_REVISION_NAMES[] = { "None", "R1B3", "R1B1", "R1B1" };
-static const char *CH_BOARD_AND_REVISION_NAMES[] = { "None", "DCP505_R1B3", "DCP405_R1B1", "DCM220_R1B1" };
+static const char *CH_BOARD_NAMES[] = { "None", "DCP505", "DCP405", "DCP405", "DCM220" };
+static const char *CH_REVISION_NAMES[] = { "None", "R1B3", "R1B1", "R2B5", "R1B1" };
+static const char *CH_BOARD_AND_REVISION_NAMES[] = { "None", "DCP505_R1B3", "DCP405_R1B1", "DCP405_R2B5", "DCM220_R1B1" };
     
 static uint16_t CH_BOARD_REVISION_FEATURES[] = {
     // CH_BOARD_REVISION_NONE
@@ -63,6 +63,10 @@ static uint16_t CH_BOARD_REVISION_FEATURES[] = {
     CH_FEATURE_RPROG | CH_FEATURE_RPOL,
 
     // CH_BOARD_REVISION_DCP405_R1B1
+    CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE | CH_FEATURE_DPROG |
+    CH_FEATURE_RPROG | CH_FEATURE_RPOL,
+
+    // CH_BOARD_REVISION_DCP405_R2B5
     CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE | CH_FEATURE_DPROG |
     CH_FEATURE_RPROG | CH_FEATURE_RPOL,
 
@@ -362,7 +366,7 @@ void Channel::set(uint8_t slotIndex_, uint8_t boardRevision_, float U_MIN_, floa
     SOA_POSTREG_PTOT = SOA_POSTREG_PTOT_;
     PTOT = PTOT_;
 
-    if (boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
+    if (boardRevision == CH_BOARD_REVISION_DCP405_R1B1 || boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {
         VOLTAGE_GND_OFFSET = 0.86f;
         CURRENT_GND_OFFSET = 0.11f;
     } else if (boardRevision == CH_BOARD_REVISION_DCP505_R1B3) {
@@ -1726,24 +1730,33 @@ float Channel::getDualRangeMax() {
 //}
 
 void Channel::doSetCurrentRange() {
-	ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_500MA, false);
+    if (boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
+	    ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_500MA, false);
+    }
+
 	if (flags.outputEnabled) {
 		if (flags.currentCurrentRange == 0) {
 			// 5A
 			DebugTrace("CH%d: Switched to 5A range", (int)index);
 			ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_5A, true);
-			ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA, false);
+			ioexp.changeBit(boardRevision == CH_BOARD_REVISION_DCP405_R1B1 ? 
+                IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA :
+                IOExpander::DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA, false);
 			// calculateNegligibleAdcDiffForCurrent();
 		} else {
 			// 50mA
 			DebugTrace("CH%d: Switched to 50mA range", (int)index);
-			ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA, true);
+			ioexp.changeBit(boardRevision == CH_BOARD_REVISION_DCP405_R1B1 ? 
+                IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA :
+                IOExpander::DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA, true);
 			ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_5A, false);
 			// calculateNegligibleAdcDiffForCurrent();
 		}
 	} else {
 		ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_5A, true);
-		ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA, false);
+		ioexp.changeBit(boardRevision == CH_BOARD_REVISION_DCP405_R1B1 ? 
+            IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA :
+            IOExpander::DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA, false);
 	}
 }
 

@@ -54,6 +54,10 @@ bool TempSensor::isInstalled() {
         return false;
 #endif
     } else if (type >= CH1 && type <= CH3) {
+    	if (Channel::get(type - CH1).boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {
+    		return false;
+    	}
+
         return g_slots[type - CH1].moduleType == MODULE_TYPE_DCP405 || g_slots[type - CH1].moduleType == MODULE_TYPE_DCP505;
     } else {
         return false;

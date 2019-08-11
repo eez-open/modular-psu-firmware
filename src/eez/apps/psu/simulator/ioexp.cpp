@@ -99,5 +99,8 @@ void IOExpander::changeBit(int io_bit, bool set) {
     }
 }
 
+void IOExpander::readAllRegisters(uint8_t registers[]) {
+}
+
 } // namespace psu
 } // namespace eez

@@ -51,13 +51,10 @@
 #include <eez/apps/psu/gui/psu.h>
 #endif
 
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
 #if OPTION_WATCHDOG
 #include <eez/apps/psu/watchdog.h>
 #endif
 #include <eez/apps/psu/fan.h>
-#endif
 
 #include <eez/apps/psu/channel_dispatcher.h>
 #include <eez/apps/psu/event_queue.h>
@@ -97,9 +94,9 @@ RLState g_rlState = RL_STATE_LOCAL;
 
 bool g_rprogAlarm = false;
 
-static uint32_t g_mainLoopCounter;
-
 ontime::Counter g_powerOnTimeCounter(ontime::ON_TIME_COUNTER_POWER);
+
+void (*g_diagCallback)();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -148,6 +145,9 @@ void init() {
         } else if (value == 405) {
             g_slots[i].moduleType = MODULE_TYPE_DCP405;
             channels[i].set(i, CH_BOARD_REVISION_DCP405_R1B1, CH_PARAMS_40V_5A);
+        } else if (value == 406) {
+            g_slots[i].moduleType = MODULE_TYPE_DCP405;
+            channels[i].set(i, CH_BOARD_REVISION_DCP405_R2B5, CH_PARAMS_40V_5A);
         } else if (value == 505) {
             g_slots[i].moduleType = MODULE_TYPE_DCP505;
             channels[i].set(i, CH_BOARD_REVISION_DCP505_R1B3, CH_PARAMS_50V_5A);
@@ -722,45 +722,17 @@ void onProtectionTripped() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void tick() {
-    ++g_mainLoopCounter;
-
     uint32_t tick_usec = micros();
-
-    static uint32_t lastTickList = 0;
-    if (list::isActive()) {
-        if (lastTickList == 0) {
-            lastTickList = tick_usec;
-        } else if (tick_usec - lastTickList >= 250) {
-            lastTickList = tick_usec;
-            list::tick(tick_usec);
-            io_pins::tick(tick_usec);
-        }
-    } else {
-        lastTickList = 0;
-    }
 
 #if OPTION_SD_CARD
     dlog::tick(tick_usec);
 #endif
 
-    static uint32_t lastTickAdc = 0;
-    if (lastTickAdc == 0) {
-        lastTickAdc = tick_usec;
-    } else if (tick_usec - lastTickAdc >= ADC_READ_TIME_US / 2) {
-        lastTickAdc = tick_usec;
-
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel::get(i).tick(tick_usec);
-        }
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel::get(i).tick(tick_usec);
     }
 
-    static uint32_t lastTickIoPins = 0;
-    if (lastTickIoPins == 0) {
-        lastTickIoPins = tick_usec;
-    } else if (tick_usec - lastTickIoPins >= 1000) {
-        lastTickIoPins = tick_usec;
-        io_pins::tick(tick_usec);
-    }
+    io_pins::tick(tick_usec);
 
 #ifdef DEBUG
     debug::tick(tick_usec);
@@ -771,10 +743,6 @@ void tick() {
     temperature::tick(tick_usec);
 
     fan::tick(tick_usec);
-
-    for (int i = 0; i < CH_NUM; ++i) {
-        Channel::get(i).tick(tick_usec);
-    }
 
     trigger::tick(tick_usec);
 
@@ -792,8 +760,12 @@ void tick() {
 
     idle::tick();
 
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
+    if (g_diagCallback) {
+        g_diagCallback();
+        g_diagCallback = NULL;
+    }
+
+#if OPTION_WATCHDOG
     watchdog::tick(tick_usec);
 #endif
 }
