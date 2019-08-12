@@ -1122,4 +1122,4 @@ enum PagesEnum {
     PAGE_ID_SCRIPTS = 102
 };
 
-extern const uint8_t assets[212650];
+extern const uint8_t assets[212562];

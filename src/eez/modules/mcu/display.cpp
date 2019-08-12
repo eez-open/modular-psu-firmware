@@ -253,7 +253,7 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
         while ((encoding = *text++) != 0) {
             int glyph_width = measureGlyph(encoding);
             if (max_width > 0 && width + glyph_width > max_width) {
-                break;
+                return max_width;
             }
             width += glyph_width;
         }
@@ -262,7 +262,7 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
             char encoding = text[i];
             int glyph_width = measureGlyph(encoding);
             if (max_width > 0 && width + glyph_width > max_width) {
-                break;
+                return max_width;
             }
             width += glyph_width;
         }

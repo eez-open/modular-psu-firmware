@@ -500,10 +500,6 @@ void action_toggle_channels_view_mode() {
 void action_toggle_channels_max_view() {
     selectChannel();
     persist_conf::toggleChannelsMaxView(g_channel->index);
-    showMainPage();
-}
-
-void action_set_channels_default_view() {
 }
 
 void action_ethernet_toggle() {
