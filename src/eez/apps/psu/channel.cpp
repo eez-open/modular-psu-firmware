@@ -1425,9 +1425,7 @@ void Channel::doSetCurrent(float value) {
             setCurrentRange(CURRENT_RANGE_HIGH);
         } else if (!calibration::isEnabled()) {
             if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_USE_BOTH) {
-                setCurrentRange(eez::greater(value, 0.05f, getPrecision(UNIT_AMPER))
-                                    ? CURRENT_RANGE_HIGH
-                                    : CURRENT_RANGE_LOW);
+                setCurrentRange(eez::greater(value, 0.05f, getPrecision(UNIT_AMPER)) ? CURRENT_RANGE_HIGH : CURRENT_RANGE_LOW);
             } else if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_HIGH) {
                 setCurrentRange(CURRENT_RANGE_HIGH);
             } else {

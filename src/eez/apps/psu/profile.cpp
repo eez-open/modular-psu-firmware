@@ -208,10 +208,8 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
             trigger::setCurrent(channel, profile->channels[i].i_triggerValue);
             list::setListCount(channel, profile->channels[i].listCount);
 
-            channel.flags.currentRangeSelectionMode =
-                profile->channels[i].flags.currentRangeSelectionMode;
-            channel.flags.autoSelectCurrentRange =
-                profile->channels[i].flags.autoSelectCurrentRange;
+            channel.flags.currentRangeSelectionMode = profile->channels[i].flags.currentRangeSelectionMode;
+            channel.flags.autoSelectCurrentRange = profile->channels[i].flags.autoSelectCurrentRange;
 
 #if OPTION_SD_CARD
             loadProfileList(*profile, channel, location);
@@ -287,8 +285,7 @@ void fillProfile(Parameters *pProfile) {
             profile.channels[i].i_triggerValue = trigger::getCurrent(channel);
             profile.channels[i].listCount = list::getListCount(channel);
 
-            profile.channels[i].flags.currentRangeSelectionMode =
-                channel.flags.currentRangeSelectionMode;
+            profile.channels[i].flags.currentRangeSelectionMode = channel.flags.currentRangeSelectionMode;
             profile.channels[i].flags.autoSelectCurrentRange = channel.flags.autoSelectCurrentRange;
         }
         else {

@@ -107,13 +107,13 @@ EnumItem g_triggerSourceEnumDefinition[] = { { trigger::SOURCE_BUS, "Bus" },
 
 EnumItem g_channelCurrentRangeSelectionModeEnumDefinition[] = {
     { CURRENT_RANGE_SELECTION_USE_BOTH, "Best (default)" },
-    { CURRENT_RANGE_SELECTION_ALWAYS_HIGH, "5A" },
-    { CURRENT_RANGE_SELECTION_ALWAYS_LOW, "50mA" },
+    { CURRENT_RANGE_SELECTION_ALWAYS_HIGH, "High (5A)" },
+    { CURRENT_RANGE_SELECTION_ALWAYS_LOW, "Low (50mA)" },
     { 0, 0 }
 };
 
-EnumItem g_channelCurrentRangeEnumDefinition[] = { { CURRENT_RANGE_HIGH, "5A" },
-                                                   { CURRENT_RANGE_LOW, "50mA" },
+EnumItem g_channelCurrentRangeEnumDefinition[] = { { CURRENT_RANGE_HIGH, "High" },
+                                                   { CURRENT_RANGE_LOW, "Low" },
                                                    { 0, 0 } };
 
 EnumItem g_channelTriggerOnListStopEnumDefinition[] = {
@@ -3337,7 +3337,9 @@ void data_channel_ranges_auto_ranging(data::DataOperationEnum operation, data::C
 void data_channel_ranges_currently_selected(data::DataOperationEnum operation, data::Cursor &cursor,
                                             data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeEnumDefinitionValue(g_channel->flags.currentCurrentRange,
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        Channel &channel = Channel::get(iChannel);
+        value = MakeEnumDefinitionValue(channel.flags.currentCurrentRange,
                                         ENUM_DEFINITION_CHANNEL_CURRENT_RANGE);
     }
 }
