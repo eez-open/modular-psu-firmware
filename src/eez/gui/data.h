@@ -143,7 +143,9 @@ struct Value {
     Unit getUnit() const {
         return (Unit)unit_;
     }
+
     bool isMilli() const;
+
     bool isMicro() const;
 
     float getFloat() const {

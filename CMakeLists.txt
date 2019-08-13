@@ -64,8 +64,11 @@ include_directories(
     src/third_party/libscpi/inc
     src/third_party/micropython
     src/third_party/micropython/port
-    src/third_party/micropython/port/win32
 )
+
+if(WIN32)
+    include_directories(src/third_party/micropython/port/win32)
+endif()
 
 set(src_files)
 set(header_files)

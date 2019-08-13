@@ -68,9 +68,9 @@ class PsuAppContext : public AppContext {
                                       const Style *style) override;
     bool isBlinking(const data::Cursor &cursor, uint16_t id) override;
 
-    int getNumHistoryValues(uint16_t id) override;
-    int getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) override;
-    Value getHistoryValue(const Cursor &cursor, uint16_t id, int position) override;
+    uint32_t getNumHistoryValues(uint16_t id) override;
+    uint32_t getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) override;
+    Value getHistoryValue(const Cursor &cursor, uint16_t id, uint32_t position) override;
 
   protected:
     int getMainPageId() override;

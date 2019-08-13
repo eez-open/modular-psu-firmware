@@ -96,9 +96,9 @@ public:
     virtual void onScaleUpdated(int dataId, bool scaleIsVertical, int scaleWidth,
                                 float scaleHeight);
 
-    virtual int getNumHistoryValues(uint16_t id);
-    virtual int getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id);
-    virtual Value getHistoryValue(const Cursor &cursor, uint16_t id, int position);
+    virtual uint32_t getNumHistoryValues(uint16_t id);
+    virtual uint32_t getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id);
+    virtual Value getHistoryValue(const Cursor &cursor, uint16_t id, uint32_t position);
 
     virtual bool isActiveWidget(const WidgetCursor &widgetCursor);
     virtual void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);

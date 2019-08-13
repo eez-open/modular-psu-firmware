@@ -256,6 +256,48 @@ int Value::getInt() const {
     return int_;
 }
 
+bool Value::isMilli() const {
+    float floatValue = getFloat();
+    Unit unit = getUnit();
+
+    if (floatValue != 0) {
+        if (unit == UNIT_VOLT) {
+            if (fabs(floatValue) < 1) {
+                return true;
+            }
+        } else if (unit == UNIT_AMPER) {
+            if (fabs(floatValue) < 1 && !(fabs(floatValue) < 0.001f && fabs(floatValue) != 0.0005f)) {
+                return true;
+            }
+        } else if (unit == UNIT_WATT) {
+            if (fabs(floatValue) < 1) {
+                return true;
+            }
+        } else if (unit == UNIT_SECOND) {
+            if (fabs(floatValue) < 1) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool Value::isMicro() const {
+    float floatValue = getFloat();
+    Unit unit = getUnit();
+
+    if (floatValue != 0) {
+        if (unit == UNIT_AMPER) {
+            if (fabs(floatValue) < 0.001f && fabs(floatValue) != 0.0005f) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 int count(uint16_t id) {

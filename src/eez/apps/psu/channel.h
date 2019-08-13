@@ -562,14 +562,14 @@ class Channel {
         return isCurrentBalanced() ? iBeforeBalancing : i.set;
     }
 
-    int getCurrentHistoryValuePosition() {
+    uint32_t getCurrentHistoryValuePosition() {
         return historyPosition;
     }
-    float getUMonHistory(int position) const {
-        return uHistory[position];
+    float getUMonHistory(uint32_t position) const {
+        return uHistory[position % CHANNEL_HISTORY_SIZE];
     }
-    float getIMonHistory(int position) const {
-        return iHistory[position];
+    float getIMonHistory(uint32_t position) const {
+        return iHistory[position % CHANNEL_HISTORY_SIZE];
     }
 
     void resetHistory();
@@ -626,7 +626,7 @@ class Channel {
 
     float uHistory[CHANNEL_HISTORY_SIZE];
     float iHistory[CHANNEL_HISTORY_SIZE];
-    int historyPosition;
+    uint32_t historyPosition;
     uint32_t historyLastTick;
 
     float VOLTAGE_GND_OFFSET; // [V], (1375 / 65535) * (40V | 50V)

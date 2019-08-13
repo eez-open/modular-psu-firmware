@@ -631,7 +631,16 @@ void Channel::reset() {
 }
 
 void Channel::resetHistory() {
-    historyPosition = -1;
+    uHistory[0] = u.mon_last;
+    iHistory[0] = i.mon_last;
+
+    for (int i = 1; i < CHANNEL_HISTORY_SIZE; ++i) {
+        uHistory[i] = 0;
+        iHistory[i] = 0;
+    }
+
+    historyPosition = 0;
+    historyLastTick = micros();
 }
 
 void Channel::clearCalibrationConf() {
@@ -824,26 +833,13 @@ void Channel::tick(uint32_t tick_usec) {
 #endif
 
     // update history values
-    if (historyPosition == -1) {
-        uHistory[0] = u.mon_last;
-        iHistory[0] = i.mon_last;
-        for (int i = 1; i < CHANNEL_HISTORY_SIZE; ++i) {
-            uHistory[i] = 0;
-            iHistory[i] = 0;
-        }
-
-        historyPosition = 1;
-        historyLastTick = tick_usec;
-    } else {
-        uint32_t ytViewRateMicroseconds = (int)round(ytViewRate * 1000000L);
-        while (tick_usec - historyLastTick >= ytViewRateMicroseconds) {
-            uHistory[historyPosition] = u.mon_last;
-            iHistory[historyPosition] = i.mon_last;
-            if (++historyPosition == CHANNEL_HISTORY_SIZE) {
-                historyPosition = 0;
-            }
-            historyLastTick += ytViewRateMicroseconds;
-        }
+    uint32_t ytViewRateMicroseconds = (int)round(ytViewRate * 1000000L);
+    while (tick_usec - historyLastTick >= ytViewRateMicroseconds) {
+        uint32_t historyIndex = historyPosition % CHANNEL_HISTORY_SIZE;
+        uHistory[historyIndex] = u.mon_last;
+        iHistory[historyIndex] = i.mon_last;
+        ++historyPosition;
+        historyLastTick += ytViewRateMicroseconds;
     }
 
     doAutoSelectCurrentRange(tick_usec);

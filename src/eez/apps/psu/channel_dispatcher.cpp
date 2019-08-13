@@ -235,7 +235,7 @@ float getUMonLast(const Channel &channel) {
     return channel.u.mon_last;
 }
 
-float getUMonHistory(const Channel &channel, int position) {
+float getUMonHistory(const Channel &channel, uint32_t position) {
     if (isSeries()) {
         return Channel::get(0).getUMonHistory(position) + Channel::get(1).getUMonHistory(position);
     }
@@ -402,7 +402,7 @@ float getIMonLast(const Channel &channel) {
     return channel.i.mon_last;
 }
 
-float getIMonHistory(const Channel &channel, int position) {
+float getIMonHistory(const Channel &channel, uint32_t position) {
     if (isParallel()) {
         return Channel::get(0).getIMonHistory(position) + Channel::get(1).getIMonHistory(position);
     }

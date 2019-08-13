@@ -111,6 +111,12 @@ void NumericKeypad::init(const char *label, const data::Value &value, NumericKey
         m_options.flags.dotButtonEnabled = true;
     }
 
+    if (m_startValue.isMicro()) {
+        switchToMicro();
+    } else if (m_startValue.isMilli()) {
+        switchToMilli();
+    }
+
     m_maxChars = 16;
 
     reset();

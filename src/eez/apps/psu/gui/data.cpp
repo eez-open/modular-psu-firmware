@@ -878,7 +878,7 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
-        int position = value.getInt();
+        uint32_t position = value.getUInt32();
         value = MakeValue(channel_dispatcher::getUMonHistory(channel, position), UNIT_VOLT);
     }
 }
@@ -978,7 +978,7 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
-        int position = value.getInt();
+        uint32_t position = value.getUInt32();
         value =
             MakeValue(channel_dispatcher::getIMonHistory(channel, position), UNIT_AMPER);
     }
@@ -1052,7 +1052,7 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
-        float pMon = channel_dispatcher::getUMonHistory(channel, value.getInt()) * channel_dispatcher::getIMonHistory(channel, value.getInt());
+        float pMon = channel_dispatcher::getUMonHistory(channel, value.getUInt32()) * channel_dispatcher::getIMonHistory(channel, value.getUInt32());
         value = MakeValue(pMon, UNIT_WATT);
     }
 }

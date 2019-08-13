@@ -355,15 +355,15 @@ void AppContext::onScaleUpdated(int dataId, bool scaleIsVertical, int scaleWidth
                                 float scaleHeight) {
 }
 
-int AppContext::getNumHistoryValues(uint16_t id) {
+uint32_t AppContext::getNumHistoryValues(uint16_t id) {
     return 0;
 }
 
-int AppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) {
+uint32_t AppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) {
     return 0;
 }
 
-Value AppContext::getHistoryValue(const Cursor &cursor, uint16_t id, int position) {
+Value AppContext::getHistoryValue(const Cursor &cursor, uint16_t id, uint32_t position) {
     return Value();
 }
 

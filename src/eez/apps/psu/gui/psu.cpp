@@ -231,17 +231,17 @@ void PsuAppContext::onScaleUpdated(int dataId, bool scaleIsVertical, int scaleWi
     }
 }
 
-int PsuAppContext::getNumHistoryValues(uint16_t id) {
+uint32_t PsuAppContext::getNumHistoryValues(uint16_t id) {
     return CHANNEL_HISTORY_SIZE;
 }
 
-int PsuAppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) {
+uint32_t PsuAppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) {
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     return Channel::get(iChannel).getCurrentHistoryValuePosition();
 }
 
-Value PsuAppContext::getHistoryValue(const Cursor &cursor, uint16_t id, int position) {
-    Value value = position;
+Value PsuAppContext::getHistoryValue(const Cursor &cursor, uint16_t id, uint32_t position) {
+    Value value(position, VALUE_TYPE_INT);
     g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_HISTORY_VALUE, (Cursor &)cursor, value);
     return value;
 }
