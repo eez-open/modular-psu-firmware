@@ -120,7 +120,9 @@ void Channel::Value::resetMonValues() {
     mon_measured = false;
 }
 
-void Channel::Value::addMonValue(float value) {
+void Channel::Value::addMonValue(float value, float prec) {
+    value = roundPrec(value, prec);
+
     mon_last = value;
 
     if (mon_index == -1) {
@@ -135,13 +137,15 @@ void Channel::Value::addMonValue(float value) {
         mon_total += value;
         mon_arr[mon_index] = value;
         mon_index = (mon_index + 1) % NUM_ADC_AVERAGING_VALUES;
-        mon = mon_total / NUM_ADC_AVERAGING_VALUES;
+        mon = roundPrec(mon_total / NUM_ADC_AVERAGING_VALUES, prec);
     }
 
     mon_measured = true;
 }
 
-void Channel::Value::addMonDacValue(float value) {
+void Channel::Value::addMonDacValue(float value, float prec) {
+    value = roundPrec(value, prec);
+
     if (mon_dac_index == -1) {
         mon_dac_index = 0;
         for (int i = 0; i < NUM_ADC_AVERAGING_VALUES; ++i) {
@@ -154,7 +158,7 @@ void Channel::Value::addMonDacValue(float value) {
         mon_dac_total += value;
         mon_dac_arr[mon_dac_index] = value;
         mon_dac_index = (mon_dac_index + 1) % NUM_ADC_AVERAGING_VALUES;
-        mon_dac = mon_dac_total / NUM_ADC_AVERAGING_VALUES;
+        mon_dac = roundPrec(mon_dac_total / NUM_ADC_AVERAGING_VALUES, prec);
     }
 }
 
@@ -432,9 +436,7 @@ void Channel::protectionEnter(ProtectionValue &cpv) {
     int16_t eventId = event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + 3 * (index - 1);
 
     if (IS_OVP_VALUE(this, cpv)) {
-        if (flags.rprogEnabled &&
-            eez::equal(channel_dispatcher::getUProtectionLevel(*this),
-                       channel_dispatcher::getUMax(*this), getPrecision(UNIT_VOLT))) {
+        if (flags.rprogEnabled && channel_dispatcher::getUProtectionLevel(*this) == channel_dispatcher::getUMax(*this)) {
             g_rprogAlarm = true;
         }
         doRemoteProgrammingEnable(false);
@@ -456,24 +458,13 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
 
     if (IS_OVP_VALUE(this, cpv)) {
         state = flags.rprogEnabled || prot_conf.flags.u_state;
-        // condition = flags.cv_mode && (!flags.cc_mode || fabs(i.mon_last - i.set) >=
-        // CHANNEL_VALUE_PRECISION) && (prot_conf.u_level <= u.set);
-        condition = eez::greaterOrEqual(channel_dispatcher::getUMon(*this),
-                                        channel_dispatcher::getUProtectionLevel(*this),
-                                        getPrecision(UNIT_VOLT)) ||
-                    (flags.rprogEnabled &&
-                     eez::greaterOrEqual(channel_dispatcher::getUMonDac(*this),
-                                         channel_dispatcher::getUProtectionLevel(*this),
-                                         getPrecision(UNIT_VOLT)));
+        condition = channel_dispatcher::getUMon(*this) >= channel_dispatcher::getUProtectionLevel(*this) ||
+            (flags.rprogEnabled && channel_dispatcher::getUMonDac(*this) >= channel_dispatcher::getUProtectionLevel(*this));
         delay = prot_conf.u_delay;
         delay -= PROT_DELAY_CORRECTION;
     } else if (IS_OCP_VALUE(this, cpv)) {
         state = prot_conf.flags.i_state;
-        // condition = flags.cc_mode && (!flags.cv_mode || fabs(u.mon_last - u.set) >=
-        // CHANNEL_VALUE_PRECISION);
-        condition =
-            eez::greaterOrEqual(channel_dispatcher::getIMon(*this),
-                                channel_dispatcher::getISet(*this), getPrecision(UNIT_AMPER));
+        condition = channel_dispatcher::getIMon(*this) >= channel_dispatcher::getISet(*this);
         delay = prot_conf.i_delay;
         delay -= PROT_DELAY_CORRECTION;
     } else {
@@ -833,11 +824,9 @@ void Channel::tick(uint32_t tick_usec) {
 #endif
 
     // update history values
-    auto uMonLast = roundPrec(u.mon_last, getPrecisionFromNumSignificantDecimalDigits(VOLTAGE_NUM_SIGNIFICANT_DECIMAL_DIGITS));
-    auto iMonLast = roundPrec(i.mon_last, getPrecisionFromNumSignificantDecimalDigits(CURRENT_NUM_SIGNIFICANT_DECIMAL_DIGITS));
     if (historyPosition == -1) {
-        uHistory[0] = uMonLast;
-        iHistory[0] = iMonLast;
+        uHistory[0] = u.mon_last;
+        iHistory[0] = i.mon_last;
         for (int i = 1; i < CHANNEL_HISTORY_SIZE; ++i) {
             uHistory[i] = 0;
             iHistory[i] = 0;
@@ -848,8 +837,8 @@ void Channel::tick(uint32_t tick_usec) {
     } else {
         uint32_t ytViewRateMicroseconds = (int)round(ytViewRate * 1000000L);
         while (tick_usec - historyLastTick >= ytViewRateMicroseconds) {
-            uHistory[historyPosition] = uMonLast;
-            iHistory[historyPosition] = iMonLast;
+            uHistory[historyPosition] = u.mon_last;
+            iHistory[historyPosition] = i.mon_last;
             if (++historyPosition == CHANNEL_HISTORY_SIZE) {
                 historyPosition = 0;
             }
@@ -884,6 +873,56 @@ int16_t Channel::remapCurrentToAdcData(float value) {
                           (float)AnalogDigitalConverter::ADC_MAX);
 }
 
+float Channel::getVoltagePrecision() {
+    float precision = 0.005f; // 5 mV;
+
+    if (calibration::isEnabled()) {
+        precision /= 10;
+    }
+
+    return precision;
+}
+
+float Channel::getCurrentPrecision(float value) {
+    float precision = 0.0005f; // 0.5mA
+
+    if (hasSupportForCurrentDualRange()) {
+        if ((!isNaN(value) && value <= 0.05f && isMicroAmperAllowed()) || flags.currentCurrentRange == CURRENT_RANGE_LOW) {
+            precision = 0.000005f; // 5uA
+        }
+    }
+    
+    if (calibration::isEnabled()) {
+        precision /= 10;
+    }
+
+    return precision;
+}
+
+float Channel::getPowerPrecision() {
+    return 0.001f; // 1 mW;
+}
+
+bool Channel::isMicroAmperAllowed() {
+    return flags.currentRangeSelectionMode != CURRENT_RANGE_SELECTION_ALWAYS_HIGH;
+}
+
+float Channel::roundChannelValue(Unit unit, float value) {
+    if (unit == UNIT_VOLT) {
+        return roundPrec(value, getVoltagePrecision());
+    }
+    
+    if (unit == UNIT_AMPER) {
+        return roundPrec(value, getCurrentPrecision(value));
+    }
+    
+    if (unit == UNIT_WATT) {
+        return roundPrec(value, getPowerPrecision());
+    }
+    
+    return value;
+}
+
 void Channel::adcDataIsReady(int16_t data, bool startAgain) {
     uint8_t nextStartReg0 = 0;
 
@@ -894,15 +933,6 @@ void Channel::adcDataIsReady(int16_t data, bool startAgain) {
         debug::g_uMon[index - 1].set(data);
 #endif
 
-        // if (greaterOrEqual(u.mon_adc, 10.0f, getPrecision(VALUE_TYPE_FLOAT_VOLT))) {
-        //    if (abs(u.mon_adc - data) > negligibleAdcDiffForVoltage2) {
-        //        u.mon_adc = data;
-        //    }
-        //} else {
-        //    if (abs(u.mon_adc - data) > negligibleAdcDiffForVoltage3) {
-        //        u.mon_adc = data;
-        //    }
-        //}
         u.mon_adc = data;
 
         float value;
@@ -924,7 +954,7 @@ void Channel::adcDataIsReady(int16_t data, bool startAgain) {
 #endif
         }
 
-        u.addMonValue(value);
+        u.addMonValue(value, getVoltagePrecision());
 
         nextStartReg0 = AnalogDigitalConverter::ADC_REG0_READ_I_MON;
     } break;
@@ -948,7 +978,7 @@ void Channel::adcDataIsReady(int16_t data, bool startAgain) {
                           cal_conf.i[flags.currentCurrentRange].max.val);
         }
 
-        i.addMonValue(value);
+        i.addMonValue(value, getCurrentPrecision());
 
         if (isOutputEnabled()) {
             if (isRemoteProgrammingEnabled()) {
@@ -984,7 +1014,7 @@ void Channel::adcDataIsReady(int16_t data, bool startAgain) {
         //    u.mon_dac = value;
         //}
 
-        u.addMonDacValue(value);
+        u.addMonDacValue(value, getVoltagePrecision());
 
         if (isOutputEnabled() && isRemoteProgrammingEnabled()) {
             nextStartReg0 = AnalogDigitalConverter::ADC_REG0_READ_U_MON;
@@ -1010,7 +1040,7 @@ void Channel::adcDataIsReady(int16_t data, bool startAgain) {
         //    i.mon_dac = value;
         //}
 
-        i.addMonDacValue(value);
+        i.addMonDacValue(value, getCurrentPrecision());
 
         if (isOutputEnabled()) {
             nextStartReg0 = AnalogDigitalConverter::ADC_REG0_READ_U_MON;
@@ -1279,7 +1309,7 @@ void Channel::doCalibrationEnable(bool enable) {
     flags._calEnabled = enable;
 
     if (enable) {
-        u.min = floorPrec(cal_conf.u.minPossible, getPrecision(UNIT_VOLT));
+        u.min = cal_conf.u.minPossible;
         if (u.min < U_MIN)
             u.min = U_MIN;
         if (u.limit < u.min)
@@ -1287,7 +1317,7 @@ void Channel::doCalibrationEnable(bool enable) {
         if (u.set < u.min)
             setVoltage(u.min);
 
-        u.max = ceilPrec(cal_conf.u.maxPossible, getPrecision(UNIT_VOLT));
+        u.max = cal_conf.u.maxPossible;
         if (u.max > U_MAX)
             u.max = U_MAX;
         if (u.set > u.max)
@@ -1295,7 +1325,7 @@ void Channel::doCalibrationEnable(bool enable) {
         if (u.limit > u.max)
             u.limit = u.max;
 
-        i.min = floorPrec(cal_conf.i[0].minPossible, getPrecision(UNIT_AMPER));
+        i.min = cal_conf.i[0].minPossible;
         if (i.min < I_MIN)
             i.min = I_MIN;
         if (i.limit < i.min)
@@ -1303,7 +1333,7 @@ void Channel::doCalibrationEnable(bool enable) {
         if (i.set < i.min)
             setCurrent(i.min);
 
-        i.max = ceilPrec(cal_conf.i[0].maxPossible, getPrecision(UNIT_AMPER));
+        i.max = cal_conf.i[0].maxPossible;
         if (i.max > I_MAX)
             i.max = I_MAX;
         if (i.limit > i.max)
@@ -1411,6 +1441,8 @@ void Channel::doSetVoltage(float value) {
 }
 
 void Channel::setVoltage(float value) {
+    value = roundPrec(value, getVoltagePrecision());
+
     doSetVoltage(value);
 
     uBeforeBalancing = NAN;
@@ -1425,7 +1457,7 @@ void Channel::doSetCurrent(float value) {
             setCurrentRange(CURRENT_RANGE_HIGH);
         } else if (!calibration::isEnabled()) {
             if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_USE_BOTH) {
-                setCurrentRange(eez::greater(value, 0.05f, getPrecision(UNIT_AMPER)) ? CURRENT_RANGE_HIGH : CURRENT_RANGE_LOW);
+                setCurrentRange(value > 0.05f ? CURRENT_RANGE_HIGH : CURRENT_RANGE_LOW);
             } else if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_HIGH) {
                 setCurrentRange(CURRENT_RANGE_HIGH);
             } else {
@@ -1454,6 +1486,8 @@ void Channel::doSetCurrent(float value) {
 }
 
 void Channel::setCurrent(float value) {
+    value = roundPrec(value, getCurrentPrecision(value));
+
     doSetCurrent(value);
 
     iBeforeBalancing = NAN;
@@ -1556,6 +1590,8 @@ float Channel::getVoltageMaxLimit() const {
 }
 
 void Channel::setVoltageLimit(float limit) {
+    limit = roundPrec(limit, getVoltagePrecision());
+
     u.limit = limit;
     if (u.set > u.limit) {
         setVoltage(u.limit);
@@ -1568,6 +1604,8 @@ float Channel::getCurrentLimit() const {
 }
 
 void Channel::setCurrentLimit(float limit) {
+    limit = roundPrec(limit, getCurrentPrecision(limit));
+
     if (limit > getMaxCurrentLimit()) {
         limit = getMaxCurrentLimit();
     }
@@ -1626,6 +1664,8 @@ float Channel::getPowerMaxLimit() const {
 }
 
 void Channel::setPowerLimit(float limit) {
+    limit = roundPrec(limit, getPowerPrecision());
+
     p_limit = limit;
     if (u.set * i.set > p_limit) {
         // setVoltage(p_limit / i.set);
@@ -1692,11 +1732,11 @@ void Channel::setCurrentRangeSelectionMode(CurrentRangeSelectionMode mode) {
     profile::save();
 
     if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
-        if (eez::greater(i.set, 0.05f, getPrecision(UNIT_AMPER))) {
+        if (i.set > 0.05f) {
             i.set = 0.05f;
         }
 
-        if (eez::greater(i.limit, 0.05f, getPrecision(UNIT_AMPER))) {
+        if (i.limit > 0.05f) {
             i.limit = 0.05f;
         }
     }
@@ -1780,11 +1820,11 @@ void Channel::doAutoSelectCurrentRange(uint32_t tickCount) {
                     hasSupportForCurrentDualRange() && !dac.isTesting() &&
                     !calibration::isEnabled()) {
                     if (flags.currentCurrentRange == CURRENT_RANGE_LOW) {
-                        if (eez::greater(i.set, 0.05f, getPrecision(UNIT_AMPER)) && isCcMode()) {
+                        if (i.set > 0.05f && isCcMode()) {
                             doSetCurrent(i.set);
                         }
                     } else if (i.mon_measured) {
-                        if (eez::less(i.mon_last, 0.05f, getPrecision(UNIT_AMPER))) {
+                        if (i.mon_last < 0.05f) {
                             setCurrentRange(1);
                             dac.set_current((uint16_t)65535);
                         }

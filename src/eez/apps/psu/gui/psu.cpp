@@ -379,7 +379,7 @@ void changeVoltageLimit(int iChannel) {
     float maxLimit = channel_dispatcher::getUMax(channel);
     float defLimit = channel_dispatcher::getUMax(channel);
     changeValue(channel,
-                MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT, channel.index - 1),
+                MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT),
                 minLimit, maxLimit, defLimit, onSetVoltageLimit);
 }
 
@@ -397,7 +397,7 @@ void changeCurrentLimit(int iChannel) {
     float maxLimit = channel_dispatcher::getIMax(channel);
     float defLimit = channel_dispatcher::getIMax(channel);
     changeValue(channel,
-                MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER, channel.index - 1),
+                MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER),
                 minLimit, maxLimit, defLimit, onSetCurrentLimit);
 }
 
@@ -415,7 +415,7 @@ void changePowerLimit(int iChannel) {
     float maxLimit = channel_dispatcher::getPowerMaxLimit(channel);
     float defLimit = channel_dispatcher::getPowerDefaultLimit(channel);
     changeValue(channel,
-                MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT, channel.index - 1),
+                MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT),
                 minLimit, maxLimit, defLimit, onSetPowerLimit);
 }
 
@@ -433,7 +433,7 @@ void changePowerTripLevel(int iChannel) {
     float maxLevel = channel_dispatcher::getOppMaxLevel(channel);
     float defLevel = channel_dispatcher::getOppDefaultLevel(channel);
     changeValue(channel,
-        MakeValue(channel_dispatcher::getPowerProtectionLevel(channel), UNIT_WATT, channel.index - 1),
+        MakeValue(channel_dispatcher::getPowerProtectionLevel(channel), UNIT_WATT),
         minLevel, maxLevel, defLevel, onSetPowerTripLevel);
 }
 
@@ -451,7 +451,7 @@ void changePowerTripDelay(int iChannel) {
     float maxDelay = channel.OPP_MAX_DELAY;
     float defaultDelay = channel.OPP_DEFAULT_DELAY;
     changeValue(channel,
-        MakeValue(channel.prot_conf.p_delay, UNIT_SECOND, channel.index - 1),
+        MakeValue(channel.prot_conf.p_delay, UNIT_SECOND),
         minDelay, maxDelay, defaultDelay, onSetPowerTripDelay);
 }
 
@@ -469,7 +469,7 @@ void changeTemperatureTripLevel(int iChannel) {
     float maxLevel = OTP_AUX_MAX_LEVEL;
     float defLevel = OTP_AUX_DEFAULT_LEVEL;
     changeValue(channel,
-        MakeValue(temperature::getChannelSensorLevel(&channel), UNIT_CELSIUS, channel.index - 1),
+        MakeValue(temperature::getChannelSensorLevel(&channel), UNIT_CELSIUS),
         minLevel, maxLevel, defLevel, onSetTemperatureTripLevel);
 }
 
@@ -661,6 +661,8 @@ void onEncoder(int tickCount, int counter, bool clicked) {
             float newValue =
                 value.getFloat() + (value.getUnit() == UNIT_AMPER ? 0.001f : 0.01f) * counter;
 
+            newValue = Channel::get(g_focusCursor.i).roundChannelValue(value.getUnit(), newValue);
+
             float min = data::getMin(g_focusCursor, g_focusDataId).getFloat();
             if (newValue < min) {
                 newValue = min;
@@ -672,11 +674,11 @@ void onEncoder(int tickCount, int counter, bool clicked) {
             }
 
             if (persist_conf::devConf2.flags.encoderConfirmationMode) {
-                g_focusEditValue = MakeValue(newValue, value.getUnit(), g_focusCursor.i > 0 ? g_focusCursor.i : 0);
+                g_focusEditValue = MakeValue(newValue, value.getUnit());
                 g_focusEditValueChangedTime = micros();
             } else {
                 int16_t error;
-                if (!data::set(g_focusCursor, g_focusDataId, MakeValue(newValue, value.getUnit(), g_focusCursor.i), &error)) {
+                if (!data::set(g_focusCursor, g_focusDataId, MakeValue(newValue, value.getUnit()), &error)) {
                     psuErrorMessage(g_focusCursor, data::MakeScpiErrorValue(error));
                 }
             }

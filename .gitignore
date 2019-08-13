@@ -2,3 +2,11 @@
 build
 modular-psu-firmware.eez-project-ui-state
 src/third_party/stm32/Debug
+
+src/eez/gui/document_stm32.h
+src/eez/gui/document_stm32.cpp
+src/eez/scpi/commands_stm32.h
+
+src/eez/gui/document_simulator.h
+src/eez/gui/document_simulator.cpp
+src/eez/scpi/commands_simulator.h

@@ -32,7 +32,6 @@ struct NumericKeypadOptions {
     int channelIndex;
 
     Unit editValueUnit;
-    int numSignificantDecimalDigits;
 
     float min;
     float max;

@@ -93,9 +93,7 @@ void ChSettingsTriggerPage::editVoltageTriggerValue() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(
-        0, MakeValue(trigger::getVoltage(*g_channel), UNIT_VOLT, g_channel->index - 1), options,
-        onVoltageTriggerValueSet, 0, 0);
+    NumericKeypad::start(0, MakeValue(trigger::getVoltage(*g_channel), UNIT_VOLT), options, onVoltageTriggerValueSet, 0, 0);
 }
 
 void ChSettingsTriggerPage::onCurrentTriggerValueSet(float value) {
@@ -120,9 +118,7 @@ void ChSettingsTriggerPage::editCurrentTriggerValue() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(
-        0, MakeValue(trigger::getCurrent(*g_channel), UNIT_AMPER, g_channel->index - 1), options,
-        onCurrentTriggerValueSet, 0, 0);
+    NumericKeypad::start(0, MakeValue(trigger::getCurrent(*g_channel), UNIT_AMPER), options, onCurrentTriggerValueSet, 0, 0);
 }
 
 void ChSettingsTriggerPage::toggleOutputState() {
@@ -230,8 +226,7 @@ void ChSettingsListsPage::setFocusedValue(float value) {
     data::Value min = data::getMin(cursor, dataId);
     data::Value max = data::getMax(cursor, dataId);
 
-    if (eez::greaterOrEqual(value, min.getFloat(), getPrecision(min.getUnit())) &&
-        eez::lessOrEqual(value, max.getFloat(), getPrecision(max.getUnit()))) {
+    if (value >= min.getFloat() && value <= max.getFloat()) {
         int iRow = getRowIndex();
 
         if (dataId == DATA_ID_CHANNEL_LIST_DWELL) {
@@ -271,9 +266,7 @@ void ChSettingsListsPage::doValueSet(float value) {
         if (dataId == DATA_ID_CHANNEL_LIST_VOLTAGE) {
             if (iRow == 0 && m_voltageListLength <= 1) {
                 for (int i = 0; i < m_currentListLength; ++i) {
-                    if (eez::greater(value * m_currentList[i],
-                                     channel_dispatcher::getPowerMaxLimit(*g_channel),
-                                     getPrecision(UNIT_WATT))) {
+                    if (value * m_currentList[i] > channel_dispatcher::getPowerMaxLimit(*g_channel)) {
                         errorMessage("Power limit exceeded");
                         return;
                     }
@@ -288,9 +281,7 @@ void ChSettingsListsPage::doValueSet(float value) {
         } else {
             if (iRow == 0 && m_currentListLength <= 1) {
                 for (int i = 0; i < m_voltageListLength; ++i) {
-                    if (eez::greater(value * m_voltageList[i],
-                                     channel_dispatcher::getPowerMaxLimit(*g_channel),
-                                     getPrecision(UNIT_WATT))) {
+                    if (value * m_voltageList[i] > channel_dispatcher::getPowerMaxLimit(*g_channel)) {
                         errorMessage("Power limit exceeded");
                         return;
                     }
@@ -304,8 +295,7 @@ void ChSettingsListsPage::doValueSet(float value) {
             }
         }
 
-        if (eez::greater(power, channel_dispatcher::getPowerMaxLimit(*g_channel),
-                         getPrecision(UNIT_WATT))) {
+        if (power > channel_dispatcher::getPowerMaxLimit(*g_channel)) {
             errorMessage("Power limit exceeded");
             return;
         }
@@ -355,7 +345,7 @@ void ChSettingsListsPage::edit() {
             min.toText(dwell, sizeof(dwell));
             strcat(label, dwell);
         } else {
-            strcatFloat(label, options.min, getNumSignificantDecimalDigits(UNIT_SECOND, g_channel ? g_channel->index - 1 : -1, false));
+            strcatFloat(label, options.min);
         }
         strcat(label, "-");
         if (dataId == DATA_ID_CHANNEL_LIST_DWELL) {

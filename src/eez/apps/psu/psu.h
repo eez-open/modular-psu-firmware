@@ -94,5 +94,4 @@ extern void (*g_diagCallback)();
 
 #include <eez/apps/psu/channel.h>
 #include <eez/apps/psu/debug.h>
-#include <eez/apps/psu/unit.h>
 #include <eez/apps/psu/util.h>

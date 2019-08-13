@@ -133,7 +133,6 @@ set(src_eez_apps_psu
     src/eez/apps/psu/temperature.cpp
     src/eez/apps/psu/timer.cpp
     src/eez/apps/psu/trigger.cpp
-    src/eez/apps/psu/unit.cpp
     src/eez/apps/psu/util.cpp
 )
 list (APPEND src_files ${src_eez_apps_psu})
@@ -175,7 +174,6 @@ set(header_eez_apps_psu
     src/eez/apps/psu/temperature.h
     src/eez/apps/psu/timer.h
     src/eez/apps/psu/trigger.h
-    src/eez/apps/psu/unit.h
     src/eez/apps/psu/util.h
     src/eez/apps/psu/watchdog.h
 )

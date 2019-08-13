@@ -74,7 +74,7 @@ enum UserValueType {
     VALUE_TYPE_CHANNEL_LONG_TITLE
 };
 
-Value MakeValue(float value, Unit unit, int channelIndex = -1, bool extendedPrecision = false);
+Value MakeValue(float value, Unit unit);
 Value MakeValueListValue(const Value *values);
 Value MakeFloatListValue(float *pFloat);
 Value MakeEventValue(eez::psu::event_queue::Event *e);

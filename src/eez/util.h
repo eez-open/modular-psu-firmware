@@ -56,31 +56,16 @@ float clamp(float x, float min, float max);
 void strcatInt(char *str, int value);
 void strcatInt32(char *str, int32_t value);
 void strcatUInt32(char *str, uint32_t value);
-void strcatFloat(char *str, float value, int numSignificantDecimalDigits);
+void strcatFloat(char *str, float value);
 
 uint32_t crc32(const uint8_t *message, size_t size);
 
 uint8_t toBCD(uint8_t bin);
 uint8_t fromBCD(uint8_t bcd);
 
-extern float g_precisions[];
-
-inline float getPrecisionFromNumSignificantDecimalDigits(int numSignificantDecimalDigits) {
-    return g_precisions[numSignificantDecimalDigits];
-}
-
-float floorPrec(float a, float prec);
-float ceilPrec(float a, float prec);
 float roundPrec(float a, float prec);
 
-bool greater(float a, float b, float prec);
-bool greaterOrEqual(float a, float b, float prec);
-bool less(float a, float b, float prec);
-bool lessOrEqual(float a, float b, float prec);
-bool equal(float a, float b, float prec);
-bool between(float x, float a, float b, float prec);
-
-float multiply(float a, float b, float prec);
+bool between(float x, float a, float b);
 
 bool isNaN(float x);
 

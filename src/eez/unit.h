@@ -35,7 +35,8 @@ enum Unit {
     UNIT_RPM,
     UNIT_OHM,
     UNIT_KOHM,
-    UNIT_MOHM
+    UNIT_MOHM,
+    UNIT_PERCENT
 };
 
 extern const char *g_unitNames[];

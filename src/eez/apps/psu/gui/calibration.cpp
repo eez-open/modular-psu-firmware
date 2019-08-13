@@ -77,10 +77,9 @@ void start() {
 
 data::Value getLevelValue() {
     if (g_stepNum < 3) {
-        return MakeValue(calibration::getVoltage().getLevelValue(), UNIT_VOLT,
-                         g_channel->index - 1);
+        return MakeValue(calibration::getVoltage().getLevelValue(), UNIT_VOLT);
     }
-    return MakeValue(calibration::getCurrent().getLevelValue(), UNIT_AMPER, g_channel->index - 1);
+    return MakeValue(calibration::getCurrent().getLevelValue(), UNIT_AMPER);
 }
 
 void showCurrentStep() {

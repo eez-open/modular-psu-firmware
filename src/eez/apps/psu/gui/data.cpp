@@ -24,6 +24,7 @@
 #include <stdio.h>
 
 #include <eez/system.h>
+#include <eez/util.h>
 
 #include <eez/apps/psu/calibration.h>
 #include <eez/apps/psu/channel_dispatcher.h>
@@ -158,8 +159,8 @@ EnumItem g_dstRuleEnumDefinition[] = { { datetime::DST_RULE_OFF, "Off" },
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Value MakeValue(float value, Unit unit, int channelIndex, bool extendedPrecision) {
-    return Value(value, unit, getNumSignificantDecimalDigits(unit, channelIndex, extendedPrecision), extendedPrecision);
+Value MakeValue(float value, Unit unit) {
+    return Value(value, unit);
 }
 
 Value MakeValueListValue(const Value *values) {
@@ -694,19 +695,19 @@ ChannelSnapshot &getChannelSnapshot(Channel &channel) {
         float iMon = channel_dispatcher::getIMon(channel);
         if (strcmp(mode_str, "CC") == 0) {
             channelSnapshot.mode = CHANNEL_MODE_CC;
-            channelSnapshot.monValue = MakeValue(uMon, UNIT_VOLT, channel.index - 1);
+            channelSnapshot.monValue = MakeValue(uMon, UNIT_VOLT);
         } else if (strcmp(mode_str, "CV") == 0) {
             channelSnapshot.mode = CHANNEL_MODE_CV;
-            channelSnapshot.monValue = MakeValue(iMon, UNIT_AMPER, channel.index - 1);
+            channelSnapshot.monValue = MakeValue(iMon, UNIT_AMPER);
         } else {
             channelSnapshot.mode = CHANNEL_MODE_UR;
             if (uMon < iMon) {
-                channelSnapshot.monValue = MakeValue(uMon, UNIT_VOLT, channel.index - 1);
+                channelSnapshot.monValue = MakeValue(uMon, UNIT_VOLT);
             } else {
-                channelSnapshot.monValue = MakeValue(iMon, UNIT_AMPER, channel.index - 1);
+                channelSnapshot.monValue = MakeValue(iMon, UNIT_AMPER);
             }
         }
-        channelSnapshot.pMon = multiply(uMon, iMon, getPrecision(UNIT_WATT));
+        channelSnapshot.pMon = roundPrec(uMon * iMon, channel.getPowerPrecision());
         channelSnapshot.lastSnapshotTime = currentTime;
     }
 
@@ -840,23 +841,23 @@ void data_channel_u_set(data::DataOperationEnum operation, data::Cursor &cursor,
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
-        value = MakeValue(channel_dispatcher::getUSetUnbalanced(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUSetUnbalanced(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
-        value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
     } else if (operation == data::DATA_OPERATION_SET) {
-        if (!psu::between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel), UNIT_VOLT, iChannel)) {
+        if (!between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
-        } else if (psu::greater(value.getFloat(), channel_dispatcher::getULimit(channel), UNIT_VOLT, iChannel)) {
+        } else if (value.getFloat() > channel_dispatcher::getULimit(channel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
-        } else if (psu::greater(value.getFloat() * channel_dispatcher::getISetUnbalanced(channel), channel_dispatcher::getPowerLimit(channel), UNIT_WATT, iChannel)) {
+        } else if (value.getFloat() * channel_dispatcher::getISetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {
             channel_dispatcher::setVoltage(channel, value.getFloat());
@@ -869,16 +870,16 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getUMon(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMon(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
-        value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
         int position = value.getInt();
-        value = MakeValue(channel_dispatcher::getUMonHistory(channel, position), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMonHistory(channel, position), UNIT_VOLT);
     }
 }
 
@@ -887,7 +888,7 @@ void data_channel_u_mon_dac(data::DataOperationEnum operation, data::Cursor &cur
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getUMonDac(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMonDac(channel), UNIT_VOLT);
     }
 }
 
@@ -896,7 +897,7 @@ void data_channel_u_limit(data::DataOperationEnum operation, data::Cursor &curso
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
     }
 }
 
@@ -911,24 +912,24 @@ void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor &cursor
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
-            value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT, iChannel);
+            value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
         }
     } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
-        value = MakeValue(channel_dispatcher::getUSetUnbalanced(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUSetUnbalanced(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
-        value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
     } else if (operation == data::DATA_OPERATION_SET) {
-        if (!psu::between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel), UNIT_VOLT, iChannel)) {
+        if (!between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
-        } else if (psu::greater(value.getFloat(), channel_dispatcher::getULimit(channel), UNIT_VOLT,  iChannel)) {
+        } else if (value.getFloat() > channel_dispatcher::getULimit(channel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
-        } else if (psu::greater(value.getFloat() * channel_dispatcher::getISetUnbalanced(channel), channel_dispatcher::getPowerLimit(channel), UNIT_WATT, iChannel)) {
+        } else if (value.getFloat() * channel_dispatcher::getISetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {
             channel_dispatcher::setVoltage(channel, value.getFloat());
@@ -941,26 +942,23 @@ void data_channel_i_set(data::DataOperationEnum operation, data::Cursor &cursor,
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
-        value = MakeValue(channel_dispatcher::getISetUnbalanced(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getISetUnbalanced(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
-        value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_AMPER;
     } else if (operation == data::DATA_OPERATION_SET) {
-        if (!psu::between(value.getFloat(), channel_dispatcher::getIMin(channel),
-                          channel_dispatcher::getIMax(channel), UNIT_AMPER, iChannel)) {
+        if (!between(value.getFloat(), channel_dispatcher::getIMin(channel), channel_dispatcher::getIMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
-        } else if (psu::greater(value.getFloat(), channel_dispatcher::getILimit(channel),
-                                UNIT_AMPER, iChannel)) {
+        } else if (value.getFloat() > channel_dispatcher::getILimit(channel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
-        } else if (psu::greater(value.getFloat() * channel_dispatcher::getUSetUnbalanced(channel),
-                                channel_dispatcher::getPowerLimit(channel), UNIT_AMPER, iChannel)) {
+        } else if (value.getFloat() * channel_dispatcher::getUSetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {
             channel_dispatcher::setCurrent(channel, value.getFloat());
@@ -972,17 +970,17 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getIMon(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getIMon(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
-        value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
         int position = value.getInt();
         value =
-            MakeValue(channel_dispatcher::getIMonHistory(channel, position), UNIT_AMPER, iChannel);
+            MakeValue(channel_dispatcher::getIMonHistory(channel, position), UNIT_AMPER);
     }
 }
 
@@ -990,7 +988,7 @@ void data_channel_i_mon_dac(data::DataOperationEnum operation, data::Cursor &cur
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getIMonDac(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getIMonDac(channel), UNIT_AMPER);
     }
 }
 
@@ -998,7 +996,7 @@ void data_channel_i_limit(data::DataOperationEnum operation, data::Cursor &curso
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
     }
 }
 
@@ -1015,27 +1013,24 @@ void data_channel_i_edit(data::DataOperationEnum operation, data::Cursor &cursor
                    edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
-            value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER, iChannel);
+            value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER);
         }
     } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
-        value = MakeValue(channel_dispatcher::getISetUnbalanced(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getISetUnbalanced(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
-        value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_AMPER;
     } else if (operation == data::DATA_OPERATION_SET) {
-        if (!psu::between(value.getFloat(), channel_dispatcher::getIMin(channel),
-                          channel_dispatcher::getIMax(channel), UNIT_AMPER, iChannel)) {
+        if (!between(value.getFloat(), channel_dispatcher::getIMin(channel), channel_dispatcher::getIMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
-        } else if (psu::greater(value.getFloat(), channel_dispatcher::getILimit(channel),
-                                UNIT_AMPER, iChannel)) {
+        } else if (value.getFloat() > channel_dispatcher::getILimit(channel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
-        } else if (psu::greater(value.getFloat() * channel_dispatcher::getUSetUnbalanced(channel),
-                                channel_dispatcher::getPowerLimit(channel), UNIT_AMPER, iChannel)) {
+        } else if (value.getFloat() * channel_dispatcher::getUSetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {
             channel_dispatcher::setCurrent(channel, value.getFloat());
@@ -1048,19 +1043,17 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(getChannelSnapshot(channel).pMon, UNIT_WATT, iChannel);
+        value = MakeValue(getChannelSnapshot(channel).pMon, UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getPowerMinLimit(channel), UNIT_WATT, iChannel);
+        value = MakeValue(channel_dispatcher::getPowerMinLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getPowerMaxLimit(channel), UNIT_WATT, iChannel);
+        value = MakeValue(channel_dispatcher::getPowerMaxLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
-        value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT, iChannel);
+        value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
-        float pMon = multiply(channel_dispatcher::getUMonHistory(channel, value.getInt()),
-                              channel_dispatcher::getIMonHistory(channel, value.getInt()),
-                              getPrecision(UNIT_WATT));
-        value = MakeValue(pMon, UNIT_WATT, iChannel);
+        float pMon = channel_dispatcher::getUMonHistory(channel, value.getInt()) * channel_dispatcher::getIMonHistory(channel, value.getInt());
+        value = MakeValue(pMon, UNIT_WATT);
     }
 }
 
@@ -1431,6 +1424,7 @@ void data_keypad_unit_enabled(data::DataOperationEnum operation, data::Cursor &c
                     page->m_options.editValueUnit == UNIT_MILLI_VOLT ||
                     page->m_options.editValueUnit == UNIT_AMPER ||
                     page->m_options.editValueUnit == UNIT_MILLI_AMPER ||
+                    page->m_options.editValueUnit == UNIT_MICRO_AMPER ||
                     page->m_options.editValueUnit == UNIT_WATT ||
                     page->m_options.editValueUnit == UNIT_MILLI_WATT ||
                     page->m_options.editValueUnit == UNIT_SECOND ||
@@ -1627,34 +1621,33 @@ void data_channel_calibration_step_level_value(data::DataOperationEnum operation
 void data_channel_calibration_step_value(data::DataOperationEnum operation, data::Cursor &cursor,
                                          data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         switch (calibration_wizard::g_stepNum) {
         case 0:
-            value = MakeValue(psu::calibration::getVoltage().min_val, UNIT_VOLT, iChannel, true);
+            value = MakeValue(psu::calibration::getVoltage().min_val, UNIT_VOLT);
             break;
         case 1:
-            value = MakeValue(psu::calibration::getVoltage().mid_val, UNIT_VOLT, iChannel, true);
+            value = MakeValue(psu::calibration::getVoltage().mid_val, UNIT_VOLT);
             break;
         case 2:
-            value = MakeValue(psu::calibration::getVoltage().max_val, UNIT_VOLT, iChannel, true);
+            value = MakeValue(psu::calibration::getVoltage().max_val, UNIT_VOLT);
             break;
         case 3:
-            value = MakeValue(psu::calibration::getCurrent().min_val, UNIT_AMPER, iChannel, true);
+            value = MakeValue(psu::calibration::getCurrent().min_val, UNIT_AMPER);
             break;
         case 4:
-            value = MakeValue(psu::calibration::getCurrent().mid_val, UNIT_AMPER, iChannel, true);
+            value = MakeValue(psu::calibration::getCurrent().mid_val, UNIT_AMPER);
             break;
         case 5:
-            value = MakeValue(psu::calibration::getCurrent().max_val, UNIT_AMPER, iChannel, true);
+            value = MakeValue(psu::calibration::getCurrent().max_val, UNIT_AMPER);
             break;
         case 6:
-            value = MakeValue(psu::calibration::getCurrent().min_val, UNIT_AMPER, iChannel, true);
+            value = MakeValue(psu::calibration::getCurrent().min_val, UNIT_AMPER);
             break;
         case 7:
-            value = MakeValue(psu::calibration::getCurrent().mid_val, UNIT_AMPER, iChannel, true);
+            value = MakeValue(psu::calibration::getCurrent().mid_val, UNIT_AMPER);
             break;
         case 8:
-            value = MakeValue(psu::calibration::getCurrent().max_val, UNIT_AMPER, iChannel, true);
+            value = MakeValue(psu::calibration::getCurrent().max_val, UNIT_AMPER);
             break;
         case 9:
             value = data::Value(psu::calibration::getRemark());
@@ -1681,7 +1674,7 @@ void data_cal_ch_u_min(data::DataOperationEnum operation, data::Cursor &cursor, 
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
-        value = MakeValue(channel.cal_conf.u.min.val, UNIT_VOLT, channel.index - 1);
+        value = MakeValue(channel.cal_conf.u.min.val, UNIT_VOLT);
     }
 }
 
@@ -1689,7 +1682,7 @@ void data_cal_ch_u_mid(data::DataOperationEnum operation, data::Cursor &cursor, 
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
-        value = MakeValue(channel.cal_conf.u.mid.val, UNIT_VOLT, channel.index - 1);
+        value = MakeValue(channel.cal_conf.u.mid.val, UNIT_VOLT);
     }
 }
 
@@ -1697,7 +1690,7 @@ void data_cal_ch_u_max(data::DataOperationEnum operation, data::Cursor &cursor, 
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
-        value = MakeValue(channel.cal_conf.u.max.val, UNIT_VOLT, channel.index - 1);
+        value = MakeValue(channel.cal_conf.u.max.val, UNIT_VOLT);
     }
 }
 
@@ -1705,7 +1698,7 @@ void data_cal_ch_i0_min(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
-        value = MakeValue(channel.cal_conf.i[0].min.val, UNIT_AMPER, channel.index - 1);
+        value = MakeValue(channel.cal_conf.i[0].min.val, UNIT_AMPER);
     }
 }
 
@@ -1713,7 +1706,7 @@ void data_cal_ch_i0_mid(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
-        value = MakeValue(channel.cal_conf.i[0].mid.val, UNIT_AMPER, channel.index - 1);
+        value = MakeValue(channel.cal_conf.i[0].mid.val, UNIT_AMPER);
     }
 }
 
@@ -1721,7 +1714,7 @@ void data_cal_ch_i0_max(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
-        value = MakeValue(channel.cal_conf.i[0].max.val, UNIT_AMPER, channel.index - 1);
+        value = MakeValue(channel.cal_conf.i[0].max.val, UNIT_AMPER);
     }
 }
 
@@ -1730,7 +1723,7 @@ void data_cal_ch_i1_min(data::DataOperationEnum operation, data::Cursor &cursor,
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.hasSupportForCurrentDualRange()) {
-            value = MakeValue(channel.cal_conf.i[1].min.val, UNIT_AMPER, channel.index - 1);
+            value = MakeValue(channel.cal_conf.i[1].min.val, UNIT_AMPER);
         } else {
             value = data::Value("");
         }
@@ -1742,7 +1735,7 @@ void data_cal_ch_i1_mid(data::DataOperationEnum operation, data::Cursor &cursor,
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.hasSupportForCurrentDualRange()) {
-            value = MakeValue(channel.cal_conf.i[1].mid.val, UNIT_AMPER, channel.index - 1);
+            value = MakeValue(channel.cal_conf.i[1].mid.val, UNIT_AMPER);
         } else {
             value = data::Value("");
         }
@@ -1754,7 +1747,7 @@ void data_cal_ch_i1_max(data::DataOperationEnum operation, data::Cursor &cursor,
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.hasSupportForCurrentDualRange()) {
-            value = MakeValue(channel.cal_conf.i[1].max.val, UNIT_AMPER, channel.index - 1);
+            value = MakeValue(channel.cal_conf.i[1].max.val, UNIT_AMPER);
         } else {
             value = data::Value("");
         }
@@ -1822,12 +1815,12 @@ void data_channel_protection_ovp_limit(data::DataOperationEnum operation, data::
         if (page) {
             value = page->limit;
         } else {
-            value = MakeValue(channel.u.limit, UNIT_VOLT, iChannel);
+            value = MakeValue(channel.u.limit, UNIT_VOLT);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT, iChannel);
+        value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setVoltageLimit(channel, value.getFloat());
     }
@@ -1859,12 +1852,12 @@ void data_channel_protection_ocp_limit(data::DataOperationEnum operation, data::
         if (page) {
             value = page->limit;
         } else {
-            value = MakeValue(channel.i.limit, UNIT_AMPER, iChannel);
+            value = MakeValue(channel.i.limit, UNIT_AMPER);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER, iChannel);
+        value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setCurrentLimit(channel, value.getFloat());
     }
@@ -1893,12 +1886,12 @@ void data_channel_protection_opp_level(data::DataOperationEnum operation, data::
         if (page) {
             value = page->level;
         } else {
-            value = MakeValue(channel.prot_conf.p_level, UNIT_WATT, iChannel);
+            value = MakeValue(channel.prot_conf.p_level, UNIT_WATT);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getOppMinLevel(channel), UNIT_WATT, iChannel);
+        value = MakeValue(channel_dispatcher::getOppMinLevel(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getOppMaxLevel(channel), UNIT_WATT, iChannel);
+        value = MakeValue(channel_dispatcher::getOppMaxLevel(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, value.getFloat(), channel.prot_conf.p_delay);
     }
@@ -1913,12 +1906,12 @@ void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::
         if (page) {
             value = page->delay;
         } else {
-            value = MakeValue(channel.prot_conf.p_delay, UNIT_SECOND, iChannel);
+            value = MakeValue(channel.prot_conf.p_delay, UNIT_SECOND);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel.OPP_MIN_DELAY, UNIT_SECOND, iChannel);
+        value = MakeValue(channel.OPP_MIN_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel.OPP_MAX_DELAY, UNIT_SECOND, iChannel);
+        value = MakeValue(channel.OPP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, channel_dispatcher::getPowerProtectionLevel(channel), value.getFloat());
     }
@@ -1932,12 +1925,12 @@ void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::
         if (page) {
             value = page->limit;
         } else {
-            value = MakeValue(channel.p_limit, UNIT_WATT, iChannel);
+            value = MakeValue(channel.p_limit, UNIT_WATT);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getPowerMinLimit(channel), UNIT_WATT, iChannel);
+        value = MakeValue(channel_dispatcher::getPowerMinLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getPowerMaxLimit(channel), UNIT_WATT, iChannel);
+        value = MakeValue(channel_dispatcher::getPowerMaxLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setPowerLimit(channel, value.getFloat());
     }
@@ -1967,12 +1960,12 @@ void data_channel_protection_otp_level(data::DataOperationEnum operation, data::
         if (page) {
             value = page->level;
         } else {
-            value = MakeValue(temperature::getChannelSensorLevel(&channel), UNIT_CELSIUS, iChannel);
+            value = MakeValue(temperature::getChannelSensorLevel(&channel), UNIT_CELSIUS);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(OTP_AUX_MIN_LEVEL, UNIT_SECOND, iChannel);
+        value = MakeValue(OTP_AUX_MIN_LEVEL, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(OTP_AUX_MAX_LEVEL, UNIT_SECOND, iChannel);
+        value = MakeValue(OTP_AUX_MAX_LEVEL, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOtpParameters(channel, temperature::getChannelSensorState(&channel) ? 1 : 0, value.getFloat(), temperature::getChannelSensorDelay(&channel));
     }
@@ -1986,12 +1979,12 @@ void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::
         if (page) {
             value = page->delay;
         } else {
-            value = MakeValue(temperature::getChannelSensorDelay(&channel), UNIT_SECOND, iChannel);
+            value = MakeValue(temperature::getChannelSensorDelay(&channel), UNIT_SECOND);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(OTP_AUX_MIN_DELAY, UNIT_SECOND, iChannel);
+        value = MakeValue(OTP_AUX_MIN_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(OTP_AUX_MAX_DELAY, UNIT_SECOND, iChannel);
+        value = MakeValue(OTP_AUX_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOtpParameters(channel, temperature::getChannelSensorState(&channel) ? 1 : 0, temperature::getChannelSensorLevel(&channel), value.getFloat());
     }
@@ -2567,7 +2560,7 @@ void data_profile_channel_u_set(data::DataOperationEnum operation, data::Cursor 
         if (g_selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
             UserProfilesPage *page = (UserProfilesPage *)getUserProfilesPage();
             if (page) {
-                value = MakeValue(page->profile.channels[cursor.i].u_set, UNIT_VOLT, cursor.i);
+                value = MakeValue(page->profile.channels[cursor.i].u_set, UNIT_VOLT);
             }
         }
     }
@@ -2579,7 +2572,7 @@ void data_profile_channel_i_set(data::DataOperationEnum operation, data::Cursor 
         if (g_selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
             UserProfilesPage *page = (UserProfilesPage *)getUserProfilesPage();
             if (page) {
-                value = MakeValue(page->profile.channels[cursor.i].i_set, UNIT_AMPER, cursor.i);
+                value = MakeValue(page->profile.channels[cursor.i].i_set, UNIT_AMPER);
             }
         }
     }
@@ -2974,16 +2967,14 @@ void data_channel_trigger_on_list_stop(data::DataOperationEnum operation, data::
 void data_channel_u_trigger_value(data::DataOperationEnum operation, data::Cursor &cursor,
                                   data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getTriggerVoltage(*g_channel), UNIT_VOLT,
-                          g_channel->index - 1);
+        value = MakeValue(channel_dispatcher::getTriggerVoltage(*g_channel), UNIT_VOLT);
     }
 }
 
 void data_channel_i_trigger_value(data::DataOperationEnum operation, data::Cursor &cursor,
                                   data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getTriggerCurrent(*g_channel), UNIT_AMPER,
-                          g_channel->index - 1);
+        value = MakeValue(channel_dispatcher::getTriggerCurrent(*g_channel), UNIT_AMPER);
     }
 }
 
@@ -3074,17 +3065,17 @@ void data_channel_list_voltage(data::DataOperationEnum operation, data::Cursor &
             int iPage = page->getPageIndex();
             int iRow = iPage * LIST_ITEMS_PER_PAGE + cursor.i;
             if (iRow < page->m_voltageListLength) {
-                value = MakeValue(page->m_voltageList[iRow], UNIT_VOLT, g_channel->index - 1);
+                value = MakeValue(page->m_voltageList[iRow], UNIT_VOLT);
             } else {
                 value = data::Value(EMPTY_VALUE);
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getUMin(*g_channel), UNIT_VOLT, g_channel->index - 1);
+        value = MakeValue(channel_dispatcher::getUMin(*g_channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getUMax(*g_channel), UNIT_VOLT, g_channel->index - 1);
+        value = MakeValue(channel_dispatcher::getUMax(*g_channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_DEF) {
-        value = MakeValue(g_channel->u.def, UNIT_VOLT, g_channel->index - 1);
+        value = MakeValue(g_channel->u.def, UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
@@ -3118,19 +3109,19 @@ void data_channel_list_current(data::DataOperationEnum operation, data::Cursor &
             int iPage = page->getPageIndex();
             int iRow = iPage * LIST_ITEMS_PER_PAGE + cursor.i;
             if (iRow < page->m_currentListLength) {
-                value = MakeValue(page->m_currentList[iRow], UNIT_AMPER, g_channel->index - 1);
+                value = MakeValue(page->m_currentList[iRow], UNIT_AMPER);
             } else {
                 value = data::Value(EMPTY_VALUE);
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value =
-            MakeValue(channel_dispatcher::getIMin(*g_channel), UNIT_AMPER, g_channel->index - 1);
+            MakeValue(channel_dispatcher::getIMin(*g_channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
         value =
-            MakeValue(channel_dispatcher::getIMax(*g_channel), UNIT_AMPER, g_channel->index - 1);
+            MakeValue(channel_dispatcher::getIMax(*g_channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_DEF) {
-        value = MakeValue(g_channel->i.def, UNIT_AMPER, g_channel->index - 1);
+        value = MakeValue(g_channel->i.def, UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
@@ -3339,8 +3330,7 @@ void data_channel_ranges_currently_selected(data::DataOperationEnum operation, d
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         Channel &channel = Channel::get(iChannel);
-        value = MakeEnumDefinitionValue(channel.flags.currentCurrentRange,
-                                        ENUM_DEFINITION_CHANNEL_CURRENT_RANGE);
+        value = MakeEnumDefinitionValue(channel.flags.currentCurrentRange, ENUM_DEFINITION_CHANNEL_CURRENT_RANGE);
     }
 }
 

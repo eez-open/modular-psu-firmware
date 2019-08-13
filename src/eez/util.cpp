@@ -24,8 +24,6 @@
 
 namespace eez {
 
-float g_precisions[] = { 1.0f, 10.0f, 100.0f, 1000.0f, 10000.0f, 100000.0f, 1000000.0f, 10000000.0f, 100000000.0f };
-
 float remap(float x, float x1, float y1, float x2, float y2) {
     return y1 + (x - x1) * (y2 - y1) / (x2 - x1);
 }
@@ -98,48 +96,8 @@ void strcatUInt32(char *str, uint32_t value) {
     sprintf(str, "%lu", (unsigned long)value);
 }
 
-void strcatFloat(char *str, float value, int numSignificantDecimalDigits) {
-    for (int i = 0; i < numSignificantDecimalDigits; ++i) {
-        value *= 10;
-    }
-
-    int intValue = (int)roundf(value);
-
-    str = str + strlen(str);
-
-    if (intValue != 0) {
-        if (intValue < 0) {
-            *str++ = '-';
-            intValue = -intValue;
-        }
-
-        char strR[32];
-        int i = 0;
-
-        while (intValue > 0 || i < numSignificantDecimalDigits) {
-            int d = intValue % 10;
-
-            strR[i++] = '0' + d;
-
-            if (i == numSignificantDecimalDigits) {
-                strR[i++] = '.';
-            }
-
-            intValue /= 10;
-        }
-
-        if (strR[i - 1] == '.') {
-            strR[i++] = '0';
-        }
-
-        for (int j = i - 1; j >= 0; --j) {
-            *str++ = strR[j];
-        }
-    } else {
-        *str++ = '0';
-    }
-
-    *str = 0;
+void strcatFloat(char *str, float value) {
+    sprintf(str + strlen(str), "%g", value);
 }
 
 /*
@@ -177,44 +135,12 @@ uint8_t fromBCD(uint8_t bcd) {
     return ((bcd >> 4) & 0xF) * 10 + (bcd & 0xF);
 }
 
-float floorPrec(float a, float prec) {
-    return floorf(a * prec) / prec;
-}
-
-float ceilPrec(float a, float prec) {
-    return ceilf(a * prec) / prec;
-}
-
 float roundPrec(float a, float prec) {
-    return roundf(a * prec) / prec;
+    return roundf(a / prec) * prec;
 }
 
-bool greater(float a, float b, float prec) {
-    return a > b && !equal(a, b, prec);
-}
-
-bool greaterOrEqual(float a, float b, float prec) {
-    return a > b || equal(a, b, prec);
-}
-
-bool less(float a, float b, float prec) {
-    return a < b && !equal(a, b, prec);
-}
-
-bool lessOrEqual(float a, float b, float prec) {
-    return a < b || equal(a, b, prec);
-}
-
-bool equal(float a, float b, float prec) {
-    return roundf(a * prec) == roundf(b * prec);
-}
-
-bool between(float x, float a, float b, float prec) {
-    return greaterOrEqual(x, a, prec) && lessOrEqual(x, b, prec);
-}
-
-float multiply(float a, float b, float prec) {
-    return roundPrec(a, prec) * roundPrec(b, prec);
+bool between(float x, float a, float b) {
+    return x >= a && x <= b;
 }
 
 bool isNaN(float x) {

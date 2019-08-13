@@ -103,11 +103,6 @@ void update() {
     g_maxValue = data::getMax(g_focusCursor, g_focusDataId);
     if (edit_mode_keypad::g_keypad) {
         edit_mode_keypad::g_keypad->m_options.editValueUnit = g_editValue.getUnit();
-        if (g_editValue.isMicro()) {
-            edit_mode_keypad::g_keypad->switchToMicro();
-        } else if (g_editValue.isMilli()) {
-            edit_mode_keypad::g_keypad->switchToMilli();
-        }
     }
 }
 
@@ -159,8 +154,10 @@ Unit getUnit() {
     return g_editValue.getUnit();
 }
 
-bool setValue(float value_) {
-    data::Value value = MakeValue(value_, getUnit(), g_focusCursor.i);
+bool setValue(float floatValue) {
+    floatValue = Channel::get(g_focusCursor.i).roundChannelValue(getUnit(), floatValue);
+
+    data::Value value = MakeValue(floatValue, getUnit());
     if (g_isInteractiveMode || g_tabIndex == PAGE_ID_EDIT_MODE_KEYPAD) {
         int16_t error;
         if (!data::set(g_focusCursor, g_focusDataId, value, &error)) {
@@ -208,7 +205,6 @@ void getInfoText(int partIndex, char *infoText) {
     int dataId;
     const char *dataName;
     const char *unitName;
-    int numSignificantDecimalDigits = 2;
     if (dataIdIndex == 0) {
         dataId = DATA_ID_CHANNEL_U_EDIT;
         dataName = "Voltage";
@@ -237,17 +233,14 @@ void getInfoText(int partIndex, char *infoText) {
         dataId = DATA_ID_CHANNEL_PROTECTION_OPP_DELAY;
         dataName = "OPP Delay";
         unitName = "s";
-        numSignificantDecimalDigits = 0;
     } else if (dataIdIndex == 7) {
         dataId = DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL;
         dataName = "OTP Level";
         unitName = "oC";
-        numSignificantDecimalDigits = 0;
     } else if (dataIdIndex == 8) {
         dataId = DATA_ID_CHANNEL_PROTECTION_OTP_DELAY;
         dataName = "OTP Delay";
         unitName = "s";
-        numSignificantDecimalDigits = 0;
     } else {
         dataId = DATA_ID_NONE;
         dataName = "Unknown";
@@ -268,9 +261,9 @@ void getInfoText(int partIndex, char *infoText) {
     strcat(infoText, dataName);
 
     strcat(infoText, " [");
-    strcatFloat(infoText, minValue, numSignificantDecimalDigits);
+    strcatFloat(infoText, minValue);
     strcat(infoText, "-");
-    strcatFloat(infoText, maxValue, numSignificantDecimalDigits);
+    strcatFloat(infoText, maxValue);
     strcat(infoText, unitName);
     strcat(infoText, "]");
 }

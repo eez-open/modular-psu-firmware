@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <math.h>
+
 #include <eez/apps/psu/dac.h>
 #include <eez/apps/psu/ioexp.h>
 #include <eez/apps/psu/persist_conf.h>
@@ -226,8 +228,8 @@ class Channel {
 
         void init(float set_, float step_, float limit_);
         void resetMonValues();
-        void addMonDacValue(float value);
-        void addMonValue(float value);
+        void addMonDacValue(float value, float precision);
+        void addMonValue(float value, float precision);
     };
 
 #ifdef EEZ_PLATFORM_SIMULATOR
@@ -597,6 +599,14 @@ class Channel {
     }
     float getDualRangeMax();
     void setCurrentRange(uint8_t currentRange);
+
+    float getVoltagePrecision();
+    float getCurrentPrecision(float value = NAN);
+    float getPowerPrecision();
+
+    bool isMicroAmperAllowed();
+
+    float roundChannelValue(Unit unit, float value);
 
   private:
     bool delayed_dp_off;

@@ -322,8 +322,12 @@ void setVoltageLimit(Channel &channel, float limit) {
 }
 
 void setOvpParameters(Channel &channel, int state, float level, float delay) {
+    delay = roundPrec(delay, 0.001f);
+
     if (isCoupled() || isTracked()) {
         float coupledLevel = isSeries() ? level / 2 : level;
+
+        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getVoltagePrecision());
 
         Channel::get(0).prot_conf.flags.u_state = state;
         Channel::get(0).prot_conf.u_level = coupledLevel;
@@ -334,7 +338,7 @@ void setOvpParameters(Channel &channel, int state, float level, float delay) {
         Channel::get(1).prot_conf.u_delay = delay;
     } else {
         channel.prot_conf.flags.u_state = state;
-        channel.prot_conf.u_level = level;
+        channel.prot_conf.u_level = roundPrec(level, channel.getVoltagePrecision());
         channel.prot_conf.u_delay = delay;
     }
 }
@@ -351,14 +355,17 @@ void setOvpState(Channel &channel, int state) {
 void setOvpLevel(Channel &channel, float level) {
     if (isCoupled() || isTracked()) {
         float coupledLevel = isSeries() ? level / 2 : level;
+        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getVoltagePrecision());
         Channel::get(0).prot_conf.u_level = coupledLevel;
         Channel::get(1).prot_conf.u_level = coupledLevel;
     } else {
-        channel.prot_conf.u_level = level;
+        channel.prot_conf.u_level = roundPrec(level, channel.getVoltagePrecision());
     }
 }
 
 void setOvpDelay(Channel &channel, float delay) {
+    delay = roundPrec(delay, 0.001f);
+
     if (isCoupled() || isTracked()) {
         Channel::get(0).prot_conf.u_delay = delay;
         Channel::get(1).prot_conf.u_delay = delay;
@@ -475,6 +482,8 @@ void setCurrentLimit(Channel &channel, float limit) {
 }
 
 void setOcpParameters(Channel &channel, int state, float delay) {
+    delay = roundPrec(delay, 0.001f);
+
     if (isCoupled() || isTracked()) {
         Channel::get(0).prot_conf.flags.i_state = state;
         Channel::get(0).prot_conf.i_delay = delay;
@@ -497,6 +506,8 @@ void setOcpState(Channel &channel, int state) {
 }
 
 void setOcpDelay(Channel &channel, float delay) {
+    delay = roundPrec(delay, 0.001f);
+
     if (isCoupled() || isTracked()) {
         Channel::get(0).prot_conf.i_delay = delay;
         Channel::get(1).prot_conf.i_delay = delay;
@@ -568,17 +579,23 @@ float getOppDefaultLevel(Channel &channel) {
 }
 
 void setOppParameters(Channel &channel, int state, float level, float delay) {
+    delay = roundPrec(delay, 0.001f);
+
     if (isCoupled() || isTracked()) {
+        float coupledLevel = isCoupled() ? level / 2 : level;
+
+        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getPowerPrecision());
+
         Channel::get(0).prot_conf.flags.p_state = state;
-        Channel::get(0).prot_conf.p_level = isCoupled() ? level / 2 : level;
+        Channel::get(0).prot_conf.p_level = coupledLevel;
         Channel::get(0).prot_conf.p_delay = delay;
 
         Channel::get(1).prot_conf.flags.p_state = state;
-        Channel::get(1).prot_conf.p_level = isCoupled() ? level / 2 : level;
+        Channel::get(1).prot_conf.p_level = coupledLevel;
         Channel::get(1).prot_conf.p_delay = delay;
     } else {
         channel.prot_conf.flags.p_state = state;
-        channel.prot_conf.p_level = level;
+        channel.prot_conf.p_level = roundPrec(level, channel.getPowerPrecision());
         channel.prot_conf.p_delay = delay;
     }
 }
@@ -594,17 +611,25 @@ void setOppState(Channel &channel, int state) {
 
 void setOppLevel(Channel &channel, float level) {
     if (isCoupled()) {
-        Channel::get(0).prot_conf.p_level = level / 2;
-        Channel::get(1).prot_conf.p_level = level / 2;
+        float coupledLevel = level / 2;
+
+        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getPowerPrecision());
+
+        Channel::get(0).prot_conf.p_level = coupledLevel;
+        Channel::get(1).prot_conf.p_level = coupledLevel;
     } else if (isTracked()) {
+        level = roundPrec(level, Channel::get(0).getPowerPrecision());
+
         Channel::get(0).prot_conf.p_level = level;
         Channel::get(1).prot_conf.p_level = level;
     } else {
-        channel.prot_conf.p_level = level;
+        channel.prot_conf.p_level = roundPrec(level, channel.getPowerPrecision());
     }
 }
 
 void setOppDelay(Channel &channel, float delay) {
+    delay = roundPrec(delay, 0.001f);
+
     if (isCoupled() || isTracked()) {
         Channel::get(0).prot_conf.p_delay = delay;
         Channel::get(1).prot_conf.p_delay = delay;
@@ -710,6 +735,9 @@ void clearOtpProtection(int sensor) {
 }
 
 void setOtpParameters(Channel &channel, int state, float level, float delay) {
+    delay = roundPrec(delay, 0.001f);
+    level = roundPrec(level, 1);
+
     if (isCoupled() || isTracked()) {
         temperature::sensors[temp_sensor::CH1].prot_conf.state = state ? true : false;
         temperature::sensors[temp_sensor::CH2].prot_conf.state = state ? true : false;
@@ -737,6 +765,8 @@ void setOtpState(int sensor, int state) {
 }
 
 void setOtpLevel(int sensor, float level) {
+    level = roundPrec(level, 1);
+
     if ((sensor == temp_sensor::CH1 || sensor == temp_sensor::CH2) &&
         (isCoupled() || isTracked())) {
         temperature::sensors[temp_sensor::CH1].prot_conf.level = level;
@@ -747,6 +777,8 @@ void setOtpLevel(int sensor, float level) {
 }
 
 void setOtpDelay(int sensor, float delay) {
+    delay = roundPrec(delay, 0.001f);
+
     if ((sensor == temp_sensor::CH1 || sensor == temp_sensor::CH2) &&
         (isCoupled() || isTracked())) {
         temperature::sensors[temp_sensor::CH1].prot_conf.delay = delay;
@@ -880,6 +912,8 @@ void setLoadEnabled(Channel &channel, bool state) {
 }
 
 void setLoad(Channel &channel, float load) {
+    load = roundPrec(load, 0.001f);
+
     if (isCoupled()) {
         Channel::get(0).simulator.setLoad(load);
         Channel::get(1).simulator.setLoad(load);

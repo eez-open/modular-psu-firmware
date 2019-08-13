@@ -85,7 +85,7 @@ void ChSettingsProtectionSetPage::toggleState() {
 void ChSettingsProtectionSetPage::onLimitSet(float value) {
     popPage();
     ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getActivePage();
-    page->limit = MakeValue(value, page->limit.getUnit(), g_channel->index - 1);
+    page->limit = MakeValue(value, page->limit.getUnit());
 }
 
 void ChSettingsProtectionSetPage::editLimit() {
@@ -110,7 +110,7 @@ void ChSettingsProtectionSetPage::editLimit() {
 void ChSettingsProtectionSetPage::onLevelSet(float value) {
     popPage();
     ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getActivePage();
-    page->level = MakeValue(value, page->level.getUnit(), g_channel->index - 1);
+    page->level = MakeValue(value, page->level.getUnit());
 }
 
 void ChSettingsProtectionSetPage::editLevel() {
@@ -160,14 +160,12 @@ void ChSettingsProtectionSetPage::editDelay() {
 void ChSettingsOvpProtectionPage::pageAlloc() {
     origState = state = g_channel->prot_conf.flags.u_state ? 1 : 0;
 
-    origLimit = limit =
-        MakeValue(channel_dispatcher::getULimit(*g_channel), UNIT_VOLT, g_channel->index - 1);
+    origLimit = limit = MakeValue(channel_dispatcher::getULimit(*g_channel), UNIT_VOLT);
     minLimit = channel_dispatcher::getUMin(*g_channel);
     maxLimit = channel_dispatcher::getUMax(*g_channel);
     defLimit = channel_dispatcher::getUMax(*g_channel);
 
-    origLevel = level = MakeValue(channel_dispatcher::getUProtectionLevel(*g_channel), UNIT_VOLT,
-                                  g_channel->index - 1);
+    origLevel = level = MakeValue(channel_dispatcher::getUProtectionLevel(*g_channel), UNIT_VOLT);
     minLevel = channel_dispatcher::getUSet(*g_channel);
     maxLevel = channel_dispatcher::getUMax(*g_channel);
     defLevel = channel_dispatcher::getUMax(*g_channel);
@@ -184,9 +182,8 @@ void ChSettingsOvpProtectionPage::onSetParamsOk() {
 
 void ChSettingsOvpProtectionPage::setParams(bool checkLoad) {
     if (checkLoad && g_channel->isOutputEnabled() &&
-        eez::less(limit.getFloat(), channel_dispatcher::getUMon(*g_channel),
-                  getPrecision(UNIT_VOLT)) &&
-        eez::greaterOrEqual(channel_dispatcher::getIMon(*g_channel), 0, getPrecision(UNIT_AMPER))) {
+        limit.getFloat() < channel_dispatcher::getUMon(*g_channel) &&
+        channel_dispatcher::getIMon(*g_channel) >= 0) {
         areYouSureWithMessage("This change will affect current load.", onSetParamsOk);
     } else {
         channel_dispatcher::setVoltageLimit(*g_channel, limit.getFloat());
@@ -200,8 +197,7 @@ void ChSettingsOvpProtectionPage::setParams(bool checkLoad) {
 void ChSettingsOcpProtectionPage::pageAlloc() {
     origState = state = g_channel->prot_conf.flags.i_state ? 1 : 0;
 
-    origLimit = limit =
-        MakeValue(channel_dispatcher::getILimit(*g_channel), UNIT_AMPER, g_channel->index - 1);
+    origLimit = limit = MakeValue(channel_dispatcher::getILimit(*g_channel), UNIT_AMPER);
     minLimit = channel_dispatcher::getIMin(*g_channel);
     maxLimit = channel_dispatcher::getIMaxLimit(*g_channel);
     defLimit = maxLimit;
@@ -234,14 +230,12 @@ void ChSettingsOcpProtectionPage::setParams(bool checkLoad) {
 void ChSettingsOppProtectionPage::pageAlloc() {
     origState = state = g_channel->prot_conf.flags.p_state ? 1 : 0;
 
-    origLimit = limit =
-        MakeValue(channel_dispatcher::getPowerLimit(*g_channel), UNIT_WATT, g_channel->index - 1);
+    origLimit = limit = MakeValue(channel_dispatcher::getPowerLimit(*g_channel), UNIT_WATT);
     minLimit = channel_dispatcher::getPowerMinLimit(*g_channel);
     maxLimit = channel_dispatcher::getPowerMaxLimit(*g_channel);
     defLimit = channel_dispatcher::getPowerDefaultLimit(*g_channel);
 
-    origLevel = level = MakeValue(channel_dispatcher::getPowerProtectionLevel(*g_channel),
-                                  UNIT_WATT, g_channel->index - 1);
+    origLevel = level = MakeValue(channel_dispatcher::getPowerProtectionLevel(*g_channel), UNIT_WATT);
     minLevel = channel_dispatcher::getOppMinLevel(*g_channel);
     maxLevel = channel_dispatcher::getOppMaxLevel(*g_channel);
     defLevel = channel_dispatcher::getOppDefaultLevel(*g_channel);
@@ -260,9 +254,7 @@ void ChSettingsOppProtectionPage::setParams(bool checkLoad) {
     if (checkLoad && g_channel->isOutputEnabled()) {
         float pMon =
             channel_dispatcher::getUMon(*g_channel) * channel_dispatcher::getIMon(*g_channel);
-        if (eez::less(limit.getFloat(), pMon, getPrecision(UNIT_WATT)) &&
-            eez::greaterOrEqual(channel_dispatcher::getIMon(*g_channel), 0,
-                                getPrecision(UNIT_AMPER))) {
+        if (limit.getFloat() < pMon && channel_dispatcher::getIMon(*g_channel) >= 0) {
             areYouSureWithMessage("This change will affect current load.", onSetParamsOk);
             return;
         }

@@ -61,8 +61,6 @@ NumericKeypadOptions::NumericKeypadOptions() {
 
     this->channelIndex = -1;
 
-    numSignificantDecimalDigits = -1;
-
     min = NAN;
     max = NAN;
 
@@ -111,12 +109,6 @@ void NumericKeypad::init(const char *label, const data::Value &value, NumericKey
 
     if (value.getType() == VALUE_TYPE_IP_ADDRESS) {
         m_options.flags.dotButtonEnabled = true;
-    }
-
-    if (m_startValue.isMicro()) {
-        switchToMicro();
-    } else if (m_startValue.isMilli()) {
-        switchToMilli();
     }
 
     m_maxChars = 16;
@@ -247,8 +239,13 @@ Unit NumericKeypad::getSwitchToUnit() {
         return UNIT_VOLT;
     if (m_options.editValueUnit == UNIT_AMPER)
         return UNIT_MILLI_AMPER;
-    if (m_options.editValueUnit == UNIT_MILLI_AMPER)
-        return UNIT_MICRO_AMPER;
+    if (m_options.editValueUnit == UNIT_MILLI_AMPER) {
+        if (m_options.channelIndex != -1 && Channel::get(m_options.channelIndex).isMicroAmperAllowed()) {
+            return UNIT_MICRO_AMPER;
+        } else {
+            return UNIT_AMPER;
+        }
+    }
     if (m_options.editValueUnit == UNIT_MICRO_AMPER)
         return UNIT_AMPER;
     if (m_options.editValueUnit == UNIT_WATT)
@@ -326,8 +323,7 @@ bool NumericKeypad::isValueValid() {
 
     float value = getValue();
 
-    if (less(value, m_options.min, m_startValue.getUnit(), m_options.channelIndex) ||
-        greater(value, m_options.max, m_startValue.getUnit(), m_options.channelIndex)) {
+    if (value < m_options.min || value > m_options.max) {
         return false;
     }
 
@@ -335,35 +331,7 @@ bool NumericKeypad::isValueValid() {
 }
 
 bool NumericKeypad::checkNumSignificantDecimalDigits() {
-    if (getActivePageId() != PAGE_ID_EDIT_MODE_KEYPAD) {
-        return true;
-    }
-
-    float value = getValue();
-    Unit unit = getValueUnit();
-
-    int numSignificantDecimalDigits = getNumSignificantDecimalDigits(unit, m_options.channelIndex, false);
-    if (isMicro()) {
-        numSignificantDecimalDigits -= 6;
-        if (numSignificantDecimalDigits < 0) {
-            numSignificantDecimalDigits = 0;
-        }
-    } else if (isMilli()) {
-        numSignificantDecimalDigits -= 3;
-        if (numSignificantDecimalDigits < 0) {
-            numSignificantDecimalDigits = 0;
-        }
-    } else {
-        if (eez::greater(value, 9.999f, 1000.0f)) {
-            numSignificantDecimalDigits = 2;
-        }
-    }
-
-    if (unit == UNIT_AMPER && eez::lessOrEqual(value, 0.05f, getPrecision(UNIT_AMPER))) {
-        ++numSignificantDecimalDigits;
-    }
-
-    return getNumDecimalDigits() <= numSignificantDecimalDigits;
+    return true;
 }
 
 void NumericKeypad::digit(int d) {
@@ -544,9 +512,9 @@ void NumericKeypad::ok() {
         } else {
             float value = getValue();
 
-            if (!isNaN(m_options.min) && less(value, m_options.min, m_startValue.getUnit(), m_options.channelIndex)) {
+            if (!isNaN(m_options.min) && value < m_options.min) {
                 psuErrorMessage(0, MakeLessThenMinMessageValue(m_options.min, m_startValue));
-            } else if (!isNaN(m_options.max) && greater(value, m_options.max, m_startValue.getUnit(), m_options.channelIndex)) {
+            } else if (!isNaN(m_options.max) && value > m_options.max) {
                 psuErrorMessage(0, MakeGreaterThenMaxMessageValue(m_options.max, m_startValue));
             } else {
                 m_okFloatCallback(value);
@@ -603,7 +571,7 @@ bool NumericKeypad::onEncoder(int counter) {
                 newValue = m_options.max;
             }
 
-            m_startValue = MakeValue(newValue, m_startValue.getUnit(), m_options.channelIndex);
+            m_startValue = MakeValue(newValue, m_startValue.getUnit());
 
             return true;
         } else if (m_startValue.getType() == VALUE_TYPE_INT) {

@@ -61,54 +61,45 @@ void INT_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_FLOAT_value(const Value &a, const Value &b) {
-    if (a.getUnit() != b.getUnit()) {
-        return false;
-    }
-
-    if (a.getFloat() == b.getFloat()) {
-        return true;
-    }
-
-    if (a.getUnit() == UNIT_SECOND) {
-        return equal(a.getFloat(), b.getFloat(), powf(10.0f, 4));
-    }
-
-    float aValue;
-    Unit aUnit;
-    int aNumSignificantDecimalDigits;
-    a.formatFloatValue(aValue, aUnit, aNumSignificantDecimalDigits);
-
-    float bValue;
-    Unit bUnit;
-    int bNumSignificantDecimalDigits;
-    b.formatFloatValue(bValue, bUnit, bNumSignificantDecimalDigits);
-
-    if (aUnit != bUnit) {
-        return false;
-    }
-
-    if (aNumSignificantDecimalDigits != bNumSignificantDecimalDigits) {
-        return false;
-    }
-
-    return equal(aValue, bValue,
-                 getPrecisionFromNumSignificantDecimalDigits(aNumSignificantDecimalDigits));
+    return a.getUnit() == b.getUnit() && a.getFloat() == b.getFloat();
 }
 
 void FLOAT_value_to_text(const Value &value, char *text, int count) {
-    float fValue;
-    Unit unit;
-    int numSignificantDecimalDigits;
-
-    value.formatFloatValue(fValue, unit, numSignificantDecimalDigits);
-
     text[0] = 0;
 
-    strcatFloat(text, fValue, numSignificantDecimalDigits);
+    float floatValue = value.getFloat();
+    Unit unit = value.getUnit();
 
-    if (value.getUnit() == UNIT_SECOND) {
-        removeTrailingZerosFromFloat(text);
+    if (floatValue != 0) {
+        if (unit == UNIT_VOLT) {
+            if (fabs(floatValue) < 1) {
+                unit = UNIT_MILLI_VOLT;
+                floatValue *= 1000.0f;
+            }
+        } else if (unit == UNIT_AMPER) {
+            if (fabs(floatValue) < 0.001f && fabs(floatValue) != 0.0005f) {
+                unit = UNIT_MICRO_AMPER;
+                floatValue *= 1000000.0f;
+            } else if (fabs(floatValue) < 1) {
+                unit = UNIT_MILLI_AMPER;
+                floatValue *= 1000.0f;
+            }
+        } else if (unit == UNIT_WATT) {
+            if (fabs(floatValue) < 1) {
+                unit = UNIT_MILLI_WATT;
+                floatValue *= 1000.0f;
+            }
+        } else if (unit == UNIT_SECOND) {
+            if (fabs(floatValue) < 1) {
+                unit = UNIT_MILLI_SECOND;
+                floatValue *= 1000.0f;
+            }
+        }
     }
+
+    strcatFloat(text, floatValue);
+
+    removeTrailingZerosFromFloat(text);
 
     strcat(text, getUnitName(unit));
 }
@@ -236,132 +227,6 @@ Value MakePageInfoValue(uint8_t pageIndex, uint8_t numPages) {
     value.pairOfUint8_.second = numPages;
     value.type_ = VALUE_TYPE_PAGE_INFO;
     return value;
-}
-
-bool Value::isMilli() const {
-    if (unit_ == UNIT_VOLT || unit_ == UNIT_AMPER || unit_ == UNIT_WATT || unit_ == UNIT_SECOND) {
-        int numSignificantDecimalDigits =
-            options_ & VALUE_OPTIONS_NUM_SIGNIFICANT_DECIMAL_DIGITS_MASK;
-
-        float value = float_;
-        float min = -1.0f;
-        float max = 1.0f;
-        float precision = getPrecisionFromNumSignificantDecimalDigits(numSignificantDecimalDigits);
-
-        bool gt = greater(value, min, precision);
-        if (!gt) {
-            return false;
-        }
-
-        bool ls = less(value, max, precision);
-        if (!ls) {
-            return false;
-        }
-
-        return true;
-    }
-    return false;
-}
-
-bool Value::isMicro() const {
-    if (unit_ == UNIT_AMPER) {
-        int numSignificantDecimalDigits =
-            options_ & VALUE_OPTIONS_NUM_SIGNIFICANT_DECIMAL_DIGITS_MASK;
-
-        float value = float_;
-        float min = -0.001f;
-        float max = 0.001f;
-        float precision = getPrecisionFromNumSignificantDecimalDigits(numSignificantDecimalDigits);
-
-        bool gt = greater(value, min, precision);
-        if (!gt) {
-            return false;
-        }
-
-        bool ls = less(value, max, precision);
-        if (!ls) {
-            return false;
-        }
-
-        return true;
-    }
-    return false;
-}
-
-
-void Value::formatFloatValue(float &value, Unit &unit, int &numSignificantDecimalDigits) const {
-    value = float_;
-    unit = (Unit)unit_;
-    numSignificantDecimalDigits = options_ & VALUE_OPTIONS_NUM_SIGNIFICANT_DECIMAL_DIGITS_MASK;
-
-    if (isMicro()) {
-        value *= 1000000.0f;
-
-        numSignificantDecimalDigits -= 6;
-
-        if (numSignificantDecimalDigits == -1) {
-            value = roundf(value / 10) * 10;
-            numSignificantDecimalDigits = 0;
-        } else if (numSignificantDecimalDigits == -2) {
-            value = roundf(value / 100) * 100;
-            numSignificantDecimalDigits = 0;
-        } else if (numSignificantDecimalDigits == -3) {
-            value = roundf(value / 1000) * 1000;
-            numSignificantDecimalDigits = 0;
-        } else if (numSignificantDecimalDigits == -4) {
-            value = roundf(value / 10000) * 10000;
-            numSignificantDecimalDigits = 0;
-        } else if (numSignificantDecimalDigits == -5) {
-            value = roundf(value / 100000) * 100000;
-            numSignificantDecimalDigits = 0;
-        } else if (numSignificantDecimalDigits == -6) {
-            value = roundf(value / 1000000) * 1000000;
-            numSignificantDecimalDigits = 0;
-        }
-
-        unit = UNIT_MICRO_AMPER;
-	} else if (isMilli()) {
-        value *= 1000.0f;
-
-        numSignificantDecimalDigits -= 3;
-
-        if (numSignificantDecimalDigits == -1) {
-            value = roundf(value / 10) * 10;
-            numSignificantDecimalDigits = 0;
-        } else if (numSignificantDecimalDigits == -2) {
-            value = roundf(value / 100) * 100;
-            numSignificantDecimalDigits = 0;
-        } else if (numSignificantDecimalDigits == -3) {
-            value = roundf(value / 1000) * 1000;
-            numSignificantDecimalDigits = 0;
-        }
-
-        if (unit == UNIT_VOLT) {
-            unit = UNIT_MILLI_VOLT;
-        } else if (unit == UNIT_AMPER) {
-            unit = UNIT_MILLI_AMPER;
-        } else if (unit == UNIT_WATT) {
-            unit = UNIT_MILLI_WATT;
-        } else if (unit == UNIT_SECOND) {
-            unit = UNIT_MILLI_SECOND;
-        }
-    }
-
-    if (!(options_ & VALUE_OPTIONS_EXTENDED_PRECISION)) {
-        if (numSignificantDecimalDigits > 3) {
-            numSignificantDecimalDigits = 3;
-        }
-
-        if (numSignificantDecimalDigits > 2 &&
-            greater(value, 9.999f, getPrecisionFromNumSignificantDecimalDigits(3))) {
-            numSignificantDecimalDigits = 2;
-        }
-
-        if (numSignificantDecimalDigits > 1 &&
-            greater(value, 99.99f, getPrecisionFromNumSignificantDecimalDigits(2))) {
-            numSignificantDecimalDigits = 1;
-        }
-    }
 }
 
 void Value::toText(char *text, int count) const {

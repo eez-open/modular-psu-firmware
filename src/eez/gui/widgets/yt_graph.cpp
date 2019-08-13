@@ -273,8 +273,6 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     float min2 = data::getMin(widgetCursor.cursor, ytGraphWidget->y2Data).getFloat();
     float max2 = data::getLimit(widgetCursor.cursor, ytGraphWidget->y2Data).getFloat();
 
-    int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : 0;
-
     int previousHistoryValuePosition = widgetCursor.previousState && 
         previousState->iChannel == currentState->iChannel &&
         previousState->ytGraphUpdateMethod == currentState->ytGraphUpdateMethod && 

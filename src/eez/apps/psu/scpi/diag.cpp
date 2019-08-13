@@ -39,8 +39,7 @@ namespace scpi {
 
 static void printCalibrationValue(scpi_t *context, char *buffer, calibration::Value &value) {
     const char *prefix;
-    void (*strcat_value)(char *str, float value, int numSignificantDecimalDigits, int channelIndex);
-    int numSignificantDecimalDigits = 4;
+    void (*strcat_value)(char *str, float value);
     if (value.voltOrCurr) {
         prefix = "u";
         strcat_value = strcatVoltage;
@@ -52,19 +51,19 @@ static void printCalibrationValue(scpi_t *context, char *buffer, calibration::Va
     if (value.min_set) {
         strcpy(buffer, prefix);
         strcat(buffer, "_min=");
-        strcat_value(buffer, value.min_val, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, value.min_val);
         SCPI_ResultText(context, buffer);
     }
     if (value.mid_set) {
         strcpy(buffer, prefix);
         strcat(buffer, "_mid=");
-        strcat_value(buffer, value.mid_val, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, value.mid_val);
         SCPI_ResultText(context, buffer);
     }
     if (value.max_set) {
         strcpy(buffer, prefix);
         strcat(buffer, "_max=");
-        strcat_value(buffer, value.max_val, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, value.max_val);
         SCPI_ResultText(context, buffer);
     }
 
@@ -89,11 +88,11 @@ static void printCalibrationValue(scpi_t *context, char *buffer, calibration::Va
     if (value.level != calibration::LEVEL_NONE) {
         strcpy(buffer, prefix);
         strcat(buffer, "_level_value=");
-        strcat_value(buffer, value.getLevelValue(), numSignificantDecimalDigits, -1);
+        strcat_value(buffer, value.getLevelValue());
         SCPI_ResultText(context, buffer);
         strcpy(buffer, prefix);
         strcat(buffer, "_adc=");
-        strcat_value(buffer, value.getAdcValue(), numSignificantDecimalDigits, -1);
+        strcat_value(buffer, value.getAdcValue());
         SCPI_ResultText(context, buffer);
     }
 }
@@ -103,8 +102,7 @@ void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange
                                 Channel::CalibrationValueConfiguration &calibrationValue,
                                 char *buffer) {
     const char *prefix;
-    void (*strcat_value)(char *str, float value, int precision, int channelIndex);
-    int numSignificantDecimalDigits = 4;
+    void (*strcat_value)(char *str, float value);
     if (unit == UNIT_VOLT) {
         prefix = "u";
         strcat_value = strcatVoltage;
@@ -127,47 +125,47 @@ void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange
     if (calParamsExists) {
         strcpy(buffer, prefix);
         strcat(buffer, "_min_level=");
-        strcat_value(buffer, calibrationValue.min.dac, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, calibrationValue.min.dac);
         SCPI_ResultText(context, buffer);
         strcpy(buffer, prefix);
         strcat(buffer, "_min_data=");
-        strcat_value(buffer, calibrationValue.min.val, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, calibrationValue.min.val);
         SCPI_ResultText(context, buffer);
         strcpy(buffer, prefix);
         strcat(buffer, "_min_adc=");
-        strcat_value(buffer, calibrationValue.min.adc, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, calibrationValue.min.adc);
         SCPI_ResultText(context, buffer);
         strcpy(buffer, prefix);
         strcat(buffer, "_mid_level=");
-        strcat_value(buffer, calibrationValue.mid.dac, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, calibrationValue.mid.dac);
         SCPI_ResultText(context, buffer);
         strcpy(buffer, prefix);
         strcat(buffer, "_mid_data=");
-        strcat_value(buffer, calibrationValue.mid.val, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, calibrationValue.mid.val);
         SCPI_ResultText(context, buffer);
         strcpy(buffer, prefix);
         strcat(buffer, "_mid_adc=");
-        strcat_value(buffer, calibrationValue.mid.adc, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, calibrationValue.mid.adc);
         SCPI_ResultText(context, buffer);
         strcpy(buffer, prefix);
         strcat(buffer, "_max_level=");
-        strcat_value(buffer, calibrationValue.max.dac, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, calibrationValue.max.dac);
         SCPI_ResultText(context, buffer);
         strcpy(buffer, prefix);
         strcat(buffer, "_max_data=");
-        strcat_value(buffer, calibrationValue.max.val, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, calibrationValue.max.val);
         SCPI_ResultText(context, buffer);
         strcpy(buffer, prefix);
         strcat(buffer, "_max_adc=");
-        strcat_value(buffer, calibrationValue.max.adc, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, calibrationValue.max.adc);
         SCPI_ResultText(context, buffer);
         strcpy(buffer, prefix);
         strcat(buffer, "_min_range=");
-        strcat_value(buffer, calibrationValue.minPossible, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, calibrationValue.minPossible);
         SCPI_ResultText(context, buffer);
         strcpy(buffer, prefix);
         strcat(buffer, "_max_range=");
-        strcat_value(buffer, calibrationValue.maxPossible, numSignificantDecimalDigits, -1);
+        strcat_value(buffer, calibrationValue.maxPossible);
         SCPI_ResultText(context, buffer);
     }
 }
@@ -194,13 +192,11 @@ scpi_result_t scpi_cmd_diagnosticInformationAdcQ(scpi_t *context) {
     SCPI_ResultText(context, buffer);
 
     strcpy(buffer, "I_SET=");
-    strcatCurrent(buffer, channel->i.mon_dac, getNumSignificantDecimalDigits(UNIT_AMPER, channel->index - 1, false),
-                  channel->index - 1);
+    strcatCurrent(buffer, channel->i.mon_dac);
     SCPI_ResultText(context, buffer);
 
     strcpy(buffer, "I_MON=");
-    strcatCurrent(buffer, channel->i.mon_last, getNumSignificantDecimalDigits(UNIT_AMPER, channel->index - 1, false),
-                  channel->index - 1);
+    strcatCurrent(buffer, channel->i.mon_last);
     SCPI_ResultText(context, buffer);
 
     return SCPI_RES_OK;
@@ -305,7 +301,7 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
         SCPI_ResultText(context, buffer);
 
         sprintf(buffer, "temp_%s_level=", sensor.name);
-        strcatFloat(buffer, sensorTemperature.prot_conf.level, getNumSignificantDecimalDigits(UNIT_CELSIUS, -1, false));
+        strcatFloat(buffer, sensorTemperature.prot_conf.level);
         strcat(buffer, " oC");
         SCPI_ResultText(context, buffer);
     }

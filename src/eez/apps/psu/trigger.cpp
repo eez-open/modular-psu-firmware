@@ -116,6 +116,7 @@ Source getSource() {
 }
 
 void setVoltage(Channel &channel, float value) {
+    value = roundPrec(value, channel.getVoltagePrecision());
     g_levels[channel.index - 1].u = value;
 }
 
@@ -124,6 +125,7 @@ float getVoltage(Channel &channel) {
 }
 
 void setCurrent(Channel &channel, float value) {
+    value = roundPrec(value, channel.getCurrentPrecision(value));
     g_levels[channel.index - 1].i = value;
 }
 
@@ -266,19 +268,15 @@ int checkTrigger() {
                         return err;
                     }
                 } else {
-                    if (eez::greater(g_levels[i].u, channel_dispatcher::getULimit(channel),
-                                     getPrecision(UNIT_VOLT))) {
+                    if (g_levels[i].u > channel_dispatcher::getULimit(channel)) {
                         return SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
                     }
 
-                    if (eez::greater(g_levels[i].i, channel_dispatcher::getILimit(channel),
-                                     getPrecision(UNIT_AMPER))) {
+                    if (g_levels[i].i > channel_dispatcher::getILimit(channel)) {
                         return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
                     }
 
-                    if (eez::greater(g_levels[i].u * g_levels[i].i,
-                                     channel_dispatcher::getPowerLimit(channel),
-                                     getPrecision(UNIT_WATT))) {
+                    if (g_levels[i].u * g_levels[i].i > channel_dispatcher::getPowerLimit(channel)) {
                         return SCPI_ERROR_POWER_LIMIT_EXCEEDED;
                     }
                 }

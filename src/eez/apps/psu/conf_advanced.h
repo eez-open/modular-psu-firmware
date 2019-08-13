@@ -162,8 +162,8 @@
 #define FAN_MAX_PWM 255
 
 /// FAN PID controller parameters
-#define FAN_PID_KP 0.1
-#define FAN_PID_KI 0.05
+#define FAN_PID_KP 0.1f
+#define FAN_PID_KI 0.05f
 #define FAN_PID_KD 0
 #define FAN_PID_POn                                                                                \
     1 // PoM: 0, PoE: 1, see

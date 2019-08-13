@@ -21,21 +21,11 @@
 namespace eez {
 namespace psu {
 
-void strcatFloatValue(char *str, float value, Unit unit, int channelIndex);
-void strcatVoltage(char *str, float value, int numSignificantDecimalDigits = -1,
-                   int channelIndex = -1);
-void strcatCurrent(char *str, float value, int numSignificantDecimalDigits = -1,
-                   int channelIndex = -1);
+void strcatVoltage(char *str, float value);
+void strcatCurrent(char *str, float value);
 void strcatPower(char *str, float value);
 void strcatDuration(char *str, float value);
 void strcatLoad(char *str, float value);
-
-bool greater(float a, float b, Unit unit, int channelIndex);
-bool greaterOrEqual(float a, float b, Unit unit, int channelIndex);
-bool less(float a, float b, Unit unit, int channelIndex);
-bool lessOrEqual(float a, float b, Unit unit, int channelIndex);
-bool equal(float a, float b, Unit unit, int channelIndex);
-bool between(float x, float a, float b, Unit unit, int channelIndex);
 
 } // namespace psu
 } // namespace eez

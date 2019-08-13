@@ -148,12 +148,12 @@ void DigitalAnalogConverter::set_voltage(float value) {
 
 void DigitalAnalogConverter::set_current(float value) {
     if (channel.boardRevision == CH_BOARD_REVISION_DCP505_R1B3) {
-        if (value <= 0.05) {
-            set(DATA_BUFFER_A, remap(value, 0, 0, 0.05, 65535/3));
+        if (value <= 0.05f) {
+            set(DATA_BUFFER_A, remap(value, 0, 0, 0.05f, 65535/3));
         } else if (value <= 0.5) {
-            set(DATA_BUFFER_A, remap(value, 0.05, 65535/3 + 1, 0.5, 2*65535/3));
+            set(DATA_BUFFER_A, remap(value, 0.05f, 65535/3 + 1, 0.5, 2*65535/3));
         } else {
-            set(DATA_BUFFER_A, remap(value, 0.5, 2*65535/3 + 1, 5, 65535));
+            set(DATA_BUFFER_A, remap(value, 0.5f, 2*65535/3 + 1, 5, 65535));
         }
     } else {
         set(DATA_BUFFER_A, remap(value, channel.I_MIN, (float)DAC_MIN, channel.getDualRangeMax(), (float)DAC_MAX));

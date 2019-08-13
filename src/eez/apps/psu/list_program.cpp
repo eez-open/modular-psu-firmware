@@ -188,19 +188,16 @@ int checkLimits(int iChannel) {
 
     for (int j = 0; j < voltageListLength || j < currentListLength; ++j) {
         float voltage = g_channelsLists[iChannel].voltageList[j % voltageListLength];
-        if (eez::greater(voltage, channel_dispatcher::getULimit(channel),
-                         getPrecision(UNIT_VOLT))) {
+        if (voltage > channel_dispatcher::getULimit(channel)) {
             return SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
         }
 
         float current = g_channelsLists[iChannel].currentList[j % currentListLength];
-        if (eez::greater(current, channel_dispatcher::getILimit(channel),
-                         getPrecision(UNIT_AMPER))) {
+        if (current > channel_dispatcher::getILimit(channel)) {
             return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
         }
 
-        if (eez::greater(voltage * current, channel_dispatcher::getPowerLimit(channel),
-                         getPrecision(UNIT_WATT))) {
+        if (voltage * current > channel_dispatcher::getPowerLimit(channel)) {
             return SCPI_ERROR_POWER_LIMIT_EXCEEDED;
         }
     }
@@ -426,22 +423,19 @@ int maxListsSize(Channel &channel) {
 }
 
 bool setListValue(Channel &channel, int16_t it, int *err) {
-    float voltage = g_channelsLists[channel.index - 1]
-                        .voltageList[it % g_channelsLists[channel.index - 1].voltageListLength];
-    if (eez::greater(voltage, channel_dispatcher::getULimit(channel), getPrecision(UNIT_VOLT))) {
+    float voltage = g_channelsLists[channel.index - 1].voltageList[it % g_channelsLists[channel.index - 1].voltageListLength];
+    if (voltage > channel_dispatcher::getULimit(channel)) {
         *err = SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
         return false;
     }
 
-    float current = g_channelsLists[channel.index - 1]
-                        .currentList[it % g_channelsLists[channel.index - 1].currentListLength];
-    if (eez::greater(current, channel_dispatcher::getILimit(channel), getPrecision(UNIT_AMPER))) {
+    float current = g_channelsLists[channel.index - 1].currentList[it % g_channelsLists[channel.index - 1].currentListLength];
+    if (current > channel_dispatcher::getILimit(channel)) {
         *err = SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
         return false;
     }
 
-    if (eez::greater(voltage * current, channel_dispatcher::getPowerLimit(channel),
-                     getPrecision(UNIT_WATT))) {
+    if (voltage * current > channel_dispatcher::getPowerLimit(channel)) {
         *err = SCPI_ERROR_POWER_LIMIT_EXCEEDED;
         return false;
     }

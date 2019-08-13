@@ -42,35 +42,35 @@ namespace edit_mode_step {
 
 using data::Value;
 
-static const Value CONF_GUI_U_STEPS[] = { data::Value(5.0f, UNIT_UNKNOWN, 2),
-                                          data::Value(2.0f, UNIT_UNKNOWN, 2),
-                                          data::Value(1.0f, UNIT_UNKNOWN, 2),
-                                          data::Value(0.5f, UNIT_UNKNOWN, 2),
-                                          data::Value(0.1f, UNIT_UNKNOWN, 2) };
+static const Value CONF_GUI_U_STEPS[] = { data::Value(5.0f, UNIT_UNKNOWN),
+                                          data::Value(2.0f, UNIT_UNKNOWN),
+                                          data::Value(1.0f, UNIT_UNKNOWN),
+                                          data::Value(0.5f, UNIT_UNKNOWN),
+                                          data::Value(0.1f, UNIT_UNKNOWN) };
 
-static const Value CONF_GUI_I_STEPS[] = { data::Value(0.5f, UNIT_UNKNOWN, 2),
-                                          data::Value(0.25f, UNIT_UNKNOWN, 2),
-                                          data::Value(0.1f, UNIT_UNKNOWN, 2),
-                                          data::Value(0.05f, UNIT_UNKNOWN, 2),
-                                          data::Value(0.01f, UNIT_UNKNOWN, 2) };
+static const Value CONF_GUI_I_STEPS[] = { data::Value(0.5f, UNIT_UNKNOWN),
+                                          data::Value(0.25f, UNIT_UNKNOWN),
+                                          data::Value(0.1f, UNIT_UNKNOWN),
+                                          data::Value(0.05f, UNIT_UNKNOWN),
+                                          data::Value(0.01f, UNIT_UNKNOWN) };
 
-static const Value CONF_GUI_P_STEPS[] = { data::Value(10.0f, UNIT_UNKNOWN, 2),
-                                          data::Value(5.0f, UNIT_UNKNOWN, 2),
-                                          data::Value(2.0f, UNIT_UNKNOWN, 2),
-                                          data::Value(1.0f, UNIT_UNKNOWN, 2),
-                                          data::Value(0.5f, UNIT_UNKNOWN, 2) };
+static const Value CONF_GUI_P_STEPS[] = { data::Value(10.0f, UNIT_UNKNOWN),
+                                          data::Value(5.0f, UNIT_UNKNOWN),
+                                          data::Value(2.0f, UNIT_UNKNOWN),
+                                          data::Value(1.0f, UNIT_UNKNOWN),
+                                          data::Value(0.5f, UNIT_UNKNOWN) };
 
-static const Value CONF_GUI_TEMP_STEPS[] = { data::Value(20.0f, UNIT_UNKNOWN, 0),
-                                             data::Value(10.0f, UNIT_UNKNOWN, 0),
-                                             data::Value(5.0f, UNIT_UNKNOWN, 0),
-                                             data::Value(2.0f, UNIT_UNKNOWN, 0),
-                                             data::Value(1.0f, UNIT_UNKNOWN, 0) };
+static const Value CONF_GUI_TEMP_STEPS[] = { data::Value(20.0f, UNIT_UNKNOWN),
+                                             data::Value(10.0f, UNIT_UNKNOWN),
+                                             data::Value(5.0f, UNIT_UNKNOWN),
+                                             data::Value(2.0f, UNIT_UNKNOWN),
+                                             data::Value(1.0f, UNIT_UNKNOWN) };
 
-static const Value CONF_GUI_TIME_STEPS[] = { data::Value(30, UNIT_UNKNOWN, 0),
-                                             data::Value(20, UNIT_UNKNOWN, 0),
-                                             data::Value(10, UNIT_UNKNOWN, 0),
-                                             data::Value(5, UNIT_UNKNOWN, 0),
-                                             data::Value(1, UNIT_UNKNOWN, 0) };
+static const Value CONF_GUI_TIME_STEPS[] = { data::Value(30.0f, UNIT_UNKNOWN),
+                                             data::Value(20.0f, UNIT_UNKNOWN),
+                                             data::Value(10.0f, UNIT_UNKNOWN),
+                                             data::Value(5.0f, UNIT_UNKNOWN),
+                                             data::Value(1.0f, UNIT_UNKNOWN) };
 
 
 static int g_stepIndex[CH_MAX][2];

@@ -54,9 +54,9 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpper(scpi_t *context) {
         }
 
         float value = (float)param.content.value;
-        if (eez::equal(value, 0.5f, getPrecision(UNIT_AMPER))) {
+        if (value == 0.05f) {
             mode = CURRENT_RANGE_SELECTION_ALWAYS_LOW;
-        } else if (eez::equal(value, 5.0f, getPrecision(UNIT_AMPER))) {
+        } else if (value == 5.0f) {
             mode = CURRENT_RANGE_SELECTION_ALWAYS_HIGH;
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);

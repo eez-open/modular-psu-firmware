@@ -63,19 +63,17 @@ scpi_result_t scpi_cmd_apply(scpi_t *context) {
         call_set_current = true;
     }
 
-    if (eez::greater(voltage, channel_dispatcher::getULimit(*channel), getPrecision(UNIT_VOLT))) {
+    if (voltage > channel_dispatcher::getULimit(*channel)) {
         SCPI_ErrorPush(context, SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
         return SCPI_RES_ERR;
     }
 
-    if (call_set_current &&
-        eez::greater(current, channel_dispatcher::getILimit(*channel), getPrecision(UNIT_AMPER))) {
+    if (call_set_current && current > channel_dispatcher::getILimit(*channel)) {
         SCPI_ErrorPush(context, SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
         return SCPI_RES_ERR;
     }
 
-    if (eez::greater(voltage * (call_set_current ? current : channel_dispatcher::getISet(*channel)),
-                     channel_dispatcher::getPowerLimit(*channel), getPrecision(UNIT_WATT))) {
+    if (voltage * (call_set_current ? current : channel_dispatcher::getISet(*channel)) > channel_dispatcher::getPowerLimit(*channel)) {
         SCPI_ErrorPush(context, SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         return SCPI_RES_ERR;
     }
@@ -110,24 +108,19 @@ scpi_result_t scpi_cmd_applyQ(scpi_t *context) {
         sprintf(buffer, "CH%d:", channel->index);
         strcatVoltage(buffer, channel_dispatcher::getUMax(*channel));
         strcat(buffer, "/");
-        strcatCurrent(buffer, channel_dispatcher::getIMax(*channel),
-                      getNumSignificantDecimalDigits(UNIT_AMPER, channel->index - 1, false), channel->index - 1);
+        strcatCurrent(buffer, channel_dispatcher::getIMax(*channel));
         strcat(buffer, ", ");
 
-        strcatFloat(buffer, channel_dispatcher::getUSet(*channel),
-                    getNumSignificantDecimalDigits(UNIT_VOLT, channel->index - 1, false));
+        strcatFloat(buffer, channel_dispatcher::getUSet(*channel));
         strcat(buffer, ", ");
-        strcatFloatValue(buffer, channel_dispatcher::getISet(*channel), UNIT_AMPER,
-                         channel->index - 1);
+        strcatFloat(buffer, channel_dispatcher::getISet(*channel));
     } else {
         if (current_or_voltage == 0) {
             // return only current
-            strcatFloatValue(buffer, channel_dispatcher::getISet(*channel), UNIT_AMPER,
-                             channel->index - 1);
+            strcatFloat(buffer, channel_dispatcher::getISet(*channel));
         } else {
             // return only voltage
-            strcatFloat(buffer, channel_dispatcher::getUSet(*channel),
-                        getNumSignificantDecimalDigits(UNIT_VOLT, channel->index - 1, false));
+            strcatFloat(buffer, channel_dispatcher::getUSet(*channel));
         }
     }
 

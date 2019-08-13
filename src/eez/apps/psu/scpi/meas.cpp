@@ -36,7 +36,7 @@ scpi_result_t scpi_cmd_measureScalarCurrentDcQ(scpi_t *context) {
     }
 
     char buffer[256] = { 0 };
-    strcatFloatValue(buffer, channel_dispatcher::getIMon(*channel), UNIT_AMPER, channel->index - 1);
+    strcatCurrent(buffer, channel_dispatcher::getIMon(*channel));
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -50,9 +50,7 @@ scpi_result_t scpi_cmd_measureScalarPowerDcQ(scpi_t *context) {
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer,
-                channel_dispatcher::getUMon(*channel) * channel_dispatcher::getIMon(*channel),
-                getNumSignificantDecimalDigits(UNIT_WATT, channel->index - 1, false));
+    strcatFloat(buffer, channel_dispatcher::getUMon(*channel) * channel_dispatcher::getIMon(*channel));
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -66,8 +64,7 @@ scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, channel_dispatcher::getUMon(*channel),
-                getNumSignificantDecimalDigits(UNIT_VOLT, channel->index - 1, false));
+    strcatFloat(buffer, channel_dispatcher::getUMon(*channel));
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -81,8 +78,7 @@ scpi_result_t scpi_cmd_measureScalarTemperatureThermistorDcQ(scpi_t *context) {
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, temperature::sensors[sensor].measure(),
-                getNumSignificantDecimalDigits(UNIT_CELSIUS, -1, false));
+    strcatFloat(buffer, temperature::sensors[sensor].measure());
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;

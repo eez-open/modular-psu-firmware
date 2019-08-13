@@ -160,13 +160,12 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitude(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (eez::greater(current, channel_dispatcher::getILimit(*channel), getPrecision(UNIT_AMPER))) {
+    if (current > channel_dispatcher::getILimit(*channel)) {
         SCPI_ErrorPush(context, SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
         return SCPI_RES_ERR;
     }
 
-    if (eez::greater(current * channel_dispatcher::getUSetUnbalanced(*channel),
-                     channel_dispatcher::getPowerLimit(*channel), getPrecision(UNIT_WATT))) {
+    if (current * channel_dispatcher::getUSetUnbalanced(*channel) > channel_dispatcher::getPowerLimit(*channel)) {
         SCPI_ErrorPush(context, SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         return SCPI_RES_ERR;
     }
@@ -212,13 +211,12 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitude(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (eez::greater(voltage, channel_dispatcher::getULimit(*channel), getPrecision(UNIT_VOLT))) {
+    if (voltage > channel_dispatcher::getULimit(*channel)) {
         SCPI_ErrorPush(context, SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
         return SCPI_RES_ERR;
     }
 
-    if (eez::greater(voltage * channel_dispatcher::getISetUnbalanced(*channel),
-                     channel_dispatcher::getPowerLimit(*channel), getPrecision(UNIT_WATT))) {
+    if (voltage * channel_dispatcher::getISetUnbalanced(*channel) > channel_dispatcher::getPowerLimit(*channel)) {
         SCPI_ErrorPush(context, SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         return SCPI_RES_ERR;
     }
@@ -979,16 +977,13 @@ scpi_result_t scpi_cmd_sourceListCurrentLevel(scpi_t *context) {
             return SCPI_RES_ERR;
         }
 
-        if (eez::greater(current, channel_dispatcher::getIMaxLimit(*channel),
-                         getPrecision(UNIT_AMPER))) {
+        if (current > channel_dispatcher::getIMaxLimit(*channel)) {
             SCPI_ErrorPush(context, SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
             return SCPI_RES_ERR;
         }
 
         if (voltageListLength > 0) {
-            if (eez::greater(current * voltageList[i % voltageListLength],
-                             channel_dispatcher::getPowerMaxLimit(*channel),
-                             getPrecision(UNIT_WATT))) {
+            if (current * voltageList[i % voltageListLength] > channel_dispatcher::getPowerMaxLimit(*channel)) {
                 SCPI_ErrorPush(context, SCPI_ERROR_POWER_LIMIT_EXCEEDED);
                 return SCPI_RES_ERR;
             }
@@ -1119,16 +1114,13 @@ scpi_result_t scpi_cmd_sourceListVoltageLevel(scpi_t *context) {
             return SCPI_RES_ERR;
         }
 
-        if (eez::greater(voltage, channel_dispatcher::getUMaxLimit(*channel),
-                         getPrecision(UNIT_VOLT))) {
+        if (voltage > channel_dispatcher::getUMaxLimit(*channel)) {
             SCPI_ErrorPush(context, SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
             return SCPI_RES_ERR;
         }
 
         if (currentListLength > 0) {
-            if (eez::greater(voltage * currentList[i % currentListLength],
-                             channel_dispatcher::getPowerMaxLimit(*channel),
-                             getPrecision(UNIT_WATT))) {
+            if (voltage * currentList[i % currentListLength] > channel_dispatcher::getPowerMaxLimit(*channel)) {
                 SCPI_ErrorPush(context, SCPI_ERROR_POWER_LIMIT_EXCEEDED);
                 return SCPI_RES_ERR;
             }

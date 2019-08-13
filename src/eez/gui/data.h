@@ -54,11 +54,6 @@ struct EnumItem {
 
 extern const data::EnumItem *g_enumDefinitions[];
 
-enum ValueOptions {
-    VALUE_OPTIONS_NUM_SIGNIFICANT_DECIMAL_DIGITS_MASK = 0x0F,
-    VALUE_OPTIONS_EXTENDED_PRECISION = 0x10
-};
-
 struct EnumValue {
     uint8_t enumValue;
     uint8_t enumDefinition;
@@ -73,42 +68,60 @@ typedef uint8_t ValueType;
 
 struct Value {
   public:
-    Value() : type_(VALUE_TYPE_NONE), options_(0), unit_(UNIT_UNKNOWN) {
+    Value() 
+        : type_(VALUE_TYPE_NONE), options_(0), unit_(UNIT_UNKNOWN) 
+    {
         uint32_ = 0;
     }
-    Value(int value) : type_(VALUE_TYPE_INT), options_(0), unit_(UNIT_UNKNOWN), int_(value) {
+
+    Value(int value) 
+        : type_(VALUE_TYPE_INT), options_(0), unit_(UNIT_UNKNOWN), int_(value) 
+    {
     }
+
     Value(bool value)
-        : type_(VALUE_TYPE_INT), options_(0), unit_(UNIT_UNKNOWN), int_(value ? 1 : 0) {
+        : type_(VALUE_TYPE_INT), options_(0), unit_(UNIT_UNKNOWN), int_(value ? 1 : 0) 
+    {
     }
-    Value(const char *str) : type_(VALUE_TYPE_STR), options_(0), unit_(UNIT_UNKNOWN), str_(str) {
+    
+    Value(const char *str) 
+        : type_(VALUE_TYPE_STR), options_(0), unit_(UNIT_UNKNOWN), str_(str) 
+    {
     }
 
-    Value(int value, ValueType type) : type_(type), options_(0), unit_(UNIT_UNKNOWN), int_(value) {
+    Value(int value, ValueType type) 
+        : type_(type), options_(0), unit_(UNIT_UNKNOWN), int_(value) 
+    {
     }
+
     Value(uint8_t value, ValueType type)
-        : type_(type), options_(0), unit_(UNIT_UNKNOWN), uint8_(value) {
+        : type_(type), options_(0), unit_(UNIT_UNKNOWN), uint8_(value) 
+    {
     }
+
     Value(uint16_t value, ValueType type)
-        : type_(type), options_(0), unit_(UNIT_UNKNOWN), uint16_(value) {
+        : type_(type), options_(0), unit_(UNIT_UNKNOWN), uint16_(value) 
+    {
     }
+
     Value(uint32_t value, ValueType type)
-        : type_(type), options_(0), unit_(UNIT_UNKNOWN), uint32_(value) {
+        : type_(type), options_(0), unit_(UNIT_UNKNOWN), uint32_(value) 
+    {
     }
 
-    Value(float value, Unit unit = UNIT_UNKNOWN, int numSignificantDecimalDigits = 0,
-          bool extendedPrecision = false)
-        : type_(VALUE_TYPE_FLOAT),
-          options_(
-              (numSignificantDecimalDigits & VALUE_OPTIONS_NUM_SIGNIFICANT_DECIMAL_DIGITS_MASK) |
-              (extendedPrecision ? VALUE_OPTIONS_EXTENDED_PRECISION : 0)),
-          unit_(unit), float_(value) {
+    Value(float value, Unit unit)
+        : type_(VALUE_TYPE_FLOAT), options_(0), unit_(unit), float_(value) 
+    {
     }
 
-    Value(void *value, ValueType type) : type_(type), pVoid_(value) {
+    Value(void *value, ValueType type) 
+        : type_(type), pVoid_(value) 
+    {
     }
 
-    Value(AppContext *appContext) : type_(VALUE_TYPE_POINTER), pVoid_(appContext) {
+    Value(AppContext *appContext) 
+        : type_(VALUE_TYPE_POINTER), pVoid_(appContext) 
+    {
     }
 
     bool operator==(const Value &other) const;
@@ -192,7 +205,6 @@ struct Value {
     }
 
     void toText(char *text, int count) const;
-    void formatFloatValue(float &value, Unit &unit, int &numSignificantDecimalDigits) const;
 
   public:
     ValueType type_;
