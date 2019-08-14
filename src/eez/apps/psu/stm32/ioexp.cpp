@@ -76,6 +76,7 @@ static const uint8_t DCP505_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
 
 static const uint8_t DCP405_REG_VALUE_GPIOA = 0B00000000; //
 static const uint8_t DCP405_REG_VALUE_GPIOB = 0B00100001; // DP is OFF, disable OVP
+static const uint8_t DCP405_R2B5_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
 
 static const uint8_t REG_VALUES[] = {
     REG_IODIRA,   DCP505_REG_VALUE_IODIRA, 1,
@@ -119,7 +120,11 @@ void IOExpander::init() {
         	} else if (reg == REG_GPIOA) {
         		value = DCP405_REG_VALUE_GPIOA;
         	} else if (reg == REG_GPIOB) {
-        		value = DCP405_REG_VALUE_GPIOB;
+                if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
+        		    value = DCP405_REG_VALUE_GPIOB;
+                } else {
+                    value = DCP405_R2B5_REG_VALUE_GPIOB;
+                }
         	}
     	}
 
@@ -128,7 +133,11 @@ void IOExpander::init() {
 
     if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
     	gpioa = DCP405_REG_VALUE_GPIOA;
-    	gpiob = DCP405_REG_VALUE_GPIOB;
+        if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
+        	gpiob = DCP405_REG_VALUE_GPIOB;
+        } else {
+            gpiob = DCP405_R2B5_REG_VALUE_GPIOB;
+        }
     } else {
     	gpioa = DCP505_REG_VALUE_GPIOA;
     	gpiob = DCP505_REG_VALUE_GPIOB;

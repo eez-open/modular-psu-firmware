@@ -24,6 +24,7 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/drivers/tmp1075.h>
+#include <eez/drivers/tc77.h>
 #endif
 
 namespace eez {
@@ -54,9 +55,9 @@ bool TempSensor::isInstalled() {
         return false;
 #endif
     } else if (type >= CH1 && type <= CH3) {
-    	if (Channel::get(type - CH1).boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {
-    		return false;
-    	}
+    	// if (Channel::get(type - CH1).boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {
+    	// 	return false;
+    	// }
 
         return g_slots[type - CH1].moduleType == MODULE_TYPE_DCP405 || g_slots[type - CH1].moduleType == MODULE_TYPE_DCP505;
     } else {
@@ -76,7 +77,7 @@ void TempSensor::init() {
 
 float TempSensor::doRead() {
     if (!isInstalled()) {
-        return false;
+        return NAN;
     }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -86,7 +87,13 @@ float TempSensor::doRead() {
 #if defined(EEZ_PLATFORM_STM32)
     if (type >= CH1 && type <= CH3) {
         int slotIndex = type - CH1;
-        if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 || g_slots[slotIndex].moduleType == MODULE_TYPE_DCP505) {
+        if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+            if (Channel::get(slotIndex).boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {
+                return drivers::tc77::readTemperature(slotIndex);
+            } else {
+                return drivers::tmp1075::readTemperature(slotIndex);
+            }
+        } else if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP505) {
             return drivers::tmp1075::readTemperature(slotIndex);
         }
     }
@@ -98,7 +105,10 @@ float TempSensor::doRead() {
 bool TempSensor::test() {
     if (isInstalled()) {
         float temperature = doRead();
-        g_testResult = !isNaN(temperature) && temperature > TEMP_SENSOR_MIN_VALID_TEMPERATURE ? TEST_OK : TEST_FAILED;
+        g_testResult = 
+            isNaN(temperature) || 
+            temperature < TEMP_SENSOR_MIN_VALID_TEMPERATURE || 
+            temperature > TEMP_SENSOR_MAX_VALID_TEMPERATURE ? TEST_FAILED : TEST_OK;
     } else {
         g_testResult = TEST_SKIPPED;
     }
@@ -128,7 +138,7 @@ float TempSensor::read() {
 
     float value = doRead();
 
-    if (isNaN(value) || value <= TEMP_SENSOR_MIN_VALID_TEMPERATURE) {
+    if (isNaN(value) || value < TEMP_SENSOR_MIN_VALID_TEMPERATURE || value > TEMP_SENSOR_MAX_VALID_TEMPERATURE) {
         g_testResult = TEST_FAILED;
 
         Channel *channel = getChannel();

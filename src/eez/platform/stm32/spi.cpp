@@ -40,12 +40,20 @@ void select(uint8_t slotIndex, int chip) {
 
 	__HAL_SPI_DISABLE(spiHandle[slotIndex]);
     if (chip == CHIP_IOEXP) {
-        // set SPI mode 0
-        WRITE_REG(spiHandle[slotIndex]->Instance->CR1, READ_REG(spiHandle[slotIndex]->Instance->CR1) & ~SPI_PHASE_2EDGE);
-    } else {
-        // set SPI mode 1
-        WRITE_REG(spiHandle[slotIndex]->Instance->CR1, READ_REG(spiHandle[slotIndex]->Instance->CR1) | SPI_PHASE_2EDGE);
+    	spiHandle[slotIndex]->Init.Direction = SPI_DIRECTION_2LINES;
+        WRITE_REG(spiHandle[slotIndex]->Instance->CR1, 
+			SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+    } else if (chip == CHIP_TEMP_SENSOR) {
+    	spiHandle[slotIndex]->Init.Direction = SPI_DIRECTION_1LINE;
+        WRITE_REG(spiHandle[slotIndex]->Instance->CR1, 
+			SPI_MODE_MASTER | SPI_DIRECTION_1LINE  | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_32 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+	} else {
+		// ADC & DAC
+		spiHandle[slotIndex]->Init.Direction = SPI_DIRECTION_2LINES;
+        WRITE_REG(spiHandle[slotIndex]->Instance->CR1, 
+			SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_2EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
     }
+
 	__HAL_SPI_ENABLE(spiHandle[slotIndex]);
 
     if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
@@ -57,11 +65,15 @@ void select(uint8_t slotIndex, int chip) {
     		// 01
     	    HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_SET);
     	    HAL_GPIO_WritePin(SPI_CSB_GPIO_Port[slotIndex], SPI_CSB_Pin[slotIndex], GPIO_PIN_RESET);
-    	} else {
-    		// IOEXP
+    	} else if (chip == CHIP_IOEXP) {
     		// 10
     	    HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_RESET);
     	    HAL_GPIO_WritePin(SPI_CSB_GPIO_Port[slotIndex], SPI_CSB_Pin[slotIndex], GPIO_PIN_SET);
+    	} else {
+    		// TEMP_SENSOR
+    		// 11
+    		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_SET);
+    		HAL_GPIO_WritePin(SPI_CSB_GPIO_Port[slotIndex], SPI_CSB_Pin[slotIndex], GPIO_PIN_SET);
     	}
     } else {
     	if (chip == CHIP_DAC) {
@@ -83,9 +95,9 @@ void select(uint8_t slotIndex, int chip) {
 
 void deselect(uint8_t slotIndex) {
 	if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
-		// 11
+		// 01 ADC
 		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_SET);
-		HAL_GPIO_WritePin(SPI_CSB_GPIO_Port[slotIndex], SPI_CSB_Pin[slotIndex], GPIO_PIN_SET);
+		HAL_GPIO_WritePin(SPI_CSB_GPIO_Port[slotIndex], SPI_CSB_Pin[slotIndex], GPIO_PIN_RESET);
 	} else {
 		// 10
 		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_RESET);
@@ -97,6 +109,14 @@ void deselect(uint8_t slotIndex) {
 
 void transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size) {
     HAL_SPI_TransmitReceive(spiHandle[slotIndex], input, output, size, 10);
+}
+
+void transmit(uint8_t slotIndex, uint8_t *input, uint16_t size) {
+    HAL_SPI_Transmit(spiHandle[slotIndex], input, size, 10);
+}
+
+void receive(uint8_t slotIndex, uint8_t *output, uint16_t size) {
+    HAL_SPI_Receive(spiHandle[slotIndex], output, size, 10);
 }
 
 } // namespace spi

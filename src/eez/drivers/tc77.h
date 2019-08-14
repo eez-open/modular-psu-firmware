@@ -21,21 +21,11 @@
 #include <stdint.h>
 
 namespace eez {
-namespace psu {
-namespace spi {
+namespace drivers {
+namespace tc77 {
 
-static const int CHIP_DAC = 0;
-static const int CHIP_ADC = 1;
-static const int CHIP_IOEXP = 2;
-static const int CHIP_TEMP_SENSOR = 3;
+float readTemperature(uint8_t slotIndex);
 
-void select(uint8_t slotIndex, int chip);
-void deselect(uint8_t slotIndex);
-
-void transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size);
-void transmit(uint8_t slotIndex, uint8_t *input, uint16_t size);
-void receive(uint8_t slotIndex, uint8_t *output, uint16_t size);
-
-} // namespace spi
-} // namespace psu
+} // namespace tc77
+} // namespace drivers
 } // namespace eez

@@ -140,7 +140,8 @@
 #define CONF_SKIP_PWRGOOD_TEST 0
 
 /// Minimal temperature (in oC) for sensor to be declared as valid.
-#define TEMP_SENSOR_MIN_VALID_TEMPERATURE -5
+#define TEMP_SENSOR_MIN_VALID_TEMPERATURE -55
+#define TEMP_SENSOR_MAX_VALID_TEMPERATURE 125
 
 /// Interval at which fan speed should be adjusted
 #define FAN_SPEED_ADJUSTMENT_INTERVAL 500
