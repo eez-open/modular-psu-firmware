@@ -74,7 +74,7 @@ void mainLoop(const void *) {
 }
 
 void oneIter() {
-    osEvent event = osMessageGet(g_psuMessageQueueId, 1500);
+    osEvent event = osMessageGet(g_psuMessageQueueId, 1);
     if (event.status == osEventMessage) {
     	uint32_t message = event.value.v;
     	uint32_t type = PSU_QUEUE_MESSAGE_TYPE(message);

@@ -39,7 +39,7 @@ float readTemperature(uint8_t slotIndex) {
     uint8_t result[2];
 
     spi::select(slotIndex, spi::CHIP_TEMP_SENSOR);
-    spi::receive(slotIndex, result, 2);
+    spi::receive(slotIndex, result, 1);
     spi::deselect(slotIndex);
 
     uint16_t adc = (((uint16_t)result[0]) << 8) | result[1];
@@ -49,7 +49,7 @@ float readTemperature(uint8_t slotIndex) {
         adc |= 0xE000;
     }
 
-    float temperature = roundPrec((int16_t)adc * 0.0625f, 1) + 2;
+    float temperature = roundPrec((int16_t)adc * 0.0625f, 0.1);
 
     return temperature;
 }
