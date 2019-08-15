@@ -49,13 +49,13 @@
 #define CH_PARAMS_OPP_DELAY 1.0f,          10.0f,             300.0f
 
 //                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT
-#define CH_PARAMS_NONE   CH_PARAMS_U_50V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            200.0f
+#define CH_PARAMS_NONE   CH_PARAMS_U_50V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            155.0f
 
 //                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT
-#define CH_PARAMS_50V_5A CH_PARAMS_U_50V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            200.0f
+#define CH_PARAMS_50V_5A CH_PARAMS_U_50V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            155.0f
 
 //                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT
-#define CH_PARAMS_40V_5A CH_PARAMS_U_40V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            200.0f
+#define CH_PARAMS_40V_5A CH_PARAMS_U_40V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            155.0f
 
 //                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT
 #define CH_PARAMS_20V_4A CH_PARAMS_U_20V, CH_PARAMS_I_4A, true, CH_PARAMS_OPP_DELAY, 0.0f,           70.0f,   80.0f,            58.0f,         5.0f,          25.0f,             80.0f
