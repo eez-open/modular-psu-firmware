@@ -67,6 +67,7 @@ void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint8_t curren
                             bool (*disabledCallback)(uint8_t value), void (*onSet)(uint8_t));
 void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
 	                        uint8_t currentValue, bool(*disabledCallback)(uint8_t value), void(*onSet)(uint8_t)); 
+bool isPageInternal(int pageId);
 void executeAction(int actionId);
 
 int transformStyle(const Widget *widget);

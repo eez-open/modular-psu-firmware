@@ -100,10 +100,6 @@ void AppContext::stateManagment() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool isPageInternal(int pageId) {
-    return pageId < INTERNAL_PAGE_ID_NONE;
-}
-
 bool AppContext::isActivePageInternal() {
     return isPageInternal(m_activePageId);
 }

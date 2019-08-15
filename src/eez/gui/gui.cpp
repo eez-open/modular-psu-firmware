@@ -181,6 +181,10 @@ void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum op
 	g_appContext->pushSelectFromEnumPage(enumDefinitionFunc, currentValue, disabledCallback, onSet);
 }
 
+bool isPageInternal(int pageId) {
+    return pageId < INTERNAL_PAGE_ID_NONE;
+}
+
 int transformStyle(const Widget *widget) {
     return g_appContext->transformStyle(widget);
 }

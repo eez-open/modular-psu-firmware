@@ -99,8 +99,7 @@ void onTouchMove() {
         last_scale = scale;
     }
 
-    float value = start_value + (scale_is_vertical ? 1 : -1) * (start_y - touchY()) * (max - min) /
-                                    (scale * scale_height);
+    float value = start_value + (scale_is_vertical ? 1 : -1) * (start_y - touchY()) * (max - min) / (scale * scale_height);
 
     if (value < min) {
         value = min;

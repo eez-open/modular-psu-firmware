@@ -26,6 +26,7 @@
 #include <eez/modules/mcu/encoder.h>
 #endif
 
+#include <eez/apps/psu/channel.h>
 #include <eez/apps/psu/gui/data.h>
 #include <eez/apps/psu/gui/edit_mode.h>
 #include <eez/apps/psu/gui/edit_mode_step.h>
@@ -42,36 +43,53 @@ namespace edit_mode_step {
 
 using data::Value;
 
-static const Value CONF_GUI_U_STEPS[] = { data::Value(5.0f, UNIT_UNKNOWN),
-                                          data::Value(2.0f, UNIT_UNKNOWN),
-                                          data::Value(1.0f, UNIT_UNKNOWN),
-                                          data::Value(0.5f, UNIT_UNKNOWN),
-                                          data::Value(0.1f, UNIT_UNKNOWN) };
+static const Value CONF_GUI_U_STEPS[] = {
+    data::Value(5.0f, UNIT_VOLT),
+    data::Value(2.0f, UNIT_VOLT),
+    data::Value(1.0f, UNIT_VOLT),
+    data::Value(0.5f, UNIT_VOLT),
+    data::Value(0.1f, UNIT_VOLT)
+};
 
-static const Value CONF_GUI_I_STEPS[] = { data::Value(0.5f, UNIT_UNKNOWN),
-                                          data::Value(0.25f, UNIT_UNKNOWN),
-                                          data::Value(0.1f, UNIT_UNKNOWN),
-                                          data::Value(0.05f, UNIT_UNKNOWN),
-                                          data::Value(0.01f, UNIT_UNKNOWN) };
+static const Value CONF_GUI_I_STEPS[] = {
+    data::Value(0.5f, UNIT_AMPER),
+    data::Value(0.25f, UNIT_AMPER),
+    data::Value(0.1f, UNIT_AMPER),
+    data::Value(0.05f, UNIT_AMPER),
+    data::Value(0.01f, UNIT_AMPER)
+};
 
-static const Value CONF_GUI_P_STEPS[] = { data::Value(10.0f, UNIT_UNKNOWN),
-                                          data::Value(5.0f, UNIT_UNKNOWN),
-                                          data::Value(2.0f, UNIT_UNKNOWN),
-                                          data::Value(1.0f, UNIT_UNKNOWN),
-                                          data::Value(0.5f, UNIT_UNKNOWN) };
+static const Value CONF_GUI_I_LOW_STEPS[] = {
+    data::Value(0.005f, UNIT_AMPER),
+    data::Value(0.0025f, UNIT_AMPER),
+    data::Value(0.001f, UNIT_AMPER),
+    data::Value(0.0005f, UNIT_AMPER),
+    data::Value(0.0001f, UNIT_AMPER)
+};
 
-static const Value CONF_GUI_TEMP_STEPS[] = { data::Value(20.0f, UNIT_UNKNOWN),
-                                             data::Value(10.0f, UNIT_UNKNOWN),
-                                             data::Value(5.0f, UNIT_UNKNOWN),
-                                             data::Value(2.0f, UNIT_UNKNOWN),
-                                             data::Value(1.0f, UNIT_UNKNOWN) };
+static const Value CONF_GUI_P_STEPS[] = {
+    data::Value(10.0f, UNIT_WATT),
+    data::Value(5.0f, UNIT_WATT),
+    data::Value(2.0f, UNIT_WATT),
+    data::Value(1.0f, UNIT_WATT),
+    data::Value(0.5f, UNIT_WATT)
+};
 
-static const Value CONF_GUI_TIME_STEPS[] = { data::Value(30.0f, UNIT_UNKNOWN),
-                                             data::Value(20.0f, UNIT_UNKNOWN),
-                                             data::Value(10.0f, UNIT_UNKNOWN),
-                                             data::Value(5.0f, UNIT_UNKNOWN),
-                                             data::Value(1.0f, UNIT_UNKNOWN) };
+static const Value CONF_GUI_TEMP_STEPS[] = {
+    data::Value(20.0f, UNIT_CELSIUS),
+    data::Value(10.0f, UNIT_CELSIUS),
+    data::Value(5.0f, UNIT_CELSIUS),
+    data::Value(2.0f, UNIT_CELSIUS),
+    data::Value(1.0f, UNIT_CELSIUS)
+};
 
+static const Value CONF_GUI_TIME_STEPS[] = {
+    data::Value(30.0f, UNIT_SECOND),
+    data::Value(20.0f, UNIT_SECOND),
+    data::Value(10.0f, UNIT_SECOND),
+    data::Value(5.0f, UNIT_SECOND),
+    data::Value(1.0f, UNIT_SECOND)
+};
 
 static int g_stepIndex[CH_MAX][2];
 
@@ -89,25 +107,16 @@ float getStepValue() {
 }
 
 int getStepValuesCount() {
-    if (edit_mode::getUnit() == UNIT_VOLT) {
-        return sizeof(CONF_GUI_U_STEPS) / sizeof(Value);
-    } else if (edit_mode::getUnit() == UNIT_AMPER) {
-        return sizeof(CONF_GUI_I_STEPS) / sizeof(Value);
-    } else if (edit_mode::getUnit() == UNIT_WATT) {
-        return sizeof(CONF_GUI_P_STEPS) / sizeof(Value);
-    } else if (edit_mode::getUnit() == UNIT_CELSIUS) {
-        return sizeof(CONF_GUI_TEMP_STEPS) / sizeof(Value);
-    } else if (edit_mode::getUnit() == UNIT_SECOND) {
-        return sizeof(CONF_GUI_TIME_STEPS) / sizeof(Value);
-    } else {
-        return sizeof(CONF_GUI_U_STEPS) / sizeof(Value);
-    }
+    return 5;
 }
 
 const data::Value *getStepValues() {
     if (edit_mode::getUnit() == UNIT_VOLT) {
         return CONF_GUI_U_STEPS;
     } else if (edit_mode::getUnit() == UNIT_AMPER) {
+        if (Channel::get(g_focusCursor.i).flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
+            return CONF_GUI_I_LOW_STEPS;
+        }
         return CONF_GUI_I_STEPS;
     } else if (edit_mode::getUnit() == UNIT_WATT) {
         return CONF_GUI_P_STEPS;
