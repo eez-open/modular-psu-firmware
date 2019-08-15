@@ -36,10 +36,11 @@ namespace drivers {
 namespace tc77 {
 
 float readTemperature(uint8_t slotIndex) {
+    uint8_t output[2] = { 0, 0 };
     uint8_t result[2];
 
     spi::select(slotIndex, spi::CHIP_TEMP_SENSOR);
-    spi::receive(slotIndex, result, 1);
+    spi::transfer(slotIndex, output, result, 2);
     spi::deselect(slotIndex);
 
     uint16_t adc = (((uint16_t)result[0]) << 8) | result[1];
