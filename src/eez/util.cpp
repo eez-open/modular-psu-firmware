@@ -136,7 +136,8 @@ uint8_t fromBCD(uint8_t bcd) {
 }
 
 float roundPrec(float a, float prec) {
-    return roundf(a / prec) * prec;
+    float r = 1 / prec;
+    return roundf(a * r) / r;
 }
 
 bool between(float x, float a, float b) {
