@@ -48,7 +48,7 @@ static bool g_digitalOutputPinState[2] = { false, false };
 
 int ioPinRead(int pin) {
     if (pin == EXT_TRIG1) {
-    	return HAL_GPIO_ReadPin(DIN1_GPIO_Port, DIN1_Pin) ? 1 : 0;
+    	return HAL_GPIO_ReadPin(UART_RX_DIN1_GPIO_Port, UART_RX_DIN1_Pin) ? 1 : 0;
     } {
     	assert(pin == EXT_TRIG2);
     	return HAL_GPIO_ReadPin(DIN2_GPIO_Port, DIN2_Pin) ? 1 : 0;
@@ -57,7 +57,7 @@ int ioPinRead(int pin) {
 
 void ioPinWrite(int pin, int state) {
     if (pin == DOUT1) {
-    	HAL_GPIO_WritePin(DOUT1_GPIO_Port, DOUT1_Pin, state ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    	HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin, state ? GPIO_PIN_SET : GPIO_PIN_RESET);
     } else {
         assert(pin == DOUT2);
         HAL_GPIO_WritePin(DOUT2_GPIO_Port, DOUT2_Pin, state ? GPIO_PIN_SET : GPIO_PIN_RESET);
