@@ -88,11 +88,12 @@
 /* Section where include file can be added */
 /* USER CODE END Includes */ 
 
-/* Ensure definitions are only used by the compiler, and not by the assembler. */
+/* Ensure stdint is only used by the compiler, and not the assembler. */
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
-  #include <stdint.h>
-  extern uint32_t SystemCoreClock;
+    #include <stdint.h>
+    extern uint32_t SystemCoreClock;
 #endif
+
 #define configUSE_PREEMPTION                     1
 #define configSUPPORT_STATIC_ALLOCATION          0
 #define configSUPPORT_DYNAMIC_ALLOCATION         1
