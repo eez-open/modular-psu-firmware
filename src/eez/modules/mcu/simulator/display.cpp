@@ -246,123 +246,14 @@ void animate() {
         bufferNew = g_frontPanelBuffer2;
     }
 
-    if (!g_animationState.direction) {
-        auto bufferTemp = bufferOld;
-        bufferOld = bufferNew;
-        bufferNew = bufferTemp;
-    }
-
-    auto remapX = g_animationState.direction ? remapExp : remapOutExp;
-    auto remapY = g_animationState.direction ? remapExp : remapOutExp;
-
-    int srcX1;
-    int srcY1;
-    int srcX2;
-    int srcY2;
-
-    int dstX1;
-    int dstY1;
-    int dstX2;
-    int dstY2;
-
-    if (g_animationState.direction) {
-        srcX1 = g_animationState.srcRect.x;
-        srcY1 = g_animationState.srcRect.y;
-        srcX2 = g_animationState.srcRect.x + g_animationState.srcRect.w;
-        srcY2 = g_animationState.srcRect.y + g_animationState.srcRect.h;
-
-        int dx = MAX(g_animationState.srcRect.x - g_animationState.dstRect.x,
-                     g_animationState.dstRect.x + g_animationState.dstRect.w -
-                         (g_animationState.srcRect.x + g_animationState.srcRect.w));
-
-        int dy = MAX(g_animationState.srcRect.y - g_animationState.dstRect.y,
-                     g_animationState.dstRect.y + g_animationState.dstRect.h -
-                         (g_animationState.srcRect.y + g_animationState.srcRect.h));
-
-        dstX1 = g_animationState.srcRect.x - dx;
-        dstY1 = g_animationState.srcRect.y - dy;
-        dstX2 = g_animationState.srcRect.x + g_animationState.srcRect.w + dx;
-        dstY2 = g_animationState.srcRect.y + g_animationState.srcRect.h + dy;
-    } else {
-        int dx = MAX(g_animationState.dstRect.x - g_animationState.srcRect.x,
-                     g_animationState.srcRect.x + g_animationState.srcRect.w -
-                         (g_animationState.dstRect.x + g_animationState.dstRect.w));
-
-        int dy = MAX(g_animationState.dstRect.y - g_animationState.srcRect.y,
-                     g_animationState.srcRect.y + g_animationState.srcRect.h -
-                         g_animationState.dstRect.y + g_animationState.dstRect.h);
-
-        srcX1 = g_animationState.dstRect.x - dx;
-        srcY1 = g_animationState.dstRect.y - dx;
-        srcX2 = g_animationState.dstRect.x + g_animationState.dstRect.w + dx;
-        srcY2 = g_animationState.dstRect.y + g_animationState.dstRect.h + dy;
-
-        dstX1 = g_animationState.dstRect.x;
-        dstY1 = g_animationState.dstRect.y;
-        dstX2 = g_animationState.dstRect.x + g_animationState.dstRect.w;
-        dstY2 = g_animationState.dstRect.y + g_animationState.dstRect.h;
-    }
-
     while (true) {
-        double t = 1.0f * (millis() - g_animationState.startTime) / g_animationState.duration;
+        float t = 1.0f * (millis() - g_animationState.startTime) / g_animationState.duration;
         if (t >= 1.0f) {
             g_animationState.enabled = false;
             break;
         }
 
-        memcpy(g_frontPanelBuffer3, bufferOld,
-               g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
-
-        int x1 = (int)round(remapX((float)t, 0, (float)srcX1, 1, (float)dstX1));
-        if (g_animationState.direction) {
-            if (x1 < g_animationState.dstRect.x) {
-                x1 = g_animationState.dstRect.x;
-            }
-        } else {
-            if (x1 < g_animationState.srcRect.x) {
-                x1 = g_animationState.srcRect.x;
-            }
-        }
-
-        int y1 = (int)round(remapY((float)t, 0, (float)srcY1, 1, (float)dstY1));
-        if (g_animationState.direction) {
-            if (y1 < g_animationState.dstRect.y) {
-                y1 = g_animationState.dstRect.y;
-            }
-        } else {
-            if (y1 < g_animationState.srcRect.y) {
-                y1 = g_animationState.srcRect.y;
-            }
-        }
-
-        int x2 = (int)round(remapX((float)t, 0, (float)srcX2, 1, (float)dstX2));
-        if (g_animationState.direction) {
-            if (x2 > g_animationState.dstRect.x + g_animationState.dstRect.w) {
-                x2 = g_animationState.dstRect.x + g_animationState.dstRect.w;
-            }
-        } else {
-            if (x2 > g_animationState.srcRect.x + g_animationState.srcRect.w) {
-                x2 = g_animationState.srcRect.x + g_animationState.srcRect.w;
-            }
-        }
-
-        int y2 = (int)round(remapY((float)t, 0, (float)srcY2, 1, (float)dstY2));
-        if (g_animationState.direction) {
-            if (y2 > g_animationState.dstRect.y + g_animationState.dstRect.h) {
-                y2 = g_animationState.dstRect.y + g_animationState.dstRect.h;
-            }
-        } else {
-            if (y2 > g_animationState.srcRect.y + g_animationState.srcRect.h) {
-                y2 = g_animationState.srcRect.y + g_animationState.srcRect.h;
-            }
-        }
-
-        for (int y = y1; y < y2; ++y) {
-            for (int x = x1; x < x2; ++x) {
-                int i = y * g_frontPanelWidth + x;
-                g_frontPanelBuffer3[i] = blendColor(bufferNew[i], bufferOld[i]);
-            }
-        }
+        g_animationState.callback(t, bufferOld, bufferNew, g_frontPanelBuffer3);
 
         updateScreen(g_frontPanelBuffer3);
 
@@ -615,6 +506,17 @@ void fillRect(int x1, int y1, int x2, int y2, int r) {
     g_painted = true;
 }
 
+void fillRect(void *dst, int x1, int y1, int x2, int y2) {
+    auto saved = g_frontPanelBuffer;
+    g_frontPanelBuffer = (uint32_t *)dst;
+    setXY(x1, y1, x2, y2);
+    int n = (x2 - x1 + 1) * (y2 - y1 + 1);
+    for (int i = 0; i < n; ++i) {
+        setPixel(g_fc);
+    }
+    g_frontPanelBuffer = saved;
+}
+
 void drawHLine(int x, int y, int l) {
     setXY(x, y, x + l, y);
     for (int i = 0; i < l + 1; ++i) {
@@ -646,6 +548,28 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
     }
 
     g_painted = true;
+}
+
+void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
+    for (int y = y1; y < y2; ++y) {
+        for (int x = x1; x < x2; ++x) {
+            int i = y * g_frontPanelWidth + x;
+            ((uint32_t *)dst)[i] = ((uint32_t *)src)[i];
+        }
+    }
+}
+
+void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity) {
+    for (int y = 0; y < sh; ++y) {
+        for (int x = 0; x < sw; ++x) {
+            uint8_t *p = (uint8_t *)&((uint32_t *)src)[(sy + y) * g_frontPanelWidth + sx + x];
+            p[3] = opacity;
+            ((uint32_t *)dst)[(dy + y) * g_frontPanelWidth + dx + x] = blendColor(
+                ((uint32_t *)src)[(sy + y) * g_frontPanelWidth + sx + x], 
+                ((uint32_t *)dst)[(dy + y) * g_frontPanelWidth + dx + x]
+            );
+        }
+    }
 }
 
 void drawBitmap(void *bitmapData, int bitmapBpp, int bitmapWidth, int x, int y, int width, int height) {

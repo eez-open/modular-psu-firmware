@@ -18,6 +18,19 @@
 
 #pragma once
 
+#define NUM_CHANNELS_VIEW_MODES 4
+
+#define CHANNELS_VIEW_MODE_NUMERIC   0
+#define CHANNELS_VIEW_MODE_HORZ_BAR  1
+#define CHANNELS_VIEW_MODE_VERT_BAR  2
+#define CHANNELS_VIEW_MODE_YT        3
+
+#define NUM_CHANNELS_VIEW_MODES_IN_MAX 3
+
+#define CHANNELS_VIEW_MODE_IN_MAX_NUMERIC   0
+#define CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR  1
+#define CHANNELS_VIEW_MODE_IN_MAX_YT        2
+
 namespace eez {
 namespace psu {
 

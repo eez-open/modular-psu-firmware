@@ -88,18 +88,19 @@ bool isFrontPanelLocked();
 
 struct AnimationState {
     bool enabled;
-    bool skipOneFrame;
     uint32_t startTime;
     uint32_t duration;
-    bool direction;
-    Rect srcRect;
-    Rect dstRect;
+    void (*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst);
 };
 
 extern AnimationState g_animationState;
 
 void animateOpen(const Rect &srcRect, const Rect &dstRect);
 void animateClose(const Rect &srcRect, const Rect &dstRect);
+
+void animateFromDefaultViewToMaxView();
+void animateFromMaxViewToDefaultView();
+void animateFromMinViewToMaxView(int iWasMax);
 
 ////////////////////////////////////////////////////////////////////////////////
 

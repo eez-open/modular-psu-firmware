@@ -499,7 +499,19 @@ void action_toggle_channels_view_mode() {
 
 void action_toggle_channels_max_view() {
     selectChannel();
+
+    auto channelsIsMaxView = persist_conf::devConf.flags.channelsIsMaxView;
+    auto channelMax = persist_conf::devConf.flags.channelMax;
+
     persist_conf::toggleChannelsMaxView(g_channel->index);
+    
+    if (!channelsIsMaxView && persist_conf::devConf.flags.channelsIsMaxView) {
+        animateFromDefaultViewToMaxView();
+    } else if (channelsIsMaxView && !persist_conf::devConf.flags.channelsIsMaxView) {
+        animateFromMaxViewToDefaultView();
+    } else {
+        animateFromMinViewToMaxView(channelMax);
+    }
 }
 
 void action_ethernet_toggle() {

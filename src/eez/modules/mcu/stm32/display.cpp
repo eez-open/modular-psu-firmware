@@ -134,57 +134,11 @@ void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color
 	}
 }
 
-void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x, int y, int width, int height) {
-//    if (srcBpp == 32) {
-//        hdma2d.Init.Mode = DMA2D_R2M;
-//        hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
-//        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
-//        DMA2D_WAIT;
-//        HAL_DMA2D_Init(&hdma2d);
-//        HAL_DMA2D_Start(&hdma2d, 0xFF5c5c5c, VRAM_BUFFER3_START_ADDRESS, width, height);
-//    }
-//
-//    hdma2d.Init.Mode = srcBpp == 32 ? DMA2D_M2M_BLEND : DMA2D_M2M_PFC;
-//    hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
-//    hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
-//
-//    if (srcBpp == 32) {
-//        hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - width;
-//        hdma2d.LayerCfg[0].InputColorMode = DMA2D_OUTPUT_ARGB8888;
-//        hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
-//        hdma2d.LayerCfg[0].InputAlpha = 0;
-//
-//        hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
-//        hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_ARGB8888;
-//        hdma2d.LayerCfg[1].AlphaMode = DMA2D_COMBINE_ALPHA;
-//        hdma2d.LayerCfg[1].InputAlpha = g_opacity;
-//    } else {
-//        hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
-//        hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_RGB565;
-//        hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
-//        hdma2d.LayerCfg[1].InputAlpha = 0;
-//    }
-//
-//    DMA2D_WAIT;
-//    HAL_DMA2D_Init(&hdma2d);
-//    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
-//    if (srcBpp == 32) {
-//        HAL_DMA2D_ConfigLayer(&hdma2d, 0);
-//        HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t)src, VRAM_BUFFER3_START_ADDRESS,
-//                                vramOffset(dst, x, y), width, height);
-//    } else {
-//        HAL_DMA2D_Start(&hdma2d, (uint32_t)src, vramOffset(dst, x, y), width, height);
-//    }
-//
-//    if (srcBpp == 32) {
-//        hdma2d.Init.Mode = DMA2D_R2M;
-//        hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
-//        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
-//        DMA2D_WAIT;
-//        HAL_DMA2D_Init(&hdma2d);
-//        HAL_DMA2D_Start(&hdma2d, 0xFF5c5c5c, VRAM_BUFFER3_START_ADDRESS, width, height);
-//    }
+void fillRect(void *dst, int x1, int y1, int x2, int y2) {
+	fillRect((uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
+}
 
+void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x, int y, int width, int height) {
     hdma2d.Init.Mode = srcBpp == 32 ? DMA2D_M2M_BLEND : DMA2D_M2M_PFC;
     hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
     hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
@@ -238,6 +192,10 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
     HAL_DMA2D_Start(&hdma2d, (uint32_t)vramOffset(src, x, y), vramOffset(dst, x, y), width, height);
 }
 
+void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
+    bitBlt((uint16_t *)src, (uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1);
+}
+
 void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, int dstx, int dsty) {
     hdma2d.Init.Mode = DMA2D_M2M;
     hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
@@ -253,6 +211,33 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, i
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
     HAL_DMA2D_Start(&hdma2d, (uint32_t)vramOffset(src, x, y), vramOffset(dst, dstx, dsty), width, height);
+}
+
+void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity) {
+	hdma2d.Init.Mode = DMA2D_M2M_BLEND;
+	hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+	hdma2d.Init.OutputOffset = DISPLAY_WIDTH - sw;
+
+	hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - sw;
+	hdma2d.LayerCfg[0].InputColorMode = DMA2D_OUTPUT_RGB565;
+	hdma2d.LayerCfg[0].AlphaMode = DMA2D_COMBINE_ALPHA;
+	hdma2d.LayerCfg[0].AlphaInverted = DMA2D_REGULAR_ALPHA;
+	hdma2d.LayerCfg[0].InputAlpha = 0xFF;
+
+	hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - sw;
+	hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_RGB565;
+	hdma2d.LayerCfg[1].AlphaMode = DMA2D_COMBINE_ALPHA;
+	hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
+	hdma2d.LayerCfg[1].InputAlpha = opacity;
+
+	auto dstOffset = vramOffset((uint16_t *)dst, dx, dy);
+
+	DMA2D_WAIT;
+
+	HAL_DMA2D_Init(&hdma2d);
+	HAL_DMA2D_ConfigLayer(&hdma2d, 1);
+	HAL_DMA2D_ConfigLayer(&hdma2d, 0);
+	HAL_DMA2D_BlendingStart(&hdma2d, vramOffset((uint16_t *)src, sx, sy), dstOffset, dstOffset, sw, sh);
 }
 
 void bitBltA8Init(uint16_t color) {
@@ -358,131 +343,29 @@ void animate() {
         bufferNew = (uint16_t *)VRAM_BUFFER2_START_ADDRESS;
     }
 
-    if (!g_animationState.direction) {
-        auto bufferTemp = bufferOld;
-        bufferOld = bufferNew;
-        bufferNew = bufferTemp;
-    }
-
-    auto remapX = g_animationState.direction ? remapCubic : remapOutExp;
-    auto remapY = g_animationState.direction ? remapCubic : remapOutExp;
-
-    int srcX1;
-    int srcY1;
-    int srcX2;
-    int srcY2;
-
-    int dstX1;
-    int dstY1;
-    int dstX2;
-    int dstY2;
-
-    if (g_animationState.direction) {
-        srcX1 = g_animationState.srcRect.x;
-        srcY1 = g_animationState.srcRect.y;
-        srcX2 = g_animationState.srcRect.x + g_animationState.srcRect.w;
-        srcY2 = g_animationState.srcRect.y + g_animationState.srcRect.h;
-
-        int dx = MAX(g_animationState.srcRect.x - g_animationState.dstRect.x,
-                     g_animationState.dstRect.x + g_animationState.dstRect.w -
-                         (g_animationState.srcRect.x + g_animationState.srcRect.w));
-
-        int dy = MAX(g_animationState.srcRect.y - g_animationState.dstRect.y,
-                     g_animationState.dstRect.y + g_animationState.dstRect.h -
-                         (g_animationState.srcRect.y + g_animationState.srcRect.h));
-
-        dstX1 = g_animationState.srcRect.x - dx;
-        dstY1 = g_animationState.srcRect.y - dy;
-        dstX2 = g_animationState.srcRect.x + g_animationState.srcRect.w + dx;
-        dstY2 = g_animationState.srcRect.y + g_animationState.srcRect.h + dy;
-    } else {
-        int dx = MAX(g_animationState.dstRect.x - g_animationState.srcRect.x,
-                     g_animationState.srcRect.x + g_animationState.srcRect.w -
-                         (g_animationState.dstRect.x + g_animationState.dstRect.w));
-
-        int dy = MAX(g_animationState.dstRect.y - g_animationState.srcRect.y,
-                     g_animationState.srcRect.y + g_animationState.srcRect.h -
-                         g_animationState.dstRect.y + g_animationState.dstRect.h);
-
-        srcX1 = g_animationState.dstRect.x - dx;
-        srcY1 = g_animationState.dstRect.y - dx;
-        srcX2 = g_animationState.dstRect.x + g_animationState.dstRect.w + dx;
-        srcY2 = g_animationState.dstRect.y + g_animationState.dstRect.h + dy;
-
-        dstX1 = g_animationState.dstRect.x;
-        dstY1 = g_animationState.dstRect.y;
-        dstX2 = g_animationState.dstRect.x + g_animationState.dstRect.w;
-        dstY2 = g_animationState.dstRect.y + g_animationState.dstRect.h;
-    }
-
-    uint16_t *bufferAnim = nullptr;
+    uint16_t *bufferDst = nullptr;
 
     while (true) {
-        double t = 1.0f * (millis() - g_animationState.startTime) / g_animationState.duration;
+        float t = 1.0f * (millis() - g_animationState.startTime) / g_animationState.duration;
         if (t >= 1.0f) {
             g_animationState.enabled = false;
             break;
         }
 
-        // auto alpha = g_animationState.direction ? t : 1 - t;
-
-        int x1 = round(remapX(t, 0, srcX1, 1, dstX1));
-        if (g_animationState.direction) {
-            if (x1 < g_animationState.dstRect.x) {
-                x1 = g_animationState.dstRect.x;
-            }
-        } else {
-            if (x1 < g_animationState.srcRect.x) {
-                x1 = g_animationState.srcRect.x;
-            }
-        }
-
-        int y1 = round(remapY(t, 0, srcY1, 1, dstY1));
-        if (g_animationState.direction) {
-            if (y1 < g_animationState.dstRect.y) {
-                y1 = g_animationState.dstRect.y;
-            }
-        } else {
-            if (y1 < g_animationState.srcRect.y) {
-                y1 = g_animationState.srcRect.y;
-            }
-        }
-
-        int x2 = round(remapX(t, 0, srcX2, 1, dstX2));
-        if (g_animationState.direction) {
-            if (x2 > g_animationState.dstRect.x + g_animationState.dstRect.w) {
-                x2 = g_animationState.dstRect.x + g_animationState.dstRect.w;
-            }
-        } else {
-            if (x2 > g_animationState.srcRect.x + g_animationState.srcRect.w) {
-                x2 = g_animationState.srcRect.x + g_animationState.srcRect.w;
-            }
-        }
-
-        int y2 = round(remapY(t, 0, srcY2, 1, dstY2));
-        if (g_animationState.direction) {
-            if (y2 > g_animationState.dstRect.y + g_animationState.dstRect.h) {
-                y2 = g_animationState.dstRect.y + g_animationState.dstRect.h;
-            }
-        } else {
-            if (y2 > g_animationState.srcRect.y + g_animationState.srcRect.h) {
-                y2 = g_animationState.srcRect.y + g_animationState.srcRect.h;
-            }
-        }
-
-        bufferAnim = bufferAnim == (uint16_t *)VRAM_BUFFER3_START_ADDRESS
+        bufferDst = bufferDst == (uint16_t *)VRAM_BUFFER3_START_ADDRESS
                          ? (uint16_t *)VRAM_BUFFER4_START_ADDRESS
                          : (uint16_t *)VRAM_BUFFER3_START_ADDRESS;
 
-        bitBlt(bufferOld, bufferAnim, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-        bitBlt(bufferNew, bufferAnim, x1, y1, x2 - x1 + 1, y2 - y1 + 1);
+        g_animationState.callback(t, bufferOld, bufferNew, bufferDst);
 
         DMA2D_WAIT;
 
         // wait for VSYNC
         while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS));
 
-        HAL_LTDC_SetAddress(&hltdc, (uint32_t)bufferAnim, 0);
+        HAL_LTDC_SetAddress(&hltdc, (uint32_t)bufferDst, 0);
+
+        //osDelay(1);
     }
 }
 

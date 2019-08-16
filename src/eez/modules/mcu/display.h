@@ -82,9 +82,12 @@ void screanshotEnd();
 void drawPixel(int x, int y);
 void drawRect(int x1, int y1, int x2, int y2);
 void fillRect(int x1, int y1, int x2, int y2, int radius = 0);
+void fillRect(void *dst, int x1, int y1, int x2, int y2);
 void drawHLine(int x, int y, int l);
 void drawVLine(int x, int y, int l);
 void bitBlt(int x1, int y1, int x2, int y2, int x, int y);
+void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2);
+void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity);
 void drawBitmap(void *data, int bpp, int bitmapWidth, int x, int y, int width, int height);
 void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,
              int clip_y2, gui::font::Font &font);
