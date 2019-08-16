@@ -30,11 +30,6 @@
 
 #include <eez/index.h>
 
-#undef ADC_SPS
-/// How many times per second will ADC take snapshot value?
-/// 0: 20 SPS, 1: 45 SPS, 2: 90 SPS, 3: 175 SPS, 4: 330 SPS, 5: 600 SPS, 6: 1000 SPS
-#define ADC_SPS 5
-
 namespace eez {
 namespace psu {
 
@@ -131,20 +126,9 @@ bool AnalogDigitalConverter::test() {
 
 void AnalogDigitalConverter::tick(uint32_t tick_usec) {
     if (start_reg0) {
-    	// int ready = !HAL_GPIO_ReadPin(SPI2_IRQ_GPIO_Port, SPI2_IRQ_Pin)
-    	int ready;
-    	if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
-            // DCP405_IO_BIT_IN_ADC_DRDY
-        	uint8_t gpioa = channel.ioexp.readGpio();
-    		ready = !(gpioa & 0b00010000);
-    	} else {
-        	uint8_t gpiob = channel.ioexp.readGpioB();
-    		ready = !(gpiob & 0b10000000);
-    	}
-    	if (ready) {
+    	if (channel.ioexp.isAdcReady()) {
 			int16_t adc_data = read();
 			channel.eventAdcData(adc_data);
-
 	#ifdef DEBUG
 			debug::g_adcCounter.inc();
 	#endif

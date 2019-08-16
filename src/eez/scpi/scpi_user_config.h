@@ -58,8 +58,10 @@ extern "C" {
     X(SCPI_ERROR_HARDWARE_MISSING,                          -241, "Hardware missing")                             \
     X(SCPI_ERROR_CH1_FAULT_DETECTED,                        -242, "CH1 fault detected")                           \
 	X(SCPI_ERROR_CH2_FAULT_DETECTED,                        -243, "CH2 fault detected")                           \
+    X(SCPI_ERROR_CH3_FAULT_DETECTED,                        -244, "CH3 fault detected")                           \
     X(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED,                 -245, "CH1 output fault detected")                    \
 	X(SCPI_ERROR_CH2_OUTPUT_FAULT_DETECTED,                 -246, "CH2 output fault detected")                    \
+    X(SCPI_ERROR_CH3_OUTPUT_FAULT_DETECTED,                 -247, "CH3 output fault detected")                    \
     X(SCPI_ERROR_MASS_STORAGE_ERROR,                        -250, "Mass storage error")                           \
     X(SCPI_ERROR_FILE_NAME_NOT_FOUND,                       -256, "File name not found")                          \
     X(SCPI_ERROR_FILE_NAME_ERROR,                           -257, "File name error")                              \
@@ -81,15 +83,19 @@ extern "C" {
     X(SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION,  201, "Cannot execute before clearing protection")    \
     X(SCPI_ERROR_CH1_IOEXP_TEST_FAILED,                      210, "CH1 IOEXP test failed")                        \
     X(SCPI_ERROR_CH2_IOEXP_TEST_FAILED,                      211, "CH2 IOEXP test failed")                        \
+    X(SCPI_ERROR_CH3_IOEXP_TEST_FAILED,                      212, "CH3 IOEXP test failed")                        \
     X(SCPI_ERROR_CH1_ADC_TEST_FAILED,                        220, "CH1 ADC test failed")                          \
     X(SCPI_ERROR_CH2_ADC_TEST_FAILED,                        221, "CH2 ADC test failed")                          \
+    X(SCPI_ERROR_CH3_ADC_TEST_FAILED,                        222, "CH3 ADC test failed")                          \
     X(SCPI_ERROR_CH1_DAC_TEST_FAILED,                        230, "CH1 DAC test failed")                          \
     X(SCPI_ERROR_CH2_DAC_TEST_FAILED,                        231, "CH2 DAC test failed")                          \
+    X(SCPI_ERROR_CH3_DAC_TEST_FAILED,                        232, "CH3 DAC test failed")                          \
     X(SCPI_ERROR_EXT_EEPROM_TEST_FAILED,                     240, "External EEPROM test failed")                  \
     X(SCPI_ERROR_RTC_TEST_FAILED,                            250, "RTC test failed")                              \
 	X(SCPI_ERROR_ETHERNET_TEST_FAILED,                       260, "Ethernet test failed")                         \
     X(SCPI_ERROR_CH1_ADC_TIMEOUT_DETECTED,                   270, "CH1 ADC timeout detected")                     \
     X(SCPI_ERROR_CH2_ADC_TIMEOUT_DETECTED,                   271, "CH2 ADC timeout detected")                     \
+    X(SCPI_ERROR_CH3_ADC_TIMEOUT_DETECTED,                   272, "CH3 ADC timeout detected")                     \
     X(SCPI_ERROR_INCOMPATIBLE_TRANSIENT_MODES,               304, "Incompatible transient modes")                 \
     X(SCPI_ERROR_TOO_MANY_LIST_POINTS,                       306, "Too many list points")                         \
     X(SCPI_ERROR_LIST_LENGTHS_NOT_EQUIVALENT,                307, "List lengths are not equivalent")              \
@@ -102,6 +108,7 @@ extern "C" {
 	X(SCPI_ERROR_CANNOT_LOAD_EMPTY_PROFILE,                  400, "Cannot load empty profile")                    \
     X(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF,           500, "Down-programmer on CH1 switched off")          \
     X(SCPI_ERROR_CH2_DOWN_PROGRAMMER_SWITCHED_OFF,           501, "Down-programmer on CH2 switched off")          \
+    X(SCPI_ERROR_CH3_DOWN_PROGRAMMER_SWITCHED_OFF,           502, "Down-programmer on CH3 switched off")          \
     X(SCPI_ERROR_EXTERNAL_EEPROM_SAVE_FAILED,                615, "External EEPROM save failed")                  \
 	X(SCPI_ERROR_FAN_TEST_FAILED,                            630, "Fan test failed")                              \
 	X(SCPI_ERROR_AUX_TEMP_SENSOR_TEST_FAILED,                720, "AUX temperature sensor test failed")           \

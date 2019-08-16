@@ -47,6 +47,8 @@ class IOExpander {
     static const uint8_t DCP505_IO_BIT_IN_CURRENT_RANGE_500MA = 13;
     static const uint8_t DCP505_IO_BIT_IN_CURRENT_RANGE_50MA = 14;
 
+    static const uint8_t DCP505_IO_BIT_IN_ADC_DRDY = 15;
+
     // DPC405
     static const uint8_t DCP405_IO_BIT_IN_ADC_DRDY = 4;
 
@@ -70,19 +72,24 @@ class IOExpander {
 
     void tick(uint32_t tick_usec);
 
-    uint8_t readGpio();
-    uint8_t readGpioB();
-
     int getBitDirection(int io_bit); // 0: output, 1: input
     bool testBit(int io_bit);
+    bool isAdcReady();
     void changeBit(int io_bit, bool set);
 
     void readAllRegisters(uint8_t registers[]);
 
+    uint16_t gpio;
+
   private:
     Channel &channel;
-    uint8_t gpioa;
-    uint8_t gpiob;
+
+    uint16_t gpioWritten;
+    uint16_t gpioOutputPinsMask;
+
+    void reinit();
+
+    void readGpio();
 
     uint8_t read(uint8_t reg);
     void write(uint8_t reg, uint8_t val);

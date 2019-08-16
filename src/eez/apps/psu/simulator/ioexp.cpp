@@ -28,8 +28,7 @@ namespace psu {
 IOExpander::IOExpander(Channel &channel_) : channel(channel_) {
     g_testResult = TEST_SKIPPED;
 
-    gpioa = 0B00000000;
-    gpiob = 0B00000001; // 5A
+    gpio = 0B0000000100000000; // 5A
 }
 
 void IOExpander::init() {
@@ -42,61 +41,39 @@ bool IOExpander::test() {
 }
 
 void IOExpander::tick(uint32_t tick_usec) {
-    if (isPowerUp()) {
-        uint8_t gpio0 = readGpio();
-        channel.eventGpio(gpio0);
-    }
-}
-
-uint8_t IOExpander::readGpio() {
-    uint8_t result = gpioa;
-
     if (simulator::getPwrgood(channel.index - 1)) {
-        result |= 1 << IOExpander::IO_BIT_IN_PWRGOOD;
+        gpio |= 1 << IOExpander::IO_BIT_IN_PWRGOOD;
     } else {
-        result &= ~(1 << IOExpander::IO_BIT_IN_PWRGOOD);
+        gpio &= ~(1 << IOExpander::IO_BIT_IN_PWRGOOD);
     }
 
     if (channel.getFeatures() & CH_FEATURE_RPOL) {
         if (!simulator::getRPol(channel.index - 1)) {
-            result |= 1 << IOExpander::IO_BIT_IN_RPOL;
+            gpio |= 1 << IOExpander::IO_BIT_IN_RPOL;
         } else {
-            result &= ~(1 << IOExpander::IO_BIT_IN_RPOL);
+            gpio &= ~(1 << IOExpander::IO_BIT_IN_RPOL);
         }
     }
 
     if (simulator::getCV(channel.index - 1)) {
-        result |= 1 << IOExpander::IO_BIT_IN_CV_ACTIVE;
+        gpio |= 1 << IOExpander::IO_BIT_IN_CV_ACTIVE;
     } else {
-        result &= ~(1 << IOExpander::IO_BIT_IN_CV_ACTIVE);
+        gpio &= ~(1 << IOExpander::IO_BIT_IN_CV_ACTIVE);
     }
 
     if (simulator::getCC(channel.index - 1)) {
-        result |= 1 << IOExpander::IO_BIT_IN_CC_ACTIVE;
+        gpio |= 1 << IOExpander::IO_BIT_IN_CC_ACTIVE;
     } else {
-        result &= ~(1 << IOExpander::IO_BIT_IN_CC_ACTIVE);
+        gpio &= ~(1 << IOExpander::IO_BIT_IN_CC_ACTIVE);
     }
-
-    return result;
 }
 
 bool IOExpander::testBit(int io_bit) {
-    uint8_t value = readGpio();
-    return value & (1 << io_bit) ? true : false;
+    return gpio & (1 << io_bit) ? true : false;
 }
 
 void IOExpander::changeBit(int io_bit, bool set) {
-    if (io_bit < 8) {
-        uint8_t newValue = set ? (gpioa | (1 << io_bit)) : (gpioa & ~(1 << io_bit));
-        if (gpioa != newValue) {
-            gpioa = newValue;
-        }
-    } else {
-        uint8_t newValue = set ? (gpiob | (1 << (io_bit - 8))) : (gpiob & ~(1 << (io_bit - 8)));
-        if (gpiob != newValue) {
-            gpiob = newValue;
-        }
-    }
+    gpio = set ? (gpio | (1 << io_bit)) : (gpio & ~(1 << io_bit));
 }
 
 void IOExpander::readAllRegisters(uint8_t registers[]) {

@@ -36,8 +36,10 @@ static const int EVENT_TYPE_ERROR = 3;
     EVENT_SCPI_ERROR(SCPI_ERROR_CH3_TEMP_SENSOR_TEST_FAILED, "CH3 temp failed")                    \
     EVENT_SCPI_ERROR(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF, "DProg CH1 disabled")            \
     EVENT_SCPI_ERROR(SCPI_ERROR_CH2_DOWN_PROGRAMMER_SWITCHED_OFF, "DProg CH2 disabled")            \
+    EVENT_SCPI_ERROR(SCPI_ERROR_CH3_DOWN_PROGRAMMER_SWITCHED_OFF, "DProg CH3 disabled")            \
     EVENT_SCPI_ERROR(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED, "CH1 output fault")                     \
     EVENT_SCPI_ERROR(SCPI_ERROR_CH2_OUTPUT_FAULT_DETECTED, "CH2 output fault")                     \
+    EVENT_SCPI_ERROR(SCPI_ERROR_CH3_OUTPUT_FAULT_DETECTED, "CH3 output fault")                     \
     EVENT_ERROR(CH1_OVP_TRIPPED, 0, "Ch1 OVP tripped")                                             \
     EVENT_ERROR(CH1_OCP_TRIPPED, 1, "Ch1 OCP tripped")                                             \
     EVENT_ERROR(CH1_OPP_TRIPPED, 2, "Ch1 OPP tripped")                                             \
@@ -46,6 +48,15 @@ static const int EVENT_TYPE_ERROR = 3;
     EVENT_ERROR(CH2_OPP_TRIPPED, 5, "Ch2 OPP tripped")                                             \
     EVENT_ERROR(FILE_UPLOAD_FAILED, 6, "File upload failed")                                       \
     EVENT_ERROR(FILE_DOWNLOAD_FAILED, 7, "File download failed")                                   \
+    EVENT_ERROR(CH3_OVP_TRIPPED, 8, "Ch3 OVP tripped")                                             \
+    EVENT_ERROR(CH3_OCP_TRIPPED, 9, "Ch3 OCP tripped")                                             \
+    EVENT_ERROR(CH3_OPP_TRIPPED, 10, "Ch3 OPP tripped")                                            \
+    EVENT_ERROR(CH1_IOEXP_RESET_DETECTED, 11, "Ch1 IOEXP reset detected")                          \
+    EVENT_ERROR(CH2_IOEXP_RESET_DETECTED, 12, "Ch2 IOEXP reset detected")                          \
+    EVENT_ERROR(CH3_IOEXP_RESET_DETECTED, 13, "Ch3 IOEXP reset detected")                          \
+    EVENT_ERROR(CH1_IOEXP_FAULT_MATCH_DETECTED, 14, "Ch1 IOEXP fault match detected")              \
+    EVENT_ERROR(CH2_IOEXP_FAULT_MATCH_DETECTED, 15, "Ch2 IOEXP fault match detected")              \
+    EVENT_ERROR(CH3_IOEXP_FAULT_MATCH_DETECTED, 16, "Ch3 IOEXP fault match detected")              \
     EVENT_ERROR(AUX_OTP_TRIPPED, 39, "AUX OTP tripped")                                            \
     EVENT_ERROR(CH1_OTP_TRIPPED, 40, "CH1 OTP tripped")                                            \
     EVENT_ERROR(CH2_OTP_TRIPPED, 41, "CH2 OTP tripped")                                            \

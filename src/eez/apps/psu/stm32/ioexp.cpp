@@ -26,6 +26,7 @@
 
 #include <eez/apps/psu/psu.h>
 #include <eez/apps/psu/ioexp.h>
+#include <eez/apps/psu/event_queue.h>
 
 namespace eez {
 namespace psu {
@@ -103,6 +104,29 @@ IOExpander::IOExpander(Channel &channel_) : channel(channel_) {
 }
 
 void IOExpander::init() {
+    gpioOutputPinsMask = 
+        (1 << IO_BIT_OUT_DP_ENABLE) | 
+        (1 << IO_BIT_OUT_OUTPUT_ENABLE) | 
+        (1 << IO_BIT_OUT_REMOTE_SENSE) | 
+        (1 << IO_BIT_OUT_REMOTE_PROGRAMMING);
+    if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_500MA;
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_5A;
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OVP_ENABLE;
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OVP_LE;
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED;
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_COUPLED_LED;
+        if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
+            gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA;
+        } else {
+            gpioOutputPinsMask |= 1 << DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA;
+        }
+    } else {
+        gpioOutputPinsMask |= 1 << DCP505_IO_BIT_OUT_OVP_ENABLE;
+        gpioOutputPinsMask |= 1 << DCP505_IO_BIT_OUT_OE_UNCOUPLED_LED;
+        gpioOutputPinsMask |= 1 << DCP505_IO_BIT_OUT_OE_COUPLED_LED;
+    }
+
     const uint8_t N_REGS = sizeof(REG_VALUES) / 3;
     for (int i = 0; i < N_REGS; i++) {
     	uint8_t reg = REG_VALUES[3 * i];
@@ -129,18 +153,6 @@ void IOExpander::init() {
     	}
 
     	write(reg, value);
-    }
-
-    if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
-    	gpioa = DCP405_REG_VALUE_GPIOA;
-        if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
-        	gpiob = DCP405_REG_VALUE_GPIOB;
-        } else {
-            gpiob = DCP405_R2B5_REG_VALUE_GPIOB;
-        }
-    } else {
-    	gpioa = DCP505_REG_VALUE_GPIOA;
-    	gpiob = DCP505_REG_VALUE_GPIOB;
     }
 }
 
@@ -179,7 +191,9 @@ bool IOExpander::test() {
         }
     }
 
-     if (g_testResult == TEST_OK) {
+    readGpio();
+
+    if (g_testResult == TEST_OK) {
  #if !CONF_SKIP_PWRGOOD_TEST
         channel.flags.powerOk = testBit(IO_BIT_IN_PWRGOOD);
         if (!channel.flags.powerOk) {
@@ -206,18 +220,49 @@ bool IOExpander::test() {
     return g_testResult != TEST_FAILED;
 }
 
-void IOExpander::tick(uint32_t tick_usec) {
-    if (isPowerUp()) {
-        channel.eventGpio(readGpio());
+void IOExpander::reinit() {
+    const uint8_t N_REGS = sizeof(REG_VALUES) / 3;
+    for (int i = 0; i < N_REGS; i++) {
+    	uint8_t reg = REG_VALUES[3 * i];
+    	uint8_t value = REG_VALUES[3 * i + 1];
+
+    	if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
+        	if (reg == REG_IODIRA) {
+                if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
+        		    value = DCP405_REG_VALUE_IODIRA;
+                } else {
+                    value = DCP405_R2B5_REG_VALUE_IODIRA;
+                }
+        	} else if (reg == REG_IODIRB) {
+        		value = DCP405_REG_VALUE_IODIRB;
+        	}
+    	}
+
+        if (reg == REG_GPIOA) {
+            value = (uint8_t)gpioWritten;
+        } else if (reg == REG_GPIOB) {
+            value = (uint8_t)(gpioWritten >> 8);
+        }        
+
+    	write(reg, value);
     }
 }
 
-uint8_t IOExpander::readGpio() {
-    return read(REG_GPIOA);
-}
+void IOExpander::tick(uint32_t tick_usec) {
+	readGpio();
 
-uint8_t IOExpander::readGpioB() {
-	return read(REG_GPIOB);
+    uint8_t iodira = read(REG_IODIRA);
+    if (iodira == 0xFF || (gpio & gpioOutputPinsMask) != gpioWritten) {
+        if (iodira == 0xFF) {
+            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_RESET_DETECTED + channel.index - 1);
+        } else {
+            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_FAULT_MATCH_DETECTED + channel.index - 1);
+        }
+
+        reinit();
+
+        readGpio();
+    }
 }
 
 int IOExpander::getBitDirection(int bit) {
@@ -232,14 +277,12 @@ int IOExpander::getBitDirection(int bit) {
 }
 
 bool IOExpander::testBit(int io_bit) {
-    uint8_t value;
-    if (io_bit < 8) {
-        value = readGpio();
-    } else {
-        value = readGpioB();
-        io_bit -= 8;
-    }
-    return value & (1 << io_bit) ? true : false;
+    return (gpio & (1 << io_bit)) ? true : false;
+}
+
+bool IOExpander::isAdcReady() {
+    // ready = !HAL_GPIO_ReadPin(SPI2_IRQ_GPIO_Port, SPI2_IRQ_Pin);
+    return !testBit(g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_IO_BIT_IN_ADC_DRDY : DCP505_IO_BIT_IN_ADC_DRDY);
 }
 
 void IOExpander::changeBit(int io_bit, bool set) {
@@ -248,22 +291,28 @@ void IOExpander::changeBit(int io_bit, bool set) {
     }
 
     if (io_bit < 8) {
-        uint8_t newValue = set ? (gpioa | (1 << io_bit)) : (gpioa & ~(1 << io_bit));
-	    if (gpioa != newValue) {
-		    gpioa = newValue;
-			write(REG_GPIOA, gpioa);
+        uint8_t oldValue = (uint8_t)gpioWritten;
+        uint8_t newValue = set ? (oldValue | (1 << io_bit)) : (oldValue & ~(1 << io_bit));
+	    if (newValue != oldValue) {
+			write(REG_GPIOA, newValue);
 	    }
     } else {
-        uint8_t newValue = set ? (gpiob | (1 << (io_bit - 8))) : (gpiob & ~(1 << (io_bit - 8)));
-	    if (gpiob != newValue) {
-		    gpiob = newValue;
-            write(REG_GPIOB, gpiob);
+        uint8_t oldValue = (uint8_t)(gpioWritten >> 8);
+        uint8_t newValue = set ? (oldValue | (1 << (io_bit - 8))) : (oldValue & ~(1 << (io_bit - 8)));
+	    if (newValue != oldValue) {
+            write(REG_GPIOB, newValue);
 	    }
     }
 
     if (io_bit == IO_BIT_OUT_OUTPUT_ENABLE) {
         HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
     }
+}
+
+void IOExpander::readGpio() {
+    uint8_t gpioa = read(REG_GPIOA);
+    uint8_t gpiob = read(REG_GPIOB);
+    gpio = (gpiob << 8) | gpioa;
 }
 
 uint8_t IOExpander::read(uint8_t reg) {
@@ -288,7 +337,15 @@ void IOExpander::write(uint8_t reg, uint8_t val) {
     uint8_t result[3];
 
     spi::select(channel.slotIndex, spi::CHIP_IOEXP);
+
     spi::transfer(channel.slotIndex, data, result, 3);
+
+    if (reg == REG_GPIOA) {
+        gpioWritten = (gpioWritten & 0xFF00) | val;
+    } else if (reg == REG_GPIOB) {
+        gpioWritten = (gpioWritten & 0x00FF) | (val << 8);
+    }
+
     spi::deselect(channel.slotIndex);
 }
 

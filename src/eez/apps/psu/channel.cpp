@@ -780,6 +780,31 @@ void Channel::tick(uint32_t tick_usec) {
     }
 
     ioexp.tick(tick_usec);
+
+#if !CONF_SKIP_PWRGOOD_TEST
+    testPwrgood();
+#endif
+
+    if (getFeatures() & CH_FEATURE_RPOL) {
+        unsigned rpol = !ioexp.testBit(IOExpander::IO_BIT_IN_RPOL);
+
+        if (rpol != flags.rpol) {
+            flags.rpol = rpol;
+            setQuesBits(QUES_ISUM_RPOL, flags.rpol ? true : false);
+        }
+
+        if (rpol && isOutputEnabled()) {
+            channel_dispatcher::outputEnable(*this, false);
+            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_REMOTE_SENSE_REVERSE_POLARITY_DETECTED + index - 1);
+            onProtectionTripped();
+        }
+    }
+
+    if (!io_pins::isInhibited()) {
+        setCvMode(ioexp.testBit(IOExpander::IO_BIT_IN_CV_ACTIVE));
+        setCcMode(ioexp.testBit(IOExpander::IO_BIT_IN_CC_ACTIVE));
+    }
+
     adc.tick(tick_usec);
     onTimeCounter.tick(tick_usec);
 
@@ -823,14 +848,6 @@ void Channel::tick(uint32_t tick_usec) {
             }
         }
     }
-
-    // If channel output is off then test PWRGOOD here, otherwise it is tested in Channel::eventGpio
-    // method.
-#if !CONF_SKIP_PWRGOOD_TEST
-    if (!isOutputEnabled()) {
-        testPwrgood(ioexp.readGpio());
-    }
-#endif
 
     // update history values
     uint32_t ytViewRateMicroseconds = (int)round(ytViewRate * 1000000L);
@@ -1092,37 +1109,6 @@ void Channel::eventAdcData(int16_t adc_data, bool startAgain) {
 
     adcDataIsReady(adc_data, startAgain);
     protectionCheck();
-}
-
-void Channel::eventGpio(uint8_t gpio) {
-    if (!isOk())
-        return;
-
-#if !CONF_SKIP_PWRGOOD_TEST
-    testPwrgood(gpio);
-#endif
-
-    if (getFeatures() & CH_FEATURE_RPOL) {
-        unsigned rpol = !(gpio & (1 << IOExpander::IO_BIT_IN_RPOL));
-
-        if (rpol != flags.rpol) {
-            flags.rpol = rpol;
-            setQuesBits(QUES_ISUM_RPOL, flags.rpol ? true : false);
-        }
-
-        if (rpol && isOutputEnabled()) {
-            channel_dispatcher::outputEnable(*this, false);
-            event_queue::pushEvent(
-                event_queue::EVENT_ERROR_CH1_REMOTE_SENSE_REVERSE_POLARITY_DETECTED + index - 1);
-            onProtectionTripped();
-            return;
-        }
-    }
-
-    if (!io_pins::isInhibited()) {
-        setCvMode(gpio & (1 << IOExpander::IO_BIT_IN_CV_ACTIVE) ? true : false);
-        setCcMode(gpio & (1 << IOExpander::IO_BIT_IN_CC_ACTIVE) ? true : false);
-    }
 }
 
 void Channel::adcReadMonDac() {
@@ -1671,9 +1657,9 @@ void Channel::setPowerLimit(float limit) {
 }
 
 #if !CONF_SKIP_PWRGOOD_TEST
-void Channel::testPwrgood(uint8_t gpio) {
-    if (!(gpio & (1 << IOExpander::IO_BIT_IN_PWRGOOD))) {
-        DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d", index, (int)gpio);
+void Channel::testPwrgood() {
+    if (!ioexp.testBit(IOExpander::IO_BIT_IN_PWRGOOD)) {
+        DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d", index, (int)ioexp.gpio);
         flags.powerOk = 0;
         generateError(SCPI_ERROR_CH1_FAULT_DETECTED - (index - 1));
         powerDownBySensor();
