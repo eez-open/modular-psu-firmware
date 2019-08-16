@@ -405,7 +405,6 @@ class Channel {
     /// @param gpio State of IO expander GPIO register.
     /// @param adc_data ADC snapshot data.
     void eventAdcData(int16_t adc_data, bool startAgain = true);
-    void eventGpio(uint8_t gpio);
 
     /// Called when device power is turned off, so channel
     /// can do its own housekeeping.
@@ -666,7 +665,7 @@ class Channel {
     void doDpEnable(bool enable);
 
 #if !CONF_SKIP_PWRGOOD_TEST
-    void testPwrgood(uint8_t gpio);
+    void testPwrgood();
 #endif
 
     float getDualRangeGndOffset();

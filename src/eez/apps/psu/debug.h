@@ -34,12 +34,12 @@ namespace debug {
 
 void tick(uint32_t tickCount);
 
-extern DebugValueVariable g_uDac[2];
-extern DebugValueVariable g_uMon[2];
-extern DebugValueVariable g_uMonDac[2];
-extern DebugValueVariable g_iDac[2];
-extern DebugValueVariable g_iMon[2];
-extern DebugValueVariable g_iMonDac[2];
+extern DebugValueVariable g_uDac[CH_MAX];
+extern DebugValueVariable g_uMon[CH_MAX];
+extern DebugValueVariable g_uMonDac[CH_MAX];
+extern DebugValueVariable g_iDac[CH_MAX];
+extern DebugValueVariable g_iMon[CH_MAX];
+extern DebugValueVariable g_iMonDac[CH_MAX];
 
 extern DebugDurationVariable g_mainLoopDuration;
 #if CONF_DEBUG_VARIABLES

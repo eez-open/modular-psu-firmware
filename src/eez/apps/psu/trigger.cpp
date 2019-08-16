@@ -244,6 +244,10 @@ int checkTrigger() {
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
 
+        if (!channel.isOk()) {
+            continue;
+        }
+
         if (i == 0 || !(channel_dispatcher::isCoupled() || channel_dispatcher::isTracked())) {
             if (channel.getVoltageTriggerMode() != channel.getCurrentTriggerMode()) {
                 return SCPI_ERROR_INCOMPATIBLE_TRANSIENT_MODES;
@@ -301,7 +305,10 @@ int startImmediately() {
 
     setState(STATE_EXECUTING);
     for (int i = 0; i < CH_NUM; ++i) {
-        g_triggerInProgress[i] = true;
+        Channel &channel = Channel::get(i);
+        if (channel.isOk()) {
+            g_triggerInProgress[i] = true;
+        }
     }
 
     io_pins::onTrigger();
@@ -309,7 +316,7 @@ int startImmediately() {
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
 
-        if (i == 0 || !(channel_dispatcher::isCoupled() || channel_dispatcher::isTracked())) {
+        if (channel.isOk() && (i == 0 || !(channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()))) {
             if (channel.getVoltageTriggerMode() == TRIGGER_MODE_LIST) {
                 channel_dispatcher::setVoltage(channel, 0);
                 channel_dispatcher::setCurrent(channel, 0);

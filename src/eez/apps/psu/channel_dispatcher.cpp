@@ -59,7 +59,7 @@ bool setType(Type value) {
 
         g_channelCoupling = value;
 
-        for (int i = 0; i < 2; ++i) {
+        for (int i = 0; i < CH_MAX; ++i) {
             if (i < CH_NUM) {
                 Channel &channel = Channel::get(i);
                 if (Channel::get(i).isOk()) {
@@ -77,81 +77,83 @@ bool setType(Type value) {
 
                     list::resetChannelList(channel);
 
-                    if (isTracked()) {
-                        channel.setVoltageLimit(MIN(Channel::get(0).getVoltageLimit(),
-                                                    Channel::get(1).getVoltageLimit()));
-                        if (i != 0) {
-                            channel.setVoltage(Channel::get(0).u.set);
-                        }
+                    if (i < 2) {
+                        if (isTracked()) {
+                            channel.setVoltageLimit(MIN(Channel::get(0).getVoltageLimit(),
+                                                        Channel::get(1).getVoltageLimit()));
+                            if (i != 0) {
+                                channel.setVoltage(Channel::get(0).u.set);
+                            }
 
-                        channel.setCurrentLimit(MIN(Channel::get(0).getCurrentLimit(),
-                                                    Channel::get(1).getCurrentLimit()));
-                        if (i != 0) {
-                            channel.setCurrent(Channel::get(0).i.set);
-                        }
+                            channel.setCurrentLimit(MIN(Channel::get(0).getCurrentLimit(),
+                                                        Channel::get(1).getCurrentLimit()));
+                            if (i != 0) {
+                                channel.setCurrent(Channel::get(0).i.set);
+                            }
 
-                        trigger::setVoltage(channel, Channel::get(0).u.def);
-                        trigger::setCurrent(channel, Channel::get(0).i.def);
-                    } else if (isCoupled()) {
-                        channel.setVoltage(getUMin(channel));
-                        channel.setVoltageLimit(MIN(Channel::get(0).getVoltageLimit(),
-                                                    Channel::get(1).getVoltageLimit()));
+                            trigger::setVoltage(channel, Channel::get(0).u.def);
+                            trigger::setCurrent(channel, Channel::get(0).i.def);
+                        } else if (isCoupled()) {
+                            channel.setVoltage(getUMin(channel));
+                            channel.setVoltageLimit(MIN(Channel::get(0).getVoltageLimit(),
+                                                        Channel::get(1).getVoltageLimit()));
 
-                        channel.setCurrent(getIMin(channel));
-                        channel.setCurrentLimit(MIN(Channel::get(0).getCurrentLimit(),
-                                                    Channel::get(1).getCurrentLimit()));
+                            channel.setCurrent(getIMin(channel));
+                            channel.setCurrentLimit(MIN(Channel::get(0).getCurrentLimit(),
+                                                        Channel::get(1).getCurrentLimit()));
 
-                        trigger::setVoltage(channel, getUMin(channel));
-                        trigger::setCurrent(channel, getIMin(channel));
+                            trigger::setVoltage(channel, getUMin(channel));
+                            trigger::setCurrent(channel, getIMin(channel));
 
 #ifdef EEZ_PLATFORM_SIMULATOR
-                        channel.simulator.setLoadEnabled(false);
-                        channel.simulator.setLoad(Channel::get(0).simulator.getLoad());
+                            channel.simulator.setLoadEnabled(false);
+                            channel.simulator.setLoad(Channel::get(0).simulator.getLoad());
 #endif
-                    }
+                        }
 
-                    if (isTracked() || isCoupled()) {
-                        channel.prot_conf.flags.u_state =
-                            Channel::get(0).prot_conf.flags.u_state ||
-                                    Channel::get(1).prot_conf.flags.u_state
-                                ? 1
-                                : 0;
-                        channel.prot_conf.u_level = MIN(Channel::get(0).prot_conf.u_level,
-                                                        Channel::get(1).prot_conf.u_level);
-                        channel.prot_conf.u_delay = MIN(Channel::get(0).prot_conf.u_delay,
-                                                        Channel::get(1).prot_conf.u_delay);
+                        if (isTracked() || isCoupled()) {
+                            channel.prot_conf.flags.u_state =
+                                Channel::get(0).prot_conf.flags.u_state ||
+                                        Channel::get(1).prot_conf.flags.u_state
+                                    ? 1
+                                    : 0;
+                            channel.prot_conf.u_level = MIN(Channel::get(0).prot_conf.u_level,
+                                                            Channel::get(1).prot_conf.u_level);
+                            channel.prot_conf.u_delay = MIN(Channel::get(0).prot_conf.u_delay,
+                                                            Channel::get(1).prot_conf.u_delay);
 
-                        channel.prot_conf.flags.i_state =
-                            Channel::get(0).prot_conf.flags.i_state ||
-                                    Channel::get(1).prot_conf.flags.i_state
-                                ? 1
-                                : 0;
-                        channel.prot_conf.i_delay = MIN(Channel::get(0).prot_conf.i_delay,
-                                                        Channel::get(1).prot_conf.i_delay);
+                            channel.prot_conf.flags.i_state =
+                                Channel::get(0).prot_conf.flags.i_state ||
+                                        Channel::get(1).prot_conf.flags.i_state
+                                    ? 1
+                                    : 0;
+                            channel.prot_conf.i_delay = MIN(Channel::get(0).prot_conf.i_delay,
+                                                            Channel::get(1).prot_conf.i_delay);
 
-                        channel.prot_conf.flags.p_state =
-                            Channel::get(0).prot_conf.flags.p_state ||
-                                    Channel::get(1).prot_conf.flags.p_state
-                                ? 1
-                                : 0;
-                        channel.prot_conf.p_level = MIN(Channel::get(0).prot_conf.p_level,
-                                                        Channel::get(1).prot_conf.p_level);
-                        channel.prot_conf.p_delay = MIN(Channel::get(0).prot_conf.p_delay,
-                                                        Channel::get(1).prot_conf.p_delay);
+                            channel.prot_conf.flags.p_state =
+                                Channel::get(0).prot_conf.flags.p_state ||
+                                        Channel::get(1).prot_conf.flags.p_state
+                                    ? 1
+                                    : 0;
+                            channel.prot_conf.p_level = MIN(Channel::get(0).prot_conf.p_level,
+                                                            Channel::get(1).prot_conf.p_level);
+                            channel.prot_conf.p_delay = MIN(Channel::get(0).prot_conf.p_delay,
+                                                            Channel::get(1).prot_conf.p_delay);
 
-                        temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.state =
-                            temperature::sensors[temp_sensor::CH1].prot_conf.state ||
-                                    temperature::sensors[temp_sensor::CH2].prot_conf.state
-                                ? 1
-                                : 0;
+                            temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.state =
+                                temperature::sensors[temp_sensor::CH1].prot_conf.state ||
+                                        temperature::sensors[temp_sensor::CH2].prot_conf.state
+                                    ? 1
+                                    : 0;
 
-                        temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.level =
-                            MIN(temperature::sensors[temp_sensor::CH1].prot_conf.level,
-                                temperature::sensors[temp_sensor::CH2].prot_conf.level);
+                            temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.level =
+                                MIN(temperature::sensors[temp_sensor::CH1].prot_conf.level,
+                                    temperature::sensors[temp_sensor::CH2].prot_conf.level);
 
-                        temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.delay =
-                            MIN(temperature::sensors[temp_sensor::CH1].prot_conf.delay,
-                                temperature::sensors[temp_sensor::CH2].prot_conf.delay);
+                            temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.delay =
+                                MIN(temperature::sensors[temp_sensor::CH1].prot_conf.delay,
+                                    temperature::sensors[temp_sensor::CH2].prot_conf.delay);
+                        }
                     }
                 }
 

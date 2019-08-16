@@ -775,9 +775,11 @@ void channelToggleOutput() {
                 trigger::abort();
                 for (int i = 0; i < CH_NUM; ++i) {
                     Channel &channel = Channel::get(i);
-                    if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||
-                        channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) {
-                        channel_dispatcher::outputEnable(Channel::get(i), false);
+                    if (channel.isOk()) {
+						if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||
+							channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) {
+							channel_dispatcher::outputEnable(Channel::get(i), false);
+						}
                     }
                 }
             } else {
