@@ -184,6 +184,7 @@ list (APPEND header_files ${header_eez_apps_psu})
 source_group("eez\\apps\\psu" FILES ${src_eez_apps_psu} ${header_eez_apps_psu})
 
 set(src_eez_apps_psu_gui
+    src/eez/apps/psu/gui/animations.cpp
     src/eez/apps/psu/gui/calibration.cpp
     src/eez/apps/psu/gui/data.cpp
     src/eez/apps/psu/gui/edit_mode.cpp
@@ -204,6 +205,7 @@ set(src_eez_apps_psu_gui
 )
 list (APPEND src_files ${src_eez_apps_psu_gui})
 set(header_eez_apps_psu_gui
+    src/eez/apps/psu/gui/animations.h
     src/eez/apps/psu/gui/calibration.h
     src/eez/apps/psu/gui/data.h
     src/eez/apps/psu/gui/edit_mode.h

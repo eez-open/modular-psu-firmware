@@ -32,6 +32,7 @@
 
 #include <eez/apps/psu/gui/psu.h>
 
+#include <eez/apps/psu/gui/animations.h>
 #include <eez/apps/psu/gui/calibration.h>
 #include <eez/apps/psu/gui/edit_mode.h>
 #include <eez/apps/psu/gui/edit_mode_keypad.h>
@@ -168,7 +169,13 @@ void action_stand_by() {
 }
 
 void action_show_previous_page() {
-	popPage();
+    int previousPageId = getActivePageId();
+
+    popPage();
+
+    if (getActivePageId() == PAGE_ID_MAIN && previousPageId == PAGE_ID_SYS_SETTINGS) {
+        animateHideSysSettings();
+    }
 }
 
 void showMainPage() {
@@ -196,6 +203,7 @@ void action_show_channel_settings() {
 
 void action_show_sys_settings() {
     showPage(PAGE_ID_SYS_SETTINGS);
+    animateShowSysSettings();
 }
 
 void action_show_sys_settings_trigger() {

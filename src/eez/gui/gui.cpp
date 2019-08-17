@@ -415,15 +415,16 @@ void animateOpenCloseCallback(float t, void *bufferOld, void *bufferNew, void *b
     bitBlt(bufferNew, bufferDst, x1, y1, x2, y2);
 }
 
-void animate(uint32_t duration, void(*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst)) {
+void animate(Buffer startBuffer, uint32_t duration, void(*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst)) {
     g_animationState.enabled = true;
     g_animationState.startTime = millis();
     g_animationState.duration = duration;
+    g_animationState.startBuffer = startBuffer;
     g_animationState.callback = callback;
 }
 
 void animateOpenClose(uint32_t duration, const Rect &srcRect, const Rect &dstRect, bool direction) {
-    animate(duration, animateOpenCloseCallback);
+    animate(BUFFER_OLD, duration, animateOpenCloseCallback);
     g_animationStateSrcRect = srcRect;
     g_animationStateDstRect = dstRect;
     g_animationStateDirection = direction;
@@ -437,34 +438,21 @@ void animateClose(const Rect &srcRect, const Rect &dstRect) {
     animateOpenClose(ANIMATION_DURATION_CLOSE, srcRect, dstRect, false);
 }
 
-static const Rect g_vertDefRects[3] = {
-    {   0, 0, 160, 240 },
-    { 160, 0, 160, 240 },
-    { 320, 0, 160, 240 }
-};
-static const Rect g_horzDefRects[3] = {
-    { 0,   0, 480, 80 },
-    { 0,  80, 480, 80 },
-    { 0, 160, 480, 80 }
-};
-static const Rect g_maxRect = { 0, 0, 480, 167 };
-static const Rect g_minRects[2] = {
-    {   0, 167, 240, 74 },
-    { 240, 167, 240, 74 }
-};
+int g_spec;
 
-static int g_xOffset;
-static int g_yOffset;
+static Rect g_clipRect;
 
-static int g_numRects;
-static Rect g_srcRects[3];
-static Rect g_dstRects[3];
+int g_numRects;
+Rect g_srcRects[4];
+Rect g_dstRects[4];
+
+AnimRect g_animRects[MAX_ANIM_RECTS];
 
 void bitBltSpec(int i, void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, float opacity) {
     int w = MIN(dw, sw);
     int h = MIN(dh, sh);
 
-    if (i == 2) {
+    if (i == g_spec) {
         bitBlt(src, dst,
             sx + (sw - w) / 2, sy + (sh - h) / 2, w, h,
             dx + (dw - w) / 2, dy + (dh - h) / 2,
@@ -479,12 +467,12 @@ void bitBltSpec(int i, void *src, void *dst, int sx, int sy, int sw, int sh, int
 }
 
 void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst) {
-    auto tSaved = t;
+    auto t1 = remapOutExp(t, 0, 0, 1, 1);
 	t = remapOutQuad(t, 0, 0, 1, 1);
 
     bitBlt(bufferOld, bufferDst, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
     setColor(0);
-    fillRect(bufferDst, g_xOffset + 0, g_yOffset + 0, g_xOffset + 480 - 1, g_yOffset + 240 - 1);
+    fillRect(bufferDst, g_clipRect.x + 0, g_clipRect.y + 0, g_clipRect.x + 480 - 1, g_clipRect.y + 240 - 1);
     
     for (int i = 0; i < 3; ++i) {
         if (g_srcRects[i].x == g_dstRects[i].x && g_srcRects[i].y == g_dstRects[i].y && g_srcRects[i].w == g_dstRects[i].w && g_srcRects[i].h == g_dstRects[i].h) {
@@ -497,7 +485,7 @@ void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst
                 (int)roundf(g_srcRects[i].y + t * (g_dstRects[i].y - g_srcRects[i].y)),
                 (int)roundf(g_srcRects[i].w + t * (g_dstRects[i].w - g_srcRects[i].w)),
                 (int)roundf(g_srcRects[i].h + t * (g_dstRects[i].h - g_srcRects[i].h)),
-                1 - tSaved);
+                1 - t1);
 
             bitBltSpec(i,
                 bufferNew, bufferDst,
@@ -506,118 +494,228 @@ void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst
                 (int)roundf(g_srcRects[i].y + t * (g_dstRects[i].y - g_srcRects[i].y)),
                 (int)roundf(g_srcRects[i].w + t * (g_dstRects[i].w - g_srcRects[i].w)),
                 (int)roundf(g_srcRects[i].h + t * (g_dstRects[i].h - g_srcRects[i].h)),
-                tSaved);
+                t1);
         }
     }
 }
 
 void animateRects() {
-    animate(350, animateRectsStep);
+    animate(BUFFER_OLD, 350, animateRectsStep);
 
-    g_xOffset = g_appContext->x;
-    g_yOffset = g_appContext->y;
+    g_clipRect.x = g_appContext->x;
+    g_clipRect.y = g_appContext->y;
 
-    if (g_xOffset > 0) {
+    if (g_appContext->x > 0) {
         for (int i = 0; i < 3; i++) {
-            g_srcRects[i].x += g_xOffset;
-            g_dstRects[i].x += g_xOffset;
+            g_srcRects[i].x += g_appContext->x;
+            g_dstRects[i].x += g_appContext->x;
         }
     }
 
     if (g_appContext->y > 0) {
         for (int i = 0; i < 3; i++) {
-            g_srcRects[i].y += g_yOffset;
-            g_dstRects[i].y += g_yOffset;
+            g_srcRects[i].y += g_appContext->y;
+            g_dstRects[i].y += g_appContext->y;
         }
     }
 }
 
-void animateFromDefaultViewToMaxView() {
-    int iMax = psu::gui::g_channel->index - 1;
-    int iMin1 = iMax == 0 ? 1 : 0;
-    int iMin2 = iMax == 2 ? 1 : 2;
+void animateRectsStep2(float t, void *bufferOld, void *bufferNew, void *bufferDst) {
+    bitBlt(g_animationState.startBuffer == BUFFER_OLD ? bufferOld : bufferNew, bufferDst, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
 
-    g_numRects = 3;
+    float t1 = remapOutQuad(t, 0, 0, 1, 1);
+    float t2 = remapOutExp(t, 0, 0, 1, 1);
 
-    auto g_defRects = psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
-        psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
+    for (int i = 0; i < g_numRects; i++) {
+        AnimRect &animRect = g_animRects[i];
 
-    g_srcRects[0] = g_defRects[iMin1];
-    g_dstRects[0] = g_minRects[0];
+        int x, y, w, h;
 
-    g_srcRects[1] = g_defRects[iMin2];
-    g_dstRects[1] = g_minRects[1];
+        if (animRect.srcRect == animRect.dstRect) {
+            x = animRect.srcRect.x;
+            y = animRect.srcRect.y;
+            w = animRect.srcRect.w;
+            h = animRect.srcRect.h;
+        } else {
+            x = (int)roundf(animRect.srcRect.x + t1 * (animRect.dstRect.x - animRect.srcRect.x));
+            y = (int)roundf(animRect.srcRect.y + t1 * (animRect.dstRect.y - animRect.srcRect.y));
+            w = (int)roundf(animRect.srcRect.w + t1 * (animRect.dstRect.w - animRect.srcRect.w));
+            h = (int)roundf(animRect.srcRect.h + t1 * (animRect.dstRect.h - animRect.srcRect.h));
+        }
 
-    g_srcRects[2] = g_defRects[iMax];
-    g_dstRects[2] = g_maxRect;
+        uint8_t opacity;
+        if (animRect.opacity == OPACITY_FADE_IN) {
+            opacity = (uint8_t)roundf(clamp(roundf(t2 * 255), 0, 255));
+        } else if (animRect.opacity == OPACITY_FADE_OUT) {
+            opacity = (uint8_t)roundf(clamp((1 - t2) * 255, 0, 255));
+        } else {
+            opacity = 255;
+        }
 
-    animateRects();
-}
+        if (animRect.buffer == BUFFER_SOLID_COLOR) {
+            auto savedOpacity = getOpacity();
+            setOpacity(opacity);
+            setColor(animRect.color);
 
-void animateFromMaxViewToDefaultView() {
-    int iMax = psu::gui::g_channel->index - 1;
-    int iMin1 = iMax == 0 ? 1 : 0;
-    int iMin2 = iMax == 2 ? 1 : 2;
+            // clip
+            if (x < g_clipRect.x) {
+                w -= g_clipRect.x - x;
+                x = g_clipRect.x;
+            }
 
-    g_numRects = 3;
+            if (x + w > g_clipRect.x + g_clipRect.w) {
+                w -= (x + w) - (g_clipRect.x + g_clipRect.w);
+            }
 
-    auto g_defRects = psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
-        psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
+            if (y < g_clipRect.y) {
+                h -= g_clipRect.y - y;
+                y = g_clipRect.y;
+            }
 
-    g_srcRects[0] = g_minRects[0];
-    g_dstRects[0] = g_defRects[iMin1];
+            if (y + h > g_clipRect.y + g_clipRect.h) {
+                h -= (y + h) - (g_clipRect.y + g_clipRect.y);
+            }
 
-    g_srcRects[1] = g_minRects[1];
-    g_dstRects[1] = g_defRects[iMin2];
+            fillRect(bufferDst, x, y, x + w - 1, y + h - 1);
 
-    g_srcRects[2] = g_maxRect;
-    g_dstRects[2] = g_defRects[iMax];
+            setOpacity(savedOpacity);
+        } else {
+            void *buffer = animRect.buffer == BUFFER_OLD ? bufferOld : bufferNew;
+            Rect &srcRect = animRect.buffer == BUFFER_OLD ? animRect.srcRect : animRect.dstRect;
 
-    animateRects();
-}
+            int sx;
+            int sy;
+            int sw;
+            int sh;
 
-void animateFromMinViewToMaxView(int iWasMax) {
-    int iMax = psu::persist_conf::devConf.flags.channelMax;
+            int dx;
+            int dy;
 
-    if ((iMax == 1 && iWasMax == 2) || (iMax == 2 && iWasMax == 1)) {
-        g_srcRects[0] = g_maxRect;
-        g_dstRects[0] = g_minRects[0];
+            if (animRect.position == POSITION_TOP_LEFT || animRect.position == POSITION_LEFT || animRect.position == POSITION_BOTTOM_LEFT) {
+                sx = srcRect.x;
+                sw = MIN(srcRect.w, w);
+                dx = x;
+            } else if (animRect.position == POSITION_TOP || animRect.position == POSITION_CENTER || animRect.position == POSITION_BOTTOM) {
+                if (srcRect.w < w) {
+                    sx = srcRect.x;
+                    sw = srcRect.w;
+                    dx = (w - srcRect.w) / 2;
+                } else if (srcRect.w > w) {
+                    sx = (srcRect.w - w) / 2;
+                    sw = w;
+                    dx = x;
+                } else {
+                    sx = srcRect.x;
+                    sw = srcRect.w;
+                    dx = x;
+                }
+            } else {
+                sw = MIN(srcRect.w, w);
+                sx = srcRect.x + srcRect.w - sw;
+                dx = x + w - sw;
+            }
 
-        g_srcRects[1] = g_minRects[0];
-        g_dstRects[1] = g_maxRect;
+            if (animRect.position == POSITION_TOP_LEFT || animRect.position == POSITION_TOP || animRect.position == POSITION_TOP_RIGHT) {
+                sy = srcRect.y;
+                sh = MIN(srcRect.h, h);
+                dy = y;
+            } else if (animRect.position == POSITION_LEFT || animRect.position == POSITION_CENTER || animRect.position == POSITION_RIGHT) {
+                if (srcRect.h < h) {
+                    sy = srcRect.y;
+                    sh = srcRect.h;
+                    dy = (h - srcRect.h) / 2;
+                } else if (srcRect.h > h) {
+                    sy = (srcRect.h - h) / 2;
+                    sh = h;
+                    dy = y;
+                } else {
+                    sy = srcRect.y;
+                    sh = srcRect.h;
+                    dy = y;
+                }
+            } else {
+                sh = MIN(srcRect.h, h);
+                sy = srcRect.y + srcRect.h - sh;
+                dy = y + h - sh;
+            }
 
-        g_srcRects[2] = g_minRects[1];
-        g_dstRects[2] = g_minRects[1];
-    } else if ((iMax == 2 && iWasMax == 3) || (iMax == 3 && iWasMax == 2)) {
-        g_srcRects[0] = g_maxRect;
-        g_dstRects[0] = g_minRects[1];
+            // clip
+            if (sx < g_clipRect.x) {
+                sw -= g_clipRect.x - sx;
+                dx += g_clipRect.x - sx;
+                sx = g_clipRect.x;
+            }
 
-        g_srcRects[1] = g_minRects[1];
-        g_dstRects[1] = g_maxRect;
+            if (dx < g_clipRect.x) {
+                sw -= g_clipRect.x - dx;
+                sx += g_clipRect.x - dx;
+                dx = g_clipRect.x;
+            }
 
-        g_srcRects[2] = g_minRects[0];
-        g_dstRects[2] = g_minRects[0];
-    } else if (iMax == 1 && iWasMax == 3) {
-        g_srcRects[1] = g_minRects[1];
-        g_dstRects[1] = g_minRects[0];
+            if (sx + sw > g_clipRect.x + g_clipRect.w) {
+                sw -= (sx + sw) - (g_clipRect.x + g_clipRect.w);
+            }
 
-        g_srcRects[0] = g_maxRect;
-        g_dstRects[0] = g_minRects[1];
+            if (dx + sw > g_clipRect.x + g_clipRect.w) {
+                sw -= (dx + sw) - (g_clipRect.x + g_clipRect.w);
+            }
 
-        g_srcRects[2] = g_minRects[0];
-        g_dstRects[2] = g_maxRect;
-    } else if (iMax == 3 && iWasMax == 1) {
-        g_srcRects[0] = g_maxRect;
-        g_dstRects[0] = g_minRects[0];
+            if (sy < g_clipRect.y) {
+                sh -= g_clipRect.y - sy;
+                dy += g_clipRect.y - sy;
+                sy = g_clipRect.y;
+            }
 
-        g_srcRects[1] = g_minRects[0];
-        g_dstRects[1] = g_minRects[1];
+            if (dy < g_clipRect.y) {
+                sh -= g_clipRect.y - dy;
+                sy += g_clipRect.y - dy;
+                dy = g_clipRect.y;
+            }
 
-        g_srcRects[2] = g_minRects[1];
-        g_dstRects[2] = g_maxRect;
+            if (dy + sh > g_clipRect.y + g_clipRect.h) {
+                sh -= (dy + sh) - (g_clipRect.y + g_clipRect.h);
+            }
+
+            if (sy + sh > g_clipRect.y + g_clipRect.h) {
+                sy -= (sy + sh) - (g_clipRect.y + g_clipRect.h);
+            }
+
+            bitBlt(buffer, bufferDst, sx, sy, sw, sh, dx, dy, opacity);
+        }
     }
+}
 
-    animateRects();
+void prepareRect(Rect &rect) {
+    if (rect.x == -1 && rect.y == -1 && rect.w == -1 && rect.h == -1) {
+        rect.x = 0;
+        rect.y = 0;
+        rect.w = getDisplayWidth();
+        rect.h = getDisplayHeight();
+    } else {
+        if (g_appContext->x > 0) {
+            rect.x += g_appContext->x;
+        }
+        if (g_appContext->y > 0) {
+            rect.y += g_appContext->y;
+        }
+    }
+}
+
+void animateRects(Buffer startBuffer, int numRects, uint32_t duration) {
+    animate(startBuffer, duration, animateRectsStep2);
+
+    g_numRects = numRects;
+
+    g_clipRect.x = g_appContext->x;
+    g_clipRect.y = g_appContext->y;
+    g_clipRect.w = g_appContext->width;
+    g_clipRect.h = g_appContext->height;
+
+
+    for (int i = 0; i < numRects; i++) {
+        prepareRect(g_animRects[i].srcRect);
+        prepareRect(g_animRects[i].dstRect);
+    }
 }
 
 } // namespace gui

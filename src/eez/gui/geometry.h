@@ -30,5 +30,13 @@ struct Rect {
     int16_t h;
 };
 
+inline bool operator != (const Rect& r1, const Rect& r2) {
+    return r1.x != r2.x || r1.y != r2.y || r1.w != r2.w || r1.h != r2.h;
+}
+
+inline bool operator == (const Rect& r1, const Rect& r2) {
+    return !(r1 != r2);
+}
+
 } // namespace gui
 } // namespace eez

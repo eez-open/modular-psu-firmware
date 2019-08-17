@@ -86,21 +86,62 @@ void lockFrontPanel();
 void unlockFrontPanel();
 bool isFrontPanelLocked();
 
+enum Buffer {
+    BUFFER_OLD,
+    BUFFER_NEW,
+    BUFFER_SOLID_COLOR
+};
+
 struct AnimationState {
     bool enabled;
     uint32_t startTime;
     uint32_t duration;
+    Buffer startBuffer;
     void (*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst);
+};
+
+enum Opacity {
+    OPACITY_SOLID,
+    OPACITY_FADE_IN,
+    OPACITY_FADE_OUT
+};
+
+enum Position {
+    POSITION_TOP_LEFT,
+    POSITION_TOP,
+    POSITION_TOP_RIGHT,
+    POSITION_LEFT,
+    POSITION_CENTER,
+    POSITION_RIGHT,
+    POSITION_BOTTOM_LEFT,
+    POSITION_BOTTOM,
+    POSITION_BOTTOM_RIGHT
+};
+
+struct AnimRect {
+    Buffer buffer;
+    Rect srcRect;
+    Rect dstRect;
+    uint16_t color;
+    Opacity opacity;
+    Position position;
 };
 
 extern AnimationState g_animationState;
 
+extern int g_spec;
+extern int g_numRects;
+extern Rect g_srcRects[4];
+extern Rect g_dstRects[4];
+
+#define MAX_ANIM_RECTS 10
+
+extern AnimRect g_animRects[MAX_ANIM_RECTS];
+
 void animateOpen(const Rect &srcRect, const Rect &dstRect);
 void animateClose(const Rect &srcRect, const Rect &dstRect);
-
-void animateFromDefaultViewToMaxView();
-void animateFromMaxViewToDefaultView();
-void animateFromMinViewToMaxView(int iWasMax);
+void animateRects();
+void animateRects(Buffer startBuffer, int numRects, uint32_t duration);
 
 ////////////////////////////////////////////////////////////////////////////////
 

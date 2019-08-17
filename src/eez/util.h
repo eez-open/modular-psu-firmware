@@ -65,6 +65,7 @@ uint8_t fromBCD(uint8_t bcd);
 
 float roundPrec(float a, float prec);
 
+bool equal(float a, float b, float prec);
 bool between(float x, float a, float b);
 
 bool isNaN(float x);
