@@ -599,13 +599,13 @@ class Channel {
     float getDualRangeMax();
     void setCurrentRange(uint8_t currentRange);
 
-    float getVoltagePrecision();
-    float getCurrentPrecision(float value = NAN);
-    float getPowerPrecision();
+    float getVoltagePrecision() const;
+    float getCurrentPrecision(float value = NAN) const;
+    float getPowerPrecision() const;
 
-    bool isMicroAmperAllowed();
+    bool isMicroAmperAllowed() const;
 
-    float roundChannelValue(Unit unit, float value);
+    float roundChannelValue(Unit unit, float value) const;
 
   private:
     bool delayed_dp_off;

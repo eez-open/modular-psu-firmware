@@ -381,13 +381,13 @@ void Channel::set(uint8_t slotIndex_, uint8_t boardRevision_, float U_MIN_, floa
         CURRENT_GND_OFFSET = 0;
     }
 
-    u.min = U_MIN;
-    u.max = U_MAX;
-    u.def = U_DEF;
+    u.min = roundChannelValue(UNIT_VOLT, U_MIN);
+    u.max = roundChannelValue(UNIT_VOLT, U_MAX);
+    u.def = roundChannelValue(UNIT_VOLT, U_DEF);
 
-    i.min = I_MIN;
-    i.max = I_MAX;
-    i.def = I_DEF;
+    i.min = roundChannelValue(UNIT_AMPER, I_MIN);
+    i.max = roundChannelValue(UNIT_AMPER, I_MAX);
+    i.def = roundChannelValue(UNIT_AMPER, I_DEF);
 
     // negligibleAdcDiffForVoltage2 = (int)((AnalogDigitalConverter::ADC_MAX -
     // AnalogDigitalConverter::ADC_MIN) / (2 * 100 * (U_MAX - U_MIN))) + 1;
@@ -608,7 +608,7 @@ void Channel::reset() {
     i.init(I_MIN, I_DEF_STEP, i.max);
 
     maxCurrentLimitCause = MAX_CURRENT_LIMIT_CAUSE_NONE;
-    p_limit = PTOT;
+    p_limit = roundChannelValue(UNIT_WATT, PTOT);
 
     resetHistory();
 
@@ -886,7 +886,7 @@ int16_t Channel::remapCurrentToAdcData(float value) {
                           (float)AnalogDigitalConverter::ADC_MAX);
 }
 
-float Channel::getVoltagePrecision() {
+float Channel::getVoltagePrecision() const {
     float precision = 0.005f; // 5 mV;
 
     if (calibration::isEnabled()) {
@@ -896,7 +896,7 @@ float Channel::getVoltagePrecision() {
     return precision;
 }
 
-float Channel::getCurrentPrecision(float value) {
+float Channel::getCurrentPrecision(float value) const {
     float precision = 0.0005f; // 0.5mA
 
     if (hasSupportForCurrentDualRange()) {
@@ -912,15 +912,15 @@ float Channel::getCurrentPrecision(float value) {
     return precision;
 }
 
-float Channel::getPowerPrecision() {
+float Channel::getPowerPrecision() const {
     return 0.001f; // 1 mW;
 }
 
-bool Channel::isMicroAmperAllowed() {
+bool Channel::isMicroAmperAllowed() const {
     return flags.currentRangeSelectionMode != CURRENT_RANGE_SELECTION_ALWAYS_HIGH;
 }
 
-float Channel::roundChannelValue(Unit unit, float value) {
+float Channel::roundChannelValue(Unit unit, float value) const {
     if (unit == UNIT_VOLT) {
         return roundPrec(value, getVoltagePrecision());
     }
@@ -1291,23 +1291,19 @@ void Channel::doCalibrationEnable(bool enable) {
     flags._calEnabled = enable;
 
     if (enable) {
-        u.min = cal_conf.u.minPossible;
-        if (u.min < U_MIN)
-            u.min = U_MIN;
+        u.min = roundChannelValue(UNIT_VOLT, MAX(cal_conf.u.minPossible, U_MIN));
         if (u.limit < u.min)
             u.limit = u.min;
         if (u.set < u.min)
             setVoltage(u.min);
 
-        u.max = cal_conf.u.maxPossible;
-        if (u.max > U_MAX)
-            u.max = U_MAX;
-        if (u.set > u.max)
-            setVoltage(u.max);
+        u.max = roundChannelValue(UNIT_VOLT, MIN(cal_conf.u.maxPossible, U_MAX));
         if (u.limit > u.max)
             u.limit = u.max;
+        if (u.set > u.max)
+            setVoltage(u.max);
 
-        i.min = cal_conf.i[0].minPossible;
+        i.min = roundChannelValue(UNIT_AMPER, MAX(cal_conf.i[0].minPossible, I_MIN));
         if (i.min < I_MIN)
             i.min = I_MIN;
         if (i.limit < i.min)
@@ -1315,23 +1311,21 @@ void Channel::doCalibrationEnable(bool enable) {
         if (i.set < i.min)
             setCurrent(i.min);
 
-        i.max = cal_conf.i[0].maxPossible;
-        if (i.max > I_MAX)
-            i.max = I_MAX;
+        i.max = roundChannelValue(UNIT_AMPER, MIN(cal_conf.i[0].maxPossible, I_MAX));
         if (i.limit > i.max)
             i.limit = i.max;
         if (i.set > i.max)
             setCurrent(i.max);
     } else {
-        u.min = U_MIN;
-        u.max = U_MAX;
+        u.min = roundChannelValue(UNIT_VOLT, U_MIN);
+        u.max = roundChannelValue(UNIT_VOLT, U_MAX);
 
-        i.min = I_MIN;
-        i.max = I_MAX;
+        i.min = roundChannelValue(UNIT_AMPER, I_MIN);
+        i.max = roundChannelValue(UNIT_AMPER, I_MAX);
     }
 
-    u.def = u.min;
-    i.def = i.min;
+    u.def = roundChannelValue(UNIT_VOLT, u.min);
+    i.def = roundChannelValue(UNIT_AMPER, i.min);
 
     if (g_isBooted) {
     	setVoltage(u.set);
@@ -1599,11 +1593,13 @@ void Channel::setCurrentLimit(float limit) {
 }
 
 float Channel::getMaxCurrentLimit() const {
-    if (hasSupportForCurrentDualRange() &&
-        flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
-        return 0.5f;
+    float limit;
+    if (hasSupportForCurrentDualRange() && flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
+        limit = 0.05f;
+    } else {
+        limit = isMaxCurrentLimited() ? ERR_MAX_CURRENT : i.max;
     }
-    return isMaxCurrentLimited() ? ERR_MAX_CURRENT : i.max;
+    return roundChannelValue(UNIT_AMPER, limit);
 }
 
 bool Channel::isMaxCurrentLimited() const {
