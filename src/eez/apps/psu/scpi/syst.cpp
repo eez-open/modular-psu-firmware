@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/system.h>
+
 #include <eez/apps/psu/psu.h>
 
 #include <stdio.h>
@@ -79,7 +81,11 @@ scpi_result_t scpi_cmd_systemPower(scpi_t *context) {
     }
 #endif
 
-    if (!changePowerState(up)) {
+    changePowerState(up);
+
+    osDelay(1000);
+
+    if (!isPowerUp()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }

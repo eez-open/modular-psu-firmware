@@ -598,24 +598,23 @@ bool isPowerUp() {
     return g_powerIsUp;
 }
 
-bool changePowerState(bool up) {
-//    if (osThreadGetId() != g_psuTaskHandle) {
-//        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE, up ? 1 : 0), osWaitForever);
-//        osDelay(1000);
-//        return up == g_powerIsUp;
-//    }
-
+void changePowerState(bool up) {
     if (up == g_powerIsUp)
-        return true;
+        return;
+
+    // at least MIN_POWER_UP_DELAY seconds shall pass after last power down
+    if (g_testPowerUpDelay) {
+        if (millis() - g_powerDownTime < MIN_POWER_UP_DELAY * 1000)
+            return;
+        g_testPowerUpDelay = false;
+    }
+
+    if (osThreadGetId() != g_psuTaskHandle) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE, up ? 1 : 0), osWaitForever);
+        return;
+    }
 
     if (up) {
-        // at least MIN_POWER_UP_DELAY seconds shall pass after last power down
-        if (g_testPowerUpDelay) {
-            if (millis() - g_powerDownTime < MIN_POWER_UP_DELAY * 1000)
-                return false;
-            g_testPowerUpDelay = false;
-        }
-
         g_bootTestSuccess = true;
 
         // auto recall channels parameters from profile
@@ -624,7 +623,7 @@ bool changePowerState(bool up) {
         auto recall = loadAutoRecallProfile(&profile, &location);
 
         if (!powerUp()) {
-            return false;
+            return;
         }
 
         // auto recall channels parameters from profile
@@ -652,8 +651,6 @@ bool changePowerState(bool up) {
         g_testPowerUpDelay = true;
         g_powerDownTime = millis();
     }
-
-    return true;
 }
 
 void powerDownBySensor() {

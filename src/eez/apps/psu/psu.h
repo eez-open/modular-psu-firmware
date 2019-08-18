@@ -47,7 +47,7 @@ extern bool g_isBooted;
 bool powerUp();
 void powerDown();
 bool isPowerUp();
-bool changePowerState(bool up);
+void changePowerState(bool up);
 void powerDownBySensor();
 
 bool reset();
