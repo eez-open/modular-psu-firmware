@@ -140,7 +140,6 @@ extern AnimRect g_animRects[MAX_ANIM_RECTS];
 
 void animateOpen(const Rect &srcRect, const Rect &dstRect);
 void animateClose(const Rect &srcRect, const Rect &dstRect);
-void animateRects();
 void animateRects(Buffer startBuffer, int numRects, uint32_t duration);
 
 ////////////////////////////////////////////////////////////////////////////////

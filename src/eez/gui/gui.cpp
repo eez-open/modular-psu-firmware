@@ -438,93 +438,15 @@ void animateClose(const Rect &srcRect, const Rect &dstRect) {
     animateOpenClose(ANIMATION_DURATION_CLOSE, srcRect, dstRect, false);
 }
 
-int g_spec;
-
 static Rect g_clipRect;
-
 int g_numRects;
-Rect g_srcRects[4];
-Rect g_dstRects[4];
-
 AnimRect g_animRects[MAX_ANIM_RECTS];
 
-void bitBltSpec(int i, void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, float opacity) {
-    int w = MIN(dw, sw);
-    int h = MIN(dh, sh);
-
-    if (i == g_spec) {
-        bitBlt(src, dst,
-            sx + (sw - w) / 2, sy + (sh - h) / 2, w, h,
-            dx + (dw - w) / 2, dy + (dh - h) / 2,
-			(uint8_t)round(opacity * 255));
-    } else {
-        bitBlt(src, dst,
-            (sw > dw ? sx : sx + (sw - w) / 2), (sh > dh ? sy : sy + (sh - h) / 2), w, h,
-            (dw > sw ? dx : dx + (dw - w) / 2), 
-            (dh > sh ? dy : dy + (dh - h) / 2),
-			(uint8_t)round(opacity * 255));
-    }
-}
-
 void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst) {
-    auto t1 = remapOutExp(t, 0, 0, 1, 1);
-	t = remapOutQuad(t, 0, 0, 1, 1);
-
-    bitBlt(bufferOld, bufferDst, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
-    setColor(0);
-    fillRect(bufferDst, g_clipRect.x + 0, g_clipRect.y + 0, g_clipRect.x + 480 - 1, g_clipRect.y + 240 - 1);
-    
-    for (int i = 0; i < 3; ++i) {
-        if (g_srcRects[i].x == g_dstRects[i].x && g_srcRects[i].y == g_dstRects[i].y && g_srcRects[i].w == g_dstRects[i].w && g_srcRects[i].h == g_dstRects[i].h) {
-            bitBlt(bufferNew, bufferDst, g_srcRects[i].x, g_srcRects[i].y, g_srcRects[i].x + g_srcRects[i].w - 1, g_srcRects[i].y + g_srcRects[i].h - 1);
-        } else {
-            bitBltSpec(i,
-                bufferOld, bufferDst,
-                g_srcRects[i].x, g_srcRects[i].y, g_srcRects[i].w, g_srcRects[i].h,
-                (int)roundf(g_srcRects[i].x + t * (g_dstRects[i].x - g_srcRects[i].x)),
-                (int)roundf(g_srcRects[i].y + t * (g_dstRects[i].y - g_srcRects[i].y)),
-                (int)roundf(g_srcRects[i].w + t * (g_dstRects[i].w - g_srcRects[i].w)),
-                (int)roundf(g_srcRects[i].h + t * (g_dstRects[i].h - g_srcRects[i].h)),
-                1 - t1);
-
-            bitBltSpec(i,
-                bufferNew, bufferDst,
-                g_dstRects[i].x, g_dstRects[i].y, g_dstRects[i].w, g_dstRects[i].h,
-                (int)roundf(g_srcRects[i].x + t * (g_dstRects[i].x - g_srcRects[i].x)),
-                (int)roundf(g_srcRects[i].y + t * (g_dstRects[i].y - g_srcRects[i].y)),
-                (int)roundf(g_srcRects[i].w + t * (g_dstRects[i].w - g_srcRects[i].w)),
-                (int)roundf(g_srcRects[i].h + t * (g_dstRects[i].h - g_srcRects[i].h)),
-                t1);
-        }
-    }
-}
-
-void animateRects() {
-    animate(BUFFER_OLD, 350, animateRectsStep);
-
-    g_clipRect.x = g_appContext->x;
-    g_clipRect.y = g_appContext->y;
-
-    if (g_appContext->x > 0) {
-        for (int i = 0; i < 3; i++) {
-            g_srcRects[i].x += g_appContext->x;
-            g_dstRects[i].x += g_appContext->x;
-        }
-    }
-
-    if (g_appContext->y > 0) {
-        for (int i = 0; i < 3; i++) {
-            g_srcRects[i].y += g_appContext->y;
-            g_dstRects[i].y += g_appContext->y;
-        }
-    }
-}
-
-void animateRectsStep2(float t, void *bufferOld, void *bufferNew, void *bufferDst) {
     bitBlt(g_animationState.startBuffer == BUFFER_OLD ? bufferOld : bufferNew, bufferDst, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
 
     float t1 = remapOutQuad(t, 0, 0, 1, 1);
-    float t2 = remapOutExp(t, 0, 0, 1, 1);
+    float t2 = remapOutCubic(t, 0, 0, 1, 1);
 
     for (int i = 0; i < g_numRects; i++) {
         AnimRect &animRect = g_animRects[i];
@@ -599,9 +521,9 @@ void animateRectsStep2(float t, void *bufferOld, void *bufferNew, void *bufferDs
                 if (srcRect.w < w) {
                     sx = srcRect.x;
                     sw = srcRect.w;
-                    dx = (w - srcRect.w) / 2;
+                    dx = x + (w - srcRect.w) / 2;
                 } else if (srcRect.w > w) {
-                    sx = (srcRect.w - w) / 2;
+                    sx = srcRect.x + (srcRect.w - w) / 2;
                     sw = w;
                     dx = x;
                 } else {
@@ -623,9 +545,9 @@ void animateRectsStep2(float t, void *bufferOld, void *bufferNew, void *bufferDs
                 if (srcRect.h < h) {
                     sy = srcRect.y;
                     sh = srcRect.h;
-                    dy = (h - srcRect.h) / 2;
+                    dy = y + (h - srcRect.h) / 2;
                 } else if (srcRect.h > h) {
-                    sy = (srcRect.h - h) / 2;
+                    sy = srcRect.y + (srcRect.h - h) / 2;
                     sh = h;
                     dy = y;
                 } else {
@@ -702,7 +624,7 @@ void prepareRect(Rect &rect) {
 }
 
 void animateRects(Buffer startBuffer, int numRects, uint32_t duration) {
-    animate(startBuffer, duration, animateRectsStep2);
+    animate(startBuffer, duration, animateRectsStep);
 
     g_numRects = numRects;
 
