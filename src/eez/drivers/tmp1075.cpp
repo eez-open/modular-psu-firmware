@@ -21,6 +21,7 @@
 #include <cmsis_os.h>
 #include <eez/drivers/tmp1075.h>
 #include <eez/debug.h>
+#include <eez/util.h>
 
 // TMP1075 Temperature Sensor With I2C
 // http://www.ti.com/lit/ds/symlink/tmp1075.pdf
