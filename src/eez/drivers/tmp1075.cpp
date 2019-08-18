@@ -59,7 +59,7 @@ float readTemperature(uint8_t slotIndex) {
         return NAN;
     }
 
-	float temperature = ((data[0] << 4) | (data[1] >> 4)) * 0.0625;
+	float temperature = roundPrec(((data[0] << 4) | (data[1] >> 4)) * 0.0625, 1);
     //DebugTrace("T on slot %d: %f\n", slotIndex + 1, temperature);
     return temperature;
 }

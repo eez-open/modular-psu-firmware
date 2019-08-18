@@ -50,7 +50,7 @@ float readTemperature(uint8_t slotIndex) {
         adc |= 0xE000;
     }
 
-    float temperature = roundPrec((int16_t)adc * 0.0625f, 0.1);
+    float temperature = roundPrec((int16_t)adc * 0.0625f, 1);
 
     return temperature;
 }
