@@ -95,7 +95,7 @@ enum Buffer {
 struct AnimationState {
     bool enabled;
     uint32_t startTime;
-    uint32_t duration;
+    float duration;
     Buffer startBuffer;
     void (*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst);
 };
@@ -129,18 +129,13 @@ struct AnimRect {
 
 extern AnimationState g_animationState;
 
-extern int g_spec;
-extern int g_numRects;
-extern Rect g_srcRects[4];
-extern Rect g_dstRects[4];
-
 #define MAX_ANIM_RECTS 10
 
 extern AnimRect g_animRects[MAX_ANIM_RECTS];
 
 void animateOpen(const Rect &srcRect, const Rect &dstRect);
 void animateClose(const Rect &srcRect, const Rect &dstRect);
-void animateRects(Buffer startBuffer, int numRects, uint32_t duration);
+void animateRects(Buffer startBuffer, int numRects);
 
 ////////////////////////////////////////////////////////////////////////////////
 

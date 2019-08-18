@@ -68,7 +68,7 @@ enum PersistConfSection {
 ////////////////////////////////////////////////////////////////////////////////
 
 static const uint16_t DEV_CONF_VERSION = 9;
-static const uint16_t DEV_CONF2_VERSION = 10;
+static const uint16_t DEV_CONF2_VERSION = 11;
 static const uint16_t CH_CAL_CONF_VERSION = 3;
 
 static const uint16_t PERSIST_CONF_DEVICE_ADDRESS = 1024;
@@ -260,6 +260,8 @@ static void initDevice2() {
 
     devConf2.displayBackgroundLuminosityStep = DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT;
 
+    devConf2.animationsDuration = CONF_DEFAULT_ANIMATIONS_DURATION;
+
 #if OPTION_DISPLAY
     onLuminocityChanged();
 #endif
@@ -279,6 +281,10 @@ void loadDevice2() {
 
         if (devConf2.header.version < 10) {
             devConf2.displayBackgroundLuminosityStep = DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT;
+        }
+
+        if (devConf2.header.version < 11) {
+            devConf2.animationsDuration = CONF_DEFAULT_ANIMATIONS_DURATION;
         }
 
 #if OPTION_DISPLAY
@@ -566,9 +572,19 @@ void toggleChannelsViewMode() {
     }
 }
 
+void setChannelsMaxView(int channelIndex) {
+    auto channelsIsMaxView = devConf.flags.channelsIsMaxView;
+    auto channelMax = devConf.flags.channelMax;
+
+    devConf.flags.channelsIsMaxView = 1;
+    devConf.flags.channelMax = channelIndex;
+
+    if (channelsIsMaxView != devConf.flags.channelsIsMaxView || channelMax != devConf.flags.channelMax) {
+        saveDevice();
+    }
+}
+
 void toggleChannelsMaxView(int channelIndex) {
-#if 1
-    // method 1: always the same order of small channels
     if (devConf.flags.channelsIsMaxView) {
         if (channelIndex == devConf.flags.channelMax) {
             devConf.flags.channelsIsMaxView = 0;
@@ -592,43 +608,7 @@ void toggleChannelsMaxView(int channelIndex) {
             devConf.flags.channelSmall2 = 2;
         }
     }
-#else
-    // method 2: swap max and small channel
-    if (devConf.flags.channelsIsMaxView) {
-        if (channelIndex == devConf.flags.channelMax) {
-            devConf.flags.channelsIsMaxView = 0;
-        } else {
-            if (devConf.flags.channelSmall1 == channelIndex) {
-                devConf.flags.channelSmall1 = devConf.flags.channelMax;
-            } else {
-                devConf.flags.channelSmall2 = devConf.flags.channelMax;
-            }
-            devConf.flags.channelMax = channelIndex;
-        }
-    } else {
-        devConf.flags.channelsIsMaxView = 1;
-        if (devConf.flags.channelMax != channelIndex) {
-            if (devConf.flags.channelSmall1 == channelIndex) {
-                devConf.flags.channelSmall1 = devConf.flags.channelMax;
-            } else if (devConf.flags.channelSmall2 == channelIndex) {
-                devConf.flags.channelSmall2 = devConf.flags.channelMax;
-            }
-            else {
-                if (channelIndex == 1) {
-                    devConf.flags.channelSmall1 = 2;
-                    devConf.flags.channelSmall2 = 3;
-                } else if (channelIndex == 2) {
-                    devConf.flags.channelSmall1 = 1;
-                    devConf.flags.channelSmall2 = 3;
-                } else {
-                    devConf.flags.channelSmall1 = 1;
-                    devConf.flags.channelSmall2 = 2;
-                }
-            }
-            devConf.flags.channelMax = channelIndex;
-        }
-    }
-#endif
+
     saveDevice();
 }
 
@@ -1138,6 +1118,11 @@ bool setSdLocked(bool sdLocked) {
 
 bool isSdLocked() {
     return devConf2.flags.sdLocked ? true : false;
+}
+
+void setAnimationsDuration(float value) {
+    devConf2.animationsDuration = value;
+    saveDevice2();
 }
 
 } // namespace persist_conf

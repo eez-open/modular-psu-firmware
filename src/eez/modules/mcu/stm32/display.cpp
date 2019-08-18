@@ -346,7 +346,7 @@ void animate() {
     uint16_t *bufferDst = nullptr;
 
     while (true) {
-        float t = 1.0f * (millis() - g_animationState.startTime) / g_animationState.duration;
+        float t = (millis() - g_animationState.startTime) / (1000.0f * psu::persist_conf::devConf2.animationsDuration);
         if (t >= 1.0f) {
             g_animationState.enabled = false;
             break;

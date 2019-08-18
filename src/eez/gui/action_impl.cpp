@@ -508,17 +508,23 @@ void action_toggle_channels_view_mode() {
 void action_toggle_channels_max_view() {
     selectChannel();
 
-    auto channelsIsMaxView = persist_conf::devConf.flags.channelsIsMaxView;
-    auto channelMax = persist_conf::devConf.flags.channelMax;
-
-    persist_conf::toggleChannelsMaxView(g_channel->index);
-    
-    if (!channelsIsMaxView && persist_conf::devConf.flags.channelsIsMaxView) {
-        animateFromDefaultViewToMaxView();
-    } else if (channelsIsMaxView && !persist_conf::devConf.flags.channelsIsMaxView) {
-        animateFromMaxViewToDefaultView();
+    if (getActivePageId() != PAGE_ID_MAIN) {
+        showMainPage();
+        persist_conf::setChannelsMaxView(g_channel->index);
+        animateFromMicroViewToMaxView();
     } else {
-        animateFromMinViewToMaxView(channelMax);
+        auto channelsIsMaxView = persist_conf::devConf.flags.channelsIsMaxView;
+        auto channelMax = persist_conf::devConf.flags.channelMax;
+
+        persist_conf::toggleChannelsMaxView(g_channel->index);
+        
+        if (!channelsIsMaxView && persist_conf::devConf.flags.channelsIsMaxView) {
+            animateFromDefaultViewToMaxView();
+        } else if (channelsIsMaxView && !persist_conf::devConf.flags.channelsIsMaxView) {
+            animateFromMaxViewToDefaultView();
+        } else {
+            animateFromMinViewToMaxView(channelMax);
+        }
     }
 }
 
@@ -895,6 +901,27 @@ void onSetSelectedThemeIndex(uint8_t value) {
 
 void action_select_theme() {
     pushSelectFromEnumPage(themesEnumDefinition, persist_conf::devConf2.selectedThemeIndex, NULL, onSetSelectedThemeIndex);
+}
+
+void onSetAnimationsDuration(float value) {
+    popPage();
+    psu::persist_conf::setAnimationsDuration(value);
+}
+
+void action_edit_animations_duration() {
+    NumericKeypadOptions options;
+
+    options.editValueUnit = UNIT_SECOND;
+
+    options.min = 0.0f;
+    options.max = 2.0f;
+    options.def = CONF_DEFAULT_ANIMATIONS_DURATION;
+
+    options.enableDefButton();
+    options.flags.signButtonEnabled = false;
+    options.flags.dotButtonEnabled = true;
+
+    NumericKeypad::start(0, data::Value(psu::persist_conf::devConf2.animationsDuration, UNIT_SECOND), options, onSetAnimationsDuration, 0, 0);
 }
 
 void action_test() {

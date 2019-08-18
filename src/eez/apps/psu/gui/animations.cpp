@@ -24,8 +24,6 @@
 #include <eez/apps/psu/gui/animations.h>
 #include <eez/gui/gui.h>
 
-#define DURATION 250
-
 static const Rect g_workingAreaRect = { 0, 0, 480, 240 };
 
 static const Rect g_statusLineRects[] = {
@@ -72,8 +70,6 @@ void animateFromDefaultViewToMaxView() {
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 
-    g_numRects = 3;
-
     auto g_defRects = psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
         psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
 
@@ -89,7 +85,7 @@ void animateFromDefaultViewToMaxView() {
     g_animRects[i++] = { BUFFER_NEW, g_defRects[iMin2], g_minRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_defRects[iMax], g_maxRect, 0, OPACITY_FADE_IN, POSITION_BOTTOM};
     
-    animateRects(BUFFER_OLD, i, DURATION);
+    animateRects(BUFFER_OLD, i);
 }
 
 void animateFromMaxViewToDefaultView() {
@@ -112,7 +108,7 @@ void animateFromMaxViewToDefaultView() {
     g_animRects[i++] = { BUFFER_NEW, g_minRects[1], g_defRects[iMin2], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_maxRect, g_defRects[iMax], 0, OPACITY_FADE_IN, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
 
-    animateRects(BUFFER_OLD, i, DURATION);
+    animateRects(BUFFER_OLD, i);
 }
 
 void animateFromMinViewToMaxView(int iMaxBefore) {
@@ -156,7 +152,30 @@ void animateFromMinViewToMaxView(int iMaxBefore) {
         g_animRects[i++] = { BUFFER_NEW, g_minRects[1], g_maxRect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
     }
 
-    animateRects(BUFFER_OLD, i, DURATION);
+    animateRects(BUFFER_OLD, i);
+}
+
+void animateFromMicroViewToMaxView() {
+    int iMax = g_channel->index - 1;
+    int iMin1 = iMax == 0 ? 1 : 0;
+    int iMin2 = iMax == 2 ? 1 : 2;
+
+    auto g_defRects = psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
+        psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
+
+    int i = 0;
+
+    g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+    g_animRects[i++] = { BUFFER_OLD, g_microRects[iMin1], g_minRects[0], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_OLD, g_microRects[iMin2], g_minRects[1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_OLD, g_microRects[iMax], g_maxRect, 0, OPACITY_FADE_OUT, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
+
+    g_animRects[i++] = { BUFFER_NEW, g_microRects[iMin1], g_minRects[0], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_microRects[iMin2], g_minRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_microRects[iMax], g_maxRect, 0, OPACITY_FADE_IN, POSITION_BOTTOM};
+    
+    animateRects(BUFFER_OLD, i);
 }
 
 void animateShowSysSettings() {
@@ -179,7 +198,7 @@ void animateShowSysSettings() {
 
     g_animRects[i++] = { BUFFER_NEW, g_statusLineRects[0], g_statusLineRects[1], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    animateRects(BUFFER_OLD, i, DURATION);
+    animateRects(BUFFER_OLD, i);
 }
 
 void animateHideSysSettings() {
@@ -202,7 +221,7 @@ void animateHideSysSettings() {
 
     g_animRects[i++] = { BUFFER_OLD, g_statusLineRects[1], g_statusLineRects[0], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    animateRects(BUFFER_NEW, i, DURATION);
+    animateRects(BUFFER_NEW, i);
 }
 
 } // namespace gui

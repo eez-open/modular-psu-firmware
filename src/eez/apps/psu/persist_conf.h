@@ -152,7 +152,8 @@ struct DeviceConfiguration2 {
     IOPin ioPinInput2;
 	uint8_t selectedThemeIndex;
     uint8_t ytGraphUpdateMethod;
-    uint8_t reserverd[21];
+    float animationsDuration;
+    uint8_t reserved[16];
 };
 
 static const uint16_t PROFILE_VERSION = 8;
@@ -206,6 +207,7 @@ void setChannelsViewModeInMax(unsigned int viewModeInMax);
 
 void toggleChannelsViewMode();
 
+void setChannelsMaxView(int channelIndex); // channelIndex starts from 1
 void toggleChannelsMaxView(int channelIndex); // channelIndex starts from 1
 
 void loadChannelCalibration(Channel &channel);
@@ -265,6 +267,8 @@ bool setNtpSettings(bool enable, const char *ntpServer);
 
 bool setSdLocked(bool sdLocked);
 bool isSdLocked();
+
+void setAnimationsDuration(float value);
 
 } // namespace persist_conf
 } // namespace psu

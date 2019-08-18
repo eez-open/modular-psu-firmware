@@ -301,3 +301,6 @@
 
 /// Size of serial port output buffer
 #define CONF_SERIAL_BUFFER_SIZE 1024
+
+// Default duration of all animations in seconds
+#define CONF_DEFAULT_ANIMATIONS_DURATION 0.25f

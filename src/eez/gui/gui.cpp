@@ -296,14 +296,6 @@ bool isFrontPanelLocked() {
 
 using namespace mcu::display;
 
-#ifdef EEZ_PLATFORM_SIMULATOR
-#define ANIMATION_DURATION_OPEN 250
-#define ANIMATION_DURATION_CLOSE 250
-#else
-#define ANIMATION_DURATION_OPEN 250
-#define ANIMATION_DURATION_CLOSE 250
-#endif
-
 AnimationState g_animationState;
 static bool g_animationStateDirection;
 static Rect g_animationStateSrcRect;
@@ -415,31 +407,31 @@ void animateOpenCloseCallback(float t, void *bufferOld, void *bufferNew, void *b
     bitBlt(bufferNew, bufferDst, x1, y1, x2, y2);
 }
 
-void animate(Buffer startBuffer, uint32_t duration, void(*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst)) {
+void animate(Buffer startBuffer, void(*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst)) {
     g_animationState.enabled = true;
     g_animationState.startTime = millis();
-    g_animationState.duration = duration;
+    g_animationState.duration = psu::persist_conf::devConf2.animationsDuration;
     g_animationState.startBuffer = startBuffer;
     g_animationState.callback = callback;
 }
 
-void animateOpenClose(uint32_t duration, const Rect &srcRect, const Rect &dstRect, bool direction) {
-    animate(BUFFER_OLD, duration, animateOpenCloseCallback);
+void animateOpenClose(const Rect &srcRect, const Rect &dstRect, bool direction) {
+    animate(BUFFER_OLD, animateOpenCloseCallback);
     g_animationStateSrcRect = srcRect;
     g_animationStateDstRect = dstRect;
     g_animationStateDirection = direction;
 }
 
 void animateOpen(const Rect &srcRect, const Rect &dstRect) {
-    animateOpenClose(ANIMATION_DURATION_OPEN, srcRect, dstRect, true);
+    animateOpenClose(srcRect, dstRect, true);
 }
 
 void animateClose(const Rect &srcRect, const Rect &dstRect) {
-    animateOpenClose(ANIMATION_DURATION_CLOSE, srcRect, dstRect, false);
+    animateOpenClose(srcRect, dstRect, false);
 }
 
 static Rect g_clipRect;
-int g_numRects;
+static int g_numRects;
 AnimRect g_animRects[MAX_ANIM_RECTS];
 
 void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst) {
@@ -608,23 +600,16 @@ void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst
 }
 
 void prepareRect(Rect &rect) {
-    if (rect.x == -1 && rect.y == -1 && rect.w == -1 && rect.h == -1) {
-        rect.x = 0;
-        rect.y = 0;
-        rect.w = getDisplayWidth();
-        rect.h = getDisplayHeight();
-    } else {
-        if (g_appContext->x > 0) {
-            rect.x += g_appContext->x;
-        }
-        if (g_appContext->y > 0) {
-            rect.y += g_appContext->y;
-        }
+    if (g_appContext->x > 0) {
+        rect.x += g_appContext->x;
+    }
+    if (g_appContext->y > 0) {
+        rect.y += g_appContext->y;
     }
 }
 
-void animateRects(Buffer startBuffer, int numRects, uint32_t duration) {
-    animate(startBuffer, duration, animateRectsStep);
+void animateRects(Buffer startBuffer, int numRects) {
+    animate(startBuffer, animateRectsStep);
 
     g_numRects = numRects;
 

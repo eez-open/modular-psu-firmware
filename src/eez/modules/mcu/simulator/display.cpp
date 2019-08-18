@@ -247,7 +247,7 @@ void animate() {
     }
 
     while (true) {
-        float t = 1.0f * (millis() - g_animationState.startTime) / g_animationState.duration;
+        float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
         if (t >= 1.0f) {
             g_animationState.enabled = false;
             break;
