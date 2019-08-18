@@ -264,22 +264,22 @@ void animate() {
 }
 
 void sync() {
+    if (g_animationState.enabled) {
+        animate();
+    }
+
+#ifdef __EMSCRIPTEN__
+    if (g_animationState.enabled) {
+        return;
+    }
+#endif
+
     if (isOn() && g_painted) {
         g_painted = false;
 
         if (g_mainWindow == nullptr) {
             init();
         }
-
-        if (g_animationState.enabled) {
-            animate();
-        }
-
-#ifdef __EMSCRIPTEN__
-        if (g_animationState.enabled) {
-            return;
-        }
-#endif
 
         updateScreen(g_frontPanelBuffer);
 
