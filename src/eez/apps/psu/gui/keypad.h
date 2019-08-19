@@ -86,7 +86,10 @@ class Keypad : public eez::gui::Page {
                void (*ok)(char *), void (*cancel)());
 };
 
+class NumericKeypad;
+
 Keypad *getActiveKeypad();
+NumericKeypad *getActiveNumericKeypad();
 
 } // namespace gui
 } // namespace psu

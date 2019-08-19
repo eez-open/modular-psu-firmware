@@ -75,18 +75,8 @@ void SetPage::discard() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-InternalPage::InternalPage() {
-    shadowIsDrawn = false;
-}
-
 void InternalPage::drawShadow() {
-    if (shadowIsDrawn) {
-        return;
-    }
-
     gui::drawShadow(x, y, x + width - 1, y + height - 1);
-
-    shadowIsDrawn = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,37 +85,46 @@ ToastMessagePage::ToastMessagePage(ToastType type_, const char *message1_)
     : type(type_), message1(message1_), message2(nullptr), message3(nullptr)
 {
     actionWidget.action = 0;
+    appContext = g_appContext;
 }
 
 ToastMessagePage::ToastMessagePage(ToastType type_, data::Value message1Value_) 
     : type(type_), message1(nullptr), message1Value(message1Value_), message2(nullptr), message3(nullptr)
 {
     actionWidget.action = 0;
+    appContext = g_appContext;
 }
 
 ToastMessagePage::ToastMessagePage(ToastType type_, const char *message1_, const char *message2_) 
     : type(type_), message1(message1_), message2(message2_), message3(nullptr)
 {
     actionWidget.action = 0;
+    appContext = g_appContext;
 }
 
 ToastMessagePage::ToastMessagePage(ToastType type_, const char *message1_, const char *message2_, const char *message3_) 
     : type(type_), message1(message1_), message2(message2_), message3(message3_)
 {
     actionWidget.action = 0;
+    appContext = g_appContext;
 }
 
 ToastMessagePage::ToastMessagePage(ToastType type_, data::Value message1Value_, void (*action)(int param), const char *actionLabel, int actionParam) 
     : type(type_), message1(nullptr), message1Value(message1Value_), message2(actionLabel), message3(nullptr), actionWidgetIsActive(false)
 {
     actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION;
-    g_appContext->m_toastAction = action;
-    g_appContext->m_toastActionParam = actionParam;
+    appContext = g_appContext;
+    appContext->m_toastAction = action;
+    appContext->m_toastActionParam = actionParam;
 }
 
-void ToastMessagePage::refresh() {
+void ToastMessagePage::pageFree() {
+    delete this;
+}
+
+void ToastMessagePage::refresh(bool doNotDrawShadow) {
     const Style *style = getStyle(
-        type == INFO_TOAST ? STYLE_ID_INFO_ALERT : 
+        type == INFO_TOAST ? STYLE_ID_INFO_ALERT :
         STYLE_ID_ERROR_ALERT);
 
     font::Font font = styleGetFont(style);
@@ -137,30 +136,32 @@ void ToastMessagePage::refresh() {
         message1 = message1TextBuffer;
     }
 
-    int minTextWidth = g_appContext->width / 2;
+    int minTextWidth = appContext->width / 2;
     int textWidth1 = display::measureStr(message1, -1, font, 0);
     int textWidth2 = message2 ? display::measureStr(message2, -1, font, 0) : 0;
     int textWidth3 = message3 ? display::measureStr(message3, -1, font, 0) : 0;
     int textWidth = MAX(minTextWidth, MAX(MAX(textWidth1, textWidth2), textWidth3));
     int textHeight = font.getHeight();
 
-    width = style->border_size_left + style->padding_left + 
+    width = style->border_size_left + style->padding_left +
         textWidth +
         style->padding_right + style->border_size_right;
 
-    height = style->border_size_top + style->padding_top + 
+    height = style->border_size_top + style->padding_top +
         ((message3 || actionWidget.action) ? 3 : message2 ? 2 : 1) * textHeight +
         style->padding_bottom + style->border_size_bottom;
 
-	x = g_appContext->x + (g_appContext->width - width) / 2;
-	y = g_appContext->y + (g_appContext->height - height) / 2;
+	x = appContext->x + (appContext->width - width) / 2;
+	y = appContext->y + (appContext->height - height) / 2;
 
     int x1 = x;
     int y1 = y;
     int x2 = x + width - 1;
     int y2 = y + height - 1;
 
-    drawShadow();
+    if (!doNotDrawShadow) {
+        drawShadow();
+    }
 
     int borderRadius = style->border_radius;
     if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
@@ -236,19 +237,19 @@ void ToastMessagePage::refresh() {
 }
 
 void ToastMessagePage::updatePage() {
-    if (actionWidgetIsActive != isActiveWidget(WidgetCursor(g_appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0))) {
+    if (actionWidgetIsActive != isActiveWidget(WidgetCursor(appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0))) {
         actionWidgetIsActive = !actionWidgetIsActive;
-        refresh();
+        refresh(true);
     }
 }
 
 WidgetCursor ToastMessagePage::findWidget(int x, int y) {
     if (x >= this->x && x < this->x + width && y >= this->y && y < this->y + height) {
         if (actionWidget.action && x >= actionWidget.x && x < actionWidget.x + actionWidget.w && y >= actionWidget.y && y < actionWidget.y + actionWidget.h) {
-            return WidgetCursor(g_appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0);
+            return WidgetCursor(appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0);
         }
         widget.action = ACTION_ID_INTERNAL_DIALOG_YES;
-        return WidgetCursor(g_appContext, &widget, x, y, -1, 0, 0);
+        return WidgetCursor(appContext, &widget, x, y, -1, 0, 0);
     }
     
     return WidgetCursor();
@@ -323,8 +324,6 @@ void SelectFromEnumPage::init() {
     }
 
     findPagePosition();
-
-    shadowIsDrawn = false;
 }
 
 uint8_t SelectFromEnumPage::getValue(int i) {
@@ -368,8 +367,10 @@ void SelectFromEnumPage::findPagePosition() {
 	}
 }
 
-void SelectFromEnumPage::refresh() {
-    drawShadow();
+void SelectFromEnumPage::refresh(bool doNotDrawShadow) {
+    if (!doNotDrawShadow) {
+        drawShadow();
+    }
 
     const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
 	const Style *itemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
@@ -396,7 +397,7 @@ void SelectFromEnumPage::refresh() {
 
 void SelectFromEnumPage::updatePage() {
     if (dirty) {
-        refresh();
+        refresh(true);
     }
 }
 

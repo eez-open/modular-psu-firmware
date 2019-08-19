@@ -72,7 +72,7 @@ Channel *g_channel;
 static WidgetCursor g_toggleOutputWidgetCursor;
 
 bool showSetupWizardQuestion();
-void onEncoder(int tickCount, int counter, bool clicked);
+void onEncoder(int counter, bool clicked);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -85,15 +85,13 @@ void PsuAppContext::stateManagment() {
 
     // TODO move this to some other place
 #if OPTION_ENCODER
-    uint32_t tickCount = micros();
-
     int counter;
     bool clicked;
-    mcu::encoder::read(tickCount, counter, clicked);
+    mcu::encoder::read(counter, clicked);
     if (counter != 0 || clicked) {
         idle::noteEncoderActivity();
     }
-    onEncoder(tickCount, counter, clicked);
+    onEncoder(counter, clicked);
 #endif
 
     int activePageId = getActivePageId();
@@ -117,7 +115,7 @@ void PsuAppContext::stateManagment() {
     }
 
     // show startup wizard
-    if (!isFrontPanelLocked() && activePageId == PAGE_ID_MAIN && int32_t(tickCount - getShowPageTime()) >= 50000L) {
+    if (!isFrontPanelLocked() && activePageId == PAGE_ID_MAIN && int32_t(micros() - getShowPageTime()) >= 50000L) {
         if (showSetupWizardQuestion()) {
             return;
         }
@@ -627,10 +625,15 @@ bool onEncoderConfirmation() {
     return false;
 }
 
-void onEncoder(int tickCount, int counter, bool clicked) {
+void onEncoder(int counter, bool clicked) {
+    if (isFrontPanelLocked()) {
+        return;
+    }
+
+    uint32_t tickCount = micros();
+
     // wait for confirmation of changed value ...
-    if (isFocusChanged() &&
-        tickCount - g_focusEditValueChangedTime >= ENCODER_CHANGE_TIMEOUT * 1000000L) {
+    if (isFocusChanged() && tickCount - g_focusEditValueChangedTime >= ENCODER_CHANGE_TIMEOUT * 1000000L) {
         // ... on timeout discard changed value
         g_focusEditValue = data::Value();
     }
@@ -640,10 +643,6 @@ void onEncoder(int tickCount, int counter, bool clicked) {
     }
 
     if (counter != 0) {
-        if (isFrontPanelLocked()) {
-            return;
-        }
-
         if (!isEnabledFocusCursor(g_focusCursor, g_focusDataId)) {
             moveToNextFocusCursor();
         }
@@ -658,8 +657,11 @@ void onEncoder(int tickCount, int counter, bool clicked) {
                 value = data::getEditValue(g_focusCursor, g_focusDataId);
             }
 
-            float newValue =
-                value.getFloat() + (value.getUnit() == UNIT_AMPER ? 0.001f : 0.01f) * counter;
+            float oldValue = value.getFloat();
+
+            float factor = Channel::get(g_focusCursor.i).getValuePrecision(value.getUnit(), oldValue);
+
+            float newValue = oldValue + factor * counter;
 
             newValue = Channel::get(g_focusCursor.i).roundChannelValue(value.getUnit(), newValue);
 
@@ -668,10 +670,16 @@ void onEncoder(int tickCount, int counter, bool clicked) {
                 newValue = min;
             }
 
+            float limit = data::getLimit(g_focusCursor, g_focusDataId).getFloat();
+            if (newValue > limit && oldValue < limit) {
+                newValue = limit;
+            }
+
             float max = data::getMax(g_focusCursor, g_focusDataId).getFloat();
             if (newValue > max) {
                 newValue = max;
             }
+
 
             if (persist_conf::devConf2.flags.encoderConfirmationMode) {
                 g_focusEditValue = MakeValue(newValue, value.getUnit());

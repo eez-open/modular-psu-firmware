@@ -827,6 +827,21 @@ int16_t Channel::remapCurrentToAdcData(float value) {
                           (float)AnalogDigitalConverter::ADC_MAX);
 }
 
+float Channel::getValuePrecision(Unit unit, float value) const {
+    if (unit == UNIT_VOLT) {
+        return getVoltagePrecision();
+    } else if (unit == UNIT_AMPER) {
+        return getCurrentPrecision(value);
+    } else if (unit == UNIT_WATT) {
+        return getPowerPrecision();
+    } else if (unit == UNIT_CELSIUS) {
+        return 1;
+    } else if (unit == UNIT_SECOND) {
+        return 0.001f;
+    }
+    return 1;
+}
+
 float Channel::getVoltagePrecision() const {
     float precision = 0.005f; // 5 mV;
 

@@ -603,8 +603,7 @@ void SysSettingsEncoderPage::toggleConfirmationMode() {
 }
 
 int SysSettingsEncoderPage::getDirty() {
-    return origConfirmationMode != confirmationMode || origMovingSpeedDown != movingSpeedDown ||
-           origMovingSpeedUp != movingSpeedUp;
+    return origConfirmationMode != confirmationMode || origMovingSpeedDown != movingSpeedDown || origMovingSpeedUp != movingSpeedUp;
 }
 
 void SysSettingsEncoderPage::set() {

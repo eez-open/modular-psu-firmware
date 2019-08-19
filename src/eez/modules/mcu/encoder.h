@@ -30,7 +30,7 @@ static const uint8_t DEFAULT_MOVING_UP_SPEED = 6;
 bool onSystemStateChanged();
 
 void init();
-void read(uint32_t tickCount, int &counter, bool &clicked);
+void read(int &counter, bool &clicked);
 
 void enableAcceleration(bool enable);
 void setMovingSpeed(uint8_t down, uint8_t up);

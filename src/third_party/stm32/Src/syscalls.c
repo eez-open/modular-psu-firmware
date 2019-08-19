@@ -85,6 +85,7 @@ int _kill(int pid, int sig)
 void _exit (int status)
 {
 	_kill(status, -1);
+	NVIC_SystemReset();
 	while (1) {}		/* Make sure we hang here */
 }
 

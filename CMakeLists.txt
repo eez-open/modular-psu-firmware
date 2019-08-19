@@ -22,6 +22,8 @@ else()
     add_definitions(-DOPTION_ETHERNET=1)
 endif()
 
+add_definitions(-DDEBUG)
+
 add_definitions(-DHAVE_STRTOLL)
 add_definitions(-DHAVE_STDBOOL)
 add_definitions(-DSCPI_USER_CONFIG)

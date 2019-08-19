@@ -78,6 +78,25 @@ Keypad *getActiveKeypad() {
     return 0;
 }
 
+NumericKeypad *getActiveNumericKeypad() {
+    if (getActivePageId() == PAGE_ID_NUMERIC_KEYPAD) {
+        return (NumericKeypad *)getActivePage();
+    }
+    
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    if (getActivePageId() == PAGE_ID_NUMERIC_KEYPAD2) {
+        return (NumericKeypad *)getActivePage();
+    }
+#endif
+
+    if (getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD) {
+        return edit_mode_keypad::g_keypad;
+    }
+    
+    return 0;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void Keypad::pageAlloc() {

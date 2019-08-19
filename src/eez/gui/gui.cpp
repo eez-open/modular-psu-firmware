@@ -113,7 +113,7 @@ void oneIter() {
     g_appContext->x = 0;
     g_appContext->y = 0;
     g_appContext->width = mcu::display::getDisplayWidth();
-    g_appContext->height = mcu::display::getDisplayWidth();
+    g_appContext->height = mcu::display::getDisplayHeight();
 
     eventHandling();
     stateManagment();

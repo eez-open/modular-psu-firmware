@@ -218,7 +218,9 @@ scpi_result_t scpi_cmd_debugMeasureVoltage(scpi_t *context) {
 
     while (true) {
         uint32_t tickCount = micros();
+#if OPTION_WATCHDOG
         watchdog::tick(tickCount);
+#endif
         temperature::tick(tickCount);
         fan::tick(tickCount);
 
@@ -260,7 +262,9 @@ scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
 
     while (true) {
         uint32_t tickCount = micros();
+#if OPTION_WATCHDOG        
         watchdog::tick(tickCount);
+#endif
         temperature::tick(tickCount);
         fan::tick(tickCount);
 
@@ -366,7 +370,7 @@ scpi_result_t scpi_cmd_debugCsvQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
-#ifdef DEBUG
+#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     uint8_t ch = psu_context->selected_channel_index;
     Channel *channel = &Channel::get(ch - 1);
@@ -404,7 +408,7 @@ scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
-#ifdef DEBUG
+#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     uint8_t ch = psu_context->selected_channel_index;
     Channel *channel = &Channel::get(ch - 1);

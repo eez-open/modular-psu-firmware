@@ -152,23 +152,23 @@ bool AppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
 }
 
 int AppContext::transformStyle(const Widget *widget) {
-    if (isFrontPanelLocked()) {
-        if (widget->action) {
-            if (widget->style == STYLE_ID_BOTTOM_BUTTON) {
-                if (widget->action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
-                    return STYLE_ID_BOTTOM_BUTTON_DISABLED;
-                }
-            } else if (widget->style == STYLE_ID_EDIT_S) {
-                return STYLE_ID_DEFAULT_S;
-            } else if (widget->style == STYLE_ID_MON_VALUE) {
-                return STYLE_ID_DEFAULT;
-            } else if (widget->style == STYLE_ID_CHANNEL_OFF) {
-                return STYLE_ID_CHANNEL_OFF_DISABLED;
-            } else if (widget->style == STYLE_ID_EDIT_VALUE_ACTIVE_S_RIGHT) {
-                return STYLE_ID_EDIT_VALUE_S_RIGHT;
-            }
-        }
-    }
+    // if (isFrontPanelLocked()) {
+    //     if (widget->action) {
+    //         if (widget->style == STYLE_ID_BOTTOM_BUTTON) {
+    //             if (widget->action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
+    //                 return STYLE_ID_BOTTOM_BUTTON_DISABLED;
+    //             }
+    //         } else if (widget->style == STYLE_ID_EDIT_S) {
+    //             return STYLE_ID_DEFAULT_S;
+    //         } else if (widget->style == STYLE_ID_MON_VALUE) {
+    //             return STYLE_ID_DEFAULT;
+    //         } else if (widget->style == STYLE_ID_CHANNEL_OFF) {
+    //             return STYLE_ID_CHANNEL_OFF_DISABLED;
+    //         } else if (widget->style == STYLE_ID_EDIT_VALUE_ACTIVE_S_RIGHT) {
+    //             return STYLE_ID_EDIT_VALUE_S_RIGHT;
+    //         }
+    //     }
+    // }
 
     return widget->style;
 }
@@ -463,7 +463,7 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
         }
     }
 
-    bool repaint = false;
+    bool repaint = i + 1 < m_pageNavigationStackPointer;
 
     m_activePageIdSaved = m_activePageId;
     Page *activePageSaved = m_activePage;
@@ -480,7 +480,7 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
         m_activePage = m_pageNavigationStack[i].page;
         updatePage(m_pageNavigationStack[i].repaint || repaint, widgetCursor);
         
-        repaint = mcu::display::g_painted;
+        repaint |= mcu::display::g_painted;
         mcu::display::g_painted = paintedSaved;
 
         m_pageNavigationStack[i].repaint = false;

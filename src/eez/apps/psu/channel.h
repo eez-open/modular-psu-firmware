@@ -603,6 +603,8 @@ class Channel {
 
     bool isMicroAmperAllowed() const;
 
+    float getValuePrecision(Unit unit, float value) const;
+
     float roundChannelValue(Unit unit, float value) const;
 
   private:

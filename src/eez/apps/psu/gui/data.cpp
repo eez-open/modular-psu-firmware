@@ -1287,119 +1287,73 @@ void data_keypad_caps(data::DataOperationEnum operation, data::Cursor &cursor, d
     }
 }
 
-void data_keypad_option1_text(data::DataOperationEnum operation, data::Cursor &cursor,
-                              data::Value &value) {
+void data_keypad_option1_text(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        NumericKeypad *page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD);
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        if (!page) {
-            page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD2);
-        }
-#endif
-        if (page) {
-            value = data::Value(page->m_options.flags.option1ButtonEnabled
-                                    ? page->m_options.option1ButtonText
-                                    : "");
+        NumericKeypad *keypad = getActiveNumericKeypad();
+        if (keypad) {
+            value = data::Value(keypad->m_options.flags.option1ButtonEnabled ? keypad->m_options.option1ButtonText : "");
         }
     }
 }
 
-void data_keypad_option1_enabled(data::DataOperationEnum operation, data::Cursor &cursor,
-                                 data::Value &value) {
+void data_keypad_option1_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        NumericKeypad *page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD);
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        if (!page) {
-            page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD2);
-        }
-#endif
-        if (page) {
-            value = (int)page->m_options.flags.option1ButtonEnabled;
+        NumericKeypad *keypad = getActiveNumericKeypad();
+        if (keypad) {
+            value = (int)keypad->m_options.flags.option1ButtonEnabled;
         }
     }
 }
 
-void data_keypad_option2_text(data::DataOperationEnum operation, data::Cursor &cursor,
-                              data::Value &value) {
+void data_keypad_option2_text(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        NumericKeypad *page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD);
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        if (!page) {
-            page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD2);
-        }
-#endif
-        if (page) {
-            value = data::Value(page->m_options.flags.option2ButtonEnabled
-                                    ? page->m_options.option2ButtonText
-                                    : "");
+        NumericKeypad *keypad = getActiveNumericKeypad();
+        if (keypad) {
+            value = data::Value(keypad->m_options.flags.option2ButtonEnabled ? keypad->m_options.option2ButtonText : "");
         }
     }
 }
 
-void data_keypad_option2_enabled(data::DataOperationEnum operation, data::Cursor &cursor,
-                                 data::Value &value) {
+void data_keypad_option2_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        NumericKeypad *page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD);
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        if (!page) {
-            page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD2);
-        }
-#endif
-        if (page) {
-            value = (int)page->m_options.flags.option2ButtonEnabled;
+        NumericKeypad *keypad = getActiveNumericKeypad();
+        if (keypad) {
+            value = (int)keypad->m_options.flags.option2ButtonEnabled;
         }
     }
 }
 
-void data_keypad_sign_enabled(data::DataOperationEnum operation, data::Cursor &cursor,
-                              data::Value &value) {
+void data_keypad_sign_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        NumericKeypad *page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD);
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        if (!page) {
-            page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD2);
-        }
-#endif
-        if (page) {
-            value = (int)page->m_options.flags.signButtonEnabled;
+        NumericKeypad *keypad = getActiveNumericKeypad();
+        if (keypad) {
+            value = (int)keypad->m_options.flags.signButtonEnabled;
         }
     }
 }
 
-void data_keypad_dot_enabled(data::DataOperationEnum operation, data::Cursor &cursor,
-                             data::Value &value) {
+void data_keypad_dot_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        NumericKeypad *page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD);
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        if (!page) {
-            page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD2);
-        }
-#endif
-        if (page) {
-            value = (int)page->m_options.flags.dotButtonEnabled;
+        NumericKeypad *keypad = getActiveNumericKeypad();
+        if (keypad) {
+            value = (int)keypad->m_options.flags.dotButtonEnabled;
         }
     }
 }
 
-void data_keypad_unit_enabled(data::DataOperationEnum operation, data::Cursor &cursor,
-                              data::Value &value) {
+void data_keypad_unit_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        NumericKeypad *page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD);
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        if (!page) {
-            page = (NumericKeypad *)getPage(PAGE_ID_NUMERIC_KEYPAD2);
-        }
-#endif
-        if (page) {
-            value = page->m_options.editValueUnit == UNIT_VOLT ||
-                    page->m_options.editValueUnit == UNIT_MILLI_VOLT ||
-                    page->m_options.editValueUnit == UNIT_AMPER ||
-                    page->m_options.editValueUnit == UNIT_MILLI_AMPER ||
-                    page->m_options.editValueUnit == UNIT_MICRO_AMPER ||
-                    page->m_options.editValueUnit == UNIT_WATT ||
-                    page->m_options.editValueUnit == UNIT_MILLI_WATT ||
-                    page->m_options.editValueUnit == UNIT_SECOND ||
-                    page->m_options.editValueUnit == UNIT_MILLI_SECOND;
+        NumericKeypad *keypad = getActiveNumericKeypad();
+        if (keypad) {
+            value = keypad->m_options.editValueUnit == UNIT_VOLT ||
+                    keypad->m_options.editValueUnit == UNIT_MILLI_VOLT ||
+                    keypad->m_options.editValueUnit == UNIT_AMPER ||
+                    keypad->m_options.editValueUnit == UNIT_MILLI_AMPER ||
+                    keypad->m_options.editValueUnit == UNIT_MICRO_AMPER ||
+                    keypad->m_options.editValueUnit == UNIT_WATT ||
+                    keypad->m_options.editValueUnit == UNIT_MILLI_WATT ||
+                    keypad->m_options.editValueUnit == UNIT_SECOND ||
+                    keypad->m_options.editValueUnit == UNIT_MILLI_SECOND;
         }
     }
 }

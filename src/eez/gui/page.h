@@ -54,9 +54,7 @@ class SetPage : public Page {
 
 class InternalPage : public Page {
   public:
-    InternalPage();
-
-    virtual void refresh() = 0; // repaint page
+    virtual void refresh(bool doNotDrawShadow = false) = 0; // repaint page
     virtual void updatePage() = 0;
 	  virtual WidgetCursor findWidget(int x, int y) = 0;
 
@@ -66,8 +64,7 @@ class InternalPage : public Page {
     int height;
 
   protected:
-	  Widget widget;
-    bool shadowIsDrawn;
+    Widget widget;
     void drawShadow();
 };
 
@@ -84,7 +81,9 @@ public:
     ToastMessagePage(ToastType type, const char *message1, const char *message2, const char *message3);
     ToastMessagePage(ToastType type, data::Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam);
 
-    void refresh();
+    void pageFree();
+
+    void refresh(bool doNotDrawShadow = false);
     void updatePage();
     WidgetCursor findWidget(int x, int y);
 
@@ -100,6 +99,8 @@ private:
 
     Widget actionWidget;
     bool actionWidgetIsActive;
+
+    AppContext *appContext;
 };
 
 class SelectFromEnumPage : public InternalPage {
@@ -111,7 +112,7 @@ class SelectFromEnumPage : public InternalPage {
 
     void init();
 
-    void refresh();
+    void refresh(bool doNotDrawShadow = false);
     void updatePage();
     WidgetCursor findWidget(int x, int y);
 

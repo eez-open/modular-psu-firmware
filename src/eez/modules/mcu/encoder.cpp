@@ -17,7 +17,9 @@
 */
 
 #include <stdint.h>
+#include <math.h>
 
+#include <eez/system.h>
 #include <eez/debug.h>
 #include <eez/util.h>
 
@@ -39,21 +41,31 @@ int g_counter;
 bool g_clicked;
 #endif	
 
-#if defined(EEZ_PLATFORM_STM32)
-uint16_t g_lastCounter;
 uint32_t g_lastTick;
 
+#if defined(EEZ_PLATFORM_STM32)
+uint16_t g_lastCounter;
 GPIO_PinState g_buttonPinState = GPIO_PIN_RESET;
 uint32_t g_buttonPinStateTick = 0;
 #define CONF_DEBOUNCE_THRESHOLD_TIME 10 // 10 ms
 int g_btnIsDown = 0;
-
-#define CONF_ENCODER_ACCELERATION_DECREMENT_PER_MS 1
-#define CONF_ENCODER_ACCELERATION_INCREMENT_FACTOR 2
-
-#define CONF_ENCODER_SWITCH_DURATION_MIN 5000
-#define CONF_ENCODER_SWITCH_DURATION_MAX 1000000
 #endif	
+
+// ignore counter change when direction is changed if tick difference is less then this number
+#ifdef EEZ_PLATFORM_SIMULATOR
+#define DIRECTION_CHANGE_DIFF_TICK_THRESHOLD 100
+#else
+#define DIRECTION_CHANGE_DIFF_TICK_THRESHOLD 50
+#endif
+
+// acceleration is enabled only if tick difference is less then this number
+#define ACCELERATION_DIFF_TICK_THRESHOLD 50
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+#define SPEED_FACTOR 10.0f
+#else
+#define SPEED_FACTOR 2.0f
+#endif
 
 bool g_accelerationEnabled = true;
 int g_speedDown;
@@ -67,59 +79,69 @@ void init() {
 #endif
 }
 
-#if defined(EEZ_PLATFORM_STM32)
-
 int g_direction = 0;
-float g_acc = 0;
 
 int getCounter() {
-    uint16_t currentCounter = __HAL_TIM_GET_COUNTER(&htim8);
-    int16_t diffCounter = currentCounter - g_lastCounter;
-    g_lastCounter = currentCounter;
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    int16_t diffCounter = g_counter;
+#endif
 
-	uint32_t previousTick = g_lastTick;
-	g_lastTick = HAL_GetTick();
+#if defined(EEZ_PLATFORM_STM32)
+    uint16_t previousCounter = g_lastCounter;
+    g_lastCounter = __HAL_TIM_GET_COUNTER(&htim8);
+    int16_t diffCounter = g_lastCounter - previousCounter;
+#endif
 
-	if (diffCounter > 0) {
-		if (g_direction != 1) {
-			g_direction = 1;
-			g_acc = 0;
+    if (diffCounter != 0) {
+		uint32_t previousTick = g_lastTick;
+		g_lastTick = millis();
+		float diffTick = 1.0f * (g_lastTick - previousTick) / diffCounter;
+
+		if (diffCounter > 0) {
+			if (g_direction != 1) {
+				g_direction = 1;
+				if (diffTick < DIRECTION_CHANGE_DIFF_TICK_THRESHOLD) {
+					diffCounter = 0;
+				}
+			}
+		} else {
+			diffCounter = -diffCounter;
+			diffTick = -diffTick;
+
+			if (g_direction != -1) {
+				g_direction = -1;
+				if (diffTick < DIRECTION_CHANGE_DIFF_TICK_THRESHOLD) {
+					diffCounter = 0;
+				}
+			}
 		}
-	} else {
-		if (g_direction != -1) {
-			g_direction = -1;
-			g_acc = 0;
+
+		if (diffCounter > 0) {
+			// DebugTrace("C=%d, T=%g\n", (int)diffCounter, diffTick);
+
+			int counter;
+
+			if (g_accelerationEnabled && diffTick < ACCELERATION_DIFF_TICK_THRESHOLD) {
+				uint8_t speed = g_direction == 1 ? g_speedUp : g_speedDown;
+				float speedFactor = SPEED_FACTOR * (speed - MIN_MOVING_SPEED) / (MAX_MOVING_SPEED - MIN_MOVING_SPEED);
+                counter = (int)roundf(diffCounter * speedFactor * ACCELERATION_DIFF_TICK_THRESHOLD / diffTick);
+			} else {
+				counter = diffCounter;
+			}
+
+			return counter * g_direction;
 		}
-		diffCounter = -diffCounter;
-	}
+    }
 
-	if (diffCounter > 0) {
-		static const float A1 = 0.125;
-		static const float B1 = 1.75;
-
-		static const float A2 = 0.75;
-		static const float B2 = 100;
-
-		float speed = 1.0f * diffCounter / (g_lastTick - previousTick);
-		if (speed < A1) speed = A1;
-		if (speed > B1) speed = B1;
-
-		float t = (speed - A1) / (B1 - A1);
-
-		g_acc += A2 + (t * t) * (B2 - A2);
-
-		int counter = (int)g_acc;
-
-		g_acc -= counter;
-
-		return counter * g_direction;
-	}
-
-	g_direction = 0;
     return 0;
 }
 
 bool isButtonClicked() {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    return g_clicked;
+#endif
+
+#if defined(EEZ_PLATFORM_STM32)
     if (HAL_GPIO_ReadPin(ENC_SW_GPIO_Port, ENC_SW_Pin) == GPIO_PIN_RESET) {
     	// button is DOWN
     	if (!g_btnIsDown) {
@@ -150,20 +172,12 @@ bool isButtonClicked() {
     }
 
     return false;
+#endif
 }
-#endif
 
-void read(uint32_t tickCount, int &counter, bool &clicked) {
-#if defined(EEZ_PLATFORM_SIMULATOR)		
-    counter = g_counter;
-    clicked = g_clicked;
-#endif
-
-#if defined(EEZ_PLATFORM_STM32)		
+void read(int &counter, bool &clicked) {
     counter = getCounter();
     clicked = isButtonClicked();
-#endif
-
 }
 
 void enableAcceleration(bool enable) {

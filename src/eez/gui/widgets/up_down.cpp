@@ -21,6 +21,7 @@
 #include <eez/gui/draw.h>
 #include <eez/gui/gui.h>
 #include <eez/util.h>
+#include <eez/sound.h>
 
 namespace eez {
 namespace gui {
@@ -123,6 +124,8 @@ void UpDownWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
         } else {
             upDown(widgetCursor, UP_DOWN_WIDGET_SEGMENT_UP_BUTTON);
         }
+
+        sound::playClick();
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         g_selectedWidget = 0;
     }
