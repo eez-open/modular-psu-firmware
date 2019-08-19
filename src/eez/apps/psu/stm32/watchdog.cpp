@@ -22,7 +22,7 @@
 #include <eez/apps/psu/timer.h>
 #include <eez/system.h>
 
-#if (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 || EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12) && OPTION_WATCHDOG
+#if OPTION_WATCHDOG
 
 namespace eez {
 namespace psu {

@@ -1392,7 +1392,6 @@ scpi_result_t scpi_cmd_systemDigitalInputDataQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_systemDigitalOutputData(scpi_t *context) {
     // TODO migrate to generic firmware
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     int32_t pin;
     if (!SCPI_ParamInt(context, &pin, TRUE)) {
         return SCPI_RES_ERR;
@@ -1416,16 +1415,10 @@ scpi_result_t scpi_cmd_systemDigitalOutputData(scpi_t *context) {
     io_pins::setDigitalOutputPinState(pin, state);
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_systemDigitalOutputDataQ(scpi_t *context) {
     // TODO migrate to generic firmware
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     int32_t pin;
     if (!SCPI_ParamInt(context, &pin, TRUE)) {
         return SCPI_RES_ERR;
@@ -1444,11 +1437,6 @@ scpi_result_t scpi_cmd_systemDigitalOutputDataQ(scpi_t *context) {
     SCPI_ResultBool(context, io_pins::getDigitalOutputPinState(pin));
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-
-    return SCPI_RES_ERR;
-#endif
 }
 
 static scpi_choice_def_t functionChoice[] = { { "NONE", io_pins::FUNCTION_NONE },
@@ -1469,12 +1457,6 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
-#if EEZ_PSU_SELECTED_REVISION != EEZ_PSU_REVISION_R5B12
-    if (pin != 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-        return SCPI_RES_ERR;
-    }
-#endif
 
     int32_t function;
     if (!SCPI_ParamChoice(context, functionChoice, &function, true)) {
@@ -1511,12 +1493,6 @@ scpi_result_t scpi_cmd_systemDigitalPinFunctionQ(scpi_t *context) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
-#if EEZ_PSU_SELECTED_REVISION != EEZ_PSU_REVISION_R5B12
-    if (pin != 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-        return SCPI_RES_ERR;
-    }
-#endif
 
     resultChoiceName(context, functionChoice, persist_conf::devConf2.ioPins[pin - 1].function);
 
@@ -1535,12 +1511,6 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarity(scpi_t *context) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
-#if EEZ_PSU_SELECTED_REVISION != EEZ_PSU_REVISION_R5B12
-    if (pin != 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-        return SCPI_RES_ERR;
-    }
-#endif
 
     int32_t polarity;
     if (!SCPI_ParamChoice(context, polarityChoice, &polarity, true)) {
@@ -1562,12 +1532,6 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarityQ(scpi_t *context) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
-#if EEZ_PSU_SELECTED_REVISION != EEZ_PSU_REVISION_R5B12
-    if (pin != 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-        return SCPI_RES_ERR;
-    }
-#endif
 
     resultChoiceName(context, polarityChoice, persist_conf::devConf2.ioPins[pin - 1].polarity);
 

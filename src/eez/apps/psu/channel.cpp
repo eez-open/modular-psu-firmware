@@ -197,76 +197,6 @@ void Channel::restoreOE() {
     }
 }
 
-char *Channel::getChannelsInfo(char *p) {
-    bool ch_used[CH_MAX];
-
-    for (int i = 0; i < CH_NUM; ++i) {
-        ch_used[i] = false;
-    }
-
-    bool first_channel = true;
-
-    for (int i = 0; i < CH_NUM; ++i) {
-        if (!ch_used[i]) {
-            int count = 1;
-            for (int j = i + 1; j < CH_NUM; ++j) {
-                if (Channel::get(i).U_MAX == Channel::get(j).U_MAX &&
-                    Channel::get(i).I_MAX == Channel::get(j).I_MAX) {
-                    ch_used[j] = true;
-                    ++count;
-                }
-            }
-
-            if (first_channel) {
-                *p++ += ' ';
-                first_channel = false;
-            } else {
-                *p++ += '-';
-            }
-
-            p += sprintf(p, "%d/%02d/%02d", count, (int)floor(Channel::get(i).U_MAX),
-                         (int)floor(Channel::get(i).I_MAX));
-        }
-    }
-
-    return p;
-}
-
-char *Channel::getChannelsInfoShort(char *p) {
-    bool ch_used[CH_MAX];
-
-    for (int i = 0; i < CH_NUM; ++i) {
-        ch_used[i] = false;
-    }
-
-    bool first_channel = true;
-
-    for (int i = 0; i < CH_NUM; ++i) {
-        if (!ch_used[i]) {
-            int count = 1;
-            for (int j = i + 1; j < CH_NUM; ++j) {
-                if (Channel::get(i).U_MAX == Channel::get(j).U_MAX &&
-                    Channel::get(i).I_MAX == Channel::get(j).I_MAX) {
-                    ch_used[j] = true;
-                    ++count;
-                }
-            }
-
-            if (first_channel) {
-                first_channel = false;
-            } else {
-                *p++ += '-';
-                *p++ += ' ';
-            }
-
-            p += sprintf(p, "%d V / %d A", (int)floor(Channel::get(i).U_MAX),
-                         (int)floor(Channel::get(i).I_MAX));
-        }
-    }
-
-    return p;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef EEZ_PLATFORM_SIMULATOR
@@ -722,14 +652,25 @@ bool Channel::isPowerOk() {
     return flags.powerOk;
 }
 
+TestResult Channel::getTestResult() {
+    if (!isInstalled()) {
+        return TEST_SKIPPED;
+    }
+    if (ioexp.g_testResult == TEST_NONE || adc.g_testResult == TEST_NONE || dac.g_testResult == TEST_NONE) {
+        return TEST_NONE;
+    }
+    if (ioexp.g_testResult == TEST_OK && adc.g_testResult == TEST_OK && dac.g_testResult == TEST_OK) {
+        return TEST_OK;
+    }
+    return TEST_FAILED;
+}
+
 bool Channel::isTestFailed() {
-    return ioexp.g_testResult == TEST_FAILED || adc.g_testResult == TEST_FAILED ||
-           dac.g_testResult == TEST_FAILED;
+    return ioexp.g_testResult == TEST_FAILED || adc.g_testResult == TEST_FAILED || dac.g_testResult == TEST_FAILED;
 }
 
 bool Channel::isTestOk() {
-    return ioexp.g_testResult == TEST_OK && adc.g_testResult == TEST_OK &&
-           dac.g_testResult == TEST_OK;
+    return ioexp.g_testResult == TEST_OK && adc.g_testResult == TEST_OK && dac.g_testResult == TEST_OK;
 }
 
 bool Channel::isOk() {

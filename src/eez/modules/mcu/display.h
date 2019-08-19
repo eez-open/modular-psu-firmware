@@ -29,7 +29,7 @@ namespace display {
 
 void sync();
 
-void turnOn(bool withoutTransition = false);
+void turnOn();
 void turnOff();
 bool isOn();
 

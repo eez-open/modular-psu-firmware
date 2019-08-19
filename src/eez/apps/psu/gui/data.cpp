@@ -1169,8 +1169,6 @@ void data_opp(data::DataOperationEnum operation, data::Cursor &cursor, data::Val
 }
 
 void data_otp_ch(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
@@ -1184,7 +1182,6 @@ void data_otp_ch(data::DataOperationEnum operation, data::Cursor &cursor, data::
             value = 2;
         }
     }
-#endif
 }
 
 void data_otp_aux(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -1244,32 +1241,6 @@ void data_edit_steps(data::DataOperationEnum operation, data::Cursor &cursor, da
         value = edit_mode_step::getStepValuesCount();
     } else if (operation == data::DATA_OPERATION_SET) {
         edit_mode_step::setStepIndex(value.getInt());
-    }
-}
-
-void data_model_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        /*
-        We are auto generating model name from the channels definition:
-
-        <cnt>/<volt>/<curr>[-<cnt2>/<volt2>/<curr2>] (<platform>)
-
-        Where is:
-
-        <cnt>      - number of the equivalent channels
-        <volt>     - max. voltage
-        <curr>     - max. curr
-        <platform> - Mega, Due, Simulator or Unknown
-        */
-        static char
-            model_info[CH_MAX * (sizeof("XX V / XX A") - 1) + CH_MAX * (sizeof(" - ") - 1) + 1];
-
-        if (*model_info == 0) {
-            char *p = Channel::getChannelsInfoShort(model_info);
-            *p = 0;
-        }
-
-        value = model_info;
     }
 }
 
@@ -1476,10 +1447,6 @@ void data_channel_long_title(data::DataOperationEnum operation, data::Cursor &cu
 void data_channel_temp_status(data::DataOperationEnum operation, data::Cursor &cursor,
                               data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R1B9
-        value = 2;
-#elif EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                        \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         temperature::TempSensorTemperature &tempSensor =
             temperature::sensors[temp_sensor::CH1 + Channel::get(iChannel).slotIndex];
@@ -1492,22 +1459,20 @@ void data_channel_temp_status(data::DataOperationEnum operation, data::Cursor &c
         } else {
             value = 2;
         }
-#endif
     }
 }
 
 void data_channel_temp(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         float temperature = 0;
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
+
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
         temperature::TempSensorTemperature &tempSensor =
             temperature::sensors[temp_sensor::CH1 + Channel::get(iChannel).slotIndex];
         if (tempSensor.isInstalled() && tempSensor.isTestOK()) {
             temperature = tempSensor.temperature;
         }
-#endif
+
         value = MakeValue(temperature, UNIT_CELSIUS);
     }
 }
@@ -2289,10 +2254,9 @@ void data_sys_info_ethernet(data::DataOperationEnum operation, data::Cursor &cur
 void data_sys_info_fan_status(data::DataOperationEnum operation, data::Cursor &cursor,
                               data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R1B9 || !OPTION_FAN
+#if !OPTION_FAN
         value = 3;
-#elif EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                        \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
+#else
         if (fan::g_testResult == TEST_FAILED || fan::g_testResult == TEST_WARNING) {
             value = 0;
         } else if (fan::g_testResult == TEST_OK) {
@@ -2310,9 +2274,7 @@ void data_sys_info_fan_status(data::DataOperationEnum operation, data::Cursor &c
 
 void data_sys_info_fan_speed(data::DataOperationEnum operation, data::Cursor &cursor,
                              data::Value &value) {
-#if (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                         \
-     EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12) &&                                       \
-    FAN_OPTION_RPM_MEASUREMENT
+#if FAN_OPTION_RPM_MEASUREMENT
     if (operation == data::DATA_OPERATION_GET) {
         if (fan::g_testResult == TEST_OK) {
             value = MakeValue((float)fan::g_rpm, UNIT_RPM);

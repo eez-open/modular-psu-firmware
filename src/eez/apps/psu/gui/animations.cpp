@@ -160,9 +160,6 @@ void animateFromMicroViewToMaxView() {
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 
-    auto g_defRects = psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
-        psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
-
     int i = 0;
 
     g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };

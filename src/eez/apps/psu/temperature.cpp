@@ -108,16 +108,9 @@ void tick(uint32_t tick_usec) {
 }
 
 bool isChannelSensorInstalled(Channel *channel) {
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R1B9
-    return false;
-#elif EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                        \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     return sensors[temp_sensor::CH1 + channel->slotIndex].isInstalled();
-#endif
 }
 
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
 bool getChannelSensorState(Channel *channel) {
     return sensors[temp_sensor::CH1 + channel->slotIndex].prot_conf.state;
 }
@@ -129,7 +122,6 @@ float getChannelSensorLevel(Channel *channel) {
 float getChannelSensorDelay(Channel *channel) {
     return sensors[temp_sensor::CH1 + channel->slotIndex].prot_conf.delay;
 }
-#endif
 
 bool isAnySensorTripped(Channel *channel) {
     for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {

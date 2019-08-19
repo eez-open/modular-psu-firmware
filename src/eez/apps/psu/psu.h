@@ -29,13 +29,16 @@
 /// Namespace for the everything from the EEZ.
 namespace eez {
 
-enum TestResult { 
+enum TestResult {
+    TEST_NONE,
     TEST_FAILED, 
     TEST_OK, 
     TEST_CONNECTING, 
     TEST_SKIPPED, 
     TEST_WARNING 
 };
+
+extern TestResult g_masterTestResult;
 
 /// PSU firmware.
 namespace psu {

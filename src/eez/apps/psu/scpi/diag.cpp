@@ -26,10 +26,7 @@
 #include <eez/apps/psu/devices.h>
 #include <eez/apps/psu/scpi/psu.h>
 #include <eez/apps/psu/temperature.h>
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
 #include <eez/apps/psu/fan.h>
-#endif
 
 namespace eez {
 namespace psu {
@@ -355,13 +352,10 @@ scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
     // buffer);
     //	}
     //
-    //#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 || EEZ_PSU_SELECTED_REVISION ==
-    // EEZ_PSU_REVISION_R5B12
-    //    sprintf(buffer, "%d, Fan, %s, %s",
-    //        fan::g_testResult, get_installed_str(OPTION_FAN),
-    //        get_test_result_str(fan::g_testResult));
-    //    SCPI_ResultText(context, buffer);
-    //#endif
+    //  sprintf(buffer, "%d, Fan, %s, %s",
+    //      fan::g_testResult, get_installed_str(OPTION_FAN),
+    //      get_test_result_str(fan::g_testResult));
+    //  SCPI_ResultText(context, buffer);
     //
     //	if (isPowerUp()) {
     //        for (int i = 0; i < CH_NUM; ++i) {
@@ -389,9 +383,7 @@ scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_diagnosticInformationFanQ(scpi_t *context) {
     // TODO migrate to generic firmware
-#if (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                         \
-     EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12) &&                                       \
-    OPTION_FAN && FAN_OPTION_RPM_MEASUREMENT
+#if OPTION_FAN && FAN_OPTION_RPM_MEASUREMENT
     SCPI_ResultInt(context, fan::g_rpm);
 #else
     SCPI_ResultInt(context, -1);

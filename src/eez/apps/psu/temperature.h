@@ -41,11 +41,9 @@ bool test();
 void tick(uint32_t tick_usec);
 
 bool isChannelSensorInstalled(Channel *channel);
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 || EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
 bool getChannelSensorState(Channel *channel);
 float getChannelSensorLevel(Channel *channel);
 float getChannelSensorDelay(Channel *channel);
-#endif
 
 bool isAnySensorTripped(Channel *channel);
 

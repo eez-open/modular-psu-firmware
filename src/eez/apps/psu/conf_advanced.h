@@ -32,13 +32,16 @@
 #define IDN_MANUFACTURER "Envox"
 
 /// Model description text used for *IDN?
-#if defined(EEZ_PLATFORM_SIMULATOR)
-#define IDN_MODEL "EEZ H24005 (Simulator)"
-#elif defined(EEZ_PLATFORM_STM32)
-#define IDN_MODEL "EEZ H24005 (STM32)"
+#if defined(EEZ_PLATFORM_STM32)
+#define IDN_MODEL "EEZ BB3 (STM32)"
 #else
-#define IDN_MODEL "EEZ H24005 (Due)"
+#define IDN_MODEL "EEZ BB3 (Simulator)"
 #endif
+
+#define EEZ_PSU_SELECTED_REVISION EEZ_MCU_REVISION_R1B5
+
+#define MCU_NAME "STM32F7"
+#define MCU_REVISION "R1B5"
 
 /// SCPI TCP server port.
 #define TCP_PORT 5025

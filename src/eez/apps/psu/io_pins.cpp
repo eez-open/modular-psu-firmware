@@ -106,7 +106,6 @@ uint8_t isOutputEnabled() {
     return 0;
 }
 
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
 void updateFaultPin(int i) {
     persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
     int pin = i == 1 ? DOUT1 : DOUT2;
@@ -130,7 +129,6 @@ void updateOnCouplePin(int i) {
     ioPinWrite(pin, state);
     // DebugTrace("FUNCTION_ON_COUPLE %d %d", pin, state);
 }
-#endif
 
 void tick(uint32_t tickCount) {
     // execute input pins function
@@ -155,7 +153,6 @@ void tick(uint32_t tickCount) {
         }
     }
 
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     // end trigger output pulse
     if (g_lastState.toutputPulse) {
         int32_t diff = tickCount - g_toutputPulseStartTickCount;
@@ -208,11 +205,9 @@ void tick(uint32_t tickCount) {
             }
         }
     }
-#endif
 }
 
 void onTrigger() {
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     // start trigger output pulse
     for (int i = 1; i < 3; ++i) {
         persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
@@ -223,11 +218,9 @@ void onTrigger() {
             g_toutputPulseStartTickCount = micros();
         }
     }
-#endif
 }
 
 void refresh() {
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     // refresh output pins
     for (int i = 1; i < 3; ++i) {
         persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
@@ -240,7 +233,6 @@ void refresh() {
             updateOnCouplePin(i);
         }
     }
-#endif
 }
 
 bool isInhibited() {

@@ -37,6 +37,7 @@
 // TODO
 #include <eez/apps/psu/psu.h>
 #include <eez/apps/psu/conf.h> // CH_MAX
+#include <eez/apps/psu/channel.h>
 #include <eez/apps/psu/persist_conf.h>
 
 namespace eez {
@@ -178,20 +179,69 @@ void PAGE_INFO_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
+bool compare_MASTER_INFO_value(const Value &a, const Value &b) {
+    return true;
+}
+
+void MASTER_INFO_value_to_text(const Value &value, char *text, int count) {
+    snprintf(text, count - 1, "%s %s", MCU_NAME, MCU_REVISION);
+    text[count - 1] = 0;
+}
+
+bool compare_SLOT_INFO_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void SLOT_INFO_value_to_text(const Value &value, char *text, int count) {
+    int slotIndex = value.getInt();
+    psu::Channel &channel = psu::Channel::get(slotIndex);
+    if (channel.isInstalled()) {
+        snprintf(text, count - 1, "%s %s", channel.getBoardName(), channel.getRevisionName());
+    } else {
+        strncpy(text, "Not installed", count - 1);
+    }
+    text[count - 1] = 0;
+}
+
+bool compare_TEST_RESULT_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void TEST_RESULT_value_to_text(const Value &value, char *text, int count) {
+    TestResult testResult = (TestResult)value.getInt();
+    if (testResult == TEST_FAILED) {
+        strncpy(text, "Failed", count - 1);
+    } else if (testResult == TEST_OK) {
+        strncpy(text, "OK", count - 1);
+    } else if (testResult == TEST_CONNECTING) {
+        strncpy(text, "Connecting", count - 1);
+    } else if (testResult == TEST_SKIPPED) {
+        strncpy(text, "Skipped", count - 1);
+    } else if (testResult == TEST_WARNING) {
+        strncpy(text, "Warning", count - 1);
+    } else {
+        strncpy(text, "", count - 1);
+    }
+    text[count - 1] = 0;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static CompareValueFunction g_compareBuiltInValueFunctions[] = {
     compare_NONE_value,       compare_INT_value,  compare_FLOAT_value,
     compare_STR_value,        compare_ENUM_value, compare_SCPI_ERROR_value,
     compare_PERCENTAGE_value, compare_SIZE_value, compare_POINTER_value,
-    compare_PAGE_INFO_value
+    compare_PAGE_INFO_value,  compare_MASTER_INFO_value, compare_SLOT_INFO_value,
+    compare_TEST_RESULT_value
 };
 
 static ValueToTextFunction g_builtInValueToTextFunctions[] = {
     NONE_value_to_text,       INT_value_to_text,  FLOAT_value_to_text,
     STR_value_to_text,        ENUM_value_to_text, SCPI_ERROR_value_to_text,
     PERCENTAGE_value_to_text, SIZE_value_to_text, POINTER_value_to_text,
-    PAGE_INFO_value_to_text
+    PAGE_INFO_value_to_text,  MASTER_INFO_value_to_text, SLOT_INFO_value_to_text,
+    TEST_RESULT_value_to_text
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -526,6 +576,54 @@ void data_scripts_page_info(DataOperationEnum operation, Cursor &cursor, Value &
 void data_animations_duration(DataOperationEnum operation, Cursor &cursor, Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = data::Value(psu::persist_conf::devConf2.animationsDuration, UNIT_SECOND);
+    }
+}
+
+void data_master_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(0, VALUE_TYPE_MASTER_INFO);
+    }
+}
+
+void data_master_test_result(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value((int)g_masterTestResult, VALUE_TYPE_TEST_RESULT);
+    }
+}
+
+void data_slot1_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(0, VALUE_TYPE_SLOT_INFO);
+    }
+}
+
+void data_slot1_test_result (data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value((int)psu::Channel::get(0).getTestResult(), VALUE_TYPE_TEST_RESULT);
+    }
+}
+
+void data_slot2_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(1, VALUE_TYPE_SLOT_INFO);
+    }
+}
+
+void data_slot2_test_result(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value((int)psu::Channel::get(1).getTestResult(), VALUE_TYPE_TEST_RESULT);
+    }
+}
+
+void data_slot3_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(2, VALUE_TYPE_SLOT_INFO);
+    }
+}
+
+void data_slot3_test_result(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value((int)psu::Channel::get(2).getTestResult(), VALUE_TYPE_TEST_RESULT);
     }
 }
 

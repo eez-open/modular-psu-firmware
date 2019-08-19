@@ -25,8 +25,7 @@
 #include <eez/apps/psu/serial_psu.h>
 #include <eez/scpi/commands.h>
 #include <eez/sound.h>
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
+#if OPTION_WATCHDOG
 #include <eez/apps/psu/watchdog.h>
 #endif
 #include <eez/apps/psu/idle.h>
@@ -115,8 +114,7 @@ void printError(int_fast16_t err) {
         Serial.println(errorOutputBuffer);
     }
 
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
+#if OPTION_WATCHDOG
     watchdog::tick(micros());
 #endif
 }

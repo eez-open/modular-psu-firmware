@@ -268,8 +268,6 @@ void ChSettingsOppProtectionPage::setParams(bool checkLoad) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void ChSettingsOtpProtectionPage::pageAlloc() {
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     origState = state = temperature::getChannelSensorState(g_channel) ? 1 : 0;
 
     origLimit = limit = 0;
@@ -286,15 +284,11 @@ void ChSettingsOtpProtectionPage::pageAlloc() {
     minDelay = OTP_AUX_MIN_DELAY;
     maxDelay = OTP_AUX_MAX_DELAY;
     defaultDelay = OTP_CH_DEFAULT_DELAY;
-#endif
 }
 
 void ChSettingsOtpProtectionPage::setParams(bool checkLoad) {
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     channel_dispatcher::setOtpParameters(*g_channel, state, level.getFloat(), delay.getFloat());
     onSetFinish(checkLoad);
-#endif
 }
 
 } // namespace gui

@@ -28,8 +28,6 @@
 #include <eez/apps/psu/stm32/psu.h>
 #endif
 
-#include <eez/apps/psu/conf_user_revision.h>
-
 #include <eez/apps/psu/conf.h>
 #include <eez/apps/psu/conf_advanced.h>
 #include <eez/apps/psu/conf_channel.h>

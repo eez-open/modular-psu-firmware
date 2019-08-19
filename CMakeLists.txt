@@ -149,7 +149,6 @@ set(header_eez_apps_psu
     src/eez/apps/psu/conf_all.h
     src/eez/apps/psu/conf_channel.h
     src/eez/apps/psu/conf_user.h
-    src/eez/apps/psu/conf_user_revision.h
     src/eez/apps/psu/dac.h
     src/eez/apps/psu/datetime.h
     src/eez/apps/psu/debug.h

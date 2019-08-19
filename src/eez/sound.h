@@ -27,7 +27,13 @@ void init();
 void tick();
 
 /// Play power up tune.
-void playPowerUp();
+enum PlayPowerUpCondition {
+    PLAY_POWER_UP_CONDITION_NONE,
+    PLAY_POWER_UP_CONDITION_TEST_SUCCESSFUL,
+    PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE
+};
+
+void playPowerUp(PlayPowerUpCondition condition);
 
 /// Play power down tune.
 void playPowerDown();

@@ -78,6 +78,8 @@ namespace eez {
 
 using namespace scpi;
 
+TestResult g_masterTestResult;
+
 namespace psu {
 
 using namespace scpi;
@@ -100,7 +102,7 @@ void (*g_diagCallback)();
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool testShield();
+static bool testMaster();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -185,10 +187,7 @@ void init() {
     DebugTrace("Ethernet initialization skipped!");
 #endif
 
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     fan::init();
-#endif
 
     temperature::init();
 
@@ -217,7 +216,7 @@ static bool testChannels() {
     return result;
 }
 
-static bool testShield() {
+static bool testMaster() {
     bool result = true;
 
     result &= rtc::test();
@@ -234,28 +233,24 @@ static bool testShield() {
 
     result &= temperature::test();
 
+    g_masterTestResult = result ? TEST_OK : TEST_FAILED;
+
     return result;
 }
 
 bool test() {
     bool testResult = true;
 
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     fan::test_start();
-#endif
 
-    testResult &= testShield();
+    testResult &= testMaster();
 
     // test BP3c
     testResult &= bp3c::relays::test();
 
     testResult &= testChannels();
 
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     testResult &= fan::test();
-#endif
 
     if (!testResult) {
         sound::playBeep();
@@ -472,7 +467,7 @@ void boot() {
     // test
     g_bootTestSuccess = true;
 
-    g_bootTestSuccess &= testShield();
+    g_bootTestSuccess &= testMaster();
 
     if (!autoRecall()) {
         psuReset();
@@ -497,16 +492,15 @@ bool powerUp() {
         return false;
     }
 
+    sound::playPowerUp(sound::PLAY_POWER_UP_CONDITION_NONE);
+
     g_rlState = persist_conf::devConf.flags.isFrontPanelLocked ? RL_STATE_REMOTE : RL_STATE_LOCAL;
 
 #if OPTION_DISPLAY
     eez::gui::showWelcomePage();
 #endif
 
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     fan::test_start();
-#endif
 
     // reset channels
     for (int i = 0; i < CH_NUM; ++i) {
@@ -526,7 +520,7 @@ bool powerUp() {
     bool testSuccess = true;
 
     if (g_isBooted) {
-        testSuccess &= testShield();
+        testSuccess &= testMaster();
     }
 
     // test channels
@@ -534,10 +528,7 @@ bool powerUp() {
         testSuccess &= Channel::get(i).test();
     }
 
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     testSuccess &= fan::test();
-#endif
 
     // turn on Power On (PON) bit of ESE register
     reg_set_esr_bits(ESR_PON);
@@ -546,7 +537,7 @@ bool powerUp() {
 
     // play power up tune on success
     if (testSuccess) {
-        sound::playPowerUp();
+        sound::playPowerUp(sound::PLAY_POWER_UP_CONDITION_TEST_SUCCESSFUL);
     }
 
     g_bootTestSuccess &= testSuccess;
@@ -584,10 +575,7 @@ void powerDown() {
 
     event_queue::pushEvent(event_queue::EVENT_INFO_POWER_DOWN);
 
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
     fan::g_testResult = TEST_OK;
-#endif
 
     io_pins::tick(micros());
 

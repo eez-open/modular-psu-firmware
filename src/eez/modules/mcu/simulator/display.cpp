@@ -178,7 +178,7 @@ bool init() {
     return true;
 }
 
-void turnOn(bool withoutTransition) {
+void turnOn() {
     if (!isOn()) {
         g_frontPanelBuffer1 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
         g_frontPanelBuffer2 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];

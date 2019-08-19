@@ -16,9 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                         \
-     EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12) &&                                       \
-    OPTION_WATCHDOG
+#if OPTION_WATCHDOG
 
 #include <eez/apps/psu/psu.h>
 

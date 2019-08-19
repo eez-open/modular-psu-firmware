@@ -26,10 +26,7 @@
 #include <eez/apps/psu/scpi/psu.h>
 #include <eez/apps/psu/sd_card.h>
 #include <eez/system.h>
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
 #include <eez/apps/psu/watchdog.h>
-#endif
 #include <eez/apps/psu/dlog.h>
 
 namespace eez {
@@ -240,10 +237,10 @@ void log(uint32_t tickCount) {
     g_currentTime = g_seconds + g_micros * 1E-6;
 
     if (g_currentTime >= g_nextTime) {
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
+#if OPTION_WATCHDOG
         watchdog::disable();
 #endif
+
 
         while (1) {
             g_nextTime = ++g_iSample * g_period;
@@ -309,8 +306,7 @@ void log(uint32_t tickCount) {
             }
         }
 
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
+#if OPTION_WATCHDOG
         watchdog::enable();
 #endif
     }

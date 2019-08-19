@@ -22,9 +22,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define EEZ_PSU_REVISION_R1B9 1
-#define EEZ_PSU_REVISION_R3B4 2
-#define EEZ_PSU_REVISION_R5B12 3
+#define EEZ_MCU_REVISION_R1B5 1
 
 static const uint8_t EXT_TRIG1 = 0;
 static const uint8_t EXT_TRIG2 = 1;

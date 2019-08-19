@@ -75,6 +75,9 @@ void AppContext::stateManagment() {
 
     if (m_setPageIdOnNextIter) {
         setPage(m_pageIdToSetOnNextIter);
+        if (m_pageIdToSetOnNextIter == PAGE_ID_WELCOME) {
+            playPowerUp(sound::PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE);
+        } 
         m_setPageIdOnNextIter = false;
     }
 

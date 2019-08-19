@@ -26,10 +26,7 @@
 #include <eez/apps/psu/ntp.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/system.h>
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
 #include <eez/apps/psu/watchdog.h>
-#endif
 #include <eez/modules/mcu/ethernet.h>
 
 // Some time servers:
@@ -98,56 +95,56 @@ int sendNtpPacket() {
     // you can send a packet requesting a timestamp:
     int rc;
 
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
+#if OPTION_WATCHDOG
     watchdog::disable();
 #endif
 
+
     rc = g_udp.beginPacket(getNtpServer(), 123); // NTP requests are to port 123
     if (!rc) {
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
+#if OPTION_WATCHDOG
         watchdog::enable();
 #endif
+
         return -1;
     }
 
     int written = g_udp.write(packetBuffer, NTP_PACKET_SIZE);
     if (written != NTP_PACKET_SIZE) {
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
+#if OPTION_WATCHDOG
         watchdog::enable();
 #endif
+
         return -2;
     }
 
     rc = g_udp.endPacket();
     if (!rc) {
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
+#if OPTION_WATCHDOG
         watchdog::enable();
 #endif
+
         return -3;
     }
 
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
-    watchdog::enable();
+#if OPTION_WATCHDOG
+        watchdog::enable();
 #endif
+
+
     return 0;
 }
 
 void readNtpPacket() {
     // We've received a packet, read the data from it
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
+#if OPTION_WATCHDOG
     watchdog::disable();
 #endif
     g_udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
-#if OPTION_WATCHDOG && (EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                      \
-                        EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12)
+#if OPTION_WATCHDOG
     watchdog::enable();
 #endif
+
 
     // The timestamp starts at byte 40 of the received packet and is four bytes,
     // or two words, long. First, esxtract the two words:

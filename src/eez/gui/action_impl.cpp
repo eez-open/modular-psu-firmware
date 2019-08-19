@@ -681,6 +681,7 @@ void action_sys_settings_encoder_toggle_confirmation_mode() {
 }
 
 void action_turn_display_off() {
+    popPage();    
     turnDisplayOff();
 }
 

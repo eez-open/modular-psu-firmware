@@ -22,9 +22,6 @@
 #include <eez/apps/psu/scpi/psu.h>
 #include <eez/apps/psu/temperature.h>
 
-#if EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R3B4 ||                                          \
-    EEZ_PSU_SELECTED_REVISION == EEZ_PSU_REVISION_R5B12
-
 #include <eez/apps/psu/fan.h>
 
 namespace eez {
@@ -90,5 +87,3 @@ void setFanPwm(int pwm) {
 } // namespace fan
 } // namespace psu
 } // namespace eez
-
-#endif

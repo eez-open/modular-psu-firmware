@@ -185,7 +185,9 @@ Tune g_tunes[4] = {
 	{ powerDownTune, 0.75f },
 };
 
-int g_iNextTuneToPlay = -1;
+static int g_iNextTuneToPlay = -1;
+
+static PlayPowerUpCondition g_playPowerUpCondition;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -288,10 +290,20 @@ static void playTune(int iTune) {
 	}
 }
 
-void playPowerUp() {
-    if (psu::persist_conf::isSoundEnabled()) {
-		playTune(POWER_UP_TUNE);
-    }
+void playPowerUp(PlayPowerUpCondition condition) {
+	if (condition == PLAY_POWER_UP_CONDITION_NONE) {
+		g_playPowerUpCondition = PLAY_POWER_UP_CONDITION_NONE;
+	} else if (g_playPowerUpCondition == PLAY_POWER_UP_CONDITION_NONE) {
+		g_playPowerUpCondition = condition;
+	} else if (
+		(condition == PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE && g_playPowerUpCondition == PLAY_POWER_UP_CONDITION_TEST_SUCCESSFUL) ||
+		(condition == PLAY_POWER_UP_CONDITION_TEST_SUCCESSFUL && g_playPowerUpCondition == PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE)
+	) {
+		g_playPowerUpCondition = PLAY_POWER_UP_CONDITION_NONE;
+    	if (psu::persist_conf::isSoundEnabled()) {
+			playTune(POWER_UP_TUNE);
+    	}
+	}
 }
 
 void playPowerDown() {

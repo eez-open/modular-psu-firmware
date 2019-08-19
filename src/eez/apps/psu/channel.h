@@ -268,10 +268,6 @@ class Channel {
     /// Restore previously saved OE state for all the channels.
     static void restoreOE();
 
-    ///
-    static char *getChannelsInfo(char *p);
-    static char *getChannelsInfoShort(char *p);
-
     /// Channel index. Starts from 1.
     uint8_t index;
 
@@ -388,6 +384,8 @@ class Channel {
 
     /// Is channel power ok (state of PWRGOOD bit in IO Expander)?
     bool isPowerOk();
+
+    TestResult getTestResult();
 
     /// Is channel test failed?
     bool isTestFailed();
