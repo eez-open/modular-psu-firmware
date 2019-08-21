@@ -217,7 +217,7 @@ struct WidgetCursor {
 
 typedef void (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
 void enumWidgets(EnumWidgetsCallback callback);
-void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);                
+void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 WidgetCursor findWidget(int16_t x, int16_t y);
 

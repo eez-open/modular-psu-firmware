@@ -24,12 +24,18 @@
 #include <eez/apps/psu/gui/animations.h>
 #include <eez/gui/gui.h>
 
-static const Rect g_workingAreaRect = { 0, 0, 480, 240 };
+static const Rect g_displayRect = { 0, 0, 480, 272 };
 
-static const Rect g_statusLineRects[] = {
-    { 0, 272, 480, 32 },
-    { 0, 240, 480, 32 }
-};
+static const Rect g_workingAreaRect = { 0, 0, 480, 240 };
+static const Rect g_workingAreaRectTop = { 0, -240, 480, 240 };
+static const Rect g_workingAreaRectBottom = { 0, 240, 480, 240 };
+static const Rect g_workingAreaRectLeft = { -480, 0, 480, 240 };
+static const Rect g_workingAreaRectRight = { 480, 0, 480, 240 };
+
+static const Rect g_statusLineRect = { 0, 240, 480, 32 };
+static const Rect g_statusLineRectBottom = { 0, 272, 480, 32 };
+static const Rect g_statusLineRectLeft = { -480, 240, 480, 32 };
+static const Rect g_statusLineRectRight = { 480, 240, 480, 32 };
 
 static const Rect g_vertDefRects[] = {
     {   0, 0, 160, 240 },
@@ -56,10 +62,11 @@ static const Rect g_microRects[] = {
     { 320, 168, 160, 72 }
 };
 
-static const Rect g_settingsRects[] = {
-    { 0, -168, 480, 168 },
-    { 0, 0, 480, 168 }
-};
+static const Rect g_settingsRect = { 0, 0, 480, 168 };
+static const Rect g_settingsRectTop = { 0, -168, 480, 168 };
+static const Rect g_settingsRectLeft = { -480, 0, 480, 240 };
+static const Rect g_settingsRectRight = { 480, 0, 480, 240 };
+
 
 namespace eez {
 namespace psu {
@@ -191,9 +198,9 @@ void animateShowSysSettings() {
     g_animRects[i++] = { BUFFER_NEW, g_defRects[1], g_microRects[1], 0, OPACITY_FADE_IN, POSITION_TOP };
     g_animRects[i++] = { BUFFER_NEW, g_defRects[2], g_microRects[2], 0, OPACITY_FADE_IN, POSITION_TOP_RIGHT };
 
-    g_animRects[i++] = { BUFFER_NEW, g_settingsRects[0], g_settingsRects[1], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_settingsRectTop, g_settingsRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    g_animRects[i++] = { BUFFER_NEW, g_statusLineRects[0], g_statusLineRects[1], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_statusLineRectBottom, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
     animateRects(BUFFER_OLD, i);
 }
@@ -214,11 +221,85 @@ void animateHideSysSettings() {
     g_animRects[i++] = { BUFFER_NEW, g_microRects[1], g_defRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_microRects[2], g_defRects[2], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
 
-    g_animRects[i++] = { BUFFER_OLD, g_settingsRects[1], g_settingsRects[0], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_OLD, g_settingsRect, g_settingsRectTop, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    g_animRects[i++] = { BUFFER_OLD, g_statusLineRects[1], g_statusLineRects[0], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectBottom, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
     animateRects(BUFFER_NEW, i);
+}
+
+void animateSettingsSlideLeft() {
+    int i = 0;
+
+    g_animRects[i++] = { BUFFER_OLD, g_settingsRect, g_settingsRectLeft, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_settingsRectRight, g_settingsRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+    g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectLeft, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_statusLineRectRight, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+    animateRects(BUFFER_NEW, i);
+}
+
+void animateSettingsSlideRight() {
+    int i = 0;
+
+    g_animRects[i++] = { BUFFER_OLD, g_settingsRect, g_settingsRectRight, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_settingsRectLeft, g_settingsRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+    g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectRight, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_statusLineRectLeft, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+    animateRects(BUFFER_NEW, i);
+}
+
+void animateSlideUp() {
+    int i = 0;
+
+    g_animRects[i++] = { BUFFER_OLD, g_workingAreaRect, g_workingAreaRectTop, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+    g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectBottom, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+    animateRects(BUFFER_NEW, i);
+}
+
+void animateSlideDown() {
+    int i = 0;
+
+    g_animRects[i++] = { BUFFER_NEW, g_workingAreaRectTop, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+    g_animRects[i++] = { BUFFER_NEW, g_statusLineRectBottom, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+    animateRects(BUFFER_OLD, i);
+}
+
+void animateSlideLeft() {
+    int i = 0;
+
+    g_animRects[i++] = { BUFFER_OLD, g_workingAreaRect, g_workingAreaRectLeft, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_workingAreaRectRight, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+    animateRects(BUFFER_NEW, i);
+
+    g_animationState.easingRects = remapInOutQuad;
+}
+
+void animateSlideRight() {
+    int i = 0;
+
+    g_animRects[i++] = { BUFFER_OLD, g_workingAreaRect, g_workingAreaRectRight, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_workingAreaRectLeft, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+    animateRects(BUFFER_NEW, i);
+
+    g_animationState.easingRects = remapInOutQuad;
+}
+
+void animateFadeOutFadeInWorkingArea() {
+    int i = 0;
+    g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_OLD, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
+    animateRects(BUFFER_NEW, i, psu::persist_conf::devConf2.animationsDuration);
 }
 
 } // namespace gui

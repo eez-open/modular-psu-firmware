@@ -28,6 +28,13 @@ void animateFromMinViewToMaxView(int iMaxBefore);
 void animateFromMicroViewToMaxView();
 void animateShowSysSettings();
 void animateHideSysSettings();
+void animateSettingsSlideLeft();
+void animateSettingsSlideRight();
+void animateSlideUp();
+void animateSlideDown();
+void animateSlideLeft();
+void animateSlideRight();
+void animateFadeOutFadeInWorkingArea();
 
 } // namespace gui
 } // namespace psu

@@ -407,12 +407,15 @@ void animateOpenCloseCallback(float t, void *bufferOld, void *bufferNew, void *b
     bitBlt(bufferNew, bufferDst, x1, y1, x2, y2);
 }
 
-void animate(Buffer startBuffer, void(*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst)) {
+void animate(Buffer startBuffer, void(*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst), float duration = -1) {
     g_animationState.enabled = true;
     g_animationState.startTime = millis();
-    g_animationState.duration = psu::persist_conf::devConf2.animationsDuration;
+    g_animationState.duration = duration != -1 ? duration : psu::persist_conf::devConf2.animationsDuration;
     g_animationState.startBuffer = startBuffer;
     g_animationState.callback = callback;
+    g_animationState.easingRects = remapOutQuad;
+    g_animationState.easingOpacity = remapOutCubic;
+
 }
 
 void animateOpenClose(const Rect &srcRect, const Rect &dstRect, bool direction) {
@@ -437,8 +440,8 @@ AnimRect g_animRects[MAX_ANIM_RECTS];
 void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst) {
     bitBlt(g_animationState.startBuffer == BUFFER_OLD ? bufferOld : bufferNew, bufferDst, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
 
-    float t1 = remapOutQuad(t, 0, 0, 1, 1);
-    float t2 = remapOutCubic(t, 0, 0, 1, 1);
+    float t1 = g_animationState.easingRects(t, 0, 0, 1, 1); // rects
+    float t2 = g_animationState.easingOpacity(t, 0, 0, 1, 1); // opacity
 
     for (int i = 0; i < g_numRects; i++) {
         AnimRect &animRect = g_animRects[i];
@@ -608,8 +611,8 @@ void prepareRect(Rect &rect) {
     }
 }
 
-void animateRects(Buffer startBuffer, int numRects) {
-    animate(startBuffer, animateRectsStep);
+void animateRects(Buffer startBuffer, int numRects, float duration) {
+    animate(startBuffer, animateRectsStep, duration);
 
     g_numRects = numRects;
 

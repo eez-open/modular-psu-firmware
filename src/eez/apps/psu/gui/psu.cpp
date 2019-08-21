@@ -24,6 +24,7 @@
 #include <eez/apps/psu/channel_dispatcher.h>
 #include <eez/apps/psu/devices.h>
 #include <eez/apps/psu/event_queue.h>
+#include <eez/apps/psu/gui/animations.h>
 #include <eez/apps/psu/gui/data.h>
 #include <eez/apps/psu/gui/edit_mode.h>
 #include <eez/apps/psu/gui/edit_mode_keypad.h>
@@ -126,10 +127,90 @@ int PsuAppContext::getMainPageId() {
     return PAGE_ID_MAIN;
 }
 
+bool isSysSettingsSubPage(int pageId) {
+    return pageId == PAGE_ID_SYS_SETTINGS_AUX_OTP ||
+        pageId == PAGE_ID_SYS_SETTINGS_PROTECTIONS ||
+        pageId == PAGE_ID_SYS_SETTINGS_IO ||
+        pageId == PAGE_ID_SYS_SETTINGS_DATE_TIME ||
+        pageId == PAGE_ID_SYS_SETTINGS_ENCODER ||
+        pageId == PAGE_ID_SYS_SETTINGS_SERIAL ||
+        pageId == PAGE_ID_SYS_SETTINGS_ETHERNET ||
+        pageId == PAGE_ID_SYS_SETTINGS_CAL ||
+        pageId == PAGE_ID_SYS_SETTINGS_TRIGGER ||
+        pageId == PAGE_ID_SYS_SETTINGS_DISPLAY ||
+        pageId == PAGE_ID_SYS_SETTINGS_SOUND;
+}
+
 void PsuAppContext::onPageChanged() {
     AppContext::onPageChanged();
 
     g_focusEditValue = data::Value();
+
+    if (m_previousPageId == PAGE_ID_EVENT_QUEUE) {
+        if (m_activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        }
+    } else if (m_previousPageId == PAGE_ID_MAIN) {
+        if (m_activePageId == PAGE_ID_SYS_SETTINGS) {
+            animateShowSysSettings();
+        } else if (isSysSettingsSubPage(m_activePageId)) {
+            animateShowSysSettings();
+        } else if (m_activePageId == PAGE_ID_EVENT_QUEUE) {
+            animateSlideDown();
+        } else if (m_activePageId == PAGE_ID_USER_PROFILES) {
+            animateSlideDown();
+        } else if (m_activePageId == PAGE_ID_SYS_INFO) {
+            animateSlideDown();
+        }
+    } else if (m_previousPageId == PAGE_ID_USER_PROFILES) {
+        if (m_activePageId == PAGE_ID_USER_PROFILE_0_SETTINGS) {
+            animateSlideDown();
+        } else if (m_activePageId == PAGE_ID_USER_PROFILE_SETTINGS) {
+            animateSlideDown();
+        } else if (m_activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        } else if (m_activePageId == PAGE_ID_USER_PROFILES2) {
+            animateSlideLeft();
+        }
+    } else if (m_previousPageId == PAGE_ID_USER_PROFILES2) {
+        if (m_activePageId == PAGE_ID_USER_PROFILE_SETTINGS) {
+            animateSlideDown();
+        } else if (m_activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        } else if (m_activePageId == PAGE_ID_USER_PROFILES) {
+            animateSlideRight();
+        }
+    } else if (m_previousPageId == PAGE_ID_USER_PROFILE_0_SETTINGS) {
+        if (m_activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        } else if (m_activePageId == PAGE_ID_USER_PROFILES) {
+            animateSlideUp();
+        }
+    } else if (m_previousPageId == PAGE_ID_USER_PROFILE_SETTINGS) {
+        if (m_activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        } else if (m_activePageId == PAGE_ID_USER_PROFILES) {
+            animateSlideUp();
+        } else if (m_activePageId == PAGE_ID_USER_PROFILES2) {
+            animateSlideUp();
+        }
+    } else if (m_previousPageId == PAGE_ID_SYS_INFO) {
+        if (m_activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        }
+    } else if (m_previousPageId == PAGE_ID_SYS_SETTINGS) {
+        if (m_activePageId == PAGE_ID_MAIN) {
+            animateHideSysSettings();
+        } else if (isSysSettingsSubPage(m_activePageId)) {
+            animateSettingsSlideLeft();
+        }
+    } else if (isSysSettingsSubPage(m_previousPageId)) {
+        if (m_activePageId == PAGE_ID_MAIN) {
+            animateHideSysSettings();
+        } else if (m_activePageId == PAGE_ID_SYS_SETTINGS) {
+            animateSettingsSlideRight();
+        }
+    }
 }
 
 bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
@@ -855,9 +936,9 @@ void selectChannel() {
 }
 
 static bool isChannelTripLastEvent(int i, event_queue::Event &lastEvent) {
-    if (lastEvent.eventId == (event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + i * 3) ||
-        lastEvent.eventId == (event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + i * 3) ||
-        lastEvent.eventId == (event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + i * 3) ||
+    if (lastEvent.eventId == (event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + i) ||
+        lastEvent.eventId == (event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + i) ||
+        lastEvent.eventId == (event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + i) ||
         lastEvent.eventId == (event_queue::EVENT_ERROR_CH1_OTP_TRIPPED + i)) {
         return Channel::get(i).isTripped();
     }

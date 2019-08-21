@@ -42,6 +42,13 @@ float remapOutQuad(float x, float x1, float y1, float x2, float y2) {
     return remap(x, x1, y1, x2, y2);
 }
 
+float remapInOutQuad(float x, float x1, float y1, float x2, float y2) {
+    float t = remap(x, x1, 0, x2, 1);
+    t = t < .5 ? 2 * t*t : -1 + (4 - 2 * t)*t;
+    x = remap(t, 0, x1, 1, x2);
+    return remap(x, x1, y1, x2, y2);
+}
+
 float remapCubic(float x, float x1, float y1, float x2, float y2) {
     float t = remap(x, x1, 0, x2, 1);
     t = t * t * t;

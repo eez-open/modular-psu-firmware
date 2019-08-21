@@ -47,6 +47,7 @@ namespace eez {
 float remap(float x, float x1, float y1, float x2, float y2);
 float remapQuad(float x, float x1, float y1, float x2, float y2);
 float remapOutQuad(float x, float x1, float y1, float x2, float y2);
+float remapInOutQuad(float x, float x1, float y1, float x2, float y2);
 float remapCubic(float x, float x1, float y1, float x2, float y2);
 float remapOutCubic(float x, float x1, float y1, float x2, float y2);
 float remapExp(float x, float x1, float y1, float x2, float y2);

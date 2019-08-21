@@ -98,6 +98,8 @@ struct AnimationState {
     float duration;
     Buffer startBuffer;
     void (*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst);
+    float (*easingRects)(float x, float x1, float y1, float x2, float y2);
+    float (*easingOpacity)(float x, float x1, float y1, float x2, float y2);
 };
 
 enum Opacity {
@@ -135,10 +137,11 @@ extern AnimRect g_animRects[MAX_ANIM_RECTS];
 
 void animateOpen(const Rect &srcRect, const Rect &dstRect);
 void animateClose(const Rect &srcRect, const Rect &dstRect);
-void animateRects(Buffer startBuffer, int numRects);
+void animateRects(Buffer startBuffer, int numRects, float duration = -1);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool isUpdatingScreen();
 int getCurrentStateBufferIndex();
 uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor);
 

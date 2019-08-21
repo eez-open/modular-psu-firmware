@@ -560,14 +560,22 @@ void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
 }
 
 void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity) {
-    for (int y = 0; y < sh; ++y) {
-        for (int x = 0; x < sw; ++x) {
-            uint8_t *p = (uint8_t *)&((uint32_t *)src)[(sy + y) * g_frontPanelWidth + sx + x];
-            p[3] = opacity;
-            ((uint32_t *)dst)[(dy + y) * g_frontPanelWidth + dx + x] = blendColor(
-                ((uint32_t *)src)[(sy + y) * g_frontPanelWidth + sx + x], 
-                ((uint32_t *)dst)[(dy + y) * g_frontPanelWidth + dx + x]
-            );
+    if (opacity == 255) {
+        for (int y = 0; y < sh; ++y) {
+            for (int x = 0; x < sw; ++x) {
+                ((uint32_t *)dst)[(dy + y) * g_frontPanelWidth + dx + x] = ((uint32_t *)src)[(sy + y) * g_frontPanelWidth + sx + x];
+            }
+        }
+    } else {
+        for (int y = 0; y < sh; ++y) {
+            for (int x = 0; x < sw; ++x) {
+                uint8_t *p = (uint8_t *)&((uint32_t *)src)[(sy + y) * g_frontPanelWidth + sx + x];
+                p[3] = opacity;
+                ((uint32_t *)dst)[(dy + y) * g_frontPanelWidth + dx + x] = blendColor(
+                    ((uint32_t *)src)[(sy + y) * g_frontPanelWidth + sx + x],
+                    ((uint32_t *)dst)[(dy + y) * g_frontPanelWidth + dx + x]
+                );
+            }
         }
     }
 }

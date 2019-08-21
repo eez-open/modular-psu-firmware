@@ -169,13 +169,7 @@ void action_stand_by() {
 }
 
 void action_show_previous_page() {
-    int previousPageId = getActivePageId();
-
     popPage();
-
-    if (getActivePageId() == PAGE_ID_MAIN && previousPageId == PAGE_ID_SYS_SETTINGS) {
-        animateHideSysSettings();
-    }
 }
 
 void showMainPage() {
@@ -203,7 +197,6 @@ void action_show_channel_settings() {
 
 void action_show_sys_settings() {
     showPage(PAGE_ID_SYS_SETTINGS);
-    animateShowSysSettings();
 }
 
 void action_show_sys_settings_trigger() {
@@ -261,10 +254,6 @@ void action_show_sys_settings_encoder() {
 
 void action_show_sys_info() {
     showPage(PAGE_ID_SYS_INFO);
-}
-
-void action_show_sys_info2() {
-    showPage(PAGE_ID_SYS_INFO2);
 }
 
 void action_show_main_help_page() {
@@ -447,10 +436,12 @@ void action_edit_field() {
 
 void action_event_queue_previous_page() {
     event_queue::moveToPreviousPage();
+    animateSlideRight();
 }
 
 void action_event_queue_next_page() {
     event_queue::moveToNextPage();
+    animateSlideLeft();
 }
 
 void action_ch_settings_adv_remote_toggle_sense() {
@@ -503,6 +494,7 @@ void action_profile_edit_remark() {
 
 void action_toggle_channels_view_mode() {
     persist_conf::toggleChannelsViewMode();
+    animateFadeOutFadeInWorkingArea();
 }
 
 void action_toggle_channels_max_view() {
@@ -800,6 +792,16 @@ void action_show_stand_by_menu() {
 
 void action_reset() {
     eez::gui::reset();
+}
+
+void hard_reset() {
+#if defined(EEZ_PLATFORM_STM32)
+    NVIC_SystemReset();
+#endif
+}
+
+void action_hard_reset() {
+    areYouSure(hard_reset);
 }
 
 void action_ch_settings_adv_ranges_select_mode() {

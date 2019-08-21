@@ -20,6 +20,7 @@
 
 #include <eez/apps/home/home.h>
 
+#include <eez/apps/home/animations.h>
 #include <eez/apps/home/data.h>
 #include <eez/apps/home/touch_calibration.h>
 #include <eez/gui/gui.h>
@@ -34,7 +35,7 @@
 #include <eez/apps/psu/idle.h>
 
 #define CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT 2000000L // 2s
-#define CONF_GUI_STANDBY_PAGE_TIMEOUT 10000000L         // 10s
+#define CONF_GUI_STANDBY_PAGE_TIMEOUT 4000000L          // 4s
 #define CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT 2000000L      // 2s
 #define CONF_GUI_WELCOME_PAGE_TIMEOUT 2000000L          // 2s
 
@@ -141,6 +142,14 @@ bool HomeAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
 
 int HomeAppContext::getMainPageId() {
     return PAGE_ID_HOME_PSU;
+}
+
+void HomeAppContext::onPageChanged() {
+    AppContext::onPageChanged();
+
+    if (m_previousPageId == PAGE_ID_WELCOME) {
+        animateFadeOutFadeIn();
+    }
 }
 
 void HomeAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {

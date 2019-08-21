@@ -33,6 +33,7 @@ class HomeAppContext : public AppContext {
 
   protected:
     int getMainPageId() override;
+    void onPageChanged() override;
     bool isActiveWidget(const WidgetCursor &widgetCursor) override;
     void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) override;
 };

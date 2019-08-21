@@ -98,12 +98,14 @@ list (APPEND header_files ${header_eez})
 source_group("eez" FILES ${src_eez} ${header_eez})
 
 set(src_eez_apps_home
+    src/eez/apps/home/animations.cpp
     src/eez/apps/home/data.cpp
     src/eez/apps/home/home.cpp
     src/eez/apps/home/touch_calibration.cpp
 )
 list (APPEND src_files ${src_eez_apps_home})
 set(header_eez_apps_home
+    src/eez/apps/home/animations.h
     src/eez/apps/home/data.h
     src/eez/apps/home/home.h
     src/eez/apps/home/touch_calibration.h
