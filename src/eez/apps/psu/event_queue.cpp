@@ -30,9 +30,9 @@ namespace psu {
 namespace event_queue {
 
 static const uint32_t MAGIC = 0xD8152FC3L;
-static const uint16_t VERSION = 4;
+static const uint16_t VERSION = 5;
 
-static const uint16_t MAX_EVENTS = 100;
+static const uint16_t MAX_EVENTS = 200;
 static const uint16_t NULL_INDEX = MAX_EVENTS;
 
 static const uint16_t EVENT_HEADER_SIZE = 16;

@@ -1909,11 +1909,13 @@ void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::
     }
 }
 
+event_queue::Event g_stateEvents[2][event_queue::EVENTS_PER_PAGE];
 static event_queue::Event g_lastEvent[2];
+event_queue::Event g_event;
 
 void data_event_queue_last_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        event_queue::Event *lastEvent = &g_lastEvent[getCurrentStateBufferIndex()];
+        event_queue::Event *lastEvent = isUpdatingScreen() ? &g_lastEvent[getCurrentStateBufferIndex()] : &g_event;
         event_queue::getLastErrorEvent(lastEvent);
         value = data::Value(event_queue::getEventType(lastEvent));
     }
@@ -1921,7 +1923,7 @@ void data_event_queue_last_event_type(data::DataOperationEnum operation, data::C
 
 void data_event_queue_last_event_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        event_queue::Event *lastEvent = &g_lastEvent[getCurrentStateBufferIndex()];
+        event_queue::Event *lastEvent = isUpdatingScreen() ? &g_lastEvent[getCurrentStateBufferIndex()] : &g_event;
         event_queue::getLastErrorEvent(lastEvent);
         if (event_queue::getEventType(lastEvent) != event_queue::EVENT_TYPE_NONE) {
             value = MakeEventValue(lastEvent);
@@ -1935,12 +1937,10 @@ void data_event_queue_events(data::DataOperationEnum operation, data::Cursor &cu
     }
 }
 
-event_queue::Event g_stateEvents[2][event_queue::EVENTS_PER_PAGE];
-
 void data_event_queue_events_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (cursor.i >= 0) {
-            event_queue::Event *event = &g_stateEvents[getCurrentStateBufferIndex()][cursor.i];
+            event_queue::Event *event = isUpdatingScreen() ? &g_stateEvents[getCurrentStateBufferIndex()][cursor.i] : &g_event;
 
             int n = event_queue::getActivePageNumEvents();
             if (cursor.i < n) {
@@ -1957,7 +1957,7 @@ void data_event_queue_events_type(data::DataOperationEnum operation, data::Curso
 void data_event_queue_events_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (cursor.i >= 0) {
-            event_queue::Event *event = &g_stateEvents[getCurrentStateBufferIndex()][cursor.i];
+            event_queue::Event *event = isUpdatingScreen() ? &g_stateEvents[getCurrentStateBufferIndex()][cursor.i] : &g_event;
 
             int n = event_queue::getActivePageNumEvents();
             if (cursor.i < n) {

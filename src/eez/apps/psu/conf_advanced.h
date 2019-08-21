@@ -203,7 +203,7 @@
 #define MAX_KEYPAD_TEXT_LENGTH 128
 
 /// Enable transition to the Main page after period of inactivity.
-#define GUI_BACK_TO_MAIN_ENABLED 1
+#define GUI_BACK_TO_MAIN_ENABLED 0
 
 /// Inactivity period duration in seconds before transition to the Main page.
 #define GUI_BACK_TO_MAIN_DELAY 10

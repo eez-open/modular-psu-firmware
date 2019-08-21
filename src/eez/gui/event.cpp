@@ -37,7 +37,7 @@
 //
 
 #define CONF_GUI_LONG_TOUCH_TIMEOUT 1000000L        // 1s
-#define CONF_GUI_KEYPAD_AUTO_REPEAT_DELAY 250000L   // 250ms
+#define CONF_GUI_KEYPAD_AUTO_REPEAT_DELAY 100000L   // 100ms
 #define CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT 30000000L // 30s
 
 namespace eez {
@@ -85,9 +85,11 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
         }
     } else if (touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
         int action = getAction(widgetCursor);
-        if (action == ACTION_ID_KEYPAD_BACK || action == ACTION_ID_EVENT_QUEUE_PREVIOUS_PAGE ||
+        if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor) && (
+            action == ACTION_ID_KEYPAD_BACK || 
+            action == ACTION_ID_EVENT_QUEUE_PREVIOUS_PAGE ||
             action == ACTION_ID_EVENT_QUEUE_NEXT_PAGE ||
-            widgetCursor.appContext->isAutoRepeatAction(action)) {
+            widgetCursor.appContext->isAutoRepeatAction(action))) {
             m_touchActionExecuted = true;
             executeAction(action);
         }

@@ -25,9 +25,14 @@
 namespace eez {
 namespace gui {
 
+static bool g_updatingScreen;
 static uint8_t g_stateBuffer[2][CONF_MAX_STATE_SIZE];
 static WidgetState *g_previousState;
 static WidgetState *g_currentState;
+
+bool isUpdatingScreen() {
+    return g_updatingScreen;
+}
 
 int getCurrentStateBufferIndex() {
     return (uint8_t *)g_currentState == &g_stateBuffer[0][0] ? 0 : 1;
@@ -48,7 +53,11 @@ void updateScreen() {
 	widgetCursor.previousState = g_previousState;
 	widgetCursor.currentState = g_currentState;
 
+    g_updatingScreen = true;
+
     g_appContext->updateAppView(widgetCursor);
+
+    g_updatingScreen = false;
 }
 
 } // namespace gui

@@ -363,7 +363,7 @@ void Channel::protectionEnter(ProtectionValue &cpv) {
     int bit_mask = reg_get_ques_isum_bit_mask_for_channel_protection_value(cpv);
     setQuesBits(bit_mask, true);
 
-    int16_t eventId = event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + 3 * (index - 1);
+    int16_t eventId = event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + (index - 1);
 
     if (IS_OVP_VALUE(this, cpv)) {
         if (flags.rprogEnabled && channel_dispatcher::getUProtectionLevel(*this) == channel_dispatcher::getUMax(*this)) {
@@ -1448,21 +1448,21 @@ void Channel::clearProtection(bool clearOTP) {
     ovp.flags.tripped = 0;
     ovp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OVP, false);
-    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + 3 * (index - 1)) {
+    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + (index - 1)) {
         event_queue::markAsRead();
     }
 
     ocp.flags.tripped = 0;
     ocp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OCP, false);
-    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + 3 * (index - 1)) {
+    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + (index - 1)) {
         event_queue::markAsRead();
     }
 
     opp.flags.tripped = 0;
     opp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OPP, false);
-    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + 3 * (index - 1)) {
+    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + (index - 1)) {
         event_queue::markAsRead();
     }
 
