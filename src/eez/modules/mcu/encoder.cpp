@@ -92,6 +92,8 @@ int getCounter() {
     int16_t diffCounter = g_lastCounter - previousCounter;
 #endif
 
+	static float aux1 = 0;
+
     if (diffCounter != 0) {
 		uint32_t previousTick = g_lastTick;
 		g_lastTick = millis();
@@ -117,21 +119,28 @@ int getCounter() {
 		}
 
 		if (diffCounter > 0) {
-			// DebugTrace("C=%d, T=%g\n", (int)diffCounter, diffTick);
-
 			int counter;
 
-			if (g_accelerationEnabled && diffTick < ACCELERATION_DIFF_TICK_THRESHOLD) {
+//			if (g_accelerationEnabled && diffTick < 3 * ACCELERATION_DIFF_TICK_THRESHOLD) {
 				uint8_t speed = g_direction == 1 ? g_speedUp : g_speedDown;
 				float speedFactor = SPEED_FACTOR * (speed - MIN_MOVING_SPEED) / (MAX_MOVING_SPEED - MIN_MOVING_SPEED);
-                counter = (int)roundf(diffCounter * speedFactor * ACCELERATION_DIFF_TICK_THRESHOLD / diffTick);
-			} else {
-				counter = diffCounter;
-			}
+                float aux2 = aux1 + diffCounter * speedFactor * ACCELERATION_DIFF_TICK_THRESHOLD / diffTick;
+                counter = (int)floor(aux2);
+                aux1 = aux2 - counter;
+
+                // DebugTrace("C=%d, T=%g, aux2=%g, counter=%d, aux1=%g\n", (int)diffCounter, diffTick, aux2, counter, aux1);
+
+//			} else {
+//				counter = diffCounter;
+//			}
 
 			return counter * g_direction;
 		}
-    }
+    } else {
+		if (aux1 > 0 && (millis() - g_lastTick) > 500) {
+			aux1 = 0;
+		}
+	}
 
     return 0;
 }
