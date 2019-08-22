@@ -29,7 +29,6 @@ extern data::Value g_alertMessage;
 extern data::Value g_alertMessage2;
 extern data::Value g_alertMessage3;
 extern data::Value g_progress;
-extern char g_throbber[8];
 
 void showAsyncOperationInProgress(const char *message, void (*checkStatus)() = 0);
 void hideAsyncOperationInProgress();

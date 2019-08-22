@@ -25,6 +25,7 @@
 #include <eez/apps/psu/serial_psu.h>
 #if OPTION_ETHERNET
 #include <eez/apps/psu/ethernet.h>
+#include <eez/apps/psu/ntp.h>
 #endif
 #include <eez/apps/psu/event_queue.h>
 #include <eez/apps/psu/profile.h>
@@ -106,6 +107,9 @@ void oneIter() {
         }      
     } else {
         profile::tick();
+#if OPTION_ETHERNET
+        ntp::tick();
+#endif
     }
 }
 

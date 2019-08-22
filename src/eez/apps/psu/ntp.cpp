@@ -18,6 +18,12 @@
 
 #if OPTION_ETHERNET
 
+#ifdef EEZ_PLATFORM_STM32
+#include <api.h>
+#include <sntp.h>
+#include <ip_addr.h>
+#endif
+
 #include <eez/apps/psu/psu.h>
 
 #include <eez/apps/psu/datetime.h>
@@ -26,8 +32,6 @@
 #include <eez/apps/psu/ntp.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/system.h>
-#include <eez/apps/psu/watchdog.h>
-#include <eez/modules/mcu/ethernet.h>
 
 // Some time servers:
 // - time.google.com
@@ -35,30 +39,22 @@
 
 #define CONF_NTP_LOCAL_PORT 8888
 
-#define CONF_PARSE_TIMEOUT_MS 5 * 1000 // 5 second
 #define CONF_TIMEOUT_AFTER_SUCCESS_MS CONF_NTP_PERIOD_SEC * 1000L
 #define CONF_TIMEOUT_AFTER_ERROR_MS CONF_NTP_PERIOD_AFTER_ERROR_SEC * 1000L
 
-using namespace eez::mcu::ethernet;
+#define CONF_TEST_NTP_SERVER_TIMEOUT 5 * 1000 // 5 second
 
 namespace eez {
 namespace psu {
 namespace ntp {
 
-static EthernetUDP g_udp;
+#ifdef EEZ_PLATFORM_STM32
 
-static const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
-static uint8_t packetBuffer[NTP_PACKET_SIZE]; // buffer to hold incoming and outgoing packets
-
-enum State { STOPPED, START, PARSE, SUCCESS, ERROR };
-
-static State g_state;
-
-static uint32_t g_lastTickCount;
-
+static bool g_initialized;
+static bool g_succeeded;
+static bool g_errorReported;
+static uint32_t g_initTime;
 static const char *g_ntpServerToTest;
-
-static bool g_lastWasSuccess;
 
 const char *getNtpServer() {
     if (g_ntpServerToTest) {
@@ -73,203 +69,93 @@ const char *getNtpServer() {
     return NULL;
 }
 
-// send an NTP request to the time server at the given address
-int sendNtpPacket() {
-    // set all bytes in the buffer to 0
-    memset(packetBuffer, 0, NTP_PACKET_SIZE);
+extern "C" void sntpSetSystemTimeUs(uint32_t utc, uint32_t us) {
+	 uint32_t local = datetime::utcToLocal(utc, persist_conf::devConf.time_zone, (datetime::DstRule)persist_conf::devConf2.dstRule);
+	 int year, month, day, hour, minute, second;
+	 datetime::breakTime(local, year, month, day, hour, minute, second);
+	 datetime::setDateTime(year - 2000, month, day, hour, minute, second, false, 2);
 
-    // Initialize values needed to form NTP request
-    // (see http://en.wikipedia.org/wiki/Network_Time_Protocol for details on the packets)
-    packetBuffer[0] = 0b11100011; // LI, Version, Mode
-    packetBuffer[1] = 0;          // Stratum, or type of clock
-    packetBuffer[2] = 6;          // Polling Interval
-    packetBuffer[3] = 0xEC;       // Peer Clock Precision
-
-    // 8 bytes of zero for Root Delay & Root Dispersion
-    packetBuffer[12] = 49;
-    packetBuffer[13] = 0x4E;
-    packetBuffer[14] = 49;
-    packetBuffer[15] = 52;
-
-    // All NTP fields have been given values, now
-    // you can send a packet requesting a timestamp:
-    int rc;
-
-#if OPTION_WATCHDOG
-    watchdog::disable();
-#endif
-
-
-    rc = g_udp.beginPacket(getNtpServer(), 123); // NTP requests are to port 123
-    if (!rc) {
-#if OPTION_WATCHDOG
-        watchdog::enable();
-#endif
-
-        return -1;
-    }
-
-    int written = g_udp.write(packetBuffer, NTP_PACKET_SIZE);
-    if (written != NTP_PACKET_SIZE) {
-#if OPTION_WATCHDOG
-        watchdog::enable();
-#endif
-
-        return -2;
-    }
-
-    rc = g_udp.endPacket();
-    if (!rc) {
-#if OPTION_WATCHDOG
-        watchdog::enable();
-#endif
-
-        return -3;
-    }
-
-#if OPTION_WATCHDOG
-        watchdog::enable();
-#endif
-
-
-    return 0;
+	 g_succeeded = true;
 }
-
-void readNtpPacket() {
-    // We've received a packet, read the data from it
-#if OPTION_WATCHDOG
-    watchdog::disable();
 #endif
-    g_udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
-#if OPTION_WATCHDOG
-    watchdog::enable();
-#endif
-
-
-    // The timestamp starts at byte 40 of the received packet and is four bytes,
-    // or two words, long. First, esxtract the two words:
-    uint32_t highWord = (packetBuffer[40] << 8) + packetBuffer[41];
-    uint32_t lowWord = (packetBuffer[42] << 8) + packetBuffer[43];
-
-    // Combine the four bytes (two words) into a long integer
-    // this is NTP time (seconds since Jan 1 1900):
-    uint32_t secsSince1900 = highWord << 16 | lowWord;
-
-    // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
-    const uint32_t seventyYears = 2208988800UL;
-
-    // Subtract seventy years:
-    uint32_t utc = secsSince1900 - seventyYears;
-
-    uint32_t local = datetime::utcToLocal(utc, persist_conf::devConf.time_zone,
-                                          (datetime::DstRule)persist_conf::devConf2.dstRule);
-
-    int year, month, day, hour, minute, second;
-    datetime::breakTime(local, year, month, day, hour, minute, second);
-
-    // DebugTrace("NTP: %d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
-
-    datetime::setDateTime(year - 2000, month, day, hour, minute, second, false, 2);
-}
-
-void begin() {
-    g_udp.begin(CONF_NTP_LOCAL_PORT);
-    g_state = START;
-    g_lastWasSuccess = true;
-}
 
 void init() {
-    if (ethernet::g_testResult == TEST_OK && persist_conf::isNtpEnabled()) {
-        begin();
-    }
 }
 
-void setState(State state) {
-    g_state = state;
+void tick() {
+#ifdef EEZ_PLATFORM_STM32
+	if (ethernet::g_testResult == TEST_OK && persist_conf::isNtpEnabled()) {
+		if (!g_initialized) {
+			g_initialized = true;
 
-    if (g_state == SUCCESS) {
-        g_lastWasSuccess = true;
-    } else if (g_state == ERROR) {
-        if (g_lastWasSuccess) {
-            event_queue::pushEvent(event_queue::EVENT_WARNING_NTP_REFRESH_FAILED);
-        }
-        g_lastWasSuccess = false;
-    }
-}
+			sntp_setoperatingmode(SNTP_OPMODE_POLL);
+            sntp_setservername(0, (char *)getNtpServer());
+			sntp_init();
+		} else {
+			if (!g_ntpServerToTest) {
+				int diff = millis() - g_initTime;
+				if (g_succeeded) {
+					if (diff > CONF_TIMEOUT_AFTER_SUCCESS_MS) {
+						reset();
+					}
+				} else {
+					if (diff > CONF_TIMEOUT_AFTER_ERROR_MS) {
+						reset();
+					} else if (!g_errorReported && diff > CONF_TEST_NTP_SERVER_TIMEOUT) {
+						event_queue::pushEvent(event_queue::EVENT_WARNING_NTP_REFRESH_FAILED);
+						g_errorReported = true;
+					}
+				}
+			}
+		}
 
-void tick(uint32_t tickCount) {
-    if (ethernet::g_testResult == TEST_OK && persist_conf::isNtpEnabled()) {
-        if (g_state == STOPPED) {
-            begin();
-        }
-
-        tickCount = millis();
-
-        if (g_state == START) {
-            if (getNtpServer()) {
-                // DebugTrace("sendNtpPacket start %ul", micros());
-                int rc = sendNtpPacket();
-                if (rc >= 0) {
-                    // DebugTrace("sendNtpPacket success %ul", micros());
-                    setState(PARSE);
-                    g_lastTickCount = tickCount;
-                } else {
-                    // DebugTrace("sendNtpPacket fail %d %ul", rc, micros());
-                    setState(ERROR);
-                    g_lastTickCount = tickCount;
-                }
-            } else {
-                setState(ERROR);
-                g_lastTickCount = tickCount;
-            }
-        } else if (g_state == PARSE) {
-            if (g_udp.parsePacket()) {
-                readNtpPacket();
-                setState(SUCCESS);
-                g_lastTickCount = tickCount;
-            } else {
-                if (tickCount - g_lastTickCount > CONF_PARSE_TIMEOUT_MS) {
-                    setState(ERROR);
-                    g_lastTickCount = tickCount;
-                }
-            }
-        } else if (g_state == SUCCESS) {
-            if (tickCount - g_lastTickCount > CONF_TIMEOUT_AFTER_SUCCESS_MS) {
-                setState(START);
-            }
-        } else if (g_state == ERROR) {
-            if (tickCount - g_lastTickCount > CONF_TIMEOUT_AFTER_ERROR_MS) {
-                setState(START);
-            }
-        }
     } else {
-        if (g_state != STOPPED) {
-            g_udp.stop();
-            setState(STOPPED);
-        }
+    	reset();
     }
+#endif
 }
 
 void reset() {
-    if (g_state == SUCCESS || g_state == ERROR) {
-        g_lastWasSuccess = true;
-        setState(START);
-    }
+#ifdef EEZ_PLATFORM_STM32
+	if (g_initialized) {
+		sntp_stop();
+		g_initTime = millis();
+		g_initialized = false;
+		g_succeeded = false;
+		g_errorReported = false;
+	}
+#endif
 }
 
 void testNtpServer(const char *ntpServer) {
+#ifdef EEZ_PLATFORM_STM32
+    // TODO
     g_ntpServerToTest = ntpServer;
-    g_lastWasSuccess = true;
-    setState(START);
+    reset();
+#else
+#endif
 }
 
 bool isTestNtpServerDone(bool &result) {
-    if (g_state == SUCCESS || g_state == ERROR || g_state == STOPPED) {
-        g_ntpServerToTest = NULL;
-        result = g_state == SUCCESS;
+#ifdef EEZ_PLATFORM_STM32
+	if (g_succeeded) {
+		g_ntpServerToTest = NULL;
+        result = true;
         return true;
+    } else {
+    	int diff = millis() - g_initTime;
+    	if (diff > CONF_TEST_NTP_SERVER_TIMEOUT) {
+    		g_ntpServerToTest = NULL;
+    		reset();
+    		result = false;
+            return true;
+    	}
     }
     return false;
+#else
+    result = true;
+    return true;
+#endif
 }
 
 } // namespace ntp

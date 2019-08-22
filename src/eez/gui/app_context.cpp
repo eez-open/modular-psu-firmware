@@ -81,11 +81,9 @@ void AppContext::stateManagment() {
         m_setPageIdOnNextIter = false;
     }
 
-    // update throbber in progress info
+    // call m_checkAsyncOperationStatus
     uint32_t tickCount = micros();
     if (getActivePageId() == PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
-        data::set(data::Cursor(), DATA_ID_ASYNC_OPERATION_THROBBER,
-                  data::Value(g_throbber[(tickCount % 1000000) / 125000]), 0);
         if (m_checkAsyncOperationStatus) {
             m_checkAsyncOperationStatus();
         }

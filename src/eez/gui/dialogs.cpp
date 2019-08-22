@@ -39,8 +39,6 @@ Value g_alertMessage2;
 Value g_alertMessage3;
 Value g_progress;
 
-char g_throbber[8] = { '|', '/', '-', '\\', '|', '/', '-', '\\' };
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void showAsyncOperationInProgress(const char *message, void (*checkStatus)()) {

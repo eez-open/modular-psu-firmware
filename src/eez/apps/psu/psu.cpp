@@ -731,10 +731,6 @@ void tick() {
 
     datetime::tick(tick_usec);
 
-#if OPTION_ETHERNET
-    ntp::tick(tick_usec);
-#endif
-
 	sound::tick();
 
     idle::tick();

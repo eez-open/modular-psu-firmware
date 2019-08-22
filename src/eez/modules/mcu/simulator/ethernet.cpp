@@ -499,35 +499,6 @@ int writeBuffer(const char *buffer, uint32_t length) {
     return numWritten;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-uint8_t EthernetUDP::begin(uint16_t port) {
-    return 0;
-}
-
-void EthernetUDP::stop() {
-}
-
-int EthernetUDP::beginPacket(const char *host, uint16_t port) {
-    return 0;
-}
-
-size_t EthernetUDP::write(const uint8_t *buffer, size_t size) {
-    return 0;
-}
-
-int EthernetUDP::endPacket() {
-    return 0;
-}
-
-int EthernetUDP::read(unsigned char *buffer, size_t len) {
-    return 0;
-}
-
-int EthernetUDP::parsePacket() {
-    return 0;
-}
-
 } // namespace ethernet
 } // namespace mcu
 } // namespace eez

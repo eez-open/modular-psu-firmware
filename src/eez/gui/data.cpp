@@ -503,6 +503,7 @@ void data_progress(data::DataOperationEnum operation, data::Cursor &cursor, data
 void data_async_operation_throbber(data::DataOperationEnum operation, data::Cursor &cursor,
                                    data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
+        static const char *g_throbber[8] = { "|", "/", "-", "\\", "|", "/", "-", "\\" };
         value = data::Value(g_throbber[(millis() % 1000) / 125]);
     }
 }

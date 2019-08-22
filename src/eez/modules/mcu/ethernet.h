@@ -18,6 +18,10 @@
 
 #pragma once
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <api.h>
+#endif
+
 namespace eez {
 namespace mcu {
 namespace ethernet {
@@ -56,17 +60,6 @@ void getInputBuffer(int bufferPosition, char **buffer, uint32_t *length);
 void releaseInputBuffer();
 
 int writeBuffer(const char *buffer, uint32_t length);
-
-class EthernetUDP {
-public:
-    uint8_t begin(uint16_t port);
-    void stop();
-    int beginPacket(const char *host, uint16_t port);
-    size_t write(const uint8_t *buffer, size_t size);
-    int endPacket();
-    int read(unsigned char* buffer, size_t len);
-    int parsePacket();
-};
 
 }
 }

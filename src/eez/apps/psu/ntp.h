@@ -23,7 +23,7 @@ namespace psu {
 namespace ntp {
 
 void init();
-void tick(uint32_t tickCount);
+void tick();
 void reset();
 
 void testNtpServer(const char *ntpServer);
