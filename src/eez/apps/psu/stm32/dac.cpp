@@ -39,7 +39,6 @@ static const uint16_t DAC_MAX = (1L << DAC_RES) - 1;
 ////////////////////////////////////////////////////////////////////////////////
 
 DigitalAnalogConverter::DigitalAnalogConverter(Channel &channel_) : channel(channel_) {
-    g_testResult = TEST_SKIPPED;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,9 +47,9 @@ void DigitalAnalogConverter::init() {
 }
 
 bool DigitalAnalogConverter::test() {
-    g_testResult = TEST_OK;
+	g_testResult = TEST_OK;
 
-    // if (channel.ioexp.g_testResult != TEST_OK) {
+	// if (channel.ioexp.g_testResult != TEST_OK) {
     //     DebugTrace("Ch%d DAC test skipped because of IO expander", channel.index);
     //     g_testResult = TEST_SKIPPED;
     //     return true;
@@ -71,8 +70,6 @@ bool DigitalAnalogConverter::test() {
     // int save_output_enabled = channel.flags.outputEnabled;
     // channel.flags.outputEnabled = 0;
     // channel.ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, false);
-
-    // g_testResult = TEST_OK;
 
     // // set U on DAC and check it on ADC
     // float u_set = channel.u.max / 2;
@@ -123,17 +120,11 @@ bool DigitalAnalogConverter::test() {
     // channel.setVoltage(u_set_save);
     // channel.setCurrent(i_set_save);
 
-    // if (g_testResult == TEST_FAILED) {
-    //     if (channel.index == 1) {
-    //         generateError(SCPI_ERROR_CH1_DAC_TEST_FAILED);
-    //     }
-    //     else if (channel.index == 2) {
-    //         generateError(SCPI_ERROR_CH2_DAC_TEST_FAILED);
-    //     }
-    //     else {
-    //         // TODO
-    //     }
-    // }
+	// if (g_testResult == TEST_FAILED) {
+	// 	generateError(SCPI_ERROR_CH1_DAC_TEST_FAILED + channel.index - 1);
+	// } else {
+	// 	g_testResult == TEST_OK;
+	// }
 
     // m_testing = false;
 

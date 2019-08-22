@@ -44,7 +44,6 @@ static const uint8_t ADC_REG3_VAL = 0B00000000;
 ////////////////////////////////////////////////////////////////////////////////
 
 AnalogDigitalConverter::AnalogDigitalConverter(Channel &channel_) : channel(channel_) {
-    g_testResult = TEST_SKIPPED;
 }
 
 uint8_t AnalogDigitalConverter::getReg1Val() {
@@ -89,8 +88,6 @@ bool AnalogDigitalConverter::test() {
     uint8_t reg2 = result[2];
     uint8_t reg3 = result[3];
 
-    g_testResult = TEST_OK;
-
 	if (reg1 != getReg1Val()) {
 		DebugTrace("Ch%d ADC test failed reg1: expected=%d, got=%d", channel.index,
 				getReg1Val(), reg1);
@@ -110,15 +107,9 @@ bool AnalogDigitalConverter::test() {
 	}
 
     if (g_testResult == TEST_FAILED) {
-        if (channel.index == 1) {
-            generateError(SCPI_ERROR_CH1_ADC_TEST_FAILED);
-        }
-        else if (channel.index == 2) {
-            generateError(SCPI_ERROR_CH2_ADC_TEST_FAILED);
-        }
-        else {
-            // TODO
-        }
+		generateError(SCPI_ERROR_CH1_ADC_TEST_FAILED + channel.index - 1);
+    } else {
+    	g_testResult = TEST_OK;
     }
 
     return g_testResult != TEST_FAILED;

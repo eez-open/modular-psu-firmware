@@ -100,7 +100,6 @@ static const uint8_t REG_VALUES[] = {
 ////////////////////////////////////////////////////////////////////////////////
 
 IOExpander::IOExpander(Channel &channel_) : channel(channel_) {
-    g_testResult = TEST_SKIPPED;
 }
 
 void IOExpander::init() {
@@ -157,8 +156,6 @@ void IOExpander::init() {
 }
 
 bool IOExpander::test() {
-    g_testResult = TEST_OK;
-
     channel.flags.powerOk = 1;
 
     const uint8_t N_REGS = sizeof(REG_VALUES) / 3;
@@ -193,31 +190,22 @@ bool IOExpander::test() {
 
     readGpio();
 
-    if (g_testResult == TEST_OK) {
- #if !CONF_SKIP_PWRGOOD_TEST
+    if (g_testResult == TEST_FAILED) {
+		 generateError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED + channel.index - 1);
+		 channel.flags.powerOk = 0;
+    } else {
+    	g_testResult = TEST_OK;
+
+#if !CONF_SKIP_PWRGOOD_TEST
         channel.flags.powerOk = testBit(IO_BIT_IN_PWRGOOD);
         if (!channel.flags.powerOk) {
             DebugTrace("Ch%d power fault", channel.index);
             generateError(SCPI_ERROR_CH1_FAULT_DETECTED - (channel.index - 1));
         }
- #endif
-     } else {
-         channel.flags.powerOk = 0;
-     }
+#endif
+	}
 
-     if (g_testResult == TEST_FAILED) {
-         if (channel.index == 1) {
-             generateError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED);
-         }
-         else if (channel.index == 2) {
-             generateError(SCPI_ERROR_CH2_IOEXP_TEST_FAILED);
-         }
-         else {
-             // TODO
-         }
-     }
-
-    return g_testResult != TEST_FAILED;
+	return g_testResult != TEST_FAILED;
 }
 
 void IOExpander::reinit() {

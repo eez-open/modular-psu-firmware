@@ -26,8 +26,6 @@ namespace psu {
 ////////////////////////////////////////////////////////////////////////////////
 
 IOExpander::IOExpander(Channel &channel_) : channel(channel_) {
-    g_testResult = TEST_SKIPPED;
-
     gpio = 0B0000000100000000; // 5A
 }
 

@@ -78,7 +78,6 @@ void updateValues(Channel &channel) {
 }
 
 AnalogDigitalConverter::AnalogDigitalConverter(Channel &channel_) : channel(channel_) {
-    g_testResult = TEST_SKIPPED;
 }
 
 void AnalogDigitalConverter::init() {

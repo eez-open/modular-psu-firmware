@@ -70,27 +70,28 @@ osThreadId g_guiTaskHandle;
 bool onSystemStateChanged() {
     if (eez::g_systemState == eez::SystemState::BOOTING) {
         if (eez::g_systemStatePhase == 0) {
-            return false;
-        } else if (eez::g_systemStatePhase == 1) {
-            decompressAssets();
-        	mcu::display::onThemeChanged();
-        	mcu::display::updateBrightness();
             g_guiTaskHandle = osThreadCreate(osThread(g_guiTask), nullptr);
+        } else if (eez::g_systemStatePhase == 1) {
         }
     }
 
     return true;
 }
 
+
 void oneIter();
 
+bool x = false;
+
 void mainLoop(const void *) {
+	if (!x) {
+		x = true;
+		decompressAssets();
+		mcu::display::onThemeChanged();
+		mcu::display::updateBrightness();
+	}
 #ifdef __EMSCRIPTEN__
-    if (g_animationState.enabled) {
-        mcu::display::sync();
-    } else {
-        oneIter();
-    }
+	oneIter();
 #else
     while (1) {
         osDelay(1);
