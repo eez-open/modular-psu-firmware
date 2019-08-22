@@ -61,7 +61,9 @@ static enum {
 } g_displayState;
 static uint32_t g_displayStateTransitionStartTime;
 
+static uint16_t *g_bufferOld;
 static uint16_t *g_buffer;
+static uint16_t *g_animationBuffer;
 
 static bool g_takeScreenshot;
 static int g_screenshotY;
@@ -320,6 +322,7 @@ void turnOn() {
         __HAL_RCC_DMA2D_CLK_ENABLE();
 
         // clear video RAM
+        g_bufferOld = (uint16_t *)VRAM_BUFFER2_START_ADDRESS;
         g_buffer = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
         fillRect(g_buffer, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
 
@@ -356,41 +359,23 @@ void updateBrightness() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void animate() {
-    uint16_t *bufferOld;
-    uint16_t *bufferNew;
+	float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
+	if (t < 1.0f) {
+		g_animationBuffer = g_animationBuffer == (uint16_t *)VRAM_BUFFER3_START_ADDRESS
+						 ? (uint16_t *)VRAM_BUFFER4_START_ADDRESS
+						 : (uint16_t *)VRAM_BUFFER3_START_ADDRESS;
 
-    if (g_buffer == (uint16_t *)VRAM_BUFFER1_START_ADDRESS) {
-        bufferOld = (uint16_t *)VRAM_BUFFER2_START_ADDRESS;
-        bufferNew = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
-    } else {
-        bufferOld = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
-        bufferNew = (uint16_t *)VRAM_BUFFER2_START_ADDRESS;
-    }
+		g_animationState.callback(t, g_bufferOld, g_buffer, g_animationBuffer);
 
-    uint16_t *bufferDst = nullptr;
+		DMA2D_WAIT;
 
-    while (true) {
-        float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
-        if (t >= 1.0f) {
-            g_animationState.enabled = false;
-            break;
-        }
+		// wait for VSYNC
+		while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS));
 
-        bufferDst = bufferDst == (uint16_t *)VRAM_BUFFER3_START_ADDRESS
-                         ? (uint16_t *)VRAM_BUFFER4_START_ADDRESS
-                         : (uint16_t *)VRAM_BUFFER3_START_ADDRESS;
-
-        g_animationState.callback(t, bufferOld, bufferNew, bufferDst);
-
-        DMA2D_WAIT;
-
-        // wait for VSYNC
-        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS));
-
-        HAL_LTDC_SetAddress(&hltdc, (uint32_t)bufferDst, 0);
-
-        //osDelay(1);
-    }
+		HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_animationBuffer, 0);
+	} else {
+		g_animationState.enabled = false;
+	}
 }
 
 void sync() {
@@ -434,24 +419,24 @@ void sync() {
     	g_takeScreenshot = false;
     }
 
+    if (g_animationState.enabled) {
+        animate();
+        g_painted = !g_animationState.enabled;
+    }
+
     if (g_painted) {
         g_painted = false;
-
-        if (g_animationState.enabled) {
-            animate();
-        }
 
         // wait for VSYNC
         while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {}
 
 		HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
 
-        // copy current video buffer to the new one
-        uint16_t *g_newBufferAddress = g_buffer == (uint16_t *)VRAM_BUFFER1_START_ADDRESS
-                                           ? (uint16_t *)VRAM_BUFFER2_START_ADDRESS
-                                           : (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
-        bitBlt(g_buffer, g_newBufferAddress, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-        g_buffer = g_newBufferAddress;
+        bitBlt(g_buffer, g_bufferOld, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+
+        auto temp = g_buffer;
+        g_buffer = g_bufferOld;
+        g_bufferOld = temp;
     }
 }
 
@@ -613,14 +598,7 @@ void drawVLine(int x, int y, int l) {
 }
 
 void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
-    uint16_t * bufferOld;
-    if (g_buffer == (uint16_t *)VRAM_BUFFER1_START_ADDRESS) {
-        bufferOld = (uint16_t *)VRAM_BUFFER2_START_ADDRESS;
-    } else {
-        bufferOld = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
-    }
-
-    bitBlt(bufferOld, g_buffer, x1, y1, x2-x1+1, y2-y1+1, dstx, dsty);
+    bitBlt(g_buffer, g_buffer, x1, y1, x2-x1+1, y2-y1+1, dstx, dsty);
 
     g_painted = true;
 }

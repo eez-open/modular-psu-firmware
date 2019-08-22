@@ -246,40 +246,31 @@ void animate() {
         bufferNew = g_frontPanelBuffer2;
     }
 
-    while (true) {
-        float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
-        if (t >= 1.0f) {
-            g_animationState.enabled = false;
-            break;
-        }
-
+    float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
+    if (t < 1.0f) {
         g_animationState.callback(t, bufferOld, bufferNew, g_frontPanelBuffer3);
-
         updateScreen(g_frontPanelBuffer3);
-
-#ifdef __EMSCRIPTEN__
-        break;
-#endif
+    } else {
+        g_animationState.enabled = false;
     }
 }
 
 void sync() {
-    if (g_animationState.enabled) {
-        animate();
-    }
-
-#ifdef __EMSCRIPTEN__
-    if (g_animationState.enabled) {
+    if (!isOn()) {
         return;
     }
-#endif
 
-    if (isOn() && g_painted) {
+    if (g_mainWindow == nullptr) {
+        init();
+    }
+
+    if (g_animationState.enabled) {
+        animate();
+        g_painted = !g_animationState.enabled;
+    }
+    
+    if (g_painted) {
         g_painted = false;
-
-        if (g_mainWindow == nullptr) {
-            init();
-        }
 
         updateScreen(g_frontPanelBuffer);
 
@@ -293,11 +284,6 @@ void sync() {
             g_frontPanelBuffer = g_frontPanelBuffer1;
         }
     }
-
-#ifndef __EMSCRIPTEN__
-    // sync
-    osDelay(1000 / 60);
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
