@@ -64,6 +64,11 @@ void readEvents() {
         }
     }
 
+    // for web simulator
+    if (yMouseWheel >= 100 || yMouseWheel <= -100) {
+        yMouseWheel /= 100;
+    }
+
     mcu::encoder::write(yMouseWheel, mouseButton2IsUp);
 }
 

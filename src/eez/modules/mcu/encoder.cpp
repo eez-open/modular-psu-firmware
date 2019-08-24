@@ -29,25 +29,22 @@
 
 #if defined(EEZ_PLATFORM_STM32)	
 #include <tim.h>
-#include <gpio.h>
+#include <eez/modules/mcu/button.h>
 #endif
 
 namespace eez {
 namespace mcu {
 namespace encoder {
 
+#if defined(EEZ_PLATFORM_STM32)
+static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin);
+static uint16_t g_lastCounter;
+#endif	
+
 #if defined(EEZ_PLATFORM_SIMULATOR)
 int g_simulatorCounter;
 bool g_simulatorClicked;
 #endif	
-
-#if defined(EEZ_PLATFORM_STM32)
-static uint16_t g_lastCounter;
-static GPIO_PinState g_buttonPinState = GPIO_PIN_RESET;
-static uint32_t g_buttonPinStateTick = 0;
-#define CONF_DEBOUNCE_THRESHOLD_TIME 10 // 10 ms
-static int g_btnIsDown = 0;
-#endif
 
 // ignore counter change when direction is changed if tick difference is less then this number
 #ifdef EEZ_PLATFORM_SIMULATOR
@@ -62,6 +59,8 @@ static int g_speedUp;
 static float g_acceleration;
 static uint32_t g_lastTick;
 static int g_direction;
+
+EncoderMode g_encoderMode = ENCODER_MODE_AUTO;
 
 void init() {
 #if defined(EEZ_PLATFORM_STM32)	
@@ -120,7 +119,7 @@ int getCounter() {
             float accelerationIncrement = -CONF_ENCODER_ACCELERATION_DECREMENT_PER_MS * diffTick + CONF_ENCODER_ACCELERATION_INCREMENT_FACTOR * speed;
 
             for (int i = 0; i < g_direction * deltaCounter; i++) {
-                if (g_accelerationEnabled) {
+                if (g_accelerationEnabled && g_encoderMode == ENCODER_MODE_AUTO) {
                     g_acceleration += accelerationIncrement;
                     if (g_acceleration < 0) g_acceleration = 0;
                     if (g_acceleration > 99) g_acceleration = 99;
@@ -142,36 +141,7 @@ bool isButtonClicked() {
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
-    if (HAL_GPIO_ReadPin(ENC_SW_GPIO_Port, ENC_SW_Pin) == GPIO_PIN_RESET) {
-        // button is DOWN
-        if (!g_btnIsDown) {
-            if (g_buttonPinState != GPIO_PIN_RESET) {
-                g_buttonPinState = GPIO_PIN_RESET;
-                g_buttonPinStateTick = HAL_GetTick();
-            } else {
-                int32_t diff = HAL_GetTick() - g_buttonPinStateTick;
-                if (diff > CONF_DEBOUNCE_THRESHOLD_TIME) {
-                    g_btnIsDown = true;
-                    return true;
-                }
-            }
-        }
-    } else {
-        // button is UP
-        if (g_btnIsDown) {
-            if (g_buttonPinState) {
-                g_buttonPinState = GPIO_PIN_RESET;
-                g_buttonPinStateTick = HAL_GetTick();
-            } else {
-                int32_t diff = HAL_GetTick() - g_buttonPinStateTick;
-                if (diff > CONF_DEBOUNCE_THRESHOLD_TIME) {
-                    g_btnIsDown = false;
-                }
-            }
-        }
-    }
-
-    return false;
+    return g_encoderSwitch.isClicked();
 #endif
 }
 
@@ -189,6 +159,14 @@ void enableAcceleration(bool enable) {
 void setMovingSpeed(uint8_t down, uint8_t up) {
     g_speedDown = down;
     g_speedUp = up;
+}
+
+void switchEncoderMode() {
+    if (g_encoderMode == ENCODER_MODE_STEP5) {
+        g_encoderMode = ENCODER_MODE_AUTO;
+    } else {
+        g_encoderMode = EncoderMode(g_encoderMode + 1);
+    }
 }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

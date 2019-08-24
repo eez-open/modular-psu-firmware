@@ -59,6 +59,10 @@
 #include <eez/apps/psu/dlog.h>
 #endif
 
+#if EEZ_PLATFORM_STM32
+#include <eez/modules/mcu/button.h>
+#endif
+
 #define CONF_DLOG_COLOR 62464
 
 namespace eez {
@@ -72,6 +76,10 @@ static bool g_showSetupWizardQuestionCalled;
 Channel *g_channel;
 static WidgetCursor g_toggleOutputWidgetCursor;
 
+#if EEZ_PLATFORM_STM32
+static mcu::Button g_userSwitch(USER_SW_GPIO_Port, USER_SW_Pin);
+#endif
+
 bool showSetupWizardQuestion();
 void onEncoder(int counter, bool clicked);
 
@@ -83,6 +91,12 @@ PsuAppContext::PsuAppContext() {
 
 void PsuAppContext::stateManagment() {
     AppContext::stateManagment();
+
+#if EEZ_PLATFORM_STM32
+    if (g_userSwitch.isClicked()) {
+        action_user_switch_clicked();
+    }
+#endif
 
     // TODO move this to some other place
 #if OPTION_ENCODER
@@ -292,8 +306,9 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
 }
 
 bool PsuAppContext::isAutoRepeatAction(int action) {
-    return action == ACTION_ID_CHANNEL_LISTS_PREVIOUS_PAGE ||
-           action == ACTION_ID_CHANNEL_LISTS_NEXT_PAGE;
+    return action == ACTION_ID_KEYPAD_BACK || 
+        action == ACTION_ID_EVENT_QUEUE_PREVIOUS_PAGE || action == ACTION_ID_EVENT_QUEUE_NEXT_PAGE || 
+        action == ACTION_ID_CHANNEL_LISTS_PREVIOUS_PAGE || action == ACTION_ID_CHANNEL_LISTS_NEXT_PAGE;
 }
 
 void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
@@ -321,7 +336,7 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
 }
 
 bool PsuAppContext::testExecuteActionOnTouchDown(int action) {
-    return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT;
+    return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT || isAutoRepeatAction(action);
 }
 
 uint16_t PsuAppContext::getWidgetBackgroundColor(const WidgetCursor &widgetCursor,
@@ -796,23 +811,29 @@ void onEncoder(int counter, bool clicked) {
 
             float oldValue = value.getFloat();
 
-            float factor = Channel::get(g_focusCursor.i).getValuePrecision(value.getUnit(), oldValue);
-
-            float newValue = oldValue + factor * counter;
+            float newValue;
+            if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
+                float factor = Channel::get(g_focusCursor.i).getValuePrecision(value.getUnit(), oldValue);
+                newValue = oldValue + factor * counter;
+            } else {
+                newValue = oldValue + edit_mode_step::getCurrentEncoderStepValue().getFloat() * counter;
+            }
 
             newValue = Channel::get(g_focusCursor.i).roundChannelValue(value.getUnit(), newValue);
 
-            float diff = fabs(newValue - oldValue);
-            if (diff > 1) {
-            	newValue = roundPrec(newValue, 1);
-            } else if (diff > 0.1) {
-            	newValue = roundPrec(newValue, 0.1f);
-            } else if (diff > 0.01) {
-            	newValue = roundPrec(newValue, 0.01f);
-            } else if (diff > 0.001) {
-            	newValue = roundPrec(newValue, 0.001f);
-            } else if (diff > 0.0001) {
-            	newValue = roundPrec(newValue, 0.0001f);
+            if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
+                float diff = fabs(newValue - oldValue);
+                if (diff > 1) {
+                    newValue = roundPrec(newValue, 1);
+                } else if (diff > 0.1) {
+                    newValue = roundPrec(newValue, 0.1f);
+                } else if (diff > 0.01) {
+                    newValue = roundPrec(newValue, 0.01f);
+                } else if (diff > 0.001) {
+                    newValue = roundPrec(newValue, 0.001f);
+                } else if (diff > 0.0001) {
+                    newValue = roundPrec(newValue, 0.0001f);
+                }
             }
 
             float min = data::getMin(g_focusCursor, g_focusDataId).getFloat();

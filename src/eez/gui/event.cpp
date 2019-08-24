@@ -37,8 +37,8 @@
 //
 
 #define CONF_GUI_LONG_TOUCH_TIMEOUT              1000000L // 1s
-#define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY   250000L // 250ms
-#define CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY     75000L // 75ms
+#define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY   300000L // 300ms
+#define CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY     50000L // 50ms
 #define CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT       30000000L // 30s
 
 namespace eez {
@@ -81,16 +81,15 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
         if (widgetCursor.appContext->testExecuteActionOnTouchDown(action)) {
             executeAction(action);
             m_touchActionExecutedAtDown = true;
+            if (widgetCursor.appContext->isAutoRepeatAction(action)) {
+                m_activeWidget = widgetCursor;    
+            }
         } else {
             m_activeWidget = widgetCursor;
         }
     } else if (touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
         int action = getAction(widgetCursor);
-        if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor) && (
-            action == ACTION_ID_KEYPAD_BACK || 
-            action == ACTION_ID_EVENT_QUEUE_PREVIOUS_PAGE ||
-            action == ACTION_ID_EVENT_QUEUE_NEXT_PAGE ||
-            widgetCursor.appContext->isAutoRepeatAction(action))) {
+        if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor) && widgetCursor.appContext->isAutoRepeatAction(action)) {
             m_touchActionExecuted = true;
             executeAction(action);
         }

@@ -1699,7 +1699,12 @@ void data_channel_protection_ovp_limit(data::DataOperationEnum operation, data::
         if (page) {
             value = page->limit;
         } else {
-            value = MakeValue(channel.u.limit, UNIT_VOLT);
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else {
+                value = MakeValue(channel.u.limit, UNIT_VOLT);
+            }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
@@ -1736,7 +1741,12 @@ void data_channel_protection_ocp_limit(data::DataOperationEnum operation, data::
         if (page) {
             value = page->limit;
         } else {
-            value = MakeValue(channel.i.limit, UNIT_AMPER);
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else {
+                value = MakeValue(channel.i.limit, UNIT_AMPER);
+            }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
@@ -1770,7 +1780,12 @@ void data_channel_protection_opp_level(data::DataOperationEnum operation, data::
         if (page) {
             value = page->level;
         } else {
-            value = MakeValue(channel.prot_conf.p_level, UNIT_WATT);
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else {
+                value = MakeValue(channel.prot_conf.p_level, UNIT_WATT);
+            }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getOppMinLevel(channel), UNIT_WATT);
@@ -1790,7 +1805,12 @@ void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::
         if (page) {
             value = page->delay;
         } else {
-            value = MakeValue(channel.prot_conf.p_delay, UNIT_SECOND);
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else {
+                value = MakeValue(channel.prot_conf.p_delay, UNIT_SECOND);
+            }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel.OPP_MIN_DELAY, UNIT_SECOND);
@@ -1809,7 +1829,12 @@ void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::
         if (page) {
             value = page->limit;
         } else {
-            value = MakeValue(channel.p_limit, UNIT_WATT);
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else {
+                value = MakeValue(channel.p_limit, UNIT_WATT);
+            }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getPowerMinLimit(channel), UNIT_WATT);
@@ -1844,7 +1869,12 @@ void data_channel_protection_otp_level(data::DataOperationEnum operation, data::
         if (page) {
             value = page->level;
         } else {
-            value = MakeValue(temperature::getChannelSensorLevel(&channel), UNIT_CELSIUS);
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else {
+                value = MakeValue(temperature::getChannelSensorLevel(&channel), UNIT_CELSIUS);
+            }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = MakeValue(OTP_AUX_MIN_LEVEL, UNIT_SECOND);
@@ -1863,7 +1893,12 @@ void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::
         if (page) {
             value = page->delay;
         } else {
-            value = MakeValue(temperature::getChannelSensorDelay(&channel), UNIT_SECOND);
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else {
+                value = MakeValue(temperature::getChannelSensorDelay(&channel), UNIT_SECOND);
+            }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = MakeValue(OTP_AUX_MIN_DELAY, UNIT_SECOND);

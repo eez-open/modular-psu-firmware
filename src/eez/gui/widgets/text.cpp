@@ -35,7 +35,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
     const Style* style = getWidgetStyle(widget);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
-    widgetCursor.currentState->flags.blinking = isBlinkTime() && styleIsBlink(style);
+    widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);
     widgetCursor.currentState->data =
         widget->data ? data::get(widgetCursor.cursor, widget->data) : 0;
 

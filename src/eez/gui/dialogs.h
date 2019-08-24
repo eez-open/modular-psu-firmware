@@ -43,6 +43,7 @@ const char *getTextMessage();
 uint8_t getTextMessageVersion();
 
 void infoMessage(const char *message);
+void infoMessage(data::Value value);
 void infoMessage(const char *message1, const char *message2);
 void errorMessage(const char *message);
 void errorMessage(const char *message1, const char *message2);

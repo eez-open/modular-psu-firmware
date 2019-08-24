@@ -100,6 +100,11 @@ void infoMessage(const char *message) {
     pushToastMessage(ToastMessagePage::create(INFO_TOAST, message));
 }
 
+void infoMessage(data::Value value) {
+    pushToastMessage(ToastMessagePage::create(INFO_TOAST, value));
+}
+
+
 void infoMessage(const char *message1, const char *message2) {
     pushToastMessage(ToastMessagePage::create(INFO_TOAST, message1, message2));
 }

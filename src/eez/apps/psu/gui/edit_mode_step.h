@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <eez/gui/data.h>
+
 namespace eez {
 namespace psu {
 namespace gui {
@@ -37,6 +39,9 @@ void onEncoder(int counter);
 void onTouchDown();
 void onTouchMove();
 void onTouchUp();
+
+eez::gui::data::Value getCurrentEncoderStepValue();
+void showCurrentEncoderMode();
 
 } // namespace edit_mode_step
 } // namespace gui

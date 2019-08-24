@@ -33,6 +33,19 @@ void read(int &counter, bool &clicked);
 void enableAcceleration(bool enable);
 void setMovingSpeed(uint8_t down, uint8_t up);
 
+enum EncoderMode {
+    ENCODER_MODE_AUTO,
+    ENCODER_MODE_STEP1,
+    ENCODER_MODE_STEP2,
+    ENCODER_MODE_STEP3,
+    ENCODER_MODE_STEP4,
+    ENCODER_MODE_STEP5
+};
+
+extern EncoderMode g_encoderMode;
+
+void switchEncoderMode();
+
 #if defined(EEZ_PLATFORM_SIMULATOR)
 void write(int counter, bool clicked);
 #endif

@@ -36,6 +36,7 @@
 #include <eez/apps/psu/gui/calibration.h>
 #include <eez/apps/psu/gui/edit_mode.h>
 #include <eez/apps/psu/gui/edit_mode_keypad.h>
+#include <eez/apps/psu/gui/edit_mode_step.h>
 #include <eez/apps/psu/gui/keypad.h>
 #include <eez/apps/psu/gui/numeric_keypad.h>
 #include <eez/apps/psu/gui/page_ch_settings_adv.h>
@@ -46,7 +47,12 @@
 #include <eez/apps/psu/gui/password.h>
 #include <eez/apps/psu/gui/data.h>
 
+#if OPTION_ENCODER
+#include <eez/modules/mcu/encoder.h>
+#endif
+
 #include <eez/scripting.h>
+
 
 using namespace eez::gui;
 using namespace eez::psu;
@@ -943,6 +949,22 @@ void action_scripts_previous_page() {
 
 void action_scripts_next_page() {
     scripting::g_currentPageIndex++;
+}
+
+void action_user_switch_clicked() {
+#if EEZ_PLATFORM_SIMULATOR
+    AppContext *saved = g_appContext;
+    g_appContext = &psu::gui::g_psuAppContext;
+#endif
+
+#if OPTION_ENCODER
+    mcu::encoder::switchEncoderMode();
+    psu::gui::edit_mode_step::showCurrentEncoderMode();
+#endif
+
+#if EEZ_PLATFORM_SIMULATOR
+    g_appContext = saved;
+#endif
 }
 
 } // namespace gui

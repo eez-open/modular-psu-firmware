@@ -22,6 +22,11 @@
 
 #include <math.h>
 
+#include <eez/sound.h>
+
+#include <eez/gui/touch.h>
+#include <eez/gui/dialogs.h>
+
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif
@@ -31,8 +36,6 @@
 #include <eez/apps/psu/gui/edit_mode.h>
 #include <eez/apps/psu/gui/edit_mode_step.h>
 #include <eez/apps/psu/gui/psu.h>
-#include <eez/gui/touch.h>
-#include <eez/sound.h>
 
 #define CONF_GUI_EDIT_MODE_STEP_THRESHOLD_PX 5
 
@@ -44,51 +47,51 @@ namespace edit_mode_step {
 using data::Value;
 
 static const Value CONF_GUI_U_STEPS[] = {
-    data::Value(5.0f, UNIT_VOLT),
-    data::Value(2.0f, UNIT_VOLT),
-    data::Value(1.0f, UNIT_VOLT),
-    data::Value(0.5f, UNIT_VOLT),
-    data::Value(0.1f, UNIT_VOLT)
+    Value(5.0f, UNIT_VOLT),
+    Value(2.0f, UNIT_VOLT),
+    Value(1.0f, UNIT_VOLT),
+    Value(0.5f, UNIT_VOLT),
+    Value(0.1f, UNIT_VOLT)
 };
 
 static const Value CONF_GUI_I_STEPS[] = {
-    data::Value(0.5f, UNIT_AMPER),
-    data::Value(0.25f, UNIT_AMPER),
-    data::Value(0.1f, UNIT_AMPER),
-    data::Value(0.05f, UNIT_AMPER),
-    data::Value(0.01f, UNIT_AMPER)
+    Value(0.5f, UNIT_AMPER),
+    Value(0.25f, UNIT_AMPER),
+    Value(0.1f, UNIT_AMPER),
+    Value(0.05f, UNIT_AMPER),
+    Value(0.01f, UNIT_AMPER)
 };
 
 static const Value CONF_GUI_I_LOW_STEPS[] = {
-    data::Value(0.005f, UNIT_AMPER),
-    data::Value(0.0025f, UNIT_AMPER),
-    data::Value(0.001f, UNIT_AMPER),
-    data::Value(0.0005f, UNIT_AMPER),
-    data::Value(0.0001f, UNIT_AMPER)
+    Value(0.005f, UNIT_AMPER),
+    Value(0.0025f, UNIT_AMPER),
+    Value(0.001f, UNIT_AMPER),
+    Value(0.0005f, UNIT_AMPER),
+    Value(0.0001f, UNIT_AMPER)
 };
 
 static const Value CONF_GUI_P_STEPS[] = {
-    data::Value(10.0f, UNIT_WATT),
-    data::Value(5.0f, UNIT_WATT),
-    data::Value(2.0f, UNIT_WATT),
-    data::Value(1.0f, UNIT_WATT),
-    data::Value(0.5f, UNIT_WATT)
+    Value(10.0f, UNIT_WATT),
+    Value(5.0f, UNIT_WATT),
+    Value(2.0f, UNIT_WATT),
+    Value(1.0f, UNIT_WATT),
+    Value(0.5f, UNIT_WATT)
 };
 
 static const Value CONF_GUI_TEMP_STEPS[] = {
-    data::Value(20.0f, UNIT_CELSIUS),
-    data::Value(10.0f, UNIT_CELSIUS),
-    data::Value(5.0f, UNIT_CELSIUS),
-    data::Value(2.0f, UNIT_CELSIUS),
-    data::Value(1.0f, UNIT_CELSIUS)
+    Value(20.0f, UNIT_CELSIUS),
+    Value(10.0f, UNIT_CELSIUS),
+    Value(5.0f, UNIT_CELSIUS),
+    Value(2.0f, UNIT_CELSIUS),
+    Value(1.0f, UNIT_CELSIUS)
 };
 
 static const Value CONF_GUI_TIME_STEPS[] = {
-    data::Value(30.0f, UNIT_SECOND),
-    data::Value(20.0f, UNIT_SECOND),
-    data::Value(10.0f, UNIT_SECOND),
-    data::Value(5.0f, UNIT_SECOND),
-    data::Value(1.0f, UNIT_SECOND)
+    Value(30.0f, UNIT_SECOND),
+    Value(20.0f, UNIT_SECOND),
+    Value(10.0f, UNIT_SECOND),
+    Value(5.0f, UNIT_SECOND),
+    Value(1.0f, UNIT_SECOND)
 };
 
 static int g_stepIndex[CH_MAX][2];
@@ -110,23 +113,27 @@ int getStepValuesCount() {
     return 5;
 }
 
-const data::Value *getStepValues() {
-    if (edit_mode::getUnit() == UNIT_VOLT) {
+const Value *getStepValues(Unit unit) {
+    if (unit == UNIT_VOLT) {
         return CONF_GUI_U_STEPS;
-    } else if (edit_mode::getUnit() == UNIT_AMPER) {
+    } else if (unit == UNIT_AMPER) {
         if (Channel::get(g_focusCursor.i).flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
             return CONF_GUI_I_LOW_STEPS;
         }
         return CONF_GUI_I_STEPS;
-    } else if (edit_mode::getUnit() == UNIT_WATT) {
+    } else if (unit == UNIT_WATT) {
         return CONF_GUI_P_STEPS;
-    } else if (edit_mode::getUnit() == UNIT_CELSIUS) {
+    } else if (unit == UNIT_CELSIUS) {
         return CONF_GUI_TEMP_STEPS;
-    } else if (edit_mode::getUnit() == UNIT_SECOND) {
+    } else if (unit == UNIT_SECOND) {
         return CONF_GUI_TIME_STEPS;
     } else {
         return CONF_GUI_U_STEPS;
     }
+}
+
+const Value *getStepValues() {
+    return getStepValues(edit_mode::getUnit());
 }
 
 int getStepIndex() {
@@ -217,6 +224,22 @@ void onTouchMove() {
 }
 
 void onTouchUp() {
+}
+
+Value getCurrentEncoderStepValue() {
+    auto editValue = data::getEditValue(g_focusCursor, g_focusDataId);
+    auto stepValues = getStepValues(editValue.getUnit());
+    return stepValues[mcu::encoder::ENCODER_MODE_STEP5 - mcu::encoder::g_encoderMode];
+}
+
+void showCurrentEncoderMode() {
+#if OPTION_ENCODER
+    if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
+        infoMessage("Auto");
+    } else {
+        infoMessage(getCurrentEncoderStepValue());
+    }
+#endif
 }
 
 } // namespace edit_mode_step

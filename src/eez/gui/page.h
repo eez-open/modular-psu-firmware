@@ -85,6 +85,9 @@ public:
 
     void pageFree();
 
+    bool onEncoder(int counter);
+    bool onEncoderClicked();
+
     void refresh(bool doNotDrawShadow = false);
     void updatePage();
     WidgetCursor findWidget(int x, int y);

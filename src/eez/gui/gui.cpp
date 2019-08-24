@@ -42,7 +42,7 @@
 
 #include <eez/modules/mcu/display.h>
 
-#define CONF_GUI_BLINK_TIME 400000UL // 400ms
+#define CONF_GUI_BLINK_TIME 400 // 400ms
 
 namespace eez {
 namespace gui {
@@ -104,7 +104,7 @@ void oneIter() {
     mcu::display::sync();
 
     g_wasBlinkTime = g_isBlinkTime;
-    g_isBlinkTime = (micros() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME &&
+    g_isBlinkTime = (millis() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME &&
                     touch::g_eventType == EVENT_TYPE_TOUCH_NONE;
 
     touch::tick();

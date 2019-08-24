@@ -43,10 +43,6 @@ bool onSystemStateChanged();
 
 extern bool g_isBlinkTime;
 
-inline bool isBlinkTime() {
-    return g_isBlinkTime;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 WidgetCursor &getFoundWidgetAtDown();

@@ -50,7 +50,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
 	const Style *style = getStyle(widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->style);
     const Style *activeStyle = getStyle(widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->activeStyle);
 
-    widgetCursor.currentState->flags.blinking = isBlinkTime() && data::isBlinking(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
     widgetCursor.currentState->backgroundColor = g_appContext->getWidgetBackgroundColor(widgetCursor, style);
 

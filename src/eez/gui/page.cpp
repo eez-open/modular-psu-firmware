@@ -174,6 +174,16 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, data::Value message1V
     return page;
 }
 
+bool ToastMessagePage::onEncoder(int counter) {
+    popPage();
+    return false;
+}
+
+bool ToastMessagePage::onEncoderClicked() {
+    popPage();
+    return false;
+}
+
 void ToastMessagePage::refresh(bool doNotDrawShadow) {
     const Style *style = getStyle(
         type == INFO_TOAST ? STYLE_ID_INFO_ALERT :
@@ -188,7 +198,7 @@ void ToastMessagePage::refresh(bool doNotDrawShadow) {
         message1 = message1TextBuffer;
     }
 
-    int minTextWidth = appContext->width / 2;
+    int minTextWidth = 80;
     int textWidth1 = display::measureStr(message1, -1, font, 0);
     int textWidth2 = message2 ? display::measureStr(message2, -1, font, 0) : 0;
     int textWidth3 = message3 ? display::measureStr(message3, -1, font, 0) : 0;

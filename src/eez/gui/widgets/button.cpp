@@ -40,7 +40,7 @@ void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->flags.enabled =
         data::get(widgetCursor.cursor, button_widget->enabled).getInt() ? 1 : 0;
     widgetCursor.currentState->flags.blinking =
-        isBlinkTime() && data::isBlinking(widgetCursor.cursor, widget->data);
+        g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
     widgetCursor.currentState->data =
         widget->data ? data::get(widgetCursor.cursor, widget->data) : 0;
 
