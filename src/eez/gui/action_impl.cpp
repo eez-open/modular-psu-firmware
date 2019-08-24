@@ -190,11 +190,6 @@ void action_show_event_queue() {
 	showPage(PAGE_ID_EVENT_QUEUE);
 }
 
-void action_show_channel_settings() {
-    selectChannel();
-    showPage(PAGE_ID_CH_SETTINGS_PROT);
-}
-
 void action_show_sys_settings() {
     showPage(PAGE_ID_SYS_SETTINGS);
 }
@@ -268,14 +263,14 @@ void action_show_edit_mode_slider_help() {
     pushPage(PAGE_ID_EDIT_MODE_SLIDER_HELP);
 }
 
-void action_show_ch_settings_prot() {
+void action_show_ch_settings() {
     selectChannel();
-    showPage(PAGE_ID_CH_SETTINGS_PROT);
+    showPage(PAGE_ID_CH_SETTINGS);
 }
 
 void action_show_ch_settings_prot_clear() {
     selectChannel();
-    showPage(PAGE_ID_CH_SETTINGS_PROT_CLEAR);
+    pushPage(PAGE_ID_CH_SETTINGS_PROT_CLEAR);
 }
 
 void action_show_ch_settings_prot_ocp() {
@@ -300,7 +295,7 @@ void action_show_ch_settings_prot_otp() {
 
 void action_show_ch_settings_trigger() {
     selectChannel();
-    showPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+    pushPage(PAGE_ID_CH_SETTINGS_TRIGGER);
 }
 
 void action_show_ch_settings_lists() {
@@ -308,29 +303,24 @@ void action_show_ch_settings_lists() {
     pushPage(PAGE_ID_CH_SETTINGS_LISTS);
 }
 
-void action_show_ch_settings_adv() {
-    selectChannel();
-    showPage(PAGE_ID_CH_SETTINGS_ADV);
-}
-
 void action_show_ch_settings_adv_remote() {
     selectChannel();
-    showPage(PAGE_ID_CH_SETTINGS_ADV_REMOTE);
+    pushPage(PAGE_ID_CH_SETTINGS_ADV_REMOTE);
 }
 
 void action_show_ch_settings_adv_ranges() {
     selectChannel();
-    showPage(PAGE_ID_CH_SETTINGS_ADV_RANGES);
+    pushPage(PAGE_ID_CH_SETTINGS_ADV_RANGES);
 }
 
 void action_show_ch_settings_adv_tracking() {
     selectChannel();
-    showPage(PAGE_ID_CH_SETTINGS_ADV_TRACKING);
+    pushPage(PAGE_ID_CH_SETTINGS_ADV_TRACKING);
 }
 
 void action_show_ch_settings_adv_coupling() {
     selectChannel();
-    showPage(PAGE_ID_CH_SETTINGS_ADV_COUPLING);
+    pushPage(PAGE_ID_CH_SETTINGS_ADV_COUPLING);
 }
 
 void action_show_ch_settings_adv_view() {
@@ -340,7 +330,7 @@ void action_show_ch_settings_adv_view() {
 
 void action_show_ch_settings_info() {
     selectChannel();
-    showPage(PAGE_ID_CH_SETTINGS_INFO);
+    pushPage(PAGE_ID_CH_SETTINGS_INFO);
 }
 
 void action_show_ch_settings_info_cal() {

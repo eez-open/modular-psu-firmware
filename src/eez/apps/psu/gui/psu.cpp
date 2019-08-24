@@ -141,6 +141,24 @@ bool isSysSettingsSubPage(int pageId) {
         pageId == PAGE_ID_SYS_SETTINGS_SOUND;
 }
 
+bool isChSettingsSubPage(int pageId) {
+    return pageId == PAGE_ID_CH_SETTINGS_PROT_CLEAR ||
+        pageId == PAGE_ID_CH_SETTINGS_PROT_OVP ||
+        pageId == PAGE_ID_CH_SETTINGS_PROT_OCP ||
+        pageId == PAGE_ID_CH_SETTINGS_PROT_OPP ||
+        pageId == PAGE_ID_CH_SETTINGS_PROT_OTP ||
+        pageId == PAGE_ID_CH_SETTINGS_TRIGGER ||
+        pageId == PAGE_ID_CH_SETTINGS_LISTS ||
+        pageId == PAGE_ID_CH_SETTINGS_ADV_REMOTE ||
+        pageId == PAGE_ID_CH_SETTINGS_ADV_RANGES ||
+        pageId == PAGE_ID_CH_SETTINGS_ADV_TRACKING ||
+        pageId == PAGE_ID_CH_SETTINGS_ADV_COUPLING ||
+        pageId == PAGE_ID_CH_SETTINGS_ADV_COUPLING_INFO ||
+        pageId == PAGE_ID_CH_SETTINGS_ADV_VIEW ||
+        pageId == PAGE_ID_CH_SETTINGS_INFO;
+}
+
+
 void PsuAppContext::onPageChanged() {
     AppContext::onPageChanged();
 
@@ -155,6 +173,10 @@ void PsuAppContext::onPageChanged() {
             animateShowSysSettings();
         } else if (isSysSettingsSubPage(m_activePageId)) {
             animateShowSysSettings();
+        } else if (m_activePageId == PAGE_ID_CH_SETTINGS) {
+            animateSlideDown();
+        } else if (isChSettingsSubPage(m_activePageId)) {
+            animateSlideDown();
         } else if (m_activePageId == PAGE_ID_EVENT_QUEUE) {
             animateSlideDown();
         } else if (m_activePageId == PAGE_ID_USER_PROFILES) {
@@ -204,11 +226,45 @@ void PsuAppContext::onPageChanged() {
         } else if (isSysSettingsSubPage(m_activePageId)) {
             animateSettingsSlideLeft();
         }
+    } else if (m_previousPageId == PAGE_ID_SYS_SETTINGS_TRIGGER) {
+        if (m_activePageId == PAGE_ID_MAIN) {
+            animateHideSysSettings();
+        } else if (m_activePageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
+            animateSlideUp();
+        } else if (m_activePageId == PAGE_ID_SYS_SETTINGS) {
+            animateSettingsSlideRight();
+        }
     } else if (isSysSettingsSubPage(m_previousPageId)) {
         if (m_activePageId == PAGE_ID_MAIN) {
             animateHideSysSettings();
         } else if (m_activePageId == PAGE_ID_SYS_SETTINGS) {
             animateSettingsSlideRight();
+        }
+    } else if (m_previousPageId == PAGE_ID_CH_SETTINGS) {
+        if (m_activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        } else if (isChSettingsSubPage(m_activePageId)) {
+            animateSlideLeft();
+        }
+    } else if (m_previousPageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
+        if (m_activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        } else if (m_activePageId == PAGE_ID_SYS_SETTINGS_TRIGGER) {
+            animateSlideDown();
+        } else if (m_activePageId == PAGE_ID_CH_SETTINGS_LISTS) {
+            animateSlideDown();
+        } else if (m_activePageId == PAGE_ID_CH_SETTINGS) {
+            animateSlideRight();
+        }
+    } else if (m_previousPageId == PAGE_ID_CH_SETTINGS_LISTS) {
+        if (m_activePageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
+            animateSlideUp();
+        }
+    } else if (isChSettingsSubPage(m_previousPageId)) {
+        if (m_activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        } else if (m_activePageId == PAGE_ID_CH_SETTINGS) {
+            animateSlideRight();
         }
     }
 }
@@ -746,6 +802,19 @@ void onEncoder(int counter, bool clicked) {
 
             newValue = Channel::get(g_focusCursor.i).roundChannelValue(value.getUnit(), newValue);
 
+            float diff = fabs(newValue - oldValue);
+            if (diff > 1) {
+            	newValue = roundPrec(newValue, 1);
+            } else if (diff > 0.1) {
+            	newValue = roundPrec(newValue, 0.1f);
+            } else if (diff > 0.01) {
+            	newValue = roundPrec(newValue, 0.01f);
+            } else if (diff > 0.001) {
+            	newValue = roundPrec(newValue, 0.001f);
+            } else if (diff > 0.0001) {
+            	newValue = roundPrec(newValue, 0.0001f);
+            }
+
             float min = data::getMin(g_focusCursor, g_focusDataId).getFloat();
             if (newValue < min) {
                 newValue = min;
@@ -760,7 +829,6 @@ void onEncoder(int counter, bool clicked) {
             if (newValue > max) {
                 newValue = max;
             }
-
 
             if (persist_conf::devConf2.flags.encoderConfirmationMode) {
                 g_focusEditValue = MakeValue(newValue, value.getUnit());

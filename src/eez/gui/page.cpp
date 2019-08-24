@@ -81,45 +81,97 @@ void InternalPage::drawShadow() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-ToastMessagePage::ToastMessagePage(ToastType type_, const char *message1_) 
-    : type(type_), message1(message1_), message2(nullptr), message3(nullptr)
-{
-    actionWidget.action = 0;
-    appContext = g_appContext;
-}
+static ToastMessagePage g_toastMessagePages[3];
 
-ToastMessagePage::ToastMessagePage(ToastType type_, data::Value message1Value_) 
-    : type(type_), message1(nullptr), message1Value(message1Value_), message2(nullptr), message3(nullptr)
-{
-    actionWidget.action = 0;
-    appContext = g_appContext;
-}
-
-ToastMessagePage::ToastMessagePage(ToastType type_, const char *message1_, const char *message2_) 
-    : type(type_), message1(message1_), message2(message2_), message3(nullptr)
-{
-    actionWidget.action = 0;
-    appContext = g_appContext;
-}
-
-ToastMessagePage::ToastMessagePage(ToastType type_, const char *message1_, const char *message2_, const char *message3_) 
-    : type(type_), message1(message1_), message2(message2_), message3(message3_)
-{
-    actionWidget.action = 0;
-    appContext = g_appContext;
-}
-
-ToastMessagePage::ToastMessagePage(ToastType type_, data::Value message1Value_, void (*action)(int param), const char *actionLabel, int actionParam) 
-    : type(type_), message1(nullptr), message1Value(message1Value_), message2(actionLabel), message3(nullptr), actionWidgetIsActive(false)
-{
-    actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION;
-    appContext = g_appContext;
-    appContext->m_toastAction = action;
-    appContext->m_toastActionParam = actionParam;
+ToastMessagePage *ToastMessagePage::findFreePage() {
+    for (int i = 0; i < sizeof(g_toastMessagePages) / sizeof(ToastMessagePage); i++) {
+        ToastMessagePage *page = &g_toastMessagePages[i];
+        if (!page->inUse) {
+            memset(page, sizeof(ToastMessagePage), 0);
+            page->inUse = true;
+            return page;
+        }
+    }
+    return nullptr;
 }
 
 void ToastMessagePage::pageFree() {
-    delete this;
+    inUse = false;
+}
+
+ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1) {
+    ToastMessagePage *page = ToastMessagePage::findFreePage();
+    
+    page->type = type;
+    page->message1 = message1;
+    page->message2 = nullptr;
+    page->message3 = nullptr;
+
+    page->actionWidget.action = 0;
+    page->appContext = g_appContext;
+
+    return page;
+}
+
+ToastMessagePage *ToastMessagePage::create(ToastType type, data::Value message1Value)  {
+    ToastMessagePage *page = ToastMessagePage::findFreePage();
+
+    page->type = type;
+    page->message1 = nullptr;
+    page->message1Value = message1Value;
+    page->message2 = nullptr;
+    page->message3 = nullptr;
+
+    page->actionWidget.action = 0;
+    page->appContext = g_appContext;
+
+    return page;
+}
+
+ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1, const char *message2)  {
+    ToastMessagePage *page = ToastMessagePage::findFreePage();
+
+    page->type = type;
+    page->message1 = message1;
+    page->message2 = message2;
+    page->message3 = nullptr;
+
+    page->actionWidget.action = 0;
+    page->appContext = g_appContext;
+
+    return page;
+}
+
+ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1, const char *message2, const char *message3)  {
+    ToastMessagePage *page = ToastMessagePage::findFreePage();
+
+    page->type = type;
+    page->message1 = message1;
+    page->message2 = message2;
+    page->message3 = message3;
+
+    page->actionWidget.action = 0;
+    page->appContext = g_appContext;
+
+    return page;
+}
+
+ToastMessagePage *ToastMessagePage::create(ToastType type, data::Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam) {
+    ToastMessagePage *page = ToastMessagePage::findFreePage();
+
+    page->type = type;
+    page->message1 = nullptr;
+    page->message1Value = message1Value;
+    page->message2 = actionLabel;
+    page->message3 = nullptr;
+    page->actionWidgetIsActive = false;
+
+    page->actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION;
+    page->appContext = g_appContext;
+    page->appContext->m_toastAction = action;
+    page->appContext->m_toastActionParam = actionParam;
+
+    return page;
 }
 
 void ToastMessagePage::refresh(bool doNotDrawShadow) {
@@ -248,7 +300,7 @@ WidgetCursor ToastMessagePage::findWidget(int x, int y) {
         if (actionWidget.action && x >= actionWidget.x && x < actionWidget.x + actionWidget.w && y >= actionWidget.y && y < actionWidget.y + actionWidget.h) {
             return WidgetCursor(appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0);
         }
-        widget.action = ACTION_ID_INTERNAL_DIALOG_YES;
+        widget.action = ACTION_ID_INTERNAL_DIALOG_CLOSE;
         return WidgetCursor(appContext, &widget, x, y, -1, 0, 0);
     }
     

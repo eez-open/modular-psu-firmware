@@ -74,12 +74,14 @@ enum ToastType {
 };
 
 class ToastMessagePage : public InternalPage {
+    static ToastMessagePage *findFreePage();
+
 public:
-    ToastMessagePage(ToastType type, const char *message1);
-    ToastMessagePage(ToastType type, data::Value message1Value);
-    ToastMessagePage(ToastType type, const char *message1, const char *message2);
-    ToastMessagePage(ToastType type, const char *message1, const char *message2, const char *message3);
-    ToastMessagePage(ToastType type, data::Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam);
+    static ToastMessagePage *create(ToastType type, const char *message1);
+    static ToastMessagePage *create(ToastType type, data::Value message1Value);
+    static ToastMessagePage *create(ToastType type, const char *message1, const char *message2);
+    static ToastMessagePage *create(ToastType type, const char *message1, const char *message2, const char *message3);
+    static ToastMessagePage *create(ToastType type, data::Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam);
 
     void pageFree();
 
@@ -90,6 +92,8 @@ public:
     static void executeAction();
 
 private:
+    bool inUse;
+
     ToastType type;
 
     const char *message1;

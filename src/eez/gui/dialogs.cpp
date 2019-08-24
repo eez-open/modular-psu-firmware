@@ -97,34 +97,34 @@ void pushToastMessage(ToastMessagePage *toastMessage) {
 }
 
 void infoMessage(const char *message) {
-    pushToastMessage(new ToastMessagePage(INFO_TOAST, message));
+    pushToastMessage(ToastMessagePage::create(INFO_TOAST, message));
 }
 
 void infoMessage(const char *message1, const char *message2) {
-    pushToastMessage(new ToastMessagePage(INFO_TOAST, message1, message2));
+    pushToastMessage(ToastMessagePage::create(INFO_TOAST, message1, message2));
 }
 
 void errorMessage(const char *message) {
-    pushToastMessage(new ToastMessagePage(ERROR_TOAST, message));
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message));
     sound::playBeep();
 }
 
 void errorMessage(const char *message1, const char *message2) {
-    pushToastMessage(new ToastMessagePage(ERROR_TOAST, message1, message2));
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message1, message2));
     sound::playBeep();
 }
 
 void errorMessage(const char *message1, const char *message2, const char *message3) {
-    pushToastMessage(new ToastMessagePage(ERROR_TOAST, message1, message2, message3));
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message1, message2, message3));
     sound::playBeep();
 }
 void errorMessage(data::Value value) {
-    pushToastMessage(new ToastMessagePage(ERROR_TOAST, value));
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, value));
     sound::playBeep();
 }
 
 void errorMessageWithAction(data::Value value, void (*action)(int param), const char *actionLabel, int actionParam) {
-    pushToastMessage(new ToastMessagePage(ERROR_TOAST, value, action, actionLabel, actionParam));
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, value, action, actionLabel, actionParam));
     sound::playBeep();
 }
 

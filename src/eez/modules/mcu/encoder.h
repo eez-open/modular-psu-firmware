@@ -27,8 +27,6 @@ static const uint8_t MIN_MOVING_SPEED = 1;
 static const uint8_t DEFAULT_MOVING_DOWN_SPEED = 8;
 static const uint8_t DEFAULT_MOVING_UP_SPEED = 6;
 
-bool onSystemStateChanged();
-
 void init();
 void read(int &counter, bool &clicked);
 

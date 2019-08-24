@@ -35,18 +35,17 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
     g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
+    appContext->x = widgetCursor.x;
+    appContext->y = widgetCursor.y;
+    appContext->width = widget->w;
+    appContext->height = widget->h;
+
     bool refresh = !widgetCursor.previousState;
-    if (refresh && !appContext->isActivePageInternal()) {
+    if (refresh && !appContext->isActivePageInternal() && appContext->getActivePageId() != INTERNAL_PAGE_ID_NONE) {
         // clear background
 		Widget *page = g_document->pages.first + appContext->getActivePageId();
         const Style* style = getWidgetStyle(page);
         mcu::display::setColor(style->background_color);
-
-		appContext->x = widgetCursor.x + page->x;
-		appContext->y = widgetCursor.y + page->y;
-
-		appContext->width = page->w;
-		appContext->height = page->h;
 
 		mcu::display::fillRect(appContext->x, appContext->y, appContext->x + page->w - 1, appContext->y + page->h - 1);
     }

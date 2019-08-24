@@ -37,19 +37,17 @@ namespace mcu {
 namespace encoder {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-int g_counter;
-bool g_clicked;
+int g_simulatorCounter;
+bool g_simulatorClicked;
 #endif	
-
-uint32_t g_lastTick;
 
 #if defined(EEZ_PLATFORM_STM32)
-uint16_t g_lastCounter;
-GPIO_PinState g_buttonPinState = GPIO_PIN_RESET;
-uint32_t g_buttonPinStateTick = 0;
+static uint16_t g_lastCounter;
+static GPIO_PinState g_buttonPinState = GPIO_PIN_RESET;
+static uint32_t g_buttonPinStateTick = 0;
 #define CONF_DEBOUNCE_THRESHOLD_TIME 10 // 10 ms
-int g_btnIsDown = 0;
-#endif	
+static int g_btnIsDown = 0;
+#endif
 
 // ignore counter change when direction is changed if tick difference is less then this number
 #ifdef EEZ_PLATFORM_SIMULATOR
@@ -58,126 +56,119 @@ int g_btnIsDown = 0;
 #define DIRECTION_CHANGE_DIFF_TICK_THRESHOLD 50
 #endif
 
-// acceleration is enabled only if tick difference is less then this number
-#define ACCELERATION_DIFF_TICK_THRESHOLD 50
-
-#ifdef EEZ_PLATFORM_SIMULATOR
-#define SPEED_FACTOR 10.0f
-#else
-#define SPEED_FACTOR 2.0f
-#endif
-
-bool g_accelerationEnabled = true;
-int g_speedDown;
-int g_speedUp;
+static bool g_accelerationEnabled = true;
+static int g_speedDown;
+static int g_speedUp;
+static float g_acceleration;
+static uint32_t g_lastTick;
+static int g_direction;
 
 void init() {
 #if defined(EEZ_PLATFORM_STM32)	
 	HAL_TIM_Encoder_Start(&htim8, TIM_CHANNEL_ALL);
 	g_lastCounter = __HAL_TIM_GET_COUNTER(&htim8);
-	g_lastTick = HAL_GetTick();
 #endif
-}
 
-int g_direction = 0;
+    g_lastTick = millis();
+}
 
 int getCounter() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    int16_t diffCounter = g_counter;
+    int16_t deltaCounter = g_simulatorCounter;
+    g_simulatorCounter = 0;
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
-    uint16_t previousCounter = g_lastCounter;
-    g_lastCounter = __HAL_TIM_GET_COUNTER(&htim8);
-    int16_t diffCounter = g_lastCounter - previousCounter;
+    uint16_t counter = __HAL_TIM_GET_COUNTER(&htim8);
+    int16_t deltaCounter = counter - g_lastCounter;
+    g_lastCounter = counter;
 #endif
 
-	static float aux1 = 0;
+#define CONF_ENCODER_ACCELERATION_INCREMENT_FACTOR 1.5f
+#define CONF_ENCODER_ACCELERATION_DECREMENT_PER_MS 1.0f
 
-    if (diffCounter != 0) {
-		uint32_t previousTick = g_lastTick;
-		g_lastTick = millis();
-		float diffTick = 1.0f * (g_lastTick - previousTick) / diffCounter;
+    float acceleratedCounter = 0;
 
-		if (diffCounter > 0) {
+    if (deltaCounter != 0) {
+        uint32_t tick = millis();
+        float diffTick = 1.0f * (tick - g_lastTick);
+        g_lastTick = tick;
+
+        if (deltaCounter > 0) {
 			if (g_direction != 1) {
 				g_direction = 1;
 				if (diffTick < DIRECTION_CHANGE_DIFF_TICK_THRESHOLD) {
-					diffCounter = 0;
+					deltaCounter = 0;
 				}
 			}
 		} else {
-			diffCounter = -diffCounter;
-			diffTick = -diffTick;
-
 			if (g_direction != -1) {
 				g_direction = -1;
 				if (diffTick < DIRECTION_CHANGE_DIFF_TICK_THRESHOLD) {
-					diffCounter = 0;
+					deltaCounter = 0;
 				}
 			}
-		}
+		}        
 
-		if (diffCounter > 0) {
-			int counter;
+        if (deltaCounter != 0) {
+            diffTick = diffTick / (g_direction * deltaCounter);
+            //float maxDiffTick = CONF_ENCODER_ACCELERATION_INCREMENT_FACTOR * MAX(g_speedUp, g_speedDown) / CONF_ENCODER_ACCELERATION_DECREMENT_PER_MS;
+            //diffTick = MIN(diffTick, maxDiffTick);
 
-//			if (g_accelerationEnabled && diffTick < 3 * ACCELERATION_DIFF_TICK_THRESHOLD) {
-				uint8_t speed = g_direction == 1 ? g_speedUp : g_speedDown;
-				float speedFactor = SPEED_FACTOR * (speed - MIN_MOVING_SPEED) / (MAX_MOVING_SPEED - MIN_MOVING_SPEED);
-                float aux2 = aux1 + diffCounter * speedFactor * ACCELERATION_DIFF_TICK_THRESHOLD / diffTick;
-                counter = (int)floor(aux2);
-                aux1 = aux2 - counter;
+            int speed = g_direction ? g_speedUp : g_speedDown;
 
-                // DebugTrace("C=%d, T=%g, aux2=%g, counter=%d, aux1=%g\n", (int)diffCounter, diffTick, aux2, counter, aux1);
+            float accelerationIncrement = -CONF_ENCODER_ACCELERATION_DECREMENT_PER_MS * diffTick + CONF_ENCODER_ACCELERATION_INCREMENT_FACTOR * speed;
 
-//			} else {
-//				counter = diffCounter;
-//			}
+            for (int i = 0; i < g_direction * deltaCounter; i++) {
+                if (g_accelerationEnabled) {
+                    g_acceleration += accelerationIncrement;
+                    if (g_acceleration < 0) g_acceleration = 0;
+                    if (g_acceleration > 99) g_acceleration = 99;
+                } else {
+                    g_acceleration = 0;
+                }
 
-			return counter * g_direction;
-		}
-    } else {
-		if (aux1 > 0 && (millis() - g_lastTick) > 500) {
-			aux1 = 0;
-		}
-	}
+                acceleratedCounter += g_direction * (1 + g_acceleration);
+            }
+        }
+    }
 
-    return 0;
+    return (int)roundf(acceleratedCounter);
 }
 
 bool isButtonClicked() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    return g_clicked;
+    return g_simulatorClicked;
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
     if (HAL_GPIO_ReadPin(ENC_SW_GPIO_Port, ENC_SW_Pin) == GPIO_PIN_RESET) {
-    	// button is DOWN
-    	if (!g_btnIsDown) {
-			if (g_buttonPinState != GPIO_PIN_RESET) {
-				g_buttonPinState = GPIO_PIN_RESET;
-				g_buttonPinStateTick = HAL_GetTick();
-			} else {
-				int32_t diff = HAL_GetTick() - g_buttonPinStateTick;
-				if (diff > CONF_DEBOUNCE_THRESHOLD_TIME) {
-					g_btnIsDown = true;
-					return true;
-				}
-			}
-    	}
+        // button is DOWN
+        if (!g_btnIsDown) {
+            if (g_buttonPinState != GPIO_PIN_RESET) {
+                g_buttonPinState = GPIO_PIN_RESET;
+                g_buttonPinStateTick = HAL_GetTick();
+            } else {
+                int32_t diff = HAL_GetTick() - g_buttonPinStateTick;
+                if (diff > CONF_DEBOUNCE_THRESHOLD_TIME) {
+                    g_btnIsDown = true;
+                    return true;
+                }
+            }
+        }
     } else {
-    	// button is UP
-    	if (g_btnIsDown) {
-			if (g_buttonPinState) {
-				g_buttonPinState = GPIO_PIN_RESET;
-				g_buttonPinStateTick = HAL_GetTick();
-			} else {
-				int32_t diff = HAL_GetTick() - g_buttonPinStateTick;
-				if (diff > CONF_DEBOUNCE_THRESHOLD_TIME) {
-					g_btnIsDown = false;
-				}
-			}
-    	}
+        // button is UP
+        if (g_btnIsDown) {
+            if (g_buttonPinState) {
+                g_buttonPinState = GPIO_PIN_RESET;
+                g_buttonPinStateTick = HAL_GetTick();
+            } else {
+                int32_t diff = HAL_GetTick() - g_buttonPinStateTick;
+                if (diff > CONF_DEBOUNCE_THRESHOLD_TIME) {
+                    g_btnIsDown = false;
+                }
+            }
+        }
     }
 
     return false;
@@ -202,8 +193,8 @@ void setMovingSpeed(uint8_t down, uint8_t up) {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 void write(int counter, bool clicked) {
-	g_counter = counter;
-	g_clicked = clicked;
+	g_simulatorCounter = counter;
+	g_simulatorClicked = clicked;
 }
 #endif
 

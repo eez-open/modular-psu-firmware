@@ -36,7 +36,7 @@ void animateFadeOutFadeIn() {
     g_animRects[i++] = { BUFFER_SOLID_COLOR, g_displayRect, g_displayRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_OLD, g_displayRect, g_displayRect, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_displayRect, g_displayRect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    animateRects(BUFFER_NEW, i, psu::persist_conf::devConf2.animationsDuration * 2);
+    animateRects(BUFFER_NEW, i, 2 * psu::persist_conf::devConf2.animationsDuration);
 }
 
 } // namespace home

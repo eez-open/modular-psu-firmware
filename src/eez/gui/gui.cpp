@@ -200,7 +200,7 @@ void action_internal_select_enum_item() {
 static ActionExecFunc g_internalActionExecFunctions[] = {
     0,
     action_internal_select_enum_item,
-    dialogYes,
+    popPage,
     ToastMessagePage::executeAction
 };
 

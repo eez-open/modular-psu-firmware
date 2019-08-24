@@ -88,7 +88,6 @@ namespace gui {
 
 static SelfTestResultPage g_SelfTestResultPage;
 static EventQueuePage g_EventQueuePage;
-static ChSettingsProtectionPage g_ChSettingsProtectionPage;
 static ChSettingsOvpProtectionPage g_ChSettingsOvpProtectionPage;
 static ChSettingsOcpProtectionPage g_ChSettingsOcpProtectionPage;
 static ChSettingsOppProtectionPage g_ChSettingsOppProtectionPage;
@@ -125,9 +124,6 @@ Page *getPageFromId(int pageId) {
         break;
     case PAGE_ID_EVENT_QUEUE:
         page = &g_EventQueuePage;
-        break;
-    case PAGE_ID_CH_SETTINGS_PROT:
-        page = &g_ChSettingsProtectionPage;
         break;
     case PAGE_ID_CH_SETTINGS_PROT_OVP:
         page = &g_ChSettingsOvpProtectionPage;
