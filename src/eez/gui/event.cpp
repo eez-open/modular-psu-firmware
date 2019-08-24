@@ -36,9 +36,10 @@
 #include <eez/apps/home/home.h>
 //
 
-#define CONF_GUI_LONG_TOUCH_TIMEOUT 1000000L        // 1s
-#define CONF_GUI_KEYPAD_AUTO_REPEAT_DELAY 100000L   // 100ms
-#define CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT 30000000L // 30s
+#define CONF_GUI_LONG_TOUCH_TIMEOUT              1000000L // 1s
+#define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY   250000L // 250ms
+#define CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY     75000L // 75ms
+#define CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT       30000000L // 30s
 
 namespace eez {
 namespace gui {
@@ -257,7 +258,7 @@ void touchHandling() {
             processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH);
         }
 
-        if (int32_t(tickCount - m_lastAutoRepeatEventTime) >= CONF_GUI_KEYPAD_AUTO_REPEAT_DELAY) {
+        if (int32_t(tickCount - m_lastAutoRepeatEventTime) >= (m_lastAutoRepeatEventTime == m_touchDownTime ? CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY : CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY)) {
             processTouchEvent(EVENT_TYPE_AUTO_REPEAT);
             m_lastAutoRepeatEventTime = tickCount;
         }
