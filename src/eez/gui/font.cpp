@@ -77,6 +77,10 @@ const uint8_t *Font::findGlyphData(uint8_t encoding) {
     typedef uint32_t u32;
     const uint32_t offset = p[0] | (u32(p[1]) << 8) | (u32(p[2]) << 16) | (u32(p[3]) << 24);
 
+    if (*(int8_t *)(fontData + offset) == -1) {
+        return nullptr;
+    }
+
     return fontData + offset;
 }
 
