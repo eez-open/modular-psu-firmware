@@ -336,7 +336,7 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
 }
 
 bool PsuAppContext::testExecuteActionOnTouchDown(int action) {
-    return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT || isAutoRepeatAction(action);
+    return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT || action == ACTION_ID_USER_SWITCH_CLICKED || isAutoRepeatAction(action);
 }
 
 uint16_t PsuAppContext::getWidgetBackgroundColor(const WidgetCursor &widgetCursor,
