@@ -23,11 +23,13 @@
 namespace eez {
 namespace gui {
 
+#if OPTION_SDRAM
 void GridWidget_fixPointers(Widget *widget) {
     GridWidget *gridWidget = (GridWidget *)widget->specific;
-	gridWidget->item_widget = (Widget *)((uint8_t *)g_document + (uint32_t)gridWidget->item_widget);
-    Widget_fixPointers(gridWidget->item_widget);
+	gridWidget->itemWidget = (Widget *)((uint8_t *)g_document + (uint32_t)gridWidget->itemWidget);
+    Widget_fixPointers((Widget *)gridWidget->itemWidget);
 }
+#endif
 
 void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;
@@ -49,9 +51,9 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
     auto parentWidget = savedWidget;
 
-    const GridWidget *gridWidget = (const GridWidget *)widgetCursor.widget->specific;
+    const GridWidget *gridWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const GridWidget *);
 
-	const Widget *childWidget = gridWidget->item_widget;
+	const Widget *childWidget = GET_WIDGET_PROPERTY(gridWidget, itemWidget, const Widget *);
 
     widgetCursor.widget = childWidget;
 

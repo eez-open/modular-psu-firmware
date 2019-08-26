@@ -34,6 +34,7 @@ add_definitions(-DOPTION_AUX_TEMP_SENSOR=1)
 add_definitions(-DOPTION_EXT_RTC=1)
 add_definitions(-DOPTION_ENCODER=1)
 add_definitions(-DOPTION_EXT_EEPROM=1)
+add_definitions(-DOPTION_SDCARD=1)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     add_definitions(-DOPTION_ETHERNET=0)

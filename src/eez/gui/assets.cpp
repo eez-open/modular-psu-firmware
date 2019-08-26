@@ -20,6 +20,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <memory.h>
 
 #include <eez/libs/lz4/lz4.h>
 
@@ -42,6 +43,7 @@ uint8_t *g_fontsData;
 uint8_t *g_bitmapsData;
 Colors *g_colorsData;
 
+#if OPTION_SDRAM
 void StyleList_fixPointers(StyleList &styleList) {
     styleList.first = (Style *)((uint8_t *)g_styles + (uint32_t)styleList.first);
 }
@@ -49,7 +51,7 @@ void StyleList_fixPointers(StyleList &styleList) {
 void WidgetList_fixPointers(WidgetList &widgetList) {
     widgetList.first = (Widget *)((uint8_t *)g_document + (uint32_t)widgetList.first);
     for (uint32_t i = 0; i < widgetList.count; ++i) {
-        Widget_fixPointers(widgetList.first + i);
+        Widget_fixPointers((Widget *)widgetList.first + i);
     }
 }
 
@@ -65,7 +67,7 @@ void Theme_fixPointers(Theme *theme) {
 void ThemeList_fixPointers(ThemeList &themeList) {
     themeList.first = (Theme *)((uint8_t *)g_colorsData + (uint32_t)themeList.first);
     for (uint32_t i = 0; i < themeList.count; ++i) {
-        Theme_fixPointers(themeList.first + i);
+        Theme_fixPointers((Theme *)themeList.first + i);
     }
 }
 
@@ -79,8 +81,10 @@ void fixPointers() {
     StyleList_fixPointers(*g_styles);
     ColorsData_fixPointers();
 }
+#endif
 
 void decompressAssets() {
+#if OPTION_SDRAM
     int compressedSize = sizeof(assets) - 4;
 
     // first 4 bytes (uint32_t) are decompressed size
@@ -97,9 +101,11 @@ void decompressAssets() {
 #endif
 
     int result = LZ4_decompress_safe((const char *)assets + 4, (char *)g_decompressedAssets,
-                                     compressedSize, decompressedSize);
-
+        compressedSize, decompressedSize);
     assert(result == decompressedSize);
+#else
+    g_decompressedAssets = (uint8_t *)assets;
+#endif
 
     g_document = (Document *)(g_decompressedAssets + ((uint32_t *)g_decompressedAssets)[0]);
     g_styles = (StyleList *)(g_decompressedAssets + ((uint32_t *)g_decompressedAssets)[1]);
@@ -107,11 +113,80 @@ void decompressAssets() {
     g_bitmapsData = g_decompressedAssets + ((uint32_t *)g_decompressedAssets)[3];
     g_colorsData = (Colors *)(g_decompressedAssets + ((uint32_t *)g_decompressedAssets)[4]);
 
+#if OPTION_SDRAM
     fixPointers();
+#endif
+}
+
+const Style *getStyle(int styleID) {
+#if OPTION_SDRAM
+    return g_styles->first + styleID - 1;
+#else
+    return (Style *)((uint8_t *)g_styles + (uint32_t)g_styles->firstOffset) + styleID - 1;
+#endif
 }
 
 const Style *getWidgetStyle(const Widget *widget) {
     return getStyle(transformStyle(widget));
+}
+
+const Widget* getPageWidget(int pageId) {
+#if OPTION_SDRAM
+    return g_document->pages.first + pageId;
+#else
+    return (const Widget *)((uint8_t *)g_document + (uint32_t)g_document->pages.firstOffset) + pageId;
+#endif
+}
+
+const uint8_t *getFontData(int fontID) {
+    if (fontID == 0) {
+        return 0;
+    }
+    return g_fontsData + ((uint32_t *)g_fontsData)[fontID - 1];
+}
+
+const Bitmap *getBitmap(int bitmapID) {
+    return (const Bitmap *)(g_bitmapsData + ((uint32_t *)g_bitmapsData)[bitmapID - 1]);
+}
+
+int getThemesCount() {
+    return (int)g_colorsData->themes.count;
+}
+
+const Theme *getTheme(int i) {
+#if OPTION_SDRAM
+    return g_colorsData->themes.first + i;
+#else
+    return (const Theme *)((uint8_t *)g_colorsData + (uint32_t)(g_colorsData->themes).firstOffset) + i;
+#endif
+}
+
+const char *getThemeName(int i) {
+#if OPTION_SDRAM
+    return getTheme(i)->name;
+#else
+    return (const char *)((uint8_t *)g_colorsData + (uint32_t)getTheme(i)->nameOffset);
+#endif
+}
+
+const uint16_t *getThemeColors(int themeIndex) {
+#if OPTION_SDRAM
+    return getTheme(themeIndex)->colors.first;
+#else
+    return (const uint16_t *)((uint8_t *)g_colorsData + (uint32_t)getTheme(themeIndex)->colors.firstOffset);
+#endif
+}
+
+const uint32_t getThemeColorsCount(int themeIndex) {
+    return getTheme(themeIndex)->colors.count;
+}
+
+const uint16_t *getColors() {
+#if OPTION_SDRAM
+    return g_colorsData->colors.first;
+#else
+    return (const uint16_t *)((uint8_t *)g_colorsData + (uint32_t)g_colorsData->colors.firstOffset);
+#endif
 }
 
 } // namespace gui

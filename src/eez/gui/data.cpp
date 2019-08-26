@@ -528,7 +528,7 @@ void data_slot_module_type(DataOperationEnum operation, Cursor &cursor, Value &v
 
 void data_selected_theme(DataOperationEnum operation, Cursor &cursor, Value &value) {
 	if (operation == data::DATA_OPERATION_GET) {
-		value = g_colorsData->themes.first[psu::persist_conf::devConf2.selectedThemeIndex].name;
+		value = getThemeName(psu::persist_conf::devConf2.selectedThemeIndex);
 	}
 }
 

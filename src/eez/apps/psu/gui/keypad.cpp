@@ -211,8 +211,8 @@ void Keypad::appendChar(char c) {
 }
 
 void Keypad::key() {
-    const TextWidget *textWidget = (const TextWidget *)getFoundWidgetAtDown().widget->specific;
-    key(textWidget->text[0]);
+    const TextWidget *textWidget = GET_WIDGET_PROPERTY(getFoundWidgetAtDown().widget, specific, const TextWidget *);
+    key(GET_WIDGET_PROPERTY(textWidget, text, const char *)[0]);
 }
 
 void Keypad::key(char ch) {

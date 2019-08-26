@@ -23,19 +23,36 @@
 namespace eez {
 namespace gui {
 
-extern Document *g_document;
-extern StyleList *g_styles;
-extern uint8_t *g_fontsData;
-extern uint8_t *g_bitmapsData;
-extern Colors *g_colorsData;
-
 void decompressAssets();
+    
+ extern Document *g_document;
+ extern StyleList *g_styles;
+ extern uint8_t *g_fontsData;
+ extern uint8_t *g_bitmapsData;
+ extern Colors *g_colorsData;
 
-inline const Style *getStyle(int styleID) {
-    return g_styles->first + styleID - 1;
-}
-
+const Style *getStyle(int styleID);
 const Style *getWidgetStyle(const Widget *widget);
+const Widget *getPageWidget(int pageId);
+const uint8_t *getFontData(int fontID);
+const Bitmap *getBitmap(int bitmapID);
+int getThemesCount();
+const char *getThemeName(int i);
+const uint16_t *getThemeColors(int themeIndex);
+const uint32_t getThemeColorsCount(int themeIndex);
+const uint16_t *getColors();
+
+#if OPTION_SDRAM
+#define GET_WIDGET_PROPERTY(widget, propertyName, type) ((type)widget->propertyName)
+#else
+#define GET_WIDGET_PROPERTY(widget, propertyName, type) ((type)((uint8_t *)g_document + (uint32_t)(widget)->propertyName##Offset))
+#endif
+
+#if OPTION_SDRAM
+#define GET_WIDGET_LIST_ELEMENT(list, index) ((list).first + (index))
+#else
+#define GET_WIDGET_LIST_ELEMENT(list, index) (((const Widget *)((uint8_t *)g_document + (uint32_t)(list.firstOffset))) + index)
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 

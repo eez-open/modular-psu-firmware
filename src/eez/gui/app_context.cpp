@@ -126,7 +126,7 @@ bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
         }
 
         if (widget->type == WIDGET_TYPE_BUTTON) {
-            const ButtonWidget *buttonWidget = (const ButtonWidget *)widget->specific;
+            const ButtonWidget *buttonWidget = GET_WIDGET_PROPERTY(widget, specific, const ButtonWidget *);
             if (!data::get(widgetCursor.cursor, buttonWidget->enabled).getInt()) {
                 g_appContext = saved;
                 return false;
@@ -380,7 +380,7 @@ void AppContext::updatePage(bool repaint, WidgetCursor &widgetCursor) {
         }
         ((InternalPage *)g_appContext->getActivePage())->updatePage();
     } else {
-		Widget *page = g_document->pages.first + m_activePageId;
+		const Widget *page = getPageWidget(m_activePageId);
 
 		auto savedPreviousState = widgetCursor.previousState;
         auto savedWidget = widgetCursor.widget;
@@ -430,7 +430,7 @@ void getPageRect(int pageId, Page *page, int &x, int &y, int &w, int &h) {
 		w = ((InternalPage *)page)->width;
 		h = ((InternalPage *)page)->height;
 	} else {
-		Widget *page = g_document->pages.first + pageId;
+		const Widget *page = getPageWidget(pageId);
 		x = page->x;
 		y = page->y;
 		w = page->w;
@@ -461,7 +461,11 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
         }
     }
 
+#if OPTION_SDRAM
     bool repaint = i + 1 < m_pageNavigationStackPointer;
+#else
+    bool repaint = false;
+#endif
 
     m_activePageIdSaved = m_activePageId;
     Page *activePageSaved = m_activePage;

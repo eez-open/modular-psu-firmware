@@ -25,13 +25,13 @@ namespace eez {
 namespace gui {
 
 void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    const LayoutViewWidgetSpecific *layoutViewSpecific = (const LayoutViewWidgetSpecific *)widgetCursor.widget->specific;
+    const LayoutViewWidgetSpecific *layoutViewSpecific = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const LayoutViewWidgetSpecific *);
 
     data::setContext(widgetCursor.cursor, layoutViewSpecific->context);
 
 	if (layoutViewSpecific->layout != -1) {
-		Widget *layout = g_document->pages.first + layoutViewSpecific->layout;
-		const PageWidget *layoutSpecific = (const PageWidget *)layout->specific;
+		const Widget *layout = getPageWidget(layoutViewSpecific->layout);
+		const PageWidget *layoutSpecific = GET_WIDGET_PROPERTY(layout, specific, const PageWidget *);
 		enumContainer(widgetCursor, callback, layoutSpecific->widgets);
 	}
 }

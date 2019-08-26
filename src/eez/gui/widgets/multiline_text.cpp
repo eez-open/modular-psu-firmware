@@ -26,10 +26,12 @@
 namespace eez {
 namespace gui {
 
+#if OPTION_SDRAM
 void MultilineTextWidget_fixPointers(Widget *widget) {
     MultilineTextWidget *multilineTextWidget = (MultilineTextWidget *)widget->specific;
     multilineTextWidget->text = (const char *)((uint8_t *)g_document + (uint32_t)multilineTextWidget->text);
 }
+#endif
 
 void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
@@ -59,9 +61,11 @@ void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
                                   widgetCursor.currentState->flags.active);
             }
         } else {
-            const MultilineTextWidget *display_string_widget = (const MultilineTextWidget *)widget->specific;
-            drawMultilineText(display_string_widget->text, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                              style, nullptr, widgetCursor.currentState->flags.active);
+            const MultilineTextWidget *display_string_widget = GET_WIDGET_PROPERTY(widget, specific, const MultilineTextWidget *);
+            drawMultilineText(
+                GET_WIDGET_PROPERTY(display_string_widget, text, const char *), 
+                widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                style, nullptr, widgetCursor.currentState->flags.active);
         }
     }
 }

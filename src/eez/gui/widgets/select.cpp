@@ -26,10 +26,12 @@
 namespace eez {
 namespace gui {
 
+#if OPTION_SDRAM
 void SelectWidget_fixPointers(Widget *widget) {
     SelectWidget *selectWidget = (SelectWidget *)widget->specific;
     WidgetList_fixPointers(selectWidget->widgets);
 }
+#endif
 
 void SelectWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;
@@ -58,9 +60,9 @@ void SelectWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback)
 
     auto savedWidget = widgetCursor.widget;
 
-	const ContainerWidget *containerWidget = (const ContainerWidget *)widgetCursor.widget->specific;
+	const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
 	
-    widgetCursor.widget = containerWidget->widgets.first + indexValue.getInt();
+    widgetCursor.widget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, + indexValue.getInt());
 
     enumWidget(widgetCursor, callback);
 

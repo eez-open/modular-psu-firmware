@@ -27,14 +27,16 @@
 namespace eez {
 namespace gui {
 
+#if OPTION_SDRAM
 void ButtonWidget_fixPointers(Widget *widget) {
     ButtonWidget *buttonWidget = (ButtonWidget *)widget->specific;
     buttonWidget->text = (const char *)((uint8_t *)g_document + (uint32_t)buttonWidget->text);
 }
+#endif
 
 void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const ButtonWidget *button_widget = (const ButtonWidget *)widget->specific;
+    const ButtonWidget *button_widget = GET_WIDGET_PROPERTY(widget, specific, const ButtonWidget *);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.enabled =
@@ -61,13 +63,13 @@ void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
                          widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr);
             } else {
-                drawText(button_widget->text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                drawText(GET_WIDGET_PROPERTY(button_widget, text, const char *), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                          style, nullptr, widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr);
             }
         } else {
 			const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : button_widget->disabledStyle);
-            drawText(button_widget->text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            drawText(GET_WIDGET_PROPERTY(button_widget, text, const char *), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                      style, nullptr, widgetCursor.currentState->flags.active,
                      widgetCursor.currentState->flags.blinking, false, nullptr);
         }

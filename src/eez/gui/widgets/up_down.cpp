@@ -35,15 +35,17 @@ enum UpDownWidgetSegment {
 UpDownWidgetSegment g_segment;
 WidgetCursor g_selectedWidget;
 
+#if OPTION_SDRAM
 void UpDownWidget_fixPointers(Widget *widget) {
     UpDownWidget *upDownWidget = (UpDownWidget *)widget->specific;
     upDownWidget->downButtonText = (const char *)((uint8_t *)g_document + (uint32_t)upDownWidget->downButtonText);
     upDownWidget->upButtonText = (const char *)((uint8_t *)g_document + (uint32_t)upDownWidget->upButtonText);
 }
+#endif
 
 void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const UpDownWidget *upDownWidget = (const UpDownWidget *)widget->specific;
+    const UpDownWidget *upDownWidget = GET_WIDGET_PROPERTY(widget, specific, const UpDownWidget *);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
@@ -60,7 +62,7 @@ void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
         font::Font buttonsFont = styleGetFont(buttonsStyle);
         int buttonWidth = buttonsFont.getHeight();
 
-        drawText(upDownWidget->downButtonText, -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
+        drawText(GET_WIDGET_PROPERTY(upDownWidget, downButtonText, const char *), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
                  buttonsStyle, nullptr,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
@@ -73,7 +75,7 @@ void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
                  (int)(widget->w - 2 * buttonWidth), (int)widget->h, style, nullptr, false, false,
                  false, nullptr);
 
-        drawText(upDownWidget->upButtonText, -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
+        drawText(GET_WIDGET_PROPERTY(upDownWidget, upButtonText, const char *), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
                  buttonWidth, (int)widget->h, buttonsStyle, nullptr,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,

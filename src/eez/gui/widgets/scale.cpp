@@ -203,7 +203,7 @@ void ScaleWidget_draw(const WidgetCursor &widgetCursor) {
 
         const Style* style = getWidgetStyle(widget);
 
-        const ScaleWidget *scale_widget = (const ScaleWidget *)widget->specific;
+        const ScaleWidget *scale_widget = GET_WIDGET_PROPERTY(widget, specific, const ScaleWidget *);
 
         bool vertical = scale_widget->needle_position == SCALE_NEEDLE_POSITION_LEFT ||
                         scale_widget->needle_position == SCALE_NEEDLE_POSITION_RIGHT;

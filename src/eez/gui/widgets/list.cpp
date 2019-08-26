@@ -23,11 +23,13 @@
 namespace eez {
 namespace gui {
 
+#if OPTION_SDRAM
 void ListWidget_fixPointers(Widget *widget) {
     ListWidget *listWidget = (ListWidget *)widget->specific;
-    listWidget->item_widget = (Widget *)((uint8_t *)g_document + (uint32_t)listWidget->item_widget);
-    Widget_fixPointers(listWidget->item_widget);
+    listWidget->itemWidget = (Widget *)((uint8_t *)g_document + (uint32_t)listWidget->itemWidget);
+    Widget_fixPointers((Widget *)listWidget->itemWidget);
 }
+#endif
 
 void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;
@@ -49,9 +51,9 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
     auto parentWidget = savedWidget;
 
-    const ListWidget *listWidget = (const ListWidget *)widgetCursor.widget->specific;
+    const ListWidget *listWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ListWidget *);
 
-    const Widget *childWidget = listWidget->item_widget;
+    const Widget *childWidget = GET_WIDGET_PROPERTY(listWidget, itemWidget, const Widget *);
     widgetCursor.widget = childWidget;
 
 	auto savedX = widgetCursor.x;

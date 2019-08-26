@@ -25,10 +25,12 @@
 namespace eez {
 namespace gui {
 
+#if OPTION_SDRAM
 void TextWidget_fixPointers(Widget *widget) {
     TextWidget *textWidget = (TextWidget *)widget->specific;
     textWidget->text = (const char *)((uint8_t *)g_document + (uint32_t)textWidget->text);
 }
+#endif
 
 void TextWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
@@ -48,7 +50,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         const Style *activeStyle = getStyle(widget->activeStyle);
-        const TextWidget *display_string_widget = (const TextWidget *)widget->specific;
+        const TextWidget *display_string_widget = GET_WIDGET_PROPERTY(widget, specific, const TextWidget *);
 
         if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
@@ -66,7 +68,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                          display_string_widget->flags.ignoreLuminosity, nullptr);
             }
         } else {
-            drawText(display_string_widget->text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            drawText(GET_WIDGET_PROPERTY(display_string_widget, text, const char *), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                      style, activeStyle, widgetCursor.currentState->flags.active,
                      widgetCursor.currentState->flags.blinking,
                      display_string_widget->flags.ignoreLuminosity, nullptr);

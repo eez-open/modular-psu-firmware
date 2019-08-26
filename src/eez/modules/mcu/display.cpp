@@ -46,15 +46,14 @@ static uint8_t g_colorCache[256][4];
 #define RGB_TO_HIGH_BYTE(R, G, B) (((R) & 248) | (G) >> 5)
 #define RGB_TO_LOW_BYTE(R, G, B) (((G) & 28) << 3 | (B) >> 3)
 
-uint16_t *g_themeColors;
-uint32_t g_themeColorsCount;
-uint16_t *g_colors;
+static const uint16_t *g_themeColors;
+static uint32_t g_themeColorsCount;
+static const uint16_t *g_colors;
 
 void onThemeChanged() {
-	Theme* theme = g_colorsData->themes.first + psu::persist_conf::devConf2.selectedThemeIndex;
-	g_themeColors = theme->colors.first;
-	g_themeColorsCount = theme->colors.count;
-	g_colors = g_colorsData->colors.first;
+	g_themeColors = getThemeColors(psu::persist_conf::devConf2.selectedThemeIndex);
+	g_themeColorsCount = getThemeColorsCount(psu::persist_conf::devConf2.selectedThemeIndex);
+	g_colors = getColors();
 }
 
 void onLuminocityChanged() {

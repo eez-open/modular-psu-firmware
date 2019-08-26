@@ -43,7 +43,7 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
     bool refresh = !widgetCursor.previousState;
     if (refresh && !appContext->isActivePageInternal() && appContext->getActivePageId() != INTERNAL_PAGE_ID_NONE) {
         // clear background
-		Widget *page = g_document->pages.first + appContext->getActivePageId();
+		const Widget *page = getPageWidget(appContext->getActivePageId());
         const Style* style = getWidgetStyle(page);
         mcu::display::setColor(style->background_color);
 

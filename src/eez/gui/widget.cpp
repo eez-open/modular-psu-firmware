@@ -65,6 +65,7 @@ bool g_isActiveWidget;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if OPTION_SDRAM
 typedef void (*FixWidgetPointersFunction)(Widget *widget);
 static FixWidgetPointersFunction g_fixWidgetPointersFunctions[] = {
     nullptr,                         // WIDGET_TYPE_NONE
@@ -88,6 +89,7 @@ static FixWidgetPointersFunction g_fixWidgetPointersFunctions[] = {
     nullptr,                         // WIDGET_TYPE_LIST_GRAPH
     nullptr,                         // WIDGET_TYPE_APP_VIEW
 };
+#endif
 
 typedef void (*EnumFunctionType)(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 static EnumFunctionType g_enumWidgetFunctions[] = {
@@ -162,12 +164,14 @@ OnTouchFunctionType g_onTouchFunctions[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if OPTION_SDRAM
 void Widget_fixPointers(Widget *widget) {
     widget->specific = (void *)((uint8_t *)g_document + (uint32_t)widget->specific);
     if (g_fixWidgetPointersFunctions[widget->type]) {
         g_fixWidgetPointersFunctions[widget->type](widget);
     }
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -276,7 +280,7 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     }
 
     auto savedWidget = widgetCursor.widget;
-    widgetCursor.widget = g_document->pages.first + g_appContext->getActivePageId();
+    widgetCursor.widget = getPageWidget(g_appContext->getActivePageId());
     enumWidget(widgetCursor, callback);
     widgetCursor.widget = savedWidget;
 }
@@ -287,7 +291,7 @@ void enumWidgets(EnumWidgetsCallback callback) {
 	}
 	WidgetCursor widgetCursor;
 	widgetCursor.appContext = g_appContext;
-	widgetCursor.widget = g_document->pages.first + g_appContext->getActivePageId();
+	widgetCursor.widget = getPageWidget(g_appContext->getActivePageId());
 	enumWidget(widgetCursor, callback);
 }
 

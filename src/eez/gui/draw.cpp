@@ -49,8 +49,7 @@ bool styleIsVertAlignBottom(const Style *style) {
 }
 
 font::Font styleGetFont(const Style *style) {
-    return font::Font(style->font > 0 ? (g_fontsData + ((uint32_t *)g_fontsData)[style->font - 1])
-                                      : 0);
+    return font::Font(getFontData(style->font));
 }
 
 bool styleIsBlink(const Style *style) {
@@ -377,7 +376,7 @@ void drawShadowGlyph(char glyph, int x, int y, int xClip = -1, int yClip = -1) {
     if (yClip == -1) {
         yClip = y + H - 1;
     }
-    font::Font font(g_fontsData + ((uint32_t *)g_fontsData)[FONT_ID_SHADOW - 1]);
+    font::Font font(getFontData(FONT_ID_SHADOW));
     eez::mcu::display::drawStr(&glyph, 1, x, y, x, y, xClip, yClip, font);
 }
 

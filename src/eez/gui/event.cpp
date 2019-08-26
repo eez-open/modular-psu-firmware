@@ -119,8 +119,8 @@ void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
         // start touch screen calibration in case of really long touch
         showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
     } else if (!isPageInternal(activePageId)) {
-        Widget *page = g_document->pages.first + activePageId;
-		const PageWidget *pageSpecific = (const PageWidget *)page->specific;
+        const Widget *page = getPageWidget(activePageId);
+		const PageWidget *pageSpecific = GET_WIDGET_PROPERTY(page, specific, const PageWidget *);
         if (pageSpecific->closePageIfTouchedOutside) {
             if (!pointInsideRect(touchEvent.x, touchEvent.y, page->x, page->y, page->w, page->h)) {
                 popPage();

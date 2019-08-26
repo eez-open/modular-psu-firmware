@@ -42,7 +42,7 @@ int findStartOfUnit(char *text, int i) {
 
 void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const DisplayDataWidget *display_data_widget = (const DisplayDataWidget *)widget->specific;
+    const DisplayDataWidget *display_data_widget = GET_WIDGET_PROPERTY(widget, specific, const DisplayDataWidget *);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);

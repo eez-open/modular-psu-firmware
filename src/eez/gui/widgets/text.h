@@ -28,7 +28,11 @@ struct TextFlags {
 };
 
 struct TextWidget {
+#if OPTION_SDRAM    
     const char *text;
+#else
+    uint32_t textOffset;
+#endif
     TextFlags flags;
 };
 

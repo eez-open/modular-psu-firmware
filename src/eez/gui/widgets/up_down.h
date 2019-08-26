@@ -25,8 +25,18 @@ namespace gui {
 
 struct UpDownWidget {
     uint16_t buttonsStyle;
+
+#if OPTION_SDRAM    
     const char *downButtonText;
+#else
+    uint32_t downButtonTextOffset;
+#endif
+
+#if OPTION_SDRAM    
 	const char *upButtonText;
+#else
+    uint32_t upButtonTextOffset;
+#endif
 };
 
 void UpDownWidget_fixPointers(Widget *widget);

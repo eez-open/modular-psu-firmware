@@ -28,7 +28,11 @@ namespace gui {
 
 struct ListWidget {
     uint8_t listType; // LIST_TYPE_VERTICAL or LIST_TYPE_HORIZONTAL
-    Widget *item_widget;
+#if OPTION_SDRAM    
+    const Widget *itemWidget;
+#else
+    uint32_t itemWidgetOffset;
+#endif
     uint8_t gap;
 };
 

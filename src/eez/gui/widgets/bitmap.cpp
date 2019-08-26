@@ -37,10 +37,10 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
     if (refresh) {
-        BitmapWidget *display_bitmap_widget = (BitmapWidget *)widget->specific;
+        const BitmapWidget *display_bitmap_widget = GET_WIDGET_PROPERTY(widget, specific, const BitmapWidget *);
         const Style* style = getWidgetStyle(widget);
 
-        Bitmap *bitmap = nullptr;
+        const Bitmap *bitmap = nullptr;
 
         if (widget->data) {
             Value valuePixels;
@@ -64,12 +64,10 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
                 g_dataOperationsFunctions[widget->data](
                     data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, valueBitmapId);
 
-                bitmap = (Bitmap *)(g_bitmapsData +
-                                    ((uint32_t *)g_bitmapsData)[valueBitmapId.getInt() - 1]);
+                bitmap = getBitmap(valueBitmapId.getInt());
             }
         } else if (display_bitmap_widget->bitmap != 0) {
-            bitmap = (Bitmap *)(g_bitmapsData +
-                                ((uint32_t *)g_bitmapsData)[display_bitmap_widget->bitmap - 1]);
+            bitmap = getBitmap(display_bitmap_widget->bitmap);
         }
 
         if (bitmap) {

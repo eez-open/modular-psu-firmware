@@ -23,10 +23,12 @@
 namespace eez {
 namespace gui {
 
+#if OPTION_SDRAM
 void ContainerWidget_fixPointers(Widget *widget) {
     ContainerWidget *containerWidget = (ContainerWidget *)widget->specific;
     WidgetList_fixPointers(containerWidget->widgets);
 }
+#endif
 
 void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const WidgetList &widgets) {
     auto savedCurrentState = widgetCursor.currentState;
@@ -45,7 +47,7 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
     auto savedWidget = widgetCursor.widget;
 
     for (uint32_t index = 0; index < widgets.count; ++index) {
-		widgetCursor.widget = widgets.first + index;
+		widgetCursor.widget = GET_WIDGET_LIST_ELEMENT(widgets, index);
 
         enumWidget(widgetCursor, callback);
 
@@ -70,7 +72,7 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
 }
 
 void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    const ContainerWidget *container = (const ContainerWidget *)widgetCursor.widget->specific;
+    const ContainerWidget *container = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
     enumContainer(widgetCursor, callback, container->widgets);
 }
 

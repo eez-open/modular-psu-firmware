@@ -33,7 +33,7 @@ namespace gui {
 
 void ListGraphWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const ListGraphWidget *listGraphWidget = (const ListGraphWidget *)widget->specific;
+    const ListGraphWidget *listGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const ListGraphWidget *);
     const Style* style = getWidgetStyle(widget);
 	const Style* y1Style = getStyle(listGraphWidget->y1Style);
 	const Style* y2Style = getStyle(listGraphWidget->y2Style);
@@ -187,7 +187,7 @@ void ListGraphWidget_draw(const WidgetCursor &widgetCursor) {
 void ListGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
         const Widget *widget = widgetCursor.widget;
-        const ListGraphWidget *listGraphWidget = (const ListGraphWidget *)widget->specific;
+        const ListGraphWidget *listGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const ListGraphWidget *);
 
         if (touchEvent.x < widgetCursor.x || touchEvent.x >= widgetCursor.x + (int)widget->w) {
             return;

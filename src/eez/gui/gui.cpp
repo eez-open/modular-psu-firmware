@@ -81,11 +81,11 @@ bool onSystemStateChanged() {
 
 void oneIter();
 
-bool x = false;
+static bool g_assetsInitialized = false;
 
 void mainLoop(const void *) {
-	if (!x) {
-		x = true;
+	if (!g_assetsInitialized) {
+		g_assetsInitialized = true;
 		decompressAssets();
 		mcu::display::onThemeChanged();
 		mcu::display::updateBrightness();

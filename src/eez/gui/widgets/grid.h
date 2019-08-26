@@ -24,7 +24,11 @@ namespace eez {
 namespace gui {
 
 struct GridWidget {
-    Widget *item_widget;
+#if OPTION_SDRAM    
+    const Widget *itemWidget;
+#else
+    uint32_t itemWidgetOffset;
+#endif
 };
 
 void GridWidget_fixPointers(Widget *widget);

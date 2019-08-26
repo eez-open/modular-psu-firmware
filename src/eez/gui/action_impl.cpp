@@ -881,8 +881,8 @@ void themesEnumDefinition(data::DataOperationEnum operation, data::Cursor &curso
     if (operation == data::DATA_OPERATION_GET_VALUE) {
         value = (uint8_t)cursor.i;
     } else if (operation == data::DATA_OPERATION_GET_LABEL) {
-		if (cursor.i < (int)g_colorsData->themes.count) {
-			value = g_colorsData->themes.first[cursor.i].name;
+		if (cursor.i < getThemesCount()) {
+			value = getThemeName(cursor.i);
 		} else {
 			value = (const char *)NULL;
 		}

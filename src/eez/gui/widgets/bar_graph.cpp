@@ -65,7 +65,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
     bool fullScale = true;
 
     const Widget *widget = widgetCursor.widget;
-    const BarGraphWidget *barGraphWidget = (const BarGraphWidget *)widget->specific;
+    const BarGraphWidget *barGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const BarGraphWidget *);
 
     widgetCursor.currentState->size = sizeof(BarGraphWidgetState);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);

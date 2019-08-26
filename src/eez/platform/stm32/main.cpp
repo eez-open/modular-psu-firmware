@@ -77,8 +77,10 @@ int main(int argc, char **argv) {
     MX_TIM8_Init();
     MX_TIM12_Init();
 
+#if OPTION_SDRAM
     /* SDRAM initialization sequence */
     BSP_SDRAM_Initialization_sequence(REFRESH_COUNT);
+#endif
 
     DWT_Delay_Init();
 

@@ -90,7 +90,11 @@ struct Style {
 
 struct StyleList {
     uint32_t count;
-    Style *first;
+#if OPTION_SDRAM
+    const Style *first;
+#else
+    uint32_t firstOffset;
+#endif
 };
 
 void StyleList_fixPointers(StyleList &styleList);
@@ -105,14 +109,24 @@ struct Widget {
     int16_t h;
     uint16_t style;
     uint16_t activeStyle;
-    void *specific;
+#if OPTION_SDRAM
+    const void *specific;
+#else
+    uint32_t specificOffset;
+#endif
 };
 
+#if OPTION_SDRAM
 void Widget_fixPointers(Widget *widget);
+#endif
 
 struct WidgetList {
     uint32_t count;
-    Widget *first;
+#if OPTION_SDRAM
+    const Widget *first;
+#else
+    uint32_t firstOffset;
+#endif
 };
 
 void WidgetList_fixPointers(WidgetList &widgetList);
@@ -128,13 +142,21 @@ struct Document {
 
 struct ColorList {
     uint32_t count;
-    uint16_t *first;
+#if OPTION_SDRAM
+    const uint16_t *first;
+#else
+    uint32_t firstOffset;
+#endif
 };
 
 void ColorList_fixPointers(ColorList &colorList);
 
 struct Theme {
+#if OPTION_SDRAM
     const char *name;
+#else
+    uint32_t nameOffset;
+#endif
     ColorList colors;
 };
 
@@ -142,7 +164,11 @@ void Theme_fixPointers(Theme *theme);
 
 struct ThemeList {
     uint32_t count;
-    Theme *first;
+#if OPTION_SDRAM
+    const Theme *first;
+#else
+    uint32_t firstOffset;
+#endif
 };
 
 void ThemeList_fixPointers(ThemeList &themeList);

@@ -61,9 +61,13 @@ static enum {
 } g_displayState;
 static uint32_t g_displayStateTransitionStartTime;
 
+#if OPTION_SDRAM
 static uint16_t *g_bufferOld;
 static uint16_t *g_buffer;
 static uint16_t *g_animationBuffer;
+#else
+static uint16_t g_buffer[480 * 272];
+#endif
 
 static bool g_takeScreenshot;
 static int g_screenshotY;
@@ -322,8 +326,10 @@ void turnOn() {
         __HAL_RCC_DMA2D_CLK_ENABLE();
 
         // clear video RAM
+#if OPTION_SDRAM
         g_bufferOld = (uint16_t *)VRAM_BUFFER2_START_ADDRESS;
         g_buffer = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
+#endif
         fillRect(g_buffer, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
 
         // set video RAM address
@@ -359,6 +365,7 @@ void updateBrightness() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void animate() {
+#if OPTION_SDRAM
 	float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
 	if (t < 1.0f) {
 		g_animationBuffer = g_animationBuffer == (uint16_t *)VRAM_BUFFER3_START_ADDRESS
@@ -376,6 +383,9 @@ void animate() {
 	} else {
 		g_animationState.enabled = false;
 	}
+#else
+	g_animationState.enabled = false;
+#endif
 }
 
 void sync() {
@@ -414,8 +424,10 @@ void sync() {
     DMA2D_WAIT;
 
     if (g_takeScreenshot) {
+#if OPTION_SDRAM
     	bitBlt(g_buffer, (uint16_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
         DMA2D_WAIT;
+#endif
     	g_takeScreenshot = false;
     }
 
@@ -427,16 +439,18 @@ void sync() {
     if (g_painted) {
         g_painted = false;
 
+#if OPTION_SDRAM
         // wait for VSYNC
         while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {}
 
-		HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
+        HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
 
         bitBlt(g_buffer, g_bufferOld, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
         auto temp = g_buffer;
         g_buffer = g_bufferOld;
         g_bufferOld = temp;
+#endif
     }
 }
 
