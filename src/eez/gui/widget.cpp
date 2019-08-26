@@ -254,7 +254,7 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     		return;
     	}
 
-		WidgetCursor &foundWidget = ((InternalPage *)g_appContext->getActivePage())->findWidget(g_findWidgetAtX, g_findWidgetAtY);
+		const WidgetCursor &foundWidget = ((InternalPage *)g_appContext->getActivePage())->findWidget(g_findWidgetAtX, g_findWidgetAtY);
 		if (foundWidget) {
             g_foundWidget = foundWidget;
 			return;
