@@ -95,8 +95,6 @@ public:
     static void executeAction();
 
 private:
-    bool inUse;
-
     ToastType type;
 
     const char *message1;

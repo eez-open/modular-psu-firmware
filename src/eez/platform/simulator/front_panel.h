@@ -29,6 +29,8 @@ class FrontPanelAppContext : public AppContext {
   public:
     FrontPanelAppContext();
 
+    bool testExecuteActionOnTouchDown(int action);
+
   protected:
     int getMainPageId() override;
 };

@@ -27,21 +27,22 @@
 namespace eez {
 namespace mcu {
 
-Button::Button(GPIO_TypeDef* port, uint16_t pin) 
+Button::Button(GPIO_TypeDef* port, uint16_t pin, bool activeLow) 
     : m_port(port)
     , m_pin(pin)
-    , m_buttonPinState(GPIO_PIN_RESET)
+    , m_activePinState(activeLow ? GPIO_PIN_RESET : GPIO_PIN_SET)
+    , m_buttonPinState(activeLow ? GPIO_PIN_RESET : GPIO_PIN_SET)
     , m_buttonPinStateChangedTick(0)
     , m_btnIsDown(false)
 {
 }
 
 bool Button::isClicked() {
-    if (HAL_GPIO_ReadPin(m_port, m_pin) == GPIO_PIN_RESET) {
+    if (HAL_GPIO_ReadPin(m_port, m_pin) == m_activePinState) {
         // button is DOWN
         if (!m_btnIsDown) {
-            if (m_buttonPinState != GPIO_PIN_RESET) {
-                m_buttonPinState = GPIO_PIN_RESET;
+            if (m_buttonPinState != m_activePinState) {
+                m_buttonPinState = m_activePinState;
                 m_buttonPinStateChangedTick = millis();
             } else {
                 int32_t diff = millis() - m_buttonPinStateChangedTick;
@@ -55,7 +56,7 @@ bool Button::isClicked() {
         // button is UP
         if (m_btnIsDown) {
             if (m_buttonPinState) {
-                m_buttonPinState = GPIO_PIN_RESET;
+                m_buttonPinState = m_activePinState;
                 m_buttonPinStateChangedTick = millis();
             } else {
                 int32_t diff = millis() - m_buttonPinStateChangedTick;

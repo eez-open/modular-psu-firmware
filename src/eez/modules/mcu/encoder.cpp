@@ -37,7 +37,7 @@ namespace mcu {
 namespace encoder {
 
 #if defined(EEZ_PLATFORM_STM32)
-static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin);
+static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true);
 static uint16_t g_lastCounter;
 #endif	
 

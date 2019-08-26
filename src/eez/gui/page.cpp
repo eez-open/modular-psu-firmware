@@ -81,22 +81,20 @@ void InternalPage::drawShadow() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static ToastMessagePage g_toastMessagePages[3];
+static ToastMessagePage g_toastMessagePage;
 
 ToastMessagePage *ToastMessagePage::findFreePage() {
-    for (int i = 0; i < sizeof(g_toastMessagePages) / sizeof(ToastMessagePage); i++) {
-        ToastMessagePage *page = &g_toastMessagePages[i];
-        if (!page->inUse) {
-            memset(page, sizeof(ToastMessagePage), 0);
-            page->inUse = true;
-            return page;
-        }
+    ToastMessagePage *page = &g_toastMessagePage;
+
+    if (page->appContext && page->appContext->getActivePage() == page) {
+        page->appContext->popPage();
     }
-    return nullptr;
+
+    return page;
 }
 
 void ToastMessagePage::pageFree() {
-    inUse = false;
+    appContext = nullptr;
 }
 
 ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1) {

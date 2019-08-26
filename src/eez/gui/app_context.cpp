@@ -82,7 +82,6 @@ void AppContext::stateManagment() {
     }
 
     // call m_checkAsyncOperationStatus
-    uint32_t tickCount = micros();
     if (getActivePageId() == PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
         if (m_checkAsyncOperationStatus) {
             m_checkAsyncOperationStatus();
@@ -219,6 +218,7 @@ void AppContext::doShowPage(int index, Page *page) {
     }
 
     if (m_activePage) {
+        m_activePage->pageAlloc();
         m_activePage->pageWillAppear();
     }
 

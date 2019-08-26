@@ -652,6 +652,7 @@ void USBD_LL_Delay(uint32_t Delay)
 {
   HAL_Delay(Delay);
 }
+
 /* USER CODE BEGIN 5 */
 /**
   * @brief  Configures system clock after wake-up from USB resume callBack:
@@ -663,7 +664,6 @@ static void SystemClockConfig_Resume(void)
   SystemClock_Config();
 }
 /* USER CODE END 5 */
-
 /**
   * @brief  Retuns the USB status depending on the HAL status:
   * @param  hal_status: HAL status

@@ -201,10 +201,6 @@ Page *getPageFromId(int pageId) {
         break;
     }
 
-    if (page) {
-        page->pageAlloc();
-    }
-
     return page;
 }
 

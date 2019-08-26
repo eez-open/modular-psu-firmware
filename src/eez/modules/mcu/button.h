@@ -25,13 +25,14 @@ namespace mcu {
 
 class Button {
 public:
-    Button(GPIO_TypeDef* port, uint16_t pin);
+    Button(GPIO_TypeDef* port, uint16_t pin, bool activeLow);
 
     bool isClicked();
 
 private:
     GPIO_TypeDef* m_port;
     uint16_t m_pin;
+    GPIO_PinState m_activePinState;
 
     GPIO_PinState m_buttonPinState;
     uint32_t m_buttonPinStateChangedTick;

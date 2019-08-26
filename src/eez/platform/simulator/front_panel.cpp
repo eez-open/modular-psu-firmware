@@ -53,6 +53,10 @@ int FrontPanelAppContext::getMainPageId() {
     return PAGE_ID_FRONT_PANEL;
 }
 
+bool FrontPanelAppContext::testExecuteActionOnTouchDown(int action) {
+    return action == ACTION_ID_USER_SWITCH_CLICKED;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void data_main_app_view(DataOperationEnum operation, Cursor &cursor, Value &value) {

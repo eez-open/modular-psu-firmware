@@ -77,7 +77,7 @@ Channel *g_channel;
 static WidgetCursor g_toggleOutputWidgetCursor;
 
 #if EEZ_PLATFORM_STM32
-static mcu::Button g_userSwitch(USER_SW_GPIO_Port, USER_SW_Pin);
+static mcu::Button g_userSwitch(USER_SW_GPIO_Port, USER_SW_Pin, true);
 #endif
 
 bool showSetupWizardQuestion();
@@ -336,7 +336,7 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
 }
 
 bool PsuAppContext::testExecuteActionOnTouchDown(int action) {
-    return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT || action == ACTION_ID_USER_SWITCH_CLICKED || isAutoRepeatAction(action);
+    return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT || isAutoRepeatAction(action);
 }
 
 uint16_t PsuAppContext::getWidgetBackgroundColor(const WidgetCursor &widgetCursor,
