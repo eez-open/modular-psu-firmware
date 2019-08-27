@@ -76,7 +76,7 @@ bool writeDate(uint8_t year, uint8_t month, uint8_t day) {
 	date.Date = day;
 	
     // TODO ???
-    // date.WeekDay = RTC_WEEKDAY_FRIDAY;
+    date.WeekDay = RTC_WEEKDAY_MONDAY;
 
 	HAL_RTC_SetDate(&hrtc, &date, FORMAT_BIN);
 
