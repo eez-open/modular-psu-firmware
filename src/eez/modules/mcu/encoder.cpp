@@ -94,7 +94,7 @@ int getCounter() {
     int32_t diffTick = tick - g_lastTick;
     g_lastTick = tick;
 
-    g_acceleration += ((diffCounter > 0 ? CONF_ENCODER_ACCELERATION_INCREMENT_FACTOR : 0) - CONF_ENCODER_ACCELERATION_DECREMENT_PER_MS) * diffTick;
+    g_acceleration += ((diffCounter != 0 ? CONF_ENCODER_ACCELERATION_INCREMENT_FACTOR : 0) - CONF_ENCODER_ACCELERATION_DECREMENT_PER_MS) * diffTick;
     if (g_acceleration < 0) g_acceleration = 0;
     if (g_acceleration > 99) g_acceleration = 99;
     

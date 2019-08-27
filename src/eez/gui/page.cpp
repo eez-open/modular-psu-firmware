@@ -51,6 +51,10 @@ bool Page::onEncoderClicked() {
     return false;
 }
 
+Unit Page::getEncoderUnit() {
+    return UNIT_UNKNOWN;
+}
+
 int Page::getDirty() {
     return 0;
 }

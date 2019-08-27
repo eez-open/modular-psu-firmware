@@ -777,6 +777,19 @@ bool onEncoderConfirmation() {
     return false;
 }
 
+Unit getCurrentEncoderUnit() {
+    Page *activePage = getActivePage();
+    if (activePage) {
+        Unit unit = activePage->getEncoderUnit();
+        if (unit != UNIT_UNKNOWN) {
+            return unit;
+        }
+    }
+
+    auto editValue = data::getEditValue(g_focusCursor, g_focusDataId);
+    return editValue.getUnit();
+}
+
 void onEncoder(int counter, bool clicked) {
     if (isFrontPanelLocked()) {
         return;

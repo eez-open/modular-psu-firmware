@@ -35,6 +35,7 @@ class Page {
 
     virtual bool onEncoder(int counter);
     virtual bool onEncoderClicked();
+    virtual Unit getEncoderUnit();
 
     virtual int getDirty();
 };

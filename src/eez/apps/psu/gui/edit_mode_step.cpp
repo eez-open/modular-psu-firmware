@@ -228,8 +228,7 @@ void onTouchUp() {
 }
 
 Value getCurrentEncoderStepValue() {
-    auto editValue = data::getEditValue(g_focusCursor, g_focusDataId);
-    auto stepValues = getUnitStepValues(editValue.getUnit());
+    auto stepValues = getUnitStepValues(getCurrentEncoderUnit());
     return stepValues[mcu::encoder::ENCODER_MODE_STEP5 - mcu::encoder::g_encoderMode];
 }
 

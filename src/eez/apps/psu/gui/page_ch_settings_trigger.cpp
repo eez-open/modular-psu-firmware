@@ -542,6 +542,18 @@ bool ChSettingsListsPage::onEncoderClicked() {
     return true;
 }
 
+Unit ChSettingsListsPage::getEncoderUnit() {
+    data::Cursor cursor(getCursorIndexWithinPage());
+
+    data::Value value = data::get(cursor, getDataIdAtCursor());
+
+    if (value.getType() == VALUE_TYPE_STR) {
+        value = data::getDef(cursor, getDataIdAtCursor());
+    }
+
+    return value.getUnit();
+}
+
 void ChSettingsListsPage::showInsertMenu() {
     if (getRowIndex() < getMaxListLength()) {
         pushPage(PAGE_ID_CH_SETTINGS_LISTS_INSERT_MENU);

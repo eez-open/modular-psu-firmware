@@ -56,6 +56,8 @@ void changeTemperatureTripDelay(int iChannel);
 
 void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_callback)() = 0);
 
+Unit getCurrentEncoderUnit();
+
 class PsuAppContext : public AppContext {
   public:
     PsuAppContext();

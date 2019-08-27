@@ -71,6 +71,7 @@ class ChSettingsListsPage : public SetPage {
 
     bool onEncoder(int counter);
     bool onEncoderClicked();
+    Unit getEncoderUnit();
 
     void showInsertMenu();
     void showDeleteMenu();
