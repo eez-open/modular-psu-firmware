@@ -51,7 +51,7 @@ int ioPinRead(int pin) {
 #if EEZ_MCU_REVISION_R1B5
     return HAL_GPIO_ReadPin(UART_RX_DIN1_GPIO_Port, UART_RX_DIN1_Pin) ? 1 : 0;
 #else
-    return HAL_GPIO_ReadPin(DIN1_GPIO_Port, _DIN1_Pin) ? 1 : 0;
+    return HAL_GPIO_ReadPin(DIN1_GPIO_Port, DIN1_Pin) ? 1 : 0;
 #endif
     } {
     	assert(pin == EXT_TRIG2);
