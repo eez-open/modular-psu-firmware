@@ -38,8 +38,6 @@
 #define IDN_MODEL "EEZ BB3 (Simulator)"
 #endif
 
-#define EEZ_PSU_SELECTED_REVISION EEZ_MCU_REVISION_R1B5
-
 #define MCU_NAME "STM32F7"
 #define MCU_REVISION "R1B5"
 

@@ -228,6 +228,11 @@ unsigned int generateTuneSamples(int *tune, int sampleRate, uint16_t *pMemBuffer
 #endif
 		}
 	}
+
+	// add zero to the end
+	*pMemBuffer = 0;
+	size++;
+
 	return size;
 }
 

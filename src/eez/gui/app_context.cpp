@@ -218,7 +218,6 @@ void AppContext::doShowPage(int index, Page *page) {
     }
 
     if (m_activePage) {
-        m_activePage->pageAlloc();
         m_activePage->pageWillAppear();
     }
 
