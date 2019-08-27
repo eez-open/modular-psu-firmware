@@ -98,8 +98,6 @@ int getCounter() {
     if (g_acceleration < 0) g_acceleration = 0;
     if (g_acceleration > 99) g_acceleration = 99;
     
-    DebugTrace("%g\n", g_acceleration);
-
     diffTick = tick - g_lastIntervalTick;
     if (diffTick < CONF_INTERVAL) {
         return 0;
