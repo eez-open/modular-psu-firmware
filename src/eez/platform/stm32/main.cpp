@@ -52,6 +52,69 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *p
     while (true) {}
 }
 
+#if OPTION_SDRAM
+#include <assert.h>
+#include <stdlib.h>
+
+void SDRAM_Test() {
+    for (unsigned int seedValue = 0; seedValue < 100000; ++seedValue) {
+        {
+            uint32_t *p;
+
+            srand(seedValue);
+            p = (uint32_t *)0xc0000000;
+
+            for (int i = 0; i < 8 * 1024 * 1024 / 4; ++i) {
+                p[i] = (uint32_t)rand();
+            }
+
+            srand(seedValue);
+            p = (uint32_t *)0xc0000000;
+
+            for (int i = 0; i < 8 * 1024 * 1024 / 4; ++i) {
+                assert(p[i] == (uint32_t)rand());
+            }
+        }
+
+        {
+            uint16_t *p;
+
+            srand(seedValue);
+            p = (uint16_t *)0xc0000000;
+
+            for (int i = 0; i < 8 * 1024 * 1024 / 2; ++i) {
+                p[i] = (uint16_t)rand();
+            }
+
+            srand(seedValue);
+            p = (uint16_t *)0xc0000000;
+
+            for (int i = 0; i < 8 * 1024 * 1024 / 2; ++i) {
+                assert(p[i] == (uint16_t)rand());
+            }
+        }
+
+        {
+            uint8_t *p;
+
+            srand(seedValue);
+            p = (uint8_t *)0xc0000000;
+
+            for (int i = 0; i < 8 * 1024 * 1024; ++i) {
+                p[i] = (uint8_t)rand();
+            }
+
+            srand(seedValue);
+            p = (uint8_t *)0xc0000000;
+
+            for (int i = 0; i < 8 * 1024 * 1024; ++i) {
+                assert(p[i] == (uint8_t)rand());
+            }
+        }
+    }
+}
+#endif
+
 int main(int argc, char **argv) {
     HAL_Init();
 
@@ -80,6 +143,7 @@ int main(int argc, char **argv) {
 #if OPTION_SDRAM
     /* SDRAM initialization sequence */
     BSP_SDRAM_Initialization_sequence(REFRESH_COUNT);
+    SDRAM_Test();
 #endif
 
     DWT_Delay_Init();
