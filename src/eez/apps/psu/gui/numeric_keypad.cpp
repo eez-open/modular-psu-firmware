@@ -565,24 +565,10 @@ bool NumericKeypad::onEncoder(int counter) {
         }
 
         if (m_startValue.getType() == VALUE_TYPE_FLOAT) {
-            mcu::encoder::enableAcceleration(true);
-
-            float newValue = m_startValue.getFloat() + 0.01f * counter;
-
-            if (newValue < m_options.min) {
-                newValue = m_options.min;
-            }
-
-            if (newValue > m_options.max) {
-                newValue = m_options.max;
-            }
-
+            float newValue = mcu::encoder::increment(m_startValue, counter, m_options.min, m_options.max, m_options.channelIndex, 0.01f);
             m_startValue = MakeValue(newValue, m_startValue.getUnit());
-
             return true;
         } else if (m_startValue.getType() == VALUE_TYPE_INT) {
-            mcu::encoder::enableAcceleration(false);
-
             int newValue = m_startValue.getInt() + counter;
 
             if (newValue < (int)m_options.min) {

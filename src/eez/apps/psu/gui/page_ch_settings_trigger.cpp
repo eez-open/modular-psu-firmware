@@ -490,12 +490,21 @@ void ChSettingsListsPage::set() {
 
 bool ChSettingsListsPage::onEncoder(int counter) {
 #if OPTION_ENCODER
-    mcu::encoder::enableAcceleration(true);
+    data::Cursor cursor(getCursorIndexWithinPage());
     uint16_t dataId = getDataIdAtCursor();
 
-    float step = dataId == DATA_ID_CHANNEL_LIST_VOLTAGE ? 0.01f : 0.001f;
+    data::Value value = data::get(cursor, dataId);
+    if (value.getType() == VALUE_TYPE_STR) {
+        value = data::getDef(cursor, dataId);
+    }
 
-    setFocusedValue(getFocusedValue() + step * counter);
+    data::Value min = data::getMin(cursor, dataId);
+    data::Value max = data::getMax(cursor, dataId);
+
+    float newValue = mcu::encoder::increment(value, counter, min.getFloat(), max.getFloat(), g_channel->index - 1, 0);
+
+    setFocusedValue(newValue);
+
     return true;
 #endif
     return false;

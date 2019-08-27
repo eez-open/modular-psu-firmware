@@ -794,12 +794,12 @@ void onEncoder(int counter, bool clicked) {
         moveToNextFocusCursor();
     }
 
+    Page *activePage = getActivePage();
+
     if (counter != 0) {
         if (!isEnabledFocusCursor(g_focusCursor, g_focusDataId)) {
             moveToNextFocusCursor();
         }
-
-        mcu::encoder::enableAcceleration(true);
 
         if (isEncoderEnabledInActivePage()) {
             data::Value value;
@@ -809,46 +809,14 @@ void onEncoder(int counter, bool clicked) {
                 value = data::getEditValue(g_focusCursor, g_focusDataId);
             }
 
-            float oldValue = value.getFloat();
-
-            float newValue;
-            if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
-                float factor = Channel::get(g_focusCursor.i).getValuePrecision(value.getUnit(), oldValue);
-                newValue = oldValue + factor * counter;
-            } else {
-                newValue = oldValue + edit_mode_step::getCurrentEncoderStepValue().getFloat() * counter;
-            }
-
-            newValue = Channel::get(g_focusCursor.i).roundChannelValue(value.getUnit(), newValue);
-
-            if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
-                float diff = fabs(newValue - oldValue);
-                if (diff > 1) {
-                    newValue = roundPrec(newValue, 1);
-                } else if (diff > 0.1) {
-                    newValue = roundPrec(newValue, 0.1f);
-                } else if (diff > 0.01) {
-                    newValue = roundPrec(newValue, 0.01f);
-                } else if (diff > 0.001) {
-                    newValue = roundPrec(newValue, 0.001f);
-                } else if (diff > 0.0001) {
-                    newValue = roundPrec(newValue, 0.0001f);
-                }
-            }
-
             float min = data::getMin(g_focusCursor, g_focusDataId).getFloat();
-            if (newValue < min) {
-                newValue = min;
-            }
+            float max = data::getMax(g_focusCursor, g_focusDataId).getFloat();
+
+            float newValue = mcu::encoder::increment(value, counter, min, max, g_focusCursor.i, 0);
 
             float limit = data::getLimit(g_focusCursor, g_focusDataId).getFloat();
-            if (newValue > limit && oldValue < limit) {
+            if (newValue > limit && value.getFloat() < limit) {
                 newValue = limit;
-            }
-
-            float max = data::getMax(g_focusCursor, g_focusDataId).getFloat();
-            if (newValue > max) {
-                newValue = max;
             }
 
             if (persist_conf::devConf2.flags.encoderConfirmationMode) {
@@ -883,11 +851,15 @@ void onEncoder(int counter, bool clicked) {
             return;
         }
 
-        mcu::encoder::enableAcceleration(true);
-
         if (activePageId == PAGE_ID_EDIT_MODE_SLIDER) {
             edit_mode_slider::increment(counter);
             return;
+        }
+
+        if (activePage) {
+            if (activePage->onEncoder(counter)) {
+                return;
+            }
         }
     }
 
@@ -910,23 +882,23 @@ void onEncoder(int counter, bool clicked) {
 
         int activePageId = getActivePageId();
         if (activePageId == PAGE_ID_EDIT_MODE_KEYPAD || activePageId == PAGE_ID_NUMERIC_KEYPAD) {
-            ((NumericKeypad *)getActiveKeypad())->onEncoderClicked();
+            if (((NumericKeypad *)getActiveKeypad())->onEncoderClicked()) {
+                return;
+            }
         }
+
 #if defined(EEZ_PLATFORM_SIMULATOR)
         if (activePageId == PAGE_ID_NUMERIC_KEYPAD2) {
-            ((NumericKeypad *)getActiveKeypad())->onEncoderClicked();
+            if (((NumericKeypad *)getActiveKeypad())->onEncoderClicked()) {
+                return;
+            }
         }
 #endif
-    }
 
-    Page *activePage = getActivePage();
-    if (activePage) {
-        if (counter) {
-            activePage->onEncoder(counter);
-        }
-
-        if (clicked) {
-            activePage->onEncoderClicked();
+        if (activePage) {
+            if (activePage->onEncoderClicked()) {
+                return;
+            }
         }
     }
 }

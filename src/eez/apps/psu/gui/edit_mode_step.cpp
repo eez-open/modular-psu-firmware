@@ -46,117 +46,119 @@ namespace edit_mode_step {
 
 using data::Value;
 
-static const Value CONF_GUI_U_STEPS[] = {
-    Value(5.0f, UNIT_VOLT),
-    Value(2.0f, UNIT_VOLT),
-    Value(1.0f, UNIT_VOLT),
-    Value(0.5f, UNIT_VOLT),
-    Value(0.1f, UNIT_VOLT)
+#define NUM_UNITS 6
+#define NUM_STEPS_PER_UNIT 5
+
+static const Value CONF_GUI_UNIT_STEPS_LIST[NUM_UNITS][NUM_STEPS_PER_UNIT] = {
+    { 
+        Value(5.0f, UNIT_VOLT), 
+        Value(2.0f, UNIT_VOLT), 
+        Value(1.0f, UNIT_VOLT), 
+        Value(0.5f, UNIT_VOLT), 
+        Value(0.1f, UNIT_VOLT) 
+    },
+    { 
+        Value(0.5f, UNIT_AMPER), 
+        Value(0.25f, UNIT_AMPER), 
+        Value(0.1f, UNIT_AMPER), 
+        Value(0.05f, UNIT_AMPER), 
+        Value(0.01f, UNIT_AMPER) 
+    },
+    { 
+        Value(0.005f, UNIT_AMPER), 
+        Value(0.0025f, UNIT_AMPER), 
+        Value(0.001f, UNIT_AMPER), 
+        Value(0.0005f, UNIT_AMPER), 
+        Value(0.0001f, UNIT_AMPER) 
+    },
+    { 
+        Value(10.0f, UNIT_WATT), 
+        Value(5.0f, UNIT_WATT), 
+        Value(2.0f, UNIT_WATT), 
+        Value(1.0f, UNIT_WATT), 
+        Value(0.5f, UNIT_WATT) 
+    },
+    { 
+        Value(20.0f, UNIT_CELSIUS), 
+        Value(10.0f, UNIT_CELSIUS), 
+        Value(5.0f, UNIT_CELSIUS), 
+        Value(2.0f, UNIT_CELSIUS), 
+        Value(1.0f, UNIT_CELSIUS) 
+    },
+    { 
+        Value(30.0f, UNIT_SECOND), 
+        Value(20.0f, UNIT_SECOND), 
+        Value(10.0f, UNIT_SECOND), 
+        Value(5.0f, UNIT_SECOND), 
+        Value(1.0f, UNIT_SECOND) 
+    },
 };
 
-static const Value CONF_GUI_I_STEPS[] = {
-    Value(0.5f, UNIT_AMPER),
-    Value(0.25f, UNIT_AMPER),
-    Value(0.1f, UNIT_AMPER),
-    Value(0.05f, UNIT_AMPER),
-    Value(0.01f, UNIT_AMPER)
-};
+static int g_stepIndexes[NUM_UNITS][CH_MAX];
 
-static const Value CONF_GUI_I_LOW_STEPS[] = {
-    Value(0.005f, UNIT_AMPER),
-    Value(0.0025f, UNIT_AMPER),
-    Value(0.001f, UNIT_AMPER),
-    Value(0.0005f, UNIT_AMPER),
-    Value(0.0001f, UNIT_AMPER)
-};
-
-static const Value CONF_GUI_P_STEPS[] = {
-    Value(10.0f, UNIT_WATT),
-    Value(5.0f, UNIT_WATT),
-    Value(2.0f, UNIT_WATT),
-    Value(1.0f, UNIT_WATT),
-    Value(0.5f, UNIT_WATT)
-};
-
-static const Value CONF_GUI_TEMP_STEPS[] = {
-    Value(20.0f, UNIT_CELSIUS),
-    Value(10.0f, UNIT_CELSIUS),
-    Value(5.0f, UNIT_CELSIUS),
-    Value(2.0f, UNIT_CELSIUS),
-    Value(1.0f, UNIT_CELSIUS)
-};
-
-static const Value CONF_GUI_TIME_STEPS[] = {
-    Value(30.0f, UNIT_SECOND),
-    Value(20.0f, UNIT_SECOND),
-    Value(10.0f, UNIT_SECOND),
-    Value(5.0f, UNIT_SECOND),
-    Value(1.0f, UNIT_SECOND)
-};
-
-static int g_stepIndex[CH_MAX][2];
-
-static const int DEFAULT_INDEX = 3;
+static const int DEFAULT_INDEX = 2;
 
 static bool g_changed;
 static int g_startPos;
 
-float getStepValue() {
-    if (edit_mode::getUnit() == UNIT_VOLT) {
-        return getStepValues()[getStepIndex()].getFloat();
-    } else {
-        return getStepValues()[getStepIndex()].getFloat();
-    }
-}
-
 int getStepValuesCount() {
-    return 5;
+    return NUM_STEPS_PER_UNIT;
 }
 
-const Value *getStepValues(Unit unit) {
+int getUnitStepValuesIndex(Unit unit) {
     if (unit == UNIT_VOLT) {
-        return CONF_GUI_U_STEPS;
-    } else if (unit == UNIT_AMPER) {
+        return 0;
+    } 
+    
+    if (unit == UNIT_AMPER) {
         if (Channel::get(g_focusCursor.i).flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
-            return CONF_GUI_I_LOW_STEPS;
+            return 2;
         }
-        return CONF_GUI_I_STEPS;
-    } else if (unit == UNIT_WATT) {
-        return CONF_GUI_P_STEPS;
-    } else if (unit == UNIT_CELSIUS) {
-        return CONF_GUI_TEMP_STEPS;
-    } else if (unit == UNIT_SECOND) {
-        return CONF_GUI_TIME_STEPS;
-    } else {
-        return CONF_GUI_U_STEPS;
+        return 1;
+    } 
+    
+    if (unit == UNIT_WATT) {
+        return 3;
+    } 
+    
+    if (unit == UNIT_CELSIUS) {
+        return 4;
+    } 
+    
+    if (unit == UNIT_SECOND) {
+        return 5;
     }
+
+    return 0;
 }
 
-const Value *getStepValues() {
-    return getStepValues(edit_mode::getUnit());
+const Value *getUnitStepValues(Unit unit) {
+    return CONF_GUI_UNIT_STEPS_LIST[getUnitStepValuesIndex(unit)];
 }
 
 int getStepIndex() {
-    int value;
-    if (edit_mode::getUnit() == UNIT_VOLT) {
-        value = g_stepIndex[g_focusCursor.i][0];
-    } else {
-        value = g_stepIndex[g_focusCursor.i][1];
+    int stepIndex = g_stepIndexes[getUnitStepValuesIndex(edit_mode::getUnit())][g_focusCursor.i];
+    if (stepIndex == 0) {
+        return DEFAULT_INDEX;
     }
-
-    if (value == 0) {
-        value = DEFAULT_INDEX;
-    }
-
-    return value - 1;
+    return stepIndex - 1;
 }
 
 void setStepIndex(int value) {
-    if (edit_mode::getUnit() == UNIT_VOLT) {
-        g_stepIndex[g_focusCursor.i][0] = value + 1;
-    } else {
-        g_stepIndex[g_focusCursor.i][1] = value + 1;
-    }
+    int unitStepValuesIndex = getUnitStepValuesIndex(edit_mode::getUnit());
+    g_stepIndexes[unitStepValuesIndex][g_focusCursor.i] = 1 + value;
+}
+
+void switchToNextStepIndex() {
+    g_stepIndexes[getUnitStepValuesIndex(edit_mode::getUnit())][g_focusCursor.i] = 1 + ((getStepIndex() + 1) % NUM_STEPS_PER_UNIT);
+}
+
+const Value *getStepValues() {
+    return getUnitStepValues(edit_mode::getUnit());
+}
+
+float getStepValue() {
+    return getStepValues()[getStepIndex()].getFloat();
 }
 
 void increment(int counter, bool playClick) {
@@ -199,7 +201,6 @@ void increment(int counter, bool playClick) {
 #if OPTION_ENCODER
 
 void onEncoder(int counter) {
-    mcu::encoder::enableAcceleration(false);
     increment(counter, false);
 }
 
@@ -228,7 +229,7 @@ void onTouchUp() {
 
 Value getCurrentEncoderStepValue() {
     auto editValue = data::getEditValue(g_focusCursor, g_focusDataId);
-    auto stepValues = getStepValues(editValue.getUnit());
+    auto stepValues = getUnitStepValues(editValue.getUnit());
     return stepValues[mcu::encoder::ENCODER_MODE_STEP5 - mcu::encoder::g_encoderMode];
 }
 

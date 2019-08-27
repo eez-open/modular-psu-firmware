@@ -952,18 +952,24 @@ void action_scripts_next_page() {
 }
 
 void action_user_switch_clicked() {
+#if OPTION_ENCODER
+
 #if EEZ_PLATFORM_SIMULATOR
     AppContext *saved = g_appContext;
     g_appContext = &psu::gui::g_psuAppContext;
 #endif
 
-#if OPTION_ENCODER
-    mcu::encoder::switchEncoderMode();
-    psu::gui::edit_mode_step::showCurrentEncoderMode();
-#endif
+    if (getActivePageId() == PAGE_ID_EDIT_MODE_STEP) {
+        psu::gui::edit_mode_step::switchToNextStepIndex();
+    } else {
+        mcu::encoder::switchEncoderMode();
+        psu::gui::edit_mode_step::showCurrentEncoderMode();
+    }
 
 #if EEZ_PLATFORM_SIMULATOR
     g_appContext = saved;
+#endif
+
 #endif
 }
 

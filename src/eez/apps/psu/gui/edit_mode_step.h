@@ -40,6 +40,8 @@ void onTouchDown();
 void onTouchMove();
 void onTouchUp();
 
+void switchToNextStepIndex();
+
 eez::gui::data::Value getCurrentEncoderStepValue();
 void showCurrentEncoderMode();
 

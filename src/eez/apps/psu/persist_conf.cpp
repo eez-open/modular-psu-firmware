@@ -303,7 +303,6 @@ void loadDevice2() {
     if (!devConf2.encoderMovingSpeedUp) {
         devConf2.encoderMovingSpeedUp = mcu::encoder::DEFAULT_MOVING_UP_SPEED;
     }
-    mcu::encoder::setMovingSpeed(devConf2.encoderMovingSpeedDown, devConf2.encoderMovingSpeedUp);
 #endif
 }
 
@@ -805,10 +804,6 @@ bool setEncoderSettings(uint8_t confirmationMode, uint8_t movingSpeedDown, uint8
     devConf2.flags.encoderConfirmationMode = confirmationMode;
     devConf2.encoderMovingSpeedDown = movingSpeedDown;
     devConf2.encoderMovingSpeedUp = movingSpeedUp;
-
-#if OPTION_ENCODER
-    mcu::encoder::setMovingSpeed(devConf2.encoderMovingSpeedDown, devConf2.encoderMovingSpeedUp);
-#endif
 
     return saveDevice2();
 }

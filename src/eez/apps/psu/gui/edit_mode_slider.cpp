@@ -20,9 +20,11 @@
 
 #if OPTION_DISPLAY
 
+#include <eez/apps/psu/gui/psu.h>
 #include <eez/apps/psu/gui/edit_mode.h>
 #include <eez/gui/touch.h>
 #include <eez/modules/mcu/display.h>
+#include <eez/modules/mcu/encoder.h>
 
 namespace eez {
 namespace psu {
@@ -58,16 +60,7 @@ int displayXSize() {
 void increment(int counter) {
     float min = edit_mode::getMin().getFloat();
     float max = edit_mode::getMax().getFloat();
-
-    float value = edit_mode::getEditValue().getFloat() + 0.01f * counter;
-
-    if (value < min) {
-        value = min;
-    }
-    if (value > max) {
-        value = max;
-    }
-
+    float value = mcu::encoder::increment(edit_mode::getEditValue(), counter, min, max, g_focusCursor.i, 0);
     edit_mode::setValue(value);
 }
 
