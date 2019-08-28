@@ -264,6 +264,7 @@ static void initDevice2() {
 
 #if OPTION_DISPLAY
     onLuminocityChanged();
+    onThemeChanged();
 #endif
 }
 
@@ -289,6 +290,7 @@ void loadDevice2() {
 
 #if OPTION_DISPLAY
         onLuminocityChanged();
+        onThemeChanged();
 #endif
     }
 
