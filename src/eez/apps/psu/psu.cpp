@@ -233,6 +233,9 @@ static bool testMaster() {
 
     result &= temperature::test();
 
+    // test BP3c
+    result &= bp3c::relays::test();
+
     g_masterTestResult = result ? TEST_OK : TEST_FAILED;
 
     return result;
@@ -244,9 +247,6 @@ bool test() {
     fan::test_start();
 
     testResult &= testMaster();
-
-    // test BP3c
-    testResult &= bp3c::relays::test();
 
     testResult &= testChannels();
 

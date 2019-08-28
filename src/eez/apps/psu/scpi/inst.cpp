@@ -135,12 +135,7 @@ scpi_result_t scpi_cmd_instrumentCoupleTracking(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!Channel::get(0).isOk() || !Channel::get(1).isOk()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_ERROR);
-        return SCPI_RES_ERR;
-    }
-
-    if ((type == channel_dispatcher::TYPE_PARALLEL || type == channel_dispatcher::TYPE_SERIES) && Channel::get(0).boardRevision != Channel::get(1).boardRevision) {
+    if (!channel_dispatcher::isCouplingOrTrackingAllowed((channel_dispatcher::Type)type)) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }

@@ -30,18 +30,28 @@
 
 
 #ifdef EEZ_PLATFORM_STM32
-#define IOEXP_ADDRESS 0x82
+
+#if EEZ_BP3C_REVISION_R1B1
+// http://www.ti.com/lit/ds/symlink/pca9536.pdf
+#define IOEXP_ADDRESS 0x82 // 1 0 0 0 0 0 1 R/W'
+#endif
+
+#if EEZ_BP3C_REVISION_R3B1
+// https://www.ti.com/lit/ds/symlink/tca9534.pdf
+#define IOEXP_ADDRESS 0x40 // 0 1 0 0 A2 A1 A0 R/W'
+#endif
 
 #define REG_INPUT_PORT         0x00
 #define REG_OUTPUT_PORT        0x01
 #define REG_POLARITY_INVERSION 0x02
 #define REG_CONFIGURATION      0x03
 
-#define COUPLING_MODE_NONE          0b000
-#define COUPLING_MODE_COMMON_GROUND 0b0001
-#define COUPLING_MODE_PARALLEL      0b0010
-#define COUPLING_MODE_SERIES        0b0100
-#define COUPLING_MODE_SPLIT_RAIL    0b1000
+#define COUPLING_MODE_NONE          0b10000000
+#define COUPLING_MODE_COMMON_GROUND 0b10000001
+#define COUPLING_MODE_PARALLEL      0b10000010
+#define COUPLING_MODE_SERIES        0b10000100
+#define COUPLING_MODE_SPLIT_RAIL    0b10001000
+
 #endif
 
 namespace eez {
@@ -80,8 +90,16 @@ void init() {
 #if defined(EEZ_PLATFORM_STM32)
 	g_testResult = TEST_FAILED;
 
+#if EEZ_BP3C_REVISION_R1B1
 	// all 4 pins are output (bit 0, 1, 2 and 3 should be set to 0)
 	uint8_t configValue = 0b11110000;
+#endif
+
+#if EEZ_BP3C_REVISION_R3B1
+	// all 8 pins are output (should be set to 0)
+	uint8_t configValue = 0b00000000;
+#endif
+
 	if (write(REG_CONFIGURATION, configValue) == HAL_OK) {
 		// check if configuration register is properly set
 		uint8_t value;

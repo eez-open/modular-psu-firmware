@@ -24,6 +24,7 @@
 #include <eez/scpi/regs.h>
 #include <eez/apps/psu/temperature.h>
 #include <eez/apps/psu/trigger.h>
+#include <eez/index.h>
 #include <eez/system.h>
 #include <eez/modules/bp3c/relays.h>
 
@@ -43,7 +44,11 @@ bool isCouplingOrTrackingAllowed(Type value) {
     }
 
     if (value == TYPE_PARALLEL || value == TYPE_SERIES) {
-        if (Channel::get(0).boardRevision != Channel::get(1).boardRevision) {
+        if (g_slots[0].moduleType != g_slots[1].moduleType) {
+            return false;
+        }
+
+        if (g_slots[0].moduleType != MODULE_TYPE_DCP405 && g_slots[0].moduleType != MODULE_TYPE_DCP505) {
             return false;
         }
     }
