@@ -110,7 +110,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pins : PGPin PGPin */
   GPIO_InitStruct.Pin = PWR_DIRECT_Pin|PWR_SSTART_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
