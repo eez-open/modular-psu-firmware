@@ -73,7 +73,7 @@ namespace psu {
 namespace gui {
 
 void animateFromDefaultViewToMaxView() {
-    int iMax = g_channel->index - 1;
+    int iMax = g_channel->channelIndex;
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 
@@ -96,7 +96,7 @@ void animateFromDefaultViewToMaxView() {
 }
 
 void animateFromMaxViewToDefaultView() {
-    int iMax = g_channel->index - 1;
+    int iMax = g_channel->channelIndex;
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 
@@ -119,7 +119,7 @@ void animateFromMaxViewToDefaultView() {
 }
 
 void animateFromMinViewToMaxView(int iMaxBefore) {
-    int iMax = psu::persist_conf::devConf.flags.channelMax;
+    int iMax = psu::persist_conf::devConf.flags.slotMax;
 
     int i = 0;
 
@@ -163,7 +163,7 @@ void animateFromMinViewToMaxView(int iMaxBefore) {
 }
 
 void animateFromMicroViewToMaxView() {
-    int iMax = g_channel->index - 1;
+    int iMax = g_channel->channelIndex;
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 

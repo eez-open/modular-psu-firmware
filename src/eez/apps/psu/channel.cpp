@@ -75,28 +75,75 @@ static uint16_t CH_BOARD_REVISION_FEATURES[] = {
     CH_FEATURE_RPROG | CH_FEATURE_RPOL
 };
 
+static struct {
+    float U_MIN;
+    float U_DEF;
+    float U_MAX;
+    float U_MAX_CONF;
+    float U_MIN_STEP;
+    float U_DEF_STEP;
+    float U_MAX_STEP;
+    float U_CAL_VAL_MIN;
+    float U_CAL_VAL_MID;
+    float U_CAL_VAL_MAX;
+    float U_CURR_CAL;
+    bool OVP_DEFAULT_STATE;
+    float OVP_MIN_DELAY;
+    float OVP_DEFAULT_DELAY;
+    float OVP_MAX_DELAY;
+    float I_MIN;
+    float I_DEF;
+    float I_MAX;
+    float I_MAX_CONF;
+    float I_MIN_STEP;
+    float I_DEF_STEP;
+    float I_MAX_STEP; 
+    float I_CAL_VAL_MIN;
+    float I_CAL_VAL_MID;
+    float I_CAL_VAL_MAX;
+    float I_VOLT_CAL;
+    bool OCP_DEFAULT_STATE;
+    float OCP_MIN_DELAY;
+    float OCP_DEFAULT_DELAY;
+    float OCP_MAX_DELAY;
+    bool OPP_DEFAULT_STATE;
+    float OPP_MIN_DELAY;
+    float OPP_DEFAULT_DELAY;
+    float OPP_MAX_DELAY;
+    float OPP_MIN_LEVEL;
+    float OPP_DEFAULT_LEVEL;
+    float OPP_MAX_LEVEL;
+    float SOA_VIN;
+    float SOA_PREG_CURR;
+    float SOA_POSTREG_PTOT;
+    float PTOT;
+} CH_BOARD_REVISION_PARAMS[] = {
+    { CH_PARAMS_NONE },   // CH_BOARD_REVISION_NONE
+    { CH_PARAMS_50V_5A }, // CH_BOARD_REVISION_DCP505_R1B3
+    { CH_PARAMS_40V_5A }, // CH_BOARD_REVISION_DCP405_R1B1
+    { CH_PARAMS_40V_5A }, // CH_BOARD_REVISION_DCP405_R2B5
+    { CH_PARAMS_20V_4A }  // CH_BOARD_REVISION_DCM220_R1B1
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 int CH_NUM = 0;
-
-#define CHANNEL(INDEX) Channel(INDEX)
 Channel channels[CH_MAX];
-#undef CHANNEL
 
 ////////////////////////////////////////////////////////////////////////////////
 
 Channel &Channel::get(int channelIndex) {
-	assert(channelIndex >= 0 && channelIndex < CH_NUM);
+	assert(channelIndex >= 0 && channelIndex < CH_MAX);
     return channels[channelIndex];
 }
 
-Channel *Channel::getBySlotIndex(int slotIndex) {
-    for (int i = 0; i < CH_NUM; i++) {
+Channel &Channel::getBySlotIndex(int slotIndex) {
+    for (int i = 0; i < CH_NUM - 1; i++) {
     	if (channels[i].slotIndex == slotIndex) {
-            return &channels[i];
+            return channels[i];
         }
     }
-    return NULL;
+    return channels[CH_NUM - 1];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -233,7 +280,7 @@ float Channel::Simulator::getVoltProgExt() {
 ////////////////////////////////////////////////////////////////////////////////
 
 Channel::Channel()
-    : index(1)
+    : channelIndex(0)
     , ioexp(*this)
     , adc(*this)
     , dac(*this)
@@ -241,64 +288,56 @@ Channel::Channel()
 {
 }
 
-void Channel::set(uint8_t slotIndex_, uint8_t boardRevision_, float U_MIN_, float U_DEF_, float U_MAX_,
-                 float U_MAX_CONF_, float U_MIN_STEP_, float U_DEF_STEP_, float U_MAX_STEP_,
-                 float U_CAL_VAL_MIN_, float U_CAL_VAL_MID_, float U_CAL_VAL_MAX_,
-                 float U_CURR_CAL_, bool OVP_DEFAULT_STATE_, float OVP_MIN_DELAY_,
-                 float OVP_DEFAULT_DELAY_, float OVP_MAX_DELAY_, float I_MIN_, float I_DEF_,
-                 float I_MAX_, float I_MAX_CONF_, float I_MIN_STEP_, float I_DEF_STEP_,
-                 float I_MAX_STEP_, float I_CAL_VAL_MIN_, float I_CAL_VAL_MID_,
-                 float I_CAL_VAL_MAX_, float I_VOLT_CAL_, bool OCP_DEFAULT_STATE_,
-                 float OCP_MIN_DELAY_, float OCP_DEFAULT_DELAY_, float OCP_MAX_DELAY_,
-                 bool OPP_DEFAULT_STATE_, float OPP_MIN_DELAY_, float OPP_DEFAULT_DELAY_,
-                 float OPP_MAX_DELAY_, float OPP_MIN_LEVEL_, float OPP_DEFAULT_LEVEL_,
-                 float OPP_MAX_LEVEL_, float SOA_VIN_, float SOA_PREG_CURR_,
-                 float SOA_POSTREG_PTOT_, float PTOT_)
-{
+void Channel::set(uint8_t slotIndex_, uint8_t subchannelIndex_, uint8_t boardRevision_) {
 	slotIndex = slotIndex_;
     boardRevision = boardRevision_;
+    subchannelIndex = subchannelIndex_;
 
-    U_MIN = U_MIN_;
-    U_DEF = U_DEF_;
-    U_MAX = U_MAX_,
-    U_MAX_CONF = U_MAX_CONF_;
-    U_MIN_STEP = U_MIN_STEP_;
-    U_DEF_STEP = U_DEF_STEP_;
-    U_MAX_STEP = U_MAX_STEP_;
-    U_CAL_VAL_MIN = U_CAL_VAL_MIN_;
-    U_CAL_VAL_MID = U_CAL_VAL_MID_;
-    U_CAL_VAL_MAX = U_CAL_VAL_MAX_;
-    U_CURR_CAL = U_CURR_CAL_;
-    OVP_DEFAULT_STATE = OVP_DEFAULT_STATE_;
-    OVP_MIN_DELAY = OVP_MIN_DELAY_;
-    OVP_DEFAULT_DELAY = OVP_DEFAULT_DELAY_;
-    OVP_MAX_DELAY = OVP_MAX_DELAY_;
-    I_MIN = I_MIN_;
-    I_DEF = I_DEF_;
-    I_MAX = I_MAX_;
-    I_MAX_CONF = I_MAX_CONF_;
-    I_MIN_STEP = I_MIN_STEP_;
-    I_DEF_STEP = I_DEF_STEP_;
-    I_MAX_STEP = I_MAX_STEP_;
-    I_CAL_VAL_MIN = I_CAL_VAL_MIN_;
-    I_CAL_VAL_MID = I_CAL_VAL_MID_;
-    I_CAL_VAL_MAX = I_CAL_VAL_MAX_;
-    I_VOLT_CAL = I_VOLT_CAL_;
-    OCP_DEFAULT_STATE = OCP_DEFAULT_STATE_;
-    OCP_MIN_DELAY = OCP_MIN_DELAY_;
-    OCP_DEFAULT_DELAY = OCP_DEFAULT_DELAY_;
-    OCP_MAX_DELAY = OCP_MAX_DELAY_;
-    OPP_DEFAULT_STATE = OPP_DEFAULT_STATE_;
-    OPP_MIN_DELAY = OPP_MIN_DELAY_;
-    OPP_DEFAULT_DELAY = OPP_DEFAULT_DELAY_;
-    OPP_MAX_DELAY = OPP_MAX_DELAY_;
-    OPP_MIN_LEVEL = OPP_MIN_LEVEL_;
-    OPP_DEFAULT_LEVEL = OPP_DEFAULT_LEVEL_;
-    OPP_MAX_LEVEL = OPP_MAX_LEVEL_;
-    SOA_VIN = SOA_VIN_;
-    SOA_PREG_CURR = SOA_PREG_CURR_;
-    SOA_POSTREG_PTOT = SOA_POSTREG_PTOT_;
-    PTOT = PTOT_;
+    reset();
+
+    auto params = CH_BOARD_REVISION_PARAMS[boardRevision];
+
+    U_MIN = params.U_MIN;
+    U_DEF = params.U_DEF;
+    U_MAX = params.U_MAX,
+    U_MAX_CONF = params.U_MAX_CONF;
+    U_MIN_STEP = params.U_MIN_STEP;
+    U_DEF_STEP = params.U_DEF_STEP;
+    U_MAX_STEP = params.U_MAX_STEP;
+    U_CAL_VAL_MIN = params.U_CAL_VAL_MIN;
+    U_CAL_VAL_MID = params.U_CAL_VAL_MID;
+    U_CAL_VAL_MAX = params.U_CAL_VAL_MAX;
+    U_CURR_CAL = params.U_CURR_CAL;
+    OVP_DEFAULT_STATE = params.OVP_DEFAULT_STATE;
+    OVP_MIN_DELAY = params.OVP_MIN_DELAY;
+    OVP_DEFAULT_DELAY = params.OVP_DEFAULT_DELAY;
+    OVP_MAX_DELAY = params.OVP_MAX_DELAY;
+    I_MIN = params.I_MIN;
+    I_DEF = params.I_DEF;
+    I_MAX = params.I_MAX;
+    I_MAX_CONF = params.I_MAX_CONF;
+    I_MIN_STEP = params.I_MIN_STEP;
+    I_DEF_STEP = params.I_DEF_STEP;
+    I_MAX_STEP = params.I_MAX_STEP;
+    I_CAL_VAL_MIN = params.I_CAL_VAL_MIN;
+    I_CAL_VAL_MID = params.I_CAL_VAL_MID;
+    I_CAL_VAL_MAX = params.I_CAL_VAL_MAX;
+    I_VOLT_CAL = params.I_VOLT_CAL;
+    OCP_DEFAULT_STATE = params.OCP_DEFAULT_STATE;
+    OCP_MIN_DELAY = params.OCP_MIN_DELAY;
+    OCP_DEFAULT_DELAY = params.OCP_DEFAULT_DELAY;
+    OCP_MAX_DELAY = params.OCP_MAX_DELAY;
+    OPP_DEFAULT_STATE = params.OPP_DEFAULT_STATE;
+    OPP_MIN_DELAY = params.OPP_MIN_DELAY;
+    OPP_DEFAULT_DELAY = params.OPP_DEFAULT_DELAY;
+    OPP_MAX_DELAY = params.OPP_MAX_DELAY;
+    OPP_MIN_LEVEL = params.OPP_MIN_LEVEL;
+    OPP_DEFAULT_LEVEL = params.OPP_DEFAULT_LEVEL;
+    OPP_MAX_LEVEL = params.OPP_MAX_LEVEL;
+    SOA_VIN = params.SOA_VIN;
+    SOA_PREG_CURR = params.SOA_PREG_CURR;
+    SOA_POSTREG_PTOT = params.SOA_POSTREG_PTOT;
+    PTOT = params.PTOT;
 
     if (boardRevision == CH_BOARD_REVISION_DCP405_R1B1 || boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {
         VOLTAGE_GND_OFFSET = 0.86f;
@@ -363,7 +402,7 @@ void Channel::protectionEnter(ProtectionValue &cpv) {
     int bit_mask = reg_get_ques_isum_bit_mask_for_channel_protection_value(cpv);
     setQuesBits(bit_mask, true);
 
-    int16_t eventId = event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + (index - 1);
+    int16_t eventId = event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + channelIndex;
 
     if (IS_OVP_VALUE(this, cpv)) {
         if (flags.rprogEnabled && channel_dispatcher::getUProtectionLevel(*this) == channel_dispatcher::getUMax(*this)) {
@@ -736,7 +775,7 @@ void Channel::tick(uint32_t tick_usec) {
 
         if (rpol && isOutputEnabled()) {
             channel_dispatcher::outputEnable(*this, false);
-            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_REMOTE_SENSE_REVERSE_POLARITY_DETECTED + index - 1);
+            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_REMOTE_SENSE_REVERSE_POLARITY_DETECTED + channelIndex);
             onProtectionTripped();
         }
     }
@@ -765,23 +804,23 @@ void Channel::tick(uint32_t tick_usec) {
         } else {
             if (tick_usec - dpNegMonitoringTime > DP_NEG_DELAY * 1000000UL) {
                 if (flags.dpOn) {
-                    DebugTrace("CH%d, neg. P, DP off: %f", index, u.mon_last * i.mon_last);
+                    DebugTrace("CH%d, neg. P, DP off: %f", channelIndex + 1, u.mon_last * i.mon_last);
                     dpNegMonitoringTime = tick_usec;
-                    generateError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF + (index - 1));
+                    generateError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF + channelIndex);
                     doDpEnable(false);
                 } else {
-                    DebugTrace("CH%d, neg. P, output off: %f", index, u.mon_last * i.mon_last);
-                    generateError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED - (index - 1));
+                    DebugTrace("CH%d, neg. P, output off: %f", channelIndex + 1, u.mon_last * i.mon_last);
+                    generateError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED - channelIndex);
                     channel_dispatcher::outputEnable(*this, false);
                 }
             } else if (tick_usec - dpNegMonitoringTime > 500 * 1000UL) {
                 if (flags.dpOn) {
                     if (channel_dispatcher::isSeries()) {
-                        Channel &channel = Channel::get(index == 1 ? 1 : 0);
+                        Channel &channel = Channel::get(channelIndex == 0 ? 1 : 0);
                         channel.voltageBalancing();
                         dpNegMonitoringTime = tick_usec;
                     } else if (channel_dispatcher::isParallel()) {
-                        Channel &channel = Channel::get(index == 1 ? 1 : 0);
+                        Channel &channel = Channel::get(channelIndex == 0 ? 1 : 0);
                         channel.currentBalancing();
                         dpNegMonitoringTime = tick_usec;
                     }
@@ -899,7 +938,7 @@ void Channel::adcDataIsReady(int16_t data, bool startAgain) {
 
     case AnalogDigitalConverter::ADC_REG0_READ_U_MON: {
 #ifdef DEBUG
-        debug::g_uMon[index - 1].set(data);
+        debug::g_uMon[channelIndex].set(data);
 #endif
 
         u.mon_adc = data;
@@ -930,7 +969,7 @@ void Channel::adcDataIsReady(int16_t data, bool startAgain) {
 
     case AnalogDigitalConverter::ADC_REG0_READ_I_MON: {
 #ifdef DEBUG
-        debug::g_iMon[index - 1].set(data);
+        debug::g_iMon[channelIndex].set(data);
 #endif
 
         // if (abs(i.mon_adc - data) > negligibleAdcDiffForCurrent) {
@@ -965,7 +1004,7 @@ void Channel::adcDataIsReady(int16_t data, bool startAgain) {
 
     case AnalogDigitalConverter::ADC_REG0_READ_U_SET: {
 #ifdef DEBUG
-        debug::g_uMonDac[index - 1].set(data);
+        debug::g_uMonDac[channelIndex].set(data);
 #endif
 
         float value = remapAdcDataToVoltage(data);
@@ -994,7 +1033,7 @@ void Channel::adcDataIsReady(int16_t data, bool startAgain) {
 
     case AnalogDigitalConverter::ADC_REG0_READ_I_SET: {
 #ifdef DEBUG
-        debug::g_iMonDac[index - 1].set(data);
+        debug::g_iMonDac[channelIndex].set(data);
 #endif
 
         float value = remapAdcDataToCurrent(data) - getDualRangeGndOffset();
@@ -1030,7 +1069,7 @@ void Channel::setCcMode(bool cc_mode) {
         setQuesBits(QUES_ISUM_VOLT, cc_mode);
 
         if (channel_dispatcher::isParallel()) {
-        	Channel::get(index == 1 ? 1 : 0).restoreCurrentToValueBeforeBalancing();
+        	Channel::get(channelIndex == 0 ? 1 : 0).restoreCurrentToValueBeforeBalancing();
         }
     }
 }
@@ -1043,13 +1082,13 @@ void Channel::setCvMode(bool cv_mode) {
         setQuesBits(QUES_ISUM_CURR, cv_mode);
 
         if (channel_dispatcher::isSeries()) {
-        	Channel::get(index == 1 ? 1 : 0).restoreVoltageToValueBeforeBalancing();
+        	Channel::get(channelIndex == 0 ? 1 : 0).restoreVoltageToValueBeforeBalancing();
         }
     }
 }
 
 void Channel::protectionCheck() {
-    if (channel_dispatcher::isCoupled() && index == 2) {
+    if (channel_dispatcher::isCoupled() && channelIndex == 1) {
         // protections of coupled channels are checked on channel 1
         return;
     }
@@ -1110,6 +1149,12 @@ void Channel::doDpEnable(bool enable) {
 }
 
 void Channel::executeOutputEnable(bool enable) {
+	if (enable) {
+		doSetVoltage(u.set);
+	} else {
+		dac.set_voltage((uint16_t)0);
+	}
+
     ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, enable);
 
     setOperBits(OPER_ISUM_OE_OFF, !enable);
@@ -1210,9 +1255,9 @@ void Channel::update() {
         return;
     }
 
-    if (index == 1) {
+    if (channelIndex == 0) {
         doCalibrationEnable(persist_conf::devConf.flags.ch1CalEnabled && isCalibrationExists());
-    } else if (index == 2) {
+    } else if (channelIndex == 1) {
         doCalibrationEnable(persist_conf::devConf.flags.ch2CalEnabled && isCalibrationExists());
     }
 
@@ -1232,9 +1277,7 @@ void Channel::update() {
 void Channel::outputEnable(bool enable) {
     if (enable != flags.outputEnabled) {
         doOutputEnable(enable);
-        event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_OUTPUT_ENABLED
-                                       : event_queue::EVENT_INFO_CH1_OUTPUT_DISABLED) +
-                               index - 1);
+        event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_OUTPUT_ENABLED : event_queue::EVENT_INFO_CH1_OUTPUT_DISABLED) + channelIndex);
         profile::save();
     }
 }
@@ -1292,9 +1335,7 @@ void Channel::doCalibrationEnable(bool enable) {
 void Channel::calibrationEnable(bool enabled) {
     if (enabled != isCalibrationEnabled()) {
         doCalibrationEnable(enabled);
-        event_queue::pushEvent((enabled ? event_queue::EVENT_INFO_CH1_CALIBRATION_ENABLED
-                                        : event_queue::EVENT_WARNING_CH1_CALIBRATION_DISABLED) +
-                               index - 1);
+        event_queue::pushEvent((enabled ? event_queue::EVENT_INFO_CH1_CALIBRATION_ENABLED : event_queue::EVENT_WARNING_CH1_CALIBRATION_DISABLED) + channelIndex);
         persist_conf::saveCalibrationEnabledFlag(*this, enabled);
     }
 }
@@ -1323,9 +1364,7 @@ bool Channel::isCurrentCalibrationEnabled() {
 void Channel::remoteSensingEnable(bool enable) {
     if (enable != flags.senseEnabled) {
         doRemoteSensingEnable(enable);
-        event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_REMOTE_SENSE_ENABLED
-                                       : event_queue::EVENT_INFO_CH1_REMOTE_SENSE_DISABLED) +
-                               index - 1);
+        event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_REMOTE_SENSE_ENABLED : event_queue::EVENT_INFO_CH1_REMOTE_SENSE_DISABLED) + channelIndex);
         profile::save();
     }
 }
@@ -1337,9 +1376,7 @@ bool Channel::isRemoteSensingEnabled() {
 void Channel::remoteProgrammingEnable(bool enable) {
     if (enable != flags.rprogEnabled) {
         doRemoteProgrammingEnable(enable);
-        event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_REMOTE_PROG_ENABLED
-                                       : event_queue::EVENT_INFO_CH1_REMOTE_PROG_DISABLED) +
-                               index - 1);
+        event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_REMOTE_PROG_ENABLED : event_queue::EVENT_INFO_CH1_REMOTE_PROG_DISABLED) + channelIndex);
         profile::save();
     }
 }
@@ -1448,21 +1485,21 @@ void Channel::clearProtection(bool clearOTP) {
     ovp.flags.tripped = 0;
     ovp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OVP, false);
-    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + (index - 1)) {
+    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + channelIndex) {
         event_queue::markAsRead();
     }
 
     ocp.flags.tripped = 0;
     ocp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OCP, false);
-    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + (index - 1)) {
+    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + channelIndex) {
         event_queue::markAsRead();
     }
 
     opp.flags.tripped = 0;
     opp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OPP, false);
-    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + (index - 1)) {
+    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + channelIndex) {
         event_queue::markAsRead();
     }
 
@@ -1481,11 +1518,11 @@ void Channel::disableProtection() {
 }
 
 void Channel::setQuesBits(int bit_mask, bool on) {
-    reg_set_ques_isum_bit(this->index - 1, bit_mask, on);
+    reg_set_ques_isum_bit(channelIndex, bit_mask, on);
 }
 
 void Channel::setOperBits(int bit_mask, bool on) {
-    reg_set_oper_isum_bit(this->index - 1, bit_mask, on);
+    reg_set_oper_isum_bit(channelIndex, bit_mask, on);
 }
 
 const char *Channel::getCvModeStr() {
@@ -1611,9 +1648,9 @@ void Channel::setPowerLimit(float limit) {
 #if !CONF_SKIP_PWRGOOD_TEST
 void Channel::testPwrgood() {
     if (!ioexp.testBit(IOExpander::IO_BIT_IN_PWRGOOD)) {
-        DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d", index, (int)ioexp.gpio);
+        DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d", channelIndex + 1, (int)ioexp.gpio);
         flags.powerOk = 0;
-        generateError(SCPI_ERROR_CH1_FAULT_DETECTED - (index - 1));
+        generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channelIndex);
         powerDownBySensor();
         return;
     }
@@ -1709,7 +1746,7 @@ void Channel::doSetCurrentRange() {
 	if (flags.outputEnabled) {
 		if (flags.currentCurrentRange == 0) {
 			// 5A
-			DebugTrace("CH%d: Switched to 5A range", (int)index);
+			DebugTrace("CH%d: Switched to 5A range", channelIndex + 1);
 			ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_5A, true);
 			ioexp.changeBit(boardRevision == CH_BOARD_REVISION_DCP405_R1B1 ? 
                 IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA :
@@ -1717,7 +1754,7 @@ void Channel::doSetCurrentRange() {
 			// calculateNegligibleAdcDiffForCurrent();
 		} else {
 			// 50mA
-			DebugTrace("CH%d: Switched to 50mA range", (int)index);
+			DebugTrace("CH%d: Switched to 50mA range", channelIndex + 1);
 			ioexp.changeBit(boardRevision == CH_BOARD_REVISION_DCP405_R1B1 ? 
                 IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA :
                 IOExpander::DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA, true);

@@ -22,6 +22,9 @@ enum EnumDefinition {
     ENUM_DEFINITION_IO_PINS_OUTPUT_FUNCTION,
     ENUM_DEFINITION_SERIAL_PARITY,
     ENUM_DEFINITION_DST_RULE
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    , ENUM_DEFINITION_MODULE_TYPE
+#endif
 };
 
 extern EnumItem g_channelDisplayValueEnumDefinition[];
@@ -35,6 +38,10 @@ extern EnumItem g_ioPinsInputFunctionEnumDefinition[];
 extern EnumItem g_ioPinsOutputFunctionEnumDefinition[];
 extern EnumItem g_serialParityEnumDefinition[];
 extern EnumItem g_dstRuleEnumDefinition[];
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+extern EnumItem g_moduleTypeEnumDefinition[];
+#endif
 
 enum UserValueType {
     VALUE_TYPE_LESS_THEN_MIN_FLOAT = VALUE_TYPE_USER,

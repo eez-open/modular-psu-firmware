@@ -19,21 +19,45 @@
 #include <eez/gui/widgets/layout_view.h>
 
 #include <eez/gui/assets.h>
+#include <eez/gui/draw.h>
 #include <eez/gui/widgets/container.h>
 
 namespace eez {
 namespace gui {
 
 void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+    auto savedCurrentState = widgetCursor.currentState;
+    auto savedPreviousState = widgetCursor.previousState;
+
     const LayoutViewWidgetSpecific *layoutViewSpecific = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const LayoutViewWidgetSpecific *);
 
     data::setContext(widgetCursor.cursor, layoutViewSpecific->context);
 
-	if (layoutViewSpecific->layout != -1) {
-		const Widget *layout = getPageWidget(layoutViewSpecific->layout);
+    const Widget *layout = nullptr;
+
+    if (widgetCursor.widget->data) {
+        auto layoutValue = data::get(widgetCursor.cursor, widgetCursor.widget->data);
+
+        if (widgetCursor.currentState) {
+            widgetCursor.currentState->data = layoutValue;
+
+            if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {
+                widgetCursor.previousState = 0;
+            }
+        }
+
+        layout = getPageWidget(layoutValue.getInt());
+    } else if (layoutViewSpecific->layout != -1) {
+        layout = getPageWidget(layoutViewSpecific->layout);
+    }
+    
+	if (layout) {
 		const PageWidget *layoutSpecific = GET_WIDGET_PROPERTY(layout, specific, const PageWidget *);
 		enumContainer(widgetCursor, callback, layoutSpecific->widgets);
 	}
+
+    widgetCursor.currentState = savedCurrentState;
+    widgetCursor.previousState = savedPreviousState;
 }
 
 } // namespace gui

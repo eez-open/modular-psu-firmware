@@ -26,7 +26,7 @@
 #define PSU_SERIAL "0000000"
 
 /// Firmware version.
-#define FIRMWARE "M1"
+#define FIRMWARE "M1 0.1"
 
 /// Manufacturer description text used for *IDN?
 #define IDN_MANUFACTURER "Envox"

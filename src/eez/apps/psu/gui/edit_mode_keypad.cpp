@@ -49,7 +49,7 @@ void enter(Channel &channel, const eez::gui::data::Value &editValue, const eez::
 
     NumericKeypadOptions options;
 
-    options.channelIndex = channel.index - 1;
+    options.channelIndex = channel.channelIndex;
 
     options.editValueUnit = editValue.getUnit();
 

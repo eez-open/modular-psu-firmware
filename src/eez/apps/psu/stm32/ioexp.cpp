@@ -179,8 +179,7 @@ bool IOExpander::test() {
             }
 
             if (value != expectedValue) {
-                DebugTrace("Ch%d IO expander reg check failure: reg=%d, expected=%d, got=%d",
-                        channel.index, (int)REG_VALUES[3 * i], (int)expectedValue, (int)value);
+                DebugTrace("Ch%d IO expander reg check failure: reg=%d, expected=%d, got=%d", channel.channelIndex + 1, (int)REG_VALUES[3 * i], (int)expectedValue, (int)value);
 
                 g_testResult = TEST_FAILED;
                 break;
@@ -191,7 +190,7 @@ bool IOExpander::test() {
     readGpio();
 
     if (g_testResult == TEST_FAILED) {
-		 generateError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED + channel.index - 1);
+		 generateError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED + channel.channelIndex);
 		 channel.flags.powerOk = 0;
     } else {
     	g_testResult = TEST_OK;
@@ -199,8 +198,8 @@ bool IOExpander::test() {
 #if !CONF_SKIP_PWRGOOD_TEST
         channel.flags.powerOk = testBit(IO_BIT_IN_PWRGOOD);
         if (!channel.flags.powerOk) {
-            DebugTrace("Ch%d power fault", channel.index);
-            generateError(SCPI_ERROR_CH1_FAULT_DETECTED - (channel.index - 1));
+            DebugTrace("Ch%d power fault", channel.channelIndex + 1);
+            generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channel.channelIndex);
         }
 #endif
 	}
@@ -242,9 +241,9 @@ void IOExpander::tick(uint32_t tick_usec) {
     uint8_t iodira = read(REG_IODIRA);
     if (iodira == 0xFF || (gpio & gpioOutputPinsMask) != gpioWritten) {
         if (iodira == 0xFF) {
-            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_RESET_DETECTED + channel.index - 1);
+            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_RESET_DETECTED + channel.channelIndex);
         } else {
-            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_FAULT_MATCH_DETECTED + channel.index - 1);
+            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_FAULT_MATCH_DETECTED + channel.channelIndex);
         }
 
         reinit();

@@ -20,9 +20,14 @@
 
 #include <eez/platform/simulator/front_panel.h>
 
+#include <eez/index.h>
+
 #include <eez/apps/home/home.h>
 #include <eez/gui/assets.h>
 #include <eez/gui/document.h>
+
+#include <eez/apps/psu/psu.h>
+#include <eez/apps/psu/channel.h>
 
 using namespace eez::gui;
 using namespace eez::home;
@@ -62,6 +67,36 @@ bool FrontPanelAppContext::testExecuteActionOnTouchDown(int action) {
 void data_main_app_view(DataOperationEnum operation, Cursor &cursor, Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(&g_homeAppContext);
+    }
+}
+
+int getSlotView(int channelIndex) {
+    int slotIndex = psu::Channel::get(channelIndex).slotIndex;
+
+    if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+        return PAGE_ID_DCP405_FRONT_PANEL;
+    } else if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCM220) {
+        return PAGE_ID_DCM220_FRONT_PANEL;
+    } else {
+        return PAGE_ID_FRONT_PANEL_EMPTY_SLOT;
+    }
+}
+
+void data_front_panel_slot1_view(DataOperationEnum operation, Cursor &cursor, Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getSlotView(cursor.i);
+    }
+}
+
+void data_front_panel_slot2_view(DataOperationEnum operation, Cursor &cursor, Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getSlotView(cursor.i);
+    }
+}
+
+void data_front_panel_slot3_view(DataOperationEnum operation, Cursor &cursor, Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getSlotView(cursor.i);
     }
 }
 

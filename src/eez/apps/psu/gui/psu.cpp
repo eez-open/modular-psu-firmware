@@ -289,8 +289,7 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
     }
 
     // TODO this is not valid, how can we know cursor.i is channels index and not index of some other collection?
-    int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i
-                                              : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
     if (iChannel >= 0 && iChannel < CH_NUM) {
 		if (channel_dispatcher::getVoltageTriggerMode(Channel::get(iChannel)) != TRIGGER_MODE_FIXED &&
 			!trigger::isIdle()) {
@@ -343,8 +342,7 @@ uint16_t PsuAppContext::getWidgetBackgroundColor(const WidgetCursor &widgetCurso
                                                  const Style *style) {
 #if OPTION_SD_CARD
     const Widget *widget = widgetCursor.widget;
-    int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i
-                                              : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
     if (widget->data == DATA_ID_CHANNEL_U_EDIT || widget->data == DATA_ID_CHANNEL_U_MON_DAC) {
         if (dlog::g_logVoltage[iChannel]) {
             return CONF_DLOG_COLOR;
@@ -386,7 +384,7 @@ uint32_t PsuAppContext::getNumHistoryValues(uint16_t id) {
 }
 
 uint32_t PsuAppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     return Channel::get(iChannel).getCurrentHistoryValuePosition();
 }
 
@@ -499,7 +497,7 @@ static int g_iChannelSetValue;
 void changeValue(Channel &channel, const data::Value &value, float minValue, float maxValue, float defValue, void (*onSetValue)(float)) {
     NumericKeypadOptions options;
 
-    options.channelIndex = channel.index;
+    options.channelIndex = channel.channelIndex;
 
     options.editValueUnit = value.getUnit();
 
@@ -643,7 +641,7 @@ void changeTemperatureTripDelay(int iChannel) {
 
 void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_callback)()) {
     if (value.getType() == VALUE_TYPE_SCPI_ERROR) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         if (value.getScpiError() == SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED) {
             if (channel_dispatcher::getULimit(channel) < channel_dispatcher::getUMaxLimit(channel)) {
@@ -852,7 +850,7 @@ void onEncoder(int counter, bool clicked) {
         }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        if (activePageId == PAGE_ID_NUMERIC_KEYPAD2) {
+        if (activePageId == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
             if (((NumericKeypad *)getActiveKeypad())->onEncoder(counter)) {
                 return;
             }
@@ -901,7 +899,7 @@ void onEncoder(int counter, bool clicked) {
         }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        if (activePageId == PAGE_ID_NUMERIC_KEYPAD2) {
+        if (activePageId == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
             if (((NumericKeypad *)getActiveKeypad())->onEncoderClicked()) {
                 return;
             }

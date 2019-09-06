@@ -43,12 +43,12 @@ namespace eez {
 namespace psu {
 namespace debug {
 
-DebugValueVariable g_uDac[CH_MAX] = { DebugValueVariable("CH1 U_DAC"), DebugValueVariable("CH2 U_DAC"), DebugValueVariable("CH3 U_DAC") };
-DebugValueVariable g_uMon[CH_MAX] = { DebugValueVariable("CH1 U_MON"), DebugValueVariable("CH2 U_MON"), DebugValueVariable("CH3 U_MON") };
-DebugValueVariable g_uMonDac[CH_MAX] = { DebugValueVariable("CH1 U_MON_DAC"), DebugValueVariable("CH2 U_MON_DAC"), DebugValueVariable("CH3 U_MON_DAC") };
-DebugValueVariable g_iDac[CH_MAX] = { DebugValueVariable("CH1 I_DAC"), DebugValueVariable("CH2 I_DAC"), DebugValueVariable("CH3 I_DAC") };
-DebugValueVariable g_iMon[CH_MAX] = { DebugValueVariable("CH1 I_MON"), DebugValueVariable("CH2 I_MON"), DebugValueVariable("CH3 I_MON") };
-DebugValueVariable g_iMonDac[CH_MAX] = { DebugValueVariable("CH1 I_MON_DAC"), DebugValueVariable("CH2 I_MON_DAC"), DebugValueVariable("CH3 I_MON_DAC") };
+DebugValueVariable g_uDac[CH_MAX] = { DebugValueVariable("CH1 U_DAC"), DebugValueVariable("CH2 U_DAC"), DebugValueVariable("CH3 U_DAC"), DebugValueVariable("CH4 U_DAC"), DebugValueVariable("CH5 U_DAC"), DebugValueVariable("CH6 U_DAC") };
+DebugValueVariable g_uMon[CH_MAX] = { DebugValueVariable("CH1 U_MON"), DebugValueVariable("CH2 U_MON"), DebugValueVariable("CH3 U_MON"), DebugValueVariable("CH4 U_MON"), DebugValueVariable("CH5 U_MON"), DebugValueVariable("CH6 U_MON") };
+DebugValueVariable g_uMonDac[CH_MAX] = { DebugValueVariable("CH1 U_MON_DAC"), DebugValueVariable("CH2 U_MON_DAC"), DebugValueVariable("CH3 U_MON_DAC"), DebugValueVariable("CH4 U_MON_DAC"), DebugValueVariable("CH5 U_MON_DAC"), DebugValueVariable("CH6 U_MON_DAC") };
+DebugValueVariable g_iDac[CH_MAX] = { DebugValueVariable("CH1 I_DAC"), DebugValueVariable("CH2 I_DAC"), DebugValueVariable("CH3 I_DAC"), DebugValueVariable("CH4 I_DAC"), DebugValueVariable("CH5 I_DAC"), DebugValueVariable("CH6 I_DAC") };
+DebugValueVariable g_iMon[CH_MAX] = { DebugValueVariable("CH1 I_MON"), DebugValueVariable("CH2 I_MON"), DebugValueVariable("CH3 I_MON"), DebugValueVariable("CH4 I_MON"), DebugValueVariable("CH5 I_MON"), DebugValueVariable("CH6 I_MON") };
+DebugValueVariable g_iMonDac[CH_MAX] = { DebugValueVariable("CH1 I_MON_DAC"), DebugValueVariable("CH2 I_MON_DAC"), DebugValueVariable("CH3 I_MON_DAC"), DebugValueVariable("CH4 I_MON_DAC"), DebugValueVariable("CH5 I_MON_DAC"), DebugValueVariable("CH6 I_MON_DAC") };
 
 DebugDurationVariable g_mainLoopDuration("MAIN_LOOP_DURATION");
 #if CONF_DEBUG_VARIABLES

@@ -28,6 +28,7 @@ static const int CHIP_DAC = 0;
 static const int CHIP_ADC = 1;
 static const int CHIP_IOEXP = 2;
 static const int CHIP_TEMP_SENSOR = 3;
+static const int CHIP_DCM220 = 4;
 
 void select(uint8_t slotIndex, int chip);
 void deselect(uint8_t slotIndex);

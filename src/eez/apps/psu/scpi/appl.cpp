@@ -105,7 +105,7 @@ scpi_result_t scpi_cmd_applyQ(scpi_t *context) {
         }
 
         // return both current and voltage
-        sprintf(buffer, "CH%d:", channel->index);
+        sprintf(buffer, "CH%d:", channel->channelIndex + 1);
         strcatVoltage(buffer, channel_dispatcher::getUMax(*channel));
         strcat(buffer, "/");
         strcatCurrent(buffer, channel_dispatcher::getIMax(*channel));

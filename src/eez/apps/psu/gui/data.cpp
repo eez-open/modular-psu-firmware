@@ -25,6 +25,7 @@
 
 #include <eez/system.h>
 #include <eez/util.h>
+#include <eez/index.h>
 
 #include <eez/apps/psu/calibration.h>
 #include <eez/apps/psu/channel_dispatcher.h>
@@ -80,7 +81,12 @@ const EnumItem *g_enumDefinitions[] = { g_channelDisplayValueEnumDefinition,
                                         g_ioPinsInputFunctionEnumDefinition,
                                         g_ioPinsOutputFunctionEnumDefinition,
                                         g_serialParityEnumDefinition,
-                                        g_dstRuleEnumDefinition };
+                                        g_dstRuleEnumDefinition
+#if defined(EEZ_PLATFORM_SIMULATOR)
+                                        , g_moduleTypeEnumDefinition
+#endif
+                                        
+                                         };
 
 } // namespace data
 } // namespace gui
@@ -156,6 +162,13 @@ EnumItem g_dstRuleEnumDefinition[] = { { datetime::DST_RULE_OFF, "Off" },
                                        { datetime::DST_RULE_USA, "USA" },
                                        { datetime::DST_RULE_AUSTRALIA, "Australia" },
                                        { 0, 0 } };
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+EnumItem g_moduleTypeEnumDefinition[] = { { MODULE_TYPE_NONE, "None" },
+                                          { MODULE_TYPE_DCP405, "DCP405" },
+                                          { MODULE_TYPE_DCM220, "DCM220" },
+                                          { 0, 0 } };
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -561,7 +574,7 @@ bool compare_CHANNEL_TITLE_value(const Value &a, const Value &b) {
 
 void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
-    snprintf(text, count - 1, "%s #%d", channel.getBoardName(), channel.index);
+    snprintf(text, count - 1, "%s #%d", channel.getBoardName(), channel.channelIndex + 1);
 }
 
 bool compare_CHANNEL_SHORT_TITLE_value(const Value &a, const Value &b) {
@@ -570,7 +583,7 @@ bool compare_CHANNEL_SHORT_TITLE_value(const Value &a, const Value &b) {
 
 void CHANNEL_SHORT_TITLE_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
-    snprintf(text, count - 1, "#%d", channel.index);
+    snprintf(text, count - 1, "#%d", channel.channelIndex + 1);
 }
 
 bool compare_CHANNEL_LONG_TITLE_value(const Value &a, const Value &b) {
@@ -579,7 +592,7 @@ bool compare_CHANNEL_LONG_TITLE_value(const Value &a, const Value &b) {
 
 void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
-    snprintf(text, count - 1, "%s #%d: %dV/%dA, %s", channel.getBoardName(), channel.index, 
+    snprintf(text, count - 1, "%s #%d: %dV/%dA, %s", channel.getBoardName(), channel.channelIndex + 1, 
         (int)floor(channel.U_MAX), (int)floor(channel.I_MAX), channel.getRevisionName());
 }
 
@@ -685,7 +698,7 @@ static struct ChannelSnapshot {
 } g_channelSnapshot[CH_MAX];
 
 ChannelSnapshot &getChannelSnapshot(Channel &channel) {
-    ChannelSnapshot &channelSnapshot = g_channelSnapshot[channel.index - 1];
+    ChannelSnapshot &channelSnapshot = g_channelSnapshot[channel.channelIndex];
 
     uint32_t currentTime = micros();
     if (!channelSnapshot.lastSnapshotTime ||
@@ -756,7 +769,7 @@ void data_none(data::DataOperationEnum operation, data::Cursor &cursor, data::Va
 
 void data_edit_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
 
         if ((channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED &&
@@ -779,7 +792,7 @@ void data_channels(data::DataOperationEnum operation, data::Cursor &cursor, data
 
 void data_channel_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         int channelStatus = channel.isInstalled() ? (channel.isOk() ? 1 : 2) : 0;
         value = channelStatus;
@@ -788,7 +801,7 @@ void data_channel_status(data::DataOperationEnum operation, data::Cursor &cursor
 
 void data_channel_output_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = channel.isOutputEnabled();
     }
@@ -796,7 +809,7 @@ void data_channel_output_state(data::DataOperationEnum operation, data::Cursor &
 
 void data_channel_output_mode(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
         value = (int)(channelSnapshot.mode == CHANNEL_MODE_UR ? 1 : 0);
@@ -805,7 +818,7 @@ void data_channel_output_mode(data::DataOperationEnum operation, data::Cursor &c
 
 void data_channel_is_cc(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
         value = channelSnapshot.mode == CHANNEL_MODE_CC;
@@ -814,7 +827,7 @@ void data_channel_is_cc(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_channel_is_cv(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
         value = channelSnapshot.mode == CHANNEL_MODE_CV;
@@ -823,7 +836,7 @@ void data_channel_is_cv(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_channel_mon_value(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
         value = channelSnapshot.monValue;
@@ -831,7 +844,7 @@ void data_channel_mon_value(data::DataOperationEnum operation, data::Cursor &cur
 }
 
 void data_channel_u_set(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
@@ -859,7 +872,7 @@ void data_channel_u_set(data::DataOperationEnum operation, data::Cursor &cursor,
 }
 
 void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMon(channel), UNIT_VOLT);
@@ -876,7 +889,7 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
 }
 
 void data_channel_u_mon_dac(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMonDac(channel), UNIT_VOLT);
@@ -884,7 +897,7 @@ void data_channel_u_mon_dac(data::DataOperationEnum operation, data::Cursor &cur
 }
 
 void data_channel_u_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
@@ -892,7 +905,7 @@ void data_channel_u_limit(data::DataOperationEnum operation, data::Cursor &curso
 }
 
 void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = (g_focusCursor == cursor || channel_dispatcher::isCoupled()) && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
@@ -927,7 +940,7 @@ void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor &cursor
 }
 
 void data_channel_i_set(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER);
@@ -955,7 +968,7 @@ void data_channel_i_set(data::DataOperationEnum operation, data::Cursor &cursor,
 }
 
 void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMon(channel), UNIT_AMPER);
@@ -973,7 +986,7 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
 }
 
 void data_channel_i_mon_dac(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMonDac(channel), UNIT_AMPER);
@@ -981,7 +994,7 @@ void data_channel_i_mon_dac(data::DataOperationEnum operation, data::Cursor &cur
 }
 
 void data_channel_i_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
@@ -989,7 +1002,7 @@ void data_channel_i_limit(data::DataOperationEnum operation, data::Cursor &curso
 }
 
 void data_channel_i_edit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = (g_focusCursor == cursor || channel_dispatcher::isCoupled()) &&
@@ -1026,7 +1039,7 @@ void data_channel_i_edit(data::DataOperationEnum operation, data::Cursor &cursor
 }
 
 void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(getChannelSnapshot(channel).pMon, UNIT_WATT);
@@ -1068,26 +1081,239 @@ void data_channels_view_mode_in_max(data::DataOperationEnum operation, data::Cur
     }
 }
 
-void data_channel_max(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
-        cursor.i = persist_conf::devConf.flags.channelMax - 1;
+int getDefaultView(int channelIndex) {
+    int isVert = persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+
+    Channel &channel = Channel::get(channelIndex);
+    if (channel.isInstalled()) {
+        if (channel.isOk()) {
+            if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 || g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP505) {
+                if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
+                    return channel.isOutputEnabled() ? PAGE_ID_DCP405_NUM_DEFAULT_ON : PAGE_ID_DCP405_VERT_DEFAULT_OFF;
+                } else if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+                    return channel.isOutputEnabled() ? PAGE_ID_DCP405_VBAR_DEFAULT_ON : PAGE_ID_DCP405_VERT_DEFAULT_OFF;
+                } else if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
+                    return channel.isOutputEnabled() ? PAGE_ID_DCP405_HBAR_DEFAULT_ON : PAGE_ID_DCP405_HORZ_DEFAULT_OFF;
+                } else if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_YT) {
+                    return channel.isOutputEnabled() ? PAGE_ID_DCP405_YT_DEFAULT_ON : PAGE_ID_DCP405_HORZ_DEFAULT_OFF;
+                } else {
+                    return isVert ? PAGE_ID_SLOT_VERT_DEFAULT_ERROR : PAGE_ID_SLOT_HORZ_DEFAULT_ERROR;
+                }
+            } else if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCM220) {
+                return isVert ? PAGE_ID_DCM220_VERT_DEFAULT : PAGE_ID_DCM220_HORZ_DEFAULT;
+            } else {
+                return isVert ? PAGE_ID_SLOT_VERT_DEFAULT_ERROR : PAGE_ID_SLOT_HORZ_DEFAULT_ERROR;
+            }
+        } else {
+            return isVert ? PAGE_ID_SLOT_VERT_DEFAULT_ERROR : PAGE_ID_SLOT_HORZ_DEFAULT_ERROR;
+        }
+    } else {
+        return isVert ? PAGE_ID_SLOT_VERT_DEFAULT_NOT_INSTALLED : PAGE_ID_SLOT_HORZ_DEFAULT_NOT_INSTALLED;
     }
 }
 
-void data_channel_small1(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_slot1_channel_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
-        cursor.i = persist_conf::devConf.flags.channelSmall1 - 1;
+        Channel &channel = Channel::getBySlotIndex(0);
+        cursor.i = channel.channelIndex;
     }
 }
 
-void data_channel_small2(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_slot2_channel_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
-        cursor.i = persist_conf::devConf.flags.channelSmall2 - 1;
+        Channel &channel = Channel::getBySlotIndex(1);
+        cursor.i = channel.channelIndex;
+    }
+}
+
+void data_slot3_channel_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+        Channel &channel = Channel::getBySlotIndex(2);
+        cursor.i = channel.channelIndex;
+    }
+}
+
+void data_slot_default1_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getDefaultView(cursor.i);
+    }
+}
+
+void data_slot_default2_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getDefaultView(cursor.i);
+    }
+}
+
+void data_slot_default3_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getDefaultView(cursor.i);
+    }
+}
+
+void data_slot_max_channel_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+        Channel &channel = Channel::getBySlotIndex(persist_conf::devConf.flags.slotMax - 1);
+        cursor.i = channel.channelIndex;
+    }
+}
+
+void data_slot_max_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        Channel &channel = Channel::getBySlotIndex(cursor.i);
+        if (channel.isInstalled()) {
+            if (channel.isOk()) {
+                if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 || g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP505) {
+                    if (persist_conf::devConf.flags.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
+                        value = channel.isOutputEnabled() ? PAGE_ID_DCP405_NUM_MAX_ON : PAGE_ID_DCP405_NUM_MAX_OFF;
+                    } else if (persist_conf::devConf.flags.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
+                        value = channel.isOutputEnabled() ? PAGE_ID_DCP405_HBAR_MAX_ON : PAGE_ID_DCP405_HBAR_MAX_OFF;
+                    } else if (persist_conf::devConf.flags.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT) {
+                        value = channel.isOutputEnabled() ? PAGE_ID_DCP405_YT_MAX_ON : PAGE_ID_DCP405_YT_MAX_OFF;
+                    } else {
+                        value = PAGE_ID_SLOT_ALL_MAX_ERROR;
+                    }
+                } else if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCM220) {
+                    value = PAGE_ID_DCM220_ALL_MAX;
+                } else {
+                    value = PAGE_ID_SLOT_ALL_MAX_ERROR;
+                }
+            } else {
+                value = PAGE_ID_SLOT_ALL_MAX_ERROR;
+            }
+        } else {
+            value = PAGE_ID_SLOT_ALL_MAX_NOT_INSTALLED;
+        }
+    }
+}
+
+int getMinView(int channelIndex) {
+    Channel &channel = Channel::get(channelIndex);
+    if (channel.isInstalled()) {
+        if (channel.isOk()) {
+            if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 || g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP505) {
+                return channel.isOutputEnabled() ? PAGE_ID_DCP405_ALL_MIN_ON : PAGE_ID_DCP405_ALL_MIN_OFF;
+            } else if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCM220) {
+                return PAGE_ID_DCM220_ALL_MIN;
+            } else {
+                return PAGE_ID_SLOT_ALL_MIN_ERROR;
+            }
+        } else {
+            return PAGE_ID_SLOT_ALL_MIN_ERROR;
+        }
+    } else {
+        return PAGE_ID_SLOT_ALL_MIN_NOT_INSTALLED;
+    }
+}
+
+void data_slot_min1_channel_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+        Channel &channel = Channel::getBySlotIndex(persist_conf::devConf.flags.slotMin1 - 1);
+        cursor.i = channel.channelIndex;
+    }
+}
+
+void data_slot_min1_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getMinView(cursor.i);
+    }
+}
+
+void data_slot_min2_channel_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+        Channel &channel = Channel::getBySlotIndex(persist_conf::devConf.flags.slotMin2 - 1);
+        cursor.i = channel.channelIndex;
+    }
+}
+
+void data_slot_min2_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getMinView(cursor.i);
+    }
+}
+
+int getMicroView(int channelIndex) {
+    Channel &channel = Channel::get(channelIndex);
+    if (channel.isInstalled()) {
+        if (channel.isOk()) {
+            if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 || g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP505) {
+                return channel.isOutputEnabled() ? PAGE_ID_DCP405_ALL_MICRO_ON : PAGE_ID_DCP405_ALL_MICRO_OFF;
+            } else if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCM220) {
+                return PAGE_ID_DCM220_ALL_MICRO;
+            } else {
+                return PAGE_ID_SLOT_ALL_MICRO_ERROR;
+            }
+        } else {
+            return PAGE_ID_SLOT_ALL_MICRO_ERROR;
+        }
+    } else {
+        return PAGE_ID_SLOT_ALL_MICRO_NOT_INSTALLED;
+    }
+}
+
+void data_slot_micro1_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getMicroView(cursor.i);
+    }
+}
+
+void data_slot_micro2_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getMicroView(cursor.i);
+    }
+}
+
+void data_slot_micro3_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getMicroView(cursor.i);
+    }
+}
+
+void data_dcm220_ch1_context(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+        // cursor.i = cursor.i;
+    }
+}
+
+void data_dcm220_ch2_context(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+        cursor.i = cursor.i + 1;
+    }
+}
+
+void data_dcm220_default_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor.i);
+        int isVert = persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+        value = channel.isOutputEnabled() ? 
+            (isVert ? PAGE_ID_DCM220_VERT_DEFAULT_ON : PAGE_ID_DCM220_HORZ_DEFAULT_ON) : 
+            (isVert ? PAGE_ID_DCM220_VERT_DEFAULT_OFF : PAGE_ID_DCM220_HORZ_DEFAULT_OFF);
+    }
+}
+
+void data_dcm220_max_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor.i);
+        value = channel.isOutputEnabled() ? PAGE_ID_DCM220_ALL_MAX_ON : PAGE_ID_DCM220_ALL_MAX_OFF;
+    }
+}
+
+void data_dcm220_min_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor.i);
+        value = channel.isOutputEnabled() ? PAGE_ID_DCM220_ALL_MIN_ON : PAGE_ID_DCM220_ALL_MIN_OFF;
+    }
+}
+
+void data_dcm220_micro_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor.i);
+        value = channel.isOutputEnabled() ? PAGE_ID_DCM220_ALL_MICRO_ON : PAGE_ID_DCM220_ALL_MICRO_OFF;
     }
 }
 
 void data_channel_display_value1(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
         data_channel_u_mon(operation, cursor, value);
@@ -1099,7 +1325,7 @@ void data_channel_display_value1(data::DataOperationEnum operation, data::Cursor
 }
 
 void data_channel_display_value2(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
         data_channel_u_mon(operation, cursor, value);
@@ -1111,7 +1337,7 @@ void data_channel_display_value2(data::DataOperationEnum operation, data::Cursor
 }
 
 void data_ovp(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         if (!channel.prot_conf.flags.u_state) {
@@ -1125,7 +1351,7 @@ void data_ovp(data::DataOperationEnum operation, data::Cursor &cursor, data::Val
 }
 
 void data_ocp(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         if (!channel.prot_conf.flags.i_state) {
@@ -1139,7 +1365,7 @@ void data_ocp(data::DataOperationEnum operation, data::Cursor &cursor, data::Val
 }
 
 void data_opp(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         if (!channel.prot_conf.flags.p_state) {
@@ -1153,7 +1379,7 @@ void data_opp(data::DataOperationEnum operation, data::Cursor &cursor, data::Val
 }
 
 void data_otp_ch(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         temperature::TempSensorTemperature &tempSensor =
@@ -1341,42 +1567,42 @@ void data_keypad_unit_enabled(data::DataOperationEnum operation, data::Cursor &c
 
 void data_channel_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         value = data::Value(iChannel + 1, VALUE_TYPE_CHANNEL_LABEL);
     }
 }
 
 void data_channel_short_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         value = data::Value(iChannel + 1, VALUE_TYPE_CHANNEL_SHORT_LABEL);
     }
 }
 
 void data_channel_title(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         value = data::Value(iChannel, VALUE_TYPE_CHANNEL_TITLE);
     }
 }
 
 void data_channel_short_title(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE);
     }
 }
 
 void data_channel_long_title(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         value = data::Value(iChannel, VALUE_TYPE_CHANNEL_LONG_TITLE);
     }
 }
 
 void data_channel_temp_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         temperature::TempSensorTemperature &tempSensor =
             temperature::sensors[temp_sensor::CH1 + Channel::get(iChannel).slotIndex];
         if (tempSensor.isInstalled()) {
@@ -1395,7 +1621,7 @@ void data_channel_temp(data::DataOperationEnum operation, data::Cursor &cursor, 
     if (operation == data::DATA_OPERATION_GET) {
         float temperature = 0;
 
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         temperature::TempSensorTemperature &tempSensor =
             temperature::sensors[temp_sensor::CH1 + Channel::get(iChannel).slotIndex];
         if (tempSensor.isInstalled() && tempSensor.isTestOK()) {
@@ -1407,7 +1633,7 @@ void data_channel_temp(data::DataOperationEnum operation, data::Cursor &cursor, 
 }
 
 void data_channel_on_time_total(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value =
@@ -1416,7 +1642,7 @@ void data_channel_on_time_total(data::DataOperationEnum operation, data::Cursor 
 }
 
 void data_channel_on_time_last(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value =
@@ -1426,7 +1652,7 @@ void data_channel_on_time_last(data::DataOperationEnum operation, data::Cursor &
 
 void data_channel_calibration_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = channel.isCalibrationExists();
     }
@@ -1434,7 +1660,7 @@ void data_channel_calibration_status(data::DataOperationEnum operation, data::Cu
 
 void data_channel_calibration_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = channel.isCalibrationEnabled();
     }
@@ -1442,7 +1668,7 @@ void data_channel_calibration_state(data::DataOperationEnum operation, data::Cur
 
 void data_channel_calibration_date(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = data::Value(channel.cal_conf.calibration_date);
     }
@@ -1450,7 +1676,7 @@ void data_channel_calibration_date(data::DataOperationEnum operation, data::Curs
 
 void data_channel_calibration_remark(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = data::Value(channel.cal_conf.calibration_remark);
     }
@@ -1556,7 +1782,7 @@ void data_channel_calibration_step_next_enabled(data::DataOperationEnum operatio
 
 void data_cal_ch_u_min(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.u.min.val, UNIT_VOLT);
     }
@@ -1564,7 +1790,7 @@ void data_cal_ch_u_min(data::DataOperationEnum operation, data::Cursor &cursor, 
 
 void data_cal_ch_u_mid(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.u.mid.val, UNIT_VOLT);
     }
@@ -1572,7 +1798,7 @@ void data_cal_ch_u_mid(data::DataOperationEnum operation, data::Cursor &cursor, 
 
 void data_cal_ch_u_max(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.u.max.val, UNIT_VOLT);
     }
@@ -1580,7 +1806,7 @@ void data_cal_ch_u_max(data::DataOperationEnum operation, data::Cursor &cursor, 
 
 void data_cal_ch_i0_min(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.i[0].min.val, UNIT_AMPER);
     }
@@ -1588,7 +1814,7 @@ void data_cal_ch_i0_min(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_cal_ch_i0_mid(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.i[0].mid.val, UNIT_AMPER);
     }
@@ -1596,7 +1822,7 @@ void data_cal_ch_i0_mid(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_cal_ch_i0_max(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.i[0].max.val, UNIT_AMPER);
     }
@@ -1604,7 +1830,7 @@ void data_cal_ch_i0_max(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_cal_ch_i1_min(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.hasSupportForCurrentDualRange()) {
             value = MakeValue(channel.cal_conf.i[1].min.val, UNIT_AMPER);
@@ -1616,7 +1842,7 @@ void data_cal_ch_i1_min(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_cal_ch_i1_mid(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.hasSupportForCurrentDualRange()) {
             value = MakeValue(channel.cal_conf.i[1].mid.val, UNIT_AMPER);
@@ -1628,7 +1854,7 @@ void data_cal_ch_i1_mid(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_cal_ch_i1_max(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.hasSupportForCurrentDualRange()) {
             value = MakeValue(channel.cal_conf.i[1].max.val, UNIT_AMPER);
@@ -1640,7 +1866,7 @@ void data_cal_ch_i1_max(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_channel_protection_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
 
         bool ovp = channel_dispatcher::isOvpTripped(channel);
@@ -1692,7 +1918,7 @@ void data_channel_protection_ovp_delay(data::DataOperationEnum operation, data::
 }
 
 void data_channel_protection_ovp_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
@@ -1734,7 +1960,7 @@ void data_channel_protection_ocp_delay(data::DataOperationEnum operation, data::
 }
 
 void data_channel_protection_ocp_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OCP);
@@ -1773,7 +1999,7 @@ void data_channel_protection_opp_state(data::DataOperationEnum operation, data::
 }
 
 void data_channel_protection_opp_level(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
@@ -1797,7 +2023,7 @@ void data_channel_protection_opp_level(data::DataOperationEnum operation, data::
 }
 
 void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page =
@@ -1822,7 +2048,7 @@ void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::
 }
 
 void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
@@ -1862,7 +2088,7 @@ void data_channel_protection_otp_state(data::DataOperationEnum operation, data::
 }
 
 void data_channel_protection_otp_level(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OTP);
@@ -1886,7 +2112,7 @@ void data_channel_protection_otp_level(data::DataOperationEnum operation, data::
 }
     
 void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OTP);
@@ -2004,7 +2230,7 @@ void data_event_queue_page_info(data::DataOperationEnum operation, data::Cursor 
 
 void data_channel_rsense_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
 		Channel &channel = Channel::get(iChannel);
         value = channel.isRemoteSensingEnabled();
     }	
@@ -2018,7 +2244,7 @@ void data_channel_rprog_installed(data::DataOperationEnum operation, data::Curso
 
 void data_channel_rprog_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
 		Channel &channel = Channel::get(iChannel);
 		value = (int)channel.flags.rprogEnabled;
     }
@@ -3102,7 +3328,7 @@ void data_trigger_is_manual(data::DataOperationEnum operation, data::Cursor &cur
 
 void data_channel_has_support_for_current_dual_range(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = channel.hasSupportForCurrentDualRange();
     }
@@ -3129,7 +3355,7 @@ void data_channel_ranges_auto_ranging(data::DataOperationEnum operation, data::C
 
 void data_channel_ranges_currently_selected(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeEnumDefinitionValue(channel.flags.currentCurrentRange, ENUM_DEFINITION_CHANNEL_CURRENT_RANGE);
     }
@@ -3191,7 +3417,7 @@ void data_serial_parity(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_channel_list_countdown(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         int32_t remaining;
         uint32_t total;
@@ -3327,7 +3553,7 @@ void data_dlog_status(data::DataOperationEnum operation, data::Cursor &cursor, d
 
 void data_simulator_load_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 	if (operation == data::DATA_OPERATION_GET) {
-		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
 		Channel &channel = Channel::get(iChannel);
 		value = channel.simulator.getLoadEnabled() ? 1 : 0;
 	}
@@ -3335,7 +3561,7 @@ void data_simulator_load_state(data::DataOperationEnum operation, data::Cursor &
 
 void data_simulator_load(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 	if (operation == data::DATA_OPERATION_GET) {
-		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? (g_channel->index - 1) : 0);
+		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
 		Channel &channel = Channel::get(iChannel);
 		value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
 	}

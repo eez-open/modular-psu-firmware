@@ -180,13 +180,9 @@ void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
 
     const Widget *widget = widgetCursor.widget;
 
-    widgetCursor.currentState->data =
-        widget->data ? data::get(widgetCursor.cursor, widget->data) : Value();
-
     bool refresh =
         !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data;
+        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
 
     if (refresh) {
         const Style* style = getWidgetStyle(widget);
@@ -348,7 +344,8 @@ WidgetCursor findWidget(int16_t x, int16_t y) {
     if (g_appContext->isActivePageInternal()) {
         WidgetCursor widgetCursor = ((InternalPage *)g_appContext->getActivePage())->findWidget(x, y);
 
-        if (!widgetCursor && g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
+        if (!widgetCursor) {
+            // clicked outside internal page, close internal page
             popPage();
         } else {
             return widgetCursor;

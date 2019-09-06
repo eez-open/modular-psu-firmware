@@ -260,7 +260,7 @@ class Channel {
     /// \param channel_index Zero based channel index, greater then or equal to 0 and less then
     /// CH_MAX. \returns Reference to channel.
     static Channel &get(int channelIndex);
-    static Channel *getBySlotIndex(int slotIndex);
+    static Channel &getBySlotIndex(int slotIndex);
 
     /// Save and disable OE for all the channels.
     static void saveAndDisableOE();
@@ -268,13 +268,16 @@ class Channel {
     /// Restore previously saved OE state for all the channels.
     static void restoreOE();
 
-    /// Channel index. Starts from 1.
-    uint8_t index;
-
     // Slot index. Starts from 0.
     uint8_t slotIndex;
 
     uint8_t boardRevision;
+
+    /// Channel index. Starts from 0.
+    uint8_t channelIndex;
+
+    /// In case when module has multiple channels. Starts from 0
+    uint8_t subchannelIndex;
 
     float U_MIN;
     float U_DEF;
@@ -354,17 +357,7 @@ class Channel {
 
     Channel();
 
-    void set(uint8_t slotIndex, uint8_t boardRevision, float U_MIN, float U_DEF, float U_MAX,
-            float U_MAX_CONF, float U_MIN_STEP, float U_DEF_STEP, float U_MAX_STEP,
-            float U_CAL_VAL_MIN, float U_CAL_VAL_MID, float U_CAL_VAL_MAX, float U_CURR_CAL,
-            bool OVP_DEFAULT_STATE, float OVP_MIN_DELAY, float OVP_DEFAULT_DELAY,
-            float OVP_MAX_DELAY, float I_MIN, float I_DEF, float I_MAX, float I_MAX_CONF,
-            float I_MIN_STEP, float I_DEF_STEP, float I_MAX_STEP, float I_CAL_VAL_MIN,
-            float I_CAL_VAL_MID, float I_CAL_VAL_MAX, float I_VOLT_CAL, bool OCP_DEFAULT_STATE,
-            float OCP_MIN_DELAY, float OCP_DEFAULT_DELAY, float OCP_MAX_DELAY,
-            bool OPP_DEFAULT_STATE, float OPP_MIN_DELAY, float OPP_DEFAULT_DELAY,
-            float OPP_MAX_DELAY, float OPP_MIN_LEVEL, float OPP_DEFAULT_LEVEL, float OPP_MAX_LEVEL,
-            float SOA_VIN, float SOA_PREG_CURR, float SOA_POSTREG_PTOT, float PTOT);
+    void set(uint8_t slotIndex, uint8_t subchannelIndex, uint8_t boardRevision);
 
     /// Initialize channel and underlying hardware.
     /// Makes a required tests, for example ADC, DAC and IO Expander tests.

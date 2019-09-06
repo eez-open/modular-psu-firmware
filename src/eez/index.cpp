@@ -63,6 +63,29 @@ OnSystemStateChangedCallback g_onSystemStateChangedCallbacks[] = {
 int g_numOnSystemStateChangedCallbacks =
     sizeof(g_onSystemStateChangedCallbacks) / sizeof(OnSystemStateChangedCallback);
 
+ModuleInfo g_modules[] = {
+    { 
+        0,
+        CH_BOARD_REVISION_NONE, 
+        1
+    },
+    {
+        406,
+        CH_BOARD_REVISION_DCP405_R2B5,
+        1 
+    },
+    {
+        220,
+        CH_BOARD_REVISION_DCM220_R1B1, 
+        2 
+    },
+    {
+        505,
+        CH_BOARD_REVISION_DCP505_R1B3, 
+        1 
+    },
+};
+
 SlotInfo g_slots[NUM_SLOTS] = {
     {
     	MODULE_TYPE_NONE

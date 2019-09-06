@@ -16,10 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/apps/psu/psu.h>
-
 #include <math.h>
 #include <stdio.h>
+
+#include <eez/apps/psu/psu.h>
 
 #include <eez/apps/psu/fan.h>
 #include <eez/apps/psu/scpi/psu.h>
@@ -27,6 +27,10 @@
 #include <eez/apps/psu/temperature.h>
 #include <eez/apps/psu/watchdog.h>
 #include <eez/system.h>
+
+#if defined(EEZ_PLATFORM_STM32)
+#include <eez/platform/stm32/spi.h>
+#endif
 
 extern "C" {
 #include "py/compile.h"
@@ -145,8 +149,7 @@ scpi_result_t scpi_cmd_debugOntimeQ(scpi_t *context) {
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
 
-        sprintf(p, "CH%d active: %d\n", channel.index,
-                int(channel.onTimeCounter.isActive() ? 1 : 0));
+        sprintf(p, "CH%d active: %d\n", channel.channelIndex + 1, int(channel.onTimeCounter.isActive() ? 1 : 0));
         p += strlen(p);
     }
 
@@ -229,7 +232,7 @@ scpi_result_t scpi_cmd_debugMeasureVoltage(scpi_t *context) {
         int16_t adc_data = channel->adc.read();
         channel->eventAdcData(adc_data, false);
 
-        Serial.print((int)debug::g_uMon[channel->index - 1].get());
+        Serial.print((int)debug::g_uMon[channel->channelIndex].get());
         Serial.print(" ");
         Serial.print(channel->u.mon_last, 5);
         Serial.println("V");
@@ -273,7 +276,7 @@ scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
         int16_t adc_data = channel->adc.read();
         channel->eventAdcData(adc_data, false);
 
-        Serial.print((int)debug::g_iMon[channel->index - 1].get());
+        Serial.print((int)debug::g_iMon[channel->channelIndex].get());
         Serial.print(" ");
         Serial.print(channel->i.mon_last, 5);
         Serial.println("A");
@@ -372,8 +375,7 @@ scpi_result_t scpi_cmd_debugCsvQ(scpi_t *context) {
 scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    uint8_t ch = psu_context->selected_channel_index;
-    Channel *channel = &Channel::get(ch - 1);
+    Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
     int32_t bit;
     if (!SCPI_ParamInt(context, &bit, TRUE)) {
@@ -410,8 +412,7 @@ scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
 scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    uint8_t ch = psu_context->selected_channel_index;
-    Channel *channel = &Channel::get(ch - 1);
+    Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
     int32_t bit;
     if (!SCPI_ParamInt(context, &bit, TRUE)) {
@@ -453,6 +454,315 @@ scpi_result_t scpi_cmd_debugPythonQ(scpi_t *context) {
     SCPI_ResultText(context, "1");
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif // DEBUG
+}
+
+#if defined(EEZ_PLATFORM_STM32)
+#define BUFFER_SIZE 10
+
+static uint8_t g_output[BUFFER_SIZE];
+static uint8_t g_input[BUFFER_SIZE];
+
+static bool g_synchronized;
+
+#define SPI_SLAVE_SYNBYTE         0x53
+#define SPI_MASTER_SYNBYTE        0xAC
+
+void specDelayUs(uint32_t microseconds) {
+	while (microseconds--) {
+		// 216 NOP's
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+	}
+}
+
+void masterSynchro(void) {
+	uint8_t txackbytes = SPI_MASTER_SYNBYTE, rxackbytes = 0x00;
+	do {
+	    spi::select(2, spi::CHIP_DCM220);
+	    spi::transfer(2, &txackbytes, &rxackbytes, 1);
+	    spi::deselect(2);
+	} while(rxackbytes != SPI_SLAVE_SYNBYTE);
+
+	while (HAL_GPIO_ReadPin(SPI5_IRQ_GPIO_Port, SPI5_IRQ_Pin) != GPIO_PIN_SET);
+}
+#endif
+
+scpi_result_t scpi_cmd_debugDcm220Q(scpi_t *context) {
+#if defined(EEZ_PLATFORM_STM32)
+    int32_t cmd;
+    if (!SCPI_ParamInt(context, &cmd, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t param;
+    int mandatoryParam = cmd == 14 || cmd == 15 || cmd == 24 || cmd == 25;
+    if (!SCPI_ParamInt(context, &param, mandatoryParam)) {
+        if (mandatoryParam || SCPI_ParamErrorOccurred(context)) {
+            return SCPI_RES_ERR;
+        }
+    }
+
+//    int32_t delay;
+//    if (!SCPI_ParamInt(context, &delay, TRUE)) {
+//        return SCPI_RES_ERR;
+//    }
+
+    g_output[0] = (uint8_t)(cmd | 0x80);
+	g_output[1] = (uint8_t)(param & 0xFF);
+	g_output[2] = (uint8_t)((param >> 8) & 0xFF);
+
+	for (int i = 3; i < BUFFER_SIZE; i++) {
+		g_output[i] = 0xFF;
+	}
+
+    if (!g_synchronized) {
+        masterSynchro();
+    	g_synchronized = true;
+    }
+
+    if (cmd == 31) {
+    	HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_RESET);
+    }
+
+    spi::select(2, spi::CHIP_DCM220);
+    //specDelayUs(delay);
+    spi::transfer(2, g_output, g_input, BUFFER_SIZE);
+    spi::deselect(2);
+
+    if (cmd == 31) {
+        HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
+    }
+
+	char text[100];
+
+	sprintf(text, "0x%02X, 0x%02X, U_MON_1=%d, I_MON_1=%d, U_MON_2=%d, I_MON_2=%d",
+			(int)g_input[0], (int)g_input[1],
+			(int)(uint16_t)(g_input[2] | (g_input[3] << 8)),
+			(int)(uint16_t)(g_input[4] | (g_input[5] << 8)),
+			(int)(uint16_t)(g_input[6] | (g_input[7] << 8)),
+			(int)(uint16_t)(g_input[8] | (g_input[9] << 8)));
+
+	SCPI_ResultText(context, text);
+
+	return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
     return SCPI_RES_ERR;

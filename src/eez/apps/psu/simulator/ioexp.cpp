@@ -39,27 +39,27 @@ bool IOExpander::test() {
 }
 
 void IOExpander::tick(uint32_t tick_usec) {
-    if (simulator::getPwrgood(channel.index - 1)) {
+    if (simulator::getPwrgood(channel.channelIndex)) {
         gpio |= 1 << IOExpander::IO_BIT_IN_PWRGOOD;
     } else {
         gpio &= ~(1 << IOExpander::IO_BIT_IN_PWRGOOD);
     }
 
     if (channel.getFeatures() & CH_FEATURE_RPOL) {
-        if (!simulator::getRPol(channel.index - 1)) {
+        if (!simulator::getRPol(channel.channelIndex)) {
             gpio |= 1 << IOExpander::IO_BIT_IN_RPOL;
         } else {
             gpio &= ~(1 << IOExpander::IO_BIT_IN_RPOL);
         }
     }
 
-    if (simulator::getCV(channel.index - 1)) {
+    if (simulator::getCV(channel.channelIndex)) {
         gpio |= 1 << IOExpander::IO_BIT_IN_CV_ACTIVE;
     } else {
         gpio &= ~(1 << IOExpander::IO_BIT_IN_CV_ACTIVE);
     }
 
-    if (simulator::getCC(channel.index - 1)) {
+    if (simulator::getCC(channel.channelIndex)) {
         gpio |= 1 << IOExpander::IO_BIT_IN_CC_ACTIVE;
     } else {
         gpio &= ~(1 << IOExpander::IO_BIT_IN_CC_ACTIVE);

@@ -50,13 +50,13 @@ bool DigitalAnalogConverter::test() {
 	g_testResult = TEST_OK;
 
 	// if (channel.ioexp.g_testResult != TEST_OK) {
-    //     DebugTrace("Ch%d DAC test skipped because of IO expander", channel.index);
+    //     DebugTrace("Ch%d DAC test skipped because of IO expander", channel.channelIndex + 1);
     //     g_testResult = TEST_SKIPPED;
     //     return true;
     // }
 
     // if (channel.adc.g_testResult != TEST_OK) {
-    //     DebugTrace("Ch%d DAC test skipped because of ADC", channel.index);
+    //     DebugTrace("Ch%d DAC test skipped because of ADC", channel.channelIndex + 1);
     //     g_testResult = TEST_SKIPPED;
     //     return true;
     // }
@@ -91,7 +91,7 @@ bool DigitalAnalogConverter::test() {
     //     g_testResult = TEST_FAILED;
 
     //     DebugTrace("Ch%d DAC test, U_set failure: expected=%d, got=%d, abs diff=%d",
-    //         channel.index,
+    //         channel.channelIndex + 1,
     //         (int)(u_set * 100),
     //         (int)(u_mon * 100),
     //         (int)(u_diff * 100));
@@ -103,7 +103,7 @@ bool DigitalAnalogConverter::test() {
     //     g_testResult = TEST_FAILED;
 
     //     DebugTrace("Ch%d DAC test, I_set failure: expected=%d, got=%d, abs diff=%d",
-    //         channel.index,
+    //         channel.channelIndex + 1,
     //         (int)(i_set * 100),
     //         (int)(i_mon * 100),
     //         (int)(i_diff * 100));
@@ -121,7 +121,7 @@ bool DigitalAnalogConverter::test() {
     // channel.setCurrent(i_set_save);
 
 	// if (g_testResult == TEST_FAILED) {
-	// 	generateError(SCPI_ERROR_CH1_DAC_TEST_FAILED + channel.index - 1);
+	// 	generateError(SCPI_ERROR_CH1_DAC_TEST_FAILED + channel.channelIndex);
 	// } else {
 	// 	g_testResult == TEST_OK;
 	// }
@@ -164,9 +164,9 @@ void DigitalAnalogConverter::set_current(uint16_t current) {
 void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value) {
 #ifdef DEBUG
     if (buffer == DATA_BUFFER_B) {
-        debug::g_uDac[channel.index - 1].set(value);
+        debug::g_uDac[channel.channelIndex].set(value);
     } else {
-        debug::g_iDac[channel.index - 1].set(value);
+        debug::g_iDac[channel.channelIndex].set(value);
     }
 #endif
 

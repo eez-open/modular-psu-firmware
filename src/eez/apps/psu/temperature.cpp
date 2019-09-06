@@ -246,11 +246,11 @@ void TempSensorTemperature::protection_check(uint32_t tick_usec) {
 void TempSensorTemperature::protection_enter(TempSensorTemperature &sensor) {
     Channel *channel = temp_sensor::sensors[sensor.sensorIndex].getChannel();
     if ((channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) && 
-        channel && (channel->index == 1 || channel->index == 2)) {
+        channel && (channel->channelIndex == 0 || channel->channelIndex == 1)) {
         for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
             TempSensorTemperature &sensor = sensors[i];
             Channel *channel = temp_sensor::sensors[sensor.sensorIndex].getChannel();
-            if (channel && (channel->index == 1 || channel->index == 2)) {
+            if (channel && (channel->channelIndex == 0 || channel->channelIndex == 1)) {
                 sensor.protection_enter();
             }
         }

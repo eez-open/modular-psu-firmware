@@ -53,9 +53,9 @@ scpi_choice_def_t traceValueChoice[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void select_channel(scpi_t *context, uint8_t ch) {
+static void select_channel(scpi_t *context, uint8_t channelIndex) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    psu_context->selected_channel_index = ch;
+    psu_context->selected_channel_index = channelIndex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ scpi_result_t scpi_cmd_instrumentSelect(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    select_channel(context, channel->index);
+    select_channel(context, channel->channelIndex);
 
     return SCPI_RES_OK;
 }
@@ -82,7 +82,7 @@ scpi_result_t scpi_cmd_instrumentSelectQ(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     char buffer[256] = { 0 };
-    sprintf(buffer, "CH%d", (int)psu_context->selected_channel_index);
+    sprintf(buffer, "CH%d", (int)(psu_context->selected_channel_index + 1));
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -95,16 +95,18 @@ scpi_result_t scpi_cmd_instrumentNselect(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    int32_t ch;
-    if (!SCPI_ParamInt(context, &ch, TRUE)) {
+    int32_t channelIndex;
+    if (!SCPI_ParamInt(context, &channelIndex, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    
+    channelIndex--;
+
+    if (!check_channel(context, channelIndex)) {
         return SCPI_RES_ERR;
     }
 
-    if (!check_channel(context, ch)) {
-        return SCPI_RES_ERR;
-    }
-
-    select_channel(context, ch);
+    select_channel(context, channelIndex);
 
     return SCPI_RES_OK;
 }
@@ -113,7 +115,7 @@ scpi_result_t scpi_cmd_instrumentNselectQ(scpi_t *context) {
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    SCPI_ResultInt(context, psu_context->selected_channel_index);
+    SCPI_ResultInt(context, psu_context->selected_channel_index + 1);
 
     return SCPI_RES_OK;
 }
@@ -180,7 +182,7 @@ scpi_result_t scpi_cmd_instrumentCoupleTrackingQ(scpi_t *context) {
 scpi_result_t scpi_cmd_instrumentDisplayTrace(scpi_t *context) {
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index - 1);
+    Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
     int32_t traceNumber;
     SCPI_CommandNumbers(context, &traceNumber, 1, 1);
@@ -218,7 +220,7 @@ scpi_result_t scpi_cmd_instrumentDisplayTrace(scpi_t *context) {
 scpi_result_t scpi_cmd_instrumentDisplayTraceQ(scpi_t *context) {
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index - 1);
+    Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
     int32_t traceNumber;
     SCPI_CommandNumbers(context, &traceNumber, 1, 1);
@@ -252,7 +254,7 @@ scpi_result_t scpi_cmd_instrumentDisplayTraceQ(scpi_t *context) {
 scpi_result_t scpi_cmd_instrumentDisplayTraceSwap(scpi_t *context) {
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index - 1);
+    Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
     channel_dispatcher::setDisplayViewSettings(*channel, channel->flags.displayValue2,
                                                channel->flags.displayValue1, channel->ytViewRate);
@@ -264,7 +266,7 @@ scpi_result_t scpi_cmd_instrumentDisplayTraceSwap(scpi_t *context) {
 scpi_result_t scpi_cmd_instrumentDisplayYtRate(scpi_t *context) {
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index - 1);
+    Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
     float ytViewRate;
     if (!get_duration_param(context, ytViewRate, GUI_YT_VIEW_RATE_MIN, GUI_YT_VIEW_RATE_MAX,
@@ -282,7 +284,7 @@ scpi_result_t scpi_cmd_instrumentDisplayYtRate(scpi_t *context) {
 scpi_result_t scpi_cmd_instrumentDisplayYtRateQ(scpi_t *context) {
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index - 1);
+    Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
     SCPI_ResultFloat(context, channel->ytViewRate);
 
@@ -339,8 +341,14 @@ scpi_result_t scpi_cmd_instrumentMemory(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentMemoryQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-    int32_t address;
+    int32_t ch;
+
+    if (!SCPI_ParamChoice(context, channel_choice, &ch, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+	int32_t address;
     if (!SCPI_ParamInt32(context, &address, true)) {
         return SCPI_RES_ERR;
     }
@@ -358,8 +366,7 @@ scpi_result_t scpi_cmd_instrumentMemoryQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    uint8_t slotIndex = Channel::get(psu_context->selected_channel_index - 1).slotIndex;
+    uint8_t slotIndex = Channel::get(ch - 1).slotIndex;
 
     if (size == 1) {
         uint8_t value;

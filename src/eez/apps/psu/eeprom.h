@@ -28,10 +28,18 @@
 |64     |  24|[Total ON-time counter](#ontime-counter)  |
 |128    |  24|[CH1 ON-time counter](#ontime-counter)    |
 |192    |  24|[CH2 ON-time counter](#ontime-counter)    |
+|256    |  24|[CH3 ON-time counter](#ontime-counter)    |
+|320    |  24|[CH4 ON-time counter](#ontime-counter)    |
+|384    |  24|[CH5 ON-time counter](#ontime-counter)    |
+|448    |  24|[CH6 ON-time counter](#ontime-counter)    |
 |1024   |  64|[Device configuration](#device)           |
 |1536   | 128|[Device configuration 2](#device2)           |
 |2048   | 144|CH1 [calibration parameters](#calibration)|
 |2560   | 144|CH2 [calibration parameters](#calibration)|
+|3072   | 144|CH3 [calibration parameters](#calibration)|
+|3584   | 144|CH4 [calibration parameters](#calibration)|
+|4096   | 144|CH5 [calibration parameters](#calibration)|
+|4608   | 144|CH6 [calibration parameters](#calibration)|
 |5120   | 232|[Profile](#profile) 0                     |
 |6144   | 232|[Profile](#profile) 1                     |
 |7168   | 232|[Profile](#profile) 2                     |

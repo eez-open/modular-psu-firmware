@@ -38,6 +38,12 @@ static const uint16_t SPI_CSB_Pin[] = { SPI2_CSB_Pin, SPI4_CSB_Pin, SPI5_CSB_Pin
 void select(uint8_t slotIndex, int chip) {
 	taskENTER_CRITICAL();
 
+	//if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCM220) {
+	if (slotIndex == 2) {
+		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_RESET);
+		return;
+	}
+
 	__HAL_SPI_DISABLE(spiHandle[slotIndex]);
 
     // if (chip == CHIP_IOEXP ) {
@@ -107,7 +113,10 @@ void select(uint8_t slotIndex, int chip) {
 }
 
 void deselect(uint8_t slotIndex) {
-	if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+	//if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCM220) {
+	if (slotIndex == 2) {
+		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_SET);
+	} else if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
 		// 01 ADC
 		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_SET);
 		HAL_GPIO_WritePin(SPI_CSB_GPIO_Port[slotIndex], SPI_CSB_Pin[slotIndex], GPIO_PIN_RESET);

@@ -82,7 +82,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltage(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog::g_logVoltage[channel->index - 1] = enable;
+    dlog::g_logVoltage[channel->channelIndex] = enable;
 
     return SCPI_RES_OK;
 #else
@@ -99,7 +99,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltageQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog::g_logVoltage[channel->index - 1]);
+    SCPI_ResultBool(context, dlog::g_logVoltage[channel->channelIndex]);
 
     return SCPI_RES_OK;
 #else
@@ -126,7 +126,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrent(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog::g_logCurrent[channel->index - 1] = enable;
+    dlog::g_logCurrent[channel->channelIndex] = enable;
 
     return SCPI_RES_OK;
 #else
@@ -143,7 +143,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrentQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog::g_logCurrent[channel->index - 1]);
+    SCPI_ResultBool(context, dlog::g_logCurrent[channel->channelIndex]);
 
     return SCPI_RES_OK;
 #else
@@ -170,7 +170,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionPower(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog::g_logPower[channel->index - 1] = enable;
+    dlog::g_logPower[channel->channelIndex] = enable;
 
     return SCPI_RES_OK;
 #else
@@ -187,7 +187,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionPowerQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog::g_logPower[channel->index - 1]);
+    SCPI_ResultBool(context, dlog::g_logPower[channel->channelIndex]);
 
     return SCPI_RES_OK;
 #else

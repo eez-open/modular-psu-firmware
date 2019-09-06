@@ -53,7 +53,7 @@ void init(scpi_t &scpi_context, scpi_psu_t &scpi_psu_context, scpi_interface_t *
               persist_conf::devConf.serialNumber, FIRMWARE, input_buffer, input_buffer_length,
               error_queue_data, error_queue_size);
 
-    scpi_psu_context.selected_channel_index = 1;
+    scpi_psu_context.selected_channel_index = 0;
 #if OPTION_SD_CARD
     scpi_psu_context.currentDirectory[0] = 0;
 #endif

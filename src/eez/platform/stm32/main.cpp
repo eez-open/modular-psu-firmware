@@ -37,14 +37,13 @@
 #include <tim.h>
 #include <usb_device.h>
 
-#include <dwt_stm32_delay.h>
-
 #include "FreeRTOS.h"
 
 #include <eez/system.h>
 
 #include <eez/platform/stm32/bsp_sdram.h>
 #include <eez/platform/stm32/defines.h>
+#include <eez/platform/stm32/dwt_delay.h>
 
 extern "C" void SystemClock_Config(void);
 
@@ -123,6 +122,8 @@ int main(int argc, char **argv) {
 
     SystemClock_Config();
 
+    // DWT_Delay_Init();
+
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_ADC1_Init();
@@ -148,8 +149,6 @@ int main(int argc, char **argv) {
     BSP_SDRAM_Initialization_sequence(REFRESH_COUNT);
     // SDRAM_Test();
 #endif
-
-    DWT_Delay_Init();
 
     eez::boot();
 

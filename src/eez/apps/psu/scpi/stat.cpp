@@ -181,15 +181,16 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEventQ(scpi_t *contex
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t ch;
-    SCPI_CommandNumbers(context, &ch, 1, psu_context->selected_channel_index);
-    if (ch < 1 || ch > MIN(CH_NUM, 2)) {
+    int32_t channelIndex;
+    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
+    channelIndex--;
+    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_OK;
     }
 
     scpi_psu_reg_name_t isumReg =
-        ch == 1 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT2;
+        channelIndex == 0 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT2;
 
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, isumReg));
@@ -204,15 +205,16 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryConditionQ(scpi_t *co
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t ch;
-    SCPI_CommandNumbers(context, &ch, 1, psu_context->selected_channel_index);
-    if (ch < 1 || ch > MIN(CH_NUM, 2)) {
+    int32_t channelIndex;
+    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
+    channelIndex--;
+    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_OK;
     }
 
     scpi_psu_reg_name_t isumReg =
-        ch == 1 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_COND2;
+        channelIndex == 0 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_COND2;
 
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, isumReg));
@@ -224,15 +226,16 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnable(scpi_t *contex
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t ch;
-    SCPI_CommandNumbers(context, &ch, 1, psu_context->selected_channel_index);
-    if (ch < 1 || ch > MIN(CH_NUM, 2)) {
+    int32_t channelIndex;
+    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
+    channelIndex--;
+    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_OK;
     }
 
     scpi_psu_reg_name_t isumeReg =
-        ch == 1 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE2;
+        channelIndex == 0 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE2;
 
     int32_t newVal;
     if (SCPI_ParamInt32(context, &newVal, TRUE)) {
@@ -246,15 +249,16 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnableQ(scpi_t *conte
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t ch;
-    SCPI_CommandNumbers(context, &ch, 1, psu_context->selected_channel_index);
-    if (ch < 1 || ch > MIN(CH_NUM, 2)) {
+    int32_t channelIndex;
+    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
+    channelIndex--;
+    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_OK;
     }
 
     scpi_psu_reg_name_t isumeReg =
-        ch == 1 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE2;
+        channelIndex == 0 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE2;
 
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, isumeReg));
@@ -266,15 +270,16 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEventQ(scpi_t *context) 
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t ch;
-    SCPI_CommandNumbers(context, &ch, 1, psu_context->selected_channel_index);
-    if (ch < 1 || ch > MIN(CH_NUM, 2)) {
+    int32_t channelIndex;
+    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
+    channelIndex--;
+    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_OK;
     }
 
     scpi_psu_reg_name_t isumReg =
-        ch == 1 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT2;
+        channelIndex == 0 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT2;
 
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, isumReg));
@@ -289,15 +294,16 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryConditionQ(scpi_t *conte
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t ch;
-    SCPI_CommandNumbers(context, &ch, 1, psu_context->selected_channel_index);
-    if (ch < 1 || ch > MIN(CH_NUM, 2)) {
+    int32_t channelIndex;
+    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
+    channelIndex--;
+    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_OK;
     }
 
     scpi_psu_reg_name_t isumReg =
-        ch == 1 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_COND2;
+        channelIndex == 0 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_COND2;
 
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, isumReg));
@@ -309,15 +315,16 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnable(scpi_t *context) 
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t ch;
-    SCPI_CommandNumbers(context, &ch, 1, psu_context->selected_channel_index);
-    if (ch < 1 || ch > MIN(CH_NUM, 2)) {
+    int32_t channelIndex;
+    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
+    channelIndex--;
+    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_OK;
     }
 
     scpi_psu_reg_name_t isumeReg =
-        ch == 1 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2;
+        channelIndex == 0 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2;
 
     int32_t newVal;
     if (SCPI_ParamInt32(context, &newVal, TRUE)) {
@@ -331,15 +338,16 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnableQ(scpi_t *context)
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t ch;
-    SCPI_CommandNumbers(context, &ch, 1, psu_context->selected_channel_index);
-    if (ch < 1 || ch > MIN(CH_NUM, 2)) {
+    int32_t channelIndex;
+    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
+    channelIndex--;
+    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_OK;
     }
 
     scpi_psu_reg_name_t isumeReg =
-        ch == 1 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2;
+        channelIndex == 0 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2;
 
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, isumeReg));

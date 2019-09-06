@@ -86,6 +86,9 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
         } else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
             int i = findStartOfUnit(text, 0);
             start = text + i;
+        } else if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
+            int i = findStartOfUnit(text, 0);
+            text[i] = 0;
         }
 
         drawText(start, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,

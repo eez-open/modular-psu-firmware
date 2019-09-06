@@ -68,14 +68,14 @@ void HomeAppContext::stateManagment() {
         }
         return;
     } else if (activePageId == PAGE_ID_WELCOME) {
-        if (int32_t(tickCount - getShowPageTime()) < CONF_GUI_WELCOME_PAGE_TIMEOUT) {
+        if (!psu::g_isBooted || int32_t(tickCount - getShowPageTime()) < CONF_GUI_WELCOME_PAGE_TIMEOUT) {
             return;
         }
     }
 
-    // turn the screen off if power is down
+    // turn the screen off if power is down and system is booted
     if (!psu::isPowerUp()) {
-    	if (getActivePageId() != INTERNAL_PAGE_ID_NONE) {
+    	if (psu::g_isBooted && getActivePageId() != INTERNAL_PAGE_ID_NONE) {
     		showPage(INTERNAL_PAGE_ID_NONE);
     		eez::mcu::display::turnOff();
     	}
@@ -83,8 +83,7 @@ void HomeAppContext::stateManagment() {
     }
 
     // select page to go after transitional page
-    if (activePageId == PAGE_ID_WELCOME || activePageId == PAGE_ID_STANDBY ||
-        activePageId == PAGE_ID_ENTERING_STANDBY) {
+    if (activePageId == PAGE_ID_WELCOME || activePageId == PAGE_ID_STANDBY || activePageId == PAGE_ID_ENTERING_STANDBY) {
         if (!isTouchCalibrated()) {
             // touch screen is not calibrated
             showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);

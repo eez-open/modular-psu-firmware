@@ -1538,6 +1538,16 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarityQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_systemReset(scpi_t *context) {
+#if defined(EEZ_PLATFORM_STM32)
+	NVIC_SystemReset();
+	return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

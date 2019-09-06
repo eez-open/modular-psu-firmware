@@ -89,25 +89,22 @@ bool AnalogDigitalConverter::test() {
     uint8_t reg3 = result[3];
 
 	if (reg1 != getReg1Val()) {
-		DebugTrace("Ch%d ADC test failed reg1: expected=%d, got=%d", channel.index,
-				getReg1Val(), reg1);
+		DebugTrace("Ch%d ADC test failed reg1: expected=%d, got=%d", channel.channelIndex + 1, getReg1Val(), reg1);
 		g_testResult = TEST_FAILED;
 	}
 
 	if (reg2 != ADC_REG2_VAL) {
-		DebugTrace("Ch%d ADC test failed reg2: expected=%d, got=%d", channel.index,
-				ADC_REG2_VAL, reg2);
+		DebugTrace("Ch%d ADC test failed reg2: expected=%d, got=%d", channel.channelIndex + 1, ADC_REG2_VAL, reg2);
 		g_testResult = TEST_FAILED;
 	}
 
 	if (reg3 != ADC_REG3_VAL) {
-	   DebugTrace("Ch%d ADC test failed reg3: expected=%d, got=%d", channel.index,
-	   ADC_REG3_VAL, reg3);
+	   DebugTrace("Ch%d ADC test failed reg3: expected=%d, got=%d", channel.channelIndex + 1, ADC_REG3_VAL, reg3);
 	   g_testResult = TEST_FAILED;
 	}
 
     if (g_testResult == TEST_FAILED) {
-		generateError(SCPI_ERROR_CH1_ADC_TEST_FAILED + channel.index - 1);
+		generateError(SCPI_ERROR_CH1_ADC_TEST_FAILED + channel.channelIndex);
     } else {
     	g_testResult = TEST_OK;
     }

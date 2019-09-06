@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <dwt_stm32_delay.h>
-
 #include <eez/system.h>
+
+#include <eez/platform/stm32/dwt_delay.h>
 
 namespace eez {
 
@@ -31,13 +31,13 @@ void delay(uint32_t millis) {
 }
 
 uint32_t micros() {
-    //return DWT_micros();
-	return millis() * 1000;
+    // return DWT_micros();
+    return millis() * 1000;
 }
 
 void delayMicroseconds(uint32_t microseconds) {
-    //DWT_Delay_us(microseconds);
-	delay((microseconds + 500) / 1000);
+	// DWT_Delay_us(microseconds);
+    delay((microseconds + 500) / 1000);
 }
 
 } // namespace eez

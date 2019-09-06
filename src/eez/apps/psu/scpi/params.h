@@ -27,7 +27,7 @@ extern scpi_choice_def_t internal_external_choice[];
 extern scpi_choice_def_t channel_choice[];
 
 Channel *param_channel(scpi_t *context, scpi_bool_t mandatory = FALSE, scpi_bool_t skip_channel_check = FALSE);
-bool check_channel(scpi_t *context, int32_t ch);
+bool check_channel(scpi_t *context, int32_t channelIndex);
 Channel *set_channel_from_command_number(scpi_t *context);
 
 bool param_temp_sensor(scpi_t *context, int32_t &sensor);

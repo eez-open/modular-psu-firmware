@@ -124,6 +124,7 @@ set(src_eez_apps_psu
     src/eez/apps/psu/debug.cpp
     src/eez/apps/psu/devices.cpp
     src/eez/apps/psu/dlog.cpp
+    src/eez/apps/psu/eeprom.cpp
     src/eez/apps/psu/ethernet.cpp
     src/eez/apps/psu/event_queue.cpp
     src/eez/apps/psu/idle.cpp
@@ -266,7 +267,6 @@ source_group("eez\\apps\\psu\\scpi" FILES ${src_eez_apps_psu_scpi} ${header_eez_
 set(src_eez_apps_psu_simulator
     src/eez/apps/psu/simulator/board.cpp
     src/eez/apps/psu/simulator/dac.cpp
-    src/eez/apps/psu/simulator/eeprom.cpp
     src/eez/apps/psu/simulator/fan.cpp
     src/eez/apps/psu/simulator/ioexp.cpp
     src/eez/apps/psu/simulator/psu.cpp

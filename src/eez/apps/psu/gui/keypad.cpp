@@ -66,7 +66,7 @@ Keypad *getActiveKeypad() {
     }
     
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    if (getActivePageId() == PAGE_ID_NUMERIC_KEYPAD2) {
+    if (getActivePageId() == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
         return (Keypad *)getActivePage();
     }
 #endif
@@ -84,7 +84,7 @@ NumericKeypad *getActiveNumericKeypad() {
     }
     
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    if (getActivePageId() == PAGE_ID_NUMERIC_KEYPAD2) {
+    if (getActivePageId() == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
         return (NumericKeypad *)getActivePage();
     }
 #endif

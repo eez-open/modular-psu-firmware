@@ -212,7 +212,7 @@ scpi_result_t scpi_cmd_simulatorPwrgood(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    simulator::setPwrgood(channel->index-1, on);
+    simulator::setPwrgood(channel->channelIndex, on);
 
     return SCPI_RES_OK;
 }
@@ -224,7 +224,7 @@ scpi_result_t scpi_cmd_simulatorPwrgoodQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, simulator::getPwrgood(channel->index - 1));
+    SCPI_ResultBool(context, simulator::getPwrgood(channel->channelIndex));
 
     return SCPI_RES_OK;
 }
@@ -251,7 +251,7 @@ scpi_result_t scpi_cmd_simulatorRpol(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    simulator::setRPol(channel->index-1, on);
+    simulator::setRPol(channel->channelIndex, on);
 
     return SCPI_RES_OK;
 }
@@ -273,7 +273,7 @@ scpi_result_t scpi_cmd_simulatorRpolQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, simulator::getRPol(channel->index - 1));
+    SCPI_ResultBool(context, simulator::getRPol(channel->channelIndex));
 
     return SCPI_RES_OK;
 }

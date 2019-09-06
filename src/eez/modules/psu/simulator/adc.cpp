@@ -31,7 +31,7 @@ uint16_t g_uSet[CH_MAX];
 uint16_t g_iSet[CH_MAX];
 
 void updateValues(Channel &channel) {
-    int i = channel.index - 1;
+    int i = channel.channelIndex;
 
     if (channel.simulator.getLoadEnabled()) {
         float u_set_v = channel.isRemoteProgrammingEnabled()
@@ -45,11 +45,11 @@ void updateValues(Channel &channel) {
             u_mon_v = u_set_v;
             i_mon_a = u_set_v / channel.simulator.load;
 
-            simulator::setCV(channel.index - 1, true);
-            simulator::setCC(channel.index - 1, false);
+            simulator::setCV(channel.channelIndex, true);
+            simulator::setCC(channel.channelIndex, false);
         } else {
-            simulator::setCV(channel.index - 1, false);
-            simulator::setCC(channel.index - 1, true);
+            simulator::setCV(channel.channelIndex, false);
+            simulator::setCC(channel.channelIndex, true);
         }
 
         g_uMon[i] = channel.remapVoltageToAdcData(u_mon_v);
@@ -61,11 +61,11 @@ void updateValues(Channel &channel) {
             g_uMon[i] = g_uSet[i];
             g_iMon[i] = 0;
             if (g_uSet[i] > 0 && g_iSet[i] > 0) {
-                simulator::setCV(channel.index - 1, true);
-                simulator::setCC(channel.index - 1, false);
+                simulator::setCV(channel.channelIndex, true);
+                simulator::setCC(channel.channelIndex, false);
             } else {
-                simulator::setCV(channel.index - 1, false);
-                simulator::setCC(channel.index - 1, true);
+                simulator::setCV(channel.channelIndex, false);
+                simulator::setCC(channel.channelIndex, true);
             }
             return;
         }
@@ -73,8 +73,8 @@ void updateValues(Channel &channel) {
 
     g_uMon[i] = 0;
     g_iMon[i] = 0;
-    simulator::setCV(channel.index - 1, true);
-    simulator::setCC(channel.index - 1, false);
+    simulator::setCV(channel.channelIndex, true);
+    simulator::setCC(channel.channelIndex, false);
 }
 
 AnalogDigitalConverter::AnalogDigitalConverter(Channel &channel_) : channel(channel_) {
@@ -106,15 +106,15 @@ void AnalogDigitalConverter::start(uint8_t reg0) {
 
 int16_t AnalogDigitalConverter::read() {
     if (start_reg0 == AnalogDigitalConverter::ADC_REG0_READ_U_MON) {
-        return g_uMon[channel.index - 1];
+        return g_uMon[channel.channelIndex];
     }
     if (start_reg0 == AnalogDigitalConverter::ADC_REG0_READ_I_MON) {
-        return g_iMon[channel.index - 1];
+        return g_iMon[channel.channelIndex];
     }
     if (start_reg0 == AnalogDigitalConverter::ADC_REG0_READ_U_SET) {
-        return g_uSet[channel.index - 1];
+        return g_uSet[channel.channelIndex];
     } else {
-        return g_iSet[channel.index - 1];
+        return g_iSet[channel.channelIndex];
     }
 }
 

@@ -113,7 +113,7 @@ void init() {
 		}
 	}
 #else
-    g_testResult = TEST_OK;
+	g_testResult = TEST_OK;
 #endif
 }
 

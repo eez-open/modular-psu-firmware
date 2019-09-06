@@ -62,6 +62,7 @@ const int MAX_READ_CHUNK_SIZE = 16;
 #endif
 
 bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
+
 #ifdef EEZ_PLATFORM_STM32
     for (uint16_t i = 0; i < bufferSize; i += MAX_READ_CHUNK_SIZE) {
         uint16_t chunkAddress = address + i;
@@ -87,18 +88,28 @@ bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t addr
     return true;
 #endif
 
-    if (slotIndex == 0) {
-        buffer[0] = 405 & 0xff;
-        buffer[1] = 405 >> 8;
-    } else if (slotIndex == 1) {
-        buffer[0] = 406 & 0xff;
-        buffer[1] = 406 >> 8;
-    } else {
-        buffer[0] = 505 & 0xff;
-        buffer[1] = 505 >> 8;
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    char fileName[20];
+    sprintf(fileName, "EEPROM_SLOT%d.state", slotIndex + 1);
+    char *filePath = getConfFilePath(fileName);
+    FILE *fp = fopen(filePath, "r+b");
+    if (fp == NULL) {
+        fp = fopen(filePath, "w+b");
+    }
+    
+    if (fp == NULL) {
+        return false;
     }
 
+    fseek(fp, address, SEEK_SET);
+    size_t readBytes = fread(buffer, 1, bufferSize, fp);
+    fclose(fp);
+
+    return readBytes == bufferSize;
+
     return true;
+#endif
+
 }
 
 #ifdef EEZ_PLATFORM_STM32
@@ -106,6 +117,7 @@ const int MAX_WRITE_CHUNK_SIZE = 16;
 #endif
 
 bool write(uint8_t slotIndex, const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
+
 #ifdef EEZ_PLATFORM_STM32
     for (uint16_t i = 0; i < bufferSize; i += MAX_WRITE_CHUNK_SIZE) {
         uint16_t chunkAddress = address + i;
@@ -155,7 +167,25 @@ bool write(uint8_t slotIndex, const uint8_t *buffer, uint16_t bufferSize, uint16
     return true;
 #endif
 
-    return false;
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    char fileName[20];
+    sprintf(fileName, "EEPROM_SLOT%d.state", slotIndex + 1);
+    char *filePath = getConfFilePath(fileName);
+    FILE *fp = fopen(filePath, "r+b");
+    if (fp == NULL) {
+        fp = fopen(filePath, "w+b");
+    }
+    if (fp == NULL) {
+        return false;
+    }
+
+    fseek(fp, address, SEEK_SET);
+    fwrite(buffer, 1, bufferSize, fp);
+    fclose(fp);
+
+    return true;
+#endif
+
 }
 
 void init() {

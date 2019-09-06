@@ -125,7 +125,7 @@ scpi_result_t scpi_cmd_calibrationClear(scpi_t *context) {
     }
 
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index - 1);
+    Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
     if (!calibration::clear(channel)) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -167,7 +167,7 @@ scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
     }
 
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index - 1);
+    Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
     if (!channel->isOutputEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
@@ -279,7 +279,7 @@ scpi_result_t scpi_cmd_calibrationRemarkQ(scpi_t *context) {
         remark = calibration::getRemark();
     } else {
         scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-        Channel *channel = &Channel::get(psu_context->selected_channel_index - 1);
+        Channel *channel = &Channel::get(psu_context->selected_channel_index);
         remark = channel->cal_conf.calibration_remark;
     }
 
@@ -322,7 +322,7 @@ scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
     }
 
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index - 1);
+    Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
     if (!channel->isCalibrationExists()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CAL_PARAMS_MISSING);
@@ -347,7 +347,7 @@ scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
 scpi_result_t scpi_cmd_calibrationStateQ(scpi_t *context) {
     // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index - 1);
+    Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
     SCPI_ResultBool(context, channel->isCalibrationEnabled());
 

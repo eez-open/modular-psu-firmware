@@ -117,20 +117,20 @@ Source getSource() {
 
 void setVoltage(Channel &channel, float value) {
     value = roundPrec(value, channel.getVoltagePrecision());
-    g_levels[channel.index - 1].u = value;
+    g_levels[channel.channelIndex].u = value;
 }
 
 float getVoltage(Channel &channel) {
-    return g_levels[channel.index - 1].u;
+    return g_levels[channel.channelIndex].u;
 }
 
 void setCurrent(Channel &channel, float value) {
     value = roundPrec(value, channel.getCurrentPrecision(value));
-    g_levels[channel.index - 1].i = value;
+    g_levels[channel.channelIndex].i = value;
 }
 
 float getCurrent(Channel &channel) {
-    return g_levels[channel.index - 1].i;
+    return g_levels[channel.channelIndex].i;
 }
 
 void check(uint32_t currentTime) {
@@ -228,7 +228,7 @@ void setTriggerFinished(Channel &channel) {
             g_triggerInProgress[i] = false;
         }
     } else {
-        g_triggerInProgress[channel.index - 1] = false;
+        g_triggerInProgress[channel.channelIndex] = false;
     }
 
     onTriggerFinished(channel);

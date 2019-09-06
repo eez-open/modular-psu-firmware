@@ -53,7 +53,7 @@ void getChannelProfileListFilePath(Channel &channel, int location, char *filePat
     strcpy(filePath, PROFILES_DIR);
     strcat(filePath, PATH_SEPARATOR);
     strcat(filePath, "LST_");
-    strcatInt(filePath, channel.index);
+    strcatInt(filePath, channel.channelIndex + 1);
     strcat(filePath, "_");
     strcatInt(filePath, location);
     strcat(filePath, LIST_FILE_EXTENSION);
@@ -73,7 +73,7 @@ void loadProfileList(Parameters &profile, Channel &channel, int location) {
     }
     
     int err;
-    if (list::loadList(channel.index - 1, filePath, &err)) {
+    if (list::loadList(channel.channelIndex, filePath, &err)) {
         if (location == 0) {
             list::setListsChanged(channel, false);
         }
@@ -92,7 +92,7 @@ void saveProfileList(Parameters &profile, Channel &channel, int location) {
     getChannelProfileListFilePath(channel, location, filePath);
     
     int err;
-    if (list::saveList(channel.index - 1, filePath, &err)) {
+    if (list::saveList(channel.channelIndex, filePath, &err)) {
         if (location == 0) {
             list::setListsChanged(channel, false);
         }

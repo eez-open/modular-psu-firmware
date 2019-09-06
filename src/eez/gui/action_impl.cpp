@@ -51,8 +51,10 @@
 #include <eez/modules/mcu/encoder.h>
 #endif
 
+#include <eez/index.h>
 #include <eez/scripting.h>
 
+#include <eez/modules/dcpX05/eeprom.h>
 
 using namespace eez::gui;
 using namespace eez::psu;
@@ -498,20 +500,20 @@ void action_toggle_channels_max_view() {
 
     if (getActivePageId() != PAGE_ID_MAIN) {
         showMainPage();
-        persist_conf::setChannelsMaxView(g_channel->index);
+        persist_conf::setChannelsMaxView(g_channel->slotIndex + 1);
         animateFromMicroViewToMaxView();
     } else {
         auto channelsIsMaxView = persist_conf::devConf.flags.channelsIsMaxView;
-        auto channelMax = persist_conf::devConf.flags.channelMax;
+        auto slotMax = persist_conf::devConf.flags.slotMax;
 
-        persist_conf::toggleChannelsMaxView(g_channel->index);
+        persist_conf::toggleChannelsMaxView(g_channel->slotIndex + 1);
         
         if (!channelsIsMaxView && persist_conf::devConf.flags.channelsIsMaxView) {
             animateFromDefaultViewToMaxView();
         } else if (channelsIsMaxView && !persist_conf::devConf.flags.channelsIsMaxView) {
             animateFromMaxViewToDefaultView();
         } else {
-            animateFromMinViewToMaxView(channelMax);
+            animateFromMinViewToMaxView(slotMax);
         }
     }
 }
@@ -858,7 +860,7 @@ void action_simulator_load() {
 
 	NumericKeypadOptions options;
 
-	options.pageId = PAGE_ID_NUMERIC_KEYPAD2;
+	options.pageId = PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD;
 
 	options.editValueUnit = UNIT_OHM;
 
@@ -972,6 +974,82 @@ void action_user_switch_clicked() {
 
 #endif
 }
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+
+static int g_slotIndex;
+
+void onSetModuleType(uint8_t moduleType) {
+    popPage();
+
+    int slotIndex = g_slotIndex;
+
+    // write module type to EEPROM so it remembers after restart
+    uint8_t buffer[] = {
+        (uint8_t)(g_modules[moduleType].moduleId & 0xFF),
+        (uint8_t)((g_modules[moduleType].moduleId >> 8) & 0xFF),
+    };
+    dcpX05::eeprom::write(slotIndex, buffer, 2, 0);
+
+    // hot module replacments is only possible on the simulator ;-)
+    uint8_t previousModuleType = g_slots[slotIndex].moduleType;
+    int channelIndex = Channel::getBySlotIndex(slotIndex).channelIndex;
+
+    if (g_modules[previousModuleType].numChannels != g_modules[moduleType].numChannels) {
+        // shift channels after channelIndex to the new location
+        int srcChannelIndex = channelIndex + g_modules[previousModuleType].numChannels;
+        int dstChannelIndex = channelIndex + g_modules[moduleType].numChannels;
+        int n = MIN(CH_MAX - srcChannelIndex, CH_MAX - dstChannelIndex);
+        if (g_modules[previousModuleType].numChannels > g_modules[moduleType].numChannels) {
+            // shift left
+            for (int i = 0; i < n; i++) {
+                Channel &srcChannel = Channel::get(srcChannelIndex + i);
+                Channel &dstChannel = Channel::get(dstChannelIndex + i);
+
+                memcpy(&dstChannel, &srcChannel, sizeof(dstChannel));
+                dstChannel.channelIndex = dstChannelIndex + i;
+            }
+        } else {
+            // shift right
+            for (int i = n - 1; i >= 0; i--) {
+                Channel &srcChannel = Channel::get(srcChannelIndex + i);
+                Channel &dstChannel = Channel::get(dstChannelIndex + i);
+
+                memcpy(&dstChannel, &srcChannel, sizeof(dstChannel));
+                dstChannel.channelIndex = dstChannelIndex + i;
+            }
+        }
+
+        CH_NUM += g_modules[moduleType].numChannels - g_modules[previousModuleType].numChannels;
+    }
+
+    // switch channel at channelIndex to the new module type
+    g_slots[slotIndex].moduleType = moduleType;
+    g_slots[slotIndex].boardRevision = g_modules[moduleType].lasestBoardRevision;
+
+    for (int subchannelIndex = 0; subchannelIndex < g_modules[moduleType].numChannels; subchannelIndex++) {
+        Channel::get(channelIndex++).set(slotIndex, subchannelIndex, g_slots[slotIndex].boardRevision);
+    }
+}
+
+void selectSlot(int slotIndex) {
+    g_slotIndex = slotIndex;
+    pushSelectFromEnumPage(g_moduleTypeEnumDefinition, g_slots[slotIndex].moduleType, NULL, onSetModuleType);
+}
+
+void action_front_panel_select_slot1() {
+    selectSlot(0);
+}
+
+void action_front_panel_select_slot2() {
+    selectSlot(1);
+}
+
+void action_front_panel_select_slot3() {
+    selectSlot(2);
+}
+
+#endif
 
 } // namespace gui
 } // namespace eez

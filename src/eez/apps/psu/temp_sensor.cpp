@@ -67,7 +67,7 @@ bool TempSensor::isInstalled() {
 
 Channel *TempSensor::getChannel() {
     if (type >= CH1 && type <= CH3) {
-        return Channel::getBySlotIndex(type - CH1);
+        return &Channel::getBySlotIndex(type - CH1);
     }
     return NULL;
 }

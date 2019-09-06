@@ -125,7 +125,7 @@ extern Channel channels[CH_MAX];
 
 void init() {
     for (int i = 0; i < CH_MAX; i++) {
-    	channels[i].index = i + 1;
+    	channels[i].channelIndex = i;
     }
 
     sound::init();
@@ -139,29 +139,44 @@ void init() {
 
     bp3c::relays::init();
 
-    for (int i = 0; i < CH_MAX; i++) {
+    // inst:memo ch1,0,2,406
+
+    // TODO remove this from here
+#if defined(EEZ_PLATFORM_STM32)
+    HAL_GPIO_WritePin(SPI5_CSA_GPIO_Port, SPI5_CSA_Pin, GPIO_PIN_SET);
+	WRITE_REG(hspi5.Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) |
+			SPI_BAUDRATEPRESCALER_8 |
+			SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+#endif
+
+    int channelIndex = 0;
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         uint16_t value;
-        if (!dcpX05::eeprom::read(i, (uint8_t *)&value, 2, (uint16_t)0)) {
-            g_slots[i].moduleType = MODULE_TYPE_NONE;
-            channels[i].set(i, CH_BOARD_REVISION_NONE, CH_PARAMS_NONE);
+        if (!dcpX05::eeprom::read(slotIndex, (uint8_t *)&value, 2, (uint16_t)0)) {
+            g_slots[slotIndex].moduleType = MODULE_TYPE_NONE;
+            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_NONE;
         } else if (value == 405) {
-            g_slots[i].moduleType = MODULE_TYPE_DCP405;
-            channels[i].set(i, CH_BOARD_REVISION_DCP405_R1B1, CH_PARAMS_40V_5A);
+            g_slots[slotIndex].moduleType = MODULE_TYPE_DCP405;
+            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_DCP405_R1B1;
         } else if (value == 406) {
-            g_slots[i].moduleType = MODULE_TYPE_DCP405;
-            channels[i].set(i, CH_BOARD_REVISION_DCP405_R2B5, CH_PARAMS_40V_5A);
+            g_slots[slotIndex].moduleType = MODULE_TYPE_DCP405;
+            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_DCP405_R2B5;
         } else if (value == 505) {
-            g_slots[i].moduleType = MODULE_TYPE_DCP505;
-            channels[i].set(i, CH_BOARD_REVISION_DCP505_R1B3, CH_PARAMS_50V_5A);
+            g_slots[slotIndex].moduleType = MODULE_TYPE_DCP505;
+            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_DCP505_R1B3;
         } else if (value == 220) {
-            g_slots[i].moduleType = MODULE_TYPE_DCM220;
-            channels[i].set(i, CH_BOARD_REVISION_DCM220_R1B1, CH_PARAMS_20V_4A);
+            g_slots[slotIndex].moduleType = MODULE_TYPE_DCM220;
+            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_DCM220_R1B1;
         } else {
-            g_slots[i].moduleType = MODULE_TYPE_NONE;
-            channels[i].set(i, CH_BOARD_REVISION_NONE, CH_PARAMS_NONE);
+            g_slots[slotIndex].moduleType = MODULE_TYPE_NONE;
+            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_NONE;
+        }
+
+        for (int subchannelIndex = 0; subchannelIndex < g_modules[g_slots[slotIndex].moduleType].numChannels; subchannelIndex++) {
+            channels[channelIndex++].set(slotIndex, subchannelIndex, g_slots[slotIndex].boardRevision);
         }
     }
-    CH_NUM = CH_MAX;
+    CH_NUM = channelIndex;
 
     g_powerOnTimeCounter.init();
     for (int i = 0; i < CH_NUM; i++) {
@@ -620,6 +635,7 @@ void changePowerState(bool up) {
                 memcpy(&temperature::sensors[i].prot_conf, profile.temp_prot + i,
                        sizeof(temperature::ProtectionConfiguration));
             }
+
             profile::recallChannelsFromProfile(&profile, location);
         }
 

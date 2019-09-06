@@ -146,7 +146,7 @@ void setLevelValue() {
 
     NumericKeypadOptions options;
 
-    options.channelIndex = calibration::getCalibrationChannel().index - 1;
+    options.channelIndex = calibration::getCalibrationChannel().channelIndex;
 
     options.editValueUnit = levelValue.getUnit();
 
@@ -210,7 +210,7 @@ void set() {
 
         NumericKeypadOptions options;
 
-        options.channelIndex = calibration::getCalibrationChannel().index - 1;
+        options.channelIndex = calibration::getCalibrationChannel().channelIndex;
 
         if (calibrationValue == &calibration::getVoltage()) {
             options.editValueUnit = UNIT_VOLT;
@@ -260,7 +260,7 @@ void nextStep() {
     if (g_stepNum == MAX_STEP_NUM - 1) {
         int16_t scpiErr;
         if (!calibration::canSave(scpiErr)) {
-            psuErrorMessage(data::Cursor(calibration::getCalibrationChannel().index - 1),
+            psuErrorMessage(data::Cursor(calibration::getCalibrationChannel().channelIndex),
                             data::MakeScpiErrorValue(scpiErr));
             return;
         }

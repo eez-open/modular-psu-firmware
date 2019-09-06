@@ -91,7 +91,7 @@ void ChSettingsProtectionSetPage::onLimitSet(float value) {
 void ChSettingsProtectionSetPage::editLimit() {
     NumericKeypadOptions options;
 
-    options.channelIndex = g_channel->index - 1;
+    options.channelIndex = g_channel->channelIndex;
 
     options.editValueUnit = limit.getUnit();
 
@@ -116,7 +116,7 @@ void ChSettingsProtectionSetPage::onLevelSet(float value) {
 void ChSettingsProtectionSetPage::editLevel() {
     NumericKeypadOptions options;
 
-    options.channelIndex = g_channel->index - 1;
+    options.channelIndex = g_channel->channelIndex;
 
     options.editValueUnit = level.getUnit();
 

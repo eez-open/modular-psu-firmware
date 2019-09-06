@@ -75,7 +75,7 @@ void init() {
 }
 
 void resetChannelList(Channel &channel) {
-    int i = channel.index - 1;
+    int i = channel.channelIndex;
 
     g_channelsLists[i].voltageListLength = 0;
     g_channelsLists[i].currentListLength = 0;
@@ -95,58 +95,58 @@ void reset() {
 }
 
 void setDwellList(Channel &channel, float *list, uint16_t listLength) {
-    memcpy(g_channelsLists[channel.index - 1].dwellList, list, listLength * sizeof(float));
-    g_channelsLists[channel.index - 1].dwellListLength = listLength;
-    g_channelsLists[channel.index - 1].changed = true;
+    memcpy(g_channelsLists[channel.channelIndex].dwellList, list, listLength * sizeof(float));
+    g_channelsLists[channel.channelIndex].dwellListLength = listLength;
+    g_channelsLists[channel.channelIndex].changed = true;
 }
 
 float *getDwellList(Channel &channel, uint16_t *listLength) {
-    *listLength = g_channelsLists[channel.index - 1].dwellListLength;
-    return g_channelsLists[channel.index - 1].dwellList;
+    *listLength = g_channelsLists[channel.channelIndex].dwellListLength;
+    return g_channelsLists[channel.channelIndex].dwellList;
 }
 
 void setVoltageList(Channel &channel, float *list, uint16_t listLength) {
-    memcpy(g_channelsLists[channel.index - 1].voltageList, list, listLength * sizeof(float));
-    g_channelsLists[channel.index - 1].voltageListLength = listLength;
-    g_channelsLists[channel.index - 1].changed = true;
+    memcpy(g_channelsLists[channel.channelIndex].voltageList, list, listLength * sizeof(float));
+    g_channelsLists[channel.channelIndex].voltageListLength = listLength;
+    g_channelsLists[channel.channelIndex].changed = true;
 }
 
 float *getVoltageList(Channel &channel, uint16_t *listLength) {
-    *listLength = g_channelsLists[channel.index - 1].voltageListLength;
-    return g_channelsLists[channel.index - 1].voltageList;
+    *listLength = g_channelsLists[channel.channelIndex].voltageListLength;
+    return g_channelsLists[channel.channelIndex].voltageList;
 }
 
 void setCurrentList(Channel &channel, float *list, uint16_t listLength) {
-    memcpy(g_channelsLists[channel.index - 1].currentList, list, listLength * sizeof(float));
-    g_channelsLists[channel.index - 1].currentListLength = listLength;
-    g_channelsLists[channel.index - 1].changed = true;
+    memcpy(g_channelsLists[channel.channelIndex].currentList, list, listLength * sizeof(float));
+    g_channelsLists[channel.channelIndex].currentListLength = listLength;
+    g_channelsLists[channel.channelIndex].changed = true;
 }
 
 float *getCurrentList(Channel &channel, uint16_t *listLength) {
-    *listLength = g_channelsLists[channel.index - 1].currentListLength;
-    return g_channelsLists[channel.index - 1].currentList;
+    *listLength = g_channelsLists[channel.channelIndex].currentListLength;
+    return g_channelsLists[channel.channelIndex].currentList;
 }
 
 bool getListsChanged(Channel &channel) {
-    return g_channelsLists[channel.index - 1].changed;
+    return g_channelsLists[channel.channelIndex].changed;
 }
 
 void setListsChanged(Channel &channel, bool changed) {
-    g_channelsLists[channel.index - 1].changed = changed;
+    g_channelsLists[channel.channelIndex].changed = changed;
 }
 
 uint16_t getListCount(Channel &channel) {
-    return g_channelsLists[channel.index - 1].count;
+    return g_channelsLists[channel.channelIndex].count;
 }
 
 void setListCount(Channel &channel, uint16_t value) {
-    g_channelsLists[channel.index - 1].count = value;
+    g_channelsLists[channel.channelIndex].count = value;
 }
 
 bool isListEmpty(Channel &channel) {
-    return g_channelsLists[channel.index - 1].dwellListLength == 0 &&
-           g_channelsLists[channel.index - 1].voltageListLength == 0 &&
-           g_channelsLists[channel.index - 1].currentListLength == 0;
+    return g_channelsLists[channel.channelIndex].dwellListLength == 0 &&
+           g_channelsLists[channel.channelIndex].voltageListLength == 0 &&
+           g_channelsLists[channel.channelIndex].currentListLength == 0;
 }
 
 bool areListLengthsEquivalent(uint16_t size1, uint16_t size2) {
@@ -160,24 +160,24 @@ bool areListLengthsEquivalent(uint16_t size1, uint16_t size2, uint16_t size3) {
 }
 
 bool areListLengthsEquivalent(Channel &channel) {
-    return list::areListLengthsEquivalent(g_channelsLists[channel.index - 1].dwellListLength,
-                                          g_channelsLists[channel.index - 1].voltageListLength,
-                                          g_channelsLists[channel.index - 1].currentListLength);
+    return list::areListLengthsEquivalent(g_channelsLists[channel.channelIndex].dwellListLength,
+                                          g_channelsLists[channel.channelIndex].voltageListLength,
+                                          g_channelsLists[channel.channelIndex].currentListLength);
 }
 
 bool areVoltageAndDwellListLengthsEquivalent(Channel &channel) {
-    return areListLengthsEquivalent(g_channelsLists[channel.index - 1].voltageListLength,
-                                    g_channelsLists[channel.index - 1].dwellListLength);
+    return areListLengthsEquivalent(g_channelsLists[channel.channelIndex].voltageListLength,
+                                    g_channelsLists[channel.channelIndex].dwellListLength);
 }
 
 bool areCurrentAndDwellListLengthsEquivalent(Channel &channel) {
-    return areListLengthsEquivalent(g_channelsLists[channel.index - 1].currentListLength,
-                                    g_channelsLists[channel.index - 1].dwellListLength);
+    return areListLengthsEquivalent(g_channelsLists[channel.channelIndex].currentListLength,
+                                    g_channelsLists[channel.channelIndex].dwellListLength);
 }
 
 bool areVoltageAndCurrentListLengthsEquivalent(Channel &channel) {
-    return areListLengthsEquivalent(g_channelsLists[channel.index - 1].voltageListLength,
-                                    g_channelsLists[channel.index - 1].currentListLength);
+    return areListLengthsEquivalent(g_channelsLists[channel.channelIndex].voltageListLength,
+                                    g_channelsLists[channel.channelIndex].currentListLength);
 }
 
 int checkLimits(int iChannel) {
@@ -357,28 +357,28 @@ bool saveList(int iChannel, const char *filePath, int *err) {
         return false;
     }
 
-    for (int i = 0; i < g_channelsLists[channel.index - 1].dwellListLength ||
-                    i < g_channelsLists[channel.index - 1].voltageListLength ||
-                    i < g_channelsLists[channel.index - 1].currentListLength;
+    for (int i = 0; i < g_channelsLists[channel.channelIndex].dwellListLength ||
+                    i < g_channelsLists[channel.channelIndex].voltageListLength ||
+                    i < g_channelsLists[channel.channelIndex].currentListLength;
          ++i) {
-        if (i < g_channelsLists[channel.index - 1].dwellListLength) {
-            file.print(g_channelsLists[channel.index - 1].dwellList[i], 4);
+        if (i < g_channelsLists[channel.channelIndex].dwellListLength) {
+            file.print(g_channelsLists[channel.channelIndex].dwellList[i], 4);
         } else {
             file.print(LIST_CSV_FILE_NO_VALUE_CHAR);
         }
 
         file.print(CSV_SEPARATOR);
 
-        if (i < g_channelsLists[channel.index - 1].voltageListLength) {
-            file.print(g_channelsLists[channel.index - 1].voltageList[i], 4);
+        if (i < g_channelsLists[channel.channelIndex].voltageListLength) {
+            file.print(g_channelsLists[channel.channelIndex].voltageList[i], 4);
         } else {
             file.print(LIST_CSV_FILE_NO_VALUE_CHAR);
         }
 
         file.print(CSV_SEPARATOR);
 
-        if (i < g_channelsLists[channel.index - 1].currentListLength) {
-            file.print(g_channelsLists[channel.index - 1].currentList[i], 4);
+        if (i < g_channelsLists[channel.channelIndex].currentListLength) {
+            file.print(g_channelsLists[channel.channelIndex].currentList[i], 4);
         } else {
             file.print(LIST_CSV_FILE_NO_VALUE_CHAR);
         }
@@ -398,8 +398,8 @@ bool saveList(int iChannel, const char *filePath, int *err) {
 }
 
 void executionStart(Channel &channel) {
-    g_execution[channel.index - 1].it = -1;
-    g_execution[channel.index - 1].counter = g_channelsLists[channel.index - 1].count;
+    g_execution[channel.channelIndex].it = -1;
+    g_execution[channel.channelIndex].counter = g_channelsLists[channel.channelIndex].count;
     g_active = true;
     tick(micros());
 }
@@ -407,29 +407,29 @@ void executionStart(Channel &channel) {
 int maxListsSize(Channel &channel) {
     uint16_t maxSize = 0;
 
-    if (g_channelsLists[channel.index - 1].voltageListLength > maxSize) {
-        maxSize = g_channelsLists[channel.index - 1].voltageListLength;
+    if (g_channelsLists[channel.channelIndex].voltageListLength > maxSize) {
+        maxSize = g_channelsLists[channel.channelIndex].voltageListLength;
     }
 
-    if (g_channelsLists[channel.index - 1].currentListLength > maxSize) {
-        maxSize = g_channelsLists[channel.index - 1].currentListLength;
+    if (g_channelsLists[channel.channelIndex].currentListLength > maxSize) {
+        maxSize = g_channelsLists[channel.channelIndex].currentListLength;
     }
 
-    if (g_channelsLists[channel.index - 1].dwellListLength > maxSize) {
-        maxSize = g_channelsLists[channel.index - 1].dwellListLength;
+    if (g_channelsLists[channel.channelIndex].dwellListLength > maxSize) {
+        maxSize = g_channelsLists[channel.channelIndex].dwellListLength;
     }
 
     return maxSize;
 }
 
 bool setListValue(Channel &channel, int16_t it, int *err) {
-    float voltage = g_channelsLists[channel.index - 1].voltageList[it % g_channelsLists[channel.index - 1].voltageListLength];
+    float voltage = g_channelsLists[channel.channelIndex].voltageList[it % g_channelsLists[channel.channelIndex].voltageListLength];
     if (voltage > channel_dispatcher::getULimit(channel)) {
         *err = SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
         return false;
     }
 
-    float current = g_channelsLists[channel.index - 1].currentList[it % g_channelsLists[channel.index - 1].currentListLength];
+    float current = g_channelsLists[channel.channelIndex].currentList[it % g_channelsLists[channel.channelIndex].currentListLength];
     if (current > channel_dispatcher::getILimit(channel)) {
         *err = SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
         return false;
@@ -547,7 +547,7 @@ bool isActive() {
 }
 
 bool isActive(Channel &channel) {
-    return g_execution[channel.index - 1].counter >= 0;
+    return g_execution[channel.channelIndex].counter >= 0;
 }
 
 bool anyCounterVisible(uint32_t totalThreshold) {
@@ -561,7 +561,7 @@ bool anyCounterVisible(uint32_t totalThreshold) {
 }
 
 bool getCurrentDwellTime(Channel &channel, int32_t &remaining, uint32_t &total) {
-    int i = channel.index - 1;
+    int i = channel.channelIndex;
     if (g_execution[i].counter >= 0) {
         total = (uint32_t)ceilf(g_execution[i].currentTotalDwellTime);
         if (g_execution[i].currentTotalDwellTime > CONF_COUNTER_THRESHOLD_IN_SECONDS) {

@@ -115,7 +115,7 @@ void oneIter() {
 
 void resetContext(scpi_t *context) {
     scpi_psu_t *psuContext = (scpi_psu_t *)context->user_context;
-    psuContext->selected_channel_index = 1;
+    psuContext->selected_channel_index = 0;
 #if OPTION_SD_CARD
     psuContext->currentDirectory[0] = 0;
 #endif

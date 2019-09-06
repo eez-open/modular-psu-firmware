@@ -105,7 +105,7 @@ void ChSettingsTriggerPage::onCurrentTriggerValueSet(float value) {
 void ChSettingsTriggerPage::editCurrentTriggerValue() {
     NumericKeypadOptions options;
 
-    options.channelIndex = g_channel->index - 1;
+    options.channelIndex = g_channel->channelIndex;
 
     options.editValueUnit = UNIT_AMPER;
 
@@ -311,7 +311,7 @@ void ChSettingsListsPage::edit() {
     if (isFocusWidget(getFoundWidgetAtDown())) {
         NumericKeypadOptions options;
 
-        options.channelIndex = g_channel->index - 1;
+        options.channelIndex = g_channel->channelIndex;
 
         data::Cursor cursor(getCursorIndexWithinPage());
 
@@ -501,7 +501,7 @@ bool ChSettingsListsPage::onEncoder(int counter) {
     data::Value min = data::getMin(cursor, dataId);
     data::Value max = data::getMax(cursor, dataId);
 
-    float newValue = mcu::encoder::increment(value, counter, min.getFloat(), max.getFloat(), g_channel->index - 1, 0);
+    float newValue = mcu::encoder::increment(value, counter, min.getFloat(), max.getFloat(), g_channel->channelIndex, 0);
 
     setFocusedValue(newValue);
 

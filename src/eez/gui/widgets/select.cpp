@@ -44,10 +44,10 @@ void SelectWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback)
 
     if (widgetCursor.currentState) {
 		widgetCursor.currentState->data = indexValue;
-    }
 
-    if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {
-		widgetCursor.previousState = 0;
+        if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {
+            widgetCursor.previousState = 0;
+        }
     }
 
     // move to the selected widget state

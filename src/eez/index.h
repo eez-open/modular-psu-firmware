@@ -29,12 +29,21 @@ extern OnSystemStateChangedCallback g_onSystemStateChangedCallbacks[];
 extern int g_numOnSystemStateChangedCallbacks;
 
 static const uint8_t MODULE_TYPE_NONE = 0;
-static const uint8_t MODULE_TYPE_DCP505 = 1;
-static const uint8_t MODULE_TYPE_DCP405 = 2;
-static const uint8_t MODULE_TYPE_DCM220 = 3;
+static const uint8_t MODULE_TYPE_DCP405 = 1;
+static const uint8_t MODULE_TYPE_DCM220 = 2;
+static const uint8_t MODULE_TYPE_DCP505 = 3;
+
+struct ModuleInfo {
+    uint16_t moduleId;
+    uint8_t lasestBoardRevision; // TODO should be lasestModuleRevision
+    uint8_t numChannels;
+};
+
+extern ModuleInfo g_modules[];
 
 struct SlotInfo {
     uint8_t moduleType; // MODULE_TYPE_...
+    uint8_t boardRevision; // TODO should be moduleRevision;
 };
 
 static const int NUM_SLOTS = 3;

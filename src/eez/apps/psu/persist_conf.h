@@ -21,8 +21,8 @@
 #define NUM_CHANNELS_VIEW_MODES 4
 
 #define CHANNELS_VIEW_MODE_NUMERIC   0
-#define CHANNELS_VIEW_MODE_HORZ_BAR  1
-#define CHANNELS_VIEW_MODE_VERT_BAR  2
+#define CHANNELS_VIEW_MODE_VERT_BAR  1
+#define CHANNELS_VIEW_MODE_HORZ_BAR  2
 #define CHANNELS_VIEW_MODE_YT        3
 
 #define NUM_CHANNELS_VIEW_MODES_IN_MAX 3
@@ -73,9 +73,9 @@ struct DeviceFlags {
     unsigned ch2CalEnabled : 1;
     unsigned channelsViewModeInMax : 3;
     unsigned channelsIsMaxView : 1;
-    unsigned channelMax: 2;
-    unsigned channelSmall1 : 2;
-    unsigned channelSmall2 : 2;
+    unsigned slotMax: 2;
+    unsigned slotMin1 : 2;
+    unsigned slotMin2 : 2;
     unsigned reserved : 6;
 };
 

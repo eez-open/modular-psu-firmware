@@ -74,18 +74,18 @@ void DigitalAnalogConverter::set_current(uint16_t current) {
 void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value) {
     if (buffer == DATA_BUFFER_A) {
         float adcValue = remap(value, DAC_MIN, AnalogDigitalConverter::ADC_MIN, DAC_MAX, AnalogDigitalConverter::ADC_MAX);
-        g_uSet[channel.index - 1] = (uint16_t)clamp(adcValue, AnalogDigitalConverter::ADC_MIN, AnalogDigitalConverter::ADC_MAX);
+        g_uSet[channel.channelIndex] = (uint16_t)clamp(adcValue, AnalogDigitalConverter::ADC_MIN, AnalogDigitalConverter::ADC_MAX);
 
     } else {
         float adcValue = remap(value, DAC_MIN, AnalogDigitalConverter::ADC_MIN, DAC_MAX, AnalogDigitalConverter::ADC_MAX);
-        g_iSet[channel.index - 1] = (uint16_t)clamp(adcValue, AnalogDigitalConverter::ADC_MIN, AnalogDigitalConverter::ADC_MAX);
+        g_iSet[channel.channelIndex] = (uint16_t)clamp(adcValue, AnalogDigitalConverter::ADC_MIN, AnalogDigitalConverter::ADC_MAX);
     }
 
 #ifdef DEBUG
     if (buffer == DATA_BUFFER_A) {
-        debug::g_uDac[channel.index - 1].set(value);
+        debug::g_uDac[channel.channelIndex].set(value);
     } else {
-        debug::g_iDac[channel.index - 1].set(value);
+        debug::g_iDac[channel.channelIndex].set(value);
     }
 #endif
 }

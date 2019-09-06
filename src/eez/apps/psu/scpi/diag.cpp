@@ -247,38 +247,40 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
     for (int i = 0; i < CH_NUM; ++i) {
         Channel *channel = &Channel::get(i);
 
+        int channelIndex = channel->channelIndex + 1;
+
         // voltage
-        sprintf(buffer, "CH%d u_tripped=%d", channel->index, (int)channel->ovp.flags.tripped);
+        sprintf(buffer, "CH%d u_tripped=%d", channelIndex, (int)channel->ovp.flags.tripped);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d u_state=%d", channel->index, (int)channel->prot_conf.flags.u_state);
+        sprintf(buffer, "CH%d u_state=%d", channelIndex, (int)channel->prot_conf.flags.u_state);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d u_delay=", channel->index);
+        sprintf(buffer, "CH%d u_delay=", channelIndex);
         strcatDuration(buffer, channel->prot_conf.u_delay);
         SCPI_ResultText(context, buffer);
 
-        sprintf(buffer, "CH%d u_level=", channel->index);
+        sprintf(buffer, "CH%d u_level=", channelIndex);
         strcatVoltage(buffer, channel->prot_conf.u_level);
         SCPI_ResultText(context, buffer);
 
         // current
-        sprintf(buffer, "CH%d i_tripped=%d", channel->index, (int)channel->ocp.flags.tripped);
+        sprintf(buffer, "CH%d i_tripped=%d", channelIndex, (int)channel->ocp.flags.tripped);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d i_state=%d", channel->index, (int)channel->prot_conf.flags.i_state);
+        sprintf(buffer, "CH%d i_state=%d", channelIndex, (int)channel->prot_conf.flags.i_state);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d i_delay=", channel->index);
+        sprintf(buffer, "CH%d i_delay=", channelIndex);
         strcatDuration(buffer, channel->prot_conf.i_delay);
         SCPI_ResultText(context, buffer);
 
         // power
-        sprintf(buffer, "CH%d p_tripped=%d", channel->index, (int)channel->opp.flags.tripped);
+        sprintf(buffer, "CH%d p_tripped=%d", channelIndex, (int)channel->opp.flags.tripped);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d p_state=%d", channel->index, (int)channel->prot_conf.flags.p_state);
+        sprintf(buffer, "CH%d p_state=%d", channelIndex, (int)channel->prot_conf.flags.p_state);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d p_delay=", channel->index);
+        sprintf(buffer, "CH%d p_delay=", channelIndex);
         strcatDuration(buffer, channel->prot_conf.p_delay);
         SCPI_ResultText(context, buffer);
 
-        sprintf(buffer, "CH%d p_level=", channel->index);
+        sprintf(buffer, "CH%d p_level=", channelIndex);
         strcatPower(buffer, channel->prot_conf.p_level);
         SCPI_ResultText(context, buffer);
     }
@@ -362,17 +364,17 @@ scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
     //            Channel *channel = &Channel::get(i);
     //
     //            sprintf(buffer, "%d, CH%d IOEXP, installed, %s",
-    //                channel->ioexp.g_testResult, channel->index,
+    //                channel->ioexp.g_testResult, channel->channelIndex + 1,
     //                get_test_result_str((TestResult)channel->ioexp.g_testResult));
     //            SCPI_ResultText(context, buffer);
     //
     //            sprintf(buffer, "%d, CH%d DAC, installed, %s",
-    //                channel->dac.g_testResult, channel->index,
+    //                channel->dac.g_testResult, channel->channelIndex + 1,
     //                get_test_result_str((TestResult)channel->dac.g_testResult));
     //            SCPI_ResultText(context, buffer);
     //
     //            sprintf(buffer, "%d, CH%d ADC, installed, %s",
-    //                channel->adc.g_testResult, channel->index,
+    //                channel->adc.g_testResult, channel->channelIndex + 1,
     //                get_test_result_str((TestResult)channel->adc.g_testResult));
     //            SCPI_ResultText(context, buffer);
     //        }

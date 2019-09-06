@@ -137,7 +137,7 @@ uint16_t get_address(PersistConfSection section, Channel *channel = 0) {
     case PERSIST_CONF_BLOCK_DEVICE2:
         return PERSIST_CONF_DEVICE2_ADDRESS;
     case PERSIST_CONF_BLOCK_CH_CAL:
-        return PERSIST_CONF_CH_CAL_ADDRESS + (channel->index - 1) * PERSIST_CONF_CH_CAL_BLOCK_SIZE;
+        return PERSIST_CONF_CH_CAL_ADDRESS + channel->channelIndex * PERSIST_CONF_CH_CAL_BLOCK_SIZE;
     case PERSIST_CONF_BLOCK_FIRST_PROFILE:
         return PERSIST_CONF_FIRST_PROFILE_ADDRESS;
     }
@@ -575,38 +575,38 @@ void toggleChannelsViewMode() {
 
 void setChannelsMaxView(int channelIndex) {
     auto channelsIsMaxView = devConf.flags.channelsIsMaxView;
-    auto channelMax = devConf.flags.channelMax;
+    auto slotMax = devConf.flags.slotMax;
 
     devConf.flags.channelsIsMaxView = 1;
-    devConf.flags.channelMax = channelIndex;
+    devConf.flags.slotMax = channelIndex;
 
-    if (channelsIsMaxView != devConf.flags.channelsIsMaxView || channelMax != devConf.flags.channelMax) {
+    if (channelsIsMaxView != devConf.flags.channelsIsMaxView || slotMax != devConf.flags.slotMax) {
         saveDevice();
     }
 }
 
 void toggleChannelsMaxView(int channelIndex) {
     if (devConf.flags.channelsIsMaxView) {
-        if (channelIndex == devConf.flags.channelMax) {
+        if (channelIndex == devConf.flags.slotMax) {
             devConf.flags.channelsIsMaxView = 0;
         } else {
-            devConf.flags.channelMax = channelIndex;
+            devConf.flags.slotMax = channelIndex;
         }
     } else {
         devConf.flags.channelsIsMaxView = 1;
-        devConf.flags.channelMax = channelIndex;
+        devConf.flags.slotMax = channelIndex;
     }
     
     if (devConf.flags.channelsIsMaxView) {
-        if (devConf.flags.channelMax == 1) {
-            devConf.flags.channelSmall1 = 2;
-            devConf.flags.channelSmall2 = 3;
-        } else if (devConf.flags.channelMax == 2) {
-            devConf.flags.channelSmall1 = 1;
-            devConf.flags.channelSmall2 = 3;
+        if (devConf.flags.slotMax == 1) {
+            devConf.flags.slotMin1 = 2;
+            devConf.flags.slotMin2 = 3;
+        } else if (devConf.flags.slotMax == 2) {
+            devConf.flags.slotMin1 = 1;
+            devConf.flags.slotMin2 = 3;
         } else {
-            devConf.flags.channelSmall1 = 1;
-            devConf.flags.channelSmall2 = 2;
+            devConf.flags.slotMin1 = 1;
+            devConf.flags.slotMin2 = 2;
         }
     }
 
@@ -628,9 +628,9 @@ bool saveChannelCalibration(Channel &channel) {
 }
 
 void saveCalibrationEnabledFlag(Channel &channel, bool enabled) {
-    if (channel.index == 1) {
+    if (channel.channelIndex == 0) {
         devConf.flags.ch1CalEnabled = enabled ? 1 : 0;
-    } else if (channel.index == 2) {
+    } else if (channel.channelIndex == 1) {
         devConf.flags.ch2CalEnabled = enabled ? 1 : 0;
     } else {
         return;
