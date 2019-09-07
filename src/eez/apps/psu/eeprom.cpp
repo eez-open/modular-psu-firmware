@@ -18,6 +18,14 @@
 
 #include <memory.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <i2c.h>
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+#include <stdio.h>
+#endif
+
 #include <scpi/scpi.h>
 
 #include <eez/system.h>
@@ -25,10 +33,6 @@
 #include <eez/apps/psu/psu.h>
 
 #include <eez/apps/psu/eeprom.h>
-
-#if defined(EEZ_PLATFORM_STM32)
-#include <i2c.h>
-#endif
 
 namespace eez {
 namespace psu {

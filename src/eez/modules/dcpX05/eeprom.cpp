@@ -22,6 +22,10 @@
 #include <i2c.h>
 #endif
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+#include <stdio.h>
+#endif
+
 #include <scpi/scpi.h>
 
 #include <eez/system.h>
