@@ -148,7 +148,8 @@ void action_keypad_option2() {
 }
 
 void action_enter_touch_calibration() {
-    home::enterTouchCalibration(PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL, PAGE_ID_SYS_SETTINGS_DISPLAY);
+    popPage();
+    home::enterTouchCalibration();
 }
 
 void action_yes() {
