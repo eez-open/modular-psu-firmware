@@ -573,41 +573,46 @@ void toggleChannelsViewMode() {
     }
 }
 
-void setChannelsMaxView(int channelIndex) {
+void setSlotMin() {
+    if (devConf.flags.slotMax == 1) {
+        devConf.flags.slotMin1 = 2;
+        devConf.flags.slotMin2 = 3;
+    } else if (devConf.flags.slotMax == 2) {
+        devConf.flags.slotMin1 = 1;
+        devConf.flags.slotMin2 = 3;
+    } else {
+        devConf.flags.slotMin1 = 1;
+        devConf.flags.slotMin2 = 2;
+    }
+}
+
+void setChannelsMaxView(int slotIndex) {
     auto channelsIsMaxView = devConf.flags.channelsIsMaxView;
     auto slotMax = devConf.flags.slotMax;
 
     devConf.flags.channelsIsMaxView = 1;
-    devConf.flags.slotMax = channelIndex;
+    devConf.flags.slotMax = slotIndex;
+    setSlotMin();
 
     if (channelsIsMaxView != devConf.flags.channelsIsMaxView || slotMax != devConf.flags.slotMax) {
         saveDevice();
     }
 }
 
-void toggleChannelsMaxView(int channelIndex) {
+void toggleChannelsMaxView(int slotIndex) {
     if (devConf.flags.channelsIsMaxView) {
-        if (channelIndex == devConf.flags.slotMax) {
+        if (slotIndex == devConf.flags.slotMax) {
             devConf.flags.channelsIsMaxView = 0;
         } else {
-            devConf.flags.slotMax = channelIndex;
+            devConf.flags.slotMax = slotIndex;
         }
     } else {
         devConf.flags.channelsIsMaxView = 1;
-        devConf.flags.slotMax = channelIndex;
+        devConf.flags.slotMax = slotIndex;
     }
     
     if (devConf.flags.channelsIsMaxView) {
-        if (devConf.flags.slotMax == 1) {
-            devConf.flags.slotMin1 = 2;
-            devConf.flags.slotMin2 = 3;
-        } else if (devConf.flags.slotMax == 2) {
-            devConf.flags.slotMin1 = 1;
-            devConf.flags.slotMin2 = 3;
-        } else {
-            devConf.flags.slotMin1 = 1;
-            devConf.flags.slotMin2 = 2;
-        }
+        setSlotMin();
     }
 
     saveDevice();

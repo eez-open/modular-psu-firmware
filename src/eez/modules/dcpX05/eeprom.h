@@ -43,6 +43,8 @@ extern TestResult g_testResult;
 bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t buffer_size, uint16_t address);
 bool write(uint8_t slotIndex, const uint8_t *buffer, uint16_t buffer_size, uint16_t address);
 
+void writeModuleType(uint8_t slotIndex, uint8_t moduleType);
+
 } // namespace eeprom
 } // namespace dcpX05
 } // namespace eez

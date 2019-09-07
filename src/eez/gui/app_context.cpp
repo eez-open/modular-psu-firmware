@@ -460,11 +460,12 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
         }
     }
 
-#if OPTION_SDRAM
-    bool repaint = i + 1 < m_pageNavigationStackPointer;
-#else
+// #if OPTION_SDRAM
+//     bool repaint = i + 1 < m_pageNavigationStackPointer;
+// #else
+//     bool repaint = false;
+// #endif
     bool repaint = false;
-#endif
 
     m_activePageIdSaved = m_activePageId;
     Page *activePageSaved = m_activePage;

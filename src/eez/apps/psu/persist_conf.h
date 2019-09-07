@@ -207,8 +207,8 @@ void setChannelsViewModeInMax(unsigned int viewModeInMax);
 
 void toggleChannelsViewMode();
 
-void setChannelsMaxView(int channelIndex); // channelIndex starts from 1
-void toggleChannelsMaxView(int channelIndex); // channelIndex starts from 1
+void setChannelsMaxView(int slotIndex); // slotIndex starts from 1
+void toggleChannelsMaxView(int slotIndex); // slotIndex starts from 1
 
 void loadChannelCalibration(Channel &channel);
 bool saveChannelCalibration(Channel &channel);

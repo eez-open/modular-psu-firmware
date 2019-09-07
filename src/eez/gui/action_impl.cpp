@@ -989,14 +989,7 @@ static int g_slotIndex;
 void onSetModuleType(uint8_t moduleType) {
     popPage();
 
-    int slotIndex = g_slotIndex;
-
-    // write module type to EEPROM so it remembers after restart
-    uint8_t buffer[] = {
-        (uint8_t)(g_modules[moduleType].moduleId & 0xFF),
-        (uint8_t)((g_modules[moduleType].moduleId >> 8) & 0xFF),
-    };
-    dcpX05::eeprom::write(slotIndex, buffer, 2, 0);
+    dcpX05::eeprom::writeModuleType(g_slotIndex, moduleType);
 
 #ifdef __EMSCRIPTEN__
     infoMessage("Reload page to apply change!");

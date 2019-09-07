@@ -54,7 +54,7 @@ bool TempSensor::isInstalled() {
 #else
         return false;
 #endif
-    } else if (type >= CH1 && type <= CH3) {
+    } else if (type >= CH1 && type <= CH6) {
     	// if (Channel::get(type - CH1).boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {
     	// 	return false;
     	// }
@@ -66,7 +66,7 @@ bool TempSensor::isInstalled() {
 }
 
 Channel *TempSensor::getChannel() {
-    if (type >= CH1 && type <= CH3) {
+    if (type >= CH1 && type <= CH6) {
         return &Channel::getBySlotIndex(type - CH1);
     }
     return NULL;
@@ -85,7 +85,7 @@ float TempSensor::doRead() {
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
-    if (type >= CH1 && type <= CH3) {
+    if (type >= CH1 && type <= CH6) {
         int slotIndex = type - CH1;
         if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
             if (Channel::get(slotIndex).boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {

@@ -98,7 +98,8 @@ bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t addr
     char *filePath = getConfFilePath(fileName);
     FILE *fp = fopen(filePath, "r+b");
     if (fp == NULL) {
-        fp = fopen(filePath, "w+b");
+        writeModuleType(slotIndex, MODULE_TYPE_DCP405);
+        fp = fopen(filePath, "r+b");
     }
     
     if (fp == NULL) {
@@ -208,6 +209,14 @@ bool test() {
     }
 
     return g_testResult != TEST_FAILED;
+}
+
+void writeModuleType(uint8_t slotIndex, uint8_t moduleType) {
+    uint8_t buffer[] = {
+        (uint8_t)(g_modules[moduleType].moduleId & 0xFF),
+        (uint8_t)((g_modules[moduleType].moduleId >> 8) & 0xFF),
+    };
+    dcpX05::eeprom::write(slotIndex, buffer, 2, 0);
 }
 
 } // namespace eeprom

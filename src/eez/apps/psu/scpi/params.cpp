@@ -29,7 +29,7 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_choice_def_t channel_choice[] = {
-    { "CH1", 1 }, { "CH2", 2 }, { "CH3", 3 }, SCPI_CHOICE_LIST_END /* termination of option list */
+    { "CH1", 1 }, { "CH2", 2 }, { "CH3", 3 }, { "CH4", 4 }, { "CH5", 5 }, { "CH6", 6 }, SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
 #define TEMP_SENSOR(NAME, QUES_REG_BIT, SCPI_ERROR) { #NAME, temp_sensor::NAME }
