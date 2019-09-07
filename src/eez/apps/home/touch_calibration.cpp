@@ -64,8 +64,12 @@ void startCalibration() {
 void leaveCalibrationMode() {
 	showPage(g_nextPageId);
 
+    if (g_nextPageId == PAGE_ID_SYS_SETTINGS_DISPLAY) {
+        infoMessage("Touch screen is calibrated.");
+    }
+
     Channel::restoreOE();
-}
+}   
 
 void dialogYes() {
     persist_conf::devConf.touch_screen_cal_tlx = g_points[0].x;
