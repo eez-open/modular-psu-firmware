@@ -25,7 +25,7 @@ namespace psu {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-IOExpander::IOExpander(Channel &channel_) : channel(channel_) {
+IOExpander::IOExpander() {
     gpio = 0B0000000100000000; // 5A
 }
 
@@ -33,12 +33,15 @@ void IOExpander::init() {
 }
 
 bool IOExpander::test() {
+    Channel &channel = Channel::get(channelIndex);
     g_testResult = TEST_OK;
     channel.flags.powerOk = 1;
     return g_testResult != TEST_FAILED;
 }
 
 void IOExpander::tick(uint32_t tick_usec) {
+    Channel &channel = Channel::get(channelIndex);
+
     if (simulator::getPwrgood(channel.channelIndex)) {
         gpio |= 1 << IOExpander::IO_BIT_IN_PWRGOOD;
     } else {

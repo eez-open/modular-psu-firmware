@@ -43,14 +43,13 @@ static const uint8_t ADC_REG3_VAL = 0B00000000;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-AnalogDigitalConverter::AnalogDigitalConverter(Channel &channel_) : channel(channel_) {
-}
-
 uint8_t AnalogDigitalConverter::getReg1Val() {
     return (ADC_SPS << 5) | 0B00000000;
 }
 
 void AnalogDigitalConverter::init() {
+    Channel &channel = Channel::get(channelIndex);
+
     uint8_t data[4];
     uint8_t result[4];
 
@@ -72,6 +71,8 @@ void AnalogDigitalConverter::init() {
 }
 
 bool AnalogDigitalConverter::test() {
+    Channel &channel = Channel::get(channelIndex);
+
     uint8_t data[4];
     uint8_t result[4];
 
@@ -114,6 +115,7 @@ bool AnalogDigitalConverter::test() {
 
 void AnalogDigitalConverter::tick(uint32_t tick_usec) {
     if (start_reg0) {
+        Channel &channel = Channel::get(channelIndex);
     	if (channel.ioexp.isAdcReady()) {
 			int16_t adc_data = read();
 			channel.eventAdcData(adc_data);
@@ -135,6 +137,7 @@ void AnalogDigitalConverter::start(uint8_t reg0) {
         data[1] = start_reg0;
         data[2] = ADC_START;
 
+        Channel &channel = Channel::get(channelIndex);
         spi::select(channel.slotIndex, spi::CHIP_ADC);
         spi::transfer(channel.slotIndex, data, result, 3);
         spi::deselect(channel.slotIndex);
@@ -149,6 +152,7 @@ int16_t AnalogDigitalConverter::read() {
     data[1] = 0;
     data[2] = 0;
 
+    Channel &channel = Channel::get(channelIndex);
     spi::select(channel.slotIndex, spi::CHIP_ADC);
     spi::transfer(channel.slotIndex, data, result, 3);
     spi::deselect(channel.slotIndex);
@@ -169,6 +173,7 @@ void AnalogDigitalConverter::readAllRegisters(uint8_t registers[]) {
     data[3] = 0;
     data[4] = 0;
 
+    Channel &channel = Channel::get(channelIndex);
     spi::select(channel.slotIndex, spi::CHIP_ADC);
     spi::transfer(channel.slotIndex, data, result, 5);
     spi::deselect(channel.slotIndex);

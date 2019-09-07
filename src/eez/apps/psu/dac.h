@@ -26,10 +26,8 @@ class Channel;
 /// Digital to analog converter HW used by the channel.
 class DigitalAnalogConverter {
   public:
-
+    uint8_t channelIndex;
     TestResult g_testResult;
-
-    DigitalAnalogConverter(Channel &channel);
 
     void init();
     bool test();
@@ -45,7 +43,6 @@ class DigitalAnalogConverter {
     }
 
   private:
-    Channel &channel;
     bool m_testing;
 
     void set(uint8_t buffer, uint16_t value);

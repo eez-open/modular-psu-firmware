@@ -62,10 +62,11 @@ class IOExpander {
     static const uint8_t DCP405_IO_BIT_OUT_OVP_LE = 13;
     static const uint8_t DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED = 14;
     static const uint8_t DCP405_IO_BIT_OUT_OE_COUPLED_LED = 15;
-    
+
+    uint8_t channelIndex;
     TestResult g_testResult;
 
-    IOExpander(Channel &channel);
+    IOExpander();
 
     void init();
     bool test();
@@ -82,8 +83,6 @@ class IOExpander {
     uint16_t gpio;
 
   private:
-    Channel &channel;
-
     uint16_t gpioWritten;
     uint16_t gpioOutputPinsMask;
 

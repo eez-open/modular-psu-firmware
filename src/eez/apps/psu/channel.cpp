@@ -280,11 +280,7 @@ float Channel::Simulator::getVoltProgExt() {
 ////////////////////////////////////////////////////////////////////////////////
 
 Channel::Channel()
-    : channelIndex(0)
-    , ioexp(*this)
-    , adc(*this)
-    , dac(*this)
-    , onTimeCounter(1)
+    : channelIndex(0), onTimeCounter(1)
 {
 }
 
@@ -295,7 +291,7 @@ void Channel::set(uint8_t slotIndex_, uint8_t subchannelIndex_, uint8_t boardRev
 
     reset();
 
-    auto params = CH_BOARD_REVISION_PARAMS[boardRevision];
+    auto &params = CH_BOARD_REVISION_PARAMS[boardRevision];
 
     U_MIN = params.U_MIN;
     U_DEF = params.U_DEF;
@@ -384,6 +380,13 @@ void Channel::set(uint8_t slotIndex_, uint8_t subchannelIndex_, uint8_t boardRev
 
     flags.cvMode = 0;
     flags.ccMode = 0;
+}
+
+void Channel::setChannelIndex(uint8_t channelIndex_) {
+    channelIndex = channelIndex_;
+    adc.channelIndex = channelIndex_;
+    dac.channelIndex = channelIndex_;
+    ioexp.channelIndex = channelIndex_;
 }
 
 int Channel::reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionValue &cpv) {

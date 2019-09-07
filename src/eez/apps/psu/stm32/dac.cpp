@@ -38,15 +38,12 @@ static const uint16_t DAC_MAX = (1L << DAC_RES) - 1;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-DigitalAnalogConverter::DigitalAnalogConverter(Channel &channel_) : channel(channel_) {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void DigitalAnalogConverter::init() {
 }
 
 bool DigitalAnalogConverter::test() {
+    Channel &channel = Channel::get(channelIndex);
+
 	g_testResult = TEST_OK;
 
 	// if (channel.ioexp.g_testResult != TEST_OK) {
@@ -134,10 +131,12 @@ bool DigitalAnalogConverter::test() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void DigitalAnalogConverter::set_voltage(float value) {
+    Channel &channel = Channel::get(channelIndex);
     set(DATA_BUFFER_B, remap(value, channel.U_MIN, (float)DAC_MIN, channel.U_MAX, (float)DAC_MAX));
 }
 
 void DigitalAnalogConverter::set_current(float value) {
+    Channel &channel = Channel::get(channelIndex);
     if (channel.boardRevision == CH_BOARD_REVISION_DCP505_R1B3) {
         if (value <= 0.05f) {
             set(DATA_BUFFER_A, remap(value, 0, 0, 0.05f, 65535/3));
@@ -177,6 +176,7 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value) {
     data[1] = value >> 8;
     data[2] = value & 0xFF;
 
+    Channel &channel = Channel::get(channelIndex);
     spi::select(channel.slotIndex, spi::CHIP_DAC);
     spi::transfer(channel.slotIndex, data, result, 3);
     spi::deselect(channel.slotIndex);

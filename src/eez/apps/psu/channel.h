@@ -359,6 +359,8 @@ class Channel {
 
     void set(uint8_t slotIndex, uint8_t subchannelIndex, uint8_t boardRevision);
 
+    void setChannelIndex(uint8_t channelIndex);
+
     /// Initialize channel and underlying hardware.
     /// Makes a required tests, for example ADC, DAC and IO Expander tests.
     void init();

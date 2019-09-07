@@ -44,10 +44,9 @@ class AnalogDigitalConverter {
     static const uint8_t ADC_REG0_READ_U_SET = 0xA1; // B10100001: [7:4] AINP = AIN2, AINN = AVSS, [3:1] Gain = 1, [0] PGA disabled and bypassed
     static const uint8_t ADC_REG0_READ_I_MON = 0xB1; // B10110001: [7:4] AINP = AIN3, AINN = AVSS, [3:1] Gain = 1, [0] PGA disabled and bypassed
 
+    uint8_t channelIndex;
     TestResult g_testResult;
     uint8_t start_reg0;
-
-    AnalogDigitalConverter(Channel &channel);
 
     void init();
     bool test();
@@ -60,7 +59,6 @@ class AnalogDigitalConverter {
     void readAllRegisters(uint8_t registers[]);
 
   private:
-    Channel &channel;
     uint32_t start_time;
 
     uint8_t getReg1Val();

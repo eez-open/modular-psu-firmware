@@ -38,11 +38,6 @@ extern uint16_t g_iSet[CH_MAX];
 
 ////////////////////////////////////////////////////////////////////////////////
 
-DigitalAnalogConverter::DigitalAnalogConverter(Channel &channel_) : channel(channel_) {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void DigitalAnalogConverter::init() {
 }
 
@@ -54,10 +49,12 @@ bool DigitalAnalogConverter::test() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void DigitalAnalogConverter::set_voltage(float value) {
+    Channel &channel = Channel::get(channelIndex);
     set(DATA_BUFFER_A, remap(value, channel.U_MIN, (float)DAC_MIN, channel.U_MAX, (float)DAC_MAX));
 }
 
 void DigitalAnalogConverter::set_current(float value) {
+    Channel &channel = Channel::get(channelIndex);
     set(DATA_BUFFER_B, remap(value, channel.I_MIN, (float)DAC_MIN, channel.getDualRangeMax(), (float)DAC_MAX));
 }
 
@@ -72,6 +69,8 @@ void DigitalAnalogConverter::set_current(uint16_t current) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value) {
+    Channel &channel = Channel::get(channelIndex);
+
     if (buffer == DATA_BUFFER_A) {
         float adcValue = remap(value, DAC_MIN, AnalogDigitalConverter::ADC_MIN, DAC_MAX, AnalogDigitalConverter::ADC_MAX);
         g_uSet[channel.channelIndex] = (uint16_t)clamp(adcValue, AnalogDigitalConverter::ADC_MIN, AnalogDigitalConverter::ADC_MAX);

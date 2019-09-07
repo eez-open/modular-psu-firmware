@@ -99,10 +99,9 @@ static const uint8_t REG_VALUES[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-IOExpander::IOExpander(Channel &channel_) : channel(channel_) {
-}
-
 void IOExpander::init() {
+    Channel &channel = Channel::get(channelIndex);
+
     gpioOutputPinsMask = 
         (1 << IO_BIT_OUT_DP_ENABLE) | 
         (1 << IO_BIT_OUT_OUTPUT_ENABLE) | 
@@ -156,6 +155,8 @@ void IOExpander::init() {
 }
 
 bool IOExpander::test() {
+    Channel &channel = Channel::get(channelIndex);
+
     channel.flags.powerOk = 1;
 
     const uint8_t N_REGS = sizeof(REG_VALUES) / 3;
@@ -208,6 +209,8 @@ bool IOExpander::test() {
 }
 
 void IOExpander::reinit() {
+    Channel &channel = Channel::get(channelIndex);
+
     const uint8_t N_REGS = sizeof(REG_VALUES) / 3;
     for (int i = 0; i < N_REGS; i++) {
     	uint8_t reg = REG_VALUES[3 * i];
@@ -236,6 +239,8 @@ void IOExpander::reinit() {
 }
 
 void IOExpander::tick(uint32_t tick_usec) {
+    Channel &channel = Channel::get(channelIndex);
+
 	readGpio();
 
     uint8_t iodira = read(REG_IODIRA);
@@ -253,6 +258,8 @@ void IOExpander::tick(uint32_t tick_usec) {
 }
 
 int IOExpander::getBitDirection(int bit) {
+    Channel &channel = Channel::get(channelIndex);
+
     uint8_t dir;
     if (bit < 8) {
         dir = g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_REG_VALUE_IODIRA : DCP505_REG_VALUE_IODIRA;
@@ -268,6 +275,7 @@ bool IOExpander::testBit(int io_bit) {
 }
 
 bool IOExpander::isAdcReady() {
+    Channel &channel = Channel::get(channelIndex);
     // ready = !HAL_GPIO_ReadPin(SPI2_IRQ_GPIO_Port, SPI2_IRQ_Pin);
     return !testBit(g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_IO_BIT_IN_ADC_DRDY : DCP505_IO_BIT_IN_ADC_DRDY);
 }
@@ -303,6 +311,8 @@ void IOExpander::readGpio() {
 }
 
 uint8_t IOExpander::read(uint8_t reg) {
+    Channel &channel = Channel::get(channelIndex);
+
     uint8_t data[3];
     data[0] = IOEXP_READ;
     data[1] = reg;
@@ -317,6 +327,8 @@ uint8_t IOExpander::read(uint8_t reg) {
 }
 
 void IOExpander::write(uint8_t reg, uint8_t val) {
+    Channel &channel = Channel::get(channelIndex);
+
     uint8_t data[3];
     data[0] = IOEXP_WRITE;
     data[1] = reg;
