@@ -28,6 +28,7 @@ namespace gui {
 void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     auto savedCurrentState = widgetCursor.currentState;
     auto savedPreviousState = widgetCursor.previousState;
+    auto cursor = widgetCursor.cursor;
 
     const LayoutViewWidgetSpecific *layoutViewSpecific = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const LayoutViewWidgetSpecific *);
 
@@ -56,6 +57,7 @@ void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callb
 		enumContainer(widgetCursor, callback, layoutSpecific->widgets);
 	}
 
+    widgetCursor.cursor = cursor;
     widgetCursor.currentState = savedCurrentState;
     widgetCursor.previousState = savedPreviousState;
 }

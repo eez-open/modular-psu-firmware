@@ -169,6 +169,8 @@ bool setValue(float floatValue) {
     return true;
 }
 
+#define NUM_PARTS 12
+
 int getInfoTextPartIndex(data::Cursor &cursor, uint16_t dataId) {
     int dataIdIndex;
     
@@ -178,29 +180,33 @@ int getInfoTextPartIndex(data::Cursor &cursor, uint16_t dataId) {
         dataIdIndex = 1;
     } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT) {
         dataIdIndex = 2;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT) {
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OVP_DELAY) {
         dataIdIndex = 3;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT) {
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT) {
         dataIdIndex = 4;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL) {
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OCP_DELAY) {
         dataIdIndex = 5;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY) {
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT) {
         dataIdIndex = 6;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL) {
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL) {
         dataIdIndex = 7;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY) {
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY) {
         dataIdIndex = 8;
-    } else {
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL) {
         dataIdIndex = 9;
+    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY) {
+        dataIdIndex = 10;
+    } else {
+        dataIdIndex = 11;
     }
 
-    return g_focusCursor.i * 10 + dataIdIndex;
+    return g_focusCursor.i * NUM_PARTS + dataIdIndex;
 }
 
 void getInfoText(int partIndex, char *infoText) {
-    int iChannel = partIndex / 10;
+    int iChannel = partIndex / NUM_PARTS;
 
-    int dataIdIndex = partIndex % 10;
+    int dataIdIndex = partIndex % NUM_PARTS;
 
     int dataId;
     const char *dataName;
@@ -218,26 +224,34 @@ void getInfoText(int partIndex, char *infoText) {
         dataName = "OVP Limit";
         unitName = "V";
     } else if (dataIdIndex == 3) {
+        dataId = DATA_ID_CHANNEL_PROTECTION_OVP_DELAY;
+        dataName = "OVP Delay";
+        unitName = "s";
+    } else if (dataIdIndex == 4) {
         dataId = DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT;
         dataName = "OCP Limit";
         unitName = "A";
-    } else if (dataIdIndex == 4) {
+    } else if (dataIdIndex == 5) {
+        dataId = DATA_ID_CHANNEL_PROTECTION_OCP_DELAY;
+        dataName = "OCP Delay";
+        unitName = "s";
+    } else if (dataIdIndex == 6) {
         dataId = DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT;
         dataName = "OPP Limit";
         unitName = "W";
-    } else if (dataIdIndex == 5) {
+    } else if (dataIdIndex == 7) {
         dataId = DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL;
         dataName = "OPP Level";
         unitName = "W";
-    } else if (dataIdIndex == 6) {
+    } else if (dataIdIndex == 8) {
         dataId = DATA_ID_CHANNEL_PROTECTION_OPP_DELAY;
         dataName = "OPP Delay";
         unitName = "s";
-    } else if (dataIdIndex == 7) {
+    } else if (dataIdIndex == 9) {
         dataId = DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL;
         dataName = "OTP Level";
         unitName = "oC";
-    } else if (dataIdIndex == 8) {
+    } else if (dataIdIndex == 10) {
         dataId = DATA_ID_CHANNEL_PROTECTION_OTP_DELAY;
         dataName = "OTP Delay";
         unitName = "s";

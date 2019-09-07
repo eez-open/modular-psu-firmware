@@ -1087,28 +1087,29 @@ int getDefaultView(int channelIndex) {
     Channel &channel = Channel::get(channelIndex);
     if (channel.isInstalled()) {
         if (channel.isOk()) {
-            if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 || g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP505) {
+            int numChannels = g_modules[g_slots[channel.slotIndex].moduleType].numChannels;
+            if (numChannels == 1) {
                 if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
-                    return channel.isOutputEnabled() ? PAGE_ID_DCP405_NUM_DEFAULT_ON : PAGE_ID_DCP405_VERT_DEFAULT_OFF;
+                    return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_NUM_ON : PAGE_ID_SLOT_DEF_1CH_VERT_OFF;
                 } else if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
-                    return channel.isOutputEnabled() ? PAGE_ID_DCP405_VBAR_DEFAULT_ON : PAGE_ID_DCP405_VERT_DEFAULT_OFF;
+                    return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_VBAR_ON : PAGE_ID_SLOT_DEF_1CH_VERT_OFF;
                 } else if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
-                    return channel.isOutputEnabled() ? PAGE_ID_DCP405_HBAR_DEFAULT_ON : PAGE_ID_DCP405_HORZ_DEFAULT_OFF;
+                    return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_HBAR_ON : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF;
                 } else if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_YT) {
-                    return channel.isOutputEnabled() ? PAGE_ID_DCP405_YT_DEFAULT_ON : PAGE_ID_DCP405_HORZ_DEFAULT_OFF;
+                    return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_YT_ON : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF;
                 } else {
-                    return isVert ? PAGE_ID_SLOT_VERT_DEFAULT_ERROR : PAGE_ID_SLOT_HORZ_DEFAULT_ERROR;
+                    return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
                 }
-            } else if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCM220) {
-                return isVert ? PAGE_ID_DCM220_VERT_DEFAULT : PAGE_ID_DCM220_HORZ_DEFAULT;
+            } else if (numChannels == 2) {
+                return isVert ? PAGE_ID_SLOT_DEF_2CH_VERT : PAGE_ID_SLOT_DEF_2CH_HORZ;
             } else {
-                return isVert ? PAGE_ID_SLOT_VERT_DEFAULT_ERROR : PAGE_ID_SLOT_HORZ_DEFAULT_ERROR;
+                return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
             }
         } else {
-            return isVert ? PAGE_ID_SLOT_VERT_DEFAULT_ERROR : PAGE_ID_SLOT_HORZ_DEFAULT_ERROR;
+            return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
         }
     } else {
-        return isVert ? PAGE_ID_SLOT_VERT_DEFAULT_NOT_INSTALLED : PAGE_ID_SLOT_HORZ_DEFAULT_NOT_INSTALLED;
+        return isVert ? PAGE_ID_SLOT_DEF_VERT_NOT_INSTALLED : PAGE_ID_SLOT_DEF_HORZ_NOT_INSTALLED;
     }
 }
 
@@ -1163,26 +1164,27 @@ void data_slot_max_view(data::DataOperationEnum operation, data::Cursor &cursor,
         Channel &channel = Channel::getBySlotIndex(cursor.i);
         if (channel.isInstalled()) {
             if (channel.isOk()) {
-                if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 || g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP505) {
+                int numChannels = g_modules[g_slots[channel.slotIndex].moduleType].numChannels;
+                if (numChannels == 1) {
                     if (persist_conf::devConf.flags.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
-                        value = channel.isOutputEnabled() ? PAGE_ID_DCP405_NUM_MAX_ON : PAGE_ID_DCP405_NUM_MAX_OFF;
+                        value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_NUM_ON : PAGE_ID_SLOT_MAX_1CH_NUM_OFF;
                     } else if (persist_conf::devConf.flags.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
-                        value = channel.isOutputEnabled() ? PAGE_ID_DCP405_HBAR_MAX_ON : PAGE_ID_DCP405_HBAR_MAX_OFF;
+                        value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_HBAR_ON : PAGE_ID_SLOT_MAX_1CH_HBAR_OFF;
                     } else if (persist_conf::devConf.flags.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT) {
-                        value = channel.isOutputEnabled() ? PAGE_ID_DCP405_YT_MAX_ON : PAGE_ID_DCP405_YT_MAX_OFF;
+                        value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_YT_ON : PAGE_ID_SLOT_MAX_1CH_YT_OFF;
                     } else {
-                        value = PAGE_ID_SLOT_ALL_MAX_ERROR;
+                        value = PAGE_ID_SLOT_MAX_ERROR;
                     }
-                } else if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCM220) {
-                    value = PAGE_ID_DCM220_ALL_MAX;
+                } else if (numChannels == 2) {
+                    value = PAGE_ID_SLOT_MAX_2CH;
                 } else {
-                    value = PAGE_ID_SLOT_ALL_MAX_ERROR;
+                    value = PAGE_ID_SLOT_MAX_ERROR;
                 }
             } else {
-                value = PAGE_ID_SLOT_ALL_MAX_ERROR;
+                value = PAGE_ID_SLOT_MAX_ERROR;
             }
         } else {
-            value = PAGE_ID_SLOT_ALL_MAX_NOT_INSTALLED;
+            value = PAGE_ID_SLOT_MAX_NOT_INSTALLED;
         }
     }
 }
@@ -1191,18 +1193,19 @@ int getMinView(int channelIndex) {
     Channel &channel = Channel::get(channelIndex);
     if (channel.isInstalled()) {
         if (channel.isOk()) {
-            if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 || g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP505) {
-                return channel.isOutputEnabled() ? PAGE_ID_DCP405_ALL_MIN_ON : PAGE_ID_DCP405_ALL_MIN_OFF;
-            } else if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCM220) {
-                return PAGE_ID_DCM220_ALL_MIN;
+            int numChannels = g_modules[g_slots[channel.slotIndex].moduleType].numChannels;
+            if (numChannels == 1) {
+                return channel.isOutputEnabled() ? PAGE_ID_SLOT_MIN_1CH_ON : PAGE_ID_SLOT_MIN_1CH_OFF;
+            } else if (numChannels == 2) {
+                return PAGE_ID_SLOT_MIN_2CH;
             } else {
-                return PAGE_ID_SLOT_ALL_MIN_ERROR;
+                return PAGE_ID_SLOT_MIN_ERROR;
             }
         } else {
-            return PAGE_ID_SLOT_ALL_MIN_ERROR;
+            return PAGE_ID_SLOT_MIN_ERROR;
         }
     } else {
-        return PAGE_ID_SLOT_ALL_MIN_NOT_INSTALLED;
+        return PAGE_ID_SLOT_MIN_NOT_INSTALLED;
     }
 }
 
@@ -1236,18 +1239,19 @@ int getMicroView(int channelIndex) {
     Channel &channel = Channel::get(channelIndex);
     if (channel.isInstalled()) {
         if (channel.isOk()) {
-            if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 || g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP505) {
-                return channel.isOutputEnabled() ? PAGE_ID_DCP405_ALL_MICRO_ON : PAGE_ID_DCP405_ALL_MICRO_OFF;
-            } else if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCM220) {
-                return PAGE_ID_DCM220_ALL_MICRO;
+            int numChannels = g_modules[g_slots[channel.slotIndex].moduleType].numChannels;
+            if (numChannels == 1) {
+                return channel.isOutputEnabled() ? PAGE_ID_SLOT_MICRO_1CH_ON : PAGE_ID_SLOT_MICRO_1CH_OFF;
+            } else if (numChannels == 2) {
+                return PAGE_ID_SLOT_MICRO_2CH;
             } else {
-                return PAGE_ID_SLOT_ALL_MICRO_ERROR;
+                return PAGE_ID_SLOT_MICRO_ERROR;
             }
         } else {
-            return PAGE_ID_SLOT_ALL_MICRO_ERROR;
+            return PAGE_ID_SLOT_MICRO_ERROR;
         }
     } else {
-        return PAGE_ID_SLOT_ALL_MICRO_NOT_INSTALLED;
+        return PAGE_ID_SLOT_MICRO_NOT_INSTALLED;
     }
 }
 
@@ -1269,46 +1273,46 @@ void data_slot_micro3_view(data::DataOperationEnum operation, data::Cursor &curs
     }
 }
 
-void data_dcm220_ch1_context(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_slot_2ch_ch1_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
         // cursor.i = cursor.i;
     }
 }
 
-void data_dcm220_ch2_context(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_slot_2ch_ch2_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
         cursor.i = cursor.i + 1;
     }
 }
 
-void data_dcm220_default_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_slot_def_2ch_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor.i);
         int isVert = persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
         value = channel.isOutputEnabled() ? 
-            (isVert ? PAGE_ID_DCM220_VERT_DEFAULT_ON : PAGE_ID_DCM220_HORZ_DEFAULT_ON) : 
-            (isVert ? PAGE_ID_DCM220_VERT_DEFAULT_OFF : PAGE_ID_DCM220_HORZ_DEFAULT_OFF);
+            (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_ON : PAGE_ID_SLOT_DEF_2CH_HORZ_ON) :
+            (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_OFF : PAGE_ID_SLOT_DEF_2CH_HORZ_OFF);
     }
 }
 
-void data_dcm220_max_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_slot_max_2ch_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor.i);
-        value = channel.isOutputEnabled() ? PAGE_ID_DCM220_ALL_MAX_ON : PAGE_ID_DCM220_ALL_MAX_OFF;
+        value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_2CH_ON : PAGE_ID_SLOT_MAX_2CH_OFF;
     }
 }
 
-void data_dcm220_min_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_slot_min_2ch_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor.i);
-        value = channel.isOutputEnabled() ? PAGE_ID_DCM220_ALL_MIN_ON : PAGE_ID_DCM220_ALL_MIN_OFF;
+        value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MIN_2CH_ON : PAGE_ID_SLOT_MIN_2CH_OFF;
     }
 }
 
-void data_dcm220_micro_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_slot_micro_2ch_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor.i);
-        value = channel.isOutputEnabled() ? PAGE_ID_DCM220_ALL_MICRO_ON : PAGE_ID_DCM220_ALL_MICRO_OFF;
+        value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MICRO_2CH_ON : PAGE_ID_SLOT_MICRO_2CH_OFF;
     }
 }
 
@@ -1909,11 +1913,26 @@ void data_channel_protection_ovp_level(data::DataOperationEnum operation, data::
 }
 
 void data_channel_protection_ovp_delay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+    Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
         if (page) {
             value = page->delay;
+        } else {
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_DELAY;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else {
+                value = MakeValue(channel.prot_conf.u_delay, UNIT_SECOND);
+            }
         }
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = MakeValue(channel.OVP_MIN_DELAY, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = MakeValue(channel.OVP_MAX_DELAY, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_SET) {
+        channel_dispatcher::setOvpParameters(channel, channel.prot_conf.flags.u_state ? 1 : 0, channel_dispatcher::getUProtectionLevel(channel), value.getFloat());
     }
 }
 
@@ -1951,11 +1970,26 @@ void data_channel_protection_ocp_state(data::DataOperationEnum operation, data::
 }
 
 void data_channel_protection_ocp_delay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+    Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OCP);
         if (page) {
             value = page->delay;
+        } else {
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OCP_DELAY;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else {
+                value = MakeValue(channel.prot_conf.i_delay, UNIT_SECOND);
+            }
         }
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = MakeValue(channel.OCP_MIN_DELAY, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = MakeValue(channel.OCP_MAX_DELAY, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_SET) {
+        channel_dispatcher::setOcpParameters(channel, channel.prot_conf.flags.i_state ? 1 : 0, value.getFloat());
     }
 }
 
@@ -2026,8 +2060,7 @@ void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        ChSettingsProtectionSetPage *page =
-            (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
+        ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
         if (page) {
             value = page->delay;
         } else {
@@ -3553,18 +3586,30 @@ void data_dlog_status(data::DataOperationEnum operation, data::Cursor &cursor, d
 
 void data_simulator_load_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 	if (operation == data::DATA_OPERATION_GET) {
-		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-		Channel &channel = Channel::get(iChannel);
+        Channel &channel = Channel::get(cursor.i);
 		value = channel.simulator.getLoadEnabled() ? 1 : 0;
 	}
 }
 
 void data_simulator_load(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 	if (operation == data::DATA_OPERATION_GET) {
-		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-		Channel &channel = Channel::get(iChannel);
+        Channel &channel = Channel::get(cursor.i);
 		value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
 	}
+}
+
+void data_simulator_load_state2(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor.i + 1);
+        value = channel.simulator.getLoadEnabled() ? 1 : 0;
+    }
+}
+
+void data_simulator_load2(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor.i + 1);
+        value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
+    }
 }
 
 #endif

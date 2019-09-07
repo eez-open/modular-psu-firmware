@@ -125,7 +125,7 @@ extern Channel channels[CH_MAX];
 
 void init() {
     for (int i = 0; i < CH_MAX; i++) {
-    	channels[i].channelIndex = i;
+    	channels[i].setChannelIndex(i);
     }
 
     sound::init();

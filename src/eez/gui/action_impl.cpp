@@ -855,26 +855,33 @@ void onSimulatorDisconnectLoad() {
 	channel_dispatcher::setLoadEnabled(*g_channel, false);
 }
 
+void selectSimulatorLoad() {
+    NumericKeypadOptions options;
+
+    options.pageId = PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD;
+
+    options.editValueUnit = UNIT_OHM;
+
+    options.min = 0;
+
+    options.flags.signButtonEnabled = false;
+    options.flags.dotButtonEnabled = true;
+    options.flags.option1ButtonEnabled = true;
+    options.option1ButtonText = "Off";
+    options.option1 = onSimulatorDisconnectLoad;
+
+    NumericKeypad::start(
+        0, MakeValue(g_channel->simulator.getLoad(), UNIT_OHM), options,
+        onSimulatorLoadSet, 0, 0);
+}
+
 void action_simulator_load() {
-	selectChannel();
-
-	NumericKeypadOptions options;
-
-	options.pageId = PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD;
-
-	options.editValueUnit = UNIT_OHM;
-
-	options.min = 0;
-
-	options.flags.signButtonEnabled = false;
-	options.flags.dotButtonEnabled = true;
-	options.flags.option1ButtonEnabled = true;
-	options.option1ButtonText = "Off";
-	options.option1 = onSimulatorDisconnectLoad;
-
-	NumericKeypad::start(
-		0, MakeValue(g_channel->simulator.getLoad(), UNIT_OHM), options,
-		onSimulatorLoadSet, 0, 0);
+    int channelIndex = getFoundWidgetAtDown().cursor.i;
+    if (getFoundWidgetAtDown().widget->data == DATA_ID_SIMULATOR_LOAD_STATE2) {
+        channelIndex++;
+    }
+    g_channel = &Channel::get(channelIndex);
+    selectSimulatorLoad();
 }
 
 #endif
@@ -991,45 +998,11 @@ void onSetModuleType(uint8_t moduleType) {
     };
     dcpX05::eeprom::write(slotIndex, buffer, 2, 0);
 
-    // hot module replacments is only possible on the simulator ;-)
-    uint8_t previousModuleType = g_slots[slotIndex].moduleType;
-    int channelIndex = Channel::getBySlotIndex(slotIndex).channelIndex;
-
-    if (g_modules[previousModuleType].numChannels != g_modules[moduleType].numChannels) {
-        // shift channels after channelIndex to the new location
-        int srcChannelIndex = channelIndex + g_modules[previousModuleType].numChannels;
-        int dstChannelIndex = channelIndex + g_modules[moduleType].numChannels;
-        int n = MIN(CH_MAX - srcChannelIndex, CH_MAX - dstChannelIndex);
-        if (g_modules[previousModuleType].numChannels > g_modules[moduleType].numChannels) {
-            // shift left
-            for (int i = 0; i < n; i++) {
-                Channel &srcChannel = Channel::get(srcChannelIndex + i);
-                Channel &dstChannel = Channel::get(dstChannelIndex + i);
-
-                memcpy(&dstChannel, &srcChannel, sizeof(dstChannel));
-                dstChannel.channelIndex = dstChannelIndex + i;
-            }
-        } else {
-            // shift right
-            for (int i = n - 1; i >= 0; i--) {
-                Channel &srcChannel = Channel::get(srcChannelIndex + i);
-                Channel &dstChannel = Channel::get(dstChannelIndex + i);
-
-                memcpy(&dstChannel, &srcChannel, sizeof(dstChannel));
-                dstChannel.channelIndex = dstChannelIndex + i;
-            }
-        }
-
-        CH_NUM += g_modules[moduleType].numChannels - g_modules[previousModuleType].numChannels;
-    }
-
-    // switch channel at channelIndex to the new module type
-    g_slots[slotIndex].moduleType = moduleType;
-    g_slots[slotIndex].boardRevision = g_modules[moduleType].lasestBoardRevision;
-
-    for (int subchannelIndex = 0; subchannelIndex < g_modules[moduleType].numChannels; subchannelIndex++) {
-        Channel::get(channelIndex++).set(slotIndex, subchannelIndex, g_slots[slotIndex].boardRevision);
-    }
+#ifdef __EMSCRIPTEN__
+    infoMessage("Reload page to apply change!");
+#else
+    infoMessage("Restart program to apply change!");
+#endif
 }
 
 void selectSlot(int slotIndex) {

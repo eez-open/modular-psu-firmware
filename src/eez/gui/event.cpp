@@ -65,7 +65,8 @@ bool isActiveWidget(const WidgetCursor &widgetCursor) {
         return true;
     }
 
-    return widgetCursor == m_activeWidget;
+    bool result = widgetCursor == m_activeWidget;
+    return result;
 }
 
 int getAction(const WidgetCursor &widgetCursor) {
