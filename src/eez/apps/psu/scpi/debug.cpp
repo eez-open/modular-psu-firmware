@@ -84,8 +84,9 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
 #ifdef DEBUG
     char buffer[768];
 
-    Channel::get(0).adcReadAll();
-    Channel::get(1).adcReadAll();
+    for (int i = 0; i < CH_MAX; i++) {
+        Channel::get(i).adcMeasureAll();
+    }
 
     debug::dumpVariables(buffer);
 
@@ -175,7 +176,7 @@ scpi_result_t scpi_cmd_debugVoltage(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    channel->dac.set_voltage((uint16_t)value);
+    channel->channelInterface->setDacVoltage(channel->subchannelIndex, (uint16_t)value);
 
     return SCPI_RES_OK;
 #else
@@ -197,7 +198,7 @@ scpi_result_t scpi_cmd_debugCurrent(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    channel->dac.set_current((uint16_t)value);
+    channel->channelInterface->setDacCurrent(channel->subchannelIndex, (uint16_t)value);
 
     return SCPI_RES_OK;
 #else
@@ -227,10 +228,7 @@ scpi_result_t scpi_cmd_debugMeasureVoltage(scpi_t *context) {
         temperature::tick(tickCount);
         fan::tick(tickCount);
 
-        channel->adc.start(AnalogDigitalConverter::ADC_REG0_READ_U_MON);
-        delayMicroseconds(2000);
-        int16_t adc_data = channel->adc.read();
-        channel->eventAdcData(adc_data, false);
+        channel->channelInterface->adcMeasureUMon(channel->subchannelIndex);
 
         Serial.print((int)debug::g_uMon[channel->channelIndex].get());
         Serial.print(" ");
@@ -271,10 +269,7 @@ scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
         temperature::tick(tickCount);
         fan::tick(tickCount);
 
-        channel->adc.start(AnalogDigitalConverter::ADC_REG0_READ_I_MON);
-        delayMicroseconds(2000);
-        int16_t adc_data = channel->adc.read();
-        channel->eventAdcData(adc_data, false);
+        channel->channelInterface->adcMeasureIMon(channel->subchannelIndex);
 
         Serial.print((int)debug::g_iMon[channel->channelIndex].get());
         Serial.print(" ");
@@ -376,6 +371,10 @@ scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     Channel *channel = &Channel::get(psu_context->selected_channel_index);
+    if (!channel->isInstalled()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
 
     int32_t bit;
     if (!SCPI_ParamInt(context, &bit, TRUE)) {
@@ -390,7 +389,8 @@ scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
     if (!SCPI_ParamInt(context, &direction, TRUE)) {
         return SCPI_RES_ERR;
     }
-    if (direction != channel->ioexp.getBitDirection(bit)) {
+
+    if (direction != channel->channelInterface->getIoExpBitDirection(channel->subchannelIndex, bit)) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }
@@ -400,7 +400,7 @@ scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    channel->ioexp.changeBit(bit, state);
+    channel->channelInterface->changeIoExpBit(channel->subchannelIndex, bit, state);
 
     return SCPI_RES_OK;
 #else
@@ -413,6 +413,10 @@ scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     Channel *channel = &Channel::get(psu_context->selected_channel_index);
+    if (!channel->isInstalled()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
 
     int32_t bit;
     if (!SCPI_ParamInt(context, &bit, TRUE)) {
@@ -427,12 +431,13 @@ scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
     if (!SCPI_ParamInt(context, &direction, TRUE)) {
         return SCPI_RES_ERR;
     }
-    if (direction != channel->ioexp.getBitDirection(bit)) {
+
+    if (direction != channel->channelInterface->getIoExpBitDirection(channel->subchannelIndex, bit)) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }
 
-    bool state = channel->ioexp.testBit(bit);
+    bool state = channel->channelInterface->testIoExpBit(channel->subchannelIndex, bit);
 
     SCPI_ResultBool(context, state);
 
@@ -696,9 +701,11 @@ void specDelayUs(uint32_t microseconds) {
 void masterSynchro(void) {
 	uint8_t txackbytes = SPI_MASTER_SYNBYTE, rxackbytes = 0x00;
 	do {
-	    spi::select(2, spi::CHIP_DCM220);
+	    taskENTER_CRITICAL();
+	    spi::selectA(2);
 	    spi::transfer(2, &txackbytes, &rxackbytes, 1);
-	    spi::deselect(2);
+	    spi::deselectA(2);
+	    taskEXIT_CRITICAL();
 	} while(rxackbytes != SPI_SLAVE_SYNBYTE);
 
 	while (HAL_GPIO_ReadPin(SPI5_IRQ_GPIO_Port, SPI5_IRQ_Pin) != GPIO_PIN_SET);
@@ -720,12 +727,7 @@ scpi_result_t scpi_cmd_debugDcm220Q(scpi_t *context) {
         }
     }
 
-//    int32_t delay;
-//    if (!SCPI_ParamInt(context, &delay, TRUE)) {
-//        return SCPI_RES_ERR;
-//    }
-
-    g_output[0] = (uint8_t)(cmd | 0x80);
+    g_output[0] = (uint8_t)(cmd | 0x40);
 	g_output[1] = (uint8_t)(param & 0xFF);
 	g_output[2] = (uint8_t)((param >> 8) & 0xFF);
 
@@ -734,6 +736,7 @@ scpi_result_t scpi_cmd_debugDcm220Q(scpi_t *context) {
 	}
 
     if (!g_synchronized) {
+    	spi::init(2, spi::CHIP_DCM220);
         masterSynchro();
     	g_synchronized = true;
     }
@@ -742,10 +745,11 @@ scpi_result_t scpi_cmd_debugDcm220Q(scpi_t *context) {
     	HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_RESET);
     }
 
-    spi::select(2, spi::CHIP_DCM220);
-    //specDelayUs(delay);
+    taskENTER_CRITICAL();
+    spi::selectA(2);
     spi::transfer(2, g_output, g_input, BUFFER_SIZE);
-    spi::deselect(2);
+    spi::deselectA(2);
+    taskEXIT_CRITICAL();
 
     if (cmd == 31) {
         HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);

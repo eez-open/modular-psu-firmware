@@ -254,8 +254,7 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateStepIncrement(scpi_t *context)
         return SCPI_RES_ERR;
     }
 
-    return set_step(context, &channel->i, channel->I_MIN_STEP, channel->I_MAX_STEP,
-                    channel->I_DEF_STEP, SCPI_UNIT_AMPER);
+    return set_step(context, &channel->i, channel->params->I_MIN_STEP, channel->params->I_MAX_STEP, channel->params->I_DEF_STEP, SCPI_UNIT_AMPER);
 }
 
 scpi_result_t scpi_cmd_sourceCurrentLevelImmediateStepIncrementQ(scpi_t *context) {
@@ -265,7 +264,7 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateStepIncrementQ(scpi_t *context
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_AMPER, channel->i.step, channel->I_DEF_STEP);
+    return get_source_value(context, *channel, UNIT_AMPER, channel->i.step, channel->params->I_DEF_STEP);
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrement(scpi_t *context) {
@@ -275,8 +274,7 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrement(scpi_t *context)
         return SCPI_RES_ERR;
     }
 
-    return set_step(context, &channel->u, channel->U_MIN_STEP, channel->U_MAX_STEP,
-                    channel->U_DEF_STEP, SCPI_UNIT_VOLT);
+    return set_step(context, &channel->u, channel->params->U_MIN_STEP, channel->params->U_MAX_STEP, channel->params->U_DEF_STEP, SCPI_UNIT_VOLT);
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrementQ(scpi_t *context) {
@@ -286,7 +284,7 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrementQ(scpi_t *context
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_VOLT, channel->u.step, channel->U_DEF_STEP);
+    return get_source_value(context, *channel, UNIT_VOLT, channel->u.step, channel->params->U_DEF_STEP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -299,8 +297,7 @@ scpi_result_t scpi_cmd_sourceCurrentProtectionDelayTime(scpi_t *context) {
     }
 
     float delay;
-    if (!get_duration_param(context, delay, channel->OCP_MIN_DELAY, channel->OCP_MAX_DELAY,
-                            channel->OCP_DEFAULT_DELAY)) {
+    if (!get_duration_param(context, delay, channel->params->OCP_MIN_DELAY, channel->params->OCP_MAX_DELAY, channel->params->OCP_DEFAULT_DELAY)) {
         return SCPI_RES_ERR;
     }
 
@@ -399,8 +396,7 @@ scpi_result_t scpi_cmd_sourcePowerProtectionDelayTime(scpi_t *context) {
     }
 
     float delay;
-    if (!get_duration_param(context, delay, channel->OPP_MIN_DELAY, channel->OPP_MAX_DELAY,
-                            channel->OPP_DEFAULT_DELAY)) {
+    if (!get_duration_param(context, delay, channel->params->OPP_MIN_DELAY, channel->params->OPP_MAX_DELAY, channel->params->OPP_DEFAULT_DELAY)) {
         return SCPI_RES_ERR;
     }
 
@@ -499,8 +495,7 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionDelayTime(scpi_t *context) {
     }
 
     float delay;
-    if (!get_duration_param(context, delay, channel->OVP_MIN_DELAY, channel->OVP_MAX_DELAY,
-                            channel->OVP_DEFAULT_DELAY)) {
+    if (!get_duration_param(context, delay, channel->params->OVP_MIN_DELAY, channel->params->OVP_MAX_DELAY, channel->params->OVP_DEFAULT_DELAY)) {
         return SCPI_RES_ERR;
     }
 

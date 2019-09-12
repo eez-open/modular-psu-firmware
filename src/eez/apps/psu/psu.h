@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 
+#include <eez/index.h>
 #include <eez/util.h>
 
 #include <eez/apps/psu/conf_all.h>
@@ -28,15 +29,6 @@
 
 /// Namespace for the everything from the EEZ.
 namespace eez {
-
-enum TestResult {
-    TEST_NONE,
-    TEST_FAILED, 
-    TEST_OK, 
-    TEST_CONNECTING, 
-    TEST_SKIPPED, 
-    TEST_WARNING 
-};
 
 extern TestResult g_masterTestResult;
 

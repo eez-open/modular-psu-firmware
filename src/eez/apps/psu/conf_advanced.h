@@ -68,9 +68,8 @@
 /// 0: 20 SPS, 1: 45 SPS, 2: 90 SPS, 3: 175 SPS, 4: 330 SPS, 5: 600 SPS, 6: 1000 SPS
 #define ADC_SPS 5
 
-/// Duration, in milliseconds, from the last ADC interrupt
-/// after which ADC timeout condition is declared.
-#define ADC_TIMEOUT_MS 60
+/// ADC conversion should be finished after ADC_CONVERSION_MAX_TIME_MS milliseconds.
+#define ADC_CONVERSION_MAX_TIME_MS 3
 
 /// Maximum number of attempts to recover from ADC timeout before giving up.
 #define MAX_ADC_TIMEOUT_RECOVERY_ATTEMPTS 3

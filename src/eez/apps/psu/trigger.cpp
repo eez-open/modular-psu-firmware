@@ -116,7 +116,7 @@ Source getSource() {
 }
 
 void setVoltage(Channel &channel, float value) {
-    value = roundPrec(value, channel.getVoltagePrecision());
+    value = roundPrec(value, channel.getVoltageResolution());
     g_levels[channel.channelIndex].u = value;
 }
 
@@ -125,7 +125,7 @@ float getVoltage(Channel &channel) {
 }
 
 void setCurrent(Channel &channel, float value) {
-    value = roundPrec(value, channel.getCurrentPrecision(value));
+    value = roundPrec(value, channel.getCurrentResolution(value));
     g_levels[channel.channelIndex].i = value;
 }
 

@@ -42,6 +42,7 @@ void tick(uint32_t tickCount);
 void onTrigger();
 void refresh();
 
+// When PSU is in inhibited state all outputs are disabled and execution of LIST on channels is stopped.
 bool isInhibited();
 
 void setDigitalOutputPinState(int pin, bool state);

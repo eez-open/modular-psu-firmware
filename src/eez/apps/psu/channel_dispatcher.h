@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <eez/apps/psu/dac.h>
-#include <eez/apps/psu/ioexp.h>
+#include <eez/modules/dcpx05/dac.h>
+#include <eez/modules/dcpx05/ioexp.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/apps/psu/temp_sensor.h>
-#include <eez/modules/psu/adc.h>
+#include <eez/modules/dcpx05/adc.h>
 
 namespace eez {
 namespace psu {
@@ -124,8 +124,7 @@ void setOtpState(int sensor, int state);
 void setOtpLevel(int sensor, float level);
 void setOtpDelay(int sensor, float delay);
 
-void setDisplayViewSettings(Channel &channel, int displayValue1, int displayValue2,
-                            float ytViewRate);
+void setDisplayViewSettings(Channel &channel, int displayValue1, int displayValue2, float ytViewRate);
 
 TriggerMode getVoltageTriggerMode(Channel &channel);
 void setVoltageTriggerMode(Channel &channel, TriggerMode mode);

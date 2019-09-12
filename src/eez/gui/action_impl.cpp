@@ -54,7 +54,7 @@
 #include <eez/index.h>
 #include <eez/scripting.h>
 
-#include <eez/modules/dcpX05/eeprom.h>
+#include <eez/modules/bp3c/eeprom.h>
 
 using namespace eez::gui;
 using namespace eez::psu;
@@ -990,7 +990,7 @@ static int g_slotIndex;
 void onSetModuleType(uint8_t moduleType) {
     popPage();
 
-    dcpX05::eeprom::writeModuleType(g_slotIndex, moduleType);
+    bp3c::eeprom::writeModuleType(g_slotIndex, moduleType);
 
 #ifdef __EMSCRIPTEN__
     infoMessage("Reload page to apply change!");

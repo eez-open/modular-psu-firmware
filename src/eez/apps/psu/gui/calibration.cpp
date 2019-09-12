@@ -288,9 +288,9 @@ void finishStop() {
 
     g_channel->outputEnable(false);
 
-    g_channel->prot_conf.flags.u_state = g_channel->OVP_DEFAULT_STATE;
-    g_channel->prot_conf.flags.i_state = g_channel->OCP_DEFAULT_STATE;
-    g_channel->prot_conf.flags.p_state = g_channel->OPP_DEFAULT_STATE;
+    g_channel->prot_conf.flags.u_state = g_channel->params->OVP_DEFAULT_STATE;
+    g_channel->prot_conf.flags.i_state = g_channel->params->OCP_DEFAULT_STATE;
+    g_channel->prot_conf.flags.p_state = g_channel->params->OPP_DEFAULT_STATE;
 
     (*g_stopCallback)();
 }

@@ -29,14 +29,14 @@
 #endif
 
 #include <eez/apps/psu/board.h>
-#include <eez/apps/psu/dac.h>
+#include <eez/modules/dcpx05/dac.h>
 #include <eez/apps/psu/datetime.h>
 #include <eez/apps/psu/eeprom.h>
-#include <eez/apps/psu/ioexp.h>
+#include <eez/modules/dcpx05/ioexp.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/apps/psu/rtc.h>
 #include <eez/apps/psu/temperature.h>
-#include <eez/modules/psu/adc.h>
+#include <eez/modules/dcpx05/adc.h>
 #include <eez/sound.h>
 
 #if OPTION_SD_CARD
@@ -64,7 +64,7 @@
 #include <eez/apps/psu/trigger.h>
 
 #include <eez/modules/bp3c/relays.h>
-#include <eez/modules/dcpX05/eeprom.h>
+#include <eez/modules/bp3c/eeprom.h>
 #include <eez/index.h>
 
 // TODO move this to some other place
@@ -121,11 +121,9 @@ void loadConf() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-extern Channel channels[CH_MAX];
-
 void init() {
     for (int i = 0; i < CH_MAX; i++) {
-    	channels[i].setChannelIndex(i);
+    	Channel::get(i).setChannelIndex(i);
     }
 
     sound::init();
@@ -141,18 +139,10 @@ void init() {
 
     // inst:memo ch1,0,2,406
 
-    // TODO remove this from here
-#if defined(EEZ_PLATFORM_STM32)
-    HAL_GPIO_WritePin(SPI5_CSA_GPIO_Port, SPI5_CSA_Pin, GPIO_PIN_SET);
-	WRITE_REG(hspi5.Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) |
-			SPI_BAUDRATEPRESCALER_8 |
-			SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
-#endif
-
     int channelIndex = 0;
-    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+    for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         uint16_t value;
-        if (!dcpX05::eeprom::read(slotIndex, (uint8_t *)&value, 2, (uint16_t)0)) {
+        if (!bp3c::eeprom::read(slotIndex, (uint8_t *)&value, 2, (uint16_t)0)) {
             g_slots[slotIndex].moduleType = MODULE_TYPE_NONE;
             g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_NONE;
         } else if (value == 405) {
@@ -172,8 +162,10 @@ void init() {
             g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_NONE;
         }
 
-        for (int subchannelIndex = 0; subchannelIndex < g_modules[g_slots[slotIndex].moduleType].numChannels; subchannelIndex++) {
-            channels[channelIndex++].set(slotIndex, subchannelIndex, g_slots[slotIndex].boardRevision);
+        g_slots[slotIndex].channelIndex = channelIndex;
+
+        for (uint8_t subchannelIndex = 0; subchannelIndex < g_modules[g_slots[slotIndex].moduleType].numChannels; subchannelIndex++) {
+            Channel::get(channelIndex++).set(slotIndex, subchannelIndex, g_slots[slotIndex].boardRevision);
         }
     }
     CH_NUM = channelIndex;

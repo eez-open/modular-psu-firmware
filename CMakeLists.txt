@@ -157,7 +157,6 @@ set(header_eez_apps_psu
     src/eez/apps/psu/conf_all.h
     src/eez/apps/psu/conf_channel.h
     src/eez/apps/psu/conf_user.h
-    src/eez/apps/psu/dac.h
     src/eez/apps/psu/datetime.h
     src/eez/apps/psu/debug.h
     src/eez/apps/psu/devices.h
@@ -169,7 +168,6 @@ set(header_eez_apps_psu
     src/eez/apps/psu/idle.h
     src/eez/apps/psu/init.h
     src/eez/apps/psu/io_pins.h
-    src/eez/apps/psu/ioexp.h
     src/eez/apps/psu/list_program.h
     src/eez/apps/psu/ntp.h
     src/eez/apps/psu/ontime.h
@@ -266,9 +264,7 @@ source_group("eez\\apps\\psu\\scpi" FILES ${src_eez_apps_psu_scpi} ${header_eez_
 
 set(src_eez_apps_psu_simulator
     src/eez/apps/psu/simulator/board.cpp
-    src/eez/apps/psu/simulator/dac.cpp
     src/eez/apps/psu/simulator/fan.cpp
-    src/eez/apps/psu/simulator/ioexp.cpp
     src/eez/apps/psu/simulator/psu.cpp
     src/eez/apps/psu/simulator/rtc.cpp
     src/eez/apps/psu/simulator/serial.cpp
@@ -403,24 +399,16 @@ list (APPEND header_files ${header_eez_libs_sd_fat})
 source_group("eez\\libs\\sd_fat" FILES ${src_eez_libs_sd_fat} ${header_eez_libs_sd_fat})
 
 set(src_eez_modules_bp3c
+    src/eez/modules/bp3c/eeprom.cpp
     src/eez/modules/bp3c/relays.cpp
 ) 
 list (APPEND src_files ${src_eez_modules_bp3c})
 set(header_eez_modules_bp3c
+    src/eez/modules/bp3c/eeprom.h
     src/eez/modules/bp3c/relays.h
 ) 
 list (APPEND header_files ${header_eez_modules_bp3c})
 source_group("eez\\modules\\bp3c" FILES ${src_eez_modules_bp3c} ${header_eez_modules_bp3c})
-
-set(src_eez_modules_dcpX05
-    src/eez/modules/dcpX05/eeprom.cpp
-) 
-list (APPEND src_files ${src_eez_modules_dcpX05})
-set(header_eez_modules_dcpX05
-    src/eez/modules/dcpX05/eeprom.h
-) 
-list (APPEND header_files ${header_eez_modules_dcpX05})
-source_group("eez\\modules\\dcpX05" FILES ${src_eez_modules_dcpX05} ${header_eez_modules_dcpX05})
 
 set(src_eez_modules_mcu
     src/eez/modules/mcu/display.cpp
@@ -444,11 +432,31 @@ set(src_eez_modules_mcu_simulator
 list (APPEND src_files ${src_eez_modules_mcu_simulator})
 source_group("eez\\modules\\mcu\\simulator" FILES ${src_eez_modules_mcu_simulator})
 
-set(src_eez_modules_psu_simulator
-    src/eez/modules/psu/simulator/adc.cpp
+set(src_eez_modules_dcpx05
+    src/eez/modules/dcpx05/adc.cpp
+    src/eez/modules/dcpx05/channel.cpp
+    src/eez/modules/dcpx05/dac.cpp
+    src/eez/modules/dcpx05/ioexp.cpp
 ) 
-source_group("eez\\modules\\psu\\simulator" FILES ${src_eez_modules_psu_simulator})
-list (APPEND src_files ${src_eez_modules_psu_simulator})
+list (APPEND src_files ${src_eez_modules_dcpx05})
+set(header_eez_modules_dcpx05
+    src/eez/modules/dcpx05/adc.h
+    src/eez/modules/dcpx05/channel.h
+    src/eez/modules/dcpx05/dac.h
+    src/eez/modules/dcpx05/ioexp.h
+) 
+list (APPEND header_files ${header_eez_modules_dcpx05})
+source_group("eez\\modules\\dcpx05" FILES ${src_eez_modules_dcpx05} ${header_eez_modules_dcpx05})
+
+set(src_eez_modules_dcm220
+    src/eez/modules/dcm220/channel.cpp
+) 
+list (APPEND src_files ${src_eez_modules_dcm220})
+set(header_eez_modules_dcm220
+    src/eez/modules/dcm220/channel.h
+) 
+list (APPEND header_files ${header_eez_modules_dcm220})
+source_group("eez\\modules\\dcm220" FILES ${src_eez_modules_dcm220} ${header_eez_modules_dcm220})
 
 set(src_eez_platform_simulator
     src/eez/platform/simulator/cmsis_os.cpp

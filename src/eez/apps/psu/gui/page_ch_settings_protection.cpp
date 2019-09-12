@@ -171,9 +171,9 @@ void ChSettingsOvpProtectionPage::pageAlloc() {
     defLevel = channel_dispatcher::getUMax(*g_channel);
 
     origDelay = delay = MakeValue(g_channel->prot_conf.u_delay, UNIT_SECOND);
-    minDelay = g_channel->OVP_MIN_DELAY;
-    maxDelay = g_channel->OVP_MAX_DELAY;
-    defaultDelay = g_channel->OVP_DEFAULT_DELAY;
+    minDelay = g_channel->params->OVP_MIN_DELAY;
+    maxDelay = g_channel->params->OVP_MAX_DELAY;
+    defaultDelay = g_channel->params->OVP_DEFAULT_DELAY;
 }
 
 void ChSettingsOvpProtectionPage::onSetParamsOk() {
@@ -205,9 +205,9 @@ void ChSettingsOcpProtectionPage::pageAlloc() {
     origLevel = level = 0;
 
     origDelay = delay = MakeValue(g_channel->prot_conf.i_delay, UNIT_SECOND);
-    minDelay = g_channel->OCP_MIN_DELAY;
-    maxDelay = g_channel->OCP_MAX_DELAY;
-    defaultDelay = g_channel->OCP_DEFAULT_DELAY;
+    minDelay = g_channel->params->OCP_MIN_DELAY;
+    maxDelay = g_channel->params->OCP_MAX_DELAY;
+    defaultDelay = g_channel->params->OCP_DEFAULT_DELAY;
 }
 
 void ChSettingsOcpProtectionPage::onSetParamsOk() {
@@ -241,9 +241,9 @@ void ChSettingsOppProtectionPage::pageAlloc() {
     defLevel = channel_dispatcher::getOppDefaultLevel(*g_channel);
 
     origDelay = delay = MakeValue(g_channel->prot_conf.p_delay, UNIT_SECOND);
-    minDelay = g_channel->OPP_MIN_DELAY;
-    maxDelay = g_channel->OPP_MAX_DELAY;
-    defaultDelay = g_channel->OPP_DEFAULT_DELAY;
+    minDelay = g_channel->params->OPP_MIN_DELAY;
+    maxDelay = g_channel->params->OPP_MAX_DELAY;
+    defaultDelay = g_channel->params->OPP_DEFAULT_DELAY;
 }
 
 void ChSettingsOppProtectionPage::onSetParamsOk() {

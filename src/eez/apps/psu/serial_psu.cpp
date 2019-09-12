@@ -120,6 +120,9 @@ UARTClass::UARTModes getConfig() {
 }
 
 void init() {
+    scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer,
+        SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
+
     if (g_testResult == TEST_OK) {
         Serial.end();
     }
@@ -138,9 +141,6 @@ void init() {
 #else
     Serial.println("EEZ PSU serial com ready");
 #endif
-
-    scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer,
-               SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
 
     g_testResult = TEST_OK;
 }

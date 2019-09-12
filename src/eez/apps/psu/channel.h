@@ -20,11 +20,8 @@
 
 #include <math.h>
 
-#include <eez/apps/psu/dac.h>
-#include <eez/apps/psu/ioexp.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/apps/psu/temp_sensor.h>
-#include <eez/modules/psu/adc.h>
 
 #define IS_OVP_VALUE(channel, cpv) (&cpv == &channel->ovp)
 #define IS_OCP_VALUE(channel, cpv) (&cpv == &channel->ocp)
@@ -78,6 +75,56 @@ struct ProtectionFlags {
 struct ProtectionValue {
     ProtectionFlags flags;
     uint32_t alarm_started;
+};
+
+struct ChannelParams {
+    float U_MIN;
+    float U_DEF;
+    float U_MAX;
+    float U_MAX_CONF;
+    float U_MIN_STEP;
+    float U_DEF_STEP;
+    float U_MAX_STEP;
+    float U_CAL_VAL_MIN;
+    float U_CAL_VAL_MID;
+    float U_CAL_VAL_MAX;
+    float U_CURR_CAL;
+    bool OVP_DEFAULT_STATE;
+    float OVP_MIN_DELAY;
+    float OVP_DEFAULT_DELAY;
+    float OVP_MAX_DELAY;
+    float I_MIN;
+    float I_DEF;
+    float I_MAX;
+    float I_MAX_CONF;
+    float I_MIN_STEP;
+    float I_DEF_STEP;
+    float I_MAX_STEP; 
+    float I_CAL_VAL_MIN;
+    float I_CAL_VAL_MID;
+    float I_CAL_VAL_MAX;
+    float I_VOLT_CAL;
+    bool OCP_DEFAULT_STATE;
+    float OCP_MIN_DELAY;
+    float OCP_DEFAULT_DELAY;
+    float OCP_MAX_DELAY;
+    bool OPP_DEFAULT_STATE;
+    float OPP_MIN_DELAY;
+    float OPP_DEFAULT_DELAY;
+    float OPP_MAX_DELAY;
+    float OPP_MIN_LEVEL;
+    float OPP_DEFAULT_LEVEL;
+    float OPP_MAX_LEVEL;
+    float SOA_VIN;
+    float SOA_PREG_CURR;
+    float SOA_POSTREG_PTOT;
+    float PTOT;
+    float U_RESOLUTION;
+    float I_RESOLUTION;
+    float I_LOW_RESOLUTION;
+    float P_RESOLUTION;
+    float VOLTAGE_GND_OFFSET; // [V], (1375 / 65535) * (40V | 50V)
+    float CURRENT_GND_OFFSET; // [A]
 };
 
 /// PSU channel.
@@ -180,7 +227,6 @@ class Channel {
     struct Flags {
         unsigned outputEnabled : 1;
         unsigned reserved1 : 1; // was afterBootOutputEnabled
-        unsigned dpOn : 1;
         unsigned senseEnabled : 1;
         unsigned cvMode : 1;
         unsigned ccMode : 1;
@@ -256,11 +302,18 @@ class Channel {
     };
 #endif // EEZ_PLATFORM_SIMULATOR
 
+    static Channel g_channels[CH_MAX];
+
     /// Get channel instance
     /// \param channel_index Zero based channel index, greater then or equal to 0 and less then
     /// CH_MAX. \returns Reference to channel.
-    static Channel &get(int channelIndex);
-    static Channel &getBySlotIndex(int slotIndex);
+    static inline Channel &get(int channelIndex) {
+        return g_channels[channelIndex];
+    } 
+
+    static inline Channel &getBySlotIndex(uint8_t slotIndex, uint8_t subchannelIndex = 0) {
+        return g_channels[g_slots[slotIndex].channelIndex + subchannelIndex];
+    }
 
     /// Save and disable OE for all the channels.
     static void saveAndDisableOE();
@@ -279,59 +332,9 @@ class Channel {
     /// In case when module has multiple channels. Starts from 0
     uint8_t subchannelIndex;
 
-    float U_MIN;
-    float U_DEF;
-    float U_MAX;
-    float U_MAX_CONF;
+    ChannelInterface *channelInterface;
 
-    float U_MIN_STEP;
-    float U_DEF_STEP;
-    float U_MAX_STEP;
-    float U_CAL_VAL_MIN;
-    float U_CAL_VAL_MID;
-    float U_CAL_VAL_MAX;
-    float U_CURR_CAL; // voltage level during current calibration
-
-    bool OVP_DEFAULT_STATE;
-    float OVP_MIN_DELAY;
-    float OVP_DEFAULT_DELAY;
-    float OVP_MAX_DELAY;
-
-    float I_MIN;
-    float I_DEF;
-    float I_MAX;
-    float I_MAX_CONF;
-
-    float I_MIN_STEP;
-    float I_DEF_STEP;
-    float I_MAX_STEP;
-    float I_CAL_VAL_MIN;
-    float I_CAL_VAL_MID;
-    float I_CAL_VAL_MAX;
-    float I_VOLT_CAL; // current level during voltage calibration
-
-    bool OCP_DEFAULT_STATE;
-    float OCP_MIN_DELAY;
-    float OCP_DEFAULT_DELAY;
-    float OCP_MAX_DELAY;
-
-    bool OPP_DEFAULT_STATE;
-    float OPP_MIN_DELAY;
-    float OPP_DEFAULT_DELAY;
-    float OPP_MAX_DELAY;
-    float OPP_MIN_LEVEL;
-    float OPP_DEFAULT_LEVEL;
-    float OPP_MAX_LEVEL;
-
-    float SOA_VIN;
-    float SOA_PREG_CURR;
-    float SOA_POSTREG_PTOT;
-
-    float PTOT;
-
-    IOExpander ioexp;
-    AnalogDigitalConverter adc;
-    DigitalAnalogConverter dac;
+    ChannelParams *params;
 
     Flags flags;
 
@@ -394,20 +397,19 @@ class Channel {
     /// Called by main loop, used for channel maintenance.
     void tick(uint32_t tick_usec);
 
-    /// Called from IO expander interrupt routine.
-    /// @param gpio State of IO expander GPIO register.
-    /// @param adc_data ADC snapshot data.
-    void eventAdcData(int16_t adc_data, bool startAgain = true);
+    /// Called from channel driver when ADC data is ready.
+    /// Returns what to read next.
+    AdcDataType onAdcData(AdcDataType adcDataType, float value);
 
     /// Called when device power is turned off, so channel
     /// can do its own housekeeping.
     void onPowerDown();
 
-    /// Force ADC read of u.mon_dac and i.mon_dac.
-    void adcReadMonDac();
+    /// Force ADC to measure u.mon_dac and i.mon_dac.
+    void adcMeasureMonDac();
 
-    /// Force ADC read of all values: u.mon, u.mon_dac, i.mon and i.mon_dac.
-    void adcReadAll();
+    /// Force ADC to measure all values: u.mon, u.mon_dac, i.mon and i.mon_dac.
+    void adcMeasureAll();
 
     /// Force update of all channel state (u.set, i.set, output enable, remote sensing, ...).
     /// This is called when channel is recovering from hardware failure.
@@ -478,18 +480,6 @@ class Channel {
     /// Returns "CC", "CV" or "UR"
     const char *getCvModeStr();
 
-    /// Remap ADC data value to actual voltage value
-    float remapAdcDataToVoltage(int16_t adc_data);
-
-    /// Remap ADC data value to actual current value (use calibration if configured).
-    float remapAdcDataToCurrent(int16_t adc_data);
-
-    /// Remap voltage value to ADC data value (use calibration if configured).
-    int16_t remapVoltageToAdcData(float value);
-
-    /// Remap current value to ADC data value (use calibration if configured).
-    int16_t remapCurrentToAdcData(float value);
-
     /// Returns name of the board of this channel.
     const char *getBoardName();
 
@@ -541,18 +531,10 @@ class Channel {
     /// Change power limit, it will adjust U_SET or I_SET if necessary.
     void setPowerLimit(float limit);
 
-    bool isVoltageBalanced() {
-        return !isNaN(uBeforeBalancing);
-    }
-    bool isCurrentBalanced() {
-        return !isNaN(iBeforeBalancing);
-    }
-    float getUSetUnbalanced() {
-        return isVoltageBalanced() ? uBeforeBalancing : u.set;
-    }
-    float getISetUnbalanced() {
-        return isCurrentBalanced() ? iBeforeBalancing : i.set;
-    }
+    bool isVoltageBalanced();
+    bool isCurrentBalanced();
+    float getUSetUnbalanced();
+    float getISetUnbalanced();
 
     uint32_t getCurrentHistoryValuePosition() {
         return historyPosition;
@@ -578,9 +560,7 @@ class Channel {
     TriggerOnListStop getTriggerOnListStop();
     void setTriggerOnListStop(TriggerOnListStop value);
 
-    bool hasSupportForCurrentDualRange() const {
-        return boardRevision == CH_BOARD_REVISION_DCP405_R1B1 || boardRevision == CH_BOARD_REVISION_DCP405_R2B5;
-    }
+    bool hasSupportForCurrentDualRange() const;
     void setCurrentRangeSelectionMode(CurrentRangeSelectionMode mode);
     CurrentRangeSelectionMode getCurrentRangeSelectionMode() {
         return (CurrentRangeSelectionMode)flags.currentRangeSelectionMode;
@@ -592,9 +572,9 @@ class Channel {
     float getDualRangeMax();
     void setCurrentRange(uint8_t currentRange);
 
-    float getVoltagePrecision() const;
-    float getCurrentPrecision(float value = NAN) const;
-    float getPowerPrecision() const;
+    float getVoltageResolution() const;
+    float getCurrentResolution(float value = NAN) const;
+    float getPowerResolution() const;
 
     bool isMicroAmperAllowed() const;
 
@@ -602,29 +582,21 @@ class Channel {
 
     float roundChannelValue(Unit unit, float value) const;
 
+    void doSetVoltage(float value);
+    void doSetCurrent(float value);
+
+    float getDualRangeGndOffset();
+
   private:
-    bool delayed_dp_off;
-    uint32_t delayed_dp_off_start;
     bool delayLowRippleCheck;
     uint32_t outputEnableStartTime;
-    uint32_t dpNegMonitoringTime;
-
-    float uBeforeBalancing;
-    float iBeforeBalancing;
-
+    
     MaxCurrentLimitCause maxCurrentLimitCause;
-
-    // int negligibleAdcDiffForVoltage2;
-    // int negligibleAdcDiffForVoltage3;
-    // int negligibleAdcDiffForCurrent;
 
     float uHistory[CHANNEL_HISTORY_SIZE];
     float iHistory[CHANNEL_HISTORY_SIZE];
     uint32_t historyPosition;
     uint32_t historyLastTick;
-
-    float VOLTAGE_GND_OFFSET; // [V], (1375 / 65535) * (40V | 50V)
-    float CURRENT_GND_OFFSET; // [A]
 
     int reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionValue &cpv);
 
@@ -637,16 +609,10 @@ class Channel {
     bool isVoltageCalibrationEnabled();
     bool isCurrentCalibrationEnabled();
 
-    void adcDataIsReady(int16_t data, bool startAgain);
-
-    void voltageBalancing();
-    void currentBalancing();
-
-    void restoreVoltageToValueBeforeBalancing();
-    void restoreCurrentToValueBeforeBalancing();
-
-    void doSetVoltage(float value);
-    void doSetCurrent(float value);
+    void addUMonAdcValue(float value);
+    void addIMonAdcValue(float value);
+    void addUMonDacAdcValue(float value);
+    void addIMonDacAdcValue(float value);
 
     void setCcMode(bool cc_mode);
     void setCvMode(bool cv_mode);
@@ -657,19 +623,8 @@ class Channel {
     void doRemoteSensingEnable(bool enable);
     void doRemoteProgrammingEnable(bool enable);
 
-    void doDpEnable(bool enable);
-
-#if !CONF_SKIP_PWRGOOD_TEST
-    void testPwrgood();
-#endif
-
-    float getDualRangeGndOffset();
-    // void calculateNegligibleAdcDiffForCurrent();
-
     uint32_t autoRangeCheckLastTickCount;
     void doAutoSelectCurrentRange(uint32_t tickCount);
-
-    void doSetCurrentRange();
 };
 
 } // namespace psu

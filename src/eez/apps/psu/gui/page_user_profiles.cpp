@@ -87,6 +87,9 @@ void UserProfilesPage::recall() {
 void UserProfilesPage::onSaveFinish(char *remark, void (*callback)()) {
     callback();
     if (profile::saveAtLocation(g_selectedProfileLocation, remark)) {
+        UserProfilesPage *page = (UserProfilesPage *)getActivePage();
+        profile::load(g_selectedProfileLocation, &page->profile);
+
         infoMessage("Current parameters saved");
     } else {
         errorMessage("EEPROM save failed!");

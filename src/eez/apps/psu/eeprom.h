@@ -40,16 +40,16 @@
 |3584   | 144|CH4 [calibration parameters](#calibration)|
 |4096   | 144|CH5 [calibration parameters](#calibration)|
 |4608   | 144|CH6 [calibration parameters](#calibration)|
-|5120   | 232|[Profile](#profile) 0                     |
-|6144   | 232|[Profile](#profile) 1                     |
-|7168   | 232|[Profile](#profile) 2                     |
-|8192   | 232|[Profile](#profile) 3                     |
-|9216   | 232|[Profile](#profile) 4                     |
-|10240  | 232|[Profile](#profile) 5                     |
-|11264  | 232|[Profile](#profile) 6                     |
-|12288  | 232|[Profile](#profile) 7                     |
-|13312  | 232|[Profile](#profile) 8                     |
-|14336  | 232|[Profile](#profile) 9                     |
+|5120   | 568|[Profile](#profile) 0                     |
+|6144   | 568|[Profile](#profile) 1                     |
+|7168   | 568|[Profile](#profile) 2                     |
+|8192   | 568|[Profile](#profile) 3                     |
+|9216   | 568|[Profile](#profile) 4                     |
+|10240  | 568|[Profile](#profile) 5                     |
+|11264  | 568|[Profile](#profile) 6                     |
+|12288  | 568|[Profile](#profile) 7                     |
+|13312  | 568|[Profile](#profile) 8                     |
+|14336  | 568|[Profile](#profile) 9                     |
 |16384  | 610|[Event Queue](#event-queue)               |
 
 ## <a name="ontime-counter">ON-time counter</a>

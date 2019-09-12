@@ -25,7 +25,7 @@
 #include <eez/apps/psu/profile.h>
 #include <eez/apps/psu/scpi/psu.h>
 
-#include <eez/modules/dcpX05/eeprom.h>
+#include <eez/modules/bp3c/eeprom.h>
 
 namespace eez {
 namespace psu {
@@ -292,12 +292,12 @@ scpi_result_t scpi_cmd_instrumentDisplayYtRateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentMemory(scpi_t *context) {
-    int32_t ch;
-
-    if (!SCPI_ParamChoice(context, channel_choice, &ch, true)) {
+    int32_t slotIndex;
+    if (!SCPI_ParamInt32(context, &slotIndex, true)) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }
+    slotIndex--;
 
     int32_t address;
     if (!SCPI_ParamInt32(context, &address, true)) {
@@ -330,9 +330,7 @@ scpi_result_t scpi_cmd_instrumentMemory(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    uint8_t slotIndex = Channel::get(ch - 1).slotIndex;
-
-    if (!dcpX05::eeprom::write(slotIndex, (const uint8_t *)&value, size, (uint16_t)address)) {
+    if (!bp3c::eeprom::write(slotIndex, (const uint8_t *)&value, size, (uint16_t)address)) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
@@ -341,12 +339,12 @@ scpi_result_t scpi_cmd_instrumentMemory(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentMemoryQ(scpi_t *context) {
-    int32_t ch;
-
-    if (!SCPI_ParamChoice(context, channel_choice, &ch, true)) {
+    int32_t slotIndex;
+    if (!SCPI_ParamInt32(context, &slotIndex, true)) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }
+    slotIndex--;
 
 	int32_t address;
     if (!SCPI_ParamInt32(context, &address, true)) {
@@ -366,25 +364,23 @@ scpi_result_t scpi_cmd_instrumentMemoryQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    uint8_t slotIndex = Channel::get(ch - 1).slotIndex;
-
     if (size == 1) {
         uint8_t value;
-        if (!dcpX05::eeprom::read(slotIndex, &value, 1, (uint16_t)address)) {
+        if (!bp3c::eeprom::read(slotIndex, &value, 1, (uint16_t)address)) {
             SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
             return SCPI_RES_ERR;
         }
         SCPI_ResultUInt8(context, value);
     } else if (size == 2) {
         uint16_t value;
-        if (!dcpX05::eeprom::read(slotIndex, (uint8_t *)&value, 2, (uint16_t)address)) {
+        if (!bp3c::eeprom::read(slotIndex, (uint8_t *)&value, 2, (uint16_t)address)) {
             SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
             return SCPI_RES_ERR;
         }
         SCPI_ResultUInt16(context, value);
     } else {
         uint32_t value;
-        if (!dcpX05::eeprom::read(slotIndex, (uint8_t *)&value, 4, (uint16_t)address)) {
+        if (!bp3c::eeprom::read(slotIndex, (uint8_t *)&value, 4, (uint16_t)address)) {
             SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
             return SCPI_RES_ERR;
         }

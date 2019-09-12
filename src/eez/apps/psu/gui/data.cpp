@@ -593,7 +593,7 @@ bool compare_CHANNEL_LONG_TITLE_value(const Value &a, const Value &b) {
 void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
     snprintf(text, count - 1, "%s #%d: %dV/%dA, %s", channel.getBoardName(), channel.channelIndex + 1, 
-        (int)floor(channel.U_MAX), (int)floor(channel.I_MAX), channel.getRevisionName());
+        (int)floor(channel.params->U_MAX), (int)floor(channel.params->I_MAX), channel.getRevisionName());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -720,7 +720,7 @@ ChannelSnapshot &getChannelSnapshot(Channel &channel) {
                 channelSnapshot.monValue = MakeValue(iMon, UNIT_AMPER);
             }
         }
-        channelSnapshot.pMon = roundPrec(uMon * iMon, channel.getPowerPrecision());
+        channelSnapshot.pMon = roundPrec(uMon * iMon, channel.getPowerResolution());
         channelSnapshot.lastSnapshotTime = currentTime;
     }
 
@@ -1928,9 +1928,9 @@ void data_channel_protection_ovp_delay(data::DataOperationEnum operation, data::
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel.OVP_MIN_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params->OVP_MIN_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel.OVP_MAX_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params->OVP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOvpParameters(channel, channel.prot_conf.flags.u_state ? 1 : 0, channel_dispatcher::getUProtectionLevel(channel), value.getFloat());
     }
@@ -1985,9 +1985,9 @@ void data_channel_protection_ocp_delay(data::DataOperationEnum operation, data::
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel.OCP_MIN_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params->OCP_MIN_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel.OCP_MAX_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params->OCP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOcpParameters(channel, channel.prot_conf.flags.i_state ? 1 : 0, value.getFloat());
     }
@@ -2072,9 +2072,9 @@ void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel.OPP_MIN_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params->OPP_MIN_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel.OPP_MAX_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params->OPP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, channel_dispatcher::getPowerProtectionLevel(channel), value.getFloat());
     }

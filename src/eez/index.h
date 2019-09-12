@@ -28,6 +28,73 @@ typedef bool (*OnSystemStateChangedCallback)();
 extern OnSystemStateChangedCallback g_onSystemStateChangedCallbacks[];
 extern int g_numOnSystemStateChangedCallbacks;
 
+enum TestResult {
+    TEST_NONE,
+    TEST_FAILED,
+    TEST_OK,
+    TEST_CONNECTING,
+    TEST_SKIPPED,
+    TEST_WARNING
+};
+
+enum AdcDataType {
+    ADC_DATA_TYPE_NONE,
+    ADC_DATA_TYPE_U_MON,
+    ADC_DATA_TYPE_I_MON,
+    ADC_DATA_TYPE_U_MON_DAC,
+    ADC_DATA_TYPE_I_MON_DAC,
+};
+
+struct ChannelInterface {
+	int slotIndex;
+
+    ChannelInterface(int slotIndex);
+
+    virtual void init(int subchannelIndex) = 0;
+    virtual void reset(int subchannelIndex) = 0;
+    virtual void test(int subchannelIndex) = 0;
+    virtual void tick(int subchannelIndex, uint32_t tickCount) = 0;
+
+    virtual TestResult getTestResult(int subchannelIndex) = 0;
+
+    virtual unsigned getRPol(int subchannelIndex);
+
+    virtual bool isCcMode(int subchannelIndex) = 0;
+    virtual bool isCvMode(int subchannelIndex) = 0;
+
+    virtual void adcMeasureUMon(int subchannelIndex) = 0;
+    virtual void adcMeasureIMon(int subchannelIndex) = 0;
+    virtual void adcMeasureMonDac(int subchannelIndex) = 0;
+    virtual void adcMeasureAll(int subchannelIndex) = 0;
+
+    virtual void setOutputEnable(int subchannelIndex, bool enable) = 0;
+
+    virtual void setDacVoltage(int subchannelIndex, uint16_t value) = 0;
+    virtual void setDacVoltageFloat(int subchannelIndex, float value) = 0;
+    virtual void setDacCurrent(int subchannelIndex, uint16_t value) = 0;
+    virtual void setDacCurrentFloat(int subchannelIndex, float value) = 0;
+
+    virtual bool isDacTesting(int subchannelIndex) = 0;
+
+    virtual void setRemoteSense(int subchannelIndex, bool enable);
+    virtual void setRemoteProgramming(int subchannelIndex, bool enable);
+
+    virtual void setCurrentRange(int subchannelIndex);
+
+    virtual bool isVoltageBalanced(int subchannelIndex);
+    virtual bool isCurrentBalanced(int subchannelIndex);
+    virtual float getUSetUnbalanced(int subchannelIndex);
+    virtual float getISetUnbalanced(int subchannelIndex);
+
+    virtual void readAllRegisters(int subchannelIndex, uint8_t ioexpRegisters[], uint8_t adcRegisters[]);
+
+#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
+    virtual int getIoExpBitDirection(int subchannelIndex, int io_bit);
+    virtual bool testIoExpBit(int subchannelIndex, int io_bit);
+    virtual void changeIoExpBit(int subchannelIndex, int io_bit, bool set);
+#endif
+};
+
 static const uint8_t MODULE_TYPE_NONE = 0;
 static const uint8_t MODULE_TYPE_DCP405 = 1;
 static const uint8_t MODULE_TYPE_DCM220 = 2;
@@ -37,6 +104,7 @@ struct ModuleInfo {
     uint16_t moduleId;
     uint8_t lasestBoardRevision; // TODO should be lasestModuleRevision
     uint8_t numChannels;
+    ChannelInterface **channelInterface;
 };
 
 extern ModuleInfo g_modules[];
@@ -44,6 +112,7 @@ extern ModuleInfo g_modules[];
 struct SlotInfo {
     uint8_t moduleType; // MODULE_TYPE_...
     uint8_t boardRevision; // TODO should be moduleRevision;
+    uint8_t channelIndex;
 };
 
 static const int NUM_SLOTS = 3;

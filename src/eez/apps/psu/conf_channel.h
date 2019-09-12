@@ -48,14 +48,14 @@
 //                          OPP_MIN_DELAY, OPP_DEFAULT_DELAY, OPP_MAX_DELAY
 #define CH_PARAMS_OPP_DELAY 1.0f,          10.0f,             300.0f
 
-//                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT
-#define CH_PARAMS_NONE   CH_PARAMS_U_50V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            155.0f
+//                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT,   U_RESOLUTION, I_RESOLUTION, I_LOW_RESOLUTION, P_RESOLUTION
+#define CH_PARAMS_NONE   CH_PARAMS_U_50V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            155.0f, 0,            0,            0,                0
 
-//                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT
-#define CH_PARAMS_50V_5A CH_PARAMS_U_50V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            155.0f
+//                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT,   U_RESOLUTION, I_RESOLUTION, I_LOW_RESOLUTION, P_RESOLUTION
+#define CH_PARAMS_50V_5A CH_PARAMS_U_50V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            155.0f, 0.005f,       0.0005f,      0.000005f,        0.001f
 
-//                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT
-#define CH_PARAMS_40V_5A CH_PARAMS_U_40V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            155.0f
+//                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT,   U_RESOLUTION, I_RESOLUTION, I_LOW_RESOLUTION, P_RESOLUTION
+#define CH_PARAMS_40V_5A CH_PARAMS_U_40V, CH_PARAMS_I_5A, true, CH_PARAMS_OPP_DELAY, 0.0f,          160.0f,  155.0f,            58.0f,         5.0f,          25.0f,            155.0f, 0.005f,       0.0005f,      0.000005f,        0.001f
 
-//                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT
-#define CH_PARAMS_20V_4A CH_PARAMS_U_20V, CH_PARAMS_I_4A, true, CH_PARAMS_OPP_DELAY, 0.0f,           70.0f,   80.0f,            58.0f,         5.0f,          25.0f,             80.0f
+//                                                        OPP_DEFAULT_STATE,         OPP_MIN_LEVEL, SOA_VIN, OPP_DEFAULT_LEVEL, SOA_PREG_CURR, OPP_MAX_LEVEL, SOA_POSTREG_PTOT, PTOT,   U_RESOLUTION, I_RESOLUTION, I_LOW_RESOLUTION, P_RESOLUTION
+#define CH_PARAMS_20V_4A CH_PARAMS_U_20V, CH_PARAMS_I_4A, true, CH_PARAMS_OPP_DELAY, 0.0f,           70.0f,   80.0f,            58.0f,         5.0f,          25.0f,             80.0f, 0.01f,        0.02f,        0,                0.001f

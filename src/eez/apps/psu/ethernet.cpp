@@ -121,6 +121,9 @@ scpi_t g_scpiContext;
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
+    scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer,
+        SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
+
     if (!persist_conf::isEthernetEnabled()) {
         g_testResult = TEST_SKIPPED;
         return;
@@ -169,8 +172,6 @@ void onQueueMessage(uint32_t type, uint32_t param) {
 
         eez::mcu::ethernet::beginServer(persist_conf::devConf2.ethernetScpiPort);
         DebugTrace("Listening on port %d", (int)persist_conf::devConf2.ethernetScpiPort);
-        scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer,
-                SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
     } else if (type == ETHERNET_CLIENT_CONNECTED) {
         g_isConnected = true;
         scpi::emptyBuffer(g_scpiContext);

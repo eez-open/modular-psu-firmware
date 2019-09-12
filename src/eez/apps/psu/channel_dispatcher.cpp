@@ -334,7 +334,7 @@ void setOvpParameters(Channel &channel, int state, float level, float delay) {
     if (isCoupled() || isTracked()) {
         float coupledLevel = isSeries() ? level / 2 : level;
 
-        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getVoltagePrecision());
+        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getVoltageResolution());
 
         Channel::get(0).prot_conf.flags.u_state = state;
         Channel::get(0).prot_conf.u_level = coupledLevel;
@@ -345,7 +345,7 @@ void setOvpParameters(Channel &channel, int state, float level, float delay) {
         Channel::get(1).prot_conf.u_delay = delay;
     } else {
         channel.prot_conf.flags.u_state = state;
-        channel.prot_conf.u_level = roundPrec(level, channel.getVoltagePrecision());
+        channel.prot_conf.u_level = roundPrec(level, channel.getVoltageResolution());
         channel.prot_conf.u_delay = delay;
     }
 }
@@ -362,11 +362,11 @@ void setOvpState(Channel &channel, int state) {
 void setOvpLevel(Channel &channel, float level) {
     if (isCoupled() || isTracked()) {
         float coupledLevel = isSeries() ? level / 2 : level;
-        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getVoltagePrecision());
+        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getVoltageResolution());
         Channel::get(0).prot_conf.u_level = coupledLevel;
         Channel::get(1).prot_conf.u_level = coupledLevel;
     } else {
-        channel.prot_conf.u_level = roundPrec(level, channel.getVoltagePrecision());
+        channel.prot_conf.u_level = roundPrec(level, channel.getVoltageResolution());
     }
 }
 
@@ -536,9 +536,9 @@ float getPowerMinLimit(const Channel &channel) {
 
 float getPowerMaxLimit(const Channel &channel) {
     if (isCoupled()) {
-        return 2 * MIN(Channel::get(0).PTOT, Channel::get(1).PTOT);
+        return 2 * MIN(Channel::get(0).params->PTOT, Channel::get(1).params->PTOT);
     }
-    return channel.PTOT;
+    return channel.params->PTOT;
 }
 
 float getPowerDefaultLimit(const Channel &channel) {
@@ -566,23 +566,23 @@ void setPowerLimit(Channel &channel, float limit) {
 
 float getOppMinLevel(Channel &channel) {
     if (isCoupled()) {
-        return 2 * MAX(Channel::get(0).OPP_MIN_LEVEL, Channel::get(1).OPP_MIN_LEVEL);
+        return 2 * MAX(Channel::get(0).params->OPP_MIN_LEVEL, Channel::get(1).params->OPP_MIN_LEVEL);
     }
-    return channel.OPP_MIN_LEVEL;
+    return channel.params->OPP_MIN_LEVEL;
 }
 
 float getOppMaxLevel(Channel &channel) {
     if (isCoupled()) {
-        return 2 * MIN(Channel::get(0).OPP_MAX_LEVEL, Channel::get(1).OPP_MAX_LEVEL);
+        return 2 * MIN(Channel::get(0).params->OPP_MAX_LEVEL, Channel::get(1).params->OPP_MAX_LEVEL);
     }
-    return channel.OPP_MAX_LEVEL;
+    return channel.params->OPP_MAX_LEVEL;
 }
 
 float getOppDefaultLevel(Channel &channel) {
     if (isCoupled()) {
-        return Channel::get(0).OPP_DEFAULT_LEVEL + Channel::get(1).OPP_DEFAULT_LEVEL;
+        return Channel::get(0).params->OPP_DEFAULT_LEVEL + Channel::get(1).params->OPP_DEFAULT_LEVEL;
     }
-    return channel.OPP_DEFAULT_LEVEL;
+    return channel.params->OPP_DEFAULT_LEVEL;
 }
 
 void setOppParameters(Channel &channel, int state, float level, float delay) {
@@ -591,7 +591,7 @@ void setOppParameters(Channel &channel, int state, float level, float delay) {
     if (isCoupled() || isTracked()) {
         float coupledLevel = isCoupled() ? level / 2 : level;
 
-        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getPowerPrecision());
+        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getPowerResolution());
 
         Channel::get(0).prot_conf.flags.p_state = state;
         Channel::get(0).prot_conf.p_level = coupledLevel;
@@ -602,7 +602,7 @@ void setOppParameters(Channel &channel, int state, float level, float delay) {
         Channel::get(1).prot_conf.p_delay = delay;
     } else {
         channel.prot_conf.flags.p_state = state;
-        channel.prot_conf.p_level = roundPrec(level, channel.getPowerPrecision());
+        channel.prot_conf.p_level = roundPrec(level, channel.getPowerResolution());
         channel.prot_conf.p_delay = delay;
     }
 }
@@ -620,17 +620,17 @@ void setOppLevel(Channel &channel, float level) {
     if (isCoupled()) {
         float coupledLevel = level / 2;
 
-        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getPowerPrecision());
+        coupledLevel = roundPrec(coupledLevel, Channel::get(0).getPowerResolution());
 
         Channel::get(0).prot_conf.p_level = coupledLevel;
         Channel::get(1).prot_conf.p_level = coupledLevel;
     } else if (isTracked()) {
-        level = roundPrec(level, Channel::get(0).getPowerPrecision());
+        level = roundPrec(level, Channel::get(0).getPowerResolution());
 
         Channel::get(0).prot_conf.p_level = level;
         Channel::get(1).prot_conf.p_level = level;
     } else {
-        channel.prot_conf.p_level = roundPrec(level, channel.getPowerPrecision());
+        channel.prot_conf.p_level = roundPrec(level, channel.getPowerResolution());
     }
 }
 

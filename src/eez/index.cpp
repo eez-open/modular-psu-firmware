@@ -45,7 +45,66 @@ using namespace eez::psu::gui;
 #include <eez/modules/mcu/ethernet.h>
 #endif
 
+#include <eez/modules/dcpx05/channel.h>
+#include <eez/modules/dcm220/channel.h>
+
 namespace eez {
+
+////////////////////////////////////////////////////////////////////////////////
+
+ChannelInterface::ChannelInterface(int slotIndex_) 
+    : slotIndex(slotIndex_) 
+{
+}
+
+unsigned ChannelInterface::getRPol(int subchannelIndex) {
+    return 0;
+}
+
+void ChannelInterface::setRemoteSense(int subchannelIndex, bool enable) {
+}
+
+void ChannelInterface::setRemoteProgramming(int subchannelIndex, bool enable) {
+}
+
+void ChannelInterface::setCurrentRange(int subchannelIndex) {
+}
+
+bool ChannelInterface::isVoltageBalanced(int subchannelIndex) {
+	return false;
+}
+
+bool ChannelInterface::isCurrentBalanced(int subchannelIndex) {
+	return false;
+}
+
+float ChannelInterface::getUSetUnbalanced(int subchannelIndex) {
+    psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    return channel.u.set;
+}
+
+float ChannelInterface::getISetUnbalanced(int subchannelIndex) {
+    psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    return channel.i.set;
+}
+
+void ChannelInterface::readAllRegisters(int subchannelIndex, uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
+}
+
+#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
+int ChannelInterface::getIoExpBitDirection(int subchannelIndex, int io_bit) {
+	return 0;
+}
+
+bool ChannelInterface::testIoExpBit(int subchannelIndex, int io_bit) {
+	return false;
+}
+
+void ChannelInterface::changeIoExpBit(int subchannelIndex, int io_bit, bool set) {
+}
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
 
 OnSystemStateChangedCallback g_onSystemStateChangedCallbacks[] = {
     // modules
@@ -67,22 +126,26 @@ ModuleInfo g_modules[] = {
     { 
         0,
         CH_BOARD_REVISION_NONE, 
-        1
+        1,
+        nullptr
     },
     {
         406,
         CH_BOARD_REVISION_DCP405_R2B5,
-        1 
+        1,
+        dcpX05::g_channelInterface
     },
     {
         220,
         CH_BOARD_REVISION_DCM220_R1B1, 
-        2 
+        2,
+        dcm220::g_channelInterface
     },
     {
         505,
         CH_BOARD_REVISION_DCP505_R1B3, 
-        1 
+        1,
+        dcpX05::g_channelInterface
     },
 };
 

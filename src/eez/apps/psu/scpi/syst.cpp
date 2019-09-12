@@ -464,7 +464,7 @@ scpi_result_t scpi_cmd_systemChannelInformationPowerQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultFloat(context, channel->PTOT);
+    SCPI_ResultFloat(context, channel->params->PTOT);
 
     return SCPI_RES_OK;
 }
