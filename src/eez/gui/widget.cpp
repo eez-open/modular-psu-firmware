@@ -1,4 +1,4 @@
-/* / system.h
+/*
 * EEZ Generic Firmware
 * Copyright (C) 2015-present, Envox d.o.o.
 *

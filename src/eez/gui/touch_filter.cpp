@@ -1,5 +1,5 @@
 /*
- * EEZ Generic Firmware
+ * EEZ Modular Firmware
  * Copyright (C) 2015-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify

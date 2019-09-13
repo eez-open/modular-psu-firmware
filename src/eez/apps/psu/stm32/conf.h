@@ -1,6 +1,6 @@
 /*
- * EEZ PSU Firmware
- * Copyright (C) 2018-present, Envox d.o.o.
+ * EEZ Modular Firmware
+ * Copyright (C) 2015-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
