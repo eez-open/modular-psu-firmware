@@ -1,5 +1,5 @@
 /*
- * EEZ PSU Firmware
+ * EEZ Modular Firmware
  * Copyright (C) 2015-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -87,13 +87,12 @@ float TempSensor::doRead() {
 #if defined(EEZ_PLATFORM_STM32)
     if (type >= CH1 && type <= CH6) {
         int slotIndex = type - CH1;
-        if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
-            if (Channel::get(slotIndex).boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {
-                return drivers::tc77::readTemperature(slotIndex);
-            } else {
-                return drivers::tmp1075::readTemperature(slotIndex);
-            }
-        } else if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP505) {
+        if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 && Channel::get(slotIndex).boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {
+            return drivers::tc77::readTemperature(slotIndex);
+        } 
+        
+        if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 && Channel::get(slotIndex).boardRevision == CH_BOARD_REVISION_DCP405_R1B1 ||
+            g_slots[slotIndex].moduleType == MODULE_TYPE_DCP505) {
             return drivers::tmp1075::readTemperature(slotIndex);
         }
     }
