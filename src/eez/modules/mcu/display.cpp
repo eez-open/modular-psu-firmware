@@ -1,6 +1,6 @@
-/* / system.h
- * EEZ Generic Firmware
- * Copyright (C) 2018-present, Envox d.o.o.
+/*
+ * EEZ Modular Firmware
+ * Copyright (C) 2015-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -236,7 +236,7 @@ uint8_t getOpacity() {
 static int8_t measureGlyph(uint8_t encoding) {
     gui::font::Glyph glyph;
     g_font.getGlyph(encoding, glyph);
-    if (!glyph.isFound())
+    if (!glyph)
         return 0;
 
     return glyph.dx;

@@ -1,6 +1,6 @@
-/* / system.h
- * EEZ Generic Firmware
- * Copyright (C) 2018-present, Envox d.o.o.
+/*
+ * EEZ Modular Firmware
+ * Copyright (C) 2015-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -397,7 +397,7 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
                         uint8_t encoding) {
     gui::font::Glyph glyph;
     g_font.getGlyph(encoding, glyph);
-    if (!glyph.isFound())
+    if (!glyph)
         return 0;
 
     int x_glyph = x1 + glyph.x;

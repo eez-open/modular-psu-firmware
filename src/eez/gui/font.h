@@ -1,5 +1,5 @@
 /*
- * EEZ Generic Firmware
+ * EEZ Modular Firmware
  * Copyright (C) 2015-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ struct Glyph {
     uint8_t width;
     uint8_t height;
 
-    bool isFound() {
+    operator bool() {
         return data != 0;
     }
 };
