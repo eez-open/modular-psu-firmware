@@ -52,7 +52,7 @@ namespace dcm220 {
 #define ADC_MIN 0
 #define ADC_MAX 65535
 
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 16
 
 #define SPI_SLAVE_SYNBYTE         0x53
 #define SPI_MASTER_SYNBYTE        0xAC
@@ -227,11 +227,11 @@ struct Channel : ChannelInterface {
     	int offset = subchannelIndex * 2;
 
         uint16_t uMonAdc = inputSetValues[offset];
-        float uMon = remap(uMonAdc, (float)ADC_MIN, channel.U_MIN, (float)ADC_MAX, channel.U_MAX);
+        float uMon = remap(uMonAdc, (float)ADC_MIN, channel.params->U_MIN, (float)ADC_MAX, channel.params->U_MAX);
         channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon);
 
         uint16_t iMonAdc = inputSetValues[offset + 1];
-        float iMon = remap(iMonAdc, (float)ADC_MIN, channel.I_MIN, (float)ADC_MAX, channel.I_MAX);
+        float iMon = remap(iMonAdc, (float)ADC_MIN, channel.params->I_MIN, (float)ADC_MAX, channel.params->I_MAX);
         channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon);
 #endif
 
@@ -310,7 +310,7 @@ struct Channel : ChannelInterface {
 	void setDacVoltageFloat(int subchannelIndex, float value) {
 #if defined(EEZ_PLATFORM_STM32)
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        value = remap(value, channel.U_MIN, (float)DAC_MIN, channel.U_MAX, (float)DAC_MAX);
+        value = remap(value, channel.params->U_MIN, (float)DAC_MIN, channel.params->U_MAX, (float)DAC_MAX);
         uSet[subchannelIndex] = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
 #endif
 
@@ -334,7 +334,7 @@ struct Channel : ChannelInterface {
 	void setDacCurrentFloat(int subchannelIndex, float value) {
 #if defined(EEZ_PLATFORM_STM32)
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        value = remap(value, channel.I_MIN, (float)DAC_MIN, channel.I_MAX, (float)DAC_MAX);
+        value = remap(value, channel.params->I_MIN, (float)DAC_MIN, channel.params->I_MAX, (float)DAC_MAX);
         iSet[subchannelIndex] = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
 #endif
 

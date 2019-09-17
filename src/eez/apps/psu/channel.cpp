@@ -1035,7 +1035,7 @@ void Channel::doSetVoltage(float value) {
     }
 
 #if !defined(EEZ_PLATFORM_SIMULATOR)
-    value += VOLTAGE_GND_OFFSET;
+    value += params->VOLTAGE_GND_OFFSET;
 #endif
 
     channelInterface->setDacVoltageFloat(subchannelIndex, value);
@@ -1334,8 +1334,7 @@ float Channel::getDualRangeGndOffset() {
 #ifdef EEZ_PLATFORM_SIMULATOR
     return 0;
 #else
-    return flags.currentCurrentRange == CURRENT_RANGE_LOW ? (CURRENT_GND_OFFSET / 100)
-                                                          : CURRENT_GND_OFFSET;
+    return flags.currentCurrentRange == CURRENT_RANGE_LOW ? (params->CURRENT_GND_OFFSET / 100) : params->CURRENT_GND_OFFSET;
 #endif
 }
 
