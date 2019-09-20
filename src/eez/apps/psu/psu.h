@@ -38,6 +38,7 @@ namespace psu {
 void boot();
 
 extern bool g_isBooted;
+extern uint32_t g_isBootedTime;
 
 bool powerUp();
 void powerDown();

@@ -25,5 +25,9 @@ namespace dcm220 {
 
 extern ChannelInterface *g_channelInterface[NUM_SLOTS];
 
+#if defined(EEZ_PLATFORM_STM32)
+float readTemperature(int channelIndex);
+#endif
+
 } // namespace dcpX05
 } // namespace eez

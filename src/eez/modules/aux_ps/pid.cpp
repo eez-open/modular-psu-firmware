@@ -7,7 +7,7 @@
 
 #include <eez/apps/psu/psu.h>
 
-#include <eez/apps/psu/pid.h>
+#include <eez/modules/aux_ps/pid.h>
 #include <eez/system.h>
 
 /*Constructor (...)*********************************************************

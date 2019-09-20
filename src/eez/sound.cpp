@@ -268,7 +268,7 @@ void init() {
 #endif
 }
 
-void tick() {
+void tick(uint32_t tickCount) {
 	if (g_iNextTuneToPlay == -1) {
 		return;
 	}

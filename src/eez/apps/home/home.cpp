@@ -38,6 +38,7 @@
 #define CONF_GUI_STANDBY_PAGE_TIMEOUT 4000000L          // 4s
 #define CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT 2000000L      // 2s
 #define CONF_GUI_WELCOME_PAGE_TIMEOUT 2000000L          // 2s
+#define CONF_GUI_KEEP_WELCOME_PAGE_AFTER_BOOT 100000L   // 0.1s
 
 namespace eez {
 namespace home {
@@ -68,7 +69,7 @@ void HomeAppContext::stateManagment() {
         }
         return;
     } else if (activePageId == PAGE_ID_WELCOME) {
-        if (!psu::g_isBooted || int32_t(tickCount - getShowPageTime()) < CONF_GUI_WELCOME_PAGE_TIMEOUT) {
+        if (!psu::g_isBooted || int32_t(tickCount - psu::g_isBootedTime) < CONF_GUI_KEEP_WELCOME_PAGE_AFTER_BOOT || int32_t(tickCount - getShowPageTime()) < CONF_GUI_WELCOME_PAGE_TIMEOUT) {
             return;
         }
     }

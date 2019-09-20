@@ -22,7 +22,7 @@ namespace eez {
 namespace psu {
 namespace idle {
 
-void tick();
+void tick(uint32_t tickCount);
 
 void noteScpiActivity();
 

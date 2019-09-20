@@ -526,9 +526,9 @@ void Channel::clearProtectionConf() {
     prot_conf.p_delay = params->OPP_DEFAULT_DELAY;
     prot_conf.p_level = params->OPP_DEFAULT_LEVEL;
 
-    temperature::sensors[temp_sensor::CH1 + slotIndex].prot_conf.state = OTP_CH_DEFAULT_STATE;
-    temperature::sensors[temp_sensor::CH1 + slotIndex].prot_conf.level = OTP_CH_DEFAULT_LEVEL;
-    temperature::sensors[temp_sensor::CH1 + slotIndex].prot_conf.delay = OTP_CH_DEFAULT_DELAY;
+    temperature::sensors[temp_sensor::CH1 + channelIndex].prot_conf.state = OTP_CH_DEFAULT_STATE;
+    temperature::sensors[temp_sensor::CH1 + channelIndex].prot_conf.level = OTP_CH_DEFAULT_LEVEL;
+    temperature::sensors[temp_sensor::CH1 + channelIndex].prot_conf.delay = OTP_CH_DEFAULT_DELAY;
 }
 
 bool Channel::test() {

@@ -54,7 +54,10 @@
 #if OPTION_WATCHDOG
 #include <eez/apps/psu/watchdog.h>
 #endif
-#include <eez/apps/psu/fan.h>
+
+#if OPTION_FAN
+#include <eez/modules/aux_ps/fan.h>
+#endif
 
 #include <eez/apps/psu/channel_dispatcher.h>
 #include <eez/apps/psu/event_queue.h>
@@ -72,6 +75,8 @@
 #include <eez/modules/mcu/encoder.h>
 #endif
 
+#include <eez/modules/mcu/battery.h>
+
 #include <eez/scpi/scpi.h>
 
 namespace eez {
@@ -85,6 +90,7 @@ namespace psu {
 using namespace scpi;
 
 bool g_isBooted = false;
+uint32_t g_isBootedTime;
 static bool g_bootTestSuccess;
 static bool g_powerIsUp = false;
 static bool g_testPowerUpDelay = false;
@@ -194,9 +200,13 @@ void init() {
     DebugTrace("Ethernet initialization skipped!");
 #endif
 
-    fan::init();
+#if OPTION_FAN
+    aux_ps::fan::init();
+#endif
 
     temperature::init();
+
+    mcu::battery::init();
 
     trigger::init();
 
@@ -226,6 +236,10 @@ static bool testChannels() {
 static bool testMaster() {
     bool result = true;
 
+#if OPTION_FAN
+    result &= aux_ps::fan::test();
+#endif
+
     result &= rtc::test();
     result &= datetime::test();
     result &= eeprom::test();
@@ -251,13 +265,9 @@ static bool testMaster() {
 bool test() {
     bool testResult = true;
 
-    fan::test_start();
-
     testResult &= testMaster();
 
     testResult &= testChannels();
-
-    testResult &= fan::test();
 
     if (!testResult) {
         sound::playBeep();
@@ -485,6 +495,7 @@ void boot() {
         sound::playBeep();
     }
 
+    g_isBootedTime = micros();
     g_isBooted = true;
 }
 
@@ -507,8 +518,6 @@ bool powerUp() {
     eez::gui::showWelcomePage();
 #endif
 
-    fan::test_start();
-
     // reset channels
     for (int i = 0; i < CH_NUM; ++i) {
         Channel::get(i).reset();
@@ -527,15 +536,13 @@ bool powerUp() {
     bool testSuccess = true;
 
     if (g_isBooted) {
-        testSuccess &= testMaster();
+    	testSuccess &= testMaster();
     }
 
     // test channels
     for (int i = 0; i < CH_NUM; ++i) {
         testSuccess &= Channel::get(i).test();
     }
-
-    testSuccess &= fan::test();
 
     // turn on Power On (PON) bit of ESE register
     reg_set_esr_bits(ESR_PON);
@@ -582,7 +589,9 @@ void powerDown() {
 
     event_queue::pushEvent(event_queue::EVENT_INFO_POWER_DOWN);
 
-    fan::g_testResult = TEST_OK;
+#if OPTION_FAN
+    aux_ps::fan::g_testResult = TEST_OK;
+#endif
 
     io_pins::tick(micros());
 
@@ -708,49 +717,56 @@ void onProtectionTripped() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void tick_powerOnTimeCounter(uint32_t tickCount) {
+    g_powerOnTimeCounter.tick(tickCount);
+}
+
+typedef void (*TickFunc)(uint32_t tickCount);
+static TickFunc g_tickFuncs[] = {
+#ifdef DEBUG
+    debug::tick,
+#endif
+    event_queue::tick,
+    tick_powerOnTimeCounter,
+    temperature::tick,
+#if OPTION_FAN
+    aux_ps::fan::tick,
+#endif
+    datetime::tick,
+    sound::tick,
+    mcu::battery::tick,
+    idle::tick,
+#if OPTION_WATCHDOG
+    watchdog::tick
+#endif
+};
+static const int NUM_TICK_FUNCS = sizeof(g_tickFuncs) / sizeof(TickFunc);
+static int g_tickFuncIndex = 0;
+
 void tick() {
-    uint32_t tick_usec = micros();
+    uint32_t tickCount = micros();
 
 #if OPTION_SD_CARD
-    dlog::tick(tick_usec);
+    dlog::tick(tickCount);
 #endif
 
     for (int i = 0; i < CH_NUM; ++i) {
-        Channel::get(i).tick(tick_usec);
+        Channel::get(i).tick(tickCount);
     }
 
-    io_pins::tick(tick_usec);
+    io_pins::tick(tickCount);
 
-#ifdef DEBUG
-    debug::tick(tick_usec);
-#endif
+    trigger::tick(tickCount);
 
-    g_powerOnTimeCounter.tick(tick_usec);
+    list::tick(tickCount);
 
-    temperature::tick(tick_usec);
-
-    fan::tick(tick_usec);
-
-    trigger::tick(tick_usec);
-
-    list::tick(tick_usec);
-
-    event_queue::tick(tick_usec);
-
-    datetime::tick(tick_usec);
-
-	sound::tick();
-
-    idle::tick();
+    g_tickFuncs[g_tickFuncIndex](tickCount);
+    g_tickFuncIndex = (g_tickFuncIndex + 1) % NUM_TICK_FUNCS;
 
     if (g_diagCallback) {
         g_diagCallback();
         g_diagCallback = NULL;
     }
-
-#if OPTION_WATCHDOG
-    watchdog::tick(tick_usec);
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -145,17 +145,17 @@ bool setType(Type value) {
                             channel.prot_conf.p_delay = MIN(Channel::get(0).prot_conf.p_delay,
                                                             Channel::get(1).prot_conf.p_delay);
 
-                            temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.state =
+                            temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.state =
                                 temperature::sensors[temp_sensor::CH1].prot_conf.state ||
                                         temperature::sensors[temp_sensor::CH2].prot_conf.state
                                     ? 1
                                     : 0;
 
-                            temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.level =
+                            temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.level =
                                 MIN(temperature::sensors[temp_sensor::CH1].prot_conf.level,
                                     temperature::sensors[temp_sensor::CH2].prot_conf.level);
 
-                            temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.delay =
+                            temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.delay =
                                 MIN(temperature::sensors[temp_sensor::CH1].prot_conf.delay,
                                     temperature::sensors[temp_sensor::CH2].prot_conf.delay);
                         }
@@ -727,7 +727,7 @@ bool isOtpTripped(Channel &channel) {
         return temperature::sensors[temp_sensor::CH1].isTripped() ||
                temperature::sensors[temp_sensor::CH2].isTripped();
     } else {
-        return temperature::sensors[temp_sensor::CH1 + channel.slotIndex].isTripped();
+        return temperature::sensors[temp_sensor::CH1 + channel.channelIndex].isTripped();
     }
 }
 
@@ -755,9 +755,9 @@ void setOtpParameters(Channel &channel, int state, float level, float delay) {
         temperature::sensors[temp_sensor::CH1].prot_conf.delay = delay;
         temperature::sensors[temp_sensor::CH2].prot_conf.delay = delay;
     } else {
-        temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.state = state ? true : false;
-        temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.level = level;
-        temperature::sensors[temp_sensor::CH1 + channel.slotIndex].prot_conf.delay = delay;
+        temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.state = state ? true : false;
+        temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.level = level;
+        temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.delay = delay;
     }
 }
 

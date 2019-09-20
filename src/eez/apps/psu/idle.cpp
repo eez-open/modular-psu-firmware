@@ -42,9 +42,7 @@ static uint32_t g_timeOfLastActivity;
 static bool g_guiOrEncoderInactivityTimeMaxed = true;
 static uint32_t g_timeOfLastGuiOrEncoderActivity;
 
-void tick() {
-    uint32_t tickCount = micros();
-
+void tick(uint32_t tickCount) {
     if (g_lastActivityType != ACTIVITY_TYPE_NONE) {
         if (tickCount - g_timeOfLastActivity >=
             g_idleTimeout[g_lastActivityType - 1] * 1000 * 1000) {

@@ -35,7 +35,10 @@
 #include <eez/apps/psu/datetime.h>
 #include <eez/apps/psu/rtc.h>
 #include <eez/apps/psu/temp_sensor.h>
-#include <eez/apps/psu/fan.h>
+
+#if OPTION_FAN
+#include <eez/modules/aux_ps/fan.h>
+#endif
 
 namespace eez {
 namespace psu {
@@ -82,7 +85,9 @@ Device devices[] = {
     { "BP option", 0, 0 },
 #endif
 
-    { "Fan", OPTION_FAN, &fan::g_testResult },
+#if OPTION_FAN
+    { "Fan", OPTION_FAN, &aux_ps::fan::g_testResult },
+#endif
 
     TEMP_SENSORS
 };

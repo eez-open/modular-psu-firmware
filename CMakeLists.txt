@@ -135,7 +135,6 @@ set(src_eez_apps_psu
     src/eez/apps/psu/ntp.cpp
     src/eez/apps/psu/ontime.cpp
     src/eez/apps/psu/persist_conf.cpp
-    src/eez/apps/psu/pid.cpp
     src/eez/apps/psu/profile.cpp
     src/eez/apps/psu/psu.cpp
     src/eez/apps/psu/sd_card.cpp
@@ -164,7 +163,6 @@ set(header_eez_apps_psu
     src/eez/apps/psu/eeprom.h
     src/eez/apps/psu/ethernet.h
     src/eez/apps/psu/event_queue.h
-    src/eez/apps/psu/fan.h
     src/eez/apps/psu/idle.h
     src/eez/apps/psu/init.h
     src/eez/apps/psu/io_pins.h
@@ -172,7 +170,6 @@ set(header_eez_apps_psu
     src/eez/apps/psu/ntp.h
     src/eez/apps/psu/ontime.h
     src/eez/apps/psu/persist_conf.h
-    src/eez/apps/psu/pid.h
     src/eez/apps/psu/profile.h
     src/eez/apps/psu/psu.h
     src/eez/apps/psu/rtc.h
@@ -264,7 +261,6 @@ source_group("eez\\apps\\psu\\scpi" FILES ${src_eez_apps_psu_scpi} ${header_eez_
 
 set(src_eez_apps_psu_simulator
     src/eez/apps/psu/simulator/board.cpp
-    src/eez/apps/psu/simulator/fan.cpp
     src/eez/apps/psu/simulator/psu.cpp
     src/eez/apps/psu/simulator/rtc.cpp
     src/eez/apps/psu/simulator/serial.cpp
@@ -398,6 +394,18 @@ set(header_eez_libs_sd_fat
 list (APPEND header_files ${header_eez_libs_sd_fat})
 source_group("eez\\libs\\sd_fat" FILES ${src_eez_libs_sd_fat} ${header_eez_libs_sd_fat})
 
+set(src_eez_modules_aux_ps
+    src/eez/modules/aux_ps/fan.cpp
+    src/eez/modules/aux_ps/pid.cpp
+) 
+list (APPEND src_files ${src_eez_modules_aux_ps})
+set(header_eez_modules_aux_ps
+    src/eez/modules/aux_ps/fan.h
+    src/eez/modules/aux_ps/pid.h
+) 
+list (APPEND header_files ${header_eez_modules_aux_ps})
+source_group("eez\\modules\\aux_ps" FILES ${src_eez_modules_aux_ps} ${header_eez_modules_aux_ps})
+
 set(src_eez_modules_bp3c
     src/eez/modules/bp3c/eeprom.cpp
     src/eez/modules/bp3c/relays.cpp
@@ -411,11 +419,13 @@ list (APPEND header_files ${header_eez_modules_bp3c})
 source_group("eez\\modules\\bp3c" FILES ${src_eez_modules_bp3c} ${header_eez_modules_bp3c})
 
 set(src_eez_modules_mcu
+    src/eez/modules/mcu/battery.cpp
     src/eez/modules/mcu/display.cpp
     src/eez/modules/mcu/ethernet.cpp
     src/eez/modules/mcu/encoder.cpp) 
 list (APPEND src_files ${src_eez_modules_mcu})
 set(header_eez_modules_mcu
+    src/eez/modules/mcu/battery.h
     src/eez/modules/mcu/display.h
     src/eez/modules/mcu/encoder.h
     src/eez/modules/mcu/ethernet.h

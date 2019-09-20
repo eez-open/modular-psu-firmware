@@ -108,19 +108,19 @@ void tick(uint32_t tick_usec) {
 }
 
 bool isChannelSensorInstalled(Channel *channel) {
-    return sensors[temp_sensor::CH1 + channel->slotIndex].isInstalled();
+    return sensors[temp_sensor::CH1 + channel->channelIndex].isInstalled();
 }
 
 bool getChannelSensorState(Channel *channel) {
-    return sensors[temp_sensor::CH1 + channel->slotIndex].prot_conf.state;
+    return sensors[temp_sensor::CH1 + channel->channelIndex].prot_conf.state;
 }
 
 float getChannelSensorLevel(Channel *channel) {
-    return sensors[temp_sensor::CH1 + channel->slotIndex].prot_conf.level;
+    return sensors[temp_sensor::CH1 + channel->channelIndex].prot_conf.level;
 }
 
 float getChannelSensorDelay(Channel *channel) {
-    return sensors[temp_sensor::CH1 + channel->slotIndex].prot_conf.delay;
+    return sensors[temp_sensor::CH1 + channel->channelIndex].prot_conf.delay;
 }
 
 bool isAnySensorTripped(Channel *channel) {

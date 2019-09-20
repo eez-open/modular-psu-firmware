@@ -15,18 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #pragma once
 
+#include <stdint.h>
+
+#include <eez/index.h> // TestResult
+
 namespace eez {
-namespace psu {
+namespace aux_ps {
 namespace fan {
 
 extern TestResult g_testResult;
-extern volatile int g_rpm;
+extern int g_rpm;
 
 void init();
-void test_start();
 bool test();
 void tick(uint32_t tick_usec);
 
@@ -42,6 +45,8 @@ void setPidTunings(double Kp, double Ki, double Kd, int POn);
 
 void setFanPwm(int pwm);
 
-}
-}
-} // namespace eez::psu::fan
+float readTemperature();
+
+} // namespace fan
+} // namespace aux_ps
+} // namespace eez

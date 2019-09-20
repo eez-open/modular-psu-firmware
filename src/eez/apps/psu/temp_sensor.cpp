@@ -25,6 +25,11 @@
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/drivers/tmp1075.h>
 #include <eez/drivers/tc77.h>
+#include <eez/modules/dcm220/channel.h>
+#endif
+
+#if OPTION_AUX_TEMP_SENSOR
+#include <eez/modules/aux_ps/fan.h>
 #endif
 
 namespace eez {
@@ -49,17 +54,18 @@ TempSensor::TempSensor(Type type_, const char *name_, int ques_bit_, int scpi_er
 
 bool TempSensor::isInstalled() {
     if (type == AUX) {
-#if OPTION_AUX_TEMP_SENSOR        
+#if OPTION_AUX_TEMP_SENSOR  
         return true;
 #else
         return false;
 #endif
     } else if (type >= CH1 && type <= CH6) {
-    	// if (Channel::get(type - CH1).boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {
-    	// 	return false;
-    	// }
-
-        return g_slots[type - CH1].moduleType == MODULE_TYPE_DCP405 || g_slots[type - CH1].moduleType == MODULE_TYPE_DCP505;
+    	int channelIndex = type - CH1;
+        int slotIndex = Channel::get(channelIndex).slotIndex;
+        return
+        		g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 ||
+        		g_slots[slotIndex].moduleType == MODULE_TYPE_DCP505 ||
+				g_slots[slotIndex].moduleType == MODULE_TYPE_DCM220;
     } else {
         return false;
     }
@@ -85,15 +91,26 @@ float TempSensor::doRead() {
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
+#if OPTION_AUX_TEMP_SENSOR
+    if (type == AUX) {
+        return aux_ps::fan::readTemperature();
+    }
+#endif
+    
     if (type >= CH1 && type <= CH6) {
-        int slotIndex = type - CH1;
+    	int channelIndex = type - CH1;
+        int slotIndex = Channel::get(channelIndex).slotIndex;
+
         if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 && Channel::get(slotIndex).boardRevision == CH_BOARD_REVISION_DCP405_R2B5) {
             return drivers::tc77::readTemperature(slotIndex);
         } 
         
-        if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 && Channel::get(slotIndex).boardRevision == CH_BOARD_REVISION_DCP405_R1B1 ||
-            g_slots[slotIndex].moduleType == MODULE_TYPE_DCP505) {
+        if ((g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 && Channel::get(slotIndex).boardRevision == CH_BOARD_REVISION_DCP405_R1B1) || g_slots[slotIndex].moduleType == MODULE_TYPE_DCP505) {
             return drivers::tmp1075::readTemperature(slotIndex);
+        }
+
+        if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCM220) {
+        	return dcm220::readTemperature(channelIndex);
         }
     }
 #endif

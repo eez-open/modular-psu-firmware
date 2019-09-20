@@ -24,7 +24,10 @@
 
 #include <eez/apps/psu/psu.h>
 
-#include <eez/apps/psu/fan.h>
+#if OPTION_FAN
+#include <eez/modules/aux_ps/fan.h>
+#endif
+
 #include <eez/apps/psu/io_pins.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/system.h>
@@ -89,11 +92,13 @@ void ioPinWrite(int pin, int state) {
 #endif
 
 uint8_t isOutputFault() {
+#if OPTION_FAN
     if (isPowerUp()) {
-        if (fan::g_testResult == TEST_FAILED) {
+        if (aux_ps::fan::g_testResult == TEST_FAILED) {
             return 1;
         }
     }
+#endif
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);

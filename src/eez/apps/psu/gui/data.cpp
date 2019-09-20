@@ -33,11 +33,14 @@
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif
+#include <eez/modules/mcu/battery.h>
 #if OPTION_ETHERNET
 #include <eez/apps/psu/ethernet.h>
 #endif
 #include <eez/apps/psu/event_queue.h>
-#include <eez/apps/psu/fan.h>
+#if OPTION_FAN
+#include <eez/modules/aux_ps/fan.h>
+#endif
 #include <eez/apps/psu/list_program.h>
 #include <eez/apps/psu/serial_psu.h>
 #include <eez/apps/psu/temperature.h>
@@ -1386,8 +1389,7 @@ void data_otp_ch(data::DataOperationEnum operation, data::Cursor &cursor, data::
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        temperature::TempSensorTemperature &tempSensor =
-            temperature::sensors[temp_sensor::CH1 + Channel::get(iChannel).slotIndex];
+        temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::CH1 + iChannel];
         if (!tempSensor.isInstalled() || !tempSensor.isTestOK() || !tempSensor.prot_conf.state) {
             value = 0;
         } else if (!channel_dispatcher::isOtpTripped(channel)) {
@@ -1607,8 +1609,7 @@ void data_channel_long_title(data::DataOperationEnum operation, data::Cursor &cu
 void data_channel_temp_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-        temperature::TempSensorTemperature &tempSensor =
-            temperature::sensors[temp_sensor::CH1 + Channel::get(iChannel).slotIndex];
+        temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::CH1 + iChannel];
         if (tempSensor.isInstalled()) {
             if (tempSensor.isTestOK()) {
                 value = 1;
@@ -1626,8 +1627,7 @@ void data_channel_temp(data::DataOperationEnum operation, data::Cursor &cursor, 
         float temperature = 0;
 
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-        temperature::TempSensorTemperature &tempSensor =
-            temperature::sensors[temp_sensor::CH1 + Channel::get(iChannel).slotIndex];
+        temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::CH1 + iChannel];
         if (tempSensor.isInstalled() && tempSensor.isTestOK()) {
             temperature = tempSensor.temperature;
         }
@@ -2443,12 +2443,10 @@ void data_sys_info_ethernet(data::DataOperationEnum operation, data::Cursor &cur
 
 void data_sys_info_fan_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-#if !OPTION_FAN
-        value = 3;
-#else
-        if (fan::g_testResult == TEST_FAILED || fan::g_testResult == TEST_WARNING) {
+#if OPTION_FAN
+        if (aux_ps::fan::g_testResult == TEST_FAILED || aux_ps::fan::g_testResult == TEST_WARNING) {
             value = 0;
-        } else if (fan::g_testResult == TEST_OK) {
+        } else if (aux_ps::fan::g_testResult == TEST_OK) {
 #if FAN_OPTION_RPM_MEASUREMENT
             value = 1;
 #else
@@ -2457,15 +2455,17 @@ void data_sys_info_fan_status(data::DataOperationEnum operation, data::Cursor &c
         } else {
             value = 3;
         }
+#else
+        value = 3;
 #endif
     }
 }
 
 void data_sys_info_fan_speed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if FAN_OPTION_RPM_MEASUREMENT
+#if OPTION_FAN && FAN_OPTION_RPM_MEASUREMENT
     if (operation == data::DATA_OPERATION_GET) {
-        if (fan::g_testResult == TEST_OK) {
-            value = MakeValue((float)fan::g_rpm, UNIT_RPM);
+        if (aux_ps::fan::g_testResult == TEST_OK) {
+            value = MakeValue((float)aux_ps::fan::g_rpm, UNIT_RPM);
         }
     }
 #endif
@@ -3613,6 +3613,12 @@ void data_simulator_load2(data::DataOperationEnum operation, data::Cursor &curso
 }
 
 #endif
+
+void data_battery(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = MakeValue(mcu::battery::g_battery, UNIT_VOLT);
+    }
+}
 
 } // namespace gui
 } // namespace eez

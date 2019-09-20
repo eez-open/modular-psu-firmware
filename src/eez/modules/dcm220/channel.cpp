@@ -18,6 +18,7 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
+#include <crc.h>
 #include <eez/platform/stm32/spi.h>
 #include <memory.h>
 #include <string.h>
@@ -52,7 +53,7 @@ namespace dcm220 {
 #define ADC_MIN 0
 #define ADC_MAX 65535
 
-#define BUFFER_SIZE 16
+#define BUFFER_SIZE 20
 
 #define SPI_SLAVE_SYNBYTE         0x53
 #define SPI_MASTER_SYNBYTE        0xAC
@@ -71,6 +72,29 @@ void masterSynchro(int slotIndex) {
 	while (HAL_GPIO_ReadPin(SPI_IRQ_GPIO_Port[slotIndex], SPI_IRQ_Pin[slotIndex]) != GPIO_PIN_SET);
 }
 
+float calcTemperature(uint16_t adcValue) {
+	if (adcValue == 65535) {
+		// not measured yet
+		return 25;
+	}
+
+	float RF = 3300.0f;
+	float UREF = 3.3f;
+	float T25 = 298.15F;
+	float R25 = 10000;
+	float BETA = 3570;
+	float ADC_MAX_FOR_TEMP = 4095.0f;
+
+	float UT = UREF - adcValue * UREF / ADC_MAX_FOR_TEMP;
+	float RT = RF * UT / (UREF - UT);
+
+	float Tkelvin = 1 / (logf(RT / R25) / BETA + 1 / T25);
+
+	float Tcelsius = Tkelvin - 273.15f;
+
+	return roundPrec(Tcelsius, 0.1f);
+}
+
 #endif
 
 struct Channel : ChannelInterface {
@@ -84,6 +108,8 @@ struct Channel : ChannelInterface {
 	bool outputEnable[2];
 	uint16_t uSet[2];
 	uint16_t iSet[2];
+
+	float temperature[2];
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -93,17 +119,41 @@ struct Channel : ChannelInterface {
     float iSet[2];
 #endif
 
+    TestResult testResult;
+
     Channel(int slotIndex_)
 		: ChannelInterface(slotIndex_)
 #if defined(EEZ_PLATFORM_STM32)
 		, synchronized(false)
 #endif
+    	, testResult(TEST_NONE)
 	{
 #if defined(EEZ_PLATFORM_STM32)
     	memset(output, 0, sizeof(output));
     	memset(input, 0, sizeof(input));
 #endif
     }
+
+#if defined(EEZ_PLATFORM_STM32)
+    bool isCrcOk;
+
+	void transfer() {
+		spi::select(slotIndex, spi::CHIP_DCM220);
+		spi::transfer(slotIndex, output, input, BUFFER_SIZE);
+		spi::deselect(slotIndex);
+
+		lastTickCount = micros();
+
+		uint32_t crc = HAL_CRC_Calculate(&hcrc, (uint32_t *)input, BUFFER_SIZE - 4);
+		if (crc == *((uint32_t *)(input + BUFFER_SIZE - 4))) {
+			isCrcOk = true;
+		} else {
+			isCrcOk = false;
+			DebugTrace("CRC NOT OK %u\n", crc);
+
+		}
+	}
+#endif
 
 	void init(int subchannelIndex) {
 #if defined(EEZ_PLATFORM_STM32)
@@ -127,11 +177,7 @@ struct Channel : ChannelInterface {
 		if (subchannelIndex == 0) {
 			output[0] = 0;
 
-			spi::select(slotIndex, spi::CHIP_DCM220);
-			spi::transfer(slotIndex, output, input, BUFFER_SIZE);
-			spi::deselect(slotIndex);
-
-			lastTickCount = micros();
+			transfer();
 		}
 
 		bool pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
@@ -143,10 +189,12 @@ struct Channel : ChannelInterface {
 #endif
 
 		channel.flags.powerOk = pwrGood ? 1 : 0;
+
+		testResult = channel.flags.powerOk ? TEST_OK : TEST_FAILED;
 	}
 
 	TestResult getTestResult(int subchannelIndex) {
-		return TEST_OK;
+		return testResult;
 	}
 
 	void tick(int subchannelIndex, uint32_t tickCount) {
@@ -172,15 +220,14 @@ struct Channel : ChannelInterface {
         	outputSetValues[2] = uSet[1];
         	outputSetValues[3] = iSet[1];
 
-			spi::select(slotIndex, spi::CHIP_DCM220);
-			spi::transfer(slotIndex, output, input, BUFFER_SIZE);
-			spi::deselect(slotIndex);
+			transfer();
 
 		    if (oeSync) {
 		        HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
 		    }
 
-			lastTickCount = tickCount;
+			temperature[0] = calcTemperature(*((uint16_t *)(input + 10)));
+			temperature[1] = calcTemperature(*((uint16_t *)(input + 12)));
         }
 #endif
 
@@ -259,7 +306,19 @@ struct Channel : ChannelInterface {
 			return;
 		}
 #endif
+
+//		diff = tickCount - dumpTempTickCount;
+//		if (subchannelIndex == 0 && diff > 2000000) {
+//			uint16_t temp0 = *((uint16_t *)(input + 10));
+//			uint16_t temp1 = *((uint16_t *)(input + 12));
+//			uint16_t temp2 = *((uint16_t *)(input + 14));
+//
+//			DebugTrace("CH1=%u, CH2=%u, MCU=%u, %g, %g\n", (unsigned)temp0, (unsigned)temp1, (unsigned)temp2, temperature[0], temperature[1]);
+//			dumpTempTickCount = tickCount;
+//		}
 	}
+
+//	uint32_t dumpTempTickCount;
 
 	bool isCcMode(int subchannelIndex) {
 #if defined(EEZ_PLATFORM_STM32)
@@ -353,6 +412,17 @@ static Channel g_channel1(1);
 static Channel g_channel2(2);
 ChannelInterface *g_channelInterface[NUM_SLOTS] = { &g_channel0, &g_channel1, &g_channel2 };
 
+#if defined(EEZ_PLATFORM_STM32)
+
+float readTemperature(int channelIndex) {
+	psu::Channel& channel = psu::Channel::get(channelIndex);
+	int slotIndex = channel.slotIndex;
+	int subchannelIndex = channel.subchannelIndex;
+	Channel *dcm220Channel = (Channel *)g_channelInterface[slotIndex];
+	return dcm220Channel->temperature[subchannelIndex];
+}
+
+#endif
 
 } // namespace dcm220
 } // namespace eez

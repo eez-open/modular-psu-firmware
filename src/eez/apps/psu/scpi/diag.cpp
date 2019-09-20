@@ -27,7 +27,10 @@
 #include <eez/apps/psu/devices.h>
 #include <eez/apps/psu/scpi/psu.h>
 #include <eez/apps/psu/temperature.h>
-#include <eez/apps/psu/fan.h>
+
+#if OPTION_FAN
+#include <eez/modules/aux_ps/fan.h>
+#endif
 
 namespace eez {
 namespace psu {
@@ -355,10 +358,12 @@ scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
     // buffer);
     //	}
     //
+    // #if OPTION_FAN    
     //  sprintf(buffer, "%d, Fan, %s, %s",
-    //      fan::g_testResult, get_installed_str(OPTION_FAN),
-    //      get_test_result_str(fan::g_testResult));
+    //      aux_ps::fan::g_testResult, get_installed_str(OPTION_FAN),
+    //      get_test_result_str(aux_ps::fan::g_testResult));
     //  SCPI_ResultText(context, buffer);
+    // #endif
     //
     //	if (isPowerUp()) {
     //        for (int i = 0; i < CH_NUM; ++i) {
@@ -387,7 +392,7 @@ scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
 scpi_result_t scpi_cmd_diagnosticInformationFanQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_FAN && FAN_OPTION_RPM_MEASUREMENT
-    SCPI_ResultInt(context, fan::g_rpm);
+    SCPI_ResultInt(context, aux_ps::fan::g_rpm);
 #else
     SCPI_ResultInt(context, -1);
 #endif

@@ -21,7 +21,10 @@
 
 #include <eez/apps/psu/psu.h>
 
-#include <eez/apps/psu/fan.h>
+#if OPTION_FAN
+#include <eez/modules/aux_ps/fan.h>
+#endif
+
 #include <eez/apps/psu/scpi/psu.h>
 #include <eez/apps/psu/serial_psu.h>
 #include <eez/apps/psu/temperature.h>
@@ -226,7 +229,10 @@ scpi_result_t scpi_cmd_debugMeasureVoltage(scpi_t *context) {
         watchdog::tick(tickCount);
 #endif
         temperature::tick(tickCount);
-        fan::tick(tickCount);
+
+#if OPTION_FAN
+        aux_ps::fan::tick(tickCount);
+#endif
 
         channel->channelInterface->adcMeasureUMon(channel->subchannelIndex);
 
@@ -267,7 +273,10 @@ scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
         watchdog::tick(tickCount);
 #endif
         temperature::tick(tickCount);
-        fan::tick(tickCount);
+
+#if OPTION_FAN
+        aux_ps::fan::tick(tickCount);
+#endif
 
         channel->channelInterface->adcMeasureIMon(channel->subchannelIndex);
 
@@ -290,6 +299,7 @@ scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugFan(scpi_t *context) {
+#if OPTION_FAN
     // TODO migrate to generic firmware
     int32_t fanSpeed;
     if (!SCPI_ParamInt(context, &fanSpeed, TRUE)) {
@@ -297,29 +307,39 @@ scpi_result_t scpi_cmd_debugFan(scpi_t *context) {
     }
 
     if (fanSpeed < 0) {
-        fan::g_fanManualControl = false;
+        aux_ps::fan::g_fanManualControl = false;
     } else {
-        fan::g_fanManualControl = true;
+        aux_ps::fan::g_fanManualControl = true;
 
         if (fanSpeed > 255) {
             fanSpeed = 255;
         }
 
-        fan::g_fanSpeedPWM = fanSpeed;
-        fan::setFanPwm(fan::g_fanSpeedPWM);
+        aux_ps::fan::g_fanSpeedPWM = fanSpeed;
+        aux_ps::fan::setFanPwm(aux_ps::fan::g_fanSpeedPWM);
     }
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_debugFanQ(scpi_t *context) {
+#if OPTION_FAN
     // TODO migrate to generic firmware
-    SCPI_ResultInt(context, fan::g_fanSpeedPWM);
+    SCPI_ResultInt(context, aux_ps::fan::g_fanSpeedPWM);
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_debugFanPid(scpi_t *context) {
+#if OPTION_FAN
     // TODO migrate to generic firmware
     double Kp;
     if (!SCPI_ParamDouble(context, &Kp, TRUE)) {
@@ -341,18 +361,27 @@ scpi_result_t scpi_cmd_debugFanPid(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    fan::setPidTunings(Kp, Ki, Kd, POn);
+    aux_ps::fan::setPidTunings(Kp, Ki, Kd, POn);
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_debugFanPidQ(scpi_t *context) {
+#if OPTION_FAN
     // TODO migrate to generic firmware
-    double Kp[4] = { fan::g_Kp, fan::g_Ki, fan::g_Kd, fan::g_POn * 1.0f };
+    double Kp[4] = { aux_ps::fan::g_Kp, aux_ps::fan::g_Ki, aux_ps::fan::g_Kd, aux_ps::fan::g_POn * 1.0f };
 
     SCPI_ResultArrayDouble(context, Kp, 4, SCPI_FORMAT_ASCII);
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_debugCsvQ(scpi_t *context) {

@@ -156,15 +156,16 @@
 /// power will be turned off.
 #define FAN_MAX_TEMP 75
 
-///  PWM value for min. fan speed (12)
-#define FAN_MIN_PWM 1
+/// PWM value for min. fan speed
+#define FAN_MIN_PWM 30
 
-/// PWM value for max. fan speed (255)
+/// PWM value for max. fan speed
 #define FAN_MAX_PWM 255
 
 /// FAN PID controller parameters
 #define FAN_PID_KP 0.1f
-#define FAN_PID_KI 0.05f
+#define FAN_PID_KI_MIN 0.05f
+#define FAN_PID_KI_MAX 0.8f
 #define FAN_PID_KD 0
 #define FAN_PID_POn                                                                                \
     1 // PoM: 0, PoE: 1, see
