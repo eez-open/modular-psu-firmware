@@ -53,7 +53,7 @@ void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_VBAT;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -71,6 +71,10 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
   /* USER CODE END ADC1_MspInit 0 */
     /* ADC1 clock enable */
     __HAL_RCC_ADC1_CLK_ENABLE();
+
+    /* ADC1 interrupt Init */
+    HAL_NVIC_SetPriority(ADC_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(ADC_IRQn);
   /* USER CODE BEGIN ADC1_MspInit 1 */
 
   /* USER CODE END ADC1_MspInit 1 */
@@ -87,6 +91,9 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
   /* USER CODE END ADC1_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_ADC1_CLK_DISABLE();
+
+    /* ADC1 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(ADC_IRQn);
   /* USER CODE BEGIN ADC1_MspDeInit 1 */
 
   /* USER CODE END ADC1_MspDeInit 1 */

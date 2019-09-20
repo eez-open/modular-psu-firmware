@@ -1,9 +1,11 @@
 #MicroXplorer Configuration settings - do not modify
 ADC1.Channel-0\#ChannelRegularConversion=ADC_CHANNEL_VBAT
-ADC1.IPParameters=Rank-0\#ChannelRegularConversion,Channel-0\#ChannelRegularConversion,SamplingTime-0\#ChannelRegularConversion,NbrOfConversionFlag,master
+ADC1.ContinuousConvMode=DISABLE
+ADC1.IPParameters=Rank-0\#ChannelRegularConversion,Channel-0\#ChannelRegularConversion,SamplingTime-0\#ChannelRegularConversion,NbrOfConversionFlag,master,ContinuousConvMode,ScanConvMode
 ADC1.NbrOfConversionFlag=1
 ADC1.Rank-0\#ChannelRegularConversion=1
-ADC1.SamplingTime-0\#ChannelRegularConversion=ADC_SAMPLETIME_3CYCLES
+ADC1.SamplingTime-0\#ChannelRegularConversion=ADC_SAMPLETIME_15CYCLES
+ADC1.ScanConvMode=ADC_SCAN_DISABLE
 ADC1.master=1
 DAC.DAC_Trigger=DAC_TRIGGER_T6_TRGO
 DAC.IPParameters=DAC_Trigger
@@ -293,6 +295,7 @@ Mcu.UserConstants=
 Mcu.UserName=STM32F769IGTx
 MxCube.Version=5.3.0
 MxDb.Version=DB.5.0.30
+NVIC.ADC_IRQn=true\:5\:0\:false\:false\:true\:true\:true\:true
 NVIC.BusFault_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:false
 NVIC.DMA1_Stream5_IRQn=true\:5\:0\:false\:false\:true\:true\:true\:true
 NVIC.DMA2_Stream3_IRQn=true\:5\:0\:false\:false\:true\:true\:true\:true
