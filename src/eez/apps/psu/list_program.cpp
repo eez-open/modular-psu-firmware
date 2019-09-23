@@ -224,7 +224,7 @@ bool loadList(int iChannel, const char *filePath, int *err) {
     File file;
     if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
         if (err) {
-            *err = SCPI_ERROR_EXECUTION_ERROR;
+            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         }
         return false;
     }
@@ -314,7 +314,7 @@ bool loadList(int iChannel, const char *filePath, int *err) {
         setVoltageList(channel, voltageList, voltageListLength);
         setCurrentList(channel, currentList, currentListLength);
     } else {
-        // TODO more specific error
+        // TODO replace with more specific error
         if (err) {
             *err = SCPI_ERROR_EXECUTION_ERROR;
         }
@@ -350,9 +350,8 @@ bool saveList(int iChannel, const char *filePath, int *err) {
 
     File file;
     if (!file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
-        // TODO more specific error
         if (err) {
-            *err = SCPI_ERROR_EXECUTION_ERROR;
+            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         }
         return false;
     }

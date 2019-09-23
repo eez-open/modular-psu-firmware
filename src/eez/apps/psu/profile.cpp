@@ -434,7 +434,7 @@ bool recallFromFile(const char *filePath, int *err) {
 
     if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
         if (err)
-            *err = SCPI_ERROR_EXECUTION_ERROR;
+            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
     }
 
@@ -443,9 +443,8 @@ bool recallFromFile(const char *filePath, int *err) {
     file.close();
 
     if (size != sizeof(profile) || !persist_conf::checkBlock((const persist_conf::BlockHeader *)&profile, sizeof(profile), PROFILE_VERSION)) {
-        // TODO more specific error
         if (err)
-            *err = SCPI_ERROR_EXECUTION_ERROR;
+            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
     }
 
@@ -456,14 +455,13 @@ bool recallFromFile(const char *filePath, int *err) {
     }
 
     if (!persist_conf::saveProfile(0, &profile)) {
-        // TODO more specific error
         if (err)
-            *err = SCPI_ERROR_EXECUTION_ERROR;
+            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
     }
 
     if (!recallFromProfile(&profile, 0)) {
-        // TODO more specific error
+        // TODO replace with more specific error
         if (err)
             *err = SCPI_ERROR_EXECUTION_ERROR;
         return false;
@@ -538,9 +536,8 @@ bool saveToFile(const char *filePath, int *err) {
     File file;
 
     if (!file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
-        // TODO more specific error
         if (err)
-            *err = SCPI_ERROR_EXECUTION_ERROR;
+            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
     }
 
@@ -554,8 +551,7 @@ bool saveToFile(const char *filePath, int *err) {
     file.close();
 
     if (size != sizeof(profile)) {
-        // TODO more specific error
-        *err = SCPI_ERROR_EXECUTION_ERROR;
+        *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
     }
 

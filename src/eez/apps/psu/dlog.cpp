@@ -75,11 +75,13 @@ int checkDlogParameters() {
     }
 
     if (!somethingToLog) {
-        return SCPI_ERROR_EXECUTION_ERROR; // @todo find better SCPI error code
+        // TODO replace with more specific error
+        return SCPI_ERROR_EXECUTION_ERROR;
     }
 
     if (!*g_filePath) {
-        return SCPI_ERROR_EXECUTION_ERROR; // @todo find better SCPI error code
+        // TODO replace with more specific error
+        return SCPI_ERROR_EXECUTION_ERROR;
     }
 
     return 0;
@@ -156,7 +158,8 @@ int startImmediately() {
     }
 
     if (!g_file.open(g_filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-        return SCPI_ERROR_EXECUTION_ERROR; // @todo find better SCPI error code
+        // TODO replace with more specific error
+        return SCPI_ERROR_EXECUTION_ERROR;
     }
 
     if (!g_file.truncate(0)) {
