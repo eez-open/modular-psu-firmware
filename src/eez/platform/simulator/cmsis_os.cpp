@@ -96,19 +96,14 @@ uint32_t osKernelSysTick() {
 
     if (isFirstTime) {
         isFirstTime = false;
-
         QueryPerformanceFrequency(&frequency);
-        assert(frequency.QuadPart < 4294967296);
-        osKernelSysTickFrequency = (uint32_t)frequency.QuadPart;
-
         QueryPerformanceCounter(&startTime);
-
         return 0;
     } else {
         LARGE_INTEGER currentTime;
         QueryPerformanceCounter(&currentTime);
 
-        auto diff = currentTime.QuadPart - startTime.QuadPart;
+        auto diff = (currentTime.QuadPart - startTime.QuadPart) * 1000 / frequency.QuadPart;
 
         return uint32_t(diff % 4294967296);
     }
@@ -116,7 +111,7 @@ uint32_t osKernelSysTick() {
     timeval tv;
     gettimeofday(&tv, NULL);
     uint64_t micros = tv.tv_sec * (uint64_t)1000000 + tv.tv_usec;
-    return micros;
+    return uint32_t((micros / 1000) % 4294967296);
 #endif    
 }
 

@@ -30,6 +30,14 @@ namespace eez {
 namespace psu {
 namespace ontime {
 
+ontime::Counter g_mcuCounter(ontime::ON_TIME_COUNTER_MCU);
+
+ontime::Counter g_moduleCounters[] = {
+    ontime::Counter(ontime::ON_TIME_COUNTER_SLOT1),
+    ontime::Counter(ontime::ON_TIME_COUNTER_SLOT2),
+    ontime::Counter(ontime::ON_TIME_COUNTER_SLOT3)
+};
+
 void counterToString(char *str, size_t count, uint32_t counterTime) {
     if (counterTime >= 24 * 60) {
         uint32_t d = counterTime / (24 * 60);
@@ -93,10 +101,10 @@ void Counter::tick(uint32_t tick_usec) {
     if (time > 0) {
         lastTime += time;
         fractionTime -= time * MIN_TO_MS;
-    }
 
-    if (writeInterval.test(tick_usec)) {
-        persist_conf::writeTotalOnTime(getType(), getTotalTime());
+        if (writeInterval.test(tick_usec)) {
+            persist_conf::writeTotalOnTime(getType(), getTotalTime());
+        }
     }
 }
 

@@ -26,7 +26,12 @@ namespace ontime {
 
 void counterToString(char *str, size_t count, uint32_t counterTime);
 
-enum { ON_TIME_COUNTER_POWER, ON_TIME_COUNTER_CH1, ON_TIME_COUNTER_CH2, ON_TIME_COUNTER_CH3, ON_TIME_COUNTER_CH4, ON_TIME_COUNTER_CH5, ON_TIME_COUNTER_CH6 };
+enum { 
+    ON_TIME_COUNTER_MCU, 
+    ON_TIME_COUNTER_SLOT1,
+    ON_TIME_COUNTER_SLOT2,
+    ON_TIME_COUNTER_SLOT3
+};
 
 class Counter {
   public:
@@ -54,6 +59,9 @@ class Counter {
     uint32_t fractionTime;
     Interval writeInterval;
 };
+
+extern ontime::Counter g_mcuCounter;
+extern ontime::Counter g_moduleCounters[];
 
 } // namespace ontime
 } // namespace psu

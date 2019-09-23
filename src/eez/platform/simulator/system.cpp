@@ -23,10 +23,11 @@
 namespace eez {
 
 uint32_t millis() {
-    return osKernelSysTick() / (osKernelSysTickFrequency / 1000);
+    // osKernelSysTick must be in milliseconds
+    return osKernelSysTick();
 }
 uint32_t micros() {
-    return osKernelSysTick() / (osKernelSysTickFrequency / 1000000);
+    return osKernelSysTick() * 1000;
 }
 
 void delay(uint32_t millis) {

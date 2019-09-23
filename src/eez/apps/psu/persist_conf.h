@@ -69,8 +69,8 @@ struct DeviceFlags {
     unsigned forceDisablingAllOutputsOnPowerUp : 1;
     unsigned isFrontPanelLocked : 1;
     unsigned isClickSoundEnabled : 1;
-    unsigned ch1CalEnabled : 1;
-    unsigned ch2CalEnabled : 1;
+    unsigned reserved1 : 1; // was ch1CalEnabled
+    unsigned reserved2 : 1; // was ch2CalEnabled
     unsigned channelsViewModeInMax : 3;
     unsigned channelsIsMaxView : 1;
     unsigned slotMax: 2;
@@ -156,17 +156,14 @@ struct DeviceConfiguration2 {
     uint8_t reserved[16];
 };
 
-static const uint16_t PROFILE_VERSION = 8;
-
-bool check_block(const BlockHeader *block, uint16_t size, uint16_t version);
-uint32_t calc_checksum(const BlockHeader *block, uint16_t size);
+bool checkBlock(const BlockHeader *block, uint16_t size, uint16_t version);
+uint32_t calcChecksum(const BlockHeader *block, uint16_t size);
 
 extern DeviceConfiguration devConf;
-extern DeviceConfiguration2 devConf2;
-
 void loadDevice();
 bool saveDevice();
 
+extern DeviceConfiguration2 devConf2;
 void loadDevice2();
 bool saveDevice2();
 
@@ -209,11 +206,6 @@ void toggleChannelsViewMode();
 
 void setChannelsMaxView(int slotIndex); // slotIndex starts from 1
 void toggleChannelsMaxView(int slotIndex); // slotIndex starts from 1
-
-void loadChannelCalibration(Channel &channel);
-bool saveChannelCalibration(Channel &channel);
-
-void saveCalibrationEnabledFlag(Channel &channel, bool enabled);
 
 bool loadProfile(int location, profile::Parameters *profile);
 bool saveProfile(int location, profile::Parameters *profile);
@@ -269,6 +261,24 @@ bool setSdLocked(bool sdLocked);
 bool isSdLocked();
 
 void setAnimationsDuration(float value);
+
+////////////////////////////////////////////////////////////////////////////////
+
+struct ModuleConfiguration {
+    BlockHeader header;
+    uint8_t chCalEnabled;
+};
+
+extern ModuleConfiguration g_moduleConf[NUM_SLOTS];
+
+void loadModuleConf(int slotIndex);
+bool saveModuleConf(int slotIndex);
+
+bool isChannelCalibrationEnabled(Channel &channel);
+void saveCalibrationEnabledFlag(Channel &channel, bool enabled);
+
+void loadChannelCalibration(Channel &channel);
+bool saveChannelCalibration(Channel &channel);
 
 } // namespace persist_conf
 } // namespace psu

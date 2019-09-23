@@ -102,8 +102,6 @@ RLState g_rlState = RL_STATE_LOCAL;
 
 bool g_rprogAlarm = false;
 
-ontime::Counter g_powerOnTimeCounter(ontime::ON_TIME_COUNTER_POWER);
-
 void (*g_diagCallback)();
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,6 +135,9 @@ void init() {
     eeprom::init();
     eeprom::test();
 
+    bp3c::eeprom::init();
+    bp3c::eeprom::test();
+
 #if OPTION_SD_CARD
     sd_card::init();
 #endif
@@ -144,6 +145,8 @@ void init() {
     bp3c::relays::init();
 
     // inst:memo ch1,0,2,406
+
+    ontime::g_mcuCounter.init();
 
     int channelIndex = 0;
     for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
@@ -173,14 +176,13 @@ void init() {
         for (uint8_t subchannelIndex = 0; subchannelIndex < g_modules[g_slots[slotIndex].moduleType].numChannels; subchannelIndex++) {
             Channel::get(channelIndex++).set(slotIndex, subchannelIndex, g_slots[slotIndex].boardRevision);
         }
+
+        if (g_slots[slotIndex].moduleType != MODULE_TYPE_NONE) {
+            persist_conf::loadModuleConf(slotIndex);
+            ontime::g_moduleCounters[slotIndex].init();
+        }
     }
     CH_NUM = channelIndex;
-
-    g_powerOnTimeCounter.init();
-    for (int i = 0; i < CH_NUM; i++) {
-    	Channel::get(i).onTimeCounter.setType(i + 1);
-        Channel::get(i).onTimeCounter.init();
-    }
 
     loadConf();
 
@@ -424,8 +426,7 @@ static bool loadAutoRecallProfile(profile::Parameters *profile, int *location) {
             if (outputEnabled) {
                 bool disableOutputs = false;
 
-                if (persist_conf::isForceDisablingAllOutputsOnPowerUpEnabled() ||
-                    !g_bootTestSuccess) {
+                if (persist_conf::isForceDisablingAllOutputsOnPowerUpEnabled() || !g_bootTestSuccess) {
                     disableOutputs = true;
                 } else {
                     if (*location != 0) {
@@ -469,6 +470,11 @@ static bool autoRecall() {
     profile::Parameters profile;
     int location;
     if (loadAutoRecallProfile(&profile, &location)) {
+        if (!checkProfileModuleMatch(&profile)) {
+            event_queue::pushEvent(event_queue::EVENT_WARNING_AUTO_RECALL_MODULE_MISMATCH);
+            return false;
+        }
+
         if (profile::recallFromProfile(&profile, location)) {
             return true;
         }
@@ -526,7 +532,13 @@ bool powerUp() {
     // turn power on
     board::powerUp();
     g_powerIsUp = true;
-    g_powerOnTimeCounter.start();
+
+    ontime::g_mcuCounter.start();
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        if (g_slots[slotIndex].moduleType != MODULE_TYPE_NONE) {
+            ontime::g_moduleCounters[slotIndex].start();
+        }
+    }
 
     // init channels
     for (int i = 0; i < CH_NUM; ++i) {
@@ -585,7 +597,13 @@ void powerDown() {
     board::powerDown();
 
     g_powerIsUp = false;
-    g_powerOnTimeCounter.stop();
+
+    ontime::g_mcuCounter.stop();
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        if (g_slots[slotIndex].moduleType != MODULE_TYPE_NONE) {
+            ontime::g_moduleCounters[slotIndex].stop();
+        }
+    }
 
     event_queue::pushEvent(event_queue::EVENT_INFO_POWER_DOWN);
 
@@ -632,12 +650,15 @@ void changePowerState(bool up) {
 
         // auto recall channels parameters from profile
         if (recall) {
-            for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-                memcpy(&temperature::sensors[i].prot_conf, profile.temp_prot + i,
-                       sizeof(temperature::ProtectionConfiguration));
-            }
+            if (!checkProfileModuleMatch(&profile)) {
+                event_queue::pushEvent(event_queue::EVENT_WARNING_AUTO_RECALL_MODULE_MISMATCH);
+            } else {
+                for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
+                    memcpy(&temperature::sensors[i].prot_conf, profile.temp_prot + i, sizeof(temperature::ProtectionConfiguration));
+                }
 
-            profile::recallChannelsFromProfile(&profile, location);
+                profile::recallChannelsFromProfile(&profile, location);
+            }
         }
 
         profile::save();
@@ -717,8 +738,13 @@ void onProtectionTripped() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void tick_powerOnTimeCounter(uint32_t tickCount) {
-    g_powerOnTimeCounter.tick(tickCount);
+void tick_onTimeCounters(uint32_t tickCount) {
+    ontime::g_mcuCounter.tick(tickCount);
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        if (g_slots[slotIndex].moduleType != MODULE_TYPE_NONE) {
+            ontime::g_moduleCounters[slotIndex].tick(tickCount);
+        }
+    }
 }
 
 typedef void (*TickFunc)(uint32_t tickCount);
@@ -727,7 +753,7 @@ static TickFunc g_tickFuncs[] = {
     debug::tick,
 #endif
     event_queue::tick,
-    tick_powerOnTimeCounter,
+    tick_onTimeCounters,
     temperature::tick,
 #if OPTION_FAN
     aux_ps::fan::tick,

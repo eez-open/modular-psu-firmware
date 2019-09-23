@@ -100,17 +100,18 @@ static const int EVENT_TYPE_ERROR = 3;
     EVENT_WARNING(CH4_CALIBRATION_DISABLED, 3, "Ch4 calibration disabled")                         \
     EVENT_WARNING(CH5_CALIBRATION_DISABLED, 4, "Ch5 calibration disabled")                         \
     EVENT_WARNING(CH6_CALIBRATION_DISABLED, 5, "Ch6 calibration disabled")                         \
-    EVENT_WARNING(CH1_UNKNOWN_PWRGOOD_STATE, 10, "Ch1 unknown PWRGOOD")                             \
-    EVENT_WARNING(CH2_UNKNOWN_PWRGOOD_STATE, 11, "Ch2 unknown PWRGOOD")                             \
-    EVENT_WARNING(CH3_UNKNOWN_PWRGOOD_STATE, 12, "Ch3 unknown PWRGOOD")                             \
-    EVENT_WARNING(CH4_UNKNOWN_PWRGOOD_STATE, 13, "Ch4 unknown PWRGOOD")                             \
-    EVENT_WARNING(CH5_UNKNOWN_PWRGOOD_STATE, 14, "Ch5 unknown PWRGOOD")                             \
-    EVENT_WARNING(CH6_UNKNOWN_PWRGOOD_STATE, 15, "Ch6 unknown PWRGOOD")                             \
+    EVENT_WARNING(CH1_UNKNOWN_PWRGOOD_STATE, 10, "Ch1 unknown PWRGOOD")                            \
+    EVENT_WARNING(CH2_UNKNOWN_PWRGOOD_STATE, 11, "Ch2 unknown PWRGOOD")                            \
+    EVENT_WARNING(CH3_UNKNOWN_PWRGOOD_STATE, 12, "Ch3 unknown PWRGOOD")                            \
+    EVENT_WARNING(CH4_UNKNOWN_PWRGOOD_STATE, 13, "Ch4 unknown PWRGOOD")                            \
+    EVENT_WARNING(CH5_UNKNOWN_PWRGOOD_STATE, 14, "Ch5 unknown PWRGOOD")                            \
+    EVENT_WARNING(CH6_UNKNOWN_PWRGOOD_STATE, 15, "Ch6 unknown PWRGOOD")                            \
     EVENT_WARNING(ETHERNET_NOT_CONNECTED, 20, "Ethernet not connected")                            \
-    EVENT_WARNING(AUTO_RECALL_VALUES_MISMATCH, 21, "Auto-recall mismatch")                         \
+    EVENT_WARNING(AUTO_RECALL_VALUES_MISMATCH, 21, "Auto-recall values mismatch")                  \
     EVENT_WARNING(NTP_REFRESH_FAILED, 22, "NTP refresh failed")                                    \
     EVENT_WARNING(FILE_UPLOAD_ABORTED, 23, "File upload aborted")                                  \
     EVENT_WARNING(FILE_DOWNLOAD_ABORTED, 24, "File download aborted")                              \
+    EVENT_WARNING(AUTO_RECALL_MODULE_MISMATCH, 25, "Auto-recall module mismatch")                  \
     EVENT_INFO(WELCOME, 0, "Welcome!")                                                             \
     EVENT_INFO(POWER_UP, 1, "Power up")                                                            \
     EVENT_INFO(POWER_DOWN, 2, "Power down")                                                        \

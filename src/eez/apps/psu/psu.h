@@ -75,8 +75,6 @@ void unlimitMaxCurrent();
 
 extern volatile bool g_insideInterruptHandler;
 
-extern ontime::Counter g_powerOnTimeCounter;
-
 enum RLState { RL_STATE_LOCAL = 0, RL_STATE_REMOTE = 1, RL_STATE_RW_LOCK = 2 };
 
 extern RLState g_rlState;

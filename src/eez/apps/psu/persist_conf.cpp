@@ -16,9 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
+
 #include <eez/apps/psu/psu.h>
 
 #include <eez/apps/psu/eeprom.h>
+#include <eez/modules/bp3c/eeprom.h>
 
 #include <eez/apps/psu/event_queue.h>
 #include <eez/apps/psu/profile.h>
@@ -44,13 +47,15 @@ using namespace eez::mcu::display;
 
 #include <eez/gui/widgets/yt_graph.h>
 
+#define NUM_RETRIES 2
+
 namespace eez {
 namespace psu {
 
 #if OPTION_SD_CARD
 namespace sd_card {
-bool confRead(uint8_t *buffer, uint16_t buffer_size, uint16_t address);
-bool confWrite(const uint8_t *buffer, uint16_t buffer_size, uint16_t address);
+bool confRead(uint8_t *buffer, uint16_t bufferSize, uint16_t address);
+bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t address);
 } // namespace sd_card
 #endif
 
@@ -61,21 +66,16 @@ namespace persist_conf {
 enum PersistConfSection {
     PERSIST_CONF_BLOCK_DEVICE,
     PERSIST_CONF_BLOCK_DEVICE2,
-    PERSIST_CONF_BLOCK_CH_CAL,
     PERSIST_CONF_BLOCK_FIRST_PROFILE,
 };
 
-////////////////////////////////////////////////////////////////////////////////
-
 static const uint16_t DEV_CONF_VERSION = 9;
 static const uint16_t DEV_CONF2_VERSION = 11;
+static const uint16_t MODULE_CONF_VERSION = 1;
 static const uint16_t CH_CAL_CONF_VERSION = 3;
 
 static const uint16_t PERSIST_CONF_DEVICE_ADDRESS = 1024;
 static const uint16_t PERSIST_CONF_DEVICE2_ADDRESS = 1536;
-
-static const uint16_t PERSIST_CONF_CH_CAL_ADDRESS = 2048;
-static const uint16_t PERSIST_CONF_CH_CAL_BLOCK_SIZE = 512;
 
 static const uint16_t PERSIST_CONF_FIRST_PROFILE_ADDRESS = 5120;
 static const uint16_t PERSIST_CONF_PROFILE_BLOCK_SIZE = 1024;
@@ -84,69 +84,164 @@ static const uint32_t ONTIME_MAGIC = 0xA7F31B3CL;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+enum ModulePersistConfSection {
+    MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION,
+    MODULE_PERSIST_CONF_BLOCK_CH_CAL,
+};
+
+static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 64;
+static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE = 64;
+
+static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = 128;
+static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 144;
+
+////////////////////////////////////////////////////////////////////////////////
+
 DeviceConfiguration devConf;
 DeviceConfiguration2 devConf2;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool confRead(uint8_t *buffer, uint16_t buffer_size, uint16_t address) {
-    if (eeprom::g_testResult == TEST_OK) {
-        eeprom::read(buffer, buffer_size, address);
-        return true;
+bool confRead(uint8_t *buffer, uint16_t bufferSize, uint16_t address, int version) {
+    for (int i = 0; i < NUM_RETRIES; i++) {
+        bool result = false;
+        if (eeprom::g_testResult == TEST_OK) {
+            result = eeprom::read(buffer, bufferSize, address);
+        }
+#if OPTION_SD_CARD
+        else {
+            result = sd_card::confRead(buffer, bufferSize, address);
+        }
+#endif
+
+        if (version == -1) {
+            return result;
+        }
+
+        if (result && checkBlock((const BlockHeader *)buffer, bufferSize, version)) {
+            return true;
+        }
     }
 
-#if OPTION_SD_CARD
-    return sd_card::confRead(buffer, buffer_size, address);
-#else
-	return false;
-#endif
+    return false;
 }
 
-bool confWrite(const uint8_t *buffer, uint16_t buffer_size, uint16_t address) {
-    if (eeprom::g_testResult == TEST_OK) {
-        return eeprom::write(buffer, buffer_size, address);
+bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
+    for (int i = 0; i < NUM_RETRIES; i++) {
+        bool result = false;
+
+        if (eeprom::g_testResult == TEST_OK) {
+            result = eeprom::write(buffer, bufferSize, address);
+        }
+#if OPTION_SD_CARD
+        else {
+            result = sd_card::confWrite(buffer, bufferSize, address);
+        }
+#endif
+
+        if (result) {
+            uint8_t verifyBuffer[768];
+            assert(sizeof(verifyBuffer) >= bufferSize);
+            if (confRead(verifyBuffer, bufferSize, address, -1) && memcmp(buffer, verifyBuffer, bufferSize) == 0) {
+                return true;
+            }
+        }
     }
 
-#if OPTION_SD_CARD
-    return sd_card::confWrite(buffer, buffer_size, address);
-#else
     return false;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-uint32_t calc_checksum(const BlockHeader *block, uint16_t size) {
+bool moduleConfRead(int slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t address, int version) {
+    for (int i = 0; i < NUM_RETRIES; i++) {
+        bool result = false;
+        if (bp3c::eeprom::g_testResult == TEST_OK) {
+            result = bp3c::eeprom::read(slotIndex, buffer, bufferSize, address);
+        }
+
+        if (version == -1) {
+            return result;
+        }
+
+        if (result && checkBlock((const BlockHeader *)buffer, bufferSize, version)) {
+            return true;
+        }
+    }
+
+	return false;
+}
+
+bool moduleConfWrite(int slotIndex, const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
+    for (int i = 0; i < NUM_RETRIES; i++) {
+        bool result = false;
+
+        if (bp3c::eeprom::g_testResult == TEST_OK) {
+            return bp3c::eeprom::write(slotIndex, buffer, bufferSize, address);
+        }
+
+        if (result) {
+            uint8_t verifyBuffer[512];
+            assert(sizeof(verifyBuffer) >= bufferSize);
+            if (moduleConfRead(slotIndex, verifyBuffer, bufferSize, address, -1) && memcmp(buffer, verifyBuffer, bufferSize) == 0) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+uint32_t calcChecksum(const BlockHeader *block, uint16_t size) {
     return crc32(((const uint8_t *)block) + sizeof(uint32_t), size - sizeof(uint32_t));
 }
 
-bool check_block(const BlockHeader *block, uint16_t size, uint16_t version) {
-    return block->checksum == calc_checksum(block, size) && block->version <= version;
+bool checkBlock(const BlockHeader *block, uint16_t size, uint16_t version) {
+    return block->checksum == calcChecksum(block, size) && block->version <= version;
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 bool save(BlockHeader *block, uint16_t size, uint16_t address, uint16_t version) {
     block->version = version;
-    block->checksum = calc_checksum(block, size);
+    block->checksum = calcChecksum(block, size);
     return confWrite((const uint8_t *)block, size, address);
 }
 
-uint16_t get_address(PersistConfSection section, Channel *channel = 0) {
+uint16_t getConfSectionAddress(PersistConfSection section) {
     switch (section) {
     case PERSIST_CONF_BLOCK_DEVICE:
         return PERSIST_CONF_DEVICE_ADDRESS;
     case PERSIST_CONF_BLOCK_DEVICE2:
         return PERSIST_CONF_DEVICE2_ADDRESS;
-    case PERSIST_CONF_BLOCK_CH_CAL:
-        return PERSIST_CONF_CH_CAL_ADDRESS + channel->channelIndex * PERSIST_CONF_CH_CAL_BLOCK_SIZE;
     case PERSIST_CONF_BLOCK_FIRST_PROFILE:
         return PERSIST_CONF_FIRST_PROFILE_ADDRESS;
     }
     return -1;
 }
 
-uint16_t get_profile_address(int location) {
-    return get_address(PERSIST_CONF_BLOCK_FIRST_PROFILE) +
-           location * PERSIST_CONF_PROFILE_BLOCK_SIZE;
+uint16_t getProfileAddress(int location) {
+    return getConfSectionAddress(PERSIST_CONF_BLOCK_FIRST_PROFILE) + location * PERSIST_CONF_PROFILE_BLOCK_SIZE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+uint16_t getModuleConfSectionAddress(ModulePersistConfSection section, int channelIndex) {
+    switch (section) {
+    case MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION:
+        return MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS;
+    case MODULE_PERSIST_CONF_BLOCK_CH_CAL:
+        return MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channelIndex * MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE;
+    }
+    return -1;
+}
+
+bool moduleSave(int slotIndex, BlockHeader *block, uint16_t size, uint16_t address, uint16_t version) {
+    block->version = version;
+    block->checksum = calcChecksum(block, size);
+    return moduleConfWrite(slotIndex, (const uint8_t *)block, size, address);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -192,35 +287,24 @@ static void initDevice() {
     devConf.flags.outputProtectionCouple = 0;
     devConf.flags.shutdownWhenProtectionTripped = 0;
     devConf.flags.forceDisablingAllOutputsOnPowerUp = 0;
-
-    devConf.flags.ch1CalEnabled = 1;
-    devConf.flags.ch2CalEnabled = 1;
 }
 
 void loadDevice() {
-    bool result = confRead((uint8_t *)&devConf, sizeof(DeviceConfiguration),
-                           get_address(PERSIST_CONF_BLOCK_DEVICE));
-    if (!result ||
-        !check_block((BlockHeader *)&devConf, sizeof(DeviceConfiguration), DEV_CONF_VERSION)) {
-        initDevice();
-    } else {
+    if (confRead((uint8_t *)&devConf, sizeof(DeviceConfiguration), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE), DEV_CONF_VERSION)) {
         if (devConf.flags.channelsViewMode < 0 || devConf.flags.channelsViewMode >= NUM_CHANNELS_VIEW_MODES) {
             devConf.flags.channelsViewMode = 0;
         }
+
         if (devConf.flags.channelsViewModeInMax < 0 || devConf.flags.channelsViewModeInMax >= NUM_CHANNELS_VIEW_MODES_IN_MAX) {
             devConf.flags.channelsViewModeInMax = 0;
         }
-
-        if (devConf.header.version < 9) {
-            devConf.flags.ch1CalEnabled = 1;
-            devConf.flags.ch2CalEnabled = 1;
-        }
+    } else {
+        initDevice();
     }
 }
 
 bool saveDevice() {
-    return save((BlockHeader *)&devConf, sizeof(DeviceConfiguration),
-                get_address(PERSIST_CONF_BLOCK_DEVICE), DEV_CONF_VERSION);
+    return save((BlockHeader *)&devConf, sizeof(DeviceConfiguration), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE), DEV_CONF_VERSION);
 }
 
 static void initEthernetSettings() {
@@ -269,10 +353,7 @@ static void initDevice2() {
 }
 
 void loadDevice2() {
-    bool result = confRead((uint8_t *)&devConf2, sizeof(DeviceConfiguration2),
-                           get_address(PERSIST_CONF_BLOCK_DEVICE2));
-    if (!result ||
-        !check_block((BlockHeader *)&devConf2, sizeof(DeviceConfiguration2), DEV_CONF2_VERSION)) {
+    if (!confRead((uint8_t *)&devConf2, sizeof(DeviceConfiguration2), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE2), DEV_CONF2_VERSION)) {
         initDevice2();
     } else {
         if (devConf2.header.version < 9) {
@@ -309,8 +390,7 @@ void loadDevice2() {
 }
 
 bool saveDevice2() {
-    return save((BlockHeader *)&devConf2, sizeof(DeviceConfiguration2),
-                get_address(PERSIST_CONF_BLOCK_DEVICE2), DEV_CONF2_VERSION);
+    return save((BlockHeader *)&devConf2, sizeof(DeviceConfiguration2), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE2), DEV_CONF2_VERSION);
 }
 
 bool isSystemPasswordValid(const char *new_password, size_t new_password_len, int16_t &err) {
@@ -618,60 +698,47 @@ void toggleChannelsMaxView(int slotIndex) {
     saveDevice();
 }
 
-void loadChannelCalibration(Channel &channel) {
-    bool result = confRead((uint8_t *)&channel.cal_conf, sizeof(Channel::CalibrationConfiguration),
-                           get_address(PERSIST_CONF_BLOCK_CH_CAL, &channel));
-    if (!result || !check_block((BlockHeader *)&channel.cal_conf,
-                                sizeof(Channel::CalibrationConfiguration), CH_CAL_CONF_VERSION)) {
-        channel.clearCalibrationConf();
-    }
-}
-
-bool saveChannelCalibration(Channel &channel) {
-    return save((BlockHeader *)&channel.cal_conf, sizeof(Channel::CalibrationConfiguration),
-                get_address(PERSIST_CONF_BLOCK_CH_CAL, &channel), CH_CAL_CONF_VERSION);
-}
-
-void saveCalibrationEnabledFlag(Channel &channel, bool enabled) {
-    if (channel.channelIndex == 0) {
-        devConf.flags.ch1CalEnabled = enabled ? 1 : 0;
-    } else if (channel.channelIndex == 1) {
-        devConf.flags.ch2CalEnabled = enabled ? 1 : 0;
-    } else {
-        return;
-    }
-    saveDevice();
-}
+////////////////////////////////////////////////////////////////////////////////
 
 bool loadProfile(int location, profile::Parameters *profile) {
-    bool result =
-        confRead((uint8_t *)profile, sizeof(profile::Parameters), get_profile_address(location));
-    return result &&
-           check_block((BlockHeader *)profile, sizeof(profile::Parameters), PROFILE_VERSION);
+    assert(sizeof(profile::Parameters) <= PERSIST_CONF_PROFILE_BLOCK_SIZE);
+    return confRead((uint8_t *)profile, sizeof(profile::Parameters), getProfileAddress(location), profile::PROFILE_VERSION);
 }
 
 bool saveProfile(int location, profile::Parameters *profile) {
-    return save((BlockHeader *)profile, sizeof(profile::Parameters), get_profile_address(location),
-                PROFILE_VERSION);
+    return save((BlockHeader *)profile, sizeof(profile::Parameters), getProfileAddress(location), profile::PROFILE_VERSION);
 }
 
 uint32_t readTotalOnTime(int type) {
     uint32_t buffer[6];
 
-    bool result = confRead((uint8_t *)buffer, sizeof(buffer),
-                           eeprom::EEPROM_ONTIME_START_ADDRESS + type * eeprom::EEPROM_ONTIME_SIZE);
+    bool result;
 
-    if (result && buffer[0] == ONTIME_MAGIC && buffer[1] == buffer[2]) {
-        if (buffer[3] == ONTIME_MAGIC && buffer[4] == buffer[5]) {
-            if (buffer[4] > buffer[1]) {
-                return buffer[4];
-            }
+    for (int i = 0; i < NUM_RETRIES; i++) {
+        if (type == ontime::ON_TIME_COUNTER_MCU) {
+            result = confRead((uint8_t *)buffer, sizeof(buffer), eeprom::EEPROM_ONTIME_START_ADDRESS, -1);
+        } else {
+            result = moduleConfRead(
+                type - ontime::ON_TIME_COUNTER_SLOT1,
+                (uint8_t *)buffer, 
+                sizeof(buffer), 
+                bp3c::eeprom::EEPROM_ONTIME_START_ADDRESS,
+                -1
+            );
         }
-        return buffer[1];
-    }
 
-    if (result && buffer[3] == ONTIME_MAGIC && buffer[4] == buffer[5]) {
-        return buffer[4];
+        if (result && buffer[0] == ONTIME_MAGIC && buffer[1] == buffer[2]) {
+            if (buffer[3] == ONTIME_MAGIC && buffer[4] == buffer[5]) {
+                if (buffer[4] > buffer[1]) {
+                    return buffer[4];
+                }
+            }
+            return buffer[1];
+        }
+
+        if (result && buffer[3] == ONTIME_MAGIC && buffer[4] == buffer[5]) {
+            return buffer[4];
+        }
     }
 
     return 0;
@@ -688,8 +755,16 @@ bool writeTotalOnTime(int type, uint32_t time) {
     buffer[4] = time;
     buffer[5] = time;
 
-    return confWrite((uint8_t *)buffer, sizeof(buffer),
-                     eeprom::EEPROM_ONTIME_START_ADDRESS + type * eeprom::EEPROM_ONTIME_SIZE);
+    if (type == ontime::ON_TIME_COUNTER_MCU) {
+        return confWrite((uint8_t *)buffer, sizeof(buffer), eeprom::EEPROM_ONTIME_START_ADDRESS);
+    } else {
+        return moduleConfWrite(
+            type - ontime::ON_TIME_COUNTER_SLOT1,
+            (uint8_t *)buffer, 
+            sizeof(buffer), 
+            bp3c::eeprom::EEPROM_ONTIME_START_ADDRESS
+        );
+    }
 }
 
 bool enableOutputProtectionCouple(bool enable) {
@@ -1125,6 +1200,94 @@ bool isSdLocked() {
 void setAnimationsDuration(float value) {
     devConf2.animationsDuration = value;
     saveDevice2();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ModuleConfiguration g_moduleConf[NUM_SLOTS];
+
+static void initModuleConf(int slotIndex) {
+    ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
+
+    memset(&moduleConf, 0, sizeof(ModuleConfiguration));
+
+    moduleConf.header.checksum = 0;
+    moduleConf.header.version = MODULE_CONF_VERSION;
+
+    moduleConf.chCalEnabled = 0xFF;
+}
+
+void loadModuleConf(int slotIndex) {
+    assert(sizeof(ModuleConfiguration) <= MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE);
+
+    uint8_t buffer[MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE];
+
+    if (moduleConfRead(
+        slotIndex, 
+        buffer, 
+        MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE, 
+        getModuleConfSectionAddress(MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION, -1),
+        MODULE_CONF_VERSION
+    )) {
+        ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
+        memcpy(&moduleConf, buffer, sizeof(ModuleConfiguration));
+    } else {
+    	initModuleConf(slotIndex);
+    }
+}
+
+bool saveModuleConf(int slotIndex) {
+    uint8_t buffer[MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE];
+
+    ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
+    memcpy(&moduleConf, buffer, sizeof(ModuleConfiguration));
+
+    memset(buffer + sizeof(ModuleConfiguration), 0, MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE - sizeof(ModuleConfiguration));
+
+    return moduleSave(
+        slotIndex, 
+        (BlockHeader *)buffer, 
+        MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE, 
+        getModuleConfSectionAddress(MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION, -1),
+        MODULE_CONF_VERSION
+    );
+}
+
+bool isChannelCalibrationEnabled(Channel &channel) {
+    ModuleConfiguration &moduleConf = g_moduleConf[channel.slotIndex];
+    return moduleConf.chCalEnabled & (1 << channel.subchannelIndex);
+}
+
+void saveCalibrationEnabledFlag(Channel &channel, bool enabled) {
+    ModuleConfiguration &moduleConf = g_moduleConf[channel.slotIndex];
+    if (enabled) {
+        moduleConf.chCalEnabled |= 1 << channel.subchannelIndex;
+    } else {
+        moduleConf.chCalEnabled &= ~(1 << channel.subchannelIndex);
+    }
+    saveDevice();
+}
+
+void loadChannelCalibration(Channel &channel) {
+    if (!moduleConfRead(
+        channel.slotIndex,
+        (uint8_t *)&channel.cal_conf,
+        sizeof(Channel::CalibrationConfiguration),
+        getModuleConfSectionAddress(MODULE_PERSIST_CONF_BLOCK_CH_CAL, channel.subchannelIndex),
+        CH_CAL_CONF_VERSION
+    )) {
+        channel.clearCalibrationConf();
+    }
+}
+
+bool saveChannelCalibration(Channel &channel) {
+    return moduleSave(
+        channel.slotIndex,
+        (BlockHeader *)&channel.cal_conf,
+        sizeof(Channel::CalibrationConfiguration),
+        getModuleConfSectionAddress(MODULE_PERSIST_CONF_BLOCK_CH_CAL, channel.subchannelIndex), 
+        CH_CAL_CONF_VERSION
+    );
 }
 
 } // namespace persist_conf

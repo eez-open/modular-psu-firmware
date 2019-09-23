@@ -18,7 +18,7 @@
 
 #pragma once
 
-/*! \page eeprom_map EEPROM map
+/*! \page eeprom_map MCU EEPROM map
 
 # Overview
 
@@ -26,20 +26,8 @@
 |-------|----|------------------------------------------|
 |0      |  64|Not used                                  |
 |64     |  24|[Total ON-time counter](#ontime-counter)  |
-|128    |  24|[CH1 ON-time counter](#ontime-counter)    |
-|192    |  24|[CH2 ON-time counter](#ontime-counter)    |
-|256    |  24|[CH3 ON-time counter](#ontime-counter)    |
-|320    |  24|[CH4 ON-time counter](#ontime-counter)    |
-|384    |  24|[CH5 ON-time counter](#ontime-counter)    |
-|448    |  24|[CH6 ON-time counter](#ontime-counter)    |
 |1024   |  64|[Device configuration](#device)           |
-|1536   | 128|[Device configuration 2](#device2)           |
-|2048   | 144|CH1 [calibration parameters](#calibration)|
-|2560   | 144|CH2 [calibration parameters](#calibration)|
-|3072   | 144|CH3 [calibration parameters](#calibration)|
-|3584   | 144|CH4 [calibration parameters](#calibration)|
-|4096   | 144|CH5 [calibration parameters](#calibration)|
-|4608   | 144|CH6 [calibration parameters](#calibration)|
+|1536   | 128|[Device configuration 2](#device2)        |
 |5120   | 568|[Profile](#profile) 0                     |
 |6144   | 568|[Profile](#profile) 1                     |
 |7168   | 568|[Profile](#profile) 2                     |
@@ -112,42 +100,6 @@
 |11 |Force disabling of all outputs on power up     |
 |12 |Click sound enabled |
 
-## <a name="calibration">Calibration parameters</a>
-
-|Offset|Size|Type                   |Description                  |
-|------|----|-----------------------|-----------------------------|
-|0     |8   |[struct](#block-header)|[Block header](#block-header)|
-|8     |4   |[bitarray](#cal-flags) |[Flags](#cal-flags)          |
-|12    |44  |[struct](#cal-points)  |Voltage [points](#cal-points)|
-|56    |44  |[struct](#cal-points)  |Current [points](#cal-points)|
-|100   |9   |string                 |Date                         |
-|109   |33  |string                 |Remark                       |
-
-#### <a name="cal-flags">Calibration flags</a>
-
-|Bit|Description        |
-|---|-------------------|
-|0  |Voltage calibrated?|
-|1  |Current calibrated?|
-
-#### <a name="cal-points">Value points</a>
-
-|Offset|Size|Type                |Description            |
-|------|----|--------------------|-----------------------|
-|0     |12  |[struct](#cal-point)|Min [point](#cal-point)|
-|12    |12  |[struct](#cal-point)|Mid [point](#cal-point)|
-|24    |12  |[struct](#cal-point)|Max [point](#cal-point)|
-|36    |4   |[struct](#cal-point)|Min. set value possible|
-|40    |4   |[struct](#cal-point)|Max. set value possible|
-
-#### <a name="cal-point">Value point</a>
-
-|Offset|Size|Type |Description|
-|------|----|-----|-----------|
-|0     |4   |float|DAC value  |
-|4     |4   |float|Real value |
-|8     |4   |float|ADC value  |
-
 ## <a name="profile">Profile</a>
 
 |Offset|Size|Type                   |Description                    |
@@ -190,16 +142,14 @@
 
 |Bit|Description        |
 |---|-------------------|
-|0  |Output enabled     |
-|1  |Sense enabled      |
-|2  |OVP enabled        |
-|3  |OCP enabled        |
-|3  |OPP enabled        |
-|5  |Calibration enabled|
-|6  |RPROG enabled      |
-|7  |Reserved           |
-|8  |Reserved           |
-|9  |Params. valid      |
+|0-7|Module type        |
+|8  |Output enabled     |
+|9  |Sense enabled      |
+|10 |OVP enabled        |
+|11 |OCP enabled        |
+|12 |OPP enabled        |
+|13 |RPROG enabled      |
+|14 |Params. valid      |
 
 #### <a name="otp-conf">OTP configuration</a>
 
@@ -261,8 +211,6 @@ static const uint8_t READ = 3;
 static const uint8_t WRITE = 2;
 
 static const uint16_t EEPROM_ONTIME_START_ADDRESS = 64;
-static const uint16_t EEPROM_ONTIME_SIZE = 64;
-static const uint16_t EEPROM_START_ADDRESS = 1024;
 static const uint16_t EEPROM_EVENT_QUEUE_START_ADDRESS = 16384;
 
 void init();

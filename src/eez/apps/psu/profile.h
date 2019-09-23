@@ -29,15 +29,13 @@ namespace profile {
 
 /// Channel binary flags stored in profile.
 struct ChannelFlags {
+    unsigned moduleType: 8;
     unsigned output_enabled : 1;
     unsigned sense_enabled : 1;
     unsigned u_state : 1;
     unsigned i_state : 1;
     unsigned p_state : 1;
-    unsigned reserved1 : 1;
     unsigned rprog_enabled : 1;
-    unsigned reserverd10 : 1;
-    unsigned reserved2: 1;
     unsigned parameters_are_valid : 1;
     unsigned displayValue1 : 2;
     unsigned displayValue2 : 2;
@@ -45,10 +43,9 @@ struct ChannelFlags {
     unsigned i_triggerMode : 2;
     unsigned currentRangeSelectionMode: 2;
     unsigned autoSelectCurrentRange: 1;
-    unsigned reserved3: 1;
     unsigned triggerOutputState: 1;
     unsigned triggerOnListStop: 3;
-    unsigned reserved4: 6;
+    unsigned reserved: 2;
 };
 
 /// Channel parameters stored in profile.
@@ -94,6 +91,8 @@ struct Parameters {
     temperature::ProtectionConfiguration temp_prot[temp_sensor::MAX_NUM_TEMP_SENSORS];
 };
 
+static const uint16_t PROFILE_VERSION = 9;
+
 // auto save support
 extern bool g_profileDirty;
 bool enableSave(bool enable);
@@ -101,9 +100,11 @@ void save(bool immediately = false);
 
 void tick();
 
+bool checkProfileModuleMatch(Parameters *profile);
+
 void recallChannelsFromProfile(Parameters *profile, int location);
 bool recallFromProfile(Parameters *profile, int location);
-bool recall(int location);
+bool recall(int location, int *err);
 bool recallFromFile(const char *filePath, int *err);
 
 bool load(int location, Parameters *profile);

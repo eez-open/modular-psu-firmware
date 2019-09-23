@@ -30,6 +30,8 @@
 #include <eez/gui/dialogs.h>
 #include <eez/gui/document.h>
 
+#include <scpi/scpi.h>
+
 using namespace eez::psu::gui;
 
 namespace eez {
@@ -76,10 +78,15 @@ void UserProfilesPage::toggleIsAutoRecallLocation() {
 
 void UserProfilesPage::recall() {
     if (g_selectedProfileLocation > 0 && profile::isValid(g_selectedProfileLocation)) {
-        if (profile::recall(g_selectedProfileLocation)) {
+        int err;
+        if (profile::recall(g_selectedProfileLocation, &err)) {
             infoMessage("Profile parameters loaded");
         } else {
-            errorMessage("Failed!");
+            if (err == SCPI_ERROR_PROFILE_MODULE_MISMATCH) {
+                errorMessage("Module mismatch in profile!");
+            } else {
+                errorMessage("Failed!");
+            }
         }
     }
 }

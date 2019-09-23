@@ -359,15 +359,11 @@ class Channel {
     ProtectionValue ocp;
     ProtectionValue opp;
 
-    ontime::Counter onTimeCounter;
-
     float ytViewRate;
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     Simulator simulator;
 #endif // EEZ_PLATFORM_SIMULATOR
-
-    Channel();
 
     void set(uint8_t slotIndex, uint8_t subchannelIndex, uint8_t boardRevision);
 

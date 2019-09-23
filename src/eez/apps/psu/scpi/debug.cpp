@@ -147,13 +147,13 @@ scpi_result_t scpi_cmd_debugOntimeQ(scpi_t *context) {
     char buffer[512] = { 0 };
     char *p = buffer;
 
-    sprintf(p, "power active: %d\n", int(g_powerOnTimeCounter.isActive() ? 1 : 0));
+    sprintf(p, "power active: %d\n", int(ontime::g_mcuCounter.isActive() ? 1 : 0));
     p += strlen(p);
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
 
-        sprintf(p, "CH%d active: %d\n", channel.channelIndex + 1, int(channel.onTimeCounter.isActive() ? 1 : 0));
+        sprintf(p, "CH%d active: %d\n", channel.channelIndex + 1, int(ontime::g_mcuCounter.isActive() ? 1 : 0));
         p += strlen(p);
     }
 

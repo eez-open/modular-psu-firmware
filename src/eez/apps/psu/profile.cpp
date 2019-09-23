@@ -235,6 +235,8 @@ void fillProfile(Parameters *pProfile) {
         if (i < CH_NUM) {
             Channel &channel = Channel::get(i);
 
+            profile.channels[i].flags.moduleType = g_slots[channel.slotIndex].moduleType;
+
             profile.channels[i].flags.parameters_are_valid = 1;
 
             profile.channels[i].flags.output_enabled = channel.flags.outputEnabled;
@@ -357,19 +359,29 @@ void tick() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool checkProfileModuleMatch(Parameters *profile) {
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel &channel = Channel::get(i);
+        if (profile->channels[i].flags.moduleType != g_slots[channel.slotIndex].moduleType) {
+            return false; // mismatch
+        }
+    }
+    return true;
+}
+
 bool recallFromProfile(Parameters *profile, int location) {
     bool last_save_enabled = enableSave(false);
 
     bool result = true;
 
-    if (profile->flags.powerIsUp)
+    if (profile->flags.powerIsUp) {
         result &= powerUp();
-    else
+    } else {
         powerDown();
+    }
 
     for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-        memcpy(&temperature::sensors[i].prot_conf, profile->temp_prot + i,
-               sizeof(temperature::ProtectionConfiguration));
+        memcpy(&temperature::sensors[i].prot_conf, profile->temp_prot + i, sizeof(temperature::ProtectionConfiguration));
     }
 
     recallChannelsFromProfile(profile, location);
@@ -379,10 +391,15 @@ bool recallFromProfile(Parameters *profile, int location) {
     return result;
 }
 
-bool recall(int location) {
+bool recall(int location, int *err) {
     if (location > 0 && location < NUM_PROFILE_LOCATIONS) {
         Parameters profile;
         if (persist_conf::loadProfile(location, &profile) && profile.flags.isValid) {
+            if (!checkProfileModuleMatch(&profile)) {
+                *err = SCPI_ERROR_PROFILE_MODULE_MISMATCH;
+                return false;
+            }
+
             if (persist_conf::saveProfile(0, &profile)) {
                 if (recallFromProfile(&profile, location)) {
                     save();
@@ -394,6 +411,8 @@ bool recall(int location) {
             }
         }
     }
+
+    *err = SCPI_ERROR_CANNOT_LOAD_EMPTY_PROFILE;
     return false;
 }
 
@@ -423,12 +442,16 @@ bool recallFromFile(const char *filePath, int *err) {
     int size = file.read(&profile, sizeof(profile));
     file.close();
 
-    if (size != sizeof(profile) ||
-        !persist_conf::check_block((const persist_conf::BlockHeader *)&profile, sizeof(profile),
-                                   persist_conf::PROFILE_VERSION)) {
+    if (size != sizeof(profile) || !persist_conf::checkBlock((const persist_conf::BlockHeader *)&profile, sizeof(profile), PROFILE_VERSION)) {
         // TODO more specific error
         if (err)
             *err = SCPI_ERROR_EXECUTION_ERROR;
+        return false;
+    }
+
+    if (!checkProfileModuleMatch(&profile)) {
+        if (err)
+            *err = SCPI_ERROR_PROFILE_MODULE_MISMATCH;
         return false;
     }
 
@@ -524,8 +547,8 @@ bool saveToFile(const char *filePath, int *err) {
     Parameters profile;
     fillProfile(&profile);
 
-    profile.header.version = persist_conf::PROFILE_VERSION;
-    profile.header.checksum = persist_conf::calc_checksum((const persist_conf::BlockHeader *)&profile, sizeof(profile));
+    profile.header.version = PROFILE_VERSION;
+    profile.header.checksum = persist_conf::calcChecksum((const persist_conf::BlockHeader *)&profile, sizeof(profile));
 
     size_t size = file.write((const uint8_t *)&profile, sizeof(profile));
     file.close();

@@ -1641,7 +1641,7 @@ void data_channel_on_time_total(data::DataOperationEnum operation, data::Cursor 
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value =
-            data::Value((uint32_t)channel.onTimeCounter.getTotalTime(), VALUE_TYPE_ON_TIME_COUNTER);
+            data::Value((uint32_t)ontime::g_moduleCounters[channel.slotIndex].getTotalTime(), VALUE_TYPE_ON_TIME_COUNTER);
     }
 }
 
@@ -1650,7 +1650,7 @@ void data_channel_on_time_last(data::DataOperationEnum operation, data::Cursor &
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value =
-            data::Value((uint32_t)channel.onTimeCounter.getLastTime(), VALUE_TYPE_ON_TIME_COUNTER);
+            data::Value((uint32_t)ontime::g_moduleCounters[channel.slotIndex].getLastTime(), VALUE_TYPE_ON_TIME_COUNTER);
     }
 }
 
@@ -2338,14 +2338,14 @@ void data_channel_coupling_is_series(data::DataOperationEnum operation, data::Cu
 void data_sys_on_time_total(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value =
-            data::Value((uint32_t)g_powerOnTimeCounter.getTotalTime(), VALUE_TYPE_ON_TIME_COUNTER);
+            data::Value((uint32_t)ontime::g_mcuCounter.getTotalTime(), VALUE_TYPE_ON_TIME_COUNTER);
     }
 }
 
 void data_sys_on_time_last(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value =
-            data::Value((uint32_t)g_powerOnTimeCounter.getLastTime(), VALUE_TYPE_ON_TIME_COUNTER);
+            data::Value((uint32_t)ontime::g_mcuCounter.getLastTime(), VALUE_TYPE_ON_TIME_COUNTER);
     }
 }
 

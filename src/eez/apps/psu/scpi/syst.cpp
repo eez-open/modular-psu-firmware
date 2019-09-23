@@ -550,7 +550,7 @@ scpi_result_t scpi_cmd_systemChannelInformationOntimeTotalQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    outputOnTime(context, channel->onTimeCounter.getTotalTime());
+    outputOnTime(context, ontime::g_moduleCounters[channel->slotIndex].getTotalTime());
 
     return SCPI_RES_OK;
 }
@@ -562,7 +562,7 @@ scpi_result_t scpi_cmd_systemChannelInformationOntimeLastQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    outputOnTime(context, channel->onTimeCounter.getLastTime());
+    outputOnTime(context, ontime::g_moduleCounters[channel->slotIndex].getLastTime());
 
     return SCPI_RES_OK;
 }
@@ -593,13 +593,13 @@ scpi_result_t scpi_cmd_systemCpuInformationTypeQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_systemCpuInformationOntimeTotalQ(scpi_t *context) {
     // TODO migrate to generic firmware
-    outputOnTime(context, g_powerOnTimeCounter.getTotalTime());
+    outputOnTime(context, ontime::g_mcuCounter.getTotalTime());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemCpuInformationOntimeLastQ(scpi_t *context) {
     // TODO migrate to generic firmware
-    outputOnTime(context, g_powerOnTimeCounter.getLastTime());
+    outputOnTime(context, ontime::g_mcuCounter.getLastTime());
     return SCPI_RES_OK;
 }
 

@@ -218,11 +218,6 @@ float Channel::Simulator::getVoltProgExt() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Channel::Channel()
-    : channelIndex(0), onTimeCounter(1)
-{
-}
-
 void Channel::set(uint8_t slotIndex_, uint8_t subchannelIndex_, uint8_t boardRevision_) {
 	slotIndex = slotIndex_;
     boardRevision = boardRevision_;
@@ -610,8 +605,6 @@ void Channel::tick(uint32_t tick_usec) {
         setCcMode(channelInterface->isCvMode(subchannelIndex));
     }
 
-    onTimeCounter.tick(tick_usec);
-
     // update history values
     uint32_t ytViewRateMicroseconds = (int)round(ytViewRate * 1000000L);
     while (tick_usec - historyLastTick >= ytViewRateMicroseconds) {
@@ -828,12 +821,6 @@ void Channel::executeOutputEnable(bool enable) {
             calibration::stop();
         }
     }
-
-    if (enable) {
-        onTimeCounter.start();
-    } else {
-        onTimeCounter.stop();
-    }
 }
 
 void Channel::doOutputEnable(bool enable) {
@@ -887,11 +874,7 @@ void Channel::update() {
         return;
     }
 
-    if (channelIndex == 0) {
-        doCalibrationEnable(persist_conf::devConf.flags.ch1CalEnabled && isCalibrationExists());
-    } else if (channelIndex == 1) {
-        doCalibrationEnable(persist_conf::devConf.flags.ch2CalEnabled && isCalibrationExists());
-    }
+    doCalibrationEnable(persist_conf::isChannelCalibrationEnabled(*this) && isCalibrationExists());
 
     bool last_save_enabled = profile::enableSave(false);
 
@@ -1090,10 +1073,8 @@ void Channel::setCurrent(float value) {
 }
 
 bool Channel::isCalibrationExists() {
-    return (flags.currentCurrentRange == CURRENT_RANGE_HIGH &&
-            cal_conf.flags.i_cal_params_exists_range_high) ||
-           (flags.currentCurrentRange == CURRENT_RANGE_LOW &&
-            cal_conf.flags.i_cal_params_exists_range_low) ||
+    return (flags.currentCurrentRange == CURRENT_RANGE_HIGH && cal_conf.flags.i_cal_params_exists_range_high) ||
+           (flags.currentCurrentRange == CURRENT_RANGE_LOW && cal_conf.flags.i_cal_params_exists_range_low) ||
            cal_conf.flags.u_cal_params_exists;
 }
 
