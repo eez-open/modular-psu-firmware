@@ -96,7 +96,7 @@ struct Channel : ChannelInterface {
 
 	#if !CONF_SKIP_PWRGOOD_TEST
 		if (!ioexp.testBit(IOExpander::IO_BIT_IN_PWRGOOD)) {
-			DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d", channel.channelIndex + 1, (int)ioexp.gpio);
+			// DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d", channel.channelIndex + 1, (int)ioexp.gpio);
 			channel.flags.powerOk = 0;
 			generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channel.channelIndex);
 			powerDownBySensor();
@@ -142,12 +142,12 @@ struct Channel : ChannelInterface {
 			} else {
 				if (tickCount - dpNegMonitoringTime > DP_NEG_DELAY * 1000000UL) {
 					if (dpOn) {
-						DebugTrace("CH%d, neg. P, DP off: %f", channel.channelIndex + 1, channel.u.mon_last * channel.i.mon_last);
+						// DebugTrace("CH%d, neg. P, DP off: %f", channel.channelIndex + 1, channel.u.mon_last * channel.i.mon_last);
 						dpNegMonitoringTime = tickCount;
 						generateError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF + channel.channelIndex);
 						setDpEnable(false);
 					} else {
-						DebugTrace("CH%d, neg. P, output off: %f", channel.channelIndex + 1, channel.u.mon_last * channel.i.mon_last);
+						// DebugTrace("CH%d, neg. P, output off: %f", channel.channelIndex + 1, channel.u.mon_last * channel.i.mon_last);
 						generateError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED - channel.channelIndex);
 						channel_dispatcher::outputEnable(channel, false);
 					}
@@ -344,7 +344,7 @@ struct Channel : ChannelInterface {
 		if (channel.isOutputEnabled()) {
 			if (channel.flags.currentCurrentRange == 0 || dac.isTesting()) {
 				// 5A
-				DebugTrace("CH%d: Switched to 5A range", channel.channelIndex + 1);
+				// DebugTrace("CH%d: Switched to 5A range", channel.channelIndex + 1);
 				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_5A, true);
 				ioexp.changeBit(channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1 ?
 					IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA :
@@ -352,7 +352,7 @@ struct Channel : ChannelInterface {
 				// calculateNegligibleAdcDiffForCurrent();
 			} else {
 				// 50mA
-				DebugTrace("CH%d: Switched to 50mA range", channel.channelIndex + 1);
+				// DebugTrace("CH%d: Switched to 50mA range", channel.channelIndex + 1);
 				ioexp.changeBit(channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1 ?
 					IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA :
 					IOExpander::DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA, true);

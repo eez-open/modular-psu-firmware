@@ -356,9 +356,10 @@ void checkTest() {
     	if (diff >= CONF_FAN_TEST_DURATION) {
     		g_testResult = TEST_OK;
     	}
-	} else {
-		DebugTrace("FAN test duration: %d", diff);
-	}
+	} 
+	// else {
+	// 	DebugTrace("FAN test duration: %d", diff);
+	// }
 
 	if (g_testResult != TEST_NONE) {
 		// test is finished
