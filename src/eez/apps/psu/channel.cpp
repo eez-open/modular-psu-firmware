@@ -72,12 +72,12 @@ static uint16_t CH_BOARD_REVISION_FEATURES[] = {
 };
 
 static ChannelParams CH_BOARD_REVISION_PARAMS[] = {
-                        // VOLTAGE_GND_OFFSET // CURRENT_GND_OFFSET
-    { CH_PARAMS_NONE,   0,                    0, },    // CH_BOARD_REVISION_NONE
-    { CH_PARAMS_50V_5A, 1.05f,                0.11f }, // CH_BOARD_REVISION_DCP505_R1B3
-    { CH_PARAMS_40V_5A, 0.86f,                0.11f }, // CH_BOARD_REVISION_DCP405_R1B1
-    { CH_PARAMS_40V_5A, 0.86f,                0.11f }, // CH_BOARD_REVISION_DCP405_R2B5
-    { CH_PARAMS_20V_4A, 0,                    0 }      // CH_BOARD_REVISION_DCM220_R1B1
+                        // VOLTAGE_GND_OFFSET // CURRENT_GND_OFFSET // CALIBRATION_DATA_TOLERANCE_PERCENT // CALIBRATION_MID_TOLERANCE_PERCENT
+    { CH_PARAMS_NONE,   0,                    0,                    10.0f,                                1.0f                                 }, // CH_BOARD_REVISION_NONE
+    { CH_PARAMS_50V_5A, 1.05f,                0.11f,                10.0f,                                1.0f                                 }, // CH_BOARD_REVISION_DCP505_R1B3
+    { CH_PARAMS_40V_5A, 0.86f,                0.11f,                10.0f,                                1.0f                                 }, // CH_BOARD_REVISION_DCP405_R1B1
+    { CH_PARAMS_40V_5A, 0.86f,                0.11f,                10.0f,                                1.0f                                 }, // CH_BOARD_REVISION_DCP405_R2B5
+    { CH_PARAMS_20V_4A, 0,                    0,                    15.0f,                                2.0f                                 }  // CH_BOARD_REVISION_DCM220_R1B1
 };
 
 ////////////////////////////////////////////////////////////////////////////////

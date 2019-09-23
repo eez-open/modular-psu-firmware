@@ -126,21 +126,21 @@ bool Value::checkRange(float dac, float data, float adc) {
         }
     }
 
-    float allowedDiff = range * CALIBRATION_DATA_TOLERANCE / 100;
+    float allowedDiff = range * g_channel->params->CALIBRATION_DATA_TOLERANCE_PERCENT / 100;
     float diff;
 
     diff = fabsf(dac - data);
     if (diff > allowedDiff) {
-        DebugTrace("Data check failed: level=%f, data=%f, diff=%f, allowedDiff=%f", dac, data,
-                    diff, allowedDiff);
+        DebugTrace("Data check failed: level=%f, data=%f, diff=%f, allowedDiff=%f", dac, data, diff, allowedDiff);
         return false;
     }
 
-    diff = fabsf(dac - adc);
-    if (diff > allowedDiff) {
-        DebugTrace("ADC check failed: level=%f, adc=%f, diff=%f, allowedDiff=%f", dac, adc, diff,
-                    allowedDiff);
-        return false;
+    if (g_slots[g_channel->slotIndex].moduleType != MODULE_TYPE_DCM220) {
+        diff = fabsf(dac - adc);
+        if (diff > allowedDiff) {
+            DebugTrace("ADC check failed: level=%f, adc=%f, diff=%f, allowedDiff=%f", dac, adc, diff, allowedDiff);
+            return false;
+        }
     }
 
     return true;
@@ -180,7 +180,7 @@ void Value::setData(float dac, float data, float adc) {
 bool Value::checkMid() {
     float mid = remap(mid_dac, min_dac, min_val, max_dac, max_val);
 
-    float allowedDiff = CALIBRATION_MID_TOLERANCE_PERCENT * (max_val - min_val) / 100.0f;
+    float allowedDiff = g_channel->params->CALIBRATION_MID_TOLERANCE_PERCENT * (max_val - min_val) / 100.0f;
 
     float diff = fabsf(mid - mid_val);
     if (diff <= allowedDiff) {
@@ -348,14 +348,12 @@ bool save() {
     uint8_t month;
     uint8_t day;
     if (datetime::getDate(year, month, day)) {
-        sprintf(g_channel->cal_conf.calibration_date, "%d%02d%02d", (int)(2000 + year), (int)month,
-                (int)day);
+        sprintf(g_channel->cal_conf.calibration_date, "%d%02d%02d", (int)(2000 + year), (int)month, (int)day);
     } else {
         strcpy(g_channel->cal_conf.calibration_date, "");
     }
 
-    memset(&g_channel->cal_conf.calibration_remark, 0,
-           sizeof(g_channel->cal_conf.calibration_remark));
+    memset(&g_channel->cal_conf.calibration_remark, 0, sizeof(g_channel->cal_conf.calibration_remark));
     strcpy(g_channel->cal_conf.calibration_remark, g_remark);
 
     if (isVoltageCalibrated()) {

@@ -123,8 +123,17 @@ struct ChannelParams {
     float I_RESOLUTION;
     float I_LOW_RESOLUTION;
     float P_RESOLUTION;
+
     float VOLTAGE_GND_OFFSET; // [V], (1375 / 65535) * (40V | 50V)
     float CURRENT_GND_OFFSET; // [A]
+
+    /// Maximum difference, in percentage, between ADC
+    /// and real value during calibration.
+    float CALIBRATION_DATA_TOLERANCE_PERCENT;
+
+    /// Maximum difference, in percentage, between calculated mid value
+    /// and real mid value during calibration.
+    float CALIBRATION_MID_TOLERANCE_PERCENT;
 };
 
 /// PSU channel.

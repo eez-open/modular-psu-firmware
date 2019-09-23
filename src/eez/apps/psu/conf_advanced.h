@@ -86,14 +86,6 @@
 /// Default calibration remark text.
 #define CALIBRATION_REMARK_INIT "Not calibrated"
 
-/// Maximum difference, in percentage, between ADC
-/// and real value during calibration.
-#define CALIBRATION_DATA_TOLERANCE 10.0f
-
-/// Maximum difference, in percentage, between calculated mid value
-/// and real mid value during calibration.
-#define CALIBRATION_MID_TOLERANCE_PERCENT 1.0f
-
 /// Temperature reading interval.
 #define TEMP_SENSOR_READ_EVERY_MS 1000
 
