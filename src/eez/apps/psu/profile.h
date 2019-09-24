@@ -98,6 +98,7 @@ extern bool g_profileDirty;
 bool enableSave(bool enable);
 void save(bool immediately = false);
 
+void init();
 void tick();
 
 bool checkProfileModuleMatch(Parameters *profile);
@@ -107,9 +108,9 @@ bool recallFromProfile(Parameters *profile, int location);
 bool recall(int location, int *err);
 bool recallFromFile(const char *filePath, int *err);
 
-bool load(int location, Parameters *profile);
+Parameters *load(int location);
 
-void getSaveName(const Parameters *profile, char *name);
+void getSaveName(int location, char *name);
 bool saveAtLocation(int location, const char *name = nullptr);
 
 bool saveToFile(const char *filePath, int *err);

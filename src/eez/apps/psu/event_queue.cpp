@@ -30,15 +30,14 @@ namespace psu {
 namespace event_queue {
 
 static const uint32_t MAGIC = 0xD8152FC3L;
-static const uint16_t VERSION = 5;
+static const uint16_t VERSION = 6;
 
 static const uint16_t MAX_EVENTS = 200;
 static const uint16_t NULL_INDEX = MAX_EVENTS;
 
-static const uint16_t EVENT_HEADER_SIZE = 16;
-static const uint16_t EVENT_SIZE = 16;
+static EventQueueHeader g_eventQueue;
 
-static EventQueueHeader eventQueue;
+static Event g_events[MAX_EVENTS];
 
 static int16_t g_eventsToPush[6];
 static uint8_t g_eventsToPushHead = 0;
@@ -46,48 +45,45 @@ static const int MAX_EVENTS_TO_PUSH = sizeof(g_eventsToPush) / sizeof(int16_t);
 
 static uint8_t g_pageIndex = 0;
 
-static Event g_lastErrorEvent;
-static bool g_lastErrorEventChanged;
-
 void readHeader() {
-    eeprom::read((uint8_t *)&eventQueue, sizeof(EventQueueHeader),
+    eeprom::read((uint8_t *)&g_eventQueue, sizeof(EventQueueHeader),
                  eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS);
 }
 
 void writeHeader() {
     if (eeprom::g_testResult == TEST_OK) {
-        eeprom::write((uint8_t *)&eventQueue, sizeof(EventQueueHeader),
+        eeprom::write((uint8_t *)&g_eventQueue, sizeof(EventQueueHeader),
                       eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS);
     }
 }
 
-void readEvent(uint16_t eventIndex, Event *e) {
-    eeprom::read((uint8_t *)e, sizeof(Event),
-                 eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS + EVENT_HEADER_SIZE +
-                     eventIndex * EVENT_SIZE);
+Event *readEvent(uint16_t eventIndex) {
+    return &g_events[eventIndex];
 }
 
 void writeEvent(uint16_t eventIndex, Event *e) {
+    memcpy(&g_events[eventIndex], e, sizeof(Event));
+
     if (eeprom::g_testResult == TEST_OK) {
-        eeprom::write((uint8_t *)e, sizeof(Event),
-                      eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS + EVENT_HEADER_SIZE +
-                          eventIndex * EVENT_SIZE);
+        eeprom::write((uint8_t *)e, sizeof(Event), eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS + sizeof(EventQueueHeader) + eventIndex * sizeof(Event));
     }
 }
 
 void init() {
     readHeader();
-    g_lastErrorEventChanged = true;
 
-    if (eventQueue.magicNumber != MAGIC || eventQueue.version != VERSION ||
-        eventQueue.head >= MAX_EVENTS || eventQueue.size > MAX_EVENTS) {
-        eventQueue.magicNumber = MAGIC;
-        eventQueue.version = VERSION;
-        eventQueue.head = 0;
-        eventQueue.size = 0;
-        eventQueue.lastErrorEventIndex = NULL_INDEX;
+    if (g_eventQueue.magicNumber != MAGIC || g_eventQueue.version != VERSION ||
+        g_eventQueue.head >= MAX_EVENTS || g_eventQueue.size > MAX_EVENTS) {
+        g_eventQueue.magicNumber = MAGIC;
+        g_eventQueue.version = VERSION;
+        g_eventQueue.head = 0;
+        g_eventQueue.size = 0;
+        g_eventQueue.lastErrorEventIndex = NULL_INDEX;
 
         pushEvent(EVENT_INFO_WELCOME);
+    } else {
+        // read all events
+        eeprom::read((uint8_t *)g_events, sizeof(g_events), eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS + sizeof(EventQueueHeader));
     }
 }
 
@@ -97,24 +93,22 @@ void doPushEvent(int16_t eventId) {
     e.dateTime = datetime::now();
     e.eventId = eventId;
 
-    writeEvent(eventQueue.head, &e);
+    writeEvent(g_eventQueue.head, &e);
 
-    if (eventQueue.lastErrorEventIndex == eventQueue.head) {
+    if (g_eventQueue.lastErrorEventIndex == g_eventQueue.head) {
         // this event overwrote last error event, therefore:
-        eventQueue.lastErrorEventIndex = NULL_INDEX;
-        g_lastErrorEventChanged = true;
+        g_eventQueue.lastErrorEventIndex = NULL_INDEX;
     }
 
     int eventType = getEventType(&e);
     if (eventType == EVENT_TYPE_ERROR ||
-        (eventType == EVENT_TYPE_WARNING && eventQueue.lastErrorEventIndex == NULL_INDEX)) {
-        eventQueue.lastErrorEventIndex = eventQueue.head;
-        g_lastErrorEventChanged = true;
+        (eventType == EVENT_TYPE_WARNING && g_eventQueue.lastErrorEventIndex == NULL_INDEX)) {
+        g_eventQueue.lastErrorEventIndex = g_eventQueue.head;
     }
 
-    eventQueue.head = (eventQueue.head + 1) % MAX_EVENTS;
-    if (eventQueue.size < MAX_EVENTS) {
-        ++eventQueue.size;
+    g_eventQueue.head = (g_eventQueue.head + 1) % MAX_EVENTS;
+    if (g_eventQueue.size < MAX_EVENTS) {
+        ++g_eventQueue.size;
     }
 
     writeHeader();
@@ -132,25 +126,16 @@ void tick(uint32_t tick_usec) {
 }
 
 int getNumEvents() {
-    return eventQueue.size;
+    return g_eventQueue.size;
 }
 
-void getEvent(uint16_t index, Event *e) {
-    uint16_t eventIndex = (eventQueue.head - (index + 1) + MAX_EVENTS) % MAX_EVENTS;
-    readEvent(eventIndex, e);
+Event *getEvent(uint16_t index) {
+    uint16_t eventIndex = (g_eventQueue.head - (index + 1) + MAX_EVENTS) % MAX_EVENTS;
+    return readEvent(eventIndex);
 }
 
-void getLastErrorEvent(Event *e) {
-    if (g_lastErrorEventChanged) {
-        if (eventQueue.lastErrorEventIndex != NULL_INDEX) {
-            readEvent(eventQueue.lastErrorEventIndex, &g_lastErrorEvent);
-        } else {
-            g_lastErrorEvent.eventId = EVENT_TYPE_NONE;
-        }
-        g_lastErrorEventChanged = false;
-    }
-
-    memcpy(e, &g_lastErrorEvent, sizeof(Event));
+Event *getLastErrorEvent() {
+    return g_eventQueue.lastErrorEventIndex != NULL_INDEX ? readEvent(g_eventQueue.lastErrorEventIndex) : nullptr;
 }
 
 int getEventType(Event *e) {
@@ -243,9 +228,8 @@ void pushEvent(int16_t eventId) {
 }
 
 void markAsRead() {
-    if (eventQueue.lastErrorEventIndex != NULL_INDEX) {
-        eventQueue.lastErrorEventIndex = NULL_INDEX;
-        g_lastErrorEventChanged = true;
+    if (g_eventQueue.lastErrorEventIndex != NULL_INDEX) {
+        g_eventQueue.lastErrorEventIndex = NULL_INDEX;
         writeHeader();
     }
 }
@@ -262,8 +246,12 @@ int getActivePageNumEvents() {
     }
 }
 
-void getActivePageEvent(int i, Event *e) {
-    getEvent(g_pageIndex * EVENTS_PER_PAGE + i, e);
+Event *getActivePageEvent(int i) {
+    int n = event_queue::getActivePageNumEvents();
+    if (i < n) {
+        return getEvent(g_pageIndex * EVENTS_PER_PAGE + i);
+    }
+    return nullptr;
 }
 
 void moveToFirstPage() {

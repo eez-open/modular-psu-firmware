@@ -1007,11 +1007,12 @@ void selectChannel() {
     }
 }
 
-static bool isChannelTripLastEvent(int i, event_queue::Event &lastEvent) {
-    if (lastEvent.eventId == (event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + i) ||
-        lastEvent.eventId == (event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + i) ||
-        lastEvent.eventId == (event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + i) ||
-        lastEvent.eventId == (event_queue::EVENT_ERROR_CH1_OTP_TRIPPED + i)) {
+static bool isChannelTripLastEvent(int i, event_queue::Event *lastEvent) {
+    if (lastEvent->eventId == (event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + i) ||
+        lastEvent->eventId == (event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + i) ||
+        lastEvent->eventId == (event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + i) ||
+        lastEvent->eventId == (event_queue::EVENT_ERROR_CH1_OTP_TRIPPED + i)) 
+        {
         return Channel::get(i).isTripped();
     }
 
@@ -1019,21 +1020,24 @@ static bool isChannelTripLastEvent(int i, event_queue::Event &lastEvent) {
 }
 
 void onLastErrorEventAction() {
-    event_queue::Event lastEvent;
-    event_queue::getLastErrorEvent(&lastEvent);
+    auto lastEvent = event_queue::getLastErrorEvent();
 
-    if (lastEvent.eventId == event_queue::EVENT_ERROR_AUX_OTP_TRIPPED &&
-        temperature::sensors[temp_sensor::AUX].isTripped()) {
-        showPage(PAGE_ID_SYS_SETTINGS_AUX_OTP);
-    } else if (isChannelTripLastEvent(0, lastEvent)) {
-        g_channel = &Channel::get(0);
-        showPage(PAGE_ID_CH_SETTINGS_PROT_CLEAR);
-    } else if (isChannelTripLastEvent(1, lastEvent)) {
-        g_channel = &Channel::get(1);
-        showPage(PAGE_ID_CH_SETTINGS_PROT_CLEAR);
-    } else {
-        showPage(PAGE_ID_EVENT_QUEUE);
+    if (lastEvent) {
+        if (lastEvent->eventId == event_queue::EVENT_ERROR_AUX_OTP_TRIPPED && temperature::sensors[temp_sensor::AUX].isTripped()) {
+            showPage(PAGE_ID_SYS_SETTINGS_AUX_OTP);
+            return;
+        } 
+        
+        for (int i = 0; i < CH_NUM; i++) {
+            if (isChannelTripLastEvent(i, lastEvent)) {
+                g_channel = &Channel::get(i);
+                showPage(PAGE_ID_CH_SETTINGS_PROT_CLEAR);
+                return;
+            }
+        }
     }
+
+    showPage(PAGE_ID_EVENT_QUEUE);
 }
 
 } // namespace gui

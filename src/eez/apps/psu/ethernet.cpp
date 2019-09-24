@@ -171,7 +171,7 @@ void onQueueMessage(uint32_t type, uint32_t param) {
         g_testResult = TEST_OK;
 
         eez::mcu::ethernet::beginServer(persist_conf::devConf2.ethernetScpiPort);
-        DebugTrace("Listening on port %d", (int)persist_conf::devConf2.ethernetScpiPort);
+        //DebugTrace("Listening on port %d", (int)persist_conf::devConf2.ethernetScpiPort);
     } else if (type == ETHERNET_CLIENT_CONNECTED) {
         g_isConnected = true;
         scpi::emptyBuffer(g_scpiContext);

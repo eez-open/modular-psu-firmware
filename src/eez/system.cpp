@@ -47,7 +47,7 @@ void mainTask(const void *);
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #endif
 
-osThreadDef(g_mainTask, mainTask, osPriorityNormal, 0, 1024);
+osThreadDef(g_mainTask, mainTask, osPriorityNormal, 0, 2048);
 
 #if defined(EEZ_PLATFORM_STM32)
 #pragma GCC diagnostic pop

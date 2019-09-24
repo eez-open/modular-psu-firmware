@@ -229,17 +229,21 @@ struct EventQueueHeader {
     uint16_t head;
     uint16_t size;
     uint16_t lastErrorEventIndex;
+    uint32_t reserved;
 };
 
 struct Event {
     uint32_t dateTime;
     int16_t eventId;
+    int16_t reserved1;
+    uint32_t reserved2;
+    uint32_t reserved3;
 };
 
 void init();
 void tick(uint32_t tick_usec);
 
-void getLastErrorEvent(Event *e);
+Event *getLastErrorEvent();
 
 int getEventType(Event *e);
 const char *getEventMessage(Event *e);
@@ -250,7 +254,7 @@ void markAsRead();
 
 int getNumPages();
 int getActivePageNumEvents();
-void getActivePageEvent(int i, Event *e);
+Event *getActivePageEvent(int i);
 void moveToFirstPage();
 void moveToNextPage();
 void moveToPreviousPage();

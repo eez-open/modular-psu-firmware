@@ -187,7 +187,7 @@
 |6     |2    |int                      |Queue head                   |
 |8     |2    |int                      |Queue size                   |
 |10    |2    |int                      |Last error event index       |
-|16    |3200 |[struct](#event)         |Max. 200 events              |
+|12    |1600 |[struct](#event)         |Max. 200 events              |
 
 ## <a name="event">Event</a>
 

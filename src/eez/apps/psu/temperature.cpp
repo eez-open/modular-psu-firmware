@@ -200,9 +200,8 @@ void TempSensorTemperature::clearProtection() {
     otp_tripped = false;
     set_otp_reg(false);
 
-    event_queue::Event lastEvent;
-    event_queue::getLastErrorEvent(&lastEvent);
-    if (lastEvent.eventId == event_queue::EVENT_ERROR_AUX_OTP_TRIPPED + sensorIndex) {
+    auto lastEvent = event_queue::getLastErrorEvent();
+    if (lastEvent && lastEvent->eventId == event_queue::EVENT_ERROR_AUX_OTP_TRIPPED + sensorIndex) {
         event_queue::markAsRead();
     }
 }

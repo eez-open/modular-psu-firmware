@@ -1084,27 +1084,26 @@ bool Channel::isTripped() {
 }
 
 void Channel::clearProtection(bool clearOTP) {
-    event_queue::Event lastEvent;
-    event_queue::getLastErrorEvent(&lastEvent);
+    auto lastEvent = event_queue::getLastErrorEvent();
 
     ovp.flags.tripped = 0;
     ovp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OVP, false);
-    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + channelIndex) {
+    if (lastEvent && lastEvent->eventId == event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + channelIndex) {
         event_queue::markAsRead();
     }
 
     ocp.flags.tripped = 0;
     ocp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OCP, false);
-    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + channelIndex) {
+    if (lastEvent && lastEvent->eventId == event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + channelIndex) {
         event_queue::markAsRead();
     }
 
     opp.flags.tripped = 0;
     opp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OPP, false);
-    if (lastEvent.eventId == event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + channelIndex) {
+    if (lastEvent && lastEvent->eventId == event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + channelIndex) {
         event_queue::markAsRead();
     }
 

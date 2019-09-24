@@ -700,14 +700,37 @@ void toggleChannelsMaxView(int slotIndex) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool loadProfile(int location, profile::Parameters *profile) {
-    assert(sizeof(profile::Parameters) <= PERSIST_CONF_PROFILE_BLOCK_SIZE);
-    return confRead((uint8_t *)profile, sizeof(profile::Parameters), getProfileAddress(location), profile::PROFILE_VERSION);
+static struct {
+    bool loaded;
+    profile::Parameters profile;
+} g_profilesCache[NUM_PROFILE_LOCATIONS];
+
+profile::Parameters *loadProfile(int location) {
+    assert(location < NUM_PROFILE_LOCATIONS && sizeof(profile::Parameters) <= PERSIST_CONF_PROFILE_BLOCK_SIZE);
+    
+    if (!g_profilesCache[location].loaded) {
+        profile::Parameters profile;
+        if (confRead((uint8_t *)&profile, sizeof(profile::Parameters), getProfileAddress(location), profile::PROFILE_VERSION)) {
+           memcpy(&g_profilesCache[location].profile, &profile, sizeof(profile::Parameters));
+        }
+        g_profilesCache[location].loaded = true;
+    }
+
+    return &g_profilesCache[location].profile;
 }
 
 bool saveProfile(int location, profile::Parameters *profile) {
-    return save((BlockHeader *)profile, sizeof(profile::Parameters), getProfileAddress(location), profile::PROFILE_VERSION);
+    if (!save((BlockHeader *)profile, sizeof(profile::Parameters), getProfileAddress(location), profile::PROFILE_VERSION)) {
+        return false;
+    }
+
+    memcpy(&g_profilesCache[location].profile, profile, sizeof(profile::Parameters));
+    g_profilesCache[location].loaded = true;
+
+    return true;
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 uint32_t readTotalOnTime(int type) {
     uint32_t buffer[6];
@@ -727,33 +750,39 @@ uint32_t readTotalOnTime(int type) {
             );
         }
 
-        if (result && buffer[0] == ONTIME_MAGIC && buffer[1] == buffer[2]) {
-            if (buffer[3] == ONTIME_MAGIC && buffer[4] == buffer[5]) {
-                if (buffer[4] > buffer[1]) {
-                    return buffer[4];
-                }
+        // is counter on first location valid?
+        if (result && buffer[0] == ONTIME_MAGIC && buffer[2] == crc32((uint8_t *)(buffer + 0), 8)) {
+            // is counter on second location valid?
+            if (buffer[3] == ONTIME_MAGIC && buffer[5] == crc32((uint8_t *)(buffer + 3), 8)) {
+                // at which location time is bigger?
+                return buffer[1] > buffer[4] ? buffer[1] : buffer[4];
             }
-            return buffer[1];
-        }
 
-        if (result && buffer[3] == ONTIME_MAGIC && buffer[4] == buffer[5]) {
+            // only first location is valid
+            return buffer[1];
+        } 
+        
+        if (buffer[3] == ONTIME_MAGIC && buffer[5] == crc32((uint8_t *)(buffer + 3), 8)) {
+            // only second location is valid
             return buffer[4];
         }
     }
 
+    // no valid time stored
     return 0;
 }
 
 bool writeTotalOnTime(int type, uint32_t time) {
     uint32_t buffer[6];
 
+    // store time at two locations for extra robustness
     buffer[0] = ONTIME_MAGIC;
     buffer[1] = time;
-    buffer[2] = time;
+    buffer[2] = crc32((uint8_t *)(buffer + 0), 8);
 
     buffer[3] = ONTIME_MAGIC;
     buffer[4] = time;
-    buffer[5] = time;
+    buffer[5] = crc32((uint8_t *)(buffer + 3), 8);
 
     if (type == ontime::ON_TIME_COUNTER_MCU) {
         return confWrite((uint8_t *)buffer, sizeof(buffer), eeprom::EEPROM_ONTIME_START_ADDRESS);

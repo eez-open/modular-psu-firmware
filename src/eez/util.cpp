@@ -22,6 +22,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <crc.h>
+#endif
+
 namespace eez {
 
 float remap(float x, float x1, float y1, float x2, float y2) {
@@ -107,6 +111,11 @@ void strcatFloat(char *str, float value) {
     sprintf(str + strlen(str), "%g", value);
 }
 
+#if defined(EEZ_PLATFORM_STM32)
+uint32_t crc32(const uint8_t *mem_block, size_t block_size) {
+	return HAL_CRC_Calculate(&hcrc, (uint32_t *)mem_block, block_size);
+}
+#else
 /*
 From http://www.hackersdelight.org/hdcodetxt/crc.c.txt:
 
@@ -133,6 +142,7 @@ uint32_t crc32(const uint8_t *mem_block, size_t block_size) {
     }
     return ~crc;
 }
+#endif
 
 uint8_t toBCD(uint8_t bin) {
     return ((bin / 10) << 4) | (bin % 10);

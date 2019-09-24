@@ -356,25 +356,41 @@ void GREATER_THEN_MAX_TIME_ZONE_value_to_text(const Value &value, char *text, in
 }
 
 bool compare_EVENT_value(const Value &a, const Value &b) {
-    return getEventFromValue(a)->dateTime == getEventFromValue(b)->dateTime &&
-           getEventFromValue(a)->eventId == getEventFromValue(b)->eventId;
+    auto aEvent = getEventFromValue(a);
+    auto bEvent = getEventFromValue(a);
+
+    if (aEvent == bEvent) {
+        return true;
+    }
+
+    if (!aEvent || !bEvent) {
+        return false;
+    }
+
+    return aEvent->dateTime == bEvent->dateTime && aEvent->eventId == bEvent->eventId;
 }
 
 void EVENT_value_to_text(const Value &value, char *text, int count) {
+    auto event = getEventFromValue(value);
+    if (!event) {
+        text[0] = 0;
+        return;
+    }
+
     int year, month, day, hour, minute, second;
-    datetime::breakTime(getEventFromValue(value)->dateTime, year, month, day, hour, minute, second);
+    datetime::breakTime(event->dateTime, year, month, day, hour, minute, second);
 
     int yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow;
     datetime::breakTime(datetime::now(), yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow);
 
     if (yearNow == year && monthNow == month && dayNow == day) {
         snprintf(text, count - 1, "%c [%02d:%02d:%02d] %s",
-                 127 + event_queue::getEventType(getEventFromValue(value)), hour, minute, second,
-                 event_queue::getEventMessage(getEventFromValue(value)));
+                 127 + event_queue::getEventType(event), hour, minute, second,
+                 event_queue::getEventMessage(event));
     } else {
         snprintf(text, count - 1, "%c [%02d-%02d-%02d] %s",
-                 127 + event_queue::getEventType(getEventFromValue(value)), day, month, year % 100,
-                 event_queue::getEventMessage(getEventFromValue(value)));
+                 127 + event_queue::getEventType(event), day, month, year % 100,
+                 event_queue::getEventMessage(event));
     }
 
     text[count - 1] = 0;
@@ -2168,23 +2184,17 @@ void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::
     }
 }
 
-event_queue::Event g_stateEvents[2][event_queue::EVENTS_PER_PAGE];
-static event_queue::Event g_lastEvent[2];
-event_queue::Event g_event;
-
 void data_event_queue_last_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        event_queue::Event *lastEvent = isUpdatingScreen() ? &g_lastEvent[getCurrentStateBufferIndex()] : &g_event;
-        event_queue::getLastErrorEvent(lastEvent);
-        value = data::Value(event_queue::getEventType(lastEvent));
+        auto *lastEvent = event_queue::getLastErrorEvent();
+        value = data::Value(lastEvent ? event_queue::getEventType(lastEvent) : event_queue::EVENT_TYPE_NONE);
     }
 }
 
 void data_event_queue_last_event_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        event_queue::Event *lastEvent = isUpdatingScreen() ? &g_lastEvent[getCurrentStateBufferIndex()] : &g_event;
-        event_queue::getLastErrorEvent(lastEvent);
-        if (event_queue::getEventType(lastEvent) != event_queue::EVENT_TYPE_NONE) {
+        auto lastEvent = event_queue::getLastErrorEvent();
+        if (lastEvent && event_queue::getEventType(lastEvent) != event_queue::EVENT_TYPE_NONE) {
             value = MakeEventValue(lastEvent);
         }
     }
@@ -2199,16 +2209,8 @@ void data_event_queue_events(data::DataOperationEnum operation, data::Cursor &cu
 void data_event_queue_events_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (cursor.i >= 0) {
-            event_queue::Event *event = isUpdatingScreen() ? &g_stateEvents[getCurrentStateBufferIndex()][cursor.i] : &g_event;
-
-            int n = event_queue::getActivePageNumEvents();
-            if (cursor.i < n) {
-                event_queue::getActivePageEvent(cursor.i, event);
-            } else {
-                event->eventId = event_queue::EVENT_TYPE_NONE;
-            }
-
-            value = data::Value(event_queue::getEventType(event));
+            event_queue::Event *event = event_queue::getActivePageEvent(cursor.i);
+            value = data::Value(event ? event_queue::getEventType(event) : event_queue::EVENT_TYPE_NONE);
         }
     }
 }
@@ -2216,16 +2218,7 @@ void data_event_queue_events_type(data::DataOperationEnum operation, data::Curso
 void data_event_queue_events_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (cursor.i >= 0) {
-            event_queue::Event *event = isUpdatingScreen() ? &g_stateEvents[getCurrentStateBufferIndex()][cursor.i] : &g_event;
-
-            int n = event_queue::getActivePageNumEvents();
-            if (cursor.i < n) {
-                event_queue::getActivePageEvent(cursor.i, event);
-            } else {
-                event->eventId = event_queue::EVENT_TYPE_NONE;
-            }
-
-            value = MakeEventValue(event);
+            value = MakeEventValue(event_queue::getActivePageEvent(cursor.i));
         }
     }
 }
@@ -2452,8 +2445,10 @@ void data_sys_info_fan_status(data::DataOperationEnum operation, data::Cursor &c
 #else
             value = 2;
 #endif
-        } else {
+        } else if (aux_ps::fan::g_testResult == TEST_NONE) {
             value = 3;
+        } else {
+            value = 4;
         }
 #else
         value = 3;
@@ -2656,9 +2651,9 @@ void data_profile_label(data::DataOperationEnum operation, data::Cursor &cursor,
 void data_profile_remark(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (g_selectedProfileLocation != -1) {
-            UserProfilesPage *page = (UserProfilesPage *)getUserProfilesPage();
-            if (page) {
-                value = data::Value(page->profile.name);
+            profile::Parameters *profile = profile::load(g_selectedProfileLocation);
+            if (profile) {
+                value = data::Value(profile->name);
             }
         } else if (cursor.i >= 0) {
             value = data::Value(cursor.i, VALUE_TYPE_USER_PROFILE_REMARK);
@@ -2677,9 +2672,9 @@ void data_profile_is_auto_recall_location(data::DataOperationEnum operation, dat
 void data_profile_channel_u_set(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (g_selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
-            UserProfilesPage *page = (UserProfilesPage *)getUserProfilesPage();
-            if (page) {
-                value = MakeValue(page->profile.channels[cursor.i].u_set, UNIT_VOLT);
+            profile::Parameters *profile = profile::load(g_selectedProfileLocation);
+            if (profile) {
+                value = MakeValue(profile->channels[cursor.i].u_set, UNIT_VOLT);
             }
         }
     }
@@ -2688,9 +2683,9 @@ void data_profile_channel_u_set(data::DataOperationEnum operation, data::Cursor 
 void data_profile_channel_i_set(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (g_selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
-            UserProfilesPage *page = (UserProfilesPage *)getUserProfilesPage();
-            if (page) {
-                value = MakeValue(page->profile.channels[cursor.i].i_set, UNIT_AMPER);
+            profile::Parameters *profile = profile::load(g_selectedProfileLocation);
+            if (profile) {
+                value = MakeValue(profile->channels[cursor.i].i_set, UNIT_AMPER);
             }
         }
     }
@@ -2699,9 +2694,9 @@ void data_profile_channel_i_set(data::DataOperationEnum operation, data::Cursor 
 void data_profile_channel_output_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (g_selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
-            UserProfilesPage *page = (UserProfilesPage *)getUserProfilesPage();
-            if (page) {
-                value = (int)page->profile.channels[cursor.i].flags.output_enabled;
+            profile::Parameters *profile = profile::load(g_selectedProfileLocation);
+            if (profile) {
+                value = (int)profile->channels[cursor.i].flags.output_enabled;
             }
         }
     }

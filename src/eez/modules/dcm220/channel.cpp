@@ -145,13 +145,7 @@ struct Channel : ChannelInterface {
 		lastTickCount = micros();
 
 		uint32_t crc = HAL_CRC_Calculate(&hcrc, (uint32_t *)input, BUFFER_SIZE - 4);
-		if (crc == *((uint32_t *)(input + BUFFER_SIZE - 4))) {
-			isCrcOk = true;
-		} else {
-			isCrcOk = false;
-			DebugTrace("CRC NOT OK %u\n", crc);
-
-		}
+		isCrcOk = crc == *((uint32_t *)(input + BUFFER_SIZE - 4));
 	}
 #endif
 
@@ -180,8 +174,12 @@ struct Channel : ChannelInterface {
 			transfer();
 		}
 
-		bool pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
-		pwrGood = true;
+		bool pwrGood;
+		if (isCrcOk) {
+			pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
+		} else{
+			pwrGood = true;
+		}
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -226,8 +224,10 @@ struct Channel : ChannelInterface {
 		        HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
 		    }
 
-			temperature[0] = calcTemperature(*((uint16_t *)(input + 10)));
-			temperature[1] = calcTemperature(*((uint16_t *)(input + 12)));
+		    if (isCrcOk) {
+		    	temperature[0] = calcTemperature(*((uint16_t *)(input + 10)));
+		    	temperature[1] = calcTemperature(*((uint16_t *)(input + 12)));
+		    }
         }
 #endif
 
@@ -269,17 +269,19 @@ struct Channel : ChannelInterface {
         //
 
 #if defined(EEZ_PLATFORM_STM32)
-    	uint16_t *inputSetValues = (uint16_t *)(input + 2);
+        if (isCrcOk) {
+        	uint16_t *inputSetValues = (uint16_t *)(input + 2);
 
-    	int offset = subchannelIndex * 2;
+        	int offset = subchannelIndex * 2;
 
-        uint16_t uMonAdc = inputSetValues[offset];
-        float uMon = remap(uMonAdc, (float)ADC_MIN, channel.params->U_MIN, (float)ADC_MAX, channel.params->U_MAX);
-        channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon);
+        	uint16_t uMonAdc = inputSetValues[offset];
+        	float uMon = remap(uMonAdc, (float)ADC_MIN, channel.params->U_MIN, (float)ADC_MAX, channel.params->U_MAX);
+        	channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon);
 
-        uint16_t iMonAdc = inputSetValues[offset + 1];
-        float iMon = remap(iMonAdc, (float)ADC_MIN, channel.params->I_MIN, (float)ADC_MAX, channel.params->I_MAX);
-        channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon);
+        	uint16_t iMonAdc = inputSetValues[offset + 1];
+        	float iMon = remap(iMonAdc, (float)ADC_MIN, channel.params->I_MIN, (float)ADC_MAX, channel.params->I_MAX);
+        	channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon);
+        }
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -290,8 +292,12 @@ struct Channel : ChannelInterface {
         // PWRGOOD
 
 #if defined(EEZ_PLATFORM_STM32)
-		bool pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
-		pwrGood = true;
+		bool pwrGood;
+		if (isCrcOk) {
+			pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
+		} else{
+			pwrGood = true;
+		}
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

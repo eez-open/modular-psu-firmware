@@ -41,10 +41,7 @@ namespace gui {
 int g_selectedProfileLocation;
 
 void UserProfilesPage::pageAlloc() {
-    if (getActivePageId() == PAGE_ID_USER_PROFILE_0_SETTINGS ||
-        getActivePageId() == PAGE_ID_USER_PROFILE_SETTINGS) {
-        profile::load(g_selectedProfileLocation, &profile);
-    } else {
+    if (getActivePageId() != PAGE_ID_USER_PROFILE_0_SETTINGS && getActivePageId() != PAGE_ID_USER_PROFILE_SETTINGS) {
         g_selectedProfileLocation = -1;
     }
 }
@@ -55,8 +52,7 @@ void UserProfilesPage::pageFree() {
 
 void UserProfilesPage::showProfile() {
     g_selectedProfileLocation = getFoundWidgetAtDown().cursor.i;
-    pushPage(g_selectedProfileLocation == 0 ? PAGE_ID_USER_PROFILE_0_SETTINGS
-                                            : PAGE_ID_USER_PROFILE_SETTINGS);
+    pushPage(g_selectedProfileLocation == 0 ? PAGE_ID_USER_PROFILE_0_SETTINGS : PAGE_ID_USER_PROFILE_SETTINGS);
 }
 
 void UserProfilesPage::toggleAutoRecall() {
@@ -68,9 +64,7 @@ void UserProfilesPage::toggleAutoRecall() {
 
 void UserProfilesPage::toggleIsAutoRecallLocation() {
     if (profile::isValid(g_selectedProfileLocation)) {
-        if (persist_conf::setProfileAutoRecallLocation(g_selectedProfileLocation)) {
-            profile::load(g_selectedProfileLocation, &profile);
-        } else {
+        if (!persist_conf::setProfileAutoRecallLocation(g_selectedProfileLocation)) {
             errorMessage("Failed!");
         }
     }
@@ -94,9 +88,6 @@ void UserProfilesPage::recall() {
 void UserProfilesPage::onSaveFinish(char *remark, void (*callback)()) {
     callback();
     if (profile::saveAtLocation(g_selectedProfileLocation, remark)) {
-        UserProfilesPage *page = (UserProfilesPage *)getActivePage();
-        profile::load(g_selectedProfileLocation, &page->profile);
-
         infoMessage("Current parameters saved");
     } else {
         errorMessage("EEPROM save failed!");
@@ -110,7 +101,7 @@ void UserProfilesPage::onSaveEditRemarkOk(char *remark) {
 void UserProfilesPage::onSaveYes() {
     if (g_selectedProfileLocation > 0) {
         char remark[PROFILE_NAME_MAX_LENGTH + 1];
-        profile::getSaveName(&(((UserProfilesPage *)getActivePage())->profile), remark);
+        profile::getSaveName(g_selectedProfileLocation, remark);
 
         Keypad::startPush(0, remark, PROFILE_NAME_MAX_LENGTH, false, onSaveEditRemarkOk, 0);
     } else {

@@ -192,6 +192,7 @@ void init() {
     datetime::init();
 
     event_queue::init();
+    profile::init();
 
     list::init();
 
@@ -410,10 +411,11 @@ static bool psuReset() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool loadAutoRecallProfile(profile::Parameters *profile, int *location) {
+static profile::Parameters *loadAutoRecallProfile(int *location) {
     if (persist_conf::isProfileAutoRecallEnabled()) {
         *location = persist_conf::getProfileAutoRecallLocation();
-        if (profile::load(*location, profile)) {
+        profile::Parameters *profile = profile::load(*location);
+        if (profile) {
             bool outputEnabled = false;
 
             for (int i = 0; i < CH_NUM; ++i) {
@@ -430,16 +432,15 @@ static bool loadAutoRecallProfile(profile::Parameters *profile, int *location) {
                     disableOutputs = true;
                 } else {
                     if (*location != 0) {
-                        profile::Parameters defaultProfile;
-                        if (profile::load(0, &defaultProfile)) {
-                            if (profile->flags.channelsCoupling !=
-                                defaultProfile.flags.channelsCoupling) {
+                        profile::Parameters *defaultProfile = profile::load(0);
+                        if (defaultProfile) {
+                            if (profile->flags.channelsCoupling != defaultProfile->flags.channelsCoupling) {
                                 disableOutputs = true;
                                 event_queue::pushEvent(event_queue::EVENT_WARNING_AUTO_RECALL_VALUES_MISMATCH);
                             } else {
                                 for (int i = 0; i < CH_NUM; ++i) {
-                                    if (profile->channels[i].u_set != defaultProfile.channels[i].u_set ||
-                                        profile->channels[i].i_set != defaultProfile.channels[i].i_set) {
+                                    if (profile->channels[i].u_set != defaultProfile->channels[i].u_set ||
+                                        profile->channels[i].i_set != defaultProfile->channels[i].i_set) {
                                         disableOutputs = true;
                                         event_queue::pushEvent( event_queue::EVENT_WARNING_AUTO_RECALL_VALUES_MISMATCH);
                                         break;
@@ -459,23 +460,23 @@ static bool loadAutoRecallProfile(profile::Parameters *profile, int *location) {
                 }
             }
 
-            return true;
+            return profile;
         }
     }
 
-    return false;
+    return nullptr;
 }
 
 static bool autoRecall() {
-    profile::Parameters profile;
     int location;
-    if (loadAutoRecallProfile(&profile, &location)) {
-        if (!checkProfileModuleMatch(&profile)) {
+    profile::Parameters *profile = loadAutoRecallProfile(&location);
+    if (profile) {
+        if (!checkProfileModuleMatch(profile)) {
             event_queue::pushEvent(event_queue::EVENT_WARNING_AUTO_RECALL_MODULE_MISMATCH);
             return false;
         }
 
-        if (profile::recallFromProfile(&profile, location)) {
+        if (profile::recallFromProfile(profile, location)) {
             return true;
         }
     }
@@ -640,24 +641,23 @@ void changePowerState(bool up) {
         g_bootTestSuccess = true;
 
         // auto recall channels parameters from profile
-        profile::Parameters profile;
         int location;
-        auto recall = loadAutoRecallProfile(&profile, &location);
+        profile::Parameters *profile = loadAutoRecallProfile(&location);
 
         if (!powerUp()) {
             return;
         }
 
         // auto recall channels parameters from profile
-        if (recall) {
-            if (!checkProfileModuleMatch(&profile)) {
+        if (profile) {
+            if (!checkProfileModuleMatch(profile)) {
                 event_queue::pushEvent(event_queue::EVENT_WARNING_AUTO_RECALL_MODULE_MISMATCH);
             } else {
                 for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-                    memcpy(&temperature::sensors[i].prot_conf, profile.temp_prot + i, sizeof(temperature::ProtectionConfiguration));
+                    memcpy(&temperature::sensors[i].prot_conf, profile->temp_prot + i, sizeof(temperature::ProtectionConfiguration));
                 }
 
-                profile::recallChannelsFromProfile(&profile, location);
+                profile::recallChannelsFromProfile(profile, location);
             }
         }
 

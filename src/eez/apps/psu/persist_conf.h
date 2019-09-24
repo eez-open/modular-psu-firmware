@@ -207,7 +207,7 @@ void toggleChannelsViewMode();
 void setChannelsMaxView(int slotIndex); // slotIndex starts from 1
 void toggleChannelsMaxView(int slotIndex); // slotIndex starts from 1
 
-bool loadProfile(int location, profile::Parameters *profile);
+profile::Parameters *loadProfile(int location);
 bool saveProfile(int location, profile::Parameters *profile);
 
 uint32_t readTotalOnTime(int type);

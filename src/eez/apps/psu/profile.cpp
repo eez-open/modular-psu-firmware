@@ -176,8 +176,7 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
             channel.simulator.voltProgExt = profile->channels[i].voltProgExt;
 #endif
 
-            channel.flags.outputEnabled =
-                channel.isTripped() ? 0 : profile->channels[i].flags.output_enabled;
+            channel.flags.outputEnabled = channel.isTripped() ? 0 : profile->channels[i].flags.output_enabled;
             channel.flags.senseEnabled = profile->channels[i].flags.sense_enabled;
 
             if (channel.getFeatures() & CH_FEATURE_RPROG) {
@@ -189,7 +188,6 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
             channel.flags.displayValue1 = profile->channels[i].flags.displayValue1;
             channel.flags.displayValue2 = profile->channels[i].flags.displayValue2;
             channel.ytViewRate = profile->channels[i].ytViewRate;
-
             if (channel.flags.displayValue1 == 0 && channel.flags.displayValue2 == 0) {
                 channel.flags.displayValue1 = DISPLAY_VALUE_VOLTAGE;
                 channel.flags.displayValue2 = DISPLAY_VALUE_CURRENT;
@@ -198,10 +196,8 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
                 channel.ytViewRate = GUI_YT_VIEW_RATE_DEFAULT;
             }
 
-            channel.flags.voltageTriggerMode =
-                (TriggerMode)profile->channels[i].flags.u_triggerMode;
-            channel.flags.currentTriggerMode =
-                (TriggerMode)profile->channels[i].flags.i_triggerMode;
+            channel.flags.voltageTriggerMode = (TriggerMode)profile->channels[i].flags.u_triggerMode;
+            channel.flags.currentTriggerMode = (TriggerMode)profile->channels[i].flags.i_triggerMode;
             channel.flags.triggerOutputState = profile->channels[i].flags.triggerOutputState;
             channel.flags.triggerOnListStop = profile->channels[i].flags.triggerOnListStop;
             trigger::setVoltage(channel, profile->channels[i].u_triggerValue);
@@ -350,6 +346,12 @@ void save(bool immediately) {
     }
 }
 
+void init() {
+    for (int profileIndex = 0; profileIndex < NUM_PROFILE_LOCATIONS; profileIndex++) {
+        persist_conf::loadProfile(profileIndex);
+    }
+}
+
 void tick() {
     if (g_profileDirty && !list::isActive() && !calibration::isEnabled() && idle::isIdle()) {
         doSave();
@@ -362,7 +364,7 @@ void tick() {
 bool checkProfileModuleMatch(Parameters *profile) {
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
-        if (profile->channels[i].flags.moduleType != g_slots[channel.slotIndex].moduleType) {
+        if (profile->channels[i].flags.parameters_are_valid && profile->channels[i].flags.moduleType != g_slots[channel.slotIndex].moduleType) {
             return false; // mismatch
         }
     }
@@ -393,15 +395,15 @@ bool recallFromProfile(Parameters *profile, int location) {
 
 bool recall(int location, int *err) {
     if (location > 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters profile;
-        if (persist_conf::loadProfile(location, &profile) && profile.flags.isValid) {
-            if (!checkProfileModuleMatch(&profile)) {
+        Parameters *profile = persist_conf::loadProfile(location);
+        if (profile && profile->flags.isValid) {
+            if (!checkProfileModuleMatch(profile)) {
                 *err = SCPI_ERROR_PROFILE_MODULE_MISMATCH;
                 return false;
             }
 
-            if (persist_conf::saveProfile(0, &profile)) {
-                if (recallFromProfile(&profile, location)) {
+            if (persist_conf::saveProfile(0, profile)) {
+                if (recallFromProfile(profile, location)) {
                     save();
                     event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_PROFILE_0 + location);
                     return true;
@@ -476,24 +478,25 @@ bool recallFromFile(const char *filePath, int *err) {
 #endif
 }
 
-bool load(int location, Parameters *profile) {
+Parameters *load(int location) {
     if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
-        if (persist_conf::loadProfile(location, profile)) {
-            return profile->flags.isValid;
+        Parameters *profile = persist_conf::loadProfile(location);
+        if (profile && profile->flags.isValid) {
+            return profile;
         }
     }
-    profile->flags.isValid = 0;
-    return false;
+    return nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void getSaveName(const Parameters *profile, char *name) {
-    if (!profile->flags.isValid || strncmp(profile->name, AUTO_NAME_PREFIX, strlen(AUTO_NAME_PREFIX)) == 0) {
+void getSaveName(int location, char *name) {
+    Parameters *profile = persist_conf::loadProfile(location);
+
+    if (!profile || !profile->flags.isValid || strncmp(profile->name, AUTO_NAME_PREFIX, strlen(AUTO_NAME_PREFIX)) == 0) {
         strcpy(name, AUTO_NAME_PREFIX);
         datetime::getDateTimeAsString(name + strlen(AUTO_NAME_PREFIX));
-    }
-    else {
+    } else {
         strcpy(name, profile->name);
     }
 }
@@ -506,10 +509,7 @@ bool saveAtLocation(int location, const char *name) {
         if (name) {
             strcpy(profile.name, name);
         } else {
-            Parameters currentProfile;
-            if (persist_conf::loadProfile(location, &currentProfile)) {
-                getSaveName(&currentProfile, profile.name);
-            }
+            getSaveName(location, profile.name);
         }
 
         if (persist_conf::saveProfile(location, &profile)) {
@@ -596,9 +596,9 @@ bool deleteAll() {
 
 bool isValid(int location) {
     if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters profile;
-        if (persist_conf::loadProfile(location, &profile)) {
-            return profile.flags.isValid;
+        Parameters *profile = persist_conf::loadProfile(location);
+        if (profile) {
+            return profile->flags.isValid;
         }
     }
     return false;
@@ -606,11 +606,11 @@ bool isValid(int location) {
 
 bool setName(int location, const char *name, size_t name_len) {
     if (location > 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters profile;
-        if (persist_conf::loadProfile(location, &profile) && profile.flags.isValid) {
-            memset(profile.name, 0, sizeof(profile.name));
-            strncpy(profile.name, name, name_len);
-            return persist_conf::saveProfile(location, &profile);
+        Parameters *profile = persist_conf::loadProfile(location);
+        if (profile && profile->flags.isValid) {
+            memset(profile->name, 0, sizeof(profile->name));
+            strncpy(profile->name, name, name_len);
+            return persist_conf::saveProfile(location, profile);
         }
     }
     return false;
@@ -618,9 +618,9 @@ bool setName(int location, const char *name, size_t name_len) {
 
 void getName(int location, char *name, int count) {
     if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters profile;
-        if (persist_conf::loadProfile(location, &profile) && profile.flags.isValid) {
-            strncpy(name, profile.name, count - 1);
+        Parameters *profile = persist_conf::loadProfile(location);
+        if (profile && profile->flags.isValid) {
+            strncpy(name, profile->name, count - 1);
             name[count - 1] = 0;
             return;
         }

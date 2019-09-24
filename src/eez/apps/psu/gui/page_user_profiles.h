@@ -42,8 +42,6 @@ class UserProfilesPage : public Page {
     void deleteProfile();
     void editRemark();
 
-    profile::Parameters profile;
-
   private:
     static void onSaveFinish(char *remark = 0, void (*callback)() = 0);
     static void onSaveEditRemarkOk(char *remark);
