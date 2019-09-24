@@ -258,6 +258,8 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
         SCPI_ResultText(context, buffer);
         sprintf(buffer, "CH%d u_state=%d", channelIndex, (int)channel->prot_conf.flags.u_state);
         SCPI_ResultText(context, buffer);
+        sprintf(buffer, "CH%d u_type=%d", channelIndex, (int)channel->prot_conf.flags.u_type);
+        SCPI_ResultText(context, buffer);
         sprintf(buffer, "CH%d u_delay=", channelIndex);
         strcatDuration(buffer, channel->prot_conf.u_delay);
         SCPI_ResultText(context, buffer);

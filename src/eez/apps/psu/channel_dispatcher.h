@@ -68,8 +68,9 @@ float getUMax(const Channel &channel);
 float getUProtectionLevel(const Channel &channel);
 void setVoltage(Channel &channel, float voltage);
 void setVoltageLimit(Channel &channel, float limit);
-void setOvpParameters(Channel &channel, int state, float level, float delay);
+void setOvpParameters(Channel &channel, int type, int state, float level, float delay);
 void setOvpState(Channel &channel, int state);
+void setOvpType(Channel &channel, int type);
 void setOvpLevel(Channel &channel, float level);
 void setOvpDelay(Channel &channel, float delay);
 

@@ -553,6 +553,49 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionTrippedQ(scpi_t *context) {
     return get_tripped(context, channel->ovp);
 }
 
+static scpi_choice_def_t voltageProtectionType[] = {
+    { "HW", VOLTAGE_PROTECTION_TYPE_HW },
+    { "SW", VOLTAGE_PROTECTION_TYPE_SW },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_sourceVoltageProtectionType(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (g_slots[channel->slotIndex].moduleType != MODULE_TYPE_DCP405) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t type;
+    if (!SCPI_ParamChoice(context, voltageProtectionType, &type, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    channel_dispatcher::setOvpType(*channel, type);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageProtectionTypeQ(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (g_slots[channel->slotIndex].moduleType != MODULE_TYPE_DCP405) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, voltageProtectionType, channel->prot_conf.flags.u_type);
+
+    return SCPI_RES_OK;
+}
+
 scpi_result_t scpi_cmd_sourceVoltageSenseSource(scpi_t *context) {
     // TODO migrate to generic firmware
     if (channel_dispatcher::isSeries()) {

@@ -298,11 +298,16 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
     float delay;
 
     if (IS_OVP_VALUE(this, cpv)) {
-        state = flags.rprogEnabled || prot_conf.flags.u_state;
-        condition = channel_dispatcher::getUMon(*this) >= channel_dispatcher::getUProtectionLevel(*this) ||
-            (flags.rprogEnabled && channel_dispatcher::getUMonDac(*this) >= channel_dispatcher::getUProtectionLevel(*this));
-        delay = prot_conf.u_delay;
-        delay -= PROT_DELAY_CORRECTION;
+        state = (flags.rprogEnabled || prot_conf.flags.u_state);
+        if (prot_conf.flags.u_type) {
+            condition = channelInterface->isHwOvpTripped(subchannelIndex);
+            delay = 0;
+        } else {
+            condition = channel_dispatcher::getUMon(*this) >= channel_dispatcher::getUProtectionLevel(*this) ||
+                (flags.rprogEnabled && channel_dispatcher::getUMonDac(*this) >= channel_dispatcher::getUProtectionLevel(*this));
+            delay = prot_conf.u_delay;
+            delay -= PROT_DELAY_CORRECTION;
+        }
     } else if (IS_OCP_VALUE(this, cpv)) {
         state = prot_conf.flags.i_state;
         condition = channel_dispatcher::getIMon(*this) >= channel_dispatcher::getISet(*this);
@@ -512,6 +517,11 @@ void Channel::clearCalibrationConf() {
 
 void Channel::clearProtectionConf() {
     prot_conf.flags.u_state = params->OVP_DEFAULT_STATE;
+    if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+        prot_conf.flags.u_type = 1; // HW
+    } else {
+        prot_conf.flags.u_type = 0; // SW
+    }
     prot_conf.flags.i_state = params->OCP_DEFAULT_STATE;
     prot_conf.flags.p_state = params->OPP_DEFAULT_STATE;
 
@@ -863,7 +873,7 @@ void Channel::doRemoteProgrammingEnable(bool enable) {
         setVoltageLimit(u.max);
         setVoltage(u.min);
         prot_conf.u_level = u.max;
-        prot_conf.flags.u_state = true;
+        prot_conf.flags.u_state = 1;
     }
     channelInterface->setRemoteProgramming(subchannelIndex, enable);
     setOperBits(OPER_ISUM_RPROG_ON, enable);

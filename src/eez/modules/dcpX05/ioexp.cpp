@@ -77,7 +77,7 @@ static const uint8_t DCP505_REG_VALUE_GPIOA = 0B00100000; // disable OVP
 static const uint8_t DCP505_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
 
 static const uint8_t DCP405_REG_VALUE_GPIOA = 0B00000000; //
-static const uint8_t DCP405_REG_VALUE_GPIOB = 0B00100001; // DP is OFF, disable OVP
+static const uint8_t DCP405_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
 static const uint8_t DCP405_R2B5_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
 
 static const uint8_t REG_VALUES[] = {
@@ -114,7 +114,6 @@ void IOExpander::init() {
         gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_500MA;
         gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_5A;
         gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OVP_ENABLE;
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OVP_LE;
         gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED;
         gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_COUPLED_LED;
         if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {

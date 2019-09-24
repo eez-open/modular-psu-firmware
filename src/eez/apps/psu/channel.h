@@ -65,6 +65,11 @@ enum CurrentRangeSelectionMode {
 
 enum CurrentRange { CURRENT_RANGE_HIGH, CURRENT_RANGE_LOW };
 
+enum VoltageProtectionType {
+    VOLTAGE_PROTECTION_TYPE_HW = 1,
+    VOLTAGE_PROTECTION_TYPE_SW = 0
+};
+
 /// Runtime protection binary flags (alarmed, tripped)
 struct ProtectionFlags {
     unsigned alarmed : 1;
@@ -217,6 +222,8 @@ class Channel {
         unsigned i_state : 1;
         /// Is OPP enabled?
         unsigned p_state : 1;
+        /// HW(1) or SW(0)?
+        unsigned u_type : 1;
     };
 
     /// Channel OVP, OVP and OPP configuration parameters like level and delay.

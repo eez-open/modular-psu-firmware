@@ -1919,6 +1919,23 @@ void data_channel_protection_ovp_state(data::DataOperationEnum operation, data::
     }
 }
 
+void data_channel_protection_ovp_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
+            ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
+            if (page) {
+                value = page->type ? 0 : 1;
+            } else {
+                value = channel.prot_conf.flags.u_type ? 0 : 1;
+            }
+        } else {
+            value = 2;
+        }
+    }
+}
+
 void data_channel_protection_ovp_level(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
@@ -1948,7 +1965,7 @@ void data_channel_protection_ovp_delay(data::DataOperationEnum operation, data::
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel.params->OVP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
-        channel_dispatcher::setOvpParameters(channel, channel.prot_conf.flags.u_state ? 1 : 0, channel_dispatcher::getUProtectionLevel(channel), value.getFloat());
+        channel_dispatcher::setOvpParameters(channel, channel.prot_conf.flags.u_state ? 1 : 0, channel.prot_conf.flags.u_type ? 1 : 0, channel_dispatcher::getUProtectionLevel(channel), value.getFloat());
     }
 }
 

@@ -37,16 +37,19 @@ class ChSettingsProtectionSetPage : public SetPage {
     void set();
 
     void toggleState();
+    void toggleType();
     void editLimit();
     void editLevel();
     void editDelay();
 
     int state;
+    int type;
     data::Value limit;
     data::Value level;
     data::Value delay;
 
   protected:
+    int origType;
     int origState;
 
     data::Value origLimit;

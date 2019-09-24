@@ -180,6 +180,18 @@ struct Channel : ChannelInterface {
 				restoreCurrentToValueBeforeBalancing(psu::Channel::get(channel.channelIndex == 0 ? 1 : 0));
 			}
 		}
+
+		if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+			if (channel.isOutputEnabled()) {
+				if (channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type && !ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
+					// activate HW OVP
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+				} else if (!(channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) && ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
+					// deactivate HW OVP
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+				}
+			}
+		}
 	}
 
 	unsigned getRPol(int subchannelIndex) {
@@ -254,10 +266,19 @@ struct Channel : ChannelInterface {
 	}
 
 	void setOutputEnable(int subchannelIndex, bool enable) {
+		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
+
 		if (enable) {
 			setDacVoltageFloat(subchannelIndex, uSet);
 		} else {
 			setDacVoltage(subchannelIndex, (uint16_t)0);
+
+			if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+				if (channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
+					// OVP has to be disabled before OE deactivation
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+				}
+			}
 		}
 
 		ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, enable);
@@ -272,6 +293,13 @@ struct Channel : ChannelInterface {
 		);
 
 		if (enable) {
+			if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+				if (channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
+					// OVP has to be enabled after OE activation
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+				}
+			}
+
 			// enable DP
 			delayed_dp_off = false;
 			setDpEnable(true);
@@ -285,7 +313,6 @@ struct Channel : ChannelInterface {
 			delayed_dp_off_start = micros();
 		}
 
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 		restoreVoltageToValueBeforeBalancing(channel);
 		restoreCurrentToValueBeforeBalancing(channel);
 	}
@@ -442,6 +469,10 @@ struct Channel : ChannelInterface {
 			profile::enableSave(true);
 			iBeforeBalancing = NAN;
 		}
+	}
+
+	bool isHwOvpTripped(int subchannelIndex) {
+		return !ioexp.testBit(IOExpander::DCP405_R2B5_IO_BIT_IN_OVP_FAULT); // active low
 	}
 };
 

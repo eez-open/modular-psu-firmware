@@ -53,13 +53,12 @@ public:
     static const uint8_t DCP405_IO_BIT_IN_ADC_DRDY = 4;
 
     static const uint8_t DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA = 5;
-    static const uint8_t DCP405_R2B5_IO_BIT_IN_OVP_CTRL = 5;
+    static const uint8_t DCP405_R2B5_IO_BIT_IN_OVP_FAULT = 5; // active low
     static const uint8_t DCP405_IO_BIT_OUT_CURRENT_RANGE_500MA = 6;
     static const uint8_t DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA = 6;
     static const uint8_t DCP405_IO_BIT_OUT_CURRENT_RANGE_5A = 7;
 
     static const uint8_t DCP405_IO_BIT_OUT_OVP_ENABLE = 12;
-    static const uint8_t DCP405_IO_BIT_OUT_OVP_LE = 13;
     static const uint8_t DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED = 14;
     static const uint8_t DCP405_IO_BIT_OUT_OE_COUPLED_LED = 15;
 

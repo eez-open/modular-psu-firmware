@@ -59,9 +59,7 @@ void ChSettingsProtectionPage::clearAndDisable() {
 ////////////////////////////////////////////////////////////////////////////////
 
 int ChSettingsProtectionSetPage::getDirty() {
-    return (origState != state || origLimit != limit || origLevel != level || origDelay != delay)
-               ? 1
-               : 0;
+    return (origState != state || origType != type || origLimit != limit || origLevel != level || origDelay != delay) ? 1 : 0;
 }
 
 void ChSettingsProtectionSetPage::onSetFinish(bool showInfo) {
@@ -80,6 +78,10 @@ void ChSettingsProtectionSetPage::set() {
 
 void ChSettingsProtectionSetPage::toggleState() {
     state = state ? 0 : 1;
+}
+
+void ChSettingsProtectionSetPage::toggleType() {
+    type = type ? 0 : 1;
 }
 
 void ChSettingsProtectionSetPage::onLimitSet(float value) {
@@ -159,6 +161,7 @@ void ChSettingsProtectionSetPage::editDelay() {
 
 void ChSettingsOvpProtectionPage::pageAlloc() {
     origState = state = g_channel->prot_conf.flags.u_state ? 1 : 0;
+    origType = type = g_channel->prot_conf.flags.u_type ? 1 : 0;
 
     origLimit = limit = MakeValue(channel_dispatcher::getULimit(*g_channel), UNIT_VOLT);
     minLimit = channel_dispatcher::getUMin(*g_channel);
@@ -187,7 +190,7 @@ void ChSettingsOvpProtectionPage::setParams(bool checkLoad) {
         areYouSureWithMessage("This change will affect current load.", onSetParamsOk);
     } else {
         channel_dispatcher::setVoltageLimit(*g_channel, limit.getFloat());
-        channel_dispatcher::setOvpParameters(*g_channel, state, level.getFloat(), delay.getFloat());
+        channel_dispatcher::setOvpParameters(*g_channel, state, type, level.getFloat(), delay.getFloat());
         onSetFinish(checkLoad);
     }
 }
@@ -196,6 +199,7 @@ void ChSettingsOvpProtectionPage::setParams(bool checkLoad) {
 
 void ChSettingsOcpProtectionPage::pageAlloc() {
     origState = state = g_channel->prot_conf.flags.i_state ? 1 : 0;
+    origType = type = 0;
 
     origLimit = limit = MakeValue(channel_dispatcher::getILimit(*g_channel), UNIT_AMPER);
     minLimit = channel_dispatcher::getIMin(*g_channel);
@@ -229,6 +233,7 @@ void ChSettingsOcpProtectionPage::setParams(bool checkLoad) {
 
 void ChSettingsOppProtectionPage::pageAlloc() {
     origState = state = g_channel->prot_conf.flags.p_state ? 1 : 0;
+    origType = type = 0;
 
     origLimit = limit = MakeValue(channel_dispatcher::getPowerLimit(*g_channel), UNIT_WATT);
     minLimit = channel_dispatcher::getPowerMinLimit(*g_channel);
@@ -269,6 +274,7 @@ void ChSettingsOppProtectionPage::setParams(bool checkLoad) {
 
 void ChSettingsOtpProtectionPage::pageAlloc() {
     origState = state = temperature::getChannelSensorState(g_channel) ? 1 : 0;
+    origType = type = 0;
 
     origLimit = limit = 0;
     minLimit = 0;

@@ -399,6 +399,16 @@ void action_ch_settings_prot_toggle_state() {
     ((ChSettingsProtectionSetPage *)getActivePage())->toggleState();
 }
 
+void action_ch_settings_prot_toggle_type() {
+    if (getActivePageId() == PAGE_ID_CH_SETTINGS_PROT_OVP) {
+        ((ChSettingsProtectionSetPage *)getActivePage())->toggleType();
+    } else {
+        selectChannel();
+        channel_dispatcher::setOvpType(*g_channel, g_channel->prot_conf.flags.u_type ? 0 : 1);
+        profile::save();
+    }
+}
+
 void action_ch_settings_prot_edit_limit() {
     ((ChSettingsProtectionSetPage *)getActivePage())->editLimit();
 }

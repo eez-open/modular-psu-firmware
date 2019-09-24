@@ -165,6 +165,7 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
             channel.prot_conf.p_level = MAX(profile->channels[i].p_level, channel.p_limit);
 
             channel.prot_conf.flags.u_state = profile->channels[i].flags.u_state;
+            channel.prot_conf.flags.u_type = profile->channels[i].flags.u_type;
             channel.prot_conf.flags.i_state = profile->channels[i].flags.i_state;
             channel.prot_conf.flags.p_state = profile->channels[i].flags.p_state;
 
@@ -246,6 +247,7 @@ void fillProfile(Parameters *pProfile) {
             }
 
             profile.channels[i].flags.u_state = channel.prot_conf.flags.u_state;
+            profile.channels[i].flags.u_type = channel.prot_conf.flags.u_type;
             profile.channels[i].flags.i_state = channel.prot_conf.flags.i_state;
             profile.channels[i].flags.p_state = channel.prot_conf.flags.p_state;
 
