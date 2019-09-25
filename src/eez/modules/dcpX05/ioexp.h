@@ -76,6 +76,7 @@ public:
 #if defined(EEZ_PLATFORM_STM32)
     int getBitDirection(int io_bit); // 0: output, 1: input
     bool isAdcReady();
+    uint8_t readIntcapRegister();
 #endif
 
     void readAllRegisters(uint8_t registers[]);
@@ -83,7 +84,6 @@ public:
     uint16_t gpio;
 
 private:
-
 #if defined(EEZ_PLATFORM_STM32)
     uint16_t gpioWritten;
     uint16_t gpioOutputPinsMask;

@@ -91,8 +91,7 @@ float ChannelInterface::getISetUnbalanced(int subchannelIndex) {
 void ChannelInterface::readAllRegisters(int subchannelIndex, uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
 }
 
-bool ChannelInterface::isHwOvpTripped(int subchannelIndex) {
-    return false;
+void ChannelInterface::onSpiIrq() {
 }
 
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)

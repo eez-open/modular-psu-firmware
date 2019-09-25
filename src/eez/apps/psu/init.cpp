@@ -51,9 +51,11 @@ bool onSystemStateChanged() {
 #ifdef EEZ_PLATFORM_SIMULATOR
             eez::psu::simulator::init();
 #endif
-            boot();
 
             g_psuMessageQueueId = osMessageCreate(osMessageQ(g_psuMessageQueue), NULL);
+
+            boot();
+
             g_psuTaskHandle = osThreadCreate(osThread(g_psuTask), nullptr);
         }
     }
@@ -83,6 +85,11 @@ void oneIter() {
             changePowerState(param ? true : false);
         } else if (type == PSU_QUEUE_MESSAGE_TYPE_RESET) {
             reset();
+        } else if (type == PSU_QUEUE_MESSAGE_SPI_IRQ) {
+            auto channelInterface = eez::psu::Channel::getBySlotIndex(param).channelInterface;
+            if (channelInterface) {
+            	channelInterface->onSpiIrq();
+            }
         }
     } else {
         tick();

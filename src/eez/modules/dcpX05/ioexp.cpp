@@ -50,6 +50,8 @@ static const uint8_t REG_INTCONB = 0x09;
 static const uint8_t REG_IOCON = 0x0A;
 static const uint8_t REG_GPPUA = 0x0C;
 static const uint8_t REG_GPPUB = 0x0D;
+static const uint8_t REG_INTCAPA = 0x10;
+static const uint8_t REG_INTCAPB = 0x11;
 static const uint8_t REG_GPIOA = 0x12;
 static const uint8_t REG_GPIOB = 0x13;
 
@@ -63,11 +65,11 @@ static const uint8_t DCP405_R2B5_REG_VALUE_IODIRA = 0B00111111; // pins 0, 1, 2,
 
 static const uint8_t REG_VALUE_IPOLA    = 0B00000000; // no pin is inverted
 static const uint8_t REG_VALUE_IPOLB    = 0B00000000; // no pin is inverted
-static const uint8_t REG_VALUE_GPINTENA = 0B00000000; // no interrupts
+static const uint8_t REG_VALUE_GPINTENA = 0B00100000; // enable interrupt for HW OVP Fault
 static const uint8_t REG_VALUE_GPINTENB = 0B00000000; // no interrupts
-static const uint8_t REG_VALUE_DEFVALA  = 0B00000000; //
+static const uint8_t REG_VALUE_DEFVALA  = 0B00100000; // default value for HW OVP Fault is 1
 static const uint8_t REG_VALUE_DEFVALB  = 0B00000000; //
-static const uint8_t REG_VALUE_INTCONA  = 0B00000000; //
+static const uint8_t REG_VALUE_INTCONA  = 0B00100000; // compare HW OVP Fault value with default value
 static const uint8_t REG_VALUE_INTCONB  = 0B00000000; //
 static const uint8_t REG_VALUE_IOCON    = 0B00100000; // sequential operation disabled, hw addressing disabled
 static const uint8_t REG_VALUE_GPPUA    = 0B00000000; // pull up with 100K resistor pins 1 (CC) and 2 (CV)
@@ -78,7 +80,6 @@ static const uint8_t DCP505_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
 
 static const uint8_t DCP405_REG_VALUE_GPIOA = 0B00000000; //
 static const uint8_t DCP405_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
-static const uint8_t DCP405_R2B5_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
 
 static const uint8_t REG_VALUES[] = {
     REG_IODIRA,   DCP505_REG_VALUE_IODIRA, 1,
@@ -144,11 +145,7 @@ void IOExpander::init() {
         	} else if (reg == REG_GPIOA) {
         		value = DCP405_REG_VALUE_GPIOA;
         	} else if (reg == REG_GPIOB) {
-                if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
-        		    value = DCP405_REG_VALUE_GPIOB;
-                } else {
-                    value = DCP405_R2B5_REG_VALUE_GPIOB;
-                }
+				value = DCP405_REG_VALUE_GPIOB;
         	}
     	}
 
@@ -406,6 +403,12 @@ void IOExpander::write(uint8_t reg, uint8_t val) {
     }
 
     spi::deselect(channel.slotIndex);
+}
+#endif
+
+#if defined(EEZ_PLATFORM_STM32)
+uint8_t IOExpander::readIntcapRegister() {
+    return read(REG_INTCAPA);
 }
 #endif
 

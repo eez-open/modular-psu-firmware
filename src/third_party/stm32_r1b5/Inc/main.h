@@ -118,8 +118,10 @@ void Error_Handler(void);
 #define MCLK_25_GPIO_Port GPIOC
 #define SPI2_IRQ_Pin GPIO_PIN_8
 #define SPI2_IRQ_GPIO_Port GPIOA
+#define SPI2_IRQ_EXTI_IRQn EXTI9_5_IRQn
 #define SPI5_IRQ_Pin GPIO_PIN_15
 #define SPI5_IRQ_GPIO_Port GPIOA
+#define SPI5_IRQ_EXTI_IRQn EXTI15_10_IRQn
 #define SD_DETECT_Pin GPIO_PIN_11
 #define SD_DETECT_GPIO_Port GPIOC
 #define USB_OTG_FS_OC_Pin GPIO_PIN_4
@@ -140,6 +142,7 @@ void Error_Handler(void);
 #define DOUT2_GPIO_Port GPIOB
 #define SPI4_IRQ_Pin GPIO_PIN_9
 #define SPI4_IRQ_GPIO_Port GPIOB
+#define SPI4_IRQ_EXTI_IRQn EXTI9_5_IRQn
 #define ENC_SW_Pin GPIO_PIN_4
 #define ENC_SW_GPIO_Port GPIOI
 /* USER CODE BEGIN Private defines */

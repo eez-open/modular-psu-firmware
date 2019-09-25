@@ -599,6 +599,8 @@ class Channel {
 
     float getDualRangeGndOffset();
 
+    void enterOvpProtection();
+
   private:
     bool delayLowRippleCheck;
     uint32_t outputEnableStartTime;

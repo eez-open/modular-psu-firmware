@@ -39,7 +39,7 @@ namespace gui {
 void ChSettingsProtectionPage::clear() {
     channel_dispatcher::clearProtection(*g_channel);
 
-    g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS]();
+    popPage();
     infoMessage("Cleared!");
 }
 
@@ -48,7 +48,7 @@ void onClearAndDisableYes() {
     channel_dispatcher::disableProtection(*g_channel);
     profile::save();
 
-    g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS]();
+    popPage();
     infoMessage("Cleared and disabled!");
 }
 

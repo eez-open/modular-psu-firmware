@@ -43,12 +43,16 @@ void delayMicroseconds(uint32_t microseconds) {
 
 	while (microseconds--) {
 		// 216 NOP's
-		__ASM volatile ("NOP");
-		__ASM volatile ("NOP");
-		__ASM volatile ("NOP");
-		__ASM volatile ("NOP");
-		__ASM volatile ("NOP");
-		__ASM volatile ("NOP");
+
+		// remove 6 NOP's to compensate looping costs
+
+		// __ASM volatile ("NOP");
+		// __ASM volatile ("NOP");
+		// __ASM volatile ("NOP");
+		// __ASM volatile ("NOP");
+		// __ASM volatile ("NOP");
+		// __ASM volatile ("NOP");
+
 		__ASM volatile ("NOP");
 		__ASM volatile ("NOP");
 		__ASM volatile ("NOP");

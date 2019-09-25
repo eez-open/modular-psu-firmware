@@ -30,6 +30,7 @@ extern osMessageQId g_psuMessageQueueId;
 
 #define PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE 1
 #define PSU_QUEUE_MESSAGE_TYPE_RESET 2
+#define PSU_QUEUE_MESSAGE_SPI_IRQ 3
 
 #define PSU_QUEUE_MESSAGE(type, param) (((param) << 4) | (type))
 #define PSU_QUEUE_MESSAGE_TYPE(message) ((message) & 0xF)

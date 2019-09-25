@@ -88,7 +88,7 @@ struct ChannelInterface {
 
     virtual void readAllRegisters(int subchannelIndex, uint8_t ioexpRegisters[], uint8_t adcRegisters[]);
 
-    virtual bool isHwOvpTripped(int subchannelIndex);
+    virtual void onSpiIrq();
 
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     virtual int getIoExpBitDirection(int subchannelIndex, int io_bit);

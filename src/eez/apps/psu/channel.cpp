@@ -292,22 +292,21 @@ void Channel::protectionEnter(ProtectionValue &cpv) {
     onProtectionTripped();
 }
 
+void Channel::enterOvpProtection() {
+   protectionEnter(ovp);
+}
+
 void Channel::protectionCheck(ProtectionValue &cpv) {
     bool state;
     bool condition;
     float delay;
 
     if (IS_OVP_VALUE(this, cpv)) {
-        state = (flags.rprogEnabled || prot_conf.flags.u_state);
-        if (prot_conf.flags.u_type) {
-            condition = channelInterface->isHwOvpTripped(subchannelIndex);
-            delay = 0;
-        } else {
-            condition = channel_dispatcher::getUMon(*this) >= channel_dispatcher::getUProtectionLevel(*this) ||
-                (flags.rprogEnabled && channel_dispatcher::getUMonDac(*this) >= channel_dispatcher::getUProtectionLevel(*this));
-            delay = prot_conf.u_delay;
-            delay -= PROT_DELAY_CORRECTION;
-        }
+        state = (flags.rprogEnabled || prot_conf.flags.u_state) && !prot_conf.flags.u_type;
+        condition = channel_dispatcher::getUMon(*this) >= channel_dispatcher::getUProtectionLevel(*this) ||
+            (flags.rprogEnabled && channel_dispatcher::getUMonDac(*this) >= channel_dispatcher::getUProtectionLevel(*this));
+        delay = prot_conf.u_delay;
+        delay -= PROT_DELAY_CORRECTION;
     } else if (IS_OCP_VALUE(this, cpv)) {
         state = prot_conf.flags.i_state;
         condition = channel_dispatcher::getIMon(*this) >= channel_dispatcher::getISet(*this);

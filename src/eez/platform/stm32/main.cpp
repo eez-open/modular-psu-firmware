@@ -41,6 +41,9 @@
 
 #include <eez/system.h>
 
+#include <eez/apps/psu/psu.h>
+#include <eez/apps/psu/init.h>
+
 #include <eez/platform/stm32/bsp_sdram.h>
 #include <eez/platform/stm32/defines.h>
 #include <eez/platform/stm32/dwt_delay.h>
@@ -116,6 +119,21 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *p
 //    }
 //}
 //#endif
+
+extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    int slotIndex;
+    if (GPIO_Pin == SPI2_IRQ_Pin) {
+    	slotIndex = 0;
+    } else if (GPIO_Pin == SPI4_IRQ_Pin) {
+    	slotIndex = 1;
+    } else if (GPIO_Pin == SPI5_IRQ_Pin) {
+    	slotIndex = 2;
+    } else {
+        return;
+    }
+    
+    osMessagePut(eez::psu::g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_SPI_IRQ, slotIndex), 0);
+}
 
 int main(int argc, char **argv) {
     HAL_Init();

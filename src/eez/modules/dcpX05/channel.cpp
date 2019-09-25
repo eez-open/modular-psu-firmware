@@ -270,35 +270,10 @@ struct Channel : ChannelInterface {
 
 		if (enable) {
 			setDacVoltageFloat(subchannelIndex, uSet);
-		} else {
-			setDacVoltage(subchannelIndex, (uint16_t)0);
 
-			if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
-				if (channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
-					// OVP has to be disabled before OE deactivation
-					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
-				}
-			}
-		}
+			setCurrentRange(subchannelIndex);
 
-		ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, enable);
-
-		setCurrentRange(subchannelIndex);
-
-		ioexp.changeBit(
-			g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 ?
-			IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED :
-			IOExpander::DCP505_IO_BIT_OUT_OE_UNCOUPLED_LED,
-			enable
-		);
-
-		if (enable) {
-			if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
-				if (channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
-					// OVP has to be enabled after OE activation
-					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
-				}
-			}
+			ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, true);
 
 			// enable DP
 			delayed_dp_off = false;
@@ -306,12 +281,30 @@ struct Channel : ChannelInterface {
 
 			dpNegMonitoringTime = micros();
 
+			if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 && channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
+				// OVP has to be enabled after OE activation
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+			}
+
 			adc.start(ADC_DATA_TYPE_U_MON);
 		} else {
+			if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 && channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
+				// OVP has to be disabled before OE deactivation
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+			}
+
+			setDacVoltage(subchannelIndex, (uint16_t)0);
+
+			ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, false);
+
+			setCurrentRange(subchannelIndex);
+
 			// turn off DP after some delay
 			delayed_dp_off = true;
 			delayed_dp_off_start = micros();
 		}
+
+		ioexp.changeBit(g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 ?IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED : IOExpander::DCP505_IO_BIT_OUT_OE_UNCOUPLED_LED, enable);
 
 		restoreVoltageToValueBeforeBalancing(channel);
 		restoreCurrentToValueBeforeBalancing(channel);
@@ -471,9 +464,18 @@ struct Channel : ChannelInterface {
 		}
 	}
 
-	bool isHwOvpTripped(int subchannelIndex) {
-		return !ioexp.testBit(IOExpander::DCP405_R2B5_IO_BIT_IN_OVP_FAULT); // active low
+#if defined(EEZ_PLATFORM_STM32)
+	void onSpiIrq() {
+		uint8_t intcap = ioexp.readIntcapRegister();
+		// DebugTrace("CH%d INTCAP 0x%02X\n", (int)(channel.channelIndex + 1), (int)intcap);
+		if (!(intcap & (1 << IOExpander::DCP405_R2B5_IO_BIT_IN_OVP_FAULT))) {
+			psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
+			if (channel.isOutputEnabled()) {
+				channel.enterOvpProtection();
+			}
+		}
 	}
+#endif
 };
 
 static Channel g_channel0(0);
