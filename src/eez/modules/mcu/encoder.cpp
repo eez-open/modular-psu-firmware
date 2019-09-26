@@ -42,6 +42,12 @@ namespace mcu {
 namespace encoder {
 
 #if defined(EEZ_PLATFORM_STM32)
+#define CONF_ENCODER_SPEED_FACTOR 1.0
+#else
+#define CONF_ENCODER_SPEED_FACTOR 0.5f
+#endif
+
+#if defined(EEZ_PLATFORM_STM32)
 static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true);
 static uint16_t g_lastCounter;
 #endif	
@@ -51,26 +57,74 @@ int g_simulatorCounter;
 bool g_simulatorClicked;
 #endif	
 
-#define CONF_INTERVAL 50
-
-static uint32_t g_lastTick;
-static uint32_t g_lastIntervalTick;
-static int g_direction;
-static float g_deltaCounter;
-static float g_nextDeltaCounter;
+static float g_accumulatedCounter;
 
 EncoderMode g_encoderMode = ENCODER_MODE_AUTO;
 
+////////////////////////////////////////////////////////////////////////////////
+
+#define CONF_NUM_ACCELERATION_STEP_COUNTERS 10
+#define CONF_ACCELERATION_STEP_COUNTER_DURATION_MS 50
+#define CONF_MAX_ACCELERATION 99
+
+#if defined(EEZ_PLATFORM_STM32)
+#define CONF_ACCELERATION_CALC_POW_BASE 1.06f
+#else
+#define CONF_ACCELERATION_CALC_POW_BASE 1.05f
+#endif
+
+static uint32_t g_accelerationStepLastTick;
+static int g_accumulatedAccelerationStepCounter;
+static int g_accelerationStepCounters[CONF_NUM_ACCELERATION_STEP_COUNTERS];
+static unsigned int g_accelerationStepCounterIndex;
 static float g_acceleration;
 
+void resetAccelerationCalculation() {
+    g_accelerationStepLastTick = millis();
+    g_accumulatedAccelerationStepCounter = 0;
+    for (int i = 0; i < CONF_NUM_ACCELERATION_STEP_COUNTERS; i++) {
+        g_accelerationStepCounters[i] = 0;
+    }
+    g_accelerationStepCounterIndex = 0;
+    g_acceleration = 0;
+}
+
+void calculateAcceleration(int16_t diffCounter) {
+    g_accumulatedAccelerationStepCounter += diffCounter;
+
+    uint32_t tick = millis();
+    int32_t diffTick = tick - g_accelerationStepLastTick;
+    if (diffTick >= CONF_ACCELERATION_STEP_COUNTER_DURATION_MS) {
+        g_accelerationStepCounters[g_accelerationStepCounterIndex % CONF_NUM_ACCELERATION_STEP_COUNTERS] = g_accumulatedAccelerationStepCounter;
+
+        int stepCountersSum = 0;
+        for (int i = 0; i < CONF_NUM_ACCELERATION_STEP_COUNTERS; i++) {
+        	stepCountersSum += g_accelerationStepCounters[(g_accelerationStepCounterIndex - i) % CONF_NUM_ACCELERATION_STEP_COUNTERS];
+        }
+
+		g_acceleration = powf(CONF_ACCELERATION_CALC_POW_BASE, fabs(1.0f * stepCountersSum)) - 1;
+
+        if (g_acceleration > CONF_MAX_ACCELERATION) g_acceleration = CONF_MAX_ACCELERATION;
+
+//        if (g_acceleration > 0) {
+//        	DebugTrace("%g\n", g_acceleration);
+//        }
+
+        g_accelerationStepLastTick = tick;
+        g_accumulatedAccelerationStepCounter = 0;
+        g_accelerationStepCounterIndex++;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void init() {
-#if defined(EEZ_PLATFORM_STM32)	
+#if defined(EEZ_PLATFORM_STM32)
 	HAL_TIM_Encoder_Start(&htim8, TIM_CHANNEL_ALL);
 	g_lastCounter = __HAL_TIM_GET_COUNTER(&htim8);
 #endif
 
-    g_lastTick = millis();
-    g_lastIntervalTick = millis();
+    resetAccelerationCalculation();
 }
 
 int getCounter() {
@@ -85,54 +139,20 @@ int getCounter() {
     g_lastCounter = counter;
 #endif
 
-    g_nextDeltaCounter += diffCounter;
+    // update acceleration
+    calculateAcceleration(diffCounter);
 
-#define CONF_ENCODER_ACCELERATION_INCREMENT_FACTOR 1.5f
-#define CONF_ENCODER_ACCELERATION_DECREMENT_PER_MS 1.0f
+    //
+    g_accumulatedCounter += diffCounter;
+    float speed = 1.0f + (MAX_MOVING_SPEED - (g_accumulatedCounter > 0 ? psu::persist_conf::devConf2.encoderMovingSpeedUp : psu::persist_conf::devConf2.encoderMovingSpeedDown)) * CONF_ENCODER_SPEED_FACTOR;
+    int result = (int)(g_accumulatedCounter > 0 ? floorf(g_accumulatedCounter / speed) : ceilf(g_accumulatedCounter / speed));
+    g_accumulatedCounter -= result * speed;
 
-    uint32_t tick = millis();
-    int32_t diffTick = tick - g_lastTick;
-    g_lastTick = tick;
-
-    g_acceleration += ((diffCounter != 0 ? CONF_ENCODER_ACCELERATION_INCREMENT_FACTOR : 0) - CONF_ENCODER_ACCELERATION_DECREMENT_PER_MS) * diffTick;
-    if (g_acceleration < 0) g_acceleration = 0;
-    if (g_acceleration > 99) g_acceleration = 99;
-    
-    diffTick = tick - g_lastIntervalTick;
-    if (diffTick < CONF_INTERVAL) {
-        return 0;
-    }
-    g_lastIntervalTick = tick;
-
-    float speed = 1.0f * (g_deltaCounter > 0 ? psu::persist_conf::devConf2.encoderMovingSpeedUp : psu::persist_conf::devConf2.encoderMovingSpeedDown) / MAX_MOVING_SPEED;
-
-    int deltaCounter = (int)(g_deltaCounter > 0 ? floorf(g_deltaCounter * speed) : ceilf(g_deltaCounter * speed));
-    g_deltaCounter = g_nextDeltaCounter + (g_deltaCounter - deltaCounter / speed);
-    g_nextDeltaCounter = 0;
-
-    if (deltaCounter != 0) {
-        if (deltaCounter > 0) {
-			if (g_direction == -1) {
-				g_direction = 1;
-                deltaCounter = 0;
-			}
-		} else {
-			if (g_direction == 1) {
-				g_direction = -1;
-                deltaCounter = 0;
-			}
-		}        
-    } else {
-        g_direction = 0;
-    }
-
-    return deltaCounter;
+    return result;
 }
 
 void resetEncoder() {
-    g_deltaCounter = 0;
-    g_nextDeltaCounter = 0;
-    g_lastTick = millis() + CONF_INTERVAL;
+    resetAccelerationCalculation();
 }
 
 bool isButtonClicked() {
@@ -205,15 +225,7 @@ float increment(gui::data::Value value, int counter, float min, float max, int c
         }
     }
 
-    if (newValue < min) {
-        newValue = min;
-    }
-
-    if (newValue > max) {
-        newValue = max;
-    }
-
-    return newValue;
+    return clamp(newValue, min, max);
 }
 
 } // namespace encoder

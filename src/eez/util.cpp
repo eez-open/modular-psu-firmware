@@ -83,10 +83,10 @@ float remapOutExp(float x, float x1, float y1, float x2, float y2) {
 }
 
 float clamp(float x, float min, float max) {
-    if (x <= min) {
+    if (x < min) {
         return min;
     }
-    if (x >= max) {
+    if (x > max) {
         return max;
     }
     return x;
