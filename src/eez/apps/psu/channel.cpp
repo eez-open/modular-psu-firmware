@@ -223,7 +223,7 @@ void Channel::set(uint8_t slotIndex_, uint8_t subchannelIndex_, uint8_t boardRev
     boardRevision = boardRevision_;
     subchannelIndex = subchannelIndex_;
 
-    channelInterface = g_modules[g_slots[slotIndex].moduleType].channelInterface[slotIndex];
+    channelInterface = g_modules[g_slots[slotIndex].moduleType].channelInterfaces ? g_modules[g_slots[slotIndex].moduleType].channelInterfaces[slotIndex] : nullptr;
 
     params = &CH_BOARD_REVISION_PARAMS[boardRevision];
 

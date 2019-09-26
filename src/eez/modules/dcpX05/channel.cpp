@@ -481,7 +481,7 @@ struct Channel : ChannelInterface {
 static Channel g_channel0(0);
 static Channel g_channel1(1);
 static Channel g_channel2(2);
-ChannelInterface *g_channelInterface[NUM_SLOTS] = { &g_channel0, &g_channel1, &g_channel2 };
+ChannelInterface *g_channelInterfaces[NUM_SLOTS] = { &g_channel0, &g_channel1, &g_channel2 };
 
 } // namespace dcpX05
 } // namespace eez

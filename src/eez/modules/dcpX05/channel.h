@@ -23,7 +23,7 @@
 namespace eez {
 namespace dcpX05 {
 
-extern ChannelInterface *g_channelInterface[NUM_SLOTS];
+extern ChannelInterface *g_channelInterfaces[NUM_SLOTS];
 
 } // namespace dcpX05
 } // namespace eez

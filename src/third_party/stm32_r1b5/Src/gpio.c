@@ -125,7 +125,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pins : PAPin PAPin */
   GPIO_InitStruct.Pin = SPI2_IRQ_Pin|SPI5_IRQ_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PA10 */
@@ -181,7 +181,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = SPI4_IRQ_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SPI4_IRQ_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */

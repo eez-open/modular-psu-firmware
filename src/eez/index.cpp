@@ -136,19 +136,19 @@ ModuleInfo g_modules[] = {
         406,
         CH_BOARD_REVISION_DCP405_R2B5,
         1,
-        dcpX05::g_channelInterface
+        dcpX05::g_channelInterfaces
     },
     {
         220,
         CH_BOARD_REVISION_DCM220_R1B1, 
         2,
-        dcm220::g_channelInterface
+        dcm220::g_channelInterfaces
     },
     {
         505,
         CH_BOARD_REVISION_DCP505_R1B3, 
         1,
-        dcpX05::g_channelInterface
+        dcpX05::g_channelInterfaces
     },
 };
 

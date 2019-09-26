@@ -416,7 +416,7 @@ struct Channel : ChannelInterface {
 static Channel g_channel0(0);
 static Channel g_channel1(1);
 static Channel g_channel2(2);
-ChannelInterface *g_channelInterface[NUM_SLOTS] = { &g_channel0, &g_channel1, &g_channel2 };
+ChannelInterface *g_channelInterfaces[NUM_SLOTS] = { &g_channel0, &g_channel1, &g_channel2 };
 
 #if defined(EEZ_PLATFORM_STM32)
 
@@ -424,7 +424,7 @@ float readTemperature(int channelIndex) {
 	psu::Channel& channel = psu::Channel::get(channelIndex);
 	int slotIndex = channel.slotIndex;
 	int subchannelIndex = channel.subchannelIndex;
-	Channel *dcm220Channel = (Channel *)g_channelInterface[slotIndex];
+	Channel *dcm220Channel = (Channel *)g_channelInterfaces[slotIndex];
 	return dcm220Channel->temperature[subchannelIndex];
 }
 

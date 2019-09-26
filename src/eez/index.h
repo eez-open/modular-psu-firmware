@@ -106,7 +106,7 @@ struct ModuleInfo {
     uint16_t moduleId;
     uint8_t lasestBoardRevision; // TODO should be lasestModuleRevision
     uint8_t numChannels;
-    ChannelInterface **channelInterface;
+    ChannelInterface **channelInterfaces;
 };
 
 extern ModuleInfo g_modules[];
