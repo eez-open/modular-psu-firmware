@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <eez/modules/mcu/display.h>
 
 #include <math.h>
@@ -618,3 +620,5 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
 } // namespace display
 } // namespace mcu
 } // namespace eez
+
+#endif

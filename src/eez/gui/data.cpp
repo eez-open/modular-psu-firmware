@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -630,3 +632,5 @@ void data_slot3_test_result(data::DataOperationEnum operation, data::Cursor &cur
 
 } // namespace gui
 } // namespace eez
+
+#endif

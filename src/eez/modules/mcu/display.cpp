@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <eez/modules/mcu/display.h>
 
 #include <eez/util.h>
@@ -273,3 +275,5 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
 } // namespace display
 } // namespace mcu
 } // namespace eez
+
+#endif

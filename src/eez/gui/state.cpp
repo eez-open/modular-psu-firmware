@@ -16,6 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#if OPTION_DISPLAY
+
 #include <eez/gui/update.h>
 
 #include <eez/gui/app_context.h>
@@ -52,3 +54,5 @@ void stateManagment() {
 
 } // namespace gui
 } // namespace eez
+
+#endif

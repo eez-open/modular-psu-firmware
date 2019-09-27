@@ -46,5 +46,19 @@ bool Interval::test(uint32_t tick_usec) {
     return false;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+void Timer::start(uint32_t untilTickCount) {
+    m_isRunning = true;
+    m_untilTickCount = untilTickCount;
+}
+
+bool Timer::isRunning(uint32_t tickCount) {
+    if (m_isRunning) {
+        m_isRunning = (int32_t)(m_untilTickCount - tickCount) > 0;
+    }
+    return m_isRunning;
+}
+
 } // namespace psu
 } // namespace eez

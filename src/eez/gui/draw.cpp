@@ -16,6 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#if OPTION_DISPLAY
+
 #include <eez/gui/draw.h>
 
 #include <eez/gui/document.h>
@@ -416,3 +418,5 @@ void drawShadow(int x1, int y1, int x2, int y2) {
 
 } // namespace gui
 } // namespace eez
+
+#endif

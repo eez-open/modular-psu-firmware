@@ -16,6 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#if OPTION_DISPLAY
+
 #include <stdint.h>
 #include <math.h>
 
@@ -231,5 +233,7 @@ float increment(gui::data::Value value, int counter, float min, float max, int c
 } // namespace encoder
 } // namespace mcu
 } // namespace eez
+
+#endif
 
 #endif

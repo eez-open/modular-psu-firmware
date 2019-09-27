@@ -32,6 +32,12 @@
 #define CHANNELS_VIEW_MODE_IN_MAX_YT        2
 
 namespace eez {
+
+enum {
+    YT_GRAPH_UPDATE_METHOD_SCROLL,
+    YT_GRAPH_UPDATE_METHOD_SCAN_LINE
+};
+
 namespace psu {
 
 class Channel;

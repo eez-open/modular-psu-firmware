@@ -34,14 +34,10 @@
 
 #endif
 
-
 #include <eez/sound.h>
-
 #include <eez/system.h>
-
-// TODO
 #include <eez/apps/psu/psu.h>
-
+#include <eez/apps/psu/timer.h>
 #include <eez/apps/psu/persist_conf.h>
 
 #define NOTE_B0 31
@@ -135,6 +131,7 @@
 #define NOTE_DS8 4978
 
 #define DURATION_BETWEEN_NOTES_FACTOR 1.3
+#define CONF_SOUND_DURATION_BETWEEN_TUNES_USEC 350000L
 
 namespace eez {
 namespace sound {
@@ -148,23 +145,23 @@ enum {
 	POWER_DOWN_TUNE
 };
 
-int clickTune[] = {
+int g_clickTune[] = {
 	632, 16,
 	-1 // end!
 };
 
-int beepTune[] = {
+int g_beepTune[] = {
 	NOTE_C6, 4,
 	-1 // end!
 };
 
-int powerUpTune[] = {
+int g_powerUpTune[] = {
     NOTE_C6, 8,
     NOTE_C6, 2,
     -1 // end!
 };
 
-int powerDownTune[] = {
+int g_powerDownTune[] = {
     NOTE_C6, 10, 
     NOTE_A5, 10, 
     NOTE_G5, 5,
@@ -178,16 +175,19 @@ struct Tune {
 	unsigned int numSamples;
 };
 
-Tune g_tunes[4] = {
-	{ clickTune, 1.3f },
-	{ beepTune, 1.3f },
-	{ powerUpTune, 1.3f },
-	{ powerDownTune, 0.75f },
+Tune g_tunes[] = {
+	{ g_clickTune, 1.3f },
+	{ g_beepTune, 1.3f },
+	{ g_powerUpTune, 1.3f },
+	{ g_powerDownTune, 0.75f },
 };
 
-static int g_iNextTuneToPlay = -1;
+static const int QUEUE_SIZE = 10;
+static int g_queue[QUEUE_SIZE];
+static int g_headIndex = 0;
+static int g_tailIndex = 0;
 
-static PlayPowerUpCondition g_playPowerUpCondition;
+static psu::Timer g_tunePlayTimer;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -203,7 +203,7 @@ SDL_AudioDeviceID g_dev;
 #else
 
 #define SAMPLE_RATE 10000
-uint16_t g_memoryForTuneSamples[25000]; // TODO: move this to SDRAM
+uint16_t g_memoryForTuneSamples[25000];
 
 #endif
 
@@ -236,6 +236,18 @@ unsigned int generateTuneSamples(int *tune, int sampleRate, uint16_t *pMemBuffer
 	return size;
 }
 
+unsigned int getTuneDurationInMicroseconds(Tune &tuneDef) {
+	float duration = 0;
+
+	for (int i = 0; tuneDef.tune[i] != -1; i += 2) {
+		if (i > 0) {
+			duration += tuneDef.durationBetweenNotesFactor / tuneDef.tune[i - 1];
+		}
+		duration += 1.0f / tuneDef.tune[i + 1];
+	}
+
+	return (unsigned int)ceilf(duration * 1000000L);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -269,33 +281,57 @@ void init() {
 }
 
 void tick(uint32_t tickCount) {
-	if (g_iNextTuneToPlay == -1) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	if (!g_dev) {
+		return;
+	}
+#endif
+
+	if (g_tunePlayTimer.isRunning(tickCount)) {
 		return;
 	}
 
-#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
-
-	if (g_dev != 0) {
-		SDL_QueueAudio(g_dev, g_tunes[g_iNextTuneToPlay].pSamples, g_tunes[g_iNextTuneToPlay].numSamples * 2);
-		SDL_PauseAudioDevice(g_dev, 0);
+	if (g_tailIndex == g_headIndex) {
+		return;
 	}
 
+	int iNextToPlayTune = g_queue[g_tailIndex];
+
+	if (++g_tailIndex == QUEUE_SIZE) {
+		g_tailIndex = 0;
+	}
+
+	Tune &tuneDef = g_tunes[iNextToPlayTune];
+
+	// start play
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
+	SDL_QueueAudio(g_dev, tuneDef.pSamples, tuneDef.numSamples * 2);
+	SDL_PauseAudioDevice(g_dev, 0);
 #elif defined(EEZ_PLATFORM_STM32)
-
-	HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t *)g_tunes[g_iNextTuneToPlay].pSamples, g_tunes[g_iNextTuneToPlay].numSamples, DAC_ALIGN_12B_R);
-
+	HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t *)tuneDef.pSamples, tuneDef.numSamples, DAC_ALIGN_12B_R);
 #endif
 
-	g_iNextTuneToPlay = -1;
+	g_tunePlayTimer.start(tickCount + getTuneDurationInMicroseconds(tuneDef) + CONF_SOUND_DURATION_BETWEEN_TUNES_USEC);
 }
 
 static void playTune(int iTune) {
-	if (iTune > g_iNextTuneToPlay) {
-		g_iNextTuneToPlay = iTune;
+	g_queue[g_headIndex] = iTune;
+
+	if (++g_headIndex == QUEUE_SIZE) {
+		g_headIndex = 0;
+	}
+
+	if (g_headIndex == g_tailIndex) {
+		if (++g_tailIndex == QUEUE_SIZE) {
+			g_tailIndex = 0;
+		}
 	}
 }
 
 void playPowerUp(PlayPowerUpCondition condition) {
+#if OPTION_DISPLAY
+	static PlayPowerUpCondition g_playPowerUpCondition;
+
 	if (condition == PLAY_POWER_UP_CONDITION_NONE) {
 		g_playPowerUpCondition = PLAY_POWER_UP_CONDITION_NONE;
 	} else if (g_playPowerUpCondition == PLAY_POWER_UP_CONDITION_NONE) {
@@ -309,6 +345,13 @@ void playPowerUp(PlayPowerUpCondition condition) {
 			playTune(POWER_UP_TUNE);
     	}
 	}
+#else
+	if (condition == PLAY_POWER_UP_CONDITION_TEST_SUCCESSFUL) {
+    	if (psu::persist_conf::isSoundEnabled()) {
+			playTune(POWER_UP_TUNE);
+    	}
+	}
+#endif
 }
 
 void playPowerDown() {

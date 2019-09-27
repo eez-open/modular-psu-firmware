@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <eez/gui/widgets/layout_view.h>
 
 #include <eez/gui/assets.h>
@@ -64,3 +66,5 @@ void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callb
 
 } // namespace gui
 } // namespace eez
+
+#endif

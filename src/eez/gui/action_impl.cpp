@@ -16,6 +16,8 @@
 * along with this program.  If not, see http://www.gnu.org/licenses.
 */
 
+#if OPTION_DISPLAY
+
 #include <eez/gui/dialogs.h>
 #include <eez/gui/gui.h>
 #include <eez/apps/home/touch_calibration.h>
@@ -1030,3 +1032,5 @@ void action_front_panel_select_slot3() {
 
 } // namespace gui
 } // namespace eez
+
+#endif

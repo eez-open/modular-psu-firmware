@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #if OPTION_DISPLAY
 #include <eez/gui/app_context.h>
 #endif

@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <string.h>
 
 #include <eez/gui/page.h>
@@ -514,3 +516,5 @@ void SelectFromEnumPage::getItemLabel(int itemIndex, char *text, int count) {
 
 } // namespace gui
 } // namespace eez
+
+#endif

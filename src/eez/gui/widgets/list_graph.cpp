@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <eez/gui/widgets/list_graph.h>
 
 #include <math.h>
@@ -252,3 +254,5 @@ void ListGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
 
 } // namespace gui
 } // namespace eez
+
+#endif

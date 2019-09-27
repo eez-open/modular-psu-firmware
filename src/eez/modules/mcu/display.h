@@ -93,6 +93,10 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
              int clip_y2, gui::font::Font &font);
 int measureStr(const char *text, int textLength, gui::font::Font &font, int max_width = 0);
 
+int allocBuffer();
+void freeBuffer(int bufferIndex);
+void selectBuffer(int bufferIndex);
+
 } // namespace display
 } // namespace mcu
 } // namespace eez

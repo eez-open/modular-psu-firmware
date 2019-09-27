@@ -44,7 +44,6 @@
 #include <eez/apps/psu/psu.h>
 #include <eez/apps/psu/init.h>
 
-#include <eez/platform/stm32/bsp_sdram.h>
 #include <eez/platform/stm32/defines.h>
 #include <eez/platform/stm32/dwt_delay.h>
 
@@ -53,72 +52,6 @@ extern "C" void SystemClock_Config(void);
 extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName ) {
     while (true) {}
 }
-
-//#if OPTION_SDRAM
-//#include <assert.h>
-//#include <stdlib.h>
-//
-//#define SDRAM_TEST_LOOPS 1
-//#define SDRAM_TEST_STEP 64
-//
-//void SDRAM_Test() {
-//    for (unsigned int seedValue = 0; seedValue < SDRAM_TEST_LOOPS; ++seedValue) {
-//        {
-//            uint32_t *p;
-//
-//            srand(seedValue);
-//            p = (uint32_t *)0xc0000000;
-//
-//            for (int i = 0; i < 8 * 1024 * 1024 / 4; i += SDRAM_TEST_STEP) {
-//                p[i] = (uint32_t)rand();
-//            }
-//
-//            srand(seedValue);
-//            p = (uint32_t *)0xc0000000;
-//
-//            for (int i = 0; i < 8 * 1024 * 1024 / 4; i += SDRAM_TEST_STEP) {
-//                assert(p[i] == (uint32_t)rand());
-//            }
-//        }
-//
-//        {
-//            uint16_t *p;
-//
-//            srand(seedValue);
-//            p = (uint16_t *)0xc0000000;
-//
-//            for (int i = 0; i < 8 * 1024 * 1024 / 2; i += SDRAM_TEST_STEP) {
-//                p[i] = (uint16_t)rand();
-//            }
-//
-//            srand(seedValue);
-//            p = (uint16_t *)0xc0000000;
-//
-//            for (int i = 0; i < 8 * 1024 * 1024 / 2; i += SDRAM_TEST_STEP) {
-//                assert(p[i] == (uint16_t)rand());
-//            }
-//        }
-//
-//        {
-//            uint8_t *p;
-//
-//            srand(seedValue);
-//            p = (uint8_t *)0xc0000000;
-//
-//            for (int i = 0; i < 8 * 1024 * 1024; i += SDRAM_TEST_STEP) {
-//                p[i] = (uint8_t)rand();
-//            }
-//
-//            srand(seedValue);
-//            p = (uint8_t *)0xc0000000;
-//
-//            for (int i = 0; i < 8 * 1024 * 1024; i += SDRAM_TEST_STEP) {
-//                assert(p[i] == (uint8_t)rand());
-//            }
-//        }Ja
-//    }
-//}
-//#endif
 
 extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     int slotIndex;
@@ -161,12 +94,6 @@ int main(int argc, char **argv) {
     MX_TIM6_Init();
     MX_TIM8_Init();
     MX_TIM12_Init();
-
-#if OPTION_SDRAM
-    /* SDRAM initialization sequence */
-    BSP_SDRAM_Initialization_sequence(REFRESH_COUNT);
-    // SDRAM_Test();
-#endif
 
     eez::boot();
 

@@ -34,5 +34,17 @@ private:
 	uint32_t next_tick_usec;
 };
 
+class Timer {
+public:
+    void start(uint32_t untilTickCount);
+
+    bool isRunning(uint32_t tickCount);
+
+private:
+	uint32_t m_untilTickCount;
+	bool m_isRunning;
+};
+
+
 }
 } // namespace eez::psu

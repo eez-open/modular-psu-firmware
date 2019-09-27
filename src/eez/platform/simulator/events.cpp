@@ -69,7 +69,9 @@ void readEvents() {
         yMouseWheel /= 100;
     }
 
+#if OPTION_DISPLAY && OPTION_ENCODER
     mcu::encoder::write(yMouseWheel, mouseButton2IsUp);
+#endif
 }
 
 } // namespace simulator

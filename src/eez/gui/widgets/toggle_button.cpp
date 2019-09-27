@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <eez/gui/widgets/toggle_button.h>
 
 #include <eez/gui/draw.h>
@@ -60,3 +62,5 @@ void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor) {
 
 } // namespace gui
 } // namespace eez
+
+#endif

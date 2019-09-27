@@ -34,7 +34,7 @@ add_definitions(-DOPTION_AUX_TEMP_SENSOR=1)
 add_definitions(-DOPTION_EXT_RTC=1)
 add_definitions(-DOPTION_ENCODER=1)
 add_definitions(-DOPTION_EXT_EEPROM=1)
-add_definitions(-DOPTION_SDCARD=0)
+add_definitions(-DOPTION_SDCARD=1)
 add_definitions(-DOPTION_SDRAM=1)
 add_definitions(-DEEZ_MCU_REVISION_R1B5=1)
 
@@ -422,13 +422,15 @@ set(src_eez_modules_mcu
     src/eez/modules/mcu/battery.cpp
     src/eez/modules/mcu/display.cpp
     src/eez/modules/mcu/ethernet.cpp
-    src/eez/modules/mcu/encoder.cpp) 
+    src/eez/modules/mcu/encoder.cpp
+    src/eez/modules/mcu/sdram.cpp) 
 list (APPEND src_files ${src_eez_modules_mcu})
 set(header_eez_modules_mcu
     src/eez/modules/mcu/battery.h
     src/eez/modules/mcu/display.h
     src/eez/modules/mcu/encoder.h
     src/eez/modules/mcu/ethernet.h
+    src/eez/modules/mcu/sdram.h
     src/eez/modules/mcu/touch.h) 
 list (APPEND header_files ${header_eez_modules_mcu})
 source_group("eez\\modules\\mcu" FILES ${src_eez_modules_mcu} ${header_eez_modules_mcu})

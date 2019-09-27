@@ -27,6 +27,10 @@
 #include <eez/system.h>
 #include <eez/index.h>
 
+#if OPTION_SDRAM
+#include <eez/modules/mcu/sdram.h>
+#endif
+
 #include <eez/apps/psu/psu.h>
 #include <eez/apps/psu/serial_psu.h>
 #include <eez/scpi/scpi.h>
@@ -93,6 +97,11 @@ void mainTask(const void *) {
         setSystemState(BOOTING);
     }
 #else
+
+#if OPTION_SDRAM
+    mcu::sdram::init();
+    mcu::sdram::test();
+#endif
 
 #if defined(EEZ_PLATFORM_STM32)
     MX_USB_DEVICE_Init();

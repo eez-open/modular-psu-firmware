@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <assert.h>
 
 #include <eez/gui/widgets/app_view.h>
@@ -74,3 +76,5 @@ void AppViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback
 
 } // namespace gui
 } // namespace eez
+
+#endif

@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <eez/gui/gui.h>
 
 #include <math.h>
@@ -631,3 +633,5 @@ void animateRects(Buffer startBuffer, int numRects, float duration) {
 
 } // namespace gui
 } // namespace eez
+
+#endif

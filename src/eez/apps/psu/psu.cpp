@@ -214,7 +214,7 @@ void init() {
     trigger::init();
 
     // TODO move this to some other place
-#if OPTION_ENCODER
+#if OPTION_DISPLAY && OPTION_ENCODER
     mcu::encoder::init();
 #endif
 }

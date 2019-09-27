@@ -18,7 +18,13 @@
 
 #include <eez/index.h>
 
+#include <eez/apps/psu/psu.h>
+#include <eez/apps/psu/channel.h>
+
+#if OPTION_DISPLAY
 #include <eez/apps/psu/gui/psu.h>
+#endif
+
 #include <eez/apps/psu/init.h>
 #include <eez/apps/settings/settings.h>
 #include <eez/gui/gui.h>
@@ -116,7 +122,9 @@ OnSystemStateChangedCallback g_onSystemStateChangedCallbacks[] = {
 #endif    
     mcu::touch::onSystemStateChanged,
     // subsystems
+#if OPTION_DISPLAY
     gui::onSystemStateChanged,
+#endif
     scpi::onSystemStateChanged,
     // applications
     psu::onSystemStateChanged,

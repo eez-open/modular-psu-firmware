@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <string.h>
 
 #include <eez/gui/widgets/display_data.h>
@@ -100,3 +102,5 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
 
 } // namespace gui
 } // namespace eez
+
+#endif

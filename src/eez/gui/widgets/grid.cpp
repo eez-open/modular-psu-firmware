@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <eez/gui/widgets/grid.h>
 
 #include <eez/gui/assets.h>
@@ -110,3 +112,5 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
 } // namespace gui
 } // namespace eez
+
+#endif

@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <eez/gui/widgets/button.h>
 
 #include <eez/gui/assets.h>
@@ -78,3 +80,5 @@ void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
 
 } // namespace gui
 } // namespace eez
+
+#endif
