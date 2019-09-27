@@ -187,6 +187,7 @@ static int g_queue[QUEUE_SIZE];
 static int g_headIndex = 0;
 static int g_tailIndex = 0;
 
+static int g_iPlayingTune = -1;
 static psu::Timer g_tunePlayTimer;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -280,6 +281,22 @@ void init() {
 #endif
 }
 
+void startPlay(int iNextToPlayTune, uint32_t tickCount) {
+    g_iPlayingTune = iNextToPlayTune;
+
+    Tune &tuneDef = g_tunes[iNextToPlayTune];
+
+    // start play
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
+    SDL_QueueAudio(g_dev, tuneDef.pSamples, tuneDef.numSamples * 2);
+    SDL_PauseAudioDevice(g_dev, 0);
+#elif defined(EEZ_PLATFORM_STM32)
+    HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t *)tuneDef.pSamples, tuneDef.numSamples, DAC_ALIGN_12B_R);
+#endif
+
+    g_tunePlayTimer.start(tickCount + getTuneDurationInMicroseconds(tuneDef) + CONF_SOUND_DURATION_BETWEEN_TUNES_USEC);
+}
+
 void tick(uint32_t tickCount) {
 #if defined(EEZ_PLATFORM_SIMULATOR)
 	if (!g_dev) {
@@ -291,30 +308,36 @@ void tick(uint32_t tickCount) {
 		return;
 	}
 
+    g_iPlayingTune = -1;
+
 	if (g_tailIndex == g_headIndex) {
 		return;
 	}
 
-	int iNextToPlayTune = g_queue[g_tailIndex];
+    int iNextToPlayTune = g_queue[g_tailIndex];
 
-	if (++g_tailIndex == QUEUE_SIZE) {
-		g_tailIndex = 0;
-	}
+    if (++g_tailIndex == QUEUE_SIZE) {
+        g_tailIndex = 0;
+    }
 
-	Tune &tuneDef = g_tunes[iNextToPlayTune];
-
-	// start play
-#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
-	SDL_QueueAudio(g_dev, tuneDef.pSamples, tuneDef.numSamples * 2);
-	SDL_PauseAudioDevice(g_dev, 0);
-#elif defined(EEZ_PLATFORM_STM32)
-	HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t *)tuneDef.pSamples, tuneDef.numSamples, DAC_ALIGN_12B_R);
-#endif
-
-	g_tunePlayTimer.start(tickCount + getTuneDurationInMicroseconds(tuneDef) + CONF_SOUND_DURATION_BETWEEN_TUNES_USEC);
+    startPlay(iNextToPlayTune, tickCount);
 }
 
 static void playTune(int iTune) {
+    if (iTune == CLICK_TUNE) {
+        for (int i = g_tailIndex; i != g_headIndex; i = (i + 1 == QUEUE_SIZE) ? 0 : i + 1) {
+            if (g_queue[i] == CLICK_TUNE) {
+                // only one click tune in queue is allowed
+                return;
+            }
+        }
+
+        if (g_iPlayingTune == CLICK_TUNE) {
+            startPlay(CLICK_TUNE, micros());
+            return;
+        }
+    }
+
 	g_queue[g_headIndex] = iTune;
 
 	if (++g_headIndex == QUEUE_SIZE) {
