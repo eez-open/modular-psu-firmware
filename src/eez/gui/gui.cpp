@@ -120,7 +120,10 @@ void oneIter() {
 
     eventHandling();
     stateManagment();
-    updateScreen();
+
+    if (mcu::display::isOn()) {
+        updateScreen();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

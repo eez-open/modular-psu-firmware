@@ -55,7 +55,7 @@ class SetPage : public Page {
 
 class InternalPage : public Page {
   public:
-    virtual void refresh(bool doNotDrawShadow = false) = 0; // repaint page
+    virtual void refresh() = 0; // repaint page
     virtual void updatePage() = 0;
 	  virtual WidgetCursor findWidget(int x, int y) = 0;
 
@@ -66,7 +66,6 @@ class InternalPage : public Page {
 
   protected:
     Widget widget;
-    void drawShadow();
 };
 
 enum ToastType {
@@ -89,7 +88,7 @@ public:
     bool onEncoder(int counter);
     bool onEncoderClicked();
 
-    void refresh(bool doNotDrawShadow = false);
+    void refresh();
     void updatePage();
     WidgetCursor findWidget(int x, int y);
 
@@ -118,7 +117,7 @@ class SelectFromEnumPage : public InternalPage {
 
     void init();
 
-    void refresh(bool doNotDrawShadow = false);
+    void refresh();
     void updatePage();
     WidgetCursor findWidget(int x, int y);
 

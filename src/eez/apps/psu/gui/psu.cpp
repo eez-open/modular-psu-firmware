@@ -178,106 +178,108 @@ void PsuAppContext::onPageChanged() {
 
     g_focusEditValue = data::Value();
 
+    int activePageId = getActivePageId();
+
     if (m_previousPageId == PAGE_ID_EVENT_QUEUE) {
-        if (m_activePageId == PAGE_ID_MAIN) {
+        if (getActivePageId() == PAGE_ID_MAIN) {
             animateSlideUp();
         }
     } else if (m_previousPageId == PAGE_ID_MAIN) {
-        if (m_activePageId == PAGE_ID_SYS_SETTINGS) {
+        if (activePageId == PAGE_ID_SYS_SETTINGS) {
             animateShowSysSettings();
-        } else if (isSysSettingsSubPage(m_activePageId)) {
+        } else if (isSysSettingsSubPage(activePageId)) {
             animateShowSysSettings();
-        } else if (m_activePageId == PAGE_ID_CH_SETTINGS) {
+        } else if (activePageId == PAGE_ID_CH_SETTINGS) {
             animateSlideDown();
-        } else if (isChSettingsSubPage(m_activePageId)) {
+        } else if (isChSettingsSubPage(activePageId)) {
             animateSlideDown();
-        } else if (m_activePageId == PAGE_ID_EVENT_QUEUE) {
+        } else if (activePageId == PAGE_ID_EVENT_QUEUE) {
             animateSlideDown();
-        } else if (m_activePageId == PAGE_ID_USER_PROFILES) {
+        } else if (activePageId == PAGE_ID_USER_PROFILES) {
             animateSlideDown();
-        } else if (m_activePageId == PAGE_ID_SYS_INFO) {
+        } else if (activePageId == PAGE_ID_SYS_INFO) {
             animateSlideDown();
         }
     } else if (m_previousPageId == PAGE_ID_USER_PROFILES) {
-        if (m_activePageId == PAGE_ID_USER_PROFILE_0_SETTINGS) {
+        if (activePageId == PAGE_ID_USER_PROFILE_0_SETTINGS) {
             animateSlideDown();
-        } else if (m_activePageId == PAGE_ID_USER_PROFILE_SETTINGS) {
+        } else if (activePageId == PAGE_ID_USER_PROFILE_SETTINGS) {
             animateSlideDown();
-        } else if (m_activePageId == PAGE_ID_MAIN) {
+        } else if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
-        } else if (m_activePageId == PAGE_ID_USER_PROFILES2) {
+        } else if (activePageId == PAGE_ID_USER_PROFILES2) {
             animateSlideLeft();
         }
     } else if (m_previousPageId == PAGE_ID_USER_PROFILES2) {
-        if (m_activePageId == PAGE_ID_USER_PROFILE_SETTINGS) {
+        if (activePageId == PAGE_ID_USER_PROFILE_SETTINGS) {
             animateSlideDown();
-        } else if (m_activePageId == PAGE_ID_MAIN) {
+        } else if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
-        } else if (m_activePageId == PAGE_ID_USER_PROFILES) {
+        } else if (activePageId == PAGE_ID_USER_PROFILES) {
             animateSlideRight();
         }
     } else if (m_previousPageId == PAGE_ID_USER_PROFILE_0_SETTINGS) {
-        if (m_activePageId == PAGE_ID_MAIN) {
+        if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
-        } else if (m_activePageId == PAGE_ID_USER_PROFILES) {
+        } else if (activePageId == PAGE_ID_USER_PROFILES) {
             animateSlideUp();
         }
     } else if (m_previousPageId == PAGE_ID_USER_PROFILE_SETTINGS) {
-        if (m_activePageId == PAGE_ID_MAIN) {
+        if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
-        } else if (m_activePageId == PAGE_ID_USER_PROFILES) {
+        } else if (activePageId == PAGE_ID_USER_PROFILES) {
             animateSlideUp();
-        } else if (m_activePageId == PAGE_ID_USER_PROFILES2) {
+        } else if (activePageId == PAGE_ID_USER_PROFILES2) {
             animateSlideUp();
         }
     } else if (m_previousPageId == PAGE_ID_SYS_INFO) {
-        if (m_activePageId == PAGE_ID_MAIN) {
+        if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
         }
     } else if (m_previousPageId == PAGE_ID_SYS_SETTINGS) {
-        if (m_activePageId == PAGE_ID_MAIN) {
+        if (activePageId == PAGE_ID_MAIN) {
             animateHideSysSettings();
-        } else if (isSysSettingsSubPage(m_activePageId)) {
+        } else if (isSysSettingsSubPage(activePageId)) {
             animateSettingsSlideLeft();
         }
     } else if (m_previousPageId == PAGE_ID_SYS_SETTINGS_TRIGGER) {
-        if (m_activePageId == PAGE_ID_MAIN) {
+        if (activePageId == PAGE_ID_MAIN) {
             animateHideSysSettings();
-        } else if (m_activePageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
+        } else if (activePageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
             animateSlideUp();
-        } else if (m_activePageId == PAGE_ID_SYS_SETTINGS) {
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS) {
             animateSettingsSlideRight();
         }
     } else if (isSysSettingsSubPage(m_previousPageId)) {
-        if (m_activePageId == PAGE_ID_MAIN) {
+        if (activePageId == PAGE_ID_MAIN) {
             animateHideSysSettings();
-        } else if (m_activePageId == PAGE_ID_SYS_SETTINGS) {
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS) {
             animateSettingsSlideRight();
         }
     } else if (m_previousPageId == PAGE_ID_CH_SETTINGS) {
-        if (m_activePageId == PAGE_ID_MAIN) {
+        if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
-        } else if (isChSettingsSubPage(m_activePageId)) {
+        } else if (isChSettingsSubPage(activePageId)) {
             animateSlideLeft();
         }
     } else if (m_previousPageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
-        if (m_activePageId == PAGE_ID_MAIN) {
+        if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
-        } else if (m_activePageId == PAGE_ID_SYS_SETTINGS_TRIGGER) {
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS_TRIGGER) {
             animateSlideDown();
-        } else if (m_activePageId == PAGE_ID_CH_SETTINGS_LISTS) {
+        } else if (activePageId == PAGE_ID_CH_SETTINGS_LISTS) {
             animateSlideDown();
-        } else if (m_activePageId == PAGE_ID_CH_SETTINGS) {
+        } else if (activePageId == PAGE_ID_CH_SETTINGS) {
             animateSlideRight();
         }
     } else if (m_previousPageId == PAGE_ID_CH_SETTINGS_LISTS) {
-        if (m_activePageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
+        if (activePageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
             animateSlideUp();
         }
     } else if (isChSettingsSubPage(m_previousPageId)) {
-        if (m_activePageId == PAGE_ID_MAIN) {
+        if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
-        } else if (m_activePageId == PAGE_ID_CH_SETTINGS) {
+        } else if (activePageId == PAGE_ID_CH_SETTINGS) {
             animateSlideRight();
         }
     }

@@ -81,12 +81,6 @@ void SetPage::discard() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void InternalPage::drawShadow() {
-    gui::drawShadow(x, y, x + width - 1, y + height - 1);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 static ToastMessagePage g_toastMessagePage;
 
 ToastMessagePage *ToastMessagePage::findFreePage() {
@@ -188,7 +182,7 @@ bool ToastMessagePage::onEncoderClicked() {
     return false;
 }
 
-void ToastMessagePage::refresh(bool doNotDrawShadow) {
+void ToastMessagePage::refresh() {
     const Style *style = getStyle(
         type == INFO_TOAST ? STYLE_ID_INFO_ALERT :
         STYLE_ID_ERROR_ALERT);
@@ -224,10 +218,6 @@ void ToastMessagePage::refresh(bool doNotDrawShadow) {
     int y1 = y;
     int x2 = x + width - 1;
     int y2 = y + height - 1;
-
-    if (!doNotDrawShadow) {
-        drawShadow();
-    }
 
     int borderRadius = style->border_radius;
     if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
@@ -305,7 +295,7 @@ void ToastMessagePage::refresh(bool doNotDrawShadow) {
 void ToastMessagePage::updatePage() {
     if (actionWidgetIsActive != isActiveWidget(WidgetCursor(appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0))) {
         actionWidgetIsActive = !actionWidgetIsActive;
-        refresh(true);
+        refresh();
     }
 }
 
@@ -433,11 +423,7 @@ void SelectFromEnumPage::findPagePosition() {
 	}
 }
 
-void SelectFromEnumPage::refresh(bool doNotDrawShadow) {
-    if (!doNotDrawShadow) {
-        drawShadow();
-    }
-
+void SelectFromEnumPage::refresh() {
     const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
 	const Style *itemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
 	const Style *disabledItemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);
@@ -463,7 +449,7 @@ void SelectFromEnumPage::refresh(bool doNotDrawShadow) {
 
 void SelectFromEnumPage::updatePage() {
     if (dirty) {
-        refresh(true);
+        refresh();
     }
 }
 

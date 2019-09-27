@@ -189,6 +189,10 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
     }
 }
 
+void bitBlt(void *src, int x1, int y1, int x2, int y2) {
+    bitBlt(src, g_buffer, x1, y1, x2, y2);
+}
+
 void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
     hdma2d.Init.Mode = DMA2D_M2M;
     hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
@@ -321,6 +325,16 @@ void bitBltA8(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int widt
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if OPTION_SDRAM
+void *getBufferPointer() {
+    return g_buffer;
+}
+
+void setBufferPointer(void *buffer) {
+    g_buffer = (uint16_t *)buffer;
+}
+#endif
+
 void turnOn() {
     if (g_displayState != ON && g_displayState != TURNING_ON) {
         __HAL_RCC_DMA2D_CLK_ENABLE();
@@ -329,6 +343,10 @@ void turnOn() {
 #if OPTION_SDRAM
         g_bufferOld = (uint16_t *)VRAM_BUFFER2_START_ADDRESS;
         g_buffer = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
+
+        for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
+            g_buffers[bufferIndex].bufferPointer = (uint16_t *)(VRAM_BUFFER5_START_ADDRESS + bufferIndex * VRAM_BUFFER_SIZE);
+        }
 #endif
         fillRect(g_buffer, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
 
@@ -423,17 +441,12 @@ void sync() {
 
     DMA2D_WAIT;
 
-    if (g_takeScreenshot) {
-#if OPTION_SDRAM
-    	bitBlt(g_buffer, (uint16_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-        DMA2D_WAIT;
-#endif
-    	g_takeScreenshot = false;
-    }
-
     if (g_animationState.enabled) {
         animate();
-        g_painted = !g_animationState.enabled;
+        if (g_animationState.enabled) {
+            return;
+        }
+        g_painted = true;
     }
 
     if (g_painted) {
@@ -445,12 +458,18 @@ void sync() {
 
         HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
 
-        bitBlt(g_buffer, g_bufferOld, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-
         auto temp = g_buffer;
         g_buffer = g_bufferOld;
         g_bufferOld = temp;
 #endif
+    }
+
+    if (g_takeScreenshot) {
+#if OPTION_SDRAM
+    	bitBlt(g_bufferOld, (uint16_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+        DMA2D_WAIT;
+#endif
+    	g_takeScreenshot = false;
     }
 }
 

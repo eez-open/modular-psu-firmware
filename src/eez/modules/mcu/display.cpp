@@ -23,6 +23,7 @@
 #include <eez/util.h>
 
 #include <eez/gui/assets.h>
+#include <eez/gui/draw.h>
 #include <eez/gui/widget.h>
 
 // TODO
@@ -271,6 +272,86 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
 
     return width;
 }
+
+#if OPTION_SDRAM
+
+Buffer g_buffers[NUM_BUFFERS];
+int g_selectedBufferIndex;
+
+static void *g_bufferPointer;
+
+static int g_bufferToDrawIndexes[NUM_BUFFERS];
+static int g_numBuffersToDraw;
+
+int getNumFreeBuffers() {
+    int count = 0;
+    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
+        if (!g_buffers[bufferIndex].allocated) {
+            count++;
+        }
+    }
+    return count;
+}
+
+int allocBuffer() {
+    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
+        if (!g_buffers[bufferIndex].allocated) {
+            g_buffers[bufferIndex].allocated = true;
+            // DebugTrace("Buffer %d allocated, %d more left!\n", bufferIndex, getNumFreeBuffers());
+            return bufferIndex;
+        }
+    }
+    // DebugTrace("There is no free buffer available!\n");
+    return -1;
+}
+
+void freeBuffer(int bufferIndex) {
+    g_buffers[bufferIndex].allocated = false;
+    // DebugTrace("Buffer %d freed up, %d buffers available now!\n", bufferIndex, getNumFreeBuffers());
+    
+}
+
+int selectBuffer(int bufferIndex) {
+    int selectedBufferIndex = g_selectedBufferIndex;
+    g_selectedBufferIndex = bufferIndex;
+    setBufferPointer(g_buffers[g_selectedBufferIndex].bufferPointer);
+    //DebugTrace("Buffer %d selected!\n");
+    return selectedBufferIndex;
+}
+
+void drawBuffer(int x1, int y1, int x2, int y2, bool withShadow) {
+    Buffer &buffer = g_buffers[g_selectedBufferIndex];
+    buffer.x1 = x1;
+    buffer.y1 = y1;
+    buffer.x2 = x2;
+    buffer.y2 = y2;
+    buffer.withShadow = withShadow;
+    
+    g_bufferToDrawIndexes[g_numBuffersToDraw++] = g_selectedBufferIndex;
+}
+
+void beginBuffersDrawing() {
+    g_bufferPointer = getBufferPointer();
+}
+
+void endBuffersDrawing() {
+    setBufferPointer(g_bufferPointer);
+
+    if (g_painted) {
+        for (int i = g_numBuffersToDraw - 1; i >= 0; i--) {
+            int bufferIndex = g_bufferToDrawIndexes[i];
+            Buffer &buffer = g_buffers[bufferIndex];
+            if (buffer.withShadow) {
+                drawShadow(buffer.x1, buffer.y1, buffer.x2, buffer.y2);
+            }
+            bitBlt(buffer.bufferPointer, buffer.x1, buffer.y1, buffer.x2, buffer.y2);
+        }
+    }
+
+    g_numBuffersToDraw = 0;
+}
+
+#endif
 
 } // namespace display
 } // namespace mcu

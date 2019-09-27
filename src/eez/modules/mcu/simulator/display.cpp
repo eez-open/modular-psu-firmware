@@ -180,6 +180,16 @@ bool init() {
     return true;
 }
 
+#if OPTION_SDRAM
+void *getBufferPointer() {
+    return g_frontPanelBuffer;
+}
+
+void setBufferPointer(void *buffer) {
+    g_frontPanelBuffer = (uint32_t *)buffer;
+}
+#endif
+
 void turnOn() {
     if (!isOn()) {
         g_frontPanelBuffer1 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
@@ -187,6 +197,10 @@ void turnOn() {
         g_frontPanelBuffer3 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
 
         g_frontPanelBuffer = g_frontPanelBuffer1;
+
+        for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
+            g_buffers[bufferIndex].bufferPointer = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
+        }
 
         refreshScreen();
     }
@@ -196,14 +210,22 @@ void updateScreen(uint32_t *buffer);
 
 void turnOff() {
     if (isOn()) {
+        // clear screen
         setColor(0, 0, 0);
         fillRect(g_homeAppContext.x, g_homeAppContext.y, 
             g_homeAppContext.x + g_homeAppContext.width - 1, g_homeAppContext.y + g_homeAppContext.height - 1);
         updateScreen(g_frontPanelBuffer);
+
+        // free frame buffers
         delete g_frontPanelBuffer1;
         delete g_frontPanelBuffer2;
         delete g_frontPanelBuffer3;
+
         g_frontPanelBuffer = nullptr;
+
+        for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
+            delete g_buffers[bufferIndex].bufferPointer;
+        }
     }
 }
 
@@ -268,21 +290,20 @@ void sync() {
 
     if (g_animationState.enabled) {
         animate();
-        g_painted = !g_animationState.enabled;
+        if (g_animationState.enabled) {
+            return;
+        }
+        g_painted = true;
     }
-    
+
     if (g_painted) {
         g_painted = false;
 
         updateScreen(g_frontPanelBuffer);
 
         if (g_frontPanelBuffer == g_frontPanelBuffer1) {
-            memcpy(g_frontPanelBuffer2, g_frontPanelBuffer1,
-                   g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
             g_frontPanelBuffer = g_frontPanelBuffer2;
         } else {
-            memcpy(g_frontPanelBuffer1, g_frontPanelBuffer2,
-                   g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
             g_frontPanelBuffer = g_frontPanelBuffer1;
         }
     }
@@ -536,6 +557,10 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
     }
 
     g_painted = true;
+}
+
+void bitBlt(void *src, int x1, int y1, int x2, int y2) {
+    bitBlt(src, g_frontPanelBuffer, x1, y1, x2, y2);
 }
 
 void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {

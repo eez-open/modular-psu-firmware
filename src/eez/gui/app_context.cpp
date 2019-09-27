@@ -52,10 +52,9 @@ AppContext *g_appContext;
 ////////////////////////////////////////////////////////////////////////////////
 
 AppContext::AppContext() {
-    m_activePage.pageId = INTERNAL_PAGE_ID_NONE;
-    m_activePage.page = nullptr;
-    m_activePage.repaint = true;
-    m_activePage.displayBufferIndex = -1;
+#if OPTION_SDRAM
+    m_activePage.displayBufferIndex = mcu::display::allocBuffer();
+#endif
 
     m_pushProgressPage = false;
     m_popProgressPage = false;
@@ -212,16 +211,12 @@ void AppContext::doShowPage(int index, Page *page) {
     if (m_activePage.page) {
         m_activePage.page->pageFree();
     }
-    if (m_activePage.displayBufferIndex != -1) {
-        mcu::display::freeBuffer(m_activePage.displayBufferIndex);
-    }
 
     m_previousPageId = m_activePage.pageId;
 
     m_activePage.page = page ? page : getPageFromId(index);
     m_activePage.pageId = index;
     m_activePage.repaint = true;
-    m_activePage.displayBufferIndex = mcu::display::allocBuffer();
 
     if (m_activePage.page) {
         m_activePage.page->pageWillAppear();
@@ -242,9 +237,9 @@ void AppContext::setPage(int pageId) {
         if (m_pageNavigationStack[i].page) {
             m_pageNavigationStack[i].page->pageFree();
         }
-        if (m_pageNavigationStack[i].displayBufferIndex != -1) {
-            mcu::display::freeBuffer(m_pageNavigationStack[i].displayBufferIndex);
-        }
+#if OPTION_SDRAM
+        mcu::display::freeBuffer(m_pageNavigationStack[i].displayBufferIndex);
+#endif
     }
     m_pageNavigationStackPointer = 0;
 
@@ -266,9 +261,9 @@ void AppContext::pushPage(int pageId, Page *page) {
             if (m_pageNavigationStack[0].page) {
                 m_pageNavigationStack[0].page->pageFree();
             }
-            if (m_pageNavigationStack[0].displayBufferIndex != -1) {
-                mcu::display::freeBuffer(m_pageNavigationStack[0].displayBufferIndex);
-            }
+#if OPTION_SDRAM
+            mcu::display::freeBuffer(m_pageNavigationStack[0].displayBufferIndex);
+#endif
 
             // move stack one down
             for (int i = 1; i < m_pageNavigationStackPointer; ++i) {
@@ -280,6 +275,10 @@ void AppContext::pushPage(int pageId, Page *page) {
 
         m_pageNavigationStack[m_pageNavigationStackPointer] = m_activePage;
         ++m_pageNavigationStackPointer;
+
+#if OPTION_SDRAM
+        m_activePage.displayBufferIndex = mcu::display::allocBuffer();
+#endif
     }
 
     doShowPage(pageId, page);
@@ -288,7 +287,10 @@ void AppContext::pushPage(int pageId, Page *page) {
 void AppContext::popPage() {
     if (m_pageNavigationStackPointer > 0) {
         --m_pageNavigationStackPointer;
-
+#if OPTION_SDRAM
+        mcu::display::freeBuffer(m_activePage.displayBufferIndex);
+        m_activePage.displayBufferIndex = m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex;
+#endif
         doShowPage(m_pageNavigationStack[m_pageNavigationStackPointer].pageId, m_pageNavigationStack[m_pageNavigationStackPointer].page);
     } else {
         doShowPage(getMainPageId());
@@ -381,34 +383,48 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 ////////////////////////////////////////////////////////////////////////////////
 
 void AppContext::updatePage(bool repaint, WidgetCursor &widgetCursor) {
+#if OPTION_SDRAM
+    int selectedBufferIndexSaved = mcu::display::selectBuffer(m_activePage.displayBufferIndex);
+#endif
+
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    bool withShadow;
+
     if (isPageInternal(m_activePage.pageId)) {
+        InternalPage *internalPage = ((InternalPage *)g_appContext->getActivePage());
+        
         if (repaint) {
-            ((InternalPage *)g_appContext->getActivePage())->refresh();
+            internalPage->refresh();
         }
-        ((InternalPage *)g_appContext->getActivePage())->updatePage();
+        
+        internalPage->updatePage();
+
+        x1 = internalPage->x;
+        y1 = internalPage->y;
+        x2 = x1 + internalPage->width - 1;
+        y2 = y1 + internalPage->height - 1;
+        withShadow = true;
     } else {
 		const Widget *page = getPageWidget(m_activePage.pageId);
 
 		auto savedPreviousState = widgetCursor.previousState;
         auto savedWidget = widgetCursor.widget;
 
+        x1 = widgetCursor.x + page->x;
+        y1 = widgetCursor.y + page->y;
+        x2 = widgetCursor.x + page->x + page->w - 1;
+        y2 = widgetCursor.y + page->y + page->h - 1;
+        withShadow = page->x > 0;
+
         if (repaint) {
             // clear background
             const Style* style = getWidgetStyle(page);
             mcu::display::setColor(style->background_color);
 
-            if (page->x > 0) {
-                drawShadow(widgetCursor.x + page->x,
-                    widgetCursor.y + page->y,
-                    widgetCursor.x + page->x + page->w - 1,
-                    widgetCursor.y + page->y + page->h - 1);
-            }
-
-            mcu::display::fillRect(
-				widgetCursor.x + page->x,
-				widgetCursor.y + page->y, 
-				widgetCursor.x + page->x + page->w - 1,
-				widgetCursor.y + page->y + page->h - 1);
+            mcu::display::fillRect(x1, y1, x2, y2);
 
             // if there is no previous state then all content will be refreshed
 			widgetCursor.previousState = 0;
@@ -421,6 +437,12 @@ void AppContext::updatePage(bool repaint, WidgetCursor &widgetCursor) {
 		widgetCursor.widget = savedWidget;
 		widgetCursor.previousState = savedPreviousState;
     }
+
+#if OPTION_SDRAM
+    mcu::display::drawBuffer(x1, y1, x2, y2, withShadow);
+
+    mcu::display::selectBuffer(selectedBufferIndexSaved);
+#endif
 }
 
 bool pageContained(int xPageAbove, int yPageAbove, int wPageAbove, int hPageAbove, int xPageBelow, int yPageBelow, int wPageBelow, int hPageBelow) {
@@ -468,16 +490,42 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
         }
     }
 
-// #if OPTION_SDRAM
-//     bool repaint = i + 1 < m_pageNavigationStackPointer;
-// #else
-//     bool repaint = false;
-// #endif
-    bool repaint = false;
+#if OPTION_SDRAM
+    widgetCursor.cursor = Cursor();
+    updatePage(m_activePage.repaint, widgetCursor);
+    m_activePage.repaint = false;
 
-    m_activePageIdSaved = m_activePage.pageId;
-    Page *activePageSaved = m_activePage.page;
+    m_activePageSaved = m_activePage;
+    m_isTopPage = false;
 
+    int j = i;
+
+    for (i = m_pageNavigationStackPointer - 1; i > j; i--) {
+        bool paintedSaved = mcu::display::g_painted;
+        mcu::display::g_painted = false;
+
+        widgetCursor.cursor = Cursor();
+
+        m_activePage = m_pageNavigationStack[i];
+        updatePage(m_pageNavigationStack[i].repaint, widgetCursor);
+
+        mcu::display::g_painted = paintedSaved || mcu::display::g_painted;
+
+        m_pageNavigationStack[i].repaint = false;
+
+        if (widgetCursor.previousState) {
+            widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
+        }
+        if (widgetCursor.currentState)
+            widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
+    }
+
+    m_isTopPage = true;
+
+    m_activePage = m_activePageSaved;
+    m_activePageSaved = PageOnStack();
+#else
+    m_activePageSaved = m_activePage;
     m_isTopPage = false;
 
     for (++i; i < m_pageNavigationStackPointer; i++) {
@@ -486,12 +534,10 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
         
         widgetCursor.cursor = Cursor();
 
-        m_activePage.pageId = m_pageNavigationStack[i].pageId;
-        m_activePage.page = m_pageNavigationStack[i].page;
-        updatePage(m_pageNavigationStack[i].repaint || repaint, widgetCursor);
+        m_activePage = m_pageNavigationStack[i];
+        updatePage(m_pageNavigationStack[i].repaint, widgetCursor);
         
-        repaint |= mcu::display::g_painted;
-        mcu::display::g_painted = paintedSaved;
+        mcu::display::g_painted = paintedSaved || mcu::display::g_painted;
 
         m_pageNavigationStack[i].repaint = false;
 
@@ -506,11 +552,12 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 
     widgetCursor.cursor = Cursor();
 
-    m_activePage.pageId = m_activePageIdSaved;
-    m_activePageIdSaved = INTERNAL_PAGE_ID_NONE;
-    m_activePage.page = activePageSaved;
-    updatePage(m_activePage.repaint || repaint, widgetCursor);
+    m_activePage = m_activePageSaved;
+    m_activePageSaved = PageOnStack();
+    
+    updatePage(m_activePage.repaint, widgetCursor);
     m_activePage.repaint = false;
+#endif
 }
 
 void AppContext::showProgressPage(const char *message, void (*abortCallback)()) {
@@ -530,7 +577,7 @@ bool AppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) {
         return true;
     }
 
-    if (m_activePage.pageId == PAGE_ID_PROGRESS || m_activePageIdSaved == PAGE_ID_PROGRESS) {
+    if (m_activePage.pageId == PAGE_ID_PROGRESS || m_activePageSaved.pageId == PAGE_ID_PROGRESS) {
         return true;
     }
 

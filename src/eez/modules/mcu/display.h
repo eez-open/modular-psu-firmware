@@ -86,6 +86,7 @@ void fillRect(void *dst, int x1, int y1, int x2, int y2);
 void drawHLine(int x, int y, int l);
 void drawVLine(int x, int y, int l);
 void bitBlt(int x1, int y1, int x2, int y2, int x, int y);
+void bitBlt(void *src, int x1, int y1, int x2, int y2);
 void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2);
 void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity);
 void drawBitmap(void *data, int bpp, int bitmapWidth, int x, int y, int width, int height);
@@ -93,9 +94,30 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
              int clip_y2, gui::font::Font &font);
 int measureStr(const char *text, int textLength, gui::font::Font &font, int max_width = 0);
 
+#if OPTION_SDRAM
+static const int NUM_BUFFERS = 10;
+struct Buffer {
+    void *bufferPointer;
+    bool allocated;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    bool withShadow;
+};
+extern Buffer g_buffers[NUM_BUFFERS];
+extern int g_selectedBufferIndex;
+
 int allocBuffer();
 void freeBuffer(int bufferIndex);
-void selectBuffer(int bufferIndex);
+int selectBuffer(int bufferIndex);
+void drawBuffer(int x1, int y1, int x2, int y2, bool withShadow);
+void beginBuffersDrawing();
+void endBuffersDrawing();
+
+void *getBufferPointer();
+void setBufferPointer(void *buffer);
+#endif
 
 } // namespace display
 } // namespace mcu

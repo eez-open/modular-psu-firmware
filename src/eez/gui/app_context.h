@@ -31,10 +31,12 @@ namespace eez {
 namespace gui {
 
 struct PageOnStack {
-    int pageId;
-    Page *page;
-    bool repaint;
-    int displayBufferIndex;
+    int pageId = INTERNAL_PAGE_ID_NONE;
+    Page *page = nullptr;
+    bool repaint = true;
+#if OPTION_SDRAM    
+    int displayBufferIndex = -1;
+#endif
 };
 
 class AppContext {
@@ -125,7 +127,7 @@ public:
     //
     PageOnStack m_activePage;
     bool m_isTopPage;
-    int m_activePageIdSaved;
+    PageOnStack m_activePageSaved;
 
     int m_previousPageId = INTERNAL_PAGE_ID_NONE;
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
