@@ -20,6 +20,8 @@
 
 #include <eez/gui/app_context.h>
 
+#if OPTION_DISPLAY
+
 // TODO this must be removed from here
 #include <eez/apps/psu/psu.h>
 
@@ -50,7 +52,11 @@ AppContext *g_appContext;
 ////////////////////////////////////////////////////////////////////////////////
 
 AppContext::AppContext() {
-    m_activePageId = INTERNAL_PAGE_ID_NONE;
+    m_activePage.pageId = INTERNAL_PAGE_ID_NONE;
+    m_activePage.page = nullptr;
+    m_activePage.repaint = true;
+    m_activePage.displayBufferIndex = -1;
+
     m_pushProgressPage = false;
     m_popProgressPage = false;
     m_setPageIdOnNextIter = false;
@@ -101,7 +107,7 @@ void AppContext::stateManagment() {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool AppContext::isActivePageInternal() {
-    return isPageInternal(m_activePageId);
+    return isPageInternal(m_activePage.pageId);
 }
 
 bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
@@ -173,15 +179,15 @@ int AppContext::transformStyle(const Widget *widget) {
 ////////////////////////////////////////////////////////////////////////////////
 
 int AppContext::getActivePageId() {
-    return m_activePageId;
+    return m_activePage.pageId;
 }
 
 bool AppContext::isActivePage(int pageId) {
-    return pageId == m_activePageId;
+    return pageId == m_activePage.pageId;
 }
 
 Page *AppContext::getActivePage() {
-    return m_activePage;
+    return m_activePage.page;
 }
 
 int AppContext::getPreviousPageId() {
@@ -203,22 +209,22 @@ void AppContext::onPageChanged() {
 
 void AppContext::doShowPage(int index, Page *page) {
     // delete current page
-    if (m_activePage) {
-        m_activePage->pageFree();
+    if (m_activePage.page) {
+        m_activePage.page->pageFree();
+    }
+    if (m_activePage.displayBufferIndex != -1) {
+        mcu::display::freeBuffer(m_activePage.displayBufferIndex);
     }
 
-    m_previousPageId = m_activePageId;
-    m_activePageId = index;
-    m_repaintActivePage = true;
+    m_previousPageId = m_activePage.pageId;
 
-    if (page) {
-        m_activePage = page;
-    } else {
-        m_activePage = getPageFromId(m_activePageId);
-    }
+    m_activePage.page = page ? page : getPageFromId(index);
+    m_activePage.pageId = index;
+    m_activePage.repaint = true;
+    m_activePage.displayBufferIndex = mcu::display::allocBuffer();
 
-    if (m_activePage) {
-        m_activePage->pageWillAppear();
+    if (m_activePage.page) {
+        m_activePage.page->pageWillAppear();
     }
 
     m_showPageTime = micros();
@@ -236,6 +242,9 @@ void AppContext::setPage(int pageId) {
         if (m_pageNavigationStack[i].page) {
             m_pageNavigationStack[i].page->pageFree();
         }
+        if (m_pageNavigationStack[i].displayBufferIndex != -1) {
+            mcu::display::freeBuffer(m_pageNavigationStack[i].displayBufferIndex);
+        }
     }
     m_pageNavigationStackPointer = 0;
 
@@ -249,13 +258,16 @@ void AppContext::replacePage(int pageId, Page *page) {
 
 void AppContext::pushPage(int pageId, Page *page) {
     // push current page on stack
-    if (m_activePageId != INTERNAL_PAGE_ID_NONE) {
+    if (m_activePage.pageId != INTERNAL_PAGE_ID_NONE) {
         if (m_pageNavigationStackPointer == CONF_GUI_PAGE_NAVIGATION_STACK_SIZE) {
             // no more space on the stack
 
             // delete page on the bottom
             if (m_pageNavigationStack[0].page) {
                 m_pageNavigationStack[0].page->pageFree();
+            }
+            if (m_pageNavigationStack[0].displayBufferIndex != -1) {
+                mcu::display::freeBuffer(m_pageNavigationStack[0].displayBufferIndex);
             }
 
             // move stack one down
@@ -266,10 +278,7 @@ void AppContext::pushPage(int pageId, Page *page) {
             --m_pageNavigationStackPointer;
         }
 
-        m_pageNavigationStack[m_pageNavigationStackPointer].pageId = m_activePageId;
-        m_pageNavigationStack[m_pageNavigationStackPointer].page = m_activePage;
-        m_pageNavigationStack[m_pageNavigationStackPointer].repaint = m_repaintActivePage;
-        m_activePage = 0;
+        m_pageNavigationStack[m_pageNavigationStackPointer] = m_activePage;
         ++m_pageNavigationStackPointer;
     }
 
@@ -280,15 +289,14 @@ void AppContext::popPage() {
     if (m_pageNavigationStackPointer > 0) {
         --m_pageNavigationStackPointer;
 
-        doShowPage(m_pageNavigationStack[m_pageNavigationStackPointer].pageId,
-                   m_pageNavigationStack[m_pageNavigationStackPointer].page);
+        doShowPage(m_pageNavigationStack[m_pageNavigationStackPointer].pageId, m_pageNavigationStack[m_pageNavigationStackPointer].page);
     } else {
         doShowPage(getMainPageId());
     }
 }
 
 bool AppContext::isPageActiveOrOnStack(int pageId) {
-    if (m_activePageId == pageId) {
+    if (m_activePage.pageId == pageId) {
         return true;
     }
 
@@ -329,7 +337,7 @@ void AppContext::markForRefreshAppView() {
         m_pageNavigationStack[i].repaint = true;
     }
 
-    m_repaintActivePage = true;
+    m_activePage.repaint = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -373,13 +381,13 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 ////////////////////////////////////////////////////////////////////////////////
 
 void AppContext::updatePage(bool repaint, WidgetCursor &widgetCursor) {
-    if (isPageInternal(m_activePageId)) {
+    if (isPageInternal(m_activePage.pageId)) {
         if (repaint) {
             ((InternalPage *)g_appContext->getActivePage())->refresh();
         }
         ((InternalPage *)g_appContext->getActivePage())->updatePage();
     } else {
-		const Widget *page = getPageWidget(m_activePageId);
+		const Widget *page = getPageWidget(m_activePage.pageId);
 
 		auto savedPreviousState = widgetCursor.previousState;
         auto savedWidget = widgetCursor.widget;
@@ -415,8 +423,7 @@ void AppContext::updatePage(bool repaint, WidgetCursor &widgetCursor) {
     }
 }
 
-bool pageContained(int xPageAbove, int yPageAbove, int wPageAbove, int hPageAbove,
-		int xPageBelow, int yPageBelow, int wPageBelow, int hPageBelow) {
+bool pageContained(int xPageAbove, int yPageAbove, int wPageAbove, int hPageAbove, int xPageBelow, int yPageBelow, int wPageBelow, int hPageBelow) {
     return xPageAbove <= xPageBelow && yPageAbove <= yPageBelow &&
            xPageAbove + wPageAbove >= xPageBelow + wPageBelow &&
            yPageAbove + hPageAbove >= yPageBelow + hPageBelow;
@@ -438,7 +445,7 @@ void getPageRect(int pageId, Page *page, int &x, int &y, int &w, int &h) {
 }
 
 void AppContext::updateAppView(WidgetCursor &widgetCursor) {
-    if (m_activePageId == INTERNAL_PAGE_ID_NONE) {
+    if (m_activePage.pageId == INTERNAL_PAGE_ID_NONE) {
         return;
     }
 
@@ -446,16 +453,17 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 
     for (i = m_pageNavigationStackPointer - 1; i >= 0; i--) {
     	int xPageAbove, yPageAbove, wPageAbove, hPageAbove;
-    	getPageRect(i == m_pageNavigationStackPointer - 1 ? m_activePageId : m_pageNavigationStack[i + 1].pageId,
-    			i == m_pageNavigationStackPointer - 1 ? m_activePage : m_pageNavigationStack[i + 1].page,
-    			xPageAbove, yPageAbove, wPageAbove, hPageAbove);
+
+        if (i == m_pageNavigationStackPointer - 1) {
+            getPageRect(m_activePage.pageId, m_activePage.page, xPageAbove, yPageAbove, wPageAbove, hPageAbove);
+        } else {
+            getPageRect(m_pageNavigationStack[i + 1].pageId, m_pageNavigationStack[i + 1].page, xPageAbove, yPageAbove, wPageAbove, hPageAbove);
+        }
 
     	int xPageBelow, yPageBelow, wPageBelow, hPageBelow;
-    	getPageRect(m_pageNavigationStack[i].pageId, m_pageNavigationStack[i].page,
-    			xPageBelow, yPageBelow, wPageBelow, hPageBelow);
+    	getPageRect(m_pageNavigationStack[i].pageId, m_pageNavigationStack[i].page, xPageBelow, yPageBelow, wPageBelow, hPageBelow);
 
-        if (pageContained(xPageAbove, yPageAbove, wPageAbove, hPageAbove,
-        		xPageBelow, yPageBelow, wPageBelow, hPageBelow)) {
+        if (pageContained(xPageAbove, yPageAbove, wPageAbove, hPageAbove, xPageBelow, yPageBelow, wPageBelow, hPageBelow)) {
             break;
         }
     }
@@ -467,8 +475,8 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 // #endif
     bool repaint = false;
 
-    m_activePageIdSaved = m_activePageId;
-    Page *activePageSaved = m_activePage;
+    m_activePageIdSaved = m_activePage.pageId;
+    Page *activePageSaved = m_activePage.page;
 
     m_isTopPage = false;
 
@@ -478,8 +486,8 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
         
         widgetCursor.cursor = Cursor();
 
-        m_activePageId = m_pageNavigationStack[i].pageId;
-        m_activePage = m_pageNavigationStack[i].page;
+        m_activePage.pageId = m_pageNavigationStack[i].pageId;
+        m_activePage.page = m_pageNavigationStack[i].page;
         updatePage(m_pageNavigationStack[i].repaint || repaint, widgetCursor);
         
         repaint |= mcu::display::g_painted;
@@ -498,11 +506,11 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 
     widgetCursor.cursor = Cursor();
 
-    m_activePageId = m_activePageIdSaved;
+    m_activePage.pageId = m_activePageIdSaved;
     m_activePageIdSaved = INTERNAL_PAGE_ID_NONE;
-    m_activePage = activePageSaved;
-    updatePage(m_repaintActivePage || repaint, widgetCursor);
-    m_repaintActivePage = false;
+    m_activePage.page = activePageSaved;
+    updatePage(m_activePage.repaint || repaint, widgetCursor);
+    m_activePage.repaint = false;
 }
 
 void AppContext::showProgressPage(const char *message, void (*abortCallback)()) {
@@ -522,7 +530,7 @@ bool AppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) {
         return true;
     }
 
-    if (m_activePageId == PAGE_ID_PROGRESS || m_activePageIdSaved == PAGE_ID_PROGRESS) {
+    if (m_activePage.pageId == PAGE_ID_PROGRESS || m_activePageIdSaved == PAGE_ID_PROGRESS) {
         return true;
     }
 
@@ -535,3 +543,5 @@ void AppContext::hideProgressPage() {
 
 } // namespace gui
 } // namespace eez
+
+#endif

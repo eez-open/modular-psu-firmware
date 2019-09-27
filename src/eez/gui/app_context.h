@@ -34,6 +34,7 @@ struct PageOnStack {
     int pageId;
     Page *page;
     bool repaint;
+    int displayBufferIndex;
 };
 
 class AppContext {
@@ -122,11 +123,9 @@ public:
     virtual void onPageChanged();
 
     //
-    int m_activePageId = INTERNAL_PAGE_ID_NONE;
+    PageOnStack m_activePage;
     bool m_isTopPage;
     int m_activePageIdSaved;
-    Page *m_activePage = nullptr;
-    bool m_repaintActivePage;
 
     int m_previousPageId = INTERNAL_PAGE_ID_NONE;
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];

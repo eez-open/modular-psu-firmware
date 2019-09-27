@@ -20,6 +20,7 @@
 
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/apps/psu/scpi/psu.h>
+
 #if OPTION_DISPLAY
 #include <eez/gui/dialogs.h>
 #include <eez/gui/gui.h>
