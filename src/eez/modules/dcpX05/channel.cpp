@@ -31,6 +31,8 @@
 #include <eez/system.h>
 #include <eez/index.h>
 
+#define CONF_OVP_PERCENTAGE 3.0f
+
 namespace eez {
 
 using namespace psu;
@@ -181,12 +183,16 @@ struct Channel : ChannelInterface {
 			}
 		}
 
+		if (fallingEdge) {
+			fallingEdge = channel.u.mon_last > channel.u.set * (1.0f + CONF_OVP_PERCENTAGE / 100.0f);
+		}
+
 		if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
 			if (channel.isOutputEnabled()) {
-				if (channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type && !ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
+				if (!fallingEdge && channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type && !ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
 					// activate HW OVP
 					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
-				} else if (!(channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) && ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
+				} else if ((fallingEdge || !(channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type)) && ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
 					// deactivate HW OVP
 					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
 				}
@@ -269,7 +275,7 @@ struct Channel : ChannelInterface {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
 		if (enable) {
-			setDacVoltageFloat(subchannelIndex, uSet);
+			dac.setVoltage(uSet);
 
 			setCurrentRange(subchannelIndex);
 
@@ -293,7 +299,7 @@ struct Channel : ChannelInterface {
 				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
 			}
 
-			setDacVoltage(subchannelIndex, (uint16_t)0);
+			dac.setVoltage(channel.getCalibratedVoltage(0));
 
 			ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, false);
 
@@ -325,9 +331,26 @@ struct Channel : ChannelInterface {
         restoreCurrentToValueBeforeBalancing(psu::Channel::getBySlotIndex(slotIndex));
     }
 
+	bool fallingEdge = true;
+
 	void setDacVoltageFloat(int subchannelIndex, float value) {
-        uSet = value;
-		dac.setVoltage(value);
+		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
+
+		if (channel.isOutputEnabled()) {
+			if (value < uSet) {
+				fallingEdge = true;
+				if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+					if (channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
+						// deactivate HW OVP
+						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+					}
+				}
+			}
+
+			dac.setVoltage(value);
+		}
+
+		uSet = value;
 
 		uBeforeBalancing = NAN;
 		restoreCurrentToValueBeforeBalancing(psu::Channel::getBySlotIndex(slotIndex));

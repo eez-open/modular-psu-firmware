@@ -455,6 +455,8 @@ class Channel {
     /// Is remote programming enabled?
     bool isRemoteProgrammingEnabled();
 
+    float getCalibratedVoltage(float value);
+
     /// Set channel voltage level.
     void setVoltage(float voltage);
 

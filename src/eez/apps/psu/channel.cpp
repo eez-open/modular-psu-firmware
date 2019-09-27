@@ -1009,6 +1009,18 @@ bool Channel::isRemoteProgrammingEnabled() {
     return flags.rprogEnabled;
 }
 
+float Channel::getCalibratedVoltage(float value) {
+    if (isVoltageCalibrationEnabled()) {
+        value = remap(value, cal_conf.u.min.val, cal_conf.u.min.dac, cal_conf.u.max.val, cal_conf.u.max.dac);
+    }
+
+#if !defined(EEZ_PLATFORM_SIMULATOR)
+    value += params->VOLTAGE_GND_OFFSET;
+#endif
+
+    return value;
+}
+
 void Channel::doSetVoltage(float value) {
     u.set = value;
     u.mon_dac = 0;
@@ -1021,14 +1033,7 @@ void Channel::doSetVoltage(float value) {
         value = remap(value, 0, 0, params->U_MAX_CONF, params->U_MAX);
     }
 
-    if (isVoltageCalibrationEnabled()) {
-        value = remap(value, cal_conf.u.min.val, cal_conf.u.min.dac, cal_conf.u.max.val,
-                      cal_conf.u.max.dac);
-    }
-
-#if !defined(EEZ_PLATFORM_SIMULATOR)
-    value += params->VOLTAGE_GND_OFFSET;
-#endif
+	value = getCalibratedVoltage(value);
 
     channelInterface->setDacVoltageFloat(subchannelIndex, value);
 }
