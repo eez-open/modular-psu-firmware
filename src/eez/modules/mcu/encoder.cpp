@@ -35,7 +35,6 @@
 #endif
 
 #include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/channel.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/apps/psu/gui/edit_mode_step.h>
 
@@ -104,7 +103,7 @@ void calculateAcceleration(int16_t diffCounter) {
         	stepCountersSum += g_accelerationStepCounters[(g_accelerationStepCounterIndex - i) % CONF_NUM_ACCELERATION_STEP_COUNTERS];
         }
 
-		g_acceleration = powf(CONF_ACCELERATION_CALC_POW_BASE, fabs(1.0f * stepCountersSum)) - 1;
+		g_acceleration = powf(CONF_ACCELERATION_CALC_POW_BASE, fabsf(1.0f * stepCountersSum)) - 1.0f;
 
         if (g_acceleration > CONF_MAX_ACCELERATION) g_acceleration = CONF_MAX_ACCELERATION;
 
@@ -213,7 +212,7 @@ float increment(gui::data::Value value, int counter, float min, float max, int c
     }
 
     if (g_encoderMode == ENCODER_MODE_AUTO) {
-        float diff = fabs(newValue - value.getFloat());
+        float diff = fabsf(newValue - value.getFloat());
         if (diff > 1) {
             newValue = roundPrec(newValue, 1);
         } else if (diff > 0.1) {

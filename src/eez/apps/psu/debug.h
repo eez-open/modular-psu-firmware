@@ -47,8 +47,6 @@ extern DebugDurationVariable g_listTickDuration;
 #endif
 extern DebugCounterVariable g_adcCounter;
 
-extern bool g_debugWatchdog;
-
 void dumpVariables(char *buffer);
 
 } // namespace debug

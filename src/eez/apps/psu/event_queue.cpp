@@ -20,8 +20,9 @@
 
 #include <scpi/scpi.h>
 
+#include <eez/modules/mcu/eeprom.h>
+
 #include <eez/apps/psu/datetime.h>
-#include <eez/apps/psu/eeprom.h>
 #include <eez/apps/psu/event_queue.h>
 #include <eez/sound.h>
 
@@ -46,14 +47,12 @@ static const int MAX_EVENTS_TO_PUSH = sizeof(g_eventsToPush) / sizeof(int16_t);
 static uint8_t g_pageIndex = 0;
 
 void readHeader() {
-    eeprom::read((uint8_t *)&g_eventQueue, sizeof(EventQueueHeader),
-                 eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS);
+    mcu::eeprom::read((uint8_t *)&g_eventQueue, sizeof(EventQueueHeader), mcu::eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS);
 }
 
 void writeHeader() {
-    if (eeprom::g_testResult == TEST_OK) {
-        eeprom::write((uint8_t *)&g_eventQueue, sizeof(EventQueueHeader),
-                      eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS);
+    if (mcu::eeprom::g_testResult == TEST_OK) {
+        mcu::eeprom::write((uint8_t *)&g_eventQueue, sizeof(EventQueueHeader), mcu::eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS);
     }
 }
 
@@ -64,8 +63,8 @@ Event *readEvent(uint16_t eventIndex) {
 void writeEvent(uint16_t eventIndex, Event *e) {
     memcpy(&g_events[eventIndex], e, sizeof(Event));
 
-    if (eeprom::g_testResult == TEST_OK) {
-        eeprom::write((uint8_t *)e, sizeof(Event), eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS + sizeof(EventQueueHeader) + eventIndex * sizeof(Event));
+    if (mcu::eeprom::g_testResult == TEST_OK) {
+        mcu::eeprom::write((uint8_t *)e, sizeof(Event), mcu::eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS + sizeof(EventQueueHeader) + eventIndex * sizeof(Event));
     }
 }
 
@@ -83,7 +82,7 @@ void init() {
         pushEvent(EVENT_INFO_WELCOME);
     } else {
         // read all events
-        eeprom::read((uint8_t *)g_events, sizeof(g_events), eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS + sizeof(EventQueueHeader));
+        mcu::eeprom::read((uint8_t *)g_events, sizeof(g_events), mcu::eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS + sizeof(EventQueueHeader));
     }
 }
 

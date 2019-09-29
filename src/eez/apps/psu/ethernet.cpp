@@ -25,7 +25,6 @@
 #include <eez/apps/psu/event_queue.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/apps/psu/serial_psu.h>
-#include <eez/apps/psu/watchdog.h>
 
 #include <eez/apps/psu/ethernet.h>
 

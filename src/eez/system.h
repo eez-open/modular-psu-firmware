@@ -21,6 +21,10 @@
 #include "cmsis_os.h"
 #include <stdint.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <main.h>
+#endif
+
 namespace eez {
 
 enum SystemState { BOOTING = 1, SHUTING_DOWN };

@@ -66,8 +66,6 @@ DebugVariable *g_variables[] = { &g_uDac[0],          &g_uDac[1],    &g_uMon[0],
 #endif
                                  &g_adcCounter };
 
-bool g_debugWatchdog = true;
-
 static uint32_t g_previousTickCount1sec;
 static uint32_t g_previousTickCount10sec;
 

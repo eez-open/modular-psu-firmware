@@ -55,7 +55,10 @@ using namespace eez::scpi;
 #include <unistd.h>
 #endif
 
+#if defined(DebugTrace)
+#undef DebugTrace
 #define DebugTrace printf
+#endif
 
 namespace eez {
 namespace mcu {

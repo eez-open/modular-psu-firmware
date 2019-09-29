@@ -23,9 +23,6 @@
 #include <assert.h>
 
 #include <eez/system.h>
-#if OPTION_WATCHDOG
-#include <eez/apps/psu/watchdog.h>
-#endif
 #include <eez/apps/psu/board.h>
 #include <eez/apps/psu/calibration.h>
 #include <eez/apps/psu/channel_dispatcher.h>

@@ -18,6 +18,12 @@
  
 #pragma once
 
+static const uint8_t EXT_TRIG1 = 0;
+static const uint8_t EXT_TRIG2 = 1;
+static const uint8_t DOUT1 = 2;
+static const uint8_t DOUT2 = 3;
+static const uint8_t NUM_IO_PINS = 4;
+
 namespace eez {
 namespace psu {
 namespace io_pins {

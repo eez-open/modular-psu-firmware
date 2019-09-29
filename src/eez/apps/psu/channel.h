@@ -30,6 +30,12 @@
 namespace eez {
 namespace psu {
 
+enum MaxCurrentLimitCause {
+    MAX_CURRENT_LIMIT_CAUSE_NONE,
+    MAX_CURRENT_LIMIT_CAUSE_FAN,
+    MAX_CURRENT_LIMIT_CAUSE_TEMPERATURE
+};
+
 extern int CH_NUM;
 
 namespace calibration {

@@ -81,6 +81,7 @@ set(header_files)
 set(src_eez
     src/eez/debug.cpp
     src/eez/index.cpp
+    src/eez/main.cpp
     src/eez/scripting.cpp
     src/eez/sound.cpp
     src/eez/system.cpp
@@ -117,6 +118,7 @@ list (APPEND header_files ${header_eez_apps_home})
 source_group("eez\\apps\\home" FILES ${src_eez_apps_home} ${header_eez_apps_home})
 
 set(src_eez_apps_psu
+    src/eez/apps/psu/board.cpp
     src/eez/apps/psu/calibration.cpp
     src/eez/apps/psu/channel.cpp
     src/eez/apps/psu/channel_dispatcher.cpp
@@ -124,7 +126,6 @@ set(src_eez_apps_psu
     src/eez/apps/psu/debug.cpp
     src/eez/apps/psu/devices.cpp
     src/eez/apps/psu/dlog.cpp
-    src/eez/apps/psu/eeprom.cpp
     src/eez/apps/psu/ethernet.cpp
     src/eez/apps/psu/event_queue.cpp
     src/eez/apps/psu/idle.cpp
@@ -137,7 +138,9 @@ set(src_eez_apps_psu
     src/eez/apps/psu/persist_conf.cpp
     src/eez/apps/psu/profile.cpp
     src/eez/apps/psu/psu.cpp
+    src/eez/apps/psu/rtc.cpp
     src/eez/apps/psu/sd_card.cpp
+    src/eez/apps/psu/serial.cpp
     src/eez/apps/psu/serial_psu.cpp
     src/eez/apps/psu/temp_sensor.cpp
     src/eez/apps/psu/temperature.cpp
@@ -153,14 +156,12 @@ set(header_eez_apps_psu
     src/eez/apps/psu/channel_dispatcher.h
     src/eez/apps/psu/conf.h
     src/eez/apps/psu/conf_advanced.h
-    src/eez/apps/psu/conf_all.h
     src/eez/apps/psu/conf_channel.h
     src/eez/apps/psu/conf_user.h
     src/eez/apps/psu/datetime.h
     src/eez/apps/psu/debug.h
     src/eez/apps/psu/devices.h
     src/eez/apps/psu/dlog.h
-    src/eez/apps/psu/eeprom.h
     src/eez/apps/psu/ethernet.h
     src/eez/apps/psu/event_queue.h
     src/eez/apps/psu/idle.h
@@ -180,7 +181,6 @@ set(header_eez_apps_psu
     src/eez/apps/psu/timer.h
     src/eez/apps/psu/trigger.h
     src/eez/apps/psu/util.h
-    src/eez/apps/psu/watchdog.h
 )
 list (APPEND header_files ${header_eez_apps_psu})
 source_group("eez\\apps\\psu" FILES ${src_eez_apps_psu} ${header_eez_apps_psu})
@@ -258,22 +258,6 @@ set(header_eez_apps_psu_scpi
 )
 list (APPEND header_files ${header_eez_apps_psu_scpi})
 source_group("eez\\apps\\psu\\scpi" FILES ${src_eez_apps_psu_scpi} ${header_eez_apps_psu_scpi})
-
-set(src_eez_apps_psu_simulator
-    src/eez/apps/psu/simulator/board.cpp
-    src/eez/apps/psu/simulator/psu.cpp
-    src/eez/apps/psu/simulator/rtc.cpp
-    src/eez/apps/psu/simulator/serial.cpp
-    src/eez/apps/psu/simulator/watchdog.cpp
-)
-list (APPEND src_files ${src_eez_apps_psu_simulator})
-set(header_eez_apps_psu_simulator
-    src/eez/apps/psu/simulator/conf.h
-    src/eez/apps/psu/simulator/psu.h
-    src/eez/apps/psu/simulator/serial.h
-)
-list (APPEND header_files ${header_eez_apps_psu_simulator})
-source_group("eez\\apps\\psu\\simulator" FILES ${src_eez_apps_psu_simulator} ${header_eez_apps_psu_simulator})
 
 set(src_eez_apps_settings
     src/eez/apps/settings/settings.cpp
@@ -421,6 +405,7 @@ source_group("eez\\modules\\bp3c" FILES ${src_eez_modules_bp3c} ${header_eez_mod
 set(src_eez_modules_mcu
     src/eez/modules/mcu/battery.cpp
     src/eez/modules/mcu/display.cpp
+    src/eez/modules/mcu/eeprom.cpp
     src/eez/modules/mcu/ethernet.cpp
     src/eez/modules/mcu/encoder.cpp
     src/eez/modules/mcu/sdram.cpp) 
@@ -428,6 +413,7 @@ list (APPEND src_files ${src_eez_modules_mcu})
 set(header_eez_modules_mcu
     src/eez/modules/mcu/battery.h
     src/eez/modules/mcu/display.h
+    src/eez/modules/mcu/eeprom.h
     src/eez/modules/mcu/encoder.h
     src/eez/modules/mcu/ethernet.h
     src/eez/modules/mcu/sdram.h
@@ -474,8 +460,6 @@ set(src_eez_platform_simulator
     src/eez/platform/simulator/cmsis_os.cpp
     src/eez/platform/simulator/events.cpp
     src/eez/platform/simulator/front_panel.cpp
-    src/eez/platform/simulator/main.cpp
-    src/eez/platform/simulator/system.cpp
     src/eez/platform/simulator/texture.cpp
 ) 
 list (APPEND src_files ${src_eez_platform_simulator})

@@ -24,7 +24,15 @@
 
 #include <eez/apps/psu/channel_dispatcher.h>
 #include <eez/apps/psu/io_pins.h>
-#include <eez/apps/psu/simulator/psu.h>
+
+// SIMULATOR SPECIFC CONFIG
+#define SIM_LOAD_MIN 0
+#define SIM_LOAD_DEF 1000.0f
+#define SIM_LOAD_MAX 10000000.0F
+
+#define SIM_TEMP_MIN 0
+#define SIM_TEMP_DEF 25.0f
+#define SIM_TEMP_MAX 120.0f
 
 namespace eez {
 namespace psu {

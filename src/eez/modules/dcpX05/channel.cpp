@@ -23,7 +23,6 @@
 
 #include <eez/apps/psu/psu.h>
 #include <eez/apps/psu/profile.h>
-#include <eez/apps/psu/channel.h>
 #include <eez/apps/psu/channel_dispatcher.h>
 
 #include <eez/scpi/regs.h>

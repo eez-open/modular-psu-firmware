@@ -38,8 +38,6 @@
 
 // TODO
 #include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/conf.h> // CH_MAX
-#include <eez/apps/psu/channel.h>
 #include <eez/apps/psu/persist_conf.h>
 
 namespace eez {

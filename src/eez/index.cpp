@@ -19,7 +19,6 @@
 #include <eez/index.h>
 
 #include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/channel.h>
 
 #if OPTION_DISPLAY
 #include <eez/apps/psu/gui/psu.h>

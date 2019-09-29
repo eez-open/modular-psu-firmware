@@ -20,17 +20,33 @@
 
 #include <stdint.h>
 
+#if !defined(EEZ_PLATFORM_SIMULATOR) && !defined(EEZ_PLATFORM_STM32)
+#define EEZ_PLATFORM_STM32
+#endif
+
+#include <eez/apps/psu/conf.h>
+#include <eez/apps/psu/conf_advanced.h>
+#include <eez/apps/psu/conf_channel.h>
+#include <eez/apps/psu/conf_user.h>
+
 #include <eez/index.h>
 #include <eez/util.h>
 
-#include <eez/apps/psu/conf_all.h>
-
-#include <eez/apps/psu/ontime.h>
+#include <eez/apps/psu/channel.h>
+#include <eez/apps/psu/debug.h>
+#include <eez/apps/psu/util.h>
+#include <eez/apps/psu/serial.h>
 
 /// Namespace for the everything from the EEZ.
 namespace eez {
 
 extern TestResult g_masterTestResult;
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+char *getConfFilePath(const char *file_name);
+#endif
+
+void generateError(int16_t error);
 
 /// PSU firmware.
 namespace psu {
@@ -57,17 +73,10 @@ void tick();
 void setQuesBits(int bit_mask, bool on);
 void setOperBits(int bit_mask, bool on);
 
-void generateError(int16_t error);
-
 const char *getCpuModel();
 const char *getCpuType();
 const char *getCpuEthernetType();
 
-enum MaxCurrentLimitCause {
-    MAX_CURRENT_LIMIT_CAUSE_NONE,
-    MAX_CURRENT_LIMIT_CAUSE_FAN,
-    MAX_CURRENT_LIMIT_CAUSE_TEMPERATURE
-};
 bool isMaxCurrentLimited();
 MaxCurrentLimitCause getMaxCurrentLimitCause();
 void limitMaxCurrent(MaxCurrentLimitCause cause);
@@ -83,9 +92,31 @@ extern bool g_rprogAlarm;
 
 extern void (*g_diagCallback)();
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+namespace simulator {
+
+void init();
+void tick();
+
+void setTemperature(int sensor, float value);
+float getTemperature(int sensor);
+
+bool getPwrgood(int pin);
+void setPwrgood(int pin, bool on);
+
+bool getRPol(int pin);
+void setRPol(int pin, bool on);
+
+bool getCV(int pin);
+void setCV(int pin, bool on);
+
+bool getCC(int pin);
+void setCC(int pin, bool on);
+
+void exit();
+
+} // namespace simulator
+#endif
+
 } // namespace psu
 } // namespace eez
-
-#include <eez/apps/psu/channel.h>
-#include <eez/apps/psu/debug.h>
-#include <eez/apps/psu/util.h>

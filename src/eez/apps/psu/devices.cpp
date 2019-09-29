@@ -22,7 +22,7 @@
 
 #include <eez/apps/psu/devices.h>
 
-#include <eez/apps/psu/eeprom.h>
+#include <eez/modules/mcu/eeprom.h>
 
 #if OPTION_SD_CARD
 #include <eez/apps/psu/sd_card.h>
@@ -54,7 +54,7 @@ namespace devices {
 
 Device devices[] = {
 #if OPTION_EXT_EEPROM
-    { "EEPROM", OPTION_EXT_EEPROM, &eeprom::g_testResult },
+    { "EEPROM", OPTION_EXT_EEPROM, &mcu::eeprom::g_testResult },
 #else
     { "EEPROM", 0, 0 },
 #endif

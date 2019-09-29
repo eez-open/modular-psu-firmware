@@ -333,7 +333,7 @@ void getIMonMax(float &iMonMax, float &iMax) {
 #if defined(EEZ_PLATFORM_STM32)
 void genFanError() {
 	g_testResult = TEST_FAILED;
-	psu::generateError(SCPI_ERROR_FAN_TEST_FAILED);
+	generateError(SCPI_ERROR_FAN_TEST_FAILED);
 	psu::setQuesBits(QUES_FAN, true);
 	psu::limitMaxCurrent(psu::MAX_CURRENT_LIMIT_CAUSE_FAN);
 }

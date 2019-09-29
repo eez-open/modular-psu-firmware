@@ -45,6 +45,7 @@
 #include <eez/apps/psu/serial_psu.h>
 #include <eez/apps/psu/temperature.h>
 #include <eez/apps/psu/trigger.h>
+#include <eez/apps/psu/ontime.h>
 
 #include <eez/apps/psu/gui/calibration.h>
 #include <eez/apps/psu/gui/data.h>
@@ -357,7 +358,7 @@ void GREATER_THEN_MAX_TIME_ZONE_value_to_text(const Value &value, char *text, in
 
 bool compare_EVENT_value(const Value &a, const Value &b) {
     auto aEvent = getEventFromValue(a);
-    auto bEvent = getEventFromValue(a);
+    auto bEvent = getEventFromValue(b);
 
     if (aEvent == bEvent) {
         return true;
@@ -1180,7 +1181,7 @@ void data_slot_max_channel_index(data::DataOperationEnum operation, data::Cursor
 
 void data_slot_max_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        Channel &channel = Channel::getBySlotIndex(cursor.i);
+        Channel &channel = Channel::get(cursor.i);
         if (channel.isInstalled()) {
             if (channel.isOk()) {
                 int numChannels = g_modules[g_slots[channel.slotIndex].moduleType].numChannels;

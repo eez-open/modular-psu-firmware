@@ -31,7 +31,6 @@
 #include <eez/modules/mcu/encoder.h>
 #endif
 
-#include <eez/apps/psu/channel.h>
 #include <eez/apps/psu/gui/data.h>
 #include <eez/apps/psu/gui/edit_mode.h>
 #include <eez/apps/psu/gui/edit_mode_step.h>

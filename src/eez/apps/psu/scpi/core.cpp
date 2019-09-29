@@ -18,7 +18,8 @@
 
 #include <eez/apps/psu/psu.h>
 
-#include <eez/apps/psu/eeprom.h>
+#include <eez/modules/mcu/eeprom.h>
+
 #include <eez/apps/psu/profile.h>
 #include <eez/apps/psu/scpi/psu.h>
 

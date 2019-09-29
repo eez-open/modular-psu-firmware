@@ -31,7 +31,7 @@
 #include <eez/apps/psu/board.h>
 #include <eez/modules/dcpx05/dac.h>
 #include <eez/apps/psu/datetime.h>
-#include <eez/apps/psu/eeprom.h>
+#include <eez/modules/mcu/eeprom.h>
 #include <eez/modules/dcpx05/ioexp.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/apps/psu/rtc.h>
@@ -51,10 +51,6 @@
 #include <eez/apps/psu/gui/psu.h>
 #endif
 
-#if OPTION_WATCHDOG
-#include <eez/apps/psu/watchdog.h>
-#endif
-
 #if OPTION_FAN
 #include <eez/modules/aux_ps/fan.h>
 #endif
@@ -65,6 +61,7 @@
 #include <eez/apps/psu/io_pins.h>
 #include <eez/apps/psu/list_program.h>
 #include <eez/apps/psu/trigger.h>
+#include <eez/apps/psu/ontime.h>
 
 #include <eez/modules/bp3c/relays.h>
 #include <eez/modules/bp3c/eeprom.h>
@@ -79,11 +76,83 @@
 
 #include <eez/scpi/scpi.h>
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+
+// for home directory (see getConfFilePath)
+#ifdef _WIN32
+#undef INPUT
+#undef OUTPUT
+#include <Shlobj.h>
+#include <Windows.h>
+#include <direct.h>
+#else
+#include <string.h>
+#include <pwd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
+#endif
+
 namespace eez {
 
 using namespace scpi;
 
 TestResult g_masterTestResult;
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+
+char *getConfFilePath(const char *file_name) {
+    static char file_path[1024];
+
+    *file_path = 0;
+
+#ifdef _WIN32
+    if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, file_path))) {
+        strcat(file_path, "\\.eez_psu_sim");
+        _mkdir(file_path);
+        strcat(file_path, "\\");
+    }
+#elif defined(__EMSCRIPTEN__)
+    strcat(file_path, "/eez_modular_firmware/");
+#else
+    const char *home_dir = 0;
+    if ((home_dir = getenv("HOME")) == NULL) {
+        home_dir = getpwuid(getuid())->pw_dir;
+    }
+    if (home_dir) {
+        strcat(file_path, home_dir);
+        strcat(file_path, "/.eez_psu_sim");
+        mkdir(file_path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        strcat(file_path, "/");
+    }
+#endif
+
+    char *q = file_path + strlen(file_path);
+    const char *p = file_name;
+    while (*p) {
+        char ch = *p++;
+#ifdef _WIN32
+        if (ch == '/')
+            *q++ = '\\';
+#else
+        if (ch == '\\')
+            *q++ = '/';
+#endif
+        else
+            *q++ = ch;
+    }
+    *q = 0;
+
+    return file_path;
+}
+
+#endif
+
+void generateError(int16_t error) {
+    eez::scpi::generateError(error);
+}
 
 namespace psu {
 
@@ -132,8 +201,8 @@ void init() {
 
     sound::init();
 
-    eeprom::init();
-    eeprom::test();
+    mcu::eeprom::init();
+    mcu::eeprom::test();
 
     bp3c::eeprom::init();
     bp3c::eeprom::test();
@@ -245,7 +314,7 @@ static bool testMaster() {
 
     result &= rtc::test();
     result &= datetime::test();
-    result &= eeprom::test();
+    result &= mcu::eeprom::test();
 
 #if OPTION_SD_CARD
     result &= sd_card::test();
@@ -761,10 +830,7 @@ static TickFunc g_tickFuncs[] = {
     datetime::tick,
     sound::tick,
     mcu::battery::tick,
-    idle::tick,
-#if OPTION_WATCHDOG
-    watchdog::tick
-#endif
+    idle::tick
 };
 static const int NUM_TICK_FUNCS = sizeof(g_tickFuncs) / sizeof(TickFunc);
 static int g_tickFuncIndex = 0;
@@ -804,12 +870,6 @@ void setQuesBits(int bit_mask, bool on) {
 void setOperBits(int bit_mask, bool on) {
     reg_set_oper_bit(bit_mask, on);
 }
-
-void generateError(int16_t error) {
-    eez::scpi::generateError(error);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -867,6 +927,82 @@ void unlimitMaxCurrent() {
 MaxCurrentLimitCause getMaxCurrentLimitCause() {
     return g_maxCurrentLimitCause;
 }
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+
+namespace simulator {
+
+static float g_temperature[temp_sensor::NUM_TEMP_SENSORS];
+static bool g_pwrgood[CH_MAX];
+static bool g_rpol[CH_MAX];
+static bool g_cv[CH_MAX];
+static bool g_cc[CH_MAX];
+float g_uSet[CH_MAX];
+float g_iSet[CH_MAX];
+
+void init() {
+    for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
+        g_temperature[i] = 25.0f;
+    }
+
+    for (int i = 0; i < CH_MAX; ++i) {
+        g_pwrgood[i] = true;
+        g_rpol[i] = false;
+    }
+}
+
+void tick() {
+    psu::tick();
+}
+
+void setTemperature(int sensor, float value) {
+    g_temperature[sensor] = value;
+}
+
+float getTemperature(int sensor) {
+    return g_temperature[sensor];
+}
+
+bool getPwrgood(int pin) {
+    return g_pwrgood[pin];
+}
+
+void setPwrgood(int pin, bool on) {
+    g_pwrgood[pin] = on;
+}
+
+bool getRPol(int pin) {
+    return g_rpol[pin];
+}
+
+void setRPol(int pin, bool on) {
+    g_rpol[pin] = on;
+}
+
+bool getCV(int pin) {
+    return g_cv[pin];
+}
+
+void setCV(int pin, bool on) {
+    g_cv[pin] = on;
+}
+
+bool getCC(int pin) {
+    return g_cc[pin];
+}
+
+void setCC(int pin, bool on) {
+    g_cc[pin] = on;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void exit() {
+}
+
+} // namespace simulator
+
+#endif
 
 } // namespace psu
 } // namespace eez

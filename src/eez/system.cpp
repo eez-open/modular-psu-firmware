@@ -22,6 +22,7 @@
 #include <usb_device.h>
 #include <sdmmc.h>
 #include <fatfs.h>
+// #include <eez/platform/stm32/dwt_delay.h>
 #endif
 
 #include <eez/system.h>
@@ -148,6 +149,274 @@ void boot() {
 
 void shutdown() {
     g_shutdown = true;
+}
+
+uint32_t millis() {
+#if defined(EEZ_PLATFORM_STM32)
+    return HAL_GetTick();
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    // osKernelSysTick must be in milliseconds
+    return osKernelSysTick();
+#endif
+}
+
+void delay(uint32_t millis) {
+#if defined(EEZ_PLATFORM_STM32)
+    HAL_Delay(millis);
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	osDelay(millis);
+#endif
+}
+
+uint32_t micros() {
+#if defined(EEZ_PLATFORM_STM32)	
+    // return DWT_micros();
+    return millis() * 1000;
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	return osKernelSysTick() * 1000;
+#endif
+}
+
+void delayMicroseconds(uint32_t microseconds) {
+#if defined(EEZ_PLATFORM_STM32)
+	// DWT_Delay_us(microseconds);
+
+    // delay((microseconds + 500) / 1000);
+
+	while (microseconds--) {
+		// 216 NOP's
+
+		// remove 6 NOP's to compensate looping costs
+
+		// __ASM volatile ("NOP");
+		// __ASM volatile ("NOP");
+		// __ASM volatile ("NOP");
+		// __ASM volatile ("NOP");
+		// __ASM volatile ("NOP");
+		// __ASM volatile ("NOP");
+
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+		__ASM volatile ("NOP");
+	}
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	osDelay((microseconds + 500) / 1000);
+#endif
 }
 
 } // namespace eez

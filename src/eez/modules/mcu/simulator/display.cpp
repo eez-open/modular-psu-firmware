@@ -68,14 +68,12 @@ static uint32_t *g_frontPanelBuffer1;
 static uint32_t *g_frontPanelBuffer2;
 static uint32_t *g_frontPanelBuffer3;
 
-static uint16_t g_x, g_y, g_x1, g_y1, g_x2, g_y2;
-
 static uint8_t *g_screenshotBuffer;
 static int g_screenshotY;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-uint32_t blendColor(uint32_t fgColor, uint32_t bgColor) {
+static uint32_t blendColor(uint32_t fgColor, uint32_t bgColor) {
     uint8_t *fg = (uint8_t *)&fgColor;
     uint8_t *bg = (uint8_t *)&bgColor;
 
@@ -98,6 +96,15 @@ uint32_t blendColor(uint32_t fgColor, uint32_t bgColor) {
     presult[3] = (uint8_t)alphaOut;
 
     return result;
+}
+
+static uint32_t color16to32(uint16_t color) {
+    uint32_t color32;
+    ((uint8_t *)&color32)[0] = COLOR_TO_B(color);
+    ((uint8_t *)&color32)[1] = COLOR_TO_G(color);
+    ((uint8_t *)&color32)[2] = COLOR_TO_R(color);
+    ((uint8_t *)&color32)[3] = 255;
+    return color32;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -321,45 +328,6 @@ int getDisplayHeight() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void setXY(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
-    g_x1 = x1;
-    g_y1 = y1;
-    g_x2 = x2;
-    g_y2 = y2;
-
-    g_x = x1;
-    g_y = y1;
-}
-
-inline uint32_t *getDst() {
-    return g_frontPanelBuffer + g_y * g_frontPanelWidth + g_x;
-}
-
-static void setPixel(uint32_t color) {
-    if (g_x >= 0 && g_x < g_frontPanelWidth && g_y >= 0 && g_y < g_frontPanelHeight) {
-        uint32_t *dst = getDst();
-        *dst = color;
-    }
-
-    if (++g_x > g_x2) {
-        g_x = g_x1;
-        if (++g_y > g_y2) {
-            g_y = g_y1;
-        }
-    }
-}
-
-static void setPixel(uint16_t color) {
-    uint32_t pixel;
-    ((uint8_t *)&pixel)[0] = COLOR_TO_B(color);
-    ((uint8_t *)&pixel)[1] = COLOR_TO_G(color);
-    ((uint8_t *)&pixel)[2] = COLOR_TO_R(color);
-    ((uint8_t *)&pixel)[3] = 255;
-    setPixel(pixel);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void screanshotBegin() {
     g_screenshotBuffer = new uint8_t[480 * 272 * 3];
 
@@ -397,21 +365,23 @@ void screanshotEnd() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void doDrawGlyph(const gui::font::Glyph &glyph, int x_glyph, int y_glyph, int width,
-                        int height, int offset, int iStartByte) {
-    setXY(x_glyph, y_glyph, x_glyph + width - 1, y_glyph + height - 1);
-
+static void doDrawGlyph(const gui::font::Glyph &glyph, int x_glyph, int y_glyph, int width, int height, int offset, int iStartByte) {
     uint32_t pixel;
     ((uint8_t *)&pixel)[0] = COLOR_TO_B(g_fc);
     ((uint8_t *)&pixel)[1] = COLOR_TO_G(g_fc);
     ((uint8_t *)&pixel)[2] = COLOR_TO_R(g_fc);
     uint8_t *pixelAlpha = ((uint8_t *)&pixel) + 3;
 
-    const uint8_t *pixels = glyph.data + offset + iStartByte;
-    for (int y = 0; y < height; ++y, pixels += glyph.width - width) {
-        for (int x = 0; x < width; ++x) {
-            *pixelAlpha = *pixels++;
-            setPixel(blendColor(pixel, *getDst()));
+    const uint8_t *src = glyph.data + offset + iStartByte;
+    int nlSrc = glyph.width - width;
+
+    uint32_t *dst = g_frontPanelBuffer + y_glyph * g_frontPanelWidth + x_glyph;
+    int nlDst = g_frontPanelWidth - width;
+
+    for (const uint8_t *srcEnd = src + height * glyph.width; src != srcEnd; src += nlSrc, dst += nlDst) {
+        for (uint32_t *dstEnd = dst + width; dst != dstEnd; src++, dst++) {
+            *pixelAlpha = *src;
+            *dst = blendColor(pixel, *dst);
         }
     }
 }
@@ -467,8 +437,7 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
 ////////////////////////////////////////////////////////////////////////////////
 
 void drawPixel(int x, int y) {
-    setXY(x, y, x, y);
-    setPixel(g_fc);
+    *(g_frontPanelBuffer + y * g_frontPanelWidth + x) = color16to32(g_fc);
 
     g_painted = true;
 }
@@ -491,10 +460,15 @@ void drawRect(int x1, int y1, int x2, int y2) {
 
 void fillRect(int x1, int y1, int x2, int y2, int r) {
     if (r == 0) {
-        setXY(x1, y1, x2, y2);
-        int n = (x2 - x1 + 1) * (y2 - y1 + 1);
-        for (int i = 0; i < n; ++i) {
-            setPixel(g_fc);
+        uint32_t color32 = color16to32(g_fc);
+        uint32_t *dst = g_frontPanelBuffer + y1 * g_frontPanelWidth + x1;
+        int width = x2 - x1 + 1;
+        int height = y2 - y1 + 1;
+        int nl = g_frontPanelWidth - width;
+        for (uint32_t *dstEnd = dst + height * g_frontPanelWidth; dst != dstEnd; dst += nl) {
+            for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++) {
+                *dst = color32;
+            }
         }
     } else {
         // draw rounded rect
@@ -515,44 +489,56 @@ void fillRect(int x1, int y1, int x2, int y2, int r) {
     g_painted = true;
 }
 
-void fillRect(void *dst, int x1, int y1, int x2, int y2) {
-    auto saved = g_frontPanelBuffer;
-    g_frontPanelBuffer = (uint32_t *)dst;
-    setXY(x1, y1, x2, y2);
-    int n = (x2 - x1 + 1) * (y2 - y1 + 1);
-    for (int i = 0; i < n; ++i) {
-        setPixel(g_fc);
+void fillRect(void *dstBuffer, int x1, int y1, int x2, int y2) {
+    uint32_t color32 = color16to32(g_fc);
+    uint32_t *dst = (uint32_t *)dstBuffer + y1 * g_frontPanelWidth + x1;
+    int nl = g_frontPanelWidth - (x2 - x1 + 1);
+    for (int y = y1; y <= y2; y++) {
+        for (int x = x1; x <= x2; x++) {
+            *dst++ = color32;
+        }
+        dst += nl;
     }
-    g_frontPanelBuffer = saved;
 }
 
 void drawHLine(int x, int y, int l) {
-    setXY(x, y, x + l, y);
-    for (int i = 0; i < l + 1; ++i) {
-        setPixel(g_fc);
+    uint32_t color32 = color16to32(g_fc);
+
+    uint32_t *dst = g_frontPanelBuffer + y * g_frontPanelWidth + x;
+    uint32_t *dstEnd = dst + l + 1;
+    while (dst < dstEnd) {
+        *dst++ = color32;
     }
 
     g_painted = true;
 }
 
 void drawVLine(int x, int y, int l) {
-    setXY(x, y, x, y + l);
-    for (int i = 0; i < l + 1; ++i) {
-        setPixel(g_fc);
+    uint32_t color32 = color16to32(g_fc);
+
+    uint32_t *dst = g_frontPanelBuffer + y * g_frontPanelWidth + x;
+    uint32_t *dstEnd = dst + (l + 1) * g_frontPanelWidth;
+
+    while (dst < dstEnd) {
+        *dst = color32;
+        dst += g_frontPanelWidth;
     }
 
     g_painted = true;
 }
 
 void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
-    uint32_t *frontPanelBuffer = g_frontPanelBuffer == g_frontPanelBuffer1 ? g_frontPanelBuffer2 : g_frontPanelBuffer1;
-    
-    setXY(dstx, dsty, dstx + x2 - x1, dsty + y2 - y1);
-    for (int y = y1; y <= y2; y++) {
-        for (int x = x1; x <= x2; x++) {
-            uint8_t *src = (uint8_t *)(g_frontPanelBuffer + y * g_frontPanelWidth + x);
-            uint16_t color = RGB_TO_COLOR(src[2], src[1], src[0]);
-            setPixel(color);
+    int width = x2 - x1 + 1;
+    int height = y2 - y1 + 1;
+
+    uint32_t *src = g_frontPanelBuffer + y1 * g_frontPanelWidth + x1;
+    uint32_t *dst = g_frontPanelBuffer + dsty * g_frontPanelWidth + dstx;
+    int nl = g_frontPanelWidth - width;
+
+    for (int y = y1; y <= y2; y++, src += nl, dst += nl) {
+        for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++, src++) {
+            uint8_t *src8 = (uint8_t *)src;
+            *dst = color16to32(RGB_TO_COLOR(src8[2], src8[1], src8[0]));
         }
     }
 
@@ -594,29 +580,31 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
 }
 
 void drawBitmap(void *bitmapData, int bitmapBpp, int bitmapWidth, int x, int y, int width, int height) {
+    uint32_t *dst = g_frontPanelBuffer + y * g_frontPanelWidth + x;
+    int nlDst = g_frontPanelWidth - width;
+
     if (bitmapBpp == 32) {
-        setXY(x, y, x + width - 1, y + height - 1);
+        uint32_t *src = (uint32_t *)bitmapData;
+        int nlSrc = bitmapWidth - width;
 
         uint32_t pixel;
         uint8_t *pixelAlpha = ((uint8_t *)&pixel) + 3;
 
-        uint32_t *p = (uint32_t *)bitmapData;
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
-                pixel = *p++;
+        for (uint32_t *srcEnd = src + bitmapWidth * height; src != srcEnd; src += nlSrc, dst += nlDst) {
+            for (uint32_t *lineEnd = dst + width; dst != lineEnd; src++, dst++) {
+                pixel = *src;
                 *pixelAlpha = *pixelAlpha * g_opacity / 255;
-                setPixel(blendColor(pixel, *getDst()));
+                *dst = blendColor(pixel, *dst);
             }
-            p += bitmapWidth - width;
         }
     } else {
-        setXY(x, y, x + width - 1, y + height - 1);
-        uint16_t *p = (uint16_t *)bitmapData;
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
-                setPixel(*p++);
+        uint16_t *src = (uint16_t *)bitmapData;
+        int nlSrc = bitmapWidth - width;
+
+        for (uint16_t *srcEnd = src + bitmapWidth * height; src != srcEnd; src += nlSrc, dst += nlDst) {
+            for (uint32_t *lineEnd = dst + width; dst != lineEnd; src++, dst++) {
+                *dst = color16to32(*src);
             }
-            p += bitmapWidth - width;
         }
     }
 

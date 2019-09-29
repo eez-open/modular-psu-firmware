@@ -19,7 +19,6 @@
 #pragma once
 
 #include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/channel.h> // AdcDataType
 
 namespace eez {
 namespace psu {

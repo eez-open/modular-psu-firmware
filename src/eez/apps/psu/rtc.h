@@ -22,33 +22,6 @@ namespace eez {
 namespace psu {
 namespace rtc {
 
-static const uint8_t RD_CONTROL_1 = 0B10010000;
-static const uint8_t WR_CONTROL_1 = 0B00010000;
-static const uint8_t RD_CONTROL_2 = 0B10010001;
-static const uint8_t WR_CONTROL_2 = 0B00010001;
-
-static const uint8_t RD_SECONDS = 0B10010010;
-static const uint8_t WR_SECONDS = 0B00010010;
-static const uint8_t RD_MINUTES = 0B10010011;
-static const uint8_t WR_MINUTES = 0B00010011;
-static const uint8_t RD_HOURS = 0B10010100;
-static const uint8_t WR_HOURS = 0B00010100;
-
-static const uint8_t RD_DAYS = 0B10010101;
-static const uint8_t WR_DAYS = 0B00010101;
-static const uint8_t RD_WEEKDAYS = 0B10010110;
-static const uint8_t WR_WEEKDAYS = 0B00010110;
-static const uint8_t RD_MONTHS = 0B10010111;
-static const uint8_t WR_MONTHS = 0B00010111;
-static const uint8_t RD_YEARS = 0B10011000;
-static const uint8_t WR_YEARS = 0B00011000;
-
-static const uint8_t RD_CLKOUT = 0B10011101;
-static const uint8_t WR_CLKOUT = 0B00011101;
-
-static const uint8_t CONTROL_1_VALUE = 0B00001000;
-static const uint8_t CONTROL_2_VALUE = 0B00000000;
-
 extern TestResult g_testResult;
 
 void init();

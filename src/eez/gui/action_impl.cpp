@@ -18,6 +18,8 @@
 
 #if OPTION_DISPLAY
 
+#include <eez/system.h>
+
 #include <eez/gui/dialogs.h>
 #include <eez/gui/gui.h>
 #include <eez/apps/home/touch_calibration.h>

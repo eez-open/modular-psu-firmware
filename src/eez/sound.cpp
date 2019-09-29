@@ -298,7 +298,7 @@ void startPlay(int iNextToPlayTune, uint32_t tickCount) {
 }
 
 void tick(uint32_t tickCount) {
-#if defined(EEZ_PLATFORM_SIMULATOR)
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
 	if (!g_dev) {
 		return;
 	}

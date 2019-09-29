@@ -21,6 +21,7 @@
 #include <eez/apps/psu/channel_dispatcher.h>
 #include <eez/apps/psu/scpi/psu.h>
 #include <eez/apps/psu/temp_sensor.h>
+#include <eez/apps/psu/ontime.h>
 
 namespace eez {
 namespace psu {

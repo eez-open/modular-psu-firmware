@@ -19,17 +19,17 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <eez/apps/psu/psu.h>
+#include <eez/system.h>
 
 #if OPTION_FAN
 #include <eez/modules/aux_ps/fan.h>
 #endif
 
+#include <eez/apps/psu/psu.h>
 #include <eez/apps/psu/scpi/psu.h>
 #include <eez/apps/psu/serial_psu.h>
 #include <eez/apps/psu/temperature.h>
-#include <eez/apps/psu/watchdog.h>
-#include <eez/system.h>
+#include <eez/apps/psu/ontime.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/platform/stm32/spi.h>
@@ -103,42 +103,13 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugWdog(scpi_t *context) {
-    // TODO migrate to generic firmware
-#ifdef DEBUG
-#if !OPTION_WATCHDOG
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
     return SCPI_RES_ERR;
-#endif
-
-    bool enable;
-    if (!SCPI_ParamBool(context, &enable, TRUE)) {
-        return SCPI_RES_ERR;
-    }
-
-    debug::g_debugWatchdog = enable;
-
-    return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif // DEBUG
 }
 
 scpi_result_t scpi_cmd_debugWdogQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-#ifdef DEBUG
-#if !OPTION_WATCHDOG
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
     return SCPI_RES_ERR;
-#endif
-
-    SCPI_ResultBool(context, debug::g_debugWatchdog);
-
-    return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif // DEBUG
 }
 
 scpi_result_t scpi_cmd_debugOntimeQ(scpi_t *context) {
@@ -225,9 +196,6 @@ scpi_result_t scpi_cmd_debugMeasureVoltage(scpi_t *context) {
 
     while (true) {
         uint32_t tickCount = micros();
-#if OPTION_WATCHDOG
-        watchdog::tick(tickCount);
-#endif
         temperature::tick(tickCount);
 
 #if OPTION_FAN
@@ -269,9 +237,6 @@ scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
 
     while (true) {
         uint32_t tickCount = micros();
-#if OPTION_WATCHDOG        
-        watchdog::tick(tickCount);
-#endif
         temperature::tick(tickCount);
 
 #if OPTION_FAN

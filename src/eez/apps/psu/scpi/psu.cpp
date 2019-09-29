@@ -25,9 +25,6 @@
 #include <eez/apps/psu/serial_psu.h>
 #include <eez/scpi/commands.h>
 #include <eez/sound.h>
-#if OPTION_WATCHDOG
-#include <eez/apps/psu/watchdog.h>
-#endif
 #include <eez/apps/psu/idle.h>
 #include <eez/system.h>
 
@@ -113,10 +110,6 @@ void printError(int_fast16_t err) {
         sprintf(errorOutputBuffer, ": %d,\"%s\"", (int16_t)err, SCPI_ErrorTranslate(err));
         Serial.println(errorOutputBuffer);
     }
-
-#if OPTION_WATCHDOG
-    watchdog::tick(micros());
-#endif
 }
 
 void resultChoiceName(scpi_t *context, scpi_choice_def_t *choice, int tag) {

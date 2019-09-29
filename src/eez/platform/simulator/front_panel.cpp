@@ -27,7 +27,6 @@
 #include <eez/gui/document.h>
 
 #include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/channel.h>
 
 using namespace eez::gui;
 using namespace eez::home;

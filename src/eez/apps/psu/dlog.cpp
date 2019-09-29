@@ -26,7 +26,6 @@
 #include <eez/apps/psu/scpi/psu.h>
 #include <eez/apps/psu/sd_card.h>
 #include <eez/system.h>
-#include <eez/apps/psu/watchdog.h>
 #include <eez/apps/psu/dlog.h>
 
 namespace eez {
@@ -240,11 +239,6 @@ void log(uint32_t tickCount) {
     g_currentTime = g_seconds + g_micros * 1E-6;
 
     if (g_currentTime >= g_nextTime) {
-#if OPTION_WATCHDOG
-        watchdog::disable();
-#endif
-
-
         while (1) {
             g_nextTime = ++g_iSample * g_period;
             if (g_currentTime < g_nextTime || g_nextTime > g_time) {
@@ -308,10 +302,6 @@ void log(uint32_t tickCount) {
                 g_file.sync();
             }
         }
-
-#if OPTION_WATCHDOG
-        watchdog::enable();
-#endif
     }
 }
 

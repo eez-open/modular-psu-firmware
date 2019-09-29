@@ -36,6 +36,7 @@
 #include <eez/apps/psu/gui/psu.h>
 #endif
 #include <eez/apps/psu/io_pins.h>
+#include <eez/apps/psu/ontime.h>
 
 namespace eez {
 namespace psu {
@@ -653,13 +654,6 @@ scpi_result_t scpi_cmd_systemCpuOptionQ(scpi_t *context) {
         strcat(strFeatures, ", ");
     }
     strcat(strFeatures, "Display");
-#endif
-
-#if OPTION_WATCHDOG
-    if (strFeatures[0]) {
-        strcat(strFeatures, ", ");
-    }
-    strcat(strFeatures, "Watchdog");
 #endif
 
     SCPI_ResultText(context, strFeatures);
