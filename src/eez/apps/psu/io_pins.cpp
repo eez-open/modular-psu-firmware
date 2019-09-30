@@ -45,7 +45,7 @@ static struct {
 
 static uint32_t g_toutputPulseStartTickCount;
 
-static bool g_digitalOutputPinState[2] = { false, false };
+static bool g_pinState[NUM_IO_PINS] = { false, false, false, false };
 
 #if defined EEZ_PLATFORM_STM32
 
@@ -121,26 +121,22 @@ uint8_t isOutputEnabled() {
 
 void updateFaultPin(int i) {
     persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
-    int pin = i == 1 ? DOUT1 : DOUT2;
-    int state =
-        (g_lastState.outputFault && outputPin.polarity == io_pins::POLARITY_POSITIVE) ||
-                (!g_lastState.outputFault && outputPin.polarity == io_pins::POLARITY_NEGATIVE)
-            ? 1
-            : 0;
+    int pin = i == 2 ? DOUT1 : DOUT2;
+    int state = (g_lastState.outputFault && outputPin.polarity == io_pins::POLARITY_POSITIVE) || (!g_lastState.outputFault && outputPin.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
     ioPinWrite(pin, state);
     // DebugTrace("FUNCTION_FAULT %d %d", pin, state);
 }
 
 void updateOnCouplePin(int i) {
     persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
-    int pin = i == 1 ? DOUT1 : DOUT2;
-    int state =
-        (g_lastState.outputEnabled && outputPin.polarity == io_pins::POLARITY_POSITIVE) ||
-                (!g_lastState.outputEnabled && outputPin.polarity == io_pins::POLARITY_NEGATIVE)
-            ? 1
-            : 0;
+    int pin = i == 2 ? DOUT1 : DOUT2;
+    int state = (g_lastState.outputEnabled && outputPin.polarity == io_pins::POLARITY_POSITIVE) || (!g_lastState.outputEnabled && outputPin.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
     ioPinWrite(pin, state);
     // DebugTrace("FUNCTION_ON_COUPLE %d %d", pin, state);
+}
+
+void init() {
+    refresh();
 }
 
 void tick(uint32_t tickCount) {
@@ -153,7 +149,7 @@ void tick(uint32_t tickCount) {
         inhibited = (value && inputPin1.polarity == io_pins::POLARITY_POSITIVE) || (!value && inputPin1.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
     }
 
-    persist_conf::IOPin &inputPin2 = persist_conf::devConf2.ioPinInput2;
+    persist_conf::IOPin &inputPin2 = persist_conf::devConf2.ioPins[1];
     if (inputPin2.function == io_pins::FUNCTION_INHIBIT) {
         int value = ioPinRead(EXT_TRIG2);
         inhibited = (value && inputPin2.polarity == io_pins::POLARITY_POSITIVE) || (!value && inputPin2.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
@@ -170,11 +166,10 @@ void tick(uint32_t tickCount) {
     if (g_lastState.toutputPulse) {
         int32_t diff = tickCount - g_toutputPulseStartTickCount;
         if (diff > CONF_TOUTPUT_PULSE_WIDTH_MS * 1000L) {
-            for (int i = 1; i < 3; ++i) {
+            for (int i = 2; i < NUM_IO_PINS; ++i) {
                 persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
                 if (outputPin.function == io_pins::FUNCTION_TOUTPUT) {
-                    ioPinWrite(i == 1 ? DOUT1 : DOUT2,
-                               outputPin.polarity == io_pins::POLARITY_POSITIVE ? 0 : 1);
+                    ioPinWrite(i == 2 ? DOUT1 : DOUT2, outputPin.polarity == io_pins::POLARITY_POSITIVE ? 0 : 1);
                 }
             }
 
@@ -185,7 +180,7 @@ void tick(uint32_t tickCount) {
     enum { UNKNOWN, UNCHANGED, CHANGED } trippedState = UNKNOWN, outputEnabledState = UNKNOWN;
 
     // execute output pins function
-    for (int i = 1; i < 3; ++i) {
+    for (int i = 2; i < NUM_IO_PINS; ++i) {
         persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
 
         if (outputPin.function == io_pins::FUNCTION_FAULT) {
@@ -222,11 +217,10 @@ void tick(uint32_t tickCount) {
 
 void onTrigger() {
     // start trigger output pulse
-    for (int i = 1; i < 3; ++i) {
+    for (int i = 2; i < NUM_IO_PINS; ++i) {
         persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
         if (outputPin.function == io_pins::FUNCTION_TOUTPUT) {
-            ioPinWrite(i == 1 ? DOUT1 : DOUT2,
-                       outputPin.polarity == io_pins::POLARITY_POSITIVE ? 1 : 0);
+            ioPinWrite(i == 2 ? DOUT1 : DOUT2, outputPin.polarity == io_pins::POLARITY_POSITIVE ? 1 : 0);
             g_lastState.toutputPulse = 1;
             g_toutputPulseStartTickCount = micros();
         }
@@ -235,11 +229,11 @@ void onTrigger() {
 
 void refresh() {
     // refresh output pins
-    for (int i = 1; i < 3; ++i) {
+    for (int i = 2; i < NUM_IO_PINS; ++i) {
         persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
 
         if (outputPin.function == io_pins::FUNCTION_NONE) {
-            ioPinWrite(i == 1 ? DOUT1 : DOUT2, 0);
+            ioPinWrite(i == 2 ? DOUT1 : DOUT2, 0);
         } else if (outputPin.function == io_pins::FUNCTION_FAULT) {
             updateFaultPin(i);
         } else if (outputPin.function == io_pins::FUNCTION_ON_COUPLE) {
@@ -252,22 +246,40 @@ bool isInhibited() {
     return g_lastState.inhibited ? true : false;
 }
 
-void setDigitalOutputPinState(int pin, bool state) {
-    g_digitalOutputPinState[pin - 2] = state;
+void setPinState(int pin, bool state) {
+    if (pin >= 2) {
+        g_pinState[pin] = state;
 
-    if (persist_conf::devConf2.ioPins[pin - 2].polarity == io_pins::POLARITY_NEGATIVE) {
-        state = !state;
-    }
+        if (persist_conf::devConf2.ioPins[pin].polarity == io_pins::POLARITY_NEGATIVE) {
+            state = !state;
+        }
 
-    if (pin == 3) {
-        ioPinWrite(DOUT1, state);
-    } else {
-        ioPinWrite(DOUT2, state);
+        if (pin == 2) {
+            ioPinWrite(DOUT1, state);
+        } else {
+            ioPinWrite(DOUT2, state);
+        }
     }
 }
 
-bool getDigitalOutputPinState(int pin) {
-    return g_digitalOutputPinState[pin - 2];
+bool getPinState(int pin) {
+    if (pin < 2) {
+        bool state;
+        if (pin == 0) {
+            state = ioPinRead(EXT_TRIG1) ? true : false;
+            if (persist_conf::devConf2.ioPins[0].polarity == io_pins::POLARITY_NEGATIVE) {
+                state = !state;
+            }
+        } else {
+            state = ioPinRead(EXT_TRIG2) ? true : false;
+            if (persist_conf::devConf2.ioPins[1].polarity == io_pins::POLARITY_NEGATIVE) {
+                state = !state;
+            }
+        }
+        return state;
+    }
+
+    return g_pinState[pin];
 }
 
 } // namespace io_pins

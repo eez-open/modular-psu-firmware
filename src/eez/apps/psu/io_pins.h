@@ -44,6 +44,7 @@ enum Function {
     FUNCTION_TOUTPUT
 };
 
+void init();
 void tick(uint32_t tickCount);
 void onTrigger();
 void refresh();
@@ -51,8 +52,8 @@ void refresh();
 // When PSU is in inhibited state all outputs are disabled and execution of LIST on channels is stopped.
 bool isInhibited();
 
-void setDigitalOutputPinState(int pin, bool state);
-bool getDigitalOutputPinState(int pin);
+void setPinState(int pin, bool state);
+bool getPinState(int pin);
 
 int ioPinRead(int pin);
 void ioPinWrite(int pin, int state);

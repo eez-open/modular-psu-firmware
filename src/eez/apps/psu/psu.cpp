@@ -263,6 +263,8 @@ void init() {
     event_queue::init();
     profile::init();
 
+    io_pins::init();
+
     list::init();
 
 #if OPTION_ETHERNET

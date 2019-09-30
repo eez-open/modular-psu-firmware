@@ -3483,7 +3483,7 @@ void data_io_pins(data::DataOperationEnum operation, data::Cursor &cursor, data:
 void data_io_pins_inhibit_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         persist_conf::IOPin &inputPin1 = persist_conf::devConf2.ioPins[0];
-        persist_conf::IOPin &inputPin2 = persist_conf::devConf2.ioPinInput2;
+        persist_conf::IOPin &inputPin2 = persist_conf::devConf2.ioPins[1];
         if (inputPin1.function == io_pins::FUNCTION_INHIBIT || inputPin2.function == io_pins::FUNCTION_INHIBIT) {
             value = io_pins::isInhibited();
         } else {
@@ -3491,7 +3491,7 @@ void data_io_pins_inhibit_state(data::DataOperationEnum operation, data::Cursor 
         }
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
         persist_conf::IOPin &inputPin1 = persist_conf::devConf2.ioPins[0];
-        persist_conf::IOPin &inputPin2 = persist_conf::devConf2.ioPinInput2;
+        persist_conf::IOPin &inputPin2 = persist_conf::devConf2.ioPins[1];
         value = (inputPin1.function == io_pins::FUNCTION_INHIBIT || inputPin2.function == io_pins::FUNCTION_INHIBIT) && io_pins::isInhibited();
     }
 }
@@ -3506,8 +3506,7 @@ void data_io_pin_polarity(data::DataOperationEnum operation, data::Cursor &curso
     if (operation == data::DATA_OPERATION_GET) {
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page) {
-            value = MakeEnumDefinitionValue(page->m_polarity[cursor.i],
-                                            ENUM_DEFINITION_IO_PINS_POLARITY);
+            value = MakeEnumDefinitionValue(page->m_polarity[cursor.i], ENUM_DEFINITION_IO_PINS_POLARITY);
         }
     }
 }
@@ -3517,13 +3516,31 @@ void data_io_pin_function(data::DataOperationEnum operation, data::Cursor &curso
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page) {
             if (cursor.i < 2) {
-                value = MakeEnumDefinitionValue(page->m_function[cursor.i],
-                                                ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION);
+                value = MakeEnumDefinitionValue(page->m_function[cursor.i], ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION);
             } else {
-                value = MakeEnumDefinitionValue(page->m_function[cursor.i],
-                                                ENUM_DEFINITION_IO_PINS_OUTPUT_FUNCTION);
+                value = MakeEnumDefinitionValue(page->m_function[cursor.i], ENUM_DEFINITION_IO_PINS_OUTPUT_FUNCTION);
             }
         }
+    }
+}
+
+void data_io_pin_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+        if (page) {
+            int pin = cursor.i;
+            int state = io_pins::getPinState(cursor.i);
+            if (page->m_polarity[pin] != persist_conf::devConf2.ioPins[pin].polarity) {
+                state = state ? 0 : 1;
+            }
+            value = state;
+        }
+    }
+}
+
+void data_io_pin_is_output(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = cursor.i < 2 ? 0 : 1;
     }
 }
 

@@ -143,7 +143,7 @@ struct DeviceConfiguration2 {
     uint8_t displayBrightness;
     uint8_t triggerSource;
     float triggerDelay;
-    IOPin ioPins[3];
+    IOPin reserved1[3];
     uint8_t serialBaud;
     uint8_t serialParity;
     uint32_t ethernetIpAddress;
@@ -155,11 +155,11 @@ struct DeviceConfiguration2 {
     uint8_t dstRule;
     uint8_t ethernetMacAddress[6];
     uint8_t displayBackgroundLuminosityStep;
-    IOPin ioPinInput2;
+    IOPin reserved2;
 	uint8_t selectedThemeIndex;
     uint8_t ytGraphUpdateMethod;
     float animationsDuration;
-    uint8_t reserved[16];
+    IOPin ioPins[4];
 };
 
 bool checkBlock(const BlockHeader *block, uint16_t size, uint16_t version);

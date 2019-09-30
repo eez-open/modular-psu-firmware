@@ -829,6 +829,11 @@ void action_io_pin_toggle_polarity() {
     ((SysSettingsIOPinsPage *)getActivePage())->togglePolarity();
 }
 
+void action_io_pin_toggle_state() {
+    int pin = getFoundWidgetAtDown().cursor.i;
+    io_pins::setPinState(pin, io_pins::getPinState(pin) ? 0 : 1);
+}
+
 void action_io_pin_select_function() {
     ((SysSettingsIOPinsPage *)getActivePage())->selectFunction();
 }

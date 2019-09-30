@@ -1356,30 +1356,14 @@ scpi_result_t scpi_cmd_systemDigitalInputDataQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (pin == 1 && persist_conf::devConf2.ioPins[0].function != io_pins::FUNCTION_INPUT) {
+    pin--;
+
+    if (persist_conf::devConf2.ioPins[pin].function != io_pins::FUNCTION_INPUT) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
 
-    if (pin == 2 && persist_conf::devConf2.ioPinInput2.function != io_pins::FUNCTION_INPUT) {
-        SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
-        return SCPI_RES_ERR;
-    }
-
-    bool state;
-    if (pin == 1) {
-        state = io_pins::ioPinRead(EXT_TRIG1) ? true : false;
-        if (persist_conf::devConf2.ioPins[0].polarity == io_pins::POLARITY_NEGATIVE) {
-            state = !state;
-        }
-    } else {
-        state = io_pins::ioPinRead(EXT_TRIG2) ? true : false;
-        if (persist_conf::devConf2.ioPinInput2.polarity == io_pins::POLARITY_NEGATIVE) {
-            state = !state;
-        }
-    }
-
-    SCPI_ResultInt(context, state ? 1 : 0);
+    SCPI_ResultInt(context, io_pins::getPinState(pin) ? 1 : 0);
 
     return SCPI_RES_OK;
 }
@@ -1396,7 +1380,9 @@ scpi_result_t scpi_cmd_systemDigitalOutputData(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (persist_conf::devConf2.ioPins[pin - 2].function != io_pins::FUNCTION_OUTPUT) {
+    pin--;
+
+    if (persist_conf::devConf2.ioPins[pin].function != io_pins::FUNCTION_OUTPUT) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
@@ -1406,7 +1392,7 @@ scpi_result_t scpi_cmd_systemDigitalOutputData(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    io_pins::setDigitalOutputPinState(pin, state);
+    io_pins::setPinState(pin, state);
 
     return SCPI_RES_OK;
 }
@@ -1418,17 +1404,19 @@ scpi_result_t scpi_cmd_systemDigitalOutputDataQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (pin != 2 && pin != 3) {
+    if (pin != 3 && pin != 4) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }
 
-    if (persist_conf::devConf2.ioPins[pin - 1].function != io_pins::FUNCTION_OUTPUT) {
+    pin--;
+
+    if (persist_conf::devConf2.ioPins[pin].function != io_pins::FUNCTION_OUTPUT) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, io_pins::getDigitalOutputPinState(pin));
+    SCPI_ResultBool(context, io_pins::getPinState(pin));
 
     return SCPI_RES_OK;
 }
@@ -1447,7 +1435,7 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
     // TODO migrate to generic firmware
     int32_t pin;
     SCPI_CommandNumbers(context, &pin, 1, 1);
-    if (pin < 1 || pin > 3) {
+    if (pin < 1 || pin > 4) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
@@ -1457,7 +1445,9 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (pin == 1) {
+    pin--;
+
+    if (pin < 2) {
         if (function != io_pins::FUNCTION_NONE && function != io_pins::FUNCTION_INPUT &&
             function != io_pins::FUNCTION_INHIBIT && function != io_pins::FUNCTION_TINPUT) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
@@ -1472,7 +1462,7 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
         }
     }
 
-    persist_conf::devConf2.ioPins[pin - 1].function = function;
+    persist_conf::devConf2.ioPins[pin].function = function;
 
     io_pins::refresh();
 
@@ -1483,12 +1473,14 @@ scpi_result_t scpi_cmd_systemDigitalPinFunctionQ(scpi_t *context) {
     // TODO migrate to generic firmware
     int32_t pin;
     SCPI_CommandNumbers(context, &pin, 1, 1);
-    if (pin < 1 || pin > 3) {
+    if (pin < 1 || pin > 4) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
 
-    resultChoiceName(context, functionChoice, persist_conf::devConf2.ioPins[pin - 1].function);
+    pin--;
+
+    resultChoiceName(context, functionChoice, persist_conf::devConf2.ioPins[pin].function);
 
     return SCPI_RES_OK;
 }
@@ -1501,17 +1493,19 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarity(scpi_t *context) {
     // TODO migrate to generic firmware
     int32_t pin;
     SCPI_CommandNumbers(context, &pin, 1, 1);
-    if (pin < 1 || pin > 3) {
+    if (pin < 1 || pin > 4) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
+
+    pin--;
 
     int32_t polarity;
     if (!SCPI_ParamChoice(context, polarityChoice, &polarity, true)) {
         return SCPI_RES_ERR;
     }
 
-    persist_conf::devConf2.ioPins[pin - 1].polarity = polarity;
+    persist_conf::devConf2.ioPins[pin].polarity = polarity;
 
     io_pins::refresh();
 
@@ -1522,12 +1516,14 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarityQ(scpi_t *context) {
     // TODO migrate to generic firmware
     int32_t pin;
     SCPI_CommandNumbers(context, &pin, 1, 1);
-    if (pin < 1 || pin > 3) {
+    if (pin < 1 || pin > 4) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
 
-    resultChoiceName(context, polarityChoice, persist_conf::devConf2.ioPins[pin - 1].polarity);
+    pin--;
+
+    resultChoiceName(context, polarityChoice, persist_conf::devConf2.ioPins[pin].polarity);
 
     return SCPI_RES_OK;
 }

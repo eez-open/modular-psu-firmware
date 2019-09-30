@@ -103,50 +103,50 @@ void BSP_SDRAM_Initialization_sequence(uint32_t RefreshCount) {
 }
 
 #define SDRAM_TEST_LOOPS 1
-#define SDRAM_TEST_STEP 64
+#define SDRAM_TEST_STEP 1024
 
 bool SDRAM_Test() {
    for (unsigned int seedValue = 0; seedValue < SDRAM_TEST_LOOPS; ++seedValue) {
-       {
-           uint32_t *p;
-
-           srand(seedValue);
-           p = (uint32_t *)0xc0000000;
-
-           for (int i = 0; i < 8 * 1024 * 1024 / 4; i += SDRAM_TEST_STEP) {
-               p[i] = (uint32_t)rand();
-           }
-
-           srand(seedValue);
-           p = (uint32_t *)0xc0000000;
-
-           for (int i = 0; i < 8 * 1024 * 1024 / 4; i += SDRAM_TEST_STEP) {
-               if (p[i] != (uint32_t)rand()) {
-                   return false;
-               }
-           }
-       }
-
-       {
-           uint16_t *p;
-
-           srand(seedValue);
-           p = (uint16_t *)0xc0000000;
-
-           for (int i = 0; i < 8 * 1024 * 1024 / 2; i += SDRAM_TEST_STEP) {
-               p[i] = (uint16_t)rand();
-           }
-
-           srand(seedValue);
-           p = (uint16_t *)0xc0000000;
-
-           for (int i = 0; i < 8 * 1024 * 1024 / 2; i += SDRAM_TEST_STEP) {
-               if (p[i] != (uint16_t)rand()) {
-                   return false;
-               }
-           }
-       }
-
+//       {
+//           uint32_t *p;
+//
+//           srand(seedValue);
+//           p = (uint32_t *)0xc0000000;
+//
+//           for (int i = 0; i < 8 * 1024 * 1024 / 4; i += SDRAM_TEST_STEP) {
+//               p[i] = (uint32_t)rand();
+//           }
+//
+//           srand(seedValue);
+//           p = (uint32_t *)0xc0000000;
+//
+//           for (int i = 0; i < 8 * 1024 * 1024 / 4; i += SDRAM_TEST_STEP) {
+//               if (p[i] != (uint32_t)rand()) {
+//                   return false;
+//               }
+//           }
+//       }
+//
+//       {
+//           uint16_t *p;
+//
+//           srand(seedValue);
+//           p = (uint16_t *)0xc0000000;
+//
+//           for (int i = 0; i < 8 * 1024 * 1024 / 2; i += SDRAM_TEST_STEP) {
+//               p[i] = (uint16_t)rand();
+//           }
+//
+//           srand(seedValue);
+//           p = (uint16_t *)0xc0000000;
+//
+//           for (int i = 0; i < 8 * 1024 * 1024 / 2; i += SDRAM_TEST_STEP) {
+//               if (p[i] != (uint16_t)rand()) {
+//                   return false;
+//               }
+//           }
+//       }
+//
        {
            uint8_t *p;
 

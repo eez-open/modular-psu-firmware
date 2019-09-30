@@ -676,7 +676,7 @@ void SysSettingsTriggerPage::set() {
         }
 
         if (m_source == trigger::SOURCE_PIN2) {
-            persist_conf::devConf2.ioPinInput2.function = io_pins::FUNCTION_TINPUT;
+            persist_conf::devConf2.ioPins[1].function = io_pins::FUNCTION_TINPUT;
         }
 
         persist_conf::saveDevice2();
@@ -689,23 +689,15 @@ void SysSettingsTriggerPage::set() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void SysSettingsIOPinsPage::pageAlloc() {
-    m_polarityOrig[0] = m_polarity[0] = (io_pins::Polarity)persist_conf::devConf2.ioPins[0].polarity;
-    m_functionOrig[0] = m_function[0] = (io_pins::Function)persist_conf::devConf2.ioPins[0].function;
-
-    m_polarityOrig[1] = m_polarity[1] = (io_pins::Polarity)persist_conf::devConf2.ioPinInput2.polarity;
-    m_functionOrig[1] = m_function[1] = (io_pins::Function)persist_conf::devConf2.ioPinInput2.function;
-
-    m_polarityOrig[2] = m_polarity[2] = (io_pins::Polarity)persist_conf::devConf2.ioPins[1].polarity;
-    m_functionOrig[2] = m_function[2] = (io_pins::Function)persist_conf::devConf2.ioPins[1].function;
-
-    m_polarityOrig[3] = m_polarity[3] = (io_pins::Polarity)persist_conf::devConf2.ioPins[2].polarity;
-    m_functionOrig[3] = m_function[3] = (io_pins::Function)persist_conf::devConf2.ioPins[2].function;
+    for (int i = 0; i < NUM_IO_PINS; i++) {
+        m_polarityOrig[i] = m_polarity[i] = (io_pins::Polarity)persist_conf::devConf2.ioPins[i].polarity;
+        m_functionOrig[i] = m_function[i] = (io_pins::Function)persist_conf::devConf2.ioPins[i].function;
+    }
 }
 
 void SysSettingsIOPinsPage::togglePolarity() {
     int i = getFoundWidgetAtDown().cursor.i;
-    m_polarity[i] = m_polarity[i] == io_pins::POLARITY_NEGATIVE ? io_pins::POLARITY_POSITIVE
-                                                                : io_pins::POLARITY_NEGATIVE;
+    m_polarity[i] = m_polarity[i] == io_pins::POLARITY_NEGATIVE ? io_pins::POLARITY_POSITIVE : io_pins::POLARITY_NEGATIVE;
 }
 
 void SysSettingsIOPinsPage::onFunctionSet(uint8_t value) {
@@ -733,17 +725,10 @@ int SysSettingsIOPinsPage::getDirty() {
 
 void SysSettingsIOPinsPage::set() {
     if (getDirty()) {
-		persist_conf::devConf2.ioPins[0].polarity = m_polarity[0];
-		persist_conf::devConf2.ioPins[0].function = m_function[0];
-
-		persist_conf::devConf2.ioPinInput2.polarity = m_polarity[1];
-		persist_conf::devConf2.ioPinInput2.function = m_function[1];
-
-		persist_conf::devConf2.ioPins[1].polarity = m_polarity[2];
-		persist_conf::devConf2.ioPins[1].function = m_function[2];
-
-		persist_conf::devConf2.ioPins[2].polarity = m_polarity[3];
-		persist_conf::devConf2.ioPins[2].function = m_function[3];
+        for (int i = 0; i < NUM_IO_PINS; i++) {
+            persist_conf::devConf2.ioPins[i].polarity = m_polarity[i];
+            persist_conf::devConf2.ioPins[i].function = m_function[i];
+        }
 
         if (persist_conf::saveDevice2()) {
             popPage();

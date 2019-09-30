@@ -87,7 +87,7 @@ scpi_result_t scpi_cmd_triggerSequenceSource(scpi_t *context) {
     }
 
     if (source == trigger::SOURCE_PIN2) {
-        persist_conf::devConf2.ioPinInput2.function = io_pins::FUNCTION_TINPUT;
+        persist_conf::devConf2.ioPins[1].function = io_pins::FUNCTION_TINPUT;
     }
 
     persist_conf::saveDevice2();
@@ -228,7 +228,7 @@ scpi_result_t scpi_cmd_triggerDlogSource(scpi_t *context) {
     }
 
     if (source == trigger::SOURCE_PIN2) {
-        persist_conf::devConf2.ioPinInput2.function = io_pins::FUNCTION_TINPUT;
+        persist_conf::devConf2.ioPins[1].function = io_pins::FUNCTION_TINPUT;
     }
 
     return SCPI_RES_OK;
