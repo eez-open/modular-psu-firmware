@@ -3536,21 +3536,25 @@ void data_io_pin_state(data::DataOperationEnum operation, data::Cursor &cursor, 
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page) {
             int pin = cursor.i;
-            int state = io_pins::getPinState(cursor.i);
-            if (page->m_polarity[pin] != persist_conf::devConf2.ioPins[pin].polarity) {
-                state = state ? 0 : 1;
-            }
-            value = state;
-        }
-    }
-}
+            if (page->m_function[pin] == io_pins::FUNCTION_NONE) {
+                value = 4; // Unassigned
+            } else {
+                int state = io_pins::getPinState(cursor.i);
 
-void data_io_pin_is_output(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
-        if (page) {
-            int pin = cursor.i;
-            value = pin >= 2 && page->m_function[pin] == io_pins::FUNCTION_OUTPUT && persist_conf::devConf2.ioPins[pin].function == io_pins::FUNCTION_OUTPUT ? 1 : 0;
+                if (page->m_polarity[pin] != persist_conf::devConf2.ioPins[pin].polarity) {
+                    state = state ? 0 : 1;
+                }
+
+                if (pin >= 2 && page->m_function[pin] == io_pins::FUNCTION_OUTPUT && persist_conf::devConf2.ioPins[pin].function == io_pins::FUNCTION_OUTPUT) {
+                    if (state) {
+                        value = 3; // Active_Changeable
+                    } else {
+                        value = 2; // Inactive_Changeable
+                    }
+                } else {
+                    value = state; // Active or Inactive
+                }
+            }
         }
     }
 }

@@ -72,27 +72,6 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     osMessagePut(eez::psu::g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_SPI_IRQ, slotIndex), 0);
 }
 
-void initRxTxDin1TxDout1() {
-    // MX_UART7_Init();
-    // HAL_UART_DeInit(&huart7);
-
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    // Configure DIN1 GPIO pin
-    GPIO_InitStruct.Pin = UART_RX_DIN1_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(UART_RX_DIN1_GPIO_Port, &GPIO_InitStruct);
-
-    // Configure DOUT1 GPIO pin
-    GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
-    HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, DOUT2_Pin, GPIO_PIN_RESET);
-}
-
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -191,8 +170,6 @@ int main(int argc, char **argv) {
     MX_TIM6_Init();
     MX_TIM8_Init();
     MX_TIM12_Init();
-
-    initRxTxDin1TxDout1();
 #endif
 
 #ifdef __EMSCRIPTEN__

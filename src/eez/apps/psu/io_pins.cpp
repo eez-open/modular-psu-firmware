@@ -20,6 +20,7 @@
 
 #if defined EEZ_PLATFORM_STM32
 #include <main.h>
+#include <gpio.h>
 #endif
 
 #include <eez/apps/psu/psu.h>
@@ -119,24 +120,38 @@ uint8_t isOutputEnabled() {
     return 0;
 }
 
-void updateFaultPin(int i) {
-    persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
-    int pin = i == 2 ? DOUT1 : DOUT2;
-    int state = (g_lastState.outputFault && outputPin.polarity == io_pins::POLARITY_POSITIVE) || (!g_lastState.outputFault && outputPin.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
-    ioPinWrite(pin, state);
-    // DebugTrace("FUNCTION_FAULT %d %d", pin, state);
+void initInputPin(int pin) {
+#if defined EEZ_PLATFORM_STM32
+    GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+    persist_conf::IOPin &ioPin = persist_conf::devConf2.ioPins[pin];
+
+    GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = ioPin.polarity == io_pins::POLARITY_POSITIVE ? GPIO_PULLDOWN : GPIO_PULLUP;
+    HAL_GPIO_Init(pin == 0 ? UART_RX_DIN1_GPIO_Port : DIN2_GPIO_Port, &GPIO_InitStruct);
+#endif
 }
 
-void updateOnCouplePin(int i) {
-    persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
-    int pin = i == 2 ? DOUT1 : DOUT2;
-    int state = (g_lastState.outputEnabled && outputPin.polarity == io_pins::POLARITY_POSITIVE) || (!g_lastState.outputEnabled && outputPin.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
-    ioPinWrite(pin, state);
-    // DebugTrace("FUNCTION_ON_COUPLE %d %d", pin, state);
+void initOutputPins() {
+#if defined EEZ_PLATFORM_STM32
+	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+    // Configure DOUT1 GPIO pin
+    GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, DOUT2_Pin, GPIO_PIN_RESET);
+
+    // DOUT2 is already initialized
+#endif
 }
 
 void init() {
-    refresh();
+    initOutputPins();
+    refresh(); // this will initialize input pins
 }
 
 void tick(uint32_t tickCount) {
@@ -166,10 +181,10 @@ void tick(uint32_t tickCount) {
     if (g_lastState.toutputPulse) {
         int32_t diff = tickCount - g_toutputPulseStartTickCount;
         if (diff > CONF_TOUTPUT_PULSE_WIDTH_MS * 1000L) {
-            for (int i = 2; i < NUM_IO_PINS; ++i) {
-                persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
+            for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
+                persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[pin];
                 if (outputPin.function == io_pins::FUNCTION_TOUTPUT) {
-                    ioPinWrite(i == 2 ? DOUT1 : DOUT2, outputPin.polarity == io_pins::POLARITY_POSITIVE ? 0 : 1);
+                    setPinState(pin, false);
                 }
             }
 
@@ -180,8 +195,8 @@ void tick(uint32_t tickCount) {
     enum { UNKNOWN, UNCHANGED, CHANGED } trippedState = UNKNOWN, outputEnabledState = UNKNOWN;
 
     // execute output pins function
-    for (int i = 2; i < NUM_IO_PINS; ++i) {
-        persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
+    for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
+        persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[pin];
 
         if (outputPin.function == io_pins::FUNCTION_FAULT) {
             if (trippedState == UNKNOWN) {
@@ -195,7 +210,7 @@ void tick(uint32_t tickCount) {
             }
 
             if (trippedState == CHANGED) {
-                updateFaultPin(i);
+                setPinState(pin, g_lastState.outputFault);
             }
         } else if (outputPin.function == io_pins::FUNCTION_ON_COUPLE) {
             if (outputEnabledState == UNKNOWN) {
@@ -209,7 +224,7 @@ void tick(uint32_t tickCount) {
             }
 
             if (outputEnabledState == CHANGED) {
-                updateOnCouplePin(i);
+                setPinState(pin, g_lastState.outputEnabled);
             }
         }
     }
@@ -217,10 +232,10 @@ void tick(uint32_t tickCount) {
 
 void onTrigger() {
     // start trigger output pulse
-    for (int i = 2; i < NUM_IO_PINS; ++i) {
-        persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
+    for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
+        persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[pin];
         if (outputPin.function == io_pins::FUNCTION_TOUTPUT) {
-            ioPinWrite(i == 2 ? DOUT1 : DOUT2, outputPin.polarity == io_pins::POLARITY_POSITIVE ? 1 : 0);
+            setPinState(pin, true);
             g_lastState.toutputPulse = 1;
             g_toutputPulseStartTickCount = micros();
         }
@@ -229,17 +244,20 @@ void onTrigger() {
 
 void refresh() {
     // refresh output pins
-    for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
-        persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[pin];
-
-        if (outputPin.function == io_pins::FUNCTION_NONE) {
-            ioPinWrite(pin == 2 ? DOUT1 : DOUT2, 0);
-        } else if (outputPin.function == io_pins::FUNCTION_OUTPUT) {
-        	setPinState(pin, g_pinState[pin]);
-        } else if (outputPin.function == io_pins::FUNCTION_FAULT) {
-            updateFaultPin(pin);
-        } else if (outputPin.function == io_pins::FUNCTION_ON_COUPLE) {
-            updateOnCouplePin(pin);
+    for (int pin = 0; pin < NUM_IO_PINS; ++pin) {
+        if (pin < 2) {
+        	initInputPin(pin);
+        } else {
+            persist_conf::IOPin &ioPin = persist_conf::devConf2.ioPins[pin];
+            if (ioPin.function == io_pins::FUNCTION_NONE) {
+                setPinState(pin, false);
+            } else if (ioPin.function == io_pins::FUNCTION_OUTPUT) {
+                setPinState(pin, g_pinState[pin]);
+            } else if (ioPin.function == io_pins::FUNCTION_FAULT) {
+                setPinState(pin, g_lastState.outputFault);
+            } else if (ioPin.function == io_pins::FUNCTION_ON_COUPLE) {
+                setPinState(pin, g_lastState.outputEnabled);
+            }
         }
     }
 }
@@ -256,11 +274,7 @@ void setPinState(int pin, bool state) {
             state = !state;
         }
 
-        if (pin == 2) {
-            ioPinWrite(DOUT1, state);
-        } else {
-            ioPinWrite(DOUT2, state);
-        }
+        ioPinWrite(pin == 2 ? DOUT1 : DOUT2, state);
     }
 }
 
