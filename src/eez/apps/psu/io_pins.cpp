@@ -229,15 +229,17 @@ void onTrigger() {
 
 void refresh() {
     // refresh output pins
-    for (int i = 2; i < NUM_IO_PINS; ++i) {
-        persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[i];
+    for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
+        persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[pin];
 
         if (outputPin.function == io_pins::FUNCTION_NONE) {
-            ioPinWrite(i == 2 ? DOUT1 : DOUT2, 0);
+            ioPinWrite(pin == 2 ? DOUT1 : DOUT2, 0);
+        } else if (outputPin.function == io_pins::FUNCTION_OUTPUT) {
+        	setPinState(pin, g_pinState[pin]);
         } else if (outputPin.function == io_pins::FUNCTION_FAULT) {
-            updateFaultPin(i);
+            updateFaultPin(pin);
         } else if (outputPin.function == io_pins::FUNCTION_ON_COUPLE) {
-            updateOnCouplePin(i);
+            updateOnCouplePin(pin);
         }
     }
 }

@@ -3540,7 +3540,8 @@ void data_io_pin_state(data::DataOperationEnum operation, data::Cursor &cursor, 
 
 void data_io_pin_is_output(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = cursor.i < 2 ? 0 : 1;
+        int pin = cursor.i;
+        value = pin >= 2 && persist_conf::devConf2.ioPins[pin].function == io_pins::FUNCTION_OUTPUT ? 1 : 0;
     }
 }
 
