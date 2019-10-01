@@ -26,13 +26,10 @@ namespace eez {
 namespace psu {
 namespace gui {
 
-extern int g_selectedProfileLocation;
-
 class UserProfilesPage : public Page {
   public:
-    void pageAlloc();
-    void pageFree();
-
+    static int getSelectedProfileLocation();
+    
     void showProfile();
 
     void toggleAutoRecall();

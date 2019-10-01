@@ -38,16 +38,13 @@ namespace eez {
 namespace psu {
 namespace gui {
 
-int g_selectedProfileLocation;
+static int g_selectedProfileLocation = -1;
 
-void UserProfilesPage::pageAlloc() {
-    if (getActivePageId() != PAGE_ID_USER_PROFILE_0_SETTINGS && getActivePageId() != PAGE_ID_USER_PROFILE_SETTINGS) {
-        g_selectedProfileLocation = -1;
+int UserProfilesPage::getSelectedProfileLocation() {
+    if (getActivePageId() == PAGE_ID_USER_PROFILE_0_SETTINGS || getActivePageId() == PAGE_ID_USER_PROFILE_SETTINGS) {
+        return g_selectedProfileLocation;
     }
-}
-
-void UserProfilesPage::pageFree() {
-    g_selectedProfileLocation = -1;
+    return -1;
 }
 
 void UserProfilesPage::showProfile() {

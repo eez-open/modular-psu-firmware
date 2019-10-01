@@ -2650,16 +2650,18 @@ void data_profiles_auto_recall_location(data::DataOperationEnum operation, data:
 
 void data_profile_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (g_selectedProfileLocation != -1) {
-            value = profile::isValid(g_selectedProfileLocation);
+        int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
+        if (selectedProfileLocation != -1) {
+            value = profile::isValid(selectedProfileLocation);
         }
     }
 }
 
 void data_profile_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (g_selectedProfileLocation != -1) {
-            value = data::Value(g_selectedProfileLocation, VALUE_TYPE_USER_PROFILE_LABEL);
+        int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
+        if (selectedProfileLocation != -1) {
+            value = data::Value(selectedProfileLocation, VALUE_TYPE_USER_PROFILE_LABEL);
         } else if (cursor.i >= 0) {
             value = data::Value(cursor.i, VALUE_TYPE_USER_PROFILE_LABEL);
         }
@@ -2668,8 +2670,9 @@ void data_profile_label(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_profile_remark(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (g_selectedProfileLocation != -1) {
-            profile::Parameters *profile = profile::load(g_selectedProfileLocation);
+        int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
+        if (selectedProfileLocation != -1) {
+            profile::Parameters *profile = profile::load(selectedProfileLocation);
             if (profile) {
                 value = data::Value(profile->name);
             }
@@ -2681,16 +2684,18 @@ void data_profile_remark(data::DataOperationEnum operation, data::Cursor &cursor
 
 void data_profile_is_auto_recall_location(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (g_selectedProfileLocation != -1) {
-            value = persist_conf::getProfileAutoRecallLocation() == g_selectedProfileLocation;
+        int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
+        if (selectedProfileLocation != -1) {
+            value = persist_conf::getProfileAutoRecallLocation() == selectedProfileLocation;
         }
     }
 }
 
 void data_profile_channel_u_set(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (g_selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
-            profile::Parameters *profile = profile::load(g_selectedProfileLocation);
+        int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
+        if (selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
+            profile::Parameters *profile = profile::load(selectedProfileLocation);
             if (profile) {
                 value = MakeValue(profile->channels[cursor.i].u_set, UNIT_VOLT);
             }
@@ -2700,8 +2705,9 @@ void data_profile_channel_u_set(data::DataOperationEnum operation, data::Cursor 
 
 void data_profile_channel_i_set(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (g_selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
-            profile::Parameters *profile = profile::load(g_selectedProfileLocation);
+        int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
+        if (selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
+            profile::Parameters *profile = profile::load(selectedProfileLocation);
             if (profile) {
                 value = MakeValue(profile->channels[cursor.i].i_set, UNIT_AMPER);
             }
@@ -2711,8 +2717,9 @@ void data_profile_channel_i_set(data::DataOperationEnum operation, data::Cursor 
 
 void data_profile_channel_output_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (g_selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
-            profile::Parameters *profile = profile::load(g_selectedProfileLocation);
+        int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
+        if (selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
+            profile::Parameters *profile = profile::load(selectedProfileLocation);
             if (profile) {
                 value = (int)profile->channels[cursor.i].flags.output_enabled;
             }
