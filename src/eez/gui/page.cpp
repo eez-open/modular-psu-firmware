@@ -183,9 +183,7 @@ bool ToastMessagePage::onEncoderClicked() {
 }
 
 void ToastMessagePage::refresh() {
-    const Style *style = getStyle(
-        type == INFO_TOAST ? STYLE_ID_INFO_ALERT :
-        STYLE_ID_ERROR_ALERT);
+    const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
 
     font::Font font = styleGetFont(style);
 

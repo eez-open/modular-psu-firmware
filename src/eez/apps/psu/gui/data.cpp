@@ -3540,8 +3540,11 @@ void data_io_pin_state(data::DataOperationEnum operation, data::Cursor &cursor, 
 
 void data_io_pin_is_output(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int pin = cursor.i;
-        value = pin >= 2 && persist_conf::devConf2.ioPins[pin].function == io_pins::FUNCTION_OUTPUT ? 1 : 0;
+        SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+        if (page) {
+            int pin = cursor.i;
+            value = pin >= 2 && page->m_function[pin] == io_pins::FUNCTION_OUTPUT && persist_conf::devConf2.ioPins[pin].function == io_pins::FUNCTION_OUTPUT ? 1 : 0;
+        }
     }
 }
 
