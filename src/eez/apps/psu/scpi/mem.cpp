@@ -124,10 +124,7 @@ scpi_result_t scpi_cmd_memoryStateRecallAuto(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!persist_conf::enableProfileAutoRecall(enable)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    persist_conf::enableProfileAutoRecall(enable);
 
     return SCPI_RES_OK;
 }
@@ -151,10 +148,7 @@ scpi_result_t scpi_cmd_memoryStateRecallSelect(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!persist_conf::setProfileAutoRecallLocation(location)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    persist_conf::setProfileAutoRecallLocation(location);
 
     return SCPI_RES_OK;
 }

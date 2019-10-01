@@ -54,16 +54,12 @@ void UserProfilesPage::showProfile() {
 
 void UserProfilesPage::toggleAutoRecall() {
     bool enable = persist_conf::isProfileAutoRecallEnabled() ? false : true;
-    if (!persist_conf::enableProfileAutoRecall(enable)) {
-        errorMessage("Failed!");
-    }
+    persist_conf::enableProfileAutoRecall(enable);
 }
 
 void UserProfilesPage::toggleIsAutoRecallLocation() {
     if (profile::isValid(g_selectedProfileLocation)) {
-        if (!persist_conf::setProfileAutoRecallLocation(g_selectedProfileLocation)) {
-            errorMessage("Failed!");
-        }
+        persist_conf::setProfileAutoRecallLocation(g_selectedProfileLocation);
     }
 }
 

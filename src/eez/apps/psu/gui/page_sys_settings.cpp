@@ -281,7 +281,7 @@ void SysSettingsDateTimePage::doSet() {
     }
 
     popPage();
-    infoMessage("Date and time settings saved!");
+    
     return;
 }
 
@@ -434,37 +434,25 @@ void SysSettingsEthernetStaticPage::set() {
 
 void SysSettingsProtectionsPage::toggleOutputProtectionCouple() {
     if (persist_conf::isOutputProtectionCoupleEnabled()) {
-        if (persist_conf::enableOutputProtectionCouple(false)) {
-            infoMessage("Output protection decoupled!");
-        }
+        persist_conf::enableOutputProtectionCouple(false);
     } else {
-        if (persist_conf::enableOutputProtectionCouple(true)) {
-            infoMessage("Output protection coupled!");
-        }
+        persist_conf::enableOutputProtectionCouple(true);
     }
 }
 
 void SysSettingsProtectionsPage::toggleShutdownWhenProtectionTripped() {
     if (persist_conf::isShutdownWhenProtectionTrippedEnabled()) {
-        if (persist_conf::enableShutdownWhenProtectionTripped(false)) {
-            infoMessage("Shutdown when tripped disabled!");
-        }
+        persist_conf::enableShutdownWhenProtectionTripped(false);
     } else {
-        if (persist_conf::enableShutdownWhenProtectionTripped(true)) {
-            infoMessage("Shutdown when tripped enabled!");
-        }
+        persist_conf::enableShutdownWhenProtectionTripped(true);
     }
 }
 
 void SysSettingsProtectionsPage::toggleForceDisablingAllOutputsOnPowerUp() {
     if (persist_conf::isForceDisablingAllOutputsOnPowerUpEnabled()) {
-        if (persist_conf::enableForceDisablingAllOutputsOnPowerUp(false)) {
-            infoMessage("Force disabling outputs disabled!");
-        }
+        persist_conf::enableForceDisablingAllOutputsOnPowerUp(false);
     } else {
-        if (persist_conf::enableForceDisablingAllOutputsOnPowerUp(true)) {
-            infoMessage("Force disabling outputs enabled!");
-        }
+        persist_conf::enableForceDisablingAllOutputsOnPowerUp(true);
     }
 }
 
@@ -566,25 +554,17 @@ void SysSettingsAuxOtpPage::clear() {
 
 void SysSettingsSoundPage::toggleSound() {
     if (persist_conf::isSoundEnabled()) {
-        if (persist_conf::enableSound(false)) {
-            infoMessage("Sound disabled!");
-        }
+        persist_conf::enableSound(false);
     } else {
-        if (persist_conf::enableSound(true)) {
-            infoMessage("Sound enabled!");
-        }
+        persist_conf::enableSound(true);
     }
 }
 
 void SysSettingsSoundPage::toggleClickSound() {
     if (persist_conf::isClickSoundEnabled()) {
-        if (persist_conf::enableClickSound(false)) {
-            infoMessage("Click sound disabled!");
-        }
+        persist_conf::enableClickSound(false);
     } else {
-        if (persist_conf::enableClickSound(true)) {
-            infoMessage("Click sound enabled!");
-        }
+        persist_conf::enableClickSound(true);
     }
 }
 
@@ -682,7 +662,8 @@ void SysSettingsTriggerPage::set() {
         persist_conf::saveDevice2();
 
         popPage();
-        infoMessage("Trigger settings saved!");
+        
+        // infoMessage("Trigger settings saved!");
     }
 }
 
@@ -730,10 +711,9 @@ void SysSettingsIOPinsPage::set() {
             persist_conf::devConf2.ioPins[i].function = m_function[i];
         }
 
-        if (persist_conf::saveDevice2()) {
-            popPage();
-            infoMessage("Digital I/O pin settings saved!");
-        }
+        persist_conf::saveDevice2();
+
+        popPage();
 
         io_pins::refresh();
     }

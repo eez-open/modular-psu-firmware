@@ -167,24 +167,24 @@ uint32_t calcChecksum(const BlockHeader *block, uint16_t size);
 
 extern DeviceConfiguration devConf;
 void loadDevice();
-bool saveDevice();
+void saveDevice();
 
 extern DeviceConfiguration2 devConf2;
 void loadDevice2();
-bool saveDevice2();
+void saveDevice2();
 
 bool isSystemPasswordValid(const char *new_password, size_t new_password_len, int16_t &err);
-bool changeSystemPassword(const char *new_password, size_t new_password_len);
+void changeSystemPassword(const char *new_password, size_t new_password_len);
 
 bool isCalibrationPasswordValid(const char *new_password, size_t new_password_len, int16_t &err);
-bool changeCalibrationPassword(const char *new_password, size_t new_password_len);
+void changeCalibrationPassword(const char *new_password, size_t new_password_len);
 
-bool changeSerial(const char *newSerialNumber, size_t newSerialNumberLength);
+void changeSerial(const char *newSerialNumber, size_t newSerialNumberLength);
 
-bool enableSound(bool enable);
+void enableSound(bool enable);
 bool isSoundEnabled();
 
-bool enableClickSound(bool enable);
+void enableClickSound(bool enable);
 bool isClickSoundEnabled();
 
 bool enableEthernet(bool enable);
@@ -199,9 +199,9 @@ void writeSystemTime(uint8_t hour, uint8_t minute, uint8_t second, unsigned dst)
 void writeSystemDateTime(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute,
                          uint8_t second, unsigned dst);
 
-bool enableProfileAutoRecall(bool enable);
+void enableProfileAutoRecall(bool enable);
 bool isProfileAutoRecallEnabled();
-bool setProfileAutoRecallLocation(int location);
+void setProfileAutoRecallLocation(int location);
 int getProfileAutoRecallLocation();
 
 void setChannelsViewMode(unsigned int viewMode);
@@ -219,22 +219,22 @@ bool saveProfile(int location, profile::Parameters *profile);
 uint32_t readTotalOnTime(int type);
 bool writeTotalOnTime(int type, uint32_t time);
 
-bool enableOutputProtectionCouple(bool enable);
+void enableOutputProtectionCouple(bool enable);
 bool isOutputProtectionCoupleEnabled();
 
-bool enableShutdownWhenProtectionTripped(bool enable);
+void enableShutdownWhenProtectionTripped(bool enable);
 bool isShutdownWhenProtectionTrippedEnabled();
 
-bool enableForceDisablingAllOutputsOnPowerUp(bool enable);
+void enableForceDisablingAllOutputsOnPowerUp(bool enable);
 bool isForceDisablingAllOutputsOnPowerUpEnabled();
 
-bool lockFrontPanel(bool lock);
+void lockFrontPanel(bool lock);
 
-bool setEncoderSettings(uint8_t confirmationMode, uint8_t movingSpeedDown, uint8_t movingSpeedUp);
+void setEncoderSettings(uint8_t confirmationMode, uint8_t movingSpeedDown, uint8_t movingSpeedUp);
 
-bool setDisplayState(unsigned state);
-bool setDisplayBrightness(uint8_t displayBrightness);
-bool setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep);
+void setDisplayState(unsigned state);
+void setDisplayBrightness(uint8_t displayBrightness);
+void setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep);
 
 bool enableSerial(bool enable);
 bool isSerialEnabled();
@@ -258,12 +258,12 @@ bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint3
                          uint32_t gateway, uint32_t subnetMask, uint16_t scpiPort,
                          uint8_t *macAddress);
 
-bool enableNtp(bool enable);
+void enableNtp(bool enable);
 bool isNtpEnabled();
-bool setNtpServer(const char *ntpServer, size_t ntpServerLength);
-bool setNtpSettings(bool enable, const char *ntpServer);
+void setNtpServer(const char *ntpServer, size_t ntpServerLength);
+void setNtpSettings(bool enable, const char *ntpServer);
 
-bool setSdLocked(bool sdLocked);
+void setSdLocked(bool sdLocked);
 bool isSdLocked();
 
 void setAnimationsDuration(float value);

@@ -287,10 +287,7 @@ scpi_result_t scpi_cmd_systemBeeperState(scpi_t *context) {
     }
 
     if (enable != persist_conf::isSoundEnabled()) {
-        if (!persist_conf::enableSound(enable)) {
-            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-            return SCPI_RES_ERR;
-        }
+        persist_conf::enableSound(enable);
     }
 
     return SCPI_RES_OK;
@@ -310,10 +307,7 @@ scpi_result_t scpi_cmd_systemBeeperKeyState(scpi_t *context) {
     }
 
     if (enable != persist_conf::isClickSoundEnabled()) {
-        if (!persist_conf::enableClickSound(enable)) {
-            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-            return SCPI_RES_ERR;
-        }
+        persist_conf::enableClickSound(enable);
     }
 
     return SCPI_RES_OK;
@@ -675,10 +669,7 @@ scpi_result_t scpi_cmd_systemSerial(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!persist_conf::changeSerial(serial, serialLength)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    persist_conf::changeSerial(serial, serialLength);
 
     return SCPI_RES_OK;
 }
@@ -696,10 +687,7 @@ scpi_result_t scpi_cmd_systemPowerProtectionTrip(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!persist_conf::enableShutdownWhenProtectionTripped(enable)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    persist_conf::enableShutdownWhenProtectionTripped(enable);
 
     return SCPI_RES_OK;
 }
@@ -718,10 +706,7 @@ scpi_result_t scpi_cmd_systemPonOutputDisable(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!persist_conf::enableForceDisablingAllOutputsOnPowerUp(enable)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    persist_conf::enableForceDisablingAllOutputsOnPowerUp(enable);
 
     return SCPI_RES_OK;
 }
@@ -752,41 +737,24 @@ scpi_result_t scpi_cmd_systemPasswordNew(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!persist_conf::changeSystemPassword(new_password, new_password_len)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    persist_conf::changeSystemPassword(new_password, new_password_len);
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemPasswordFpanelReset(scpi_t *context) {
-    // TODO migrate to generic firmware
-    if (!persist_conf::changeSystemPassword("", 0)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
-
+    persist_conf::changeSystemPassword("", 0);
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemPasswordCalibrationReset(scpi_t *context) {
-    // TODO migrate to generic firmware
-    if (!persist_conf::changeCalibrationPassword(CALIBRATION_PASSWORD_DEFAULT,
-                                                 strlen(CALIBRATION_PASSWORD_DEFAULT))) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
-
+    persist_conf::changeCalibrationPassword(CALIBRATION_PASSWORD_DEFAULT, strlen(CALIBRATION_PASSWORD_DEFAULT));
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemKlock(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (!persist_conf::lockFrontPanel(true)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    persist_conf::lockFrontPanel(true);
 
 #if OPTION_DISPLAY
     refreshScreen();
@@ -1315,10 +1283,7 @@ scpi_result_t scpi_cmd_systemCommunicateNtp(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!persist_conf::setNtpServer(ntpServer, ntpServerLength)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    persist_conf::setNtpServer(ntpServer, ntpServerLength);
 
     return SCPI_RES_OK;
 #else

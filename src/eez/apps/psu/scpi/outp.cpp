@@ -170,10 +170,7 @@ scpi_result_t scpi_cmd_outputProtectionCouple(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!persist_conf::enableOutputProtectionCouple(enable)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    persist_conf::enableOutputProtectionCouple(enable);
 
     return SCPI_RES_OK;
 }

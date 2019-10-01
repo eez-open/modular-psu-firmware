@@ -303,8 +303,10 @@ void loadDevice() {
     }
 }
 
-bool saveDevice() {
-    return save((BlockHeader *)&devConf, sizeof(DeviceConfiguration), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE), DEV_CONF_VERSION);
+void saveDevice() {
+    if (!save((BlockHeader *)&devConf, sizeof(DeviceConfiguration), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE), DEV_CONF_VERSION)) {
+        generateError(SCPI_ERROR_EXTERNAL_EEPROM_SAVE_FAILED);
+    }
 }
 
 static void initEthernetSettings() {
@@ -389,8 +391,10 @@ void loadDevice2() {
 #endif
 }
 
-bool saveDevice2() {
-    return save((BlockHeader *)&devConf2, sizeof(DeviceConfiguration2), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE2), DEV_CONF2_VERSION);
+void saveDevice2() {
+    if (!save((BlockHeader *)&devConf2, sizeof(DeviceConfiguration2), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE2), DEV_CONF2_VERSION)) {
+        generateError(SCPI_ERROR_EXTERNAL_EEPROM_SAVE_FAILED);
+    }
 }
 
 bool isSystemPasswordValid(const char *new_password, size_t new_password_len, int16_t &err) {
@@ -407,14 +411,11 @@ bool isSystemPasswordValid(const char *new_password, size_t new_password_len, in
     return true;
 }
 
-bool changeSystemPassword(const char *new_password, size_t new_password_len) {
+void changeSystemPassword(const char *new_password, size_t new_password_len) {
     memset(&devConf2.systemPassword, 0, sizeof(devConf2.systemPassword));
     strncpy(devConf2.systemPassword, new_password, new_password_len);
-    if (saveDevice2()) {
-        event_queue::pushEvent(event_queue::EVENT_INFO_SYSTEM_PASSWORD_CHANGED);
-        return true;
-    }
-    return false;
+    saveDevice2();
+    event_queue::pushEvent(event_queue::EVENT_INFO_SYSTEM_PASSWORD_CHANGED);
 }
 
 bool isCalibrationPasswordValid(const char *new_password, size_t new_password_len, int16_t &err) {
@@ -431,17 +432,14 @@ bool isCalibrationPasswordValid(const char *new_password, size_t new_password_le
     return true;
 }
 
-bool changeCalibrationPassword(const char *new_password, size_t new_password_len) {
+void changeCalibrationPassword(const char *new_password, size_t new_password_len) {
     memset(&devConf.calibration_password, 0, sizeof(devConf.calibration_password));
     strncpy(devConf.calibration_password, new_password, new_password_len);
-    if (saveDevice()) {
-        event_queue::pushEvent(event_queue::EVENT_INFO_CALIBRATION_PASSWORD_CHANGED);
-        return true;
-    }
-    return false;
+    saveDevice();
+    event_queue::pushEvent(event_queue::EVENT_INFO_CALIBRATION_PASSWORD_CHANGED);
 }
 
-bool changeSerial(const char *newSerialNumber, size_t newSerialNumberLength) {
+void changeSerial(const char *newSerialNumber, size_t newSerialNumberLength) {
     // copy up to 7 characters from newSerialNumber, fill the rest with zero's
     for (size_t i = 0; i < 7; ++i) {
         if (i < newSerialNumberLength) {
@@ -452,29 +450,22 @@ bool changeSerial(const char *newSerialNumber, size_t newSerialNumberLength) {
     }
     devConf.serialNumber[7] = 0;
 
-    return saveDevice();
+    saveDevice();
 }
 
-bool enableSound(bool enable) {
+void enableSound(bool enable) {
     devConf.flags.isSoundEnabled = enable ? 1 : 0;
-    if (saveDevice()) {
-        event_queue::pushEvent(enable ? event_queue::EVENT_INFO_SOUND_ENABLED
-                                      : event_queue::EVENT_INFO_SOUND_DISABLED);
-        return true;
-    }
-    return false;
+    saveDevice();
+    event_queue::pushEvent(enable ? event_queue::EVENT_INFO_SOUND_ENABLED : event_queue::EVENT_INFO_SOUND_DISABLED);
 }
 
 bool isSoundEnabled() {
     return devConf.flags.isSoundEnabled ? true : false;
 }
 
-bool enableClickSound(bool enable) {
+void enableClickSound(bool enable) {
     devConf.flags.isClickSoundEnabled = enable ? 1 : 0;
-    if (saveDevice()) {
-        return true;
-    }
-    return false;
+    saveDevice();
 }
 
 bool isClickSoundEnabled() {
@@ -561,27 +552,22 @@ void writeSystemDateTime(uint8_t year, uint8_t month, uint8_t day, uint8_t hour,
     saveDevice();
 }
 
-bool enableProfileAutoRecall(bool enable) {
+void enableProfileAutoRecall(bool enable) {
     devConf.flags.profileAutoRecallEnabled = enable ? 1 : 0;
-    return saveDevice();
+    saveDevice();
 }
 
 bool isProfileAutoRecallEnabled() {
     return devConf.flags.profileAutoRecallEnabled ? true : false;
 }
 
-bool setProfileAutoRecallLocation(int location) {
+void setProfileAutoRecallLocation(int location) {
     devConf.profile_auto_recall_location = (int8_t)location;
-    if (saveDevice()) {
-        event_queue::pushEvent(event_queue::EVENT_INFO_DEFAULE_PROFILE_CHANGED_TO_0 + location);
-
-        if (location == 0) {
-            profile::save();
-        }
-
-        return true;
+    saveDevice();
+    event_queue::pushEvent(event_queue::EVENT_INFO_DEFAULE_PROFILE_CHANGED_TO_0 + location);
+    if (location == 0) {
+        profile::save();
     }
-    return false;
 }
 
 int getProfileAutoRecallLocation() {
@@ -796,154 +782,116 @@ bool writeTotalOnTime(int type, uint32_t time) {
     }
 }
 
-bool enableOutputProtectionCouple(bool enable) {
+void enableOutputProtectionCouple(bool enable) {
     int outputProtectionCouple = enable ? 1 : 0;
 
     if (devConf.flags.outputProtectionCouple == outputProtectionCouple) {
-        return true;
+        return;
     }
 
     devConf.flags.outputProtectionCouple = outputProtectionCouple;
 
-    if (saveDevice()) {
-        if (devConf.flags.outputProtectionCouple) {
-            event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_COUPLED);
-        } else {
-            event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_DECOUPLED);
-        }
-
-        return true;
+    if (devConf.flags.outputProtectionCouple) {
+        event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_COUPLED);
+    } else {
+        event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_DECOUPLED);
     }
-
-    devConf.flags.outputProtectionCouple = 1 - outputProtectionCouple;
-
-    return false;
 }
 
 bool isOutputProtectionCoupleEnabled() {
     return devConf.flags.outputProtectionCouple ? true : false;
 }
 
-bool enableShutdownWhenProtectionTripped(bool enable) {
+void enableShutdownWhenProtectionTripped(bool enable) {
     int shutdownWhenProtectionTripped = enable ? 1 : 0;
 
     if (devConf.flags.shutdownWhenProtectionTripped == shutdownWhenProtectionTripped) {
-        return true;
+        return;
     }
 
     devConf.flags.shutdownWhenProtectionTripped = shutdownWhenProtectionTripped;
 
-    if (saveDevice()) {
-        if (devConf.flags.shutdownWhenProtectionTripped) {
-            event_queue::pushEvent(
-                event_queue::EVENT_INFO_SHUTDOWN_WHEN_PROTECTION_TRIPPED_ENABLED);
-        } else {
-            event_queue::pushEvent(
-                event_queue::EVENT_INFO_SHUTDOWN_WHEN_PROTECTION_TRIPPED_DISABLED);
-        }
-
-        return true;
+    if (devConf.flags.shutdownWhenProtectionTripped) {
+        event_queue::pushEvent(
+            event_queue::EVENT_INFO_SHUTDOWN_WHEN_PROTECTION_TRIPPED_ENABLED);
+    } else {
+        event_queue::pushEvent(
+            event_queue::EVENT_INFO_SHUTDOWN_WHEN_PROTECTION_TRIPPED_DISABLED);
     }
-
-    devConf.flags.shutdownWhenProtectionTripped = 1 - shutdownWhenProtectionTripped;
-
-    return false;
 }
 
 bool isShutdownWhenProtectionTrippedEnabled() {
     return devConf.flags.shutdownWhenProtectionTripped ? true : false;
 }
 
-bool enableForceDisablingAllOutputsOnPowerUp(bool enable) {
+void enableForceDisablingAllOutputsOnPowerUp(bool enable) {
     int forceDisablingAllOutputsOnPowerUp = enable ? 1 : 0;
 
     if (devConf.flags.forceDisablingAllOutputsOnPowerUp == forceDisablingAllOutputsOnPowerUp) {
-        return true;
+        return;
     }
 
     devConf.flags.forceDisablingAllOutputsOnPowerUp = forceDisablingAllOutputsOnPowerUp;
 
-    if (saveDevice()) {
-        if (devConf.flags.forceDisablingAllOutputsOnPowerUp) {
-            event_queue::pushEvent(
-                event_queue::EVENT_INFO_FORCE_DISABLING_ALL_OUTPUTS_ON_POWERUP_ENABLED);
-        } else {
-            event_queue::pushEvent(
-                event_queue::EVENT_INFO_FORCE_DISABLING_ALL_OUTPUTS_ON_POWERUP_DISABLED);
-        }
-
-        return true;
+    if (devConf.flags.forceDisablingAllOutputsOnPowerUp) {
+        event_queue::pushEvent(
+            event_queue::EVENT_INFO_FORCE_DISABLING_ALL_OUTPUTS_ON_POWERUP_ENABLED);
+    } else {
+        event_queue::pushEvent(
+            event_queue::EVENT_INFO_FORCE_DISABLING_ALL_OUTPUTS_ON_POWERUP_DISABLED);
     }
-
-    devConf.flags.forceDisablingAllOutputsOnPowerUp = 1 - forceDisablingAllOutputsOnPowerUp;
-
-    return false;
 }
 
 bool isForceDisablingAllOutputsOnPowerUpEnabled() {
     return devConf.flags.forceDisablingAllOutputsOnPowerUp ? true : false;
 }
 
-bool lockFrontPanel(bool lock) {
+void lockFrontPanel(bool lock) {
     g_rlState = lock ? RL_STATE_REMOTE : RL_STATE_LOCAL;
 
     int isFrontPanelLocked = lock ? 1 : 0;
 
     if (devConf.flags.isFrontPanelLocked == isFrontPanelLocked) {
-        return true;
+        return;
     }
 
     devConf.flags.isFrontPanelLocked = isFrontPanelLocked;
 
-    if (saveDevice()) {
-        if (devConf.flags.isFrontPanelLocked) {
-            event_queue::pushEvent(event_queue::EVENT_INFO_FRONT_PANEL_LOCKED);
-        } else {
-            event_queue::pushEvent(event_queue::EVENT_INFO_FRONT_PANEL_UNLOCKED);
-        }
-
-        return true;
+    if (devConf.flags.isFrontPanelLocked) {
+        event_queue::pushEvent(event_queue::EVENT_INFO_FRONT_PANEL_LOCKED);
+    } else {
+        event_queue::pushEvent(event_queue::EVENT_INFO_FRONT_PANEL_UNLOCKED);
     }
-
-    devConf.flags.isFrontPanelLocked = 1 - isFrontPanelLocked;
-    g_rlState = devConf.flags.isFrontPanelLocked ? RL_STATE_REMOTE : RL_STATE_LOCAL;
-
-    return false;
 }
 
-bool setEncoderSettings(uint8_t confirmationMode, uint8_t movingSpeedDown, uint8_t movingSpeedUp) {
+void setEncoderSettings(uint8_t confirmationMode, uint8_t movingSpeedDown, uint8_t movingSpeedUp) {
     devConf2.flags.encoderConfirmationMode = confirmationMode;
     devConf2.encoderMovingSpeedDown = movingSpeedDown;
     devConf2.encoderMovingSpeedUp = movingSpeedUp;
 
-    return saveDevice2();
+    saveDevice2();
 }
 
-bool setDisplayState(unsigned newState) {
+void setDisplayState(unsigned newState) {
     unsigned currentDisplayState = devConf2.flags.displayState;
 
     if (currentDisplayState != newState) {
         devConf2.flags.displayState = newState;
-        if (!saveDevice2()) {
-            devConf2.flags.displayState = currentDisplayState;
-            return false;
-        }
+        saveDevice2();
     }
-
-    return true;
 }
 
-bool setDisplayBrightness(uint8_t displayBrightness) {
+void setDisplayBrightness(uint8_t displayBrightness) {
     devConf2.displayBrightness = displayBrightness;
 
 #if OPTION_DISPLAY
     updateBrightness();
 #endif
 
-    return saveDevice2();
+    saveDevice2();
 }
 
-bool setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep) {
+void setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep) {
     devConf2.displayBackgroundLuminosityStep = displayBackgroundLuminosityStep;
 
 #if OPTION_DISPLAY
@@ -951,7 +899,7 @@ bool setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep)
     refreshScreen();
 #endif
 
-    return saveDevice2();
+    saveDevice2();
 }
 
 bool enableSerial(bool enable) {
@@ -1196,30 +1144,30 @@ bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint3
 #endif
 }
 
-bool enableNtp(bool enable) {
+void enableNtp(bool enable) {
     devConf2.flags.ntpEnabled = enable ? 1 : 0;
-    return saveDevice2();
+    saveDevice2();
 }
 
 bool isNtpEnabled() {
     return devConf2.flags.ntpEnabled ? true : false;
 }
 
-bool setNtpServer(const char *ntpServer, size_t ntpServerLength) {
+void setNtpServer(const char *ntpServer, size_t ntpServerLength) {
     strncpy(devConf2.ntpServer, ntpServer, ntpServerLength);
     devConf2.ntpServer[ntpServerLength] = 0;
-    return saveDevice2();
+    saveDevice2();
 }
 
-bool setNtpSettings(bool enable, const char *ntpServer) {
+void setNtpSettings(bool enable, const char *ntpServer) {
     devConf2.flags.ntpEnabled = enable ? 1 : 0;
     strcpy(devConf2.ntpServer, ntpServer);
-    return saveDevice2();
+    saveDevice2();
 }
 
-bool setSdLocked(bool sdLocked) {
+void setSdLocked(bool sdLocked) {
     devConf2.flags.sdLocked = sdLocked ? 1 : 0;
-    return saveDevice2();
+    saveDevice2();
 }
 
 bool isSdLocked() {

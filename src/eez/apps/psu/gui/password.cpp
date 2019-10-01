@@ -67,23 +67,13 @@ static void onRetypeNewPasswordOk(char *text) {
         return;
     }
 
-    bool isChanged;
-
     if (g_oldPassword == persist_conf::devConf2.systemPassword) {
-        isChanged = persist_conf::changeSystemPassword(g_newPassword, strlen(g_newPassword));
+        persist_conf::changeSystemPassword(g_newPassword, strlen(g_newPassword));
     } else {
-        isChanged = persist_conf::changeCalibrationPassword(g_newPassword, strlen(g_newPassword));
+        persist_conf::changeCalibrationPassword(g_newPassword, strlen(g_newPassword));
     }
 
     popPage();
-
-    if (isChanged) {
-        // success
-        infoMessage("Password changed!");
-    } else{
-        // failed to save changed password
-        errorMessage("Failed to change password!");
-    }
 }
 
 static void onNewPasswordOk(char *text) {

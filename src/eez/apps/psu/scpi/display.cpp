@@ -106,10 +106,7 @@ scpi_result_t scpi_cmd_displayWindowState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!persist_conf::setDisplayState(onOff ? 1 : 0)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    persist_conf::setDisplayState(onOff ? 1 : 0);
 
     return SCPI_RES_OK;
 #else

@@ -240,10 +240,7 @@ scpi_result_t scpi_cmd_calibrationPasswordNew(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!persist_conf::changeCalibrationPassword(new_password, new_password_len)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    persist_conf::changeCalibrationPassword(new_password, new_password_len);
 
     return SCPI_RES_OK;
 }

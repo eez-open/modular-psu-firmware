@@ -268,29 +268,25 @@ void reset() {
 static void doUnlockFrontPanel() {
     popPage();
 
-    if (psu::persist_conf::lockFrontPanel(false)) {
-        infoMessage("Front panel is unlocked!");
-    }
+    psu::persist_conf::lockFrontPanel(false);
+    infoMessage("Front panel is unlocked!");
 }
 
 static void checkPasswordToUnlockFrontPanel() {
-    psu::gui::checkPassword("Password: ", psu::persist_conf::devConf2.systemPassword,
-                            doUnlockFrontPanel);
+    psu::gui::checkPassword("Password: ", psu::persist_conf::devConf2.systemPassword, doUnlockFrontPanel);
 }
 
 void lockFrontPanel() {
-    if (psu::persist_conf::lockFrontPanel(true)) {
-        infoMessage("Front panel is locked!");
-    }
+    psu::persist_conf::lockFrontPanel(true);
+    infoMessage("Front panel is locked!");
 }
 
 void unlockFrontPanel() {
     if (strlen(psu::persist_conf::devConf2.systemPassword) > 0) {
         checkPasswordToUnlockFrontPanel();
     } else {
-        if (psu::persist_conf::lockFrontPanel(false)) {
-            infoMessage("Front panel is unlocked!");
-        }
+        psu::persist_conf::lockFrontPanel(false);
+        infoMessage("Front panel is unlocked!");
     }
 }
 
