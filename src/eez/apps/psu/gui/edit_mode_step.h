@@ -30,6 +30,8 @@ int getStepIndex();
 int getStepValuesCount();
 const eez::gui::data::Value *getStepValues();
 
+const eez::gui::data::Value *getUnitStepValues(Unit unit);
+
 void setStepIndex(int value);
 
 #if OPTION_ENCODER

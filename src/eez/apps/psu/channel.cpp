@@ -674,19 +674,7 @@ bool Channel::isMicroAmperAllowed() const {
 }
 
 float Channel::roundChannelValue(Unit unit, float value) const {
-    if (unit == UNIT_VOLT) {
-        return roundPrec(value, getVoltageResolution());
-    }
-    
-    if (unit == UNIT_AMPER) {
-        return roundPrec(value, getCurrentResolution(value));
-    }
-    
-    if (unit == UNIT_WATT) {
-        return roundPrec(value, getPowerResolution());
-    }
-    
-    return value;
+    return roundPrec(value, getValuePrecision(unit, value));
 }
 
 void Channel::addUMonAdcValue(float value) {

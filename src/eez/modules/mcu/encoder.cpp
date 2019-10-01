@@ -64,58 +64,60 @@ EncoderMode g_encoderMode = ENCODER_MODE_AUTO;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define CONF_NUM_ACCELERATION_STEP_COUNTERS 10
-#define CONF_ACCELERATION_STEP_COUNTER_DURATION_MS 50
-#define CONF_MAX_ACCELERATION 99
+struct CalcAutoModeStepLevel {
+    static const int CONF_NUM_ACCELERATION_STEP_COUNTERS = 10;
+    static const int CONF_ACCELERATION_STEP_COUNTER_DURATION_MS = 50;
+    static const int CONF_COUNTER_TO_STEP_DIVISOR = 20;
 
-#if defined(EEZ_PLATFORM_STM32)
-#define CONF_ACCELERATION_CALC_POW_BASE 1.06f
-#else
-#define CONF_ACCELERATION_CALC_POW_BASE 1.05f
-#endif
+    uint32_t m_lastTick;
+    int m_accumulatedCounter;
+    int m_counters[CONF_NUM_ACCELERATION_STEP_COUNTERS];
+    unsigned int m_counterIndex;
+    int m_stepLevel;
 
-static uint32_t g_accelerationStepLastTick;
-static int g_accumulatedAccelerationStepCounter;
-static int g_accelerationStepCounters[CONF_NUM_ACCELERATION_STEP_COUNTERS];
-static unsigned int g_accelerationStepCounterIndex;
-static float g_acceleration;
-
-void resetAccelerationCalculation() {
-    g_accelerationStepLastTick = millis();
-    g_accumulatedAccelerationStepCounter = 0;
-    for (int i = 0; i < CONF_NUM_ACCELERATION_STEP_COUNTERS; i++) {
-        g_accelerationStepCounters[i] = 0;
-    }
-    g_accelerationStepCounterIndex = 0;
-    g_acceleration = 0;
-}
-
-void calculateAcceleration(int16_t diffCounter) {
-    g_accumulatedAccelerationStepCounter += diffCounter;
-
-    uint32_t tick = millis();
-    int32_t diffTick = tick - g_accelerationStepLastTick;
-    if (diffTick >= CONF_ACCELERATION_STEP_COUNTER_DURATION_MS) {
-        g_accelerationStepCounters[g_accelerationStepCounterIndex % CONF_NUM_ACCELERATION_STEP_COUNTERS] = g_accumulatedAccelerationStepCounter;
-
-        int stepCountersSum = 0;
+    void reset() {
+        m_lastTick = millis();
+        m_accumulatedCounter = 0;
         for (int i = 0; i < CONF_NUM_ACCELERATION_STEP_COUNTERS; i++) {
-        	stepCountersSum += g_accelerationStepCounters[(g_accelerationStepCounterIndex - i) % CONF_NUM_ACCELERATION_STEP_COUNTERS];
+            m_counters[i] = 0;
         }
-
-		g_acceleration = powf(CONF_ACCELERATION_CALC_POW_BASE, fabsf(1.0f * stepCountersSum)) - 1.0f;
-
-        if (g_acceleration > CONF_MAX_ACCELERATION) g_acceleration = CONF_MAX_ACCELERATION;
-
-//        if (g_acceleration > 0) {
-//        	DebugTrace("%g\n", g_acceleration);
-//        }
-
-        g_accelerationStepLastTick = tick;
-        g_accumulatedAccelerationStepCounter = 0;
-        g_accelerationStepCounterIndex++;
+        m_counterIndex = 0;
+        m_stepLevel = 0;
     }
-}
+
+    void update(int16_t diffCounter) {
+        m_accumulatedCounter += diffCounter;
+
+        uint32_t tick = millis();
+        int32_t diffTick = tick - m_lastTick;
+        if (diffTick >= CONF_ACCELERATION_STEP_COUNTER_DURATION_MS) {
+            m_counters[m_counterIndex % CONF_NUM_ACCELERATION_STEP_COUNTERS] = m_accumulatedCounter;
+
+            int stepCountersSum = 0;
+            for (int i = 0; i < CONF_NUM_ACCELERATION_STEP_COUNTERS; i++) {
+                stepCountersSum += m_counters[(m_counterIndex - i) % CONF_NUM_ACCELERATION_STEP_COUNTERS];
+            }
+
+            stepCountersSum = abs(stepCountersSum);
+
+            m_stepLevel = MIN(stepCountersSum / CONF_COUNTER_TO_STEP_DIVISOR, 2);
+
+            //if (stepCountersSum != 0) {
+            //    DebugTrace("%d, %d\n", stepCountersSum, m_stepLevel);
+            //}
+
+            m_lastTick = tick;
+            m_accumulatedCounter = 0;
+            m_counterIndex++;
+        }
+    }
+
+    int stepLevel() {
+        return m_stepLevel;
+    }
+};
+
+static CalcAutoModeStepLevel g_calcAutoModeStepLevel;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -125,7 +127,7 @@ void init() {
 	g_lastCounter = __HAL_TIM_GET_COUNTER(&htim8);
 #endif
 
-    resetAccelerationCalculation();
+    g_calcAutoModeStepLevel.reset();
 }
 
 int getCounter() {
@@ -141,7 +143,7 @@ int getCounter() {
 #endif
 
     // update acceleration
-    calculateAcceleration(diffCounter);
+    g_calcAutoModeStepLevel.update(diffCounter);
 
     //
     g_accumulatedCounter += diffCounter;
@@ -153,7 +155,7 @@ int getCounter() {
 }
 
 void resetEncoder() {
-    resetAccelerationCalculation();
+    g_calcAutoModeStepLevel.reset();
 }
 
 bool isButtonClicked() {
@@ -190,41 +192,20 @@ void switchEncoderMode() {
 }
 
 float increment(gui::data::Value value, int counter, float min, float max, int channelIndex, float precision) {
-    float newValue;
-    if (g_encoderMode == ENCODER_MODE_AUTO) {
-        float factor;
-
-        if (channelIndex != -1) {
-            factor = psu::Channel::get(channelIndex).getValuePrecision(value.getUnit(), value.getFloat());
-        } else {
-            factor = precision;
-        }
-
-        newValue = value.getFloat() + factor * (1 + g_acceleration) * counter;
-    } else {
-        newValue = value.getFloat() + psu::gui::edit_mode_step::getCurrentEncoderStepValue().getFloat() * counter;
-    }
-
     if (channelIndex != -1) {
-        newValue = psu::Channel::get(channelIndex).roundChannelValue(value.getUnit(), newValue);
-    } else {
-        newValue = roundPrec(newValue, precision);
+        precision = psu::Channel::get(channelIndex).getValuePrecision(value.getUnit(), value.getFloat());
     }
 
+    float step;
+
     if (g_encoderMode == ENCODER_MODE_AUTO) {
-        float diff = fabsf(newValue - value.getFloat());
-        if (diff > 1) {
-            newValue = roundPrec(newValue, 1);
-        } else if (diff > 0.1) {
-            newValue = roundPrec(newValue, 0.1f);
-        } else if (diff > 0.01) {
-            newValue = roundPrec(newValue, 0.01f);
-        } else if (diff > 0.001) {
-            newValue = roundPrec(newValue, 0.001f);
-        } else if (diff > 0.0001) {
-            newValue = roundPrec(newValue, 0.0001f);
-        }
+        step = precision * powf(10.0f, 1.0f * g_calcAutoModeStepLevel.stepLevel());
+    } else {
+        step = psu::gui::edit_mode_step::getCurrentEncoderStepValue().getFloat(); 
     }
+
+    float newValue = value.getFloat() + step * counter;
+    newValue = roundPrec(newValue, step);
 
     return clamp(newValue, min, max);
 }
