@@ -791,6 +791,8 @@ void enableOutputProtectionCouple(bool enable) {
 
     devConf.flags.outputProtectionCouple = outputProtectionCouple;
 
+    saveDevice();
+
     if (devConf.flags.outputProtectionCouple) {
         event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_COUPLED);
     } else {
@@ -810,6 +812,8 @@ void enableShutdownWhenProtectionTripped(bool enable) {
     }
 
     devConf.flags.shutdownWhenProtectionTripped = shutdownWhenProtectionTripped;
+
+    saveDevice();
 
     if (devConf.flags.shutdownWhenProtectionTripped) {
         event_queue::pushEvent(
@@ -832,6 +836,8 @@ void enableForceDisablingAllOutputsOnPowerUp(bool enable) {
     }
 
     devConf.flags.forceDisablingAllOutputsOnPowerUp = forceDisablingAllOutputsOnPowerUp;
+
+    saveDevice();
 
     if (devConf.flags.forceDisablingAllOutputsOnPowerUp) {
         event_queue::pushEvent(
@@ -856,6 +862,8 @@ void lockFrontPanel(bool lock) {
     }
 
     devConf.flags.isFrontPanelLocked = isFrontPanelLocked;
+
+    saveDevice();
 
     if (devConf.flags.isFrontPanelLocked) {
         event_queue::pushEvent(event_queue::EVENT_INFO_FRONT_PANEL_LOCKED);
