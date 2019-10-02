@@ -609,6 +609,9 @@ class Channel {
 
     void enterOvpProtection();
 
+    DprogState getDprogState();
+    void setDprogState(DprogState dprogState);
+
   private:
     bool delayLowRippleCheck;
     uint32_t outputEnableStartTime;

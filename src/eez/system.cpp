@@ -101,7 +101,7 @@ void mainTask(const void *) {
 
 #if OPTION_SDRAM
     mcu::sdram::init();
-    mcu::sdram::test();
+    //mcu::sdram::test();
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)

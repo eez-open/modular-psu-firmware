@@ -1395,5 +1395,13 @@ void Channel::doAutoSelectCurrentRange(uint32_t tickCount) {
     }
 }
 
+DprogState Channel::getDprogState() {
+    return channelInterface->getDprogState();
+}
+
+void Channel::setDprogState(DprogState dprogState) {
+    channelInterface->setDprogState(dprogState);
+}
+
 } // namespace psu
 } // namespace eez

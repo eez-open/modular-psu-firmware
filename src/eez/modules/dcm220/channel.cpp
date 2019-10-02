@@ -358,7 +358,14 @@ struct Channel : ChannelInterface {
 #endif
 	}
 
-	void setDacVoltage(int subchannelIndex, uint16_t value) {
+    DprogState getDprogState() {
+        return DPROG_STATE_OFF;
+    }
+
+    void setDprogState(DprogState dprogState) {
+    }
+    
+    void setDacVoltage(int subchannelIndex, uint16_t value) {
 
 #if defined(EEZ_PLATFORM_STM32)
         value = (uint16_t)clamp((float)value, (float)DAC_MIN, (float)DAC_MAX);

@@ -200,7 +200,7 @@
 #define ETHERNET_DHCP_TIMEOUT 15
 
 /// Output power is monitored and if its go below DP_NEG_LEV
-/// that is negative value in Watts (default -1 W),
+/// that is negative value in Watts (default -5 W),
 /// and that condition lasts more then DP_NEG_DELAY seconds (default 5 s),
 /// down-programmer circuit has to be switched off.
 #define DP_NEG_LEV -5 // -5 W

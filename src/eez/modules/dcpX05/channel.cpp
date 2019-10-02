@@ -43,7 +43,8 @@ struct Channel : ChannelInterface {
 	DigitalAnalogConverter dac;
 	IOExpander ioexp;
 
-	bool delayed_dp_off;
+    DprogState dprogState;
+    bool delayed_dp_off;
 	uint32_t delayed_dp_off_start;
 	bool dpOn;
 	uint32_t dpNegMonitoringTime;
@@ -63,11 +64,14 @@ struct Channel : ChannelInterface {
 		ioexp.init();
 		adc.init();
 		dac.init();
+
+        dprogState = DPROG_STATE_AUTO;
 	}
 
 	void reset(int subchannelIndex) {
 		uSet = 0;
-		dpOn = false;
+        dprogState = DPROG_STATE_AUTO;
+        dpOn = false;
 		uBeforeBalancing = NAN;
 		iBeforeBalancing = NAN;
 	}
@@ -127,11 +131,13 @@ struct Channel : ChannelInterface {
 
 		}
 
-		// turn off DP after delay
-		if (delayed_dp_off && (micros() - delayed_dp_off_start) >= DP_OFF_DELAY_PERIOD * 1000000L) {
-			delayed_dp_off = false;
-            setDpEnable(false);
-		}
+        if (dprogState == DPROG_STATE_AUTO) {
+            // turn off DP after delay
+            if (delayed_dp_off && (micros() - delayed_dp_off_start) >= DP_OFF_DELAY_PERIOD * 1000000L) {
+                delayed_dp_off = false;
+                setDpEnable(false);
+            }
+        }
 
 		/// Output power is monitored and if its go below DP_NEG_LEV
 		/// that is negative value in Watts (default -1 W),
@@ -265,6 +271,7 @@ struct Channel : ChannelInterface {
 
 		setOperBits(OPER_ISUM_DP_OFF, !enable);
 		dpOn = enable;
+
 		if (enable) {
 			dpNegMonitoringTime = micros();
 		}
@@ -274,17 +281,18 @@ struct Channel : ChannelInterface {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
 		if (enable) {
+            if (dprogState == DPROG_STATE_AUTO) {
+                // enable DP
+                dpNegMonitoringTime = micros();
+                delayed_dp_off = false;
+                setDpEnable(true);
+            }
+
 			dac.setVoltage(uSet);
 
 			setCurrentRange(subchannelIndex);
 
 			ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, true);
-
-			// enable DP
-			delayed_dp_off = false;
-			setDpEnable(true);
-
-			dpNegMonitoringTime = micros();
 
 			if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 && channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
 				// OVP has to be enabled after OE activation
@@ -304,9 +312,11 @@ struct Channel : ChannelInterface {
 
 			setCurrentRange(subchannelIndex);
 
-			// turn off DP after some delay
-			delayed_dp_off = true;
-			delayed_dp_off_start = micros();
+            if (dprogState == DPROG_STATE_AUTO) {
+                // turn off DP after some delay
+                delayed_dp_off = true;
+                delayed_dp_off_start = micros();
+            }
 		}
 
 		ioexp.changeBit(g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 ?IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED : IOExpander::DCP505_IO_BIT_OUT_OE_UNCOUPLED_LED, enable);
@@ -315,7 +325,26 @@ struct Channel : ChannelInterface {
 		restoreCurrentToValueBeforeBalancing(channel);
 	}
 
-	void setRemoteSense(int subchannelIndex, bool enable) {
+    DprogState getDprogState() {
+        return dprogState;
+    }
+
+    void setDprogState(DprogState dprogState_) {
+        dprogState = dprogState_;
+
+        if (dprogState == DPROG_STATE_OFF) {
+            setDpEnable(false);
+        } else if (dprogState == DPROG_STATE_ON) {
+            setDpEnable(true);
+        } else {
+            psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
+            setDpEnable(channel.isOutputEnabled());
+        }
+
+        delayed_dp_off = false;
+    }
+    
+    void setRemoteSense(int subchannelIndex, bool enable) {
 		ioexp.changeBit(IOExpander::IO_BIT_OUT_REMOTE_SENSE, enable);
 	}
 

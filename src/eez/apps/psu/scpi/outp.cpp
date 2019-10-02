@@ -211,6 +211,50 @@ scpi_result_t scpi_cmd_outputStateTriggeredQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_choice_def_t dprogStateChoice[] = {
+    { "ON", DPROG_STATE_ON },
+    { "OFF", DPROG_STATE_OFF },
+    { "AUTO", DPROG_STATE_AUTO },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_outputDprog(scpi_t *context) {
+    int32_t dprogState;
+    if (!SCPI_ParamChoice(context, dprogStateChoice, &dprogState, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    Channel *channel = param_channel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (channel->getFeatures() & CH_FEATURE_DPROG) {
+        channel->setDprogState((DprogState)dprogState);
+    } else {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_outputDprogQ(scpi_t *context) {
+    Channel *channel = param_channel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (channel->getFeatures() & CH_FEATURE_DPROG) {
+        resultChoiceName(context, dprogStateChoice, channel->getDprogState());
+    } else {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

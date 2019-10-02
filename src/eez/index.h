@@ -47,6 +47,12 @@ enum AdcDataType {
     ADC_DATA_TYPE_I_MON_DAC,
 };
 
+enum DprogState {
+    DPROG_STATE_OFF = 0,
+    DPROG_STATE_ON = 1,
+    DPROG_STATE_AUTO = 2
+};
+
 struct ChannelInterface {
 	int slotIndex;
 
@@ -70,6 +76,9 @@ struct ChannelInterface {
     virtual void adcMeasureAll(int subchannelIndex) = 0;
 
     virtual void setOutputEnable(int subchannelIndex, bool enable) = 0;
+
+    virtual DprogState getDprogState() = 0;
+    virtual void setDprogState(DprogState dprogState) = 0;
 
     virtual void setDacVoltage(int subchannelIndex, uint16_t value) = 0;
     virtual void setDacVoltageFloat(int subchannelIndex, float value) = 0;
