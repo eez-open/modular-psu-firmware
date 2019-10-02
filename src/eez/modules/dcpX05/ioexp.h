@@ -21,8 +21,6 @@
 namespace eez {
 namespace psu {
 
-class Channel;
-
 /// IO Expander HW used by the channel.
 class IOExpander {
 public:

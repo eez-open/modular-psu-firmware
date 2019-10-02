@@ -111,7 +111,7 @@ void IOExpander::init() {
         (1 << IO_BIT_OUT_OUTPUT_ENABLE) | 
         (1 << IO_BIT_OUT_REMOTE_SENSE) | 
         (1 << IO_BIT_OUT_REMOTE_PROGRAMMING);
-    if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
+    if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
         gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_500MA;
         gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_5A;
         gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OVP_ENABLE;
@@ -133,7 +133,7 @@ void IOExpander::init() {
     	uint8_t reg = REG_VALUES[3 * i];
     	uint8_t value = REG_VALUES[3 * i + 1];
 
-    	if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
+    	if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
         	if (reg == REG_IODIRA) {
                 if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
         		    value = DCP405_REG_VALUE_IODIRA;
@@ -172,7 +172,7 @@ bool IOExpander::test() {
 
             uint8_t expectedValue = REG_VALUES[3 * i + 1];
 
-            if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
+            if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
                 if (reg == REG_IODIRA) {
                     if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
                         expectedValue = DCP405_REG_VALUE_IODIRA;
@@ -229,7 +229,7 @@ void IOExpander::reinit() {
     	uint8_t reg = REG_VALUES[3 * i];
     	uint8_t value = REG_VALUES[3 * i + 1];
 
-    	if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
+    	if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
         	if (reg == REG_IODIRA) {
                 if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
         		    value = DCP405_REG_VALUE_IODIRA;
@@ -305,13 +305,11 @@ void IOExpander::tick(uint32_t tick_usec) {
 
 #if defined(EEZ_PLATFORM_STM32)
 int IOExpander::getBitDirection(int bit) {
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
-
     uint8_t dir;
     if (bit < 8) {
-        dir = g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_REG_VALUE_IODIRA : DCP505_REG_VALUE_IODIRA;
+        dir = g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_REG_VALUE_IODIRA : DCP505_REG_VALUE_IODIRA;
     } else {
-        dir = g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_REG_VALUE_IODIRB : DCP505_REG_VALUE_IODIRB;
+        dir = g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_REG_VALUE_IODIRB : DCP505_REG_VALUE_IODIRB;
         bit -= 8;
     }
     return dir & (1 << bit) ? 1 : 0;
@@ -324,9 +322,8 @@ bool IOExpander::testBit(int io_bit) {
 
 #if defined(EEZ_PLATFORM_STM32)
 bool IOExpander::isAdcReady() {
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
     // ready = !HAL_GPIO_ReadPin(SPI2_IRQ_GPIO_Port, SPI2_IRQ_Pin);
-    return !testBit(g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_IO_BIT_IN_ADC_DRDY : DCP505_IO_BIT_IN_ADC_DRDY);
+    return !testBit(g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_IO_BIT_IN_ADC_DRDY : DCP505_IO_BIT_IN_ADC_DRDY);
 }
 #endif
 
@@ -368,33 +365,29 @@ void IOExpander::readGpio() {
 }
 
 uint8_t IOExpander::read(uint8_t reg) {
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
-
     uint8_t data[3];
     data[0] = IOEXP_READ;
     data[1] = reg;
     data[2] = 0;
     uint8_t result[3];
 
-    spi::select(channel.slotIndex, spi::CHIP_IOEXP);
-    spi::transfer(channel.slotIndex, data, result, 3);
-    spi::deselect(channel.slotIndex);
+    spi::select(slotIndex, spi::CHIP_IOEXP);
+    spi::transfer(slotIndex, data, result, 3);
+    spi::deselect(slotIndex);
 
     return result[2];
 }
 
 void IOExpander::write(uint8_t reg, uint8_t val) {
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
-
     uint8_t data[3];
     data[0] = IOEXP_WRITE;
     data[1] = reg;
     data[2] = val;
     uint8_t result[3];
 
-    spi::select(channel.slotIndex, spi::CHIP_IOEXP);
+    spi::select(slotIndex, spi::CHIP_IOEXP);
 
-    spi::transfer(channel.slotIndex, data, result, 3);
+    spi::transfer(slotIndex, data, result, 3);
 
     if (reg == REG_GPIOA) {
         gpioWritten = (gpioWritten & 0xFF00) | val;
@@ -402,7 +395,7 @@ void IOExpander::write(uint8_t reg, uint8_t val) {
         gpioWritten = (gpioWritten & 0x00FF) | (val << 8);
     }
 
-    spi::deselect(channel.slotIndex);
+    spi::deselect(slotIndex);
 }
 #endif
 

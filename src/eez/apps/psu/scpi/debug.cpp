@@ -26,10 +26,11 @@
 #endif
 
 #include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/scpi/psu.h>
+#include <eez/apps/psu/init.h>
 #include <eez/apps/psu/serial_psu.h>
 #include <eez/apps/psu/temperature.h>
 #include <eez/apps/psu/ontime.h>
+#include <eez/apps/psu/scpi/psu.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/platform/stm32/spi.h>
@@ -88,7 +89,10 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
     char buffer[768];
 
     for (int i = 0; i < CH_MAX; i++) {
-        Channel::get(i).adcMeasureAll();
+        if (!measureAllAdcValuesOnChannel(i)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+            return SCPI_RES_ERR;
+        }
     }
 
     debug::dumpVariables(buffer);

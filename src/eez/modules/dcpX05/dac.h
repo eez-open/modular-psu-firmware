@@ -21,7 +21,8 @@
 namespace eez {
 namespace psu {
 
-class Channel;
+class IOExpander;
+class AnalogDigitalConverter;
 
 /// Digital to analog converter HW used by the channel.
 class DigitalAnalogConverter {
@@ -30,7 +31,7 @@ class DigitalAnalogConverter {
     TestResult g_testResult;
 
     void init();
-    bool test();
+    bool test(IOExpander &ioexp, AnalogDigitalConverter &adc);
 
     void setVoltage(float voltage);
     void setDacVoltage(uint16_t voltage);

@@ -75,6 +75,8 @@ void mainLoop(const void *) {
 #endif
 }
 
+bool g_adcMeasureAllFinished = false;
+
 void oneIter() {
     osEvent event = osMessageGet(g_psuMessageQueueId, 1);
     if (event.status == osEventMessage) {
@@ -90,10 +92,25 @@ void oneIter() {
             if (channelInterface) {
             	channelInterface->onSpiIrq();
             }
+        } else if (type == PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL) {
+            eez::psu::Channel::get(param).adcMeasureAll();
+            g_adcMeasureAllFinished = true;
         }
     } else {
         tick();
     }
+}
+
+bool measureAllAdcValuesOnChannel(int channelIndex) {
+    g_adcMeasureAllFinished = false;
+    osMessagePut(eez::psu::g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL, channelIndex), 0);
+
+    int i;
+    for (i = 0; i < 100 && !g_adcMeasureAllFinished; ++i) {
+        osDelay(10);
+    }
+
+    return g_adcMeasureAllFinished;
 }
 
 } // namespace psu

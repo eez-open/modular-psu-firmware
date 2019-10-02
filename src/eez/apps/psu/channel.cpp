@@ -129,6 +129,8 @@ void Channel::Value::addMonValue(float value, float prec) {
 void Channel::Value::addMonDacValue(float value, float prec) {
     value = roundPrec(value, prec);
 
+    mon_dac_last = value;
+
     if (mon_dac_index == -1) {
         mon_dac_index = 0;
         for (int i = 0; i < NUM_ADC_AVERAGING_VALUES; ++i) {
@@ -790,15 +792,11 @@ void Channel::protectionCheck() {
 }
 
 void Channel::adcMeasureMonDac() {
-    if (isOk()) {
-        channelInterface->adcMeasureMonDac(subchannelIndex);
-    }
+    channelInterface->adcMeasureMonDac(subchannelIndex);
 }
 
 void Channel::adcMeasureAll() {
-    if (isOk()) {
-        channelInterface->adcMeasureAll(subchannelIndex);
-    }
+    channelInterface->adcMeasureAll(subchannelIndex);
 }
 
 void Channel::executeOutputEnable(bool enable) {

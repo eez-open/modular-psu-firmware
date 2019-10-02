@@ -283,6 +283,7 @@ class Channel {
         float mon_total;
 
         float mon_dac;
+        float mon_dac_last;
         int8_t mon_dac_index;
         float mon_dac_arr[NUM_ADC_AVERAGING_VALUES];
         float mon_dac_total;

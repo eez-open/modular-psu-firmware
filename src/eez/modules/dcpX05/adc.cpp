@@ -143,16 +143,14 @@ void updateValues(Channel &channel) {
 
 void AnalogDigitalConverter::init() {
 #if defined(EEZ_PLATFORM_STM32)
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
-
     uint8_t data[4];
     uint8_t result[4];
 
-    spi::select(channel.slotIndex, spi::CHIP_ADC);
+    spi::select(slotIndex, spi::CHIP_ADC);
 
     // Send RESET command
     data[0] = ADC_RESET;
-    spi::transfer(channel.slotIndex, data, result, 1);
+    spi::transfer(slotIndex, data, result, 1);
 
     delay(1);
 
@@ -160,9 +158,9 @@ void AnalogDigitalConverter::init() {
     data[1] = getReg1Val();
     data[2] = ADC_REG2_VAL;
     data[3] = ADC_REG3_VAL;
-    spi::transfer(channel.slotIndex, data, result, 4);
+    spi::transfer(slotIndex, data, result, 4);
 
-    spi::deselect(channel.slotIndex);
+    spi::deselect(slotIndex);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -172,8 +170,6 @@ void AnalogDigitalConverter::init() {
 
 bool AnalogDigitalConverter::test() {
 #if defined(EEZ_PLATFORM_STM32)    
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
-
     uint8_t data[4];
     uint8_t result[4];
 
@@ -182,26 +178,28 @@ bool AnalogDigitalConverter::test() {
     data[2] = 0;
     data[3] = 0;
 
-    spi::select(channel.slotIndex, spi::CHIP_ADC);
-    spi::transfer(channel.slotIndex, data, result, 4);
-    spi::deselect(channel.slotIndex);
+    spi::select(slotIndex, spi::CHIP_ADC);
+    spi::transfer(slotIndex, data, result, 4);
+    spi::deselect(slotIndex);
 
     uint8_t reg1 = result[1];
     uint8_t reg2 = result[2];
     uint8_t reg3 = result[3];
 
+    Channel &channel = Channel::getBySlotIndex(slotIndex);
+
 	if (reg1 != getReg1Val()) {
-		DebugTrace("Ch%d ADC test failed reg1: expected=%d, got=%d", channel.channelIndex + 1, getReg1Val(), reg1);
+		// DebugTrace("Ch%d ADC test failed reg1: expected=%d, got=%d", channel.channelIndex + 1, getReg1Val(), reg1);
 		g_testResult = TEST_FAILED;
 	}
 
 	if (reg2 != ADC_REG2_VAL) {
-		DebugTrace("Ch%d ADC test failed reg2: expected=%d, got=%d", channel.channelIndex + 1, ADC_REG2_VAL, reg2);
+		// DebugTrace("Ch%d ADC test failed reg2: expected=%d, got=%d", channel.channelIndex + 1, ADC_REG2_VAL, reg2);
 		g_testResult = TEST_FAILED;
 	}
 
 	if (reg3 != ADC_REG3_VAL) {
-	   DebugTrace("Ch%d ADC test failed reg3: expected=%d, got=%d", channel.channelIndex + 1, ADC_REG3_VAL, reg3);
+	   // DebugTrace("Ch%d ADC test failed reg3: expected=%d, got=%d", channel.channelIndex + 1, ADC_REG3_VAL, reg3);
 	   g_testResult = TEST_FAILED;
 	}
 
@@ -237,10 +235,9 @@ void AnalogDigitalConverter::start(AdcDataType adcDataType_) {
 
         data[2] = ADC_START;
 
-        Channel &channel = Channel::getBySlotIndex(slotIndex);
-        spi::select(channel.slotIndex, spi::CHIP_ADC);
-        spi::transfer(channel.slotIndex, data, result, 3);
-        spi::deselect(channel.slotIndex);
+        spi::select(slotIndex, spi::CHIP_ADC);
+        spi::transfer(slotIndex, data, result, 3);
+        spi::deselect(slotIndex);
     }
 #endif
 }
@@ -254,9 +251,9 @@ float AnalogDigitalConverter::read(Channel& channel) {
     data[1] = 0;
     data[2] = 0;
 
-    spi::select(channel.slotIndex, spi::CHIP_ADC);
-    spi::transfer(channel.slotIndex, data, result, 3);
-    spi::deselect(channel.slotIndex);
+    spi::select(slotIndex, spi::CHIP_ADC);
+    spi::transfer(slotIndex, data, result, 3);
+    spi::deselect(slotIndex);
 
     uint16_t dmsb = result[1];
     uint16_t dlsb = result[2];
@@ -322,10 +319,9 @@ void AnalogDigitalConverter::readAllRegisters(uint8_t registers[]) {
     data[3] = 0;
     data[4] = 0;
 
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
-    spi::select(channel.slotIndex, spi::CHIP_ADC);
-    spi::transfer(channel.slotIndex, data, result, 5);
-    spi::deselect(channel.slotIndex);
+    spi::select(slotIndex, spi::CHIP_ADC);
+    spi::transfer(slotIndex, data, result, 5);
+    spi::deselect(slotIndex);
 
     registers[0] = result[1];
     registers[1] = result[2];

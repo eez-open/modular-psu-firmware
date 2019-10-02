@@ -18,17 +18,19 @@
 
 #include <math.h>
 
-#include <eez/apps/psu/psu.h>
-#include <eez/modules/dcpx05/dac.h>
+#include <scpi/scpi.h>
+
+#include <eez/system.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/platform/stm32/spi.h>
-#include <eez/system.h>
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
+#include <eez/apps/psu/psu.h>
+
+#include <eez/modules/dcpx05/dac.h>
 #include <eez/modules/dcpx05/adc.h>
-#endif
+#include <eez/modules/dcpx05/ioexp.h>
 
 namespace eez {
 namespace psu {
@@ -51,93 +53,89 @@ extern float g_iSet[CH_MAX];
 void DigitalAnalogConverter::init() {
 }
 
-bool DigitalAnalogConverter::test() {
-	g_testResult = TEST_OK;
-
+bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc) {
 #if defined(EEZ_PLATFORM_STM32)
-    // Channel &channel = Channel::getBySlotIndex(slotIndex);
+    Channel &channel = Channel::getBySlotIndex(slotIndex);
 
-    // if (channel.ioexp.g_testResult != TEST_OK) {
-    //     DebugTrace("Ch%d DAC test skipped because of IO expander", channel.channelIndex + 1);
-    //     g_testResult = TEST_SKIPPED;
-    //     return true;
-    // }
+    if (ioexp.g_testResult != TEST_OK) {
+        // DebugTrace("Ch%d DAC test skipped because of IO expander", channel.channelIndex + 1);
+        g_testResult = TEST_SKIPPED;
+        return true;
+    }
 
-    // if (channel.adc.g_testResult != TEST_OK) {
-    //     DebugTrace("Ch%d DAC test skipped because of ADC", channel.channelIndex + 1);
-    //     g_testResult = TEST_SKIPPED;
-    //     return true;
-    // }
+    if (adc.g_testResult != TEST_OK) {
+        // DebugTrace("Ch%d DAC test skipped because of ADC", channel.channelIndex + 1);
+        g_testResult = TEST_SKIPPED;
+        return true;
+    }
 
-    // m_testing = true;
+    m_testing = true;
 
-    // bool saveCalibrationEnabled = channel.isCalibrationEnabled();
-    // channel.calibrationEnableNoEvent(false);
+    bool wasCalibrationEnabled = channel.isCalibrationEnabled();
+    channel.calibrationEnableNoEvent(false);
 
-    // // disable OE on channel
-    // int save_output_enabled = channel.flags.outputEnabled;
-    // channel.flags.outputEnabled = 0;
-    // channel.ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, false);
+    // disable OE on channel
+    if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+        // OVP has to be disabled before OE deactivation
+        ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+    }
+    ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, false);
 
-    // // set U on DAC and check it on ADC
-    // float u_set = channel.u.max / 2;
-    // float i_set = channel.i.max / 2;
+    // set U on DAC and check it on ADC
+    float uSet = channel.u.max / 2;
+    float iSet = channel.i.max / 2;
 
-    // float u_set_save = channel.u.set;
-    // channel.setVoltage(u_set);
+    float wasUSet = channel.u.set;
+    channel.setVoltage(uSet);
 
-    // float i_set_save = channel.i.set;
-    // channel.setCurrent(i_set);
+    float wasISet = channel.i.set;
+    channel.setCurrent(iSet);
 
-    // delay(200);
+    delay(200);
 
-    // channel.adcReadMonDac();
+    channel.adcMeasureMonDac();
 
-    // float u_mon = channel.u.mon_dac;
-    // float u_diff = u_mon - u_set;
-    // if (fabsf(u_diff) > u_set * DAC_TEST_TOLERANCE / 100) {
-    //     g_testResult = TEST_FAILED;
+    float uMon = channel.u.mon_dac_last;
+    float uDiff = uMon - uSet;
+    if (fabsf(uDiff) > uSet * DAC_TEST_TOLERANCE / 100) {
+        // g_testResult = TEST_FAILED;
 
-    //     DebugTrace("Ch%d DAC test, U_set failure: expected=%d, got=%d, abs diff=%d",
-    //         channel.channelIndex + 1,
-    //         (int)(u_set * 100),
-    //         (int)(u_mon * 100),
-    //         (int)(u_diff * 100));
-    // }
+        // DebugTrace("Ch%d DAC test, U_set failure: expected=%d, got=%d, abs diff=%d",
+        //     channel.channelIndex + 1,
+        //     (int)(uSet * 100),
+        //     (int)(uMon * 100),
+        //     (int)(uDiff * 100));
+    }
 
-    // float i_mon = channel.i.mon_dac;
-    // float i_diff = i_mon - i_set;
-    // if (fabsf(i_diff) > i_set * DAC_TEST_TOLERANCE / 100) {
-    //     g_testResult = TEST_FAILED;
+    float iMon = channel.i.mon_dac_last;
+    float iDiff = iMon - iSet;
+    if (fabsf(iDiff) > iSet * DAC_TEST_TOLERANCE / 100) {
+        g_testResult = TEST_FAILED;
 
-    //     DebugTrace("Ch%d DAC test, I_set failure: expected=%d, got=%d, abs diff=%d",
-    //         channel.channelIndex + 1,
-    //         (int)(i_set * 100),
-    //         (int)(i_mon * 100),
-    //         (int)(i_diff * 100));
-    // }
+        // DebugTrace("Ch%d DAC test, I_set failure: expected=%d, got=%d, abs diff=%d",
+        //     channel.channelIndex + 1,
+        //     (int)(iSet * 100),
+        //     (int)(iMon * 100),
+        //     (int)(iDiff * 100));
+    }
 
-    // channel.calibrationEnableNoEvent(saveCalibrationEnabled);
+    if (wasCalibrationEnabled) {
+        channel.calibrationEnableNoEvent(true);
+    }
 
-    // // Re-enable output
-    // if (save_output_enabled) {
-    //     channel.flags.outputEnabled = true;
-    //     channel.ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, true);
-    // }
+    channel.setVoltage(wasUSet);
+    channel.setCurrent(wasISet);
 
-    // channel.setVoltage(u_set_save);
-    // channel.setCurrent(i_set_save);
+    if (g_testResult == TEST_FAILED) {
+        generateError(SCPI_ERROR_CH1_DAC_TEST_FAILED + channel.channelIndex);
+    } else {
+        g_testResult = TEST_OK;
+    }
 
-	// if (g_testResult == TEST_FAILED) {
-	// 	generateError(SCPI_ERROR_CH1_DAC_TEST_FAILED + channel.channelIndex);
-	// } else {
-	// 	g_testResult == TEST_OK;
-	// }
-
-    // m_testing = false;
+    m_testing = false;
 #endif
 
-    return g_testResult != TEST_FAILED;
+return g_testResult != TEST_FAILED;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

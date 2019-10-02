@@ -79,7 +79,7 @@ struct Channel : ChannelInterface {
 	void test(int subchannelIndex) {
 		ioexp.test();
 		adc.test();
-		dac.test();
+		dac.test(ioexp, adc);
 	}
 
 	TestResult getTestResult(int subchannelIndex) {
@@ -99,7 +99,7 @@ struct Channel : ChannelInterface {
 
 		ioexp.tick(tickCount);
 
-	#if !CONF_SKIP_PWRGOOD_TEST
+#if !CONF_SKIP_PWRGOOD_TEST
 		if (!ioexp.testBit(IOExpander::IO_BIT_IN_PWRGOOD)) {
 			// DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d", channel.channelIndex + 1, (int)ioexp.gpio);
 			channel.flags.powerOk = 0;
@@ -107,28 +107,27 @@ struct Channel : ChannelInterface {
 			powerDownBySensor();
 			return;
 		}
-	#endif
+#endif
 
 		AdcDataType adcDataType = adc.adcDataType;
 
 		if (adcDataType) {
 
-	#if defined(EEZ_PLATFORM_STM32)
+#if defined(EEZ_PLATFORM_STM32)
 			if (ioexp.isAdcReady()) {
-	#endif
+#endif
 
-		#ifdef DEBUG
+#ifdef DEBUG
 				psu::debug::g_adcCounter.inc();
-		#endif
+#endif
 
 				float value = adc.read(channel);
 				AdcDataType nextAdcDataType = channel.onAdcData(adcDataType, value);
 				adc.start(nextAdcDataType);
 
-	#if defined(EEZ_PLATFORM_STM32)
+#if defined(EEZ_PLATFORM_STM32)
 			}
-	#endif
-
+#endif
 		}
 
         if (dprogState == DPROG_STATE_AUTO) {
@@ -217,11 +216,23 @@ struct Channel : ChannelInterface {
 		return ioexp.testBit(IOExpander::IO_BIT_IN_CC_ACTIVE);
 	}
 
+	void waitConversionEnd() {
+#if defined(EEZ_PLATFORM_STM32)
+        for (int i = 0; i < ADC_CONVERSION_MAX_TIME_MS; i++) {
+            ioexp.tick(micros());
+            if (ioexp.isAdcReady()) {
+				break;
+			}
+			delay(1);
+		}
+#endif
+    }
+
 	void adcMeasureUMon(int subchannelIndex) {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
 		adc.start(ADC_DATA_TYPE_U_MON);
-		delay(ADC_CONVERSION_MAX_TIME_MS);
+		waitConversionEnd();
 		channel.onAdcData(ADC_DATA_TYPE_U_MON, adc.read(channel));
 	}
 
@@ -229,39 +240,41 @@ struct Channel : ChannelInterface {
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
 		adc.start(ADC_DATA_TYPE_U_MON);
-		delay(ADC_CONVERSION_MAX_TIME_MS);
+		waitConversionEnd();
 		channel.onAdcData(ADC_DATA_TYPE_U_MON, adc.read(channel));
 	}
 
 	void adcMeasureMonDac(int subchannelIndex) {
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
-		adc.start(ADC_DATA_TYPE_U_MON_DAC);
-		delay(ADC_CONVERSION_MAX_TIME_MS);
-		channel.onAdcData(ADC_DATA_TYPE_U_MON_DAC, adc.read(channel));
+		if (channel.isOk() || isDacTesting(subchannelIndex)) {
+			adc.start(ADC_DATA_TYPE_U_MON_DAC);
+			waitConversionEnd();
+			channel.onAdcData(ADC_DATA_TYPE_U_MON_DAC, adc.read(channel));
 
-		adc.start(ADC_DATA_TYPE_I_MON_DAC);
-		delay(ADC_CONVERSION_MAX_TIME_MS);
-		channel.onAdcData(ADC_DATA_TYPE_I_MON_DAC, adc.read(channel));
+			adc.start(ADC_DATA_TYPE_I_MON_DAC);
+			waitConversionEnd();
+			channel.onAdcData(ADC_DATA_TYPE_I_MON_DAC, adc.read(channel));
+		}
 	}
 
 	void adcMeasureAll(int subchannelIndex) {
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
 		adc.start(ADC_DATA_TYPE_U_MON);
-		delay(ADC_CONVERSION_MAX_TIME_MS);
+		waitConversionEnd();
 		channel.onAdcData(ADC_DATA_TYPE_U_MON, adc.read(channel));
 
 		adc.start(ADC_DATA_TYPE_I_MON);
-		delay(ADC_CONVERSION_MAX_TIME_MS);
+		waitConversionEnd();
 		channel.onAdcData(ADC_DATA_TYPE_I_MON, adc.read(channel));
 
 		adc.start(ADC_DATA_TYPE_U_MON_DAC);
-		delay(ADC_CONVERSION_MAX_TIME_MS);
+		waitConversionEnd();
 		channel.onAdcData(ADC_DATA_TYPE_U_MON_DAC, adc.read(channel));
 
 		adc.start(ADC_DATA_TYPE_I_MON_DAC);
-		delay(ADC_CONVERSION_MAX_TIME_MS);
+		waitConversionEnd();
 		channel.onAdcData(ADC_DATA_TYPE_I_MON_DAC, adc.read(channel));
 	}
 

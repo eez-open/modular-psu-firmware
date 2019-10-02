@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+
 #include <eez/system.h>
 #include <eez/index.h>
 
 #include <eez/apps/psu/psu.h>
-
-#include <stdio.h>
-
+#include <eez/apps/psu/init.h>
 #include <eez/apps/psu/calibration.h>
 #include <eez/apps/psu/devices.h>
 #include <eez/apps/psu/scpi/psu.h>
@@ -180,12 +180,15 @@ scpi_result_t scpi_cmd_diagnosticInformationAdcQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    channel->adcMeasureAll();
+    if (!measureAllAdcValuesOnChannel(channel->channelIndex)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        return SCPI_RES_ERR;
+    }
 
     char buffer[64] = { 0 };
 
     strcpy(buffer, "U_SET=");
-    strcatVoltage(buffer, channel->u.mon_dac);
+    strcatVoltage(buffer, channel->u.mon_dac_last);
     SCPI_ResultText(context, buffer);
 
     strcpy(buffer, "U_MON=");
@@ -193,7 +196,7 @@ scpi_result_t scpi_cmd_diagnosticInformationAdcQ(scpi_t *context) {
     SCPI_ResultText(context, buffer);
 
     strcpy(buffer, "I_SET=");
-    strcatCurrent(buffer, channel->i.mon_dac);
+    strcatCurrent(buffer, channel->i.mon_dac_last);
     SCPI_ResultText(context, buffer);
 
     strcpy(buffer, "I_MON=");
