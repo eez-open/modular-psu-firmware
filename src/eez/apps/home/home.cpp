@@ -168,9 +168,15 @@ void HomeAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEv
             y = 1;
         else if (y > eez::mcu::display::getDisplayHeight() - 2)
             y = eez::mcu::display::getDisplayHeight() - 2;
-
+        
+#if OPTION_SDRAM
+        int selectedBufferIndexSaved = mcu::display::selectBuffer(m_activePage.displayBufferIndex);
+#endif
         eez::mcu::display::setColor(255, 255, 255);
         eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+#if OPTION_SDRAM
+        mcu::display::selectBuffer(selectedBufferIndexSaved);
+#endif
     }
 #endif
 
