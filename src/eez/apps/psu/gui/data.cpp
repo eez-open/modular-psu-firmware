@@ -2272,6 +2272,14 @@ void data_event_queue_page_info(data::DataOperationEnum operation, data::Cursor 
     }
 }
 
+void data_channel_has_advanced_options(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        value = g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 ? 1 : 0;
+    }
+}
+
 void data_channel_rsense_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
 		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
@@ -2291,6 +2299,22 @@ void data_channel_rprog_status(data::DataOperationEnum operation, data::Cursor &
 		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
 		Channel &channel = Channel::get(iChannel);
 		value = (int)channel.flags.rprogEnabled;
+    }
+}
+
+void data_channel_dprog_installed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        value = channel.getFeatures() & CH_FEATURE_DPROG ? 1 : 0;
+    }
+}
+
+void data_channel_dprog(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        value = (int)channel.getDprogState();
     }
 }
 

@@ -316,9 +316,9 @@ void action_show_ch_settings_lists() {
     pushPage(PAGE_ID_CH_SETTINGS_LISTS);
 }
 
-void action_show_ch_settings_adv_remote() {
+void action_show_ch_settings_adv_options() {
     selectChannel();
-    pushPage(PAGE_ID_CH_SETTINGS_ADV_REMOTE);
+    pushPage(PAGE_ID_CH_SETTINGS_ADV_OPTIONS);
 }
 
 void action_show_ch_settings_adv_ranges() {
@@ -458,11 +458,15 @@ void action_event_queue_next_page() {
 }
 
 void action_ch_settings_adv_remote_toggle_sense() {
-    ((ChSettingsAdvRemotePage *)getActivePage())->toggleSense();
+    ((ChSettingsAdvOptionsPage *)getActivePage())->toggleSense();
 }
 
 void action_ch_settings_adv_remote_toggle_programming() {
-    ((ChSettingsAdvRemotePage *)getActivePage())->toggleProgramming();
+    ((ChSettingsAdvOptionsPage *)getActivePage())->toggleProgramming();
+}
+
+void action_ch_settings_adv_toggle_dprog() {
+    ((ChSettingsAdvOptionsPage *)getActivePage())->toggleDprog();
 }
 
 void action_date_time_select_dst_rule() {

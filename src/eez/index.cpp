@@ -188,7 +188,7 @@ static ChSettingsOvpProtectionPage g_ChSettingsOvpProtectionPage;
 static ChSettingsOcpProtectionPage g_ChSettingsOcpProtectionPage;
 static ChSettingsOppProtectionPage g_ChSettingsOppProtectionPage;
 static ChSettingsOtpProtectionPage g_ChSettingsOtpProtectionPage;
-static ChSettingsAdvRemotePage g_ChSettingsAdvRemotePage;
+static ChSettingsAdvOptionsPage g_ChSettingsAdvOptionPage;
 static ChSettingsAdvRangesPage g_ChSettingsAdvRangesPage;
 static ChSettingsAdvTrackingPage g_ChSettingsAdvTrackingPage;
 static ChSettingsAdvCouplingPage g_ChSettingsAdvCouplingPage;
@@ -233,8 +233,8 @@ Page *getPageFromId(int pageId) {
     case PAGE_ID_CH_SETTINGS_PROT_OTP:
         page = &g_ChSettingsOtpProtectionPage;
         break;
-    case PAGE_ID_CH_SETTINGS_ADV_REMOTE:
-        page = &g_ChSettingsAdvRemotePage;
+    case PAGE_ID_CH_SETTINGS_ADV_OPTIONS:
+        page = &g_ChSettingsAdvOptionPage;
         break;
     case PAGE_ID_CH_SETTINGS_ADV_RANGES:
         page = &g_ChSettingsAdvRangesPage;

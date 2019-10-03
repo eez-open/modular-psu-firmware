@@ -36,12 +36,22 @@ namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ChSettingsAdvRemotePage::toggleSense() {
+void ChSettingsAdvOptionsPage::toggleSense() {
     channel_dispatcher::remoteSensingEnable(*g_channel, !g_channel->isRemoteSensingEnabled());
 }
 
-void ChSettingsAdvRemotePage::toggleProgramming() {
+void ChSettingsAdvOptionsPage::toggleProgramming() {
     g_channel->remoteProgrammingEnable(!g_channel->isRemoteProgrammingEnabled());
+}
+
+void ChSettingsAdvOptionsPage::toggleDprog() {
+    if (g_channel->getDprogState() == DPROG_STATE_OFF) {
+        g_channel->setDprogState(DPROG_STATE_ON);
+    } else if (g_channel->getDprogState() == DPROG_STATE_ON) {
+        g_channel->setDprogState(DPROG_STATE_AUTO);
+    } else {
+        g_channel->setDprogState(DPROG_STATE_OFF);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

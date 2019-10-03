@@ -163,7 +163,7 @@ bool isChSettingsSubPage(int pageId) {
         pageId == PAGE_ID_CH_SETTINGS_PROT_OTP ||
         pageId == PAGE_ID_CH_SETTINGS_TRIGGER ||
         pageId == PAGE_ID_CH_SETTINGS_LISTS ||
-        pageId == PAGE_ID_CH_SETTINGS_ADV_REMOTE ||
+        pageId == PAGE_ID_CH_SETTINGS_ADV_OPTIONS ||
         pageId == PAGE_ID_CH_SETTINGS_ADV_RANGES ||
         pageId == PAGE_ID_CH_SETTINGS_ADV_TRACKING ||
         pageId == PAGE_ID_CH_SETTINGS_ADV_COUPLING ||

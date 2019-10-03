@@ -25,10 +25,11 @@ namespace eez {
 namespace psu {
 namespace gui {
 
-class ChSettingsAdvRemotePage : public Page {
+class ChSettingsAdvOptionsPage : public Page {
   public:
     void toggleSense();
     void toggleProgramming();
+    void toggleDprog();
 };
 
 class ChSettingsAdvRangesPage : public Page {
