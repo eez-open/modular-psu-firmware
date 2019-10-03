@@ -60,7 +60,7 @@ void getChannelProfileListFilePath(Channel &channel, int location, char *filePat
 }
 
 void loadProfileList(Parameters &profile, Channel &channel, int location) {
-    if (sd_card::g_testResult != TEST_OK) {
+    if (!sd_card::isOk()) {
     	generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
         return;
     }
@@ -124,7 +124,7 @@ void deleteProfileList(Channel &channel, int location) {
 
 void deleteProfileLists(int location) {
 #if OPTION_SD_CARD
-    if (sd_card::g_testResult != TEST_OK) {
+    if (!sd_card::isOk()) {
     	generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
         return;
     }
@@ -422,7 +422,7 @@ bool recall(int location, int *err) {
 
 bool recallFromFile(const char *filePath, int *err) {
 #if OPTION_SD_CARD
-    if (sd_card::g_testResult != TEST_OK) {
+    if (!sd_card::isOk()) {
         if (err)
             *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
@@ -525,7 +525,7 @@ bool saveAtLocation(int location, const char *name) {
 
 bool saveToFile(const char *filePath, int *err) {
 #if OPTION_SD_CARD
-    if (sd_card::g_testResult != TEST_OK) {
+    if (!sd_card::isOk()) {
         if (err)
             *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;

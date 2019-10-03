@@ -32,6 +32,8 @@ extern TestResult g_testResult;
 void init();
 bool test();
 
+bool isOk();
+
 void dumpInfo(char *buffer);
 
 void matchZeroOrMoreSpaces(File &file);

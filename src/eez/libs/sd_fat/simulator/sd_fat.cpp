@@ -362,10 +362,13 @@ void File::print(char value) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool SdFat::begin() {
+bool SdFat::mount() {
     // make sure SD card root path exists
     mkdir("/");
     return pathExists("/");
+}
+
+void SdFat::unmount() {
 }
 
 bool SdFat::exists(const char *path) {

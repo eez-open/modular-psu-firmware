@@ -228,8 +228,12 @@ void File::print(char value) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool SdFat::begin() {
+bool SdFat::mount() {
     return f_mount(&SDFatFS, SDPath, 1) == FR_OK;
+}
+
+void SdFat::unmount() {
+    f_mount(0, "", 0);
 }
 
 bool SdFat::exists(const char *path) {

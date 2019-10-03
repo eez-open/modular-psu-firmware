@@ -26,10 +26,11 @@ namespace scpi {
 //
 // QUEStionable status register bits
 //
-#define QUES_TIME (1 << 3)  /* TIME */
-#define QUES_TEMP (1 << 4)  /* TEMPerature */
-#define QUES_FAN (1 << 12)  /* FAN */
-#define QUES_ISUM (1 << 13) /* INSTrument Summary */
+#define QUES_TIME (1 << 3)   /* TIME */
+#define QUES_TEMP (1 << 4)   /* TEMPerature */
+#define QUES_MMEM (1 << 5)   /* MMEM – SD card is not inserted */
+#define QUES_FAN  (1 << 12)  /* FAN */
+#define QUES_ISUM (1 << 13)  /* INSTrument Summary */
 
 //
 // OPERation Status Register bits

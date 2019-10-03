@@ -150,7 +150,8 @@ class File {
 
 class SdFat {
   public:
-    bool begin();
+    bool mount();
+    void unmount();
     bool exists(const char *path);
     bool rename(const char *sourcePath, const char *destinationPath);
     bool remove(const char *path);

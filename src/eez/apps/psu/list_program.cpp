@@ -209,7 +209,7 @@ bool loadList(int iChannel, const char *filePath, int *err) {
 #if OPTION_SD_CARD
     Channel &channel = Channel::get(iChannel);
 
-    if (sd_card::g_testResult != TEST_OK) {
+    if (!sd_card::isOk()) {
         *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
     }
@@ -339,7 +339,7 @@ bool saveList(int iChannel, const char *filePath, int *err) {
 
     Channel &channel = Channel::get(iChannel);
 
-    if (sd_card::g_testResult != TEST_OK) {
+    if (!sd_card::isOk()) {
         *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
     }
