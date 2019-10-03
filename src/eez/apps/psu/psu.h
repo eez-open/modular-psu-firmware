@@ -75,7 +75,6 @@ void setOperBits(int bit_mask, bool on);
 
 const char *getCpuModel();
 const char *getCpuType();
-const char *getCpuEthernetType();
 
 bool isMaxCurrentLimited();
 MaxCurrentLimitCause getMaxCurrentLimitCause();

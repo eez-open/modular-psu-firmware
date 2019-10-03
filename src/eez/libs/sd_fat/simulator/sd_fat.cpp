@@ -41,6 +41,7 @@
 #endif
 
 #include <eez/util.h>
+#include <scpi/scpi.h>
 
 namespace eez {
 
@@ -362,10 +363,17 @@ void File::print(char value) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool SdFat::mount() {
+bool SdFat::mount(int *err) {
     // make sure SD card root path exists
     mkdir("/");
-    return pathExists("/");
+    
+    if (!pathExists("/")) {
+        *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+        return false;
+    } 
+    
+    *err = SCPI_RES_OK;
+    return true;
 }
 
 void SdFat::unmount() {

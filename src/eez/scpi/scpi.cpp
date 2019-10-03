@@ -29,6 +29,9 @@
 #endif
 #include <eez/apps/psu/event_queue.h>
 #include <eez/apps/psu/profile.h>
+#if OPTION_SD_CARD
+#include <eez/apps/psu/sd_card.h>
+#endif
 #include <eez/apps/psu/scpi/psu.h>
 
 using namespace eez::psu;
@@ -104,11 +107,19 @@ void oneIter() {
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_DELETE_PROFILE_LISTS) {
                 profile::deleteProfileLists(param);
             }
-        }      
+#if defined(EEZ_PLATFORM_STM32) && OPTION_SD_CARD
+			else if (type == SCPI_QUEUE_MESSAGE_TYPE_SD_DETECT_IRQ) {
+				eez::psu::sd_card::onSdDetectInterruptHandler();
+			}
+#endif
+        }
     } else {
         profile::tick();
 #if OPTION_ETHERNET
         ntp::tick();
+#endif
+#if OPTION_SD_CARD
+        sd_card::tick();
 #endif
     }
 }

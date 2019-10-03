@@ -50,6 +50,7 @@ extern osMessageQId g_scpiMessageQueueId;
 
 #define SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST 1
 #define SCPI_QUEUE_MESSAGE_TYPE_DELETE_PROFILE_LISTS 2
+#define SCPI_QUEUE_MESSAGE_TYPE_SD_DETECT_IRQ 3
 
 extern char g_listFilePath[CH_MAX][MAX_PATH_LENGTH];
 

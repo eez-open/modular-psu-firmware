@@ -61,6 +61,9 @@
 #include <eez/apps/psu/gui/page_user_profiles.h>
 #include <eez/apps/psu/gui/psu.h>
 #include <eez/gui/dialogs.h>
+#if OPTION_SD_CARD
+#include <eez/apps/psu/sd_card.h>
+#endif
 
 #define CONF_GUI_REFRESH_EVERY_MS 250
 #define CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD 5 // 5 seconds
@@ -2470,11 +2473,29 @@ void data_sys_info_cpu(data::DataOperationEnum operation, data::Cursor &cursor, 
     }
 }
 
-void data_sys_info_ethernet(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_sys_info_sdcard(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(getCpuEthernetType());
+#if OPTION_SD_CARD
+    	int err;
+        if (eez::psu::sd_card::isMounted(&err)) {
+            if (eez::psu::sd_card::isBusy()) {
+                value = 5; // busy
+            } else {
+                value = 1; // present
+            }
+        } else if (err == SCPI_ERROR_MISSING_MASS_MEDIA) {
+            value = 2; // not present
+        } else if (err == SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM) {
+        	value = 3; // no FAT
+		} else {
+			value = 4; // failed
+		}
+#else
+        value = 0; // unsupported
+#endif
     }
 }
+
 
 void data_sys_info_fan_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {

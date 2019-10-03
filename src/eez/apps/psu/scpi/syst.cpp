@@ -574,12 +574,6 @@ scpi_result_t scpi_cmd_systemChannelModelQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemCpuInformationEthernetTypeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-    SCPI_ResultText(context, getCpuEthernetType());
-    return SCPI_RES_OK;
-}
-
 scpi_result_t scpi_cmd_systemCpuInformationTypeQ(scpi_t *context) {
     // TODO migrate to generic firmware
     SCPI_ResultText(context, getCpuType());

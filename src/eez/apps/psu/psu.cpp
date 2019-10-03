@@ -891,14 +891,6 @@ const char *getCpuType() {
 #endif
 }
 
-const char *getCpuEthernetType() {
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    return "Simulator";
-#elif defined(EEZ_PLATFORM_STM32)
-    return "None";
-#endif
-}
-
 bool isMaxCurrentLimited() {
     return g_maxCurrentLimitCause != MAX_CURRENT_LIMIT_CAUSE_NONE;
 }

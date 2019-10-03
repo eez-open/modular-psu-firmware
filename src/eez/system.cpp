@@ -106,10 +106,6 @@ void mainTask(const void *) {
 
 #if defined(EEZ_PLATFORM_STM32)
     MX_USB_DEVICE_Init();
-#if OPTION_SD_CARD
-    MX_SDMMC1_SD_Init();
-    MX_FATFS_Init();
-#endif
 #endif
 
     setSystemState(BOOTING);

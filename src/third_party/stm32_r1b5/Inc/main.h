@@ -124,6 +124,7 @@ void Error_Handler(void);
 #define SPI5_IRQ_EXTI_IRQn EXTI15_10_IRQn
 #define SD_DETECT_Pin GPIO_PIN_11
 #define SD_DETECT_GPIO_Port GPIOC
+#define SD_DETECT_EXTI_IRQn EXTI15_10_IRQn
 #define USB_OTG_FS_OC_Pin GPIO_PIN_4
 #define USB_OTG_FS_OC_GPIO_Port GPIOD
 #define USB_OTG_FS_PSO_Pin GPIO_PIN_5

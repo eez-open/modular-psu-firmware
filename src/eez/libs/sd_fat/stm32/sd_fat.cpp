@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <scpi/scpi.h>
+
 namespace eez {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,12 +230,24 @@ void File::print(char value) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool SdFat::mount() {
-    return f_mount(&SDFatFS, SDPath, 1) == FR_OK;
+bool SdFat::mount(int *err) {
+	auto res = f_mount(&SDFatFS, SDPath, 1);
+	if (res != FR_OK) {
+		if (res == FR_NO_FILESYSTEM) {
+			*err = SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM;
+		} else {
+			*err = SCPI_ERROR_MASS_STORAGE_ERROR;
+		}
+		return false;
+	}
+
+	*err = SCPI_RES_OK;
+    return true;
 }
 
 void SdFat::unmount() {
     f_mount(0, "", 0);
+    memset(&SDFatFS, 0, sizeof(SDFatFS));
 }
 
 bool SdFat::exists(const char *path) {

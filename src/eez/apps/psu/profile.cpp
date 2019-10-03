@@ -30,6 +30,7 @@
 #include <eez/apps/psu/trigger.h>
 #if OPTION_SD_CARD
 #include <eez/apps/psu/sd_card.h>
+#include <eez/libs/sd_fat/sd_fat.h>
 #endif
 #include <eez/scpi/scpi.h>
 
@@ -60,19 +61,21 @@ void getChannelProfileListFilePath(Channel &channel, int location, char *filePat
 }
 
 void loadProfileList(Parameters &profile, Channel &channel, int location) {
-    if (!sd_card::isOk()) {
-    	generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
+    int err;
+    if (!sd_card::isMounted(&err)) {
+        if (err != SCPI_ERROR_MISSING_MASS_MEDIA && err != SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM) {
+    	    generateError(err);
+        }
         return;
     }
 
     char filePath[MAX_PATH_LENGTH];
     getChannelProfileListFilePath(channel, location, filePath);
 
-    if (!SD.exists(filePath)) {
+    if (!sd_card::exists(filePath, &err)) {
         return;
     }
     
-    int err;
     if (list::loadList(channel.channelIndex, filePath, &err)) {
         if (location == 0) {
             list::setListsChanged(channel, false);
@@ -112,20 +115,24 @@ void deleteProfileList(Channel &channel, int location) {
     char filePath[MAX_PATH_LENGTH];
     getChannelProfileListFilePath(channel, location, filePath);
 
-    if (!SD.exists(filePath)) {
+    int err;
+
+    if (!sd_card::exists(filePath, &err)) {
         return;
     }
 
-    if (!SD.remove(filePath)) {
-        // TODO more specific error
-        generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
+    if (!sd_card::deleteFile(filePath, &err)) {
+        generateError(err);
     }
 }
 
 void deleteProfileLists(int location) {
 #if OPTION_SD_CARD
-    if (!sd_card::isOk()) {
-    	generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
+    int err;
+    if (!sd_card::isMounted(&err)) {
+        if (err != SCPI_ERROR_MISSING_MASS_MEDIA && err != SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM) {
+    	    generateError(err);
+        }
         return;
     }
 
@@ -422,9 +429,7 @@ bool recall(int location, int *err) {
 
 bool recallFromFile(const char *filePath, int *err) {
 #if OPTION_SD_CARD
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -525,9 +530,7 @@ bool saveAtLocation(int location, const char *name) {
 
 bool saveToFile(const char *filePath, int *err) {
 #if OPTION_SD_CARD
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 

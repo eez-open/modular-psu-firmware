@@ -50,6 +50,10 @@
 #include <eez/apps/psu/psu.h>
 #include <eez/apps/psu/init.h>
 
+#if OPTION_SD_CARD
+#include <eez/apps/psu/sd_card.h>
+#endif
+
 #if defined(EEZ_PLATFORM_STM32)
 extern "C" void SystemClock_Config(void);
 
@@ -58,18 +62,26 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *p
 }
 
 extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    int slotIndex;
+    int slotIndex = -1;
+
     if (GPIO_Pin == SPI2_IRQ_Pin) {
     	slotIndex = 0;
     } else if (GPIO_Pin == SPI4_IRQ_Pin) {
     	slotIndex = 1;
     } else if (GPIO_Pin == SPI5_IRQ_Pin) {
     	slotIndex = 2;
-    } else {
+    }
+
+#if OPTION_SD_CARD
+    else if (GPIO_Pin == SD_DETECT_Pin) {
+        eez::psu::sd_card::onSdDetectInterrupt();
         return;
     }
+#endif
     
-    osMessagePut(eez::psu::g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_SPI_IRQ, slotIndex), 0);
+    if (slotIndex != -1) {
+    	osMessagePut(eez::psu::g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_SPI_IRQ, slotIndex), 0);
+    }
 }
 
 #endif

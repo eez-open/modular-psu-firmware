@@ -33,6 +33,7 @@
 extern SD_HandleTypeDef hsd1;
 
 /* USER CODE BEGIN BeforeInitSection */
+int g_sdCardIsPresent = 0;
 /* can be used to modify / undefine following code or add code */
 /* USER CODE END BeforeInitSection */
 /**
@@ -279,10 +280,11 @@ uint8_t BSP_SD_IsDetected(void)
 {
   __IO uint8_t status = SD_PRESENT;
 
-  if (BSP_PlatformIsDetected() == 0x0) 
-  {
-    status = SD_NOT_PRESENT;
+  /* USER CODE BEGIN 1 */
+  if (!g_sdCardIsPresent) {
+	  g_sdCardIsPresent = SD_NOT_PRESENT;
   }
+  /* USER CODE END 1 */
 
   return status;
 }

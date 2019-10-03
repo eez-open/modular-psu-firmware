@@ -57,6 +57,7 @@ extern "C" {
     X(SCPI_ERROR_HARDWARE_ERROR,                            -240, "Hardware error")                               \
     X(SCPI_ERROR_HARDWARE_MISSING,                          -241, "Hardware missing")                             \
     X(SCPI_ERROR_MASS_STORAGE_ERROR,                        -250, "Mass storage error")                           \
+	X(SCPI_ERROR_MISSING_MASS_MEDIA,                        -252, "Missing media")                                \
     X(SCPI_ERROR_FILE_NAME_NOT_FOUND,                       -256, "File name not found")                          \
     X(SCPI_ERROR_FILE_NAME_ERROR,                           -257, "File name error")                              \
     X(SCPI_ERROR_MEDIA_PROTECTED,                           -258, "Media protected")                              \
@@ -125,6 +126,7 @@ extern "C" {
     X(SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE,             313, "Cannot execute in tracking mode")              \
 	X(SCPI_ERROR_CANNOT_LOAD_EMPTY_PROFILE,                  400, "Cannot load empty profile")                    \
     X(SCPI_ERROR_PROFILE_MODULE_MISMATCH,                    401, "Module mismatch in profile")                   \
+	X(SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM,                   410, "No FAT file system on mass media")             \
     X(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF,           500, "Down-programmer on CH1 switched off")          \
     X(SCPI_ERROR_CH2_DOWN_PROGRAMMER_SWITCHED_OFF,           501, "Down-programmer on CH2 switched off")          \
     X(SCPI_ERROR_CH3_DOWN_PROGRAMMER_SWITCHED_OFF,           502, "Down-programmer on CH3 switched off")          \

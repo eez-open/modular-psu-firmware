@@ -29,6 +29,7 @@
 #include <eez/apps/psu/trigger.h>
 #if OPTION_SD_CARD
 #include <eez/apps/psu/sd_card.h>
+#include <eez/libs/sd_fat/sd_fat.h>
 #endif
 #include <eez/apps/psu/io_pins.h>
 #include <eez/system.h>
@@ -209,8 +210,7 @@ bool loadList(int iChannel, const char *filePath, int *err) {
 #if OPTION_SD_CARD
     Channel &channel = Channel::get(iChannel);
 
-    if (!sd_card::isOk()) {
-        *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -339,8 +339,7 @@ bool saveList(int iChannel, const char *filePath, int *err) {
 
     Channel &channel = Channel::get(iChannel);
 
-    if (!sd_card::isOk()) {
-        *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 

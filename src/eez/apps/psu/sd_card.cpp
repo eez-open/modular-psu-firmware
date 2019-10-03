@@ -18,9 +18,16 @@
 
 #if OPTION_SD_CARD
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <gpio.h>
+#include <sdmmc.h>
+#include <fatfs.h>
+#endif
+
 #include <eez/apps/psu/psu.h>
 
 #include <scpi/scpi.h>
+#include <eez/scpi/scpi.h>
 
 #include <eez/apps/psu/datetime.h>
 #include <eez/apps/psu/event_queue.h>
@@ -34,47 +41,108 @@
 #include <eez/gui/dialogs.h>
 #endif
 
+#include <eez/libs/sd_fat/sd_fat.h>
+
+extern "C" int g_sdCardIsPresent;
+
 namespace eez {
 
 SdFat SD;
 
+using namespace scpi;
+
 namespace psu {
 namespace sd_card {
 
+bool g_mounted;
+
 TestResult g_testResult = TEST_FAILED;
+int g_lastError;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void mount() {
+#if defined(EEZ_PLATFORM_STM32)
+	MX_FATFS_Init();
+#endif
+	if (SD.mount(&g_lastError)) {
+		g_mounted = true;
+		g_testResult = TEST_OK;
+		setQuesBits(QUES_MMEM, true);
+	} else {
+		g_testResult = TEST_FAILED;
+	}
+}
+
+void unmount() {
+    SD.unmount();
+#if defined(EEZ_PLATFORM_STM32)
+	FATFS_UnLinkDriver(SDPath);
+#endif
+	g_mounted = false;
+	g_testResult = TEST_SKIPPED;
+	setQuesBits(QUES_MMEM, false);
+}
+
 void init() {
+#if defined(EEZ_PLATFORM_STM32)
+    MX_SDMMC1_SD_Init();
+	g_sdCardIsPresent = HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin) == GPIO_PIN_RESET ? 1 : 0;
+	if (g_sdCardIsPresent) {
+		mount();
+	} else {
+		g_testResult = TEST_SKIPPED;
+	}
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	mount();
+#endif
 }
 
 bool test() {
-#if defined(EEZ_PLATFORM_STM32)
-    if (!BSP_PlatformIsDetected()) {
-        g_testResult = TEST_SKIPPED;
-    } else {
-#endif
-
-    	if (SD.mount()) {
-#ifdef EEZ_PLATFORM_SIMULATOR
-    		makeParentDir("/");
-#endif
-    		g_testResult = TEST_OK;
-    	} else {
-    		g_testResult = TEST_FAILED;
-    	}
-
-#if defined(EEZ_PLATFORM_STM32)
-    }
-#endif
-
-    setQuesBits(QUES_MMEM, g_testResult != TEST_OK);
-
     return g_testResult != TEST_FAILED;
 }
 
-bool isOk() {
-    return g_testResult == TEST_OK;
+void tick() {
+#if defined(EEZ_PLATFORM_STM32)
+	g_sdCardIsPresent = HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin) == GPIO_PIN_RESET ? 1 : 0;
+	if (g_sdCardIsPresent && !g_mounted && g_testResult == TEST_SKIPPED) {
+		mount();
+	}
+#endif
+}
+
+#if defined(EEZ_PLATFORM_STM32)
+void onSdDetectInterrupt() {
+	// push message into SCPI thread queue so onSdDetectInterruptHandler is called inside SCPI thread
+	osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SD_DETECT_IRQ, 0), 0);
+}
+
+void onSdDetectInterruptHandler() {
+	if (g_mounted || g_testResult == TEST_FAILED) {
+		unmount();
+	}
+}
+#endif
+
+bool isMounted(int *err) {
+	if (g_mounted) {
+		*err = SCPI_RES_OK;
+	    return true;
+	}
+
+	if (g_testResult == TEST_SKIPPED) {
+		*err = SCPI_ERROR_MISSING_MASS_MEDIA;
+		return false;
+	}
+
+	*err = g_lastError;
+	return false;
+}
+
+bool isBusy() {
+    return false;
 }
 
 void dumpInfo(char *buffer) {
@@ -171,9 +239,7 @@ bool makeParentDir(const char *filePath) {
 }
 
 bool exists(const char *dirPath, int *err) {
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -191,9 +257,7 @@ bool catalog(const char *dirPath, void *param,
              int *numFiles, int *err) {
     *numFiles = 0;
 
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -234,9 +298,7 @@ bool catalog(const char *dirPath, void *param,
 }
 
 bool catalogLength(const char *dirPath, size_t *length, int *err) {
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -266,11 +328,8 @@ bool catalogLength(const char *dirPath, size_t *length, int *err) {
     return true;
 }
 
-bool upload(const char *filePath, void *param,
-            void (*callback)(void *param, const void *buffer, int size), int *err) {
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+bool upload(const char *filePath, void *param, void (*callback)(void *param, const void *buffer, int size), int *err) {
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -333,9 +392,7 @@ bool upload(const char *filePath, void *param,
 File file;
 
 bool download(const char *filePath, bool truncate, const void *buffer, size_t size, int *err) {
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -363,9 +420,7 @@ void downloadFinished() {
 }
 
 bool moveFile(const char *sourcePath, const char *destinationPath, int *err) {
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -385,9 +440,7 @@ bool moveFile(const char *sourcePath, const char *destinationPath, int *err) {
 }
 
 bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -470,9 +523,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
 }
 
 bool deleteFile(const char *filePath, int *err) {
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -492,9 +543,7 @@ bool deleteFile(const char *filePath, int *err) {
 }
 
 bool makeDir(const char *dirPath, int *err) {
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -508,9 +557,7 @@ bool makeDir(const char *dirPath, int *err) {
 }
 
 bool removeDir(const char *dirPath, int *err) {
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -552,9 +599,7 @@ void getDateTime(FileInfo &fileInfo, uint8_t *resultYear, uint8_t *resultMonth, 
 }
 
 bool getDate(const char *filePath, uint8_t &year, uint8_t &month, uint8_t &day, int *err) {
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -571,9 +616,7 @@ bool getDate(const char *filePath, uint8_t &year, uint8_t &month, uint8_t &day, 
 }
 
 bool getTime(const char *filePath, uint8_t &hour, uint8_t &minute, uint8_t &second, int *err) {
-    if (!sd_card::isOk()) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    if (!sd_card::isMounted(err)) {
         return false;
     }
 
@@ -594,7 +637,8 @@ bool getInfo(uint64_t &usedSpace, uint64_t &freeSpace) {
 }
 
 bool confRead(uint8_t *buffer, uint16_t buffer_size, uint16_t address) {
-    if (!sd_card::isOk()) {
+    int err;
+    if (!sd_card::isMounted(&err)) {
         return false;
     }
 
@@ -613,7 +657,8 @@ bool confRead(uint8_t *buffer, uint16_t buffer_size, uint16_t address) {
 }
 
 bool confWrite(const uint8_t *buffer, uint16_t buffer_size, uint16_t address) {
-    if (!sd_card::isOk()) {
+    int err;
+    if (!sd_card::isMounted(&err)) {
         return false;
     }
 

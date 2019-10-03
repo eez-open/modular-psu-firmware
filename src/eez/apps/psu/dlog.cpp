@@ -18,6 +18,7 @@
 
 #if OPTION_SD_CARD
 #include <eez/apps/psu/psu.h>
+#include <eez/libs/sd_fat/sd_fat.h>
 
 #include <math.h>
 

@@ -18,21 +18,32 @@
 
 #pragma once
 
-#include <eez/libs/sd_fat/sd_fat.h>
+//#include <eez/libs/sd_fat/sd_fat.h>
 
 namespace eez {
 
-extern SdFat SD;
+class File;
+
+//extern SdFat SD;
 
 namespace psu {
 namespace sd_card {
 
 extern TestResult g_testResult;
+extern int g_lastError;
 
 void init();
 bool test();
 
-bool isOk();
+void tick();
+
+#if defined(EEZ_PLATFORM_STM32)
+void onSdDetectInterrupt();
+void onSdDetectInterruptHandler();
+#endif
+
+bool isMounted(int *err);
+bool isBusy();
 
 void dumpInfo(char *buffer);
 
