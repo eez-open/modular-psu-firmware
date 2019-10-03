@@ -80,7 +80,8 @@ void unmount() {
 	FATFS_UnLinkDriver(SDPath);
 #endif
 	g_mounted = false;
-	g_testResult = TEST_SKIPPED;
+    g_lastError = SCPI_ERROR_MISSING_MASS_MEDIA;
+	g_testResult = TEST_FAILED;
 	setQuesBits(QUES_MMEM, false);
 }
 
@@ -91,7 +92,8 @@ void init() {
 	if (g_sdCardIsPresent) {
 		mount();
 	} else {
-		g_testResult = TEST_SKIPPED;
+        g_lastError = SCPI_ERROR_MISSING_MASS_MEDIA;
+        g_testResult = TEST_FAILED;
 	}
 #endif
 
@@ -107,7 +109,7 @@ bool test() {
 void tick() {
 #if defined(EEZ_PLATFORM_STM32)
 	g_sdCardIsPresent = HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin) == GPIO_PIN_RESET ? 1 : 0;
-	if (g_sdCardIsPresent && !g_mounted && g_testResult == TEST_SKIPPED) {
+	if (g_sdCardIsPresent && !g_mounted && g_lastError == SCPI_ERROR_MISSING_MASS_MEDIA) {
 		mount();
 	}
 #endif
@@ -128,16 +130,15 @@ void onSdDetectInterruptHandler() {
 
 bool isMounted(int *err) {
 	if (g_mounted) {
-		*err = SCPI_RES_OK;
+        if (err != nullptr) {
+            *err = SCPI_RES_OK;
+        }
 	    return true;
 	}
 
-	if (g_testResult == TEST_SKIPPED) {
-		*err = SCPI_ERROR_MISSING_MASS_MEDIA;
-		return false;
-	}
-
-	*err = g_lastError;
+    if (err != nullptr) {
+        *err = g_lastError;
+    }
 	return false;
 }
 

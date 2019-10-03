@@ -214,7 +214,7 @@ bool loadList(int iChannel, const char *filePath, int *err) {
         return false;
     }
 
-    if (!sd_card::exists(filePath, NULL)) {
+    if (!sd_card::exists(filePath, err)) {
         if (err) {
             *err = SCPI_ERROR_LIST_NOT_FOUND;
         }
