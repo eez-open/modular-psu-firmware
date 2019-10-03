@@ -98,7 +98,7 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
     float uMon = channel.u.mon_dac_last;
     float uDiff = uMon - uSet;
     if (fabsf(uDiff) > uSet * DAC_TEST_TOLERANCE / 100) {
-        // g_testResult = TEST_FAILED;
+        g_testResult = TEST_FAILED;
 
         // DebugTrace("Ch%d DAC test, U_set failure: expected=%d, got=%d, abs diff=%d",
         //     channel.channelIndex + 1,
@@ -135,7 +135,11 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
     m_testing = false;
 #endif
 
-return g_testResult != TEST_FAILED;
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_testResult = TEST_OK;
+#endif
+
+    return g_testResult != TEST_FAILED;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

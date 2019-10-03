@@ -377,17 +377,19 @@ struct Channel : ChannelInterface {
 	void setDacVoltageFloat(int subchannelIndex, float value) {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
-		if (channel.isOutputEnabled()) {
-			if (value < uSet) {
-				fallingEdge = true;
-				if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
-					if (channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
-						// deactivate HW OVP
-						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
-					}
-				}
-			}
+        if (channel.isOutputEnabled()) {
+            if (value < uSet) {
+                fallingEdge = true;
+                if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+                    if (channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
+                        // deactivate HW OVP
+                        ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+                    }
+                }
+            }
+        }
 
+        if (channel.isOutputEnabled() || isDacTesting(subchannelIndex)) {
 			dac.setVoltage(value);
 		}
 
