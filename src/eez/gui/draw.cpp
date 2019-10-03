@@ -289,23 +289,6 @@ void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, 
     if (y_offset < 0)
         y_offset = y1;
 
-    uint16_t background_color = active
-                                    ? (activeStyle ? activeStyle->background_color : style->color)
-                                    : style->background_color;
-    display::setColor(background_color);
-
-    // fill background
-    if (x1 <= x_offset - 1 && y1 <= y2)
-        display::fillRect(x1, y1, x_offset - 1, y2);
-    if (x_offset + width <= x2 && y1 <= y2)
-        display::fillRect(x_offset + width, y1, x2, y2);
-
-    int right = MIN(x_offset + width - 1, x2);
-
-    if (x_offset <= right && y1 <= y_offset - 1)
-        display::fillRect(x_offset, y1, right, y_offset - 1);
-    if (x_offset <= right && y_offset + height <= y2)
-        display::fillRect(x_offset, y_offset + height, right, y2);
 
     // draw bitmap
     uint8_t savedOpacity = display::getOpacity();
