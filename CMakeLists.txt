@@ -22,6 +22,10 @@ else()
     add_definitions(-DOPTION_ETHERNET=1)
 endif()
 
+if (UNIX)
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fpermissive")
+endif (UNIX)
+
 add_definitions(-DDEBUG)
 
 add_definitions(-DHAVE_STRTOLL)
@@ -733,6 +737,12 @@ if(MSVC)
     target_compile_options(modular-psu-firmware PRIVATE "/MP")
 endif()
 
+if (UNIX)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
+    target_link_libraries(modular-psu-firmware Threads::Threads)    
+endif (UNIX)
+
 target_link_libraries(modular-psu-firmware ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 
 if(WIN32)
@@ -762,17 +772,17 @@ if(WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/libwebp-7.dll"
             $<TARGET_FILE_DIR:modular-psu-firmware>)
-                        
+
     add_custom_command(TARGET modular-psu-firmware POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/SDL2_image.dll"
             $<TARGET_FILE_DIR:modular-psu-firmware>)
-            
+
     add_custom_command(TARGET modular-psu-firmware POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/zlib1.dll"
             $<TARGET_FILE_DIR:modular-psu-firmware>)
-                
+
 endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
