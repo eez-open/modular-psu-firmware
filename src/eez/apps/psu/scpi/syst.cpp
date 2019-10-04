@@ -38,6 +38,8 @@
 #include <eez/apps/psu/io_pins.h>
 #include <eez/apps/psu/ontime.h>
 
+#include <eez/modules/mcu/battery.h>
+
 namespace eez {
 namespace psu {
 namespace scpi {
@@ -1496,6 +1498,28 @@ scpi_result_t scpi_cmd_systemReset(scpi_t *context) {
     return SCPI_RES_ERR;
 #endif
 }
+
+static scpi_choice_def_t systemMeasureVoltageChoice[] = { 
+    { "VBAT", 1 },
+    SCPI_CHOICE_LIST_END 
+};
+
+scpi_result_t scpi_cmd_systemMeasureScalarVoltageDcQ(scpi_t *context) {
+#if defined(EEZ_PLATFORM_STM32)
+    // TODO migrate to generic firmware
+    int32_t choice;
+    if (!SCPI_ParamChoice(context, systemMeasureVoltageChoice, &choice, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    // only choice for now is VBAT
+    return result_float(context, 0, mcu::battery::g_battery, UNIT_VOLT);
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
 
 } // namespace scpi
 } // namespace psu

@@ -328,6 +328,8 @@ static bool testMaster() {
 
     result &= temperature::test();
 
+    result &= mcu::battery::test();
+
     // test BP3c
     result &= bp3c::relays::test();
 

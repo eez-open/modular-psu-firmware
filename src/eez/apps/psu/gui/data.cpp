@@ -2449,6 +2449,23 @@ void data_sys_temp_aux(data::DataOperationEnum operation, data::Cursor &cursor, 
     }
 }
 
+void data_sys_info_has_error(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::AUX];
+        int err;
+        value = (
+            // AUX temp.
+            (tempSensor.isInstalled() && !tempSensor.isTestOK()) ||
+            // FAN
+            (aux_ps::fan::g_testResult == TEST_FAILED || aux_ps::fan::g_testResult == TEST_WARNING) ||
+            // Battery
+            mcu::battery::g_testResult == TEST_FAILED ||
+            // SD card
+            !eez::psu::sd_card::isMounted(&err)
+        ) ? 1 : 0;
+    }
+}
+
 void data_sys_info_firmware_ver(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = data::Value(FIRMWARE);
@@ -2473,7 +2490,25 @@ void data_sys_info_cpu(data::DataOperationEnum operation, data::Cursor &cursor, 
     }
 }
 
-void data_sys_info_sdcard(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_sys_info_battery_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        if (mcu::battery::g_testResult == TEST_FAILED) {
+            value = 0;
+        } else if (mcu::battery::g_testResult == TEST_OK) {
+            value = 1;
+        } else {
+            value = 2;
+        }
+    }
+}
+
+void data_battery(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = MakeValue(mcu::battery::g_battery, UNIT_VOLT);
+    }
+}
+
+void data_sys_info_sdcard_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
 #if OPTION_SD_CARD
     	int err;
@@ -3703,12 +3738,6 @@ void data_simulator_load2(data::DataOperationEnum operation, data::Cursor &curso
 }
 
 #endif
-
-void data_battery(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(mcu::battery::g_battery, UNIT_VOLT);
-    }
-}
 
 } // namespace gui
 } // namespace eez

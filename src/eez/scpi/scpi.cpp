@@ -88,7 +88,7 @@ void mainLoop(const void *) {
 }
 
 void oneIter() {
-    osEvent event = osMessageGet(g_scpiMessageQueueId, 1);
+    osEvent event = osMessageGet(g_scpiMessageQueueId, 250);
     if (event.status == osEventMessage) {
     	uint32_t message = event.value.v;
     	uint32_t target = SCPI_QUEUE_MESSAGE_TARGET(message);

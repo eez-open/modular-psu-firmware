@@ -20,11 +20,16 @@
 
 #include <stdint.h>
 
+#include <eez/index.h>
+
 namespace eez {
 namespace mcu {
 namespace battery {
 
+extern TestResult g_testResult;
+
 void init();
+bool test();
 void tick(uint32_t tickCount);
 
 extern float g_battery;

@@ -30,6 +30,10 @@ using namespace eez::mcu::battery;
 #define VBAT_DIV 4
 #define MAX_CONVERTED_VALUE 4095
 #define VREF 3.3f
+#define CONF_CONVERSION_DURATION 5 // 5ms
+
+// If battery voltage is less than this value then battery should be replaced
+#define CONF_MIN_ALLOWED_BATTERY_VOLTAGE 2.7f
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 	uint32_t convertedValue = HAL_ADC_GetValue(hadc);
@@ -41,6 +45,7 @@ namespace eez {
 namespace mcu {
 namespace battery {
 
+TestResult g_testResult;
 float g_battery;
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -60,10 +65,28 @@ void init() {
 #endif
 }
 
+#if defined(EEZ_PLATFORM_STM32)
+void checkBattery() {
+	g_testResult = g_battery >= CONF_MIN_ALLOWED_BATTERY_VOLTAGE ? TEST_OK : TEST_FAILED;
+}
+#endif
+
+bool test() {
+#if defined(EEZ_PLATFORM_STM32)
+	adcStart();
+	delay(CONF_CONVERSION_DURATION);
+	checkBattery();
+#else
+	g_testResult = TEST_SKIPPED;
+#endif
+	return g_testResult != TEST_FAILED;
+}
+
 void tick(uint32_t tickCount) {
 #if defined(EEZ_PLATFORM_STM32)
 	int32_t diff = tickCount - g_lastTickCount;
 	if (diff >= 1000000) {
+		checkBattery();
 		adcStart();
 		g_lastTickCount = tickCount;
 	}
