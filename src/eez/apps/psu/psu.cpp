@@ -840,9 +840,9 @@ static int g_tickFuncIndex = 0;
 void tick() {
     uint32_t tickCount = micros();
 
-#if OPTION_SD_CARD
+//#if OPTION_SD_CARD
     dlog::tick(tickCount);
-#endif
+//#endif
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel::get(i).tick(tickCount);

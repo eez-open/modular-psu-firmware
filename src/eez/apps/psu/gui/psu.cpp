@@ -63,7 +63,7 @@
 #include <eez/modules/mcu/button.h>
 #endif
 
-#define CONF_DLOG_COLOR 62464
+#define CONF_DLOG_COLOR COLOR_ID_DATA_LOGGING
 
 namespace eez {
 namespace psu {

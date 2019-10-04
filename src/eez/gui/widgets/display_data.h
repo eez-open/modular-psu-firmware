@@ -37,6 +37,11 @@ struct DisplayDataWidget {
     uint8_t displayOption;
 };
 
+struct DisplayDataState {
+    WidgetState genericState;
+    uint16_t backgroundColor;
+};
+
 void DisplayDataWidget_draw(const WidgetCursor &widgetCursor);
 
 } // namespace gui

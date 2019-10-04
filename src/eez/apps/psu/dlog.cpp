@@ -22,6 +22,8 @@
 
 #include <math.h>
 
+#include <eez/scpi/scpi.h>
+
 #include <eez/apps/psu/channel_dispatcher.h>
 #include <eez/apps/psu/datetime.h>
 #include <eez/apps/psu/scpi/psu.h>
@@ -30,6 +32,9 @@
 #include <eez/apps/psu/dlog.h>
 
 namespace eez {
+
+using namespace scpi;
+
 namespace psu {
 namespace dlog {
 
@@ -51,7 +56,11 @@ uint32_t g_micros;
 uint32_t g_iSample;
 double g_currentTime;
 double g_nextTime;
-uint32_t g_lastSyncTickCount;
+
+static const unsigned int BUFFER_SIZE = 4096;
+uint8_t g_buffers[2][BUFFER_SIZE];
+int g_selectedbufferIndex;
+int g_bufferIndex;
 
 void setState(State newState) {
     if (g_state != newState) {
@@ -131,8 +140,52 @@ void triggerGenerated(bool startImmediatelly) {
 #define MAGIC2 0x474F4C44L
 #define VERSION 0x00000001L
 
+#define DISK_OPERATION_OPEN 1
+#define DISK_OPERATION_WRITE 2
+#define DISK_OPERATION_CLOSE 3
+
+void executeDiskOperation(int diskOperation) {
+    switch (diskOperation) {
+    case DISK_OPERATION_OPEN:
+        if (!g_file.open(g_filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+            // return SCPI_ERROR_EXECUTION_ERROR;
+            return;
+        }
+
+        if (!g_file.truncate(0)) {
+            // return SCPI_ERROR_MASS_STORAGE_ERROR;
+            return;
+        }
+        break;
+
+    case DISK_OPERATION_WRITE:
+        g_file.write(&g_buffers[g_selectedbufferIndex ? 0 : 1][0], BUFFER_SIZE);
+        break;
+
+    case DISK_OPERATION_CLOSE:
+        if (g_bufferIndex > 0) {
+            g_file.write(&g_buffers[g_selectedbufferIndex][0], g_bufferIndex);
+        }
+        g_file.close();
+        break;
+    }
+}
+
+void queueDiskOperation(int diskOperation) {
+    if (osThreadGetId() != g_scpiTaskHandle) {
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_DISK_OPERATION, diskOperation), osWaitForever);
+    } else {
+        executeDiskOperation(diskOperation);
+    }
+}
+
 void writeUint8(uint8_t value) {
-    g_file.write((const uint8_t *)&value, 1);
+    g_buffers[g_selectedbufferIndex][g_bufferIndex] = value;
+    if (++g_bufferIndex == BUFFER_SIZE) {
+        g_selectedbufferIndex = g_selectedbufferIndex ? 0 : 1;
+        g_bufferIndex = 0;
+        queueDiskOperation(DISK_OPERATION_WRITE);
+    }
 }
 
 void writeUint16(uint16_t value) {
@@ -157,14 +210,10 @@ int startImmediately() {
         return err;
     }
 
-    if (!g_file.open(g_filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-        // TODO replace with more specific error
-        return SCPI_ERROR_EXECUTION_ERROR;
-    }
+    queueDiskOperation(DISK_OPERATION_OPEN);
 
-    if (!g_file.truncate(0)) {
-        return SCPI_ERROR_MASS_STORAGE_ERROR;
-    }
+    g_selectedbufferIndex = 0;
+    g_bufferIndex = 0;
 
     setState(STATE_EXECUTING);
 
@@ -203,7 +252,6 @@ int startImmediately() {
     g_iSample = 0;
     g_currentTime = 0;
     g_nextTime = 0;
-    g_lastSyncTickCount = g_lastTickCount;
 
     log(g_lastTickCount);
 
@@ -212,7 +260,7 @@ int startImmediately() {
 
 void finishLogging() {
     setState(STATE_IDLE);
-    g_file.close();
+    queueDiskOperation(DISK_OPERATION_CLOSE);
     for (int i = 0; i < CH_NUM; ++i) {
         g_logVoltage[i] = 0;
         g_logCurrent[i] = 0;
@@ -296,12 +344,6 @@ void log(uint32_t tickCount) {
 
         if (g_nextTime > g_time) {
             finishLogging();
-        } else {
-            int32_t diff = tickCount - g_lastSyncTickCount;
-            if (diff > CONF_DLOG_SYNC_FILE_TIME * 1000000L) {
-                g_lastSyncTickCount = tickCount;
-                g_file.sync();
-            }
         }
     }
 }

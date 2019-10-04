@@ -31,6 +31,7 @@
 #include <eez/apps/psu/profile.h>
 #if OPTION_SD_CARD
 #include <eez/apps/psu/sd_card.h>
+#include <eez/apps/psu/dlog.h>
 #endif
 #include <eez/apps/psu/scpi/psu.h>
 
@@ -60,10 +61,13 @@ osMessageQId g_scpiMessageQueueId;
 
 char g_listFilePath[CH_MAX][MAX_PATH_LENGTH];
 
+uint32_t g_lastTickCount;
+
 bool onSystemStateChanged() {
     if (eez::g_systemState == eez::SystemState::BOOTING) {
         if (eez::g_systemStatePhase == 0) {
             g_scpiMessageQueueId = osMessageCreate(osMessageQ(g_scpiMessageQueue), NULL);
+            g_lastTickCount = micros();
             g_scpiTaskHandle = osThreadCreate(osThread(g_scpiTask), nullptr);
         }
     }
@@ -84,7 +88,7 @@ void mainLoop(const void *) {
 }
 
 void oneIter() {
-    osEvent event = osMessageGet(g_scpiMessageQueueId, 1000);
+    osEvent event = osMessageGet(g_scpiMessageQueueId, 1);
     if (event.status == osEventMessage) {
     	uint32_t message = event.value.v;
     	uint32_t target = SCPI_QUEUE_MESSAGE_TARGET(message);
@@ -112,15 +116,31 @@ void oneIter() {
 				eez::psu::sd_card::onSdDetectInterruptHandler();
 			}
 #endif
+#if OPTION_SD_CARD
+			else if (type == SCPI_QUEUE_MESSAGE_DLOG_DISK_OPERATION) {
+				eez::psu::dlog::executeDiskOperation(param);
+			}
+#endif
+
         }
     } else {
-        profile::tick();
+    	uint32_t tickCount = micros();
+
+    	int32_t diff = tickCount - g_lastTickCount;
+
+    	if (diff >= 1000000L) { // 1 sec
+    		profile::tick();
+
 #if OPTION_ETHERNET
-        ntp::tick();
+    		ntp::tick();
 #endif
+    	}
+
+    	if (diff >= 250000L) { // 250 msec
 #if OPTION_SD_CARD
-        sd_card::tick();
+    		sd_card::tick();
 #endif
+    	}
     }
 }
 

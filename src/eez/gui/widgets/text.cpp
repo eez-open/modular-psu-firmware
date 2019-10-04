@@ -47,8 +47,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
         !widgetCursor.previousState ||
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
         widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data ||
-        widgetCursor.previousState->backgroundColor != widgetCursor.currentState->backgroundColor;
+        widgetCursor.previousState->data != widgetCursor.currentState->data;
 
     if (refresh) {
         const Style *activeStyle = getStyle(widget->activeStyle);

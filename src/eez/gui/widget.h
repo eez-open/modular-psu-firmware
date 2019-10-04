@@ -191,7 +191,6 @@ struct WidgetState {
     uint16_t size;
     WidgetStateFlags flags;
     data::Value data;
-    uint16_t backgroundColor;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

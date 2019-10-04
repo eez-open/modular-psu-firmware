@@ -46,7 +46,10 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const DisplayDataWidget *display_data_widget = GET_WIDGET_PROPERTY(widget, specific, const DisplayDataWidget *);
 
-    widgetCursor.currentState->size = sizeof(WidgetState);
+    DisplayDataState *currentState = (DisplayDataState *)widgetCursor.currentState;
+    DisplayDataState *previousState = (DisplayDataState *)widgetCursor.previousState;
+
+    widgetCursor.currentState->size = sizeof(DisplayDataState);
     widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
 
 	const Style *style = getStyle(widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->style);
@@ -54,7 +57,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
-    widgetCursor.currentState->backgroundColor = g_appContext->getWidgetBackgroundColor(widgetCursor, style);
+    currentState->backgroundColor = g_appContext->getWidgetBackgroundColor(widgetCursor, style);
 
     bool refresh =
         !widgetCursor.previousState ||
@@ -62,7 +65,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
         widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
         widgetCursor.previousState->data != widgetCursor.currentState->data ||
-        widgetCursor.previousState->backgroundColor != widgetCursor.currentState->backgroundColor;
+        currentState->backgroundColor != previousState->backgroundColor;
 
     if (refresh) {
         char text[64];
@@ -96,7 +99,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
         drawText(start, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                  style, activeStyle, widgetCursor.currentState->flags.active,
                  widgetCursor.currentState->flags.blinking, false,
-                 &widgetCursor.currentState->backgroundColor);
+                 &currentState->backgroundColor);
     }
 }
 

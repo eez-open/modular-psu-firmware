@@ -28,7 +28,7 @@ extern bool g_logVoltage[CH_MAX];
 extern bool g_logCurrent[CH_MAX];
 extern bool g_logPower[CH_MAX];
 
-static const float PERIOD_MIN = 0.02f;
+static const float PERIOD_MIN = 0.005f;
 static const float PERIOD_MAX = 120.0f;
 static const float PERIOD_DEFAULT = 0.02f;
 extern float g_period;
@@ -51,6 +51,8 @@ void abort();
 
 void tick(uint32_t tick_usec);
 void reset();
+
+void executeDiskOperation(int diskOperation);
 
 } // namespace dlog
 } // namespace psu
