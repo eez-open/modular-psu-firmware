@@ -233,8 +233,8 @@ struct Channel : ChannelInterface {
 #if defined(EEZ_PLATFORM_SIMULATOR)
         if (channel.isOutputEnabled()) {
             if (channel.simulator.getLoadEnabled()) {
-                float u_set_v = uSet[channel.channelIndex];
-                float i_set_a = iSet[channel.channelIndex];
+                float u_set_v = uSet[channel.subchannelIndex];
+                float i_set_a = iSet[channel.subchannelIndex];
 
                 float u_mon_v = i_set_a * channel.simulator.load;
                 float i_mon_a = i_set_a;
@@ -247,20 +247,20 @@ struct Channel : ChannelInterface {
                     simulator::setCC(channel.channelIndex, true);
                 }
 
-                uMon[channel.channelIndex] = u_mon_v;
-                iMon[channel.channelIndex] = i_mon_a;
+                uMon[channel.subchannelIndex] = u_mon_v;
+                iMon[channel.subchannelIndex] = i_mon_a;
             } else {
-                uMon[channel.channelIndex] = uSet[channel.channelIndex];
-                iMon[channel.channelIndex] = 0;
-                if (uSet[channel.channelIndex] > 0 && iSet[channel.channelIndex] > 0) {
+                uMon[channel.subchannelIndex] = uSet[channel.subchannelIndex];
+                iMon[channel.subchannelIndex] = 0;
+                if (uSet[channel.subchannelIndex] > 0 && iSet[channel.subchannelIndex] > 0) {
                     simulator::setCC(channel.channelIndex, false);
                 } else {
                     simulator::setCC(channel.channelIndex, true);
                 }
             }
         } else {
-            uMon[channel.channelIndex] = 0;
-            iMon[channel.channelIndex] = 0;
+            uMon[channel.subchannelIndex] = 0;
+            iMon[channel.subchannelIndex] = 0;
             simulator::setCC(channel.channelIndex, false);
         }
 #endif
@@ -284,8 +284,8 @@ struct Channel : ChannelInterface {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon[channel.channelIndex]);
-        channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon[channel.channelIndex]);
+        channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon[channel.subchannelIndex]);
+        channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon[channel.subchannelIndex]);
 #endif
 
         // PWRGOOD

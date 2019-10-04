@@ -56,11 +56,13 @@ uint32_t g_micros;
 uint32_t g_iSample;
 double g_currentTime;
 double g_nextTime;
+uint32_t g_lastSyncTickCount;
 
 static const unsigned int BUFFER_SIZE = 4096;
 uint8_t g_buffers[2][BUFFER_SIZE];
 int g_selectedbufferIndex;
 int g_bufferIndex;
+int g_lastBufferSize;
 
 void setState(State newState) {
     if (g_state != newState) {
@@ -159,7 +161,7 @@ void executeDiskOperation(int diskOperation) {
         break;
 
     case DISK_OPERATION_WRITE:
-        g_file.write(&g_buffers[g_selectedbufferIndex ? 0 : 1][0], BUFFER_SIZE);
+        g_file.write(&g_buffers[g_selectedbufferIndex ? 0 : 1][0], g_lastBufferSize);
         break;
 
     case DISK_OPERATION_CLOSE:
@@ -179,12 +181,18 @@ void queueDiskOperation(int diskOperation) {
     }
 }
 
+void flushData() {
+    g_selectedbufferIndex = g_selectedbufferIndex ? 0 : 1;
+    g_lastBufferSize = g_bufferIndex;
+    g_bufferIndex = 0;
+    queueDiskOperation(DISK_OPERATION_WRITE);
+}
+
 void writeUint8(uint8_t value) {
     g_buffers[g_selectedbufferIndex][g_bufferIndex] = value;
     if (++g_bufferIndex == BUFFER_SIZE) {
-        g_selectedbufferIndex = g_selectedbufferIndex ? 0 : 1;
-        g_bufferIndex = 0;
-        queueDiskOperation(DISK_OPERATION_WRITE);
+        g_lastSyncTickCount = micros();
+        flushData();
     }
 }
 
@@ -344,6 +352,12 @@ void log(uint32_t tickCount) {
 
         if (g_nextTime > g_time) {
             finishLogging();
+        } else {
+            int32_t diff = tickCount - g_lastSyncTickCount;
+            if (diff > CONF_DLOG_SYNC_FILE_TIME * 1000000L) {
+                g_lastSyncTickCount = tickCount;
+                flushData();
+            }
         }
     }
 }
