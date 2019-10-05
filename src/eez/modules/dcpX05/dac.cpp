@@ -37,8 +37,10 @@ namespace psu {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if defined(EEZ_PLATFORM_STM32)
 static const uint8_t DATA_BUFFER_A = 0B00010000;
 static const uint8_t DATA_BUFFER_B = 0B00100100;
+#endif
 
 static const uint16_t DAC_MIN = 0;
 static const uint16_t DAC_MAX = (1L << DAC_RES) - 1;
