@@ -205,12 +205,7 @@ void processTouchEvent(EventType type) {
     }
 
     if (type == EVENT_TYPE_TOUCH_UP) {
-        if (m_activeWidget) {
-            // deactivate active widget and make sure screen is updated
-            m_activeWidget = 0;
-            updateScreen();
-            mcu::display::sync();
-        }
+        m_activeWidget = 0;
     }
 
     if (m_onTouchFunction) {

@@ -495,6 +495,13 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
     updatePage(m_activePage.repaint, widgetCursor);
     m_activePage.repaint = false;
 
+    if (widgetCursor.previousState) {
+        widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
+    }
+    if (widgetCursor.currentState) {
+        widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
+    }
+
     m_activePageSaved = m_activePage;
     m_isTopPage = false;
 
@@ -516,8 +523,9 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
         if (widgetCursor.previousState) {
             widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
         }
-        if (widgetCursor.currentState)
+        if (widgetCursor.currentState) {
             widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
+        }
     }
 
     m_isTopPage = true;
@@ -557,6 +565,13 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
     
     updatePage(m_activePage.repaint, widgetCursor);
     m_activePage.repaint = false;
+
+    if (widgetCursor.previousState) {
+        widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
+    }
+    if (widgetCursor.currentState) {
+        widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
+    }
 #endif
 }
 
