@@ -50,24 +50,28 @@ void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
     if (refresh) {
         const Style* style = getWidgetStyle(widget);
 
+        const MultilineTextWidget *display_string_widget = GET_WIDGET_PROPERTY(widget, specific, const MultilineTextWidget *);
+
         if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
                 drawMultilineText(widgetCursor.currentState->data.getString(), widgetCursor.x,
-                                  widgetCursor.y, (int)widget->w, (int)widget->h, style, nullptr,
-                                  widgetCursor.currentState->flags.active);
+                    widgetCursor.y, (int)widget->w, (int)widget->h, style, nullptr,
+                    widgetCursor.currentState->flags.active,
+                    display_string_widget->firstLineIndent, display_string_widget->hangingIndent);
             } else {
                 char text[64];
                 widgetCursor.currentState->data.toText(text, sizeof(text));
                 drawMultilineText(text, widgetCursor.x, widgetCursor.y, (int)widget->w,
-                                  (int)widget->h, style, nullptr,
-                                  widgetCursor.currentState->flags.active);
+                    (int)widget->h, style, nullptr,
+                    widgetCursor.currentState->flags.active,
+                    display_string_widget->firstLineIndent, display_string_widget->hangingIndent);
             }
         } else {
-            const MultilineTextWidget *display_string_widget = GET_WIDGET_PROPERTY(widget, specific, const MultilineTextWidget *);
             drawMultilineText(
                 GET_WIDGET_PROPERTY(display_string_widget, text, const char *), 
                 widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                style, nullptr, widgetCursor.currentState->flags.active);
+                style, nullptr, widgetCursor.currentState->flags.active,
+                display_string_widget->firstLineIndent, display_string_widget->hangingIndent);
         }
     }
 }

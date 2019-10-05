@@ -24,12 +24,13 @@ namespace eez {
 namespace gui {
 
 struct MultilineTextWidget {
-#if OPTION_SDRAM    
+#if OPTION_SDRAM
     const char *text;
 #else
     uint32_t textOffset;
 #endif
-
+    int16_t firstLineIndent;
+    int16_t hangingIndent;
 };
 
 void MultilineTextWidget_fixPointers(Widget *widget);

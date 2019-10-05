@@ -32,7 +32,7 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
               uint16_t *overrideBackgroundColor);
 
 void drawMultilineText(const char *text, int x, int y, int w, int h, const Style *style,
-                       const Style *activeStyle, bool active);
+                       const Style *activeStyle, bool active, int firstLineIndent, int hangingIndent);
 
 void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, int x, int y, int w,
                 int h, const Style *style, const Style *activeStyle, bool active);

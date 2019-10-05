@@ -18,6 +18,8 @@
 
 #if OPTION_DISPLAY
 
+#include <string.h>
+
 #include <eez/gui/draw.h>
 
 #include <eez/gui/document.h>
@@ -140,110 +142,215 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
     display::drawStr(text, textLength, x_offset, y_offset, x1, y1, x2, y2, font);
 }
 
-void drawMultilineText(const char *text, int x, int y, int w, int h, const Style *style,
-                       const Style *activeStyle, bool active) {
-    int x1 = x;
-    int y1 = y;
-    int x2 = x + w - 1;
-    int y2 = y + h - 1;
+////////////////////////////////////////////////////////////////////////////////
 
-    int borderRadius = style->border_radius;
-	if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
-        display::setColor(style->border_color);
-		if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
-            display::drawRect(x1, y1, x2, y2);
-        } else {
-            display::fillRect(x1, y1, x2, y2, style->border_radius);
-			borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
+static const unsigned int CONF_MULTILINE_TEXT_MAX_LINE_LENGTH = 100;
+
+enum MultilineTextRenderStep {
+    MEASURE,
+    RENDER
+};
+
+struct MultilineTextRender {
+    const char *text;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    const Style *style;
+    const Style *activeStyle;
+    bool active;
+    int firstLineIndent;
+    int hangingIndent;
+
+    font::Font font;
+    int spaceWidth;
+
+    int lineHeight;
+    int textHeight;
+
+    char line[CONF_MULTILINE_TEXT_MAX_LINE_LENGTH + 1];
+    int lineIndent;
+    int lineWidth;
+
+    void appendToLine(const char *str, int n) {
+        int j = strlen(line);
+        for (int i = 0; i < n && j < CONF_MULTILINE_TEXT_MAX_LINE_LENGTH; i++, j++) {
+            line[j] = str[i];
         }
-		x1 += style->border_size_left;
-		y1 += style->border_size_top;
-		x2 -= style->border_size_right;
-		y2 -= style->border_size_bottom;
-	}
-
-    font::Font font = styleGetFont(style);
-    int height = (int)(0.9 * font.getHeight());
-
-    font::Glyph space_glyph;
-    font.getGlyph(' ', space_glyph);
-    int space_width = space_glyph.dx;
-
-    // fill background
-    uint16_t background_color = active
-                                    ? (activeStyle ? activeStyle->background_color : style->color)
-                                    : style->background_color;
-    display::setColor(background_color);
-    display::fillRect(x1, y1, x2, y2, borderRadius);
-
-    // draw text
-    if (active) {
-        if (activeStyle) {
-            display::setColor(activeStyle->color);
-        } else {
-            display::setColor(style->background_color);
-        }
-    } else {
-        display::setColor(style->color);
+        line[j] = 0;
     }
 
-    x1 += style->padding_left;
-    x2 -= style->padding_right;
-    y1 += style->padding_top;
-    y2 -= style->padding_bottom;
+    void flushLine(int y, MultilineTextRenderStep step) {
+        if (line[0] && lineWidth) {
+            if (step == RENDER) {
+                int x;
 
-    x = x1;
-    y = y1;
+                if (styleIsHorzAlignLeft(style)) {
+                    x = x1;
+                } else if (styleIsHorzAlignRight(style)) {
+                    x = x2 + 1 - lineWidth;
+                } else {
+                    x = x1 + int((x2 - x1 + 1 - lineWidth) / 2);
+                }
 
-    int i = 0;
-    while (true) {
-        int j = i;
-        while (text[i] != 0 && text[i] != ' ' && text[i] != '\n')
-            ++i;
-
-        int width = display::measureStr(text + j, i - j, font);
-
-        while (width > x2 - x + 1) {
-            y += height;
-            if (y + height > y2) {
-                break;
+                display::drawStr(line, -1, x + lineIndent, y, x, y, x + lineWidth - 1, y + font.getHeight() - 1, font);
+            } else {
+                textHeight = MAX(textHeight, y + lineHeight - y1);
             }
 
-            x = x1;
-        }
-
-        if (y + height > y2) {
-            break;
-        }
-
-        display::drawStr(text + j, i - j, x, y, x1, y1, x2, y2, font);
-
-        x += width;
-
-        while (text[i] == ' ') {
-            x += space_width;
-            ++i;
-        }
-
-        if (text[i] == 0 || text[i] == '\n') {
-            y += height;
-
-            if (text[i] == 0) {
-                break;
-            }
-
-            ++i;
-
-            int extraHeightBetweenParagraphs = (int)(0.2 * height);
-            y += extraHeightBetweenParagraphs;
-
-            if (y + height > y2) {
-                break;
-            }
-            x = x1;
+            line[0] = 0;
+            lineWidth = lineIndent = hangingIndent;
         }
     }
+
+    int executeStep(MultilineTextRenderStep step) {
+        textHeight = 0;
+        
+        int y = y1;
+
+        line[0] = 0;
+        lineWidth = lineIndent = firstLineIndent;
+
+        int i = 0;
+        while (true) {
+            int j = i;
+            while (text[i] != 0 && text[i] != ' ' && text[i] != '\n')
+                ++i;
+
+            int width = display::measureStr(text + j, i - j, font);
+
+            while (lineWidth + (line[0] ? spaceWidth : 0) + width > x2 - x1 + 1) {
+                flushLine(y, step);
+                
+                y += lineHeight;
+                if (y + lineHeight - 1 > y2) {
+                    break;
+                }
+            }
+
+            if (y + lineHeight - 1 > y2) {
+                break;
+            }
+
+            if (line[0]) {
+                appendToLine(" ", 1);
+                lineWidth += spaceWidth;
+            }
+            appendToLine(text + j, i - j);
+            lineWidth += width;
+
+            while (text[i] == ' ') {
+                ++i;
+            }
+
+            if (text[i] == 0 || text[i] == '\n') {
+                flushLine(y, step);
+                
+                y += lineHeight;
+
+                if (text[i] == 0) {
+                    break;
+                }
+
+                ++i;
+
+                int extraHeightBetweenParagraphs = (int)(0.2 * lineHeight);
+                y += extraHeightBetweenParagraphs;
+
+                if (y + lineHeight - 1 > y2) {
+                    break;
+                }
+            }
+        }
+
+        flushLine(y, step);
+
+        return textHeight + font.getHeight() - lineHeight;
+    }
+
+    void render() {
+        int borderRadius = style->border_radius;
+        if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
+            display::setColor(style->border_color);
+            if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
+                display::drawRect(x1, y1, x2, y2);
+            } else {
+                display::fillRect(x1, y1, x2, y2, style->border_radius);
+                borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
+            }
+            x1 += style->border_size_left;
+            y1 += style->border_size_top;
+            x2 -= style->border_size_right;
+            y2 -= style->border_size_bottom;
+        }
+
+        // fill background
+        uint16_t background_color = active ? (activeStyle ? activeStyle->background_color : style->color) : style->background_color;
+        display::setColor(background_color);
+        display::fillRect(x1, y1, x2, y2, borderRadius);
+
+        //
+        font = styleGetFont(style);
+        
+        lineHeight = (int)(0.9 * font.getHeight());
+        if (lineHeight <= 0) {
+            return;
+        }
+
+        font::Glyph space_glyph;
+        font.getGlyph(' ', space_glyph);
+        spaceWidth = space_glyph.dx;
+
+        // draw text
+        if (active) {
+            if (activeStyle) {
+                display::setColor(activeStyle->color);
+            } else {
+                display::setColor(style->background_color);
+            }
+        } else {
+            display::setColor(style->color);
+        }
+
+        x1 += style->padding_left;
+        x2 -= style->padding_right;
+        y1 += style->padding_top;
+        y2 -= style->padding_bottom;
+
+        int textHeight = executeStep(MEASURE);
+
+        if (styleIsVertAlignTop(style)) {
+        } else if (styleIsVertAlignBottom(style)) {
+            y1 = y2 + 1 - textHeight;
+        } else {
+            y1 += (int)((y2 - y1 + 1 - textHeight) / 2);
+        }
+        y2 = y1 + textHeight - 1;
+
+        executeStep(RENDER);
+
+    }
+};
+
+void drawMultilineText(const char *text, int x, int y, int w, int h, const Style *style, const Style *activeStyle, bool active, int firstLineIndent, int hangingIndent) {
+    MultilineTextRender multilineTextRender;
+
+    multilineTextRender.text = text;
+    multilineTextRender.x1 = x;
+    multilineTextRender.y1 = y;
+    multilineTextRender.x2 = x + w - 1;
+    multilineTextRender.y2 = y + h - 1;
+    multilineTextRender.style = style;
+    multilineTextRender.activeStyle = activeStyle;
+    multilineTextRender.active = active;
+    multilineTextRender.firstLineIndent = firstLineIndent;
+    multilineTextRender.hangingIndent = hangingIndent;
+
+    multilineTextRender.render();
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, int x, int y, int w,
                 int h, const Style *style, const Style *activeStyle, bool active) {
@@ -313,6 +420,8 @@ void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, 
 
     display::setOpacity(savedOpacity);
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 void drawRectangle(int x, int y, int w, int h, const Style *style, const Style *activeStyle,
                    bool active, bool ignoreLuminocity) {
