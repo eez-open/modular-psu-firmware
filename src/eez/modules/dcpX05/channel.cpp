@@ -30,7 +30,10 @@
 #include <eez/system.h>
 #include <eez/index.h>
 
-#define CONF_OVP_PERCENTAGE 3.0f
+#define CONF_OVP_PERCENTAGE 2.0f
+#define CONF_OVP_SW_OVP_AT_START_DURATION_MS 5
+#define CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD 1.2f
+#define CONF_OVP_SW_OVP_AT_START_U_PROTECTION_LEVEL 1.55f
 
 namespace eez {
 
@@ -53,6 +56,11 @@ struct Channel : ChannelInterface {
 
 	float uBeforeBalancing = NAN;
 	float iBeforeBalancing = NAN;
+
+	bool fallingEdge = true;
+
+	bool isSwOvpAtStart;
+	uint32_t oeTickCount;
 
 	Channel(int slotIndex_) : ChannelInterface(slotIndex_), uSet(0) {}
 
@@ -193,10 +201,23 @@ struct Channel : ChannelInterface {
 
 		if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
 			if (channel.isOutputEnabled()) {
-				if (!fallingEdge && channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type && !ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
-					// activate HW OVP
-					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
-				} else if ((fallingEdge || !(channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type)) && ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
+				if (!fallingEdge && channel.isHwOvpEnabled() && !ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
+					if (isSwOvpAtStart) {
+						int32_t diff = tickCount - oeTickCount;
+						if (diff >= CONF_OVP_SW_OVP_AT_START_DURATION_MS * 1000 || channel_dispatcher::getUSet(channel) >= CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD) {
+							// SW OVP at start lasts 5ms
+							isSwOvpAtStart = false;
+						} else {
+							if (channel.checkSwOvpCondition(CONF_OVP_SW_OVP_AT_START_U_PROTECTION_LEVEL)) {
+								channel.enterOvpProtection();
+							}
+						}
+					}
+					if (!isSwOvpAtStart) {
+						// activate HW OVP
+						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+					}
+				} else if ((fallingEdge || !channel.isHwOvpEnabled()) && ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
 					// deactivate HW OVP
 					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
 				}
@@ -307,14 +328,19 @@ struct Channel : ChannelInterface {
 
 			ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, true);
 
-			if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 && channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
-				// OVP has to be enabled after OE activation
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+			if (channel.isHwOvpEnabled()) {
+				isSwOvpAtStart = channel_dispatcher::getUSet(channel) < CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD;
+				if (isSwOvpAtStart) {
+					oeTickCount = micros();
+				} else {
+					// OVP has to be enabled after OE activation
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+				}
 			}
 
 			adc.start(ADC_DATA_TYPE_U_MON);
 		} else {
-			if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 && channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
+			if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
 				// OVP has to be disabled before OE deactivation
 				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
 			}
@@ -372,20 +398,16 @@ struct Channel : ChannelInterface {
         restoreCurrentToValueBeforeBalancing(psu::Channel::getBySlotIndex(slotIndex));
     }
 
-	bool fallingEdge = true;
-
 	void setDacVoltageFloat(int subchannelIndex, float value) {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
         if (channel.isOutputEnabled()) {
             if (value < uSet) {
                 fallingEdge = true;
-                if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
-                    if (channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type) {
-                        // deactivate HW OVP
-                        ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
-                    }
-                }
+				if (channel.isHwOvpEnabled()) {
+					// deactivate HW OVP
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+				}
             }
         }
 

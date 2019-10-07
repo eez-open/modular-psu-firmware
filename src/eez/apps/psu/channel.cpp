@@ -295,6 +295,10 @@ void Channel::enterOvpProtection() {
    protectionEnter(ovp);
 }
 
+bool Channel::checkSwOvpCondition(float uProtectionLevel) {
+    return channel_dispatcher::getUMon(*this) >= uProtectionLevel || (flags.rprogEnabled && channel_dispatcher::getUMonDac(*this) >= uProtectionLevel);
+}
+
 void Channel::protectionCheck(ProtectionValue &cpv) {
     bool state;
     bool condition;
@@ -302,8 +306,7 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
 
     if (IS_OVP_VALUE(this, cpv)) {
         state = (flags.rprogEnabled || prot_conf.flags.u_state) && !prot_conf.flags.u_type;
-        condition = channel_dispatcher::getUMon(*this) >= channel_dispatcher::getUProtectionLevel(*this) ||
-            (flags.rprogEnabled && channel_dispatcher::getUMonDac(*this) >= channel_dispatcher::getUProtectionLevel(*this));
+        condition = checkSwOvpCondition(channel_dispatcher::getUProtectionLevel(*this));
         delay = prot_conf.u_delay;
         delay -= PROT_DELAY_CORRECTION;
     } else if (IS_OCP_VALUE(this, cpv)) {

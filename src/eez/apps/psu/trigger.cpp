@@ -319,13 +319,13 @@ int startImmediately() {
 
         if (channel.isOk() && (i == 0 || !(channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()))) {
             if (channel.getVoltageTriggerMode() == TRIGGER_MODE_LIST) {
-                channel_dispatcher::setVoltage(channel, 0);
-                channel_dispatcher::setCurrent(channel, 0);
+                //channel_dispatcher::setVoltage(channel, 0);
+                //channel_dispatcher::setCurrent(channel, 0);
+
+                list::executionStart(channel);
 
                 channel_dispatcher::outputEnable(
                     channel, channel_dispatcher::getTriggerOutputState(channel));
-
-                list::executionStart(channel);
             } else {
                 if (channel.getVoltageTriggerMode() == TRIGGER_MODE_STEP) {
                     channel_dispatcher::setVoltage(channel, g_levels[i].u);

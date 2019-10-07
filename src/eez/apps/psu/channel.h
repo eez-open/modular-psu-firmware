@@ -476,6 +476,12 @@ class Channel {
     /// Is OVP, OCP or OPP tripped?
     bool isTripped();
 
+    inline bool isHwOvpEnabled() {
+        return prot_conf.flags.u_state && prot_conf.flags.u_type;
+    }
+
+    bool checkSwOvpCondition(float uProtectionLevel);
+
     /// Clear channel protection tripp state.
     void clearProtection(bool clearOTP = true);
 
