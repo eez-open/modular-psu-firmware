@@ -355,6 +355,8 @@ static void initDevice2() {
 }
 
 void loadDevice2() {
+    DebugTrace("%d\n", sizeof(DeviceConfiguration2));
+
     if (!confRead((uint8_t *)&devConf2, sizeof(DeviceConfiguration2), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE2), DEV_CONF2_VERSION)) {
         initDevice2();
     } else {

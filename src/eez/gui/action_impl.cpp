@@ -249,7 +249,7 @@ void action_show_sys_settings_protections() {
 }
 
 void action_show_sys_settings_aux_otp() {
-    pushPage(PAGE_ID_SYS_SETTINGS_AUX_OTP);
+    pushPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
 }
 
 void action_show_sys_settings_sound() {
@@ -628,20 +628,29 @@ void action_sys_settings_protections_toggle_force_disabling_all_outputs_on_power
 }
 
 void action_sys_settings_protections_aux_otp_toggle_state() {
-    ((SysSettingsAuxOtpPage *)getActivePage())->toggleState();
+    ((SysSettingsTemperaturePage *)getActivePage())->toggleState();
 }
 
 void action_sys_settings_protections_aux_otp_edit_level() {
-    ((SysSettingsAuxOtpPage *)getActivePage())->editLevel();
+    ((SysSettingsTemperaturePage *)getActivePage())->editLevel();
 }
 
 void action_sys_settings_protections_aux_otp_edit_delay() {
-    ((SysSettingsAuxOtpPage *)getActivePage())->editDelay();
+    ((SysSettingsTemperaturePage *)getActivePage())->editDelay();
 }
 
 void action_sys_settings_protections_aux_otp_clear() {
-    SysSettingsAuxOtpPage::clear();
+    SysSettingsTemperaturePage::clear();
 }
+
+void action_sys_settings_fan_toggle_mode() {
+    ((SysSettingsTemperaturePage *)getActivePage())->toggleFanMode();
+}
+
+void action_sys_settings_fan_edit_speed() {
+    ((SysSettingsTemperaturePage *)getActivePage())->editFanSpeed();
+}
+
 
 void action_on_last_error_event_action() {
     onLastErrorEventAction();

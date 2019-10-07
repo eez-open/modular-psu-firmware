@@ -160,7 +160,7 @@ class SysSettingsProtectionsPage : public Page {
     static void toggleForceDisablingAllOutputsOnPowerUp();
 };
 
-class SysSettingsAuxOtpPage : public SetPage {
+class SysSettingsTemperaturePage : public SetPage {
   public:
     void pageAlloc();
 
@@ -171,11 +171,17 @@ class SysSettingsAuxOtpPage : public SetPage {
     void editLevel();
     void editDelay();
 
+    void toggleFanMode();
+    void editFanSpeed();
+
     static void clear();
 
     int state;
     data::Value level;
     data::Value delay;
+
+    int fanMode;
+    data::Value fanSpeed;
 
   protected:
     int origState;
@@ -190,10 +196,14 @@ class SysSettingsAuxOtpPage : public SetPage {
     float maxDelay;
     float defaultDelay;
 
+    int origFanMode;
+    data::Value origFanSpeed;
+
     virtual void setParams();
 
     static void onLevelSet(float value);
     static void onDelaySet(float value);
+    static void onFanSpeedSet(float value);
 };
 
 class SysSettingsSoundPage : public Page {

@@ -200,13 +200,19 @@ void setBufferPointer(void *buffer) {
 void turnOn() {
     if (!isOn()) {
         g_frontPanelBuffer1 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
+        memset(g_frontPanelBuffer1, 0, g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
+        
         g_frontPanelBuffer2 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
+        memset(g_frontPanelBuffer2, 0, g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
+
         g_frontPanelBuffer3 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
+        memset(g_frontPanelBuffer3, 0, g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
 
         g_frontPanelBuffer = g_frontPanelBuffer1;
 
         for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
             g_buffers[bufferIndex].bufferPointer = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
+            memset(g_buffers[bufferIndex].bufferPointer, 0, g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
         }
 
         refreshScreen();
@@ -231,7 +237,7 @@ void turnOff() {
         g_frontPanelBuffer = nullptr;
 
         for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-            delete g_buffers[bufferIndex].bufferPointer;
+            delete (uint32_t *)g_buffers[bufferIndex].bufferPointer;
         }
     }
 }

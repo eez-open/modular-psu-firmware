@@ -142,7 +142,7 @@ int PsuAppContext::getMainPageId() {
 }
 
 bool isSysSettingsSubPage(int pageId) {
-    return pageId == PAGE_ID_SYS_SETTINGS_AUX_OTP ||
+    return pageId == PAGE_ID_SYS_SETTINGS_TEMPERATURE ||
         pageId == PAGE_ID_SYS_SETTINGS_PROTECTIONS ||
         pageId == PAGE_ID_SYS_SETTINGS_IO ||
         pageId == PAGE_ID_SYS_SETTINGS_DATE_TIME ||
@@ -1025,7 +1025,7 @@ void onLastErrorEventAction() {
 
     if (lastEvent) {
         if (lastEvent->eventId == event_queue::EVENT_ERROR_AUX_OTP_TRIPPED && temperature::sensors[temp_sensor::AUX].isTripped()) {
-            showPage(PAGE_ID_SYS_SETTINGS_AUX_OTP);
+            showPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
             return;
         } 
         

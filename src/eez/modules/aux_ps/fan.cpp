@@ -24,6 +24,7 @@
 #include <eez/apps/psu/psu.h>
 #include <eez/apps/psu/scpi/psu.h>
 #include <eez/apps/psu/temperature.h>
+#include <eez/apps/psu/persist_conf.h>
 
 #include <eez/system.h>
 
@@ -39,8 +40,8 @@ namespace fan {
 
 TestResult g_testResult = TEST_FAILED;
 
-bool g_fanManualControl = false;
-int g_fanSpeedPWM;
+static uint8_t g_fanMode = FAN_MODE_AUTO;
+static int g_fanSpeedPWM;
 
 double g_Kp = FAN_PID_KP;
 double g_Ki = FAN_PID_KI_MIN;
@@ -369,6 +370,53 @@ void checkTest() {
 
 #endif
 
+void updateFanSpeed() {
+    int newFanSpeedPWM = g_fanSpeedPWM;
+
+    if (g_fanMode == FAN_MODE_MANUAL) {
+        newFanSpeedPWM = psu::persist_conf::devConf2.fanSpeed * FAN_MAX_PWM / 100;
+        if (newFanSpeedPWM < 0) {
+            newFanSpeedPWM = 0;
+        } else if (newFanSpeedPWM > FAN_MAX_PWM) {
+            newFanSpeedPWM = FAN_MAX_PWM;
+    }
+} else {
+        // adjust fan speed depending on max. channel temperature
+        float maxChannelTemperature = psu::temperature::getMaxChannelTemperature();
+
+        float iMonMax, iMax;
+        getIMonMax(iMonMax, iMax);
+        float Ki = roundPrec(remap(iMonMax * iMonMax, 0, FAN_PID_KI_MIN, iMax * iMax, FAN_PID_KI_MAX), 0.05f);
+        if (Ki != g_Ki) {
+            g_Ki = Ki;
+            g_fanPID.SetTunings(g_Kp, g_Ki, g_Kd, g_POn);
+            g_pidTarget = FAN_MIN_TEMP - 2.0 * iMonMax;
+        }
+
+        g_pidTemp = maxChannelTemperature;
+        if (g_fanPID.Compute()) {
+            newFanSpeedPWM = (int)round(g_pidDuty);
+
+            if (newFanSpeedPWM <= 0) {
+                newFanSpeedPWM = 0;
+            } else {
+                newFanSpeedPWM += FAN_MIN_PWM;
+            }
+
+            if (newFanSpeedPWM > FAN_MAX_PWM) {
+                newFanSpeedPWM = FAN_MAX_PWM;
+            }
+        }
+    }
+
+    if (newFanSpeedPWM != g_fanSpeedPWM) {
+        g_fanSpeedPWM = newFanSpeedPWM;
+#if defined(EEZ_PLATFORM_STM32)
+        setPwmDutyCycle(g_fanSpeedPWM);
+#endif
+    }
+}
+
 void tick(uint32_t tickCount) {
 #if defined(EEZ_PLATFORM_STM32)
     if (g_testResult == TEST_NONE) {
@@ -381,41 +429,7 @@ void tick(uint32_t tickCount) {
         return;
     }
 
-    if (!g_fanManualControl) {
-		// adjust fan speed depending on max. channel temperature
-		float maxChannelTemperature = psu::temperature::getMaxChannelTemperature();
-
-        float iMonMax, iMax;
-        getIMonMax(iMonMax, iMax);
-        float Ki = roundPrec(remap(iMonMax * iMonMax, 0, FAN_PID_KI_MIN, iMax * iMax, FAN_PID_KI_MAX), 0.05f);
-        if (Ki != g_Ki) {
-            g_Ki = Ki;
-            g_fanPID.SetTunings(g_Kp, g_Ki, g_Kd, g_POn);
-            g_pidTarget = FAN_MIN_TEMP - 2.0 * iMonMax;
-        }
-
-		g_pidTemp = maxChannelTemperature;
-		if (g_fanPID.Compute()) {
-			int newFanSpeedPWM = (int)round(g_pidDuty);
-
-			if (newFanSpeedPWM <= 0) {
-				newFanSpeedPWM = 0;
-			} else {
-				newFanSpeedPWM += FAN_MIN_PWM;
-			} 
-            
-            if (newFanSpeedPWM > FAN_MAX_PWM) {
-				newFanSpeedPWM = FAN_MAX_PWM;
-			}
-
-			if (newFanSpeedPWM != g_fanSpeedPWM) {
-				g_fanSpeedPWM = newFanSpeedPWM;
-#if defined(EEZ_PLATFORM_STM32)
-				setPwmDutyCycle(g_fanSpeedPWM);
-#endif
-			}
-		}
-    }
+    updateFanSpeed();
 
 #if FAN_OPTION_RPM_MEASUREMENT && defined(EEZ_PLATFORM_STM32)
 	if (g_fanSpeedPWM != 0) {
@@ -451,12 +465,6 @@ void setPidTunings(double Kp, double Ki, double Kd, int POn) {
 	g_POn = POn;
 
 	g_fanPID.SetTunings(g_Kp, g_Ki, g_Kd, g_POn);
-}
-
-void setFanPwm(int pwm) {
-#if defined(EEZ_PLATFORM_STM32)
-	setPwmDutyCycle(pwm);
-#endif
 }
 
 float readTemperature() {

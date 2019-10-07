@@ -2404,8 +2404,7 @@ void data_sys_temp_aux_status(data::DataOperationEnum operation, data::Cursor &c
 
 void data_sys_temp_aux_otp_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        SysSettingsAuxOtpPage *page =
-            (SysSettingsAuxOtpPage *)getPage(PAGE_ID_SYS_SETTINGS_AUX_OTP);
+        SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
         if (page) {
             value = page->state;
         }
@@ -2414,8 +2413,7 @@ void data_sys_temp_aux_otp_state(data::DataOperationEnum operation, data::Cursor
 
 void data_sys_temp_aux_otp_level(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        SysSettingsAuxOtpPage *page =
-            (SysSettingsAuxOtpPage *)getPage(PAGE_ID_SYS_SETTINGS_AUX_OTP);
+        SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
         if (page) {
             value = page->level;
         }
@@ -2424,8 +2422,7 @@ void data_sys_temp_aux_otp_level(data::DataOperationEnum operation, data::Cursor
 
 void data_sys_temp_aux_otp_delay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        SysSettingsAuxOtpPage *page =
-            (SysSettingsAuxOtpPage *)getPage(PAGE_ID_SYS_SETTINGS_AUX_OTP);
+        SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
         if (page) {
             value = page->delay;
         }
@@ -2562,6 +2559,24 @@ void data_sys_info_fan_speed(data::DataOperationEnum operation, data::Cursor &cu
         }
     }
 #endif
+}
+
+void data_sys_fan_mode(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
+        if (page) {
+            value = page->fanMode;
+        }
+    }
+}
+
+void data_sys_fan_speed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
+        if (page) {
+            value = page->fanSpeed;
+        }
+    }
 }
 
 void data_channel_board_info_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {

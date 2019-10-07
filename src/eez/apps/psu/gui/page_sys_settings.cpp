@@ -41,6 +41,8 @@
 #include <eez/gui/dialogs.h>
 #include <eez/gui/gui.h>
 
+#include <eez/modules/aux_ps/fan.h>
+
 using namespace eez::psu::gui;
 
 namespace eez {
@@ -458,43 +460,44 @@ void SysSettingsProtectionsPage::toggleForceDisablingAllOutputsOnPowerUp() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void SysSettingsAuxOtpPage::pageAlloc() {
+void SysSettingsTemperaturePage::pageAlloc() {
     origState = state = temperature::sensors[temp_sensor::AUX].prot_conf.state ? 1 : 0;
 
-    origLevel = level =
-        MakeValue(temperature::sensors[temp_sensor::AUX].prot_conf.level, UNIT_CELSIUS);
+    origLevel = level = MakeValue(temperature::sensors[temp_sensor::AUX].prot_conf.level, UNIT_CELSIUS);
     minLevel = OTP_AUX_MIN_LEVEL;
     maxLevel = OTP_AUX_MAX_LEVEL;
     defLevel = OTP_AUX_DEFAULT_LEVEL;
 
-    origDelay = delay =
-        MakeValue(temperature::sensors[temp_sensor::AUX].prot_conf.delay, UNIT_SECOND);
+    origDelay = delay = MakeValue(temperature::sensors[temp_sensor::AUX].prot_conf.delay, UNIT_SECOND);
     minDelay = OTP_AUX_MIN_DELAY;
     maxDelay = OTP_AUX_MAX_DELAY;
     defaultDelay = OTP_CH_DEFAULT_DELAY;
+
+    origFanMode = fanMode = persist_conf::devConf2.fanMode;
+    origFanSpeed = fanSpeed = MakeValue(fanMode == FAN_MODE_AUTO ? 100.0f : 1.0f * persist_conf::devConf2.fanSpeed, UNIT_PERCENT);
 }
 
-int SysSettingsAuxOtpPage::getDirty() {
-    return (origState != state || origLevel != level || origDelay != delay) ? 1 : 0;
+int SysSettingsTemperaturePage::getDirty() {
+    return (origState != state || origLevel != level || origDelay != delay || origFanMode != fanMode || origFanSpeed != fanSpeed) ? 1 : 0;
 }
 
-void SysSettingsAuxOtpPage::set() {
+void SysSettingsTemperaturePage::set() {
     if (getDirty()) {
         setParams();
     }
 }
 
-void SysSettingsAuxOtpPage::toggleState() {
+void SysSettingsTemperaturePage::toggleState() {
     state = state ? 0 : 1;
 }
 
-void SysSettingsAuxOtpPage::onLevelSet(float value) {
+void SysSettingsTemperaturePage::onLevelSet(float value) {
     popPage();
-    SysSettingsAuxOtpPage *page = (SysSettingsAuxOtpPage *)getActivePage();
+    SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getActivePage();
     page->level = MakeValue(value, page->level.getUnit());
 }
 
-void SysSettingsAuxOtpPage::editLevel() {
+void SysSettingsTemperaturePage::editLevel() {
     NumericKeypadOptions options;
 
     options.editValueUnit = level.getUnit();
@@ -511,13 +514,13 @@ void SysSettingsAuxOtpPage::editLevel() {
     NumericKeypad::start(0, level, options, onLevelSet, 0, 0);
 }
 
-void SysSettingsAuxOtpPage::onDelaySet(float value) {
+void SysSettingsTemperaturePage::onDelaySet(float value) {
     popPage();
-    SysSettingsAuxOtpPage *page = (SysSettingsAuxOtpPage *)getActivePage();
+    SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getActivePage();
     page->delay = MakeValue(value, page->delay.getUnit());
 }
 
-void SysSettingsAuxOtpPage::editDelay() {
+void SysSettingsTemperaturePage::editDelay() {
     NumericKeypadOptions options;
 
     options.editValueUnit = delay.getUnit();
@@ -534,17 +537,49 @@ void SysSettingsAuxOtpPage::editDelay() {
     NumericKeypad::start(0, delay, options, onDelaySet, 0, 0);
 }
 
-void SysSettingsAuxOtpPage::setParams() {
+void SysSettingsTemperaturePage::toggleFanMode() {
+    fanMode = fanMode ? 0 : 1;
+}
+
+void SysSettingsTemperaturePage::onFanSpeedSet(float value) {
+    popPage();
+    SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getActivePage();
+    page->fanSpeed = MakeValue(value, UNIT_PERCENT);
+}
+
+void SysSettingsTemperaturePage::editFanSpeed() {
+    NumericKeypadOptions options;
+
+    options.editValueUnit = UNIT_PERCENT;
+
+    options.min = 0;
+    options.max = 100;
+    options.def = 100;
+
+    options.enableMaxButton();
+    options.enableDefButton();
+    options.flags.signButtonEnabled = false;
+    options.flags.dotButtonEnabled = false;
+
+    NumericKeypad::start(0, fanSpeed, options, onFanSpeedSet, 0, 0);
+}
+
+void SysSettingsTemperaturePage::setParams() {
     temperature::sensors[temp_sensor::AUX].prot_conf.state = state ? true : false;
     temperature::sensors[temp_sensor::AUX].prot_conf.level = level.getFloat();
     temperature::sensors[temp_sensor::AUX].prot_conf.delay = delay.getFloat();
 
     profile::save();
+
+    persist_conf::devConf2.fanMode = fanMode;
+    persist_conf::devConf2.fanSpeed = (uint8_t)roundf(fanSpeed.getFloat());
+    persist_conf::saveDevice2();
+
     popPage();
     infoMessage("Aux temp. protection changed!");
 }
 
-void SysSettingsAuxOtpPage::clear() {
+void SysSettingsTemperaturePage::clear() {
     temperature::sensors[temp_sensor::AUX].clearProtection();
     popPage();
     infoMessage("Cleared!");

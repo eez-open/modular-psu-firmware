@@ -203,7 +203,7 @@ static SysSettingsEthernetStaticPage g_SysSettingsEthernetStaticPage;
 static SysSettingsProtectionsPage g_SysSettingsProtectionsPage;
 static SysSettingsTriggerPage g_SysSettingsTriggerPage;
 static SysSettingsIOPinsPage g_SysSettingsIOPinsPage;
-static SysSettingsAuxOtpPage g_SysSettingsAuxOtpPage;
+static SysSettingsTemperaturePage g_SysSettingsTemperaturePage;
 static SysSettingsSoundPage g_SysSettingsSoundPage;
 #if OPTION_ENCODER
 static SysSettingsEncoderPage g_SysSettingsEncoderPage;
@@ -275,8 +275,8 @@ Page *getPageFromId(int pageId) {
     case PAGE_ID_SYS_SETTINGS_IO:
         page = &g_SysSettingsIOPinsPage;
         break;
-    case PAGE_ID_SYS_SETTINGS_AUX_OTP:
-        page = &g_SysSettingsAuxOtpPage;
+    case PAGE_ID_SYS_SETTINGS_TEMPERATURE:
+        page = &g_SysSettingsTemperaturePage;
         break;
     case PAGE_ID_SYS_SETTINGS_SOUND:
         page = &g_SysSettingsSoundPage;

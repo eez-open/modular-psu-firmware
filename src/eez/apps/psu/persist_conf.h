@@ -155,7 +155,9 @@ struct DeviceConfiguration2 {
     uint8_t dstRule;
     uint8_t ethernetMacAddress[6];
     uint8_t displayBackgroundLuminosityStep;
-    IOPin reserved2;
+    uint8_t fanMode;
+    uint8_t fanSpeed;
+    uint16_t reserved2;
 	uint8_t selectedThemeIndex;
     uint8_t ytGraphUpdateMethod;
     float animationsDuration;
