@@ -173,9 +173,9 @@ struct MultilineTextRender {
     int lineIndent;
     int lineWidth;
 
-    void appendToLine(const char *str, int n) {
-        int j = strlen(line);
-        for (int i = 0; i < n && j < CONF_MULTILINE_TEXT_MAX_LINE_LENGTH; i++, j++) {
+    void appendToLine(const char *str, size_t n) {
+        size_t j = strlen(line);
+        for (size_t i = 0; i < n && j < CONF_MULTILINE_TEXT_MAX_LINE_LENGTH; i++, j++) {
             line[j] = str[i];
         }
         line[j] = 0;
