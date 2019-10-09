@@ -340,7 +340,7 @@ struct Channel : ChannelInterface {
 
 			adc.start(ADC_DATA_TYPE_U_MON);
 		} else {
-			if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+			if (channel.isHwOvpEnabled()) {
 				// OVP has to be disabled before OE deactivation
 				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
 			}
