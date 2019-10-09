@@ -297,17 +297,22 @@ void AppContext::popPage() {
     }
 }
 
-bool AppContext::isPageActiveOrOnStack(int pageId) {
+Page *AppContext::getPage(int pageId) {
     if (m_activePage.pageId == pageId) {
-        return true;
+        return m_activePage.page;
     }
 
     for (int i = 0; i < m_pageNavigationStackPointer; ++i) {
         if (m_pageNavigationStack[i].pageId == pageId) {
-            return true;
+            return m_pageNavigationStack[i].page;
         }
     }
-    return false;
+
+    return nullptr;
+}
+
+bool AppContext::isPageActiveOrOnStack(int pageId) {
+    return getPage(pageId) != nullptr;
 }
 
 void AppContext::showPage(int pageId) {

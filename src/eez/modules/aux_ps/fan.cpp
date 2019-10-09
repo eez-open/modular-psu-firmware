@@ -32,6 +32,10 @@
 #include <i2c.h>
 #endif
 
+#include <eez/apps/psu/psu.h>
+#include <eez/apps/psu/gui/psu.h>
+#include <eez/apps/psu/gui/page_sys_settings.h>
+
 namespace eez {
 namespace aux_ps {
 namespace fan {
@@ -40,7 +44,6 @@ namespace fan {
 
 TestResult g_testResult = TEST_FAILED;
 
-static uint8_t g_fanMode = FAN_MODE_AUTO;
 static int g_fanSpeedPWM;
 
 double g_Kp = FAN_PID_KP;
@@ -373,14 +376,27 @@ void checkTest() {
 void updateFanSpeed() {
     int newFanSpeedPWM = g_fanSpeedPWM;
 
-    if (g_fanMode == FAN_MODE_MANUAL) {
-        newFanSpeedPWM = psu::persist_conf::devConf2.fanSpeed * FAN_MAX_PWM / 100;
-        if (newFanSpeedPWM < 0) {
-            newFanSpeedPWM = 0;
-        } else if (newFanSpeedPWM > FAN_MAX_PWM) {
-            newFanSpeedPWM = FAN_MAX_PWM;
+    uint8_t fanMode;
+    uint8_t fanSpeed;
+    auto page = (psu::gui::SysSettingsTemperaturePage *)psu::gui::g_psuAppContext.getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
+    if (page) {
+        fanMode = page->fanMode;
+        fanSpeed = (uint8_t)page->fanSpeed.getFloat();
+    } else {
+        fanMode = psu::persist_conf::devConf2.fanMode;
+        fanSpeed = psu::persist_conf::devConf2.fanSpeed;
     }
-} else {
+
+    if (fanMode == FAN_MODE_MANUAL) {
+        if (fanSpeed == 0) {
+            newFanSpeedPWM = 0;
+        } else {
+            newFanSpeedPWM = FAN_MIN_PWM + fanSpeed * (FAN_MAX_PWM - FAN_MIN_PWM) / 100;
+            if (newFanSpeedPWM > FAN_MAX_PWM) {
+                newFanSpeedPWM = FAN_MAX_PWM;
+            }
+        }
+    } else {
         // adjust fan speed depending on max. channel temperature
         float maxChannelTemperature = psu::temperature::getMaxChannelTemperature();
 
@@ -455,7 +471,6 @@ void tick(uint32_t tickCount) {
         g_rpm = 0;
     }
 #endif
-
 }
 
 void setPidTunings(double Kp, double Ki, double Kd, int POn) {

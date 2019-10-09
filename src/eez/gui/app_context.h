@@ -89,6 +89,7 @@ public:
 
     void replacePage(int pageId, Page *page = nullptr);
 
+    Page *getPage(int pageId);
     bool isPageActiveOrOnStack(int pageId);
 
     virtual bool isFocusWidget(const WidgetCursor &widgetCursor);
