@@ -29,14 +29,14 @@
 #endif
 
 #include <eez/apps/psu/board.h>
-#include <eez/modules/dcpx05/dac.h>
+#include <eez/modules/dcpX05/dac.h>
 #include <eez/apps/psu/datetime.h>
 #include <eez/modules/mcu/eeprom.h>
-#include <eez/modules/dcpx05/ioexp.h>
+#include <eez/modules/dcpX05/ioexp.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/apps/psu/rtc.h>
 #include <eez/apps/psu/temperature.h>
-#include <eez/modules/dcpx05/adc.h>
+#include <eez/modules/dcpX05/adc.h>
 #include <eez/sound.h>
 
 #if OPTION_SD_CARD

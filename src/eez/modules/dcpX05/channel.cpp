@@ -16,10 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/modules/dcpx05/channel.h>
-#include <eez/modules/dcpx05/adc.h>
-#include <eez/modules/dcpx05/dac.h>
-#include <eez/modules/dcpx05/ioexp.h>
+#include <eez/modules/dcpX05/channel.h>
+#include <eez/modules/dcpX05/adc.h>
+#include <eez/modules/dcpX05/dac.h>
+#include <eez/modules/dcpX05/ioexp.h>
 
 #include <eez/apps/psu/psu.h>
 #include <eez/apps/psu/profile.h>

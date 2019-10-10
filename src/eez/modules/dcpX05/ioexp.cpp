@@ -17,7 +17,7 @@
  */
 
 #include <eez/apps/psu/psu.h>
-#include <eez/modules/dcpx05/ioexp.h>
+#include <eez/modules/dcpX05/ioexp.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <scpi/scpi.h>

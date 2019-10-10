@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <eez/modules/dcpx05/dac.h>
-#include <eez/modules/dcpx05/ioexp.h>
+#include <eez/modules/dcpX05/dac.h>
+#include <eez/modules/dcpX05/ioexp.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/apps/psu/temp_sensor.h>
-#include <eez/modules/dcpx05/adc.h>
+#include <eez/modules/dcpX05/adc.h>
 
 namespace eez {
 namespace psu {

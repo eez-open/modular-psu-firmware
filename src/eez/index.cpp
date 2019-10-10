@@ -50,7 +50,7 @@ using namespace eez::psu::gui;
 #include <eez/modules/mcu/ethernet.h>
 #endif
 
-#include <eez/modules/dcpx05/channel.h>
+#include <eez/modules/dcpX05/channel.h>
 #include <eez/modules/dcm220/channel.h>
 
 namespace eez {

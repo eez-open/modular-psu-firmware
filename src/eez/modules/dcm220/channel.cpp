@@ -26,7 +26,7 @@
 #include <stdio.h>
 #endif
 
-#include <eez/modules/dcpx05/channel.h>
+#include <eez/modules/dcpX05/channel.h>
 
 #include <eez/apps/psu/psu.h>
 #include <eez/scpi/regs.h>

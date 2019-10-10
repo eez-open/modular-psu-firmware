@@ -28,9 +28,9 @@
 
 #include <eez/apps/psu/psu.h>
 
-#include <eez/modules/dcpx05/dac.h>
-#include <eez/modules/dcpx05/adc.h>
-#include <eez/modules/dcpx05/ioexp.h>
+#include <eez/modules/dcpX05/dac.h>
+#include <eez/modules/dcpX05/adc.h>
+#include <eez/modules/dcpX05/ioexp.h>
 
 namespace eez {
 namespace psu {

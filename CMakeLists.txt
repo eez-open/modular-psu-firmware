@@ -435,17 +435,17 @@ list (APPEND src_files ${src_eez_modules_mcu_simulator})
 source_group("eez\\modules\\mcu\\simulator" FILES ${src_eez_modules_mcu_simulator})
 
 set(src_eez_modules_dcpx05
-    src/eez/modules/dcpx05/adc.cpp
-    src/eez/modules/dcpx05/channel.cpp
-    src/eez/modules/dcpx05/dac.cpp
-    src/eez/modules/dcpx05/ioexp.cpp
+    src/eez/modules/dcpX05/adc.cpp
+    src/eez/modules/dcpX05/channel.cpp
+    src/eez/modules/dcpX05/dac.cpp
+    src/eez/modules/dcpX05/ioexp.cpp
 ) 
 list (APPEND src_files ${src_eez_modules_dcpx05})
 set(header_eez_modules_dcpx05
-    src/eez/modules/dcpx05/adc.h
-    src/eez/modules/dcpx05/channel.h
-    src/eez/modules/dcpx05/dac.h
-    src/eez/modules/dcpx05/ioexp.h
+    src/eez/modules/dcpX05/adc.h
+    src/eez/modules/dcpX05/channel.h
+    src/eez/modules/dcpX05/dac.h
+    src/eez/modules/dcpX05/ioexp.h
 ) 
 list (APPEND header_files ${header_eez_modules_dcpx05})
 source_group("eez\\modules\\dcpx05" FILES ${src_eez_modules_dcpx05} ${header_eez_modules_dcpx05})
