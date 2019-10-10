@@ -86,9 +86,9 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
 scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #ifdef DEBUG
-    char buffer[768];
+    static char buffer[2048];
 
-    for (int i = 0; i < CH_MAX; i++) {
+    for (int i = 0; i < CH_NUM; i++) {
         if (!measureAllAdcValuesOnChannel(i)) {
             SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
             return SCPI_RES_ERR;

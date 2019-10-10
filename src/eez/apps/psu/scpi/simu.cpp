@@ -163,10 +163,6 @@ scpi_result_t scpi_cmd_simulatorLoadQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_simulatorVoltageProgramExternal(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isCoupled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
-        return SCPI_RES_ERR;
-    }
 
     float value;
     if (!get_voltage_param(context, value, 0, 0)) {
@@ -175,6 +171,11 @@ scpi_result_t scpi_cmd_simulatorVoltageProgramExternal(scpi_t *context) {
 
     Channel *channel = param_channel(context, FALSE, TRUE);
     if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
         return SCPI_RES_ERR;
     }
 
@@ -190,13 +191,13 @@ scpi_result_t scpi_cmd_simulatorVoltageProgramExternal(scpi_t *context) {
 
 scpi_result_t scpi_cmd_simulatorVoltageProgramExternalQ(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isCoupled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
+    Channel *channel = param_channel(context, FALSE, TRUE);
+    if (!channel) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context, FALSE, TRUE);
-    if (!channel) {
+    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
         return SCPI_RES_ERR;
     }
 
@@ -239,10 +240,6 @@ scpi_result_t scpi_cmd_simulatorPwrgoodQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_simulatorRpol(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isSeries()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
-        return SCPI_RES_ERR;
-    }
 
     bool on;
     if (!SCPI_ParamBool(context, &on, TRUE)) {
@@ -251,6 +248,11 @@ scpi_result_t scpi_cmd_simulatorRpol(scpi_t *context) {
 
     Channel *channel = param_channel(context, FALSE, TRUE);
     if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
         return SCPI_RES_ERR;
     }
 
@@ -266,13 +268,13 @@ scpi_result_t scpi_cmd_simulatorRpol(scpi_t *context) {
 
 scpi_result_t scpi_cmd_simulatorRpolQ(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isSeries()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
+    Channel *channel = param_channel(context, FALSE, TRUE);
+    if (!channel) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context, FALSE, TRUE);
-    if (!channel) {
+    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
         return SCPI_RES_ERR;
     }
 

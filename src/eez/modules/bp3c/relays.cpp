@@ -123,13 +123,13 @@ bool test() {
 
 void switchChannelCoupling(int channelCoupling) {
 #if defined(EEZ_PLATFORM_STM32)
-	if (channelCoupling == psu::channel_dispatcher::TYPE_PARALLEL) {
+	if (channelCoupling == psu::channel_dispatcher::COUPLING_TYPE_PARALLEL) {
 		write(REG_OUTPUT_PORT, COUPLING_MODE_PARALLEL);
-	} else if (channelCoupling == psu::channel_dispatcher::TYPE_SERIES) {
+	} else if (channelCoupling == psu::channel_dispatcher::COUPLING_TYPE_SERIES) {
 		write(REG_OUTPUT_PORT, COUPLING_MODE_SERIES);
-	} else if (channelCoupling == psu::channel_dispatcher::TYPE_SPLIT_RAIL) {
+	} else if (channelCoupling == psu::channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
 		write(REG_OUTPUT_PORT, COUPLING_MODE_SPLIT_RAIL);
-	} else if (channelCoupling == psu::channel_dispatcher::TYPE_COMMON_GROUND) {
+	} else if (channelCoupling == psu::channel_dispatcher::COUPLING_TYPE_COMMON_GND) {
 		write(REG_OUTPUT_PORT, COUPLING_MODE_COMMON_GROUND);
 	} else {
 		write(REG_OUTPUT_PORT, COUPLING_MODE_NONE);

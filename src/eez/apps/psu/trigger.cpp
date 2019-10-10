@@ -223,9 +223,14 @@ void onTriggerFinished(Channel &channel) {
 }
 
 void setTriggerFinished(Channel &channel) {
-    if (channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
+    if (channel.channelIndex < 2 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL)) {
+        g_triggerInProgress[0] = false;
+        g_triggerInProgress[1] = false;
+    } else if (channel.flags.trackingEnabled) {
         for (int i = 0; i < CH_NUM; ++i) {
-            g_triggerInProgress[i] = false;
+            if (Channel::get(i).flags.trackingEnabled) {
+                g_triggerInProgress[i] = false;
+            }
         }
     } else {
         g_triggerInProgress[channel.channelIndex] = false;
@@ -240,6 +245,8 @@ void setTriggerFinished(Channel &channel) {
 
 int checkTrigger() {
     bool onlyFixed = true;
+    
+    bool trackingChannelsChecked = false;
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
@@ -248,46 +255,55 @@ int checkTrigger() {
             continue;
         }
 
-        if (i == 0 || !(channel_dispatcher::isCoupled() || channel_dispatcher::isTracked())) {
-            if (channel.getVoltageTriggerMode() != channel.getCurrentTriggerMode()) {
-                return SCPI_ERROR_INCOMPATIBLE_TRANSIENT_MODES;
+        if (i == 1 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES)) {
+            continue;
+        }
+
+        if (channel.flags.trackingEnabled) {
+            if (trackingChannelsChecked) {
+                continue;
+            }
+            trackingChannelsChecked = true;
+        }
+
+        if (channel.getVoltageTriggerMode() != channel.getCurrentTriggerMode()) {
+            return SCPI_ERROR_INCOMPATIBLE_TRANSIENT_MODES;
+        }
+
+        if (channel.getVoltageTriggerMode() != TRIGGER_MODE_FIXED) {
+            if (channel.isRemoteProgrammingEnabled()) {
+                // TODO replace with more specific error
+                return SCPI_ERROR_EXECUTION_ERROR;
             }
 
-            if (channel.getVoltageTriggerMode() != TRIGGER_MODE_FIXED) {
-                if (channel.isRemoteProgrammingEnabled()) {
-                    // TODO replace with more specific error
-                    return SCPI_ERROR_EXECUTION_ERROR;
+            if (channel.getVoltageTriggerMode() == TRIGGER_MODE_LIST) {
+                if (list::isListEmpty(channel)) {
+                    return SCPI_ERROR_LIST_IS_EMPTY;
                 }
 
-                if (channel.getVoltageTriggerMode() == TRIGGER_MODE_LIST) {
-                    if (list::isListEmpty(channel)) {
-                        return SCPI_ERROR_LIST_IS_EMPTY;
-                    }
-
-                    if (!list::areListLengthsEquivalent(channel)) {
-                        return SCPI_ERROR_LIST_LENGTHS_NOT_EQUIVALENT;
-                    }
-
-                    int err = list::checkLimits(i);
-                    if (err) {
-                        return err;
-                    }
-                } else {
-                    if (g_levels[i].u > channel_dispatcher::getULimit(channel)) {
-                        return SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
-                    }
-
-                    if (g_levels[i].i > channel_dispatcher::getILimit(channel)) {
-                        return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
-                    }
-
-                    if (g_levels[i].u * g_levels[i].i > channel_dispatcher::getPowerLimit(channel)) {
-                        return SCPI_ERROR_POWER_LIMIT_EXCEEDED;
-                    }
+                if (!list::areListLengthsEquivalent(channel)) {
+                    return SCPI_ERROR_LIST_LENGTHS_NOT_EQUIVALENT;
                 }
 
-                onlyFixed = false;
+                int err = list::checkLimits(i);
+                if (err) {
+                    return err;
+                }
+            } else {
+                if (g_levels[i].u > channel_dispatcher::getULimit(channel)) {
+                    return SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
+                }
+
+                if (g_levels[i].i > channel_dispatcher::getILimit(channel)) {
+                    return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
+                }
+
+                if (g_levels[i].u * g_levels[i].i > channel_dispatcher::getPowerLimit(channel)) {
+                    return SCPI_ERROR_POWER_LIMIT_EXCEEDED;
+                }
             }
+
+            onlyFixed = false;
         }
     }
 
@@ -314,29 +330,44 @@ int startImmediately() {
 
     io_pins::onTrigger();
 
+    bool trackingChannelsStarted = false;
+
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
 
-        if (channel.isOk() && (i == 0 || !(channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()))) {
-            if (channel.getVoltageTriggerMode() == TRIGGER_MODE_LIST) {
-                //channel_dispatcher::setVoltage(channel, 0);
-                //channel_dispatcher::setCurrent(channel, 0);
+        if (!channel.isOk()) {
+            continue;
+        }
 
-                list::executionStart(channel);
+        if (i == 1 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES)) {
+            continue;
+        }
+
+        if (channel.flags.trackingEnabled) {
+            if (trackingChannelsStarted) {
+                continue;
+            }
+            trackingChannelsStarted = true;
+        }
+
+        if (channel.getVoltageTriggerMode() == TRIGGER_MODE_LIST) {
+            //channel_dispatcher::setVoltage(channel, 0);
+            //channel_dispatcher::setCurrent(channel, 0);
+
+            list::executionStart(channel);
+
+            channel_dispatcher::outputEnable(
+                channel, channel_dispatcher::getTriggerOutputState(channel));
+        } else {
+            if (channel.getVoltageTriggerMode() == TRIGGER_MODE_STEP) {
+                channel_dispatcher::setVoltage(channel, g_levels[i].u);
+                channel_dispatcher::setCurrent(channel, g_levels[i].i);
 
                 channel_dispatcher::outputEnable(
                     channel, channel_dispatcher::getTriggerOutputState(channel));
-            } else {
-                if (channel.getVoltageTriggerMode() == TRIGGER_MODE_STEP) {
-                    channel_dispatcher::setVoltage(channel, g_levels[i].u);
-                    channel_dispatcher::setCurrent(channel, g_levels[i].i);
-
-                    channel_dispatcher::outputEnable(
-                        channel, channel_dispatcher::getTriggerOutputState(channel));
-                }
-
-                setTriggerFinished(channel);
             }
+
+            setTriggerFinished(channel);
         }
     }
 

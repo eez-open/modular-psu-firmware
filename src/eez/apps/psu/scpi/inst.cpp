@@ -34,11 +34,11 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_choice_def_t channelsCouplingChoice[] = {
-    { "NONE", channel_dispatcher::TYPE_NONE },
-    { "PARallel", channel_dispatcher::TYPE_PARALLEL },
-    { "SERies", channel_dispatcher::TYPE_SERIES },
-    { "CGND", channel_dispatcher::TYPE_COMMON_GROUND },
-    { "SRAil", channel_dispatcher::TYPE_SPLIT_RAIL },
+    { "NONE", channel_dispatcher::COUPLING_TYPE_NONE },
+    { "PARallel", channel_dispatcher::COUPLING_TYPE_PARALLEL },
+    { "SERies", channel_dispatcher::COUPLING_TYPE_SERIES },
+    { "CGND", channel_dispatcher::COUPLING_TYPE_COMMON_GND },
+    { "SRAil", channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
@@ -122,30 +122,16 @@ scpi_result_t scpi_cmd_instrumentNselectQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_instrumentCoupleTracking(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isTracked()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
-        return SCPI_RES_ERR;
-    }
-
     int32_t type;
     if (!SCPI_ParamChoice(context, channelsCouplingChoice, &type, true)) {
         return SCPI_RES_ERR;
     }
 
-    if (CH_NUM < 2) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-        return SCPI_RES_ERR;
-    }
-
-    if (!channel_dispatcher::isCouplingOrTrackingAllowed((channel_dispatcher::Type)type)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-        return SCPI_RES_ERR;
-    }
-
-    if (channel_dispatcher::setType((channel_dispatcher::Type)type)) {
+    int err;
+    if (channel_dispatcher::setCouplingType((channel_dispatcher::CouplingType)type, &err)) {
         profile::save();
     } else {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
@@ -154,21 +140,16 @@ scpi_result_t scpi_cmd_instrumentCoupleTracking(scpi_t *context) {
 
 scpi_result_t scpi_cmd_instrumentCoupleTrackingQ(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isTracked()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
-        return SCPI_RES_ERR;
-    }
-
     char result[16];
 
-    channel_dispatcher::Type type = channel_dispatcher::getType();
-    if (type == channel_dispatcher::TYPE_PARALLEL) {
+    channel_dispatcher::CouplingType couplingType = channel_dispatcher::getCouplingType();
+    if (couplingType == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
         strcpy(result, "PARALLEL");
-    } else if (type == channel_dispatcher::TYPE_SERIES) {
+    } else if (couplingType == channel_dispatcher::COUPLING_TYPE_SERIES) {
         strcpy(result, "SERIES");
-    } else if (type == channel_dispatcher::TYPE_COMMON_GROUND) {
+    } else if (couplingType == channel_dispatcher::COUPLING_TYPE_COMMON_GND) {
         strcpy(result, "CGND");
-    } else if (type == channel_dispatcher::TYPE_SERIES) {
+    } else if (couplingType == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
         strcpy(result, "SRAIL");
     } else {
         strcpy(result, "NONE");

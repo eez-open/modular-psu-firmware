@@ -141,6 +141,10 @@ void oneIter() {
     		sd_card::tick();
 #endif
     	}
+
+#ifdef DEBUG
+        psu::debug::tick(tickCount);
+#endif
     }
 }
 

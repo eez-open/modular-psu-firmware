@@ -137,16 +137,6 @@ scpi_result_t scpi_cmd_calibrationClear(scpi_t *context) {
 
 scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isCoupled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
-        return SCPI_RES_ERR;
-    }
-
-    if (channel_dispatcher::isTracked()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
-        return SCPI_RES_ERR;
-    }
-
     if (!trigger::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -168,6 +158,16 @@ scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
 
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     Channel *channel = &Channel::get(psu_context->selected_channel_index);
+
+    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
+        return SCPI_RES_ERR;
+    }
+
+    if (channel->flags.trackingEnabled) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
+        return SCPI_RES_ERR;
+    }
 
     if (!channel->isOutputEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
@@ -303,16 +303,6 @@ scpi_result_t scpi_cmd_calibrationSave(scpi_t *context) {
 
 scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isCoupled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
-        return SCPI_RES_ERR;
-    }
-
-    if (channel_dispatcher::isTracked()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
-        return SCPI_RES_ERR;
-    }
-
     if (calibration::isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
@@ -320,6 +310,16 @@ scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
 
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     Channel *channel = &Channel::get(psu_context->selected_channel_index);
+
+    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
+        return SCPI_RES_ERR;
+    }
+
+    if (channel->flags.trackingEnabled) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
+        return SCPI_RES_ERR;
+    }
 
     if (!channel->isCalibrationExists()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CAL_PARAMS_MISSING);

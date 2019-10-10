@@ -25,6 +25,7 @@ using namespace eez::gui;
 #include <eez/apps/psu/io_pins.h>
 #include <eez/apps/psu/serial_psu.h>
 #include <eez/apps/psu/trigger.h>
+#include <eez/apps/psu/channel_dispatcher.h>
 
 namespace eez {
 namespace psu {
@@ -301,6 +302,36 @@ class SysSettingsSerialPage : public SetPage {
     serial::Parity m_parityOrig;
 
     static void onParitySet(uint8_t value);
+};
+
+class SysSettingsTrackingPage : public SetPage {
+    friend class SysSettingsCouplingPage;
+
+public:
+    void pageAlloc();
+
+    int getDirty();
+    void set();
+
+    int m_trackingEnabled[CH_MAX];
+
+private:
+    int m_trackingEnabledOrig[CH_MAX];
+}; 
+
+class SysSettingsCouplingPage : public SetPage {
+public:
+    void pageAlloc();
+
+    int getDirty();
+    void set();
+
+    channel_dispatcher::CouplingType m_couplingType;
+    bool m_enableTrackingMode;
+
+private:
+    channel_dispatcher::CouplingType m_couplingTypeOrig;
+    bool m_enableTrackingModeOrig;
 };
 
 } // namespace gui

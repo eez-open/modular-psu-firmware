@@ -56,15 +56,55 @@ DebugDurationVariable g_listTickDuration("LIST_TICK_DURATION");
 #endif
 DebugCounterVariable g_adcCounter("ADC_COUNTER");
 
-DebugVariable *g_variables[] = { &g_uDac[0],          &g_uDac[1],    &g_uMon[0],    &g_uMon[1],
-                                 &g_uMonDac[0],       &g_uMonDac[1], &g_iDac[0],    &g_iDac[1],
-                                 &g_iMon[0],          &g_iMon[1],    &g_iMonDac[0], &g_iMonDac[1],
+DebugVariable *g_variables[] = { 
+    &g_uDac[0],          
+    &g_uDac[1],    
+    &g_uDac[2],
+    &g_uDac[3],
+    &g_uDac[4],
+    &g_uDac[5],
 
-                                 &g_mainLoopDuration,
+    &g_uMon[0],
+    &g_uMon[1],
+    &g_uMon[2],
+    &g_uMon[3],
+    &g_uMon[4],
+    &g_uMon[5],
+
+    &g_uMonDac[0],
+    &g_uMonDac[1], 
+    &g_uMonDac[2],
+    &g_uMonDac[3],
+    &g_uMonDac[4],
+    &g_uMonDac[5],
+
+    &g_iDac[0],
+    &g_iDac[1],
+    &g_iDac[2],
+    &g_iDac[3],
+    &g_iDac[4],
+    &g_iDac[5],
+
+    &g_iMon[0],
+    &g_iMon[1],    
+    &g_iMon[2],
+    &g_iMon[3],
+    &g_iMon[4],
+    &g_iMon[5],
+
+    &g_iMonDac[0],
+    &g_iMonDac[1],
+    &g_iMonDac[2],
+    &g_iMonDac[3],
+    &g_iMonDac[4],
+    &g_iMonDac[5],
+
+    &g_mainLoopDuration,
 #if CONF_DEBUG_VARIABLES
-                                 &g_listTickDuration,
+    &g_listTickDuration,
 #endif
-                                 &g_adcCounter };
+    &g_adcCounter 
+};
 
 static uint32_t g_previousTickCount1sec;
 static uint32_t g_previousTickCount10sec;

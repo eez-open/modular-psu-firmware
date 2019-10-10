@@ -190,8 +190,6 @@ static ChSettingsOppProtectionPage g_ChSettingsOppProtectionPage;
 static ChSettingsOtpProtectionPage g_ChSettingsOtpProtectionPage;
 static ChSettingsAdvOptionsPage g_ChSettingsAdvOptionPage;
 static ChSettingsAdvRangesPage g_ChSettingsAdvRangesPage;
-static ChSettingsAdvTrackingPage g_ChSettingsAdvTrackingPage;
-static ChSettingsAdvCouplingPage g_ChSettingsAdvCouplingPage;
 static ChSettingsAdvViewPage g_ChSettingsAdvViewPage;
 static ChSettingsTriggerPage g_ChSettingsTriggerPage;
 static ChSettingsListsPage g_ChSettingsListsPage;
@@ -209,6 +207,8 @@ static SysSettingsSoundPage g_SysSettingsSoundPage;
 static SysSettingsEncoderPage g_SysSettingsEncoderPage;
 #endif
 static SysSettingsSerialPage g_SysSettingsSerialPage;
+static SysSettingsTrackingPage g_sysSettingsTrackingPage;
+static SysSettingsCouplingPage g_sysSettingsCouplingPage;
 static UserProfilesPage g_UserProfilesPage;
 
 Page *getPageFromId(int pageId) {
@@ -239,12 +239,11 @@ Page *getPageFromId(int pageId) {
     case PAGE_ID_CH_SETTINGS_ADV_RANGES:
         page = &g_ChSettingsAdvRangesPage;
         break;
-    case PAGE_ID_CH_SETTINGS_ADV_TRACKING:
-        page = &g_ChSettingsAdvTrackingPage;
+    case PAGE_ID_SYS_SETTINGS_TRACKING:
+        page = &g_sysSettingsTrackingPage;
         break;
-    case PAGE_ID_CH_SETTINGS_ADV_COUPLING:
-    case PAGE_ID_CH_SETTINGS_ADV_COUPLING_INFO:
-        page = &g_ChSettingsAdvCouplingPage;
+    case PAGE_ID_SYS_SETTINGS_COUPLING:
+        page = &g_sysSettingsCouplingPage;
         break;
     case PAGE_ID_CH_SETTINGS_ADV_VIEW:
         page = &g_ChSettingsAdvViewPage;

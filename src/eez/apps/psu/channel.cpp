@@ -784,11 +784,6 @@ void Channel::setCvMode(bool cv_mode) {
 }
 
 void Channel::protectionCheck() {
-    if (channel_dispatcher::isCoupled() && channelIndex == 1) {
-        // protections of coupled channels are checked on channel 1
-        return;
-    }
-
     protectionCheck(ovp);
     protectionCheck(ocp);
     protectionCheck(opp);

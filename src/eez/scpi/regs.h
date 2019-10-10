@@ -35,8 +35,8 @@ namespace scpi {
 //
 // OPERation Status Register bits
 //
-#define OPER_GROUP_COMMON_GROUND (1 << 6) /* CGND */
-#define OPER_GROUP_SPLIT_RAIL    (1 << 7) /* SRAil */
+#define OPER_GROUP_COMMON_GND    (1 << 6) /* CGND */
+#define OPER_GROUP_SPLIT_RAILS   (1 << 7) /* SRAil */
 #define OPER_GROUP_PARALLEL      (1 << 8) /* GROUp PARAllel */
 #define OPER_GROUP_SERIAL        (1 << 9) /* GROUp SERIal */
 

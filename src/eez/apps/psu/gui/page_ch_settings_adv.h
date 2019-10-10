@@ -41,22 +41,6 @@ class ChSettingsAdvRangesPage : public Page {
     static void onModeSet(uint8_t value);
 };
 
-class ChSettingsAdvCouplingPage : public Page {
-  public:
-    void uncouple();
-    void setParallelInfo();
-    void setSeriesInfo();
-    void setParallel();
-    void setSeries();
-
-    static int selectedMode;
-};
-
-class ChSettingsAdvTrackingPage : public Page {
-  public:
-    void toggleTrackingMode();
-};
-
 class ChSettingsAdvViewPage : public SetPage {
   public:
     void pageAlloc();

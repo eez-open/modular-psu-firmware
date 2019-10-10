@@ -74,7 +74,7 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpper(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
+    if ((channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel->flags.trackingEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
@@ -96,7 +96,7 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpperQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
+    if ((channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel->flags.trackingEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
@@ -131,7 +131,7 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeAuto(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
+    if ((channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel->flags.trackingEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
@@ -153,7 +153,7 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeAutoQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
+    if ((channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel->flags.trackingEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }

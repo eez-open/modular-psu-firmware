@@ -174,6 +174,10 @@ Page *getPreviousPage() {
     return g_appContext->getPreviousPage();
 }
 
+Page *getPage(int pageId) {
+    return g_appContext->getPage(pageId);
+}
+
 bool isPageActiveOrOnStack(int pageId) {
     return g_appContext->isPageActiveOrOnStack(pageId);
 }

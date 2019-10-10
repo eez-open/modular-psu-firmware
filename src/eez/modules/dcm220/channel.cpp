@@ -32,6 +32,8 @@
 #include <eez/scpi/regs.h>
 #include <eez/system.h>
 
+#define CONF_MASTER_SYNC_TIMEOUT_MS 500
+
 namespace eez {
 
 using namespace psu;
@@ -60,15 +62,28 @@ namespace dcm220 {
 static GPIO_TypeDef *SPI_IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
 static const uint16_t SPI_IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
 
-void masterSynchro(int slotIndex) {
+bool masterSynchro(int slotIndex) {
+	uint32_t start = millis();
 	uint8_t txackbytes = SPI_MASTER_SYNBYTE, rxackbytes = 0x00;
 	do {
 	    spi::select(slotIndex, spi::CHIP_DCM220);
 	    spi::transfer(slotIndex, &txackbytes, &rxackbytes, 1);
 	    spi::deselect(slotIndex);
+
+	    int32_t diff = millis() - start;
+	    if (diff > CONF_MASTER_SYNC_TIMEOUT_MS) {
+	    	return false;
+	    }
 	} while(rxackbytes != SPI_SLAVE_SYNBYTE);
 
-	while (HAL_GPIO_ReadPin(SPI_IRQ_GPIO_Port[slotIndex], SPI_IRQ_Pin[slotIndex]) != GPIO_PIN_SET);
+	while (HAL_GPIO_ReadPin(SPI_IRQ_GPIO_Port[slotIndex], SPI_IRQ_Pin[slotIndex]) != GPIO_PIN_SET) {
+	    int32_t diff = millis() - start;
+	    if (diff > CONF_MASTER_SYNC_TIMEOUT_MS) {
+	    	return false;
+	    }
+	}
+
+	return true;
 }
 
 float calcTemperature(uint16_t adcValue) {
@@ -153,9 +168,10 @@ struct Channel : ChannelInterface {
 		if (!synchronized) {
 			spi::deselectA(slotIndex);
 			spi::init(slotIndex, spi::CHIP_DCM220);
-			masterSynchro(slotIndex);
-			synchronized = true;
-			delay(1);
+			if (masterSynchro(slotIndex)) {
+				synchronized = true;
+				delay(1);
+			}
 		}
 #endif
 	}
@@ -164,6 +180,13 @@ struct Channel : ChannelInterface {
 	}
 
 	void test(int subchannelIndex) {
+#if defined(EEZ_PLATFORM_STM32)
+		if (!synchronized) {
+			testResult = TEST_FAILED;
+			return;
+		}
+#endif
+
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
 
 #if defined(EEZ_PLATFORM_STM32)

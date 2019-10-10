@@ -213,7 +213,11 @@ void init() {
 
     bp3c::relays::init();
 
-    // inst:memo ch1,0,2,406
+    // inst:memo 1,0,2,406
+    // 1: slot no. (1, 2 or 3)
+    // 0: address
+    // 2: size of value (1 byte or 2 bytes)
+    // 406: value
 
     ontime::g_mcuCounter.init();
 
@@ -454,7 +458,10 @@ static bool psuReset() {
     calibration::stop();
 
     // reset channels
-    channel_dispatcher::setType(channel_dispatcher::TYPE_NONE);
+    int err;
+    if (!channel_dispatcher::setCouplingType(channel_dispatcher::COUPLING_TYPE_NONE, &err)) {
+        event_queue::pushEvent(err);
+    }
     for (int i = 0; i < CH_NUM; ++i) {
         Channel::get(i).reset();
     }
@@ -507,7 +514,7 @@ static profile::Parameters *loadAutoRecallProfile(int *location) {
                     if (*location != 0) {
                         profile::Parameters *defaultProfile = profile::load(0);
                         if (defaultProfile) {
-                            if (profile->flags.channelsCoupling != defaultProfile->flags.channelsCoupling) {
+                            if (profile->flags.couplingType != defaultProfile->flags.couplingType) {
                                 disableOutputs = true;
                                 event_queue::pushEvent(event_queue::EVENT_WARNING_AUTO_RECALL_VALUES_MISMATCH);
                             } else {
@@ -662,7 +669,10 @@ void powerDown() {
     dlog::abort();
 #endif
 
-    channel_dispatcher::setType(channel_dispatcher::TYPE_NONE);
+    int err;
+    if (!channel_dispatcher::setCouplingType(channel_dispatcher::COUPLING_TYPE_NONE, &err)) {
+        event_queue::pushEvent(err);
+    }
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel::get(i).onPowerDown();
@@ -822,9 +832,6 @@ void tick_onTimeCounters(uint32_t tickCount) {
 
 typedef void (*TickFunc)(uint32_t tickCount);
 static TickFunc g_tickFuncs[] = {
-#ifdef DEBUG
-    debug::tick,
-#endif
     event_queue::tick,
     tick_onTimeCounters,
     temperature::tick,

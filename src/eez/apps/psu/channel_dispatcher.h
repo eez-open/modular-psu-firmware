@@ -28,31 +28,15 @@ namespace eez {
 namespace psu {
 namespace channel_dispatcher {
 
-enum Type { TYPE_NONE, TYPE_PARALLEL, TYPE_SERIES, TYPE_COMMON_GROUND, TYPE_SPLIT_RAIL, TYPE_TRACKED };
+enum CouplingType { COUPLING_TYPE_NONE, COUPLING_TYPE_PARALLEL, COUPLING_TYPE_SERIES, COUPLING_TYPE_COMMON_GND, COUPLING_TYPE_SPLIT_RAILS };
 
-bool isCouplingOrTrackingAllowed(Type value);
+bool isTrackingAllowed(Channel &channel, int *err);
+bool isCouplingTypeAllowed(CouplingType couplingType, int *err);
 
-bool setType(Type value);
-Type getType();
+bool setCouplingType(CouplingType couplingType, int *err);
+CouplingType getCouplingType();
 
-inline bool isCoupled() {
-    return getType() == TYPE_PARALLEL || getType() == TYPE_SERIES;
-}
-inline bool isParallel() {
-    return getType() == TYPE_PARALLEL;
-}
-inline bool isSeries() {
-    return getType() == TYPE_SERIES;
-}
-inline bool isCommonGround() {
-    return getType() == TYPE_COMMON_GROUND;
-}
-inline bool isSplitRail() {
-    return getType() == TYPE_SPLIT_RAIL;
-}
-inline bool isTracked() {
-    return getType() == channel_dispatcher::TYPE_TRACKED;
-}
+void setTrackingChannels(int trackingEnabled[]);
 
 float getUSet(const Channel &channel);
 float getUSetUnbalanced(const Channel &channel);

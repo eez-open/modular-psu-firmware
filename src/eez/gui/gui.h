@@ -58,6 +58,7 @@ int getActivePageId();
 Page *getActivePage();
 int getPreviousPageId();
 Page *getPreviousPage();
+Page *getPage(int pageId);
 bool isPageActiveOrOnStack(int pageId);
 void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint8_t currentValue,
                             bool (*disabledCallback)(uint8_t value), void (*onSet)(uint8_t));

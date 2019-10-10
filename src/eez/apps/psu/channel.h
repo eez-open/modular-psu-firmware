@@ -266,6 +266,7 @@ class Channel {
         unsigned currentRangeSelectionMode : 2; // see enum CurrentRangeSelectionMode
         unsigned autoSelectCurrentRange : 1;    // switch between 5A/50mA depending on Imon
         unsigned currentCurrentRange : 1;       // 0: 5A, 1:50mA
+        unsigned trackingEnabled : 1;
     };
 
     /// Voltage and current data set and measured during runtime.

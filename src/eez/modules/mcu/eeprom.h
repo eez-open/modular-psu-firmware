@@ -28,16 +28,16 @@
 |64     |  24|[Total ON-time counter](#ontime-counter)  |
 |1024   |  64|[Device configuration](#device)           |
 |1536   | 128|[Device configuration 2](#device2)        |
-|5120   | 568|[Profile](#profile) 0                     |
-|6144   | 568|[Profile](#profile) 1                     |
-|7168   | 568|[Profile](#profile) 2                     |
-|8192   | 568|[Profile](#profile) 3                     |
-|9216   | 568|[Profile](#profile) 4                     |
-|10240  | 568|[Profile](#profile) 5                     |
-|11264  | 568|[Profile](#profile) 6                     |
-|12288  | 568|[Profile](#profile) 7                     |
-|13312  | 568|[Profile](#profile) 8                     |
-|14336  | 568|[Profile](#profile) 9                     |
+|5120   |1024|[Profile](#profile) 0                     |
+|6144   |1024|[Profile](#profile) 1                     |
+|7168   |1024|[Profile](#profile) 2                     |
+|8192   |1024|[Profile](#profile) 3                     |
+|9216   |1024|[Profile](#profile) 4                     |
+|10240  |1024|[Profile](#profile) 5                     |
+|11264  |1024|[Profile](#profile) 6                     |
+|12288  |1024|[Profile](#profile) 7                     |
+|13312  |1024|[Profile](#profile) 8                     |
+|14336  |1024|[Profile](#profile) 9                     |
 |16384  | 610|[Event Queue](#event-queue)               |
 
 ## <a name="ontime-counter">ON-time counter</a>
@@ -110,7 +110,10 @@
 |48    |52  |[struct](#ch-params)   |CH1 [parameters](#ch-params)   |
 |100   |52  |[struct](#ch-params)   |CH2 [parameters](#ch-params)   |
 |152   |52  |[struct](#ch-params)   |CH3 [parameters](#ch-params)   |
-|204   |80  |[struct](#otp-conf)[5] |[OTP configurations](#otp-conf)|
+|204   |52  |[struct](#ch-params)   |CH4 [parameters](#ch-params)   |
+|256   |52  |[struct](#ch-params)   |CH5 [parameters](#ch-params)   |
+|308   |52  |[struct](#ch-params)   |CH6 [parameters](#ch-params)   |
+|360   |80  |[struct](#otp-conf)[5] |[OTP configurations](#otp-conf)|
 
 #### <a name="prof-flags">Profile flags</a>
 
@@ -140,16 +143,27 @@
 
 #### <a name="ch-flags">Channel flags</a>
 
-|Bit|Description        |
-|---|-------------------|
-|0-7|Module type        |
-|8  |Output enabled     |
-|9  |Sense enabled      |
-|10 |OVP enabled        |
-|11 |OCP enabled        |
-|12 |OPP enabled        |
-|13 |RPROG enabled      |
-|14 |Params. valid      |
+|Bit|Description                  |
+|---|-----------------------------|
+|0-7|Module type                  |
+|8  |Output enabled               |
+|9  |Sense enabled                |
+|10 |OVP enabled                  |
+|11 |OCP enabled                  |
+|12 |OPP enabled                  |
+|13 |RPROG enabled                |
+|14 |Params. valid                |
+|15 |Display value 1              |
+|17 |Display value 2              |
+|19 |U trigger mode               |
+|21 |I trigger mode               |
+|23 |Current range selection mode |
+|25 |Auto select current range    |
+|26 |Trigger output state         |
+|27 |Trigger on list stop         |
+|30 |OVP type (SW or HW)          |
+|31 |DProg mode                   |  // OFF (0), ON (1), AUTO (2)
+|33 |Tracking enabled             |
 
 #### <a name="otp-conf">OTP configuration</a>
 

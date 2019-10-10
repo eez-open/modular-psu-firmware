@@ -33,6 +33,7 @@
 #if OPTION_ETHERNET
 #include <eez/apps/psu/ntp.h>
 #endif
+#include <eez/apps/psu/channel_dispatcher.h>
 
 #include <eez/apps/psu/gui/data.h>
 #include <eez/apps/psu/gui/numeric_keypad.h>
@@ -785,6 +786,121 @@ void SysSettingsSerialPage::set() {
         if (persist_conf::setSerialSettings(m_enabled, m_baudIndex, m_parity)) {
             popPage();
             infoMessage("Serial settings saved!");
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void SysSettingsTrackingPage::pageAlloc() {
+    for (int i = 0; i < CH_MAX; i++) {
+        m_trackingEnabled[i] = m_trackingEnabledOrig[i] = Channel::get(i).flags.trackingEnabled;
+    }
+}
+
+int SysSettingsTrackingPage::getDirty() {
+    for (int i = 0; i < CH_MAX; i++) {
+        if (m_trackingEnabled[i] != m_trackingEnabledOrig[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void SysSettingsTrackingPage::set() {
+    if (getDirty()) {
+        int n = 0;
+        for (int i = 0; i < CH_MAX; i++) {
+            if (m_trackingEnabled[i]) {
+                n++;
+            }
+        }
+
+        if (n == 1) {
+            errorMessage("At least 2 channels must be enabled!");
+        } else {
+            channel_dispatcher::setTrackingChannels(m_trackingEnabled);
+            profile::save();
+
+            popPage();
+
+            if (n >= 2) {
+                infoMessage("Tracking enabled!");
+            } else {
+                infoMessage("Tracking disabled!");
+            }
+
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void SysSettingsCouplingPage::pageAlloc() {
+    m_couplingType = m_couplingTypeOrig = channel_dispatcher::getCouplingType();
+
+    m_enableTrackingMode = m_enableTrackingModeOrig = 
+        m_couplingType != channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS || 
+        (Channel::get(0).flags.trackingEnabled && Channel::get(1).flags.trackingEnabled);
+}
+
+int SysSettingsCouplingPage::getDirty() {
+    return m_couplingType != m_couplingTypeOrig || m_enableTrackingMode != m_enableTrackingModeOrig;
+}
+
+void SysSettingsCouplingPage::set() {
+    if (getDirty()) {
+        int err;
+        if (channel_dispatcher::setCouplingType(m_couplingType, &err)) {
+            if (m_couplingType == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
+                auto trackingPage = (SysSettingsTrackingPage *)getPage(PAGE_ID_SYS_SETTINGS_TRACKING);
+                if (trackingPage) {
+                    if (m_enableTrackingMode) {
+                        trackingPage->m_trackingEnabled[0] = trackingPage->m_trackingEnabledOrig[0] = true;
+                        trackingPage->m_trackingEnabled[1] = trackingPage->m_trackingEnabledOrig[1] = true;
+                    } else {
+                        trackingPage->m_trackingEnabled[0] = trackingPage->m_trackingEnabledOrig[0] = false;
+                        trackingPage->m_trackingEnabled[1] = trackingPage->m_trackingEnabledOrig[1] = false;
+                    }
+                    for (int i = 2; i < CH_MAX; i++) {
+                        trackingPage->m_trackingEnabled[i] = trackingPage->m_trackingEnabledOrig[i] = false;
+                    }
+                    channel_dispatcher::setTrackingChannels(trackingPage->m_trackingEnabled);
+
+                } else {
+                    int trackingEnabled[CH_MAX];
+                    if (m_enableTrackingMode) {
+                        trackingEnabled[0] = true;
+                        trackingEnabled[1] = true;
+                    } else {
+                        trackingEnabled[0] = false;
+                        trackingEnabled[1] = false;
+                    }
+                    for (int i = 2; i < CH_MAX; i++) {
+                        trackingEnabled[i] = false;
+                    }
+                    channel_dispatcher::setTrackingChannels(trackingEnabled);
+                }
+            }
+
+            profile::save();
+
+            popPage();
+
+            if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_NONE) {
+                infoMessage("Uncoupled!");
+            } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+                infoMessage("Coupled in parallel!");
+            } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+                infoMessage("Coupled in series!");
+            } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
+                infoMessage("Coupled in split rails!");
+            } else {
+                infoMessage("Coupled in common GND!");
+            }
+        } else {
+            event_queue::pushEvent(err);
+            infoMessage("Coupling failed!");
         }
     }
 }

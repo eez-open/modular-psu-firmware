@@ -326,14 +326,14 @@ void action_show_ch_settings_adv_ranges() {
     pushPage(PAGE_ID_CH_SETTINGS_ADV_RANGES);
 }
 
-void action_show_ch_settings_adv_tracking() {
+void action_show_sys_settings_tracking() {
     selectChannel();
-    pushPage(PAGE_ID_CH_SETTINGS_ADV_TRACKING);
+    pushPage(PAGE_ID_SYS_SETTINGS_TRACKING);
 }
 
-void action_show_ch_settings_adv_coupling() {
+void action_show_sys_settings_coupling() {
     selectChannel();
-    pushPage(PAGE_ID_CH_SETTINGS_ADV_COUPLING);
+    pushPage(PAGE_ID_SYS_SETTINGS_COUPLING);
 }
 
 void action_show_ch_settings_adv_view() {
@@ -591,28 +591,34 @@ void action_ethernet_edit_scpi_port() {
     #endif
 }
 
-void action_ch_settings_adv_coupling_uncouple() {
-    ((ChSettingsAdvCouplingPage *)getActivePage())->uncouple();
+void action_set_coupling_uncoupled() {
+    ((SysSettingsCouplingPage *)getActivePage())->m_couplingType = channel_dispatcher::COUPLING_TYPE_NONE;
 }
 
-void action_ch_settings_adv_coupling_set_parallel_info() {
-    ((ChSettingsAdvCouplingPage *)getActivePage())->setParallelInfo();
+void action_set_coupling_parallel() {
+    ((SysSettingsCouplingPage *)getActivePage())->m_couplingType = channel_dispatcher::COUPLING_TYPE_PARALLEL;
 }
 
-void action_ch_settings_adv_coupling_set_series_info() {
-    ((ChSettingsAdvCouplingPage *)getActivePage())->setSeriesInfo();
+void action_set_coupling_series() {
+    ((SysSettingsCouplingPage *)getActivePage())->m_couplingType = channel_dispatcher::COUPLING_TYPE_SERIES;
 }
 
-void action_ch_settings_adv_coupling_set_parallel() {
-    ((ChSettingsAdvCouplingPage *)getActivePage())->setParallel();
+void action_set_coupling_common_gnd() {
+    ((SysSettingsCouplingPage *)getActivePage())->m_couplingType = channel_dispatcher::COUPLING_TYPE_COMMON_GND;
 }
 
-void action_ch_settings_adv_coupling_set_series() {
-    ((ChSettingsAdvCouplingPage *)getActivePage())->setSeries();
+void action_set_coupling_split_rails() {
+    ((SysSettingsCouplingPage *)getActivePage())->m_couplingType = channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS;
 }
 
-void action_ch_settings_adv_toggle_tracking_mode() {
-    ((ChSettingsAdvTrackingPage *)getActivePage())->toggleTrackingMode();
+void action_toggle_enable_tracking_mode_in_coupling() {
+    ((SysSettingsCouplingPage *)getActivePage())->m_enableTrackingMode = !((SysSettingsCouplingPage *)getActivePage())->m_enableTrackingMode;
+}
+
+void action_toggle_channel_tracking() {
+    selectChannel();
+    auto page = (SysSettingsTrackingPage *)getActivePage();
+    page->m_trackingEnabled[g_channel->channelIndex] = !page->m_trackingEnabled[g_channel->channelIndex];
 }
 
 void action_sys_settings_protections_toggle_output_protection_couple() {

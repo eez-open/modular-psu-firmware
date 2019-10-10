@@ -102,6 +102,10 @@ void oneIter() {
 }
 
 bool measureAllAdcValuesOnChannel(int channelIndex) {
+	if (g_slots[Channel::get(channelIndex).slotIndex].moduleType == MODULE_TYPE_NONE) {
+		return true;
+	}
+
     g_adcMeasureAllFinished = false;
     osMessagePut(eez::psu::g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL, channelIndex), 0);
 

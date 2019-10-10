@@ -166,31 +166,31 @@ struct Channel : ChannelInterface {
 						channel_dispatcher::outputEnable(channel, false);
 					}
 				} else if (tickCount - dpNegMonitoringTime > 500 * 1000UL) {
-					if (dpOn) {
-						if (channel_dispatcher::isSeries()) {
-							psu::Channel &channel2 = psu::Channel::get(channel.channelIndex == 0 ? 1 : 0);
-							voltageBalancing(channel2);
-							dpNegMonitoringTime = tickCount;
-						} else if (channel_dispatcher::isParallel()) {
+					if (dpOn && channel.channelIndex < 2) {
+                        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
                             psu::Channel &channel2 = psu::Channel::get(channel.channelIndex == 0 ? 1 : 0);
-							currentBalancing(channel2);
-							dpNegMonitoringTime = tickCount;
-						}
-					}
+                            voltageBalancing(channel2);
+                            dpNegMonitoringTime = tickCount;
+                        } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+                            psu::Channel &channel2 = psu::Channel::get(channel.channelIndex == 0 ? 1 : 0);
+                            currentBalancing(channel2);
+                            dpNegMonitoringTime = tickCount;
+                        }
+                    }
 				}
 			}
 		}
 
-		unsigned cvMode = isCvMode(subchannelIndex) ? 1 : 0;
-		if (cvMode != channel.flags.cvMode) {
-			if (channel_dispatcher::isSeries()) {
-				restoreVoltageToValueBeforeBalancing(psu::Channel::get(channel.channelIndex == 0 ? 1 : 0));
-			}
-		}
+        if (channel.channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+            unsigned cvMode = isCvMode(subchannelIndex) ? 1 : 0;
+            if (cvMode != channel.flags.cvMode) {
+                restoreVoltageToValueBeforeBalancing(psu::Channel::get(channel.channelIndex == 0 ? 1 : 0));
+            }
+        }
 
-		unsigned ccMode = isCcMode(subchannelIndex) ? 1 : 0;
-		if (ccMode != channel.flags.ccMode) {
-			if (channel_dispatcher::isParallel()) {
+        if (channel.channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+            unsigned ccMode = isCcMode(subchannelIndex) ? 1 : 0;
+		    if (ccMode != channel.flags.ccMode) {
 				restoreCurrentToValueBeforeBalancing(psu::Channel::get(channel.channelIndex == 0 ? 1 : 0));
 			}
 		}

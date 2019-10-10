@@ -75,9 +75,6 @@ void enter(int tabIndex) {
     if (tabIndex == -1) {
         gui::selectChannel();
         data::Cursor newDataCursor = getFoundWidgetAtDown().cursor;
-        if (channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
-            newDataCursor.i = 0;
-        }
         int newDataId = getFoundWidgetAtDown().widget->data;
         setFocusCursor(newDataCursor, newDataId);
         update();
@@ -266,7 +263,8 @@ void getInfoText(int partIndex, char *infoText) {
     float maxValue = (dataId == DATA_ID_CHANNEL_U_EDIT || dataId == DATA_ID_CHANNEL_I_EDIT) ?
         data::getLimit(cursor, dataId).getFloat() : data::getMax(cursor, dataId).getFloat();
 
-    if (channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
+    Channel& channel = Channel::get(iChannel);
+    if ((channel.channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel.flags.trackingEnabled) {
         strcpy(infoText, "Set ");
     } else {
         sprintf(infoText, "Set Ch%d ", iChannel + 1);

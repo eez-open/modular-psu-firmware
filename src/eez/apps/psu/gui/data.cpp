@@ -752,16 +752,6 @@ ChannelSnapshot &getChannelSnapshot(Channel &channel) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Page *getPage(int pageId) {
-    if (getActivePageId() == pageId) {
-        return getActivePage();
-    }
-    if (getPreviousPageId() == pageId) {
-        return getPreviousPage();
-    }
-    return NULL;
-}
-
 Page *getUserProfilesPage() {
     Page *page = getPage(PAGE_ID_USER_PROFILE_SETTINGS);
     if (!page) {
@@ -931,7 +921,7 @@ void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor &cursor
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        bool focused = (g_focusCursor == cursor || channel_dispatcher::isCoupled()) && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -1028,8 +1018,7 @@ void data_channel_i_edit(data::DataOperationEnum operation, data::Cursor &cursor
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        bool focused = (g_focusCursor == cursor || channel_dispatcher::isCoupled()) &&
-                       g_focusDataId == DATA_ID_CHANNEL_I_EDIT;
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_I_EDIT;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD &&
@@ -2323,53 +2312,120 @@ void data_channel_dprog(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_channel_is_coupled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = channel_dispatcher::isCoupled();
-    }
-}
-
-void data_channel_is_tracked(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = channel_dispatcher::isTracked();
+        value = channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE;
     }
 }
 
 void data_channel_is_coupled_or_tracked(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = channel_dispatcher::isCoupled() || channel_dispatcher::isTracked();
+        if (channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
+            value = 1;
+        } else {
+            for (int i = 0; i < CH_NUM; i++) {
+                if (Channel::get(i).flags.trackingEnabled) {
+                    value = 1;
+                    return;
+                }
+            }
+            value = 0;
+        }
     }
 }
 
-void data_channel_coupling_is_allowed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_is_tracking_allowed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = channel_dispatcher::isCouplingOrTrackingAllowed(channel_dispatcher::TYPE_PARALLEL);
+        int n = 0;
+        for (int i = 0; i < CH_NUM; i++) {
+            if (Channel::get(i).isOk()) {
+                ++n;
+            }
+        }
+        value = n >= 2 ? 1 : 0;
+    }
+}
+
+void data_channel_tracking_is_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        auto channel = Channel::get(cursor.i);
+        auto page = (SysSettingsTrackingPage *)getPage(PAGE_ID_SYS_SETTINGS_TRACKING);
+        if (page) {
+            value = page->m_trackingEnabled[channel.channelIndex];
+        } else {
+            value = channel.flags.trackingEnabled ? 1 : 0;
+        }
+    }
+}
+
+void data_channel_tracking_is_allowed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        auto channel = Channel::get(cursor.i);
+        value = channel_dispatcher::isTrackingAllowed(channel, nullptr) ? 1 : 0;
+    }
+}
+
+void data_is_coupling_parallel_allowed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_PARALLEL, nullptr) ? 1 : 0;
+    }
+}
+
+void data_is_coupling_series_allowed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_SERIES, nullptr) ? 1 : 0;
+    }
+}
+
+channel_dispatcher::CouplingType getCouplingType() {
+    auto page = (SysSettingsCouplingPage *)getPage(PAGE_ID_SYS_SETTINGS_COUPLING);
+    if (page) {
+        return page->m_couplingType;
+    } else {
+        return channel_dispatcher::getCouplingType();
     }
 }
 
 void data_channel_coupling_mode(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (channel_dispatcher::getType() == channel_dispatcher::TYPE_PARALLEL) {
-            value = 1;
-        } else if (channel_dispatcher::getType() == channel_dispatcher::TYPE_SERIES) {
-            value = 2;
-        } else if (channel_dispatcher::getType() == channel_dispatcher::TYPE_TRACKED) {
-            value = 3;
-        } else {
-            value = 0;
-        }
-    } else if (operation == data::DATA_OPERATION_SELECT) {
-        cursor.i = 0;
+        value = (int)getCouplingType();
     }
 }
 
-void data_channel_coupling_selected_mode(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_channel_coupling_is_uncoupled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = ChSettingsAdvCouplingPage::selectedMode;
+        value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_NONE ? 1 : 0;
     }
 }
 
 void data_channel_coupling_is_series(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = channel_dispatcher::isSeries();
+        value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES ? 1 : 0;
+    }
+}
+
+void data_channel_coupling_is_parallel(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL ? 1 : 0;
+    }
+}
+
+void data_channel_coupling_is_common_gnd(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_COMMON_GND ? 1 : 0;
+    }
+}
+
+void data_channel_coupling_is_split_rails(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS ? 1 : 0;
+    }
+}
+
+void data_channel_coupling_enable_tracking_mode(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        auto page = (SysSettingsCouplingPage *)getPage(PAGE_ID_SYS_SETTINGS_COUPLING);
+        if (page) {
+            value = page->m_enableTrackingMode ? 1 : 0;
+        }
     }
 }
 
@@ -2960,7 +3016,7 @@ void data_ethernet_mac(data::DataOperationEnum operation, data::Cursor &cursor, 
 
 void data_channel_is_voltage_balanced(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (channel_dispatcher::isSeries()) {
+        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
             value = Channel::get(0).isVoltageBalanced() || Channel::get(1).isVoltageBalanced();
         } else {
             value = 0;
@@ -2970,7 +3026,7 @@ void data_channel_is_voltage_balanced(data::DataOperationEnum operation, data::C
 
 void data_channel_is_current_balanced(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (channel_dispatcher::isParallel()) {
+        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
             value = Channel::get(0).isCurrentBalanced() || Channel::get(1).isCurrentBalanced();
         } else {
             value = 0;

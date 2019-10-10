@@ -165,9 +165,6 @@ bool isChSettingsSubPage(int pageId) {
         pageId == PAGE_ID_CH_SETTINGS_LISTS ||
         pageId == PAGE_ID_CH_SETTINGS_ADV_OPTIONS ||
         pageId == PAGE_ID_CH_SETTINGS_ADV_RANGES ||
-        pageId == PAGE_ID_CH_SETTINGS_ADV_TRACKING ||
-        pageId == PAGE_ID_CH_SETTINGS_ADV_COUPLING ||
-        pageId == PAGE_ID_CH_SETTINGS_ADV_COUPLING_INFO ||
         pageId == PAGE_ID_CH_SETTINGS_ADV_VIEW ||
         pageId == PAGE_ID_CH_SETTINGS_INFO;
 }
@@ -198,6 +195,8 @@ void PsuAppContext::onPageChanged() {
         } else if (activePageId == PAGE_ID_USER_PROFILES) {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_SYS_INFO) {
+            animateSlideDown();
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS_TRACKING) {
             animateSlideDown();
         }
     } else if (m_previousPageId == PAGE_ID_USER_PROFILES) {
@@ -234,6 +233,18 @@ void PsuAppContext::onPageChanged() {
         }
     } else if (m_previousPageId == PAGE_ID_SYS_INFO) {
         if (activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        }
+    } else if (m_previousPageId == PAGE_ID_SYS_SETTINGS_TRACKING) {
+        if (activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS_COUPLING) {
+            animateSlideLeft();
+        }
+    } else if (activePageId == PAGE_ID_SYS_SETTINGS_COUPLING) {
+        if (activePageId == PAGE_ID_SYS_SETTINGS_TRACKING) {
+            animateSlideRight();
+        } else if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
         }
     } else if (m_previousPageId == PAGE_ID_SYS_SETTINGS) {
@@ -364,8 +375,7 @@ uint16_t PsuAppContext::getWidgetBackgroundColor(const WidgetCursor &widgetCurso
 }
 
 bool PsuAppContext::isBlinking(const data::Cursor &cursor, uint16_t id) {
-    if ((g_focusCursor == cursor || channel_dispatcher::isCoupled()) && g_focusDataId == id &&
-        g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+    if (g_focusCursor == cursor && g_focusDataId == id && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
         return true;
     }
 
@@ -454,14 +464,12 @@ bool showSetupWizardQuestion() {
         g_deviceFlags2 = persist_conf::devConf2.flags;
     }
 
-    if (!channel_dispatcher::isCoupled() && !channel_dispatcher::isTracked()) {
-        if (!g_deviceFlags2.skipChannelCalibrations) {
-            g_deviceFlags2.skipChannelCalibrations = 1;
-            if (!isChannelCalibrationsDone()) {
-                yesNoLater("Do you want to calibrate channels?", channelCalibrationsYes,
-                           channelCalibrationsNo);
-                return true;
-            }
+    if (!g_deviceFlags2.skipChannelCalibrations) {
+        g_deviceFlags2.skipChannelCalibrations = 1;
+        if (!isChannelCalibrationsDone()) {
+            yesNoLater("Do you want to calibrate channels?", channelCalibrationsYes,
+                        channelCalibrationsNo);
+            return true;
         }
     }
 
@@ -1003,7 +1011,7 @@ void channelEnableOutput() {
 void selectChannel() {
     if (getFoundWidgetAtDown().cursor.i >= 0) {
         g_channel = &Channel::get(getFoundWidgetAtDown().cursor.i);
-    } else if (!g_channel || channel_dispatcher::isCoupled() || channel_dispatcher::isTracked()) {
+    } else if (!g_channel) {
         g_channel = &Channel::get(0);
     }
 }

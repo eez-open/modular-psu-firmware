@@ -598,13 +598,13 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionTypeQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_sourceVoltageSenseSource(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isSeries()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = set_channel_from_command_number(context);
-    if (!channel) {
+    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
         return SCPI_RES_ERR;
     }
 
@@ -619,13 +619,13 @@ scpi_result_t scpi_cmd_sourceVoltageSenseSource(scpi_t *context) {
 
 scpi_result_t scpi_cmd_sourceVoltageSenseSourceQ(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isSeries()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = set_channel_from_command_number(context);
-    if (!channel) {
+    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
         return SCPI_RES_ERR;
     }
 
@@ -636,18 +636,18 @@ scpi_result_t scpi_cmd_sourceVoltageSenseSourceQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_sourceVoltageProgramSource(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isCoupled()) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
         return SCPI_RES_ERR;
     }
 
-    if (channel_dispatcher::isTracked()) {
+    if (channel->flags.trackingEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
-        return SCPI_RES_ERR;
-    }
-
-    Channel *channel = set_channel_from_command_number(context);
-    if (!channel) {
         return SCPI_RES_ERR;
     }
 
@@ -668,18 +668,18 @@ scpi_result_t scpi_cmd_sourceVoltageProgramSource(scpi_t *context) {
 
 scpi_result_t scpi_cmd_sourceVoltageProgramSourceQ(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isCoupled()) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
         return SCPI_RES_ERR;
     }
 
-    if (channel_dispatcher::isTracked()) {
+    if (channel->flags.trackingEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
-        return SCPI_RES_ERR;
-    }
-
-    Channel *channel = set_channel_from_command_number(context);
-    if (!channel) {
         return SCPI_RES_ERR;
     }
 

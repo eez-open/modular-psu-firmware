@@ -108,7 +108,7 @@ scpi_result_t scpi_cmd_outputStateQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isCoupled()) {
+    if (channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
         return SCPI_RES_ERR;
     }
@@ -123,24 +123,15 @@ scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (enable != channel_dispatcher::isTracked()) {
-        if (CH_NUM < 2) {
-            SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-            return SCPI_RES_ERR;
-        }
+    int err;
+    if (!channel_dispatcher::isTrackingAllowed(*channel, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
 
-        if (!Channel::get(0).isOk() || !Channel::get(1).isOk()) {
-            SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_ERROR);
-            return SCPI_RES_ERR;
-        }
-
-        if (channel_dispatcher::setType(enable ? channel_dispatcher::TYPE_TRACKED
-                                               : channel_dispatcher::TYPE_NONE)) {
-            profile::save();
-        } else {
-            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-            return SCPI_RES_ERR;
-        }
+    if (enable != channel->flags.trackingEnabled) {
+        channel->flags.trackingEnabled = enable;
+        profile::save();
     }
 
     return SCPI_RES_OK;
@@ -148,17 +139,12 @@ scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
 
 scpi_result_t scpi_cmd_outputTrackStateQ(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (channel_dispatcher::isCoupled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
-        return SCPI_RES_ERR;
-    }
-
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, channel_dispatcher::isTracked());
+    SCPI_ResultBool(context, channel->flags.trackingEnabled ? true : false);
 
     return SCPI_RES_OK;
 }

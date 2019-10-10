@@ -150,7 +150,10 @@ void deleteProfileLists(int location) {
 void recallChannelsFromProfile(Parameters *profile, int location) {
     bool last_save_enabled = enableSave(false);
 
-    channel_dispatcher::setType((channel_dispatcher::Type)profile->flags.channelsCoupling);
+    int err;
+    if (!channel_dispatcher::setCouplingType((channel_dispatcher::CouplingType)profile->flags.couplingType, &err)) {
+        event_queue::pushEvent(err);
+    }
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
@@ -215,6 +218,9 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
             channel.flags.currentRangeSelectionMode = profile->channels[i].flags.currentRangeSelectionMode;
             channel.flags.autoSelectCurrentRange = profile->channels[i].flags.autoSelectCurrentRange;
 
+            channel.setDprogState((DprogState)profile->channels[i].flags.dprogState);
+            channel.flags.trackingEnabled = profile->channels[i].flags.trackingEnabled;
+
 #if OPTION_SD_CARD
             loadProfileList(*profile, channel, location);
 #endif
@@ -231,14 +237,13 @@ void fillProfile(Parameters *pProfile) {
 
     memset(&profile, 0, sizeof(Parameters));
 
-    profile.flags.channelsCoupling = channel_dispatcher::getType();
+    profile.flags.couplingType = channel_dispatcher::getCouplingType();
 
     profile.flags.powerIsUp = isPowerUp();
 
     for (int i = 0; i < CH_MAX; ++i) {
-        if (i < CH_NUM) {
-            Channel &channel = Channel::get(i);
-
+        Channel &channel = Channel::get(i);
+        if (i < CH_NUM && channel.isInstalled()) {
             profile.channels[i].flags.moduleType = g_slots[channel.slotIndex].moduleType;
 
             profile.channels[i].flags.parameters_are_valid = 1;
@@ -294,6 +299,9 @@ void fillProfile(Parameters *pProfile) {
 
             profile.channels[i].flags.currentRangeSelectionMode = channel.flags.currentRangeSelectionMode;
             profile.channels[i].flags.autoSelectCurrentRange = channel.flags.autoSelectCurrentRange;
+
+            profile.channels[i].flags.dprogState = channel.getDprogState();
+            profile.channels[i].flags.trackingEnabled = channel.flags.trackingEnabled;
         }
         else {
             profile.channels[i].flags.parameters_are_valid = 0;

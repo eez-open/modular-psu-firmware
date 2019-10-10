@@ -46,7 +46,8 @@ struct ChannelFlags {
     unsigned triggerOutputState: 1;
     unsigned triggerOnListStop: 3;
     unsigned u_type : 1;
-    unsigned reserved: 1;
+    unsigned dprogState : 2;
+    unsigned trackingEnabled : 1;
 };
 
 /// Channel parameters stored in profile.
@@ -79,8 +80,8 @@ struct ChannelParameters {
 struct ProfileFlags {
     unsigned isValid: 1;
     unsigned powerIsUp: 1;
-    unsigned channelsCoupling : 2;
-    unsigned reserverd : 12;
+    unsigned couplingType : 3;
+    unsigned reserverd : 11;
 };
 
 /// Profile parameters.
@@ -92,7 +93,7 @@ struct Parameters {
     temperature::ProtectionConfiguration temp_prot[temp_sensor::MAX_NUM_TEMP_SENSORS];
 };
 
-static const uint16_t PROFILE_VERSION = 9;
+static const uint16_t PROFILE_VERSION = 10;
 
 // auto save support
 extern bool g_profileDirty;
