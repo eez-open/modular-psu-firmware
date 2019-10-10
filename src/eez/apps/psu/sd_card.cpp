@@ -79,6 +79,7 @@ void unmount() {
 #if defined(EEZ_PLATFORM_STM32)
 	FATFS_UnLinkDriver(SDPath);
 #endif
+	g_mounted = false;
     g_lastError = SCPI_ERROR_MISSING_MASS_MEDIA;
 	g_testResult = TEST_FAILED;
 	setQuesBits(QUES_MMEM, true);
