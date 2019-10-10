@@ -45,6 +45,8 @@ uint8_t *g_fontsData;
 uint8_t *g_bitmapsData;
 Colors *g_colorsData;
 
+bool g_assetsLoaded;
+
 #if OPTION_SDRAM
 void StyleList_fixPointers(StyleList &styleList) {
     styleList.first = (Style *)((uint8_t *)g_styles + (uint32_t)styleList.first);
@@ -118,6 +120,8 @@ void decompressAssets() {
 #if OPTION_SDRAM
     fixPointers();
 #endif
+
+    g_assetsLoaded = true;
 }
 
 const Style *getStyle(int styleID) {

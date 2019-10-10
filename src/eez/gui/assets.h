@@ -24,12 +24,14 @@ namespace eez {
 namespace gui {
 
 void decompressAssets();
-    
- extern Document *g_document;
- extern StyleList *g_styles;
- extern uint8_t *g_fontsData;
- extern uint8_t *g_bitmapsData;
- extern Colors *g_colorsData;
+
+extern Document *g_document;
+extern StyleList *g_styles;
+extern uint8_t *g_fontsData;
+extern uint8_t *g_bitmapsData;
+extern Colors *g_colorsData;
+
+extern bool g_assetsLoaded;
 
 const Style *getStyle(int styleID);
 const Style *getWidgetStyle(const Widget *widget);

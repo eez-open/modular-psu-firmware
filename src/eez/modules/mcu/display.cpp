@@ -54,9 +54,11 @@ static uint32_t g_themeColorsCount;
 static const uint16_t *g_colors;
 
 void onThemeChanged() {
-	g_themeColors = getThemeColors(psu::persist_conf::devConf2.selectedThemeIndex);
-	g_themeColorsCount = getThemeColorsCount(psu::persist_conf::devConf2.selectedThemeIndex);
-	g_colors = getColors();
+	if (g_assetsLoaded) {
+		g_themeColors = getThemeColors(psu::persist_conf::devConf2.selectedThemeIndex);
+		g_themeColorsCount = getThemeColorsCount(psu::persist_conf::devConf2.selectedThemeIndex);
+		g_colors = getColors();
+	}
 }
 
 void onLuminocityChanged() {
