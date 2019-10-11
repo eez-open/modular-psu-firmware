@@ -359,9 +359,12 @@ struct Channel : ChannelInterface {
 		}
 
 		if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
-			if (channel.channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+			if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
 				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
 				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
+			} else if (channel.channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, false);
 			} else if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
 				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
 				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
