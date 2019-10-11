@@ -180,6 +180,12 @@ bool setCouplingType(CouplingType couplingType, int *err) {
             channel.resetHistory();
         }
 
+        if (g_couplingType == COUPLING_TYPE_PARALLEL || g_couplingType == COUPLING_TYPE_SERIES) {
+            if (persist_conf::devConf.flags.slotMax ==  2) {
+                persist_conf::setChannelsMaxView(1);
+            }
+        }
+
         bp3c::relays::switchChannelCoupling(g_couplingType);
 
         if (g_couplingType == COUPLING_TYPE_PARALLEL) {

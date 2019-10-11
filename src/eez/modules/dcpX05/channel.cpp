@@ -358,7 +358,30 @@ struct Channel : ChannelInterface {
             }
 		}
 
-		ioexp.changeBit(g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 ?IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED : IOExpander::DCP505_IO_BIT_OUT_OE_UNCOUPLED_LED, enable);
+		if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+			if (channel.channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
+			} else if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
+			} else if (channel.channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, false);
+			} else if (channel.channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
+			} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_COMMON_GND) {
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
+			} else {
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, enable);
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, false);
+			}
+		} else {
+			ioexp.changeBit(IOExpander::DCP505_IO_BIT_OUT_OE_UNCOUPLED_LED, enable);
+
+		}
 
 		restoreVoltageToValueBeforeBalancing(channel);
 		restoreCurrentToValueBeforeBalancing(channel);
