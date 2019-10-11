@@ -1443,13 +1443,6 @@ void setLoadEnabled(Channel &channel, bool state) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
         Channel::get(0).simulator.setLoadEnabled(state);
         Channel::get(1).simulator.setLoadEnabled(state);
-    } else if (channel.flags.trackingEnabled) {
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel &trackingChannel = Channel::get(i);
-            if (trackingChannel.flags.trackingEnabled) {
-                trackingChannel.simulator.setLoadEnabled(state);
-            }
-        }
     } else {
         channel.simulator.setLoadEnabled(state);
     }
@@ -1461,13 +1454,6 @@ void setLoad(Channel &channel, float load) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
         Channel::get(0).simulator.setLoad(load);
         Channel::get(1).simulator.setLoad(load);
-    } else if (channel.flags.trackingEnabled) {
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel &trackingChannel = Channel::get(i);
-            if (trackingChannel.flags.trackingEnabled) {
-                trackingChannel.simulator.setLoad(load);
-            }
-        }
     } else {
         channel.simulator.setLoad(load);
     }

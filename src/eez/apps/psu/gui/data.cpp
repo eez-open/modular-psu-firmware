@@ -2371,13 +2371,7 @@ void data_channel_dprog(data::DataOperationEnum operation, data::Cursor &cursor,
     }
 }
 
-void data_channel_is_coupled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE;
-    }
-}
-
-void data_channel_is_coupled_or_tracked(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_is_coupled_or_tracked(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
             value = 1;
@@ -2388,6 +2382,18 @@ void data_channel_is_coupled_or_tracked(data::DataOperationEnum operation, data:
                     return;
                 }
             }
+            value = 0;
+        }
+    }
+}
+
+void data_channel_is_par_ser_coupled_or_tracked(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        if (channel.flags.trackingEnabled || (iChannel < 2 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES))) {
+            value = 1;
+        } else {
             value = 0;
         }
     }
@@ -2407,7 +2413,8 @@ void data_is_tracking_allowed(data::DataOperationEnum operation, data::Cursor &c
 
 void data_channel_tracking_is_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        auto channel = Channel::get(cursor.i);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
         auto page = (SysSettingsTrackingPage *)getPage(PAGE_ID_SYS_SETTINGS_TRACKING);
         if (page) {
             value = page->m_trackingEnabled[channel.channelIndex];
@@ -2445,39 +2452,46 @@ channel_dispatcher::CouplingType getCouplingType() {
     }
 }
 
-void data_channel_coupling_mode(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_coupling_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = (int)getCouplingType();
     }
 }
 
-void data_channel_coupling_is_uncoupled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_is_coupling_type_uncoupled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_NONE ? 1 : 0;
     }
 }
 
-void data_channel_coupling_is_series(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_is_coupling_type_series(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES ? 1 : 0;
     }
 }
 
-void data_channel_coupling_is_parallel(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_is_coupling_type_parallel(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL ? 1 : 0;
     }
 }
 
-void data_channel_coupling_is_common_gnd(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_is_coupling_type_common_gnd(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_COMMON_GND ? 1 : 0;
     }
 }
 
-void data_channel_coupling_is_split_rails(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_is_coupling_type_split_rails(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS ? 1 : 0;
+    }
+}
+
+void data_channel_coupling_is_series(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        value = iChannel < 2 && getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES ? 1 : 0;
     }
 }
 
