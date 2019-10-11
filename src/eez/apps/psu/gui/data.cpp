@@ -592,31 +592,59 @@ void FLOAT_LIST_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_CHANNEL_TITLE_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
+    Channel &aChannel = Channel::get(a.getInt());
+    Channel &bChannel = Channel::get(b.getInt());
+    return aChannel.channelIndex == bChannel.channelIndex && aChannel.flags.trackingEnabled == bChannel.flags.trackingEnabled;
 }
 
 void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
-    snprintf(text, count - 1, "%s #%d", channel.getBoardName(), channel.channelIndex + 1);
+    if (channel.flags.trackingEnabled) {
+        snprintf(text, count - 1, "\xA2 #%d", channel.channelIndex + 1);
+    } else {
+        snprintf(text, count - 1, "%s #%d", channel.getBoardName(), channel.channelIndex + 1);
+    }
 }
 
 bool compare_CHANNEL_SHORT_TITLE_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
+    Channel &aChannel = Channel::get(a.getInt());
+    Channel &bChannel = Channel::get(b.getInt());
+    return aChannel.channelIndex == bChannel.channelIndex && aChannel.flags.trackingEnabled == bChannel.flags.trackingEnabled;
 }
 
 void CHANNEL_SHORT_TITLE_value_to_text(const Value &value, char *text, int count) {
+    Channel &channel = Channel::get(value.getInt());
+    if (channel.flags.trackingEnabled) {
+        snprintf(text, count - 1, "\xA2");
+    } else {
+        snprintf(text, count - 1, "#%d", channel.channelIndex + 1);
+    }
+}
+
+bool compare_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
     snprintf(text, count - 1, "#%d", channel.channelIndex + 1);
 }
 
 bool compare_CHANNEL_LONG_TITLE_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
+    Channel &aChannel = Channel::get(a.getInt());
+    Channel &bChannel = Channel::get(b.getInt());
+    return aChannel.channelIndex == bChannel.channelIndex && aChannel.flags.trackingEnabled == bChannel.flags.trackingEnabled;
 }
 
 void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
-    snprintf(text, count - 1, "%s #%d: %dV/%dA, %s", channel.getBoardName(), channel.channelIndex + 1, 
-        (int)floor(channel.params->U_MAX), (int)floor(channel.params->I_MAX), channel.getRevisionName());
+    if (channel.flags.trackingEnabled) {
+        snprintf(text, count - 1, "\xA2 %s #%d: %dV/%dA, %s", channel.getBoardName(), channel.channelIndex + 1, 
+            (int)floor(channel.params->U_MAX), (int)floor(channel.params->I_MAX), channel.getRevisionName());
+    } else {
+        snprintf(text, count - 1, "%s #%d: %dV/%dA, %s", channel.getBoardName(), channel.channelIndex + 1, 
+            (int)floor(channel.params->U_MAX), (int)floor(channel.params->I_MAX), channel.getRevisionName());
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -662,6 +690,7 @@ CompareValueFunction g_compareUserValueFunctions[] = { compare_LESS_THEN_MIN_FLO
                                                        compare_FLOAT_LIST_value,
                                                        compare_CHANNEL_TITLE_value,
                                                        compare_CHANNEL_SHORT_TITLE_value,
+                                                       compare_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value,
                                                        compare_CHANNEL_LONG_TITLE_value };
 
 ValueToTextFunction g_userValueToTextFunctions[] = { LESS_THEN_MIN_FLOAT_value_to_text,
@@ -698,6 +727,7 @@ ValueToTextFunction g_userValueToTextFunctions[] = { LESS_THEN_MIN_FLOAT_value_t
                                                      FLOAT_LIST_value_to_text,
                                                      CHANNEL_TITLE_value_to_text,
                                                      CHANNEL_SHORT_TITLE_value_to_text,
+                                                     CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_to_text,
                                                      CHANNEL_LONG_TITLE_value_to_text };
 
 } // namespace data
@@ -1629,6 +1659,13 @@ void data_channel_short_title(data::DataOperationEnum operation, data::Cursor &c
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE);
+    }
+}
+
+void data_channel_short_title_without_tracking_icon(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON);
     }
 }
 
@@ -3833,6 +3870,31 @@ void data_simulator_load2(data::DataOperationEnum operation, data::Cursor &curso
 }
 
 #endif
+
+void data_channel_active_coupled_led(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor.i);
+        if (channel.isOutputEnabled()) {
+            if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+                value = 2;
+            } else if (channel.channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+                value = 0;
+            } else if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+                value = 2;
+            } else if (channel.channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+                value = 0;
+            } else if (channel.channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
+                value = 2;
+            } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_COMMON_GND) {
+                value = 2;
+            } else {
+                value = 1;
+            }
+        } else {
+            value = 0;
+        }
+    }
+}
 
 } // namespace gui
 } // namespace eez
