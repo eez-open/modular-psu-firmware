@@ -208,9 +208,9 @@
 /// See DP_NEG_LEV.
 #define DP_NEG_DELAY 5 // 5 s
 
-/// Number of history values shown in YT diagram. This value must be the same as
-/// the width of YT widget.
-#define CHANNEL_HISTORY_SIZE 352
+/// Number of history values shown in YT diagram. This value must be power of 2 and
+/// greater then width of YT widget.
+#define CHANNEL_HISTORY_SIZE 512
 
 #define GUI_YT_VIEW_RATE_DEFAULT 0.1f
 #define GUI_YT_VIEW_RATE_MIN 0.01f

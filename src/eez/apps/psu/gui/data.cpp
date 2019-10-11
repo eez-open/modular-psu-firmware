@@ -829,7 +829,7 @@ void data_edit_enabled(data::DataOperationEnum operation, data::Cursor &cursor, 
 
 void data_channels(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
-        value = CH_MAX;
+        value = CH_NUM;
     }
 }
 
@@ -927,7 +927,7 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
         uint32_t position = value.getUInt32();
-        value = MakeValue(channel_dispatcher::getUMonHistory(channel, position), UNIT_VOLT);
+        value = MakeValue(channel.getUMonHistory(position), UNIT_VOLT);
     }
 }
 
@@ -1024,7 +1024,7 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
         uint32_t position = value.getUInt32();
         value =
-            MakeValue(channel_dispatcher::getIMonHistory(channel, position), UNIT_AMPER);
+            MakeValue(channel.getIMonHistory(position), UNIT_AMPER);
     }
 }
 
@@ -1093,7 +1093,7 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
-        float pMon = channel_dispatcher::getUMonHistory(channel, value.getUInt32()) * channel_dispatcher::getIMonHistory(channel, value.getUInt32());
+        float pMon = channel.getUMonHistory(value.getUInt32()) * channel.getIMonHistory(value.getUInt32());
         value = MakeValue(pMon, UNIT_WATT);
     }
 }
@@ -2131,7 +2131,7 @@ void data_channel_protection_opp_level(data::DataOperationEnum operation, data::
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
                 value = g_focusEditValue;
             } else {
-                value = MakeValue(channel.prot_conf.p_level, UNIT_WATT);
+                value = MakeValue(channel_dispatcher::getOppLevel(channel), UNIT_WATT);
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
@@ -2179,7 +2179,7 @@ void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
                 value = g_focusEditValue;
             } else {
-                value = MakeValue(channel.p_limit, UNIT_WATT);
+                value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {

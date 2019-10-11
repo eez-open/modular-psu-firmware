@@ -177,6 +177,10 @@ bool setCouplingType(CouplingType couplingType, int *err) {
             channel.setCurrentRangeSelectionMode(CURRENT_RANGE_SELECTION_USE_BOTH);
             channel.enableAutoSelectCurrentRange(false);
 
+            if (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL) { 
+                channel.flags.trackingEnabled = false;
+            }
+
             channel.resetHistory();
         }
 
@@ -356,13 +360,6 @@ float getUMonLast(const Channel &channel) {
         return Channel::get(0).u.mon_last + Channel::get(1).u.mon_last;
     }
     return channel.u.mon_last;
-}
-
-float getUMonHistory(const Channel &channel, uint32_t position) {
-    if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
-        return Channel::get(0).getUMonHistory(position) + Channel::get(1).getUMonHistory(position);
-    }
-    return channel.getUMonHistory(position);
 }
 
 float getUMonDac(const Channel &channel) {
@@ -638,13 +635,6 @@ float getIMonLast(const Channel &channel) {
     return channel.i.mon_last;
 }
 
-float getIMonHistory(const Channel &channel, uint32_t position) {
-    if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_PARALLEL) {
-        return Channel::get(0).getIMonHistory(position) + Channel::get(1).getIMonHistory(position);
-    }
-    return channel.getIMonHistory(position);
-}
-
 float getIMonDac(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_PARALLEL) {
         return Channel::get(0).i.mon_dac + Channel::get(1).i.mon_dac;
@@ -866,6 +856,13 @@ void setPowerLimit(Channel &channel, float limit) {
     } else {
         channel.setPowerLimit(limit);
     }
+}
+
+float getOppLevel(Channel &channel) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        return Channel::get(0).prot_conf.p_level + Channel::get(1).prot_conf.p_level;
+    }
+    return channel.prot_conf.p_level;
 }
 
 float getOppMinLevel(Channel &channel) {

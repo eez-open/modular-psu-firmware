@@ -477,10 +477,7 @@ void Channel::reset() {
 }
 
 void Channel::resetHistory() {
-    uHistory[0] = u.mon_last;
-    iHistory[0] = i.mon_last;
-
-    for (int i = 1; i < CHANNEL_HISTORY_SIZE; ++i) {
+    for (int i = 0; i < CHANNEL_HISTORY_SIZE; ++i) {
         uHistory[i] = 0;
         iHistory[i] = 0;
     }
@@ -620,8 +617,8 @@ void Channel::tick(uint32_t tick_usec) {
     uint32_t ytViewRateMicroseconds = (int)round(ytViewRate * 1000000L);
     while (tick_usec - historyLastTick >= ytViewRateMicroseconds) {
         uint32_t historyIndex = historyPosition % CHANNEL_HISTORY_SIZE;
-        uHistory[historyIndex] = u.mon_last;
-        iHistory[historyIndex] = i.mon_last;
+        uHistory[historyIndex] = channel_dispatcher::getUMonLast(*this);
+        iHistory[historyIndex] = channel_dispatcher::getIMonLast(*this);
         ++historyPosition;
         historyLastTick += ytViewRateMicroseconds;
     }
