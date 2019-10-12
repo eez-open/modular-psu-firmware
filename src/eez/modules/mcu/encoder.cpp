@@ -65,6 +65,7 @@ EncoderMode g_encoderMode = ENCODER_MODE_AUTO;
 ////////////////////////////////////////////////////////////////////////////////
 
 struct CalcAutoModeStepLevel {
+    static const int CONF_NUM_STEP_LEVELS = 3; // 0, 1 and 2
     static const int CONF_NUM_ACCELERATION_STEP_COUNTERS = 10;
     static const int CONF_ACCELERATION_STEP_COUNTER_DURATION_MS = 50;
     static const int CONF_COUNTER_TO_STEP_DIVISOR = 20;
@@ -100,7 +101,7 @@ struct CalcAutoModeStepLevel {
 
             stepCountersSum = abs(stepCountersSum);
 
-            m_stepLevel = MIN(stepCountersSum / CONF_COUNTER_TO_STEP_DIVISOR, 2);
+            m_stepLevel = MIN(stepCountersSum / CONF_COUNTER_TO_STEP_DIVISOR, CONF_NUM_STEP_LEVELS - 1);
 
             //if (stepCountersSum != 0) {
             //    DebugTrace("%d, %d\n", stepCountersSum, m_stepLevel);
