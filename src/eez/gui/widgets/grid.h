@@ -23,7 +23,11 @@
 namespace eez {
 namespace gui {
 
+#define GRID_FLOW_ROW 1
+#define GRID_FLOW_COLUMN 2
+
 struct GridWidget {
+    uint8_t gridFlow; // GRID_FLOW_ROW or GRID_FLOW_COLUMN
 #if OPTION_SDRAM    
     const Widget *itemWidget;
 #else

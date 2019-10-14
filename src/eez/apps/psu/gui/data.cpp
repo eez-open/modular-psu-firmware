@@ -790,9 +790,6 @@ Page *getUserProfilesPage() {
     if (!page) {
         page = getPage(PAGE_ID_USER_PROFILES);
     }
-    if (!page) {
-        page = getPage(PAGE_ID_USER_PROFILES2);
-    }
     return page;
 }
 
@@ -2848,17 +2845,9 @@ void data_set_page_dirty(data::DataOperationEnum operation, data::Cursor &cursor
     }
 }
 
-void data_profiles_list1(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_profiles_list(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
-        value = 4;
-    }
-}
-
-void data_profiles_list2(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
-        value = 6;
-    } else if (operation == data::DATA_OPERATION_SELECT) {
-        cursor.i = 4 + value.getInt();
+        value = 10;
     }
 }
 

@@ -73,15 +73,29 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
 		enumWidget(widgetCursor, callback);
 		
-        if (xOffset + childWidget->w < parentWidget->w) {
-            xOffset += childWidget->w;
+        if (gridWidget->gridFlow == GRID_FLOW_ROW) {
+            if (xOffset + childWidget->w < parentWidget->w) {
+                xOffset += childWidget->w;
+            } else {
+                if (yOffset + childWidget->h < parentWidget->h) {
+                    yOffset += childWidget->h;
+                    xOffset = 0;
+                } else {
+                    // TODO: add vertical scroll
+                    break;
+                }
+            }
         } else {
             if (yOffset + childWidget->h < parentWidget->h) {
                 yOffset += childWidget->h;
-                xOffset = 0;
             } else {
-                // TODO: add horizontal scroll
-                break;
+                if (xOffset + childWidget->w < parentWidget->w) {
+                    yOffset = 0;
+                    xOffset += childWidget->w;
+                } else {
+                    // TODO: add horizontal scroll
+                    break;
+                }
             }
         }
 

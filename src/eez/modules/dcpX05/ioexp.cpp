@@ -72,7 +72,7 @@ static const uint8_t REG_VALUE_DEFVALB  = 0B00000000; //
 static const uint8_t REG_VALUE_INTCONA  = 0B00100000; // compare HW OVP Fault value with default value
 static const uint8_t REG_VALUE_INTCONB  = 0B00000000; //
 static const uint8_t REG_VALUE_IOCON    = 0B00100000; // sequential operation disabled, hw addressing disabled
-static const uint8_t REG_VALUE_GPPUA    = 0B00000000; // pull up with 100K resistor pins 1 (CC) and 2 (CV)
+static const uint8_t REG_VALUE_GPPUA    = 0B00100001; // pull up with 100K
 static const uint8_t REG_VALUE_GPPUB    = 0B00000000; //
 
 static const uint8_t DCP505_REG_VALUE_GPIOA = 0B00100000; // disable OVP

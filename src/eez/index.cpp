@@ -289,7 +289,6 @@ Page *getPageFromId(int pageId) {
         page = &g_SysSettingsSerialPage;
         break;
     case PAGE_ID_USER_PROFILES:
-    case PAGE_ID_USER_PROFILES2:
     case PAGE_ID_USER_PROFILE_0_SETTINGS:
     case PAGE_ID_USER_PROFILE_SETTINGS:
         page = &g_UserProfilesPage;

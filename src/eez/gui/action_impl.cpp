@@ -477,10 +477,6 @@ void action_show_user_profiles() {
     showPage(PAGE_ID_USER_PROFILES);
 }
 
-void action_show_user_profiles2() {
-    showPage(PAGE_ID_USER_PROFILES2);
-}
-
 void action_show_user_profile_settings() {
     ((UserProfilesPage *)getActivePage())->showProfile();
 }

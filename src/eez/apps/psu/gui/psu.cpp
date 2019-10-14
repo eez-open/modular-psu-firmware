@@ -114,9 +114,12 @@ void PsuAppContext::stateManagment() {
 #if GUI_BACK_TO_MAIN_ENABLED
     uint32_t inactivityPeriod = psu::idle::getGuiAndEncoderInactivityPeriod();
 
-    if (activePageId == PAGE_ID_EVENT_QUEUE || activePageId == PAGE_ID_USER_PROFILES ||
-        activePageId == PAGE_ID_USER_PROFILES2 || activePageId == PAGE_ID_USER_PROFILE_0_SETTINGS ||
-        activePageId == PAGE_ID_USER_PROFILE_SETTINGS) {
+    if (
+        activePageId == PAGE_ID_EVENT_QUEUE ||
+        activePageId == PAGE_ID_USER_PROFILES ||
+        activePageId == PAGE_ID_USER_PROFILE_0_SETTINGS ||
+        activePageId == PAGE_ID_USER_PROFILE_SETTINGS
+    ) {
         if (inactivityPeriod >= GUI_BACK_TO_MAIN_DELAY * 1000UL) {
             showPage(PAGE_ID_MAIN);
         }
@@ -206,16 +209,6 @@ void PsuAppContext::onPageChanged() {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
-        } else if (activePageId == PAGE_ID_USER_PROFILES2) {
-            animateSlideLeft();
-        }
-    } else if (m_previousPageId == PAGE_ID_USER_PROFILES2) {
-        if (activePageId == PAGE_ID_USER_PROFILE_SETTINGS) {
-            animateSlideDown();
-        } else if (activePageId == PAGE_ID_MAIN) {
-            animateSlideUp();
-        } else if (activePageId == PAGE_ID_USER_PROFILES) {
-            animateSlideRight();
         }
     } else if (m_previousPageId == PAGE_ID_USER_PROFILE_0_SETTINGS) {
         if (activePageId == PAGE_ID_MAIN) {
@@ -227,8 +220,6 @@ void PsuAppContext::onPageChanged() {
         if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
         } else if (activePageId == PAGE_ID_USER_PROFILES) {
-            animateSlideUp();
-        } else if (activePageId == PAGE_ID_USER_PROFILES2) {
             animateSlideUp();
         }
     } else if (m_previousPageId == PAGE_ID_SYS_INFO) {
