@@ -136,10 +136,10 @@ void init() {
                       getConfig());
 
 #ifdef EEZ_PLATFORM_SIMULATOR
-    Serial.print("EEZ PSU software simulator ver. ");
+    Serial.print("EEZ BB3 software simulator ver. ");
     Serial.println(FIRMWARE);
 #else
-    Serial.println("EEZ PSU serial com ready");
+    Serial.println("EEZ BB3 serial com ready");
 #endif
 
     g_testResult = TEST_OK;
