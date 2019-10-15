@@ -443,10 +443,11 @@ void sync() {
 
     if (g_animationState.enabled) {
         animate();
-        if (g_animationState.enabled) {
-            return;
+        if (!g_animationState.enabled) {
+            finishAnimation();
         }
-        g_painted = true;
+        g_painted = false;
+        return;
     }
 
     if (g_painted) {
@@ -471,6 +472,19 @@ void sync() {
 #endif
     	g_takeScreenshot = false;
     }
+}
+
+void finishAnimation() {
+#if OPTION_SDRAM
+        // wait for VSYNC
+        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {}
+
+        HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
+
+        auto temp = g_buffer;
+        g_buffer = g_bufferOld;
+        g_bufferOld = temp;
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

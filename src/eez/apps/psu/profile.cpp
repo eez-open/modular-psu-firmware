@@ -638,7 +638,11 @@ void getName(int location, char *name, int count) {
             return;
         }
     }
-    strncpy(name, "--Not used--", count - 1);
+    if (location > 0) {
+        strncpy(name, "--Empty--", count - 1);
+    } else {
+        strncpy(name, "--Never used--", count - 1);
+    }
     name[count - 1] = 0;
 }
 

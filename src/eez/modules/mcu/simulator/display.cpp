@@ -303,15 +303,14 @@ void sync() {
 
     if (g_animationState.enabled) {
         animate();
-        if (g_animationState.enabled) {
-            return;
+        if (!g_animationState.enabled) {
+            finishAnimation();
         }
-        g_painted = true;
+        g_painted = false;
+        return;
     }
 
     if (g_painted) {
-        g_painted = false;
-
         updateScreen(g_frontPanelBuffer);
 
         if (g_frontPanelBuffer == g_frontPanelBuffer1) {
@@ -319,6 +318,16 @@ void sync() {
         } else {
             g_frontPanelBuffer = g_frontPanelBuffer1;
         }
+    }
+}
+
+void finishAnimation() {
+    updateScreen(g_frontPanelBuffer);
+
+    if (g_frontPanelBuffer == g_frontPanelBuffer1) {
+        g_frontPanelBuffer = g_frontPanelBuffer2;
+    } else {
+        g_frontPanelBuffer = g_frontPanelBuffer1;
     }
 }
 

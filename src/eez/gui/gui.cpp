@@ -414,6 +414,9 @@ void animateOpenCloseCallback(float t, void *bufferOld, void *bufferNew, void *b
 }
 
 void animate(Buffer startBuffer, void(*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst), float duration = -1) {
+    if (g_animationState.enabled) {
+        mcu::display::finishAnimation();
+    }
     g_animationState.enabled = true;
     g_animationState.startTime = millis();
     g_animationState.duration = duration != -1 ? duration : psu::persist_conf::devConf2.animationsDuration;

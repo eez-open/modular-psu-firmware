@@ -58,7 +58,7 @@ void UserProfilesPage::toggleAutoRecall() {
 }
 
 void UserProfilesPage::toggleIsAutoRecallLocation() {
-    if (profile::isValid(g_selectedProfileLocation)) {
+    if (g_selectedProfileLocation == 0 || profile::isValid(g_selectedProfileLocation)) {
         persist_conf::setProfileAutoRecallLocation(g_selectedProfileLocation);
     }
 }

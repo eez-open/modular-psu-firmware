@@ -28,6 +28,7 @@ namespace mcu {
 namespace display {
 
 void sync();
+void finishAnimation();
 
 void turnOn();
 void turnOff();
