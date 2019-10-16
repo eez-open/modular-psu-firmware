@@ -60,10 +60,10 @@ int getPreviousPageId();
 Page *getPreviousPage();
 Page *getPage(int pageId);
 bool isPageActiveOrOnStack(int pageId);
-void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint8_t currentValue,
-                            bool (*disabledCallback)(uint8_t value), void (*onSet)(uint8_t));
+void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,
+                            bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t));
 void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
-	                        uint8_t currentValue, bool(*disabledCallback)(uint8_t value), void(*onSet)(uint8_t)); 
+	                        uint16_t currentValue, bool(*disabledCallback)(uint16_t value), void(*onSet)(uint16_t)); 
 bool isPageInternal(int pageId);
 void executeAction(int actionId);
 

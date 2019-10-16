@@ -316,8 +316,8 @@ void ToastMessagePage::executeAction() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void SelectFromEnumPage::init(const data::EnumItem *enumDefinition_, uint8_t currentValue_,
-		bool (*disabledCallback_)(uint8_t value), void (*onSet_)(uint8_t))
+void SelectFromEnumPage::init(const data::EnumItem *enumDefinition_, uint16_t currentValue_,
+		bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t))
 {
 	enumDefinition = enumDefinition_;
 	enumDefinitionFunc = NULL;
@@ -329,7 +329,7 @@ void SelectFromEnumPage::init(const data::EnumItem *enumDefinition_, uint8_t cur
 }
 
 void SelectFromEnumPage::init(void (*enumDefinitionFunc_)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
-		uint8_t currentValue_, bool (*disabledCallback_)(uint8_t value), void (*onSet_)(uint8_t))
+    uint16_t currentValue_, bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t))
 {
 	enumDefinition = NULL;
 	enumDefinitionFunc = enumDefinitionFunc_;
@@ -380,7 +380,7 @@ void SelectFromEnumPage::init() {
     findPagePosition();
 }
 
-uint8_t SelectFromEnumPage::getValue(int i) {
+uint16_t SelectFromEnumPage::getValue(int i) {
     if (enumDefinitionFunc) {
         data::Value value;
         data::Cursor cursor(i);

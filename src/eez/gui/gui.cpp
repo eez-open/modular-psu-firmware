@@ -73,7 +73,6 @@ bool onSystemStateChanged() {
     if (eez::g_systemState == eez::SystemState::BOOTING) {
         if (eez::g_systemStatePhase == 0) {
             g_guiTaskHandle = osThreadCreate(osThread(g_guiTask), nullptr);
-        } else if (eez::g_systemStatePhase == 1) {
         }
     }
 
@@ -182,13 +181,13 @@ bool isPageActiveOrOnStack(int pageId) {
     return g_appContext->isPageActiveOrOnStack(pageId);
 }
 
-void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint8_t currentValue,
-                            bool (*disabledCallback)(uint8_t value), void (*onSet)(uint8_t)) {
+void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,
+                            bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t)) {
     g_appContext->pushSelectFromEnumPage(enumDefinition, currentValue, disabledCallback, onSet);
 }
 
 void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
-	                        uint8_t currentValue, bool(*disabledCallback)(uint8_t value), void(*onSet)(uint8_t)) {
+	                        uint16_t currentValue, bool(*disabledCallback)(uint16_t value), void(*onSet)(uint16_t)) {
 	g_appContext->pushSelectFromEnumPage(enumDefinitionFunc, currentValue, disabledCallback, onSet);
 }
 

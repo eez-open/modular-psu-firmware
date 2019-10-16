@@ -56,14 +56,14 @@ void Value::reset() {
     max_set = false;
 
     min_dac = voltOrCurr
-                  ? g_channel->params->U_CAL_VAL_MIN
-                  : (currentRange == 0 ? g_channel->params->I_CAL_VAL_MIN : g_channel->params->I_CAL_VAL_MIN / 100);
+                  ? g_channel->params.U_CAL_VAL_MIN
+                  : (currentRange == 0 ? g_channel->params.I_CAL_VAL_MIN : g_channel->params.I_CAL_VAL_MIN / 100);
     mid_dac = voltOrCurr
-                  ? g_channel->params->U_CAL_VAL_MID
-                  : (currentRange == 0 ? g_channel->params->I_CAL_VAL_MID : g_channel->params->I_CAL_VAL_MID / 100);
+                  ? g_channel->params.U_CAL_VAL_MID
+                  : (currentRange == 0 ? g_channel->params.I_CAL_VAL_MID : g_channel->params.I_CAL_VAL_MID / 100);
     max_dac = voltOrCurr
-                  ? g_channel->params->U_CAL_VAL_MAX
-                  : (currentRange == 0 ? g_channel->params->I_CAL_VAL_MAX : g_channel->params->I_CAL_VAL_MAX / 100);
+                  ? g_channel->params.U_CAL_VAL_MAX
+                  : (currentRange == 0 ? g_channel->params.I_CAL_VAL_MAX : g_channel->params.I_CAL_VAL_MAX / 100);
 }
 
 float Value::getLevelValue() {
@@ -91,10 +91,10 @@ void Value::setLevel(int8_t value) {
 void Value::setLevelValue() {
     if (voltOrCurr) {
         g_channel->setVoltage(getLevelValue());
-        g_channel->setCurrent(g_channel->params->I_VOLT_CAL);
+        g_channel->setCurrent(g_channel->params.I_VOLT_CAL);
     } else {
         g_channel->setCurrent(getLevelValue());
-        g_channel->setVoltage(g_channel->params->U_CURR_CAL);
+        g_channel->setVoltage(g_channel->params.U_CURR_CAL);
     }
 }
 
@@ -117,16 +117,16 @@ void Value::setDacValue(float value) {
 bool Value::checkRange(float dac, float data, float adc) {
     float range;
     if (voltOrCurr) {
-        range = g_channel->params->U_CAL_VAL_MAX - g_channel->params->U_CAL_VAL_MIN;
+        range = g_channel->params.U_CAL_VAL_MAX - g_channel->params.U_CAL_VAL_MIN;
     } else {
-        range = g_channel->params->I_CAL_VAL_MAX - g_channel->params->I_CAL_VAL_MIN;
+        range = g_channel->params.I_CAL_VAL_MAX - g_channel->params.I_CAL_VAL_MIN;
         if (currentRange == 1) {
             // range /= 5; // 500mA
         	range /= 25; // 50mA
         }
     }
 
-    float allowedDiff = range * g_channel->params->CALIBRATION_DATA_TOLERANCE_PERCENT / 100;
+    float allowedDiff = range * g_channel->params.CALIBRATION_DATA_TOLERANCE_PERCENT / 100;
     float diff;
 
     diff = fabsf(dac - data);
@@ -135,7 +135,7 @@ bool Value::checkRange(float dac, float data, float adc) {
         return false;
     }
 
-    if (g_slots[g_channel->slotIndex].moduleType != MODULE_TYPE_DCM220) {
+    if (g_slots[g_channel->slotIndex].moduleInfo->moduleType != MODULE_TYPE_DCM220) {
         diff = fabsf(dac - adc);
         if (diff > allowedDiff) {
             DebugTrace("ADC check failed: level=%f, adc=%f, diff=%f, allowedDiff=%f", dac, adc, diff, allowedDiff);
@@ -165,12 +165,12 @@ void Value::setData(float dac, float data, float adc) {
 
     if (min_set && max_set) {
         if (voltOrCurr) {
-            minPossible = g_channel->params->U_MIN;
-            maxPossible = g_channel->params->U_MAX;
+            minPossible = g_channel->params.U_MIN;
+            maxPossible = g_channel->params.U_MAX;
         } else {
             if (currentRange == 0) {
-                minPossible = g_channel->params->I_MIN;
-                maxPossible = g_channel->params->I_MAX;
+                minPossible = g_channel->params.I_MIN;
+                maxPossible = g_channel->params.I_MAX;
             }
         }
         DebugTrace("ADC=%f", min_adc);
@@ -180,7 +180,7 @@ void Value::setData(float dac, float data, float adc) {
 bool Value::checkMid() {
     float mid = remap(mid_dac, min_dac, min_val, max_dac, max_val);
 
-    float allowedDiff = g_channel->params->CALIBRATION_MID_TOLERANCE_PERCENT * (max_val - min_val) / 100.0f;
+    float allowedDiff = g_channel->params.CALIBRATION_MID_TOLERANCE_PERCENT * (max_val - min_val) / 100.0f;
 
     float diff = fabsf(mid - mid_val);
     if (diff <= allowedDiff) {

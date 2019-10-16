@@ -215,7 +215,7 @@ scpi_result_t scpi_cmd_outputDprog(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel->getFeatures() & CH_FEATURE_DPROG) {
+    if (channel->params.features & CH_FEATURE_DPROG) {
         channel->setDprogState((DprogState)dprogState);
     } else {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -231,7 +231,7 @@ scpi_result_t scpi_cmd_outputDprogQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel->getFeatures() & CH_FEATURE_DPROG) {
+    if (channel->params.features & CH_FEATURE_DPROG) {
         resultChoiceName(context, dprogStateChoice, channel->getDprogState());
     } else {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

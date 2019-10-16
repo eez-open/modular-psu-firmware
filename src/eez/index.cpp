@@ -129,45 +129,64 @@ OnSystemStateChangedCallback g_onSystemStateChangedCallbacks[] = {
     psu::onSystemStateChanged,
 };
 
-int g_numOnSystemStateChangedCallbacks =
-    sizeof(g_onSystemStateChangedCallbacks) / sizeof(OnSystemStateChangedCallback);
+int g_numOnSystemStateChangedCallbacks = sizeof(g_onSystemStateChangedCallbacks) / sizeof(OnSystemStateChangedCallback);
 
-ModuleInfo g_modules[] = {
+static ModuleInfo g_modules[] = {
     { 
+        MODULE_TYPE_NONE,
+        "None",
         0,
-        CH_BOARD_REVISION_NONE, 
         1,
         nullptr
     },
     {
-        406,
-        CH_BOARD_REVISION_DCP405_R2B5,
+        MODULE_TYPE_DCP405,
+        "DCP405",
+        MODULE_REVISION_DCP405_R2B7,
         1,
         dcpX05::g_channelInterfaces
     },
     {
-        220,
-        CH_BOARD_REVISION_DCM220_R1B1, 
+        MODULE_TYPE_DCP405B,
+        "DCP405B",
+        MODULE_REVISION_DCP405B_R2B7,
+        1,
+        dcpX05::g_channelInterfaces
+    },
+    {
+        MODULE_TYPE_DCP505, 
+        "DCP505",
+        MODULE_REVISION_DCP505_R1B3,
+        1,
+        dcpX05::g_channelInterfaces
+    },
+    {
+        MODULE_TYPE_DCM220, 
+        "DCM220",
+        MODULE_REVISION_DCM220_R2B4,
         2,
         dcm220::g_channelInterfaces
-    },
-    {
-        505,
-        CH_BOARD_REVISION_DCP505_R1B3, 
-        1,
-        dcpX05::g_channelInterfaces
-    },
+    }
 };
+
+ModuleInfo *getModuleInfo(uint16_t moduleType) {
+    for (size_t i = 0; i < sizeof(g_modules) / sizeof(ModuleInfo); i++) {
+        if (g_modules[i].moduleType == moduleType) {
+            return &g_modules[i];
+        }
+    }
+    return &g_modules[0];
+}
 
 SlotInfo g_slots[NUM_SLOTS] = {
     {
-    	MODULE_TYPE_NONE
+        &g_modules[0]
     },
     {
-    	MODULE_TYPE_NONE
+        &g_modules[0]
     },
     {
-        MODULE_TYPE_NONE
+        &g_modules[0]
     }
 };
 

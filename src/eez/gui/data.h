@@ -37,6 +37,7 @@ enum BuiltInValueType {
     VALUE_TYPE_PAGE_INFO,
     VALUE_TYPE_MASTER_INFO,
     VALUE_TYPE_SLOT_INFO,
+    VALUE_TYPE_SLOT_INFO2,
     VALUE_TYPE_TEST_RESULT,
     VALUE_TYPE_USER,
 };
@@ -50,7 +51,7 @@ struct Style;
 namespace data {
 
 struct EnumItem {
-    uint8_t value;
+    uint16_t value;
     const char *menuLabel;
     const char *widgetLabel;
 };
@@ -58,8 +59,8 @@ struct EnumItem {
 extern const data::EnumItem *g_enumDefinitions[];
 
 struct EnumValue {
-    uint8_t enumValue;
-    uint8_t enumDefinition;
+    uint16_t enumValue;
+    uint16_t enumDefinition;
 };
 
 struct PairOfUint8Value {

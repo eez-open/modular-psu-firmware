@@ -102,7 +102,7 @@ void oneIter() {
 }
 
 bool measureAllAdcValuesOnChannel(int channelIndex) {
-	if (g_slots[Channel::get(channelIndex).slotIndex].moduleType == MODULE_TYPE_NONE) {
+	if (g_slots[Channel::get(channelIndex).slotIndex].moduleInfo->moduleType == MODULE_TYPE_NONE) {
 		return true;
 	}
 

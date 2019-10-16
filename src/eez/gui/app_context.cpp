@@ -326,15 +326,15 @@ void AppContext::showPageOnNextIter(int pageId) {
     m_pageIdToSetOnNextIter = pageId;
 }
 
-void AppContext::pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint8_t currentValue,
-                                        bool (*disabledCallback)(uint8_t value),
-                                        void (*onSet)(uint8_t)) {
+void AppContext::pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,
+                                        bool (*disabledCallback)(uint16_t value),
+                                        void (*onSet)(uint16_t)) {
 	m_selectFromEnumPage.init(enumDefinition, currentValue, disabledCallback, onSet);
     pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &m_selectFromEnumPage);
 }
 
 void AppContext::pushSelectFromEnumPage(void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
-                                        uint8_t currentValue, bool (*disabledCallback)(uint8_t value), void (*onSet)(uint8_t)) {
+                                        uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t)) {
 	m_selectFromEnumPage.init(enumDefinitionFunc, currentValue, disabledCallback, onSet);
     pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &m_selectFromEnumPage);
 }

@@ -56,14 +56,13 @@ void ChSettingsAdvOptionsPage::toggleDprog() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ChSettingsAdvRangesPage::onModeSet(uint8_t value) {
+void ChSettingsAdvRangesPage::onModeSet(uint16_t value) {
     popPage();
     g_channel->setCurrentRangeSelectionMode((CurrentRangeSelectionMode)value);
 }
 
 void ChSettingsAdvRangesPage::selectMode() {
-    pushSelectFromEnumPage(g_channelCurrentRangeSelectionModeEnumDefinition,
-                           g_channel->getCurrentRangeSelectionMode(), 0, onModeSet);
+    pushSelectFromEnumPage(g_channelCurrentRangeSelectionModeEnumDefinition, g_channel->getCurrentRangeSelectionMode(), 0, onModeSet);
 }
 
 void ChSettingsAdvRangesPage::toggleAutoRanging() {
@@ -78,36 +77,34 @@ void ChSettingsAdvViewPage::pageAlloc() {
     origYTViewRate = ytViewRate = g_channel->ytViewRate;
 }
 
-bool ChSettingsAdvViewPage::isDisabledDisplayValue1(uint8_t value) {
+bool ChSettingsAdvViewPage::isDisabledDisplayValue1(uint16_t value) {
     ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getPreviousPage();
     return value == page->displayValue2;
 }
 
-void ChSettingsAdvViewPage::onDisplayValue1Set(uint8_t value) {
+void ChSettingsAdvViewPage::onDisplayValue1Set(uint16_t value) {
     popPage();
     ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getActivePage();
-    page->displayValue1 = value;
+    page->displayValue1 = (uint8_t)value;
 }
 
 void ChSettingsAdvViewPage::editDisplayValue1() {
-    pushSelectFromEnumPage(g_channelDisplayValueEnumDefinition, displayValue1,
-                           isDisabledDisplayValue1, onDisplayValue1Set);
+    pushSelectFromEnumPage(g_channelDisplayValueEnumDefinition, displayValue1, isDisabledDisplayValue1, onDisplayValue1Set);
 }
 
-bool ChSettingsAdvViewPage::isDisabledDisplayValue2(uint8_t value) {
+bool ChSettingsAdvViewPage::isDisabledDisplayValue2(uint16_t value) {
     ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getPreviousPage();
     return value == page->displayValue1;
 }
 
-void ChSettingsAdvViewPage::onDisplayValue2Set(uint8_t value) {
+void ChSettingsAdvViewPage::onDisplayValue2Set(uint16_t value) {
     popPage();
     ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getActivePage();
-    page->displayValue2 = value;
+    page->displayValue2 = (uint8_t)value;
 }
 
 void ChSettingsAdvViewPage::editDisplayValue2() {
-    pushSelectFromEnumPage(g_channelDisplayValueEnumDefinition, displayValue2,
-                           isDisabledDisplayValue2, onDisplayValue2Set);
+    pushSelectFromEnumPage(g_channelDisplayValueEnumDefinition, displayValue2, isDisabledDisplayValue2, onDisplayValue2Set);
 }
 
 void ChSettingsAdvViewPage::onYTViewRateSet(float value) {

@@ -51,12 +51,12 @@ void ChSettingsTriggerPage::onFinishTriggerModeSet() {
     profile::save();
 }
 
-void ChSettingsTriggerPage::onTriggerModeSet(uint8_t value) {
+void ChSettingsTriggerPage::onTriggerModeSet(uint16_t value) {
     popPage();
 
     if (channel_dispatcher::getVoltageTriggerMode(*g_channel) != value ||
         channel_dispatcher::getCurrentTriggerMode(*g_channel) != value) {
-        g_newTriggerMode = value;
+        g_newTriggerMode = (uint8_t)value;
 
         if (trigger::isInitiated() || list::isActive()) {
             yesNoDialog(PAGE_ID_YES_NO, "Trigger is active. Are you sure?", onFinishTriggerModeSet,
@@ -68,9 +68,7 @@ void ChSettingsTriggerPage::onTriggerModeSet(uint8_t value) {
 }
 
 void ChSettingsTriggerPage::editTriggerMode() {
-    pushSelectFromEnumPage(g_channelTriggerModeEnumDefinition,
-                           channel_dispatcher::getVoltageTriggerMode(*g_channel), 0,
-                           onTriggerModeSet);
+    pushSelectFromEnumPage(g_channelTriggerModeEnumDefinition, channel_dispatcher::getVoltageTriggerMode(*g_channel), 0, onTriggerModeSet);
 }
 
 void ChSettingsTriggerPage::onVoltageTriggerValueSet(float value) {
@@ -127,16 +125,14 @@ void ChSettingsTriggerPage::toggleOutputState() {
     profile::save();
 }
 
-void ChSettingsTriggerPage::onTriggerOnListStopSet(uint8_t value) {
+void ChSettingsTriggerPage::onTriggerOnListStopSet(uint16_t value) {
     popPage();
     channel_dispatcher::setTriggerOnListStop(*g_channel, (TriggerOnListStop)value);
     profile::save();
 }
 
 void ChSettingsTriggerPage::editTriggerOnListStop() {
-    pushSelectFromEnumPage(g_channelTriggerOnListStopEnumDefinition,
-                           channel_dispatcher::getTriggerOnListStop(*g_channel), 0,
-                           onTriggerOnListStopSet);
+    pushSelectFromEnumPage(g_channelTriggerOnListStopEnumDefinition, channel_dispatcher::getTriggerOnListStop(*g_channel), 0, onTriggerOnListStopSet);
 }
 
 void ChSettingsTriggerPage::onListCountSet(float value) {

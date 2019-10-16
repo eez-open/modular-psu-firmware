@@ -596,9 +596,9 @@ void onSetPowerTripDelay(float delay) {
 void changePowerTripDelay(int iChannel) {
     g_iChannelSetValue = iChannel;
     Channel &channel = Channel::get(iChannel);
-    float minDelay = channel.params->OPP_MIN_DELAY;
-    float maxDelay = channel.params->OPP_MAX_DELAY;
-    float defaultDelay = channel.params->OPP_DEFAULT_DELAY;
+    float minDelay = channel.params.OPP_MIN_DELAY;
+    float maxDelay = channel.params.OPP_MAX_DELAY;
+    float defaultDelay = channel.params.OPP_DEFAULT_DELAY;
     changeValue(channel,
         MakeValue(channel.prot_conf.p_delay, UNIT_SECOND),
         minDelay, maxDelay, defaultDelay, onSetPowerTripDelay);

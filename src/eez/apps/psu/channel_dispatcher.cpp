@@ -85,14 +85,7 @@ bool isCouplingTypeAllowed(CouplingType couplingType, int *err) {
     }
 
     if (couplingType == COUPLING_TYPE_PARALLEL || couplingType == COUPLING_TYPE_SERIES) {
-        if (g_slots[0].moduleType != g_slots[1].moduleType) {
-            if (err) {
-                *err = SCPI_ERROR_HARDWARE_MISSING;
-            }
-            return false;
-        }
-
-        if (g_slots[0].moduleType != MODULE_TYPE_DCP405 && g_slots[0].moduleType != MODULE_TYPE_DCP505) {
+        if (!(Channel::get(0).params.features & CH_FEATURE_COUPLING) || !(Channel::get(1).params.features & CH_FEATURE_COUPLING)) {
             if (err) {
                 *err = SCPI_ERROR_HARDWARE_MISSING;
             }
@@ -116,7 +109,7 @@ bool setCouplingType(CouplingType couplingType, int *err) {
             channel.outputEnable(false);
             channel.remoteSensingEnable(false);
 
-            if (channel.getFeatures() & CH_FEATURE_RPROG) {
+            if (channel.params.features & CH_FEATURE_RPROG) {
                 channel.remoteProgrammingEnable(false);
             }
 
@@ -825,9 +818,9 @@ float getPowerMinLimit(const Channel &channel) {
 
 float getPowerMaxLimit(const Channel &channel) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        return 2 * MIN(Channel::get(0).params->PTOT, Channel::get(1).params->PTOT);
+        return 2 * MIN(Channel::get(0).params.PTOT, Channel::get(1).params.PTOT);
     }
-    return channel.params->PTOT;
+    return channel.params.PTOT;
 }
 
 float getPowerDefaultLimit(const Channel &channel) {
@@ -867,23 +860,23 @@ float getOppLevel(Channel &channel) {
 
 float getOppMinLevel(Channel &channel) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        return 2 * MAX(Channel::get(0).params->OPP_MIN_LEVEL, Channel::get(1).params->OPP_MIN_LEVEL);
+        return 2 * MAX(Channel::get(0).params.OPP_MIN_LEVEL, Channel::get(1).params.OPP_MIN_LEVEL);
     }
-    return channel.params->OPP_MIN_LEVEL;
+    return channel.params.OPP_MIN_LEVEL;
 }
 
 float getOppMaxLevel(Channel &channel) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        return 2 * MIN(Channel::get(0).params->OPP_MAX_LEVEL, Channel::get(1).params->OPP_MAX_LEVEL);
+        return 2 * MIN(Channel::get(0).params.OPP_MAX_LEVEL, Channel::get(1).params.OPP_MAX_LEVEL);
     }
-    return channel.params->OPP_MAX_LEVEL;
+    return channel.params.OPP_MAX_LEVEL;
 }
 
 float getOppDefaultLevel(Channel &channel) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        return Channel::get(0).params->OPP_DEFAULT_LEVEL + Channel::get(1).params->OPP_DEFAULT_LEVEL;
+        return Channel::get(0).params.OPP_DEFAULT_LEVEL + Channel::get(1).params.OPP_DEFAULT_LEVEL;
     }
-    return channel.params->OPP_DEFAULT_LEVEL;
+    return channel.params.OPP_DEFAULT_LEVEL;
 }
 
 void setOppParameters(Channel &channel, int state, float level, float delay) {

@@ -173,6 +173,7 @@ EnumItem g_dstRuleEnumDefinition[] = { { datetime::DST_RULE_OFF, "Off" },
 #if defined(EEZ_PLATFORM_SIMULATOR)
 EnumItem g_moduleTypeEnumDefinition[] = { { MODULE_TYPE_NONE, "None" },
                                           { MODULE_TYPE_DCP405, "DCP405" },
+                                          { MODULE_TYPE_DCP405B, "DCP405B" },
                                           { MODULE_TYPE_DCM220, "DCM220" },
                                           { 0, 0 } };
 #endif
@@ -319,7 +320,7 @@ bool compare_CHANNEL_BOARD_INFO_LABEL_value(const Value &a, const Value &b) {
 }
 
 void CHANNEL_BOARD_INFO_LABEL_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "CH%d board:", value.getInt());
+    snprintf(text, count - 1, "CH%d board:", value.getInt() + 1);
     text[count - 1] = 0;
 }
 
@@ -602,7 +603,7 @@ void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
     if (channel.flags.trackingEnabled) {
         snprintf(text, count - 1, "\xA2 #%d", channel.channelIndex + 1);
     } else {
-        snprintf(text, count - 1, "%s #%d", channel.getBoardName(), channel.channelIndex + 1);
+        snprintf(text, count - 1, "%s #%d", g_slots[channel.slotIndex].moduleInfo->moduleName, channel.channelIndex + 1);
     }
 }
 
@@ -637,13 +638,16 @@ bool compare_CHANNEL_LONG_TITLE_value(const Value &a, const Value &b) {
 }
 
 void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count) {
-    Channel &channel = Channel::get(value.getInt());
+    auto &channel = Channel::get(value.getInt());
+    auto &slot = g_slots[channel.slotIndex];
     if (channel.flags.trackingEnabled) {
-        snprintf(text, count - 1, "\xA2 %s #%d: %dV/%dA, %s", channel.getBoardName(), channel.channelIndex + 1, 
-            (int)floor(channel.params->U_MAX), (int)floor(channel.params->I_MAX), channel.getRevisionName());
+        snprintf(text, count - 1, "\xA2 %s #%d: %dV/%dA, R%dB%d", slot.moduleInfo->moduleName, slot.channelIndex + 1, 
+            (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
+            (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     } else {
-        snprintf(text, count - 1, "%s #%d: %dV/%dA, %s", channel.getBoardName(), channel.channelIndex + 1, 
-            (int)floor(channel.params->U_MAX), (int)floor(channel.params->I_MAX), channel.getRevisionName());
+        snprintf(text, count - 1, "%s #%d: %dV/%dA, R%dB%d", g_slots[channel.slotIndex].moduleInfo->moduleName, slot.channelIndex + 1, 
+            (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
+            (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     }
 }
 
@@ -1126,7 +1130,7 @@ int getDefaultView(int channelIndex) {
     Channel &channel = Channel::get(channelIndex);
     if (channel.isInstalled()) {
         if (channel.isOk()) {
-            int numChannels = g_modules[g_slots[channel.slotIndex].moduleType].numChannels;
+            int numChannels = g_slots[channel.slotIndex].moduleInfo->numChannels;
             if (numChannels == 1) {
                 if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
                     if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
@@ -1215,7 +1219,7 @@ void data_slot_max_view(data::DataOperationEnum operation, data::Cursor &cursor,
         Channel &channel = Channel::get(cursor.i);
         if (channel.isInstalled()) {
             if (channel.isOk()) {
-                int numChannels = g_modules[g_slots[channel.slotIndex].moduleType].numChannels;
+                int numChannels = g_slots[channel.slotIndex].moduleInfo->numChannels;
                 if (numChannels == 1) {
                     if (persist_conf::devConf.flags.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
                         value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_NUM_ON : PAGE_ID_SLOT_MAX_1CH_NUM_OFF;
@@ -1244,7 +1248,7 @@ int getMinView(int channelIndex) {
     Channel &channel = Channel::get(channelIndex);
     if (channel.isInstalled()) {
         if (channel.isOk()) {
-            int numChannels = g_modules[g_slots[channel.slotIndex].moduleType].numChannels;
+            int numChannels = g_slots[channel.slotIndex].moduleInfo->numChannels;
             if (numChannels == 1) {
                 if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
                     return PAGE_ID_SLOT_MIN_1CH_COUPLED_SERIES;
@@ -1296,7 +1300,7 @@ int getMicroView(int channelIndex) {
     Channel &channel = Channel::get(channelIndex);
     if (channel.isInstalled()) {
         if (channel.isOk()) {
-            int numChannels = g_modules[g_slots[channel.slotIndex].moduleType].numChannels;
+            int numChannels = g_slots[channel.slotIndex].moduleInfo->numChannels;
             if (numChannels == 1) {
                 if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
                     return PAGE_ID_SLOT_MICRO_1CH_COUPLED_SERIES;
@@ -1974,7 +1978,7 @@ void data_channel_protection_ovp_type(data::DataOperationEnum operation, data::C
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        if (g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405) {
+        if (channel.params.features & CH_FEATURE_HW_OVP) {
             ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
             if (page) {
                 value = page->type ? 0 : 1;
@@ -2012,9 +2016,9 @@ void data_channel_protection_ovp_delay(data::DataOperationEnum operation, data::
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel.params->OVP_MIN_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params.OVP_MIN_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel.params->OVP_MAX_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params.OVP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOvpParameters(channel, channel.prot_conf.flags.u_state ? 1 : 0, channel.prot_conf.flags.u_type ? 1 : 0, channel_dispatcher::getUProtectionLevel(channel), value.getFloat());
     }
@@ -2069,9 +2073,9 @@ void data_channel_protection_ocp_delay(data::DataOperationEnum operation, data::
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel.params->OCP_MIN_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params.OCP_MIN_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel.params->OCP_MAX_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params.OCP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOcpParameters(channel, channel.prot_conf.flags.i_state ? 1 : 0, value.getFloat());
     }
@@ -2156,9 +2160,9 @@ void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel.params->OPP_MIN_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params.OPP_MIN_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel.params->OPP_MAX_DELAY, UNIT_SECOND);
+        value = MakeValue(channel.params.OPP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, channel_dispatcher::getPowerProtectionLevel(channel), value.getFloat());
     }
@@ -2326,7 +2330,7 @@ void data_channel_has_advanced_options(data::DataOperationEnum operation, data::
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        value = g_slots[channel.slotIndex].moduleType == MODULE_TYPE_DCP405 ? 1 : 0;
+        value = channel.params.features & (CH_FEATURE_DPROG | CH_FEATURE_RPROG | CH_FEATURE_RPOL) ? 1 : 0;
     }
 }
 
@@ -2340,7 +2344,7 @@ void data_channel_rsense_status(data::DataOperationEnum operation, data::Cursor 
 
 void data_channel_rprog_installed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = g_channel->getFeatures() & CH_FEATURE_RPROG ? 1 : 0;
+        value = g_channel->params.features & CH_FEATURE_RPROG ? 1 : 0;
     }
 }
 
@@ -2356,7 +2360,7 @@ void data_channel_dprog_installed(data::DataOperationEnum operation, data::Curso
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        value = channel.getFeatures() & CH_FEATURE_DPROG ? 1 : 0;
+        value = channel.params.features & CH_FEATURE_DPROG ? 1 : 0;
     }
 }
 
@@ -2710,7 +2714,7 @@ void data_sys_fan_speed(data::DataOperationEnum operation, data::Cursor &cursor,
 void data_channel_board_info_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (cursor.i >= 0 && cursor.i < CH_NUM) {
-            value = data::Value(cursor.i + 1, VALUE_TYPE_CHANNEL_BOARD_INFO_LABEL);
+            value = data::Value(cursor.i, VALUE_TYPE_CHANNEL_BOARD_INFO_LABEL);
         }
     }
 }
@@ -2718,7 +2722,7 @@ void data_channel_board_info_label(data::DataOperationEnum operation, data::Curs
 void data_channel_board_info_revision(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (cursor.i >= 0 && cursor.i < CH_NUM) {
-            value = data::Value(Channel::get(cursor.i).getBoardAndRevisionName());
+            value = Value((int)Channel::get(cursor.i).slotIndex, VALUE_TYPE_SLOT_INFO);
         }
     }
 }

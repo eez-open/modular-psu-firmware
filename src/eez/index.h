@@ -53,10 +53,94 @@ enum DprogState {
     DPROG_STATE_AUTO = 2
 };
 
+enum ChannelFeatures {
+    CH_FEATURE_VOLT = (1 << 0),
+    CH_FEATURE_CURRENT = (1 << 1),
+    CH_FEATURE_POWER = (1 << 2),
+    CH_FEATURE_OE = (1 << 3),
+    CH_FEATURE_DPROG = (1 << 4),
+    CH_FEATURE_RPROG = (1 << 5),
+    CH_FEATURE_RPOL = (1 << 6),
+    CH_FEATURE_CURRENT_DUAL_RANGE = (1 << 7),
+    CH_FEATURE_HW_OVP = (1 << 8),
+    CH_FEATURE_COUPLING = (1 << 9)
+};
+
+struct ChannelParams {
+    float U_MIN;
+    float U_DEF;
+    float U_MAX;
+    float U_MAX_CONF;
+    
+    float U_MIN_STEP;
+    float U_DEF_STEP;
+    float U_MAX_STEP;
+
+    float U_CAL_VAL_MIN;
+    float U_CAL_VAL_MID;
+    float U_CAL_VAL_MAX;
+    float U_CURR_CAL;
+
+    float I_MIN;
+    float I_DEF;
+    float I_MAX;
+    
+    float I_MAX_CONF;
+    float I_MIN_STEP;
+    float I_DEF_STEP;
+    float I_MAX_STEP; 
+    
+    float I_CAL_VAL_MIN;
+    float I_CAL_VAL_MID;
+    float I_CAL_VAL_MAX;
+    float I_VOLT_CAL;
+
+    bool OVP_DEFAULT_STATE;
+    float OVP_MIN_DELAY;
+    float OVP_DEFAULT_DELAY;
+    float OVP_MAX_DELAY;
+
+    bool OCP_DEFAULT_STATE;
+    float OCP_MIN_DELAY;
+    float OCP_DEFAULT_DELAY;
+    float OCP_MAX_DELAY;
+
+    bool OPP_DEFAULT_STATE;
+    float OPP_MIN_DELAY;
+    float OPP_DEFAULT_DELAY;
+    float OPP_MAX_DELAY;
+    float OPP_MIN_LEVEL;
+    float OPP_DEFAULT_LEVEL;
+    float OPP_MAX_LEVEL;
+
+    float PTOT;
+
+    float U_RESOLUTION;
+    float I_RESOLUTION;
+    float I_LOW_RESOLUTION;
+    float P_RESOLUTION;
+
+    float VOLTAGE_GND_OFFSET; // [V], (1375 / 65535) * (40V | 50V)
+    float CURRENT_GND_OFFSET; // [A]
+
+    /// Maximum difference, in percentage, between ADC
+    /// and real value during calibration.
+    float CALIBRATION_DATA_TOLERANCE_PERCENT;
+
+    /// Maximum difference, in percentage, between calculated mid value
+    /// and real mid value during calibration.
+    float CALIBRATION_MID_TOLERANCE_PERCENT;
+
+    /// Returns features present (check ChannelFeatures) in board revision of this channel.
+    uint32_t features;
+};
+
 struct ChannelInterface {
 	int slotIndex;
 
     ChannelInterface(int slotIndex);
+
+    virtual void getParams(int subchannelIndex, ChannelParams &params) = 0;
 
     virtual void init(int subchannelIndex) = 0;
     virtual void reset(int subchannelIndex) = 0;
@@ -108,23 +192,35 @@ struct ChannelInterface {
 #endif
 };
 
-static const uint8_t MODULE_TYPE_NONE = 0;
-static const uint8_t MODULE_TYPE_DCP405 = 1;
-static const uint8_t MODULE_TYPE_DCM220 = 2;
-static const uint8_t MODULE_TYPE_DCP505 = 3;
+static const uint16_t MODULE_TYPE_NONE    = 0;
+static const uint16_t MODULE_TYPE_DCP405  = 405;
+static const uint16_t MODULE_TYPE_DCP405B = 406;
+static const uint16_t MODULE_TYPE_DCP505  = 505;
+static const uint16_t MODULE_TYPE_DCM220  = 220;
+
+static const uint16_t MODULE_REVISION_DCP405_R1B1  = 0x0101;
+static const uint16_t MODULE_REVISION_DCP405_R2B5  = 0x0205;
+static const uint16_t MODULE_REVISION_DCP405_R2B7  = 0x0207;
+
+static const uint16_t MODULE_REVISION_DCP405B_R2B7 = 0x0207;
+
+static const uint16_t MODULE_REVISION_DCP505_R1B3  = 0x0103;
+
+static const uint16_t MODULE_REVISION_DCM220_R2B4  = 0x0204;
 
 struct ModuleInfo {
-    uint16_t moduleId;
-    uint8_t lasestBoardRevision; // TODO should be lasestModuleRevision
+    uint16_t moduleType;
+    const char *moduleName;
+    uint16_t latestModuleRevision;
     uint8_t numChannels;
     ChannelInterface **channelInterfaces;
 };
 
-extern ModuleInfo g_modules[];
+ModuleInfo *getModuleInfo(uint16_t moduleType);
 
 struct SlotInfo {
-    uint8_t moduleType; // MODULE_TYPE_...
-    uint8_t boardRevision; // TODO should be moduleRevision;
+    ModuleInfo *moduleInfo;
+    uint16_t moduleRevision;
     uint8_t channelIndex;
 };
 

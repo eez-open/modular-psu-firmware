@@ -34,17 +34,17 @@ namespace psu {
 #if defined(EEZ_PLATFORM_STM32)
 
 float remapAdcDataToVoltage(Channel& channel, AdcDataType adcDataType, int16_t adcData) {
-    float value = remap((float)adcData, (float)AnalogDigitalConverter::ADC_MIN, channel.params->U_MIN, (float)AnalogDigitalConverter::ADC_MAX, channel.params->U_MAX_CONF);
+    float value = remap((float)adcData, (float)AnalogDigitalConverter::ADC_MIN, channel.params.U_MIN, (float)AnalogDigitalConverter::ADC_MAX, channel.params.U_MAX_CONF);
 #if !defined(EEZ_PLATFORM_SIMULATOR)    
     if (adcDataType == ADC_DATA_TYPE_U_MON || !channel.flags.rprogEnabled) {
-        value -= channel.params->VOLTAGE_GND_OFFSET;
+        value -= channel.params.VOLTAGE_GND_OFFSET;
     }
 #endif
     return value;
 }
 
 float remapAdcDataToCurrent(Channel& channel, AdcDataType adcDataType, int16_t adcData) {
-    float value = remap((float)adcData, (float)AnalogDigitalConverter::ADC_MIN, channel.params->I_MIN, (float)AnalogDigitalConverter::ADC_MAX, channel.getDualRangeMax());
+    float value = remap((float)adcData, (float)AnalogDigitalConverter::ADC_MIN, channel.params.I_MIN, (float)AnalogDigitalConverter::ADC_MAX, channel.getDualRangeMax());
 #if !defined(EEZ_PLATFORM_SIMULATOR)    
     value -= channel.getDualRangeGndOffset();
 #endif

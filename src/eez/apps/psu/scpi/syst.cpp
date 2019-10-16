@@ -461,7 +461,7 @@ scpi_result_t scpi_cmd_systemChannelInformationPowerQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultFloat(context, channel->params->PTOT);
+    SCPI_ResultFloat(context, channel->params.PTOT);
 
     return SCPI_RES_OK;
 }
@@ -473,7 +473,7 @@ scpi_result_t scpi_cmd_systemChannelInformationProgramQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    uint16_t features = channel->getFeatures();
+    uint16_t features = channel->params.features;
 
     char strFeatures[64] = { 0 };
 
@@ -565,13 +565,19 @@ scpi_result_t scpi_cmd_systemChannelInformationOntimeLastQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelModelQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultText(context, channel->getBoardAndRevisionName());
+    if (channel->isInstalled()) {
+        auto &slot = g_slots[channel->slotIndex];
+        char text[100];
+        sprintf(text, "%s_R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+        SCPI_ResultText(context, text);
+    } else {
+        SCPI_ResultText(context, "None");
+    }
 
     return SCPI_RES_OK;
 }

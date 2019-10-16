@@ -29,7 +29,6 @@ namespace profile {
 
 /// Channel binary flags stored in profile.
 struct ChannelFlags {
-    unsigned moduleType: 8;
     unsigned output_enabled : 1;
     unsigned sense_enabled : 1;
     unsigned u_state : 1;
@@ -52,6 +51,8 @@ struct ChannelFlags {
 
 /// Channel parameters stored in profile.
 struct ChannelParameters {
+    uint16_t moduleType;
+    uint16_t moduleRevision;
     ChannelFlags flags;
     float u_set;
     float u_step;
@@ -93,7 +94,7 @@ struct Parameters {
     temperature::ProtectionConfiguration temp_prot[temp_sensor::MAX_NUM_TEMP_SENSORS];
 };
 
-static const uint16_t PROFILE_VERSION = 10;
+static const uint16_t PROFILE_VERSION = 11;
 
 // auto save support
 extern bool g_profileDirty;

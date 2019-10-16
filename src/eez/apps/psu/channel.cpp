@@ -44,41 +44,6 @@ namespace psu {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const char *CH_BOARD_NAMES[] = { "None", "DCP505", "DCP405", "DCP405", "DCM220" };
-static const char *CH_REVISION_NAMES[] = { "None", "R1B3", "R1B1", "R2B5", "R1B1" };
-static const char *CH_BOARD_AND_REVISION_NAMES[] = { "None", "DCP505_R1B3", "DCP405_R1B1", "DCP405_R2B5", "DCM220_R1B1" };
-    
-static uint16_t CH_BOARD_REVISION_FEATURES[] = {
-    // CH_BOARD_REVISION_NONE
-    0,
-
-    // CH_BOARD_REVISION_DCP505_R1B3
-    CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE | CH_FEATURE_DPROG |
-    CH_FEATURE_RPROG | CH_FEATURE_RPOL,
-
-    // CH_BOARD_REVISION_DCP405_R1B1
-    CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE | CH_FEATURE_DPROG |
-    CH_FEATURE_RPROG | CH_FEATURE_RPOL,
-
-    // CH_BOARD_REVISION_DCP405_R2B5
-    CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE | CH_FEATURE_DPROG |
-    CH_FEATURE_RPROG | CH_FEATURE_RPOL,
-
-    // CH_BOARD_REVISION_DCM220_R1B1
-    CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE
-};
-
-static ChannelParams CH_BOARD_REVISION_PARAMS[] = {
-                        // VOLTAGE_GND_OFFSET // CURRENT_GND_OFFSET // CALIBRATION_DATA_TOLERANCE_PERCENT // CALIBRATION_MID_TOLERANCE_PERCENT
-    { CH_PARAMS_NONE,   0,                    0,                    10.0f,                                1.0f                                 }, // CH_BOARD_REVISION_NONE
-    { CH_PARAMS_50V_5A, 1.05f,                0.11f,                10.0f,                                1.0f                                 }, // CH_BOARD_REVISION_DCP505_R1B3
-    { CH_PARAMS_40V_5A, 0.86f,                0.11f,                10.0f,                                1.0f                                 }, // CH_BOARD_REVISION_DCP405_R1B1
-    { CH_PARAMS_40V_5A, 0.86f,                0.11f,                10.0f,                                1.0f                                 }, // CH_BOARD_REVISION_DCP405_R2B5
-    { CH_PARAMS_20V_4A, 0,                    0,                    15.0f,                                2.0f                                 }  // CH_BOARD_REVISION_DCM220_R1B1
-};
-
-////////////////////////////////////////////////////////////////////////////////
-
 int CH_NUM = 0;
 Channel Channel::g_channels[CH_MAX];
 
@@ -217,22 +182,27 @@ float Channel::Simulator::getVoltProgExt() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Channel::set(uint8_t slotIndex_, uint8_t subchannelIndex_, uint8_t boardRevision_) {
+void Channel::set(uint8_t slotIndex_, uint8_t subchannelIndex_) {
+    auto slot = g_slots[slotIndex_];
+
 	slotIndex = slotIndex_;
-    boardRevision = boardRevision_;
     subchannelIndex = subchannelIndex_;
 
-    channelInterface = g_modules[g_slots[slotIndex].moduleType].channelInterfaces ? g_modules[g_slots[slotIndex].moduleType].channelInterfaces[slotIndex] : nullptr;
+    channelInterface = slot.moduleInfo->channelInterfaces ? slot.moduleInfo->channelInterfaces[slotIndex] : nullptr;
 
-    params = &CH_BOARD_REVISION_PARAMS[boardRevision];
+    if (!channelInterface) {
+        return;
+    }
 
-    u.min = roundChannelValue(UNIT_VOLT, params->U_MIN);
-    u.max = roundChannelValue(UNIT_VOLT, params->U_MAX);
-    u.def = roundChannelValue(UNIT_VOLT, params->U_DEF);
+    channelInterface->getParams(subchannelIndex, params);
 
-    i.min = roundChannelValue(UNIT_AMPER, params->I_MIN);
-    i.max = roundChannelValue(UNIT_AMPER, params->I_MAX);
-    i.def = roundChannelValue(UNIT_AMPER, params->I_DEF);
+    u.min = roundChannelValue(UNIT_VOLT, params.U_MIN);
+    u.max = roundChannelValue(UNIT_VOLT, params.U_MAX);
+    u.def = roundChannelValue(UNIT_VOLT, params.U_DEF);
+
+    i.min = roundChannelValue(UNIT_AMPER, params.I_MIN);
+    i.max = roundChannelValue(UNIT_AMPER, params.I_MAX);
+    i.def = roundChannelValue(UNIT_AMPER, params.I_DEF);
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     simulator.load_enabled = true;
@@ -383,7 +353,7 @@ void Channel::onPowerDown() {
 
     outputEnable(false);
     doRemoteSensingEnable(false);
-    if (getFeatures() & CH_FEATURE_RPROG) {
+    if (params.features & CH_FEATURE_RPROG) {
         doRemoteProgrammingEnable(false);
     }
 
@@ -430,7 +400,7 @@ void Channel::reset() {
     // [SOUR[n]]:VOLT:SENS INTernal
     doRemoteSensingEnable(false);
 
-    if (getFeatures() & CH_FEATURE_RPROG) {
+    if (params.features & CH_FEATURE_RPROG) {
         // [SOUR[n]]:VOLT:PROG INTernal
         doRemoteProgrammingEnable(false);
     }
@@ -448,11 +418,11 @@ void Channel::reset() {
     // [SOUR[n]]:CURR:STEP
     // [SOUR[n]]:VOLT
     // [SOUR[n]]:VOLT:STEP -> set all to default
-    u.init(params->U_MIN, params->U_DEF_STEP, u.max);
-    i.init(params->I_MIN, params->I_DEF_STEP, i.max);
+    u.init(params.U_MIN, params.U_DEF_STEP, u.max);
+    i.init(params.I_MIN, params.I_DEF_STEP, i.max);
 
     maxCurrentLimitCause = MAX_CURRENT_LIMIT_CAUSE_NONE;
-    p_limit = roundChannelValue(UNIT_WATT, params->PTOT);
+    p_limit = roundChannelValue(UNIT_WATT, params.PTOT);
 
     resetHistory();
 
@@ -464,8 +434,8 @@ void Channel::reset() {
     flags.currentTriggerMode = TRIGGER_MODE_FIXED;
     flags.triggerOutputState = 1;
     flags.triggerOnListStop = TRIGGER_ON_LIST_STOP_OUTPUT_OFF;
-    trigger::setVoltage(*this, params->U_MIN);
-    trigger::setCurrent(*this, params->I_MIN);
+    trigger::setVoltage(*this, params.U_MIN);
+    trigger::setCurrent(*this, params.I_MIN);
     list::resetChannelList(*this);
 
 #ifdef EEZ_PLATFORM_SIMULATOR
@@ -491,43 +461,43 @@ void Channel::clearCalibrationConf() {
     cal_conf.flags.i_cal_params_exists_range_high = 0;
     cal_conf.flags.i_cal_params_exists_range_low = 0;
 
-    cal_conf.u.min.dac = cal_conf.u.min.val = cal_conf.u.min.adc = params->U_CAL_VAL_MIN;
-    cal_conf.u.mid.dac = cal_conf.u.mid.val = cal_conf.u.mid.adc = (params->U_CAL_VAL_MIN + params->U_CAL_VAL_MAX) / 2;
-    cal_conf.u.max.dac = cal_conf.u.max.val = cal_conf.u.max.adc = params->U_CAL_VAL_MAX;
-    cal_conf.u.minPossible = params->U_MIN;
-    cal_conf.u.maxPossible = params->U_MAX;
+    cal_conf.u.min.dac = cal_conf.u.min.val = cal_conf.u.min.adc = params.U_CAL_VAL_MIN;
+    cal_conf.u.mid.dac = cal_conf.u.mid.val = cal_conf.u.mid.adc = (params.U_CAL_VAL_MIN + params.U_CAL_VAL_MAX) / 2;
+    cal_conf.u.max.dac = cal_conf.u.max.val = cal_conf.u.max.adc = params.U_CAL_VAL_MAX;
+    cal_conf.u.minPossible = params.U_MIN;
+    cal_conf.u.maxPossible = params.U_MAX;
 
-    cal_conf.i[0].min.dac = cal_conf.i[0].min.val = cal_conf.i[0].min.adc = params->I_CAL_VAL_MIN;
-    cal_conf.i[0].mid.dac = cal_conf.i[0].mid.val = cal_conf.i[0].mid.adc = (params->I_CAL_VAL_MIN + params->I_CAL_VAL_MAX) / 2;
-    cal_conf.i[0].max.dac = cal_conf.i[0].max.val = cal_conf.i[0].max.adc = params->I_CAL_VAL_MAX;
-    cal_conf.i[0].minPossible = params->I_MIN;
-    cal_conf.i[0].maxPossible = params->I_MAX;
+    cal_conf.i[0].min.dac = cal_conf.i[0].min.val = cal_conf.i[0].min.adc = params.I_CAL_VAL_MIN;
+    cal_conf.i[0].mid.dac = cal_conf.i[0].mid.val = cal_conf.i[0].mid.adc = (params.I_CAL_VAL_MIN + params.I_CAL_VAL_MAX) / 2;
+    cal_conf.i[0].max.dac = cal_conf.i[0].max.val = cal_conf.i[0].max.adc = params.I_CAL_VAL_MAX;
+    cal_conf.i[0].minPossible = params.I_MIN;
+    cal_conf.i[0].maxPossible = params.I_MAX;
 
-    cal_conf.i[1].min.dac = cal_conf.i[1].min.val = cal_conf.i[1].min.adc = params->I_CAL_VAL_MIN / 100;
-    cal_conf.i[1].mid.dac = cal_conf.i[1].mid.val = cal_conf.i[1].mid.adc = (params->I_CAL_VAL_MIN + params->I_CAL_VAL_MAX) / 2 / 100;
-    cal_conf.i[1].max.dac = cal_conf.i[1].max.val = cal_conf.i[1].max.adc = params->I_CAL_VAL_MAX / 100;
-    cal_conf.i[1].minPossible = params->I_MIN;
-    cal_conf.i[1].maxPossible = params->I_MAX / 100;
+    cal_conf.i[1].min.dac = cal_conf.i[1].min.val = cal_conf.i[1].min.adc = params.I_CAL_VAL_MIN / 100;
+    cal_conf.i[1].mid.dac = cal_conf.i[1].mid.val = cal_conf.i[1].mid.adc = (params.I_CAL_VAL_MIN + params.I_CAL_VAL_MAX) / 2 / 100;
+    cal_conf.i[1].max.dac = cal_conf.i[1].max.val = cal_conf.i[1].max.adc = params.I_CAL_VAL_MAX / 100;
+    cal_conf.i[1].minPossible = params.I_MIN;
+    cal_conf.i[1].maxPossible = params.I_MAX / 100;
 
     strcpy(cal_conf.calibration_date, "");
     strcpy(cal_conf.calibration_remark, CALIBRATION_REMARK_INIT);
 }
 
 void Channel::clearProtectionConf() {
-    prot_conf.flags.u_state = params->OVP_DEFAULT_STATE;
-    if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+    prot_conf.flags.u_state = params.OVP_DEFAULT_STATE;
+    if (params.features & CH_FEATURE_HW_OVP) {
         prot_conf.flags.u_type = 1; // HW
     } else {
         prot_conf.flags.u_type = 0; // SW
     }
-    prot_conf.flags.i_state = params->OCP_DEFAULT_STATE;
-    prot_conf.flags.p_state = params->OPP_DEFAULT_STATE;
+    prot_conf.flags.i_state = params.OCP_DEFAULT_STATE;
+    prot_conf.flags.p_state = params.OPP_DEFAULT_STATE;
 
-    prot_conf.u_delay = params->OVP_DEFAULT_DELAY;
+    prot_conf.u_delay = params.OVP_DEFAULT_DELAY;
     prot_conf.u_level = u.max;
-    prot_conf.i_delay = params->OCP_DEFAULT_DELAY;
-    prot_conf.p_delay = params->OPP_DEFAULT_DELAY;
-    prot_conf.p_level = params->OPP_DEFAULT_LEVEL;
+    prot_conf.i_delay = params.OCP_DEFAULT_DELAY;
+    prot_conf.p_delay = params.OPP_DEFAULT_DELAY;
+    prot_conf.p_level = params.OPP_DEFAULT_LEVEL;
 
     temperature::sensors[temp_sensor::CH1 + channelIndex].prot_conf.state = OTP_CH_DEFAULT_STATE;
     temperature::sensors[temp_sensor::CH1 + channelIndex].prot_conf.level = OTP_CH_DEFAULT_LEVEL;
@@ -545,7 +515,7 @@ bool Channel::test() {
 
     outputEnable(false);
     doRemoteSensingEnable(false);
-    if (getFeatures() & CH_FEATURE_RPROG) {
+    if (params.features & CH_FEATURE_RPROG) {
         doRemoteProgrammingEnable(false);
     }
 
@@ -558,7 +528,7 @@ bool Channel::test() {
 }
 
 bool Channel::isInstalled() {
-    return boardRevision != CH_BOARD_REVISION_NONE;
+    return channelInterface != nullptr;
 }
 
 bool Channel::isPowerOk() {
@@ -591,7 +561,7 @@ void Channel::tick(uint32_t tick_usec) {
 
     channelInterface->tick(subchannelIndex, tick_usec);
 
-    if (getFeatures() & CH_FEATURE_RPOL) {
+    if (params.features & CH_FEATURE_RPOL) {
         unsigned rpol = 0;
             
         rpol = channelInterface->getRPol(subchannelIndex);
@@ -642,7 +612,7 @@ float Channel::getValuePrecision(Unit unit, float value) const {
 }
 
 float Channel::getVoltageResolution() const {
-    float precision = params->U_RESOLUTION; // 5 mV;
+    float precision = params.U_RESOLUTION; // 5 mV;
 
     if (calibration::isEnabled()) {
         precision /= 10;
@@ -652,11 +622,11 @@ float Channel::getVoltageResolution() const {
 }
 
 float Channel::getCurrentResolution(float value) const {
-    float precision = params->I_RESOLUTION; // 0.5mA
+    float precision = params.I_RESOLUTION; // 0.5mA
 
     if (hasSupportForCurrentDualRange()) {
         if ((!isNaN(value) && value <= 0.05f && isMicroAmperAllowed()) || flags.currentCurrentRange == CURRENT_RANGE_LOW) {
-            precision = params->I_LOW_RESOLUTION; // 5uA
+            precision = params.I_LOW_RESOLUTION; // 5uA
         }
     }
     
@@ -668,7 +638,7 @@ float Channel::getCurrentResolution(float value) const {
 }
 
 float Channel::getPowerResolution() const {
-    return params->P_RESOLUTION; // 1 mW;
+    return params.P_RESOLUTION; // 1 mW;
 }
 
 bool Channel::isMicroAmperAllowed() const {
@@ -869,7 +839,7 @@ void Channel::update() {
     setCurrent(i.set);
     doOutputEnable(flags.outputEnabled);
     doRemoteSensingEnable(flags.senseEnabled);
-    if (getFeatures() & CH_FEATURE_RPROG) {
+    if (params.features & CH_FEATURE_RPROG) {
         doRemoteProgrammingEnable(flags.rprogEnabled);
     }
 
@@ -892,37 +862,37 @@ void Channel::doCalibrationEnable(bool enable) {
     flags._calEnabled = enable;
 
     if (enable) {
-        u.min = roundChannelValue(UNIT_VOLT, MAX(cal_conf.u.minPossible, params->U_MIN));
+        u.min = roundChannelValue(UNIT_VOLT, MAX(cal_conf.u.minPossible, params.U_MIN));
         if (u.limit < u.min)
             u.limit = u.min;
         if (u.set < u.min)
             setVoltage(u.min);
 
-        u.max = roundChannelValue(UNIT_VOLT, MIN(cal_conf.u.maxPossible, params->U_MAX));
+        u.max = roundChannelValue(UNIT_VOLT, MIN(cal_conf.u.maxPossible, params.U_MAX));
         if (u.limit > u.max)
             u.limit = u.max;
         if (u.set > u.max)
             setVoltage(u.max);
 
-        i.min = roundChannelValue(UNIT_AMPER, MAX(cal_conf.i[0].minPossible, params->I_MIN));
-        if (i.min < params->I_MIN)
-            i.min = params->I_MIN;
+        i.min = roundChannelValue(UNIT_AMPER, MAX(cal_conf.i[0].minPossible, params.I_MIN));
+        if (i.min < params.I_MIN)
+            i.min = params.I_MIN;
         if (i.limit < i.min)
             i.limit = i.min;
         if (i.set < i.min)
             setCurrent(i.min);
 
-        i.max = roundChannelValue(UNIT_AMPER, MIN(cal_conf.i[0].maxPossible, params->I_MAX));
+        i.max = roundChannelValue(UNIT_AMPER, MIN(cal_conf.i[0].maxPossible, params.I_MAX));
         if (i.limit > i.max)
             i.limit = i.max;
         if (i.set > i.max)
             setCurrent(i.max);
     } else {
-        u.min = roundChannelValue(UNIT_VOLT, params->U_MIN);
-        u.max = roundChannelValue(UNIT_VOLT, params->U_MAX);
+        u.min = roundChannelValue(UNIT_VOLT, params.U_MIN);
+        u.max = roundChannelValue(UNIT_VOLT, params.U_MAX);
 
-        i.min = roundChannelValue(UNIT_AMPER, params->I_MIN);
-        i.max = roundChannelValue(UNIT_AMPER, params->I_MAX);
+        i.min = roundChannelValue(UNIT_AMPER, params.I_MIN);
+        i.max = roundChannelValue(UNIT_AMPER, params.I_MAX);
     }
 
     u.def = roundChannelValue(UNIT_VOLT, u.min);
@@ -993,7 +963,7 @@ float Channel::getCalibratedVoltage(float value) {
     }
 
 #if !defined(EEZ_PLATFORM_SIMULATOR)
-    value += params->VOLTAGE_GND_OFFSET;
+    value += params.VOLTAGE_GND_OFFSET;
 #endif
 
     return value;
@@ -1007,8 +977,8 @@ void Channel::doSetVoltage(float value) {
         prot_conf.u_level = u.set;
     }
 
-    if (params->U_MAX != params->U_MAX_CONF) {
-        value = remap(value, 0, 0, params->U_MAX_CONF, params->U_MAX);
+    if (params.U_MAX != params.U_MAX_CONF) {
+        value = remap(value, 0, 0, params.U_MAX_CONF, params.U_MAX);
     }
 
 	value = getCalibratedVoltage(value);
@@ -1040,8 +1010,8 @@ void Channel::doSetCurrent(float value) {
     i.set = value;
     i.mon_dac = 0;
 
-    if (params->I_MAX != params->I_MAX_CONF) {
-        value = remap(value, 0, 0, params->I_MAX_CONF, params->I_MAX);
+    if (params.I_MAX != params.I_MAX_CONF) {
+        value = remap(value, 0, 0, params.I_MAX_CONF, params.I_MAX);
     }
 
     if (isCurrentCalibrationEnabled()) {
@@ -1130,22 +1100,6 @@ const char *Channel::getCvModeStr() {
         return "UR";
 }
 
-const char *Channel::getBoardName() {
-    return CH_BOARD_NAMES[boardRevision];
-}
-
-const char *Channel::getRevisionName() {
-    return CH_REVISION_NAMES[boardRevision];
-}
-
-const char *Channel::getBoardAndRevisionName() {
-    return CH_BOARD_AND_REVISION_NAMES[boardRevision];
-}
-
-uint16_t Channel::getFeatures() {
-    return CH_BOARD_REVISION_FEATURES[boardRevision];
-}
-
 float Channel::getVoltageLimit() const {
     return u.limit;
 }
@@ -1227,7 +1181,7 @@ float Channel::getPowerLimit() const {
 }
 
 float Channel::getPowerMaxLimit() const {
-    return params->PTOT;
+    return params.PTOT;
 }
 
 void Channel::setPowerLimit(float limit) {
@@ -1306,13 +1260,12 @@ float Channel::getDualRangeGndOffset() {
 #ifdef EEZ_PLATFORM_SIMULATOR
     return 0;
 #else
-    return flags.currentCurrentRange == CURRENT_RANGE_LOW ? (params->CURRENT_GND_OFFSET / 100) : params->CURRENT_GND_OFFSET;
+    return flags.currentCurrentRange == CURRENT_RANGE_LOW ? (params.CURRENT_GND_OFFSET / 100) : params.CURRENT_GND_OFFSET;
 #endif
 }
 
 bool Channel::hasSupportForCurrentDualRange() const {
-    return (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) && 
-        (boardRevision == CH_BOARD_REVISION_DCP405_R1B1 || boardRevision == CH_BOARD_REVISION_DCP405_R2B5);
+    return params.features & CH_FEATURE_CURRENT_DUAL_RANGE ? true : false;
 }
 
 void Channel::setCurrentRangeSelectionMode(CurrentRangeSelectionMode mode) {
@@ -1342,7 +1295,7 @@ void Channel::enableAutoSelectCurrentRange(bool enable) {
 }
 
 float Channel::getDualRangeMax() {
-    return flags.currentCurrentRange == CURRENT_RANGE_LOW ? (params->I_MAX / 100) : params->I_MAX;
+    return flags.currentCurrentRange == CURRENT_RANGE_LOW ? (params.I_MAX / 100) : params.I_MAX;
 }
 
 void Channel::setCurrentRange(uint8_t currentCurrentRange) {

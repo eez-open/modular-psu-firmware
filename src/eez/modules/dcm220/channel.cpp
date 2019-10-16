@@ -148,6 +148,70 @@ struct Channel : ChannelInterface {
 #endif
     }
 
+	void getParams(int subchannelIndex, ChannelParams &params) {
+		params.U_MIN = 0.0f;
+		params.U_DEF = 0.0f;
+		params.U_MAX = 20.0f;
+		params.U_MAX_CONF = 20.0f;
+
+		params.U_MIN_STEP = 0.01f;
+		params.U_DEF_STEP = 0.1f;
+		params.U_MAX_STEP = 5.0f;
+
+		params.U_CAL_VAL_MIN = 0.75f;
+		params.U_CAL_VAL_MID = 10.0f;
+		params.U_CAL_VAL_MAX = 18.0f;
+		params.U_CURR_CAL = 20.0f;
+
+		params.I_MIN = 0.0f;
+		params.I_DEF = 0.0f;
+		params.I_MAX = 4.0f;
+		params.I_MAX_CONF = 4.0f;
+
+		params.I_MIN_STEP = 0.01f;
+		params.I_DEF_STEP = 0.01f;
+		params.I_MAX_STEP = 1.0f; 
+
+		params.I_CAL_VAL_MIN = 0.05f;
+		params.I_CAL_VAL_MID = 1.95f;
+		params.I_CAL_VAL_MAX = 3.8f;
+		params.I_VOLT_CAL = 0.5f;
+
+		params.OVP_DEFAULT_STATE = false;
+		params.OVP_MIN_DELAY = 0.0f;
+		params.OVP_DEFAULT_DELAY = 0.005f;
+		params.OVP_MAX_DELAY = 10.0f;
+
+		params.OCP_DEFAULT_STATE = false;
+		params.OCP_MIN_DELAY = 0.0f;
+		params.OCP_DEFAULT_DELAY = 0.02f;
+		params.OCP_MAX_DELAY = 10.0f;
+
+		params.OPP_DEFAULT_STATE = true;
+		params.OPP_MIN_DELAY = 1.0f;
+		params.OPP_DEFAULT_DELAY = 10.0f;
+		params.OPP_MAX_DELAY = 300.0f;
+		params.OPP_MIN_LEVEL = 0.0f;
+		params.OPP_DEFAULT_LEVEL = 80.0f;
+		params.OPP_MAX_LEVEL = 80.0f;
+
+		params.PTOT = 80.0f;
+
+		params.U_RESOLUTION = 0.01f;
+		params.I_RESOLUTION = 0.02f;
+		params.I_LOW_RESOLUTION = 0;
+		params.P_RESOLUTION = 0.001f;
+
+		params.VOLTAGE_GND_OFFSET = 0;
+		params.CURRENT_GND_OFFSET = 0;
+
+		params.CALIBRATION_DATA_TOLERANCE_PERCENT = 15.0f;
+
+		params.CALIBRATION_MID_TOLERANCE_PERCENT = 2.0f;
+
+		params.features = CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE;
+	}
+
 #if defined(EEZ_PLATFORM_STM32)
     bool isCrcOk;
 
@@ -297,11 +361,11 @@ struct Channel : ChannelInterface {
         	int offset = subchannelIndex * 2;
 
         	uint16_t uMonAdc = inputSetValues[offset];
-        	float uMon = remap(uMonAdc, (float)ADC_MIN, channel.params->U_MIN, (float)ADC_MAX, channel.params->U_MAX);
+        	float uMon = remap(uMonAdc, (float)ADC_MIN, channel.params.U_MIN, (float)ADC_MAX, channel.params.U_MAX);
         	channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon);
 
         	uint16_t iMonAdc = inputSetValues[offset + 1];
-        	float iMon = remap(iMonAdc, (float)ADC_MIN, channel.params->I_MIN, (float)ADC_MAX, channel.params->I_MAX);
+        	float iMon = remap(iMonAdc, (float)ADC_MIN, channel.params.I_MIN, (float)ADC_MAX, channel.params.I_MAX);
         	channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon);
         }
 #endif
@@ -397,14 +461,14 @@ struct Channel : ChannelInterface {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        uSet[subchannelIndex] = remap(clamp((float)value, (float)DAC_MIN, (float)DAC_MAX), (float)DAC_MIN, channel.params->U_MIN, (float)DAC_MAX, channel.params->U_MAX);
+        uSet[subchannelIndex] = remap(clamp((float)value, (float)DAC_MIN, (float)DAC_MAX), (float)DAC_MIN, channel.params.U_MIN, (float)DAC_MAX, channel.params.U_MAX);
 #endif
 	}
 
 	void setDacVoltageFloat(int subchannelIndex, float value) {
 #if defined(EEZ_PLATFORM_STM32)
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        value = remap(value, channel.params->U_MIN, (float)DAC_MIN, channel.params->U_MAX, (float)DAC_MAX);
+        value = remap(value, channel.params.U_MIN, (float)DAC_MIN, channel.params.U_MAX, (float)DAC_MAX);
         uSet[subchannelIndex] = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
 #endif
 
@@ -421,14 +485,14 @@ struct Channel : ChannelInterface {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        uSet[subchannelIndex] = remap(clamp((float)value, (float)DAC_MIN, (float)DAC_MAX), (float)DAC_MIN, channel.params->I_MIN, (float)DAC_MAX, channel.params->I_MAX);
+        uSet[subchannelIndex] = remap(clamp((float)value, (float)DAC_MIN, (float)DAC_MAX), (float)DAC_MIN, channel.params.I_MIN, (float)DAC_MAX, channel.params.I_MAX);
 #endif
     }
 
 	void setDacCurrentFloat(int subchannelIndex, float value) {
 #if defined(EEZ_PLATFORM_STM32)
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        value = remap(value, channel.params->I_MIN, (float)DAC_MIN, channel.params->I_MAX, (float)DAC_MAX);
+        value = remap(value, channel.params.I_MIN, (float)DAC_MIN, channel.params.I_MAX, (float)DAC_MAX);
         iSet[subchannelIndex] = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
 #endif
 

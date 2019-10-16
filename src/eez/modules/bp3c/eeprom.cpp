@@ -223,12 +223,12 @@ bool test() {
     return g_testResult != TEST_FAILED;
 }
 
-void writeModuleType(uint8_t slotIndex, uint8_t moduleType) {
-    uint8_t buffer[] = {
-        (uint8_t)(g_modules[moduleType].moduleId & 0xFF),
-        (uint8_t)((g_modules[moduleType].moduleId >> 8) & 0xFF),
+void writeModuleType(uint8_t slotIndex, uint16_t moduleType) {
+    uint16_t buffer[] = {
+        moduleType,
+        getModuleInfo(moduleType)->latestModuleRevision
     };
-    write(slotIndex, buffer, 2, 0);
+    write(slotIndex, (uint8_t *)buffer, 4, 0);
 }
 
 } // namespace eeprom

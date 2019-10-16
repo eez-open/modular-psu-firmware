@@ -934,9 +934,9 @@ void themesEnumDefinition(data::DataOperationEnum operation, data::Cursor &curso
 }
 
 
-void onSetSelectedThemeIndex(uint8_t value) {
+void onSetSelectedThemeIndex(uint16_t value) {
     popPage();
-	persist_conf::devConf2.selectedThemeIndex = value;
+	persist_conf::devConf2.selectedThemeIndex = (uint8_t)value;
 	persist_conf::saveDevice2();
     mcu::display::onThemeChanged();
 	refreshScreen();
@@ -1021,7 +1021,7 @@ void action_user_switch_clicked() {
 
 static int g_slotIndex;
 
-void onSetModuleType(uint8_t moduleType) {
+void onSetModuleType(uint16_t moduleType) {
     popPage();
 
     bp3c::eeprom::writeModuleType(g_slotIndex, moduleType);
@@ -1035,7 +1035,7 @@ void onSetModuleType(uint8_t moduleType) {
 
 void selectSlot(int slotIndex) {
     g_slotIndex = slotIndex;
-    pushSelectFromEnumPage(g_moduleTypeEnumDefinition, g_slots[slotIndex].moduleType, NULL, onSetModuleType);
+    pushSelectFromEnumPage(g_moduleTypeEnumDefinition, g_slots[slotIndex].moduleInfo->moduleType, NULL, onSetModuleType);
 }
 
 void action_front_panel_select_slot1() {

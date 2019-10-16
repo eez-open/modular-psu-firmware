@@ -46,7 +46,7 @@ option.
 #define MIN_POWER_UP_DELAY 5
 
 /// Default calibration password.
-#define CALIBRATION_PASSWORD_DEFAULT "eezpsu"
+#define CALIBRATION_PASSWORD_DEFAULT "eezbb3"
 
 /// Is OTP enabled by default?
 #define OTP_AUX_DEFAULT_STATE 1

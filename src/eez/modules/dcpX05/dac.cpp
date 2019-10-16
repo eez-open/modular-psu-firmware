@@ -77,7 +77,7 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
     channel.calibrationEnableNoEvent(false);
 
     // disable OE on channel
-    if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+    if (channel.params.features & CH_FEATURE_HW_OVP) {
         // OVP has to be disabled before OE deactivation
         ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
     }
@@ -150,7 +150,7 @@ void DigitalAnalogConverter::setVoltage(float value) {
     Channel &channel = Channel::getBySlotIndex(slotIndex);
 
 #if defined(EEZ_PLATFORM_STM32)
-    set(DATA_BUFFER_B, remap(value, channel.params->U_MIN, (float)DAC_MIN, channel.params->U_MAX, (float)DAC_MAX));
+    set(DATA_BUFFER_B, remap(value, channel.params.U_MIN, (float)DAC_MIN, channel.params.U_MAX, (float)DAC_MAX));
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -165,7 +165,7 @@ void DigitalAnalogConverter::setDacVoltage(uint16_t value) {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
     Channel &channel = Channel::getBySlotIndex(slotIndex);
-    g_uSet[channel.channelIndex] = remap(value, (float)DAC_MIN, channel.params->U_MIN, (float)DAC_MAX, channel.params->U_MAX);
+    g_uSet[channel.channelIndex] = remap(value, (float)DAC_MIN, channel.params.U_MIN, (float)DAC_MAX, channel.params.U_MAX);
 #endif
 }
 
@@ -173,7 +173,7 @@ void DigitalAnalogConverter::setCurrent(float value) {
     Channel &channel = Channel::getBySlotIndex(slotIndex);
 
 #if defined(EEZ_PLATFORM_STM32)
-    set(DATA_BUFFER_A, remap(value, channel.params->I_MIN, (float)DAC_MIN, channel.getDualRangeMax(), (float)DAC_MAX));
+    set(DATA_BUFFER_A, remap(value, channel.params.I_MIN, (float)DAC_MIN, channel.getDualRangeMax(), (float)DAC_MAX));
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -188,7 +188,7 @@ void DigitalAnalogConverter::setDacCurrent(uint16_t value) {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
     Channel &channel = Channel::getBySlotIndex(slotIndex);
-    g_iSet[channel.channelIndex] = remap(value, (float)DAC_MIN, channel.params->I_MIN, (float)DAC_MAX, channel.getDualRangeMax());
+    g_iSet[channel.channelIndex] = remap(value, (float)DAC_MIN, channel.params.I_MIN, (float)DAC_MAX, channel.getDualRangeMax());
 #endif
 }
 

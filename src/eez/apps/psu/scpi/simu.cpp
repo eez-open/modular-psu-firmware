@@ -179,7 +179,7 @@ scpi_result_t scpi_cmd_simulatorVoltageProgramExternal(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!(channel->getFeatures() & CH_FEATURE_RPROG)) {
+    if (!(channel->params.features & CH_FEATURE_RPROG)) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
@@ -201,7 +201,7 @@ scpi_result_t scpi_cmd_simulatorVoltageProgramExternalQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!(channel->getFeatures() & CH_FEATURE_RPROG)) {
+    if (!(channel->params.features & CH_FEATURE_RPROG)) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
@@ -256,7 +256,7 @@ scpi_result_t scpi_cmd_simulatorRpol(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel->getFeatures() & CH_FEATURE_RPOL) {
+    if (channel->params.features & CH_FEATURE_RPOL) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
@@ -278,7 +278,7 @@ scpi_result_t scpi_cmd_simulatorRpolQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel->getFeatures() & CH_FEATURE_RPOL) {
+    if (channel->params.features & CH_FEATURE_RPOL) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }

@@ -57,7 +57,7 @@ class SysSettingsDateTimePage : public SetPage {
     int16_t origTimeZone;
     datetime::DstRule origDstRule;
 
-    static void onDstRuleSet(uint8_t value);
+    static void onDstRuleSet(uint16_t value);
 
 #if OPTION_ETHERNET
     enum {
@@ -256,7 +256,7 @@ class SysSettingsTriggerPage : public SetPage {
     float m_delayOrig;
     bool m_initiateContinuouslyOrig;
 
-    static void onTriggerSourceSet(uint8_t value);
+    static void onTriggerSourceSet(uint16_t value);
     static void onDelaySet(float value);
 };
 
@@ -279,7 +279,7 @@ class SysSettingsIOPinsPage : public SetPage {
     io_pins::Polarity m_polarityOrig[NUM_IO_PINS];
     io_pins::Function m_functionOrig[NUM_IO_PINS];
 
-    static void onFunctionSet(uint8_t value);
+    static void onFunctionSet(uint16_t value);
 };
 
 class SysSettingsSerialPage : public SetPage {
@@ -301,7 +301,7 @@ class SysSettingsSerialPage : public SetPage {
     uint8_t m_baudIndexOrig;
     serial::Parity m_parityOrig;
 
-    static void onParitySet(uint8_t value);
+    static void onParitySet(uint16_t value);
 };
 
 class SysSettingsTrackingPage : public SetPage {

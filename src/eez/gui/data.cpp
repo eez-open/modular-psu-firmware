@@ -194,11 +194,28 @@ bool compare_SLOT_INFO_value(const Value &a, const Value &b) {
 
 void SLOT_INFO_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
-    psu::Channel &channel = psu::Channel::get(slotIndex);
+    auto &slot = g_slots[slotIndex];
+    psu::Channel &channel = psu::Channel::get(slot.channelIndex);
     if (channel.isInstalled()) {
-        snprintf(text, count - 1, "%s %s", channel.getBoardName(), channel.getRevisionName());
+        snprintf(text, count - 1, "%s R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     } else {
         strncpy(text, "Not installed", count - 1);
+    }
+    text[count - 1] = 0;
+}
+
+bool compare_SLOT_INFO2_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void SLOT_INFO2_value_to_text(const Value &value, char *text, int count) {
+    int slotIndex = value.getInt();
+    auto &slot = g_slots[slotIndex];
+    psu::Channel &channel = psu::Channel::get(slot.channelIndex);
+    if (channel.isInstalled()) {
+        snprintf(text, count - 1, "%s_R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+    } else {
+        strncpy(text, "None", count - 1);
     }
     text[count - 1] = 0;
 }
@@ -232,7 +249,7 @@ static CompareValueFunction g_compareBuiltInValueFunctions[] = {
     compare_NONE_value,       compare_INT_value,  compare_FLOAT_value,
     compare_STR_value,        compare_ENUM_value, compare_SCPI_ERROR_value,
     compare_PERCENTAGE_value, compare_SIZE_value, compare_POINTER_value,
-    compare_PAGE_INFO_value,  compare_MASTER_INFO_value, compare_SLOT_INFO_value,
+    compare_PAGE_INFO_value,  compare_MASTER_INFO_value, compare_SLOT_INFO_value, compare_SLOT_INFO2_value,
     compare_TEST_RESULT_value
 };
 
@@ -240,7 +257,7 @@ static ValueToTextFunction g_builtInValueToTextFunctions[] = {
     NONE_value_to_text,       INT_value_to_text,  FLOAT_value_to_text,
     STR_value_to_text,        ENUM_value_to_text, SCPI_ERROR_value_to_text,
     PERCENTAGE_value_to_text, SIZE_value_to_text, POINTER_value_to_text,
-    PAGE_INFO_value_to_text,  MASTER_INFO_value_to_text, SLOT_INFO_value_to_text,
+    PAGE_INFO_value_to_text,  MASTER_INFO_value_to_text, SLOT_INFO_value_to_text, SLOT_INFO2_value_to_text,
     TEST_RESULT_value_to_text
 };
 
@@ -513,14 +530,6 @@ void data_async_operation_throbber(data::DataOperationEnum operation, data::Curs
 void data_slots(DataOperationEnum operation, Cursor &cursor, Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
         value = CH_MAX;
-    }
-}
-
-void data_slot_module_type(DataOperationEnum operation, Cursor &cursor, Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        int slotIndex = cursor.i;
-        assert(slotIndex >= 0 && slotIndex < CH_MAX);
-        value = g_slots[slotIndex].moduleType;
     }
 }
 

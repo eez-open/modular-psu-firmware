@@ -38,7 +38,7 @@ class ChSettingsAdvRangesPage : public Page {
     void toggleAutoRanging();
 
   private:
-    static void onModeSet(uint8_t value);
+    static void onModeSet(uint16_t value);
 };
 
 class ChSettingsAdvViewPage : public SetPage {
@@ -62,10 +62,10 @@ class ChSettingsAdvViewPage : public SetPage {
     uint8_t origDisplayValue2;
     float origYTViewRate;
 
-    static bool isDisabledDisplayValue1(uint8_t value);
-    static void onDisplayValue1Set(uint8_t value);
-    static bool isDisabledDisplayValue2(uint8_t value);
-    static void onDisplayValue2Set(uint8_t value);
+    static bool isDisabledDisplayValue1(uint16_t value);
+    static void onDisplayValue1Set(uint16_t value);
+    static bool isDisabledDisplayValue2(uint16_t value);
+    static void onDisplayValue2Set(uint16_t value);
     static void onYTViewRateSet(float value);
 };
 

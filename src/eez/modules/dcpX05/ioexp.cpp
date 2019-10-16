@@ -59,18 +59,27 @@ static const uint8_t DCP505_REG_VALUE_IODIRA   = 0B00011111; // pins 0, 1, 2, 3,
 static const uint8_t DCP505_REG_VALUE_IODIRB   = 0B11110000; //
 
 static const uint8_t DCP405_REG_VALUE_IODIRA   = 0B00011111; // pins 0, 1, 2, 3 and 4 are inputs (set to 1)
+static const uint8_t DCP405_R2B5_REG_VALUE_IODIRA = 0B00111111; // pins 0, 1, 2, 3, 4 and 5 are inputs (set to 1)
 static const uint8_t DCP405_REG_VALUE_IODIRB   = 0B00000000; //
 
-static const uint8_t DCP405_R2B5_REG_VALUE_IODIRA = 0B00111111; // pins 0, 1, 2, 3, 4 and 5 are inputs (set to 1)
+static const uint8_t DCP405B_REG_VALUE_IODIRA   = 0B00011111; // pins 0, 1, 2, 3 and 4 are inputs (set to 1)
+static const uint8_t DCP405B_REG_VALUE_IODIRB   = 0B00000000; //
 
 static const uint8_t REG_VALUE_IPOLA    = 0B00000000; // no pin is inverted
 static const uint8_t REG_VALUE_IPOLB    = 0B00000000; // no pin is inverted
-static const uint8_t REG_VALUE_GPINTENA = 0B00100000; // enable interrupt for HW OVP Fault
+
+static const uint8_t REG_VALUE_GPINTENA = 0B00000000; // no interrupts
+static const uint8_t DCP405_REG_VALUE_GPINTENA = 0B00100000; // enable interrupt for HW OVP Fault
 static const uint8_t REG_VALUE_GPINTENB = 0B00000000; // no interrupts
-static const uint8_t REG_VALUE_DEFVALA  = 0B00100000; // default value for HW OVP Fault is 1
+
+static const uint8_t REG_VALUE_DEFVALA  = 0B00000000; //
+static const uint8_t DCP405_REG_VALUE_DEFVALA  = 0B00100000; // default value for HW OVP Fault is 1
 static const uint8_t REG_VALUE_DEFVALB  = 0B00000000; //
-static const uint8_t REG_VALUE_INTCONA  = 0B00100000; // compare HW OVP Fault value with default value
+
+static const uint8_t REG_VALUE_INTCONA  = 0B00000000;
+static const uint8_t DCP405_REG_VALUE_INTCONA  = 0B00100000; // compare HW OVP Fault value with default value
 static const uint8_t REG_VALUE_INTCONB  = 0B00000000; //
+
 static const uint8_t REG_VALUE_IOCON    = 0B00100000; // sequential operation disabled, hw addressing disabled
 static const uint8_t REG_VALUE_GPPUA    = 0B00100001; // pull up with 100K
 static const uint8_t REG_VALUE_GPPUB    = 0B00000000; //
@@ -80,6 +89,9 @@ static const uint8_t DCP505_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
 
 static const uint8_t DCP405_REG_VALUE_GPIOA = 0B00000000; //
 static const uint8_t DCP405_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
+
+static const uint8_t DCP405B_REG_VALUE_GPIOA = 0B00000000; //
+static const uint8_t DCP405B_REG_VALUE_GPIOB = 0B00000000; //
 
 static const uint8_t REG_VALUES[] = {
     REG_IODIRA,   DCP505_REG_VALUE_IODIRA, 1,
@@ -98,31 +110,94 @@ static const uint8_t REG_VALUES[] = {
     REG_GPIOA,    DCP505_REG_VALUE_GPIOA, 0,
     REG_GPIOB,    DCP505_REG_VALUE_GPIOB, 0,
 };
+
+static const int REG_IODIRA_INDEX = 0;
+static const int REG_IODIRB_INDEX = 1;
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if defined(EEZ_PLATFORM_STM32)
+uint8_t IOExpander::getRegValue(int i) {
+    uint8_t reg = REG_VALUES[3 * i];
+    uint8_t value = REG_VALUES[3 * i + 1];
+
+    auto &slot = g_slots[slotIndex];
+
+    if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+        if (reg == REG_IODIRA) {
+            if (slot.moduleRevision < MODULE_REVISION_DCP405_R2B5) {
+                value = DCP405_REG_VALUE_IODIRA;
+            } else {
+                value = DCP405_R2B5_REG_VALUE_IODIRA;
+            }
+        } else if (reg == REG_IODIRB) {
+            value = DCP405_REG_VALUE_IODIRB;
+        } else if (reg == REG_GPIOA) {
+            value = DCP405_REG_VALUE_GPIOA;
+        } else if (reg == REG_GPIOB) {
+            value = DCP405_REG_VALUE_GPIOB;
+        } else if (reg == REG_GPINTENA) {
+            value = DCP405_REG_VALUE_GPINTENA;
+        } else if (reg == REG_DEFVALA) {
+            value = DCP405_REG_VALUE_DEFVALA;
+        } else if (reg == REG_INTCONA) {
+            value = DCP405_REG_VALUE_INTCONA;
+        }
+    } else if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
+        if (reg == REG_IODIRA) {
+            value = DCP405B_REG_VALUE_IODIRA;
+        } else if (reg == REG_IODIRB) {
+            value = DCP405B_REG_VALUE_IODIRB;
+        } else if (reg == REG_GPIOA) {
+            value = DCP405B_REG_VALUE_GPIOA;
+        } else if (reg == REG_GPIOB) {
+            value = DCP405B_REG_VALUE_GPIOB;
+        }
+    }
+
+    return value;
+}
+#endif
+
 void IOExpander::init() {
 #if defined(EEZ_PLATFORM_STM32)
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
+    auto &slot = g_slots[slotIndex];
 
-    gpioOutputPinsMask = 
-        (1 << IO_BIT_OUT_DP_ENABLE) | 
-        (1 << IO_BIT_OUT_OUTPUT_ENABLE) | 
-        (1 << IO_BIT_OUT_REMOTE_SENSE) | 
-        (1 << IO_BIT_OUT_REMOTE_PROGRAMMING);
-    if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_500MA;
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_5A;
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OVP_ENABLE;
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED;
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_COUPLED_LED;
-        if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
+    gpioOutputPinsMask = 0;
+
+    if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+        gpioOutputPinsMask |= 1 << IO_BIT_OUT_DP_ENABLE;
+        gpioOutputPinsMask |= 1 << IO_BIT_OUT_OUTPUT_ENABLE;
+        gpioOutputPinsMask |= 1 << IO_BIT_OUT_REMOTE_SENSE;
+        gpioOutputPinsMask |= 1 << IO_BIT_OUT_REMOTE_PROGRAMMING;
+
+        if (slot.moduleRevision < MODULE_REVISION_DCP405_R2B5) {
             gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA;
+            gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_500MA;
         } else {
             gpioOutputPinsMask |= 1 << DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA;
         }
+
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_5A;
+
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OVP_ENABLE;
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED;
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_COUPLED_LED;
+    } else if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
+        gpioOutputPinsMask |= 1 << IO_BIT_OUT_OUTPUT_ENABLE;
+
+        gpioOutputPinsMask |= 1 << DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA;
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_5A;
+
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED;
+        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_COUPLED_LED;
     } else {
+        // DCP505
+        gpioOutputPinsMask |= 1 << IO_BIT_OUT_DP_ENABLE;
+        gpioOutputPinsMask |= 1 << IO_BIT_OUT_OUTPUT_ENABLE;
+        gpioOutputPinsMask |= 1 << IO_BIT_OUT_REMOTE_SENSE;
+        gpioOutputPinsMask |= 1 << IO_BIT_OUT_REMOTE_PROGRAMMING;
         gpioOutputPinsMask |= 1 << DCP505_IO_BIT_OUT_OVP_ENABLE;
         gpioOutputPinsMask |= 1 << DCP505_IO_BIT_OUT_OE_UNCOUPLED_LED;
         gpioOutputPinsMask |= 1 << DCP505_IO_BIT_OUT_OE_COUPLED_LED;
@@ -131,24 +206,7 @@ void IOExpander::init() {
     const uint8_t N_REGS = sizeof(REG_VALUES) / 3;
     for (int i = 0; i < N_REGS; i++) {
     	uint8_t reg = REG_VALUES[3 * i];
-    	uint8_t value = REG_VALUES[3 * i + 1];
-
-    	if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
-        	if (reg == REG_IODIRA) {
-                if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
-        		    value = DCP405_REG_VALUE_IODIRA;
-                } else {
-                    value = DCP405_R2B5_REG_VALUE_IODIRA;
-                }
-        	} else if (reg == REG_IODIRB) {
-        		value = DCP405_REG_VALUE_IODIRB;
-        	} else if (reg == REG_GPIOA) {
-        		value = DCP405_REG_VALUE_GPIOA;
-        	} else if (reg == REG_GPIOB) {
-				value = DCP405_REG_VALUE_GPIOB;
-        	}
-    	}
-
+    	uint8_t value = getRegValue(i);
     	write(reg, value);
     }
 #endif
@@ -161,6 +219,7 @@ void IOExpander::init() {
 bool IOExpander::test() {
 #if defined(EEZ_PLATFORM_STM32)    
     Channel &channel = Channel::getBySlotIndex(slotIndex);
+    auto &slot = g_slots[slotIndex];
 
     channel.flags.powerOk = 1;
 
@@ -169,23 +228,9 @@ bool IOExpander::test() {
         if (REG_VALUES[3 * i + 2]) {
             uint8_t reg = REG_VALUES[3 * i];
             uint8_t value = read(reg);
-
-            uint8_t expectedValue = REG_VALUES[3 * i + 1];
-
-            if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
-                if (reg == REG_IODIRA) {
-                    if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
-                        expectedValue = DCP405_REG_VALUE_IODIRA;
-                    } else {
-                        expectedValue = DCP405_R2B5_REG_VALUE_IODIRA;
-                    }
-                } else if (reg == REG_IODIRB) {
-                    expectedValue = DCP405_REG_VALUE_IODIRB;
-                }
-            }
-
+            uint8_t expectedValue = getRegValue(i);
             if (value != expectedValue) {
-                DebugTrace("Ch%d IO expander reg check failure: reg=%d, expected=%d, got=%d", channel.channelIndex + 1, (int)REG_VALUES[3 * i], (int)expectedValue, (int)value);
+                DebugTrace("Ch%d IO expander reg check failure: reg=%d, expected=%d, got=%d", slot.channelIndex + 1, (int)REG_VALUES[3 * i], (int)expectedValue, (int)value);
 
                 g_testResult = TEST_FAILED;
                 break;
@@ -196,7 +241,7 @@ bool IOExpander::test() {
     readGpio();
 
     if (g_testResult == TEST_FAILED) {
-		 generateError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED + channel.channelIndex);
+		 generateError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED + slot.channelIndex);
 		 channel.flags.powerOk = 0;
     } else {
     	g_testResult = TEST_OK;
@@ -204,8 +249,8 @@ bool IOExpander::test() {
 #if !CONF_SKIP_PWRGOOD_TEST
         channel.flags.powerOk = testBit(IO_BIT_IN_PWRGOOD);
         if (!channel.flags.powerOk) {
-            DebugTrace("Ch%d power fault", channel.channelIndex + 1);
-            generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channel.channelIndex);
+            DebugTrace("Ch%d power fault", slot.channelIndex + 1);
+            generateError(SCPI_ERROR_CH1_FAULT_DETECTED + slot.channelIndex);
         }
 #endif
 	}
@@ -222,24 +267,10 @@ bool IOExpander::test() {
 
 #if defined(EEZ_PLATFORM_STM32)
 void IOExpander::reinit() {
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
-
     const uint8_t N_REGS = sizeof(REG_VALUES) / 3;
     for (int i = 0; i < N_REGS; i++) {
     	uint8_t reg = REG_VALUES[3 * i];
-    	uint8_t value = REG_VALUES[3 * i + 1];
-
-    	if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
-        	if (reg == REG_IODIRA) {
-                if (channel.boardRevision == CH_BOARD_REVISION_DCP405_R1B1) {
-        		    value = DCP405_REG_VALUE_IODIRA;
-                } else {
-                    value = DCP405_R2B5_REG_VALUE_IODIRA;
-                }
-        	} else if (reg == REG_IODIRB) {
-        		value = DCP405_REG_VALUE_IODIRB;
-        	}
-    	}
+    	uint8_t value = getRegValue(i);
 
         if (reg == REG_GPIOA) {
             value = (uint8_t)gpioWritten;
@@ -254,16 +285,16 @@ void IOExpander::reinit() {
 
 void IOExpander::tick(uint32_t tick_usec) {
 #if defined(EEZ_PLATFORM_STM32)    
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
+    auto &slot = g_slots[slotIndex];
 
 	readGpio();
 
     uint8_t iodira = read(REG_IODIRA);
     if (iodira == 0xFF || (gpio & gpioOutputPinsMask) != gpioWritten) {
         if (iodira == 0xFF) {
-            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_RESET_DETECTED + channel.channelIndex);
+            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_RESET_DETECTED + slot.channelIndex);
         } else {
-            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_FAULT_MATCH_DETECTED + channel.channelIndex);
+            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_FAULT_MATCH_DETECTED + slot.channelIndex);
         }
 
         reinit();
@@ -281,7 +312,7 @@ void IOExpander::tick(uint32_t tick_usec) {
         gpio &= ~(1 << IOExpander::IO_BIT_IN_PWRGOOD);
     }
 
-    if (channel.getFeatures() & CH_FEATURE_RPOL) {
+    if (channel.params.features & CH_FEATURE_RPOL) {
         if (!simulator::getRPol(channel.channelIndex)) {
             gpio |= 1 << IOExpander::IO_BIT_IN_RPOL;
         } else {
@@ -307,9 +338,9 @@ void IOExpander::tick(uint32_t tick_usec) {
 int IOExpander::getBitDirection(int bit) {
     uint8_t dir;
     if (bit < 8) {
-        dir = g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_REG_VALUE_IODIRA : DCP505_REG_VALUE_IODIRA;
+        dir = getRegValue(REG_IODIRA_INDEX);
     } else {
-        dir = g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_REG_VALUE_IODIRB : DCP505_REG_VALUE_IODIRB;
+        dir = getRegValue(REG_IODIRB_INDEX);
         bit -= 8;
     }
     return dir & (1 << bit) ? 1 : 0;
@@ -323,7 +354,8 @@ bool IOExpander::testBit(int io_bit) {
 #if defined(EEZ_PLATFORM_STM32)
 bool IOExpander::isAdcReady() {
     // ready = !HAL_GPIO_ReadPin(SPI2_IRQ_GPIO_Port, SPI2_IRQ_Pin);
-    return !testBit(g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405 ? DCP405_IO_BIT_IN_ADC_DRDY : DCP505_IO_BIT_IN_ADC_DRDY);
+	auto &slot = g_slots[slotIndex];
+    return !testBit(slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 || slot.moduleInfo->moduleType == MODULE_TYPE_DCP405B ? DCP405_IO_BIT_IN_ADC_DRDY : DCP505_IO_BIT_IN_ADC_DRDY);
 }
 #endif
 

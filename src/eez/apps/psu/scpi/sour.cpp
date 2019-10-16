@@ -254,7 +254,7 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateStepIncrement(scpi_t *context)
         return SCPI_RES_ERR;
     }
 
-    return set_step(context, &channel->i, channel->params->I_MIN_STEP, channel->params->I_MAX_STEP, channel->params->I_DEF_STEP, SCPI_UNIT_AMPER);
+    return set_step(context, &channel->i, channel->params.I_MIN_STEP, channel->params.I_MAX_STEP, channel->params.I_DEF_STEP, SCPI_UNIT_AMPER);
 }
 
 scpi_result_t scpi_cmd_sourceCurrentLevelImmediateStepIncrementQ(scpi_t *context) {
@@ -264,7 +264,7 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateStepIncrementQ(scpi_t *context
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_AMPER, channel->i.step, channel->params->I_DEF_STEP);
+    return get_source_value(context, *channel, UNIT_AMPER, channel->i.step, channel->params.I_DEF_STEP);
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrement(scpi_t *context) {
@@ -274,7 +274,7 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrement(scpi_t *context)
         return SCPI_RES_ERR;
     }
 
-    return set_step(context, &channel->u, channel->params->U_MIN_STEP, channel->params->U_MAX_STEP, channel->params->U_DEF_STEP, SCPI_UNIT_VOLT);
+    return set_step(context, &channel->u, channel->params.U_MIN_STEP, channel->params.U_MAX_STEP, channel->params.U_DEF_STEP, SCPI_UNIT_VOLT);
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrementQ(scpi_t *context) {
@@ -284,7 +284,7 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrementQ(scpi_t *context
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_VOLT, channel->u.step, channel->params->U_DEF_STEP);
+    return get_source_value(context, *channel, UNIT_VOLT, channel->u.step, channel->params.U_DEF_STEP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -297,7 +297,7 @@ scpi_result_t scpi_cmd_sourceCurrentProtectionDelayTime(scpi_t *context) {
     }
 
     float delay;
-    if (!get_duration_param(context, delay, channel->params->OCP_MIN_DELAY, channel->params->OCP_MAX_DELAY, channel->params->OCP_DEFAULT_DELAY)) {
+    if (!get_duration_param(context, delay, channel->params.OCP_MIN_DELAY, channel->params.OCP_MAX_DELAY, channel->params.OCP_DEFAULT_DELAY)) {
         return SCPI_RES_ERR;
     }
 
@@ -396,7 +396,7 @@ scpi_result_t scpi_cmd_sourcePowerProtectionDelayTime(scpi_t *context) {
     }
 
     float delay;
-    if (!get_duration_param(context, delay, channel->params->OPP_MIN_DELAY, channel->params->OPP_MAX_DELAY, channel->params->OPP_DEFAULT_DELAY)) {
+    if (!get_duration_param(context, delay, channel->params.OPP_MIN_DELAY, channel->params.OPP_MAX_DELAY, channel->params.OPP_DEFAULT_DELAY)) {
         return SCPI_RES_ERR;
     }
 
@@ -495,7 +495,7 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionDelayTime(scpi_t *context) {
     }
 
     float delay;
-    if (!get_duration_param(context, delay, channel->params->OVP_MIN_DELAY, channel->params->OVP_MAX_DELAY, channel->params->OVP_DEFAULT_DELAY)) {
+    if (!get_duration_param(context, delay, channel->params.OVP_MIN_DELAY, channel->params.OVP_MAX_DELAY, channel->params.OVP_DEFAULT_DELAY)) {
         return SCPI_RES_ERR;
     }
 
@@ -565,7 +565,7 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionType(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (g_slots[channel->slotIndex].moduleType != MODULE_TYPE_DCP405) {
+    if (!(channel->params.features & CH_FEATURE_HW_OVP)) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
@@ -586,7 +586,7 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionTypeQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (g_slots[channel->slotIndex].moduleType != MODULE_TYPE_DCP405) {
+    if (!(channel->params.features & CH_FEATURE_HW_OVP)) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
@@ -651,7 +651,7 @@ scpi_result_t scpi_cmd_sourceVoltageProgramSource(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!(channel->getFeatures() & CH_FEATURE_RPROG)) {
+    if (!(channel->params.features & CH_FEATURE_RPROG)) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
@@ -683,7 +683,7 @@ scpi_result_t scpi_cmd_sourceVoltageProgramSourceQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!(channel->getFeatures() & CH_FEATURE_RPROG)) {
+    if (!(channel->params.features & CH_FEATURE_RPROG)) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }

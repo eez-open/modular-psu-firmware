@@ -160,7 +160,6 @@ set(header_eez_apps_psu
     src/eez/apps/psu/channel_dispatcher.h
     src/eez/apps/psu/conf.h
     src/eez/apps/psu/conf_advanced.h
-    src/eez/apps/psu/conf_channel.h
     src/eez/apps/psu/conf_user.h
     src/eez/apps/psu/datetime.h
     src/eez/apps/psu/debug.h

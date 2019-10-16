@@ -328,8 +328,8 @@ void getIMonMax(float &iMonMax, float &iMax) {
                 iMonMax = channel.i.mon;
             }
         }
-        if (channel.params->I_MAX > iMax) {
-            iMax = channel.params->I_MAX;
+        if (channel.params.I_MAX > iMax) {
+            iMax = channel.params.I_MAX;
         }
 	}
 }

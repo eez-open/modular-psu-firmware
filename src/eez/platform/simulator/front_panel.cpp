@@ -68,9 +68,11 @@ void data_main_app_view(DataOperationEnum operation, Cursor &cursor, Value &valu
 int getSlotView(int channelIndex) {
     int slotIndex = psu::Channel::get(channelIndex).slotIndex;
 
-    if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCP405) {
+    if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405) {
         return PAGE_ID_DCP405_FRONT_PANEL;
-    } else if (g_slots[slotIndex].moduleType == MODULE_TYPE_DCM220) {
+    } else if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
+        return PAGE_ID_DCP405B_FRONT_PANEL;
+    } else if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCM220) {
         return PAGE_ID_DCM220_FRONT_PANEL;
     } else {
         return PAGE_ID_FRONT_PANEL_EMPTY_SLOT;

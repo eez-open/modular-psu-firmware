@@ -190,7 +190,7 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
             channel.flags.outputEnabled = channel.isTripped() ? 0 : profile->channels[i].flags.output_enabled;
             channel.flags.senseEnabled = profile->channels[i].flags.sense_enabled;
 
-            if (channel.getFeatures() & CH_FEATURE_RPROG) {
+            if (channel.params.features & CH_FEATURE_RPROG) {
                 channel.flags.rprogEnabled = profile->channels[i].flags.rprog_enabled;
             } else {
                 channel.flags.rprogEnabled = 0;
@@ -244,14 +244,15 @@ void fillProfile(Parameters *pProfile) {
     for (int i = 0; i < CH_MAX; ++i) {
         Channel &channel = Channel::get(i);
         if (i < CH_NUM && channel.isInstalled()) {
-            profile.channels[i].flags.moduleType = g_slots[channel.slotIndex].moduleType;
+            profile.channels[i].moduleType = g_slots[channel.slotIndex].moduleInfo->moduleType;
+            profile.channels[i].moduleRevision = g_slots[channel.slotIndex].moduleRevision;
 
             profile.channels[i].flags.parameters_are_valid = 1;
 
             profile.channels[i].flags.output_enabled = channel.flags.outputEnabled;
             profile.channels[i].flags.sense_enabled = channel.flags.senseEnabled;
 
-            if (channel.getFeatures() & CH_FEATURE_RPROG) {
+            if (channel.params.features & CH_FEATURE_RPROG) {
                 profile.channels[i].flags.rprog_enabled = channel.flags.rprogEnabled;
             }
             else {
@@ -381,7 +382,7 @@ void tick() {
 bool checkProfileModuleMatch(Parameters *profile) {
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
-        if (profile->channels[i].flags.parameters_are_valid && profile->channels[i].flags.moduleType != g_slots[channel.slotIndex].moduleType) {
+        if (profile->channels[i].flags.parameters_are_valid && profile->channels[i].moduleType != g_slots[channel.slotIndex].moduleInfo->moduleType) {
             return false; // mismatch
         }
     }

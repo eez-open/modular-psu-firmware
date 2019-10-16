@@ -223,34 +223,27 @@ void init() {
 
     int channelIndex = 0;
     for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        uint16_t value;
-        if (!bp3c::eeprom::read(slotIndex, (uint8_t *)&value, 2, (uint16_t)0)) {
-            g_slots[slotIndex].moduleType = MODULE_TYPE_NONE;
-            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_NONE;
-        } else if (value == 405) {
-            g_slots[slotIndex].moduleType = MODULE_TYPE_DCP405;
-            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_DCP405_R1B1;
-        } else if (value == 406) {
-            g_slots[slotIndex].moduleType = MODULE_TYPE_DCP405;
-            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_DCP405_R2B5;
-        } else if (value == 505) {
-            g_slots[slotIndex].moduleType = MODULE_TYPE_DCP505;
-            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_DCP505_R1B3;
-        } else if (value == 220) {
-            g_slots[slotIndex].moduleType = MODULE_TYPE_DCM220;
-            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_DCM220_R1B1;
-        } else {
-            g_slots[slotIndex].moduleType = MODULE_TYPE_NONE;
-            g_slots[slotIndex].boardRevision = CH_BOARD_REVISION_NONE;
+        auto& slot = g_slots[slotIndex];
+
+        static const uint16_t ADDRESS = 0;
+        uint16_t value[2];
+        if (!bp3c::eeprom::read(slotIndex, (uint8_t *)&value, sizeof(value), ADDRESS)) {
+            value[0] = MODULE_TYPE_NONE;
+            value[1] = 0;
         }
 
-        g_slots[slotIndex].channelIndex = channelIndex;
+        uint16_t moduleType = value[0];
+        uint16_t moduleRevision = value[1];
 
-        for (uint8_t subchannelIndex = 0; subchannelIndex < g_modules[g_slots[slotIndex].moduleType].numChannels; subchannelIndex++) {
-            Channel::get(channelIndex++).set(slotIndex, subchannelIndex, g_slots[slotIndex].boardRevision);
+        slot.moduleInfo = getModuleInfo(moduleType);
+        slot.moduleRevision = moduleRevision;
+        slot.channelIndex = channelIndex;
+
+        for (uint8_t subchannelIndex = 0; subchannelIndex < slot.moduleInfo->numChannels; subchannelIndex++) {
+            Channel::get(channelIndex++).set(slotIndex, subchannelIndex);
         }
 
-        if (g_slots[slotIndex].moduleType != MODULE_TYPE_NONE) {
+        if (slot.moduleInfo->moduleType != MODULE_TYPE_NONE) {
             persist_conf::loadModuleConf(slotIndex);
             ontime::g_moduleCounters[slotIndex].init();
         }
@@ -616,7 +609,7 @@ bool powerUp() {
 
     ontime::g_mcuCounter.start();
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (g_slots[slotIndex].moduleType != MODULE_TYPE_NONE) {
+        if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
             ontime::g_moduleCounters[slotIndex].start();
         }
     }
@@ -684,7 +677,7 @@ void powerDown() {
 
     ontime::g_mcuCounter.stop();
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (g_slots[slotIndex].moduleType != MODULE_TYPE_NONE) {
+        if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
             ontime::g_moduleCounters[slotIndex].stop();
         }
     }
@@ -824,7 +817,7 @@ void onProtectionTripped() {
 void tick_onTimeCounters(uint32_t tickCount) {
     ontime::g_mcuCounter.tick(tickCount);
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (g_slots[slotIndex].moduleType != MODULE_TYPE_NONE) {
+        if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
             ontime::g_moduleCounters[slotIndex].tick(tickCount);
         }
     }

@@ -44,16 +44,6 @@ struct Value;
 
 enum DisplayValue { DISPLAY_VALUE_VOLTAGE, DISPLAY_VALUE_CURRENT, DISPLAY_VALUE_POWER };
 
-enum ChannelFeatures {
-    CH_FEATURE_VOLT = (1 << 1),
-    CH_FEATURE_CURRENT = (1 << 2),
-    CH_FEATURE_POWER = (1 << 3),
-    CH_FEATURE_OE = (1 << 4),
-    CH_FEATURE_DPROG = (1 << 5),
-    CH_FEATURE_RPROG = (1 << 7),
-    CH_FEATURE_RPOL = (1 << 8)
-};
-
 enum TriggerMode { TRIGGER_MODE_FIXED, TRIGGER_MODE_LIST, TRIGGER_MODE_STEP };
 
 enum TriggerOnListStop {
@@ -86,65 +76,6 @@ struct ProtectionFlags {
 struct ProtectionValue {
     ProtectionFlags flags;
     uint32_t alarm_started;
-};
-
-struct ChannelParams {
-    float U_MIN;
-    float U_DEF;
-    float U_MAX;
-    float U_MAX_CONF;
-    float U_MIN_STEP;
-    float U_DEF_STEP;
-    float U_MAX_STEP;
-    float U_CAL_VAL_MIN;
-    float U_CAL_VAL_MID;
-    float U_CAL_VAL_MAX;
-    float U_CURR_CAL;
-    bool OVP_DEFAULT_STATE;
-    float OVP_MIN_DELAY;
-    float OVP_DEFAULT_DELAY;
-    float OVP_MAX_DELAY;
-    float I_MIN;
-    float I_DEF;
-    float I_MAX;
-    float I_MAX_CONF;
-    float I_MIN_STEP;
-    float I_DEF_STEP;
-    float I_MAX_STEP; 
-    float I_CAL_VAL_MIN;
-    float I_CAL_VAL_MID;
-    float I_CAL_VAL_MAX;
-    float I_VOLT_CAL;
-    bool OCP_DEFAULT_STATE;
-    float OCP_MIN_DELAY;
-    float OCP_DEFAULT_DELAY;
-    float OCP_MAX_DELAY;
-    bool OPP_DEFAULT_STATE;
-    float OPP_MIN_DELAY;
-    float OPP_DEFAULT_DELAY;
-    float OPP_MAX_DELAY;
-    float OPP_MIN_LEVEL;
-    float OPP_DEFAULT_LEVEL;
-    float OPP_MAX_LEVEL;
-    float SOA_VIN;
-    float SOA_PREG_CURR;
-    float SOA_POSTREG_PTOT;
-    float PTOT;
-    float U_RESOLUTION;
-    float I_RESOLUTION;
-    float I_LOW_RESOLUTION;
-    float P_RESOLUTION;
-
-    float VOLTAGE_GND_OFFSET; // [V], (1375 / 65535) * (40V | 50V)
-    float CURRENT_GND_OFFSET; // [A]
-
-    /// Maximum difference, in percentage, between ADC
-    /// and real value during calibration.
-    float CALIBRATION_DATA_TOLERANCE_PERCENT;
-
-    /// Maximum difference, in percentage, between calculated mid value
-    /// and real mid value during calibration.
-    float CALIBRATION_MID_TOLERANCE_PERCENT;
 };
 
 /// PSU channel.
@@ -348,8 +279,6 @@ class Channel {
     // Slot index. Starts from 0.
     uint8_t slotIndex;
 
-    uint8_t boardRevision;
-
     /// Channel index. Starts from 0.
     uint8_t channelIndex;
 
@@ -358,7 +287,7 @@ class Channel {
 
     ChannelInterface *channelInterface;
 
-    ChannelParams *params;
+    ChannelParams params;
 
     Flags flags;
 
@@ -380,7 +309,7 @@ class Channel {
     Simulator simulator;
 #endif // EEZ_PLATFORM_SIMULATOR
 
-    void set(uint8_t slotIndex, uint8_t subchannelIndex, uint8_t boardRevision);
+    void set(uint8_t slotIndex, uint8_t subchannelIndex);
 
     void setChannelIndex(uint8_t channelIndex);
 
@@ -507,18 +436,6 @@ class Channel {
 
     /// Returns "CC", "CV" or "UR"
     const char *getCvModeStr();
-
-    /// Returns name of the board of this channel.
-    const char *getBoardName();
-
-    /// Returns name of the revison of this channel.
-    const char *getRevisionName();
-    
-    /// Returns name of the board and revison of this channel.
-    const char *getBoardAndRevisionName();
-
-    /// Returns features present (check ChannelFeatures) in board revision of this channel.
-    uint16_t getFeatures();
 
     /// Returns currently set voltage limit
     float getVoltageLimit() const;

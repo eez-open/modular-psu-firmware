@@ -44,9 +44,9 @@ class ChSettingsTriggerPage : public Page {
 
   private:
     static void onFinishTriggerModeSet();
-    static void onTriggerModeSet(uint8_t value);
+    static void onTriggerModeSet(uint16_t value);
 
-    static void onTriggerOnListStopSet(uint8_t value);
+    static void onTriggerOnListStopSet(uint16_t value);
 
     static void onVoltageTriggerValueSet(float value);
     static void onCurrentTriggerValueSet(float value);

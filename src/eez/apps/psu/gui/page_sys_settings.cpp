@@ -150,7 +150,7 @@ void SysSettingsDateTimePage::edit() {
     }
 }
 
-void SysSettingsDateTimePage::onDstRuleSet(uint8_t value) {
+void SysSettingsDateTimePage::onDstRuleSet(uint16_t value) {
     popPage();
     SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getActivePage();
     page->dstRule = (datetime::DstRule)value;
@@ -641,7 +641,7 @@ void SysSettingsTriggerPage::pageAlloc() {
         trigger::isContinuousInitializationEnabled();
 }
 
-void SysSettingsTriggerPage::onTriggerSourceSet(uint8_t value) {
+void SysSettingsTriggerPage::onTriggerSourceSet(uint16_t value) {
     popPage();
     SysSettingsTriggerPage *page = (SysSettingsTriggerPage *)getActivePage();
     page->m_source = (trigger::Source)value;
@@ -717,7 +717,7 @@ void SysSettingsIOPinsPage::togglePolarity() {
     m_polarity[i] = m_polarity[i] == io_pins::POLARITY_NEGATIVE ? io_pins::POLARITY_POSITIVE : io_pins::POLARITY_NEGATIVE;
 }
 
-void SysSettingsIOPinsPage::onFunctionSet(uint8_t value) {
+void SysSettingsIOPinsPage::onFunctionSet(uint16_t value) {
     popPage();
     SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getActivePage();
     page->m_function[page->pinNumber] = (io_pins::Function)value;
@@ -767,7 +767,7 @@ void SysSettingsSerialPage::toggle() {
     m_enabled = !m_enabled;
 }
 
-void SysSettingsSerialPage::onParitySet(uint8_t value) {
+void SysSettingsSerialPage::onParitySet(uint16_t value) {
     popPage();
     SysSettingsSerialPage *page = (SysSettingsSerialPage *)getActivePage();
     page->m_parity = (serial::Parity)value;

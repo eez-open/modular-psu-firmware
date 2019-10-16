@@ -26,7 +26,6 @@
 
 #include <eez/apps/psu/conf.h>
 #include <eez/apps/psu/conf_advanced.h>
-#include <eez/apps/psu/conf_channel.h>
 #include <eez/apps/psu/conf_user.h>
 
 #include <eez/index.h>
