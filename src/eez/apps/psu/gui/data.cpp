@@ -1052,8 +1052,7 @@ void data_channel_i_edit(data::DataOperationEnum operation, data::Cursor &cursor
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_I_EDIT;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
-        } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD &&
-                   edit_mode_keypad::g_keypad->isEditing()) {
+        } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
             value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER);
@@ -2036,7 +2035,7 @@ void data_channel_protection_ovp_limit(data::DataOperationEnum operation, data::
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
                 value = g_focusEditValue;
             } else {
-                value = MakeValue(channel.u.limit, UNIT_VOLT);
+                value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
@@ -2093,7 +2092,7 @@ void data_channel_protection_ocp_limit(data::DataOperationEnum operation, data::
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
                 value = g_focusEditValue;
             } else {
-                value = MakeValue(channel.i.limit, UNIT_AMPER);
+                value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
