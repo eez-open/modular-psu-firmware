@@ -24,11 +24,16 @@
 #include <cstddef>
 
 #include <eez/debug.h>
+#include <eez/system.h>
+
+#include <eez/modules/mcu/display.h>
+
 #include <eez/gui/app_context.h>
 #include <eez/gui/assets.h>
 #include <eez/gui/draw.h>
 #include <eez/gui/gui.h>
 #include <eez/gui/touch.h>
+#include <eez/gui/overlay.h>
 #include <eez/gui/widgets/app_view.h>
 #include <eez/gui/widgets/bar_graph.h>
 #include <eez/gui/widgets/bitmap.h>
@@ -48,8 +53,6 @@
 #include <eez/gui/widgets/toggle_button.h>
 #include <eez/gui/widgets/up_down.h>
 #include <eez/gui/widgets/yt_graph.h>
-#include <eez/modules/mcu/display.h>
-#include <eez/system.h>
 
 using namespace eez::mcu;
 
@@ -120,7 +123,7 @@ static EnumFunctionType g_enumWidgetFunctions[] = {
 typedef void (*DrawFunctionType)(const WidgetCursor &widgetCursor);
 static DrawFunctionType g_drawWidgetFunctions[] = {
     nullptr,                  // WIDGET_TYPE_NONE
-    nullptr,                  // WIDGET_TYPE_CONTAINER
+    ContainerWidget_draw,     // WIDGET_TYPE_CONTAINER
     nullptr,                  // WIDGET_TYPE_LIST
     nullptr,                  // WIDGET_TYPE_GRID
     nullptr,                  // WIDGET_TYPE_SELECT
@@ -224,9 +227,25 @@ WidgetState *nextWidgetState(WidgetState *p) {
     return (WidgetState *)(((uint8_t *)p) + p->size);
 }
 
+void WidgetCursor::nextState() {
+    if (previousState) {
+        previousState = nextWidgetState(previousState);
+    }
+    if (currentState) {
+        currentState = nextWidgetState(currentState);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-	widgetCursor.x += widgetCursor.widget->x;
-	widgetCursor.y += widgetCursor.widget->y;
+    auto xSaved = widgetCursor.x;
+    auto ySaved = widgetCursor.y;
+    
+    widgetCursor.x += widgetCursor.widget->x;
+    widgetCursor.y += widgetCursor.widget->y;
+
+    overlayEnumWidgetHook(widgetCursor, callback);
 
     bool savedIsActiveWidget;
     if (callback == drawWidgetCallback) {
@@ -237,18 +256,16 @@ void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     callback(widgetCursor);
 
     if (g_enumWidgetFunctions[widgetCursor.widget->type]) {
-        g_enumWidgetFunctions[widgetCursor.widget->type](widgetCursor, callback);
+       g_enumWidgetFunctions[widgetCursor.widget->type](widgetCursor, callback);
     }
 
     if (callback == drawWidgetCallback) {
         g_isActiveWidget = savedIsActiveWidget;
     }
 
-	widgetCursor.x -= widgetCursor.widget->x;
-	widgetCursor.y -= widgetCursor.widget->y;
+	widgetCursor.x = xSaved;
+	widgetCursor.y = ySaved;
 }
-
-void findWidgetStep(const WidgetCursor &widgetCursor);
 
 void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     if (g_appContext->isActivePageInternal()) {
@@ -296,23 +313,25 @@ void enumWidgets(EnumWidgetsCallback callback) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void findWidgetStep(const WidgetCursor &widgetCursor) {
+    if (g_foundWidget && g_foundWidget.widget->action == ACTION_ID_DRAG_OVERLAY) {
+        return;
+    }
+
     const Widget *widget = widgetCursor.widget;
 
-    // if (g_enumWidgetFunctions[widget->type]) {
-    //     return;
-    // }
+    Overlay *overlay = getOverlay(widgetCursor);
 
     static const int MIN_SIZE = 40;
         
     int x = widgetCursor.x;
-    int w = widget->w;
+    int w = overlay ? overlay->width : widget->w;
     if (w < MIN_SIZE) {
         x = x - (MIN_SIZE - w) / 2;
         w = MIN_SIZE;
     }
 
     int y = widgetCursor.y;
-    int h = widget->h;
+    int h = overlay ? overlay->height : widget->h;
     if (h < MIN_SIZE) {
         y = y - (MIN_SIZE - h) / 2;
         h = MIN_SIZE;
@@ -323,20 +342,27 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
         g_findWidgetAtY >= y && g_findWidgetAtY < y + h;
 
     if (inside && (widget->type == WIDGET_TYPE_APP_VIEW || getTouchFunction(widgetCursor))) {
-
-        int dx = g_findWidgetAtX - (x + w / 2);
-        int dy = g_findWidgetAtY - (y + h / 2);
-        int distance = dx * dx + dy * dy;
-
-        if (!g_foundWidget || distance <= g_distanceToFoundWidget || g_foundWidget.widget->type == WIDGET_TYPE_APP_VIEW) {
+        if (widget->action == ACTION_ID_DRAG_OVERLAY) {
+            if (overlay && !overlay->state) {
+                return;
+            }
             g_foundWidget = widgetCursor;
-            g_distanceToFoundWidget = distance;
+            g_distanceToFoundWidget = 0;
+        } else {
+            int dx = g_findWidgetAtX - (x + w / 2);
+            int dy = g_findWidgetAtY - (y + h / 2);
+            int distance = dx * dx + dy * dy;
 
-            // if found widget is AppView, make sure we set right AppContext
-            if (widget->type == WIDGET_TYPE_APP_VIEW) {
-                Value appContextValue;
-                g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, appContextValue);
-                g_foundWidget.appContext = appContextValue.getAppContext();
+            if (!g_foundWidget || distance <= g_distanceToFoundWidget || g_foundWidget.widget->type == WIDGET_TYPE_APP_VIEW) {
+                g_foundWidget = widgetCursor;
+                g_distanceToFoundWidget = distance;
+
+                // if found widget is AppView, make sure we set right AppContext
+                if (widget->type == WIDGET_TYPE_APP_VIEW) {
+                    Value appContextValue;
+                    g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, appContextValue);
+                    g_foundWidget.appContext = appContextValue.getAppContext();
+                }
             }
         }
     }

@@ -64,9 +64,11 @@
 #if OPTION_SD_CARD
 #include <eez/apps/psu/sd_card.h>
 #endif
+#include <eez/gui/overlay.h>
+#include <eez/gui/assets.h>
+#include <eez/gui/widgets/container.h>
 
 #define CONF_GUI_REFRESH_EVERY_MS 250
-#define CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD 5 // 5 seconds
 
 using namespace eez::gui;
 using namespace eez::gui::data;
@@ -574,8 +576,7 @@ bool compare_DLOG_STATUS_value(const Value &a, const Value &b) {
 }
 
 void DLOG_STATUS_value_to_text(const Value &value, char *text, int count) {
-    strcpy(text, "Dlog: ");
-    printTime(value.getUInt32(), text + 6, count - 6);
+    printTime(value.getUInt32(), text, count);
 }
 
 bool compare_VALUE_LIST_value(const Value &a, const Value &b) {
@@ -629,6 +630,15 @@ bool compare_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value(const Value &a, con
 void CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
     snprintf(text, count - 1, "#%d", channel.channelIndex + 1);
+}
+
+bool compare_CHANNEL_SHORT_TITLE_WITH_COLON_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void CHANNEL_SHORT_TITLE_WITH_COLON_value_to_text(const Value &value, char *text, int count) {
+    Channel &channel = Channel::get(value.getInt());
+    snprintf(text, count - 1, "#%d:", channel.channelIndex + 1);
 }
 
 bool compare_CHANNEL_LONG_TITLE_value(const Value &a, const Value &b) {
@@ -695,6 +705,7 @@ CompareValueFunction g_compareUserValueFunctions[] = { compare_LESS_THEN_MIN_FLO
                                                        compare_CHANNEL_TITLE_value,
                                                        compare_CHANNEL_SHORT_TITLE_value,
                                                        compare_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value,
+                                                       compare_CHANNEL_SHORT_TITLE_WITH_COLON_value,
                                                        compare_CHANNEL_LONG_TITLE_value };
 
 ValueToTextFunction g_userValueToTextFunctions[] = { LESS_THEN_MIN_FLOAT_value_to_text,
@@ -732,6 +743,7 @@ ValueToTextFunction g_userValueToTextFunctions[] = { LESS_THEN_MIN_FLOAT_value_t
                                                      CHANNEL_TITLE_value_to_text,
                                                      CHANNEL_SHORT_TITLE_value_to_text,
                                                      CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_to_text,
+                                                     CHANNEL_SHORT_TITLE_WITH_COLON_value_to_text,
                                                      CHANNEL_LONG_TITLE_value_to_text };
 
 } // namespace data
@@ -1666,6 +1678,13 @@ void data_channel_short_title_without_tracking_icon(data::DataOperationEnum oper
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON);
+    }
+}
+
+void data_channel_short_title_with_colon(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITH_COLON);
     }
 }
 
@@ -3686,19 +3705,6 @@ void data_serial_parity(data::DataOperationEnum operation, data::Cursor &cursor,
     }
 }
 
-void data_channel_list_countdown(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        int32_t remaining;
-        uint32_t total;
-        if (list::getCurrentDwellTime(channel, remaining, total) &&
-            total >= CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD) {
-            value = data::Value((uint32_t)remaining, VALUE_TYPE_COUNTDOWN);
-        }
-    }
-}
-
 void data_io_pins(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
         value = 4;
@@ -3809,42 +3815,6 @@ void data_sys_display_background_luminosity_step(data::DataOperationEnum operati
     }
 }
 
-void data_view_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-#if OPTION_SD_CARD
-        bool listStatusVisible = list::anyCounterVisible(CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD);
-        bool dlogStatusVisible = !dlog::isIdle();
-        if (listStatusVisible && dlogStatusVisible) {
-            value = micros() % (2 * 1000000UL) < 1000000UL ? 1 : 2;
-        } else if (listStatusVisible) {
-            value = 1;
-        } else if (dlogStatusVisible) {
-            value = 2;
-        } else {
-            value = 0;
-        }
-#else
-        if (list::anyCounterVisible(CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD)) {
-            value = 1;
-        } else {
-            value = 0;
-        }
-#endif
-    }
-}
-
-void data_dlog_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
-    if (operation == data::DATA_OPERATION_GET) {
-        if (dlog::isInitiated()) {
-            value = "Dlog trigger waiting";
-        } else if (!dlog::isIdle()) {
-            value = data::Value((uint32_t)floor(dlog::g_currentTime), VALUE_TYPE_DLOG_STATUS);
-        }
-    }
-#endif
-}
-
 #if defined(EEZ_PLATFORM_SIMULATOR)
 
 void data_simulator_load_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -3899,6 +3869,146 @@ void data_channel_active_coupled_led(data::DataOperationEnum operation, data::Cu
         } else {
             value = 0;
         }
+    }
+}
+
+void data_channels_with_list_counter_visible(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_COUNT) {
+        value = list::g_numChannelsWithVisibleCounters;
+    }
+}
+
+void data_channel_list_countdown(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        if (cursor.i >= 0 && cursor.i < list::g_numChannelsWithVisibleCounters) {
+            int iChannel = list::g_channelsWithVisibleCounters[cursor.i];
+            Channel &channel = Channel::get(iChannel);
+            int32_t remaining;
+            uint32_t total;
+            if (list::getCurrentDwellTime(channel, remaining, total) && total >= CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD) {
+                value = data::Value((uint32_t)remaining, VALUE_TYPE_COUNTDOWN);
+            }
+        }
+    }
+}
+
+void data_dlog_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        if (dlog::isInitiated()) {
+            value = "Dlog trigger waiting";
+        } else if (!dlog::isIdle()) {
+            value = data::Value((uint32_t)floor(dlog::g_currentTime), VALUE_TYPE_DLOG_STATUS);
+        }
+    }
+#endif
+}
+
+static const int NUM_WIDGETS = 4;
+
+static const int LIST_ICON_WIDGET = 0;
+static const int LIST_GRID_WIDGET = 1;
+static const int DLOG_ICON_WIDGET = 2;
+static const int DLOG_STATUS_WIDGET = 3;
+
+static Overlay overlay;
+static WidgetOverride widgetOverrides[NUM_WIDGETS];
+
+void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = data::Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+        overlay.widgetOverrides = widgetOverrides;
+
+        bool areListCountersVisible = list::g_numChannelsWithVisibleCounters > 0;
+        bool isDlogVisible = !dlog::isIdle();
+
+        int state = 0;
+        if (areListCountersVisible || isDlogVisible) {
+            if (list::g_numChannelsWithVisibleCounters > 0) {
+                if (list::g_numChannelsWithVisibleCounters > 4) {
+                    state = 1;
+                } else if (list::g_numChannelsWithVisibleCounters > 2) {
+                    state = 2;
+                } else if (list::g_numChannelsWithVisibleCounters == 2) {
+                    state = 3;
+                } else {
+                    state = 4;
+                }
+            }
+            if (isDlogVisible) {
+                state += 5;
+            }
+        }
+
+        if (overlay.state != state) {
+            overlay.state = state;
+            if (state > 0) {
+                WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
+
+                const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+
+                const Widget *listIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LIST_ICON_WIDGET);
+                const Widget *listGridWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LIST_GRID_WIDGET);
+                const Widget *dlogIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_ICON_WIDGET);
+                const Widget *dlogStatusWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_STATUS_WIDGET);
+
+                overlay.width = widgetCursor.widget->w;
+                overlay.height = widgetCursor.widget->h;
+
+                if (list::g_numChannelsWithVisibleCounters > 0) {
+                    widgetOverrides[LIST_ICON_WIDGET].isVisible = true;
+                    widgetOverrides[LIST_ICON_WIDGET].x = listIconWidget->x;
+                    widgetOverrides[LIST_ICON_WIDGET].y = listIconWidget->y;
+                    widgetOverrides[LIST_ICON_WIDGET].w = listIconWidget->w;
+                    widgetOverrides[LIST_ICON_WIDGET].h = listIconWidget->h;
+
+                    widgetOverrides[LIST_GRID_WIDGET].isVisible = true;
+                    widgetOverrides[LIST_GRID_WIDGET].x = listGridWidget->x;
+                    widgetOverrides[LIST_GRID_WIDGET].y = listGridWidget->y;
+                    widgetOverrides[LIST_GRID_WIDGET].w = listGridWidget->w;
+
+                    if (list::g_numChannelsWithVisibleCounters > 4) {
+                        widgetOverrides[LIST_GRID_WIDGET].h = 3 * listGridWidget->h;
+                        overlay.height += 2 * listGridWidget->h;
+                    } else if (list::g_numChannelsWithVisibleCounters > 2) {
+                        widgetOverrides[LIST_GRID_WIDGET].h = 2 * listGridWidget->h;
+                        overlay.height += listGridWidget->h;
+                    } else {
+                        widgetOverrides[LIST_GRID_WIDGET].h = listGridWidget->h;
+                        if (list::g_numChannelsWithVisibleCounters == 1) {
+                            widgetOverrides[LIST_GRID_WIDGET].w = listGridWidget->w / 2;
+                            overlay.width -= listGridWidget->w / 2;
+                        }
+                    }
+                } else {
+                    widgetOverrides[LIST_ICON_WIDGET].isVisible = false;
+                    widgetOverrides[LIST_GRID_WIDGET].isVisible = false;
+                    overlay.height -= listGridWidget->h;
+                }
+
+                if (isDlogVisible) {
+                    widgetOverrides[DLOG_ICON_WIDGET].isVisible = true;
+                    widgetOverrides[DLOG_ICON_WIDGET].x = dlogIconWidget->x;
+                    widgetOverrides[DLOG_ICON_WIDGET].y = overlay.height - (widgetCursor.widget->h - dlogIconWidget->y);
+                    widgetOverrides[DLOG_ICON_WIDGET].w = listIconWidget->w;
+                    widgetOverrides[DLOG_ICON_WIDGET].h = listIconWidget->h;
+
+                    widgetOverrides[DLOG_STATUS_WIDGET].isVisible = true;
+                    widgetOverrides[DLOG_STATUS_WIDGET].x = dlogStatusWidget->x;
+                    widgetOverrides[DLOG_STATUS_WIDGET].y = overlay.height - (widgetCursor.widget->h - dlogStatusWidget->y);
+                    widgetOverrides[DLOG_STATUS_WIDGET].w = dlogStatusWidget->w;
+                    widgetOverrides[DLOG_STATUS_WIDGET].h = dlogStatusWidget->h;
+                } else {
+                    widgetOverrides[DLOG_ICON_WIDGET].isVisible = false;
+                    widgetOverrides[DLOG_STATUS_WIDGET].isVisible = false;
+                    overlay.height -= dlogStatusWidget->h;
+                }
+            }
+        }
+
+
+        value = data::Value(&overlay, VALUE_TYPE_POINTER);
     }
 }
 

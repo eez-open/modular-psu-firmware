@@ -182,7 +182,12 @@ void action_stand_by() {
 }
 
 void action_show_previous_page() {
-    popPage();
+    Page *page = getActivePage();
+    if (page && page->getDirty()) {
+        areYouSureWithMessage(g_discardMessage, popPage);
+    } else {
+        popPage();
+    }
 }
 
 void showMainPage() {
@@ -1051,6 +1056,9 @@ void action_front_panel_select_slot3() {
 }
 
 #endif
+
+void action_drag_overlay() {
+}
 
 } // namespace gui
 } // namespace eez

@@ -38,8 +38,9 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedPreviousState = widgetCursor.previousState;
 
     WidgetState *endOfContainerInPreviousState = 0;
-    if (widgetCursor.previousState)
+    if (widgetCursor.previousState) {
         endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
+    }
 
     // move to the first child widget state
     if (widgetCursor.previousState) {
@@ -101,12 +102,14 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
         if (widgetCursor.previousState) {
 			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
-            if (widgetCursor.previousState >= endOfContainerInPreviousState)
+            if (widgetCursor.previousState >= endOfContainerInPreviousState) {
 				widgetCursor.previousState = 0;
+            }
         }
 
-        if (widgetCursor.currentState)
+        if (widgetCursor.currentState) {
 			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
+        }
     }
 
 	widgetCursor.x = savedX;

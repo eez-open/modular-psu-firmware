@@ -73,7 +73,7 @@ void setBackColor(uint8_t r, uint8_t g, uint8_t b);
 void setBackColor(uint16_t color, bool ignoreLuminocity = false);
 uint16_t getBackColor();
 
-void setOpacity(uint8_t opacity);
+uint8_t setOpacity(uint8_t opacity);
 uint8_t getOpacity();
 
 void screanshotBegin();
@@ -97,22 +97,32 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
 
 #if OPTION_SDRAM
 static const int NUM_BUFFERS = 10;
+struct BufferFlags {
+    unsigned allocated : 1;
+    unsigned staticallyAllocated : 1;
+    unsigned used : 1;
+    unsigned garbageCollect : 1;
+};
+
 struct Buffer {
     void *bufferPointer;
-    bool allocated;
-    int x1;
-    int y1;
-    int x2;
-    int y2;
+    BufferFlags flags;
+    int x;
+    int y;
+    int width;
+    int height;
     bool withShadow;
+    uint8_t opacity;
+    int xOffset;
+    int yOffset;
 };
 extern Buffer g_buffers[NUM_BUFFERS];
 extern int g_selectedBufferIndex;
 
-int allocBuffer();
+int allocBuffer(bool staticallyAllocated = false, bool garbageCollect = false);
 void freeBuffer(int bufferIndex);
 int selectBuffer(int bufferIndex);
-void drawBuffer(int x1, int y1, int x2, int y2, bool withShadow);
+void drawBuffer(int x, int y, int width, int height, bool withShadow, uint8_t opacity = 255, int xOffset = 0, int yOffset = 0);
 void beginBuffersDrawing();
 void endBuffersDrawing();
 

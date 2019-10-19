@@ -133,6 +133,7 @@ void WidgetList_fixPointers(WidgetList &widgetList);
 
 struct PageWidget {
     WidgetList widgets;
+    uint16_t overlay;
     uint8_t closePageIfTouchedOutside;
 };
 
@@ -226,7 +227,7 @@ struct WidgetCursor {
     }
 
     bool operator!=(const WidgetCursor &rhs) const {
-        return appContext != rhs.appContext || widget != rhs.widget || x != rhs.x || y != rhs.y || cursor != rhs.cursor;
+        return appContext != rhs.appContext || widget != rhs.widget || cursor != rhs.cursor;
     }
 
     bool operator==(const WidgetCursor &rhs) const {
@@ -236,6 +237,8 @@ struct WidgetCursor {
     operator bool() const {
         return widget != nullptr;
     }
+
+    void nextState();
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -244,6 +247,7 @@ typedef void (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
 void enumWidgets(EnumWidgetsCallback callback);
 void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
+void findWidgetStep(const WidgetCursor &widgetCursor);
 WidgetCursor findWidget(int16_t x, int16_t y);
 
 typedef void (*OnTouchFunctionType)(const WidgetCursor &widgetCursor, Event &touchEvent);

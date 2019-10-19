@@ -25,11 +25,19 @@ namespace gui {
 
 struct ContainerWidget {
     WidgetList widgets;
+    uint16_t overlay;
+};
+
+struct ContainerWidgetState {
+    WidgetState genericState;
+    int overlayState;
+    int displayBufferIndex;
 };
 
 void ContainerWidget_fixPointers(Widget *widget);
 void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const WidgetList &widgets);
 void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
+void ContainerWidget_draw(const WidgetCursor &widgetCursor);
 
 } // namespace gui
 } // namespace eez

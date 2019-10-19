@@ -135,10 +135,6 @@ void setShowPageTime(uint32_t time) {
     g_appContext->m_showPageTime = time;
 }
 
-void refreshScreen() {
-    getRootAppContext().markForRefreshAppView();
-}
-
 void showPage(int pageId) {
     if (g_appContext) {
         g_appContext->showPage(pageId);
@@ -478,8 +474,7 @@ void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst
         }
 
         if (animRect.buffer == BUFFER_SOLID_COLOR) {
-            auto savedOpacity = getOpacity();
-            setOpacity(opacity);
+            auto savedOpacity = setOpacity(opacity);
             setColor(animRect.color);
 
             // clip

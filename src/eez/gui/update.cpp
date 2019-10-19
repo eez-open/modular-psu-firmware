@@ -44,6 +44,10 @@ uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor) {
     return (uint8_t *)widgetCursor.currentState - (uint8_t *)g_currentState;
 }
 
+void refreshScreen() {
+    g_currentState = 0;
+}
+
 void updateScreen() {
 #if OPTION_SDRAM
     mcu::display::beginBuffersDrawing();

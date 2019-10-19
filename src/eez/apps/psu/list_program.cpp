@@ -395,10 +395,25 @@ bool saveList(int iChannel, const char *filePath, int *err) {
 #endif
 }
 
+void updateChannelsWithVisibleCountersList();
+
+void setActive(bool active, bool forceUpdate = false) {
+    if (g_active != active) {
+        g_active = active;
+        updateChannelsWithVisibleCountersList();
+    } else {
+        if (forceUpdate) {
+            updateChannelsWithVisibleCountersList();
+        }
+    }
+
+}
+
 void executionStart(Channel &channel) {
     g_execution[channel.channelIndex].it = -1;
     g_execution[channel.channelIndex].counter = g_channelsLists[channel.channelIndex].count;
-    g_active = true;
+    setActive(true, true);
+
     tick(micros());
 }
 
@@ -460,7 +475,7 @@ void tick(uint32_t tick_usec) {
         Channel &channel = Channel::get(i);
         if (g_execution[i].counter >= 0) {
             if (channel_dispatcher::isTripped(channel)) {
-                g_active = false;
+                setActive(false);
                 abort();
                 return;
             }
@@ -507,7 +522,7 @@ void tick(uint32_t tick_usec) {
 
                     int err;
                     if (!setListValue(channel, g_execution[i].it, &err)) {
-                        g_active = false;
+                        setActive(false);
                         generateError(err);
                         abort();
                         return;
@@ -537,7 +552,7 @@ void tick(uint32_t tick_usec) {
         }
     }
 
-    g_active = active;
+    setActive(active);
 }
 
 bool isActive() {
@@ -548,14 +563,22 @@ bool isActive(Channel &channel) {
     return g_execution[channel.channelIndex].counter >= 0;
 }
 
-bool anyCounterVisible(uint32_t totalThreshold) {
-    for (int i = 0; i < CH_NUM; ++i) {
-        if (g_execution[i].counter >= 0 &&
-            (uint32_t)ceilf(g_execution[i].currentTotalDwellTime) >= totalThreshold) {
-            return true;
+int g_numChannelsWithVisibleCounters;
+int g_channelsWithVisibleCounters[CH_MAX];
+
+void updateChannelsWithVisibleCountersList() {
+    g_numChannelsWithVisibleCounters = 0;
+    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+        if (g_execution[channelIndex].counter >= 0) {
+            auto &channelLists = g_channelsLists[channelIndex];
+            for (int j = 0; j < channelLists.dwellListLength; j++) {
+                if (channelLists.dwellList[j] >= CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD) {
+                    g_channelsWithVisibleCounters[g_numChannelsWithVisibleCounters++] = channelIndex;
+                    break;
+                }
+            }
         }
     }
-    return false;
 }
 
 bool getCurrentDwellTime(Channel &channel, int32_t &remaining, uint32_t &total) {

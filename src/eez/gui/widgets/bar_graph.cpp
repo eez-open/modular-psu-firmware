@@ -70,20 +70,21 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
     const BarGraphWidget *barGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const BarGraphWidget *);
 
     widgetCursor.currentState->size = sizeof(BarGraphWidgetState);
+
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
-    ((BarGraphWidgetState *)widgetCursor.currentState)->line1Data =
-        data::get(widgetCursor.cursor, barGraphWidget->line1Data);
-    ((BarGraphWidgetState *)widgetCursor.currentState)->line2Data =
-        data::get(widgetCursor.cursor, barGraphWidget->line2Data);
+    
+    auto currentState = (BarGraphWidgetState *)widgetCursor.currentState;
+    auto previousState = (BarGraphWidgetState *)widgetCursor.previousState;
+
+    currentState->line1Data = data::get(widgetCursor.cursor, barGraphWidget->line1Data);
+    currentState->line2Data = data::get(widgetCursor.cursor, barGraphWidget->line2Data);
 
     bool refresh =
         !widgetCursor.previousState ||
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
         widgetCursor.previousState->data != widgetCursor.currentState->data ||
-        ((BarGraphWidgetState *)widgetCursor.previousState)->line1Data !=
-            ((BarGraphWidgetState *)widgetCursor.currentState)->line1Data ||
-        ((BarGraphWidgetState *)widgetCursor.previousState)->line2Data !=
-            ((BarGraphWidgetState *)widgetCursor.currentState)->line2Data;
+        previousState->line1Data != currentState->line1Data ||
+        previousState->line2Data != currentState->line2Data;
 
     if (refresh) {
         int x = widgetCursor.x;
@@ -92,9 +93,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
         const int h = widget->h;
 
         float min = data::getMin(widgetCursor.cursor, widget->data).getFloat();
-        float max = fullScale
-                        ? ((BarGraphWidgetState *)widgetCursor.currentState)->line2Data.getFloat()
-                        : data::getMax(widgetCursor.cursor, widget->data).getFloat();
+        float max = fullScale ? currentState->line2Data.getFloat() : data::getMax(widgetCursor.cursor, widget->data).getFloat();
 
         bool horizontal = barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_LEFT_RIGHT ||
                           barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_RIGHT_LEFT;
@@ -105,14 +104,12 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
         int pValue = calcValuePosInBarGraphWidget(widgetCursor.currentState->data, min, max, d);
 
         // calc line 1 position (set value)
-        int pLine1 = calcValuePosInBarGraphWidget(
-            ((BarGraphWidgetState *)widgetCursor.currentState)->line1Data, min, max, d);
+        int pLine1 = calcValuePosInBarGraphWidget(currentState->line1Data, min, max, d);
 
         int pLine2;
         if (!fullScale) {
             // calc line 2 position (limit value)
-            pLine2 = calcValuePosInBarGraphWidget(
-                ((BarGraphWidgetState *)widgetCursor.currentState)->line2Data, min, max, d);
+            pLine2 = calcValuePosInBarGraphWidget(currentState->line2Data, min, max, d);
 
             // make sure line positions don't overlap
             if (pLine1 == pLine2) {

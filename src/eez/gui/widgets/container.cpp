@@ -21,6 +21,18 @@
 #include <eez/gui/widgets/container.h>
 
 #include <eez/gui/assets.h>
+#include <eez/gui/draw.h>
+#include <eez/gui/app_context.h>
+#include <eez/gui/overlay.h>
+
+#include <eez/system.h>
+#include <eez/debug.h>
+
+#if OPTION_SDRAM
+#include <eez/modules/mcu/display.h>
+#endif
+
+#define CONF_OVERLAY_OPACITY 240
 
 namespace eez {
 namespace gui {
@@ -37,30 +49,82 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
 	auto savedPreviousState = widgetCursor.previousState;
 
     WidgetState *endOfContainerInPreviousState = 0;
-    if (widgetCursor.previousState)
+    if (widgetCursor.previousState) {
         endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
+    }
 
     // move to the first child widget state
-    if (widgetCursor.previousState)
-        ++widgetCursor.previousState;
-    if (widgetCursor.currentState)
-        ++widgetCursor.currentState;
+    if (widgetCursor.previousState) {
+        if (widgetCursor.widget->type == WIDGET_TYPE_CONTAINER) {
+            widgetCursor.previousState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.previousState) + 1);
+        } else {
+            ++widgetCursor.previousState;
+        }
+    }
+    if (widgetCursor.currentState) {
+        if (widgetCursor.widget->type == WIDGET_TYPE_CONTAINER) {
+            widgetCursor.currentState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.currentState) + 1);
+        } else {
+            ++widgetCursor.currentState;
+        }
+    }
 
     auto savedWidget = widgetCursor.widget;
 
+    Overlay *overlay = nullptr;
+    if (isOverlay(widgetCursor)) {
+        overlay = getOverlay(widgetCursor);
+    }
+
     for (uint32_t index = 0; index < widgets.count; ++index) {
-		widgetCursor.widget = GET_WIDGET_LIST_ELEMENT(widgets, index);
+        widgetCursor.widget = GET_WIDGET_LIST_ELEMENT(widgets, index);
+
+#if OPTION_SDRAM
+        int xSaved;
+        int ySaved;
+        int wSaved;
+        int hSaved;
+#endif
+
+        if (overlay) {
+            if (!overlay->widgetOverrides[index].isVisible) {
+                continue;
+            }
+
+#if OPTION_SDRAM
+            xSaved = widgetCursor.widget->x;
+            ySaved = widgetCursor.widget->y;
+            wSaved = widgetCursor.widget->w;
+            hSaved = widgetCursor.widget->h;
+
+            ((Widget*)widgetCursor.widget)->x = overlay->widgetOverrides[index].x;
+            ((Widget*)widgetCursor.widget)->y = overlay->widgetOverrides[index].y;
+            ((Widget*)widgetCursor.widget)->w = overlay->widgetOverrides[index].w;
+            ((Widget*)widgetCursor.widget)->h = overlay->widgetOverrides[index].h;
+#endif
+        }
 
         enumWidget(widgetCursor, callback);
 
+#if OPTION_SDRAM
+        if (overlay) {
+            ((Widget*)widgetCursor.widget)->x = xSaved;
+            ((Widget*)widgetCursor.widget)->y = ySaved;
+            ((Widget*)widgetCursor.widget)->w = wSaved;
+            ((Widget*)widgetCursor.widget)->h = hSaved;
+        }
+#endif
+
         if (widgetCursor.previousState) {
 			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
-            if (widgetCursor.previousState >= endOfContainerInPreviousState)
+            if (widgetCursor.previousState >= endOfContainerInPreviousState) {
 				widgetCursor.previousState = 0;
+            }
         }
 
-        if (widgetCursor.currentState)
+        if (widgetCursor.currentState) {
 			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
+        }
     }
 
     widgetCursor.widget = savedWidget;
@@ -74,8 +138,99 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
 }
 
 void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    const ContainerWidget *container = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
-    enumContainer(widgetCursor, callback, container->widgets);
+    Overlay *overlay;
+    if (isOverlay(widgetCursor)) {
+        overlay = getOverlay(widgetCursor);
+
+        auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
+        auto previousState = (ContainerWidgetState *)widgetCursor.previousState;
+
+        if (currentState) {
+            currentState->overlayState = overlay->state;
+
+            if (previousState && previousState->overlayState != currentState->overlayState) {
+                widgetCursor.previousState = 0;
+            }
+        }
+
+        if (!overlay->state) {
+            if (widgetCursor.currentState) {
+                widgetCursor.currentState->size = sizeof(ContainerWidgetState);
+            }
+            return;
+        }
+    }
+
+    const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+    enumContainer(widgetCursor, callback, containerWidget->widgets);
+
+#if OPTION_SDRAM
+    if (isOverlay(widgetCursor)) {
+        auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
+        if (currentState) {
+            int xOffset;
+            int yOffset;
+            getOverlayOffset(widgetCursor, xOffset, yOffset);
+
+            mcu::display::drawBuffer(widgetCursor.x, widgetCursor.y, overlay ? overlay->width: widgetCursor.widget->w, overlay ? overlay->height : widgetCursor.widget->h, true, CONF_OVERLAY_OPACITY, xOffset, yOffset);
+            currentState->displayBufferIndex = mcu::display::selectBuffer(currentState->displayBufferIndex);
+        }
+    }
+#endif
+}
+
+void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
+    const Widget *widget = widgetCursor.widget;
+
+    bool refresh =
+        !widgetCursor.previousState ||
+        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
+
+    int w = (int)widget->w;
+    int h = (int)widget->h;
+
+    if (isOverlay(widgetCursor)) {
+        auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
+        auto previousState = (ContainerWidgetState *)widgetCursor.previousState;
+
+        Overlay *overlay = getOverlay(widgetCursor);
+
+        if (overlay->state == 0) {
+            currentState->displayBufferIndex = -1;
+            return;
+        }
+
+        if (previousState && overlay->state != previousState->overlayState) {
+            refresh = true;
+        }
+
+        w = overlay->width;
+        h = overlay->height;
+
+#if OPTION_SDRAM
+        if (!previousState || previousState->displayBufferIndex == -1) {
+            refresh = true;
+            currentState->displayBufferIndex = mcu::display::allocBuffer(false, true);
+        } else {
+            currentState->displayBufferIndex = previousState->displayBufferIndex;
+        }
+        currentState->displayBufferIndex = mcu::display::selectBuffer(currentState->displayBufferIndex);
+#endif
+    }
+
+    if (refresh) {
+        const Style* style = getWidgetStyle(widget);
+		const Style* activeStyle = getStyle(widget->activeStyle);
+
+        if (activeStyle) {
+            drawRectangle(widgetCursor.x, widgetCursor.y, w, h,
+                          widgetCursor.currentState->flags.active ? activeStyle : style, nullptr,
+                          true, false);
+        } else {
+            drawRectangle(widgetCursor.x, widgetCursor.y, w, h, style,
+                          nullptr, !widgetCursor.currentState->flags.active, false);
+        }
+    }
 }
 
 } // namespace gui

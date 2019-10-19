@@ -230,8 +230,10 @@ uint16_t getBackColor() {
     return g_bc;
 }
 
-void setOpacity(uint8_t opacity) {
+uint8_t setOpacity(uint8_t opacity) {
+    uint8_t savedOpacity = g_opacity;
     g_opacity = opacity;
+    return savedOpacity;
 }
 
 uint8_t getOpacity() {
@@ -285,30 +287,40 @@ static void *g_bufferPointer;
 static int g_bufferToDrawIndexes[NUM_BUFFERS];
 static int g_numBuffersToDraw;
 
-int getNumFreeBuffers() {
-    int count = 0;
-    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-        if (!g_buffers[bufferIndex].allocated) {
-            count++;
-        }
-    }
-    return count;
-}
+//int getNumFreeBuffers() {
+//    int count = 0;
+//    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
+//        if (!g_buffers[bufferIndex].flags.allocated) {
+//            count++;
+//        }
+//    }
+//    return count;
+//}
 
-int allocBuffer() {
-    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-        if (!g_buffers[bufferIndex].allocated) {
-            g_buffers[bufferIndex].allocated = true;
+int allocBuffer(bool staticallyAllocated, bool garbageCollect) {
+    int bufferIndex;
+
+    for (bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
+        if (!g_buffers[bufferIndex].flags.allocated) {
             // DebugTrace("Buffer %d allocated, %d more left!\n", bufferIndex, getNumFreeBuffers());
-            return bufferIndex;
+            break;
         }
     }
-    // DebugTrace("There is no free buffer available!\n");
-    return -1;
+
+    if (bufferIndex == NUM_BUFFERS) {
+        // DebugTrace("There is no free buffer available!\n");
+        bufferIndex = NUM_BUFFERS - 1;
+    }
+
+    g_buffers[bufferIndex].flags.allocated = true;
+    g_buffers[bufferIndex].flags.staticallyAllocated = staticallyAllocated;
+    g_buffers[bufferIndex].flags.garbageCollect = garbageCollect;
+
+    return bufferIndex;
 }
 
 void freeBuffer(int bufferIndex) {
-    g_buffers[bufferIndex].allocated = false;
+    g_buffers[bufferIndex].flags.allocated = false;
     // DebugTrace("Buffer %d freed up, %d buffers available now!\n", bufferIndex, getNumFreeBuffers());
     
 }
@@ -316,23 +328,48 @@ void freeBuffer(int bufferIndex) {
 int selectBuffer(int bufferIndex) {
     int selectedBufferIndex = g_selectedBufferIndex;
     g_selectedBufferIndex = bufferIndex;
+    g_buffers[bufferIndex].flags.used = true;
     setBufferPointer(g_buffers[g_selectedBufferIndex].bufferPointer);
-    //DebugTrace("Buffer %d selected!\n");
+    // DebugTrace("Buffer %d selected!\n");
     return selectedBufferIndex;
 }
 
-void drawBuffer(int x1, int y1, int x2, int y2, bool withShadow) {
+void drawBuffer(int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset) {
     Buffer &buffer = g_buffers[g_selectedBufferIndex];
-    buffer.x1 = x1;
-    buffer.y1 = y1;
-    buffer.x2 = x2;
-    buffer.y2 = y2;
-    buffer.withShadow = withShadow;
     
+    if (buffer.x != x || buffer.y != y || buffer.width != width || buffer.height != height || buffer.withShadow != withShadow || buffer.opacity != opacity || buffer.xOffset != xOffset || buffer.yOffset != yOffset) {
+        buffer.x = x;
+        buffer.y = y;
+        buffer.width = width;
+        buffer.height = height;
+        buffer.withShadow = withShadow;
+        buffer.opacity = opacity;
+        buffer.xOffset = xOffset;
+        buffer.yOffset = yOffset;
+
+        g_painted = true;
+    }
+
     g_bufferToDrawIndexes[g_numBuffersToDraw++] = g_selectedBufferIndex;
 }
 
+void clearBufferUsage() {
+    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
+        g_buffers[bufferIndex].flags.used = false;
+    }
+}
+
+void freeUnusedBuffers() {
+    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
+        if (g_buffers[bufferIndex].flags.allocated && !g_buffers[bufferIndex].flags.staticallyAllocated && !g_buffers[bufferIndex].flags.used && g_buffers[bufferIndex].flags.garbageCollect) {
+            g_buffers[bufferIndex].flags.allocated = false;
+            // DebugTrace("Buffer %d allocated but not used!\n", bufferIndex);
+        }
+    }
+}
+
 void beginBuffersDrawing() {
+    clearBufferUsage();
     g_bufferPointer = getBufferPointer();
 }
 
@@ -344,13 +381,15 @@ void endBuffersDrawing() {
             int bufferIndex = g_bufferToDrawIndexes[i];
             Buffer &buffer = g_buffers[bufferIndex];
             if (buffer.withShadow) {
-                drawShadow(buffer.x1, buffer.y1, buffer.x2, buffer.y2);
+                drawShadow(buffer.x + buffer.xOffset, buffer.y + buffer.yOffset, buffer.x + buffer.xOffset + buffer.width - 1, buffer.y + buffer.yOffset + buffer.height - 1);
             }
-            bitBlt(buffer.bufferPointer, buffer.x1, buffer.y1, buffer.x2, buffer.y2);
+            bitBlt(buffer.bufferPointer, nullptr, buffer.x, buffer.y, buffer.width, buffer.height, buffer.x + buffer.xOffset, buffer.y + buffer.yOffset, buffer.opacity);
         }
     }
 
     g_numBuffersToDraw = 0;
+
+    freeUnusedBuffers();
 }
 
 #endif

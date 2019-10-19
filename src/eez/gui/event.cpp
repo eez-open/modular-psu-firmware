@@ -22,12 +22,15 @@
 
 #include <stdint.h>
 
+#include <eez/system.h>
+
 #include <eez/gui/app_context.h>
 #include <eez/gui/gui.h>
 #include <eez/gui/touch.h>
 #include <eez/gui/update.h>
 #include <eez/gui/dialogs.h>
-#include <eez/system.h>
+#include <eez/gui/overlay.h>
+#include <eez/gui/widgets/container.h>
 
 // TODO this must be removed from here
 #include <eez/apps/psu/psu.h>
@@ -81,7 +84,10 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
         m_touchActionExecutedAtDown = false;
 
         int action = getAction(widgetCursor);
-        if (widgetCursor.appContext->testExecuteActionOnTouchDown(action)) {
+        if (action == ACTION_ID_DRAG_OVERLAY) {
+            dragOverlay(touchEvent);
+            m_activeWidget = widgetCursor;    
+        } else if (widgetCursor.appContext->testExecuteActionOnTouchDown(action)) {
             executeAction(action);
             m_touchActionExecutedAtDown = true;
             if (widgetCursor.appContext->isAutoRepeatAction(action)) {
@@ -89,6 +95,11 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
             }
         } else {
             m_activeWidget = widgetCursor;
+        }
+    } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
+        int action = getAction(widgetCursor);
+        if (action == ACTION_ID_DRAG_OVERLAY) {
+            dragOverlay(touchEvent);
         }
     } else if (touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
         int action = getAction(widgetCursor);
@@ -101,7 +112,11 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
             m_activeWidget = 0;
             if (!m_touchActionExecuted) {
                 int action = getAction(widgetCursor);
-                executeAction(action);
+                if (action == ACTION_ID_DRAG_OVERLAY) {
+                    dragOverlay(touchEvent);
+                } else {
+                    executeAction(action);
+                }
             }
         }
     }
@@ -176,17 +191,17 @@ void processTouchEvent(EventType type) {
     int x = touch::getX();
     int y = touch::getY();
 
-    if (type == EVENT_TYPE_TOUCH_DOWN) {
-        m_lastTouchMoveX = x;
-        m_lastTouchMoveX = y;
-    } else if (type == EVENT_TYPE_TOUCH_MOVE) {
+#if defined(EEZ_PLATFORM_STM32)    
+    if (type == EVENT_TYPE_TOUCH_MOVE) {
         // ignore EVENT_TYPE_TOUCH_MOVE if it is the same as the last event
-        if (m_lastTouchMoveX == x && m_lastTouchMoveY == y) {
+    	int dx = (m_lastTouchMoveX - x);
+    	int dy = (m_lastTouchMoveY - y);
+    	int d = dx * dx + dy * dy;
+        if (d == 0 || d > 1000) {
             return;
         }
-        m_lastTouchMoveX = x;
-        m_lastTouchMoveX = y;
     }
+#endif
 
     if (type == EVENT_TYPE_TOUCH_DOWN) {
         m_foundWidgetAtDown = findWidget(x, y);
@@ -223,6 +238,9 @@ void processTouchEvent(EventType type) {
 
         g_appContext = saved;
     }
+
+    m_lastTouchMoveX = x;
+    m_lastTouchMoveY = y;
 }
 
 void touchHandling() {

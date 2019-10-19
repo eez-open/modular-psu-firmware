@@ -33,7 +33,6 @@ namespace gui {
 struct PageOnStack {
     int pageId = INTERNAL_PAGE_ID_NONE;
     Page *page = nullptr;
-    bool repaint = true;
 #if OPTION_SDRAM    
     int displayBufferIndex = -1;
 #endif
@@ -113,8 +112,6 @@ public:
 
     bool isWidgetActionEnabled(const WidgetCursor &widgetCursor);
 
-    void markForRefreshAppView();
-
     void updateAppView(WidgetCursor &widgetCursor);
 
     void showProgressPage(const char *message, void (*abortCallback)());
@@ -148,7 +145,9 @@ public:
     void doShowPage(int index, Page *page = 0);
     void setPage(int pageId);
 
-    void updatePage(bool repaint, WidgetCursor &widgetCursor);
+    void updatePage(WidgetCursor &widgetCursor);
+
+    bool isPageFullyCovered(int pageNavigationStackIndex);
 }; // namespace gui
 
 extern AppContext *g_appContext;

@@ -287,3 +287,5 @@
 
 // Default duration of all animations in seconds
 #define CONF_DEFAULT_ANIMATIONS_DURATION 0.25f
+
+#define CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD 5 // 5 seconds

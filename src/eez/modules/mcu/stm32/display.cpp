@@ -232,6 +232,10 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, i
 }
 
 void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity) {
+    if (dst == nullptr) {
+        dst = g_buffer;
+    }
+
 	auto srcOffset = vramOffset((uint16_t *)src, sx, sy);
 	auto dstOffset = vramOffset((uint16_t *)dst, dx, dy);
 
