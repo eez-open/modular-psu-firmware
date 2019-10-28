@@ -46,7 +46,7 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
     if (refresh && !appContext->isActivePageInternal() && appContext->getActivePageId() != INTERNAL_PAGE_ID_NONE) {
         // clear background
 		const Widget *page = getPageWidget(appContext->getActivePageId());
-        const Style* style = getWidgetStyle(page);
+        const Style* style = getStyle(page->style);
         mcu::display::setColor(style->background_color);
 
 		mcu::display::fillRect(appContext->x, appContext->y, appContext->x + page->w - 1, appContext->y + page->h - 1);

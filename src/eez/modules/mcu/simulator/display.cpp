@@ -311,6 +311,8 @@ void sync() {
     }
 
     if (g_painted) {
+        g_painted = false;
+
         updateScreen(g_frontPanelBuffer);
 
         if (g_frontPanelBuffer == g_frontPanelBuffer1) {

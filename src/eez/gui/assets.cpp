@@ -132,10 +132,6 @@ const Style *getStyle(int styleID) {
 #endif
 }
 
-const Style *getWidgetStyle(const Widget *widget) {
-    return getStyle(transformStyle(widget));
-}
-
 const Widget* getPageWidget(int pageId) {
 #if OPTION_SDRAM
     return g_document->pages.first + pageId;

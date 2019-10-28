@@ -194,6 +194,7 @@ void adjustColor(uint16_t &c) {
 }
 
 uint16_t getColor16FromIndex(uint16_t color) {
+    color = transformColor(color);
 	return color < g_themeColorsCount ? g_themeColors[color] : g_colors[color - g_themeColorsCount];
 }
 

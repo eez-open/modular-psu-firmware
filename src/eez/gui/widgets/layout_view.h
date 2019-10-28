@@ -28,7 +28,13 @@ struct LayoutViewWidgetSpecific {
     uint16_t context; // data ID
 };
 
+struct LayoutViewWidgetState {
+    WidgetState genericState;
+    data::Value context;
+};
+
 void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
+void LayoutViewWidget_draw(const WidgetCursor &widgetCursor);
 
 } // namespace gui
 } // namespace eez

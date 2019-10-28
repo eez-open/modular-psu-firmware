@@ -48,7 +48,7 @@ void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->data != widgetCursor.currentState->data;
 
     if (refresh) {
-        const Style* style = getWidgetStyle(widget);
+        const Style* style = getStyle(widget->style);
 
         const MultilineTextWidget *display_string_widget = GET_WIDGET_PROPERTY(widget, specific, const MultilineTextWidget *);
 

@@ -203,7 +203,7 @@ void ScaleWidget_draw(const WidgetCursor &widgetCursor) {
         float min = data::getMin(widgetCursor.cursor, widget->data).getFloat();
         float max = data::getMax(widgetCursor.cursor, widget->data).getFloat();
 
-        const Style* style = getWidgetStyle(widget);
+        const Style* style = getStyle(widget->style);
 
         const ScaleWidget *scale_widget = GET_WIDGET_PROPERTY(widget, specific, const ScaleWidget *);
 

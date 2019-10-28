@@ -194,7 +194,7 @@ void drawYTGraphWithScrolling(const WidgetCursor &widgetCursor, const Widget *wi
 void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     YTGraphWidget *ytGraphWidget = GET_WIDGET_PROPERTY(widget, specific, YTGraphWidget *);
-    const Style* style = getWidgetStyle(widget);
+    const Style* style = getStyle(widget->style);
 	const Style* y1Style = getStyle(ytGraphWidget->y1Style);
 	const Style* y2Style = getStyle(ytGraphWidget->y2Style);
 

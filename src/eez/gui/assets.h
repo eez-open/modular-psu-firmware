@@ -34,7 +34,6 @@ extern Colors *g_colorsData;
 extern bool g_assetsLoaded;
 
 const Style *getStyle(int styleID);
-const Style *getWidgetStyle(const Widget *widget);
 const Widget *getPageWidget(int pageId);
 const uint8_t *getFontData(int fontID);
 const Bitmap *getBitmap(int bitmapID);

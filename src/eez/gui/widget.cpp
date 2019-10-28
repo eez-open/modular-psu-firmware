@@ -137,7 +137,7 @@ static DrawFunctionType g_drawWidgetFunctions[] = {
     ButtonGroupWidget_draw,   // WIDGET_TYPE_BUTTON_GROUP
     ScaleWidget_draw,         // WIDGET_TYPE_SCALE
     BarGraphWidget_draw,      // WIDGET_TYPE_BAR_GRAPH
-    nullptr,                  // WIDGET_TYPE_LAYOUT_VIEW
+    LayoutViewWidget_draw,    // WIDGET_TYPE_LAYOUT_VIEW
     YTGraphWidget_draw,       // WIDGET_TYPE_YT_GRAPH
     UpDownWidget_draw,        // WIDGET_TYPE_UP_DOWN
     ListGraphWidget_draw,     // WIDGET_TYPE_LIST_GRAPH
@@ -190,7 +190,7 @@ void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
 
     if (refresh) {
-        const Style* style = getWidgetStyle(widget);
+        const Style* style = getStyle(widget->style);
 		const Style* activeStyle = getStyle(widget->activeStyle);
 
         if (activeStyle) {

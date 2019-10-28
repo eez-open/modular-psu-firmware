@@ -19,6 +19,7 @@
 #if OPTION_DISPLAY
 
 #include <eez/gui/widgets/container.h>
+#include <eez/gui/widgets/layout_view.h>
 
 #include <eez/gui/assets.h>
 #include <eez/gui/draw.h>
@@ -57,6 +58,8 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
     if (widgetCursor.previousState) {
         if (widgetCursor.widget->type == WIDGET_TYPE_CONTAINER) {
             widgetCursor.previousState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.previousState) + 1);
+        } else if (widgetCursor.widget->type == WIDGET_TYPE_LAYOUT_VIEW) {
+            widgetCursor.previousState = (WidgetState *)(((LayoutViewWidgetState *)widgetCursor.previousState) + 1);
         } else {
             ++widgetCursor.previousState;
         }
@@ -64,6 +67,8 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
     if (widgetCursor.currentState) {
         if (widgetCursor.widget->type == WIDGET_TYPE_CONTAINER) {
             widgetCursor.currentState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.currentState) + 1);
+        } else if (widgetCursor.widget->type == WIDGET_TYPE_LAYOUT_VIEW) {
+            widgetCursor.currentState = (WidgetState *)(((LayoutViewWidgetState *)widgetCursor.currentState) + 1);
         } else {
             ++widgetCursor.currentState;
         }
@@ -219,7 +224,7 @@ void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
     }
 
     if (refresh) {
-        const Style* style = getWidgetStyle(widget);
+        const Style* style = getStyle(widget->style);
 		const Style* activeStyle = getStyle(widget->activeStyle);
 
         if (activeStyle) {

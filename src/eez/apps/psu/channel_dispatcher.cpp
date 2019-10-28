@@ -138,7 +138,9 @@ bool setCouplingType(CouplingType couplingType, int *err) {
 #endif
 
                 channel.prot_conf.flags.u_state = Channel::get(0).prot_conf.flags.u_state || Channel::get(1).prot_conf.flags.u_state ? 1 : 0;
-                channel.prot_conf.flags.u_type = Channel::get(0).prot_conf.flags.u_type || Channel::get(1).prot_conf.flags.u_type ? 1 : 0;
+                if (channel.params.features & CH_FEATURE_HW_OVP) {
+                    channel.prot_conf.flags.u_type = Channel::get(0).prot_conf.flags.u_type || Channel::get(1).prot_conf.flags.u_type ? 1 : 0;
+                }
                 channel.prot_conf.u_level = MIN(Channel::get(0).prot_conf.u_level, Channel::get(1).prot_conf.u_level);
                 channel.prot_conf.u_delay = MIN(Channel::get(0).prot_conf.u_delay, Channel::get(1).prot_conf.u_delay);
 
@@ -299,7 +301,9 @@ void setTrackingChannels(int trackingEnabled[]) {
                 trigger::setCurrent(trackingChannel, iDef);
 
                 trackingChannel.prot_conf.flags.u_state = u_state;
-                trackingChannel.prot_conf.flags.u_type = u_type;
+                if (trackingChannel.params.features & CH_FEATURE_HW_OVP) {
+                    trackingChannel.prot_conf.flags.u_type = u_type;
+                }
                 trackingChannel.prot_conf.u_level = u_level;
                 trackingChannel.prot_conf.u_delay = u_delay;
 
@@ -504,12 +508,16 @@ void setOvpParameters(Channel &channel, int state, int type, float level, float 
         coupledLevel = roundPrec(coupledLevel, Channel::get(0).getVoltageResolution());
 
         Channel::get(0).prot_conf.flags.u_state = state;
-        Channel::get(0).prot_conf.flags.u_type = type;
+        if (Channel::get(0).params.features & CH_FEATURE_HW_OVP) {
+            Channel::get(0).prot_conf.flags.u_type = type;
+        }
         Channel::get(0).prot_conf.u_level = coupledLevel;
         Channel::get(0).prot_conf.u_delay = delay;
 
         Channel::get(1).prot_conf.flags.u_state = state;
-        Channel::get(1).prot_conf.flags.u_type = type;
+        if (Channel::get(1).params.features & CH_FEATURE_HW_OVP) {
+            Channel::get(1).prot_conf.flags.u_type = type;
+        }
         Channel::get(1).prot_conf.u_level = coupledLevel;
         Channel::get(1).prot_conf.u_delay = delay;
     } else if (channel.flags.trackingEnabled) {
@@ -518,14 +526,18 @@ void setOvpParameters(Channel &channel, int state, int type, float level, float 
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
                 trackingChannel.prot_conf.flags.u_state = state;
-                trackingChannel.prot_conf.flags.u_type = type;
+                if (trackingChannel.params.features & CH_FEATURE_HW_OVP) {
+                    trackingChannel.prot_conf.flags.u_type = type;
+                }
                 trackingChannel.prot_conf.u_level = level;
                 trackingChannel.prot_conf.u_delay = delay;
             }
         }
     } else {
         channel.prot_conf.flags.u_state = state;
-        channel.prot_conf.flags.u_type = type;
+        if (channel.params.features & CH_FEATURE_HW_OVP) {
+            channel.prot_conf.flags.u_type = type;
+        }
         channel.prot_conf.u_level = roundPrec(level, channel.getVoltageResolution());
         channel.prot_conf.u_delay = delay;
     }
@@ -549,17 +561,25 @@ void setOvpState(Channel &channel, int state) {
 
 void setOvpType(Channel &channel, int type) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        Channel::get(0).prot_conf.flags.u_type = type;
-        Channel::get(1).prot_conf.flags.u_type = type;
+        if (Channel::get(0).params.features & CH_FEATURE_HW_OVP) {
+            Channel::get(0).prot_conf.flags.u_type = type;
+        }
+        if (Channel::get(1).params.features & CH_FEATURE_HW_OVP) {
+            Channel::get(1).prot_conf.flags.u_type = type;
+        }
     } else if (channel.flags.trackingEnabled) {
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
-            if (trackingChannel.flags.trackingEnabled) {
-                trackingChannel.prot_conf.flags.u_type = type;
+            if (trackingChannel.params.features & CH_FEATURE_HW_OVP) {
+                if (trackingChannel.flags.trackingEnabled) {
+                    trackingChannel.prot_conf.flags.u_type = type;
+                }
             }
         }
     } else {
-        channel.prot_conf.flags.u_type = type;
+        if (channel.params.features & CH_FEATURE_HW_OVP) {
+            channel.prot_conf.flags.u_type = type;
+        }
     }
 }
 

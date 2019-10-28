@@ -438,21 +438,25 @@ struct Channel : ChannelInterface {
 
 			ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, true);
 
-			if (channel.isHwOvpEnabled()) {
-				isSwOvpAtStart = channel_dispatcher::getUSet(channel) < CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD;
-				if (isSwOvpAtStart) {
-					oeTickCount = micros();
-				} else {
-					// OVP has to be enabled after OE activation
-					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+			if (channel.params.features & CH_FEATURE_HW_OVP) {
+				if (channel.isHwOvpEnabled()) {
+					isSwOvpAtStart = channel_dispatcher::getUSet(channel) < CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD;
+					if (isSwOvpAtStart) {
+						oeTickCount = micros();
+					} else {
+						// OVP has to be enabled after OE activation
+						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+					}
 				}
 			}
 
 			adc.start(ADC_DATA_TYPE_U_MON);
 		} else {
-			if (channel.isHwOvpEnabled()) {
-				// OVP has to be disabled before OE deactivation
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+			if (channel.params.features & CH_FEATURE_HW_OVP) {
+				if (channel.isHwOvpEnabled()) {
+					// OVP has to be disabled before OE deactivation
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+				}
 			}
 
 			dac.setVoltage(channel.getCalibratedVoltage(0));
@@ -541,15 +545,17 @@ struct Channel : ChannelInterface {
 	void setDacVoltageFloat(int subchannelIndex, float value) {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
-        if (channel.isOutputEnabled()) {
-            if (value < uSet) {
-                fallingEdge = true;
-				if (channel.isHwOvpEnabled()) {
-					// deactivate HW OVP
-					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+		if (channel.params.features & CH_FEATURE_HW_OVP) {
+			if (channel.isOutputEnabled()) {
+				if (value < uSet) {
+					fallingEdge = true;
+					if (channel.isHwOvpEnabled()) {
+						// deactivate HW OVP
+						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+					}
 				}
-            }
-        }
+			}
+		}
 
         if (channel.isOutputEnabled() || isDacTesting(subchannelIndex)) {
 			dac.setVoltage(value);
@@ -697,10 +703,12 @@ struct Channel : ChannelInterface {
 	void onSpiIrq() {
 		uint8_t intcap = ioexp.readIntcapRegister();
 		// DebugTrace("CH%d INTCAP 0x%02X\n", (int)(channel.channelIndex + 1), (int)intcap);
-		if (!(intcap & (1 << IOExpander::DCP405_R2B5_IO_BIT_IN_OVP_FAULT))) {
-			psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-			if (channel.isOutputEnabled()) {
-				channel.enterOvpProtection();
+		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
+		if (channel.params.features & CH_FEATURE_HW_OVP) {
+			if (!(intcap & (1 << IOExpander::DCP405_R2B5_IO_BIT_IN_OVP_FAULT))) {
+				if (channel.isOutputEnabled()) {
+					channel.enterOvpProtection();
+				}
 			}
 		}
 	}

@@ -67,8 +67,6 @@ void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum op
 bool isPageInternal(int pageId);
 void executeAction(int actionId);
 
-int transformStyle(const Widget *widget);
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void showWelcomePage();

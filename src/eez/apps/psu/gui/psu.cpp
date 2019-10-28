@@ -1042,6 +1042,20 @@ void onLastErrorEventAction() {
 
 } // namespace gui
 } // namespace psu
+
+namespace mcu {
+namespace display {
+
+uint16_t transformColor(uint16_t color) {
+    if (color == COLOR_ID_CHANNEL1) {
+        return color + eez::psu::gui::g_channel->channelIndex;
+    }
+    return color;
+}
+
+}
+}
+
 } // namespace eez
 
 #endif

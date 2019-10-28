@@ -154,28 +154,6 @@ bool AppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
     return false;
 }
 
-int AppContext::transformStyle(const Widget *widget) {
-    // if (isFrontPanelLocked()) {
-    //     if (widget->action) {
-    //         if (widget->style == STYLE_ID_BOTTOM_BUTTON) {
-    //             if (widget->action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
-    //                 return STYLE_ID_BOTTOM_BUTTON_DISABLED;
-    //             }
-    //         } else if (widget->style == STYLE_ID_EDIT_S) {
-    //             return STYLE_ID_DEFAULT_S;
-    //         } else if (widget->style == STYLE_ID_MON_VALUE) {
-    //             return STYLE_ID_DEFAULT;
-    //         } else if (widget->style == STYLE_ID_CHANNEL_OFF) {
-    //             return STYLE_ID_CHANNEL_OFF_DISABLED;
-    //         } else if (widget->style == STYLE_ID_EDIT_VALUE_ACTIVE_S_RIGHT) {
-    //             return STYLE_ID_EDIT_VALUE_S_RIGHT;
-    //         }
-    //     }
-    // }
-
-    return widget->style;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 int AppContext::getActivePageId() {
@@ -419,7 +397,7 @@ void AppContext::updatePage(WidgetCursor &widgetCursor) {
 
         if (!widgetCursor.previousState) {
             // clear background
-            const Style* style = getWidgetStyle(page);
+            const Style* style = getStyle(page->style);
             mcu::display::setColor(style->background_color);
             mcu::display::fillRect(x, y, x + width - 1, y + height - 1);
         }

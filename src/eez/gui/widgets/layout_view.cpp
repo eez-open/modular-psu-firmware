@@ -27,41 +27,85 @@
 namespace eez {
 namespace gui {
 
+int getLayoutId(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.widget->data) {
+        auto layoutValue = data::get(widgetCursor.cursor, widgetCursor.widget->data);
+        return layoutValue.getInt();
+    }
+    
+    const LayoutViewWidgetSpecific *layoutViewSpecific = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const LayoutViewWidgetSpecific *);
+    return layoutViewSpecific->layout;
+}
+
 void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    auto savedCurrentState = widgetCursor.currentState;
-    auto savedPreviousState = widgetCursor.previousState;
     auto cursor = widgetCursor.cursor;
 
     const LayoutViewWidgetSpecific *layoutViewSpecific = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const LayoutViewWidgetSpecific *);
 
-    data::setContext(widgetCursor.cursor, layoutViewSpecific->context);
-
-    const Widget *layout = nullptr;
-
-    if (widgetCursor.widget->data) {
-        auto layoutValue = data::get(widgetCursor.cursor, widgetCursor.widget->data);
-
-        if (widgetCursor.currentState) {
-            widgetCursor.currentState->data = layoutValue;
-
-            if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {
-                widgetCursor.previousState = 0;
-            }
-        }
-
-        layout = getPageWidget(layoutValue.getInt());
-    } else if (layoutViewSpecific->layout != -1) {
-        layout = getPageWidget(layoutViewSpecific->layout);
+    if (widgetCursor.previousState && (widgetCursor.previousState->data != widgetCursor.currentState->data || ((LayoutViewWidgetState *)widgetCursor.previousState)->context != ((LayoutViewWidgetState *)widgetCursor.currentState)->context)) {
+        widgetCursor.previousState = 0;
     }
-    
-	if (layout) {
+
+    Value oldContext;
+    Value newContext;
+    if (layoutViewSpecific->context) {
+        data::setContext(widgetCursor.cursor, layoutViewSpecific->context, oldContext, newContext);
+    }
+
+    int layoutId = getLayoutId(widgetCursor);
+    const Widget *layout = layoutId != -1 ? getPageWidget(layoutId) : nullptr;
+
+    if (layout) {
 		const PageWidget *layoutSpecific = GET_WIDGET_PROPERTY(layout, specific, const PageWidget *);
 		enumContainer(widgetCursor, callback, layoutSpecific->widgets);
 	}
 
+    if (layoutViewSpecific->context) {
+        data::restoreContext(widgetCursor.cursor, layoutViewSpecific->context, oldContext);
+    }
+
     widgetCursor.cursor = cursor;
-    widgetCursor.currentState = savedCurrentState;
-    widgetCursor.previousState = savedPreviousState;
+}
+
+void LayoutViewWidget_draw(const WidgetCursor &widgetCursor) {
+    const Widget *widget = widgetCursor.widget;
+    const LayoutViewWidgetSpecific *layoutViewSpecific = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const LayoutViewWidgetSpecific *);
+
+    Value oldContext;
+    Value newContext;
+    if (layoutViewSpecific->context) {
+        data::setContext(((WidgetCursor &)widgetCursor).cursor, layoutViewSpecific->context, oldContext, newContext);
+        ((LayoutViewWidgetState *)widgetCursor.currentState)->context = newContext;
+    } else {
+        ((LayoutViewWidgetState *)widgetCursor.currentState)->context = Value();
+    }
+
+    widgetCursor.currentState->data = getLayoutId(widgetCursor);
+
+    if (layoutViewSpecific->context) {
+        data::restoreContext(((WidgetCursor &)widgetCursor).cursor, layoutViewSpecific->context, oldContext);
+    }
+
+    bool refresh =
+        !widgetCursor.previousState ||
+        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
+        widgetCursor.previousState->data != widgetCursor.currentState->data ||
+        ((LayoutViewWidgetState *)widgetCursor.previousState)->context != ((LayoutViewWidgetState *)widgetCursor.currentState)->context;
+
+    if (refresh) {
+        const Style* style = getStyle(widget->style);
+        const Style* activeStyle = getStyle(widget->activeStyle);
+
+        if (activeStyle) {
+            drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                widgetCursor.currentState->flags.active ? activeStyle : style, nullptr,
+                true, false);
+
+        } else {
+            drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
+                nullptr, !widgetCursor.currentState->flags.active, false);
+        }
+    }
 }
 
 } // namespace gui

@@ -36,7 +36,7 @@ namespace gui {
 void ListGraphWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const ListGraphWidget *listGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const ListGraphWidget *);
-    const Style* style = getWidgetStyle(widget);
+    const Style* style = getStyle(widget->style);
 	const Style* y1Style = getStyle(listGraphWidget->y1Style);
 	const Style* y2Style = getStyle(listGraphWidget->y2Style);
 	const Style* cursorStyle = getStyle(listGraphWidget->cursorStyle);

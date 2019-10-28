@@ -123,7 +123,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
             }
         }
 
-        const Style* style = getWidgetStyle(widget);
+        const Style* style = getStyle(widget->style);
 
         Style textStyle;
 

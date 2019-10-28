@@ -40,7 +40,7 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         const BitmapWidget *display_bitmap_widget = GET_WIDGET_PROPERTY(widget, specific, const BitmapWidget *);
-        const Style* style = getWidgetStyle(widget);
+        const Style* style = getStyle(widget->style);
 
         const Bitmap *bitmap = nullptr;
 

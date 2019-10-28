@@ -92,7 +92,6 @@ public:
     bool isPageActiveOrOnStack(int pageId);
 
     virtual bool isFocusWidget(const WidgetCursor &widgetCursor);
-    int transformStyle(const Widget *widget);
 
     virtual uint16_t getWidgetBackgroundColor(const WidgetCursor &widgetCursor, const Style *style);
     virtual bool isBlinking(const data::Cursor &cursor, uint16_t id);

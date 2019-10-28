@@ -80,7 +80,7 @@ scpi_result_t scpi_cmd_outputState(scpi_t *context) {
 
             if (channel_dispatcher::isTripped(*channel)) {
                 SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION);
-                return SCPI_RES_OK;
+                return SCPI_RES_ERR;
             }
         } else {
             if (calibration::isEnabled()) {

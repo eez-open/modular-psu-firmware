@@ -66,8 +66,11 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     int xOffset = 0;
     int yOffset = 0;
     int count = data::count(parentWidget->data);
+
+    Value oldValue;
+
     for (int index = 0; index < count; ++index) {
-        data::select(widgetCursor.cursor, parentWidget->data, index);
+        data::select(widgetCursor.cursor, parentWidget->data, index, oldValue);
 
 		widgetCursor.x = savedX + xOffset;
 		widgetCursor.y = savedY + yOffset;
@@ -121,7 +124,9 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
         savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
     }
 
-    data::select(widgetCursor.cursor, widgetCursor.widget->data, -1);
+    if (count > 0) {
+        data::deselect(widgetCursor.cursor, widgetCursor.widget->data, oldValue);
+    }
 
 	widgetCursor.currentState = savedCurrentState;
 	widgetCursor.previousState = savedPreviousState;

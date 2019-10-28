@@ -36,7 +36,7 @@ void TextWidget_fixPointers(Widget *widget) {
 
 void TextWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const Style* style = getWidgetStyle(widget);
+    const Style* style = getStyle(widget->style);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);

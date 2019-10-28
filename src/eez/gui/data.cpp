@@ -374,15 +374,26 @@ int count(uint16_t id) {
     return countValue.getInt();
 }
 
-void select(Cursor &cursor, uint16_t id, int index) {
+void select(Cursor &cursor, uint16_t id, int index, Value &oldValue) {
     cursor.i = index;
     Value indexValue = index;
     g_dataOperationsFunctions[id](data::DATA_OPERATION_SELECT, cursor, indexValue);
+    if (index == 0) {
+        oldValue = indexValue;
+    }
 }
 
-void setContext(Cursor &cursor, uint16_t id) {
-	Value empty;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_SET_CONTEXT, cursor, empty);
+void deselect(Cursor &cursor, uint16_t id, Value &oldValue) {
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_DESELECT, cursor, oldValue);
+}
+
+void setContext(Cursor &cursor, uint16_t id, Value &oldContext, Value &newContext) {
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_SET_CONTEXT, cursor, oldContext);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_CONTEXT, cursor, newContext);
+}
+
+void restoreContext(Cursor &cursor, uint16_t id, Value &oldContext) {
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_RESTORE_CONTEXT, cursor, oldContext);
 }
 
 int getFloatListLength(uint16_t id) {

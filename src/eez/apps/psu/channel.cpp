@@ -275,7 +275,7 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
     float delay;
 
     if (IS_OVP_VALUE(this, cpv)) {
-        state = (flags.rprogEnabled || prot_conf.flags.u_state) && !prot_conf.flags.u_type;
+        state = (flags.rprogEnabled || prot_conf.flags.u_state) && !((params.features & CH_FEATURE_HW_OVP) && prot_conf.flags.u_type);
         condition = checkSwOvpCondition(channel_dispatcher::getUProtectionLevel(*this));
         delay = prot_conf.u_delay;
         delay -= PROT_DELAY_CORRECTION;

@@ -299,15 +299,20 @@ enum DataOperationEnum {
     DATA_OPERATION_UPDATE_OVERLAY_DATA,
     DATA_OPERATION_COUNT,
     DATA_OPERATION_SELECT,
+    DATA_OPERATION_DESELECT,
+    DATA_OPERATION_GET_CONTEXT,
     DATA_OPERATION_SET_CONTEXT,
+    DATA_OPERATION_RESTORE_CONTEXT,
     DATA_OPERATION_IS_BLINKING,
     DATA_OPERATION_SET
 };
 
 int count(uint16_t id);
-void select(Cursor &cursor, uint16_t id, int index);
+void select(Cursor &cursor, uint16_t id, int index, Value &oldValue);
+void deselect(Cursor &cursor, uint16_t id, Value &oldValue);
 
-void setContext(Cursor &cursor, uint16_t id);
+void setContext(Cursor &cursor, uint16_t id, Value &oldContext, Value &newContext);
+void restoreContext(Cursor &cursor, uint16_t id, Value &oldContext);
 
 int getFloatListLength(uint16_t id);
 float *getFloatList(uint16_t id);

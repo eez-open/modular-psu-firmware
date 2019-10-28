@@ -843,6 +843,11 @@ void data_edit_enabled(data::DataOperationEnum operation, data::Cursor &cursor, 
 void data_channels(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
         value = CH_NUM;
+    } else if (operation == data::DATA_OPERATION_SELECT) {
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        g_channel = &Channel::get(cursor.i);
+    } else if (operation == data::DATA_OPERATION_DESELECT) {
+        g_channel = (Channel * )value.getVoidPointer();
     }
 }
 
@@ -1183,6 +1188,12 @@ void data_slot1_channel_index(data::DataOperationEnum operation, data::Cursor &c
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::getBySlotIndex(0);
         cursor.i = channel.channelIndex;
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        g_channel = &channel;
+    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+        g_channel = (Channel *)value.getVoidPointer();
     }
 }
 
@@ -1190,6 +1201,12 @@ void data_slot2_channel_index(data::DataOperationEnum operation, data::Cursor &c
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::getBySlotIndex(1);
         cursor.i = channel.channelIndex;
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        g_channel = &channel;
+    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+        g_channel = (Channel *)value.getVoidPointer();
     }
 }
 
@@ -1197,6 +1214,12 @@ void data_slot3_channel_index(data::DataOperationEnum operation, data::Cursor &c
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::getBySlotIndex(2);
         cursor.i = channel.channelIndex;
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        g_channel = &channel;
+    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+        g_channel = (Channel *)value.getVoidPointer();
     }
 }
 
@@ -1222,6 +1245,12 @@ void data_slot_max_channel_index(data::DataOperationEnum operation, data::Cursor
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::getBySlotIndex(persist_conf::devConf.flags.slotMax - 1);
         cursor.i = channel.channelIndex;
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        g_channel = &channel;
+    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+        g_channel = (Channel *)value.getVoidPointer();
     }
 }
 
@@ -1285,6 +1314,12 @@ void data_slot_min1_channel_index(data::DataOperationEnum operation, data::Curso
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::getBySlotIndex(persist_conf::devConf.flags.slotMin1 - 1);
         cursor.i = channel.channelIndex;
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        g_channel = &channel;
+    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+        g_channel = (Channel *)value.getVoidPointer();
     }
 }
 
@@ -1298,6 +1333,12 @@ void data_slot_min2_channel_index(data::DataOperationEnum operation, data::Curso
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::getBySlotIndex(persist_conf::devConf.flags.slotMin2 - 1);
         cursor.i = channel.channelIndex;
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        g_channel = &channel;
+    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+        g_channel = (Channel *)value.getVoidPointer();
     }
 }
 
@@ -1353,13 +1394,26 @@ void data_slot_micro3_view(data::DataOperationEnum operation, data::Cursor &curs
 
 void data_slot_2ch_ch1_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
-        // cursor.i = cursor.i;
+        Channel &channel = Channel::get(cursor.i);
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        g_channel = &channel;
+    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+        g_channel = (Channel *)value.getVoidPointer();
     }
 }
 
 void data_slot_2ch_ch2_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
         cursor.i = cursor.i + 1;
+        Channel &channel = Channel::get(cursor.i);
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        g_channel = &channel;
+    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
+        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+        g_channel = (Channel *)value.getVoidPointer();
     }
 }
 

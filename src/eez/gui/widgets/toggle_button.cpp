@@ -49,7 +49,7 @@ void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         const ToggleButtonWidget *toggle_button_widget = GET_WIDGET_PROPERTY(widget, specific, const ToggleButtonWidget *);
-        const Style* style = getWidgetStyle(widget);
+        const Style* style = getStyle(widget->style);
         drawText(
             widgetCursor.currentState->flags.enabled ? 
                 GET_WIDGET_PROPERTY(toggle_button_widget, text2, const char *) : 

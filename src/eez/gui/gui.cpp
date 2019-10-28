@@ -191,10 +191,6 @@ bool isPageInternal(int pageId) {
     return pageId < INTERNAL_PAGE_ID_NONE;
 }
 
-int transformStyle(const Widget *widget) {
-    return g_appContext->transformStyle(widget);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void action_internal_select_enum_item() {

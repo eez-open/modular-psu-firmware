@@ -92,6 +92,8 @@ float calcTemperature(uint16_t adcValue) {
 		return 25;
 	}
 
+	// http://www.giangrandi.ch/electronics/ntc/ntc.shtml
+
 	float RF = 3300.0f;
 	float UREF = 3.3f;
 	float T25 = 298.15F;
