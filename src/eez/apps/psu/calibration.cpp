@@ -145,6 +145,7 @@ bool Value::checkRange(float dac, float data, float adc) {
 
     return true;
 }
+
 void Value::setData(float dac, float data, float adc) {
     if (level == LEVEL_MIN) {
         min_set = true;

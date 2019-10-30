@@ -72,7 +72,6 @@ struct Channel : ChannelInterface {
 
 		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP505) {
 			params.U_MAX = 50.0f;
-			params.U_MAX_CONF = 50.0f;
 
 			params.U_CAL_VAL_MIN = 0.15f;
 			params.U_CAL_VAL_MID = 24.1f;
@@ -80,7 +79,6 @@ struct Channel : ChannelInterface {
 			params.U_CURR_CAL = 25.0f;
 		} else {
 			params.U_MAX = 40.0f;
-			params.U_MAX_CONF = 40.0f;
 
 			params.U_CAL_VAL_MIN = 0.15f;
 			params.U_CAL_VAL_MID = 20.0f;
@@ -96,25 +94,29 @@ struct Channel : ChannelInterface {
 			params.U_CAL_VAL_MIN = 0.15f;
 			params.U_CAL_VAL_MID = 24.1f;
 			params.U_CAL_VAL_MAX = 48.0f;
-			params.U_CURR_CAL = 25.0f;
 		} else {
 			params.U_CAL_VAL_MIN = 0.15f;
 			params.U_CAL_VAL_MID = 20.0f;
 			params.U_CAL_VAL_MAX = 38.0f;
-			params.U_CURR_CAL = 20.0f;
 		}
+		params.I_VOLT_CAL = 0.1f;
 
 		params.I_MIN = 0.0f;
 		params.I_DEF = 0.0f;
 		params.I_MAX = 5.0f;
-		params.I_MAX_CONF = 5.0f;
+		
 		params.I_MIN_STEP = 0.01f;
 		params.I_DEF_STEP = 0.01f;
 		params.I_MAX_STEP = 1.0f; 
+		
 		params.I_CAL_VAL_MIN = 0.05f;
 		params.I_CAL_VAL_MID = 2.425f;
 		params.I_CAL_VAL_MAX = 4.8f;
-		params.I_VOLT_CAL = 0.1f;
+		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP505) {
+			params.U_CURR_CAL = 25.0f;
+		} else {
+			params.U_CURR_CAL = 20.0f;
+		}
 
 		params.OVP_DEFAULT_STATE = false;
 		params.OVP_MIN_DELAY = 0.0f;
@@ -222,19 +224,12 @@ struct Channel : ChannelInterface {
 		AdcDataType adcDataType = adc.adcDataType;
 
 		if (adcDataType) {
-
 #if defined(EEZ_PLATFORM_STM32)
 			if (ioexp.isAdcReady()) {
 #endif
-
-#ifdef DEBUG
-				psu::debug::g_adcCounter.inc();
-#endif
-
 				float value = adc.read(channel);
 				AdcDataType nextAdcDataType = channel.onAdcData(adcDataType, value);
 				adc.start(nextAdcDataType);
-
 #if defined(EEZ_PLATFORM_STM32)
 			}
 #endif

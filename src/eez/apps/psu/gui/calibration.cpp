@@ -158,7 +158,7 @@ void setLevelValue() {
     NumericKeypad *numericKeypad =
         NumericKeypad::start(0, levelValue, options, onSetLevelOk, 0, showCurrentStep);
 
-    if (g_stepNum == 0 || g_stepNum == 3 || (g_stepNum >= 6 && g_stepNum <= 8)) {
+    if (levelValue.getFloat() < 1) {
         numericKeypad->switchToMilli();
     }
 }
@@ -226,7 +226,7 @@ void set() {
         NumericKeypad *numericKeypad =
             NumericKeypad::start(0, data::Value(), options, onSetOk, 0, showCurrentStep);
 
-        if (g_stepNum == 0 || g_stepNum == 3 || (g_stepNum >= 6 && g_stepNum <= 8)) {
+        if (getLevelValue().getFloat() < 1) {
             numericKeypad->switchToMilli();
         }
     } else if (g_stepNum == MAX_STEP_NUM - 1) {

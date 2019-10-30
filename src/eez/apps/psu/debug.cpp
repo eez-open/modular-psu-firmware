@@ -24,21 +24,6 @@
 #include <eez/apps/psu/serial_psu.h>
 #include <eez/system.h>
 
-#ifndef EEZ_PLATFORM_SIMULATOR
-#include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-extern char _end;
-extern "C" char *sbrk(int i);
-char *ramstart = (char *)0x20070000;
-char *ramend = (char *)0x20088000;
-#endif
-
-#if OPTION_SD_CARD
-#include <eez/apps/psu/sd_card.h>
-#endif
-
 namespace eez {
 namespace psu {
 namespace debug {
@@ -50,60 +35,13 @@ DebugValueVariable g_iDac[CH_MAX] = { DebugValueVariable("CH1 I_DAC"), DebugValu
 DebugValueVariable g_iMon[CH_MAX] = { DebugValueVariable("CH1 I_MON"), DebugValueVariable("CH2 I_MON"), DebugValueVariable("CH3 I_MON"), DebugValueVariable("CH4 I_MON"), DebugValueVariable("CH5 I_MON"), DebugValueVariable("CH6 I_MON") };
 DebugValueVariable g_iMonDac[CH_MAX] = { DebugValueVariable("CH1 I_MON_DAC"), DebugValueVariable("CH2 I_MON_DAC"), DebugValueVariable("CH3 I_MON_DAC"), DebugValueVariable("CH4 I_MON_DAC"), DebugValueVariable("CH5 I_MON_DAC"), DebugValueVariable("CH6 I_MON_DAC") };
 
-DebugDurationVariable g_mainLoopDuration("MAIN_LOOP_DURATION");
-#if CONF_DEBUG_VARIABLES
-DebugDurationVariable g_listTickDuration("LIST_TICK_DURATION");
-#endif
-DebugCounterVariable g_adcCounter("ADC_COUNTER");
-
 DebugVariable *g_variables[] = { 
-    &g_uDac[0],          
-    &g_uDac[1],    
-    &g_uDac[2],
-    &g_uDac[3],
-    &g_uDac[4],
-    &g_uDac[5],
-
-    &g_uMon[0],
-    &g_uMon[1],
-    &g_uMon[2],
-    &g_uMon[3],
-    &g_uMon[4],
-    &g_uMon[5],
-
-    &g_uMonDac[0],
-    &g_uMonDac[1], 
-    &g_uMonDac[2],
-    &g_uMonDac[3],
-    &g_uMonDac[4],
-    &g_uMonDac[5],
-
-    &g_iDac[0],
-    &g_iDac[1],
-    &g_iDac[2],
-    &g_iDac[3],
-    &g_iDac[4],
-    &g_iDac[5],
-
-    &g_iMon[0],
-    &g_iMon[1],    
-    &g_iMon[2],
-    &g_iMon[3],
-    &g_iMon[4],
-    &g_iMon[5],
-
-    &g_iMonDac[0],
-    &g_iMonDac[1],
-    &g_iMonDac[2],
-    &g_iMonDac[3],
-    &g_iMonDac[4],
-    &g_iMonDac[5],
-
-    &g_mainLoopDuration,
-#if CONF_DEBUG_VARIABLES
-    &g_listTickDuration,
-#endif
-    &g_adcCounter 
+    &g_uDac[0], &g_uMon[0], &g_uMonDac[0], &g_iDac[0], &g_iMon[0], &g_iMonDac[0],
+    &g_uDac[1], &g_uMon[1], &g_uMonDac[1], &g_iDac[1], &g_iMon[1], &g_iMonDac[1],
+    &g_uDac[2], &g_uMon[2], &g_uMonDac[2], &g_iDac[2], &g_iMon[2], &g_iMonDac[2],
+    &g_uDac[3], &g_uMon[3], &g_uMonDac[3], &g_iDac[3], &g_iMon[3], &g_iMonDac[3],
+    &g_uDac[4], &g_uMon[4], &g_uMonDac[4], &g_iDac[4], &g_iMon[4], &g_iMonDac[4],
+    &g_uDac[5], &g_uMon[5], &g_uMonDac[5], &g_iDac[5], &g_iMon[5], &g_iMonDac[5] 
 };
 
 static uint32_t g_previousTickCount1sec;
@@ -112,32 +50,15 @@ static uint32_t g_previousTickCount10sec;
 void dumpVariables(char *buffer) {
     buffer[0] = 0;
 
-    for (unsigned i = 0; i < sizeof(g_variables) / sizeof(DebugVariable *); ++i) {
+    for (int i = 0; i < CH_NUM * 6; ++i) {
         strcat(buffer, g_variables[i]->name());
         strcat(buffer, " = ");
         g_variables[i]->dump(buffer);
         strcat(buffer, "\n");
     }
-
-#ifndef EEZ_PLATFORM_SIMULATOR
-    char *heapend = sbrk(0);
-    register char *stack_ptr asm("sp");
-    struct mallinfo mi = mallinfo();
-    sprintf(buffer + strlen(buffer), "Dynamic ram used: %d\n", mi.uordblks);
-    sprintf(buffer + strlen(buffer), "Program static ram used %d\n", &_end - ramstart);
-    sprintf(buffer + strlen(buffer), "Stack ram used %d\n", ramend - stack_ptr);
-    sprintf(buffer + strlen(buffer), "My guess at free mem: %d\n",
-            stack_ptr - heapend + mi.fordblks);
-#endif
-
-#if OPTION_SD_CARD
-    sd_card::dumpInfo(buffer);
-#endif
 }
 
 void tick(uint32_t tickCount) {
-    debug::g_mainLoopDuration.tick(tickCount);
-
     if (g_previousTickCount1sec != 0) {
         if (tickCount - g_previousTickCount1sec >= 1000000L) {
             for (unsigned i = 0; i < sizeof(g_variables) / sizeof(DebugVariable *); ++i) {

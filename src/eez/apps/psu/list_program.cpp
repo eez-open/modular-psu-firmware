@@ -465,10 +465,6 @@ bool setListValue(Channel &channel, int16_t it, int *err) {
 }
 
 void tick(uint32_t tick_usec) {
-#if CONF_DEBUG_VARIABLES
-    debug::g_listTickDuration.tick(tick_usec);
-#endif
-
     bool active = false;
 
     for (int i = 0; i < CH_NUM; ++i) {

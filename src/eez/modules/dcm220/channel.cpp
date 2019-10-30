@@ -95,20 +95,20 @@ float calcTemperature(uint16_t adcValue) {
 	// http://www.giangrandi.ch/electronics/ntc/ntc.shtml
 
 	float RF = 3300.0f;
-	float UREF = 3.3f;
 	float T25 = 298.15F;
 	float R25 = 10000;
 	float BETA = 3570;
 	float ADC_MAX_FOR_TEMP = 4095.0f;
 
-	float UT = UREF - adcValue * UREF / ADC_MAX_FOR_TEMP;
-	float RT = RF * UT / (UREF - UT);
+	float RT = RF * (ADC_MAX_FOR_TEMP  - adcValue) / adcValue;
 
 	float Tkelvin = 1 / (logf(RT / R25) / BETA + 1 / T25);
-
 	float Tcelsius = Tkelvin - 273.15f;
 
-	return roundPrec(Tcelsius, 0.1f);
+	float TEMP_OFFSET = 10.0f; // empirically determined
+	Tcelsius -= TEMP_OFFSET;
+
+	return roundPrec(Tcelsius, 1.0f);
 }
 
 #endif
@@ -151,33 +151,31 @@ struct Channel : ChannelInterface {
     }
 
 	void getParams(int subchannelIndex, ChannelParams &params) {
-		params.U_MIN = 0.0f;
-		params.U_DEF = 0.0f;
+		params.U_MIN = 1.0f;
+		params.U_DEF = 1.0f;
 		params.U_MAX = 20.0f;
-		params.U_MAX_CONF = 20.0f;
 
 		params.U_MIN_STEP = 0.01f;
 		params.U_DEF_STEP = 0.1f;
 		params.U_MAX_STEP = 5.0f;
 
-		params.U_CAL_VAL_MIN = 0.75f;
+		params.U_CAL_VAL_MIN = 2.0f;
 		params.U_CAL_VAL_MID = 10.0f;
 		params.U_CAL_VAL_MAX = 18.0f;
-		params.U_CURR_CAL = 20.0f;
+		params.I_VOLT_CAL = 1.0f;
 
 		params.I_MIN = 0.0f;
 		params.I_DEF = 0.0f;
 		params.I_MAX = 4.0f;
-		params.I_MAX_CONF = 4.0f;
 
 		params.I_MIN_STEP = 0.01f;
 		params.I_DEF_STEP = 0.01f;
 		params.I_MAX_STEP = 1.0f; 
 
-		params.I_CAL_VAL_MIN = 0.05f;
-		params.I_CAL_VAL_MID = 1.95f;
-		params.I_CAL_VAL_MAX = 3.8f;
-		params.I_VOLT_CAL = 0.5f;
+		params.I_CAL_VAL_MIN = 0.5f;
+		params.I_CAL_VAL_MID = 2.0f;
+		params.I_CAL_VAL_MAX = 3.5f;
+		params.U_CURR_CAL = 20.0f;
 
 		params.OVP_DEFAULT_STATE = false;
 		params.OVP_MIN_DELAY = 0.0f;
@@ -209,7 +207,7 @@ struct Channel : ChannelInterface {
 
 		params.CALIBRATION_DATA_TOLERANCE_PERCENT = 15.0f;
 
-		params.CALIBRATION_MID_TOLERANCE_PERCENT = 2.0f;
+		params.CALIBRATION_MID_TOLERANCE_PERCENT = 3.0f;
 
 		params.features = CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE;
 	}
@@ -306,6 +304,13 @@ struct Channel : ChannelInterface {
         	outputSetValues[2] = uSet[1];
         	outputSetValues[3] = iSet[1];
 
+#ifdef DEBUG
+			psu::debug::g_uDac[channel.channelIndex + 0].set(uSet[0]);
+			psu::debug::g_iDac[channel.channelIndex + 0].set(iSet[0]);
+			psu::debug::g_uDac[channel.channelIndex + 1].set(uSet[1]);
+			psu::debug::g_iDac[channel.channelIndex + 1].set(iSet[1]);
+#endif
+
 			transfer();
 
 		    if (oeSync) {
@@ -363,12 +368,20 @@ struct Channel : ChannelInterface {
         	int offset = subchannelIndex * 2;
 
         	uint16_t uMonAdc = inputSetValues[offset];
-        	float uMon = remap(uMonAdc, (float)ADC_MIN, channel.params.U_MIN, (float)ADC_MAX, channel.params.U_MAX);
+        	float uMon = remap(uMonAdc, (float)ADC_MIN, 0, (float)ADC_MAX, channel.params.U_MAX);
         	channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon);
 
         	uint16_t iMonAdc = inputSetValues[offset + 1];
-        	float iMon = remap(iMonAdc, (float)ADC_MIN, channel.params.I_MIN, (float)ADC_MAX, channel.params.I_MAX);
+
+			const float FULL_SCALE = 2.0F;
+			const float U_REF = 2.5F;
+        	float iMon = remap(iMonAdc, (float)ADC_MIN, 0, FULL_SCALE * ADC_MAX / U_REF, /*channel.params.I_MAX*/ 4.1667f);
         	channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon);
+
+#ifdef DEBUG
+			psu::debug::g_uMon[channel.channelIndex].set(uMonAdc);
+			psu::debug::g_iMon[channel.channelIndex].set(iMonAdc);
+#endif
         }
 #endif
 
@@ -463,14 +476,14 @@ struct Channel : ChannelInterface {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        uSet[subchannelIndex] = remap(clamp((float)value, (float)DAC_MIN, (float)DAC_MAX), (float)DAC_MIN, channel.params.U_MIN, (float)DAC_MAX, channel.params.U_MAX);
+        uSet[subchannelIndex] = remap(clamp((float)value, (float)DAC_MIN, (float)DAC_MAX), (float)DAC_MIN, 0, (float)DAC_MAX, channel.params.U_MAX);
 #endif
 	}
 
 	void setDacVoltageFloat(int subchannelIndex, float value) {
 #if defined(EEZ_PLATFORM_STM32)
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        value = remap(value, channel.params.U_MIN, (float)DAC_MIN, channel.params.U_MAX, (float)DAC_MAX);
+        value = remap(value, 0, (float)DAC_MIN, channel.params.U_MAX, (float)DAC_MAX);
         uSet[subchannelIndex] = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
 #endif
 
@@ -494,7 +507,7 @@ struct Channel : ChannelInterface {
 	void setDacCurrentFloat(int subchannelIndex, float value) {
 #if defined(EEZ_PLATFORM_STM32)
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        value = remap(value, channel.params.I_MIN, (float)DAC_MIN, channel.params.I_MAX, (float)DAC_MAX);
+        value = remap(value, channel.params.I_MIN, (float)DAC_MIN, /*channel.params.I_MAX*/ 4.1667f, (float)DAC_MAX);
         iSet[subchannelIndex] = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
 #endif
 

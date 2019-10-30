@@ -41,12 +41,6 @@ extern DebugValueVariable g_iDac[CH_MAX];
 extern DebugValueVariable g_iMon[CH_MAX];
 extern DebugValueVariable g_iMonDac[CH_MAX];
 
-extern DebugDurationVariable g_mainLoopDuration;
-#if CONF_DEBUG_VARIABLES
-extern DebugDurationVariable g_listTickDuration;
-#endif
-extern DebugCounterVariable g_adcCounter;
-
 void dumpVariables(char *buffer);
 
 } // namespace debug

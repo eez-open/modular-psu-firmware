@@ -977,10 +977,6 @@ void Channel::doSetVoltage(float value) {
         prot_conf.u_level = u.set;
     }
 
-    if (params.U_MAX != params.U_MAX_CONF) {
-        value = remap(value, 0, 0, params.U_MAX_CONF, params.U_MAX);
-    }
-
 	value = getCalibratedVoltage(value);
 
     channelInterface->setDacVoltageFloat(subchannelIndex, value);
@@ -1009,10 +1005,6 @@ void Channel::doSetCurrent(float value) {
 
     i.set = value;
     i.mon_dac = 0;
-
-    if (params.I_MAX != params.I_MAX_CONF) {
-        value = remap(value, 0, 0, params.I_MAX_CONF, params.I_MAX);
-    }
 
     if (isCurrentCalibrationEnabled()) {
         value = remap(value, cal_conf.i[flags.currentCurrentRange].min.val,

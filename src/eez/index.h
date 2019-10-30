@@ -70,7 +70,6 @@ struct ChannelParams {
     float U_MIN;
     float U_DEF;
     float U_MAX;
-    float U_MAX_CONF;
     
     float U_MIN_STEP;
     float U_DEF_STEP;
@@ -85,7 +84,6 @@ struct ChannelParams {
     float I_DEF;
     float I_MAX;
     
-    float I_MAX_CONF;
     float I_MIN_STEP;
     float I_DEF_STEP;
     float I_MAX_STEP; 

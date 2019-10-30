@@ -351,9 +351,9 @@ void action_show_ch_settings_info() {
     pushPage(PAGE_ID_CH_SETTINGS_INFO);
 }
 
-void action_show_ch_settings_info_cal() {
+void action_show_ch_settings_cal() {
     selectChannel();
-    pushPage(PAGE_ID_SYS_SETTINGS_CAL_CH);
+    pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
 }
 
 void action_sys_settings_cal_edit_password() {
