@@ -349,7 +349,7 @@
 						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">BUS – enables LAN and serial (via USB) triggering using the *TRG command.</li>
 						<li class="List_1" style="text-indent: 0; list-style-type: disc;">IMMediate – the BB3 executes a complete trigger operation immediately after executing the INITiate command without delay.</li>
 						<li class="List_1" style="text-indent: 0; list-style-type: disc;">MANual – enables triggering by selecting<span style="font-style: italic;"> </span>the encoder knob switch.</li>
-						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">PIN&lt;n&gt; – selects a digital port pin configured as a trigger input. &lt;n&gt; specifies the pin number (it’s always 1).</li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">PIN&lt;n&gt; – selects a digital port pin configured as a trigger input. &lt;n&gt; specifies the pin number.</li>
 					</ul>
 					<p>When the trigger source is set to BUS, the *WAI command can ensure the synchronization. After executing the *WAI command, the BB3 will only execute new command when all the pending operations are completed.</p>
 					<p>Also when the trigger source is set to BUS, you can use the *OPC command to report that the operation is completed. The *OPC? command will return “1” to the output buffer and the *OPC command will set the bit 0 (OPC bit, operation complete) in the standard event register when the operation is finished.</p>
@@ -367,10 +367,10 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 24%;">
 					<p style="text-align: center;">Name</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 18%;">
 					<p style="text-align: center;">Type</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 26%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 30%;">
 					<p style="text-align: center;">Range</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 16%;">
@@ -384,11 +384,11 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 24%;">
 					<p>&lt;source&gt;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
 					<p style="text-align: center;">Discrete</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 26%;">
-					<p style="text-align: center;">BUS|IMM|MAN|PIN1</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 30%;">
+					<p style="text-align: center;">BUS|IMM|MAN|PIN1|PIN2</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
 					<p style="text-align: center;">–</p>
