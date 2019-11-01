@@ -205,6 +205,7 @@ set(src_eez_apps_psu_gui
     src/eez/apps/psu/gui/page_self_test_result.cpp
     src/eez/apps/psu/gui/page_sys_settings.cpp
     src/eez/apps/psu/gui/page_user_profiles.cpp
+    src/eez/apps/psu/gui/page_recordings_view.cpp
     src/eez/apps/psu/gui/password.cpp
     src/eez/apps/psu/gui/psu.cpp
 )
@@ -226,6 +227,7 @@ set(header_eez_apps_psu_gui
     src/eez/apps/psu/gui/page_self_test_result.h
     src/eez/apps/psu/gui/page_sys_settings.h
     src/eez/apps/psu/gui/page_user_profiles.h
+    src/eez/apps/psu/gui/page_recordings_view.h
     src/eez/apps/psu/gui/password.h
     src/eez/apps/psu/gui/psu.h
 )
@@ -332,6 +334,7 @@ set(src_eez_gui_widgets
     src/eez/gui/widgets/multiline_text.cpp
     src/eez/gui/widgets/rectangle.cpp
     src/eez/gui/widgets/scale.cpp
+    src/eez/gui/widgets/scroll_bar.cpp
     src/eez/gui/widgets/select.cpp
     src/eez/gui/widgets/text.cpp
     src/eez/gui/widgets/toggle_button.cpp
@@ -354,6 +357,7 @@ set(header_eez_gui_widgets
     src/eez/gui/widgets/multiline_text.h
     src/eez/gui/widgets/rectangle.h
     src/eez/gui/widgets/scale.h
+    src/eez/gui/widgets/scroll_bar.h
     src/eez/gui/widgets/select.h
     src/eez/gui/widgets/text.h
     src/eez/gui/widgets/toggle_button.h

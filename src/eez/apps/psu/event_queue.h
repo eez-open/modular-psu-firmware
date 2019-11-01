@@ -94,6 +94,25 @@ static const int EVENT_TYPE_ERROR = 3;
     EVENT_ERROR(CH4_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, 83, "CH4 rsense reverse polarity detected") \
     EVENT_ERROR(CH5_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, 84, "CH5 rsense reverse polarity detected") \
     EVENT_ERROR(CH6_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, 85, "CH6 rsense reverse polarity detected") \
+	EVENT_ERROR(EEPROM_MCU_READ_ERROR, 86, "EEPROM read error on MCU")                             \
+	EVENT_ERROR(EEPROM_SLOT1_READ_ERROR, 87, "EEPROM read error on module 1")                      \
+	EVENT_ERROR(EEPROM_SLOT2_READ_ERROR, 88, "EEPROM read error on module 2")                      \
+	EVENT_ERROR(EEPROM_SLOT3_READ_ERROR, 89, "EEPROM read error on module 3")                      \
+	EVENT_ERROR(EEPROM_MCU_CRC_CHECK_ERROR, 90, "EEPROM CRC check error on MCU")                   \
+	EVENT_ERROR(EEPROM_SLOT1_CRC_CHECK_ERROR, 91, "EEPROM CRC check error on module 1")            \
+	EVENT_ERROR(EEPROM_SLOT2_CRC_CHECK_ERROR, 92, "EEPROM CRC check error on module 2")            \
+	EVENT_ERROR(EEPROM_SLOT3_CRC_CHECK_ERROR, 93, "EEPROM CRC check error on module 3")            \
+	EVENT_ERROR(EEPROM_MCU_WRITE_ERROR, 94, "EEPROM write error on MCU")                           \
+	EVENT_ERROR(EEPROM_SLOT1_WRITE_ERROR, 95, "EEPROM write error on module 1")                    \
+	EVENT_ERROR(EEPROM_SLOT2_WRITE_ERROR, 96, "EEPROM write error on module 2")                    \
+	EVENT_ERROR(EEPROM_SLOT3_WRITE_ERROR, 97, "EEPROM write error on module 3")                    \
+	EVENT_ERROR(EEPROM_MCU_WRITE_VERIFY_ERROR, 98, "EEPROM write verify error on MCU")             \
+	EVENT_ERROR(EEPROM_SLOT1_WRITE_VERIFY_ERROR, 99, "EEPROM write verify error on module 1")      \
+	EVENT_ERROR(EEPROM_SLOT2_WRITE_VERIFY_ERROR, 100, "EEPROM write verify error on module 2")     \
+	EVENT_ERROR(EEPROM_SLOT3_WRITE_VERIFY_ERROR, 101, "EEPROM write verify error on module 3")     \
+	EVENT_ERROR(SLOT1_CRC_CHECK_ERROR, 102, "CRC error on module 1")      \
+	EVENT_ERROR(SLOT2_CRC_CHECK_ERROR, 103, "CRC error on module 2")     \
+	EVENT_ERROR(SLOT3_CRC_CHECK_ERROR, 104, "CRC error on module 3")     \
     EVENT_WARNING(CH1_CALIBRATION_DISABLED, 0, "Ch1 calibration disabled")                         \
     EVENT_WARNING(CH2_CALIBRATION_DISABLED, 1, "Ch2 calibration disabled")                         \
     EVENT_WARNING(CH3_CALIBRATION_DISABLED, 2, "Ch3 calibration disabled")                         \

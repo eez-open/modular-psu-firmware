@@ -93,7 +93,7 @@ static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 6
 static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE = 64;
 
 static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = 128;
-static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 144;
+static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 256;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -103,49 +103,67 @@ DeviceConfiguration2 devConf2;
 ////////////////////////////////////////////////////////////////////////////////
 
 bool confRead(uint8_t *buffer, uint16_t bufferSize, uint16_t address, int version) {
+	if (bp3c::eeprom::g_testResult != TEST_OK) {
+		return false;
+    }
+
     for (int i = 0; i < NUM_RETRIES; i++) {
-        bool result = false;
-        if (mcu::eeprom::g_testResult == TEST_OK) {
-            result = mcu::eeprom::read(buffer, bufferSize, address);
-        }
-#if OPTION_SD_CARD
-        else {
-            result = sd_card::confRead(buffer, bufferSize, address);
-        }
+        bool result = mcu::eeprom::read(buffer, bufferSize, address);
+
+        if (!result) {
+#if defined(EEZ_PLATFORM_STM32)
+        	pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_READ_ERROR);
 #endif
+        	continue;
+        }
 
         if (version == -1) {
             return result;
         }
 
-        if (result && checkBlock((const BlockHeader *)buffer, bufferSize, version)) {
-            return true;
+        if (!checkBlock((const BlockHeader *)buffer, bufferSize, version)) {
+#if defined(EEZ_PLATFORM_STM32)
+            if (((const BlockHeader *)buffer)->checksum != 0xFFFFFFFF) {
+			    pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_CRC_CHECK_ERROR);
+            }
+#endif
+            continue;
         }
+
+        return true;
     }
 
     return false;
 }
 
 bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
+	if (bp3c::eeprom::g_testResult != TEST_OK) {
+		return false;
+    }
+
     for (int i = 0; i < NUM_RETRIES; i++) {
-        bool result = false;
+        bool result = mcu::eeprom::write(buffer, bufferSize, address);
 
-        if (mcu::eeprom::g_testResult == TEST_OK) {
-            result = mcu::eeprom::write(buffer, bufferSize, address);
-        }
-#if OPTION_SD_CARD
-        else {
-            result = sd_card::confWrite(buffer, bufferSize, address);
-        }
+        if (!result) {
+#if defined(EEZ_PLATFORM_STM32)
+        	pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_WRITE_ERROR);
 #endif
-
-        if (result) {
-            uint8_t verifyBuffer[768];
-            assert(sizeof(verifyBuffer) >= bufferSize);
-            if (confRead(verifyBuffer, bufferSize, address, -1) && memcmp(buffer, verifyBuffer, bufferSize) == 0) {
-                return true;
-            }
+        	continue;
         }
+
+		uint8_t verifyBuffer[768];
+		assert(sizeof(verifyBuffer) >= bufferSize);
+		if (!confRead(verifyBuffer, bufferSize, address, -1)) {
+			continue;
+		}
+		if (memcmp(buffer, verifyBuffer, bufferSize) != 0) {
+#if defined(EEZ_PLATFORM_STM32)
+        	pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_WRITE_VERIFY_ERROR);
+#endif
+			continue;
+		}
+
+		return true;
     }
 
     return false;
@@ -154,39 +172,67 @@ bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool moduleConfRead(int slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t address, int version) {
-    for (int i = 0; i < NUM_RETRIES; i++) {
-        bool result = false;
-        if (bp3c::eeprom::g_testResult == TEST_OK) {
-            result = bp3c::eeprom::read(slotIndex, buffer, bufferSize, address);
+	if (bp3c::eeprom::g_testResult != TEST_OK) {
+		return false;
+    }
+
+	for (int i = 0; i < NUM_RETRIES; i++) {
+        bool result = bp3c::eeprom::read(slotIndex, buffer, bufferSize, address);
+
+        if (!result) {
+#if defined(EEZ_PLATFORM_STM32)
+        	event_queue::pushEvent(event_queue::EVENT_ERROR_EEPROM_SLOT1_READ_ERROR + slotIndex);
+#endif
+        	continue;
         }
 
         if (version == -1) {
             return result;
         }
 
-        if (result && checkBlock((const BlockHeader *)buffer, bufferSize, version)) {
-            return true;
+        if (!checkBlock((const BlockHeader *)buffer, bufferSize, version)) {
+            if (((const BlockHeader *)buffer)->checksum != 0xFFFFFFFF) {
+#if defined(EEZ_PLATFORM_STM32)
+        	    event_queue::pushEvent(event_queue::EVENT_ERROR_EEPROM_SLOT1_CRC_CHECK_ERROR + slotIndex);
+#endif
+            }
+			continue;
         }
+
+        return true;
     }
 
 	return false;
 }
 
 bool moduleConfWrite(int slotIndex, const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
-    for (int i = 0; i < NUM_RETRIES; i++) {
-        bool result = false;
+	if (bp3c::eeprom::g_testResult != TEST_OK) {
+		return false;
+    }
 
-        if (bp3c::eeprom::g_testResult == TEST_OK) {
-            return bp3c::eeprom::write(slotIndex, buffer, bufferSize, address);
+	for (int i = 0; i < NUM_RETRIES; i++) {
+        bool result = bp3c::eeprom::write(slotIndex, buffer, bufferSize, address);
+
+        if (!result) {
+#if defined(EEZ_PLATFORM_STM32)
+        	event_queue::pushEvent(event_queue::EVENT_ERROR_EEPROM_SLOT1_WRITE_ERROR + slotIndex);
+#endif
+        	continue;
         }
 
-        if (result) {
-            uint8_t verifyBuffer[512];
-            assert(sizeof(verifyBuffer) >= bufferSize);
-            if (moduleConfRead(slotIndex, verifyBuffer, bufferSize, address, -1) && memcmp(buffer, verifyBuffer, bufferSize) == 0) {
-                return true;
-            }
-        }
+		uint8_t verifyBuffer[512];
+		assert(sizeof(verifyBuffer) >= bufferSize);
+		if (!moduleConfRead(slotIndex, verifyBuffer, bufferSize, address, -1)) {
+			continue;
+		}
+		if (memcmp(buffer, verifyBuffer, bufferSize) != 0) {
+#if defined(EEZ_PLATFORM_STM32)
+			event_queue::pushEvent(event_queue::EVENT_ERROR_EEPROM_SLOT1_WRITE_VERIFY_ERROR + slotIndex);
+#endif
+        	continue;
+		}
+
+		return true;
     }
 
     return false;
@@ -1199,7 +1245,7 @@ static void initModuleConf(int slotIndex) {
     moduleConf.header.checksum = 0;
     moduleConf.header.version = MODULE_CONF_VERSION;
 
-    moduleConf.chCalEnabled = 0xFF;
+    moduleConf.chCalEnabled = 0x00;
 }
 
 void loadModuleConf(int slotIndex) {
@@ -1225,7 +1271,7 @@ bool saveModuleConf(int slotIndex) {
     uint8_t buffer[MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE];
 
     ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
-    memcpy(&moduleConf, buffer, sizeof(ModuleConfiguration));
+    memcpy(buffer, &moduleConf, sizeof(ModuleConfiguration));
 
     memset(buffer + sizeof(ModuleConfiguration), 0, MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE - sizeof(ModuleConfiguration));
 
@@ -1250,10 +1296,12 @@ void saveCalibrationEnabledFlag(Channel &channel, bool enabled) {
     } else {
         moduleConf.chCalEnabled &= ~(1 << channel.subchannelIndex);
     }
-    saveDevice();
+    saveModuleConf(channel.slotIndex);
 }
 
 void loadChannelCalibration(Channel &channel) {
+	assert(MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= sizeof(Channel::CalibrationConfiguration));
+
     if (!moduleConfRead(
         channel.slotIndex,
         (uint8_t *)&channel.cal_conf,

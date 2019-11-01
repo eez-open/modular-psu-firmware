@@ -33,6 +33,7 @@
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/sound.h>
 #include <eez/apps/psu/trigger.h>
+#include <eez/apps/psu/dlog.h>
 
 #include <eez/apps/psu/gui/psu.h>
 
@@ -59,6 +60,12 @@
 #include <eez/scripting.h>
 
 #include <eez/modules/bp3c/eeprom.h>
+
+#include <eez/scpi/scpi.h>
+
+#if OPTION_SDCARD
+#include <eez/apps/psu/sd_card.h>
+#endif
 
 using namespace eez::gui;
 using namespace eez::psu;
@@ -1058,6 +1065,17 @@ void action_front_panel_select_slot3() {
 #endif
 
 void action_drag_overlay() {
+}
+
+void action_dlog_toggle() {
+#if OPTION_SD_CARD
+    using namespace scpi;
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_TOGGLE, 0), osWaitForever);
+#endif
+}
+
+void action_show_recordings_view() {
+    showPage(PAGE_ID_RECORDINGS_VIEW);
 }
 
 } // namespace gui

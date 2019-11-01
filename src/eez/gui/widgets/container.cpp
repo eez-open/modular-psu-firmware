@@ -85,10 +85,10 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
         widgetCursor.widget = GET_WIDGET_LIST_ELEMENT(widgets, index);
 
 #if OPTION_SDRAM
-        int xSaved;
-        int ySaved;
-        int wSaved;
-        int hSaved;
+        int xSaved = 0;
+        int ySaved = 0;
+        int wSaved = 0;
+        int hSaved = 0;
 #endif
 
         if (overlay) {
@@ -143,7 +143,7 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
 }
 
 void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    Overlay *overlay;
+    Overlay *overlay = nullptr;
     if (isOverlay(widgetCursor)) {
         overlay = getOverlay(widgetCursor);
 

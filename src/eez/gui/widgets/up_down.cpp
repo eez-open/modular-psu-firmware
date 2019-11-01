@@ -34,8 +34,8 @@ enum UpDownWidgetSegment {
     UP_DOWN_WIDGET_SEGMENT_UP_BUTTON
 };
 
-UpDownWidgetSegment g_segment;
-WidgetCursor g_selectedWidget;
+static UpDownWidgetSegment g_segment;
+static WidgetCursor g_selectedWidget;
 
 #if OPTION_SDRAM
 void UpDownWidget_fixPointers(Widget *widget) {

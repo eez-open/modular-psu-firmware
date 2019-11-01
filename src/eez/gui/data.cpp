@@ -488,6 +488,31 @@ Value getEditValue(const Cursor &cursor, uint16_t id) {
     return value;
 }
 
+int ytDataGetSize(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_SIZE, (Cursor &)cursor, value);
+    return value.getInt();
+
+}
+
+int ytDataGetPosition(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_POSITION, (Cursor &)cursor, value);
+    return value.getInt();
+}
+
+void ytDataSetPosition(const Cursor &cursor, uint16_t id, int newPosition) {
+	Value value(newPosition);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_SET_POSITION, (Cursor &)cursor, value);
+}
+
+int ytDataGetPageSize(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_PAGE_SIZE, (Cursor &)cursor, value);
+    return value.getInt();
+
+}
+
 } // namespace data
 } // namespace gui
 } // namespace eez

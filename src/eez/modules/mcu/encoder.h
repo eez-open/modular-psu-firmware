@@ -48,6 +48,7 @@ void write(int counter, bool clicked);
 #endif
 
 void switchEncoderMode();
+void setUseSameSpeed(bool enable);
 
 float increment(gui::data::Value value, int counter, float min, float max, int channelIndex, float precision = 1.0f);
 

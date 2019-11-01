@@ -304,7 +304,11 @@ enum DataOperationEnum {
     DATA_OPERATION_SET_CONTEXT,
     DATA_OPERATION_RESTORE_CONTEXT,
     DATA_OPERATION_IS_BLINKING,
-    DATA_OPERATION_SET
+    DATA_OPERATION_SET,
+    DATA_OPERATION_YT_DATA_GET_SIZE,
+    DATA_OPERATION_YT_DATA_GET_POSITION,
+    DATA_OPERATION_YT_DATA_SET_POSITION,
+    DATA_OPERATION_YT_DATA_GET_PAGE_SIZE
 };
 
 int count(uint16_t id);
@@ -330,6 +334,11 @@ bool set(const Cursor &cursor, uint16_t id, Value value, int16_t *error);
 
 bool isBlinking(const Cursor &cursor, uint16_t id);
 Value getEditValue(const Cursor &cursor, uint16_t id);
+
+int ytDataGetSize(const Cursor &cursor, uint16_t id);
+int ytDataGetPosition(const Cursor &cursor, uint16_t id);
+void ytDataSetPosition(const Cursor &cursor, uint16_t id, int newPosition);
+int ytDataGetPageSize(const Cursor &cursor, uint16_t id);
 
 } // namespace data
 } // namespace gui

@@ -62,6 +62,8 @@ static float g_accumulatedCounter;
 
 EncoderMode g_encoderMode = ENCODER_MODE_AUTO;
 
+static bool g_useSameSpeed = false;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct CalcAutoModeStepLevel {
@@ -148,7 +150,7 @@ int getCounter() {
 
     //
     g_accumulatedCounter += diffCounter;
-    float speed = 1.0f + (MAX_MOVING_SPEED - (g_accumulatedCounter > 0 ? psu::persist_conf::devConf2.encoderMovingSpeedUp : psu::persist_conf::devConf2.encoderMovingSpeedDown)) * CONF_ENCODER_SPEED_FACTOR;
+    float speed = 1.0f + (MAX_MOVING_SPEED - (g_useSameSpeed ? MAX(psu::persist_conf::devConf2.encoderMovingSpeedUp, psu::persist_conf::devConf2.encoderMovingSpeedDown) : g_accumulatedCounter > 0 ? psu::persist_conf::devConf2.encoderMovingSpeedUp : psu::persist_conf::devConf2.encoderMovingSpeedDown)) * CONF_ENCODER_SPEED_FACTOR;
     int result = (int)(g_accumulatedCounter > 0 ? floorf(g_accumulatedCounter / speed) : ceilf(g_accumulatedCounter / speed));
     g_accumulatedCounter -= result * speed;
 
@@ -190,6 +192,10 @@ void switchEncoderMode() {
     } else {
         g_encoderMode = EncoderMode(g_encoderMode + 1);
     }
+}
+
+void setUseSameSpeed(bool enable) {
+    g_useSameSpeed = enable;
 }
 
 float increment(gui::data::Value value, int counter, float min, float max, int channelIndex, float precision) {

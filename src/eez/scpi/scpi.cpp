@@ -16,6 +16,8 @@
 * along with this program.  If not, see http://www.gnu.org/licenses.
 */
 
+#include <stdio.h> // sprintf
+
 #include <eez/scpi/scpi.h>
 
 #include <eez/system.h>
@@ -34,6 +36,7 @@
 #include <eez/apps/psu/dlog.h>
 #endif
 #include <eez/apps/psu/scpi/psu.h>
+#include <eez/apps/psu/datetime.h>
 
 using namespace eez::psu;
 using namespace eez::psu::scpi;
@@ -119,6 +122,44 @@ void oneIter() {
 #if OPTION_SD_CARD
 			else if (type == SCPI_QUEUE_MESSAGE_DLOG_DISK_OPERATION) {
 				eez::psu::dlog::executeDiskOperation(param);
+			}
+			else if (type == SCPI_QUEUE_MESSAGE_DLOG_TOGGLE) {
+                if (dlog::isExecuting()) {
+                    dlog::abort();
+                } else {
+                    int err;
+                    if (!sd_card::exists("/RECORDINGS", &err)) {
+                        if (err != SCPI_ERROR_FILE_NAME_NOT_FOUND) {
+                            event_queue::pushEvent(err);
+                        } else {
+                            if (!sd_card::makeDir("/RECORDINGS", &err)) {
+                                event_queue::pushEvent(err);
+                            }
+                        }
+                    }
+
+                    char filePath[40];
+                    uint8_t year, month, day, hour, minute, second;
+                    datetime::getDate(year, month, day);
+                    datetime::getTime(hour, minute, second);
+                    sprintf(filePath, "/RECORDINGS/%d_%02d_%02d-%02d_%02d_%02d.DLOG",
+                        (int)(year + 2000), (int)month, (int)day,
+                        (int)hour, (int)minute, (int)second);
+
+                    dlog::g_logVoltage[0] = true;
+                    dlog::g_logCurrent[0] = true;
+                    dlog::g_logPower[0] = false;
+                    for (int i = 1; i < CH_MAX; i++) {
+                        dlog::g_logVoltage[i] = false;
+                        dlog::g_logCurrent[i] = false;
+                        dlog::g_logPower[i] = false;
+                    }
+                    dlog::g_period = dlog::PERIOD_MIN;
+                    dlog::g_time = dlog::TIME_MAX;
+                    dlog::g_triggerSource = trigger::SOURCE_IMMEDIATE;
+
+                    dlog::initiate(filePath);
+                }
 			}
 #endif
 

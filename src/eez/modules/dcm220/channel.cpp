@@ -29,6 +29,7 @@
 #include <eez/modules/dcpX05/channel.h>
 
 #include <eez/apps/psu/psu.h>
+#include <eez/apps/psu/event_queue.h>
 #include <eez/scpi/regs.h>
 #include <eez/system.h>
 
@@ -224,6 +225,12 @@ struct Channel : ChannelInterface {
 
 		uint32_t crc = HAL_CRC_Calculate(&hcrc, (uint32_t *)input, BUFFER_SIZE - 4);
 		isCrcOk = crc == *((uint32_t *)(input + BUFFER_SIZE - 4));
+		if (!isCrcOk) {
+		    auto lastEvent = event_queue::getLastErrorEvent();
+			if (!lastEvent || lastEvent->eventId != event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex) {
+				event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
+			}
+		}
 	}
 #endif
 
@@ -314,6 +321,7 @@ struct Channel : ChannelInterface {
 			transfer();
 
 		    if (oeSync) {
+		    	delayMicroseconds(50);
 		        HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
 		    }
 

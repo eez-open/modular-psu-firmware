@@ -55,6 +55,7 @@ namespace gui {
 #define WIDGET_TYPE_UP_DOWN 17
 #define WIDGET_TYPE_LIST_GRAPH 18
 #define WIDGET_TYPE_APP_VIEW 19
+#define WIDGET_TYPE_SCROLL_BAR 19
 
 ////////////////////////////////////////////////////////////////////////////////
 

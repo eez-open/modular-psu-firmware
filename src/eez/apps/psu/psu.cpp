@@ -188,7 +188,9 @@ void loadConf() {
 
     // load channels calibration parameters
     for (int i = 0; i < CH_NUM; ++i) {
-        persist_conf::loadChannelCalibration(Channel::get(i));
+        if (Channel::get(i).isInstalled()) {
+            persist_conf::loadChannelCalibration(Channel::get(i));
+        }
     }
 }
 

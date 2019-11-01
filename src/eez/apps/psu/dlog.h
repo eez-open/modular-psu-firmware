@@ -44,6 +44,7 @@ extern double g_currentTime;
 
 bool isIdle();
 bool isInitiated();
+bool isExecuting();
 int initiate(const char *filePath);
 void triggerGenerated(bool startImmediatelly = true);
 int startImmediately();

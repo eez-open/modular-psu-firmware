@@ -48,6 +48,7 @@
 #include <eez/gui/widgets/multiline_text.h>
 #include <eez/gui/widgets/rectangle.h>
 #include <eez/gui/widgets/scale.h>
+#include <eez/gui/widgets/scroll_bar.h>
 #include <eez/gui/widgets/select.h>
 #include <eez/gui/widgets/text.h>
 #include <eez/gui/widgets/toggle_button.h>
@@ -93,6 +94,7 @@ static FixWidgetPointersFunction g_fixWidgetPointersFunctions[] = {
     UpDownWidget_fixPointers,        // WIDGET_TYPE_UP_DOWN
     nullptr,                         // WIDGET_TYPE_LIST_GRAPH
     nullptr,                         // WIDGET_TYPE_APP_VIEW
+    ScrollBarWidget_fixPointers,     // WIDGET_TYPE_SCROLL_BAR
 };
 #endif
 
@@ -118,6 +120,7 @@ static EnumFunctionType g_enumWidgetFunctions[] = {
     nullptr,               // WIDGET_TYPE_UP_DOWN
     nullptr,               // WIDGET_TYPE_LIST_GRAPH
     AppViewWidget_enum,    // WIDGET_TYPE_APP_VIEW
+    nullptr,               // WIDGET_TYPE_SCROLL_BAR
 };
 
 typedef void (*DrawFunctionType)(const WidgetCursor &widgetCursor);
@@ -142,6 +145,7 @@ static DrawFunctionType g_drawWidgetFunctions[] = {
     UpDownWidget_draw,        // WIDGET_TYPE_UP_DOWN
     ListGraphWidget_draw,     // WIDGET_TYPE_LIST_GRAPH
     AppViewWidget_draw,       // WIDGET_TYPE_APP_VIEW
+    ScrollBarWidget_draw,     // WIDGET_TYPE_SCROLL_BAR
 };
 
 OnTouchFunctionType g_onTouchFunctions[] = {
@@ -165,6 +169,7 @@ OnTouchFunctionType g_onTouchFunctions[] = {
     UpDownWidget_onTouch,      // WIDGET_TYPE_UP_DOWN
     ListGraphWidget_onTouch,   // WIDGET_TYPE_LIST_GRAPH
     nullptr,                   // WIDGET_TYPE_APP_VIEW
+    ScrollBarWidget_onTouch,   // WIDGET_TYPE_SCROLL_BAR
 };
 
 ////////////////////////////////////////////////////////////////////////////////

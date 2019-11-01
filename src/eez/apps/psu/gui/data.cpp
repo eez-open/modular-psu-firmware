@@ -4066,6 +4066,35 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data:
     }
 }
 
+void data_dlog_started(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = dlog::isExecuting() ? 1 : 0;
+    }
+}
+
+void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    static int g_size = 5000;
+    static int g_position = 0;
+    static int g_pageSize = 480;
+    if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
+        value = g_size;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
+        value = g_position;
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
+        int newPosition = value.getInt();
+
+        if (newPosition < 0) {
+            newPosition = 0;
+        } else if (newPosition + g_pageSize > g_size) {
+            newPosition = g_size - g_pageSize;
+        }
+
+        g_position = newPosition;
+    }else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+        value = g_pageSize;
+    } 
+}
+
 } // namespace gui
 } // namespace eez
 

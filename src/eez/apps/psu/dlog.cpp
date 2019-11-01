@@ -106,6 +106,10 @@ bool isInitiated() {
     return g_state == STATE_INITIATED;
 }
 
+bool isExecuting() {
+    return g_state == STATE_EXECUTING;
+}
+
 int initiate(const char *filePath) {
     int error = SCPI_RES_OK;
 
