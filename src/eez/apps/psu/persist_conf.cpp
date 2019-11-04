@@ -394,6 +394,8 @@ static void initDevice2() {
 
     devConf2.animationsDuration = CONF_DEFAULT_ANIMATIONS_DURATION;
 
+    devConf2.selectedThemeIndex = THEME_ID_DARK;
+
 #if OPTION_DISPLAY
     onLuminocityChanged();
     onThemeChanged();
