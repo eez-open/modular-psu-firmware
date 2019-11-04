@@ -342,22 +342,23 @@ bool PsuAppContext::testExecuteActionOnTouchDown(int action) {
     return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT || isAutoRepeatAction(action);
 }
 
-uint16_t PsuAppContext::getWidgetBackgroundColor(const WidgetCursor &widgetCursor,
-                                                 const Style *style) {
+uint16_t PsuAppContext::getWidgetBackgroundColor(const WidgetCursor &widgetCursor, const Style *style) {
 #if OPTION_SD_CARD
-    const Widget *widget = widgetCursor.widget;
-    int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
-    if (widget->data == DATA_ID_CHANNEL_U_EDIT || widget->data == DATA_ID_CHANNEL_U_MON_DAC) {
-        if (dlog::g_logVoltage[iChannel]) {
-            return CONF_DLOG_COLOR;
-        }
-    } else if (widget->data == DATA_ID_CHANNEL_I_EDIT) {
-        if (dlog::g_logCurrent[iChannel]) {
-            return CONF_DLOG_COLOR;
-        }
-    } else if (widget->data == DATA_ID_CHANNEL_P_MON) {
-        if (dlog::g_logPower[iChannel]) {
-            return CONF_DLOG_COLOR;
+    if (!dlog::isIdle()) {
+        const Widget *widget = widgetCursor.widget;
+        int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        if (widget->data == DATA_ID_CHANNEL_U_EDIT || widget->data == DATA_ID_CHANNEL_U_MON_DAC) {
+            if (dlog::g_lastOptions.logVoltage[iChannel]) {
+                return CONF_DLOG_COLOR;
+            }
+        } else if (widget->data == DATA_ID_CHANNEL_I_EDIT) {
+            if (dlog::g_lastOptions.logCurrent[iChannel]) {
+                return CONF_DLOG_COLOR;
+            }
+        } else if (widget->data == DATA_ID_CHANNEL_P_MON) {
+            if (dlog::g_lastOptions.logPower[iChannel]) {
+                return CONF_DLOG_COLOR;
+            }
         }
     }
 #endif

@@ -27,6 +27,9 @@ namespace eez {
 enum BuiltInValueType {
     VALUE_TYPE_NONE,
     VALUE_TYPE_INT,
+    VALUE_TYPE_UINT8,
+    VALUE_TYPE_UINT16,
+    VALUE_TYPE_UINT32,
     VALUE_TYPE_FLOAT,
     VALUE_TYPE_STR,
     VALUE_TYPE_ENUM,
@@ -39,6 +42,7 @@ enum BuiltInValueType {
     VALUE_TYPE_SLOT_INFO,
     VALUE_TYPE_SLOT_INFO2,
     VALUE_TYPE_TEST_RESULT,
+    VALUE_TYPE_TIME_SECONDS,
     VALUE_TYPE_USER,
 };
 
@@ -115,6 +119,11 @@ struct Value {
 
     Value(float value, Unit unit)
         : type_(VALUE_TYPE_FLOAT), options_(0), unit_(unit), float_(value) 
+    {
+    }
+
+    Value(float value, ValueType type)
+        : type_(type), options_(0), unit_(UNIT_UNKNOWN), float_(value)
     {
     }
 
@@ -308,7 +317,20 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_GET_SIZE,
     DATA_OPERATION_YT_DATA_GET_POSITION,
     DATA_OPERATION_YT_DATA_SET_POSITION,
-    DATA_OPERATION_YT_DATA_GET_PAGE_SIZE
+    DATA_OPERATION_YT_DATA_GET_PAGE_SIZE,
+    DATA_OPERATION_YT_DATA_GET_STYLE,
+    DATA_OPERATION_YT_DATA_GET_MIN,
+    DATA_OPERATION_YT_DATA_GET_MAX,
+    DATA_OPERATION_YT_DATA_GET_VALUE1,
+    DATA_OPERATION_YT_DATA_GET_VALUE2,
+    DATA_OPERATION_YT_DATA_GET_VALUE3,
+    DATA_OPERATION_YT_DATA_GET_VALUE4,
+    DATA_OPERATION_YT_DATA_GET_VALUE5,
+    DATA_OPERATION_YT_DATA_GET_VALUE6,
+    DATA_OPERATION_YT_DATA_GET_VALUE7,
+    DATA_OPERATION_YT_DATA_GET_VALUE8,
+    DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD,
+    DATA_OPERATION_YT_DATA_GET_PERIOD
 };
 
 int count(uint16_t id);
@@ -335,10 +357,16 @@ bool set(const Cursor &cursor, uint16_t id, Value value, int16_t *error);
 bool isBlinking(const Cursor &cursor, uint16_t id);
 Value getEditValue(const Cursor &cursor, uint16_t id);
 
-int ytDataGetSize(const Cursor &cursor, uint16_t id);
-int ytDataGetPosition(const Cursor &cursor, uint16_t id);
-void ytDataSetPosition(const Cursor &cursor, uint16_t id, int newPosition);
-int ytDataGetPageSize(const Cursor &cursor, uint16_t id);
+uint32_t ytDataGetSize(const Cursor &cursor, uint16_t id);
+uint32_t ytDataGetPosition(const Cursor &cursor, uint16_t id);
+void ytDataSetPosition(const Cursor &cursor, uint16_t id, uint32_t newPosition);
+uint32_t ytDataGetPageSize(const Cursor &cursor, uint16_t id);
+const Style *ytDataGetStyle(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
+Value ytDataGetMin(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
+Value ytDataGetMax(const Cursor &cursor, uint16_t id, uint8_t valueIndex); // limit
+Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint8_t valueIndex, uint32_t position);
+uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, uint16_t id);
+float ytDataGetPeriod(const Cursor &cursor, uint16_t id);
 
 } // namespace data
 } // namespace gui

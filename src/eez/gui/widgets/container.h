@@ -23,9 +23,14 @@
 namespace eez {
 namespace gui {
 
+struct ContainerWidgetFlags {
+    unsigned shadow : 1;
+};
+
 struct ContainerWidget {
     WidgetList widgets;
     uint16_t overlay;
+    ContainerWidgetFlags flags;
 };
 
 struct ContainerWidgetState {

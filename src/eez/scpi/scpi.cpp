@@ -139,23 +139,25 @@ void oneIter() {
                     }
 
                     char filePath[40];
-                    uint8_t year, month, day, hour, minute, second;
-                    datetime::getDate(year, month, day);
-                    datetime::getTime(hour, minute, second);
-                    sprintf(filePath, "/RECORDINGS/%d_%02d_%02d-%02d_%02d_%02d.DLOG",
-                        (int)(year + 2000), (int)month, (int)day,
-                        (int)hour, (int)minute, (int)second);
+                    //uint8_t year, month, day, hour, minute, second;
+                    //datetime::getDate(year, month, day);
+                    //datetime::getTime(hour, minute, second);
+                    //sprintf(filePath, "/RECORDINGS/%d_%02d_%02d-%02d_%02d_%02d.DLOG",
+                    //    (int)(year + 2000), (int)month, (int)day,
+                    //    (int)hour, (int)minute, (int)second);
+                    sprintf(filePath, "/RECORDINGS/LATEST.DLOG");
 
-                    dlog::g_logVoltage[0] = true;
-                    dlog::g_logCurrent[0] = true;
-                    dlog::g_logPower[0] = false;
+                    dlog::g_nextOptions.logVoltage[0] = true;
+                    dlog::g_nextOptions.logCurrent[0] = true;
+                    dlog::g_nextOptions.logPower[0] = false;
                     for (int i = 1; i < CH_MAX; i++) {
-                        dlog::g_logVoltage[i] = false;
-                        dlog::g_logCurrent[i] = false;
-                        dlog::g_logPower[i] = false;
+                        dlog::g_nextOptions.logVoltage[i] = false;
+                        dlog::g_nextOptions.logCurrent[i] = false;
+                        dlog::g_nextOptions.logPower[i] = false;
                     }
-                    dlog::g_period = dlog::PERIOD_MIN;
-                    dlog::g_time = dlog::TIME_MAX;
+                    dlog::g_nextOptions.period = dlog::PERIOD_MIN;
+                    dlog::g_nextOptions.time = dlog::TIME_MAX;
+                    
                     dlog::g_triggerSource = trigger::SOURCE_IMMEDIATE;
 
                     dlog::initiate(filePath);

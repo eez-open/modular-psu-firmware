@@ -23,11 +23,11 @@
 #include <eez/apps/psu/gui/animations.h>
 #include <eez/gui/gui.h>
 
-static const Rect g_displayRect = { 0, 0, 480, 272 };
+//static const Rect g_displayRect = { 0, 0, 480, 272 };
 
 static const Rect g_workingAreaRect = { 0, 0, 480, 240 };
 static const Rect g_workingAreaRectTop = { 0, -240, 480, 240 };
-static const Rect g_workingAreaRectBottom = { 0, 240, 480, 240 };
+//static const Rect g_workingAreaRectBottom = { 0, 240, 480, 240 };
 static const Rect g_workingAreaRectLeft = { -480, 0, 480, 240 };
 static const Rect g_workingAreaRectRight = { 480, 0, 480, 240 };
 

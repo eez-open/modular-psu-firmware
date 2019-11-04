@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
 
 #ifdef __EMSCRIPTEN__
     mount_file_system();
-    emscripten_set_main_loop(main_loop, 0, 1);
+    emscripten_set_main_loop(main_loop, 4, true);
 #else
     eez::boot();
 #endif

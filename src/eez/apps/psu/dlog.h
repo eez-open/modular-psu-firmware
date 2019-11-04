@@ -24,21 +24,50 @@ namespace eez {
 namespace psu {
 namespace dlog {
 
-extern bool g_logVoltage[CH_MAX];
-extern bool g_logCurrent[CH_MAX];
-extern bool g_logPower[CH_MAX];
+enum DlogValues {
+    DLOG_VALUE_CH1_U,
+    DLOG_VALUE_CH1_I,
+    DLOG_VALUE_CH1_P,
+    DLOG_VALUE_CH2_U,
+    DLOG_VALUE_CH2_I,
+    DLOG_VALUE_CH2_P,
+    DLOG_VALUE_CH3_U,
+    DLOG_VALUE_CH3_I,
+    DLOG_VALUE_CH3_P,
+    DLOG_VALUE_CH4_U,
+    DLOG_VALUE_CH4_I,
+    DLOG_VALUE_CH4_P,
+    DLOG_VALUE_CH5_U,
+    DLOG_VALUE_CH5_I,
+    DLOG_VALUE_CH5_P,
+    DLOG_VALUE_CH6_U,
+    DLOG_VALUE_CH6_I,
+    DLOG_VALUE_CH6_P,
+};
 
 static const float PERIOD_MIN = 0.005f;
 static const float PERIOD_MAX = 120.0f;
 static const float PERIOD_DEFAULT = 0.02f;
-extern float g_period;
 
 static const float TIME_MIN = 1.0f;
 static const float TIME_MAX = 86400000.0f;
 static const float TIME_DEFAULT = 60.0f;
-extern float g_time;
+
+struct Options {
+    bool logVoltage[CH_MAX];
+    bool logCurrent[CH_MAX];
+    bool logPower[CH_MAX];
+    float period;
+    float time;
+};
+
+extern Options g_nextOptions;
 
 extern trigger::Source g_triggerSource;
+
+extern Options g_lastOptions;
+extern uint8_t *g_lastBufferStart;
+extern uint8_t *g_lastBufferEnd;
 
 extern double g_currentTime;
 

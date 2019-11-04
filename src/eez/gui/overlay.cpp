@@ -68,6 +68,9 @@ void getOverlayOffset(WidgetCursor &widgetCursor, int &xOffset, int &yOffset) {
 
         xOffset = overlay->xOffset = x - widgetCursor.x;
         yOffset = overlay->yOffset = y - widgetCursor.y;
+    } else {
+        xOffset = 0;
+        yOffset = 0;
     }
 }
 

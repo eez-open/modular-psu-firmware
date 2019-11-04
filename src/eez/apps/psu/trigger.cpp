@@ -140,8 +140,8 @@ void check(uint32_t currentTime) {
 }
 
 int generateTrigger(Source source, bool checkImmediatelly) {
-    bool seqTriggered =
-        persist_conf::devConf2.triggerSource == source && g_state == STATE_INITIATED;
+    bool seqTriggered = persist_conf::devConf2.triggerSource == source && g_state == STATE_INITIATED;
+
 #if OPTION_SD_CARD
     bool dlogTriggered = dlog::g_triggerSource == source && dlog::isInitiated();
 #endif

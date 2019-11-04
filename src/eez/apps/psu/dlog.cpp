@@ -31,6 +31,10 @@
 #include <eez/system.h>
 #include <eez/apps/psu/dlog.h>
 
+#ifdef EEZ_PLATFORM_STM32
+#include <eez/platform/stm32/defines.h>
+#endif
+
 namespace eez {
 
 using namespace scpi;
@@ -38,31 +42,45 @@ using namespace scpi;
 namespace psu {
 namespace dlog {
 
-bool g_logVoltage[CH_MAX];
-bool g_logCurrent[CH_MAX];
-bool g_logPower[CH_MAX];
-float g_period = PERIOD_DEFAULT;
-float g_time = TIME_DEFAULT;
+Options g_nextOptions;
+
 trigger::Source g_triggerSource = trigger::SOURCE_IMMEDIATE;
-char g_filePath[MAX_PATH_LENGTH + 1];
+static char g_filePath[MAX_PATH_LENGTH + 1];
+
+Options g_lastOptions;
+uint8_t *g_lastBufferStart;
+uint8_t *g_lastBufferEnd;
 
 enum State { STATE_IDLE, STATE_INITIATED, STATE_TRIGGERED, STATE_EXECUTING };
 static State g_state = STATE_IDLE;
 
-File g_file;
-uint32_t g_lastTickCount;
-uint32_t g_seconds;
-uint32_t g_micros;
-uint32_t g_iSample;
+static File g_file;
+static uint32_t g_lastTickCount;
+static uint32_t g_seconds;
+static uint32_t g_micros;
+static uint32_t g_iSample;
 double g_currentTime;
-double g_nextTime;
-uint32_t g_lastSyncTickCount;
+static double g_nextTime;
+static uint32_t g_lastSyncTickCount;
 
-static const unsigned int BUFFER_SIZE = 4096;
-uint8_t g_buffers[2][BUFFER_SIZE];
-int g_selectedbufferIndex;
-int g_bufferIndex;
-int g_lastBufferSize;
+#ifdef EEZ_PLATFORM_STM32
+static uint8_t *g_buffer = (uint8_t *)DLOG_BUFFER;
+#endif
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+#define DLOG_BUFFER_SIZE (1024 * 1024)
+static uint8_t g_bufferMemory[DLOG_BUFFER_SIZE];
+static uint8_t *g_buffer = g_bufferMemory;
+#endif
+
+static const unsigned int CHUNK_SIZE = 4096;
+static const unsigned int NUM_CHUNKS = DLOG_BUFFER_SIZE / CHUNK_SIZE;
+
+static int g_selectedChunkIndex;
+static int g_bufferIndex;
+
+static int g_lastChunkIndex;
+static int g_lastChunkSize;
 
 void setState(State newState) {
     if (g_state != newState) {
@@ -79,7 +97,7 @@ void setState(State newState) {
 int checkDlogParameters() {
     bool somethingToLog = false;
     for (int i = 0; i < CH_NUM; ++i) {
-        if (g_logVoltage[i] || g_logCurrent[i] || g_logPower[i]) {
+        if (g_nextOptions.logVoltage[i] || g_nextOptions.logCurrent[i] || g_nextOptions.logPower[i]) {
             somethingToLog = true;
             break;
         }
@@ -165,12 +183,12 @@ void executeDiskOperation(int diskOperation) {
         break;
 
     case DISK_OPERATION_WRITE:
-        g_file.write(&g_buffers[g_selectedbufferIndex ? 0 : 1][0], g_lastBufferSize);
+        g_file.write(g_buffer + g_lastChunkIndex * CHUNK_SIZE, g_lastChunkSize);
         break;
 
     case DISK_OPERATION_CLOSE:
         if (g_bufferIndex > 0) {
-            g_file.write(&g_buffers[g_selectedbufferIndex][0], g_bufferIndex);
+            g_file.write(g_buffer + g_selectedChunkIndex * CHUNK_SIZE, g_bufferIndex);
         }
         g_file.close();
         break;
@@ -186,15 +204,19 @@ void queueDiskOperation(int diskOperation) {
 }
 
 void flushData() {
-    g_selectedbufferIndex = g_selectedbufferIndex ? 0 : 1;
-    g_lastBufferSize = g_bufferIndex;
+    g_lastChunkIndex = g_selectedChunkIndex;
+    g_lastChunkSize = g_bufferIndex;
+
+    g_selectedChunkIndex = (g_selectedChunkIndex + 1) % NUM_CHUNKS;
     g_bufferIndex = 0;
+
     queueDiskOperation(DISK_OPERATION_WRITE);
 }
 
 void writeUint8(uint8_t value) {
-    g_buffers[g_selectedbufferIndex][g_bufferIndex] = value;
-    if (++g_bufferIndex == BUFFER_SIZE) {
+    *(g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex) = value;
+
+    if (++g_bufferIndex == CHUNK_SIZE) {
         g_lastSyncTickCount = micros();
         flushData();
     }
@@ -224,8 +246,11 @@ int startImmediately() {
 
     queueDiskOperation(DISK_OPERATION_OPEN);
 
-    g_selectedbufferIndex = 0;
+    g_selectedChunkIndex = 0;
     g_bufferIndex = 0;
+    g_lastSyncTickCount = micros();
+
+    memcpy(&g_lastOptions, &g_nextOptions, sizeof(Options));
 
     setState(STATE_EXECUTING);
 
@@ -242,21 +267,23 @@ int startImmediately() {
 
     uint32_t columns = 0;
     for (int iChannel = 0; iChannel < CH_NUM; ++iChannel) {
-        if (g_logVoltage[iChannel]) {
+        if (g_lastOptions.logVoltage[iChannel]) {
             columns |= 1 << (4 * iChannel);
         }
-        if (g_logCurrent[iChannel]) {
+        if (g_lastOptions.logCurrent[iChannel]) {
             columns |= 2 << (4 * iChannel);
         }
-        if (g_logPower[iChannel]) {
+        if (g_lastOptions.logPower[iChannel]) {
             columns |= 4 << (4 * iChannel);
         }
     }
     writeUint32(columns);
 
-    writeFloat(g_period);
-    writeFloat(g_time);
+    writeFloat(g_lastOptions.period);
+    writeFloat(g_lastOptions.time);
     writeUint32(datetime::nowUtc());
+
+    g_lastBufferStart = g_lastBufferEnd = g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex;
 
     g_lastTickCount = micros();
     g_seconds = 0;
@@ -271,12 +298,13 @@ int startImmediately() {
 }
 
 void finishLogging() {
+    g_lastBufferEnd = g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex;
     setState(STATE_IDLE);
     queueDiskOperation(DISK_OPERATION_CLOSE);
     for (int i = 0; i < CH_NUM; ++i) {
-        g_logVoltage[i] = 0;
-        g_logCurrent[i] = 0;
-        g_logPower[i] = 0;
+        g_nextOptions.logVoltage[i] = 0;
+        g_nextOptions.logCurrent[i] = 0;
+        g_nextOptions.logPower[i] = 0;
     }
 }
 
@@ -301,26 +329,55 @@ void log(uint32_t tickCount) {
 
     if (g_currentTime >= g_nextTime) {
         while (1) {
-            g_nextTime = ++g_iSample * g_period;
-            if (g_currentTime < g_nextTime || g_nextTime > g_time) {
+            g_nextTime = ++g_iSample * g_lastOptions.period;
+            if (g_currentTime < g_nextTime || g_nextTime > g_lastOptions.time) {
                 break;
             }
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+            for (int i = 0; i < CH_NUM; ++i) {
+                Channel &channel = Channel::get(i);
+
+                float uMon = 0;
+                float iMon = 0;
+
+                if (g_lastOptions.logVoltage[i]) {
+                    uMon = channel_dispatcher::getUMonLast(channel);
+                    writeFloat(uMon);
+                }
+
+                if (g_lastOptions.logCurrent[i]) {
+                    iMon = channel_dispatcher::getIMonLast(channel);
+                    writeFloat(iMon);
+                }
+
+                if (g_lastOptions.logPower[i]) {
+                    if (!g_lastOptions.logVoltage[i]) {
+                        uMon = channel_dispatcher::getUMonLast(channel);
+                    }
+                    if (!g_lastOptions.logCurrent[i]) {
+                        iMon = channel_dispatcher::getIMonLast(channel);
+                    }
+                    writeFloat(uMon * iMon);
+                }
+            }
+#else
             // we missed a sample, write NAN
 #ifdef DLOG_JITTER
             writeFloat(NAN);
 #endif
             for (int i = 0; i < CH_NUM; ++i) {
-                if (g_logVoltage[i]) {
+                if (g_lastOptions.logVoltage[i]) {
                     writeFloat(NAN);
                 }
-                if (g_logCurrent[i]) {
+                if (g_lastOptions.logCurrent[i]) {
                     writeFloat(NAN);
                 }
-                if (g_logPower[i]) {
+                if (g_lastOptions.logPower[i]) {
                     writeFloat(NAN);
                 }
             }
+#endif
         }
 
         // write sample
@@ -333,28 +390,30 @@ void log(uint32_t tickCount) {
             float uMon = 0;
             float iMon = 0;
 
-            if (g_logVoltage[i]) {
+            if (g_lastOptions.logVoltage[i]) {
                 uMon = channel_dispatcher::getUMonLast(channel);
                 writeFloat(uMon);
             }
 
-            if (g_logCurrent[i]) {
+            if (g_lastOptions.logCurrent[i]) {
                 iMon = channel_dispatcher::getIMonLast(channel);
                 writeFloat(iMon);
             }
 
-            if (g_logPower[i]) {
-                if (!g_logVoltage[i]) {
+            if (g_lastOptions.logPower[i]) {
+                if (!g_lastOptions.logVoltage[i]) {
                     uMon = channel_dispatcher::getUMonLast(channel);
                 }
-                if (!g_logCurrent[i]) {
+                if (!g_lastOptions.logCurrent[i]) {
                     iMon = channel_dispatcher::getIMonLast(channel);
                 }
                 writeFloat(uMon * iMon);
             }
         }
 
-        if (g_nextTime > g_time) {
+        g_lastBufferEnd = g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex;
+
+        if (g_nextTime > g_lastOptions.time) {
             finishLogging();
         } else {
             int32_t diff = tickCount - g_lastSyncTickCount;
@@ -381,13 +440,13 @@ void reset() {
     abort();
 
     for (int i = 0; i < CH_NUM; ++i) {
-        g_logVoltage[i] = 0;
-        g_logCurrent[i] = 0;
-        g_logPower[i] = 0;
+        g_nextOptions.logVoltage[i] = 0;
+        g_nextOptions.logCurrent[i] = 0;
+        g_nextOptions.logPower[i] = 0;
     }
 
-    g_period = PERIOD_DEFAULT;
-    g_time = TIME_DEFAULT;
+    g_nextOptions.period = PERIOD_DEFAULT;
+    g_nextOptions.time = TIME_DEFAULT;
     g_triggerSource = trigger::SOURCE_IMMEDIATE;
     g_filePath[0] = 0;
 }

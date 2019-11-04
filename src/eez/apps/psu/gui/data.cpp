@@ -67,6 +67,7 @@
 #include <eez/gui/overlay.h>
 #include <eez/gui/assets.h>
 #include <eez/gui/widgets/container.h>
+#include <eez/gui/widgets/yt_graph.h>
 
 #define CONF_GUI_REFRESH_EVERY_MS 250
 
@@ -661,6 +662,16 @@ void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count)
     }
 }
 
+bool compare_DLOG_VALUE_LABEL_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void DLOG_VALUE_LABEL_value_to_text(const Value &value, char *text, int count) {
+    static const char labels[] = { 'U', 'I', 'P' };
+    int dlogValue = value.getInt();
+    snprintf(text, count - 1, "%c%d", labels[dlogValue % 3], dlogValue / 3 + 1);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 } // namespace gui
@@ -670,81 +681,87 @@ namespace eez {
 namespace gui {
 namespace data {
 
-CompareValueFunction g_compareUserValueFunctions[] = { compare_LESS_THEN_MIN_FLOAT_value,
-                                                       compare_GREATER_THEN_MAX_FLOAT_value,
-                                                       compare_CHANNEL_LABEL_value,
-                                                       compare_CHANNEL_SHORT_LABEL_value,
-                                                       compare_CHANNEL_BOARD_INFO_LABEL_value,
-                                                       compare_LESS_THEN_MIN_INT_value,
-                                                       compare_LESS_THEN_MIN_TIME_ZONE_value,
-                                                       compare_GREATER_THEN_MAX_INT_value,
-                                                       compare_GREATER_THEN_MAX_TIME_ZONE_value,
-                                                       compare_EVENT_value,
-                                                       compare_ON_TIME_COUNTER_value,
-                                                       compare_COUNTDOWN_value,
-                                                       compare_TIME_ZONE_value,
-                                                       compare_DATE_value,
-                                                       compare_YEAR_value,
-                                                       compare_MONTH_value,
-                                                       compare_DAY_value,
-                                                       compare_TIME_value,
-                                                       compare_HOUR_value,
-                                                       compare_MINUTE_value,
-                                                       compare_SECOND_value,
-                                                       compare_USER_PROFILE_LABEL_value,
-                                                       compare_USER_PROFILE_REMARK_value,
-                                                       compare_EDIT_INFO_value,
-                                                       compare_MAC_ADDRESS_value,
-                                                       compare_IP_ADDRESS_value,
-                                                       compare_PORT_value,
-                                                       compare_TEXT_MESSAGE_value,
-                                                       compare_SERIAL_BAUD_INDEX_value,
-                                                       compare_DLOG_STATUS_value,
-                                                       compare_VALUE_LIST_value,
-                                                       compare_FLOAT_LIST_value,
-                                                       compare_CHANNEL_TITLE_value,
-                                                       compare_CHANNEL_SHORT_TITLE_value,
-                                                       compare_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value,
-                                                       compare_CHANNEL_SHORT_TITLE_WITH_COLON_value,
-                                                       compare_CHANNEL_LONG_TITLE_value };
+CompareValueFunction g_compareUserValueFunctions[] = {
+    compare_LESS_THEN_MIN_FLOAT_value,
+    compare_GREATER_THEN_MAX_FLOAT_value,
+    compare_CHANNEL_LABEL_value,
+    compare_CHANNEL_SHORT_LABEL_value,
+    compare_CHANNEL_BOARD_INFO_LABEL_value,
+    compare_LESS_THEN_MIN_INT_value,
+    compare_LESS_THEN_MIN_TIME_ZONE_value,
+    compare_GREATER_THEN_MAX_INT_value,
+    compare_GREATER_THEN_MAX_TIME_ZONE_value,
+    compare_EVENT_value,
+    compare_ON_TIME_COUNTER_value,
+    compare_COUNTDOWN_value,
+    compare_TIME_ZONE_value,
+    compare_DATE_value,
+    compare_YEAR_value,
+    compare_MONTH_value,
+    compare_DAY_value,
+    compare_TIME_value,
+    compare_HOUR_value,
+    compare_MINUTE_value,
+    compare_SECOND_value,
+    compare_USER_PROFILE_LABEL_value,
+    compare_USER_PROFILE_REMARK_value,
+    compare_EDIT_INFO_value,
+    compare_MAC_ADDRESS_value,
+    compare_IP_ADDRESS_value,
+    compare_PORT_value,
+    compare_TEXT_MESSAGE_value,
+    compare_SERIAL_BAUD_INDEX_value,
+    compare_DLOG_STATUS_value,
+    compare_VALUE_LIST_value,
+    compare_FLOAT_LIST_value,
+    compare_CHANNEL_TITLE_value,
+    compare_CHANNEL_SHORT_TITLE_value,
+    compare_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value,
+    compare_CHANNEL_SHORT_TITLE_WITH_COLON_value,
+    compare_CHANNEL_LONG_TITLE_value,
+    compare_DLOG_VALUE_LABEL_value 
+};
 
-ValueToTextFunction g_userValueToTextFunctions[] = { LESS_THEN_MIN_FLOAT_value_to_text,
-                                                     GREATER_THEN_MAX_FLOAT_value_to_text,
-                                                     CHANNEL_LABEL_value_to_text,
-                                                     CHANNEL_SHORT_LABEL_value_to_text,
-                                                     CHANNEL_BOARD_INFO_LABEL_value_to_text,
-                                                     LESS_THEN_MIN_INT_value_to_text,
-                                                     LESS_THEN_MIN_TIME_ZONE_value_to_text,
-                                                     GREATER_THEN_MAX_INT_value_to_text,
-                                                     GREATER_THEN_MAX_TIME_ZONE_value_to_text,
-                                                     EVENT_value_to_text,
-                                                     ON_TIME_COUNTER_value_to_text,
-                                                     COUNTDOWN_value_to_text,
-                                                     TIME_ZONE_value_to_text,
-                                                     DATE_value_to_text,
-                                                     YEAR_value_to_text,
-                                                     MONTH_value_to_text,
-                                                     DAY_value_to_text,
-                                                     TIME_value_to_text,
-                                                     HOUR_value_to_text,
-                                                     MINUTE_value_to_text,
-                                                     SECOND_value_to_text,
-                                                     USER_PROFILE_LABEL_value_to_text,
-                                                     USER_PROFILE_REMARK_value_to_text,
-                                                     EDIT_INFO_value_to_text,
-                                                     MAC_ADDRESS_value_to_text,
-                                                     IP_ADDRESS_value_to_text,
-                                                     PORT_value_to_text,
-                                                     TEXT_MESSAGE_value_to_text,
-                                                     SERIAL_BAUD_INDEX_value_to_text,
-                                                     DLOG_STATUS_value_to_text,
-                                                     VALUE_LIST_value_to_text,
-                                                     FLOAT_LIST_value_to_text,
-                                                     CHANNEL_TITLE_value_to_text,
-                                                     CHANNEL_SHORT_TITLE_value_to_text,
-                                                     CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_to_text,
-                                                     CHANNEL_SHORT_TITLE_WITH_COLON_value_to_text,
-                                                     CHANNEL_LONG_TITLE_value_to_text };
+ValueToTextFunction g_userValueToTextFunctions[] = { 
+    LESS_THEN_MIN_FLOAT_value_to_text,
+    GREATER_THEN_MAX_FLOAT_value_to_text,
+    CHANNEL_LABEL_value_to_text,
+    CHANNEL_SHORT_LABEL_value_to_text,
+    CHANNEL_BOARD_INFO_LABEL_value_to_text,
+    LESS_THEN_MIN_INT_value_to_text,
+    LESS_THEN_MIN_TIME_ZONE_value_to_text,
+    GREATER_THEN_MAX_INT_value_to_text,
+    GREATER_THEN_MAX_TIME_ZONE_value_to_text,
+    EVENT_value_to_text,
+    ON_TIME_COUNTER_value_to_text,
+    COUNTDOWN_value_to_text,
+    TIME_ZONE_value_to_text,
+    DATE_value_to_text,
+    YEAR_value_to_text,
+    MONTH_value_to_text,
+    DAY_value_to_text,
+    TIME_value_to_text,
+    HOUR_value_to_text,
+    MINUTE_value_to_text,
+    SECOND_value_to_text,
+    USER_PROFILE_LABEL_value_to_text,
+    USER_PROFILE_REMARK_value_to_text,
+    EDIT_INFO_value_to_text,
+    MAC_ADDRESS_value_to_text,
+    IP_ADDRESS_value_to_text,
+    PORT_value_to_text,
+    TEXT_MESSAGE_value_to_text,
+    SERIAL_BAUD_INDEX_value_to_text,
+    DLOG_STATUS_value_to_text,
+    VALUE_LIST_value_to_text,
+    FLOAT_LIST_value_to_text,
+    CHANNEL_TITLE_value_to_text,
+    CHANNEL_SHORT_TITLE_value_to_text,
+    CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_to_text,
+    CHANNEL_SHORT_TITLE_WITH_COLON_value_to_text,
+    CHANNEL_LONG_TITLE_value_to_text,
+    DLOG_VALUE_LABEL_value_to_text
+};
 
 } // namespace data
 } // namespace gui
@@ -3958,17 +3975,17 @@ void data_dlog_status(data::DataOperationEnum operation, data::Cursor &cursor, d
 #endif
 }
 
-static const int NUM_WIDGETS = 4;
-
-static const int LIST_ICON_WIDGET = 0;
-static const int LIST_GRID_WIDGET = 1;
-static const int DLOG_ICON_WIDGET = 2;
-static const int DLOG_STATUS_WIDGET = 3;
-
-static Overlay overlay;
-static WidgetOverride widgetOverrides[NUM_WIDGETS];
-
 void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    static const int NUM_WIDGETS = 4;
+
+    static const int LIST_ICON_WIDGET = 0;
+    static const int LIST_GRID_WIDGET = 1;
+    static const int DLOG_ICON_WIDGET = 2;
+    static const int DLOG_STATUS_WIDGET = 3;
+
+    static Overlay overlay;
+    static WidgetOverride widgetOverrides[NUM_WIDGETS];
+
     if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
@@ -4066,33 +4083,140 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data:
     }
 }
 
+void data_nondrag_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+}
+
 void data_dlog_started(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = dlog::isExecuting() ? 1 : 0;
     }
 }
 
-void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    static int g_size = 5000;
-    static int g_position = 0;
-    static int g_pageSize = 480;
+void data_channel_history_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
-        value = g_size;
+        value = Value(g_appContext->getNumHistoryValues(DATA_ID_CHANNEL_DISPLAY_VALUE1), VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
-        value = g_position;
-    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
-        int newPosition = value.getInt();
+        value = Value(g_appContext->getCurrentHistoryValuePosition(cursor, DATA_ID_CHANNEL_DISPLAY_VALUE1) - 1, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
+        if (channelSnapshot.mode == CHANNEL_MODE_UR) {
+            value = Value(STYLE_ID_YT_GRAPH_UNREGULATED, VALUE_TYPE_UINT16);
+        } else {
+            value = Value(value.getUInt8() == 0 ? STYLE_ID_YT_GRAPH_U_DEFAULT : STYLE_ID_YT_GRAPH_I_DEFAULT, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_MIN) {
+        value = getMin(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_MAX) {
+        value = getMax(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_VALUE1) {
+        value = g_appContext->getHistoryValue(cursor, DATA_ID_CHANNEL_DISPLAY_VALUE1, value.getUInt32());
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_VALUE2) {
+        value = g_appContext->getHistoryValue(cursor, DATA_ID_CHANNEL_DISPLAY_VALUE2, value.getUInt32());
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
+        value = Value(psu::persist_conf::devConf2.ytGraphUpdateMethod, VALUE_TYPE_UINT8);
+    }
+}
 
-        if (newPosition < 0) {
-            newPosition = 0;
-        } else if (newPosition + g_pageSize > g_size) {
-            newPosition = g_size - g_pageSize;
+void data_recording_ready(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = dlog::g_lastBufferEnd - dlog::g_lastBufferStart > 0 ? 1 : 0;
+    }
+}
+
+void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    static uint32_t g_position = 0;
+    static uint32_t g_pageSize = 480;
+
+    if (operation == DATA_OPERATION_YT_DATA_GET_VALUE1) {
+        value = Value(((float *)dlog::g_lastBufferStart)[2 * value.getUInt32() + 0], UNIT_VOLT);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_VALUE2) {
+        value = Value(((float *)dlog::g_lastBufferStart)[2 * value.getUInt32() + 1], UNIT_AMPER);
+    } else {
+        uint32_t size = (dlog::g_lastBufferEnd - dlog::g_lastBufferStart) / 8;
+        if (g_position + g_pageSize > size) {
+            if (size > g_pageSize) {
+                g_position = size - g_pageSize;
+            } else {
+                g_position = 0;
+            }
         }
 
-        g_position = newPosition;
-    }else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
-        value = g_pageSize;
-    } 
+        if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
+            value = Value((uint32_t)((dlog::g_lastBufferEnd - dlog::g_lastBufferStart) / 8), VALUE_TYPE_UINT32);
+        } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
+            value = Value(g_position, VALUE_TYPE_UINT32);
+        } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
+            int32_t newPosition = value.getUInt32();
+            if (newPosition < 0) {
+                newPosition = 0;
+            } else {
+                if (newPosition + g_pageSize > size) {
+                    newPosition = size - g_pageSize;
+                }
+            }
+            g_position = newPosition;
+        } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+            value = Value(g_pageSize, VALUE_TYPE_UINT32);
+        } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
+            value = Value(value.getUInt8() == 0 ? STYLE_ID_YT_GRAPH_U_DEFAULT : STYLE_ID_YT_GRAPH_I_DEFAULT, VALUE_TYPE_UINT16);
+        } else if (operation == DATA_OPERATION_YT_DATA_GET_MIN) {
+            value = value.getUInt8() == 0 ? Value(0.0f, UNIT_VOLT) : Value(0.0f, UNIT_AMPER);
+        } else if (operation == DATA_OPERATION_YT_DATA_GET_MAX) {
+            value = value.getUInt8() == 0 ? Value(40.0f, UNIT_VOLT) : Value(5.0f, UNIT_AMPER);
+        } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
+            value = YT_GRAPH_UPDATE_METHOD_STATIC;
+        } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
+            value = Value(dlog::g_lastOptions.period, UNIT_SECOND);
+        }
+    }
+}
+
+void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    static Overlay overlay;
+
+    if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = data::Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+        overlay.state = 1;
+        WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
+        overlay.width = widgetCursor.widget->w;
+        overlay.height = widgetCursor.widget->h;
+        value = data::Value(&overlay, VALUE_TYPE_POINTER);
+    }
+}
+
+void data_dlog_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_COUNT) {
+        value = 2;
+    }
+}
+
+void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(cursor.i == 0 ? dlog::DLOG_VALUE_CH1_U : dlog::DLOG_VALUE_CH1_I, VALUE_TYPE_DLOG_VALUE_LABEL);
+    }
+}
+
+void data_dlog_value_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        if (cursor.i == 0) {
+            value = Value(10.0f, UNIT_VOLT_PER_DIV);
+        } else {
+            value = Value(1.15f, UNIT_AMPER_PER_DIV);
+        }
+    }
+}
+
+void data_dlog_value_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        if (cursor.i == 0) {
+            value = Value(20.0f, UNIT_VOLT);
+        } else {
+            value = Value(2.5f, UNIT_AMPER);
+        }
+    }
 }
 
 } // namespace gui

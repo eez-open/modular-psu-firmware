@@ -61,6 +61,30 @@ void INT_value_to_text(const Value &value, char *text, int count) {
     strcatInt(text, value.getInt());
 }
 
+bool compare_UINT8_value(const Value &a, const Value &b) {
+    return a.getUInt8() == b.getUInt8();
+}
+
+void UINT8_value_to_text(const Value &value, char *text, int count) {
+    strcatUInt32(text, value.getUInt8());
+}
+
+bool compare_UINT16_value(const Value &a, const Value &b) {
+    return a.getUInt16() == b.getUInt16();
+}
+
+void UINT16_value_to_text(const Value &value, char *text, int count) {
+    strcatUInt32(text, value.getUInt16());
+}
+
+bool compare_UINT32_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void UINT32_value_to_text(const Value &value, char *text, int count) {
+    strcatUInt32(text, value.getUInt32());
+}
+
 bool compare_FLOAT_value(const Value &a, const Value &b) {
     return a.getUnit() == b.getUnit() && a.getFloat() == b.getFloat();
 }
@@ -242,23 +266,61 @@ void TEST_RESULT_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
+bool compare_TIME_SECONDS_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void TIME_SECONDS_value_to_text(const Value &value, char *text, int count) {
+    uint32_t totalSeconds = (uint32_t)value.getFloat();
+    uint32_t hours = totalSeconds / 3600;
+    uint32_t totalMinutes = totalSeconds - hours * 3600;
+    uint32_t minutes = totalMinutes / 60;
+    uint32_t seconds = totalMinutes % 60;
+    snprintf(text, count - 1, "%02d:%02d:%02d", (int)hours, (int)minutes, (int)seconds);
+    text[count - 1] = 0;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 static CompareValueFunction g_compareBuiltInValueFunctions[] = {
-    compare_NONE_value,       compare_INT_value,  compare_FLOAT_value,
-    compare_STR_value,        compare_ENUM_value, compare_SCPI_ERROR_value,
-    compare_PERCENTAGE_value, compare_SIZE_value, compare_POINTER_value,
-    compare_PAGE_INFO_value,  compare_MASTER_INFO_value, compare_SLOT_INFO_value, compare_SLOT_INFO2_value,
-    compare_TEST_RESULT_value
+    compare_NONE_value,
+    compare_INT_value,
+    compare_UINT8_value,
+    compare_UINT16_value,
+    compare_UINT32_value,
+    compare_FLOAT_value,
+    compare_STR_value,
+    compare_ENUM_value,
+    compare_SCPI_ERROR_value,
+    compare_PERCENTAGE_value,
+    compare_SIZE_value, compare_POINTER_value,
+    compare_PAGE_INFO_value,
+    compare_MASTER_INFO_value,
+    compare_SLOT_INFO_value,
+    compare_SLOT_INFO2_value,
+    compare_TEST_RESULT_value,
+    compare_TIME_SECONDS_value
 };
 
 static ValueToTextFunction g_builtInValueToTextFunctions[] = {
-    NONE_value_to_text,       INT_value_to_text,  FLOAT_value_to_text,
-    STR_value_to_text,        ENUM_value_to_text, SCPI_ERROR_value_to_text,
-    PERCENTAGE_value_to_text, SIZE_value_to_text, POINTER_value_to_text,
-    PAGE_INFO_value_to_text,  MASTER_INFO_value_to_text, SLOT_INFO_value_to_text, SLOT_INFO2_value_to_text,
-    TEST_RESULT_value_to_text
+    NONE_value_to_text,
+    INT_value_to_text,
+    UINT8_value_to_text,
+    UINT16_value_to_text,
+    UINT32_value_to_text,
+    FLOAT_value_to_text,
+    STR_value_to_text,
+    ENUM_value_to_text,
+    SCPI_ERROR_value_to_text,
+    PERCENTAGE_value_to_text,
+    SIZE_value_to_text,
+    POINTER_value_to_text,
+    PAGE_INFO_value_to_text,
+    MASTER_INFO_value_to_text,
+    SLOT_INFO_value_to_text,
+    SLOT_INFO2_value_to_text,
+    TEST_RESULT_value_to_text,
+    TIME_SECONDS_value_to_text
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -488,29 +550,64 @@ Value getEditValue(const Cursor &cursor, uint16_t id) {
     return value;
 }
 
-int ytDataGetSize(const Cursor &cursor, uint16_t id) {
+uint32_t ytDataGetSize(const Cursor &cursor, uint16_t id) {
     Value value;
     g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_SIZE, (Cursor &)cursor, value);
-    return value.getInt();
+    return value.getUInt32();
 
 }
 
-int ytDataGetPosition(const Cursor &cursor, uint16_t id) {
+uint32_t ytDataGetPosition(const Cursor &cursor, uint16_t id) {
     Value value;
     g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_POSITION, (Cursor &)cursor, value);
-    return value.getInt();
+    return value.getUInt32();
 }
 
-void ytDataSetPosition(const Cursor &cursor, uint16_t id, int newPosition) {
-	Value value(newPosition);
+void ytDataSetPosition(const Cursor &cursor, uint16_t id, uint32_t newPosition) {
+	Value value(newPosition, VALUE_TYPE_UINT32);
     g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_SET_POSITION, (Cursor &)cursor, value);
 }
 
-int ytDataGetPageSize(const Cursor &cursor, uint16_t id) {
+uint32_t ytDataGetPageSize(const Cursor &cursor, uint16_t id) {
     Value value;
     g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_PAGE_SIZE, (Cursor &)cursor, value);
-    return value.getInt();
+    return value.getUInt32();
+}
 
+const Style *ytDataGetStyle(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+    Value value(valueIndex, VALUE_TYPE_UINT8);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_STYLE, (Cursor &)cursor, value);
+    return getStyle(value.getUInt16());
+}
+
+Value ytDataGetMin(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+    Value value(valueIndex, VALUE_TYPE_UINT8);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_MIN, (Cursor &)cursor, value);
+    return value;
+}
+
+Value ytDataGetMax(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+    Value value(valueIndex, VALUE_TYPE_UINT8);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_MAX, (Cursor &)cursor, value);
+    return value;
+}
+
+Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint8_t valueIndex, uint32_t position) {
+    Value value(position, VALUE_TYPE_UINT32);
+    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_VALUE1 + valueIndex), (Cursor &)cursor, value);
+    return value;
+}
+
+uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD, (Cursor &)cursor, value);
+    return value.getUInt8();
+}
+
+float ytDataGetPeriod(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_PERIOD, (Cursor &)cursor, value);
+    return value.getFloat();
 }
 
 } // namespace data

@@ -21,24 +21,25 @@
 #include <eez/gui/widget.h>
 
 namespace eez {
-namespace gui {
 
-struct YTGraphWidget {
-    uint16_t y1Style;
-    uint16_t y2Data;
-    uint16_t y2Style;
+enum {
+    YT_GRAPH_UPDATE_METHOD_SCROLL,
+    YT_GRAPH_UPDATE_METHOD_SCAN_LINE,
+    YT_GRAPH_UPDATE_METHOD_STATIC
 };
+
+namespace gui {
 
 struct YTGraphWidgetState {
     WidgetState genericState;
-    data::Value y2Data;
     uint8_t iChannel;
     uint32_t historyValuePosition;
-    uint16_t scanLinePosition;
     uint8_t ytGraphUpdateMethod;
+    uint32_t cursorPosition;
 };
 
 void YTGraphWidget_draw(const WidgetCursor &widgetCursor);
+void YTGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 
 } // namespace gui
 } // namespace eez

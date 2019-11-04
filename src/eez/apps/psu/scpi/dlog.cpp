@@ -82,7 +82,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltage(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog::g_logVoltage[channel->channelIndex] = enable;
+    dlog::g_nextOptions.logVoltage[channel->channelIndex] = enable;
 
     return SCPI_RES_OK;
 #else
@@ -99,7 +99,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltageQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog::g_logVoltage[channel->channelIndex]);
+    SCPI_ResultBool(context, dlog::g_nextOptions.logVoltage[channel->channelIndex]);
 
     return SCPI_RES_OK;
 #else
@@ -126,7 +126,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrent(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog::g_logCurrent[channel->channelIndex] = enable;
+    dlog::g_nextOptions.logCurrent[channel->channelIndex] = enable;
 
     return SCPI_RES_OK;
 #else
@@ -143,7 +143,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrentQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog::g_logCurrent[channel->channelIndex]);
+    SCPI_ResultBool(context, dlog::g_nextOptions.logCurrent[channel->channelIndex]);
 
     return SCPI_RES_OK;
 #else
@@ -170,7 +170,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionPower(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog::g_logPower[channel->channelIndex] = enable;
+    dlog::g_nextOptions.logPower[channel->channelIndex] = enable;
 
     return SCPI_RES_OK;
 #else
@@ -187,7 +187,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionPowerQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog::g_logPower[channel->channelIndex]);
+    SCPI_ResultBool(context, dlog::g_nextOptions.logPower[channel->channelIndex]);
 
     return SCPI_RES_OK;
 #else
@@ -231,7 +231,7 @@ scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog::g_period = period;
+    dlog::g_nextOptions.period = period;
 
     return SCPI_RES_OK;
 #else
@@ -243,7 +243,7 @@ scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
 scpi_result_t scpi_cmd_senseDlogPeriodQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
-    SCPI_ResultFloat(context, dlog::g_period);
+    SCPI_ResultFloat(context, dlog::g_nextOptions.period);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -286,7 +286,7 @@ scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog::g_time = time;
+    dlog::g_nextOptions.time = time;
 
     return SCPI_RES_OK;
 #else
@@ -298,7 +298,7 @@ scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
 scpi_result_t scpi_cmd_senseDlogTimeQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
-    SCPI_ResultFloat(context, dlog::g_time);
+    SCPI_ResultFloat(context, dlog::g_nextOptions.time);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

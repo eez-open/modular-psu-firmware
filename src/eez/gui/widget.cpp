@@ -165,7 +165,7 @@ OnTouchFunctionType g_onTouchFunctions[] = {
     nullptr,                   // WIDGET_TYPE_SCALE
     nullptr,                   // WIDGET_TYPE_BAR_GRAPH
     nullptr,                   // WIDGET_TYPE_LAYOUT_VIEW
-    nullptr,                   // WIDGET_TYPE_YT_GRAPH
+    YTGraphWidget_onTouch,     // WIDGET_TYPE_YT_GRAPH
     UpDownWidget_onTouch,      // WIDGET_TYPE_UP_DOWN
     ListGraphWidget_onTouch,   // WIDGET_TYPE_LIST_GRAPH
     nullptr,                   // WIDGET_TYPE_APP_VIEW

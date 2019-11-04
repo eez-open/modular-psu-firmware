@@ -33,8 +33,6 @@
 #include <eez/modules/mcu/display.h>
 #endif
 
-#define CONF_OVERLAY_OPACITY 240
-
 namespace eez {
 namespace gui {
 
@@ -91,7 +89,7 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
         int hSaved = 0;
 #endif
 
-        if (overlay) {
+        if (overlay && overlay->widgetOverrides) {
             if (!overlay->widgetOverrides[index].isVisible) {
                 continue;
             }
@@ -112,7 +110,7 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
         enumWidget(widgetCursor, callback);
 
 #if OPTION_SDRAM
-        if (overlay) {
+        if (overlay && overlay->widgetOverrides) {
             ((Widget*)widgetCursor.widget)->x = xSaved;
             ((Widget*)widgetCursor.widget)->y = ySaved;
             ((Widget*)widgetCursor.widget)->w = wSaved;
@@ -151,14 +149,14 @@ void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callba
         auto previousState = (ContainerWidgetState *)widgetCursor.previousState;
 
         if (currentState) {
-            currentState->overlayState = overlay->state;
+            currentState->overlayState = overlay ? overlay->state : 1;
 
             if (previousState && previousState->overlayState != currentState->overlayState) {
                 widgetCursor.previousState = 0;
             }
         }
 
-        if (!overlay->state) {
+        if (overlay && !overlay->state) {
             if (widgetCursor.currentState) {
                 widgetCursor.currentState->size = sizeof(ContainerWidgetState);
             }
@@ -173,11 +171,13 @@ void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callba
     if (isOverlay(widgetCursor)) {
         auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
         if (currentState) {
-            int xOffset;
-            int yOffset;
+            int xOffset = 0;
+            int yOffset = 0;
             getOverlayOffset(widgetCursor, xOffset, yOffset);
 
-            mcu::display::drawBuffer(widgetCursor.x, widgetCursor.y, overlay ? overlay->width: widgetCursor.widget->w, overlay ? overlay->height : widgetCursor.widget->h, true, CONF_OVERLAY_OPACITY, xOffset, yOffset);
+            const Style *style = getStyle(widgetCursor.widget->style);
+
+            mcu::display::drawBuffer(widgetCursor.x, widgetCursor.y, overlay ? overlay->width: widgetCursor.widget->w, overlay ? overlay->height : widgetCursor.widget->h, containerWidget->flags.shadow, style->opacity, xOffset, yOffset);
             currentState->displayBufferIndex = mcu::display::selectBuffer(currentState->displayBufferIndex);
         }
     }
@@ -200,17 +200,17 @@ void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
 
         Overlay *overlay = getOverlay(widgetCursor);
 
-        if (overlay->state == 0) {
+        if (overlay && overlay->state == 0) {
             currentState->displayBufferIndex = -1;
             return;
         }
 
-        if (previousState && overlay->state != previousState->overlayState) {
+        if (previousState && (overlay ? overlay->state : 1) != previousState->overlayState) {
             refresh = true;
         }
 
-        w = overlay->width;
-        h = overlay->height;
+        w = overlay ? overlay->width : widget->w;
+        h = overlay ? overlay->height : widget->h;
 
 #if OPTION_SDRAM
         if (!previousState || previousState->displayBufferIndex == -1) {

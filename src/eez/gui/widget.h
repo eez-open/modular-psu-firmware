@@ -132,10 +132,15 @@ struct WidgetList {
 
 void WidgetList_fixPointers(WidgetList &widgetList);
 
+struct PageWidgetFlags {
+    unsigned shadow : 1;
+    unsigned closePageIfTouchedOutside: 1;
+};  
+
 struct PageWidget {
     WidgetList widgets;
     uint16_t overlay;
-    uint8_t closePageIfTouchedOutside;
+    PageWidgetFlags flags;
 };
 
 struct Document {
