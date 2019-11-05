@@ -309,29 +309,6 @@ struct YTGraphStaticDrawHelper {
             display::drawHLine(widgetCursor.x, widgetCursor.y + y * widget->h / vertDivisions, widget->w - 1);
         }
 
-        // draw cursor
-        if (data::ytDataIsCursorVisible(widgetCursor.cursor, widgetCursor.widget->data)) {
-            display::setColor(style->color);
-            display::drawVLine(startX + cursorPosition - currentHistoryValuePosition, widgetCursor.y, widget->h - 1);
-
-            int timeTextWidth = 75;
-            int timeTextHeight = 22;
-            const int PADDING = 0;
-            int xTimeText = widgetCursor.x + cursorPosition - currentHistoryValuePosition - timeTextWidth / 2;
-            if (xTimeText < widgetCursor.x + PADDING) {
-                xTimeText = widgetCursor.x + PADDING;
-            } else if (xTimeText + timeTextWidth > widgetCursor.x + widgetCursor.widget->w - PADDING) {
-                xTimeText = widgetCursor.x + widgetCursor.widget->w - PADDING - timeTextWidth;
-            }
-            int yTimeText = widgetCursor.y + widgetCursor.widget->h - timeTextHeight - PADDING;
-
-            float period = data::ytDataGetPeriod(widgetCursor.cursor, widgetCursor.widget->data);
-
-            char text[64];
-            data::ytDataGetCursorTime(widgetCursor.cursor, widgetCursor.widget->data).toText(text, sizeof(text));
-            drawText(text, -1, xTimeText, yTimeText, timeTextWidth, timeTextHeight, style, nullptr, false, false, false, nullptr);
-        }
-
         // draw charts
         YTGraphWidgetState *currentState = (YTGraphWidgetState *)widgetCursor.currentState;
 
@@ -354,6 +331,27 @@ struct YTGraphStaticDrawHelper {
                 drawValue();
                 yPrev = y;
             }
+        }
+
+        // draw cursor
+        if (data::ytDataIsCursorVisible(widgetCursor.cursor, widgetCursor.widget->data)) {
+            display::setColor(style->color);
+            display::drawVLine(startX + cursorPosition - currentHistoryValuePosition, widgetCursor.y, widget->h - 1);
+
+            int timeTextWidth = 75;
+            int timeTextHeight = 22;
+            const int PADDING = 0;
+            int xTimeText = widgetCursor.x + cursorPosition - currentHistoryValuePosition - timeTextWidth / 2;
+            if (xTimeText < widgetCursor.x + PADDING) {
+                xTimeText = widgetCursor.x + PADDING;
+            } else if (xTimeText + timeTextWidth > widgetCursor.x + widgetCursor.widget->w - PADDING) {
+                xTimeText = widgetCursor.x + widgetCursor.widget->w - PADDING - timeTextWidth;
+            }
+            int yTimeText = widgetCursor.y + widgetCursor.widget->h - timeTextHeight - PADDING;
+
+            char text[64];
+            data::ytDataGetCursorTime(widgetCursor.cursor, widgetCursor.widget->data).toText(text, sizeof(text));
+            drawText(text, -1, xTimeText, yTimeText, timeTextWidth, timeTextHeight, style, nullptr, false, false, false, nullptr);
         }
     }
 };
@@ -392,8 +390,7 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
         previousState->ytGraphUpdateMethod == currentState->ytGraphUpdateMethod && 
         g_appContext->isActivePageTopPage() ? previousState->historyValuePosition : currentState->historyValuePosition - graphWidth;
 
-    bool refreshBackground = !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
+    bool refreshBackground = !widgetCursor.previousState;
 
     if (refreshBackground || transformChanged || previousHistoryValuePosition != currentState->historyValuePosition || (!previousState || previousState->numHistoryValues != currentState->numHistoryValues || previousState->cursorPosition != currentState->cursorPosition)) {
         if (currentState->ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
@@ -405,9 +402,7 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
             const Style* style = getStyle(widget->style);
 
             if (refreshBackground) {
-                // draw background
-                uint16_t color = widgetCursor.currentState->flags.active ? style->color : style->background_color;
-                display::setColor(color);
+                display::setColor(style->background_color);
                 display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1, widgetCursor.y + (int)widget->h - 1);
             }
 
