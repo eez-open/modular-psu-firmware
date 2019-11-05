@@ -39,16 +39,16 @@
 #include <eez/modules/dcpX05/adc.h>
 #include <eez/sound.h>
 
-#if OPTION_SD_CARD
-#include <eez/apps/psu/dlog.h>
-#include <eez/apps/psu/sd_card.h>
-#endif
-
 #include <eez/apps/psu/calibration.h>
 #include <eez/apps/psu/profile.h>
 
 #if OPTION_DISPLAY
 #include <eez/apps/psu/gui/psu.h>
+#endif
+
+#if OPTION_SD_CARD
+#include <eez/apps/psu/dlog.h>
+#include <eez/apps/psu/sd_card.h>
 #endif
 
 #if OPTION_FAN
@@ -270,7 +270,7 @@ void init() {
     ethernet::init();
     ntp::init();
 #else
-    DebugTrace("Ethernet initialization skipped!");
+    // DebugTrace("Ethernet initialization skipped!");
 #endif
 
 #if OPTION_FAN

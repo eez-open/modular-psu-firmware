@@ -318,15 +318,11 @@ void enumWidgets(EnumWidgetsCallback callback) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void findWidgetStep(const WidgetCursor &widgetCursor) {
-    if (g_foundWidget && g_foundWidget.widget->action == ACTION_ID_DRAG_OVERLAY) {
-        return;
-    }
-
     const Widget *widget = widgetCursor.widget;
 
     Overlay *overlay = getOverlay(widgetCursor);
 
-    static const int MIN_SIZE = 40;
+    static const int MIN_SIZE = 50;
         
     int x = widgetCursor.x;
     int w = overlay ? overlay->width : widget->w;
@@ -347,17 +343,17 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
         g_findWidgetAtY >= y && g_findWidgetAtY < y + h;
 
     if (inside && (widget->type == WIDGET_TYPE_APP_VIEW || getTouchFunction(widgetCursor))) {
+        int dx = g_findWidgetAtX - (x + w / 2);
+        int dy = g_findWidgetAtY - (y + h / 2);
+        int distance = dx * dx + dy * dy;
+
         if (widget->action == ACTION_ID_DRAG_OVERLAY) {
             if (overlay && !overlay->state) {
                 return;
             }
             g_foundWidget = widgetCursor;
-            g_distanceToFoundWidget = 0;
+            g_distanceToFoundWidget = distance;
         } else {
-            int dx = g_findWidgetAtX - (x + w / 2);
-            int dy = g_findWidgetAtY - (y + h / 2);
-            int distance = dx * dx + dy * dy;
-
             if (!g_foundWidget || distance <= g_distanceToFoundWidget || g_foundWidget.widget->type == WIDGET_TYPE_APP_VIEW) {
                 g_foundWidget = widgetCursor;
                 g_distanceToFoundWidget = distance;

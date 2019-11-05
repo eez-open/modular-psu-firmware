@@ -23,14 +23,10 @@
 namespace eez {
 namespace gui {
 
-struct ContainerWidgetFlags {
-    unsigned shadow : 1;
-};
-
 struct ContainerWidget {
     WidgetList widgets;
     uint16_t overlay;
-    ContainerWidgetFlags flags;
+    uint8_t flags;
 };
 
 struct ContainerWidgetState {
@@ -40,7 +36,9 @@ struct ContainerWidgetState {
 };
 
 void ContainerWidget_fixPointers(Widget *widget);
+
 void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const WidgetList &widgets);
+
 void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 void ContainerWidget_draw(const WidgetCursor &widgetCursor);
 

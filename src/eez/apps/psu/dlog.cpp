@@ -51,6 +51,15 @@ Options g_lastOptions;
 uint8_t *g_lastBufferStart;
 uint8_t *g_lastBufferEnd;
 
+int g_numDlogValues;
+DlogValueParams g_dlogValues[MAX_DLOG_VALUES];
+
+eez::gui::data::Value g_timeOffset;
+
+uint32_t g_pageSize = 480;
+uint32_t g_cursorOffset = 240;
+
+
 enum State { STATE_IDLE, STATE_INITIATED, STATE_TRIGGERED, STATE_EXECUTING };
 static State g_state = STATE_IDLE;
 
@@ -449,6 +458,10 @@ void reset() {
     g_nextOptions.time = TIME_DEFAULT;
     g_triggerSource = trigger::SOURCE_IMMEDIATE;
     g_filePath[0] = 0;
+}
+
+uint32_t getSize() {
+    return (g_lastBufferEnd - g_lastBufferStart) / (g_numDlogValues * sizeof(float));
 }
 
 } // namespace dlog

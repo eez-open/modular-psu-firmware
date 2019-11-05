@@ -63,7 +63,7 @@
 
 #include <eez/scpi/scpi.h>
 
-#if OPTION_SDCARD
+#if OPTION_SD_CARD
 #include <eez/apps/psu/sd_card.h>
 #endif
 

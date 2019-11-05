@@ -22,6 +22,7 @@
 
 #include <eez/gui/draw.h>
 #include <eez/gui/gui.h>
+#include <eez/gui/app_context.h>
 #include <eez/util.h>
 
 namespace eez {
@@ -36,42 +37,48 @@ void TextWidget_fixPointers(Widget *widget) {
 
 void TextWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const Style* style = getStyle(widget->style);
+    const TextWidget *textWidget = GET_WIDGET_PROPERTY(widget, specific, const TextWidget *);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
+    widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
+    
+    const Style *style = getStyle(widgetCursor.currentState->flags.focused ? textWidget->focusStyle : widget->style);
+    const Style *activeStyle = getStyle(widgetCursor.currentState->flags.focused ? textWidget->focusStyle : widget->activeStyle);
+
+    const char *text = GET_WIDGET_PROPERTY(textWidget, text, const char *);
+
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);
-    widgetCursor.currentState->data = widget->data ? data::get(widgetCursor.cursor, widget->data) : 0;
+    widgetCursor.currentState->data = !(text && text[0]) && widget->data ? data::get(widgetCursor.cursor, widget->data) : 0;
 
     bool refresh =
         !widgetCursor.previousState ||
+        widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
         widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
         widgetCursor.previousState->data != widgetCursor.currentState->data;
 
     if (refresh) {
-        const Style *activeStyle = getStyle(widget->activeStyle);
-        const TextWidget *display_string_widget = GET_WIDGET_PROPERTY(widget, specific, const TextWidget *);
-
-        if (widget->data) {
+        bool ignoreLuminosity = (textWidget->flags & IGNORE_LUMINOSITY_FLAG) != 0;
+        if (text && text[0]) {
+            drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                style, activeStyle, widgetCursor.currentState->flags.active,
+                widgetCursor.currentState->flags.blinking,
+                ignoreLuminosity, nullptr);
+        } else if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
                 drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,
-                         widgetCursor.y, (int)widget->w, (int)widget->h, style, activeStyle,
-                         widgetCursor.currentState->flags.active,
-                         widgetCursor.currentState->flags.blinking,
-                         display_string_widget->flags.ignoreLuminosity, nullptr);
+                    widgetCursor.y, (int)widget->w, (int)widget->h, style, activeStyle,
+                    widgetCursor.currentState->flags.active,
+                    widgetCursor.currentState->flags.blinking,
+                    ignoreLuminosity, nullptr);
             } else {
                 char text[64];
                 widgetCursor.currentState->data.toText(text, sizeof(text));
                 drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                         style, activeStyle, widgetCursor.currentState->flags.active,
-                         widgetCursor.currentState->flags.blinking,
-                         display_string_widget->flags.ignoreLuminosity, nullptr);
+                    style, activeStyle, widgetCursor.currentState->flags.active,
+                    widgetCursor.currentState->flags.blinking,
+                    ignoreLuminosity, nullptr);
             }
-        } else {
-            drawText(GET_WIDGET_PROPERTY(display_string_widget, text, const char *), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                     style, activeStyle, widgetCursor.currentState->flags.active,
-                     widgetCursor.currentState->flags.blinking,
-                     display_string_widget->flags.ignoreLuminosity, nullptr);
         }
     }
 }

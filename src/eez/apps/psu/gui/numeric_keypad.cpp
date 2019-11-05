@@ -456,9 +456,22 @@ void NumericKeypad::sign() {
                 m_keypadText[0] = '-';
             }
         } else {
-            // not supported
-            sound::playBeep();
+            if (m_keypadText[0] == '-') {
+                strcpy(m_keypadText, m_keypadText + 1);
+            } else if (m_keypadText[0] == '+') {
+                m_keypadText[0] = '-';
+            } else {
+                memmove(m_keypadText + 1, m_keypadText, strlen(m_keypadText));
+                m_keypadText[0] = '-';
+            }
+
+            if (m_state == START || m_state == EMPTY) {
+                m_state = BEFORE_DOT;
+            }
         }
+    } else {
+        // not supported
+        sound::playBeep();
     }
 }
 

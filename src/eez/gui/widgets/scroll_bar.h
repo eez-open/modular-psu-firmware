@@ -40,10 +40,20 @@ struct ScrollBarWidget {
 #endif
 };
 
+enum ScrollBarWidgetSegment {
+    SCROLL_BAR_WIDGET_SEGMENT_NONE,
+    SCROLL_BAR_WIDGET_SEGMENT_TRACK_LEFT,
+    SCROLL_BAR_WIDGET_SEGMENT_TRACK_RIGHT,
+    SCROLL_BAR_WIDGET_SEGMENT_THUMB,
+    SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON,
+    SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON
+};
+
 struct ScrollBarWidgetState {
     int size;
     int position;
     int pageSize;
+    ScrollBarWidgetSegment segment;
 };
 
 void ScrollBarWidget_fixPointers(Widget *widget);

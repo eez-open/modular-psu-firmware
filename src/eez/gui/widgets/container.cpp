@@ -177,7 +177,7 @@ void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callba
 
             const Style *style = getStyle(widgetCursor.widget->style);
 
-            mcu::display::drawBuffer(widgetCursor.x, widgetCursor.y, overlay ? overlay->width: widgetCursor.widget->w, overlay ? overlay->height : widgetCursor.widget->h, containerWidget->flags.shadow, style->opacity, xOffset, yOffset);
+            mcu::display::drawBuffer(widgetCursor.x, widgetCursor.y, overlay ? overlay->width: widgetCursor.widget->w, overlay ? overlay->height : widgetCursor.widget->h, (containerWidget->flags & SHADOW_FLAG) != 0, style->opacity, xOffset, yOffset);
             currentState->displayBufferIndex = mcu::display::selectBuffer(currentState->displayBufferIndex);
         }
     }

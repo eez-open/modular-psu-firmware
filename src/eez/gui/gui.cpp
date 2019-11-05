@@ -61,7 +61,7 @@ void mainLoop(const void *);
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #endif
 
-osThreadDef(g_guiTask, mainLoop, osPriorityNormal, 0, 2048);
+osThreadDef(g_guiTask, mainLoop, osPriorityNormal, 0, 4096);
 
 #if defined(EEZ_PLATFORM_STM32)
 #pragma GCC diagnostic pop

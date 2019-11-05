@@ -23,9 +23,7 @@
 namespace eez {
 namespace gui {
 
-struct TextFlags {
-    unsigned ignoreLuminosity : 1;
-};
+#define IGNORE_LUMINOSITY_FLAG 1
 
 struct TextWidget {
 #if OPTION_SDRAM    
@@ -33,7 +31,8 @@ struct TextWidget {
 #else
     uint32_t textOffset;
 #endif
-    TextFlags flags;
+    uint16_t focusStyle;
+    uint8_t flags;
 };
 
 void TextWidget_fixPointers(Widget *widget);

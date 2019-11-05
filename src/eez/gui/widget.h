@@ -55,7 +55,7 @@ namespace gui {
 #define WIDGET_TYPE_UP_DOWN 17
 #define WIDGET_TYPE_LIST_GRAPH 18
 #define WIDGET_TYPE_APP_VIEW 19
-#define WIDGET_TYPE_SCROLL_BAR 19
+#define WIDGET_TYPE_SCROLL_BAR 20
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -132,15 +132,13 @@ struct WidgetList {
 
 void WidgetList_fixPointers(WidgetList &widgetList);
 
-struct PageWidgetFlags {
-    unsigned shadow : 1;
-    unsigned closePageIfTouchedOutside: 1;
-};  
+#define SHADOW_FLAG 1
+#define CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG 2
 
 struct PageWidget {
     WidgetList widgets;
     uint16_t overlay;
-    PageWidgetFlags flags;
+    uint8_t flags;
 };
 
 struct Document {

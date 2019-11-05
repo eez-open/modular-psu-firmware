@@ -203,6 +203,11 @@ float increment(gui::data::Value value, int counter, float min, float max, int c
         precision = psu::Channel::get(channelIndex).getValuePrecision(value.getUnit(), value.getFloat());
     }
 
+    // TODO 
+    if (precision == 0) {
+        precision = 0.001f;
+    }
+
     float step;
 
     if (g_encoderMode == ENCODER_MODE_AUTO) {

@@ -25,6 +25,10 @@
 
 #include <eez/apps/psu/calibration.h>
 #include <eez/apps/psu/channel_dispatcher.h>
+#if OPTION_SD_CARD
+#include <eez/apps/psu/dlog.h>
+#endif
+#include <eez/apps/psu/dlog.h>
 #include <eez/sound.h>
 
 #include <eez/apps/psu/gui/data.h>
@@ -166,7 +170,7 @@ bool setValue(float floatValue) {
     return true;
 }
 
-#define NUM_PARTS 12
+#define NUM_PARTS 15
 
 int getInfoTextPartIndex(data::Cursor &cursor, uint16_t dataId) {
     int dataIdIndex;
@@ -193,15 +197,25 @@ int getInfoTextPartIndex(data::Cursor &cursor, uint16_t dataId) {
         dataIdIndex = 9;
     } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY) {
         dataIdIndex = 10;
-    } else {
+    } 
+#if OPTION_SD_CARD
+    else if (dataId == DATA_ID_DLOG_VALUE_DIV) {
         dataIdIndex = 11;
+    } else if (dataId == DATA_ID_DLOG_VALUE_OFFSET) {
+        dataIdIndex = 12;
+    } else if (dataId == DATA_ID_DLOG_TIME_OFFSET) {
+        dataIdIndex = 13;
+    } 
+#endif
+    else {
+        dataIdIndex = 14;
     }
 
     return g_focusCursor.i * NUM_PARTS + dataIdIndex;
 }
 
 void getInfoText(int partIndex, char *infoText) {
-    int iChannel = partIndex / NUM_PARTS;
+    int cursorIndex = partIndex / NUM_PARTS;
 
     int dataIdIndex = partIndex % NUM_PARTS;
 
@@ -252,25 +266,50 @@ void getInfoText(int partIndex, char *infoText) {
         dataId = DATA_ID_CHANNEL_PROTECTION_OTP_DELAY;
         dataName = "OTP Delay";
         unitName = "s";
-    } else {
+    } 
+#if OPTION_SD_CARD
+    else if (dataIdIndex == 11) {
+        dataId = DATA_ID_DLOG_VALUE_DIV;
+        dataName = "Div";
+        unitName = g_unitNames[dlog::g_dlogValues[cursorIndex].perDiv.getUnit()];
+    } else if (dataIdIndex == 12) {
+        dataId = DATA_ID_DLOG_VALUE_OFFSET;
+        dataName = "Offset";
+        unitName = g_unitNames[dlog::g_dlogValues[cursorIndex].offset.getUnit()];
+    } else if (dataIdIndex == 13) {
+        dataId = DATA_ID_DLOG_TIME_OFFSET;
+        dataName = "Time Offset";
+        unitName = g_unitNames[dlog::g_timeOffset.getUnit()];
+    } 
+#endif
+    else {
         dataId = DATA_ID_NONE;
         dataName = "Unknown";
         unitName = "";
     }
 
-    data::Cursor cursor(iChannel);
+    data::Cursor cursor(cursorIndex);
     float minValue = data::getMin(cursor, dataId).getFloat();
     float maxValue = (dataId == DATA_ID_CHANNEL_U_EDIT || dataId == DATA_ID_CHANNEL_I_EDIT) ?
         data::getLimit(cursor, dataId).getFloat() : data::getMax(cursor, dataId).getFloat();
 
-    Channel& channel = Channel::get(iChannel);
-    if ((channel.channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel.flags.trackingEnabled) {
-        strcpy(infoText, "Set ");
-    } else {
-        sprintf(infoText, "Set Ch%d ", iChannel + 1);
+#if OPTION_SD_CARD
+    if (dataId != DATA_ID_DLOG_VALUE_DIV && dataId != DATA_ID_DLOG_VALUE_OFFSET && dataId != DATA_ID_DLOG_TIME_OFFSET) {
+#endif
+        Channel& channel = Channel::get(cursorIndex);
+        if ((channel.channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel.flags.trackingEnabled) {
+            strcpy(infoText, "Set ");
+        } else {
+            sprintf(infoText, "Set Ch%d ", cursorIndex + 1);
+        }
+        
+        strcat(infoText, dataName);
+    } 
+#if OPTION_SD_CARD
+    else {
+        strcat(infoText, dataName);
     }
-
-    strcat(infoText, dataName);
+#endif
 
     strcat(infoText, " [");
     strcatFloat(infoText, minValue);

@@ -43,7 +43,6 @@
 #include <eez/apps/psu/gui/page_self_test_result.h>
 #include <eez/apps/psu/gui/page_sys_settings.h>
 #include <eez/apps/psu/gui/page_user_profiles.h>
-#include <eez/apps/psu/gui/page_recordings_view.h>
 using namespace eez::psu::gui;
 #endif
 
@@ -230,7 +229,6 @@ static SysSettingsSerialPage g_SysSettingsSerialPage;
 static SysSettingsTrackingPage g_sysSettingsTrackingPage;
 static SysSettingsCouplingPage g_sysSettingsCouplingPage;
 static UserProfilesPage g_UserProfilesPage;
-static RecordingsViewPage g_RecordingsViewPage;
 
 Page *getPageFromId(int pageId) {
     Page *page = nullptr;
@@ -313,9 +311,6 @@ Page *getPageFromId(int pageId) {
     case PAGE_ID_USER_PROFILE_0_SETTINGS:
     case PAGE_ID_USER_PROFILE_SETTINGS:
         page = &g_UserProfilesPage;
-        break;
-    case PAGE_ID_RECORDINGS_VIEW:
-        page = &g_RecordingsViewPage;
         break;
     }
 

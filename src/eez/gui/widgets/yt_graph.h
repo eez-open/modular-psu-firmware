@@ -30,12 +30,17 @@ enum {
 
 namespace gui {
 
+static const int MAX_DLOG_VALUES = 6;
+
 struct YTGraphWidgetState {
     WidgetState genericState;
     uint8_t iChannel;
+    uint32_t numHistoryValues;
     uint32_t historyValuePosition;
     uint8_t ytGraphUpdateMethod;
     uint32_t cursorPosition;
+    float valuePerDiv[MAX_DLOG_VALUES];
+    float valueOffset[MAX_DLOG_VALUES];
 };
 
 void YTGraphWidget_draw(const WidgetCursor &widgetCursor);

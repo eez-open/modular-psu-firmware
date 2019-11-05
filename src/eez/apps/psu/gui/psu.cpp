@@ -201,6 +201,8 @@ void PsuAppContext::onPageChanged() {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_SYS_SETTINGS_TRACKING) {
             animateSlideDown();
+        } else if (activePageId == PAGE_ID_RECORDINGS_VIEW) {
+            animateSlideDown();
         }
     } else if (m_previousPageId == PAGE_ID_USER_PROFILES) {
         if (activePageId == PAGE_ID_USER_PROFILE_0_SETTINGS) {
@@ -284,25 +286,31 @@ void PsuAppContext::onPageChanged() {
         } else if (activePageId == PAGE_ID_CH_SETTINGS) {
             animateSlideRight();
         }
+    } else if (m_previousPageId == PAGE_ID_RECORDINGS_VIEW) {
+        if (activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        }
     }
 }
 
 bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
+    if (calibration::isEnabled()) {
+        return false;
+    }
+
     if (isPageActiveOrOnStack(PAGE_ID_CH_SETTINGS_LISTS)) {
         return ((ChSettingsListsPage *)getActivePage())->isFocusWidget(widgetCursor);
     }
 
-    // TODO this is not valid, how can we know cursor.i is channels index and not index of some other collection?
-    int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
-    if (iChannel >= 0 && iChannel < CH_NUM) {
-		if (channel_dispatcher::getVoltageTriggerMode(Channel::get(iChannel)) != TRIGGER_MODE_FIXED &&
-			!trigger::isIdle()) {
-			return false;
-		}
-    }
-
-    if (calibration::isEnabled()) {
-        return false;
+    if (getActivePageId() != PAGE_ID_RECORDINGS_VIEW) {
+        // TODO this is not valid, how can we know cursor.i is channels index and not index of some other collection?
+        int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        if (iChannel >= 0 && iChannel < CH_NUM) {
+            if (channel_dispatcher::getVoltageTriggerMode(Channel::get(iChannel)) != TRIGGER_MODE_FIXED &&
+                !trigger::isIdle()) {
+                return false;
+            }
+        }
     }
 
     return (widgetCursor.cursor == -1 || widgetCursor.cursor == g_focusCursor) && widgetCursor.widget->data == g_focusDataId;

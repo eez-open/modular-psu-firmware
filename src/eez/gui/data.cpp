@@ -122,11 +122,13 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
         }
     }
 
-    strcatFloat(text, floatValue);
-
-    removeTrailingZerosFromFloat(text);
-
-    strcat(text, getUnitName(unit));
+    if (!isNaN(floatValue)) {
+        strcatFloat(text, floatValue);
+        removeTrailingZerosFromFloat(text);
+        strcat(text, getUnitName(unit));
+    } else {
+        text[0] = 0;
+    }
 }
 
 bool compare_STR_value(const Value &a, const Value &b) {
@@ -580,6 +582,12 @@ const Style *ytDataGetStyle(const Cursor &cursor, uint16_t id, uint8_t valueInde
     return getStyle(value.getUInt16());
 }
 
+int ytDataGetNumValues(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_NUM_VALUES, (Cursor &)cursor, value);
+    return value.getInt();
+}
+
 Value ytDataGetMin(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
     g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_MIN, (Cursor &)cursor, value);
@@ -592,9 +600,33 @@ Value ytDataGetMax(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
     return value;
 }
 
-Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint8_t valueIndex, uint32_t position) {
+int ytDataGetVertDivisions(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS, (Cursor &)cursor, value);
+    return value.getInt();
+}
+
+int ytDataGetHorzDivisions(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_HORZ_DIVISIONS, (Cursor &)cursor, value);
+    return value.getInt();
+}
+
+float ytDataGetPerDiv(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+    Value value(valueIndex, VALUE_TYPE_UINT8);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_PER_DIV, (Cursor &)cursor, value);
+    return value.getFloat();
+}
+
+float ytDataGetOffset(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+    Value value(valueIndex, VALUE_TYPE_UINT8);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_OFFSET, (Cursor &)cursor, value);
+    return value.getFloat();
+}
+
+Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint32_t position) {
     Value value(position, VALUE_TYPE_UINT32);
-    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_VALUE1 + valueIndex), (Cursor &)cursor, value);
+    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_VALUE), (Cursor &)cursor, value);
     return value;
 }
 
@@ -608,6 +640,29 @@ float ytDataGetPeriod(const Cursor &cursor, uint16_t id) {
     Value value;
     g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_PERIOD, (Cursor &)cursor, value);
     return value.getFloat();
+}
+
+bool ytDataIsCursorVisible(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE, (Cursor &)cursor, value);
+    return value.getInt() == 1;
+}
+
+uint32_t ytDataGetCursorOffset(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET, (Cursor &)cursor, value);
+    return value.getUInt32();
+}
+
+void ytDataSetCursorOffset(const Cursor &cursor, uint16_t id, uint32_t newCursorOffset) {
+    Value value(newCursorOffset, VALUE_TYPE_UINT32);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_SET_CURSOR_OFFSET, (Cursor &)cursor, value);
+}
+
+Value ytDataGetCursorTime(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_CURSOR_TIME, (Cursor &)cursor, value);
+    return value;
 }
 
 } // namespace data

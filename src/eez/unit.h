@@ -36,14 +36,7 @@ enum Unit {
     UNIT_OHM,
     UNIT_KOHM,
     UNIT_MOHM,
-    UNIT_PERCENT,
-    UNIT_VOLT_PER_DIV,
-    UNIT_MILLI_VOLT_PER_DIV,
-    UNIT_AMPER_PER_DIV,
-    UNIT_MILLI_AMPER_PER_DIV,
-    UNIT_MICRO_AMPER_PER_DIV,
-    UNIT_WATT_PER_DIV,
-    UNIT_MILLI_WATT_PER_DIV,
+    UNIT_PERCENT
 };
 
 extern const char *g_unitNames[];

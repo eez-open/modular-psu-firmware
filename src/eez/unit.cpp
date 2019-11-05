@@ -36,14 +36,7 @@ const char *g_unitNames[] = {
     "ohm",
     "Kohm",
     "Mohm",
-    "%",
-    "V/",
-    "mV/",
-    "A/",
-    "mA/",
-    "uA/",
-    "W/",
-    "mW/"
+    "%"
 };
 
 } // namespace eez

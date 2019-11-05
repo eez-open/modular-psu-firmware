@@ -24,7 +24,7 @@ namespace eez {
 namespace psu {
 namespace dlog {
 
-enum DlogValues {
+enum DlogValueType {
     DLOG_VALUE_CH1_U,
     DLOG_VALUE_CH1_I,
     DLOG_VALUE_CH1_P,
@@ -69,7 +69,26 @@ extern Options g_lastOptions;
 extern uint8_t *g_lastBufferStart;
 extern uint8_t *g_lastBufferEnd;
 
+struct DlogValueParams {
+    DlogValueType type;
+    eez::gui::data::Value perDiv;
+    eez::gui::data::Value offset;
+};
+
+static const int MAX_DLOG_VALUES = 6;
+
+static const int NUM_HORZ_DIVISIONS = 12;
+static const int NUM_VERT_DIVISIONS = 6;
+
+extern int g_numDlogValues;
+extern DlogValueParams g_dlogValues[MAX_DLOG_VALUES];
+
+extern eez::gui::Value g_timeOffset;
+
 extern double g_currentTime;
+
+extern uint32_t g_pageSize;
+extern uint32_t g_cursorOffset;
 
 bool isIdle();
 bool isInitiated();
@@ -83,6 +102,8 @@ void tick(uint32_t tick_usec);
 void reset();
 
 void executeDiskOperation(int diskOperation);
+
+uint32_t getSize();
 
 } // namespace dlog
 } // namespace psu

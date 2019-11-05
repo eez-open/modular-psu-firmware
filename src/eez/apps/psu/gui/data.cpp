@@ -4110,10 +4110,8 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
         value = getMin(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_MAX) {
         value = getMax(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_VALUE1) {
-        value = g_appContext->getHistoryValue(cursor, DATA_ID_CHANNEL_DISPLAY_VALUE1, value.getUInt32());
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_VALUE2) {
-        value = g_appContext->getHistoryValue(cursor, DATA_ID_CHANNEL_DISPLAY_VALUE2, value.getUInt32());
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_VALUE) {
+        value = g_appContext->getHistoryValue(cursor, cursor.i == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2, value.getUInt32());
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
         value = Value(psu::persist_conf::devConf2.ytGraphUpdateMethod, VALUE_TYPE_UINT8);
     }
@@ -4126,50 +4124,68 @@ void data_recording_ready(data::DataOperationEnum operation, data::Cursor &curso
 }
 
 void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    static uint32_t g_position = 0;
-    static uint32_t g_pageSize = 480;
+    uint32_t size = dlog::getSize();
 
-    if (operation == DATA_OPERATION_YT_DATA_GET_VALUE1) {
-        value = Value(((float *)dlog::g_lastBufferStart)[2 * value.getUInt32() + 0], UNIT_VOLT);
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_VALUE2) {
-        value = Value(((float *)dlog::g_lastBufferStart)[2 * value.getUInt32() + 1], UNIT_AMPER);
-    } else {
-        uint32_t size = (dlog::g_lastBufferEnd - dlog::g_lastBufferStart) / 8;
-        if (g_position + g_pageSize > size) {
-            if (size > g_pageSize) {
-                g_position = size - g_pageSize;
+    if (operation == DATA_OPERATION_YT_DATA_GET_VALUE) {
+        uint8_t valueIndex = cursor.i;
+        Unit unit = dlog::g_dlogValues[valueIndex].offset.getUnit();
+        if (value.getUInt32() >= size) {
+            value = Value(NAN, unit);
+        } else {
+            value = Value(((float *)dlog::g_lastBufferStart)[dlog::g_numDlogValues * value.getUInt32() + valueIndex], unit);
+        }
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
+        value = Value((uint32_t)((dlog::g_lastBufferEnd - dlog::g_lastBufferStart) / (dlog::g_numDlogValues * sizeof(float))), VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
+        float position;
+        if (dlog::isExecuting()) {
+            value = Value(size - dlog::g_pageSize, VALUE_TYPE_UINT32);
+        } else {
+            position = dlog::g_timeOffset.getFloat() / dlog::g_lastOptions.period;
+            if (position < 0) {
+                value = Value(0, VALUE_TYPE_UINT32);
+            } else if (position > size - dlog::g_pageSize) {
+                value = Value(size - dlog::g_pageSize, VALUE_TYPE_UINT32);
             } else {
-                g_position = 0;
+                value = Value((uint32_t)roundf(position), VALUE_TYPE_UINT32);
             }
         }
-
-        if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
-            value = Value((uint32_t)((dlog::g_lastBufferEnd - dlog::g_lastBufferStart) / 8), VALUE_TYPE_UINT32);
-        } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
-            value = Value(g_position, VALUE_TYPE_UINT32);
-        } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
-            int32_t newPosition = value.getUInt32();
-            if (newPosition < 0) {
-                newPosition = 0;
-            } else {
-                if (newPosition + g_pageSize > size) {
-                    newPosition = size - g_pageSize;
-                }
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
+        int32_t newPosition = value.getUInt32();
+        if (newPosition < 0) {
+            newPosition = 0;
+        } else {
+            if (newPosition + dlog::g_pageSize > size) {
+                newPosition = size - dlog::g_pageSize;
             }
-            g_position = newPosition;
-        } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
-            value = Value(g_pageSize, VALUE_TYPE_UINT32);
-        } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
-            value = Value(value.getUInt8() == 0 ? STYLE_ID_YT_GRAPH_U_DEFAULT : STYLE_ID_YT_GRAPH_I_DEFAULT, VALUE_TYPE_UINT16);
-        } else if (operation == DATA_OPERATION_YT_DATA_GET_MIN) {
-            value = value.getUInt8() == 0 ? Value(0.0f, UNIT_VOLT) : Value(0.0f, UNIT_AMPER);
-        } else if (operation == DATA_OPERATION_YT_DATA_GET_MAX) {
-            value = value.getUInt8() == 0 ? Value(40.0f, UNIT_VOLT) : Value(5.0f, UNIT_AMPER);
-        } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
-            value = YT_GRAPH_UPDATE_METHOD_STATIC;
-        } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
-            value = Value(dlog::g_lastOptions.period, UNIT_SECOND);
         }
+        dlog::g_timeOffset = Value(newPosition * dlog::g_lastOptions.period, dlog::g_timeOffset.getUnit());
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+        value = Value(dlog::g_pageSize, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
+        value = Value(value.getUInt8() % 3 == 0 ? STYLE_ID_YT_GRAPH_U_DEFAULT : value.getUInt8() % 3 == 1 ? STYLE_ID_YT_GRAPH_I_DEFAULT : STYLE_ID_YT_GRAPH_P_DEFAULT, VALUE_TYPE_UINT16);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_HORZ_DIVISIONS) {
+        value = dlog::NUM_HORZ_DIVISIONS;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS) {
+        value = dlog::NUM_VERT_DIVISIONS;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_NUM_VALUES) {
+        value = dlog::g_numDlogValues;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PER_DIV) {
+        value = dlog::g_dlogValues[value.getUInt8()].perDiv;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_OFFSET) {
+        value = dlog::g_dlogValues[value.getUInt8()].offset;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
+        value = YT_GRAPH_UPDATE_METHOD_STATIC;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
+        value = Value(dlog::g_lastOptions.period, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE) {
+        value = dlog::isIdle() ? 1 : 0;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET) {
+        value = Value(dlog::g_cursorOffset, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_CURSOR_OFFSET) {
+        dlog::g_cursorOffset = value.getUInt32();
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_TIME) {
+        value = Value((ytDataGetPosition(cursor, DATA_ID_RECORDING) + dlog::g_cursorOffset) * dlog::g_lastOptions.period, UNIT_SECOND);
     }
 }
 
@@ -4179,7 +4195,7 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
     if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
-        overlay.state = 1;
+        overlay.state = dlog::isIdle() ? 1 : 0;
         WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
         overlay.width = widgetCursor.widget->w;
         overlay.height = widgetCursor.widget->h;
@@ -4189,33 +4205,82 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
 
 void data_dlog_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
-        value = 2;
+        value = dlog::g_numDlogValues;
     }
 }
 
 void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = Value(cursor.i == 0 ? dlog::DLOG_VALUE_CH1_U : dlog::DLOG_VALUE_CH1_I, VALUE_TYPE_DLOG_VALUE_LABEL);
+        value = Value(dlog::g_dlogValues[cursor.i].type, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
 
 void data_dlog_value_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (cursor.i == 0) {
-            value = Value(10.0f, UNIT_VOLT_PER_DIV);
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VALUE_DIV;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
         } else {
-            value = Value(1.15f, UNIT_AMPER_PER_DIV);
+            value = dlog::g_dlogValues[cursor.i].perDiv;
         }
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = Value(0.01f, dlog::g_dlogValues[cursor.i].perDiv.getUnit());
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = Value(100.0f, dlog::g_dlogValues[cursor.i].perDiv.getUnit());
+    } else if (operation == data::DATA_OPERATION_SET) {
+        dlog::g_dlogValues[cursor.i].perDiv = value;
     }
 }
 
 void data_dlog_value_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (cursor.i == 0) {
-            value = Value(20.0f, UNIT_VOLT);
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VALUE_OFFSET;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
         } else {
-            value = Value(2.5f, UNIT_AMPER);
+            value = dlog::g_dlogValues[cursor.i].offset;
         }
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = Value(-100.0f, dlog::g_dlogValues[cursor.i].offset.getUnit());
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = Value(100.0f, dlog::g_dlogValues[cursor.i].offset.getUnit());
+    } else if (operation == data::DATA_OPERATION_SET) {
+        dlog::g_dlogValues[cursor.i].offset = value;
+    }
+}
+
+void data_dlog_time_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_TIME_OFFSET;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else {
+            value = dlog::g_timeOffset;
+        }
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = Value(0.0f, dlog::g_dlogValues[cursor.i].offset.getUnit());
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = Value((dlog::getSize() - dlog::g_pageSize) * dlog::g_lastOptions.period, dlog::g_dlogValues[cursor.i].offset.getUnit());
+    } else if (operation == data::DATA_OPERATION_SET) {
+        dlog::g_timeOffset = value;
+    }
+}
+
+void data_dlog_time_duration(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(dlog::getSize() * dlog::g_lastOptions.period, UNIT_SECOND);
+    }
+}
+
+void data_dlog_time_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(dlog::g_pageSize * dlog::g_lastOptions.period / dlog::NUM_HORZ_DIVISIONS, UNIT_SECOND);
+    }
+}
+
+void data_dlog_value_cursor(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = data::ytDataGetValue(cursor, DATA_ID_RECORDING, ytDataGetPosition(cursor, DATA_ID_RECORDING) + dlog::g_cursorOffset);
     }
 }
 

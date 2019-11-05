@@ -139,7 +139,7 @@ void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
     } else if (!isPageInternal(activePageId)) {
         const Widget *page = getPageWidget(activePageId);
 		const PageWidget *pageSpecific = GET_WIDGET_PROPERTY(page, specific, const PageWidget *);
-        if (pageSpecific->flags.closePageIfTouchedOutside) {
+        if ((pageSpecific->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
             if (!pointInsideRect(touchEvent.x, touchEvent.y, page->x, page->y, page->w, page->h)) {
                 popPage();
             }

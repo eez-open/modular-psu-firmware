@@ -38,7 +38,6 @@ add_definitions(-DOPTION_AUX_TEMP_SENSOR=1)
 add_definitions(-DOPTION_EXT_RTC=1)
 add_definitions(-DOPTION_ENCODER=1)
 add_definitions(-DOPTION_EXT_EEPROM=1)
-add_definitions(-DOPTION_SDCARD=1)
 add_definitions(-DOPTION_SDRAM=1)
 add_definitions(-DEEZ_MCU_REVISION_R1B5=1)
 
@@ -205,7 +204,6 @@ set(src_eez_apps_psu_gui
     src/eez/apps/psu/gui/page_self_test_result.cpp
     src/eez/apps/psu/gui/page_sys_settings.cpp
     src/eez/apps/psu/gui/page_user_profiles.cpp
-    src/eez/apps/psu/gui/page_recordings_view.cpp
     src/eez/apps/psu/gui/password.cpp
     src/eez/apps/psu/gui/psu.cpp
 )
@@ -227,7 +225,6 @@ set(header_eez_apps_psu_gui
     src/eez/apps/psu/gui/page_self_test_result.h
     src/eez/apps/psu/gui/page_sys_settings.h
     src/eez/apps/psu/gui/page_user_profiles.h
-    src/eez/apps/psu/gui/page_recordings_view.h
     src/eez/apps/psu/gui/password.h
     src/eez/apps/psu/gui/psu.h
 )
