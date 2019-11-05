@@ -68,20 +68,20 @@ void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
                  buttonsStyle, nullptr,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
-                 false, false, nullptr);
+                 false, false, nullptr, nullptr);
 
         char text[64];
         widgetCursor.currentState->data.toText(text, sizeof(text));
         const Style *style = getStyle(widget->style);
         drawText(text, -1, widgetCursor.x + buttonWidth, widgetCursor.y,
                  (int)(widget->w - 2 * buttonWidth), (int)widget->h, style, nullptr, false, false,
-                 false, nullptr);
+                 false, nullptr, nullptr);
 
         drawText(GET_WIDGET_PROPERTY(upDownWidget, upButtonText, const char *), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
                  buttonWidth, (int)widget->h, buttonsStyle, nullptr,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
-                 false, false, nullptr);
+                 false, false, nullptr, nullptr);
     }
 }
 

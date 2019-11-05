@@ -75,8 +75,7 @@ struct YTGraphDrawHelper {
             return INT_MIN;
         }
 
-        Cursor cursor(valueIndex);
-        float value = data::ytDataGetValue(cursor, widget->data, position).getFloat();
+        float value = data::ytDataGetValue(widgetCursor.cursor, widget->data, position, valueIndex).getFloat();
 
         if (isNaN(value)) {
             return INT_MIN;
@@ -212,10 +211,10 @@ struct YTGraphStaticDrawHelper {
     uint32_t numPositions;
     uint32_t position;
 
-    Cursor valueCursor;
-
     float offset;
     float scale;
+
+    int valueIndex;
 
     int x;
 
@@ -232,7 +231,7 @@ struct YTGraphStaticDrawHelper {
             return INT_MIN;
         }
 
-        float value = data::ytDataGetValue(valueCursor, widget->data, position).getFloat();
+        float value = data::ytDataGetValue(widgetCursor.cursor, widget->data, position, valueIndex).getFloat();
 
         if (isNaN(value)) {
             return INT_MIN;
@@ -313,8 +312,7 @@ struct YTGraphStaticDrawHelper {
         YTGraphWidgetState *currentState = (YTGraphWidgetState *)widgetCursor.currentState;
 
         int numValues = data::ytDataGetNumValues(widgetCursor.cursor, widget->data);
-        for (int valueIndex = 0; valueIndex < numValues; valueIndex++) {
-            valueCursor = valueIndex;
+        for (valueIndex = 0; valueIndex < numValues; valueIndex++) {
 
             position = currentHistoryValuePosition;
 
@@ -351,7 +349,7 @@ struct YTGraphStaticDrawHelper {
 
             char text[64];
             data::ytDataGetCursorTime(widgetCursor.cursor, widgetCursor.widget->data).toText(text, sizeof(text));
-            drawText(text, -1, xTimeText, yTimeText, timeTextWidth, timeTextHeight, style, nullptr, false, false, false, nullptr);
+            drawText(text, -1, xTimeText, yTimeText, timeTextWidth, timeTextHeight, style, nullptr, false, false, false, nullptr, nullptr);
         }
     }
 };

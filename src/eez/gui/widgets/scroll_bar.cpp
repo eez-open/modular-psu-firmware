@@ -104,7 +104,7 @@ void ScrollBarWidget_draw(const WidgetCursor &widgetCursor) {
             int buttonWidth = buttonsFont.getHeight();
 
             // draw left button
-            drawText(GET_WIDGET_PROPERTY(scrollBarWidget, leftButtonText, const char *), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h, buttonsStyle, nullptr, currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON, false, false, nullptr);
+            drawText(GET_WIDGET_PROPERTY(scrollBarWidget, leftButtonText, const char *), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h, buttonsStyle, nullptr, currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON, false, false, nullptr, nullptr);
 
             // draw track
             int xTrack = widgetCursor.x + buttonWidth;
@@ -124,7 +124,7 @@ void ScrollBarWidget_draw(const WidgetCursor &widgetCursor) {
             display::fillRect(xThumb, yTrack, xThumb + wThumb - 1, yTrack + hTrack - 1);
 
             // draw right button
-            drawText(GET_WIDGET_PROPERTY(scrollBarWidget, rightButtonText, const char *), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y, buttonWidth, (int)widget->h, buttonsStyle, nullptr, currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr);
+            drawText(GET_WIDGET_PROPERTY(scrollBarWidget, rightButtonText, const char *), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y, buttonWidth, (int)widget->h, buttonsStyle, nullptr, currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr, nullptr);
         } else {
             // scroll bar is hidden
             const Style *trackStyle = getStyle(widget->style);

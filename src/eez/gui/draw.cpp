@@ -64,7 +64,7 @@ bool styleIsBlink(const Style *style) {
 
 void drawText(const char *text, int textLength, int x, int y, int w, int h, const Style *style,
               const Style *activeStyle, bool active, bool blink, bool ignoreLuminocity,
-              uint16_t *overrideBackgroundColor) {
+              uint16_t *overrideColor, uint16_t *overrideBackgroundColor) {
     int x1 = x;
     int y1 = y;
     int x2 = x + w - 1;
@@ -137,7 +137,11 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
             display::setColor(backgroundColor, ignoreLuminocity);
         }
     } else {
-        display::setColor(style->color, ignoreLuminocity);
+        if (overrideColor) {
+            display::setColor(*overrideColor, ignoreLuminocity);
+        } else {
+            display::setColor(style->color, ignoreLuminocity);
+        }
     }
     display::drawStr(text, textLength, x_offset, y_offset, x1, y1, x2, y2, font);
 }

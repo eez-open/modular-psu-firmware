@@ -173,7 +173,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                 }
 
                 drawText(valueText, -1, x + pText, y, wText, h, &textStyle, nullptr, false, false,
-                         false, nullptr);
+                         false, nullptr, nullptr);
 
                 // draw background, but do not draw over line 1 and line 2
                 display::setColor(bg);
@@ -209,7 +209,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                 }
 
                 drawText(valueText, -1, x - (pText + wText - 1), y, wText, h, &textStyle, nullptr,
-                         false, false, false, nullptr);
+                         false, false, false, nullptr, nullptr);
 
                 // draw background, but do not draw over line 1 and line 2
                 display::setColor(bg);
@@ -275,7 +275,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                 }
 
                 drawText(valueText, -1, x, y + pText, w, hText, &textStyle, nullptr, false, false,
-                         false, nullptr);
+                         false, nullptr, nullptr);
 
                 // draw background, but do not draw over line 1 and line 2
                 display::setColor(bg);
@@ -311,7 +311,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                 }
 
                 drawText(valueText, -1, x, y - (pText + hText - 1), w, hText, &textStyle, nullptr,
-                         false, false, false, nullptr);
+                         false, false, false, nullptr, nullptr);
 
                 // draw background, but do not draw over line 1 and line 2
                 display::setColor(bg);

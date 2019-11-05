@@ -326,7 +326,10 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS,
     DATA_OPERATION_YT_DATA_GET_PER_DIV,
     DATA_OPERATION_YT_DATA_GET_OFFSET,
-    DATA_OPERATION_YT_DATA_GET_VALUE,
+    DATA_OPERATION_YT_DATA_GET_VALUE1,
+    DATA_OPERATION_YT_DATA_GET_VALUE2,
+    DATA_OPERATION_YT_DATA_GET_VALUE3,
+    DATA_OPERATION_YT_DATA_GET_VALUE4,
     DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD,
     DATA_OPERATION_YT_DATA_GET_PERIOD,
     DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE,
@@ -371,7 +374,7 @@ int ytDataGetVertDivisions(const Cursor &cursor, uint16_t id);
 int ytDataGetHorzDivisions(const Cursor &cursor, uint16_t id);
 float ytDataGetPerDiv(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 float ytDataGetOffset(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
-Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint32_t position);
+Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint32_t position, uint8_t valueIndex);
 uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, uint16_t id);
 float ytDataGetPeriod(const Cursor &cursor, uint16_t id);
 bool ytDataIsCursorVisible(const Cursor &cursor, uint16_t id);

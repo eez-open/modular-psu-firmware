@@ -99,7 +99,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
         drawText(start, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                  style, activeStyle, widgetCursor.currentState->flags.active,
                  widgetCursor.currentState->flags.blinking, false,
-                 &currentState->backgroundColor);
+                 nullptr, &currentState->backgroundColor);
     }
 }
 

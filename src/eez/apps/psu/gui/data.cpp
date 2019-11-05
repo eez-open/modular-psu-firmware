@@ -4110,8 +4110,8 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
         value = getMin(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_MAX) {
         value = getMax(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_VALUE) {
-        value = g_appContext->getHistoryValue(cursor, cursor.i == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2, value.getUInt32());
+    } else if (operation >= DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE2) {
+        value = g_appContext->getHistoryValue(cursor, operation - DATA_OPERATION_YT_DATA_GET_VALUE1 == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2, value.getUInt32());
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
         value = Value(psu::persist_conf::devConf2.ytGraphUpdateMethod, VALUE_TYPE_UINT8);
     }
@@ -4126,8 +4126,8 @@ void data_recording_ready(data::DataOperationEnum operation, data::Cursor &curso
 void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     uint32_t size = dlog::getSize();
 
-    if (operation == DATA_OPERATION_YT_DATA_GET_VALUE) {
-        uint8_t valueIndex = cursor.i;
+    if (operation == DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE4) {
+        uint8_t valueIndex = operation - DATA_OPERATION_YT_DATA_GET_VALUE1;
         Unit unit = dlog::g_dlogValues[valueIndex].offset.getUnit();
         if (value.getUInt32() >= size) {
             value = Value(NAN, unit);
@@ -4280,7 +4280,7 @@ void data_dlog_time_div(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_dlog_value_cursor(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = data::ytDataGetValue(cursor, DATA_ID_RECORDING, ytDataGetPosition(cursor, DATA_ID_RECORDING) + dlog::g_cursorOffset);
+        value = data::ytDataGetValue(cursor, DATA_ID_RECORDING, ytDataGetPosition(cursor, DATA_ID_RECORDING) + dlog::g_cursorOffset, cursor.i);
     }
 }
 

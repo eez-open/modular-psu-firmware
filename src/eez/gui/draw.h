@@ -29,7 +29,7 @@ bool styleIsBlink(const Style *style);
 
 void drawText(const char *text, int textLength, int x, int y, int w, int h, const Style *style,
               const Style *activeStyle, bool active, bool blink, bool ignoreLuminocity,
-              uint16_t *overrideBackgroundColor);
+              uint16_t *overrideColor, uint16_t *overrideBackgroundColor);
 
 void drawMultilineText(const char *text, int x, int y, int w, int h, const Style *style,
                        const Style *activeStyle, bool active, int firstLineIndent, int hangingIndent);

@@ -624,9 +624,9 @@ float ytDataGetOffset(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
     return value.getFloat();
 }
 
-Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint32_t position) {
+Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint32_t position, uint8_t valueIndex) {
     Value value(position, VALUE_TYPE_UINT32);
-    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_VALUE), (Cursor &)cursor, value);
+    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_VALUE1 + valueIndex), (Cursor &)cursor, value);
     return value;
 }
 
