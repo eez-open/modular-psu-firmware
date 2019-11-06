@@ -68,6 +68,9 @@ bool setPosition(const WidgetCursor &widgetCursor, int position) {
 void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTrack, int minThumbWidth, int &xThumb, int &widthThumb) {
     xThumb = xTrack + (int)floorf(1.0f * position * wTrack / size);
     widthThumb = MAX((int)floorf(1.0f * pageSize * wTrack / size), minThumbWidth);
+    if (xThumb + widthThumb >= xTrack + wTrack) {
+        xThumb = xTrack + wTrack - widthThumb;
+    }
 }
 
 int getPositionFromThumbPosition(int thumbPosition, int size, int xTrack, int wTrack) {
