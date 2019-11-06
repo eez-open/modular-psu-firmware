@@ -243,17 +243,19 @@ void Channel::protectionEnter(ProtectionValue &cpv) {
     int bit_mask = reg_get_ques_isum_bit_mask_for_channel_protection_value(cpv);
     setQuesBits(bit_mask, true);
 
-    int16_t eventId = event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + channelIndex;
+    int16_t eventId;
 
     if (IS_OVP_VALUE(this, cpv)) {
         if (flags.rprogEnabled && channel_dispatcher::getUProtectionLevel(*this) == channel_dispatcher::getUMax(*this)) {
             g_rprogAlarm = true;
         }
         doRemoteProgrammingEnable(false);
+
+        eventId = event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + channelIndex;
     } else if (IS_OCP_VALUE(this, cpv)) {
-        eventId += 1;
+        eventId = event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + channelIndex;
     } else {
-        eventId += 2;
+        eventId = event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + channelIndex;
     }
 
     event_queue::pushEvent(eventId);

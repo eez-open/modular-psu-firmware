@@ -665,11 +665,6 @@ void action_sys_settings_fan_edit_speed() {
     ((SysSettingsTemperaturePage *)getActivePage())->editFanSpeed();
 }
 
-
-void action_on_last_error_event_action() {
-    onLastErrorEventAction();
-}
-
 void action_edit_system_password() {
     editSystemPassword();
 }

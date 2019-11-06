@@ -38,8 +38,6 @@ void channelEnableOutput();
 void selectChannel();
 extern Channel *g_channel;
 
-void onLastErrorEventAction();
-
 extern data::Cursor g_focusCursor;
 extern uint16_t g_focusDataId;
 extern data::Value g_focusEditValue;

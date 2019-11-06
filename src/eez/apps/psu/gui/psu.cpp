@@ -1016,46 +1016,13 @@ void selectChannel() {
     }
 }
 
-static bool isChannelTripLastEvent(int i, event_queue::Event *lastEvent) {
-    if (lastEvent->eventId == (event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + i) ||
-        lastEvent->eventId == (event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + i) ||
-        lastEvent->eventId == (event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + i) ||
-        lastEvent->eventId == (event_queue::EVENT_ERROR_CH1_OTP_TRIPPED + i)) 
-        {
-        return Channel::get(i).isTripped();
-    }
-
-    return false;
-}
-
-void onLastErrorEventAction() {
-    auto lastEvent = event_queue::getLastErrorEvent();
-
-    if (lastEvent) {
-        if (lastEvent->eventId == event_queue::EVENT_ERROR_AUX_OTP_TRIPPED && temperature::sensors[temp_sensor::AUX].isTripped()) {
-            showPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
-            return;
-        } 
-        
-        for (int i = 0; i < CH_NUM; i++) {
-            if (isChannelTripLastEvent(i, lastEvent)) {
-                g_channel = &Channel::get(i);
-                showPage(PAGE_ID_CH_SETTINGS_PROT_CLEAR);
-                return;
-            }
-        }
-    }
-
-    showPage(PAGE_ID_EVENT_QUEUE);
-}
-
 } // namespace gui
 } // namespace psu
 
 namespace mcu {
 namespace display {
 
-uint16_t transformColor(uint16_t color) {
+uint16_t transformColorHook(uint16_t color) {
     if (color == COLOR_ID_CHANNEL1) {
         return color + eez::psu::gui::g_channel->channelIndex;
     }
@@ -1063,6 +1030,17 @@ uint16_t transformColor(uint16_t color) {
 }
 
 }
+}
+
+namespace gui {
+
+uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
+    if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL) {
+        return widgetCursor.cursor.i == 0 ? COLOR_ID_BAR_GRAPH_VOLTAGE : COLOR_ID_BAR_GRAPH_CURRENT;
+    }
+    return style->color;
+}
+
 }
 
 } // namespace eez
