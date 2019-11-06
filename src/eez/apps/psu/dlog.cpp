@@ -59,8 +59,6 @@ eez::gui::data::Value g_timeOffset;
 uint32_t g_pageSize = 480;
 uint32_t g_cursorOffset = 240;
 
-
-enum State { STATE_IDLE, STATE_INITIATED, STATE_TRIGGERED, STATE_EXECUTING };
 static State g_state = STATE_IDLE;
 
 static File g_file;
@@ -71,6 +69,8 @@ static uint32_t g_iSample;
 double g_currentTime;
 static double g_nextTime;
 static uint32_t g_lastSyncTickCount;
+
+uint32_t g_fileLength;
 
 #ifdef EEZ_PLATFORM_STM32
 static uint8_t *g_buffer = (uint8_t *)DLOG_BUFFER;
@@ -123,6 +123,10 @@ int checkDlogParameters() {
     }
 
     return 0;
+}
+
+State getState() {
+    return g_state;
 }
 
 bool isIdle() {
@@ -229,6 +233,8 @@ void writeUint8(uint8_t value) {
         g_lastSyncTickCount = micros();
         flushData();
     }
+
+    ++g_fileLength;
 }
 
 void writeUint16(uint16_t value) {
@@ -258,6 +264,7 @@ int startImmediately() {
     g_selectedChunkIndex = 0;
     g_bufferIndex = 0;
     g_lastSyncTickCount = micros();
+    g_fileLength = 0;
 
     memcpy(&g_lastOptions, &g_nextOptions, sizeof(Options));
 

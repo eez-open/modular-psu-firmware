@@ -58,12 +58,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->data != widgetCursor.currentState->data;
 
     if (refresh) {
-        uint16_t overrideColor = style->color;
-
-        // TODO
-        if (widget->data == DATA_ID_DLOG_VALUE_LABEL) {
-            overrideColor = widgetCursor.cursor.i == 0 ? COLOR_ID_BAR_GRAPH_VOLTAGE : COLOR_ID_BAR_GRAPH_CURRENT;
-        }
+        uint16_t overrideColor = overrideStyleColorHook(widgetCursor, style);
 
         bool ignoreLuminosity = (textWidget->flags & IGNORE_LUMINOSITY_FLAG) != 0;
         if (text && text[0]) {

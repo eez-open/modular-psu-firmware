@@ -136,7 +136,6 @@ void animateRects(Buffer startBuffer, int numRects, float duration = -1);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool isUpdatingScreen();
 int getCurrentStateBufferIndex();
 uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor);
 

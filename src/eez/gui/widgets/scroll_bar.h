@@ -50,6 +50,7 @@ enum ScrollBarWidgetSegment {
 };
 
 struct ScrollBarWidgetState {
+    WidgetState genericState;
     int size;
     int position;
     int pageSize;

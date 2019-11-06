@@ -115,4 +115,6 @@ void replaceCharacter(char *str, char ch, char repl);
 
 bool endsWith(const char *str, const char *suffix);
 
+void formatBytes(uint32_t bytes, char *text, int count);
+
 } // namespace eez

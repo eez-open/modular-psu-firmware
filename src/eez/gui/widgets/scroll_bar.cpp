@@ -55,7 +55,7 @@ int getPosition(const WidgetCursor &widgetCursor) {
 }
 
 int getPageSize(const WidgetCursor &widgetCursor) {
-    return 480;
+    return data::ytDataGetPageSize(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 }
 
 bool setPosition(const WidgetCursor &widgetCursor, int position) {

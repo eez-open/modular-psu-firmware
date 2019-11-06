@@ -131,11 +131,11 @@ void oneIter() {
                     dlog::abort();
                 } else {
                     int err;
-                    if (!sd_card::exists("/RECORDINGS", &err)) {
+                    if (!sd_card::exists("/recordings", &err)) {
                         if (err != SCPI_ERROR_FILE_NAME_NOT_FOUND) {
                             event_queue::pushEvent(err);
                         } else {
-                            if (!sd_card::makeDir("/RECORDINGS", &err)) {
+                            if (!sd_card::makeDir("/recordings", &err)) {
                                 event_queue::pushEvent(err);
                             }
                         }
@@ -145,10 +145,10 @@ void oneIter() {
                     //uint8_t year, month, day, hour, minute, second;
                     //datetime::getDate(year, month, day);
                     //datetime::getTime(hour, minute, second);
-                    //sprintf(filePath, "/RECORDINGS/%d_%02d_%02d-%02d_%02d_%02d.DLOG",
+                    //sprintf(filePath, "/recordings/%d_%02d_%02d-%02d_%02d_%02d.dlog",
                     //    (int)(year + 2000), (int)month, (int)day,
                     //    (int)hour, (int)minute, (int)second);
-                    sprintf(filePath, "/RECORDINGS/LATEST.DLOG");
+                    sprintf(filePath, "/recordings/latest.dlog");
 
                     dlog::g_nextOptions.logVoltage[0] = true;
                     dlog::g_nextOptions.logCurrent[0] = true;

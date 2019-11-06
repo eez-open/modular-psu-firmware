@@ -266,5 +266,7 @@ void drawWidgetCallback(const WidgetCursor &widgetCursor);
 
 OnTouchFunctionType getTouchFunction(const WidgetCursor &widgetCursor);
 
+uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
+
 } // namespace gui
 } // namespace eez

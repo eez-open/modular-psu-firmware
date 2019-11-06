@@ -252,11 +252,8 @@ void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
     overlayEnumWidgetHook(widgetCursor, callback);
 
-    bool savedIsActiveWidget;
-    if (callback == drawWidgetCallback) {
-        savedIsActiveWidget = g_isActiveWidget;
-        g_isActiveWidget = g_isActiveWidget || isActiveWidget(widgetCursor);
-    }
+    bool savedIsActiveWidget = g_isActiveWidget;
+    g_isActiveWidget = g_isActiveWidget || isActiveWidget(widgetCursor);
 
     callback(widgetCursor);
 
@@ -264,9 +261,7 @@ void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
        g_enumWidgetFunctions[widgetCursor.widget->type](widgetCursor, callback);
     }
 
-    if (callback == drawWidgetCallback) {
-        g_isActiveWidget = savedIsActiveWidget;
-    }
+    g_isActiveWidget = savedIsActiveWidget;
 
 	widgetCursor.x = xSaved;
 	widgetCursor.y = ySaved;

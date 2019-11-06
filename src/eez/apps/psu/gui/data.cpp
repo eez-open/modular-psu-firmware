@@ -253,21 +253,45 @@ Value MakeMacAddressValue(uint8_t *macAddress) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void printTime(uint32_t time, char *text, int count) {
-    int h = time / 3600;
-    int r = time - h * 3600;
-    int m = r / 60;
-    int s = r - m * 60;
+void printTime(double time, char *text, int count) {
+    unsigned int d = (unsigned int)floor(time / (24 * 3600));
+    time -= d * (24 * 3600);
+    
+    unsigned int h = (unsigned int)floor(time / 3600);
+    time -= h * 3600;
+    
+    unsigned int m = (unsigned int)floor(time / 60);
+    time -= m * 60;
+    
+    float s = (float)(floor(time * 1000) / 1000);
 
-    if (h > 0) {
-        snprintf(text, count - 1, "%dh %dm", h, m);
+    if (d > 0) {
+        if (h > 0) {
+            snprintf(text, count - 1, "%ud %uh", d, h);
+        } else if (m > 0) {
+            snprintf(text, count - 1, "%ud %um", d, m);
+        } else {
+            snprintf(text, count - 1, "%ud %ds", d, (unsigned int)floor(s));
+        }
+    } else if (h > 0) {
+        if (m > 0) {
+            snprintf(text, count - 1, "%uh %um", h, m);
+        } else {
+            snprintf(text, count - 1, "%uh %ds", h, (unsigned int)floor(s));
+        }
     } else if (m > 0) {
-        snprintf(text, count - 1, "%dm %ds", m, s);
+        snprintf(text, count - 1, "%um %us", m, (unsigned int)floor(s));
     } else {
-        snprintf(text, count - 1, "%ds", s);
+        snprintf(text, count - 1, "%gs", s);
     }
 
     text[count - 1] = 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void printTime(uint32_t time, char *text, int count) {
+    printTime((double)time, text, count);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -572,14 +596,6 @@ void SERIAL_BAUD_INDEX_value_to_text(const Value &value, char *text, int count) 
     text[count - 1] = 0;
 }
 
-bool compare_DLOG_STATUS_value(const Value &a, const Value &b) {
-    return a.getUInt32() == b.getUInt32();
-}
-
-void DLOG_STATUS_value_to_text(const Value &value, char *text, int count) {
-    printTime(value.getUInt32(), text, count);
-}
-
 bool compare_VALUE_LIST_value(const Value &a, const Value &b) {
     return a.getValueList() == b.getValueList();
 }
@@ -672,6 +688,39 @@ void DLOG_VALUE_LABEL_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count - 1, "%c%d", labels[dlogValue % 3], dlogValue / 3 + 1);
 }
 
+static double g_savedCurrentTime;
+
+bool compare_DLOG_CURRENT_TIME_value(const Value &a, const Value &b) {
+    bool result = g_savedCurrentTime == dlog::g_currentTime;
+    g_savedCurrentTime = dlog::g_currentTime;
+    return result;
+}
+
+void DLOG_CURRENT_TIME_value_to_text(const Value &value, char *text, int count) {
+    printTime(g_savedCurrentTime, text, count);
+}
+
+static double g_savedRecordingDuration;
+
+bool compare_DLOG_TIME_DURATION_value(const Value &a, const Value &b) {
+    double recordingDuration  = (double)dlog::getSize() * dlog::g_lastOptions.period;
+    bool result = g_savedRecordingDuration == recordingDuration;
+    g_savedRecordingDuration = recordingDuration;
+    return result;
+}
+
+void DLOG_TIME_DURATION_value_to_text(const Value &value, char *text, int count) {
+    printTime(g_savedRecordingDuration, text, count);
+}
+
+bool compare_FILE_LENGTH_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void FILE_LENGTH_value_to_text(const Value &value, char *text, int count) {
+    formatBytes(value.getUInt32(), text, count);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 } // namespace gui
@@ -711,7 +760,6 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_PORT_value,
     compare_TEXT_MESSAGE_value,
     compare_SERIAL_BAUD_INDEX_value,
-    compare_DLOG_STATUS_value,
     compare_VALUE_LIST_value,
     compare_FLOAT_LIST_value,
     compare_CHANNEL_TITLE_value,
@@ -719,7 +767,10 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value,
     compare_CHANNEL_SHORT_TITLE_WITH_COLON_value,
     compare_CHANNEL_LONG_TITLE_value,
-    compare_DLOG_VALUE_LABEL_value 
+    compare_DLOG_VALUE_LABEL_value,
+    compare_DLOG_CURRENT_TIME_value,
+    compare_DLOG_TIME_DURATION_value,
+    compare_FILE_LENGTH_value
 };
 
 ValueToTextFunction g_userValueToTextFunctions[] = { 
@@ -752,7 +803,6 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     PORT_value_to_text,
     TEXT_MESSAGE_value_to_text,
     SERIAL_BAUD_INDEX_value_to_text,
-    DLOG_STATUS_value_to_text,
     VALUE_LIST_value_to_text,
     FLOAT_LIST_value_to_text,
     CHANNEL_TITLE_value_to_text,
@@ -760,7 +810,10 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_to_text,
     CHANNEL_SHORT_TITLE_WITH_COLON_value_to_text,
     CHANNEL_LONG_TITLE_value_to_text,
-    DLOG_VALUE_LABEL_value_to_text
+    DLOG_VALUE_LABEL_value_to_text,
+    DLOG_CURRENT_TIME_value_to_text,
+    DLOG_TIME_DURATION_value_to_text,
+    FILE_LENGTH_value_to_text
 };
 
 } // namespace data
@@ -3963,18 +4016,6 @@ void data_channel_list_countdown(data::DataOperationEnum operation, data::Cursor
     }
 }
 
-void data_dlog_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
-    if (operation == data::DATA_OPERATION_GET) {
-        if (dlog::isInitiated()) {
-            value = "Dlog trigger waiting";
-        } else if (!dlog::isIdle()) {
-            value = data::Value((uint32_t)floor(dlog::g_currentTime), VALUE_TYPE_DLOG_STATUS);
-        }
-    }
-#endif
-}
-
 void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     static const int NUM_WIDGETS = 4;
 
@@ -4087,9 +4128,11 @@ void data_nondrag_overlay(data::DataOperationEnum operation, data::Cursor &curso
 }
 
 void data_dlog_started(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = dlog::isExecuting() ? 1 : 0;
     }
+#endif
 }
 
 void data_channel_history_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -4117,16 +4160,26 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
     }
 }
 
+void data_dlog_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = dlog::getState();
+    }
+#endif
+}
 void data_recording_ready(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
     if (operation == DATA_OPERATION_GET) {
         value = dlog::g_lastBufferEnd - dlog::g_lastBufferStart > 0 ? 1 : 0;
     }
+#endif
 }
 
 void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
     uint32_t size = dlog::getSize();
 
-    if (operation == DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE4) {
+    if (operation >= DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE4) {
         uint8_t valueIndex = operation - DATA_OPERATION_YT_DATA_GET_VALUE1;
         Unit unit = dlog::g_dlogValues[valueIndex].offset.getUnit();
         if (value.getUInt32() >= size) {
@@ -4187,9 +4240,11 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_TIME) {
         value = Value((ytDataGetPosition(cursor, DATA_ID_RECORDING) + dlog::g_cursorOffset) * dlog::g_lastOptions.period, UNIT_SECOND);
     }
+#endif
 }
 
 void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
     static Overlay overlay;
 
     if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
@@ -4201,12 +4256,15 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
         overlay.height = widgetCursor.widget->h;
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     }
+#endif
 }
 
 void data_dlog_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_COUNT) {
         value = dlog::g_numDlogValues;
     }
+#endif
 }
 
 void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -4216,6 +4274,7 @@ void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor &curs
 }
 
 void data_dlog_value_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VALUE_DIV;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
@@ -4230,9 +4289,11 @@ void data_dlog_value_div(data::DataOperationEnum operation, data::Cursor &cursor
     } else if (operation == data::DATA_OPERATION_SET) {
         dlog::g_dlogValues[cursor.i].perDiv = value;
     }
+#endif
 }
 
 void data_dlog_value_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VALUE_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
@@ -4247,9 +4308,11 @@ void data_dlog_value_offset(data::DataOperationEnum operation, data::Cursor &cur
     } else if (operation == data::DATA_OPERATION_SET) {
         dlog::g_dlogValues[cursor.i].offset = value;
     }
+#endif
 }
 
 void data_dlog_time_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_TIME_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
@@ -4264,24 +4327,46 @@ void data_dlog_time_offset(data::DataOperationEnum operation, data::Cursor &curs
     } else if (operation == data::DATA_OPERATION_SET) {
         dlog::g_timeOffset = value;
     }
+#endif
+}
+
+void data_dlog_current_time(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(0, VALUE_TYPE_DLOG_CURRENT_TIME);
+    }
+#endif
 }
 
 void data_dlog_time_duration(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        value = Value(dlog::getSize() * dlog::g_lastOptions.period, UNIT_SECOND);
+        value = Value(0, VALUE_TYPE_DLOG_TIME_DURATION);
     }
+#endif
+}
+void data_dlog_file_length(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(dlog::g_fileLength, VALUE_TYPE_FILE_LENGTH);
+    }
+#endif
 }
 
 void data_dlog_time_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(dlog::g_pageSize * dlog::g_lastOptions.period / dlog::NUM_HORZ_DIVISIONS, UNIT_SECOND);
     }
+#endif
 }
 
 void data_dlog_value_cursor(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = data::ytDataGetValue(cursor, DATA_ID_RECORDING, ytDataGetPosition(cursor, DATA_ID_RECORDING) + dlog::g_cursorOffset, cursor.i);
     }
+#endif
 }
 
 } // namespace gui

@@ -24,6 +24,8 @@ namespace eez {
 namespace psu {
 namespace dlog {
 
+enum State { STATE_IDLE, STATE_INITIATED, STATE_TRIGGERED, STATE_EXECUTING };
+
 enum DlogValueType {
     DLOG_VALUE_CH1_U,
     DLOG_VALUE_CH1_I,
@@ -87,9 +89,12 @@ extern eez::gui::Value g_timeOffset;
 
 extern double g_currentTime;
 
+extern uint32_t g_fileLength;
+
 extern uint32_t g_pageSize;
 extern uint32_t g_cursorOffset;
 
+State getState();
 bool isIdle();
 bool isInitiated();
 bool isExecuting();
