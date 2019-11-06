@@ -180,6 +180,9 @@ struct Channel : ChannelInterface {
         dprogState = DPROG_STATE_AUTO;
 	}
 
+	void onPowerDown(int subchannelIndex) {
+	}
+
 	void reset(int subchannelIndex) {
 		uSet = 0;
         dprogState = DPROG_STATE_AUTO;

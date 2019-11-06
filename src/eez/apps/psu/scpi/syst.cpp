@@ -88,7 +88,7 @@ scpi_result_t scpi_cmd_systemPower(scpi_t *context) {
 
     osDelay(1000);
 
-    if (!isPowerUp()) {
+    if (up != isPowerUp()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }

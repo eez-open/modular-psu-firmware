@@ -247,6 +247,12 @@ struct Channel : ChannelInterface {
 #endif
 	}
 
+	void onPowerDown(int subchannelIndex) {
+#if defined(EEZ_PLATFORM_STM32)
+		synchronized = false;
+#endif
+	}
+
 	void reset(int subchannelIndex) {
 	}
 

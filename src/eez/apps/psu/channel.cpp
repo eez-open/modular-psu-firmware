@@ -361,6 +361,8 @@ void Channel::onPowerDown() {
 
     clearProtection(false);
 
+    channelInterface->onPowerDown(subchannelIndex);
+
     profile::enableSave(last_save_enabled);
 }
 

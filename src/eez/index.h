@@ -141,6 +141,7 @@ struct ChannelInterface {
     virtual void getParams(int subchannelIndex, ChannelParams &params) = 0;
 
     virtual void init(int subchannelIndex) = 0;
+    virtual void onPowerDown(int subchannelIndex) = 0;
     virtual void reset(int subchannelIndex) = 0;
     virtual void test(int subchannelIndex) = 0;
     virtual void tick(int subchannelIndex, uint32_t tickCount) = 0;
