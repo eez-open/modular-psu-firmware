@@ -18,14 +18,13 @@
 
 #include <eez/index.h>
 
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 
 #if OPTION_DISPLAY
-#include <eez/apps/psu/gui/psu.h>
+#include <eez/modules/psu/gui/psu.h>
 #endif
 
-#include <eez/apps/psu/init.h>
-#include <eez/apps/settings/settings.h>
+#include <eez/modules/psu/init.h>
 #include <eez/gui/gui.h>
 #include <eez/modules/mcu/display.h>
 #include <eez/modules/mcu/touch.h>
@@ -34,15 +33,15 @@
 #include <eez/gui/document.h>
 
 #if OPTION_DISPLAY
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 
-#include <eez/apps/psu/gui/page_ch_settings_adv.h>
-#include <eez/apps/psu/gui/page_ch_settings_protection.h>
-#include <eez/apps/psu/gui/page_ch_settings_trigger.h>
-#include <eez/apps/psu/gui/page_event_queue.h>
-#include <eez/apps/psu/gui/page_self_test_result.h>
-#include <eez/apps/psu/gui/page_sys_settings.h>
-#include <eez/apps/psu/gui/page_user_profiles.h>
+#include <eez/modules/psu/gui/page_ch_settings_adv.h>
+#include <eez/modules/psu/gui/page_ch_settings_protection.h>
+#include <eez/modules/psu/gui/page_ch_settings_trigger.h>
+#include <eez/modules/psu/gui/page_event_queue.h>
+#include <eez/modules/psu/gui/page_self_test_result.h>
+#include <eez/modules/psu/gui/page_sys_settings.h>
+#include <eez/modules/psu/gui/page_user_profiles.h>
 using namespace eez::psu::gui;
 #endif
 
@@ -191,13 +190,6 @@ SlotInfo g_slots[NUM_SLOTS] = {
 };
 
 #if OPTION_DISPLAY
-
-ApplicationInfo g_applications[] = {
-    { "PSU", gui::BITMAP_ID_PSU_ICON, &psu::gui::g_psuAppContext },
-    { "Settings", gui::BITMAP_ID_SETTINGS_ICON, &settings::g_settingsAppContext },
-};
-
-int g_numApplications = sizeof(g_applications) / sizeof(ApplicationInfo);
 
 namespace gui {
 

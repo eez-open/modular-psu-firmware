@@ -33,12 +33,10 @@
 #include <eez/gui/widgets/container.h>
 
 // TODO this must be removed from here
-#include <eez/apps/psu/psu.h>
-
-#include <eez/apps/psu/idle.h>
-#include <eez/apps/psu/persist_conf.h>
-
-#include <eez/apps/home/home.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/idle.h>
+#include <eez/modules/psu/persist_conf.h>
+#include <eez/modules/psu/gui/psu.h>
 //
 
 #define CONF_GUI_LONG_TOUCH_TIMEOUT              1000000L // 1s
@@ -211,7 +209,7 @@ void processTouchEvent(EventType type) {
         if (!m_onTouchFunction) {
             if (isFrontPanelLocked()) {
                 auto savedAppContext = g_appContext;
-                g_appContext = &home::g_homeAppContext;
+                g_appContext = &psu::gui::g_psuAppContext;
                 errorMessage("Front panel is locked!");                
                 g_appContext = savedAppContext;
             }

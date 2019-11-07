@@ -26,7 +26,7 @@
 #include <eez/platform/stm32/spi.h>
 #endif
 
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 
 #include <eez/modules/dcpX05/dac.h>
 #include <eez/modules/dcpX05/adc.h>

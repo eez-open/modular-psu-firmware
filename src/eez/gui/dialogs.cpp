@@ -28,9 +28,9 @@
 #include <eez/util.h>
 
 // TODO this must be removed from here
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 
-#include <eez/apps/psu/gui/psu.h>
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/sound.h>
 
 namespace eez {

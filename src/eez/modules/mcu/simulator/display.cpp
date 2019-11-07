@@ -30,7 +30,7 @@
 #include <SDL_image.h>
 
 #include <cmsis_os.h>
-#include <eez/apps/home/home.h>
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/debug.h>
 #include <eez/gui/app_context.h>
 #include <eez/gui/data.h>
@@ -43,10 +43,8 @@
 
 #include "texture.h"
 
-#include <eez/apps/home/home.h>
-
 using namespace eez::gui;
-using namespace eez::home;
+using namespace eez::psu::gui;
 
 namespace eez {
 namespace mcu {
@@ -225,8 +223,7 @@ void turnOff() {
     if (isOn()) {
         // clear screen
         setColor(0, 0, 0);
-        fillRect(g_homeAppContext.x, g_homeAppContext.y, 
-            g_homeAppContext.x + g_homeAppContext.width - 1, g_homeAppContext.y + g_homeAppContext.height - 1);
+        fillRect(g_psuAppContext.x, g_psuAppContext.y, g_psuAppContext.x + g_psuAppContext.width - 1, g_psuAppContext.y + g_psuAppContext.height - 1);
         updateScreen(g_frontPanelBuffer);
 
         // free frame buffers
@@ -348,7 +345,7 @@ int getDisplayHeight() {
 void screanshotBegin() {
     g_screenshotBuffer = new uint8_t[480 * 272 * 3];
 
-    uint8_t *src = (uint8_t *)(g_frontPanelBuffer + home::g_homeAppContext.y * g_frontPanelWidth + home::g_homeAppContext.x);
+    uint8_t *src = (uint8_t *)(g_frontPanelBuffer + g_psuAppContext.y * g_frontPanelWidth + g_psuAppContext.x);
     uint8_t *dst = g_screenshotBuffer;
 
     int srcAdvance = (g_frontPanelWidth - 480) * 4;

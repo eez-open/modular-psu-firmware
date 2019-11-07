@@ -16,11 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/scpi/psu.h>
-#include <eez/apps/psu/serial_psu.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/scpi/psu.h>
+#include <eez/modules/psu/serial_psu.h>
 #if OPTION_ETHERNET
-#include <eez/apps/psu/ethernet.h>
+#include <eez/modules/psu/ethernet.h>
 #endif
 
 using namespace eez::psu;

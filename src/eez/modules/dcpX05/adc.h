@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 
 namespace eez {
 namespace psu {

@@ -22,14 +22,13 @@
 
 #include <eez/index.h>
 
-#include <eez/apps/home/home.h>
 #include <eez/gui/assets.h>
 #include <eez/gui/document.h>
 
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/gui/psu.h>
 
 using namespace eez::gui;
-using namespace eez::home;
 
 namespace eez {
 namespace gui {
@@ -61,7 +60,7 @@ int FrontPanelAppContext::getMainPageId() {
 
 void data_main_app_view(DataOperationEnum operation, Cursor &cursor, Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = Value(&g_homeAppContext);
+        value = Value(&psu::gui::g_psuAppContext);
     }
 }
 

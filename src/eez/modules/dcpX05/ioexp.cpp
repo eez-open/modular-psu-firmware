@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/dcpX05/ioexp.h>
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -25,7 +25,7 @@
 #include <eez/platform/stm32/spi.h>
 #include <eez/system.h>
 #include <eez/index.h>
-#include <eez/apps/psu/event_queue.h>
+#include <eez/modules/psu/event_queue.h>
 #endif
 
 namespace eez {

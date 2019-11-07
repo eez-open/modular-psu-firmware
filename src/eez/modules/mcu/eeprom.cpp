@@ -30,7 +30,7 @@
 
 #include <eez/system.h>
 
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 
 #include <eez/modules/mcu/eeprom.h>
 

@@ -20,8 +20,8 @@
 
 #include <cmsis_os.h>
 
-#include <eez/apps/psu/conf.h>
-#include <eez/apps/psu/conf_advanced.h>
+#include <eez/modules/psu/conf.h>
+#include <eez/modules/psu/conf_advanced.h>
 
 namespace eez {
 namespace scpi {

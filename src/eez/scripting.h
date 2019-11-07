@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/apps/psu/conf_advanced.h> // MAX_PATH
+#include <eez/modules/psu/conf_advanced.h> // MAX_PATH
 
 #define MAX_NUM_SCRIPTS 100
 #define SCRIPTS_PER_PAGE 6

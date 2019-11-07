@@ -21,7 +21,7 @@
 #include <main.h>
 #include <eez/platform/stm32/spi.h>
 
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/dcpX05/ioexp.h>
 
 // TC77 Thermal Sensor with SPI Interface

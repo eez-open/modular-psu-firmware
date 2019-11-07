@@ -25,9 +25,9 @@
 #include <string.h>
 
 // TODO these includes should not be inside apps/psu
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 
-#include <eez/apps/psu/datetime.h>
+#include <eez/modules/psu/datetime.h>
 
 #include <eez/system.h>
 #include <eez/util.h>

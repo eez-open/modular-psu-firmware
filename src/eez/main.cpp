@@ -47,11 +47,11 @@
 
 #include <eez/system.h>
 
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/init.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/init.h>
 
 #if OPTION_SD_CARD
-#include <eez/apps/psu/sd_card.h>
+#include <eez/modules/psu/sd_card.h>
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -89,8 +89,8 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 #ifdef __EMSCRIPTEN__
 #include <stdio.h>
 #include <emscripten.h>
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/serial_psu.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/serial_psu.h>
 
 void eez_serial_put(int ch) {
     Serial.put(ch);

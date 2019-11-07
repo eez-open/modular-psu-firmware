@@ -228,15 +228,7 @@ extern SlotInfo g_slots[NUM_SLOTS];
 
 #if OPTION_DISPLAY
 
-struct ApplicationInfo {
-    const char *title;
-    int bitmap;
-    gui::AppContext *appContext;
-};
-
 typedef bool (*OnSystemStateChangedCallback)();
-extern ApplicationInfo g_applications[];
-extern int g_numApplications;
 
 namespace gui {
 

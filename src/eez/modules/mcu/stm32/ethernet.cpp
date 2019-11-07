@@ -33,8 +33,8 @@
 
 #include <eez/modules/mcu/ethernet.h>
 
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/ethernet.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/ethernet.h>
 using namespace eez::psu::ethernet;
 
 #include <eez/scpi/scpi.h>

@@ -33,14 +33,12 @@
 #include <eez/system.h>
 #include <eez/util.h>
 
-#include <eez/apps/home/home.h>
-
 // TODO this must be removed from here
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 
-#include <eez/apps/psu/gui/psu.h>
-#include <eez/apps/psu/gui/password.h>
-#include <eez/apps/psu/persist_conf.h>
+#include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/password.h>
+#include <eez/modules/psu/persist_conf.h>
 
 #include <eez/modules/mcu/display.h>
 
@@ -230,15 +228,15 @@ void executeAction(int actionId) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void showWelcomePage() {
-	home::g_homeAppContext.showPageOnNextIter(PAGE_ID_WELCOME);
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_WELCOME);
 }
 
 void showStandbyPage() {
-	home::g_homeAppContext.showPageOnNextIter(PAGE_ID_STANDBY);
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_STANDBY);
 }
 
 void showEnteringStandbyPage() {
-	home::g_homeAppContext.showPageOnNextIter(PAGE_ID_ENTERING_STANDBY);
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_ENTERING_STANDBY);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

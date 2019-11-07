@@ -22,22 +22,22 @@
 
 #include <eez/system.h>
 
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/channel_dispatcher.h>
-#include <eez/apps/psu/list_program.h>
-#include <eez/apps/psu/serial_psu.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/channel_dispatcher.h>
+#include <eez/modules/psu/list_program.h>
+#include <eez/modules/psu/serial_psu.h>
 #if OPTION_ETHERNET
-#include <eez/apps/psu/ethernet.h>
-#include <eez/apps/psu/ntp.h>
+#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ntp.h>
 #endif
-#include <eez/apps/psu/event_queue.h>
-#include <eez/apps/psu/profile.h>
+#include <eez/modules/psu/event_queue.h>
+#include <eez/modules/psu/profile.h>
 #if OPTION_SD_CARD
-#include <eez/apps/psu/sd_card.h>
-#include <eez/apps/psu/dlog.h>
+#include <eez/modules/psu/sd_card.h>
+#include <eez/modules/psu/dlog.h>
 #endif
-#include <eez/apps/psu/scpi/psu.h>
-#include <eez/apps/psu/datetime.h>
+#include <eez/modules/psu/scpi/psu.h>
+#include <eez/modules/psu/datetime.h>
 
 #include <eez/gui/data.h>
 

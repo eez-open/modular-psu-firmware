@@ -22,35 +22,33 @@
 
 #include <eez/gui/dialogs.h>
 #include <eez/gui/gui.h>
-#include <eez/apps/home/touch_calibration.h>
 
-#include <eez/apps/home/home.h>
+#include <eez/modules/psu/psu.h>
 
-#include <eez/apps/psu/psu.h>
-
-#include <eez/apps/psu/channel_dispatcher.h>
-#include <eez/apps/psu/event_queue.h>
-#include <eez/apps/psu/persist_conf.h>
+#include <eez/modules/psu/channel_dispatcher.h>
+#include <eez/modules/psu/event_queue.h>
+#include <eez/modules/psu/persist_conf.h>
 #include <eez/sound.h>
-#include <eez/apps/psu/trigger.h>
-#include <eez/apps/psu/dlog.h>
+#include <eez/modules/psu/trigger.h>
+#include <eez/modules/psu/dlog.h>
 
-#include <eez/apps/psu/gui/psu.h>
+#include <eez/modules/psu/gui/psu.h>
 
-#include <eez/apps/psu/gui/animations.h>
-#include <eez/apps/psu/gui/calibration.h>
-#include <eez/apps/psu/gui/edit_mode.h>
-#include <eez/apps/psu/gui/edit_mode_keypad.h>
-#include <eez/apps/psu/gui/edit_mode_step.h>
-#include <eez/apps/psu/gui/keypad.h>
-#include <eez/apps/psu/gui/numeric_keypad.h>
-#include <eez/apps/psu/gui/page_ch_settings_adv.h>
-#include <eez/apps/psu/gui/page_ch_settings_protection.h>
-#include <eez/apps/psu/gui/page_ch_settings_trigger.h>
-#include <eez/apps/psu/gui/page_sys_settings.h>
-#include <eez/apps/psu/gui/page_user_profiles.h>
-#include <eez/apps/psu/gui/password.h>
-#include <eez/apps/psu/gui/data.h>
+#include <eez/modules/psu/gui/animations.h>
+#include <eez/modules/psu/gui/calibration.h>
+#include <eez/modules/psu/gui/edit_mode.h>
+#include <eez/modules/psu/gui/edit_mode_keypad.h>
+#include <eez/modules/psu/gui/edit_mode_step.h>
+#include <eez/modules/psu/gui/keypad.h>
+#include <eez/modules/psu/gui/numeric_keypad.h>
+#include <eez/modules/psu/gui/page_ch_settings_adv.h>
+#include <eez/modules/psu/gui/page_ch_settings_protection.h>
+#include <eez/modules/psu/gui/page_ch_settings_trigger.h>
+#include <eez/modules/psu/gui/page_sys_settings.h>
+#include <eez/modules/psu/gui/page_user_profiles.h>
+#include <eez/modules/psu/gui/password.h>
+#include <eez/modules/psu/gui/data.h>
+#include <eez/modules/psu/gui/touch_calibration.h>
 
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
@@ -64,7 +62,7 @@
 #include <eez/scpi/scpi.h>
 
 #if OPTION_SD_CARD
-#include <eez/apps/psu/sd_card.h>
+#include <eez/modules/psu/sd_card.h>
 #endif
 
 using namespace eez::gui;
@@ -160,7 +158,7 @@ void action_keypad_option2() {
 
 void action_enter_touch_calibration() {
     popPage();
-    home::enterTouchCalibration();
+    psu::gui::enterTouchCalibration();
 }
 
 void action_yes() {
@@ -874,14 +872,6 @@ void action_ntp_toggle() {
 
 void action_ntp_edit_server() {
     ((SysSettingsDateTimePage *)getActivePage())->editNtpServer();
-}
-
-void action_open_application() {
-    home::openApplication();
-}
-
-void action_show_home() {
-    home::closeApplication();
 }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

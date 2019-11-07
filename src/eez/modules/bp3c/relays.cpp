@@ -22,9 +22,9 @@
 #endif
 
 // TODO
-#include <eez/apps/psu/psu.h> // TestResult
+#include <eez/modules/psu/psu.h> // TestResult
 
-#include <eez/apps/psu/channel_dispatcher.h>
+#include <eez/modules/psu/channel_dispatcher.h>
 
 #include <eez/modules/bp3c/relays.h>
 

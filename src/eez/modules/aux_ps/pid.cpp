@@ -5,7 +5,7 @@
  * This Library is licensed under the MIT License
  **********************************************************************************************/
 
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 
 #include <eez/modules/aux_ps/pid.h>
 #include <eez/system.h>

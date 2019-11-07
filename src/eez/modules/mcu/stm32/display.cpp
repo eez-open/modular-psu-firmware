@@ -29,7 +29,6 @@
 #include <tim.h>
 
 #include <cmsis_os.h>
-#include <eez/apps/home/home.h>
 #include <eez/gui/app_context.h>
 #include <eez/gui/font.h>
 #include <eez/gui/touch.h>
@@ -37,8 +36,8 @@
 #include <eez/system.h>
 #include <eez/util.h>
 
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/persist_conf.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/persist_conf.h>
 
 #include <eez/platform/stm32/defines.h>
 

@@ -21,10 +21,10 @@
 #include <eez/modules/aux_ps/fan.h>
 #include <eez/modules/aux_ps/pid.h>
 
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/scpi/psu.h>
-#include <eez/apps/psu/temperature.h>
-#include <eez/apps/psu/persist_conf.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/scpi/psu.h>
+#include <eez/modules/psu/temperature.h>
+#include <eez/modules/psu/persist_conf.h>
 
 #include <eez/system.h>
 
@@ -32,9 +32,9 @@
 #include <i2c.h>
 #endif
 
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/gui/psu.h>
-#include <eez/apps/psu/gui/page_sys_settings.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/page_sys_settings.h>
 
 namespace eez {
 namespace aux_ps {

@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 
-#include <eez/apps/psu/channel_dispatcher.h>
+#include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/dcpX05/adc.h>
 
 #if defined(EEZ_PLATFORM_STM32)

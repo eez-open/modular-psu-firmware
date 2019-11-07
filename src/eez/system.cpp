@@ -32,8 +32,8 @@
 #include <eez/modules/mcu/sdram.h>
 #endif
 
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/serial_psu.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/serial_psu.h>
 #include <eez/scpi/scpi.h>
 using namespace eez::psu::serial;
 using namespace eez::scpi;

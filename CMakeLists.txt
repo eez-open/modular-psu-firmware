@@ -104,172 +104,148 @@ set(header_eez
 list (APPEND header_files ${header_eez})
 source_group("eez" FILES ${src_eez} ${header_eez})
 
-set(src_eez_apps_home
-    src/eez/apps/home/animations.cpp
-    src/eez/apps/home/data.cpp
-    src/eez/apps/home/home.cpp
-    src/eez/apps/home/touch_calibration.cpp
+set(src_eez_modules_psu
+    src/eez/modules/psu/board.cpp
+    src/eez/modules/psu/calibration.cpp
+    src/eez/modules/psu/channel.cpp
+    src/eez/modules/psu/channel_dispatcher.cpp
+    src/eez/modules/psu/datetime.cpp
+    src/eez/modules/psu/debug.cpp
+    src/eez/modules/psu/devices.cpp
+    src/eez/modules/psu/dlog.cpp
+    src/eez/modules/psu/ethernet.cpp
+    src/eez/modules/psu/event_queue.cpp
+    src/eez/modules/psu/idle.cpp
+    src/eez/modules/psu/init.cpp
+    src/eez/modules/psu/io_pins.cpp
+    src/eez/modules/psu/lcd.cpp
+    src/eez/modules/psu/list_program.cpp
+    src/eez/modules/psu/ntp.cpp
+    src/eez/modules/psu/ontime.cpp
+    src/eez/modules/psu/persist_conf.cpp
+    src/eez/modules/psu/profile.cpp
+    src/eez/modules/psu/psu.cpp
+    src/eez/modules/psu/rtc.cpp
+    src/eez/modules/psu/sd_card.cpp
+    src/eez/modules/psu/serial.cpp
+    src/eez/modules/psu/serial_psu.cpp
+    src/eez/modules/psu/temp_sensor.cpp
+    src/eez/modules/psu/temperature.cpp
+    src/eez/modules/psu/timer.cpp
+    src/eez/modules/psu/trigger.cpp
+    src/eez/modules/psu/util.cpp
 )
-list (APPEND src_files ${src_eez_apps_home})
-set(header_eez_apps_home
-    src/eez/apps/home/animations.h
-    src/eez/apps/home/data.h
-    src/eez/apps/home/home.h
-    src/eez/apps/home/touch_calibration.h
+list (APPEND src_files ${src_eez_modules_psu})
+set(header_eez_modules_psu
+    src/eez/modules/psu/board.h
+    src/eez/modules/psu/calibration.h
+    src/eez/modules/psu/channel.h
+    src/eez/modules/psu/channel_dispatcher.h
+    src/eez/modules/psu/conf.h
+    src/eez/modules/psu/conf_advanced.h
+    src/eez/modules/psu/conf_user.h
+    src/eez/modules/psu/datetime.h
+    src/eez/modules/psu/debug.h
+    src/eez/modules/psu/devices.h
+    src/eez/modules/psu/dlog.h
+    src/eez/modules/psu/ethernet.h
+    src/eez/modules/psu/event_queue.h
+    src/eez/modules/psu/idle.h
+    src/eez/modules/psu/init.h
+    src/eez/modules/psu/io_pins.h
+    src/eez/modules/psu/list_program.h
+    src/eez/modules/psu/ntp.h
+    src/eez/modules/psu/ontime.h
+    src/eez/modules/psu/persist_conf.h
+    src/eez/modules/psu/profile.h
+    src/eez/modules/psu/psu.h
+    src/eez/modules/psu/rtc.h
+    src/eez/modules/psu/sd_card.h
+    src/eez/modules/psu/serial_psu.h
+    src/eez/modules/psu/temp_sensor.h
+    src/eez/modules/psu/temperature.h
+    src/eez/modules/psu/timer.h
+    src/eez/modules/psu/trigger.h
+    src/eez/modules/psu/util.h
 )
-list (APPEND header_files ${header_eez_apps_home})
-source_group("eez\\apps\\home" FILES ${src_eez_apps_home} ${header_eez_apps_home})
+list (APPEND header_files ${header_eez_modules_psu})
+source_group("eez\\modules\\psu" FILES ${src_eez_modules_psu} ${header_eez_modules_psu})
 
-set(src_eez_apps_psu
-    src/eez/apps/psu/board.cpp
-    src/eez/apps/psu/calibration.cpp
-    src/eez/apps/psu/channel.cpp
-    src/eez/apps/psu/channel_dispatcher.cpp
-    src/eez/apps/psu/datetime.cpp
-    src/eez/apps/psu/debug.cpp
-    src/eez/apps/psu/devices.cpp
-    src/eez/apps/psu/dlog.cpp
-    src/eez/apps/psu/ethernet.cpp
-    src/eez/apps/psu/event_queue.cpp
-    src/eez/apps/psu/idle.cpp
-    src/eez/apps/psu/init.cpp
-    src/eez/apps/psu/io_pins.cpp
-    src/eez/apps/psu/lcd.cpp
-    src/eez/apps/psu/list_program.cpp
-    src/eez/apps/psu/ntp.cpp
-    src/eez/apps/psu/ontime.cpp
-    src/eez/apps/psu/persist_conf.cpp
-    src/eez/apps/psu/profile.cpp
-    src/eez/apps/psu/psu.cpp
-    src/eez/apps/psu/rtc.cpp
-    src/eez/apps/psu/sd_card.cpp
-    src/eez/apps/psu/serial.cpp
-    src/eez/apps/psu/serial_psu.cpp
-    src/eez/apps/psu/temp_sensor.cpp
-    src/eez/apps/psu/temperature.cpp
-    src/eez/apps/psu/timer.cpp
-    src/eez/apps/psu/trigger.cpp
-    src/eez/apps/psu/util.cpp
+set(src_eez_modules_psu_gui
+    src/eez/modules/psu/gui/animations.cpp
+    src/eez/modules/psu/gui/calibration.cpp
+    src/eez/modules/psu/gui/data.cpp
+    src/eez/modules/psu/gui/edit_mode.cpp
+    src/eez/modules/psu/gui/edit_mode_keypad.cpp
+    src/eez/modules/psu/gui/edit_mode_slider.cpp
+    src/eez/modules/psu/gui/edit_mode_step.cpp
+    src/eez/modules/psu/gui/keypad.cpp
+    src/eez/modules/psu/gui/numeric_keypad.cpp
+    src/eez/modules/psu/gui/page_ch_settings_adv.cpp
+    src/eez/modules/psu/gui/page_ch_settings_protection.cpp
+    src/eez/modules/psu/gui/page_ch_settings_trigger.cpp
+    src/eez/modules/psu/gui/page_event_queue.cpp
+    src/eez/modules/psu/gui/page_self_test_result.cpp
+    src/eez/modules/psu/gui/page_sys_settings.cpp
+    src/eez/modules/psu/gui/page_user_profiles.cpp
+    src/eez/modules/psu/gui/password.cpp
+    src/eez/modules/psu/gui/psu.cpp
+    src/eez/modules/psu/gui/touch_calibration.cpp
 )
-list (APPEND src_files ${src_eez_apps_psu})
-set(header_eez_apps_psu
-    src/eez/apps/psu/board.h
-    src/eez/apps/psu/calibration.h
-    src/eez/apps/psu/channel.h
-    src/eez/apps/psu/channel_dispatcher.h
-    src/eez/apps/psu/conf.h
-    src/eez/apps/psu/conf_advanced.h
-    src/eez/apps/psu/conf_user.h
-    src/eez/apps/psu/datetime.h
-    src/eez/apps/psu/debug.h
-    src/eez/apps/psu/devices.h
-    src/eez/apps/psu/dlog.h
-    src/eez/apps/psu/ethernet.h
-    src/eez/apps/psu/event_queue.h
-    src/eez/apps/psu/idle.h
-    src/eez/apps/psu/init.h
-    src/eez/apps/psu/io_pins.h
-    src/eez/apps/psu/list_program.h
-    src/eez/apps/psu/ntp.h
-    src/eez/apps/psu/ontime.h
-    src/eez/apps/psu/persist_conf.h
-    src/eez/apps/psu/profile.h
-    src/eez/apps/psu/psu.h
-    src/eez/apps/psu/rtc.h
-    src/eez/apps/psu/sd_card.h
-    src/eez/apps/psu/serial_psu.h
-    src/eez/apps/psu/temp_sensor.h
-    src/eez/apps/psu/temperature.h
-    src/eez/apps/psu/timer.h
-    src/eez/apps/psu/trigger.h
-    src/eez/apps/psu/util.h
+list (APPEND src_files ${src_eez_modules_psu_gui})
+set(header_eez_modules_psu_gui
+    src/eez/modules/psu/gui/animations.h
+    src/eez/modules/psu/gui/calibration.h
+    src/eez/modules/psu/gui/data.h
+    src/eez/modules/psu/gui/edit_mode.h
+    src/eez/modules/psu/gui/edit_mode_keypad.h
+    src/eez/modules/psu/gui/edit_mode_slider.h
+    src/eez/modules/psu/gui/edit_mode_step.h
+    src/eez/modules/psu/gui/keypad.h
+    src/eez/modules/psu/gui/numeric_keypad.h
+    src/eez/modules/psu/gui/page_ch_settings_adv.h
+    src/eez/modules/psu/gui/page_ch_settings_protection.h
+    src/eez/modules/psu/gui/page_ch_settings_trigger.h
+    src/eez/modules/psu/gui/page_event_queue.h
+    src/eez/modules/psu/gui/page_self_test_result.h
+    src/eez/modules/psu/gui/page_sys_settings.h
+    src/eez/modules/psu/gui/page_user_profiles.h
+    src/eez/modules/psu/gui/password.h
+    src/eez/modules/psu/gui/psu.h
+    src/eez/modules/psu/gui/touch_calibration.h
 )
-list (APPEND header_files ${header_eez_apps_psu})
-source_group("eez\\apps\\psu" FILES ${src_eez_apps_psu} ${header_eez_apps_psu})
+list (APPEND header_files ${header_eez_modules_psu_gui})
+source_group("eez\\modules\\psu\\gui" FILES ${src_eez_modules_psu_gui} ${header_eez_modules_psu_gui})
 
-set(src_eez_apps_psu_gui
-    src/eez/apps/psu/gui/animations.cpp
-    src/eez/apps/psu/gui/calibration.cpp
-    src/eez/apps/psu/gui/data.cpp
-    src/eez/apps/psu/gui/edit_mode.cpp
-    src/eez/apps/psu/gui/edit_mode_keypad.cpp
-    src/eez/apps/psu/gui/edit_mode_slider.cpp
-    src/eez/apps/psu/gui/edit_mode_step.cpp
-    src/eez/apps/psu/gui/keypad.cpp
-    src/eez/apps/psu/gui/numeric_keypad.cpp
-    src/eez/apps/psu/gui/page_ch_settings_adv.cpp
-    src/eez/apps/psu/gui/page_ch_settings_protection.cpp
-    src/eez/apps/psu/gui/page_ch_settings_trigger.cpp
-    src/eez/apps/psu/gui/page_event_queue.cpp
-    src/eez/apps/psu/gui/page_self_test_result.cpp
-    src/eez/apps/psu/gui/page_sys_settings.cpp
-    src/eez/apps/psu/gui/page_user_profiles.cpp
-    src/eez/apps/psu/gui/password.cpp
-    src/eez/apps/psu/gui/psu.cpp
+set(src_eez_modules_psu_scpi
+    src/eez/modules/psu/scpi/appl.cpp
+    src/eez/modules/psu/scpi/cal.cpp
+    src/eez/modules/psu/scpi/core.cpp
+    src/eez/modules/psu/scpi/debug.cpp
+    src/eez/modules/psu/scpi/diag.cpp
+    src/eez/modules/psu/scpi/display.cpp
+    src/eez/modules/psu/scpi/dlog.cpp
+    src/eez/modules/psu/scpi/inst.cpp
+    src/eez/modules/psu/scpi/meas.cpp
+    src/eez/modules/psu/scpi/mem.cpp
+    src/eez/modules/psu/scpi/mmem.cpp
+    src/eez/modules/psu/scpi/outp.cpp
+    src/eez/modules/psu/scpi/params.cpp
+    src/eez/modules/psu/scpi/psu.cpp
+    src/eez/modules/psu/scpi/sense.cpp
+    src/eez/modules/psu/scpi/simu.cpp
+    src/eez/modules/psu/scpi/sour.cpp
+    src/eez/modules/psu/scpi/stat.cpp
+    src/eez/modules/psu/scpi/syst.cpp
+    src/eez/modules/psu/scpi/trigger.cpp
 )
-list (APPEND src_files ${src_eez_apps_psu_gui})
-set(header_eez_apps_psu_gui
-    src/eez/apps/psu/gui/animations.h
-    src/eez/apps/psu/gui/calibration.h
-    src/eez/apps/psu/gui/data.h
-    src/eez/apps/psu/gui/edit_mode.h
-    src/eez/apps/psu/gui/edit_mode_keypad.h
-    src/eez/apps/psu/gui/edit_mode_slider.h
-    src/eez/apps/psu/gui/edit_mode_step.h
-    src/eez/apps/psu/gui/keypad.h
-    src/eez/apps/psu/gui/numeric_keypad.h
-    src/eez/apps/psu/gui/page_ch_settings_adv.h
-    src/eez/apps/psu/gui/page_ch_settings_protection.h
-    src/eez/apps/psu/gui/page_ch_settings_trigger.h
-    src/eez/apps/psu/gui/page_event_queue.h
-    src/eez/apps/psu/gui/page_self_test_result.h
-    src/eez/apps/psu/gui/page_sys_settings.h
-    src/eez/apps/psu/gui/page_user_profiles.h
-    src/eez/apps/psu/gui/password.h
-    src/eez/apps/psu/gui/psu.h
+list (APPEND src_files ${src_eez_modules_psu_scpi})
+set(header_eez_modules_psu_scpi
+    src/eez/modules/psu/scpi/params.h
+    src/eez/modules/psu/scpi/psu.h
 )
-list (APPEND header_files ${header_eez_apps_psu_gui})
-source_group("eez\\apps\\psu\\gui" FILES ${src_eez_apps_psu_gui} ${header_eez_apps_psu_gui})
-
-set(src_eez_apps_psu_scpi
-    src/eez/apps/psu/scpi/appl.cpp
-    src/eez/apps/psu/scpi/cal.cpp
-    src/eez/apps/psu/scpi/core.cpp
-    src/eez/apps/psu/scpi/debug.cpp
-    src/eez/apps/psu/scpi/diag.cpp
-    src/eez/apps/psu/scpi/display.cpp
-    src/eez/apps/psu/scpi/dlog.cpp
-    src/eez/apps/psu/scpi/inst.cpp
-    src/eez/apps/psu/scpi/meas.cpp
-    src/eez/apps/psu/scpi/mem.cpp
-    src/eez/apps/psu/scpi/mmem.cpp
-    src/eez/apps/psu/scpi/outp.cpp
-    src/eez/apps/psu/scpi/params.cpp
-    src/eez/apps/psu/scpi/psu.cpp
-    src/eez/apps/psu/scpi/sense.cpp
-    src/eez/apps/psu/scpi/simu.cpp
-    src/eez/apps/psu/scpi/sour.cpp
-    src/eez/apps/psu/scpi/stat.cpp
-    src/eez/apps/psu/scpi/syst.cpp
-    src/eez/apps/psu/scpi/trigger.cpp
-)
-list (APPEND src_files ${src_eez_apps_psu_scpi})
-set(header_eez_apps_psu_scpi
-    src/eez/apps/psu/scpi/params.h
-    src/eez/apps/psu/scpi/psu.h
-)
-list (APPEND header_files ${header_eez_apps_psu_scpi})
-source_group("eez\\apps\\psu\\scpi" FILES ${src_eez_apps_psu_scpi} ${header_eez_apps_psu_scpi})
-
-set(src_eez_apps_settings
-    src/eez/apps/settings/settings.cpp
-)
-list (APPEND src_files ${src_eez_apps_settings})
-set(header_eez_apps_settings
-    src/eez/apps/settings/settings.h
-)
-list (APPEND header_files ${header_eez_apps_settings})
-source_group("eez\\apps\\settings" FILES ${src_eez_apps_settings} ${header_eez_apps_settings})
+list (APPEND header_files ${header_eez_modules_psu_scpi})
+source_group("eez\\modules\\psu\\scpi" FILES ${src_eez_modules_psu_scpi} ${header_eez_modules_psu_scpi})
 
 set(src_eez_gui
     src/eez/gui/action_impl.cpp

@@ -37,8 +37,8 @@
 #include <eez/index.h>
 
 // TODO
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/persist_conf.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/persist_conf.h>
 
 namespace eez {
 namespace gui {

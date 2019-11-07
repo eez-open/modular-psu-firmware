@@ -34,9 +34,9 @@
 #include <eez/modules/mcu/button.h>
 #endif
 
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/persist_conf.h>
-#include <eez/apps/psu/gui/edit_mode_step.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/persist_conf.h>
+#include <eez/modules/psu/gui/edit_mode_step.h>
 
 namespace eez {
 namespace mcu {

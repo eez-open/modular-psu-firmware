@@ -23,12 +23,12 @@
 #if OPTION_DISPLAY
 
 // TODO this must be removed from here
-#include <eez/apps/psu/psu.h>
+#include <eez/modules/psu/psu.h>
 
-#include <eez/apps/psu/devices.h>
-#include <eez/apps/psu/idle.h>
+#include <eez/modules/psu/devices.h>
+#include <eez/modules/psu/idle.h>
 
-#include <eez/apps/psu/gui/psu.h>
+#include <eez/modules/psu/gui/psu.h>
 //
 
 #include <eez/gui/assets.h>

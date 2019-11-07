@@ -28,8 +28,8 @@
 
 #include <eez/modules/dcpX05/channel.h>
 
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/event_queue.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/event_queue.h>
 #include <eez/scpi/regs.h>
 #include <eez/system.h>
 

@@ -36,9 +36,9 @@
 
 #include <eez/sound.h>
 #include <eez/system.h>
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/timer.h>
-#include <eez/apps/psu/persist_conf.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/timer.h>
+#include <eez/modules/psu/persist_conf.h>
 
 #define NOTE_B0 31
 #define NOTE_C1 33

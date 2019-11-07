@@ -21,9 +21,9 @@
 #include <eez/modules/dcpX05/dac.h>
 #include <eez/modules/dcpX05/ioexp.h>
 
-#include <eez/apps/psu/psu.h>
-#include <eez/apps/psu/profile.h>
-#include <eez/apps/psu/channel_dispatcher.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/profile.h>
+#include <eez/modules/psu/channel_dispatcher.h>
 
 #include <eez/scpi/regs.h>
 
