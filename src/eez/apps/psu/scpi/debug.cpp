@@ -272,13 +272,10 @@ scpi_result_t scpi_cmd_debugFan(scpi_t *context) {
     }
 
     if (fanSpeed < 0) {
-        persist_conf::devConf2.fanMode = FAN_MODE_AUTO;
+        persist_conf::setFanSettings(FAN_MODE_AUTO, 100);
     } else {
-        persist_conf::devConf2.fanMode = FAN_MODE_MANUAL;
-        persist_conf::devConf2.fanSpeed = (uint8_t)MIN(fanSpeed, 100);
+        persist_conf::setFanSettings(FAN_MODE_MANUAL, (uint8_t)MIN(fanSpeed, 100));
     }
-
-    persist_conf::saveDevice2();
 
     return SCPI_RES_OK;
 #else
@@ -290,7 +287,7 @@ scpi_result_t scpi_cmd_debugFan(scpi_t *context) {
 scpi_result_t scpi_cmd_debugFanQ(scpi_t *context) {
 #if OPTION_FAN
     // TODO migrate to generic firmware
-    SCPI_ResultInt(context, persist_conf::devConf2.fanMode = FAN_MODE_MANUAL ? persist_conf::devConf2.fanSpeed : -1);
+    SCPI_ResultInt(context, persist_conf::devConf.fanMode == FAN_MODE_MANUAL ? persist_conf::devConf.fanSpeed : -1);
 
     return SCPI_RES_OK;
 #else

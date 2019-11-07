@@ -179,21 +179,6 @@ static bool testMaster();
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void loadConf() {
-    // loads global configuration parameters
-    persist_conf::loadDevice();
-
-    // loads global configuration parameters block 2
-    persist_conf::loadDevice2();
-
-    // load channels calibration parameters
-    for (int i = 0; i < CH_NUM; ++i) {
-        if (Channel::get(i).isInstalled()) {
-            persist_conf::loadChannelCalibration(Channel::get(i));
-        }
-    }
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
@@ -252,7 +237,7 @@ void init() {
     }
     CH_NUM = channelIndex;
 
-    loadConf();
+    persist_conf::init();
 
     serial::init();
 
@@ -594,7 +579,7 @@ bool powerUp() {
 
     sound::playPowerUp(sound::PLAY_POWER_UP_CONDITION_NONE);
 
-    g_rlState = persist_conf::devConf.flags.isFrontPanelLocked ? RL_STATE_REMOTE : RL_STATE_LOCAL;
+    g_rlState = persist_conf::devConf.isFrontPanelLocked ? RL_STATE_REMOTE : RL_STATE_LOCAL;
 
 #if OPTION_DISPLAY
     eez::gui::showWelcomePage();

@@ -371,6 +371,26 @@ scpi_result_t scpi_cmd_instrumentMemoryQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_instrumentCatalogFullQ(scpi_t *context) {
+    SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+    return SCPI_RES_ERR;
+}
+
+scpi_result_t scpi_cmd_instrumentCatalogQ(scpi_t *context) {
+    SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+    return SCPI_RES_ERR;
+}
+
+scpi_result_t scpi_cmd_instrumentCoupleTrigger(scpi_t *context) {
+    SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+    return SCPI_RES_ERR;
+}
+
+scpi_result_t scpi_cmd_instrumentCoupleTriggerQ(scpi_t *context) {
+    SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+    return SCPI_RES_ERR;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

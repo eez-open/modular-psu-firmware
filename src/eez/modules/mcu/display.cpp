@@ -55,8 +55,8 @@ static const uint16_t *g_colors;
 
 void onThemeChanged() {
 	if (g_assetsLoaded) {
-		g_themeColors = getThemeColors(psu::persist_conf::devConf2.selectedThemeIndex);
-		g_themeColorsCount = getThemeColorsCount(psu::persist_conf::devConf2.selectedThemeIndex);
+		g_themeColors = getThemeColors(psu::persist_conf::devConf.selectedThemeIndex);
+		g_themeColorsCount = getThemeColorsCount(psu::persist_conf::devConf.selectedThemeIndex);
 		g_colors = getColors();
 	}
 }
@@ -139,7 +139,7 @@ void hslToRgb(float h, float s, float l, float &r, float &g, float &b) {
 }
 
 void adjustColor(uint16_t &c) {
-    if (psu::persist_conf::devConf2.displayBackgroundLuminosityStep == DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT) {
+    if (psu::persist_conf::devConf.displayBackgroundLuminosityStep == DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT) {
         return;
     }
 
@@ -168,7 +168,7 @@ void adjustColor(uint16_t &c) {
     float lmin = l - a;
     float lmax = l + a;
 
-    float lNew = remap((float)psu::persist_conf::devConf2.displayBackgroundLuminosityStep,
+    float lNew = remap((float)psu::persist_conf::devConf.displayBackgroundLuminosityStep,
         (float)DISPLAY_BACKGROUND_LUMINOSITY_STEP_MIN,
         lmin,
         (float)DISPLAY_BACKGROUND_LUMINOSITY_STEP_MAX,

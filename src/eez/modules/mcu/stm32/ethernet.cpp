@@ -180,7 +180,7 @@ static void mainLoop(const void *) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void begin(uint8_t *mac, uint8_t *, uint8_t *, uint8_t *, uint8_t *) {
+void begin(const uint8_t *mac, const uint8_t *, const uint8_t *, const uint8_t *, const uint8_t *) {
 	g_connectionState = CONNECTION_STATE_CONNECTING;
 	osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_CONNECT, osWaitForever);
 }

@@ -268,7 +268,7 @@ static void doUnlockFrontPanel() {
 }
 
 static void checkPasswordToUnlockFrontPanel() {
-    psu::gui::checkPassword("Password: ", psu::persist_conf::devConf2.systemPassword, doUnlockFrontPanel);
+    psu::gui::checkPassword("Password: ", psu::persist_conf::devConf.systemPassword, doUnlockFrontPanel);
 }
 
 void lockFrontPanel() {
@@ -277,7 +277,7 @@ void lockFrontPanel() {
 }
 
 void unlockFrontPanel() {
-    if (strlen(psu::persist_conf::devConf2.systemPassword) > 0) {
+    if (strlen(psu::persist_conf::devConf.systemPassword) > 0) {
         checkPasswordToUnlockFrontPanel();
     } else {
         psu::persist_conf::lockFrontPanel(false);
@@ -410,7 +410,7 @@ void animate(Buffer startBuffer, void(*callback)(float t, void *bufferOld, void 
     }
     g_animationState.enabled = true;
     g_animationState.startTime = millis();
-    g_animationState.duration = duration != -1 ? duration : psu::persist_conf::devConf2.animationsDuration;
+    g_animationState.duration = duration != -1 ? duration : psu::persist_conf::devConf.animationsDuration;
     g_animationState.startBuffer = startBuffer;
     g_animationState.callback = callback;
     g_animationState.easingRects = remapOutQuad;

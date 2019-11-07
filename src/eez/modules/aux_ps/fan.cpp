@@ -383,8 +383,8 @@ void updateFanSpeed() {
         fanMode = page->fanMode;
         fanSpeed = (uint8_t)page->fanSpeed.getFloat();
     } else {
-        fanMode = psu::persist_conf::devConf2.fanMode;
-        fanSpeed = psu::persist_conf::devConf2.fanSpeed;
+        fanMode = psu::persist_conf::devConf.fanMode;
+        fanSpeed = psu::persist_conf::devConf.fanSpeed;
     }
 
     if (fanMode == FAN_MODE_MANUAL) {

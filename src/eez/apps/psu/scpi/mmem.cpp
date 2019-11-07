@@ -608,7 +608,7 @@ scpi_result_t scpi_cmd_mmemoryTimeQ(scpi_t *context) {
 scpi_result_t scpi_cmd_mmemoryLock(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
-    if (!checkPassword(context, persist_conf::devConf2.systemPassword)) {
+    if (!checkPassword(context, persist_conf::devConf.systemPassword)) {
         return SCPI_RES_ERR;
     }
 
@@ -635,7 +635,7 @@ scpi_result_t scpi_cmd_mmemoryLockQ(scpi_t *context) {
 scpi_result_t scpi_cmd_mmemoryUnlock(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
-    if (!checkPassword(context, persist_conf::devConf2.systemPassword)) {
+    if (!checkPassword(context, persist_conf::devConf.systemPassword)) {
         return SCPI_RES_ERR;
     }
 

@@ -140,8 +140,7 @@ scpi_result_t scpi_cmd_systemDate(scpi_t *context) {
 
 scpi_result_t scpi_cmd_systemDateClear(scpi_t *context) {
     // TODO migrate to generic firmware
-    persist_conf::devConf.flags.dateValid = 0;
-    persist_conf::saveDevice();
+    persist_conf::setDateValid(0);
     return SCPI_RES_OK;
 }
 
@@ -192,8 +191,7 @@ scpi_result_t scpi_cmd_systemTime(scpi_t *context) {
 
 scpi_result_t scpi_cmd_systemTimeClear(scpi_t *context) {
     // TODO migrate to generic firmware
-    persist_conf::devConf.flags.timeValid = 0;
-    persist_conf::saveDevice();
+    persist_conf::setTimeValid(0);
     return SCPI_RES_OK;
 }
 
@@ -226,8 +224,7 @@ scpi_result_t scpi_cmd_systemTimeDst(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    persist_conf::devConf2.dstRule = (uint8_t)dstRule;
-    persist_conf::saveDevice2();
+    persist_conf::setDstRule((uint8_t)dstRule);
 
 #if OPTION_ETHERNET
     ntp::reset();
@@ -238,7 +235,7 @@ scpi_result_t scpi_cmd_systemTimeDst(scpi_t *context) {
 
 scpi_result_t scpi_cmd_systemTimeDstQ(scpi_t *context) {
     // TODO migrate to generic firmware
-    resultChoiceName(context, dstChoice, persist_conf::devConf2.dstRule);
+    resultChoiceName(context, dstChoice, persist_conf::devConf.dstRule);
     return SCPI_RES_OK;
 }
 
@@ -257,8 +254,7 @@ scpi_result_t scpi_cmd_systemTimeZone(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    persist_conf::devConf.time_zone = timeZone;
-    persist_conf::saveDevice();
+    persist_conf::setTimeZone(timeZone);
 
 #if OPTION_ETHERNET
     ntp::reset();
@@ -722,7 +718,7 @@ scpi_result_t scpi_cmd_systemPonOutputDisableQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_systemPasswordNew(scpi_t *context) {
     // TODO migrate to generic firmware
-    if (!checkPassword(context, persist_conf::devConf2.systemPassword)) {
+    if (!checkPassword(context, persist_conf::devConf.systemPassword)) {
         return SCPI_RES_ERR;
     }
 
@@ -979,7 +975,7 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetDhcpQ(scpi_t *context) {
 scpi_result_t scpi_cmd_systemCommunicateEthernetAddress(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_ETHERNET
-    if (!persist_conf::isEthernetEnabled() || persist_conf::devConf2.flags.ethernetDhcpEnabled) {
+    if (!persist_conf::isEthernetEnabled() || persist_conf::devConf.ethernetDhcpEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
@@ -1015,10 +1011,10 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetAddressQ(scpi_t *context) {
     }
 
     char ipAddressStr[16];
-    if (persist_conf::devConf2.flags.ethernetDhcpEnabled) {
+    if (persist_conf::devConf.ethernetDhcpEnabled) {
         ipAddressToString(ethernet::getIpAddress(), ipAddressStr);
     } else {
-        ipAddressToString(persist_conf::devConf2.ethernetIpAddress, ipAddressStr);
+        ipAddressToString(persist_conf::devConf.ethernetIpAddress, ipAddressStr);
     }
     SCPI_ResultText(context, ipAddressStr);
     return SCPI_RES_OK;
@@ -1031,7 +1027,7 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetAddressQ(scpi_t *context) {
 scpi_result_t scpi_cmd_systemCommunicateEthernetDns(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_ETHERNET
-    if (!persist_conf::isEthernetEnabled() || persist_conf::devConf2.flags.ethernetDhcpEnabled) {
+    if (!persist_conf::isEthernetEnabled() || persist_conf::devConf.ethernetDhcpEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
@@ -1066,11 +1062,11 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetDnsQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (persist_conf::devConf2.flags.ethernetDhcpEnabled) {
+    if (persist_conf::devConf.ethernetDhcpEnabled) {
         SCPI_ResultText(context, "unknown");
     } else {
         char ipAddressStr[16];
-        ipAddressToString(persist_conf::devConf2.ethernetDns, ipAddressStr);
+        ipAddressToString(persist_conf::devConf.ethernetDns, ipAddressStr);
         SCPI_ResultText(context, ipAddressStr);
     }
     return SCPI_RES_OK;
@@ -1083,7 +1079,7 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetDnsQ(scpi_t *context) {
 scpi_result_t scpi_cmd_systemCommunicateEthernetGateway(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_ETHERNET
-    if (!persist_conf::isEthernetEnabled() || persist_conf::devConf2.flags.ethernetDhcpEnabled) {
+    if (!persist_conf::isEthernetEnabled() || persist_conf::devConf.ethernetDhcpEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
@@ -1118,11 +1114,11 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetGatewayQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (persist_conf::devConf2.flags.ethernetDhcpEnabled) {
+    if (persist_conf::devConf.ethernetDhcpEnabled) {
         SCPI_ResultText(context, "unknown");
     } else {
         char ipAddressStr[16];
-        ipAddressToString(persist_conf::devConf2.ethernetGateway, ipAddressStr);
+        ipAddressToString(persist_conf::devConf.ethernetGateway, ipAddressStr);
         SCPI_ResultText(context, ipAddressStr);
     }
     return SCPI_RES_OK;
@@ -1135,7 +1131,7 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetGatewayQ(scpi_t *context) {
 scpi_result_t scpi_cmd_systemCommunicateEthernetSmask(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_ETHERNET
-    if (!persist_conf::isEthernetEnabled() || persist_conf::devConf2.flags.ethernetDhcpEnabled) {
+    if (!persist_conf::isEthernetEnabled() || persist_conf::devConf.ethernetDhcpEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
@@ -1170,11 +1166,11 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetSmaskQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (persist_conf::devConf2.flags.ethernetDhcpEnabled) {
+    if (persist_conf::devConf.ethernetDhcpEnabled) {
         SCPI_ResultText(context, "unknown");
     } else {
         char ipAddressStr[16];
-        ipAddressToString(persist_conf::devConf2.ethernetSubnetMask, ipAddressStr);
+        ipAddressToString(persist_conf::devConf.ethernetSubnetMask, ipAddressStr);
         SCPI_ResultText(context, ipAddressStr);
     }
     return SCPI_RES_OK;
@@ -1219,7 +1215,7 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetPortQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultInt(context, persist_conf::devConf2.ethernetScpiPort);
+    SCPI_ResultInt(context, persist_conf::devConf.ethernetScpiPort);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -1261,7 +1257,7 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetMacQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     char macAddressStr[18];
-    macAddressToString(persist_conf::devConf2.ethernetMacAddress, macAddressStr);
+    macAddressToString(persist_conf::devConf.ethernetMacAddress, macAddressStr);
     SCPI_ResultText(context, macAddressStr);
     return SCPI_RES_OK;
 #else
@@ -1297,7 +1293,7 @@ scpi_result_t scpi_cmd_systemCommunicateNtp(scpi_t *context) {
 scpi_result_t scpi_cmd_systemCommunicateNtpQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_ETHERNET
-    SCPI_ResultText(context, persist_conf::devConf2.ntpServer);
+    SCPI_ResultText(context, persist_conf::devConf.ntpServer);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -1325,7 +1321,7 @@ scpi_result_t scpi_cmd_systemDigitalInputDataQ(scpi_t *context) {
 
     pin--;
 
-    if (persist_conf::devConf2.ioPins[pin].function != io_pins::FUNCTION_INPUT) {
+    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_INPUT) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
@@ -1349,7 +1345,7 @@ scpi_result_t scpi_cmd_systemDigitalOutputData(scpi_t *context) {
 
     pin--;
 
-    if (persist_conf::devConf2.ioPins[pin].function != io_pins::FUNCTION_OUTPUT) {
+    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_OUTPUT) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
@@ -1378,7 +1374,7 @@ scpi_result_t scpi_cmd_systemDigitalOutputDataQ(scpi_t *context) {
 
     pin--;
 
-    if (persist_conf::devConf2.ioPins[pin].function != io_pins::FUNCTION_OUTPUT) {
+    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_OUTPUT) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
@@ -1429,7 +1425,7 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
         }
     }
 
-    persist_conf::devConf2.ioPins[pin].function = function;
+    persist_conf::setIoPinFunction(pin, function);
 
     io_pins::refresh();
 
@@ -1447,7 +1443,7 @@ scpi_result_t scpi_cmd_systemDigitalPinFunctionQ(scpi_t *context) {
 
     pin--;
 
-    resultChoiceName(context, functionChoice, persist_conf::devConf2.ioPins[pin].function);
+    resultChoiceName(context, functionChoice, persist_conf::devConf.ioPins[pin].function);
 
     return SCPI_RES_OK;
 }
@@ -1472,7 +1468,7 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarity(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    persist_conf::devConf2.ioPins[pin].polarity = polarity;
+    persist_conf::setIoPinPolarity(pin, polarity);
 
     io_pins::refresh();
 
@@ -1490,7 +1486,7 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarityQ(scpi_t *context) {
 
     pin--;
 
-    resultChoiceName(context, polarityChoice, persist_conf::devConf2.ioPins[pin].polarity);
+    resultChoiceName(context, polarityChoice, persist_conf::devConf.ioPins[pin].polarity);
 
     return SCPI_RES_OK;
 }

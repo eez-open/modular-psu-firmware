@@ -725,7 +725,7 @@ void data_slots(DataOperationEnum operation, Cursor &cursor, Value &value) {
 
 void data_selected_theme(DataOperationEnum operation, Cursor &cursor, Value &value) {
 	if (operation == data::DATA_OPERATION_GET) {
-		value = getThemeName(psu::persist_conf::devConf2.selectedThemeIndex);
+		value = getThemeName(psu::persist_conf::devConf.selectedThemeIndex);
 	}
 }
 
@@ -773,7 +773,7 @@ void data_scripts_page_info(DataOperationEnum operation, Cursor &cursor, Value &
 
 void data_animations_duration(DataOperationEnum operation, Cursor &cursor, Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(psu::persist_conf::devConf2.animationsDuration, UNIT_SECOND);
+        value = data::Value(psu::persist_conf::devConf.animationsDuration, UNIT_SECOND);
     }
 }
 

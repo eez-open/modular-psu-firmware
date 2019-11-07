@@ -72,15 +72,7 @@ void leaveCalibrationMode() {
 }   
 
 void dialogYes() {
-    persist_conf::devConf.touch_screen_cal_tlx = g_points[0].x;
-    persist_conf::devConf.touch_screen_cal_tly = g_points[0].y;
-    persist_conf::devConf.touch_screen_cal_brx = g_points[1].x;
-    persist_conf::devConf.touch_screen_cal_bry = g_points[1].y;
-    persist_conf::devConf.touch_screen_cal_trx = g_points[2].x;
-    persist_conf::devConf.touch_screen_cal_try = g_points[2].y;
-
-    persist_conf::saveDevice();
-
+    persist_conf::setTouchscreenCalParams(g_points[0].x, g_points[0].y, g_points[1].x, g_points[1].y, g_points[2].x, g_points[2].y);
     leaveCalibrationMode();
 }
 

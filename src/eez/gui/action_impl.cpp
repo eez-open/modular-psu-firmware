@@ -527,20 +527,20 @@ void action_toggle_channels_max_view() {
 
     if (getActivePageId() != PAGE_ID_MAIN) {
         showMainPage();
-        persist_conf::setChannelsMaxView(g_channel->slotIndex + 1);
+        persist_conf::setMaxChannelIndex(g_channel->channelIndex);
         animateFromMicroViewToMaxView();
     } else {
-        auto channelsIsMaxView = persist_conf::devConf.flags.channelsIsMaxView;
-        auto slotMax = persist_conf::devConf.flags.slotMax;
+        auto isMaxChannelViewBefore = persist_conf::isMaxChannelView();
+        auto maxChannelIndexBefore = persist_conf::getMaxChannelIndex();
 
-        persist_conf::toggleChannelsMaxView(g_channel->slotIndex + 1);
+        persist_conf::toggleMaxChannelIndex(g_channel->channelIndex);
         
-        if (!channelsIsMaxView && persist_conf::devConf.flags.channelsIsMaxView) {
+        if (!isMaxChannelViewBefore && persist_conf::isMaxChannelView()) {
             animateFromDefaultViewToMaxView();
-        } else if (channelsIsMaxView && !persist_conf::devConf.flags.channelsIsMaxView) {
+        } else if (isMaxChannelViewBefore && !persist_conf::isMaxChannelView()) {
             animateFromMaxViewToDefaultView();
         } else {
-            animateFromMinViewToMaxView(slotMax);
+            animateFromMinViewToMaxView(maxChannelIndexBefore);
         }
     }
 }
@@ -943,14 +943,13 @@ void themesEnumDefinition(data::DataOperationEnum operation, data::Cursor &curso
 
 void onSetSelectedThemeIndex(uint16_t value) {
     popPage();
-	persist_conf::devConf2.selectedThemeIndex = (uint8_t)value;
-	persist_conf::saveDevice2();
+	persist_conf::setSelectedThemeIndex((uint8_t)value);
     mcu::display::onThemeChanged();
 	refreshScreen();
 }
 
 void action_select_theme() {
-    pushSelectFromEnumPage(themesEnumDefinition, persist_conf::devConf2.selectedThemeIndex, NULL, onSetSelectedThemeIndex);
+    pushSelectFromEnumPage(themesEnumDefinition, persist_conf::devConf.selectedThemeIndex, NULL, onSetSelectedThemeIndex);
 }
 
 void onSetAnimationsDuration(float value) {
@@ -971,7 +970,7 @@ void action_edit_animations_duration() {
     options.flags.signButtonEnabled = false;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, data::Value(psu::persist_conf::devConf2.animationsDuration, UNIT_SECOND), options, onSetAnimationsDuration, 0, 0);
+    NumericKeypad::start(0, data::Value(psu::persist_conf::devConf.animationsDuration, UNIT_SECOND), options, onSetAnimationsDuration, 0, 0);
 }
 
 void action_test() {

@@ -106,7 +106,7 @@ uint32_t getIpAddress(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
 bool parseIpAddress(const char *ipAddressStr, size_t ipAddressStrLength, uint32_t &ipAddress);
 void ipAddressToString(uint32_t ipAddress, char *ipAddressStr);
 
-void macAddressToString(uint8_t *macAddress, char *macAddressStr);
+void macAddressToString(const uint8_t *macAddress, char *macAddressStr);
 
 void formatTimeZone(int16_t timeZone, char *text, int count);
 bool parseTimeZone(const char *timeZoneStr, size_t timeZoneLength, int16_t &timeZone);

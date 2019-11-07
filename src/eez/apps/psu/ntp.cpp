@@ -62,15 +62,15 @@ const char *getNtpServer() {
             return g_ntpServerToTest;
         }
     } else {
-        if (persist_conf::devConf2.ntpServer[0]) {
-            return persist_conf::devConf2.ntpServer;
+        if (persist_conf::devConf.ntpServer[0]) {
+            return persist_conf::devConf.ntpServer;
         }
     }
     return NULL;
 }
 
 extern "C" void sntpSetSystemTimeUs(uint32_t utc, uint32_t us) {
-	 uint32_t local = datetime::utcToLocal(utc, persist_conf::devConf.time_zone, (datetime::DstRule)persist_conf::devConf2.dstRule);
+	 uint32_t local = datetime::utcToLocal(utc, persist_conf::devConf.time_zone, (datetime::DstRule)persist_conf::devConf.dstRule);
 	 int year, month, day, hour, minute, second;
 	 datetime::breakTime(local, year, month, day, hour, minute, second);
 	 datetime::setDateTime(year - 2000, month, day, hour, minute, second, false, 2);

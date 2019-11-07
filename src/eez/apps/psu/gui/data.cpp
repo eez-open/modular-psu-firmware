@@ -668,11 +668,11 @@ void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count)
     auto &channel = Channel::get(value.getInt());
     auto &slot = g_slots[channel.slotIndex];
     if (channel.flags.trackingEnabled) {
-        snprintf(text, count - 1, "\xA2 %s #%d: %dV/%dA, R%dB%d", slot.moduleInfo->moduleName, slot.channelIndex + 1, 
+        snprintf(text, count - 1, "\xA2 %s #%d: %dV/%dA, R%dB%d", slot.moduleInfo->moduleName, channel.channelIndex + 1, 
             (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
             (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     } else {
-        snprintf(text, count - 1, "%s #%d: %dV/%dA, R%dB%d", g_slots[channel.slotIndex].moduleInfo->moduleName, slot.channelIndex + 1, 
+        snprintf(text, count - 1, "%s #%d: %dV/%dA, R%dB%d", g_slots[channel.slotIndex].moduleInfo->moduleName, channel.channelIndex + 1, 
             (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
             (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     }
@@ -1187,31 +1187,30 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_channels_is_max_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        // TODO
-        value = (int)persist_conf::devConf.flags.channelsIsMaxView;
+        value = (int)persist_conf::isMaxChannelView();
     }
 }
 
 void data_channels_view_mode(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = (int)persist_conf::devConf.flags.channelsViewMode;
+        value = (int)persist_conf::devConf.channelsViewMode;
     }
 }
 
 void data_channels_view_mode_in_default(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = (int)persist_conf::devConf.flags.channelsViewMode;
+        value = (int)persist_conf::devConf.channelsViewMode;
     }
 }
 
 void data_channels_view_mode_in_max(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = (int)persist_conf::devConf.flags.channelsViewModeInMax;
+        value = (int)persist_conf::devConf.channelsViewModeInMax;
     }
 }
 
 int getDefaultView(int channelIndex) {
-    int isVert = persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+    int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
 
     Channel &channel = Channel::get(channelIndex);
     if (channel.isInstalled()) {
@@ -1219,24 +1218,24 @@ int getDefaultView(int channelIndex) {
             int numChannels = g_slots[channel.slotIndex].moduleInfo->numChannels;
             if (numChannels == 1) {
                 if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
-                    if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+                    if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
                         return PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_SERIES;
                     } else {
                         return PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_SERIES;
                     }
                 } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
-                    if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+                    if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
                         return PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_PARALLEL;
                     } else {
                         return PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_PARALLEL;
                     }
-                } else if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
+                } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
                     return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_NUM_ON : PAGE_ID_SLOT_DEF_1CH_VERT_OFF;
-                } else if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+                } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
                     return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_VBAR_ON : PAGE_ID_SLOT_DEF_1CH_VERT_OFF;
-                } else if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
+                } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
                     return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_HBAR_ON : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF;
-                } else if (persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_YT) {
+                } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_YT) {
                     return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_YT_ON : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF;
                 } else {
                     return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
@@ -1313,7 +1312,7 @@ void data_slot_default3_view(data::DataOperationEnum operation, data::Cursor &cu
 
 void data_slot_max_channel_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
-        Channel &channel = Channel::getBySlotIndex(persist_conf::devConf.flags.slotMax - 1);
+        Channel &channel = Channel::get(persist_conf::getMaxChannelIndex());
         cursor.i = channel.channelIndex;
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
         g_channel = &channel;
@@ -1331,11 +1330,11 @@ void data_slot_max_view(data::DataOperationEnum operation, data::Cursor &cursor,
             if (channel.isOk()) {
                 int numChannels = g_slots[channel.slotIndex].moduleInfo->numChannels;
                 if (numChannels == 1) {
-                    if (persist_conf::devConf.flags.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
+                    if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
                         value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_NUM_ON : PAGE_ID_SLOT_MAX_1CH_NUM_OFF;
-                    } else if (persist_conf::devConf.flags.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
+                    } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
                         value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_HBAR_ON : PAGE_ID_SLOT_MAX_1CH_HBAR_OFF;
-                    } else if (persist_conf::devConf.flags.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT) {
+                    } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT) {
                         value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_YT_ON : PAGE_ID_SLOT_MAX_1CH_YT_OFF;
                     } else {
                         value = PAGE_ID_SLOT_MAX_ERROR;
@@ -1382,7 +1381,7 @@ int getMinView(int channelIndex) {
 
 void data_slot_min1_channel_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
-        Channel &channel = Channel::getBySlotIndex(persist_conf::devConf.flags.slotMin1 - 1);
+        Channel &channel = Channel::get(persist_conf::getMin1ChannelIndex());
         cursor.i = channel.channelIndex;
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
         g_channel = &channel;
@@ -1401,7 +1400,7 @@ void data_slot_min1_view(data::DataOperationEnum operation, data::Cursor &cursor
 
 void data_slot_min2_channel_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
-        Channel &channel = Channel::getBySlotIndex(persist_conf::devConf.flags.slotMin2 - 1);
+        Channel &channel = Channel::get(persist_conf::getMin2ChannelIndex());
         cursor.i = channel.channelIndex;
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
         g_channel = &channel;
@@ -1476,7 +1475,11 @@ void data_slot_2ch_ch1_index(data::DataOperationEnum operation, data::Cursor &cu
 
 void data_slot_2ch_ch2_index(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
-        cursor.i = cursor.i + 1;
+        if (cursor.i == persist_conf::getMaxChannelIndex() && Channel::get(cursor.i).subchannelIndex == 1) {
+            cursor.i = cursor.i - 1;
+        } else {
+            cursor.i = cursor.i + 1;
+        }
         Channel &channel = Channel::get(cursor.i);
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
         g_channel = &channel;
@@ -1490,7 +1493,7 @@ void data_slot_2ch_ch2_index(data::DataOperationEnum operation, data::Cursor &cu
 void data_slot_def_2ch_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor.i);
-        int isVert = persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+        int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
         value = channel.isOutputEnabled() ? 
             (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_ON : PAGE_ID_SLOT_DEF_2CH_HORZ_ON) :
             (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_OFF : PAGE_ID_SLOT_DEF_2CH_HORZ_OFF);
@@ -1500,9 +1503,24 @@ void data_slot_def_2ch_view(data::DataOperationEnum operation, data::Cursor &cur
 void data_slot_max_2ch_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor.i);
-        value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_2CH_ON : PAGE_ID_SLOT_MAX_2CH_OFF;
+
+        if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
+            value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_2CH_NUM_ON : PAGE_ID_SLOT_MAX_2CH_NUM_OFF;
+        } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
+            value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_2CH_HBAR_ON : PAGE_ID_SLOT_MAX_2CH_HBAR_OFF;
+        } else {
+            value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_2CH_YT_ON : PAGE_ID_SLOT_MAX_2CH_YT_OFF;
+        }
     }
 }
+
+void data_slot_max_2ch_min_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor.i);
+        value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_2CH_MIN_ON : PAGE_ID_SLOT_MAX_2CH_MIN_OFF;
+    }
+}
+
 
 void data_slot_min_2ch_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
@@ -3264,7 +3282,7 @@ void data_sys_force_disabling_all_outputs_on_power_up(data::DataOperationEnum op
 
 void data_sys_password_is_set(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = strlen(persist_conf::devConf2.systemPassword) > 0;
+        value = strlen(persist_conf::devConf.systemPassword) > 0;
     }
 }
 
@@ -3397,13 +3415,13 @@ void data_sys_encoder_installed(data::DataOperationEnum operation, data::Cursor 
 
 void data_sys_display_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = (int)persist_conf::devConf2.flags.displayState;
+        value = (int)persist_conf::devConf.displayState;
     }
 }
 
 void data_sys_display_brightness(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(persist_conf::devConf2.displayBrightness);
+        value = data::Value(persist_conf::devConf.displayBrightness);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = DISPLAY_BRIGHTNESS_MIN;
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
@@ -3837,16 +3855,16 @@ void data_io_pins(data::DataOperationEnum operation, data::Cursor &cursor, data:
 
 void data_io_pins_inhibit_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        persist_conf::IOPin &inputPin1 = persist_conf::devConf2.ioPins[0];
-        persist_conf::IOPin &inputPin2 = persist_conf::devConf2.ioPins[1];
+        const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
+        const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
         if (inputPin1.function == io_pins::FUNCTION_INHIBIT || inputPin2.function == io_pins::FUNCTION_INHIBIT) {
             value = io_pins::isInhibited();
         } else {
             value = 2;
         }
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
-        persist_conf::IOPin &inputPin1 = persist_conf::devConf2.ioPins[0];
-        persist_conf::IOPin &inputPin2 = persist_conf::devConf2.ioPins[1];
+        const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
+        const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
         value = (inputPin1.function == io_pins::FUNCTION_INHIBIT || inputPin2.function == io_pins::FUNCTION_INHIBIT) && io_pins::isInhibited();
     }
 }
@@ -3889,11 +3907,11 @@ void data_io_pin_state(data::DataOperationEnum operation, data::Cursor &cursor, 
             } else {
                 int state = io_pins::getPinState(cursor.i);
 
-                if (page->m_polarity[pin] != persist_conf::devConf2.ioPins[pin].polarity) {
+                if (page->m_polarity[pin] != persist_conf::devConf.ioPins[pin].polarity) {
                     state = state ? 0 : 1;
                 }
 
-                if (pin >= 2 && page->m_function[pin] == io_pins::FUNCTION_OUTPUT && persist_conf::devConf2.ioPins[pin].function == io_pins::FUNCTION_OUTPUT) {
+                if (pin >= 2 && page->m_function[pin] == io_pins::FUNCTION_OUTPUT && persist_conf::devConf.ioPins[pin].function == io_pins::FUNCTION_OUTPUT) {
                     if (state) {
                         value = 3; // Active_Changeable
                     } else {
@@ -3929,7 +3947,7 @@ void data_ntp_server(data::DataOperationEnum operation, data::Cursor &cursor, da
 
 void data_sys_display_background_luminosity_step(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(persist_conf::devConf2.displayBackgroundLuminosityStep);
+        value = data::Value(persist_conf::devConf.displayBackgroundLuminosityStep);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = DISPLAY_BACKGROUND_LUMINOSITY_STEP_MIN;
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
@@ -4088,7 +4106,7 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data:
                         overlay.height += listGridWidget->h;
                     } else {
                         widgetOverrides[LIST_GRID_WIDGET].h = listGridWidget->h;
-                        if (list::g_numChannelsWithVisibleCounters == 1) {
+                        if (list::g_numChannelsWithVisibleCounters == 1 && !isDlogVisible) {
                             widgetOverrides[LIST_GRID_WIDGET].w = listGridWidget->w / 2;
                             overlay.width -= listGridWidget->w / 2;
                         }
@@ -4156,7 +4174,7 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
     } else if (operation >= DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE2) {
         value = g_appContext->getHistoryValue(cursor, operation - DATA_OPERATION_YT_DATA_GET_VALUE1 == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2, value.getUInt32());
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
-        value = Value(psu::persist_conf::devConf2.ytGraphUpdateMethod, VALUE_TYPE_UINT8);
+        value = Value(psu::persist_conf::devConf.ytGraphUpdateMethod, VALUE_TYPE_UINT8);
     }
 }
 

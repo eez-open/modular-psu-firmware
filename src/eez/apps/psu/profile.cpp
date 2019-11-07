@@ -335,7 +335,7 @@ void fillProfile(Parameters *pProfile) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool isAutoSaveAllowed() {
-    return persist_conf::devConf.flags.profileAutoRecallEnabled && persist_conf::devConf.profile_auto_recall_location == 0;
+    return persist_conf::devConf.profileAutoRecallEnabled && persist_conf::devConf.profile_auto_recall_location == 0;
 }
 
 bool enableSave(bool enable) {

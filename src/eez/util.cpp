@@ -388,7 +388,7 @@ void ipAddressToString(uint32_t ipAddress, char *ipAddressStr) {
             getIpAddressPartC(ipAddress), getIpAddressPartD(ipAddress));
 }
 
-void macAddressToString(uint8_t *macAddress, char *macAddressStr) {
+void macAddressToString(const uint8_t *macAddress, char *macAddressStr) {
     for (int i = 0; i < 6; ++i) {
         macAddressStr[3 * i] = toHexDigit((macAddress[i] & 0xF0) >> 4);
         macAddressStr[3 * i + 1] = toHexDigit(macAddress[i] & 0xF);

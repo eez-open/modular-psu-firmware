@@ -129,21 +129,21 @@ void init() {
     }
 
     if (persist_conf::isEthernetDhcpEnabled()) {
-        eez::mcu::ethernet::begin(persist_conf::devConf2.ethernetMacAddress);
+        eez::mcu::ethernet::begin(persist_conf::devConf.ethernetMacAddress);
     } else {
         uint8_t ipAddress[4];
-        ipAddressToArray(persist_conf::devConf2.ethernetIpAddress, ipAddress);
+        ipAddressToArray(persist_conf::devConf.ethernetIpAddress, ipAddress);
 
         uint8_t dns[4];
-        ipAddressToArray(persist_conf::devConf2.ethernetIpAddress, ipAddress);
+        ipAddressToArray(persist_conf::devConf.ethernetIpAddress, ipAddress);
 
         uint8_t gateway[4];
-        ipAddressToArray(persist_conf::devConf2.ethernetIpAddress, ipAddress);
+        ipAddressToArray(persist_conf::devConf.ethernetIpAddress, ipAddress);
 
         uint8_t subnetMask[4];
-        ipAddressToArray(persist_conf::devConf2.ethernetIpAddress, ipAddress);
+        ipAddressToArray(persist_conf::devConf.ethernetIpAddress, ipAddress);
 
-        eez::mcu::ethernet::begin(persist_conf::devConf2.ethernetMacAddress, ipAddress, dns, gateway, subnetMask);
+        eez::mcu::ethernet::begin(persist_conf::devConf.ethernetMacAddress, ipAddress, dns, gateway, subnetMask);
     }
 
     g_testResult = TEST_CONNECTING;
@@ -169,8 +169,8 @@ void onQueueMessage(uint32_t type, uint32_t param) {
 
         g_testResult = TEST_OK;
 
-        eez::mcu::ethernet::beginServer(persist_conf::devConf2.ethernetScpiPort);
-        //DebugTrace("Listening on port %d", (int)persist_conf::devConf2.ethernetScpiPort);
+        eez::mcu::ethernet::beginServer(persist_conf::devConf.ethernetScpiPort);
+        //DebugTrace("Listening on port %d", (int)persist_conf::devConf.ethernetScpiPort);
     } else if (type == ETHERNET_CLIENT_CONNECTED) {
         g_isConnected = true;
         scpi::emptyBuffer(g_scpiContext);

@@ -148,12 +148,12 @@ bool dstCheck() {
     rtc::readDateTime(year, month, day, hour, minute, second);
     uint32_t now = makeTime(2000 + year, month, day, hour, minute, second);
 
-    bool dst = isDst(now, (DstRule)persist_conf::devConf2.dstRule);
+    bool dst = isDst(now, (DstRule)persist_conf::devConf.dstRule);
 
-    if (dst != persist_conf::devConf.flags.dst) {
+    if (dst != persist_conf::devConf.dst) {
         if (dst) {
             now += SECONDS_PER_HOUR;
-            if (!isDst(now, (DstRule)persist_conf::devConf2.dstRule)) {
+            if (!isDst(now, (DstRule)persist_conf::devConf.dstRule)) {
                 return false;
             }
         } else {
@@ -302,7 +302,7 @@ uint32_t nowUtc() {
     rtc::readDateTime(year, month, day, hour, minute, second);
     uint32_t now = makeTime(2000 + year, month, day, hour, minute, second);
     return localToUtc(now, persist_conf::devConf.time_zone,
-                      (DstRule)persist_conf::devConf2.dstRule);
+                      (DstRule)persist_conf::devConf.dstRule);
 }
 
 uint32_t makeTime(int year, int month, int day, int hour, int minute, int second) {

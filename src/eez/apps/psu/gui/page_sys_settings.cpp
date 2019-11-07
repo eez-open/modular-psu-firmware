@@ -55,8 +55,8 @@ namespace gui {
 void SysSettingsDateTimePage::pageAlloc() {
 #if OPTION_ETHERNET
     ntpEnabled = origNtpEnabled = persist_conf::isNtpEnabled();
-    strcpy(ntpServer, persist_conf::devConf2.ntpServer);
-    strcpy(origNtpServer, persist_conf::devConf2.ntpServer);
+    strcpy(ntpServer, persist_conf::devConf.ntpServer);
+    strcpy(origNtpServer, persist_conf::devConf.ntpServer);
 #else
     ntpEnabled = origNtpEnabled = false;
     strcpy(ntpServer, "");
@@ -64,7 +64,7 @@ void SysSettingsDateTimePage::pageAlloc() {
 #endif
     dateTimeModified = false;
     timeZone = origTimeZone = persist_conf::devConf.time_zone;
-    dstRule = origDstRule = (datetime::DstRule)persist_conf::devConf2.dstRule;
+    dstRule = origDstRule = (datetime::DstRule)persist_conf::devConf.dstRule;
 }
 
 void SysSettingsDateTimePage::toggleNtp() {
@@ -261,8 +261,7 @@ void SysSettingsDateTimePage::doSet() {
 #endif
 
     if (dstRule != origDstRule) {
-        persist_conf::devConf2.dstRule = dstRule;
-        persist_conf::saveDevice2();
+        persist_conf::setDstRule(dstRule);
     }
 
     if (!ntpEnabled && dateTimeModified) {
@@ -271,8 +270,7 @@ void SysSettingsDateTimePage::doSet() {
     }
 
     if (timeZone != origTimeZone) {
-        persist_conf::devConf.time_zone = timeZone;
-        persist_conf::saveDevice();
+        persist_conf::setTimeZone(timeZone);
     }
 
 #if OPTION_ETHERNET
@@ -295,13 +293,13 @@ void SysSettingsDateTimePage::doSet() {
 void SysSettingsEthernetPage::pageAlloc() {
     m_enabledOrig = m_enabled = persist_conf::isEthernetEnabled();
     m_dhcpEnabledOrig = m_dhcpEnabled = persist_conf::isEthernetDhcpEnabled();
-    m_ipAddressOrig = m_ipAddress = persist_conf::devConf2.ethernetIpAddress;
-    m_dnsOrig = m_dns = persist_conf::devConf2.ethernetDns;
-    m_gatewayOrig = m_gateway = persist_conf::devConf2.ethernetGateway;
-    m_subnetMaskOrig = m_subnetMask = persist_conf::devConf2.ethernetSubnetMask;
-    m_scpiPortOrig = m_scpiPort = persist_conf::devConf2.ethernetScpiPort;
-    memcpy(m_macAddressOrig, persist_conf::devConf2.ethernetMacAddress, 6);
-    memcpy(m_macAddress, persist_conf::devConf2.ethernetMacAddress, 6);
+    m_ipAddressOrig = m_ipAddress = persist_conf::devConf.ethernetIpAddress;
+    m_dnsOrig = m_dns = persist_conf::devConf.ethernetDns;
+    m_gatewayOrig = m_gateway = persist_conf::devConf.ethernetGateway;
+    m_subnetMaskOrig = m_subnetMask = persist_conf::devConf.ethernetSubnetMask;
+    m_scpiPortOrig = m_scpiPort = persist_conf::devConf.ethernetScpiPort;
+    memcpy(m_macAddressOrig, persist_conf::devConf.ethernetMacAddress, 6);
+    memcpy(m_macAddress, persist_conf::devConf.ethernetMacAddress, 6);
 }
 
 void SysSettingsEthernetPage::toggle() {
@@ -474,8 +472,8 @@ void SysSettingsTemperaturePage::pageAlloc() {
     maxDelay = OTP_AUX_MAX_DELAY;
     defaultDelay = OTP_CH_DEFAULT_DELAY;
 
-    origFanMode = fanMode = persist_conf::devConf2.fanMode;
-    origFanSpeed = fanSpeed = MakeValue(fanMode == FAN_MODE_AUTO ? 100.0f : 1.0f * persist_conf::devConf2.fanSpeed, UNIT_PERCENT);
+    origFanMode = fanMode = persist_conf::devConf.fanMode;
+    origFanSpeed = fanSpeed = MakeValue(fanMode == FAN_MODE_AUTO ? 100.0f : 1.0f * persist_conf::devConf.fanSpeed, UNIT_PERCENT);
 }
 
 int SysSettingsTemperaturePage::getDirty() {
@@ -572,9 +570,7 @@ void SysSettingsTemperaturePage::setParams() {
 
     profile::save();
 
-    persist_conf::devConf2.fanMode = fanMode;
-    persist_conf::devConf2.fanSpeed = (uint8_t)roundf(fanSpeed.getFloat());
-    persist_conf::saveDevice2();
+    persist_conf::setFanSettings(fanMode, (uint8_t)roundf(fanSpeed.getFloat()));
 
     popPage();
     infoMessage("Aux temp. protection changed!");
@@ -609,9 +605,9 @@ void SysSettingsSoundPage::toggleClickSound() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void SysSettingsEncoderPage::pageAlloc() {
-    origConfirmationMode = confirmationMode = persist_conf::devConf2.flags.encoderConfirmationMode;
-    origMovingSpeedDown = movingSpeedDown = persist_conf::devConf2.encoderMovingSpeedDown;
-    origMovingSpeedUp = movingSpeedUp = persist_conf::devConf2.encoderMovingSpeedUp;
+    origConfirmationMode = confirmationMode = persist_conf::devConf.encoderConfirmationMode;
+    origMovingSpeedDown = movingSpeedDown = persist_conf::devConf.encoderMovingSpeedDown;
+    origMovingSpeedUp = movingSpeedUp = persist_conf::devConf.encoderMovingSpeedUp;
 }
 
 void SysSettingsEncoderPage::toggleConfirmationMode() {
@@ -688,14 +684,12 @@ void SysSettingsTriggerPage::set() {
         trigger::enableInitiateContinuous(m_initiateContinuously);
 
         if (m_source == trigger::SOURCE_PIN1) {
-            persist_conf::devConf2.ioPins[0].function = io_pins::FUNCTION_TINPUT;
+            persist_conf::setIoPinFunction(0, io_pins::FUNCTION_TINPUT);
         }
 
         if (m_source == trigger::SOURCE_PIN2) {
-            persist_conf::devConf2.ioPins[1].function = io_pins::FUNCTION_TINPUT;
+            persist_conf::setIoPinFunction(1, io_pins::FUNCTION_TINPUT);
         }
-
-        persist_conf::saveDevice2();
 
         popPage();
         
@@ -707,8 +701,8 @@ void SysSettingsTriggerPage::set() {
 
 void SysSettingsIOPinsPage::pageAlloc() {
     for (int i = 0; i < NUM_IO_PINS; i++) {
-        m_polarityOrig[i] = m_polarity[i] = (io_pins::Polarity)persist_conf::devConf2.ioPins[i].polarity;
-        m_functionOrig[i] = m_function[i] = (io_pins::Function)persist_conf::devConf2.ioPins[i].function;
+        m_polarityOrig[i] = m_polarity[i] = (io_pins::Polarity)persist_conf::devConf.ioPins[i].polarity;
+        m_functionOrig[i] = m_function[i] = (io_pins::Function)persist_conf::devConf.ioPins[i].function;
     }
 }
 
@@ -743,11 +737,9 @@ int SysSettingsIOPinsPage::getDirty() {
 void SysSettingsIOPinsPage::set() {
     if (getDirty()) {
         for (int i = 0; i < NUM_IO_PINS; i++) {
-            persist_conf::devConf2.ioPins[i].polarity = m_polarity[i];
-            persist_conf::devConf2.ioPins[i].function = m_function[i];
+            persist_conf::setIoPinPolarity(i, m_polarity[i]);
+            persist_conf::setIoPinFunction(i, m_function[i]);
         }
-
-        persist_conf::saveDevice2();
 
         popPage();
 

@@ -124,7 +124,7 @@ void initInputPin(int pin) {
 #if defined EEZ_PLATFORM_STM32
     GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-    persist_conf::IOPin &ioPin = persist_conf::devConf2.ioPins[pin];
+    persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
 
     GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -158,13 +158,13 @@ void tick(uint32_t tickCount) {
     // execute input pins function
     unsigned inhibited = 0;
 
-    persist_conf::IOPin &inputPin1 = persist_conf::devConf2.ioPins[0];
+    const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
     if (inputPin1.function == io_pins::FUNCTION_INHIBIT) {
         int value = ioPinRead(EXT_TRIG1);
         inhibited = (value && inputPin1.polarity == io_pins::POLARITY_POSITIVE) || (!value && inputPin1.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
     }
 
-    persist_conf::IOPin &inputPin2 = persist_conf::devConf2.ioPins[1];
+    const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
     if (inputPin2.function == io_pins::FUNCTION_INHIBIT) {
         int value = ioPinRead(EXT_TRIG2);
         inhibited = (value && inputPin2.polarity == io_pins::POLARITY_POSITIVE) || (!value && inputPin2.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
@@ -182,7 +182,7 @@ void tick(uint32_t tickCount) {
         int32_t diff = tickCount - g_toutputPulseStartTickCount;
         if (diff > CONF_TOUTPUT_PULSE_WIDTH_MS * 1000L) {
             for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
-                persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[pin];
+                const persist_conf::IOPin &outputPin = persist_conf::devConf.ioPins[pin];
                 if (outputPin.function == io_pins::FUNCTION_TOUTPUT) {
                     setPinState(pin, false);
                 }
@@ -196,7 +196,7 @@ void tick(uint32_t tickCount) {
 
     // execute output pins function
     for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
-        persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[pin];
+        const persist_conf::IOPin &outputPin = persist_conf::devConf.ioPins[pin];
 
         if (outputPin.function == io_pins::FUNCTION_FAULT) {
             if (trippedState == UNKNOWN) {
@@ -233,7 +233,7 @@ void tick(uint32_t tickCount) {
 void onTrigger() {
     // start trigger output pulse
     for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
-        persist_conf::IOPin &outputPin = persist_conf::devConf2.ioPins[pin];
+        const persist_conf::IOPin &outputPin = persist_conf::devConf.ioPins[pin];
         if (outputPin.function == io_pins::FUNCTION_TOUTPUT) {
             setPinState(pin, true);
             g_lastState.toutputPulse = 1;
@@ -248,7 +248,7 @@ void refresh() {
         if (pin < 2) {
         	initInputPin(pin);
         } else {
-            persist_conf::IOPin &ioPin = persist_conf::devConf2.ioPins[pin];
+            const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
             if (ioPin.function == io_pins::FUNCTION_NONE) {
                 setPinState(pin, false);
             } else if (ioPin.function == io_pins::FUNCTION_OUTPUT) {
@@ -270,7 +270,7 @@ void setPinState(int pin, bool state) {
     if (pin >= 2) {
         g_pinState[pin] = state;
 
-        if (persist_conf::devConf2.ioPins[pin].polarity == io_pins::POLARITY_NEGATIVE) {
+        if (persist_conf::devConf.ioPins[pin].polarity == io_pins::POLARITY_NEGATIVE) {
             state = !state;
         }
 
@@ -283,12 +283,12 @@ bool getPinState(int pin) {
         bool state;
         if (pin == 0) {
             state = ioPinRead(EXT_TRIG1) ? true : false;
-            if (persist_conf::devConf2.ioPins[0].polarity == io_pins::POLARITY_NEGATIVE) {
+            if (persist_conf::devConf.ioPins[0].polarity == io_pins::POLARITY_NEGATIVE) {
                 state = !state;
             }
         } else {
             state = ioPinRead(EXT_TRIG2) ? true : false;
-            if (persist_conf::devConf2.ioPins[1].polarity == io_pins::POLARITY_NEGATIVE) {
+            if (persist_conf::devConf.ioPins[1].polarity == io_pins::POLARITY_NEGATIVE) {
                 state = !state;
             }
         }

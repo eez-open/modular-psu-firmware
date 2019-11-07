@@ -39,6 +39,7 @@ class Channel;
 namespace profile {
 
 struct Parameters;
+
 }
 } // namespace psu
 } // namespace eez
@@ -55,36 +56,31 @@ struct BlockHeader {
     uint16_t version;
 };
 
-/// Device binary flags stored in DeviceConfiguration.
-struct DeviceFlags {
-    unsigned isSoundEnabled : 1;
-    unsigned dateValid : 1;
-    unsigned timeValid : 1;
-    unsigned profileAutoRecallEnabled : 1;
-    unsigned dst : 1;
-    unsigned channelsViewMode : 3;
-    unsigned ethernetEnabled : 1;
-    unsigned outputProtectionCouple : 1;
-    unsigned shutdownWhenProtectionTripped : 1;
-    unsigned forceDisablingAllOutputsOnPowerUp : 1;
-    unsigned isFrontPanelLocked : 1;
-    unsigned isClickSoundEnabled : 1;
-    unsigned reserved1 : 1; // was ch1CalEnabled
-    unsigned reserved2 : 1; // was ch2CalEnabled
-    unsigned channelsViewModeInMax : 3;
-    unsigned channelsIsMaxView : 1;
-    unsigned slotMax: 2;
-    unsigned slotMin1 : 2;
-    unsigned slotMin2 : 2;
-    unsigned reserved : 6;
+struct IOPin {
+    unsigned polarity : 1;
+    unsigned function : 7;
 };
 
 /// Device configuration block.
 struct DeviceConfiguration {
-    BlockHeader header;
+    // block 1
     char serialNumber[7 + 1];
+    char systemPassword[PASSWORD_MAX_LENGTH + 1];
     char calibration_password[PASSWORD_MAX_LENGTH + 1];
-    DeviceFlags flags;
+
+    int16_t touch_screen_cal_tlx;
+    int16_t touch_screen_cal_tly;
+    int16_t touch_screen_cal_brx;
+    int16_t touch_screen_cal_bry;
+    int16_t touch_screen_cal_trx;
+    int16_t touch_screen_cal_try;
+
+    unsigned skipChannelCalibrations : 1;
+    unsigned skipDateTimeSetup : 1;
+    unsigned skipSerialSetup : 1;
+    unsigned skipEthernetSetup : 1;
+
+    // block 2
     uint8_t date_year;
     uint8_t date_month;
     uint8_t date_day;
@@ -92,82 +88,83 @@ struct DeviceConfiguration {
     uint8_t time_minute;
     uint8_t time_second;
     int16_t time_zone;
+    uint8_t dstRule;
+
+    unsigned dateValid : 1;
+    unsigned timeValid : 1;
+    unsigned dst : 1;
+
+    // block 3
     int8_t profile_auto_recall_location;
-    int8_t touch_screen_cal_orientation;
-    int16_t touch_screen_cal_tlx;
-    int16_t touch_screen_cal_tly;
-    int16_t touch_screen_cal_brx;
-    int16_t touch_screen_cal_bry;
-    int16_t touch_screen_cal_trx;
-    int16_t touch_screen_cal_try;
-};
 
-/// Device binary flags stored in DeviceConfiguration.
-struct DeviceFlags2 {
-    unsigned encoderConfirmationMode : 1;
-    unsigned displayState : 1;
-    unsigned triggerContinuousInitializationEnabled : 1;
-    unsigned skipChannelCalibrations : 1;
-    unsigned skipDateTimeSetup : 1;
-    unsigned skipSerialSetup : 1;
-    unsigned skipEthernetSetup : 1;
-    unsigned serialEnabled : 1;
-    unsigned ethernetDhcpEnabled : 1;
-    unsigned ntpEnabled : 1;
-    unsigned sdLocked : 1;
-};
+    unsigned profileAutoRecallEnabled : 1;
 
-struct IOPin {
-    unsigned polarity : 1;
-    unsigned function : 7;
-};
+    unsigned outputProtectionCouple : 1;
+    unsigned shutdownWhenProtectionTripped : 1;
+    unsigned forceDisablingAllOutputsOnPowerUp : 1;
 
-struct SerialConf {
-    unsigned bits : 2;
-    unsigned parity : 2;
-    unsigned sbits : 1;
-};
-
-struct DeviceConfiguration2 {
-    BlockHeader header;
-    char systemPassword[PASSWORD_MAX_LENGTH + 1];
-    DeviceFlags2 flags;
-    uint8_t encoderMovingSpeedDown;
-    uint8_t encoderMovingSpeedUp;
-    uint8_t displayBrightness;
-    uint8_t triggerSource;
-    float triggerDelay;
-    IOPin reserved1[3];
+    // block 4
     uint8_t serialBaud;
     uint8_t serialParity;
+    
     uint32_t ethernetIpAddress;
     uint32_t ethernetDns;
     uint32_t ethernetGateway;
     uint32_t ethernetSubnetMask;
     uint16_t ethernetScpiPort;
     char ntpServer[32 + 1];
-    uint8_t dstRule;
     uint8_t ethernetMacAddress[6];
-    uint8_t displayBackgroundLuminosityStep;
+
     uint8_t fanMode;
     uint8_t fanSpeed;
-    uint16_t reserved2;
-	uint8_t selectedThemeIndex;
-    uint8_t ytGraphUpdateMethod;
+
+    uint8_t encoderMovingSpeedDown;
+    uint8_t encoderMovingSpeedUp;
+
+    uint8_t displayBrightness;
+    uint8_t displayBackgroundLuminosityStep;
+    uint8_t selectedThemeIndex;
     float animationsDuration;
+
+    unsigned serialEnabled : 1;
+
+    unsigned ethernetEnabled : 1;
+    unsigned ntpEnabled : 1;
+    unsigned ethernetDhcpEnabled : 1;
+
+    unsigned encoderConfirmationMode : 1;
+
+    unsigned isSoundEnabled : 1;
+    unsigned isClickSoundEnabled : 1;
+
+    // block 5
+    uint8_t triggerSource;
+    float triggerDelay;
+
     IOPin ioPins[4];
+
+    unsigned triggerContinuousInitializationEnabled : 1;
+
+    unsigned isFrontPanelLocked : 1;
+
+    unsigned sdLocked : 1;
+
+    // block 6
+    uint8_t ytGraphUpdateMethod;
+
+    unsigned displayState : 1; // 0: display is OFF, 1: display is ON
+    unsigned channelsViewMode : 3;
+    unsigned maxChannel : 3; // 0: default view, 1: Ch1 maxed, 2: Ch2 maxed, ...
+    unsigned channelsViewModeInMax : 3;
 };
+
+extern const DeviceConfiguration &devConf;
+
+void init();
+void tick();
 
 bool checkBlock(const BlockHeader *block, uint16_t size, uint16_t version);
 uint32_t calcChecksum(const BlockHeader *block, uint16_t size);
-
-extern DeviceConfiguration devConf;
-void loadDevice();
-void saveDevice();
-
-extern DeviceConfiguration2 devConf2;
-void loadDevice2();
-void saveDevice2();
 
 bool isSystemPasswordValid(const char *new_password, size_t new_password_len, int16_t &err);
 void changeSystemPassword(const char *new_password, size_t new_password_len);
@@ -206,8 +203,12 @@ void setChannelsViewModeInMax(unsigned int viewModeInMax);
 
 void toggleChannelsViewMode();
 
-void setChannelsMaxView(int slotIndex); // slotIndex starts from 1
-void toggleChannelsMaxView(int slotIndex); // slotIndex starts from 1
+bool isMaxChannelView();
+int getMaxChannelIndex();
+int getMin1ChannelIndex();
+int getMin2ChannelIndex();
+void setMaxChannelIndex(int channelIndex);
+void toggleMaxChannelIndex(int channelIndex);
 
 profile::Parameters *loadProfile(int location);
 bool saveProfile(int location, profile::Parameters *profile);
@@ -263,6 +264,30 @@ void setSdLocked(bool sdLocked);
 bool isSdLocked();
 
 void setAnimationsDuration(float value);
+
+void setTouchscreenCalParams(int16_t touch_screen_cal_tlx, int16_t touch_screen_cal_tly, int16_t touch_screen_cal_brx, int16_t touch_screen_cal_bry, int16_t touch_screen_cal_trx, int16_t touch_screen_cal_try);
+
+void setFanSettings(uint8_t fanMode, uint8_t fanSpeed);
+
+void setDateValid(unsigned dateValid);
+void setTimeValid(unsigned timeValid);
+void setTimeZone(int16_t time_zone);
+void setDstRule(uint8_t dstRule);
+
+void setIoPinPolarity(int pin, unsigned polarity);
+void setIoPinFunction(int pin, unsigned function);
+
+void setSelectedThemeIndex(uint8_t selectedThemeIndex);
+
+void resetTrigger();
+void setTriggerContinuousInitializationEnabled(unsigned triggerContinuousInitializationEnabled);
+void setTriggerDelay(float triggerDelay);
+void setTriggerSource(uint8_t triggerSource);
+
+void setSkipChannelCalibrations(unsigned skipChannelCalibrations);
+void setSkipDateTimeSetup(unsigned skipDateTimeSetup);
+void setSkipSerialSetup(unsigned skipSerialSetup);
+void setSkipEthernetSetup(unsigned skipEthernetSetup);
 
 ////////////////////////////////////////////////////////////////////////////////
 

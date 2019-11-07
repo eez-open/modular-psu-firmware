@@ -73,6 +73,8 @@ bool onSystemStateChanged() {
     if (eez::g_systemState == eez::SystemState::BOOTING) {
         if (eez::g_systemStatePhase == 0) {
             g_scpiMessageQueueId = osMessageCreate(osMessageQ(g_scpiMessageQueue), NULL);
+            return false;
+        } else {
             g_lastTickCount = micros();
             g_scpiTaskHandle = osThreadCreate(osThread(g_scpiTask), nullptr);
         }
@@ -199,6 +201,7 @@ void oneIter() {
     	}
 
     	if (diff >= 250000L) { // 250 msec
+            persist_conf::tick();
 #if OPTION_SD_CARD
     		sd_card::tick();
 #endif

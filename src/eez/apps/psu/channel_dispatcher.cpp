@@ -180,8 +180,8 @@ bool setCouplingType(CouplingType couplingType, int *err) {
         }
 
         if (g_couplingType == COUPLING_TYPE_PARALLEL || g_couplingType == COUPLING_TYPE_SERIES) {
-            if (persist_conf::devConf.flags.slotMax ==  2) {
-                persist_conf::setChannelsMaxView(1);
+            if (persist_conf::getMaxChannelIndex() ==  1) {
+                persist_conf::setMaxChannelIndex(0);
             }
         }
 

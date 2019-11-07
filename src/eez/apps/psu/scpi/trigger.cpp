@@ -62,7 +62,6 @@ scpi_result_t scpi_cmd_triggerSequenceDelay(scpi_t *context) {
     }
 
     trigger::setDelay(delay);
-    persist_conf::saveDevice2();
 
     return SCPI_RES_OK;
 }
@@ -83,14 +82,12 @@ scpi_result_t scpi_cmd_triggerSequenceSource(scpi_t *context) {
     trigger::setSource((trigger::Source)source);
 
     if (source == trigger::SOURCE_PIN1) {
-        persist_conf::devConf2.ioPins[0].function = io_pins::FUNCTION_TINPUT;
+        persist_conf::setIoPinFunction(0, io_pins::FUNCTION_TINPUT);
     }
 
     if (source == trigger::SOURCE_PIN2) {
-        persist_conf::devConf2.ioPins[1].function = io_pins::FUNCTION_TINPUT;
+        persist_conf::setIoPinFunction(1, io_pins::FUNCTION_TINPUT);
     }
-
-    persist_conf::saveDevice2();
 
     return SCPI_RES_OK;
 }
@@ -165,8 +162,6 @@ scpi_result_t scpi_cmd_initiateContinuous(scpi_t *context) {
 
     int result = trigger::enableInitiateContinuous(enable);
 
-    persist_conf::saveDevice2();
-
     if (result != SCPI_RES_OK) {
         SCPI_ErrorPush(context, result);
         return SCPI_RES_ERR;
@@ -224,11 +219,11 @@ scpi_result_t scpi_cmd_triggerDlogSource(scpi_t *context) {
     dlog::g_triggerSource = (trigger::Source)source;
 
     if (source == trigger::SOURCE_PIN1) {
-        persist_conf::devConf2.ioPins[0].function = io_pins::FUNCTION_TINPUT;
+        persist_conf::setIoPinFunction(0, io_pins::FUNCTION_TINPUT);
     }
 
     if (source == trigger::SOURCE_PIN2) {
-        persist_conf::devConf2.ioPins[1].function = io_pins::FUNCTION_TINPUT;
+        persist_conf::setIoPinFunction(1, io_pins::FUNCTION_TINPUT);
     }
 
     return SCPI_RES_OK;

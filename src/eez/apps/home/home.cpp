@@ -95,12 +95,12 @@ void HomeAppContext::stateManagment() {
     }
 
     // turn display on/off depending on displayState
-    if (psu::persist_conf::devConf2.flags.displayState == 0 &&
+    if (psu::persist_conf::devConf.displayState == 0 &&
         (activePageId != PAGE_ID_DISPLAY_OFF && activePageId != PAGE_ID_SELF_TEST_RESULT &&
          isTouchCalibrated())) {
         showPage(PAGE_ID_DISPLAY_OFF);
         return;
-    } else if (psu::persist_conf::devConf2.flags.displayState == 1 &&
+    } else if (psu::persist_conf::devConf.displayState == 1 &&
                activePageId == PAGE_ID_DISPLAY_OFF) {
         eez::mcu::display::turnOn();
         showPage(getMainPageId());

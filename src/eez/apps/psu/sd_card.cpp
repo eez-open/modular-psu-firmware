@@ -583,7 +583,7 @@ void getDateTime(FileInfo &fileInfo, uint8_t *resultYear, uint8_t *resultMonth, 
 
     uint32_t utc = datetime::makeTime(year, month, day, hour, minute, second);
     uint32_t local = datetime::utcToLocal(utc, persist_conf::devConf.time_zone,
-                                          (datetime::DstRule)persist_conf::devConf2.dstRule);
+                                          (datetime::DstRule)persist_conf::devConf.dstRule);
     datetime::breakTime(local, year, month, day, hour, minute, second);
 
     if (resultYear) {

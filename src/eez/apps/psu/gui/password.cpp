@@ -67,7 +67,7 @@ static void onRetypeNewPasswordOk(char *text) {
         return;
     }
 
-    if (g_oldPassword == persist_conf::devConf2.systemPassword) {
+    if (g_oldPassword == persist_conf::devConf.systemPassword) {
         persist_conf::changeSystemPassword(g_newPassword, strlen(g_newPassword));
     } else {
         persist_conf::changeCalibrationPassword(g_newPassword, strlen(g_newPassword));
@@ -81,7 +81,7 @@ static void onNewPasswordOk(char *text) {
 
     bool isOk;
     int16_t err;
-    if (g_oldPassword == persist_conf::devConf2.systemPassword) {
+    if (g_oldPassword == persist_conf::devConf.systemPassword) {
         isOk = persist_conf::isSystemPasswordValid(text, textLength, err);
     } else {
         isOk = persist_conf::isCalibrationPasswordValid(text, textLength, err);
@@ -128,7 +128,7 @@ void checkPassword(const char *label, const char *password, void (*ok)()) {
 }
 
 void editSystemPassword() {
-    editPassword(persist_conf::devConf2.systemPassword);
+    editPassword(persist_conf::devConf.systemPassword);
 }
 
 void editCalibrationPassword() {

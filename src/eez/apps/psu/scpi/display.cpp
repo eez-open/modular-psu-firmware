@@ -57,7 +57,7 @@ scpi_result_t scpi_cmd_displayBrightness(scpi_t *context) {
 scpi_result_t scpi_cmd_displayBrightnessQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_DISPLAY
-    SCPI_ResultInt(context, persist_conf::devConf2.displayBrightness);
+    SCPI_ResultInt(context, persist_conf::devConf.displayBrightness);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -118,7 +118,7 @@ scpi_result_t scpi_cmd_displayWindowState(scpi_t *context) {
 scpi_result_t scpi_cmd_displayWindowStateQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_DISPLAY
-    SCPI_ResultBool(context, persist_conf::devConf2.flags.displayState);
+    SCPI_ResultBool(context, persist_conf::devConf.displayState);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

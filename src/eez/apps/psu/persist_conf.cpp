@@ -18,6 +18,8 @@
 
 #include <assert.h>
 
+#include <eez/system.h>
+
 #include <eez/apps/psu/psu.h>
 
 #include <eez/modules/mcu/eeprom.h>
@@ -47,7 +49,7 @@ using namespace eez::mcu::display;
 
 #include <eez/gui/widgets/yt_graph.h>
 
-#define NUM_RETRIES 2
+#define NUM_RETRIES 3
 
 namespace eez {
 namespace psu {
@@ -63,20 +65,10 @@ namespace persist_conf {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-enum PersistConfSection {
-    PERSIST_CONF_BLOCK_DEVICE,
-    PERSIST_CONF_BLOCK_DEVICE2,
-    PERSIST_CONF_BLOCK_FIRST_PROFILE,
-};
-
-static const uint16_t DEV_CONF_VERSION = 9;
-static const uint16_t DEV_CONF2_VERSION = 11;
 static const uint16_t MODULE_CONF_VERSION = 1;
 static const uint16_t CH_CAL_CONF_VERSION = 3;
 
-static const uint16_t PERSIST_CONF_DEVICE_ADDRESS = 1024;
-static const uint16_t PERSIST_CONF_DEVICE2_ADDRESS = 1536;
-
+static const uint16_t PERSIST_CONF_DEV_CONF_ADDRESS = 128;
 static const uint16_t PERSIST_CONF_FIRST_PROFILE_ADDRESS = 5120;
 static const uint16_t PERSIST_CONF_PROFILE_BLOCK_SIZE = 1024;
 
@@ -84,21 +76,101 @@ static const uint32_t ONTIME_MAGIC = 0xA7F31B3CL;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-enum ModulePersistConfSection {
-    MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION,
-    MODULE_PERSIST_CONF_BLOCK_CH_CAL,
+DeviceConfiguration g_devConf;
+const DeviceConfiguration &devConf = g_devConf;
+DeviceConfiguration g_defaultDevConf;
+DeviceConfiguration g_savedDevConf;
+
+struct DevConfBlock {
+    uint16_t end;
+    uint16_t version;
+    bool dirty;
 };
 
-static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 64;
-static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE = 64;
+static DevConfBlock g_devConfBlocks[] = {
+    { offsetof(DeviceConfiguration, date_year), 1, false },
+    { offsetof(DeviceConfiguration, profile_auto_recall_location), 1, false },
+    { offsetof(DeviceConfiguration, serialBaud), 1, false },
+    { offsetof(DeviceConfiguration, triggerSource), 1, false },
+    { offsetof(DeviceConfiguration, ytGraphUpdateMethod), 1, false },
+    { sizeof(DeviceConfiguration), 1, false }
+};
 
-static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = 128;
-static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 256;
+void initDefaultDevConf() {
+    // block 1
+    strcpy(g_defaultDevConf.serialNumber, PSU_SERIAL);
+    strcpy(g_defaultDevConf.calibration_password, CALIBRATION_PASSWORD_DEFAULT);
 
-////////////////////////////////////////////////////////////////////////////////
+    g_defaultDevConf.touch_screen_cal_tlx = 0;
+    g_defaultDevConf.touch_screen_cal_tly = 0;
+    g_defaultDevConf.touch_screen_cal_brx = 0;
+    g_defaultDevConf.touch_screen_cal_bry = 0;
+    g_defaultDevConf.touch_screen_cal_trx = 0;
+    g_defaultDevConf.touch_screen_cal_try = 0;
 
-DeviceConfiguration devConf;
-DeviceConfiguration2 devConf2;
+    // block2
+    g_defaultDevConf.dateValid = 0;
+    g_defaultDevConf.timeValid = 0;
+    g_defaultDevConf.dst = 0;
+
+    g_defaultDevConf.time_zone = 0;
+    g_defaultDevConf.dstRule = datetime::DST_RULE_OFF;
+
+    // block 3
+    g_defaultDevConf.profileAutoRecallEnabled = 0;
+
+    g_defaultDevConf.outputProtectionCouple = 0;
+    g_defaultDevConf.shutdownWhenProtectionTripped = 0;
+    g_defaultDevConf.forceDisablingAllOutputsOnPowerUp = 0;
+
+    g_defaultDevConf.profile_auto_recall_location = 0;
+
+    // block 4
+    g_defaultDevConf.serialEnabled = 1;
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+    g_defaultDevConf.ethernetEnabled = 1;
+#else
+    g_defaultDevConf.ethernetEnabled = 0;
+#endif
+    g_defaultDevConf.ethernetDhcpEnabled = 1;
+
+    g_defaultDevConf.encoderConfirmationMode = 0;
+
+    g_defaultDevConf.isSoundEnabled = 1;
+    g_defaultDevConf.isClickSoundEnabled = 1;
+
+    g_defaultDevConf.serialBaud = getIndexFromBaud(SERIAL_SPEED);
+    g_defaultDevConf.serialParity = serial::PARITY_NONE;
+
+    g_defaultDevConf.ethernetIpAddress = getIpAddress(192, 168, 1, 100);
+    g_defaultDevConf.ethernetDns = getIpAddress(192, 168, 1, 1);
+    g_defaultDevConf.ethernetGateway = getIpAddress(192, 168, 1, 1);
+    g_defaultDevConf.ethernetSubnetMask = getIpAddress(255, 255, 255, 0);
+    g_defaultDevConf.ethernetScpiPort = TCP_PORT;
+    strcpy(g_defaultDevConf.ntpServer, CONF_DEFAULT_NTP_SERVER);
+    uint8_t macAddress[] = ETHERNET_MAC_ADDRESS;
+    memcpy(g_defaultDevConf.ethernetMacAddress, macAddress, 6);
+
+    g_defaultDevConf.displayBrightness = DISPLAY_BRIGHTNESS_DEFAULT;
+    g_defaultDevConf.displayBackgroundLuminosityStep = DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT;
+    g_defaultDevConf.selectedThemeIndex = THEME_ID_DARK;
+    g_defaultDevConf.animationsDuration = CONF_DEFAULT_ANIMATIONS_DURATION;
+
+// block 5
+    g_defaultDevConf.triggerContinuousInitializationEnabled = 0;
+
+    g_defaultDevConf.triggerSource = trigger::SOURCE_IMMEDIATE;
+    g_defaultDevConf.triggerDelay = 0;
+
+// block 6
+    g_defaultDevConf.displayState = 1;
+    g_defaultDevConf.channelsViewMode = 0;
+    g_defaultDevConf.maxChannel = 0;
+    g_defaultDevConf.channelsViewModeInMax = 0;
+
+    g_defaultDevConf.ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCROLL;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -111,9 +183,7 @@ bool confRead(uint8_t *buffer, uint16_t bufferSize, uint16_t address, int versio
         bool result = mcu::eeprom::read(buffer, bufferSize, address);
 
         if (!result) {
-#if defined(EEZ_PLATFORM_STM32)
         	pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_READ_ERROR);
-#endif
         	continue;
         }
 
@@ -122,11 +192,6 @@ bool confRead(uint8_t *buffer, uint16_t bufferSize, uint16_t address, int versio
         }
 
         if (!checkBlock((const BlockHeader *)buffer, bufferSize, version)) {
-#if defined(EEZ_PLATFORM_STM32)
-            if (((const BlockHeader *)buffer)->checksum != 0xFFFFFFFF) {
-			    pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_CRC_CHECK_ERROR);
-            }
-#endif
             continue;
         }
 
@@ -145,9 +210,7 @@ bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
         bool result = mcu::eeprom::write(buffer, bufferSize, address);
 
         if (!result) {
-#if defined(EEZ_PLATFORM_STM32)
         	pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_WRITE_ERROR);
-#endif
         	continue;
         }
 
@@ -157,9 +220,7 @@ bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
 			continue;
 		}
 		if (memcmp(buffer, verifyBuffer, bufferSize) != 0) {
-#if defined(EEZ_PLATFORM_STM32)
         	pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_WRITE_VERIFY_ERROR);
-#endif
 			continue;
 		}
 
@@ -256,33 +317,7 @@ bool save(BlockHeader *block, uint16_t size, uint16_t address, uint16_t version)
     return confWrite((const uint8_t *)block, size, address);
 }
 
-uint16_t getConfSectionAddress(PersistConfSection section) {
-    switch (section) {
-    case PERSIST_CONF_BLOCK_DEVICE:
-        return PERSIST_CONF_DEVICE_ADDRESS;
-    case PERSIST_CONF_BLOCK_DEVICE2:
-        return PERSIST_CONF_DEVICE2_ADDRESS;
-    case PERSIST_CONF_BLOCK_FIRST_PROFILE:
-        return PERSIST_CONF_FIRST_PROFILE_ADDRESS;
-    }
-    return -1;
-}
-
-uint16_t getProfileAddress(int location) {
-    return getConfSectionAddress(PERSIST_CONF_BLOCK_FIRST_PROFILE) + location * PERSIST_CONF_PROFILE_BLOCK_SIZE;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
-
-uint16_t getModuleConfSectionAddress(ModulePersistConfSection section, int channelIndex) {
-    switch (section) {
-    case MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION:
-        return MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS;
-    case MODULE_PERSIST_CONF_BLOCK_CH_CAL:
-        return MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channelIndex * MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE;
-    }
-    return -1;
-}
 
 bool moduleSave(int slotIndex, BlockHeader *block, uint16_t size, uint16_t address, uint16_t version) {
     block->version = version;
@@ -292,156 +327,91 @@ bool moduleSave(int slotIndex, BlockHeader *block, uint16_t size, uint16_t addre
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void initDevice() {
-    memset(&devConf, 0, sizeof(devConf));
+void init() {
+    initDefaultDevConf();
 
-    devConf.header.checksum = 0;
-    devConf.header.version = DEV_CONF_VERSION;
+    bool storageInitialized = true;
 
-    strcpy(devConf.serialNumber, PSU_SERIAL);
+    uint8_t blockData[sizeof(BlockHeader) + sizeof(DeviceConfiguration)];
+    uint16_t blockAddress = PERSIST_CONF_DEV_CONF_ADDRESS;
+    uint16_t blockStart = 0;
+    for (unsigned i = 0; i < sizeof(g_devConfBlocks) / sizeof(DevConfBlock); i++) {
+        uint16_t blockEnd = g_devConfBlocks[i].end;
+        uint16_t blockSize = blockEnd - blockStart;
 
-    strcpy(devConf.calibration_password, CALIBRATION_PASSWORD_DEFAULT);
+        if (!confRead(blockData, sizeof(BlockHeader) + blockSize, blockAddress, g_devConfBlocks[i].version)) {
+            if (!confRead(blockData, sizeof(BlockHeader) + blockSize, blockAddress + sizeof(BlockHeader) + blockSize, g_devConfBlocks[i].version)) {
+                if (i == 0) {
+                    // if we can't read first block at both locations we assume storage is not initialized
+                    storageInitialized = false;
+                } else if (storageInitialized) {
+                    // generate error only if storage is intialized and we failed to read block at both locations
+                    pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_CRC_CHECK_ERROR);
+                }
 
-    devConf.flags.isSoundEnabled = 1;
-    devConf.flags.isClickSoundEnabled = 1;
+                // use default g_devConf data for this block
+                memcpy(blockData + sizeof(BlockHeader), (uint8_t *)&g_defaultDevConf + blockStart, blockSize);
 
-    devConf.flags.dateValid = 0;
-    devConf.flags.timeValid = 0;
-    devConf.flags.dst = 0;
-
-    devConf.time_zone = 0;
-
-    devConf.flags.profileAutoRecallEnabled = 0;
-    devConf.profile_auto_recall_location = 0;
-
-    devConf.touch_screen_cal_orientation = -1;
-    devConf.touch_screen_cal_tlx = 0;
-    devConf.touch_screen_cal_tly = 0;
-    devConf.touch_screen_cal_brx = 0;
-    devConf.touch_screen_cal_bry = 0;
-    devConf.touch_screen_cal_trx = 0;
-    devConf.touch_screen_cal_try = 0;
-
-    devConf.flags.channelsViewMode = 0;
-
-#ifdef EEZ_PLATFORM_SIMULATOR
-    devConf.flags.ethernetEnabled = 1;
-#else
-    devConf.flags.ethernetEnabled = 0;
-#endif // EEZ_PLATFORM_SIMULATOR
-
-    devConf.flags.outputProtectionCouple = 0;
-    devConf.flags.shutdownWhenProtectionTripped = 0;
-    devConf.flags.forceDisablingAllOutputsOnPowerUp = 0;
-}
-
-void loadDevice() {
-    if (confRead((uint8_t *)&devConf, sizeof(DeviceConfiguration), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE), DEV_CONF_VERSION)) {
-        if (devConf.flags.channelsViewMode < 0 || devConf.flags.channelsViewMode >= NUM_CHANNELS_VIEW_MODES) {
-            devConf.flags.channelsViewMode = 0;
+                // mark this block dirty, so it will be saved to persistent storage
+                g_devConfBlocks[i].dirty = true;
+            }
         }
 
-        if (devConf.flags.channelsViewModeInMax < 0 || devConf.flags.channelsViewModeInMax >= NUM_CHANNELS_VIEW_MODES_IN_MAX) {
-            devConf.flags.channelsViewModeInMax = 0;
-        }
-    } else {
-        initDevice();
+        // copy this block to g_devConf
+        memcpy((uint8_t *)&g_devConf + blockStart, blockData + sizeof(BlockHeader), blockSize);
+
+        blockAddress += 2 * (sizeof(BlockHeader) + blockSize);
+        blockStart = blockEnd;
     }
-}
 
-void saveDevice() {
-    if (!save((BlockHeader *)&devConf, sizeof(DeviceConfiguration), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE), DEV_CONF_VERSION)) {
-        generateError(SCPI_ERROR_EXTERNAL_EEPROM_SAVE_FAILED);
-    }
-}
-
-static void initEthernetSettings() {
-    devConf2.flags.ethernetDhcpEnabled = 1;
-    devConf2.ethernetIpAddress = getIpAddress(192, 168, 1, 100);
-    devConf2.ethernetDns = getIpAddress(192, 168, 1, 1);
-    devConf2.ethernetGateway = getIpAddress(192, 168, 1, 1);
-    devConf2.ethernetSubnetMask = getIpAddress(255, 255, 255, 0);
-    devConf2.ethernetScpiPort = TCP_PORT;
-}
-
-static void initDevice2() {
-    memset(&devConf2, 0, sizeof(devConf2));
-    devConf2.header.version = DEV_CONF2_VERSION;
-
-    devConf2.flags.encoderConfirmationMode = 0;
-    devConf2.flags.displayState = 1;
-
-    devConf2.displayBrightness = DISPLAY_BRIGHTNESS_DEFAULT;
-
-    devConf2.triggerSource = trigger::SOURCE_IMMEDIATE;
-    devConf2.triggerDelay = 0;
-    devConf2.flags.triggerContinuousInitializationEnabled = 0;
-
-    devConf2.flags.serialEnabled = 1;
-    devConf2.serialBaud = getIndexFromBaud(SERIAL_SPEED);
-    devConf2.serialParity = serial::PARITY_NONE;
-
-    initEthernetSettings();
-
-    strcpy(devConf2.ntpServer, CONF_DEFAULT_NTP_SERVER);
-
-    uint8_t macAddress[] = ETHERNET_MAC_ADDRESS;
-    memcpy(devConf2.ethernetMacAddress, macAddress, 6);
-
-    devConf2.dstRule = datetime::DST_RULE_OFF;
-
-    devConf2.displayBackgroundLuminosityStep = DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT;
-
-    devConf2.animationsDuration = CONF_DEFAULT_ANIMATIONS_DURATION;
-
-    devConf2.selectedThemeIndex = THEME_ID_DARK;
+    // remember this g_devConf to be used to detect when it changes
+    memcpy(&g_savedDevConf, &g_devConf, sizeof(DeviceConfiguration));
 
 #if OPTION_DISPLAY
     onLuminocityChanged();
     onThemeChanged();
 #endif
+
+    // load channels calibration parameters
+    for (int i = 0; i < CH_NUM; ++i) {
+        if (Channel::get(i).isInstalled()) {
+            persist_conf::loadChannelCalibration(Channel::get(i));
+        }
+    }
 }
 
-void loadDevice2() {
-    if (!confRead((uint8_t *)&devConf2, sizeof(DeviceConfiguration2), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE2), DEV_CONF2_VERSION)) {
-        initDevice2();
-    } else {
-        if (devConf2.header.version < 9) {
-            uint8_t macAddress[] = ETHERNET_MAC_ADDRESS;
-            memcpy(devConf2.ethernetMacAddress, macAddress, 6);
+void tick() {
+    DeviceConfiguration devConf;
+    memcpy(&devConf, &g_devConf, sizeof(DeviceConfiguration));
+
+    uint8_t blockData[sizeof(BlockHeader) + sizeof(DeviceConfiguration)];
+    uint16_t blockAddress = PERSIST_CONF_DEV_CONF_ADDRESS;
+    uint16_t blockStart = 0;
+    for (unsigned i = 0; i < sizeof(g_devConfBlocks) / sizeof(DevConfBlock); i++) {
+        uint16_t blockEnd = g_devConfBlocks[i].end;
+        uint16_t blockSize = blockEnd - blockStart;
+
+        if (!g_devConfBlocks[i].dirty) {
+            // compare devConf with last saved g_devConf
+            g_devConfBlocks[i].dirty = memcmp((uint8_t *)&devConf + blockStart, (uint8_t *)&g_savedDevConf + blockStart, blockSize) != 0;
         }
 
-        if (devConf2.header.version < 10) {
-            devConf2.displayBackgroundLuminosityStep = DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT;
+        if (g_devConfBlocks[i].dirty) {
+            memcpy(blockData + sizeof(BlockHeader), (uint8_t *)&devConf + blockStart, blockSize);
+
+        	bool saved = save((BlockHeader *)blockData, sizeof(BlockHeader) + blockSize, blockAddress, g_devConfBlocks[i].version);
+        	saved |= save((BlockHeader *)blockData, sizeof(BlockHeader) + blockSize, blockAddress + sizeof(BlockHeader) + blockSize, g_devConfBlocks[i].version);
+
+            if (saved) {
+                memcpy((uint8_t *)&g_savedDevConf + blockStart, (uint8_t *)&devConf + blockStart, blockSize);
+                g_devConfBlocks[i].dirty = false;
+            } else {
+                generateError(SCPI_ERROR_EXTERNAL_EEPROM_SAVE_FAILED);
+            }
         }
 
-        if (devConf2.header.version < 11) {
-            devConf2.animationsDuration = CONF_DEFAULT_ANIMATIONS_DURATION;
-        }
-
-#if OPTION_DISPLAY
-        onLuminocityChanged();
-        onThemeChanged();
-#endif
-    }
-
-    if (devConf2.serialBaud < 1 || devConf2.serialBaud > serial::g_baudsSize) {
-        devConf2.serialBaud = getIndexFromBaud(SERIAL_SPEED);
-    }
-
-#if OPTION_ENCODER
-    if (!devConf2.encoderMovingSpeedDown) {
-        devConf2.encoderMovingSpeedDown = mcu::encoder::DEFAULT_MOVING_DOWN_SPEED;
-    }
-    if (!devConf2.encoderMovingSpeedUp) {
-        devConf2.encoderMovingSpeedUp = mcu::encoder::DEFAULT_MOVING_UP_SPEED;
-    }
-#endif
-}
-
-void saveDevice2() {
-    if (!save((BlockHeader *)&devConf2, sizeof(DeviceConfiguration2), getConfSectionAddress(PERSIST_CONF_BLOCK_DEVICE2), DEV_CONF2_VERSION)) {
-        generateError(SCPI_ERROR_EXTERNAL_EEPROM_SAVE_FAILED);
+        blockAddress += 2 * (sizeof(BlockHeader) + blockSize);
+        blockStart = blockEnd;
     }
 }
 
@@ -460,9 +430,8 @@ bool isSystemPasswordValid(const char *new_password, size_t new_password_len, in
 }
 
 void changeSystemPassword(const char *new_password, size_t new_password_len) {
-    memset(&devConf2.systemPassword, 0, sizeof(devConf2.systemPassword));
-    strncpy(devConf2.systemPassword, new_password, new_password_len);
-    saveDevice2();
+    memset(&g_devConf.systemPassword, 0, sizeof(g_devConf.systemPassword));
+    strncpy(g_devConf.systemPassword, new_password, new_password_len);
     event_queue::pushEvent(event_queue::EVENT_INFO_SYSTEM_PASSWORD_CHANGED);
 }
 
@@ -481,9 +450,8 @@ bool isCalibrationPasswordValid(const char *new_password, size_t new_password_le
 }
 
 void changeCalibrationPassword(const char *new_password, size_t new_password_len) {
-    memset(&devConf.calibration_password, 0, sizeof(devConf.calibration_password));
-    strncpy(devConf.calibration_password, new_password, new_password_len);
-    saveDevice();
+    memset(&g_devConf.calibration_password, 0, sizeof(g_devConf.calibration_password));
+    strncpy(g_devConf.calibration_password, new_password, new_password_len);
     event_queue::pushEvent(event_queue::EVENT_INFO_CALIBRATION_PASSWORD_CHANGED);
 }
 
@@ -491,127 +459,122 @@ void changeSerial(const char *newSerialNumber, size_t newSerialNumberLength) {
     // copy up to 7 characters from newSerialNumber, fill the rest with zero's
     for (size_t i = 0; i < 7; ++i) {
         if (i < newSerialNumberLength) {
-            devConf.serialNumber[i] = newSerialNumber[i];
+            g_devConf.serialNumber[i] = newSerialNumber[i];
         } else {
-            devConf.serialNumber[i] = 0;
+            g_devConf.serialNumber[i] = 0;
         }
     }
-    devConf.serialNumber[7] = 0;
-
-    saveDevice();
+    g_devConf.serialNumber[7] = 0;
 }
 
 void enableSound(bool enable) {
-    devConf.flags.isSoundEnabled = enable ? 1 : 0;
-    saveDevice();
+    g_devConf.isSoundEnabled = enable ? 1 : 0;
     event_queue::pushEvent(enable ? event_queue::EVENT_INFO_SOUND_ENABLED : event_queue::EVENT_INFO_SOUND_DISABLED);
 }
 
 bool isSoundEnabled() {
-    return devConf.flags.isSoundEnabled ? true : false;
+    return g_devConf.isSoundEnabled ? true : false;
 }
 
 void enableClickSound(bool enable) {
-    devConf.flags.isClickSoundEnabled = enable ? 1 : 0;
-    saveDevice();
+    g_devConf.isClickSoundEnabled = enable ? 1 : 0;
 }
 
 bool isClickSoundEnabled() {
-    return devConf.flags.isClickSoundEnabled ? true : false;
+    return g_devConf.isClickSoundEnabled ? true : false;
 }
 
 bool readSystemDate(uint8_t &year, uint8_t &month, uint8_t &day) {
-    if (devConf.flags.dateValid) {
-        year = devConf.date_year;
-        month = devConf.date_month;
-        day = devConf.date_day;
+    if (g_devConf.dateValid) {
+        year = g_devConf.date_year;
+        month = g_devConf.date_month;
+        day = g_devConf.date_day;
         return true;
     }
     return false;
 }
 
 bool isDst() {
-    return datetime::isDst(datetime::makeTime(2000 + devConf.date_year, devConf.date_month,
-                                              devConf.date_day, devConf.time_hour,
-                                              devConf.time_minute, devConf.time_second),
-                           (datetime::DstRule)devConf2.dstRule);
+    return datetime::isDst(
+        datetime::makeTime(
+            2000 + g_devConf.date_year,
+            g_devConf.date_month,
+            g_devConf.date_day,
+            g_devConf.time_hour,
+            g_devConf.time_minute,
+            g_devConf.time_second
+        ),
+        (datetime::DstRule)g_devConf.dstRule
+    );
 }
 
 void setDst(unsigned dst) {
     if (dst == 0) {
-        devConf.flags.dst = 0;
+        g_devConf.dst = 0;
     } else if (dst == 1) {
-        devConf.flags.dst = 1;
+        g_devConf.dst = 1;
     } else {
-        devConf.flags.dst = isDst();
+        g_devConf.dst = isDst();
     }
 }
 
 void writeSystemDate(uint8_t year, uint8_t month, uint8_t day, unsigned dst) {
-    devConf.date_year = year;
-    devConf.date_month = month;
-    devConf.date_day = day;
+    g_devConf.date_year = year;
+    g_devConf.date_month = month;
+    g_devConf.date_day = day;
 
-    devConf.flags.dateValid = 1;
+    g_devConf.dateValid = 1;
 
     setDst(dst);
-
-    saveDevice();
 }
 
 bool readSystemTime(uint8_t &hour, uint8_t &minute, uint8_t &second) {
-    if (devConf.flags.timeValid) {
-        hour = devConf.time_hour;
-        minute = devConf.time_minute;
-        second = devConf.time_second;
+    if (g_devConf.timeValid) {
+        hour = g_devConf.time_hour;
+        minute = g_devConf.time_minute;
+        second = g_devConf.time_second;
         return true;
     }
     return false;
 }
 
 void writeSystemTime(uint8_t hour, uint8_t minute, uint8_t second, unsigned dst) {
-    devConf.time_hour = hour;
-    devConf.time_minute = minute;
-    devConf.time_second = second;
+    g_devConf.time_hour = hour;
+    g_devConf.time_minute = minute;
+    g_devConf.time_second = second;
 
-    devConf.flags.timeValid = 1;
+    g_devConf.timeValid = 1;
 
     setDst(dst);
-
-    saveDevice();
 }
 
 void writeSystemDateTime(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute,
                          uint8_t second, unsigned dst) {
-    devConf.date_year = year;
-    devConf.date_month = month;
-    devConf.date_day = day;
+    g_devConf.date_year = year;
+    g_devConf.date_month = month;
+    g_devConf.date_day = day;
 
-    devConf.flags.dateValid = 1;
+    g_devConf.dateValid = 1;
 
-    devConf.time_hour = hour;
-    devConf.time_minute = minute;
-    devConf.time_second = second;
+    g_devConf.time_hour = hour;
+    g_devConf.time_minute = minute;
+    g_devConf.time_second = second;
 
-    devConf.flags.timeValid = 1;
+    g_devConf.timeValid = 1;
 
     setDst(dst);
-
-    saveDevice();
 }
 
 void enableProfileAutoRecall(bool enable) {
-    devConf.flags.profileAutoRecallEnabled = enable ? 1 : 0;
-    saveDevice();
+    g_devConf.profileAutoRecallEnabled = enable ? 1 : 0;
 }
 
 bool isProfileAutoRecallEnabled() {
-    return devConf.flags.profileAutoRecallEnabled ? true : false;
+    return g_devConf.profileAutoRecallEnabled ? true : false;
 }
 
 void setProfileAutoRecallLocation(int location) {
-    devConf.profile_auto_recall_location = (int8_t)location;
-    saveDevice();
+    g_devConf.profile_auto_recall_location = (int8_t)location;
     event_queue::pushEvent(event_queue::EVENT_INFO_DEFAULE_PROFILE_CHANGED_TO_0 + location);
     if (location == 0) {
         profile::save();
@@ -619,11 +582,11 @@ void setProfileAutoRecallLocation(int location) {
 }
 
 int getProfileAutoRecallLocation() {
-    return devConf.profile_auto_recall_location;
+    return g_devConf.profile_auto_recall_location;
 }
 
 void setChannelsViewMode(unsigned int channelsViewMode) {
-    uint8_t ytGraphUpdateMethod = devConf2.ytGraphUpdateMethod;
+    uint8_t ytGraphUpdateMethod = g_devConf.ytGraphUpdateMethod;
 
     if (channelsViewMode == CHANNELS_VIEW_MODE_YT) {
         ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCROLL;
@@ -636,26 +599,19 @@ void setChannelsViewMode(unsigned int channelsViewMode) {
         }
     }
 
-    if (channelsViewMode != devConf.flags.channelsViewMode) {
-        devConf.flags.channelsViewMode = channelsViewMode;
-        saveDevice();
-    }
-
-    if (ytGraphUpdateMethod != devConf2.ytGraphUpdateMethod) {
-        devConf2.ytGraphUpdateMethod = ytGraphUpdateMethod;
-        saveDevice2();
-    }
+    g_devConf.channelsViewMode = channelsViewMode;
+    g_devConf.ytGraphUpdateMethod = ytGraphUpdateMethod;
 }
 
 unsigned int getChannelsViewMode() {
-    if (devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_YT && devConf2.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCAN_LINE) {
+    if (g_devConf.channelsViewMode == CHANNELS_VIEW_MODE_YT && g_devConf.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCAN_LINE) {
         return CHANNELS_VIEW_MODE_YT + 1;
     }
-    return devConf.flags.channelsViewMode;
+    return g_devConf.channelsViewMode;
 }
 
 void setChannelsViewModeInMax(unsigned int channelsViewModeInMax) {
-    uint8_t ytGraphUpdateMethod = devConf2.ytGraphUpdateMethod;
+    uint8_t ytGraphUpdateMethod = g_devConf.ytGraphUpdateMethod;
 
     if (channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT) {
         ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCROLL;
@@ -668,68 +624,58 @@ void setChannelsViewModeInMax(unsigned int channelsViewModeInMax) {
         }
     }
 
-    if (channelsViewModeInMax != devConf.flags.channelsViewModeInMax) {
-        devConf.flags.channelsViewModeInMax = channelsViewModeInMax;
-        saveDevice();
-    }
-
-    if (ytGraphUpdateMethod != devConf2.ytGraphUpdateMethod) {
-        devConf2.ytGraphUpdateMethod = ytGraphUpdateMethod;
-        saveDevice2();
-    }
+    g_devConf.channelsViewModeInMax = channelsViewModeInMax;
+    g_devConf.ytGraphUpdateMethod = ytGraphUpdateMethod;
 }
 
 void toggleChannelsViewMode() {
-    if (devConf.flags.channelsIsMaxView) {
-        setChannelsViewModeInMax(devConf.flags.channelsViewModeInMax + 1);
+    if (isMaxChannelView()) {
+        setChannelsViewModeInMax(g_devConf.channelsViewModeInMax + 1);
     } else {
-        setChannelsViewMode(devConf.flags.channelsViewMode + 1);
+        setChannelsViewMode(g_devConf.channelsViewMode + 1);
     }
 }
 
-void setSlotMin() {
-    if (devConf.flags.slotMax == 1) {
-        devConf.flags.slotMin1 = 2;
-        devConf.flags.slotMin2 = 3;
-    } else if (devConf.flags.slotMax == 2) {
-        devConf.flags.slotMin1 = 1;
-        devConf.flags.slotMin2 = 3;
+bool isMaxChannelView() {
+    return getMaxChannelIndex() >= 0;
+}
+
+int getMaxChannelIndex() {
+    int channelIndex = g_devConf.maxChannel - 1;
+    if (channelIndex < CH_NUM) {
+        return channelIndex;
+    }
+    return -1;
+}
+
+int getMin1ChannelIndex() {
+    int maxChannelSlotIndex = Channel::get(getMaxChannelIndex()).slotIndex;
+    if (maxChannelSlotIndex == 0) {
+        return Channel::getBySlotIndex(1).channelIndex;
     } else {
-        devConf.flags.slotMin1 = 1;
-        devConf.flags.slotMin2 = 2;
+        return Channel::getBySlotIndex(0).channelIndex;
     }
 }
 
-void setChannelsMaxView(int slotIndex) {
-    auto channelsIsMaxView = devConf.flags.channelsIsMaxView;
-    auto slotMax = devConf.flags.slotMax;
-
-    devConf.flags.channelsIsMaxView = 1;
-    devConf.flags.slotMax = slotIndex;
-    setSlotMin();
-
-    if (channelsIsMaxView != devConf.flags.channelsIsMaxView || slotMax != devConf.flags.slotMax) {
-        saveDevice();
+int getMin2ChannelIndex() {
+    int maxChannelSlotIndex = Channel::get(getMaxChannelIndex()).slotIndex;
+    if (maxChannelSlotIndex == 2) {
+        return Channel::getBySlotIndex(1).channelIndex;
+    } else {
+        return Channel::getBySlotIndex(2).channelIndex;
     }
 }
 
-void toggleChannelsMaxView(int slotIndex) {
-    if (devConf.flags.channelsIsMaxView) {
-        if (slotIndex == devConf.flags.slotMax) {
-            devConf.flags.channelsIsMaxView = 0;
-        } else {
-            devConf.flags.slotMax = slotIndex;
-        }
-    } else {
-        devConf.flags.channelsIsMaxView = 1;
-        devConf.flags.slotMax = slotIndex;
-    }
-    
-    if (devConf.flags.channelsIsMaxView) {
-        setSlotMin();
-    }
+void setMaxChannelIndex(int channelIndex) {
+    g_devConf.maxChannel = channelIndex + 1;
+}
 
-    saveDevice();
+void toggleMaxChannelIndex(int channelIndex) {
+    if (isMaxChannelView() && channelIndex == getMaxChannelIndex()) {
+        g_devConf.maxChannel = 0;
+    } else {
+        g_devConf.maxChannel = channelIndex + 1;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -738,6 +684,10 @@ static struct {
     bool loaded;
     profile::Parameters profile;
 } g_profilesCache[NUM_PROFILE_LOCATIONS];
+
+uint16_t getProfileAddress(int location) {
+    return PERSIST_CONF_FIRST_PROFILE_ADDRESS + location * PERSIST_CONF_PROFILE_BLOCK_SIZE;
+}
 
 profile::Parameters *loadProfile(int location) {
     assert(location < NUM_PROFILE_LOCATIONS && sizeof(profile::Parameters) <= PERSIST_CONF_PROFILE_BLOCK_SIZE);
@@ -833,15 +783,13 @@ bool writeTotalOnTime(int type, uint32_t time) {
 void enableOutputProtectionCouple(bool enable) {
     int outputProtectionCouple = enable ? 1 : 0;
 
-    if (devConf.flags.outputProtectionCouple == outputProtectionCouple) {
+    if (g_devConf.outputProtectionCouple != outputProtectionCouple) {
         return;
     }
 
-    devConf.flags.outputProtectionCouple = outputProtectionCouple;
+    g_devConf.outputProtectionCouple = outputProtectionCouple;
 
-    saveDevice();
-
-    if (devConf.flags.outputProtectionCouple) {
+    if (g_devConf.outputProtectionCouple) {
         event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_COUPLED);
     } else {
         event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_DECOUPLED);
@@ -849,55 +797,47 @@ void enableOutputProtectionCouple(bool enable) {
 }
 
 bool isOutputProtectionCoupleEnabled() {
-    return devConf.flags.outputProtectionCouple ? true : false;
+    return g_devConf.outputProtectionCouple ? true : false;
 }
 
 void enableShutdownWhenProtectionTripped(bool enable) {
     int shutdownWhenProtectionTripped = enable ? 1 : 0;
 
-    if (devConf.flags.shutdownWhenProtectionTripped == shutdownWhenProtectionTripped) {
+    if (g_devConf.shutdownWhenProtectionTripped == shutdownWhenProtectionTripped) {
         return;
     }
 
-    devConf.flags.shutdownWhenProtectionTripped = shutdownWhenProtectionTripped;
+    g_devConf.shutdownWhenProtectionTripped = shutdownWhenProtectionTripped;
 
-    saveDevice();
-
-    if (devConf.flags.shutdownWhenProtectionTripped) {
-        event_queue::pushEvent(
-            event_queue::EVENT_INFO_SHUTDOWN_WHEN_PROTECTION_TRIPPED_ENABLED);
+    if (g_devConf.shutdownWhenProtectionTripped) {
+        event_queue::pushEvent(event_queue::EVENT_INFO_SHUTDOWN_WHEN_PROTECTION_TRIPPED_ENABLED);
     } else {
-        event_queue::pushEvent(
-            event_queue::EVENT_INFO_SHUTDOWN_WHEN_PROTECTION_TRIPPED_DISABLED);
+        event_queue::pushEvent(event_queue::EVENT_INFO_SHUTDOWN_WHEN_PROTECTION_TRIPPED_DISABLED);
     }
 }
 
 bool isShutdownWhenProtectionTrippedEnabled() {
-    return devConf.flags.shutdownWhenProtectionTripped ? true : false;
+    return g_devConf.shutdownWhenProtectionTripped ? true : false;
 }
 
 void enableForceDisablingAllOutputsOnPowerUp(bool enable) {
     int forceDisablingAllOutputsOnPowerUp = enable ? 1 : 0;
 
-    if (devConf.flags.forceDisablingAllOutputsOnPowerUp == forceDisablingAllOutputsOnPowerUp) {
+    if (g_devConf.forceDisablingAllOutputsOnPowerUp == forceDisablingAllOutputsOnPowerUp) {
         return;
     }
 
-    devConf.flags.forceDisablingAllOutputsOnPowerUp = forceDisablingAllOutputsOnPowerUp;
+    g_devConf.forceDisablingAllOutputsOnPowerUp = forceDisablingAllOutputsOnPowerUp;
 
-    saveDevice();
-
-    if (devConf.flags.forceDisablingAllOutputsOnPowerUp) {
-        event_queue::pushEvent(
-            event_queue::EVENT_INFO_FORCE_DISABLING_ALL_OUTPUTS_ON_POWERUP_ENABLED);
+    if (g_devConf.forceDisablingAllOutputsOnPowerUp) {
+        event_queue::pushEvent(event_queue::EVENT_INFO_FORCE_DISABLING_ALL_OUTPUTS_ON_POWERUP_ENABLED);
     } else {
-        event_queue::pushEvent(
-            event_queue::EVENT_INFO_FORCE_DISABLING_ALL_OUTPUTS_ON_POWERUP_DISABLED);
+        event_queue::pushEvent(event_queue::EVENT_INFO_FORCE_DISABLING_ALL_OUTPUTS_ON_POWERUP_DISABLED);
     }
 }
 
 bool isForceDisablingAllOutputsOnPowerUpEnabled() {
-    return devConf.flags.forceDisablingAllOutputsOnPowerUp ? true : false;
+    return g_devConf.forceDisablingAllOutputsOnPowerUp ? true : false;
 }
 
 void lockFrontPanel(bool lock) {
@@ -905,15 +845,13 @@ void lockFrontPanel(bool lock) {
 
     int isFrontPanelLocked = lock ? 1 : 0;
 
-    if (devConf.flags.isFrontPanelLocked == isFrontPanelLocked) {
+    if (g_devConf.isFrontPanelLocked == isFrontPanelLocked) {
         return;
     }
 
-    devConf.flags.isFrontPanelLocked = isFrontPanelLocked;
+    g_devConf.isFrontPanelLocked = isFrontPanelLocked;
 
-    saveDevice();
-
-    if (devConf.flags.isFrontPanelLocked) {
+    if (g_devConf.isFrontPanelLocked) {
         event_queue::pushEvent(event_queue::EVENT_INFO_FRONT_PANEL_LOCKED);
     } else {
         event_queue::pushEvent(event_queue::EVENT_INFO_FRONT_PANEL_UNLOCKED);
@@ -921,56 +859,44 @@ void lockFrontPanel(bool lock) {
 }
 
 void setEncoderSettings(uint8_t confirmationMode, uint8_t movingSpeedDown, uint8_t movingSpeedUp) {
-    devConf2.flags.encoderConfirmationMode = confirmationMode;
-    devConf2.encoderMovingSpeedDown = movingSpeedDown;
-    devConf2.encoderMovingSpeedUp = movingSpeedUp;
-
-    saveDevice2();
+    g_devConf.encoderConfirmationMode = confirmationMode;
+    g_devConf.encoderMovingSpeedDown = movingSpeedDown;
+    g_devConf.encoderMovingSpeedUp = movingSpeedUp;
 }
 
 void setDisplayState(unsigned newState) {
-    unsigned currentDisplayState = devConf2.flags.displayState;
-
-    if (currentDisplayState != newState) {
-        devConf2.flags.displayState = newState;
-        saveDevice2();
-    }
+    g_devConf.displayState = newState;
 }
 
 void setDisplayBrightness(uint8_t displayBrightness) {
-    devConf2.displayBrightness = displayBrightness;
+    g_devConf.displayBrightness = displayBrightness;
 
 #if OPTION_DISPLAY
     updateBrightness();
 #endif
-
-    saveDevice2();
 }
 
 void setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep) {
-    devConf2.displayBackgroundLuminosityStep = displayBackgroundLuminosityStep;
+    g_devConf.displayBackgroundLuminosityStep = displayBackgroundLuminosityStep;
 
 #if OPTION_DISPLAY
     onLuminocityChanged();
     refreshScreen();
 #endif
-
-    saveDevice2();
 }
 
 bool enableSerial(bool enable) {
     unsigned serialEnabled = enable ? 1 : 0;
-    if (!devConf2.flags.skipSerialSetup || devConf2.flags.serialEnabled != serialEnabled) {
-        devConf2.flags.serialEnabled = serialEnabled;
-        devConf2.flags.skipSerialSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipSerialSetup || g_devConf.serialEnabled != serialEnabled) {
+        g_devConf.serialEnabled = serialEnabled;
+        g_devConf.skipSerialSetup = 1;
         serial::update();
     }
     return true;
 }
 
 bool isSerialEnabled() {
-    return devConf2.flags.serialEnabled ? true : false;
+    return g_devConf.serialEnabled ? true : false;
 }
 
 int getIndexFromBaud(long baud) {
@@ -987,30 +913,28 @@ long getBaudFromIndex(int index) {
 }
 
 int getSerialBaudIndex() {
-    return devConf2.serialBaud;
+    return g_devConf.serialBaud;
 }
 
 bool setSerialBaudIndex(int baudIndex) {
     uint8_t serialBaud = (uint8_t)baudIndex;
-    if (!devConf2.flags.skipSerialSetup || devConf2.serialBaud != serialBaud) {
-        devConf2.serialBaud = serialBaud;
-        devConf2.flags.skipSerialSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipSerialSetup || g_devConf.serialBaud != serialBaud) {
+        g_devConf.serialBaud = serialBaud;
+        g_devConf.skipSerialSetup = 1;
         serial::update();
     }
     return true;
 }
 
 int getSerialParity() {
-    return devConf2.serialParity;
+    return g_devConf.serialParity;
 }
 
 bool setSerialParity(int parity) {
     unsigned serialParity = (unsigned)parity;
-    if (!devConf2.flags.skipSerialSetup || devConf2.serialParity != serialParity) {
-        devConf2.serialParity = serialParity;
-        devConf2.flags.skipSerialSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipSerialSetup || g_devConf.serialParity != serialParity) {
+        g_devConf.serialParity = serialParity;
+        g_devConf.skipSerialSetup = 1;
         serial::update();
     }
     return true;
@@ -1020,13 +944,12 @@ bool setSerialSettings(bool enabled, int baudIndex, int parity) {
     unsigned serialEnabled = enabled ? 1 : 0;
     uint8_t serialBaud = (uint8_t)baudIndex;
     unsigned serialParity = (unsigned)parity;
-    if (!devConf2.flags.skipSerialSetup || devConf2.flags.serialEnabled != serialEnabled ||
-        devConf2.serialBaud != serialBaud || devConf2.serialParity != serialParity) {
-        devConf2.flags.serialEnabled = enabled;
-        devConf2.serialBaud = serialBaud;
-        devConf2.serialParity = serialParity;
-        devConf2.flags.skipSerialSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipSerialSetup || g_devConf.serialEnabled != serialEnabled ||
+        g_devConf.serialBaud != serialBaud || g_devConf.serialParity != serialParity) {
+        g_devConf.serialEnabled = enabled;
+        g_devConf.serialBaud = serialBaud;
+        g_devConf.serialParity = serialParity;
+        g_devConf.skipSerialSetup = 1;
         serial::update();
     }
     return true;
@@ -1035,11 +958,9 @@ bool setSerialSettings(bool enabled, int baudIndex, int parity) {
 bool enableEthernet(bool enable) {
 #if OPTION_ETHERNET
     unsigned ethernetEnabled = enable ? 1 : 0;
-    if (!devConf2.flags.skipEthernetSetup || devConf.flags.ethernetEnabled != ethernetEnabled) {
-        devConf.flags.ethernetEnabled = ethernetEnabled;
-        saveDevice();
-        devConf2.flags.skipEthernetSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipEthernetSetup || g_devConf.ethernetEnabled != ethernetEnabled) {
+        g_devConf.ethernetEnabled = ethernetEnabled;
+        g_devConf.skipEthernetSetup = 1;
         event_queue::pushEvent(enable ? event_queue::EVENT_INFO_ETHERNET_ENABLED
                                       : event_queue::EVENT_INFO_ETHERNET_DISABLED);
         ethernet::update();
@@ -1051,17 +972,16 @@ bool enableEthernet(bool enable) {
 }
 
 bool isEthernetEnabled() {
-    return devConf.flags.ethernetEnabled ? true : false;
+    return g_devConf.ethernetEnabled ? true : false;
 }
 
 bool enableEthernetDhcp(bool enable) {
 #if OPTION_ETHERNET
     unsigned ethernetDhcpEnabled = enable ? 1 : 0;
-    if (!devConf2.flags.skipEthernetSetup ||
-        devConf2.flags.ethernetDhcpEnabled != ethernetDhcpEnabled) {
-        devConf2.flags.ethernetDhcpEnabled = ethernetDhcpEnabled;
-        devConf2.flags.skipEthernetSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipEthernetSetup ||
+        g_devConf.ethernetDhcpEnabled != ethernetDhcpEnabled) {
+        g_devConf.ethernetDhcpEnabled = ethernetDhcpEnabled;
+        g_devConf.skipEthernetSetup = 1;
         ethernet::update();
     }
     return true;
@@ -1071,16 +991,15 @@ bool enableEthernetDhcp(bool enable) {
 }
 
 bool isEthernetDhcpEnabled() {
-    return devConf2.flags.ethernetDhcpEnabled ? true : false;
+    return g_devConf.ethernetDhcpEnabled ? true : false;
 }
 
 bool setEthernetMacAddress(uint8_t macAddress[]) {
 #if OPTION_ETHERNET
-    if (!devConf2.flags.skipEthernetSetup ||
-        memcmp(devConf2.ethernetMacAddress, macAddress, 6) != 0) {
-        memcpy(devConf2.ethernetMacAddress, macAddress, 6);
-        devConf2.flags.skipEthernetSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipEthernetSetup ||
+        memcmp(g_devConf.ethernetMacAddress, macAddress, 6) != 0) {
+        memcpy(g_devConf.ethernetMacAddress, macAddress, 6);
+        g_devConf.skipEthernetSetup = 1;
         ethernet::update();
     }
     return true;
@@ -1091,10 +1010,9 @@ bool setEthernetMacAddress(uint8_t macAddress[]) {
 
 bool setEthernetIpAddress(uint32_t ipAddress) {
 #if OPTION_ETHERNET
-    if (!devConf2.flags.skipEthernetSetup || devConf2.ethernetIpAddress != ipAddress) {
-        devConf2.ethernetIpAddress = ipAddress;
-        devConf2.flags.skipEthernetSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipEthernetSetup || g_devConf.ethernetIpAddress != ipAddress) {
+        g_devConf.ethernetIpAddress = ipAddress;
+        g_devConf.skipEthernetSetup = 1;
         ethernet::update();
     }
     return true;
@@ -1105,10 +1023,9 @@ bool setEthernetIpAddress(uint32_t ipAddress) {
 
 bool setEthernetDns(uint32_t dns) {
 #if OPTION_ETHERNET
-    if (!devConf2.flags.skipEthernetSetup || devConf2.ethernetDns != dns) {
-        devConf2.ethernetDns = dns;
-        devConf2.flags.skipEthernetSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipEthernetSetup || g_devConf.ethernetDns != dns) {
+        g_devConf.ethernetDns = dns;
+        g_devConf.skipEthernetSetup = 1;
         ethernet::update();
     }
     return true;
@@ -1119,10 +1036,9 @@ bool setEthernetDns(uint32_t dns) {
 
 bool setEthernetGateway(uint32_t gateway) {
 #if OPTION_ETHERNET
-    if (!devConf2.flags.skipEthernetSetup || devConf2.ethernetGateway != gateway) {
-        devConf2.ethernetGateway = gateway;
-        devConf2.flags.skipEthernetSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipEthernetSetup || g_devConf.ethernetGateway != gateway) {
+        g_devConf.ethernetGateway = gateway;
+        g_devConf.skipEthernetSetup = 1;
         ethernet::update();
     }
     return true;
@@ -1133,10 +1049,9 @@ bool setEthernetGateway(uint32_t gateway) {
 
 bool setEthernetSubnetMask(uint32_t subnetMask) {
 #if OPTION_ETHERNET
-    if (!devConf2.flags.skipEthernetSetup || devConf2.ethernetSubnetMask != subnetMask) {
-        devConf2.ethernetSubnetMask = subnetMask;
-        devConf2.flags.skipEthernetSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipEthernetSetup || g_devConf.ethernetSubnetMask != subnetMask) {
+        g_devConf.ethernetSubnetMask = subnetMask;
+        g_devConf.skipEthernetSetup = 1;
         ethernet::update();
     }
     return true;
@@ -1147,10 +1062,9 @@ bool setEthernetSubnetMask(uint32_t subnetMask) {
 
 bool setEthernetScpiPort(uint16_t scpiPort) {
 #if OPTION_ETHERNET
-    if (!devConf2.flags.skipEthernetSetup || devConf2.ethernetScpiPort != scpiPort) {
-        devConf2.ethernetScpiPort = scpiPort;
-        devConf2.flags.skipEthernetSetup = 1;
-        saveDevice2();
+    if (!g_devConf.skipEthernetSetup || g_devConf.ethernetScpiPort != scpiPort) {
+        g_devConf.ethernetScpiPort = scpiPort;
+        g_devConf.skipEthernetSetup = 1;
         ethernet::update();
     }
     return true;
@@ -1166,30 +1080,28 @@ bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint3
     unsigned ethernetEnabled = enable ? 1 : 0;
     unsigned ethernetDhcpEnabled = dhcpEnable ? 1 : 0;
 
-    if (!devConf2.flags.skipEthernetSetup || devConf.flags.ethernetEnabled != ethernetEnabled ||
-        devConf2.flags.ethernetDhcpEnabled != ethernetDhcpEnabled ||
-        memcmp(devConf2.ethernetMacAddress, macAddress, 6) != 0 ||
-        devConf2.ethernetIpAddress != ipAddress || devConf2.ethernetDns != dns ||
-        devConf2.ethernetGateway != gateway || devConf2.ethernetSubnetMask != subnetMask ||
-        devConf2.ethernetScpiPort != scpiPort) {
+    if (!g_devConf.skipEthernetSetup || g_devConf.ethernetEnabled != ethernetEnabled ||
+        g_devConf.ethernetDhcpEnabled != ethernetDhcpEnabled ||
+        memcmp(g_devConf.ethernetMacAddress, macAddress, 6) != 0 ||
+        g_devConf.ethernetIpAddress != ipAddress || g_devConf.ethernetDns != dns ||
+        g_devConf.ethernetGateway != gateway || g_devConf.ethernetSubnetMask != subnetMask ||
+        g_devConf.ethernetScpiPort != scpiPort) {
 
-        if (devConf.flags.ethernetEnabled != ethernetEnabled) {
-            devConf.flags.ethernetEnabled = ethernetEnabled;
-            saveDevice();
-            event_queue::pushEvent(devConf.flags.ethernetEnabled
+        if (g_devConf.ethernetEnabled != ethernetEnabled) {
+            g_devConf.ethernetEnabled = ethernetEnabled;
+            event_queue::pushEvent(g_devConf.ethernetEnabled
                                        ? event_queue::EVENT_INFO_ETHERNET_ENABLED
                                        : event_queue::EVENT_INFO_ETHERNET_DISABLED);
         }
 
-        devConf2.flags.ethernetDhcpEnabled = ethernetDhcpEnabled;
-        memcpy(devConf2.ethernetMacAddress, macAddress, 6);
-        devConf2.ethernetIpAddress = ipAddress;
-        devConf2.ethernetDns = dns;
-        devConf2.ethernetGateway = gateway;
-        devConf2.ethernetSubnetMask = subnetMask;
-        devConf2.ethernetScpiPort = scpiPort;
-        devConf2.flags.skipEthernetSetup = 1;
-        saveDevice2();
+        g_devConf.ethernetDhcpEnabled = ethernetDhcpEnabled;
+        memcpy(g_devConf.ethernetMacAddress, macAddress, 6);
+        g_devConf.ethernetIpAddress = ipAddress;
+        g_devConf.ethernetDns = dns;
+        g_devConf.ethernetGateway = gateway;
+        g_devConf.ethernetSubnetMask = subnetMask;
+        g_devConf.ethernetScpiPort = scpiPort;
+        g_devConf.skipEthernetSetup = 1;
 
         ethernet::update();
     }
@@ -1201,41 +1113,118 @@ bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint3
 }
 
 void enableNtp(bool enable) {
-    devConf2.flags.ntpEnabled = enable ? 1 : 0;
-    saveDevice2();
+    g_devConf.ntpEnabled = enable ? 1 : 0;
 }
 
 bool isNtpEnabled() {
-    return devConf2.flags.ntpEnabled ? true : false;
+    return g_devConf.ntpEnabled ? true : false;
 }
 
 void setNtpServer(const char *ntpServer, size_t ntpServerLength) {
-    strncpy(devConf2.ntpServer, ntpServer, ntpServerLength);
-    devConf2.ntpServer[ntpServerLength] = 0;
-    saveDevice2();
+    strncpy(g_devConf.ntpServer, ntpServer, ntpServerLength);
+    g_devConf.ntpServer[ntpServerLength] = 0;
 }
 
 void setNtpSettings(bool enable, const char *ntpServer) {
-    devConf2.flags.ntpEnabled = enable ? 1 : 0;
-    strcpy(devConf2.ntpServer, ntpServer);
-    saveDevice2();
+    g_devConf.ntpEnabled = enable ? 1 : 0;
+    strcpy(g_devConf.ntpServer, ntpServer);
 }
 
 void setSdLocked(bool sdLocked) {
-    devConf2.flags.sdLocked = sdLocked ? 1 : 0;
-    saveDevice2();
+    g_devConf.sdLocked = sdLocked ? 1 : 0;
 }
 
 bool isSdLocked() {
-    return devConf2.flags.sdLocked ? true : false;
+    return g_devConf.sdLocked ? true : false;
 }
 
 void setAnimationsDuration(float value) {
-    devConf2.animationsDuration = value;
-    saveDevice2();
+    g_devConf.animationsDuration = value;
+}
+
+void setTouchscreenCalParams(int16_t touch_screen_cal_tlx, int16_t touch_screen_cal_tly, int16_t touch_screen_cal_brx, int16_t touch_screen_cal_bry, int16_t touch_screen_cal_trx, int16_t touch_screen_cal_try) {
+    g_devConf.touch_screen_cal_tlx = touch_screen_cal_tlx;
+    g_devConf.touch_screen_cal_tly = touch_screen_cal_tly;
+    g_devConf.touch_screen_cal_brx = touch_screen_cal_brx;
+    g_devConf.touch_screen_cal_bry = touch_screen_cal_bry;
+    g_devConf.touch_screen_cal_trx = touch_screen_cal_trx;
+    g_devConf.touch_screen_cal_try = touch_screen_cal_try;
+}
+
+void setFanSettings(uint8_t fanMode, uint8_t fanSpeed) {
+    g_devConf.fanMode = fanMode;
+    g_devConf.fanSpeed = fanSpeed;
+}
+
+void setDateValid(unsigned dateValid) {
+    g_devConf.dateValid = dateValid;
+}
+
+void setTimeValid(unsigned timeValid) {
+    g_devConf.timeValid = timeValid;
+}
+
+void setTimeZone(int16_t time_zone) {
+    g_devConf.time_zone = time_zone;
+}
+
+void setDstRule(uint8_t dstRule) {
+    g_devConf.dstRule = dstRule;
+}
+
+void setIoPinPolarity(int pin, unsigned polarity) {
+    g_devConf.ioPins[pin].polarity = polarity;
+}
+
+void setIoPinFunction(int pin, unsigned function) {
+    g_devConf.ioPins[pin].function = function;
+}
+
+void setSelectedThemeIndex(uint8_t selectedThemeIndex) {
+    g_devConf.selectedThemeIndex = selectedThemeIndex;
+}
+
+void resetTrigger() {
+    g_devConf.triggerDelay = trigger::DELAY_DEFAULT;
+    g_devConf.triggerSource = trigger::SOURCE_IMMEDIATE;
+    g_devConf.triggerContinuousInitializationEnabled = 0;
+}
+
+void setTriggerContinuousInitializationEnabled(unsigned triggerContinuousInitializationEnabled) {
+    g_devConf.triggerContinuousInitializationEnabled = triggerContinuousInitializationEnabled;
+}
+
+void setTriggerDelay(float triggerDelay) {
+    g_devConf.triggerDelay = triggerDelay;
+}
+
+void setTriggerSource(uint8_t triggerSource) {
+    g_devConf.triggerSource = triggerSource;
+}
+
+void setSkipChannelCalibrations(unsigned skipChannelCalibrations) {
+    g_devConf.skipChannelCalibrations = skipChannelCalibrations;
+}
+
+void setSkipDateTimeSetup(unsigned skipDateTimeSetup) {
+    g_devConf.skipDateTimeSetup = skipDateTimeSetup;
+}
+
+void setSkipSerialSetup(unsigned skipSerialSetup) {
+    g_devConf.skipSerialSetup = skipSerialSetup;
+}
+
+void setSkipEthernetSetup(unsigned skipEthernetSetup) {
+    g_devConf.skipEthernetSetup = skipEthernetSetup;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 64;
+static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE = 64;
+
+static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = 128;
+static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 256;
 
 ModuleConfiguration g_moduleConf[NUM_SLOTS];
 
@@ -1259,7 +1248,7 @@ void loadModuleConf(int slotIndex) {
         slotIndex, 
         buffer, 
         MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE, 
-        getModuleConfSectionAddress(MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION, -1),
+        MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS,
         MODULE_CONF_VERSION
     )) {
         ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
@@ -1281,7 +1270,7 @@ bool saveModuleConf(int slotIndex) {
         slotIndex, 
         (BlockHeader *)buffer, 
         MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE, 
-        getModuleConfSectionAddress(MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION, -1),
+        MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS,
         MODULE_CONF_VERSION
     );
 }
@@ -1308,7 +1297,7 @@ void loadChannelCalibration(Channel &channel) {
         channel.slotIndex,
         (uint8_t *)&channel.cal_conf,
         sizeof(Channel::CalibrationConfiguration),
-        getModuleConfSectionAddress(MODULE_PERSIST_CONF_BLOCK_CH_CAL, channel.subchannelIndex),
+        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE,
         CH_CAL_CONF_VERSION
     )) {
         channel.clearCalibrationConf();
@@ -1320,7 +1309,7 @@ bool saveChannelCalibration(Channel &channel) {
         channel.slotIndex,
         (BlockHeader *)&channel.cal_conf,
         sizeof(Channel::CalibrationConfiguration),
-        getModuleConfSectionAddress(MODULE_PERSIST_CONF_BLOCK_CH_CAL, channel.subchannelIndex), 
+        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE,
         CH_CAL_CONF_VERSION
     );
 }
@@ -1330,5 +1319,5 @@ bool saveChannelCalibration(Channel &channel) {
 } // namespace eez
 
 extern "C" void getMacAddress(uint8_t macAddress[]) {
-    memcpy(macAddress, eez::psu::persist_conf::devConf2.ethernetMacAddress, 6);
+    memcpy(macAddress, eez::psu::persist_conf::g_devConf.ethernetMacAddress, 6);
 }

@@ -100,7 +100,11 @@ bool read(uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
     size_t readBytes = fread(buffer, 1, bufferSize, fp);
     fclose(fp);
 
-    return readBytes == bufferSize;
+    if (readBytes < bufferSize) {
+        memset(buffer + readBytes, 0xFF, bufferSize - readBytes);
+    }
+
+    return true;
 #endif
 
 }

@@ -214,7 +214,7 @@ struct Channel : ChannelInterface {
 	}
 
 #if defined(EEZ_PLATFORM_STM32)
-    bool isCrcOk;
+    int numCrcErrors;
 
 	void transfer() {
 		spi::select(slotIndex, spi::CHIP_DCM220);
@@ -224,11 +224,14 @@ struct Channel : ChannelInterface {
 		lastTickCount = micros();
 
 		uint32_t crc = HAL_CRC_Calculate(&hcrc, (uint32_t *)input, BUFFER_SIZE - 4);
-		isCrcOk = crc == *((uint32_t *)(input + BUFFER_SIZE - 4));
-		if (!isCrcOk) {
-		    auto lastEvent = event_queue::getLastErrorEvent();
-			if (!lastEvent || lastEvent->eventId != event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex) {
-				event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
+		if (crc == *((uint32_t *)(input + BUFFER_SIZE - 4))) {
+			numCrcErrors = 0;
+		} else {
+			if (++numCrcErrors >= 3) {
+				auto lastEvent = event_queue::getLastErrorEvent();
+				if (!lastEvent || lastEvent->eventId != event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex) {
+					event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
+				}
 			}
 		}
 	}
@@ -241,7 +244,7 @@ struct Channel : ChannelInterface {
 			spi::init(slotIndex, spi::CHIP_DCM220);
 			if (masterSynchro(slotIndex)) {
 				synchronized = true;
-				delay(1);
+				numCrcErrors = 0;
 			}
 		}
 #endif
@@ -274,7 +277,7 @@ struct Channel : ChannelInterface {
 		}
 
 		bool pwrGood;
-		if (isCrcOk) {
+		if (numCrcErrors == 0) {
 			pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
 		} else{
 			pwrGood = true;
@@ -331,7 +334,7 @@ struct Channel : ChannelInterface {
 		        HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
 		    }
 
-		    if (isCrcOk) {
+		    if (numCrcErrors == 0) {
 		    	temperature[0] = calcTemperature(*((uint16_t *)(input + 10)));
 		    	temperature[1] = calcTemperature(*((uint16_t *)(input + 12)));
 		    }
@@ -376,7 +379,7 @@ struct Channel : ChannelInterface {
         //
 
 #if defined(EEZ_PLATFORM_STM32)
-        if (isCrcOk) {
+        if (numCrcErrors == 0) {
         	uint16_t *inputSetValues = (uint16_t *)(input + 2);
 
         	int offset = subchannelIndex * 2;
@@ -408,7 +411,7 @@ struct Channel : ChannelInterface {
 
 #if defined(EEZ_PLATFORM_STM32)
 		bool pwrGood;
-		if (isCrcOk) {
+		if (numCrcErrors == 0) {
 			pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
 		} else{
 			pwrGood = true;

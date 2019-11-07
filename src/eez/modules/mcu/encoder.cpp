@@ -150,7 +150,7 @@ int getCounter() {
 
     //
     g_accumulatedCounter += diffCounter;
-    float speed = 1.0f + (MAX_MOVING_SPEED - (g_useSameSpeed ? MAX(psu::persist_conf::devConf2.encoderMovingSpeedUp, psu::persist_conf::devConf2.encoderMovingSpeedDown) : g_accumulatedCounter > 0 ? psu::persist_conf::devConf2.encoderMovingSpeedUp : psu::persist_conf::devConf2.encoderMovingSpeedDown)) * CONF_ENCODER_SPEED_FACTOR;
+    float speed = 1.0f + (MAX_MOVING_SPEED - (g_useSameSpeed ? MAX(psu::persist_conf::devConf.encoderMovingSpeedUp, psu::persist_conf::devConf.encoderMovingSpeedDown) : g_accumulatedCounter > 0 ? psu::persist_conf::devConf.encoderMovingSpeedUp : psu::persist_conf::devConf.encoderMovingSpeedDown)) * CONF_ENCODER_SPEED_FACTOR;
     int result = (int)(g_accumulatedCounter > 0 ? floorf(g_accumulatedCounter / speed) : ceilf(g_accumulatedCounter / speed));
     g_accumulatedCounter -= result * speed;
 

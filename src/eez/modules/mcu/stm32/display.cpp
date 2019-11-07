@@ -63,6 +63,7 @@ static uint32_t g_displayStateTransitionStartTime;
 
 #if OPTION_SDRAM
 static uint16_t *g_bufferOld;
+static uint16_t *g_bufferNew;
 static uint16_t *g_buffer;
 static uint16_t *g_animationBuffer;
 #else
@@ -346,7 +347,8 @@ void turnOn() {
         // clear video RAM
 #if OPTION_SDRAM
         g_bufferOld = (uint16_t *)VRAM_BUFFER2_START_ADDRESS;
-        g_buffer = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
+        g_bufferNew = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
+        g_buffer = g_bufferNew;
 
         for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
             g_buffers[bufferIndex].bufferPointer = (uint16_t *)(VRAM_BUFFER5_START_ADDRESS + bufferIndex * VRAM_BUFFER_SIZE);
@@ -380,7 +382,7 @@ bool isOn() {
 void updateBrightness() {
 	if (g_displayState == ON) {
 		uint32_t max = __HAL_TIM_GET_AUTORELOAD(&htim12);
-		__HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, psu::persist_conf::devConf2.displayBrightness * max / 20);
+		__HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, psu::persist_conf::devConf.displayBrightness * max / 20);
 	}
 }
 
@@ -410,6 +412,21 @@ void animate() {
 #endif
 }
 
+void swapBuffers() {
+#if OPTION_SDRAM
+    // wait for VSYNC
+    while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {}
+
+    HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
+
+    auto temp = g_bufferNew;
+    g_bufferNew = g_bufferOld;
+    g_bufferOld = temp;
+
+    g_buffer = g_bufferNew;
+#endif
+}
+
 void sync() {
     if (g_displayState == OFF) {
         return;
@@ -426,7 +443,7 @@ void sync() {
             g_displayState = OFF;
         } else {
             uint32_t max = __HAL_TIM_GET_AUTORELOAD(&htim12);
-            max = psu::persist_conf::devConf2.displayBrightness * max / 20;
+            max = psu::persist_conf::devConf.displayBrightness * max / 20;
             __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, (uint32_t)remap(1.0f * (CONF_TURN_ON_OFF_ANIMATION_DURATION - diff) / CONF_TURN_ON_OFF_ANIMATION_DURATION, 0.0f, 0.0f, 1.0f, 1.0f * max));
         }
         return;
@@ -438,7 +455,7 @@ void sync() {
             g_displayState = ON;
         } else {
             uint32_t max = __HAL_TIM_GET_AUTORELOAD(&htim12);
-            max = psu::persist_conf::devConf2.displayBrightness * max / 20;
+            max = psu::persist_conf::devConf.displayBrightness * max / 20;
             __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, (uint32_t)remapQuad(1.0f * diff / CONF_TURN_ON_OFF_ANIMATION_DURATION, 0.0f, 0.0f, 1.0f, 1.0f * max));
         }
     }
@@ -457,16 +474,7 @@ void sync() {
     if (g_painted) {
         g_painted = false;
 
-#if OPTION_SDRAM
-        // wait for VSYNC
-        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {}
-
-        HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
-
-        auto temp = g_buffer;
-        g_buffer = g_bufferOld;
-        g_bufferOld = temp;
-#endif
+        swapBuffers();
     }
 
     if (g_takeScreenshot) {
@@ -479,16 +487,7 @@ void sync() {
 }
 
 void finishAnimation() {
-#if OPTION_SDRAM
-        // wait for VSYNC
-        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {}
-
-        HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
-
-        auto temp = g_buffer;
-        g_buffer = g_bufferOld;
-        g_bufferOld = temp;
-#endif
+    swapBuffers();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

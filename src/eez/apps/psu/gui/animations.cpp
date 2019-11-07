@@ -50,6 +50,9 @@ static const Rect g_horzDefRects[] = {
 
 static const Rect g_maxRect = { 0, 0, 480, 167 };
 
+static const Rect g_maxRectMax = { 0, 0, 360, 167 };
+static const Rect g_maxRectMin = { 360, 0, 120, 167 };
+
 static const Rect g_minRects[] = {
     {   0, 167, 240, 74 },
     { 240, 167, 240, 74 }
@@ -76,8 +79,8 @@ void animateFromDefaultViewToMaxView() {
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 
-    auto g_defRects = psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
-        psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
+    auto g_defRects = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
+        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
 
     int i = 0;
 
@@ -99,8 +102,8 @@ void animateFromMaxViewToDefaultView() {
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 
-    auto g_defRects = psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
-        psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
+    auto g_defRects = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
+        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
 
     int i = 0;
 
@@ -117,8 +120,9 @@ void animateFromMaxViewToDefaultView() {
     animateRects(BUFFER_OLD, i);
 }
 
-void animateFromMinViewToMaxView(int iMaxBefore) {
-    int iMax = psu::persist_conf::devConf.flags.slotMax;
+void animateFromMinViewToMaxView(int maxChannelIndexBefore) {
+    int iMaxBefore = Channel::get(maxChannelIndexBefore).slotIndex + 1;
+    int iMax = Channel::get(psu::persist_conf::getMaxChannelIndex()).slotIndex + 1;
 
     int i = 0;
 
@@ -156,6 +160,15 @@ void animateFromMinViewToMaxView(int iMaxBefore) {
         g_animRects[i++] = { BUFFER_NEW, g_minRects[0], g_minRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
         g_animRects[i++] = { BUFFER_NEW, g_maxRect, g_minRects[0], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
         g_animRects[i++] = { BUFFER_NEW, g_minRects[1], g_maxRect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
+    } else {
+        g_animRects[i++] = { BUFFER_NEW, g_minRects[0], g_minRects[0], 0, OPACITY_SOLID, POSITION_CENTER };
+        g_animRects[i++] = { BUFFER_NEW, g_minRects[1], g_minRects[1], 0, OPACITY_SOLID, POSITION_CENTER };
+
+        g_animRects[i++] = { BUFFER_OLD, g_maxRectMax, g_maxRectMin, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
+        g_animRects[i++] = { BUFFER_OLD, g_maxRectMin, g_maxRectMax, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
+
+        g_animRects[i++] = { BUFFER_NEW, g_maxRectMax, g_maxRectMin, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
+        g_animRects[i++] = { BUFFER_NEW, g_maxRectMin, g_maxRectMax, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
     }
 
     animateRects(BUFFER_OLD, i);
@@ -182,8 +195,8 @@ void animateFromMicroViewToMaxView() {
 }
 
 void animateShowSysSettings() {
-    auto g_defRects = psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
-        psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
+    auto g_defRects = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
+        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
 
     int i = 0;
 
@@ -205,8 +218,8 @@ void animateShowSysSettings() {
 }
 
 void animateHideSysSettings() {
-    auto g_defRects = psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC ||
-        psu::persist_conf::devConf.flags.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
+    auto g_defRects = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC ||
+        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
 
     int i = 0;
 
@@ -298,7 +311,7 @@ void animateFadeOutFadeInWorkingArea() {
     g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_OLD, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    animateRects(BUFFER_NEW, i, 2 * psu::persist_conf::devConf2.animationsDuration);
+    animateRects(BUFFER_NEW, i, 2 * psu::persist_conf::devConf.animationsDuration);
 }
 
 } // namespace gui

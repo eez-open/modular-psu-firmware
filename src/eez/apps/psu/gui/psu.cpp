@@ -71,7 +71,11 @@ namespace gui {
 
 PsuAppContext g_psuAppContext;
 
-static persist_conf::DeviceFlags2 g_deviceFlags2;
+static unsigned g_skipChannelCalibrations;
+static unsigned g_skipDateTimeSetup;
+static unsigned g_skipSerialSetup;
+static unsigned g_skipEthernetSetup;
+
 static bool g_showSetupWizardQuestionCalled;
 Channel *g_channel;
 static WidgetCursor g_toggleOutputWidgetCursor;
@@ -419,7 +423,7 @@ bool isChannelCalibrationsDone() {
 }
 
 bool isDateTimeSetupDone() {
-    return persist_conf::devConf.flags.dateValid && persist_conf::devConf.flags.timeValid;
+    return persist_conf::devConf.dateValid && persist_conf::devConf.timeValid;
 }
 
 void channelCalibrationsYes() {
@@ -427,8 +431,7 @@ void channelCalibrationsYes() {
 }
 
 void channelCalibrationsNo() {
-    persist_conf::devConf2.flags.skipChannelCalibrations = 1;
-    persist_conf::saveDevice2();
+    persist_conf::setSkipChannelCalibrations(1);
 }
 
 void dateTimeYes() {
@@ -436,8 +439,7 @@ void dateTimeYes() {
 }
 
 void dateTimeNo() {
-    persist_conf::devConf2.flags.skipDateTimeSetup = 1;
-    persist_conf::saveDevice2();
+    persist_conf::setSkipDateTimeSetup(1);
 }
 
 void serialYes() {
@@ -445,8 +447,7 @@ void serialYes() {
 }
 
 void serialNo() {
-    persist_conf::devConf2.flags.skipSerialSetup = 1;
-    persist_conf::saveDevice2();
+    persist_conf::setSkipSerialSetup(1);
 }
 
 void ethernetYes() {
@@ -454,18 +455,21 @@ void ethernetYes() {
 }
 
 void ethernetNo() {
-    persist_conf::devConf2.flags.skipEthernetSetup = 1;
-    persist_conf::saveDevice2();
+    persist_conf::setSkipEthernetSetup(1);
 }
 
 bool showSetupWizardQuestion() {
     if (!g_showSetupWizardQuestionCalled) {
         g_showSetupWizardQuestionCalled = true;
-        g_deviceFlags2 = persist_conf::devConf2.flags;
+        
+        g_skipChannelCalibrations = persist_conf::devConf.skipChannelCalibrations;
+        g_skipDateTimeSetup = persist_conf::devConf.skipDateTimeSetup;
+        g_skipSerialSetup = persist_conf::devConf.skipSerialSetup;
+        g_skipEthernetSetup = persist_conf::devConf.skipEthernetSetup;
     }
 
-    if (!g_deviceFlags2.skipChannelCalibrations) {
-        g_deviceFlags2.skipChannelCalibrations = 1;
+    if (!g_skipChannelCalibrations) {
+        g_skipChannelCalibrations = 1;
         if (!isChannelCalibrationsDone()) {
             yesNoLater("Do you want to calibrate channels?", channelCalibrationsYes,
                         channelCalibrationsNo);
@@ -473,8 +477,8 @@ bool showSetupWizardQuestion() {
         }
     }
 
-    if (!g_deviceFlags2.skipSerialSetup) {
-        g_deviceFlags2.skipSerialSetup = 1;
+    if (!g_skipSerialSetup) {
+        g_skipSerialSetup = 1;
         if (!persist_conf::isSerialEnabled()) {
             yesNoLater("Do you want to setup serial port?", serialYes, serialNo);
             return true;
@@ -482,8 +486,8 @@ bool showSetupWizardQuestion() {
     }
 
 #if OPTION_ETHERNET
-    if (!g_deviceFlags2.skipEthernetSetup) {
-        g_deviceFlags2.skipEthernetSetup = 1;
+    if (!g_skipEthernetSetup) {
+        g_skipEthernetSetup = 1;
         if (!persist_conf::isEthernetEnabled()) {
             yesNoLater("Do you want to setup ethernet?", ethernetYes, ethernetNo);
             return true;
@@ -491,8 +495,8 @@ bool showSetupWizardQuestion() {
     }
 #endif
 
-    if (!g_deviceFlags2.skipDateTimeSetup) {
-        g_deviceFlags2.skipDateTimeSetup = 1;
+    if (!g_skipDateTimeSetup) {
+        g_skipDateTimeSetup = 1;
         if (!isDateTimeSetupDone()) {
             yesNoLater("Do you want to set date and time?", dateTimeYes, dateTimeNo);
             return true;
@@ -824,7 +828,7 @@ void onEncoder(int counter, bool clicked) {
 
         if (isEncoderEnabledInActivePage()) {
             data::Value value;
-            if (persist_conf::devConf2.flags.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (persist_conf::devConf.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
                 value = g_focusEditValue;
             } else {
                 value = data::getEditValue(g_focusCursor, g_focusDataId);
@@ -840,7 +844,7 @@ void onEncoder(int counter, bool clicked) {
                 newValue = limit;
             }
 
-            if (persist_conf::devConf2.flags.encoderConfirmationMode) {
+            if (persist_conf::devConf.encoderConfirmationMode) {
                 g_focusEditValue = MakeValue(newValue, value.getUnit());
                 g_focusEditValueChangedTime = micros();
             } else {

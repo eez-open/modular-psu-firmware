@@ -47,7 +47,7 @@ struct IPAddress {
     };
 };
 
-void begin(uint8_t *mac, uint8_t *ipAddress = 0, uint8_t *dns = 0, uint8_t *gateway = 0, uint8_t *subnetMask = 0);
+void begin(const uint8_t *mac, const uint8_t *ipAddress = 0, const uint8_t *dns = 0, const uint8_t *gateway = 0, const uint8_t *subnetMask = 0);
 
 IPAddress localIP();
 IPAddress subnetMask();

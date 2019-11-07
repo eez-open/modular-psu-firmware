@@ -23,6 +23,7 @@
 #include <eez/apps/psu/list_program.h>
 #include <eez/apps/psu/persist_conf.h>
 #include <eez/apps/psu/profile.h>
+#include <eez/apps/psu/trigger.h>
 #include <eez/scpi/regs.h>
 #include <eez/apps/psu/trigger.h>
 #include <eez/system.h>
@@ -67,26 +68,7 @@ void setState(State newState) {
 }
 
 void reset() {
-    bool changed = false;
-
-    if (persist_conf::devConf2.triggerDelay != DELAY_DEFAULT) {
-        persist_conf::devConf2.triggerDelay = DELAY_DEFAULT;
-        changed = true;
-    }
-
-    if (persist_conf::devConf2.triggerSource != SOURCE_IMMEDIATE) {
-        persist_conf::devConf2.triggerSource = SOURCE_IMMEDIATE;
-        changed = true;
-    }
-
-    if (persist_conf::devConf2.flags.triggerContinuousInitializationEnabled) {
-        persist_conf::devConf2.flags.triggerContinuousInitializationEnabled = 0;
-        changed = true;
-    }
-
-    if (changed) {
-        persist_conf::saveDevice2();
-    }
+    persist_conf::resetTrigger();
 
     setState(STATE_IDLE);
 }
@@ -100,19 +82,19 @@ void init() {
 }
 
 void setDelay(float delay) {
-    persist_conf::devConf2.triggerDelay = delay;
+    persist_conf::setTriggerDelay(delay);
 }
 
 float getDelay() {
-    return persist_conf::devConf2.triggerDelay;
+    return persist_conf::devConf.triggerDelay;
 }
 
 void setSource(Source source) {
-    persist_conf::devConf2.triggerSource = source;
+    persist_conf::setTriggerSource(source);
 }
 
 Source getSource() {
-    return (Source)persist_conf::devConf2.triggerSource;
+    return (Source)persist_conf::devConf.triggerSource;
 }
 
 void setVoltage(Channel &channel, float value) {
@@ -134,13 +116,13 @@ float getCurrent(Channel &channel) {
 }
 
 void check(uint32_t currentTime) {
-    if (currentTime - g_triggeredTime > persist_conf::devConf2.triggerDelay * 1000L) {
+    if (currentTime - g_triggeredTime > persist_conf::devConf.triggerDelay * 1000L) {
         startImmediately();
     }
 }
 
 int generateTrigger(Source source, bool checkImmediatelly) {
-    bool seqTriggered = persist_conf::devConf2.triggerSource == source && g_state == STATE_INITIATED;
+    bool seqTriggered = persist_conf::devConf.triggerSource == source && g_state == STATE_INITIATED;
 
 #if OPTION_SD_CARD
     bool dlogTriggered = dlog::g_triggerSource == source && dlog::isInitiated();
@@ -185,7 +167,7 @@ bool isTriggerFinished() {
 }
 
 void triggerFinished() {
-    if (persist_conf::devConf2.flags.triggerContinuousInitializationEnabled) {
+    if (persist_conf::devConf.triggerContinuousInitializationEnabled) {
         setState(STATE_INITIATED);
     } else {
         setState(STATE_IDLE);
@@ -375,7 +357,7 @@ int startImmediately() {
 }
 
 int initiate() {
-    if (persist_conf::devConf2.triggerSource == SOURCE_IMMEDIATE) {
+    if (persist_conf::devConf.triggerSource == SOURCE_IMMEDIATE) {
         return startImmediately();
     } else {
         int err = checkTrigger();
@@ -388,7 +370,7 @@ int initiate() {
 }
 
 int enableInitiateContinuous(bool enable) {
-    persist_conf::devConf2.flags.triggerContinuousInitializationEnabled = enable;
+    persist_conf::setTriggerContinuousInitializationEnabled(enable);
     if (enable) {
         return initiate();
     } else {
@@ -397,7 +379,7 @@ int enableInitiateContinuous(bool enable) {
 }
 
 bool isContinuousInitializationEnabled() {
-    return persist_conf::devConf2.flags.triggerContinuousInitializationEnabled;
+    return persist_conf::devConf.triggerContinuousInitializationEnabled;
 }
 
 bool isIdle() {
