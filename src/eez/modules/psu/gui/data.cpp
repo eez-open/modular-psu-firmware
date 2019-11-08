@@ -1185,6 +1185,14 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     }
 }
 
+void data_channel_other_value_mon(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (g_focusDataId == DATA_ID_CHANNEL_U_EDIT) {
+        data_channel_i_mon(operation, cursor, value);
+    } else if (g_focusDataId == DATA_ID_CHANNEL_I_EDIT) {
+        data_channel_u_mon(operation, cursor, value);
+    }
+}
+
 void data_channels_is_max_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = (int)persist_conf::isMaxChannelView();

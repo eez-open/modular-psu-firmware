@@ -119,7 +119,7 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
 
     // fill background
     if (active || blink) {
-        if (activeStyle && activeStyle != style) {
+        if (!blink && activeStyle && activeStyle != style) {
             display::setColor(activeStyle->background_color, ignoreLuminocity);
         } else {
             display::setColor(style->color, ignoreLuminocity);
@@ -131,7 +131,7 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
 
     // draw text
     if (active || blink) {
-        if (activeStyle && activeStyle != style) {
+        if (!blink && activeStyle && activeStyle != style) {
             display::setColor(activeStyle->color, ignoreLuminocity);
         } else {
             display::setColor(backgroundColor, ignoreLuminocity);
