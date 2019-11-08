@@ -74,6 +74,17 @@
 #define CONF_DLOG_COLOR COLOR_ID_DATA_LOGGING
 
 namespace eez {
+
+namespace gui {
+
+#if EEZ_PLATFORM_STM32
+AppContext &getRootAppContext() {
+    return psu::gui::g_psuAppContext;
+}
+#endif
+
+}
+
 namespace psu {
 namespace gui {
 
@@ -94,6 +105,7 @@ static mcu::Button g_userSwitch(USER_SW_GPIO_Port, USER_SW_Pin, true);
 
 bool showSetupWizardQuestion();
 void onEncoder(int counter, bool clicked);
+
 
 ////////////////////////////////////////////////////////////////////////////////
 

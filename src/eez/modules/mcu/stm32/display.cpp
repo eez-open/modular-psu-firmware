@@ -42,7 +42,6 @@
 #include <eez/platform/stm32/defines.h>
 
 using namespace eez::gui;
-using namespace eez::home;
 
 #define CONF_TURN_ON_OFF_ANIMATION_DURATION 1000
 

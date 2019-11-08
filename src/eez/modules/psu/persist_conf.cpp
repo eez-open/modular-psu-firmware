@@ -63,6 +63,8 @@ bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t address);
 
 namespace persist_conf {
 
+#define CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED 2
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static const uint16_t MODULE_CONF_VERSION = 1;
@@ -85,6 +87,7 @@ struct DevConfBlock {
     uint16_t end;
     uint16_t version;
     bool dirty;
+    unsigned numSaveErrors;
 };
 
 static DevConfBlock g_devConfBlocks[] = {
@@ -327,6 +330,8 @@ bool moduleSave(int slotIndex, BlockHeader *block, uint16_t size, uint16_t addre
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static const unsigned PERSISTENT_STORAGE_ADDRESS_ALIGNMENT = 32;
+
 void init() {
     initDefaultDevConf();
 
@@ -338,9 +343,10 @@ void init() {
     for (unsigned i = 0; i < sizeof(g_devConfBlocks) / sizeof(DevConfBlock); i++) {
         uint16_t blockEnd = g_devConfBlocks[i].end;
         uint16_t blockSize = blockEnd - blockStart;
+        uint16_t blockStorageSize = PERSISTENT_STORAGE_ADDRESS_ALIGNMENT * ((sizeof(BlockHeader) + blockSize + PERSISTENT_STORAGE_ADDRESS_ALIGNMENT - 1) / PERSISTENT_STORAGE_ADDRESS_ALIGNMENT);
 
-        if (!confRead(blockData, sizeof(BlockHeader) + blockSize, blockAddress, g_devConfBlocks[i].version)) {
-            if (!confRead(blockData, sizeof(BlockHeader) + blockSize, blockAddress + sizeof(BlockHeader) + blockSize, g_devConfBlocks[i].version)) {
+        if (!confRead(blockData, blockStorageSize, blockAddress, g_devConfBlocks[i].version)) {
+            if (!confRead(blockData, blockStorageSize, blockAddress + blockStorageSize, g_devConfBlocks[i].version)) {
                 if (i == 0) {
                     // if we can't read first block at both locations we assume storage is not initialized
                     storageInitialized = false;
@@ -360,7 +366,7 @@ void init() {
         // copy this block to g_devConf
         memcpy((uint8_t *)&g_devConf + blockStart, blockData + sizeof(BlockHeader), blockSize);
 
-        blockAddress += 2 * (sizeof(BlockHeader) + blockSize);
+        blockAddress += 2 * blockStorageSize;
         blockStart = blockEnd;
     }
 
@@ -390,27 +396,31 @@ void tick() {
     for (unsigned i = 0; i < sizeof(g_devConfBlocks) / sizeof(DevConfBlock); i++) {
         uint16_t blockEnd = g_devConfBlocks[i].end;
         uint16_t blockSize = blockEnd - blockStart;
+        uint16_t blockStorageSize = PERSISTENT_STORAGE_ADDRESS_ALIGNMENT * ((sizeof(BlockHeader) + blockSize + PERSISTENT_STORAGE_ADDRESS_ALIGNMENT - 1) / PERSISTENT_STORAGE_ADDRESS_ALIGNMENT);
 
         if (!g_devConfBlocks[i].dirty) {
             // compare devConf with last saved g_devConf
             g_devConfBlocks[i].dirty = memcmp((uint8_t *)&devConf + blockStart, (uint8_t *)&g_savedDevConf + blockStart, blockSize) != 0;
         }
 
-        if (g_devConfBlocks[i].dirty) {
+        if (g_devConfBlocks[i].dirty && g_devConfBlocks[i].numSaveErrors < CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED) {
+        	memset(blockData, 0, blockStorageSize);
             memcpy(blockData + sizeof(BlockHeader), (uint8_t *)&devConf + blockStart, blockSize);
 
-        	bool saved = save((BlockHeader *)blockData, sizeof(BlockHeader) + blockSize, blockAddress, g_devConfBlocks[i].version);
-        	saved |= save((BlockHeader *)blockData, sizeof(BlockHeader) + blockSize, blockAddress + sizeof(BlockHeader) + blockSize, g_devConfBlocks[i].version);
+        	bool saved = save((BlockHeader *)blockData, blockStorageSize, blockAddress, g_devConfBlocks[i].version);
+        	saved |= save((BlockHeader *)blockData, blockStorageSize, blockAddress + blockStorageSize, g_devConfBlocks[i].version);
 
             if (saved) {
                 memcpy((uint8_t *)&g_savedDevConf + blockStart, (uint8_t *)&devConf + blockStart, blockSize);
                 g_devConfBlocks[i].dirty = false;
+                g_devConfBlocks[i].numSaveErrors = 0;
             } else {
+                ++g_devConfBlocks[i].numSaveErrors;
                 generateError(SCPI_ERROR_EXTERNAL_EEPROM_SAVE_FAILED);
             }
         }
 
-        blockAddress += 2 * (sizeof(BlockHeader) + blockSize);
+        blockAddress += 2 * blockStorageSize;
         blockStart = blockEnd;
     }
 }
@@ -781,7 +791,7 @@ bool writeTotalOnTime(int type, uint32_t time) {
 }
 
 void enableOutputProtectionCouple(bool enable) {
-    int outputProtectionCouple = enable ? 1 : 0;
+    unsigned outputProtectionCouple = enable ? 1 : 0;
 
     if (g_devConf.outputProtectionCouple != outputProtectionCouple) {
         return;
@@ -801,7 +811,7 @@ bool isOutputProtectionCoupleEnabled() {
 }
 
 void enableShutdownWhenProtectionTripped(bool enable) {
-    int shutdownWhenProtectionTripped = enable ? 1 : 0;
+    unsigned shutdownWhenProtectionTripped = enable ? 1 : 0;
 
     if (g_devConf.shutdownWhenProtectionTripped == shutdownWhenProtectionTripped) {
         return;
@@ -821,7 +831,7 @@ bool isShutdownWhenProtectionTrippedEnabled() {
 }
 
 void enableForceDisablingAllOutputsOnPowerUp(bool enable) {
-    int forceDisablingAllOutputsOnPowerUp = enable ? 1 : 0;
+    unsigned forceDisablingAllOutputsOnPowerUp = enable ? 1 : 0;
 
     if (g_devConf.forceDisablingAllOutputsOnPowerUp == forceDisablingAllOutputsOnPowerUp) {
         return;
@@ -843,7 +853,7 @@ bool isForceDisablingAllOutputsOnPowerUpEnabled() {
 void lockFrontPanel(bool lock) {
     g_rlState = lock ? RL_STATE_REMOTE : RL_STATE_LOCAL;
 
-    int isFrontPanelLocked = lock ? 1 : 0;
+    unsigned isFrontPanelLocked = lock ? 1 : 0;
 
     if (g_devConf.isFrontPanelLocked == isFrontPanelLocked) {
         return;

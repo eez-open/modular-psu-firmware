@@ -124,7 +124,7 @@ void initInputPin(int pin) {
 #if defined EEZ_PLATFORM_STM32
     GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-    persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
+    const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
 
     GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
