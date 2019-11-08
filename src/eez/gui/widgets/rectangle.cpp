@@ -39,9 +39,9 @@ void RectangleWidget_draw(const WidgetCursor &widgetCursor) {
         const RectangleWidget *rectangle_widget = GET_WIDGET_PROPERTY(widget, specific, const RectangleWidget *);
         const Style* style = getStyle(widget->style);
         drawRectangle(
-            widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, nullptr,
-            rectangle_widget->flags.invertColors ? !widgetCursor.currentState->flags.active
-                                                 : widgetCursor.currentState->flags.active,
+            widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            style, 
+            rectangle_widget->flags.invertColors ? !widgetCursor.currentState->flags.active : widgetCursor.currentState->flags.active, 
             rectangle_widget->flags.ignoreLuminosity);
     }
 }

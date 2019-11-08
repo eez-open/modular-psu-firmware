@@ -61,18 +61,18 @@ void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
 
             if (widgetCursor.currentState->data.isString()) {
                 drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,
-                         widgetCursor.y, (int)widget->w, (int)widget->h, style, nullptr,
+                         widgetCursor.y, (int)widget->w, (int)widget->h, style,
                          widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr, nullptr);
             } else {
                 drawText(GET_WIDGET_PROPERTY(button_widget, text, const char *), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                         style, nullptr, widgetCursor.currentState->flags.active,
+                         style, widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr, nullptr);
             }
         } else {
 			const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : button_widget->disabledStyle);
             drawText(GET_WIDGET_PROPERTY(button_widget, text, const char *), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                     style, nullptr, widgetCursor.currentState->flags.active,
+                     style, widgetCursor.currentState->flags.active,
                      widgetCursor.currentState->flags.blinking, false, nullptr, nullptr);
         }
     }

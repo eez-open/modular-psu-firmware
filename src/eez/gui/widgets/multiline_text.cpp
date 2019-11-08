@@ -55,14 +55,14 @@ void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
         if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
                 drawMultilineText(widgetCursor.currentState->data.getString(), widgetCursor.x,
-                    widgetCursor.y, (int)widget->w, (int)widget->h, style, nullptr,
+                    widgetCursor.y, (int)widget->w, (int)widget->h, style,
                     widgetCursor.currentState->flags.active,
                     display_string_widget->firstLineIndent, display_string_widget->hangingIndent);
             } else {
                 char text[64];
                 widgetCursor.currentState->data.toText(text, sizeof(text));
                 drawMultilineText(text, widgetCursor.x, widgetCursor.y, (int)widget->w,
-                    (int)widget->h, style, nullptr,
+                    (int)widget->h, style,
                     widgetCursor.currentState->flags.active,
                     display_string_widget->firstLineIndent, display_string_widget->hangingIndent);
             }
@@ -70,7 +70,7 @@ void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
             drawMultilineText(
                 GET_WIDGET_PROPERTY(display_string_widget, text, const char *), 
                 widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                style, nullptr, widgetCursor.currentState->flags.active,
+                style, widgetCursor.currentState->flags.active,
                 display_string_widget->firstLineIndent, display_string_widget->hangingIndent);
         }
     }

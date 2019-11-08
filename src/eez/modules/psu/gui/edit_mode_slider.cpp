@@ -22,77 +22,48 @@
 
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/edit_mode.h>
+#include <eez/modules/psu/gui/edit_mode_step.h>
 #include <eez/gui/touch.h>
 #include <eez/modules/mcu/display.h>
-#include <eez/modules/mcu/encoder.h>
 
 namespace eez {
 namespace psu {
 namespace gui {
 namespace edit_mode_slider {
 
-bool scale_is_vertical;
-int scale_width = 34;
-float scale_height = 204;
+static const int TOP_BORDER = 51;
+static const int BOTTOM_BORDER = 255;
 
-static int start_y;
-static float start_value;
+static const int DX = 10;
 
-static int last_scale;
-
-////////////////////////////////////////////////////////////////////////////////
-
-int touchY() {
-    using namespace eez::gui::touch;
-    return scale_is_vertical ? getY() : getX();
-}
-
-int touchX() {
-    using namespace eez::gui::touch;
-    return scale_is_vertical ? getX() : getY();
-}
-
-int displayXSize() {
-    using namespace eez::mcu::display;
-    return scale_is_vertical ? getDisplayWidth() : getDisplayHeight();
-}
-
-void increment(int counter) {
-    float min = edit_mode::getMin().getFloat();
-    float max = edit_mode::getMax().getFloat();
-    float value = mcu::encoder::increment(edit_mode::getEditValue(), counter, min, max, g_focusCursor.i, 0);
-    edit_mode::setValue(value);
-}
+static float startValue;
+static int startX;
+static float stepValue;
 
 void onTouchDown() {
-    start_value = edit_mode::getEditValue().getFloat();
-    start_y = touchY();
+    startValue = edit_mode::getEditValue().getFloat();
+    startX = eez::gui::touch::getX();
 
-    last_scale = 1;
+    int y = eez::gui::touch::getY() - g_appContext->y;
+    if (y < TOP_BORDER) {
+        y = TOP_BORDER;
+    } else if (y > BOTTOM_BORDER) {
+        y = BOTTOM_BORDER;
+    }
+    y -= TOP_BORDER;
+
+    int stepIndex = NUM_STEPS_PER_UNIT * y / (BOTTOM_BORDER - TOP_BORDER);
+    stepIndex = MAX(MIN(stepIndex, NUM_STEPS_PER_UNIT - 1), 0);
+    stepValue = edit_mode_step::getStepValues()[stepIndex].getFloat();
 }
 
 void onTouchMove() {
     float min = edit_mode::getMin().getFloat();
     float max = edit_mode::getMax().getFloat();
 
-    int scale;
+    int counter = (eez::gui::touch::getX() - startX) / DX;
 
-    int x = (touchX() / 20) * 20;
-    if (x < scale_width) {
-        scale = 1;
-    } else {
-        int num_bars = (max - min) >= 10 ? 9 : 5;
-        int bar_width = (displayXSize() - scale_width) / num_bars;
-        scale = 1 << (1 + (x - scale_width) / bar_width);
-    }
-
-    if (scale != last_scale) {
-        start_value = edit_mode::getEditValue().getFloat();
-        start_y = touchY();
-        last_scale = scale;
-    }
-
-    float value = start_value + (scale_is_vertical ? 1 : -1) * (start_y - touchY()) * (max - min) / (scale * scale_height);
+    float value = roundPrec(startValue + counter * stepValue, stepValue);
 
     if (value < min) {
         value = min;

@@ -59,7 +59,7 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
 
                 drawBitmap((uint16_t *)valuePixels.getVoidPointer(), 16, valueWidth.getUInt16(),
                            valueHeight.getUInt16(), widgetCursor.x, widgetCursor.y, (int)widget->w,
-                           (int)widget->h, style, nullptr, widgetCursor.currentState->flags.active);
+                           (int)widget->h, style, widgetCursor.currentState->flags.active);
                 return;
             } else {
                 Value valueBitmapId;
@@ -73,11 +73,9 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
         }
 
         if (bitmap) {
-			const Style *activeStyle = getStyle(widget->activeStyle);
-
             drawBitmap((uint16_t *)&bitmap->pixels[0], bitmap->bpp, bitmap->w, bitmap->h,
                        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                       activeStyle, widgetCursor.currentState->flags.active);
+                       widgetCursor.currentState->flags.active);
         }
     }
 }

@@ -53,7 +53,6 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
 
 	const Style *style = getStyle(widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->style);
-    const Style *activeStyle = getStyle(widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->activeStyle);
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
@@ -97,7 +96,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
         }
 
         drawText(start, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                 style, activeStyle, widgetCursor.currentState->flags.active,
+                 style, widgetCursor.currentState->flags.active,
                  widgetCursor.currentState->flags.blinking, false,
                  nullptr, &currentState->backgroundColor);
     }

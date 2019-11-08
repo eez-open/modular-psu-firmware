@@ -528,15 +528,6 @@ bool PsuAppContext::isBlinking(const data::Cursor &cursor, uint16_t id) {
     return AppContext::isBlinking(cursor, id);
 }
 
-void PsuAppContext::onScaleUpdated(int dataId, bool scaleIsVertical, int scaleWidth,
-                                   float scaleHeight) {
-    if (dataId == DATA_ID_EDIT_VALUE) {
-        edit_mode_slider::scale_is_vertical = scaleIsVertical;
-        edit_mode_slider::scale_width = scaleWidth;
-        edit_mode_slider::scale_height = scaleHeight;
-    }
-}
-
 uint32_t PsuAppContext::getNumHistoryValues(uint16_t id) {
     return CHANNEL_HISTORY_SIZE;
 }
@@ -1015,11 +1006,6 @@ void onEncoder(int counter, bool clicked) {
 
         if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
             edit_mode_step::onEncoder(counter);
-            return;
-        }
-
-        if (activePageId == PAGE_ID_EDIT_MODE_SLIDER) {
-            edit_mode_slider::increment(counter);
             return;
         }
 

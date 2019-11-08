@@ -349,7 +349,7 @@ struct YTGraphStaticDrawHelper {
 
             char text[64];
             data::ytDataGetCursorTime(widgetCursor.cursor, widgetCursor.widget->data).toText(text, sizeof(text));
-            drawText(text, -1, xTimeText, yTimeText, timeTextWidth, timeTextHeight, style, nullptr, false, false, false, nullptr, nullptr);
+            drawText(text, -1, xTimeText, yTimeText, timeTextWidth, timeTextHeight, style, false, false, false, nullptr, nullptr);
         }
     }
 };

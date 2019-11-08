@@ -95,8 +95,6 @@ public:
 
     virtual uint16_t getWidgetBackgroundColor(const WidgetCursor &widgetCursor, const Style *style);
     virtual bool isBlinking(const data::Cursor &cursor, uint16_t id);
-    virtual void onScaleUpdated(int dataId, bool scaleIsVertical, int scaleWidth,
-                                float scaleHeight);
 
     virtual uint32_t getNumHistoryValues(uint16_t id);
     virtual uint32_t getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id);

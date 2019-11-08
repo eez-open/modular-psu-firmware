@@ -80,8 +80,6 @@ class PsuAppContext : public AppContext {
     bool isAutoRepeatAction(int action) override;
     void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) override;
     bool testExecuteActionOnTouchDown(int action) override;
-    void onScaleUpdated(int dataId, bool scaleIsVertical, int scaleWidth,
-                        float scaleHeight) override;
 };
 
 extern PsuAppContext g_psuAppContext;

@@ -334,10 +334,6 @@ bool AppContext::isBlinking(const data::Cursor &cursor, uint16_t id) {
     return false;
 }
 
-void AppContext::onScaleUpdated(int dataId, bool scaleIsVertical, int scaleWidth,
-                                float scaleHeight) {
-}
-
 uint32_t AppContext::getNumHistoryValues(uint16_t id) {
     return 0;
 }

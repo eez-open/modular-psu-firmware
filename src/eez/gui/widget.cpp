@@ -47,7 +47,6 @@
 #include <eez/gui/widgets/list_graph.h>
 #include <eez/gui/widgets/multiline_text.h>
 #include <eez/gui/widgets/rectangle.h>
-#include <eez/gui/widgets/scale.h>
 #include <eez/gui/widgets/scroll_bar.h>
 #include <eez/gui/widgets/select.h>
 #include <eez/gui/widgets/text.h>
@@ -87,7 +86,7 @@ static FixWidgetPointersFunction g_fixWidgetPointersFunctions[] = {
     ButtonWidget_fixPointers,        // WIDGET_TYPE_BUTTON
     ToggleButtonWidget_fixPointers,  // WIDGET_TYPE_TOGGLE_BUTTON
     nullptr,                         // WIDGET_TYPE_BUTTON_GROUP
-    nullptr,                         // WIDGET_TYPE_SCALE
+    nullptr,                         // WIDGET_TYPE_RESERVED
     nullptr,                         // WIDGET_TYPE_BAR_GRAPH
     nullptr,                         // WIDGET_TYPE_LAYOUT_VIEW
     nullptr,                         // WIDGET_TYPE_YT_GRAPH
@@ -113,7 +112,7 @@ static EnumFunctionType g_enumWidgetFunctions[] = {
     nullptr,               // WIDGET_TYPE_BUTTON
     nullptr,               // WIDGET_TYPE_TOGGLE_BUTTON
     nullptr,               // WIDGET_TYPE_BUTTON_GROUP
-    nullptr,               // WIDGET_TYPE_SCALE
+    nullptr,               // WIDGET_TYPE_RESERVED
     nullptr,               // WIDGET_TYPE_BAR_GRAPH
     LayoutViewWidget_enum, // WIDGET_TYPE_LAYOUT_VIEW
     nullptr,               // WIDGET_TYPE_YT_GRAPH
@@ -138,7 +137,7 @@ static DrawFunctionType g_drawWidgetFunctions[] = {
     ButtonWidget_draw,        // WIDGET_TYPE_BUTTON
     ToggleButtonWidget_draw,  // WIDGET_TYPE_TOGGLE_BUTTON
     ButtonGroupWidget_draw,   // WIDGET_TYPE_BUTTON_GROUP
-    ScaleWidget_draw,         // WIDGET_TYPE_SCALE
+    nullptr,                  // WIDGET_TYPE_RESERVED
     BarGraphWidget_draw,      // WIDGET_TYPE_BAR_GRAPH
     LayoutViewWidget_draw,    // WIDGET_TYPE_LAYOUT_VIEW
     YTGraphWidget_draw,       // WIDGET_TYPE_YT_GRAPH
@@ -162,7 +161,7 @@ OnTouchFunctionType g_onTouchFunctions[] = {
     nullptr,                   // WIDGET_TYPE_BUTTON
     nullptr,                   // WIDGET_TYPE_TOGGLE_BUTTON
     ButtonGroupWidget_onTouch, // WIDGET_TYPE_BUTTON_GROUP
-    nullptr,                   // WIDGET_TYPE_SCALE
+    nullptr,                   // WIDGET_TYPE_RESERVED
     nullptr,                   // WIDGET_TYPE_BAR_GRAPH
     nullptr,                   // WIDGET_TYPE_LAYOUT_VIEW
     YTGraphWidget_onTouch,     // WIDGET_TYPE_YT_GRAPH
@@ -195,18 +194,7 @@ void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
 
     if (refresh) {
-        const Style* style = getStyle(widget->style);
-		const Style* activeStyle = getStyle(widget->activeStyle);
-
-        if (activeStyle) {
-            drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                          widgetCursor.currentState->flags.active ? activeStyle : style, nullptr,
-                          true, false);
-
-        } else {
-            drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                          nullptr, !widgetCursor.currentState->flags.active, false);
-        }
+        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, getStyle(widget->style), !widgetCursor.currentState->flags.active, false);
     }
 }
 

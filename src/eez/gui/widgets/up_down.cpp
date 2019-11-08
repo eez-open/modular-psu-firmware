@@ -65,7 +65,7 @@ void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
         int buttonWidth = buttonsFont.getHeight();
 
         drawText(GET_WIDGET_PROPERTY(upDownWidget, downButtonText, const char *), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
-                 buttonsStyle, nullptr,
+                 buttonsStyle,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
                  false, false, nullptr, nullptr);
@@ -74,11 +74,11 @@ void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
         widgetCursor.currentState->data.toText(text, sizeof(text));
         const Style *style = getStyle(widget->style);
         drawText(text, -1, widgetCursor.x + buttonWidth, widgetCursor.y,
-                 (int)(widget->w - 2 * buttonWidth), (int)widget->h, style, nullptr, false, false,
+                 (int)(widget->w - 2 * buttonWidth), (int)widget->h, style, false, false,
                  false, nullptr, nullptr);
 
         drawText(GET_WIDGET_PROPERTY(upDownWidget, upButtonText, const char *), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
-                 buttonWidth, (int)widget->h, buttonsStyle, nullptr,
+                 buttonWidth, (int)widget->h, buttonsStyle,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
                  false, false, nullptr, nullptr);

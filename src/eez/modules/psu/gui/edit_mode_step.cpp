@@ -46,7 +46,6 @@ namespace edit_mode_step {
 using data::Value;
 
 #define NUM_UNITS 6
-#define NUM_STEPS_PER_UNIT 5
 
 static const Value CONF_GUI_UNIT_STEPS_LIST[NUM_UNITS][NUM_STEPS_PER_UNIT] = {
     { 

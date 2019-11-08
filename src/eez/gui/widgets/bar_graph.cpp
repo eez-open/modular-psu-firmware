@@ -172,8 +172,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                     display::fillRect(x, y, x + pText - 1, y + h - 1);
                 }
 
-                drawText(valueText, -1, x + pText, y, wText, h, &textStyle, nullptr, false, false,
-                         false, nullptr, nullptr);
+                drawText(valueText, -1, x + pText, y, wText, h, &textStyle, false, false, false, nullptr, nullptr);
 
                 // draw background, but do not draw over line 1 and line 2
                 display::setColor(bg);
@@ -208,8 +207,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                     display::fillRect(x - (pText - 1), y, x, y + h - 1);
                 }
 
-                drawText(valueText, -1, x - (pText + wText - 1), y, wText, h, &textStyle, nullptr,
-                         false, false, false, nullptr, nullptr);
+                drawText(valueText, -1, x - (pText + wText - 1), y, wText, h, &textStyle, false, false, false, nullptr, nullptr);
 
                 // draw background, but do not draw over line 1 and line 2
                 display::setColor(bg);
@@ -274,8 +272,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                     display::fillRect(x, y, x + w - 1, y + pText - 1);
                 }
 
-                drawText(valueText, -1, x, y + pText, w, hText, &textStyle, nullptr, false, false,
-                         false, nullptr, nullptr);
+                drawText(valueText, -1, x, y + pText, w, hText, &textStyle, false, false, false, nullptr, nullptr);
 
                 // draw background, but do not draw over line 1 and line 2
                 display::setColor(bg);
@@ -310,8 +307,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                     display::fillRect(x, y - (pText - 1), x + w - 1, y);
                 }
 
-                drawText(valueText, -1, x, y - (pText + hText - 1), w, hText, &textStyle, nullptr,
-                         false, false, false, nullptr, nullptr);
+                drawText(valueText, -1, x, y - (pText + hText - 1), w, hText, &textStyle, false, false, false, nullptr, nullptr);
 
                 // draw background, but do not draw over line 1 and line 2
                 display::setColor(bg);

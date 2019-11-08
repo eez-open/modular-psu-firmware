@@ -48,7 +48,7 @@ namespace gui {
 #define WIDGET_TYPE_BUTTON 10
 #define WIDGET_TYPE_TOGGLE_BUTTON 11
 #define WIDGET_TYPE_BUTTON_GROUP 12
-#define WIDGET_TYPE_SCALE 13
+#define WIDGET_TYPE_RESERVED 13  // RESERVED
 #define WIDGET_TYPE_BAR_GRAPH 14
 #define WIDGET_TYPE_LAYOUT_VIEW 15
 #define WIDGET_TYPE_YT_GRAPH 16
@@ -109,7 +109,6 @@ struct Widget {
     int16_t w;
     int16_t h;
     uint16_t style;
-    uint16_t activeStyle;
 #if OPTION_SDRAM
     const void *specific;
 #else

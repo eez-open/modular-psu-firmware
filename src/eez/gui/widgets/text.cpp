@@ -43,7 +43,6 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
     
     const Style *style = getStyle(widgetCursor.currentState->flags.focused ? textWidget->focusStyle : widget->style);
-    const Style *activeStyle = getStyle(widgetCursor.currentState->flags.focused ? textWidget->focusStyle : widget->activeStyle);
 
     const char *text = GET_WIDGET_PROPERTY(textWidget, text, const char *);
 
@@ -63,13 +62,13 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
         bool ignoreLuminosity = (textWidget->flags & IGNORE_LUMINOSITY_FLAG) != 0;
         if (text && text[0]) {
             drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                style, activeStyle, widgetCursor.currentState->flags.active,
+                style, widgetCursor.currentState->flags.active,
                 widgetCursor.currentState->flags.blinking,
                 ignoreLuminosity, &overrideColor, nullptr);
         } else if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
                 drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,
-                    widgetCursor.y, (int)widget->w, (int)widget->h, style, activeStyle,
+                    widgetCursor.y, (int)widget->w, (int)widget->h, style,
                     widgetCursor.currentState->flags.active,
                     widgetCursor.currentState->flags.blinking,
                     ignoreLuminosity, &overrideColor, nullptr);
@@ -77,7 +76,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                 char text[64];
                 widgetCursor.currentState->data.toText(text, sizeof(text));
                 drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                    style, activeStyle, widgetCursor.currentState->flags.active,
+                    style, widgetCursor.currentState->flags.active,
                     widgetCursor.currentState->flags.blinking,
                     ignoreLuminosity, &overrideColor, nullptr);
             }

@@ -20,6 +20,8 @@
 
 #include <eez/gui/data.h>
 
+#define NUM_STEPS_PER_UNIT 5
+
 namespace eez {
 namespace psu {
 namespace gui {
