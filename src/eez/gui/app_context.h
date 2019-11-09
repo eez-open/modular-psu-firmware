@@ -78,7 +78,6 @@ public:
         return (InternalPage *)getActivePage();
     }
 
-    int getPreviousPageId();
     Page *getPreviousPage();
 
     void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,
@@ -117,14 +116,13 @@ public:
 
   protected:
     virtual int getMainPageId() = 0;
-    virtual void onPageChanged();
+    virtual void onPageChanged(int previousPageId, int activePageId);
 
     //
     PageOnStack m_activePage;
     bool m_isTopPage;
     PageOnStack m_activePageSaved;
 
-    int m_previousPageId = INTERNAL_PAGE_ID_NONE;
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
 

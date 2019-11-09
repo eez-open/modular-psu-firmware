@@ -168,10 +168,6 @@ Page *AppContext::getActivePage() {
     return m_activePage.page;
 }
 
-int AppContext::getPreviousPageId() {
-    return m_previousPageId;
-}
-
 Page *AppContext::getPreviousPage() {
     if (m_pageNavigationStackPointer > 0) {
         return m_pageNavigationStack[m_pageNavigationStackPointer - 1].page;
@@ -180,7 +176,7 @@ Page *AppContext::getPreviousPage() {
     }
 }
 
-void AppContext::onPageChanged() {
+void AppContext::onPageChanged(int previousPageId, int activePageId) {
     eez::mcu::display::turnOn();
     psu::idle::noteGuiActivity();
 }
@@ -191,7 +187,7 @@ void AppContext::doShowPage(int index, Page *page) {
         m_activePage.page->pageFree();
     }
 
-    m_previousPageId = m_activePage.pageId;
+    int previousPageId = m_activePage.pageId;
 
     m_activePage.page = page ? page : getPageFromId(index);
     m_activePage.pageId = index;
@@ -206,7 +202,7 @@ void AppContext::doShowPage(int index, Page *page) {
     if (getActivePageId() != PAGE_ID_TEXT_MESSAGE && m_textMessage[0]) {
         m_textMessage[0] = 0;
     }
-    onPageChanged();
+    onPageChanged(previousPageId, m_activePage.pageId);
 
     refreshScreen();
 }

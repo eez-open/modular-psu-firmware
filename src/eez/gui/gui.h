@@ -56,7 +56,6 @@ void popPage();
 void replacePage(int pageId, Page *page = nullptr);
 int getActivePageId();
 Page *getActivePage();
-int getPreviousPageId();
 Page *getPreviousPage();
 Page *getPage(int pageId);
 bool isPageActiveOrOnStack(int pageId);

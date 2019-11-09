@@ -159,10 +159,6 @@ Page *getActivePage() {
     return g_appContext->getActivePage();
 }
 
-int getPreviousPageId() {
-    return g_appContext->getPreviousPageId();
-}
-
 Page *getPreviousPage() {
     return g_appContext->getPreviousPage();
 }

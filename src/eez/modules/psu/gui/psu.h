@@ -76,7 +76,7 @@ class PsuAppContext : public AppContext {
 
   protected:
     int getMainPageId() override;
-    void onPageChanged() override;
+    void onPageChanged(int previousPageId, int activePageId) override;
     bool isAutoRepeatAction(int action) override;
     void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) override;
     bool testExecuteActionOnTouchDown(int action) override;
