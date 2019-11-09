@@ -52,6 +52,8 @@ void printError(int_fast16_t err);
 
 void resultChoiceName(scpi_t *context, scpi_choice_def_t *choice, int tag);
 
+void abortDownloading();
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

@@ -60,7 +60,6 @@ AppContext::AppContext() {
     m_pushProgressPage = false;
     m_popProgressPage = false;
     m_setPageIdOnNextIter = false;
-    m_isTopPage = true;
 }
 
 
@@ -462,7 +461,6 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
     widgetCursor.nextState();
 
     m_activePageSaved = m_activePage;
-    m_isTopPage = false;
 
     for (int i = m_pageNavigationStackPointer - 1; i >= 0; i--) {
         if (!isPageFullyCovered(i)) {
@@ -479,12 +477,10 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
         }
     }
 
-    m_isTopPage = true;
     m_activePage = m_activePageSaved;
     m_activePageSaved = PageOnStack();
 #else
     m_activePageSaved = m_activePage;
-    m_isTopPage = false;
 
     for (int i = 0; i < m_pageNavigationStackPointer; ++i) {
         if (!isPageFullyCovered(i)) {
@@ -501,7 +497,6 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
         }
     }
 
-    m_isTopPage = true;
     m_activePage = m_activePageSaved;
     m_activePageSaved = PageOnStack();
     

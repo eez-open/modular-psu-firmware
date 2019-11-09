@@ -183,7 +183,9 @@ void oneIter() {
 
                     dlog::initiate(filePath);
                 }
-			}
+			} else if (type == SCPI_QUEUE_MESSAGE_ABORT_DOWNLOADING) {
+                abortDownloading();
+            }
 #endif
 
         }

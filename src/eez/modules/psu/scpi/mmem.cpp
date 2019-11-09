@@ -36,8 +36,12 @@
 #endif
 
 #include <eez/system.h>
+#include <eez/scpi/scpi.h>
 
 namespace eez {
+
+using namespace scpi;
+
 namespace psu {
 namespace scpi {
 
@@ -283,8 +287,12 @@ void finishDownloading(int16_t eventId) {
 }
 
 void abortDownloading() {
-    finishDownloading(event_queue::EVENT_WARNING_FILE_DOWNLOAD_ABORTED);
-    g_aborted = true;
+    if (osThreadGetId() != g_scpiTaskHandle) {
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_ABORT_DOWNLOADING, 0), osWaitForever);
+    } else {
+        finishDownloading(event_queue::EVENT_WARNING_FILE_DOWNLOAD_ABORTED);
+        g_aborted = true;
+    }    
 }
 #endif
 

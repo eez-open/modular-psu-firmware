@@ -23,7 +23,6 @@
 #include <math.h>
 #include <limits.h>
 
-#include <eez/gui/app_context.h>
 #include <eez/gui/draw.h>
 #include <eez/gui/gui.h>
 #include <eez/modules/mcu/display.h>
@@ -383,10 +382,15 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
     uint16_t graphWidth = (uint16_t)widget->w;
 
-    uint32_t previousHistoryValuePosition = widgetCursor.previousState && 
+    uint32_t previousHistoryValuePosition;
+    if (widgetCursor.previousState &&
         previousState->iChannel == currentState->iChannel &&
-        previousState->ytGraphUpdateMethod == currentState->ytGraphUpdateMethod && 
-        g_appContext->isActivePageTopPage() ? previousState->historyValuePosition : currentState->historyValuePosition - graphWidth;
+        previousState->ytGraphUpdateMethod == currentState->ytGraphUpdateMethod) 
+    {
+        previousHistoryValuePosition = previousState->historyValuePosition;
+    } else {
+        previousHistoryValuePosition = currentState->historyValuePosition - graphWidth;
+    }
 
     bool refreshBackground = !widgetCursor.previousState;
 

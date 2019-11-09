@@ -69,9 +69,6 @@ public:
     int getActivePageId();
     Page *getActivePage();
     bool isActivePage(int pageId);
-    bool isActivePageTopPage() {
-    	return m_isTopPage;
-    }
 
     bool isActivePageInternal();
     InternalPage *getActivePageInternal() {
@@ -120,7 +117,6 @@ public:
 
     //
     PageOnStack m_activePage;
-    bool m_isTopPage;
     PageOnStack m_activePageSaved;
 
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
