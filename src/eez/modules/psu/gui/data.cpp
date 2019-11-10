@@ -898,9 +898,7 @@ void data_edit_enabled(data::DataOperationEnum operation, data::Cursor &cursor, 
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
 
-        if ((channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED &&
-             !trigger::isIdle()) ||
-            isPageActiveOrOnStack(PAGE_ID_CH_SETTINGS_LISTS)) {
+        if ((channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) || isPageOnStack(PAGE_ID_CH_SETTINGS_LISTS)) {
             value = 0;
         }
         if (psu::calibration::isEnabled()) {

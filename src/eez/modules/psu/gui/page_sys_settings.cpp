@@ -81,7 +81,7 @@ void SysSettingsDateTimePage::editNtpServer() {
 
 #if OPTION_ETHERNET
 void SysSettingsDateTimePage::onSetNtpServer(char *value) {
-    SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPreviousPage();
+    SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
     strcpy(page->ntpServer, value);
 
     popPage();
@@ -340,7 +340,7 @@ void SysSettingsEthernetPage::onSetMacAddress(char *value) {
         return;
     }
 
-    SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPreviousPage();
+    SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
     memcpy(page->m_macAddress, macAddress, 6);
 
     popPage();
@@ -372,7 +372,7 @@ void SysSettingsEthernetPage::set() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void SysSettingsEthernetStaticPage::pageAlloc() {
-    SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPreviousPage();
+    SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
 
     m_ipAddressOrig = m_ipAddress = page->m_ipAddress;
     m_dnsOrig = m_dns = page->m_dns;
@@ -418,7 +418,7 @@ int SysSettingsEthernetStaticPage::getDirty() {
 
 void SysSettingsEthernetStaticPage::set() {
     if (getDirty()) {
-        SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPreviousPage();
+        SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
 
         page->m_ipAddress = m_ipAddress;
         page->m_dns = m_dns;

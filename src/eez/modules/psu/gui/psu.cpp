@@ -173,7 +173,7 @@ void PsuAppContext::stateManagment() {
     uint32_t inactivityPeriod = psu::idle::getGuiAndEncoderInactivityPeriod();
     if (activePageId == PAGE_ID_TOUCH_CALIBRATION_INTRO) {
         if (inactivityPeriod >= 20 * 1000UL) {
-            enterTouchCalibration(PAGE_ID_TOUCH_CALIBRATION_YES_NO, getMainPageId());
+            enterTouchCalibration();
             return;
         }
     }
@@ -407,7 +407,7 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
         return false;
     }
 
-    if (isPageActiveOrOnStack(PAGE_ID_CH_SETTINGS_LISTS)) {
+    if (isPageOnStack(PAGE_ID_CH_SETTINGS_LISTS)) {
         return ((ChSettingsListsPage *)getActivePage())->isFocusWidget(widgetCursor);
     }
 
@@ -449,19 +449,16 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
             y = eez::mcu::display::getDisplayHeight() - 2;
         
 #if OPTION_SDRAM
-        int selectedBufferIndexSaved = mcu::display::selectBuffer(m_activePage.displayBufferIndex);
+        mcu::display::selectBuffer(m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex);
 #endif
         eez::mcu::display::setColor(255, 255, 255);
         eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
-#if OPTION_SDRAM
-        mcu::display::selectBuffer(selectedBufferIndexSaved);
-#endif
     }
 #endif
 
     if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_INTRO) {
         if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
-            enterTouchCalibration(PAGE_ID_TOUCH_CALIBRATION_YES_NO, getMainPageId());
+            enterTouchCalibration();
         }
     } else if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION) {
         onTouchCalibrationPageTouch(foundWidget, touchEvent);

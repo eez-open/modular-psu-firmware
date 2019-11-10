@@ -281,7 +281,6 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
 #if OPTION_SDRAM
 
 Buffer g_buffers[NUM_BUFFERS];
-int g_selectedBufferIndex;
 
 static void *g_bufferPointer;
 
@@ -298,7 +297,7 @@ static int g_numBuffersToDraw;
 //    return count;
 //}
 
-int allocBuffer(bool staticallyAllocated, bool garbageCollect) {
+int allocBuffer() {
     int bufferIndex;
 
     for (bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
@@ -314,8 +313,6 @@ int allocBuffer(bool staticallyAllocated, bool garbageCollect) {
     }
 
     g_buffers[bufferIndex].flags.allocated = true;
-    g_buffers[bufferIndex].flags.staticallyAllocated = staticallyAllocated;
-    g_buffers[bufferIndex].flags.garbageCollect = garbageCollect;
 
     return bufferIndex;
 }
@@ -323,20 +320,16 @@ int allocBuffer(bool staticallyAllocated, bool garbageCollect) {
 void freeBuffer(int bufferIndex) {
     g_buffers[bufferIndex].flags.allocated = false;
     // DebugTrace("Buffer %d freed up, %d buffers available now!\n", bufferIndex, getNumFreeBuffers());
-    
 }
 
-int selectBuffer(int bufferIndex) {
-    int selectedBufferIndex = g_selectedBufferIndex;
-    g_selectedBufferIndex = bufferIndex;
+void selectBuffer(int bufferIndex) {
     g_buffers[bufferIndex].flags.used = true;
-    setBufferPointer(g_buffers[g_selectedBufferIndex].bufferPointer);
-    // DebugTrace("Buffer %d selected!\n");
-    return selectedBufferIndex;
+    g_bufferToDrawIndexes[g_numBuffersToDraw++] = bufferIndex;
+    setBufferPointer(g_buffers[bufferIndex].bufferPointer);
 }
 
-void drawBuffer(int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset) {
-    Buffer &buffer = g_buffers[g_selectedBufferIndex];
+void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset) {
+    Buffer &buffer = g_buffers[bufferIndex];
     
     if (buffer.x != x || buffer.y != y || buffer.width != width || buffer.height != height || buffer.withShadow != withShadow || buffer.opacity != opacity || buffer.xOffset != xOffset || buffer.yOffset != yOffset) {
         buffer.x = x;
@@ -351,7 +344,9 @@ void drawBuffer(int x, int y, int width, int height, bool withShadow, uint8_t op
         g_painted = true;
     }
 
-    g_bufferToDrawIndexes[g_numBuffersToDraw++] = g_selectedBufferIndex;
+    if (g_numBuffersToDraw > 1) {
+        setBufferPointer(g_buffers[g_numBuffersToDraw - 2].bufferPointer);        
+    }
 }
 
 void clearBufferUsage() {
@@ -362,7 +357,7 @@ void clearBufferUsage() {
 
 void freeUnusedBuffers() {
     for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-        if (g_buffers[bufferIndex].flags.allocated && !g_buffers[bufferIndex].flags.staticallyAllocated && !g_buffers[bufferIndex].flags.used && g_buffers[bufferIndex].flags.garbageCollect) {
+        if (g_buffers[bufferIndex].flags.allocated && !g_buffers[bufferIndex].flags.used) {
             g_buffers[bufferIndex].flags.allocated = false;
             // DebugTrace("Buffer %d allocated but not used!\n", bufferIndex);
         }
@@ -378,7 +373,7 @@ void endBuffersDrawing() {
     setBufferPointer(g_bufferPointer);
 
     if (g_painted) {
-        for (int i = g_numBuffersToDraw - 1; i >= 0; i--) {
+        for (int i = 0; i < g_numBuffersToDraw; i++) {
             int bufferIndex = g_bufferToDrawIndexes[i];
             Buffer &buffer = g_buffers[bufferIndex];
             if (buffer.withShadow) {

@@ -78,7 +78,7 @@ void ChSettingsAdvViewPage::pageAlloc() {
 }
 
 bool ChSettingsAdvViewPage::isDisabledDisplayValue1(uint16_t value) {
-    ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getPreviousPage();
+    ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getPage(PAGE_ID_CH_SETTINGS_ADV_VIEW);
     return value == page->displayValue2;
 }
 
@@ -93,7 +93,7 @@ void ChSettingsAdvViewPage::editDisplayValue1() {
 }
 
 bool ChSettingsAdvViewPage::isDisabledDisplayValue2(uint16_t value) {
-    ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getPreviousPage();
+    ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getPage(PAGE_ID_CH_SETTINGS_ADV_VIEW);
     return value == page->displayValue1;
 }
 

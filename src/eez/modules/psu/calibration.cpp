@@ -424,6 +424,7 @@ bool save() {
 
     resetChannelToZero();
 
+    // TODO move this to scpi thread
     return persist_conf::saveChannelCalibration(*g_channel);
 }
 

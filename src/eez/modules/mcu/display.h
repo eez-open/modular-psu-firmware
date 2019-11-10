@@ -101,9 +101,7 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
 static const int NUM_BUFFERS = 10;
 struct BufferFlags {
     unsigned allocated : 1;
-    unsigned staticallyAllocated : 1;
     unsigned used : 1;
-    unsigned garbageCollect : 1;
 };
 
 struct Buffer {
@@ -119,12 +117,11 @@ struct Buffer {
     int yOffset;
 };
 extern Buffer g_buffers[NUM_BUFFERS];
-extern int g_selectedBufferIndex;
 
-int allocBuffer(bool staticallyAllocated = false, bool garbageCollect = false);
+int allocBuffer();
 void freeBuffer(int bufferIndex);
-int selectBuffer(int bufferIndex);
-void drawBuffer(int x, int y, int width, int height, bool withShadow, uint8_t opacity = 255, int xOffset = 0, int yOffset = 0);
+void selectBuffer(int bufferIndex);
+void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity = 255, int xOffset = 0, int yOffset = 0);
 void beginBuffersDrawing();
 void endBuffersDrawing();
 

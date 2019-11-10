@@ -177,8 +177,7 @@ void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callba
 
             const Style *style = getStyle(widgetCursor.widget->style);
 
-            mcu::display::drawBuffer(widgetCursor.x, widgetCursor.y, overlay ? overlay->width: widgetCursor.widget->w, overlay ? overlay->height : widgetCursor.widget->h, (containerWidget->flags & SHADOW_FLAG) != 0, style->opacity, xOffset, yOffset);
-            currentState->displayBufferIndex = mcu::display::selectBuffer(currentState->displayBufferIndex);
+            mcu::display::setBufferBounds(currentState->displayBufferIndex, widgetCursor.x, widgetCursor.y, overlay ? overlay->width: widgetCursor.widget->w, overlay ? overlay->height : widgetCursor.widget->h, (containerWidget->flags & SHADOW_FLAG) != 0, style->opacity, xOffset, yOffset);
         }
     }
 #endif
@@ -187,7 +186,7 @@ void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callba
 void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
-    bool refresh =
+    bool refresh = 
         !widgetCursor.previousState ||
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
 
@@ -215,16 +214,19 @@ void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
 #if OPTION_SDRAM
         if (!previousState || previousState->displayBufferIndex == -1) {
             refresh = true;
-            currentState->displayBufferIndex = mcu::display::allocBuffer(false, true);
+            currentState->displayBufferIndex = mcu::display::allocBuffer();
         } else {
             currentState->displayBufferIndex = previousState->displayBufferIndex;
         }
-        currentState->displayBufferIndex = mcu::display::selectBuffer(currentState->displayBufferIndex);
+        mcu::display::selectBuffer(currentState->displayBufferIndex);
 #endif
     }
 
     if (refresh) {
-        drawRectangle(widgetCursor.x, widgetCursor.y, w, h, getStyle(widget->style), !widgetCursor.currentState->flags.active, false);
+        drawRectangle(
+            widgetCursor.x, widgetCursor.y, w, h, 
+            getStyle(widget->style), !widgetCursor.currentState->flags.active, false
+        );
     }
 }
 

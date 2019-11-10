@@ -247,7 +247,7 @@ void ChSettingsListsPage::setFocusedValue(float value) {
 }
 
 void ChSettingsListsPage::onValueSet(float value) {
-    ChSettingsListsPage *page = (ChSettingsListsPage *)getPreviousPage();
+    ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
     page->doValueSet(value);
 }
 

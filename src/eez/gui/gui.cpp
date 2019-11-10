@@ -115,12 +115,30 @@ void oneIter() {
     g_appContext->width = mcu::display::getDisplayWidth();
     g_appContext->height = mcu::display::getDisplayHeight();
 
+#if OPTION_SDRAM
+    bool wasOn = mcu::display::isOn();
+    if (wasOn) {
+        mcu::display::beginBuffersDrawing();
+    }
+#endif
+
     eventHandling();
     stateManagment();
 
     if (mcu::display::isOn()) {
+#if OPTION_SDRAM
+        if (!wasOn) {
+            mcu::display::beginBuffersDrawing();
+        }
+#endif
         updateScreen();
     }
+
+#if OPTION_SDRAM
+    if (wasOn || mcu::display::isOn()) {
+        mcu::display::endBuffersDrawing();
+    }
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -159,16 +177,12 @@ Page *getActivePage() {
     return g_appContext->getActivePage();
 }
 
-Page *getPreviousPage() {
-    return g_appContext->getPreviousPage();
-}
-
 Page *getPage(int pageId) {
     return g_appContext->getPage(pageId);
 }
 
-bool isPageActiveOrOnStack(int pageId) {
-    return g_appContext->isPageActiveOrOnStack(pageId);
+bool isPageOnStack(int pageId) {
+    return g_appContext->isPageOnStack(pageId);
 }
 
 void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,

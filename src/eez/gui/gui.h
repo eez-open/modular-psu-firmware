@@ -56,9 +56,8 @@ void popPage();
 void replacePage(int pageId, Page *page = nullptr);
 int getActivePageId();
 Page *getActivePage();
-Page *getPreviousPage();
 Page *getPage(int pageId);
-bool isPageActiveOrOnStack(int pageId);
+bool isPageOnStack(int pageId);
 void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,
                             bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t));
 void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),

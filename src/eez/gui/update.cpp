@@ -44,10 +44,6 @@ void refreshScreen() {
 }
 
 void updateScreen() {
-#if OPTION_SDRAM
-    mcu::display::beginBuffersDrawing();
-#endif
-
     g_isActiveWidget = false;
     g_previousState = g_currentState;
     g_currentState = (WidgetState *)(&g_stateBuffer[getCurrentStateBufferIndex() == 0 ? 1 : 0][0]);
@@ -58,10 +54,6 @@ void updateScreen() {
 	widgetCursor.currentState = g_currentState;
 
     g_appContext->updateAppView(widgetCursor);
-
-#if OPTION_SDRAM
-    mcu::display::endBuffersDrawing();
-#endif
 }
 
 } // namespace gui

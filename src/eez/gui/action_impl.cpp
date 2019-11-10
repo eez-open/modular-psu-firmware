@@ -157,7 +157,6 @@ void action_keypad_option2() {
 }
 
 void action_enter_touch_calibration() {
-    popPage();
     psu::gui::enterTouchCalibration();
 }
 

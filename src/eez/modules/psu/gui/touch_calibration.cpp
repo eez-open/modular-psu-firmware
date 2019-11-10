@@ -43,9 +43,6 @@ namespace eez {
 namespace psu {
 namespace gui {
 
-static int g_yesNoPageId;
-static int g_nextPageId;
-
 static uint32_t g_pointStartTime;
 
 static struct {
@@ -54,25 +51,39 @@ static struct {
 } g_points[3];
 static int g_currentPoint;
 
+bool isTouchCalibrated() {
+    bool success;
+    success = touch::calibrateTransform(
+        persist_conf::devConf.touch_screen_cal_tlx, persist_conf::devConf.touch_screen_cal_tly,
+        persist_conf::devConf.touch_screen_cal_brx, persist_conf::devConf.touch_screen_cal_bry,
+        persist_conf::devConf.touch_screen_cal_trx, persist_conf::devConf.touch_screen_cal_try,
+        CONF_GUI_TOUCH_CALIBRATION_M, getDisplayWidth(), getDisplayHeight());
+    return success;
+}
+
 void startCalibration() {
     touch::resetTransformCalibration();
     g_currentPoint = 0;
     g_pointStartTime = millis();
 }
 
-void leaveCalibrationMode() {
-	showPage(g_nextPageId);
-
-    if (g_nextPageId == PAGE_ID_SYS_SETTINGS_DISPLAY) {
-        infoMessage("Touch screen is calibrated.");
-    }
-
-    Channel::restoreOE();
-}   
+void enterTouchCalibration() {
+    psu::gui::g_psuAppContext.replacePage(PAGE_ID_TOUCH_CALIBRATION);
+    Channel::saveAndDisableOE();
+    startCalibration();
+}
 
 void dialogYes() {
     persist_conf::setTouchscreenCalParams(g_points[0].x, g_points[0].y, g_points[1].x, g_points[1].y, g_points[2].x, g_points[2].y);
-    leaveCalibrationMode();
+
+    if (isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY)) {
+        popPage();
+        infoMessage("Touch screen is calibrated.");
+    } else {
+	    showPage(PAGE_ID_MAIN);
+    }
+
+    Channel::restoreOE();
 }
 
 void dialogNo() {
@@ -80,7 +91,13 @@ void dialogNo() {
 }
 
 void dialogCancel() {
-    leaveCalibrationMode();
+    if (isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY)) {
+        popPage();
+    } else {
+	    showPage(PAGE_ID_MAIN);
+    }
+
+    Channel::restoreOE();
 }
 
 void selectTouchCalibrationPoint() {
@@ -98,37 +115,15 @@ void selectTouchCalibrationPoint() {
             g_points[2].y, CONF_GUI_TOUCH_CALIBRATION_M, getDisplayWidth(), getDisplayHeight());
 
         if (success) {
-            yesNoDialog(g_yesNoPageId, "Save changes?", dialogYes, dialogNo, dialogCancel);
+            yesNoDialog(
+                isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY) ? PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL : PAGE_ID_TOUCH_CALIBRATION_YES_NO,
+                "Save changes?", dialogYes, dialogNo, dialogCancel
+            );
         } else {
             startCalibration();
             errorMessage("Received data is invalid due to", "imprecise pointing or", "communication problem!");
         }
     }
-}
-
-bool isTouchCalibrated() {
-    bool success;
-    success = touch::calibrateTransform(
-        persist_conf::devConf.touch_screen_cal_tlx, persist_conf::devConf.touch_screen_cal_tly,
-        persist_conf::devConf.touch_screen_cal_brx, persist_conf::devConf.touch_screen_cal_bry,
-        persist_conf::devConf.touch_screen_cal_trx, persist_conf::devConf.touch_screen_cal_try,
-        CONF_GUI_TOUCH_CALIBRATION_M, getDisplayWidth(), getDisplayHeight());
-    return success;
-}
-
-void enterTouchCalibration(int yesNoPageId, int nextPageId) {
-	g_nextPageId = psu::gui::g_psuAppContext.getActivePageId();
-
-	psu::gui::g_psuAppContext.showPage(PAGE_ID_TOUCH_CALIBRATION);
-
-    g_yesNoPageId = yesNoPageId;
-    if (nextPageId != -1) {
-    	g_nextPageId = nextPageId;
-    }
-
-    startCalibration();
-
-    Channel::saveAndDisableOE();
 }
 
 void onTouchCalibrationPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {

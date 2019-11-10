@@ -68,14 +68,11 @@ public:
 
     int getActivePageId();
     Page *getActivePage();
-    bool isActivePage(int pageId);
 
     bool isActivePageInternal();
     InternalPage *getActivePageInternal() {
         return (InternalPage *)getActivePage();
     }
-
-    Page *getPreviousPage();
 
     void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,
                                 bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t));
@@ -85,7 +82,7 @@ public:
     void replacePage(int pageId, Page *page = nullptr);
 
     Page *getPage(int pageId);
-    bool isPageActiveOrOnStack(int pageId);
+    bool isPageOnStack(int pageId);
 
     virtual bool isFocusWidget(const WidgetCursor &widgetCursor);
 
@@ -116,11 +113,10 @@ public:
     virtual void onPageChanged(int previousPageId, int activePageId);
 
     //
-    PageOnStack m_activePage;
-    PageOnStack m_activePageSaved;
-
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
+    int m_activePageIndex;
+    int m_updatePageIndex;
 
     bool m_setPageIdOnNextIter;
     int m_pageIdToSetOnNextIter;
@@ -133,10 +129,12 @@ public:
 
     SelectFromEnumPage m_selectFromEnumPage;
 
-    void doShowPage(int index, Page *page = 0);
+    void doShowPage(int index, Page *page, int previousPageId);
     void setPage(int pageId);
 
-    void updatePage(WidgetCursor &widgetCursor);
+    int getActivePageStackPointer();
+
+    void updatePage(int i, WidgetCursor &widgetCursor);
 
     bool isPageFullyCovered(int pageNavigationStackIndex);
 }; // namespace gui
