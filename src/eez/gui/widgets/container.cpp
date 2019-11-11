@@ -213,8 +213,8 @@ void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
 
 #if OPTION_SDRAM
         if (!previousState || previousState->displayBufferIndex == -1) {
-            refresh = true;
             currentState->displayBufferIndex = mcu::display::allocBuffer();
+            refresh = true;
         } else {
             currentState->displayBufferIndex = previousState->displayBufferIndex;
         }
@@ -225,7 +225,7 @@ void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
     if (refresh) {
         drawRectangle(
             widgetCursor.x, widgetCursor.y, w, h, 
-            getStyle(widget->style), !widgetCursor.currentState->flags.active, false
+            getStyle(widget->style), widgetCursor.currentState->flags.active, false, true
         );
     }
 }

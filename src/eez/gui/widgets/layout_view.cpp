@@ -94,7 +94,7 @@ void LayoutViewWidget_draw(const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         const Style* style = getStyle(widget->style);
-        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, !widgetCursor.currentState->flags.active, false);
+        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, false, true);
     }
 }
 

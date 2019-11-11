@@ -437,7 +437,7 @@ void SelectFromEnumPage::refresh() {
         getItemPosition(i, xItem, yItem);
 
         getItemLabel(i, text, sizeof(text));
-        drawText(text, -1, xItem, yItem, itemWidth, itemHeight, isDisabled(i) ? disabledItemStyle : itemStyle, false, false, false, nullptr, nullptr);
+        drawText(text, -1, xItem, yItem, itemWidth, itemHeight, isDisabled(i) ? disabledItemStyle : itemStyle, false, false, false, nullptr, nullptr, nullptr, nullptr);
     }
 
     dirty = false;

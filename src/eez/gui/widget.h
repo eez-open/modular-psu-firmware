@@ -71,6 +71,8 @@ struct Style {
     uint16_t flags;
     uint16_t background_color;
     uint16_t color;
+    uint16_t active_background_color;
+    uint16_t active_color;
     uint8_t border_size_top;
     uint8_t border_size_right;
     uint8_t border_size_bottom;
@@ -266,6 +268,7 @@ void drawWidgetCallback(const WidgetCursor &widgetCursor);
 OnTouchFunctionType getTouchFunction(const WidgetCursor &widgetCursor);
 
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
+uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
 
 } // namespace gui
 } // namespace eez

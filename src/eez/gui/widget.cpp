@@ -194,7 +194,7 @@ void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
 
     if (refresh) {
-        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, getStyle(widget->style), !widgetCursor.currentState->flags.active, false);
+        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, getStyle(widget->style), widgetCursor.currentState->flags.active, false, true);
     }
 }
 

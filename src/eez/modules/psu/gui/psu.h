@@ -62,7 +62,7 @@ class PsuAppContext : public AppContext {
 
     void stateManagment() override;
 
-    bool isActiveWidget(const WidgetCursor &widgetCursor);
+    bool isActiveWidget(const WidgetCursor &widgetCursor) override;
 
     bool isFocusWidget(const WidgetCursor &widgetCursor) override;
 

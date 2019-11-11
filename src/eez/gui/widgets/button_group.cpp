@@ -46,7 +46,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, int sel
         for (int i = 0; i < count; ++i) {
             char text[32];
             labels[i].toText(text, 32);
-            drawText(text, -1, x, y, w, h, style, i == selectedButton, false, false, nullptr, nullptr);
+            drawText(text, -1, x, y, w, h, style, i == selectedButton, false, false, nullptr, nullptr, nullptr, nullptr);
             x += w;
         }
     } else {
@@ -75,7 +75,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, int sel
 
             char text[32];
             labels[i].toText(text, 32);
-            drawText(text, -1, x, y + yOffset, w, labelHeight, style, i == selectedButton, false, false, nullptr, nullptr);
+            drawText(text, -1, x, y + yOffset, w, labelHeight, style, i == selectedButton, false, false, nullptr, nullptr, nullptr, nullptr);
 
             int b = y + yOffset + labelHeight;
 

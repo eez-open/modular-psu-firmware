@@ -64,7 +64,8 @@ bool styleIsBlink(const Style *style) {
 
 void drawText(const char *text, int textLength, int x, int y, int w, int h, const Style *style,
               bool active, bool blink, bool ignoreLuminocity,
-              uint16_t *overrideColor, uint16_t *overrideBackgroundColor) {
+              uint16_t *overrideColor, uint16_t *overrideBackgroundColor,
+              uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor) {
     int x1 = x;
     int y1 = y;
     int x2 = x + w - 1;
@@ -118,17 +119,29 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
     }
 
     // fill background
-    if (active || blink) {
+    if (active) {
+        if (overrideActiveBackgroundColor) {
+            display::setColor(*overrideActiveBackgroundColor, ignoreLuminocity);
+        } else {
+            display::setColor(style->active_background_color, ignoreLuminocity);
+        }
+    } else if (blink) {
         display::setColor(style->color, ignoreLuminocity);
-    } else {
+    }else {
         display::setColor(backgroundColor, ignoreLuminocity);
     }
     display::fillRect(x1, y1, x2, y2, borderRadius);
 
     // draw text
-    if (active || blink) {
+    if (active) {
+        if (overrideActiveColor) {
+            display::setColor(*overrideActiveColor, ignoreLuminocity);
+        } else {
+            display::setColor(style->active_color, ignoreLuminocity);
+        }
+    } else if (blink) {
         display::setColor(backgroundColor, ignoreLuminocity);
-    } else {
+    }else {
         if (overrideColor) {
             display::setColor(*overrideColor, ignoreLuminocity);
         } else {
@@ -281,7 +294,7 @@ struct MultilineTextRender {
         }
 
         // fill background
-        uint16_t background_color = active ? style->color : style->background_color;
+        uint16_t background_color = active ? style->active_background_color : style->background_color;
         display::setColor(background_color);
         display::fillRect(x1, y1, x2, y2, borderRadius);
 
@@ -298,7 +311,7 @@ struct MultilineTextRender {
         spaceWidth = space_glyph.dx;
 
         // draw text
-        display::setColor(active ? style->background_color : style->color);
+        display::setColor(active ? style->active_color : style->color);
 
         x1 += style->padding_left;
         x2 -= style->padding_right;
@@ -386,8 +399,8 @@ void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, 
     uint8_t savedOpacity = display::getOpacity();
 
     if (active) {
-        display::setBackColor(style->color);
-        display::setColor(style->background_color);
+        display::setBackColor(style->active_background_color);
+        display::setColor(style->active_color);
         display::setOpacity(style->opacity);
     } else {
         display::setBackColor(style->background_color);
@@ -402,7 +415,7 @@ void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, bool ignoreLuminocity) {
+void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, bool ignoreLuminocity, bool invertColors) {
     if (w > 0 && h > 0) {
         int x1 = x;
         int y1 = y;
@@ -424,7 +437,12 @@ void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, 
 			y2 -= style->border_size_bottom;
 		}
 
-        display::setColor(active ? style->background_color : style->color, ignoreLuminocity);
+        if (invertColors) {
+            display::setColor(active ? style->active_background_color : style->background_color, ignoreLuminocity);
+        } else {
+            display::setColor(active ? style->active_color : style->color, ignoreLuminocity);
+        }
+        
         display::fillRect(x1, y1, x2, y2, borderRadius);
     }
 }

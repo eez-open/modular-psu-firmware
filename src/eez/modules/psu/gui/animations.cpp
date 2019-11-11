@@ -48,14 +48,14 @@ static const Rect g_horzDefRects[] = {
     { 0, 160, 480, 80 }
 };
 
-static const Rect g_maxRect = { 0, 0, 480, 167 };
+static const Rect g_maxRect = { 0, 0, 480, 168 };
 
-static const Rect g_maxRectMax = { 0, 0, 360, 167 };
-static const Rect g_maxRectMin = { 360, 0, 120, 167 };
+static const Rect g_maxRectMax = { 0, 0, 360, 168 };
+static const Rect g_maxRectMin = { 360, 0, 120, 168 };
 
 static const Rect g_minRects[] = {
-    {   0, 167, 240, 74 },
-    { 240, 167, 240, 74 }
+    {   0, 168, 240, 72 },
+    { 240, 168, 240, 72 }
 };
 
 static const Rect g_microRects[] = {

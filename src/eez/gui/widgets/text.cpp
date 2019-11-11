@@ -58,27 +58,28 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         uint16_t overrideColor = overrideStyleColorHook(widgetCursor, style);
+        uint16_t overrideActiveColor = overrideActiveStyleColorHook(widgetCursor, style);
 
         bool ignoreLuminosity = (textWidget->flags & IGNORE_LUMINOSITY_FLAG) != 0;
         if (text && text[0]) {
             drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                 style, widgetCursor.currentState->flags.active,
                 widgetCursor.currentState->flags.blinking,
-                ignoreLuminosity, &overrideColor, nullptr);
+                ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
         } else if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
                 drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,
                     widgetCursor.y, (int)widget->w, (int)widget->h, style,
                     widgetCursor.currentState->flags.active,
                     widgetCursor.currentState->flags.blinking,
-                    ignoreLuminosity, &overrideColor, nullptr);
+                    ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
             } else {
                 char text[64];
                 widgetCursor.currentState->data.toText(text, sizeof(text));
                 drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                     style, widgetCursor.currentState->flags.active,
                     widgetCursor.currentState->flags.blinking,
-                    ignoreLuminosity, &overrideColor, nullptr);
+                    ignoreLuminosity, &overrideColor, nullptr, &overrideActiveColor, nullptr);
             }
         }
     }

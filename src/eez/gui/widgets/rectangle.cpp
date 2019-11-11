@@ -41,8 +41,9 @@ void RectangleWidget_draw(const WidgetCursor &widgetCursor) {
         drawRectangle(
             widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
             style, 
-            rectangle_widget->flags.invertColors ? !widgetCursor.currentState->flags.active : widgetCursor.currentState->flags.active, 
-            rectangle_widget->flags.ignoreLuminosity);
+            widgetCursor.currentState->flags.active, 
+            rectangle_widget->flags.ignoreLuminosity,
+            rectangle_widget->flags.invertColors);
     }
 }
 

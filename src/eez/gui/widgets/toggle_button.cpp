@@ -56,7 +56,7 @@ void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor) {
                 GET_WIDGET_PROPERTY(toggle_button_widget, text1, const char *),
             -1,
 			widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
-            widgetCursor.currentState->flags.active, false, false, nullptr, nullptr);
+            widgetCursor.currentState->flags.active, false, false, nullptr, nullptr, nullptr, nullptr);
     }
 }
 

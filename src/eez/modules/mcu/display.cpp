@@ -344,8 +344,13 @@ void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool 
         g_painted = true;
     }
 
-    if (g_numBuffersToDraw > 1) {
-        setBufferPointer(g_buffers[g_numBuffersToDraw - 2].bufferPointer);        
+    for (int i = 0; i < g_numBuffersToDraw; i++) {
+        if (g_bufferToDrawIndexes[i] == bufferIndex) {
+            if (i > 0) {
+                setBufferPointer(g_buffers[g_bufferToDrawIndexes[i - 1]].bufferPointer);
+            }
+            break;
+        }
     }
 }
 
