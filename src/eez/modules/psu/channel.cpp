@@ -339,11 +339,11 @@ void Channel::init() {
     if (!isInstalled()) {
         return;
     }
-    bool last_save_enabled = profile::enableSave(false);
+    bool wasSaveProfileEnabled = profile::enableSave(false);
 
     channelInterface->init(subchannelIndex);
 
-    profile::enableSave(last_save_enabled);
+    profile::enableSave(wasSaveProfileEnabled);
 }
 
 void Channel::onPowerDown() {
@@ -351,7 +351,7 @@ void Channel::onPowerDown() {
         return;
     }
 
-    bool last_save_enabled = profile::enableSave(false);
+    bool wasSaveProfileEnabled = profile::enableSave(false);
 
     outputEnable(false);
     doRemoteSensingEnable(false);
@@ -363,7 +363,7 @@ void Channel::onPowerDown() {
 
     channelInterface->onPowerDown(subchannelIndex);
 
-    profile::enableSave(last_save_enabled);
+    profile::enableSave(wasSaveProfileEnabled);
 }
 
 void Channel::reset() {
@@ -513,7 +513,7 @@ bool Channel::test() {
         return true;
     }
 
-    bool last_save_enabled = profile::enableSave(false);
+    bool wasSaveProfileEnabled = profile::enableSave(false);
 
     flags.powerOk = 0;
 
@@ -525,7 +525,7 @@ bool Channel::test() {
 
     channelInterface->test(subchannelIndex);
 
-    profile::enableSave(last_save_enabled);
+    profile::enableSave(wasSaveProfileEnabled);
     profile::save();
 
     return isOk();
@@ -837,7 +837,7 @@ void Channel::update() {
 
     doCalibrationEnable(persist_conf::isChannelCalibrationEnabled(*this) && isCalibrationExists());
 
-    bool last_save_enabled = profile::enableSave(false);
+    bool wasSaveProfileEnabled = profile::enableSave(false);
 
     setVoltage(u.set);
     setCurrent(i.set);
@@ -847,7 +847,7 @@ void Channel::update() {
         doRemoteProgrammingEnable(flags.rprogEnabled);
     }
 
-    profile::enableSave(last_save_enabled);
+    profile::enableSave(wasSaveProfileEnabled);
 }
 
 void Channel::outputEnable(bool enable) {

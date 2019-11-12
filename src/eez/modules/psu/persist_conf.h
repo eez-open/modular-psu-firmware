@@ -211,7 +211,7 @@ void setMaxChannelIndex(int channelIndex);
 void toggleMaxChannelIndex(int channelIndex);
 
 profile::Parameters *loadProfile(int location);
-bool saveProfile(int location, profile::Parameters *profile);
+void saveProfile(int location, profile::Parameters *profile);
 
 uint32_t readTotalOnTime(int type);
 bool writeTotalOnTime(int type, uint32_t time);

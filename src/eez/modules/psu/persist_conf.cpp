@@ -53,14 +53,6 @@ using namespace eez::mcu::display;
 
 namespace eez {
 namespace psu {
-
-#if OPTION_SD_CARD
-namespace sd_card {
-bool confRead(uint8_t *buffer, uint16_t bufferSize, uint16_t address);
-bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t address);
-} // namespace sd_card
-#endif
-
 namespace persist_conf {
 
 #define CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED 2
@@ -88,16 +80,27 @@ struct DevConfBlock {
     uint16_t version;
     bool dirty;
     unsigned numSaveErrors;
+    uint32_t minTickCountsBetweenSaves;
+    uint32_t lastSaveTickCount;
 };
 
 static DevConfBlock g_devConfBlocks[] = {
-    { offsetof(DeviceConfiguration, date_year), 1, false },
-    { offsetof(DeviceConfiguration, profile_auto_recall_location), 1, false },
-    { offsetof(DeviceConfiguration, serialBaud), 1, false },
-    { offsetof(DeviceConfiguration, triggerSource), 1, false },
-    { offsetof(DeviceConfiguration, ytGraphUpdateMethod), 1, false },
-    { sizeof(DeviceConfiguration), 1, false }
+    { offsetof(DeviceConfiguration, date_year), 1, false, 0, 0, 0 },
+    { offsetof(DeviceConfiguration, profile_auto_recall_location), 1, false, 0, 0, 0 },
+    { offsetof(DeviceConfiguration, serialBaud), 1, false, 0, 0, 0 },
+    { offsetof(DeviceConfiguration, triggerSource), 1, false, 0, 0, 0 },
+    { offsetof(DeviceConfiguration, ytGraphUpdateMethod), 1, false, 0, 0, 0 },
+    { sizeof(DeviceConfiguration), 1, false, 0, 60 * 1000, 0 }
 };
+
+static struct {
+    bool loaded;
+    profile::Parameters profile;
+    bool dirty;
+    unsigned numSaveErrors;
+} g_profilesCache[NUM_PROFILE_LOCATIONS];
+
+////////////////////////////////////////////////////////////////////////////////
 
 void initDefaultDevConf() {
     // block 1
@@ -177,7 +180,7 @@ void initDefaultDevConf() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool confRead(uint8_t *buffer, uint16_t bufferSize, uint16_t address, int version) {
+static bool confRead(uint8_t *buffer, uint16_t bufferSize, uint16_t address, int version) {
 	if (bp3c::eeprom::g_testResult != TEST_OK) {
 		return false;
     }
@@ -204,7 +207,7 @@ bool confRead(uint8_t *buffer, uint16_t bufferSize, uint16_t address, int versio
     return false;
 }
 
-bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
+static bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
 	if (bp3c::eeprom::g_testResult != TEST_OK) {
 		return false;
     }
@@ -235,7 +238,7 @@ bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool moduleConfRead(int slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t address, int version) {
+static bool moduleConfRead(int slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t address, int version) {
 	if (bp3c::eeprom::g_testResult != TEST_OK) {
 		return false;
     }
@@ -269,7 +272,7 @@ bool moduleConfRead(int slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_
 	return false;
 }
 
-bool moduleConfWrite(int slotIndex, const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
+static bool moduleConfWrite(int slotIndex, const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
 	if (bp3c::eeprom::g_testResult != TEST_OK) {
 		return false;
     }
@@ -314,7 +317,7 @@ bool checkBlock(const BlockHeader *block, uint16_t size, uint16_t version) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool save(BlockHeader *block, uint16_t size, uint16_t address, uint16_t version) {
+static bool save(BlockHeader *block, uint16_t size, uint16_t address, uint16_t version) {
     block->version = version;
     block->checksum = calcChecksum(block, size);
     return confWrite((const uint8_t *)block, size, address);
@@ -322,10 +325,16 @@ bool save(BlockHeader *block, uint16_t size, uint16_t address, uint16_t version)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool moduleSave(int slotIndex, BlockHeader *block, uint16_t size, uint16_t address, uint16_t version) {
+static bool moduleSave(int slotIndex, BlockHeader *block, uint16_t size, uint16_t address, uint16_t version) {
     block->version = version;
     block->checksum = calcChecksum(block, size);
     return moduleConfWrite(slotIndex, (const uint8_t *)block, size, address);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+uint16_t getProfileAddress(int location) {
+    return PERSIST_CONF_FIRST_PROFILE_ADDRESS + location * PERSIST_CONF_PROFILE_BLOCK_SIZE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -387,6 +396,9 @@ void init() {
 }
 
 void tick() {
+    uint32_t tickCountMillis = millis();
+
+    // write dirty device configuration blocks
     DeviceConfiguration devConf;
     memcpy(&devConf, &g_devConf, sizeof(DeviceConfiguration));
 
@@ -403,7 +415,13 @@ void tick() {
             g_devConfBlocks[i].dirty = memcmp((uint8_t *)&devConf + blockStart, (uint8_t *)&g_savedDevConf + blockStart, blockSize) != 0;
         }
 
-        if (g_devConfBlocks[i].dirty && g_devConfBlocks[i].numSaveErrors < CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED) {
+        int32_t diff = tickCountMillis - g_devConfBlocks[i].lastSaveTickCount;
+
+        if (
+            g_devConfBlocks[i].dirty && 
+            g_devConfBlocks[i].numSaveErrors < CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED && 
+            int32_t(tickCountMillis - g_devConfBlocks[i].lastSaveTickCount) >= g_devConfBlocks[i].minTickCountsBetweenSaves
+        ) {
         	memset(blockData, 0, blockStorageSize);
             memcpy(blockData + sizeof(BlockHeader), (uint8_t *)&devConf + blockStart, blockSize);
 
@@ -414,14 +432,30 @@ void tick() {
                 memcpy((uint8_t *)&g_savedDevConf + blockStart, (uint8_t *)&devConf + blockStart, blockSize);
                 g_devConfBlocks[i].dirty = false;
                 g_devConfBlocks[i].numSaveErrors = 0;
+                g_devConfBlocks[i].lastSaveTickCount = tickCountMillis;
             } else {
-                ++g_devConfBlocks[i].numSaveErrors;
-                generateError(SCPI_ERROR_EXTERNAL_EEPROM_SAVE_FAILED);
+                if (++g_devConfBlocks[i].numSaveErrors == CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED) {
+                    event_queue::pushEvent(event_queue::EVENT_ERROR_SAVE_DEV_CONF_BLOCK_0 + i);
+                }
             }
         }
 
         blockAddress += 2 * blockStorageSize;
         blockStart = blockEnd;
+    }
+
+    // write dirty profiles
+    for (unsigned i = 0; i < NUM_PROFILE_LOCATIONS; i++) {
+        if (g_profilesCache[i].dirty && g_profilesCache[i].numSaveErrors < CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED) {
+            if (save((BlockHeader *)&g_profilesCache[i].profile, sizeof(profile::Parameters), getProfileAddress(i), profile::PROFILE_VERSION)) {
+                g_profilesCache[i].dirty = false;
+                g_profilesCache[i].numSaveErrors = 0;
+            } else {
+                if (++g_profilesCache[i].numSaveErrors == CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED) {
+                    event_queue::pushEvent(event_queue::EVENT_ERROR_SAVE_PROFILE_0 + i);
+                }
+            }
+        }
     }
 }
 
@@ -690,15 +724,6 @@ void toggleMaxChannelIndex(int channelIndex) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static struct {
-    bool loaded;
-    profile::Parameters profile;
-} g_profilesCache[NUM_PROFILE_LOCATIONS];
-
-uint16_t getProfileAddress(int location) {
-    return PERSIST_CONF_FIRST_PROFILE_ADDRESS + location * PERSIST_CONF_PROFILE_BLOCK_SIZE;
-}
-
 profile::Parameters *loadProfile(int location) {
     assert(location < NUM_PROFILE_LOCATIONS && sizeof(profile::Parameters) <= PERSIST_CONF_PROFILE_BLOCK_SIZE);
     
@@ -713,15 +738,10 @@ profile::Parameters *loadProfile(int location) {
     return &g_profilesCache[location].profile;
 }
 
-bool saveProfile(int location, profile::Parameters *profile) {
-    if (!save((BlockHeader *)profile, sizeof(profile::Parameters), getProfileAddress(location), profile::PROFILE_VERSION)) {
-        return false;
-    }
-
+void saveProfile(int location, profile::Parameters *profile) {
     memcpy(&g_profilesCache[location].profile, profile, sizeof(profile::Parameters));
     g_profilesCache[location].loaded = true;
-
-    return true;
+    g_profilesCache[location].dirty = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -801,19 +801,8 @@ void onProtectionTripped() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void tick_onTimeCounters(uint32_t tickCount) {
-    ontime::g_mcuCounter.tick(tickCount);
-    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
-            ontime::g_moduleCounters[slotIndex].tick(tickCount);
-        }
-    }
-}
-
 typedef void (*TickFunc)(uint32_t tickCount);
 static TickFunc g_tickFuncs[] = {
-    event_queue::tick,
-    tick_onTimeCounters,
     temperature::tick,
 #if OPTION_FAN
     aux_ps::fan::tick,

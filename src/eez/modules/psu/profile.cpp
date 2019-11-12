@@ -148,7 +148,7 @@ void deleteProfileLists(int location) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void recallChannelsFromProfile(Parameters *profile, int location) {
-    bool last_save_enabled = enableSave(false);
+    bool wasSaveProfileEnabled = enableSave(false);
 
     int err;
     if (!channel_dispatcher::setCouplingType((channel_dispatcher::CouplingType)profile->flags.couplingType, &err)) {
@@ -229,7 +229,7 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
         channel.update();
     }
 
-    enableSave(last_save_enabled);
+    enableSave(wasSaveProfileEnabled);
 }
 
 void fillProfile(Parameters *pProfile) {
@@ -339,9 +339,9 @@ bool isAutoSaveAllowed() {
 }
 
 bool enableSave(bool enable) {
-    bool last_save_enabled = g_saveEnabled;
+    bool wasEnabled = g_saveEnabled;
     g_saveEnabled = enable;
-    return last_save_enabled;
+    return wasEnabled;
 }
 
 void doSave() {
@@ -390,7 +390,7 @@ bool checkProfileModuleMatch(Parameters *profile) {
 }
 
 bool recallFromProfile(Parameters *profile, int location) {
-    bool last_save_enabled = enableSave(false);
+    bool wasSaveProfileEnabled = enableSave(false);
 
     bool result = true;
 
@@ -406,7 +406,7 @@ bool recallFromProfile(Parameters *profile, int location) {
 
     recallChannelsFromProfile(profile, location);
 
-    enableSave(last_save_enabled);
+    enableSave(wasSaveProfileEnabled);
 
     return result;
 }
@@ -420,14 +420,12 @@ bool recall(int location, int *err) {
                 return false;
             }
 
-            if (persist_conf::saveProfile(0, profile)) {
-                if (recallFromProfile(profile, location)) {
-                    save();
-                    event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_PROFILE_0 + location);
-                    return true;
-                } else {
-                    return false;
-                }
+            if (recallFromProfile(profile, location)) {
+                save();
+                event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_PROFILE_0 + location);
+                return true;
+            } else {
+                return false;
             }
         }
     }
@@ -472,11 +470,7 @@ bool recallFromFile(const char *filePath, int *err) {
         return false;
     }
 
-    if (!persist_conf::saveProfile(0, &profile)) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
-        return false;
-    }
+    persist_conf::saveProfile(0, &profile);
 
     if (!recallFromProfile(&profile, 0)) {
         // TODO replace with more specific error
@@ -528,10 +522,10 @@ bool saveAtLocation(int location, const char *name) {
             getSaveName(location, profile.name);
         }
 
-        if (persist_conf::saveProfile(location, &profile)) {
-            saveProfileListForAllChannels(profile, location);
-            return true;
-        }
+        persist_conf::saveProfile(location, &profile);
+        saveProfileListForAllChannels(profile, location);
+
+        return true;
     }
 
     return false;
@@ -581,22 +575,21 @@ bool saveToFile(const char *filePath, int *err) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool deleteLocation(int location) {
-    bool result = false;
     if (location > 0 && location < NUM_PROFILE_LOCATIONS) {
         Parameters profile;
         profile.flags.isValid = false;
         if (location == persist_conf::getProfileAutoRecallLocation()) {
             persist_conf::setProfileAutoRecallLocation(0);
         }
-        result = persist_conf::saveProfile(location, &profile);
+        persist_conf::saveProfile(location, &profile);
 
-    if (osThreadGetId() != g_scpiTaskHandle) {
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DELETE_PROFILE_LISTS, location), osWaitForever);
-        return true;
+        if (osThreadGetId() != g_scpiTaskHandle) {
+            osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DELETE_PROFILE_LISTS, location), osWaitForever);
+            return true;
+        }
     }
 
-    }
-    return result;
+    return true;
 }
 
 bool deleteAll() {
@@ -624,7 +617,8 @@ bool setName(int location, const char *name, size_t name_len) {
         if (profile && profile->flags.isValid) {
             memset(profile->name, 0, sizeof(profile->name));
             strncpy(profile->name, name, name_len);
-            return persist_conf::saveProfile(location, profile);
+            persist_conf::saveProfile(location, profile);
+            return true;
         }
     }
     return false;

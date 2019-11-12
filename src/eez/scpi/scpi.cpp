@@ -38,6 +38,7 @@
 #endif
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/datetime.h>
+#include <eez/modules/psu/ontime.h>
 
 #include <eez/gui/data.h>
 
@@ -191,23 +192,28 @@ void oneIter() {
         }
     } else {
     	uint32_t tickCount = micros();
-
     	int32_t diff = tickCount - g_lastTickCount;
+
+        event_queue::tick();
+
+        for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+            if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
+                ontime::g_moduleCounters[slotIndex].tick(tickCount);
+            }
+        }
 
     	if (diff >= 1000000L) { // 1 sec
     		profile::tick();
-
 #if OPTION_ETHERNET
     		ntp::tick();
 #endif
     	}
 
-    	if (diff >= 250000L) { // 250 msec
-            persist_conf::tick();
+        persist_conf::tick();
+
 #if OPTION_SD_CARD
-    		sd_card::tick();
+        sd_card::tick();
 #endif
-    	}
 
 #ifdef DEBUG
         psu::debug::tick(tickCount);

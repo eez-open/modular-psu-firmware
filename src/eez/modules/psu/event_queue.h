@@ -117,6 +117,26 @@ static const int EVENT_TYPE_ERROR = 3;
 	EVENT_ERROR(DLOG_TRUNCATE_ERROR, 111, "DLOG truncate error")                                   \
 	EVENT_ERROR(DLOG_FILE_REOPEN_ERROR, 112, "DLOG file reopen error")                             \
 	EVENT_ERROR(DLOG_WRITE_ERROR, 113, "DLOG write")                                               \
+    EVENT_ERROR(SAVE_DEV_CONF_BLOCK_0, 120, "Failed to save configuration block 0")                \
+    EVENT_ERROR(SAVE_DEV_CONF_BLOCK_1, 121, "Failed to save configuration block 1")                \
+    EVENT_ERROR(SAVE_DEV_CONF_BLOCK_2, 122, "Failed to save configuration block 2")                \
+    EVENT_ERROR(SAVE_DEV_CONF_BLOCK_3, 123, "Failed to save configuration block 3")                \
+    EVENT_ERROR(SAVE_DEV_CONF_BLOCK_4, 124, "Failed to save configuration block 4")                \
+    EVENT_ERROR(SAVE_DEV_CONF_BLOCK_5, 125, "Failed to save configuration block 5")                \
+    EVENT_ERROR(SAVE_DEV_CONF_BLOCK_6, 126, "Failed to save configuration block 6")                \
+    EVENT_ERROR(SAVE_DEV_CONF_BLOCK_7, 127, "Failed to save configuration block 7")                \
+    EVENT_ERROR(SAVE_DEV_CONF_BLOCK_8, 128, "Failed to save configuration block 8")                \
+    EVENT_ERROR(SAVE_DEV_CONF_BLOCK_9, 129, "Failed to save configuration block 9")                \
+    EVENT_ERROR(SAVE_PROFILE_0, 130, "Failed to save profile 0")                                   \
+    EVENT_ERROR(SAVE_PROFILE_1, 131, "Failed to save profile 1")                                   \
+    EVENT_ERROR(SAVE_PROFILE_2, 132, "Failed to save profile 2")                                   \
+    EVENT_ERROR(SAVE_PROFILE_3, 133, "Failed to save profile 3")                                   \
+    EVENT_ERROR(SAVE_PROFILE_4, 134, "Failed to save profile 4")                                   \
+    EVENT_ERROR(SAVE_PROFILE_5, 135, "Failed to save profile 5")                                   \
+    EVENT_ERROR(SAVE_PROFILE_6, 136, "Failed to save profile 6")                                   \
+    EVENT_ERROR(SAVE_PROFILE_7, 137, "Failed to save profile 7")                                   \
+    EVENT_ERROR(SAVE_PROFILE_8, 138, "Failed to save profile 8")                                   \
+    EVENT_ERROR(SAVE_PROFILE_9, 139, "Failed to save profile 9")                                   \
     EVENT_WARNING(CH1_CALIBRATION_DISABLED, 0, "Ch1 calibration disabled")                         \
     EVENT_WARNING(CH2_CALIBRATION_DISABLED, 1, "Ch2 calibration disabled")                         \
     EVENT_WARNING(CH3_CALIBRATION_DISABLED, 2, "Ch3 calibration disabled")                         \
@@ -264,7 +284,7 @@ struct Event {
 };
 
 void init();
-void tick(uint32_t tick_usec);
+void tick();
 
 Event *getLastErrorEvent();
 
