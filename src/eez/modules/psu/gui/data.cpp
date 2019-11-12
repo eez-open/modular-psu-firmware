@@ -4209,7 +4209,7 @@ void data_dlog_status(data::DataOperationEnum operation, data::Cursor &cursor, d
 void data_recording_ready(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == DATA_OPERATION_GET) {
-        value = dlog::g_lastBufferEnd - dlog::g_lastBufferStart > 0 ? 1 : 0;
+        value = dlog::getSize() > 0 ? 1 : 0;
     }
 #endif
 }
@@ -4224,10 +4224,10 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         if (value.getUInt32() >= size) {
             value = Value(NAN, unit);
         } else {
-            value = Value(((float *)dlog::g_lastBufferStart)[dlog::g_numDlogValues * value.getUInt32() + valueIndex], unit);
+            value = Value(((float *)dlog::g_lastBufferStart)[dlog::g_totalDlogValues * value.getUInt32() + valueIndex], unit);
         }
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
-        value = Value((uint32_t)((dlog::g_lastBufferEnd - dlog::g_lastBufferStart) / (dlog::g_numDlogValues * sizeof(float))), VALUE_TYPE_UINT32);
+        value = Value(size, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
         float position;
         if (dlog::isExecuting()) {
@@ -4261,7 +4261,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
     } else if (operation == DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS) {
         value = dlog::NUM_VERT_DIVISIONS;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_NUM_VALUES) {
-        value = dlog::g_numDlogValues;
+        value = dlog::g_numVisibleDlogValues;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PER_DIV) {
         value = dlog::g_dlogValues[value.getUInt8()].perDiv;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_OFFSET) {
@@ -4301,14 +4301,14 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
 void data_dlog_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_COUNT) {
-        value = dlog::g_numDlogValues;
+        value = dlog::g_numVisibleDlogValues;
     }
 #endif
 }
 
 void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = Value(dlog::g_dlogValues[cursor.i].type, VALUE_TYPE_DLOG_VALUE_LABEL);
+        value = Value(dlog::g_dlogValues[cursor.i].dlogValueType, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
 

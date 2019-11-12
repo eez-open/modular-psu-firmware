@@ -50,9 +50,10 @@ static char g_filePath[MAX_PATH_LENGTH + 1];
 
 Options g_lastOptions;
 uint8_t *g_lastBufferStart;
-uint8_t *g_lastBufferEnd;
+uint32_t g_size;
 
-int g_numDlogValues;
+uint8_t g_totalDlogValues;
+uint8_t g_numVisibleDlogValues;
 DlogValueParams g_dlogValues[MAX_DLOG_VALUES];
 
 eez::gui::data::Value g_timeOffset;
@@ -273,6 +274,60 @@ int startImmediately() {
 
     memcpy(&g_lastOptions, &g_nextOptions, sizeof(Options));
 
+    dlog::g_timeOffset = gui::data::Value(0.0f, UNIT_SECOND);
+
+    g_totalDlogValues = 0;
+    g_numVisibleDlogValues = 0;
+
+    static const int MAX_VISIBLE_DLOG_VALUES = 2;
+
+    uint32_t columns = 0;
+    for (int iChannel = 0; iChannel < CH_NUM; ++iChannel) {
+        if (g_lastOptions.logVoltage[iChannel]) {
+            columns |= 1 << (4 * iChannel);
+            ++g_totalDlogValues;
+            if (g_numVisibleDlogValues < MAX_VISIBLE_DLOG_VALUES) {
+                dlog::g_dlogValues[g_numVisibleDlogValues].dlogValueType = (DlogValueType)(3 * g_numVisibleDlogValues + dlog::DLOG_VALUE_CH1_U);
+                float perDiv = channel_dispatcher::getUMax(Channel::get(iChannel)) / dlog::NUM_VERT_DIVISIONS;
+                dlog::g_dlogValues[g_numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_VOLT);
+                dlog::g_dlogValues[g_numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
+
+                ++g_numVisibleDlogValues;
+            }
+        }
+        if (g_lastOptions.logCurrent[iChannel]) {
+            columns |= 2 << (4 * iChannel);
+            ++g_totalDlogValues;
+            if (g_numVisibleDlogValues < MAX_VISIBLE_DLOG_VALUES) {
+                dlog::g_dlogValues[g_numVisibleDlogValues].dlogValueType = (DlogValueType)(3 * g_numVisibleDlogValues + dlog::DLOG_VALUE_CH1_I);
+                float perDiv = channel_dispatcher::getIMax(Channel::get(iChannel)) / dlog::NUM_VERT_DIVISIONS;
+                dlog::g_dlogValues[g_numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_AMPER);
+                dlog::g_dlogValues[g_numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_AMPER);
+
+                ++g_numVisibleDlogValues;
+            }
+        }
+        if (g_lastOptions.logPower[iChannel]) {
+            columns |= 4 << (4 * iChannel);
+            ++g_totalDlogValues;
+            if (g_numVisibleDlogValues < MAX_VISIBLE_DLOG_VALUES) {
+                dlog::g_dlogValues[g_numVisibleDlogValues].dlogValueType = (DlogValueType)(3 * g_numVisibleDlogValues + dlog::DLOG_VALUE_CH1_P);
+                float perDiv = channel_dispatcher::getPowerMaxLimit(Channel::get(iChannel)) / dlog::NUM_VERT_DIVISIONS;
+                dlog::g_dlogValues[g_numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_WATT);
+                dlog::g_dlogValues[g_numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_WATT);
+
+                ++g_numVisibleDlogValues;
+            }
+        }
+    }
+
+    g_lastTickCount = micros();
+    g_seconds = 0;
+    g_micros = 0;
+    g_iSample = 0;
+    g_currentTime = 0;
+    g_nextTime = 0;
+
     writeUint32(MAGIC1);
     writeUint32(MAGIC2);
 
@@ -284,32 +339,14 @@ int startImmediately() {
         writeUint16(0);
     }
 
-    uint32_t columns = 0;
-    for (int iChannel = 0; iChannel < CH_NUM; ++iChannel) {
-        if (g_lastOptions.logVoltage[iChannel]) {
-            columns |= 1 << (4 * iChannel);
-        }
-        if (g_lastOptions.logCurrent[iChannel]) {
-            columns |= 2 << (4 * iChannel);
-        }
-        if (g_lastOptions.logPower[iChannel]) {
-            columns |= 4 << (4 * iChannel);
-        }
-    }
     writeUint32(columns);
 
     writeFloat(g_lastOptions.period);
     writeFloat(g_lastOptions.time);
     writeUint32(datetime::nowUtc());
 
-    g_lastBufferStart = g_lastBufferEnd = g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex;
-
-    g_lastTickCount = micros();
-    g_seconds = 0;
-    g_micros = 0;
-    g_iSample = 0;
-    g_currentTime = 0;
-    g_nextTime = 0;
+    g_lastBufferStart = g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex;
+    g_size = 0;
 
     setState(STATE_EXECUTING);
 
@@ -319,7 +356,6 @@ int startImmediately() {
 }
 
 void finishLogging(bool flush) {
-	g_lastBufferEnd = g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex;
 	setState(STATE_IDLE);
 
 	if (flush) {
@@ -386,6 +422,8 @@ void log(uint32_t tickCount) {
                     writeFloat(uMon * iMon);
                 }
             }
+
+            ++g_size;
 #else
             // we missed a sample, write NAN
 #ifdef DLOG_JITTER
@@ -402,6 +440,8 @@ void log(uint32_t tickCount) {
                     writeFloat(NAN);
                 }
             }
+
+            ++g_size;
 #endif
         }
 
@@ -435,8 +475,8 @@ void log(uint32_t tickCount) {
                 writeFloat(uMon * iMon);
             }
         }
-
-        g_lastBufferEnd = g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex;
+        
+        ++g_size;
 
         if (g_nextTime > g_lastOptions.time) {
             finishLogging(true);
@@ -477,7 +517,7 @@ void reset() {
 }
 
 uint32_t getSize() {
-    return (g_lastBufferEnd - g_lastBufferStart) / (g_numDlogValues * sizeof(float));
+    return g_size;
 }
 
 } // namespace dlog

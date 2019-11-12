@@ -69,10 +69,9 @@ extern trigger::Source g_triggerSource;
 
 extern Options g_lastOptions;
 extern uint8_t *g_lastBufferStart;
-extern uint8_t *g_lastBufferEnd;
 
 struct DlogValueParams {
-    DlogValueType type;
+    DlogValueType dlogValueType;
     eez::gui::data::Value perDiv;
     eez::gui::data::Value offset;
 };
@@ -82,7 +81,8 @@ static const int MAX_DLOG_VALUES = 6;
 static const int NUM_HORZ_DIVISIONS = 12;
 static const int NUM_VERT_DIVISIONS = 6;
 
-extern int g_numDlogValues;
+extern uint8_t g_totalDlogValues;
+extern uint8_t g_numVisibleDlogValues;
 extern DlogValueParams g_dlogValues[MAX_DLOG_VALUES];
 
 extern eez::gui::Value g_timeOffset;

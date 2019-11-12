@@ -166,22 +166,6 @@ void oneIter() {
                     
                     dlog::g_triggerSource = trigger::SOURCE_IMMEDIATE;
 
-                    dlog::g_numDlogValues = 2;
-
-                    float perDiv;
-
-                    dlog::g_dlogValues[0].type = dlog::DLOG_VALUE_CH1_U;
-                    perDiv = channel_dispatcher::getUMax(Channel::get(0)) / dlog::NUM_VERT_DIVISIONS;
-                    dlog::g_dlogValues[0].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_VOLT);
-                    dlog::g_dlogValues[0].offset = gui::data::Value(roundPrec(-perDiv * dlog::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
-
-                    dlog::g_dlogValues[1].type = dlog::DLOG_VALUE_CH1_I;
-                    perDiv = channel_dispatcher::getIMax(Channel::get(0)) / dlog::NUM_VERT_DIVISIONS;
-                    dlog::g_dlogValues[1].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_AMPER);
-                    dlog::g_dlogValues[1].offset = gui::data::Value(roundPrec(-perDiv * dlog::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_AMPER);
-
-                    dlog::g_timeOffset = gui::data::Value(0.0f, UNIT_SECOND);
-
                     dlog::initiate(filePath);
                 }
 			} else if (type == SCPI_QUEUE_MESSAGE_ABORT_DOWNLOADING) {
