@@ -512,11 +512,11 @@ uint16_t PsuAppContext::getWidgetBackgroundColor(const WidgetCursor &widgetCurso
     if (!dlog::isIdle()) {
         const Widget *widget = widgetCursor.widget;
         int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
-        if (widget->data == DATA_ID_CHANNEL_U_EDIT || widget->data == DATA_ID_CHANNEL_U_MON_DAC) {
+        if (widget->data == DATA_ID_CHANNEL_U_MON || widget->data == DATA_ID_CHANNEL_U_MON_DAC) {
             if (dlog::g_lastOptions.logVoltage[iChannel]) {
                 return CONF_DLOG_COLOR;
             }
-        } else if (widget->data == DATA_ID_CHANNEL_I_EDIT) {
+        } else if (widget->data == DATA_ID_CHANNEL_I_MON || widget->data == DATA_ID_CHANNEL_I_MON_DAC) {
             if (dlog::g_lastOptions.logCurrent[iChannel]) {
                 return CONF_DLOG_COLOR;
             }
