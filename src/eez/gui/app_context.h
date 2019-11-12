@@ -104,10 +104,6 @@ public:
 
     void updateAppView(WidgetCursor &widgetCursor);
 
-    void showProgressPage(const char *message, void (*abortCallback)());
-    bool updateProgressPage(size_t processedSoFar, size_t totalSize);
-    void hideProgressPage();
-
   protected:
     virtual int getMainPageId() = 0;
     virtual void onPageChanged(int previousPageId, int activePageId);
@@ -120,12 +116,6 @@ public:
 
     bool m_setPageIdOnNextIter;
     int m_pageIdToSetOnNextIter;
-
-    bool m_pushProgressPage;
-    const char *m_progressMessage;
-    void (*m_progressAbortCallback)();
-
-    bool m_popProgressPage;
 
     SelectFromEnumPage m_selectFromEnumPage;
 

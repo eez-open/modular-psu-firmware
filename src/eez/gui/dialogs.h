@@ -33,10 +33,6 @@ extern data::Value g_progress;
 void showAsyncOperationInProgress(const char *message, void (*checkStatus)() = 0);
 void hideAsyncOperationInProgress();
 
-void showProgressPage(const char *message, void (*abortCallback)() = 0);
-bool updateProgressPage(size_t processedSoFar, size_t totalSize);
-void hideProgressPage();
-
 void setTextMessage(const char *message, unsigned int len);
 void clearTextMessage();
 const char *getTextMessage();

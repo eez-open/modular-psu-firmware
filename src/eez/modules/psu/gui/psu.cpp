@@ -110,6 +110,8 @@ void onEncoder(int counter, bool clicked);
 ////////////////////////////////////////////////////////////////////////////////
 
 PsuAppContext::PsuAppContext() {
+    m_pushProgressPage = false;
+    m_popProgressPage = false;
 }
 
 void PsuAppContext::stateManagment() {
@@ -232,6 +234,20 @@ void PsuAppContext::stateManagment() {
         if (showSetupWizardQuestion()) {
             return;
         }
+    }
+
+    if (m_pushProgressPage) {
+        data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage), 0);
+        g_appContext->m_dialogCancelCallback = m_progressAbortCallback;
+        pushPage(PAGE_ID_PROGRESS);
+        m_pushProgressPage = false;
+    }
+
+    if (m_popProgressPage) {
+        if (getActivePageId() == PAGE_ID_PROGRESS) {
+            popPage();
+        }
+        m_popProgressPage = false;
     }
 }
 
@@ -536,6 +552,44 @@ Value PsuAppContext::getHistoryValue(const Cursor &cursor, uint16_t id, uint32_t
     Value value(position, VALUE_TYPE_INT);
     g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_HISTORY_VALUE, (Cursor &)cursor, value);
     return value;
+}
+
+void PsuAppContext::showProgressPage(const char *message, void (*abortCallback)()) {
+    m_progressMessage = message;
+    m_progressAbortCallback = abortCallback;
+    m_pushProgressPage = true;
+}
+
+bool PsuAppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) {
+    if (totalSize > 0) {
+        g_progress = data::Value((int)round((processedSoFar * 1.0f / totalSize) * 100.0f), VALUE_TYPE_PERCENTAGE);
+    } else {
+        g_progress = data::Value((uint32_t)processedSoFar, VALUE_TYPE_SIZE);
+    }
+
+    if (m_pushProgressPage) {
+        return true;
+    }
+
+    return isPageOnStack(PAGE_ID_PROGRESS);
+}
+
+void PsuAppContext::hideProgressPage() {
+    m_popProgressPage = true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void showProgressPage(const char *message, void (*abortCallback)()) {
+    psu::gui::g_psuAppContext.showProgressPage(message, abortCallback);
+}
+
+bool updateProgressPage(size_t processedSoFar, size_t totalSize) {
+    return psu::gui::g_psuAppContext.updateProgressPage(processedSoFar, totalSize);
+}
+
+void hideProgressPage() {
+    psu::gui::g_psuAppContext.hideProgressPage();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

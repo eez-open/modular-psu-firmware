@@ -55,20 +55,6 @@ void hideAsyncOperationInProgress() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void showProgressPage(const char *message, void (*abortCallback)()) {
-    psu::gui::g_psuAppContext.showProgressPage(message, abortCallback);
-}
-
-bool updateProgressPage(size_t processedSoFar, size_t totalSize) {
-    return psu::gui::g_psuAppContext.updateProgressPage(processedSoFar, totalSize);
-}
-
-void hideProgressPage() {
-    psu::gui::g_psuAppContext.hideProgressPage();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void setTextMessage(const char *message, unsigned int len) {
     strncpy(g_appContext->m_textMessage, message, len);
     g_appContext->m_textMessage[len] = 0;

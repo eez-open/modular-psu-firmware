@@ -56,6 +56,10 @@ void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_ca
 
 Unit getCurrentEncoderUnit();
 
+void showProgressPage(const char *message, void (*abortCallback)() = 0);
+bool updateProgressPage(size_t processedSoFar, size_t totalSize);
+void hideProgressPage();
+
 class PsuAppContext : public AppContext {
   public:
     PsuAppContext();
@@ -74,7 +78,17 @@ class PsuAppContext : public AppContext {
     uint32_t getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) override;
     Value getHistoryValue(const Cursor &cursor, uint16_t id, uint32_t position) override;
 
+    void showProgressPage(const char *message, void (*abortCallback)());
+    bool updateProgressPage(size_t processedSoFar, size_t totalSize);
+    void hideProgressPage();
+
   protected:
+    bool m_pushProgressPage;
+    const char *m_progressMessage;
+    void (*m_progressAbortCallback)();
+
+    bool m_popProgressPage;
+
     int getMainPageId() override;
     void onPageChanged(int previousPageId, int activePageId) override;
     bool isAutoRepeatAction(int action) override;

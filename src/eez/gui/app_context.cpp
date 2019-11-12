@@ -54,28 +54,12 @@ AppContext *g_appContext;
 ////////////////////////////////////////////////////////////////////////////////
 
 AppContext::AppContext() {
-    m_pushProgressPage = false;
-    m_popProgressPage = false;
     m_setPageIdOnNextIter = false;
     m_updatePageIndex = -1;
 }
 
 
 void AppContext::stateManagment() {
-    if (m_pushProgressPage) {
-        data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage), 0);
-        g_appContext->m_dialogCancelCallback = m_progressAbortCallback;
-        pushPage(PAGE_ID_PROGRESS);
-        m_pushProgressPage = false;
-    }
-
-    if (m_popProgressPage) {
-        if (getActivePageId() == PAGE_ID_PROGRESS) {
-            popPage();
-        }
-        m_popProgressPage = false;
-    }
-
     if (m_setPageIdOnNextIter) {
         setPage(m_pageIdToSetOnNextIter);
         if (m_pageIdToSetOnNextIter == PAGE_ID_WELCOME) {
@@ -214,8 +198,8 @@ void AppContext::replacePage(int pageId, Page *page) {
     int previousPageId = getActivePageId();
 
     Page *activePage = getActivePage();
-    if (page) {
-        page->pageFree();
+    if (activePage) {
+    	activePage->pageFree();
     }
 
     doShowPage(pageId, page, previousPageId);
@@ -434,36 +418,6 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
             widgetCursor.nextState();
         }
     }
-}
-
-void AppContext::showProgressPage(const char *message, void (*abortCallback)()) {
-    m_progressMessage = message;
-    m_progressAbortCallback = abortCallback;
-    m_pushProgressPage = true;
-}
-
-bool AppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) {
-    if (totalSize > 0) {
-        g_progress = data::Value((int)round((processedSoFar * 1.0f / totalSize) * 100.0f), VALUE_TYPE_PERCENTAGE);
-    } else {
-        g_progress = data::Value((uint32_t)processedSoFar, VALUE_TYPE_SIZE);
-    }
-
-    if (m_pushProgressPage) {
-        return true;
-    }
-
-    for (int i = 0; i < m_pageNavigationStackPointer; i++) {
-        if (m_pageNavigationStack[i].pageId == PAGE_ID_PROGRESS) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void AppContext::hideProgressPage() {
-    m_popProgressPage = true;
 }
 
 } // namespace gui
