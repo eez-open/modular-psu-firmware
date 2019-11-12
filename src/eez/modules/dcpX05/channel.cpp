@@ -120,7 +120,7 @@ struct Channel : ChannelInterface {
 
 		params.OVP_DEFAULT_STATE = false;
 		params.OVP_MIN_DELAY = 0.0f;
-		params.OVP_DEFAULT_DELAY = 0.005f;
+		params.OVP_DEFAULT_DELAY = 0.0f;
 		params.OVP_MAX_DELAY = 10.0f;
 
 		params.OCP_DEFAULT_STATE = false;
