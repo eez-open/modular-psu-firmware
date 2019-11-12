@@ -2158,11 +2158,26 @@ void data_channel_protection_ovp_type(data::DataOperationEnum operation, data::C
 }
 
 void data_channel_protection_ovp_level(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+    Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
         if (page) {
             value = page->level;
+        } else {
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_LEVEL;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else {
+                value = MakeValue(channel.prot_conf.u_level, UNIT_VOLT);
+            }
         }
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = MakeValue(channel_dispatcher::getUMaxOvpLevel(channel), UNIT_VOLT);
+    } else if (operation == data::DATA_OPERATION_SET) {
+        channel_dispatcher::setOvpLevel(channel, value.getFloat());
     }
 }
 
@@ -2186,7 +2201,7 @@ void data_channel_protection_ovp_delay(data::DataOperationEnum operation, data::
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel.params.OVP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
-        channel_dispatcher::setOvpParameters(channel, channel.prot_conf.flags.u_state ? 1 : 0, channel.prot_conf.flags.u_type ? 1 : 0, channel_dispatcher::getUProtectionLevel(channel), value.getFloat());
+        channel_dispatcher::setOvpDelay(channel, value.getFloat());
     }
 }
 

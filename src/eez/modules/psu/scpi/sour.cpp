@@ -462,9 +462,13 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionLevel(scpi_t *context) {
     }
 
     float voltage;
-    if (!get_voltage_protection_level_param(context, voltage, channel_dispatcher::getUSet(*channel),
-                                            channel_dispatcher::getUMax(*channel),
-                                            channel_dispatcher::getUMax(*channel))) {
+    if (!get_voltage_protection_level_param(
+        context, 
+        voltage, 
+        channel_dispatcher::getUSet(*channel),
+        channel_dispatcher::getUMax(*channel),
+        channel_dispatcher::getUMaxOvpLevel(*channel)
+    )) {
         return SCPI_RES_ERR;
     }
 

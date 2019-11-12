@@ -170,7 +170,7 @@ void ChSettingsOvpProtectionPage::pageAlloc() {
 
     origLevel = level = MakeValue(channel_dispatcher::getUProtectionLevel(*g_channel), UNIT_VOLT);
     minLevel = channel_dispatcher::getUSet(*g_channel);
-    maxLevel = channel_dispatcher::getUMax(*g_channel);
+    maxLevel = channel_dispatcher::getUMaxOvpLevel(*g_channel);
     defLevel = channel_dispatcher::getUMax(*g_channel);
 
     origDelay = delay = MakeValue(g_channel->prot_conf.u_delay, UNIT_SECOND);
