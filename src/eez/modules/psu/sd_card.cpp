@@ -346,7 +346,7 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
     size_t totalSize = file.size();
 
 #if OPTION_DISPLAY
-    eez::gui::showProgressPage("Uploading...");
+    eez::psu::gui::showProgressPage("Uploading...");
     size_t uploaded = 0;
 #endif
 
@@ -364,8 +364,8 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
 
 #if OPTION_DISPLAY
         uploaded += size;
-        if (!eez::gui::updateProgressPage(uploaded, totalSize)) {
-            eez::gui::hideProgressPage();
+        if (!eez::psu::gui::updateProgressPage(uploaded, totalSize)) {
+            eez::psu::gui::hideProgressPage();
             event_queue::pushEvent(event_queue::EVENT_WARNING_FILE_UPLOAD_ABORTED);
             if (err)
                 *err = SCPI_ERROR_FILE_TRANSFER_ABORTED;
@@ -384,7 +384,7 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
     callback(param, NULL, -1);
 
 #if OPTION_DISPLAY
-    eez::gui::hideProgressPage();
+    eez::psu::gui::hideProgressPage();
 #endif
 
     return result;
@@ -461,7 +461,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
     }
 
 #if OPTION_DISPLAY
-    eez::gui::showProgressPage("Copying...");
+    eez::psu::gui::showProgressPage("Copying...");
 #endif
 
     const int CHUNK_SIZE = 512;
@@ -475,7 +475,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
         size_t written = destinationFile.write((const uint8_t *)buffer, size);
         if (size < 0 || written != (size_t)size) {
 #if OPTION_DISPLAY
-            eez::gui::hideProgressPage();
+            eez::psu::gui::hideProgressPage();
 #endif
             sourceFile.close();
             destinationFile.close();
@@ -488,7 +488,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
         totalWritten += written;
 
 #if OPTION_DISPLAY
-        if (!eez::gui::updateProgressPage(totalWritten, totalSize)) {
+        if (!eez::psu::gui::updateProgressPage(totalWritten, totalSize)) {
             sourceFile.close();
             destinationFile.close();
 
@@ -496,7 +496,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
             if (err)
                 *err = SCPI_ERROR_MASS_STORAGE_ERROR;
 
-            eez::gui::hideProgressPage();
+            eez::psu::gui::hideProgressPage();
             return false;
         }
 #endif
@@ -510,7 +510,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
     destinationFile.close();
 
 #if OPTION_DISPLAY
-    eez::gui::hideProgressPage();
+    eez::psu::gui::hideProgressPage();
 #endif
 
     if (totalWritten != totalSize) {

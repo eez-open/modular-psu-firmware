@@ -125,8 +125,8 @@ void oneIter() {
 			}
 #endif
 #if OPTION_SD_CARD
-			else if (type == SCPI_QUEUE_MESSAGE_DLOG_DISK_OPERATION) {
-				eez::psu::dlog::executeDiskOperation(param);
+			else if (type == SCPI_QUEUE_MESSAGE_DLOG_FILE_WRITE) {
+				eez::psu::dlog::fileWrite();
 			}
 			else if (type == SCPI_QUEUE_MESSAGE_DLOG_TOGGLE) {
                 if (dlog::isExecuting()) {

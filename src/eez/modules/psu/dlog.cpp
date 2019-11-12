@@ -30,6 +30,7 @@
 #include <eez/modules/psu/sd_card.h>
 #include <eez/system.h>
 #include <eez/modules/psu/dlog.h>
+#include <eez/modules/psu/event_queue.h>
 
 #ifdef EEZ_PLATFORM_STM32
 #include <eez/platform/stm32/defines.h>
@@ -61,7 +62,6 @@ uint32_t g_cursorOffset = 240;
 
 static State g_state = STATE_IDLE;
 
-static File g_file;
 static uint32_t g_lastTickCount;
 static uint32_t g_seconds;
 static uint32_t g_micros;
@@ -85,11 +85,11 @@ static uint8_t *g_buffer = g_bufferMemory;
 static const unsigned int CHUNK_SIZE = 4096;
 static const unsigned int NUM_CHUNKS = DLOG_BUFFER_SIZE / CHUNK_SIZE;
 
-static int g_selectedChunkIndex;
-static int g_bufferIndex;
+static unsigned int g_selectedChunkIndex;
+static unsigned int g_bufferIndex;
 
-static int g_lastChunkIndex;
-static int g_lastChunkSize;
+static unsigned int g_lastChunkIndex;
+static unsigned int g_lastChunkSize;
 
 void setState(State newState) {
     if (g_state != newState) {
@@ -122,7 +122,7 @@ int checkDlogParameters() {
         return SCPI_ERROR_EXECUTION_ERROR;
     }
 
-    return 0;
+    return SCPI_RES_OK;
 }
 
 State getState() {
@@ -150,12 +150,12 @@ int initiate(const char *filePath) {
         error = startImmediately();
     } else {
         error = checkDlogParameters();
-        if (!error) {
+        if (error == SCPI_RES_OK) {
             setState(STATE_INITIATED);
         }
     }
 
-    if (error) {
+    if (error != SCPI_RES_OK) {
         g_filePath[0] = 0;
     }
 
@@ -177,43 +177,39 @@ void triggerGenerated(bool startImmediatelly) {
 #define MAGIC2 0x474F4C44L
 #define VERSION 0x00000001L
 
-#define DISK_OPERATION_OPEN 1
-#define DISK_OPERATION_WRITE 2
-#define DISK_OPERATION_CLOSE 3
-
-void executeDiskOperation(int diskOperation) {
-    switch (diskOperation) {
-    case DISK_OPERATION_OPEN:
-        if (!g_file.open(g_filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-            // return SCPI_ERROR_EXECUTION_ERROR;
-            return;
-        }
-
-        if (!g_file.truncate(0)) {
-            // return SCPI_ERROR_MASS_STORAGE_ERROR;
-            return;
-        }
-        break;
-
-    case DISK_OPERATION_WRITE:
-        g_file.write(g_buffer + g_lastChunkIndex * CHUNK_SIZE, g_lastChunkSize);
-        break;
-
-    case DISK_OPERATION_CLOSE:
-        if (g_bufferIndex > 0) {
-            g_file.write(g_buffer + g_selectedChunkIndex * CHUNK_SIZE, g_bufferIndex);
-        }
-        g_file.close();
-        break;
+int fileOpen() {
+	File file;
+    if (!file.open(g_filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+    	event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_OPEN_ERROR);
+        // TODO replace with more specific error
+        return SCPI_ERROR_MASS_STORAGE_ERROR;
     }
+     
+    bool result = file.truncate(0);
+    file.close();
+    if (!result) {
+        event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_TRUNCATE_ERROR);
+        // TODO replace with more specific error
+        return SCPI_ERROR_MASS_STORAGE_ERROR;
+    }
+
+    return SCPI_RES_OK;
 }
 
-void queueDiskOperation(int diskOperation) {
-    if (osThreadGetId() != g_scpiTaskHandle) {
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_DISK_OPERATION, diskOperation), osWaitForever);
-    } else {
-        executeDiskOperation(diskOperation);
+void fileWrite() {
+	File file;
+    if (!file.open(g_filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+    	event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR);
+    	abort(false);
+        return;
     }
+
+    size_t written = file.write(g_buffer + g_lastChunkIndex * CHUNK_SIZE, g_lastChunkSize);
+	file.close();
+	if (written != g_lastChunkSize) {
+		event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_WRITE_ERROR);
+		abort(false);
+	}
 }
 
 void flushData() {
@@ -223,7 +219,11 @@ void flushData() {
     g_selectedChunkIndex = (g_selectedChunkIndex + 1) % NUM_CHUNKS;
     g_bufferIndex = 0;
 
-    queueDiskOperation(DISK_OPERATION_WRITE);
+    if (osThreadGetId() != g_scpiTaskHandle) {
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_FILE_WRITE, 0), osWaitForever);
+    } else {
+        fileWrite();
+    }
 }
 
 void writeUint8(uint8_t value) {
@@ -254,12 +254,17 @@ void writeFloat(float value) {
 }
 
 int startImmediately() {
-    int err = checkDlogParameters();
-    if (err) {
+	int err;
+
+    err = checkDlogParameters();
+    if (err != SCPI_RES_OK) {
         return err;
     }
 
-    queueDiskOperation(DISK_OPERATION_OPEN);
+    err = fileOpen();
+    if (err != SCPI_RES_OK) {
+        return err;
+    }
 
     g_selectedChunkIndex = 0;
     g_bufferIndex = 0;
@@ -267,8 +272,6 @@ int startImmediately() {
     g_fileLength = 0;
 
     memcpy(&g_lastOptions, &g_nextOptions, sizeof(Options));
-
-    setState(STATE_EXECUTING);
 
     writeUint32(MAGIC1);
     writeUint32(MAGIC2);
@@ -308,15 +311,21 @@ int startImmediately() {
     g_currentTime = 0;
     g_nextTime = 0;
 
+    setState(STATE_EXECUTING);
+
     log(g_lastTickCount);
 
     return SCPI_RES_OK;
 }
 
-void finishLogging() {
-    g_lastBufferEnd = g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex;
-    setState(STATE_IDLE);
-    queueDiskOperation(DISK_OPERATION_CLOSE);
+void finishLogging(bool flush) {
+	g_lastBufferEnd = g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex;
+	setState(STATE_IDLE);
+
+	if (flush) {
+        flushData();
+	}
+
     for (int i = 0; i < CH_NUM; ++i) {
         g_nextOptions.logVoltage[i] = 0;
         g_nextOptions.logCurrent[i] = 0;
@@ -324,9 +333,9 @@ void finishLogging() {
     }
 }
 
-void abort() {
+void abort(bool flush) {
     if (g_state == STATE_EXECUTING) {
-        finishLogging();
+        finishLogging(flush);
     } else if (g_state == STATE_INITIATED || g_state == STATE_TRIGGERED) {
         setState(STATE_IDLE);
     }
@@ -430,7 +439,7 @@ void log(uint32_t tickCount) {
         g_lastBufferEnd = g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex;
 
         if (g_nextTime > g_lastOptions.time) {
-            finishLogging();
+            finishLogging(true);
         } else {
             int32_t diff = tickCount - g_lastSyncTickCount;
             if (diff > CONF_DLOG_SYNC_FILE_TIME * 1000000L) {
@@ -453,7 +462,7 @@ void tick(uint32_t tickCount) {
 }
 
 void reset() {
-    abort();
+    abort(false);
 
     for (int i = 0; i < CH_NUM; ++i) {
         g_nextOptions.logVoltage[i] = 0;

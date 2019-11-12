@@ -268,7 +268,7 @@ void startDownloading() {
     g_downloading = true;
     g_downloaded = 0;
 #if OPTION_DISPLAY
-    eez::gui::showProgressPage("Downloading...", abortDownloading);
+    eez::psu::gui::showProgressPage("Downloading...", abortDownloading);
 #endif
 }
 
@@ -280,7 +280,7 @@ void finishDownloading(int16_t eventId) {
     }
     event_queue::pushEvent(eventId);
 #if OPTION_DISPLAY
-    eez::gui::hideProgressPage();
+    eez::psu::gui::hideProgressPage();
 #endif
     g_downloading = false;
     g_downloadFilePath[0] = 0;
@@ -380,7 +380,7 @@ scpi_result_t scpi_cmd_mmemoryDownloadData(scpi_t *context) {
 
 #if OPTION_DISPLAY
     g_downloaded += size;
-    eez::gui::updateProgressPage(g_downloaded, g_downloadSize);
+    eez::psu::gui::updateProgressPage(g_downloaded, g_downloadSize);
 #endif
 
     return SCPI_RES_OK;

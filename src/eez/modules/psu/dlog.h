@@ -101,12 +101,12 @@ bool isExecuting();
 int initiate(const char *filePath);
 void triggerGenerated(bool startImmediatelly = true);
 int startImmediately();
-void abort();
+void abort(bool flush = true);
 
 void tick(uint32_t tick_usec);
 void reset();
 
-void executeDiskOperation(int diskOperation);
+void fileWrite();
 
 uint32_t getSize();
 

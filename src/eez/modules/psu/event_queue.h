@@ -110,9 +110,13 @@ static const int EVENT_TYPE_ERROR = 3;
 	EVENT_ERROR(EEPROM_SLOT1_WRITE_VERIFY_ERROR, 99, "EEPROM write verify error on module 1")      \
 	EVENT_ERROR(EEPROM_SLOT2_WRITE_VERIFY_ERROR, 100, "EEPROM write verify error on module 2")     \
 	EVENT_ERROR(EEPROM_SLOT3_WRITE_VERIFY_ERROR, 101, "EEPROM write verify error on module 3")     \
-	EVENT_ERROR(SLOT1_CRC_CHECK_ERROR, 102, "CRC error on module 1")      \
-	EVENT_ERROR(SLOT2_CRC_CHECK_ERROR, 103, "CRC error on module 2")     \
-	EVENT_ERROR(SLOT3_CRC_CHECK_ERROR, 104, "CRC error on module 3")     \
+	EVENT_ERROR(SLOT1_CRC_CHECK_ERROR, 102, "CRC error on module 1")                               \
+	EVENT_ERROR(SLOT2_CRC_CHECK_ERROR, 103, "CRC error on module 2")                               \
+	EVENT_ERROR(SLOT3_CRC_CHECK_ERROR, 104, "CRC error on module 3")                               \
+	EVENT_ERROR(DLOG_FILE_OPEN_ERROR, 110, "DLOG file open error")                                 \
+	EVENT_ERROR(DLOG_TRUNCATE_ERROR, 111, "DLOG truncate error")                                   \
+	EVENT_ERROR(DLOG_FILE_REOPEN_ERROR, 112, "DLOG file reopen error")                             \
+	EVENT_ERROR(DLOG_WRITE_ERROR, 113, "DLOG write")                                               \
     EVENT_WARNING(CH1_CALIBRATION_DISABLED, 0, "Ch1 calibration disabled")                         \
     EVENT_WARNING(CH2_CALIBRATION_DISABLED, 1, "Ch2 calibration disabled")                         \
     EVENT_WARNING(CH3_CALIBRATION_DISABLED, 2, "Ch3 calibration disabled")                         \
