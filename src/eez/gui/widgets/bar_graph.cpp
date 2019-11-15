@@ -136,6 +136,9 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
         Style textStyle;
         memcpy(&textStyle, barGraphWidget->textStyle ? getStyle(barGraphWidget->textStyle) : style, sizeof(Style));
+        if (style->color != currentState->color) {
+            textStyle.color = widgetCursor.currentState->flags.active || widgetCursor.currentState->flags.blinking ? currentState->activeColor : currentState->color;
+        }
 
         uint16_t fg = widgetCursor.currentState->flags.active || widgetCursor.currentState->flags.blinking ? currentState->activeColor : currentState->color;
         uint16_t bg = widgetCursor.currentState->flags.active || widgetCursor.currentState->flags.blinking ? currentState->activeBackgroundColor : currentState->backgroundColor;
