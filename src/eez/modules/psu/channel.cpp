@@ -69,6 +69,9 @@ void Channel::Value::resetMonValues() {
 }
 
 void Channel::Value::addMonValue(float value, float prec) {
+    if (io_pins::isInhibited()) {
+        value = 0;
+    }
     value = roundPrec(value, prec);
 
     mon_last = value;
@@ -85,7 +88,7 @@ void Channel::Value::addMonValue(float value, float prec) {
         mon_total += value;
         mon_arr[mon_index] = value;
         mon_index = (mon_index + 1) % NUM_ADC_AVERAGING_VALUES;
-        mon = roundPrec(mon_total / NUM_ADC_AVERAGING_VALUES, prec);
+        mon = io_pins::isInhibited() ? 0 : roundPrec(mon_total / NUM_ADC_AVERAGING_VALUES, prec);
     }
 
     mon_measured = true;
