@@ -26,7 +26,6 @@
 #include <eez/gui/app_context.h>
 #include <eez/gui/dialogs.h>
 #include <eez/gui/event.h>
-#include <eez/gui/state.h>
 #include <eez/gui/touch.h>
 #include <eez/gui/update.h>
 #include <eez/sound.h>
@@ -123,7 +122,7 @@ void oneIter() {
 #endif
 
     eventHandling();
-    stateManagment();
+    stateManagmentHook();
 
     if (mcu::display::isOn()) {
 #if OPTION_SDRAM

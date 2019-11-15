@@ -37,13 +37,13 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
     g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
-    appContext->x = widgetCursor.x;
-    appContext->y = widgetCursor.y;
-    appContext->width = widget->w;
-    appContext->height = widget->h;
-
     bool refresh = !widgetCursor.previousState;
     if (refresh && !appContext->isActivePageInternal() && appContext->getActivePageId() != INTERNAL_PAGE_ID_NONE) {
+        appContext->x = widgetCursor.x;
+        appContext->y = widgetCursor.y;
+        appContext->width = widget->w;
+        appContext->height = widget->h;
+
         // clear background
 		const Widget *page = getPageWidget(appContext->getActivePageId());
         const Style* style = getStyle(page->style);

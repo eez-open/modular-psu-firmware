@@ -48,6 +48,7 @@ extern bool g_isBlinkTime;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void stateManagmentHook();
 WidgetCursor &getFoundWidgetAtDown();
 void clearFoundWidgetAtDown();
 bool isActiveWidget(const WidgetCursor &widgetCursor);

@@ -998,6 +998,7 @@ void action_user_switch_clicked() {
 
     switch (persist_conf::devConf.userSwitchAction) {
     case persist_conf::USER_SWITCH_ACTION_NONE:
+        action_select_user_switch_action();
     	break;
 
     case persist_conf::USER_SWITCH_ACTION_ENCODER_STEP:
@@ -1045,8 +1046,8 @@ void action_user_switch_clicked() {
         io_pins::setIsInhibitedByUser(!io_pins::getIsInhibitedByUser());
         break;
 
-    case persist_conf::USER_SWITCH_ACTION_SELECTED_ACTION:
-    	// TODO
+    case persist_conf::USER_SWITCH_ACTION_STANDBY:
+    	changePowerState(isPowerUp() ? false : true);
     	break;
     }
 }
@@ -1062,9 +1063,13 @@ void action_select_user_switch_action() {
     g_appContext = &psu::gui::g_psuAppContext;
 #endif
 
-    clearFoundWidgetAtDown();
-    pushSelectFromEnumPage(g_userSwitchActionEnumDefinition, persist_conf::devConf.userSwitchAction, nullptr, onSetUserSwitchAction);
-    
+    if (g_appContext->getActiveSelectEnumDefinition() == g_userSwitchActionEnumDefinition) {
+    	popPage();
+    } else {
+        clearFoundWidgetAtDown();
+        pushSelectFromEnumPage(g_userSwitchActionEnumDefinition, persist_conf::devConf.userSwitchAction, nullptr, onSetUserSwitchAction);
+    }
+
 #if EEZ_PLATFORM_SIMULATOR
     g_appContext = saved;
 #endif

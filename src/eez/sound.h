@@ -44,5 +44,8 @@ void playBeep(bool force = false);
 /// Play click sound
 void playClick();
 
+/// Play shutter sound
+void playShutter();
+
 } // namespace sound
 } // namespace eez

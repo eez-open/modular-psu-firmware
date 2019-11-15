@@ -428,6 +428,13 @@ void AppContext::infoMessage(const char *message) {
     m_showInfoMessageOnNextIter = message;
 }
 
+const data::EnumItem *AppContext::getActiveSelectEnumDefinition() {
+    if (getActivePageId() == INTERNAL_PAGE_ID_SELECT_FROM_ENUM) {
+        return m_selectFromEnumPage.getEnumDefinition();
+    }
+    return nullptr;
+}
+
 } // namespace gui
 } // namespace eez
 

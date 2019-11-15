@@ -21,6 +21,7 @@
 #include <eez/scpi/scpi.h>
 
 #include <eez/system.h>
+#include <eez/sound.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -177,6 +178,8 @@ void oneIter() {
 			} else if (type == SCPI_QUEUE_MESSAGE_ABORT_DOWNLOADING) {
                 abortDownloading();
             } else if (type == SCPI_QUEUE_MESSAGE_SCREENSHOT) {
+                sound::playShutter();
+
                 const uint8_t *screenshotPixels = mcu::display::takeScreenshot();
 
                 unsigned char* imageData;

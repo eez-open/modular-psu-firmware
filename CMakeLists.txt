@@ -260,7 +260,6 @@ set(src_eez_gui
     src/eez/gui/gui.cpp
     src/eez/gui/overlay.cpp
     src/eez/gui/page.cpp
-    src/eez/gui/state.cpp
     src/eez/gui/touch.cpp
     src/eez/gui/touch_filter.cpp
     src/eez/gui/update.cpp
@@ -283,7 +282,6 @@ set(header_eez_gui
     src/eez/gui/gui.h
     src/eez/gui/overlay.h
     src/eez/gui/page.h
-    src/eez/gui/state.h
     src/eez/gui/touch.h
     src/eez/gui/touch_filter.h
     src/eez/gui/update.h

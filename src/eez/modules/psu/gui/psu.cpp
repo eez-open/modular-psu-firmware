@@ -63,6 +63,10 @@
 #include <eez/modules/mcu/button.h>
 #endif
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+#include <eez/platform/simulator/front_panel.h>
+#endif
+
 #include <eez/modules/psu/gui/touch_calibration.h>
 
 #define CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT 2000000L // 2s
@@ -80,6 +84,20 @@ AppContext &getRootAppContext() {
     return psu::gui::g_psuAppContext;
 }
 #endif
+
+void stateManagmentHook() {
+    AppContext *saved = g_appContext;
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_appContext = &g_frontPanelAppContext;
+    g_frontPanelAppContext.stateManagment();
+#endif
+
+    g_appContext = &psu::gui::g_psuAppContext;
+    psu::gui::g_psuAppContext.stateManagment();
+
+    g_appContext = saved;
+}
 
 }
 
@@ -136,6 +154,14 @@ void PsuAppContext::stateManagment() {
         }
     }
 
+#if EEZ_PLATFORM_STM32
+    if (g_userSwitch.isLongPress()) {
+        action_select_user_switch_action();
+    } else if (g_userSwitch.isClicked()) {
+        action_user_switch_clicked();
+    }
+#endif
+
     // turn the screen off if power is down and system is booted
     if (!psu::isPowerUp()) {
     	if (psu::g_isBooted && getActivePageId() != INTERNAL_PAGE_ID_NONE) {
@@ -188,14 +214,6 @@ void PsuAppContext::stateManagment() {
         }
         return;
     }
-
-#if EEZ_PLATFORM_STM32
-    if (g_userSwitch.isLongPress()) {
-        action_select_user_switch_action();
-    } else if (g_userSwitch.isClicked()) {
-        action_user_switch_clicked();
-    }
-#endif
 
     // TODO move this to some other place
 #if OPTION_ENCODER

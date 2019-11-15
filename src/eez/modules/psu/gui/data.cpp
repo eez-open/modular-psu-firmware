@@ -189,7 +189,7 @@ EnumItem g_userSwitchActionEnumDefinition[] = {
     { persist_conf::USER_SWITCH_ACTION_OUTPUT_ENABLE, "Output Enable" },
     { persist_conf::USER_SWITCH_ACTION_HOME, "Home/Back" },
     { persist_conf::USER_SWITCH_ACTION_INHIBIT, "Inhibit" },
-    //{ persist_conf::USER_SWITCH_ACTION_SELECTED_ACTION, "Selected Action" },
+    { persist_conf::USER_SWITCH_ACTION_STANDBY, "Standby" },
     { 0, 0 }
 };
 

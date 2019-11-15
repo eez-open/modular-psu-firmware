@@ -111,6 +111,8 @@ public:
 
     void infoMessage(const char *message);
 
+    const data::EnumItem *getActiveSelectEnumDefinition();
+
 protected:
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;

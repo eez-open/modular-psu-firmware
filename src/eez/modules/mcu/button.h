@@ -28,7 +28,6 @@ public:
     Button(GPIO_TypeDef* port, uint16_t pin, bool activeLow, bool detectLongPress);
 
     bool isClicked();
-
     bool isLongPress();
 
 private:

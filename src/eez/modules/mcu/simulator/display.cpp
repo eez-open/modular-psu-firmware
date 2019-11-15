@@ -55,6 +55,8 @@ namespace display {
 static const char *TITLE = "EEZ Modular Firmware Simulator";
 static const char *ICON = "eez.png";
 
+static bool g_isOn;
+
 static SDL_Window *g_mainWindow;
 static SDL_Renderer *g_renderer;
 
@@ -198,6 +200,8 @@ void setBufferPointer(void *buffer) {
 
 void turnOn() {
     if (!isOn()) {
+        g_isOn = true;
+
         g_frontPanelBuffer1 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
         memset(g_frontPanelBuffer1, 0, g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
         
@@ -222,6 +226,8 @@ void updateScreen(uint32_t *buffer);
 
 void turnOff() {
     if (isOn()) {
+        g_isOn = false;
+
         // clear screen
         setColor(0, 0, 0);
         fillRect(g_psuAppContext.x, g_psuAppContext.y, g_psuAppContext.x + g_psuAppContext.width - 1, g_psuAppContext.y + g_psuAppContext.height - 1);
@@ -241,13 +247,17 @@ void turnOff() {
 }
 
 bool isOn() {
-    return g_frontPanelBuffer != nullptr;
+    return g_isOn;
 }
 
 void updateBrightness() {
 }
 
 void updateScreen(uint32_t *buffer) {
+    if (!isOn()) {
+        return;
+    }
+
     SDL_Surface *rgbSurface = SDL_CreateRGBSurfaceFrom(
         buffer, g_frontPanelWidth, g_frontPanelHeight, 32, 4 * g_frontPanelWidth, 0, 0, 0, 0);
     if (rgbSurface != NULL) {
