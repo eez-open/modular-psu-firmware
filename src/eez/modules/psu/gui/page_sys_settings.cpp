@@ -742,8 +742,6 @@ void SysSettingsIOPinsPage::set() {
         }
 
         popPage();
-
-        io_pins::refresh();
     }
 }
 

@@ -1427,8 +1427,6 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
 
     persist_conf::setIoPinFunction(pin, function);
 
-    io_pins::refresh();
-
     return SCPI_RES_OK;
 }
 
@@ -1469,8 +1467,6 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarity(scpi_t *context) {
     }
 
     persist_conf::setIoPinPolarity(pin, polarity);
-
-    io_pins::refresh();
 
     return SCPI_RES_OK;
 }

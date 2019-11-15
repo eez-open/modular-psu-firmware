@@ -46,6 +46,7 @@ using namespace eez::mcu::display;
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ontime.h>
+#include <eez/modules/psu/io_pins.h>
 
 #include <eez/gui/widgets/yt_graph.h>
 
@@ -1206,10 +1207,12 @@ void setDstRule(uint8_t dstRule) {
 
 void setIoPinPolarity(int pin, unsigned polarity) {
     g_devConf.ioPins[pin].polarity = polarity;
+    io_pins::refresh();
 }
 
 void setIoPinFunction(int pin, unsigned function) {
     g_devConf.ioPins[pin].function = function;
+    io_pins::refresh();
 }
 
 void setSelectedThemeIndex(uint8_t selectedThemeIndex) {

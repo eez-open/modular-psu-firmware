@@ -48,6 +48,8 @@ static uint32_t g_toutputPulseStartTickCount;
 
 static bool g_pinState[NUM_IO_PINS] = { false, false, false, false };
 
+static bool g_isInhibitedByUser;
+
 #if defined EEZ_PLATFORM_STM32
 
 int ioPinRead(int pin) {
@@ -156,18 +158,20 @@ void init() {
 
 void tick(uint32_t tickCount) {
     // execute input pins function
-    unsigned inhibited = 0;
+    unsigned inhibited = g_isInhibitedByUser;
 
-    const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
-    if (inputPin1.function == io_pins::FUNCTION_INHIBIT) {
-        int value = ioPinRead(EXT_TRIG1);
-        inhibited = (value && inputPin1.polarity == io_pins::POLARITY_POSITIVE) || (!value && inputPin1.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
-    }
+    if (!inhibited) {
+        const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
+        if (inputPin1.function == io_pins::FUNCTION_INHIBIT) {
+            int value = ioPinRead(EXT_TRIG1);
+            inhibited = (value && inputPin1.polarity == io_pins::POLARITY_POSITIVE) || (!value && inputPin1.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
+        }
 
-    const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
-    if (inputPin2.function == io_pins::FUNCTION_INHIBIT) {
-        int value = ioPinRead(EXT_TRIG2);
-        inhibited = (value && inputPin2.polarity == io_pins::POLARITY_POSITIVE) || (!value && inputPin2.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
+        const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
+        if (inputPin2.function == io_pins::FUNCTION_INHIBIT) {
+            int value = ioPinRead(EXT_TRIG2);
+            inhibited = (value && inputPin2.polarity == io_pins::POLARITY_POSITIVE) || (!value && inputPin2.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
+        }
     }
 
     if (inhibited != g_lastState.inhibited) {
@@ -262,8 +266,6 @@ void refresh() {
     }
 }
 
-static bool g_isInhibitedByUser;
-
 bool getIsInhibitedByUser() {
     return g_isInhibitedByUser;
 }
@@ -273,7 +275,7 @@ void setIsInhibitedByUser(bool isInhibitedByUser) {
 }
 
 bool isInhibited() {
-    return g_isInhibitedByUser || g_lastState.inhibited ? true : false;
+    return g_lastState.inhibited;
 }
 
 void setPinState(int pin, bool state) {
