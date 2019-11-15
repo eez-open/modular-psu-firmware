@@ -68,13 +68,20 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
     const Widget *widget = widgetCursor.widget;
     const BarGraphWidget *barGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const BarGraphWidget *);
+    const Style* style = getStyle(widget->style);
 
     widgetCursor.currentState->size = sizeof(BarGraphWidgetState);
 
+    widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
     
     auto currentState = (BarGraphWidgetState *)widgetCursor.currentState;
     auto previousState = (BarGraphWidgetState *)widgetCursor.previousState;
+
+    currentState->color = data::getColor(widgetCursor.cursor, widget->data, style);
+    currentState->backgroundColor = data::getBackgroundColor(widgetCursor.cursor, widget->data, style);
+    currentState->activeColor = data::getActiveColor(widgetCursor.cursor, widget->data, style);
+    currentState->activeBackgroundColor = data::getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
 
     currentState->line1Data = data::get(widgetCursor.cursor, barGraphWidget->line1Data);
     currentState->line2Data = data::get(widgetCursor.cursor, barGraphWidget->line2Data);
@@ -82,7 +89,12 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
     bool refresh =
         !widgetCursor.previousState ||
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
+        widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
         widgetCursor.previousState->data != widgetCursor.currentState->data ||
+        currentState->color != previousState->color ||
+        currentState->backgroundColor != previousState->backgroundColor ||
+        currentState->activeColor != previousState->activeColor ||
+        currentState->activeBackgroundColor != previousState->activeBackgroundColor ||
         previousState->line1Data != currentState->line1Data ||
         previousState->line2Data != currentState->line2Data;
 
@@ -95,8 +107,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
         float min = data::getMin(widgetCursor.cursor, widget->data).getFloat();
         float max = fullScale ? currentState->line2Data.getFloat() : data::getMax(widgetCursor.cursor, widget->data).getFloat();
 
-        bool horizontal = barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_LEFT_RIGHT ||
-                          barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_RIGHT_LEFT;
+        bool horizontal = barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_LEFT_RIGHT || barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_RIGHT_LEFT;
 
         int d = horizontal ? w : h;
 
@@ -123,23 +134,11 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
             }
         }
 
-        const Style* style = getStyle(widget->style);
-
         Style textStyle;
+        memcpy(&textStyle, barGraphWidget->textStyle ? getStyle(barGraphWidget->textStyle) : style, sizeof(Style));
 
-        uint16_t inverseColor;
-        if (barGraphWidget->textStyle) {
-            const Style *textStyleInner = getStyle(barGraphWidget->textStyle);
-            memcpy(&textStyle, textStyleInner, sizeof(Style));
-
-            inverseColor = textStyle.background_color;
-        } else {
-            inverseColor = style->background_color;
-        }
-
-        uint16_t fg = widgetCursor.currentState->flags.active ? inverseColor : style->color;
-        uint16_t bg =
-            widgetCursor.currentState->flags.active ? inverseColor : style->background_color;
+        uint16_t fg = widgetCursor.currentState->flags.active || widgetCursor.currentState->flags.blinking ? currentState->activeColor : currentState->color;
+        uint16_t bg = widgetCursor.currentState->flags.active || widgetCursor.currentState->flags.blinking ? currentState->activeBackgroundColor : currentState->backgroundColor;
 
         if (horizontal) {
             // calc text position
@@ -235,11 +234,9 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                 }
             }
 
-            drawLineInBarGraphWidget(barGraphWidget, pLine1, barGraphWidget->line1Style, x, y, w,
-                                     h);
+            drawLineInBarGraphWidget(barGraphWidget, pLine1, barGraphWidget->line1Style, x, y, w, h);
             if (!fullScale) {
-                drawLineInBarGraphWidget(barGraphWidget, pLine2, barGraphWidget->line2Style, x, y,
-                                         w, h);
+                drawLineInBarGraphWidget(barGraphWidget, pLine2, barGraphWidget->line2Style, x, y, w, h);
             }
         } else {
             // calc text position
@@ -335,11 +332,9 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                 }
             }
 
-            drawLineInBarGraphWidget(barGraphWidget, pLine1, barGraphWidget->line1Style, x, y, w,
-                                     h);
+            drawLineInBarGraphWidget(barGraphWidget, pLine1, barGraphWidget->line1Style, x, y, w, h);
             if (!fullScale) {
-                drawLineInBarGraphWidget(barGraphWidget, pLine2, barGraphWidget->line2Style, x, y,
-                                         w, h);
+                drawLineInBarGraphWidget(barGraphWidget, pLine2, barGraphWidget->line2Style, x, y, w, h);
             }
         }
     }

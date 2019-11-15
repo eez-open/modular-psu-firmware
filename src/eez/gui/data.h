@@ -312,6 +312,10 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_CONTEXT,
     DATA_OPERATION_SET_CONTEXT,
     DATA_OPERATION_RESTORE_CONTEXT,
+    DATA_OPERATION_GET_COLOR,
+    DATA_OPERATION_GET_BACKGROUND_COLOR,
+    DATA_OPERATION_GET_ACTIVE_COLOR,
+    DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR,
     DATA_OPERATION_IS_BLINKING,
     DATA_OPERATION_SET,
     DATA_OPERATION_YT_DATA_GET_SIZE,
@@ -358,6 +362,11 @@ void getList(const Cursor &cursor, uint16_t id, const Value **labels, int &count
 
 Value get(const Cursor &cursor, uint16_t id);
 bool set(const Cursor &cursor, uint16_t id, Value value, int16_t *error);
+
+uint16_t getColor(const Cursor &cursor, uint16_t id, const Style *style);
+uint16_t getBackgroundColor(const Cursor &cursor, uint16_t id, const Style *style);
+uint16_t getActiveColor(const Cursor &cursor, uint16_t id, const Style *style);
+uint16_t getActiveBackgroundColor(const Cursor &cursor, uint16_t id, const Style *style);
 
 bool isBlinking(const Cursor &cursor, uint16_t id);
 Value getEditValue(const Cursor &cursor, uint16_t id);

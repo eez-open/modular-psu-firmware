@@ -70,8 +70,6 @@ class PsuAppContext : public AppContext {
 
     bool isFocusWidget(const WidgetCursor &widgetCursor) override;
 
-    uint16_t getWidgetBackgroundColor(const WidgetCursor &widgetCursor,
-                                      const Style *style) override;
     bool isBlinking(const data::Cursor &cursor, uint16_t id) override;
 
     uint32_t getNumHistoryValues(uint16_t id) override;

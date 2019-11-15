@@ -39,7 +39,10 @@ struct DisplayDataWidget {
 
 struct DisplayDataState {
     WidgetState genericState;
+    uint16_t color;
     uint16_t backgroundColor;
+    uint16_t activeColor;
+    uint16_t activeBackgroundColor;
 };
 
 void DisplayDataWidget_draw(const WidgetCursor &widgetCursor);

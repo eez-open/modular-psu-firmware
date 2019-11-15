@@ -531,6 +531,42 @@ bool set(const Cursor &cursor, uint16_t id, Value value, int16_t *error) {
     return true;
 }
 
+uint16_t getColor(const Cursor &cursor, uint16_t id, const Style *style) {
+    Value value((void *)style, VALUE_TYPE_POINTER);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_COLOR, (Cursor &)cursor, value);
+    if (value.getType() == VALUE_TYPE_UINT16) {
+        return value.getUInt16();
+    }
+    return style->color;
+}
+
+uint16_t getBackgroundColor(const Cursor &cursor, uint16_t id, const Style *style) {
+    Value value((void *)style, VALUE_TYPE_POINTER);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_BACKGROUND_COLOR, (Cursor &)cursor, value);
+    if (value.getType() == VALUE_TYPE_UINT16) {
+        return value.getUInt16();
+    }
+    return style->background_color;
+}
+
+uint16_t getActiveColor(const Cursor &cursor, uint16_t id, const Style *style) {
+    Value value((void *)style, VALUE_TYPE_POINTER);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_ACTIVE_COLOR, (Cursor &)cursor, value);
+    if (value.getType() == VALUE_TYPE_UINT16) {
+        return value.getUInt16();
+    }
+    return style->active_color;
+}
+
+uint16_t getActiveBackgroundColor(const Cursor &cursor, uint16_t id, const Style *style) {
+    Value value((void *)style, VALUE_TYPE_POINTER);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR, (Cursor &)cursor, value);
+    if (value.getType() == VALUE_TYPE_UINT16) {
+        return value.getUInt16();
+    }
+    return style->active_background_color;
+}
+
 bool isBlinking(const Cursor &cursor, uint16_t id) {
     if (id == DATA_ID_NONE) {
         return false;

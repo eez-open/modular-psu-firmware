@@ -39,6 +39,10 @@ struct BarGraphWidget {
 
 struct BarGraphWidgetState {
     WidgetState genericState;
+    uint16_t color;
+    uint16_t backgroundColor;
+    uint16_t activeColor;
+    uint16_t activeBackgroundColor;
     data::Value line1Data;
     data::Value line2Data;
 };

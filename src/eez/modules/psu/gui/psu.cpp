@@ -71,8 +71,6 @@
 #define CONF_GUI_WELCOME_PAGE_TIMEOUT 2000000L          // 2s
 #define CONF_GUI_KEEP_WELCOME_PAGE_AFTER_BOOT 100000L   // 0.1s
 
-#define CONF_DLOG_COLOR COLOR_ID_DATA_LOGGING
-
 namespace eez {
 
 namespace gui {
@@ -507,30 +505,6 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
 
 bool PsuAppContext::testExecuteActionOnTouchDown(int action) {
     return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT || isAutoRepeatAction(action);
-}
-
-uint16_t PsuAppContext::getWidgetBackgroundColor(const WidgetCursor &widgetCursor, const Style *style) {
-#if OPTION_SD_CARD
-    if (!dlog::isIdle()) {
-        const Widget *widget = widgetCursor.widget;
-        int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
-        if (widget->data == DATA_ID_CHANNEL_U_MON || widget->data == DATA_ID_CHANNEL_U_MON_DAC) {
-            if (dlog::g_lastOptions.logVoltage[iChannel]) {
-                return CONF_DLOG_COLOR;
-            }
-        } else if (widget->data == DATA_ID_CHANNEL_I_MON || widget->data == DATA_ID_CHANNEL_I_MON_DAC) {
-            if (dlog::g_lastOptions.logCurrent[iChannel]) {
-                return CONF_DLOG_COLOR;
-            }
-        } else if (widget->data == DATA_ID_CHANNEL_P_MON) {
-            if (dlog::g_lastOptions.logPower[iChannel]) {
-                return CONF_DLOG_COLOR;
-            }
-        }
-    }
-#endif
-
-    return AppContext::getWidgetBackgroundColor(widgetCursor, style);
 }
 
 bool PsuAppContext::isBlinking(const data::Cursor &cursor, uint16_t id) {

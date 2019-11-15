@@ -86,7 +86,6 @@ public:
 
     virtual bool isFocusWidget(const WidgetCursor &widgetCursor);
 
-    virtual uint16_t getWidgetBackgroundColor(const WidgetCursor &widgetCursor, const Style *style);
     virtual bool isBlinking(const data::Cursor &cursor, uint16_t id);
 
     virtual uint32_t getNumHistoryValues(uint16_t id);

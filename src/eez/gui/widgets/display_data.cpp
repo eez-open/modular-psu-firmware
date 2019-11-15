@@ -56,7 +56,11 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
-    currentState->backgroundColor = g_appContext->getWidgetBackgroundColor(widgetCursor, style);
+    
+    currentState->color = data::getColor(widgetCursor.cursor, widget->data, style);
+    currentState->backgroundColor = data::getBackgroundColor(widgetCursor.cursor, widget->data, style);
+    currentState->activeColor = data::getActiveColor(widgetCursor.cursor, widget->data, style);
+    currentState->activeBackgroundColor = data::getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
 
     bool refresh =
         !widgetCursor.previousState ||
@@ -64,7 +68,10 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
         widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
         widgetCursor.previousState->data != widgetCursor.currentState->data ||
-        currentState->backgroundColor != previousState->backgroundColor;
+        currentState->color != previousState->color ||
+        currentState->backgroundColor != previousState->backgroundColor ||
+        currentState->activeColor != previousState->activeColor ||
+        currentState->activeBackgroundColor != previousState->activeBackgroundColor;
 
     if (refresh) {
         char text[64];
@@ -98,7 +105,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
         drawText(start, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                  style, widgetCursor.currentState->flags.active,
                  widgetCursor.currentState->flags.blinking, false,
-                 nullptr, &currentState->backgroundColor, nullptr, nullptr);
+                 &currentState->color, &currentState->backgroundColor, &currentState->activeColor, &currentState->activeBackgroundColor);
     }
 }
 

@@ -111,37 +111,30 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
     if (y_offset < 0)
         y_offset = y1;
 
-    uint16_t backgroundColor;
-    if (overrideBackgroundColor) {
-        backgroundColor = *overrideBackgroundColor;
-    } else {
-        backgroundColor = style->background_color;
-    }
-
     // fill background
-    if (active) {
+    if (active || blink) {
         if (overrideActiveBackgroundColor) {
             display::setColor(*overrideActiveBackgroundColor, ignoreLuminocity);
         } else {
             display::setColor(style->active_background_color, ignoreLuminocity);
         }
-    } else if (blink) {
-        display::setColor(style->color, ignoreLuminocity);
-    }else {
-        display::setColor(backgroundColor, ignoreLuminocity);
+    } else {
+        if (overrideBackgroundColor) {
+            display::setColor(*overrideBackgroundColor, ignoreLuminocity);
+        } else {
+            display::setColor(style->background_color, ignoreLuminocity);
+        }
     }
     display::fillRect(x1, y1, x2, y2, borderRadius);
 
     // draw text
-    if (active) {
+    if (active || blink) {
         if (overrideActiveColor) {
             display::setColor(*overrideActiveColor, ignoreLuminocity);
         } else {
             display::setColor(style->active_color, ignoreLuminocity);
         }
-    } else if (blink) {
-        display::setColor(backgroundColor, ignoreLuminocity);
-    }else {
+    }  else {
         if (overrideColor) {
             display::setColor(*overrideColor, ignoreLuminocity);
         } else {

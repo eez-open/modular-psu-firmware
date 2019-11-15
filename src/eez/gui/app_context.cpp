@@ -284,11 +284,6 @@ bool AppContext::testExecuteActionOnTouchDown(int action) {
     return false;
 }
 
-uint16_t AppContext::getWidgetBackgroundColor(const WidgetCursor &widgetCursor,
-                                              const Style *style) {
-    return style->background_color;
-}
-
 bool AppContext::isBlinking(const data::Cursor &cursor, uint16_t id) {
     return false;
 }

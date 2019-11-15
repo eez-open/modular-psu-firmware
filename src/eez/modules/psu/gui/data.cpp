@@ -948,15 +948,6 @@ void data_channel_output_state(data::DataOperationEnum operation, data::Cursor &
     }
 }
 
-void data_channel_output_mode(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
-        value = (int)(channelSnapshot.mode == CHANNEL_MODE_UR ? 1 : 0);
-    }
-}
-
 void data_channel_is_cc(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
@@ -1026,6 +1017,25 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
         uint32_t position = value.getUInt32();
         value = MakeValue(channel.getUMonHistory(position), UNIT_VOLT);
+    } else if (operation == data::DATA_OPERATION_GET_COLOR) {
+        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
+        if (io_pins::isInhibited() || channelSnapshot.mode == CHANNEL_MODE_UR) {
+            value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
+        if (!dlog::isIdle() && dlog::g_lastOptions.logVoltage[iChannel]) {
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_COLOR) {
+        if (io_pins::isInhibited()) {
+            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
+        if (io_pins::isInhibited()) {
+            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
+        value = io_pins::isInhibited() ? 1 : 0;
     }
 }
 
@@ -1034,6 +1044,10 @@ void data_channel_u_mon_dac(data::DataOperationEnum operation, data::Cursor &cur
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMonDac(channel), UNIT_VOLT);
+    } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
+        if (!dlog::isIdle() && dlog::g_lastOptions.logVoltage[iChannel]) {
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+        }
     }
 }
 
@@ -1123,6 +1137,25 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         uint32_t position = value.getUInt32();
         value =
             MakeValue(channel.getIMonHistory(position), UNIT_AMPER);
+    } else if (operation == data::DATA_OPERATION_GET_COLOR) {
+        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
+        if (io_pins::isInhibited() || channelSnapshot.mode == CHANNEL_MODE_UR) {
+            value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
+        if (!dlog::isIdle() && dlog::g_lastOptions.logCurrent[iChannel]) {
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_COLOR) {
+        if (io_pins::isInhibited()) {
+            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
+        if (io_pins::isInhibited()) {
+            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
+        value = io_pins::isInhibited() ? 1 : 0;
     }
 }
 
@@ -1131,7 +1164,11 @@ void data_channel_i_mon_dac(data::DataOperationEnum operation, data::Cursor &cur
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMonDac(channel), UNIT_AMPER);
-    }
+    } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
+        if (!dlog::isIdle() && dlog::g_lastOptions.logCurrent[iChannel]) {
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+        }
+    } 
 }
 
 void data_channel_i_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -1192,6 +1229,25 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
         float pMon = channel.getUMonHistory(value.getUInt32()) * channel.getIMonHistory(value.getUInt32());
         value = MakeValue(pMon, UNIT_WATT);
+    } else if (operation == data::DATA_OPERATION_GET_COLOR) {
+        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
+        if (io_pins::isInhibited() || channelSnapshot.mode == CHANNEL_MODE_UR) {
+            value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
+        if (!dlog::isIdle() && dlog::g_lastOptions.logPower[iChannel]) {
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_COLOR) {
+        if (io_pins::isInhibited()) {
+            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
+        if (io_pins::isInhibited()) {
+            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
+        value = io_pins::isInhibited() ? 1 : 0;
     }
 }
 
