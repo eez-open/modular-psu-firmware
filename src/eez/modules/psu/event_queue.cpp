@@ -100,8 +100,8 @@ void doPushEvent(int16_t eventId) {
     }
 
     int eventType = getEventType(&e);
-    if (eventType == EVENT_TYPE_ERROR ||
-        (eventType == EVENT_TYPE_WARNING && g_eventQueue.lastErrorEventIndex == NULL_INDEX)) {
+    int lastEventType = getEventType(getLastErrorEvent());
+    if (eventType >= lastEventType) {
         g_eventQueue.lastErrorEventIndex = g_eventQueue.head;
     }
 
@@ -138,6 +138,9 @@ Event *getLastErrorEvent() {
 }
 
 int getEventType(Event *e) {
+    if (!e) {
+        return EVENT_TYPE_NONE;
+    }
     if (e->eventId >= EVENT_INFO_START_ID) {
         return EVENT_TYPE_INFO;
     } else if (e->eventId >= EVENT_WARNING_START_ID) {

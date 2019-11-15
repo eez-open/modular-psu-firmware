@@ -67,6 +67,7 @@ static uint32_t *g_frontPanelBuffer2;
 static uint32_t *g_frontPanelBuffer3;
 
 static uint8_t *g_screenshotBuffer;
+static bool g_takeScreenshot;
 static int g_screenshotY;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -307,6 +308,31 @@ void sync() {
         return;
     }
 
+    if (g_takeScreenshot) {
+        g_screenshotBuffer = new uint8_t[480 * 272 * 3];
+
+        uint8_t *src = (uint8_t *)(g_frontPanelBuffer + g_psuAppContext.y * g_frontPanelWidth + g_psuAppContext.x);
+        uint8_t *dst = g_screenshotBuffer;
+
+        int srcAdvance = (g_frontPanelWidth - 480) * 4;
+
+        for (int y = 0; y < 272; y++) {
+            for (int x = 0; x < 480; x++) {
+                uint8_t b = *src++;
+                uint8_t g = *src++;
+                uint8_t r = *src++;
+                src++;
+
+                *dst++ = r;
+                *dst++ = g;
+                *dst++ = b;
+            }
+            src += srcAdvance;
+        }
+
+    	g_takeScreenshot = false;
+    }
+
     if (g_painted) {
         g_painted = false;
 
@@ -318,6 +344,7 @@ void sync() {
             g_frontPanelBuffer = g_frontPanelBuffer1;
         }
     }
+
 }
 
 void finishAnimation() {
@@ -342,39 +369,13 @@ int getDisplayHeight() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void screanshotBegin() {
-    g_screenshotBuffer = new uint8_t[480 * 272 * 3];
+const uint8_t *takeScreenshot() {
+	g_takeScreenshot = true;
+	do {
+		osDelay(0);
+	} while (g_takeScreenshot);
 
-    uint8_t *src = (uint8_t *)(g_frontPanelBuffer + g_psuAppContext.y * g_frontPanelWidth + g_psuAppContext.x);
-    uint8_t *dst = g_screenshotBuffer;
-
-    int srcAdvance = (g_frontPanelWidth - 480) * 4;
-
-    for (int y = 0; y < 272; y++) {
-        for (int x = 0; x < 480; x++) {
-            *dst++ = *src++;
-            *dst++ = *src++;
-            *dst++ = *src++;
-            src++;
-        }
-        src += srcAdvance;
-    }
-
-    g_screenshotY = 272 - 1;
-}
-
-bool screanshotGetLine(uint8_t *line) {
-    if (g_screenshotY < 0) {
-        return false;
-    }
-    memcpy(line, g_screenshotBuffer + g_screenshotY * 480 * 3, 480 * 3);
-    --g_screenshotY;
-    return true;
-}
-
-void screanshotEnd() {
-    delete g_screenshotBuffer;
-    g_screenshotBuffer = nullptr;
+    return g_screenshotBuffer;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

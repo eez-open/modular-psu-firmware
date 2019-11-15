@@ -244,7 +244,8 @@ static const int EVENT_TYPE_ERROR = 3;
     EVENT_INFO(FILE_UPLOAD_SUCCEEDED, 123, "File upload succeeded")                                \
     EVENT_INFO(FILE_DOWNLOAD_SUCCEEDED, 124, "File download succeeded")                            \
     EVENT_INFO(COUPLED_IN_COMMON_GND, 125, "Coupled in common GND")                                \
-    EVENT_INFO(COUPLED_IN_SPLIT_RAILS, 126, "Coupled in split rails")
+    EVENT_INFO(COUPLED_IN_SPLIT_RAILS, 126, "Coupled in split rails")                              \
+	EVENT_INFO(SCREENSHOT_SAVED, 127, "A screenshot was saved")
 
 #define EVENT_ERROR_START_ID 10000
 #define EVENT_WARNING_START_ID 12000

@@ -63,6 +63,10 @@ WidgetCursor &getFoundWidgetAtDown() {
     return m_foundWidgetAtDown;
 }
 
+void clearFoundWidgetAtDown() {
+    m_foundWidgetAtDown = WidgetCursor();
+}
+
 bool isActiveWidget(const WidgetCursor &widgetCursor) {
     if (widgetCursor.appContext->isActiveWidget(widgetCursor)) {
         return true;
@@ -77,6 +81,10 @@ int getAction(const WidgetCursor &widgetCursor) {
 }
 
 void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+    if (!widgetCursor.widget) {
+        return;
+    }
+
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         m_touchActionExecuted = false;
         m_touchActionExecutedAtDown = false;
@@ -103,6 +111,12 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
         int action = getAction(widgetCursor);
         if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor) && widgetCursor.appContext->isAutoRepeatAction(action)) {
             m_touchActionExecuted = true;
+            executeAction(action);
+        }
+    } else if (touchEvent.type == EVENT_TYPE_LONG_TOUCH) {
+        m_touchActionExecuted = true;
+        int action = widgetCursor.appContext->getLongTouchActionHook(widgetCursor);
+        if (action != ACTION_ID_NONE) {
             executeAction(action);
         }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {

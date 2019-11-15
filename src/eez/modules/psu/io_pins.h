@@ -58,6 +58,9 @@ bool getPinState(int pin);
 int ioPinRead(int pin);
 void ioPinWrite(int pin, int state);
 
+bool getIsInhibitedByUser();
+void setIsInhibitedByUser(bool isInhibitedByUser);
+
 }
 }
 } // namespace eez::psu::io_pins

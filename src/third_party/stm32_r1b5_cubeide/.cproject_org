@@ -91,6 +91,12 @@
 									<listOptionValue builtIn="false" value="OPTION_ENCODER=1" />
 									<listOptionValue builtIn="false" value="OPTION_EXT_EEPROM=1" />
 									<listOptionValue builtIn="false" value="EEZ_MCU_REVISION_R1B5=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DECODER=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DISK=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ERROR_TEXT=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_CPP=1"/>
 									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))" />
 									<listOptionValue builtIn="false" value="__packed=__attribute__((__packed__))" />
 								</option>
@@ -148,6 +154,12 @@
 									<listOptionValue builtIn="false" value="OPTION_AUX_TEMP_SENSOR=1" />
 									<listOptionValue builtIn="false" value="OPTION_WATCHDOG=1" />
 									<listOptionValue builtIn="false" value="OPTION_ENCODER=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DECODER=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DISK=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ERROR_TEXT=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_CPP=1"/>
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.176262651" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess" useByScannerDiscovery="false" value="com.atollic.truestudio.common_options.target.endianess.little" valueType="enumerated" />
 								<option id="com.atollic.truestudio.common_options.target.mcpu.630487808" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32F769IG" valueType="enumerated" />
@@ -339,6 +351,12 @@
 									<listOptionValue builtIn="false" value="OPTION_WATCHDOG=1" />
 									<listOptionValue builtIn="false" value="OPTION_ENCODER=1" />
 									<listOptionValue builtIn="false" value="OPTION_EXT_EEPROM=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DECODER=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DISK=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ERROR_TEXT=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_CPP=1"/>
 									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))" />
 									<listOptionValue builtIn="false" value="__packed=__attribute__((__packed__))" />
 								</option>
@@ -391,6 +409,12 @@
 									<listOptionValue builtIn="false" value="OPTION_AUX_TEMP_SENSOR=0" />
 									<listOptionValue builtIn="false" value="OPTION_WATCHDOG=1" />
 									<listOptionValue builtIn="false" value="OPTION_ENCODER=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DECODER=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DISK=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ERROR_TEXT=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_CPP=1"/>
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.176262651" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess" useByScannerDiscovery="false" value="com.atollic.truestudio.common_options.target.endianess.little" valueType="enumerated" />
 								<option id="com.atollic.truestudio.common_options.target.mcpu.630487808" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32F769IG" valueType="enumerated" />

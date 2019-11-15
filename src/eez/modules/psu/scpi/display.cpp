@@ -28,6 +28,8 @@
 #include <eez/system.h>
 #endif
 
+#include <eez/libs/image/jpeg_encode.h>
+
 namespace eez {
 namespace psu {
 namespace scpi {
@@ -174,57 +176,26 @@ scpi_result_t scpi_cmd_displayWindowTextClear(scpi_t *context) {
 scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_DISPLAY
-    const uint8_t buffer[] = {
-        // BMP Header (14 bytes)
+    const uint8_t *screenshotPixels = mcu::display::takeScreenshot();
 
-        // ID field (42h, 4Dh): BM
-        0x42, 0x4D,
-        // size of BMP file
-        0x36, 0xFA, 0x05, 0x00, // 14 + 40 + (480 * 272 * 3) = 391734‬ = 0x5FA36
-        // unused
-        0x00, 0x00,
-        // unused
-        0x00, 0x00,
-        // Offset where the pixel array (bitmap data) can be found
-        0x36, 0x00, 0x00, 0x00, // 53 = 0x36
+    unsigned char* imageData;
+    size_t imageDataSize;
 
-        // DIB Header (40 bytes)
-
-        // Number of bytes in the DIB header (from this point)
-        0x28, 0x00, 0x00, 0x00, // 40 = 0x28
-        // Width of the bitmap in pixels
-        0xE0, 0x01, 0x00, 0x00, // 480 = 0x1E0
-        // Height of the bitmap in pixels. Positive for bottom to top pixel order.
-        0x10, 0x01, 0x00, 0x00, // 272 = 0x110
-        // Number of color planes being used
-        0x01, 0x00,
-        // Number of bits per pixel
-        0x18, 0x00, // 24 = 0x18
-        // BI_RGB, no pixel array compression used
-        0x00, 0x00, 0x00, 0x00,
-        // Size of the raw bitmap data (including padding)
-        0x00, 0xFA, 0x05, 0x00, // 480 * 272 * 3 = 0x5FA00
-        // Print resolution of the image,
-        // 72 DPI × 39.3701 inches per metre yields 2834.6472
-        0x13, 0x0B, 0x00, 0x00, // 2835 pixels/metre horizontal
-        0x13, 0x0B, 0x00, 0x00, // 2835 pixels/metre vertical
-        // Number of colors in the palette
-        0x00, 0x00, 0x00, 0x00,
-        // 0 means all colors are important
-        0x00, 0x00, 0x00, 0x00,
-    };
-
-    SCPI_ResultArbitraryBlockHeader(context, sizeof(buffer) + 480 * 272 * 3);
-    SCPI_ResultArbitraryBlockData(context, buffer, sizeof(buffer));
-
-    mcu::display::screanshotBegin();
-
-    uint8_t line[480 * 3];
-    while (mcu::display::screanshotGetLine(line)) {
-        SCPI_ResultArbitraryBlockData(context, line, sizeof(line));
+    if (jpegEncode(screenshotPixels, &imageData, &imageDataSize)) {
+    	SCPI_ErrorPush(context, SCPI_ERROR_OUT_OF_MEMORY_FOR_REQ_OP);
+    	return SCPI_RES_ERR;
     }
 
-    mcu::display::screanshotEnd();
+    SCPI_ResultArbitraryBlockHeader(context, imageDataSize);
+
+    static const size_t CHUNK_SIZE = 1024;
+
+    while (imageDataSize > 0) {
+        size_t n = MIN(imageDataSize, CHUNK_SIZE);
+        SCPI_ResultArbitraryBlockData(context, imageData, n);
+        imageData += n;
+        imageDataSize -= n;
+    }
 
     return SCPI_RES_OK;
 #else

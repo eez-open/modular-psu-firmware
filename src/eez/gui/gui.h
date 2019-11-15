@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <cmsis_os.h>
+
 #include <eez/gui/assets.h>
 #include <eez/gui/data.h>
 #include <eez/gui/page.h>
@@ -41,11 +43,13 @@ bool onSystemStateChanged();
 
 ////////////////////////////////////////////////////////////////////////////////
 
+extern osThreadId g_guiTaskHandle;
 extern bool g_isBlinkTime;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 WidgetCursor &getFoundWidgetAtDown();
+void clearFoundWidgetAtDown();
 bool isActiveWidget(const WidgetCursor &widgetCursor);
 uint32_t getShowPageTime();
 void setShowPageTime(uint32_t time);

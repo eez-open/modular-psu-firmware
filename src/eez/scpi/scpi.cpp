@@ -34,13 +34,17 @@
 #include <eez/modules/psu/profile.h>
 #if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
+#include <eez/libs/sd_fat/sd_fat.h>
 #include <eez/modules/psu/dlog.h>
+#include <eez/libs/image/jpeg_encode.h>
 #endif
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/ontime.h>
+#include <eez/modules/psu/gui/psu.h>
 
 #include <eez/gui/data.h>
+#include <eez/gui/dialogs.h>
 
 using namespace eez::psu;
 using namespace eez::psu::scpi;
@@ -57,7 +61,7 @@ osThreadId g_scpiTaskHandle;
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #endif
 
-osThreadDef(g_scpiTask, mainLoop, osPriorityNormal, 0, 4096);
+osThreadDef(g_scpiTask, mainLoop, osPriorityNormal, 0, 8192);
 
 #if defined(EEZ_PLATFORM_STM32)
 #pragma GCC diagnostic pop
@@ -137,10 +141,12 @@ void oneIter() {
                     if (!sd_card::exists("/recordings", &err)) {
                         if (err != SCPI_ERROR_FILE_NAME_NOT_FOUND) {
                             event_queue::pushEvent(err);
-                        } else {
-                            if (!sd_card::makeDir("/recordings", &err)) {
-                                event_queue::pushEvent(err);
-                            }
+                            return;
+                        } 
+
+                        if (!sd_card::makeDir("/recordings", &err)) {
+                            event_queue::pushEvent(err);
+                            return;
                         }
                     }
 
@@ -170,9 +176,54 @@ void oneIter() {
                 }
 			} else if (type == SCPI_QUEUE_MESSAGE_ABORT_DOWNLOADING) {
                 abortDownloading();
+            } else if (type == SCPI_QUEUE_MESSAGE_SCREENSHOT) {
+                const uint8_t *screenshotPixels = mcu::display::takeScreenshot();
+
+                unsigned char* imageData;
+                size_t imageDataSize;
+
+                if (jpegEncode(screenshotPixels, &imageData, &imageDataSize)) {
+                    event_queue::pushEvent(SCPI_ERROR_OUT_OF_MEMORY_FOR_REQ_OP);
+                    return;
+                }
+
+                int err;
+                if (!sd_card::exists("/screenshots", &err)) {
+                    if (err != SCPI_ERROR_FILE_NAME_NOT_FOUND) {
+                        event_queue::pushEvent(err);
+                        return;
+                    } else if (!sd_card::makeDir("/screenshots", &err)) {
+                        event_queue::pushEvent(err);
+                        return;
+                    }
+                }
+
+                char filePath[40];
+                uint8_t year, month, day, hour, minute, second;
+                datetime::getDate(year, month, day);
+                datetime::getTime(hour, minute, second);
+                sprintf(filePath, "/screenshots/%d_%02d_%02d-%02d_%02d_%02d.jpg",
+                    (int)(year + 2000), (int)month, (int)day,
+                    (int)hour, (int)minute, (int)second);
+
+                File file;
+                if (file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
+                    size_t written = file.write(imageData, imageDataSize);
+
+                    file.close();
+
+                    if (written == imageDataSize) {
+                    	// success!
+                    	event_queue::pushEvent(event_queue::EVENT_INFO_SCREENSHOT_SAVED);
+                    } else {
+                        sd_card::deleteFile(filePath, &err);
+                        event_queue::pushEvent(SCPI_ERROR_MASS_STORAGE_ERROR);
+                    }
+                } else {
+                    event_queue::pushEvent(SCPI_ERROR_FILE_NAME_NOT_FOUND);
+                }
             }
 #endif
-
         }
     } else {
     	uint32_t tickCount = micros();

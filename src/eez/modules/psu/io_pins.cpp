@@ -262,8 +262,18 @@ void refresh() {
     }
 }
 
+static bool g_isInhibitedByUser;
+
+bool getIsInhibitedByUser() {
+    return g_isInhibitedByUser;
+}
+
+void setIsInhibitedByUser(bool isInhibitedByUser) {
+    g_isInhibitedByUser = isInhibitedByUser;
+}
+
 bool isInhibited() {
-    return g_lastState.inhibited ? true : false;
+    return g_isInhibitedByUser || g_lastState.inhibited ? true : false;
 }
 
 void setPinState(int pin, bool state) {

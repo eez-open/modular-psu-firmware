@@ -353,18 +353,25 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
 }
 
 WidgetCursor findWidget(int16_t x, int16_t y) {
+    g_foundWidget = 0;
+
     if (g_appContext->isActivePageInternal()) {
         WidgetCursor widgetCursor = ((InternalPage *)g_appContext->getActivePage())->findWidget(x, y);
 
         if (!widgetCursor) {
             // clicked outside internal page, close internal page
+        	bool passThrough = g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE;
+
             popPage();
+
+            if (!passThrough) {
+    			return g_foundWidget;
+    		}
         } else {
             return widgetCursor;
         }
     }
 
-    g_foundWidget = 0;
 
     g_findWidgetAtX = x;
     g_findWidgetAtY = y;

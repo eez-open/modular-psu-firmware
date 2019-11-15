@@ -90,7 +90,8 @@ static DevConfBlock g_devConfBlocks[] = {
     { offsetof(DeviceConfiguration, serialBaud), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, triggerSource), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, ytGraphUpdateMethod), 1, false, 0, 0, 0 },
-    { sizeof(DeviceConfiguration), 1, false, 0, 60 * 1000, 0 }
+    { offsetof(DeviceConfiguration, userSwitchAction), 1, false, 0, 60 * 1000, 0 },
+    { sizeof(DeviceConfiguration), 1, false, 0, 0, 0 },
 };
 
 static struct {
@@ -176,6 +177,9 @@ void initDefaultDevConf() {
     g_defaultDevConf.channelsViewModeInMax = 0;
 
     g_defaultDevConf.ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCROLL;
+
+// block 7
+    g_defaultDevConf.userSwitchAction = USER_SWITCH_ACTION_ENCODER_STEP;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -344,7 +348,7 @@ static const unsigned PERSISTENT_STORAGE_ADDRESS_ALIGNMENT = 32;
 void init() {
     initDefaultDevConf();
 
-    bool storageInitialized = true;
+    //bool storageInitialized = true;
 
     uint8_t blockData[sizeof(BlockHeader) + sizeof(DeviceConfiguration)];
     uint16_t blockAddress = PERSIST_CONF_DEV_CONF_ADDRESS;
@@ -356,13 +360,13 @@ void init() {
 
         if (!confRead(blockData, blockStorageSize, blockAddress, g_devConfBlocks[i].version)) {
             if (!confRead(blockData, blockStorageSize, blockAddress + blockStorageSize, g_devConfBlocks[i].version)) {
-                if (i == 0) {
-                    // if we can't read first block at both locations we assume storage is not initialized
-                    storageInitialized = false;
-                } else if (storageInitialized) {
-                    // generate error only if storage is intialized and we failed to read block at both locations
-                    pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_CRC_CHECK_ERROR);
-                }
+                //if (i == 0) {
+                //    // if we can't read first block at both locations we assume storage is not initialized
+                //    storageInitialized = false;
+                //} else if (storageInitialized) {
+                //    // generate error only if storage is intialized and we failed to read block at both locations
+                //    pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_CRC_CHECK_ERROR);
+                //}
 
                 // use default g_devConf data for this block
                 memcpy(blockData + sizeof(BlockHeader), (uint8_t *)&g_defaultDevConf + blockStart, blockSize);
@@ -415,12 +419,10 @@ void tick() {
             g_devConfBlocks[i].dirty = memcmp((uint8_t *)&devConf + blockStart, (uint8_t *)&g_savedDevConf + blockStart, blockSize) != 0;
         }
 
-        int32_t diff = tickCountMillis - g_devConfBlocks[i].lastSaveTickCount;
-
         if (
             g_devConfBlocks[i].dirty && 
             g_devConfBlocks[i].numSaveErrors < CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED && 
-            int32_t(tickCountMillis - g_devConfBlocks[i].lastSaveTickCount) >= g_devConfBlocks[i].minTickCountsBetweenSaves
+			tickCountMillis - g_devConfBlocks[i].lastSaveTickCount >= g_devConfBlocks[i].minTickCountsBetweenSaves
         ) {
         	memset(blockData, 0, blockStorageSize);
             memcpy(blockData + sizeof(BlockHeader), (uint8_t *)&devConf + blockStart, blockSize);
@@ -1246,6 +1248,10 @@ void setSkipSerialSetup(unsigned skipSerialSetup) {
 
 void setSkipEthernetSetup(unsigned skipEthernetSetup) {
     g_devConf.skipEthernetSetup = skipEthernetSetup;
+}
+
+void setUserSwitchAction(UserSwitchAction userSwitchAction) {
+    g_devConf.userSwitchAction = userSwitchAction;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

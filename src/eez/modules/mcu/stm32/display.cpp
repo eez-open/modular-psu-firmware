@@ -69,7 +69,6 @@ static uint16_t g_buffer[480 * 272];
 #endif
 
 static bool g_takeScreenshot;
-static int g_screenshotY;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -77,6 +76,10 @@ static int g_screenshotY;
 
 uint32_t vramOffset(uint16_t *vram, int x, int y) {
     return (uint32_t)(vram + y * DISPLAY_WIDTH + x);
+}
+
+uint32_t vramOffsetRGB888(uint8_t *vram, int x, int y) {
+    return (uint32_t)(vram + (y * DISPLAY_WIDTH  + x) * 3);
 }
 
 uint32_t vramOffset(uint32_t *vram, int x, int y) {
@@ -126,14 +129,13 @@ void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color
 	    hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
 
 		hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - width;
-		hdma2d.LayerCfg[0].InputColorMode = DMA2D_OUTPUT_RGB565;
+		hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_RGB565;
 		hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
 		hdma2d.LayerCfg[0].InputAlpha = 0;
 
 		hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - width;
-		hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_ARGB8888;
+		hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_ARGB8888;
 		hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
-		hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
 		hdma2d.LayerCfg[1].InputAlpha = 0;
 
 	    auto dstOffset = vramOffset(dst, x, y);
@@ -158,18 +160,17 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
 
     if (srcBpp == 32) {
         hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - width;
-        hdma2d.LayerCfg[0].InputColorMode = DMA2D_OUTPUT_RGB565;
+        hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_RGB565;
         hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
         hdma2d.LayerCfg[0].InputAlpha = 0;
 
         hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
-        hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_ARGB8888;
+        hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_ARGB8888;
         hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
-        hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
         hdma2d.LayerCfg[1].InputAlpha = 0;
     } else {
         hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
-        hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_RGB565;
+        hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
         hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
         hdma2d.LayerCfg[1].InputAlpha = 0;
     }
@@ -198,7 +199,7 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
     hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
 
     hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - width;
-    hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_RGB565;
+    hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
     hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
     hdma2d.LayerCfg[1].InputAlpha = 0;
 
@@ -206,7 +207,27 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
 
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
-    HAL_DMA2D_Start(&hdma2d, (uint32_t)vramOffset(src, x, y), vramOffset(dst, x, y), width, height);
+    HAL_DMA2D_Start(&hdma2d, vramOffset(src, x, y), vramOffset(dst, x, y), width, height);
+}
+
+void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, int height) {
+    hdma2d.Init.Mode = DMA2D_M2M_PFC;
+    hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB888;
+    hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+    hdma2d.Init.RedBlueSwap = DMA2D_RB_SWAP;
+
+    hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - width;
+    hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
+    hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+    hdma2d.LayerCfg[1].InputAlpha = 0;
+
+    DMA2D_WAIT;
+
+    HAL_DMA2D_Init(&hdma2d);
+    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
+    HAL_DMA2D_Start(&hdma2d, vramOffset(src, x, y), vramOffsetRGB888(dst, x, y), width, height);
+
+    hdma2d.Init.RedBlueSwap = DMA2D_RB_REGULAR;
 }
 
 void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
@@ -219,7 +240,7 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, i
     hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
 
     hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - width;
-    hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_RGB565;
+    hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
     hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
     hdma2d.LayerCfg[1].InputAlpha = 0;
 
@@ -227,7 +248,7 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, i
 
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
-    HAL_DMA2D_Start(&hdma2d, (uint32_t)vramOffset(src, x, y), vramOffset(dst, dstx, dsty), width, height);
+    HAL_DMA2D_Start(&hdma2d, vramOffset(src, x, y), vramOffset(dst, dstx, dsty), width, height);
 }
 
 void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity) {
@@ -244,7 +265,7 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
 	    hdma2d.Init.OutputOffset = DISPLAY_WIDTH - sw;
 
 	    hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - sw;
-	    hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_RGB565;
+	    hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
 	    hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
 	    hdma2d.LayerCfg[1].InputAlpha = 0;
 
@@ -259,15 +280,13 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
 		hdma2d.Init.OutputOffset = DISPLAY_WIDTH - sw;
 
 		hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - sw;
-		hdma2d.LayerCfg[0].InputColorMode = DMA2D_OUTPUT_RGB565;
+		hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_RGB565;
 		hdma2d.LayerCfg[0].AlphaMode = DMA2D_COMBINE_ALPHA;
-		hdma2d.LayerCfg[0].AlphaInverted = DMA2D_REGULAR_ALPHA;
 		hdma2d.LayerCfg[0].InputAlpha = 0xFF;
 
 		hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - sw;
-		hdma2d.LayerCfg[1].InputColorMode = DMA2D_OUTPUT_RGB565;
+		hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
 		hdma2d.LayerCfg[1].AlphaMode = DMA2D_COMBINE_ALPHA;
-		hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
 		hdma2d.LayerCfg[1].InputAlpha = opacity;
 
 		DMA2D_WAIT;
@@ -287,7 +306,7 @@ void bitBltA8Init(uint16_t color) {
     hdma2d.Init.OutputOffset = 0;
 
     // background
-    hdma2d.LayerCfg[0].InputColorMode = DMA2D_OUTPUT_RGB565;
+    hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_RGB565;
     hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
     hdma2d.LayerCfg[0].InputAlpha = 0;
     hdma2d.LayerCfg[0].InputOffset = 0;
@@ -351,6 +370,8 @@ void turnOn() {
         for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
             g_buffers[bufferIndex].bufferPointer = (uint16_t *)(VRAM_BUFFER5_START_ADDRESS + bufferIndex * VRAM_BUFFER_SIZE);
         }
+
+        assert((uint32_t)g_buffers[NUM_BUFFERS - 1].bufferPointer + VRAM_BUFFER_SIZE - SDRAM_START_ADDRESS <= SDRAM_SIZE);
 #endif
         fillRect(g_buffer, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
 
@@ -477,7 +498,7 @@ void sync() {
 
     if (g_takeScreenshot) {
 #if OPTION_SDRAM
-    	bitBlt(g_bufferOld, (uint16_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    	bitBltRGB888(g_bufferOld, (uint8_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
         DMA2D_WAIT;
 #endif
     	g_takeScreenshot = false;
@@ -500,38 +521,13 @@ int getDisplayHeight() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void screanshotBegin() {
+const uint8_t *takeScreenshot() {
 	g_takeScreenshot = true;
 	do {
 		osDelay(0);
 	} while (g_takeScreenshot);
 
-	g_screenshotY = 272 - 1;
-}
-
-bool screanshotGetLine(uint8_t *line) {
-    if (g_screenshotY < 0) {
-        return false;
-    }
-
-    uint16_t *src = ((uint16_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS) + g_screenshotY * getDisplayWidth();
-    uint8_t *dst = line;
-
-    int n = 480;
-    while (n--) {
-    	uint16_t color = *src++;
-
-    	*dst++ = COLOR_TO_B(color);
-		*dst++ = COLOR_TO_G(color);
-    	*dst++ = COLOR_TO_R(color);
-    }
-
-    --g_screenshotY;
-
-    return true;
-}
-
-void screanshotEnd() {
+	return (const uint8_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

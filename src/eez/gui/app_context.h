@@ -104,11 +104,15 @@ public:
 
     void updateAppView(WidgetCursor &widgetCursor);
 
-  protected:
-    virtual int getMainPageId() = 0;
-    virtual void onPageChanged(int previousPageId, int activePageId);
+    virtual int getLongTouchActionHook(const WidgetCursor &widgetCursor);
 
-    //
+    int getNumPagesOnStack() {
+        return m_pageNavigationStackPointer + 1;
+    }
+
+    void infoMessage(const char *message);
+
+protected:
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
     int m_activePageIndex;
@@ -118,6 +122,11 @@ public:
     int m_pageIdToSetOnNextIter;
 
     SelectFromEnumPage m_selectFromEnumPage;
+
+    const char *m_showInfoMessageOnNextIter;
+      
+    virtual int getMainPageId() = 0;
+    virtual void onPageChanged(int previousPageId, int activePageId);
 
     void doShowPage(int index, Page *page, int previousPageId);
     void setPage(int pageId);

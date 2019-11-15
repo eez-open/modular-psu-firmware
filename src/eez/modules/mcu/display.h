@@ -78,9 +78,7 @@ uint16_t getBackColor();
 uint8_t setOpacity(uint8_t opacity);
 uint8_t getOpacity();
 
-void screanshotBegin();
-bool screanshotGetLine(uint8_t *line);
-void screanshotEnd();
+const uint8_t * takeScreenshot();
 
 void drawPixel(int x, int y);
 void drawRect(int x1, int y1, int x2, int y2);

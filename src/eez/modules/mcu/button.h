@@ -25,18 +25,21 @@ namespace mcu {
 
 class Button {
 public:
-    Button(GPIO_TypeDef* port, uint16_t pin, bool activeLow);
+    Button(GPIO_TypeDef* port, uint16_t pin, bool activeLow, bool detectLongPress);
 
     bool isClicked();
+
+    bool isLongPress();
 
 private:
     GPIO_TypeDef* m_port;
     uint16_t m_pin;
     GPIO_PinState m_activePinState;
-
     GPIO_PinState m_buttonPinState;
+    bool m_detectLongPress;
     uint32_t m_buttonPinStateChangedTick;
     bool m_btnIsDown;
+    bool m_longPressDetected;
 };
 
 } // namespace mcu

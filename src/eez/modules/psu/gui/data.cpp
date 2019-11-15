@@ -181,6 +181,18 @@ EnumItem g_moduleTypeEnumDefinition[] = { { MODULE_TYPE_NONE, "None" },
                                           { 0, 0 } };
 #endif
 
+EnumItem g_userSwitchActionEnumDefinition[] = {
+	{ persist_conf::USER_SWITCH_ACTION_NONE, "None" },
+    { persist_conf::USER_SWITCH_ACTION_ENCODER_STEP, "Encoder Step" },
+    { persist_conf::USER_SWITCH_ACTION_SCREENSHOT, "Screenshot" },
+    { persist_conf::USER_SWITCH_ACTION_MANUAL_TRIGGER, "Manual Trigger" },
+    { persist_conf::USER_SWITCH_ACTION_OUTPUT_ENABLE, "Output Enable" },
+    { persist_conf::USER_SWITCH_ACTION_HOME, "Home/Back" },
+    { persist_conf::USER_SWITCH_ACTION_INHIBIT, "Inhibit" },
+    //{ persist_conf::USER_SWITCH_ACTION_SELECTED_ACTION, "Selected Action" },
+    { 0, 0 }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Value MakeValue(float value, Unit unit) {
@@ -3876,17 +3888,19 @@ void data_io_pins(data::DataOperationEnum operation, data::Cursor &cursor, data:
 
 void data_io_pins_inhibit_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
-        const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
-        if (inputPin1.function == io_pins::FUNCTION_INHIBIT || inputPin2.function == io_pins::FUNCTION_INHIBIT) {
-            value = io_pins::isInhibited();
+        if (io_pins::isInhibited()) {
+            value = 1;
         } else {
-            value = 2;
+            const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
+            const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
+            if (inputPin1.function == io_pins::FUNCTION_INHIBIT || inputPin2.function == io_pins::FUNCTION_INHIBIT) {
+                value = 0;
+            } else {
+                value = 2;
+            }
         }
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
-        const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
-        const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
-        value = (inputPin1.function == io_pins::FUNCTION_INHIBIT || inputPin2.function == io_pins::FUNCTION_INHIBIT) && io_pins::isInhibited();
+        value = io_pins::isInhibited();
     }
 }
 

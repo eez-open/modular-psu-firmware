@@ -49,7 +49,7 @@ namespace encoder {
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
-static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true);
+static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true, false);
 static uint16_t g_lastCounter;
 #endif	
 

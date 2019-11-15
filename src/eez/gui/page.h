@@ -57,7 +57,7 @@ class InternalPage : public Page {
   public:
     virtual void refresh() = 0; // repaint page
     virtual void updatePage() = 0;
-	  virtual WidgetCursor findWidget(int x, int y) = 0;
+	virtual WidgetCursor findWidget(int x, int y) = 0;
 
     int x;
     int y;
@@ -123,11 +123,16 @@ class SelectFromEnumPage : public InternalPage {
 
     void selectEnumItem();
 
+    const data::EnumItem *getEnumDefinition() {
+        return enumDefinition;
+    }
+
   private:
     const data::EnumItem *enumDefinition;
     void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value);
 
     int numItems;
+    int numColumns;
     int itemWidth;
     int itemHeight;
 
@@ -140,6 +145,7 @@ class SelectFromEnumPage : public InternalPage {
     bool (*disabledCallback)(uint16_t value);
     void (*onSet)(uint16_t);
 
+    bool calcSize();
     void findPagePosition();
 
     bool isDisabled(int i);

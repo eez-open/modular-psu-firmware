@@ -83,6 +83,11 @@ void AppContext::stateManagment() {
             return;
         }
     }
+
+    if (m_showInfoMessageOnNextIter) {
+        gui::infoMessage(m_showInfoMessageOnNextIter);
+        m_showInfoMessageOnNextIter = nullptr;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -418,6 +423,14 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
             widgetCursor.nextState();
         }
     }
+}
+
+int AppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {
+    return ACTION_ID_NONE;
+}
+
+void AppContext::infoMessage(const char *message) {
+    m_showInfoMessageOnNextIter = message;
 }
 
 } // namespace gui

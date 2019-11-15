@@ -21,9 +21,10 @@ enum EnumDefinition {
     ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION,
     ENUM_DEFINITION_IO_PINS_OUTPUT_FUNCTION,
     ENUM_DEFINITION_SERIAL_PARITY,
-    ENUM_DEFINITION_DST_RULE
+    ENUM_DEFINITION_DST_RULE,
+    ENUM_DEFINITION_USER_SWITCH_ACTION,
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    , ENUM_DEFINITION_MODULE_TYPE
+    ENUM_DEFINITION_MODULE_TYPE
 #endif
 };
 
@@ -38,7 +39,7 @@ extern EnumItem g_ioPinsInputFunctionEnumDefinition[];
 extern EnumItem g_ioPinsOutputFunctionEnumDefinition[];
 extern EnumItem g_serialParityEnumDefinition[];
 extern EnumItem g_dstRuleEnumDefinition[];
-
+extern EnumItem g_userSwitchActionEnumDefinition[];
 #if defined(EEZ_PLATFORM_SIMULATOR)
 extern EnumItem g_moduleTypeEnumDefinition[];
 #endif

@@ -320,7 +320,7 @@ void SelectFromEnumPage::init(const data::EnumItem *enumDefinition_, uint16_t cu
 		bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t))
 {
 	enumDefinition = enumDefinition_;
-	enumDefinitionFunc = NULL;
+	enumDefinitionFunc = nullptr;
 	currentValue = currentValue_;
 	disabledCallback = disabledCallback_;
 	onSet = onSet_;
@@ -331,7 +331,7 @@ void SelectFromEnumPage::init(const data::EnumItem *enumDefinition_, uint16_t cu
 void SelectFromEnumPage::init(void (*enumDefinitionFunc_)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
     uint16_t currentValue_, bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t))
 {
-	enumDefinition = NULL;
+	enumDefinition = nullptr;
 	enumDefinitionFunc = enumDefinitionFunc_;
 	currentValue = currentValue_;
 	disabledCallback = disabledCallback_;
@@ -340,41 +340,12 @@ void SelectFromEnumPage::init(void (*enumDefinitionFunc_)(data::DataOperationEnu
     init();
 }
 
+
 void SelectFromEnumPage::init() {
-    const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
-    const Style *itemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
-
-    font::Font font = styleGetFont(itemStyle);
-
-    // calculate geometry
-    itemHeight = itemStyle->padding_left + font.getHeight() + itemStyle->padding_right;
-    itemWidth = 0;
-
-    int i;
-
-    char text[64];
-
-    for (i = 0; getLabel(i); ++i) {
-        getItemLabel(i, text, sizeof(text));
-        int width = display::measureStr(text, -1, font);
-        if (width > itemWidth) {
-            itemWidth = width;
-        }
-    }
-
-    numItems = i;
-
-    itemWidth = itemStyle->padding_left + itemWidth + itemStyle->padding_right;
-
-    width = containerStyle->padding_left + itemWidth + containerStyle->padding_right;
-    if (width > display::getDisplayWidth()) {
-        width = display::getDisplayWidth();
-    }
-
-    height =
-        containerStyle->padding_top + numItems * itemHeight + containerStyle->padding_bottom;
-    if (height > display::getDisplayHeight()) {
-        height = display::getDisplayHeight();
+    numColumns = 1;
+    if (!calcSize()) {
+        numColumns = 2;
+        calcSize();
     }
 
     findPagePosition();
@@ -406,19 +377,68 @@ bool SelectFromEnumPage::isDisabled(int i) {
     return disabledCallback && disabledCallback(getValue(i));
 }
 
-void SelectFromEnumPage::findPagePosition() {
-	const WidgetCursor &widgetCursorAtTouchDown = getFoundWidgetAtDown();
-	x = widgetCursorAtTouchDown.x;
-    int right = g_appContext->x + g_appContext->width - 22;
-    if (x + width > right) {
-        x = right - width;
-	}
+bool SelectFromEnumPage::calcSize() {
+    const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
+    const Style *itemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
 
-    y = widgetCursorAtTouchDown.y + widgetCursorAtTouchDown.widget->h;
-    int bottom = g_appContext->y + g_appContext->height - 30;
-    if (y + height > bottom) {
-        y = bottom - height;
-	}
+    font::Font font = styleGetFont(itemStyle);
+
+    // calculate geometry
+    itemHeight = itemStyle->padding_top + font.getHeight() + itemStyle->padding_bottom;
+    itemWidth = 0;
+
+    char text[64];
+
+    numItems = 0;
+    for (int i = 0; getLabel(i); ++i) {
+        ++numItems;
+    }
+
+    for (int i = 0; i < numItems; ++i) {
+        getItemLabel(i, text, sizeof(text));
+        int width = display::measureStr(text, -1, font);
+        if (width > itemWidth) {
+            itemWidth = width;
+        }
+    }
+
+    itemWidth = itemStyle->padding_left + itemWidth + itemStyle->padding_right;
+
+    width = containerStyle->padding_left + (numColumns == 2 ? itemWidth + containerStyle->padding_left + itemWidth : itemWidth) + containerStyle->padding_right;
+    if (width > g_appContext->width) {
+        width = g_appContext->width;
+    }
+
+    height =
+        containerStyle->padding_top + (numColumns == 2 ? (numItems + 1) / 2 : numItems) * itemHeight + containerStyle->padding_bottom;
+    if (height > g_appContext->height) {
+        if (numColumns == 1) {
+            return false;
+        }
+        height = g_appContext->height;
+    }
+
+    return true;
+}
+
+void SelectFromEnumPage::findPagePosition() {
+    const WidgetCursor &widgetCursorAtTouchDown = getFoundWidgetAtDown();
+    if (widgetCursorAtTouchDown.widget) {
+        x = widgetCursorAtTouchDown.x;
+        int right = g_appContext->x + g_appContext->width - 22;
+        if (x + width > right) {
+            x = right - width;
+        }
+
+        y = widgetCursorAtTouchDown.y + widgetCursorAtTouchDown.widget->h;
+        int bottom = g_appContext->y + g_appContext->height - 30;
+        if (y + height > bottom) {
+            y = bottom - height;
+        }
+    } else {
+        x = g_appContext->x + (g_appContext->width - width) / 2;
+        y = g_appContext->y + (g_appContext->height - height) / 2;
+    }
 }
 
 void SelectFromEnumPage::refresh() {
@@ -450,9 +470,7 @@ void SelectFromEnumPage::updatePage() {
 }
 
 WidgetCursor SelectFromEnumPage::findWidget(int x, int y) {
-    int i;
-
-    for (i = 0; getLabel(i); ++i) {
+    for (int i = 0; i < numItems; ++i) {
         int xItem, yItem;
         getItemPosition(i, xItem, yItem);
         if (!isDisabled(i)) {
@@ -478,8 +496,13 @@ void SelectFromEnumPage::selectEnumItem() {
 void SelectFromEnumPage::getItemPosition(int itemIndex, int &xItem, int &yItem) {
     const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
 
-    xItem = x + containerStyle->padding_left;
-    yItem = y + containerStyle->padding_top + itemIndex * itemHeight;
+    if (numColumns == 1 || itemIndex < (numItems + 1) / 2) {
+        xItem = x + containerStyle->padding_left;
+        yItem = y + containerStyle->padding_top + itemIndex * itemHeight;
+    } else {
+        xItem = x + containerStyle->padding_left + itemWidth + containerStyle->padding_left / 2;
+        yItem = y + containerStyle->padding_top + (itemIndex - (numItems + 1) / 2) * itemHeight;
+    }
 }
 
 void SelectFromEnumPage::getItemLabel(int itemIndex, char *text, int count) {

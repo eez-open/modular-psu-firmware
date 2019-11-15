@@ -53,6 +53,7 @@ extern "C" {
     X(SCPI_ERROR_TRIGGER_IGNORED,                           -211, "Trigger ignored")                              \
     X(SCPI_ERROR_DATA_OUT_OF_RANGE,                         -222, "Data out of range")                            \
     X(SCPI_ERROR_TOO_MUCH_DATA,                             -223, "Too much data")                                \
+    X(SCPI_ERROR_OUT_OF_MEMORY_FOR_REQ_OP,                  -225, "Out of memory")                                \
     X(SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH,             -230, "Digital pin function mismatch")                \
     X(SCPI_ERROR_HARDWARE_ERROR,                            -240, "Hardware error")                               \
     X(SCPI_ERROR_HARDWARE_MISSING,                          -241, "Hardware missing")                             \

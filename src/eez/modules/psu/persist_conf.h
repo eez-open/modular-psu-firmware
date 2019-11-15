@@ -61,6 +61,17 @@ struct IOPin {
     unsigned function : 7;
 };
 
+enum UserSwitchAction {
+	USER_SWITCH_ACTION_NONE,
+    USER_SWITCH_ACTION_ENCODER_STEP,
+    USER_SWITCH_ACTION_SCREENSHOT,
+    USER_SWITCH_ACTION_MANUAL_TRIGGER,
+    USER_SWITCH_ACTION_OUTPUT_ENABLE,
+    USER_SWITCH_ACTION_HOME,
+    USER_SWITCH_ACTION_INHIBIT,
+    USER_SWITCH_ACTION_SELECTED_ACTION
+};
+
 /// Device configuration block.
 struct DeviceConfiguration {
     // block 1
@@ -156,6 +167,10 @@ struct DeviceConfiguration {
     unsigned channelsViewMode : 3;
     unsigned maxChannel : 3; // 0: default view, 1: Ch1 maxed, 2: Ch2 maxed, ...
     unsigned channelsViewModeInMax : 3;
+
+    // block 7
+    UserSwitchAction userSwitchAction;
+    uint8_t reserved[60];
 };
 
 extern const DeviceConfiguration &devConf;
@@ -288,6 +303,8 @@ void setSkipChannelCalibrations(unsigned skipChannelCalibrations);
 void setSkipDateTimeSetup(unsigned skipDateTimeSetup);
 void setSkipSerialSetup(unsigned skipSerialSetup);
 void setSkipEthernetSetup(unsigned skipEthernetSetup);
+
+void setUserSwitchAction(UserSwitchAction userSwitchAction);
 
 ////////////////////////////////////////////////////////////////////////////////
 

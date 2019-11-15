@@ -61,6 +61,12 @@
 									<listOptionValue builtIn="false" value="OPTION_AUX_TEMP_SENSOR=1"/>
 									<listOptionValue builtIn="false" value="OPTION_WATCHDOG=1"/>
 									<listOptionValue builtIn="false" value="OPTION_ENCODER=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DECODER=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DISK=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ERROR_TEXT=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_CPP=1"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths.954599403" name="Include paths (-I)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/include"/>
@@ -120,6 +126,12 @@
 									<listOptionValue builtIn="false" value="OPTION_AUX_TEMP_SENSOR=1"/>
 									<listOptionValue builtIn="false" value="OPTION_WATCHDOG=1"/>
 									<listOptionValue builtIn="false" value="OPTION_ENCODER=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DECODER=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DISK=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ERROR_TEXT=1"/>
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_CPP=1"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.includepaths.1548744158" name="Include paths (-I)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.includepaths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/include"/>

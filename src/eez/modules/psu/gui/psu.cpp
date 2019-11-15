@@ -100,7 +100,7 @@ Channel *g_channel;
 static WidgetCursor g_toggleOutputWidgetCursor;
 
 #if EEZ_PLATFORM_STM32
-static mcu::Button g_userSwitch(USER_SW_GPIO_Port, USER_SW_Pin, true);
+static mcu::Button g_userSwitch(USER_SW_GPIO_Port, USER_SW_Pin, true, true);
 #endif
 
 bool showSetupWizardQuestion();
@@ -192,7 +192,9 @@ void PsuAppContext::stateManagment() {
     }
 
 #if EEZ_PLATFORM_STM32
-    if (g_userSwitch.isClicked()) {
+    if (g_userSwitch.isLongPress()) {
+        action_select_user_switch_action();
+    } else if (g_userSwitch.isClicked()) {
         action_user_switch_clicked();
     }
 #endif

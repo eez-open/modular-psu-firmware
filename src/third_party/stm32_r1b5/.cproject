@@ -69,6 +69,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
+									
+									
 								</option>
 								<option id="com.atollic.truestudio.gcc.symbols.defined.1670122205" name="Defined symbols" superClass="com.atollic.truestudio.gcc.symbols.defined" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER" />
@@ -91,6 +93,12 @@
 									<listOptionValue builtIn="false" value="OPTION_ENCODER=1" />
 									<listOptionValue builtIn="false" value="OPTION_EXT_EEPROM=1" />
 									<listOptionValue builtIn="false" value="EEZ_MCU_REVISION_R1B5=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DECODER=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DISK=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ERROR_TEXT=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_CPP=1" />
 									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))" />
 									<listOptionValue builtIn="false" value="__packed=__attribute__((__packed__))" />
 								</option>
@@ -148,6 +156,12 @@
 									<listOptionValue builtIn="false" value="OPTION_AUX_TEMP_SENSOR=1" />
 									<listOptionValue builtIn="false" value="OPTION_WATCHDOG=1" />
 									<listOptionValue builtIn="false" value="OPTION_ENCODER=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DECODER=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DISK=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ERROR_TEXT=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_CPP=1" />
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.176262651" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess" useByScannerDiscovery="false" value="com.atollic.truestudio.common_options.target.endianess.little" valueType="enumerated" />
 								<option id="com.atollic.truestudio.common_options.target.mcpu.630487808" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32F769IG" valueType="enumerated" />
@@ -187,6 +201,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
+									
+									
 								</option>
 								<option id="com.atollic.truestudio.exe.debug.toolchain.gpp.optimization.level.1860305798" name="Optimization Level" superClass="com.atollic.truestudio.exe.debug.toolchain.gpp.optimization.level" useByScannerDiscovery="false" value="com.atollic.truestudio.gpp.optimization.level.0g" valueType="enumerated" />
 								<option id="com.atollic.truestudio.gpp.cppstandard.1842281748" name="C++ standard" superClass="com.atollic.truestudio.gpp.cppstandard" useByScannerDiscovery="false" value="com.atollic.truestudio.gpp.cppstandard.cpp0x" valueType="enumerated" />
@@ -210,6 +226,12 @@
 							<tool id="com.atollic.truestudio.ar.base.1779238401" name="Archiver" superClass="com.atollic.truestudio.ar.base" />
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.atollic.truestudio.exe.debug.1518366166.1172155198" name="toojpeg.cpp" rcbsApplicability="disable" resourcePath="eez/libs/image/toojpeg.cpp" toolsToInvoke="com.atollic.truestudio.exe.debug.toolchain.gpp.981298185.245018321">
+						<tool id="com.atollic.truestudio.exe.debug.toolchain.gpp.981298185.245018321" name="C++ Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gpp.981298185">
+							<option id="com.atollic.truestudio.exe.debug.toolchain.gpp.optimization.level.1285773310" superClass="com.atollic.truestudio.exe.debug.toolchain.gpp.optimization.level" useByScannerDiscovery="false" value="com.atollic.truestudio.gpp.optimization.level.02" valueType="enumerated" />
+							<inputType id="com.atollic.truestudio.gpp.input.1059682549" superClass="com.atollic.truestudio.gpp.input" />
+						</tool>
+					</fileInfo>
 					<fileInfo id="com.atollic.truestudio.exe.debug.311825581.983937533" name="" rcbsApplicability="disable" resourcePath="nofile" toolsToInvoke="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1976695455">
 						<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1976695455" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447">
 							<inputType id="com.atollic.truestudio.gcc.input.1274347818" superClass="com.atollic.truestudio.gcc.input" />
@@ -237,6 +259,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities" />
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers" />
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Inc" />
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares" />
@@ -320,6 +343,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
+									
+									
 								</option>
 								<option id="com.atollic.truestudio.gcc.symbols.defined.1670122205" name="Defined symbols" superClass="com.atollic.truestudio.gcc.symbols.defined" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER" />
@@ -339,6 +364,12 @@
 									<listOptionValue builtIn="false" value="OPTION_WATCHDOG=1" />
 									<listOptionValue builtIn="false" value="OPTION_ENCODER=1" />
 									<listOptionValue builtIn="false" value="OPTION_EXT_EEPROM=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DECODER=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DISK=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ERROR_TEXT=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_CPP=1" />
 									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))" />
 									<listOptionValue builtIn="false" value="__packed=__attribute__((__packed__))" />
 								</option>
@@ -391,6 +422,13 @@
 									<listOptionValue builtIn="false" value="OPTION_AUX_TEMP_SENSOR=0" />
 									<listOptionValue builtIn="false" value="OPTION_WATCHDOG=1" />
 									<listOptionValue builtIn="false" value="OPTION_ENCODER=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DECODER=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_DISK=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ERROR_TEXT=1" />
+									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_CPP=1" />
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.176262651" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess" useByScannerDiscovery="false" value="com.atollic.truestudio.common_options.target.endianess.little" valueType="enumerated" />
 								<option id="com.atollic.truestudio.common_options.target.mcpu.630487808" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32F769IG" valueType="enumerated" />
@@ -430,6 +468,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
+									
+									
 								</option>
 								<option id="com.atollic.truestudio.gpp.cppstandard.1729714908" name="C++ standard" superClass="com.atollic.truestudio.gpp.cppstandard" useByScannerDiscovery="false" value="com.atollic.truestudio.gpp.cppstandard.cpp0x" valueType="enumerated" />
 								<inputType id="com.atollic.truestudio.gpp.input.892002667" superClass="com.atollic.truestudio.gpp.input" />
@@ -457,6 +497,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities" />
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers" />
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Inc" />
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares" />

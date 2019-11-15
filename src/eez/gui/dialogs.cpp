@@ -85,7 +85,11 @@ void pushToastMessage(ToastMessagePage *toastMessage) {
 }
 
 void infoMessage(const char *message) {
-    pushToastMessage(ToastMessagePage::create(INFO_TOAST, message));
+    if (osThreadGetId() != g_guiTaskHandle) {
+        eez::psu::gui::g_psuAppContext.infoMessage(message);
+    } else {
+        pushToastMessage(ToastMessagePage::create(INFO_TOAST, message));
+    }
 }
 
 void infoMessage(data::Value value) {

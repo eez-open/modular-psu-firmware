@@ -991,24 +991,82 @@ void action_scripts_next_page() {
 }
 
 void action_user_switch_clicked() {
-#if OPTION_ENCODER
-
 #if EEZ_PLATFORM_SIMULATOR
     AppContext *saved = g_appContext;
     g_appContext = &psu::gui::g_psuAppContext;
 #endif
 
-    if (getActivePageId() == PAGE_ID_EDIT_MODE_STEP) {
-        psu::gui::edit_mode_step::switchToNextStepIndex();
-    } else {
-        mcu::encoder::switchEncoderMode();
-        psu::gui::edit_mode_step::showCurrentEncoderMode();
-    }
+    switch (persist_conf::devConf.userSwitchAction) {
+    case persist_conf::USER_SWITCH_ACTION_NONE:
+    	break;
 
+    case persist_conf::USER_SWITCH_ACTION_ENCODER_STEP:
+#if OPTION_ENCODER
+        if (getActivePageId() == PAGE_ID_EDIT_MODE_STEP) {
+            psu::gui::edit_mode_step::switchToNextStepIndex();
+        } else {
+            mcu::encoder::switchEncoderMode();
+            psu::gui::edit_mode_step::showCurrentEncoderMode();
+        }
+#endif
+        break;
+
+    case persist_conf::USER_SWITCH_ACTION_SCREENSHOT:
+#if OPTION_SD_CARD
+        using namespace scpi;
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_SCREENSHOT, 0), osWaitForever);
+#endif
+        break;
+
+    case persist_conf::USER_SWITCH_ACTION_MANUAL_TRIGGER:
+        action_trigger_generate_manual();
+        break;
+
+    case persist_conf::USER_SWITCH_ACTION_OUTPUT_ENABLE:
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &channel = Channel::get(i);
+            if (channel.flags.trackingEnabled) {
+                channel_dispatcher::outputEnable(channel, !channel.isOutputEnabled());
+                return;
+            }
+        }
+        infoMessage("Tracking is not enabled.");
+        break;
+
+    case persist_conf::USER_SWITCH_ACTION_HOME:
+        if (g_appContext->getNumPagesOnStack() > 1) {
+            action_show_previous_page();
+        } else {
+            showMainPage();
+        }
+        break;
+
+    case persist_conf::USER_SWITCH_ACTION_INHIBIT:
+        io_pins::setIsInhibitedByUser(!io_pins::getIsInhibitedByUser());
+        break;
+
+    case persist_conf::USER_SWITCH_ACTION_SELECTED_ACTION:
+    	// TODO
+    	break;
+    }
+}
+
+void onSetUserSwitchAction(uint16_t value) {
+    popPage();
+    persist_conf::setUserSwitchAction((persist_conf::UserSwitchAction)value);
+}
+
+void action_select_user_switch_action() {
 #if EEZ_PLATFORM_SIMULATOR
-    g_appContext = saved;
+    AppContext *saved = g_appContext;
+    g_appContext = &psu::gui::g_psuAppContext;
 #endif
 
+    clearFoundWidgetAtDown();
+    pushSelectFromEnumPage(g_userSwitchActionEnumDefinition, persist_conf::devConf.userSwitchAction, nullptr, onSetUserSwitchAction);
+    
+#if EEZ_PLATFORM_SIMULATOR
+    g_appContext = saved;
 #endif
 }
 

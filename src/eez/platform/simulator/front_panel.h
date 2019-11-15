@@ -26,10 +26,12 @@ namespace eez {
 namespace gui {
 
 class FrontPanelAppContext : public AppContext {
-  public:
+public:
     FrontPanelAppContext();
 
-  protected:
+    int getLongTouchActionHook(const WidgetCursor &widgetCursor) override;
+
+protected:
     int getMainPageId() override;
 };
 

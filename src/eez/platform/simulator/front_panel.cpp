@@ -56,6 +56,13 @@ int FrontPanelAppContext::getMainPageId() {
     return PAGE_ID_FRONT_PANEL;
 }
 
+int FrontPanelAppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.widget->action == ACTION_ID_USER_SWITCH_CLICKED) {
+        return ACTION_ID_SELECT_USER_SWITCH_ACTION;
+    }
+    return ACTION_ID_NONE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void data_main_app_view(DataOperationEnum operation, Cursor &cursor, Value &value) {
