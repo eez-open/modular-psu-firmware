@@ -3823,7 +3823,9 @@ void data_trigger_initiate_continuously(data::DataOperationEnum operation, data:
 
 void data_trigger_is_initiated(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = trigger::isInitiated();
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        value = trigger::isInitiated() && channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED;
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
         value = trigger::isInitiated();
     }

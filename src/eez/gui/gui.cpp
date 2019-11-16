@@ -102,8 +102,7 @@ void oneIter() {
     mcu::display::sync();
 
     g_wasBlinkTime = g_isBlinkTime;
-    g_isBlinkTime = (millis() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME &&
-                    touch::g_eventType == EVENT_TYPE_TOUCH_NONE;
+    g_isBlinkTime = (millis() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME;
 
     touch::tick();
 
