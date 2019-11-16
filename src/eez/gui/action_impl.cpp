@@ -1034,8 +1034,10 @@ void action_user_switch_clicked() {
     case persist_conf::USER_SWITCH_ACTION_HOME:
         if (g_appContext->getNumPagesOnStack() > 1) {
             action_show_previous_page();
-        } else {
+        } else if (getActivePageId() != PAGE_ID_MAIN) {
             showMainPage();
+        } else if (persist_conf::isMaxChannelView()) {
+            action_toggle_channels_max_view();
         }
         break;
 

@@ -1528,14 +1528,16 @@ unsigned int generateTuneSamples(float *tune, int sampleRate, uint8_t *pMemBuffe
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if !defined(__EMSCRIPTEN__)
 void initTune(Tune &tuneDef) {
-	if (!tuneDef.pSamples) {
+    if (!tuneDef.pSamples) {
 		tuneDef.pSamples = g_memoryForTuneSamples + g_memoryForTuneSamplesOffset;
 		tuneDef.numSamples = generateTuneSamples(tuneDef.tune, tuneDef.sampleRate, tuneDef.pSamples, tuneDef.durationBetweenNotesFactor);
         g_memoryForTuneSamplesOffset += tuneDef.numSamples;
         assert(g_memoryForTuneSamplesOffset * sizeof(uint8_t) <= g_memoryForTuneSamplesSize);
 	}
 }
+#endif
 
 void init() {
 #if !defined(__EMSCRIPTEN__)

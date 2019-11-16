@@ -1155,8 +1155,10 @@ void channelInitiateTrigger() {
     popPage();
     int err = trigger::initiate();
     if (err == SCPI_RES_OK) {
-        Channel &channel = Channel::get(g_toggleOutputWidgetCursor.cursor.i >= 0 ? g_toggleOutputWidgetCursor.cursor.i : 0);
-        channel_dispatcher::outputEnable(channel, true);
+        if (!trigger::isInitiated()) {
+            Channel &channel = Channel::get(g_toggleOutputWidgetCursor.cursor.i >= 0 ? g_toggleOutputWidgetCursor.cursor.i : 0);
+            channel_dispatcher::outputEnable(channel, true);
+        }
     } else {
         psuErrorMessage(g_toggleOutputWidgetCursor.cursor, data::MakeScpiErrorValue(err));
     }

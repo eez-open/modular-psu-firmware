@@ -3823,13 +3823,7 @@ void data_trigger_initiate_continuously(data::DataOperationEnum operation, data:
 
 void data_trigger_is_initiated(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        bool isInitiated = trigger::isInitiated();
-#if OPTION_SD_CARD
-        if (!isInitiated && dlog::isInitiated()) {
-            isInitiated = true;
-        }
-#endif
-        value = isInitiated;
+        value = trigger::isInitiated();
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
         value = trigger::isInitiated();
     }
