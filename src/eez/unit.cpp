@@ -36,7 +36,8 @@ const char *g_unitNames[] = {
     "ohm",
     "Kohm",
     "Mohm",
-    "%"
+    "%",
+    "Hz"
 };
 
 } // namespace eez

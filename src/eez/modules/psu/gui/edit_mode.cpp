@@ -211,7 +211,7 @@ int getInfoTextPartIndex(data::Cursor &cursor, uint16_t dataId) {
         dataIdIndex = 14;
     }
 
-    return g_focusCursor.i * NUM_PARTS + dataIdIndex;
+    return (g_focusCursor.i + 1) * NUM_PARTS + dataIdIndex;
 }
 
 void getInfoText(int partIndex, char *infoText) {
@@ -288,14 +288,13 @@ void getInfoText(int partIndex, char *infoText) {
         unitName = "";
     }
 
+    cursorIndex--;
     data::Cursor cursor(cursorIndex);
     float minValue = data::getMin(cursor, dataId).getFloat();
     float maxValue = (dataId == DATA_ID_CHANNEL_U_EDIT || dataId == DATA_ID_CHANNEL_I_EDIT) ?
         data::getLimit(cursor, dataId).getFloat() : data::getMax(cursor, dataId).getFloat();
 
-#if OPTION_SD_CARD
-    if (dataId != DATA_ID_DLOG_VALUE_DIV && dataId != DATA_ID_DLOG_VALUE_OFFSET && dataId != DATA_ID_DLOG_TIME_OFFSET) {
-#endif
+    if (cursorIndex >= 0) {
         Channel& channel = Channel::get(cursorIndex);
         if ((channel.channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel.flags.trackingEnabled) {
             strcpy(infoText, "Set ");
@@ -305,11 +304,9 @@ void getInfoText(int partIndex, char *infoText) {
         
         strcat(infoText, dataName);
     } 
-#if OPTION_SD_CARD
     else {
         strcat(infoText, dataName);
     }
-#endif
 
     strcat(infoText, " [");
     strcatFloat(infoText, minValue);

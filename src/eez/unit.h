@@ -36,7 +36,8 @@ enum Unit {
     UNIT_OHM,
     UNIT_KOHM,
     UNIT_MOHM,
-    UNIT_PERCENT
+    UNIT_PERCENT,
+    UNIT_FREQUENCY
 };
 
 extern const char *g_unitNames[];

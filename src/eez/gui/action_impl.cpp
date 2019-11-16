@@ -808,10 +808,7 @@ void action_trigger_toggle_initiate_continuously() {
 }
 
 void action_trigger_generate_manual() {
-    if (trigger::generateTrigger(trigger::SOURCE_MANUAL, false) != SCPI_ERROR_TRIGGER_IGNORED) {
-        sound::playClick();
-        return;
-    }
+    trigger::generateTrigger(trigger::SOURCE_MANUAL, false);
 }
 
 void action_trigger_show_general_settings() {
