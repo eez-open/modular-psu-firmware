@@ -102,7 +102,7 @@ void mainLoop(const void *) {
 }
 
 void oneIter() {
-    osEvent event = osMessageGet(g_scpiMessageQueueId, 250);
+    osEvent event = osMessageGet(g_scpiMessageQueueId, 25);
     if (event.status == osEventMessage) {
     	uint32_t message = event.value.v;
     	uint32_t target = SCPI_QUEUE_MESSAGE_TARGET(message);
@@ -180,6 +180,7 @@ void oneIter() {
             } else if (type == SCPI_QUEUE_MESSAGE_SCREENSHOT) {
                 sound::playShutter();
 
+#if !defined(__EMSCRIPTEN__)
                 const uint8_t *screenshotPixels = mcu::display::takeScreenshot();
 
                 unsigned char* imageData;
@@ -225,14 +226,20 @@ void oneIter() {
                 } else {
                     event_queue::pushEvent(SCPI_ERROR_FILE_NAME_NOT_FOUND);
                 }
+#else
+                event_queue::pushEvent(event_queue::EVENT_INFO_SCREENSHOT_SAVED);
+#endif // !__EMSCRIPTEN__
             }
-#endif
+
+#endif // OPTION_SD_CARD
         }
     } else {
     	uint32_t tickCount = micros();
     	int32_t diff = tickCount - g_lastTickCount;
 
         event_queue::tick();
+
+        sound::tick();
 
         for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
             if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {

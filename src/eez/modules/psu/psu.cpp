@@ -808,7 +808,6 @@ static TickFunc g_tickFuncs[] = {
     aux_ps::fan::tick,
 #endif
     datetime::tick,
-    sound::tick,
     mcu::battery::tick,
     idle::tick
 };
