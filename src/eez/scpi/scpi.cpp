@@ -241,17 +241,18 @@ void oneIter() {
 
         sound::tick();
 
-        for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-            if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
-                ontime::g_moduleCounters[slotIndex].tick(tickCount);
-            }
-        }
-
     	if (diff >= 1000000L) { // 1 sec
     		profile::tick();
 #if OPTION_ETHERNET
     		ntp::tick();
 #endif
+
+            ontime::g_mcuCounter.tick(tickCount);
+            for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+                if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
+                    ontime::g_moduleCounters[slotIndex].tick(tickCount);
+                }
+            }
     	}
 
         persist_conf::tick();
