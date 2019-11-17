@@ -150,6 +150,8 @@ void deleteProfileLists(int location) {
 void recallChannelsFromProfile(Parameters *profile, int location) {
     bool wasSaveProfileEnabled = enableSave(false);
 
+    trigger::abort();
+
     int err;
     if (!channel_dispatcher::setCouplingType((channel_dispatcher::CouplingType)profile->flags.couplingType, &err)) {
         event_queue::pushEvent(err);

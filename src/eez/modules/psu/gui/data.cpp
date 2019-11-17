@@ -1862,6 +1862,12 @@ void data_keypad_unit_enabled(data::DataOperationEnum operation, data::Cursor &c
     }
 }
 
+void data_channel_off_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = io_pins::isInhibited() ? "INH" : "OFF";
+    }
+}
+
 void data_channel_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
@@ -3825,7 +3831,7 @@ void data_trigger_is_initiated(data::DataOperationEnum operation, data::Cursor &
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        value = trigger::isInitiated() && channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED;
+        value = (trigger::isInitiated() || trigger::isTriggered()) && channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED;
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
         value = trigger::isInitiated();
     }
@@ -3833,13 +3839,7 @@ void data_trigger_is_initiated(data::DataOperationEnum operation, data::Cursor &
 
 void data_trigger_is_manual(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        bool isManual = trigger::getSource() == trigger::SOURCE_MANUAL;
-#if OPTION_SD_CARD
-        if (!isManual && dlog::g_triggerSource == trigger::SOURCE_MANUAL) {
-            isManual = true;
-        }
-#endif
-        value = isManual;
+        value = trigger::getSource() == trigger::SOURCE_MANUAL && !trigger::isTriggered();
     }
 }
 

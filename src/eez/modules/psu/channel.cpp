@@ -239,6 +239,8 @@ int Channel::reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionV
 }
 
 void Channel::protectionEnter(ProtectionValue &cpv) {
+    trigger::abort();
+
     channel_dispatcher::outputEnable(*this, false);
 
     cpv.flags.tripped = 1;

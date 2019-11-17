@@ -102,6 +102,8 @@ bool setCouplingType(CouplingType couplingType, int *err) {
             return false;
         }
 
+        trigger::abort();
+
         g_couplingType = couplingType;
 
         for (int i = 0; i < 2; ++i) {
@@ -222,6 +224,8 @@ void setTrackingChannels(int trackingEnabled[]) {
 
     if (channelsTracked) {
         event_queue::pushEvent(event_queue::EVENT_INFO_CHANNELS_TRACKED);
+
+        trigger::abort();
 
         float uMin = 0;
         float iMin = 0;

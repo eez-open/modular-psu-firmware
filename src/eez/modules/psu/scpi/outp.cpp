@@ -67,9 +67,27 @@ scpi_result_t scpi_cmd_outputState(scpi_t *context) {
     }
 
     if (enable != channel->isOutputEnabled()) {
-        if (enable) {
-            if (channel_dispatcher::getVoltageTriggerMode(*channel) != TRIGGER_MODE_FIXED &&
-                !trigger::isIdle()) {
+        bool triggerModeEnabled =
+            channel_dispatcher::getVoltageTriggerMode(*channel) != TRIGGER_MODE_FIXED ||
+            channel_dispatcher::getCurrentTriggerMode(*channel) != TRIGGER_MODE_FIXED;
+
+        if (channel->isOutputEnabled()) {
+            if (calibration::isEnabled()) {
+                SCPI_ErrorPush(context, SCPI_ERROR_CAL_OUTPUT_DISABLED);
+            }
+
+            if (triggerModeEnabled) {
+                trigger::abort();
+            } else {
+                channel_dispatcher::outputEnable(*channel, false);
+            }
+        } else {
+            if (channel_dispatcher::isTripped(*channel)) {
+                SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION);
+                return SCPI_RES_ERR;
+            }
+
+            if (triggerModeEnabled && !trigger::isIdle()) {
                 if (trigger::isInitiated()) {
                     trigger::abort();
                 } else {
@@ -78,17 +96,8 @@ scpi_result_t scpi_cmd_outputState(scpi_t *context) {
                 }
             }
 
-            if (channel_dispatcher::isTripped(*channel)) {
-                SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION);
-                return SCPI_RES_ERR;
-            }
-        } else {
-            if (calibration::isEnabled()) {
-                SCPI_ErrorPush(context, SCPI_ERROR_CAL_OUTPUT_DISABLED);
-            }
+            channel_dispatcher::outputEnable(*channel, true);
         }
-
-        channel_dispatcher::outputEnable(*channel, enable);
     }
 
     return SCPI_RES_OK;

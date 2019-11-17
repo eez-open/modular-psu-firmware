@@ -593,7 +593,11 @@ bool getCurrentDwellTime(Channel &channel, int32_t &remaining, uint32_t &total) 
 
 void abort() {
     for (int i = 0; i < CH_NUM; ++i) {
-        g_execution[i].counter = -1;
+        Channel &channel = Channel::get(i);
+        if (g_execution[i].counter >= 0) {
+            g_execution[i].counter = -1;
+            channel_dispatcher::outputEnable(Channel::get(i), false);
+        }
     }
 }
 

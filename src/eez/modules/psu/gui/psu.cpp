@@ -1119,15 +1119,6 @@ void channelToggleOutput() {
         if (channel.isOutputEnabled()) {
             if (triggerModeEnabled) {
                 trigger::abort();
-                for (int i = 0; i < CH_NUM; ++i) {
-                    Channel &channel = Channel::get(i);
-                    if (channel.isOk()) {
-						if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||
-							channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) {
-							channel_dispatcher::outputEnable(Channel::get(i), false);
-						}
-                    }
-                }
             } else {
                 channel_dispatcher::outputEnable(channel, false);
             }
@@ -1138,8 +1129,6 @@ void channelToggleOutput() {
                     pushPage(PAGE_ID_CH_START_LIST);
                 } else if (trigger::isInitiated()) {
                     trigger::abort();
-                    g_toggleOutputWidgetCursor = getFoundWidgetAtDown();
-                    pushPage(PAGE_ID_CH_START_LIST);
                 } else {
                     yesNoDialog(PAGE_ID_YES_NO, "Trigger is active. Re-initiate trigger?",
                                 channelReinitiateTrigger, 0, 0);

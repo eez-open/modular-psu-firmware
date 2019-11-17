@@ -390,6 +390,10 @@ bool isInitiated() {
     return g_state == STATE_INITIATED;
 }
 
+bool isTriggered() {
+    return g_state == STATE_TRIGGERED;
+}
+
 void abort() {
     list::abort();
     setState(STATE_IDLE);
