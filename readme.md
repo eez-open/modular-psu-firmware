@@ -52,6 +52,6 @@ Visual Studio solution is created in `\path\to\modular-psu-firmware\build\win32'
 
 ### STM32 firmware
 
-- Open `/path/to/modular-psu-firmware/modular-psu-firmware.eez-project" in latest [Studio](https://github.com/eez-open/studio/releases/tag/nightly-build) and build it.
+- Open `/path/to/modular-psu-firmware/modular-psu-firmware.eez-project` in latest [Studio](https://github.com/eez-open/studio/releases/tag/nightly-build) and build it.
 
 - Import project from `/path/to/modular-psu-firmware/src/third_party/stm32/stm32_r1b5` into [TrueStudio](https://atollic.com/truestudio/) and build it.
