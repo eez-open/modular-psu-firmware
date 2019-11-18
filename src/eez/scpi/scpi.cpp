@@ -178,6 +178,10 @@ void oneIter() {
 			} else if (type == SCPI_QUEUE_MESSAGE_ABORT_DOWNLOADING) {
                 abortDownloading();
             } else if (type == SCPI_QUEUE_MESSAGE_SCREENSHOT) {
+                if (!sd_card::isMounted(nullptr)) {
+                    return;
+                }
+
                 sound::playShutter();
 
 #if !defined(__EMSCRIPTEN__)

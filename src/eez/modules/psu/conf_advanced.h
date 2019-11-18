@@ -26,7 +26,7 @@
 #define PSU_SERIAL "0000000"
 
 /// Firmware version.
-#define FIRMWARE "M1 0.2"
+#define FIRMWARE "M1 0.3"
 
 /// Manufacturer description text used for *IDN?
 #define IDN_MANUFACTURER "Envox"
@@ -39,7 +39,7 @@
 #endif
 
 #define MCU_NAME "STM32F7"
-#define MCU_REVISION "R1B5"
+#define MCU_REVISION "R1B6"
 
 /// SCPI TCP server port.
 #define TCP_PORT 5025
