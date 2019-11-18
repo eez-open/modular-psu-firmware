@@ -19,7 +19,7 @@
 							<option id="com.atollic.truestudio.toolchain_options.mcu.548299258" name="Microcontroller" superClass="com.atollic.truestudio.toolchain_options.mcu" useByScannerDiscovery="false" value="STM32F769IG" valueType="string" />
 							<option id="com.atollic.truestudio.toolchain_options.vendor.37794771" name="Vendor name" superClass="com.atollic.truestudio.toolchain_options.vendor" useByScannerDiscovery="false" value="STMicroelectronics" valueType="string" />
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.atollic.truestudio.exe.debug.toolchain.platform.2054752829" isAbstract="false" name="Debug platform" superClass="com.atollic.truestudio.exe.debug.toolchain.platform" />
-							<builder buildPath="${workspace_loc:/h25005}/Debug" customBuilderProperties="toolChainpathType=1|toolChainpathString=C:\\Program Files (x86)\\Atollic\\TrueSTUDIO for STM32 9.3.0\\ARMTools\\bin|" id="com.atollic.truestudio.mbs.builder1.1222194476" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="com.atollic.truestudio.mbs.builder1">
+							<builder buildPath="${workspace_loc:/bb3}/Debug" customBuilderProperties="toolChainpathType=1|toolChainpathString=C:\\Program Files (x86)\\Atollic\\TrueSTUDIO for STM32 9.3.0\\ARMTools\\bin|" id="com.atollic.truestudio.mbs.builder1.1222194476" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="com.atollic.truestudio.mbs.builder1">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug" />
 								</outputEntries>
@@ -29,7 +29,7 @@
 								<option id="com.atollic.truestudio.common_options.target.mcpu.286463162" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32F769IG" valueType="enumerated" />
 								<option id="com.atollic.truestudio.common_options.target.instr_set.2033833414" name="Instruction set" superClass="com.atollic.truestudio.common_options.target.instr_set" useByScannerDiscovery="false" value="com.atollic.truestudio.common_options.target.instr_set.thumb2" valueType="enumerated" />
 								<option id="com.atollic.truestudio.as.general.incpath.770237934" name="Include path" superClass="com.atollic.truestudio.as.general.incpath" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;" />
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bb3/Middlewares/Third_Party/FatFs/src}&quot;" />
 								</option>
 								<option id="com.atollic.truestudio.gcc.symbols.defined.1670122205" name="Defined symbols" superClass="com.atollic.truestudio.gcc.symbols.defined" useByScannerDiscovery="false" />
 								<option id="com.atollic.truestudio.as.general.otherflags.51384659" name="Other options" superClass="com.atollic.truestudio.as.general.otherflags" useByScannerDiscovery="false" value="" valueType="string" />
@@ -66,7 +66,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/port&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;" />
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;" />
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bb3/Middlewares/Third_Party/FatFs/src}&quot;" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
 								</option>
@@ -196,7 +196,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/port&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;" />
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;" />
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bb3/Middlewares/Third_Party/FatFs/src}&quot;" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
 								</option>
@@ -282,7 +282,7 @@
 							<option id="com.atollic.truestudio.toolchain_options.mcu.279404405" name="Microcontroller" superClass="com.atollic.truestudio.toolchain_options.mcu" useByScannerDiscovery="false" value="STM32F769IG" valueType="string" />
 							<option id="com.atollic.truestudio.toolchain_options.vendor.839780669" name="Vendor name" superClass="com.atollic.truestudio.toolchain_options.vendor" useByScannerDiscovery="false" value="STMicroelectronics" valueType="string" />
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.atollic.truestudio.exe.release.toolchain.platform.2054752829" isAbstract="false" name="Release platform" superClass="com.atollic.truestudio.exe.release.toolchain.platform" />
-							<builder buildPath="${workspace_loc:/h25005}/Release" customBuilderProperties="toolChainpathType=1|toolChainpathString=C:\\Program Files (x86)\\Atollic\\TrueSTUDIO for STM32 9.0.1\\ARMTools\\bin|" id="com.atollic.truestudio.mbs.builder1.1222194476" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="com.atollic.truestudio.mbs.builder1">
+							<builder buildPath="${workspace_loc:/bb3}/Release" customBuilderProperties="toolChainpathType=1|toolChainpathString=C:\\Program Files (x86)\\Atollic\\TrueSTUDIO for STM32 9.0.1\\ARMTools\\bin|" id="com.atollic.truestudio.mbs.builder1.1222194476" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="com.atollic.truestudio.mbs.builder1">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release" />
 								</outputEntries>
@@ -292,7 +292,7 @@
 								<option id="com.atollic.truestudio.common_options.target.mcpu.286463162" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32F769IG" valueType="enumerated" />
 								<option id="com.atollic.truestudio.common_options.target.instr_set.2033833414" name="Instruction set" superClass="com.atollic.truestudio.common_options.target.instr_set" useByScannerDiscovery="false" value="com.atollic.truestudio.common_options.target.instr_set.thumb2" valueType="enumerated" />
 								<option id="com.atollic.truestudio.as.general.incpath.770237934" name="Include path" superClass="com.atollic.truestudio.as.general.incpath" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;" />
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bb3/Middlewares/Third_Party/FatFs/src}&quot;" />
 								</option>
 								<option id="com.atollic.truestudio.gcc.symbols.defined.1670122205" name="Defined symbols" superClass="com.atollic.truestudio.gcc.symbols.defined" useByScannerDiscovery="false" />
 								<option id="com.atollic.truestudio.as.general.otherflags.51384659" name="Other options" superClass="com.atollic.truestudio.as.general.otherflags" useByScannerDiscovery="false" value="" valueType="string" />
@@ -329,7 +329,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/port&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;" />
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;" />
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bb3/Middlewares/Third_Party/FatFs/src}&quot;" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
 								</option>
@@ -451,7 +451,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/port&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;" />
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/h25005/Middlewares/Third_Party/FatFs/src}&quot;" />
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bb3/Middlewares/Third_Party/FatFs/src}&quot;" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
 								</option>
@@ -496,14 +496,14 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="h25005.com.atollic.truestudio.exe.1549124020" name="Executable" projectType="com.atollic.truestudio.exe" />
+		<project id="bb3.com.atollic.truestudio.exe.1549124020" name="Executable" projectType="com.atollic.truestudio.exe" />
 	</storageModule>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="h25005" />
+			<resource resourceType="PROJECT" workspacePath="bb3" />
 		</configuration>
 		<configuration configurationName="Release">
-			<resource resourceType="PROJECT" workspacePath="/h25005" />
+			<resource resourceType="PROJECT" workspacePath="/bb3" />
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders" />

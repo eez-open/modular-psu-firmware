@@ -3,8 +3,8 @@ build/emscripten
 build/linux
 build/win32
 modular-psu-firmware.eez-project-ui-state
-src/third_party/stm32_r1b2/Debug
-src/third_party/stm32_r1b5/Debug
+src/third_party/stm32_cubeide/Debug
+src/third_party/stm32_truestudio/Debug
 
 src/eez/gui/document_stm32.h
 src/eez/gui/document_stm32.cpp
