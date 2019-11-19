@@ -17,6 +17,7 @@
  */
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/dcpX05/ioexp.h>
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -360,9 +361,11 @@ bool IOExpander::isAdcReady() {
 #endif
 
 void IOExpander::changeBit(int io_bit, bool set) {
+    Channel &channel = Channel::getBySlotIndex(slotIndex);
+
 #if defined(EEZ_PLATFORM_STM32)    
     if (io_bit == IO_BIT_OUT_OUTPUT_ENABLE) {
-        HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_RESET);
+        channel_dispatcher::outputEnableSyncPrepare(channel);
     }
 
     if (io_bit < 8) {
@@ -380,12 +383,19 @@ void IOExpander::changeBit(int io_bit, bool set) {
     }
 
     if (io_bit == IO_BIT_OUT_OUTPUT_ENABLE) {
-        HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
+        channel_dispatcher::outputEnableSyncReady(channel);
     }
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
     gpio = set ? (gpio | (1 << io_bit)) : (gpio & ~(1 << io_bit));
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    if (io_bit == IO_BIT_OUT_OUTPUT_ENABLE) {
+        channel_dispatcher::outputEnableSyncPrepare(channel);
+        channel_dispatcher::outputEnableSyncReady(channel);
+    }
 #endif
 }
 

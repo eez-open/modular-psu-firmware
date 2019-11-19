@@ -39,5 +39,8 @@ extern osMessageQId g_psuMessageQueueId;
 
 bool measureAllAdcValuesOnChannel(int channelIndex);
 
+void lock();
+void unlock();
+
 }
 } // namespace eez

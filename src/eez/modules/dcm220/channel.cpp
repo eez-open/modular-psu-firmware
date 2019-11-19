@@ -29,6 +29,7 @@
 #include <eez/modules/dcpX05/channel.h>
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/scpi/regs.h>
 #include <eez/system.h>
@@ -44,18 +45,19 @@ namespace dcm220 {
 #define DAC_MIN 0
 #define DAC_MAX 4095
 
+#define REG0_OE1_MASK     (1 << 0)
+#define REG0_OE2_MASK     (1 << 2)
+
+#define BUFFER_SIZE 20
+
 #if defined(EEZ_PLATFORM_STM32)
 
-#define REG0_OE1_MASK     (1 << 0)
 #define REG0_CC1_MASK     (1 << 1)
-#define REG0_OE2_MASK     (1 << 2)
 #define REG0_CC2_MASK     (1 << 3)
 #define REG0_PWRGOOD_MASK (1 << 4)
 
 #define ADC_MIN 0
 #define ADC_MAX 65535
-
-#define BUFFER_SIZE 20
 
 #define SPI_SLAVE_SYNBYTE         0x53
 #define SPI_MASTER_SYNBYTE        0xAC
@@ -115,14 +117,17 @@ float calcTemperature(uint16_t adcValue) {
 #endif
 
 struct Channel : ChannelInterface {
+    uint32_t lastTickCount;
+
+    bool outputEnable[2];
+
+    uint8_t output[BUFFER_SIZE];
+
 #if defined(EEZ_PLATFORM_STM32)
 	bool synchronized;
-	uint32_t lastTickCount;
 
-	uint8_t output[BUFFER_SIZE];
 	uint8_t input[BUFFER_SIZE];
 
-	bool outputEnable[2];
 	uint16_t uSet[2];
 	uint16_t iSet[2];
 
@@ -299,17 +304,18 @@ struct Channel : ChannelInterface {
 	void tick(int subchannelIndex, uint32_t tickCount) {
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
 
-#if defined(EEZ_PLATFORM_STM32)
         int32_t diff = tickCount - lastTickCount;
         if (subchannelIndex == 0 && diff > 1000) {
         	uint8_t output0 = 0x80 | (outputEnable[0] ? REG0_OE1_MASK : 0) | (outputEnable[1] ? REG0_OE2_MASK : 0);
 
         	bool oeSync = output[0] != output0;
         	if (oeSync) {
-            	HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_RESET);
+				channel_dispatcher::outputEnableSyncPrepare(channel);
         	}
 
-        	output[0] = output0;
+            output[0] = output0;
+
+#if defined(EEZ_PLATFORM_STM32)
         	output[1] = 0;
 
         	uint16_t *outputSetValues = (uint16_t *)(output + 2);
@@ -327,18 +333,23 @@ struct Channel : ChannelInterface {
 #endif
 
 			transfer();
+#endif
 
 		    if (oeSync) {
 		    	delayMicroseconds(50);
-		        HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
+		    	channel_dispatcher::outputEnableSyncReady(channel);
+
+                channel_dispatcher::outputEnableSyncPrepare(channel);
+				channel_dispatcher::outputEnableSyncReady(psu::Channel::getBySlotIndex(slotIndex, 1));
 		    }
 
-		    if (numCrcErrors == 0) {
+#if defined(EEZ_PLATFORM_STM32)
+            if (numCrcErrors == 0) {
 		    	temperature[0] = calcTemperature(*((uint16_t *)(input + 10)));
 		    	temperature[1] = calcTemperature(*((uint16_t *)(input + 12)));
 		    }
-        }
 #endif
+        }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
         if (channel.isOutputEnabled()) {
@@ -471,9 +482,7 @@ struct Channel : ChannelInterface {
 	}
 
 	void setOutputEnable(int subchannelIndex, bool enable) {
-#if defined(EEZ_PLATFORM_STM32)
 		outputEnable[subchannelIndex] = enable;
-#endif
 	}
 
     DprogState getDprogState() {

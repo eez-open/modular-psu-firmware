@@ -314,6 +314,8 @@ int startImmediately() {
 
     bool trackingChannelsStarted = false;
 
+    channel_dispatcher::beginOutputEnableSequence();
+
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
 
@@ -352,6 +354,8 @@ int startImmediately() {
             setTriggerFinished(channel);
         }
     }
+
+    channel_dispatcher::endOutputEnableSequence();
 
     return SCPI_RES_OK;
 }

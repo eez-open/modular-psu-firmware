@@ -90,6 +90,11 @@ void setOppState(Channel &channel, int state);
 void setOppLevel(Channel &channel, float level);
 void setOppDelay(Channel &channel, float delay);
 
+void beginOutputEnableSequence();
+void endOutputEnableSequence();
+void outputEnableSyncPrepare(Channel &channel);
+void outputEnableSyncReady(Channel &channel);
+
 void outputEnable(Channel &channel, bool enable);
 void disableOutputForAllChannels();
 

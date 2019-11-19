@@ -17,9 +17,10 @@
  */
 
 #include <float.h>
+#include <assert.h>
 
 #include <eez/modules/psu/psu.h>
-
+#include <eez/modules/psu/init.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/list_program.h>
@@ -106,6 +107,8 @@ bool setCouplingType(CouplingType couplingType, int *err) {
 
         g_couplingType = couplingType;
 
+        beginOutputEnableSequence();
+
         for (int i = 0; i < 2; ++i) {
             Channel &channel = Channel::get(i);
             channel.outputEnable(false);
@@ -180,6 +183,8 @@ bool setCouplingType(CouplingType couplingType, int *err) {
 
             channel.resetHistory();
         }
+
+        endOutputEnableSequence();
 
         if (g_couplingType == COUPLING_TYPE_PARALLEL || g_couplingType == COUPLING_TYPE_SERIES) {
             if (persist_conf::getMaxChannelIndex() ==  1) {
@@ -292,6 +297,8 @@ void setTrackingChannels(uint16_t trackingEnabled) {
             }
         }
 
+        beginOutputEnableSequence();
+
         for (int i = 0; i < CH_NUM; i++) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
@@ -330,6 +337,8 @@ void setTrackingChannels(uint16_t trackingEnabled) {
                 trackingChannel.setTriggerOnListStop(TRIGGER_ON_LIST_STOP_OUTPUT_OFF);
             }
         }
+
+        endOutputEnableSequence();
     }
 }
 
@@ -998,26 +1007,131 @@ void setOppDelay(Channel &channel, float delay) {
 
 void outputEnable(Channel &channel, bool enable) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        beginOutputEnableSequence();
+        
         Channel::get(0).outputEnable(enable);
         Channel::get(1).outputEnable(enable);
+
+        endOutputEnableSequence();
     } else if (channel.flags.trackingEnabled) {
+        beginOutputEnableSequence();
+
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
                 trackingChannel.outputEnable(enable);
             }
         }
+
+        endOutputEnableSequence();
     } else {
         channel.outputEnable(enable);
     }
 }
 
 void disableOutputForAllChannels() {
+    beginOutputEnableSequence();
+
     for (int i = 0; i < CH_NUM; i++) {
         if (Channel::get(i).isOutputEnabled()) {
             Channel::get(i).outputEnable(false);
         }
     }
+
+    endOutputEnableSequence();
+}
+
+static int g_sequenceCounter;
+static bool g_syncPrepared;
+static uint16_t g_oeStateBegin;
+static uint16_t g_oeStateDiff;
+static uint16_t g_syncReady;
+
+static uint16_t getOeStateForAllChannels() {
+	uint16_t oeState = 0;
+	for (int i = 0; i < CH_NUM; i++) {
+		if (Channel::get(i).isOutputEnabled()) {
+			oeState |= 1 << i;
+		}
+	}
+	return oeState;
+}
+
+static void prepareSync() {
+	assert(!g_syncPrepared);
+
+#if defined(EEZ_PLATFORM_STM32)
+	HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_RESET);
+#endif
+	g_syncPrepared = true;
+}
+
+static void doSync() {
+	assert(g_syncPrepared);
+
+#if defined(EEZ_PLATFORM_STM32)
+	HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
+#endif
+	g_syncPrepared = false;
+	g_syncReady = 0;
+	g_oeStateDiff = 0;
+}
+
+void beginOutputEnableSequence() {
+    lock();
+
+    if (g_sequenceCounter++ == 0) {
+    	if (!g_syncPrepared) {
+    		prepareSync();
+    	}
+    	// remember channel output states at sequence begin
+    	g_oeStateBegin = getOeStateForAllChannels();
+    }
+
+    unlock();
+}
+
+void endOutputEnableSequence() {
+    lock();
+
+    if (--g_sequenceCounter == 0) {
+    	// which channals changed output enable state
+    	g_oeStateDiff = g_oeStateBegin ^ getOeStateForAllChannels();
+        if (g_oeStateDiff != 0) {
+            // is sync ready for all changed channels?
+            if (g_syncReady == g_oeStateDiff) {
+                doSync();
+            }
+        }
+    }
+
+    assert(g_sequenceCounter >= 0);
+
+    unlock();
+}
+
+void outputEnableSyncPrepare(Channel &channel) {
+    lock();
+
+    if (!g_syncPrepared) {
+    	prepareSync();
+    }
+
+    unlock();
+}
+
+void outputEnableSyncReady(Channel &channel) {
+    lock();
+
+    g_syncReady |= 1 << channel.channelIndex;
+
+    if (g_sequenceCounter == 0) {
+    	if (!g_oeStateDiff || g_syncReady == g_oeStateDiff) {
+    		doSync();
+    	}
+    }
+
+    unlock();
 }
 
 void remoteSensingEnable(Channel &channel, bool enable) {

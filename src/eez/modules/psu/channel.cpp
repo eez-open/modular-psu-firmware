@@ -123,6 +123,7 @@ static uint16_t g_oeSavedState;
 
 void Channel::saveAndDisableOE() {
     if (!g_oeSavedState) {
+        channel_dispatcher::beginOutputEnableSequence();
         for (int i = 0; i < CH_NUM; i++)  {
             Channel& channel = Channel::get(i);
             if (channel.isOutputEnabled()) {
@@ -130,17 +131,20 @@ void Channel::saveAndDisableOE() {
                 channel.outputEnable(false);
             }
         }
+        channel_dispatcher::endOutputEnableSequence();
         g_oeSavedState |= 1;
     }
 }
 
 void Channel::restoreOE() {
     if (g_oeSavedState) {
+    	channel_dispatcher::beginOutputEnableSequence();
         for (int i = 0; i < CH_NUM; i++)  {
             if ((g_oeSavedState & (1 << (i + 1))) != 0) {
                 Channel::get(i).outputEnable(true);
             }
         }
+        channel_dispatcher::endOutputEnableSequence();
         g_oeSavedState = 0;
     }
 }

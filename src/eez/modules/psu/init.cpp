@@ -45,11 +45,22 @@ osThreadId g_psuTaskHandle;
 osMessageQDef(g_psuMessageQueue, PSU_QUEUE_SIZE, uint32_t);
 osMessageQId g_psuMessageQueueId;
 
+#if defined(EEZ_PLATFORM_STM32)
+osMutexDef(psuMutex);
+osMutexId(psuMutexId);
+#else
+bool psuMutexLocked;
+#endif
+
 bool onSystemStateChanged() {
     if (g_systemState == eez::SystemState::BOOTING) {
         if (g_systemStatePhase == 0) {
 #ifdef EEZ_PLATFORM_SIMULATOR
             eez::psu::simulator::init();
+#endif
+
+#if defined(EEZ_PLATFORM_STM32)
+            psuMutexId = osMutexCreate(osMutex(psuMutex));
 #endif
 
             g_psuMessageQueueId = osMessageCreate(osMessageQ(g_psuMessageQueue), NULL);
@@ -116,6 +127,27 @@ bool measureAllAdcValuesOnChannel(int channelIndex) {
 
     return g_adcMeasureAllFinished;
 }
+
+void lock() {
+#if defined(EEZ_PLATFORM_STM32)
+    osMutexWait(psuMutexId, osWaitForever);
+#else
+    while (psuMutexLocked) {
+    	osDelay(1);
+    }
+    psuMutexLocked = true;
+#endif
+
+}
+
+void unlock() {
+#if defined(EEZ_PLATFORM_STM32)
+    osMutexRelease(psuMutexId);
+#else
+    psuMutexLocked = false;
+#endif
+}
+
 
 } // namespace psu
 } // namespace eez
