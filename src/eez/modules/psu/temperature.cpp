@@ -274,11 +274,9 @@ void TempSensorTemperature::protection_enter() {
 
     Channel *channel = temp_sensor::sensors[sensorIndex].getChannel();
     if (channel) {
-        channel->outputEnable(false);
+        channel_dispatcher::outputEnable(*channel, false);
     } else {
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel::get(i).outputEnable(false);
-        }
+        channel_dispatcher::disableOutputForAllChannels();
     }
 
     set_otp_reg(true);

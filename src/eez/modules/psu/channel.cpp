@@ -119,36 +119,29 @@ void Channel::Value::addMonDacValue(float value, float prec) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static struct {
-    unsigned OE_SAVED : 1;
-    unsigned CH1_OE : 1;
-    unsigned CH2_OE : 1;
-} g_savedOE;
+static uint16_t g_oeSavedState;
 
 void Channel::saveAndDisableOE() {
-    if (!g_savedOE.OE_SAVED) {
-        if (CH_NUM > 0) {
-            g_savedOE.CH1_OE = Channel::get(0).isOutputEnabled() ? 1 : 0;
-            Channel::get(0).outputEnable(false);
-
-            if (CH_NUM > 1) {
-                g_savedOE.CH2_OE = Channel::get(1).isOutputEnabled() ? 1 : 0;
-                Channel::get(1).outputEnable(false);
+    if (!g_oeSavedState) {
+        for (int i = 0; i < CH_NUM; i++)  {
+            Channel& channel = Channel::get(i);
+            if (channel.isOutputEnabled()) {
+                g_oeSavedState |= (1 << (i + 1));
+                channel.outputEnable(false);
             }
         }
-        g_savedOE.OE_SAVED = 1;
+        g_oeSavedState |= 1;
     }
 }
 
 void Channel::restoreOE() {
-    if (g_savedOE.OE_SAVED) {
-        if (CH_NUM > 0) {
-            Channel::get(0).outputEnable(g_savedOE.CH1_OE ? true : false);
-            if (CH_NUM > 1) {
-                Channel::get(1).outputEnable(g_savedOE.CH2_OE ? true : false);
+    if (g_oeSavedState) {
+        for (int i = 0; i < CH_NUM; i++)  {
+            if ((g_oeSavedState & (1 << (i + 1))) != 0) {
+                Channel::get(i).outputEnable(true);
             }
         }
-        g_savedOE.OE_SAVED = 0;
+        g_oeSavedState = 0;
     }
 }
 
@@ -562,7 +555,11 @@ bool Channel::isTestOk() {
 }
 
 bool Channel::isOk() {
-    return isPowerUp() && isPowerOk() && isTestOk() && !bp3c::relays::g_bootloaderMode;
+    return isPowerUp() && isPowerOk() && isTestOk()
+#ifdef EEZ_PLATFORM_STM32
+        && !bp3c::relays::g_bootloaderMode
+#endif
+    ;
 }
 
 void Channel::tick(uint32_t tick_usec) {

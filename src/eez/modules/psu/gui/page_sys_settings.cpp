@@ -783,25 +783,24 @@ void SysSettingsSerialPage::set() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void SysSettingsTrackingPage::pageAlloc() {
+    m_trackingEnabled = 0;
     for (int i = 0; i < CH_MAX; i++) {
-        m_trackingEnabled[i] = m_trackingEnabledOrig[i] = Channel::get(i).flags.trackingEnabled;
+        if (Channel::get(i).flags.trackingEnabled) {
+            m_trackingEnabled |= 1 << i;
+        }
     }
+    m_trackingEnabledOrig = m_trackingEnabled;
 }
 
 int SysSettingsTrackingPage::getDirty() {
-    for (int i = 0; i < CH_MAX; i++) {
-        if (m_trackingEnabled[i] != m_trackingEnabledOrig[i]) {
-            return true;
-        }
-    }
-    return false;
+    return m_trackingEnabled != m_trackingEnabledOrig;
 }
 
 void SysSettingsTrackingPage::set() {
     if (getDirty()) {
         int n = 0;
         for (int i = 0; i < CH_MAX; i++) {
-            if (m_trackingEnabled[i]) {
+            if (m_trackingEnabled & (1 << i)) {
                 n++;
             }
         }
@@ -845,29 +844,21 @@ void SysSettingsCouplingPage::set() {
             if (m_couplingType == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
                 auto trackingPage = (SysSettingsTrackingPage *)getPage(PAGE_ID_SYS_SETTINGS_TRACKING);
                 if (trackingPage) {
+                    trackingPage->m_trackingEnabled = 0;
                     if (m_enableTrackingMode) {
-                        trackingPage->m_trackingEnabled[0] = trackingPage->m_trackingEnabledOrig[0] = true;
-                        trackingPage->m_trackingEnabled[1] = trackingPage->m_trackingEnabledOrig[1] = true;
-                    } else {
-                        trackingPage->m_trackingEnabled[0] = trackingPage->m_trackingEnabledOrig[0] = false;
-                        trackingPage->m_trackingEnabled[1] = trackingPage->m_trackingEnabledOrig[1] = false;
+                        // enable tracking for first two channels
+                        trackingPage->m_trackingEnabled |= (1 << 0);
+                        trackingPage->m_trackingEnabled |= (1 << 1);
                     }
-                    for (int i = 2; i < CH_MAX; i++) {
-                        trackingPage->m_trackingEnabled[i] = trackingPage->m_trackingEnabledOrig[i] = false;
-                    }
+                    trackingPage->m_trackingEnabledOrig = trackingPage->m_trackingEnabled;
+                   
                     channel_dispatcher::setTrackingChannels(trackingPage->m_trackingEnabled);
-
                 } else {
-                    int trackingEnabled[CH_MAX];
+                    int trackingEnabled = 0;
                     if (m_enableTrackingMode) {
-                        trackingEnabled[0] = true;
-                        trackingEnabled[1] = true;
-                    } else {
-                        trackingEnabled[0] = false;
-                        trackingEnabled[1] = false;
-                    }
-                    for (int i = 2; i < CH_MAX; i++) {
-                        trackingEnabled[i] = false;
+                        // enable tracking for first two channels
+                        trackingEnabled |= (1 << 0);
+                        trackingEnabled |= (1 << 1);
                     }
                     channel_dispatcher::setTrackingChannels(trackingEnabled);
                 }

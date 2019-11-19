@@ -313,10 +313,10 @@ public:
     int getDirty();
     void set();
 
-    int m_trackingEnabled[CH_MAX];
+    uint16_t m_trackingEnabled;
 
 private:
-    int m_trackingEnabledOrig[CH_MAX];
+    uint16_t m_trackingEnabledOrig;
 }; 
 
 class SysSettingsCouplingPage : public SetPage {

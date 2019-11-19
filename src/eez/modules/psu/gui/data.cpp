@@ -2673,7 +2673,7 @@ void data_channel_tracking_is_enabled(data::DataOperationEnum operation, data::C
         Channel &channel = Channel::get(iChannel);
         auto page = (SysSettingsTrackingPage *)getPage(PAGE_ID_SYS_SETTINGS_TRACKING);
         if (page) {
-            value = page->m_trackingEnabled[channel.channelIndex];
+            value = (page->m_trackingEnabled & (1 << channel.channelIndex)) ? 1 : 0;
         } else {
             value = channel.flags.trackingEnabled ? 1 : 0;
         }

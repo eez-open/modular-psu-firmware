@@ -36,7 +36,7 @@ bool isCouplingTypeAllowed(CouplingType couplingType, int *err);
 bool setCouplingType(CouplingType couplingType, int *err);
 CouplingType getCouplingType();
 
-void setTrackingChannels(int trackingEnabled[]);
+void setTrackingChannels(uint16_t trackingEnabled);
 
 float getUSet(const Channel &channel);
 float getUSetUnbalanced(const Channel &channel);
@@ -91,6 +91,8 @@ void setOppLevel(Channel &channel, float level);
 void setOppDelay(Channel &channel, float delay);
 
 void outputEnable(Channel &channel, bool enable);
+void disableOutputForAllChannels();
+
 void remoteSensingEnable(Channel &channel, bool enable);
 void remoteProgrammingEnable(Channel &channel, bool enable);
 

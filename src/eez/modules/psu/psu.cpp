@@ -748,9 +748,7 @@ void powerDownBySensor() {
         eez::gui::showEnteringStandbyPage();
 #endif
 
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel::get(i).outputEnable(false);
-        }
+        channel_dispatcher::disableOutputForAllChannels();
 
         g_powerIsUp = false;
         profile::save(true);
@@ -779,21 +777,13 @@ bool reset() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void disableChannels() {
-    for (int i = 0; i < CH_NUM; ++i) {
-        if (Channel::get(i).isOutputEnabled()) {
-            Channel::get(i).outputEnable(false);
-        }
-    }
-}
-
 void onProtectionTripped() {
     if (isPowerUp()) {
         if (persist_conf::isShutdownWhenProtectionTrippedEnabled()) {
             powerDownBySensor();
         } else {
             if (persist_conf::isOutputProtectionCoupleEnabled()) {
-                disableChannels();
+                channel_dispatcher::disableOutputForAllChannels();
             }
         }
     }

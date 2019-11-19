@@ -212,12 +212,12 @@ bool setCouplingType(CouplingType couplingType, int *err) {
     return true;
 }
 
-void setTrackingChannels(int trackingEnabled[]) {
+void setTrackingChannels(uint16_t trackingEnabled) {
     bool channelsTracked = false;
     for (int i = 0; i < CH_NUM; i++) {
         Channel &trackingChannel = Channel::get(i);
-        trackingChannel.flags.trackingEnabled = trackingEnabled[i];
-        if (trackingEnabled[i]) {
+        trackingChannel.flags.trackingEnabled = (trackingEnabled & (1 << i)) ? 1 : 0;
+        if (trackingChannel.flags.trackingEnabled) {
             channelsTracked = true;
         }
     }
@@ -1009,6 +1009,14 @@ void outputEnable(Channel &channel, bool enable) {
         }
     } else {
         channel.outputEnable(enable);
+    }
+}
+
+void disableOutputForAllChannels() {
+    for (int i = 0; i < CH_NUM; i++) {
+        if (Channel::get(i).isOutputEnabled()) {
+            Channel::get(i).outputEnable(false);
+        }
     }
 }
 
