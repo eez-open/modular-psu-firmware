@@ -295,6 +295,8 @@ void setTrackingChannels(int trackingEnabled[]) {
         for (int i = 0; i < CH_NUM; i++) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
+            	trackingChannel.outputEnable(false);
+
                 trackingChannel.setVoltage(uMin);
                 trackingChannel.setCurrent(iMin);
 

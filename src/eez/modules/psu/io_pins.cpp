@@ -123,32 +123,32 @@ uint8_t isOutputEnabled() {
 }
 
 void initInputPin(int pin) {
-#if defined EEZ_PLATFORM_STM32
-    GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+// #if defined EEZ_PLATFORM_STM32
+//     GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-    const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
+//     const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
 
-    GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = ioPin.polarity == io_pins::POLARITY_POSITIVE ? GPIO_PULLDOWN : GPIO_PULLUP;
-    HAL_GPIO_Init(pin == 0 ? UART_RX_DIN1_GPIO_Port : DIN2_GPIO_Port, &GPIO_InitStruct);
-#endif
+//     GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
+//     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+//     GPIO_InitStruct.Pull = ioPin.polarity == io_pins::POLARITY_POSITIVE ? GPIO_PULLDOWN : GPIO_PULLUP;
+//     HAL_GPIO_Init(pin == 0 ? UART_RX_DIN1_GPIO_Port : DIN2_GPIO_Port, &GPIO_InitStruct);
+// #endif
 }
 
 void initOutputPins() {
-#if defined EEZ_PLATFORM_STM32
-	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+// #if defined EEZ_PLATFORM_STM32
+// 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-    // Configure DOUT1 GPIO pin
-    GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
-    HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, DOUT2_Pin, GPIO_PIN_RESET);
+//     // Configure DOUT1 GPIO pin
+//     GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
+//     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//     GPIO_InitStruct.Pull = GPIO_NOPULL;
+//     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+//     HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
+//     HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, DOUT2_Pin, GPIO_PIN_RESET);
 
-    // DOUT2 is already initialized
-#endif
+//     // DOUT2 is already initialized
+// #endif
 }
 
 void init() {

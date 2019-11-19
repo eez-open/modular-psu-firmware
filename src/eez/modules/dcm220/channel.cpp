@@ -228,10 +228,9 @@ struct Channel : ChannelInterface {
 			numCrcErrors = 0;
 		} else {
 			if (++numCrcErrors >= 3) {
-				auto lastEvent = event_queue::getLastErrorEvent();
-				if (!lastEvent || lastEvent->eventId != event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex) {
-					event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
-				}
+				event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
+				synchronized = false;
+				testResult = TEST_FAILED;
 			}
 		}
 	}

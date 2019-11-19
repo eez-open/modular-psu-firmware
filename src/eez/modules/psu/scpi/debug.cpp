@@ -32,6 +32,8 @@
 #include <eez/modules/psu/ontime.h>
 #include <eez/modules/psu/scpi/psu.h>
 
+#include <eez/modules/bp3c/relays.h>
+
 extern "C" {
 #include "py/compile.h"
 #include "py/runtime.h"
@@ -458,6 +460,17 @@ scpi_result_t scpi_cmd_debugDcm220Q(scpi_t *context) {
 	sprintf(text, "TODO");
 	SCPI_ResultText(context, text);
 	return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif // DEBUG
+}
+
+scpi_result_t scpi_cmd_debugBoot(scpi_t *context) {
+#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
+    bp3c::relays::toggleBootloader(2);
+
+    return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
     return SCPI_RES_ERR;

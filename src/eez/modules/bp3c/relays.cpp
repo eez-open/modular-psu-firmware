@@ -21,6 +21,8 @@
 #include <cmsis_os.h>
 #endif
 
+#include <eez/system.h>
+
 // TODO
 #include <eez/modules/psu/psu.h> // TestResult
 
@@ -28,8 +30,13 @@
 
 #include <eez/modules/bp3c/relays.h>
 
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/channel.h>
+#include <eez/modules/psu/io_pins.h>
 
 #ifdef EEZ_PLATFORM_STM32
+
+#include <usart.h>
 
 #if EEZ_BP3C_REVISION_R1B1
 // http://www.ti.com/lit/ds/symlink/pca9536.pdf
@@ -136,6 +143,109 @@ void switchChannelCoupling(int channelCoupling) {
 	}
 #endif
 }
+
+#ifdef EEZ_PLATFORM_STM32
+
+bool g_bootloaderMode = false;
+
+void toggleBootloader(int slotIndex) {
+	if(!g_bootloaderMode) {
+		psu::reset();
+
+		g_bootloaderMode = true;
+
+		// init channels
+		for (int i = 0; i < psu::CH_NUM; ++i) {
+			psu::Channel::get(i).onPowerDown();
+		}
+
+		osDelay(25);
+
+		if (slotIndex == 0) {
+			write(REG_OUTPUT_PORT, 0b10010000);
+		} else if (slotIndex == 1) {
+			write(REG_OUTPUT_PORT, 0b10100000);
+		} else if (slotIndex == 2) {
+			write(REG_OUTPUT_PORT, 0b11000000);
+		}
+
+		osDelay(5);
+
+		if (slotIndex == 0) {
+			write(REG_OUTPUT_PORT, 0b00010000);	
+		} else if (slotIndex == 1) {
+			write(REG_OUTPUT_PORT, 0b00100000);	
+		} else if (slotIndex == 2) {
+			write(REG_OUTPUT_PORT, 0b01000000);	
+		}
+
+		osDelay(25);
+
+		if (slotIndex == 0) {
+			write(REG_OUTPUT_PORT, 0b10010000);	
+		} else if (slotIndex == 1) {
+			write(REG_OUTPUT_PORT, 0b10100000);	
+		} else if (slotIndex == 2) {
+			write(REG_OUTPUT_PORT, 0b11000000);	
+		}
+
+		osDelay(25);
+
+		// GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+		// GPIO_InitStruct.Pin = UART_RX_DIN1_Pin;
+		// GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+		// GPIO_InitStruct.Pull = GPIO_NOPULL;
+		// GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+		// GPIO_InitStruct.Alternate = GPIO_AF8_UART7;
+		// HAL_GPIO_Init(UART_RX_DIN1_GPIO_Port, &GPIO_InitStruct);
+
+		// GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
+		// GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+		// GPIO_InitStruct.Pull = GPIO_NOPULL;
+		// GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+		// GPIO_InitStruct.Alternate = GPIO_AF12_UART7;
+		// HAL_GPIO_Init(UART_TX_DOUT1_GPIO_Port, &GPIO_InitStruct);
+
+		uint8_t tx = 0x7F;
+
+		auto result = HAL_UART_Transmit(&huart7, &tx, 1, 1000);
+		if (result == HAL_OK) {
+			osDelay(10);
+			uint8_t rx = 0xFF;
+			result = HAL_UART_Receive(&huart7, &rx, 1, 1000);
+			if (result == HAL_OK) {
+				DebugTrace("Received: 0x%02x", (int)rx);
+			} else {
+				DebugTrace("Receive error: %d", (int)result);
+			}
+		} else {
+			DebugTrace("Transmit error: %d", (int)result);
+		}
+	} else {
+		write(REG_OUTPUT_PORT, 0b10000000);
+		delay(5);
+		write(REG_OUTPUT_PORT, 0b00000000);
+		delay(25);
+		write(REG_OUTPUT_PORT, 0b10000000);	
+
+		psu::io_pins::refresh();
+
+		// init channels
+		for (int i = 0; i < psu::CH_NUM; ++i) {
+			psu::Channel::get(i).init();
+		}
+
+		// test channels
+		for (int i = 0; i < psu::CH_NUM; ++i) {
+			psu::Channel::get(i).test();
+		}
+
+		g_bootloaderMode = false;
+	}
+}
+
+#endif
 
 } // namespace relays
 } // namespace bp3c

@@ -36,6 +36,8 @@
 #include <eez/sound.h>
 #include <eez/index.h>
 
+#include <eez/modules/bp3c/relays.h>
+
 namespace eez {
 
 using namespace scpi;
@@ -560,7 +562,7 @@ bool Channel::isTestOk() {
 }
 
 bool Channel::isOk() {
-    return isPowerUp() && isPowerOk() && isTestOk();
+    return isPowerUp() && isPowerOk() && isTestOk() && !bp3c::relays::g_bootloaderMode;
 }
 
 void Channel::tick(uint32_t tick_usec) {

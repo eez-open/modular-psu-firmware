@@ -29,6 +29,11 @@ bool test();
 
 void switchChannelCoupling(int channelCoupling);
 
+#ifdef EEZ_PLATFORM_STM32
+void toggleBootloader(int slotIndex);
+extern bool g_bootloaderMode;
+#endif
+
 } // namespace relays
 } // namespace bp3c
 } // namespace eez
