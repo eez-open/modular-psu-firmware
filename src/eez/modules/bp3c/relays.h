@@ -30,6 +30,8 @@ bool test();
 void switchChannelCoupling(int channelCoupling);
 
 #ifdef EEZ_PLATFORM_STM32
+void hardResetModules();
+
 void toggleBootloader(int slotIndex);
 extern bool g_bootloaderMode;
 #endif

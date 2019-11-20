@@ -35,6 +35,7 @@
 #endif
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/gui/edit_mode_step.h>
 
@@ -200,7 +201,7 @@ void setUseSameSpeed(bool enable) {
 
 float increment(gui::data::Value value, int counter, float min, float max, int channelIndex, float precision) {
     if (channelIndex != -1) {
-        precision = psu::Channel::get(channelIndex).getValuePrecision(value.getUnit(), value.getFloat());
+        precision = psu::channel_dispatcher::getValuePrecision(psu::Channel::get(channelIndex), value.getUnit(), value.getFloat());
     }
 
     // TODO 

@@ -425,17 +425,17 @@ class Channel {
     void setOperBits(int bit_mask, bool on);
 
     /// Is channel in CV (constant voltage) mode?
-    bool isCvMode() {
+    bool isCvMode() const {
         return flags.cvMode && !flags.ccMode;
     }
 
     /// Is channel in CC (constant current) mode?
-    bool isCcMode() {
+    bool isCcMode() const {
         return flags.ccMode && !flags.cvMode;
     }
 
     /// Returns "CC", "CV" or "UR"
-    const char *getCvModeStr();
+    const char *getCvModeStr() const;
 
     /// Returns currently set voltage limit
     float getVoltageLimit() const;

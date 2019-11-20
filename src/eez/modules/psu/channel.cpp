@@ -74,9 +74,8 @@ void Channel::Value::addMonValue(float value, float prec) {
     if (io_pins::isInhibited()) {
         value = 0;
     }
-    value = roundPrec(value, prec);
-
-    mon_last = value;
+    
+    mon_last = roundPrec(value, prec);
 
     if (mon_index == -1) {
         mon_index = 0;
@@ -84,22 +83,27 @@ void Channel::Value::addMonValue(float value, float prec) {
             mon_arr[i] = value;
         }
         mon_total = NUM_ADC_AVERAGING_VALUES * value;
-        mon = value;
+        mon = mon_last;
     } else {
         mon_total -= mon_arr[mon_index];
         mon_total += value;
         mon_arr[mon_index] = value;
         mon_index = (mon_index + 1) % NUM_ADC_AVERAGING_VALUES;
-        mon = io_pins::isInhibited() ? 0 : roundPrec(mon_total / NUM_ADC_AVERAGING_VALUES, prec);
+        if (io_pins::isInhibited()) {
+            mon = 0;
+        } else {
+            float monNew = mon_total / NUM_ADC_AVERAGING_VALUES;
+            if (fabs(monNew - mon) > prec) {
+                mon = roundPrec(monNew, prec);
+            }
+        }
     }
 
     mon_measured = true;
 }
 
 void Channel::Value::addMonDacValue(float value, float prec) {
-    value = roundPrec(value, prec);
-
-    mon_dac_last = value;
+    mon_dac_last = roundPrec(value, prec);
 
     if (mon_dac_index == -1) {
         mon_dac_index = 0;
@@ -107,7 +111,7 @@ void Channel::Value::addMonDacValue(float value, float prec) {
             mon_dac_arr[i] = value;
         }
         mon_dac_total = NUM_ADC_AVERAGING_VALUES * value;
-        mon_dac = value;
+        mon_dac = mon_dac_last;
     } else {
         mon_dac_total -= mon_dac_arr[mon_dac_index];
         mon_dac_total += value;
@@ -1095,7 +1099,7 @@ void Channel::setOperBits(int bit_mask, bool on) {
     reg_set_oper_isum_bit(channelIndex, bit_mask, on);
 }
 
-const char *Channel::getCvModeStr() {
+const char *Channel::getCvModeStr() const {
     if (isCvMode())
         return "CV";
     else if (isCcMode())

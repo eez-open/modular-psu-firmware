@@ -346,6 +346,72 @@ CouplingType getType() {
     return g_couplingType;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+#define CONF_GUI_REFRESH_EVERY_MS 250
+
+uint32_t g_lastSnapshotTime;
+
+static struct ChannelSnapshot {
+    ChannelMode channelMode;
+    float uMon;
+    float iMon;
+    float pMon;
+} g_channelSnapshots[CH_MAX];
+
+ChannelSnapshot &getChannelSnapshot(int channelIndex) {
+    uint32_t currentTime = micros();
+    if (!g_lastSnapshotTime || currentTime - g_lastSnapshotTime >= CONF_GUI_REFRESH_EVERY_MS * 1000UL) {
+        for (int i = 0; i < CH_NUM; i++) {
+            Channel &channel = Channel::get(i);
+            ChannelSnapshot &channelSnapshot = g_channelSnapshots[i];
+            const char *mode_str = channel.getCvModeStr();
+            channelSnapshot.uMon = channel_dispatcher::getUMon(channel);
+            channelSnapshot.iMon = channel_dispatcher::getIMon(channel);
+            if (strcmp(mode_str, "CC") == 0) {
+                channelSnapshot.channelMode = CHANNEL_MODE_CC;
+            } else if (strcmp(mode_str, "CV") == 0) {
+                channelSnapshot.channelMode = CHANNEL_MODE_CV;
+            } else {
+                channelSnapshot.channelMode = CHANNEL_MODE_UR;
+            }
+            channelSnapshot.pMon = roundPrec(channelSnapshot.uMon * channelSnapshot.iMon, channel.getPowerResolution());
+        }
+
+        g_lastSnapshotTime = currentTime;
+    }
+
+    return g_channelSnapshots[channelIndex];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ChannelMode getChannelMode(const Channel &channel) {
+    return getChannelSnapshot(channel.channelIndex).channelMode;
+}
+
+float getTrackingValuePrecision(Unit unit, float value) {
+    float precision = 0;
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel &trackingChannel = Channel::get(i);
+        if (trackingChannel.flags.trackingEnabled) {
+            precision = MAX(precision, trackingChannel.getValuePrecision(unit, value));
+        }
+    }
+    return precision;
+}
+
+float roundTrackingValuePrecision(Unit unit, float value) {
+    return roundPrec(value, getTrackingValuePrecision(unit, value));
+}
+
+float getValuePrecision(const Channel &channel, Unit unit, float value) {
+    if (channel.flags.trackingEnabled) {
+        return getTrackingValuePrecision(unit, value);
+    }
+    return channel.getValuePrecision(unit, value);
+}
+
 float getUSet(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
         return Channel::get(0).u.set + Channel::get(1).u.set;
@@ -365,6 +431,13 @@ float getUMon(const Channel &channel) {
         return Channel::get(0).u.mon + Channel::get(1).u.mon;
     }
     return channel.u.mon;
+}
+
+float getUMonSnapshot(const Channel &channel) {
+    if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
+        return getChannelSnapshot(0).uMon + getChannelSnapshot(1).uMon;
+    }
+    return getChannelSnapshot(channel.channelIndex).uMon;
 }
 
 float getUMonLast(const Channel &channel) {
@@ -466,17 +539,6 @@ float getUProtectionLevel(const Channel &channel) {
     return channel.prot_conf.u_level;
 }
 
-float getTrackingValuePrecision(Unit unit, float value) {
-    float precision = 0;
-    for (int i = 0; i < CH_NUM; ++i) {
-        Channel &trackingChannel = Channel::get(i);
-        if (trackingChannel.flags.trackingEnabled) {
-            precision = MAX(precision, trackingChannel.getValuePrecision(unit, value));
-        }
-    }
-    return roundPrec(value, precision);
-}
-
 void setVoltage(Channel &channel, float voltage) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
         Channel::get(0).setVoltage(voltage / 2);
@@ -485,7 +547,7 @@ void setVoltage(Channel &channel, float voltage) {
         Channel::get(0).setVoltage(voltage);
         Channel::get(1).setVoltage(voltage);
     } else if (channel.flags.trackingEnabled) {
-        voltage = getTrackingValuePrecision(UNIT_VOLT, voltage);
+        voltage = roundTrackingValuePrecision(UNIT_VOLT, voltage);
 
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
@@ -506,7 +568,7 @@ void setVoltageLimit(Channel &channel, float limit) {
         Channel::get(0).setVoltageLimit(limit);
         Channel::get(1).setVoltageLimit(limit);
     } else if (channel.flags.trackingEnabled) {
-        limit = getTrackingValuePrecision(UNIT_VOLT, limit);
+        limit = roundTrackingValuePrecision(UNIT_VOLT, limit);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
@@ -540,7 +602,7 @@ void setOvpParameters(Channel &channel, int state, int type, float level, float 
         Channel::get(1).prot_conf.u_level = coupledLevel;
         Channel::get(1).prot_conf.u_delay = delay;
     } else if (channel.flags.trackingEnabled) {
-        level = getTrackingValuePrecision(UNIT_VOLT, level);
+        level = roundTrackingValuePrecision(UNIT_VOLT, level);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
@@ -609,7 +671,7 @@ void setOvpLevel(Channel &channel, float level) {
         Channel::get(0).prot_conf.u_level = coupledLevel;
         Channel::get(1).prot_conf.u_level = coupledLevel;
     } else if (channel.flags.trackingEnabled) {
-        level = getTrackingValuePrecision(UNIT_VOLT, level);
+        level = roundTrackingValuePrecision(UNIT_VOLT, level);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
@@ -658,6 +720,13 @@ float getIMon(const Channel &channel) {
         return Channel::get(0).i.mon + Channel::get(1).i.mon;
     }
     return channel.i.mon;
+}
+
+float getIMonSnapshot(const Channel &channel) {
+    if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_PARALLEL) {
+        return getChannelSnapshot(0).iMon + getChannelSnapshot(1).iMon;
+    }
+    return getChannelSnapshot(channel.channelIndex).iMon;
 }
 
 float getIMonLast(const Channel &channel) {
@@ -756,7 +825,7 @@ void setCurrent(Channel &channel, float current) {
         Channel::get(0).setCurrent(current);
         Channel::get(1).setCurrent(current);
     } else if (channel.flags.trackingEnabled) {
-        current = getTrackingValuePrecision(UNIT_AMPER, current);
+        current = roundTrackingValuePrecision(UNIT_AMPER, current);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
@@ -776,7 +845,7 @@ void setCurrentLimit(Channel &channel, float limit) {
         Channel::get(0).setCurrentLimit(limit);
         Channel::get(1).setCurrentLimit(limit);
     } else if (channel.flags.trackingEnabled) {
-        limit = getTrackingValuePrecision(UNIT_AMPER, limit);
+        limit = roundTrackingValuePrecision(UNIT_AMPER, limit);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
@@ -878,7 +947,7 @@ void setPowerLimit(Channel &channel, float limit) {
         Channel::get(0).setPowerLimit(limit / 2);
         Channel::get(1).setPowerLimit(limit / 2);
     } else if (channel.flags.trackingEnabled) {
-        limit = getTrackingValuePrecision(UNIT_WATT, limit);
+        limit = roundTrackingValuePrecision(UNIT_WATT, limit);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
@@ -934,7 +1003,7 @@ void setOppParameters(Channel &channel, int state, float level, float delay) {
         Channel::get(1).prot_conf.p_level = coupledLevel;
         Channel::get(1).prot_conf.p_delay = delay;
     } else if (channel.flags.trackingEnabled) {
-        level = getTrackingValuePrecision(UNIT_WATT, level);
+        level = roundTrackingValuePrecision(UNIT_WATT, level);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
@@ -975,7 +1044,7 @@ void setOppLevel(Channel &channel, float level) {
         Channel::get(0).prot_conf.p_level = coupledLevel;
         Channel::get(1).prot_conf.p_level = coupledLevel;
     } else if (channel.flags.trackingEnabled) {
-        level = getTrackingValuePrecision(UNIT_WATT, level);
+        level = roundTrackingValuePrecision(UNIT_WATT, level);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
@@ -1538,7 +1607,7 @@ void setTriggerVoltage(Channel &channel, float value) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
         trigger::setVoltage(Channel::get(0), value);
     } else if (channel.flags.trackingEnabled) {
-        value = getTrackingValuePrecision(UNIT_VOLT, value);
+        value = roundTrackingValuePrecision(UNIT_VOLT, value);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
@@ -1568,7 +1637,7 @@ void setTriggerCurrent(Channel &channel, float value) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
         trigger::setCurrent(Channel::get(0), value);
     } else if (channel.flags.trackingEnabled) {
-        value = getTrackingValuePrecision(UNIT_AMPER, value);
+        value = roundTrackingValuePrecision(UNIT_AMPER, value);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {

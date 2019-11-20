@@ -148,6 +148,10 @@ void switchChannelCoupling(int channelCoupling) {
 
 bool g_bootloaderMode = false;
 
+void hardResetModules() {
+	write(REG_OUTPUT_PORT, 0);	
+}
+
 void toggleBootloader(int slotIndex) {
 	if(!g_bootloaderMode) {
 		psu::reset();
@@ -209,18 +213,24 @@ void toggleBootloader(int slotIndex) {
 
 		uint8_t tx = 0x7F;
 
-		auto result = HAL_UART_Transmit(&huart7, &tx, 1, 1000);
-		if (result == HAL_OK) {
-			osDelay(10);
+		int i;
+		for (i = 0; i < 10; i++) {
+			auto result = HAL_UART_Transmit(&huart7, &tx, 1, 1000);
+			if (result != HAL_OK) {
+				DebugTrace("Transmit error: %d", (int)result);
+				break;
+			}
+			osDelay(1000);
+		}
+
+		if (i == 10) {
 			uint8_t rx = 0xFF;
-			result = HAL_UART_Receive(&huart7, &rx, 1, 1000);
+			auto result = HAL_UART_Receive(&huart7, &rx, 1, 1000);
 			if (result == HAL_OK) {
 				DebugTrace("Received: 0x%02x", (int)rx);
 			} else {
 				DebugTrace("Receive error: %d", (int)result);
 			}
-		} else {
-			DebugTrace("Transmit error: %d", (int)result);
 		}
 	} else {
 		write(REG_OUTPUT_PORT, 0b10000000);

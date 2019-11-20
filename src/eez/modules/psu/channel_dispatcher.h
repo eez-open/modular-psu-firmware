@@ -38,9 +38,20 @@ CouplingType getCouplingType();
 
 void setTrackingChannels(uint16_t trackingEnabled);
 
+enum ChannelMode {
+    CHANNEL_MODE_UR,
+    CHANNEL_MODE_CC,
+    CHANNEL_MODE_CV
+};
+
+ChannelMode getChannelMode(const Channel &channel);
+
+float getValuePrecision(const Channel &channel, Unit unit, float value);
+
 float getUSet(const Channel &channel);
 float getUSetUnbalanced(const Channel &channel);
 float getUMon(const Channel &channel);
+float getUMonSnapshot(const Channel &channel);
 float getUMonLast(const Channel &channel);
 float getUMonDac(const Channel &channel);
 float getULimit(const Channel &channel);
@@ -61,6 +72,7 @@ void setOvpDelay(Channel &channel, float delay);
 float getISet(const Channel &channel);
 float getISetUnbalanced(const Channel &channel);
 float getIMon(const Channel &channel);
+float getIMonSnapshot(const Channel &channel);
 float getIMonLast(const Channel &channel);
 float getIMonDac(const Channel &channel);
 float getILimit(const Channel &channel);

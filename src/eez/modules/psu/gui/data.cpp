@@ -69,8 +69,6 @@
 #include <eez/gui/widgets/container.h>
 #include <eez/gui/widgets/yt_graph.h>
 
-#define CONF_GUI_REFRESH_EVERY_MS 250
-
 using namespace eez::gui;
 using namespace eez::gui::data;
 using data::EnumItem;
@@ -837,49 +835,6 @@ namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define CHANNEL_MODE_UR 0
-#define CHANNEL_MODE_CC 1
-#define CHANNEL_MODE_CV 2
-
-static struct ChannelSnapshot {
-    unsigned int mode; // 0: 1: CC, 2: CV
-    data::Value monValue;
-    float pMon;
-    uint32_t lastSnapshotTime;
-} g_channelSnapshot[CH_MAX];
-
-ChannelSnapshot &getChannelSnapshot(Channel &channel) {
-    ChannelSnapshot &channelSnapshot = g_channelSnapshot[channel.channelIndex];
-
-    uint32_t currentTime = micros();
-    if (!channelSnapshot.lastSnapshotTime ||
-        currentTime - channelSnapshot.lastSnapshotTime >= CONF_GUI_REFRESH_EVERY_MS * 1000UL) {
-        const char *mode_str = channel.getCvModeStr();
-        float uMon = channel_dispatcher::getUMon(channel);
-        float iMon = channel_dispatcher::getIMon(channel);
-        if (strcmp(mode_str, "CC") == 0) {
-            channelSnapshot.mode = CHANNEL_MODE_CC;
-            channelSnapshot.monValue = MakeValue(uMon, UNIT_VOLT);
-        } else if (strcmp(mode_str, "CV") == 0) {
-            channelSnapshot.mode = CHANNEL_MODE_CV;
-            channelSnapshot.monValue = MakeValue(iMon, UNIT_AMPER);
-        } else {
-            channelSnapshot.mode = CHANNEL_MODE_UR;
-            if (uMon < iMon) {
-                channelSnapshot.monValue = MakeValue(uMon, UNIT_VOLT);
-            } else {
-                channelSnapshot.monValue = MakeValue(iMon, UNIT_AMPER);
-            }
-        }
-        channelSnapshot.pMon = roundPrec(uMon * iMon, channel.getPowerResolution());
-        channelSnapshot.lastSnapshotTime = currentTime;
-    }
-
-    return channelSnapshot;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 Page *getUserProfilesPage() {
     Page *page = getPage(PAGE_ID_USER_PROFILE_SETTINGS);
     if (!page) {
@@ -952,8 +907,7 @@ void data_channel_is_cc(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
-        value = channelSnapshot.mode == CHANNEL_MODE_CC;
+        value = channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_CC;
     }
 }
 
@@ -961,17 +915,7 @@ void data_channel_is_cv(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
-        value = channelSnapshot.mode == CHANNEL_MODE_CV;
-    }
-}
-
-void data_channel_mon_value(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
-        value = channelSnapshot.monValue;
+        value = channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_CV;
     }
 }
 
@@ -1018,8 +962,7 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         uint32_t position = value.getUInt32();
         value = MakeValue(channel.getUMonHistory(position), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_COLOR) {
-        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
-        if (io_pins::isInhibited() || channelSnapshot.mode == CHANNEL_MODE_UR) {
+        if (io_pins::isInhibited() || channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
@@ -1036,6 +979,16 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         }
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;
+    }
+}
+
+void data_channel_u_mon_snapshot(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (false && operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        value = MakeValue(channel_dispatcher::getUMonSnapshot(channel), UNIT_VOLT);
+    } else {
+        data_channel_u_mon(operation, cursor, value);
     }
 }
 
@@ -1138,8 +1091,7 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         value =
             MakeValue(channel.getIMonHistory(position), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_COLOR) {
-        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
-        if (io_pins::isInhibited() || channelSnapshot.mode == CHANNEL_MODE_UR) {
+        if (io_pins::isInhibited() || channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
@@ -1156,6 +1108,16 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         }
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;
+    }
+}
+
+void data_channel_i_mon_snapshot(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (false && operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        value = MakeValue(channel_dispatcher::getIMonSnapshot(channel), UNIT_AMPER);
+    } else {
+        data_channel_i_mon(operation, cursor, value);
     }
 }
 
@@ -1218,7 +1180,7 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(getChannelSnapshot(channel).pMon, UNIT_WATT);
+        value = MakeValue(channel_dispatcher::getUMon(channel) * channel_dispatcher::getIMon(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getPowerMinLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
@@ -1230,8 +1192,7 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         float pMon = channel.getUMonHistory(value.getUInt32()) * channel.getIMonHistory(value.getUInt32());
         value = MakeValue(pMon, UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_COLOR) {
-        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
-        if (io_pins::isInhibited() || channelSnapshot.mode == CHANNEL_MODE_UR) {
+        if (io_pins::isInhibited() || channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
@@ -1248,6 +1209,16 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         }
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;
+    }
+}
+
+void data_channel_p_mon_snapshot(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (false && operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        value = MakeValue(channel_dispatcher::getUMonSnapshot(channel) * channel_dispatcher::getIMonSnapshot(channel), UNIT_WATT);
+    } else {
+        data_channel_p_mon(operation, cursor, value);
     }
 }
 
@@ -4248,8 +4219,7 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
     } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        ChannelSnapshot &channelSnapshot = getChannelSnapshot(channel);
-        if (channelSnapshot.mode == CHANNEL_MODE_UR) {
+        if (channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
             value = Value(STYLE_ID_YT_GRAPH_UNREGULATED, VALUE_TYPE_UINT16);
         } else {
             value = Value(value.getUInt8() == 0 ? STYLE_ID_YT_GRAPH_U_DEFAULT : STYLE_ID_YT_GRAPH_I_DEFAULT, VALUE_TYPE_UINT16);
