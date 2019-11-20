@@ -84,17 +84,21 @@ void Channel::Value::addMonValue(float value, float prec) {
         }
         mon_total = NUM_ADC_AVERAGING_VALUES * value;
         mon = mon_last;
+        mon_prev = mon_last;
     } else {
         mon_total -= mon_arr[mon_index];
         mon_total += value;
         mon_arr[mon_index] = value;
         mon_index = (mon_index + 1) % NUM_ADC_AVERAGING_VALUES;
+
         if (io_pins::isInhibited()) {
             mon = 0;
+            mon_prev = 0;
         } else {
-            float monNew = mon_total / NUM_ADC_AVERAGING_VALUES;
-            if (fabs(monNew - mon) > prec) {
-                mon = roundPrec(monNew, prec);
+            float mon_next = mon_total / NUM_ADC_AVERAGING_VALUES;
+            if (fabs(mon_prev - mon_next) >= prec) {
+                mon = roundPrec(mon_next, prec);
+                mon_prev = mon_next;
             }
         }
     }
@@ -112,12 +116,19 @@ void Channel::Value::addMonDacValue(float value, float prec) {
         }
         mon_dac_total = NUM_ADC_AVERAGING_VALUES * value;
         mon_dac = mon_dac_last;
+        mon_dac_prev = mon_dac_last;
     } else {
         mon_dac_total -= mon_dac_arr[mon_dac_index];
         mon_dac_total += value;
         mon_dac_arr[mon_dac_index] = value;
         mon_dac_index = (mon_dac_index + 1) % NUM_ADC_AVERAGING_VALUES;
-        mon_dac = roundPrec(mon_dac_total / NUM_ADC_AVERAGING_VALUES, prec);
+
+        float mon_dac_next = mon_dac_total / NUM_ADC_AVERAGING_VALUES;
+
+		if (fabs(mon_dac_prev - mon_dac_next) >= prec) {
+			mon_dac = roundPrec(mon_dac_next, prec);
+			mon_dac_prev = mon_dac_next;
+		}
     }
 }
 
