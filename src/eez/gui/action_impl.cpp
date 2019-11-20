@@ -274,7 +274,7 @@ void action_show_sys_settings_encoder() {
 }
 
 void action_show_sys_info() {
-    showPage(PAGE_ID_SYS_INFO);
+    pushPage(PAGE_ID_SYS_INFO);
 }
 
 void action_show_main_help_page() {
@@ -1126,6 +1126,14 @@ void action_dlog_toggle() {
 
 void action_show_recordings_view() {
     showPage(PAGE_ID_RECORDINGS_VIEW);
+}
+
+void action_show_file_manager() {
+    showPage(PAGE_ID_FILE_MANAGER);
+}
+
+void action_file_select() {
+    showPage(PAGE_ID_FILE_MANAGER);
 }
 
 } // namespace gui

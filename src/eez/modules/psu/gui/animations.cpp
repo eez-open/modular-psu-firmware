@@ -69,6 +69,7 @@ static const Rect g_settingsRectTop = { 0, -168, 480, 168 };
 static const Rect g_settingsRectLeft = { -480, 0, 480, 240 };
 static const Rect g_settingsRectRight = { 480, 0, 480, 240 };
 
+static const Rect g_settingsRectNoChannels = { 0, 0, 480, 240 };
 
 namespace eez {
 namespace psu {
@@ -240,11 +241,11 @@ void animateHideSysSettings() {
     animateRects(BUFFER_NEW, i);
 }
 
-void animateSettingsSlideLeft() {
+void animateSettingsSlideLeft(bool noChannels) {
     int i = 0;
 
-    g_animRects[i++] = { BUFFER_OLD, g_settingsRect, g_settingsRectLeft, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_settingsRectRight, g_settingsRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_OLD, noChannels ? g_settingsRectNoChannels : g_settingsRect, g_settingsRectLeft, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_settingsRectRight, noChannels ? g_settingsRectNoChannels : g_settingsRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
     g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectLeft, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_statusLineRectRight, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
@@ -252,11 +253,11 @@ void animateSettingsSlideLeft() {
     animateRects(BUFFER_NEW, i);
 }
 
-void animateSettingsSlideRight() {
+void animateSettingsSlideRight(bool noChannels) {
     int i = 0;
 
-    g_animRects[i++] = { BUFFER_OLD, g_settingsRect, g_settingsRectRight, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_settingsRectLeft, g_settingsRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_OLD, noChannels ? g_settingsRectNoChannels : g_settingsRect, g_settingsRectRight, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_settingsRectLeft, noChannels ? g_settingsRectNoChannels : g_settingsRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
     g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectRight, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_statusLineRectLeft, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };

@@ -39,6 +39,7 @@
 #include <eez/modules/psu/gui/page_ch_settings_protection.h>
 #include <eez/modules/psu/gui/page_ch_settings_trigger.h>
 #include <eez/modules/psu/gui/page_event_queue.h>
+#include <eez/modules/psu/gui/page_file_manager.h>
 #include <eez/modules/psu/gui/page_self_test_result.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
@@ -221,6 +222,7 @@ static SysSettingsSerialPage g_SysSettingsSerialPage;
 static SysSettingsTrackingPage g_sysSettingsTrackingPage;
 static SysSettingsCouplingPage g_sysSettingsCouplingPage;
 static UserProfilesPage g_UserProfilesPage;
+static FileManagerPage g_FileManagerPage;
 
 Page *getPageFromId(int pageId) {
     Page *page = nullptr;
@@ -303,6 +305,9 @@ Page *getPageFromId(int pageId) {
     case PAGE_ID_USER_PROFILE_0_SETTINGS:
     case PAGE_ID_USER_PROFILE_SETTINGS:
         page = &g_UserProfilesPage;
+        break;
+    case PAGE_ID_FILE_MANAGER:
+        page = &g_FileManagerPage;
         break;
     }
 

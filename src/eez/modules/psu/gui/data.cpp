@@ -4444,6 +4444,26 @@ void data_dlog_value_cursor(data::DataOperationEnum operation, data::Cursor &cur
 #endif
 }
 
+void data_files(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+#endif
+}
+
+void data_file_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+#endif
+}
+
+void data_file_size(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+#endif
+}
+
+void data_file_date(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+#endif
+}
+
 } // namespace gui
 } // namespace eez
 

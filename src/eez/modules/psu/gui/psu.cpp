@@ -296,7 +296,8 @@ bool isSysSettingsSubPage(int pageId) {
         pageId == PAGE_ID_SYS_SETTINGS_CAL ||
         pageId == PAGE_ID_SYS_SETTINGS_TRIGGER ||
         pageId == PAGE_ID_SYS_SETTINGS_DISPLAY ||
-        pageId == PAGE_ID_SYS_SETTINGS_SOUND;
+        pageId == PAGE_ID_SYS_SETTINGS_SOUND ||
+        pageId == PAGE_ID_SYS_INFO;
 }
 
 bool isChSettingsSubPage(int pageId) {
@@ -340,11 +341,11 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_USER_PROFILES) {
             animateSlideDown();
-        } else if (activePageId == PAGE_ID_SYS_INFO) {
-            animateSlideDown();
         } else if (activePageId == PAGE_ID_SYS_SETTINGS_TRACKING) {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_RECORDINGS_VIEW) {
+            animateSlideDown();
+        } else if (activePageId == PAGE_ID_FILE_MANAGER) {
             animateSlideDown();
         }
     } else if (previousPageId == PAGE_ID_USER_PROFILES) {
@@ -367,10 +368,6 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         } else if (activePageId == PAGE_ID_USER_PROFILES) {
             animateSlideUp();
         }
-    } else if (previousPageId == PAGE_ID_SYS_INFO) {
-        if (activePageId == PAGE_ID_MAIN) {
-            animateSlideUp();
-        }
     } else if (previousPageId == PAGE_ID_SYS_SETTINGS_TRACKING) {
         if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
@@ -387,7 +384,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         if (activePageId == PAGE_ID_MAIN) {
             animateHideSysSettings();
         } else if (isSysSettingsSubPage(activePageId)) {
-            animateSettingsSlideLeft();
+            animateSettingsSlideLeft(activePageId == PAGE_ID_SYS_INFO);
         }
     } else if (previousPageId == PAGE_ID_SYS_SETTINGS_TRIGGER) {
         if (activePageId == PAGE_ID_MAIN) {
@@ -395,13 +392,13 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         } else if (activePageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
             animateSlideUp();
         } else if (activePageId == PAGE_ID_SYS_SETTINGS) {
-            animateSettingsSlideRight();
+            animateSettingsSlideRight(false);
         }
     } else if (isSysSettingsSubPage(previousPageId)) {
         if (activePageId == PAGE_ID_MAIN) {
             animateHideSysSettings();
         } else if (activePageId == PAGE_ID_SYS_SETTINGS) {
-            animateSettingsSlideRight();
+            animateSettingsSlideRight(previousPageId == PAGE_ID_SYS_INFO);
         }
     } else if (previousPageId == PAGE_ID_CH_SETTINGS) {
         if (activePageId == PAGE_ID_MAIN) {
@@ -430,6 +427,10 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
             animateSlideRight();
         }
     } else if (previousPageId == PAGE_ID_RECORDINGS_VIEW) {
+        if (activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        }
+    } else if (previousPageId == PAGE_ID_FILE_MANAGER) {
         if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
         }
