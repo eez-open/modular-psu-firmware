@@ -102,7 +102,7 @@ scpi_result_t scpi_cmd_mmemoryCdirectoryQ(scpi_t *context) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void catalogCallback(void *param, const char *name, const char *type, size_t size) {
+void catalogCallback(void *param, const char *name, FileType type, size_t size) {
     scpi_t *context = (scpi_t *)param;
 
     char buffer[MAX_PATH_LENGTH + 10 + 10 + 1];
@@ -119,9 +119,18 @@ void catalogCallback(void *param, const char *name, const char *type, size_t siz
     }
 
     // max. 10 characters
+    static const char *typeNames[] = {
+        "FOLD",
+        "LIST",
+        "PROF",
+        "DLOG",
+        "IMG",
+        "BIN",
+    };
+
     buffer[position++] = ',';
-    strcpy(buffer + position, type);
-    position += strlen(type);
+    strcpy(buffer + position, typeNames[type]);
+    position += strlen(typeNames[type]);
     buffer[position++] = ',';
 
     // max. 10 characters (for 4294967296)

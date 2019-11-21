@@ -85,6 +85,7 @@ enum UserValueType {
     VALUE_TYPE_DLOG_CURRENT_TIME,
     VALUE_TYPE_DLOG_TIME_DURATION,
     VALUE_TYPE_FILE_LENGTH,
+    VALUE_TYPE_FILE_DATE_TIME,
 };
 
 Value MakeValue(float value, Unit unit);

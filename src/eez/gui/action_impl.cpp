@@ -49,6 +49,7 @@
 #include <eez/modules/psu/gui/password.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/touch_calibration.h>
+#include <eez/modules/psu/gui/file_manager.h>
 
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
@@ -1132,8 +1133,12 @@ void action_show_file_manager() {
     showPage(PAGE_ID_FILE_MANAGER);
 }
 
-void action_file_select() {
-    showPage(PAGE_ID_FILE_MANAGER);
+void action_file_manager_go_to_parent_directory() {
+    file_manager::goToParentDirectory();
+}
+
+void action_file_manager_select_file() {
+    file_manager::selectFile(getFoundWidgetAtDown().cursor.i);
 }
 
 } // namespace gui

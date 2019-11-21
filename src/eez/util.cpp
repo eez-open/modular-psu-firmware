@@ -504,6 +504,16 @@ void replaceCharacter(char *str, char ch, char repl) {
     }
 }
 
+bool startsWith(const char *str, const char *prefix) {
+    if (!str || !prefix)
+        return false;
+    size_t strLen = strlen(str);
+    size_t prefixLen = strlen(prefix);
+    if (prefixLen > strLen)
+        return false;
+    return strncmp(str, prefix, prefixLen) == 0;
+}
+
 bool endsWith(const char *str, const char *suffix) {
     if (!str || !suffix)
         return false;

@@ -94,6 +94,7 @@ set(src_eez
 list (APPEND src_files ${src_eez})
 set(header_eez
     src/eez/debug.h
+    src/eez/file_type.h
     src/eez/index.h
     src/eez/scripting.h
     src/eez/sound.h
@@ -179,6 +180,7 @@ set(src_eez_modules_psu_gui
     src/eez/modules/psu/gui/edit_mode_keypad.cpp
     src/eez/modules/psu/gui/edit_mode_slider.cpp
     src/eez/modules/psu/gui/edit_mode_step.cpp
+    src/eez/modules/psu/gui/file_manager.cpp
     src/eez/modules/psu/gui/keypad.cpp
     src/eez/modules/psu/gui/numeric_keypad.cpp
     src/eez/modules/psu/gui/page_ch_settings_adv.cpp
@@ -201,6 +203,7 @@ set(header_eez_modules_psu_gui
     src/eez/modules/psu/gui/edit_mode_keypad.h
     src/eez/modules/psu/gui/edit_mode_slider.h
     src/eez/modules/psu/gui/edit_mode_step.h
+    src/eez/modules/psu/gui/file_manager.h
     src/eez/modules/psu/gui/keypad.h
     src/eez/modules/psu/gui/numeric_keypad.h
     src/eez/modules/psu/gui/page_ch_settings_adv.h

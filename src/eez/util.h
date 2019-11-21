@@ -113,6 +113,7 @@ bool parseTimeZone(const char *timeZoneStr, size_t timeZoneLength, int16_t &time
 
 void replaceCharacter(char *str, char ch, char repl);
 
+bool startsWith(const char *str, const char *prefix);
 bool endsWith(const char *str, const char *suffix);
 
 void formatBytes(uint32_t bytes, char *text, int count);

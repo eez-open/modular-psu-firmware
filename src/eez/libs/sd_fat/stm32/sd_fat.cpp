@@ -109,7 +109,7 @@ void Directory::close() {
 }
 
 SdFatResult Directory::findFirst(const char *path, const char *pattern, FileInfo &fileInfo) {
-    return (SdFatResult)f_findfirst(&m_dj, &fileInfo.m_fno, path, pattern);
+    return (SdFatResult)f_findfirst(&m_dj, &fileInfo.m_fno, path, pattern ? pattern : "*");
 }
 
 SdFatResult Directory::findFirst(const char *path, FileInfo &fileInfo) {

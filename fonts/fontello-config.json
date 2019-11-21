@@ -1,0 +1,28 @@
+{
+  "name": "fontello",
+  "css_prefix_text": "icon-",
+  "css_use_suffix": false,
+  "hinting": true,
+  "units_per_em": 1000,
+  "ascent": 850,
+  "glyphs": [
+    {
+      "uid": "040e72500c863813088c9f9c9415f8e9",
+      "css": "up",
+      "code": 59394,
+      "src": "mfglabs"
+    },
+    {
+      "uid": "35ce53990ec0892d7dcea2d0159f8dca",
+      "css": "hourglass",
+      "code": 59393,
+      "src": "mfglabs"
+    },
+    {
+      "uid": "08fcae555c22437a112411038ac28e16",
+      "css": "chart",
+      "code": 59392,
+      "src": "elusive"
+    }
+  ]
+}

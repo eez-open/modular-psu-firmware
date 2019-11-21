@@ -18,7 +18,7 @@
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
-#include <string>
+#include <stdio.h>
 #include <time.h>
 
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
@@ -103,7 +103,7 @@ bool FileInfo::isDirectory() {
     return m_ffd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY;
 #else
     struct stat stbuf;
-    stat(m_dirent->d_name, &stbuf);
+    stat((m_parentPath + "/" + m_dirent->d_name).c_str(), &stbuf);
     return S_ISDIR(stbuf.st_mode);
 #endif
 }
@@ -130,7 +130,7 @@ size_t FileInfo::getSize() {
     return (size_t)((m_ffd.nFileSizeHigh * ((uint64_t)MAXDWORD + 1)) + m_ffd.nFileSizeLow);
 #else
     struct stat stbuf;
-    stat(m_dirent->d_name, &stbuf);
+    stat((m_parentPath + "/" + m_dirent->d_name).c_str(), &stbuf);
     return stbuf.st_size;
 #endif
 }
@@ -146,6 +146,9 @@ struct tm *getGmTime(FileInfo &fileInfo) {
 
     mtime = ull.QuadPart / 10000000ULL - 11644473600ULL;
 #else
+    struct stat stbuf;
+    stat((fileInfo.m_parentPath + "/" + fileInfo.m_dirent->d_name).c_str(), &stbuf);
+    mtime = stbuf.st_mtime;
 #endif
 
     return gmtime(&mtime);
@@ -212,11 +215,19 @@ void Directory::close() {
 
 SdFatResult Directory::findFirst(const char *path, const char *pattern, FileInfo &fileInfo) {
     std::string temp = path;
+
     if (pattern) {
         temp += "/";
         temp += pattern;
     }
+#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
+    else {
+        temp += "/*.*";
+    }   
+#endif 
+
     temp = getRealPath(temp.c_str());
+
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
     m_handle = FindFirstFileA(temp.c_str(), &fileInfo.m_ffd);
     if (m_handle == INVALID_HANDLE_VALUE) {
@@ -234,6 +245,7 @@ SdFatResult Directory::findFirst(const char *path, const char *pattern, FileInfo
         // TODO check FatFs what he returns
         return SD_FAT_RESULT_NO_PATH;
     }
+    fileInfo.m_parentPath = temp;
     fileInfo.m_dirent = ep;
 #endif
     return SD_FAT_RESULT_OK;

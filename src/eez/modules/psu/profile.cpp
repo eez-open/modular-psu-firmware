@@ -50,14 +50,14 @@ bool g_profileDirty;
 
 #if OPTION_SD_CARD
 
-void getChannelProfileListFilePath(Channel &channel, int location, char *filePath) {
-    strcpy(filePath, PROFILES_DIR);
+static void getChannelProfileListFilePath(Channel &channel, int location, char *filePath) {
+    strcpy(filePath, LISTS_DIR);
     strcat(filePath, PATH_SEPARATOR);
-    strcat(filePath, "LST_");
+    strcat(filePath, "PROFILE_");
     strcatInt(filePath, channel.channelIndex + 1);
     strcat(filePath, "_");
     strcatInt(filePath, location);
-    strcat(filePath, LIST_FILE_EXTENSION);
+    strcat(filePath, LIST_EXT);
 }
 
 void loadProfileList(Parameters &profile, Channel &channel, int location) {

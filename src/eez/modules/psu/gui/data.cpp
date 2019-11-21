@@ -52,6 +52,7 @@
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/edit_mode_keypad.h>
 #include <eez/modules/psu/gui/edit_mode_step.h>
+#include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/page_ch_settings_adv.h>
 #include <eez/modules/psu/gui/page_ch_settings_protection.h>
@@ -731,6 +732,26 @@ void FILE_LENGTH_value_to_text(const Value &value, char *text, int count) {
     formatBytes(value.getUInt32(), text, count);
 }
 
+bool compare_FILE_DATE_TIME_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void FILE_DATE_TIME_value_to_text(const Value &value, char *text, int count) {
+    int year, month, day, hour, minute, second;
+    datetime::breakTime(value.getUInt32(), year, month, day, hour, minute, second);
+
+    int yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow;
+    datetime::breakTime(datetime::now(), yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow);
+
+    if (yearNow == year && monthNow == month && dayNow == day) {
+        snprintf(text, count - 1, "%02d:%02d:%02d", hour, minute, second);
+    } else {
+        snprintf(text, count - 1, "%02d-%02d-%02d", day, month, year % 100);
+    }
+
+    text[count - 1] = 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 } // namespace gui
@@ -780,7 +801,8 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_DLOG_VALUE_LABEL_value,
     compare_DLOG_CURRENT_TIME_value,
     compare_DLOG_TIME_DURATION_value,
-    compare_FILE_LENGTH_value
+    compare_FILE_LENGTH_value,
+    compare_FILE_DATE_TIME_value
 };
 
 ValueToTextFunction g_userValueToTextFunctions[] = { 
@@ -823,7 +845,8 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     DLOG_VALUE_LABEL_value_to_text,
     DLOG_CURRENT_TIME_value_to_text,
     DLOG_TIME_DURATION_value_to_text,
-    FILE_LENGTH_value_to_text
+    FILE_LENGTH_value_to_text,
+    FILE_DATE_TIME_value_to_text
 };
 
 } // namespace data
@@ -4444,23 +4467,75 @@ void data_dlog_value_cursor(data::DataOperationEnum operation, data::Cursor &cur
 #endif
 }
 
-void data_files(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_current_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::getCurrentDirectory();
+    }
 #endif
 }
 
-void data_file_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::getStatus();
+    }
 #endif
 }
 
-void data_file_size(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_is_root_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::isRootDirectory() ? 1 : 0;
+    }
 #endif
 }
 
-void data_file_date(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_files(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_COUNT) {
+        value = file_manager::getFilesCount();
+    }
+#endif
+}
+
+void data_file_manager_is_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::isDirectory(cursor.i) ? 1 : 0;
+    }
+#endif
+}
+
+void data_file_manager_file_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::getFileType(cursor.i);
+    }
+#endif
+}
+
+void data_file_manager_file_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::getFileName(cursor.i);
+    }
+#endif
+}
+
+void data_file_manager_file_size(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(file_manager::getFileSize(cursor.i), VALUE_TYPE_FILE_LENGTH);
+    }
+#endif
+}
+
+void data_file_manager_file_date_time(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(file_manager::getFileDataTime(cursor.i), VALUE_TYPE_FILE_DATE_TIME);
+    }
 #endif
 }
 

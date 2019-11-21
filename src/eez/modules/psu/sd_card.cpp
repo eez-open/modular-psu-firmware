@@ -18,6 +18,9 @@
 
 #if OPTION_SD_CARD
 
+#include <stdio.h>
+#include <string.h>
+
 #if defined(EEZ_PLATFORM_STM32)
 #include <gpio.h>
 #include <sdmmc.h>
@@ -61,14 +64,90 @@ int g_lastError;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void migrateProfileListsCallback(void *param, const char *name, FileType type, size_t size) {
+    if (startsWith(name, "LST_") && endsWith(name, ".CSV")) {
+        char srcFilePath[128];
+        sprintf(srcFilePath, "%s/%s", PROFILES_DIR, name);
+
+        char nameBaseStr[128] = { 0 };
+        strncpy(nameBaseStr, name + strlen("LST_"), strlen(name) - strlen("LST_") - strlen(".CSV"));
+
+        char dstFilePath[128];
+        sprintf(dstFilePath, "%s/PROFILE_%s.LIST", LISTS_DIR, nameBaseStr);
+
+        int err;
+        moveFile(srcFilePath, dstFilePath, &err);
+    }
+}
+
+void migrateCard() {
+    int err;
+
+    if (exists(LISTS_DIR, &err)) {
+        moveFile(LISTS_DIR, LISTS_DIR, &err);
+    }
+
+    if (exists(PROFILES_DIR, &err)) {
+        moveFile(PROFILES_DIR, PROFILES_DIR, &err);
+    }
+
+    if (exists(RECORDINGS_DIR, &err)) {
+        moveFile(RECORDINGS_DIR, RECORDINGS_DIR, &err);
+    }
+
+    if (exists(SCREENSHOTS_DIR, &err)) {
+        moveFile(SCREENSHOTS_DIR, SCREENSHOTS_DIR, &err);
+    }
+
+    int numFiles;
+    catalog(PROFILES_DIR, nullptr, migrateProfileListsCallback, &numFiles, &err);
+}
+
+bool prepareCard() {
+    int err;
+
+    if (!exists(LISTS_DIR, &err)) {
+        if (!makeDir(LISTS_DIR, &err)) {
+            return false;
+        }
+    }
+
+    if (!exists(PROFILES_DIR, &err)) {
+        if (!makeDir(PROFILES_DIR, &err)) {
+            return false;
+        }
+    }
+
+    if (!exists(RECORDINGS_DIR, &err)) {
+        if (!makeDir(RECORDINGS_DIR, &err)) {
+            return false;
+        }
+    }
+
+    if (!exists(SCREENSHOTS_DIR, &err)) {
+        if (!makeDir(SCREENSHOTS_DIR, &err)) {
+            return false;
+        }
+    }
+
+    migrateCard();
+    
+    return true;
+}
+
 void mount() {
 #if defined(EEZ_PLATFORM_STM32)
 	MX_FATFS_Init();
 #endif
 	if (SD.mount(&g_lastError)) {
-		g_mounted = true;
-		g_testResult = TEST_OK;
-		setQuesBits(QUES_MMEM, false);
+        g_mounted = true;
+        if (prepareCard()) {
+            g_testResult = TEST_OK;
+            setQuesBits(QUES_MMEM, false);
+        } else {
+            g_mounted = false;
+            g_testResult = TEST_FAILED;
+        }
 	} else {
 		g_testResult = TEST_FAILED;
 	}
@@ -254,7 +333,7 @@ bool exists(const char *dirPath, int *err) {
 }
 
 bool catalog(const char *dirPath, void *param,
-             void (*callback)(void *param, const char *name, const char *type, size_t size),
+             void (*callback)(void *param, const char *name, FileType type, size_t size),
              int *numFiles, int *err) {
     *numFiles = 0;
 
@@ -264,7 +343,7 @@ bool catalog(const char *dirPath, void *param,
 
     Directory dir;
     FileInfo fileInfo;
-    if (dir.findFirst(dirPath, "*", fileInfo) != SD_FAT_RESULT_OK) {
+    if (dir.findFirst(dirPath, nullptr, fileInfo) != SD_FAT_RESULT_OK) {
         // TODO better error handling
         if (err)
             *err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
@@ -277,15 +356,23 @@ bool catalog(const char *dirPath, void *param,
 
         if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0) {
             (*numFiles)++;
+
+            FileType type;
             if (fileInfo.isDirectory()) {
-                callback(param, name, "FOLD", fileInfo.getSize());
+                type = FILE_TYPE_DIRECTORY;
             } else if (endsWith(name, LIST_EXT)) {
-                callback(param, name, "LIST", fileInfo.getSize());
+                type = FILE_TYPE_LIST;
             } else if (endsWith(name, PROFILE_EXT)) {
-                callback(param, name, "PROF", fileInfo.getSize());
+                type = FILE_TYPE_PROFILE;
+            } else if (endsWith(name, ".dlog")) {
+                type = FILE_TYPE_DLOG;
+            } else if (endsWith(name, ".jpg")) {
+                type = FILE_TYPE_IMAGE;
             } else {
-                callback(param, name, "BIN", fileInfo.getSize());
+                type = FILE_TYPE_OTHER;
             }
+
+            callback(param != nullptr ? param : &fileInfo, name, type, fileInfo.getSize());
         }
 
         if (dir.findNext(fileInfo) != SD_FAT_RESULT_OK) {
@@ -305,7 +392,7 @@ bool catalogLength(const char *dirPath, size_t *length, int *err) {
 
     Directory dir;
     FileInfo fileInfo;
-    if (dir.findFirst(dirPath, "*", fileInfo) != SD_FAT_RESULT_OK) {
+    if (dir.findFirst(dirPath, nullptr, fileInfo) != SD_FAT_RESULT_OK) {
         // TODO better error handling
         if (err)
             *err = SCPI_ERROR_FILE_NAME_NOT_FOUND;

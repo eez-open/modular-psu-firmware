@@ -43,6 +43,7 @@
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/ontime.h>
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/file_manager.h>
 
 #include <eez/gui/data.h>
 #include <eez/gui/dialogs.h>
@@ -138,27 +139,15 @@ void oneIter() {
                 if (dlog::isExecuting()) {
                     dlog::abort();
                 } else {
-                    int err;
-                    if (!sd_card::exists("/recordings", &err)) {
-                        if (err != SCPI_ERROR_FILE_NAME_NOT_FOUND) {
-                            event_queue::pushEvent(err);
-                            return;
-                        } 
-
-                        if (!sd_card::makeDir("/recordings", &err)) {
-                            event_queue::pushEvent(err);
-                            return;
-                        }
-                    }
-
                     char filePath[40];
                     //uint8_t year, month, day, hour, minute, second;
                     //datetime::getDate(year, month, day);
                     //datetime::getTime(hour, minute, second);
-                    //sprintf(filePath, "/recordings/%d_%02d_%02d-%02d_%02d_%02d.dlog",
+                    //sprintf(filePath, "%s/%d_%02d_%02d-%02d_%02d_%02d.dlog",
+                    //    RECORDINGS_DIR,
                     //    (int)(year + 2000), (int)month, (int)day,
                     //    (int)hour, (int)minute, (int)second);
-                    sprintf(filePath, "/recordings/latest.dlog");
+                    sprintf(filePath, "%s/Latest.dlog", RECORDINGS_DIR);
 
                     dlog::g_nextOptions.logVoltage[0] = true;
                     dlog::g_nextOptions.logCurrent[0] = true;
@@ -184,7 +173,6 @@ void oneIter() {
 
                 sound::playShutter();
 
-#if !defined(__EMSCRIPTEN__)
                 const uint8_t *screenshotPixels = mcu::display::takeScreenshot();
 
                 unsigned char* imageData;
@@ -195,22 +183,12 @@ void oneIter() {
                     return;
                 }
 
-                int err;
-                if (!sd_card::exists("/screenshots", &err)) {
-                    if (err != SCPI_ERROR_FILE_NAME_NOT_FOUND) {
-                        event_queue::pushEvent(err);
-                        return;
-                    } else if (!sd_card::makeDir("/screenshots", &err)) {
-                        event_queue::pushEvent(err);
-                        return;
-                    }
-                }
-
                 char filePath[40];
                 uint8_t year, month, day, hour, minute, second;
                 datetime::getDate(year, month, day);
                 datetime::getTime(hour, minute, second);
-                sprintf(filePath, "/screenshots/%d_%02d_%02d-%02d_%02d_%02d.jpg",
+                sprintf(filePath, "%s/%d_%02d_%02d-%02d_%02d_%02d.jpg",
+                    SCREENSHOTS_DIR,
                     (int)(year + 2000), (int)month, (int)day,
                     (int)hour, (int)minute, (int)second);
 
@@ -224,17 +202,17 @@ void oneIter() {
                     	// success!
                     	event_queue::pushEvent(event_queue::EVENT_INFO_SCREENSHOT_SAVED);
                     } else {
+                        int err;
                         sd_card::deleteFile(filePath, &err);
                         event_queue::pushEvent(SCPI_ERROR_MASS_STORAGE_ERROR);
                     }
                 } else {
                     event_queue::pushEvent(SCPI_ERROR_FILE_NAME_NOT_FOUND);
                 }
-#else
                 event_queue::pushEvent(event_queue::EVENT_INFO_SCREENSHOT_SAVED);
-#endif // !__EMSCRIPTEN__
+            } else if (type == SCPI_QUEUE_MESSAGE_FILE_MANAGER_LOAD_DIRECTORY) {
+                file_manager::loadDirectory();
             }
-
 #endif // OPTION_SD_CARD
         }
     } else {

@@ -23,6 +23,7 @@
 
 #ifdef EEZ_PLATFORM_SIMULATOR
 #include <stdio.h>
+#include <string>
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -93,6 +94,7 @@ struct FileInfo {
 #elif defined(EEZ_PLATFORM_SIMULATOR_WIN32)
     WIN32_FIND_DATAA m_ffd;
 #else
+    std::string m_parentPath;
     struct dirent *m_dirent;
 #endif
 };

@@ -300,6 +300,32 @@ void animate() {
     }
 }
 
+void doTakeScreenshot() {
+    g_screenshotBuffer = new uint8_t[480 * 272 * 3];
+
+    uint8_t *src = (uint8_t *)(g_frontPanelBuffer + g_psuAppContext.y * g_frontPanelWidth + g_psuAppContext.x);
+    uint8_t *dst = g_screenshotBuffer;
+
+    int srcAdvance = (g_frontPanelWidth - 480) * 4;
+
+    for (int y = 0; y < 272; y++) {
+        for (int x = 0; x < 480; x++) {
+            uint8_t b = *src++;
+            uint8_t g = *src++;
+            uint8_t r = *src++;
+            src++;
+
+            *dst++ = r;
+            *dst++ = g;
+            *dst++ = b;
+        }
+        src += srcAdvance;
+    }
+
+    g_takeScreenshot = false;
+
+}
+
 void sync() {
     if (!isOn()) {
         return;
@@ -319,28 +345,7 @@ void sync() {
     }
 
     if (g_takeScreenshot) {
-        g_screenshotBuffer = new uint8_t[480 * 272 * 3];
-
-        uint8_t *src = (uint8_t *)(g_frontPanelBuffer + g_psuAppContext.y * g_frontPanelWidth + g_psuAppContext.x);
-        uint8_t *dst = g_screenshotBuffer;
-
-        int srcAdvance = (g_frontPanelWidth - 480) * 4;
-
-        for (int y = 0; y < 272; y++) {
-            for (int x = 0; x < 480; x++) {
-                uint8_t b = *src++;
-                uint8_t g = *src++;
-                uint8_t r = *src++;
-                src++;
-
-                *dst++ = r;
-                *dst++ = g;
-                *dst++ = b;
-            }
-            src += srcAdvance;
-        }
-
-    	g_takeScreenshot = false;
+        doTakeScreenshot();
     }
 
     if (g_painted) {
@@ -381,6 +386,11 @@ int getDisplayHeight() {
 
 const uint8_t *takeScreenshot() {
 	g_takeScreenshot = true;
+
+#ifdef __EMSCRIPTEN__
+    doTakeScreenshot();
+#endif
+
 	do {
 		osDelay(0);
 	} while (g_takeScreenshot);

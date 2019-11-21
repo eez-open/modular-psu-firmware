@@ -20,6 +20,8 @@
 
 //#include <eez/libs/sd_fat/sd_fat.h>
 
+#include <eez/file_type.h>
+
 namespace eez {
 
 class File;
@@ -55,7 +57,7 @@ bool makeParentDir(const char *filePath);
 
 bool exists(const char *dirPath, int *err);
 bool catalog(const char *dirPath, void *param,
-             void (*callback)(void *param, const char *name, const char *type, size_t size),
+             void (*callback)(void *param, const char *name, FileType type, size_t size),
 			 int *numFiles, int *err);
 bool catalogLength(const char *dirPath, size_t *length, int *err);
 bool upload(const char *filePath, void *param,
