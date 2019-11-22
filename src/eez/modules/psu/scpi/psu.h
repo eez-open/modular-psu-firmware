@@ -54,6 +54,8 @@ void resultChoiceName(scpi_t *context, scpi_choice_def_t *choice, int tag);
 
 void abortDownloading();
 
+bool mmemUpload(const char *filePath, scpi_t *context, int *err);
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

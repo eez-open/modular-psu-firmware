@@ -4494,7 +4494,15 @@ void data_file_manager_is_root_directory(data::DataOperationEnum operation, data
 void data_file_manager_files(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_COUNT) {
-        value = file_manager::getFilesCount();
+        value = (int)file_manager::getFilesCount();
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
+        value = Value(file_manager::getFilesCount(), VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
+        value = Value(file_manager::getFilesStartPosition(), VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
+        file_manager::setFilesStartPosition(value.getUInt32());
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+        value = Value(file_manager::FILES_PAGE_SIZE, VALUE_TYPE_UINT32);
     }
 #endif
 }
@@ -4518,7 +4526,7 @@ void data_file_manager_file_type(data::DataOperationEnum operation, data::Cursor
 void data_file_manager_file_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        value = file_manager::getFileName(cursor.i);
+        value = Value(file_manager::getFileName(cursor.i), VALUE_TYPE_STR, STRING_OPTIONS_FILE_ELLIPSIS);
     }
 #endif
 }
@@ -4535,6 +4543,38 @@ void data_file_manager_file_date_time(data::DataOperationEnum operation, data::C
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(file_manager::getFileDataTime(cursor.i), VALUE_TYPE_FILE_DATE_TIME);
+    }
+#endif
+}
+
+void data_file_manager_open_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::isOpenFileEnabled();
+    }
+#endif
+}
+
+void data_file_manager_upload_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::isUploadFileEnabled();
+    }
+#endif
+}
+
+void data_file_manager_rename_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::isRenameFileEnabled();
+    }
+#endif
+}
+
+void data_file_manager_delete_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::isDeleteFileEnabled();
     }
 #endif
 }

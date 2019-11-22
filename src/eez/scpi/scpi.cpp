@@ -209,9 +209,10 @@ void oneIter() {
                 } else {
                     event_queue::pushEvent(SCPI_ERROR_FILE_NAME_NOT_FOUND);
                 }
-                event_queue::pushEvent(event_queue::EVENT_INFO_SCREENSHOT_SAVED);
             } else if (type == SCPI_QUEUE_MESSAGE_FILE_MANAGER_LOAD_DIRECTORY) {
                 file_manager::loadDirectory();
+            } else if (type == SCPI_QUEUE_MESSAGE_FILE_MANAGER_UPLOAD_FILE) {
+                file_manager::uploadFile();
             }
 #endif // OPTION_SD_CARD
         }

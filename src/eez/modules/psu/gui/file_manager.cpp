@@ -18,23 +18,30 @@
 
 #if OPTION_SD_CARD
 
+#include <eez/modules/psu/psu.h>
+
 #include <string.h>
 
 #include <eez/system.h>
 
-#include <eez/libs/sd_fat/sd_fat.h>
+#include <eez/scpi/scpi.h>
 
-#include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/serial_psu.h>
+#if OPTION_ETHERNET
+#include <eez/modules/psu/ethernet.h>
+#endif
 #include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/datetime.h>
+#include <eez/modules/psu/scpi/psu.h>
+#include <eez/modules/psu/gui/file_manager.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/platform/stm32/defines.h>
 #endif
 
-#include <eez/scpi/scpi.h>
+#include <eez/libs/sd_fat/sd_fat.h>
 
 namespace eez {
 namespace gui {
@@ -62,7 +69,10 @@ struct FileItem {
 static uint8_t *g_frontBufferPosition;
 static uint8_t *g_backBufferPosition;
 
-int g_filesCount;
+uint32_t g_filesCount;
+uint32_t g_filesStartPosition;
+
+uint32_t g_selectedFileIndex;
 
 void catalogCallback(void *param, const char *name, FileType type, size_t size) {
     auto fileInfo = (FileInfo *)param;
@@ -123,6 +133,8 @@ void loadDirectory() {
     int err;
     psu::sd_card::catalog(g_currentDirectory, 0, catalogCallback, &numFiles, &err);
 
+    g_filesStartPosition = 0;
+
     g_loading = 2;
 }
 
@@ -130,7 +142,7 @@ const char *getCurrentDirectory() {
     return *g_currentDirectory == 0 ? "/<Root directory>" : g_currentDirectory;
 }
 
-static FileItem *getFileItem(int fileIndex) {
+static FileItem *getFileItem(uint32_t fileIndex) {
     if (g_loading != 2) {
         return nullptr;
     }
@@ -178,36 +190,51 @@ void goToParentDirectory() {
     loadDirectory();
 }
 
-int getFilesCount() {
+uint32_t getFilesCount() {
     return g_filesCount;
 }
 
-bool isDirectory(int fileIndex) {
+uint32_t getFilesStartPosition() {
+    return g_filesStartPosition;
+}
+
+void setFilesStartPosition(uint32_t position) {
+    g_filesStartPosition = position;
+    if (g_filesStartPosition + FILES_PAGE_SIZE > getFilesCount()) {
+        if (getFilesCount() > FILES_PAGE_SIZE) {
+            g_filesStartPosition = getFilesCount() - FILES_PAGE_SIZE;
+        } else {
+            g_filesStartPosition = 0;
+        }
+    }
+}
+
+bool isDirectory(uint32_t fileIndex) {
     auto fileItem = getFileItem(fileIndex);
     return fileItem ? fileItem->type == FILE_TYPE_DIRECTORY : false;
 }
 
-FileType getFileType(int fileIndex) {
+FileType getFileType(uint32_t fileIndex) {
     auto fileItem = getFileItem(fileIndex);
     return fileItem ? fileItem->type : FILE_TYPE_OTHER;
 }
 
-const char *getFileName(int fileIndex) {
+const char *getFileName(uint32_t fileIndex) {
     auto fileItem = getFileItem(fileIndex);
     return fileItem ? fileItem->name : "";
 }
 
-const uint32_t getFileSize(int fileIndex) {
+const uint32_t getFileSize(uint32_t fileIndex) {
     auto fileItem = getFileItem(fileIndex);
     return fileItem ? fileItem->size : 0;
 }
 
-const uint32_t getFileDataTime(int fileIndex) {
+const uint32_t getFileDataTime(uint32_t fileIndex) {
     auto fileItem = getFileItem(fileIndex);
     return fileItem ? fileItem->dateTime : 0;
 }
 
-void selectFile(int fileIndex) {
+void selectFile(uint32_t fileIndex) {
     if (g_loading != 2) {
         return;
     }
@@ -219,7 +246,93 @@ void selectFile(int fileIndex) {
             strcat(g_currentDirectory, fileItem->name);
             loadDirectory();
         }
+    } else {
+        g_selectedFileIndex = fileIndex;
+        pushPage(PAGE_ID_FILE_MENU);
     }
+}
+
+bool isOpenFileEnabled() {
+    return false;
+}
+
+void openFile() {
+}
+
+bool isUploadFileEnabled() {
+#if !defined(EEZ_PLATFORM_SIMULATOR)
+    if (psu::serial::isConnected()) {
+        return true;
+    }
+#endif
+
+#if OPTION_ETHERNET
+    if (psu::ethernet::isConnected()) {
+        return true;
+    }
+#endif
+    return false;
+}
+
+void uploadFile() {
+    if (osThreadGetId() != scpi::g_scpiTaskHandle) {
+        popPage();
+        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FILE_MANAGER_UPLOAD_FILE, 0), osWaitForever);
+        return;
+    }
+
+    auto fileItem = getFileItem(g_selectedFileIndex);
+    if (!fileItem) {
+        return;
+    }
+
+    scpi_t *context = nullptr;
+
+#if !defined(EEZ_PLATFORM_SIMULATOR)
+    if (psu::serial::isConnected()) {
+        context = &psu::serial::g_scpiContext;
+    }
+#endif
+
+#if OPTION_ETHERNET
+    if (!context && psu::ethernet::isConnected()) {
+        context = &psu::ethernet::g_scpiContext;
+    }
+#endif
+
+    if (!context) {
+        return;
+    }
+
+    char filePath[MAX_PATH_LENGTH + 1];
+    strcpy(filePath, g_currentDirectory);
+    strcat(filePath, "/");
+    strcat(filePath, fileItem->name);
+
+    int err;
+    psu::scpi::mmemUpload(filePath, context, &err);
+}
+
+bool isRenameFileEnabled() {
+    return false;
+}
+
+void renameFile() {
+}
+
+bool isDeleteFileEnabled() {
+    return false;
+}
+
+void deleteFile() {
+}
+
+void onEncoder(int counter) {
+    int32_t newPosition = getFilesStartPosition() + counter;
+    if (newPosition < 0) {
+        newPosition = 0;
+    }
+    setFilesStartPosition(newPosition);
 }
 
 }

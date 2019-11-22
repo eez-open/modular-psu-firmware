@@ -250,6 +250,15 @@ static int8_t measureGlyph(uint8_t encoding) {
     return glyph.dx;
 }
 
+int8_t measureGlyph(uint8_t encoding, gui::font::Font &font) {
+    gui::font::Glyph glyph;
+    font.getGlyph(encoding, glyph);
+    if (!glyph)
+        return 0;
+
+    return glyph.dx;
+}
+
 int measureStr(const char *text, int textLength, gui::font::Font &font, int max_width) {
     g_font = font;
 

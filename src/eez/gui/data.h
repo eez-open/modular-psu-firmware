@@ -74,6 +74,8 @@ struct PairOfUint8Value {
 
 typedef uint8_t ValueType;
 
+#define STRING_OPTIONS_FILE_ELLIPSIS 1
+
 struct Value {
   public:
     Value() 
@@ -124,6 +126,11 @@ struct Value {
 
     Value(float value, ValueType type)
         : type_(type), options_(0), unit_(UNIT_UNKNOWN), float_(value)
+    {
+    }
+
+    Value(const char *value, ValueType type, int16_t options)
+        : type_(type), options_(options), unit_(UNIT_UNKNOWN), str_(value)
     {
     }
 
@@ -220,6 +227,10 @@ struct Value {
     }
 
     void toText(char *text, int count) const;
+
+    uint16_t getOptions() const {
+        return options_;
+    }
 
   public:
     ValueType type_;

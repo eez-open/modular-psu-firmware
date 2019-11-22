@@ -18,12 +18,15 @@
 
 #if OPTION_DISPLAY
 
+#include <string.h>
+
 #include <eez/gui/widgets/text.h>
 
 #include <eez/gui/draw.h>
 #include <eez/gui/gui.h>
 #include <eez/gui/app_context.h>
 #include <eez/util.h>
+#include <eez/modules/mcu/display.h>
 
 namespace eez {
 namespace gui {
@@ -68,11 +71,61 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                 ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
         } else if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
-                drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,
-                    widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                    widgetCursor.currentState->flags.active,
-                    widgetCursor.currentState->flags.blinking,
-                    ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
+                if (widgetCursor.currentState->data.getOptions() & STRING_OPTIONS_FILE_ELLIPSIS) {
+                    const char *fullText = widgetCursor.currentState->data.getString();
+                    int fullTextLength = strlen(fullText);
+                    font::Font font = styleGetFont(style);
+                    int fullTextWidth = mcu::display::measureStr(fullText, fullTextLength, font);
+                    if (fullTextWidth <= widget->w) {
+                        drawText(fullText, fullTextLength, widgetCursor.x,
+                            widgetCursor.y, (int)widget->w, (int)widget->h, style,
+                            widgetCursor.currentState->flags.active,
+                            widgetCursor.currentState->flags.blinking,
+                            ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
+
+                    } else {
+                        char text[64];
+                        int ellipsisWidth = mcu::display::measureStr("...", 3, font);
+                        int width = ellipsisWidth;
+                        int textLength = 3;
+                        int iLeft = 0;
+                        int iRight = strlen(fullText) - 1;
+                        while (iLeft < iRight && textLength < 64) {
+                            int widthLeft = mcu::display::measureGlyph(fullText[iLeft], font);
+                            if (width + widthLeft > widget->w) {
+                                break;
+                            }
+                            width += widthLeft;
+                            iLeft++;
+                            textLength++;
+
+                            int widthRight = mcu::display::measureGlyph(fullText[iRight], font);
+                            if (width + widthRight > widget->w) {
+                                break;
+                            }
+                            width += widthRight;
+                            iRight--;
+                            textLength++;
+                        }
+
+                        strncpy(text, fullText, iLeft);
+                        strcpy(text + iLeft, "...");
+                        strcpy(text + iLeft + 3, fullText + iRight + 1);
+
+                        drawText(text, textLength, widgetCursor.x,
+                            widgetCursor.y, (int)widget->w, (int)widget->h, style,
+                            widgetCursor.currentState->flags.active,
+                            widgetCursor.currentState->flags.blinking,
+                            ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
+                    }
+
+                } else {
+                    drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,
+                        widgetCursor.y, (int)widget->w, (int)widget->h, style,
+                        widgetCursor.currentState->flags.active,
+                        widgetCursor.currentState->flags.blinking,
+                        ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
+                }
             } else {
                 char text[64];
                 widgetCursor.currentState->data.toText(text, sizeof(text));

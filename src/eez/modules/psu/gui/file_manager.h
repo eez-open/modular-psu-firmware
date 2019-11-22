@@ -26,18 +26,32 @@ namespace eez {
 namespace gui {
 namespace file_manager {
 
+static const uint32_t FILES_PAGE_SIZE = 6;
+
 void loadDirectory();
 const char *getCurrentDirectory();
 int getStatus();
 bool isRootDirectory();
 void goToParentDirectory();
-int getFilesCount();
-bool isDirectory(int fileIndex);
-FileType getFileType(int fileIndex);
-const char *getFileName(int fileIndex);
-const uint32_t getFileSize(int fileIndex);
-const uint32_t getFileDataTime(int fileIndex);
-void selectFile(int fileIndex);
+uint32_t getFilesCount();
+uint32_t getFilesStartPosition();
+void setFilesStartPosition(uint32_t position);
+bool isDirectory(uint32_t fileIndex);
+FileType getFileType(uint32_t fileIndex);
+const char *getFileName(uint32_t fileIndex);
+const uint32_t getFileSize(uint32_t fileIndex);
+const uint32_t getFileDataTime(uint32_t fileIndex);
+void selectFile(uint32_t fileIndex);
+bool isOpenFileEnabled();
+void openFile();
+bool isUploadFileEnabled();
+void uploadFile();
+bool isRenameFileEnabled();
+void renameFile();
+bool isDeleteFileEnabled();
+void deleteFile();
+
+void onEncoder(int couter);
 
 } // namespace file_manager
 } // namespace gui

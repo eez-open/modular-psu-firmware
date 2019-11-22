@@ -969,10 +969,6 @@ void action_test() {
     infoMessage("Hello, world!");
 }
 
-void action_show_scripts() {
-    pushPage(PAGE_ID_SCRIPTS);
-}
-
 void action_start_script() {
     // TODO
 }
@@ -1130,15 +1126,45 @@ void action_show_recordings_view() {
 }
 
 void action_show_file_manager() {
+#if OPTION_SD_CARD
     showPage(PAGE_ID_FILE_MANAGER);
+#endif
 }
 
 void action_file_manager_go_to_parent_directory() {
+#if OPTION_SD_CARD
     file_manager::goToParentDirectory();
+#endif
 }
 
 void action_file_manager_select_file() {
+#if OPTION_SD_CARD
     file_manager::selectFile(getFoundWidgetAtDown().cursor.i);
+#endif
+}
+
+void action_file_manager_open_file() {
+#if OPTION_SD_CARD
+    file_manager::openFile();
+#endif
+}
+
+void action_file_manager_upload_file() {
+#if OPTION_SD_CARD
+    file_manager::uploadFile();
+#endif
+}
+
+void action_file_manager_rename_file() {
+#if OPTION_SD_CARD
+    file_manager::renameFile();
+#endif
+}
+
+void action_file_manager_delete_file() {
+#if OPTION_SD_CARD
+    file_manager::deleteFile();
+#endif
 }
 
 } // namespace gui

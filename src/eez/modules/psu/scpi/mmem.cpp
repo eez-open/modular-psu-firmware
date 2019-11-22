@@ -230,6 +230,11 @@ void uploadCallback(void *param, const void *buffer, int size) {
 
     osDelay(0);
 }
+
+bool mmemUpload(const char *filePath, scpi_t *context, int *err) {
+    return sd_card::upload(filePath, context, uploadCallback, err);
+}
+
 #endif
 
 scpi_result_t scpi_cmd_mmemoryUploadQ(scpi_t *context) {
@@ -241,7 +246,7 @@ scpi_result_t scpi_cmd_mmemoryUploadQ(scpi_t *context) {
     }
 
     int err;
-    if (!sd_card::upload(filePath, context, uploadCallback, &err)) {
+    if (!mmemUpload(filePath, context, &err)) {
         if (err != SCPI_ERROR_FILE_TRANSFER_ABORTED) {
             event_queue::pushEvent(event_queue::EVENT_ERROR_FILE_UPLOAD_FAILED);
         }

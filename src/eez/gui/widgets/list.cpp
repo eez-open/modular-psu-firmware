@@ -56,6 +56,8 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
     const ListWidget *listWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ListWidget *);
 
+    int startPosition = data::ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+
     const Widget *childWidget = GET_WIDGET_PROPERTY(listWidget, itemWidget, const Widget *);
     widgetCursor.widget = childWidget;
 
@@ -67,7 +69,7 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
     Value oldValue;
 
-    for (int index = 0; index < count; ++index) {
+    for (int index = startPosition; index < count; ++index) {
         data::select(widgetCursor.cursor, parentWidget->data, index, oldValue);
 
         if (listWidget->listType == LIST_TYPE_VERTICAL) {

@@ -40,9 +40,9 @@ static int g_thumbOffset;
 
 #if OPTION_SDRAM
 void ScrollBarWidget_fixPointers(Widget *widget) {
-    ScrollBarWidget *upDownWidget = (ScrollBarWidget *)widget->specific;
-    upDownWidget->leftButtonText = (const char *)((uint8_t *)g_document + (uint32_t)upDownWidget->leftButtonText);
-    upDownWidget->rightButtonText = (const char *)((uint8_t *)g_document + (uint32_t)upDownWidget->rightButtonText);
+    ScrollBarWidget *scrollBarWidget = (ScrollBarWidget *)widget->specific;
+    scrollBarWidget->leftButtonText = (const char *)((uint8_t *)g_document + (uint32_t)scrollBarWidget->leftButtonText);
+    scrollBarWidget->rightButtonText = (const char *)((uint8_t *)g_document + (uint32_t)scrollBarWidget->rightButtonText);
 }
 #endif
 
@@ -60,7 +60,7 @@ int getPageSize(const WidgetCursor &widgetCursor) {
 
 bool setPosition(const WidgetCursor &widgetCursor, int position) {
     int oldPosition = getPosition(widgetCursor);
-    data::ytDataSetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data, position);
+    data::ytDataSetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data, position < 0 ? 0 : position);
     int newPosition = getPosition(widgetCursor);
     return newPosition != oldPosition;
 }
@@ -103,31 +103,60 @@ void ScrollBarWidget_draw(const WidgetCursor &widgetCursor) {
     if (refresh) {
         if (currentState->pageSize < currentState->size) {
             const Style *buttonsStyle = getStyle(scrollBarWidget->buttonsStyle);
-            font::Font buttonsFont = styleGetFont(buttonsStyle);
-            int buttonWidth = buttonsFont.getHeight();
+            auto isHorizontal = widget->w > widget->h;
+
+            int buttonSize = isHorizontal ? widget->h : widget->w;
 
             // draw left button
-            drawText(GET_WIDGET_PROPERTY(scrollBarWidget, leftButtonText, const char *), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h, buttonsStyle, currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
+            drawText(GET_WIDGET_PROPERTY(scrollBarWidget, leftButtonText, const char *), -1, 
+                widgetCursor.x, 
+                widgetCursor.y, 
+                isHorizontal ? buttonSize : (int)widget->w, 
+                isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
+                currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
 
             // draw track
-            int xTrack = widgetCursor.x + buttonWidth;
-            int yTrack = widgetCursor.y;
-            int wTrack = widget->w - 2 * buttonWidth;
-            int hTrack = widget->h;
+            int xTrack;
+            int yTrack;
+            int wTrack;
+            int hTrack;
+
+            if (isHorizontal) {
+                xTrack = widgetCursor.x + buttonSize;
+                yTrack = widgetCursor.y;
+                wTrack = widget->w - 2 * buttonSize;
+                hTrack = widget->h;
+            } else {
+                xTrack = widgetCursor.x;
+                yTrack = widgetCursor.y + buttonSize;
+                wTrack = widget->w;
+                hTrack = widget->h - 2 * buttonSize;
+            }
 
             const Style *trackStyle = getStyle(widget->style);
             display::setColor(trackStyle->color);
             display::fillRect(xTrack, yTrack, xTrack + wTrack - 1, yTrack + hTrack - 1, 0);
 
             // draw thumb
-            int xThumb, wThumb;
-            getThumbGeometry(currentState->size, currentState->position, currentState->pageSize, xTrack, wTrack, buttonWidth, xThumb, wThumb);
             const Style *thumbStyle = getStyle(scrollBarWidget->thumbStyle);
             display::setColor(thumbStyle->color);
-            display::fillRect(xThumb, yTrack, xThumb + wThumb - 1, yTrack + hTrack - 1);
+            if (isHorizontal) {
+                int xThumb, wThumb;
+                getThumbGeometry(currentState->size, currentState->position, currentState->pageSize, xTrack, wTrack, buttonSize, xThumb, wThumb);
+                display::fillRect(xThumb, yTrack, xThumb + wThumb - 1, yTrack + hTrack - 1);
+            } else {
+                int yThumb, hThumb;
+                getThumbGeometry(currentState->size, currentState->position, currentState->pageSize, yTrack, hTrack, buttonSize, yThumb, hThumb);
+                display::fillRect(xTrack, yThumb, xTrack + wTrack - 1, yThumb + hThumb - 1);
+            }
 
             // draw right button
-            drawText(GET_WIDGET_PROPERTY(scrollBarWidget, rightButtonText, const char *), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y, buttonWidth, (int)widget->h, buttonsStyle, currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
+            drawText(GET_WIDGET_PROPERTY(scrollBarWidget, rightButtonText, const char *), -1, 
+                isHorizontal ? widgetCursor.x + widget->w - buttonSize : widgetCursor.x, 
+                isHorizontal ? widgetCursor.y : widgetCursor.y + widget->h - buttonSize, 
+                isHorizontal ? buttonSize : (int)widget->w, 
+                isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
+                currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
         } else {
             // scroll bar is hidden
             const Style *trackStyle = getStyle(widget->style);
@@ -144,6 +173,23 @@ void ScrollBarWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
     if (size > pageSize) {
         const Widget *widget = widgetCursor.widget;
 
+        auto isHorizontal = widget->w > widget->h;
+        int buttonSize = isHorizontal ? widget->h : widget->w;
+
+        int xTrack;
+        int wTrack;
+        int x;
+
+        if (isHorizontal) {
+            x = touchEvent.x;
+            xTrack = widgetCursor.x + buttonSize;
+            wTrack = widget->w - 2 * buttonSize;
+        } else {
+            x = touchEvent.y;
+            xTrack = widgetCursor.y + buttonSize;
+            wTrack = widget->h - 2 * buttonSize;
+        }
+
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
             if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                 g_selectedWidget = widgetCursor;
@@ -154,19 +200,14 @@ void ScrollBarWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
                 return;
             }
 
-            const ScrollBarWidget *scrollBarWidget = GET_WIDGET_PROPERTY(widget, specific, const ScrollBarWidget *);
-            const Style *buttonsStyle = getStyle(scrollBarWidget->buttonsStyle);
-            font::Font buttonsFont = styleGetFont(buttonsStyle);
-            int buttonWidth = buttonsFont.getHeight();
-
-            if (touchEvent.x < widgetCursor.x + buttonWidth) {
+            if ((isHorizontal && touchEvent.x < widgetCursor.x + buttonSize) || (!isHorizontal && touchEvent.y < widgetCursor.y + buttonSize)) {
                 if (setPosition(widgetCursor, getPosition(widgetCursor) - 1)) {
                     g_segment = SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON;
                     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                         sound::playClick();
                     }
                 }
-            } else if (touchEvent.x >= widgetCursor.x + widget->w - buttonWidth) {
+            } else if ((isHorizontal && (touchEvent.x >= widgetCursor.x + widget->w - buttonSize)) || (!isHorizontal && (touchEvent.y >= widgetCursor.y + widget->h - buttonSize))) {
                 if (setPosition(widgetCursor, getPosition(widgetCursor) + 1)) {
                     g_segment = SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON;
                     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
@@ -174,47 +215,36 @@ void ScrollBarWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
                     }
                 }
             } else {
-                int xTrack = widgetCursor.x + buttonWidth;
-                int wTrack = widget->w - 2 * buttonWidth;
-
+                int xThumb, wThumb;
+                
                 int position = getPosition(widgetCursor);
 
-                int xThumb, wThumb;
-                getThumbGeometry(size, position, pageSize, xTrack, wTrack, buttonWidth, xThumb, wThumb);
+                getThumbGeometry(size, position, pageSize, xTrack, wTrack, buttonSize, xThumb, wThumb);
 
-                if (touchEvent.x < xThumb) {
+                if (x < xThumb) {
                     if (setPosition(widgetCursor, getPosition(widgetCursor) - pageSize)) {
                         g_segment = SCROLL_BAR_WIDGET_SEGMENT_TRACK_LEFT;
                         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                             sound::playClick();
                         }
                     }
-                } else if (touchEvent.x >= xThumb + wThumb) {
+                } else if (x >= xThumb + wThumb) {
                     if (setPosition(widgetCursor, getPosition(widgetCursor) + pageSize)) {
                         g_segment = SCROLL_BAR_WIDGET_SEGMENT_TRACK_RIGHT;
                         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                             sound::playClick();
                         }
                     }
-                } else if (touchEvent.x >= xThumb || touchEvent.x < xThumb + wThumb) {
+                } else if (x >= xThumb || touchEvent.x < xThumb + wThumb) {
                     g_segment = SCROLL_BAR_WIDGET_SEGMENT_THUMB;
-                    g_thumbOffset = xThumb - touchEvent.x;
+                    g_thumbOffset = xThumb - x;
 
                 }
             }
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
             if (g_segment == SCROLL_BAR_WIDGET_SEGMENT_THUMB) {
-                const ScrollBarWidget *scrollBarWidget = GET_WIDGET_PROPERTY(widget, specific, const ScrollBarWidget *);
-                const Style *buttonsStyle = getStyle(scrollBarWidget->buttonsStyle);
-                font::Font buttonsFont = styleGetFont(buttonsStyle);
-                int buttonWidth = buttonsFont.getHeight();
-
-                int xTrack = widgetCursor.x + buttonWidth;
-                int wTrack = widget->w - 2 * buttonWidth;
-
                 int size = getSize(widgetCursor);
-
-                setPosition(widgetCursor, getPositionFromThumbPosition(touchEvent.x + g_thumbOffset, size, xTrack, wTrack));
+                setPosition(widgetCursor, getPositionFromThumbPosition(x + g_thumbOffset, size, xTrack, wTrack));
             }
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
             g_selectedWidget = 0;

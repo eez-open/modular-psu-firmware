@@ -40,6 +40,7 @@
 #include <eez/modules/psu/gui/page_user_profiles.h>
 #include <eez/modules/psu/gui/password.h>
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/idle.h>
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/trigger.h>
@@ -1050,6 +1051,11 @@ void onEncoder(int counter, bool clicked) {
 
         if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
             edit_mode_step::onEncoder(counter);
+            return;
+        }
+
+        if (activePageId == PAGE_ID_FILE_MANAGER) {
+            file_manager::onEncoder(counter);
             return;
         }
 
