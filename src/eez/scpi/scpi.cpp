@@ -140,32 +140,7 @@ void oneIter() {
                 if (dlog_record::isExecuting()) {
                     dlog_record::abort();
                 } else {
-                    char filePath[40];
-
-                    uint8_t year, month, day, hour, minute, second;
-                    datetime::getDate(year, month, day);
-                    datetime::getTime(hour, minute, second);
-                    sprintf(filePath, "%s/%d_%02d_%02d-%02d_%02d_%02d.dlog",
-                       RECORDINGS_DIR,
-                       (int)(year + 2000), (int)month, (int)day,
-                       (int)hour, (int)minute, (int)second);
-
-                    //sprintf(filePath, "%s/Latest.dlog", RECORDINGS_DIR);
-
-                    dlog_record::g_nextOptions.logVoltage[0] = true;
-                    dlog_record::g_nextOptions.logCurrent[0] = true;
-                    dlog_record::g_nextOptions.logPower[0] = false;
-                    for (int i = 1; i < CH_MAX; i++) {
-                        dlog_record::g_nextOptions.logVoltage[i] = false;
-                        dlog_record::g_nextOptions.logCurrent[i] = false;
-                        dlog_record::g_nextOptions.logPower[i] = false;
-                    }
-                    dlog_record::g_nextOptions.period = dlog_record::PERIOD_MIN;
-                    dlog_record::g_nextOptions.time = dlog_record::TIME_MAX;
-
-                    dlog_record::g_triggerSource = trigger::SOURCE_IMMEDIATE;
-
-                    dlog_record::initiate(filePath);
+                    dlog_record::initiate();
                 }
             } else if (type == SCPI_QUEUE_MESSAGE_DLOG_SHOW_FILE) {
                 eez::psu::dlog_view::openFile(nullptr);

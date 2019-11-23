@@ -126,7 +126,7 @@ void loadBlock() {
 
 void stateManagment() {
     auto isExecuting = dlog_record::isExecuting();
-    if (!isExecuting && g_wasExecuting && g_showLatest && gui::getActivePageId() == gui::PAGE_ID_RECORDINGS_VIEW) {
+    if (!isExecuting && g_wasExecuting && g_showLatest && gui::getActivePageId() == gui::PAGE_ID_DLOG_VIEW) {
         openFile(dlog_record::getLatestFilePath());
     }
     g_wasExecuting = isExecuting;
@@ -194,8 +194,8 @@ void openFile(const char *filePath) {
                 float duration = readFloat(buffer, &offset);
                 uint32_t startTime = readUint32(buffer, &offset);
 
-                g_recording.lastOptions.period = period;
-                g_recording.lastOptions.time = duration;
+                g_recording.parameters.period = period;
+                g_recording.parameters.time = duration;
 
                 g_recording.totalDlogValues = 0;
                 g_recording.numVisibleDlogValues = 0;
@@ -204,7 +204,7 @@ void openFile(const char *filePath) {
                     if (columns & (1 << (4 * iChannel))) {
                         ++g_recording.totalDlogValues;
 
-                        g_recording.lastOptions.logVoltage[iChannel] = 1;
+                        g_recording.parameters.logVoltage[iChannel] = 1;
 
                         if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
                             g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * g_recording.numVisibleDlogValues + dlog_view::DLOG_VALUE_CH1_U);
@@ -222,7 +222,7 @@ void openFile(const char *filePath) {
                     if (columns & (2 << (4 * iChannel))) {
                         ++g_recording.totalDlogValues;
 
-                        g_recording.lastOptions.logCurrent[iChannel] = 1;
+                        g_recording.parameters.logCurrent[iChannel] = 1;
 
                         if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
                             g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * g_recording.numVisibleDlogValues + dlog_view::DLOG_VALUE_CH1_I);
@@ -240,7 +240,7 @@ void openFile(const char *filePath) {
                     if (columns & (4 << (4 * iChannel))) {
                         ++g_recording.totalDlogValues;
 
-                        g_recording.lastOptions.logPower[iChannel] = 1;
+                        g_recording.parameters.logPower[iChannel] = 1;
 
                         if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
                             g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * g_recording.numVisibleDlogValues + dlog_view::DLOG_VALUE_CH1_P);

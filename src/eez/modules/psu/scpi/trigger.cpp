@@ -216,7 +216,7 @@ scpi_result_t scpi_cmd_triggerDlogSource(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog_record::g_triggerSource = (trigger::Source)source;
+    dlog_record::g_parameters.triggerSource = (trigger::Source)source;
 
     if (source == trigger::SOURCE_PIN1) {
         persist_conf::setIoPinFunction(0, io_pins::FUNCTION_TINPUT);
@@ -236,7 +236,7 @@ scpi_result_t scpi_cmd_triggerDlogSource(scpi_t *context) {
 scpi_result_t scpi_cmd_triggerDlogSourceQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
-    resultChoiceName(context, sourceChoice, dlog_record::g_triggerSource);
+    resultChoiceName(context, sourceChoice, dlog_record::g_parameters.triggerSource);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

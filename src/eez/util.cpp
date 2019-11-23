@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <string.h>
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -539,6 +540,14 @@ void formatBytes(uint32_t bytes, char *text, int count) {
     float g = roundf((bytes / powf(c, (float)f)) * 100) / 100;
 
     snprintf(text, count - 1, "%g %s", g, e[f]);
+}
+
+int strcicmp(char const *a, char const *b) {
+    for (;; a++, b++) {
+        int d = tolower((unsigned char)*a) - tolower((unsigned char)*b);
+        if (d != 0 || !*a)
+            return d;
+    }
 }
 
 } // namespace eez

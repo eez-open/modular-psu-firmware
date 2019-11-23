@@ -34,7 +34,18 @@ enum State {
     STATE_READY
 };
 
+enum SortBy {
+    SORT_BY_NAME_ASC,
+    SORT_BY_NAME_DESC,
+    SORT_BY_SIZE_ASC,
+    SORT_BY_SIZE_DESC,
+    SORT_BY_TIME_ASC,
+    SORT_BY_TIME_DESC
+};
+
 void loadDirectory();
+SortBy getSortBy();
+void setSortBy(SortBy sortBy);
 const char *getCurrentDirectory();
 State getState();
 bool isRootDirectory();

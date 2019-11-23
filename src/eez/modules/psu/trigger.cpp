@@ -125,7 +125,7 @@ int generateTrigger(Source source, bool checkImmediatelly) {
     bool seqTriggered = persist_conf::devConf.triggerSource == source && g_state == STATE_INITIATED;
 
 #if OPTION_SD_CARD
-    bool dlogTriggered = dlog_record::g_triggerSource == source && dlog_record::isInitiated();
+    bool dlogTriggered = dlog_record::g_parameters.triggerSource == source && dlog_record::isInitiated();
 #endif
 
     if (!seqTriggered) {

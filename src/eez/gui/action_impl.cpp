@@ -18,6 +18,8 @@
 
 #if OPTION_DISPLAY
 
+#include <stdio.h>
+
 #include <eez/system.h>
 
 #include <eez/gui/dialogs.h>
@@ -37,6 +39,7 @@
 
 #include <eez/modules/psu/gui/animations.h>
 #include <eez/modules/psu/gui/calibration.h>
+#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/edit_mode_keypad.h>
 #include <eez/modules/psu/gui/edit_mode_step.h>
@@ -1115,6 +1118,42 @@ void action_front_panel_select_slot3() {
 void action_drag_overlay() {
 }
 
+void action_show_dlog_params() {
+#if OPTION_SD_CARD
+    pushPage(PAGE_ID_DLOG_PARAMS);
+#endif
+}
+
+void action_dlog_voltage_toggle() {
+    dlog_record::g_parameters.logVoltage[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_parameters.logVoltage[getFoundWidgetAtDown().cursor.i];
+}
+
+void action_dlog_current_toggle() {
+    dlog_record::g_parameters.logCurrent[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_parameters.logCurrent[getFoundWidgetAtDown().cursor.i];
+}
+
+void action_dlog_power_toggle() {
+    dlog_record::g_parameters.logPower[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_parameters.logPower[getFoundWidgetAtDown().cursor.i];
+}
+
+void action_dlog_edit_period() {
+    editValue(DATA_ID_DLOG_PERIOD);
+}
+
+void action_dlog_edit_duration() {
+    editValue(DATA_ID_DLOG_DURATION);
+}
+
+void action_dlog_edit_file_name() {
+    editValue(DATA_ID_DLOG_FILE_NAME);
+}
+
+void action_dlog_toggle_append_time() {
+#if OPTION_SD_CARD
+    dlog_record::g_guiParameters.appendTime = !dlog_record::g_guiParameters.appendTime;
+#endif
+}
+
 void action_dlog_toggle() {
 #if OPTION_SD_CARD
     using namespace scpi;
@@ -1122,12 +1161,38 @@ void action_dlog_toggle() {
 #endif
 }
 
-void action_show_recordings_view() {
+void action_show_dlog_view() {
     dlog_view::g_showLatest = true;
     if (!dlog_record::isExecuting()) {
         dlog_view::openFile(dlog_record::getLatestFilePath());
     }
-    showPage(PAGE_ID_RECORDINGS_VIEW);
+    showPage(PAGE_ID_DLOG_VIEW);
+}
+
+void action_dlog_start_recording() {
+#if OPTION_SD_CARD
+    popPage();
+
+    char filePath[MAX_PATH_LENGTH + 1];
+
+    if (dlog_record::g_guiParameters.appendTime) {
+        uint8_t year, month, day, hour, minute, second;
+        datetime::getDate(year, month, day);
+        datetime::getTime(hour, minute, second);
+        sprintf(filePath, "%s/%s%d_%02d_%02d-%02d_%02d_%02d.dlog",
+            RECORDINGS_DIR,
+            dlog_record::g_guiParameters.filePath,
+            (int)(year + 2000), (int)month, (int)day,
+            (int)hour, (int)minute, (int)second);
+    } else {
+        sprintf(filePath, "%s/%s.dlog", RECORDINGS_DIR, dlog_record::g_guiParameters.filePath);
+    }
+
+    memcpy(&dlog_record::g_parameters, &dlog_record::g_guiParameters, sizeof(dlog_record::g_guiParameters));
+    strcpy(dlog_record::g_parameters.filePath, filePath);
+
+    action_dlog_toggle();
+#endif
 }
 
 void action_show_file_manager() {
@@ -1169,6 +1234,17 @@ void action_file_manager_rename_file() {
 void action_file_manager_delete_file() {
 #if OPTION_SD_CARD
     file_manager::deleteFile();
+#endif
+}
+
+void onSetFileManagerSortBy(uint16_t value) {
+    popPage();
+    file_manager::setSortBy((file_manager::SortBy)value);
+}
+
+void action_file_manager_sort_by() {
+#if OPTION_SD_CARD
+    pushSelectFromEnumPage(g_fileManagerSortByEnumDefinition, file_manager::getSortBy(), NULL, onSetFileManagerSortBy, true);
 #endif
 }
 

@@ -111,9 +111,9 @@ private:
 class SelectFromEnumPage : public InternalPage {
   public:
     void init(const data::EnumItem *enumDefinition_, uint16_t currentValue_,
-    		bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t));
+    		bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t), bool smallFont_);
     void init(void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
-        uint16_t currentValue_, bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t));
+        uint16_t currentValue_, bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t), bool smallFont_);
 
     void init();
 
@@ -144,6 +144,8 @@ class SelectFromEnumPage : public InternalPage {
     uint16_t currentValue;
     bool (*disabledCallback)(uint16_t value);
     void (*onSet)(uint16_t);
+
+    bool smallFont;
 
     bool calcSize();
     void findPagePosition();

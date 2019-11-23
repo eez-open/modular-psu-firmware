@@ -23,6 +23,18 @@
       "css": "chart",
       "code": 59392,
       "src": "elusive"
+    },
+    {
+      "uid": "f06941dfcb90dc24b987d810898c4310",
+      "css": "down",
+      "code": 61813,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "720f98e7580b7987c8dc542513d1d440",
+      "css": "up-1",
+      "code": 61814,
+      "src": "fontawesome"
     }
   ]
 }

@@ -37,21 +37,21 @@ static const float TIME_MIN = 1.0f;
 static const float TIME_MAX = 86400000.0f;
 static const float TIME_DEFAULT = 60.0f;
 
-extern trigger::Source g_triggerSource;
-
 extern double g_currentTime;
 
 extern uint32_t g_fileLength;
 
-extern dlog_view::Options g_nextOptions;
+extern dlog_view::Parameters g_parameters;
+extern dlog_view::Parameters g_guiParameters;
 
 extern dlog_view::Recording g_recording;
 
 State getState();
+int checkDlogParameters(dlog_view::Parameters &parameters);
 bool isIdle();
 bool isInitiated();
 bool isExecuting();
-int initiate(const char *filePath);
+int initiate();
 void triggerGenerated(bool startImmediatelly = true);
 int startImmediately();
 void abort(bool flush = true);

@@ -184,13 +184,13 @@ bool isPageOnStack(int pageId) {
 }
 
 void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,
-                            bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t)) {
-    g_appContext->pushSelectFromEnumPage(enumDefinition, currentValue, disabledCallback, onSet);
+                            bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont) {
+    g_appContext->pushSelectFromEnumPage(enumDefinition, currentValue, disabledCallback, onSet, smallFont);
 }
 
 void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
-	                        uint16_t currentValue, bool(*disabledCallback)(uint16_t value), void(*onSet)(uint16_t)) {
-	g_appContext->pushSelectFromEnumPage(enumDefinitionFunc, currentValue, disabledCallback, onSet);
+	                        uint16_t currentValue, bool(*disabledCallback)(uint16_t value), void(*onSet)(uint16_t), bool smallFont) {
+	g_appContext->pushSelectFromEnumPage(enumDefinitionFunc, currentValue, disabledCallback, onSet, smallFont);
 }
 
 bool isPageInternal(int pageId) {

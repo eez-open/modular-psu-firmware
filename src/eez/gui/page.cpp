@@ -317,25 +317,27 @@ void ToastMessagePage::executeAction() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void SelectFromEnumPage::init(const data::EnumItem *enumDefinition_, uint16_t currentValue_,
-		bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t))
+		bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t), bool smallFont_)
 {
 	enumDefinition = enumDefinition_;
 	enumDefinitionFunc = nullptr;
 	currentValue = currentValue_;
 	disabledCallback = disabledCallback_;
 	onSet = onSet_;
+    smallFont = smallFont_;
 
 	init();
 }
 
 void SelectFromEnumPage::init(void (*enumDefinitionFunc_)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
-    uint16_t currentValue_, bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t))
+    uint16_t currentValue_, bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t), bool smallFont_)
 {
 	enumDefinition = nullptr;
 	enumDefinitionFunc = enumDefinitionFunc_;
 	currentValue = currentValue_;
 	disabledCallback = disabledCallback_;
 	onSet = onSet_;
+    smallFont = smallFont_;
 
     init();
 }
@@ -378,8 +380,8 @@ bool SelectFromEnumPage::isDisabled(int i) {
 }
 
 bool SelectFromEnumPage::calcSize() {
-    const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
-    const Style *itemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
+    const Style *containerStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
+    const Style *itemStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
 
     font::Font font = styleGetFont(itemStyle);
 
@@ -442,9 +444,9 @@ void SelectFromEnumPage::findPagePosition() {
 }
 
 void SelectFromEnumPage::refresh() {
-    const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
-	const Style *itemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
-	const Style *disabledItemStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);
+    const Style *containerStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
+	const Style *itemStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
+	const Style *disabledItemStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);
 
     // draw background
     display::setColor(containerStyle->background_color);
@@ -494,7 +496,7 @@ void SelectFromEnumPage::selectEnumItem() {
 }
 
 void SelectFromEnumPage::getItemPosition(int itemIndex, int &xItem, int &yItem) {
-    const Style *containerStyle = getStyle(STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
+    const Style *containerStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
 
     if (numColumns == 1 || itemIndex < (numItems + 1) / 2) {
         xItem = x + containerStyle->padding_left;

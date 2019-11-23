@@ -23,8 +23,9 @@ enum EnumDefinition {
     ENUM_DEFINITION_SERIAL_PARITY,
     ENUM_DEFINITION_DST_RULE,
     ENUM_DEFINITION_USER_SWITCH_ACTION,
+    ENUM_DEFINITION_FILE_MANAGER_SORT_BY,
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    ENUM_DEFINITION_MODULE_TYPE
+    ENUM_DEFINITION_MODULE_TYPE,
 #endif
 };
 
@@ -40,6 +41,8 @@ extern EnumItem g_ioPinsOutputFunctionEnumDefinition[];
 extern EnumItem g_serialParityEnumDefinition[];
 extern EnumItem g_dstRuleEnumDefinition[];
 extern EnumItem g_userSwitchActionEnumDefinition[];
+extern EnumItem g_fileManagerSortByEnumDefinition[];
+
 #if defined(EEZ_PLATFORM_SIMULATOR)
 extern EnumItem g_moduleTypeEnumDefinition[];
 #endif
@@ -95,6 +98,8 @@ Value MakeEventValue(eez::psu::event_queue::Event *e);
 Value MakeLessThenMinMessageValue(float float_, const Value &value_);
 Value MakeGreaterThenMaxMessageValue(float float_, const Value &value_);
 Value MakeMacAddressValue(uint8_t *macAddress);
+
+void editValue(uint16_t dataId);
 
 } // namespace gui
 } // namespace eez

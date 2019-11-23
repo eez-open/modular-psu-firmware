@@ -21,6 +21,7 @@
 #include <eez/modules/psu/psu.h>
 
 #include <string.h>
+#include <stdlib.h>
 
 #include <eez/system.h>
 
@@ -76,17 +77,19 @@ uint32_t g_filesStartPosition;
 
 uint32_t g_selectedFileIndex;
 
+static SortBy g_sortBy = SORT_BY_TIME_DESC;
+
 void catalogCallback(void *param, const char *name, FileType type, size_t size) {
     auto fileInfo = (FileInfo *)param;
 
     size_t nameLen = 4 * ((strlen(name) + 1 + 3) / 4);
 
-    if (g_frontBufferPosition + sizeof(FileItem*) > g_backBufferPosition - sizeof(FileItem) - nameLen) {
+    if (g_frontBufferPosition + sizeof(FileItem) > g_backBufferPosition - nameLen) {
         return;
     }
 
-    g_backBufferPosition -= sizeof(FileItem);
-    auto fileItem = (FileItem *)g_backBufferPosition;
+    auto fileItem = (FileItem *)g_frontBufferPosition;
+    g_frontBufferPosition += sizeof(FileItem);
 
     fileItem->type = type;
 
@@ -109,10 +112,29 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
 
     fileItem->dateTime = local;
 
-    *((FileItem **)g_frontBufferPosition) = fileItem;
-    g_frontBufferPosition += sizeof(FileItem *);
-
     g_filesCount++;
+}
+
+int compareFunc(const void *p1, const void *p2) {
+    FileItem *item1 = (FileItem *)p1;
+    FileItem *item2 = (FileItem *)p2;
+    if (g_sortBy == SORT_BY_NAME_ASC) {
+        return strcicmp(item1->name, item2->name);
+    } else if (g_sortBy == SORT_BY_NAME_DESC) {
+        return -strcicmp(item1->name, item2->name);
+    } else if (g_sortBy == SORT_BY_SIZE_ASC) {
+        return item1->size - item2->size;
+    } else if (g_sortBy == SORT_BY_SIZE_DESC) {
+        return item2->size - item1->size;
+    } else if (g_sortBy == SORT_BY_TIME_ASC) {
+        return item1->dateTime - item2->dateTime;
+    } else {
+        return item2->dateTime - item1->dateTime;
+    }
+} 
+
+void sort() {
+    qsort(g_buffer, g_filesCount, sizeof(FileItem), compareFunc);
 }
 
 void loadDirectory() {
@@ -135,9 +157,20 @@ void loadDirectory() {
     int err;
     psu::sd_card::catalog(g_currentDirectory, 0, catalogCallback, &numFiles, &err);
 
+    sort();
     g_filesStartPosition = 0;
 
     g_state = STATE_READY;
+}
+
+SortBy getSortBy() {
+    return g_sortBy;
+}
+
+void setSortBy(SortBy sortBy) {
+    g_sortBy = sortBy;
+    sort();
+    g_filesStartPosition = 0;
 }
 
 const char *getCurrentDirectory() {
@@ -153,7 +186,7 @@ static FileItem *getFileItem(uint32_t fileIndex) {
         return nullptr;
     }
 
-    return ((FileItem **)g_buffer)[fileIndex];
+    return (FileItem *)(g_buffer + fileIndex * sizeof(FileItem));
 }
 
 State getState() {
@@ -270,7 +303,7 @@ void openFile() {
         strcat(filePath, fileItem->name);
         psu::dlog_view::g_showLatest = false;
         psu::dlog_view::openFile(filePath);
-        gui::pushPage(gui::PAGE_ID_RECORDINGS_VIEW);
+        gui::pushPage(gui::PAGE_ID_DLOG_VIEW);
     }
 }
 

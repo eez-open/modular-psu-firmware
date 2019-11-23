@@ -44,10 +44,29 @@ using namespace scpi;
 namespace psu {
 namespace dlog_record {
 
-dlog_view::Options g_nextOptions;
+dlog_view::Parameters g_parameters = {
+    { 0 },
+    false,
+    {false, false, false, false, false, false},
+    {false, false, false, false, false, false},
+    {false, false, false, false, false, false},
+    dlog_record::PERIOD_DEFAULT,
+    dlog_record::TIME_DEFAULT,
+    trigger::SOURCE_IMMEDIATE
+};
+
+dlog_view::Parameters g_guiParameters = {
+    { 0 },
+    true,
+    { true, false, false, false, false, false },
+    { true, false, false, false, false, false },
+    { false, false, false, false, false, false },
+    dlog_record::PERIOD_DEFAULT,
+    dlog_record::TIME_DEFAULT,
+    trigger::SOURCE_IMMEDIATE
+};
 
 trigger::Source g_triggerSource = trigger::SOURCE_IMMEDIATE;
-static char g_filePath[MAX_PATH_LENGTH + 1];
 
 dlog_view::Recording g_recording; 
 
@@ -94,10 +113,10 @@ void setState(State newState) {
     }
 }
 
-int checkDlogParameters() {
+int checkDlogParameters(dlog_view::Parameters &parameters) {
     bool somethingToLog = false;
     for (int i = 0; i < CH_NUM; ++i) {
-        if (g_nextOptions.logVoltage[i] || g_nextOptions.logCurrent[i] || g_nextOptions.logPower[i]) {
+        if (parameters.logVoltage[i] || parameters.logCurrent[i] || parameters.logPower[i]) {
             somethingToLog = true;
             break;
         }
@@ -108,7 +127,7 @@ int checkDlogParameters() {
         return SCPI_ERROR_EXECUTION_ERROR;
     }
 
-    if (!*g_filePath) {
+    if (!parameters.filePath[0] && !parameters.appendTime) {
         // TODO replace with more specific error
         return SCPI_ERROR_EXECUTION_ERROR;
     }
@@ -132,22 +151,20 @@ bool isExecuting() {
     return g_state == STATE_EXECUTING;
 }
 
-int initiate(const char *filePath) {
+int initiate() {
     int error = SCPI_RES_OK;
 
-    strcpy(g_filePath, filePath);
-
-    if (g_triggerSource == trigger::SOURCE_IMMEDIATE) {
+    if (g_parameters.triggerSource == trigger::SOURCE_IMMEDIATE) {
         error = startImmediately();
     } else {
-        error = checkDlogParameters();
+        error = checkDlogParameters(g_parameters);
         if (error == SCPI_RES_OK) {
             setState(STATE_INITIATED);
         }
     }
 
     if (error != SCPI_RES_OK) {
-        g_filePath[0] = 0;
+        g_parameters.filePath[0] = 0;
     }
 
     return error;
@@ -166,7 +183,7 @@ void triggerGenerated(bool startImmediatelly) {
 
 int fileOpen() {
 	File file;
-    if (!file.open(g_filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+    if (!file.open(g_parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
     	event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_OPEN_ERROR);
         // TODO replace with more specific error
         return SCPI_ERROR_MASS_STORAGE_ERROR;
@@ -185,7 +202,7 @@ int fileOpen() {
 
 void fileWrite() {
 	File file;
-    if (!file.open(g_filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+    if (!file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
     	event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR);
     	abort(false);
         return;
@@ -246,9 +263,9 @@ eez::gui::data::Value getValue(int rowIndex, int columnIndex) {
 }
 
 int startImmediately() {
-	int err;
+    int err;
 
-    err = checkDlogParameters();
+    err = checkDlogParameters(g_parameters);
     if (err != SCPI_RES_OK) {
         return err;
     }
@@ -258,12 +275,12 @@ int startImmediately() {
         return err;
     }
 
+    memcpy(&g_recording.parameters, &g_parameters, sizeof(dlog_view::Parameters));
+
     g_selectedChunkIndex = 0;
     g_bufferIndex = 0;
     g_lastSyncTickCount = micros();
     g_fileLength = 0;
-
-    memcpy(&g_recording.lastOptions, &g_nextOptions, sizeof(dlog_view::Options));
 
     g_recording.timeOffset = gui::data::Value(0.0f, UNIT_SECOND);
 
@@ -274,7 +291,7 @@ int startImmediately() {
 
     uint32_t columns = 0;
     for (int iChannel = 0; iChannel < CH_NUM; ++iChannel) {
-        if (g_recording.lastOptions.logVoltage[iChannel]) {
+        if (g_recording.parameters.logVoltage[iChannel]) {
             columns |= 1 << (4 * iChannel);
             ++g_recording.totalDlogValues;
             if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
@@ -286,7 +303,7 @@ int startImmediately() {
                 ++g_recording.numVisibleDlogValues;
             }
         }
-        if (g_recording.lastOptions.logCurrent[iChannel]) {
+        if (g_recording.parameters.logCurrent[iChannel]) {
             columns |= 2 << (4 * iChannel);
             ++g_recording.totalDlogValues;
             if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
@@ -298,7 +315,7 @@ int startImmediately() {
                 ++g_recording.numVisibleDlogValues;
             }
         }
-        if (g_recording.lastOptions.logPower[iChannel]) {
+        if (g_recording.parameters.logPower[iChannel]) {
             columns |= 4 << (4 * iChannel);
             ++g_recording.totalDlogValues;
             if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
@@ -332,8 +349,8 @@ int startImmediately() {
 
     writeUint32(columns);
 
-    writeFloat(g_recording.lastOptions.period);
-    writeFloat(g_recording.lastOptions.time);
+    writeFloat(g_recording.parameters.period);
+    writeFloat(g_recording.parameters.time);
     writeUint32(datetime::nowUtc());
 
     g_recording.size = 0;
@@ -347,6 +364,19 @@ int startImmediately() {
     return SCPI_RES_OK;
 }
 
+void resetParameters() {
+    for (int i = 0; i < CH_NUM; ++i) {
+        g_parameters.logVoltage[i] = 0;
+        g_parameters.logCurrent[i] = 0;
+        g_parameters.logPower[i] = 0;
+    }
+
+    g_parameters.period = PERIOD_DEFAULT;
+    g_parameters.time = TIME_DEFAULT;
+    g_parameters.triggerSource = trigger::SOURCE_IMMEDIATE;
+    g_parameters.filePath[0] = 0;
+}
+
 void finishLogging(bool flush) {
 	setState(STATE_IDLE);
 
@@ -354,11 +384,7 @@ void finishLogging(bool flush) {
         flushData();
 	}
 
-    for (int i = 0; i < CH_NUM; ++i) {
-        g_nextOptions.logVoltage[i] = 0;
-        g_nextOptions.logCurrent[i] = 0;
-        g_nextOptions.logPower[i] = 0;
-    }
+    reset();
 }
 
 void abort(bool flush) {
@@ -382,8 +408,8 @@ void log(uint32_t tickCount) {
 
     if (g_currentTime >= g_nextTime) {
         while (1) {
-            g_nextTime = ++g_iSample * g_recording.lastOptions.period;
-            if (g_currentTime < g_nextTime || g_nextTime > g_recording.lastOptions.time) {
+            g_nextTime = ++g_iSample * g_recording.parameters.period;
+            if (g_currentTime < g_nextTime || g_nextTime > g_recording.parameters.time) {
                 break;
             }
 
@@ -394,21 +420,21 @@ void log(uint32_t tickCount) {
                 float uMon = 0;
                 float iMon = 0;
 
-                if (g_recording.lastOptions.logVoltage[i]) {
+                if (g_recording.parameters.logVoltage[i]) {
                     uMon = channel_dispatcher::getUMonLast(channel);
                     writeFloat(uMon);
                 }
 
-                if (g_recording.lastOptions.logCurrent[i]) {
+                if (g_recording.parameters.logCurrent[i]) {
                     iMon = channel_dispatcher::getIMonLast(channel);
                     writeFloat(iMon);
                 }
 
-                if (g_recording.lastOptions.logPower[i]) {
-                    if (!g_recording.lastOptions.logVoltage[i]) {
+                if (g_recording.parameters.logPower[i]) {
+                    if (!g_recording.parameters.logVoltage[i]) {
                         uMon = channel_dispatcher::getUMonLast(channel);
                     }
-                    if (!g_recording.lastOptions.logCurrent[i]) {
+                    if (!g_recording.parameters.logCurrent[i]) {
                         iMon = channel_dispatcher::getIMonLast(channel);
                     }
                     writeFloat(uMon * iMon);
@@ -447,21 +473,21 @@ void log(uint32_t tickCount) {
             float uMon = 0;
             float iMon = 0;
 
-            if (g_recording.lastOptions.logVoltage[i]) {
+            if (g_recording.parameters.logVoltage[i]) {
                 uMon = channel_dispatcher::getUMonLast(channel);
                 writeFloat(uMon);
             }
 
-            if (g_recording.lastOptions.logCurrent[i]) {
+            if (g_recording.parameters.logCurrent[i]) {
                 iMon = channel_dispatcher::getIMonLast(channel);
                 writeFloat(iMon);
             }
 
-            if (g_recording.lastOptions.logPower[i]) {
-                if (!g_recording.lastOptions.logVoltage[i]) {
+            if (g_recording.parameters.logPower[i]) {
+                if (!g_recording.parameters.logVoltage[i]) {
                     uMon = channel_dispatcher::getUMonLast(channel);
                 }
-                if (!g_recording.lastOptions.logCurrent[i]) {
+                if (!g_recording.parameters.logCurrent[i]) {
                     iMon = channel_dispatcher::getIMonLast(channel);
                 }
                 writeFloat(uMon * iMon);
@@ -470,7 +496,7 @@ void log(uint32_t tickCount) {
         
         ++g_recording.size;
 
-        if (g_nextTime > g_recording.lastOptions.time) {
+        if (g_nextTime > g_recording.parameters.time) {
             finishLogging(true);
         } else {
             int32_t diff = tickCount - g_lastSyncTickCount;
@@ -495,21 +521,11 @@ void tick(uint32_t tickCount) {
 
 void reset() {
     abort(false);
-
-    for (int i = 0; i < CH_NUM; ++i) {
-        g_nextOptions.logVoltage[i] = 0;
-        g_nextOptions.logCurrent[i] = 0;
-        g_nextOptions.logPower[i] = 0;
-    }
-
-    g_nextOptions.period = PERIOD_DEFAULT;
-    g_nextOptions.time = TIME_DEFAULT;
-    g_triggerSource = trigger::SOURCE_IMMEDIATE;
-    g_filePath[0] = 0;
+    resetParameters();
 }
 
 const char *getLatestFilePath() {
-    return g_filePath[0] != 0 ? g_filePath : nullptr;
+    return g_recording.parameters.filePath[0] != 0 ? g_recording.parameters.filePath : nullptr;
 }
 
 } // namespace dlog_record

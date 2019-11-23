@@ -347,7 +347,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_SYS_SETTINGS_TRACKING) {
             animateSlideDown();
-        } else if (activePageId == PAGE_ID_RECORDINGS_VIEW) {
+        } else if (activePageId == PAGE_ID_DLOG_VIEW) {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_FILE_MANAGER) {
             animateSlideDown();
@@ -430,7 +430,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         } else if (activePageId == PAGE_ID_CH_SETTINGS) {
             animateSlideRight();
         }
-    } else if (previousPageId == PAGE_ID_RECORDINGS_VIEW) {
+    } else if (previousPageId == PAGE_ID_DLOG_VIEW) {
         if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
         }
@@ -450,7 +450,7 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
         return ((ChSettingsListsPage *)getActivePage())->isFocusWidget(widgetCursor);
     }
 
-    if (getActivePageId() != PAGE_ID_RECORDINGS_VIEW) {
+    if (getActivePageId() != PAGE_ID_DLOG_VIEW) {
         // TODO this is not valid, how can we know cursor.i is channels index and not index of some other collection?
         int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
         if (iChannel >= 0 && iChannel < CH_NUM) {

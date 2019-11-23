@@ -102,14 +102,17 @@ struct DlogValueParams {
     eez::gui::data::Value offset;
 };
 
-struct Options {
+struct Parameters {
+    char filePath[MAX_PATH_LENGTH + 1];
+    bool appendTime; // append current date and time to basename
+
     bool logVoltage[CH_MAX];
     bool logCurrent[CH_MAX];
     bool logPower[CH_MAX];
     float period;
     float time;
+    trigger::Source triggerSource;
 };
-
 
 struct Recording {
     uint32_t refreshCounter;
@@ -121,7 +124,7 @@ struct Recording {
     DlogValueParams dlogValues[MAX_DLOG_VALUES];
 
     eez::gui::Value timeOffset;
-    Options lastOptions;
+    Parameters parameters;
 
     uint32_t pageSize;
     uint32_t cursorOffset;
