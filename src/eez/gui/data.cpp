@@ -499,10 +499,16 @@ Value getLimit(const Cursor &cursor, uint16_t id) {
     return value;
 }
 
-ValueType getUnit(const Cursor &cursor, uint16_t id) {
+const char *getName(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_NAME, (Cursor &)cursor, value);
+    return value.getString();
+}
+
+Unit getUnit(const Cursor &cursor, uint16_t id) {
     Value value;
     g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_UNIT, (Cursor &)cursor, value);
-    return (ValueType)value.getInt();
+    return (Unit)value.getInt();
 }
 
 void getList(const Cursor &cursor, uint16_t id, const Value **values, int &count) {

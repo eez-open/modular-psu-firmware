@@ -577,7 +577,7 @@ bool compare_EDIT_INFO_value(const Value &a, const Value &b) {
 }
 
 void EDIT_INFO_value_to_text(const Value &value, char *text, int count) {
-    edit_mode::getInfoText(value.getInt(), text);
+    edit_mode::getInfoText(text, count);
 }
 
 bool compare_MAC_ADDRESS_value(const Value &a, const Value &b) {
@@ -1072,6 +1072,8 @@ void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor &cursor
         value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "Voltage";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
     } else if (operation == data::DATA_OPERATION_SET) {
@@ -1201,6 +1203,8 @@ void data_channel_i_edit(data::DataOperationEnum operation, data::Cursor &cursor
         value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "Current";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_AMPER;
     } else if (operation == data::DATA_OPERATION_SET) {
@@ -1739,7 +1743,7 @@ void data_edit_unit(data::DataOperationEnum operation, data::Cursor &cursor, dat
 
 void data_edit_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(edit_mode::getInfoTextPartIndex(g_focusCursor, g_focusDataId), VALUE_TYPE_EDIT_INFO);
+        value = data::Value(0, VALUE_TYPE_EDIT_INFO);
     }
 }
 
@@ -2287,7 +2291,11 @@ void data_channel_protection_ovp_delay(data::DataOperationEnum operation, data::
         value = MakeValue(channel.params.OVP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOvpDelay(channel, value.getFloat());
-    }
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "OVP Delay";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    } 
 }
 
 void data_channel_protection_ovp_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2311,7 +2319,11 @@ void data_channel_protection_ovp_limit(data::DataOperationEnum operation, data::
         value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setVoltageLimit(channel, value.getFloat());
-    }
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "OVP Limit";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_VOLT;
+    } 
 }
 
 void data_channel_protection_ocp_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2344,7 +2356,11 @@ void data_channel_protection_ocp_delay(data::DataOperationEnum operation, data::
         value = MakeValue(channel.params.OCP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOcpParameters(channel, channel.prot_conf.flags.i_state ? 1 : 0, value.getFloat());
-    }
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "OCP Delay";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    } 
 }
 
 void data_channel_protection_ocp_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2368,6 +2384,10 @@ void data_channel_protection_ocp_limit(data::DataOperationEnum operation, data::
         value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setCurrentLimit(channel, value.getFloat());
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "OCP Limit";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_AMPER;
     }
 }
 
@@ -2407,7 +2427,11 @@ void data_channel_protection_opp_level(data::DataOperationEnum operation, data::
         value = MakeValue(channel_dispatcher::getOppMaxLevel(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, value.getFloat(), channel.prot_conf.p_delay);
-    }
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "OPP Level";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_WATT;
+    } 
 }
 
 void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2431,7 +2455,11 @@ void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::
         value = MakeValue(channel.params.OPP_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, channel_dispatcher::getPowerProtectionLevel(channel), value.getFloat());
-    }
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "OPP Delay";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    } 
 }
 
 void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2455,7 +2483,11 @@ void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::
         value = MakeValue(channel_dispatcher::getPowerMaxLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setPowerLimit(channel, value.getFloat());
-    }
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "OPP Limit";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_WATT;
+    } 
 }
 
 void data_channel_protection_otp_installed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2495,7 +2527,11 @@ void data_channel_protection_otp_level(data::DataOperationEnum operation, data::
         value = MakeValue(OTP_AUX_MAX_LEVEL, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOtpParameters(channel, temperature::getChannelSensorState(&channel) ? 1 : 0, value.getFloat(), temperature::getChannelSensorDelay(&channel));
-    }
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "OTP Level";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_CELSIUS;
+    } 
 }
     
 void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2519,7 +2555,11 @@ void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::
         value = MakeValue(OTP_AUX_MAX_DELAY, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOtpParameters(channel, temperature::getChannelSensorState(&channel) ? 1 : 0, temperature::getChannelSensorLevel(&channel), value.getFloat());
-    }
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "OTP Delay";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    } 
 }
 
 void data_event_queue_last_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -4432,7 +4472,11 @@ void data_dlog_value_div(data::DataOperationEnum operation, data::Cursor &cursor
         value = Value(100.0f, recording.dlogValues[cursor.i].perDiv.getUnit());
     } else if (operation == data::DATA_OPERATION_SET) {
         recording.dlogValues[cursor.i].perDiv = value;
-    }
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "Div";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = recording.dlogValues[cursor.i].perDiv.getUnit();
+    } 
 #endif
 }
 
@@ -4453,7 +4497,11 @@ void data_dlog_value_offset(data::DataOperationEnum operation, data::Cursor &cur
         value = Value(100.0f, recording.dlogValues[cursor.i].offset.getUnit());
     } else if (operation == data::DATA_OPERATION_SET) {
         recording.dlogValues[cursor.i].offset = value;
-    }
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "Offset";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = recording.dlogValues[cursor.i].offset.getUnit();
+    } 
 #endif
 }
 
@@ -4474,7 +4522,11 @@ void data_dlog_time_offset(data::DataOperationEnum operation, data::Cursor &curs
         value = Value((recording.size - recording.pageSize) * recording.lastOptions.period, recording.dlogValues[cursor.i].offset.getUnit());
     } else if (operation == data::DATA_OPERATION_SET) {
         recording.timeOffset = value;
-    }
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "Time Offset";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = recording.timeOffset.getUnit();
+    } 
 #endif
 }
 

@@ -171,137 +171,26 @@ bool setValue(float floatValue) {
 
 #define NUM_PARTS 15
 
-int getInfoTextPartIndex(data::Cursor &cursor, uint16_t dataId) {
-    int dataIdIndex;
-    
-    if (dataId == DATA_ID_CHANNEL_U_SET || dataId == DATA_ID_CHANNEL_U_EDIT) {
-        dataIdIndex = 0;
-    } else if (dataId == DATA_ID_CHANNEL_I_SET || dataId == DATA_ID_CHANNEL_I_EDIT) {
-        dataIdIndex = 1;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT) {
-        dataIdIndex = 2;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OVP_DELAY) {
-        dataIdIndex = 3;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT) {
-        dataIdIndex = 4;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OCP_DELAY) {
-        dataIdIndex = 5;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT) {
-        dataIdIndex = 6;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL) {
-        dataIdIndex = 7;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY) {
-        dataIdIndex = 8;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL) {
-        dataIdIndex = 9;
-    } else if (dataId == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY) {
-        dataIdIndex = 10;
-    } 
-#if OPTION_SD_CARD
-    else if (dataId == DATA_ID_DLOG_VALUE_DIV) {
-        dataIdIndex = 11;
-    } else if (dataId == DATA_ID_DLOG_VALUE_OFFSET) {
-        dataIdIndex = 12;
-    } else if (dataId == DATA_ID_DLOG_TIME_OFFSET) {
-        dataIdIndex = 13;
-    } 
-#endif
-    else {
-        dataIdIndex = 14;
-    }
+void getInfoText(char *infoText, int count) {
+    Cursor cursor(g_focusCursor.i);
 
-    return (g_focusCursor.i + 1) * NUM_PARTS + dataIdIndex;
-}
-
-void getInfoText(int partIndex, char *infoText) {
-    int cursorIndex = partIndex / NUM_PARTS;
-
-    int dataIdIndex = partIndex % NUM_PARTS;
-
-    int dataId;
-    const char *dataName;
-    const char *unitName;
-    if (dataIdIndex == 0) {
-        dataId = DATA_ID_CHANNEL_U_EDIT;
-        dataName = "Voltage";
-        unitName = "V";
-    } else if (dataIdIndex == 1) {
-        dataId = DATA_ID_CHANNEL_I_EDIT;
-        dataName = "Current";
-        unitName = "A";
-    } else if (dataIdIndex == 2) {
-        dataId = DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT;
-        dataName = "OVP Limit";
-        unitName = "V";
-    } else if (dataIdIndex == 3) {
-        dataId = DATA_ID_CHANNEL_PROTECTION_OVP_DELAY;
-        dataName = "OVP Delay";
-        unitName = "s";
-    } else if (dataIdIndex == 4) {
-        dataId = DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT;
-        dataName = "OCP Limit";
-        unitName = "A";
-    } else if (dataIdIndex == 5) {
-        dataId = DATA_ID_CHANNEL_PROTECTION_OCP_DELAY;
-        dataName = "OCP Delay";
-        unitName = "s";
-    } else if (dataIdIndex == 6) {
-        dataId = DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT;
-        dataName = "OPP Limit";
-        unitName = "W";
-    } else if (dataIdIndex == 7) {
-        dataId = DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL;
-        dataName = "OPP Level";
-        unitName = "W";
-    } else if (dataIdIndex == 8) {
-        dataId = DATA_ID_CHANNEL_PROTECTION_OPP_DELAY;
-        dataName = "OPP Delay";
-        unitName = "s";
-    } else if (dataIdIndex == 9) {
-        dataId = DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL;
-        dataName = "OTP Level";
-        unitName = "oC";
-    } else if (dataIdIndex == 10) {
-        dataId = DATA_ID_CHANNEL_PROTECTION_OTP_DELAY;
-        dataName = "OTP Delay";
-        unitName = "s";
-    } 
-#if OPTION_SD_CARD
-    else if (dataIdIndex == 11) {
-        dataId = DATA_ID_DLOG_VALUE_DIV;
-        dataName = "Div";
-        dlog_view::Recording &recording = dlog_view::getRecording();
-        unitName = g_unitNames[recording.dlogValues[cursorIndex].perDiv.getUnit()];
-    } else if (dataIdIndex == 12) {
-        dataId = DATA_ID_DLOG_VALUE_OFFSET;
-        dataName = "Offset";
-        dlog_view::Recording &recording = dlog_view::getRecording();
-        unitName = g_unitNames[recording.dlogValues[cursorIndex].offset.getUnit()];
-    } else if (dataIdIndex == 13) {
-        dataId = DATA_ID_DLOG_TIME_OFFSET;
-        dataName = "Time Offset";
-        dlog_view::Recording &recording = dlog_view::getRecording();
-        unitName = g_unitNames[recording.timeOffset.getUnit()];
-    } 
-#endif
-    else {
-        dataId = DATA_ID_NONE;
+    const char *dataName = getName(cursor, g_focusDataId);
+    if (!dataName) {
         dataName = "Unknown";
-        unitName = "";
     }
+    const char *unitName = getUnitName(getUnit(cursor, g_focusDataId));
 
-    cursorIndex--;
-    data::Cursor cursor(cursorIndex);
-    float minValue = data::getMin(cursor, dataId).getFloat();
-    float maxValue = (dataId == DATA_ID_CHANNEL_U_EDIT || dataId == DATA_ID_CHANNEL_I_EDIT) ?
-        data::getLimit(cursor, dataId).getFloat() : data::getMax(cursor, dataId).getFloat();
+    float minValue = data::getMin(cursor, g_focusDataId).getFloat();
+    float maxValue = (g_focusDataId == DATA_ID_CHANNEL_U_EDIT || g_focusDataId == DATA_ID_CHANNEL_I_EDIT) ?
+        data::getLimit(cursor, g_focusDataId).getFloat() : data::getMax(cursor, g_focusDataId).getFloat();
 
-    if (cursorIndex >= 0) {
-        Channel& channel = Channel::get(cursorIndex);
+    if (g_focusCursor.i >= 0) {
+
+        Channel& channel = Channel::get(g_focusCursor.i);
         if ((channel.channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel.flags.trackingEnabled) {
             strcpy(infoText, "Set ");
         } else {
-            sprintf(infoText, "Set Ch%d ", cursorIndex + 1);
+            sprintf(infoText, "Set Ch%d ", g_focusCursor.i + 1);
         }
         
         strcat(infoText, dataName);

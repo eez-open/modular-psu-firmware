@@ -305,6 +305,7 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_MAX,
     DATA_OPERATION_GET_DEF,
     DATA_OPERATION_GET_LIMIT,
+    DATA_OPERATION_GET_NAME,
     DATA_OPERATION_GET_UNIT,
     DATA_OPERATION_GET_HISTORY_VALUE,
     DATA_OPERATION_GET_VALUE_LIST,
@@ -368,7 +369,8 @@ Value getMin(const Cursor &cursor, uint16_t id);
 Value getMax(const Cursor &cursor, uint16_t id);
 Value getDef(const Cursor &cursor, uint16_t id);
 Value getLimit(const Cursor &cursor, uint16_t id);
-ValueType getUnit(const Cursor &cursor, uint16_t id);
+const char *getName(const Cursor &cursor, uint16_t id);
+Unit getUnit(const Cursor &cursor, uint16_t id);
 
 void getList(const Cursor &cursor, uint16_t id, const Value **labels, int &count);
 

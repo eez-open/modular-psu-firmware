@@ -39,8 +39,7 @@ const eez::gui::data::Value &getMax();
 Unit getUnit();
 bool setValue(float value);
 
-int getInfoTextPartIndex(eez::gui::data::Cursor &cursor, uint16_t dataId);
-void getInfoText(int part, char *infoText);
+void getInfoText(char *infoText, int count);
 
 void nonInteractiveSet();
 void nonInteractiveDiscard();
