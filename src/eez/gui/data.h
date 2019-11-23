@@ -329,6 +329,7 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR,
     DATA_OPERATION_IS_BLINKING,
     DATA_OPERATION_SET,
+    DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER,
     DATA_OPERATION_YT_DATA_GET_SIZE,
     DATA_OPERATION_YT_DATA_GET_POSITION,
     DATA_OPERATION_YT_DATA_SET_POSITION,
@@ -382,6 +383,7 @@ uint16_t getActiveBackgroundColor(const Cursor &cursor, uint16_t id, const Style
 bool isBlinking(const Cursor &cursor, uint16_t id);
 Value getEditValue(const Cursor &cursor, uint16_t id);
 
+uint32_t ytDataGetRefreshCounter(const Cursor &cursor, uint16_t id);
 uint32_t ytDataGetSize(const Cursor &cursor, uint16_t id);
 uint32_t ytDataGetPosition(const Cursor &cursor, uint16_t id);
 void ytDataSetPosition(const Cursor &cursor, uint16_t id, uint32_t newPosition);

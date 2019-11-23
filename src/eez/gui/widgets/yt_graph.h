@@ -34,6 +34,7 @@ static const int MAX_DLOG_VALUES = 6;
 
 struct YTGraphWidgetState {
     WidgetState genericState;
+    uint32_t refreshCounter;
     uint8_t iChannel;
     uint32_t numHistoryValues;
     uint32_t historyValuePosition;

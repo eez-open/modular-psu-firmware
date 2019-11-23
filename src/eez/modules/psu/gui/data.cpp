@@ -29,7 +29,8 @@
 
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
-#include <eez/modules/psu/dlog.h>
+#include <eez/modules/psu/dlog_record.h>
+#include <eez/modules/psu/dlog_view.h>
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif
@@ -80,22 +81,22 @@ namespace eez {
 namespace gui {
 namespace data {
 
-const EnumItem *g_enumDefinitions[] = { g_channelDisplayValueEnumDefinition,
-                                        g_channelTriggerModeEnumDefinition,
-                                        g_triggerSourceEnumDefinition,
-                                        g_channelCurrentRangeSelectionModeEnumDefinition,
-                                        g_channelCurrentRangeEnumDefinition,
-                                        g_channelTriggerOnListStopEnumDefinition,
-                                        g_ioPinsPolarityEnumDefinition,
-                                        g_ioPinsInputFunctionEnumDefinition,
-                                        g_ioPinsOutputFunctionEnumDefinition,
-                                        g_serialParityEnumDefinition,
-                                        g_dstRuleEnumDefinition
+const EnumItem *g_enumDefinitions[] = { 
+    g_channelDisplayValueEnumDefinition,
+    g_channelTriggerModeEnumDefinition,
+    g_triggerSourceEnumDefinition,
+    g_channelCurrentRangeSelectionModeEnumDefinition,
+    g_channelCurrentRangeEnumDefinition,
+    g_channelTriggerOnListStopEnumDefinition,
+    g_ioPinsPolarityEnumDefinition,
+    g_ioPinsInputFunctionEnumDefinition,
+    g_ioPinsOutputFunctionEnumDefinition,
+    g_serialParityEnumDefinition,
+    g_dstRuleEnumDefinition,
 #if defined(EEZ_PLATFORM_SIMULATOR)
-                                        , g_moduleTypeEnumDefinition
+    g_moduleTypeEnumDefinition,
 #endif
-                                        
-                                         };
+};
 
 } // namespace data
 } // namespace gui
@@ -104,22 +105,28 @@ const EnumItem *g_enumDefinitions[] = { g_channelDisplayValueEnumDefinition,
 namespace eez {
 namespace gui {
 
-EnumItem g_channelDisplayValueEnumDefinition[] = { { DISPLAY_VALUE_VOLTAGE, "Voltage (V)" },
-                                                   { DISPLAY_VALUE_CURRENT, "Current (A)" },
-                                                   { DISPLAY_VALUE_POWER, "Power (W)" },
-                                                   { 0, 0 } };
+EnumItem g_channelDisplayValueEnumDefinition[] = {
+    { DISPLAY_VALUE_VOLTAGE, "Voltage (V)" },
+    { DISPLAY_VALUE_CURRENT, "Current (A)" },
+    { DISPLAY_VALUE_POWER, "Power (W)" },
+    { 0, 0 }
+};
 
-EnumItem g_channelTriggerModeEnumDefinition[] = { { TRIGGER_MODE_FIXED, "Fixed" },
-                                                  { TRIGGER_MODE_LIST, "List" },
-                                                  { TRIGGER_MODE_STEP, "Step" },
-                                                  { 0, 0 } };
+EnumItem g_channelTriggerModeEnumDefinition[] = {
+    { TRIGGER_MODE_FIXED, "Fixed" },
+    { TRIGGER_MODE_LIST, "List" },
+    { TRIGGER_MODE_STEP, "Step" },
+    { 0, 0 } 
+};
 
-EnumItem g_triggerSourceEnumDefinition[] = { { trigger::SOURCE_BUS, "Bus" },
-                                             { trigger::SOURCE_IMMEDIATE, "Immediate" },
-                                             { trigger::SOURCE_MANUAL, "Manual" },
-                                             { trigger::SOURCE_PIN1, "Pin1" },
-                                             { trigger::SOURCE_PIN2, "Pin2" },
-                                             { 0, 0 } };
+EnumItem g_triggerSourceEnumDefinition[] = {
+    { trigger::SOURCE_BUS, "Bus" },
+    { trigger::SOURCE_IMMEDIATE, "Immediate" },
+    { trigger::SOURCE_MANUAL, "Manual" },
+    { trigger::SOURCE_PIN1, "Pin1" },
+    { trigger::SOURCE_PIN2, "Pin2" },
+    { 0, 0 }
+};
 
 EnumItem g_channelCurrentRangeSelectionModeEnumDefinition[] = {
     { CURRENT_RANGE_SELECTION_USE_BOTH, "Best (default)" },
@@ -128,9 +135,11 @@ EnumItem g_channelCurrentRangeSelectionModeEnumDefinition[] = {
     { 0, 0 }
 };
 
-EnumItem g_channelCurrentRangeEnumDefinition[] = { { CURRENT_RANGE_HIGH, "High" },
-                                                   { CURRENT_RANGE_LOW, "Low" },
-                                                   { 0, 0 } };
+EnumItem g_channelCurrentRangeEnumDefinition[] = {
+    { CURRENT_RANGE_HIGH, "High" },
+    { CURRENT_RANGE_LOW, "Low" },
+    { 0, 0 }
+};
 
 EnumItem g_channelTriggerOnListStopEnumDefinition[] = {
     { TRIGGER_ON_LIST_STOP_OUTPUT_OFF, "Output OFF" },
@@ -140,16 +149,19 @@ EnumItem g_channelTriggerOnListStopEnumDefinition[] = {
     { 0, 0 }
 };
 
-EnumItem g_ioPinsPolarityEnumDefinition[] = { { io_pins::POLARITY_NEGATIVE, "Negative" },
-                                              { io_pins::POLARITY_POSITIVE, "Positive" },
-                                              { 0, 0 } };
+EnumItem g_ioPinsPolarityEnumDefinition[] = {
+    { io_pins::POLARITY_NEGATIVE, "Negative" },
+    { io_pins::POLARITY_POSITIVE, "Positive" },
+    { 0, 0 }
+};
 
-EnumItem g_ioPinsInputFunctionEnumDefinition[] = { { io_pins::FUNCTION_NONE, "None" },
-                                                   { io_pins::FUNCTION_INPUT, "Input" },
-                                                   { io_pins::FUNCTION_INHIBIT, "Inhibit" },
-                                                   { io_pins::FUNCTION_TINPUT, "Trigger input",
-                                                     "Tinput" },
-                                                   { 0, 0 } };
+EnumItem g_ioPinsInputFunctionEnumDefinition[] = {
+    { io_pins::FUNCTION_NONE, "None" },
+    { io_pins::FUNCTION_INPUT, "Input" },
+    { io_pins::FUNCTION_INHIBIT, "Inhibit" },
+    { io_pins::FUNCTION_TINPUT, "Trigger input", "Tinput" },
+    { 0, 0 }
+};
 
 EnumItem g_ioPinsOutputFunctionEnumDefinition[] = {
     { io_pins::FUNCTION_NONE, "None" },
@@ -166,18 +178,22 @@ EnumItem g_serialParityEnumDefinition[] = {
     { serial::PARITY_SPACE, "Space" }, { 0, 0 }
 };
 
-EnumItem g_dstRuleEnumDefinition[] = { { datetime::DST_RULE_OFF, "Off" },
-                                       { datetime::DST_RULE_EUROPE, "Europe" },
-                                       { datetime::DST_RULE_USA, "USA" },
-                                       { datetime::DST_RULE_AUSTRALIA, "Australia" },
-                                       { 0, 0 } };
+EnumItem g_dstRuleEnumDefinition[] = {
+    { datetime::DST_RULE_OFF, "Off" },
+    { datetime::DST_RULE_EUROPE, "Europe" },
+    { datetime::DST_RULE_USA, "USA" },
+    { datetime::DST_RULE_AUSTRALIA, "Australia" },
+    { 0, 0 }
+};
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-EnumItem g_moduleTypeEnumDefinition[] = { { MODULE_TYPE_NONE, "None" },
-                                          { MODULE_TYPE_DCP405, "DCP405" },
-                                          { MODULE_TYPE_DCP405B, "DCP405B" },
-                                          { MODULE_TYPE_DCM220, "DCM220" },
-                                          { 0, 0 } };
+EnumItem g_moduleTypeEnumDefinition[] = {
+    { MODULE_TYPE_NONE, "None" },
+    { MODULE_TYPE_DCP405, "DCP405" },
+    { MODULE_TYPE_DCP405B, "DCP405B" },
+    { MODULE_TYPE_DCM220, "DCM220" },
+    { 0, 0 }
+};
 #endif
 
 EnumItem g_userSwitchActionEnumDefinition[] = {
@@ -702,8 +718,8 @@ void DLOG_VALUE_LABEL_value_to_text(const Value &value, char *text, int count) {
 static double g_savedCurrentTime;
 
 bool compare_DLOG_CURRENT_TIME_value(const Value &a, const Value &b) {
-    bool result = g_savedCurrentTime == dlog::g_currentTime;
-    g_savedCurrentTime = dlog::g_currentTime;
+    bool result = g_savedCurrentTime == dlog_record::g_currentTime;
+    g_savedCurrentTime = dlog_record::g_currentTime;
     return result;
 }
 
@@ -714,7 +730,8 @@ void DLOG_CURRENT_TIME_value_to_text(const Value &value, char *text, int count) 
 static double g_savedRecordingDuration;
 
 bool compare_DLOG_TIME_DURATION_value(const Value &a, const Value &b) {
-    double recordingDuration  = (double)dlog::getSize() * dlog::g_lastOptions.period;
+    dlog_view::Recording &recording = dlog_view::getRecording();
+    double recordingDuration  = (double)recording.size * recording.lastOptions.period;
     bool result = g_savedRecordingDuration == recordingDuration;
     g_savedRecordingDuration = recordingDuration;
     return result;
@@ -871,7 +888,7 @@ Page *getUserProfilesPage() {
 
 } // namespace gui
 } // namespace eez
-
+ 
 ////////////////////////////////////////////////////////////////////////////////
 
 using namespace eez::psu;
@@ -989,7 +1006,7 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog::isIdle() && dlog::g_lastOptions.logVoltage[iChannel]) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.lastOptions.logVoltage[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -1021,7 +1038,7 @@ void data_channel_u_mon_dac(data::DataOperationEnum operation, data::Cursor &cur
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMonDac(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog::isIdle() && dlog::g_lastOptions.logVoltage[iChannel]) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.lastOptions.logVoltage[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     }
@@ -1118,7 +1135,7 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog::isIdle() && dlog::g_lastOptions.logCurrent[iChannel]) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.lastOptions.logCurrent[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -1150,7 +1167,7 @@ void data_channel_i_mon_dac(data::DataOperationEnum operation, data::Cursor &cur
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMonDac(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog::isIdle() && dlog::g_lastOptions.logCurrent[iChannel]) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.lastOptions.logCurrent[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } 
@@ -1219,7 +1236,7 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog::isIdle() && dlog::g_lastOptions.logPower[iChannel]) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.lastOptions.logPower[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -4132,7 +4149,7 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data:
         overlay.widgetOverrides = widgetOverrides;
 
         bool areListCountersVisible = list::g_numChannelsWithVisibleCounters > 0;
-        bool isDlogVisible = !dlog::isIdle();
+        bool isDlogVisible = !dlog_record::isIdle();
 
         int state = 0;
         if (areListCountersVisible || isDlogVisible) {
@@ -4229,13 +4246,28 @@ void data_nondrag_overlay(data::DataOperationEnum operation, data::Cursor &curso
 void data_dlog_started(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        value = dlog::isExecuting() ? 1 : 0;
+        value = dlog_record::isExecuting() ? 1 : 0;
+    }
+#endif
+}
+
+void data_is_show_live_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        value = &recording == &dlog_record::g_recording;
     }
 #endif
 }
 
 void data_channel_history_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
+    if (operation >= DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE2) {
+        value = g_appContext->getHistoryValue(cursor, operation - DATA_OPERATION_YT_DATA_GET_VALUE1 == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2, value.getUInt32());
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
+        value = Value(0, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_NUM_VALUES) {
+        value = 2;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
         value = Value(g_appContext->getNumHistoryValues(DATA_ID_CHANNEL_DISPLAY_VALUE1), VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
         value = Value(g_appContext->getCurrentHistoryValuePosition(cursor, DATA_ID_CHANNEL_DISPLAY_VALUE1) - 1, VALUE_TYPE_UINT32);
@@ -4251,8 +4283,6 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
         value = getMin(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_MAX) {
         value = getMax(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
-    } else if (operation >= DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE2) {
-        value = g_appContext->getHistoryValue(cursor, operation - DATA_OPERATION_YT_DATA_GET_VALUE1 == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2, value.getUInt32());
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
         value = Value(psu::persist_conf::devConf.ytGraphUpdateMethod, VALUE_TYPE_UINT8);
     }
@@ -4261,42 +4291,53 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
 void data_dlog_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        value = dlog::getState();
+        value = dlog_record::getState();
     }
 #endif
 }
+
+void data_recordings_view_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == DATA_OPERATION_GET) {
+        value = dlog_view::getState();
+    }
+#endif
+}
+
 void data_recording_ready(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == DATA_OPERATION_GET) {
-        value = dlog::getSize() > 0 ? 1 : 0;
+        value = dlog_record::isExecuting() || dlog_record::getLatestFilePath() ? 1 : 0;
     }
 #endif
+}
+
+void data_is_show_latest_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = dlog_view::g_showLatest;
+    }
 }
 
 void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
-    uint32_t size = dlog::getSize();
+    dlog_view::Recording &recording = dlog_view::getRecording();
 
-    if (operation >= DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE4) {
-        uint8_t valueIndex = operation - DATA_OPERATION_YT_DATA_GET_VALUE1;
-        Unit unit = dlog::g_dlogValues[valueIndex].offset.getUnit();
-        if (value.getUInt32() >= size) {
-            value = Value(NAN, unit);
-        } else {
-            value = Value(((float *)dlog::g_lastBufferStart)[dlog::g_totalDlogValues * value.getUInt32() + valueIndex], unit);
-        }
+    if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
+        value = Value(recording.refreshCounter, VALUE_TYPE_UINT32);
+    } else if (operation >= DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE4) {
+        value = recording.getValue(value.getUInt32(), operation - DATA_OPERATION_YT_DATA_GET_VALUE1);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
-        value = Value(size, VALUE_TYPE_UINT32);
+        value = Value(recording.size, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
         float position;
-        if (dlog::isExecuting()) {
-            value = Value(size - dlog::g_pageSize, VALUE_TYPE_UINT32);
+        if (&recording == &dlog_record::g_recording) {
+            value = Value(recording.size - recording.pageSize, VALUE_TYPE_UINT32);
         } else {
-            position = dlog::g_timeOffset.getFloat() / dlog::g_lastOptions.period;
+            position = recording.timeOffset.getFloat() / recording.lastOptions.period;
             if (position < 0) {
                 value = Value(0, VALUE_TYPE_UINT32);
-            } else if (position > size - dlog::g_pageSize) {
-                value = Value(size - dlog::g_pageSize, VALUE_TYPE_UINT32);
+            } else if (position > recording.size - recording.pageSize) {
+                value = Value(recording.size - recording.pageSize, VALUE_TYPE_UINT32);
             } else {
                 value = Value((uint32_t)roundf(position), VALUE_TYPE_UINT32);
             }
@@ -4306,37 +4347,37 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         if (newPosition < 0) {
             newPosition = 0;
         } else {
-            if (newPosition + dlog::g_pageSize > size) {
-                newPosition = size - dlog::g_pageSize;
+            if (newPosition + recording.pageSize > recording.size) {
+                newPosition = recording.size - recording.pageSize;
             }
         }
-        dlog::g_timeOffset = Value(newPosition * dlog::g_lastOptions.period, dlog::g_timeOffset.getUnit());
+        recording.timeOffset = Value(newPosition * recording.lastOptions.period, recording.timeOffset.getUnit());
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
-        value = Value(dlog::g_pageSize, VALUE_TYPE_UINT32);
+        value = Value(recording.pageSize, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
         value = Value(value.getUInt8() % 3 == 0 ? STYLE_ID_YT_GRAPH_U_DEFAULT : value.getUInt8() % 3 == 1 ? STYLE_ID_YT_GRAPH_I_DEFAULT : STYLE_ID_YT_GRAPH_P_DEFAULT, VALUE_TYPE_UINT16);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_HORZ_DIVISIONS) {
-        value = dlog::NUM_HORZ_DIVISIONS;
+        value = dlog_view::NUM_HORZ_DIVISIONS;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS) {
-        value = dlog::NUM_VERT_DIVISIONS;
+        value = dlog_view::NUM_VERT_DIVISIONS;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_NUM_VALUES) {
-        value = dlog::g_numVisibleDlogValues;
+        value = recording.numVisibleDlogValues;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PER_DIV) {
-        value = dlog::g_dlogValues[value.getUInt8()].perDiv;
+        value = recording.dlogValues[value.getUInt8()].perDiv;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_OFFSET) {
-        value = dlog::g_dlogValues[value.getUInt8()].offset;
+        value = recording.dlogValues[value.getUInt8()].offset;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
         value = YT_GRAPH_UPDATE_METHOD_STATIC;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
-        value = Value(dlog::g_lastOptions.period, UNIT_SECOND);
+        value = Value(recording.lastOptions.period, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE) {
-        value = dlog::isIdle() ? 1 : 0;
+        value = &recording != &dlog_record::g_recording;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET) {
-        value = Value(dlog::g_cursorOffset, VALUE_TYPE_UINT32);
+        value = Value(recording.cursorOffset, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_SET_CURSOR_OFFSET) {
-        dlog::g_cursorOffset = value.getUInt32();
+        recording.cursorOffset = value.getUInt32();
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_TIME) {
-        value = Value((ytDataGetPosition(cursor, DATA_ID_RECORDING) + dlog::g_cursorOffset) * dlog::g_lastOptions.period, UNIT_SECOND);
+        value = Value((ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset) * recording.lastOptions.period, UNIT_SECOND);
     }
 #endif
 }
@@ -4348,7 +4389,8 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
     if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
-        overlay.state = dlog::isIdle() ? 1 : 0;
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        overlay.state = &recording != &dlog_record::g_recording;
         WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
         overlay.width = widgetCursor.widget->w;
         overlay.height = widgetCursor.widget->h;
@@ -4360,70 +4402,78 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
 void data_dlog_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_COUNT) {
-        value = dlog::g_numVisibleDlogValues;
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        value = recording.numVisibleDlogValues;
     }
 #endif
 }
 
 void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = Value(dlog::g_dlogValues[cursor.i].dlogValueType, VALUE_TYPE_DLOG_VALUE_LABEL);
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        value = Value(recording.dlogValues[cursor.i].dlogValueType, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
 
 void data_dlog_value_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
+    dlog_view::Recording &recording = dlog_view::getRecording();
+
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VALUE_DIV;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = dlog::g_dlogValues[cursor.i].perDiv;
+            value = recording.dlogValues[cursor.i].perDiv;
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(0.01f, dlog::g_dlogValues[cursor.i].perDiv.getUnit());
+        value = Value(0.01f, recording.dlogValues[cursor.i].perDiv.getUnit());
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(100.0f, dlog::g_dlogValues[cursor.i].perDiv.getUnit());
+        value = Value(100.0f, recording.dlogValues[cursor.i].perDiv.getUnit());
     } else if (operation == data::DATA_OPERATION_SET) {
-        dlog::g_dlogValues[cursor.i].perDiv = value;
+        recording.dlogValues[cursor.i].perDiv = value;
     }
 #endif
 }
 
 void data_dlog_value_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
+    dlog_view::Recording &recording = dlog_view::getRecording();
+
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VALUE_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = dlog::g_dlogValues[cursor.i].offset;
+            value = recording.dlogValues[cursor.i].offset;
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(-100.0f, dlog::g_dlogValues[cursor.i].offset.getUnit());
+        value = Value(-100.0f, recording.dlogValues[cursor.i].offset.getUnit());
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(100.0f, dlog::g_dlogValues[cursor.i].offset.getUnit());
+        value = Value(100.0f, recording.dlogValues[cursor.i].offset.getUnit());
     } else if (operation == data::DATA_OPERATION_SET) {
-        dlog::g_dlogValues[cursor.i].offset = value;
+        recording.dlogValues[cursor.i].offset = value;
     }
 #endif
 }
 
 void data_dlog_time_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
+    dlog_view::Recording &recording = dlog_view::getRecording();
+
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_TIME_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = dlog::g_timeOffset;
+            value = recording.timeOffset;
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(0.0f, dlog::g_dlogValues[cursor.i].offset.getUnit());
+        value = Value(0.0f, recording.dlogValues[cursor.i].offset.getUnit());
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value((dlog::getSize() - dlog::g_pageSize) * dlog::g_lastOptions.period, dlog::g_dlogValues[cursor.i].offset.getUnit());
+        value = Value((recording.size - recording.pageSize) * recording.lastOptions.period, recording.dlogValues[cursor.i].offset.getUnit());
     } else if (operation == data::DATA_OPERATION_SET) {
-        dlog::g_timeOffset = value;
+        recording.timeOffset = value;
     }
 #endif
 }
@@ -4446,7 +4496,7 @@ void data_dlog_time_duration(data::DataOperationEnum operation, data::Cursor &cu
 void data_dlog_file_length(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        value = Value(dlog::g_fileLength, VALUE_TYPE_FILE_LENGTH);
+        value = Value(dlog_record::g_fileLength, VALUE_TYPE_FILE_LENGTH);
     }
 #endif
 }
@@ -4454,7 +4504,8 @@ void data_dlog_file_length(data::DataOperationEnum operation, data::Cursor &curs
 void data_dlog_time_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        value = Value(dlog::g_pageSize * dlog::g_lastOptions.period / dlog::NUM_HORZ_DIVISIONS, UNIT_SECOND);
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        value = Value(recording.pageSize * recording.lastOptions.period / dlog_view::NUM_HORZ_DIVISIONS, UNIT_SECOND);
     }
 #endif
 }
@@ -4462,7 +4513,8 @@ void data_dlog_time_div(data::DataOperationEnum operation, data::Cursor &cursor,
 void data_dlog_value_cursor(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        value = data::ytDataGetValue(cursor, DATA_ID_RECORDING, ytDataGetPosition(cursor, DATA_ID_RECORDING) + dlog::g_cursorOffset, cursor.i);
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        value = data::ytDataGetValue(cursor, DATA_ID_RECORDING, ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, cursor.i);
     }
 #endif
 }
@@ -4475,10 +4527,10 @@ void data_file_manager_current_directory(data::DataOperationEnum operation, data
 #endif
 }
 
-void data_file_manager_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        value = file_manager::getStatus();
+        value = file_manager::getState();
     }
 #endif
 }

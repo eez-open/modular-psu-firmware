@@ -47,7 +47,7 @@
 #endif
 
 #if OPTION_SD_CARD
-#include <eez/modules/psu/dlog.h>
+#include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/sd_card.h>
 #endif
 
@@ -454,7 +454,7 @@ static bool psuReset() {
 
     //
 #if OPTION_SD_CARD
-    dlog::reset();
+    dlog_record::reset();
 #endif
 
     // SYST:POW ON
@@ -646,7 +646,7 @@ void powerDown() {
 
     trigger::abort();
 #if OPTION_SD_CARD
-    dlog::abort();
+    dlog_record::abort();
 #endif
 
     int err;
@@ -807,7 +807,7 @@ static int g_tickFuncIndex = 0;
 void tick() {
     uint32_t tickCount = micros();
 
-    dlog::tick(tickCount);
+    dlog_record::tick(tickCount);
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel::get(i).tick(tickCount);

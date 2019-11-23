@@ -28,9 +28,15 @@ namespace file_manager {
 
 static const uint32_t FILES_PAGE_SIZE = 6;
 
+enum State {
+    STATE_STARTING,
+    STATE_LOADING,
+    STATE_READY
+};
+
 void loadDirectory();
 const char *getCurrentDirectory();
-int getStatus();
+State getState();
 bool isRootDirectory();
 void goToParentDirectory();
 uint32_t getFilesCount();

@@ -588,6 +588,12 @@ Value getEditValue(const Cursor &cursor, uint16_t id) {
     return value;
 }
 
+uint32_t ytDataGetRefreshCounter(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER, (Cursor &)cursor, value);
+    return value.getUInt32();
+}
+
 uint32_t ytDataGetSize(const Cursor &cursor, uint16_t id) {
     Value value;
     g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_SIZE, (Cursor &)cursor, value);

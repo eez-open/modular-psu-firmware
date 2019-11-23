@@ -36,7 +36,8 @@
 #if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
 #include <eez/libs/sd_fat/sd_fat.h>
-#include <eez/modules/psu/dlog.h>
+#include <eez/modules/psu/dlog_record.h>
+#include <eez/modules/psu/dlog_view.h>
 #include <eez/libs/image/jpeg_encode.h>
 #endif
 #include <eez/modules/psu/scpi/psu.h>
@@ -133,38 +134,44 @@ void oneIter() {
 #endif
 #if OPTION_SD_CARD
 			else if (type == SCPI_QUEUE_MESSAGE_DLOG_FILE_WRITE) {
-				eez::psu::dlog::fileWrite();
+				eez::psu::dlog_record::fileWrite();
 			}
-			else if (type == SCPI_QUEUE_MESSAGE_DLOG_TOGGLE) {
-                if (dlog::isExecuting()) {
-                    dlog::abort();
+            else if (type == SCPI_QUEUE_MESSAGE_DLOG_TOGGLE) {
+                if (dlog_record::isExecuting()) {
+                    dlog_record::abort();
                 } else {
                     char filePath[40];
-                    //uint8_t year, month, day, hour, minute, second;
-                    //datetime::getDate(year, month, day);
-                    //datetime::getTime(hour, minute, second);
-                    //sprintf(filePath, "%s/%d_%02d_%02d-%02d_%02d_%02d.dlog",
-                    //    RECORDINGS_DIR,
-                    //    (int)(year + 2000), (int)month, (int)day,
-                    //    (int)hour, (int)minute, (int)second);
-                    sprintf(filePath, "%s/Latest.dlog", RECORDINGS_DIR);
 
-                    dlog::g_nextOptions.logVoltage[0] = true;
-                    dlog::g_nextOptions.logCurrent[0] = true;
-                    dlog::g_nextOptions.logPower[0] = false;
+                    uint8_t year, month, day, hour, minute, second;
+                    datetime::getDate(year, month, day);
+                    datetime::getTime(hour, minute, second);
+                    sprintf(filePath, "%s/%d_%02d_%02d-%02d_%02d_%02d.dlog",
+                       RECORDINGS_DIR,
+                       (int)(year + 2000), (int)month, (int)day,
+                       (int)hour, (int)minute, (int)second);
+
+                    //sprintf(filePath, "%s/Latest.dlog", RECORDINGS_DIR);
+
+                    dlog_record::g_nextOptions.logVoltage[0] = true;
+                    dlog_record::g_nextOptions.logCurrent[0] = true;
+                    dlog_record::g_nextOptions.logPower[0] = false;
                     for (int i = 1; i < CH_MAX; i++) {
-                        dlog::g_nextOptions.logVoltage[i] = false;
-                        dlog::g_nextOptions.logCurrent[i] = false;
-                        dlog::g_nextOptions.logPower[i] = false;
+                        dlog_record::g_nextOptions.logVoltage[i] = false;
+                        dlog_record::g_nextOptions.logCurrent[i] = false;
+                        dlog_record::g_nextOptions.logPower[i] = false;
                     }
-                    dlog::g_nextOptions.period = dlog::PERIOD_MIN;
-                    dlog::g_nextOptions.time = dlog::TIME_MAX;
-                    
-                    dlog::g_triggerSource = trigger::SOURCE_IMMEDIATE;
+                    dlog_record::g_nextOptions.period = dlog_record::PERIOD_MIN;
+                    dlog_record::g_nextOptions.time = dlog_record::TIME_MAX;
 
-                    dlog::initiate(filePath);
+                    dlog_record::g_triggerSource = trigger::SOURCE_IMMEDIATE;
+
+                    dlog_record::initiate(filePath);
                 }
-			} else if (type == SCPI_QUEUE_MESSAGE_ABORT_DOWNLOADING) {
+            } else if (type == SCPI_QUEUE_MESSAGE_DLOG_SHOW_FILE) {
+                eez::psu::dlog_view::openFile(nullptr);
+            } else if (type == SCPI_QUEUE_MESSAGE_DLOG_LOAD_BLOCK) {
+                eez::psu::dlog_view::loadBlock();
+            } else if (type == SCPI_QUEUE_MESSAGE_ABORT_DOWNLOADING) {
                 abortDownloading();
             } else if (type == SCPI_QUEUE_MESSAGE_SCREENSHOT) {
                 if (!sd_card::isMounted(nullptr)) {

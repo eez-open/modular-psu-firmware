@@ -20,7 +20,7 @@
 
 #include <eez/modules/psu/scpi/psu.h>
 #if OPTION_SD_CARD
-#include <eez/modules/psu/dlog.h>
+#include <eez/modules/psu/dlog_record.h>
 #endif
 
 namespace eez {
@@ -30,7 +30,7 @@ namespace scpi {
 scpi_result_t scpi_cmd_abortDlog(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
-    dlog::abort();
+    dlog_record::abort();
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -46,12 +46,12 @@ scpi_result_t scpi_cmd_initiateDlog(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!dlog::isIdle()) {
+    if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
     }
 
-    int result = dlog::initiate(filePath);
+    int result = dlog_record::initiate(filePath);
     if (result != SCPI_RES_OK) {
         SCPI_ErrorPush(context, result);
         return SCPI_RES_ERR;
@@ -77,12 +77,12 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltage(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!dlog::isIdle()) {
+    if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
     }
 
-    dlog::g_nextOptions.logVoltage[channel->channelIndex] = enable;
+    dlog_record::g_nextOptions.logVoltage[channel->channelIndex] = enable;
 
     return SCPI_RES_OK;
 #else
@@ -99,7 +99,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltageQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog::g_nextOptions.logVoltage[channel->channelIndex]);
+    SCPI_ResultBool(context, dlog_record::g_nextOptions.logVoltage[channel->channelIndex]);
 
     return SCPI_RES_OK;
 #else
@@ -121,12 +121,12 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrent(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!dlog::isIdle()) {
+    if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
     }
 
-    dlog::g_nextOptions.logCurrent[channel->channelIndex] = enable;
+    dlog_record::g_nextOptions.logCurrent[channel->channelIndex] = enable;
 
     return SCPI_RES_OK;
 #else
@@ -143,7 +143,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrentQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog::g_nextOptions.logCurrent[channel->channelIndex]);
+    SCPI_ResultBool(context, dlog_record::g_nextOptions.logCurrent[channel->channelIndex]);
 
     return SCPI_RES_OK;
 #else
@@ -165,12 +165,12 @@ scpi_result_t scpi_cmd_senseDlogFunctionPower(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!dlog::isIdle()) {
+    if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
     }
 
-    dlog::g_nextOptions.logPower[channel->channelIndex] = enable;
+    dlog_record::g_nextOptions.logPower[channel->channelIndex] = enable;
 
     return SCPI_RES_OK;
 #else
@@ -187,7 +187,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionPowerQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog::g_nextOptions.logPower[channel->channelIndex]);
+    SCPI_ResultBool(context, dlog_record::g_nextOptions.logPower[channel->channelIndex]);
 
     return SCPI_RES_OK;
 #else
@@ -208,11 +208,11 @@ scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
 
     if (param.special) {
         if (param.content.tag == SCPI_NUM_MIN) {
-            period = dlog::PERIOD_MIN;
+            period = dlog_record::PERIOD_MIN;
         } else if (param.content.tag == SCPI_NUM_MAX) {
-            period = dlog::PERIOD_MAX;
+            period = dlog_record::PERIOD_MAX;
         } else if (param.content.tag == SCPI_NUM_DEF) {
-            period = dlog::PERIOD_DEFAULT;
+            period = dlog_record::PERIOD_DEFAULT;
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
@@ -226,12 +226,12 @@ scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
         period = (float)param.content.value;
     }
 
-    if (!dlog::isIdle()) {
+    if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
     }
 
-    dlog::g_nextOptions.period = period;
+    dlog_record::g_nextOptions.period = period;
 
     return SCPI_RES_OK;
 #else
@@ -243,7 +243,7 @@ scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
 scpi_result_t scpi_cmd_senseDlogPeriodQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
-    SCPI_ResultFloat(context, dlog::g_nextOptions.period);
+    SCPI_ResultFloat(context, dlog_record::g_nextOptions.period);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -263,11 +263,11 @@ scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
 
     if (param.special) {
         if (param.content.tag == SCPI_NUM_MIN) {
-            time = dlog::TIME_MIN;
+            time = dlog_record::TIME_MIN;
         } else if (param.content.tag == SCPI_NUM_MAX) {
-            time = dlog::TIME_MAX;
+            time = dlog_record::TIME_MAX;
         } else if (param.content.tag == SCPI_NUM_DEF) {
-            time = dlog::TIME_DEFAULT;
+            time = dlog_record::TIME_DEFAULT;
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
@@ -281,12 +281,12 @@ scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
         time = (float)param.content.value;
     }
 
-    if (!dlog::isIdle()) {
+    if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
     }
 
-    dlog::g_nextOptions.time = time;
+    dlog_record::g_nextOptions.time = time;
 
     return SCPI_RES_OK;
 #else
@@ -298,7 +298,7 @@ scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
 scpi_result_t scpi_cmd_senseDlogTimeQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
-    SCPI_ResultFloat(context, dlog::g_nextOptions.time);
+    SCPI_ResultFloat(context, dlog_record::g_nextOptions.time);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

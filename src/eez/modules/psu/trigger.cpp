@@ -29,7 +29,7 @@
 #include <eez/system.h>
 
 #if OPTION_SD_CARD
-#include <eez/modules/psu/dlog.h>
+#include <eez/modules/psu/dlog_record.h>
 #endif
 
 namespace eez {
@@ -125,7 +125,7 @@ int generateTrigger(Source source, bool checkImmediatelly) {
     bool seqTriggered = persist_conf::devConf.triggerSource == source && g_state == STATE_INITIATED;
 
 #if OPTION_SD_CARD
-    bool dlogTriggered = dlog::g_triggerSource == source && dlog::isInitiated();
+    bool dlogTriggered = dlog_record::g_triggerSource == source && dlog_record::isInitiated();
 #endif
 
     if (!seqTriggered) {
@@ -140,7 +140,7 @@ int generateTrigger(Source source, bool checkImmediatelly) {
 
 #if OPTION_SD_CARD
     if (dlogTriggered) {
-        dlog::triggerGenerated(checkImmediatelly);
+        dlog_record::triggerGenerated(checkImmediatelly);
     }
 #endif
 

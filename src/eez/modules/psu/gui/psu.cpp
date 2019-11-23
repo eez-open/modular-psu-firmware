@@ -44,6 +44,7 @@
 #include <eez/modules/psu/idle.h>
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/trigger.h>
+#include <eez/modules/psu/dlog_view.h>
 #include <eez/gui/dialogs.h>
 #include <eez/gui/document.h>
 #include <eez/gui/gui.h>
@@ -57,7 +58,7 @@
 #endif
 
 #if OPTION_SD_CARD
-#include <eez/modules/psu/dlog.h>
+#include <eez/modules/psu/dlog_record.h>
 #endif
 
 #if EEZ_PLATFORM_STM32
@@ -268,6 +269,8 @@ void PsuAppContext::stateManagment() {
         }
         m_popProgressPage = false;
     }
+
+    dlog_view::stateManagment();
 }
 
 bool PsuAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
@@ -1126,9 +1129,9 @@ void channelToggleOutput() {
         if (channel.isOutputEnabled()) {
             if (triggerModeEnabled) {
                 trigger::abort();
-            } else {
-                channel_dispatcher::outputEnable(channel, false);
             }
+
+            channel_dispatcher::outputEnable(channel, false);
         } else {
             if (triggerModeEnabled) {
                 if (trigger::isIdle()) {

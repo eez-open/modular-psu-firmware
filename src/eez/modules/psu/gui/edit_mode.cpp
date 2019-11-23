@@ -26,9 +26,8 @@
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #if OPTION_SD_CARD
-#include <eez/modules/psu/dlog.h>
+#include <eez/modules/psu/dlog_record.h>
 #endif
-#include <eez/modules/psu/dlog.h>
 #include <eez/sound.h>
 
 #include <eez/modules/psu/gui/data.h>
@@ -271,15 +270,18 @@ void getInfoText(int partIndex, char *infoText) {
     else if (dataIdIndex == 11) {
         dataId = DATA_ID_DLOG_VALUE_DIV;
         dataName = "Div";
-        unitName = g_unitNames[dlog::g_dlogValues[cursorIndex].perDiv.getUnit()];
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        unitName = g_unitNames[recording.dlogValues[cursorIndex].perDiv.getUnit()];
     } else if (dataIdIndex == 12) {
         dataId = DATA_ID_DLOG_VALUE_OFFSET;
         dataName = "Offset";
-        unitName = g_unitNames[dlog::g_dlogValues[cursorIndex].offset.getUnit()];
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        unitName = g_unitNames[recording.dlogValues[cursorIndex].offset.getUnit()];
     } else if (dataIdIndex == 13) {
         dataId = DATA_ID_DLOG_TIME_OFFSET;
         dataName = "Time Offset";
-        unitName = g_unitNames[dlog::g_timeOffset.getUnit()];
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        unitName = g_unitNames[recording.timeOffset.getUnit()];
     } 
 #endif
     else {

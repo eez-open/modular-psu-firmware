@@ -364,6 +364,7 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->size = sizeof(YTGraphWidgetState);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
 
+    currentState->refreshCounter = data::ytDataGetRefreshCounter(widgetCursor.cursor, widget->data);
     currentState->iChannel = widgetCursor.cursor.i;
     currentState->numHistoryValues = data::ytDataGetSize(widgetCursor.cursor, widget->data);
     currentState->historyValuePosition = data::ytDataGetPosition(widgetCursor.cursor, widget->data);
@@ -371,6 +372,9 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     currentState->cursorPosition = currentState->historyValuePosition + data::ytDataGetCursorOffset(widgetCursor.cursor, widget->data);
 
     int numValues = data::ytDataGetNumValues(widgetCursor.cursor, widget->data);
+    if (numValues == 0) {
+        return;
+    }
     bool transformChanged = false;
     for (int valueIndex = 0; valueIndex < numValues; valueIndex++) {
         currentState->valuePerDiv[valueIndex] = data::ytDataGetPerDiv(widgetCursor.cursor, widget->data, valueIndex);
@@ -385,7 +389,8 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     uint32_t previousHistoryValuePosition;
     if (widgetCursor.previousState &&
         previousState->iChannel == currentState->iChannel &&
-        previousState->ytGraphUpdateMethod == currentState->ytGraphUpdateMethod) 
+        previousState->ytGraphUpdateMethod == currentState->ytGraphUpdateMethod &&
+        previousState->refreshCounter == currentState->refreshCounter)
     {
         previousHistoryValuePosition = previousState->historyValuePosition;
     } else {

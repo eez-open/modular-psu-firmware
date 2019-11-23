@@ -36,6 +36,7 @@
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
+#include <eez/modules/psu/dlog_view.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/platform/stm32/defines.h>
@@ -43,11 +44,12 @@
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
+
 namespace eez {
 namespace gui {
 namespace file_manager {
 
-static int g_loading;
+static State g_state;
 static uint32_t g_loadingStartTickCount;
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -115,10 +117,10 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
 
 void loadDirectory() {
     if (osThreadGetId() != scpi::g_scpiTaskHandle) {
-        if (g_loading == 1) {
+        if (g_state == STATE_LOADING) {
             return;
         }
-        g_loading = 1;
+        g_state = STATE_LOADING;
         g_loadingStartTickCount = millis();
         osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FILE_MANAGER_LOAD_DIRECTORY, 0), osWaitForever);
         return;
@@ -135,7 +137,7 @@ void loadDirectory() {
 
     g_filesStartPosition = 0;
 
-    g_loading = 2;
+    g_state = STATE_READY;
 }
 
 const char *getCurrentDirectory() {
@@ -143,7 +145,7 @@ const char *getCurrentDirectory() {
 }
 
 static FileItem *getFileItem(uint32_t fileIndex) {
-    if (g_loading != 2) {
+    if (g_state != STATE_READY) {
         return nullptr;
     }
 
@@ -154,20 +156,20 @@ static FileItem *getFileItem(uint32_t fileIndex) {
     return ((FileItem **)g_buffer)[fileIndex];
 }
 
-int getStatus() {
-    if (g_loading == 0) {
+State getState() {
+    if (g_state == STATE_STARTING) {
         loadDirectory();
-        return 0;
+        return STATE_STARTING;
     }
 
-    if (g_loading == 1) {
+    if (g_state == STATE_LOADING) {
         if (millis() - g_loadingStartTickCount < 1000) {
-            return 0; // STARTING (during first second)
+            return STATE_STARTING; // during 1st second of loading
         }
-        return 1; // LOADING
+        return STATE_LOADING;
     }
     
-    return 2; // READY
+    return STATE_READY;
 }
 
 bool isRootDirectory() {
@@ -175,7 +177,7 @@ bool isRootDirectory() {
 }
 
 void goToParentDirectory() {
-    if (g_loading != 2) {
+    if (g_state != STATE_READY) {
         return;
     }
 
@@ -235,7 +237,7 @@ const uint32_t getFileDataTime(uint32_t fileIndex) {
 }
 
 void selectFile(uint32_t fileIndex) {
-    if (g_loading != 2) {
+    if (g_state != STATE_READY) {
         return;
     }
 
@@ -253,10 +255,23 @@ void selectFile(uint32_t fileIndex) {
 }
 
 bool isOpenFileEnabled() {
-    return false;
+    auto fileItem = getFileItem(g_selectedFileIndex);
+    return fileItem && fileItem->type == FILE_TYPE_DLOG;
 }
 
 void openFile() {
+    popPage();
+
+    auto fileItem = getFileItem(g_selectedFileIndex);
+    if (fileItem && fileItem->type == FILE_TYPE_DLOG) {
+        char filePath[MAX_PATH_LENGTH + 1];
+        strcpy(filePath, g_currentDirectory);
+        strcat(filePath, "/");
+        strcat(filePath, fileItem->name);
+        psu::dlog_view::g_showLatest = false;
+        psu::dlog_view::openFile(filePath);
+        gui::pushPage(gui::PAGE_ID_RECORDINGS_VIEW);
+    }
 }
 
 bool isUploadFileEnabled() {

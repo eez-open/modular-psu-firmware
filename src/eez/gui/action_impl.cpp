@@ -30,7 +30,8 @@
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/sound.h>
 #include <eez/modules/psu/trigger.h>
-#include <eez/modules/psu/dlog.h>
+#include <eez/modules/psu/dlog_record.h>
+#include <eez/modules/psu/dlog_view.h>
 
 #include <eez/modules/psu/gui/psu.h>
 
@@ -1122,6 +1123,10 @@ void action_dlog_toggle() {
 }
 
 void action_show_recordings_view() {
+    dlog_view::g_showLatest = true;
+    if (!dlog_record::isExecuting()) {
+        dlog_view::openFile(dlog_record::getLatestFilePath());
+    }
     showPage(PAGE_ID_RECORDINGS_VIEW);
 }
 

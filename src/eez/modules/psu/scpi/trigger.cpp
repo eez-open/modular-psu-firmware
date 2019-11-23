@@ -24,7 +24,7 @@
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/trigger.h>
 #if OPTION_SD_CARD
-#include <eez/modules/psu/dlog.h>
+#include <eez/modules/psu/dlog_record.h>
 #endif
 
 namespace eez {
@@ -196,7 +196,7 @@ scpi_result_t scpi_cmd_coreTrg(scpi_t *context) {
 scpi_result_t scpi_cmd_triggerDlogImmediate(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
-    int result = dlog::startImmediately();
+    int result = dlog_record::startImmediately();
     if (result != SCPI_RES_OK) {
         SCPI_ErrorPush(context, result);
         return SCPI_RES_ERR;
@@ -216,7 +216,7 @@ scpi_result_t scpi_cmd_triggerDlogSource(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog::g_triggerSource = (trigger::Source)source;
+    dlog_record::g_triggerSource = (trigger::Source)source;
 
     if (source == trigger::SOURCE_PIN1) {
         persist_conf::setIoPinFunction(0, io_pins::FUNCTION_TINPUT);
@@ -236,7 +236,7 @@ scpi_result_t scpi_cmd_triggerDlogSource(scpi_t *context) {
 scpi_result_t scpi_cmd_triggerDlogSourceQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
-    resultChoiceName(context, sourceChoice, dlog::g_triggerSource);
+    resultChoiceName(context, sourceChoice, dlog_record::g_triggerSource);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
