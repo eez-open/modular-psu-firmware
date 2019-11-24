@@ -20,6 +20,8 @@
 
 #include <eez/gui/widget.h>
 
+static const int MAX_NUM_OF_Y_VALUES = 4;
+
 namespace eez {
 
 enum {
@@ -30,8 +32,6 @@ enum {
 
 namespace gui {
 
-static const int MAX_DLOG_VALUES = 6;
-
 struct YTGraphWidgetState {
     WidgetState genericState;
     uint32_t refreshCounter;
@@ -40,8 +40,8 @@ struct YTGraphWidgetState {
     uint32_t historyValuePosition;
     uint8_t ytGraphUpdateMethod;
     uint32_t cursorPosition;
-    float valuePerDiv[MAX_DLOG_VALUES];
-    float valueOffset[MAX_DLOG_VALUES];
+    float valuePerDiv[MAX_NUM_OF_Y_VALUES];
+    float valueOffset[MAX_NUM_OF_Y_VALUES];
 };
 
 void YTGraphWidget_draw(const WidgetCursor &widgetCursor);

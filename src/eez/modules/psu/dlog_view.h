@@ -19,6 +19,7 @@
 #pragma once
 
 #include <eez/gui/data.h>
+#include <eez/gui/widgets/yt_graph.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/dlog_view.h>
 
@@ -64,10 +65,6 @@ static const uint32_t DLOG_HEADER_SIZE = 28;
 static const int NUM_HORZ_DIVISIONS = 12;
 static const int NUM_VERT_DIVISIONS = 6;
 
-static const int MAX_DLOG_VALUES = 6;
-
-static const int MAX_VISIBLE_DLOG_VALUES = 2;
-
 enum State {
     STATE_STARTING,
     STATE_LOADING,
@@ -96,12 +93,6 @@ enum DlogValueType {
     DLOG_VALUE_CH6_P,
 };
 
-struct DlogValueParams {
-    DlogValueType dlogValueType;
-    eez::gui::data::Value perDiv;
-    eez::gui::data::Value offset;
-};
-
 struct Parameters {
     char filePath[MAX_PATH_LENGTH + 1];
 
@@ -113,6 +104,12 @@ struct Parameters {
     trigger::Source triggerSource;
 };
 
+struct DlogValueParams {
+    DlogValueType dlogValueType;
+    eez::gui::data::Value perDiv;
+    eez::gui::data::Value offset;
+};
+
 struct Recording {
     uint32_t refreshCounter;
 
@@ -120,7 +117,7 @@ struct Recording {
 
     uint8_t totalDlogValues;
     uint8_t numVisibleDlogValues;
-    DlogValueParams dlogValues[MAX_DLOG_VALUES];
+    DlogValueParams dlogValues[MAX_NUM_OF_Y_VALUES];
 
     eez::gui::Value timeOffset;
     Parameters parameters;

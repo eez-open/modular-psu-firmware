@@ -96,6 +96,13 @@ class PsuAppContext : public AppContext {
 
 extern PsuAppContext g_psuAppContext;
 
+static const uint16_t g_ytGraphStyles[] = {
+    STYLE_ID_YT_GRAPH_Y1,
+    STYLE_ID_YT_GRAPH_Y2,
+    STYLE_ID_YT_GRAPH_Y3,
+    STYLE_ID_YT_GRAPH_Y4
+};
+
 } // namespace gui
 } // namespace psu
 } // namespace eez

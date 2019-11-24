@@ -1212,14 +1212,14 @@ namespace gui {
 
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL) {
-        return widgetCursor.cursor.i == 0 ? COLOR_ID_BAR_GRAPH_VOLTAGE : COLOR_ID_BAR_GRAPH_CURRENT;
+        style = getStyle(psu::gui::g_ytGraphStyles[widgetCursor.cursor.i % (sizeof(psu::gui::g_ytGraphStyles) / sizeof(uint16_t))]);
     }
     return style->color;
 }
 
 uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL) {
-        return widgetCursor.cursor.i == 0 ? COLOR_ID_BAR_GRAPH_VOLTAGE : COLOR_ID_BAR_GRAPH_CURRENT;
+        style = getStyle(psu::gui::g_ytGraphStyles[widgetCursor.cursor.i % (sizeof(psu::gui::g_ytGraphStyles) / sizeof(uint16_t))]);
     }
     return style->active_color;
 }

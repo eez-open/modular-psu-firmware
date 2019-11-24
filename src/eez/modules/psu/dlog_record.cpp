@@ -283,8 +283,8 @@ int startImmediately() {
         if (g_recording.parameters.logVoltage[iChannel]) {
             columns |= 1 << (4 * iChannel);
             ++g_recording.totalDlogValues;
-            if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * g_recording.numVisibleDlogValues + dlog_view::DLOG_VALUE_CH1_U);
+            if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
+                g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_U);
                 float perDiv = channel_dispatcher::getUMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
                 g_recording.dlogValues[g_recording.numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_VOLT);
                 g_recording.dlogValues[g_recording.numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
@@ -295,8 +295,8 @@ int startImmediately() {
         if (g_recording.parameters.logCurrent[iChannel]) {
             columns |= 2 << (4 * iChannel);
             ++g_recording.totalDlogValues;
-            if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * g_recording.numVisibleDlogValues + dlog_view::DLOG_VALUE_CH1_I);
+            if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
+                g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_I);
                 float perDiv = channel_dispatcher::getIMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
                 g_recording.dlogValues[g_recording.numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_AMPER);
                 g_recording.dlogValues[g_recording.numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_AMPER);
@@ -307,8 +307,8 @@ int startImmediately() {
         if (g_recording.parameters.logPower[iChannel]) {
             columns |= 4 << (4 * iChannel);
             ++g_recording.totalDlogValues;
-            if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * g_recording.numVisibleDlogValues + dlog_view::DLOG_VALUE_CH1_P);
+            if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
+                g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_P);
                 float perDiv = channel_dispatcher::getPowerMaxLimit(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
                 g_recording.dlogValues[g_recording.numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_WATT);
                 g_recording.dlogValues[g_recording.numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_WATT);

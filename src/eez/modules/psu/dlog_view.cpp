@@ -206,8 +206,8 @@ void openFile(const char *filePath) {
 
                         g_recording.parameters.logVoltage[iChannel] = 1;
 
-                        if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * g_recording.numVisibleDlogValues + dlog_view::DLOG_VALUE_CH1_U);
+                        if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
+                            g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_U);
 
                             // TODO this must be read from the file
                             float perDiv = channel_dispatcher::getUMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
@@ -224,8 +224,8 @@ void openFile(const char *filePath) {
 
                         g_recording.parameters.logCurrent[iChannel] = 1;
 
-                        if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * g_recording.numVisibleDlogValues + dlog_view::DLOG_VALUE_CH1_I);
+                        if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
+                            g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_I);
 
                             // TODO this must be read from the file
                             float perDiv = channel_dispatcher::getIMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
@@ -242,8 +242,8 @@ void openFile(const char *filePath) {
 
                         g_recording.parameters.logPower[iChannel] = 1;
 
-                        if (g_recording.numVisibleDlogValues < dlog_view::MAX_VISIBLE_DLOG_VALUES) {
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * g_recording.numVisibleDlogValues + dlog_view::DLOG_VALUE_CH1_P);
+                        if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
+                            g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_P);
 
                             // TODO this should be stored inside DLOG file
                             float perDiv = channel_dispatcher::getPowerMaxLimit(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;

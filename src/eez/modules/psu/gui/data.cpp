@@ -4463,7 +4463,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
         value = Value(recording.pageSize, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
-        value = Value(value.getUInt8() % 3 == 0 ? STYLE_ID_YT_GRAPH_U_DEFAULT : value.getUInt8() % 3 == 1 ? STYLE_ID_YT_GRAPH_I_DEFAULT : STYLE_ID_YT_GRAPH_P_DEFAULT, VALUE_TYPE_UINT16);
+        value = Value(g_ytGraphStyles[value.getUInt8() % (sizeof(g_ytGraphStyles) / sizeof(uint16_t))], VALUE_TYPE_UINT16);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_HORZ_DIVISIONS) {
         value = dlog_view::NUM_HORZ_DIVISIONS;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS) {
@@ -4492,16 +4492,50 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
 
 void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
+    static const int NUM_WIDGETS = 4;
+
+    static const int LABELS_CONTAINER_WIDGET = 0;
+    static const int DLOG_VALUES_LIST_WIDGET = 1;
+
     static Overlay overlay;
+    static WidgetOverride widgetOverrides[NUM_WIDGETS];
 
     if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
         dlog_view::Recording &recording = dlog_view::getRecording();
-        overlay.state = &recording != &dlog_record::g_recording;
-        WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
-        overlay.width = widgetCursor.widget->w;
-        overlay.height = widgetCursor.widget->h;
+        auto state = &recording != &dlog_record::g_recording ? recording.numVisibleDlogValues : 0;
+
+        if (overlay.state != state) {
+            overlay.state = state;
+
+            if (state > 0) {
+                overlay.widgetOverrides = widgetOverrides;
+
+                WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
+
+                const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+
+                const Widget *labelsContainerWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LABELS_CONTAINER_WIDGET);
+                const Widget *dlogValuesListWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_VALUES_LIST_WIDGET);
+
+                widgetOverrides[LABELS_CONTAINER_WIDGET].isVisible = true;
+                widgetOverrides[LABELS_CONTAINER_WIDGET].x = labelsContainerWidget->x;
+                widgetOverrides[LABELS_CONTAINER_WIDGET].y = labelsContainerWidget->y;
+                widgetOverrides[LABELS_CONTAINER_WIDGET].w = labelsContainerWidget->w;
+                widgetOverrides[LABELS_CONTAINER_WIDGET].h = labelsContainerWidget->h;
+
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].isVisible = true;
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].x = dlogValuesListWidget->x;
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].y = dlogValuesListWidget->y;
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].w = dlogValuesListWidget->w;
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].h = recording.numVisibleDlogValues * dlogValuesListWidget->h;
+
+                overlay.width = widgetCursor.widget->w;
+                overlay.height = widgetOverrides[LABELS_CONTAINER_WIDGET].h + widgetOverrides[DLOG_VALUES_LIST_WIDGET].h;
+            }
+        }
+
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     }
 #endif
