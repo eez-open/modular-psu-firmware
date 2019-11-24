@@ -58,9 +58,7 @@ void AppViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback
     g_dataOperationsFunctions[widgetCursor.widget->data](data::DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
-    assert(g_appContext == widgetCursor.appContext);
-    auto savedAppContext = widgetCursor.appContext;
-    
+    WidgetCursor savedWidgetCursor = widgetCursor;
     widgetCursor.appContext = appContext;
     g_appContext = appContext;
 
@@ -70,8 +68,12 @@ void AppViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback
 		enumWidgets(widgetCursor, callback);
     }
 
-    widgetCursor.appContext = savedAppContext;
-    g_appContext = savedAppContext;
+    if (widgetCursor.currentState) {
+        savedWidgetCursor.currentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedWidgetCursor.currentState);
+    }
+
+    widgetCursor = savedWidgetCursor;
+    g_appContext = widgetCursor.appContext;
 }
 
 } // namespace gui
