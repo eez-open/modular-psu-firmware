@@ -137,11 +137,7 @@ void oneIter() {
 				eez::psu::dlog_record::fileWrite();
 			}
             else if (type == SCPI_QUEUE_MESSAGE_DLOG_TOGGLE) {
-                if (dlog_record::isExecuting()) {
-                    dlog_record::abort();
-                } else {
-                    dlog_record::initiate();
-                }
+                eez::psu::dlog_record::toggle();
             } else if (type == SCPI_QUEUE_MESSAGE_DLOG_SHOW_FILE) {
                 eez::psu::dlog_view::openFile(nullptr);
             } else if (type == SCPI_QUEUE_MESSAGE_DLOG_LOAD_BLOCK) {

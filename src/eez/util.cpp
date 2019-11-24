@@ -550,4 +550,13 @@ int strcicmp(char const *a, char const *b) {
     }
 }
 
+bool isStringEmpty(char const *s) {
+    for (; *s; s++) {
+        if (!isspace(*s)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 } // namespace eez

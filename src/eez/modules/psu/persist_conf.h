@@ -31,6 +31,8 @@
 #define CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR  1
 #define CHANNELS_VIEW_MODE_IN_MAX_YT        2
 
+#include <eez/file_type.h>
+
 namespace eez {
 namespace psu {
 
@@ -170,7 +172,8 @@ struct DeviceConfiguration {
 
     // block 7
     UserSwitchAction userSwitchAction;
-    uint8_t reserved[60];
+    SortFilesOption sortFilesOption;
+    uint8_t reserved[56];
 };
 
 extern const DeviceConfiguration &devConf;
@@ -305,6 +308,8 @@ void setSkipSerialSetup(unsigned skipSerialSetup);
 void setSkipEthernetSetup(unsigned skipEthernetSetup);
 
 void setUserSwitchAction(UserSwitchAction userSwitchAction);
+
+void setSortFilesOption(SortFilesOption sortFilesOption);
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -119,5 +119,6 @@ bool endsWith(const char *str, const char *suffix);
 void formatBytes(uint32_t bytes, char *text, int count);
 
 int strcicmp(char const *a, char const *b);
+bool isStringEmpty(char const *a);
 
 } // namespace eez

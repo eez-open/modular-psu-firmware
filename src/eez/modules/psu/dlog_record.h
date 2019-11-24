@@ -27,7 +27,11 @@ namespace eez {
 namespace psu {
 namespace dlog_record {
 
-enum State { STATE_IDLE, STATE_INITIATED, STATE_TRIGGERED, STATE_EXECUTING };
+enum State {
+    STATE_IDLE,
+    STATE_INITIATED,
+    STATE_EXECUTING
+};
 
 static const float PERIOD_MIN = 0.005f;
 static const float PERIOD_MAX = 120.0f;
@@ -47,13 +51,14 @@ extern dlog_view::Parameters g_guiParameters;
 extern dlog_view::Recording g_recording;
 
 State getState();
-int checkDlogParameters(dlog_view::Parameters &parameters);
+int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath = false);
 bool isIdle();
 bool isInitiated();
 bool isExecuting();
-int initiate();
-void triggerGenerated(bool startImmediatelly = true);
+int initiate();                                                                                                                                                                                                                                                                                                                                                                                                                     
 int startImmediately();
+void triggerGenerated();
+void toggle();
 void abort(bool flush = true);
 
 void tick(uint32_t tick_usec);

@@ -140,7 +140,7 @@ int generateTrigger(Source source, bool checkImmediatelly) {
 
 #if OPTION_SD_CARD
     if (dlogTriggered) {
-        dlog_record::triggerGenerated(checkImmediatelly);
+        dlog_record::triggerGenerated();
     }
 #endif
 

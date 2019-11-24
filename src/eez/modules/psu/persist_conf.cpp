@@ -181,6 +181,7 @@ void initDefaultDevConf() {
 
 // block 7
     g_defaultDevConf.userSwitchAction = USER_SWITCH_ACTION_ENCODER_STEP;
+    g_defaultDevConf.sortFilesOption = SORT_FILES_BY_TIME_DESC;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1255,6 +1256,10 @@ void setSkipEthernetSetup(unsigned skipEthernetSetup) {
 
 void setUserSwitchAction(UserSwitchAction userSwitchAction) {
     g_devConf.userSwitchAction = userSwitchAction;
+}
+
+void setSortFilesOption(SortFilesOption sortFilesOption) {
+    g_devConf.sortFilesOption = sortFilesOption;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

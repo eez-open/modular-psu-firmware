@@ -93,6 +93,12 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
     text[0] = 0;
 
     float floatValue = value.getFloat();
+
+    if (isinf(floatValue)) {
+        strcat(text, INF_TEXT);
+        return;
+    }
+
     Unit unit = value.getUnit();
 
     if (floatValue != 0) {

@@ -104,7 +104,6 @@ struct DlogValueParams {
 
 struct Parameters {
     char filePath[MAX_PATH_LENGTH + 1];
-    bool appendTime; // append current date and time to basename
 
     bool logVoltage[CH_MAX];
     bool logCurrent[CH_MAX];

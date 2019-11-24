@@ -22,7 +22,6 @@
 using namespace eez::gui;
 
 #define LIST_ITEMS_PER_PAGE 5
-#define INF_TEXT "\x91"
 #define EMPTY_VALUE "\x92"
 
 namespace eez {

@@ -35,6 +35,7 @@
 #include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/datetime.h>
+#include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/dlog_view.h>
@@ -77,8 +78,6 @@ uint32_t g_filesStartPosition;
 
 uint32_t g_selectedFileIndex;
 
-static SortBy g_sortBy = SORT_BY_TIME_DESC;
-
 void catalogCallback(void *param, const char *name, FileType type, size_t size) {
     auto fileInfo = (FileInfo *)param;
 
@@ -118,15 +117,15 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
 int compareFunc(const void *p1, const void *p2) {
     FileItem *item1 = (FileItem *)p1;
     FileItem *item2 = (FileItem *)p2;
-    if (g_sortBy == SORT_BY_NAME_ASC) {
+    if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_NAME_ASC) {
         return strcicmp(item1->name, item2->name);
-    } else if (g_sortBy == SORT_BY_NAME_DESC) {
+    } else if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_NAME_DESC) {
         return -strcicmp(item1->name, item2->name);
-    } else if (g_sortBy == SORT_BY_SIZE_ASC) {
+    } else if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_SIZE_ASC) {
         return item1->size - item2->size;
-    } else if (g_sortBy == SORT_BY_SIZE_DESC) {
+    } else if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_SIZE_DESC) {
         return item2->size - item1->size;
-    } else if (g_sortBy == SORT_BY_TIME_ASC) {
+    } else if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_TIME_ASC) {
         return item1->dateTime - item2->dateTime;
     } else {
         return item2->dateTime - item1->dateTime;
@@ -163,12 +162,12 @@ void loadDirectory() {
     g_state = STATE_READY;
 }
 
-SortBy getSortBy() {
-    return g_sortBy;
+SortFilesOption getSortFilesOption() {
+    return psu::persist_conf::devConf.sortFilesOption;
 }
 
-void setSortBy(SortBy sortBy) {
-    g_sortBy = sortBy;
+void setSortFilesOption(SortFilesOption sortFilesOption) {
+    psu::persist_conf::setSortFilesOption(sortFilesOption);
     sort();
     g_filesStartPosition = 0;
 }

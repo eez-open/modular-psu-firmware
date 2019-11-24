@@ -36,7 +36,8 @@ namespace gui {
 
 static ScrollBarWidgetSegment g_segment;
 static WidgetCursor g_selectedWidget;
-static int g_thumbOffset;
+static int g_dragStartX;
+static int g_dragStartPosition;
 
 #if OPTION_SDRAM
 void ScrollBarWidget_fixPointers(Widget *widget) {
@@ -66,15 +67,18 @@ bool setPosition(const WidgetCursor &widgetCursor, int position) {
 }
 
 void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTrack, int minThumbWidth, int &xThumb, int &widthThumb) {
-    xThumb = xTrack + (int)floorf(1.0f * position * wTrack / size);
-    widthThumb = MAX((int)floorf(1.0f * pageSize * wTrack / size), minThumbWidth);
-    if (xThumb + widthThumb >= xTrack + wTrack) {
-        xThumb = xTrack + wTrack - widthThumb;
-    }
-}
+    double x = 1.0 * position * wTrack / size;
+    double width = 1.0 * pageSize * wTrack / size;
 
-int getPositionFromThumbPosition(int thumbPosition, int size, int xTrack, int wTrack) {
-    return (int)roundf(1.0f * size * (thumbPosition - xTrack) / wTrack);
+    if (width < minThumbWidth) {
+        x -=  1.0 * (minThumbWidth - width) * position / size;
+        width = minThumbWidth;
+    }
+
+    xThumb = (int)round(x);
+    widthThumb = (int)round(width + x - xThumb);
+
+    xThumb += xTrack;
 }
 
 void ScrollBarWidget_draw(const WidgetCursor &widgetCursor) {
@@ -237,14 +241,14 @@ void ScrollBarWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
                     }
                 } else if (x >= xThumb || touchEvent.x < xThumb + wThumb) {
                     g_segment = SCROLL_BAR_WIDGET_SEGMENT_THUMB;
-                    g_thumbOffset = xThumb - x;
-
+                    g_dragStartX = x;
+                    g_dragStartPosition = getPosition(widgetCursor);
                 }
             }
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
             if (g_segment == SCROLL_BAR_WIDGET_SEGMENT_THUMB) {
                 int size = getSize(widgetCursor);
-                setPosition(widgetCursor, getPositionFromThumbPosition(x + g_thumbOffset, size, xTrack, wTrack));
+                setPosition(widgetCursor, g_dragStartPosition + (int)round(1.0 * (x - g_dragStartX) * size / wTrack));
             }
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
             g_selectedWidget = 0;

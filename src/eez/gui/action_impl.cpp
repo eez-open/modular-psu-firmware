@@ -1125,15 +1125,15 @@ void action_show_dlog_params() {
 }
 
 void action_dlog_voltage_toggle() {
-    dlog_record::g_parameters.logVoltage[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_parameters.logVoltage[getFoundWidgetAtDown().cursor.i];
+    dlog_record::g_guiParameters.logVoltage[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_guiParameters.logVoltage[getFoundWidgetAtDown().cursor.i];
 }
 
 void action_dlog_current_toggle() {
-    dlog_record::g_parameters.logCurrent[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_parameters.logCurrent[getFoundWidgetAtDown().cursor.i];
+    dlog_record::g_guiParameters.logCurrent[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_guiParameters.logCurrent[getFoundWidgetAtDown().cursor.i];
 }
 
 void action_dlog_power_toggle() {
-    dlog_record::g_parameters.logPower[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_parameters.logPower[getFoundWidgetAtDown().cursor.i];
+    dlog_record::g_guiParameters.logPower[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_guiParameters.logPower[getFoundWidgetAtDown().cursor.i];
 }
 
 void action_dlog_edit_period() {
@@ -1148,16 +1148,9 @@ void action_dlog_edit_file_name() {
     editValue(DATA_ID_DLOG_FILE_NAME);
 }
 
-void action_dlog_toggle_append_time() {
-#if OPTION_SD_CARD
-    dlog_record::g_guiParameters.appendTime = !dlog_record::g_guiParameters.appendTime;
-#endif
-}
-
 void action_dlog_toggle() {
 #if OPTION_SD_CARD
-    using namespace scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_TOGGLE, 0), osWaitForever);
+    dlog_record::toggle();
 #endif
 }
 
@@ -1175,7 +1168,7 @@ void action_dlog_start_recording() {
 
     char filePath[MAX_PATH_LENGTH + 1];
 
-    if (dlog_record::g_guiParameters.appendTime) {
+    if (isStringEmpty(dlog_record::g_guiParameters.filePath)) {
         uint8_t year, month, day, hour, minute, second;
         datetime::getDate(year, month, day);
         datetime::getTime(hour, minute, second);
@@ -1191,12 +1184,13 @@ void action_dlog_start_recording() {
     memcpy(&dlog_record::g_parameters, &dlog_record::g_guiParameters, sizeof(dlog_record::g_guiParameters));
     strcpy(dlog_record::g_parameters.filePath, filePath);
 
-    action_dlog_toggle();
+    dlog_record::toggle();
 #endif
 }
 
 void action_show_file_manager() {
 #if OPTION_SD_CARD
+    file_manager::loadDirectory();
     showPage(PAGE_ID_FILE_MANAGER);
 #endif
 }
@@ -1239,12 +1233,12 @@ void action_file_manager_delete_file() {
 
 void onSetFileManagerSortBy(uint16_t value) {
     popPage();
-    file_manager::setSortBy((file_manager::SortBy)value);
+    file_manager::setSortFilesOption((SortFilesOption)value);
 }
 
 void action_file_manager_sort_by() {
 #if OPTION_SD_CARD
-    pushSelectFromEnumPage(g_fileManagerSortByEnumDefinition, file_manager::getSortBy(), NULL, onSetFileManagerSortBy, true);
+    pushSelectFromEnumPage(g_fileManagerSortByEnumDefinition, file_manager::getSortFilesOption(), NULL, onSetFileManagerSortBy, true);
 #endif
 }
 

@@ -158,8 +158,7 @@ void ChSettingsTriggerPage::editListCount() {
     options.option1ButtonText = INF_TEXT;
     options.option1 = onListCountSetToInfinity;
 
-    NumericKeypad::start(0, data::Value((uint16_t)list::getListCount(*g_channel)), options,
-                         onListCountSet, 0, 0);
+    NumericKeypad::start(0, data::Value((uint16_t)list::getListCount(*g_channel)), options, onListCountSet, 0, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

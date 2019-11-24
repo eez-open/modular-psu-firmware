@@ -233,9 +233,9 @@ void init() {
         if (slot.moduleInfo->moduleType != MODULE_TYPE_NONE) {
             persist_conf::loadModuleConf(slotIndex);
             ontime::g_moduleCounters[slotIndex].init();
+            CH_NUM = channelIndex;
         }
     }
-    CH_NUM = channelIndex;
 
     persist_conf::init();
 

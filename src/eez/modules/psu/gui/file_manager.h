@@ -21,6 +21,7 @@
 #include <stdint.h>
 
 #include <eez/file_type.h>
+#include <eez/modules/psu/persist_conf.h>
 
 namespace eez {
 namespace gui {
@@ -34,18 +35,9 @@ enum State {
     STATE_READY
 };
 
-enum SortBy {
-    SORT_BY_NAME_ASC,
-    SORT_BY_NAME_DESC,
-    SORT_BY_SIZE_ASC,
-    SORT_BY_SIZE_DESC,
-    SORT_BY_TIME_ASC,
-    SORT_BY_TIME_DESC
-};
-
 void loadDirectory();
-SortBy getSortBy();
-void setSortBy(SortBy sortBy);
+SortFilesOption getSortFilesOption();
+void setSortFilesOption(SortFilesOption sortFilesOption);
 const char *getCurrentDirectory();
 State getState();
 bool isRootDirectory();

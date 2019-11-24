@@ -46,7 +46,6 @@ namespace dlog_record {
 
 dlog_view::Parameters g_parameters = {
     { 0 },
-    false,
     {false, false, false, false, false, false},
     {false, false, false, false, false, false},
     {false, false, false, false, false, false},
@@ -57,7 +56,6 @@ dlog_view::Parameters g_parameters = {
 
 dlog_view::Parameters g_guiParameters = {
     { 0 },
-    true,
     { true, false, false, false, false, false },
     { true, false, false, false, false, false },
     { false, false, false, false, false, false },
@@ -101,94 +99,14 @@ static unsigned int g_bufferIndex;
 static unsigned int g_lastChunkIndex;
 static unsigned int g_lastChunkSize;
 
-void setState(State newState) {
-    if (g_state != newState) {
-        if (newState == STATE_EXECUTING) {
-            setOperBits(OPER_DLOG, true);
-        } else if (g_state == STATE_EXECUTING) {
-            setOperBits(OPER_DLOG, false);
-        }
-
-        g_state = newState;
-    }
-}
-
-int checkDlogParameters(dlog_view::Parameters &parameters) {
-    bool somethingToLog = false;
-    for (int i = 0; i < CH_NUM; ++i) {
-        if (parameters.logVoltage[i] || parameters.logCurrent[i] || parameters.logPower[i]) {
-            somethingToLog = true;
-            break;
-        }
-    }
-
-    if (!somethingToLog) {
-        // TODO replace with more specific error
-        return SCPI_ERROR_EXECUTION_ERROR;
-    }
-
-    if (!parameters.filePath[0] && !parameters.appendTime) {
-        // TODO replace with more specific error
-        return SCPI_ERROR_EXECUTION_ERROR;
-    }
-
-    return SCPI_RES_OK;
-}
-
-State getState() {
-    return g_state;
-}
-
-bool isIdle() {
-    return g_state == STATE_IDLE;
-}
-
-bool isInitiated() {
-    return g_state == STATE_INITIATED;
-}
-
-bool isExecuting() {
-    return g_state == STATE_EXECUTING;
-}
-
-int initiate() {
-    int error = SCPI_RES_OK;
-
-    if (g_parameters.triggerSource == trigger::SOURCE_IMMEDIATE) {
-        error = startImmediately();
-    } else {
-        error = checkDlogParameters(g_parameters);
-        if (error == SCPI_RES_OK) {
-            setState(STATE_INITIATED);
-        }
-    }
-
-    if (error != SCPI_RES_OK) {
-        g_parameters.filePath[0] = 0;
-    }
-
-    return error;
-}
-
-void triggerGenerated(bool startImmediatelly) {
-    if (startImmediatelly) {
-        int err = startImmediately();
-        if (err != SCPI_RES_OK) {
-            generateError(err);
-        }
-    } else {
-        setState(STATE_TRIGGERED);
-    }
-}
-
 int fileOpen() {
-	File file;
+    File file;
     if (!file.open(g_parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-    	event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_OPEN_ERROR);
+        event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_OPEN_ERROR);
         // TODO replace with more specific error
         return SCPI_ERROR_MASS_STORAGE_ERROR;
     }
-     
+
     bool result = file.truncate(0);
     file.close();
     if (!result) {
@@ -201,19 +119,19 @@ int fileOpen() {
 }
 
 void fileWrite() {
-	File file;
+    File file;
     if (!file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-    	event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR);
-    	abort(false);
+        event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR);
+        abort(false);
         return;
     }
 
     size_t written = file.write(g_buffer + g_lastChunkIndex * CHUNK_SIZE, g_lastChunkSize);
-	file.close();
-	if (written != g_lastChunkSize) {
-		event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_WRITE_ERROR);
-		abort(false);
-	}
+    file.close();
+    if (written != g_lastChunkSize) {
+        event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_WRITE_ERROR);
+        abort(false);
+    }
 }
 
 void flushData() {
@@ -255,6 +173,77 @@ void writeUint32(uint32_t value) {
 
 void writeFloat(float value) {
     writeUint32(*((uint32_t *)&value));
+}
+
+void setState(State newState) {
+    if (g_state != newState) {
+        if (newState == STATE_EXECUTING) {
+            setOperBits(OPER_DLOG, true);
+        } else if (g_state == STATE_EXECUTING) {
+            setOperBits(OPER_DLOG, false);
+        }
+
+        g_state = newState;
+    }
+}
+
+State getState() {
+    return g_state;
+}
+
+int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath) {
+    bool somethingToLog = false;
+    for (int i = 0; i < CH_NUM; ++i) {
+        if (parameters.logVoltage[i] || parameters.logCurrent[i] || parameters.logPower[i]) {
+            somethingToLog = true;
+            break;
+        }
+    }
+
+    if (!somethingToLog) {
+        // TODO replace with more specific error
+        return SCPI_ERROR_EXECUTION_ERROR;
+    }
+
+    if (!doNotCheckFilePath) {
+        if (!parameters.filePath[0]) {
+            // TODO replace with more specific error
+            return SCPI_ERROR_EXECUTION_ERROR;
+        }
+    }
+
+    return SCPI_RES_OK;
+}
+
+bool isIdle() {
+    return g_state == STATE_IDLE;
+}
+
+bool isInitiated() {
+    return g_state == STATE_INITIATED;
+}
+
+bool isExecuting() {
+    return g_state == STATE_EXECUTING;
+}
+
+int initiate() {
+    int error = SCPI_RES_OK;
+
+    if (g_parameters.triggerSource == trigger::SOURCE_IMMEDIATE) {
+        error = startImmediately();
+    } else {
+        error = checkDlogParameters(g_parameters);
+        if (error == SCPI_RES_OK) {
+            setState(STATE_INITIATED);
+        }
+    }
+
+    if (error != SCPI_RES_OK) {
+        g_parameters.filePath[0] = 0;
+    }
+
+    return error;
 }
 
 eez::gui::data::Value getValue(int rowIndex, int columnIndex) {
@@ -364,6 +353,28 @@ int startImmediately() {
     return SCPI_RES_OK;
 }
 
+void triggerGenerated() {
+    int err = startImmediately();
+    if (err != SCPI_RES_OK) {
+        generateError(err);
+    }
+}
+
+void toggle() {
+    if (osThreadGetId() != g_scpiTaskHandle) {
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_TOGGLE, 0), osWaitForever);
+        return;
+    }
+
+    if (dlog_record::isExecuting()) {
+        dlog_record::abort();
+    } else if (dlog_record::isInitiated()) {
+        triggerGenerated();
+    } else {
+        dlog_record::initiate();
+    }
+}
+
 void resetParameters() {
     for (int i = 0; i < CH_NUM; ++i) {
         g_parameters.logVoltage[i] = 0;
@@ -390,7 +401,7 @@ void finishLogging(bool flush) {
 void abort(bool flush) {
     if (g_state == STATE_EXECUTING) {
         finishLogging(flush);
-    } else if (g_state == STATE_INITIATED || g_state == STATE_TRIGGERED) {
+    } else {
         setState(STATE_IDLE);
     }
 }
@@ -509,12 +520,7 @@ void log(uint32_t tickCount) {
 }
 
 void tick(uint32_t tickCount) {
-    if (g_state == STATE_TRIGGERED) {
-        int err = startImmediately();
-        if (err != SCPI_RES_OK) {
-            generateError(err);
-        }
-    } else if (g_state == STATE_EXECUTING) {
+    if (g_state == STATE_EXECUTING) {
         log(tickCount);
     }
 }

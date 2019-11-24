@@ -30,4 +30,13 @@ enum FileType {
     FILE_TYPE_OTHER,
 };
 
+enum SortFilesOption {
+    SORT_FILES_BY_NAME_ASC,
+    SORT_FILES_BY_NAME_DESC,
+    SORT_FILES_BY_SIZE_ASC,
+    SORT_FILES_BY_SIZE_DESC,
+    SORT_FILES_BY_TIME_ASC,
+    SORT_FILES_BY_TIME_DESC
+};
+
 } // eez
