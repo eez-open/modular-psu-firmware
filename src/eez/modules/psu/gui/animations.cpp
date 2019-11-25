@@ -81,7 +81,7 @@ void animateFromDefaultViewToMaxView() {
     int iMin2 = iMax == 2 ? 1 : 2;
 
     auto g_defRects = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
-        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
+        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR ? g_vertDefRects : g_horzDefRects;
 
     int i = 0;
 
@@ -104,7 +104,7 @@ void animateFromMaxViewToDefaultView() {
     int iMin2 = iMax == 2 ? 1 : 2;
 
     auto g_defRects = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
-        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
+        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR ? g_vertDefRects : g_horzDefRects;
 
     int i = 0;
 
@@ -197,7 +197,7 @@ void animateFromMicroViewToMaxView() {
 
 void animateShowSysSettings() {
     auto g_defRects = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
-        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
+        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR ? g_vertDefRects : g_horzDefRects;
 
     int i = 0;
 
@@ -220,7 +220,7 @@ void animateShowSysSettings() {
 
 void animateHideSysSettings() {
     auto g_defRects = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC ||
-        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR ? g_vertDefRects : g_horzDefRects;
+        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR ? g_vertDefRects : g_horzDefRects;
 
     int i = 0;
 
