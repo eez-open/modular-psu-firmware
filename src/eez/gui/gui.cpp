@@ -113,15 +113,15 @@ void oneIter() {
     g_appContext->width = mcu::display::getDisplayWidth();
     g_appContext->height = mcu::display::getDisplayHeight();
 
+    eventHandling();
+    stateManagmentHook();
+
 #if OPTION_SDRAM
     bool wasOn = mcu::display::isOn();
     if (wasOn) {
         mcu::display::beginBuffersDrawing();
     }
 #endif
-
-    eventHandling();
-    stateManagmentHook();
 
     if (mcu::display::isOn()) {
 #if OPTION_SDRAM
@@ -625,7 +625,6 @@ void animateRects(Buffer startBuffer, int numRects, float duration) {
     g_clipRect.y = g_appContext->y;
     g_clipRect.w = g_appContext->width;
     g_clipRect.h = g_appContext->height;
-
 
     for (int i = 0; i < numRects; i++) {
         prepareRect(g_animRects[i].srcRect);
