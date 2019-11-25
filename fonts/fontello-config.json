@@ -35,6 +35,12 @@
       "css": "up-1",
       "code": 61814,
       "src": "fontawesome"
+    },
+    {
+      "uid": "2cfb3f2b46b34a1790aec0aa846297b6",
+      "css": "menu",
+      "code": 59395,
+      "src": "entypo"
     }
   ]
 }

@@ -35,8 +35,9 @@ void channelInitiateTrigger();
 void channelSetToFixed();
 void channelEnableOutput();
 
-void selectChannel();
+void selectChannel(Channel *channel = nullptr);
 extern Channel *g_channel;
+extern int g_channelIndex;
 
 extern data::Cursor g_focusCursor;
 extern uint16_t g_focusDataId;

@@ -336,13 +336,13 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_SET_POSITION,
     DATA_OPERATION_YT_DATA_GET_PAGE_SIZE,
     DATA_OPERATION_YT_DATA_GET_STYLE,
-    DATA_OPERATION_YT_DATA_GET_NUM_VALUES,
     DATA_OPERATION_YT_DATA_GET_MIN,
     DATA_OPERATION_YT_DATA_GET_MAX,
     DATA_OPERATION_YT_DATA_GET_HORZ_DIVISIONS,
     DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS,
     DATA_OPERATION_YT_DATA_GET_PER_DIV,
     DATA_OPERATION_YT_DATA_GET_OFFSET,
+    DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE,
     DATA_OPERATION_YT_DATA_GET_VALUE1,
     DATA_OPERATION_YT_DATA_GET_VALUE2,
     DATA_OPERATION_YT_DATA_GET_VALUE3,
@@ -391,13 +391,13 @@ uint32_t ytDataGetPosition(const Cursor &cursor, uint16_t id);
 void ytDataSetPosition(const Cursor &cursor, uint16_t id, uint32_t newPosition);
 uint32_t ytDataGetPageSize(const Cursor &cursor, uint16_t id);
 const Style *ytDataGetStyle(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
-int ytDataGetNumValues(const Cursor &cursor, uint16_t id);
 Value ytDataGetMin(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 Value ytDataGetMax(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 int ytDataGetVertDivisions(const Cursor &cursor, uint16_t id);
 int ytDataGetHorzDivisions(const Cursor &cursor, uint16_t id);
 float ytDataGetPerDiv(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 float ytDataGetOffset(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
+bool ytDataDataValueIsVisible(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint32_t position, uint8_t valueIndex);
 uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, uint16_t id);
 float ytDataGetPeriod(const Cursor &cursor, uint16_t id);

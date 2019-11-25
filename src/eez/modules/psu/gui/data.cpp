@@ -980,9 +980,9 @@ void data_channels(data::DataOperationEnum operation, data::Cursor &cursor, data
         value = CH_NUM;
     } else if (operation == data::DATA_OPERATION_SELECT) {
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
-        g_channel = &Channel::get(cursor.i);
+        selectChannel(&Channel::get(cursor.i));
     } else if (operation == data::DATA_OPERATION_DESELECT) {
-        g_channel = (Channel * )value.getVoidPointer();
+        selectChannel((Channel * )value.getVoidPointer());
     }
 }
 
@@ -1407,11 +1407,11 @@ void data_slot1_channel_index(data::DataOperationEnum operation, data::Cursor &c
         Channel &channel = Channel::getBySlotIndex(0);
         cursor.i = channel.channelIndex;
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
-        g_channel = &channel;
+        selectChannel(&channel);
     } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
-        g_channel = (Channel *)value.getVoidPointer();
+        selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
@@ -1420,11 +1420,11 @@ void data_slot2_channel_index(data::DataOperationEnum operation, data::Cursor &c
         Channel &channel = Channel::getBySlotIndex(1);
         cursor.i = channel.channelIndex;
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
-        g_channel = &channel;
+        selectChannel(&channel);
     } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
-        g_channel = (Channel *)value.getVoidPointer();
+        selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
@@ -1433,11 +1433,11 @@ void data_slot3_channel_index(data::DataOperationEnum operation, data::Cursor &c
         Channel &channel = Channel::getBySlotIndex(2);
         cursor.i = channel.channelIndex;
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
-        g_channel = &channel;
+        selectChannel(&channel);
     } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
-        g_channel = (Channel *)value.getVoidPointer();
+        selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
@@ -1464,11 +1464,11 @@ void data_slot_max_channel_index(data::DataOperationEnum operation, data::Cursor
         Channel &channel = Channel::get(persist_conf::getMaxChannelIndex());
         cursor.i = channel.channelIndex;
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
-        g_channel = &channel;
+        selectChannel(&channel);
     } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
-        g_channel = (Channel *)value.getVoidPointer();
+        selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
@@ -1533,11 +1533,11 @@ void data_slot_min1_channel_index(data::DataOperationEnum operation, data::Curso
         Channel &channel = Channel::get(persist_conf::getMin1ChannelIndex());
         cursor.i = channel.channelIndex;
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
-        g_channel = &channel;
+        selectChannel(&channel);
     } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
-        g_channel = (Channel *)value.getVoidPointer();
+        selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
@@ -1552,11 +1552,11 @@ void data_slot_min2_channel_index(data::DataOperationEnum operation, data::Curso
         Channel &channel = Channel::get(persist_conf::getMin2ChannelIndex());
         cursor.i = channel.channelIndex;
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
-        g_channel = &channel;
+        selectChannel(&channel);
     } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
-        g_channel = (Channel *)value.getVoidPointer();
+        selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
@@ -1614,11 +1614,11 @@ void data_slot_2ch_ch1_index(data::DataOperationEnum operation, data::Cursor &cu
     if (operation == data::DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::get(cursor.i);
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
-        g_channel = &channel;
+        selectChannel(&channel);
     } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
-        g_channel = (Channel *)value.getVoidPointer();
+        selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
@@ -1631,11 +1631,11 @@ void data_slot_2ch_ch2_index(data::DataOperationEnum operation, data::Cursor &cu
         }
         Channel &channel = Channel::get(cursor.i);
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
-        g_channel = &channel;
+        selectChannel(&channel);
     } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
-        g_channel = (Channel *)value.getVoidPointer();
+        selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
@@ -4381,8 +4381,6 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
         value = g_appContext->getHistoryValue(cursor, operation - DATA_OPERATION_YT_DATA_GET_VALUE1 == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2, value.getUInt32());
     } else if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
         value = Value(0, VALUE_TYPE_UINT32);
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_NUM_VALUES) {
-        value = 2;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
         value = Value(g_appContext->getNumHistoryValues(DATA_ID_CHANNEL_DISPLAY_VALUE1), VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
@@ -4402,6 +4400,82 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
         value = Value(psu::persist_conf::devConf.ytGraphUpdateMethod, VALUE_TYPE_UINT8);
     }
+}
+
+void data_dlog_voltage_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = dlog_record::g_guiParameters.logVoltage[cursor.i];
+    }
+#endif
+}
+
+void data_dlog_current_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = dlog_record::g_guiParameters.logCurrent[cursor.i];
+    }
+#endif
+}
+
+void data_dlog_power_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = dlog_record::g_guiParameters.logPower[cursor.i];
+    }
+#endif
+}
+
+void data_dlog_period(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = MakeValue(dlog_record::g_guiParameters.period, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = MakeValue(dlog_record::PERIOD_MIN, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = MakeValue(dlog_record::PERIOD_MAX, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_SET) {
+        dlog_record::g_guiParameters.period = value.getFloat();
+    }
+#endif
+}
+
+void data_dlog_duration(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = MakeValue(dlog_record::g_guiParameters.time, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = MakeValue(dlog_record::TIME_MIN, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = MakeValue(INFINITY, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_SET) {
+        dlog_record::g_guiParameters.time = value.getFloat();
+    }
+#endif
+}
+
+void data_dlog_file_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = dlog_record::g_guiParameters.filePath;
+    } else if (operation == data::DATA_OPERATION_SET) {
+        strcpy(dlog_record::g_guiParameters.filePath, value.getString());
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = Value(MAX_PATH_LENGTH, VALUE_TYPE_UINT32);
+    }
+#endif
+}
+
+void data_dlog_start_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = dlog_record::checkDlogParameters(dlog_record::g_guiParameters, true) == SCPI_RES_OK ? 1 : 0;
+    }
+#endif
 }
 
 void data_dlog_view_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -4434,6 +4508,8 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         value = Value(recording.refreshCounter, VALUE_TYPE_UINT32);
     } else if (operation >= DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE4) {
         value = recording.getValue(value.getUInt32(), operation - DATA_OPERATION_YT_DATA_GET_VALUE1);
+    } else if (operation == DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE) {
+        value = Value(recording.dlogValues[value.getUInt8()].isVisible);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
         value = Value(recording.size, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
@@ -4468,8 +4544,6 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         value = dlog_view::NUM_HORZ_DIVISIONS;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS) {
         value = dlog_view::NUM_VERT_DIVISIONS;
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_NUM_VALUES) {
-        value = recording.numVisibleDlogValues;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PER_DIV) {
         value = recording.dlogValues[value.getUInt8()].perDiv;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_OFFSET) {
@@ -4492,10 +4566,11 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
 
 void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
-    static const int NUM_WIDGETS = 4;
+    static const int NUM_WIDGETS = 3;
 
-    static const int LABELS_CONTAINER_WIDGET = 0;
-    static const int DLOG_VALUES_LIST_WIDGET = 1;
+    static const int SHOW_OPTIONS_BUTTON = 0;
+    static const int LABELS_CONTAINER_WIDGET = 1;
+    static const int DLOG_VALUES_LIST_WIDGET = 2;
 
     static Overlay overlay;
     static WidgetOverride widgetOverrides[NUM_WIDGETS];
@@ -4504,7 +4579,19 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
         dlog_view::Recording &recording = dlog_view::getRecording();
-        auto state = &recording != &dlog_record::g_recording ? recording.numVisibleDlogValues : 0;
+        
+        int state = 0;
+        int numVisibleDlogValues = 0;
+        
+        if (&recording != &dlog_record::g_recording) {
+            state = numVisibleDlogValues = dlog_view::getNumVisibleDlogValues(recording);
+
+            if (dlog_view::g_overlayMinimized) {
+                state |= 0x80;
+            }
+
+            state |= 0x100;
+        }
 
         if (overlay.state != state) {
             overlay.state = state;
@@ -4516,23 +4603,41 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
 
                 const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
 
+                const Widget *showOptionsButtonWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, SHOW_OPTIONS_BUTTON);
                 const Widget *labelsContainerWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LABELS_CONTAINER_WIDGET);
                 const Widget *dlogValuesListWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_VALUES_LIST_WIDGET);
 
-                widgetOverrides[LABELS_CONTAINER_WIDGET].isVisible = true;
-                widgetOverrides[LABELS_CONTAINER_WIDGET].x = labelsContainerWidget->x;
-                widgetOverrides[LABELS_CONTAINER_WIDGET].y = labelsContainerWidget->y;
-                widgetOverrides[LABELS_CONTAINER_WIDGET].w = labelsContainerWidget->w;
-                widgetOverrides[LABELS_CONTAINER_WIDGET].h = labelsContainerWidget->h;
-
-                widgetOverrides[DLOG_VALUES_LIST_WIDGET].isVisible = true;
-                widgetOverrides[DLOG_VALUES_LIST_WIDGET].x = dlogValuesListWidget->x;
-                widgetOverrides[DLOG_VALUES_LIST_WIDGET].y = dlogValuesListWidget->y;
-                widgetOverrides[DLOG_VALUES_LIST_WIDGET].w = dlogValuesListWidget->w;
-                widgetOverrides[DLOG_VALUES_LIST_WIDGET].h = recording.numVisibleDlogValues * dlogValuesListWidget->h;
-
                 overlay.width = widgetCursor.widget->w;
-                overlay.height = widgetOverrides[LABELS_CONTAINER_WIDGET].h + widgetOverrides[DLOG_VALUES_LIST_WIDGET].h;
+
+                widgetOverrides[SHOW_OPTIONS_BUTTON].isVisible = true;
+                widgetOverrides[SHOW_OPTIONS_BUTTON].x = showOptionsButtonWidget->x;
+                widgetOverrides[SHOW_OPTIONS_BUTTON].y = showOptionsButtonWidget->y;
+                widgetOverrides[SHOW_OPTIONS_BUTTON].w = showOptionsButtonWidget->w;
+                widgetOverrides[SHOW_OPTIONS_BUTTON].h = showOptionsButtonWidget->h;
+
+                if (state & 0x80) {
+                    // minimized
+                    widgetOverrides[LABELS_CONTAINER_WIDGET].isVisible = false;
+                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].isVisible = false;
+
+                    overlay.width = showOptionsButtonWidget->w;
+                    overlay.height = showOptionsButtonWidget->h;
+                } else {
+                    widgetOverrides[LABELS_CONTAINER_WIDGET].isVisible = true;
+                    widgetOverrides[LABELS_CONTAINER_WIDGET].x = labelsContainerWidget->x;
+                    widgetOverrides[LABELS_CONTAINER_WIDGET].y = labelsContainerWidget->y;
+                    widgetOverrides[LABELS_CONTAINER_WIDGET].w = labelsContainerWidget->w;
+                    widgetOverrides[LABELS_CONTAINER_WIDGET].h = labelsContainerWidget->h;
+
+                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].isVisible = true;
+                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].x = dlogValuesListWidget->x;
+                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].y = dlogValuesListWidget->y;
+                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].w = dlogValuesListWidget->w;
+                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].h = numVisibleDlogValues * dlogValuesListWidget->h;
+
+                    overlay.width = widgetCursor.widget->w;
+                    overlay.height = widgetOverrides[LABELS_CONTAINER_WIDGET].h + widgetOverrides[DLOG_VALUES_LIST_WIDGET].h;
+                }
             }
         }
 
@@ -4541,68 +4646,71 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
 #endif
 }
 
-void data_dlog_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_visible_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_COUNT) {
         dlog_view::Recording &recording = dlog_view::getRecording();
-        value = recording.numVisibleDlogValues;
+        value = getNumVisibleDlogValues(recording);
     }
 #endif
 }
 
-void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_visible_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
-        value = Value(recording.dlogValues[cursor.i].dlogValueType, VALUE_TYPE_DLOG_VALUE_LABEL);
+        dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, cursor.i);
+        value = Value(dlogValueParams->dlogValueType, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
 
-void data_dlog_value_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     dlog_view::Recording &recording = dlog_view::getRecording();
+    dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, cursor.i);
 
     if (operation == data::DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VALUE_DIV;
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = recording.dlogValues[cursor.i].perDiv;
+            value = dlogValueParams->perDiv;
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(0.01f, recording.dlogValues[cursor.i].perDiv.getUnit());
+        value = Value(0.01f, dlogValueParams->perDiv.getUnit());
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(100.0f, recording.dlogValues[cursor.i].perDiv.getUnit());
+        value = Value(100.0f, dlogValueParams->perDiv.getUnit());
     } else if (operation == data::DATA_OPERATION_SET) {
-        recording.dlogValues[cursor.i].perDiv = value;
+        dlogValueParams->perDiv = value;
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
         value = "Div";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = recording.dlogValues[cursor.i].perDiv.getUnit();
+        value = dlogValueParams->perDiv.getUnit();
     } 
 #endif
 }
 
-void data_dlog_value_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     dlog_view::Recording &recording = dlog_view::getRecording();
+    dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, cursor.i);
 
     if (operation == data::DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VALUE_OFFSET;
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = recording.dlogValues[cursor.i].offset;
+            value = dlogValueParams->offset;
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(-100.0f, recording.dlogValues[cursor.i].offset.getUnit());
+        value = Value(-100.0f, dlogValueParams->offset.getUnit());
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(100.0f, recording.dlogValues[cursor.i].offset.getUnit());
+        value = Value(100.0f, dlogValueParams->offset.getUnit());
     } else if (operation == data::DATA_OPERATION_SET) {
-        recording.dlogValues[cursor.i].offset = value;
+        dlogValueParams->offset = value;
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
         value = "Offset";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = recording.dlogValues[cursor.i].offset.getUnit();
+        value = dlogValueParams->offset.getUnit();
     } 
 #endif
 }
@@ -4619,9 +4727,9 @@ void data_dlog_time_offset(data::DataOperationEnum operation, data::Cursor &curs
             value = recording.timeOffset;
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(0.0f, recording.dlogValues[cursor.i].offset.getUnit());
+        value = Value(0.0f, recording.timeOffset.getUnit());
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value((recording.size - recording.pageSize) * recording.parameters.period, recording.dlogValues[cursor.i].offset.getUnit());
+        value = Value((recording.size - recording.pageSize) * recording.parameters.period, recording.timeOffset.getUnit());
     } else if (operation == data::DATA_OPERATION_SET) {
         recording.timeOffset = value;
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
@@ -4629,6 +4737,16 @@ void data_dlog_time_offset(data::DataOperationEnum operation, data::Cursor &curs
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = recording.timeOffset.getUnit();
     } 
+#endif
+}
+
+void data_dlog_visible_value_cursor(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        int dlogValueIndex = dlog_view::getVisibleDlogValueIndex(recording, cursor.i);
+        value = data::ytDataGetValue(cursor, DATA_ID_RECORDING, ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, dlogValueIndex);
+    }
 #endif
 }
 
@@ -4664,11 +4782,36 @@ void data_dlog_time_div(data::DataOperationEnum operation, data::Cursor &cursor,
 #endif
 }
 
-void data_dlog_value_cursor(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_all_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_COUNT) {
+        value = 4;
+    }
+#endif
+}
+
+void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
-        value = data::ytDataGetValue(cursor, DATA_ID_RECORDING, ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, cursor.i);
+        value = Value(recording.dlogValues[cursor.i].dlogValueType, VALUE_TYPE_DLOG_VALUE_LABEL);
+    }
+#endif
+}
+
+void data_dlog_value_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        value = cursor.i < recording.totalDlogValues ? recording.dlogValues[cursor.i].isVisible : 2;
+    }
+#endif
+}
+
+void data_dlog_view_overlay_minimized(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = dlog_view::g_overlayMinimized;
     }
 #endif
 }
@@ -4781,82 +4924,6 @@ void data_file_manager_delete_file_enabled(data::DataOperationEnum operation, da
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::isDeleteFileEnabled();
-    }
-#endif
-}
-
-void data_dlog_voltage_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
-    if (operation == data::DATA_OPERATION_GET) {
-        value = dlog_record::g_guiParameters.logVoltage[cursor.i];
-    }
-#endif
-}
-
-void data_dlog_current_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
-    if (operation == data::DATA_OPERATION_GET) {
-        value = dlog_record::g_guiParameters.logCurrent[cursor.i];
-    }
-#endif
-}
-
-void data_dlog_power_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
-    if (operation == data::DATA_OPERATION_GET) {
-        value = dlog_record::g_guiParameters.logPower[cursor.i];
-    }
-#endif
-}
-
-void data_dlog_period(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
-    if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(dlog_record::g_guiParameters.period, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = UNIT_SECOND;
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(dlog_record::PERIOD_MIN, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(dlog_record::PERIOD_MAX, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_SET) {
-        dlog_record::g_guiParameters.period = value.getFloat();
-    }
-#endif
-}
-
-void data_dlog_duration(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
-    if (operation == data::DATA_OPERATION_GET) {
-        value = MakeValue(dlog_record::g_guiParameters.time, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = UNIT_SECOND;
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(dlog_record::TIME_MIN, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(INFINITY, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_SET) {
-        dlog_record::g_guiParameters.time = value.getFloat();
-    }
-#endif
-}
-
-void data_dlog_file_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
-    if (operation == data::DATA_OPERATION_GET) {
-        value = dlog_record::g_guiParameters.filePath;
-    } else if (operation == data::DATA_OPERATION_SET) {
-        strcpy(dlog_record::g_guiParameters.filePath, value.getString());
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(MAX_PATH_LENGTH, VALUE_TYPE_UINT32);
-    }
-#endif
-}
-
-void data_dlog_start_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
-    if (operation == data::DATA_OPERATION_GET) {
-        value = dlog_record::checkDlogParameters(dlog_record::g_guiParameters, true) == SCPI_RES_OK ? 1 : 0;
     }
 #endif
 }

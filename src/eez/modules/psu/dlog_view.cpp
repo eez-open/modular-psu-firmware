@@ -47,6 +47,7 @@ namespace dlog_view {
 static State g_state;
 static uint32_t g_loadingStartTickCount;
 bool g_showLatest = true;
+bool g_overlayMinimized;
 char g_filePath[MAX_PATH_LENGTH + 1];
 Recording g_recording;
 
@@ -116,7 +117,7 @@ void loadBlock() {
     if (file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
         uint32_t blockAddress = *((uint32_t *)&g_buffer[g_blockIndexToLoad * BLOCK_SIZE_WITH_HEADER]);
         file.seek(DLOG_HEADER_SIZE + blockAddress);
-        uint32_t read = file.read(g_buffer + g_blockIndexToLoad * BLOCK_SIZE_WITH_HEADER + BLOCK_HEADER_SIZE, BLOCK_SIZE_WITHOUT_HEADER);
+        file.read(g_buffer + g_blockIndexToLoad * BLOCK_SIZE_WITH_HEADER + BLOCK_HEADER_SIZE, BLOCK_SIZE_WITHOUT_HEADER);
     }
     file.close();
 
@@ -149,8 +150,8 @@ eez::gui::data::Value getValue(int rowIndex, int columnIndex) {
 
     if (g_buffer[blockIndex * BLOCK_SIZE_WITH_HEADER] == INVALID_BLOCK_ADDRESS || *((uint32_t *)&g_buffer[blockIndex * BLOCK_SIZE_WITH_HEADER]) != blockAddress) {
         float *p = (float *)(g_buffer + blockIndex * BLOCK_SIZE_WITH_HEADER + BLOCK_HEADER_SIZE);
-        for (int i = 0; i < BLOCK_SIZE_WITHOUT_HEADER / 4; i += 4) {
-            *p = NAN;
+        for (unsigned i = 0; i < BLOCK_SIZE_WITHOUT_HEADER; i += 4) {
+            *p++ = NAN;
         }
 
         if (!g_isLoading) {
@@ -163,6 +164,62 @@ eez::gui::data::Value getValue(int rowIndex, int columnIndex) {
 
     float value = *(float *)(g_buffer + blockIndex * BLOCK_SIZE_WITH_HEADER + BLOCK_HEADER_SIZE + blockOffset);
     return eez::gui::data::Value(value, g_recording.dlogValues[columnIndex].offset.getUnit());
+}
+
+void setDlogValue(int dlogValueIndex, int channelIndex, DlogValueType valueType) {
+    g_recording.dlogValues[dlogValueIndex].isVisible = true;
+
+    g_recording.dlogValues[dlogValueIndex].dlogValueType = (DlogValueType)(3 * channelIndex + valueType);
+
+    float perDiv;
+    
+    if (valueType == DLOG_VALUE_CH1_U) {
+        // TODO this must be read from the file        
+        perDiv = channel_dispatcher::getUMax(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
+        g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_VOLT);
+    } else if (valueType == DLOG_VALUE_CH1_I) {
+        // TODO this must be read from the file
+        perDiv = channel_dispatcher::getIMax(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
+        g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_AMPER);
+    } else {
+        // TODO this must be read from the file
+        perDiv = channel_dispatcher::getPowerMaxLimit(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
+        g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_WATT);
+    }
+    
+    g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-perDiv * NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
+}
+
+int getNumVisibleDlogValues(const Recording &recording) {
+    int count = 0;
+    for (int dlogValueIndex = 0; dlogValueIndex < MAX_NUM_OF_Y_VALUES; dlogValueIndex++) {
+        if (recording.dlogValues[dlogValueIndex].isVisible) {
+            count++;
+        }
+    }
+    return count;
+}
+
+int getVisibleDlogValueIndex(Recording &recording, int visibleDlogValueIndex) {
+    int i = 0;
+    for (int dlogValueIndex = 0; dlogValueIndex < MAX_NUM_OF_Y_VALUES; dlogValueIndex++) {
+        if (recording.dlogValues[dlogValueIndex].isVisible) {
+            if (i == visibleDlogValueIndex) {
+                return dlogValueIndex;
+            }
+            i++;
+        }
+    }
+    return -1;
+
+}
+
+DlogValueParams* getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex) {
+    int dlogValueIndex = getVisibleDlogValueIndex(recording, visibleDlogValueIndex);
+    if (dlogValueIndex != -1) {
+        return &recording.dlogValues[dlogValueIndex];
+    }
+    return nullptr;
 }
 
 void openFile(const char *filePath) {
@@ -188,88 +245,57 @@ void openFile(const char *filePath) {
             uint16_t version = readUint16(buffer, &offset);
 
             if (magic1 == MAGIC1 && magic2 == MAGIC2 && version == VERSION) {
-                uint16_t flags = readUint16(buffer, &offset);
+                readUint16(buffer, &offset); // flags
                 uint32_t columns = readUint32(buffer, &offset);
                 float period = readFloat(buffer, &offset);
                 float duration = readFloat(buffer, &offset);
-                uint32_t startTime = readUint32(buffer, &offset);
+                readUint32(buffer, &offset); // startTime
 
                 g_recording.parameters.period = period;
                 g_recording.parameters.time = duration;
 
                 g_recording.totalDlogValues = 0;
-                g_recording.numVisibleDlogValues = 0;
+                unsigned int dlogValueIndex = 0;
 
-                for (int iChannel = 0; iChannel < CH_NUM; ++iChannel) {
-                    if (columns & (1 << (4 * iChannel))) {
+                for (int channelIndex = 0; channelIndex < CH_MAX; ++channelIndex) {
+                    if (columns & (1 << (4 * channelIndex))) {
                         ++g_recording.totalDlogValues;
-
-                        g_recording.parameters.logVoltage[iChannel] = 1;
-
-                        if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_U);
-
-                            // TODO this must be read from the file
-                            float perDiv = channel_dispatcher::getUMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
-
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_VOLT);
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
-
-                            ++g_recording.numVisibleDlogValues;
+                        g_recording.parameters.logVoltage[channelIndex] = 1;
+                        if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
+                            setDlogValue(dlogValueIndex, channelIndex, DLOG_VALUE_CH1_U);
+                            dlogValueIndex++;
                         }
                     }
 
-                    if (columns & (2 << (4 * iChannel))) {
+                    if (columns & (2 << (4 * channelIndex))) {
                         ++g_recording.totalDlogValues;
-
-                        g_recording.parameters.logCurrent[iChannel] = 1;
-
-                        if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_I);
-
-                            // TODO this must be read from the file
-                            float perDiv = channel_dispatcher::getIMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
-
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_AMPER);
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_AMPER);
-
-                            ++g_recording.numVisibleDlogValues;
+                        g_recording.parameters.logCurrent[channelIndex] = 1;
+                        if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
+                            setDlogValue(dlogValueIndex, channelIndex, DLOG_VALUE_CH1_I);
+                            dlogValueIndex++;
                         }
                     }
 
-                    if (columns & (4 << (4 * iChannel))) {
+                    if (columns & (4 << (4 * channelIndex))) {
                         ++g_recording.totalDlogValues;
-
-                        g_recording.parameters.logPower[iChannel] = 1;
-
-                        if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_P);
-
-                            // TODO this should be stored inside DLOG file
-                            float perDiv = channel_dispatcher::getPowerMaxLimit(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
-
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_WATT);
-                            g_recording.dlogValues[g_recording.numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_WATT);
-
-                            ++g_recording.numVisibleDlogValues;
+                        g_recording.parameters.logPower[channelIndex] = 1;
+                        if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
+                            setDlogValue(dlogValueIndex, channelIndex, DLOG_VALUE_CH1_P);
+                            dlogValueIndex++;
                         }
                     }
                 }
 
                 g_recording.size = (file.size() - DLOG_HEADER_SIZE) / (g_recording.totalDlogValues * 4);
-
                 g_recording.timeOffset = gui::data::Value(0.0f, UNIT_SECOND);
-
                 g_recording.pageSize = 480;
                 g_recording.cursorOffset = 240;
+                g_recording.getValue = getValue;
+                g_overlayMinimized = false;
+                g_isLoading = false;
+                g_state = STATE_READY;
 
                 invalidateAllBlocks();
-
-                g_recording.getValue = getValue;
-
-                g_isLoading = false;
-
-                g_state = STATE_READY;
             }
         }
     }
@@ -281,7 +307,7 @@ void openFile(const char *filePath) {
     }
 }
 
-dlog_view::Recording &getRecording() {
+Recording &getRecording() {
     return g_showLatest && dlog_record::isExecuting() ? dlog_record::g_recording : g_recording;
 }
 

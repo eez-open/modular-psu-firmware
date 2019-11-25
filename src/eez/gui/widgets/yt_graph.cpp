@@ -213,7 +213,7 @@ struct YTGraphStaticDrawHelper {
     float offset;
     float scale;
 
-    int valueIndex;
+    int m_valueIndex;
 
     int x;
 
@@ -230,7 +230,7 @@ struct YTGraphStaticDrawHelper {
             return INT_MIN;
         }
 
-        float value = data::ytDataGetValue(widgetCursor.cursor, widget->data, position, valueIndex).getFloat();
+        float value = data::ytDataGetValue(widgetCursor.cursor, widget->data, position, m_valueIndex).getFloat();
 
         if (isNaN(value)) {
             return INT_MIN;
@@ -310,23 +310,23 @@ struct YTGraphStaticDrawHelper {
         // draw charts
         YTGraphWidgetState *currentState = (YTGraphWidgetState *)widgetCursor.currentState;
 
-        int numValues = data::ytDataGetNumValues(widgetCursor.cursor, widget->data);
-        for (valueIndex = 0; valueIndex < numValues; valueIndex++) {
+        for (m_valueIndex = 0; m_valueIndex < MAX_NUM_OF_Y_VALUES; m_valueIndex++) {
+            if (data::ytDataDataValueIsVisible(widgetCursor.cursor, widget->data, m_valueIndex)) {
+                position = currentHistoryValuePosition;
 
-            position = currentHistoryValuePosition;
+                scale = (widget->h - 1)  / currentState->valuePerDiv[m_valueIndex] / vertDivisions;
+                offset = currentState->valueOffset[m_valueIndex];
 
-            scale = (widget->h - 1)  / currentState->valuePerDiv[valueIndex] / vertDivisions;
-            offset = currentState->valueOffset[valueIndex];
+                const Style* style = data::ytDataGetStyle(widgetCursor.cursor, widget->data, m_valueIndex);
+                dataColor16 = display::getColor16FromIndex(style->color);
 
-            const Style* style = data::ytDataGetStyle(widgetCursor.cursor, widget->data, valueIndex);
-            dataColor16 = display::getColor16FromIndex(style->color);
+                yPrev = getYValue(previousHistoryValuePosition);
 
-            yPrev = getYValue(previousHistoryValuePosition);
-
-            for (x = startX; x < endX; x++, position++) {
-                y = getYValue(position);
-                drawValue();
-                yPrev = y;
+                for (x = startX; x < endX; x++, position++) {
+                    y = getYValue(position);
+                    drawValue();
+                    yPrev = y;
+                }
             }
         }
 
@@ -371,19 +371,18 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     currentState->ytGraphUpdateMethod = data::ytDataGetGraphUpdateMethod(widgetCursor.cursor, widget->data);
     currentState->cursorPosition = currentState->historyValuePosition + data::ytDataGetCursorOffset(widgetCursor.cursor, widget->data);
 
-    int numValues = data::ytDataGetNumValues(widgetCursor.cursor, widget->data);
-    if (numValues == 0) {
-        return;
-    }
-    bool transformChanged = false;
-    for (int valueIndex = 0; valueIndex < numValues; valueIndex++) {
-        currentState->valuePerDiv[valueIndex] = data::ytDataGetPerDiv(widgetCursor.cursor, widget->data, valueIndex);
-        currentState->valueOffset[valueIndex] = data::ytDataGetOffset(widgetCursor.cursor, widget->data, valueIndex);
-        if (previousState && (previousState->valuePerDiv[valueIndex] != currentState->valuePerDiv[valueIndex] || previousState->valueOffset[valueIndex] != currentState->valueOffset[valueIndex])) {
-            transformChanged = true;
+    bool visibleValuesChanged = false;
+
+    if (currentState->ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
+        for (int valueIndex = 0; valueIndex < MAX_NUM_OF_Y_VALUES; valueIndex++) {
+            currentState->valueIsVisible[valueIndex] = data::ytDataDataValueIsVisible(widgetCursor.cursor, widget->data, valueIndex);
+            currentState->valuePerDiv[valueIndex] = data::ytDataGetPerDiv(widgetCursor.cursor, widget->data, valueIndex);
+            currentState->valueOffset[valueIndex] = data::ytDataGetOffset(widgetCursor.cursor, widget->data, valueIndex);
+            if (previousState && (previousState->valueIsVisible[valueIndex] != currentState->valueIsVisible[valueIndex] || previousState->valuePerDiv[valueIndex] != currentState->valuePerDiv[valueIndex] || previousState->valueOffset[valueIndex] != currentState->valueOffset[valueIndex])) {
+                visibleValuesChanged = true;
+            }
         }
     }
-
     uint16_t graphWidth = (uint16_t)widget->w;
 
     uint32_t previousHistoryValuePosition;
@@ -399,7 +398,8 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
     bool refreshBackground = !widgetCursor.previousState;
 
-    if (refreshBackground || transformChanged || previousHistoryValuePosition != currentState->historyValuePosition || (!previousState || previousState->numHistoryValues != currentState->numHistoryValues || previousState->cursorPosition != currentState->cursorPosition)) {
+    if (refreshBackground || visibleValuesChanged || previousHistoryValuePosition != currentState->historyValuePosition || (!previousState ||  previousState->numHistoryValues != currentState->numHistoryValues || previousState->cursorPosition != currentState->cursorPosition)
+    ) {
         if (currentState->ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
             YTGraphStaticDrawHelper drawHelper(widgetCursor);
 

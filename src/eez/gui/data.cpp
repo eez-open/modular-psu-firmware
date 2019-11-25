@@ -636,12 +636,6 @@ const Style *ytDataGetStyle(const Cursor &cursor, uint16_t id, uint8_t valueInde
     return getStyle(value.getUInt16());
 }
 
-int ytDataGetNumValues(const Cursor &cursor, uint16_t id) {
-    Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_NUM_VALUES, (Cursor &)cursor, value);
-    return value.getInt();
-}
-
 Value ytDataGetMin(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
     g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_MIN, (Cursor &)cursor, value);
@@ -676,6 +670,12 @@ float ytDataGetOffset(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
     g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_OFFSET, (Cursor &)cursor, value);
     return value.getFloat();
+}
+
+bool ytDataDataValueIsVisible(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+    Value value(valueIndex, VALUE_TYPE_UINT8);
+    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE), (Cursor &)cursor, value);
+    return value.getInt();
 }
 
 Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint32_t position, uint8_t valueIndex) {

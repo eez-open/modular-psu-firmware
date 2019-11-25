@@ -105,6 +105,7 @@ struct Parameters {
 };
 
 struct DlogValueParams {
+    bool isVisible;
     DlogValueType dlogValueType;
     eez::gui::data::Value perDiv;
     eez::gui::data::Value offset;
@@ -116,7 +117,6 @@ struct Recording {
     uint32_t size;
 
     uint8_t totalDlogValues;
-    uint8_t numVisibleDlogValues;
     DlogValueParams dlogValues[MAX_NUM_OF_Y_VALUES];
 
     eez::gui::Value timeOffset;
@@ -129,6 +129,7 @@ struct Recording {
 };
 
 extern bool g_showLatest;
+extern bool g_overlayMinimized;
 
 // open dlog file for viewing
 void openFile(const char *filePath);
@@ -143,6 +144,10 @@ void stateManagment();
 
 Recording &getRecording();
 
+void setDlogValue(int dlogValueIndex, int channelIndex, DlogValueType valueType);
+int getNumVisibleDlogValues(const Recording &recording);
+int getVisibleDlogValueIndex(Recording &recording, int visibleDlogValueIndex);
+DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex);
 
 } // namespace dlog_view
 } // namespace psu

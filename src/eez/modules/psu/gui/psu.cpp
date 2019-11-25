@@ -115,6 +115,7 @@ static unsigned g_skipEthernetSetup;
 
 static bool g_showSetupWizardQuestionCalled;
 Channel *g_channel;
+int g_channelIndex;
 static WidgetCursor g_toggleOutputWidgetCursor;
 
 #if EEZ_PLATFORM_STM32
@@ -1184,11 +1185,21 @@ void channelEnableOutput() {
     channel_dispatcher::outputEnable(channel, true);
 }
 
-void selectChannel() {
-    if (getFoundWidgetAtDown().cursor.i >= 0) {
-        g_channel = &Channel::get(getFoundWidgetAtDown().cursor.i);
-    } else if (!g_channel) {
-        g_channel = &Channel::get(0);
+void selectChannel(Channel *channel) {
+    if (channel) {
+        g_channel = channel;
+    } else {
+        if (getFoundWidgetAtDown().cursor.i >= 0) {
+            g_channel = &Channel::get(getFoundWidgetAtDown().cursor.i);
+        } else if (!g_channel) {
+            g_channel = &Channel::get(0);
+        }
+    }
+
+    if (g_channel) {
+        g_channelIndex = g_channel->channelIndex;
+    } else {
+        g_channelIndex = -1;
     }
 }
 
@@ -1199,8 +1210,8 @@ namespace mcu {
 namespace display {
 
 uint16_t transformColorHook(uint16_t color) {
-    if (color == COLOR_ID_CHANNEL1) {
-        return color + eez::psu::gui::g_channel->channelIndex;
+    if (color == COLOR_ID_CHANNEL1 && eez::psu::gui::g_channelIndex >= 0 && eez::psu::gui::g_channelIndex < CH_MAX) {
+        return COLOR_ID_CHANNEL1 + eez::psu::gui::g_channelIndex;
     }
     return color;
 }
@@ -1211,14 +1222,14 @@ uint16_t transformColorHook(uint16_t color) {
 namespace gui {
 
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
-    if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL) {
+    if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
         style = getStyle(psu::gui::g_ytGraphStyles[widgetCursor.cursor.i % (sizeof(psu::gui::g_ytGraphStyles) / sizeof(uint16_t))]);
     }
     return style->color;
 }
 
 uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
-    if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL) {
+    if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
         style = getStyle(psu::gui::g_ytGraphStyles[widgetCursor.cursor.i % (sizeof(psu::gui::g_ytGraphStyles) / sizeof(uint16_t))]);
     }
     return style->active_color;

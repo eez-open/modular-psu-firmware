@@ -49,8 +49,8 @@ dlog_view::Parameters g_parameters = {
     {false, false, false, false, false, false},
     {false, false, false, false, false, false},
     {false, false, false, false, false, false},
-    dlog_record::PERIOD_DEFAULT,
-    dlog_record::TIME_DEFAULT,
+    PERIOD_DEFAULT,
+    TIME_DEFAULT,
     trigger::SOURCE_IMMEDIATE
 };
 
@@ -59,8 +59,8 @@ dlog_view::Parameters g_guiParameters = {
     { true, false, false, false, false, false },
     { true, false, false, false, false, false },
     { false, false, false, false, false, false },
-    dlog_record::PERIOD_DEFAULT,
-    dlog_record::TIME_DEFAULT,
+    PERIOD_DEFAULT,
+    TIME_DEFAULT,
     trigger::SOURCE_IMMEDIATE
 };
 
@@ -90,14 +90,12 @@ static uint8_t g_bufferMemory[DLOG_RECORD_BUFFER_SIZE];
 static uint8_t *g_buffer = g_bufferMemory;
 #endif
 
-static const unsigned int CHUNK_SIZE = 4096;
-static const unsigned int NUM_CHUNKS = DLOG_RECORD_BUFFER_SIZE / CHUNK_SIZE;
+#define CHUNK_SIZE 4096
 
-static unsigned int g_selectedChunkIndex;
 static unsigned int g_bufferIndex;
 
-static unsigned int g_lastChunkIndex;
-static unsigned int g_lastChunkSize;
+static unsigned int g_lastSavedBufferIndex;
+static unsigned int g_saveUpToBufferIndex;
 
 int fileOpen() {
     File file;
@@ -119,28 +117,29 @@ int fileOpen() {
 }
 
 void fileWrite() {
-    File file;
-    if (!file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-        event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR);
-        abort(false);
-        return;
-    }
+    size_t length = g_saveUpToBufferIndex - g_lastSavedBufferIndex;
+    if (length > 0) {
+        File file;
+        if (!file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+            event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR);
+            abort(false);
+            return;
+        }
 
-    size_t written = file.write(g_buffer + g_lastChunkIndex * CHUNK_SIZE, g_lastChunkSize);
-    file.close();
-    if (written != g_lastChunkSize) {
-        event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_WRITE_ERROR);
-        abort(false);
+        size_t written = file.write(g_buffer + g_lastSavedBufferIndex, length);
+
+        g_lastSavedBufferIndex = g_saveUpToBufferIndex;
+
+        file.close();
+
+        if (written != length) {
+            event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_WRITE_ERROR);
+            abort(false);
+        }
     }
 }
 
 void flushData() {
-    g_lastChunkIndex = g_selectedChunkIndex;
-    g_lastChunkSize = g_bufferIndex;
-
-    g_selectedChunkIndex = (g_selectedChunkIndex + 1) % NUM_CHUNKS;
-    g_bufferIndex = 0;
-
     if (osThreadGetId() != g_scpiTaskHandle) {
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_FILE_WRITE, 0), osWaitForever);
     } else {
@@ -149,10 +148,11 @@ void flushData() {
 }
 
 void writeUint8(uint8_t value) {
-    *(g_buffer + g_selectedChunkIndex * CHUNK_SIZE + g_bufferIndex) = value;
+    *(g_buffer + g_bufferIndex) = value;
 
-    if (++g_bufferIndex == CHUNK_SIZE) {
+    if (++g_bufferIndex % CHUNK_SIZE == 0) {
         g_lastSyncTickCount = micros();
+        g_saveUpToBufferIndex = g_bufferIndex;
         flushData();
     }
 
@@ -266,8 +266,8 @@ int startImmediately() {
 
     memcpy(&g_recording.parameters, &g_parameters, sizeof(dlog_view::Parameters));
 
-    g_selectedChunkIndex = 0;
     g_bufferIndex = 0;
+    g_lastSavedBufferIndex = 0;
     g_lastSyncTickCount = micros();
     g_fileLength = 0;
 
@@ -276,44 +276,47 @@ int startImmediately() {
     g_recording.pageSize = 480;
 
     g_recording.totalDlogValues = 0;
-    g_recording.numVisibleDlogValues = 0;
+    unsigned int dlogValueIndex = 0;
 
     uint32_t columns = 0;
     for (int iChannel = 0; iChannel < CH_NUM; ++iChannel) {
         if (g_recording.parameters.logVoltage[iChannel]) {
             columns |= 1 << (4 * iChannel);
             ++g_recording.totalDlogValues;
-            if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_U);
+            if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
+                g_recording.dlogValues[dlogValueIndex].isVisible = true;
+                g_recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_U);
                 float perDiv = channel_dispatcher::getUMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_VOLT);
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
+                g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_VOLT);
+                g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
 
-                ++g_recording.numVisibleDlogValues;
+                dlogValueIndex++;
             }
         }
         if (g_recording.parameters.logCurrent[iChannel]) {
             columns |= 2 << (4 * iChannel);
             ++g_recording.totalDlogValues;
-            if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_I);
+            if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
+                g_recording.dlogValues[dlogValueIndex].isVisible = true;
+                g_recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_I);
                 float perDiv = channel_dispatcher::getIMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_AMPER);
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_AMPER);
+                g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_AMPER);
+                g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_AMPER);
 
-                ++g_recording.numVisibleDlogValues;
+                dlogValueIndex++;
             }
         }
         if (g_recording.parameters.logPower[iChannel]) {
             columns |= 4 << (4 * iChannel);
             ++g_recording.totalDlogValues;
-            if (g_recording.numVisibleDlogValues < MAX_NUM_OF_Y_VALUES) {
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_P);
+            if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
+                g_recording.dlogValues[dlogValueIndex].isVisible = true;
+                g_recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_P);
                 float perDiv = channel_dispatcher::getPowerMaxLimit(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_WATT);
-                g_recording.dlogValues[g_recording.numVisibleDlogValues].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_WATT);
+                g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_WATT);
+                g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_WATT);
 
-                ++g_recording.numVisibleDlogValues;
+                dlogValueIndex++;
             }
         }
     }
@@ -366,12 +369,12 @@ void toggle() {
         return;
     }
 
-    if (dlog_record::isExecuting()) {
-        dlog_record::abort();
-    } else if (dlog_record::isInitiated()) {
+    if (isExecuting()) {
+        abort();
+    } else if (isInitiated()) {
         triggerGenerated();
     } else {
-        dlog_record::initiate();
+        initiate();
     }
 }
 
@@ -392,6 +395,7 @@ void finishLogging(bool flush) {
 	setState(STATE_IDLE);
 
 	if (flush) {
+        g_saveUpToBufferIndex = g_bufferIndex;
         flushData();
 	}
 
@@ -459,13 +463,13 @@ void log(uint32_t tickCount) {
             writeFloat(NAN);
 #endif
             for (int i = 0; i < CH_NUM; ++i) {
-                if (g_recording.lastOptions.logVoltage[i]) {
+                if (g_recording.parameters.logVoltage[i]) {
                     writeFloat(NAN);
                 }
-                if (g_recording.lastOptions.logCurrent[i]) {
+                if (g_recording.parameters.logCurrent[i]) {
                     writeFloat(NAN);
                 }
-                if (g_recording.lastOptions.logPower[i]) {
+                if (g_recording.parameters.logPower[i]) {
                     writeFloat(NAN);
                 }
             }
@@ -513,6 +517,7 @@ void log(uint32_t tickCount) {
             int32_t diff = tickCount - g_lastSyncTickCount;
             if (diff > CONF_DLOG_SYNC_FILE_TIME * 1000000L) {
                 g_lastSyncTickCount = tickCount;
+                g_saveUpToBufferIndex = g_bufferIndex;
                 flushData();
             }
         }

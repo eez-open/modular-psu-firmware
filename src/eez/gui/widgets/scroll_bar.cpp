@@ -59,11 +59,8 @@ int getPageSize(const WidgetCursor &widgetCursor) {
     return data::ytDataGetPageSize(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 }
 
-bool setPosition(const WidgetCursor &widgetCursor, int position) {
-    int oldPosition = getPosition(widgetCursor);
+void setPosition(const WidgetCursor &widgetCursor, int position) {
     data::ytDataSetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data, position < 0 ? 0 : position);
-    int newPosition = getPosition(widgetCursor);
-    return newPosition != oldPosition;
 }
 
 void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTrack, int minThumbWidth, int &xThumb, int &widthThumb) {
@@ -205,18 +202,16 @@ void ScrollBarWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
             }
 
             if ((isHorizontal && touchEvent.x < widgetCursor.x + buttonSize) || (!isHorizontal && touchEvent.y < widgetCursor.y + buttonSize)) {
-                if (setPosition(widgetCursor, getPosition(widgetCursor) - 1)) {
-                    g_segment = SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON;
-                    if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-                        sound::playClick();
-                    }
+                setPosition(widgetCursor, getPosition(widgetCursor) - 1);
+                g_segment = SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON;
+                if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
+                    sound::playClick();
                 }
             } else if ((isHorizontal && (touchEvent.x >= widgetCursor.x + widget->w - buttonSize)) || (!isHorizontal && (touchEvent.y >= widgetCursor.y + widget->h - buttonSize))) {
-                if (setPosition(widgetCursor, getPosition(widgetCursor) + 1)) {
-                    g_segment = SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON;
-                    if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-                        sound::playClick();
-                    }
+                setPosition(widgetCursor, getPosition(widgetCursor) + 1);
+                g_segment = SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON;
+                if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
+                    sound::playClick();
                 }
             } else {
                 int xThumb, wThumb;
@@ -226,18 +221,16 @@ void ScrollBarWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
                 getThumbGeometry(size, position, pageSize, xTrack, wTrack, buttonSize, xThumb, wThumb);
 
                 if (x < xThumb) {
-                    if (setPosition(widgetCursor, getPosition(widgetCursor) - pageSize)) {
-                        g_segment = SCROLL_BAR_WIDGET_SEGMENT_TRACK_LEFT;
-                        if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-                            sound::playClick();
-                        }
+                    setPosition(widgetCursor, getPosition(widgetCursor) - pageSize);
+                    g_segment = SCROLL_BAR_WIDGET_SEGMENT_TRACK_LEFT;
+                    if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
+                        sound::playClick();
                     }
                 } else if (x >= xThumb + wThumb) {
-                    if (setPosition(widgetCursor, getPosition(widgetCursor) + pageSize)) {
-                        g_segment = SCROLL_BAR_WIDGET_SEGMENT_TRACK_RIGHT;
-                        if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-                            sound::playClick();
-                        }
+                    setPosition(widgetCursor, getPosition(widgetCursor) + pageSize);
+                    g_segment = SCROLL_BAR_WIDGET_SEGMENT_TRACK_RIGHT;
+                    if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
+                        sound::playClick();
                     }
                 } else if (x >= xThumb || touchEvent.x < xThumb + wThumb) {
                     g_segment = SCROLL_BAR_WIDGET_SEGMENT_THUMB;

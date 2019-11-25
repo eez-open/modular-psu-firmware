@@ -918,7 +918,7 @@ void action_simulator_load() {
     if (getFoundWidgetAtDown().widget->data == DATA_ID_SIMULATOR_LOAD_STATE2) {
         channelIndex++;
     }
-    g_channel = &Channel::get(channelIndex);
+    selectChannel(&Channel::get(channelIndex));
     selectSimulatorLoad();
 }
 
@@ -1186,6 +1186,21 @@ void action_dlog_start_recording() {
 
     dlog_record::toggle();
 #endif
+}
+
+void action_dlog_view_show_overlay_options() {
+    pushPage(PAGE_ID_DLOG_VIEW_OVERLAY_OPTIONS);
+}
+
+void action_dlog_value_toggle() {
+    dlog_view::Recording &recording = dlog_view::getRecording();
+    int dlogValueIndex = getFoundWidgetAtDown().cursor.i;
+    recording.dlogValues[dlogValueIndex].isVisible = !recording.dlogValues[dlogValueIndex].isVisible;
+}
+
+void action_dlog_view_toggle_overlay_minimized() {
+    dlog_view::g_overlayMinimized = !dlog_view::g_overlayMinimized;
+    popPage();
 }
 
 void action_show_file_manager() {
