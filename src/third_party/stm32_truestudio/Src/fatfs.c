@@ -54,12 +54,12 @@ DWORD get_fattime(void)
     RTC_DateTypeDef date;
     HAL_RTC_GetDate(&hrtc, &date, 0);
 
-    DWORD res =  (((DWORD)date.Year) << 25)
-            | ((DWORD)date.Month << 21)
-            | ((DWORD)date.Date << 16)
-            | (WORD)(time.Hours << 11)
-            | (WORD)(time.Minutes << 5)
-            | (WORD)(time.Seconds >> 1);
+    DWORD res = (((DWORD)(2000 + date.Year - 1980)) << 25)
+        | ((DWORD)date.Month << 21)
+        | ((DWORD)date.Date << 16)
+        | (WORD)(time.Hours << 11)
+        | (WORD)(time.Minutes << 5)
+        | (WORD)(time.Seconds >> 1);
 
     return res;
   /* USER CODE END get_fattime */  

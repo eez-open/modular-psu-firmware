@@ -106,10 +106,7 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
     int minute = fileInfo->getModifiedMinute();
     int second = fileInfo->getModifiedSecond();
 
-    uint32_t utc = psu::datetime::makeTime(year, month, day, hour, minute, second);
-    uint32_t local = psu::datetime::utcToLocal(utc, psu::persist_conf::devConf.time_zone, (psu::datetime::DstRule)psu::persist_conf::devConf.dstRule);
-
-    fileItem->dateTime = local;
+    fileItem->dateTime = psu::datetime::makeTime(year, month, day, hour, minute, second);
 
     g_filesCount++;
 }
