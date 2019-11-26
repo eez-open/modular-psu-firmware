@@ -376,10 +376,11 @@ void freeUnusedBuffers() {
             // DebugTrace("Buffer %d allocated but not used!\n", bufferIndex);
         }
     }
+    
+    clearBufferUsage();
 }
 
 void beginBuffersDrawing() {
-    clearBufferUsage();
     g_bufferPointer = getBufferPointer();
 }
 
