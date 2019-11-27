@@ -113,6 +113,7 @@ struct Parameters {
 struct DlogValueParams {
     bool isVisible;
     DlogValueType dlogValueType;
+    int channelIndex;
     eez::gui::data::Value offset;
     eez::gui::data::Value div;
 };
@@ -166,6 +167,8 @@ float getMaxTimeOffset(Recording& recording);
 void changeTimeOffset(Recording &recording, float timeOffset);
 void changeTimeDiv(Recording &recording, float timeDiv);
 float getDuration(Recording &recording);
+
+void autoScale(Recording &recording);
 
 } // namespace dlog_view
 } // namespace psu

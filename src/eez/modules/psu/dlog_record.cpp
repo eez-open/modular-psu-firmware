@@ -297,6 +297,7 @@ int startImmediately() {
             if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
                 g_recording.dlogValues[dlogValueIndex].isVisible = true;
                 g_recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_U);
+                g_recording.dlogValues[dlogValueIndex].channelIndex = iChannel;
                 float div = channel_dispatcher::getUMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
                 g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, 0.01f), UNIT_VOLT);
                 g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-div * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
@@ -310,6 +311,7 @@ int startImmediately() {
             if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
                 g_recording.dlogValues[dlogValueIndex].isVisible = true;
                 g_recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_I);
+                g_recording.dlogValues[dlogValueIndex].channelIndex = iChannel;
                 float div = channel_dispatcher::getIMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
                 g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, 0.01f), UNIT_AMPER);
                 g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-div * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_AMPER);
@@ -323,6 +325,7 @@ int startImmediately() {
             if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
                 g_recording.dlogValues[dlogValueIndex].isVisible = true;
                 g_recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_P);
+                g_recording.dlogValues[dlogValueIndex].channelIndex = iChannel;
                 float div = channel_dispatcher::getPowerMaxLimit(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
                 g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, 0.01f), UNIT_WATT);
                 g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-div * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_WATT);

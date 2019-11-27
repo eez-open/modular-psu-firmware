@@ -1203,6 +1203,10 @@ void action_dlog_view_toggle_overlay_minimized() {
     popPage();
 }
 
+void action_dlog_auto_scale() {
+    dlog_view::autoScale(dlog_view::getRecording());
+}
+
 void action_show_file_manager() {
 #if OPTION_SD_CARD
     file_manager::loadDirectory();

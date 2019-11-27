@@ -65,6 +65,8 @@ uint8_t toBCD(uint8_t bin);
 uint8_t fromBCD(uint8_t bcd);
 
 float roundPrec(float a, float prec);
+float floorPrec(float a, float prec);
+float ceilPrec(float a, float prec);
 
 bool equal(float a, float b, float prec);
 bool between(float x, float a, float b);

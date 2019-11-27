@@ -307,41 +307,8 @@ float getDuration(Recording &recording) {
 
 void setDlogValue(int dlogValueIndex, int channelIndex, DlogValueType valueType) {
     g_recording.dlogValues[dlogValueIndex].isVisible = true;
-
     g_recording.dlogValues[dlogValueIndex].dlogValueType = (DlogValueType)(3 * channelIndex + valueType);
-
-    float div;
-    
-    if (valueType == DLOG_VALUE_CH1_U) {
-        // TODO this must be read from the file        
-        if (Channel::get(channelIndex).isInstalled()) {
-            div = channel_dispatcher::getUMax(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
-        } else {
-            div = 40.0f / NUM_VERT_DIVISIONS;
-        }
-
-        g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, VALUE_PREC), UNIT_VOLT);
-    } else if (valueType == DLOG_VALUE_CH1_I) {
-        // TODO this must be read from the file
-        if (Channel::get(channelIndex).isInstalled()) {
-            div = channel_dispatcher::getIMax(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
-        } else {
-            div = 5.0f / NUM_VERT_DIVISIONS;
-        }
-
-        g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, VALUE_PREC), UNIT_AMPER);
-    } else {
-        // TODO this must be read from the file
-        if (Channel::get(channelIndex).isInstalled()) {
-            div = channel_dispatcher::getPowerMaxLimit(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
-        } else {
-            div = 155.0f / NUM_VERT_DIVISIONS;
-        }
-
-        g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, VALUE_PREC), UNIT_WATT);
-    }
-    
-    g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-div * NUM_VERT_DIVISIONS / 2, VALUE_PREC), g_recording.dlogValues[dlogValueIndex].div.getUnit());
+    g_recording.dlogValues[dlogValueIndex].channelIndex = channelIndex;
 }
 
 int getNumVisibleDlogValues(const Recording &recording) {
@@ -368,12 +335,55 @@ int getVisibleDlogValueIndex(Recording &recording, int visibleDlogValueIndex) {
 
 }
 
-DlogValueParams* getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex) {
+DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex) {
     int dlogValueIndex = getVisibleDlogValueIndex(recording, visibleDlogValueIndex);
     if (dlogValueIndex != -1) {
         return &recording.dlogValues[dlogValueIndex];
     }
     return nullptr;
+}
+
+void autoScale(Recording &recording) {
+    auto numVisibleDlogValues = getNumVisibleDlogValues(recording);
+
+    for (auto visibleDlogValueIndex = 0; visibleDlogValueIndex < numVisibleDlogValues; visibleDlogValueIndex++) {
+        DlogValueParams *dlogValueParams = getVisibleDlogValueParams(recording, visibleDlogValueIndex);
+
+        float div;
+
+        float numDivisions = 1.0f * NUM_VERT_DIVISIONS / numVisibleDlogValues;
+
+        if (dlogValueParams->dlogValueType == DLOG_VALUE_CH1_U) {
+            // TODO this must be read from the file        
+            if (Channel::get(dlogValueParams->channelIndex).isInstalled()) {
+                div = channel_dispatcher::getUMax(Channel::get(dlogValueParams->channelIndex)) / numDivisions;
+            } else {
+                div = 40.0f / numDivisions;
+            }
+
+            dlogValueParams->div = gui::data::Value(ceilPrec(div, VALUE_PREC), UNIT_VOLT);
+        } else if (dlogValueParams->dlogValueType == DLOG_VALUE_CH1_I) {
+            // TODO this must be read from the file
+            if (Channel::get(dlogValueParams->channelIndex).isInstalled()) {
+                div = channel_dispatcher::getIMax(Channel::get(dlogValueParams->channelIndex)) / numDivisions;
+            } else {
+                div = 5.0f / numDivisions;
+            }
+
+            dlogValueParams->div = gui::data::Value(ceilPrec(div, VALUE_PREC), UNIT_AMPER);
+        } else {
+            // TODO this must be read from the file
+            if (Channel::get(dlogValueParams->channelIndex).isInstalled()) {
+                div = channel_dispatcher::getPowerMaxLimit(Channel::get(dlogValueParams->channelIndex)) / numDivisions;
+            } else {
+                div = 155.0f / numDivisions;
+            }
+
+            dlogValueParams->div = gui::data::Value(ceilPrec(div, VALUE_PREC), UNIT_WATT);
+        }
+
+        dlogValueParams->offset = gui::data::Value(roundPrec(div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions), VALUE_PREC), dlogValueParams->div.getUnit());
+    }
 }
 
 void openFile(const char *filePath) {
@@ -457,6 +467,9 @@ void openFile(const char *filePath) {
                 g_recording.getValue = getValue;
                 g_overlayMinimized = false;
                 g_isLoading = false;
+
+                autoScale(g_recording);
+
                 g_state = STATE_READY;
 
                 invalidateAllBlocks();

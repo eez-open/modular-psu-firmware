@@ -158,6 +158,16 @@ float roundPrec(float a, float prec) {
     return roundf(a * r) / r;
 }
 
+float floorPrec(float a, float prec) {
+    float r = 1 / prec;
+    return floor(a * r) / r;
+}
+
+float ceilPrec(float a, float prec) {
+    float r = 1 / prec;
+    return ceil(a * r) / r;
+}
+
 bool between(float x, float a, float b) {
     return x >= a && x <= b;
 }

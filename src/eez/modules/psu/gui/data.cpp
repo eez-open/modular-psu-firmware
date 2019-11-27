@@ -4913,7 +4913,7 @@ void data_dlog_file_length(data::DataOperationEnum operation, data::Cursor &curs
 void data_dlog_all_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_COUNT) {
-        value = 4;
+        value = MAX_NUM_OF_Y_VALUES;
     }
 #endif
 }
