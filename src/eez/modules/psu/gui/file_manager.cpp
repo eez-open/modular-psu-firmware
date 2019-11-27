@@ -358,14 +358,14 @@ void uploadFile() {
 }
 
 bool isRenameFileEnabled() {
-    return false;
+    return true;
 }
 
 void renameFile() {
 }
 
 bool isDeleteFileEnabled() {
-    return false;
+    return true;
 }
 
 void deleteFile() {
