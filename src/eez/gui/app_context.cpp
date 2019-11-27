@@ -298,10 +298,6 @@ uint32_t AppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uint16
     return 0;
 }
 
-Value AppContext::getHistoryValue(const Cursor &cursor, uint16_t id, uint32_t position) {
-    return Value();
-}
-
 bool AppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
     return false;
 }

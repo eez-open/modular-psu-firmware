@@ -267,6 +267,7 @@ void drawWidgetCallback(const WidgetCursor &widgetCursor);
 
 OnTouchFunctionType getTouchFunction(const WidgetCursor &widgetCursor);
 
+uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId);
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
 uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
 

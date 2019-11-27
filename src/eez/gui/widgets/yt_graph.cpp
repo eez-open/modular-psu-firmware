@@ -55,6 +55,8 @@ struct YTGraphDrawHelper {
     int yPrev[2];
     int y[2];
 
+    Value::YtDataGetValueFunctionPointer ytDataGetValue;
+
     YTGraphDrawHelper(const WidgetCursor &widgetCursor_) : widgetCursor(widgetCursor_), widget(widgetCursor.widget) {
         min[0] = data::ytDataGetMin(widgetCursor.cursor, widget->data, 0).getFloat();
         max[0] = data::ytDataGetMax(widgetCursor.cursor, widget->data, 0).getFloat();
@@ -67,6 +69,7 @@ struct YTGraphDrawHelper {
         dataColor16[0] = display::getColor16FromIndex(y1Style->color);
         dataColor16[1] = display::getColor16FromIndex(y2Style->color);
 
+        ytDataGetValue = data::ytDataGetGetValueFunc(widgetCursor.cursor, widget->data);
     }
 
     int getYValue(int valueIndex, uint32_t position) {
@@ -74,7 +77,7 @@ struct YTGraphDrawHelper {
             return INT_MIN;
         }
 
-        float value = data::ytDataGetValue(widgetCursor.cursor, widget->data, position, valueIndex).getFloat();
+        float value = ytDataGetValue(position, valueIndex, nullptr);
 
         if (isNaN(value)) {
             return INT_MIN;
@@ -217,30 +220,43 @@ struct YTGraphStaticDrawHelper {
 
     int x;
 
-    int yPrev;
-    int y;
+    int yPrevMin;
+    int yPrevMax;
+    int yMin;
+    int yMax;
 
     uint32_t cursorPosition;
 
+    Value::YtDataGetValueFunctionPointer ytDataGetValue;
+
     YTGraphStaticDrawHelper(const WidgetCursor &widgetCursor_) : widgetCursor(widgetCursor_), widget(widgetCursor.widget) {
+        ytDataGetValue = data::ytDataGetGetValueFunc(widgetCursor.cursor, widget->data);
     }
 
-    int getYValue(uint32_t position) {
+    void getYValue(uint32_t position, int &min, int &max) {
         if (position >= numPositions) {
-            return INT_MIN;
+            max = INT_MIN;
+            min = INT_MIN;
+        } else {
+            float fMax;
+            float fMin = ytDataGetValue(position, m_valueIndex, &fMax);
+
+            if (isNaN(fMin)) {
+                max = INT_MIN;
+            } else {
+                max = widget->h - 1 - (int)floor(widget->h / 2.0f + (fMin + offset) * scale);
+            }
+
+            if (isNaN(fMax)) {
+                min = INT_MIN;
+            } else {
+                min = widget->h - 1 - (int)floor(widget->h / 2.0f + (fMax + offset) * scale);
+            }
         }
-
-        float value = data::ytDataGetValue(widgetCursor.cursor, widget->data, position, m_valueIndex).getFloat();
-
-        if (isNaN(value)) {
-            return INT_MIN;
-        }
-
-        return widget->h - 1 - (int)floor(widget->h / 2.0f + (value + offset) * scale);
     }
 
     void drawValue() {
-        if (y == INT_MIN) {
+        if (yMin == INT_MIN) {
             return;
         }
 
@@ -249,19 +265,19 @@ struct YTGraphStaticDrawHelper {
         int yFrom;
         int yTo;
 
-        if (yPrev == INT_MIN) {
-            yFrom = y;
-            yTo = y;
+        if (yPrevMax == INT_MIN) {
+            yFrom = yMin;
+            yTo = yMax;
         } else {
-            if (yPrev < y) {
-                yFrom = yPrev + 1;
-                yTo = y;
-            } else if (y < yPrev) {
-                yFrom = y;
-                yTo = yPrev - 1;
+            if (yPrevMax < yMin) {
+                yFrom = yPrevMax + 1;
+                yTo = yMax;
+            } else if (yMax < yPrevMin) {
+                yFrom = yMin;
+                yTo = yPrevMin - 1;
             } else {
-                yFrom = y;
-                yTo = y;
+                yFrom = yMin;
+                yTo = yMax;
             }
         }
 
@@ -278,7 +294,7 @@ struct YTGraphStaticDrawHelper {
         }
 
         if (yFrom == yTo) {
-            display::drawPixel(x, widgetCursor.y + y);
+            display::drawPixel(x, widgetCursor.y + yFrom);
         } else {
             display::drawVLine(x, widgetCursor.y + yFrom, yTo - yFrom);
         }
@@ -314,18 +330,19 @@ struct YTGraphStaticDrawHelper {
             if (data::ytDataDataValueIsVisible(widgetCursor.cursor, widget->data, m_valueIndex)) {
                 position = currentHistoryValuePosition;
 
-                scale = (widget->h - 1)  / currentState->valuePerDiv[m_valueIndex] / vertDivisions;
+                scale = (widget->h - 1)  / currentState->valueDiv[m_valueIndex] / vertDivisions;
                 offset = currentState->valueOffset[m_valueIndex];
 
                 const Style* style = data::ytDataGetStyle(widgetCursor.cursor, widget->data, m_valueIndex);
                 dataColor16 = display::getColor16FromIndex(style->color);
 
-                yPrev = getYValue(previousHistoryValuePosition);
+                getYValue(previousHistoryValuePosition, yPrevMin, yPrevMax);
 
                 for (x = startX; x < endX; x++, position++) {
-                    y = getYValue(position);
+                    getYValue(position, yMin, yMax);
                     drawValue();
-                    yPrev = y;
+                    yPrevMin = yMin;
+                    yPrevMax = yMax;
                 }
             }
         }
@@ -376,9 +393,9 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     if (currentState->ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
         for (int valueIndex = 0; valueIndex < MAX_NUM_OF_Y_VALUES; valueIndex++) {
             currentState->valueIsVisible[valueIndex] = data::ytDataDataValueIsVisible(widgetCursor.cursor, widget->data, valueIndex);
-            currentState->valuePerDiv[valueIndex] = data::ytDataGetPerDiv(widgetCursor.cursor, widget->data, valueIndex);
+            currentState->valueDiv[valueIndex] = data::ytDataGetDiv(widgetCursor.cursor, widget->data, valueIndex);
             currentState->valueOffset[valueIndex] = data::ytDataGetOffset(widgetCursor.cursor, widget->data, valueIndex);
-            if (previousState && (previousState->valueIsVisible[valueIndex] != currentState->valueIsVisible[valueIndex] || previousState->valuePerDiv[valueIndex] != currentState->valuePerDiv[valueIndex] || previousState->valueOffset[valueIndex] != currentState->valueOffset[valueIndex])) {
+            if (previousState && (previousState->valueIsVisible[valueIndex] != currentState->valueIsVisible[valueIndex] || previousState->valueDiv[valueIndex] != currentState->valueDiv[valueIndex] || previousState->valueOffset[valueIndex] != currentState->valueOffset[valueIndex])) {
                 visibleValuesChanged = true;
             }
         }
@@ -445,14 +462,11 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
 void YTGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (data::ytDataGetGraphUpdateMethod(widgetCursor.cursor, widgetCursor.widget->data) == YT_GRAPH_UPDATE_METHOD_STATIC) {
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
-            int32_t cursorOffset = touchEvent.x - widgetCursor.x;
-            if (cursorOffset < 0) {
-                cursorOffset = 0;
-            }
-            if (cursorOffset >= widgetCursor.widget->w) {
-                cursorOffset = widgetCursor.widget->w - 1;
-            }
-            data::ytDataSetCursorOffset(widgetCursor.cursor, widgetCursor.widget->data, cursorOffset);
+            data::TouchDrag touchDrag;
+            touchDrag.type = touchEvent.type;
+            touchDrag.x = touchEvent.x - widgetCursor.x;
+            touchDrag.y = touchEvent.y - widgetCursor.y;
+            data::ytDataTouchDrag(widgetCursor.cursor, widgetCursor.widget->data, &touchDrag);
         }
     } else {
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {

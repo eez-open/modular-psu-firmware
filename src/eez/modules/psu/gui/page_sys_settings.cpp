@@ -556,7 +556,7 @@ void SysSettingsTemperaturePage::editFanSpeed() {
     options.def = 100;
 
     options.enableMaxButton();
-    options.enableDefButton();
+    options.enableMinButton();
     options.flags.signButtonEnabled = false;
     options.flags.dotButtonEnabled = false;
 

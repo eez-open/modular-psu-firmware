@@ -49,6 +49,7 @@ class Keypad : public eez::gui::Page {
     virtual void option1();
     virtual void option2();
     virtual void setMaxValue();
+    virtual void setMinValue();
     virtual void setDefValue();
     virtual void ok();
     virtual void cancel();

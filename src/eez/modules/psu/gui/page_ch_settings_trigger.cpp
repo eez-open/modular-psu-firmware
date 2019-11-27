@@ -87,7 +87,7 @@ void ChSettingsTriggerPage::editVoltageTriggerValue() {
     options.def = channel_dispatcher::getUMax(*g_channel);
 
     options.enableMaxButton();
-    options.enableDefButton();
+    options.enableMinButton();
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
@@ -112,7 +112,7 @@ void ChSettingsTriggerPage::editCurrentTriggerValue() {
     options.def = channel_dispatcher::getIMax(*g_channel);
 
     options.enableMaxButton();
-    options.enableDefButton();
+    options.enableMinButton();
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 

@@ -21,6 +21,7 @@
 #include <stdint.h>
 
 #include <eez/unit.h>
+#include <eez/gui/event.h>
 
 namespace eez {
 
@@ -43,6 +44,7 @@ enum BuiltInValueType {
     VALUE_TYPE_SLOT_INFO2,
     VALUE_TYPE_TEST_RESULT,
     VALUE_TYPE_TIME_SECONDS,
+    VALUE_TYPE_YT_DATA_GET_VALUE_FUNCTION_POINTER,
     VALUE_TYPE_USER,
 };
 
@@ -144,6 +146,13 @@ struct Value {
     {
     }
 
+    typedef float (*YtDataGetValueFunctionPointer)(int rowIndex, int columnIndex, float *max);
+
+    Value(YtDataGetValueFunctionPointer ytDataGetValueFunctionPointer)
+        : type_(VALUE_TYPE_YT_DATA_GET_VALUE_FUNCTION_POINTER), pVoid_((void *)ytDataGetValueFunctionPointer)
+    {
+    }
+
     bool operator==(const Value &other) const;
 
     bool operator!=(const Value &other) const {
@@ -217,6 +226,10 @@ struct Value {
 
     AppContext *getAppContext() const {
         return (AppContext *)pVoid_;
+    }
+
+    YtDataGetValueFunctionPointer getYtDataGetValueFunctionPointer() const {
+        return (YtDataGetValueFunctionPointer)pVoid_;
     }
 
     uint8_t getFirstUInt8() const {
@@ -307,7 +320,6 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_LIMIT,
     DATA_OPERATION_GET_NAME,
     DATA_OPERATION_GET_UNIT,
-    DATA_OPERATION_GET_HISTORY_VALUE,
     DATA_OPERATION_GET_VALUE_LIST,
     DATA_OPERATION_GET_FLOAT_LIST_LENGTH,
     DATA_OPERATION_GET_FLOAT_LIST,
@@ -340,19 +352,16 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_GET_MAX,
     DATA_OPERATION_YT_DATA_GET_HORZ_DIVISIONS,
     DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS,
-    DATA_OPERATION_YT_DATA_GET_PER_DIV,
+    DATA_OPERATION_YT_DATA_GET_DIV,
     DATA_OPERATION_YT_DATA_GET_OFFSET,
     DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE,
-    DATA_OPERATION_YT_DATA_GET_VALUE1,
-    DATA_OPERATION_YT_DATA_GET_VALUE2,
-    DATA_OPERATION_YT_DATA_GET_VALUE3,
-    DATA_OPERATION_YT_DATA_GET_VALUE4,
+    DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC,
     DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD,
     DATA_OPERATION_YT_DATA_GET_PERIOD,
     DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE,
     DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET,
-    DATA_OPERATION_YT_DATA_SET_CURSOR_OFFSET,
-    DATA_OPERATION_YT_DATA_GET_CURSOR_TIME
+    DATA_OPERATION_YT_DATA_GET_CURSOR_TIME,
+    DATA_OPERATION_YT_DATA_TOUCH_DRAG
 };
 
 int count(uint16_t id);
@@ -395,16 +404,22 @@ Value ytDataGetMin(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 Value ytDataGetMax(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 int ytDataGetVertDivisions(const Cursor &cursor, uint16_t id);
 int ytDataGetHorzDivisions(const Cursor &cursor, uint16_t id);
-float ytDataGetPerDiv(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
+float ytDataGetDiv(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 float ytDataGetOffset(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 bool ytDataDataValueIsVisible(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
-Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint32_t position, uint8_t valueIndex);
+Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(const Cursor &cursor, uint16_t id);
 uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, uint16_t id);
 float ytDataGetPeriod(const Cursor &cursor, uint16_t id);
 bool ytDataIsCursorVisible(const Cursor &cursor, uint16_t id);
 uint32_t ytDataGetCursorOffset(const Cursor &cursor, uint16_t id);
-void ytDataSetCursorOffset(const Cursor &cursor, uint16_t id, uint32_t newCursorOffset);
 Value ytDataGetCursorTime(const Cursor &cursor, uint16_t id);
+
+struct TouchDrag {
+    EventType type;
+    int x;
+    int y;
+};
+void ytDataTouchDrag(const Cursor &cursor, uint16_t id, TouchDrag *touchDrag);
 
 } // namespace data
 } // namespace gui

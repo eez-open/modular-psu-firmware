@@ -55,10 +55,10 @@ void enter(Channel &channel, const eez::gui::data::Value &editValue, const eez::
 
     options.min = minValue.getFloat();
     options.max = maxValue.getFloat();
-    options.def = 0;
+    options.def = options.min;
 
     options.enableMaxButton();
-    options.enableDefButton();
+    options.enableMinButton();
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 

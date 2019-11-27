@@ -52,10 +52,12 @@ struct NumericKeypadOptions {
     void (*option2)();
 
     void enableMaxButton();
+    void enableMinButton();
     void enableDefButton();
 
   private:
     static void maxOption();
+    static void minOption();
     static void defOption();
 };
 
@@ -101,6 +103,7 @@ class NumericKeypad : public Keypad {
     void option1();
     void option2();
     void setMaxValue();
+    void setMinValue();
     void setDefValue();
     void ok();
     void cancel();

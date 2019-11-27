@@ -255,6 +255,9 @@ void Keypad::option2() {
 void Keypad::setMaxValue() {
 }
 
+void Keypad::setMinValue() {
+}
+
 void Keypad::setDefValue() {
 }
 

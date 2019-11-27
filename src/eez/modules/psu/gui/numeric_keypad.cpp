@@ -79,6 +79,11 @@ void NumericKeypadOptions::enableMaxButton() {
     option1 = maxOption;
 }
 
+void NumericKeypadOptions::enableMinButton() {
+    flags.option2ButtonEnabled = true;
+    option2ButtonText = "min";
+    option2 = minOption;
+}
 void NumericKeypadOptions::enableDefButton() {
     flags.option2ButtonEnabled = true;
     option2ButtonText = "def";
@@ -87,6 +92,10 @@ void NumericKeypadOptions::enableDefButton() {
 
 void NumericKeypadOptions::maxOption() {
     getActiveKeypad()->setMaxValue();
+}
+
+void NumericKeypadOptions::minOption() {
+    getActiveKeypad()->setMinValue();
 }
 
 void NumericKeypadOptions::defOption() {
@@ -496,6 +505,10 @@ void NumericKeypad::option2() {
 
 void NumericKeypad::setMaxValue() {
     m_okFloatCallback(m_options.max);
+}
+
+void NumericKeypad::setMinValue() {
+    m_okFloatCallback(m_options.min);
 }
 
 void NumericKeypad::setDefValue() {

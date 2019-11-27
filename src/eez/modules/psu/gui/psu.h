@@ -75,8 +75,7 @@ class PsuAppContext : public AppContext {
 
     uint32_t getNumHistoryValues(uint16_t id) override;
     uint32_t getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) override;
-    Value getHistoryValue(const Cursor &cursor, uint16_t id, uint32_t position) override;
-
+    
     void showProgressPage(const char *message, void (*abortCallback)());
     bool updateProgressPage(size_t processedSoFar, size_t totalSize);
     void hideProgressPage();

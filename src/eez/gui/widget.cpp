@@ -22,6 +22,7 @@
 
 #include <assert.h>
 #include <cstddef>
+#include <limits.h>
 
 #include <eez/debug.h>
 #include <eez/system.h>
@@ -335,7 +336,7 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
                 return;
             }
             g_foundWidget = widgetCursor;
-            g_distanceToFoundWidget = distance;
+            g_distanceToFoundWidget = INT_MAX;
         } else {
             if (!g_foundWidget || distance <= g_distanceToFoundWidget || g_foundWidget.widget->type == WIDGET_TYPE_APP_VIEW) {
                 g_foundWidget = widgetCursor;

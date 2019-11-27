@@ -288,6 +288,14 @@ void TIME_SECONDS_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
+bool compare_YT_DATA_GET_VALUE_FUNCTION_POINTER_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void YT_DATA_GET_VALUE_FUNCTION_POINTER_value_to_text(const Value &value, char *text, int count) {
+    text[0] = 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static CompareValueFunction g_compareBuiltInValueFunctions[] = {
@@ -307,7 +315,8 @@ static CompareValueFunction g_compareBuiltInValueFunctions[] = {
     compare_SLOT_INFO_value,
     compare_SLOT_INFO2_value,
     compare_TEST_RESULT_value,
-    compare_TIME_SECONDS_value
+    compare_TIME_SECONDS_value,
+    compare_YT_DATA_GET_VALUE_FUNCTION_POINTER_value
 };
 
 static ValueToTextFunction g_builtInValueToTextFunctions[] = {
@@ -328,7 +337,8 @@ static ValueToTextFunction g_builtInValueToTextFunctions[] = {
     SLOT_INFO_value_to_text,
     SLOT_INFO2_value_to_text,
     TEST_RESULT_value_to_text,
-    TIME_SECONDS_value_to_text
+    TIME_SECONDS_value_to_text,
+    YT_DATA_GET_VALUE_FUNCTION_POINTER_value_to_text
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -660,9 +670,9 @@ int ytDataGetHorzDivisions(const Cursor &cursor, uint16_t id) {
     return value.getInt();
 }
 
-float ytDataGetPerDiv(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+float ytDataGetDiv(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_PER_DIV, (Cursor &)cursor, value);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_DIV, (Cursor &)cursor, value);
     return value.getFloat();
 }
 
@@ -678,10 +688,10 @@ bool ytDataDataValueIsVisible(const Cursor &cursor, uint16_t id, uint8_t valueIn
     return value.getInt();
 }
 
-Value ytDataGetValue(const Cursor &cursor, uint16_t id, uint32_t position, uint8_t valueIndex) {
-    Value value(position, VALUE_TYPE_UINT32);
-    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_VALUE1 + valueIndex), (Cursor &)cursor, value);
-    return value;
+Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC, (Cursor &)cursor, value);
+    return value.getYtDataGetValueFunctionPointer();
 }
 
 uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, uint16_t id) {
@@ -708,15 +718,15 @@ uint32_t ytDataGetCursorOffset(const Cursor &cursor, uint16_t id) {
     return value.getUInt32();
 }
 
-void ytDataSetCursorOffset(const Cursor &cursor, uint16_t id, uint32_t newCursorOffset) {
-    Value value(newCursorOffset, VALUE_TYPE_UINT32);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_SET_CURSOR_OFFSET, (Cursor &)cursor, value);
-}
-
 Value ytDataGetCursorTime(const Cursor &cursor, uint16_t id) {
     Value value;
     g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_CURSOR_TIME, (Cursor &)cursor, value);
     return value;
+}
+
+void ytDataTouchDrag(const Cursor &cursor, uint16_t id, TouchDrag *touchDrag) {
+    Value value = Value(touchDrag, VALUE_TYPE_POINTER);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_TOUCH_DRAG, (Cursor &)cursor, value);
 }
 
 } // namespace data

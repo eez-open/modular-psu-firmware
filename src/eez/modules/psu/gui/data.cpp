@@ -740,20 +740,6 @@ void DLOG_CURRENT_TIME_value_to_text(const Value &value, char *text, int count) 
     printTime(g_savedCurrentTime, text, count);
 }
 
-static double g_savedRecordingDuration;
-
-bool compare_DLOG_TIME_DURATION_value(const Value &a, const Value &b) {
-    dlog_view::Recording &recording = dlog_view::getRecording();
-    double recordingDuration  = (double)recording.size * recording.parameters.period;
-    bool result = g_savedRecordingDuration == recordingDuration;
-    g_savedRecordingDuration = recordingDuration;
-    return result;
-}
-
-void DLOG_TIME_DURATION_value_to_text(const Value &value, char *text, int count) {
-    printTime(g_savedRecordingDuration, text, count);
-}
-
 bool compare_FILE_LENGTH_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
@@ -830,7 +816,6 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_CHANNEL_LONG_TITLE_value,
     compare_DLOG_VALUE_LABEL_value,
     compare_DLOG_CURRENT_TIME_value,
-    compare_DLOG_TIME_DURATION_value,
     compare_FILE_LENGTH_value,
     compare_FILE_DATE_TIME_value
 };
@@ -874,7 +859,6 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     CHANNEL_LONG_TITLE_value_to_text,
     DLOG_VALUE_LABEL_value_to_text,
     DLOG_CURRENT_TIME_value_to_text,
-    DLOG_TIME_DURATION_value_to_text,
     FILE_LENGTH_value_to_text,
     FILE_DATE_TIME_value_to_text
 };
@@ -940,10 +924,10 @@ void editValue(uint16_t dataId) {
             }
         }
 
-        auto def = getDef(g_editValueCursor, g_editValueDataId);
-        if (def.getType() != VALUE_TYPE_NONE) {
-            options.def = def.getFloat();
-            options.enableDefButton();
+        auto min = getDef(g_editValueCursor, g_editValueDataId);
+        if (min.getType() != VALUE_TYPE_NONE) {
+            options.min = min.getFloat();
+            options.enableMinButton();
         }
 
         options.flags.signButtonEnabled = options.min < 0;
@@ -1058,9 +1042,6 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
-        uint32_t position = value.getUInt32();
-        value = MakeValue(channel.getUMonHistory(position), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
@@ -1188,10 +1169,6 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
-        uint32_t position = value.getUInt32();
-        value =
-            MakeValue(channel.getIMonHistory(position), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
@@ -1292,9 +1269,6 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-    } else if (operation == data::DATA_OPERATION_GET_HISTORY_VALUE) {
-        float pMon = channel.getUMonHistory(value.getUInt32()) * channel.getIMonHistory(value.getUInt32());
-        value = MakeValue(pMon, UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
@@ -4376,9 +4350,64 @@ void data_is_show_live_recording(data::DataOperationEnum operation, data::Cursor
 #endif
 }
 
+float getChannelHistoryValue(int channelIndex, int rowIndex, int columnIndex) {
+    auto channel = Channel::get(channelIndex);
+    
+    if (columnIndex == 0) {
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.getUMonHistory(rowIndex);
+        }
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+            return channel.getIMonHistory(rowIndex);
+        }
+    } else {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.getUMonHistory(rowIndex);
+        }
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+            return channel.getIMonHistory(rowIndex);
+        }
+    }
+    
+    return channel.getUMonHistory(rowIndex) * channel.getIMonHistory(rowIndex);
+}
+
+float getChannel1HistoryValue(int rowIndex, int columnIndex, float *) {
+    return getChannelHistoryValue(0, rowIndex, columnIndex);
+}
+
+float getChannel2HistoryValue(int rowIndex, int columnIndex, float *) {
+    return getChannelHistoryValue(1, rowIndex, columnIndex);
+}
+
+float getChannel3HistoryValue(int rowIndex, int columnIndex, float *) {
+    return getChannelHistoryValue(2, rowIndex, columnIndex);
+}
+
+float getChannel4HistoryValue(int rowIndex, int columnIndex, float *) {
+    return getChannelHistoryValue(3, rowIndex, columnIndex);
+}
+
+float getChannel5HistoryValue(int rowIndex, int columnIndex, float *) {
+    return getChannelHistoryValue(4, rowIndex, columnIndex);
+}
+
+float getChannel6HistoryValue(int rowIndex, int columnIndex, float *) {
+    return getChannelHistoryValue(5, rowIndex, columnIndex);
+}
+
+static Value::YtDataGetValueFunctionPointer g_getChannelHistoryValueFuncs[CH_MAX] = {
+    getChannel1HistoryValue,
+    getChannel2HistoryValue,
+    getChannel3HistoryValue,
+    getChannel4HistoryValue,
+    getChannel5HistoryValue,
+    getChannel6HistoryValue
+};
+
 void data_channel_history_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation >= DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE2) {
-        value = g_appContext->getHistoryValue(cursor, operation - DATA_OPERATION_YT_DATA_GET_VALUE1 == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2, value.getUInt32());
+    if (operation == DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC) {
+        value = g_getChannelHistoryValueFuncs[cursor.i];
     } else if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
         value = Value(0, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
@@ -4391,7 +4420,20 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
         if (channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
             value = Value(STYLE_ID_YT_GRAPH_UNREGULATED, VALUE_TYPE_UINT16);
         } else {
-            value = Value(value.getUInt8() == 0 ? STYLE_ID_YT_GRAPH_U_DEFAULT : STYLE_ID_YT_GRAPH_I_DEFAULT, VALUE_TYPE_UINT16);
+            if (value.getUInt8() == 0) {
+                value = Value(
+                    channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE ? STYLE_ID_YT_GRAPH_U_DEFAULT : 
+                    channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT ? STYLE_ID_YT_GRAPH_I_DEFAULT :
+                    STYLE_ID_YT_GRAPH_P_DEFAULT, 
+                    VALUE_TYPE_UINT16);
+            } else {
+                value = Value(
+                    channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE ? STYLE_ID_YT_GRAPH_U_DEFAULT :
+                    channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT ? STYLE_ID_YT_GRAPH_I_DEFAULT :
+                    STYLE_ID_YT_GRAPH_P_DEFAULT,
+                    VALUE_TYPE_UINT16);
+            }
+            
         }
     } else if (operation == DATA_OPERATION_YT_DATA_GET_MIN) {
         value = getMin(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
@@ -4506,8 +4548,8 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
 
     if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
         value = Value(recording.refreshCounter, VALUE_TYPE_UINT32);
-    } else if (operation >= DATA_OPERATION_YT_DATA_GET_VALUE1 && operation <= DATA_OPERATION_YT_DATA_GET_VALUE4) {
-        value = recording.getValue(value.getUInt32(), operation - DATA_OPERATION_YT_DATA_GET_VALUE1);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC) {
+        value = recording.getValue;
     } else if (operation == DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE) {
         value = Value(recording.dlogValues[value.getUInt8()].isVisible);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
@@ -4517,7 +4559,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         if (&recording == &dlog_record::g_recording) {
             value = Value(recording.size - recording.pageSize, VALUE_TYPE_UINT32);
         } else {
-            position = recording.timeOffset.getFloat() / recording.parameters.period;
+            position = recording.timeOffset / recording.parameters.period;
             if (position < 0) {
                 value = Value(0, VALUE_TYPE_UINT32);
             } else if (position > recording.size - recording.pageSize) {
@@ -4535,7 +4577,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
                 newPosition = recording.size - recording.pageSize;
             }
         }
-        recording.timeOffset = Value(newPosition * recording.parameters.period, recording.timeOffset.getUnit());
+        dlog_view::changeTimeOffset(recording, newPosition * recording.parameters.period);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
         value = Value(recording.pageSize, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
@@ -4544,8 +4586,8 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         value = dlog_view::NUM_HORZ_DIVISIONS;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS) {
         value = dlog_view::NUM_VERT_DIVISIONS;
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_PER_DIV) {
-        value = recording.dlogValues[value.getUInt8()].perDiv;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_DIV) {
+        value = recording.dlogValues[value.getUInt8()].div;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_OFFSET) {
         value = recording.dlogValues[value.getUInt8()].offset;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
@@ -4556,8 +4598,71 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         value = &recording != &dlog_record::g_recording;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET) {
         value = Value(recording.cursorOffset, VALUE_TYPE_UINT32);
-    } else if (operation == DATA_OPERATION_YT_DATA_SET_CURSOR_OFFSET) {
-        recording.cursorOffset = value.getUInt32();
+    } else if (operation == DATA_OPERATION_YT_DATA_TOUCH_DRAG) {
+        TouchDrag *touchDrag = (TouchDrag *)value.getVoidPointer();
+        
+        static float valueAtTouchDown;
+        static int xAtTouchDown;
+        static int yAtTouchDown;
+        
+        if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET) {
+            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, g_focusCursor.i);
+
+            if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
+                valueAtTouchDown = dlogValueParams->offset.getFloat();
+                yAtTouchDown = touchDrag->y;
+            } else {
+                float newOffset = valueAtTouchDown + dlogValueParams->div.getFloat() * (yAtTouchDown - touchDrag->y) * dlog_view::NUM_VERT_DIVISIONS / dlog_view::VIEW_HEIGHT;
+
+                float min = getMin(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_OFFSET).getFloat();
+                float max = getMax(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_OFFSET).getFloat();
+
+                newOffset = roundPrec(clamp(newOffset, min, max), dlog_view::VALUE_PREC);
+                
+                dlogValueParams->offset = Value(newOffset, dlogValueParams->offset.getUnit());
+            }
+        } else if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV) {
+            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, g_focusCursor.i);
+
+            if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
+                valueAtTouchDown = dlogValueParams->div.getFloat();
+
+                //uint32_t position = ytDataGetPosition(cursor, DATA_ID_RECORDING);
+                //Value::YtDataGetValueFunctionPointer ytDataGetValue = data::ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
+                //for (int i = position + touchDrag->x - 10; i < position + touchDrag->x + 10; )
+
+                yAtTouchDown = touchDrag->y;
+            } else {
+                float scale = 1.0f * (dlog_view::VIEW_HEIGHT - yAtTouchDown) / (dlog_view::VIEW_HEIGHT - touchDrag->y);
+
+                float newDiv = valueAtTouchDown * scale;
+
+                float min = getMin(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_DIV).getFloat();
+                float max = getMax(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_DIV).getFloat();
+
+                newDiv = roundPrec(clamp(newDiv, min, max), dlog_view::VALUE_PREC);
+
+                dlogValueParams->div = Value(newDiv, dlogValueParams->div.getUnit());
+            }
+        } else if (g_focusDataId == DATA_ID_DLOG_TIME_DIV) {
+            if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
+                valueAtTouchDown = recording.timeDiv;
+                xAtTouchDown = touchDrag->x;
+            } else {
+                float scale = 1.0f * (dlog_view::VIEW_WIDTH - touchDrag->x) / (dlog_view::VIEW_WIDTH - xAtTouchDown);
+
+                float newDiv = valueAtTouchDown * scale;
+
+                float min = getMin(g_focusCursor, DATA_ID_DLOG_TIME_DIV).getFloat();
+                float max = getMax(g_focusCursor, DATA_ID_DLOG_TIME_DIV).getFloat();
+
+                newDiv = roundPrec(clamp(newDiv, min, max), dlog_view::TIME_PREC);
+
+                dlog_view::changeTimeDiv(recording, newDiv);
+            }
+        } else {
+            recording.cursorOffset = MIN(dlog_view::VIEW_WIDTH - 1, MAX(touchDrag->x, 0));
+        }
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_TIME) {
         value = Value((ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset) * recording.parameters.period, UNIT_SECOND);
     }
@@ -4673,18 +4778,18 @@ void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = dlogValueParams->perDiv;
+            value = dlogValueParams->div;
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(0.01f, dlogValueParams->perDiv.getUnit());
+        value = Value(0.1f, dlogValueParams->div.getUnit());
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(100.0f, dlogValueParams->perDiv.getUnit());
+        value = Value(100.0f, dlogValueParams->div.getUnit());
     } else if (operation == data::DATA_OPERATION_SET) {
-        dlogValueParams->perDiv = value;
+        dlogValueParams->div = Value(roundPrec(value.getFloat(), dlog_view::VALUE_PREC), value.getUnit());
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
         value = "Div";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = dlogValueParams->perDiv.getUnit();
+        value = dlogValueParams->div.getUnit();
     } 
 #endif
 }
@@ -4706,7 +4811,7 @@ void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cur
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
         value = Value(100.0f, dlogValueParams->offset.getUnit());
     } else if (operation == data::DATA_OPERATION_SET) {
-        dlogValueParams->offset = value;
+        dlogValueParams->offset = Value(roundPrec(value.getFloat(), dlog_view::VALUE_PREC), value.getUnit());
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
         value = "Offset";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
@@ -4724,19 +4829,44 @@ void data_dlog_time_offset(data::DataOperationEnum operation, data::Cursor &curs
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = recording.timeOffset;
+            value = Value(recording.timeOffset, UNIT_SECOND);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(0.0f, recording.timeOffset.getUnit());
+        value = Value(0.0f, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value((recording.size - recording.pageSize) * recording.parameters.period, recording.timeOffset.getUnit());
+        value = Value(dlog_view::getMaxTimeOffset(recording), UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_SET) {
-        recording.timeOffset = value;
+        dlog_view::changeTimeOffset(recording, value.getFloat());
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
         value = "Time Offset";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = recording.timeOffset.getUnit();
+        value = UNIT_SECOND;
     } 
+#endif
+}
+
+void data_dlog_time_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    dlog_view::Recording &recording = dlog_view::getRecording();
+
+    if (operation == data::DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_TIME_DIV;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else {
+            value = Value(recording.timeDiv, UNIT_SECOND);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_MIN || operation == data::DATA_OPERATION_GET_DEF) {
+        value = Value(recording.timeDivMin, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = Value(recording.timeDivMax, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_SET) {
+        dlog_view::changeTimeDiv(recording, value.getFloat());
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "Time Div";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    }
 #endif
 }
 
@@ -4745,7 +4875,14 @@ void data_dlog_visible_value_cursor(data::DataOperationEnum operation, data::Cur
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
         int dlogValueIndex = dlog_view::getVisibleDlogValueIndex(recording, cursor.i);
-        value = data::ytDataGetValue(cursor, DATA_ID_RECORDING, ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, dlogValueIndex);
+        auto ytDataGetValue = data::ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
+        float max;
+        float min = ytDataGetValue(ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, dlogValueIndex, &max);
+        value = Value(
+            (min + max) / 2,
+            recording.dlogValues[dlogValueIndex].div.getUnit()
+        );
+
     }
 #endif
 }
@@ -4761,7 +4898,7 @@ void data_dlog_current_time(data::DataOperationEnum operation, data::Cursor &cur
 void data_dlog_time_duration(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        value = Value(0, VALUE_TYPE_DLOG_TIME_DURATION);
+        value = Value(dlog_view::getDuration(dlog_view::getRecording()), UNIT_SECOND);
     }
 #endif
 }
@@ -4769,15 +4906,6 @@ void data_dlog_file_length(data::DataOperationEnum operation, data::Cursor &curs
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(dlog_record::g_fileLength, VALUE_TYPE_FILE_LENGTH);
-    }
-#endif
-}
-
-void data_dlog_time_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
-    if (operation == data::DATA_OPERATION_GET) {
-        dlog_view::Recording &recording = dlog_view::getRecording();
-        value = Value(recording.pageSize * recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS, UNIT_SECOND);
     }
 #endif
 }

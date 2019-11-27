@@ -62,8 +62,14 @@ static const uint32_t MAGIC2 = 0x474F4C44;
 static const uint16_t VERSION = 1;
 static const uint32_t DLOG_HEADER_SIZE = 28;
 
+static const int VIEW_WIDTH = 480;
+static const int VIEW_HEIGHT = 240;
+
 static const int NUM_HORZ_DIVISIONS = 12;
 static const int NUM_VERT_DIVISIONS = 6;
+
+static const float TIME_PREC = 0.005f;
+static const float VALUE_PREC = 0.1f;
 
 enum State {
     STATE_STARTING,
@@ -107,25 +113,32 @@ struct Parameters {
 struct DlogValueParams {
     bool isVisible;
     DlogValueType dlogValueType;
-    eez::gui::data::Value perDiv;
     eez::gui::data::Value offset;
+    eez::gui::data::Value div;
 };
 
 struct Recording {
-    uint32_t refreshCounter;
-
-    uint32_t size;
+    Parameters parameters;
 
     uint8_t totalDlogValues;
     DlogValueParams dlogValues[MAX_NUM_OF_Y_VALUES];
 
-    eez::gui::Value timeOffset;
-    Parameters parameters;
-
+    uint32_t size;
     uint32_t pageSize;
+
+    float timeOffset;
+    float timeDiv;
+
     uint32_t cursorOffset;
 
-    eez::gui::data::Value (*getValue)(int rowIndex, int columnIndex);
+    float (*getValue)(int rowIndex, int columnIndex, float *max);
+
+    uint32_t refreshCounter;
+
+    uint32_t numSamples;
+    float minPeriod;
+    float timeDivMin;
+    float timeDivMax;
 };
 
 extern bool g_showLatest;
@@ -148,6 +161,11 @@ void setDlogValue(int dlogValueIndex, int channelIndex, DlogValueType valueType)
 int getNumVisibleDlogValues(const Recording &recording);
 int getVisibleDlogValueIndex(Recording &recording, int visibleDlogValueIndex);
 DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex);
+
+float getMaxTimeOffset(Recording& recording);
+void changeTimeOffset(Recording &recording, float timeOffset);
+void changeTimeDiv(Recording &recording, float timeDiv);
+float getDuration(Recording &recording);
 
 } // namespace dlog_view
 } // namespace psu

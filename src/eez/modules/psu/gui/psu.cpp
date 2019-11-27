@@ -548,12 +548,6 @@ uint32_t PsuAppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uin
     return Channel::get(iChannel).getCurrentHistoryValuePosition();
 }
 
-Value PsuAppContext::getHistoryValue(const Cursor &cursor, uint16_t id, uint32_t position) {
-    Value value(position, VALUE_TYPE_INT);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_HISTORY_VALUE, (Cursor &)cursor, value);
-    return value;
-}
-
 void PsuAppContext::showProgressPage(const char *message, void (*abortCallback)()) {
     m_progressMessage = message;
     m_progressAbortCallback = abortCallback;
@@ -1220,6 +1214,32 @@ uint16_t transformColorHook(uint16_t color) {
 }
 
 namespace gui {
+
+uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
+    if (widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE1 || widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE2) {
+        if (styleId == STYLE_ID_YT_GRAPH_U_DEFAULT || styleId == STYLE_ID_YT_GRAPH_I_DEFAULT) {
+            using namespace psu;
+            using namespace psu::gui;
+            int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
+            Channel &channel = Channel::get(iChannel);
+            if (widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE1) {
+                if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+                    return STYLE_ID_YT_GRAPH_U_DEFAULT;
+                } else if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+                    return STYLE_ID_YT_GRAPH_I_DEFAULT;
+                }
+            } else {
+                if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+                    return STYLE_ID_YT_GRAPH_U_DEFAULT;
+                } else if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+                    return STYLE_ID_YT_GRAPH_I_DEFAULT;
+                }
+            }
+            return STYLE_ID_YT_GRAPH_P_DEFAULT;
+        }
+    }
+    return styleId;
+}
 
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {

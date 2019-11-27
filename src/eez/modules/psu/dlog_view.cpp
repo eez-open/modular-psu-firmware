@@ -19,6 +19,7 @@
 #if OPTION_SD_CARD
 
 #include <string.h>
+#include <assert.h>
 
 #include <eez/system.h>
 
@@ -61,14 +62,27 @@ static uint8_t g_bufferMemory[DLOG_VIEW_BUFFER_SIZE];
 static uint8_t *g_buffer = g_bufferMemory;
 #endif
 
-static const uint32_t BLOCK_SIZE_WITH_HEADER = 1024;
-static const uint32_t BLOCK_HEADER_SIZE = 4;
-static const uint32_t BLOCK_SIZE_WITHOUT_HEADER = BLOCK_SIZE_WITH_HEADER - BLOCK_HEADER_SIZE;
-static const uint32_t NUM_BLOCKS = DLOG_VIEW_BUFFER_SIZE / BLOCK_SIZE_WITH_HEADER;
-static const uint32_t INVALID_BLOCK_ADDRESS = 0x1;
+struct CacheBlock {
+    unsigned valid: 1;
+    unsigned loaded: 1;
+    uint32_t startAddress;
+};
+
+struct BlockElement {
+    float min;
+    float max;
+};
+
+static const uint32_t NUM_ELEMENTS_PER_BLOCKS = 480 * MAX_NUM_OF_Y_VALUES;
+static const uint32_t BLOCK_SIZE = NUM_ELEMENTS_PER_BLOCKS * sizeof(BlockElement);
+static const uint32_t NUM_BLOCKS = DLOG_VIEW_BUFFER_SIZE / (BLOCK_SIZE + sizeof(CacheBlock));
+
+CacheBlock *g_cacheBlocks = (CacheBlock *)g_buffer;
 
 static bool g_isLoading;
+static bool g_interruptLoading;
 static uint32_t g_blockIndexToLoad;
+static float g_loadScale;
 static bool g_refreshed;
 static bool g_wasExecuting;
 
@@ -106,19 +120,81 @@ float readFloat(uint8_t *buffer, uint32_t *offset) {
     return *((float *)&value);
 }
 
+BlockElement *getCacheBlock(unsigned blockIndex) {
+    return (BlockElement *)(g_buffer + NUM_BLOCKS * sizeof(CacheBlock) + blockIndex * BLOCK_SIZE);
+}
+
+unsigned getNumElementsPerRow() {
+    return MIN(g_recording.totalDlogValues, MAX_NUM_OF_Y_VALUES);
+}
+
 void invalidateAllBlocks() {
-    for (uint32_t blockIndex = 0; blockIndex < NUM_BLOCKS; blockIndex++) {
-        g_buffer[blockIndex * BLOCK_SIZE_WITH_HEADER] = INVALID_BLOCK_ADDRESS;
+    g_interruptLoading = true;
+
+    while (g_isLoading) {
+        osDelay(1);
+    }
+
+    for (unsigned blockIndex = 0; blockIndex < NUM_BLOCKS; blockIndex++) {
+        g_cacheBlocks[blockIndex].valid = false;
     }
 }
 
 void loadBlock() {
+    static const int NUM_VALUES_ROWS = 16;
+    float values[18 * NUM_VALUES_ROWS];
+
     File file;
     if (file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        uint32_t blockAddress = *((uint32_t *)&g_buffer[g_blockIndexToLoad * BLOCK_SIZE_WITH_HEADER]);
-        file.seek(DLOG_HEADER_SIZE + blockAddress);
-        file.read(g_buffer + g_blockIndexToLoad * BLOCK_SIZE_WITH_HEADER + BLOCK_HEADER_SIZE, BLOCK_SIZE_WITHOUT_HEADER);
+        auto numSamplesPerValue = (unsigned)round(g_loadScale);
+        auto numElementsPerRow = getNumElementsPerRow();
+
+        BlockElement *blockElements = getCacheBlock(g_blockIndexToLoad);
+            
+        for (unsigned i = 0; i < NUM_ELEMENTS_PER_BLOCKS && !g_interruptLoading;) {
+            auto offset = (uint32_t)roundf((g_blockIndexToLoad * NUM_ELEMENTS_PER_BLOCKS + i) / numElementsPerRow * g_loadScale * g_recording.totalDlogValues);
+
+            offset = g_recording.totalDlogValues *((offset + g_recording.totalDlogValues - 1) / g_recording.totalDlogValues);
+
+            file.seek(DLOG_HEADER_SIZE + offset * sizeof(float));
+
+            unsigned iStart = i;
+
+            for (unsigned j = 0; j < numSamplesPerValue; j++) {
+                i = iStart;
+
+                auto valuesRow = j % NUM_VALUES_ROWS;
+                if (valuesRow == 0) {
+                    // read up to NUM_VALUES_ROWS
+                    file.read(values, MIN(NUM_VALUES_ROWS, numSamplesPerValue - j) * g_recording.totalDlogValues * sizeof(float));
+                }
+
+                unsigned valuesOffset = valuesRow * g_recording.totalDlogValues;
+
+                for (unsigned k = 0; k < g_recording.totalDlogValues; k++) {
+                    if (k < numElementsPerRow) {
+                        BlockElement *blockElement = blockElements + i;
+                        i++;
+
+                        float value = values[valuesOffset + k];
+
+                        if (isNaN(blockElement->min) || value < blockElement->min) {
+                            blockElement->min = value;
+                        }
+
+                        if (isNaN(blockElement->max) || value > blockElement->max) {
+                            blockElement->max = value;
+                        }
+                    }
+                }
+            }
+
+            g_refreshed = true;
+        }
+
+        g_cacheBlocks[g_blockIndexToLoad].loaded = 1;
     }
+
     file.close();
 
     g_isLoading = false;
@@ -138,32 +214,95 @@ void stateManagment() {
     }
 }
 
-eez::gui::data::Value getValue(int rowIndex, int columnIndex) {
-    uint32_t address = (rowIndex * g_recording.totalDlogValues + columnIndex) * 4;
+float getValue(int rowIndex, int columnIndex, float *max) {
+    uint32_t blockElementAddress = (rowIndex * getNumElementsPerRow() + columnIndex) * sizeof(BlockElement);
 
-    uint32_t blockAddress = address / BLOCK_SIZE_WITHOUT_HEADER;
-    uint32_t blockOffset = address % BLOCK_SIZE_WITHOUT_HEADER;
+    uint32_t blockIndex = blockElementAddress / BLOCK_SIZE;
+    uint32_t blockStartAddress = blockIndex * BLOCK_SIZE;
 
-    uint32_t blockIndex = blockAddress % NUM_BLOCKS;
+    blockIndex %= NUM_BLOCKS;
 
-    blockAddress *= BLOCK_SIZE_WITHOUT_HEADER;
+    BlockElement *blockElements = getCacheBlock(blockIndex);
 
-    if (g_buffer[blockIndex * BLOCK_SIZE_WITH_HEADER] == INVALID_BLOCK_ADDRESS || *((uint32_t *)&g_buffer[blockIndex * BLOCK_SIZE_WITH_HEADER]) != blockAddress) {
-        float *p = (float *)(g_buffer + blockIndex * BLOCK_SIZE_WITH_HEADER + BLOCK_HEADER_SIZE);
-        for (unsigned i = 0; i < BLOCK_SIZE_WITHOUT_HEADER; i += 4) {
-            *p++ = NAN;
+    if (!(g_cacheBlocks[blockIndex].valid && g_cacheBlocks[blockIndex].startAddress == blockStartAddress)) {
+        for (unsigned i = 0; i < NUM_ELEMENTS_PER_BLOCKS; i++) {
+            blockElements[i].min = NAN;
+            blockElements[i].max = NAN;
         }
 
-        if (!g_isLoading) {
-            g_isLoading = true;
-            g_blockIndexToLoad = blockIndex;
-            *((uint32_t *)&g_buffer[blockIndex * BLOCK_SIZE_WITH_HEADER]) = blockAddress;
-            osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_LOAD_BLOCK, 0), osWaitForever);
-        }
+        g_cacheBlocks[blockIndex].valid = 1;
+        g_cacheBlocks[blockIndex].loaded = 0;
+        g_cacheBlocks[blockIndex].startAddress = blockStartAddress;
     }
 
-    float value = *(float *)(g_buffer + blockIndex * BLOCK_SIZE_WITH_HEADER + BLOCK_HEADER_SIZE + blockOffset);
-    return eez::gui::data::Value(value, g_recording.dlogValues[columnIndex].offset.getUnit());
+    if (!g_cacheBlocks[blockIndex].loaded && !g_isLoading) {
+        g_isLoading = true;
+        g_interruptLoading = false;
+        g_blockIndexToLoad = blockIndex;
+        g_loadScale = g_recording.timeDiv / g_recording.timeDivMin;
+
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_LOAD_BLOCK, 0), osWaitForever);
+    }
+
+    uint32_t blockElementIndex = (blockElementAddress % BLOCK_SIZE) / sizeof(BlockElement);
+
+    BlockElement *blockElement = blockElements + blockElementIndex;
+    *max = blockElement->max;
+    return blockElement->min;
+}
+
+void adjustTimeOffset(Recording &recording) {
+    auto duration = getDuration(recording);
+    if (recording.timeOffset + recording.pageSize * recording.parameters.period > duration) {
+        recording.timeOffset = roundPrec(duration - recording.pageSize * recording.parameters.period, TIME_PREC);
+        if (recording.timeOffset < 0) {
+            recording.timeOffset = 0;
+        }
+    }
+}
+
+float getMaxTimeOffset(Recording &recording) {
+    return roundPrec((recording.size - recording.pageSize) * recording.parameters.period, TIME_PREC);
+}
+
+void changeTimeOffset(Recording &recording, float timeOffset) {
+    if (&dlog_view::g_recording == &recording) {
+        float newTimeOffset = roundPrec(timeOffset, TIME_PREC);
+        if (newTimeOffset != recording.timeOffset) {
+            recording.timeOffset = newTimeOffset;
+            adjustTimeOffset(recording);
+        }
+    } else {
+        recording.timeOffset = timeOffset;
+    }
+}
+
+void changeTimeDiv(Recording &recording, float timeDiv) {
+    float newTimeDiv = timeDiv != recording.timeDivMin ? roundPrec(timeDiv, TIME_PREC) : timeDiv;
+
+    if (recording.timeDiv != newTimeDiv) {
+        recording.timeDiv = newTimeDiv;
+
+        if (recording.timeDiv == recording.timeDivMin) {
+            recording.parameters.period = recording.minPeriod;
+            recording.size = recording.numSamples;
+        } else {
+            recording.parameters.period = recording.minPeriod * recording.timeDiv / recording.timeDivMin;
+            recording.size = (uint32_t)round(recording.numSamples * recording.timeDivMin / recording.timeDiv);
+        }
+        
+        adjustTimeOffset(recording);
+
+        invalidateAllBlocks();
+    }
+}
+
+float getDuration(Recording &recording) {
+    if (&recording == &g_recording) {
+        return recording.numSamples * recording.minPeriod;
+    }
+
+    return recording.size * recording.parameters.period;
 }
 
 void setDlogValue(int dlogValueIndex, int channelIndex, DlogValueType valueType) {
@@ -171,23 +310,38 @@ void setDlogValue(int dlogValueIndex, int channelIndex, DlogValueType valueType)
 
     g_recording.dlogValues[dlogValueIndex].dlogValueType = (DlogValueType)(3 * channelIndex + valueType);
 
-    float perDiv;
+    float div;
     
     if (valueType == DLOG_VALUE_CH1_U) {
         // TODO this must be read from the file        
-        perDiv = channel_dispatcher::getUMax(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
-        g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_VOLT);
+        if (Channel::get(channelIndex).isInstalled()) {
+            div = channel_dispatcher::getUMax(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
+        } else {
+            div = 40.0f / NUM_VERT_DIVISIONS;
+        }
+
+        g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, VALUE_PREC), UNIT_VOLT);
     } else if (valueType == DLOG_VALUE_CH1_I) {
         // TODO this must be read from the file
-        perDiv = channel_dispatcher::getIMax(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
-        g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_AMPER);
+        if (Channel::get(channelIndex).isInstalled()) {
+            div = channel_dispatcher::getIMax(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
+        } else {
+            div = 5.0f / NUM_VERT_DIVISIONS;
+        }
+
+        g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, VALUE_PREC), UNIT_AMPER);
     } else {
         // TODO this must be read from the file
-        perDiv = channel_dispatcher::getPowerMaxLimit(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
-        g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_WATT);
+        if (Channel::get(channelIndex).isInstalled()) {
+            div = channel_dispatcher::getPowerMaxLimit(Channel::get(channelIndex)) / NUM_VERT_DIVISIONS;
+        } else {
+            div = 155.0f / NUM_VERT_DIVISIONS;
+        }
+
+        g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, VALUE_PREC), UNIT_WATT);
     }
     
-    g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-perDiv * NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
+    g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-div * NUM_VERT_DIVISIONS / 2, VALUE_PREC), g_recording.dlogValues[dlogValueIndex].div.getUnit());
 }
 
 int getNumVisibleDlogValues(const Recording &recording) {
@@ -286,10 +440,20 @@ void openFile(const char *filePath) {
                     }
                 }
 
-                g_recording.size = (file.size() - DLOG_HEADER_SIZE) / (g_recording.totalDlogValues * 4);
-                g_recording.timeOffset = gui::data::Value(0.0f, UNIT_SECOND);
-                g_recording.pageSize = 480;
-                g_recording.cursorOffset = 240;
+                g_recording.pageSize = VIEW_WIDTH;
+
+                g_recording.numSamples = (file.size() - DLOG_HEADER_SIZE) / (g_recording.totalDlogValues * 4);
+                g_recording.minPeriod = g_recording.parameters.period;
+                g_recording.timeDivMin = g_recording.pageSize * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
+                g_recording.timeDivMax = roundPrec(MAX(g_recording.numSamples, g_recording.pageSize) * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS, TIME_PREC);
+
+                g_recording.size = g_recording.numSamples;
+
+                g_recording.timeOffset = 0.0f;
+                g_recording.timeDiv = g_recording.timeDivMin;
+
+                g_recording.cursorOffset = VIEW_WIDTH / 2;
+
                 g_recording.getValue = getValue;
                 g_overlayMinimized = false;
                 g_isLoading = false;

@@ -52,7 +52,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->size = sizeof(DisplayDataState);
     widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
 
-	const Style *style = getStyle(widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->style);
+	const Style *style = getStyle(overrideStyleHook(widgetCursor, widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->style));
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);

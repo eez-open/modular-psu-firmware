@@ -126,7 +126,15 @@ void fileWrite() {
             return;
         }
 
-        size_t written = file.write(g_buffer + g_lastSavedBufferIndex, length);
+        int i = g_lastSavedBufferIndex % DLOG_RECORD_BUFFER_SIZE;
+        int j = g_saveUpToBufferIndex % DLOG_RECORD_BUFFER_SIZE;
+
+        size_t written;
+        if (i < j || j == 0) {
+            written = file.write(g_buffer + i, length);
+        } else {
+            written = file.write(g_buffer + i, DLOG_RECORD_BUFFER_SIZE - i) + file.write(g_buffer, j);
+        }
 
         g_lastSavedBufferIndex = g_saveUpToBufferIndex;
 
@@ -148,7 +156,7 @@ void flushData() {
 }
 
 void writeUint8(uint8_t value) {
-    *(g_buffer + g_bufferIndex) = value;
+    *(g_buffer + (g_bufferIndex % DLOG_RECORD_BUFFER_SIZE)) = value;
 
     if (++g_bufferIndex % CHUNK_SIZE == 0) {
         g_lastSyncTickCount = micros();
@@ -246,9 +254,10 @@ int initiate() {
     return error;
 }
 
-eez::gui::data::Value getValue(int rowIndex, int columnIndex) {
+float getValue(int rowIndex, int columnIndex, float *max) {
     float value = *(float *)(g_buffer + (28 + (rowIndex * g_recording.totalDlogValues + columnIndex) * 4) % DLOG_RECORD_BUFFER_SIZE);
-    return eez::gui::data::Value(value, g_recording.dlogValues[columnIndex].offset.getUnit());
+    *max = value;
+    return value;
 }
 
 int startImmediately() {
@@ -271,9 +280,11 @@ int startImmediately() {
     g_lastSyncTickCount = micros();
     g_fileLength = 0;
 
-    g_recording.timeOffset = gui::data::Value(0.0f, UNIT_SECOND);
-
+    g_recording.size = 0;
     g_recording.pageSize = 480;
+
+    g_recording.timeOffset = 0.0f;
+    g_recording.timeDiv = g_recording.pageSize * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
 
     g_recording.totalDlogValues = 0;
     unsigned int dlogValueIndex = 0;
@@ -286,9 +297,9 @@ int startImmediately() {
             if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
                 g_recording.dlogValues[dlogValueIndex].isVisible = true;
                 g_recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_U);
-                float perDiv = channel_dispatcher::getUMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
-                g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_VOLT);
-                g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
+                float div = channel_dispatcher::getUMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
+                g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, 0.01f), UNIT_VOLT);
+                g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-div * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
 
                 dlogValueIndex++;
             }
@@ -299,9 +310,9 @@ int startImmediately() {
             if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
                 g_recording.dlogValues[dlogValueIndex].isVisible = true;
                 g_recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_I);
-                float perDiv = channel_dispatcher::getIMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
-                g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_AMPER);
-                g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_AMPER);
+                float div = channel_dispatcher::getIMax(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
+                g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, 0.01f), UNIT_AMPER);
+                g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-div * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_AMPER);
 
                 dlogValueIndex++;
             }
@@ -312,9 +323,9 @@ int startImmediately() {
             if (dlogValueIndex < MAX_NUM_OF_Y_VALUES) {
                 g_recording.dlogValues[dlogValueIndex].isVisible = true;
                 g_recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * iChannel + dlog_view::DLOG_VALUE_CH1_P);
-                float perDiv = channel_dispatcher::getPowerMaxLimit(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
-                g_recording.dlogValues[dlogValueIndex].perDiv = gui::data::Value(roundPrec(perDiv, 0.01f), UNIT_WATT);
-                g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-perDiv * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_WATT);
+                float div = channel_dispatcher::getPowerMaxLimit(Channel::get(iChannel)) / dlog_view::NUM_VERT_DIVISIONS;
+                g_recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, 0.01f), UNIT_WATT);
+                g_recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-div * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_WATT);
 
                 dlogValueIndex++;
             }
@@ -344,8 +355,6 @@ int startImmediately() {
     writeFloat(g_recording.parameters.period);
     writeFloat(g_recording.parameters.time);
     writeUint32(datetime::nowUtc());
-
-    g_recording.size = 0;
 
     g_recording.getValue = getValue;
 

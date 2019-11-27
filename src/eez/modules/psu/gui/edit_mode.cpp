@@ -155,7 +155,9 @@ Unit getUnit() {
 }
 
 bool setValue(float floatValue) {
-    floatValue = Channel::get(g_focusCursor.i).roundChannelValue(getUnit(), floatValue);
+    if (g_focusCursor.i != -1) {
+        floatValue = Channel::get(g_focusCursor.i).roundChannelValue(getUnit(), floatValue);
+    }
 
     data::Value value = MakeValue(floatValue, getUnit());
     if (g_isInteractiveMode || g_tabIndex == PAGE_ID_EDIT_MODE_KEYPAD) {

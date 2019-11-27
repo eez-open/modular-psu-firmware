@@ -162,6 +162,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                     pText = pValue;
                 } else {
                     textStyle.background_color = fg;
+                    textStyle.color = textStyle.active_color;
                     wText += padding;
                     pText = pValue - wText;
                 }
@@ -260,6 +261,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
                     pText = pValue;
                 } else {
                     textStyle.background_color = fg;
+                    textStyle.color = textStyle.active_color;
                     hText += padding;
                     pText = pValue - hText;
                 }
