@@ -30,7 +30,7 @@
 
 #define CONF_GUI_TOUCH_FILTER_N 5   // level of smoothing in the form of a fraction N / D
 #define CONF_GUI_TOUCH_FILTER_D 10 
-#define CONF_GUI_TOUCH_FILTER_P 3   // debounce
+#define CONF_GUI_TOUCH_FILTER_P 5   // debounce
 
 namespace eez {
 namespace gui {

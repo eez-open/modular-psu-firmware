@@ -40,10 +40,10 @@ void tick() {
     mcu::touch::read(touchIsPressed, g_x, g_y);
 
 #ifndef EEZ_PLATFORM_SIMULATOR
-        touchIsPressed = filter(touchIsPressed, g_x, g_y);
-        if (touchIsPressed) {
-            transform(g_x, g_y);
-        }
+    //touchIsPressed = filter(touchIsPressed, g_x, g_y);
+    if (touchIsPressed) {
+        transform(g_x, g_y);
+    }
 #endif
 
     if (touchIsPressed) {
