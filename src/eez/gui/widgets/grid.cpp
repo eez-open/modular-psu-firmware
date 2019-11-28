@@ -103,9 +103,15 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
             }
         }
 
-        widgetCursor.nextState();
-        if (widgetCursor.previousState >= endOfContainerInPreviousState) {
-            widgetCursor.previousState = 0;
+        if (widgetCursor.previousState) {
+			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
+            if (widgetCursor.previousState >= endOfContainerInPreviousState) {
+				widgetCursor.previousState = 0;
+            }
+        }
+
+        if (widgetCursor.currentState) {
+			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
         }
     }
 

@@ -118,9 +118,15 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
         }
 #endif
 
-        widgetCursor.nextState();
-        if (widgetCursor.previousState >= endOfContainerInPreviousState) {
-            widgetCursor.previousState = 0;
+        if (widgetCursor.previousState) {
+			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
+            if (widgetCursor.previousState >= endOfContainerInPreviousState) {
+				widgetCursor.previousState = 0;
+            }
+        }
+
+        if (widgetCursor.currentState) {
+			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
         }
     }
 
@@ -179,8 +185,6 @@ void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callba
 
 void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-
-    widgetCursor.currentState->size = sizeof(ContainerWidgetState);
 
     bool refresh = 
         !widgetCursor.previousState ||
