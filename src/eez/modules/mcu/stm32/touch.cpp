@@ -38,6 +38,8 @@ bool onSystemStateChanged() {
     return true;
 }
 
+static const int CONF_TOUCH_DEBOUNCE_THRESHOLD = 25;
+
 static const int CONF_TOUCH_Z1_THRESHOLD = 100;
 
 static const uint8_t X_DATA_ID = 0b11000010;
@@ -90,7 +92,7 @@ void read(bool &isPressed, int &x, int &y) {
     uint32_t now = millis();
 
     if (g_wasPressed != isPressedNow) {
-        if (now - g_time > 25) {
+        if (now - g_time > CONF_TOUCH_DEBOUNCE_THRESHOLD) {
             g_wasPressed = isPressedNow;
             g_time = now;
         }

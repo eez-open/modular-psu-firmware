@@ -336,7 +336,6 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
     } else {
 		const Widget *page = getPageWidget(m_pageNavigationStack[i].pageId);
 
-        auto savedCurrentState = widgetCursor.currentState;
 		auto savedPreviousState = widgetCursor.previousState;
         auto savedWidget = widgetCursor.widget;
 
@@ -357,7 +356,6 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
         enumWidget(widgetCursor, drawWidgetCallback);
 
 		widgetCursor.widget = savedWidget;
-        widgetCursor.currentState = savedCurrentState;
 		widgetCursor.previousState = savedPreviousState;
     }
 

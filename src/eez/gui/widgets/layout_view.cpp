@@ -80,7 +80,6 @@ void LayoutViewWidget_draw(const WidgetCursor &widgetCursor) {
         ((LayoutViewWidgetState *)widgetCursor.currentState)->context = Value();
     }
 
-    widgetCursor.currentState->size = sizeof(LayoutViewWidgetState);
     widgetCursor.currentState->data = getLayoutId(widgetCursor);
 
     if (layoutViewSpecific->context) {
