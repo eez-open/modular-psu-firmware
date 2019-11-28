@@ -115,12 +115,13 @@ bool parseTimeZone(const char *timeZoneStr, size_t timeZoneLength, int16_t &time
 
 void replaceCharacter(char *str, char ch, char repl);
 
+int strcicmp(char const *a, char const *b);
+int strncicmp(char const *a, char const *b, int n);
+bool isStringEmpty(char const *a);
 bool startsWith(const char *str, const char *prefix);
 bool endsWith(const char *str, const char *suffix);
+bool endsWithNoCase(const char *str, const char *suffix);
 
 void formatBytes(uint32_t bytes, char *text, int count);
-
-int strcicmp(char const *a, char const *b);
-bool isStringEmpty(char const *a);
 
 } // namespace eez

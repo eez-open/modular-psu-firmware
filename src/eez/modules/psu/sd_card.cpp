@@ -360,13 +360,13 @@ bool catalog(const char *dirPath, void *param,
             FileType type;
             if (fileInfo.isDirectory()) {
                 type = FILE_TYPE_DIRECTORY;
-            } else if (endsWith(name, LIST_EXT)) {
+            } else if (endsWithNoCase(name, LIST_EXT)) {
                 type = FILE_TYPE_LIST;
-            } else if (endsWith(name, PROFILE_EXT)) {
+            } else if (endsWithNoCase(name, PROFILE_EXT)) {
                 type = FILE_TYPE_PROFILE;
-            } else if (endsWith(name, ".dlog")) {
+            } else if (endsWithNoCase(name, ".dlog")) {
                 type = FILE_TYPE_DLOG;
-            } else if (endsWith(name, ".jpg")) {
+            } else if (endsWithNoCase(name, ".jpg")) {
                 type = FILE_TYPE_IMAGE;
             } else {
                 type = FILE_TYPE_OTHER;

@@ -160,12 +160,12 @@ float roundPrec(float a, float prec) {
 
 float floorPrec(float a, float prec) {
     float r = 1 / prec;
-    return floor(a * r) / r;
+    return floorf(a * r) / r;
 }
 
 float ceilPrec(float a, float prec) {
     float r = 1 / prec;
-    return ceil(a * r) / r;
+    return ceilf(a * r) / r;
 }
 
 bool between(float x, float a, float b) {
@@ -515,6 +515,32 @@ void replaceCharacter(char *str, char ch, char repl) {
     }
 }
 
+int strcicmp(char const *a, char const *b) {
+    for (;; a++, b++) {
+        int d = tolower((unsigned char)*a) - tolower((unsigned char)*b);
+        if (d != 0 || !*a)
+            return d;
+    }
+}
+
+int strncicmp(char const *a, char const *b, int n) {
+    for (; n--; a++, b++) {
+        int d = tolower((unsigned char)*a) - tolower((unsigned char)*b);
+        if (d != 0 || !*a)
+            return d;
+    }
+    return 0;
+}
+
+bool isStringEmpty(char const *s) {
+    for (; *s; s++) {
+        if (!isspace(*s)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool startsWith(const char *str, const char *prefix) {
     if (!str || !prefix)
         return false;
@@ -535,6 +561,16 @@ bool endsWith(const char *str, const char *suffix) {
     return strncmp(str + strLen - suffixLen, suffix, suffixLen) == 0;
 }
 
+bool endsWithNoCase(const char *str, const char *suffix) {
+    if (!str || !suffix)
+        return false;
+    size_t strLen = strlen(str);
+    size_t suffixLen = strlen(suffix);
+    if (suffixLen > strLen)
+        return false;
+    return strncicmp(str + strLen - suffixLen, suffix, suffixLen) == 0;
+}
+
 void formatBytes(uint32_t bytes, char *text, int count) {
     if (bytes == 0) {
         strcpy(text, "0 Bytes");
@@ -550,23 +586,6 @@ void formatBytes(uint32_t bytes, char *text, int count) {
     float g = roundf((bytes / powf(c, (float)f)) * 100) / 100;
 
     snprintf(text, count - 1, "%g %s", g, e[f]);
-}
-
-int strcicmp(char const *a, char const *b) {
-    for (;; a++, b++) {
-        int d = tolower((unsigned char)*a) - tolower((unsigned char)*b);
-        if (d != 0 || !*a)
-            return d;
-    }
-}
-
-bool isStringEmpty(char const *s) {
-    for (; *s; s++) {
-        if (!isspace(*s)) {
-            return false;
-        }
-    }
-    return true;
 }
 
 } // namespace eez
