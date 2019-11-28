@@ -39,11 +39,14 @@ void tick() {
 
     mcu::touch::read(touchIsPressed, g_x, g_y);
 
-    if (touchIsPressed) {
 #ifndef EEZ_PLATFORM_SIMULATOR
-        transform(g_x, g_y);
+        touchIsPressed = filter(touchIsPressed, g_x, g_y);
+        if (touchIsPressed) {
+            transform(g_x, g_y);
+        }
 #endif
 
+    if (touchIsPressed) {
         if (g_eventType == EVENT_TYPE_TOUCH_NONE || g_eventType == EVENT_TYPE_TOUCH_UP) {
             g_eventType = EVENT_TYPE_TOUCH_DOWN;
         } else {

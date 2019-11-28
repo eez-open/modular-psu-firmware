@@ -24,13 +24,13 @@
 // Thanks to: http://dlbeer.co.nz/articles/tsf.html
 //
 
-#define CONF_GUI_TOUCH_FILTER_N 0
-#define CONF_GUI_TOUCH_FILTER_D 1
-#define CONF_GUI_TOUCH_FILTER_P 5
+// #define CONF_GUI_TOUCH_FILTER_N 0
+// #define CONF_GUI_TOUCH_FILTER_D 1
+// #define CONF_GUI_TOUCH_FILTER_P 5
 
-// #define CONF_GUI_TOUCH_FILTER_N 5
-// #define CONF_GUI_TOUCH_FILTER_D 10
-// #define CONF_GUI_TOUCH_FILTER_P 10
+#define CONF_GUI_TOUCH_FILTER_N 5   // level of smoothing in the form of a fraction N / D
+#define CONF_GUI_TOUCH_FILTER_D 10 
+#define CONF_GUI_TOUCH_FILTER_P 3   // debounce
 
 namespace eez {
 namespace gui {

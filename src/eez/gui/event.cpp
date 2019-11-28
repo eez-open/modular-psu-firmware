@@ -206,6 +206,7 @@ void processTouchEvent(EventType type) {
 #if defined(EEZ_PLATFORM_STM32)    
     if (type == EVENT_TYPE_TOUCH_MOVE) {
         // ignore EVENT_TYPE_TOUCH_MOVE if it is the same as the last event
+        // or change is too big
     	int dx = (m_lastTouchMoveX - x);
     	int dy = (m_lastTouchMoveY - y);
     	int d = dx * dx + dy * dy;
