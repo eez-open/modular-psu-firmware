@@ -64,7 +64,7 @@ static uint8_t *g_buffer = g_bufferMemory;
 
 struct CacheBlock {
     unsigned valid: 1;
-    unsigned loaded: 1;
+    uint32_t loadedValues;
     uint32_t startAddress;
 };
 
@@ -150,13 +150,20 @@ void loadBlock() {
         auto numElementsPerRow = getNumElementsPerRow();
 
         BlockElement *blockElements = getCacheBlock(g_blockIndexToLoad);
-            
-        for (unsigned i = 0; i < NUM_ELEMENTS_PER_BLOCKS && !g_interruptLoading;) {
+
+        uint32_t totalBytesRead = 0;
+
+        uint32_t i = g_cacheBlocks[g_blockIndexToLoad].loadedValues;
+        while (i < NUM_ELEMENTS_PER_BLOCKS) {
             auto offset = (uint32_t)roundf((g_blockIndexToLoad * NUM_ELEMENTS_PER_BLOCKS + i) / numElementsPerRow * g_loadScale * g_recording.totalDlogValues);
 
             offset = g_recording.totalDlogValues *((offset + g_recording.totalDlogValues - 1) / g_recording.totalDlogValues);
 
-            file.seek(DLOG_HEADER_SIZE + offset * sizeof(float));
+            size_t filePosition = DLOG_HEADER_SIZE + offset * sizeof(float);
+            if (!file.seek(filePosition)) {
+            	i = NUM_ELEMENTS_PER_BLOCKS;
+            	goto closeFile;
+            }
 
             unsigned iStart = i;
 
@@ -164,38 +171,54 @@ void loadBlock() {
                 i = iStart;
 
                 auto valuesRow = j % NUM_VALUES_ROWS;
+
                 if (valuesRow == 0) {
+                	if (g_interruptLoading) {
+                		i = NUM_ELEMENTS_PER_BLOCKS;
+                		goto closeFile;
+                	}
+
                     // read up to NUM_VALUES_ROWS
-                    file.read(values, MIN(NUM_VALUES_ROWS, numSamplesPerValue - j) * g_recording.totalDlogValues * sizeof(float));
+                	uint32_t bytesToRead = MIN(NUM_VALUES_ROWS, numSamplesPerValue - j) * g_recording.totalDlogValues * sizeof(float);
+                	uint32_t bytesRead = file.read(values, bytesToRead);
+                	if (bytesToRead != bytesRead) {
+                		i = NUM_ELEMENTS_PER_BLOCKS;
+                		goto closeFile;
+                	}
+
+                    totalBytesRead += bytesRead;
                 }
 
                 unsigned valuesOffset = valuesRow * g_recording.totalDlogValues;
 
                 for (unsigned k = 0; k < g_recording.totalDlogValues; k++) {
                     if (k < numElementsPerRow) {
-                        BlockElement *blockElement = blockElements + i;
-                        i++;
+                        BlockElement *blockElement = blockElements + i++;
 
                         float value = values[valuesOffset + k];
 
-                        if (isNaN(blockElement->min) || value < blockElement->min) {
+                        if (j == 0) {
+                        	blockElement->min = blockElement->max = value;
+                        } else if (value < blockElement->min) {
                             blockElement->min = value;
-                        }
-
-                        if (isNaN(blockElement->max) || value > blockElement->max) {
+                        } else if (value > blockElement->max) {
                             blockElement->max = value;
                         }
                     }
                 }
             }
 
+            if (totalBytesRead > NUM_ELEMENTS_PER_BLOCKS * sizeof(BlockElement)) {
+                break;
+            }
+
             g_refreshed = true;
         }
 
-        g_cacheBlocks[g_blockIndexToLoad].loaded = 1;
+    closeFile:
+        g_cacheBlocks[g_blockIndexToLoad].loadedValues = i;
+        file.close();
     }
-
-    file.close();
 
     g_isLoading = false;
     g_refreshed = true;
@@ -231,11 +254,11 @@ float getValue(int rowIndex, int columnIndex, float *max) {
         }
 
         g_cacheBlocks[blockIndex].valid = 1;
-        g_cacheBlocks[blockIndex].loaded = 0;
+        g_cacheBlocks[blockIndex].loadedValues = 0;
         g_cacheBlocks[blockIndex].startAddress = blockStartAddress;
     }
 
-    if (!g_cacheBlocks[blockIndex].loaded && !g_isLoading) {
+    if (!g_isLoading && g_cacheBlocks[blockIndex].loadedValues < NUM_ELEMENTS_PER_BLOCKS) {
         g_isLoading = true;
         g_interruptLoading = false;
         g_blockIndexToLoad = blockIndex;
