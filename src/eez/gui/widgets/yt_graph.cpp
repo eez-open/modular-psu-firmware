@@ -111,10 +111,6 @@ struct YTGraphDrawHelper {
     }
 
     void drawStep() {
-        // clear vertical line
-        display::setColor16(color16);
-        display::drawVLine(x, widgetCursor.y, widget->h - 1);
-
         if (y[0] != INT_MIN && y[1] != INT_MIN && abs(yPrev[0] - y[0]) <= 1 && abs(yPrev[1] - y[1]) <= 1 && y[0] == y[1]) {
             display::setColor16(position % 2 ? dataColor16[1] : dataColor16[0]);
             display::drawPixel(x, widgetCursor.y + y[0]);
@@ -126,6 +122,16 @@ struct YTGraphDrawHelper {
 
     void drawScanLine(uint32_t startPosition, uint32_t endPosition, uint16_t graphWidth) {
         numPositions = endPosition;
+
+        int x1 = widgetCursor.x + startPosition % graphWidth;
+        int x2 = widgetCursor.x + (endPosition - 1) % graphWidth;
+        display::setColor16(color16);
+        if (x1 <= x2) {
+            display::fillRect(x1, widgetCursor.y, x2, widgetCursor.y + widget->h - 1);
+        } else {
+            display::fillRect(x1, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
+            display::fillRect(widgetCursor.x, widgetCursor.y, x2, widgetCursor.y + widget->h - 1);
+        }
 
         for (position = startPosition; position < endPosition; ++position) {
             x = widgetCursor.x + position % graphWidth;
@@ -166,27 +172,8 @@ struct YTGraphDrawHelper {
         yPrev[0] = getYValue(0, previousHistoryValuePosition);
         yPrev[1] = getYValue(1, previousHistoryValuePosition);
 
-        for (x = startX; x < endX; x++, position++) {
-            y[0] = getYValue(0, position);
-            y[1] = getYValue(1, position);
-
-            drawStep();
-
-            yPrev[0] = y[0];
-            yPrev[1] = y[1];
-        }
-    }
-
-    void drawStatic(uint32_t previousHistoryValuePosition, uint32_t currentHistoryValuePosition, uint32_t numPositions_, uint16_t graphWidth) {
-        numPositions = numPositions_;
-
-        int startX = widgetCursor.x;
-        int endX = startX + graphWidth;
-
-        position = currentHistoryValuePosition;
-
-        yPrev[0] = getYValue(0, currentHistoryValuePosition > 0 ? currentHistoryValuePosition - 1 : 0);
-        yPrev[1] = getYValue(1, currentHistoryValuePosition > 0 ? currentHistoryValuePosition - 1 : 0);
+        display::setColor16(color16);
+        display::fillRect(startX, widgetCursor.y, endX - 1, widgetCursor.y + widget->h - 1);
 
         for (x = startX; x < endX; x++, position++) {
             y[0] = getYValue(0, position);
