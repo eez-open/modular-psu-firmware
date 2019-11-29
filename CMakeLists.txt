@@ -52,6 +52,7 @@ add_definitions(-DOPTION_SD_CARD=1)
 add_definitions(-DEEZ_PLATFORM_SIMULATOR)
 
 if(WIN32)
+    ENABLE_LANGUAGE(RC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_definitions(-DEEZ_PLATFORM_SIMULATOR_WIN32)
 endif()
@@ -721,6 +722,16 @@ set(header_third_party_micropython_py
 )
 list (APPEND header_files ${header_third_party_micropython_py})
 source_group("third_party\\micropython\\py" FILES ${src_third_party_micropython_py} ${header_third_party_micropython_py})
+
+if(WIN32)
+    set(src_win32_specific
+        src/eez/platform/simulator/win32/icon.rc
+    ) 
+    list (APPEND src_files ${src_win32_specific})
+    source_group("eez\\win32" FILES ${src_win32_specific})
+
+    set(SOURCES src/eez/platform/simulator/win32/icon.rc ${src_files})
+endif()
 
 add_executable(modular-psu-firmware ${src_files} ${header_files})
 

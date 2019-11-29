@@ -22,12 +22,11 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-LicenseFile=..\LICENSE.TXT
-OutputDir=.\win32\Installation
+LicenseFile=..\..\..\..\..\LICENSE.TXT
+OutputDir=..\..\..\..\..\build\win32\Installation
 OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
-AppIcon=..\images\eez.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -37,16 +36,16 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: ".\win32\Debug\modular-psu-firmware.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\win32\Debug\libjpeg-9.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\win32\Debug\libpng16-16.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\win32\Debug\libtiff-5.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\win32\Debug\libwebp-7.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\win32\Debug\SDL2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\win32\Debug\SDL2_image.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\win32\Debug\zlib1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\images\eez.png"; DestDir: "{app}\images"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\docs\SCPI reference guide\EEZ BB3 SCPI reference guide.pdf"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\..\..\build\win32\Debug\modular-psu-firmware.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\..\..\build\win32\Debug\libjpeg-9.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\..\..\build\win32\Debug\libpng16-16.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\..\..\build\win32\Debug\libtiff-5.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\..\..\build\win32\Debug\libwebp-7.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\..\..\build\win32\Debug\SDL2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\..\..\build\win32\Debug\SDL2_image.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\..\..\build\win32\Debug\zlib1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\..\..\images\eez.png"; DestDir: "{app}\images"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\..\..\..\docs\SCPI reference guide\EEZ BB3 SCPI reference guide.pdf"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
