@@ -166,6 +166,168 @@ void Channel::restoreOE() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+float Channel::getChannel0HistoryValue(int rowIndex, int columnIndex, float *max) {
+    Channel &channel = g_channels[0];
+
+    uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
+    
+    if (columnIndex == 0) {
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    } else {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    }
+
+    return channel.uHistory[position] * channel.iHistory[position];
+}
+
+float Channel::getChannel1HistoryValue(int rowIndex, int columnIndex, float *max) {
+    Channel &channel = g_channels[1];
+
+    uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
+
+    if (columnIndex == 0) {
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    } else {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    }
+
+    return channel.uHistory[position] * channel.iHistory[position];
+}
+
+float Channel::getChannel2HistoryValue(int rowIndex, int columnIndex, float *max) {
+    Channel &channel = g_channels[2];
+
+    uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
+
+    if (columnIndex == 0) {
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    } else {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    }
+
+    return channel.uHistory[position] * channel.iHistory[position];
+}
+
+float Channel::getChannel3HistoryValue(int rowIndex, int columnIndex, float *max) {
+    Channel &channel = g_channels[3];
+
+    uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
+
+    if (columnIndex == 0) {
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    } else {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    }
+
+    return channel.uHistory[position] * channel.iHistory[position];
+}
+
+float Channel::getChannel4HistoryValue(int rowIndex, int columnIndex, float *max) {
+    Channel &channel = g_channels[4];
+
+    uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
+
+    if (columnIndex == 0) {
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    } else {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    }
+
+    return channel.uHistory[position] * channel.iHistory[position];
+}
+
+float Channel::getChannel5HistoryValue(int rowIndex, int columnIndex, float *max) {
+    Channel &channel = g_channels[5];
+
+    uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
+
+    if (columnIndex == 0) {
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    } else {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+            return channel.uHistory[position];
+        }
+        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
+    }
+
+    return channel.uHistory[position] * channel.iHistory[position];
+}
+
+Channel::YtDataGetValueFunctionPointer Channel::getChannelHistoryValueFuncs(int channelIndex) {
+    if (channelIndex == 0) {
+        return Channel::getChannel0HistoryValue;
+    } else if (channelIndex == 1) {
+        return Channel::getChannel1HistoryValue;
+    } else if (channelIndex == 2) {
+        return Channel::getChannel2HistoryValue;
+    } else if (channelIndex == 3) {
+        return Channel::getChannel3HistoryValue;
+    } else if (channelIndex == 4) {
+        return Channel::getChannel4HistoryValue;
+    } else {
+        return Channel::getChannel5HistoryValue;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 #ifdef EEZ_PLATFORM_SIMULATOR
 
 void Channel::Simulator::setLoadEnabled(bool value) {
@@ -471,12 +633,10 @@ void Channel::reset() {
 
 void Channel::resetHistory() {
     for (int i = 0; i < CHANNEL_HISTORY_SIZE; ++i) {
-        uHistory[i] = 0;
-        iHistory[i] = 0;
+        uHistory[i] = NAN;
+        iHistory[i] = NAN;
     }
-
-    historyPosition = 0;
-    historyLastTick = micros();
+    flags.historyStarted = 0;
 }
 
 void Channel::clearCalibrationConf() {
@@ -611,13 +771,19 @@ void Channel::tick(uint32_t tick_usec) {
     }
 
     // update history values
-    uint32_t ytViewRateMicroseconds = (int)round(ytViewRate * 1000000L);
-    while (tick_usec - historyLastTick >= ytViewRateMicroseconds) {
-        uint32_t historyIndex = historyPosition % CHANNEL_HISTORY_SIZE;
-        uHistory[historyIndex] = channel_dispatcher::getUMonLast(*this);
-        iHistory[historyIndex] = channel_dispatcher::getIMonLast(*this);
-        ++historyPosition;
-        historyLastTick += ytViewRateMicroseconds;
+    if (!flags.historyStarted) {
+        flags.historyStarted = 1;
+        historyLastTick = tick_usec;
+        historyPosition = 0;
+    } else {
+        uint32_t ytViewRateMicroseconds = (int)round(ytViewRate * 1000000L);
+        while (tick_usec - historyLastTick >= ytViewRateMicroseconds) {
+            uint32_t historyIndex = historyPosition % CHANNEL_HISTORY_SIZE;
+            uHistory[historyIndex] = channel_dispatcher::getUMonLast(*this);
+            iHistory[historyIndex] = channel_dispatcher::getIMonLast(*this);
+            ++historyPosition;
+            historyLastTick += ytViewRateMicroseconds;
+        }
     }
 
     doAutoSelectCurrentRange(tick_usec);

@@ -179,7 +179,7 @@ class Channel {
     /// Channel binary flags like output enabled, sense enabled, ...
     struct Flags {
         unsigned outputEnabled : 1;
-        unsigned reserved1 : 1; // was afterBootOutputEnabled
+        unsigned historyStarted : 1;
         unsigned senseEnabled : 1;
         unsigned cvMode : 1;
         unsigned ccMode : 1;
@@ -277,6 +277,10 @@ class Channel {
 
     /// Restore previously saved OE state for all the channels.
     static void restoreOE();
+
+    typedef float(*YtDataGetValueFunctionPointer)(int rowIndex, int columnIndex, float *max);
+
+    static YtDataGetValueFunctionPointer getChannelHistoryValueFuncs(int channelIndex);
 
     // Slot index. Starts from 0.
     uint8_t slotIndex;
@@ -551,6 +555,13 @@ class Channel {
     uint32_t historyLastTick;
 
     int reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionValue &cpv);
+
+    static float getChannel0HistoryValue(int rowIndex, int columnIndex, float *max);
+    static float getChannel1HistoryValue(int rowIndex, int columnIndex, float *max);
+    static float getChannel2HistoryValue(int rowIndex, int columnIndex, float *max);
+    static float getChannel3HistoryValue(int rowIndex, int columnIndex, float *max);
+    static float getChannel4HistoryValue(int rowIndex, int columnIndex, float *max);
+    static float getChannel5HistoryValue(int rowIndex, int columnIndex, float *max);
 
     void clearProtectionConf();
     void protectionEnter(ProtectionValue &cpv);

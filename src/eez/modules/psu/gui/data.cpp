@@ -4350,64 +4350,9 @@ void data_is_show_live_recording(data::DataOperationEnum operation, data::Cursor
 #endif
 }
 
-float getChannelHistoryValue(int channelIndex, int rowIndex, int columnIndex) {
-    auto channel = Channel::get(channelIndex);
-    
-    if (columnIndex == 0) {
-        if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
-            return channel.getUMonHistory(rowIndex);
-        }
-        if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
-            return channel.getIMonHistory(rowIndex);
-        }
-    } else {
-        if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
-            return channel.getUMonHistory(rowIndex);
-        }
-        if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
-            return channel.getIMonHistory(rowIndex);
-        }
-    }
-    
-    return channel.getUMonHistory(rowIndex) * channel.getIMonHistory(rowIndex);
-}
-
-float getChannel1HistoryValue(int rowIndex, int columnIndex, float *) {
-    return getChannelHistoryValue(0, rowIndex, columnIndex);
-}
-
-float getChannel2HistoryValue(int rowIndex, int columnIndex, float *) {
-    return getChannelHistoryValue(1, rowIndex, columnIndex);
-}
-
-float getChannel3HistoryValue(int rowIndex, int columnIndex, float *) {
-    return getChannelHistoryValue(2, rowIndex, columnIndex);
-}
-
-float getChannel4HistoryValue(int rowIndex, int columnIndex, float *) {
-    return getChannelHistoryValue(3, rowIndex, columnIndex);
-}
-
-float getChannel5HistoryValue(int rowIndex, int columnIndex, float *) {
-    return getChannelHistoryValue(4, rowIndex, columnIndex);
-}
-
-float getChannel6HistoryValue(int rowIndex, int columnIndex, float *) {
-    return getChannelHistoryValue(5, rowIndex, columnIndex);
-}
-
-static Value::YtDataGetValueFunctionPointer g_getChannelHistoryValueFuncs[CH_MAX] = {
-    getChannel1HistoryValue,
-    getChannel2HistoryValue,
-    getChannel3HistoryValue,
-    getChannel4HistoryValue,
-    getChannel5HistoryValue,
-    getChannel6HistoryValue
-};
-
 void data_channel_history_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC) {
-        value = g_getChannelHistoryValueFuncs[cursor.i];
+        value = Channel::getChannelHistoryValueFuncs(cursor.i);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
         value = Value(0, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
