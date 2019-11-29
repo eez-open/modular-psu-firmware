@@ -154,11 +154,12 @@ void fillRect(void *dst, int x1, int y1, int x2, int y2) {
 }
 
 void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x, int y, int width, int height) {
-    hdma2d.Init.Mode = srcBpp == 32 ? DMA2D_M2M_BLEND : DMA2D_M2M_PFC;
     hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
     hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
 
     if (srcBpp == 32) {
+        hdma2d.Init.Mode = DMA2D_M2M_BLEND;
+
         hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - width;
         hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_RGB565;
         hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
@@ -168,7 +169,17 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
         hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_ARGB8888;
         hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
         hdma2d.LayerCfg[1].InputAlpha = 0;
+    } else if (srcBpp == 24) {
+    	hdma2d.Init.Mode = DMA2D_M2M_PFC;
+        hdma2d.Init.RedBlueSwap = DMA2D_RB_SWAP;
+
+        hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
+        hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB888;
+        hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+        hdma2d.LayerCfg[1].InputAlpha = 0;
     } else {
+    	hdma2d.Init.Mode = DMA2D_M2M;
+
         hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
         hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
         hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
@@ -186,6 +197,10 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
         HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t)src, dstOffset, dstOffset, width, height);
     } else {
         HAL_DMA2D_Start(&hdma2d, (uint32_t)src, dstOffset, width, height);
+    }
+
+    if (srcBpp == 24) {
+        hdma2d.Init.RedBlueSwap = DMA2D_RB_REGULAR;
     }
 }
 

@@ -135,7 +135,7 @@ class File {
     bool seek(uint32_t pos);
     int peek();
     int read();
-    int read(void *buf, uint16_t nbyte);
+    int read(void *buf, uint32_t nbyte);
     size_t write(const uint8_t *buf, size_t size);
     void sync();
 

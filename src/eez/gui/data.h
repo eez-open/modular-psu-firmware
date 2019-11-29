@@ -394,6 +394,10 @@ uint16_t getActiveBackgroundColor(const Cursor &cursor, uint16_t id, const Style
 bool isBlinking(const Cursor &cursor, uint16_t id);
 Value getEditValue(const Cursor &cursor, uint16_t id);
 
+uint16_t getBitmapWidth(const Cursor &cursor, uint16_t id);
+uint16_t getBitmapHeight(const Cursor &cursor, uint16_t id);
+Value getBitmapPixels(const Cursor &cursor, uint16_t id);
+
 uint32_t ytDataGetRefreshCounter(const Cursor &cursor, uint16_t id);
 uint32_t ytDataGetSize(const Cursor &cursor, uint16_t id);
 uint32_t ytDataGetPosition(const Cursor &cursor, uint16_t id);

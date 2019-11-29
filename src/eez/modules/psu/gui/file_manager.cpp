@@ -40,12 +40,15 @@
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/dlog_view.h>
 
+#include <eez/gui/dialogs.h>
+
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/platform/stm32/defines.h>
 #endif
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
+#include <eez/libs/image/jpeg.h>
 
 namespace eez {
 namespace gui {
@@ -77,6 +80,9 @@ uint32_t g_filesCount;
 uint32_t g_filesStartPosition;
 
 uint32_t g_selectedFileIndex;
+
+bool g_imageLoadFailed;
+uint8_t *g_openedImagePixels;
 
 void catalogCallback(void *param, const char *name, FileType type, size_t size) {
     auto fileInfo = (FileInfo *)param;
@@ -285,22 +291,58 @@ void selectFile(uint32_t fileIndex) {
 
 bool isOpenFileEnabled() {
     auto fileItem = getFileItem(g_selectedFileIndex);
-    return fileItem && fileItem->type == FILE_TYPE_DLOG;
+    return fileItem && (fileItem->type == FILE_TYPE_DLOG || fileItem->type == FILE_TYPE_IMAGE);
+}
+
+static void checkImageLoadingStatus() {
+    if (g_openedImagePixels) {
+        gui::popPage();
+        gui::pushPage(gui::PAGE_ID_IMAGE_VIEW);
+    } else if (g_imageLoadFailed) {
+        gui::popPage();
+        gui::errorMessage("Failed to load image!");
+    }
 }
 
 void openFile() {
     popPage();
 
     auto fileItem = getFileItem(g_selectedFileIndex);
-    if (fileItem && fileItem->type == FILE_TYPE_DLOG) {
+    if (fileItem) {
+        if (fileItem->type == FILE_TYPE_DLOG) {
+            char filePath[MAX_PATH_LENGTH + 1];
+            strcpy(filePath, g_currentDirectory);
+            strcat(filePath, "/");
+            strcat(filePath, fileItem->name);
+
+            psu::dlog_view::g_showLatest = false;
+            psu::dlog_view::openFile(filePath);
+            gui::pushPage(gui::PAGE_ID_DLOG_VIEW);
+        } else if (fileItem->type == FILE_TYPE_IMAGE) {
+            g_imageLoadFailed = false;
+            g_openedImagePixels = nullptr;
+            osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
+            gui::showAsyncOperationInProgress("Loading...", checkImageLoadingStatus);
+        }
+    }
+}
+
+void openImageFile() {
+    auto fileItem = getFileItem(g_selectedFileIndex);
+    if (fileItem) {
         char filePath[MAX_PATH_LENGTH + 1];
         strcpy(filePath, g_currentDirectory);
         strcat(filePath, "/");
         strcat(filePath, fileItem->name);
-        psu::dlog_view::g_showLatest = false;
-        psu::dlog_view::openFile(filePath);
-        gui::pushPage(gui::PAGE_ID_DLOG_VIEW);
+        g_openedImagePixels = jpegDecode(filePath);
+        if (!g_openedImagePixels) {
+            g_imageLoadFailed = true;
+        }
     }
+}
+
+uint8_t *getOpenedImagePixels() {
+    return g_openedImagePixels;
 }
 
 bool isUploadFileEnabled() {

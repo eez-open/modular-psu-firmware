@@ -636,6 +636,18 @@ void drawBitmap(void *bitmapData, int bitmapBpp, int bitmapWidth, int x, int y, 
                 *dst = blendColor(pixel, *dst);
             }
         }
+    } else if (bitmapBpp == 24) {
+        uint8_t *src = (uint8_t *)bitmapData;
+        int nlSrc = 3 * (bitmapWidth - width);
+
+        for (uint8_t *srcEnd = src + 3 * bitmapWidth * height; src != srcEnd; src += nlSrc, dst += nlDst) {
+            for (uint32_t *lineEnd = dst + width; dst != lineEnd; src += 3, dst++) {
+                ((uint8_t *)dst)[0] = ((uint8_t *)src)[2];
+                ((uint8_t *)dst)[1] = ((uint8_t *)src)[1];
+                ((uint8_t *)dst)[2] = ((uint8_t *)src)[0];
+                ((uint8_t *)dst)[3] = 255;
+            }
+        }
     } else {
         uint16_t *src = (uint16_t *)bitmapData;
         int nlSrc = bitmapWidth - width;

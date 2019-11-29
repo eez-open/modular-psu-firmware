@@ -5056,6 +5056,18 @@ void data_file_manager_delete_file_enabled(data::DataOperationEnum operation, da
 #endif
 }
 
+void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET_BITMAP_PIXELS) {
+        value = Value(file_manager::getOpenedImagePixels(), VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_GET_BITMAP_WIDTH) {
+        value = Value(480, VALUE_TYPE_UINT16);
+    } else if (operation == data::DATA_OPERATION_GET_BITMAP_HEIGHT) {
+        value = Value(272, VALUE_TYPE_UINT16);
+    }
+#endif
+}
+
 } // namespace gui
 } // namespace eez
 

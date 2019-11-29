@@ -53,12 +53,12 @@ char g_filePath[MAX_PATH_LENGTH + 1];
 Recording g_recording;
 
 #ifdef EEZ_PLATFORM_STM32
-static uint8_t *g_buffer = (uint8_t *)DLOG_VIEW_BUFFER;
+static uint8_t *g_buffer = (uint8_t *)FILE_VIEW_BUFFER;
 #endif
 
 #ifdef EEZ_PLATFORM_SIMULATOR
-#define DLOG_VIEW_BUFFER_SIZE (896 * 1024)
-static uint8_t g_bufferMemory[DLOG_VIEW_BUFFER_SIZE];
+#define FILE_VIEW_BUFFER_SIZE (896 * 1024)
+static uint8_t g_bufferMemory[FILE_VIEW_BUFFER_SIZE];
 static uint8_t *g_buffer = g_bufferMemory;
 #endif
 
@@ -75,7 +75,7 @@ struct BlockElement {
 
 static const uint32_t NUM_ELEMENTS_PER_BLOCKS = 480 * MAX_NUM_OF_Y_VALUES;
 static const uint32_t BLOCK_SIZE = NUM_ELEMENTS_PER_BLOCKS * sizeof(BlockElement);
-static const uint32_t NUM_BLOCKS = DLOG_VIEW_BUFFER_SIZE / (BLOCK_SIZE + sizeof(CacheBlock));
+static const uint32_t NUM_BLOCKS = FILE_VIEW_BUFFER_SIZE / (BLOCK_SIZE + sizeof(CacheBlock));
 
 CacheBlock *g_cacheBlocks = (CacheBlock *)g_buffer;
 

@@ -38,7 +38,7 @@
 #include <eez/libs/sd_fat/sd_fat.h>
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/dlog_view.h>
-#include <eez/libs/image/jpeg_encode.h>
+#include <eez/libs/image/jpeg.h>
 #endif
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/datetime.h>
@@ -191,6 +191,8 @@ void oneIter() {
                 file_manager::loadDirectory();
             } else if (type == SCPI_QUEUE_MESSAGE_FILE_MANAGER_UPLOAD_FILE) {
                 file_manager::uploadFile();
+            } else if (type == SCPI_QUEUE_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE) {
+                file_manager::openImageFile();
             }
 #endif // OPTION_SD_CARD
         }

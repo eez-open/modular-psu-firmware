@@ -228,26 +228,11 @@
 							<inputType id="com.atollic.truestudio.gpp.input.1059682549" superClass="com.atollic.truestudio.gpp.input"/>
 						</tool>
 					</fileInfo>
-					<folderInfo id="com.atollic.truestudio.exe.debug.1518366166.1499905155" name="/" resourcePath="eez/libs/umm_malloc">
-						<toolChain id="com.atollic.truestudio.exe.debug.toolchain.1608707875" name="Atollic ARM Tools" superClass="com.atollic.truestudio.exe.debug.toolchain" unusedChildren="">
-							<option id="com.atollic.truestudio.general.runtimelib.1105223817.80388928" name="Runtime Library" superClass="com.atollic.truestudio.general.runtimelib.1105223817"/>
-							<option id="com.atollic.truestudio.toolchain_options.mcu.548299258.1056350566" name="Microcontroller" superClass="com.atollic.truestudio.toolchain_options.mcu.548299258"/>
-							<option id="com.atollic.truestudio.toolchain_options.vendor.37794771.1505915783" name="Vendor name" superClass="com.atollic.truestudio.toolchain_options.vendor.37794771"/>
-							<tool id="com.atollic.truestudio.exe.debug.toolchain.as.1876323113" name="Assembler" superClass="com.atollic.truestudio.exe.debug.toolchain.as.1545899283">
-								<inputType id="com.atollic.truestudio.as.input.1211315036" name="Input" superClass="com.atollic.truestudio.as.input"/>
-							</tool>
-							<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.655490324" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447">
-								<inputType id="com.atollic.truestudio.gcc.input.709266229" superClass="com.atollic.truestudio.gcc.input"/>
-							</tool>
-							<tool id="com.atollic.truestudio.exe.debug.toolchain.ld.1464090989" name="C Linker" superClass="com.atollic.truestudio.exe.debug.toolchain.ld.1444973427"/>
-							<tool id="com.atollic.truestudio.exe.debug.toolchain.gpp.931526411" name="C++ Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gpp.981298185">
-								<inputType id="com.atollic.truestudio.gpp.input.213818409" superClass="com.atollic.truestudio.gpp.input"/>
-							</tool>
-							<tool id="com.atollic.truestudio.exe.debug.toolchain.ldcc.1131657554" name="C++ Linker" superClass="com.atollic.truestudio.exe.debug.toolchain.ldcc.428260"/>
-							<tool id="com.atollic.truestudio.ar.base.1523212070" name="Archiver" superClass="com.atollic.truestudio.ar.base.1779238401"/>
-							<tool id="com.atollic.truestudio.exe.debug.toolchain.secoutput.1508742191" name="Other" superClass="com.atollic.truestudio.exe.debug.toolchain.secoutput.839033486"/>
-						</toolChain>
-					</folderInfo>
+					<fileInfo id="com.atollic.truestudio.exe.debug.1518366166.2102805434" name="nanojpeg.c" rcbsApplicability="disable" resourcePath="eez/libs/image/nanojpeg.c" toolsToInvoke="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.990612617">
+						<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.990612617" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447">
+							<inputType id="com.atollic.truestudio.gcc.input.848074461" superClass="com.atollic.truestudio.gcc.input"/>
+						</tool>
+					</fileInfo>
 					<fileInfo id="com.atollic.truestudio.exe.debug.311825581.983937533" name="" rcbsApplicability="disable" resourcePath="nofile" toolsToInvoke="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1976695455">
 						<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1976695455" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447">
 							<inputType id="com.atollic.truestudio.gcc.input.1274347818" superClass="com.atollic.truestudio.gcc.input"/>
@@ -280,7 +265,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry excluding="third_party" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
-						<entry excluding="libs/umm_malloc|gui/document_stm32.cpp|gui/document_simulator.cpp|libs/sd_fat/simulator|modules/psu/simulator|modules/mcu/simulator|apps/psu/simulator|apps/psu/platform/simulator|platform/simulator" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
+						<entry excluding="libs/image/nanojpeg.c|libs/umm_malloc|gui/document_stm32.cpp|gui/document_simulator.cpp|libs/sd_fat/simulator|modules/psu/simulator|modules/mcu/simulator|apps/psu/simulator|apps/psu/platform/simulator|platform/simulator" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libscpi"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>

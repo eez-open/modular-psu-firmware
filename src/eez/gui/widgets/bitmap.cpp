@@ -31,12 +31,15 @@ namespace eez {
 namespace gui {
 
 void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
-    widgetCursor.currentState->size = sizeof(WidgetState);
+	const Widget *widget = widgetCursor.widget;
 
-    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->flags.active !=
-                                                      widgetCursor.currentState->flags.active;
+	widgetCursor.currentState->size = sizeof(WidgetState);
 
-    const Widget *widget = widgetCursor.widget;
+    widgetCursor.currentState->data = widget->data ? data::getBitmapPixels(widgetCursor.cursor, widget->data) : 0;
+
+    bool refresh = !widgetCursor.previousState ||
+    		widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
+			widgetCursor.currentState->data != widgetCursor.previousState->data;
 
     if (refresh) {
         const BitmapWidget *display_bitmap_widget = GET_WIDGET_PROPERTY(widget, specific, const BitmapWidget *);
@@ -45,21 +48,18 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
         const Bitmap *bitmap = nullptr;
 
         if (widget->data) {
-            Value valuePixels;
-            g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET_BITMAP_PIXELS,
-                                                    (Cursor &)widgetCursor.cursor, valuePixels);
-            if (valuePixels.getType() != VALUE_TYPE_NONE) {
-                Value valueWidth;
-                g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET_BITMAP_WIDTH,
-                                                        (Cursor &)widgetCursor.cursor, valueWidth);
-
-                Value valueHeight;
-                g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET_BITMAP_HEIGHT,
-                                                        (Cursor &)widgetCursor.cursor, valueHeight);
-
-                drawBitmap((uint16_t *)valuePixels.getVoidPointer(), 16, valueWidth.getUInt16(),
-                           valueHeight.getUInt16(), widgetCursor.x, widgetCursor.y, (int)widget->w,
-                           (int)widget->h, style, widgetCursor.currentState->flags.active);
+            if (widgetCursor.currentState->data.getType() != VALUE_TYPE_NONE) {
+                auto pixels = (uint8_t *)widgetCursor.currentState->data.getVoidPointer();
+                if (pixels) {
+                    drawBitmap(pixels, 24,
+                    	getBitmapWidth(widgetCursor.cursor, widget->data),
+                        getBitmapHeight(widgetCursor.cursor, widget->data),
+						widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+						style, widgetCursor.currentState->flags.active
+					);
+                } else {
+                    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, true, true);
+                }
                 return;
             } else {
                 Value valueBitmapId;

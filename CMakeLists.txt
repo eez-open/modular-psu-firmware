@@ -362,12 +362,12 @@ list (APPEND header_files ${header_eez_libs_sd_fat})
 source_group("eez\\libs\\sd_fat" FILES ${src_eez_libs_sd_fat} ${header_eez_libs_sd_fat})
 
 set(src_eez_libs_image
-    src/eez/libs/image/jpeg_encode.cpp
+    src/eez/libs/image/jpeg.cpp
     src/eez/libs/image/toojpeg.cpp
 )
 list (APPEND src_files ${src_eez_libs_image})
 set(header_eez_libs_image
-    src/eez/libs/image/jpeg_encode.h
+    src/eez/libs/image/jpeg.h
     src/eez/libs/image/toojpeg.h
 )
 list (APPEND header_files ${src_eez_libs_image})

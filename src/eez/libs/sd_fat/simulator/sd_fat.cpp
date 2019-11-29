@@ -353,7 +353,7 @@ int File::read() {
     return getc(m_fp);
 }
 
-int File::read(void *buf, uint16_t nbyte) {
+int File::read(void *buf, uint32_t nbyte) {
     return fread(buf, 1, nbyte, m_fp);
 }
 

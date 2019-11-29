@@ -438,7 +438,11 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
     } else if (previousPageId == PAGE_ID_FILE_MANAGER) {
         if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
+        } else if (activePageId == PAGE_ID_IMAGE_VIEW) {
+            animateFadeOutFadeIn();
         }
+    } else if (previousPageId == PAGE_ID_IMAGE_VIEW) {
+        animateFadeOutFadeIn();
     }
 }
 

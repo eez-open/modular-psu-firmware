@@ -28,7 +28,7 @@
 #include <eez/system.h>
 #endif
 
-#include <eez/libs/image/jpeg_encode.h>
+#include <eez/libs/image/jpeg.h>
 
 namespace eez {
 namespace psu {

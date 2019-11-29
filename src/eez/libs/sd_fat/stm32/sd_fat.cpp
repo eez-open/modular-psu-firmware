@@ -167,7 +167,7 @@ int File::read() {
     return result != FR_OK || br != 1 ? EOF : (int)value;
 }
 
-int File::read(void *buf, uint16_t nbyte) {
+int File::read(void *buf, uint32_t nbyte) {
     UINT br;
     auto result = f_read(&m_file, buf, nbyte, &br);
     return result == FR_OK ? br : 0;
