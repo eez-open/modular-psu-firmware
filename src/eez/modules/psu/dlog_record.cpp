@@ -117,7 +117,8 @@ int fileOpen() {
 }
 
 void fileWrite() {
-    size_t length = g_saveUpToBufferIndex - g_lastSavedBufferIndex;
+    auto saveUpToBufferIndex = g_saveUpToBufferIndex;
+    size_t length = saveUpToBufferIndex - g_lastSavedBufferIndex;
     if (length > 0) {
         File file;
         if (!file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
@@ -127,7 +128,7 @@ void fileWrite() {
         }
 
         int i = g_lastSavedBufferIndex % DLOG_RECORD_BUFFER_SIZE;
-        int j = g_saveUpToBufferIndex % DLOG_RECORD_BUFFER_SIZE;
+        int j = saveUpToBufferIndex % DLOG_RECORD_BUFFER_SIZE;
 
         size_t written;
         if (i < j || j == 0) {
@@ -136,7 +137,7 @@ void fileWrite() {
             written = file.write(g_buffer + i, DLOG_RECORD_BUFFER_SIZE - i) + file.write(g_buffer, j);
         }
 
-        g_lastSavedBufferIndex = g_saveUpToBufferIndex;
+        g_lastSavedBufferIndex = saveUpToBufferIndex;
 
         file.close();
 
@@ -158,7 +159,9 @@ void flushData() {
 void writeUint8(uint8_t value) {
     *(g_buffer + (g_bufferIndex % DLOG_RECORD_BUFFER_SIZE)) = value;
 
-    if (++g_bufferIndex % CHUNK_SIZE == 0) {
+    g_bufferIndex++;
+
+    if ((g_bufferIndex - g_saveUpToBufferIndex) >= CHUNK_SIZE) {
         g_lastSyncTickCount = micros();
         g_saveUpToBufferIndex = g_bufferIndex;
         flushData();
@@ -277,6 +280,7 @@ int startImmediately() {
 
     g_bufferIndex = 0;
     g_lastSavedBufferIndex = 0;
+    g_saveUpToBufferIndex = 0;
     g_lastSyncTickCount = micros();
     g_fileLength = 0;
 
