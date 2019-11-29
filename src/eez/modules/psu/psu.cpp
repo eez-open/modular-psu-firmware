@@ -209,6 +209,7 @@ void init() {
     ontime::g_mcuCounter.init();
 
     int channelIndex = 0;
+    int uninstalledChannelIndex = CH_MAX - 1;
     for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         auto& slot = g_slots[slotIndex];
 
@@ -224,16 +225,21 @@ void init() {
 
         slot.moduleInfo = getModuleInfo(moduleType);
         slot.moduleRevision = moduleRevision;
-        slot.channelIndex = channelIndex;
-
-        for (uint8_t subchannelIndex = 0; subchannelIndex < slot.moduleInfo->numChannels; subchannelIndex++) {
-            Channel::get(channelIndex++).set(slotIndex, subchannelIndex);
-        }
 
         if (slot.moduleInfo->moduleType != MODULE_TYPE_NONE) {
+            slot.channelIndex = channelIndex;
+
+            for (uint8_t subchannelIndex = 0; subchannelIndex < slot.moduleInfo->numChannels; subchannelIndex++) {
+                Channel::get(channelIndex++).set(slotIndex, subchannelIndex);
+            }
+
             persist_conf::loadModuleConf(slotIndex);
             ontime::g_moduleCounters[slotIndex].init();
             CH_NUM = channelIndex;
+        } else {
+            slot.channelIndex = uninstalledChannelIndex;
+            Channel::get(uninstalledChannelIndex).set(slotIndex, 0);
+            uninstalledChannelIndex--;
         }
     }
 

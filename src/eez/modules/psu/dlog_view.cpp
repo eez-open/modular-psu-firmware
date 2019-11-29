@@ -376,7 +376,7 @@ void autoScale(Recording &recording) {
 
         float numDivisions = 1.0f * NUM_VERT_DIVISIONS / numVisibleDlogValues;
 
-        if (dlogValueParams->dlogValueType == DLOG_VALUE_CH1_U) {
+        if (dlogValueParams->dlogValueType % 3 == DLOG_VALUE_CH1_U) {
             // TODO this must be read from the file        
             if (Channel::get(dlogValueParams->channelIndex).isInstalled()) {
                 div = channel_dispatcher::getUMax(Channel::get(dlogValueParams->channelIndex)) / numDivisions;
@@ -385,7 +385,7 @@ void autoScale(Recording &recording) {
             }
 
             dlogValueParams->div = gui::data::Value(ceilPrec(div, VALUE_PREC), UNIT_VOLT);
-        } else if (dlogValueParams->dlogValueType == DLOG_VALUE_CH1_I) {
+        } else if (dlogValueParams->dlogValueType % 3 == DLOG_VALUE_CH1_I) {
             // TODO this must be read from the file
             if (Channel::get(dlogValueParams->channelIndex).isInstalled()) {
                 div = channel_dispatcher::getIMax(Channel::get(dlogValueParams->channelIndex)) / numDivisions;
