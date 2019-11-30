@@ -34,6 +34,9 @@
 
 #include <eez/modules/bp3c/relays.h>
 
+#pragma warning( push )
+#pragma warning( disable : 4200)
+
 extern "C" {
 #include "py/compile.h"
 #include "py/runtime.h"
@@ -44,7 +47,7 @@ void do_str(const char *src, mp_parse_input_kind_t input_kind) {
         mp_lexer_t *lex = mp_lexer_new_from_str_len(MP_QSTR__lt_stdin_gt_, src, strlen(src), 0);
         qstr source_name = lex->source_name;
         mp_parse_tree_t parse_tree = mp_parse(lex, input_kind);
-        mp_obj_t module_fun = mp_compile(&parse_tree, source_name, MP_EMIT_OPT_NONE, true);
+        mp_obj_t module_fun = mp_compile(&parse_tree, source_name, true);
         mp_call_function_0(module_fun);
         nlr_pop();
     } else {
@@ -54,6 +57,8 @@ void do_str(const char *src, mp_parse_input_kind_t input_kind) {
 }
 
 }
+
+#pragma warning( pop ) 
 
 namespace eez {
 namespace psu {
@@ -439,10 +444,103 @@ scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugPythonQ(scpi_t *context) {
 #ifdef DEBUG
+/*
+
+- Usporediti ovo https://github.com/numworks/epsilon sa onim što mi imamo i sa latest verzijom MP-a
+- Pokrenuti one python make skripte i vidjeti što se dobije i kako se to razlikuje od onoga što je već buildano
+- Dodati jedan modul
+- Probati primiti str parameter i vratiti int ili string
+- Delay funkcija
+- Python thread
+- Vidjeti kako zaglaviti i odglaviti
+- scpi funkcija bi trebala poslati scpi komandu u scpi thread kao string i čekati rezultat
+- python može zaglaviti u delay i scpi komandi
+
+- dlog specificira X os (vrijeme, U) i Y osi (U, I, P). Za svaku os MIN, MAX, MIN_MEAS, MAX_MEAS. 
+  Za x os i STEP ili PERIOD. Ako step nije zadan onda se i vrijednosti i za X osi nalaze u podacima.
+
+MAGIC1
+MAGIC2
+VERSION
+TAG PARAMS
+TAG PARAMS
+0xFF
+DATA
+
+Tag 0x01 X-os unit min max min_meas max_meas
+Tag 0x02 start time
+
+Tag 0x10 Y1-os min max min_meas max_meas
+Tag 0x11 Y2-os min max min_meas max_meas
+Tag 0x12 Y3-os min max min_meas max_meas
+Tag 0x1F Y16-os min max min_meas max_meas
+
+Unit: 0x00 time, 0x01 VOLT, 0x02 AMPER, 0x03 WATT
+
+- DLOG view dock legend
+
+
+U1 DIV OFFSET |--------------------------------|
+   CURSOR     |                                |
+I1 DIV OFFSET |                                |
+   CURSOR     |                                |
+U2 DIV OFFSET |                                |
+   CURSOR     |                                |
+I2 DIV OFFSET |                                |
+   CURSOR     |--------------------------------|
+
+Width: 40 + 80 * 2 = 200px
+Height: 8 x 30 = 240px
+
+Ostaje za graf: 280px x 240px
+7 x 6 divisiona
+
+from eez import scpi, dlog, start, delay
+
+scpi("inst ch1");
+
+U_MAX = 40.0
+U_STEP = 0.01
+TIME_STEP = 0.01
+MEASURE_DELAY = 0.005
+I_SET = 0.02
+
+scpi("curr " % I_SET);
+
+i_list = []
+
+t = start()
+
+u_set = 0
+while True:
+    scpi("volt " % u_set);
+
+    delay(t, MEASURE_DELAY)
+
+    if scpi("outp:mode?") == "CC":
+        break
+
+    i_list.add(scpi("curr?"))
+
+    u_set = u_set + U_STEP
+    if u_set > U_MAX:
+        break
+
+    delay(t, TIME_STEP - MEASURE_DELAY)
+
+FILE_NAME_MAX_CHARS = 20
+fileName = scpi('query text, "Diode model", ' % FILE_NAME_MAX_CHARS)
+dlog(fileName, TIME_STEP, i_list)
+
+https://docs.micropython.org/en/latest/develop/cmodules.html
+
+*/
+
     mp_init();
     do_str("print('hello world!', list(x+1 for x in range(10)), end='eol\\n')", MP_PARSE_SINGLE_INPUT);
     do_str("for i in range(10):\n  print(i)", MP_PARSE_FILE_INPUT);
-    do_str("print(1)\nprint(2)\nprint(3", MP_PARSE_FILE_INPUT);
+    do_str("print(1)\nprint(2)\nprint(3)", MP_PARSE_FILE_INPUT);
+    do_str("from eez import test\nprint(test(1, 2, 3))\n", MP_PARSE_FILE_INPUT);
     mp_deinit();
 
     SCPI_ResultText(context, "1");

@@ -72,11 +72,11 @@ include_directories(
 
     src/third_party/libscpi/inc
     src/third_party/micropython
-    src/third_party/micropython/port
+    src/third_party/micropython/ports/bb3
 )
 
 if(WIN32)
-    include_directories(src/third_party/micropython/port/win32)
+    include_directories(src/third_party/micropython/ports/bb3/win32)
 endif()
 
 set(src_files)
@@ -373,6 +373,9 @@ set(header_eez_libs_image
 )
 list (APPEND header_files ${src_eez_libs_image})
 source_group("eez\\libs\\image" FILES ${src_eez_libs_image} ${header_eez_libs_image})
+if(MSVC)
+set_source_files_properties(src/eez/libs/image/toojpeg.cpp PROPERTIES COMPILE_FLAGS /W0)
+endif()
 
 set(src_eez_modules_aux_ps
     src/eez/modules/aux_ps/fan.cpp
@@ -512,6 +515,9 @@ set(header_third_party_scpi
 )
 list (APPEND header_files ${header_third_party_scpi})
 source_group("third_party\\scpi" FILES ${src_third_party_scpi} ${header_third_party_scpi})
+if(MSVC)
+set_source_files_properties(${src_third_party_scpi} PROPERTIES COMPILE_FLAGS /W0)
+endif()
 
 set(src_third_party_micropython_extmod
     src/third_party/micropython/extmod/virtpin.c
@@ -523,26 +529,37 @@ set(header_third_party_micropython_extmod
 list (APPEND header_files ${header_third_party_micropython_extmod})
 source_group("third_party\\micropython\\extmod" FILES ${src_third_party_micropython_extmod} ${header_third_party_micropython_extmod})
 
-set(src_third_party_micropython_port
-    src/third_party/micropython/port/main.c
-    src/third_party/micropython/port/mphalport.c
+set(src_third_party_micropython_ports_bb3
+    src/third_party/micropython/ports/bb3/main.c
+    src/third_party/micropython/ports/bb3/mphalport.c
 )
-list (APPEND src_files ${src_third_party_micropython_port})
-set(header_third_party_micropython_port
-    src/third_party/micropython/port/mpconfigport.h
-    src/third_party/micropython/port/mphalport.h
-    src/third_party/micropython/port/qstrdefsport.h
+list (APPEND src_files ${src_third_party_micropython_ports_bb3})
+set(header_third_party_micropython_ports_bb3
+    src/third_party/micropython/ports/bb3/mpconfigport.h
+    src/third_party/micropython/ports/bb3/mphalport.h
+    src/third_party/micropython/ports/bb3/qstrdefsport.h
 )
-list (APPEND header_files ${header_third_party_micropython_port})
-source_group("third_party\\micropython\\port" FILES ${src_third_party_micropython_port} ${header_third_party_micropython_port})
+list (APPEND header_files ${header_third_party_micropython_ports_bb3})
+source_group("third_party\\micropython\\ports\\bb3" FILES ${src_third_party_micropython_ports_bb3} ${header_third_party_micropython_ports_bb3})
 
-set(header_third_party_micropython_port_genhdr
-    src/third_party/micropython/port/genhdr/moduledefs.h
-    src/third_party/micropython/port/genhdr/mpversion.h
-    src/third_party/micropython/port/genhdr/qstrdefs.generated.h
+set(header_third_party_micropython_ports_bb3_genhdr
+    src/third_party/micropython/ports/bb3/genhdr/moduledefs.h
+    src/third_party/micropython/ports/bb3/genhdr/mpversion.h
+    src/third_party/micropython/ports/bb3/genhdr/qstrdefs.generated.h
 )
-list (APPEND header_files ${header_third_party_micropython_port_genhdr})
-source_group("third_party\\micropython\\port\\genhdr" FILES ${header_third_party_micropython_port_genhdr})
+list (APPEND header_files ${header_third_party_micropython_ports_bb3_genhdr})
+source_group("third_party\\micropython\\ports\\bb3\\genhdr" FILES ${header_third_party_micropython_ports_bb3_genhdr})
+
+set(src_third_party_micropython_ports_bb3_mod_eez
+    src/third_party/micropython/ports/bb3/mod/eez/modeez_table.c
+    src/third_party/micropython/ports/bb3/mod/eez/modeez.cpp
+)
+list (APPEND src_files ${src_third_party_micropython_ports_bb3_mod_eez})
+set(header_third_party_micropython_ports_bb3_mod_eez
+    src/third_party/micropython/ports/bb3/mod/eez/modeez.h
+)
+list (APPEND header_files ${header_third_party_micropython_ports_bb3_mod_eez})
+source_group("third_party\\micropython\\ports\\bb3\\modeez" FILES ${src_third_party_micropython_ports_bb3_mod_eez} ${header_third_party_micropython_ports_bb3_mod_eez})
 
 set(src_third_party_micropython_py
     src/third_party/micropython/py/argcheck.c
@@ -722,6 +739,9 @@ set(header_third_party_micropython_py
 )
 list (APPEND header_files ${header_third_party_micropython_py})
 source_group("third_party\\micropython\\py" FILES ${src_third_party_micropython_py} ${header_third_party_micropython_py})
+if(MSVC)
+set_source_files_properties(${src_third_party_micropython_py} PROPERTIES COMPILE_FLAGS /W0)
+endif()
 
 if(WIN32)
     set(src_win32_specific

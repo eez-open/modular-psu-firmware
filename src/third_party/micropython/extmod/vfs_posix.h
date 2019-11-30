@@ -3,7 +3,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2013, 2014 Damien P. George and 2017, 2018 Rami Ali
+ * Copyright (c) 2018 Damien P. George
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,26 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef MICROPY_INCLUDED_EXTMOD_VFS_POSIX_H
+#define MICROPY_INCLUDED_EXTMOD_VFS_POSIX_H
 
-#include "mphalport.h"
+#include "py/lexer.h"
+#include "py/obj.h"
 
-void mp_hal_stdout_tx_strn(const char *str, size_t len) {
-}
+extern const mp_obj_type_t mp_type_vfs_posix;
+extern const mp_obj_type_t mp_type_vfs_posix_fileio;
+extern const mp_obj_type_t mp_type_vfs_posix_textio;
 
-void mp_hal_delay_ms(mp_uint_t ms) {
-}
+mp_obj_t mp_vfs_posix_file_open(const mp_obj_type_t *type, mp_obj_t file_in, mp_obj_t mode_in);
 
-void mp_hal_delay_us(mp_uint_t us) {
-}
-
-mp_uint_t mp_hal_ticks_us(void) {
-    return 0;
-}
-
-mp_uint_t mp_hal_ticks_ms(void) {
-    return 0;
-}
-
-mp_uint_t mp_hal_ticks_cpu(void) {
-    return 0;
-}
+#endif // MICROPY_INCLUDED_EXTMOD_VFS_POSIX_H

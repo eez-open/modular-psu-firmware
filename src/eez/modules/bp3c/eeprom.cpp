@@ -26,14 +26,12 @@
 #include <stdio.h>
 #endif
 
-#include <scpi/scpi.h>
-
 #include <eez/system.h>
 #include <eez/index.h>
-
 #include <eez/modules/psu/psu.h>
-
 #include <eez/modules/bp3c/eeprom.h>
+
+#include <scpi/scpi.h>
 
 // DCP405:
 //   EEPROM M24C32

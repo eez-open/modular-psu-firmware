@@ -26,13 +26,11 @@
 #include <stdio.h>
 #endif
 
-#include <scpi/scpi.h>
-
 #include <eez/system.h>
-
 #include <eez/modules/psu/psu.h>
-
 #include <eez/modules/mcu/eeprom.h>
+
+#include <scpi/scpi.h>
 
 namespace eez {
 namespace mcu {

@@ -64,6 +64,8 @@ typedef long mp_off_t;
 #define MICROPY_PORT_BUILTINS \
     { MP_ROM_QSTR(MP_QSTR_open), MP_ROM_PTR(&mp_builtin_open_obj) },
 
+#define MODULE_EEZ_ENABLED (1)
+
 // We need to provide a declaration/definition of alloca()
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
 
