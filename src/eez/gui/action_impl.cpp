@@ -1055,6 +1055,10 @@ void action_user_switch_clicked() {
     	changePowerState(isPowerUp() ? false : true);
     	break;
     }
+
+#if EEZ_PLATFORM_SIMULATOR
+    g_appContext = saved;
+#endif
 }
 
 void onSetUserSwitchAction(uint16_t value) {

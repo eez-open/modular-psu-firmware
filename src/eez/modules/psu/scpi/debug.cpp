@@ -91,12 +91,14 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
 #ifdef DEBUG
     static char buffer[2048];
 
+#ifndef __EMSCRIPTEN__
     for (int i = 0; i < CH_NUM; i++) {
         if (!measureAllAdcValuesOnChannel(i)) {
             SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
             return SCPI_RES_ERR;
         }
     }
+#endif
 
     debug::dumpVariables(buffer);
 
@@ -541,6 +543,7 @@ https://docs.micropython.org/en/latest/develop/cmodules.html
     do_str("for i in range(10):\n  print(i)", MP_PARSE_FILE_INPUT);
     do_str("print(1)\nprint(2)\nprint(3)", MP_PARSE_FILE_INPUT);
     do_str("from eez import test\nprint(test(1, 2, 3))\n", MP_PARSE_FILE_INPUT);
+    do_str("from struct import *\nprint(pack('hhl', 1, 2, 3))", MP_PARSE_FILE_INPUT);
     mp_deinit();
 
     SCPI_ResultText(context, "1");

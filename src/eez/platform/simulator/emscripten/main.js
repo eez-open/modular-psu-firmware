@@ -6,10 +6,18 @@ var stdinBuffer = [];
 
 var terminal = $("#output").terminal(
   function(command) {
-    for (let i = 0; i < command.length; ++i) {
-      stdinBuffer.push(command.charCodeAt(i));
+    // send command characters one by one, with 10ms interval, otherwise it will block for unknown reason
+    const sendChar = () => {
+      if (i < command.length) {
+        stdinBuffer.push(command.charCodeAt(i));
+        i++;
+        setTimeout(sendChar, 10); // 10ms
+      } else {
+        stdinBuffer.push(13);
+      }
     }
-    stdinBuffer.push(13);
+    let i = 0;
+    sendChar();
   },
   {
     greetings: "",
