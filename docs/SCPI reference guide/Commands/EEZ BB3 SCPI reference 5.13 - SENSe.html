@@ -96,10 +96,10 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 44%;">
-					<p class="scpi3"><a href="#sens_curr_rang"><span style="text-decoration: underline;">RANGe?</span></a></p>
+					<p class="scpi3"><a href="#sens_curr_rang"><span style="text-decoration: underline;">RANGe[:UPPer] {&lt;range&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 56%;">
-					<p>Returns selected DC current measurement range</p>
+					<p>Selects a DC current measurement range</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -247,21 +247,22 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.13.2. <a name="sens_curr_rang"></a>SENSe:CURRent[:DC]:RANGe</p>
+		<p class="Heading_3">5.13.2. <a name="sens_curr_rang"></a>SENSe:CURRent[:DC]:RANGe[:UPPer]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SENSe:CURRent[:DC]:RANGe?</p>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SENSe:CURRent[:DC]:RANGe[:UPPer] {&lt;range&gt;}</p>
+					<p class="cmd_root">SENSe:CURRent[:DC]:RANGe[:UPPer]?</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Modules</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p><span class="DCP405">&#160;DCP405&#160;&#160;</span><span class="DCP405B">&#160;DCP405B&#160;</span></p>
 				</td>
 			</tr>
@@ -269,15 +270,46 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Description</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>The query command returns the maximum DC current that can be measured on the range that is set by auto-ranging circuit.</p>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>This command selects a DC current measurement range when Power board with multiple current ranges is installed (e.g. r5B12 that can be find out with the SYSTem:CHANnel:MODel? command). The entered value must be higher than the maximum current that you expect to measure. Units are in amperes. </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;range&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR2|Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">0.5, 5, MIN|MAX|DEFault</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">DEF</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_code">SENS:CURR:RANG?</p>
 					<p class="cmd_code_Start">0.05</p>
 				</td>
@@ -286,7 +318,7 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Errors</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_code">-241,&quot;Hardware missing&quot;</p>
 				</td>
 			</tr>
@@ -294,7 +326,7 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Related Commands</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>SENSe:CURRent[:DC]:RANGe:AUTO</p>
 					<p>SYSTem:CHANnel:MODel?</p>
 				</td>
@@ -596,7 +628,7 @@
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>Use this command to set the sample period in seconds. For the sample period, the </p>
-					<p>minimum is 20&#160;ms, and it has to be in integral of 20&#160;ms, while the maximum is 120&#160;s. The entered value will be rounded to the nearest 20&#160;ms integral.</p>
+					<p>minimum is 5&#160;ms, and it has to be in integral of 5&#160;ms, while the maximum is 120&#160;s. The entered value will be rounded to the nearest 20&#160;ms integral.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -624,7 +656,7 @@
 					<p style="text-align: center;">NR2</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">0.02 – 120</p>
+					<p style="text-align: center;">0.005 – 120</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
 					<p style="text-align: center;">0.02</p>
