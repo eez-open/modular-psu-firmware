@@ -174,11 +174,6 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
 
     m_showPageTime = micros();
 
-    // clear text message if active page is not PAGE_ID_TEXT_MESSAGE
-    if (getActivePageId() != PAGE_ID_TEXT_MESSAGE && m_textMessage[0]) {
-        m_textMessage[0] = 0;
-    }
-
     onPageChanged(previousPageId, pageId);
 
     refreshScreen();

@@ -49,8 +49,6 @@ public:
 
     // TODO these should be private
     uint32_t m_showPageTime;
-    char m_textMessage[32 + 1];
-    uint8_t m_textMessageVersion;
     void (*m_dialogYesCallback)();
     void (*m_dialogNoCallback)();
     void (*m_dialogCancelCallback)();

@@ -57,12 +57,8 @@ void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_ca
 
 Unit getCurrentEncoderUnit();
 
-void showProgressPage(const char *message, void (*abortCallback)() = 0);
-bool updateProgressPage(size_t processedSoFar, size_t totalSize);
-void hideProgressPage();
-
 class PsuAppContext : public AppContext {
-  public:
+public:
     PsuAppContext();
 
     void stateManagment() override;
@@ -76,16 +72,25 @@ class PsuAppContext : public AppContext {
     uint32_t getNumHistoryValues(uint16_t id) override;
     uint32_t getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) override;
     
-    void showProgressPage(const char *message, void (*abortCallback)());
-    bool updateProgressPage(size_t processedSoFar, size_t totalSize);
-    void hideProgressPage();
+    static void showProgressPage(const char *message, void (*abortCallback)() = 0);
+    static bool updateProgressPage(size_t processedSoFar, size_t totalSize);
+    static void hideProgressPage();
 
-  protected:
+    static void setTextMessage(const char *message, unsigned int len);
+    static void clearTextMessage();
+    static const char *getTextMessage();
+    static uint8_t getTextMessageVersion();
+
+protected:
     bool m_pushProgressPage;
     const char *m_progressMessage;
     void (*m_progressAbortCallback)();
-
     bool m_popProgressPage;
+
+    char m_textMessage[32 + 1];
+    uint8_t m_textMessageVersion;
+    bool m_showTextMessage;
+    bool m_clearTextMessage;
 
     int getMainPageId() override;
     void onPageChanged(int previousPageId, int activePageId) override;

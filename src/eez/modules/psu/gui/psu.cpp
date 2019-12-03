@@ -271,6 +271,27 @@ void PsuAppContext::stateManagment() {
         m_popProgressPage = false;
     }
 
+    if (m_showTextMessage) {
+        m_showTextMessage = false;
+        if (getActivePageId() != PAGE_ID_TEXT_MESSAGE) {
+            pushPage(PAGE_ID_TEXT_MESSAGE);
+        } else {
+            ++m_textMessageVersion;
+        }
+    } else if (m_clearTextMessage) {
+        m_clearTextMessage = false;
+        if (getActivePageId() == PAGE_ID_TEXT_MESSAGE) {
+            popPage();
+            m_textMessage[0] = 0;
+        }
+    } else {
+        // clear text message if active page is not PAGE_ID_TEXT_MESSAGE
+        if (getActivePageId() != PAGE_ID_TEXT_MESSAGE && m_textMessage[0]) {
+            m_textMessage[0] = 0;
+        }
+    }
+
+
     dlog_view::stateManagment();
 }
 
@@ -553,9 +574,9 @@ uint32_t PsuAppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uin
 }
 
 void PsuAppContext::showProgressPage(const char *message, void (*abortCallback)()) {
-    m_progressMessage = message;
-    m_progressAbortCallback = abortCallback;
-    m_pushProgressPage = true;
+    g_psuAppContext.m_progressMessage = message;
+    g_psuAppContext.m_progressAbortCallback = abortCallback;
+    g_psuAppContext.m_pushProgressPage = true;
 }
 
 bool PsuAppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) {
@@ -565,29 +586,33 @@ bool PsuAppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) 
         g_progress = data::Value((uint32_t)processedSoFar, VALUE_TYPE_SIZE);
     }
 
-    if (m_pushProgressPage) {
+    if (g_psuAppContext.m_pushProgressPage) {
         return true;
     }
 
-    return isPageOnStack(PAGE_ID_PROGRESS);
+    return g_psuAppContext.isPageOnStack(PAGE_ID_PROGRESS);
 }
 
 void PsuAppContext::hideProgressPage() {
-    m_popProgressPage = true;
+    g_psuAppContext.m_popProgressPage = true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-void showProgressPage(const char *message, void (*abortCallback)()) {
-    psu::gui::g_psuAppContext.showProgressPage(message, abortCallback);
+void PsuAppContext::setTextMessage(const char *message, unsigned int len) {
+    strncpy(g_psuAppContext.m_textMessage, message, len);
+    g_psuAppContext.m_textMessage[len] = 0;
+    g_psuAppContext.m_showTextMessage = true;
 }
 
-bool updateProgressPage(size_t processedSoFar, size_t totalSize) {
-    return psu::gui::g_psuAppContext.updateProgressPage(processedSoFar, totalSize);
+void PsuAppContext::clearTextMessage() {
+    g_psuAppContext.m_clearTextMessage =  true;
 }
 
-void hideProgressPage() {
-    psu::gui::g_psuAppContext.hideProgressPage();
+const char *PsuAppContext::getTextMessage() {
+    return g_psuAppContext.m_textMessage;
+}
+
+uint8_t PsuAppContext::getTextMessageVersion() {
+    return g_psuAppContext.m_textMessageVersion;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -55,49 +55,6 @@ void hideAsyncOperationInProgress() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void setTextMessage(const char *message, unsigned int len) {
-#if EEZ_PLATFORM_SIMULATOR
-    AppContext *saved = g_appContext;
-    g_appContext = &psu::gui::g_psuAppContext;
-#endif
-
-    strncpy(g_appContext->m_textMessage, message, len);
-    g_appContext->m_textMessage[len] = 0;
-    ++g_appContext->m_textMessageVersion;
-    if (getActivePageId() != PAGE_ID_TEXT_MESSAGE) {
-        pushPage(PAGE_ID_TEXT_MESSAGE);
-    }
-
-#if EEZ_PLATFORM_SIMULATOR
-    g_appContext = saved;
-#endif
-}
-
-void clearTextMessage() {
-#if EEZ_PLATFORM_SIMULATOR
-    AppContext *saved = g_appContext;
-    g_appContext = &psu::gui::g_psuAppContext;
-#endif
-
-    if (getActivePageId() == PAGE_ID_TEXT_MESSAGE) {
-        popPage();
-    }
-
-#if EEZ_PLATFORM_SIMULATOR
-    g_appContext = saved;
-#endif
-}
-
-const char *getTextMessage() {
-    return g_appContext->m_textMessage;
-}
-
-uint8_t getTextMessageVersion() {
-    return g_appContext->m_textMessageVersion;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void pushToastMessage(ToastMessagePage *toastMessage) {
     pushPage(INTERNAL_PAGE_ID_TOAST_MESSAGE, toastMessage);
 }

@@ -33,11 +33,6 @@ extern data::Value g_progress;
 void showAsyncOperationInProgress(const char *message, void (*checkStatus)() = 0);
 void hideAsyncOperationInProgress();
 
-void setTextMessage(const char *message, unsigned int len);
-void clearTextMessage();
-const char *getTextMessage();
-uint8_t getTextMessageVersion();
-
 void infoMessage(const char *message);
 void infoMessage(data::Value value);
 void infoMessage(const char *message1, const char *message2);
