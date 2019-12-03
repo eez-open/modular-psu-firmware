@@ -6,6 +6,7 @@
 #include "py/runtime.h"
 #include "py/repl.h"
 #include "py/mperrno.h"
+#include "py/gc.h"
 
 mp_lexer_t *mp_lexer_new_from_file(const char *filename) {
     mp_raise_OSError(MP_ENOENT);

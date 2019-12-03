@@ -22,6 +22,7 @@
 
 #include <eez/system.h>
 #include <eez/sound.h>
+#include <eez/mp.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -118,7 +119,9 @@ void oneIter() {
             ethernet::onQueueMessage(type, param);
         }
 #endif  
-        else if (target == SCPI_QUEUE_MESSAGE_TARGET_NONE) {
+        else if (target == SCPI_QUEUE_MESSAGE_TARGET_MP) {
+            mp::onQueueMessage(type, param);
+        } else if (target == SCPI_QUEUE_MESSAGE_TARGET_NONE) {
             if (type == SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST) {
                 int err;
                 if (!eez::psu::list::saveList(param, &g_listFilePath[param][0], &err)) {

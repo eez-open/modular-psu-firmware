@@ -18,6 +18,8 @@
 
 #include <eez/index.h>
 
+#include <eez/mp.h>
+
 #include <eez/modules/psu/psu.h>
 
 #if OPTION_DISPLAY
@@ -119,11 +121,14 @@ OnSystemStateChangedCallback g_onSystemStateChangedCallbacks[] = {
     mcu::ethernet::onSystemStateChanged,
 #endif    
     mcu::touch::onSystemStateChanged,
+
     // subsystems
 #if OPTION_DISPLAY
     gui::onSystemStateChanged,
 #endif
     scpi::onSystemStateChanged,
+    mp::onSystemStateChanged,
+
     // applications
     psu::onSystemStateChanged,
 };

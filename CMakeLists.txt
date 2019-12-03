@@ -86,7 +86,8 @@ set(src_eez
     src/eez/debug.cpp
     src/eez/index.cpp
     src/eez/main.cpp
-    src/eez/scripting.cpp
+    src/eez/memory.cpp
+    src/eez/mp.cpp
     src/eez/sound.cpp
     src/eez/system.cpp
     src/eez/unit.cpp
@@ -97,7 +98,8 @@ set(header_eez
     src/eez/debug.h
     src/eez/file_type.h
     src/eez/index.h
-    src/eez/scripting.h
+    src/eez/memory.h
+    src/eez/mp.h
     src/eez/sound.h
     src/eez/system.h
     src/eez/unit.h
@@ -531,7 +533,8 @@ source_group("third_party\\micropython\\extmod" FILES ${src_third_party_micropyt
 
 set(src_third_party_micropython_ports_bb3
     src/third_party/micropython/ports/bb3/main.c
-    src/third_party/micropython/ports/bb3/mphalport.c
+    src/third_party/micropython/ports/bb3/gccollect.c
+    src/third_party/micropython/ports/bb3/mphalport.cpp
 )
 list (APPEND src_files ${src_third_party_micropython_ports_bb3})
 set(header_third_party_micropython_ports_bb3

@@ -39,6 +39,7 @@ extern osMessageQId g_scpiMessageQueueId;
 #define SCPI_QUEUE_MESSAGE_TARGET_NONE 0
 #define SCPI_QUEUE_MESSAGE_TARGET_SERIAL 1
 #define SCPI_QUEUE_MESSAGE_TARGET_ETHERNET 2
+#define SCPI_QUEUE_MESSAGE_TARGET_MP 3
 
 #define SCPI_QUEUE_MESSAGE(target, type, param) (((target) << 30) | ((param) << 4) | (type))
 #define SCPI_QUEUE_MESSAGE_TARGET(message) ((message) >> 30)
@@ -47,6 +48,7 @@ extern osMessageQId g_scpiMessageQueueId;
 
 #define SCPI_QUEUE_SERIAL_MESSAGE(type, param) SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_SERIAL, type, param)
 #define SCPI_QUEUE_ETHERNET_MESSAGE(type, param) SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_ETHERNET, type, param)
+#define SCPI_QUEUE_MP_MESSAGE(type, param) SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_MP, type, param)
 
 #define SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST 1
 #define SCPI_QUEUE_MESSAGE_TYPE_DELETE_PROFILE_LISTS 2

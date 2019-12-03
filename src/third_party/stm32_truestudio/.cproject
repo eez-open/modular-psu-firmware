@@ -63,7 +63,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../libscpi/inc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/port&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/ports/bb3&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bb3/Middlewares/Third_Party/FatFs/src}&quot;"/>
@@ -193,7 +193,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../libscpi/inc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/port&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/ports/bb3&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bb3/Middlewares/Third_Party/FatFs/src}&quot;"/>
@@ -228,11 +228,6 @@
 							<inputType id="com.atollic.truestudio.gpp.input.1059682549" superClass="com.atollic.truestudio.gpp.input"/>
 						</tool>
 					</fileInfo>
-					<fileInfo id="com.atollic.truestudio.exe.debug.1518366166.2102805434" name="nanojpeg.c" rcbsApplicability="disable" resourcePath="eez/libs/image/nanojpeg.c" toolsToInvoke="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.990612617">
-						<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.990612617" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447">
-							<inputType id="com.atollic.truestudio.gcc.input.848074461" superClass="com.atollic.truestudio.gcc.input"/>
-						</tool>
-					</fileInfo>
 					<fileInfo id="com.atollic.truestudio.exe.debug.311825581.983937533" name="" rcbsApplicability="disable" resourcePath="nofile" toolsToInvoke="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1976695455">
 						<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1976695455" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447">
 							<inputType id="com.atollic.truestudio.gcc.input.1274347818" superClass="com.atollic.truestudio.gcc.input"/>
@@ -259,6 +254,11 @@
 							<tool id="com.atollic.truestudio.exe.debug.toolchain.secoutput.492725595" name="Other" superClass="com.atollic.truestudio.exe.debug.toolchain.secoutput.839033486"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.atollic.truestudio.exe.debug.1518366166.718005614" name="gccollect_simulator.c" rcbsApplicability="disable" resourcePath="micropython/ports/bb3/gccollect_simulator.c" toolsToInvoke="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1282955217">
+						<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1282955217" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447">
+							<inputType id="com.atollic.truestudio.gcc.input.704885575" superClass="com.atollic.truestudio.gcc.input"/>
+						</tool>
+					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Inc"/>
@@ -267,7 +267,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
 						<entry excluding="libs/image/nanojpeg.c|libs/umm_malloc|gui/document_stm32.cpp|gui/document_simulator.cpp|libs/sd_fat/simulator|modules/psu/simulator|modules/mcu/simulator|apps/psu/simulator|apps/psu/platform/simulator|platform/simulator" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libscpi"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
+						<entry excluding="ports/bb3/gccollect_simulator.c|ports/bare-arm|extmod" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 					</sourceEntries>
 				</configuration>

@@ -20,6 +20,7 @@
 
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/scpi/psu.h>
+#include <eez/modules/psu/gui/psu.h>
 
 #if OPTION_DISPLAY
 #include <eez/gui/dialogs.h>
@@ -142,7 +143,7 @@ scpi_result_t scpi_cmd_displayWindowText(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    eez::gui::setTextMessage(text, len);
+    eez::psu::gui::g_psuAppContext.setTextMessage(text, len);
 
     return SCPI_RES_OK;
 #else
@@ -154,7 +155,7 @@ scpi_result_t scpi_cmd_displayWindowText(scpi_t *context) {
 scpi_result_t scpi_cmd_displayWindowTextQ(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_DISPLAY
-    SCPI_ResultText(context, eez::gui::getTextMessage());
+    SCPI_ResultText(context, eez::psu::gui::g_psuAppContext.getTextMessage());
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -165,7 +166,7 @@ scpi_result_t scpi_cmd_displayWindowTextQ(scpi_t *context) {
 scpi_result_t scpi_cmd_displayWindowTextClear(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_DISPLAY
-    eez::gui::clearTextMessage();
+    eez::psu::gui::g_psuAppContext.clearTextMessage();
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

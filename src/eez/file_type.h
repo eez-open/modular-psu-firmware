@@ -18,7 +18,6 @@
 
 #pragma once
 
-
 namespace eez {
 
 enum FileType {
@@ -27,6 +26,7 @@ enum FileType {
     FILE_TYPE_PROFILE,
     FILE_TYPE_DLOG,
     FILE_TYPE_IMAGE,
+    FILE_TYPE_MICROPYTHON,
     FILE_TYPE_OTHER,
 };
 

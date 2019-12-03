@@ -64,45 +64,6 @@ int g_lastError;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void migrateProfileListsCallback(void *param, const char *name, FileType type, size_t size) {
-    if (startsWith(name, "LST_") && endsWith(name, ".CSV")) {
-        char srcFilePath[128];
-        sprintf(srcFilePath, "%s/%s", PROFILES_DIR, name);
-
-        char nameBaseStr[128] = { 0 };
-        strncpy(nameBaseStr, name + strlen("LST_"), strlen(name) - strlen("LST_") - strlen(".CSV"));
-
-        char dstFilePath[128];
-        sprintf(dstFilePath, "%s/PROFILE_%s.LIST", LISTS_DIR, nameBaseStr);
-
-        int err;
-        moveFile(srcFilePath, dstFilePath, &err);
-    }
-}
-
-void migrateCard() {
-    int err;
-
-    if (exists(LISTS_DIR, &err)) {
-        moveFile(LISTS_DIR, LISTS_DIR, &err);
-    }
-
-    if (exists(PROFILES_DIR, &err)) {
-        moveFile(PROFILES_DIR, PROFILES_DIR, &err);
-    }
-
-    if (exists(RECORDINGS_DIR, &err)) {
-        moveFile(RECORDINGS_DIR, RECORDINGS_DIR, &err);
-    }
-
-    if (exists(SCREENSHOTS_DIR, &err)) {
-        moveFile(SCREENSHOTS_DIR, SCREENSHOTS_DIR, &err);
-    }
-
-    int numFiles;
-    catalog(PROFILES_DIR, nullptr, migrateProfileListsCallback, &numFiles, &err);
-}
-
 bool prepareCard() {
     int err;
 
@@ -130,8 +91,12 @@ bool prepareCard() {
         }
     }
 
-    migrateCard();
-    
+    if (!exists(SCRIPTS_DIR, &err)) {
+        if (!makeDir(SCRIPTS_DIR, &err)) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -368,6 +333,8 @@ bool catalog(const char *dirPath, void *param,
                 type = FILE_TYPE_DLOG;
             } else if (endsWithNoCase(name, ".jpg")) {
                 type = FILE_TYPE_IMAGE;
+            } else if (endsWithNoCase(name, ".py")) {
+                type = FILE_TYPE_MICROPYTHON;
             } else {
                 type = FILE_TYPE_OTHER;
             }
@@ -433,7 +400,7 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
     size_t totalSize = file.size();
 
 #if OPTION_DISPLAY
-    eez::psu::gui::showProgressPage("Uploading...");
+    eez::psu::gui::PsuAppContext::showProgressPage("Uploading...");
     size_t uploaded = 0;
 #endif
 
@@ -451,8 +418,8 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
 
 #if OPTION_DISPLAY
         uploaded += size;
-        if (!eez::psu::gui::updateProgressPage(uploaded, totalSize)) {
-            eez::psu::gui::hideProgressPage();
+        if (!eez::psu::gui::PsuAppContext::updateProgressPage(uploaded, totalSize)) {
+            eez::psu::gui::PsuAppContext::hideProgressPage();
             event_queue::pushEvent(event_queue::EVENT_WARNING_FILE_UPLOAD_ABORTED);
             if (err)
                 *err = SCPI_ERROR_FILE_TRANSFER_ABORTED;
@@ -471,7 +438,7 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
     callback(param, NULL, -1);
 
 #if OPTION_DISPLAY
-    eez::psu::gui::hideProgressPage();
+    eez::psu::gui::g_psuAppContext.hideProgressPage();
 #endif
 
     return result;
@@ -548,7 +515,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
     }
 
 #if OPTION_DISPLAY
-    eez::psu::gui::showProgressPage("Copying...");
+    eez::psu::gui::g_psuAppContext.showProgressPage("Copying...");
 #endif
 
     const int CHUNK_SIZE = 512;
@@ -562,7 +529,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
         size_t written = destinationFile.write((const uint8_t *)buffer, size);
         if (size < 0 || written != (size_t)size) {
 #if OPTION_DISPLAY
-            eez::psu::gui::hideProgressPage();
+            eez::psu::gui::g_psuAppContext.hideProgressPage();
 #endif
             sourceFile.close();
             destinationFile.close();
@@ -575,7 +542,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
         totalWritten += written;
 
 #if OPTION_DISPLAY
-        if (!eez::psu::gui::updateProgressPage(totalWritten, totalSize)) {
+        if (!eez::psu::gui::g_psuAppContext.updateProgressPage(totalWritten, totalSize)) {
             sourceFile.close();
             destinationFile.close();
 
@@ -583,7 +550,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
             if (err)
                 *err = SCPI_ERROR_MASS_STORAGE_ERROR;
 
-            eez::psu::gui::hideProgressPage();
+            eez::psu::gui::g_psuAppContext.hideProgressPage();
             return false;
         }
 #endif
@@ -597,7 +564,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
     destinationFile.close();
 
 #if OPTION_DISPLAY
-    eez::psu::gui::hideProgressPage();
+    eez::psu::gui::g_psuAppContext.hideProgressPage();
 #endif
 
     if (totalWritten != totalSize) {

@@ -90,12 +90,12 @@ void decompressAssets() {
     int compressedSize = sizeof(assets) - 4;
 
     // first 4 bytes (uint32_t) are decompressed size
-    int decompressedSize = (int)(((uint32_t *)assets)[0]);
+    uint32_t decompressedSize = ((uint32_t *)assets)[0];
     assert(decompressedSize <= DECOMPRESSED_ASSETS_SIZE);
     g_decompressedAssets = DECOMPRESSED_ASSETS_START_ADDRESS;
 
-    int result = LZ4_decompress_safe((const char *)assets + 4, (char *)g_decompressedAssets, compressedSize, decompressedSize);
-    assert(result == decompressedSize);
+    int result = LZ4_decompress_safe((const char *)assets + 4, (char *)g_decompressedAssets, compressedSize, (int)decompressedSize);
+    assert(result == (int)decompressedSize);
 #else
     g_decompressedAssets = (uint8_t *)assets;
 #endif

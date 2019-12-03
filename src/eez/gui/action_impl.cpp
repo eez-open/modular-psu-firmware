@@ -60,7 +60,6 @@
 #endif
 
 #include <eez/index.h>
-#include <eez/scripting.h>
 
 #include <eez/modules/bp3c/eeprom.h>
 
@@ -971,26 +970,6 @@ void action_edit_animations_duration() {
 
 void action_test() {
     infoMessage("Hello, world!");
-}
-
-void action_start_script() {
-    // TODO
-}
-
-void action_set_scripts_page_mode_scripts() {
-    scripting::g_scriptsPageMode = scripting::SCRIPTS_PAGE_MODE_SCRIPTS;
-}
-
-void action_set_scripts_page_mode_shell() {
-    scripting::g_scriptsPageMode = scripting::SCRIPTS_PAGE_MODE_SHELL;
-}
-
-void action_scripts_previous_page() {
-    scripting::g_currentPageIndex--;
-}
-
-void action_scripts_next_page() {
-    scripting::g_currentPageIndex++;
 }
 
 void action_user_switch_clicked() {

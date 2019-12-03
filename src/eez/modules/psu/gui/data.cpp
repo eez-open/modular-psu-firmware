@@ -623,7 +623,7 @@ bool compare_TEXT_MESSAGE_value(const Value &a, const Value &b) {
 }
 
 void TEXT_MESSAGE_value_to_text(const Value &value, char *text, int count) {
-    strncpy(text, getTextMessage(), count - 1);
+    strncpy(text, g_psuAppContext.getTextMessage(), count - 1);
     text[count - 1] = 0;
 }
 
@@ -3965,7 +3965,7 @@ void data_channel_ranges_currently_selected(data::DataOperationEnum operation, d
 
 void data_text_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(getTextMessageVersion(), VALUE_TYPE_TEXT_MESSAGE);
+        value = data::Value(g_psuAppContext.getTextMessageVersion(), VALUE_TYPE_TEXT_MESSAGE);
     }
 }
 

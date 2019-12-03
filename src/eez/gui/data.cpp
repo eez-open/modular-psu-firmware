@@ -31,7 +31,6 @@
 #include <eez/gui/dialogs.h>
 #include <eez/gui/document.h>
 #include <eez/gui/gui.h>
-#include <eez/scripting.h>
 #include <eez/system.h>
 #include <eez/util.h>
 #include <eez/index.h>
@@ -809,48 +808,6 @@ void data_selected_theme(DataOperationEnum operation, Cursor &cursor, Value &val
 	if (operation == data::DATA_OPERATION_GET) {
 		value = getThemeName(psu::persist_conf::devConf.selectedThemeIndex);
 	}
-}
-
-void data_scripts(DataOperationEnum operation, Cursor &cursor, Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
-        value = scripting::getNumScriptsInCurrentPage();
-    }
-}
-
-void data_script_name(DataOperationEnum operation, Cursor &cursor, Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = scripting::getScriptName(cursor.i);
-    }
-}
-
-void data_scripts_page_mode(DataOperationEnum operation, Cursor &cursor, Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = scripting::g_scriptsPageMode;
-    }
-}
-
-void data_scripts_multiple_pages(DataOperationEnum operation, Cursor &cursor, Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = scripting::getNumPages() > 1 ? 1 : 0;
-    }
-}
-
-void data_scripts_previous_page_enabled(DataOperationEnum operation, Cursor &cursor, Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = scripting::g_currentPageIndex > 0 ? 1 : 0;
-    }
-}
-
-void data_scripts_next_page_enabled(DataOperationEnum operation, Cursor &cursor, Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = scripting::g_currentPageIndex < scripting::getNumPages() - 1 ? 1 : 0;
-    }
-}
-
-void data_scripts_page_info(DataOperationEnum operation, Cursor &cursor, Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::MakePageInfoValue(scripting::g_currentPageIndex, scripting::getNumPages());
-    }
 }
 
 void data_animations_duration(DataOperationEnum operation, Cursor &cursor, Value &value) {

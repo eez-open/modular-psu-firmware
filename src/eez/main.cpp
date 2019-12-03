@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
+
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
 
@@ -41,11 +43,11 @@
 
 #include "FreeRTOS.h"
 
-#include <eez/platform/stm32/defines.h>
 #include <eez/platform/stm32/dwt_delay.h>
 #endif
 
 #include <eez/system.h>
+#include <eez/memory.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/init.h>
@@ -156,6 +158,8 @@ void main_loop() {
 #endif
 
 int main(int argc, char **argv) {
+    assert(MEMORY_END - MEMORY_BEGIN <= MEMORY_SIZE);
+
 #if defined(EEZ_PLATFORM_STM32)
     HAL_Init();
 
