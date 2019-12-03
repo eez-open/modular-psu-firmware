@@ -34,9 +34,7 @@
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
-#ifdef EEZ_PLATFORM_STM32
-#include <eez/platform/stm32/defines.h>
-#endif
+#include <eez/memory.h>
 
 namespace eez {
 
@@ -51,16 +49,6 @@ bool g_showLatest = true;
 bool g_overlayMinimized;
 char g_filePath[MAX_PATH_LENGTH + 1];
 Recording g_recording;
-
-#ifdef EEZ_PLATFORM_STM32
-static uint8_t *g_buffer = (uint8_t *)FILE_VIEW_BUFFER;
-#endif
-
-#ifdef EEZ_PLATFORM_SIMULATOR
-#define FILE_VIEW_BUFFER_SIZE (896 * 1024)
-static uint8_t g_bufferMemory[FILE_VIEW_BUFFER_SIZE];
-static uint8_t *g_buffer = g_bufferMemory;
-#endif
 
 struct CacheBlock {
     unsigned valid: 1;
@@ -77,7 +65,7 @@ static const uint32_t NUM_ELEMENTS_PER_BLOCKS = 480 * MAX_NUM_OF_Y_VALUES;
 static const uint32_t BLOCK_SIZE = NUM_ELEMENTS_PER_BLOCKS * sizeof(BlockElement);
 static const uint32_t NUM_BLOCKS = FILE_VIEW_BUFFER_SIZE / (BLOCK_SIZE + sizeof(CacheBlock));
 
-CacheBlock *g_cacheBlocks = (CacheBlock *)g_buffer;
+CacheBlock *g_cacheBlocks = (CacheBlock *)FILE_VIEW_BUFFER;
 
 static bool g_isLoading;
 static bool g_interruptLoading;
@@ -121,7 +109,7 @@ float readFloat(uint8_t *buffer, uint32_t *offset) {
 }
 
 BlockElement *getCacheBlock(unsigned blockIndex) {
-    return (BlockElement *)(g_buffer + NUM_BLOCKS * sizeof(CacheBlock) + blockIndex * BLOCK_SIZE);
+    return (BlockElement *)(FILE_VIEW_BUFFER + NUM_BLOCKS * sizeof(CacheBlock) + blockIndex * BLOCK_SIZE);
 }
 
 unsigned getNumElementsPerRow() {

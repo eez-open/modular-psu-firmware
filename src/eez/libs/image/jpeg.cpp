@@ -27,53 +27,32 @@
 #include <eez/debug.h>
 #include <eez/libs/sd_fat/sd_fat.h>
 
+#include <eez/memory.h>
+
+static size_t g_imageDataSize;
+
+void WRITE_ONE_BYTE(unsigned char byte) {
+	VRAM_SCREENSHOOT_JPEG_OUT_BUFFER[g_imageDataSize++] = byte;
+}
+
+int jpegEncode(const uint8_t *screenshotPixels, unsigned char **imageData, size_t *imageDataSize) {
+	g_imageDataSize = 0;
+	TooJpeg::writeJpeg(WRITE_ONE_BYTE, screenshotPixels, 480, 272);
+    *imageData = VRAM_SCREENSHOOT_JPEG_OUT_BUFFER;
+    *imageDataSize = g_imageDataSize;
+    return 0;
+}
+
+extern "C" void * const g_jpegDecodeContext = (void *)FILE_VIEW_BUFFER;
+
 #define NJ_USE_LIBC 0
 #define NJ_USE_WIN32 0
 extern "C" {
 #include "nanojpeg.c"
 }
 
-#if defined(EEZ_PLATFORM_STM32)
-#include <eez/platform/stm32/defines.h>
-static const size_t MAX_IMAGE_DATA_SIZE = VRAM_SCREENSHOOT_JPEG_OUT_BUFFER_SIZE;
-static uint8_t *g_imageData = (uint8_t *)VRAM_SCREENSHOOT_JPEG_OUT_BUFFER;
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-static const size_t MAX_IMAGE_DATA_SIZE = 256 * 1024;
-static uint8_t g_imageData[MAX_IMAGE_DATA_SIZE];
-#endif
-
-static size_t g_imageDataSize;
-
-void WRITE_ONE_BYTE(unsigned char byte) {
-	g_imageData[g_imageDataSize++] = byte;
-}
-
-int jpegEncode(const uint8_t *screenshotPixels, unsigned char **imageData, size_t *imageDataSize) {
-	g_imageDataSize = 0;
-	TooJpeg::writeJpeg(WRITE_ONE_BYTE, screenshotPixels, 480, 272);
-    *imageData = g_imageData;
-    *imageDataSize = g_imageDataSize;
-    return 0;
-}
-
-#if defined(EEZ_PLATFORM_STM32)
-extern "C" {
-void *g_jpegDecodeContext = (void *)FILE_VIEW_BUFFER;
-}
-static uint8_t *g_decodeBuffer = (uint8_t *)(FILE_VIEW_BUFFER + sizeof(nj_context_t));
+static uint8_t *g_decodeBuffer = FILE_VIEW_BUFFER + sizeof(nj_context_t);
 static const size_t DECODE_BUFFER_SIZE = FILE_VIEW_BUFFER_SIZE - sizeof(nj_context_t);
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-uint8_t g_decodeBuffer[896 * 1024];
-static const size_t DECODE_BUFFER_SIZE = sizeof(g_decodeBuffer);
-uint8_t g_jpegDecodeContextMemeory[sizeof(nj_context_t)];
-extern "C" {
-void *g_jpegDecodeContext = g_jpegDecodeContextMemeory;
-}
-#endif
 
 uint8_t *g_decodeDynamicMemory;
 uint8_t *g_fileData;

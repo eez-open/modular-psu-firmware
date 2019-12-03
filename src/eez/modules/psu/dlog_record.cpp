@@ -33,9 +33,7 @@
 #include <eez/modules/psu/event_queue.h>
 #include <eez/gui/widgets/yt_graph.h>
 
-#ifdef EEZ_PLATFORM_STM32
-#include <eez/platform/stm32/defines.h>
-#endif
+#include <eez/memory.h>
 
 namespace eez {
 
@@ -80,16 +78,6 @@ static uint32_t g_lastSyncTickCount;
 
 uint32_t g_fileLength;
 
-#ifdef EEZ_PLATFORM_STM32
-static uint8_t *g_buffer = (uint8_t *)DLOG_RECORD_BUFFER;
-#endif
-
-#ifdef EEZ_PLATFORM_SIMULATOR
-#define DLOG_RECORD_BUFFER_SIZE (128 * 1024)
-static uint8_t g_bufferMemory[DLOG_RECORD_BUFFER_SIZE];
-static uint8_t *g_buffer = g_bufferMemory;
-#endif
-
 #define CHUNK_SIZE 4096
 
 static unsigned int g_bufferIndex;
@@ -132,9 +120,9 @@ void fileWrite() {
 
         size_t written;
         if (i < j || j == 0) {
-            written = file.write(g_buffer + i, length);
+            written = file.write(DLOG_RECORD_BUFFER + i, length);
         } else {
-            written = file.write(g_buffer + i, DLOG_RECORD_BUFFER_SIZE - i) + file.write(g_buffer, j);
+            written = file.write(DLOG_RECORD_BUFFER + i, DLOG_RECORD_BUFFER_SIZE - i) + file.write(DLOG_RECORD_BUFFER, j);
         }
 
         g_lastSavedBufferIndex = saveUpToBufferIndex;
@@ -157,7 +145,7 @@ void flushData() {
 }
 
 void writeUint8(uint8_t value) {
-    *(g_buffer + (g_bufferIndex % DLOG_RECORD_BUFFER_SIZE)) = value;
+    *(DLOG_RECORD_BUFFER + (g_bufferIndex % DLOG_RECORD_BUFFER_SIZE)) = value;
 
     g_bufferIndex++;
 
@@ -258,7 +246,7 @@ int initiate() {
 }
 
 float getValue(int rowIndex, int columnIndex, float *max) {
-    float value = *(float *)(g_buffer + (28 + (rowIndex * g_recording.totalDlogValues + columnIndex) * 4) % DLOG_RECORD_BUFFER_SIZE);
+    float value = *(float *)(DLOG_RECORD_BUFFER + (28 + (rowIndex * g_recording.totalDlogValues + columnIndex) * 4) % DLOG_RECORD_BUFFER_SIZE);
     *max = value;
     return value;
 }

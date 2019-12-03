@@ -24,6 +24,7 @@
 #include <stdlib.h>
 
 #include <eez/system.h>
+#include <eez/mp.h>
 
 #include <eez/scpi/scpi.h>
 
@@ -42,9 +43,7 @@
 
 #include <eez/gui/dialogs.h>
 
-#if defined(EEZ_PLATFORM_STM32)
-#include <eez/platform/stm32/defines.h>
-#endif
+#include <eez/memory.h>
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
@@ -56,13 +55,6 @@ namespace file_manager {
 
 static State g_state;
 static uint32_t g_loadingStartTickCount;
-
-#if defined(EEZ_PLATFORM_STM32)
-static uint8_t *g_buffer = (uint8_t *)FILE_MANAGER_MEMORY;
-#else
-static const int FILE_MANAGER_MEMORY_SIZE = 256 * 1024;
-static uint8_t g_buffer[FILE_MANAGER_MEMORY_SIZE];
-#endif
 
 static char g_currentDirectory[MAX_PATH_LENGTH + 1];
 
@@ -136,7 +128,7 @@ int compareFunc(const void *p1, const void *p2) {
 } 
 
 void sort() {
-    qsort(g_buffer, g_filesCount, sizeof(FileItem), compareFunc);
+    qsort(FILE_MANAGER_MEMORY, g_filesCount, sizeof(FileItem), compareFunc);
 }
 
 void loadDirectory() {
@@ -150,8 +142,8 @@ void loadDirectory() {
         return;
     }
 
-    g_frontBufferPosition = g_buffer;
-    g_backBufferPosition = g_buffer + FILE_MANAGER_MEMORY_SIZE;
+    g_frontBufferPosition = FILE_MANAGER_MEMORY;
+    g_backBufferPosition = FILE_MANAGER_MEMORY + FILE_MANAGER_MEMORY_SIZE;
 
     g_filesCount = 0;
 
@@ -188,7 +180,7 @@ static FileItem *getFileItem(uint32_t fileIndex) {
         return nullptr;
     }
 
-    return (FileItem *)(g_buffer + fileIndex * sizeof(FileItem));
+    return (FileItem *)(FILE_MANAGER_MEMORY + fileIndex * sizeof(FileItem));
 }
 
 State getState() {
@@ -291,7 +283,23 @@ void selectFile(uint32_t fileIndex) {
 
 bool isOpenFileEnabled() {
     auto fileItem = getFileItem(g_selectedFileIndex);
-    return fileItem && (fileItem->type == FILE_TYPE_DLOG || fileItem->type == FILE_TYPE_IMAGE);
+    if (!fileItem) {
+        return false;
+    }
+
+    if (fileItem->type == FILE_TYPE_DLOG) {
+        return true;
+    }
+
+    if (fileItem->type == FILE_TYPE_IMAGE) {
+        return true;
+    }
+
+    if (fileItem->type == FILE_TYPE_MICROPYTHON) {
+        return true;
+    }
+
+    return false;
 }
 
 static void checkImageLoadingStatus() {
@@ -308,22 +316,26 @@ void openFile() {
     popPage();
 
     auto fileItem = getFileItem(g_selectedFileIndex);
-    if (fileItem) {
-        if (fileItem->type == FILE_TYPE_DLOG) {
-            char filePath[MAX_PATH_LENGTH + 1];
-            strcpy(filePath, g_currentDirectory);
-            strcat(filePath, "/");
-            strcat(filePath, fileItem->name);
+    if (!fileItem) {
+        return;
+    }
 
-            psu::dlog_view::g_showLatest = false;
-            psu::dlog_view::openFile(filePath);
-            gui::pushPage(gui::PAGE_ID_DLOG_VIEW);
-        } else if (fileItem->type == FILE_TYPE_IMAGE) {
-            g_imageLoadFailed = false;
-            g_openedImagePixels = nullptr;
-            osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
-            gui::showAsyncOperationInProgress("Loading...", checkImageLoadingStatus);
-        }
+    char filePath[MAX_PATH_LENGTH + 1];
+    strcpy(filePath, g_currentDirectory);
+    strcat(filePath, "/");
+    strcat(filePath, fileItem->name);
+
+    if (fileItem->type == FILE_TYPE_DLOG) {
+        psu::dlog_view::g_showLatest = false;
+        psu::dlog_view::openFile(filePath);
+        gui::pushPage(gui::PAGE_ID_DLOG_VIEW);
+    } else if (fileItem->type == FILE_TYPE_IMAGE) {
+        g_imageLoadFailed = false;
+        g_openedImagePixels = nullptr;
+        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
+        gui::showAsyncOperationInProgress("Loading...", checkImageLoadingStatus);
+    } else if (fileItem->type == FILE_TYPE_MICROPYTHON) {
+        mp::startScript(filePath);
     }
 }
 

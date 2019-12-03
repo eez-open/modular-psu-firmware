@@ -329,7 +329,7 @@ typedef struct _nj_ctx {
     unsigned char *rgb;
 } nj_context_t;
 
-extern void *g_jpegDecodeContext;
+extern "C" void * const g_jpegDecodeContext;
 
 static nj_context_t &nj = *(nj_context_t *)g_jpegDecodeContext;
 

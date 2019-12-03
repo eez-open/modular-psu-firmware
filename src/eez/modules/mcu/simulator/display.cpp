@@ -32,6 +32,7 @@
 #include <cmsis_os.h>
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/debug.h>
+#include <eez/memory.h>
 #include <eez/gui/app_context.h>
 #include <eez/gui/data.h>
 #include <eez/gui/document.h>
@@ -60,15 +61,8 @@ static bool g_isOn;
 static SDL_Window *g_mainWindow;
 static SDL_Renderer *g_renderer;
 
-static uint16_t g_frontPanelWidth = 1396;
-static uint16_t g_frontPanelHeight = 563;
-static uint32_t *g_frontPanelBuffer;
+static uint32_t *g_buffer;
 
-static uint32_t *g_frontPanelBuffer1;
-static uint32_t *g_frontPanelBuffer2;
-static uint32_t *g_frontPanelBuffer3;
-
-static uint8_t *g_screenshotBuffer;
 static bool g_takeScreenshot;
 static int g_screenshotY;
 
@@ -148,8 +142,7 @@ bool init() {
     }
 
     // Create window
-    g_mainWindow = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                    g_frontPanelWidth, g_frontPanelHeight, SDL_WINDOW_HIDDEN);
+    g_mainWindow = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, DISPLAY_WIDTH, DISPLAY_HEIGHT, SDL_WINDOW_HIDDEN);
 
     if (g_mainWindow == NULL) {
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -190,11 +183,11 @@ bool init() {
 
 #if OPTION_SDRAM
 void *getBufferPointer() {
-    return g_frontPanelBuffer;
+    return g_buffer;
 }
 
 void setBufferPointer(void *buffer) {
-    g_frontPanelBuffer = (uint32_t *)buffer;
+    g_buffer = (uint32_t *)buffer;
 }
 #endif
 
@@ -202,21 +195,20 @@ void turnOn() {
     if (!isOn()) {
         g_isOn = true;
 
-        g_frontPanelBuffer1 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
-        memset(g_frontPanelBuffer1, 0, g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
-        
-        g_frontPanelBuffer2 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
-        memset(g_frontPanelBuffer2, 0, g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
+        memset(VRAM_BUFFER1_START_ADDRESS, 0, VRAM_BUFFER_SIZE);
+        memset(VRAM_BUFFER2_START_ADDRESS, 0, VRAM_BUFFER_SIZE);
+        memset(VRAM_ANIMATION_BUFFER1_START_ADDRESS, 0, VRAM_BUFFER_SIZE);
 
-        g_frontPanelBuffer3 = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
-        memset(g_frontPanelBuffer3, 0, g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
+        g_buffer = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
 
-        g_frontPanelBuffer = g_frontPanelBuffer1;
-
-        for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-            g_buffers[bufferIndex].bufferPointer = new uint32_t[g_frontPanelWidth * g_frontPanelHeight];
-            memset(g_buffers[bufferIndex].bufferPointer, 0, g_frontPanelWidth * g_frontPanelHeight * sizeof(uint32_t));
-        }
+        g_buffers[0].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER1_START_ADDRESS;
+        g_buffers[1].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER2_START_ADDRESS;
+        g_buffers[2].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER3_START_ADDRESS;
+        g_buffers[3].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER4_START_ADDRESS;
+        g_buffers[4].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER5_START_ADDRESS;
+        g_buffers[5].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER6_START_ADDRESS;
+        g_buffers[6].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER7_START_ADDRESS;
+        g_buffers[7].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER8_START_ADDRESS;
 
         refreshScreen();
     }
@@ -231,14 +223,9 @@ void turnOff() {
         // clear screen
         setColor(0, 0, 0);
         fillRect(g_psuAppContext.x, g_psuAppContext.y, g_psuAppContext.x + g_psuAppContext.width - 1, g_psuAppContext.y + g_psuAppContext.height - 1);
-        updateScreen(g_frontPanelBuffer);
+        updateScreen(g_buffer);
 
-        // free frame buffers
-        delete g_frontPanelBuffer1;
-        delete g_frontPanelBuffer2;
-        delete g_frontPanelBuffer3;
-
-        g_frontPanelBuffer = nullptr;
+        g_buffer = nullptr;
 
         for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
             delete (uint32_t *)g_buffers[bufferIndex].bufferPointer;
@@ -259,12 +246,12 @@ void updateScreen(uint32_t *buffer) {
     }
 
     SDL_Surface *rgbSurface = SDL_CreateRGBSurfaceFrom(
-        buffer, g_frontPanelWidth, g_frontPanelHeight, 32, 4 * g_frontPanelWidth, 0, 0, 0, 0);
+        buffer, DISPLAY_WIDTH, DISPLAY_HEIGHT, 32, 4 * DISPLAY_WIDTH, 0, 0, 0, 0);
     if (rgbSurface != NULL) {
         SDL_Texture *texture = SDL_CreateTextureFromSurface(g_renderer, rgbSurface);
         if (texture != NULL) {
-            SDL_Rect srcRect = { 0, 0, g_frontPanelWidth, g_frontPanelHeight };
-            SDL_Rect dstRect = { 0, 0, g_frontPanelWidth, g_frontPanelHeight };
+            SDL_Rect srcRect = { 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT };
+            SDL_Rect dstRect = { 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT };
 
             SDL_RenderCopyEx(g_renderer, texture, &srcRect, &dstRect, 0.0, NULL, SDL_FLIP_NONE);
 
@@ -283,30 +270,28 @@ void animate() {
     uint32_t *bufferOld;
     uint32_t *bufferNew;
 
-    if (g_frontPanelBuffer == g_frontPanelBuffer1) {
-        bufferOld = g_frontPanelBuffer2;
-        bufferNew = g_frontPanelBuffer1;
+    if (g_buffer == (uint32_t *)VRAM_BUFFER1_START_ADDRESS) {
+        bufferOld = (uint32_t *)VRAM_BUFFER2_START_ADDRESS;
+        bufferNew = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
     } else {
-        bufferOld = g_frontPanelBuffer1;
-        bufferNew = g_frontPanelBuffer2;
+        bufferOld = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
+        bufferNew = (uint32_t *)VRAM_BUFFER2_START_ADDRESS;
     }
 
     float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
     if (t < 1.0f) {
-        g_animationState.callback(t, bufferOld, bufferNew, g_frontPanelBuffer3);
-        updateScreen(g_frontPanelBuffer3);
+        g_animationState.callback(t, bufferOld, bufferNew, VRAM_ANIMATION_BUFFER1_START_ADDRESS);
+        updateScreen((uint32_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS);
     } else {
         g_animationState.enabled = false;
     }
 }
 
 void doTakeScreenshot() {
-    g_screenshotBuffer = new uint8_t[480 * 272 * 3];
+    uint8_t *src = (uint8_t *)(g_buffer + g_psuAppContext.y * DISPLAY_WIDTH + g_psuAppContext.x);
+    uint8_t *dst = SCREENSHOOT_BUFFER_START_ADDRESS;
 
-    uint8_t *src = (uint8_t *)(g_frontPanelBuffer + g_psuAppContext.y * g_frontPanelWidth + g_psuAppContext.x);
-    uint8_t *dst = g_screenshotBuffer;
-
-    int srcAdvance = (g_frontPanelWidth - 480) * 4;
+    int srcAdvance = (DISPLAY_WIDTH - 480) * 4;
 
     for (int y = 0; y < 272; y++) {
         for (int x = 0; x < 480; x++) {
@@ -351,35 +336,35 @@ void sync() {
     if (g_painted) {
         g_painted = false;
 
-        updateScreen(g_frontPanelBuffer);
+        updateScreen(g_buffer);
 
-        if (g_frontPanelBuffer == g_frontPanelBuffer1) {
-            g_frontPanelBuffer = g_frontPanelBuffer2;
+        if (g_buffer == (uint32_t *)VRAM_BUFFER1_START_ADDRESS) {
+            g_buffer = (uint32_t *)VRAM_BUFFER2_START_ADDRESS;
         } else {
-            g_frontPanelBuffer = g_frontPanelBuffer1;
+            g_buffer = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
         }
     }
 
 }
 
 void finishAnimation() {
-    updateScreen(g_frontPanelBuffer);
+    updateScreen(g_buffer);
 
-    if (g_frontPanelBuffer == g_frontPanelBuffer1) {
-        g_frontPanelBuffer = g_frontPanelBuffer2;
+    if (g_buffer == (uint32_t *)VRAM_BUFFER1_START_ADDRESS) {
+        g_buffer = (uint32_t *)VRAM_BUFFER2_START_ADDRESS;
     } else {
-        g_frontPanelBuffer = g_frontPanelBuffer1;
+        g_buffer = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 int getDisplayWidth() {
-    return g_frontPanelWidth;
+    return DISPLAY_WIDTH;
 }
 
 int getDisplayHeight() {
-    return g_frontPanelHeight;
+    return DISPLAY_HEIGHT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -395,7 +380,7 @@ const uint8_t *takeScreenshot() {
 		osDelay(0);
 	} while (g_takeScreenshot);
 
-    return g_screenshotBuffer;
+    return SCREENSHOOT_BUFFER_START_ADDRESS;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -410,8 +395,8 @@ static void doDrawGlyph(const gui::font::Glyph &glyph, int x_glyph, int y_glyph,
     const uint8_t *src = glyph.data + offset + iStartByte;
     int nlSrc = glyph.width - width;
 
-    uint32_t *dst = g_frontPanelBuffer + y_glyph * g_frontPanelWidth + x_glyph;
-    int nlDst = g_frontPanelWidth - width;
+    uint32_t *dst = g_buffer + y_glyph * DISPLAY_WIDTH + x_glyph;
+    int nlDst = DISPLAY_WIDTH - width;
 
     for (const uint8_t *srcEnd = src + height * glyph.width; src != srcEnd; src += nlSrc, dst += nlDst) {
         for (uint32_t *dstEnd = dst + width; dst != dstEnd; src++, dst++) {
@@ -472,7 +457,7 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
 ////////////////////////////////////////////////////////////////////////////////
 
 void drawPixel(int x, int y) {
-    *(g_frontPanelBuffer + y * g_frontPanelWidth + x) = color16to32(g_fc);
+    *(g_buffer + y * DISPLAY_WIDTH + x) = color16to32(g_fc);
 
     g_painted = true;
 }
@@ -496,11 +481,11 @@ void drawRect(int x1, int y1, int x2, int y2) {
 void fillRect(int x1, int y1, int x2, int y2, int r) {
     if (r == 0) {
         uint32_t color32 = color16to32(g_fc);
-        uint32_t *dst = g_frontPanelBuffer + y1 * g_frontPanelWidth + x1;
+        uint32_t *dst = g_buffer + y1 * DISPLAY_WIDTH + x1;
         int width = x2 - x1 + 1;
         int height = y2 - y1 + 1;
-        int nl = g_frontPanelWidth - width;
-        for (uint32_t *dstEnd = dst + height * g_frontPanelWidth; dst != dstEnd; dst += nl) {
+        int nl = DISPLAY_WIDTH - width;
+        for (uint32_t *dstEnd = dst + height * DISPLAY_WIDTH; dst != dstEnd; dst += nl) {
             for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++) {
                 *dst = color32;
             }
@@ -526,8 +511,8 @@ void fillRect(int x1, int y1, int x2, int y2, int r) {
 
 void fillRect(void *dstBuffer, int x1, int y1, int x2, int y2) {
     uint32_t color32 = color16to32(g_fc);
-    uint32_t *dst = (uint32_t *)dstBuffer + y1 * g_frontPanelWidth + x1;
-    int nl = g_frontPanelWidth - (x2 - x1 + 1);
+    uint32_t *dst = (uint32_t *)dstBuffer + y1 * DISPLAY_WIDTH + x1;
+    int nl = DISPLAY_WIDTH - (x2 - x1 + 1);
     for (int y = y1; y <= y2; y++) {
         for (int x = x1; x <= x2; x++) {
             *dst++ = color32;
@@ -539,7 +524,7 @@ void fillRect(void *dstBuffer, int x1, int y1, int x2, int y2) {
 void drawHLine(int x, int y, int l) {
     uint32_t color32 = color16to32(g_fc);
 
-    uint32_t *dst = g_frontPanelBuffer + y * g_frontPanelWidth + x;
+    uint32_t *dst = g_buffer + y * DISPLAY_WIDTH + x;
     uint32_t *dstEnd = dst + l + 1;
     while (dst < dstEnd) {
         *dst++ = color32;
@@ -551,12 +536,12 @@ void drawHLine(int x, int y, int l) {
 void drawVLine(int x, int y, int l) {
     uint32_t color32 = color16to32(g_fc);
 
-    uint32_t *dst = g_frontPanelBuffer + y * g_frontPanelWidth + x;
-    uint32_t *dstEnd = dst + (l + 1) * g_frontPanelWidth;
+    uint32_t *dst = g_buffer + y * DISPLAY_WIDTH + x;
+    uint32_t *dstEnd = dst + (l + 1) * DISPLAY_WIDTH;
 
     while (dst < dstEnd) {
         *dst = color32;
-        dst += g_frontPanelWidth;
+        dst += DISPLAY_WIDTH;
     }
 
     g_painted = true;
@@ -566,9 +551,9 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
     int width = x2 - x1 + 1;
     int height = y2 - y1 + 1;
 
-    uint32_t *src = g_frontPanelBuffer + y1 * g_frontPanelWidth + x1;
-    uint32_t *dst = g_frontPanelBuffer + dsty * g_frontPanelWidth + dstx;
-    int nl = g_frontPanelWidth - width;
+    uint32_t *src = g_buffer + y1 * DISPLAY_WIDTH + x1;
+    uint32_t *dst = g_buffer + dsty * DISPLAY_WIDTH + dstx;
+    int nl = DISPLAY_WIDTH - width;
 
     for (int y = y1; y <= y2; y++, src += nl, dst += nl) {
         for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++, src++) {
@@ -581,13 +566,13 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
 }
 
 void bitBlt(void *src, int x1, int y1, int x2, int y2) {
-    bitBlt(src, g_frontPanelBuffer, x1, y1, x2, y2);
+    bitBlt(src, g_buffer, x1, y1, x2, y2);
 }
 
 void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
     for (int y = y1; y <= y2; ++y) {
         for (int x = x1; x <= x2; ++x) {
-            int i = y * g_frontPanelWidth + x;
+            int i = y * DISPLAY_WIDTH + x;
             ((uint32_t *)dst)[i] = ((uint32_t *)src)[i];
         }
     }
@@ -595,23 +580,23 @@ void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
 
 void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity) {
     if (dst == nullptr) {
-        dst = g_frontPanelBuffer;
+        dst = g_buffer;
     }
 
     if (opacity == 255) {
         for (int y = 0; y < sh; ++y) {
             for (int x = 0; x < sw; ++x) {
-                ((uint32_t *)dst)[(dy + y) * g_frontPanelWidth + dx + x] = ((uint32_t *)src)[(sy + y) * g_frontPanelWidth + sx + x];
+                ((uint32_t *)dst)[(dy + y) * DISPLAY_WIDTH + dx + x] = ((uint32_t *)src)[(sy + y) * DISPLAY_WIDTH + sx + x];
             }
         }
     } else {
         for (int y = 0; y < sh; ++y) {
             for (int x = 0; x < sw; ++x) {
-                uint8_t *p = (uint8_t *)&((uint32_t *)src)[(sy + y) * g_frontPanelWidth + sx + x];
+                uint8_t *p = (uint8_t *)&((uint32_t *)src)[(sy + y) * DISPLAY_WIDTH + sx + x];
                 p[3] = opacity;
-                ((uint32_t *)dst)[(dy + y) * g_frontPanelWidth + dx + x] = blendColor(
-                    ((uint32_t *)src)[(sy + y) * g_frontPanelWidth + sx + x],
-                    ((uint32_t *)dst)[(dy + y) * g_frontPanelWidth + dx + x]
+                ((uint32_t *)dst)[(dy + y) * DISPLAY_WIDTH + dx + x] = blendColor(
+                    ((uint32_t *)src)[(sy + y) * DISPLAY_WIDTH + sx + x],
+                    ((uint32_t *)dst)[(dy + y) * DISPLAY_WIDTH + dx + x]
                 );
             }
         }
@@ -619,8 +604,8 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
 }
 
 void drawBitmap(void *bitmapData, int bitmapBpp, int bitmapWidth, int x, int y, int width, int height) {
-    uint32_t *dst = g_frontPanelBuffer + y * g_frontPanelWidth + x;
-    int nlDst = g_frontPanelWidth - width;
+    uint32_t *dst = g_buffer + y * DISPLAY_WIDTH + x;
+    int nlDst = DISPLAY_WIDTH - width;
 
     if (bitmapBpp == 32) {
         uint32_t *src = (uint32_t *)bitmapData;

@@ -39,7 +39,7 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/persist_conf.h>
 
-#include <eez/platform/stm32/defines.h>
+#include <eez/memory.h>
 
 using namespace eez::gui;
 
@@ -104,7 +104,7 @@ void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color
 		HAL_DMA2D_Start(&hdma2d, colorBGRA, vramOffset(dst, x, y), width, height);
 	} else {
 		// fill aux. buffer with BGRA color
-		auto auxBuffer = (uint32_t *)VRAM_BUFFER3_START_ADDRESS;
+		auto auxBuffer = (uint32_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS;
 
 		hdma2d.Init.Mode = DMA2D_R2M;
 		hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
@@ -382,11 +382,14 @@ void turnOn() {
         g_bufferNew = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
         g_buffer = g_bufferNew;
 
-        for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-            g_buffers[bufferIndex].bufferPointer = (uint16_t *)(VRAM_BUFFER5_START_ADDRESS + bufferIndex * VRAM_BUFFER_SIZE);
-        }
-
-        assert((uint32_t)g_buffers[NUM_BUFFERS - 1].bufferPointer + VRAM_BUFFER_SIZE - SDRAM_START_ADDRESS <= SDRAM_SIZE);
+		g_buffers[0].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER1_START_ADDRESS);
+		g_buffers[1].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER2_START_ADDRESS);
+		g_buffers[2].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER3_START_ADDRESS);
+		g_buffers[3].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER4_START_ADDRESS);
+		g_buffers[4].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER5_START_ADDRESS);
+		g_buffers[5].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER6_START_ADDRESS);
+		g_buffers[6].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER7_START_ADDRESS);
+		g_buffers[7].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER8_START_ADDRESS);
 #endif
         fillRect(g_buffer, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
 
@@ -426,9 +429,9 @@ void animate() {
 #if OPTION_SDRAM
 	float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
 	if (t < 1.0f) {
-		g_animationBuffer = g_animationBuffer == (uint16_t *)VRAM_BUFFER3_START_ADDRESS
-						 ? (uint16_t *)VRAM_BUFFER4_START_ADDRESS
-						 : (uint16_t *)VRAM_BUFFER3_START_ADDRESS;
+		g_animationBuffer = g_animationBuffer == (uint16_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS
+						 ? (uint16_t *)VRAM_ANIMATION_BUFFER2_START_ADDRESS
+						 : (uint16_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS;
 
 		g_animationState.callback(t, g_bufferOld, g_buffer, g_animationBuffer);
 
@@ -513,7 +516,7 @@ void sync() {
 
     if (g_takeScreenshot) {
 #if OPTION_SDRAM
-    	bitBltRGB888(g_bufferOld, (uint8_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    	bitBltRGB888(g_bufferOld, SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
         DMA2D_WAIT;
 #endif
     	g_takeScreenshot = false;
@@ -542,7 +545,7 @@ const uint8_t *takeScreenshot() {
 		osDelay(0);
 	} while (g_takeScreenshot);
 
-	return (const uint8_t *)VRAM_SCREENSHOOT_BUFFER_START_ADDRESS;
+	return SCREENSHOOT_BUFFER_START_ADDRESS;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

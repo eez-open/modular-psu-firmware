@@ -30,9 +30,7 @@
 #include <eez/gui/document.h>
 #include <eez/system.h>
 
-#ifdef EEZ_PLATFORM_STM32
-#include <eez/platform/stm32/defines.h>
-#endif
+#include <eez/memory.h>
 
 namespace eez {
 namespace gui {
@@ -93,19 +91,10 @@ void decompressAssets() {
 
     // first 4 bytes (uint32_t) are decompressed size
     int decompressedSize = (int)(((uint32_t *)assets)[0]);
+    assert(decompressedSize <= DECOMPRESSED_ASSETS_SIZE);
+    g_decompressedAssets = DECOMPRESSED_ASSETS_START_ADDRESS;
 
-#ifdef EEZ_PLATFORM_SIMULATOR
-    g_decompressedAssets = (uint8_t *)malloc(decompressedSize);
-    if (!g_decompressedAssets) {
-        shutdown();
-        return;
-    }
-#else
-    g_decompressedAssets = (uint8_t *)DECOMPRESSED_ASSETS_START_ADDRESS;
-#endif
-
-    int result = LZ4_decompress_safe((const char *)assets + 4, (char *)g_decompressedAssets,
-        compressedSize, decompressedSize);
+    int result = LZ4_decompress_safe((const char *)assets + 4, (char *)g_decompressedAssets, compressedSize, decompressedSize);
     assert(result == decompressedSize);
 #else
     g_decompressedAssets = (uint8_t *)assets;

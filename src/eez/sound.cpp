@@ -33,12 +33,11 @@
 #include <math.h>
 #include <dac.h>
 #include <tim.h>
-#include <eez/platform/stm32/defines.h>
-
 #endif
 
 #include <eez/sound.h>
 #include <eez/system.h>
+#include <eez/memory.h>
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/scpi/scpi.h>
@@ -1479,7 +1478,7 @@ int16_t g_memoryForTuneSamples[g_memoryForTuneSamplesSize];
 SDL_AudioDeviceID g_dev;
 #elif defined(EEZ_PLATFORM_STM32)
 static const uint32_t g_memoryForTuneSamplesSize = SOUND_TUNES_MEMORY_SIZE;
-uint8_t *g_memoryForTuneSamples = (uint8_t *)SOUND_TUNES_MEMORY;
+uint8_t *g_memoryForTuneSamples = SOUND_TUNES_MEMORY;
 #endif
 
 #if !defined(__EMSCRIPTEN__)
