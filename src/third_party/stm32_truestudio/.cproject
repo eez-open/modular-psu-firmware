@@ -106,7 +106,7 @@
 								<option id="com.atollic.truestudio.gcc.optimization.prep_garbage.586275206" name="Prepare dead code removal " superClass="com.atollic.truestudio.gcc.optimization.prep_garbage" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option id="com.atollic.truestudio.gcc.optimization.prep_data.1044766448" name="Prepare dead data removal" superClass="com.atollic.truestudio.gcc.optimization.prep_data" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option id="com.atollic.truestudio.gcc.misc.otherflags.895097519" name="Other options" superClass="com.atollic.truestudio.gcc.misc.otherflags" useByScannerDiscovery="false" value="" valueType="string"/>
-								<option id="com.atollic.truestudio.exe.debug.toolchain.gcc.optimization.level.1763412676" name="Optimization Level" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.optimization.level" useByScannerDiscovery="false" value="com.atollic.truestudio.gcc.optimization.level.0s" valueType="enumerated"/>
+								<option id="com.atollic.truestudio.exe.debug.toolchain.gcc.optimization.level.1763412676" name="Optimization Level" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.optimization.level" useByScannerDiscovery="false" value="com.atollic.truestudio.gcc.optimization.level.0g" valueType="enumerated"/>
 								<option id="com.atollic.truestudio.common_options.target.fpu.829683864" name="Floating point" superClass="com.atollic.truestudio.common_options.target.fpu" useByScannerDiscovery="false" value="com.atollic.truestudio.common_options.target.fpu.hard" valueType="enumerated"/>
 								<option id="com.atollic.truestudio.common_options.target.fpucore.1297069055" name="FPU" superClass="com.atollic.truestudio.common_options.target.fpucore" useByScannerDiscovery="false" value="com.atollic.truestudio.common_options.target.fpucore.fpv5-d16" valueType="enumerated"/>
 								<option id="com.atollic.truestudio.common_options.target.interwork.1173495076" name="Mix ARM/Thumb" superClass="com.atollic.truestudio.common_options.target.interwork" useByScannerDiscovery="false"/>
@@ -254,10 +254,8 @@
 							<tool id="com.atollic.truestudio.exe.debug.toolchain.secoutput.492725595" name="Other" superClass="com.atollic.truestudio.exe.debug.toolchain.secoutput.839033486"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.atollic.truestudio.exe.debug.1518366166.718005614" name="gccollect_simulator.c" rcbsApplicability="disable" resourcePath="micropython/ports/bb3/gccollect_simulator.c" toolsToInvoke="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1282955217">
-						<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1282955217" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447">
-							<inputType id="com.atollic.truestudio.gcc.input.704885575" superClass="com.atollic.truestudio.gcc.input"/>
-						</tool>
+					<fileInfo id="com.atollic.truestudio.exe.debug.1518366166.1016139296" name="gchelper_m0.s" rcbsApplicability="disable" resourcePath="micropython/lib/utils/gchelper_m0.s" toolsToInvoke="com.atollic.truestudio.exe.debug.toolchain.as.1545899283.1451400809">
+						<tool id="com.atollic.truestudio.exe.debug.toolchain.as.1545899283.1451400809" name="Assembler" superClass="com.atollic.truestudio.exe.debug.toolchain.as.1545899283"/>
 					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
@@ -267,7 +265,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
 						<entry excluding="libs/image/nanojpeg.c|libs/umm_malloc|gui/document_stm32.cpp|gui/document_simulator.cpp|libs/sd_fat/simulator|modules/psu/simulator|modules/mcu/simulator|apps/psu/simulator|apps/psu/platform/simulator|platform/simulator" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libscpi"/>
-						<entry excluding="ports/bb3/gccollect_simulator.c|ports/bare-arm|extmod" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
+						<entry excluding="lib/utils/gchelper_m0.s|ports/bb3/gccollect_simulator.c|ports/bare-arm|extmod" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 					</sourceEntries>
 				</configuration>

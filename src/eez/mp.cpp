@@ -233,21 +233,19 @@ void oneIter() {
     if (event.status == osEventMessage) {
         switch (event.value.v) {
         case QUEUE_MESSAGE_START_SCRIPT:
-            static bool g_initialized = false;
-            if (!g_initialized) {
-                volatile char dummy;
-                g_initialized = true;
-                mp_stack_set_top((void *)&dummy);
-                gc_init(g_scriptSource + g_scriptSourceLength, MP_BUFFER + MP_BUFFER_SIZE - 32768 - 1024);
-                mp_init();
-            }
+#if 0
+        	// this version reinitialise MP every time
+			volatile char dummy;
+			mp_stack_set_top((void *)&dummy);
+			gc_init(g_scriptSource + g_scriptSourceLength, MP_BUFFER + MP_BUFFER_SIZE - 32768 - 1024);
+			mp_init();
 
             nlr_buf_t nlr;
             if (nlr_push(&nlr) == 0) {
                 mp_lexer_t *lex = mp_lexer_new_from_str_len(MP_QSTR__lt_stdin_gt_, g_scriptSource, g_scriptSourceLength, 0);
                 qstr source_name = lex->source_name;
                 mp_parse_tree_t parse_tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
-                mp_obj_t module_fun = mp_compile(&parse_tree, source_name, MP_EMIT_OPT_NONE, true);
+                mp_obj_t module_fun = mp_compile(&parse_tree, source_name/*, MP_EMIT_OPT_NONE*/, true);
                 mp_call_function_0(module_fun);
                 nlr_pop();
             } else {
@@ -255,9 +253,36 @@ void oneIter() {
                 mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
             }
 
-            // gc_sweep_all();
+            gc_sweep_all();
+            mp_deinit();
+#endif
 
-            // mp_deinit();
+#if 1
+        	// this version doesn't reinitialise MP every time
+			static bool g_initialized = false;
+			if (!g_initialized) {
+				volatile char dummy;
+				g_initialized = true;
+				mp_stack_set_top((void *)&dummy);
+				gc_init(g_scriptSource + g_scriptSourceLength, MP_BUFFER + MP_BUFFER_SIZE - 32768 - 1024);
+				mp_init();
+			}
+
+			nlr_buf_t nlr;
+			if (nlr_push(&nlr) == 0) {
+				mp_lexer_t *lex = mp_lexer_new_from_str_len(MP_QSTR__lt_stdin_gt_, g_scriptSource, g_scriptSourceLength, 0);
+				qstr source_name = lex->source_name;
+				mp_parse_tree_t parse_tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
+				mp_obj_t module_fun = mp_compile(&parse_tree, source_name/*, MP_EMIT_OPT_NONE*/, true);
+				mp_call_function_0(module_fun);
+				nlr_pop();
+			} else {
+				// uncaught exception
+				mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
+			}
+
+			mp_deinit();
+#endif
 
             break;
         }
