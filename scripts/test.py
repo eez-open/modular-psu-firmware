@@ -4,8 +4,8 @@ from eez import scpi #, dlog
 
 U_STEP = 0.1
 U_MAX = 40.0
-TIME_STEP_MS = 10
-MEASURE_DELAY_MS = 5
+#TIME_STEP_MS = 10
+#MEASURE_DELAY_MS = 5
 I_SET = 0.001
 
 scpi("inst ch1")
@@ -14,7 +14,7 @@ scpi("outp 1")
 
 print("start")
 
-#i_list = []
+i_list = []
 #t = ticks_ms()
 i = 0
 while True:
@@ -23,6 +23,14 @@ while True:
         break
 
     scpi("volt " + str(u_set))
+    curr = scpi("curr?")
+    mode = scpi("outp:mode?")
+
+    i_list.append(float(curr))
+
+    #print(u_set)
+    #print(curr)
+    #print(mode)
 
     i = i + 1
 
@@ -33,6 +41,8 @@ while True:
     #    break
 
     #i_list.add(scpi("curr?"))
+
+print(i_list)
 
      #t = ticks_add(t, (TIME_STEP_MS - MEASURE_DELAY_MS) * 1000)
     #sleep_ms(ticks_diff(t, ticks_ms()))

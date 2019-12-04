@@ -111,7 +111,7 @@ osThreadId g_mpTaskHandle;
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #endif
 
-osThreadDef(g_mpTask, mainLoop, osPriorityNormal, 0, 2048);
+osThreadDef(g_mpTask, mainLoop, osPriorityNormal, 0, 4096);
 
 #if defined(EEZ_PLATFORM_STM32)
 #pragma GCC diagnostic pop
@@ -233,26 +233,21 @@ void oneIter() {
     if (event.status == osEventMessage) {
         switch (event.value.v) {
         case QUEUE_MESSAGE_START_SCRIPT:
-
-            // Initialized stack limit
-            //mp_stack_set_limit(40000 * (BYTES_PER_WORD / 4));
-
-            // Initialize heap
-
-            // volatile int stackTop;
-            // mp_stack_set_top((void *)(&stackTop));
-            // mp_stack_set_limit(1024);
-
-            gc_init(g_scriptSource + g_scriptSourceLength, MP_BUFFER + MP_BUFFER_SIZE);
-
-            mp_init();
+            static bool g_initialized = false;
+            if (!g_initialized) {
+                volatile char dummy;
+                g_initialized = true;
+                mp_stack_set_top((void *)&dummy);
+                gc_init(g_scriptSource + g_scriptSourceLength, MP_BUFFER + MP_BUFFER_SIZE - 32768 - 1024);
+                mp_init();
+            }
 
             nlr_buf_t nlr;
             if (nlr_push(&nlr) == 0) {
                 mp_lexer_t *lex = mp_lexer_new_from_str_len(MP_QSTR__lt_stdin_gt_, g_scriptSource, g_scriptSourceLength, 0);
                 qstr source_name = lex->source_name;
                 mp_parse_tree_t parse_tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
-                mp_obj_t module_fun = mp_compile(&parse_tree, source_name, true);
+                mp_obj_t module_fun = mp_compile(&parse_tree, source_name, MP_EMIT_OPT_NONE, true);
                 mp_call_function_0(module_fun);
                 nlr_pop();
             } else {
@@ -260,7 +255,9 @@ void oneIter() {
                 mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
             }
 
-            mp_deinit();
+            // gc_sweep_all();
+
+            // mp_deinit();
 
             break;
         }
@@ -328,29 +325,33 @@ void onQueueMessage(uint32_t type, uint32_t param) {
 }
 
 bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen) {
-    g_commandOrQueryText = commandOrQueryText;
     g_scpiDataLen = 0;
 
-    osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MP_MESSAGE(EXECUTE_SCPI, 0), osWaitForever);
+    // g_commandOrQueryText = commandOrQueryText;
+    // osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MP_MESSAGE(EXECUTE_SCPI, 0), osWaitForever);
 
-    while (true) {
-       osEvent event = osMessageGet(g_mpMessageQueueId, osWaitForever);
-       if (event.status == osEventMessage) {
-           switch (event.value.v) {
-           case QUEUE_MESSAGE_SCPI_RESULT:
-               *resultText = g_scpiData;
-               *resultTextLen = g_scpiDataLen;
-               return true;
-           }
-       }
+    // while (true) {
+    //    osEvent event = osMessageGet(g_mpMessageQueueId, osWaitForever);
+    //    if (event.status == osEventMessage) {
+    //        switch (event.value.v) {
+    //        case QUEUE_MESSAGE_SCPI_RESULT:
+    //            *resultText = g_scpiData;
+    //            *resultTextLen = g_scpiDataLen;
+    //            return true;
+    //        }
+    //    }
+    // }
+
+    input(g_scpiContext, (const char *)commandOrQueryText, strlen(commandOrQueryText));
+    input(g_scpiContext, "\r\n", 2);
+
+    if (g_scpiDataLen >= 2 && g_scpiData[g_scpiDataLen - 2] == '\r' && g_scpiData[g_scpiDataLen - 1] == '\n') {
+        g_scpiDataLen -= 2;
     }
 
-    // input(g_scpiContext, (const char *)commandOrQueryText, strlen(commandOrQueryText));
-    // input(g_scpiContext, "\r\n", 2);
-
-    // *resultText = g_scpiData;
-    // *resultTextLen = g_scpiDataLen;
-    // return true;
+    *resultText = g_scpiData;
+    *resultTextLen = g_scpiDataLen;
+    return true;
 }
 
 } // mp

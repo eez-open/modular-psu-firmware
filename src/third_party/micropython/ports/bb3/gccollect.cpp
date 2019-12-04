@@ -3,7 +3,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2013, 2014 Damien P. George and 2017, 2018 Rami Ali
+ * Copyright (c) 2013, 2014 Damien P. George
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,8 @@
  * THE SOFTWARE.
  */
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
 #include <stdio.h>
-#endif
+#include <setjmp.h>
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -34,37 +33,33 @@
 #endif
 
 extern "C" {
-#include "mphalport.h"
+#include "py/mpstate.h"
+#include "py/gc.h"
 }
 
 #ifdef _MSC_VER
 #pragma warning( pop )
 #endif
 
-#include "cmsis_os.h"
+#if MICROPY_ENABLE_GC
 
 #include <eez/debug.h>
 
-extern"C" void mp_hal_stdout_tx_strn(const char *str, size_t len) {
-    DebugTrace("%.*s", len, str);
+typedef jmp_buf regs_t;
+static void gc_helper_get_regs(regs_t arr) {
+    setjmp(arr);
 }
 
-extern"C" void mp_hal_delay_ms(mp_uint_t ms) {
-    osDelay(ms);
+extern "C" void gc_collect(void) {
+    DebugTrace("gc_collect\n");
+
+    gc_collect_start();
+    regs_t regs;
+    gc_helper_get_regs(regs);
+    // GC stack (and regs because we captured them)
+    void **regs_ptr = (void**)(void*)&regs;
+    gc_collect_root(regs_ptr, ((mp_uint_t)MP_STATE_THREAD(stack_top) - (mp_uint_t)&regs) / sizeof(mp_uint_t));
+    gc_collect_end();
 }
 
-extern"C" void mp_hal_delay_us(mp_uint_t us) {
-    osDelay((us + 999) / 1000);
-}
-
-extern"C" mp_uint_t mp_hal_ticks_us(void) {
-    return osKernelSysTick() * 1000;
-}
-
-extern"C" mp_uint_t mp_hal_ticks_ms(void) {
-    return osKernelSysTick();
-}
-
-extern"C" mp_uint_t mp_hal_ticks_cpu(void) {
-    return osKernelSysTick();
-}
+#endif //MICROPY_ENABLE_GC

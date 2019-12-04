@@ -533,7 +533,7 @@ source_group("third_party\\micropython\\extmod" FILES ${src_third_party_micropyt
 
 set(src_third_party_micropython_ports_bb3
     src/third_party/micropython/ports/bb3/main.c
-    src/third_party/micropython/ports/bb3/gccollect.c
+    src/third_party/micropython/ports/bb3/gccollect.cpp
     src/third_party/micropython/ports/bb3/mphalport.cpp
 )
 list (APPEND src_files ${src_third_party_micropython_ports_bb3})
