@@ -278,9 +278,6 @@
 /// To prevent too fast switching betweeen current ranges
 #define CURRENT_AUTO_RANGE_SWITCHING_DELAY_MS 5
 
-/// Change to 1 if you want to add jitter column in DLOG file
-#define CONF_DLOG_JITTER 0
-
 /// During data logging call file.sync every N seconds
 #define CONF_DLOG_SYNC_FILE_TIME 10 // 10 seconds
 

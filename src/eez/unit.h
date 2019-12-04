@@ -37,7 +37,8 @@ enum Unit {
     UNIT_KOHM,
     UNIT_MOHM,
     UNIT_PERCENT,
-    UNIT_FREQUENCY
+    UNIT_FREQUENCY,
+    UNIT_JOULE
 };
 
 extern const char *g_unitNames[];
@@ -45,5 +46,8 @@ extern const char *g_unitNames[];
 inline const char *getUnitName(Unit unit) {
     return g_unitNames[unit];
 }
+
+int getScpiUnit(Unit unit);
+
 
 } // namespace eez

@@ -59,8 +59,9 @@ namespace dlog_view {
 
 static const uint32_t MAGIC1 = 0x2D5A4545;
 static const uint32_t MAGIC2 = 0x474F4C44;
-static const uint16_t VERSION = 1;
-static const uint32_t DLOG_HEADER_SIZE = 28;
+static const uint16_t VERSION1 = 1;
+static const uint16_t VERSION2 = 2;
+static const uint32_t DLOG_VERSION1_HEADER_SIZE = 28;
 
 static const int VIEW_WIDTH = 480;
 static const int VIEW_HEIGHT = 240;
@@ -71,11 +72,30 @@ static const int NUM_VERT_DIVISIONS = 6;
 static const float TIME_PREC = 0.005f;
 static const float VALUE_PREC = 0.1f;
 
+static const int MAX_NUM_OF_Y_AXES = CH_MAX * 3;
+
 enum State {
     STATE_STARTING,
     STATE_LOADING,
     STATE_ERROR,
     STATE_READY
+};
+
+enum Fields {
+    FIELD_ID_X_UNIT = 10,
+    FIELD_ID_X_STEP = 11,
+    FIELD_ID_X_RANGE_MIN = 12,
+    FIELD_ID_X_RANGE_MAX = 13,
+    FIELD_ID_X_LABEL = 14,
+
+    FIELD_ID_Y_UNIT = 30,
+    FIELD_ID_Y_RANGE_MIN = 32,
+    FIELD_ID_Y_RANGE_MAX = 33,
+    FIELD_ID_Y_LABEL = 34,
+    FIELD_ID_Y_CHANNEL_INDEX = 35,
+
+    FIELD_ID_CHANNEL_MODULE_TYPE = 50,
+    FIELD_ID_CHANNEL_MODULE_REVISION = 51
 };
 
 enum DlogValueType {
@@ -99,8 +119,34 @@ enum DlogValueType {
     DLOG_VALUE_CH6_P,
 };
 
+struct Range {
+    float min;
+    float max;
+};
+
+static const int MAX_LABEL_LENGTH = 32;
+
+struct XAxis {
+    Unit unit;
+    float step;
+    Range range;
+    char label[MAX_LABEL_LENGTH + 1];
+};
+
+struct YAxis {
+    Unit unit;
+    Range range;
+    char label[MAX_LABEL_LENGTH + 1];
+    int8_t channelIndex;
+};
+
 struct Parameters {
     char filePath[MAX_PATH_LENGTH + 1];
+
+    XAxis xAxis;
+
+    uint8_t numYAxes;
+    YAxis yAxes[MAX_NUM_OF_Y_AXES];
 
     bool logVoltage[CH_MAX];
     bool logCurrent[CH_MAX];
@@ -121,7 +167,6 @@ struct DlogValueParams {
 struct Recording {
     Parameters parameters;
 
-    uint8_t totalDlogValues;
     DlogValueParams dlogValues[MAX_NUM_OF_Y_VALUES];
 
     uint32_t size;
@@ -140,6 +185,8 @@ struct Recording {
     float minPeriod;
     float timeDivMin;
     float timeDivMax;
+
+    uint32_t dataOffset;
 };
 
 extern bool g_showLatest;
@@ -158,7 +205,8 @@ void stateManagment();
 
 Recording &getRecording();
 
-void setDlogValue(int dlogValueIndex, int channelIndex, DlogValueType valueType);
+void initAxis(Recording &recording);
+void initDlogValues(Recording &recording);
 int getNumVisibleDlogValues(const Recording &recording);
 int getVisibleDlogValueIndex(Recording &recording, int visibleDlogValueIndex);
 DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex);

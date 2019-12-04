@@ -205,6 +205,11 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
 #endif
 }
 
+scpi_result_t scpi_cmd_displayWindowDlog(scpi_t *context) {
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_DLOG_VIEW);
+    return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

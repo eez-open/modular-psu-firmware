@@ -4876,7 +4876,7 @@ void data_dlog_value_state(data::DataOperationEnum operation, data::Cursor &curs
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
-        value = cursor.i < recording.totalDlogValues ? recording.dlogValues[cursor.i].isVisible : 2;
+        value = cursor.i < recording.parameters.numYAxes ? recording.dlogValues[cursor.i].isVisible : 2;
     }
 #endif
 }

@@ -55,7 +55,8 @@ int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePa
 bool isIdle();
 bool isInitiated();
 bool isExecuting();
-int initiate();                                                                                                                                                                                                                                                                                                                                                                                                                     
+int initiate();
+int initiateTrace();
 int startImmediately();
 void triggerGenerated();
 void toggle();

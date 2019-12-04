@@ -18,6 +18,8 @@
 
 #include <eez/unit.h>
 
+#include <scpi/types.h>
+
 namespace eez {
 
 const char *g_unitNames[] = {
@@ -37,7 +39,33 @@ const char *g_unitNames[] = {
     "Kohm",
     "Mohm",
     "%",
-    "Hz"
+    "Hz",
+    "J"
 };
+
+static const int g_scpiUnits[] = {
+    SCPI_UNIT_NONE,
+    SCPI_UNIT_VOLT,
+    SCPI_UNIT_VOLT,
+    SCPI_UNIT_AMPER,
+    SCPI_UNIT_AMPER,
+    SCPI_UNIT_AMPER,
+    SCPI_UNIT_WATT,
+    SCPI_UNIT_WATT,
+    SCPI_UNIT_SECOND,
+    SCPI_UNIT_SECOND,
+    SCPI_UNIT_CELSIUS,
+    SCPI_UNIT_NONE,
+    SCPI_UNIT_OHM,
+    SCPI_UNIT_OHM,
+    SCPI_UNIT_OHM,
+    SCPI_UNIT_NONE,
+    SCPI_UNIT_HERTZ,
+    SCPI_UNIT_JOULE
+};
+
+int getScpiUnit(Unit unit) {
+    return g_scpiUnits[unit];
+}
 
 } // namespace eez

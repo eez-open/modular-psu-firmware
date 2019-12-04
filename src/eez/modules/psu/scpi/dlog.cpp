@@ -41,13 +41,13 @@ scpi_result_t scpi_cmd_abortDlog(scpi_t *context) {
 scpi_result_t scpi_cmd_initiateDlog(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
-    char filePath[MAX_PATH_LENGTH + 1];
-    if (!getFilePath(context, filePath, true)) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
     }
 
-    if (!dlog_record::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+    char filePath[MAX_PATH_LENGTH + 1];
+    if (!getFilePath(context, filePath, true)) {
         return SCPI_RES_ERR;
     }
 
@@ -69,6 +69,11 @@ scpi_result_t scpi_cmd_initiateDlog(scpi_t *context) {
 scpi_result_t scpi_cmd_senseDlogFunctionVoltage(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -76,11 +81,6 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltage(scpi_t *context) {
 
     Channel *channel = param_channel(context);
     if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    if (!dlog_record::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
     }
 
@@ -113,6 +113,11 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltageQ(scpi_t *context) {
 scpi_result_t scpi_cmd_senseDlogFunctionCurrent(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -120,11 +125,6 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrent(scpi_t *context) {
 
     Channel *channel = param_channel(context);
     if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    if (!dlog_record::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
     }
 
@@ -157,6 +157,11 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrentQ(scpi_t *context) {
 scpi_result_t scpi_cmd_senseDlogFunctionPower(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -164,11 +169,6 @@ scpi_result_t scpi_cmd_senseDlogFunctionPower(scpi_t *context) {
 
     Channel *channel = param_channel(context);
     if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    if (!dlog_record::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
     }
 
@@ -201,6 +201,11 @@ scpi_result_t scpi_cmd_senseDlogFunctionPowerQ(scpi_t *context) {
 scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
     scpi_number_t param;
     if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
         return SCPI_RES_ERR;
@@ -228,11 +233,6 @@ scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
         period = (float)param.content.value;
     }
 
-    if (!dlog_record::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
-        return SCPI_RES_ERR;
-    }
-
     dlog_record::g_parameters.period = period;
 
     return SCPI_RES_OK;
@@ -256,6 +256,11 @@ scpi_result_t scpi_cmd_senseDlogPeriodQ(scpi_t *context) {
 scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_SD_CARD
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
     scpi_number_t param;
     if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
         return SCPI_RES_ERR;
@@ -283,11 +288,6 @@ scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
         time = (float)param.content.value;
     }
 
-    if (!dlog_record::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
-        return SCPI_RES_ERR;
-    }
-
     dlog_record::g_parameters.time = time;
 
     return SCPI_RES_OK;
@@ -307,6 +307,426 @@ scpi_result_t scpi_cmd_senseDlogTimeQ(scpi_t *context) {
     return SCPI_RES_ERR;
 #endif
 }
+
+static scpi_choice_def_t unitChoice[] = {
+    { "UNKNown", UNIT_UNKNOWN },
+    { "VOLT", UNIT_VOLT },
+    { "AMPEr", UNIT_AMPER },
+    { "WATT", UNIT_WATT },
+    { "JOULe", UNIT_JOULE },
+    { "SECOnd", UNIT_SECOND },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_senseDlogTraceXUnit(scpi_t *context) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t unit;
+    if (!SCPI_ParamChoice(context, unitChoice, &unit, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    dlog_record::g_parameters.xAxis.unit = (Unit)unit;
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceXUnitQ(scpi_t *context) {
+    resultChoiceName(context, unitChoice, dlog_record::g_parameters.xAxis.unit);
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceXStep(scpi_t *context) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    float step;
+
+    if (param.special) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    } else {
+        if (param.unit != SCPI_UNIT_NONE && param.unit != getScpiUnit(dlog_record::g_parameters.xAxis.unit)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+
+        step = (float)param.content.value;
+
+        if (step <= 0) {
+            SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+            return SCPI_RES_ERR;
+        }
+    }
+
+    dlog_record::g_parameters.xAxis.step = step;
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceXStepQ(scpi_t *context) {
+    SCPI_ResultFloat(context, dlog_record::g_parameters.xAxis.step);
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceXLabel(scpi_t *context) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    const char *label;
+    size_t len;
+    if (!SCPI_ParamCharacters(context, &label, &len, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (len > dlog_view::MAX_LABEL_LENGTH) {
+        SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+        return SCPI_RES_ERR;
+    }
+
+    strncpy(dlog_record::g_parameters.xAxis.label, label, len);
+    dlog_record::g_parameters.xAxis.label[len] = 0;
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceXLabelQ(scpi_t *context) {
+    SCPI_ResultText(context, dlog_record::g_parameters.xAxis.label);
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceXRangeMin(scpi_t *context) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    float min;
+
+    if (param.special) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    } else {
+        if (param.unit != SCPI_UNIT_NONE && param.unit != getScpiUnit(dlog_record::g_parameters.xAxis.unit)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+
+        min = (float)param.content.value;
+        
+        if (min >= dlog_record::g_parameters.xAxis.range.max) {
+            SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+            return SCPI_RES_ERR;
+        }
+    }
+
+    dlog_record::g_parameters.xAxis.range.min = min;
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceXRangeMinQ(scpi_t *context) {
+    SCPI_ResultFloat(context, dlog_record::g_parameters.xAxis.range.min);
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceXRangeMax(scpi_t *context) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    float max;
+
+    if (param.special) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    } else {
+        if (param.unit != SCPI_UNIT_NONE && param.unit != getScpiUnit(dlog_record::g_parameters.xAxis.unit)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+
+        max = (float)param.content.value;
+
+        if (max <= dlog_record::g_parameters.xAxis.range.min) {
+            SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+            return SCPI_RES_ERR;
+        }
+    }
+
+    dlog_record::g_parameters.xAxis.range.max = max;
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceXRangeMaxQ(scpi_t *context) {
+    SCPI_ResultFloat(context, dlog_record::g_parameters.xAxis.range.max);
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceYUnit(scpi_t *context) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t yAxisIndex = 0;
+    SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
+    yAxisIndex--;
+
+    if (yAxisIndex < 0 || yAxisIndex >= dlog_view::MAX_NUM_OF_Y_AXES) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t unit;
+    if (!SCPI_ParamChoice(context, unitChoice, &unit, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
+        dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
+    }
+
+    dlog_record::g_parameters.yAxes[yAxisIndex].unit = (Unit)unit;
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceYUnitQ(scpi_t *context) {
+    int32_t yAxisIndex = 0;
+    SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
+    yAxisIndex--;
+
+    if (yAxisIndex < 0 || yAxisIndex >= dlog_record::g_parameters.numYAxes) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, unitChoice, dlog_record::g_parameters.yAxes[yAxisIndex].unit);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceYLabel(scpi_t *context) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t yAxisIndex = 0;
+    SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
+    yAxisIndex--;
+
+    if (yAxisIndex < 0 || yAxisIndex >= dlog_view::MAX_NUM_OF_Y_AXES) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
+        return SCPI_RES_ERR;
+    }
+
+    const char *label;
+    size_t len;
+    if (!SCPI_ParamCharacters(context, &label, &len, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (len > dlog_view::MAX_LABEL_LENGTH) {
+        SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+        return SCPI_RES_ERR;
+    }
+
+    if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
+        dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
+    }
+
+    strncpy(dlog_record::g_parameters.yAxes[yAxisIndex].label, label, len);
+    dlog_record::g_parameters.yAxes[yAxisIndex].label[len] = 0;
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceYLabelQ(scpi_t *context) {
+    int32_t yAxisIndex = 0;
+    SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
+    yAxisIndex--;
+
+    if (yAxisIndex < 0 || yAxisIndex >= dlog_record::g_parameters.numYAxes) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultText(context, dlog_record::g_parameters.yAxes[yAxisIndex].label);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceYRangeMin(scpi_t *context) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t yAxisIndex = 0;
+    SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
+    yAxisIndex--;
+
+    if (yAxisIndex < 0 || yAxisIndex >= dlog_view::MAX_NUM_OF_Y_AXES) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
+        return SCPI_RES_ERR;
+    }
+
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    float min;
+
+    if (param.special) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    } else {
+        if (param.unit != SCPI_UNIT_NONE && param.unit != getScpiUnit(dlog_record::g_parameters.yAxes[yAxisIndex].unit)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+
+        min = (float)param.content.value;
+        
+        if (min >= dlog_record::g_parameters.yAxes[yAxisIndex].range.max) {
+            SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+            return SCPI_RES_ERR;
+        }
+    }
+
+    if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
+        dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
+    }
+
+    dlog_record::g_parameters.yAxes[yAxisIndex].range.min = min;
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceYRangeMinQ(scpi_t *context) {
+    int32_t yAxisIndex = 0;
+    SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
+    yAxisIndex--;
+
+    if (yAxisIndex < 0 || yAxisIndex >= dlog_record::g_parameters.numYAxes) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, dlog_record::g_parameters.yAxes[yAxisIndex].range.min);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceYRangeMax(scpi_t *context) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t yAxisIndex = 0;
+    SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
+    yAxisIndex--;
+
+    if (yAxisIndex < 0 || yAxisIndex >= dlog_view::MAX_NUM_OF_Y_AXES) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
+        return SCPI_RES_ERR;
+    }
+
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    float max;
+
+    if (param.special) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    } else {
+        if (param.unit != SCPI_UNIT_NONE && param.unit != getScpiUnit(dlog_record::g_parameters.yAxes[yAxisIndex].unit)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+
+        max = (float)param.content.value;
+
+        if (max <= dlog_record::g_parameters.yAxes[yAxisIndex].range.min) {
+            SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+            return SCPI_RES_ERR;
+        }
+    }
+
+    if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
+        dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
+    }
+
+    dlog_record::g_parameters.yAxes[yAxisIndex].range.max = max;
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceYRangeMaxQ(scpi_t *context) {
+    int32_t yAxisIndex = 0;
+    SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
+    yAxisIndex--;
+
+    if (yAxisIndex < 0 || yAxisIndex >= dlog_record::g_parameters.numYAxes) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, dlog_record::g_parameters.yAxes[yAxisIndex].range.max);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_initiateDlogTrace(scpi_t *context) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    int result = dlog_record::initiateTrace();
+    if (result != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, result);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_dlogTraceData(scpi_t *context) {
+    return SCPI_RES_OK;
+}
+
 
 } // namespace scpi
 } // namespace psu
