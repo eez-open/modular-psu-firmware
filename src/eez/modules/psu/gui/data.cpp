@@ -4481,9 +4481,9 @@ void data_recording_ready(data::DataOperationEnum operation, data::Cursor &curso
 #endif
 }
 
-void data_is_show_latest_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_is_single_page_on_stack(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = dlog_view::g_showLatest;
+        value = g_psuAppContext.getNumPagesOnStack() == 1 ? 1 : 0;
     }
 }
 

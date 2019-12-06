@@ -319,6 +319,7 @@ static scpi_choice_def_t unitChoice[] = {
 };
 
 scpi_result_t scpi_cmd_senseDlogTraceXUnit(scpi_t *context) {
+#if OPTION_SD_CARD
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -332,14 +333,24 @@ scpi_result_t scpi_cmd_senseDlogTraceXUnit(scpi_t *context) {
     dlog_record::g_parameters.xAxis.unit = (Unit)unit;
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceXUnitQ(scpi_t *context) {
+#if OPTION_SD_CARD
     resultChoiceName(context, unitChoice, dlog_record::g_parameters.xAxis.unit);
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceXStep(scpi_t *context) {
+#if OPTION_SD_CARD
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -372,14 +383,24 @@ scpi_result_t scpi_cmd_senseDlogTraceXStep(scpi_t *context) {
     dlog_record::g_parameters.xAxis.step = step;
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceXStepQ(scpi_t *context) {
+#if OPTION_SD_CARD
     SCPI_ResultFloat(context, dlog_record::g_parameters.xAxis.step);
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceXLabel(scpi_t *context) {
+#if OPTION_SD_CARD
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -400,14 +421,24 @@ scpi_result_t scpi_cmd_senseDlogTraceXLabel(scpi_t *context) {
     dlog_record::g_parameters.xAxis.label[len] = 0;
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceXLabelQ(scpi_t *context) {
+#if OPTION_SD_CARD
     SCPI_ResultText(context, dlog_record::g_parameters.xAxis.label);
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceXRangeMin(scpi_t *context) {
+#if OPTION_SD_CARD
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -440,14 +471,24 @@ scpi_result_t scpi_cmd_senseDlogTraceXRangeMin(scpi_t *context) {
     dlog_record::g_parameters.xAxis.range.min = min;
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceXRangeMinQ(scpi_t *context) {
+#if OPTION_SD_CARD
     SCPI_ResultFloat(context, dlog_record::g_parameters.xAxis.range.min);
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceXRangeMax(scpi_t *context) {
+#if OPTION_SD_CARD
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -480,14 +521,24 @@ scpi_result_t scpi_cmd_senseDlogTraceXRangeMax(scpi_t *context) {
     dlog_record::g_parameters.xAxis.range.max = max;
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceXRangeMaxQ(scpi_t *context) {
+#if OPTION_SD_CARD
     SCPI_ResultFloat(context, dlog_record::g_parameters.xAxis.range.max);
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceYUnit(scpi_t *context) {
+#if OPTION_SD_CARD
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -514,9 +565,14 @@ scpi_result_t scpi_cmd_senseDlogTraceYUnit(scpi_t *context) {
     dlog_record::g_parameters.yAxes[yAxisIndex].unit = (Unit)unit;
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceYUnitQ(scpi_t *context) {
+#if OPTION_SD_CARD
     int32_t yAxisIndex = 0;
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
@@ -529,9 +585,14 @@ scpi_result_t scpi_cmd_senseDlogTraceYUnitQ(scpi_t *context) {
     resultChoiceName(context, unitChoice, dlog_record::g_parameters.yAxes[yAxisIndex].unit);
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceYLabel(scpi_t *context) {
+#if OPTION_SD_CARD
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -565,9 +626,14 @@ scpi_result_t scpi_cmd_senseDlogTraceYLabel(scpi_t *context) {
     dlog_record::g_parameters.yAxes[yAxisIndex].label[len] = 0;
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceYLabelQ(scpi_t *context) {
+#if OPTION_SD_CARD
     int32_t yAxisIndex = 0;
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
@@ -580,9 +646,14 @@ scpi_result_t scpi_cmd_senseDlogTraceYLabelQ(scpi_t *context) {
     SCPI_ResultText(context, dlog_record::g_parameters.yAxes[yAxisIndex].label);
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceYRangeMin(scpi_t *context) {
+#if OPTION_SD_CARD
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -628,9 +699,14 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMin(scpi_t *context) {
     dlog_record::g_parameters.yAxes[yAxisIndex].range.min = min;
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceYRangeMinQ(scpi_t *context) {
+#if OPTION_SD_CARD
     int32_t yAxisIndex = 0;
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
@@ -643,9 +719,14 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMinQ(scpi_t *context) {
     SCPI_ResultFloat(context, dlog_record::g_parameters.yAxes[yAxisIndex].range.min);
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceYRangeMax(scpi_t *context) {
+#if OPTION_SD_CARD
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -691,9 +772,14 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMax(scpi_t *context) {
     dlog_record::g_parameters.yAxes[yAxisIndex].range.max = max;
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_senseDlogTraceYRangeMaxQ(scpi_t *context) {
+#if OPTION_SD_CARD
     int32_t yAxisIndex = 0;
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
@@ -706,13 +792,25 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMaxQ(scpi_t *context) {
     SCPI_ResultFloat(context, dlog_record::g_parameters.yAxes[yAxisIndex].range.max);
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_initiateDlogTrace(scpi_t *context) {
+#if OPTION_SD_CARD
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
     }
+
+    char filePath[MAX_PATH_LENGTH + 1];
+    if (!getFilePath(context, filePath, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    strcpy(dlog_record::g_parameters.filePath, filePath);
 
     int result = dlog_record::initiateTrace();
     if (result != SCPI_RES_OK) {
@@ -721,10 +819,41 @@ scpi_result_t scpi_cmd_initiateDlogTrace(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 scpi_result_t scpi_cmd_dlogTraceData(scpi_t *context) {
+#if OPTION_SD_CARD
+    if (!dlog_record::isExecuting()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        return SCPI_RES_ERR;
+    }
+
+    float values[dlog_view::MAX_NUM_OF_Y_AXES];
+    for (int yAxisIndex = 0; yAxisIndex < dlog_record::g_recording.parameters.numYAxes; yAxisIndex++) {
+        scpi_number_t param;
+        if (!SCPI_ParamNumber(context, 0, &param, true)) {
+            break;
+        }
+
+        if (param.unit != SCPI_UNIT_NONE && param.unit != getScpiUnit(dlog_record::g_recording.parameters.yAxes[yAxisIndex].unit)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+
+        values[yAxisIndex] = (float)param.content.value;
+    }
+
+    dlog_record::log(values);
+
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 

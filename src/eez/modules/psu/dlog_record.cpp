@@ -418,8 +418,10 @@ int startImmediately() {
         }
     }
 
+    writeUint16(0); // end of meta fields section
+
     // write beginning of data offset
-    g_recording.dataOffset = g_bufferIndex;
+    g_recording.dataOffset = 4 * ((g_bufferIndex + 3) / 4);
     g_bufferIndex = savedBufferIndex;
     writeUint32(g_recording.dataOffset);
     g_bufferIndex = g_recording.dataOffset;
@@ -499,6 +501,10 @@ void log(uint32_t tickCount) {
     }
 
     g_currentTime = g_seconds + g_micros * 1E-6;
+
+    if (g_traceInitiated) {
+        return;
+    }
 
     if (g_currentTime >= g_nextTime) {
         while (1) {
@@ -595,6 +601,13 @@ void log(uint32_t tickCount) {
             }
         }
     }
+}
+
+void log(float *values) {
+    for (int yAxisIndex = 0; yAxisIndex < dlog_record::g_recording.parameters.numYAxes; yAxisIndex++) {
+        writeFloat(values[yAxisIndex]);
+    }
+    ++g_recording.size;
 }
 
 void tick(uint32_t tickCount) {

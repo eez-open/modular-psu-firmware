@@ -449,7 +449,7 @@ void Channel::enterOvpProtection() {
 }
 
 bool Channel::checkSwOvpCondition(float uProtectionLevel) {
-    return channel_dispatcher::getUMon(*this) >= uProtectionLevel || (flags.rprogEnabled && channel_dispatcher::getUMonDac(*this) >= uProtectionLevel);
+    return channel_dispatcher::getUMonLast(*this) >= uProtectionLevel || (flags.rprogEnabled && channel_dispatcher::getUMonDacLast(*this) >= uProtectionLevel);
 }
 
 void Channel::protectionCheck(ProtectionValue &cpv) {
@@ -469,8 +469,7 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
         delay -= PROT_DELAY_CORRECTION;
     } else {
         state = prot_conf.flags.p_state;
-        condition = channel_dispatcher::getUMon(*this) * channel_dispatcher::getIMon(*this) >
-                    channel_dispatcher::getPowerProtectionLevel(*this);
+        condition = channel_dispatcher::getUMonLast(*this) * channel_dispatcher::getIMonLast(*this) > channel_dispatcher::getPowerProtectionLevel(*this);
         delay = prot_conf.p_delay;
     }
 

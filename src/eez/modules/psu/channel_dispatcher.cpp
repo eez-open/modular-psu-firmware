@@ -454,6 +454,13 @@ float getUMonDac(const Channel &channel) {
     return channel.u.mon_dac;
 }
 
+float getUMonDacLast(const Channel &channel) {
+    if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
+        return Channel::get(0).u.mon_dac_last + Channel::get(1).u.mon_dac_last;
+    }
+    return channel.u.mon_dac_last;
+}
+
 float getULimit(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
         return 2 * MIN(Channel::get(0).getVoltageLimit(), Channel::get(1).getVoltageLimit());

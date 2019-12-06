@@ -536,6 +536,9 @@ void openFile(const char *filePath) {
 
                     while (!invalidHeader && offset < g_recording.dataOffset) {
                         uint16_t fieldLength = readUint16(buffer, offset);
+                        if (fieldLength == 0) {
+                        	break;
+                        }
 
                         if (offset - sizeof(uint16_t) + fieldLength > g_recording.dataOffset) {
                             invalidHeader = true;
@@ -607,12 +610,8 @@ void openFile(const char *filePath) {
                         }
                     }
 
-                    if (offset > g_recording.dataOffset) {
-                        invalidHeader = true;
-                    } else {
-                        g_recording.parameters.period = g_recording.parameters.xAxis.step;
-                        g_recording.parameters.time = g_recording.parameters.xAxis.range.max;
-                    }
+					g_recording.parameters.period = g_recording.parameters.xAxis.step;
+					g_recording.parameters.time = g_recording.parameters.xAxis.range.max;
                 }
 
                 if (!invalidHeader) {

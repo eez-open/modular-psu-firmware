@@ -82,7 +82,7 @@ extern "C" void njCopyMem(void* dest, const void* src, int size) {
 }
 
 uint8_t *jpegDecode(const char *filePath) {
-    // DebugTrace("alloc %d\n", sizeof(nj_context_t));
+    // DebugTrace("context size: %d\n", sizeof(nj_context_t));
 
     uint32_t fileSize;
     uint32_t bytesRead;

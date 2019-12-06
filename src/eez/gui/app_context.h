@@ -38,6 +38,12 @@ struct PageOnStack {
 #endif
 };
 
+enum NextIterOperation {
+    NEXT_ITER_OPERATION_NONE,
+    NEXT_ITER_OPERATION_SET,
+    NEXT_ITER_OPERATION_PUSH
+};
+
 class AppContext {
 public:
 	int x;
@@ -61,6 +67,7 @@ public:
 
     void showPage(int pageId);
     void showPageOnNextIter(int pageId);
+    void pushPageOnNextIter(int pageId);
     void pushPage(int pageId, Page *page = 0);
     void popPage();
 
@@ -118,7 +125,7 @@ protected:
     int m_activePageIndex;
     int m_updatePageIndex;
 
-    bool m_setPageIdOnNextIter;
+    NextIterOperation m_nextIterOperation;
     int m_pageIdToSetOnNextIter;
 
     SelectFromEnumPage m_selectFromEnumPage;

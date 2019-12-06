@@ -43,7 +43,7 @@ static uint8_t * const DLOG_RECORD_BUFFER = DECOMPRESSED_ASSETS_START_ADDRESS + 
 static const uint32_t DLOG_RECORD_BUFFER_SIZE = 128 * 1024;
 
 static uint8_t * const FILE_VIEW_BUFFER = DLOG_RECORD_BUFFER + DLOG_RECORD_BUFFER_SIZE;
-static const uint32_t FILE_VIEW_BUFFER_SIZE = 1408 * 1024;
+static const uint32_t FILE_VIEW_BUFFER_SIZE = (3 * 512 - 128) * 1024;
 
 static uint8_t * const MP_BUFFER = FILE_VIEW_BUFFER + FILE_VIEW_BUFFER_SIZE;
 static const uint32_t MP_BUFFER_SIZE = 512 * 1024;

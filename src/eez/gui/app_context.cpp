@@ -54,18 +54,21 @@ AppContext *g_appContext;
 ////////////////////////////////////////////////////////////////////////////////
 
 AppContext::AppContext() {
-    m_setPageIdOnNextIter = false;
+    m_nextIterOperation = NEXT_ITER_OPERATION_NONE;
     m_updatePageIndex = -1;
 }
 
 
 void AppContext::stateManagment() {
-    if (m_setPageIdOnNextIter) {
+    if (m_nextIterOperation == NEXT_ITER_OPERATION_SET) {
         setPage(m_pageIdToSetOnNextIter);
         if (m_pageIdToSetOnNextIter == PAGE_ID_WELCOME) {
             playPowerUp(sound::PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE);
         } 
-        m_setPageIdOnNextIter = false;
+        m_nextIterOperation = NEXT_ITER_OPERATION_NONE;
+    } else if (m_nextIterOperation == NEXT_ITER_OPERATION_PUSH) {
+        pushPage(m_pageIdToSetOnNextIter);
+        m_nextIterOperation = NEXT_ITER_OPERATION_NONE;
     }
 
     // call m_checkAsyncOperationStatus
@@ -256,7 +259,12 @@ void AppContext::showPage(int pageId) {
 }
 
 void AppContext::showPageOnNextIter(int pageId) {
-    m_setPageIdOnNextIter = true;
+    m_nextIterOperation = NEXT_ITER_OPERATION_SET;
+    m_pageIdToSetOnNextIter = pageId;
+}
+
+void AppContext::pushPageOnNextIter(int pageId) {
+    m_nextIterOperation = NEXT_ITER_OPERATION_PUSH;
     m_pageIdToSetOnNextIter = pageId;
 }
 

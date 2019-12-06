@@ -97,7 +97,7 @@ int8_t measureGlyph(uint8_t encoding, gui::font::Font &font);
 int measureStr(const char *text, int textLength, gui::font::Font &font, int max_width = 0);
 
 #if OPTION_SDRAM
-static const int NUM_BUFFERS = 10;
+static const int NUM_BUFFERS = 8;
 struct BufferFlags {
     unsigned allocated : 1;
     unsigned used : 1;

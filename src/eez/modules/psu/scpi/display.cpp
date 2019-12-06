@@ -29,6 +29,10 @@
 #include <eez/system.h>
 #endif
 
+#if OPTION_SD_CARD
+#include <eez/modules/psu/dlog_view.h>
+#endif
+
 #include <eez/libs/image/jpeg.h>
 
 namespace eez {
@@ -206,8 +210,14 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_displayWindowDlog(scpi_t *context) {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_DLOG_VIEW);
+#if OPTION_DISPLAY && OPTION_SD_CARD
+    dlog_view::g_showLatest = true;
+    psu::gui::g_psuAppContext.pushPageOnNextIter(PAGE_ID_DLOG_VIEW);
     return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 } // namespace scpi

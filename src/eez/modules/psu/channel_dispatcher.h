@@ -54,6 +54,7 @@ float getUMon(const Channel &channel);
 float getUMonSnapshot(const Channel &channel);
 float getUMonLast(const Channel &channel);
 float getUMonDac(const Channel &channel);
+float getUMonDacLast(const Channel &channel);
 float getULimit(const Channel &channel);
 float getUMaxLimit(const Channel &channel);
 float getUMin(const Channel &channel);

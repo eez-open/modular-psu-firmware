@@ -65,6 +65,8 @@ void abort(bool flush = true);
 void tick(uint32_t tick_usec);
 void reset();
 
+void log(float *values);
+
 void fileWrite();
 
 const char *getLatestFilePath();
