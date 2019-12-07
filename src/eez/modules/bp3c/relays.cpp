@@ -36,8 +36,6 @@
 
 #ifdef EEZ_PLATFORM_STM32
 
-#include <usart.h>
-
 #if EEZ_BP3C_REVISION_R1B1
 // http://www.ti.com/lit/ds/symlink/pca9536.pdf
 #define IOEXP_ADDRESS 0x82 // 1 0 0 0 0 0 1 R/W'
@@ -58,6 +56,8 @@
 #define COUPLING_MODE_PARALLEL      0b10000010
 #define COUPLING_MODE_SERIES        0b10000100
 #define COUPLING_MODE_SPLIT_RAIL    0b10001000
+
+#include <eez/modules/bp3c/flashSlave.h>
 
 #endif
 
@@ -211,27 +211,24 @@ void toggleBootloader(int slotIndex) {
 		// GPIO_InitStruct.Alternate = GPIO_AF12_UART7;
 		// HAL_GPIO_Init(UART_TX_DOUT1_GPIO_Port, &GPIO_InitStruct);
 
-		uint8_t tx = 0x7F;
+		DebugTrace("start slave FSM");
 
-		int i;
-		for (i = 0; i < 10; i++) {
-			auto result = HAL_UART_Transmit(&huart7, &tx, 1, 1000);
-			if (result != HAL_OK) {
-				DebugTrace("Transmit error: %d", (int)result);
+		int wasFlashStatus = -1;
+		uint32_t startTick = HAL_GetTick();
+		while (true) {
+			flashSlaveFSM();
+			if (flashStatus != wasFlashStatus) {
+				DebugTrace("flash status: %d", flashStatus);
+				wasFlashStatus = flashStatus;
+			}
+
+			uint32_t currentTick = HAL_GetTick();
+			if (currentTick - startTick >= 3000) {
 				break;
 			}
-			osDelay(1000);
 		}
 
-		if (i == 10) {
-			uint8_t rx = 0xFF;
-			auto result = HAL_UART_Receive(&huart7, &rx, 1, 1000);
-			if (result == HAL_OK) {
-				DebugTrace("Received: 0x%02x", (int)rx);
-			} else {
-				DebugTrace("Receive error: %d", (int)result);
-			}
-		}
+		DebugTrace("end slave FSM after 3 seconds");
 	} else {
 		write(REG_OUTPUT_PORT, 0b10000000);
 		delay(5);

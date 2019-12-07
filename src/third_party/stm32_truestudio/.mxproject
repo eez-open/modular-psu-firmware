@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Users/mvladic/Dropbox/Code/EEZ/modular-psu-firmware/src/third_party/stm32_r1b5/Inc
+HeaderPath=C:/Users/Martin/Dropbox/Code/EEZ/modular-psu-firmware/src/third_party/stm32_truestudio/Inc
 HeaderFiles=gpio.h;adc.h;crc.h;dac.h;dma.h;dma2d.h;fmc.h;FreeRTOSConfig.h;i2c.h;ltdc.h;lwip.h;lwipopts.h;ethernetif.h;rng.h;rtc.h;sdmmc.h;spi.h;tim.h;usb_device.h;usbd_conf.h;usbd_desc.h;usbd_cdc_if.h;stm32f7xx_it.h;stm32f7xx_hal_conf.h;main.h;ffconf.h;bsp_driver_sd.h;sd_diskio.h;fatfs.h;fatfs_platform.h;eth.h;usart.h;jpeg.h;jpeg_utils_conf.h;libjpeg.h;jconfig.h;jmorecfg.h;jdata_conf.h;
-SourcePath=C:/Users/mvladic/Dropbox/Code/EEZ/modular-psu-firmware/src/third_party/stm32_r1b5/Src
+SourcePath=C:/Users/Martin/Dropbox/Code/EEZ/modular-psu-firmware/src/third_party/stm32_truestudio/Src
 SourceFiles=gpio.c;adc.c;crc.c;dac.c;dma.c;dma2d.c;fmc.c;freertos.c;i2c.c;ltdc.c;lwip.c;ethernetif.c;syscalls.c;rng.c;rtc.c;sdmmc.c;spi.c;tim.c;usb_device.c;usbd_conf.c;usbd_desc.c;usbd_cdc_if.c;stm32f7xx_it.c;stm32f7xx_hal_msp.c;stm32f7xx_hal_timebase_TIM.c;main.c;bsp_driver_sd.c;sd_diskio.c;fatfs.c;fatfs_platform.c;stm32f7xx_hal_timebase_tim.c;eth.c;usart.c;jpeg.c;libjpeg.c;jdata_conf.c;
 
 [PreviousLibFiles]
