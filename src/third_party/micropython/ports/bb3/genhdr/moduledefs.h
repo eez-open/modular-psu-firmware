@@ -14,8 +14,16 @@
     #define MODULE_DEF_MP_QSTR_UARRAY
 #endif
 
+#if (MICROPY_PY_UTIME)
+    extern const struct _mp_obj_module_t mp_module_utime;
+    #define MODULE_DEF_MP_QSTR_UTIME { MP_ROM_QSTR(MP_QSTR_utime), MP_ROM_PTR(&mp_module_utime) },
+#else
+    #define MODULE_DEF_MP_QSTR_UTIME
+#endif
+
 
 #define MICROPY_REGISTERED_MODULES \
     MODULE_DEF_MP_QSTR_EEZ \
     MODULE_DEF_MP_QSTR_UARRAY \
+    MODULE_DEF_MP_QSTR_UTIME \
 // MICROPY_REGISTERED_MODULES

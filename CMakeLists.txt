@@ -523,10 +523,12 @@ endif()
 
 set(src_third_party_micropython_extmod
     src/third_party/micropython/extmod/virtpin.c
+    src/third_party/micropython/extmod/utime_mphal.c
 )
 list (APPEND src_files ${src_third_party_micropython_extmod})
 set(header_third_party_micropython_extmod
     src/third_party/micropython/extmod/virtpin.h
+    src/third_party/micropython/extmod/utime_mphal.h
 )
 list (APPEND header_files ${header_third_party_micropython_extmod})
 source_group("third_party\\micropython\\extmod" FILES ${src_third_party_micropython_extmod} ${header_third_party_micropython_extmod})
@@ -563,6 +565,12 @@ set(header_third_party_micropython_ports_bb3_mod_eez
 )
 list (APPEND header_files ${header_third_party_micropython_ports_bb3_mod_eez})
 source_group("third_party\\micropython\\ports\\bb3\\modeez" FILES ${src_third_party_micropython_ports_bb3_mod_eez} ${header_third_party_micropython_ports_bb3_mod_eez})
+
+set(src_third_party_micropython_ports_bb3_mod_utime
+    src/third_party/micropython/ports/bb3/mod/utime/modutime.c
+)
+list (APPEND src_files ${src_third_party_micropython_ports_bb3_mod_utime})
+source_group("third_party\\micropython\\ports\\bb3\\utime" FILES ${src_third_party_micropython_ports_bb3_mod_utime})
 
 set(src_third_party_micropython_py
     src/third_party/micropython/py/argcheck.c
