@@ -18,11 +18,12 @@
 
 #ifdef DEBUG
 
-#include <eez/debug.h>
-
 #include <cstdio>
 #include <stdarg.h>
 #include <string.h>
+
+#include <eez/debug.h>
+#include <eez/memory.h>
 
 // TODO these includes should not be inside apps/psu
 #include <eez/modules/psu/psu.h>
@@ -37,17 +38,145 @@ using namespace eez::psu;
 namespace eez {
 namespace debug {
 
+static char *g_log = (char *)DEBUG_TRACE_LOG;
+static uint32_t g_head;
+static uint32_t g_tail;
+static bool g_full;
+
+static uint32_t g_numLines;
+static uint32_t g_changed;
+
+static uint32_t g_lastLineIndex;
+static uint32_t g_lastLineCharPosition;
+
+static uint32_t g_startPosition = 0;
+static const uint32_t TRACE_LOG_PAGE_SIZE = 10;
+
+void addCharToLog(char ch) {
+    *(g_log + g_head) = ch;
+
+    // advance pointer
+    if (g_full) {
+        g_tail = (g_tail + 1) % DEBUG_TRACE_LOG_SIZE;
+    }
+    g_head = (g_head + 1) % DEBUG_TRACE_LOG_SIZE;
+    g_full = g_head == g_tail;
+}
+
 void Trace(const char *format, ...) {
     va_list args;
     va_start(args, format);
 
-    //vprintf(format, args);
-
     char buffer[896];
     vsnprintf(buffer, 896, format, args);
-    Serial.write(buffer, strlen(buffer));
 
     va_end(args);
+
+    for (char *p = buffer; *p; p++) {
+        if (*p == '\r') {
+            continue;
+        }
+        if (*p == '\n') {
+            addCharToLog(0);
+        } else if (*p == '\t') {
+            static const int TAB_SIZE = 4;
+            for (int i = 0; i < TAB_SIZE; i++) {
+                addCharToLog(' ');
+            }
+        } else {
+            addCharToLog(*p);
+        }
+    }
+
+    g_changed = true;
+
+    g_lastLineIndex = 0;
+    g_lastLineCharPosition = g_tail;
+}
+
+uint32_t getNumTraceLogLines() {
+    if (g_changed) {
+        g_changed = false;
+        g_numLines = 1;
+        uint32_t from = g_tail;
+        uint32_t to = g_head > 0 ? g_head - 1 : DEBUG_TRACE_LOG_SIZE - 1;
+        for (uint32_t i = from; i != to; i = (i + 1) % DEBUG_TRACE_LOG_SIZE) {
+            if (!g_log[i]) {
+                g_numLines++;
+            }
+        }
+    }
+    return g_numLines;
+}
+
+const char *getTraceLogLine(uint32_t lineIndex) {
+    if (lineIndex > g_lastLineIndex) {
+        do {
+            if (g_log[g_lastLineCharPosition] == 0) {
+                g_lastLineIndex++;
+            }
+
+            g_lastLineCharPosition = (g_lastLineCharPosition + 1) % DEBUG_TRACE_LOG_SIZE;
+        } while (g_lastLineIndex != lineIndex);
+    } else if (lineIndex < g_lastLineIndex) {
+        if (lineIndex == 0) {
+            g_lastLineIndex = 0;
+            g_lastLineCharPosition = g_tail;
+        } else {
+            g_lastLineCharPosition = (g_lastLineCharPosition + DEBUG_TRACE_LOG_SIZE - 2) % DEBUG_TRACE_LOG_SIZE;
+
+            do {
+                if (g_log[g_lastLineCharPosition] == 0) {
+                    g_lastLineIndex--;
+                }
+
+                g_lastLineCharPosition = (g_lastLineCharPosition + DEBUG_TRACE_LOG_SIZE - 1) % DEBUG_TRACE_LOG_SIZE;
+            } while (g_lastLineIndex != lineIndex);
+                
+            g_lastLineCharPosition = (g_lastLineCharPosition + 2) % DEBUG_TRACE_LOG_SIZE;
+        }
+    }
+
+    return g_log + g_lastLineCharPosition;
+}
+
+uint32_t getTraceLogStartPosition() {
+    uint32_t position = g_startPosition;
+    uint32_t count = eez::debug::getNumTraceLogLines();
+    if (count <= TRACE_LOG_PAGE_SIZE) {
+        position = 0;
+    } else if (position > count - TRACE_LOG_PAGE_SIZE) {
+        position = count - TRACE_LOG_PAGE_SIZE;
+    }
+    return position;
+}
+
+void setTraceLogStartPosition(uint32_t position) {
+    g_startPosition = position;
+}
+
+void resetTraceLogStartPosition() {
+    uint32_t count = eez::debug::getNumTraceLogLines();
+    if (count <= TRACE_LOG_PAGE_SIZE) {
+        g_startPosition = 0;
+    } else {
+        g_startPosition = count - TRACE_LOG_PAGE_SIZE;
+    }
+}
+
+uint32_t getTraceLogPageSize() {
+    return TRACE_LOG_PAGE_SIZE;
+}
+
+void onEncoder(int counter) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    counter = -counter;
+#endif
+    int32_t newPosition = getTraceLogStartPosition() + counter;
+    if (newPosition < 0) {
+        newPosition = 0;
+    }
+    setTraceLogStartPosition(newPosition);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

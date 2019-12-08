@@ -365,7 +365,7 @@ ChannelSnapshot &getChannelSnapshot(int channelIndex) {
         for (int i = 0; i < CH_NUM; i++) {
             Channel &channel = Channel::get(i);
             ChannelSnapshot &channelSnapshot = g_channelSnapshots[i];
-            const char *mode_str = channel.getCvModeStr();
+            const char *mode_str = channel.getModeStr();
             channelSnapshot.uMon = channel_dispatcher::getUMon(channel);
             channelSnapshot.iMon = channel_dispatcher::getIMon(channel);
             if (strcmp(mode_str, "CC") == 0) {

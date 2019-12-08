@@ -398,7 +398,11 @@ void initDlogValues(Recording &recording) {
 
             dlogValueIndex++;
         }
-    }    
+    }
+
+    for (; dlogValueIndex < MAX_NUM_OF_Y_VALUES; dlogValueIndex++) {
+        recording.dlogValues[dlogValueIndex].isVisible = false;
+    }
 }
 
 int getNumVisibleDlogValues(const Recording &recording) {

@@ -25,7 +25,11 @@
 #include <eez/libs/sd_fat/sd_fat.h>
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/scpi/psu.h>
+
+#include <eez/gui/dialogs.h>
+#include <eez/gui/document.h>
 
 #include <eez/memory.h>
 
@@ -122,7 +126,9 @@ osThreadDef(g_mpTask, mainLoop, osPriorityNormal, 0, 4096);
 osMessageQDef(g_mpMessageQueue, MP_QUEUE_SIZE, uint32_t);
 osMessageQId g_mpMessageQueueId;
 
-static char *g_scriptPath = (char *)MP_BUFFER;
+State g_state;
+
+char *g_scriptPath = (char *)MP_BUFFER;
 static char *g_scriptSource = g_scriptPath + MAX_PATH_LENGTH + 1;
 static const size_t MAX_SCRIPT_SOURCE_AND_HEAP_SIZE = MP_BUFFER_SIZE - MAX_PATH_LENGTH + 1;
 static size_t g_scriptSourceLength;
@@ -134,6 +140,7 @@ using namespace eez::psu::scpi;
 
 static char g_scpiData[SCPI_PARSER_INPUT_BUFFER_LENGTH];
 static size_t g_scpiDataLen;
+static int_fast16_t g_lastError;
 
 size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
     len = MIN(len, SCPI_PARSER_INPUT_BUFFER_LENGTH - g_scpiDataLen);
@@ -149,38 +156,24 @@ scpi_result_t SCPI_Flush(scpi_t *context) {
 }
 
 int SCPI_Error(scpi_t *context, int_fast16_t err) {
-    //if (err != 0) {
-    //    scpi::printError(err);
+    g_lastError = err;
 
-    //    if (err == SCPI_ERROR_INPUT_BUFFER_OVERRUN) {
-    //        scpi::onBufferOverrun(*context);
-    //    }
-    //}
+    if (err != 0) {
+       psu::scpi::printError(err);
+
+       if (err == SCPI_ERROR_INPUT_BUFFER_OVERRUN) {
+           psu::scpi::onBufferOverrun(*context);
+       }
+    }
 
     return 0;
 }
 
 scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_t val) {
-    //if (serial::g_testResult == TEST_OK) {
-    //    char errorOutputBuffer[256];
-    //    if (SCPI_CTRL_SRQ == ctrl) {
-    //        sprintf(errorOutputBuffer, "**SRQ: 0x%X (%d)\r\n", val, val);
-    //    } else {
-    //        sprintf(errorOutputBuffer, "**CTRL %02x: 0x%X (%d)\r\n", ctrl, val, val);
-    //    }
-    //    Serial.println(errorOutputBuffer);
-    //}
-
     return SCPI_RES_OK;
 }
 
 scpi_result_t SCPI_Reset(scpi_t *context) {
-    //if (serial::g_testResult == TEST_OK) {
-    //    char errorOutputBuffer[256];
-    //    strcpy(errorOutputBuffer, "**Reset\r\n");
-    //    Serial.println(errorOutputBuffer);
-    //}
-
     return eez::psu::reset() ? SCPI_RES_OK : SCPI_RES_ERR;
 }
 
@@ -251,6 +244,7 @@ void oneIter() {
             } else {
                 // uncaught exception
                 mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
+                onUncaughtScriptExceptionHook();
             }
 
             gc_sweep_all();
@@ -279,10 +273,11 @@ void oneIter() {
 			} else {
 				// uncaught exception
 				mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
+                onUncaughtScriptExceptionHook();
 			}
-
-			mp_deinit();
 #endif
+
+            g_state = STATE_IDLE;
 
             break;
         }
@@ -295,8 +290,8 @@ enum {
 };
 
 void startScript(const char *filePath) {
+    g_state = STATE_EXECUTING;
     strcpy(g_scriptPath, filePath);
-
     osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MP_MESSAGE(LOAD_SCRIPT, 0), osWaitForever);
 }
 
@@ -367,8 +362,14 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
     //    }
     // }
 
+    g_lastError = 0;
+
     input(g_scpiContext, (const char *)commandOrQueryText, strlen(commandOrQueryText));
     input(g_scpiContext, "\r\n", 2);
+
+    if (g_lastError != 0) {
+        mp_raise_ValueError("SCPI error");
+    }
 
     if (g_scpiDataLen >= 2 && g_scpiData[g_scpiDataLen - 2] == '\r' && g_scpiData[g_scpiDataLen - 1] == '\n') {
         g_scpiDataLen -= 2;

@@ -24,12 +24,23 @@
 namespace eez {
 namespace mp {
 
+enum State {
+    STATE_IDLE,
+    STATE_EXECUTING
+};
+
+extern State g_state;
+extern char *g_scriptPath;
+
 bool onSystemStateChanged();
 
 void onQueueMessage(uint32_t type, uint32_t param);
 
 void startScript(const char *filePath);
+inline bool isIdle() { return g_state == STATE_IDLE; }
 bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen);
+
+void onUncaughtScriptExceptionHook();
 
 } // mp
 } // eez

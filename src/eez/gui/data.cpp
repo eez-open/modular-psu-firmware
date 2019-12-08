@@ -34,6 +34,7 @@
 #include <eez/system.h>
 #include <eez/util.h>
 #include <eez/index.h>
+#include <eez/memory.h>
 
 // TODO
 #include <eez/modules/psu/psu.h>
@@ -295,6 +296,26 @@ void YT_DATA_GET_VALUE_FUNCTION_POINTER_value_to_text(const Value &value, char *
     text[0] = 0;
 }
 
+bool compare_DEBUG_TRACE_LOG_STR_value(const Value &a, const Value &b) {
+    return strcmp(a.getString(), b.getString()) == 0;
+}
+
+void DEBUG_TRACE_LOG_STR_value_to_text(const Value &value, char *text, int count) {
+    const char *p = value.getString();
+
+    while (--count) {
+        *text++ = *p;
+        if (*p == 0) {
+            break;
+        }
+        if (++p == (const char *)DEBUG_TRACE_LOG + DEBUG_TRACE_LOG_SIZE) {
+            p = (const char *)DEBUG_TRACE_LOG;
+        }
+    }
+
+    *text = 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static CompareValueFunction g_compareBuiltInValueFunctions[] = {
@@ -315,7 +336,8 @@ static CompareValueFunction g_compareBuiltInValueFunctions[] = {
     compare_SLOT_INFO2_value,
     compare_TEST_RESULT_value,
     compare_TIME_SECONDS_value,
-    compare_YT_DATA_GET_VALUE_FUNCTION_POINTER_value
+    compare_YT_DATA_GET_VALUE_FUNCTION_POINTER_value,
+    compare_DEBUG_TRACE_LOG_STR_value
 };
 
 static ValueToTextFunction g_builtInValueToTextFunctions[] = {
@@ -337,7 +359,8 @@ static ValueToTextFunction g_builtInValueToTextFunctions[] = {
     SLOT_INFO2_value_to_text,
     TEST_RESULT_value_to_text,
     TIME_SECONDS_value_to_text,
-    YT_DATA_GET_VALUE_FUNCTION_POINTER_value_to_text
+    YT_DATA_GET_VALUE_FUNCTION_POINTER_value_to_text,
+    DEBUG_TRACE_LOG_STR_value_to_text
 };
 
 ////////////////////////////////////////////////////////////////////////////////

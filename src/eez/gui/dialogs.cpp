@@ -100,6 +100,11 @@ void errorMessageWithAction(data::Value value, void (*action)(int param), const 
     sound::playBeep();
 }
 
+void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel) {
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message, action, actionLabel));
+    sound::playBeep();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(),

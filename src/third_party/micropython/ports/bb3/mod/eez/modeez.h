@@ -21,3 +21,9 @@
 #include <py/obj.h>
 
 mp_obj_t modeez_scpi(mp_obj_t commandOrQueryText);
+mp_obj_t modeez_getU(mp_obj_t channelIndexObj);
+mp_obj_t modeez_setU(mp_obj_t channelIndexObj, mp_obj_t value);
+mp_obj_t modeez_getI(mp_obj_t channelIndexObj);
+mp_obj_t modeez_setI(mp_obj_t channelIndexObj, mp_obj_t value);
+mp_obj_t modeez_getOutputMode(mp_obj_t channelIndexObj);
+mp_obj_t modeez_dlogTraceData(size_t n_args, const mp_obj_t *args);

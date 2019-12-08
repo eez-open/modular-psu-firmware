@@ -172,6 +172,22 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, data::Value message1V
     return page;
 }
 
+ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, void (*action)(), const char *actionLabel) {
+    ToastMessagePage *page = ToastMessagePage::findFreePage();
+
+    page->type = type;
+    page->message1 = message;
+    page->message2 = actionLabel;
+    page->message3 = nullptr;
+    page->actionWidgetIsActive = false;
+
+    page->actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM;
+    page->appContext = g_appContext;
+    page->appContext->m_toastActionWithoutParam = action;
+
+    return page;
+}
+
 bool ToastMessagePage::onEncoder(int counter) {
     popPage();
     return false;
@@ -312,6 +328,11 @@ WidgetCursor ToastMessagePage::findWidget(int x, int y) {
 void ToastMessagePage::executeAction() {
     popPage();
     g_appContext->m_toastAction(g_appContext->m_toastActionParam);
+}
+
+void ToastMessagePage::executeActionWithoutParam() {
+    popPage();
+    g_appContext->m_toastActionWithoutParam();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -61,13 +61,14 @@ public:
     void (*m_dialogLaterCallback)();
     void(*m_toastAction)(int param);
     int m_toastActionParam;
+    void(*m_toastActionWithoutParam)();
     void (*m_checkAsyncOperationStatus)();
 
     virtual void stateManagment();
 
     void showPage(int pageId);
-    void showPageOnNextIter(int pageId);
-    void pushPageOnNextIter(int pageId);
+    void showPageOnNextIter(int pageId, Page *page = nullptr);
+    void pushPageOnNextIter(int pageId, Page *page = nullptr);
     void pushPage(int pageId, Page *page = 0);
     void popPage();
 
@@ -127,6 +128,7 @@ protected:
 
     NextIterOperation m_nextIterOperation;
     int m_pageIdToSetOnNextIter;
+    Page *m_pageToSetOnNextIter;
 
     SelectFromEnumPage m_selectFromEnumPage;
 

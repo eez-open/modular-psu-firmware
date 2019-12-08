@@ -51,10 +51,11 @@ extern dlog_view::Parameters g_guiParameters;
 extern dlog_view::Recording g_recording;
 
 State getState();
-int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath = false);
+int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath, bool forTraceUsage);
 bool isIdle();
 bool isInitiated();
 bool isExecuting();
+bool isTraceExecuting();
 int initiate();
 int initiateTrace();
 int startImmediately();

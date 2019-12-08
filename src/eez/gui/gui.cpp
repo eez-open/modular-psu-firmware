@@ -207,7 +207,8 @@ static ActionExecFunc g_internalActionExecFunctions[] = {
     0,
     action_internal_select_enum_item,
     popPage,
-    ToastMessagePage::executeAction
+    ToastMessagePage::executeAction,
+    ToastMessagePage::executeActionWithoutParam
 };
 
 bool isInternalAction(int actionId) {

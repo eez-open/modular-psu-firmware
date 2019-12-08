@@ -36,7 +36,7 @@ scpi_result_t scpi_cmd_measureScalarCurrentDcQ(scpi_t *context) {
     }
 
     char buffer[256] = { 0 };
-    strcatCurrent(buffer, channel_dispatcher::getIMon(*channel));
+    strcatCurrent(buffer, channel_dispatcher::getIMonLast(*channel));
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -50,7 +50,7 @@ scpi_result_t scpi_cmd_measureScalarPowerDcQ(scpi_t *context) {
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, channel_dispatcher::getUMon(*channel) * channel_dispatcher::getIMon(*channel));
+    strcatFloat(buffer, channel_dispatcher::getUMonLast(*channel) * channel_dispatcher::getIMonLast(*channel));
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -64,7 +64,7 @@ scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, channel_dispatcher::getUMon(*channel));
+    strcatFloat(buffer, channel_dispatcher::getUMonLast(*channel));
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;

@@ -1,5 +1,5 @@
 from utime import ticks_ms, ticks_add, ticks_diff, sleep_ms
-from eez import scpi
+from eez import scpi, setU, getOutputMode, getI, dlogTraceData
 
 U_STEP = 0.1
 U_MAX = 40.0
@@ -30,6 +30,8 @@ try:
 
     scpi("DISP:WINDOW:DLOG")
 
+    ch = 1
+
     t = ticks_ms()
     i = 0
     while True:
@@ -37,21 +39,24 @@ try:
         if u_set > U_MAX:
             break
 
-        scpi("VOLT " + str(u_set))
+        setU(ch, u_set)
 
         t = ticks_add(t, MEASURE_DELAY_MS)
         sleep_ms(ticks_diff(t, ticks_ms()))
 
-        mode = scpi("OUTP:MODE?")
+        mode = getOutputMode(ch)
         #if mode.startswith("CC"):
         #    break
 
-        scpi("DLOG:TRACE:DATA " + scpi("MEAS:CURR?"))
+        curr = getI(ch)
+        dlogTraceData(curr)
 
         i = i + 1
 
         t = ticks_add(t, TIME_STEP_MS - MEASURE_DELAY_MS)
         sleep_ms(ticks_diff(t, ticks_ms()))
+
+        print(i, u_set, curr, mode)
 finally:
     scpi("ABOR:DLOG")
     scpi("OUTP 0")

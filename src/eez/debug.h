@@ -27,6 +27,17 @@ namespace debug {
 
 void Trace(const char *format, ...);
 
+uint32_t getNumTraceLogLines();
+const char *getTraceLogLine(uint32_t lineIndex);
+
+uint32_t getTraceLogStartPosition();
+void setTraceLogStartPosition(uint32_t position);
+void resetTraceLogStartPosition();
+
+uint32_t getTraceLogPageSize();
+
+void onEncoder(int couter);
+
 } // namespace debug
 } // namespace eez
 

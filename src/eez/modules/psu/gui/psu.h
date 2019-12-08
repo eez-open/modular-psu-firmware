@@ -81,6 +81,8 @@ public:
     static const char *getTextMessage();
     static uint8_t getTextMessageVersion();
 
+    void showUncaughtScriptExceptionMessage();
+
 protected:
     bool m_pushProgressPage;
     const char *m_progressMessage;
@@ -91,6 +93,8 @@ protected:
     uint8_t m_textMessageVersion;
     bool m_showTextMessage;
     bool m_clearTextMessage;
+
+    bool m_showUncaughtScriptExceptionMessage;
 
     int getMainPageId() override;
     void onPageChanged(int previousPageId, int activePageId) override;

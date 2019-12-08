@@ -827,7 +827,7 @@ scpi_result_t scpi_cmd_initiateDlogTrace(scpi_t *context) {
 
 scpi_result_t scpi_cmd_dlogTraceData(scpi_t *context) {
 #if OPTION_SD_CARD
-    if (!dlog_record::isExecuting()) {
+    if (!dlog_record::isTraceExecuting()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }

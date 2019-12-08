@@ -254,8 +254,8 @@ State getState() {
     return g_state;
 }
 
-int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath) {
-    if (g_traceInitiated) {
+int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath, bool forTraceUsage) {
+    if (forTraceUsage) {
         if (parameters.xAxis.step <= 0) {
             // TODO replace with more specific error
             return SCPI_ERROR_EXECUTION_ERROR;
@@ -278,12 +278,12 @@ int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePa
             // TODO replace with more specific error
             return SCPI_ERROR_EXECUTION_ERROR;
         }
+    }
 
-        if (!doNotCheckFilePath) {
-            if (!parameters.filePath[0]) {
-                // TODO replace with more specific error
-                return SCPI_ERROR_EXECUTION_ERROR;
-            }
+    if (!doNotCheckFilePath) {
+        if (!parameters.filePath[0]) {
+            // TODO replace with more specific error
+            return SCPI_ERROR_EXECUTION_ERROR;
         }
     }
 
@@ -302,13 +302,17 @@ bool isExecuting() {
     return g_state == STATE_EXECUTING;
 }
 
+bool isTraceExecuting() {
+    return g_state == STATE_EXECUTING && g_traceInitiated;
+}
+
 static int doInitiate() {
     int error = SCPI_RES_OK;
 
     if (g_parameters.triggerSource == trigger::SOURCE_IMMEDIATE) {
         error = startImmediately();
     } else {
-        error = checkDlogParameters(g_parameters);
+        error = checkDlogParameters(g_parameters, false, g_traceInitiated);
         if (error == SCPI_RES_OK) {
             setState(STATE_INITIATED);
         }
@@ -342,7 +346,7 @@ void log(uint32_t tickCount);
 int startImmediately() {
     int err;
 
-    err = checkDlogParameters(g_parameters);
+    err = checkDlogParameters(g_parameters, false, g_traceInitiated);
     if (err != SCPI_RES_OK) {
         return err;
     }

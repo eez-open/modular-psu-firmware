@@ -464,7 +464,7 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
         delay -= PROT_DELAY_CORRECTION;
     } else if (IS_OCP_VALUE(this, cpv)) {
         state = prot_conf.flags.i_state;
-        condition = channel_dispatcher::getIMon(*this) >= channel_dispatcher::getISet(*this);
+        condition = channel_dispatcher::getIMonLast(*this) >= channel_dispatcher::getISet(*this);
         delay = prot_conf.i_delay;
         delay -= PROT_DELAY_CORRECTION;
     } else {
@@ -1275,7 +1275,7 @@ void Channel::setOperBits(int bit_mask, bool on) {
     reg_set_oper_isum_bit(channelIndex, bit_mask, on);
 }
 
-const char *Channel::getCvModeStr() const {
+const char *Channel::getModeStr() const {
     if (isCvMode())
         return "CV";
     else if (isCcMode())

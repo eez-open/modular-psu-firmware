@@ -45,6 +45,7 @@ enum BuiltInValueType {
     VALUE_TYPE_TEST_RESULT,
     VALUE_TYPE_TIME_SECONDS,
     VALUE_TYPE_YT_DATA_GET_VALUE_FUNCTION_POINTER,
+    VALUE_TYPE_DEBUG_TRACE_LOG_STR,
     VALUE_TYPE_USER,
 };
 
@@ -101,7 +102,12 @@ struct Value {
     {
     }
 
-    Value(int value, ValueType type) 
+    Value(const char *str, ValueType type)
+        : type_(type), options_(0), unit_(UNIT_UNKNOWN), str_(str)
+    {
+    }
+
+    Value(int value, ValueType type)
         : type_(type), options_(0), unit_(UNIT_UNKNOWN), int_(value) 
     {
     }

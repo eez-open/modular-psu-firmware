@@ -441,7 +441,7 @@ class Channel {
     }
 
     /// Returns "CC", "CV" or "UR"
-    const char *getCvModeStr() const;
+    const char *getModeStr() const;
 
     /// Returns currently set voltage limit
     float getVoltageLimit() const;

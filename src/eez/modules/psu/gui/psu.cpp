@@ -79,6 +79,14 @@
 
 namespace eez {
 
+namespace mp {
+
+void onUncaughtScriptExceptionHook() {
+    eez::psu::gui::g_psuAppContext.showUncaughtScriptExceptionMessage();
+}
+
+}
+
 namespace gui {
 
 #if EEZ_PLATFORM_STM32
@@ -104,6 +112,7 @@ void stateManagmentHook() {
 }
 
 namespace psu {
+
 namespace gui {
 
 PsuAppContext g_psuAppContext;
@@ -291,8 +300,12 @@ void PsuAppContext::stateManagment() {
         }
     }
 
-
     dlog_view::stateManagment();
+
+    if (m_showUncaughtScriptExceptionMessage) {
+        m_showUncaughtScriptExceptionMessage = false;
+        errorMessageWithAction("Uncaught script exception!", action_show_debug_trace_log, "Show debug trace log");
+    }
 }
 
 bool PsuAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
@@ -613,6 +626,10 @@ const char *PsuAppContext::getTextMessage() {
 
 uint8_t PsuAppContext::getTextMessageVersion() {
     return g_psuAppContext.m_textMessageVersion;
+}
+
+void PsuAppContext::showUncaughtScriptExceptionMessage() {
+    m_showUncaughtScriptExceptionMessage = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1083,6 +1100,11 @@ void onEncoder(int counter, bool clicked) {
 
         if (activePageId == PAGE_ID_FILE_MANAGER) {
             file_manager::onEncoder(counter);
+            return;
+        }
+
+        if (activePageId == PAGE_ID_DEBUG_TRACE_LOG) {
+            eez::debug::onEncoder(counter);
             return;
         }
 

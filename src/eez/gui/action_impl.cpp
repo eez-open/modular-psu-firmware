@@ -1244,6 +1244,11 @@ void action_file_manager_sort_by() {
 #endif
 }
 
+void action_show_debug_trace_log() {
+    eez::debug::resetTraceLogStartPosition();
+    pushPage(PAGE_ID_DEBUG_TRACE_LOG);
+}
+
 } // namespace gui
 } // namespace eez
 

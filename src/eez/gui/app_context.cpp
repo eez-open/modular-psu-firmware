@@ -67,7 +67,7 @@ void AppContext::stateManagment() {
         } 
         m_nextIterOperation = NEXT_ITER_OPERATION_NONE;
     } else if (m_nextIterOperation == NEXT_ITER_OPERATION_PUSH) {
-        pushPage(m_pageIdToSetOnNextIter);
+        pushPage(m_pageIdToSetOnNextIter, m_pageToSetOnNextIter);
         m_nextIterOperation = NEXT_ITER_OPERATION_NONE;
     }
 
@@ -209,15 +209,19 @@ void AppContext::replacePage(int pageId, Page *page) {
 }
 
 void AppContext::pushPage(int pageId, Page *page) {
-    int previousPageId = getActivePageId();
+    if (osThreadGetId() != g_guiTaskHandle) {
+        pushPageOnNextIter(pageId, page);
+    } else {
+        int previousPageId = getActivePageId();
 
-    // advance stack pointre
-    if (getActivePageId() != INTERNAL_PAGE_ID_NONE) {
-        m_pageNavigationStackPointer++;
-        assert (m_pageNavigationStackPointer < CONF_GUI_PAGE_NAVIGATION_STACK_SIZE);
+        // advance stack pointre
+        if (getActivePageId() != INTERNAL_PAGE_ID_NONE) {
+            m_pageNavigationStackPointer++;
+            assert (m_pageNavigationStackPointer < CONF_GUI_PAGE_NAVIGATION_STACK_SIZE);
+        }
+
+        doShowPage(pageId, page, previousPageId);
     }
-
-    doShowPage(pageId, page, previousPageId);
 }
 
 void AppContext::popPage() {
@@ -258,14 +262,16 @@ void AppContext::showPage(int pageId) {
 	}
 }
 
-void AppContext::showPageOnNextIter(int pageId) {
+void AppContext::showPageOnNextIter(int pageId, Page *page) {
     m_nextIterOperation = NEXT_ITER_OPERATION_SET;
     m_pageIdToSetOnNextIter = pageId;
+    m_pageToSetOnNextIter = page;
 }
 
-void AppContext::pushPageOnNextIter(int pageId) {
+void AppContext::pushPageOnNextIter(int pageId, Page *page) {
     m_nextIterOperation = NEXT_ITER_OPERATION_PUSH;
     m_pageIdToSetOnNextIter = pageId;
+    m_pageToSetOnNextIter = page;
 }
 
 void AppContext::pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,

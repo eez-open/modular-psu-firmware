@@ -32,6 +32,7 @@
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/dlog_view.h>
+#include <eez/mp.h>
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif
@@ -4211,8 +4212,8 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data:
 
     static const int LIST_ICON_WIDGET = 0;
     static const int LIST_GRID_WIDGET = 1;
-    static const int DLOG_ICON_WIDGET = 2;
-    static const int DLOG_STATUS_WIDGET = 3;
+    static const int DLOG_INFO_WIDGET = 2;
+    static const int SCRIPT_INFO_WIDGET = 3;
 
     static Overlay overlay;
     static WidgetOverride widgetOverrides[NUM_WIDGETS];
@@ -4224,9 +4225,10 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data:
 
         bool areListCountersVisible = list::g_numChannelsWithVisibleCounters > 0;
         bool isDlogVisible = !dlog_record::isIdle();
+        bool isScriptVisible = !mp::isIdle();
 
         int state = 0;
-        if (areListCountersVisible || isDlogVisible) {
+        if (areListCountersVisible || isDlogVisible || isScriptVisible) {
             if (list::g_numChannelsWithVisibleCounters > 0) {
                 if (list::g_numChannelsWithVisibleCounters > 4) {
                     state = 1;
@@ -4238,8 +4240,13 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data:
                     state = 4;
                 }
             }
+
             if (isDlogVisible) {
-                state += 5;
+                state |= 0x8000;
+            }
+
+            if (isScriptVisible) {
+                state |= 0x4000;
             }
         }
 
@@ -4252,8 +4259,8 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data:
 
                 const Widget *listIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LIST_ICON_WIDGET);
                 const Widget *listGridWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LIST_GRID_WIDGET);
-                const Widget *dlogIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_ICON_WIDGET);
-                const Widget *dlogStatusWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_STATUS_WIDGET);
+                const Widget *dlogInfoWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_INFO_WIDGET);
+                const Widget *scriptInfoWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, SCRIPT_INFO_WIDGET);
 
                 overlay.width = widgetCursor.widget->w;
                 overlay.height = widgetCursor.widget->h;
@@ -4278,7 +4285,7 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data:
                         overlay.height += listGridWidget->h;
                     } else {
                         widgetOverrides[LIST_GRID_WIDGET].h = listGridWidget->h;
-                        if (list::g_numChannelsWithVisibleCounters == 1 && !isDlogVisible) {
+                        if (list::g_numChannelsWithVisibleCounters == 1 && !isDlogVisible && !isScriptVisible) {
                             widgetOverrides[LIST_GRID_WIDGET].w = listGridWidget->w / 2;
                             overlay.width -= listGridWidget->w / 2;
                         }
@@ -4290,25 +4297,28 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data:
                 }
 
                 if (isDlogVisible) {
-                    widgetOverrides[DLOG_ICON_WIDGET].isVisible = true;
-                    widgetOverrides[DLOG_ICON_WIDGET].x = dlogIconWidget->x;
-                    widgetOverrides[DLOG_ICON_WIDGET].y = overlay.height - (widgetCursor.widget->h - dlogIconWidget->y);
-                    widgetOverrides[DLOG_ICON_WIDGET].w = listIconWidget->w;
-                    widgetOverrides[DLOG_ICON_WIDGET].h = listIconWidget->h;
-
-                    widgetOverrides[DLOG_STATUS_WIDGET].isVisible = true;
-                    widgetOverrides[DLOG_STATUS_WIDGET].x = dlogStatusWidget->x;
-                    widgetOverrides[DLOG_STATUS_WIDGET].y = overlay.height - (widgetCursor.widget->h - dlogStatusWidget->y);
-                    widgetOverrides[DLOG_STATUS_WIDGET].w = dlogStatusWidget->w;
-                    widgetOverrides[DLOG_STATUS_WIDGET].h = dlogStatusWidget->h;
+                    widgetOverrides[DLOG_INFO_WIDGET].isVisible = true;
+                    widgetOverrides[DLOG_INFO_WIDGET].x = dlogInfoWidget->x;
+                    widgetOverrides[DLOG_INFO_WIDGET].y = overlay.height - (widgetCursor.widget->h - dlogInfoWidget->y);
+                    widgetOverrides[DLOG_INFO_WIDGET].w = dlogInfoWidget->w;
+                    widgetOverrides[DLOG_INFO_WIDGET].h = dlogInfoWidget->h;
                 } else {
-                    widgetOverrides[DLOG_ICON_WIDGET].isVisible = false;
-                    widgetOverrides[DLOG_STATUS_WIDGET].isVisible = false;
-                    overlay.height -= dlogStatusWidget->h;
+                    widgetOverrides[DLOG_INFO_WIDGET].isVisible = false;
+                    overlay.height -= dlogInfoWidget->h;
+                }
+
+                if (isScriptVisible) {
+                    widgetOverrides[SCRIPT_INFO_WIDGET].isVisible = true;
+                    widgetOverrides[SCRIPT_INFO_WIDGET].x = scriptInfoWidget->x;
+                    widgetOverrides[SCRIPT_INFO_WIDGET].y = overlay.height - (widgetCursor.widget->h - scriptInfoWidget->y);
+                    widgetOverrides[SCRIPT_INFO_WIDGET].w = scriptInfoWidget->w;
+                    widgetOverrides[SCRIPT_INFO_WIDGET].h = scriptInfoWidget->h;
+                } else {
+                    widgetOverrides[SCRIPT_INFO_WIDGET].isVisible = false;
+                    overlay.height -= scriptInfoWidget->h;
                 }
             }
         }
-
 
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     }
@@ -4460,7 +4470,7 @@ void data_dlog_file_name(data::DataOperationEnum operation, data::Cursor &cursor
 void data_dlog_start_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        value = dlog_record::checkDlogParameters(dlog_record::g_guiParameters, true) == SCPI_RES_OK ? 1 : 0;
+        value = dlog_record::checkDlogParameters(dlog_record::g_guiParameters, true, false) == SCPI_RES_OK ? 1 : 0;
     }
 #endif
 }
@@ -4589,7 +4599,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
 
                 dlogValueParams->div = Value(newDiv, dlogValueParams->div.getUnit());
             }
-        } else if (g_focusDataId == DATA_ID_DLOG_TIME_DIV) {
+        } else if (g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV) {
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
                 valueAtTouchDown = recording.timeDiv;
                 xAtTouchDown = touchDrag->x;
@@ -4598,8 +4608,8 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
 
                 float newDiv = valueAtTouchDown * scale;
 
-                float min = getMin(g_focusCursor, DATA_ID_DLOG_TIME_DIV).getFloat();
-                float max = getMax(g_focusCursor, DATA_ID_DLOG_TIME_DIV).getFloat();
+                float min = getMin(g_focusCursor, DATA_ID_DLOG_X_AXIS_DIV).getFloat();
+                float max = getMax(g_focusCursor, DATA_ID_DLOG_X_AXIS_DIV).getFloat();
 
                 newDiv = roundPrec(clamp(newDiv, min, max), dlog_view::TIME_PREC);
 
@@ -4633,15 +4643,13 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
         int state = 0;
         int numVisibleDlogValues = 0;
         
-        if (&recording != &dlog_record::g_recording) {
-            state = numVisibleDlogValues = dlog_view::getNumVisibleDlogValues(recording);
+        state = numVisibleDlogValues = dlog_view::getNumVisibleDlogValues(recording);
 
-            if (dlog_view::g_overlayMinimized) {
-                state |= 0x80;
-            }
-
-            state |= 0x100;
+        if (dlog_view::g_overlayMinimized) {
+            state |= 0x80;
         }
+
+        state |= 0x100;
 
         if (overlay.state != state) {
             overlay.state = state;
@@ -4765,52 +4773,74 @@ void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cur
 #endif
 }
 
-void data_dlog_time_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_x_axis_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     dlog_view::Recording &recording = dlog_view::getRecording();
 
     if (operation == data::DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_TIME_OFFSET;
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = Value(recording.timeOffset, UNIT_SECOND);
+            value = Value(recording.timeOffset, recording.parameters.xAxis.unit);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(0.0f, UNIT_SECOND);
+        value = Value(0.0f, recording.parameters.xAxis.unit);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(dlog_view::getMaxTimeOffset(recording), UNIT_SECOND);
+        value = Value(dlog_view::getMaxTimeOffset(recording), recording.parameters.xAxis.unit);
     } else if (operation == data::DATA_OPERATION_SET) {
         dlog_view::changeTimeOffset(recording, value.getFloat());
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
-        value = "Time Offset";
+        value = "Offset";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = UNIT_SECOND;
+        value = recording.parameters.xAxis.unit;
     } 
 #endif
 }
 
-void data_dlog_time_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_x_axis_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     dlog_view::Recording &recording = dlog_view::getRecording();
 
     if (operation == data::DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_TIME_DIV;
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = Value(recording.timeDiv, UNIT_SECOND);
+            value = Value(recording.timeDiv, recording.parameters.xAxis.unit);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN || operation == data::DATA_OPERATION_GET_DEF) {
-        value = Value(recording.timeDivMin, UNIT_SECOND);
+        value = Value(recording.timeDivMin, recording.parameters.xAxis.unit);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(recording.timeDivMax, UNIT_SECOND);
+        value = Value(recording.timeDivMax, recording.parameters.xAxis.unit);
     } else if (operation == data::DATA_OPERATION_SET) {
         dlog_view::changeTimeDiv(recording, value.getFloat());
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
-        value = "Time Div";
+        value = "Div";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = UNIT_SECOND;
+        value = recording.parameters.xAxis.unit;
+    }
+#endif
+}
+
+void data_dlog_x_axis_range_max(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        value = Value(dlog_view::getDuration(recording), recording.parameters.xAxis.unit);
+    }
+#endif
+}
+
+void data_dlog_x_axis_range_max_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        dlog_view::Recording &recording = dlog_view::getRecording();
+        if (recording.parameters.xAxis.unit == UNIT_SECOND) {
+            value = "Total duration";
+        } else {
+            value = "Max.";
+        }
     }
 #endif
 }
@@ -4847,6 +4877,7 @@ void data_dlog_time_duration(data::DataOperationEnum operation, data::Cursor &cu
     }
 #endif
 }
+
 void data_dlog_file_length(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
@@ -5011,6 +5042,43 @@ void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cur
         value = Value(272, VALUE_TYPE_UINT16);
     }
 #endif
+}
+
+void data_script_is_started(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = mp::isIdle() ? 0 : 1;
+    }
+}
+
+void data_script_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        // get script file name
+        const char *p = mp::g_scriptPath + strlen(mp::g_scriptPath) - 1;
+        while (p >= mp::g_scriptPath && *p != '/' && *p != '\\') {
+            p--;
+        }
+        value = p + 1;
+    }
+}
+
+void data_debug_trace_log(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_COUNT) {
+        value = (int)eez::debug::getNumTraceLogLines();
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
+        value = Value(eez::debug::getNumTraceLogLines(), VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
+        value = Value(eez::debug::getTraceLogStartPosition(), VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
+        eez::debug::setTraceLogStartPosition(value.getUInt32());
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+        value = Value(eez::debug::getTraceLogPageSize(), VALUE_TYPE_UINT32);
+    }
+}
+
+void data_debug_trace_log_line(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = Value(eez::debug::getTraceLogLine(cursor.i), VALUE_TYPE_DEBUG_TRACE_LOG_STR);
+    }
 }
 
 } // namespace gui

@@ -16,7 +16,14 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
+
 #include <eez/mp.h>
+
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/channel_dispatcher.h>
+#include <eez/modules/psu/trigger.h>
+#include <eez/modules/psu/dlog_record.h>
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -33,10 +40,13 @@ extern "C" {
 #pragma warning( pop ) 
 #endif
 
+using namespace eez::mp;
+using namespace eez::psu;
+
 mp_obj_t modeez_scpi(mp_obj_t commandOrQueryText) {
     const char *resultText;
     size_t resultTextLen;
-    if (!eez::mp::scpi(mp_obj_str_get_str(commandOrQueryText), &resultText, &resultTextLen)) {
+    if (!scpi(mp_obj_str_get_str(commandOrQueryText), &resultText, &resultTextLen)) {
         return mp_const_false;
     }
 
@@ -45,4 +55,116 @@ mp_obj_t modeez_scpi(mp_obj_t commandOrQueryText) {
     }
 
     return mp_obj_new_str(resultText, resultTextLen);
+}
+
+mp_obj_t modeez_getU(mp_obj_t channelIndexObj) {
+    int channelIndex = mp_obj_get_int(channelIndexObj) - 1;
+    if (channelIndex < 0 || channelIndex >= CH_NUM) {
+        mp_raise_ValueError("Invalid channel index");
+    }
+    Channel &channel = Channel::get(channelIndex);
+
+    return mp_obj_new_float(eez::psu::channel_dispatcher::getUMonLast(channel));
+}
+
+mp_obj_t modeez_setU(mp_obj_t channelIndexObj, mp_obj_t value) {
+    int channelIndex = mp_obj_get_int(channelIndexObj) - 1;
+    if (channelIndex < 0 || channelIndex >= CH_NUM) {
+        mp_raise_ValueError("Invalid channel index");
+    }
+    Channel &channel = Channel::get(channelIndex);
+
+    if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
+        mp_raise_ValueError("Can not change transient trigger");
+    }
+
+    if (channel.isRemoteProgrammingEnabled()) {
+        mp_raise_ValueError("Remote programming enabled");
+    }
+
+    float voltage = mp_obj_get_float(value);
+
+    if (voltage > channel_dispatcher::getULimit(channel)) {
+        mp_raise_ValueError("Voltage limit exceeded");
+    }
+
+    if (voltage * channel_dispatcher::getISetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
+        mp_raise_ValueError("Power limit exceeded");
+    }
+
+    channel_dispatcher::setVoltage(channel, voltage);
+
+    return mp_const_none;
+}
+
+mp_obj_t modeez_getI(mp_obj_t channelIndexObj) {
+    int channelIndex = mp_obj_get_int(channelIndexObj) - 1;
+    if (channelIndex < 0 || channelIndex >= CH_NUM) {
+        mp_raise_ValueError("Invalid channel index");
+    }
+    Channel &channel = Channel::get(channelIndex);
+
+    return mp_obj_new_float(eez::psu::channel_dispatcher::getIMonLast(channel));
+}
+
+mp_obj_t modeez_setI(mp_obj_t channelIndexObj, mp_obj_t value) {
+    int channelIndex = mp_obj_get_int(channelIndexObj) - 1;
+    if (channelIndex < 0 || channelIndex >= CH_NUM) {
+        mp_raise_ValueError("Invalid channel index");
+    }
+    Channel &channel = Channel::get(channelIndex);
+
+    if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
+        mp_raise_ValueError("Can not change transient trigger");
+    }
+
+    float current = mp_obj_get_float(value);
+
+    if (current > channel_dispatcher::getILimit(channel)) {
+        mp_raise_ValueError("Current limit exceeded");
+    }
+
+    if (current * channel_dispatcher::getUSetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
+        mp_raise_ValueError("Power limit exceeded");
+    }
+
+    channel_dispatcher::setCurrent(channel, current);
+
+    return mp_const_none;
+}
+
+mp_obj_t modeez_getOutputMode(mp_obj_t channelIndexObj) {
+    int channelIndex = mp_obj_get_int(channelIndexObj) - 1;
+    if (channelIndex < 0 || channelIndex >= CH_NUM) {
+        mp_raise_ValueError("Invalid channel index");
+    }
+    Channel &channel = Channel::get(channelIndex);
+
+    const char *modeStr = channel.getModeStr();
+
+    return mp_obj_new_str(modeStr, strlen(modeStr));
+}
+
+mp_obj_t modeez_dlogTraceData(size_t n_args, const mp_obj_t *args) {
+    if (!dlog_record::isTraceExecuting()) {
+        mp_raise_ValueError("DLOG trace data not started");
+    }
+
+    if (n_args < dlog_record::g_recording.parameters.numYAxes) {
+        mp_raise_ValueError("Too few values");
+    }
+
+    if (n_args > dlog_record::g_recording.parameters.numYAxes) {
+        mp_raise_ValueError("Too many values");
+    }
+
+    float values[4];
+
+    for (size_t i = 0; i < n_args; i++) {
+        values[i] = mp_obj_get_float(args[i]);
+    }
+
+    dlog_record::log(values);
+
+    return mp_const_none;
 }

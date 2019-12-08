@@ -296,7 +296,7 @@ bool isOpenFileEnabled() {
     }
 
     if (fileItem->type == FILE_TYPE_MICROPYTHON) {
-        return true;
+        return mp::isIdle();
     }
 
     return false;
@@ -426,6 +426,9 @@ void deleteFile() {
 }
 
 void onEncoder(int counter) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    counter = -counter;
+#endif
     int32_t newPosition = getFilesStartPosition() + counter;
     if (newPosition < 0) {
         newPosition = 0;
