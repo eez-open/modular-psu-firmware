@@ -211,14 +211,14 @@ void toggleBootloader(int slotIndex) {
 		// GPIO_InitStruct.Alternate = GPIO_AF12_UART7;
 		// HAL_GPIO_Init(UART_TX_DOUT1_GPIO_Port, &GPIO_InitStruct);
 
-		DebugTrace("start slave FSM");
+		DebugTrace("start slave FSM\n");
 
 		int wasFlashStatus = -1;
 		uint32_t startTick = HAL_GetTick();
 		while (true) {
 			flashSlaveFSM();
 			if (flashStatus != wasFlashStatus) {
-				DebugTrace("flash status: %d", flashStatus);
+				DebugTrace("flash status: %d\n", flashStatus);
 				wasFlashStatus = flashStatus;
 			}
 
@@ -228,7 +228,7 @@ void toggleBootloader(int slotIndex) {
 			}
 		}
 
-		DebugTrace("end slave FSM after 3 seconds");
+		DebugTrace("end slave FSM after 3 seconds\n");
 	} else {
 		write(REG_OUTPUT_PORT, 0b10000000);
 		delay(5);

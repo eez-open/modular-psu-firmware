@@ -130,7 +130,7 @@ State g_state;
 
 char *g_scriptPath = (char *)MP_BUFFER;
 static char *g_scriptSource = g_scriptPath + MAX_PATH_LENGTH + 1;
-static const size_t MAX_SCRIPT_SOURCE_AND_HEAP_SIZE = MP_BUFFER_SIZE - MAX_PATH_LENGTH + 1;
+static const size_t MAX_SCRIPT_LENGTH = 32 * 1024;
 static size_t g_scriptSourceLength;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +230,7 @@ void oneIter() {
         	// this version reinitialise MP every time
 			volatile char dummy;
 			mp_stack_set_top((void *)&dummy);
-			gc_init(g_scriptSource + g_scriptSourceLength, MP_BUFFER + MP_BUFFER_SIZE - 32768 - 1024);
+			gc_init(g_scriptSource + MAX_SCRIPT_LENGTH, MP_BUFFER + MP_BUFFER_SIZE - MAX_SCRIPT_LENGTH);
 			mp_init();
 
             nlr_buf_t nlr;
@@ -258,7 +258,7 @@ void oneIter() {
 				volatile char dummy;
 				g_initialized = true;
 				mp_stack_set_top((void *)&dummy);
-				gc_init(g_scriptSource + g_scriptSourceLength, MP_BUFFER + MP_BUFFER_SIZE - 32768 - 1024);
+				gc_init(g_scriptSource + MAX_SCRIPT_LENGTH, MP_BUFFER + MP_BUFFER_SIZE - MAX_SCRIPT_LENGTH);
 				mp_init();
 			}
 
@@ -305,7 +305,7 @@ void loadScript() {
     }
 
     fileSize = file.size();
-    if (fileSize > MAX_SCRIPT_SOURCE_AND_HEAP_SIZE) {
+    if (fileSize > MAX_SCRIPT_LENGTH) {
         goto Error;
     }
 

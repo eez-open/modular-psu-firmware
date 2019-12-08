@@ -263,15 +263,15 @@ void AppContext::showPage(int pageId) {
 }
 
 void AppContext::showPageOnNextIter(int pageId, Page *page) {
-    m_nextIterOperation = NEXT_ITER_OPERATION_SET;
     m_pageIdToSetOnNextIter = pageId;
     m_pageToSetOnNextIter = page;
+    m_nextIterOperation = NEXT_ITER_OPERATION_SET;
 }
 
 void AppContext::pushPageOnNextIter(int pageId, Page *page) {
-    m_nextIterOperation = NEXT_ITER_OPERATION_PUSH;
     m_pageIdToSetOnNextIter = pageId;
     m_pageToSetOnNextIter = page;
+    m_nextIterOperation = NEXT_ITER_OPERATION_PUSH;
 }
 
 void AppContext::pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,
