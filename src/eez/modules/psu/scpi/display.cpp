@@ -20,11 +20,12 @@
 
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/scpi/psu.h>
-#include <eez/modules/psu/gui/psu.h>
 
 #if OPTION_DISPLAY
 #include <eez/gui/dialogs.h>
 #include <eez/gui/gui.h>
+#include <eez/gui/dialogs.h>
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/mcu/display.h>
 #include <eez/system.h>
 #endif
@@ -213,6 +214,200 @@ scpi_result_t scpi_cmd_displayWindowDlog(scpi_t *context) {
 #if OPTION_DISPLAY && OPTION_SD_CARD
     dlog_view::g_showLatest = true;
     psu::gui::g_psuAppContext.pushPageOnNextIter(PAGE_ID_DLOG_VIEW);
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+enum {
+    INPUT_TYPE_TEXT,
+    INPUT_TYPE_NUMBER,
+    INPUT_TYPE_MENU
+};
+
+static scpi_choice_def_t inputTypeChoice[] = {
+    { "TEXT", INPUT_TYPE_TEXT },
+    { "NUMBer", INPUT_TYPE_NUMBER },
+    { "MENU", INPUT_TYPE_MENU },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+static scpi_choice_def_t menuTypeChoice[] = {
+    { "BUTTon", eez::gui::MENU_TYPE_BUTTON },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
+#if OPTION_DISPLAY
+    const char *labelText;
+    size_t labelTextLen;
+    if (!SCPI_ParamCharacters(context, &labelText, &labelTextLen, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (labelTextLen > MAX_KEYPAD_LABEL_LENGTH - 2) {
+        SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t type;
+    if (!SCPI_ParamChoice(context, inputTypeChoice, &type, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    char label[MAX_KEYPAD_LABEL_LENGTH + 1];
+    strncpy(label, labelText, labelTextLen);
+    if (type == INPUT_TYPE_TEXT || type == INPUT_TYPE_NUMBER) {
+        strcpy(label + labelTextLen, ": ");
+        labelTextLen += 2;
+    } else {
+        label[labelTextLen] = 0;
+    }
+
+    if (type == INPUT_TYPE_TEXT) {
+        int32_t max;
+        if (!SCPI_ParamInt(context, &max, true)) {
+            return SCPI_RES_ERR;
+        }
+
+        if ((size_t)max > MAX_KEYPAD_TEXT_LENGTH - labelTextLen) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
+
+        const char *valueText;
+        size_t valueTextLen;
+        if (!SCPI_ParamCharacters(context, &valueText, &valueTextLen, true)) {
+            return SCPI_RES_ERR;
+        }
+
+        if (valueTextLen > (size_t)max) {
+            SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+            return SCPI_RES_ERR;
+        }
+
+        char value[MAX_KEYPAD_TEXT_LENGTH + 1];
+        strncpy(value, valueText, valueTextLen);
+        value[valueTextLen] = 0;
+
+        const char *result = psu::gui::g_psuAppContext.textInput(label, max, value);
+        if (result) {
+            SCPI_ResultText(context, result);
+        }
+    } else if (type == INPUT_TYPE_NUMBER)  {
+        int32_t unit;
+        if (!SCPI_ParamChoice(context, unitChoice, &unit, true)) {
+            return SCPI_RES_ERR;
+        }
+ 
+        scpi_number_t param;
+ 
+        // min
+        if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+            return SCPI_RES_ERR;
+        }
+ 
+        float min;
+ 
+        if (param.special) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        } else {
+            if (param.unit != SCPI_UNIT_NONE && param.unit != getScpiUnit((Unit)unit)) {
+                SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+                return SCPI_RES_ERR;
+            }
+ 
+            min = (float)param.content.value;
+        }
+ 
+        // max
+        if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+            return SCPI_RES_ERR;
+        }
+ 
+        float max;
+ 
+        if (param.special) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        } else {
+            if (param.unit != SCPI_UNIT_NONE && param.unit != getScpiUnit((Unit)unit)) {
+                SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+                return SCPI_RES_ERR;
+            }
+ 
+            max = (float)param.content.value;
+        }
+ 
+        // value
+        if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+            return SCPI_RES_ERR;
+        }
+ 
+        float value;
+ 
+        if (param.special) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        } else {
+            if (param.unit != SCPI_UNIT_NONE && param.unit != getScpiUnit((Unit)unit)) {
+                SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+                return SCPI_RES_ERR;
+            }
+ 
+            value = (float)param.content.value;
+        }
+ 
+        if (value < min || value > max) {
+            SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+            return SCPI_RES_ERR;
+        }
+ 
+        float result = psu::gui::g_psuAppContext.numberInput(label, (Unit)unit, min, max, value);
+        if (!isNaN(result)) {
+            SCPI_ResultFloat(context, result);
+        }        
+    } else {
+        int32_t menuType;
+        if (!SCPI_ParamChoice(context, menuTypeChoice, &menuType, true)) {
+            return SCPI_RES_ERR;
+        }
+
+        static const int MAX_MENU_ITEM_TEXT_LENGTH = 20;
+        static char menuItemTexts[MAX_MENU_ITEMS][MAX_MENU_ITEM_TEXT_LENGTH + 1];
+        static const char *menuItems[MAX_MENU_ITEMS + 1] = {};
+
+        int i;
+        for (i = 0; i < MAX_MENU_ITEMS; i++) {
+            const char *menuItemText;
+            size_t menuItemTextLen;
+            if (!SCPI_ParamCharacters(context, &menuItemText, &menuItemTextLen, i == 0 ? true : false)) {
+                if (i == 0 || SCPI_ParamErrorOccurred(context)) {
+                    return SCPI_RES_ERR;
+                }
+                break;
+            }
+
+            if (menuItemTextLen > MAX_MENU_ITEM_TEXT_LENGTH) {
+                SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+                return SCPI_RES_ERR;
+            }
+
+            strncpy(&menuItemTexts[i][0], menuItemText, menuItemTextLen);
+            menuItemTexts[i][menuItemTextLen] = 0;
+
+            menuItems[i] = &menuItemTexts[i][0];
+        }
+
+        menuItems[i] = nullptr;
+
+        int result = psu::gui::g_psuAppContext.menuInput(label, (eez::gui::MenuType)menuType, menuItems);
+        SCPI_ResultInt(context, result + 1);
+    }
+
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

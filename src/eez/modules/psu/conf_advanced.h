@@ -189,6 +189,8 @@
 /// Maximum allowed length (including label) of the keypad text.
 #define MAX_KEYPAD_TEXT_LENGTH 128
 
+#define MAX_KEYPAD_LABEL_LENGTH 64
+
 /// Enable transition to the Main page after period of inactivity.
 #define GUI_BACK_TO_MAIN_ENABLED 0
 
@@ -290,3 +292,4 @@
 #define CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD 5 // 5 seconds
 
 #define INF_TEXT "\x91"
+

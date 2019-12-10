@@ -271,7 +271,7 @@ float getValue(int rowIndex, int columnIndex, float *max) {
 void adjustTimeOffset(Recording &recording) {
     auto duration = getDuration(recording);
     if (recording.timeOffset + recording.pageSize * recording.parameters.period > duration) {
-        recording.timeOffset = roundPrec(duration - recording.pageSize * recording.parameters.period, TIME_PREC);
+        recording.timeOffset = duration - recording.pageSize * recording.parameters.period;
         if (recording.timeOffset < 0) {
             recording.timeOffset = 0;
         }
@@ -279,12 +279,12 @@ void adjustTimeOffset(Recording &recording) {
 }
 
 float getMaxTimeOffset(Recording &recording) {
-    return roundPrec((recording.size - recording.pageSize) * recording.parameters.period, TIME_PREC);
+    return (recording.size - recording.pageSize) * recording.parameters.period;
 }
 
 void changeTimeOffset(Recording &recording, float timeOffset) {
     if (&dlog_view::g_recording == &recording) {
-        float newTimeOffset = roundPrec(timeOffset, TIME_PREC);
+        float newTimeOffset = timeOffset;
         if (newTimeOffset != recording.timeOffset) {
             recording.timeOffset = newTimeOffset;
             adjustTimeOffset(recording);
@@ -295,7 +295,7 @@ void changeTimeOffset(Recording &recording, float timeOffset) {
 }
 
 void changeTimeDiv(Recording &recording, float timeDiv) {
-    float newTimeDiv = timeDiv != recording.timeDivMin ? roundPrec(timeDiv, TIME_PREC) : timeDiv;
+    float newTimeDiv = timeDiv != recording.timeDivMin ? timeDiv : timeDiv;
 
     if (recording.timeDiv != newTimeDiv) {
         recording.timeDiv = newTimeDiv;
@@ -316,10 +316,10 @@ void changeTimeDiv(Recording &recording, float timeDiv) {
 
 float getDuration(Recording &recording) {
     if (&recording == &g_recording) {
-        return recording.numSamples * recording.minPeriod;
+        return (recording.numSamples - 1) * recording.minPeriod;
     }
 
-    return recording.size * recording.parameters.period;
+    return (recording.size - 1) * recording.parameters.period;
 }
 
 void initAxis(Recording &recording) {
@@ -361,8 +361,8 @@ void initAxis(Recording &recording) {
 }
 
 void initDlogValues(Recording &recording) {
-    uint8_t dlogValueIndex = 0;
-    for (uint8_t yAxisIndex = 0; yAxisIndex < recording.parameters.numYAxes && dlogValueIndex < MAX_NUM_OF_Y_VALUES; yAxisIndex++) {
+    uint8_t yAxisIndex;
+    for (yAxisIndex = 0; yAxisIndex < MIN(recording.parameters.numYAxes, MAX_NUM_OF_Y_VALUES); yAxisIndex++) {
         int8_t channelIndex = recording.parameters.yAxes[yAxisIndex].channelIndex;
 
         // TODO this is not logical
@@ -371,37 +371,31 @@ void initDlogValues(Recording &recording) {
         }
 
         if (recording.parameters.yAxes[yAxisIndex].unit == UNIT_VOLT) {
-            recording.dlogValues[dlogValueIndex].isVisible = true;
-            recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * channelIndex + dlog_view::DLOG_VALUE_CH1_U);
-            recording.dlogValues[dlogValueIndex].channelIndex = channelIndex;
+            recording.dlogValues[yAxisIndex].isVisible = true;
+            recording.dlogValues[yAxisIndex].dlogValueType = (dlog_view::DlogValueType)(3 * channelIndex + dlog_view::DLOG_VALUE_CH1_U);
+            recording.dlogValues[yAxisIndex].channelIndex = channelIndex;
             float div = recording.parameters.yAxes[yAxisIndex].range.max / dlog_view::NUM_VERT_DIVISIONS;
-            recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, 0.01f), UNIT_VOLT);
-            recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-div * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_VOLT);
-
-            dlogValueIndex++;
+            recording.dlogValues[yAxisIndex].div = div;
+            recording.dlogValues[yAxisIndex].offset = -div * dlog_view::NUM_VERT_DIVISIONS / 2;
         } else if (recording.parameters.yAxes[yAxisIndex].unit == UNIT_AMPER) {
-            recording.dlogValues[dlogValueIndex].isVisible = true;
-            recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * channelIndex + dlog_view::DLOG_VALUE_CH1_I);
-            recording.dlogValues[dlogValueIndex].channelIndex = channelIndex;
+            recording.dlogValues[yAxisIndex].isVisible = true;
+            recording.dlogValues[yAxisIndex].dlogValueType = (dlog_view::DlogValueType)(3 * channelIndex + dlog_view::DLOG_VALUE_CH1_I);
+            recording.dlogValues[yAxisIndex].channelIndex = channelIndex;
             float div = recording.parameters.yAxes[yAxisIndex].range.max / dlog_view::NUM_VERT_DIVISIONS;
-            recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, 0.01f), UNIT_AMPER);
-            recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-div * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_AMPER);
-
-            dlogValueIndex++;
+            recording.dlogValues[yAxisIndex].div = div;
+            recording.dlogValues[yAxisIndex].offset = -div * dlog_view::NUM_VERT_DIVISIONS / 2;
         } else if (recording.parameters.yAxes[yAxisIndex].unit == UNIT_WATT) {
-            recording.dlogValues[dlogValueIndex].isVisible = true;
-            recording.dlogValues[dlogValueIndex].dlogValueType = (dlog_view::DlogValueType)(3 * channelIndex + dlog_view::DLOG_VALUE_CH1_P);
-            recording.dlogValues[dlogValueIndex].channelIndex = channelIndex;
+            recording.dlogValues[yAxisIndex].isVisible = true;
+            recording.dlogValues[yAxisIndex].dlogValueType = (dlog_view::DlogValueType)(3 * channelIndex + dlog_view::DLOG_VALUE_CH1_P);
+            recording.dlogValues[yAxisIndex].channelIndex = channelIndex;
             float div = recording.parameters.yAxes[yAxisIndex].range.max / dlog_view::NUM_VERT_DIVISIONS;
-            recording.dlogValues[dlogValueIndex].div = gui::data::Value(roundPrec(div, 0.01f), UNIT_WATT);
-            recording.dlogValues[dlogValueIndex].offset = gui::data::Value(roundPrec(-div * dlog_view::NUM_VERT_DIVISIONS / 2, 0.01f), UNIT_WATT);
-
-            dlogValueIndex++;
+            recording.dlogValues[yAxisIndex].div = div;
+            recording.dlogValues[yAxisIndex].offset = -div * dlog_view::NUM_VERT_DIVISIONS / 2;
         }
     }
 
-    for (; dlogValueIndex < MAX_NUM_OF_Y_VALUES; dlogValueIndex++) {
-        recording.dlogValues[dlogValueIndex].isVisible = false;
+    for (; yAxisIndex < MAX_NUM_OF_Y_VALUES; yAxisIndex++) {
+        recording.dlogValues[yAxisIndex].isVisible = false;
     }
 }
 
@@ -441,42 +435,11 @@ void autoScale(Recording &recording) {
     auto numVisibleDlogValues = getNumVisibleDlogValues(recording);
 
     for (auto visibleDlogValueIndex = 0; visibleDlogValueIndex < numVisibleDlogValues; visibleDlogValueIndex++) {
-        DlogValueParams *dlogValueParams = getVisibleDlogValueParams(recording, visibleDlogValueIndex);
-
-        float div;
-
+        int dlogValueIndex = getVisibleDlogValueIndex(recording, visibleDlogValueIndex);
+        DlogValueParams &dlogValueParams = recording.dlogValues[dlogValueIndex];
         float numDivisions = 1.0f * NUM_VERT_DIVISIONS / numVisibleDlogValues;
-
-        if (dlogValueParams->dlogValueType % 3 == DLOG_VALUE_CH1_U) {
-            // TODO this must be read from the file        
-            if (Channel::get(dlogValueParams->channelIndex).isInstalled()) {
-                div = channel_dispatcher::getUMax(Channel::get(dlogValueParams->channelIndex)) / numDivisions;
-            } else {
-                div = 40.0f / numDivisions;
-            }
-
-            dlogValueParams->div = gui::data::Value(ceilPrec(div, VALUE_PREC), UNIT_VOLT);
-        } else if (dlogValueParams->dlogValueType % 3 == DLOG_VALUE_CH1_I) {
-            // TODO this must be read from the file
-            if (Channel::get(dlogValueParams->channelIndex).isInstalled()) {
-                div = channel_dispatcher::getIMax(Channel::get(dlogValueParams->channelIndex)) / numDivisions;
-            } else {
-                div = 5.0f / numDivisions;
-            }
-
-            dlogValueParams->div = gui::data::Value(ceilPrec(div, VALUE_PREC), UNIT_AMPER);
-        } else {
-            // TODO this must be read from the file
-            if (Channel::get(dlogValueParams->channelIndex).isInstalled()) {
-                div = channel_dispatcher::getPowerMaxLimit(Channel::get(dlogValueParams->channelIndex)) / numDivisions;
-            } else {
-                div = 155.0f / numDivisions;
-            }
-
-            dlogValueParams->div = gui::data::Value(ceilPrec(div, VALUE_PREC), UNIT_WATT);
-        }
-
-        dlogValueParams->offset = gui::data::Value(roundPrec(div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions), VALUE_PREC), dlogValueParams->div.getUnit());
+        dlogValueParams.div = recording.parameters.yAxes[dlogValueIndex].range.max / numDivisions;
+        dlogValueParams.offset = dlogValueParams.div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions);
     }
 }
 
@@ -626,7 +589,7 @@ void openFile(const char *filePath) {
                     g_recording.numSamples = (file.size() - g_recording.dataOffset) / (g_recording.parameters.numYAxes * sizeof(float));
                     g_recording.minPeriod = g_recording.parameters.period;
                     g_recording.timeDivMin = g_recording.pageSize * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
-                    g_recording.timeDivMax = roundPrec(MAX(g_recording.numSamples, g_recording.pageSize) * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS, TIME_PREC);
+                    g_recording.timeDivMax = MAX(g_recording.numSamples, g_recording.pageSize) * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
 
                     g_recording.size = g_recording.numSamples;
 
@@ -658,6 +621,16 @@ void openFile(const char *filePath) {
 
 Recording &getRecording() {
     return g_showLatest && dlog_record::isExecuting() ? dlog_record::g_recording : g_recording;
+}
+
+float roundValue(float value) {
+    if (value >= 10) {
+        return roundPrec(value, 0.1f);
+    } else if (value >= 1) {
+        return roundPrec(value, 0.01f);
+    } else {
+        return roundPrec(value, 0.001f);
+    }
 }
 
 } // namespace dlog_view

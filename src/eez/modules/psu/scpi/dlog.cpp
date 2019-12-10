@@ -308,7 +308,7 @@ scpi_result_t scpi_cmd_senseDlogTimeQ(scpi_t *context) {
 #endif
 }
 
-static scpi_choice_def_t unitChoice[] = {
+scpi_choice_def_t unitChoice[] = {
     { "UNKNown", UNIT_UNKNOWN },
     { "VOLT", UNIT_VOLT },
     { "AMPEr", UNIT_AMPER },

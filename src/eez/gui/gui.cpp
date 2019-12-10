@@ -203,12 +203,23 @@ void action_internal_select_enum_item() {
     ((SelectFromEnumPage *)g_appContext->getActivePage())->selectEnumItem();
 }
 
+// from InternalActionsEnum
 static ActionExecFunc g_internalActionExecFunctions[] = {
     0,
+    // ACTION_ID_INTERNAL_SELECT_ENUM_ITEM
     action_internal_select_enum_item,
+
+    // ACTION_ID_INTERNAL_DIALOG_CLOSE
     popPage,
+
+    // ACTION_ID_INTERNAL_TOAST_ACTION
     ToastMessagePage::executeAction,
-    ToastMessagePage::executeActionWithoutParam
+
+    // ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM
+    ToastMessagePage::executeActionWithoutParam,
+
+    // ACTION_ID_INTERNAL_MENU_WITH_BUTTONS
+    MenuWithButtonsPage::executeAction
 };
 
 bool isInternalAction(int actionId) {
@@ -220,6 +231,10 @@ void executeInternalAction(int actionId) {
 }
 
 void executeAction(int actionId) {
+    if (actionId == ACTION_ID_NONE) {
+        return;
+    }
+
     AppContext *saved = g_appContext;
     g_appContext = getFoundWidgetAtDown().appContext;
 

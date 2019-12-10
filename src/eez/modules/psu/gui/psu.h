@@ -20,6 +20,9 @@
 
 #include <eez/gui/app_context.h>
 #include <eez/gui/gui.h>
+#include <eez/gui/dialogs.h>
+
+#include <eez/modules/psu/gui/numeric_keypad.h>
 
 using namespace eez::gui;
 
@@ -83,6 +86,10 @@ public:
 
     void showUncaughtScriptExceptionMessage();
 
+    const char *textInput(const char *label, size_t maxChars, const char *value);
+    float numberInput(const char *label, Unit unit, float min, float max, float value);
+    int menuInput(const char *label, MenuType menuType, const char **menuItems);
+
 protected:
     bool m_pushProgressPage;
     const char *m_progressMessage;
@@ -95,6 +102,28 @@ protected:
     bool m_clearTextMessage;
 
     bool m_showUncaughtScriptExceptionMessage;
+
+    const char *m_inputLabel;
+
+    bool m_showTextInputOnNextIter;
+    size_t m_textInputMaxChars;
+    const char *m_textInput;
+    static void onSetTextInputResult(char *);
+    static void onCancelTextInput();
+
+    bool m_showNumberInputOnNextIter;
+    NumericKeypadOptions m_numberInputOptions;
+    float m_numberInput;
+    static void onSetNumberInputResult(float value);
+    static void onCancelNumberInput();
+
+    bool m_showMenuInputOnNextIter;
+    MenuType m_menuType;
+    const char **m_menuItems;
+    int m_menuInput;
+    static void onSetMenuInputResult(int value);
+
+    bool m_inputReady;
 
     int getMainPageId() override;
     void onPageChanged(int previousPageId, int activePageId) override;

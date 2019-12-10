@@ -306,6 +306,22 @@ void PsuAppContext::stateManagment() {
         m_showUncaughtScriptExceptionMessage = false;
         errorMessageWithAction("Uncaught script exception!", action_show_debug_trace_log, "Show debug trace log");
     }
+
+    if (m_showTextInputOnNextIter) {
+        m_showTextInputOnNextIter = false;
+        Keypad::startPush(m_inputLabel, m_textInput, m_textInputMaxChars, false, onSetTextInputResult, onCancelTextInput);
+
+    }
+
+    if (m_showNumberInputOnNextIter) {
+        m_showNumberInputOnNextIter = false;
+        NumericKeypad::start(m_inputLabel, Value(m_numberInput, m_numberInputOptions.editValueUnit), m_numberInputOptions, onSetNumberInputResult, nullptr, onCancelNumberInput);
+    }
+
+    if (m_showMenuInputOnNextIter) {
+        m_showMenuInputOnNextIter = false;
+        showMenu(this, m_inputLabel, m_menuType, m_menuItems, onSetMenuInputResult);
+    }
 }
 
 bool PsuAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
@@ -630,6 +646,95 @@ uint8_t PsuAppContext::getTextMessageVersion() {
 
 void PsuAppContext::showUncaughtScriptExceptionMessage() {
     m_showUncaughtScriptExceptionMessage = true;
+}
+
+void PsuAppContext::onSetTextInputResult(char *value) {
+    g_psuAppContext.popPage();
+
+    g_psuAppContext.m_textInput = value;
+    g_psuAppContext.m_inputReady = true;
+}
+
+void PsuAppContext::onCancelTextInput() {
+    g_psuAppContext.popPage();
+
+    g_psuAppContext.m_textInput = nullptr;
+    g_psuAppContext.m_inputReady = true;
+}
+
+const char *PsuAppContext::textInput(const char *label, size_t maxChars, const char *value) {
+    m_inputLabel = label;
+    m_textInputMaxChars = maxChars;
+    m_textInput = value;
+
+    m_inputReady = false;
+    m_showTextInputOnNextIter = true;
+
+    while (!m_inputReady) {
+        osDelay(1);
+    }
+
+    return m_textInput;
+}
+
+void PsuAppContext::onSetNumberInputResult(float value) {
+    g_psuAppContext.popPage();
+
+    g_psuAppContext.m_numberInput = value;
+    g_psuAppContext.m_inputReady = true;
+}
+
+void PsuAppContext::onCancelNumberInput() {
+    g_psuAppContext.popPage();
+
+    g_psuAppContext.m_numberInput = NAN;
+    g_psuAppContext.m_inputReady = true;
+}
+
+float PsuAppContext::numberInput(const char *label, Unit unit, float min, float max, float value) {
+    m_inputLabel = label;
+
+    m_numberInputOptions.editValueUnit = unit;
+    m_numberInputOptions.min = min;
+    m_numberInputOptions.enableMinButton();
+    m_numberInputOptions.max = max;
+    m_numberInputOptions.enableMaxButton();
+    m_numberInputOptions.flags.signButtonEnabled = m_numberInputOptions.min < 0;
+    m_numberInputOptions.flags.dotButtonEnabled = true;
+
+    m_numberInput = value;
+
+    m_inputReady = false;
+    m_showNumberInputOnNextIter = true;
+
+    while (!m_inputReady) {
+        osDelay(1);
+    }
+
+    return m_numberInput;
+}
+
+void PsuAppContext::onSetMenuInputResult(int value) {
+    g_psuAppContext.popPage();
+
+    g_psuAppContext.m_menuInput = value;
+    g_psuAppContext.m_inputReady = true;
+}
+
+int PsuAppContext::menuInput(const char *label, MenuType menuType, const char **menuItems) {
+    m_inputLabel = label;
+
+    m_menuType = menuType;
+    m_menuItems = menuItems;
+
+    m_inputReady = false;
+    m_showMenuInputOnNextIter = true;
+
+    while (!m_inputReady) {
+        osDelay(1);
+    }
+
+    return m_menuInput;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

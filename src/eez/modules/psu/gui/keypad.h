@@ -19,6 +19,7 @@
 #pragma once
 
 #include <eez/gui/page.h>
+#include <eez/modules/psu/conf_advanced.h>
 
 namespace eez {
 namespace psu {
@@ -68,7 +69,7 @@ class Keypad : public eez::gui::Page {
 
   protected:
     char m_stateText[2][MAX_KEYPAD_TEXT_LENGTH + 2];
-    char m_label[64];
+    char m_label[MAX_KEYPAD_LABEL_LENGTH + 1];
     char m_keypadText[MAX_KEYPAD_TEXT_LENGTH + 2];
     int m_maxChars;
 

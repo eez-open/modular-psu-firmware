@@ -54,6 +54,10 @@ mp_obj_t modeez_scpi(mp_obj_t commandOrQueryText) {
         return mp_const_none;
     }
 
+    if (resultTextLen >= 2 && resultText[0] == '"' && resultText[resultTextLen-1] == '"') {
+        return mp_obj_new_str(resultText + 1, resultTextLen - 2);    
+    }
+
     return mp_obj_new_str(resultText, resultTextLen);
 }
 

@@ -69,9 +69,6 @@ static const int VIEW_HEIGHT = 240;
 static const int NUM_HORZ_DIVISIONS = 12;
 static const int NUM_VERT_DIVISIONS = 6;
 
-static const float TIME_PREC = 0.005f;
-static const float VALUE_PREC = 0.1f;
-
 static const int MAX_NUM_OF_Y_AXES = CH_MAX * 3;
 
 enum State {
@@ -160,8 +157,8 @@ struct DlogValueParams {
     bool isVisible;
     DlogValueType dlogValueType;
     int channelIndex;
-    eez::gui::data::Value offset;
-    eez::gui::data::Value div;
+    float offset;
+    float div;
 };
 
 struct Recording {
@@ -217,6 +214,8 @@ void changeTimeDiv(Recording &recording, float timeDiv);
 float getDuration(Recording &recording);
 
 void autoScale(Recording &recording);
+
+float roundValue(float value);
 
 } // namespace dlog_view
 } // namespace psu

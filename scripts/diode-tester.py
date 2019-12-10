@@ -1,57 +1,68 @@
 from utime import ticks_ms, ticks_add, ticks_diff, sleep_ms
-from eez import scpi
+from eez import scpi, setU, getOutputMode, getI, dlogTraceData
 
-U_STEP = 0.1
 U_MAX = 40.0
-TIME_STEP_MS = 4
-MEASURE_DELAY_MS = 2
-I_SET = 4.0
-TRACE_FILE = "/diode-tester.dlog"
+I_SET = 0.01
+TIME_STEP_MS = 20
 
-try:
-    scpi("OUTP 0")
-    scpi("INST ch1")
-    I_MAX = float(scpi("CURR? MAX"))
-    scpi("VOLT 0")
-    scpi("CURR " + str(I_SET))
+diodeName = scpi('disp:input? "Diode name", TEXT, 20, ""')
+if diodeName != None:
+    uStep = scpi('disp:input? "U step", NUMBER, VOLT, 0.01, 1, 0.1')
+    if uStep != None:
+        uStep = float(uStep)
 
-    scpi("SENS:DLOG:TRAC:X:UNIT VOLT")
-    scpi("SENS:DLOG:TRAC:X:STEP " + str(U_STEP))
-    scpi("SENS:DLOG:TRAC:X:RANG:MAX " + str(U_MAX))
-    scpi("SENS:DLOG:TRAC:Y1:UNIT AMPER")
-    scpi("SENS:DLOG:TRAC:Y1:RANG:MAX " + str(I_MAX))
+        try:
+            scpi('DISP:INPUT? "Connect your diode on CH1", MENU, BUTTON, "Start"')
+            scpi("OUTP 0")
+            scpi("INST ch1")
+            scpi("SENS:CURR:RANG MIN")
+            scpi("VOLT 0")
+            scpi("CURR " + str(I_SET))
 
-    # FILE_NAME_MAX_CHARS = 20
-    # fileName = scpi('query text, "Diode model", ' % FILE_NAME_MAX_CHARS)
+            scpi("SENS:DLOG:TRAC:X:UNIT VOLT")
+            scpi("SENS:DLOG:TRAC:X:STEP " + str(uStep))
+            scpi("SENS:DLOG:TRAC:X:RANG:MAX " + str(U_MAX))
+            scpi("SENS:DLOG:TRAC:Y1:UNIT AMPER")
+            scpi("SENS:DLOG:TRAC:Y1:RANG:MAX " + str(I_SET))
 
-    scpi("INIT:DLOG:TRACE \"" + TRACE_FILE + "\"");
+            scpi('INIT:DLOG:TRACE "/Recordings/' + diodeName + '.dlog"')
 
-    scpi("OUTP 1")
+            scpi("OUTP 1")
 
-    scpi("DISP:WINDOW:DLOG")
+            scpi("DISP:WINDOW:DLOG")
 
-    t = ticks_ms()
-    i = 0
-    while True:
-        u_set = i * U_STEP
-        if u_set > U_MAX:
-            break
+            ch = 1
 
-        scpi("VOLT " + str(u_set))
+            t = ticks_ms()
+            i = 0
+            while True:
+                u_set = i * uStep
+                if u_set > U_MAX:
+                    break
 
-        t = ticks_add(t, MEASURE_DELAY_MS)
-        sleep_ms(ticks_diff(t, ticks_ms()))
+                setU(ch, u_set)
+                #scpi("VOLT " + str(u_set))
 
-        mode = scpi("OUTP:MODE?")
-        #if mode.startswith("CC"):
-        #    break
+                t = ticks_add(t, TIME_STEP_MS)
+                sleep_ms(ticks_diff(t, ticks_ms()))
 
-        scpi("DLOG:TRACE:DATA " + scpi("MEAS:CURR?"))
+                curr = getI(ch)
+                #curr = scpi("MEAS:CURR?")
 
-        i = i + 1
+                dlogTraceData(curr)
+                #scpi("DLOG:TRACE:DATA " + scpi("MEAS:CURR?"))
 
-        t = ticks_add(t, TIME_STEP_MS - MEASURE_DELAY_MS)
-        sleep_ms(ticks_diff(t, ticks_ms()))
-finally:
-    scpi("ABOR:DLOG")
-    scpi("OUTP 0")
+                mode = getOutputMode(ch)
+                #mode = scpi("OUTP:MODE?")
+
+                print(u_set, curr, mode)
+
+                if mode == "CC":
+                    break
+                # if curr > I_SET:
+                #     break
+
+                i = i + 1
+        finally:
+            scpi("ABOR:DLOG")
+            scpi("OUTP 0")

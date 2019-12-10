@@ -423,6 +423,26 @@ bool isDeleteFileEnabled() {
 }
 
 void deleteFile() {
+    if (osThreadGetId() != scpi::g_scpiTaskHandle) {
+        popPage();
+        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FILE_MANAGER_DELETE_FILE, 0), osWaitForever);
+        return;
+    }
+
+    auto fileItem = getFileItem(g_selectedFileIndex);
+    if (!fileItem) {
+        return;
+    }
+
+    char filePath[MAX_PATH_LENGTH + 1];
+    strcpy(filePath, g_currentDirectory);
+    strcat(filePath, "/");
+    strcat(filePath, fileItem->name);
+
+    int err;
+    psu::sd_card::deleteFile(filePath, &err);
+
+    loadDirectory();
 }
 
 void onEncoder(int counter) {

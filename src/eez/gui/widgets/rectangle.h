@@ -28,8 +28,13 @@ struct RectangleFlags {
     unsigned ignoreLuminosity : 1;
 };
 
-struct RectangleWidget {
+struct RectangleWidgetSpecific {
     RectangleFlags flags;
+};
+
+struct RectangleWidget {
+    Widget common;
+    RectangleWidgetSpecific specific;
 };
 
 void RectangleWidget_draw(const WidgetCursor &widgetCursor);

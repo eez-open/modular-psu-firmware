@@ -25,7 +25,7 @@ namespace gui {
 
 #define IGNORE_LUMINOSITY_FLAG 1
 
-struct TextWidget {
+struct TextWidgetSpecific {
 #if OPTION_SDRAM    
     const char *text;
 #else
@@ -35,7 +35,13 @@ struct TextWidget {
     uint8_t flags;
 };
 
+struct TextWidget {
+    Widget common;
+    TextWidgetSpecific specific;
+}; 
+
 void TextWidget_fixPointers(Widget *widget);
+void TextWidget_autoSize(TextWidget& widget);
 void TextWidget_draw(const WidgetCursor &widgetCursor);
 
 } // namespace gui

@@ -56,5 +56,13 @@ void dialogCancel();
 void dialogOk();
 void dialogLater();
 
+enum MenuType {
+    MENU_TYPE_BUTTON
+};
+
+static const size_t MAX_MENU_ITEMS = 4;
+
+void showMenu(AppContext *appContext, const char *message, MenuType menuType, const char **menuItems, void(*callback)(int));
+
 } // namespace gui
 } // namespace eez

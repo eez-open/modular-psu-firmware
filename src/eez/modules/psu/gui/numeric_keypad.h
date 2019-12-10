@@ -27,7 +27,7 @@ namespace gui {
 struct NumericKeypadOptions {
     NumericKeypadOptions();
 
-	  int pageId;
+	int pageId;
 
     int channelIndex;
 

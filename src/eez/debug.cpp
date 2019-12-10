@@ -110,34 +110,38 @@ uint32_t getNumTraceLogLines() {
 }
 
 const char *getTraceLogLine(uint32_t lineIndex) {
-    if (lineIndex > g_lastLineIndex) {
+    uint32_t lastLineIndex = g_lastLineIndex;
+    uint32_t lastLineCharPosition = g_lastLineCharPosition;
+    uint32_t tail = g_tail;
+
+    if (lineIndex > lastLineIndex) {
         do {
-            if (g_log[g_lastLineCharPosition] == 0) {
-                g_lastLineIndex++;
+            if (g_log[lastLineCharPosition] == 0) {
+                lastLineIndex++;
             }
 
-            g_lastLineCharPosition = (g_lastLineCharPosition + 1) % DEBUG_TRACE_LOG_SIZE;
-        } while (g_lastLineIndex != lineIndex);
-    } else if (lineIndex < g_lastLineIndex) {
+            lastLineCharPosition = (lastLineCharPosition + 1) % DEBUG_TRACE_LOG_SIZE;
+        } while (lastLineIndex != lineIndex);
+    } else if (lineIndex < lastLineIndex) {
         if (lineIndex == 0) {
-            g_lastLineIndex = 0;
-            g_lastLineCharPosition = g_tail;
+            lastLineIndex = 0;
+            lastLineCharPosition = tail;
         } else {
-            g_lastLineCharPosition = (g_lastLineCharPosition + DEBUG_TRACE_LOG_SIZE - 2) % DEBUG_TRACE_LOG_SIZE;
+            lastLineCharPosition = (lastLineCharPosition + DEBUG_TRACE_LOG_SIZE - 2) % DEBUG_TRACE_LOG_SIZE;
 
             do {
-                if (g_log[g_lastLineCharPosition] == 0) {
-                    g_lastLineIndex--;
+                if (g_log[lastLineCharPosition] == 0) {
+                    lastLineIndex--;
                 }
 
-                g_lastLineCharPosition = (g_lastLineCharPosition + DEBUG_TRACE_LOG_SIZE - 1) % DEBUG_TRACE_LOG_SIZE;
-            } while (g_lastLineIndex != lineIndex);
+                lastLineCharPosition = (lastLineCharPosition + DEBUG_TRACE_LOG_SIZE - 1) % DEBUG_TRACE_LOG_SIZE;
+            } while (lastLineIndex != lineIndex);
                 
-            g_lastLineCharPosition = (g_lastLineCharPosition + 2) % DEBUG_TRACE_LOG_SIZE;
+            lastLineCharPosition = (lastLineCharPosition + 2) % DEBUG_TRACE_LOG_SIZE;
         }
     }
 
-    return g_log + g_lastLineCharPosition;
+    return g_log + lastLineCharPosition;
 }
 
 uint32_t getTraceLogStartPosition() {

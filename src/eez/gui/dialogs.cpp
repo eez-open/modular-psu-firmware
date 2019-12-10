@@ -183,6 +183,14 @@ void dialogLater() {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+void showMenu(AppContext *appContext, const char *message, MenuType menuType, const char **menuItems, void(*callback)(int)) {
+    if (menuType == MENU_TYPE_BUTTON) {
+        pushPage(INTERNAL_PAGE_ID_MENU_WITH_BUTTONS, MenuWithButtonsPage::create(appContext, message, menuItems, callback));
+    }
+}
+
 } // namespace gui
 } // namespace eez
 

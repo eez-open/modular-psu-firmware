@@ -4542,9 +4542,9 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
     } else if (operation == DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS) {
         value = dlog_view::NUM_VERT_DIVISIONS;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_DIV) {
-        value = recording.dlogValues[value.getUInt8()].div;
+        value = Value(recording.dlogValues[value.getUInt8()].div, recording.parameters.yAxes[value.getUInt8()].unit);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_OFFSET) {
-        value = recording.dlogValues[value.getUInt8()].offset;
+        value = Value(recording.dlogValues[value.getUInt8()].offset, recording.parameters.yAxes[value.getUInt8()].unit);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
         value = YT_GRAPH_UPDATE_METHOD_STATIC;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
@@ -4564,23 +4564,23 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
             dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, g_focusCursor.i);
 
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
-                valueAtTouchDown = dlogValueParams->offset.getFloat();
+                valueAtTouchDown = dlogValueParams->offset;
                 yAtTouchDown = touchDrag->y;
             } else {
-                float newOffset = valueAtTouchDown + dlogValueParams->div.getFloat() * (yAtTouchDown - touchDrag->y) * dlog_view::NUM_VERT_DIVISIONS / dlog_view::VIEW_HEIGHT;
+                float newOffset = valueAtTouchDown + dlogValueParams->div * (yAtTouchDown - touchDrag->y) * dlog_view::NUM_VERT_DIVISIONS / dlog_view::VIEW_HEIGHT;
 
                 float min = getMin(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_OFFSET).getFloat();
                 float max = getMax(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_OFFSET).getFloat();
 
-                newOffset = roundPrec(clamp(newOffset, min, max), dlog_view::VALUE_PREC);
+                newOffset = clamp(newOffset, min, max);
                 
-                dlogValueParams->offset = Value(newOffset, dlogValueParams->offset.getUnit());
+                dlogValueParams->offset = newOffset;
             }
         } else if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV) {
             dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, g_focusCursor.i);
 
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
-                valueAtTouchDown = dlogValueParams->div.getFloat();
+                valueAtTouchDown = dlogValueParams->div;
 
                 //uint32_t position = ytDataGetPosition(cursor, DATA_ID_RECORDING);
                 //Value::YtDataGetValueFunctionPointer ytDataGetValue = data::ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
@@ -4595,9 +4595,10 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
                 float min = getMin(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_DIV).getFloat();
                 float max = getMax(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_DIV).getFloat();
 
-                newDiv = roundPrec(clamp(newDiv, min, max), dlog_view::VALUE_PREC);
+                newDiv = clamp(newDiv, min, max);
 
-                dlogValueParams->div = Value(newDiv, dlogValueParams->div.getUnit());
+                dlogValueParams->offset = dlogValueParams->offset * newDiv / dlogValueParams->div;
+                dlogValueParams->div = newDiv;
             }
         } else if (g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV) {
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
@@ -4611,7 +4612,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
                 float min = getMin(g_focusCursor, DATA_ID_DLOG_X_AXIS_DIV).getFloat();
                 float max = getMax(g_focusCursor, DATA_ID_DLOG_X_AXIS_DIV).getFloat();
 
-                newDiv = roundPrec(clamp(newDiv, min, max), dlog_view::TIME_PREC);
+                newDiv = clamp(newDiv, min, max);
 
                 dlog_view::changeTimeDiv(recording, newDiv);
             }
@@ -4724,25 +4725,26 @@ void data_dlog_visible_value_label(data::DataOperationEnum operation, data::Curs
 void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     dlog_view::Recording &recording = dlog_view::getRecording();
-    dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, cursor.i);
+    int dlogValueIndex = dlog_view::getVisibleDlogValueIndex(recording, cursor.i);
 
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = dlogValueParams->div;
+            value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].div), recording.parameters.yAxes[dlogValueIndex].unit);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(0.1f, dlogValueParams->div.getUnit());
+        value = Value(0.001f, recording.parameters.yAxes[dlogValueIndex].unit);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(100.0f, dlogValueParams->div.getUnit());
+        value = Value(100.0f, recording.parameters.yAxes[dlogValueIndex].unit);
     } else if (operation == data::DATA_OPERATION_SET) {
-        dlogValueParams->div = Value(roundPrec(value.getFloat(), dlog_view::VALUE_PREC), value.getUnit());
+        recording.dlogValues[dlogValueIndex].offset = recording.dlogValues[dlogValueIndex].offset * value.getFloat() / recording.dlogValues[dlogValueIndex].div;
+        recording.dlogValues[dlogValueIndex].div = value.getFloat();
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
         value = "Div";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = dlogValueParams->div.getUnit();
+        value = recording.parameters.yAxes[dlogValueIndex].unit;
     } 
 #endif
 }
@@ -4750,25 +4752,25 @@ void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor
 void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     dlog_view::Recording &recording = dlog_view::getRecording();
-    dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, cursor.i);
+    int dlogValueIndex = dlog_view::getVisibleDlogValueIndex(recording, cursor.i);
 
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = dlogValueParams->offset;
+            value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].offset), recording.parameters.yAxes[dlogValueIndex].unit);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(-100.0f, dlogValueParams->offset.getUnit());
+        value = Value(-100.0f, recording.parameters.yAxes[dlogValueIndex].unit);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(100.0f, dlogValueParams->offset.getUnit());
+        value = Value(100.0f, recording.parameters.yAxes[dlogValueIndex].unit);
     } else if (operation == data::DATA_OPERATION_SET) {
-        dlogValueParams->offset = Value(roundPrec(value.getFloat(), dlog_view::VALUE_PREC), value.getUnit());
+        recording.dlogValues[dlogValueIndex].offset = value.getFloat();
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
         value = "Offset";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = dlogValueParams->offset.getUnit();
+        value = recording.parameters.yAxes[dlogValueIndex].unit;
     } 
 #endif
 }
@@ -4855,7 +4857,7 @@ void data_dlog_visible_value_cursor(data::DataOperationEnum operation, data::Cur
         float min = ytDataGetValue(ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, dlogValueIndex, &max);
         value = Value(
             (min + max) / 2,
-            recording.dlogValues[dlogValueIndex].div.getUnit()
+            recording.parameters.yAxes[dlogValueIndex].unit
         );
 
     }

@@ -18,7 +18,10 @@
 
 #pragma once
 
+#include <eez/gui/dialogs.h>
 #include <eez/gui/widget.h>
+#include <eez/gui/widgets/text.h>
+#include <eez/gui/widgets/rectangle.h>
 
 namespace eez {
 namespace gui {
@@ -55,8 +58,8 @@ class SetPage : public Page {
 
 class InternalPage : public Page {
   public:
-    virtual void refresh() = 0; // repaint page
-    virtual void updatePage() = 0;
+    virtual void refresh(const WidgetCursor& widgetCursor) = 0; // repaint page
+    virtual void updatePage(const WidgetCursor& widgetCursor) = 0;
 	virtual WidgetCursor findWidget(int x, int y) = 0;
 
     int x;
@@ -89,8 +92,8 @@ public:
     bool onEncoder(int counter);
     bool onEncoderClicked();
 
-    void refresh();
-    void updatePage();
+    void refresh(const WidgetCursor& widgetCursor);
+    void updatePage(const WidgetCursor& widgetCursor);
     WidgetCursor findWidget(int x, int y);
 
     static void executeAction();
@@ -119,8 +122,8 @@ class SelectFromEnumPage : public InternalPage {
 
     void init();
 
-    void refresh();
-    void updatePage();
+    void refresh(const WidgetCursor& widgetCursor);
+    void updatePage(const WidgetCursor& widgetCursor);
     WidgetCursor findWidget(int x, int y);
 
     void selectEnumItem();
@@ -156,6 +159,27 @@ class SelectFromEnumPage : public InternalPage {
 
     void getItemPosition(int itemIndex, int &x, int &y);
     void getItemLabel(int itemIndex, char *text, int count);
+};
+
+class MenuWithButtonsPage : public InternalPage {
+public:
+    static MenuWithButtonsPage *create(AppContext *appContext, const char *message, const char **menuItems, void (*callback)(int));
+
+    void refresh(const WidgetCursor& widgetCursor);
+    void updatePage(const WidgetCursor& widgetCursor);
+    WidgetCursor findWidget(int x, int y);
+
+    static void executeAction();
+
+private:
+    AppContext *m_appContext;
+    RectangleWidget m_containerRectangleWidget;
+    TextWidget m_messageTextWidget;
+    TextWidget m_buttonTextWidgets[MAX_MENU_ITEMS];
+    size_t m_numButtonTextWidgets;
+    void (*m_callback)(int);
+
+    void init(AppContext *appContext, const char *message, const char **menuItems, void(*callback)(int));
 };
 
 } // namespace gui

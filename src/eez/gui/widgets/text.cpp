@@ -33,14 +33,21 @@ namespace gui {
 
 #if OPTION_SDRAM
 void TextWidget_fixPointers(Widget *widget) {
-    TextWidget *textWidget = (TextWidget *)widget->specific;
+    TextWidgetSpecific *textWidget = (TextWidgetSpecific *)widget->specific;
     textWidget->text = (const char *)((uint8_t *)g_document + (uint32_t)textWidget->text);
 }
 #endif
 
+void TextWidget_autoSize(TextWidget& widget) {
+    const Style *style = getStyle(widget.common.style);
+    font::Font font = styleGetFont(style);
+    widget.common.w = style->border_size_left + style->padding_left + mcu::display::measureStr(widget.specific.text, -1, font, 0) + style->border_size_right + style->padding_right;
+    widget.common.h = style->border_size_top + style->padding_top + font.getHeight() + style->border_size_bottom + style->padding_bottom;
+}
+
 void TextWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const TextWidget *textWidget = GET_WIDGET_PROPERTY(widget, specific, const TextWidget *);
+    const TextWidgetSpecific *textWidget = GET_WIDGET_PROPERTY(widget, specific, const TextWidgetSpecific *);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
