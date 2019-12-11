@@ -309,7 +309,7 @@ void PsuAppContext::stateManagment() {
 
     if (m_showTextInputOnNextIter) {
         m_showTextInputOnNextIter = false;
-        Keypad::startPush(m_inputLabel, m_textInput, m_textInputMaxChars, false, onSetTextInputResult, onCancelTextInput);
+        Keypad::startPush(m_inputLabel, m_textInput, m_textInputMinChars, m_textInputMaxChars, false, onSetTextInputResult, onCancelTextInput);
 
     }
 
@@ -662,8 +662,9 @@ void PsuAppContext::onCancelTextInput() {
     g_psuAppContext.m_inputReady = true;
 }
 
-const char *PsuAppContext::textInput(const char *label, size_t maxChars, const char *value) {
+const char *PsuAppContext::textInput(const char *label, size_t minChars, size_t maxChars, const char *value) {
     m_inputLabel = label;
+    m_textInputMinChars = minChars;
     m_textInputMaxChars = maxChars;
     m_textInput = value;
 

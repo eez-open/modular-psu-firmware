@@ -34,10 +34,8 @@ class Keypad : public eez::gui::Page {
     void pageAlloc();
     void pageFree();
 
-    static void startPush(const char *label, const char *text, int maxChars, bool isPassword,
-                          void (*ok)(char *), void (*cancel)());
-    static void startReplace(const char *label, const char *text, int maxChars, bool isPassword,
-                             void (*ok)(char *), void (*cancel)());
+    static void startPush(const char *label, const char *text, int minChars, int maxChars, bool isPassword, void (*ok)(char *), void (*cancel)());
+    static void startReplace(const char *label, const char *text, int minChars, int maxChars, bool isPassword, void (*ok)(char *), void (*cancel)());
 
     void key();
     virtual void key(char ch);
@@ -52,6 +50,7 @@ class Keypad : public eez::gui::Page {
     virtual void setMaxValue();
     virtual void setMinValue();
     virtual void setDefValue();
+    virtual bool isOkEnabled();
     virtual void ok();
     virtual void cancel();
 
@@ -71,6 +70,7 @@ class Keypad : public eez::gui::Page {
     char m_stateText[2][MAX_KEYPAD_TEXT_LENGTH + 2];
     char m_label[MAX_KEYPAD_LABEL_LENGTH + 1];
     char m_keypadText[MAX_KEYPAD_TEXT_LENGTH + 2];
+    int m_minChars;
     int m_maxChars;
 
     void init(const char *label);
@@ -84,8 +84,7 @@ class Keypad : public eez::gui::Page {
     void (*m_okCallback)(char *); // +2 for cursor and zero at the end
     void (*m_cancelCallback)();
 
-    void start(const char *label, const char *text, int maxChars_, bool isPassword_,
-               void (*ok)(char *), void (*cancel)());
+    void start(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)());
 };
 
 class NumericKeypad;

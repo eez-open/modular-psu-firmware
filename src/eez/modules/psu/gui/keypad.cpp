@@ -167,13 +167,13 @@ void Keypad::getKeypadText(char *text) {
     appendCursor(text);
 }
 
-void Keypad::start(const char *label, const char *text, int maxChars_, bool isPassword_,
-                   void (*ok)(char *), void (*cancel)()) {
+void Keypad::start(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
     init(label);
 
     m_okCallback = ok;
     m_cancelCallback = cancel;
 
+    m_minChars = minChars_;
     m_maxChars = maxChars_;
     m_isPassword = isPassword_;
 
@@ -185,17 +185,15 @@ void Keypad::start(const char *label, const char *text, int maxChars_, bool isPa
     m_isUpperCase = false;
 }
 
-void Keypad::startPush(const char *label, const char *text, int maxChars_, bool isPassword_,
-                       void (*ok)(char *), void (*cancel)()) {
+void Keypad::startPush(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
     Keypad *page = getFreeKeypad();
-    page->start(label, text, maxChars_, isPassword_, ok, cancel);
+    page->start(label, text, minChars_, maxChars_, isPassword_, ok, cancel);
     pushPage(PAGE_ID_KEYPAD, page);
 }
 
-void Keypad::startReplace(const char *label, const char *text, int maxChars_, bool isPassword_,
-                          void (*ok)(char *), void (*cancel)()) {
+void Keypad::startReplace(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
     Keypad *page = getFreeKeypad();
-    page->start(label, text, maxChars_, isPassword_, ok, cancel);
+    page->start(label, text, minChars_, maxChars_, isPassword_, ok, cancel);
     replacePage(PAGE_ID_KEYPAD, page);
 }
 
@@ -259,6 +257,11 @@ void Keypad::setMinValue() {
 }
 
 void Keypad::setDefValue() {
+}
+
+bool Keypad::isOkEnabled() {
+    int n = strlen(m_keypadText);
+    return n >= m_minChars && n <= m_maxChars;
 }
 
 void Keypad::ok() {

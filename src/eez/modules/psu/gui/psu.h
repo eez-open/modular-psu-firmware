@@ -86,7 +86,7 @@ public:
 
     void showUncaughtScriptExceptionMessage();
 
-    const char *textInput(const char *label, size_t maxChars, const char *value);
+    const char *textInput(const char *label, size_t minChars, size_t maxChars, const char *value);
     float numberInput(const char *label, Unit unit, float min, float max, float value);
     int menuInput(const char *label, MenuType menuType, const char **menuItems);
 
@@ -106,6 +106,7 @@ protected:
     const char *m_inputLabel;
 
     bool m_showTextInputOnNextIter;
+    size_t m_textInputMinChars;
     size_t m_textInputMaxChars;
     const char *m_textInput;
     static void onSetTextInputResult(char *);

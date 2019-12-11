@@ -137,11 +137,6 @@ bool setCouplingType(CouplingType couplingType, int *err) {
                 trigger::setVoltage(channel, getUMin(channel));
                 trigger::setCurrent(channel, getIMin(channel));
 
-#ifdef EEZ_PLATFORM_SIMULATOR
-                channel.simulator.setLoadEnabled(false);
-                channel.simulator.setLoad(Channel::get(0).simulator.getLoad());
-#endif
-
                 channel.prot_conf.flags.u_state = Channel::get(0).prot_conf.flags.u_state || Channel::get(1).prot_conf.flags.u_state ? 1 : 0;
                 if (channel.params.features & CH_FEATURE_HW_OVP) {
                     channel.prot_conf.flags.u_type = Channel::get(0).prot_conf.flags.u_type || Channel::get(1).prot_conf.flags.u_type ? 1 : 0;
@@ -1658,23 +1653,12 @@ void setTriggerCurrent(Channel &channel, float value) {
 
 #ifdef EEZ_PLATFORM_SIMULATOR
 void setLoadEnabled(Channel &channel, bool state) {
-    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        Channel::get(0).simulator.setLoadEnabled(state);
-        Channel::get(1).simulator.setLoadEnabled(state);
-    } else {
-        channel.simulator.setLoadEnabled(state);
-    }
+    channel.simulator.setLoadEnabled(state);
 }
 
 void setLoad(Channel &channel, float load) {
     load = roundPrec(load, 0.001f);
-
-    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        Channel::get(0).simulator.setLoad(load);
-        Channel::get(1).simulator.setLoad(load);
-    } else {
-        channel.simulator.setLoad(load);
-    }
+    channel.simulator.setLoad(load);
 }
 #endif
 

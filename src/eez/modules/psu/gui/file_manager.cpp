@@ -369,6 +369,7 @@ bool isUploadFileEnabled() {
         return true;
     }
 #endif
+
     return false;
 }
 

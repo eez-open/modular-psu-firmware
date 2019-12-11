@@ -937,7 +937,7 @@ void editValue(uint16_t dataId) {
 
         NumericKeypad::start(0, value, options, onSetFloatValue, 0, 0);
     } else {
-        Keypad::startPush(0, value.getString(), getMax(g_editValueCursor, g_editValueDataId).getUInt32(), false, onSetStringValue, 0);
+        Keypad::startPush(0, value.getString(), 0, getMax(g_editValueCursor, g_editValueDataId).getUInt32(), false, onSetStringValue, 0);
     }
 }
 
@@ -1908,6 +1908,15 @@ void data_keypad_unit_enabled(data::DataOperationEnum operation, data::Cursor &c
                     keypad->m_options.editValueUnit == UNIT_MILLI_WATT ||
                     keypad->m_options.editValueUnit == UNIT_SECOND ||
                     keypad->m_options.editValueUnit == UNIT_MILLI_SECOND;
+        }
+    }
+}
+
+void data_keypad_ok_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        Keypad *keypad = getActiveKeypad();
+        if (keypad) {
+            value = keypad->isOkEnabled() ? 1 : 0;
         }
     }
 }
@@ -4619,8 +4628,8 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         } else {
             recording.cursorOffset = MIN(dlog_view::VIEW_WIDTH - 1, MAX(touchDrag->x, 0));
         }
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_TIME) {
-        value = Value((ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset) * recording.parameters.period, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE) {
+        value = Value((ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset) * recording.parameters.period, recording.parameters.xAxis.unit);
     }
 #endif
 }

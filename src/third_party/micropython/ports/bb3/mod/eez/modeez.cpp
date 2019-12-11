@@ -17,6 +17,7 @@
 */
 
 #include <string.h>
+#include <stdlib.h>
 
 #include <eez/mp.h>
 
@@ -56,6 +57,12 @@ mp_obj_t modeez_scpi(mp_obj_t commandOrQueryText) {
 
     if (resultTextLen >= 2 && resultText[0] == '"' && resultText[resultTextLen-1] == '"') {
         return mp_obj_new_str(resultText + 1, resultTextLen - 2);    
+    }
+
+    char *strEnd;
+    long num = strtol(resultText, &strEnd, 10);
+    if (*strEnd == 0) {
+        return mp_obj_new_int(num);
     }
 
     return mp_obj_new_str(resultText, resultTextLen);

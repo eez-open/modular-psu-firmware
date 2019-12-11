@@ -75,7 +75,7 @@ void SysSettingsDateTimePage::toggleNtp() {
 
 void SysSettingsDateTimePage::editNtpServer() {
 #if OPTION_ETHERNET
-    Keypad::startPush(0, ntpServer, 32, false, onSetNtpServer, popPage);
+    Keypad::startPush(0, ntpServer, 0, 32, false, onSetNtpServer, popPage);
 #endif
 }
 
@@ -349,7 +349,7 @@ void SysSettingsEthernetPage::onSetMacAddress(char *value) {
 void SysSettingsEthernetPage::editMacAddress() {
     char macAddressStr[18];
     macAddressToString(m_macAddress, macAddressStr);
-    Keypad::startPush(0, macAddressStr, 32, false, onSetMacAddress, popPage);
+    Keypad::startPush(0, macAddressStr, 0, 32, false, onSetMacAddress, popPage);
 }
 
 int SysSettingsEthernetPage::getDirty() {

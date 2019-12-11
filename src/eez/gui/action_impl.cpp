@@ -1190,6 +1190,10 @@ void action_dlog_auto_scale() {
     dlog_view::autoScale(dlog_view::getRecording());
 }
 
+void action_dlog_upload() {
+    dlog_view::uploadFile();
+}
+
 void action_show_file_manager() {
 #if OPTION_SD_CARD
     file_manager::loadDirectory();

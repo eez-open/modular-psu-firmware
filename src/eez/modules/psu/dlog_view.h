@@ -179,7 +179,6 @@ struct Recording {
     uint32_t refreshCounter;
 
     uint32_t numSamples;
-    float minPeriod;
     float timeDivMin;
     float timeDivMax;
 
@@ -216,6 +215,8 @@ float getDuration(Recording &recording);
 void autoScale(Recording &recording);
 
 float roundValue(float value);
+
+void uploadFile();
 
 } // namespace dlog_view
 } // namespace psu

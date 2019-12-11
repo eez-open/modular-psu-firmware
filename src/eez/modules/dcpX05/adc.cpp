@@ -96,11 +96,42 @@ float g_iSet[CH_MAX];
 void updateValues(Channel &channel) {
     int channelIndex = channel.channelIndex;
 
+    bool series = false;
+    bool parallel = false;
+    Channel &channel0 = Channel::get(0);
+    Channel &channel1 = Channel::get(1);
+    if (channelIndex == 0 || channelIndex == 1) {
+        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+            series = true;
+        } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+            parallel = true;
+        }
+    }
+
+    if (series || parallel) {
+        if (channelIndex == 1) {
+            return;
+        }
+    }
+
     if (channel.simulator.getLoadEnabled()) {
-        float u_set_v = channel.isRemoteProgrammingEnabled()
-                            ? remap(channel.simulator.voltProgExt, 0, 0, 2.5, channel.u.max)
-                            : g_uSet[channelIndex];
-        float i_set_a = g_iSet[channelIndex];
+        float u_set_v;
+        if (series) {
+            u_set_v = channel.isRemoteProgrammingEnabled()
+                ? remap(channel0.simulator.voltProgExt + channel1.simulator.voltProgExt, 0, 0, 2.5, channel.u.max)
+                : g_uSet[0] + g_uSet[1];
+        } else {
+            u_set_v = channel.isRemoteProgrammingEnabled()
+                ? remap(channel.simulator.voltProgExt, 0, 0, 2.5, channel.u.max)
+                : g_uSet[channelIndex];
+        }
+
+        float i_set_a;
+        if (parallel) {
+            i_set_a = g_iSet[0] + g_iSet[1];
+        } else {
+            i_set_a = g_iSet[channelIndex];
+        }
 
         float u_mon_v = i_set_a * channel.simulator.load;
         float i_mon_a = i_set_a;
@@ -115,14 +146,37 @@ void updateValues(Channel &channel) {
             simulator::setCC(channel.channelIndex, true);
         }
 
-        g_uMon[channelIndex] = u_mon_v;
-        g_iMon[channelIndex] = i_mon_a;
+        if (series) {
+            g_uMon[0] = u_mon_v / 2;
+            g_uMon[1] = u_mon_v / 2;
+        } else {
+            g_uMon[channelIndex] = u_mon_v;
+        }
+
+        if (parallel) {
+            g_iMon[0] = i_mon_a / 2;
+            g_iMon[1] = i_mon_a / 2;
+        } else {
+            g_iMon[channelIndex] = i_mon_a;
+        }
 
         return;
     } else {
         if (channel.isOutputEnabled()) {
-            g_uMon[channelIndex] = g_uSet[channelIndex];
-            g_iMon[channelIndex] = 0;
+            if (series) {
+                g_uMon[0] = g_uSet[0];
+                g_uMon[1] = g_uSet[1];
+            } else {
+                g_uMon[channelIndex] = g_uSet[channelIndex];
+            }
+
+            if (series) {
+                g_iMon[0] = 0;
+                g_iMon[1] = 0;
+            } else {
+                g_iMon[channelIndex] = 0;
+            }
+
             if (g_uSet[channelIndex] > 0 && g_iSet[channelIndex] > 0) {
                 simulator::setCV(channel.channelIndex, true);
                 simulator::setCC(channel.channelIndex, false);

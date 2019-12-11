@@ -140,7 +140,7 @@ struct Channel : ChannelInterface {
 
 		params.U_RESOLUTION = 0.005f;
 		params.I_RESOLUTION = 0.0005f;
-		params.I_LOW_RESOLUTION = 0.000001f;
+		params.I_LOW_RESOLUTION = 0.000005f;
 		params.P_RESOLUTION = 0.001f;
 
 		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP505) {

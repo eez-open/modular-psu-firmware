@@ -366,7 +366,7 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_GET_PERIOD,
     DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE,
     DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET,
-    DATA_OPERATION_YT_DATA_GET_CURSOR_TIME,
+    DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE,
     DATA_OPERATION_YT_DATA_TOUCH_DRAG
 };
 
@@ -422,7 +422,7 @@ uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, uint16_t id);
 float ytDataGetPeriod(const Cursor &cursor, uint16_t id);
 bool ytDataIsCursorVisible(const Cursor &cursor, uint16_t id);
 uint32_t ytDataGetCursorOffset(const Cursor &cursor, uint16_t id);
-Value ytDataGetCursorTime(const Cursor &cursor, uint16_t id);
+Value ytDataGetCursorXValue(const Cursor &cursor, uint16_t id);
 
 struct TouchDrag {
     EventType type;

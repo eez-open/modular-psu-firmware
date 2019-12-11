@@ -126,6 +126,7 @@ void NumericKeypad::init(const char *label, const data::Value &value, NumericKey
         switchToMilli();
     }
 
+    m_minChars = 0;
     m_maxChars = 16;
 
     reset();
@@ -513,6 +514,10 @@ void NumericKeypad::setMinValue() {
 
 void NumericKeypad::setDefValue() {
     m_okFloatCallback(m_options.def);
+}
+
+bool NumericKeypad::isOkEnabled() {
+    return true;
 }
 
 void NumericKeypad::ok() {

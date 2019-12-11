@@ -138,7 +138,7 @@ static size_t g_scriptSourceLength;
 using namespace eez::scpi;
 using namespace eez::psu::scpi;
 
-static char g_scpiData[SCPI_PARSER_INPUT_BUFFER_LENGTH];
+static char g_scpiData[SCPI_PARSER_INPUT_BUFFER_LENGTH + 1];
 static size_t g_scpiDataLen;
 static int_fast16_t g_lastError;
 
@@ -147,6 +147,7 @@ size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
     if (len > 0) {
         strncpy(g_scpiData + g_scpiDataLen, data, len);
         g_scpiDataLen += len;
+        g_scpiData[g_scpiDataLen] = 0;
     }
     return len;
 }
@@ -368,11 +369,14 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
     input(g_scpiContext, "\r\n", 2);
 
     if (g_lastError != 0) {
-        mp_raise_ValueError("SCPI error");
+        static char g_scpiError[32];
+        snprintf(g_scpiError, 32, "SCPI error %d", g_lastError);
+        mp_raise_ValueError(g_scpiError);
     }
 
     if (g_scpiDataLen >= 2 && g_scpiData[g_scpiDataLen - 2] == '\r' && g_scpiData[g_scpiDataLen - 1] == '\n') {
         g_scpiDataLen -= 2;
+        g_scpiData[g_scpiDataLen] = 0;
     }
 
     *resultText = g_scpiData;

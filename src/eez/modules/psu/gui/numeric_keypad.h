@@ -105,6 +105,7 @@ class NumericKeypad : public Keypad {
     void setMaxValue();
     void setMinValue();
     void setDefValue();
+    bool isOkEnabled();
     void ok();
     void cancel();
 

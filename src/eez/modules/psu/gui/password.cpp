@@ -53,7 +53,7 @@ static void checkPasswordOkCallback(char *text) {
 
 static void checkPassword(const char *label, void (*ok)()) {
     g_checkPasswordOkCallback = ok;
-    Keypad::startPush(label, 0, PASSWORD_MAX_LENGTH, true, checkPasswordOkCallback, popPage);
+    Keypad::startPush(label, 0, 0, PASSWORD_MAX_LENGTH, true, checkPasswordOkCallback, popPage);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,12 +98,11 @@ static void onNewPasswordOk(char *text) {
     }
 
     strcpy(g_newPassword, text);
-    Keypad::startReplace("Retype new password: ", 0, PASSWORD_MAX_LENGTH, true,
-                         onRetypeNewPasswordOk, popPage);
+    Keypad::startReplace("Retype new password: ", 0, 0, PASSWORD_MAX_LENGTH, true, onRetypeNewPasswordOk, popPage);
 }
 
 static void onOldPasswordOk() {
-    Keypad::startReplace("New password: ", 0, PASSWORD_MAX_LENGTH, true, onNewPasswordOk, popPage);
+    Keypad::startReplace("New password: ", 0, 0, PASSWORD_MAX_LENGTH, true, onNewPasswordOk, popPage);
 }
 
 static void editPassword(const char *oldPassword) {
@@ -112,7 +111,7 @@ static void editPassword(const char *oldPassword) {
     if (strlen(g_oldPassword)) {
         checkPassword("Current password: ", onOldPasswordOk);
     } else {
-        Keypad::startPush("New password: ", 0, PASSWORD_MAX_LENGTH, true, onNewPasswordOk, popPage);
+        Keypad::startPush("New password: ", 0, 0, PASSWORD_MAX_LENGTH, true, onNewPasswordOk, popPage);
     }
 }
 

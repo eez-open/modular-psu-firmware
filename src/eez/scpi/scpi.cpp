@@ -198,6 +198,8 @@ void oneIter() {
                 file_manager::openImageFile();
             } else if (type == SCPI_QUEUE_MESSAGE_FILE_MANAGER_DELETE_FILE) {
                 file_manager::deleteFile();
+            } else if (type == SCPI_QUEUE_MESSAGE_DLOG_UPLOAD_FILE) {
+                dlog_view::uploadFile();
             }
 #endif // OPTION_SD_CARD
         }

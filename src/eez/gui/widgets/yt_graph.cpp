@@ -323,7 +323,7 @@ struct YTGraphStaticDrawHelper {
                 const Style* style = data::ytDataGetStyle(widgetCursor.cursor, widget->data, m_valueIndex);
                 dataColor16 = display::getColor16FromIndex(style->color);
 
-                getYValue(previousHistoryValuePosition, yPrevMin, yPrevMax);
+                getYValue(position > 0 ? position - 1 : 0, yPrevMin, yPrevMax);
 
                 for (x = startX; x < endX; x++, position++) {
                     getYValue(position, yMin, yMax);
@@ -351,7 +351,7 @@ struct YTGraphStaticDrawHelper {
             int yTimeText = widgetCursor.y + widgetCursor.widget->h - timeTextHeight - PADDING;
 
             char text[64];
-            data::ytDataGetCursorTime(widgetCursor.cursor, widgetCursor.widget->data).toText(text, sizeof(text));
+            data::ytDataGetCursorXValue(widgetCursor.cursor, widgetCursor.widget->data).toText(text, sizeof(text));
             drawText(text, -1, xTimeText, yTimeText, timeTextWidth, timeTextHeight, style, false, false, false, nullptr, nullptr, nullptr, nullptr);
         }
     }

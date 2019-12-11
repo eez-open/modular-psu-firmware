@@ -29,6 +29,10 @@
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/dlog_view.h>
 #include <eez/modules/psu/dlog_record.h>
+#include <eez/modules/psu/scpi/psu.h>
+#if OPTION_ETHERNET
+#include <eez/modules/psu/ethernet.h>
+#endif
 
 #include <eez/gui/gui.h>
 
@@ -138,80 +142,82 @@ void loadBlock() {
     static const int NUM_VALUES_ROWS = 16;
     float values[18 * NUM_VALUES_ROWS];
 
-    File file;
-    if (file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        auto numSamplesPerValue = (unsigned)round(g_loadScale);
-        auto numElementsPerRow = getNumElementsPerRow();
+    auto numSamplesPerValue = (unsigned)round(g_loadScale);
+    if (numSamplesPerValue > 0) {
+        File file;
+        if (file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+            auto numElementsPerRow = getNumElementsPerRow();
 
-        BlockElement *blockElements = getCacheBlock(g_blockIndexToLoad);
+            BlockElement *blockElements = getCacheBlock(g_blockIndexToLoad);
 
-        uint32_t totalBytesRead = 0;
+            uint32_t totalBytesRead = 0;
 
-        uint32_t i = g_cacheBlocks[g_blockIndexToLoad].loadedValues;
-        while (i < NUM_ELEMENTS_PER_BLOCKS) {
-            auto offset = (uint32_t)roundf((g_blockIndexToLoad * NUM_ELEMENTS_PER_BLOCKS + i) / numElementsPerRow * g_loadScale * g_recording.parameters.numYAxes);
+            uint32_t i = g_cacheBlocks[g_blockIndexToLoad].loadedValues;
+            while (i < NUM_ELEMENTS_PER_BLOCKS) {
+                auto offset = (uint32_t)roundf((g_blockIndexToLoad * NUM_ELEMENTS_PER_BLOCKS + i) / numElementsPerRow * g_loadScale * g_recording.parameters.numYAxes);
 
-            offset = g_recording.parameters.numYAxes *((offset + g_recording.parameters.numYAxes - 1) / g_recording.parameters.numYAxes);
+                offset = g_recording.parameters.numYAxes *((offset + g_recording.parameters.numYAxes - 1) / g_recording.parameters.numYAxes);
 
-            size_t filePosition = g_recording.dataOffset + offset * sizeof(float);
-            if (!file.seek(filePosition)) {
-            	i = NUM_ELEMENTS_PER_BLOCKS;
-            	goto closeFile;
-            }
-
-            unsigned iStart = i;
-
-            for (unsigned j = 0; j < numSamplesPerValue; j++) {
-                i = iStart;
-
-                auto valuesRow = j % NUM_VALUES_ROWS;
-
-                if (valuesRow == 0) {
-                	if (g_interruptLoading) {
-                		i = NUM_ELEMENTS_PER_BLOCKS;
-                		goto closeFile;
-                	}
-
-                    // read up to NUM_VALUES_ROWS
-                	uint32_t bytesToRead = MIN(NUM_VALUES_ROWS, numSamplesPerValue - j) * g_recording.parameters.numYAxes * sizeof(float);
-                	uint32_t bytesRead = file.read(values, bytesToRead);
-                	if (bytesToRead != bytesRead) {
-                		i = NUM_ELEMENTS_PER_BLOCKS;
-                		goto closeFile;
-                	}
-
-                    totalBytesRead += bytesRead;
+                size_t filePosition = g_recording.dataOffset + offset * sizeof(float);
+                if (!file.seek(filePosition)) {
+                    i = NUM_ELEMENTS_PER_BLOCKS;
+                    goto closeFile;
                 }
 
-                unsigned valuesOffset = valuesRow * g_recording.parameters.numYAxes;
+                unsigned iStart = i;
 
-                for (unsigned k = 0; k < g_recording.parameters.numYAxes; k++) {
-                    if (k < numElementsPerRow) {
-                        BlockElement *blockElement = blockElements + i++;
+                for (unsigned j = 0; j < numSamplesPerValue; j++) {
+                    i = iStart;
 
-                        float value = values[valuesOffset + k];
+                    auto valuesRow = j % NUM_VALUES_ROWS;
 
-                        if (j == 0) {
-                        	blockElement->min = blockElement->max = value;
-                        } else if (value < blockElement->min) {
-                            blockElement->min = value;
-                        } else if (value > blockElement->max) {
-                            blockElement->max = value;
+                    if (valuesRow == 0) {
+                        if (g_interruptLoading) {
+                            i = NUM_ELEMENTS_PER_BLOCKS;
+                            goto closeFile;
+                        }
+
+                        // read up to NUM_VALUES_ROWS
+                        uint32_t bytesToRead = MIN(NUM_VALUES_ROWS, numSamplesPerValue - j) * g_recording.parameters.numYAxes * sizeof(float);
+                        uint32_t bytesRead = file.read(values, bytesToRead);
+                        if (bytesToRead != bytesRead) {
+                            i = NUM_ELEMENTS_PER_BLOCKS;
+                            goto closeFile;
+                        }
+
+                        totalBytesRead += bytesRead;
+                    }
+
+                    unsigned valuesOffset = valuesRow * g_recording.parameters.numYAxes;
+
+                    for (unsigned k = 0; k < g_recording.parameters.numYAxes; k++) {
+                        if (k < numElementsPerRow) {
+                            BlockElement *blockElement = blockElements + i++;
+
+                            float value = values[valuesOffset + k];
+
+                            if (j == 0) {
+                                blockElement->min = blockElement->max = value;
+                            } else if (value < blockElement->min) {
+                                blockElement->min = value;
+                            } else if (value > blockElement->max) {
+                                blockElement->max = value;
+                            }
                         }
                     }
                 }
+
+                if (totalBytesRead > NUM_ELEMENTS_PER_BLOCKS * sizeof(BlockElement)) {
+                    break;
+                }
+
+                g_refreshed = true;
             }
 
-            if (totalBytesRead > NUM_ELEMENTS_PER_BLOCKS * sizeof(BlockElement)) {
-                break;
-            }
-
-            g_refreshed = true;
+        closeFile:
+            g_cacheBlocks[g_blockIndexToLoad].loadedValues = i;
+            file.close();
         }
-
-    closeFile:
-        g_cacheBlocks[g_blockIndexToLoad].loadedValues = i;
-        file.close();
     }
 
     g_isLoading = false;
@@ -301,10 +307,10 @@ void changeTimeDiv(Recording &recording, float timeDiv) {
         recording.timeDiv = newTimeDiv;
 
         if (recording.timeDiv == recording.timeDivMin) {
-            recording.parameters.period = recording.minPeriod;
+            recording.parameters.period = recording.parameters.xAxis.step;
             recording.size = recording.numSamples;
         } else {
-            recording.parameters.period = recording.minPeriod * recording.timeDiv / recording.timeDivMin;
+            recording.parameters.period = recording.parameters.xAxis.step * recording.timeDiv / recording.timeDivMin;
             recording.size = (uint32_t)round(recording.numSamples * recording.timeDivMin / recording.timeDiv);
         }
         
@@ -316,10 +322,10 @@ void changeTimeDiv(Recording &recording, float timeDiv) {
 
 float getDuration(Recording &recording) {
     if (&recording == &g_recording) {
-        return (recording.numSamples - 1) * recording.minPeriod;
+        return (recording.numSamples - 1) * recording.parameters.xAxis.step;
     }
 
-    return (recording.size - 1) * recording.parameters.period;
+    return (recording.size - 1) * recording.parameters.xAxis.step;
 }
 
 void initAxis(Recording &recording) {
@@ -587,7 +593,6 @@ void openFile(const char *filePath) {
                     g_recording.pageSize = VIEW_WIDTH;
 
                     g_recording.numSamples = (file.size() - g_recording.dataOffset) / (g_recording.parameters.numYAxes * sizeof(float));
-                    g_recording.minPeriod = g_recording.parameters.period;
                     g_recording.timeDivMin = g_recording.pageSize * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
                     g_recording.timeDivMax = MAX(g_recording.numSamples, g_recording.pageSize) * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
 
@@ -632,6 +637,35 @@ float roundValue(float value) {
         return roundPrec(value, 0.001f);
     }
 }
+
+void uploadFile() {
+    if (osThreadGetId() != g_scpiTaskHandle) {
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_UPLOAD_FILE, 0), osWaitForever);
+        return;
+    }
+
+    scpi_t *context = nullptr;
+
+#if !defined(EEZ_PLATFORM_SIMULATOR)
+    if (psu::serial::isConnected()) {
+        context = &psu::serial::g_scpiContext;
+    }
+#endif
+
+#if OPTION_ETHERNET
+    if (!context && psu::ethernet::isConnected()) {
+        context = &psu::ethernet::g_scpiContext;
+    }
+#endif
+
+    if (!context) {
+        return;
+    }
+
+    int err;
+    psu::scpi::mmemUpload(g_filePath, context, &err);
+}
+
 
 } // namespace dlog_view
 } // namespace psu

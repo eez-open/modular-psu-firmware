@@ -758,9 +758,9 @@ uint32_t ytDataGetCursorOffset(const Cursor &cursor, uint16_t id) {
     return value.getUInt32();
 }
 
-Value ytDataGetCursorTime(const Cursor &cursor, uint16_t id) {
+Value ytDataGetCursorXValue(const Cursor &cursor, uint16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_CURSOR_TIME, (Cursor &)cursor, value);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE, (Cursor &)cursor, value);
     return value;
 }
 

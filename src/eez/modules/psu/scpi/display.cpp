@@ -267,12 +267,24 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
     }
 
     if (type == INPUT_TYPE_TEXT) {
+        // min
+        int32_t min;
+        if (!SCPI_ParamInt(context, &min, true)) {
+            return SCPI_RES_ERR;
+        }
+
+        if ((size_t)min > MAX_KEYPAD_TEXT_LENGTH - labelTextLen) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
+
+        // max
         int32_t max;
         if (!SCPI_ParamInt(context, &max, true)) {
             return SCPI_RES_ERR;
         }
 
-        if ((size_t)max > MAX_KEYPAD_TEXT_LENGTH - labelTextLen) {
+        if (max < min || (size_t)max > MAX_KEYPAD_TEXT_LENGTH - labelTextLen) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
         }
@@ -292,7 +304,7 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
         strncpy(value, valueText, valueTextLen);
         value[valueTextLen] = 0;
 
-        const char *result = psu::gui::g_psuAppContext.textInput(label, max, value);
+        const char *result = psu::gui::g_psuAppContext.textInput(label, min, max, value);
         if (result) {
             SCPI_ResultText(context, result);
         }

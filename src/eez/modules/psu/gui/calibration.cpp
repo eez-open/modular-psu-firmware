@@ -231,8 +231,7 @@ void set() {
         }
     } else if (g_stepNum == MAX_STEP_NUM - 1) {
         calibration::resetChannelToZero();
-        Keypad::startPush(0, calibration::isRemarkSet() ? calibration::getRemark() : 0,
-                          CALIBRATION_REMARK_MAX_LENGTH, false, onSetRemarkOk, popPage);
+        Keypad::startPush(0, calibration::isRemarkSet() ? calibration::getRemark() : 0, 0, CALIBRATION_REMARK_MAX_LENGTH, false, onSetRemarkOk, popPage);
     }
 }
 
