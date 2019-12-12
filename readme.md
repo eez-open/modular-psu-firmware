@@ -15,11 +15,17 @@ _For existing Programmable Power supply (EEZ H24005) firmware visit [psu-firmwar
 
 ## Build
 
+### Prerequisites
+
+- Open `/path/to/modular-psu-firmware/modular-psu-firmware.eez-project` in latest [Studio](https://github.com/eez-open/studio/releases/tag/nightly-build) and build it.
+
+![Build instructions](images/studio-build-instructions.png)
+
 ### Linux
 
 ```
 sudo apt-get update
-sudo apt-get install -y git libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev cmake build-essentials
+sudo apt-get install -y git libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev cmake build-essential
 git clone https://github.com/eez-open/modular-psu-firmware
 mkdir -p modular-psu-firmware/build/linux
 cd modular-psu-firmware/build/linux
@@ -51,9 +57,5 @@ Execute `cmake.bat`.
 Visual Studio solution is created in `\path\to\modular-psu-firmware\build\win32'.
 
 ### STM32 firmware
-
-- Open `/path/to/modular-psu-firmware/modular-psu-firmware.eez-project` in latest [Studio](https://github.com/eez-open/studio/releases/tag/nightly-build) and build it.
-
-![Build instructions](images/studio-build-instructions.png)
 
 - Import project from `/path/to/modular-psu-firmware/src/third_party/stm32/stm32_r1b5` into [TrueStudio](https://atollic.com/truestudio/) and build it.
