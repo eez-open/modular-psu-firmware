@@ -5,90 +5,86 @@ I_SET = 0.01
 TIME_STEP_MS = 20
 
 diodeName = scpi('disp:input? "Diode name", TEXT, 1, 20, ""')
-if diodeName == None:
-    quit()
+if diodeName != None:
+    uStep = scpi('disp:input? "U step", NUMBER, VOLT, 0.01, 1, 0.1')
+    if uStep != None:
+        uStep = float(uStep)
+        uBreakdown = None
+        try:
+            scpi("*SAV 10")
+            scpi("MEM:STAT:FREEze ON")
 
-uStep = scpi('disp:input? "U step", NUMBER, VOLT, 0.01, 1, 0.1')
-if uStep == None:
-    quit()
+            ch1Model = scpi("SYSTem:CHANnel:MODel? ch1")
+            ch2Model = scpi("SYSTem:CHANnel:MODel? ch2")
+            if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
+                scpi("INST:COUP:TRAC SER")
+            else:
+                scpi("INST:COUP:TRAC NONE")
 
-uStep = float(uStep)
-uBreakdown = None
-showBreakdownInfo = True
-try:
-    scpi("*SAV 10")
-    scpi("MEM:STAT:FREEze ON")
+            scpi("INST ch1")
 
-    ch1Model = scpi("SYSTem:CHANnel:MODel? ch1")
-    ch2Model = scpi("SYSTem:CHANnel:MODel? ch2")
-    if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
-        scpi("INST:COUP:TRAC SER")
-    else:
-        scpi("INST:COUP:TRAC NONE")
+            uMax = float(scpi("VOLT? MAX"))
 
-    scpi("INST ch1")
+            scpi("OUTP 0")
 
-    uMax = float(scpi("VOLT? MAX"))
+            scpi('DISP:INPUT? "Connect your diode on CH1", MENU, BUTTON, "Start"')
 
-    scpi("OUTP 0")
+            scpi("SENS:CURR:RANG MIN")
+            scpi("VOLT 0")
+            scpi("CURR " + str(I_SET))
 
-    scpi('DISP:INPUT? "Connect your diode on CH1", MENU, BUTTON, "Start"')
+            scpi("SENS:DLOG:TRAC:X:UNIT VOLT")
+            scpi("SENS:DLOG:TRAC:X:STEP " + str(uStep))
+            scpi("SENS:DLOG:TRAC:X:RANG:MAX " + str(uMax)) # TODO this should be updated if switch to 80V range
+            scpi('SENS:DLOG:TRAC:X:LABel "Uset"')
+            scpi("SENS:DLOG:TRAC:Y1:UNIT AMPER")
+            scpi("SENS:DLOG:TRAC:Y1:RANG:MAX " + str(I_SET))
+            scpi('SENS:DLOG:TRAC:Y1:LABel "Imon"')
+            scpi('INIT:DLOG:TRACE "/Recordings/' + diodeName + '.dlog"')
 
-    scpi("SENS:CURR:RANG MIN")
-    scpi("VOLT 0")
-    scpi("CURR " + str(I_SET))
+            scpi("OUTP 1")
 
-    scpi("SENS:DLOG:TRAC:X:UNIT VOLT")
-    scpi("SENS:DLOG:TRAC:X:STEP " + str(uStep))
-    scpi("SENS:DLOG:TRAC:X:RANG:MAX " + str(uMax)) # TODO this should be updated if switch to 80V range
-    scpi("SENS:DLOG:TRAC:Y1:UNIT AMPER")
-    scpi("SENS:DLOG:TRAC:Y1:RANG:MAX " + str(I_SET))
-    scpi('INIT:DLOG:TRACE "/Recordings/' + diodeName + '.dlog"')
+            scpi("DISP:WINDOW:DLOG")
 
-    scpi("OUTP 1")
+            ch = 1
+            t = ticks_ms()
+            i = 0
+            while True:
+                uSet = i * uStep
+                
+                if uSet > uMax:
+                    break
 
-    scpi("DISP:WINDOW:DLOG")
+                setU(ch, uSet)
+                #scpi("VOLT " + str(uSet))
 
-    ch = 1
-    t = ticks_ms()
-    i = 0
-    while True:
-        uSet = i * uStep
-        
-        if uSet > uMax:
-            break
+                t = ticks_add(t, TIME_STEP_MS)
+                sleep_ms(ticks_diff(t, ticks_ms()))
 
-        setU(ch, uSet)
-        #scpi("VOLT " + str(uSet))
+                iMon = getI(ch)
+                #iMon = scpi("MEAS:CURR?")
 
-        t = ticks_add(t, TIME_STEP_MS)
-        sleep_ms(ticks_diff(t, ticks_ms()))
+                dlogTraceData(iMon)
+                #scpi("DLOG:TRACE:DATA " + scpi("MEAS:CURR?"))
 
-        iMon = getI(ch)
-        #iMon = scpi("MEAS:CURR?")
+                mode = getOutputMode(ch)
+                #mode = scpi("OUTP:MODE?")
 
-        dlogTraceData(iMon)
-        #scpi("DLOG:TRACE:DATA " + scpi("MEAS:CURR?"))
+                print(uSet, iMon, mode)
 
-        mode = getOutputMode(ch)
-        #mode = scpi("OUTP:MODE?")
+                #if mode == "CC":
+                #    break
+                if iMon >= I_SET:
+                    uBreakdown = uSet
+                    break
 
-        print(uSet, iMon, mode)
+                i = i + 1
+        finally:
+            scpi("ABOR:DLOG")
+            scpi("*RCL 10")
+            scpi("MEM:STAT:FREEze OFF")
 
-        #if mode == "CC":
-        #    break
-        if iMon >= I_SET:
-            uBreakdown = uSet
-            break
-
-        i = i + 1
-finally:
-    scpi("ABOR:DLOG")
-    scpi("*RCL 10")
-    scpi("MEM:STAT:FREEze OFF")
-
-if showBreakdownInfo:
-    if uBreakdown != None:
-        scpi('DISP:INPUT? "Breakdown voltage is ' + str(uBreakdown) + 'V", MENU, BUTTON, "Close"')
-    else:
-        scpi('DISP:INPUT? "Breakdown voltage not found", MENU, BUTTON, "Close"')
+        if uBreakdown != None:
+            scpi('DISP:INPUT? "Breakdown voltage is ' + str(uBreakdown) + 'V", MENU, BUTTON, "Close"')
+        else:
+            scpi('DISP:INPUT? "Breakdown voltage not found", MENU, BUTTON, "Close"')
