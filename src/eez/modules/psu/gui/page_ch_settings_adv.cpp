@@ -58,7 +58,7 @@ void ChSettingsAdvOptionsPage::toggleDprog() {
 
 void ChSettingsAdvRangesPage::onModeSet(uint16_t value) {
     popPage();
-    g_channel->setCurrentRangeSelectionMode((CurrentRangeSelectionMode)value);
+    channel_dispatcher::setCurrentRangeSelectionMode(*g_channel, (CurrentRangeSelectionMode)value);
 }
 
 void ChSettingsAdvRangesPage::selectMode() {
@@ -66,7 +66,7 @@ void ChSettingsAdvRangesPage::selectMode() {
 }
 
 void ChSettingsAdvRangesPage::toggleAutoRanging() {
-    g_channel->enableAutoSelectCurrentRange(!g_channel->isAutoSelectCurrentRangeEnabled());
+    channel_dispatcher::enableAutoSelectCurrentRange(*g_channel, !g_channel->isAutoSelectCurrentRangeEnabled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

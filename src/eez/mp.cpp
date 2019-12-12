@@ -17,6 +17,7 @@
 */
 
 #include <string.h>
+#include <stdio.h>
 
 #include <eez/mp.h>
 #include <eez/system.h>
@@ -48,60 +49,6 @@ extern "C" {
 #ifdef _MSC_VER
 #pragma warning( pop )
 #endif
-
-/*
-- Usporediti ovo https://github.com/numworks/epsilon sa onim Å¡to mi imamo i sa latest verzijom MP-a
-- Pokrenuti one python make skripte i vidjeti Å¡to se dobije i kako se to razlikuje od onoga Å¡to je veÄ‡ buildano
-- Dodati jedan modul
-- Probati primiti str parameter i vratiti int ili string
-- Delay funkcija
-- Python thread
-- Vidjeti kako zaglaviti i odglaviti
-- scpi funkcija bi trebala poslati scpi komandu u scpi thread kao string i Ä�ekati rezultat
-- python moÅ¾e zaglaviti u delay i scpi komandi
-
-- dlog specificira X os (vrijeme, U) i Y osi (U, I, P). Za svaku os MIN, MAX, MIN_MEAS, MAX_MEAS.
-  Za x os i STEP ili PERIOD. Ako step nije zadan onda se i vrijednosti i za X osi nalaze u podacima.
-
-MAGIC1
-MAGIC2
-VERSION
-TAG PARAMS
-TAG PARAMS
-0xFF
-DATA
-
-Tag 0x01 X-os unit min max min_meas max_meas
-Tag 0x02 start time
-
-Tag 0x10 Y1-os min max min_meas max_meas
-Tag 0x11 Y2-os min max min_meas max_meas
-Tag 0x12 Y3-os min max min_meas max_meas
-Tag 0x1F Y16-os min max min_meas max_meas
-
-Unit: 0x00 time, 0x01 VOLT, 0x02 AMPER, 0x03 WATT
-
-- DLOG view dock legend
-
-
-U1 DIV OFFSET |--------------------------------|
-   CURSOR     |                                |
-I1 DIV OFFSET |                                |
-   CURSOR     |                                |
-U2 DIV OFFSET |                                |
-   CURSOR     |                                |
-I2 DIV OFFSET |                                |
-   CURSOR     |--------------------------------|
-
-Width: 40 + 80 * 2 = 200px
-Height: 8 x 30 = 240px
-
-Ostaje za graf: 280px x 240px
-7 x 6 divisiona
-
-https://docs.micropython.org/en/latest/develop/cmodules.html
-
-*/
 
 namespace eez {
 namespace mp {

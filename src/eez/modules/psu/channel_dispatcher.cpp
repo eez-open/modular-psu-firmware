@@ -1651,6 +1651,24 @@ void setTriggerCurrent(Channel &channel, float value) {
     }
 }
 
+void setCurrentRangeSelectionMode(Channel &channel, CurrentRangeSelectionMode mode) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        Channel::get(0).setCurrentRangeSelectionMode(mode);
+        Channel::get(1).setCurrentRangeSelectionMode(mode);
+    } else {
+        channel.setCurrentRangeSelectionMode(mode);
+    }
+}
+
+void enableAutoSelectCurrentRange(Channel &channel, bool enable) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        Channel::get(0).enableAutoSelectCurrentRange(enable);
+        Channel::get(1).enableAutoSelectCurrentRange(enable);
+    } else {
+        channel.enableAutoSelectCurrentRange(enable);
+    }
+}
+
 #ifdef EEZ_PLATFORM_SIMULATOR
 void setLoadEnabled(Channel &channel, bool state) {
     channel.simulator.setLoadEnabled(state);

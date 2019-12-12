@@ -45,6 +45,7 @@ namespace profile {
 
 static bool g_saveEnabled = true;
 bool g_profileDirty;
+static bool g_freeze;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -356,7 +357,7 @@ void doSave() {
 }
 
 void save(bool immediately) {
-    if (g_saveEnabled && isAutoSaveAllowed()) {
+    if (g_saveEnabled && !g_freeze && isAutoSaveAllowed()) {
         if (immediately) {
             doSave();
             g_profileDirty = false;
@@ -641,6 +642,14 @@ void getName(int location, char *name, int count) {
         strncpy(name, "--Never used--", count - 1);
     }
     name[count - 1] = 0;
+}
+
+bool getFreezeState() {
+    return g_freeze;
+}
+
+void setFreezeState(bool value) {
+    g_freeze = value;
 }
 
 } // namespace profile

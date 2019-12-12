@@ -172,6 +172,23 @@ scpi_result_t scpi_cmd_memoryStateValidQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_memoryStateFreeze(scpi_t *context) {
+    bool enable;
+    if (!SCPI_ParamBool(context, &enable, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    profile::setFreezeState(enable);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_memoryStateFreezeQ(scpi_t *context) {
+    SCPI_ResultBool(context, profile::getFreezeState());
+
+    return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

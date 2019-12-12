@@ -128,6 +128,9 @@ bool isValid(int location);
 bool setName(int location, const char *name, size_t nameLength);
 void getName(int location, char *name, int count);
 
+bool getFreezeState();
+void setFreezeState(bool value);
+
 }
 }
 } // namespace eez::psu::profile

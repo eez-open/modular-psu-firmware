@@ -30,6 +30,7 @@
 #include <eez/modules/psu/dlog_view.h>
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/scpi/psu.h>
+#include <eez/modules/psu/serial_psu.h>
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
 #endif
@@ -349,7 +350,7 @@ void initAxis(Recording &recording) {
         if (recording.parameters.logCurrent[channelIndex]) {
             recording.parameters.yAxes[yAxisIndex].unit = UNIT_AMPER;
             recording.parameters.yAxes[yAxisIndex].range.min = channel_dispatcher::getIMin(channel);
-            recording.parameters.yAxes[yAxisIndex].range.max = channel_dispatcher::getIMax(channel);
+            recording.parameters.yAxes[yAxisIndex].range.max = channel_dispatcher::getIMaxLimit(channel);
             recording.parameters.yAxes[yAxisIndex].channelIndex = channelIndex;
             ++yAxisIndex;
         }

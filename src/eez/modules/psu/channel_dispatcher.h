@@ -149,6 +149,9 @@ void setTriggerVoltage(Channel &channel, float value);
 float getTriggerCurrent(Channel &channel);
 void setTriggerCurrent(Channel &channel, float value);
 
+void setCurrentRangeSelectionMode(Channel &channel, CurrentRangeSelectionMode mode);
+void enableAutoSelectCurrentRange(Channel &channel, bool enable);
+
 #ifdef EEZ_PLATFORM_SIMULATOR
 void setLoadEnabled(Channel &channel, bool state);
 void setLoad(Channel &channel, float load);

@@ -1762,8 +1762,7 @@ void data_edit_value(data::DataOperationEnum operation, data::Cursor &cursor, da
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
         value = edit_mode::getMax();
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
-        value = !edit_mode::isInteractiveMode() &&
-                (edit_mode::getEditValue() != edit_mode::getCurrentValue());
+        value = !edit_mode::isInteractiveMode() && (edit_mode::getEditValue() != edit_mode::getCurrentValue());
     }
 }
 
@@ -3201,7 +3200,7 @@ void data_set_page_dirty(data::DataOperationEnum operation, data::Cursor &cursor
 
 void data_profiles_list(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
-        value = 10;
+        value = NUM_PROFILE_LOCATIONS - 1; // do not show last location in GUI
     }
 }
 
@@ -4743,6 +4742,13 @@ void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor
         } else {
             value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].div), recording.parameters.yAxes[dlogValueIndex].unit);
         }
+    } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else {
+            value = Value(recording.dlogValues[dlogValueIndex].div, recording.parameters.yAxes[dlogValueIndex].unit);
+        }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = Value(0.001f, recording.parameters.yAxes[dlogValueIndex].unit);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
@@ -4769,6 +4775,13 @@ void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cur
             value = g_focusEditValue;
         } else {
             value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].offset), recording.parameters.yAxes[dlogValueIndex].unit);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else {
+            value = Value(recording.dlogValues[dlogValueIndex].offset, recording.parameters.yAxes[dlogValueIndex].unit);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = Value(-100.0f, recording.parameters.yAxes[dlogValueIndex].unit);

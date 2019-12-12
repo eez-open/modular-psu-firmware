@@ -448,8 +448,8 @@ void tick() {
         blockStart = blockEnd;
     }
 
-    // write dirty profiles
-    for (unsigned i = 0; i < NUM_PROFILE_LOCATIONS; i++) {
+    // write dirty profiles, last location should not be stored in EEPROM
+    for (unsigned i = 0; i < NUM_PROFILE_LOCATIONS - 1; i++) {
         if (g_profilesCache[i].dirty && g_profilesCache[i].numSaveErrors < CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED) {
             if (save((BlockHeader *)&g_profilesCache[i].profile, sizeof(profile::Parameters), getProfileAddress(i), profile::PROFILE_VERSION)) {
                 g_profilesCache[i].dirty = false;
@@ -732,9 +732,11 @@ profile::Parameters *loadProfile(int location) {
     assert(location < NUM_PROFILE_LOCATIONS && sizeof(profile::Parameters) <= PERSIST_CONF_PROFILE_BLOCK_SIZE);
     
     if (!g_profilesCache[location].loaded) {
-        profile::Parameters profile;
-        if (confRead((uint8_t *)&profile, sizeof(profile::Parameters), getProfileAddress(location), profile::PROFILE_VERSION)) {
-           memcpy(&g_profilesCache[location].profile, &profile, sizeof(profile::Parameters));
+        if (location != NUM_PROFILE_LOCATIONS - 1) { // last location is not stored in EEPROM
+            profile::Parameters profile;
+            if (confRead((uint8_t *)&profile, sizeof(profile::Parameters), getProfileAddress(location), profile::PROFILE_VERSION)) {
+            memcpy(&g_profilesCache[location].profile, &profile, sizeof(profile::Parameters));
+            }
         }
         g_profilesCache[location].loaded = true;
     }

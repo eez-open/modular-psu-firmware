@@ -13,24 +13,40 @@ if uStep == None:
     quit()
 
 uStep = float(uStep)
-uMax = 40.0
 uBreakdown = None
 showBreakdownInfo = True
 try:
-    scpi("INST:COUP:TRAC NONE")
+    scpi("*SAV 10")
+    scpi("MEM:STAT:FREEze ON")
+
+    ch1Model = scpi("SYSTem:CHANnel:MODel? ch1")
+    ch2Model = scpi("SYSTem:CHANnel:MODel? ch2")
+    if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
+        scpi("INST:COUP:TRAC SER")
+    else:
+        scpi("INST:COUP:TRAC NONE")
+
     scpi("INST ch1")
+
+    uMax = float(scpi("VOLT? MAX"))
+
     scpi("OUTP 0")
+
     scpi('DISP:INPUT? "Connect your diode on CH1", MENU, BUTTON, "Start"')
+
     scpi("SENS:CURR:RANG MIN")
     scpi("VOLT 0")
     scpi("CURR " + str(I_SET))
+
     scpi("SENS:DLOG:TRAC:X:UNIT VOLT")
     scpi("SENS:DLOG:TRAC:X:STEP " + str(uStep))
     scpi("SENS:DLOG:TRAC:X:RANG:MAX " + str(uMax)) # TODO this should be updated if switch to 80V range
     scpi("SENS:DLOG:TRAC:Y1:UNIT AMPER")
     scpi("SENS:DLOG:TRAC:Y1:RANG:MAX " + str(I_SET))
     scpi('INIT:DLOG:TRACE "/Recordings/' + diodeName + '.dlog"')
+
     scpi("OUTP 1")
+
     scpi("DISP:WINDOW:DLOG")
 
     ch = 1
@@ -40,22 +56,7 @@ try:
         uSet = i * uStep
         
         if uSet > uMax:
-            if uMax == 40.0:
-                ch1Model = scpi("SYSTem:CHANnel:MODel? ch1")
-                ch2Model = scpi("SYSTem:CHANnel:MODel? ch2")
-                if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
-                    if scpi('DISP:INPUT? "Breakdown not found, continue up to 80V?", MENU, BUTTON, "Yes", "No"') != 1:
-                        showBreakdownInfo = False
-                        break
-                    scpi("INST:COUP:TRAC SER")
-                    scpi("CURR " + str(I_SET))
-                    scpi("OUTP 1")
-                    uMax = 80.0
-                    t = ticks_ms()
-                else:
-                    break
-            else:
-                break
+            break
 
         setU(ch, uSet)
         #scpi("VOLT " + str(uSet))
@@ -81,12 +82,10 @@ try:
             break
 
         i = i + 1
-except:
-    showBreakdownInfo = False
 finally:
     scpi("ABOR:DLOG")
-    scpi("OUTP 0")
-    scpi("INST:COUP:TRAC NONE")
+    scpi("*RCL 10")
+    scpi("MEM:STAT:FREEze OFF")
 
 if showBreakdownInfo:
     if uBreakdown != None:

@@ -74,12 +74,12 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpper(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if ((channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel->flags.trackingEnabled) {
+    if (channel->flags.trackingEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
 
-    channel->setCurrentRangeSelectionMode(mode);
+    channel_dispatcher::setCurrentRangeSelectionMode(*channel, mode);
 
     return SCPI_RES_OK;
 }
@@ -96,7 +96,7 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpperQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if ((channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel->flags.trackingEnabled) {
+    if (channel->flags.trackingEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
@@ -131,12 +131,12 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeAuto(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if ((channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel->flags.trackingEnabled) {
+    if (channel->flags.trackingEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
 
-    channel->enableAutoSelectCurrentRange(enable);
+    channel_dispatcher::enableAutoSelectCurrentRange(*channel, enable);
 
     return SCPI_RES_OK;
 }
@@ -153,10 +153,11 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeAutoQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if ((channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel->flags.trackingEnabled) {
+    if (channel->flags.trackingEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
+
     SCPI_ResultBool(context, channel->isAutoSelectCurrentRangeEnabled());
 
     return SCPI_RES_OK;

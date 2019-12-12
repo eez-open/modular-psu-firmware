@@ -102,7 +102,7 @@
 #define OTP_AUX_MAX_LEVEL 100.0f
 
 /// Number of profile storage locations
-#define NUM_PROFILE_LOCATIONS 10
+#define NUM_PROFILE_LOCATIONS 11
 
 /// Profile name maximum length in number of characters.
 #define PROFILE_NAME_MAX_LENGTH 32
