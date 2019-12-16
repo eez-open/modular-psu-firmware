@@ -356,4 +356,8 @@ void DebugCounterVariable::dump(char *buffer) {
 } // namespace debug
 } // namespace eez
 
+extern "C" void debug_trace(const char *str, size_t len) {
+    DebugTrace("%.*s", len, str);
+}
+
 #endif // DEBUG

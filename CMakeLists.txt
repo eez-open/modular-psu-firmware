@@ -67,6 +67,7 @@ endif()
 
 include_directories(
     src
+    src/eez/libs/mqtt
     src/eez/platform/simulator
     src/eez/scpi
 
@@ -88,6 +89,7 @@ set(src_eez
     src/eez/main.cpp
     src/eez/memory.cpp
     src/eez/mp.cpp
+    src/eez/mqtt.cpp
     src/eez/sound.cpp
     src/eez/system.cpp
     src/eez/unit.cpp
@@ -100,6 +102,7 @@ set(header_eez
     src/eez/index.h
     src/eez/memory.h
     src/eez/mp.h
+    src/eez/mqtt.h
     src/eez/sound.h
     src/eez/system.h
     src/eez/unit.h
@@ -379,6 +382,19 @@ if(MSVC)
 set_source_files_properties(src/eez/libs/image/toojpeg.cpp PROPERTIES COMPILE_FLAGS /W0)
 endif()
 
+set(src_eez_libs_mqtt
+    src/eez/libs/mqtt/mqtt.c
+    src/eez/libs/mqtt/mqtt_pal.c
+)
+list (APPEND src_files ${src_eez_libs_mqtt})
+set(header_eez_libs_mqtt
+    src/eez/libs/mqtt/mqtt.h
+    src/eez/libs/mqtt/mqtt_pal.h
+)
+list (APPEND header_files ${header_eez_libs_mqtt})
+source_group("eez\\libs\\mqtt" FILES ${src_eez_libs_mqtt} ${header_eez_libs_mqtt})
+
+
 set(src_eez_modules_aux_ps
     src/eez/modules/aux_ps/fan.cpp
     src/eez/modules/aux_ps/pid.cpp
@@ -425,7 +441,6 @@ source_group("eez\\modules\\mcu" FILES ${src_eez_modules_mcu} ${header_eez_modul
 set(src_eez_modules_mcu_simulator
     src/eez/modules/mcu/simulator/display.cpp
     src/eez/modules/mcu/simulator/touch.cpp
-    src/eez/modules/mcu/simulator/ethernet.cpp
 
 ) 
 list (APPEND src_files ${src_eez_modules_mcu_simulator})

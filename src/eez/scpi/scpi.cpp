@@ -50,6 +50,8 @@
 #include <eez/gui/data.h>
 #include <eez/gui/dialogs.h>
 
+#include <eez/mqtt.h>
+
 using namespace eez::psu;
 using namespace eez::psu::scpi;
 
@@ -76,7 +78,7 @@ osMessageQId g_scpiMessageQueueId;
 
 char g_listFilePath[CH_MAX][MAX_PATH_LENGTH];
 
-uint32_t g_lastTickCount;
+uint32_t g_timer1LastTickCount;
 
 bool onSystemStateChanged() {
     if (eez::g_systemState == eez::SystemState::BOOTING) {
@@ -84,7 +86,7 @@ bool onSystemStateChanged() {
             g_scpiMessageQueueId = osMessageCreate(osMessageQ(g_scpiMessageQueue), NULL);
             return false;
         } else {
-            g_lastTickCount = micros();
+            g_timer1LastTickCount = micros();
             g_scpiTaskHandle = osThreadCreate(osThread(g_scpiTask), nullptr);
         }
     }
@@ -205,14 +207,17 @@ void oneIter() {
         }
     } else {
     	uint32_t tickCount = micros();
-    	int32_t diff = tickCount - g_lastTickCount;
+    	int32_t diff = tickCount - g_timer1LastTickCount;
 
         event_queue::tick();
 
         sound::tick();
 
     	if (diff >= 1000000L) { // 1 sec
+            g_timer1LastTickCount = tickCount;
+
     		profile::tick();
+
 #if OPTION_ETHERNET
     		ntp::tick();
 #endif
@@ -229,6 +234,10 @@ void oneIter() {
 
 #if OPTION_SD_CARD
         sd_card::tick();
+#endif
+
+#if OPTION_ETHERNET
+        mqtt::tick(tickCount);
 #endif
 
 #ifdef DEBUG

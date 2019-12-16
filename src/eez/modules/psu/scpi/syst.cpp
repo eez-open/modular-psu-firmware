@@ -27,6 +27,7 @@
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
 #include <eez/modules/psu/ntp.h>
+#include <eez/mqtt.h>
 #endif
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/datetime.h>
@@ -1518,6 +1519,106 @@ scpi_result_t scpi_cmd_systemMeasureScalarVoltageDcQ(scpi_t *context) {
 #endif
 }
 
+scpi_result_t scpi_cmd_systemCommunicateMqttConnect(scpi_t *context) {
+#if OPTION_ETHERNET
+    const char *addr;
+    size_t addrLen;
+    if (!SCPI_ParamCharacters(context, &addr, &addrLen, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t port;
+    if (!SCPI_ParamInt(context, &port, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (port < 0 && port > 65535) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    const char *user;
+    size_t userLen;
+    if (!SCPI_ParamCharacters(context, &user, &userLen, false)) {
+        if (SCPI_ParamErrorOccurred(context)) {
+            return SCPI_RES_ERR;
+        }
+        user = nullptr;
+        userLen = 0;
+    }
+
+    const char *pass;
+    size_t passLen;
+    if (!SCPI_ParamCharacters(context, &pass, &passLen, false)) {
+        if (SCPI_ParamErrorOccurred(context)) {
+            return SCPI_RES_ERR;
+        }
+        pass = nullptr;
+        passLen = 0;
+    }
+
+    char savedPastAddrChar = *(addr + addrLen);
+    *((char *)addr + addrLen) = 0;
+
+    char savedPastUserChar = 0;
+    if (user && userLen) {
+        savedPastUserChar = *(user + userLen);
+        *((char *)user + userLen) = 0;
+    }
+
+    char savedPastPassChar = 0;
+    if (pass && passLen) {
+        savedPastPassChar = *(pass + passLen);
+        *((char *)pass + passLen) = 0;
+    }
+
+    int16_t err;
+    bool result = mqtt::connect(addr, port, user, pass, &err);
+
+    *((char *)addr + addrLen) = savedPastAddrChar;
+    if (savedPastUserChar) {
+        *((char *)user + userLen) = savedPastUserChar;
+    }
+    if (savedPastPassChar) {
+        *((char *)pass + passLen) = savedPastPassChar;
+    }
+
+    if (!result) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+scpi_result_t scpi_cmd_systemCommunicateMqttDisconnect(scpi_t *context) {
+#if OPTION_ETHERNET
+    int16_t err;
+    if (!mqtt::disconnect(&err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+    
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+scpi_result_t scpi_cmd_systemCommunicateMqttStateQ(scpi_t *context) {
+#if OPTION_ETHERNET
+    SCPI_ResultInt(context, mqtt::g_connectionState);
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
 
 } // namespace scpi
 } // namespace psu

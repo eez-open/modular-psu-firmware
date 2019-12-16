@@ -392,7 +392,7 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
         static char menuItemTexts[MAX_MENU_ITEMS][MAX_MENU_ITEM_TEXT_LENGTH + 1];
         static const char *menuItems[MAX_MENU_ITEMS + 1] = {};
 
-        int i;
+        size_t i;
         for (i = 0; i < MAX_MENU_ITEMS; i++) {
             const char *menuItemText;
             size_t menuItemTextLen;

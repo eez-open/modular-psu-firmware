@@ -107,13 +107,13 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-extern void Serial_Write(const char *str, size_t len);
+extern void debug_trace(const char *str, size_t len);
 
 int __io_putchar(int ich) {
 	// ITM_SendChar(ich);
 
   char ch = (char)ich;
-	Serial_Write(&ch, 1);
+	debug_trace(&ch, 1);
 
 	return 0;
 }

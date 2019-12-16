@@ -312,6 +312,14 @@ void doTakeScreenshot() {
 }
 
 void sync() {
+    static uint32_t g_lastTickCount;
+    uint32_t tickCount = millis();
+    int32_t diff = 1000 / 60 - (tickCount - g_lastTickCount);
+    g_lastTickCount = tickCount;
+    if (diff > 0) {
+        SDL_Delay(diff);
+    }
+
     if (!isOn()) {
         return;
     }

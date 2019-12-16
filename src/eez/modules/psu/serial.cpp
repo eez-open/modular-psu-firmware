@@ -48,10 +48,6 @@ int g_serialInputCharPosition = 0;
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(EEZ_PLATFORM_STM32)
-extern "C" void Serial_Write(const char *str, size_t len) {
-	Serial.write(str, (int)len);
-}
-
 extern "C" void notifySerialLineStateChanged(uint8_t serialLineState) {
     osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_SERIAL_MESSAGE(SERIAL_LINE_STATE_CHANGED, serialLineState), osWaitForever);
 }
