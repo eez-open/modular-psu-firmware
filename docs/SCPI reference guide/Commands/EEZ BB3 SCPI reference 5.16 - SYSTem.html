@@ -295,7 +295,7 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
-					<p class="scpi2"><a href="#syst_chan_slot"><span style="text-decoration: underline;">:</span></a><a href="#syst_chan_slot"><span style="text-decoration: underline;">SLOT?</span></a></p>
+					<p class="scpi2"><a href="#syst_chan_slot"><span style="text-decoration: underline;">:SLOT?</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
 					<p>Returns the channel slot number </p>
@@ -303,7 +303,7 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
-					<p class="scpi2"><a href="#syst_chan_sno"><span style="text-decoration: underline;">:</span></a><a href="#syst_chan_sno"><span style="text-decoration: underline;">SNO?</span></a></p>
+					<p class="scpi2"><a href="#syst_chan_sno"><span style="text-decoration: underline;">:SNO?</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
 					<p>Returns the channel serial number </p>
@@ -403,6 +403,38 @@ a:hover {
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
 					<p>Set s NTP service server address</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi2">:MQTT</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_comm_mqtt_conn"><span style="text-decoration: underline;">:CONNect {&lt;address&gt;, &lt;port&gt;, </span></a><a href="#syst_comm_mqtt_conn"><span style="text-decoration: underline;">&lt;user&gt;, &lt;password&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Initiates MQTT connection</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_comm_mqtt_disc"><span style="text-decoration: underline;">:DISConnect</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Closes MQTT connection</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_comm_mqtt_stat"><span style="text-decoration: underline;">:STATe?</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Returns MQTT connection status</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -2530,7 +2562,216 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.25. <a name="syst_comm_ntp"></a>SYSTem:COMMunicate:NTP</p>
+		<p class="Heading_3">5.16.25. <a name="syst_comm_mqtt_conn"></a>SYSTem:COMMunicate:MQTT:CONNect</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:COMMunicate:MQTT:CONNect</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p><a href="https://mqtt.org/" target="_blank"><span style="text-decoration: underline;">MQTT</span></a> (<span style="font-style: italic;">MQ Telemetry Transport</span>) is an open OASIS and ISO standard (ISO/IEC PRF 20922) lightweight, publish-subscribe network protocol that transports messages between devices (i.e. clients). </p>
+					<p>The EEZ BB3 can become a MQTT client (or node) by establishing connection with this command to the MQTT broker. A broker is a server that receives all messages from the clients and then routes the messages to the appropriate destination clients. It acts as a post office, MQTT doesn’t use the address of the intended recipient but uses the subject line called “Topic”, and anyone who wants a copy of that message will subscribe to that topic. EEZ The BB3 can produce and receive data by both publishing and subscribing.</p>
+					<p>MQTT connection is initiated by sending a sequence of four comma separated connection parameters.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 25%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;address&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Quoted string</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 25%;">
+					<p style="text-align: center;">Max. 64 characters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;port&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 25%;">
+					<p style="text-align: center;">1 – 99999 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;user&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Quoted string</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 25%;">
+					<p style="text-align: center;">Max. 32 characters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;password&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Quoted string</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 25%;">
+					<p style="text-align: center;">Max. 32 characters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:COMM:MQTT:CONN &quot;farmer.cloudmqtt.com&quot;, 1883, &quot;user&quot;, &quot;password&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:COMMunicate:MQTT:DISConnect</p>
+					<p>SYSTem:COMMunicate:MQTT:STATe</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.26. <a name="syst_comm_mqtt_disc"></a>SYSTem:COMMunicate:MQTT:DISConnect</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:COMMunicate:MQTT:DISConnect</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to terminate an existing MQTT connection. If connection is not active, it will generate an execution error.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:COMM:MQTT:DISC</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Errors</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">-200,&quot;Execution error&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:COMMunicate:MQTT:CONNect</p>
+					<p>SYSTem:COMMunicate:MQTT:STATe</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.27. <a name="syst_comm_mqtt_stat"></a>SYSTem:COMMunicate:MQTT:STATe</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:COMMunicate:MQTT:STATe?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>This query returns the current status of the MQTT connection.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Returns -1 if an error occurred, 0 if connection is not established, 1 if connection is established. Return codes greater then 1 indicates various transient states.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:COMM:MQTT:STAT?</p>
+					<p class="cmd_code_Start">1</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:COMMunicate:MQTT:CONNect</p>
+					<p>SYSTem:COMMunicate:MQTT:DISConnect</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.28. <a name="syst_comm_ntp"></a>SYSTem:COMMunicate:NTP</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2609,7 +2850,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.26. <a name="syst_comm_rlst"></a>SYSTem:COMMunicate:RLSTate</p>
+		<p class="Heading_3">5.16.29. <a name="syst_comm_rlst"></a>SYSTem:COMMunicate:RLSTate</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2696,7 +2937,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.27. <a name="syst_comm_ser_baud"></a>SYSTem:COMMunicate:SERial:BAUD</p>
+		<p class="Heading_3">5.16.30. <a name="syst_comm_ser_baud"></a>SYSTem:COMMunicate:SERial:BAUD</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2773,7 +3014,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.28. <a name="syst_comm_ser_par"></a>SYSTem:COMMunicate:SERial:PARity</p>
+		<p class="Heading_3">5.16.31. <a name="syst_comm_ser_par"></a>SYSTem:COMMunicate:SERial:PARity</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2849,7 +3090,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.29. <a name="syst_cpu_ont_last"></a>SYSTem:CPU:INFOrmation:ONTime:LAST?</p>
+		<p class="Heading_3">5.16.32. <a name="syst_cpu_ont_last"></a>SYSTem:CPU:INFOrmation:ONTime:LAST?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2877,7 +3118,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.30. <a name="syst_cpu_ont_tot"></a>SYSTem:CPU:INFOrmation:ONTime:TOTal?</p>
+		<p class="Heading_3">5.16.33. <a name="syst_cpu_ont_tot"></a>SYSTem:CPU:INFOrmation:ONTime:TOTal?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2905,7 +3146,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.31. <a name="syst_cpu_mod"></a>SYSTem:CPU:MODel?</p>
+		<p class="Heading_3">5.16.34. <a name="syst_cpu_mod"></a>SYSTem:CPU:MODel?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2942,7 +3183,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.32. <a name="syst_date"></a>SYSTem:DATE</p>
+		<p class="Heading_3">5.16.35. <a name="syst_date"></a>SYSTem:DATE</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3051,7 +3292,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.33. <a name="syst_dig_inp_data"></a>SYSTem:DIGital:INPut:DATA</p>
+		<p class="Heading_3">5.16.36. <a name="syst_dig_inp_data"></a>SYSTem:DIGital:INPut:DATA</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3128,7 +3369,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.34. <a name="syst_dig_outp_data"></a>SYSTem:DIGital:OUTPut:DATA</p>
+		<p class="Heading_3">5.16.37. <a name="syst_dig_outp_data"></a>SYSTem:DIGital:OUTPut:DATA</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3229,7 +3470,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.35. <a name="syst_dig_pin_func"></a>SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion</p>
+		<p class="Heading_3">5.16.38. <a name="syst_dig_pin_func"></a>SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3331,7 +3572,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.36. <a name="syst_dig_pin_pol"></a>SYSTem:DIGital:PIN&lt;n&gt;:POLarity</p>
+		<p class="Heading_3">5.16.39. <a name="syst_dig_pin_pol"></a>SYSTem:DIGital:PIN&lt;n&gt;:POLarity</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3424,7 +3665,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.37. <a name="__RefHeading__23078_295952897"></a><a name="syst_err"></a>SYSTem:ERRor<a name="__RefHeading__23078_295952897"></a></p>
+		<p class="Heading_3">5.16.40. <a name="__RefHeading__23078_295952897"></a><a name="syst_err"></a>SYSTem:ERRor<a name="__RefHeading__23078_295952897"></a></p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3481,7 +3722,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.38. <a name="syst_err_coun"></a>SYSTem:ERRor:COUNt?</p>
+		<p class="Heading_3">5.16.41. <a name="syst_err_coun"></a>SYSTem:ERRor:COUNt?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3519,7 +3760,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.39. <a name="syst_inh"></a>SYSTem:INHibit?</p>
+		<p class="Heading_3">5.16.42. <a name="syst_inh"></a>SYSTem:INHibit?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3566,7 +3807,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.40. <a name="syst_key_def"></a>SYSTem:KEY:DEFine</p>
+		<p class="Heading_3">5.16.43. <a name="syst_key_def"></a>SYSTem:KEY:DEFine</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3663,7 +3904,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.41. <a name="syst_key_del"></a>SYSTem:KEY:DELete</p>
+		<p class="Heading_3">5.16.44. <a name="syst_key_del"></a>SYSTem:KEY:DELete</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3734,7 +3975,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.42. <a name="syst_kloc"></a>SYSTem:KLOCk</p>
+		<p class="Heading_3">5.16.45. <a name="syst_kloc"></a>SYSTem:KLOCk</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3771,7 +4012,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.43. <a name="syst_loc"></a>SYSTem:LOCal</p>
+		<p class="Heading_3">5.16.46. <a name="syst_loc"></a>SYSTem:LOCal</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3808,7 +4049,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.44. <a name="syst_meas_volt"></a>SYSTem:MEASure[:SCALar][:VOLTage][:DC]?</p>
+		<p class="Heading_3">5.16.47. <a name="syst_meas_volt"></a>SYSTem:MEASure[:SCALar][:VOLTage][:DC]?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3870,7 +4111,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.45. <a name="syst_pass_cal_res"></a>SYSTem:PASSword:CALibration:RESet</p>
+		<p class="Heading_3">5.16.48. <a name="syst_pass_cal_res"></a>SYSTem:PASSword:CALibration:RESet</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3906,7 +4147,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.46. <a name="syst_pass_fpan_res"></a>SYSTem:PASSword:FPANel:RESet</p>
+		<p class="Heading_3">5.16.49. <a name="syst_pass_fpan_res"></a>SYSTem:PASSword:FPANel:RESet</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3942,7 +4183,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.47. <a name="syst_pass_new"></a>SYSTem:PASSword:NEW</p>
+		<p class="Heading_3">5.16.50. <a name="syst_pass_new"></a>SYSTem:PASSword:NEW</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4033,7 +4274,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.48. <a name="syst_pon_outp_dis"></a>SYSTem:PON:OUTPut:DISable</p>
+		<p class="Heading_3">5.16.51. <a name="syst_pon_outp_dis"></a>SYSTem:PON:OUTPut:DISable</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4114,7 +4355,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.49. <a name="syst_pow"></a>SYSTem:POWer</p>
+		<p class="Heading_3">5.16.52. <a name="syst_pow"></a>SYSTem:POWer</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4193,7 +4434,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.50. <a name="syst_pow_prot_trip"></a>SYSTem:POWer:PROTection:TRIP</p>
+		<p class="Heading_3">5.16.53. <a name="syst_pow_prot_trip"></a>SYSTem:POWer:PROTection:TRIP</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4269,7 +4510,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.51. <a name="syst_rem"></a>SYSTem:REMote</p>
+		<p class="Heading_3">5.16.54. <a name="syst_rem"></a>SYSTem:REMote</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4307,7 +4548,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.52. <a name="syst_res"></a>SYSTem:RESet</p>
+		<p class="Heading_3">5.16.55. <a name="syst_res"></a>SYSTem:RESet</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4343,7 +4584,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.53. <a name="syst_rwl"></a>SYSTem:RWLock</p>
+		<p class="Heading_3">5.16.56. <a name="syst_rwl"></a>SYSTem:RWLock</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4380,7 +4621,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.54. <a name="syst_temp_prot"></a>SYSTem:TEMPerature:PROTection[:HIGH][:LEVel]</p>
+		<p class="Heading_3">5.16.57. <a name="syst_temp_prot"></a>SYSTem:TEMPerature:PROTection[:HIGH][:LEVel]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4479,7 +4720,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.55. <a name="syst_temp_prot_cle"></a>SYSTem:TEMPerature:PROTection[:HIGH]:CLEar</p>
+		<p class="Heading_3">5.16.58. <a name="syst_temp_prot_cle"></a>SYSTem:TEMPerature:PROTection[:HIGH]:CLEar</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4546,7 +4787,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.56. <a name="syst_temp_prot_del"></a>SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]</p>
+		<p class="Heading_3">5.16.59. <a name="syst_temp_prot_del"></a>SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4637,7 +4878,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.57. <a name="syst_temp_prot_stat"></a>SYSTem:TEMPerature:PROTection[:HIGH]:STATe </p>
+		<p class="Heading_3">5.16.60. <a name="syst_temp_prot_stat"></a>SYSTem:TEMPerature:PROTection[:HIGH]:STATe </p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4728,7 +4969,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.58. <a name="syst_temp_prot_trip"></a>SYSTem:TEMPerature:PROTection[:HIGH]:TRIPped?</p>
+		<p class="Heading_3">5.16.61. <a name="syst_temp_prot_trip"></a>SYSTem:TEMPerature:PROTection[:HIGH]:TRIPped?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4805,7 +5046,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.59. <a name="syst_time"></a>SYSTem:TIME</p>
+		<p class="Heading_3">5.16.62. <a name="syst_time"></a>SYSTem:TIME</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4914,7 +5155,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.60. <a name="syst_time_dst"></a>SYSTem:TIME:DST</p>
+		<p class="Heading_3">5.16.63. <a name="syst_time_dst"></a>SYSTem:TIME:DST</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4993,7 +5234,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.61. <a name="syst_time_zone"></a>SYSTem:TIME:ZONE</p>
+		<p class="Heading_3">5.16.64. <a name="syst_time_zone"></a>SYSTem:TIME:ZONE</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5072,7 +5313,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.62. <a name="syst_vers"></a>SYSTem:VERSion?</p>
+		<p class="Heading_3">5.16.65. <a name="syst_vers"></a>SYSTem:VERSion?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
