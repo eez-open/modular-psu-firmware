@@ -177,7 +177,7 @@ struct Channel : ChannelInterface {
 		adc.init();
 		dac.init();
 
-        dprogState = DPROG_STATE_AUTO;
+        dprogState = DPROG_STATE_ON;
 	}
 
 	void onPowerDown(int subchannelIndex) {
@@ -185,7 +185,7 @@ struct Channel : ChannelInterface {
 
 	void reset(int subchannelIndex) {
 		uSet = 0;
-        dprogState = DPROG_STATE_AUTO;
+        dprogState = DPROG_STATE_ON;
         dpOn = false;
 		uBeforeBalancing = NAN;
 		iBeforeBalancing = NAN;
@@ -239,9 +239,9 @@ struct Channel : ChannelInterface {
 		}
 
 		if (channel.params.features & CH_FEATURE_DPROG) {
-			if (dprogState == DPROG_STATE_AUTO) {
+			if (dprogState == DPROG_STATE_ON) {
 				// turn off DP after delay
-				if (delayed_dp_off && (micros() - delayed_dp_off_start) >= DP_OFF_DELAY_PERIOD * 1000000L) {
+				if (delayed_dp_off && (millis() - delayed_dp_off_start) >= DP_OFF_DELAY_PERIOD) {
 					delayed_dp_off = false;
 					setDpEnable(false);
 				}
@@ -422,7 +422,7 @@ struct Channel : ChannelInterface {
 
 		if (enable) {
 			if (channel.params.features & CH_FEATURE_DPROG) {			
-				if (dprogState == DPROG_STATE_AUTO) {
+				if (dprogState == DPROG_STATE_ON) {
 					// enable DP
 					dpNegMonitoringTime = micros();
 					delayed_dp_off = false;
@@ -464,10 +464,10 @@ struct Channel : ChannelInterface {
 			setCurrentRange(subchannelIndex);
 
 			if (channel.params.features & CH_FEATURE_DPROG) {			
-				if (dprogState == DPROG_STATE_AUTO) {
+				if (dprogState == DPROG_STATE_ON) {
 					// turn off DP after some delay
 					delayed_dp_off = true;
-					delayed_dp_off_start = micros();
+					delayed_dp_off_start = millis();
 				}
 			}
 		}
@@ -515,8 +515,6 @@ struct Channel : ChannelInterface {
 
 			if (dprogState == DPROG_STATE_OFF) {
 				setDpEnable(false);
-			} else if (dprogState == DPROG_STATE_ON) {
-				setDpEnable(true);
 			} else {
 				setDpEnable(channel.isOutputEnabled());
 			}

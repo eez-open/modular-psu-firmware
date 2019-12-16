@@ -209,7 +209,6 @@ scpi_result_t scpi_cmd_outputStateTriggeredQ(scpi_t *context) {
 scpi_choice_def_t dprogStateChoice[] = {
     { "ON", DPROG_STATE_ON },
     { "OFF", DPROG_STATE_OFF },
-    { "AUTO", DPROG_STATE_AUTO },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 

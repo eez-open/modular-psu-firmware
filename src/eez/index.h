@@ -49,8 +49,7 @@ enum AdcDataType {
 
 enum DprogState {
     DPROG_STATE_OFF = 0,
-    DPROG_STATE_ON = 1,
-    DPROG_STATE_AUTO = 2
+    DPROG_STATE_ON = 1
 };
 
 enum ChannelFeatures {

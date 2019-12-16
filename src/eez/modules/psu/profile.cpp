@@ -221,7 +221,13 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
             channel.flags.currentRangeSelectionMode = profile->channels[i].flags.currentRangeSelectionMode;
             channel.flags.autoSelectCurrentRange = profile->channels[i].flags.autoSelectCurrentRange;
 
-            channel.setDprogState((DprogState)profile->channels[i].flags.dprogState);
+            DprogState dprogState = (DprogState)profile->channels[i].flags.dprogState;
+            if (dprogState == DPROG_STATE_OFF) {
+                channel.setDprogState(DPROG_STATE_OFF);
+            } else {
+                channel.setDprogState(DPROG_STATE_ON);
+            }
+            
             channel.flags.trackingEnabled = profile->channels[i].flags.trackingEnabled;
 
 #if OPTION_SD_CARD
