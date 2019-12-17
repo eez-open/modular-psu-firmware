@@ -112,7 +112,7 @@ void Keypad::init(const char *label_) {
     m_keypadText[0] = 0;
     m_okCallback = 0;
     m_cancelCallback = 0;
-    m_isUpperCase = false;
+    m_keypadMode = KEYPAD_MODE_LOWERCASE;
     m_isPassword = false;
 
     if (label_) {
@@ -182,7 +182,7 @@ void Keypad::start(const char *label, const char *text, int minChars_, int maxCh
     } else {
         m_keypadText[0] = 0;
     }
-    m_isUpperCase = false;
+    m_keypadMode = KEYPAD_MODE_LOWERCASE;
 }
 
 void Keypad::startPush(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
@@ -214,15 +214,11 @@ void Keypad::key() {
 }
 
 void Keypad::key(char ch) {
-    appendChar(m_isUpperCase ? toupper(ch) : tolower(ch));
+    appendChar(ch);
 }
 
 void Keypad::space() {
     appendChar(' ');
-}
-
-void Keypad::caps() {
-    m_isUpperCase = !m_isUpperCase;
 }
 
 void Keypad::back() {

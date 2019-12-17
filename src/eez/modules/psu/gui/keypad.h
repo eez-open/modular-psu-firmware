@@ -27,6 +27,12 @@ namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+enum KeypadMode {
+  KEYPAD_MODE_UPPERCASE,
+  KEYPAD_MODE_LOWERCASE,
+  KEYPAD_MODE_SYMBOL
+};
+
 class Keypad : public eez::gui::Page {
   public:
     bool m_isFree = true;
@@ -40,7 +46,6 @@ class Keypad : public eez::gui::Page {
     void key();
     virtual void key(char ch);
     virtual void space();
-    virtual void caps();
     virtual void back();
     virtual void clear();
     virtual void sign();
@@ -64,7 +69,7 @@ class Keypad : public eez::gui::Page {
         return UNIT_UNKNOWN;
     }
 
-    bool m_isUpperCase;
+    KeypadMode m_keypadMode;
 
   protected:
     char m_stateText[2][MAX_KEYPAD_TEXT_LENGTH + 2];

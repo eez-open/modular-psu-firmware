@@ -97,6 +97,8 @@ class SysSettingsEthernetPage : public SetPage {
 
     uint8_t m_macAddress[6];
 
+    char m_hostName[32 + 1];
+
   private:
     bool m_enabledOrig;
 
@@ -117,6 +119,8 @@ class SysSettingsEthernetPage : public SetPage {
     uint16_t m_scpiPortOrig;
 
     uint8_t m_macAddressOrig[6];
+    
+    char m_hostNameOrig[32 + 1];
 
     static void onSetScpiPort(float value);
     static void onSetMacAddress(char *value);
@@ -150,6 +154,31 @@ class SysSettingsEthernetStaticPage : public SetPage {
 
     void editAddress(uint32_t &address);
     static void onAddressSet(uint32_t address);
+};
+
+class SysSettingsMqttPage : public SetPage {
+public:
+    void pageAlloc();
+
+    void toggle();
+
+    int getDirty();
+    void set();
+
+    bool m_enabled;
+    char m_host[64+1];
+    uint16_t m_port;
+    char m_username[32 + 1];
+    char m_password[32 + 1];
+    float m_period;
+
+private:
+    bool m_enabledOrig;
+    char m_hostOrig[64 + 1];
+    uint16_t m_portOrig;
+    char m_usernameOrig[32 + 1];
+    char m_passwordOrig[32 + 1];
+    float m_periodOrig;
 };
 
 #endif

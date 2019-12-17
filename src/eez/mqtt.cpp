@@ -41,6 +41,7 @@ extern "C" {
 
 #include <eez/debug.h>
 #include <eez/mqtt.h>
+#include <eez/system.h>
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ethernet.h>
@@ -60,23 +61,38 @@ static const char *CLIENT_ID = "BB3_STM32";
 static const char *CLIENT_ID = "BB3_Simulator";
 #endif
 
-static const char *PUB_TOPIC = "ch/%d";
-static const char *SUB_TOPIC = "ch/+/+"; // for example: ch/1/oe, ch/1/setu, ch/1/seti
+static const size_t MAX_PUB_TOPIC_LENGTH = 50;
+static const char *PUB_TOPIC_OE = "%s/ch/%d/oe";
+static const char *PUB_TOPIC_U_SET = "%s/ch/%d/uset";
+static const char *PUB_TOPIC_I_SET = "%s/ch/%d/iset";
+static const char *PUB_TOPIC_U_MON = "%s/ch/%d/umon";
+static const char *PUB_TOPIC_I_MON = "%s/ch/%d/imon";
+
+static const size_t MAX_SUB_TOPIC_LENGTH = 50;
+static const char *SUB_TOPIC = "%s/ch/+/+"; // for example: ch/1/set/oe, ch/1/set/u, ch/1/set/i
+
+static const size_t MAX_PAYLOAD_LENGTH = 100;
 
 ConnectionState g_connectionState = CONNECTION_STATE_IDLE;
 
-static char g_addr[64];
-static int g_port;
-static char g_user[32];
-static char g_pass[32];
-
-static uint32_t g_lastTickCount;
-
 static struct {
     int oe;
+
     float uSet;
+    uint32_t g_uSetTick;
+
     float iSet;
+    uint32_t g_iSetTick;
+
+    float uMon;
+    uint32_t g_uMonTick;
+
+    float iMon;
+    uint32_t g_iMonTick;
 } g_channelStates[CH_MAX];
+
+static uint8_t g_lastChannelIndex = 0;
+static uint8_t g_lastValueIndex = 0;
 
 void onIncomingPublish(const char *topic, const char *payload) {
     const char *p = topic + 3;
@@ -170,6 +186,7 @@ static char g_topic[MAX_TOPIC_LEN + 1];
 static const size_t MAX_PAYLOAD_LEN = 128;
 static char g_payload[MAX_PAYLOAD_LEN + 1];
 static size_t g_payloadLen;
+static mqtt_connection_status_t m_mqttConnectionStatus;
 
 static void dnsFoundCallback(const char* hostname, const ip_addr_t *ipaddr, void *arg) {
     if (ipaddr != NULL) {
@@ -182,6 +199,7 @@ static void dnsFoundCallback(const char* hostname, const ip_addr_t *ipaddr, void
 }
 
 static void connectCallback(mqtt_client_t *client, void *arg, mqtt_connection_status_t status) {
+    m_mqttConnectionStatus = status; 
 }
 
 static void requestCallback(void *arg, err_t err) {
@@ -213,8 +231,8 @@ void incomingDataCallback(void *arg, const u8_t *data, u16_t len, u8_t flags) {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 static int g_sockfd;
-static uint8_t g_sendbuf[2048]; /* sendbuf should be large enough to hold multiple whole mqtt messages */
-static uint8_t g_recvbuf[1024]; /* recvbuf should be large enough any whole mqtt message expected to be received */
+static uint8_t g_sendbuf[4096]; /* sendbuf should be large enough to hold multiple whole mqtt messages */
+static uint8_t g_recvbuf[2048]; /* recvbuf should be large enough any whole mqtt message expected to be received */
 static struct mqtt_client g_client; /* instantiate the client */
 
 void incomingPublishCallback(void** unused, struct mqtt_response_publish *published) {
@@ -222,11 +240,14 @@ void incomingPublishCallback(void** unused, struct mqtt_response_publish *publis
 }
 #endif
 
-void publish(char *topic, char *payload, bool retain) {
+bool publish(char *topic, char *payload, bool retain) {
 #if defined(EEZ_PLATFORM_STM32)
     err_t result = mqtt_publish(g_client, topic, payload, strlen(payload), 0, retain ? 1 : 0, requestCallback, nullptr);
     if (result != ERR_OK) {
-        DebugTrace("mqtt publish error: %d\n", (int)result);
+        if (result != ERR_MEM) {
+            DebugTrace("mqtt publish error: %d\n", (int)result);
+        }
+        return false;
     }
 #endif
 
@@ -234,46 +255,63 @@ void publish(char *topic, char *payload, bool retain) {
     mqtt_publish(&g_client, topic, payload, strlen(payload), MQTT_PUBLISH_QOS_0 | (retain ? MQTT_PUBLISH_RETAIN : 0));
     if (g_client.error != MQTT_OK) {
         DebugTrace("mqtt error: %s\n", mqtt_error_str(g_client.error));
+        return false;
     }
 #endif
+    
+    return true;
 }
 
-void publish(int channelIndex, float uMon, float iMon) {
-    char topic[20];
-    sprintf(topic, PUB_TOPIC, channelIndex + 1);
+bool publish(int channelIndex, const char *pubTopic, int value) {
+    char topic[MAX_PUB_TOPIC_LENGTH + 1];
+    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
 
-    char payload[100];
-    sprintf(payload, "{\"umon\":%g,\"imon\":%g}", uMon, iMon);
+    char payload[MAX_PAYLOAD_LENGTH + 1];
+    sprintf(payload, "%d", value);
 
-    publish(topic, payload, false);
+    return publish(topic, payload, true);
 }
 
-void publish(int channelIndex, int oeState, float uSet, float iSet) {
-    char topic[20];
-    sprintf(topic, PUB_TOPIC, channelIndex + 1);
+bool publish(int channelIndex, const char *pubTopic, float value) {
+    char topic[MAX_PUB_TOPIC_LENGTH + 1];
+    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
 
-    char payload[100];
-    sprintf(payload, "{\"oe\":%d,\"uset\":%g,\"iset\":%g}", oeState, uSet, iSet);
+    char payload[MAX_PAYLOAD_LENGTH + 1];
+    sprintf(payload, "%g", value);
 
-    publish(topic, payload, true);
+    return publish(topic, payload, false);
+}
+
+const char *getSubTopic() {
+    static char g_subTopic[MAX_SUB_TOPIC_LENGTH + 1] = { 0 };
+    if (!g_subTopic[0]) {
+        sprintf(g_subTopic, SUB_TOPIC, persist_conf::devConf.ethernetHostName);
+    }
+    return g_subTopic;
 }
 
 void setConnected(uint32_t tickCount) {
     g_connectionState = CONNECTION_STATE_CONNECTED;
-    g_lastTickCount = tickCount;
 
 #if defined(EEZ_PLATFORM_STM32)
     mqtt_set_inpub_callback(g_client, incomingPublishCallback, incomingDataCallback, nullptr);
-    mqtt_subscribe(g_client, SUB_TOPIC, 0, requestCallback, nullptr);
+    mqtt_subscribe(g_client, getSubTopic(), 0, requestCallback, nullptr);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    mqtt_subscribe(&g_client, SUB_TOPIC, 0);
+    mqtt_subscribe(&g_client, getSubTopic(), 0);
 #endif
 
-    for(int i = 0; i < CH_MAX; i++) {
+    for(int i = 0; i < CH_NUM; i++) {
         g_channelStates[i].oe = -1;
+        g_channelStates[i].uSet = NAN;
+        g_channelStates[i].iSet = NAN;
+        g_channelStates[i].uMon = NAN;
+        g_channelStates[i].iMon = NAN;
     }
+
+    g_lastChannelIndex = 0;
+    g_lastValueIndex = 0;
 }
 
 void tick(uint32_t tickCount) {
@@ -282,14 +320,16 @@ void tick(uint32_t tickCount) {
     }
 
     else if (g_connectionState == CONNECTION_STATE_IDLE) {
-        // pass
+        if (persist_conf::devConf.mqttEnabled) {
+            g_connectionState = CONNECTION_STATE_CONNECT;
+        }
     }
 
     else if (g_connectionState == CONNECTION_STATE_CONNECT) {
 #if defined(EEZ_PLATFORM_STM32)
         ip_addr_set_zero(&g_ipaddr);
         ip_addr_t ipaddr;
-        err_t err = dns_gethostbyname(g_addr, &ipaddr, dnsFoundCallback, NULL);
+        err_t err = dns_gethostbyname(persist_conf::devConf.mqttHost, &ipaddr, dnsFoundCallback, NULL);
         if (err == ERR_OK) {
             g_connectionState = CONNECTION_STATE_DNS_FOUND;
             g_ipaddr = ipaddr;
@@ -303,8 +343,8 @@ void tick(uint32_t tickCount) {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
         char port[16];
-        sprintf(port, "%d", g_port);
-        g_sockfd = open_nb_socket(g_addr, port);
+        sprintf(port, "%d", persist_conf::devConf.mqttPort);
+        g_sockfd = open_nb_socket(persist_conf::devConf.mqttHost, port);
         if (g_sockfd != -1) {
             /* initialize the client */
             mqtt_init(&g_client, g_sockfd, g_sendbuf, sizeof(g_sendbuf), g_recvbuf, sizeof(g_recvbuf), incomingPublishCallback);
@@ -313,7 +353,7 @@ void tick(uint32_t tickCount) {
             uint8_t connect_flags = MQTT_CONNECT_CLEAN_SESSION;
 
             /* Send connection request to the broker. */
-            mqtt_connect(&g_client, CLIENT_ID, NULL, NULL, 0, g_user, g_pass, connect_flags, 400);
+            mqtt_connect(&g_client, CLIENT_ID, NULL, NULL, 0, persist_conf::devConf.mqttUsername, persist_conf::devConf.mqttPassword, connect_flags, 400);
 
             /* check that we don't have any errors */
             if (g_client.error == MQTT_OK) {
@@ -329,9 +369,11 @@ void tick(uint32_t tickCount) {
 #endif
     }
 
-    else if (g_connectionState == CONNECTION_STATE_DISCONNECT) {
+    else if (g_connectionState == CONNECTION_STATE_DISCONNECT || g_connectionState == CONNECTION_STATE_RECONNECT) {
 #if defined(EEZ_PLATFORM_STM32)
-        mqtt_disconnect(g_client);
+        if (mqtt_client_is_connected(g_client)) {
+            mqtt_disconnect(g_client);
+        }
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -339,6 +381,10 @@ void tick(uint32_t tickCount) {
 #endif
 
         g_connectionState = CONNECTION_STATE_IDLE;
+
+        if (g_connectionState == CONNECTION_STATE_RECONNECT) {
+            g_connectionState = CONNECTION_STATE_CONNECT;
+        }
     }
 
     else if (g_connectionState == CONNECTION_STATE_ERROR) {
@@ -353,14 +399,16 @@ void tick(uint32_t tickCount) {
         if (g_client) {
             mqtt_connect_client_info_t clientInfo;
             clientInfo.client_id = CLIENT_ID;
-            clientInfo.client_user = g_user;
-            clientInfo.client_pass = g_pass;
+            clientInfo.client_user = persist_conf::devConf.mqttUsername;
+            clientInfo.client_pass = persist_conf::devConf.mqttPassword;
             clientInfo.keep_alive = 60; // seconds
             clientInfo.will_topic = nullptr; // not used
-            err_t result = mqtt_client_connect(g_client, &g_ipaddr, g_port, connectCallback, nullptr, &clientInfo);
+
+            m_mqttConnectionStatus = MQTT_CONNECT_ACCEPTED;
+
+            err_t result = mqtt_client_connect(g_client, &g_ipaddr, persist_conf::devConf.mqttPort, connectCallback, nullptr, &clientInfo);
             if (result == ERR_OK) {
                 g_connectionState = CONNECTION_STATE_CONNECTING;
-                g_lastTickCount = tickCount;
             } else {
                 g_connectionState = CONNECTION_STATE_ERROR;
                 DebugTrace("mqtt connect error: %d\n", (int)result);
@@ -377,83 +425,106 @@ void tick(uint32_t tickCount) {
 #if defined(EEZ_PLATFORM_STM32)
         if (mqtt_client_is_connected(g_client)) {
             setConnected(tickCount);
+        } else {
+            if (m_mqttConnectionStatus != MQTT_CONNECT_ACCEPTED) {
+                g_connectionState = CONNECTION_STATE_ERROR;
+                DebugTrace("mqtt connect error: %d\n", (int)m_mqttConnectionStatus);
+            }
         }
 #endif
     }
 
     else if (g_connectionState == CONNECTION_STATE_CONNECTED) {
-        bool callPublish = false;
-        int32_t diff = tickCount - g_lastTickCount;
-        if (diff >= 1000000L) { // 1 sec
-            g_lastTickCount = tickCount;
-            callPublish = true;
-        }
+#if defined(EEZ_PLATFORM_STM32)
+        if (mqtt_client_is_connected(g_client)) {
+#endif
+            uint8_t lastChannelIndexAtStart = g_lastChannelIndex;
+            uint8_t lastValueIndexAtStart = g_lastValueIndex;
 
-        for (uint8_t channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-			Channel &channel = Channel::get(channelIndex);
-			if (channel.isInstalled()) {
-				int oe = channel.isOutputEnabled() ? 1 : 0;
-				float uSet = channel_dispatcher::getUSet(channel);
-				float iSet = channel_dispatcher::getISet(channel);
-				if (oe != g_channelStates[channelIndex].oe || (callPublish && (uSet != g_channelStates[channelIndex].uSet || iSet != g_channelStates[channelIndex].iSet))) {
-					g_channelStates[channelIndex].oe = oe;
-					g_channelStates[channelIndex].uSet = uSet;
-					g_channelStates[channelIndex].iSet = iSet;
-					publish(channelIndex, oe, uSet, iSet);
-				}
+            do {
+                uint8_t channelIndex = g_lastChannelIndex;
+                Channel &channel = Channel::get(channelIndex);
 
-				if (oe && callPublish) {
-					publish(channelIndex, channel_dispatcher::getUMonLast(channel), channel_dispatcher::getIMonLast(channel));
-				}
-			}
-        }
+                uint32_t period = (uint32_t)roundf(persist_conf::devConf.mqttPeriod * 1000000);
+
+                if (g_lastValueIndex == 0) {
+                    int oe = channel.isOutputEnabled() ? 1 : 0;
+                    if (oe != g_channelStates[channelIndex].oe) {
+                        if (!publish(channelIndex, PUB_TOPIC_OE, oe)) {
+                            break;
+                        }
+                        g_channelStates[channelIndex].oe = oe;
+                    }
+                } else if (g_lastValueIndex == 1) {
+                    float uSet = channel_dispatcher::getUSet(channel);
+                    if ((isNaN(g_channelStates[channelIndex].uSet) || uSet != g_channelStates[channelIndex].uSet) && (tickCount - g_channelStates[channelIndex].g_uSetTick) >= period) {
+                        if (!publish(channelIndex, PUB_TOPIC_U_SET, uSet)) {
+                            break;
+                        }
+                        g_channelStates[channelIndex].uSet = uSet;
+                        g_channelStates[channelIndex].g_uSetTick = tickCount;
+                    }
+                } else if (g_lastValueIndex == 2) {
+                    float iSet = channel_dispatcher::getISet(channel);
+                    if ((isNaN(g_channelStates[channelIndex].iSet) || iSet != g_channelStates[channelIndex].iSet) && (tickCount - g_channelStates[channelIndex].g_iSetTick) >= period) {
+                        if (!publish(channelIndex, PUB_TOPIC_I_SET, iSet)) {
+                            break;
+                        }
+                        g_channelStates[channelIndex].iSet = iSet;
+                        g_channelStates[channelIndex].g_iSetTick = tickCount;
+                    }
+                } else if (g_lastValueIndex == 3) {
+                    float uMon = channel_dispatcher::getUMonLast(channel);
+                    if ((isNaN(g_channelStates[channelIndex].uMon) || uMon != g_channelStates[channelIndex].uMon) && (tickCount - g_channelStates[channelIndex].g_uMonTick) >= period) {
+                        if (!publish(channelIndex, PUB_TOPIC_U_MON, uMon)) {
+                            break;
+                        }
+                        g_channelStates[channelIndex].uMon = uMon;
+                        g_channelStates[channelIndex].g_uMonTick = tickCount;
+                    }
+                } else {
+                    float iMon = channel_dispatcher::getIMonLast(channel);
+                    if ((isNaN(g_channelStates[channelIndex].iMon) || iMon != g_channelStates[channelIndex].iMon) && (tickCount - g_channelStates[channelIndex].g_iMonTick) >= period) {
+                        if (!publish(channelIndex, PUB_TOPIC_I_MON, iMon)) {
+                            break;
+                        }
+                        g_channelStates[channelIndex].iMon = iMon;
+                        g_channelStates[channelIndex].g_iMonTick = tickCount;
+                    }
+                }
+
+                if (++g_lastValueIndex == 5) {
+                    g_lastValueIndex = 0;
+                    if (++g_lastChannelIndex == CH_NUM) {
+                        g_lastChannelIndex = 0;
+                    }
+                }
+            } while (g_lastChannelIndex != lastChannelIndexAtStart || g_lastValueIndex != lastValueIndexAtStart);
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        mqtt_sync(&g_client);
+            mqtt_sync(&g_client);
+#endif
+
+#if defined(EEZ_PLATFORM_STM32)
+        } else {
+            g_connectionState = CONNECTION_STATE_RECONNECT;
+        }
 #endif
     }
 }
 
-bool connect(const char *addr, int port, const char *user, const char *pass, int16_t *err) {
-    if (g_connectionState != CONNECTION_STATE_IDLE && g_connectionState == CONNECTION_STATE_ERROR) {
-        if (err != nullptr) {
-            // TODO find better error
-            *err = SCPI_ERROR_EXECUTION_ERROR;
+void reconnect() {
+    if (persist_conf::devConf.mqttEnabled) {
+        if (g_connectionState == CONNECTION_STATE_IDLE || g_connectionState != CONNECTION_STATE_ERROR) {
+            g_connectionState = CONNECTION_STATE_CONNECT;
+        } else {
+            g_connectionState = CONNECTION_STATE_RECONNECT;
         }
-        return false;
-    }
-
-    strcpy(g_addr, addr);
-    
-    g_port = port;
-    
-    if (user) {
-        strcpy(g_user, user);
     } else {
-        g_user[0] = 0;
-    }
-    
-    if (pass) {
-        strcpy(g_pass, pass);
-    } else {
-        g_pass[0] = 0;
-    }
-
-    g_connectionState = CONNECTION_STATE_CONNECT;
-    return true;
-}
-
-bool disconnect(int16_t *err) {
-    if (g_connectionState != CONNECTION_STATE_CONNECTED && g_connectionState != CONNECTION_STATE_CONNECTING && g_connectionState != CONNECTION_STATE_DNS_IN_PROGRESS) {
-        if (err != nullptr) {
-            // TODO find better error
-            *err = SCPI_ERROR_EXECUTION_ERROR;
+        if (g_connectionState == CONNECTION_STATE_IDLE || g_connectionState != CONNECTION_STATE_ERROR) {
+            g_connectionState = CONNECTION_STATE_DISCONNECT;
         }
-        return false;
     }
-
-    g_connectionState = CONNECTION_STATE_DISCONNECT;
-    return true;
 }
 
 } // mqtt

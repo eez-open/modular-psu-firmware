@@ -77,7 +77,7 @@ enum UserSwitchAction {
 /// Device configuration block.
 struct DeviceConfiguration {
     // block 1
-    char serialNumber[7 + 1];
+    char reserved1[7 + 1]; // was serialNumber
     char systemPassword[PASSWORD_MAX_LENGTH + 1];
     char calibration_password[PASSWORD_MAX_LENGTH + 1];
 
@@ -173,7 +173,17 @@ struct DeviceConfiguration {
     // block 7
     UserSwitchAction userSwitchAction;
     SortFilesOption sortFilesOption;
-    uint8_t reserved[56];
+    uint8_t reserved7[56];
+
+    // block 8
+    char ethernetHostName[32 + 1];
+
+    unsigned mqttEnabled : 1;
+    char mqttHost[64 + 1];
+    uint16_t mqttPort;
+    char mqttUsername[32 + 1];
+    char mqttPassword[32 + 1];
+    float mqttPeriod;
 };
 
 extern const DeviceConfiguration &devConf;
@@ -189,8 +199,6 @@ void changeSystemPassword(const char *new_password, size_t new_password_len);
 
 bool isCalibrationPasswordValid(const char *new_password, size_t new_password_len, int16_t &err);
 void changeCalibrationPassword(const char *new_password, size_t new_password_len);
-
-void changeSerial(const char *newSerialNumber, size_t newSerialNumberLength);
 
 void enableSound(bool enable);
 bool isSoundEnabled();
@@ -271,12 +279,15 @@ bool setEthernetSubnetMask(uint32_t subnetMask);
 bool setEthernetScpiPort(uint16_t scpiPort);
 bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint32_t dns,
                          uint32_t gateway, uint32_t subnetMask, uint16_t scpiPort,
-                         uint8_t *macAddress);
+                         uint8_t *macAddress, const char *hostName);
 
 void enableNtp(bool enable);
 bool isNtpEnabled();
 void setNtpServer(const char *ntpServer, size_t ntpServerLength);
 void setNtpSettings(bool enable, const char *ntpServer);
+
+bool setMqttSettings(bool enable, const char *host, uint16_t port, const char *username, const char *password, float period);
+void enableMqtt(bool enable);
 
 void setSdLocked(bool sdLocked);
 bool isSdLocked();

@@ -146,6 +146,19 @@ void STR_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
+bool compare_PASSWORD_value(const Value &a, const Value &b) {
+    return strlen(a.getString()) == strlen(b.getString());
+}
+
+void PASSWORD_value_to_text(const Value &value, char *text, int count) {
+    size_t i;
+    size_t end = MIN(strlen(value.getString()), (size_t)count);
+    for (i = 0; i < end; i++) {
+        text[i] = '*';
+    }
+    text[i] = 0;
+}
+
 bool compare_ENUM_value(const Value &a, const Value &b) {
     return a.getEnum().enumDefinition == b.getEnum().enumDefinition &&
            a.getEnum().enumValue == b.getEnum().enumValue;
@@ -326,6 +339,7 @@ static CompareValueFunction g_compareBuiltInValueFunctions[] = {
     compare_UINT32_value,
     compare_FLOAT_value,
     compare_STR_value,
+    compare_PASSWORD_value,
     compare_ENUM_value,
     compare_SCPI_ERROR_value,
     compare_PERCENTAGE_value,
@@ -348,6 +362,7 @@ static ValueToTextFunction g_builtInValueToTextFunctions[] = {
     UINT32_value_to_text,
     FLOAT_value_to_text,
     STR_value_to_text,
+    PASSWORD_value_to_text,
     ENUM_value_to_text,
     SCPI_ERROR_value_to_text,
     PERCENTAGE_value_to_text,

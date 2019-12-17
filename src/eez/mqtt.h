@@ -31,14 +31,18 @@ enum ConnectionState {
     CONNECTION_STATE_DNS_IN_PROGRESS,
     CONNECTION_STATE_DNS_FOUND,
     CONNECTION_STATE_DISCONNECT,
+    CONNECTION_STATE_RECONNECT
 };
+
+static const float PERIOD_MIN = 0.1f;
+static const float PERIOD_MAX = 120.0f;
+static const float PERIOD_DEFAULT = 1.0f;
 
 extern ConnectionState g_connectionState;
     
 void tick(uint32_t tickCount);
 
-bool connect(const char *addr, int port, const char *user, const char *pass, int16_t *err);
-bool disconnect(int16_t *err);
+void reconnect();
 
 } // mqtt
 } // eez

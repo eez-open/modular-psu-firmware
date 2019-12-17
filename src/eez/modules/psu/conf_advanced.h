@@ -22,9 +22,6 @@
 
 #pragma once
 
-/// PSU serial number.
-#define PSU_SERIAL "0000000"
-
 /// Firmware version.
 #define FIRMWARE "M1 0.3"
 

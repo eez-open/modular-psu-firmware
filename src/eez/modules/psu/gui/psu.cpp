@@ -454,6 +454,8 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
             animateHideSysSettings();
         } else if (activePageId == PAGE_ID_SYS_SETTINGS) {
             animateSettingsSlideRight(previousPageId == PAGE_ID_SYS_INFO);
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS_MQTT) {
+            animateSettingsSlideLeft(false);
         }
     } else if (previousPageId == PAGE_ID_CH_SETTINGS) {
         if (activePageId == PAGE_ID_MAIN) {
@@ -493,6 +495,8 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         }
     } else if (previousPageId == PAGE_ID_IMAGE_VIEW) {
         animateFadeOutFadeIn();
+    } else if (previousPageId == PAGE_ID_SYS_SETTINGS_MQTT) {
+        animateSlideRight();
     }
 }
 

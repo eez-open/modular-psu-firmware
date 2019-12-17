@@ -300,6 +300,8 @@ void SysSettingsEthernetPage::pageAlloc() {
     m_scpiPortOrig = m_scpiPort = persist_conf::devConf.ethernetScpiPort;
     memcpy(m_macAddressOrig, persist_conf::devConf.ethernetMacAddress, 6);
     memcpy(m_macAddress, persist_conf::devConf.ethernetMacAddress, 6);
+    strcpy(m_hostNameOrig, persist_conf::devConf.ethernetHostName);
+    strcpy(m_hostName, persist_conf::devConf.ethernetHostName);
 }
 
 void SysSettingsEthernetPage::toggle() {
@@ -329,8 +331,7 @@ void SysSettingsEthernetPage::editScpiPort() {
 
     options.enableDefButton();
 
-    NumericKeypad::start(0, data::Value((int)m_scpiPort, VALUE_TYPE_PORT), options, onSetScpiPort,
-                         0, 0);
+    NumericKeypad::start(0, data::Value((int)m_scpiPort, VALUE_TYPE_PORT), options, onSetScpiPort, 0, 0);
 }
 
 void SysSettingsEthernetPage::onSetMacAddress(char *value) {
@@ -354,15 +355,15 @@ void SysSettingsEthernetPage::editMacAddress() {
 
 int SysSettingsEthernetPage::getDirty() {
     return m_enabledOrig != m_enabled || m_dhcpEnabledOrig != m_dhcpEnabled ||
-           m_ipAddressOrig != m_ipAddress || m_dnsOrig != m_dns || m_gatewayOrig != m_gateway ||
-           m_subnetMaskOrig != m_subnetMask || m_scpiPortOrig != m_scpiPort ||
-           memcmp(m_macAddress, m_macAddressOrig, 6) != 0;
+        m_ipAddressOrig != m_ipAddress || m_dnsOrig != m_dns || m_gatewayOrig != m_gateway ||
+        m_subnetMaskOrig != m_subnetMask || m_scpiPortOrig != m_scpiPort ||
+        memcmp(m_macAddress, m_macAddressOrig, 6) != 0 ||
+        strcmp(m_hostName, m_hostNameOrig) != 0;
 }
 
 void SysSettingsEthernetPage::set() {
     if (getDirty()) {
-        if (persist_conf::setEthernetSettings(m_enabled, m_dhcpEnabled, m_ipAddress, m_dns,
-                                              m_gateway, m_subnetMask, m_scpiPort, m_macAddress)) {
+        if (persist_conf::setEthernetSettings(m_enabled, m_dhcpEnabled, m_ipAddress, m_dns, m_gateway, m_subnetMask, m_scpiPort, m_macAddress, m_hostName)) {
             popPage();
             infoMessage("Turn off and on power or", "press reset to apply changes!");
         }
@@ -426,6 +427,41 @@ void SysSettingsEthernetStaticPage::set() {
         page->m_subnetMask = m_subnetMask;
 
         popPage();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void SysSettingsMqttPage::pageAlloc() {
+    m_enabledOrig = m_enabled = persist_conf::devConf.mqttEnabled;
+    strcpy(m_hostOrig, persist_conf::devConf.mqttHost);
+    strcpy(m_host, persist_conf::devConf.mqttHost);
+    m_portOrig = m_port = persist_conf::devConf.mqttPort;
+    strcpy(m_usernameOrig, persist_conf::devConf.mqttUsername);
+    strcpy(m_username, persist_conf::devConf.mqttUsername);
+    strcpy(m_passwordOrig, persist_conf::devConf.mqttPassword);
+    strcpy(m_password, persist_conf::devConf.mqttPassword);
+    m_periodOrig = m_period = persist_conf::devConf.mqttPeriod;
+}
+
+void SysSettingsMqttPage::toggle() {
+    m_enabled = !m_enabled;
+}
+
+int SysSettingsMqttPage::getDirty() {
+    return m_enabledOrig != m_enabled ||
+        strcmp(m_hostOrig, m_host) != 0 ||
+        m_portOrig != m_port ||
+        strcmp(m_usernameOrig, m_username) != 0 ||
+        strcmp(m_passwordOrig, m_password) != 0 ||
+        m_periodOrig != m_period;
+}
+
+void SysSettingsMqttPage::set() {
+    if (getDirty()) {
+        if (persist_conf::setMqttSettings(m_enabled, m_host, m_port, m_username, m_password, m_period)) {
+            popPage();
+        }
     }
 }
 

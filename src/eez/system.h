@@ -40,4 +40,6 @@ uint32_t millis();
 void delay(uint32_t millis);
 void delayMicroseconds(uint32_t microseconds);
 
+const char *getSerialNumber();
+
 } // namespace eez

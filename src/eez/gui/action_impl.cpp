@@ -136,8 +136,15 @@ void action_keypad_clear() {
     getActiveKeypad()->clear();
 }
 
-void action_keypad_caps() {
-    getActiveKeypad()->caps();
+void action_toggle_keypad_mode() {
+    auto keypad = getActiveKeypad();
+    if (keypad->m_keypadMode == KEYPAD_MODE_LOWERCASE) {
+        getActiveKeypad()->m_keypadMode = KEYPAD_MODE_UPPERCASE;
+    } else if (keypad->m_keypadMode == KEYPAD_MODE_UPPERCASE) {
+        getActiveKeypad()->m_keypadMode = KEYPAD_MODE_SYMBOL;
+    } else {
+        getActiveKeypad()->m_keypadMode = KEYPAD_MODE_LOWERCASE;
+    }
 }
 
 void action_keypad_ok() {
@@ -572,6 +579,12 @@ void action_ethernet_edit_static_address() {
     #if OPTION_ETHERNET
     ((SysSettingsEthernetPage *)getActivePage())->editStaticAddress();
     #endif
+}
+
+void action_ethernet_edit_host_name() {
+#if OPTION_ETHERNET
+    editValue(DATA_ID_ETHERNET_HOST_NAME);
+#endif
 }
 
 void action_ethernet_edit_ip_address() {
@@ -1251,6 +1264,46 @@ void action_file_manager_sort_by() {
 void action_show_debug_trace_log() {
     eez::debug::resetTraceLogStartPosition();
     pushPage(PAGE_ID_DEBUG_TRACE_LOG);
+}
+
+void action_show_sys_settings_mqtt() {
+    pushPage(PAGE_ID_SYS_SETTINGS_MQTT);
+}
+
+void action_mqtt_toggle() {
+#if OPTION_ETHERNET
+    ((SysSettingsMqttPage *)getActivePage())->toggle();
+#endif
+}
+
+void action_mqtt_edit_host() {
+#if OPTION_ETHERNET
+    editValue(DATA_ID_MQTT_HOST);
+#endif
+}
+
+void action_mqtt_edit_port() {
+#if OPTION_ETHERNET
+    editValue(DATA_ID_MQTT_PORT);
+#endif
+}
+
+void action_mqtt_edit_username() {
+#if OPTION_ETHERNET
+    editValue(DATA_ID_MQTT_USERNAME);
+#endif
+}
+
+void action_mqtt_edit_password() {
+#if OPTION_ETHERNET
+    editValue(DATA_ID_MQTT_PASSWORD);
+#endif
+}
+
+void action_mqtt_edit_period() {
+#if OPTION_ETHERNET
+    editValue(DATA_ID_MQTT_PERIOD);
+#endif
 }
 
 } // namespace gui

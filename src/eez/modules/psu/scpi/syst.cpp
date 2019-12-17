@@ -654,28 +654,9 @@ scpi_result_t scpi_cmd_systemCpuOptionQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemSerial(scpi_t *context) {
-    // TODO migrate to generic firmware
-    const char *serial;
-    size_t serialLength;
-
-    if (!SCPI_ParamCharacters(context, &serial, &serialLength, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    if (serialLength > 7) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CHARACTER_DATA_TOO_LONG);
-        return SCPI_RES_ERR;
-    }
-
-    persist_conf::changeSerial(serial, serialLength);
-
-    return SCPI_RES_OK;
-}
-
 scpi_result_t scpi_cmd_systemSerialQ(scpi_t *context) {
     // TODO migrate to generic firmware
-    SCPI_ResultText(context, persist_conf::devConf.serialNumber);
+    SCPI_ResultText(context, getSerialNumber());
     return SCPI_RES_OK;
 }
 
@@ -881,7 +862,11 @@ scpi_result_t scpi_cmd_systemCommunicateSerialParityQ(scpi_t *context) {
 
 // NONE|ODD|EVEN
 static scpi_choice_def_t commInterfaceChoice[] = {
-    { "SERial", 1 }, { "ETHernet", 2 }, { "NTP", 3 }, SCPI_CHOICE_LIST_END
+    { "SERial", 1 }, 
+    { "ETHernet", 2 }, 
+    { "NTP", 3 }, 
+    { "MQTT", 4 }, 
+    SCPI_CHOICE_LIST_END
 };
 
 scpi_result_t scpi_cmd_systemCommunicateEnable(scpi_t *context) {
@@ -907,6 +892,8 @@ scpi_result_t scpi_cmd_systemCommunicateEnable(scpi_t *context) {
 #endif
     } else if (commInterface == 3) {
         persist_conf::enableNtp(enable);
+    } else if (commInterface == 4) {
+        persist_conf::enableMqtt(enable);
     }
 
     return SCPI_RES_OK;
@@ -1519,7 +1506,7 @@ scpi_result_t scpi_cmd_systemMeasureScalarVoltageDcQ(scpi_t *context) {
 #endif
 }
 
-scpi_result_t scpi_cmd_systemCommunicateMqttConnect(scpi_t *context) {
+scpi_result_t scpi_cmd_systemCommunicateMqttSettings(scpi_t *context) {
 #if OPTION_ETHERNET
     const char *addr;
     size_t addrLen;
@@ -1557,6 +1544,35 @@ scpi_result_t scpi_cmd_systemCommunicateMqttConnect(scpi_t *context) {
         passLen = 0;
     }
 
+    float period;
+    scpi_number_t param;
+    if (SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        if (param.special) {
+            if (param.content.tag == SCPI_NUM_MIN) {
+                period = mqtt::PERIOD_MIN;
+            } else if (param.content.tag == SCPI_NUM_MAX) {
+                period = mqtt::PERIOD_MAX;
+            } else if (param.content.tag == SCPI_NUM_DEF) {
+                period = mqtt::PERIOD_DEFAULT;
+            } else {
+                SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+                return SCPI_RES_ERR;
+            }
+        } else {
+            if (param.unit != SCPI_UNIT_NONE && param.unit != SCPI_UNIT_SECOND) {
+                SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+                return SCPI_RES_ERR;
+            }
+
+            period = (float)param.content.value;
+        }
+    } else {
+        if (SCPI_ParamErrorOccurred(context)) {
+            return SCPI_RES_ERR;
+        }
+        period = 1.0f;
+    }
+
     char savedPastAddrChar = *(addr + addrLen);
     *((char *)addr + addrLen) = 0;
 
@@ -1572,8 +1588,7 @@ scpi_result_t scpi_cmd_systemCommunicateMqttConnect(scpi_t *context) {
         *((char *)pass + passLen) = 0;
     }
 
-    int16_t err;
-    bool result = mqtt::connect(addr, port, user, pass, &err);
+    persist_conf::setMqttSettings(persist_conf::devConf.mqttEnabled, addr, port, user, pass, period);
 
     *((char *)addr + addrLen) = savedPastAddrChar;
     if (savedPastUserChar) {
@@ -1583,26 +1598,6 @@ scpi_result_t scpi_cmd_systemCommunicateMqttConnect(scpi_t *context) {
         *((char *)pass + passLen) = savedPastPassChar;
     }
 
-    if (!result) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
-
-    return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
-}
-
-scpi_result_t scpi_cmd_systemCommunicateMqttDisconnect(scpi_t *context) {
-#if OPTION_ETHERNET
-    int16_t err;
-    if (!mqtt::disconnect(&err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
-    
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

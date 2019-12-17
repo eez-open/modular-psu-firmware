@@ -17,6 +17,9 @@
 */
 
 #include <stdio.h>
+#if defined(EEZ_PLATFORM_SIMULATOR)
+#include <stdlib.h>
+#endif
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <usb_device.h>
@@ -413,6 +416,31 @@ void delayMicroseconds(uint32_t microseconds) {
 #if defined(EEZ_PLATFORM_SIMULATOR)
 	osDelay((microseconds + 500) / 1000);
 #endif
+}
+
+const char *getSerialNumber() {
+	static char g_serialNumber[24 + 1] = { 0 };
+	if (!g_serialNumber[0]) {
+#if defined(EEZ_PLATFORM_STM32)
+		uint32_t idw0 = HAL_GetUIDw0();
+		uint32_t idw1 = HAL_GetUIDw1();
+		uint32_t idw2 = HAL_GetUIDw2();
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+		uint32_t idw0 = 0x00000000;
+		uint32_t idw1 = 0x00000000;
+		uint32_t idw2 = 0x00000001;
+#endif
+
+		sprintf(g_serialNumber, "%08x", idw0);
+		sprintf(g_serialNumber + 8, "%08x", idw1);
+		sprintf(g_serialNumber + 16, "%08x", idw2);
+
+		g_serialNumber[24] = 0;
+	}
+
+	return g_serialNumber;
 }
 
 } // namespace eez

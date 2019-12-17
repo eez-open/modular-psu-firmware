@@ -213,6 +213,7 @@ static SysSettingsDateTimePage g_SysSettingsDateTimePage;
 #if OPTION_ETHERNET
 static SysSettingsEthernetPage g_SysSettingsEthernetPage;
 static SysSettingsEthernetStaticPage g_SysSettingsEthernetStaticPage;
+static SysSettingsMqttPage g_SysSettingsMqttPage;
 #endif
 static SysSettingsProtectionsPage g_SysSettingsProtectionsPage;
 static SysSettingsTriggerPage g_SysSettingsTriggerPage;
@@ -279,6 +280,9 @@ Page *getPageFromId(int pageId) {
         break;
     case PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC:
         page = &g_SysSettingsEthernetStaticPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_MQTT:
+        page = &g_SysSettingsMqttPage;
         break;
 #endif
     case PAGE_ID_SYS_SETTINGS_PROTECTIONS:

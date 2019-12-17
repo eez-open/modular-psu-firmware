@@ -39,6 +39,7 @@
 #include <eez/modules/mcu/battery.h>
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
+#include <eez/mqtt.h>
 #endif
 #include <eez/modules/psu/event_queue.h>
 #if OPTION_FAN
@@ -897,6 +898,11 @@ void onSetInfinityValue() {
     set(g_editValueCursor, g_editValueDataId, MakeValue(INFINITY, getUnit(g_editValueCursor, g_editValueDataId)), nullptr);
 }
 
+void onSetUInt16Value(float value) {
+    popPage();
+    set(g_editValueCursor, g_editValueDataId, Value((uint16_t)value, VALUE_TYPE_UINT16), nullptr);
+}
+
 void onSetStringValue(char *value) {
     popPage();
     set(g_editValueCursor, g_editValueDataId, value, nullptr);
@@ -936,8 +942,18 @@ void editValue(uint16_t dataId) {
         options.flags.option1ButtonEnabled = true;
 
         NumericKeypad::start(0, value, options, onSetFloatValue, 0, 0);
+    } else if (value.getType() == VALUE_TYPE_UINT16) {
+        NumericKeypadOptions options;
+
+        options.min = getMin(g_editValueCursor, g_editValueDataId).getUInt16();
+        options.max = getMax(g_editValueCursor, g_editValueDataId).getUInt16();
+        options.def = getDef(g_editValueCursor, g_editValueDataId).getUInt16();
+
+        options.enableDefButton();
+
+        NumericKeypad::start(0, (int)value.getUInt16(), options, onSetUInt16Value, 0, 0);
     } else {
-        Keypad::startPush(0, value.getString(), 0, getMax(g_editValueCursor, g_editValueDataId).getUInt32(), false, onSetStringValue, 0);
+        Keypad::startPush(0, value.getString(), 0, getMax(g_editValueCursor, g_editValueDataId).getUInt32(), value.getType() == VALUE_TYPE_PASSWORD, onSetStringValue, 0);
     }
 }
 
@@ -1831,11 +1847,11 @@ void data_keypad_text(data::DataOperationEnum operation, data::Cursor &cursor, d
     }
 }
 
-void data_keypad_caps(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_keypad_mode(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         Keypad *keypad = getActiveKeypad();
         if (keypad) {
-            value = keypad->m_isUpperCase;
+            value = keypad->m_keypadMode;
         }
     }
 }
@@ -2952,7 +2968,7 @@ void data_sys_info_firmware_ver(data::DataOperationEnum operation, data::Cursor 
 
 void data_sys_info_serial_no(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(persist_conf::devConf.serialNumber);
+        value = data::Value(getSerialNumber());
     }
 }
 
@@ -3330,8 +3346,7 @@ void data_ethernet_status(data::DataOperationEnum operation, data::Cursor &curso
 void data_ethernet_ip_address(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_ETHERNET
     if (operation == data::DATA_OPERATION_GET) {
-        SysSettingsEthernetStaticPage *page =
-            (SysSettingsEthernetStaticPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC);
+        SysSettingsEthernetStaticPage *page = (SysSettingsEthernetStaticPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC);
         if (page) {
             value = data::Value(page->m_ipAddress, VALUE_TYPE_IP_ADDRESS);
         } else {
@@ -3343,6 +3358,24 @@ void data_ethernet_ip_address(data::DataOperationEnum operation, data::Cursor &c
                 }
             }
         }
+    }
+#endif
+}
+
+void data_ethernet_host_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_ETHERNET
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
+        if (page) {
+            value = page->m_hostName;
+        }
+    } else if (operation == data::DATA_OPERATION_SET) {
+        SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
+        if (page) {
+            strcpy(page->m_hostName, value.getString());
+        }
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = Value(32, VALUE_TYPE_UINT32);
     }
 #endif
 }
@@ -5103,6 +5136,138 @@ void data_debug_trace_log_line(data::DataOperationEnum operation, data::Cursor &
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(eez::debug::getTraceLogLine(cursor.i), VALUE_TYPE_DEBUG_TRACE_LOG_STR);
     }
+}
+
+void data_mqtt_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_ETHERNET
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
+        if (page) {
+            value = page->m_enabled ? 1 : 0;
+        } else {
+            value = persist_conf::devConf.mqttEnabled ? 1 : 0;
+        }
+    }
+#endif
+}
+
+void data_mqtt_connection_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_ETHERNET
+    if (operation == data::DATA_OPERATION_GET) {
+        value = mqtt::g_connectionState + 1;
+    }
+#endif
+}
+
+void data_mqtt_host(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_ETHERNET
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
+        if (page) {
+            value = page->m_host;
+        } else {
+            value = persist_conf::devConf.mqttHost;
+        }
+    } else if (operation == data::DATA_OPERATION_SET) {
+        SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
+        if (page) {
+            strcpy(page->m_host, value.getString());
+        }
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = Value(64, VALUE_TYPE_UINT32);
+    }
+#endif
+}
+
+void data_mqtt_port(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_ETHERNET
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
+        if (page) {
+            value = Value(page->m_port, VALUE_TYPE_UINT16);
+        } else {
+            value = Value(persist_conf::devConf.mqttPort, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = Value(0, VALUE_TYPE_UINT16);
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = Value(65535, VALUE_TYPE_UINT16);
+    } else if (operation == data::DATA_OPERATION_GET_DEF) {
+        value = Value(1883, VALUE_TYPE_UINT16);
+    } else if (operation == data::DATA_OPERATION_SET) {
+        SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
+        if (page) {
+            page->m_port = value.getUInt16();
+        }
+    }
+
+#endif
+}
+
+void data_mqtt_username(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_ETHERNET
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
+        if (page) {
+            value = page->m_username;
+        } else {
+            value = persist_conf::devConf.mqttUsername;
+        }
+    } else if (operation == data::DATA_OPERATION_SET) {
+        SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
+        if (page) {
+            strcpy(page->m_username, value.getString());
+        }
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = Value(32, VALUE_TYPE_UINT32);
+    }
+#endif
+}
+
+void data_mqtt_password(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_ETHERNET
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
+        if (page) {
+            value = Value(page->m_password, VALUE_TYPE_PASSWORD);
+        } else {
+            value = Value(persist_conf::devConf.mqttPassword, VALUE_TYPE_PASSWORD);
+        }
+    } else if (operation == data::DATA_OPERATION_SET) {
+        SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
+        if (page) {
+            strcpy(page->m_password, value.getString());
+        }
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = Value(32, VALUE_TYPE_UINT32);
+    }
+#endif
+}
+
+void data_mqtt_period(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_ETHERNET
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
+        if (page) {
+            value = Value(page->m_period, UNIT_SECOND);
+        } else {
+            value = Value(persist_conf::devConf.mqttPeriod, UNIT_SECOND);
+        }
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = MakeValue(mqtt::PERIOD_MIN, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = MakeValue(mqtt::PERIOD_MAX, UNIT_SECOND);
+    } else if (operation == data::DATA_OPERATION_SET) {
+        SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
+        if (page) {
+            page->m_period = value.getFloat();
+        }
+    }
+#endif
 }
 
 } // namespace gui

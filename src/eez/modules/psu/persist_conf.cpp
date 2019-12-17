@@ -41,6 +41,7 @@ using namespace eez::mcu::display;
 
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
+#include <eez/mqtt.h>
 #endif
 
 #include <eez/modules/psu/datetime.h>
@@ -92,6 +93,7 @@ static DevConfBlock g_devConfBlocks[] = {
     { offsetof(DeviceConfiguration, triggerSource), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, ytGraphUpdateMethod), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, userSwitchAction), 1, false, 0, 60 * 1000, 0 },
+    { offsetof(DeviceConfiguration, ethernetHostName), 1, false, 0, 0, 0 },
     { sizeof(DeviceConfiguration), 1, false, 0, 0, 0 },
 };
 
@@ -105,8 +107,9 @@ static struct {
 ////////////////////////////////////////////////////////////////////////////////
 
 void initDefaultDevConf() {
+    memset(&g_defaultDevConf, 0, sizeof(g_defaultDevConf));
+
     // block 1
-    strcpy(g_defaultDevConf.serialNumber, PSU_SERIAL);
     strcpy(g_defaultDevConf.calibration_password, CALIBRATION_PASSWORD_DEFAULT);
 
     g_defaultDevConf.touch_screen_cal_tlx = 0;
@@ -165,13 +168,13 @@ void initDefaultDevConf() {
     g_defaultDevConf.selectedThemeIndex = THEME_ID_DARK;
     g_defaultDevConf.animationsDuration = CONF_DEFAULT_ANIMATIONS_DURATION;
 
-// block 5
+    // block 5
     g_defaultDevConf.triggerContinuousInitializationEnabled = 0;
 
     g_defaultDevConf.triggerSource = trigger::SOURCE_IMMEDIATE;
     g_defaultDevConf.triggerDelay = 0;
 
-// block 6
+    // block 6
     g_defaultDevConf.displayState = 1;
     g_defaultDevConf.channelsViewMode = 0;
     g_defaultDevConf.maxChannel = 0;
@@ -179,9 +182,16 @@ void initDefaultDevConf() {
 
     g_defaultDevConf.ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCROLL;
 
-// block 7
+    // block 7
     g_defaultDevConf.userSwitchAction = USER_SWITCH_ACTION_ENCODER_STEP;
     g_defaultDevConf.sortFilesOption = SORT_FILES_BY_TIME_DESC;
+
+    // block 7
+    strcpy(g_defaultDevConf.ethernetHostName, "BB3");
+    
+    g_defaultDevConf.mqttEnabled = 0;
+    g_defaultDevConf.mqttPort = 1883;
+    g_defaultDevConf.mqttPeriod = 1.0f;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -501,18 +511,6 @@ void changeCalibrationPassword(const char *new_password, size_t new_password_len
     memset(&g_devConf.calibration_password, 0, sizeof(g_devConf.calibration_password));
     strncpy(g_devConf.calibration_password, new_password, new_password_len);
     event_queue::pushEvent(event_queue::EVENT_INFO_CALIBRATION_PASSWORD_CHANGED);
-}
-
-void changeSerial(const char *newSerialNumber, size_t newSerialNumberLength) {
-    // copy up to 7 characters from newSerialNumber, fill the rest with zero's
-    for (size_t i = 0; i < 7; ++i) {
-        if (i < newSerialNumberLength) {
-            g_devConf.serialNumber[i] = newSerialNumber[i];
-        } else {
-            g_devConf.serialNumber[i] = 0;
-        }
-    }
-    g_devConf.serialNumber[7] = 0;
 }
 
 void enableSound(bool enable) {
@@ -1111,7 +1109,7 @@ bool setEthernetScpiPort(uint16_t scpiPort) {
 
 bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint32_t dns,
                          uint32_t gateway, uint32_t subnetMask, uint16_t scpiPort,
-                         uint8_t *macAddress) {
+                         uint8_t *macAddress, const char *hostName) {
 #if OPTION_ETHERNET
     unsigned ethernetEnabled = enable ? 1 : 0;
     unsigned ethernetDhcpEnabled = dhcpEnable ? 1 : 0;
@@ -1121,7 +1119,7 @@ bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint3
         memcmp(g_devConf.ethernetMacAddress, macAddress, 6) != 0 ||
         g_devConf.ethernetIpAddress != ipAddress || g_devConf.ethernetDns != dns ||
         g_devConf.ethernetGateway != gateway || g_devConf.ethernetSubnetMask != subnetMask ||
-        g_devConf.ethernetScpiPort != scpiPort) {
+        g_devConf.ethernetScpiPort != scpiPort || strcmp(hostName, g_devConf.ethernetHostName)) {
 
         if (g_devConf.ethernetEnabled != ethernetEnabled) {
             g_devConf.ethernetEnabled = ethernetEnabled;
@@ -1138,6 +1136,7 @@ bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint3
         g_devConf.ethernetSubnetMask = subnetMask;
         g_devConf.ethernetScpiPort = scpiPort;
         g_devConf.skipEthernetSetup = 1;
+        strcpy(g_devConf.ethernetHostName, hostName);
 
         ethernet::update();
     }
@@ -1164,6 +1163,27 @@ void setNtpServer(const char *ntpServer, size_t ntpServerLength) {
 void setNtpSettings(bool enable, const char *ntpServer) {
     g_devConf.ntpEnabled = enable ? 1 : 0;
     strcpy(g_devConf.ntpServer, ntpServer);
+}
+
+bool setMqttSettings(bool enable, const char *host, uint16_t port, const char *username, const char *password, float period) {
+#if OPTION_ETHERNET
+    g_devConf.mqttEnabled = enable ? 1 : 0;
+    strcpy(g_devConf.mqttHost, host);
+    g_devConf.mqttPort = port;
+    strcpy(g_devConf.mqttUsername, username);
+    strcpy(g_devConf.mqttPassword, password);
+    g_devConf.mqttPeriod = period;
+
+    mqtt::reconnect();
+
+    return true;
+#else
+    return false;
+#endif
+}
+
+void enableMqtt(bool enable) {
+    setMqttSettings(enable, persist_conf::devConf.mqttHost, persist_conf::devConf.mqttPort, persist_conf::devConf.mqttUsername, persist_conf::devConf.mqttPassword, persist_conf::devConf.mqttPeriod);
 }
 
 void setSdLocked(bool sdLocked) {

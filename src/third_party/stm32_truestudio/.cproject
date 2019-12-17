@@ -233,6 +233,7 @@
 							<option id="com.atollic.truestudio.general.runtimelib.1105223817.1105345618" name="Runtime Library" superClass="com.atollic.truestudio.general.runtimelib.1105223817"/>
 							<option id="com.atollic.truestudio.toolchain_options.mcu.548299258.1375015723" name="Microcontroller" superClass="com.atollic.truestudio.toolchain_options.mcu.548299258"/>
 							<option id="com.atollic.truestudio.toolchain_options.vendor.37794771.636535657" name="Vendor name" superClass="com.atollic.truestudio.toolchain_options.vendor.37794771"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.atollic.truestudio.exe.debug.toolchain.platform" isAbstract="false" name="Debug platform" osList="all" superClass="com.atollic.truestudio.exe.debug.toolchain.platform"/>
 							<tool id="com.atollic.truestudio.exe.debug.toolchain.as.1645811849" name="Assembler" superClass="com.atollic.truestudio.exe.debug.toolchain.as.1545899283">
 								<inputType id="com.atollic.truestudio.as.input.1601039722" name="Input" superClass="com.atollic.truestudio.as.input"/>
 							</tool>
