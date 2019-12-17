@@ -53,14 +53,6 @@ using namespace psu;
 
 namespace mqtt {
 
-#if defined(EEZ_PLATFORM_STM32)
-static const char *CLIENT_ID = "BB3_STM32";
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-static const char *CLIENT_ID = "BB3_Simulator";
-#endif
-
 static const uint32_t RECONNECT_AFTER_ERROR_MS = 1000;
 
 static const size_t MAX_PUB_TOPIC_LENGTH = 50;
@@ -185,7 +177,7 @@ void onIncomingPublish(const char *topic, const char *payload) {
 
 #if defined(EEZ_PLATFORM_STM32)
 static ip_addr_t g_ipaddr;
-static mqtt_client_t *g_client;
+static mqtt_client_t g_client;
 static const size_t MAX_TOPIC_LEN = 128;
 static char g_topic[MAX_TOPIC_LEN + 1];
 static const size_t MAX_PAYLOAD_LEN = 128;
@@ -253,7 +245,7 @@ void incomingPublishCallback(void** unused, struct mqtt_response_publish *publis
 
 bool publish(char *topic, char *payload, bool retain) {
 #if defined(EEZ_PLATFORM_STM32)
-    err_t result = mqtt_publish(g_client, topic, payload, strlen(payload), 0, retain ? 1 : 0, requestCallback, nullptr);
+    err_t result = mqtt_publish(&g_client, topic, payload, strlen(payload), 0, retain ? 1 : 0, requestCallback, nullptr);
     if (result != ERR_OK) {
         if (result != ERR_MEM) {
             DebugTrace("mqtt publish error: %d\n", (int)result);
@@ -304,11 +296,28 @@ const char *getSubTopic() {
     return g_subTopic;
 }
 
+const char *getClientId() {
+    static char g_clientId[50 + 1] = { 0 };
+
+    if (!g_clientId[0]) {
+#if defined(EEZ_PLATFORM_STM32)
+        sprintf(g_clientId, "BB3_STM32_%s", getSerialNumber());
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+        static const char *CLIENT_ID = "BB3_Simulator";
+        sprintf(g_clientId, "BB3_Simulator_%s", getSerialNumber());
+#endif
+    }
+    
+    return g_clientId;
+}
+
 void setState(ConnectionState connectionState) {
     if (connectionState == CONNECTION_STATE_CONNECTED) {
 #if defined(EEZ_PLATFORM_STM32)
-        mqtt_set_inpub_callback(g_client, incomingPublishCallback, incomingDataCallback, nullptr);
-        mqtt_subscribe(g_client, getSubTopic(), 0, requestCallback, nullptr);
+        mqtt_set_inpub_callback(&g_client, incomingPublishCallback, incomingDataCallback, nullptr);
+        mqtt_subscribe(&g_client, getSubTopic(), 0, requestCallback, nullptr);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -388,8 +397,8 @@ void tick(uint32_t tickCount) {
 
     else if (g_connectionState == CONNECTION_STATE_DISCONNECT || g_connectionState == CONNECTION_STATE_RECONNECT) {
 #if defined(EEZ_PLATFORM_STM32)
-        if (mqtt_client_is_connected(g_client)) {
-            mqtt_disconnect(g_client);
+        if (mqtt_client_is_connected(&g_client)) {
+            mqtt_disconnect(&g_client);
         }
 #endif
 
@@ -414,29 +423,22 @@ void tick(uint32_t tickCount) {
 
 #if defined(EEZ_PLATFORM_STM32)
     else if (g_connectionState == CONNECTION_STATE_DNS_FOUND) {
-        if (!g_client) {
-            g_client = mqtt_client_new();
-        }
-        if (g_client) {
-            mqtt_connect_client_info_t clientInfo;
-            clientInfo.client_id = CLIENT_ID;
-            clientInfo.client_user = persist_conf::devConf.mqttUsername;
-            clientInfo.client_pass = persist_conf::devConf.mqttPassword;
-            clientInfo.keep_alive = 60; // seconds
-            clientInfo.will_topic = nullptr; // not used
+        mqtt_connect_client_info_t clientInfo;
+        clientInfo.client_id = CLIENT_ID;
+        clientInfo.client_user = persist_conf::devConf.mqttUsername;
+        clientInfo.client_pass = persist_conf::devConf.mqttPassword;
+        clientInfo.keep_alive = 60; // seconds
+        clientInfo.will_topic = nullptr; // not used
 
-            err_t result = mqtt_client_connect(g_client, &g_ipaddr, persist_conf::devConf.mqttPort, connectCallback, nullptr, &clientInfo);
-            if (result == ERR_OK) {
-                setState(CONNECTION_STATE_CONNECTING);
-            } else {
-                setState(CONNECTION_STATE_ERROR);
-                DebugTrace("mqtt connect error: %d\n", (int)result);
-            }
+        memset(&g_client, 0, sizeof(g_client));
+
+        err_t result = mqtt_client_connect(&g_client, &g_ipaddr, persist_conf::devConf.mqttPort, connectCallback, nullptr, &clientInfo);
+        if (result == ERR_OK) {
+            setState(CONNECTION_STATE_CONNECTING);
         } else {
             setState(CONNECTION_STATE_ERROR);
-            DebugTrace("mqtt error: failed to create a client\n");
+            DebugTrace("mqtt connect error: %d\n", (int)result);
         }
-        return;
     }
 #endif
 
