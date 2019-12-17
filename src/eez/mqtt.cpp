@@ -424,7 +424,7 @@ void tick(uint32_t tickCount) {
 #if defined(EEZ_PLATFORM_STM32)
     else if (g_connectionState == CONNECTION_STATE_DNS_FOUND) {
         mqtt_connect_client_info_t clientInfo;
-        clientInfo.client_id = getClient();
+        clientInfo.client_id = getClientId();
         clientInfo.client_user = persist_conf::devConf.mqttUsername;
         clientInfo.client_pass = persist_conf::devConf.mqttPassword;
         clientInfo.keep_alive = 60; // seconds
