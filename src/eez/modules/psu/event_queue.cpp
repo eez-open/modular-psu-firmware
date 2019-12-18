@@ -25,6 +25,7 @@
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/sound.h>
+#include <eez/scpi/scpi.h>
 
 namespace eez {
 namespace psu {
@@ -40,9 +41,9 @@ static EventQueueHeader g_eventQueue;
 
 static Event g_events[MAX_EVENTS];
 
-static int16_t g_eventsToPush[6];
+static const int MAX_EVENTS_TO_PUSH = 10;
+static int16_t g_eventsToPush[MAX_EVENTS_TO_PUSH];
 static uint8_t g_eventsToPushHead = 0;
-static const int MAX_EVENTS_TO_PUSH = sizeof(g_eventsToPush) / sizeof(int16_t);
 
 static uint8_t g_pageIndex = 0;
 
@@ -137,28 +138,32 @@ Event *getLastErrorEvent() {
     return g_eventQueue.lastErrorEventIndex != NULL_INDEX ? readEvent(g_eventQueue.lastErrorEventIndex) : nullptr;
 }
 
-int getEventType(Event *e) {
-    if (!e) {
-        return EVENT_TYPE_NONE;
-    }
-    if (e->eventId >= EVENT_INFO_START_ID) {
+int getEventType(int16_t eventId) {
+    if (eventId >= EVENT_INFO_START_ID) {
         return EVENT_TYPE_INFO;
-    } else if (e->eventId >= EVENT_WARNING_START_ID) {
+    } else if (eventId >= EVENT_WARNING_START_ID) {
         return EVENT_TYPE_WARNING;
-    } else if (e->eventId != EVENT_TYPE_NONE) {
+    } else if (eventId != EVENT_TYPE_NONE) {
         return EVENT_TYPE_ERROR;
     } else {
         return EVENT_TYPE_NONE;
     }
 }
 
-const char *getEventMessage(Event *e) {
+int getEventType(Event *e) {
+    if (!e) {
+        return EVENT_TYPE_NONE;
+    }
+    return getEventType(e->eventId);
+}
+
+const char *getEventMessage(int16_t eventId) {
     static char message[35];
 
     const char *p_message = 0;
 
-    if (e->eventId >= EVENT_INFO_START_ID) {
-        switch (e->eventId) {
+    if (eventId >= EVENT_INFO_START_ID) {
+        switch (eventId) {
 #define EVENT_SCPI_ERROR(ID, TEXT)
 #define EVENT_ERROR(NAME, ID, TEXT)
 #define EVENT_WARNING(NAME, ID, TEXT)
@@ -172,8 +177,8 @@ const char *getEventMessage(Event *e) {
 #undef EVENT_WARNING
 #undef EVENT_ERROR
         }
-    } else if (e->eventId >= EVENT_WARNING_START_ID) {
-        switch (e->eventId) {
+    } else if (eventId >= EVENT_WARNING_START_ID) {
+        switch (eventId) {
 #define EVENT_SCPI_ERROR(ID, TEXT)
 #define EVENT_ERROR(NAME, ID, TEXT)
 #define EVENT_WARNING(NAME, ID, TEXT)                                                              \
@@ -190,7 +195,7 @@ const char *getEventMessage(Event *e) {
             p_message = 0;
         }
     } else {
-        switch (e->eventId) {
+        switch (eventId) {
 #define EVENT_SCPI_ERROR(ID, TEXT)                                                                 \
     case ID:                                                                                       \
         p_message = TEXT;                                                                          \
@@ -207,7 +212,7 @@ const char *getEventMessage(Event *e) {
 #undef EVENT_WARNING
 #undef EVENT_ERROR
         default:
-            return SCPI_ErrorTranslate(e->eventId);
+            return SCPI_ErrorTranslate(eventId);
         }
     }
 
@@ -220,6 +225,13 @@ const char *getEventMessage(Event *e) {
     return 0;
 }
 
+const char *getEventMessage(Event *e) {
+    if (!e) {
+        return nullptr;
+    }
+    return getEventMessage(e->eventId);
+}
+
 void pushEvent(int16_t eventId) {
     if (g_eventsToPushHead < MAX_EVENTS_TO_PUSH) {
         g_eventsToPush[g_eventsToPushHead] = eventId;
@@ -227,6 +239,9 @@ void pushEvent(int16_t eventId) {
     } else {
         DebugTrace("MAX_EVENTS_TO_PUSH exceeded");
     }
+
+    using namespace scpi;
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_PUSH_EVENT, (uint32_t)(uint16_t)eventId), 0);
 }
 
 void markAsRead() {

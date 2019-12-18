@@ -289,7 +289,10 @@ void tick();
 
 Event *getLastErrorEvent();
 
+int getEventType(int16_t eventId);
 int getEventType(Event *e);
+
+const char *getEventMessage(int16_t eventId);
 const char *getEventMessage(Event *e);
 
 void pushEvent(int16_t eventId);

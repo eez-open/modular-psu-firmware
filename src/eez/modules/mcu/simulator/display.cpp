@@ -224,12 +224,6 @@ void turnOff() {
         setColor(0, 0, 0);
         fillRect(g_psuAppContext.x, g_psuAppContext.y, g_psuAppContext.x + g_psuAppContext.width - 1, g_psuAppContext.y + g_psuAppContext.height - 1);
         updateScreen(g_buffer);
-
-        g_buffer = nullptr;
-
-        for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-            delete (uint32_t *)g_buffers[bufferIndex].bufferPointer;
-        }
     }
 }
 

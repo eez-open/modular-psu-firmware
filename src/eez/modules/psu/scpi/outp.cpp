@@ -66,38 +66,10 @@ scpi_result_t scpi_cmd_outputState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (enable != channel->isOutputEnabled()) {
-        bool triggerModeEnabled =
-            channel_dispatcher::getVoltageTriggerMode(*channel) != TRIGGER_MODE_FIXED ||
-            channel_dispatcher::getCurrentTriggerMode(*channel) != TRIGGER_MODE_FIXED;
-
-        if (channel->isOutputEnabled()) {
-            if (calibration::isEnabled()) {
-                SCPI_ErrorPush(context, SCPI_ERROR_CAL_OUTPUT_DISABLED);
-            }
-
-            if (triggerModeEnabled) {
-                trigger::abort();
-            } else {
-                channel_dispatcher::outputEnable(*channel, false);
-            }
-        } else {
-            if (channel_dispatcher::isTripped(*channel)) {
-                SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION);
-                return SCPI_RES_ERR;
-            }
-
-            if (triggerModeEnabled && !trigger::isIdle()) {
-                if (trigger::isInitiated()) {
-                    trigger::abort();
-                } else {
-                    SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
-                    return SCPI_RES_ERR;
-                }
-            }
-
-            channel_dispatcher::outputEnable(*channel, true);
-        }
+    int err;
+    if (!channel_dispatcher::outputEnable(*channel, enable, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
     }
 
     return SCPI_RES_OK;

@@ -41,8 +41,8 @@ static const float PERIOD_DEFAULT = 1.0f;
 extern ConnectionState g_connectionState;
     
 void tick(uint32_t tickCount);
-
 void reconnect();
+void pushEvent(int16_t eventId);
 
 } // mqtt
 } // eez

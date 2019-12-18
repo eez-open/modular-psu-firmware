@@ -109,6 +109,7 @@ void outputEnableSyncPrepare(Channel &channel);
 void outputEnableSyncReady(Channel &channel);
 
 void outputEnable(Channel &channel, bool enable);
+bool outputEnable(Channel &channel, bool enable, int *err);
 void disableOutputForAllChannels();
 
 void remoteSensingEnable(Channel &channel, bool enable);

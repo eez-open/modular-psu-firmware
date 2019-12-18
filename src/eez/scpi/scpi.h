@@ -41,7 +41,7 @@ extern osMessageQId g_scpiMessageQueueId;
 #define SCPI_QUEUE_MESSAGE_TARGET_ETHERNET 2
 #define SCPI_QUEUE_MESSAGE_TARGET_MP 3
 
-#define SCPI_QUEUE_MESSAGE(target, type, param) (((target) << 30) | ((param) << 4) | (type))
+#define SCPI_QUEUE_MESSAGE(target, type, param) (((target) << 30) | (((param) << 4) & ~0xC0000000) | (type))
 #define SCPI_QUEUE_MESSAGE_TARGET(message) ((message) >> 30)
 #define SCPI_QUEUE_MESSAGE_TYPE(message) ((message) & 0xF)
 #define SCPI_QUEUE_MESSAGE_PARAM(param) (((message) & 0x3FFFFFFF) >> 4)
@@ -64,6 +64,7 @@ extern osMessageQId g_scpiMessageQueueId;
 #define SCPI_QUEUE_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE 12
 #define SCPI_QUEUE_MESSAGE_FILE_MANAGER_DELETE_FILE 13
 #define SCPI_QUEUE_MESSAGE_DLOG_UPLOAD_FILE 14
+#define SCPI_QUEUE_MESSAGE_PUSH_EVENT 15
 
 extern char g_listFilePath[CH_MAX][MAX_PATH_LENGTH];
 

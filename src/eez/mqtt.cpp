@@ -46,6 +46,7 @@ extern "C" {
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ethernet.h>
 #include <eez/modules/psu/channel_dispatcher.h>
+#include <eez/modules/psu/event_queue.h>
 
 namespace eez {
 
@@ -56,6 +57,8 @@ namespace mqtt {
 static const uint32_t RECONNECT_AFTER_ERROR_MS = 1000;
 
 static const size_t MAX_PUB_TOPIC_LENGTH = 50;
+static const char *PUB_TOPIC_POW = "%s/pow";
+static const char *PUB_TOPIC_EVENT = "%s/event";
 static const char *PUB_TOPIC_OE = "%s/ch/%d/oe";
 static const char *PUB_TOPIC_U_SET = "%s/ch/%d/uset";
 static const char *PUB_TOPIC_I_SET = "%s/ch/%d/iset";
@@ -63,12 +66,27 @@ static const char *PUB_TOPIC_U_MON = "%s/ch/%d/umon";
 static const char *PUB_TOPIC_I_MON = "%s/ch/%d/imon";
 
 static const size_t MAX_SUB_TOPIC_LENGTH = 50;
-static const char *SUB_TOPIC = "%s/ch/+/+"; // for example: ch/1/set/oe, ch/1/set/u, ch/1/set/i
+static const char *SUB_TOPIC = "%s/ch/+/set/+"; // for example: <host_name>/ch/1/set/oe, <host_name>/ch/1/set/u, ch/1/set/i
 
 static const size_t MAX_PAYLOAD_LENGTH = 100;
 
+static const size_t MAX_TOPIC_LEN = 128;
+static char g_topic[MAX_TOPIC_LEN + 1];
+static const size_t MAX_PAYLOAD_LEN = 128;
+static char g_payload[MAX_PAYLOAD_LEN + 1];
+
 ConnectionState g_connectionState = CONNECTION_STATE_IDLE;
 uint32_t g_connectionStateChangedTickCount;
+
+static int g_powState = -1;
+
+static const size_t EVENT_QUEUE_SIZE = 10;
+struct {
+    int16_t buffer[EVENT_QUEUE_SIZE];
+    int head;
+    int tail;
+    bool full;
+} g_eventQueue;
 
 static struct {
     int oe;
@@ -91,27 +109,46 @@ static uint8_t g_lastValueIndex = 0;
 
 void setState(ConnectionState connectionState);
 
+const char *matchSeparator(const char *p) {
+    for (; *p; p++) {
+        if (*p == '/') {
+            return p + 1;
+        }
+    }
+    return nullptr;
+}
+
 void onIncomingPublish(const char *topic, const char *payload) {
-    const char *p = topic + 3;
+    const char *p = matchSeparator(topic);
+    if (!p) {
+        return;
+    }
+
+    if (strncmp(p, "ch/", 3) != 0) {
+        return;
+    }
+    p += 3;
 
     char *endptr;
     int channelIndex = strtol(p, &endptr, 10);
-    if (endptr > p && channelIndex > 0 && channelIndex <= CH_NUM) {
-        channelIndex--;
 
-        while (*p != '/') {
-            p++;
+    if (endptr > p && *endptr == '/' && channelIndex > 0 && channelIndex <= CH_NUM) {
+        channelIndex--;
+        
+        p = endptr + 1;
+        if (strncmp(p, "set/", 4) != 0) {
+            return;
         }
-        p++;
+        p += 4;
 
         Channel &channel = Channel::get(channelIndex);
 
-        if (strncmp(p, "oe", 2) == 0) {
+        if (strcmp(p, "oe") == 0) {
             int oe = strtol(payload, &endptr, 10);
             if (endptr > payload) {
-                channel_dispatcher::outputEnable(channel, oe != 0);
+                channel_dispatcher::outputEnable(channel, oe != 0, nullptr);
             }
-        } else if (strncmp(p, "setu", 4) == 0) {
+        } else if (strcmp(p, "u") == 0) {
             if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
                 return;
             }
@@ -143,7 +180,7 @@ void onIncomingPublish(const char *topic, const char *payload) {
             }
 
             channel_dispatcher::setVoltage(channel, voltage);
-        } else if (strncmp(p, "seti", 4) == 0) {
+        } else if (strcmp(p, "i") == 0) {
             if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
                 return;
             }
@@ -178,10 +215,6 @@ void onIncomingPublish(const char *topic, const char *payload) {
 #if defined(EEZ_PLATFORM_STM32)
 static ip_addr_t g_ipaddr;
 static mqtt_client_t g_client;
-static const size_t MAX_TOPIC_LEN = 128;
-static char g_topic[MAX_TOPIC_LEN + 1];
-static const size_t MAX_PAYLOAD_LEN = 128;
-static char g_payload[MAX_PAYLOAD_LEN + 1];
 static size_t g_payloadLen;
 
 static void dnsFoundCallback(const char* hostname, const ip_addr_t *ipaddr, void *arg) {
@@ -195,14 +228,12 @@ static void dnsFoundCallback(const char* hostname, const ip_addr_t *ipaddr, void
 }
 
 static void connectCallback(mqtt_client_t *client, void *arg, mqtt_connection_status_t status) {
-	if (g_connectionState == CONNECTION_STATE_CONNECTING) {
-		if (status == MQTT_CONNECT_ACCEPTED) {
-			setState(CONNECTION_STATE_CONNECTED);
-		} else {
-			setState(CONNECTION_STATE_ERROR);
-			DebugTrace("mqtt connect error: %d\n", (int)status);
-		}
-	}
+    if (status == MQTT_CONNECT_ACCEPTED) {
+        setState(CONNECTION_STATE_CONNECTED);
+    } else {
+        setState(CONNECTION_STATE_ERROR);
+        DebugTrace("mqtt connect error: %d\n", (int)status);
+    }
 }
 
 static void requestCallback(void *arg, err_t err) {
@@ -210,12 +241,10 @@ static void requestCallback(void *arg, err_t err) {
 
 void incomingPublishCallback(void *arg, const char *topic, u32_t tot_len) {
     // DebugTrace("Incoming publish: %s, %d\n", topic, (int)tot_len);
-    if (tot_len < MAX_TOPIC_LEN) {
-        strncpy(g_topic, topic, tot_len);
-        g_topic[tot_len] = 0;
-    } else {
-        g_topic[0] = 0;
-    }
+    size_t topicLen = MIN(strlen(topic), MAX_TOPIC_LEN);
+    strncpy(g_topic, topic, topicLen);
+    g_topic[topicLen] = 0;
+
     g_payloadLen = 0;
 }
 
@@ -239,13 +268,21 @@ static uint8_t g_recvbuf[2048]; /* recvbuf should be large enough any whole mqtt
 static struct mqtt_client g_client; /* instantiate the client */
 
 void incomingPublishCallback(void** unused, struct mqtt_response_publish *published) {
-    onIncomingPublish((const char *)published->topic_name, (const char *)published->application_message);
+    size_t topicLen = MIN(published->topic_name_size, MAX_TOPIC_LEN);
+    strncpy(g_topic, (const char *)published->topic_name, topicLen);
+    g_topic[topicLen] = 0;
+
+    size_t payloadLen = MIN(published->application_message_size, MAX_PAYLOAD_LEN);
+    strncpy(g_payload, (const char *)published->application_message, payloadLen);
+    g_payload[payloadLen] = 0;
+
+    onIncomingPublish(g_topic, g_payload);
 }
 #endif
 
 bool publish(char *topic, char *payload, bool retain) {
 #if defined(EEZ_PLATFORM_STM32)
-    err_t result = mqtt_publish(&g_client, topic, payload, strlen(payload), 0, retain ? 1 : 0, requestCallback, nullptr);
+    err_t result = mqtt_publish(&g_client, topic, payload, strlen(payload), 1, retain ? 1 : 0, requestCallback, nullptr);
     if (result != ERR_OK) {
         if (result != ERR_MEM) {
             DebugTrace("mqtt publish error: %d\n", (int)result);
@@ -267,6 +304,34 @@ bool publish(char *topic, char *payload, bool retain) {
     
     return true;
 }
+
+bool publish(const char *pubTopic, int value) {
+    char topic[MAX_PUB_TOPIC_LENGTH + 1];
+    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName);
+
+    char payload[MAX_PAYLOAD_LENGTH + 1];
+    sprintf(payload, "%d", value);
+
+    return publish(topic, payload, false);
+}
+
+bool publishEvent(int16_t eventId) {
+    char topic[MAX_PUB_TOPIC_LENGTH + 1];
+    sprintf(topic, PUB_TOPIC_EVENT, persist_conf::devConf.ethernetHostName);
+
+    char payload[MAX_PAYLOAD_LENGTH + 1];
+    static const char *g_eventTypes[] = {
+        "None",
+        "Info",
+        "Warning",
+        "Error"
+    };
+    snprintf(payload, MAX_PAYLOAD_LENGTH, "[%d, \"%s\", \"%s\"]", (int)eventId, g_eventTypes[event_queue::getEventType(eventId)], event_queue::getEventMessage(eventId));
+    payload[MAX_PAYLOAD_LENGTH] = 0;
+
+    return publish(topic, payload, false);
+}
+
 
 bool publish(int channelIndex, const char *pubTopic, int value) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
@@ -312,6 +377,9 @@ const char *getClientId() {
     
     return g_clientId;
 }
+
+bool peekEvent(int16_t &eventId);
+bool getEvent(int16_t &eventId);
 
 void setState(ConnectionState connectionState) {
     if (connectionState == CONNECTION_STATE_CONNECTED) {
@@ -379,7 +447,7 @@ void tick(uint32_t tickCount) {
             uint8_t connect_flags = MQTT_CONNECT_CLEAN_SESSION;
 
             /* Send connection request to the broker. */
-            mqtt_connect(&g_client, CLIENT_ID, NULL, NULL, 0, persist_conf::devConf.mqttUsername, persist_conf::devConf.mqttPassword, connect_flags, 400);
+            mqtt_connect(&g_client, getClientId(), NULL, NULL, 0, persist_conf::devConf.mqttUsername, persist_conf::devConf.mqttPassword, connect_flags, 400);
 
             /* check that we don't have any errors */
             if (g_client.error == MQTT_OK) {
@@ -447,6 +515,24 @@ void tick(uint32_t tickCount) {
 		uint8_t lastValueIndexAtStart = g_lastValueIndex;
 
 		do {
+            int powState = isPowerUp() ? 1 : 0;
+            if (powState != g_powState) {
+                if (!publish(PUB_TOPIC_POW, powState)) {
+                    break;
+                }
+                g_powState = powState;
+            }
+
+            int16_t eventId;
+Loop:
+            if (peekEvent(eventId)) {
+                if (!publishEvent(eventId)) {
+                    break;
+                }
+                getEvent(eventId);
+                goto Loop;
+            }
+
 			uint8_t channelIndex = g_lastChannelIndex;
 			Channel &channel = Channel::get(channelIndex);
 
@@ -524,6 +610,41 @@ void reconnect() {
             setState(CONNECTION_STATE_DISCONNECT);
         }
     }
+}
+
+void pushEvent(int16_t eventId) {
+    if (g_connectionState == CONNECTION_STATE_CONNECTED && publishEvent(eventId)) {
+        return;
+    }
+
+    g_eventQueue.buffer[g_eventQueue.head] = eventId;
+
+    // advance
+    if (g_eventQueue.full) {
+        g_eventQueue.tail = (g_eventQueue.tail + 1) % EVENT_QUEUE_SIZE;
+    }
+    g_eventQueue.head = (g_eventQueue.head + 1) % EVENT_QUEUE_SIZE;
+    g_eventQueue.full = g_eventQueue.head == g_eventQueue.tail;
+}
+
+bool peekEvent(int16_t &eventId) {
+    if (g_eventQueue.full || g_eventQueue.tail != g_eventQueue.head) {
+        eventId = g_eventQueue.buffer[g_eventQueue.tail];
+        return true;
+    }
+
+    return false;
+}
+
+bool getEvent(int16_t &eventId) {
+    if (g_eventQueue.full || g_eventQueue.tail != g_eventQueue.head) {
+        eventId = g_eventQueue.buffer[g_eventQueue.tail];
+        g_eventQueue.tail = (g_eventQueue.tail + 1) % EVENT_QUEUE_SIZE;
+        g_eventQueue.full = false;
+        return true;
+    }
+
+    return false;
 }
 
 } // mqtt

@@ -21,6 +21,7 @@
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/init.h>
+#include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/list_program.h>
@@ -1098,6 +1099,51 @@ void outputEnable(Channel &channel, bool enable) {
     } else {
         channel.outputEnable(enable);
     }
+}
+
+bool outputEnable(Channel &channel, bool enable, int *err) {
+    if (enable != channel.isOutputEnabled()) {
+        bool triggerModeEnabled =
+            channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||
+            channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED;
+
+        if (channel.isOutputEnabled()) {
+            if (calibration::isEnabled()) {
+                if (err) {
+                    *err = SCPI_ERROR_CAL_OUTPUT_DISABLED;
+                }
+                return false;
+            }
+
+            if (triggerModeEnabled) {
+                trigger::abort();
+            } else {
+                channel_dispatcher::outputEnable(channel, false);
+            }
+        } else {
+            if (channel_dispatcher::isTripped(channel)) {
+                if (err) {
+                    *err = SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION;
+                }
+                return false;
+            }
+
+            if (triggerModeEnabled && !trigger::isIdle()) {
+                if (trigger::isInitiated()) {
+                    trigger::abort();
+                } else {
+                    if (err) {
+                        *err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
+                    }
+                    return false;
+                }
+            }
+
+            channel_dispatcher::outputEnable(channel, true);
+        }
+    }
+
+    return true;
 }
 
 void disableOutputForAllChannels() {

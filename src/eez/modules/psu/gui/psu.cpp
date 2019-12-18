@@ -496,7 +496,9 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
     } else if (previousPageId == PAGE_ID_IMAGE_VIEW) {
         animateFadeOutFadeIn();
     } else if (previousPageId == PAGE_ID_SYS_SETTINGS_MQTT) {
-        animateSlideRight();
+        if (activePageId == PAGE_ID_SYS_SETTINGS_ETHERNET) {
+            animateSlideRight();
+        }
     }
 }
 

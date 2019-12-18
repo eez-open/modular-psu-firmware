@@ -31,6 +31,7 @@
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/ontime.h>
 #include <eez/modules/psu/scpi/psu.h>
+#include <eez/modules/psu/event_queue.h>
 
 #include <eez/modules/bp3c/relays.h>
 
@@ -439,6 +440,17 @@ scpi_result_t scpi_cmd_debugBoot(scpi_t *context) {
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
     return SCPI_RES_ERR;
 #endif // DEBUG
+}
+
+scpi_result_t scpi_cmd_debugEvent(scpi_t *context) {
+    int32_t eventId;
+    if (!SCPI_ParamInt(context, &eventId, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    event_queue::pushEvent(eventId);
+
+    return SCPI_RES_OK;
 }
 
 } // namespace scpi

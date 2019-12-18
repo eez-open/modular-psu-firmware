@@ -28,9 +28,9 @@ namespace gui {
 ////////////////////////////////////////////////////////////////////////////////
 
 enum KeypadMode {
-  KEYPAD_MODE_UPPERCASE,
-  KEYPAD_MODE_LOWERCASE,
-  KEYPAD_MODE_SYMBOL
+    KEYPAD_MODE_LOWERCASE,
+    KEYPAD_MODE_UPPERCASE,
+    KEYPAD_MODE_SYMBOL
 };
 
 class Keypad : public eez::gui::Page {

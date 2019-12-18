@@ -202,6 +202,8 @@ void oneIter() {
                 file_manager::deleteFile();
             } else if (type == SCPI_QUEUE_MESSAGE_DLOG_UPLOAD_FILE) {
                 dlog_view::uploadFile();
+            } else if (type == SCPI_QUEUE_MESSAGE_PUSH_EVENT) {
+                mqtt::pushEvent((int16_t)param);
             }
 #endif // OPTION_SD_CARD
         }

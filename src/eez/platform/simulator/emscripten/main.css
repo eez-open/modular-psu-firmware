@@ -130,4 +130,10 @@ body {
   background: #eee;
   border-top: 1px solid #ddd;
   padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#footer > a:nth-child(3) {
+  color: #999;
 }
