@@ -106,6 +106,7 @@ static struct {
 
 static uint8_t g_lastChannelIndex = 0;
 static uint8_t g_lastValueIndex = 0;
+static bool g_publishing;
 
 void setState(ConnectionState connectionState);
 
@@ -237,6 +238,7 @@ static void connectCallback(mqtt_client_t *client, void *arg, mqtt_connection_st
 }
 
 static void requestCallback(void *arg, err_t err) {
+	g_publishing = false;
 }
 
 void incomingPublishCallback(void *arg, const char *topic, u32_t tot_len) {
@@ -282,8 +284,10 @@ void incomingPublishCallback(void** unused, struct mqtt_response_publish *publis
 
 bool publish(char *topic, char *payload, bool retain) {
 #if defined(EEZ_PLATFORM_STM32)
-    err_t result = mqtt_publish(&g_client, topic, payload, strlen(payload), 1, retain ? 1 : 0, requestCallback, nullptr);
+	g_publishing = true;
+    err_t result = mqtt_publish(&g_client, topic, payload, strlen(payload), 0, retain ? 1 : 0, requestCallback, nullptr);
     if (result != ERR_OK) {
+    	g_publishing = false;
         if (result != ERR_MEM) {
             DebugTrace("mqtt publish error: %d\n", (int)result);
             if (result == ERR_CONN) {
@@ -413,6 +417,91 @@ void tick(uint32_t tickCount) {
         // pass
     }
 
+    else if (g_connectionState == CONNECTION_STATE_CONNECTED && !g_publishing) {
+        // publish power state
+        int powState = isPowerUp() ? 1 : 0;
+        if (powState != g_powState) {
+            if (publish(PUB_TOPIC_POW, powState)) {
+                g_powState = powState;
+                if (g_publishing) {
+                    return;
+                }
+            }
+        }
+
+        // publish events from event view
+        int16_t eventId;
+        if (peekEvent(eventId)) {
+            if (publishEvent(eventId)) {
+                getEvent(eventId);
+                if (g_publishing) {
+                    return;
+                }
+            }
+        }
+
+        // publish channel state (oe, u_mon, i_mon, u_set, i_set)
+        uint8_t channelIndex = g_lastChannelIndex;
+        Channel &channel = Channel::get(channelIndex);
+
+        int oe = channel.isOutputEnabled() ? 1 : 0;
+
+        if (g_lastValueIndex == 0) {
+            if (oe != g_channelStates[channelIndex].oe) {
+                if (publish(channelIndex, PUB_TOPIC_OE, oe)) {
+                    g_channelStates[channelIndex].oe = oe;
+                }
+            }
+        } else {
+            uint32_t period = (uint32_t)roundf(persist_conf::devConf.mqttPeriod * 1000000);
+
+            if (g_lastValueIndex == 1) {
+                if (oe && (tickCount - g_channelStates[channelIndex].g_uMonTick) >= period) {
+                    float uMon = channel_dispatcher::getUMonLast(channel);
+                    if (publish(channelIndex, PUB_TOPIC_U_MON, uMon)) {
+                        g_channelStates[channelIndex].uMon = uMon;
+                        g_channelStates[channelIndex].g_uMonTick = tickCount;
+                    }
+                }
+            } else if (g_lastValueIndex == 2) {
+                if (oe && (tickCount - g_channelStates[channelIndex].g_iMonTick) >= period) {
+                    float iMon = channel_dispatcher::getIMonLast(channel);
+                    if (publish(channelIndex, PUB_TOPIC_I_MON, iMon)) {
+                        g_channelStates[channelIndex].iMon = iMon;
+                        g_channelStates[channelIndex].g_iMonTick = tickCount;
+                    }
+                }
+            } else if (g_lastValueIndex == 3) {
+                float uSet = channel_dispatcher::getUSet(channel);
+                if ((isNaN(g_channelStates[channelIndex].uSet) || uSet != g_channelStates[channelIndex].uSet) && (tickCount - g_channelStates[channelIndex].g_uSetTick) >= period) {
+                    if (publish(channelIndex, PUB_TOPIC_U_SET, uSet)) {
+                        g_channelStates[channelIndex].uSet = uSet;
+                        g_channelStates[channelIndex].g_uSetTick = tickCount;
+                    }
+                }
+            } else {
+                float iSet = channel_dispatcher::getISet(channel);
+                if ((isNaN(g_channelStates[channelIndex].iSet) || iSet != g_channelStates[channelIndex].iSet) && (tickCount - g_channelStates[channelIndex].g_iSetTick) >= period) {
+                    if (publish(channelIndex, PUB_TOPIC_I_SET, iSet)) {
+                        g_channelStates[channelIndex].iSet = iSet;
+                        g_channelStates[channelIndex].g_iSetTick = tickCount;
+                    }
+                }
+            }
+        }
+
+        if (++g_lastValueIndex == 5) {
+            g_lastValueIndex = 0;
+            if (++g_lastChannelIndex == CH_NUM) {
+                g_lastChannelIndex = 0;
+            }
+        }
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+		mqtt_sync(&g_client);
+#endif
+    }
+
     else if (g_connectionState == CONNECTION_STATE_IDLE) {
         if (persist_conf::devConf.mqttEnabled) {
             setState(CONNECTION_STATE_CONNECT);
@@ -509,93 +598,6 @@ void tick(uint32_t tickCount) {
         }
     }
 #endif
-
-    else if (g_connectionState == CONNECTION_STATE_CONNECTED) {
-		uint8_t lastChannelIndexAtStart = g_lastChannelIndex;
-		uint8_t lastValueIndexAtStart = g_lastValueIndex;
-
-		do {
-            int powState = isPowerUp() ? 1 : 0;
-            if (powState != g_powState) {
-                if (!publish(PUB_TOPIC_POW, powState)) {
-                    break;
-                }
-                g_powState = powState;
-            }
-
-            int16_t eventId;
-Loop:
-            if (peekEvent(eventId)) {
-                if (!publishEvent(eventId)) {
-                    break;
-                }
-                getEvent(eventId);
-                goto Loop;
-            }
-
-			uint8_t channelIndex = g_lastChannelIndex;
-			Channel &channel = Channel::get(channelIndex);
-
-			uint32_t period = (uint32_t)roundf(persist_conf::devConf.mqttPeriod * 1000000);
-
-			if (g_lastValueIndex == 0) {
-				int oe = channel.isOutputEnabled() ? 1 : 0;
-				if (oe != g_channelStates[channelIndex].oe) {
-					if (!publish(channelIndex, PUB_TOPIC_OE, oe)) {
-						break;
-					}
-					g_channelStates[channelIndex].oe = oe;
-				}
-			} else if (g_lastValueIndex == 1) {
-				float uSet = channel_dispatcher::getUSet(channel);
-				if ((isNaN(g_channelStates[channelIndex].uSet) || uSet != g_channelStates[channelIndex].uSet) && (tickCount - g_channelStates[channelIndex].g_uSetTick) >= period) {
-					if (!publish(channelIndex, PUB_TOPIC_U_SET, uSet)) {
-						break;
-					}
-					g_channelStates[channelIndex].uSet = uSet;
-					g_channelStates[channelIndex].g_uSetTick = tickCount;
-				}
-			} else if (g_lastValueIndex == 2) {
-				float iSet = channel_dispatcher::getISet(channel);
-				if ((isNaN(g_channelStates[channelIndex].iSet) || iSet != g_channelStates[channelIndex].iSet) && (tickCount - g_channelStates[channelIndex].g_iSetTick) >= period) {
-					if (!publish(channelIndex, PUB_TOPIC_I_SET, iSet)) {
-						break;
-					}
-					g_channelStates[channelIndex].iSet = iSet;
-					g_channelStates[channelIndex].g_iSetTick = tickCount;
-				}
-			} else if (g_lastValueIndex == 3) {
-				float uMon = channel_dispatcher::getUMonLast(channel);
-				if ((isNaN(g_channelStates[channelIndex].uMon) || uMon != g_channelStates[channelIndex].uMon) && (tickCount - g_channelStates[channelIndex].g_uMonTick) >= period) {
-					if (!publish(channelIndex, PUB_TOPIC_U_MON, uMon)) {
-						break;
-					}
-					g_channelStates[channelIndex].uMon = uMon;
-					g_channelStates[channelIndex].g_uMonTick = tickCount;
-				}
-			} else {
-				float iMon = channel_dispatcher::getIMonLast(channel);
-				if ((isNaN(g_channelStates[channelIndex].iMon) || iMon != g_channelStates[channelIndex].iMon) && (tickCount - g_channelStates[channelIndex].g_iMonTick) >= period) {
-					if (!publish(channelIndex, PUB_TOPIC_I_MON, iMon)) {
-						break;
-					}
-					g_channelStates[channelIndex].iMon = iMon;
-					g_channelStates[channelIndex].g_iMonTick = tickCount;
-				}
-			}
-
-			if (++g_lastValueIndex == 5) {
-				g_lastValueIndex = 0;
-				if (++g_lastChannelIndex == CH_NUM) {
-					g_lastChannelIndex = 0;
-				}
-			}
-		} while (g_lastChannelIndex != lastChannelIndexAtStart || g_lastValueIndex != lastValueIndexAtStart);
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-		mqtt_sync(&g_client);
-#endif
-    }
 }
 
 void reconnect() {

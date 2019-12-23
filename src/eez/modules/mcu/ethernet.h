@@ -61,6 +61,8 @@ void releaseInputBuffer();
 
 int writeBuffer(const char *buffer, uint32_t length);
 
+void pushEvent(int16_t eventId);
+
 }
 }
 } // namespace eez::mcu::ethernet

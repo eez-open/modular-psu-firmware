@@ -107,3 +107,17 @@ typedef MessageQueue *osMessageQId;
 osMessageQId osMessageCreate(osMessageQId queue_id, osThreadId thread_id);
 osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec);
 osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec);
+
+// Mutex
+
+struct Mutex {
+    bool locked;
+};
+
+#define osMutexDef(mutex) Mutex mutex
+#define osMutexId(mutexId) Mutex *mutexId
+#define osMutex(mutex) mutex
+
+Mutex *osMutexCreate(Mutex &mutex);
+void osMutexWait(Mutex *mutex, unsigned int timeout);
+void osMutexRelease(Mutex *mutex);

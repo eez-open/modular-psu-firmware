@@ -5270,6 +5270,12 @@ void data_mqtt_period(data::DataOperationEnum operation, data::Cursor &cursor, d
 #endif
 }
 
+void data_debug_trace_log_is_stopped(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = eez::debug::g_stopDebugTraceLog ? 1 : 0;
+    }
+}
+
 } // namespace gui
 } // namespace eez
 

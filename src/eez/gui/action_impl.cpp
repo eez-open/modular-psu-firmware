@@ -1306,6 +1306,10 @@ void action_mqtt_edit_period() {
 #endif
 }
 
+void action_debug_trace_log_toggle() {
+    debug::g_stopDebugTraceLog = !debug::g_stopDebugTraceLog;
+}
+
 } // namespace gui
 } // namespace eez
 

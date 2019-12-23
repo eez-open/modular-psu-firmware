@@ -27,6 +27,10 @@
 #include <eez/sound.h>
 #include <eez/scpi/scpi.h>
 
+#if OPTION_ETHERNET
+#include <eez/modules/mcu/ethernet.h>
+#endif
+
 namespace eez {
 namespace psu {
 namespace event_queue {
@@ -240,8 +244,9 @@ void pushEvent(int16_t eventId) {
         DebugTrace("MAX_EVENTS_TO_PUSH exceeded");
     }
 
-    using namespace scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_PUSH_EVENT, (uint32_t)(uint16_t)eventId), 0);
+#if OPTION_ETHERNET
+    eez::mcu::ethernet::pushEvent(eventId);
+#endif
 }
 
 void markAsRead() {

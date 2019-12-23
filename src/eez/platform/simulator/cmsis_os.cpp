@@ -174,3 +174,18 @@ osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec) {
     }
     return osOK; 
 }
+
+Mutex *osMutexCreate(Mutex &mutex) {
+    return &mutex;
+}
+
+void osMutexWait(Mutex *mutex, unsigned int timeout) {
+    while (mutex->locked) {
+    	osDelay(1);
+    }
+    mutex->locked = true;    
+}
+
+void osMutexRelease(Mutex *mutex) {
+    mutex->locked = false;
+}

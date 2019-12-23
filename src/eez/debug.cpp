@@ -24,19 +24,19 @@
 
 #include <eez/debug.h>
 #include <eez/memory.h>
+#include <eez/system.h>
+#include <eez/util.h>
 
 // TODO these includes should not be inside apps/psu
 #include <eez/modules/psu/psu.h>
-
 #include <eez/modules/psu/datetime.h>
-
-#include <eez/system.h>
-#include <eez/util.h>
 
 using namespace eez::psu;
 
 namespace eez {
 namespace debug {
+
+bool g_stopDebugTraceLog;
 
 static char *g_log = (char *)DEBUG_TRACE_LOG;
 static uint32_t g_head;
@@ -67,10 +67,17 @@ void Trace(const char *format, ...) {
     va_list args;
     va_start(args, format);
 
-    char buffer[896];
-    vsnprintf(buffer, 896, format, args);
+    static const size_t BUFFER_SIZE = 128;
+    char buffer[BUFFER_SIZE + 1];
+
+	vsnprintf(buffer, BUFFER_SIZE, format, args);
+	buffer[BUFFER_SIZE] = 0;
 
     va_end(args);
+
+	if (g_stopDebugTraceLog) {
+		return;
+	}
 
     for (char *p = buffer; *p; p++) {
         if (*p == '\r') {
@@ -96,13 +103,28 @@ void Trace(const char *format, ...) {
 
 uint32_t getNumTraceLogLines() {
     if (g_changed) {
+        bool scrollLock = true;
+        if (g_numLines > TRACE_LOG_PAGE_SIZE) {
+            scrollLock = g_startPosition == g_numLines - TRACE_LOG_PAGE_SIZE;
+        }
+
         g_changed = false;
-        g_numLines = 1;
-        uint32_t from = g_tail;
-        uint32_t to = g_head > 0 ? g_head - 1 : DEBUG_TRACE_LOG_SIZE - 1;
-        for (uint32_t i = from; i != to; i = (i + 1) % DEBUG_TRACE_LOG_SIZE) {
-            if (!g_log[i]) {
-                g_numLines++;
+
+		g_numLines = 1;
+
+		if (g_full || g_head != g_tail) {
+			uint32_t from = g_tail;
+			uint32_t to = g_head > 0 ? g_head - 1 : DEBUG_TRACE_LOG_SIZE - 1;
+			for (uint32_t i = from; i != to; i = (i + 1) % DEBUG_TRACE_LOG_SIZE) {
+				if (!g_log[i]) {
+					g_numLines++;
+				}
+			}
+        }
+
+        if (scrollLock) {
+            if (g_numLines > TRACE_LOG_PAGE_SIZE) {
+                g_startPosition = g_numLines - TRACE_LOG_PAGE_SIZE;
             }
         }
     }
@@ -146,7 +168,7 @@ const char *getTraceLogLine(uint32_t lineIndex) {
 
 uint32_t getTraceLogStartPosition() {
     uint32_t position = g_startPosition;
-    uint32_t count = eez::debug::getNumTraceLogLines();
+    uint32_t count = getNumTraceLogLines();
     if (count <= TRACE_LOG_PAGE_SIZE) {
         position = 0;
     } else if (position > count - TRACE_LOG_PAGE_SIZE) {
@@ -160,7 +182,7 @@ void setTraceLogStartPosition(uint32_t position) {
 }
 
 void resetTraceLogStartPosition() {
-    uint32_t count = eez::debug::getNumTraceLogLines();
+    uint32_t count = getNumTraceLogLines();
     if (count <= TRACE_LOG_PAGE_SIZE) {
         g_startPosition = 0;
     } else {

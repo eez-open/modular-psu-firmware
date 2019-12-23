@@ -57,10 +57,13 @@ extern struct netif gnetif;
 #endif
 
 #include <eez/system.h>
+#include <eez/scpi/scpi.h>
 #include <eez/modules/mcu/ethernet.h>
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/ethernet.h>
-#include <eez/scpi/scpi.h>
+#include <eez/modules/psu/persist_conf.h>
+
+#include <eez/mqtt.h>
 
 using namespace eez::psu::ethernet;
 using namespace eez::scpi;
@@ -104,7 +107,8 @@ enum {
 	QUEUE_MESSAGE_CONNECT,
 	QUEUE_MESSAGE_CREATE_TCP_SERVER,
 	QUEUE_MESSAGE_ACCEPT_CLIENT,
-	QUEUE_MESSAGE_CLIENT_MESSAGE
+	QUEUE_MESSAGE_CLIENT_MESSAGE,
+    QUEUE_MESSAGE_PUSH_EVENT
 };
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -151,59 +155,57 @@ static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t le
 	}
 }
 
-static void mainLoop(const void *) {
-	while (1) {
-		osEvent event = osMessageGet(g_ethernetMessageQueueId, osWaitForever);
-		if (event.status == osEventMessage) {
-			switch (event.value.v) {
-			case QUEUE_MESSAGE_CONNECT:
-				{
-					MX_LWIP_Init();
-					netif_set_hostname(&gnetif, "EEZ-DIB");
-					while(!dhcp_supplied_address(&gnetif)) {
-						osDelay(10);
-					}
-					g_connectionState = CONNECTION_STATE_CONNECTED;
-					osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 1), osWaitForever);
+static void onEvent(uint8_t eventType) {
+	switch (eventType) {
+	case QUEUE_MESSAGE_CONNECT:
+		{
+			MX_LWIP_Init();
+			netif_set_hostname(&gnetif, psu::persist_conf::devConf.ethernetHostName);
+			while(!dhcp_supplied_address(&gnetif)) {
+				osDelay(10);
+			}
+			g_connectionState = CONNECTION_STATE_CONNECTED;
+			osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 1), osWaitForever);
+		}
+		break;
+
+	case QUEUE_MESSAGE_CREATE_TCP_SERVER:
+		g_tcpListenConnection = netconn_new_with_callback(NETCONN_TCP, netconnCallback);
+		if (g_tcpListenConnection == nullptr) {
+			break;
+		}
+
+		// Is this required?
+		// netconn_set_nonblocking(conn, 1);
+
+		if (netconn_bind(g_tcpListenConnection, nullptr, g_port) != ERR_OK) {
+			netconn_delete(g_tcpListenConnection);
+			break;
+		}
+
+		netconn_listen(g_tcpListenConnection);
+		break;
+
+	case QUEUE_MESSAGE_ACCEPT_CLIENT:
+		{
+			struct netconn *newConnection;
+			if (netconn_accept(g_tcpListenConnection, &newConnection) == ERR_OK) {
+				if (g_tcpClientConnection) {
+					// there is a client already connected, close this connection
+					netconn_close(newConnection);
+					netconn_delete(newConnection);
+				} else {
+					// connection with the client established
+					g_tcpClientConnection = newConnection;
+					osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_CONNECTED, 0), osWaitForever);
 				}
-			    break;
-
-			case QUEUE_MESSAGE_CREATE_TCP_SERVER:
-				g_tcpListenConnection = netconn_new_with_callback(NETCONN_TCP, netconnCallback);
-				if (g_tcpListenConnection == nullptr) {
-					break;
-				}
-
-				// Is this required?
-				// netconn_set_nonblocking(conn, 1);
-
-				if (netconn_bind(g_tcpListenConnection, nullptr, g_port) != ERR_OK) {
-					netconn_delete(g_tcpListenConnection);
-					break;
-				}
-
-				netconn_listen(g_tcpListenConnection);
-				break;
-
-			case QUEUE_MESSAGE_ACCEPT_CLIENT:
-				{
-					struct netconn *newConnection;
-					if (netconn_accept(g_tcpListenConnection, &newConnection) == ERR_OK) {
-						if (g_tcpClientConnection) {
-							// there is a client already connected, close this connection
-							netconn_close(newConnection);
-							netconn_delete(newConnection);
-						} else {
-							// connection with the client established
-							g_tcpClientConnection = newConnection;
-							osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_CONNECTED, 0), osWaitForever);
-						}
-					}
-				}
-				break;
 			}
 		}
+		break;
 	}
+}
+
+void onIdle() {
 }
 #endif
 
@@ -538,42 +540,56 @@ void stop() {
 #endif    
 }
 
-void mainLoop(const void *) {
-    bool wasConnected = false;
+void onEvent(uint8_t eventType) {
+    switch (eventType) {
+    case QUEUE_MESSAGE_CONNECT:
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 1), osWaitForever);
+        break;
 
-	while (1) {
-        osEvent event = osMessageGet(g_ethernetMessageQueueId, 0);
-		if (event.status == osEventMessage) {
-			switch (event.value.v) {
-			case QUEUE_MESSAGE_CONNECT:
-                osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 1), osWaitForever);
-			    break;
+    case QUEUE_MESSAGE_CREATE_TCP_SERVER:
+        bind(g_port);
+        break;
+    }
+}
 
-			case QUEUE_MESSAGE_CREATE_TCP_SERVER:
-                bind(g_port);
-                break;
+void onIdle() {
+    static bool wasConnected = false;
+
+    if (wasConnected) {
+        if (connected()) {
+            if (!g_inputBufferLength && available()) {
+                g_inputBufferLength = read(g_inputBuffer, INPUT_BUFFER_SIZE);
+                osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_INPUT_AVAILABLE, 0), osWaitForever);
             }
-		} else {
-            if (wasConnected) {
-                if (connected()) {
-                    if (!g_inputBufferLength && available()) {
-                        g_inputBufferLength = read(g_inputBuffer, INPUT_BUFFER_SIZE);
-                        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_INPUT_AVAILABLE, 0), osWaitForever);        
-                    }
-                } else {
-                    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_DISCONNECTED, 0), osWaitForever);    
-                    wasConnected = false;
-                }
-            } else {
-                if (client_available()) {
-                    wasConnected = true;
-                    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_CONNECTED, 0), osWaitForever);
-                }
-            }
+        } else {
+            osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_DISCONNECTED, 0), osWaitForever);
+            wasConnected = false;
         }
-	}    
+    } else {
+        if (client_available()) {
+            wasConnected = true;
+            osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_CONNECTED, 0), osWaitForever);
+        }
+    }
 }
 #endif
+
+void mainLoop(const void *) {
+    while (1) {
+        osEvent event = osMessageGet(g_ethernetMessageQueueId, 0);
+        if (event.status == osEventMessage) {
+            uint8_t eventType = event.value.v & 0xFF;
+            if (eventType == QUEUE_MESSAGE_PUSH_EVENT) {
+                mqtt::pushEvent((int16_t)(event.value.v >> 8));
+            } else {
+                onEvent(eventType);
+            }
+        } else {
+            onIdle();
+            mqtt::tick(micros());
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -697,6 +713,10 @@ int writeBuffer(const char *buffer, uint32_t length) {
     osDelay(1);
     return numWritten;
 #endif
+}
+
+void pushEvent(int16_t eventId) {
+    osMessagePut(g_ethernetMessageQueueId, ((uint32_t)(uint16_t)eventId << 8) | QUEUE_MESSAGE_PUSH_EVENT, osWaitForever);
 }
 
 } // namespace ethernet

@@ -27,6 +27,8 @@ namespace debug {
 
 void Trace(const char *format, ...);
 
+extern bool g_stopDebugTraceLog;
+
 uint32_t getNumTraceLogLines();
 const char *getTraceLogLine(uint32_t lineIndex);
 

@@ -161,6 +161,10 @@ mp_obj_t modeez_dlogTraceData(size_t n_args, const mp_obj_t *args) {
         mp_raise_ValueError("DLOG trace data not started");
     }
 
+    if (n_args == 1 && mp_obj_is_type(args[0], &mp_type_list)) {
+        mp_obj_get_array(args[0], &n_args, (mp_obj_t **)&args);
+    }
+
     if (n_args < dlog_record::g_recording.parameters.numYAxes) {
         mp_raise_ValueError("Too few values");
     }
@@ -169,9 +173,12 @@ mp_obj_t modeez_dlogTraceData(size_t n_args, const mp_obj_t *args) {
         mp_raise_ValueError("Too many values");
     }
 
-    float values[4];
+    float values[dlog_view::MAX_NUM_OF_Y_AXES];
 
-    for (size_t i = 0; i < n_args; i++) {
+    for (size_t i = 0; i < MIN(n_args, dlog_view::MAX_NUM_OF_Y_AXES); i++) {
+        if (!mp_obj_is_type(args[i], &mp_type_float)) {
+            mp_raise_ValueError("Argument is not float");
+        }
         values[i] = mp_obj_get_float(args[i]);
     }
 

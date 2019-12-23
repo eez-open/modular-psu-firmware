@@ -109,12 +109,8 @@ void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN 0 */
 extern void debug_trace(const char *str, size_t len);
 
-int __io_putchar(int ich) {
-	// ITM_SendChar(ich);
-
-  char ch = (char)ich;
-	debug_trace(&ch, 1);
-
+int __io_putstr(char *ptr, int len) {
+	debug_trace(ptr, (size_t)len);
 	return 0;
 }
 /* USER CODE END 0 */

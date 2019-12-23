@@ -187,7 +187,7 @@ void initDefaultDevConf() {
     g_defaultDevConf.sortFilesOption = SORT_FILES_BY_TIME_DESC;
 
     // block 7
-    strcpy(g_defaultDevConf.ethernetHostName, "BB3");
+    strcpy(g_defaultDevConf.ethernetHostName, DEFAULT_ETHERNET_HOST_NAME);
     
     g_defaultDevConf.mqttEnabled = 0;
     g_defaultDevConf.mqttPort = 1883;
@@ -1167,6 +1167,12 @@ void setNtpSettings(bool enable, const char *ntpServer) {
 
 bool setMqttSettings(bool enable, const char *host, uint16_t port, const char *username, const char *password, float period) {
 #if OPTION_ETHERNET
+    bool reconnectRequired = g_devConf.mqttEnabled != enable ||
+        strcmp(g_devConf.mqttHost, host) != 0 ||
+        g_devConf.mqttPort != port ||
+        strcmp(g_devConf.mqttUsername, username) != 0 ||
+        strcmp(g_devConf.mqttPassword, password) != 0;
+
     g_devConf.mqttEnabled = enable ? 1 : 0;
     strcpy(g_devConf.mqttHost, host);
     g_devConf.mqttPort = port;
@@ -1174,7 +1180,9 @@ bool setMqttSettings(bool enable, const char *host, uint16_t port, const char *u
     strcpy(g_devConf.mqttPassword, password);
     g_devConf.mqttPeriod = period;
 
-    mqtt::reconnect();
+    if (reconnectRequired) {
+        mqtt::reconnect();
+    }
 
     return true;
 #else

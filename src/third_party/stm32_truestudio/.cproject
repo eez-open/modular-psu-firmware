@@ -19,7 +19,7 @@
 							<option id="com.atollic.truestudio.toolchain_options.mcu.548299258" name="Microcontroller" superClass="com.atollic.truestudio.toolchain_options.mcu" useByScannerDiscovery="false" value="STM32F769IG" valueType="string"/>
 							<option id="com.atollic.truestudio.toolchain_options.vendor.37794771" name="Vendor name" superClass="com.atollic.truestudio.toolchain_options.vendor" useByScannerDiscovery="false" value="STMicroelectronics" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.atollic.truestudio.exe.debug.toolchain.platform.2054752829" isAbstract="false" name="Debug platform" superClass="com.atollic.truestudio.exe.debug.toolchain.platform"/>
-							<builder buildPath="${workspace_loc:/bb3}/Debug" customBuilderProperties="toolChainpathType=1|toolChainpathString=C:\\Program Files (x86)\\Atollic\\TrueSTUDIO for STM32 9.3.0\\ARMTools\\bin|" id="com.atollic.truestudio.mbs.builder1.1222194476" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="com.atollic.truestudio.mbs.builder1">
+							<builder buildPath="${workspace_loc:/bb3}/Debug" customBuilderProperties="toolChainpathString=C:\\Program Files (x86)\\Atollic\\TrueSTUDIO for STM32 9.3.0\\ARMTools\\bin|toolChainpathType=1|" id="com.atollic.truestudio.mbs.builder1.1222194476" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="com.atollic.truestudio.mbs.builder1">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug"/>
 								</outputEntries>
@@ -72,8 +72,8 @@
 								</option>
 								<option id="com.atollic.truestudio.gcc.symbols.defined.1670122205" name="Defined symbols" superClass="com.atollic.truestudio.gcc.symbols.defined" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
-									<listOptionValue builtIn="false" value="MQTT_OUTPUT_RINGBUF_SIZE=4096"/>
-									<listOptionValue builtIn="false" value="MQTT_REQ_MAX_IN_FLIGHT=32"/>
+									<listOptionValue builtIn="false" value="configCHECK_FOR_STACK_OVERFLOW=1"/>
+									<listOptionValue builtIn="false" value="LWIP_DEBUG=1"/>
 									<listOptionValue builtIn="false" value="EEZ_BP3C_REVISION_R3B1=1"/>
 									<listOptionValue builtIn="false" value="OPTION_SDRAM=1"/>
 									<listOptionValue builtIn="false" value="LWIP_NETIF_HOSTNAME=1"/>
@@ -134,8 +134,8 @@
 							<tool id="com.atollic.truestudio.exe.debug.toolchain.gpp.981298185" name="C++ Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gpp">
 								<option id="com.atollic.truestudio.gpp.symbols.defined.1619552487" name="Defined symbols" superClass="com.atollic.truestudio.gpp.symbols.defined" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="STM32F769xx"/>
-									<listOptionValue builtIn="false" value="MQTT_OUTPUT_RINGBUF_SIZE=4096"/>
-									<listOptionValue builtIn="false" value="MQTT_REQ_MAX_IN_FLIGHT=32"/>
+									<listOptionValue builtIn="false" value="configCHECK_FOR_STACK_OVERFLOW=1"/>
+									<listOptionValue builtIn="false" value="LWIP_DEBUG=1"/>
 									<listOptionValue builtIn="false" value="EEZ_BP3C_REVISION_R3B1=1"/>
 									<listOptionValue builtIn="false" value="OPTION_SDRAM=1"/>
 									<listOptionValue builtIn="false" value="EEZ_MCU_REVISION_R1B5=1"/>

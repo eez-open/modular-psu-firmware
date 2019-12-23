@@ -508,7 +508,7 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
     }
 
     if (isPageOnStack(PAGE_ID_CH_SETTINGS_LISTS)) {
-        return ((ChSettingsListsPage *)getActivePage())->isFocusWidget(widgetCursor);
+        return ((ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS))->isFocusWidget(widgetCursor);
     }
 
     if (getActivePageId() != PAGE_ID_DLOG_VIEW) {

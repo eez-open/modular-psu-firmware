@@ -50,8 +50,6 @@
 #include <eez/gui/data.h>
 #include <eez/gui/dialogs.h>
 
-#include <eez/mqtt.h>
-
 using namespace eez::psu;
 using namespace eez::psu::scpi;
 
@@ -202,8 +200,6 @@ void oneIter() {
                 file_manager::deleteFile();
             } else if (type == SCPI_QUEUE_MESSAGE_DLOG_UPLOAD_FILE) {
                 dlog_view::uploadFile();
-            } else if (type == SCPI_QUEUE_MESSAGE_PUSH_EVENT) {
-                mqtt::pushEvent((int16_t)param);
             }
 #endif // OPTION_SD_CARD
         }
@@ -236,10 +232,6 @@ void oneIter() {
 
 #if OPTION_SD_CARD
         sd_card::tick();
-#endif
-
-#if OPTION_ETHERNET
-        mqtt::tick(tickCount);
 #endif
 
 #ifdef DEBUG
