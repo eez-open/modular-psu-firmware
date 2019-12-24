@@ -716,7 +716,7 @@ int writeBuffer(const char *buffer, uint32_t length) {
 }
 
 void pushEvent(int16_t eventId) {
-    osMessagePut(g_ethernetMessageQueueId, ((uint32_t)(uint16_t)eventId << 8) | QUEUE_MESSAGE_PUSH_EVENT, osWaitForever);
+    osMessagePut(g_ethernetMessageQueueId, ((uint32_t)(uint16_t)eventId << 8) | QUEUE_MESSAGE_PUSH_EVENT, 0);
 }
 
 } // namespace ethernet

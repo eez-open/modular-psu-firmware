@@ -97,10 +97,8 @@ static struct {
     float iSet;
     uint32_t g_iSetTick;
 
-    float uMon;
     uint32_t g_uMonTick;
 
-    float iMon;
     uint32_t g_iMonTick;
 } g_channelStates[CH_MAX];
 
@@ -400,8 +398,6 @@ void setState(ConnectionState connectionState) {
             g_channelStates[i].oe = -1;
             g_channelStates[i].uSet = NAN;
             g_channelStates[i].iSet = NAN;
-            g_channelStates[i].uMon = NAN;
-            g_channelStates[i].iMon = NAN;
         }
 
         g_lastChannelIndex = 0;
@@ -459,7 +455,6 @@ void tick(uint32_t tickCount) {
                 if (oe && (tickCount - g_channelStates[channelIndex].g_uMonTick) >= period) {
                     float uMon = channel_dispatcher::getUMonLast(channel);
                     if (publish(channelIndex, PUB_TOPIC_U_MON, uMon)) {
-                        g_channelStates[channelIndex].uMon = uMon;
                         g_channelStates[channelIndex].g_uMonTick = tickCount;
                     }
                 }
@@ -467,27 +462,30 @@ void tick(uint32_t tickCount) {
                 if (oe && (tickCount - g_channelStates[channelIndex].g_iMonTick) >= period) {
                     float iMon = channel_dispatcher::getIMonLast(channel);
                     if (publish(channelIndex, PUB_TOPIC_I_MON, iMon)) {
-                        g_channelStates[channelIndex].iMon = iMon;
                         g_channelStates[channelIndex].g_iMonTick = tickCount;
                     }
                 }
             } else if (g_lastValueIndex == 3) {
-                float uSet = channel_dispatcher::getUSet(channel);
-                if ((isNaN(g_channelStates[channelIndex].uSet) || uSet != g_channelStates[channelIndex].uSet) && (tickCount - g_channelStates[channelIndex].g_uSetTick) >= period) {
-                    if (publish(channelIndex, PUB_TOPIC_U_SET, uSet)) {
-                        g_channelStates[channelIndex].uSet = uSet;
-                        g_channelStates[channelIndex].g_uSetTick = tickCount;
-                    }
+                if ((tickCount - g_channelStates[channelIndex].g_uSetTick) >= period) {
+					float uSet = channel_dispatcher::getUSet(channel);
+					if (isNaN(g_channelStates[channelIndex].uSet) || uSet != g_channelStates[channelIndex].uSet) {
+						if (publish(channelIndex, PUB_TOPIC_U_SET, uSet)) {
+							g_channelStates[channelIndex].uSet = uSet;
+							g_channelStates[channelIndex].g_uSetTick = tickCount;
+						}
+					}
                 }
             } else {
-                float iSet = channel_dispatcher::getISet(channel);
-                if ((isNaN(g_channelStates[channelIndex].iSet) || iSet != g_channelStates[channelIndex].iSet) && (tickCount - g_channelStates[channelIndex].g_iSetTick) >= period) {
-                    if (publish(channelIndex, PUB_TOPIC_I_SET, iSet)) {
-                        g_channelStates[channelIndex].iSet = iSet;
-                        g_channelStates[channelIndex].g_iSetTick = tickCount;
-                    }
-                }
-            }
+                if ((tickCount - g_channelStates[channelIndex].g_iSetTick) >= period) {
+					float iSet = channel_dispatcher::getISet(channel);
+					if (isNaN(g_channelStates[channelIndex].iSet) || iSet != g_channelStates[channelIndex].iSet) {
+						if (publish(channelIndex, PUB_TOPIC_I_SET, iSet)) {
+							g_channelStates[channelIndex].iSet = iSet;
+							g_channelStates[channelIndex].g_iSetTick = tickCount;
+						}
+					}
+				}
+			}
         }
 
         if (++g_lastValueIndex == 5) {
