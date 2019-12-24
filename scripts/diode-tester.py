@@ -35,7 +35,7 @@ if diodeName != None:
 
             scpi("SENS:DLOG:TRAC:X:UNIT VOLT")
             scpi("SENS:DLOG:TRAC:X:STEP " + str(uStep))
-            scpi("SENS:DLOG:TRAC:X:RANG:MAX " + str(uMax)) # TODO this should be updated if switch to 80V range
+            scpi("SENS:DLOG:TRAC:X:RANG:MAX " + str(uMax))
             scpi('SENS:DLOG:TRAC:X:LABel "Uset"')
             scpi("SENS:DLOG:TRAC:Y1:UNIT AMPER")
             scpi("SENS:DLOG:TRAC:Y1:RANG:MAX " + str(I_SET))
