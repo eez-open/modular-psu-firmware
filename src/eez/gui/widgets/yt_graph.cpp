@@ -287,7 +287,74 @@ struct YTGraphStaticDrawHelper {
         }
     }
 
-    void drawStatic(uint32_t previousHistoryValuePosition, uint32_t currentHistoryValuePosition, uint32_t numPositions_, uint16_t graphWidth) {
+    void getMinMax(int *yLabels, int n, int &yMin, int &yMax) {
+        yMin = INT_MAX;
+        yMax = INT_MIN;
+        for (int i = 0; i < n; i++) {
+            if (yLabels[i] < yMin) {
+                yMin = yLabels[i];
+            }
+            if (yLabels[i] > yMax) {
+                yMax = yLabels[i];
+            }
+        }
+    }
+
+    void repositionLabels(int *yLabels, int n, int labelHeight) {
+        for (int i = 0; i < n; i++) {
+            yLabels[i] = yLabels[i] - labelHeight;
+        }
+
+        if (n <= 4) {
+            int yMin = INT_MAX;
+            int yMax = INT_MIN;
+            getMinMax(yLabels, n, yMin, yMax);
+
+            int center = (yMin + yMax) / 2;
+
+            static const int MOVEMENT_FACTOR = 1;
+            static const int MAX_ITERATIONS = 100;
+
+            bool hasOverlaps = true;
+            int iteration = 0;
+            for (int iteration = 0; hasOverlaps && iteration < MAX_ITERATIONS; iteration++) {
+                hasOverlaps = false;
+
+                for (int i = 0; i < n; i++) {
+                    int move = false;
+                    int movement = 0;
+
+                    for (int j = 0; j < n; j++) {
+                        if (i == j) {
+                            continue;
+                        }
+                        int diff = yLabels[i] - yLabels[j];
+                        if (abs(diff) <= labelHeight) {
+                            move = true;
+                            movement += diff < 0 ? -MOVEMENT_FACTOR : MOVEMENT_FACTOR;
+                        }
+                    }
+
+                    if (move) {
+                        hasOverlaps = true;
+                        int diff = yLabels[i] - center;
+                        movement += diff < 0 ? -MOVEMENT_FACTOR : MOVEMENT_FACTOR;
+                        yLabels[i] += movement;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            if (yLabels[i] < widgetCursor.y) {
+                yLabels[i] = widgetCursor.y;
+            } else if (yLabels[i] > widgetCursor.y + widgetCursor.widget->h - labelHeight) {
+                yLabels[i] = widgetCursor.y + widgetCursor.widget->h - labelHeight;
+            }
+        }
+    }
+
+    void drawStatic(uint32_t previousHistoryValuePosition, uint32_t currentHistoryValuePosition, uint32_t numPositions_, uint16_t graphWidth, bool showLabels) {
         // draw background
         const Style* style = getStyle(widget->style);
         display::setColor(style->background_color);
@@ -313,14 +380,18 @@ struct YTGraphStaticDrawHelper {
         // draw charts
         YTGraphWidgetState *currentState = (YTGraphWidgetState *)widgetCursor.currentState;
 
+        int xLabels[MAX_NUM_OF_Y_VALUES];
+        int yLabels[MAX_NUM_OF_Y_VALUES];
+        int numVisibleValues = 0;
+
         for (m_valueIndex = 0; m_valueIndex < MAX_NUM_OF_Y_VALUES; m_valueIndex++) {
             if (data::ytDataDataValueIsVisible(widgetCursor.cursor, widget->data, m_valueIndex)) {
                 position = currentHistoryValuePosition;
 
-                scale = (widget->h - 1)  / currentState->valueDiv[m_valueIndex] / vertDivisions;
+                scale = (widget->h - 1) / currentState->valueDiv[m_valueIndex] / vertDivisions;
                 offset = currentState->valueOffset[m_valueIndex];
 
-                const Style* style = data::ytDataGetStyle(widgetCursor.cursor, widget->data, m_valueIndex);
+                const Style* style = data::ytDataGetStyle(widgetCursor.cursor, widget->data, numVisibleValues);
                 dataColor16 = display::getColor16FromIndex(style->color);
 
                 getYValue(position > 0 ? position - 1 : 0, yPrevMin, yPrevMax);
@@ -330,7 +401,13 @@ struct YTGraphStaticDrawHelper {
                     drawValue();
                     yPrevMin = yMin;
                     yPrevMax = yMax;
+                    if (yMin != INT_MIN) {
+                        xLabels[numVisibleValues] = x;
+                        yLabels[numVisibleValues] = widgetCursor.y + yMin;
+                    }
                 }
+
+                numVisibleValues++;
             }
         }
 
@@ -354,6 +431,31 @@ struct YTGraphStaticDrawHelper {
             data::ytDataGetCursorXValue(widgetCursor.cursor, widgetCursor.widget->data).toText(text, sizeof(text));
             drawText(text, -1, xTimeText, yTimeText, timeTextWidth, timeTextHeight, style, false, false, false, nullptr, nullptr, nullptr, nullptr);
         }
+
+        // draw labels
+        if (showLabels) {
+            font::Font font = styleGetFont(style);
+            int labelHeight = font.getHeight();
+
+            repositionLabels(yLabels, numVisibleValues, labelHeight);
+
+            for (int i = 0; i < numVisibleValues; i++) {
+                const Style *labelStyle = data::ytDataGetStyle(widgetCursor.cursor, widget->data, i);
+
+                char labelText[64];
+                data::ytDataGetLabel(widgetCursor.cursor, widget->data, i, labelText, sizeof(labelText));
+                int labelWidth = display::measureStr(labelText, -1, font, widgetCursor.widget->w);
+
+                int xLabel = xLabels[i];
+                if (xLabel < widgetCursor.x) {
+                    xLabel = widgetCursor.x;
+                } else if (xLabel > widgetCursor.x + widgetCursor.widget->w - labelWidth) {
+                    xLabel = widgetCursor.x + widgetCursor.widget->w - labelWidth;
+                }
+
+                drawText(labelText, -1, xLabel, yLabels[i], labelWidth, labelHeight, labelStyle, false, false, false, nullptr, nullptr, nullptr, nullptr);
+            }
+        }
     }
 };
 
@@ -376,6 +478,8 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     currentState->cursorPosition = currentState->historyValuePosition + data::ytDataGetCursorOffset(widgetCursor.cursor, widget->data);
 
     bool visibleValuesChanged = false;
+
+    currentState->showLabels = data::ytDataGetShowLabels(widgetCursor.cursor, widget->data);
 
     if (currentState->ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
         for (int valueIndex = 0; valueIndex < MAX_NUM_OF_Y_VALUES; valueIndex++) {
@@ -402,13 +506,18 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
     bool refreshBackground = !widgetCursor.previousState;
 
-    if (refreshBackground || visibleValuesChanged || previousHistoryValuePosition != currentState->historyValuePosition || (!previousState ||  previousState->numHistoryValues != currentState->numHistoryValues || previousState->cursorPosition != currentState->cursorPosition)
+    if (
+        refreshBackground || 
+        currentState->showLabels != previousState->showLabels ||
+        visibleValuesChanged || 
+        previousHistoryValuePosition != currentState->historyValuePosition || 
+        (!previousState || previousState->numHistoryValues != currentState->numHistoryValues || previousState->cursorPosition != currentState->cursorPosition)
     ) {
         if (currentState->ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
             YTGraphStaticDrawHelper drawHelper(widgetCursor);
 
             drawHelper.cursorPosition = currentState->cursorPosition;
-            drawHelper.drawStatic(previousHistoryValuePosition, currentState->historyValuePosition, currentState->numHistoryValues, graphWidth);
+            drawHelper.drawStatic(previousHistoryValuePosition, currentState->historyValuePosition, currentState->numHistoryValues, graphWidth, currentState->showLabels);
         } else {
             const Style* style = getStyle(widget->style);
 

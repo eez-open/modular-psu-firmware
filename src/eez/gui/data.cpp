@@ -564,6 +564,12 @@ Unit getUnit(const Cursor &cursor, uint16_t id) {
     return (Unit)value.getInt();
 }
 
+bool isChannelData(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_IS_CHANNEL_DATA, (Cursor &)cursor, value);
+    return value.getInt() != 0;
+}
+
 void getList(const Cursor &cursor, uint16_t id, const Value **values, int &count) {
     Value listValue;
     g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_VALUE_LIST, (Cursor &)cursor, listValue);
@@ -741,6 +747,23 @@ bool ytDataDataValueIsVisible(const Cursor &cursor, uint16_t id, uint8_t valueIn
     Value value(valueIndex, VALUE_TYPE_UINT8);
     g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE), (Cursor &)cursor, value);
     return value.getInt();
+}
+
+bool ytDataGetShowLabels(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_SHOW_LABELS), (Cursor &)cursor, value);
+    return value.getInt();
+}
+
+void ytDataGetLabel(const Cursor &cursor, uint16_t id, uint8_t valueIndex, char *text, int count) {
+    text[0] = 0;
+    YtDataGetLabelParams params = {
+        valueIndex,
+        text,
+        count
+    };
+    Value value(&params, VALUE_TYPE_POINTER);
+    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_LABEL), (Cursor &)cursor, value);
 }
 
 Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(const Cursor &cursor, uint16_t id) {

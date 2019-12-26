@@ -560,6 +560,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYUnit(scpi_t *context) {
 
     if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
         dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
+        dlog_view::initYAxis(dlog_record::g_parameters, yAxisIndex);
     }
 
     dlog_record::g_parameters.yAxes[yAxisIndex].unit = (Unit)unit;
@@ -620,6 +621,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYLabel(scpi_t *context) {
 
     if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
         dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
+        dlog_view::initYAxis(dlog_record::g_parameters, yAxisIndex);
     }
 
     strncpy(dlog_record::g_parameters.yAxes[yAxisIndex].label, label, len);
@@ -694,6 +696,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMin(scpi_t *context) {
 
     if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
         dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
+        dlog_view::initYAxis(dlog_record::g_parameters, yAxisIndex);
     }
 
     dlog_record::g_parameters.yAxes[yAxisIndex].range.min = min;
@@ -767,6 +770,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMax(scpi_t *context) {
 
     if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
         dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
+        dlog_view::initYAxis(dlog_record::g_parameters, yAxisIndex);
     }
 
     dlog_record::g_parameters.yAxes[yAxisIndex].range.max = max;

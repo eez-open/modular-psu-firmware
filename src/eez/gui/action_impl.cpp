@@ -1194,13 +1194,20 @@ void action_dlog_value_toggle() {
     recording.dlogValues[dlogValueIndex].isVisible = !recording.dlogValues[dlogValueIndex].isVisible;
 }
 
-void action_dlog_view_toggle_overlay_minimized() {
-    dlog_view::g_overlayMinimized = !dlog_view::g_overlayMinimized;
-    popPage();
+void action_dlog_view_toggle_legend() {
+    dlog_view::g_showLegend = !dlog_view::g_showLegend;
+}
+
+void action_dlog_view_toggle_labels() {
+    dlog_view::g_showLabels = !dlog_view::g_showLabels;
 }
 
 void action_dlog_auto_scale() {
     dlog_view::autoScale(dlog_view::getRecording());
+}
+
+void action_dlog_scale_to_fit() {
+    dlog_view::scaleToFit(dlog_view::getRecording());
 }
 
 void action_dlog_upload() {

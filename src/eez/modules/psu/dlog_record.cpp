@@ -411,7 +411,9 @@ int startImmediately() {
         writeStringFieldWithIndex(dlog_view::FIELD_ID_Y_LABEL, g_recording.parameters.yAxes[yAxisIndex].label, yAxisIndex + 1);
         writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_CHANNEL_INDEX, g_recording.parameters.yAxes[yAxisIndex].channelIndex + 1, yAxisIndex + 1);
         
-        writeChannelFields[g_recording.parameters.yAxes[yAxisIndex].channelIndex] = true;
+        if (g_recording.parameters.yAxes[yAxisIndex].channelIndex >= 0) {
+            writeChannelFields[g_recording.parameters.yAxes[yAxisIndex].channelIndex] = true;
+        }
     }
 
     for (uint8_t channelIndex = 0; channelIndex < CH_MAX; channelIndex++) {

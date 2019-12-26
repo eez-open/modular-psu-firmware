@@ -20,7 +20,7 @@
 
 #include <eez/gui/widget.h>
 
-static const int MAX_NUM_OF_Y_VALUES = 4;
+static const int MAX_NUM_OF_Y_VALUES = 10;
 
 namespace eez {
 
@@ -40,6 +40,7 @@ struct YTGraphWidgetState {
     uint32_t historyValuePosition;
     uint8_t ytGraphUpdateMethod;
     uint32_t cursorPosition;
+    bool showLabels;
     bool valueIsVisible[MAX_NUM_OF_Y_VALUES];
     float valueDiv[MAX_NUM_OF_Y_VALUES];
     float valueOffset[MAX_NUM_OF_Y_VALUES];

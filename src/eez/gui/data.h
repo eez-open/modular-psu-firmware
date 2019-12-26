@@ -327,6 +327,7 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_LIMIT,
     DATA_OPERATION_GET_NAME,
     DATA_OPERATION_GET_UNIT,
+    DATA_OPERATION_GET_IS_CHANNEL_DATA,
     DATA_OPERATION_GET_VALUE_LIST,
     DATA_OPERATION_GET_FLOAT_LIST_LENGTH,
     DATA_OPERATION_GET_FLOAT_LIST,
@@ -362,6 +363,8 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_GET_DIV,
     DATA_OPERATION_YT_DATA_GET_OFFSET,
     DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE,
+    DATA_OPERATION_YT_DATA_GET_SHOW_LABELS,
+    DATA_OPERATION_YT_DATA_GET_LABEL,
     DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC,
     DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD,
     DATA_OPERATION_YT_DATA_GET_PERIOD,
@@ -387,6 +390,7 @@ Value getDef(const Cursor &cursor, uint16_t id);
 Value getLimit(const Cursor &cursor, uint16_t id);
 const char *getName(const Cursor &cursor, uint16_t id);
 Unit getUnit(const Cursor &cursor, uint16_t id);
+bool isChannelData(const Cursor &cursor, uint16_t id);
 
 void getList(const Cursor &cursor, uint16_t id, const Value **labels, int &count);
 
@@ -418,6 +422,13 @@ int ytDataGetHorzDivisions(const Cursor &cursor, uint16_t id);
 float ytDataGetDiv(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 float ytDataGetOffset(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 bool ytDataDataValueIsVisible(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
+bool ytDataGetShowLabels(const Cursor &cursor, uint16_t id);
+struct YtDataGetLabelParams {
+    uint8_t valueIndex;
+    char *text;
+    int count;
+};
+void ytDataGetLabel(const Cursor &cursor, uint16_t id, uint8_t valueIndex, char *text, int count);
 Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(const Cursor &cursor, uint16_t id);
 uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, uint16_t id);
 float ytDataGetPeriod(const Cursor &cursor, uint16_t id);

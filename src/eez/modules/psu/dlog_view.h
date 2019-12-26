@@ -186,7 +186,8 @@ struct Recording {
 };
 
 extern bool g_showLatest;
-extern bool g_overlayMinimized;
+extern bool g_showLegend;
+extern bool g_showLabels;
 
 // open dlog file for viewing
 void openFile(const char *filePath);
@@ -202,17 +203,21 @@ void stateManagment();
 Recording &getRecording();
 
 void initAxis(Recording &recording);
+void initYAxis(Parameters &parameters, int yAxisIndex);
 void initDlogValues(Recording &recording);
 int getNumVisibleDlogValues(const Recording &recording);
 int getVisibleDlogValueIndex(Recording &recording, int visibleDlogValueIndex);
 DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex);
 
+uint32_t getPosition(Recording& recording);
 float getMaxTimeOffset(Recording& recording);
 void changeTimeOffset(Recording &recording, float timeOffset);
 void changeTimeDiv(Recording &recording, float timeDiv);
 float getDuration(Recording &recording);
+void getLabel(Recording& recording, int valueIndex, char *text, int count);
 
 void autoScale(Recording &recording);
+void scaleToFit(Recording &recording);
 
 float roundValue(float value);
 

@@ -725,9 +725,7 @@ bool compare_DLOG_VALUE_LABEL_value(const Value &a, const Value &b) {
 }
 
 void DLOG_VALUE_LABEL_value_to_text(const Value &value, char *text, int count) {
-    static const char labels[] = { 'U', 'I', 'P' };
-    int dlogValue = value.getInt();
-    snprintf(text, count - 1, "%c%d", labels[dlogValue % 3], dlogValue / 3 + 1);
+    dlog_view::getLabel(dlog_view::getRecording(), value.getInt(), text, count);
 }
 
 static double g_savedCurrentTime;
@@ -1134,6 +1132,8 @@ void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor &cursor
         value = "Voltage";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
     } else if (operation == data::DATA_OPERATION_SET) {
         if (!between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
@@ -1261,6 +1261,8 @@ void data_channel_i_edit(data::DataOperationEnum operation, data::Cursor &cursor
         value = "Current";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_AMPER;
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
     } else if (operation == data::DATA_OPERATION_SET) {
         if (!between(value.getFloat(), channel_dispatcher::getIMin(channel), channel_dispatcher::getIMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
@@ -2354,7 +2356,9 @@ void data_channel_protection_ovp_delay(data::DataOperationEnum operation, data::
         value = "OVP Delay";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
-    } 
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    }
 }
 
 void data_channel_protection_ovp_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2382,6 +2386,8 @@ void data_channel_protection_ovp_limit(data::DataOperationEnum operation, data::
         value = "OVP Limit";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
     } 
 }
 
@@ -2419,6 +2425,8 @@ void data_channel_protection_ocp_delay(data::DataOperationEnum operation, data::
         value = "OCP Delay";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
     } 
 }
 
@@ -2447,6 +2455,8 @@ void data_channel_protection_ocp_limit(data::DataOperationEnum operation, data::
         value = "OCP Limit";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_AMPER;
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
     }
 }
 
@@ -2490,7 +2500,9 @@ void data_channel_protection_opp_level(data::DataOperationEnum operation, data::
         value = "OPP Level";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_WATT;
-    } 
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    }
 }
 
 void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2518,7 +2530,9 @@ void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::
         value = "OPP Delay";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
-    } 
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    }
 }
 
 void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2546,7 +2560,9 @@ void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::
         value = "OPP Limit";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_WATT;
-    } 
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    }
 }
 
 void data_channel_protection_otp_installed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2590,7 +2606,9 @@ void data_channel_protection_otp_level(data::DataOperationEnum operation, data::
         value = "OTP Level";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_CELSIUS;
-    } 
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    }
 }
     
 void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -2618,7 +2636,9 @@ void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::
         value = "OTP Delay";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
-    } 
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    }
 }
 
 void data_event_queue_last_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -4548,22 +4568,15 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         value = recording.getValue;
     } else if (operation == DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE) {
         value = Value(recording.dlogValues[value.getUInt8()].isVisible);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_SHOW_LABELS) {
+        value = dlog_view::g_showLabels ? 1 : 0;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_LABEL) {
+        YtDataGetLabelParams *params = (YtDataGetLabelParams *)value.getVoidPointer();
+        dlog_view::getLabel(dlog_view::getRecording(), params->valueIndex, params->text, params->count);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
         value = Value(recording.size, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
-        float position;
-        if (&recording == &dlog_record::g_recording) {
-            value = Value(recording.size - recording.pageSize, VALUE_TYPE_UINT32);
-        } else {
-            position = recording.timeOffset / recording.parameters.period;
-            if (position < 0) {
-                value = Value(0, VALUE_TYPE_UINT32);
-            } else if (position > recording.size - recording.pageSize) {
-                value = Value(recording.size - recording.pageSize, VALUE_TYPE_UINT32);
-            } else {
-                value = Value((uint32_t)roundf(position), VALUE_TYPE_UINT32);
-            }
-        }
+        value = Value(dlog_view::getPosition(recording), VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
         int32_t newPosition = value.getUInt32();
         if (newPosition < 0) {
@@ -4577,7 +4590,14 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
         value = Value(recording.pageSize, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
-        value = Value(g_ytGraphStyles[value.getUInt8() % (sizeof(g_ytGraphStyles) / sizeof(uint16_t))], VALUE_TYPE_UINT16);
+        uint8_t numVisibleDlogValues = dlog_view::getNumVisibleDlogValues(recording);
+        uint8_t numYtGraphStyles = sizeof(g_ytGraphStyles) / sizeof(uint16_t);
+        if (numVisibleDlogValues <= numYtGraphStyles) {
+            uint8_t visibleValueIndex = value.getUInt8();
+            value = Value(g_ytGraphStyles[visibleValueIndex], VALUE_TYPE_UINT16);
+        } else {
+            value = Value(g_ytGraphStyles[0], VALUE_TYPE_UINT16);
+        }
     } else if (operation == DATA_OPERATION_YT_DATA_GET_HORZ_DIVISIONS) {
         value = dlog_view::NUM_HORZ_DIVISIONS;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS) {
@@ -4670,9 +4690,8 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
 #if OPTION_SD_CARD
     static const int NUM_WIDGETS = 3;
 
-    static const int SHOW_OPTIONS_BUTTON = 0;
-    static const int LABELS_CONTAINER_WIDGET = 1;
-    static const int DLOG_VALUES_LIST_WIDGET = 2;
+    static const int LABELS_CONTAINER_WIDGET = 0;
+    static const int DLOG_VALUES_LIST_WIDGET = 1;
 
     static Overlay overlay;
     static WidgetOverride widgetOverrides[NUM_WIDGETS];
@@ -4685,44 +4704,28 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
         int state = 0;
         int numVisibleDlogValues = 0;
         
-        state = numVisibleDlogValues = dlog_view::getNumVisibleDlogValues(recording);
-
-        if (dlog_view::g_overlayMinimized) {
-            state |= 0x80;
+        if (dlog_view::g_showLegend) {
+            state = numVisibleDlogValues = dlog_view::getNumVisibleDlogValues(recording);
         }
-
-        state |= 0x100;
 
         if (overlay.state != state) {
             overlay.state = state;
 
-            if (state > 0) {
+            if (state != 0) {
                 overlay.widgetOverrides = widgetOverrides;
 
                 WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
 
                 const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
 
-                const Widget *showOptionsButtonWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, SHOW_OPTIONS_BUTTON);
                 const Widget *labelsContainerWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LABELS_CONTAINER_WIDGET);
                 const Widget *dlogValuesListWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_VALUES_LIST_WIDGET);
 
                 overlay.width = widgetCursor.widget->w;
 
-                widgetOverrides[SHOW_OPTIONS_BUTTON].isVisible = true;
-                widgetOverrides[SHOW_OPTIONS_BUTTON].x = showOptionsButtonWidget->x;
-                widgetOverrides[SHOW_OPTIONS_BUTTON].y = showOptionsButtonWidget->y;
-                widgetOverrides[SHOW_OPTIONS_BUTTON].w = showOptionsButtonWidget->w;
-                widgetOverrides[SHOW_OPTIONS_BUTTON].h = showOptionsButtonWidget->h;
+                overlay.width = widgetCursor.widget->w;
 
-                if (state & 0x80) {
-                    // minimized
-                    widgetOverrides[LABELS_CONTAINER_WIDGET].isVisible = false;
-                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].isVisible = false;
-
-                    overlay.width = showOptionsButtonWidget->w;
-                    overlay.height = showOptionsButtonWidget->h;
-                } else {
+                if (numVisibleDlogValues <= 4) {
                     widgetOverrides[LABELS_CONTAINER_WIDGET].isVisible = true;
                     widgetOverrides[LABELS_CONTAINER_WIDGET].x = labelsContainerWidget->x;
                     widgetOverrides[LABELS_CONTAINER_WIDGET].y = labelsContainerWidget->y;
@@ -4735,8 +4738,17 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
                     widgetOverrides[DLOG_VALUES_LIST_WIDGET].w = dlogValuesListWidget->w;
                     widgetOverrides[DLOG_VALUES_LIST_WIDGET].h = numVisibleDlogValues * dlogValuesListWidget->h;
 
-                    overlay.width = widgetCursor.widget->w;
                     overlay.height = widgetOverrides[LABELS_CONTAINER_WIDGET].h + widgetOverrides[DLOG_VALUES_LIST_WIDGET].h;
+                } else {
+                    widgetOverrides[LABELS_CONTAINER_WIDGET].isVisible = false;
+
+                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].isVisible = true;
+                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].x = dlogValuesListWidget->x;
+                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].y = labelsContainerWidget->y;
+                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].w = dlogValuesListWidget->w;
+                    widgetOverrides[DLOG_VALUES_LIST_WIDGET].h = numVisibleDlogValues * dlogValuesListWidget->h;
+
+                    overlay.height = widgetOverrides[DLOG_VALUES_LIST_WIDGET].h;
                 }
             }
         }
@@ -4758,8 +4770,8 @@ void data_dlog_visible_values(data::DataOperationEnum operation, data::Cursor &c
 void data_dlog_visible_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
-        dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, cursor.i);
-        value = Value(dlogValueParams->dlogValueType, VALUE_TYPE_DLOG_VALUE_LABEL);
+        auto dlogValueIndex = dlog_view::getVisibleDlogValueIndex(recording, cursor.i);
+        value = Value(dlogValueIndex, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
 
@@ -4793,7 +4805,9 @@ void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor
         value = "Div";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = recording.parameters.yAxes[dlogValueIndex].unit;
-    } 
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 0;
+    }
 #endif
 }
 
@@ -4826,7 +4840,9 @@ void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cur
         value = "Offset";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = recording.parameters.yAxes[dlogValueIndex].unit;
-    } 
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 0;
+    }
 #endif
 }
 
@@ -4851,7 +4867,9 @@ void data_dlog_x_axis_offset(data::DataOperationEnum operation, data::Cursor &cu
         value = "Offset";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = recording.parameters.xAxis.unit;
-    } 
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 0;
+    }
 #endif
 }
 
@@ -4876,6 +4894,8 @@ void data_dlog_x_axis_div(data::DataOperationEnum operation, data::Cursor &curso
         value = "Div";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
         value = recording.parameters.xAxis.unit;
+    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 0;
     }
 #endif
 }
@@ -4954,8 +4974,7 @@ void data_dlog_all_values(data::DataOperationEnum operation, data::Cursor &curso
 void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        dlog_view::Recording &recording = dlog_view::getRecording();
-        value = Value(recording.dlogValues[cursor.i].dlogValueType, VALUE_TYPE_DLOG_VALUE_LABEL);
+        value = Value(cursor.i, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 #endif
 }
@@ -4969,10 +4988,18 @@ void data_dlog_value_state(data::DataOperationEnum operation, data::Cursor &curs
 #endif
 }
 
-void data_dlog_view_overlay_minimized(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_view_show_legend(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
-        value = dlog_view::g_overlayMinimized;
+        value = dlog_view::g_showLegend ? 1 : 0;
+    }
+#endif
+}
+
+void data_dlog_view_show_labels(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = dlog_view::g_showLabels ? 1 : 0;
     }
 #endif
 }

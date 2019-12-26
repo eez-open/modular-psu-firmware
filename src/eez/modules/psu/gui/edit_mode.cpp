@@ -91,7 +91,8 @@ void enter(int tabIndex) {
     }
 
     if (g_tabIndex == PAGE_ID_EDIT_MODE_KEYPAD) {
-        edit_mode_keypad::enter(Channel::get(g_focusCursor.i), g_editValue, g_minValue, g_maxValue);
+        Cursor cursor(g_focusCursor.i);
+        edit_mode_keypad::enter(isChannelData(cursor, g_focusDataId) ? g_focusCursor.i : -1, g_editValue, g_minValue, g_maxValue);
     } else {
         edit_mode_keypad::exit();
     }
@@ -155,7 +156,8 @@ Unit getUnit() {
 }
 
 bool setValue(float floatValue) {
-    if (g_focusCursor.i != -1) {
+    Cursor cursor(g_focusCursor.i);
+    if (isChannelData(cursor, g_focusDataId)) {
         floatValue = Channel::get(g_focusCursor.i).roundChannelValue(getUnit(), floatValue);
     }
 
@@ -186,8 +188,7 @@ void getInfoText(char *infoText, int count) {
     float maxValue = (g_focusDataId == DATA_ID_CHANNEL_U_EDIT || g_focusDataId == DATA_ID_CHANNEL_I_EDIT) ?
         data::getLimit(cursor, g_focusDataId).getFloat() : data::getMax(cursor, g_focusDataId).getFloat();
 
-    if (g_focusCursor.i >= 0) {
-
+    if (isChannelData(cursor, g_focusDataId)) {
         Channel& channel = Channel::get(g_focusCursor.i);
         if ((channel.channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel.flags.trackingEnabled) {
             strcpy(infoText, "Set ");
@@ -196,8 +197,7 @@ void getInfoText(char *infoText, int count) {
         }
         
         strcat(infoText, dataName);
-    } 
-    else {
+    } else {
         strcat(infoText, dataName);
     }
 

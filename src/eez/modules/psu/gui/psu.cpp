@@ -1404,16 +1404,18 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
     return styleId;
 }
 
+
+
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
-        style = getStyle(psu::gui::g_ytGraphStyles[widgetCursor.cursor.i % (sizeof(psu::gui::g_ytGraphStyles) / sizeof(uint16_t))]);
+        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, widgetCursor.cursor.i);
     }
     return style->color;
 }
 
 uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
-        style = getStyle(psu::gui::g_ytGraphStyles[widgetCursor.cursor.i % (sizeof(psu::gui::g_ytGraphStyles) / sizeof(uint16_t))]);
+        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, widgetCursor.cursor.i);
     }
     return style->active_color;
 }

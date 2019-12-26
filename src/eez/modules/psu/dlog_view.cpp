@@ -19,6 +19,8 @@
 #if OPTION_SD_CARD
 
 #include <string.h>
+#include <stdio.h>
+#include <float.h>
 #include <assert.h>
 
 #include <eez/system.h>
@@ -51,7 +53,8 @@ namespace dlog_view {
 static State g_state;
 static uint32_t g_loadingStartTickCount;
 bool g_showLatest = true;
-bool g_overlayMinimized;
+bool g_showLegend = true;
+bool g_showLabels = false;
 char g_filePath[MAX_PATH_LENGTH + 1];
 Recording g_recording;
 
@@ -285,6 +288,21 @@ void adjustTimeOffset(Recording &recording) {
     }
 }
 
+uint32_t getPosition(Recording& recording) {
+    if (&recording == &dlog_record::g_recording) {
+        return recording.size - recording.pageSize;
+    } else {
+        float position = recording.timeOffset / recording.parameters.period;
+        if (position < 0) {
+            return 0;
+        } else if (position > recording.size - recording.pageSize) {
+            return recording.size - recording.pageSize;
+        } else {
+            return (uint32_t)roundf(position);
+        }
+    }
+}
+
 float getMaxTimeOffset(Recording &recording) {
     return (recording.size - recording.pageSize) * recording.parameters.period;
 }
@@ -329,6 +347,18 @@ float getDuration(Recording &recording) {
     return (recording.size - 1) * recording.parameters.xAxis.step;
 }
 
+void getLabel(Recording& recording, int valueIndex, char *text, int count) {
+    if (recording.parameters.yAxes[valueIndex].label[0]) {
+        strncpy(text, recording.parameters.yAxes[valueIndex].label, count - 1);
+        text[count - 1] = 0;
+    } else {
+        static const char labels[] = { 'U', 'I', 'P' };
+        int dlogValueType = recording.dlogValues[valueIndex].dlogValueType;
+        snprintf(text, count - 1, "%c%d", labels[dlogValueType % 3], dlogValueType / 3 + 1);
+    }
+}
+
+
 void initAxis(Recording &recording) {
     recording.parameters.xAxis.unit = UNIT_SECOND;
     recording.parameters.xAxis.step = recording.parameters.period;
@@ -365,6 +395,14 @@ void initAxis(Recording &recording) {
     }
 
     recording.parameters.numYAxes = yAxisIndex;
+}
+
+void initYAxis(Parameters &parameters, int yAxisIndex) {
+    parameters.yAxes[yAxisIndex].unit = UNIT_UNKNOWN;
+    parameters.yAxes[yAxisIndex].range.min = 0.0f;
+    parameters.yAxes[yAxisIndex].range.max = 1.0f;
+    parameters.yAxes[yAxisIndex].label[0] = 0;
+    parameters.yAxes[yAxisIndex].channelIndex = -1;
 }
 
 void initDlogValues(Recording &recording) {
@@ -447,6 +485,37 @@ void autoScale(Recording &recording) {
         float numDivisions = 1.0f * NUM_VERT_DIVISIONS / numVisibleDlogValues;
         dlogValueParams.div = recording.parameters.yAxes[dlogValueIndex].range.max / numDivisions;
         dlogValueParams.offset = dlogValueParams.div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions);
+    }
+}
+
+void scaleToFit(Recording &recording) {
+    auto numVisibleDlogValues = getNumVisibleDlogValues(recording);
+    auto startPosition = getPosition(recording);
+
+    float totalMin = FLT_MAX;
+    float totalMax = -FLT_MAX;
+
+    for (auto position = startPosition; position < startPosition + recording.pageSize; position++) {
+        for (auto visibleDlogValueIndex = 0; visibleDlogValueIndex < numVisibleDlogValues; visibleDlogValueIndex++) {
+            int dlogValueIndex = getVisibleDlogValueIndex(recording, visibleDlogValueIndex);
+
+            float max;
+            float min = recording.getValue(position, dlogValueIndex, &max);
+            if (min < totalMin) {
+                totalMin = min;
+            }
+            if (max > totalMax) {
+                totalMax = max;
+            }
+        }
+    }
+
+    for (auto visibleDlogValueIndex = 0; visibleDlogValueIndex < numVisibleDlogValues; visibleDlogValueIndex++) {
+        int dlogValueIndex = getVisibleDlogValueIndex(recording, visibleDlogValueIndex);
+        DlogValueParams &dlogValueParams = recording.dlogValues[dlogValueIndex];
+        float numDivisions = 1.0f * NUM_VERT_DIVISIONS;
+        dlogValueParams.div = (totalMax - totalMin) / numDivisions;
+        dlogValueParams.offset = - dlogValueParams.div * NUM_VERT_DIVISIONS / 2;
     }
 }
 
@@ -605,10 +674,14 @@ void openFile(const char *filePath) {
                     g_recording.cursorOffset = VIEW_WIDTH / 2;
 
                     g_recording.getValue = getValue;
-                    g_overlayMinimized = false;
                     g_isLoading = false;
 
-                    autoScale(g_recording);
+                    if (g_recording.parameters.numYAxes > 4) {
+                        g_showLegend = false;
+                        g_showLabels = true;
+                    } else {
+                        autoScale(g_recording);
+                    }
 
                     g_state = STATE_READY;
 
