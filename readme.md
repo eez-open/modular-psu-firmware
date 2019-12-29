@@ -39,7 +39,7 @@ make
 
 ```
 source /path/to/emsdk/emsdk_env.sh
-export EMSCRIPTEN=/path/to/emsdk/fastcomp/emscripten
+export EMSCRIPTEN=/path/to/emsdk/upstream/emscripten
 mkdir -p /path/to/modular-psu-firmware/build/emscripten
 cd /path/to/modular-psu-firmware/build/emscripten
 cmake -DCMAKE_TOOLCHAIN_FILE=../../cmake/Emscripten.cmake -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" ../..
