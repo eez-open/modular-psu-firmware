@@ -18,8 +18,10 @@ if SIMULATOR:
     Ugs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     Ig = 5.0
     
-def start():
+def start(deviceName, Uds_max, Id_max):
     try:
+        Uds_step = Uds_max / NUM_U_DS_STEPS
+
         scpi("*SAV 10")
         scpi("MEM:STAT:FREEze ON")
 
@@ -49,7 +51,7 @@ def start():
         for ugs_step_counter in range(num_ugs_steps):
             scpi('SENS:DLOG:TRAC:Y' + str(ugs_step_counter+1) + ':LABel "Ugs=' + str(Ugs[ugs_step_counter]) + 'V"')
 
-        scpi('INIT:DLOG:TRACE "/Recordings/curve_tracer.dlog"')
+        scpi('INIT:DLOG:TRACE "/Recordings/' + deviceName + '.dlog"')
 
         scpi("INST ch1")
         scpi("OUTP 1")
@@ -96,13 +98,14 @@ def start():
 ch1Model = scpi("SYSTem:CHANnel:MODel? ch1")
 ch2Model = scpi("SYSTem:CHANnel:MODel? ch2")
 if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
-    Uds_max = scpi('DISP:INPUT? "Uds,max", NUMBER, VOLT, 1.0, 40.0, 20.0')
-    if Uds_max != None:
-        Uds_max = float(Uds_max)
-        Uds_step = Uds_max / NUM_U_DS_STEPS
-        Id_max = scpi('DISP:INPUT? "Id,max", NUMBER, AMPER, 0.001, 5.0, 3.0')
-        if Id_max != None:
-            Id_max = float(Id_max)
-            start()
+    deviceName = scpi('DISP:INPUT? "Device name", TEXT, 1, 20, ""')
+    if deviceName != None:
+        Uds_max = scpi('DISP:INPUT? "Uds,max", NUMBER, VOLT, 1.0, 40.0, 20.0')
+        if Uds_max != None:
+            Uds_max = float(Uds_max)
+            Id_max = scpi('DISP:INPUT? "Id,max", NUMBER, AMPER, 0.001, 5.0, 3.0')
+            if Id_max != None:
+                Id_max = float(Id_max)
+                start(deviceName, Uds_max, Id_max)
 else:
     scpi('DISP:INPUT? "Requires DCP405 or DCP405B on Ch1 and Ch2", MENU, BUTTON, "Close"')
