@@ -364,6 +364,7 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_GET_OFFSET,
     DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE,
     DATA_OPERATION_YT_DATA_GET_SHOW_LABELS,
+    DATA_OPERATION_YT_DATA_GET_SELECTED_VALUE_INDEX,
     DATA_OPERATION_YT_DATA_GET_LABEL,
     DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC,
     DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD,
@@ -423,6 +424,7 @@ float ytDataGetDiv(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 float ytDataGetOffset(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 bool ytDataDataValueIsVisible(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 bool ytDataGetShowLabels(const Cursor &cursor, uint16_t id);
+int8_t ytDataGetSelectedValueIndex(const Cursor &cursor, uint16_t id);
 struct YtDataGetLabelParams {
     uint8_t valueIndex;
     char *text;

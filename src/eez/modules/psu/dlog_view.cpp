@@ -398,9 +398,7 @@ void initAxis(Recording &recording) {
 }
 
 void initYAxis(Parameters &parameters, int yAxisIndex) {
-    parameters.yAxes[yAxisIndex].unit = UNIT_UNKNOWN;
-    parameters.yAxes[yAxisIndex].range.min = 0.0f;
-    parameters.yAxes[yAxisIndex].range.max = 1.0f;
+    memcpy(&parameters.yAxes[yAxisIndex], &parameters.yAxis, sizeof(parameters.yAxis));
     parameters.yAxes[yAxisIndex].label[0] = 0;
     parameters.yAxes[yAxisIndex].channelIndex = -1;
 }
@@ -442,6 +440,8 @@ void initDlogValues(Recording &recording) {
     for (; yAxisIndex < MAX_NUM_OF_Y_VALUES; yAxisIndex++) {
         recording.dlogValues[yAxisIndex].isVisible = false;
     }
+
+    recording.selectedVisibleValueIndex = 0;
 }
 
 int getNumVisibleDlogValues(const Recording &recording) {
@@ -454,7 +454,7 @@ int getNumVisibleDlogValues(const Recording &recording) {
     return count;
 }
 
-int getVisibleDlogValueIndex(Recording &recording, int visibleDlogValueIndex) {
+int getDlogValueIndex(Recording &recording, int visibleDlogValueIndex) {
     int i = 0;
     for (int dlogValueIndex = 0; dlogValueIndex < MAX_NUM_OF_Y_VALUES; dlogValueIndex++) {
         if (recording.dlogValues[dlogValueIndex].isVisible) {
@@ -465,11 +465,23 @@ int getVisibleDlogValueIndex(Recording &recording, int visibleDlogValueIndex) {
         }
     }
     return -1;
+}
 
+int getVisibleDlogValueIndex(Recording &recording, int fromDlogValueIndex) {
+    int visibleDlogValueIndex = 0;
+    for (int dlogValueIndex = 0; dlogValueIndex < MAX_NUM_OF_Y_VALUES; dlogValueIndex++) {
+        if (dlogValueIndex == fromDlogValueIndex) {
+            return visibleDlogValueIndex;
+        }
+        if (recording.dlogValues[dlogValueIndex].isVisible) {
+            ++visibleDlogValueIndex;
+        }
+    }
+    return -1;
 }
 
 DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex) {
-    int dlogValueIndex = getVisibleDlogValueIndex(recording, visibleDlogValueIndex);
+    int dlogValueIndex = getDlogValueIndex(recording, visibleDlogValueIndex);
     if (dlogValueIndex != -1) {
         return &recording.dlogValues[dlogValueIndex];
     }
@@ -480,7 +492,7 @@ void autoScale(Recording &recording) {
     auto numVisibleDlogValues = getNumVisibleDlogValues(recording);
 
     for (auto visibleDlogValueIndex = 0; visibleDlogValueIndex < numVisibleDlogValues; visibleDlogValueIndex++) {
-        int dlogValueIndex = getVisibleDlogValueIndex(recording, visibleDlogValueIndex);
+        int dlogValueIndex = getDlogValueIndex(recording, visibleDlogValueIndex);
         DlogValueParams &dlogValueParams = recording.dlogValues[dlogValueIndex];
         float numDivisions = 1.0f * NUM_VERT_DIVISIONS / numVisibleDlogValues;
         dlogValueParams.div = recording.parameters.yAxes[dlogValueIndex].range.max / numDivisions;
@@ -497,7 +509,7 @@ void scaleToFit(Recording &recording) {
 
     for (auto position = startPosition; position < startPosition + recording.pageSize; position++) {
         for (auto visibleDlogValueIndex = 0; visibleDlogValueIndex < numVisibleDlogValues; visibleDlogValueIndex++) {
-            int dlogValueIndex = getVisibleDlogValueIndex(recording, visibleDlogValueIndex);
+            int dlogValueIndex = getDlogValueIndex(recording, visibleDlogValueIndex);
 
             float max;
             float min = recording.getValue(position, dlogValueIndex, &max);
@@ -511,7 +523,7 @@ void scaleToFit(Recording &recording) {
     }
 
     for (auto visibleDlogValueIndex = 0; visibleDlogValueIndex < numVisibleDlogValues; visibleDlogValueIndex++) {
-        int dlogValueIndex = getVisibleDlogValueIndex(recording, visibleDlogValueIndex);
+        int dlogValueIndex = getDlogValueIndex(recording, visibleDlogValueIndex);
         DlogValueParams &dlogValueParams = recording.dlogValues[dlogValueIndex];
         float numDivisions = 1.0f * NUM_VERT_DIVISIONS;
         dlogValueParams.div = (totalMax - totalMin) / numDivisions;
@@ -610,36 +622,42 @@ void openFile(const char *filePath) {
                             }
                         } else if (fieldId >= FIELD_ID_Y_UNIT && fieldId <= FIELD_ID_Y_CHANNEL_INDEX) {
                             uint8_t yAxisIndex = readUint8(buffer, offset);
-                            if (yAxisIndex < 1 || yAxisIndex > MAX_NUM_OF_Y_AXES) {
+                            if (yAxisIndex > MAX_NUM_OF_Y_AXES) {
                                 invalidHeader = true;
                                 break;
-                            }
-                            yAxisIndex--;
-                            if (yAxisIndex >= g_recording.parameters.numYAxes) {
-                                g_recording.parameters.numYAxes = yAxisIndex + 1;
                             }
 
                             fieldDataLength -= sizeof(uint8_t);
 
-                            if (fieldId == FIELD_ID_Y_UNIT) {
-                                g_recording.parameters.yAxes[yAxisIndex].unit = (Unit)readUint8(buffer, offset);
-                            } else if (fieldId == FIELD_ID_Y_RANGE_MIN) {
-                                g_recording.parameters.yAxes[yAxisIndex].range.min = readFloat(buffer, offset);
-                            } else if (fieldId == FIELD_ID_Y_RANGE_MAX) {
-                                g_recording.parameters.yAxes[yAxisIndex].range.max = readFloat(buffer, offset);
-                            } else if (fieldId == FIELD_ID_Y_LABEL) {
-                                if (fieldDataLength > MAX_LABEL_LENGTH) {
-                                    invalidHeader = true;
-                                    break;
-                                }
-                                for (int i = 0; i < fieldDataLength; i++) {
-                                    g_recording.parameters.yAxes[yAxisIndex].label[i] = readUint8(buffer, offset);
-                                }
-                            } else if (fieldId == FIELD_ID_Y_CHANNEL_INDEX) {
-                                g_recording.parameters.yAxes[yAxisIndex].channelIndex = (int16_t)(readUint8(buffer, offset)) - 1;
-                            } else {
-                                // unknown field, skip
+                            if (yAxisIndex == 0) {
+                                // skip
                                 offset += fieldDataLength;
+                            } else {
+                                yAxisIndex--;
+                                if (yAxisIndex >= g_recording.parameters.numYAxes) {
+                                    g_recording.parameters.numYAxes = yAxisIndex + 1;
+                                }
+
+                                if (fieldId == FIELD_ID_Y_UNIT) {
+                                    g_recording.parameters.yAxes[yAxisIndex].unit = (Unit)readUint8(buffer, offset);
+                                } else if (fieldId == FIELD_ID_Y_RANGE_MIN) {
+                                    g_recording.parameters.yAxes[yAxisIndex].range.min = readFloat(buffer, offset);
+                                } else if (fieldId == FIELD_ID_Y_RANGE_MAX) {
+                                    g_recording.parameters.yAxes[yAxisIndex].range.max = readFloat(buffer, offset);
+                                } else if (fieldId == FIELD_ID_Y_LABEL) {
+                                    if (fieldDataLength > MAX_LABEL_LENGTH) {
+                                        invalidHeader = true;
+                                        break;
+                                    }
+                                    for (int i = 0; i < fieldDataLength; i++) {
+                                        g_recording.parameters.yAxes[yAxisIndex].label[i] = readUint8(buffer, offset);
+                                    }
+                                } else if (fieldId == FIELD_ID_Y_CHANNEL_INDEX) {
+                                    g_recording.parameters.yAxes[yAxisIndex].channelIndex = (int16_t)(readUint8(buffer, offset)) - 1;
+                                } else {
+                                    // unknown field, skip
+                                    offset += fieldDataLength;
+                                }
                             }
                         } else if (fieldId == FIELD_ID_CHANNEL_MODULE_TYPE) {
                             readUint8(buffer, offset); // channel index
@@ -677,7 +695,6 @@ void openFile(const char *filePath) {
                     g_isLoading = false;
 
                     if (g_recording.parameters.numYAxes > 4) {
-                        g_showLegend = false;
                         g_showLabels = true;
                     } else {
                         autoScale(g_recording);

@@ -41,6 +41,7 @@ struct YTGraphWidgetState {
     uint8_t ytGraphUpdateMethod;
     uint32_t cursorPosition;
     bool showLabels;
+    int8_t selectedValueIndex;
     bool valueIsVisible[MAX_NUM_OF_Y_VALUES];
     float valueDiv[MAX_NUM_OF_Y_VALUES];
     float valueOffset[MAX_NUM_OF_Y_VALUES];

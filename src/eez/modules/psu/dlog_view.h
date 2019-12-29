@@ -142,6 +142,8 @@ struct Parameters {
 
     XAxis xAxis;
 
+    YAxis yAxis;
+
     uint8_t numYAxes;
     YAxis yAxes[MAX_NUM_OF_Y_AXES];
 
@@ -183,6 +185,8 @@ struct Recording {
     float timeDivMax;
 
     uint32_t dataOffset;
+
+    uint8_t selectedVisibleValueIndex;
 };
 
 extern bool g_showLatest;
@@ -206,7 +210,8 @@ void initAxis(Recording &recording);
 void initYAxis(Parameters &parameters, int yAxisIndex);
 void initDlogValues(Recording &recording);
 int getNumVisibleDlogValues(const Recording &recording);
-int getVisibleDlogValueIndex(Recording &recording, int visibleDlogValueIndex);
+int getDlogValueIndex(Recording &recording, int visibleDlogValueIndex);
+int getVisibleDlogValueIndex(Recording &recording, int dlogValueIndex);
 DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex);
 
 uint32_t getPosition(Recording& recording);

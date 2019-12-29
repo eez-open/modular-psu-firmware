@@ -71,6 +71,8 @@
 
 #include <eez/modules/psu/gui/touch_calibration.h>
 
+#include <eez/modules/psu/dlog_view.h>
+
 #define CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT 2000000L // 2s
 #define CONF_GUI_STANDBY_PAGE_TIMEOUT 4000000L          // 4s
 #define CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT 2000000L      // 2s
@@ -1408,14 +1410,18 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
 
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
-        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, widgetCursor.cursor.i);
+        psu::dlog_view::Recording &recording = psu::dlog_view::getRecording();
+        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::getNumVisibleDlogValues(recording) > 4 ? recording.selectedVisibleValueIndex : widgetCursor.cursor.i);
+        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->color;
 }
 
 uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
-        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, widgetCursor.cursor.i);
+        psu::dlog_view::Recording &recording = psu::dlog_view::getRecording();
+        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::getNumVisibleDlogValues(recording) > 4 ? recording.selectedVisibleValueIndex : widgetCursor.cursor.i);
+        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->active_color;
 }

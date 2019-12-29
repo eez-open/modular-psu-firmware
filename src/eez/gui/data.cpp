@@ -755,6 +755,12 @@ bool ytDataGetShowLabels(const Cursor &cursor, uint16_t id) {
     return value.getInt();
 }
 
+int8_t ytDataGetSelectedValueIndex(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_SELECTED_VALUE_INDEX), (Cursor &)cursor, value);
+    return (int8_t)value.getInt();
+}
+
 void ytDataGetLabel(const Cursor &cursor, uint16_t id, uint8_t valueIndex, char *text, int count) {
     text[0] = 0;
     YtDataGetLabelParams params = {

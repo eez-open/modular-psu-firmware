@@ -46,6 +46,7 @@ namespace dlog_record {
 dlog_view::Parameters g_parameters = {
     { 0 },
     { },
+    { },
     0,
     {{}, {}, {}, {}, {}, {}},
     {false, false, false, false, false, false},
@@ -58,6 +59,7 @@ dlog_view::Parameters g_parameters = {
 
 dlog_view::Parameters g_guiParameters = {
     { 0 },
+    { },
     { },
     0,
     {{}, {}, {}, {}, {}, {}},
@@ -404,6 +406,14 @@ int startImmediately() {
         writeChannelFields[channelIndex] = false;
     }
 
+    if (g_recording.parameters.yAxis.unit != UNIT_UNKNOWN) {
+        writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_UNIT, g_recording.parameters.yAxis.unit, 0);
+        writeFloatFieldWithIndex(dlog_view::FIELD_ID_Y_RANGE_MIN, g_recording.parameters.yAxis.range.min, 0);
+        writeFloatFieldWithIndex(dlog_view::FIELD_ID_Y_RANGE_MAX, g_recording.parameters.yAxis.range.max, 0);
+        writeStringFieldWithIndex(dlog_view::FIELD_ID_Y_LABEL, g_recording.parameters.yAxis.label, 0);
+        writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_CHANNEL_INDEX, 0, 0);
+    }
+
     for (uint8_t yAxisIndex = 0; yAxisIndex < g_recording.parameters.numYAxes; yAxisIndex++) {
         writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_UNIT, g_recording.parameters.yAxes[yAxisIndex].unit, yAxisIndex + 1);
         writeFloatFieldWithIndex(dlog_view::FIELD_ID_Y_RANGE_MIN, g_recording.parameters.yAxes[yAxisIndex].range.min, yAxisIndex + 1);
@@ -463,6 +473,7 @@ void toggle() {
 
 void resetParameters() {
     memset(&g_parameters.xAxis, 0, sizeof(dlog_view::XAxis));
+    memset(&g_parameters.yAxis, 0, sizeof(dlog_view::YAxis));
     g_parameters.numYAxes = 0;
     memset(&g_parameters.yAxes[0], 0, dlog_view::MAX_NUM_OF_Y_AXES * sizeof(dlog_view::YAxis));
 

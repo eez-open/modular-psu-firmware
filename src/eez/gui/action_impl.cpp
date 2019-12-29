@@ -1152,7 +1152,10 @@ void action_dlog_toggle() {
 
 void action_show_dlog_view() {
     dlog_view::g_showLatest = true;
-    if (!dlog_record::isExecuting()) {
+    if (dlog_record::isExecuting()) {
+        dlog_view::g_showLegend = false;
+        dlog_view::g_showLabels = false;
+    } else {
         dlog_view::openFile(dlog_record::getLatestFilePath());
     }
     showPage(PAGE_ID_DLOG_VIEW);
@@ -1200,6 +1203,11 @@ void action_dlog_view_toggle_legend() {
 
 void action_dlog_view_toggle_labels() {
     dlog_view::g_showLabels = !dlog_view::g_showLabels;
+}
+
+void action_dlog_view_select_visible_value() {
+    dlog_view::Recording &recording = dlog_view::getRecording();
+    recording.selectedVisibleValueIndex = (recording.selectedVisibleValueIndex + 1) % dlog_view::getNumVisibleDlogValues(recording);
 }
 
 void action_dlog_auto_scale() {
