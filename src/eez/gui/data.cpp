@@ -570,6 +570,18 @@ bool isChannelData(const Cursor &cursor, uint16_t id) {
     return value.getInt() != 0;
 }
 
+Value getEncoderStep(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_ENCODER_STEP, (Cursor &)cursor, value);
+    return value;
+}
+
+bool getEncoderStepValues(const Cursor &cursor, uint16_t id, StepValues &stepValues) {
+    Value value(&stepValues, VALUE_TYPE_POINTER);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_ENCODER_STEP_VALUES, (Cursor &)cursor, value);
+    return value.getType() == VALUE_TYPE_INT && value.getInt();
+}
+
 void getList(const Cursor &cursor, uint16_t id, const Value **values, int &count) {
     Value listValue;
     g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_VALUE_LIST, (Cursor &)cursor, listValue);

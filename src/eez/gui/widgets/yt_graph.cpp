@@ -25,6 +25,7 @@
 
 #include <eez/gui/draw.h>
 #include <eez/gui/gui.h>
+#include <eez/gui/app_context.h>
 #include <eez/modules/mcu/display.h>
 #include <eez/util.h>
 
@@ -421,7 +422,7 @@ struct YTGraphStaticDrawHelper {
 
             char text[64];
             data::ytDataGetCursorXValue(widgetCursor.cursor, widgetCursor.widget->data).toText(text, sizeof(text));
-            drawText(text, -1, xTimeText, yTimeText, timeTextWidth, timeTextHeight, style, false, false, false, nullptr, nullptr, nullptr, nullptr);
+            drawText(text, -1, xTimeText, yTimeText, timeTextWidth, timeTextHeight, style, widgetCursor.currentState->flags.focused, false, false, nullptr, nullptr, nullptr, nullptr);
         }
 
         // draw labels
@@ -454,6 +455,7 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     YTGraphWidgetState *previousState = (YTGraphWidgetState *)widgetCursor.previousState;
 
     widgetCursor.currentState->size = sizeof(YTGraphWidgetState);
+    widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
 
     currentState->refreshCounter = data::ytDataGetRefreshCounter(widgetCursor.cursor, widget->data);
@@ -495,6 +497,7 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
     if (
         refreshBackground || 
+        widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
         currentState->showLabels != previousState->showLabels ||
         currentState->selectedValueIndex != previousState->selectedValueIndex ||
         visibleValuesChanged || 

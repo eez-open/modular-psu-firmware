@@ -1173,11 +1173,28 @@ void onEncoder(int counter, bool clicked) {
             float min = data::getMin(g_focusCursor, g_focusDataId).getFloat();
             float max = data::getMax(g_focusCursor, g_focusDataId).getFloat();
 
-            float newValue = mcu::encoder::increment(value, counter, min, max, g_focusCursor.i, 0);
+            float newValue;
 
-            float limit = data::getLimit(g_focusCursor, g_focusDataId).getFloat();
-            if (newValue > limit && value.getFloat() < limit) {
-                newValue = limit;
+            Value stepValue = data::getEncoderStep(g_focusCursor, g_focusDataId);
+            if (stepValue.getType() != VALUE_TYPE_NONE) {
+                float step;
+                if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
+                    step = stepValue.getFloat();
+                } else {
+                    step = psu::gui::edit_mode_step::getCurrentEncoderStepValue().getFloat();
+                }
+                newValue = clamp(value.getFloat() + counter * step, min, max);
+
+            } else {
+                newValue = mcu::encoder::increment(value, counter, min, max, g_focusCursor.i, 0);
+            }
+
+            Value limitValue = data::getLimit(g_focusCursor, g_focusDataId);
+            if (limitValue.getType() != VALUE_TYPE_NONE) {
+                float limit = limitValue.getFloat();
+                if (newValue > limit && value.getFloat() < limit) {
+                    newValue = limit;
+                }
             }
 
             if (persist_conf::devConf.encoderConfirmationMode) {
@@ -1216,7 +1233,7 @@ void onEncoder(int counter, bool clicked) {
             file_manager::onEncoder(counter);
             return;
         }
-
+         
         if (activePageId == PAGE_ID_DEBUG_TRACE_LOG) {
             eez::debug::onEncoder(counter);
             return;

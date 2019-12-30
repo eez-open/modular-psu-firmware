@@ -282,15 +282,15 @@ void adjustTimeOffset(Recording &recording) {
     auto duration = getDuration(recording);
     if (recording.timeOffset + recording.pageSize * recording.parameters.period > duration) {
         recording.timeOffset = duration - recording.pageSize * recording.parameters.period;
-        if (recording.timeOffset < 0) {
-            recording.timeOffset = 0;
-        }
+    }
+    if (recording.timeOffset < 0) {
+        recording.timeOffset = 0;
     }
 }
 
 uint32_t getPosition(Recording& recording) {
     if (&recording == &dlog_record::g_recording) {
-        return recording.size - recording.pageSize;
+        return recording.size > recording.pageSize ? recording.size - recording.pageSize : 0;
     } else {
         float position = recording.timeOffset / recording.parameters.period;
         if (position < 0) {
@@ -301,10 +301,6 @@ uint32_t getPosition(Recording& recording) {
             return (uint32_t)roundf(position);
         }
     }
-}
-
-float getMaxTimeOffset(Recording &recording) {
-    return (recording.size - recording.pageSize) * recording.parameters.period;
 }
 
 void changeTimeOffset(Recording &recording, float timeOffset) {
@@ -399,8 +395,6 @@ void initAxis(Recording &recording) {
 
 void initYAxis(Parameters &parameters, int yAxisIndex) {
     memcpy(&parameters.yAxes[yAxisIndex], &parameters.yAxis, sizeof(parameters.yAxis));
-    parameters.yAxes[yAxisIndex].label[0] = 0;
-    parameters.yAxes[yAxisIndex].channelIndex = -1;
 }
 
 void initDlogValues(Recording &recording) {
@@ -621,7 +615,7 @@ void openFile(const char *filePath) {
                                 g_recording.parameters.xAxis.label[i] = readUint8(buffer, offset);
                             }
                         } else if (fieldId >= FIELD_ID_Y_UNIT && fieldId <= FIELD_ID_Y_CHANNEL_INDEX) {
-                            uint8_t yAxisIndex = readUint8(buffer, offset);
+                            int8_t yAxisIndex = (int8_t)readUint8(buffer, offset);
                             if (yAxisIndex > MAX_NUM_OF_Y_AXES) {
                                 invalidHeader = true;
                                 break;
@@ -629,35 +623,33 @@ void openFile(const char *filePath) {
 
                             fieldDataLength -= sizeof(uint8_t);
 
-                            if (yAxisIndex == 0) {
-                                // skip
-                                offset += fieldDataLength;
-                            } else {
-                                yAxisIndex--;
-                                if (yAxisIndex >= g_recording.parameters.numYAxes) {
-                                    g_recording.parameters.numYAxes = yAxisIndex + 1;
-                                }
+                            yAxisIndex--;
+                            if (yAxisIndex >= g_recording.parameters.numYAxes) {
+                                g_recording.parameters.numYAxes = yAxisIndex + 1;
+                                initYAxis(g_recording.parameters, yAxisIndex);
+                            }
 
-                                if (fieldId == FIELD_ID_Y_UNIT) {
-                                    g_recording.parameters.yAxes[yAxisIndex].unit = (Unit)readUint8(buffer, offset);
-                                } else if (fieldId == FIELD_ID_Y_RANGE_MIN) {
-                                    g_recording.parameters.yAxes[yAxisIndex].range.min = readFloat(buffer, offset);
-                                } else if (fieldId == FIELD_ID_Y_RANGE_MAX) {
-                                    g_recording.parameters.yAxes[yAxisIndex].range.max = readFloat(buffer, offset);
-                                } else if (fieldId == FIELD_ID_Y_LABEL) {
-                                    if (fieldDataLength > MAX_LABEL_LENGTH) {
-                                        invalidHeader = true;
-                                        break;
-                                    }
-                                    for (int i = 0; i < fieldDataLength; i++) {
-                                        g_recording.parameters.yAxes[yAxisIndex].label[i] = readUint8(buffer, offset);
-                                    }
-                                } else if (fieldId == FIELD_ID_Y_CHANNEL_INDEX) {
-                                    g_recording.parameters.yAxes[yAxisIndex].channelIndex = (int16_t)(readUint8(buffer, offset)) - 1;
-                                } else {
-                                    // unknown field, skip
-                                    offset += fieldDataLength;
+                            YAxis &destYAxis = yAxisIndex >= 0 ? g_recording.parameters.yAxes[yAxisIndex] : g_recording.parameters.yAxis;
+
+                            if (fieldId == FIELD_ID_Y_UNIT) {
+                                destYAxis.unit = (Unit)readUint8(buffer, offset);
+                            } else if (fieldId == FIELD_ID_Y_RANGE_MIN) {
+                                destYAxis.range.min = readFloat(buffer, offset);
+                            } else if (fieldId == FIELD_ID_Y_RANGE_MAX) {
+                                destYAxis.range.max = readFloat(buffer, offset);
+                            } else if (fieldId == FIELD_ID_Y_LABEL) {
+                                if (fieldDataLength > MAX_LABEL_LENGTH) {
+                                    invalidHeader = true;
+                                    break;
                                 }
+                                for (int i = 0; i < fieldDataLength; i++) {
+                                    destYAxis.label[i] = readUint8(buffer, offset);
+                                }
+                            } else if (fieldId == FIELD_ID_Y_CHANNEL_INDEX) {
+                                destYAxis.channelIndex = (int16_t)(readUint8(buffer, offset)) - 1;
+                            } else {
+                                // unknown field, skip
+                                offset += fieldDataLength;
                             }
                         } else if (fieldId == FIELD_ID_CHANNEL_MODULE_TYPE) {
                             readUint8(buffer, offset); // channel index

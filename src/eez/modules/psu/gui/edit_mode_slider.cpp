@@ -54,7 +54,9 @@ void onTouchDown() {
 
     int stepIndex = NUM_STEPS_PER_UNIT * y / (BOTTOM_BORDER - TOP_BORDER);
     stepIndex = MAX(MIN(stepIndex, NUM_STEPS_PER_UNIT - 1), 0);
-    stepValue = edit_mode_step::getStepValues()[stepIndex].getFloat();
+    data::StepValues stepValues;
+    edit_mode_step::getStepValues(stepValues);
+    stepValue = stepValues.values[MIN(stepIndex, stepValues.count - 1)].getFloat();
 }
 
 void onTouchMove() {

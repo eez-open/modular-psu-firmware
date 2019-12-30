@@ -1809,9 +1809,13 @@ void data_edit_steps(data::DataOperationEnum operation, data::Cursor &cursor, da
     if (operation == data::DATA_OPERATION_GET) {
         value = edit_mode_step::getStepIndex();
     } else if (operation == data::DATA_OPERATION_GET_VALUE_LIST) {
-        value = MakeValueListValue(edit_mode_step::getStepValues());
+        data::StepValues stepValues;
+        edit_mode_step::getStepValues(stepValues);
+        value = MakeValueListValue(stepValues.values);
     } else if (operation == data::DATA_OPERATION_COUNT) {
-        value = edit_mode_step::getStepValuesCount();
+        data::StepValues stepValues;
+        edit_mode_step::getStepValues(stepValues);
+        value = stepValues.count;
     } else if (operation == data::DATA_OPERATION_SET) {
         edit_mode_step::setStepIndex(value.getInt());
     }
@@ -4688,7 +4692,40 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
             recording.cursorOffset = MIN(dlog_view::VIEW_WIDTH - 1, MAX(touchDrag->x, 0));
         }
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE) {
-        value = Value((ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset) * recording.parameters.period, recording.parameters.xAxis.unit);
+        value = Value((dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period, recording.parameters.xAxis.unit);
+    } else if (operation == DATA_OPERATION_GET) {
+        value = Value((dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period, recording.parameters.xAxis.unit);
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = Value(recording.parameters.xAxis.range.min, recording.parameters.xAxis.unit);
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = Value(recording.parameters.xAxis.range.max, recording.parameters.xAxis.unit);
+    } else if (operation == DATA_OPERATION_GET_DEF) {
+        value = Value((recording.parameters.xAxis.range.min + recording.parameters.xAxis.range.max) / 2, recording.parameters.xAxis.unit);
+    } else if (operation == DATA_OPERATION_SET) {
+        float cursorOffset = value.getFloat() / recording.parameters.period - dlog_view::getPosition(recording);
+        if (cursorOffset < 0.0f) {
+            dlog_view::changeTimeOffset(recording, recording.timeOffset + cursorOffset * recording.parameters.period);
+            recording.cursorOffset = 0;
+        } else if (cursorOffset > dlog_view::VIEW_WIDTH - 1) {
+            dlog_view::changeTimeOffset(recording, recording.timeOffset + (cursorOffset - (dlog_view::VIEW_WIDTH - 1)) * recording.parameters.period);
+            recording.cursorOffset = dlog_view::VIEW_WIDTH - 1;
+        } else {
+            recording.cursorOffset = (uint32_t)roundf(cursorOffset);
+        }
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
+        value = Value(recording.parameters.xAxis.step, recording.parameters.xAxis.unit);
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        static const int COUNT = 5;
+        static data::Value values[COUNT];
+        values[0] = Value(recording.parameters.xAxis.step * 100, recording.parameters.xAxis.unit);
+        values[1] = Value(recording.parameters.xAxis.step * 50, recording.parameters.xAxis.unit);
+        values[2] = Value(recording.parameters.xAxis.step * 10, recording.parameters.xAxis.unit);
+        values[3] = Value(recording.parameters.xAxis.step * 5, recording.parameters.xAxis.unit);
+        values[4] = Value(recording.parameters.xAxis.step, recording.parameters.xAxis.unit);
+        data::StepValues *stepValues = (data::StepValues *)value.getVoidPointer();
+        stepValues->count = COUNT;
+        stepValues->values = values;
+        value = 1;
     }
 #endif
 }
@@ -4869,9 +4906,9 @@ void data_dlog_x_axis_offset(data::DataOperationEnum operation, data::Cursor &cu
             value = Value(recording.timeOffset, recording.parameters.xAxis.unit);
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(0.0f, recording.parameters.xAxis.unit);
+        value = Value(recording.parameters.xAxis.range.min, recording.parameters.xAxis.unit);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(dlog_view::getMaxTimeOffset(recording), recording.parameters.xAxis.unit);
+        value = Value(recording.parameters.xAxis.range.max - recording.pageSize * recording.parameters.period, recording.parameters.xAxis.unit);
     } else if (operation == data::DATA_OPERATION_SET) {
         dlog_view::changeTimeOffset(recording, value.getFloat());
     } else if (operation == data::DATA_OPERATION_GET_NAME) {

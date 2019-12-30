@@ -29,10 +29,8 @@ namespace edit_mode_step {
 
 int getStepIndex();
 
-int getStepValuesCount();
-const eez::gui::data::Value *getStepValues();
-
-const eez::gui::data::Value *getUnitStepValues(Unit unit);
+void getStepValues(eez::gui::data::StepValues &stepValues);
+void getUnitStepValues(Unit unit, eez::gui::data::StepValues &stepValues);
 
 void setStepIndex(int value);
 

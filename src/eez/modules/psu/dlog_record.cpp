@@ -415,14 +415,27 @@ int startImmediately() {
     }
 
     for (uint8_t yAxisIndex = 0; yAxisIndex < g_recording.parameters.numYAxes; yAxisIndex++) {
-        writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_UNIT, g_recording.parameters.yAxes[yAxisIndex].unit, yAxisIndex + 1);
-        writeFloatFieldWithIndex(dlog_view::FIELD_ID_Y_RANGE_MIN, g_recording.parameters.yAxes[yAxisIndex].range.min, yAxisIndex + 1);
-        writeFloatFieldWithIndex(dlog_view::FIELD_ID_Y_RANGE_MAX, g_recording.parameters.yAxes[yAxisIndex].range.max, yAxisIndex + 1);
-        writeStringFieldWithIndex(dlog_view::FIELD_ID_Y_LABEL, g_recording.parameters.yAxes[yAxisIndex].label, yAxisIndex + 1);
-        writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_CHANNEL_INDEX, g_recording.parameters.yAxes[yAxisIndex].channelIndex + 1, yAxisIndex + 1);
-        
-        if (g_recording.parameters.yAxes[yAxisIndex].channelIndex >= 0) {
-            writeChannelFields[g_recording.parameters.yAxes[yAxisIndex].channelIndex] = true;
+        if (g_recording.parameters.yAxis.unit == UNIT_UNKNOWN || g_recording.parameters.yAxes[yAxisIndex].unit != g_recording.parameters.yAxis.unit) {
+            writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_UNIT, g_recording.parameters.yAxes[yAxisIndex].unit, yAxisIndex + 1);
+        }
+
+        if (g_recording.parameters.yAxis.unit == UNIT_UNKNOWN || g_recording.parameters.yAxes[yAxisIndex].range.min != g_recording.parameters.yAxis.range.min) {
+            writeFloatFieldWithIndex(dlog_view::FIELD_ID_Y_RANGE_MIN, g_recording.parameters.yAxes[yAxisIndex].range.min, yAxisIndex + 1);
+        }
+
+        if (g_recording.parameters.yAxis.unit == UNIT_UNKNOWN || g_recording.parameters.yAxes[yAxisIndex].range.max != g_recording.parameters.yAxis.range.max) {
+            writeFloatFieldWithIndex(dlog_view::FIELD_ID_Y_RANGE_MAX, g_recording.parameters.yAxes[yAxisIndex].range.max, yAxisIndex + 1);
+        }
+
+        if (g_recording.parameters.yAxis.unit == UNIT_UNKNOWN || strcmp(g_recording.parameters.yAxes[yAxisIndex].label, g_recording.parameters.yAxis.label) != 0) {
+            writeStringFieldWithIndex(dlog_view::FIELD_ID_Y_LABEL, g_recording.parameters.yAxes[yAxisIndex].label, yAxisIndex + 1);
+        }
+
+        if (g_recording.parameters.yAxis.unit == UNIT_UNKNOWN || g_recording.parameters.yAxes[yAxisIndex].channelIndex >= 0) {
+            writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_CHANNEL_INDEX, g_recording.parameters.yAxes[yAxisIndex].channelIndex + 1, yAxisIndex + 1);
+            if (g_recording.parameters.yAxes[yAxisIndex].channelIndex >= 0) {
+                writeChannelFields[g_recording.parameters.yAxes[yAxisIndex].channelIndex] = true;
+            }
         }
     }
 

@@ -99,10 +99,6 @@ static const int DEFAULT_INDEX = 2;
 static bool g_changed;
 static int g_startPos;
 
-int getStepValuesCount() {
-    return NUM_STEPS_PER_UNIT;
-}
-
 int getUnitStepValuesIndex(Unit unit) {
     if (unit == UNIT_VOLT) {
         return 0;
@@ -130,8 +126,9 @@ int getUnitStepValuesIndex(Unit unit) {
     return 0;
 }
 
-const Value *getUnitStepValues(Unit unit) {
-    return CONF_GUI_UNIT_STEPS_LIST[getUnitStepValuesIndex(unit)];
+void getUnitStepValues(Unit unit, eez::gui::data::StepValues &stepValues) {
+    stepValues.count = NUM_STEPS_PER_UNIT;
+    stepValues.values = &CONF_GUI_UNIT_STEPS_LIST[getUnitStepValuesIndex(unit)][0];
 }
 
 int getStepIndex() {
@@ -151,12 +148,14 @@ void switchToNextStepIndex() {
     g_stepIndexes[getUnitStepValuesIndex(edit_mode::getUnit())][g_focusCursor.i] = 1 + ((getStepIndex() + 1) % NUM_STEPS_PER_UNIT);
 }
 
-const Value *getStepValues() {
-    return getUnitStepValues(edit_mode::getUnit());
+void getStepValues(eez::gui::data::StepValues &stepValues) {
+    return getUnitStepValues(edit_mode::getUnit(), stepValues);
 }
 
 float getStepValue() {
-    return getStepValues()[getStepIndex()].getFloat();
+    eez::gui::data::StepValues stepValues;
+    getStepValues(stepValues);
+    return stepValues.values[MIN(getStepIndex(), stepValues.count - 1)].getFloat();
 }
 
 void increment(int counter, bool playClick) {
@@ -226,8 +225,15 @@ void onTouchUp() {
 }
 
 Value getCurrentEncoderStepValue() {
-    auto stepValues = getUnitStepValues(getCurrentEncoderUnit());
-    return stepValues[mcu::encoder::ENCODER_MODE_STEP5 - mcu::encoder::g_encoderMode];
+    data::StepValues stepValues;
+    if (!data::getEncoderStepValues(g_focusCursor, g_focusDataId, stepValues)) {
+        getUnitStepValues(getCurrentEncoderUnit(), stepValues);
+    }
+    int stepValueIndex = mcu::encoder::ENCODER_MODE_STEP5 - mcu::encoder::g_encoderMode;
+    if (stepValueIndex >= stepValues.count) {
+        stepValueIndex = stepValues.count - 1;
+    }
+    return stepValues.values[stepValueIndex];
 }
 
 void showCurrentEncoderMode() {

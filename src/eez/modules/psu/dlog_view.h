@@ -215,7 +215,6 @@ int getVisibleDlogValueIndex(Recording &recording, int dlogValueIndex);
 DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex);
 
 uint32_t getPosition(Recording& recording);
-float getMaxTimeOffset(Recording& recording);
 void changeTimeOffset(Recording &recording, float timeOffset);
 void changeTimeDiv(Recording &recording, float timeDiv);
 float getDuration(Recording &recording);

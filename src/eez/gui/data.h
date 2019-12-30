@@ -328,6 +328,8 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_NAME,
     DATA_OPERATION_GET_UNIT,
     DATA_OPERATION_GET_IS_CHANNEL_DATA,
+    DATA_OPERATION_GET_ENCODER_STEP,
+    DATA_OPERATION_GET_ENCODER_STEP_VALUES,
     DATA_OPERATION_GET_VALUE_LIST,
     DATA_OPERATION_GET_FLOAT_LIST_LENGTH,
     DATA_OPERATION_GET_FLOAT_LIST,
@@ -392,6 +394,13 @@ Value getLimit(const Cursor &cursor, uint16_t id);
 const char *getName(const Cursor &cursor, uint16_t id);
 Unit getUnit(const Cursor &cursor, uint16_t id);
 bool isChannelData(const Cursor &cursor, uint16_t id);
+
+Value getEncoderStep(const Cursor &cursor, uint16_t id);
+struct StepValues {
+    int count;
+    const eez::gui::data::Value *values;
+};
+bool getEncoderStepValues(const Cursor &cursor, uint16_t id, StepValues &stepValues);
 
 void getList(const Cursor &cursor, uint16_t id, const Value **labels, int &count);
 
