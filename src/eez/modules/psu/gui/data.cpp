@@ -4700,11 +4700,11 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
     } else if (operation == DATA_OPERATION_GET) {
         value = Value((dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = Value(recording.parameters.xAxis.range.min, dlog_view::getXAxisUnit(recording));
+        value = Value(0.0f, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = Value(recording.parameters.xAxis.range.max, dlog_view::getXAxisUnit(recording));
+        value = Value(recording.parameters.xAxis.range.max - recording.parameters.xAxis.range.min, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_DEF) {
-        value = Value((recording.parameters.xAxis.range.min + recording.parameters.xAxis.range.max) / 2, dlog_view::getXAxisUnit(recording));
+        value = Value((recording.parameters.xAxis.range.max - recording.parameters.xAxis.range.min) / 2, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_SET) {
         float cursorOffset = value.getFloat() / recording.parameters.period - dlog_view::getPosition(recording);
         if (cursorOffset < 0.0f) {
