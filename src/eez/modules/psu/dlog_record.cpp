@@ -45,6 +45,7 @@ namespace dlog_record {
 
 dlog_view::Parameters g_parameters = {
     { 0 },
+    { 0 },
     { },
     { },
     dlog_view::SCALE_LINEAR,
@@ -59,6 +60,7 @@ dlog_view::Parameters g_parameters = {
 };
 
 dlog_view::Parameters g_guiParameters = {
+    { 0 },
     { 0 },
     { },
     { },
@@ -413,6 +415,8 @@ int startImmediately() {
     writeUint32(0);
 
     // meta fields
+    writeStringField(dlog_view::FIELD_ID_COMMENT, g_recording.parameters.comment);
+
     writeUint8Field(dlog_view::FIELD_ID_X_UNIT, g_recording.parameters.xAxis.unit);
     writeFloatField(dlog_view::FIELD_ID_X_STEP, g_recording.parameters.xAxis.step);
     writeUint8Field(dlog_view::FIELD_ID_X_SCALE, g_recording.parameters.xAxis.scale);

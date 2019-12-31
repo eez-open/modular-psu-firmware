@@ -621,7 +621,16 @@ void openFile(const char *filePath) {
 
                         uint16_t fieldDataLength = fieldLength - sizeof(uint16_t) - sizeof(uint8_t);
 
-                        if (fieldId == FIELD_ID_X_UNIT) {
+                        if (fieldId == FIELD_ID_COMMENT) {
+                            if (fieldDataLength > MAX_COMMENT_LENGTH) {
+                                invalidHeader = true;
+                                break;
+                            }
+                            for (int i = 0; i < fieldDataLength; i++) {
+                                g_recording.parameters.comment[i] = readUint8(buffer, offset);
+                            }
+                            g_recording.parameters.comment[MAX_COMMENT_LENGTH] = 0;
+                        } else if (fieldId == FIELD_ID_X_UNIT) {
                             g_recording.parameters.xAxis.unit = (Unit)readUint8(buffer, offset);
                         } else if (fieldId == FIELD_ID_X_STEP) {
                             g_recording.parameters.xAxis.step = readFloat(buffer, offset);
@@ -639,6 +648,7 @@ void openFile(const char *filePath) {
                             for (int i = 0; i < fieldDataLength; i++) {
                                 g_recording.parameters.xAxis.label[i] = readUint8(buffer, offset);
                             }
+                            g_recording.parameters.xAxis.label[MAX_LABEL_LENGTH] = 0;
                         } else if (fieldId >= FIELD_ID_Y_UNIT && fieldId <= FIELD_ID_Y_CHANNEL_INDEX) {
                             int8_t yAxisIndex = (int8_t)readUint8(buffer, offset);
                             if (yAxisIndex > MAX_NUM_OF_Y_AXES) {
@@ -670,6 +680,7 @@ void openFile(const char *filePath) {
                                 for (int i = 0; i < fieldDataLength; i++) {
                                     destYAxis.label[i] = readUint8(buffer, offset);
                                 }
+                                destYAxis.label[MAX_LABEL_LENGTH] = 0;
                             } else if (fieldId == FIELD_ID_Y_CHANNEL_INDEX) {
                                 destYAxis.channelIndex = (int16_t)(readUint8(buffer, offset)) - 1;
                             } else {

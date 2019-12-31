@@ -178,15 +178,9 @@ scpi_result_t scpi_cmd_outputStateTriggeredQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_choice_def_t dprogStateChoice[] = {
-    { "ON", DPROG_STATE_ON },
-    { "OFF", DPROG_STATE_OFF },
-    SCPI_CHOICE_LIST_END /* termination of option list */
-};
-
 scpi_result_t scpi_cmd_outputDprog(scpi_t *context) {
-    int32_t dprogState;
-    if (!SCPI_ParamChoice(context, dprogStateChoice, &dprogState, true)) {
+    bool enable;
+    if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
     }
 
@@ -196,7 +190,7 @@ scpi_result_t scpi_cmd_outputDprog(scpi_t *context) {
     }
 
     if (channel->params.features & CH_FEATURE_DPROG) {
-        channel->setDprogState((DprogState)dprogState);
+        channel->setDprogState((DprogState)enable);
     } else {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
@@ -212,7 +206,7 @@ scpi_result_t scpi_cmd_outputDprogQ(scpi_t *context) {
     }
 
     if (channel->params.features & CH_FEATURE_DPROG) {
-        resultChoiceName(context, dprogStateChoice, channel->getDprogState());
+        SCPI_ResultBool(context, channel->getDprogState());
     } else {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;

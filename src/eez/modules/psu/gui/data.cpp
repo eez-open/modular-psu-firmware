@@ -4696,7 +4696,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         if (recording.parameters.xAxis.scale == dlog_view::SCALE_LOGARITHMIC) {
             xValue = powf(10, recording.parameters.xAxis.range.min + xValue);
         }
-        value = Value(xValue, recording.parameters.xAxis.unit);
+        value = Value(roundPrec(xValue, 0.001f), recording.parameters.xAxis.unit);
     } else if (operation == DATA_OPERATION_GET) {
         value = Value((dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_MIN) {

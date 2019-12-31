@@ -316,8 +316,8 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
     input(g_scpiContext, "\r\n", 2);
 
     if (g_lastError != 0) {
-        static char g_scpiError[32];
-        snprintf(g_scpiError, 32, "SCPI error %d", g_lastError);
+        static char g_scpiError[48];
+        snprintf(g_scpiError, 48, "SCPI error %d, \"%s\"", g_lastError, SCPI_ErrorTranslate(g_lastError));
         mp_raise_ValueError(g_scpiError);
     }
 

@@ -308,6 +308,45 @@ scpi_result_t scpi_cmd_senseDlogTimeQ(scpi_t *context) {
 #endif
 }
 
+scpi_result_t scpi_cmd_senseDlogTraceComment(scpi_t *context) {
+#if OPTION_SD_CARD
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    const char *comment;
+    size_t len;
+    if (!SCPI_ParamCharacters(context, &comment, &len, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (len > dlog_view::MAX_COMMENT_LENGTH) {
+        SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+        return SCPI_RES_ERR;
+    }
+
+    strncpy(dlog_record::g_parameters.comment, comment, len);
+    dlog_record::g_parameters.comment[len] = 0;
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+scpi_result_t scpi_cmd_senseDlogTraceCommentQ(scpi_t *context) {
+#if OPTION_SD_CARD
+    SCPI_ResultText(context, dlog_record::g_parameters.comment);
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+
 scpi_choice_def_t unitChoice[] = {
     { "UNKNown", UNIT_UNKNOWN },
     { "VOLT", UNIT_VOLT },

@@ -36,11 +36,14 @@ def start(deviceName, Uds_max, Id_max):
         scpi("OUTP 0")
         scpi("VOLT 0")
         scpi("CURR " + str(Ig))
+        scpi("OUTP:DPR 1")
 
         scpi("INST ch2")
         scpi("OUTP 0")
         scpi("VOLT 0")
         scpi("CURR " + str(Id_max))
+
+        scpi('SENS:DLOG:TRAC:COMMent "Device name = ' + deviceName + '; Uds,max = ' + str(Uds_max) + '; Id,max = ' + str(Id_max) + '"')
 
         scpi("SENS:DLOG:TRAC:X:UNIT VOLT")
         scpi("SENS:DLOG:TRAC:X:RANG:MIN " + str(Uds_logMin))
@@ -78,8 +81,6 @@ def start(deviceName, Uds_max, Id_max):
         for uds_step_counter in range(NUM_U_DS_STEPS):
             Uds = math.pow(10, Uds_logMin + uds_step_counter * Uds_step)
 
-            print(Uds)
-
             setU(2, Uds)
             
             for ugs_step_counter in range(num_ugs_steps):
@@ -116,6 +117,6 @@ if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
         if Uds_max != None:
             Id_max = scpi('DISP:INPUT? "Id,max", NUMBER, AMPER, 0.001, 5.0, 2.0')
             if Id_max != None:
-                start(deviceName, float(Uds_max), float(Id_max))
+                start(deviceName, Uds_max, Id_max)
 else:
     scpi('DISP:INPUT? "Requires DCP405 or DCP405B on Ch1 and Ch2", MENU, BUTTON, "Close"')

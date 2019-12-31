@@ -33,6 +33,8 @@ if diodeName != None:
             scpi("VOLT 0")
             scpi("CURR " + str(I_SET))
 
+            scpi('SENS:DLOG:TRAC:COMMent "Diode name = ' + diodeName + '; U step = ' + str(uStep) + '"')
+
             scpi("SENS:DLOG:TRAC:X:UNIT VOLT")
             scpi("SENS:DLOG:TRAC:X:STEP " + str(uStep))
             scpi("SENS:DLOG:TRAC:X:RANG:MAX " + str(uMax))

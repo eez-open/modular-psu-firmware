@@ -71,6 +71,8 @@ static const int NUM_VERT_DIVISIONS = 6;
 
 static const int MAX_NUM_OF_Y_AXES = CH_MAX * 3;
 
+static const int MAX_COMMENT_LENGTH = 128;
+
 enum State {
     STATE_STARTING,
     STATE_LOADING,
@@ -79,6 +81,8 @@ enum State {
 };
 
 enum Fields {
+    FIELD_ID_COMMENT = 1,
+
     FIELD_ID_X_UNIT = 10,
     FIELD_ID_X_STEP = 11,
     FIELD_ID_X_RANGE_MIN = 12,
@@ -147,6 +151,7 @@ struct YAxis {
 
 struct Parameters {
     char filePath[MAX_PATH_LENGTH + 1];
+    char comment[MAX_COMMENT_LENGTH + 1];
 
     XAxis xAxis;
 
