@@ -62,6 +62,7 @@ static SDL_Window *g_mainWindow;
 static SDL_Renderer *g_renderer;
 
 static uint32_t *g_buffer;
+static uint32_t *g_lastBuffer;
 
 static bool g_takeScreenshot;
 static int g_screenshotY;
@@ -235,6 +236,8 @@ void updateBrightness() {
 }
 
 void updateScreen(uint32_t *buffer) {
+    g_lastBuffer = buffer;
+
     if (!isOn()) {
         return;
     }
@@ -282,7 +285,7 @@ void animate() {
 }
 
 void doTakeScreenshot() {
-    uint8_t *src = (uint8_t *)(g_buffer + g_psuAppContext.y * DISPLAY_WIDTH + g_psuAppContext.x);
+    uint8_t *src = (uint8_t *)(g_lastBuffer + g_psuAppContext.y * DISPLAY_WIDTH + g_psuAppContext.x);
     uint8_t *dst = SCREENSHOOT_BUFFER_START_ADDRESS;
 
     int srcAdvance = (DISPLAY_WIDTH - 480) * 4;

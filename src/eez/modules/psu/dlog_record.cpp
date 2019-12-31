@@ -47,6 +47,7 @@ dlog_view::Parameters g_parameters = {
     { 0 },
     { },
     { },
+    dlog_view::SCALE_LINEAR,
     0,
     {{}, {}, {}, {}, {}, {}},
     {false, false, false, false, false, false},
@@ -61,6 +62,7 @@ dlog_view::Parameters g_guiParameters = {
     { 0 },
     { },
     { },
+    dlog_view::SCALE_LINEAR,
     0,
     {{}, {}, {}, {}, {}, {}},
     {true, false, false, false, false, false},
@@ -263,9 +265,19 @@ int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePa
             return SCPI_ERROR_EXECUTION_ERROR;
         }
 
+        if (parameters.xAxis.range.min >= parameters.xAxis.range.max) {
+            return SCPI_ERROR_DATA_OUT_OF_RANGE;
+        }
+
         if (parameters.numYAxes == 0) {
             // TODO replace with more specific error
             return SCPI_ERROR_EXECUTION_ERROR;
+        }
+
+        for (int i = 0; i < parameters.numYAxes; i++) {
+            if (parameters.yAxes[i].range.min >= parameters.yAxes[i].range.max) {
+                return SCPI_ERROR_DATA_OUT_OF_RANGE;
+            }
         }
     } else {
         bool somethingToLog = false;
@@ -339,6 +351,12 @@ int initiateTrace() {
 
 float getValue(int rowIndex, int columnIndex, float *max) {
     float value = *(float *)(DLOG_RECORD_BUFFER + (g_recording.dataOffset + (rowIndex * g_recording.parameters.numYAxes + columnIndex) * 4) % DLOG_RECORD_BUFFER_SIZE);
+
+    if (g_recording.parameters.yAxisScale == dlog_view::SCALE_LOGARITHMIC) {
+        float logOffset = 1 - g_recording.parameters.yAxes[columnIndex].range.min;
+        value = log10f(logOffset + value);
+    }
+
     *max = value;
     return value;
 }
@@ -375,8 +393,8 @@ int startImmediately() {
     g_recording.size = 0;
     g_recording.pageSize = 480;
 
-    g_recording.timeOffset = 0.0f;
-    g_recording.timeDiv = g_recording.pageSize * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
+    g_recording.xAxisOffset = 0.0f;
+    g_recording.xAxisDiv = g_recording.pageSize * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
 
     if (!g_traceInitiated) {
         dlog_view::initAxis(g_recording);
@@ -397,6 +415,7 @@ int startImmediately() {
     // meta fields
     writeUint8Field(dlog_view::FIELD_ID_X_UNIT, g_recording.parameters.xAxis.unit);
     writeFloatField(dlog_view::FIELD_ID_X_STEP, g_recording.parameters.xAxis.step);
+    writeUint8Field(dlog_view::FIELD_ID_X_SCALE, g_recording.parameters.xAxis.scale);
     writeFloatField(dlog_view::FIELD_ID_X_RANGE_MIN, g_recording.parameters.xAxis.range.min);
     writeFloatField(dlog_view::FIELD_ID_X_RANGE_MAX, g_recording.parameters.xAxis.range.max);
     writeStringField(dlog_view::FIELD_ID_X_LABEL, g_recording.parameters.xAxis.label);
@@ -438,6 +457,8 @@ int startImmediately() {
             }
         }
     }
+
+    writeUint8Field(dlog_view::FIELD_ID_Y_SCALE, g_recording.parameters.yAxisScale);
 
     for (uint8_t channelIndex = 0; channelIndex < CH_MAX; channelIndex++) {
         if (writeChannelFields[channelIndex]) {
@@ -485,21 +506,11 @@ void toggle() {
 }
 
 void resetParameters() {
-    memset(&g_parameters.xAxis, 0, sizeof(dlog_view::XAxis));
-    memset(&g_parameters.yAxis, 0, sizeof(dlog_view::YAxis));
-    g_parameters.numYAxes = 0;
-    memset(&g_parameters.yAxes[0], 0, dlog_view::MAX_NUM_OF_Y_AXES * sizeof(dlog_view::YAxis));
-
-    for (int i = 0; i < CH_NUM; ++i) {
-        g_parameters.logVoltage[i] = 0;
-        g_parameters.logCurrent[i] = 0;
-        g_parameters.logPower[i] = 0;
-    }
+    memset(&g_parameters, 0, sizeof(g_parameters));
 
     g_parameters.period = PERIOD_DEFAULT;
     g_parameters.time = TIME_DEFAULT;
     g_parameters.triggerSource = trigger::SOURCE_IMMEDIATE;
-    g_parameters.filePath[0] = 0;
 }
 
 void finishLogging(bool flush) {

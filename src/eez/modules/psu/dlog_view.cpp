@@ -266,7 +266,7 @@ float getValue(int rowIndex, int columnIndex, float *max) {
         g_isLoading = true;
         g_interruptLoading = false;
         g_blockIndexToLoad = blockIndex;
-        g_loadScale = g_recording.timeDiv / g_recording.timeDivMin;
+        g_loadScale = g_recording.xAxisDiv / g_recording.xAxisDivMin;
 
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_LOAD_BLOCK, 0), osWaitForever);
     }
@@ -274,25 +274,40 @@ float getValue(int rowIndex, int columnIndex, float *max) {
     uint32_t blockElementIndex = (blockElementAddress % BLOCK_SIZE) / sizeof(BlockElement);
 
     BlockElement *blockElement = blockElements + blockElementIndex;
+
+    if (g_recording.parameters.yAxisScale == SCALE_LOGARITHMIC) {
+        float logOffset = 1 - g_recording.parameters.yAxes[columnIndex].range.min;
+        *max = log10f(logOffset + blockElement->max);
+        return log10f(logOffset + blockElement->min);
+    }
+
     *max = blockElement->max;
     return blockElement->min;
 }
 
-void adjustTimeOffset(Recording &recording) {
+void adjustXAxisOffset(Recording &recording) {
     auto duration = getDuration(recording);
-    if (recording.timeOffset + recording.pageSize * recording.parameters.period > duration) {
-        recording.timeOffset = duration - recording.pageSize * recording.parameters.period;
+    if (recording.xAxisOffset + recording.pageSize * recording.parameters.period > duration) {
+        recording.xAxisOffset = duration - recording.pageSize * recording.parameters.period;
     }
-    if (recording.timeOffset < 0) {
-        recording.timeOffset = 0;
+    if (recording.xAxisOffset < 0) {
+        recording.xAxisOffset = 0;
     }
+}
+
+Unit getXAxisUnit(Recording& recording) {
+    return recording.parameters.xAxis.scale == SCALE_LINEAR ? recording.parameters.xAxis.unit : UNIT_UNKNOWN;
+}
+
+Unit getYAxisUnit(Recording& recording, int dlogValueIndex) {
+    return recording.parameters.yAxisScale == SCALE_LINEAR ? recording.parameters.yAxes[dlogValueIndex].unit : UNIT_UNKNOWN;
 }
 
 uint32_t getPosition(Recording& recording) {
     if (&recording == &dlog_record::g_recording) {
         return recording.size > recording.pageSize ? recording.size - recording.pageSize : 0;
     } else {
-        float position = recording.timeOffset / recording.parameters.period;
+        float position = recording.xAxisOffset / recording.parameters.period;
         if (position < 0) {
             return 0;
         } else if (position > recording.size - recording.pageSize) {
@@ -303,33 +318,31 @@ uint32_t getPosition(Recording& recording) {
     }
 }
 
-void changeTimeOffset(Recording &recording, float timeOffset) {
+void changeXAxisOffset(Recording &recording, float xAxisOffset) {
     if (&dlog_view::g_recording == &recording) {
-        float newTimeOffset = timeOffset;
-        if (newTimeOffset != recording.timeOffset) {
-            recording.timeOffset = newTimeOffset;
-            adjustTimeOffset(recording);
+        float newXAxisOffset = xAxisOffset;
+        if (newXAxisOffset != recording.xAxisOffset) {
+            recording.xAxisOffset = newXAxisOffset;
+            adjustXAxisOffset(recording);
         }
     } else {
-        recording.timeOffset = timeOffset;
+        recording.xAxisOffset = xAxisOffset;
     }
 }
 
-void changeTimeDiv(Recording &recording, float timeDiv) {
-    float newTimeDiv = timeDiv != recording.timeDivMin ? timeDiv : timeDiv;
+void changeXAxisDiv(Recording &recording, float xAxisDiv) {
+    if (recording.xAxisDiv != xAxisDiv) {
+        recording.xAxisDiv = xAxisDiv;
 
-    if (recording.timeDiv != newTimeDiv) {
-        recording.timeDiv = newTimeDiv;
-
-        if (recording.timeDiv == recording.timeDivMin) {
+        if (recording.xAxisDiv == recording.xAxisDivMin) {
             recording.parameters.period = recording.parameters.xAxis.step;
             recording.size = recording.numSamples;
         } else {
-            recording.parameters.period = recording.parameters.xAxis.step * recording.timeDiv / recording.timeDivMin;
-            recording.size = (uint32_t)round(recording.numSamples * recording.timeDivMin / recording.timeDiv);
+            recording.parameters.period = recording.parameters.xAxis.step * recording.xAxisDiv / recording.xAxisDivMin;
+            recording.size = (uint32_t)round(recording.numSamples * recording.xAxisDivMin / recording.xAxisDiv);
         }
         
-        adjustTimeOffset(recording);
+        adjustXAxisOffset(recording);
 
         invalidateAllBlocks();
     }
@@ -353,7 +366,6 @@ void getLabel(Recording& recording, int valueIndex, char *text, int count) {
         snprintf(text, count - 1, "%c%d", labels[dlogValueType % 3], dlogValueType / 3 + 1);
     }
 }
-
 
 void initAxis(Recording &recording) {
     recording.parameters.xAxis.unit = UNIT_SECOND;
@@ -407,28 +419,29 @@ void initDlogValues(Recording &recording) {
             channelIndex = 0;
         }
 
+        recording.dlogValues[yAxisIndex].isVisible = true;
+
         if (recording.parameters.yAxes[yAxisIndex].unit == UNIT_VOLT) {
-            recording.dlogValues[yAxisIndex].isVisible = true;
             recording.dlogValues[yAxisIndex].dlogValueType = (dlog_view::DlogValueType)(3 * channelIndex + dlog_view::DLOG_VALUE_CH1_U);
-            recording.dlogValues[yAxisIndex].channelIndex = channelIndex;
-            float div = recording.parameters.yAxes[yAxisIndex].range.max / dlog_view::NUM_VERT_DIVISIONS;
-            recording.dlogValues[yAxisIndex].div = div;
-            recording.dlogValues[yAxisIndex].offset = -div * dlog_view::NUM_VERT_DIVISIONS / 2;
         } else if (recording.parameters.yAxes[yAxisIndex].unit == UNIT_AMPER) {
-            recording.dlogValues[yAxisIndex].isVisible = true;
             recording.dlogValues[yAxisIndex].dlogValueType = (dlog_view::DlogValueType)(3 * channelIndex + dlog_view::DLOG_VALUE_CH1_I);
-            recording.dlogValues[yAxisIndex].channelIndex = channelIndex;
-            float div = recording.parameters.yAxes[yAxisIndex].range.max / dlog_view::NUM_VERT_DIVISIONS;
-            recording.dlogValues[yAxisIndex].div = div;
-            recording.dlogValues[yAxisIndex].offset = -div * dlog_view::NUM_VERT_DIVISIONS / 2;
         } else if (recording.parameters.yAxes[yAxisIndex].unit == UNIT_WATT) {
-            recording.dlogValues[yAxisIndex].isVisible = true;
             recording.dlogValues[yAxisIndex].dlogValueType = (dlog_view::DlogValueType)(3 * channelIndex + dlog_view::DLOG_VALUE_CH1_P);
-            recording.dlogValues[yAxisIndex].channelIndex = channelIndex;
-            float div = recording.parameters.yAxes[yAxisIndex].range.max / dlog_view::NUM_VERT_DIVISIONS;
-            recording.dlogValues[yAxisIndex].div = div;
-            recording.dlogValues[yAxisIndex].offset = -div * dlog_view::NUM_VERT_DIVISIONS / 2;
         }
+
+        float rangeMin = recording.parameters.yAxes[yAxisIndex].range.min;
+        float rangeMax = recording.parameters.yAxes[yAxisIndex].range.max;
+
+        if (recording.parameters.yAxisScale == SCALE_LOGARITHMIC) {
+            float logOffset = 1 - rangeMin;
+            rangeMin = 0;
+            rangeMax = log10f(logOffset + rangeMax);
+        }
+
+        recording.dlogValues[yAxisIndex].channelIndex = channelIndex;
+        float div = (rangeMax - rangeMin) / dlog_view::NUM_VERT_DIVISIONS;
+        recording.dlogValues[yAxisIndex].div = div;
+        recording.dlogValues[yAxisIndex].offset = -div * dlog_view::NUM_VERT_DIVISIONS / 2;
     }
 
     for (; yAxisIndex < MAX_NUM_OF_Y_VALUES; yAxisIndex++) {
@@ -489,7 +502,17 @@ void autoScale(Recording &recording) {
         int dlogValueIndex = getDlogValueIndex(recording, visibleDlogValueIndex);
         DlogValueParams &dlogValueParams = recording.dlogValues[dlogValueIndex];
         float numDivisions = 1.0f * NUM_VERT_DIVISIONS / numVisibleDlogValues;
-        dlogValueParams.div = recording.parameters.yAxes[dlogValueIndex].range.max / numDivisions;
+
+        float rangeMin = recording.parameters.yAxes[dlogValueIndex].range.min;
+        float rangeMax = recording.parameters.yAxes[dlogValueIndex].range.max;
+
+        if (recording.parameters.yAxisScale == SCALE_LOGARITHMIC) {
+            float logOffset = 1 - rangeMin;
+            rangeMin = 0;
+            rangeMax = log10f(logOffset + rangeMax);
+        }
+
+        dlogValueParams.div = (rangeMax - rangeMin) / numDivisions;
         dlogValueParams.offset = dlogValueParams.div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions);
     }
 }
@@ -602,6 +625,8 @@ void openFile(const char *filePath) {
                             g_recording.parameters.xAxis.unit = (Unit)readUint8(buffer, offset);
                         } else if (fieldId == FIELD_ID_X_STEP) {
                             g_recording.parameters.xAxis.step = readFloat(buffer, offset);
+                        } else if (fieldId == FIELD_ID_X_SCALE) {
+                            g_recording.parameters.xAxis.scale = (Scale)readUint8(buffer, offset);
                         } else if (fieldId == FIELD_ID_X_RANGE_MIN) {
                             g_recording.parameters.xAxis.range.min = readFloat(buffer, offset);
                         } else if (fieldId == FIELD_ID_X_RANGE_MAX) {
@@ -651,6 +676,8 @@ void openFile(const char *filePath) {
                                 // unknown field, skip
                                 offset += fieldDataLength;
                             }
+                        } else if (fieldId == FIELD_ID_Y_SCALE) {
+                            g_recording.parameters.yAxisScale = (Scale)readUint8(buffer, offset);
                         } else if (fieldId == FIELD_ID_CHANNEL_MODULE_TYPE) {
                             readUint8(buffer, offset); // channel index
                             readUint16(buffer, offset); // module type
@@ -664,7 +691,7 @@ void openFile(const char *filePath) {
                     }
 
 					g_recording.parameters.period = g_recording.parameters.xAxis.step;
-					g_recording.parameters.time = g_recording.parameters.xAxis.range.max;
+					g_recording.parameters.time = g_recording.parameters.xAxis.range.max - g_recording.parameters.xAxis.range.min;
                 }
 
                 if (!invalidHeader) {
@@ -673,13 +700,13 @@ void openFile(const char *filePath) {
                     g_recording.pageSize = VIEW_WIDTH;
 
                     g_recording.numSamples = (file.size() - g_recording.dataOffset) / (g_recording.parameters.numYAxes * sizeof(float));
-                    g_recording.timeDivMin = g_recording.pageSize * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
-                    g_recording.timeDivMax = MAX(g_recording.numSamples, g_recording.pageSize) * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
+                    g_recording.xAxisDivMin = g_recording.pageSize * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
+                    g_recording.xAxisDivMax = MAX(g_recording.numSamples, g_recording.pageSize) * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
 
                     g_recording.size = g_recording.numSamples;
 
-                    g_recording.timeOffset = 0.0f;
-                    g_recording.timeDiv = g_recording.timeDivMin;
+                    g_recording.xAxisOffset = 0.0f;
+                    g_recording.xAxisDiv = g_recording.xAxisDivMin;
 
                     g_recording.cursorOffset = VIEW_WIDTH / 2;
 

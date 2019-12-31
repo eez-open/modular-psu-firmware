@@ -84,12 +84,14 @@ enum Fields {
     FIELD_ID_X_RANGE_MIN = 12,
     FIELD_ID_X_RANGE_MAX = 13,
     FIELD_ID_X_LABEL = 14,
+    FIELD_ID_X_SCALE = 15, // 0 - linear, 1 - logarithmic
 
     FIELD_ID_Y_UNIT = 30,
     FIELD_ID_Y_RANGE_MIN = 32,
     FIELD_ID_Y_RANGE_MAX = 33,
     FIELD_ID_Y_LABEL = 34,
     FIELD_ID_Y_CHANNEL_INDEX = 35,
+    FIELD_ID_Y_SCALE = 36,
 
     FIELD_ID_CHANNEL_MODULE_TYPE = 50,
     FIELD_ID_CHANNEL_MODULE_REVISION = 51
@@ -123,9 +125,15 @@ struct Range {
 
 static const int MAX_LABEL_LENGTH = 32;
 
+enum Scale {
+    SCALE_LINEAR,
+    SCALE_LOGARITHMIC
+};
+
 struct XAxis {
     Unit unit;
     float step;
+    Scale scale;
     Range range;
     char label[MAX_LABEL_LENGTH + 1];
 };
@@ -143,6 +151,7 @@ struct Parameters {
     XAxis xAxis;
 
     YAxis yAxis;
+    Scale yAxisScale;
 
     uint8_t numYAxes;
     YAxis yAxes[MAX_NUM_OF_Y_AXES];
@@ -171,8 +180,8 @@ struct Recording {
     uint32_t size;
     uint32_t pageSize;
 
-    float timeOffset;
-    float timeDiv;
+    float xAxisOffset;
+    float xAxisDiv;
 
     uint32_t cursorOffset;
 
@@ -181,8 +190,8 @@ struct Recording {
     uint32_t refreshCounter;
 
     uint32_t numSamples;
-    float timeDivMin;
-    float timeDivMax;
+    float xAxisDivMin;
+    float xAxisDivMax;
 
     uint32_t dataOffset;
 
@@ -214,9 +223,12 @@ int getDlogValueIndex(Recording &recording, int visibleDlogValueIndex);
 int getVisibleDlogValueIndex(Recording &recording, int dlogValueIndex);
 DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex);
 
+Unit getXAxisUnit(Recording& recording);
+Unit getYAxisUnit(Recording& recording, int dlogValueIndex);
+
 uint32_t getPosition(Recording& recording);
-void changeTimeOffset(Recording &recording, float timeOffset);
-void changeTimeDiv(Recording &recording, float timeDiv);
+void changeXAxisOffset(Recording &recording, float xAxisOffset);
+void changeXAxisDiv(Recording &recording, float xAxisDiv);
 float getDuration(Recording &recording);
 void getLabel(Recording& recording, int valueIndex, char *text, int count);
 

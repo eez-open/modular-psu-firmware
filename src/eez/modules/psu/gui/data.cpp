@@ -4592,7 +4592,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
                 newPosition = recording.size - recording.pageSize;
             }
         }
-        dlog_view::changeTimeOffset(recording, newPosition * recording.parameters.period);
+        dlog_view::changeXAxisOffset(recording, newPosition * recording.parameters.period);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
         value = Value(recording.pageSize, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
@@ -4674,7 +4674,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
             }
         } else if (g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV) {
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
-                valueAtTouchDown = recording.timeDiv;
+                valueAtTouchDown = recording.xAxisDiv;
                 xAtTouchDown = touchDrag->x;
             } else {
                 float scale = 1.0f * (dlog_view::VIEW_WIDTH - touchDrag->x) / (dlog_view::VIEW_WIDTH - xAtTouchDown);
@@ -4686,42 +4686,46 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
 
                 newDiv = clamp(newDiv, min, max);
 
-                dlog_view::changeTimeDiv(recording, newDiv);
+                dlog_view::changeXAxisDiv(recording, newDiv);
             }
         } else {
             recording.cursorOffset = MIN(dlog_view::VIEW_WIDTH - 1, MAX(touchDrag->x, 0));
         }
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE) {
-        value = Value((dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period, recording.parameters.xAxis.unit);
+        float xValue = (dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period;
+        if (recording.parameters.xAxis.scale == dlog_view::SCALE_LOGARITHMIC) {
+            xValue = powf(10, recording.parameters.xAxis.range.min + xValue);
+        }
+        value = Value(xValue, recording.parameters.xAxis.unit);
     } else if (operation == DATA_OPERATION_GET) {
-        value = Value((dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period, recording.parameters.xAxis.unit);
+        value = Value((dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = Value(recording.parameters.xAxis.range.min, recording.parameters.xAxis.unit);
+        value = Value(recording.parameters.xAxis.range.min, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = Value(recording.parameters.xAxis.range.max, recording.parameters.xAxis.unit);
+        value = Value(recording.parameters.xAxis.range.max, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_DEF) {
-        value = Value((recording.parameters.xAxis.range.min + recording.parameters.xAxis.range.max) / 2, recording.parameters.xAxis.unit);
+        value = Value((recording.parameters.xAxis.range.min + recording.parameters.xAxis.range.max) / 2, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_SET) {
         float cursorOffset = value.getFloat() / recording.parameters.period - dlog_view::getPosition(recording);
         if (cursorOffset < 0.0f) {
-            dlog_view::changeTimeOffset(recording, recording.timeOffset + cursorOffset * recording.parameters.period);
+            dlog_view::changeXAxisOffset(recording, recording.xAxisOffset + cursorOffset * recording.parameters.period);
             recording.cursorOffset = 0;
         } else if (cursorOffset > dlog_view::VIEW_WIDTH - 1) {
-            dlog_view::changeTimeOffset(recording, recording.timeOffset + (cursorOffset - (dlog_view::VIEW_WIDTH - 1)) * recording.parameters.period);
+            dlog_view::changeXAxisOffset(recording, recording.xAxisOffset + (cursorOffset - (dlog_view::VIEW_WIDTH - 1)) * recording.parameters.period);
             recording.cursorOffset = dlog_view::VIEW_WIDTH - 1;
         } else {
             recording.cursorOffset = (uint32_t)roundf(cursorOffset);
         }
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        value = Value(recording.parameters.xAxis.step, recording.parameters.xAxis.unit);
+        value = Value(recording.parameters.xAxis.step, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static const int COUNT = 5;
         static data::Value values[COUNT];
-        values[0] = Value(recording.parameters.xAxis.step * 100, recording.parameters.xAxis.unit);
-        values[1] = Value(recording.parameters.xAxis.step * 50, recording.parameters.xAxis.unit);
-        values[2] = Value(recording.parameters.xAxis.step * 10, recording.parameters.xAxis.unit);
-        values[3] = Value(recording.parameters.xAxis.step * 5, recording.parameters.xAxis.unit);
-        values[4] = Value(recording.parameters.xAxis.step, recording.parameters.xAxis.unit);
+        values[0] = Value(recording.parameters.xAxis.step * 100, dlog_view::getXAxisUnit(recording));
+        values[1] = Value(recording.parameters.xAxis.step * 50, dlog_view::getXAxisUnit(recording));
+        values[2] = Value(recording.parameters.xAxis.step * 10, dlog_view::getXAxisUnit(recording));
+        values[3] = Value(recording.parameters.xAxis.step * 5, dlog_view::getXAxisUnit(recording));
+        values[4] = Value(recording.parameters.xAxis.step, dlog_view::getXAxisUnit(recording));
         data::StepValues *stepValues = (data::StepValues *)value.getVoidPointer();
         stepValues->count = COUNT;
         stepValues->values = values;
@@ -4833,26 +4837,26 @@ void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].div), recording.parameters.yAxes[dlogValueIndex].unit);
+            value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].div), getYAxisUnit(recording, dlogValueIndex));
         }
     } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = Value(recording.dlogValues[dlogValueIndex].div, recording.parameters.yAxes[dlogValueIndex].unit);
+            value = Value(recording.dlogValues[dlogValueIndex].div, getYAxisUnit(recording, dlogValueIndex));
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(0.001f, recording.parameters.yAxes[dlogValueIndex].unit);
+        value = Value(0.001f, getYAxisUnit(recording, dlogValueIndex));
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(100.0f, recording.parameters.yAxes[dlogValueIndex].unit);
+        value = Value(100.0f, getYAxisUnit(recording, dlogValueIndex));
     } else if (operation == data::DATA_OPERATION_SET) {
         recording.dlogValues[dlogValueIndex].offset = recording.dlogValues[dlogValueIndex].offset * value.getFloat() / recording.dlogValues[dlogValueIndex].div;
         recording.dlogValues[dlogValueIndex].div = value.getFloat();
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
         value = "Div";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = recording.parameters.yAxes[dlogValueIndex].unit;
+        value = getYAxisUnit(recording, dlogValueIndex);
     } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
@@ -4869,25 +4873,25 @@ void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cur
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].offset), recording.parameters.yAxes[dlogValueIndex].unit);
+            value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].offset), getYAxisUnit(recording, dlogValueIndex));
         }
     } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = Value(recording.dlogValues[dlogValueIndex].offset, recording.parameters.yAxes[dlogValueIndex].unit);
+            value = Value(recording.dlogValues[dlogValueIndex].offset, getYAxisUnit(recording, dlogValueIndex));
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(-100.0f, recording.parameters.yAxes[dlogValueIndex].unit);
+        value = Value(-100.0f, getYAxisUnit(recording, dlogValueIndex));
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(100.0f, recording.parameters.yAxes[dlogValueIndex].unit);
+        value = Value(100.0f, getYAxisUnit(recording, dlogValueIndex));
     } else if (operation == data::DATA_OPERATION_SET) {
         recording.dlogValues[dlogValueIndex].offset = value.getFloat();
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
         value = "Offset";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = recording.parameters.yAxes[dlogValueIndex].unit;
+        value = getYAxisUnit(recording, dlogValueIndex);
     } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
@@ -4903,18 +4907,18 @@ void data_dlog_x_axis_offset(data::DataOperationEnum operation, data::Cursor &cu
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = Value(recording.timeOffset, recording.parameters.xAxis.unit);
+            value = Value(recording.xAxisOffset, dlog_view::getXAxisUnit(recording));
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = Value(recording.parameters.xAxis.range.min, recording.parameters.xAxis.unit);
+        value = Value(recording.parameters.xAxis.range.min, dlog_view::getXAxisUnit(recording));
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(recording.parameters.xAxis.range.max - recording.pageSize * recording.parameters.period, recording.parameters.xAxis.unit);
+        value = Value(recording.parameters.xAxis.range.max - recording.pageSize * recording.parameters.period, dlog_view::getXAxisUnit(recording));
     } else if (operation == data::DATA_OPERATION_SET) {
-        dlog_view::changeTimeOffset(recording, value.getFloat());
+        dlog_view::changeXAxisOffset(recording, value.getFloat());
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
         value = "Offset";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = recording.parameters.xAxis.unit;
+        value = dlog_view::getXAxisUnit(recording);
     } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
@@ -4930,34 +4934,41 @@ void data_dlog_x_axis_div(data::DataOperationEnum operation, data::Cursor &curso
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
-            value = Value(recording.timeDiv, recording.parameters.xAxis.unit);
+            value = Value(recording.xAxisDiv, dlog_view::getXAxisUnit(recording));
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN || operation == data::DATA_OPERATION_GET_DEF) {
-        value = Value(recording.timeDivMin, recording.parameters.xAxis.unit);
+        value = Value(recording.xAxisDivMin, dlog_view::getXAxisUnit(recording));
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = Value(recording.timeDivMax, recording.parameters.xAxis.unit);
+        value = Value(recording.xAxisDivMax, dlog_view::getXAxisUnit(recording));
     } else if (operation == data::DATA_OPERATION_SET) {
-        dlog_view::changeTimeDiv(recording, value.getFloat());
+        dlog_view::changeXAxisDiv(recording, value.getFloat());
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
         value = "Div";
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = recording.parameters.xAxis.unit;
+        value = dlog_view::getXAxisUnit(recording);
     } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
 #endif
 }
 
-void data_dlog_x_axis_range_max(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_x_axis_max_value(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
-        value = Value(dlog_view::getDuration(recording), recording.parameters.xAxis.unit);
+
+        float maxValue = dlog_view::getDuration(recording);
+
+        if (recording.parameters.xAxis.scale == dlog_view::SCALE_LOGARITHMIC) {
+            maxValue = powf(10, recording.parameters.xAxis.range.min + maxValue);
+        }
+
+        value = Value(maxValue, recording.parameters.xAxis.unit);
     }
 #endif
 }
 
-void data_dlog_x_axis_range_max_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_x_axis_max_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
@@ -4978,10 +4989,12 @@ void data_dlog_visible_value_cursor(data::DataOperationEnum operation, data::Cur
         auto ytDataGetValue = data::ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
         float max;
         float min = ytDataGetValue(ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, dlogValueIndex, &max);
-        value = Value(
-            (min + max) / 2,
-            recording.parameters.yAxes[dlogValueIndex].unit
-        );
+        float cursorValue = (min + max) / 2;
+        if (recording.parameters.yAxisScale == dlog_view::SCALE_LOGARITHMIC) {
+            float logOffset = 1 - recording.parameters.yAxes[dlogValueIndex].range.min;
+            cursorValue = powf(10, cursorValue) - logOffset;
+        }
+        value = Value(cursorValue, recording.parameters.yAxes[dlogValueIndex].unit);
 
     }
 #endif
@@ -4991,14 +5004,6 @@ void data_dlog_current_time(data::DataOperationEnum operation, data::Cursor &cur
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(0, VALUE_TYPE_DLOG_CURRENT_TIME);
-    }
-#endif
-}
-
-void data_dlog_time_duration(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
-    if (operation == data::DATA_OPERATION_GET) {
-        value = Value(dlog_view::getDuration(dlog_view::getRecording()), UNIT_SECOND);
     }
 #endif
 }

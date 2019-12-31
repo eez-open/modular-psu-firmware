@@ -818,15 +818,13 @@ void enableOutputProtectionCouple(bool enable) {
     unsigned outputProtectionCouple = enable ? 1 : 0;
 
     if (g_devConf.outputProtectionCouple != outputProtectionCouple) {
-        return;
-    }
+        g_devConf.outputProtectionCouple = outputProtectionCouple;
 
-    g_devConf.outputProtectionCouple = outputProtectionCouple;
-
-    if (g_devConf.outputProtectionCouple) {
-        event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_COUPLED);
-    } else {
-        event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_DECOUPLED);
+        if (g_devConf.outputProtectionCouple) {
+            event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_COUPLED);
+        } else {
+            event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_DECOUPLED);
+        }
     }
 }
 
