@@ -96,6 +96,10 @@ public:
     void updatePage(const WidgetCursor& widgetCursor);
     WidgetCursor findWidget(int x, int y);
 
+    bool hasAction() {
+      return actionWidget.action != 0;
+    }
+
     static void executeAction();
     static void executeActionWithoutParam();
 
