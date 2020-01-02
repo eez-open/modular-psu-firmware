@@ -495,6 +495,15 @@ DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlog
     return nullptr;
 }
 
+bool yAxisHasDifferentUnits(Recording &recording) {
+    for (auto yAxisIndex = 1; yAxisIndex < recording.parameters.numYAxes; yAxisIndex++) {
+        if (recording.parameters.yAxes[yAxisIndex].unit != recording.parameters.yAxes[0].unit) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void autoScale(Recording &recording) {
     auto numVisibleDlogValues = getNumVisibleDlogValues(recording);
 
@@ -724,9 +733,9 @@ void openFile(const char *filePath) {
                     g_recording.getValue = getValue;
                     g_isLoading = false;
 
-                    if (g_recording.parameters.numYAxes > 4) {
-                        g_showLabels = true;
-                    } else {
+                    g_showLabels = true;
+
+                    if (yAxisHasDifferentUnits(g_recording)) {
                         autoScale(g_recording);
                     }
 

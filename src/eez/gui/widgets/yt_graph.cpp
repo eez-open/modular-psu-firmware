@@ -348,7 +348,7 @@ struct YTGraphStaticDrawHelper {
         }
     }
 
-    void drawLabel(font::Font &font) {
+    void drawLabel(font::Font &font, bool transparent) {
         if (yLabels[m_valueIndex] != INT_MIN) {
             const Style *labelStyle = data::ytDataGetStyle(widgetCursor.cursor, widget->data, m_valueIndex);
 
@@ -361,6 +361,11 @@ struct YTGraphStaticDrawHelper {
                 xLabel = widgetCursor.x;
             } else if (xLabel > widgetCursor.x + widgetCursor.widget->w - labelWidth) {
                 xLabel = widgetCursor.x + widgetCursor.widget->w - labelWidth;
+            }
+
+            if (!transparent) {
+                display::setColor(labelStyle->background_color, false);
+                display::fillRect(xLabel, yLabels[m_valueIndex], xLabel + labelWidth - 1, yLabels[m_valueIndex] + font.getHeight() - 1);
             }
 
             display::setColor(labelStyle->color, false);
@@ -434,13 +439,13 @@ struct YTGraphStaticDrawHelper {
 
             for (m_valueIndex = 0; m_valueIndex < MAX_NUM_OF_Y_VALUES; m_valueIndex++) {
                 if (m_valueIndex != selectedValueIndex) {
-                    drawLabel(font);
+                    drawLabel(font, true);
                 }
             }
 
             if (selectedValueIndex != -1) {
                 m_valueIndex = selectedValueIndex;
-                drawLabel(font);
+                drawLabel(font, false);
             }
         }
     }
