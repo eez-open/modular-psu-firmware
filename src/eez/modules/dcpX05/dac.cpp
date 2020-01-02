@@ -101,24 +101,14 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
     float uDiff = uMon - uSet;
     if (fabsf(uDiff) > uSet * DAC_TEST_TOLERANCE / 100) {
         g_testResult = TEST_FAILED;
-
-        // DebugTrace("Ch%d DAC test, U_set failure: expected=%d, got=%d, abs diff=%d",
-        //     channel.channelIndex + 1,
-        //     (int)(uSet * 100),
-        //     (int)(uMon * 100),
-        //     (int)(uDiff * 100));
+        DebugTrace("Ch%d DAC test, U_set failure: expected=%g, got=%g, abs diff=%g\n", channel.channelIndex + 1, uSet, uMon, uDiff);
     }
 
     float iMon = channel.i.mon_dac_last;
     float iDiff = iMon - iSet;
     if (fabsf(iDiff) > iSet * DAC_TEST_TOLERANCE / 100) {
         g_testResult = TEST_FAILED;
-
-        // DebugTrace("Ch%d DAC test, I_set failure: expected=%d, got=%d, abs diff=%d",
-        //     channel.channelIndex + 1,
-        //     (int)(iSet * 100),
-        //     (int)(iMon * 100),
-        //     (int)(iDiff * 100));
+        DebugTrace("Ch%d DAC test, I_set failure: expected=%g, got=%g, abs diff=%g\n", channel.channelIndex + 1, iSet, iMon, iDiff);
     }
 
     if (wasCalibrationEnabled) {

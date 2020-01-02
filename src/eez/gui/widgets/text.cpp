@@ -66,6 +66,8 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
         widgetCursor.previousState->data != widgetCursor.currentState->data;
 
+    static const size_t MAX_TEXT_LEN = 128;
+
     if (refresh) {
         uint16_t overrideColor = overrideStyleColorHook(widgetCursor, style);
         uint16_t overrideActiveColor = overrideActiveStyleColorHook(widgetCursor, style);
@@ -91,13 +93,13 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                             ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
 
                     } else {
-                        char text[64];
+                        char text[MAX_TEXT_LEN + 1];
                         int ellipsisWidth = mcu::display::measureStr("...", 3, font);
                         int width = ellipsisWidth;
                         int textLength = 3;
                         int iLeft = 0;
                         int iRight = strlen(fullText) - 1;
-                        while (iLeft < iRight && textLength < 64) {
+                        while (iLeft < iRight && textLength < (int)MAX_TEXT_LEN) {
                             int widthLeft = mcu::display::measureGlyph(fullText[iLeft], font);
                             if (width + widthLeft > widget->w) {
                                 break;
@@ -134,7 +136,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                         ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
                 }
             } else {
-                char text[64];
+                char text[MAX_TEXT_LEN + 1];
                 widgetCursor.currentState->data.toText(text, sizeof(text));
                 drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                     style, widgetCursor.currentState->flags.active,
