@@ -7,7 +7,7 @@ TIME_STEP_MS = 15
 # Ch1 B-E
 Ib = 3E-3
 Ube_min = 0.0
-Ube_max = 1.0
+Ube_max = 1.2
 NUM_U_BE_STEPS = 400
 
 # Ch2 C-E

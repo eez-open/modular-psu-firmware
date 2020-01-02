@@ -6,7 +6,7 @@ TIME_ON_MS = 15
 TIME_OFF_MS = 6
 
 # Ch1 G-S
-Ugs = [3, 3.5, 4, 4.5, 6, 8, 12]
+Ugs = [3.5, 4, 4.5, 5, 5.5, 6]
 Ig = 5.0
 
 # Ch2 D-S
@@ -97,10 +97,10 @@ def start(deviceName, Uds_max, Id_max):
 
                 iMonValues[ugs_step_counter] = getI(2)
 
-                setU(1, 0)
-
-                t = ticks_add(t, TIME_OFF_MS)
-                sleep_ms(ticks_diff(t, ticks_ms()))
+                if TIME_OFF_MS > 0:
+                    setU(1, 0)
+                    t = ticks_add(t, TIME_OFF_MS)
+                    sleep_ms(ticks_diff(t, ticks_ms()))
 
             dlogTraceData(iMonValues)
     finally:

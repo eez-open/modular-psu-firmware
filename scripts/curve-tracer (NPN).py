@@ -2,8 +2,8 @@ import math
 from utime import ticks_ms, ticks_add, ticks_diff, sleep_ms
 from eez import scpi, setU, setI, getOutputMode, getI, dlogTraceData
 
-TIME_ON_MS = 15
-TIME_OFF_MS = 6
+TIME_ON_MS = 30
+TIME_OFF_MS = 0
 
 # Ch1 B-E
 Ib = [50e-6, 100e-6, 150e-6, 200e-6, 250e-6, 300e-6, 350e-6, 400e-6]
