@@ -1428,7 +1428,7 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
         psu::dlog_view::Recording &recording = psu::dlog_view::getRecording();
-        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::getNumVisibleDlogValues(recording) > 4 ? recording.selectedVisibleValueIndex : widgetCursor.cursor.i);
+        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, !psu::dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : widgetCursor.cursor.i);
         style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->color;
@@ -1437,7 +1437,7 @@ uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *s
 uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
         psu::dlog_view::Recording &recording = psu::dlog_view::getRecording();
-        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::getNumVisibleDlogValues(recording) > 4 ? recording.selectedVisibleValueIndex : widgetCursor.cursor.i);
+        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, !psu::dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : widgetCursor.cursor.i);
         style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->active_color;
