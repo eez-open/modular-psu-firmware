@@ -117,6 +117,6 @@ if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
         if Uds_max != None:
             Id_max = scpi('DISP:INPUT? "Id,max", NUMBER, AMPER, 0.001, 5.0, 2.0')
             if Id_max != None:
-                start(deviceName, Uds_max, Id_max)
+                start(deviceName, float(Uds_max), float(Id_max))
 else:
     scpi('DISP:INPUT? "Requires DCP405 or DCP405B on Ch1 and Ch2", MENU, BUTTON, "Close"')
