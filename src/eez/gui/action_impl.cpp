@@ -1152,10 +1152,7 @@ void action_dlog_toggle() {
 
 void action_show_dlog_view() {
     dlog_view::g_showLatest = true;
-    if (dlog_record::isExecuting()) {
-        dlog_view::g_showLabels = false;
-    } else {
-        dlog_view::g_showLabels = true;
+    if (!dlog_record::isExecuting()) {
         dlog_view::openFile(dlog_record::getLatestFilePath());
     }
     showPage(PAGE_ID_DLOG_VIEW);

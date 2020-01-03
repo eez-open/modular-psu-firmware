@@ -733,8 +733,6 @@ void openFile(const char *filePath) {
                     g_recording.getValue = getValue;
                     g_isLoading = false;
 
-                    g_showLabels = true;
-
                     if (yAxisHasDifferentUnits(g_recording)) {
                         autoScale(g_recording);
                     }

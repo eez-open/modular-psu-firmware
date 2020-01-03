@@ -213,7 +213,6 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
 scpi_result_t scpi_cmd_displayWindowDlog(scpi_t *context) {
 #if OPTION_DISPLAY && OPTION_SD_CARD
     dlog_view::g_showLatest = true;
-    dlog_view::g_showLabels = false;
     psu::gui::g_psuAppContext.pushPageOnNextIter(PAGE_ID_DLOG_VIEW);
     return SCPI_RES_OK;
 #else
