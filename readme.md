@@ -58,4 +58,4 @@ Visual Studio solution is created in `\path\to\modular-psu-firmware\build\win32'
 
 ### STM32 firmware
 
-- Import project from `/path/to/modular-psu-firmware/src/third_party/stm32/stm32_r1b5` into [TrueStudio](https://atollic.com/truestudio/) and build it.
+- Import project from `/path/to/modular-psu-firmware/src/third_party/stm32_truestudio` into [TrueStudio](https://atollic.com/truestudio/) and build it.
