@@ -34,6 +34,7 @@ def start(deviceName):
         scpi("OUTP 0")
         scpi("VOLT " + str(Uce))
         scpi("CURR " + str(Ic_max))
+        scpi("SENS:CURR:RANG DEFault")
 
         scpi('SENS:DLOG:TRAC:COMMent "NPN Transfer curve for ' + deviceName + '"')
 
