@@ -397,8 +397,6 @@ struct YTGraphStaticDrawHelper {
         }
 
         // draw graphs
-        YTGraphWidgetState *currentState = (YTGraphWidgetState *)widgetCursor.currentState;
-
         for (m_valueIndex = 0; m_valueIndex < MAX_NUM_OF_Y_VALUES; m_valueIndex++) {
             if (m_valueIndex != selectedValueIndex) {
                 drawGraph(currentHistoryValuePosition, startX, endX, vertDivisions);

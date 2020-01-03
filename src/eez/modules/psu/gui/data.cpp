@@ -4598,10 +4598,9 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
     } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
         uint8_t dlogValueIndex = value.getUInt8();
         uint8_t visibleDlogValueIndex = dlog_view::getVisibleDlogValueIndex(recording, dlogValueIndex);
-        uint8_t numVisibleDlogValues = dlog_view::getNumVisibleDlogValues(recording);
         uint8_t numYtGraphStyles = sizeof(g_ytGraphStyles) / sizeof(uint16_t);
-        if (numVisibleDlogValues <= numYtGraphStyles) {
-            value = Value(g_ytGraphStyles[visibleDlogValueIndex], VALUE_TYPE_UINT16);
+        if (psu::dlog_view::yAxisHasDifferentUnits(recording)) {
+            value = Value(g_ytGraphStyles[visibleDlogValueIndex] % numYtGraphStyles, VALUE_TYPE_UINT16);
         } else {
             if (dlog_view::g_showLegend && visibleDlogValueIndex == recording.selectedVisibleValueIndex) {
                 value = Value(STYLE_ID_YT_GRAPH_Y1, VALUE_TYPE_UINT16);
