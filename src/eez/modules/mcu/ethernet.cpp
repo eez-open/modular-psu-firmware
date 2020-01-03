@@ -647,6 +647,10 @@ void beginServer(uint16_t port) {
 
 void getInputBuffer(int bufferPosition, char **buffer, uint32_t *length) {
 #if defined(EEZ_PLATFORM_STM32)
+	if (!g_tcpClientConnection) {
+		return;
+	}
+
 	if (netconn_recv(g_tcpClientConnection, &g_inbuf) != ERR_OK) {
 		goto fail1;
 	}
