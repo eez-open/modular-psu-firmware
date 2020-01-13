@@ -73,27 +73,14 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
 
     m_testing = true;
 
-    bool wasCalibrationEnabled = channel.isCalibrationEnabled();
     channel.calibrationEnableNoEvent(false);
-
-    // disable OE on channel
-    if (channel.params.features & CH_FEATURE_HW_OVP) {
-        // OVP has to be disabled before OE deactivation
-        ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
-    }
-    ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, false);
 
     // set U on DAC and check it on ADC
     float uSet = channel.u.max / 2;
     float iSet = channel.i.max / 2;
 
-    float wasUSet = channel.u.set;
     channel.setVoltage(uSet);
-
-    float wasISet = channel.i.set;
     channel.setCurrent(iSet);
-
-    delay(200);
 
     channel.adcMeasureMonDac();
 
@@ -110,13 +97,6 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
         g_testResult = TEST_FAILED;
         DebugTrace("Ch%d DAC test, I_set failure: expected=%g, got=%g, abs diff=%g\n", channel.channelIndex + 1, iSet, iMon, iDiff);
     }
-
-    if (wasCalibrationEnabled) {
-        channel.calibrationEnableNoEvent(true);
-    }
-
-    channel.setVoltage(wasUSet);
-    channel.setCurrent(wasISet);
 
     if (g_testResult == TEST_FAILED) {
         generateError(SCPI_ERROR_CH1_DAC_TEST_FAILED + channel.channelIndex);
