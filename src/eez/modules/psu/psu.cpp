@@ -159,7 +159,6 @@ namespace psu {
 using namespace scpi;
 
 bool g_isBooted = false;
-uint32_t g_isBootedTime;
 static bool g_bootTestSuccess;
 static bool g_powerIsUp = false;
 static bool g_testPowerUpDelay = false;
@@ -331,6 +330,9 @@ static bool testMaster() {
 bool test() {
     bool testResult = true;
 
+    profile::saveAtLocation(10);
+    reset();
+
     testResult &= testMaster();
 
     testResult &= testChannels();
@@ -338,6 +340,9 @@ bool test() {
     if (!testResult) {
         sound::playBeep();
     }
+
+    int err;
+    profile::recall(10, &err);
 
     return testResult;
 }
@@ -568,7 +573,6 @@ void boot() {
         sound::playBeep();
     }
 
-    g_isBootedTime = micros();
     g_isBooted = true;
 }
 
