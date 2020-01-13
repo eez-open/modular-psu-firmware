@@ -59,9 +59,6 @@ struct Channel : ChannelInterface {
 
 	bool fallingEdge = true;
 
-	bool isSwOvpAtStart;
-	uint32_t oeTickCount;
-
 	Channel(int slotIndex_) : ChannelInterface(slotIndex_), uSet(0) {}
 
 	void getParams(int subchannelIndex, ChannelParams &params) {
@@ -210,6 +207,10 @@ struct Channel : ChannelInterface {
 	}
 
 	void tick(int subchannelIndex, uint32_t tickCount) {
+		if (isDacTesting(subchannelIndex)) {
+			return;
+		}
+
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
 		ioexp.tick(tickCount);
@@ -305,21 +306,8 @@ struct Channel : ChannelInterface {
 			// HW OVP handling
 			if (channel.isOutputEnabled()) {
 				if (!fallingEdge && channel.isHwOvpEnabled() && !ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
-					if (isSwOvpAtStart) {
-						int32_t diff = tickCount - oeTickCount;
-						if (diff >= CONF_OVP_SW_OVP_AT_START_DURATION_MS * 1000 || channel_dispatcher::getUSet(channel) >= CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD) {
-							// SW OVP at start lasts 5ms
-							isSwOvpAtStart = false;
-						} else {
-							if (channel.checkSwOvpCondition(CONF_OVP_SW_OVP_AT_START_U_PROTECTION_LEVEL)) {
-								channel.enterOvpProtection();
-							}
-						}
-					}
-					if (!isSwOvpAtStart) {
-						// activate HW OVP
-						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
-					}
+					// activate HW OVP
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
 				} else if ((fallingEdge || !channel.isHwOvpEnabled()) && ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
 					// deactivate HW OVP
 					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
@@ -421,15 +409,6 @@ struct Channel : ChannelInterface {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
 		if (enable) {
-			if (channel.params.features & CH_FEATURE_DPROG) {			
-				if (dprogState == DPROG_STATE_ON) {
-					// enable DP
-					dpNegMonitoringTime = micros();
-					delayed_dp_off = false;
-					setDpEnable(true);
-				}
-			}
-
 			dac.setVoltage(uSet);
 
 			setCurrentRange(subchannelIndex);
@@ -438,13 +417,17 @@ struct Channel : ChannelInterface {
 
 			if (channel.params.features & CH_FEATURE_HW_OVP) {
 				if (channel.isHwOvpEnabled()) {
-					isSwOvpAtStart = channel_dispatcher::getUSet(channel) < CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD;
-					if (isSwOvpAtStart) {
-						oeTickCount = micros();
-					} else {
-						// OVP has to be enabled after OE activation
-						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
-					}
+					// OVP has to be enabled after OE activation
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+				}
+			}
+
+			if (channel.params.features & CH_FEATURE_DPROG) {			
+				if (dprogState == DPROG_STATE_ON) {
+					// enable DP
+					dpNegMonitoringTime = micros();
+					delayed_dp_off = false;
+					setDpEnable(true);
 				}
 			}
 
