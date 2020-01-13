@@ -499,7 +499,7 @@ struct Channel : ChannelInterface {
 			if (dprogState == DPROG_STATE_OFF) {
 				setDpEnable(false);
 			} else {
-				setDpEnable(channel.isOutputEnabled());
+				setDpEnable(channel.isOk() && channel.isOutputEnabled());
 			}
 
 			delayed_dp_off = false;
