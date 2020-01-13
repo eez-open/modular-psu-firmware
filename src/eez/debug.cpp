@@ -31,6 +31,8 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/datetime.h>
 
+#include <eez/gui/assets.h>
+
 using namespace eez::psu;
 
 namespace eez {
@@ -53,6 +55,22 @@ static uint32_t g_startPosition = 0;
 static const uint32_t TRACE_LOG_PAGE_SIZE = 10;
 
 void addCharToLog(char ch) {
+    // wrap line if doesn't fit
+    static gui::font::Font g_traceLogFont;
+    static uint16_t lineWidth = 0;
+    static const uint16_t TRACE_LOG_LINE_WIDTH = 448;
+    if (ch == 0) {
+        lineWidth = 0;
+    } else {
+        if (!g_traceLogFont.fontData) {
+            g_traceLogFont.fontData = gui::getFontData(gui::FONT_ID_ROBOTO_CONDENSED_REGULAR);
+        }
+        lineWidth += mcu::display::measureGlyph(ch, g_traceLogFont);
+        if (lineWidth >= TRACE_LOG_LINE_WIDTH) {
+            addCharToLog(0);
+        }
+    }
+
     *(g_log + g_head) = ch;
 
     // advance pointer
