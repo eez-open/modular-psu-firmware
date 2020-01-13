@@ -1166,8 +1166,7 @@ void action_dlog_start_recording() {
 
     if (isStringEmpty(dlog_record::g_guiParameters.filePath)) {
         uint8_t year, month, day, hour, minute, second;
-        datetime::getDate(year, month, day);
-        datetime::getTime(hour, minute, second);
+        datetime::getDateTime(year, month, day, hour, minute, second);
         sprintf(filePath, "%s/%s%d_%02d_%02d-%02d_%02d_%02d.dlog",
             RECORDINGS_DIR,
             dlog_record::g_guiParameters.filePath,
