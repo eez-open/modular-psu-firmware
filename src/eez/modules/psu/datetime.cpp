@@ -181,14 +181,14 @@ bool test() {
 
             if (!isValidDate(2000 + rtc_year, rtc_month, rtc_day)) {
                 g_testResult = TEST_FAILED;
-                DebugTrace("RTC test failed, invalid date format detected (%d-%02d-%02d)",
+                DebugTrace("RTC test failed, invalid date format detected (%d-%02d-%02d)\n",
                             (int)(2000 + rtc_year), (int)rtc_month, (int)rtc_day);
             } else if (!isValidTime(rtc_hour, rtc_minute, rtc_second)) {
                 g_testResult = TEST_FAILED;
-                DebugTrace("RTC test failed, invalid time format detected (%02d:%02d:%02d)",
+                DebugTrace("RTC test failed, invalid time format detected (%02d:%02d:%02d)\n",
                             (int)rtc_hour, (int)rtc_minute, (int)rtc_second);
-            } else if (cmp_datetime(year, month, day, hour, minute, second, rtc_year, rtc_month,
-                                    rtc_day, rtc_hour, rtc_minute, rtc_second) < 0) {
+            } else if (cmp_datetime(year, month, day, hour, minute, second,
+            		rtc_year, rtc_month, rtc_day, rtc_hour, rtc_minute, rtc_second) < 0) {
                 g_testResult = TEST_OK;
                 if (!dstCheck()) {
                     persist_conf::writeSystemDateTime(rtc_year, rtc_month, rtc_day, rtc_hour,
@@ -197,10 +197,9 @@ bool test() {
             } else {
                 g_testResult = TEST_FAILED;
                 DebugTrace("RTC test failed, RTC time (%d-%02d-%02d %02d:%02d:%02d) older then or "
-                            "equal to EEPROM time (%d-%02d-%02d %02d:%02d:%02d)",
-                            (int)(2000 + rtc_year), (int)rtc_month, (int)rtc_day, (int)rtc_hour,
-                            (int)rtc_minute, (int)rtc_second, (int)(2000 + year), (int)month,
-                            (int)day, (int)hour, (int)minute, (int)second);
+                            "equal to EEPROM time (%d-%02d-%02d %02d:%02d:%02d)\n",
+                            (int)(2000 + rtc_year), (int)rtc_month, (int)rtc_day, (int)rtc_hour, (int)rtc_minute, (int)rtc_second,
+							(int)(2000 + year), (int)month, (int)day, (int)hour, (int)minute, (int)second);
             }
         } else {
             g_testResult = TEST_SKIPPED;
@@ -263,8 +262,7 @@ bool setTime(uint8_t hour, uint8_t minute, uint8_t second, unsigned dst) {
     return false;
 }
 
-bool getDateTime(uint8_t &year, uint8_t &month, uint8_t &day, uint8_t &hour, uint8_t &minute,
-                 uint8_t &second) {
+bool getDateTime(uint8_t &year, uint8_t &month, uint8_t &day, uint8_t &hour, uint8_t &minute, uint8_t &second) {
     return rtc::readDateTime(year, month, day, hour, minute, second);
 }
 
@@ -283,7 +281,7 @@ bool setDateTime(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t
 
 bool getDateTimeAsString(char *buffer) {
     uint8_t year, month, day, hour, minute, second;
-    if (datetime::getDate(year, month, day) && datetime::getTime(hour, minute, second)) {
+    if (datetime::getDateTime(year, month, day, hour, minute, second)) {
         sprintf(buffer, "%d-%02d-%02d %02d:%02d:%02d", (int)(year + 2000), (int)month, (int)day,
                 (int)hour, (int)minute, (int)second);
         return true;

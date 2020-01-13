@@ -204,8 +204,8 @@ bool readDateTime(uint8_t &year, uint8_t &month, uint8_t &day, uint8_t &hour, ui
     }
 
 #if defined(EEZ_PLATFORM_STM32)
-    readDate(year, month, day);
     readTime(hour, minute, second);
+    readDate(year, month, day);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

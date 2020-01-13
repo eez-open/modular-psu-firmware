@@ -166,8 +166,7 @@ void oneIter() {
 
                 char filePath[40];
                 uint8_t year, month, day, hour, minute, second;
-                datetime::getDate(year, month, day);
-                datetime::getTime(hour, minute, second);
+                datetime::getDateTime(year, month, day, hour, minute, second);
                 sprintf(filePath, "%s/%d_%02d_%02d-%02d_%02d_%02d.jpg",
                     SCREENSHOTS_DIR,
                     (int)(year + 2000), (int)month, (int)day,
