@@ -132,6 +132,7 @@ void initInputPin(int pin) {
     GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = ioPin.polarity == io_pins::POLARITY_POSITIVE ? GPIO_PULLDOWN : GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(pin == 0 ? UART_RX_DIN1_GPIO_Port : DIN2_GPIO_Port, &GPIO_InitStruct);
 #endif
 }
@@ -146,7 +147,7 @@ void initOutputPins() {
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
-    HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, DOUT2_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin, GPIO_PIN_RESET);
 
     // DOUT2 is already initialized
 #endif
