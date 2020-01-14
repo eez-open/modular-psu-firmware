@@ -30,7 +30,7 @@ extern TestResult g_testResult;
 
 void init();
 bool test();
-void tick(uint32_t tickCount);
+void tick();
 
 extern float g_battery;
 

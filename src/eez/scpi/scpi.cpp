@@ -50,6 +50,8 @@
 #include <eez/gui/data.h>
 #include <eez/gui/dialogs.h>
 
+#include <eez/modules/mcu/battery.h>
+
 using namespace eez::psu;
 using namespace eez::psu::scpi;
 
@@ -225,6 +227,8 @@ void oneIter() {
                     ontime::g_moduleCounters[slotIndex].tick(tickCount);
                 }
             }
+
+            mcu::battery::tick();
     	}
 
         persist_conf::tick();

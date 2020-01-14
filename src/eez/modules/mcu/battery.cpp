@@ -58,9 +58,16 @@ static enum {
 static uint32_t g_lastTickCount;
 
 void adcStart() {
+    MX_ADC1_Init();
 	HAL_ADC_Start_IT(&hadc1);
 	g_lastTickCount = millis();
 	g_state = STATE_MEASURING;
+}
+
+void checkBattery() {
+	g_testResult = g_battery >= CONF_MIN_ALLOWED_BATTERY_VOLTAGE ? TEST_OK : TEST_FAILED;
+	g_state = STATE_IDLE;
+	HAL_ADC_DeInit(&hadc1);
 }
 
 #endif
@@ -71,13 +78,6 @@ void init() {
 	adcStart();
 #endif
 }
-
-#if defined(EEZ_PLATFORM_STM32)
-void checkBattery() {
-	g_testResult = g_battery >= CONF_MIN_ALLOWED_BATTERY_VOLTAGE ? TEST_OK : TEST_FAILED;
-	g_state = STATE_IDLE;
-}
-#endif
 
 bool test() {
 #if defined(EEZ_PLATFORM_STM32)
@@ -93,7 +93,7 @@ bool test() {
 	return g_testResult != TEST_FAILED;
 }
 
-void tick(uint32_t tickCount) {
+void tick() {
 #if defined(EEZ_PLATFORM_STM32)
 	int32_t diff = millis() - g_lastTickCount;
 	if (g_state == STATE_IDLE) {

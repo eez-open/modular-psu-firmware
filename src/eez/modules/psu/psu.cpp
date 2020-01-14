@@ -808,7 +808,6 @@ static TickFunc g_tickFuncs[] = {
     aux_ps::fan::tick,
 #endif
     datetime::tick,
-    mcu::battery::tick,
     idle::tick
 };
 static const int NUM_TICK_FUNCS = sizeof(g_tickFuncs) / sizeof(TickFunc);

@@ -169,7 +169,6 @@ int main(int argc, char **argv) {
 
     MX_GPIO_Init();
     MX_DMA_Init();
-    MX_ADC1_Init();
     MX_CRC_Init();
     MX_DAC_Init();
     MX_DMA2D_Init();
