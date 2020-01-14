@@ -116,7 +116,7 @@ uint8_t isOutputFault() {
 
 uint8_t isOutputEnabled() {
     for (int i = 0; i < CH_NUM; ++i) {
-        if (Channel::get(i).isOutputEnabled()) {
+        if (Channel::get(i).isOutputEnabled() && !isInhibited()) {
             return 1;
         }
     }
