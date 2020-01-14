@@ -33,6 +33,8 @@
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/event_queue.h>
 
+#include <eez/modules/mcu/eeprom.h>
+
 #include <eez/modules/bp3c/relays.h>
 
 namespace eez {
@@ -47,11 +49,25 @@ namespace scpi {
 scpi_result_t scpi_cmd_debug(scpi_t *context) {
     // TODO migrate to generic firmware
 #ifdef DEBUG
-    scpi_number_t param;
-    if (SCPI_ParamNumber(context, 0, &param, false)) {
-        delay((uint32_t)round(param.content.value * 1000));
+    int32_t cmd;
+    if (SCPI_ParamInt32(context, &cmd, false)) {
+        if (cmd == 23) {
+#if defined(EEZ_PLATFORM_STM32)
+            taskENTER_CRITICAL();
+#endif
+
+            mcu::eeprom::resetAllExceptOnTimeCounters();
+
+#if defined(EEZ_PLATFORM_STM32)
+            bp3c::relays::hardResetModules();
+            NVIC_SystemReset();
+#endif
+        } else {
+            SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+            return SCPI_RES_ERR;
+        }
     } else {
-        delay(1000);
+        // do nothing
     }
 
     return SCPI_RES_OK;
@@ -84,16 +100,6 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
     return SCPI_RES_ERR;
 #endif // DEBUG
-}
-
-scpi_result_t scpi_cmd_debugWdog(scpi_t *context) {
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-}
-
-scpi_result_t scpi_cmd_debugWdogQ(scpi_t *context) {
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
 }
 
 scpi_result_t scpi_cmd_debugOntimeQ(scpi_t *context) {

@@ -227,6 +227,8 @@ static const uint8_t WRITE = 2;
 static const uint16_t EEPROM_ONTIME_START_ADDRESS = 64;
 static const uint16_t EEPROM_EVENT_QUEUE_START_ADDRESS = 16384;
 
+static const uint16_t EEPROM_SIZE = 32768;
+
 void init();
 bool test();
 
@@ -234,6 +236,8 @@ extern TestResult g_testResult;
 
 bool read(uint8_t *buffer, uint16_t buffer_size, uint16_t address);
 bool write(const uint8_t *buffer, uint16_t buffer_size, uint16_t address);
+
+void resetAllExceptOnTimeCounters();
 
 } // namespace eeprom
 } // namespace mcu

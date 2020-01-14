@@ -198,6 +198,22 @@ bool test() {
     return g_testResult != TEST_FAILED;
 }
 
+void resetAllExceptOnTimeCounters() {
+    uint8_t buffer[64];
+    
+    memset(buffer, 0xFF, 64);
+
+    uint32_t address;
+
+    for (address = 0; address < EEPROM_ONTIME_START_ADDRESS; address += 64) {
+        write(buffer, MIN(EEPROM_ONTIME_START_ADDRESS - address, 64), (uint16_t)address);
+    }
+
+    for (address = EEPROM_ONTIME_START_ADDRESS + 6 * sizeof(uint32_t); address < EEPROM_SIZE; address += 64) {
+        write(buffer, MIN(EEPROM_SIZE - address, 64), (uint16_t)address);
+    }
+}
+
 } // namespace eeprom
 } // namespace mcu
 } // namespace eez
