@@ -2383,7 +2383,7 @@ void data_channel_protection_ovp_limit(data::DataOperationEnum operation, data::
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
+        value = MakeValue(channel_dispatcher::getUMaxLimit(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setVoltageLimit(channel, value.getFloat());
     } else if (operation == data::DATA_OPERATION_GET_NAME) {

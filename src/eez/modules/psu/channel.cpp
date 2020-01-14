@@ -1007,13 +1007,14 @@ void Channel::doRemoteProgrammingEnable(bool enable) {
     if (enable && !isOk()) {
         return;
     }
+
     flags.rprogEnabled = enable;
-    if (enable) {
-        setVoltageLimit(u.max);
-        setVoltage(u.min);
-        prot_conf.u_level = u.max;
-        prot_conf.flags.u_state = 1;
-    }
+
+    channel_dispatcher::setVoltageLimit(*this, channel_dispatcher::getUMaxLimit(*this));
+    channel_dispatcher::setVoltage(*this, u.min);
+    channel_dispatcher::setOvpLevel(*this, channel_dispatcher::getUMaxOvpLevel(*this));
+    channel_dispatcher::setOvpState(*this, 1);
+
     channelInterface->setRemoteProgramming(subchannelIndex, enable);
     setOperBits(OPER_ISUM_RPROG_ON, enable);
 }

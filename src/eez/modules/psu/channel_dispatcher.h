@@ -60,6 +60,7 @@ float getUMaxLimit(const Channel &channel);
 float getUMin(const Channel &channel);
 float getUDef(const Channel &channel);
 float getUMax(const Channel &channel);
+float getUMaxLimit(const Channel &channel);
 float getUMaxOvpLevel(const Channel &channel);
 float getUProtectionLevel(const Channel &channel);
 void setVoltage(Channel &channel, float voltage);
