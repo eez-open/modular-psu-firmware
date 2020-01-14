@@ -31,6 +31,7 @@
 
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/persist_conf.h>
+#include <eez/modules/psu/trigger.h>
 #include <eez/system.h>
 
 namespace eez {
@@ -123,32 +124,32 @@ uint8_t isOutputEnabled() {
 }
 
 void initInputPin(int pin) {
-// #if defined EEZ_PLATFORM_STM32
-//     GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+#if defined EEZ_PLATFORM_STM32
+    GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-//     const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
+    const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
 
-//     GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
-//     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-//     GPIO_InitStruct.Pull = ioPin.polarity == io_pins::POLARITY_POSITIVE ? GPIO_PULLDOWN : GPIO_PULLUP;
-//     HAL_GPIO_Init(pin == 0 ? UART_RX_DIN1_GPIO_Port : DIN2_GPIO_Port, &GPIO_InitStruct);
-// #endif
+    GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = ioPin.polarity == io_pins::POLARITY_POSITIVE ? GPIO_PULLDOWN : GPIO_PULLUP;
+    HAL_GPIO_Init(pin == 0 ? UART_RX_DIN1_GPIO_Port : DIN2_GPIO_Port, &GPIO_InitStruct);
+#endif
 }
 
 void initOutputPins() {
-// #if defined EEZ_PLATFORM_STM32
-// 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+#if defined EEZ_PLATFORM_STM32
+	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-//     // Configure DOUT1 GPIO pin
-//     GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
-//     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-//     GPIO_InitStruct.Pull = GPIO_NOPULL;
-//     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-//     HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
-//     HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, DOUT2_Pin, GPIO_PIN_RESET);
+    // Configure DOUT1 GPIO pin
+    GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, DOUT2_Pin, GPIO_PIN_RESET);
 
-//     // DOUT2 is already initialized
-// #endif
+    // DOUT2 is already initialized
+#endif
 }
 
 void init() {
@@ -158,19 +159,23 @@ void init() {
 
 void tick(uint32_t tickCount) {
     // execute input pins function
+    const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
+    int inputPin1Value = ioPinRead(EXT_TRIG1);
+    bool inputPin1State = (inputPin1Value && inputPin1.polarity == io_pins::POLARITY_POSITIVE) || (!inputPin1Value && inputPin1.polarity == io_pins::POLARITY_NEGATIVE);
+
+    const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
+    int inputPin2Value = ioPinRead(EXT_TRIG2);
+    bool inputPin2State = (inputPin2Value && inputPin2.polarity == io_pins::POLARITY_POSITIVE) || (!inputPin2Value && inputPin2.polarity == io_pins::POLARITY_NEGATIVE);
+
     unsigned inhibited = g_isInhibitedByUser;
 
     if (!inhibited) {
-        const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
         if (inputPin1.function == io_pins::FUNCTION_INHIBIT) {
-            int value = ioPinRead(EXT_TRIG1);
-            inhibited = (value && inputPin1.polarity == io_pins::POLARITY_POSITIVE) || (!value && inputPin1.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
+            inhibited = inputPin1State;
         }
 
-        const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
         if (inputPin2.function == io_pins::FUNCTION_INHIBIT) {
-            int value = ioPinRead(EXT_TRIG2);
-            inhibited = (value && inputPin2.polarity == io_pins::POLARITY_POSITIVE) || (!value && inputPin2.polarity == io_pins::POLARITY_NEGATIVE) ? 1 : 0;
+            inhibited = inputPin2State;
         }
     }
 
@@ -180,6 +185,17 @@ void tick(uint32_t tickCount) {
             Channel::get(i).onInhibitedChanged(inhibited ? true : false);
         }
     }
+
+    if (inputPin1.function == io_pins::FUNCTION_TINPUT && inputPin1State && !g_pinState[0]) {
+        trigger::generateTrigger(trigger::SOURCE_PIN1);
+    }
+
+    if (inputPin2.function == io_pins::FUNCTION_TINPUT && inputPin2State && !g_pinState[1]) {
+        trigger::generateTrigger(trigger::SOURCE_PIN2);
+    }
+
+    g_pinState[0] = inputPin1State;
+    g_pinState[1] = inputPin2State;
 
     // end trigger output pulse
     if (g_lastState.toutputPulse) {

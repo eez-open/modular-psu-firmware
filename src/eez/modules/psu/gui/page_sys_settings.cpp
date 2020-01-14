@@ -721,9 +721,7 @@ void SysSettingsTriggerPage::set() {
 
         if (m_source == trigger::SOURCE_PIN1) {
             persist_conf::setIoPinFunction(0, io_pins::FUNCTION_TINPUT);
-        }
-
-        if (m_source == trigger::SOURCE_PIN2) {
+        } else if (m_source == trigger::SOURCE_PIN2) {
             persist_conf::setIoPinFunction(1, io_pins::FUNCTION_TINPUT);
         }
 
