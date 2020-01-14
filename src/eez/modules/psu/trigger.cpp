@@ -361,15 +361,17 @@ int startImmediately() {
 }
 
 int initiate() {
-    if (persist_conf::devConf.triggerSource == SOURCE_IMMEDIATE) {
-        return startImmediately();
-    } else {
-        int err = checkTrigger();
-        if (err) {
-            return err;
-        }
-        setState(STATE_INITIATED);
+    int err = checkTrigger();
+    if (err) {
+        return err;
     }
+
+    setState(STATE_INITIATED);
+
+    if (persist_conf::devConf.triggerSource == SOURCE_IMMEDIATE) {
+        return trigger::generateTrigger(trigger::SOURCE_IMMEDIATE);
+    }
+
     return SCPI_RES_OK;
 }
 

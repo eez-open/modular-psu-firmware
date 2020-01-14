@@ -44,7 +44,7 @@ static scpi_choice_def_t sourceChoice[] = { { "BUS", trigger::SOURCE_BUS },
 
 scpi_result_t scpi_cmd_triggerSequenceImmediate(scpi_t *context) {
     // TODO migrate to generic firmware
-    int result = trigger::startImmediately();
+    int result = trigger::generateTrigger(trigger::SOURCE_IMMEDIATE);
     if (result != SCPI_RES_OK) {
         SCPI_ErrorPush(context, result);
         return SCPI_RES_ERR;
