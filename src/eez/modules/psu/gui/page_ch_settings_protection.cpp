@@ -165,7 +165,7 @@ void ChSettingsOvpProtectionPage::pageAlloc() {
 
     origLimit = limit = MakeValue(channel_dispatcher::getULimit(*g_channel), UNIT_VOLT);
     minLimit = channel_dispatcher::getUMin(*g_channel);
-    maxLimit = channel_dispatcher::getUMaxLimit(*g_channel);
+    maxLimit = channel_dispatcher::getUMaxOvpLimit(*g_channel);
     defLimit = channel_dispatcher::getUMax(*g_channel);
 
     origLevel = level = MakeValue(channel_dispatcher::getUProtectionLevel(*g_channel), UNIT_VOLT);

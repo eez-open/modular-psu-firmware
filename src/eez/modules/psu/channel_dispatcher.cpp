@@ -531,7 +531,7 @@ float getUMax(const Channel &channel) {
     return channel.u.max;
 }
 
-float getUMaxLimit(const Channel &channel) {
+float getUMaxOvpLimit(const Channel &channel) {
     if (channel.flags.rprogEnabled) {
         return getUMax(channel) + 0.5f;    
     }
