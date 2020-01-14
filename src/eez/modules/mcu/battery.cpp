@@ -31,6 +31,7 @@ using namespace eez::mcu::battery;
 #define MAX_CONVERTED_VALUE 4095
 #define VREF 3.3f
 #define CONF_CONVERSION_DURATION 5 // 5ms
+#define CONF_MEASURE_INTERVAL 24 * 60 * 60 * 1000L // 24h
 
 // If battery voltage is less than this value then battery should be replaced
 #define CONF_MIN_ALLOWED_BATTERY_VOLTAGE 2.7f
@@ -50,31 +51,41 @@ float g_battery;
 
 #if defined(EEZ_PLATFORM_STM32)
 
+static enum {
+	STATE_IDLE,
+	STATE_MEASURING
+} g_state = STATE_IDLE;
 static uint32_t g_lastTickCount;
 
 void adcStart() {
 	HAL_ADC_Start_IT(&hadc1);
+	g_lastTickCount = millis();
+	g_state = STATE_MEASURING;
 }
 
 #endif
 
 void init() {
 #if defined(EEZ_PLATFORM_STM32)
+	// start first measurement
 	adcStart();
-	g_lastTickCount = micros();
 #endif
 }
 
 #if defined(EEZ_PLATFORM_STM32)
 void checkBattery() {
 	g_testResult = g_battery >= CONF_MIN_ALLOWED_BATTERY_VOLTAGE ? TEST_OK : TEST_FAILED;
+	g_state = STATE_IDLE;
 }
 #endif
 
 bool test() {
 #if defined(EEZ_PLATFORM_STM32)
-	adcStart();
-	delay(CONF_CONVERSION_DURATION);
+	// wait for first measurement to finish
+	int32_t diff = g_lastTickCount + CONF_CONVERSION_DURATION - millis();
+	if (diff > 0) {
+		delay(diff);
+	}
 	checkBattery();
 #else
 	g_testResult = TEST_SKIPPED;
@@ -84,11 +95,15 @@ bool test() {
 
 void tick(uint32_t tickCount) {
 #if defined(EEZ_PLATFORM_STM32)
-	int32_t diff = tickCount - g_lastTickCount;
-	if (diff >= 1000000) {
-		checkBattery();
-		adcStart();
-		g_lastTickCount = tickCount;
+	int32_t diff = millis() - g_lastTickCount;
+	if (g_state == STATE_IDLE) {
+		if (diff >= CONF_MEASURE_INTERVAL) {
+			adcStart();
+		}
+	} else if (g_state == STATE_MEASURING) {
+		if (diff >= CONF_CONVERSION_DURATION) {
+			checkBattery();
+		}
 	}
 #endif
 }
