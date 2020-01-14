@@ -84,6 +84,9 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
 
     channel.adcMeasureMonDac();
 
+    channel.setVoltage(0);
+    channel.setCurrent(0);
+
     float uMon = channel.u.mon_dac_last;
     float uDiff = uMon - uSet;
     if (fabsf(uDiff) > uSet * DAC_TEST_TOLERANCE / 100) {
