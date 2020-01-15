@@ -313,7 +313,7 @@ void sync() {
     uint32_t tickCount = millis();
     int32_t diff = 1000 / 60 - (tickCount - g_lastTickCount);
     g_lastTickCount = tickCount;
-    if (diff > 0) {
+    if (diff > 0 && diff < 1000 / 60) {
         SDL_Delay(diff);
     }
 
