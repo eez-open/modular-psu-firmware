@@ -58,8 +58,10 @@ static enum {
 static uint32_t g_lastTickCount;
 
 void adcStart() {
-    MX_ADC1_Init();
+	// enable and start ADC
+	MX_ADC1_Init();
 	HAL_ADC_Start_IT(&hadc1);
+
 	g_lastTickCount = millis();
 	g_state = STATE_MEASURING;
 }
@@ -67,6 +69,10 @@ void adcStart() {
 void checkBattery() {
 	g_testResult = g_battery >= CONF_MIN_ALLOWED_BATTERY_VOLTAGE ? TEST_OK : TEST_FAILED;
 	g_state = STATE_IDLE;
+
+	// stop and disable ADC
+	HAL_ADC_Stop_IT(&hadc1);
+	ADC->CCR &= ~ADC_CCR_VBATE;
 	HAL_ADC_DeInit(&hadc1);
 }
 
