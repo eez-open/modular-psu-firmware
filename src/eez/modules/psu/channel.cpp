@@ -1010,10 +1010,19 @@ void Channel::doRemoteProgrammingEnable(bool enable) {
 
     flags.rprogEnabled = enable;
 
-    channel_dispatcher::setVoltageLimit(*this, channel_dispatcher::getUMaxOvpLimit(*this));
-    channel_dispatcher::setVoltage(*this, u.min);
-    channel_dispatcher::setOvpLevel(*this, channel_dispatcher::getUMaxOvpLevel(*this));
-    channel_dispatcher::setOvpState(*this, 1);
+    if (enable) {
+    	channel_dispatcher::setVoltageLimit(*this, channel_dispatcher::getUMaxOvpLimit(*this));
+    	channel_dispatcher::setVoltage(*this, u.min);
+    	channel_dispatcher::setOvpLevel(*this, channel_dispatcher::getUMaxOvpLevel(*this));
+    	channel_dispatcher::setOvpState(*this, 1);
+    } else {
+    	if (channel_dispatcher::getULimit(*this) > channel_dispatcher::getUMaxOvpLimit(*this)) {
+    		channel_dispatcher::setVoltageLimit(*this, channel_dispatcher::getUMaxOvpLimit(*this));
+    	}
+    	if (channel_dispatcher::getUProtectionLevel(*this) > channel_dispatcher::getUMaxOvpLevel(*this)) {
+    		channel_dispatcher::setOvpLevel(*this, channel_dispatcher::getUMaxOvpLevel(*this));
+    	}
+    }
 
     channelInterface->setRemoteProgramming(subchannelIndex, enable);
     setOperBits(OPER_ISUM_RPROG_ON, enable);
