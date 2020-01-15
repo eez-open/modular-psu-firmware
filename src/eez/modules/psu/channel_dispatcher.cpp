@@ -114,11 +114,7 @@ bool setCouplingType(CouplingType couplingType, int *err) {
             Channel &channel = Channel::get(i);
             channel.outputEnable(false);
             channel.remoteSensingEnable(false);
-
-            if (channel.params.features & CH_FEATURE_RPROG) {
-                channel.remoteProgrammingEnable(false);
-            }
-
+            channel.remoteProgrammingEnable(false);
             channel.setVoltageTriggerMode(TRIGGER_MODE_FIXED);
             channel.setCurrentTriggerMode(TRIGGER_MODE_FIXED);
             channel.setTriggerOutputState(true);

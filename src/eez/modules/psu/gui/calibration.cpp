@@ -57,9 +57,7 @@ void onStartPasswordOk() {
     g_channel->prot_conf.flags.i_state = 0;
     g_channel->prot_conf.flags.p_state = 0;
 
-    if (g_channel->params.features & CH_FEATURE_RPROG) {
-        g_channel->remoteProgrammingEnable(false);
-    }
+    g_channel->remoteProgrammingEnable(false);
 
     g_channel->outputEnable(true);
 

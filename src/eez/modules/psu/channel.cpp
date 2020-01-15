@@ -535,9 +535,7 @@ void Channel::onPowerDown() {
 
     outputEnable(false);
     doRemoteSensingEnable(false);
-    if (params.features & CH_FEATURE_RPROG) {
-        doRemoteProgrammingEnable(false);
-    }
+    doRemoteProgrammingEnable(false);
 
     clearProtection(false);
 
@@ -584,10 +582,8 @@ void Channel::reset() {
     // [SOUR[n]]:VOLT:SENS INTernal
     doRemoteSensingEnable(false);
 
-    if (params.features & CH_FEATURE_RPROG) {
-        // [SOUR[n]]:VOLT:PROG INTernal
-        doRemoteProgrammingEnable(false);
-    }
+    // [SOUR[n]]:VOLT:PROG INTernal
+    doRemoteProgrammingEnable(false);
 
     // [SOUR[n]]:VOLT:PROT:DEL
     // [SOUR[n]]:VOLT:PROT:STAT
@@ -697,9 +693,7 @@ bool Channel::test() {
 
     outputEnable(false);
     doRemoteSensingEnable(false);
-    if (params.features & CH_FEATURE_RPROG) {
-        doRemoteProgrammingEnable(false);
-    }
+    doRemoteProgrammingEnable(false);
 
     channelInterface->test(subchannelIndex);
 
@@ -995,6 +989,9 @@ void Channel::onInhibitedChanged(bool inhibited) {
 }
 
 void Channel::doRemoteSensingEnable(bool enable) {
+    if (!(params.features & CH_FEATURE_RPOL)) {
+        return;
+    }
     if (enable && !isOk()) {
         return;
     }
@@ -1004,6 +1001,10 @@ void Channel::doRemoteSensingEnable(bool enable) {
 }
 
 void Channel::doRemoteProgrammingEnable(bool enable) {
+    if (!(params.features & CH_FEATURE_RPROG)) {
+        return;
+    }
+
     if (enable && !isOk()) {
         return;
     }
@@ -1041,9 +1042,7 @@ void Channel::update() {
     setCurrent(i.set);
     doOutputEnable(flags.outputEnabled);
     doRemoteSensingEnable(flags.senseEnabled);
-    if (params.features & CH_FEATURE_RPROG) {
-        doRemoteProgrammingEnable(flags.rprogEnabled);
-    }
+    doRemoteProgrammingEnable(flags.rprogEnabled);
 
     profile::enableSave(wasSaveProfileEnabled);
 }
