@@ -2787,7 +2787,6 @@ void data_channel_tracking_is_allowed(data::DataOperationEnum operation, data::C
 
 void data_is_any_coupling_allowed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        auto channel = Channel::get(cursor.i);
         value = channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_PARALLEL, nullptr) ||
                 channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_SERIES, nullptr) ||
                 channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_COMMON_GND, nullptr) ||

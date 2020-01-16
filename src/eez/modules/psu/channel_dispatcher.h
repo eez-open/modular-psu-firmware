@@ -47,6 +47,7 @@ enum ChannelMode {
 ChannelMode getChannelMode(const Channel &channel);
 
 float getValuePrecision(const Channel &channel, Unit unit, float value);
+float roundChannelValue(const Channel &channel, Unit unit, float value);
 
 float getUSet(const Channel &channel);
 float getUSetUnbalanced(const Channel &channel);

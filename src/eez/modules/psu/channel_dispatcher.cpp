@@ -420,6 +420,10 @@ float getValuePrecision(const Channel &channel, Unit unit, float value) {
     return channel.getValuePrecision(unit, value);
 }
 
+float roundChannelValue(const Channel &channel, Unit unit, float value) {
+    return roundPrec(value, getValuePrecision(channel, unit, value));
+}
+
 float getUSet(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
         return Channel::get(0).u.set + Channel::get(1).u.set;
