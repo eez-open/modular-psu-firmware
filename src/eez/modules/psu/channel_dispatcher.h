@@ -115,7 +115,6 @@ bool outputEnable(Channel &channel, bool enable, int *err);
 void disableOutputForAllChannels();
 
 void remoteSensingEnable(Channel &channel, bool enable);
-void remoteProgrammingEnable(Channel &channel, bool enable);
 
 bool isTripped(Channel &channel);
 void clearProtection(Channel &channel);

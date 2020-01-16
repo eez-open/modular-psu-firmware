@@ -67,6 +67,7 @@ bool setListValue(Channel &channel, int16_t it, int *err);
 void tick(uint32_t tick_usec);
 
 bool isActive();
+bool isActive(Channel &channel);
 
 extern int g_numChannelsWithVisibleCounters;
 extern int g_channelsWithVisibleCounters[CH_MAX];

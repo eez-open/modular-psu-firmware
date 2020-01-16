@@ -45,7 +45,6 @@
 #include <eez/system.h>
 
 #define CONF_GUI_TOAST_DURATION_MS 2000L
-#define CONF_GUI_TOAST_WITH_ACTION_DURATION_MS 5000L
 
 namespace eez {
 namespace gui {
@@ -83,7 +82,7 @@ void AppContext::stateManagment() {
     uint32_t inactivityPeriod = psu::idle::getGuiAndEncoderInactivityPeriod();
     if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
         ToastMessagePage *page = (ToastMessagePage *)getActivePage();
-        if ((page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_WITH_ACTION_DURATION_MS) || (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS)) {
+        if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
             popPage();
             return;
         }

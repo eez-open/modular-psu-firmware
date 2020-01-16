@@ -269,7 +269,10 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 		}
 
 		// pass click through if active page is toast page and clicked outside
-		bool passThrough = g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE;
+        bool passThrough = 
+            g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE && 
+            !((ToastMessagePage *)g_appContext->getActivePage())->hasAction();
+
 
 		// clicked outside internal page, close internal page
 		popPage();
@@ -361,7 +364,9 @@ WidgetCursor findWidget(int16_t x, int16_t y) {
 
         if (!widgetCursor) {
             // clicked outside internal page, close internal page
-        	bool passThrough = g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE;
+        	bool passThrough = 
+                g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE && 
+                !((ToastMessagePage *)g_appContext->getActivePage())->hasAction();
 
             popPage();
 

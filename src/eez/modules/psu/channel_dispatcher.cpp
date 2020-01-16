@@ -1290,22 +1290,6 @@ void remoteSensingEnable(Channel &channel, bool enable) {
     }
 }
 
-void remoteProgrammingEnable(Channel &channel, bool enable) {
-    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        Channel::get(0).remoteProgrammingEnable(enable);
-        Channel::get(1).remoteProgrammingEnable(enable);
-    } else if (channel.flags.trackingEnabled) {
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel &trackingChannel = Channel::get(i);
-            if (trackingChannel.flags.trackingEnabled) {
-                trackingChannel.remoteProgrammingEnable(enable);
-            }
-        }
-    } else {
-        channel.remoteProgrammingEnable(enable);
-    }
-}
-
 bool isTripped(Channel &channel) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
         return Channel::get(0).isTripped() || Channel::get(1).isTripped();

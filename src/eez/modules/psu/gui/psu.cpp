@@ -1299,8 +1299,8 @@ void channelToggleOutput() {
         errorMessage("Channel is tripped!");
     } else {
         bool triggerModeEnabled =
-            channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||
-            channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED;
+            (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||
+            channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) && !channel.isRemoteProgrammingEnabled();
 
         if (channel.isOutputEnabled()) {
             if (triggerModeEnabled) {

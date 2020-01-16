@@ -1148,6 +1148,9 @@ bool Channel::isRemoteSensingEnabled() {
 
 void Channel::remoteProgrammingEnable(bool enable) {
     if (enable != flags.rprogEnabled) {
+        if (list::isActive(*this)) {
+            trigger::abort();
+        }
         doRemoteProgrammingEnable(enable);
         event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_REMOTE_PROG_ENABLED : event_queue::EVENT_INFO_CH1_REMOTE_PROG_DISABLED) + channelIndex);
         profile::save();

@@ -458,6 +458,9 @@ static bool psuReset() {
     }
 
     //
+    channel_dispatcher::setTrackingChannels(0);
+
+    //
     trigger::reset();
 
     //
