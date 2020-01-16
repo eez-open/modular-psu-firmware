@@ -72,24 +72,38 @@ bool isCouplingTypeAllowed(CouplingType couplingType, int *err) {
         return true;
     }
 
-    if (CH_NUM < 2) {
-        if (err) {
-            *err = SCPI_ERROR_HARDWARE_MISSING;
-        }
-        return false;
-    }
+    if (couplingType == COUPLING_TYPE_COMMON_GND) {
+        int n = 0;
 
-    if (!Channel::get(0).isOk() || !Channel::get(1).isOk()) {
-        if (err) {
-            *err = SCPI_ERROR_HARDWARE_ERROR;
+        for (int i = 0; i < CH_NUM; i++) {
+            Channel &channel = Channel::get(i);
+            if (channel.isOk() && channel.subchannelIndex == 0) {
+                n++;
+            }
         }
-        return false;
-    }
 
-    if (couplingType == COUPLING_TYPE_PARALLEL || couplingType == COUPLING_TYPE_SERIES) {
-        if (!(Channel::get(0).params.features & CH_FEATURE_COUPLING) || !(Channel::get(1).params.features & CH_FEATURE_COUPLING)) {
+        if (n < 2) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_ERROR;
+            }
+            return false;
+        }
+    } else {
+        if (CH_NUM < 2) {
             if (err) {
                 *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        if (
+            !Channel::get(0).isOk() || 
+            !(Channel::get(0).params.features & CH_FEATURE_COUPLING) || 
+            !Channel::get(1).isOk() ||
+            !(Channel::get(1).params.features & CH_FEATURE_COUPLING)
+        ) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_ERROR;
             }
             return false;
         }
@@ -112,9 +126,11 @@ bool setCouplingType(CouplingType couplingType, int *err) {
 
         for (int i = 0; i < 2; ++i) {
             Channel &channel = Channel::get(i);
+
             channel.outputEnable(false);
             channel.remoteSensingEnable(false);
             channel.remoteProgrammingEnable(false);
+
             channel.setVoltageTriggerMode(TRIGGER_MODE_FIXED);
             channel.setCurrentTriggerMode(TRIGGER_MODE_FIXED);
             channel.setTriggerOutputState(true);
@@ -124,12 +140,10 @@ bool setCouplingType(CouplingType couplingType, int *err) {
 
             if (g_couplingType != COUPLING_TYPE_NONE) {
                 channel.setVoltage(getUMin(channel));
-                channel.setVoltageLimit(MIN(Channel::get(0).getVoltageLimit(),
-                                            Channel::get(1).getVoltageLimit()));
+                channel.setVoltageLimit(MIN(Channel::get(0).getVoltageLimit(), Channel::get(1).getVoltageLimit()));
 
                 channel.setCurrent(getIMin(channel));
-                channel.setCurrentLimit(MIN(Channel::get(0).getCurrentLimit(),
-                                            Channel::get(1).getCurrentLimit()));
+                channel.setCurrentLimit(MIN(Channel::get(0).getCurrentLimit(), Channel::get(1).getCurrentLimit()));
 
                 trigger::setVoltage(channel, getUMin(channel));
                 trigger::setCurrent(channel, getIMin(channel));
@@ -151,11 +165,6 @@ bool setCouplingType(CouplingType couplingType, int *err) {
                 temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.state = temperature::sensors[temp_sensor::CH1].prot_conf.state || temperature::sensors[temp_sensor::CH2].prot_conf.state ? 1 : 0;
                 temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.level = MIN(temperature::sensors[temp_sensor::CH1].prot_conf.level, temperature::sensors[temp_sensor::CH2].prot_conf.level);
                 temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.delay = MIN(temperature::sensors[temp_sensor::CH1].prot_conf.delay, temperature::sensors[temp_sensor::CH2].prot_conf.delay);
-
-                channel.setVoltageTriggerMode(TRIGGER_MODE_FIXED);
-                channel.setCurrentTriggerMode(TRIGGER_MODE_FIXED);
-                channel.setTriggerOutputState(true);
-                channel.setTriggerOnListStop(TRIGGER_ON_LIST_STOP_OUTPUT_OFF);
             }
 
             if (i == 1) {
@@ -295,11 +304,20 @@ void setTrackingChannels(uint16_t trackingEnabled) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
             	trackingChannel.outputEnable(false);
+                trackingChannel.remoteSensingEnable(false);
+                trackingChannel.remoteProgrammingEnable(false);
+
+                trackingChannel.setVoltageTriggerMode(TRIGGER_MODE_FIXED);
+                trackingChannel.setCurrentTriggerMode(TRIGGER_MODE_FIXED);
+                trackingChannel.setTriggerOutputState(true);
+                trackingChannel.setTriggerOnListStop(TRIGGER_ON_LIST_STOP_OUTPUT_OFF);
+
+                list::resetChannelList(trackingChannel);
 
                 trackingChannel.setVoltage(uMin);
-                trackingChannel.setCurrent(iMin);
-
                 trackingChannel.setVoltageLimit(voltageLimit);
+
+                trackingChannel.setCurrent(iMin);
                 trackingChannel.setCurrentLimit(currentLimit);
 
                 trigger::setVoltage(trackingChannel, uDef);
@@ -323,10 +341,7 @@ void setTrackingChannels(uint16_t trackingEnabled) {
                 temperature::sensors[temp_sensor::CH1 + i].prot_conf.level = t_level;
                 temperature::sensors[temp_sensor::CH1 + i].prot_conf.delay = t_delay;
 
-                trackingChannel.setVoltageTriggerMode(TRIGGER_MODE_FIXED);
-                trackingChannel.setCurrentTriggerMode(TRIGGER_MODE_FIXED);
-                trackingChannel.setTriggerOutputState(true);
-                trackingChannel.setTriggerOnListStop(TRIGGER_ON_LIST_STOP_OUTPUT_OFF);
+                trackingChannel.resetHistory();
             }
         }
 
@@ -1697,6 +1712,70 @@ void setTriggerCurrent(Channel &channel, float value) {
         }
     } else {
         trigger::setCurrent(channel, value);
+    }
+}
+
+void setDwellList(Channel &channel, float *list, uint16_t listLength) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        list::setDwellList(Channel::get(0), list, listLength);
+        list::setDwellList(Channel::get(1), list, listLength);
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                list::setDwellList(trackingChannel, list, listLength);
+            }
+        }
+    } else {
+        list::setDwellList(channel, list, listLength);
+    }
+}
+
+void setVoltageList(Channel &channel, float *list, uint16_t listLength) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        list::setVoltageList(Channel::get(0), list, listLength);
+        list::setVoltageList(Channel::get(1), list, listLength);
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                list::setVoltageList(trackingChannel, list, listLength);
+            }
+        }
+    } else {
+        list::setVoltageList(channel, list, listLength);
+    }
+}
+
+void setCurrentList(Channel &channel, float *list, uint16_t listLength) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        list::setCurrentList(Channel::get(0), list, listLength);
+        list::setCurrentList(Channel::get(1), list, listLength);
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                list::setCurrentList(trackingChannel, list, listLength);
+            }
+        }
+    } else {
+        list::setCurrentList(channel, list, listLength);
+    }
+}
+
+void setListCount(Channel &channel, uint16_t value) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        list::setListCount(Channel::get(0), value);
+        list::setListCount(Channel::get(1), value);
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                list::setListCount(trackingChannel, value);
+            }
+        }
+    } else {
+        list::setListCount(channel, value);
     }
 }
 

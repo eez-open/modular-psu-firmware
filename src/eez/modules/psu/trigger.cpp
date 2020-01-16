@@ -339,16 +339,16 @@ int startImmediately() {
             //channel_dispatcher::setCurrent(channel, 0);
 
             list::executionStart(channel);
-
-            channel_dispatcher::outputEnable(
-                channel, channel_dispatcher::getTriggerOutputState(channel));
+            
+            if (list::isActive()) {
+                channel_dispatcher::outputEnable(channel, channel_dispatcher::getTriggerOutputState(channel));
+            }
         } else {
             if (channel.getVoltageTriggerMode() == TRIGGER_MODE_STEP) {
                 channel_dispatcher::setVoltage(channel, g_levels[i].u);
                 channel_dispatcher::setCurrent(channel, g_levels[i].i);
 
-                channel_dispatcher::outputEnable(
-                    channel, channel_dispatcher::getTriggerOutputState(channel));
+                channel_dispatcher::outputEnable(channel, channel_dispatcher::getTriggerOutputState(channel));
             }
 
             setTriggerFinished(channel);

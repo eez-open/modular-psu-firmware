@@ -310,9 +310,9 @@ bool loadList(int iChannel, const char *filePath, int *err) {
     file.close();
 
     if (success) {
-        setDwellList(channel, dwellList, dwellListLength);
-        setVoltageList(channel, voltageList, voltageListLength);
-        setCurrentList(channel, currentList, currentListLength);
+        channel_dispatcher::setDwellList(channel, dwellList, dwellListLength);
+        channel_dispatcher::setVoltageList(channel, voltageList, voltageListLength);
+        channel_dispatcher::setCurrentList(channel, currentList, currentListLength);
     } else {
         // TODO replace with more specific error
         if (err) {
@@ -355,10 +355,13 @@ bool saveList(int iChannel, const char *filePath, int *err) {
         return false;
     }
 
-    for (int i = 0; i < g_channelsLists[channel.channelIndex].dwellListLength ||
-                    i < g_channelsLists[channel.channelIndex].voltageListLength ||
-                    i < g_channelsLists[channel.channelIndex].currentListLength;
-         ++i) {
+    for (
+        int i = 0; 
+        i < g_channelsLists[channel.channelIndex].dwellListLength ||
+        i < g_channelsLists[channel.channelIndex].voltageListLength ||
+        i < g_channelsLists[channel.channelIndex].currentListLength;
+        i++
+    ) {
         if (i < g_channelsLists[channel.channelIndex].dwellListLength) {
             file.print(g_channelsLists[channel.channelIndex].dwellList[i], 4);
         } else {
@@ -472,7 +475,7 @@ void tick(uint32_t tick_usec) {
         if (g_execution[i].counter >= 0) {
             if (channel_dispatcher::isTripped(channel)) {
                 setActive(false);
-                abort();
+                trigger::abort();
                 return;
             }
 
@@ -495,9 +498,7 @@ void tick(uint32_t tick_usec) {
                 if (g_execution[i].it == -1) {
                     set = true;
                 } else {
-                    g_execution[i].currentRemainingDwellTime =
-                        g_execution[i].nextPointTime - tickCount;
-
+                    g_execution[i].currentRemainingDwellTime = g_execution[i].nextPointTime - tickCount;
                     if (g_execution[i].currentRemainingDwellTime <= 0) {
                         set = true;
                     }
@@ -518,28 +519,22 @@ void tick(uint32_t tick_usec) {
 
                     int err;
                     if (!setListValue(channel, g_execution[i].it, &err)) {
-                        setActive(false);
                         generateError(err);
-                        abort();
+                        setActive(false);
+                        trigger::abort();
                         return;
                     }
 
-                    g_execution[i].currentTotalDwellTime =
-                        g_channelsLists[i]
-                            .dwellList[g_execution[i].it % g_channelsLists[i].dwellListLength];
+                    g_execution[i].currentTotalDwellTime = g_channelsLists[i] .dwellList[g_execution[i].it % g_channelsLists[i].dwellListLength];
                     // if dwell time is greater then CONF_COUNTER_THRESHOLD_IN_SECONDS ...
                     if (g_execution[i].currentTotalDwellTime > CONF_COUNTER_THRESHOLD_IN_SECONDS) {
                         // ... then count in milliseconds
-                        g_execution[i].currentRemainingDwellTime =
-                            (uint32_t)round(g_execution[i].currentTotalDwellTime * 1000L);
-                        g_execution[i].nextPointTime =
-                            millis() + g_execution[i].currentRemainingDwellTime;
+                        g_execution[i].currentRemainingDwellTime = (uint32_t)round(g_execution[i].currentTotalDwellTime * 1000L);
+                        g_execution[i].nextPointTime = millis() + g_execution[i].currentRemainingDwellTime;
                     } else {
                         // ... else count in microseconds
-                        g_execution[i].currentRemainingDwellTime =
-                            (uint32_t)round(g_execution[i].currentTotalDwellTime * 1000000L);
-                        g_execution[i].nextPointTime =
-                            tick_usec + g_execution[i].currentRemainingDwellTime;
+                        g_execution[i].currentRemainingDwellTime = (uint32_t)round(g_execution[i].currentTotalDwellTime * 1000000L);
+                        g_execution[i].nextPointTime = tick_usec + g_execution[i].currentRemainingDwellTime;
                     }
                 }
             }

@@ -970,7 +970,7 @@ scpi_result_t scpi_cmd_sourceListCount(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    list::setListCount(*channel, count);
+    channel_dispatcher::setListCount(*channel, count);
     profile::save();
 
     return SCPI_RES_OK;
@@ -1044,7 +1044,7 @@ scpi_result_t scpi_cmd_sourceListCurrentLevel(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    list::setCurrentList(*channel, list, listLength);
+    channel_dispatcher::setCurrentList(*channel, list, listLength);
     profile::save();
 
     return SCPI_RES_OK;
@@ -1105,7 +1105,7 @@ scpi_result_t scpi_cmd_sourceListDwell(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    list::setDwellList(*channel, list, listLength);
+    channel_dispatcher::setDwellList(*channel, list, listLength);
     profile::save();
 
     return SCPI_RES_OK;
@@ -1181,7 +1181,7 @@ scpi_result_t scpi_cmd_sourceListVoltageLevel(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    list::setVoltageList(*channel, list, listLength);
+    channel_dispatcher::setVoltageList(*channel, list, listLength);
     profile::save();
 
     return SCPI_RES_OK;

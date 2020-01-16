@@ -151,6 +151,11 @@ void setTriggerVoltage(Channel &channel, float value);
 float getTriggerCurrent(Channel &channel);
 void setTriggerCurrent(Channel &channel, float value);
 
+void setDwellList(Channel &channel, float *list, uint16_t listLength);
+void setVoltageList(Channel &channel, float *list, uint16_t listLength);
+void setCurrentList(Channel &channel, float *list, uint16_t listLength);
+void setListCount(Channel &channel, uint16_t value);
+
 void setCurrentRangeSelectionMode(Channel &channel, CurrentRangeSelectionMode mode);
 void enableAutoSelectCurrentRange(Channel &channel, bool enable);
 

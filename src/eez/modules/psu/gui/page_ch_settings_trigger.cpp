@@ -137,13 +137,13 @@ void ChSettingsTriggerPage::editTriggerOnListStop() {
 
 void ChSettingsTriggerPage::onListCountSet(float value) {
     popPage();
-    list::setListCount(*g_channel, (uint16_t)value);
+    channel_dispatcher::setListCount(*g_channel, (uint16_t)value);
     profile::save();
 }
 
 void ChSettingsTriggerPage::onListCountSetToInfinity() {
     popPage();
-    list::setListCount(*g_channel, 0);
+    channel_dispatcher::setListCount(*g_channel, 0);
     profile::save();
 }
 
@@ -464,14 +464,12 @@ int ChSettingsListsPage::getDirty() {
 
 void ChSettingsListsPage::set() {
     if (getDirty()) {
-        if (list::areListLengthsEquivalent(m_dwellListLength, m_voltageListLength,
-                                           m_currentListLength) ||
-            getMaxListLength() == 0) {
+        if (list::areListLengthsEquivalent(m_dwellListLength, m_voltageListLength, m_currentListLength) || getMaxListLength() == 0) {
             trigger::abort();
 
-            list::setDwellList(*g_channel, m_dwellList, m_dwellListLength);
-            list::setVoltageList(*g_channel, m_voltageList, m_voltageListLength);
-            list::setCurrentList(*g_channel, m_currentList, m_currentListLength);
+            channel_dispatcher::setDwellList(*g_channel, m_dwellList, m_dwellListLength);
+            channel_dispatcher::setVoltageList(*g_channel, m_voltageList, m_voltageListLength);
+            channel_dispatcher::setCurrentList(*g_channel, m_currentList, m_currentListLength);
 
             profile::save();
 

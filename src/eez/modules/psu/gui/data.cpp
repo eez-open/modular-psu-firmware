@@ -1023,26 +1023,8 @@ void data_channel_u_set(data::DataOperationEnum operation, data::Cursor &cursor,
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
-        value = MakeValue(channel_dispatcher::getUSetUnbalanced(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
-        value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = UNIT_VOLT;
-    } else if (operation == data::DATA_OPERATION_SET) {
-        if (!between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel))) {
-            value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
-        } else if (value.getFloat() > channel_dispatcher::getULimit(channel)) {
-            value = MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
-        } else if (value.getFloat() * channel_dispatcher::getISetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
-            value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
-        } else {
-            channel_dispatcher::setVoltage(channel, value.getFloat());
-        }
+    } else {
+        data_channel_u_edit(operation, cursor, value);
     }
 }
 
@@ -1152,26 +1134,8 @@ void data_channel_i_set(data::DataOperationEnum operation, data::Cursor &cursor,
     Channel &channel = Channel::get(iChannel);
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
-        value = MakeValue(channel_dispatcher::getISetUnbalanced(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
-        value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-        value = UNIT_AMPER;
-    } else if (operation == data::DATA_OPERATION_SET) {
-        if (!between(value.getFloat(), channel_dispatcher::getIMin(channel), channel_dispatcher::getIMax(channel))) {
-            value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
-        } else if (value.getFloat() > channel_dispatcher::getILimit(channel)) {
-            value = MakeScpiErrorValue(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
-        } else if (value.getFloat() * channel_dispatcher::getUSetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
-            value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
-        } else {
-            channel_dispatcher::setCurrent(channel, value.getFloat());
-        }
+    } else {
+        data_channel_i_edit(operation, cursor, value);
     }
 }
 
@@ -2821,11 +2785,28 @@ void data_channel_tracking_is_allowed(data::DataOperationEnum operation, data::C
     }
 }
 
+void data_is_any_coupling_allowed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        auto channel = Channel::get(cursor.i);
+        value = channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_PARALLEL, nullptr) ||
+                channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_SERIES, nullptr) ||
+                channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_COMMON_GND, nullptr) ||
+                channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS, nullptr) ? 1 : 0;
+    }
+}
+
 void data_is_coupling_parallel_allowed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_PARALLEL, nullptr) ? 1 : 0;
     }
 }
+
+void data_is_coupling_split_rails_allowed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS, nullptr) ? 1 : 0;
+    }
+}
+
 
 void data_is_coupling_series_allowed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
