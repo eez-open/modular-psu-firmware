@@ -557,10 +557,26 @@ bool isActive(Channel &channel) {
 int g_numChannelsWithVisibleCounters;
 int g_channelsWithVisibleCounters[CH_MAX];
 
+int getFirstTrackingChannel() {
+    for (int i = 0; i < CH_NUM; i++) {
+        if (Channel::get(i).flags.trackingEnabled) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int32_t getCounter(int channelIndex) {
+    if (Channel::get(channelIndex).flags.trackingEnabled) {
+        channelIndex = getFirstTrackingChannel();
+    }
+    return g_execution[channelIndex].counter;
+}
+
 void updateChannelsWithVisibleCountersList() {
     g_numChannelsWithVisibleCounters = 0;
     for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-        if (g_execution[channelIndex].counter >= 0) {
+        if (getCounter(channelIndex) >= 0) {
             auto &channelLists = g_channelsLists[channelIndex];
             for (int j = 0; j < channelLists.dwellListLength; j++) {
                 if (channelLists.dwellList[j] >= CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD) {
@@ -573,7 +589,7 @@ void updateChannelsWithVisibleCountersList() {
 }
 
 bool getCurrentDwellTime(Channel &channel, int32_t &remaining, uint32_t &total) {
-    int i = channel.channelIndex;
+    int i = channel.flags.trackingEnabled ? getFirstTrackingChannel() : channel.channelIndex;
     if (g_execution[i].counter >= 0) {
         total = (uint32_t)ceilf(g_execution[i].currentTotalDwellTime);
         if (g_execution[i].currentTotalDwellTime > CONF_COUNTER_THRESHOLD_IN_SECONDS) {

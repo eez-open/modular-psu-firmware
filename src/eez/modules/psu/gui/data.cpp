@@ -4238,6 +4238,16 @@ void data_channels_with_list_counter_visible(data::DataOperationEnum operation, 
     }
 }
 
+void data_list_counter_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        if (cursor.i >= 0 && cursor.i < list::g_numChannelsWithVisibleCounters) {
+            int iChannel = list::g_channelsWithVisibleCounters[cursor.i];
+            value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON);
+        }
+    }
+}
+
+
 void data_channel_list_countdown(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (cursor.i >= 0 && cursor.i < list::g_numChannelsWithVisibleCounters) {

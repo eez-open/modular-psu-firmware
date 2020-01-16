@@ -220,16 +220,17 @@ bool setCouplingType(CouplingType couplingType, int *err) {
 }
 
 void setTrackingChannels(uint16_t trackingEnabled) {
-    bool channelsTracked = false;
+    bool resetTrackingChannels = false;
     for (int i = 0; i < CH_NUM; i++) {
         Channel &trackingChannel = Channel::get(i);
+        unsigned wasEnabled = trackingChannel.flags.trackingEnabled;
         trackingChannel.flags.trackingEnabled = (trackingEnabled & (1 << i)) ? 1 : 0;
-        if (trackingChannel.flags.trackingEnabled) {
-            channelsTracked = true;
+        if (!wasEnabled && trackingChannel.flags.trackingEnabled) {
+            resetTrackingChannels = true;
         }
     }
 
-    if (channelsTracked) {
+    if (resetTrackingChannels) {
         event_queue::pushEvent(event_queue::EVENT_INFO_CHANNELS_TRACKED);
 
         trigger::abort();
@@ -1546,7 +1547,6 @@ void setVoltageTriggerMode(Channel &channel, TriggerMode mode) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
                 trackingChannel.setVoltageTriggerMode(mode);
-                return;
             }
         }
     } else {
@@ -1576,7 +1576,6 @@ void setCurrentTriggerMode(Channel &channel, TriggerMode mode) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
                 trackingChannel.setCurrentTriggerMode(mode);
-                return;
             }
         }
     } else {
@@ -1606,7 +1605,6 @@ void setTriggerOutputState(Channel &channel, bool enable) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
                 trackingChannel.setTriggerOutputState(enable);
-                return;
             }
         }
     } else {
@@ -1636,7 +1634,6 @@ void setTriggerOnListStop(Channel &channel, TriggerOnListStop value) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
                 trackingChannel.setTriggerOnListStop(value);
-                return;
             }
         }
     } else {
