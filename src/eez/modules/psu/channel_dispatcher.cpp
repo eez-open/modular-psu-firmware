@@ -124,65 +124,68 @@ bool setCouplingType(CouplingType couplingType, int *err) {
 
         beginOutputEnableSequence();
 
-        for (int i = 0; i < 2; ++i) {
+        for (int i = 0; i < CH_NUM; ++i) {
             Channel &channel = Channel::get(i);
 
             channel.outputEnable(false);
-            channel.remoteSensingEnable(false);
-            channel.remoteProgrammingEnable(false);
 
-            channel.setVoltageTriggerMode(TRIGGER_MODE_FIXED);
-            channel.setCurrentTriggerMode(TRIGGER_MODE_FIXED);
-            channel.setTriggerOutputState(true);
-            channel.setTriggerOnListStop(TRIGGER_ON_LIST_STOP_OUTPUT_OFF);
+            if (i < 2 && couplingType != COUPLING_TYPE_COMMON_GND) {
+                channel.remoteSensingEnable(false);
+                channel.remoteProgrammingEnable(false);
 
-            list::resetChannelList(channel);
+                channel.setVoltageTriggerMode(TRIGGER_MODE_FIXED);
+                channel.setCurrentTriggerMode(TRIGGER_MODE_FIXED);
+                channel.setTriggerOutputState(true);
+                channel.setTriggerOnListStop(TRIGGER_ON_LIST_STOP_OUTPUT_OFF);
 
-            if (g_couplingType != COUPLING_TYPE_NONE) {
-                channel.setVoltage(getUMin(channel));
-                channel.setVoltageLimit(MIN(Channel::get(0).getVoltageLimit(), Channel::get(1).getVoltageLimit()));
+                list::resetChannelList(channel);
 
-                channel.setCurrent(getIMin(channel));
-                channel.setCurrentLimit(MIN(Channel::get(0).getCurrentLimit(), Channel::get(1).getCurrentLimit()));
+                if (g_couplingType != COUPLING_TYPE_NONE) {
+                    channel.setVoltage(getUMin(channel));
+                    channel.setVoltageLimit(MIN(Channel::get(0).getVoltageLimit(), Channel::get(1).getVoltageLimit()));
 
-                trigger::setVoltage(channel, getUMin(channel));
-                trigger::setCurrent(channel, getIMin(channel));
+                    channel.setCurrent(getIMin(channel));
+                    channel.setCurrentLimit(MIN(Channel::get(0).getCurrentLimit(), Channel::get(1).getCurrentLimit()));
 
-                channel.prot_conf.flags.u_state = Channel::get(0).prot_conf.flags.u_state || Channel::get(1).prot_conf.flags.u_state ? 1 : 0;
-                if (channel.params.features & CH_FEATURE_HW_OVP) {
-                    channel.prot_conf.flags.u_type = Channel::get(0).prot_conf.flags.u_type || Channel::get(1).prot_conf.flags.u_type ? 1 : 0;
+                    trigger::setVoltage(channel, getUMin(channel));
+                    trigger::setCurrent(channel, getIMin(channel));
+
+                    channel.prot_conf.flags.u_state = Channel::get(0).prot_conf.flags.u_state || Channel::get(1).prot_conf.flags.u_state ? 1 : 0;
+                    if (channel.params.features & CH_FEATURE_HW_OVP) {
+                        channel.prot_conf.flags.u_type = Channel::get(0).prot_conf.flags.u_type || Channel::get(1).prot_conf.flags.u_type ? 1 : 0;
+                    }
+                    channel.prot_conf.u_level = MIN(Channel::get(0).prot_conf.u_level, Channel::get(1).prot_conf.u_level);
+                    channel.prot_conf.u_delay = MIN(Channel::get(0).prot_conf.u_delay, Channel::get(1).prot_conf.u_delay);
+
+                    channel.prot_conf.flags.i_state = Channel::get(0).prot_conf.flags.i_state || Channel::get(1).prot_conf.flags.i_state ? 1 : 0;
+                    channel.prot_conf.i_delay = MIN(Channel::get(0).prot_conf.i_delay, Channel::get(1).prot_conf.i_delay);
+
+                    channel.prot_conf.flags.p_state = Channel::get(0).prot_conf.flags.p_state || Channel::get(1).prot_conf.flags.p_state ? 1 : 0;
+                    channel.prot_conf.p_level = MIN(Channel::get(0).prot_conf.p_level, Channel::get(1).prot_conf.p_level);
+                    channel.prot_conf.p_delay = MIN(Channel::get(0).prot_conf.p_delay, Channel::get(1).prot_conf.p_delay);
+
+                    temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.state = temperature::sensors[temp_sensor::CH1].prot_conf.state || temperature::sensors[temp_sensor::CH2].prot_conf.state ? 1 : 0;
+                    temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.level = MIN(temperature::sensors[temp_sensor::CH1].prot_conf.level, temperature::sensors[temp_sensor::CH2].prot_conf.level);
+                    temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.delay = MIN(temperature::sensors[temp_sensor::CH1].prot_conf.delay, temperature::sensors[temp_sensor::CH2].prot_conf.delay);
                 }
-                channel.prot_conf.u_level = MIN(Channel::get(0).prot_conf.u_level, Channel::get(1).prot_conf.u_level);
-                channel.prot_conf.u_delay = MIN(Channel::get(0).prot_conf.u_delay, Channel::get(1).prot_conf.u_delay);
 
-                channel.prot_conf.flags.i_state = Channel::get(0).prot_conf.flags.i_state || Channel::get(1).prot_conf.flags.i_state ? 1 : 0;
-                channel.prot_conf.i_delay = MIN(Channel::get(0).prot_conf.i_delay, Channel::get(1).prot_conf.i_delay);
+                if (i == 1) {
+                    Channel &channel1 = Channel::get(0);
+                    channel.flags.displayValue1 = channel1.flags.displayValue1;
+                    channel.flags.displayValue2 = channel1.flags.displayValue2;
+                    channel.ytViewRate = channel1.ytViewRate;
 
-                channel.prot_conf.flags.p_state = Channel::get(0).prot_conf.flags.p_state || Channel::get(1).prot_conf.flags.p_state ? 1 : 0;
-                channel.prot_conf.p_level = MIN(Channel::get(0).prot_conf.p_level, Channel::get(1).prot_conf.p_level);
-                channel.prot_conf.p_delay = MIN(Channel::get(0).prot_conf.p_delay, Channel::get(1).prot_conf.p_delay);
+                }
 
-                temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.state = temperature::sensors[temp_sensor::CH1].prot_conf.state || temperature::sensors[temp_sensor::CH2].prot_conf.state ? 1 : 0;
-                temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.level = MIN(temperature::sensors[temp_sensor::CH1].prot_conf.level, temperature::sensors[temp_sensor::CH2].prot_conf.level);
-                temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.delay = MIN(temperature::sensors[temp_sensor::CH1].prot_conf.delay, temperature::sensors[temp_sensor::CH2].prot_conf.delay);
+                channel.setCurrentRangeSelectionMode(CURRENT_RANGE_SELECTION_USE_BOTH);
+                channel.enableAutoSelectCurrentRange(false);
+
+                if (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL) { 
+                    channel.flags.trackingEnabled = false;
+                }
+
+                channel.resetHistory();
             }
-
-            if (i == 1) {
-                Channel &channel1 = Channel::get(0);
-                channel.flags.displayValue1 = channel1.flags.displayValue1;
-                channel.flags.displayValue2 = channel1.flags.displayValue2;
-                channel.ytViewRate = channel1.ytViewRate;
-
-            }
-
-            channel.setCurrentRangeSelectionMode(CURRENT_RANGE_SELECTION_USE_BOTH);
-            channel.enableAutoSelectCurrentRange(false);
-
-            if (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL) { 
-                channel.flags.trackingEnabled = false;
-            }
-
-            channel.resetHistory();
         }
 
         endOutputEnableSequence();
