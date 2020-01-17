@@ -1034,7 +1034,7 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMon(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
+        value = MakeValue(0, UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
@@ -1145,7 +1145,7 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMon(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
+        value = MakeValue(0, UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
@@ -1246,7 +1246,7 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMon(channel) * channel_dispatcher::getIMon(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(channel_dispatcher::getPowerMinLimit(channel), UNIT_WATT);
+        value = MakeValue(0, UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getPowerMaxLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
