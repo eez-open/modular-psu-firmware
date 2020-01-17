@@ -876,7 +876,7 @@ void setCurrentLimit(Channel &channel, float limit) {
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
-                trackingChannel.setCurrent(limit);
+                trackingChannel.setCurrentLimit(limit);
             }
         }
     } else {
