@@ -126,6 +126,10 @@ osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec) {
     if (millisec == 0) millisec = 1;
 
     while (queue_id->tail == queue_id->head) {
+        if (queue_id->overflow) {
+            queue_id->overflow = 0;
+        }
+
 #ifdef __EMSCRIPTEN__
         return {
             osOK,
