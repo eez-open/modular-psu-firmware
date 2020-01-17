@@ -34,6 +34,10 @@
 #include <eez/modules/psu/trigger.h>
 #include <eez/system.h>
 
+#if defined EEZ_PLATFORM_STM32
+#include <eez/modules/bp3c/flash_slave.h>
+#endif
+
 namespace eez {
 namespace psu {
 namespace io_pins {
@@ -56,9 +60,12 @@ static bool g_isInhibitedByUser;
 int ioPinRead(int pin) {
     if (pin == EXT_TRIG1) {
 #if EEZ_MCU_REVISION_R1B5
-    return HAL_GPIO_ReadPin(UART_RX_DIN1_GPIO_Port, UART_RX_DIN1_Pin) ? 1 : 0;
+        if (bp3c::flash_slave::g_bootloaderMode) {
+            return 0;
+        }
+        return HAL_GPIO_ReadPin(UART_RX_DIN1_GPIO_Port, UART_RX_DIN1_Pin) ? 1 : 0;
 #else
-    return HAL_GPIO_ReadPin(DIN1_GPIO_Port, DIN1_Pin) ? 1 : 0;
+        return HAL_GPIO_ReadPin(DIN1_GPIO_Port, DIN1_Pin) ? 1 : 0;
 #endif
     } {
     	assert(pin == EXT_TRIG2);
@@ -69,7 +76,9 @@ int ioPinRead(int pin) {
 void ioPinWrite(int pin, int state) {
     if (pin == DOUT1) {
 #if EEZ_MCU_REVISION_R1B5
-    	HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin, state ? GPIO_PIN_SET : GPIO_PIN_RESET);
+        if (!bp3c::flash_slave::g_bootloaderMode) {
+    	    HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin, state ? GPIO_PIN_SET : GPIO_PIN_RESET);
+        }
 #else
     	HAL_GPIO_WritePin(DOUT1_GPIO_Port, DOUT1_Pin, state ? GPIO_PIN_SET : GPIO_PIN_RESET);
 #endif
@@ -125,15 +134,17 @@ uint8_t isOutputEnabled() {
 
 void initInputPin(int pin) {
 #if defined EEZ_PLATFORM_STM32
-    GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+    if (!bp3c::flash_slave::g_bootloaderMode || pin != 0) {
+        GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-    const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
+        const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
 
-    GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = ioPin.polarity == io_pins::POLARITY_POSITIVE ? GPIO_PULLDOWN : GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(pin == 0 ? UART_RX_DIN1_GPIO_Port : DIN2_GPIO_Port, &GPIO_InitStruct);
+        GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+        GPIO_InitStruct.Pull = ioPin.polarity == io_pins::POLARITY_POSITIVE ? GPIO_PULLDOWN : GPIO_PULLUP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+        HAL_GPIO_Init(pin == 0 ? UART_RX_DIN1_GPIO_Port : DIN2_GPIO_Port, &GPIO_InitStruct);
+    }
 #endif
 }
 
@@ -142,12 +153,14 @@ void initOutputPins() {
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
     // Configure DOUT1 GPIO pin
-    GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
-    HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin, GPIO_PIN_RESET);
+    if (!bp3c::flash_slave::g_bootloaderMode) {
+        GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+        HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
+        HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin, GPIO_PIN_RESET);
+    }
 
     // DOUT2 is already initialized
 #endif

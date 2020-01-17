@@ -40,7 +40,6 @@
 #include "task.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <eez/modules/bp3c/flashSlave.h>
 /* USER CODE END Includes */
   
 /* Private typedef -----------------------------------------------------------*/
@@ -342,8 +341,9 @@ void UART7_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+extern void byteFromSlave();
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	
 	if (huart == &huart7) {
 		byteFromSlave();
 	}

@@ -185,8 +185,6 @@ int main(int argc, char **argv) {
     MX_TIM6_Init();
     MX_TIM8_Init();
     MX_TIM12_Init();
-
-    // MX_UART7_Init();
 #endif
 
 #ifdef __EMSCRIPTEN__

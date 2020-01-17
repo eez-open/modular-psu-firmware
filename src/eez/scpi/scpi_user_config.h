@@ -110,12 +110,6 @@ extern "C" {
     X(SCPI_ERROR_EXT_EEPROM_TEST_FAILED,                     240, "External EEPROM test failed")                  \
     X(SCPI_ERROR_RTC_TEST_FAILED,                            250, "RTC test failed")                              \
 	X(SCPI_ERROR_ETHERNET_TEST_FAILED,                       260, "Ethernet test failed")                         \
-    X(SCPI_ERROR_CH1_ADC_TIMEOUT_DETECTED,                   270, "CH1 ADC timeout detected")                     \
-    X(SCPI_ERROR_CH2_ADC_TIMEOUT_DETECTED,                   271, "CH2 ADC timeout detected")                     \
-    X(SCPI_ERROR_CH3_ADC_TIMEOUT_DETECTED,                   272, "CH3 ADC timeout detected")                     \
-    X(SCPI_ERROR_CH4_ADC_TIMEOUT_DETECTED,                   273, "CH4 ADC timeout detected")                     \
-    X(SCPI_ERROR_CH5_ADC_TIMEOUT_DETECTED,                   274, "CH5 ADC timeout detected")                     \
-    X(SCPI_ERROR_CH6_ADC_TIMEOUT_DETECTED,                   275, "CH6 ADC timeout detected")                     \
     X(SCPI_ERROR_INCOMPATIBLE_TRANSIENT_MODES,               304, "Incompatible transient modes")                 \
     X(SCPI_ERROR_TOO_MANY_LIST_POINTS,                       306, "Too many list points")                         \
     X(SCPI_ERROR_LIST_LENGTHS_NOT_EQUIVALENT,                307, "List lengths are not equivalent")              \
@@ -125,6 +119,7 @@ extern "C" {
     X(SCPI_ERROR_LIST_IS_EMPTY,                              311, "List is empty")                                \
     X(SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED,         312, "Cannot execute when the channels are coupled") \
     X(SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE,             313, "Cannot execute in tracking mode")              \
+    X(SCPI_ERROR_CANNOT_SET_LIST_VALUE,                      314, "Cannot set list value")                        \
 	X(SCPI_ERROR_CANNOT_LOAD_EMPTY_PROFILE,                  400, "Cannot load empty profile")                    \
     X(SCPI_ERROR_PROFILE_MODULE_MISMATCH,                    401, "Module mismatch in profile")                   \
 	X(SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM,                   410, "No FAT file system on mass media")             \

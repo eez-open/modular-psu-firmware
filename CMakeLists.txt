@@ -409,12 +409,13 @@ source_group("eez\\modules\\aux_ps" FILES ${src_eez_modules_aux_ps} ${header_eez
 
 set(src_eez_modules_bp3c
     src/eez/modules/bp3c/eeprom.cpp
-    src/eez/modules/bp3c/relays.cpp
+    src/eez/modules/bp3c/io_exp.cpp
+    src/eez/modules/bp3c/flash_slave.cpp
 ) 
 list (APPEND src_files ${src_eez_modules_bp3c})
 set(header_eez_modules_bp3c
     src/eez/modules/bp3c/eeprom.h
-    src/eez/modules/bp3c/relays.h
+    src/eez/modules/bp3c/flash_slave.h
 ) 
 list (APPEND header_files ${header_eez_modules_bp3c})
 source_group("eez\\modules\\bp3c" FILES ${src_eez_modules_bp3c} ${header_eez_modules_bp3c})

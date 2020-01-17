@@ -69,9 +69,7 @@
 #include <eez/modules/psu/sd_card.h>
 #endif
 
-#if defined(EEZ_PLATFORM_STM32)
-#include <eez/modules/bp3c/relays.h>
-#endif
+#include <eez/modules/bp3c/io_exp.h>
 
 using namespace eez::gui;
 using namespace eez::psu;
@@ -845,8 +843,8 @@ void action_reset() {
 }
 
 void hard_reset() {
+    bp3c::io_exp::hardResetModules();
 #if defined(EEZ_PLATFORM_STM32)
-    bp3c::relays::hardResetModules();
     NVIC_SystemReset();
 #endif
 }

@@ -63,7 +63,7 @@
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ontime.h>
 
-#include <eez/modules/bp3c/relays.h>
+#include <eez/modules/bp3c/io_exp.h>
 #include <eez/modules/bp3c/eeprom.h>
 #include <eez/index.h>
 
@@ -197,7 +197,7 @@ void init() {
     sd_card::init();
 #endif
 
-    bp3c::relays::init();
+    bp3c::io_exp::init();
 
     // inst:memo 1,0,2,406
     // 1: slot no. (1, 2 or 3)
@@ -320,7 +320,7 @@ static bool testMaster() {
     result &= mcu::battery::test();
 
     // test BP3c
-    result &= bp3c::relays::test();
+    result &= bp3c::io_exp::test();
 
     g_masterTestResult = result ? TEST_OK : TEST_FAILED;
 

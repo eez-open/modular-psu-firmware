@@ -30,7 +30,7 @@
 #include <eez/modules/psu/trigger.h>
 #include <eez/index.h>
 #include <eez/system.h>
-#include <eez/modules/bp3c/relays.h>
+#include <eez/modules/bp3c/io_exp.h>
 
 namespace eez {
 namespace psu {
@@ -194,7 +194,7 @@ bool setCouplingType(CouplingType couplingType, int *err) {
             }
         }
 
-        bp3c::relays::switchChannelCoupling(g_couplingType);
+        bp3c::io_exp::switchChannelCoupling(g_couplingType);
 
         if (g_couplingType == COUPLING_TYPE_PARALLEL) {
             event_queue::pushEvent(event_queue::EVENT_INFO_COUPLED_IN_PARALLEL);

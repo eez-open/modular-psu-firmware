@@ -32,10 +32,15 @@
 #include <eez/modules/psu/ontime.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/event_queue.h>
+#if OPTION_DISPLAY
+#include <eez/modules/psu/gui/psu.h>
+#include <eez/gui/document.h>
+#endif
 
 #include <eez/modules/mcu/eeprom.h>
 
-#include <eez/modules/bp3c/relays.h>
+#include <eez/modules/bp3c/flash_slave.h>
+#include <eez/modules/bp3c/io_exp.h>
 
 namespace eez {
 namespace psu {
@@ -58,8 +63,9 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
 
             mcu::eeprom::resetAllExceptOnTimeCounters();
 
+            bp3c::io_exp::hardResetModules();
+
 #if defined(EEZ_PLATFORM_STM32)
-            bp3c::relays::hardResetModules();
             NVIC_SystemReset();
 #endif
         } else {
@@ -439,7 +445,10 @@ scpi_result_t scpi_cmd_debugDcm220Q(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugBoot(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
-    bp3c::relays::toggleBootloader(2);
+#if OPTION_DISPLAY
+    psu::gui::g_psuAppContext.pushPageOnNextIter(PAGE_ID_DEBUG_TRACE_LOG);
+#endif
+    bp3c::flash_slave::toggleBootloader(2);
 
     return SCPI_RES_OK;
 #else

@@ -36,7 +36,8 @@
 #include <eez/sound.h>
 #include <eez/index.h>
 
-#include <eez/modules/bp3c/relays.h>
+#include <eez/modules/bp3c/io_exp.h>
+#include <eez/modules/bp3c/flash_slave.h>
 
 namespace eez {
 
@@ -727,11 +728,7 @@ bool Channel::isTestOk() {
 }
 
 bool Channel::isOk() {
-    return isPowerUp() && isPowerOk() && isTestOk()
-#ifdef EEZ_PLATFORM_STM32
-        && !bp3c::relays::g_bootloaderMode
-#endif
-    ;
+    return isPowerUp() && isPowerOk() && isTestOk() && !bp3c::flash_slave::g_bootloaderMode;
 }
 
 void Channel::tick(uint32_t tick_usec) {

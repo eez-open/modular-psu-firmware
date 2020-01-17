@@ -189,11 +189,29 @@ int checkLimits(int iChannel) {
 
     for (int j = 0; j < voltageListLength || j < currentListLength; ++j) {
         float voltage = g_channelsLists[iChannel].voltageList[j % voltageListLength];
+
+        if (j < voltageListLength) {
+            float roundedValue = channel_dispatcher::roundChannelValue(channel, UNIT_VOLT, voltage);
+            float diff = fabsf(roundedValue - voltage);
+            if (diff > 1E-6f) {
+                return SCPI_ERROR_CANNOT_SET_LIST_VALUE;
+            }
+        }
+
+        float current = g_channelsLists[iChannel].currentList[j % currentListLength];
+
+        if (j < currentListLength) {
+            float roundedValue = channel_dispatcher::roundChannelValue(channel, UNIT_AMPER, current);
+            float diff = fabsf(roundedValue - current);
+            if (diff > 1E-6f) {
+                return SCPI_ERROR_CANNOT_SET_LIST_VALUE;
+            }
+        }
+
         if (voltage > channel_dispatcher::getULimit(channel)) {
             return SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
         }
 
-        float current = g_channelsLists[iChannel].currentList[j % currentListLength];
         if (current > channel_dispatcher::getILimit(channel)) {
             return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
         }
