@@ -110,8 +110,8 @@ class NumericKeypad : public Keypad {
     void cancel();
 
 #if OPTION_ENCODER
-    bool onEncoderClicked();
-    bool onEncoder(int counter);
+    void onEncoderClicked();
+    void onEncoder(int counter);
 #endif
 
     Unit getSwitchToUnit();

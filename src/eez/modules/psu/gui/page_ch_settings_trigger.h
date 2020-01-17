@@ -68,8 +68,8 @@ class ChSettingsListsPage : public SetPage {
     int getDirty();
     void set();
 
-    bool onEncoder(int counter);
-    bool onEncoderClicked();
+    void onEncoder(int counter);
+    void onEncoderClicked();
     Unit getEncoderUnit();
 
     void showInsertMenu();

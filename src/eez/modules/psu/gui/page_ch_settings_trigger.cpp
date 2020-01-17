@@ -481,7 +481,7 @@ void ChSettingsListsPage::set() {
     }
 }
 
-bool ChSettingsListsPage::onEncoder(int counter) {
+void ChSettingsListsPage::onEncoder(int counter) {
 #if OPTION_ENCODER
     data::Cursor cursor(getCursorIndexWithinPage());
     uint16_t dataId = getDataIdAtCursor();
@@ -497,32 +497,29 @@ bool ChSettingsListsPage::onEncoder(int counter) {
     float newValue = mcu::encoder::increment(value, counter, min.getFloat(), max.getFloat(), g_channel->channelIndex, 0);
 
     setFocusedValue(newValue);
-
-    return true;
 #endif
-    return false;
 }
 
-bool ChSettingsListsPage::onEncoderClicked() {
+void ChSettingsListsPage::onEncoderClicked() {
     uint16_t dataId = getDataIdAtCursor();
     int iRow = getRowIndex();
 
     if (dataId == DATA_ID_CHANNEL_LIST_DWELL) {
         if (iRow <= m_voltageListLength) {
             m_iCursor += 1;
-            return true;
+            return;
         }
 
         if (iRow <= m_currentListLength) {
             m_iCursor += 2;
-            return true;
+            return;
         }
 
         m_iCursor += 3;
     } else if (dataId == DATA_ID_CHANNEL_LIST_VOLTAGE) {
         if (iRow <= m_currentListLength) {
             m_iCursor += 1;
-            return true;
+            return;
         }
 
         m_iCursor += 2;
@@ -531,8 +528,6 @@ bool ChSettingsListsPage::onEncoderClicked() {
     }
 
     moveCursorToFirstAvailableCell();
-
-    return true;
 }
 
 Unit ChSettingsListsPage::getEncoderUnit() {

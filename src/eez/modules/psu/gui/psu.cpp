@@ -1210,38 +1210,21 @@ void onEncoder(int counter, bool clicked) {
         int activePageId = getActivePageId();
 
         if (activePageId == PAGE_ID_EDIT_MODE_KEYPAD || activePageId == PAGE_ID_NUMERIC_KEYPAD) {
-            if (((NumericKeypad *)getActiveKeypad())->onEncoder(counter)) {
-                return;
-            }
+            ((NumericKeypad *)getActiveKeypad())->onEncoder(counter);
         }
-
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        if (activePageId == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
-            if (((NumericKeypad *)getActiveKeypad())->onEncoder(counter)) {
-                return;
-            }
+        else if (activePageId == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
+            ((NumericKeypad *)getActiveKeypad())->onEncoder(counter);
         }
 #endif
-
-        if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
+        else if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
             edit_mode_step::onEncoder(counter);
-            return;
-        }
-
-        if (activePageId == PAGE_ID_FILE_MANAGER) {
+        } else if (activePageId == PAGE_ID_FILE_MANAGER) {
             file_manager::onEncoder(counter);
-            return;
-        }
-         
-        if (activePageId == PAGE_ID_DEBUG_TRACE_LOG) {
+        } else if (activePageId == PAGE_ID_DEBUG_TRACE_LOG) {
             eez::debug::onEncoder(counter);
-            return;
-        }
-
-        if (activePage) {
-            if (activePage->onEncoder(counter)) {
-                return;
-            }
+        } else if (activePage) {
+            activePage->onEncoder(counter);
         }
     }
 
@@ -1260,26 +1243,18 @@ void onEncoder(int counter, bool clicked) {
             }
 
             sound::playClick();
-        }
-
-        int activePageId = getActivePageId();
-        if (activePageId == PAGE_ID_EDIT_MODE_KEYPAD || activePageId == PAGE_ID_NUMERIC_KEYPAD) {
-            if (((NumericKeypad *)getActiveKeypad())->onEncoderClicked()) {
-                return;
+        } else {
+            int activePageId = getActivePageId();
+            if (activePageId == PAGE_ID_EDIT_MODE_KEYPAD || activePageId == PAGE_ID_NUMERIC_KEYPAD) {
+                ((NumericKeypad *)getActiveKeypad())->onEncoderClicked();
             }
-        }
-
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        if (activePageId == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
-            if (((NumericKeypad *)getActiveKeypad())->onEncoderClicked()) {
-                return;
+            else if (activePageId == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
+                ((NumericKeypad *)getActiveKeypad())->onEncoderClicked();
             }
-        }
 #endif
-
-        if (activePage) {
-            if (activePage->onEncoderClicked()) {
-                return;
+            else if (activePage) {
+                activePage->onEncoderClicked();
             }
         }
     }

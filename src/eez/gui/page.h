@@ -36,8 +36,8 @@ class Page {
 
     virtual void pageWillAppear();
 
-    virtual bool onEncoder(int counter);
-    virtual bool onEncoderClicked();
+    virtual void onEncoder(int counter);
+    virtual void onEncoderClicked();
     virtual Unit getEncoderUnit();
 
     virtual int getDirty();
@@ -89,8 +89,8 @@ public:
 
     void pageFree();
 
-    bool onEncoder(int counter);
-    bool onEncoderClicked();
+    void onEncoder(int counter);
+    void onEncoderClicked();
 
     void refresh(const WidgetCursor& widgetCursor);
     void updatePage(const WidgetCursor& widgetCursor);

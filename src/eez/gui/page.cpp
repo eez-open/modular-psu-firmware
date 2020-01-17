@@ -45,12 +45,10 @@ void Page::pageFree() {
 void Page::pageWillAppear() {
 }
 
-bool Page::onEncoder(int counter) {
-    return false;
+void Page::onEncoder(int counter) {
 }
 
-bool Page::onEncoderClicked() {
-    return false;
+void Page::onEncoderClicked() {
 }
 
 Unit Page::getEncoderUnit() {
@@ -188,14 +186,18 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, 
     return page;
 }
 
-bool ToastMessagePage::onEncoder(int counter) {
-    popPage();
-    return false;
+void ToastMessagePage::onEncoder(int counter) {
+    if (counter < 0) {
+        popPage();
+    }
 }
 
-bool ToastMessagePage::onEncoderClicked() {
-    popPage();
-    return false;
+void ToastMessagePage::onEncoderClicked() {
+    if (hasAction()) {
+        eez::gui::executeAction((int)(int16_t)actionWidget.action);
+    } else {
+        popPage();
+    }
 }
 
 void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {

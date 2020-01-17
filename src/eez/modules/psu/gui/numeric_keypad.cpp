@@ -579,26 +579,24 @@ void NumericKeypad::cancel() {
 
 #if OPTION_ENCODER
 
-bool NumericKeypad::onEncoderClicked() {
+void NumericKeypad::onEncoderClicked() {
     if (m_state == START) {
         if (getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD) {
-            return false;
+            return;
         }
     }
     ok();
-    return true;
 }
 
-bool NumericKeypad::onEncoder(int counter) {
+void NumericKeypad::onEncoder(int counter) {
     if (m_state == START) {
         if (getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD) {
-            return false;
+            return;
         }
 
         if (m_startValue.getType() == VALUE_TYPE_FLOAT) {
             float newValue = mcu::encoder::increment(m_startValue, counter, m_options.min, m_options.max, m_options.channelIndex, 0.01f);
             m_startValue = MakeValue(newValue, m_startValue.getUnit());
-            return true;
         } else if (m_startValue.getType() == VALUE_TYPE_INT) {
             int newValue = m_startValue.getInt() + counter;
 
@@ -611,13 +609,10 @@ bool NumericKeypad::onEncoder(int counter) {
             }
 
             m_startValue = data::Value(newValue);
-
-            return true;
         }
     }
 
     sound::playBeep();
-    return true;
 }
 
 #endif
