@@ -193,7 +193,7 @@ int checkLimits(int iChannel) {
         if (j < voltageListLength) {
             float roundedValue = channel_dispatcher::roundChannelValue(channel, UNIT_VOLT, voltage);
             float diff = fabsf(roundedValue - voltage);
-            if (diff > 1E-6f) {
+            if (diff > 5E-6f) {
                 return SCPI_ERROR_CANNOT_SET_LIST_VALUE;
             }
         }
@@ -203,7 +203,7 @@ int checkLimits(int iChannel) {
         if (j < currentListLength) {
             float roundedValue = channel_dispatcher::roundChannelValue(channel, UNIT_AMPER, current);
             float diff = fabsf(roundedValue - current);
-            if (diff > 1E-6f) {
+            if (diff > 5E-6f) {
                 return SCPI_ERROR_CANNOT_SET_LIST_VALUE;
             }
         }
