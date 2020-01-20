@@ -149,7 +149,9 @@ void hardResetModules() {
 }
 
 void writeToOutputPort(uint8_t value) {
-	write(REG_OUTPUT_PORT, value);
+#ifdef EEZ_PLATFORM_STM32
+    write(REG_OUTPUT_PORT, value);
+#endif
 }
 
 } // namespace io_exp

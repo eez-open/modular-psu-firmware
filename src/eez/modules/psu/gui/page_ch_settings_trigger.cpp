@@ -26,6 +26,7 @@
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/trigger.h>
+#include <eez/modules/psu/datetime.h>
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif
@@ -475,6 +476,11 @@ void ChSettingsListsPage::set() {
 
             popPage();
             infoMessage("Lists changed!");
+
+            uint8_t hour, minute, second;
+            datetime::getTime(hour, minute, second);
+            DebugTrace("[%02d:%02d:%02d] List changed for channel %d!\n", hour, minute, second, g_channel->channelIndex + 1);
+
         } else {
             errorMessage("List lengths are not equivalent!");
         }

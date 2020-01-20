@@ -100,6 +100,9 @@ void saveProfileList(Parameters &profile, Channel &channel, int location) {
         if (location == 0) {
             list::setListsChanged(channel, false);
         }
+        uint8_t hour, minute, second;
+        datetime::getTime(hour, minute, second);
+        DebugTrace("[%02d:%02d:%02d] List for profile at location %d and channel %d saved!\n", hour, minute, second, location, channel.channelIndex + 1);
     } else {
         generateError(err);
     }
