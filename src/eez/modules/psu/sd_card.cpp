@@ -97,6 +97,12 @@ bool prepareCard() {
         }
     }
 
+    if (!exists(UPDATES_DIR, &err)) {
+        if (!makeDir(UPDATES_DIR, &err)) {
+            return false;
+        }
+    }
+
     return true;
 }
 

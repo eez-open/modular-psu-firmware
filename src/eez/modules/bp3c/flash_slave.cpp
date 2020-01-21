@@ -16,14 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+
 #include "eez/modules/bp3c/flash_slave.h"
 #include "eez/system.h"
+#include <eez/scpi/scpi.h>
 #include "eez/modules/psu/psu.h"
 #include "eez/modules/psu/io_pins.h"
+#include "eez/modules/psu/datetime.h"
+#include <eez/modules/psu/scpi/psu.h>
 #include "eez/modules/bp3c/io_exp.h"
+#include <eez/libs/sd_fat/sd_fat.h>
 
 #ifdef EEZ_PLATFORM_STM32
 
+#include <assert.h>
 #include <memory.h>
 
 #include "main.h"
@@ -32,31 +39,15 @@
 #endif
 
 namespace eez {
+
+using namespace scpi;
+
 namespace bp3c {
 namespace flash_slave {
 
 bool g_bootloaderMode = false;
 
 #ifdef EEZ_PLATFORM_STM32
-
-enum FlashStatus
-{
-	STAND_BY,
-	SEND_START,
-	WAIT_FOR_RESPONSE,
-	GOT_ACK,
-	GOT_NACK,
-	RESPONSE_TIMEOUT,
-	SEND_GET,
-	DATA_READY,
-	WAIT_FOR_RESPONSE_1,
-	WAIT_FOR_RESPONSE_2,
-	WAIT_FOR_RESPONSE_3,
-	WAIT_FOR_RESPONSE_4,
-	WAIT_FOR_RESPONSE_5,
-	WAIT_FOR_RESPONSE_6,
-	IDLE
-};
 
 static const uint8_t CMD_GET = 0x00;
 static const uint8_t CMD_GET_VERSION = 0x01;
@@ -76,13 +67,32 @@ static const uint8_t CRC_MASK = 0xFF;
 static const uint8_t ACK = 0x79;
 static const uint8_t NACK = 0x1F;
 
-static const uint32_t MAX_TIMEOUT = 10000;
+static const uint32_t SYNC_TIMEOUT = 3000;
+static const uint32_t CMD_TIMEOUT = 100;
 
-UART_HandleTypeDef *phuart = &huart7;
+static UART_HandleTypeDef *phuart = &huart7;
+
+static int g_slotIndex;
+static char g_hexFilePath[MAX_PATH_LENGTH + 1];
 
 static uint8_t rxData[128];
 
-static FlashStatus flashStatus = STAND_BY;
+struct BootloaderInfo {
+	uint8_t bootloaderVersion;
+
+	bool getCmdSupported;
+	bool getVersionCmdSupported;
+	bool getIdCmdSupported;
+	bool readMemoryCmdSupported;
+	bool goCmdSupported;
+	bool writeMemoryCmdSupported;
+	bool eraseCmdSupported;
+	bool extendedEraseCmdSupported;
+	bool writeProtectCmdSupported;
+	bool writeUnprotectCmdSupported;
+	bool readoutProtectCmdSupported;
+	bool readoutUnprotectCmdSupported;
+};
 
 void sendDataAndCRC(uint8_t data) {
 	uint8_t sendData[1];
@@ -98,207 +108,421 @@ void sendDataNoCRC(uint8_t data) {
 	HAL_UART_Transmit(phuart, sendData, 1, 20);
 }
 
-void resetSlave(void) {
-	// not implemented -- I do manual reset
-}
-
-bool getByte(bool start = false) {
+bool syncWithSlave() {
 	uint32_t startTime = HAL_GetTick();
 	do {
-		if (HAL_UART_Receive(phuart, rxData, 1, 100) == HAL_OK) {
+		taskENTER_CRITICAL();
+		sendDataNoCRC(ENTER_BOOTLOADER);
+		HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 1, 100);
+		taskEXIT_CRITICAL();
+		if (result == HAL_OK && rxData[0] == ACK) {
 			return true;
 		}
-		if (start) {
-			sendDataNoCRC(ENTER_BOOTLOADER);
-		}
-	} while (HAL_GetTick() - startTime < MAX_TIMEOUT);
-	flashStatus = RESPONSE_TIMEOUT;
+	} while (HAL_GetTick() - startTime < SYNC_TIMEOUT);
 	return false;
 }
 
-uint8_t flashSlaveFSM() {
-	static uint8_t numBytes = 0;
-
-	switch (flashStatus) {
-	case STAND_BY:
-		// statements
-		resetSlave();
-		flashStatus = SEND_START;
-		break;
-	case WAIT_FOR_RESPONSE:
-		if (getByte(true)) {
-			DebugTrace("Received: 0x%02x\n", (int)rxData[0]);
-
-			if (rxData[0] == ACK) {
-				flashStatus = GOT_ACK;
-			} else if (rxData[0] == NACK) {
-				flashStatus = GOT_NACK;
-			}
-		}
-		break;
-	case SEND_START:
-		sendDataNoCRC(ENTER_BOOTLOADER);
-		flashStatus = WAIT_FOR_RESPONSE;
-		break;
-	case GOT_ACK:
-		flashStatus = DATA_READY;
-		break;
-	case GOT_NACK:
-		flashStatus = DATA_READY;
-		break;
-	case RESPONSE_TIMEOUT:
-		flashStatus = STAND_BY;
-		break;
-	case DATA_READY:
-		flashStatus = SEND_GET;
-		break;
-	case SEND_GET:
-		sendDataAndCRC(CMD_GET);
-		flashStatus = WAIT_FOR_RESPONSE_1;
-		break;
-	case WAIT_FOR_RESPONSE_1:
-		if (getByte()) {
-			DebugTrace("Received: 0x%02x\n", (int)rxData[0]);
-
-			if (rxData[0] == ACK) {
-				flashStatus = WAIT_FOR_RESPONSE_2;
-			} else if (rxData[0] == NACK) {
-				flashStatus = GOT_NACK;
-			}
-		}
-		break;
-	case WAIT_FOR_RESPONSE_2:
-		if (getByte()) {
-			DebugTrace("Received: 0x%02x\n", (int)rxData[0]);
-
-			numBytes = rxData[0];
-			//numBytes += 2;
-			DebugTrace("Num bytes: %d\n", (int)numBytes);
-
-			flashStatus = WAIT_FOR_RESPONSE_3;
-		}
-		break;
-	case WAIT_FOR_RESPONSE_3:
-		if (getByte()) {
-			DebugTrace("Received: 0x%02x\n", (int)rxData[0]);
-
-			numBytes--;
-			if (numBytes == 0) {
-				flashStatus = IDLE;
-			}
-		}
-		break;
-	default:
-		flashStatus = STAND_BY;
+bool execGetCmd(BootloaderInfo &bootloaderInfo) {
+	taskENTER_CRITICAL();
+	sendDataAndCRC(CMD_GET);
+	HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 2, CMD_TIMEOUT);
+	if (result != HAL_OK || rxData[0] != ACK) {
+		taskEXIT_CRITICAL();
+		return false;
 	}
-	return flashStatus;
+	result = HAL_UART_Receive(phuart, rxData + 2, rxData[1] + 2, CMD_TIMEOUT);
+	taskEXIT_CRITICAL();
+
+	if (result != HAL_OK || rxData[0] != ACK || rxData[14] != ACK) {
+		return false;
+	}
+
+	bootloaderInfo.bootloaderVersion = rxData[2];
+
+	for (uint16_t i = 0; i < rxData[1]; i++) {
+		uint8_t cmd = rxData[3 + i];
+		if (cmd == CMD_GET) {
+			bootloaderInfo.getCmdSupported = true;
+		} else if (cmd == CMD_GET_VERSION) {
+			bootloaderInfo.getVersionCmdSupported = true;
+		} else if (cmd == CMD_ID) {
+			bootloaderInfo.getIdCmdSupported = true;
+		} else if (cmd == CMD_READ_MEMORY) {
+			bootloaderInfo.readMemoryCmdSupported = true;
+		} else if (cmd == CMD_GO) {
+			bootloaderInfo.goCmdSupported = true;
+		} else if (cmd == CMD_WRITE_MEMORY) {
+			bootloaderInfo.writeMemoryCmdSupported = true;
+		} else if (cmd == CMD_ERASE) {
+			bootloaderInfo.eraseCmdSupported = true;
+		} else if (cmd == CMD_EXTENDED_ERASE) {
+			bootloaderInfo.extendedEraseCmdSupported = true;
+		} else if (cmd == CMD_WRITE_PROTECT) {
+			bootloaderInfo.writeProtectCmdSupported = true;
+		} else if (cmd == CMD_WRITE_UNPROTECT) {
+			bootloaderInfo.writeUnprotectCmdSupported = true;
+		} else if (cmd == CMD_READOUT_PROTECT) {
+			bootloaderInfo.readoutProtectCmdSupported = true;
+		} else if (cmd == CMD_READOUT_UNPROTECT) {
+			bootloaderInfo.readoutUnprotectCmdSupported = true;
+		}
+	}
+
+	return true;
 }
 
-void toggleBootloader(int slotIndex) {
-	if (!g_bootloaderMode) {
-		psu::reset();
+void enterBootloaderMode(int slotIndex) {
+	g_bootloaderMode = true;
 
-		g_bootloaderMode = true;
+	psu::reset();
 
-		// power down channels
+	// power down channels
+	for (int i = 0; i < psu::CH_NUM; ++i) {
+		psu::Channel::get(i).onPowerDown();
+	}
 
-		for (int i = 0; i < psu::CH_NUM; ++i) {
-			psu::Channel::get(i).onPowerDown();
+	osDelay(25);
+
+	// enable BOOT0 flag for selected slot and reset modules
+
+	if (slotIndex == 0) {
+		io_exp::writeToOutputPort(0b10010000);
+	} else if (slotIndex == 1) {
+		io_exp::writeToOutputPort(0b10100000);
+	} else if (slotIndex == 2) {
+		io_exp::writeToOutputPort(0b11000000);
+	}
+
+	osDelay(5);
+
+	if (slotIndex == 0) {
+		io_exp::writeToOutputPort(0b00010000);
+	} else if (slotIndex == 1) {
+		io_exp::writeToOutputPort(0b00100000);
+	} else if (slotIndex == 2) {
+		io_exp::writeToOutputPort(0b01000000);
+	}
+
+	osDelay(25);
+
+	if (slotIndex == 0) {
+		io_exp::writeToOutputPort(0b10010000);
+	} else if (slotIndex == 1) {
+		io_exp::writeToOutputPort(0b10100000);
+	} else if (slotIndex == 2) {
+		io_exp::writeToOutputPort(0b11000000);
+	}
+
+	osDelay(25);
+
+	MX_UART7_Init();
+}
+
+void leaveBootloaderMode() {
+	// disable BOOT0 flag for selected slot and reset modules
+	io_exp::writeToOutputPort(0b10000000);
+	osDelay(5);
+	io_exp::writeToOutputPort(0b00000000);
+	osDelay(25);
+	io_exp::writeToOutputPort(0b10000000);
+
+	psu::initChannels();
+	psu::testChannels();
+
+	HAL_UART_DeInit(phuart);
+
+	g_bootloaderMode = false;
+
+	psu::io_pins::refresh();
+}
+
+bool start(int slotIndex, const char *hexFilePath, int *err) {
+	enterBootloaderMode(slotIndex);
+
+	if (!syncWithSlave()) {
+		DebugTrace("Failed to sync with slave\n");
+		if (err) {
+			*err = SCPI_ERROR_EXECUTION_ERROR;
 		}
-		osDelay(25);
+		return false;
+	}
 
-		// enable BOOT0 flag for selected slot and reset modules
+	g_slotIndex = slotIndex;
+	strcpy(g_hexFilePath, hexFilePath);
 
-		if (slotIndex == 0) {
-			io_exp::writeToOutputPort(0b10010000);
-		} else if (slotIndex == 1) {
-			io_exp::writeToOutputPort(0b10100000);
-		} else if (slotIndex == 2) {
-			io_exp::writeToOutputPort(0b11000000);
+	osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE, 0), osWaitForever);
+
+	return true;
+}
+
+bool readMemory(uint32_t address, uint8_t *buffer, uint32_t bufferSize) {
+	assert(bufferSize <= 256);
+	
+	uint8_t addressAndCrc[5] = { 
+		(uint8_t)(address >> 24),
+		(uint8_t)((address >> 16) & 0xFF),
+		(uint8_t)((address >> 8) & 0xFF),
+		(uint8_t)(address & 0xFF)
+	};
+	addressAndCrc[4] = addressAndCrc[0] ^ addressAndCrc[1] ^ addressAndCrc[2] ^ addressAndCrc[3];
+
+	uint8_t numBytesAndCrc[2] = { (uint8_t)(bufferSize - 1) };
+	numBytesAndCrc[1] = ~numBytesAndCrc[0];
+
+	taskENTER_CRITICAL();
+
+	sendDataAndCRC(CMD_READ_MEMORY);
+
+	HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+	if (result != HAL_OK || rxData[0] != ACK) {
+		taskEXIT_CRITICAL();
+		return false;
+	}
+
+	HAL_UART_Transmit(phuart, addressAndCrc, 5, 20);
+
+	result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+	if (result != HAL_OK || rxData[0] != ACK) {
+		taskEXIT_CRITICAL();
+		return false;
+	}
+
+	HAL_UART_Transmit(phuart, numBytesAndCrc, 2, 20);
+
+	result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+	if (result != HAL_OK || rxData[0] != ACK) {
+		taskEXIT_CRITICAL();
+		return false;
+	}
+
+	result = HAL_UART_Receive(phuart, buffer, bufferSize, CMD_TIMEOUT);
+	if (result != HAL_OK) {
+		taskEXIT_CRITICAL();
+		return false;
+	}
+
+	taskEXIT_CRITICAL();
+	return true;
+}
+
+bool eraseAll() {
+	taskENTER_CRITICAL();
+
+	sendDataAndCRC(CMD_EXTENDED_ERASE);
+
+	HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+	if (result != HAL_OK || rxData[0] != ACK) {
+		taskEXIT_CRITICAL();
+		return false;
+	}
+
+	static uint8_t buffer[3] = { 0xFF, 0xFF, 0x00 };
+	HAL_UART_Transmit(phuart, buffer, 3, 20);
+
+	result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+	if (result != HAL_OK || rxData[0] != ACK) {
+		taskEXIT_CRITICAL();
+		return false;
+	}
+
+	taskEXIT_CRITICAL();
+	return true;
+}
+
+bool writeMemory(uint32_t address, const uint8_t *buffer, uint32_t bufferSize) {
+	assert(bufferSize <= 256);
+
+	uint8_t addressAndCrc[5] = {
+		(uint8_t)(address >> 24),
+		(uint8_t)((address >> 16) & 0xFF),
+		(uint8_t)((address >> 8) & 0xFF),
+		(uint8_t)(address & 0xFF)
+	};
+	addressAndCrc[4] = addressAndCrc[0] ^ addressAndCrc[1] ^ addressAndCrc[2] ^ addressAndCrc[3];
+
+	uint8_t numBytes = (uint8_t)(bufferSize - 1);
+
+	uint8_t crc = numBytes;
+	for (unsigned i = 0; i < bufferSize; i++) {
+		crc ^= buffer[i];
+	}
+
+	taskENTER_CRITICAL();
+
+	sendDataAndCRC(CMD_WRITE_MEMORY);
+
+	HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+	if (result != HAL_OK || rxData[0] != ACK) {
+		taskEXIT_CRITICAL();
+		return false;
+	}
+
+	HAL_UART_Transmit(phuart, addressAndCrc, 5, 20);
+
+	result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+	if (result != HAL_OK || rxData[0] != ACK) {
+		taskEXIT_CRITICAL();
+		return false;
+	}
+
+	HAL_UART_Transmit(phuart, &numBytes, 1, 20);
+	HAL_UART_Transmit(phuart, (uint8_t *)buffer, bufferSize, 20);
+	HAL_UART_Transmit(phuart, &crc, 1, 20);
+
+	result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+	if (result != HAL_OK || rxData[0] != ACK) {
+		taskEXIT_CRITICAL();
+		return false;
+	}
+
+	taskEXIT_CRITICAL();
+	return true;
+}
+
+bool execGoCmd(uint32_t address) {
+	uint8_t addressAndCrc[5] = {
+		(uint8_t)(address >> 24),
+		(uint8_t)((address >> 16) & 0xFF),
+		(uint8_t)((address >> 8) & 0xFF),
+		(uint8_t)(address & 0xFF)
+	};
+	addressAndCrc[4] = addressAndCrc[0] ^ addressAndCrc[1] ^ addressAndCrc[2] ^ addressAndCrc[3];
+
+	taskENTER_CRITICAL();
+
+	sendDataAndCRC(CMD_GO);
+
+	HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+	if (result != HAL_OK || rxData[0] != ACK) {
+		taskEXIT_CRITICAL();
+		return false;
+	}
+
+	HAL_UART_Transmit(phuart, addressAndCrc, 5, 20);
+
+	result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+	if (result != HAL_OK || rxData[0] != ACK) {
+		taskEXIT_CRITICAL();
+		return false;
+	}
+
+	taskEXIT_CRITICAL();
+	return true;
+}
+
+struct HexRecord {
+	uint8_t recordLength;
+	uint16_t address;
+	uint8_t recordType;
+	uint8_t data[256];
+	uint8_t checksum;
+};
+
+uint8_t hex(uint8_t digit) {
+	if (digit < 'A') {
+		return digit - '0';
+	} else if (digit < 'a') {
+		return 10 + (digit - 'A');
+	} else {
+		return 10 + (digit - 'a');
+	}
+}
+
+bool readHexRecord(File &file, HexRecord &hexRecord) {
+	uint8_t buffer[512];
+
+	int bytes = file.read(buffer, 9);
+	if (bytes != 9) {
+		return false;
+	}
+
+	if (buffer[0] != ':') {
+		return false;
+	}
+
+	hexRecord.recordLength = (hex(buffer[1]) << 4) + hex(buffer[2]);
+	hexRecord.address = (hex(buffer[3]) << 12) + (hex(buffer[4]) << 8) + (hex(buffer[5]) << 4) + hex(buffer[6]);
+	hexRecord.recordType = (hex(buffer[7]) << 4) + hex(buffer[8]);
+
+	if (hexRecord.recordLength > 0) {
+		bytes = file.read(buffer, hexRecord.recordLength * 2);
+		if (bytes != hexRecord.recordLength * 2) {
+			return false;
 		}
 
-		osDelay(5);
-
-		if (slotIndex == 0) {
-			io_exp::writeToOutputPort(0b00010000);
-		} else if (slotIndex == 1) {
-			io_exp::writeToOutputPort(0b00100000);
-		} else if (slotIndex == 2) {
-			io_exp::writeToOutputPort(0b01000000);
+		for (unsigned i = 0; i < hexRecord.recordLength; i++) {
+			hexRecord.data[i] = (hex(buffer[2 * i]) << 4) + hex(buffer[2 * i + 1]);
 		}
+	} else {
+		delay(1);
+	}
 
-		osDelay(25);
+	bytes = file.read(buffer, 2);
+	if (bytes != 2) {
+		return false;
+	}
+	hexRecord.checksum = (hex(buffer[0]) << 4) + hex(buffer[1]);
 
-		if (slotIndex == 0) {
-			io_exp::writeToOutputPort(0b10010000);
-		} else if (slotIndex == 1) {
-			io_exp::writeToOutputPort(0b10100000);
-		} else if (slotIndex == 2) {
-			io_exp::writeToOutputPort(0b11000000);
-		}
+	while (file.peek() != ':' && file.peek() != EOF) {
+		file.read();
+	}
 
-		osDelay(25);
+	return true;
+}
 
-		// GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+void uploadHexFile() {
+//	uint8_t buffer[256];
+//	if (readMemory(0x08000000, buffer, sizeof(buffer))) {
+//		for (size_t i = 0; i < sizeof(buffer) / 16; i++) {
+//			for (size_t j = 0; j < 16; j++) {
+//				DebugTrace("%02x", (int)buffer[i * 16 + j]);
+//			}
+//			DebugTrace("\n");
+//		}
+//	}
 
-		// GPIO_InitStruct.Pin = UART_RX_DIN1_Pin;
-		// GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		// GPIO_InitStruct.Pull = GPIO_NOPULL;
-		// GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-		// GPIO_InitStruct.Alternate = GPIO_AF8_UART7;
-		// HAL_GPIO_Init(UART_RX_DIN1_GPIO_Port, &GPIO_InitStruct);
+    uint8_t hour, minute, second;
+    psu::datetime::getTime(hour, minute, second);
+    DebugTrace("[%02d:%02d:%02d] Flash started\n", hour, minute, second);
 
-		// GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
-		// GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		// GPIO_InitStruct.Pull = GPIO_NOPULL;
-		// GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-		// GPIO_InitStruct.Alternate = GPIO_AF12_UART7;
-		// HAL_GPIO_Init(UART_TX_DOUT1_GPIO_Port, &GPIO_InitStruct);
+    File file;
+    if (!file.open(g_hexFilePath, FILE_OPEN_EXISTING | FILE_READ)) {
+		DebugTrace("Can't open firmware hex file!\n");
+        return;
+    }
 
-		DebugTrace("start slave FSM\n");
+    eraseAll();
 
-		MX_UART7_Init();
-
-		int wasFlashStatus = -1;
-		flashStatus = STAND_BY;
-		while (true) {
-			flashSlaveFSM();
-
-			if (flashStatus != wasFlashStatus) {
-				DebugTrace("flash status: %d\n", flashStatus);
-				wasFlashStatus = flashStatus;
-			}
-
-			if (flashStatus == IDLE || flashStatus == RESPONSE_TIMEOUT) {
+	HexRecord hexRecord;
+	uint32_t addressUpperBits = 0;
+	bool eofReached = false;
+	while (!eofReached && readHexRecord(file, hexRecord)) {
+		if (hexRecord.recordType == 0x04) {
+			addressUpperBits = ((hexRecord.data[0] << 8) + hexRecord.data[1]) << 16;
+		} else if (hexRecord.recordType == 0x00) {
+			uint32_t address = addressUpperBits | hexRecord.address;
+			if (!writeMemory(address, hexRecord.data, hexRecord.recordLength)) {
+				DebugTrace("Failed to write memory at address %08x\n", address);
 				break;
 			}
+		} else if (hexRecord.recordType == 0x01) {
+			eofReached = true;
 		}
-
-		DebugTrace("end slave FSM\n");
-	} else {
-		// disable BOOT0 flag for selected slot and reset modules
-		io_exp::writeToOutputPort(0b10000000);
-		delay(5);
-		io_exp::writeToOutputPort(0b00000000);
-		delay(25);
-		io_exp::writeToOutputPort(0b10000000);
-
-		// init channels
-		for (int i = 0; i < psu::CH_NUM; ++i) {
-			psu::Channel::get(i).init();
-		}
-
-		// test channels
-		for (int i = 0; i < psu::CH_NUM; ++i) {
-			psu::Channel::get(i).test();
-		}
-
-		HAL_UART_DeInit(phuart);
-
-		g_bootloaderMode = false;
-
-		psu::io_pins::refresh();
 	}
+
+	if (eofReached) {
+	    uint8_t hour, minute, second;
+	    psu::datetime::getTime(hour, minute, second);
+	    DebugTrace("[%02d:%02d:%02d] Flash finished\n", hour, minute, second);
+	} else {
+	    uint8_t hour, minute, second;
+	    psu::datetime::getTime(hour, minute, second);
+		DebugTrace("[%02d:%02d:%02d] Flash failed\n", hour, minute, second);
+	}
+
+	file.close();
+
+	leaveBootloaderMode();
 }
 
 #endif // EEZ_PLATFORM_STM32

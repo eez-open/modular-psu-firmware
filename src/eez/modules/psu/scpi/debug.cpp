@@ -445,10 +445,30 @@ scpi_result_t scpi_cmd_debugDcm220Q(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugBoot(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
+    int32_t slotIndex;
+    if (!SCPI_ParamInt32(context, &slotIndex, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (slotIndex < 1 || slotIndex > 3) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+        return SCPI_RES_ERR;
+    }
+
+    char hexFilePath[MAX_PATH_LENGTH + 1];
+    if (!getFilePath(context, hexFilePath, true)) {
+        return SCPI_RES_ERR;
+    }
+
 #if OPTION_DISPLAY
     psu::gui::g_psuAppContext.pushPageOnNextIter(PAGE_ID_DEBUG_TRACE_LOG);
 #endif
-    bp3c::flash_slave::toggleBootloader(2);
+
+    int err;
+    if (!bp3c::flash_slave::start(slotIndex - 1, hexFilePath, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
 
     return SCPI_RES_OK;
 #else

@@ -230,6 +230,7 @@
 #define RECORDINGS_DIR (PATH_SEPARATOR "Recordings")
 #define SCREENSHOTS_DIR (PATH_SEPARATOR "Screenshots")
 #define SCRIPTS_DIR (PATH_SEPARATOR "Scripts")
+#define UPDATES_DIR (PATH_SEPARATOR "Updates")
 #define MAX_PATH_LENGTH 255
 #define CSV_SEPARATOR ','
 #define LIST_CSV_FILE_NO_VALUE_CHAR '='

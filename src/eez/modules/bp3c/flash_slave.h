@@ -22,8 +22,11 @@ namespace eez {
 namespace bp3c {
 namespace flash_slave {
 
-void toggleBootloader(int slotIndex);
 extern bool g_bootloaderMode;
+
+bool start(int slotIndex, const char *hexFilePath, int *err);
+
+void uploadHexFile();
 
 } // namespace flash_slave
 } // namespace bp3c
