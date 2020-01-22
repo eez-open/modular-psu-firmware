@@ -204,7 +204,9 @@ void oneIter() {
             } else if (type == SCPI_QUEUE_MESSAGE_DLOG_UPLOAD_FILE) {
                 dlog_view::uploadFile();
             } else if (type == SCPI_QUEUE_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE) {
+#if defined(EEZ_PLATFORM_STM32)                
                 bp3c::flash_slave::uploadHexFile();
+#endif
             }
 #endif // OPTION_SD_CARD
         }

@@ -65,19 +65,32 @@ namespace dcm220 {
 static GPIO_TypeDef *SPI_IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
 static const uint16_t SPI_IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
 
+uint8_t g_firmwareVersionMajor;
+uint8_t g_firmwareVersionMinor;
+
 bool masterSynchro(int slotIndex) {
 	uint32_t start = millis();
-	uint8_t txackbytes = SPI_MASTER_SYNBYTE, rxackbytes = 0x00;
-	do {
+
+    uint8_t txBuffer[3] = { SPI_MASTER_SYNBYTE, 0, 0 };
+    uint8_t rxBuffer[3] = { 0, 0, 0 };
+
+	while (true) {
 	    spi::select(slotIndex, spi::CHIP_DCM220);
-	    spi::transfer(slotIndex, &txackbytes, &rxackbytes, 1);
+	    spi::transfer(slotIndex, txBuffer, rxBuffer, 3);
 	    spi::deselect(slotIndex);
+
+	    if (rxBuffer[0] == SPI_SLAVE_SYNBYTE) {
+	    	g_firmwareVersionMajor = rxBuffer[1];
+	    	g_firmwareVersionMinor = rxBuffer[2];
+	    	DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)g_firmwareVersionMajor, (int)g_firmwareVersionMinor);
+	    	break;
+	    }
 
 	    int32_t diff = millis() - start;
 	    if (diff > CONF_MASTER_SYNC_TIMEOUT_MS) {
 	    	return false;
 	    }
-	} while(rxackbytes != SPI_SLAVE_SYNBYTE);
+	}
 
 	while (HAL_GPIO_ReadPin(SPI_IRQ_GPIO_Port[slotIndex], SPI_IRQ_Pin[slotIndex]) != GPIO_PIN_SET) {
 	    int32_t diff = millis() - start;
@@ -308,11 +321,6 @@ struct Channel : ChannelInterface {
         if (subchannelIndex == 0 && diff > 1000) {
         	uint8_t output0 = 0x80 | (outputEnable[0] ? REG0_OE1_MASK : 0) | (outputEnable[1] ? REG0_OE2_MASK : 0);
 
-        	bool oeSync = output[0] != output0;
-        	if (oeSync) {
-				channel_dispatcher::outputEnableSyncPrepare(channel);
-        	}
-
             output[0] = output0;
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -334,14 +342,6 @@ struct Channel : ChannelInterface {
 
 			transfer();
 #endif
-
-		    if (oeSync) {
-		    	delayMicroseconds(50);
-		    	channel_dispatcher::outputEnableSyncReady(channel);
-
-                channel_dispatcher::outputEnableSyncPrepare(channel);
-				channel_dispatcher::outputEnableSyncReady(psu::Channel::getBySlotIndex(slotIndex, 1));
-		    }
 
 #if defined(EEZ_PLATFORM_STM32)
             if (numCrcErrors == 0) {
@@ -481,13 +481,9 @@ struct Channel : ChannelInterface {
 	void adcMeasureAll(int subchannelIndex) {
 	}
 
-	void setOutputEnable(int subchannelIndex, bool enable) {
+	void setOutputEnable(int subchannelIndex, bool enable, uint16_t tasks) {
 		outputEnable[subchannelIndex] = enable;
 	}
-
-    DprogState getDprogState() {
-        return DPROG_STATE_OFF;
-    }
 
     void setDprogState(DprogState dprogState) {
     }

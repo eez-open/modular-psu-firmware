@@ -621,16 +621,14 @@ bool getCurrentDwellTime(Channel &channel, int32_t &remaining, uint32_t &total) 
 }
 
 void abort() {
-    channel_dispatcher::beginOutputEnableSequence();
-
     for (int i = 0; i < CH_NUM; ++i) {
         if (g_execution[i].counter >= 0) {
             g_execution[i].counter = -1;
-            channel_dispatcher::outputEnable(Channel::get(i), false);
+            channel_dispatcher::outputEnableOnNextSync(Channel::get(i), false);
         }
     }
 
-    channel_dispatcher::endOutputEnableSequence();
+    channel_dispatcher::syncOutputEnable();
 }
 
 } // namespace list

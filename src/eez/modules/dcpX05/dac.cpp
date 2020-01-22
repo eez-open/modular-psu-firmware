@@ -84,8 +84,8 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
 
     channel.adcMeasureMonDac();
 
-    channel.setVoltage(0);
-    channel.setCurrent(0);
+    setDacVoltage(0);
+    setDacCurrent(0);
 
     float uMon = channel.u.mon_dac_last;
     float uDiff = uMon - uSet;

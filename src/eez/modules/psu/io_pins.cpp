@@ -195,9 +195,7 @@ void tick(uint32_t tickCount) {
 
     if (inhibited != g_lastState.inhibited) {
         g_lastState.inhibited = inhibited;
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel::get(i).onInhibitedChanged(inhibited ? true : false);
-        }
+        Channel::onInhibitedChanged(inhibited);
     }
 
     if (inputPin1.function == io_pins::FUNCTION_TINPUT && inputPin1State && !g_pinState[0]) {

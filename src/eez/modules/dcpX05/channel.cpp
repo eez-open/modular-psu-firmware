@@ -46,7 +46,6 @@ struct Channel : ChannelInterface {
 	DigitalAnalogConverter dac;
 	IOExpander ioexp;
 
-    DprogState dprogState;
     bool delayed_dp_off;
 	uint32_t delayed_dp_off_start;
 	bool dpOn;
@@ -173,8 +172,6 @@ struct Channel : ChannelInterface {
 		ioexp.init();
 		adc.init();
 		dac.init();
-
-        dprogState = DPROG_STATE_ON;
 	}
 
 	void onPowerDown(int subchannelIndex) {
@@ -182,7 +179,6 @@ struct Channel : ChannelInterface {
 
 	void reset(int subchannelIndex) {
 		uSet = 0;
-        dprogState = DPROG_STATE_ON;
         dpOn = false;
 		uBeforeBalancing = NAN;
 		iBeforeBalancing = NAN;
@@ -240,7 +236,7 @@ struct Channel : ChannelInterface {
 		}
 
 		if (channel.params.features & CH_FEATURE_DPROG) {
-			if (dprogState == DPROG_STATE_ON) {
+			if (channel.flags.dprogState == DPROG_STATE_ON) {
 				// turn off DP after delay
 				if (delayed_dp_off && (millis() - delayed_dp_off_start) >= DP_OFF_DELAY_PERIOD) {
 					delayed_dp_off = false;
@@ -304,7 +300,7 @@ struct Channel : ChannelInterface {
 			}
 
 			// HW OVP handling
-			if (channel.isOutputEnabled()) {
+			if (ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE)) {
 				if (!fallingEdge && channel.isHwOvpEnabled() && !ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
 					// activate HW OVP
 					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
@@ -405,103 +401,133 @@ struct Channel : ChannelInterface {
 		}
 	}
 
-	void setOutputEnable(int subchannelIndex, bool enable) {
+	void setOutputEnable(int subchannelIndex, bool enable, uint16_t tasks) {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
 		if (enable) {
-			dac.setVoltage(uSet);
+			// OE
+			if (tasks & OUTPUT_ENABLE_TASK_OE) {
+				ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, true);
+			}
 
-			setCurrentRange(subchannelIndex);
+			// DAC
+			if (tasks & OUTPUT_ENABLE_TASK_DAC) {
+				dac.setVoltage(uSet);
+			}
 
-			ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, true);
+			// Current range
+			if (tasks & OUTPUT_ENABLE_TASK_CURRENT_RANGE) {
+				setCurrentRange(subchannelIndex);
+			}
 
-			if (channel.params.features & CH_FEATURE_HW_OVP) {
-				if (channel.isHwOvpEnabled()) {
-					// OVP has to be enabled after OE activation
-					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+			// OVP
+			if (tasks & OUTPUT_ENABLE_TASK_OVP) {
+				if (channel.params.features & CH_FEATURE_HW_OVP) {
+					if (channel.isHwOvpEnabled()) {
+						// OVP has to be enabled after OE activation
+						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+					}
 				}
 			}
 
-			if (channel.params.features & CH_FEATURE_DPROG) {			
-				if (dprogState == DPROG_STATE_ON) {
-					// enable DP
-					dpNegMonitoringTime = micros();
-					delayed_dp_off = false;
-					setDpEnable(true);
+			// DP
+			if (tasks & OUTPUT_ENABLE_TASK_DP) {
+				if (channel.params.features & CH_FEATURE_DPROG) {
+					if (channel.flags.dprogState == DPROG_STATE_ON) {
+						// enable DP
+						dpNegMonitoringTime = micros();
+						delayed_dp_off = false;
+						setDpEnable(true);
+					}
 				}
 			}
 
-			adc.start(ADC_DATA_TYPE_U_MON);
+			if (tasks & OUTPUT_ENABLE_TASK_FINALIZE) {
+				adc.start(ADC_DATA_TYPE_U_MON);
+			}
 		} else {
-			if (channel.params.features & CH_FEATURE_HW_OVP) {
-				if (channel.isHwOvpEnabled()) {
-					// OVP has to be disabled before OE deactivation
-					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+			// OVP
+			if (tasks & OUTPUT_ENABLE_TASK_OVP) {
+				if (channel.params.features & CH_FEATURE_HW_OVP) {
+					if (channel.isHwOvpEnabled()) {
+						// OVP has to be disabled before OE deactivation
+						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+					}
 				}
 			}
 
-			dac.setVoltage(channel.getCalibratedVoltage(0));
+			// DAC
+			if (tasks & OUTPUT_ENABLE_TASK_DAC) {
+				dac.setDacVoltage(0);
+			}
 
-			ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, false);
+			// OE
+			if (tasks & OUTPUT_ENABLE_TASK_OE) {
+				ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, false);
+			}
 
-			setCurrentRange(subchannelIndex);
+			// Current range
+			if (tasks & OUTPUT_ENABLE_TASK_CURRENT_RANGE) {
+				setCurrentRange(subchannelIndex);
+			}
 
-			if (channel.params.features & CH_FEATURE_DPROG) {			
-				if (dprogState == DPROG_STATE_ON) {
-					// turn off DP after some delay
-					delayed_dp_off = true;
-					delayed_dp_off_start = millis();
+			// DP
+			if (tasks & OUTPUT_ENABLE_TASK_DP) {
+				if (channel.params.features & CH_FEATURE_DPROG) {			
+					if (channel.flags.dprogState == DPROG_STATE_ON) {
+						// turn off DP after some delay
+						delayed_dp_off = true;
+						delayed_dp_off_start = millis();
+					}
 				}
 			}
 		}
 
-		if (channel.params.features & CH_FEATURE_COUPLING) {
-			if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
-			} else if (channel.channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, false);
-			} else if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
-			} else if (channel.channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, false);
-			} else if (channel.channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
-			} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_COMMON_GND) {
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
+		if (tasks & OUTPUT_ENABLE_TASK_FINALIZE) {
+			if (channel.params.features & CH_FEATURE_COUPLING) {
+				if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
+				} else if (channel.channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, false);
+				} else if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
+				} else if (channel.channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, false);
+				} else if (channel.channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
+				} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_COMMON_GND) {
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, false);
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, enable);
+				} else {
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, enable);
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, false);
+				}
 			} else {
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED, enable);
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OE_COUPLED_LED, false);
+				ioexp.changeBit(IOExpander::DCP505_IO_BIT_OUT_OE_UNCOUPLED_LED, enable);
+
 			}
-		} else {
-			ioexp.changeBit(IOExpander::DCP505_IO_BIT_OUT_OE_UNCOUPLED_LED, enable);
 
+			restoreVoltageToValueBeforeBalancing(channel);
+			restoreCurrentToValueBeforeBalancing(channel);
 		}
-
-		restoreVoltageToValueBeforeBalancing(channel);
-		restoreCurrentToValueBeforeBalancing(channel);
 	}
 
-    DprogState getDprogState() {
-        return dprogState;
-    }
+	void onAfterOutputEnableSync(int subchannelIndex) {
+	}
 
-    void setDprogState(DprogState dprogState_) {
+    void setDprogState(DprogState dprogState) {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 		if (channel.params.features & CH_FEATURE_DPROG) {			
-			dprogState = dprogState_;
-
 			if (dprogState == DPROG_STATE_OFF) {
 				setDpEnable(false);
 			} else {
-				setDpEnable(channel.isOk() && channel.isOutputEnabled());
+				setDpEnable(channel.isOk() && ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE));
 			}
-
 			delayed_dp_off = false;
 		}
     }
@@ -536,8 +562,10 @@ struct Channel : ChannelInterface {
 			}
 		}
 
-        if (channel.isOutputEnabled() || isDacTesting(subchannelIndex)) {
+        if (ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE) || isDacTesting(subchannelIndex)) {
 			dac.setVoltage(value);
+		} else {
+			dac.setDacVoltage(0);
 		}
 
 		uSet = value;

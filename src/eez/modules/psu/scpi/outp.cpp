@@ -206,7 +206,7 @@ scpi_result_t scpi_cmd_outputDprogQ(scpi_t *context) {
     }
 
     if (channel->params.features & CH_FEATURE_DPROG) {
-        SCPI_ResultBool(context, channel->getDprogState());
+        SCPI_ResultBool(context, channel->flags.dprogState);
     } else {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;

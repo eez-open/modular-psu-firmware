@@ -52,10 +52,14 @@ namespace psu {
 
 void boot();
 
+void initChannels();
+bool testChannels();
+
 extern bool g_isBooted;
 
 bool powerUp();
 void powerDown();
+void powerDownChannels();
 bool isPowerUp();
 void changePowerState(bool up);
 void powerDownBySensor();

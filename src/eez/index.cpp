@@ -63,6 +63,9 @@ ChannelInterface::ChannelInterface(int slotIndex_)
 {
 }
 
+void ChannelInterface::onAfterOutputEnableSync(int subchannelIndex) {
+}
+
 unsigned ChannelInterface::getRPol(int subchannelIndex) {
     return 0;
 }

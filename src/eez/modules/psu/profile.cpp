@@ -224,12 +224,7 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
             channel.flags.currentRangeSelectionMode = profile->channels[i].flags.currentRangeSelectionMode;
             channel.flags.autoSelectCurrentRange = profile->channels[i].flags.autoSelectCurrentRange;
 
-            DprogState dprogState = (DprogState)profile->channels[i].flags.dprogState;
-            if (dprogState == DPROG_STATE_OFF) {
-                channel.setDprogState(DPROG_STATE_OFF);
-            } else {
-                channel.setDprogState(DPROG_STATE_ON);
-            }
+            channel.flags.dprogState = profile->channels[i].flags.dprogState;
             
             channel.flags.trackingEnabled = profile->channels[i].flags.trackingEnabled;
 
@@ -237,9 +232,9 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
             loadProfileList(*profile, channel, location);
 #endif
         }
-
-        channel.update();
     }
+
+    Channel::updateAllChannels();
 
     enableSave(wasSaveProfileEnabled);
 }
@@ -313,7 +308,7 @@ void fillProfile(Parameters *pProfile) {
             profile.channels[i].flags.currentRangeSelectionMode = channel.flags.currentRangeSelectionMode;
             profile.channels[i].flags.autoSelectCurrentRange = channel.flags.autoSelectCurrentRange;
 
-            profile.channels[i].flags.dprogState = channel.getDprogState();
+            profile.channels[i].flags.dprogState = channel.flags.dprogState;
             profile.channels[i].flags.trackingEnabled = channel.flags.trackingEnabled;
         }
         else {

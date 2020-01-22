@@ -34,6 +34,7 @@ bool isTrackingAllowed(Channel &channel, int *err);
 bool isCouplingTypeAllowed(CouplingType couplingType, int *err);
 
 bool setCouplingType(CouplingType couplingType, int *err);
+void setCouplingTypeInPsuThread(CouplingType couplingType);
 CouplingType getCouplingType();
 
 void setTrackingChannels(uint16_t trackingEnabled);
@@ -105,14 +106,12 @@ void setOppState(Channel &channel, int state);
 void setOppLevel(Channel &channel, float level);
 void setOppDelay(Channel &channel, float delay);
 
-void beginOutputEnableSequence();
-void endOutputEnableSequence();
-void outputEnableSyncPrepare(Channel &channel);
-void outputEnableSyncReady(Channel &channel);
-
 void outputEnable(Channel &channel, bool enable);
 bool outputEnable(Channel &channel, bool enable, int *err);
+void outputEnableOnNextSync(Channel &channel, bool enable);
+void syncOutputEnable();
 void disableOutputForAllChannels();
+void disableOutputForAllTrackingChannels();
 
 void remoteSensingEnable(Channel &channel, bool enable);
 

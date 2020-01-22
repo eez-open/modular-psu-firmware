@@ -51,6 +51,7 @@ float getCurrent(Channel &channel);
 
 int generateTrigger(Source source, bool checkImmediatelly = true);
 int startImmediately();
+void startImmediatelyInPsuThread();
 int initiate();
 int enableInitiateContinuous(bool enable);
 bool isContinuousInitializationEnabled();

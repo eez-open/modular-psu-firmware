@@ -210,6 +210,15 @@ void IOExpander::init() {
     	uint8_t value = getRegValue(i);
     	write(reg, value);
     }
+
+#if defined(EEZ_PLATFORM_STM32)
+    HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_RESET);
+    delay(1);
+    HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
+    delay(1);
+    HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_RESET);
+#endif
+
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -361,13 +370,7 @@ bool IOExpander::isAdcReady() {
 #endif
 
 void IOExpander::changeBit(int io_bit, bool set) {
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
-
-#if defined(EEZ_PLATFORM_STM32)    
-    if (io_bit == IO_BIT_OUT_OUTPUT_ENABLE) {
-        channel_dispatcher::outputEnableSyncPrepare(channel);
-    }
-
+#if defined(EEZ_PLATFORM_STM32)
     if (io_bit < 8) {
         uint8_t oldValue = (uint8_t)gpioWritten;
         uint8_t newValue = set ? (oldValue | (1 << io_bit)) : (oldValue & ~(1 << io_bit));
@@ -382,20 +385,7 @@ void IOExpander::changeBit(int io_bit, bool set) {
 	    }
     }
 
-    if (io_bit == IO_BIT_OUT_OUTPUT_ENABLE) {
-        channel_dispatcher::outputEnableSyncReady(channel);
-    }
-#endif
-
-#if defined(EEZ_PLATFORM_STM32)
     gpio = set ? (gpio | (1 << io_bit)) : (gpio & ~(1 << io_bit));
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    if (io_bit == IO_BIT_OUT_OUTPUT_ENABLE) {
-        channel_dispatcher::outputEnableSyncPrepare(channel);
-        channel_dispatcher::outputEnableSyncReady(channel);
-    }
 #endif
 }
 

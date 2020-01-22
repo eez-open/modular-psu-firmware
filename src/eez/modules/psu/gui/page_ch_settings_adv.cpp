@@ -45,7 +45,7 @@ void ChSettingsAdvOptionsPage::toggleProgramming() {
 }
 
 void ChSettingsAdvOptionsPage::toggleDprog() {
-    if (g_channel->getDprogState() == DPROG_STATE_OFF) {
+    if (g_channel->flags.dprogState == DPROG_STATE_OFF) {
         g_channel->setDprogState(DPROG_STATE_ON);
     } else {
         g_channel->setDprogState(DPROG_STATE_OFF);

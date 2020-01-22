@@ -157,9 +157,9 @@ struct ChannelInterface {
     virtual void adcMeasureMonDac(int subchannelIndex) = 0;
     virtual void adcMeasureAll(int subchannelIndex) = 0;
 
-    virtual void setOutputEnable(int subchannelIndex, bool enable) = 0;
+    virtual void setOutputEnable(int subchannelIndex, bool enable, uint16_t tasks) = 0;
+    virtual void onAfterOutputEnableSync(int subchannelIndex);
 
-    virtual DprogState getDprogState() = 0;
     virtual void setDprogState(DprogState dprogState) = 0;
 
     virtual void setDacVoltage(int subchannelIndex, uint16_t value) = 0;

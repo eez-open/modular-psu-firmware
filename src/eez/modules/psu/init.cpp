@@ -21,6 +21,9 @@
 #include <eez/system.h>
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/channel.h>
+#include <eez/modules/psu/channel_dispatcher.h>
+#include <eez/modules/psu/trigger.h>
 
 namespace eez {
 namespace psu {
@@ -45,23 +48,15 @@ osThreadId g_psuTaskHandle;
 osMessageQDef(g_psuMessageQueue, PSU_QUEUE_SIZE, uint32_t);
 osMessageQId g_psuMessageQueueId;
 
-osMutexDef(g_psuMutex);
-osMutexId(g_psuMutexId);
-
 bool onSystemStateChanged() {
     if (g_systemState == eez::SystemState::BOOTING) {
         if (g_systemStatePhase == 0) {
 #ifdef EEZ_PLATFORM_SIMULATOR
             eez::psu::simulator::init();
 #endif
-
-            g_psuMutexId = osMutexCreate(osMutex(g_psuMutex));
-
             g_psuMessageQueueId = osMessageCreate(osMessageQ(g_psuMessageQueue), NULL);
-
-            boot();
-
             g_psuTaskHandle = osThreadCreate(osThread(g_psuTask), nullptr);
+            boot();
         }
     }
 
@@ -100,8 +95,24 @@ void oneIter() {
         } else if (type == PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL) {
             eez::psu::Channel::get(param).adcMeasureAll();
             g_adcMeasureAllFinished = true;
+        } else if (type == PSU_QUEUE_TRIGGER_START_IMMEDIATELY) {
+            trigger::startImmediatelyInPsuThread();
+        } else if (type == PSU_QUEUE_TRIGGER_ABORT) {
+            trigger::abort();
+        } else if (type == PSU_QUEUE_TRIGGER_CHANNEL_SAVE_AND_DISABLE_OE) {
+            Channel::saveAndDisableOE();
+        } else if (type == PSU_QUEUE_TRIGGER_CHANNEL_RESTORE_OE) {
+            Channel::restoreOE();
+        } else if (type == PSU_QUEUE_SET_COUPLING_TYPE) {
+            channel_dispatcher::setCouplingTypeInPsuThread((channel_dispatcher::CouplingType)param);
+        } else if (type == PSU_QUEUE_SET_TRACKING_CHANNELS) {
+            channel_dispatcher::setTrackingChannels((uint16_t)param);
+        } else if (type == PSU_QUEUE_CHANNEL_OUTPUT_ENABLE) {
+            channel_dispatcher::outputEnable(Channel::get((param >> 8) & 0xFF), param & 0xFF ? true : false);
+        } else if (type == PSU_QUEUE_SYNC_OUTPUT_ENABLE) {
+            channel_dispatcher::syncOutputEnable();
         }
-    } else {
+    } else if (g_isBooted) {
         tick();
     }
 }
@@ -121,15 +132,6 @@ bool measureAllAdcValuesOnChannel(int channelIndex) {
 
     return g_adcMeasureAllFinished;
 }
-
-void lock() {
-    osMutexWait(g_psuMutexId, osWaitForever);
-}
-
-void unlock() {
-    osMutexRelease(g_psuMutexId);
-}
-
 
 } // namespace psu
 } // namespace eez

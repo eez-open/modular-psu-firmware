@@ -2721,7 +2721,7 @@ void data_channel_dprog(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        value = (int)channel.getDprogState();
+        value = (int)channel.flags.dprogState;
     }
 }
 

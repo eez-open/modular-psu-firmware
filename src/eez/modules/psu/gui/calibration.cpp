@@ -50,7 +50,7 @@ void showCurrentStep();
 ////////////////////////////////////////////////////////////////////////////////
 
 void onStartPasswordOk() {
-    g_channel->outputEnable(false);
+    channel_dispatcher::outputEnable(*g_channel, false);
 
     g_channel->clearProtection();
     g_channel->prot_conf.flags.u_state = 0;
@@ -59,7 +59,7 @@ void onStartPasswordOk() {
 
     g_channel->remoteProgrammingEnable(false);
 
-    g_channel->outputEnable(true);
+    channel_dispatcher::outputEnable(*g_channel, true);
 
     trigger::abort();
 
@@ -283,7 +283,7 @@ void save() {
 void finishStop() {
     calibration::stop();
 
-    g_channel->outputEnable(false);
+    channel_dispatcher::outputEnable(*g_channel, false);
 
     g_channel->prot_conf.flags.u_state = g_channel->params.OVP_DEFAULT_STATE;
     g_channel->prot_conf.flags.i_state = g_channel->params.OCP_DEFAULT_STATE;

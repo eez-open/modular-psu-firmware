@@ -281,17 +281,30 @@ void init() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool testChannels() {
-   if (!g_powerIsUp) {
-       // test is skipped
-       return true;
-   }
+void initChannels() {
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel::get(i).init();
+    }
+}
+
+bool testChannels() {
+    if (!g_powerIsUp) {
+        // test is skipped
+        return true;
+    }
 
     bool result = true;
+
+    bool wasSaveProfileEnabled = profile::enableSave(false);
+
+    channel_dispatcher::disableOutputForAllChannels();
 
     for (int i = 0; i < CH_NUM; ++i) {
         result &= Channel::get(i).test();
     }
+
+    profile::enableSave(wasSaveProfileEnabled);
+    profile::save();
 
     return result;
 }
@@ -473,9 +486,7 @@ static bool psuReset() {
 
     // SYST:POW ON
     if (powerUp()) {
-    	for (int i = 0; i < CH_NUM; ++i) {
-            Channel::get(i).update();
-        }
+        Channel::updateAllChannels();
 
     	return true;
     }
@@ -615,9 +626,8 @@ bool powerUp() {
     }
 
     // init channels
-    for (int i = 0; i < CH_NUM; ++i) {
-        Channel::get(i).init();
-    }
+    initChannels();
+    uint32_t initTime = millis();
 
     bool testSuccess = true;
 
@@ -626,8 +636,12 @@ bool powerUp() {
     }
 
     // test channels
-    for (int i = 0; i < CH_NUM; ++i) {
-        testSuccess &= Channel::get(i).test();
+    testSuccess &= testChannels();
+
+    int32_t diff = millis() - initTime;
+    static const int32_t CONF_INIT_TIME = 1000;
+    if (diff < CONF_INIT_TIME) {
+        delay(CONF_INIT_TIME - diff);
     }
 
     // turn on Power On (PON) bit of ESE register
@@ -667,9 +681,7 @@ void powerDown() {
         event_queue::pushEvent(err);
     }
 
-    for (int i = 0; i < CH_NUM; ++i) {
-        Channel::get(i).onPowerDown();
-    }
+    powerDownChannels();
 
     board::powerDown();
 
@@ -691,6 +703,18 @@ void powerDown() {
     io_pins::tick(micros());
 
     sound::playPowerDown();
+}
+
+void powerDownChannels() {
+    bool wasSaveProfileEnabled = profile::enableSave(false);
+
+    channel_dispatcher::disableOutputForAllChannels();
+
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel::get(i).onPowerDown();
+    }
+
+    profile::enableSave(wasSaveProfileEnabled);
 }
 
 bool isPowerUp() {

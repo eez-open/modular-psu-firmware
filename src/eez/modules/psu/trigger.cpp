@@ -18,6 +18,7 @@
 
 #include <eez/modules/psu/psu.h>
 
+#include <eez/modules/psu/init.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/list_program.h>
@@ -157,7 +158,7 @@ int generateTrigger(Source source, bool checkImmediatelly) {
     return SCPI_RES_OK;
 }
 
-bool isTriggerFinished() {
+bool isTriggerFinishedOnAllChannels() {
     for (int i = 0; i < CH_NUM; ++i) {
         if (g_triggerInProgress[i]) {
             return false;
@@ -220,7 +221,7 @@ void setTriggerFinished(Channel &channel) {
 
     onTriggerFinished(channel);
 
-    if (isTriggerFinished()) {
+    if (isTriggerFinishedOnAllChannels()) {
         triggerFinished();
     }
 }
@@ -312,9 +313,17 @@ int startImmediately() {
 
     io_pins::onTrigger();
 
-    bool trackingChannelsStarted = false;
+    if (osThreadGetId() != g_psuTaskHandle) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_TRIGGER_START_IMMEDIATELY, 0), 0);
+    } else {
+        startImmediatelyInPsuThread();
+    }
 
-    channel_dispatcher::beginOutputEnableSequence();
+    return SCPI_RES_OK;
+}
+
+void startImmediatelyInPsuThread() {
+    bool trackingChannelsStarted = false;
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
@@ -341,23 +350,21 @@ int startImmediately() {
             list::executionStart(channel);
             
             if (list::isActive()) {
-                channel_dispatcher::outputEnable(channel, channel_dispatcher::getTriggerOutputState(channel));
+                channel_dispatcher::outputEnableOnNextSync(channel, channel_dispatcher::getTriggerOutputState(channel));
             }
         } else {
             if (channel.getVoltageTriggerMode() == TRIGGER_MODE_STEP) {
                 channel_dispatcher::setVoltage(channel, g_levels[i].u);
                 channel_dispatcher::setCurrent(channel, g_levels[i].i);
 
-                channel_dispatcher::outputEnable(channel, channel_dispatcher::getTriggerOutputState(channel));
+                channel_dispatcher::outputEnableOnNextSync(channel, channel_dispatcher::getTriggerOutputState(channel));
             }
 
             setTriggerFinished(channel);
         }
     }
 
-    channel_dispatcher::endOutputEnableSequence();
-
-    return SCPI_RES_OK;
+    channel_dispatcher::syncOutputEnable();
 }
 
 int initiate() {
@@ -401,8 +408,12 @@ bool isTriggered() {
 }
 
 void abort() {
-    list::abort();
-    setState(STATE_IDLE);
+    if (osThreadGetId() != g_psuTaskHandle) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_TRIGGER_ABORT, 0), 0);
+    } else {
+        list::abort();
+        setState(STATE_IDLE);
+    }
 }
 
 void tick(uint32_t tick_usec) {

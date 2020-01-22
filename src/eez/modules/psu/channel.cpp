@@ -27,6 +27,7 @@
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
+#include <eez/modules/psu/init.h>
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/persist_conf.h>
@@ -138,30 +139,36 @@ void Channel::Value::addMonDacValue(float value, float prec) {
 static uint16_t g_oeSavedState;
 
 void Channel::saveAndDisableOE() {
-    if (!g_oeSavedState) {
-        channel_dispatcher::beginOutputEnableSequence();
-        for (int i = 0; i < CH_NUM; i++)  {
-            Channel& channel = Channel::get(i);
-            if (channel.isOutputEnabled()) {
-                g_oeSavedState |= (1 << (i + 1));
-                channel.outputEnable(false);
+    if (osThreadGetId() != g_psuTaskHandle) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_TRIGGER_CHANNEL_SAVE_AND_DISABLE_OE, 0), 0);
+    } else {
+        if (!g_oeSavedState) {
+            for (int i = 0; i < CH_NUM; i++)  {
+                Channel& channel = Channel::get(i);
+                if (channel.isOutputEnabled()) {
+                    g_oeSavedState |= (1 << (i + 1));
+                    channel_dispatcher::outputEnableOnNextSync(channel, false);
+                }
             }
+            channel_dispatcher::syncOutputEnable();
+            g_oeSavedState |= 1;
         }
-        channel_dispatcher::endOutputEnableSequence();
-        g_oeSavedState |= 1;
     }
 }
 
 void Channel::restoreOE() {
-    if (g_oeSavedState) {
-    	channel_dispatcher::beginOutputEnableSequence();
-        for (int i = 0; i < CH_NUM; i++)  {
-            if ((g_oeSavedState & (1 << (i + 1))) != 0) {
-                Channel::get(i).outputEnable(true);
+    if (osThreadGetId() != g_psuTaskHandle) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_TRIGGER_CHANNEL_RESTORE_OE, 0), 0);
+    } else {
+        if (g_oeSavedState) {
+            for (int i = 0; i < CH_NUM; i++)  {
+                if ((g_oeSavedState & (1 << (i + 1))) != 0) {
+                    channel_dispatcher::outputEnableOnNextSync(Channel::get(i), true);
+                }
             }
+            channel_dispatcher::syncOutputEnable();
+            g_oeSavedState = 0;
         }
-        channel_dispatcher::endOutputEnableSequence();
-        g_oeSavedState = 0;
     }
 }
 
@@ -532,17 +539,12 @@ void Channel::onPowerDown() {
         return;
     }
 
-    bool wasSaveProfileEnabled = profile::enableSave(false);
-
-    outputEnable(false);
     doRemoteSensingEnable(false);
     doRemoteProgrammingEnable(false);
 
     clearProtection(false);
 
     channelInterface->onPowerDown(subchannelIndex);
-
-    profile::enableSave(wasSaveProfileEnabled);
 }
 
 void Channel::reset() {
@@ -569,6 +571,8 @@ void Channel::reset() {
     flags.currentCurrentRange = CURRENT_RANGE_HIGH;
     flags.currentRangeSelectionMode = CURRENT_RANGE_SELECTION_ALWAYS_HIGH;
     flags.autoSelectCurrentRange = 0;
+
+    flags.dprogState = 0;
 
     // CAL:STAT ON if valid calibrating data for both voltage and current exists in the nonvolatile
     // memory, otherwise OFF.
@@ -688,18 +692,12 @@ bool Channel::test() {
         return true;
     }
 
-    bool wasSaveProfileEnabled = profile::enableSave(false);
-
     flags.powerOk = 0;
 
-    outputEnable(false);
     doRemoteSensingEnable(false);
     doRemoteProgrammingEnable(false);
 
     channelInterface->test(subchannelIndex);
-
-    profile::enableSave(wasSaveProfileEnabled);
-    profile::save();
 
     return isOk();
 }
@@ -947,42 +945,160 @@ void Channel::adcMeasureAll() {
     channelInterface->adcMeasureAll(subchannelIndex);
 }
 
-void Channel::executeOutputEnable(bool enable) {
-    channelInterface->setOutputEnable(subchannelIndex, enable);
+void Channel::updateAllChannels() {
+    bool wasSaveProfileEnabled = profile::enableSave(false);
 
-    setOperBits(OPER_ISUM_OE_OFF, !enable);
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel &channel = Channel::get(i);
+        if (channel.isOk()) {
+            channel.doCalibrationEnable(persist_conf::isChannelCalibrationEnabled(channel) && channel.isCalibrationExists());
+            channel.setVoltage(channel.u.set);
+            channel.setCurrent(channel.i.set);
+        }
+    }
 
-    if (enable) {
-    } else {
-        setCvMode(false);
-        setCcMode(false);
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel &channel = Channel::get(i);
+        if (channel.isOk()) {
+            channel.flags.outputEnabledValueOnNextSync = channel.flags.outputEnabled;
+            channel.flags.outputEnabled = !channel.flags.outputEnabled;
+            channel.flags.doOutputEnableOnNextSync = 1;
+        }
+    }
 
-        if (calibration::isEnabled()) {
-            calibration::stop();
+    Channel::syncOutputEnable();
+
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel &channel = Channel::get(i);
+        if (channel.isOk()) {
+            channel.doRemoteSensingEnable(channel.flags.senseEnabled);
+            channel.doRemoteProgrammingEnable(channel.flags.rprogEnabled);
+        }
+    }
+
+    profile::enableSave(wasSaveProfileEnabled);
+}
+
+void Channel::executeOutputEnable(bool enable, uint16_t tasks) {
+    channelInterface->setOutputEnable(subchannelIndex, enable, tasks);
+
+    if (tasks & OUTPUT_ENABLE_TASK_FINALIZE) {
+        setOperBits(OPER_ISUM_OE_OFF, !enable);
+
+        if (!enable) {
+            setCvMode(false);
+            setCcMode(false);
+
+            if (calibration::isEnabled()) {
+                calibration::stop();
+            }
         }
     }
 }
 
-void Channel::doOutputEnable(bool enable) {
-    if (enable && !isOk()) {
-        return;
+void Channel::executeOutputEnable(bool inhibited) {
+    bool anyToEnable = false;
+    bool anyToDisable = false;
+
+    // before SYNC
+    for (int i = 0; i < CH_NUM; i++) {
+        Channel &channel = Channel::get(i);
+        if (channel.flags.doOutputEnableOnNextSync) {
+            if (channel.flags.outputEnabled && !inhibited) {
+                anyToEnable = true;
+                // OE for enabled
+                channel.executeOutputEnable(true, OUTPUT_ENABLE_TASK_OE);
+            } else if ((channel.flags.outputEnabled && inhibited) || (!channel.flags.outputEnabled && !inhibited)) {
+                anyToDisable = true;
+                // OVP, DAC, and OE for disabled
+                channel.executeOutputEnable(false, OUTPUT_ENABLE_TASK_OVP | OUTPUT_ENABLE_TASK_DAC | OUTPUT_ENABLE_TASK_OE);
+            }
+        }
     }
 
-    flags.outputEnabled = enable;
+    if (anyToEnable || anyToDisable) {
+        // SYNC set
+#if defined(EEZ_PLATFORM_STM32)
+        HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
+#endif
+
+        // AFTER sync
+        if (anyToEnable) {
+            delayMicroseconds(500);
+
+            // DAC and current range for enabled
+            for (int i = 0; i < CH_NUM; i++) {
+                Channel &channel = Channel::get(i);
+                if (channel.flags.doOutputEnableOnNextSync) {
+                    if (channel.flags.outputEnabled && !inhibited) {
+                        channel.executeOutputEnable(true, OUTPUT_ENABLE_TASK_DAC | OUTPUT_ENABLE_TASK_CURRENT_RANGE);
+                    }
+                }
+            }
+
+            delayMicroseconds(500);
+        }
+
+        // FINALIZE
+        for (int i = 0; i < CH_NUM; i++) {
+            Channel &channel = Channel::get(i);
+            if (channel.flags.doOutputEnableOnNextSync) {
+                if (channel.flags.outputEnabled && !inhibited) {
+                    // OVP, DP for enabled
+                    channel.executeOutputEnable(true, OUTPUT_ENABLE_TASK_OVP | OUTPUT_ENABLE_TASK_DP | OUTPUT_ENABLE_TASK_FINALIZE);
+                } else if ((channel.flags.outputEnabled && inhibited) || (!channel.flags.outputEnabled && !inhibited)) {
+                    // current range and DP for disabled
+                    channel.executeOutputEnable(false, OUTPUT_ENABLE_TASK_CURRENT_RANGE | OUTPUT_ENABLE_TASK_DP | OUTPUT_ENABLE_TASK_FINALIZE);
+                }
+
+                channel.flags.doOutputEnableOnNextSync = 0;
+            }
+        }
+
+        // SYNC reset
+#if defined(EEZ_PLATFORM_STM32)
+        HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_RESET);
+#endif
+    }
+}
+
+void Channel::syncOutputEnable() {
+    for (int i = 0; i < CH_NUM; i++) {
+        Channel &channel = Channel::get(i);
+        if (channel.flags.doOutputEnableOnNextSync) { 
+            if (channel.flags.outputEnabled != channel.flags.outputEnabledValueOnNextSync) {
+                if (channel.flags.outputEnabledValueOnNextSync && !channel.isOk()) {
+                    channel.flags.doOutputEnableOnNextSync = 0;
+                } else {
+                    channel.flags.outputEnabled = channel.flags.outputEnabledValueOnNextSync;
+                    event_queue::pushEvent((channel.flags.outputEnabled ? event_queue::EVENT_INFO_CH1_OUTPUT_ENABLED : event_queue::EVENT_INFO_CH1_OUTPUT_DISABLED) + channel.channelIndex);
+                }
+            } else {
+                channel.flags.doOutputEnableOnNextSync = 0;
+            }
+        }
+    }
 
     if (!io_pins::isInhibited()) {
-        executeOutputEnable(enable);
+        executeOutputEnable(false);
+    } else {
+        for (int i = 0; i < CH_NUM; i++) {
+            Channel &channel = Channel::get(i);
+            channel.flags.doOutputEnableOnNextSync = 0;
+        }
     }
+
+    profile::save();
 }
 
 void Channel::onInhibitedChanged(bool inhibited) {
-    if (isOutputEnabled()) {
-        if (inhibited) {
-            executeOutputEnable(false);
-        } else {
-            executeOutputEnable(true);
+    for (int i = 0; i < CH_NUM; i++) {
+        Channel &channel = Channel::get(i);
+        if (channel.isOutputEnabled()) {
+            channel.flags.doOutputEnableOnNextSync = 1;
         }
     }
+    executeOutputEnable(inhibited);
 }
 
 void Channel::doRemoteSensingEnable(bool enable) {
@@ -1024,32 +1140,6 @@ void Channel::doRemoteProgrammingEnable(bool enable) {
 
     channelInterface->setRemoteProgramming(subchannelIndex, enable);
     setOperBits(OPER_ISUM_RPROG_ON, enable);
-}
-
-void Channel::update() {
-    if (!isOk()) {
-        return;
-    }
-
-    doCalibrationEnable(persist_conf::isChannelCalibrationEnabled(*this) && isCalibrationExists());
-
-    bool wasSaveProfileEnabled = profile::enableSave(false);
-
-    setVoltage(u.set);
-    setCurrent(i.set);
-    doOutputEnable(flags.outputEnabled);
-    doRemoteSensingEnable(flags.senseEnabled);
-    doRemoteProgrammingEnable(flags.rprogEnabled);
-
-    profile::enableSave(wasSaveProfileEnabled);
-}
-
-void Channel::outputEnable(bool enable) {
-    if (enable != flags.outputEnabled) {
-        doOutputEnable(enable);
-        event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_OUTPUT_ENABLED : event_queue::EVENT_INFO_CH1_OUTPUT_DISABLED) + channelIndex);
-        profile::save();
-    }
 }
 
 bool Channel::isOutputEnabled() {
@@ -1534,11 +1624,8 @@ void Channel::doAutoSelectCurrentRange(uint32_t tickCount) {
     }
 }
 
-DprogState Channel::getDprogState() {
-    return channelInterface->getDprogState();
-}
-
 void Channel::setDprogState(DprogState dprogState) {
+    flags.dprogState = dprogState;
     channelInterface->setDprogState(dprogState);
 }
 

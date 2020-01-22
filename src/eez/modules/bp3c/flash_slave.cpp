@@ -177,9 +177,7 @@ void enterBootloaderMode(int slotIndex) {
 	psu::reset();
 
 	// power down channels
-	for (int i = 0; i < psu::CH_NUM; ++i) {
-		psu::Channel::get(i).onPowerDown();
-	}
+	psu::powerDownChannels();
 
 	osDelay(25);
 

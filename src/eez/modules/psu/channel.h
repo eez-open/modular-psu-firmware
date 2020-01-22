@@ -179,6 +179,8 @@ class Channel {
     /// Channel binary flags like output enabled, sense enabled, ...
     struct Flags {
         unsigned outputEnabled : 1;
+        unsigned doOutputEnableOnNextSync: 1;
+        unsigned outputEnabledValueOnNextSync: 1;
         unsigned historyStarted : 1;
         unsigned senseEnabled : 1;
         unsigned cvMode : 1;
@@ -198,6 +200,7 @@ class Channel {
         unsigned autoSelectCurrentRange : 1;    // switch between 5A/50mA depending on Imon
         unsigned currentCurrentRange : 1;       // 0: 5A, 1:50mA
         unsigned trackingEnabled : 1;
+        unsigned dprogState: 2;
     };
 
     /// Voltage and current data set and measured during runtime.
@@ -366,18 +369,15 @@ class Channel {
     /// Force ADC to measure all values: u.mon, u.mon_dac, i.mon and i.mon_dac.
     void adcMeasureAll();
 
-    /// Force update of all channel state (u.set, i.set, output enable, remote sensing, ...).
-    /// This is called when channel is recovering from hardware failure.
-    void update();
-
-    /// Enable/disable channel output.
-    void outputEnable(bool enable);
+    static void updateAllChannels();
 
     /// Is channel output enabled?
     bool isOutputEnabled();
 
-    /// Enable/disable channel output depending on inhibited state
-    void onInhibitedChanged(bool inhibited);
+    static void syncOutputEnable();
+
+    /// Enable/disable channel output on all channels depending on inhibited state
+    static void onInhibitedChanged(bool inhibited);
 
     /// Enable/disable channel calibration.
     void calibrationEnable(bool enabled);
@@ -540,7 +540,6 @@ class Channel {
 
     void enterOvpProtection();
 
-    DprogState getDprogState();
     void setDprogState(DprogState dprogState);
 
   private:
@@ -580,8 +579,8 @@ class Channel {
     void setCcMode(bool cc_mode);
     void setCvMode(bool cv_mode);
 
-    void executeOutputEnable(bool enable);
-    void doOutputEnable(bool enable);
+    void executeOutputEnable(bool enable, uint16_t tasks);
+    static void executeOutputEnable(bool inhibited);
 
     void doRemoteSensingEnable(bool enable);
     void doRemoteProgrammingEnable(bool enable);
@@ -589,6 +588,13 @@ class Channel {
     uint32_t autoRangeCheckLastTickCount;
     void doAutoSelectCurrentRange(uint32_t tickCount);
 };
+
+#define OUTPUT_ENABLE_TASK_OE            (1 << 0)
+#define OUTPUT_ENABLE_TASK_DAC           (1 << 1)
+#define OUTPUT_ENABLE_TASK_CURRENT_RANGE (1 << 2)
+#define OUTPUT_ENABLE_TASK_OVP           (1 << 3)
+#define OUTPUT_ENABLE_TASK_DP            (1 << 4)
+#define OUTPUT_ENABLE_TASK_FINALIZE      (1 << 5)
 
 } // namespace psu
 } // namespace eez

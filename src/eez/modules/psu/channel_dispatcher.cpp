@@ -118,236 +118,241 @@ bool setCouplingType(CouplingType couplingType, int *err) {
             return false;
         }
 
-        trigger::abort();
-
-        g_couplingType = couplingType;
-
-        beginOutputEnableSequence();
-
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel &channel = Channel::get(i);
-
-            channel.outputEnable(false);
-
-            if (i < 2 && (couplingType == COUPLING_TYPE_PARALLEL || couplingType == COUPLING_TYPE_SERIES)) {
-                channel.remoteSensingEnable(false);
-                channel.remoteProgrammingEnable(false);
-
-                channel.setVoltageTriggerMode(TRIGGER_MODE_FIXED);
-                channel.setCurrentTriggerMode(TRIGGER_MODE_FIXED);
-                channel.setTriggerOutputState(true);
-                channel.setTriggerOnListStop(TRIGGER_ON_LIST_STOP_OUTPUT_OFF);
-
-                list::resetChannelList(channel);
-
-                channel.setVoltage(getUMin(channel));
-                channel.setVoltageLimit(MIN(Channel::get(0).getVoltageLimit(), Channel::get(1).getVoltageLimit()));
-
-                channel.setCurrent(getIMin(channel));
-                channel.setCurrentLimit(MIN(Channel::get(0).getCurrentLimit(), Channel::get(1).getCurrentLimit()));
-
-                trigger::setVoltage(channel, getUMin(channel));
-                trigger::setCurrent(channel, getIMin(channel));
-
-                channel.prot_conf.flags.u_state = Channel::get(0).prot_conf.flags.u_state || Channel::get(1).prot_conf.flags.u_state ? 1 : 0;
-                if (channel.params.features & CH_FEATURE_HW_OVP) {
-                    channel.prot_conf.flags.u_type = Channel::get(0).prot_conf.flags.u_type || Channel::get(1).prot_conf.flags.u_type ? 1 : 0;
-                }
-                channel.prot_conf.u_level = MIN(Channel::get(0).prot_conf.u_level, Channel::get(1).prot_conf.u_level);
-                channel.prot_conf.u_delay = MIN(Channel::get(0).prot_conf.u_delay, Channel::get(1).prot_conf.u_delay);
-
-                channel.prot_conf.flags.i_state = Channel::get(0).prot_conf.flags.i_state || Channel::get(1).prot_conf.flags.i_state ? 1 : 0;
-                channel.prot_conf.i_delay = MIN(Channel::get(0).prot_conf.i_delay, Channel::get(1).prot_conf.i_delay);
-
-                channel.prot_conf.flags.p_state = Channel::get(0).prot_conf.flags.p_state || Channel::get(1).prot_conf.flags.p_state ? 1 : 0;
-                channel.prot_conf.p_level = MIN(Channel::get(0).prot_conf.p_level, Channel::get(1).prot_conf.p_level);
-                channel.prot_conf.p_delay = MIN(Channel::get(0).prot_conf.p_delay, Channel::get(1).prot_conf.p_delay);
-
-                temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.state = temperature::sensors[temp_sensor::CH1].prot_conf.state || temperature::sensors[temp_sensor::CH2].prot_conf.state ? 1 : 0;
-                temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.level = MIN(temperature::sensors[temp_sensor::CH1].prot_conf.level, temperature::sensors[temp_sensor::CH2].prot_conf.level);
-                temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.delay = MIN(temperature::sensors[temp_sensor::CH1].prot_conf.delay, temperature::sensors[temp_sensor::CH2].prot_conf.delay);
-
-                if (i == 1) {
-                    Channel &channel1 = Channel::get(0);
-                    channel.flags.displayValue1 = channel1.flags.displayValue1;
-                    channel.flags.displayValue2 = channel1.flags.displayValue2;
-                    channel.ytViewRate = channel1.ytViewRate;
-
-                }
-
-                channel.setCurrentRangeSelectionMode(CURRENT_RANGE_SELECTION_USE_BOTH);
-                channel.enableAutoSelectCurrentRange(false);
-
-                if (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL) { 
-                    channel.flags.trackingEnabled = false;
-                }
-
-                channel.resetHistory();
-            }
-        }
-
-        endOutputEnableSequence();
-
-        if (g_couplingType == COUPLING_TYPE_PARALLEL || g_couplingType == COUPLING_TYPE_SERIES) {
-            if (persist_conf::getMaxChannelIndex() ==  1) {
-                persist_conf::setMaxChannelIndex(0);
-            }
-        }
-
-        bp3c::io_exp::switchChannelCoupling(g_couplingType);
-
-        if (g_couplingType == COUPLING_TYPE_PARALLEL) {
-            event_queue::pushEvent(event_queue::EVENT_INFO_COUPLED_IN_PARALLEL);
-        } else if (g_couplingType == COUPLING_TYPE_SERIES) {
-            event_queue::pushEvent(event_queue::EVENT_INFO_COUPLED_IN_SERIES);
-        } else if (g_couplingType == COUPLING_TYPE_COMMON_GND) {
-            event_queue::pushEvent(event_queue::EVENT_INFO_COUPLED_IN_COMMON_GND);
-        } else if (g_couplingType == COUPLING_TYPE_SPLIT_RAILS) {
-            event_queue::pushEvent(event_queue::EVENT_INFO_COUPLED_IN_SPLIT_RAILS);
+        if (osThreadGetId() != g_psuTaskHandle) {
+            osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SET_COUPLING_TYPE, couplingType), 0);
         } else {
-            event_queue::pushEvent(event_queue::EVENT_INFO_CHANNELS_UNCOUPLED);
+            setCouplingTypeInPsuThread(couplingType);
         }
-
-        setOperBits(OPER_GROUP_PARALLEL, g_couplingType == COUPLING_TYPE_PARALLEL);
-        setOperBits(OPER_GROUP_SERIAL, g_couplingType == COUPLING_TYPE_SERIES);
-        setOperBits(OPER_GROUP_COMMON_GND, g_couplingType == COUPLING_TYPE_COMMON_GND);
-        setOperBits(OPER_GROUP_SPLIT_RAILS, g_couplingType == COUPLING_TYPE_SPLIT_RAILS);
-
-        delay(100); // Huge pause that allows relay contacts to debounce
     }
 
     return true;
 }
 
-void setTrackingChannels(uint16_t trackingEnabled) {
-    bool resetTrackingChannels = false;
-    for (int i = 0; i < CH_NUM; i++) {
-        Channel &trackingChannel = Channel::get(i);
-        unsigned wasEnabled = trackingChannel.flags.trackingEnabled;
-        trackingChannel.flags.trackingEnabled = (trackingEnabled & (1 << i)) ? 1 : 0;
-        if (!wasEnabled && trackingChannel.flags.trackingEnabled) {
-            resetTrackingChannels = true;
+void setCouplingTypeInPsuThread(CouplingType couplingType) {
+    trigger::abort();
+
+    g_couplingType = couplingType;
+
+    disableOutputForAllChannels();
+
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel &channel = Channel::get(i);
+
+        if (i < 2 && (couplingType == COUPLING_TYPE_PARALLEL || couplingType == COUPLING_TYPE_SERIES)) {
+            channel.remoteSensingEnable(false);
+            channel.remoteProgrammingEnable(false);
+
+            channel.setVoltageTriggerMode(TRIGGER_MODE_FIXED);
+            channel.setCurrentTriggerMode(TRIGGER_MODE_FIXED);
+            channel.setTriggerOutputState(true);
+            channel.setTriggerOnListStop(TRIGGER_ON_LIST_STOP_OUTPUT_OFF);
+
+            list::resetChannelList(channel);
+
+            channel.setVoltage(getUMin(channel));
+            channel.setVoltageLimit(MIN(Channel::get(0).getVoltageLimit(), Channel::get(1).getVoltageLimit()));
+
+            channel.setCurrent(getIMin(channel));
+            channel.setCurrentLimit(MIN(Channel::get(0).getCurrentLimit(), Channel::get(1).getCurrentLimit()));
+
+            trigger::setVoltage(channel, getUMin(channel));
+            trigger::setCurrent(channel, getIMin(channel));
+
+            channel.prot_conf.flags.u_state = Channel::get(0).prot_conf.flags.u_state || Channel::get(1).prot_conf.flags.u_state ? 1 : 0;
+            if (channel.params.features & CH_FEATURE_HW_OVP) {
+                channel.prot_conf.flags.u_type = Channel::get(0).prot_conf.flags.u_type || Channel::get(1).prot_conf.flags.u_type ? 1 : 0;
+            }
+            channel.prot_conf.u_level = MIN(Channel::get(0).prot_conf.u_level, Channel::get(1).prot_conf.u_level);
+            channel.prot_conf.u_delay = MIN(Channel::get(0).prot_conf.u_delay, Channel::get(1).prot_conf.u_delay);
+
+            channel.prot_conf.flags.i_state = Channel::get(0).prot_conf.flags.i_state || Channel::get(1).prot_conf.flags.i_state ? 1 : 0;
+            channel.prot_conf.i_delay = MIN(Channel::get(0).prot_conf.i_delay, Channel::get(1).prot_conf.i_delay);
+
+            channel.prot_conf.flags.p_state = Channel::get(0).prot_conf.flags.p_state || Channel::get(1).prot_conf.flags.p_state ? 1 : 0;
+            channel.prot_conf.p_level = MIN(Channel::get(0).prot_conf.p_level, Channel::get(1).prot_conf.p_level);
+            channel.prot_conf.p_delay = MIN(Channel::get(0).prot_conf.p_delay, Channel::get(1).prot_conf.p_delay);
+
+            temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.state = temperature::sensors[temp_sensor::CH1].prot_conf.state || temperature::sensors[temp_sensor::CH2].prot_conf.state ? 1 : 0;
+            temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.level = MIN(temperature::sensors[temp_sensor::CH1].prot_conf.level, temperature::sensors[temp_sensor::CH2].prot_conf.level);
+            temperature::sensors[temp_sensor::CH1 + channel.channelIndex].prot_conf.delay = MIN(temperature::sensors[temp_sensor::CH1].prot_conf.delay, temperature::sensors[temp_sensor::CH2].prot_conf.delay);
+
+            if (i == 1) {
+                Channel &channel1 = Channel::get(0);
+                channel.flags.displayValue1 = channel1.flags.displayValue1;
+                channel.flags.displayValue2 = channel1.flags.displayValue2;
+                channel.ytViewRate = channel1.ytViewRate;
+
+            }
+
+            channel.setCurrentRangeSelectionMode(CURRENT_RANGE_SELECTION_USE_BOTH);
+            channel.enableAutoSelectCurrentRange(false);
+
+            if (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL) { 
+                channel.flags.trackingEnabled = false;
+            }
+
+            channel.resetHistory();
         }
     }
 
-    if (resetTrackingChannels) {
-        event_queue::pushEvent(event_queue::EVENT_INFO_CHANNELS_TRACKED);
+    if (g_couplingType == COUPLING_TYPE_PARALLEL || g_couplingType == COUPLING_TYPE_SERIES) {
+        if (persist_conf::getMaxChannelIndex() ==  1) {
+            persist_conf::setMaxChannelIndex(0);
+        }
+    }
 
-        trigger::abort();
+    bp3c::io_exp::switchChannelCoupling(g_couplingType);
 
-        float uMin = 0;
-        float iMin = 0;
+    if (g_couplingType == COUPLING_TYPE_PARALLEL) {
+        event_queue::pushEvent(event_queue::EVENT_INFO_COUPLED_IN_PARALLEL);
+    } else if (g_couplingType == COUPLING_TYPE_SERIES) {
+        event_queue::pushEvent(event_queue::EVENT_INFO_COUPLED_IN_SERIES);
+    } else if (g_couplingType == COUPLING_TYPE_COMMON_GND) {
+        event_queue::pushEvent(event_queue::EVENT_INFO_COUPLED_IN_COMMON_GND);
+    } else if (g_couplingType == COUPLING_TYPE_SPLIT_RAILS) {
+        event_queue::pushEvent(event_queue::EVENT_INFO_COUPLED_IN_SPLIT_RAILS);
+    } else {
+        event_queue::pushEvent(event_queue::EVENT_INFO_CHANNELS_UNCOUPLED);
+    }
 
-        float voltageLimit = FLT_MAX;
-        float currentLimit = FLT_MAX;
+    setOperBits(OPER_GROUP_PARALLEL, g_couplingType == COUPLING_TYPE_PARALLEL);
+    setOperBits(OPER_GROUP_SERIAL, g_couplingType == COUPLING_TYPE_SERIES);
+    setOperBits(OPER_GROUP_COMMON_GND, g_couplingType == COUPLING_TYPE_COMMON_GND);
+    setOperBits(OPER_GROUP_SPLIT_RAILS, g_couplingType == COUPLING_TYPE_SPLIT_RAILS);
 
-        float uDef = FLT_MAX;
-        float iDef = FLT_MAX;
+    delay(100); // Huge pause that allows relay contacts to debounce
+}
 
-        int u_state = 0;
-        int u_type = 0;
-        float u_level = FLT_MAX;
-        float u_delay = FLT_MAX;
-
-        int i_state = 0;
-        float i_delay = FLT_MAX;
-
-        int p_state = 0;
-        float p_level = FLT_MAX;
-        float p_delay = FLT_MAX;
-
-        int t_state = 0;
-        float t_level = FLT_MAX;
-        float t_delay = FLT_MAX;
-
+void setTrackingChannels(uint16_t trackingEnabled) {
+    if (osThreadGetId() != g_psuTaskHandle) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SET_TRACKING_CHANNELS, trackingEnabled), 0);
+    } else {
+        bool resetTrackingChannels = false;
         for (int i = 0; i < CH_NUM; i++) {
             Channel &trackingChannel = Channel::get(i);
-            if (trackingChannel.flags.trackingEnabled) {
-                uMin = MAX(uMin, getUMin(trackingChannel));
-                iMin = MAX(iMin, getIMin(trackingChannel));
-                
-                voltageLimit = MIN(voltageLimit, trackingChannel.getVoltageLimit());
-                currentLimit = MIN(currentLimit, trackingChannel.getCurrentLimit());
-                
-                uDef = MIN(uDef, trackingChannel.u.def);
-                iDef = MIN(iDef, trackingChannel.i.def);
-
-                if (trackingChannel.prot_conf.flags.u_state) {
-                    u_state = 1;
-                }
-                if (trackingChannel.prot_conf.flags.u_type) {
-                    u_type = 1;
-                }
-                u_level = MIN(u_level, trackingChannel.prot_conf.u_level);
-                u_delay = MIN(u_delay, trackingChannel.prot_conf.u_delay);
-
-                if (trackingChannel.prot_conf.flags.i_state) {
-                    i_state = 1;
-                }
-                i_delay = MIN(i_delay, trackingChannel.prot_conf.i_delay);
-
-                if (trackingChannel.prot_conf.flags.p_state) {
-                    p_state = 1;
-                }
-                p_level = MIN(p_level, trackingChannel.prot_conf.p_level);
-                p_delay = MIN(p_delay, trackingChannel.prot_conf.p_delay);
-
-                if (temperature::sensors[temp_sensor::CH1 + i].prot_conf.state) {
-                    t_state = 1;
-                }
-                t_level = MIN(t_level, temperature::sensors[temp_sensor::CH1 + i].prot_conf.level);
-                t_delay = MIN(t_delay, temperature::sensors[temp_sensor::CH1 + i].prot_conf.delay);
+            unsigned wasEnabled = trackingChannel.flags.trackingEnabled;
+            trackingChannel.flags.trackingEnabled = (trackingEnabled & (1 << i)) ? 1 : 0;
+            if (!wasEnabled && trackingChannel.flags.trackingEnabled) {
+                resetTrackingChannels = true;
             }
         }
 
-        beginOutputEnableSequence();
+        if (resetTrackingChannels) {
+            event_queue::pushEvent(event_queue::EVENT_INFO_CHANNELS_TRACKED);
 
-        for (int i = 0; i < CH_NUM; i++) {
-            Channel &trackingChannel = Channel::get(i);
-            if (trackingChannel.flags.trackingEnabled) {
-            	trackingChannel.outputEnable(false);
-                trackingChannel.remoteSensingEnable(false);
-                trackingChannel.remoteProgrammingEnable(false);
+            trigger::abort();
 
-                trackingChannel.setVoltageTriggerMode(TRIGGER_MODE_FIXED);
-                trackingChannel.setCurrentTriggerMode(TRIGGER_MODE_FIXED);
-                trackingChannel.setTriggerOutputState(true);
-                trackingChannel.setTriggerOnListStop(TRIGGER_ON_LIST_STOP_OUTPUT_OFF);
+            float uMin = 0;
+            float iMin = 0;
 
-                list::resetChannelList(trackingChannel);
+            float voltageLimit = FLT_MAX;
+            float currentLimit = FLT_MAX;
 
-                trackingChannel.setVoltage(uMin);
-                trackingChannel.setVoltageLimit(voltageLimit);
+            float uDef = FLT_MAX;
+            float iDef = FLT_MAX;
 
-                trackingChannel.setCurrent(iMin);
-                trackingChannel.setCurrentLimit(currentLimit);
+            int u_state = 0;
+            int u_type = 0;
+            float u_level = FLT_MAX;
+            float u_delay = FLT_MAX;
 
-                trigger::setVoltage(trackingChannel, uDef);
-                trigger::setCurrent(trackingChannel, iDef);
+            int i_state = 0;
+            float i_delay = FLT_MAX;
 
-                trackingChannel.prot_conf.flags.u_state = u_state;
-                if (trackingChannel.params.features & CH_FEATURE_HW_OVP) {
-                    trackingChannel.prot_conf.flags.u_type = u_type;
+            int p_state = 0;
+            float p_level = FLT_MAX;
+            float p_delay = FLT_MAX;
+
+            int t_state = 0;
+            float t_level = FLT_MAX;
+            float t_delay = FLT_MAX;
+
+            for (int i = 0; i < CH_NUM; i++) {
+                Channel &trackingChannel = Channel::get(i);
+                if (trackingChannel.flags.trackingEnabled) {
+                    uMin = MAX(uMin, getUMin(trackingChannel));
+                    iMin = MAX(iMin, getIMin(trackingChannel));
+                    
+                    voltageLimit = MIN(voltageLimit, trackingChannel.getVoltageLimit());
+                    currentLimit = MIN(currentLimit, trackingChannel.getCurrentLimit());
+                    
+                    uDef = MIN(uDef, trackingChannel.u.def);
+                    iDef = MIN(iDef, trackingChannel.i.def);
+
+                    if (trackingChannel.prot_conf.flags.u_state) {
+                        u_state = 1;
+                    }
+                    if (trackingChannel.prot_conf.flags.u_type) {
+                        u_type = 1;
+                    }
+                    u_level = MIN(u_level, trackingChannel.prot_conf.u_level);
+                    u_delay = MIN(u_delay, trackingChannel.prot_conf.u_delay);
+
+                    if (trackingChannel.prot_conf.flags.i_state) {
+                        i_state = 1;
+                    }
+                    i_delay = MIN(i_delay, trackingChannel.prot_conf.i_delay);
+
+                    if (trackingChannel.prot_conf.flags.p_state) {
+                        p_state = 1;
+                    }
+                    p_level = MIN(p_level, trackingChannel.prot_conf.p_level);
+                    p_delay = MIN(p_delay, trackingChannel.prot_conf.p_delay);
+
+                    if (temperature::sensors[temp_sensor::CH1 + i].prot_conf.state) {
+                        t_state = 1;
+                    }
+                    t_level = MIN(t_level, temperature::sensors[temp_sensor::CH1 + i].prot_conf.level);
+                    t_delay = MIN(t_delay, temperature::sensors[temp_sensor::CH1 + i].prot_conf.delay);
                 }
-                trackingChannel.prot_conf.u_level = u_level;
-                trackingChannel.prot_conf.u_delay = u_delay;
+            }
 
-                trackingChannel.prot_conf.flags.i_state = i_state;
-                trackingChannel.prot_conf.i_delay = i_delay;
+            disableOutputForAllTrackingChannels();
 
-                trackingChannel.prot_conf.flags.p_state = p_state;
-                trackingChannel.prot_conf.p_level = p_level;
-                trackingChannel.prot_conf.p_delay = p_delay;
+            for (int i = 0; i < CH_NUM; i++) {
+                Channel &trackingChannel = Channel::get(i);
+                if (trackingChannel.flags.trackingEnabled) {
+                    trackingChannel.remoteSensingEnable(false);
+                    trackingChannel.remoteProgrammingEnable(false);
 
-                temperature::sensors[temp_sensor::CH1 + i].prot_conf.state = t_state;
-                temperature::sensors[temp_sensor::CH1 + i].prot_conf.level = t_level;
-                temperature::sensors[temp_sensor::CH1 + i].prot_conf.delay = t_delay;
+                    trackingChannel.setVoltageTriggerMode(TRIGGER_MODE_FIXED);
+                    trackingChannel.setCurrentTriggerMode(TRIGGER_MODE_FIXED);
+                    trackingChannel.setTriggerOutputState(true);
+                    trackingChannel.setTriggerOnListStop(TRIGGER_ON_LIST_STOP_OUTPUT_OFF);
 
-                trackingChannel.resetHistory();
+                    list::resetChannelList(trackingChannel);
+
+                    trackingChannel.setVoltage(uMin);
+                    trackingChannel.setVoltageLimit(voltageLimit);
+
+                    trackingChannel.setCurrent(iMin);
+                    trackingChannel.setCurrentLimit(currentLimit);
+
+                    trigger::setVoltage(trackingChannel, uDef);
+                    trigger::setCurrent(trackingChannel, iDef);
+
+                    trackingChannel.prot_conf.flags.u_state = u_state;
+                    if (trackingChannel.params.features & CH_FEATURE_HW_OVP) {
+                        trackingChannel.prot_conf.flags.u_type = u_type;
+                    }
+                    trackingChannel.prot_conf.u_level = u_level;
+                    trackingChannel.prot_conf.u_delay = u_delay;
+
+                    trackingChannel.prot_conf.flags.i_state = i_state;
+                    trackingChannel.prot_conf.i_delay = i_delay;
+
+                    trackingChannel.prot_conf.flags.p_state = p_state;
+                    trackingChannel.prot_conf.p_level = p_level;
+                    trackingChannel.prot_conf.p_delay = p_delay;
+
+                    temperature::sensors[temp_sensor::CH1 + i].prot_conf.state = t_state;
+                    temperature::sensors[temp_sensor::CH1 + i].prot_conf.level = t_level;
+                    temperature::sensors[temp_sensor::CH1 + i].prot_conf.delay = t_delay;
+
+                    trackingChannel.resetHistory();
+                }
             }
         }
-
-        endOutputEnableSequence();
     }
 }
 
@@ -1102,27 +1107,8 @@ void setOppDelay(Channel &channel, float delay) {
 }
 
 void outputEnable(Channel &channel, bool enable) {
-    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        beginOutputEnableSequence();
-        
-        Channel::get(0).outputEnable(enable);
-        Channel::get(1).outputEnable(enable);
-
-        endOutputEnableSequence();
-    } else if (channel.flags.trackingEnabled) {
-        beginOutputEnableSequence();
-
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel &trackingChannel = Channel::get(i);
-            if (trackingChannel.flags.trackingEnabled) {
-                trackingChannel.outputEnable(enable);
-            }
-        }
-
-        endOutputEnableSequence();
-    } else {
-        channel.outputEnable(enable);
-    }
+    outputEnableOnNextSync(channel, enable);
+    syncOutputEnable();
 }
 
 bool outputEnable(Channel &channel, bool enable, int *err) {
@@ -1170,109 +1156,57 @@ bool outputEnable(Channel &channel, bool enable, int *err) {
     return true;
 }
 
-void disableOutputForAllChannels() {
-    beginOutputEnableSequence();
+void outputEnableOnNextSync(Channel &channel, bool enable) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        Channel::get(0).flags.doOutputEnableOnNextSync = 1;
+        Channel::get(0).flags.outputEnabledValueOnNextSync = enable;
 
-    for (int i = 0; i < CH_NUM; i++) {
-        if (Channel::get(i).isOutputEnabled()) {
-            Channel::get(i).outputEnable(false);
-        }
-    }
-
-    endOutputEnableSequence();
-}
-
-static int g_sequenceCounter;
-static bool g_syncPrepared;
-static uint16_t g_oeStateBegin;
-static uint16_t g_oeStateDiff;
-static uint16_t g_syncReady;
-
-static uint16_t getOeStateForAllChannels() {
-	uint16_t oeState = 0;
-	for (int i = 0; i < CH_NUM; i++) {
-		if (Channel::get(i).isOutputEnabled()) {
-			oeState |= 1 << i;
-		}
-	}
-	return oeState;
-}
-
-static void prepareSync() {
-	assert(!g_syncPrepared);
-
-#if defined(EEZ_PLATFORM_STM32)
-	HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_RESET);
-#endif
-	g_syncPrepared = true;
-}
-
-static void doSync() {
-	assert(g_syncPrepared);
-
-#if defined(EEZ_PLATFORM_STM32)
-	HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
-#endif
-	g_syncPrepared = false;
-	g_syncReady = 0;
-	g_oeStateDiff = 0;
-}
-
-void beginOutputEnableSequence() {
-    lock();
-
-    if (g_sequenceCounter++ == 0) {
-    	if (!g_syncPrepared) {
-    		prepareSync();
-    	}
-    	// remember channel output states at sequence begin
-    	g_oeStateBegin = getOeStateForAllChannels();
-    }
-
-    unlock();
-}
-
-void endOutputEnableSequence() {
-    lock();
-
-    if (--g_sequenceCounter == 0) {
-    	// which channals changed output enable state
-    	g_oeStateDiff = g_oeStateBegin ^ getOeStateForAllChannels();
-        if (g_oeStateDiff != 0) {
-            // is sync ready for all changed channels?
-            if (g_syncReady == g_oeStateDiff) {
-                doSync();
+        Channel::get(1).flags.doOutputEnableOnNextSync = 1;
+        Channel::get(1).flags.outputEnabledValueOnNextSync = enable;
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                trackingChannel.flags.doOutputEnableOnNextSync = 1;
+                trackingChannel.flags.outputEnabledValueOnNextSync = enable;
             }
         }
+    } else {
+        channel.flags.doOutputEnableOnNextSync = 1;
+        channel.flags.outputEnabledValueOnNextSync = enable;
     }
 
-    assert(g_sequenceCounter >= 0);
-
-    unlock();
+    syncOutputEnable();    
 }
 
-void outputEnableSyncPrepare(Channel &channel) {
-    lock();
-
-    if (!g_syncPrepared) {
-    	prepareSync();
+void syncOutputEnable() {
+    if (osThreadGetId() != g_psuTaskHandle) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SYNC_OUTPUT_ENABLE, 0), 0);
+    } else {
+        Channel::syncOutputEnable();
     }
-
-    unlock();
 }
 
-void outputEnableSyncReady(Channel &channel) {
-    lock();
-
-    g_syncReady |= 1 << channel.channelIndex;
-
-    if (g_sequenceCounter == 0) {
-    	if (!g_oeStateDiff || g_syncReady == g_oeStateDiff) {
-    		doSync();
-    	}
+void disableOutputForAllChannels() {
+    for (int i = 0; i < CH_NUM; i++) {
+        Channel &channel = Channel::get(i);
+        if (channel.isOutputEnabled()) {
+            outputEnableOnNextSync(channel, false);
+        }
     }
 
-    unlock();
+    syncOutputEnable();
+}
+
+void disableOutputForAllTrackingChannels() {
+    for (int i = 0; i < CH_NUM; i++) {
+        Channel &channel = Channel::get(i);
+        if (channel.flags.trackingEnabled && channel.isOutputEnabled()) {
+            outputEnableOnNextSync(channel, false);
+        }
+    }
+
+    syncOutputEnable();
 }
 
 void remoteSensingEnable(Channel &channel, bool enable) {
