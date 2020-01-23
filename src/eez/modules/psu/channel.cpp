@@ -572,7 +572,7 @@ void Channel::reset() {
     flags.currentRangeSelectionMode = CURRENT_RANGE_SELECTION_ALWAYS_HIGH;
     flags.autoSelectCurrentRange = 0;
 
-    flags.dprogState = 0;
+    flags.dprogState = DPROG_STATE_ON;
 
     // CAL:STAT ON if valid calibrating data for both voltage and current exists in the nonvolatile
     // memory, otherwise OFF.
