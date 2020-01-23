@@ -517,9 +517,6 @@ struct Channel : ChannelInterface {
 		}
 	}
 
-	void onAfterOutputEnableSync(int subchannelIndex) {
-	}
-
     void setDprogState(DprogState dprogState) {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 		if (channel.params.features & CH_FEATURE_DPROG) {			
@@ -720,6 +717,11 @@ struct Channel : ChannelInterface {
 		}
 	}
 #endif
+
+	void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) {
+		majorVersion = 0;
+		minorVersion = 0;
+	}
 };
 
 static Channel g_channel0(0);

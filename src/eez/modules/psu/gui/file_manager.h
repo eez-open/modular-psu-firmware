@@ -22,12 +22,11 @@
 
 #include <eez/file_type.h>
 #include <eez/modules/psu/persist_conf.h>
+#include <eez/gui/page.h>
 
 namespace eez {
 namespace gui {
 namespace file_manager {
-
-static const uint32_t FILES_PAGE_SIZE = 6;
 
 enum State {
     STATE_STARTING,
@@ -45,11 +44,13 @@ void goToParentDirectory();
 uint32_t getFilesCount();
 uint32_t getFilesStartPosition();
 void setFilesStartPosition(uint32_t position);
+uint32_t getFilesPageSize();
 bool isDirectory(uint32_t fileIndex);
 FileType getFileType(uint32_t fileIndex);
 const char *getFileName(uint32_t fileIndex);
 const uint32_t getFileSize(uint32_t fileIndex);
 const uint32_t getFileDataTime(uint32_t fileIndex);
+bool isFileSelected(uint32_t fileIndex);
 void selectFile(uint32_t fileIndex);
 bool isOpenFileEnabled();
 void openFile();
@@ -64,6 +65,19 @@ void openImageFile();
 uint8_t *getOpenedImagePixels();
 
 void onEncoder(int couter);
+
+void openFileManager();
+
+class FileBrowserPage : public SetPage {
+public:
+    int getDirty();
+    bool showAreYouSureOnDiscard();
+    void set();
+};
+
+void browseForFile(const char *title, const char *directory, FileType fileType, void (*onFileSelected)(const char *filePath));
+
+extern const char *g_fileBrowserTitle;
 
 } // namespace file_manager
 } // namespace gui

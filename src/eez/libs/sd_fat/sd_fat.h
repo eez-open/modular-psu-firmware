@@ -133,6 +133,7 @@ class File {
     bool available();
     size_t size();
     bool seek(uint32_t pos);
+    size_t tell();
     int peek();
     int read();
     int read(void *buf, uint32_t nbyte);

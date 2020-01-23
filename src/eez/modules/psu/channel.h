@@ -542,6 +542,8 @@ class Channel {
 
     void setDprogState(DprogState dprogState);
 
+    void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion);
+
   private:
     bool delayLowRippleCheck;
     uint32_t outputEnableStartTime;

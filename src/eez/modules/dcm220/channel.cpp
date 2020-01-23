@@ -65,10 +65,7 @@ namespace dcm220 {
 static GPIO_TypeDef *SPI_IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
 static const uint16_t SPI_IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
 
-uint8_t g_firmwareVersionMajor;
-uint8_t g_firmwareVersionMinor;
-
-bool masterSynchro(int slotIndex) {
+bool masterSynchro(int slotIndex, uint8_t &firmwareMajorVersion, uint8_t &firmwareMinorVersion) {
 	uint32_t start = millis();
 
     uint8_t txBuffer[3] = { SPI_MASTER_SYNBYTE, 0, 0 };
@@ -80,9 +77,8 @@ bool masterSynchro(int slotIndex) {
 	    spi::deselect(slotIndex);
 
 	    if (rxBuffer[0] == SPI_SLAVE_SYNBYTE) {
-	    	g_firmwareVersionMajor = rxBuffer[1];
-	    	g_firmwareVersionMinor = rxBuffer[2];
-	    	DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)g_firmwareVersionMajor, (int)g_firmwareVersionMinor);
+			firmwareMajorVersion = rxBuffer[1];
+			firmwareMinorVersion = rxBuffer[2];
 	    	break;
 	    }
 
@@ -155,6 +151,9 @@ struct Channel : ChannelInterface {
 #endif
 
     TestResult testResult;
+
+	uint8_t firmwareMajorVersion = 0;
+	uint8_t firmwareMinorVersion = 0;
 
     Channel(int slotIndex_)
 		: ChannelInterface(slotIndex_)
@@ -259,13 +258,22 @@ struct Channel : ChannelInterface {
 		if (!synchronized) {
 			spi::deselectA(slotIndex);
 			spi::init(slotIndex, spi::CHIP_DCM220);
-			if (masterSynchro(slotIndex)) {
+			if (masterSynchro(slotIndex, firmwareMajorVersion, firmwareMinorVersion)) {
+	    		DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)firmwareMajorVersion, (int)firmwareMinorVersion);
 				synchronized = true;
 				numCrcErrors = 0;
+			} else {
+			    firmwareMinorVersion = 0;
+			    firmwareMajorVersion = 0;
 			}
 		}
 #endif
-	}
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+        firmwareMajorVersion = 1;
+		firmwareMinorVersion = 0;
+#endif
+    }
 
 	void onPowerDown(int subchannelIndex) {
 #if defined(EEZ_PLATFORM_STM32)
@@ -539,6 +547,11 @@ struct Channel : ChannelInterface {
 
 	bool isDacTesting(int subchannelIndex) {
 		return false;
+	}
+
+	void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) {
+		majorVersion = firmwareMajorVersion;
+		minorVersion = firmwareMinorVersion;
 	}
 };
 

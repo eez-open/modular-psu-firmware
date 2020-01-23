@@ -126,6 +126,7 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
         "DLOG",
         "IMG",
         "MP",
+        "HEX",
         "BIN",
     };
 

@@ -76,6 +76,7 @@ public:
     uint32_t getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) override;
     
     static void showProgressPage(const char *message, void (*abortCallback)() = 0);
+    static void showProgressPageWithoutAbort(const char *message);
     static bool updateProgressPage(size_t processedSoFar, size_t totalSize);
     static void hideProgressPage();
 
@@ -93,6 +94,7 @@ public:
 protected:
     bool m_pushProgressPage;
     const char *m_progressMessage;
+    bool m_progressWithoutAbort;
     void (*m_progressAbortCallback)();
     bool m_popProgressPage;
 

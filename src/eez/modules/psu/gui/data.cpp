@@ -74,6 +74,8 @@
 #include <eez/gui/widgets/container.h>
 #include <eez/gui/widgets/yt_graph.h>
 
+#include <eez/modules/bp3c/flash_slave.h>
+
 using namespace eez::gui;
 using namespace eez::gui::data;
 using data::EnumItem;
@@ -290,6 +292,13 @@ Value MakeMacAddressValue(uint8_t *macAddress) {
     Value value;
     value.type_ = VALUE_TYPE_MAC_ADDRESS;
     value.puint8_ = macAddress;
+    return value;
+}
+
+Value MakeFirmwareVersionValue(uint8_t majorVersion, uint8_t minorVersion) {
+    Value value;
+    value.type_ = VALUE_TYPE_FIRMWARE_VERSION;
+    value.uint16_ = (majorVersion << 8) | minorVersion;
     return value;
 }
 
@@ -728,6 +737,17 @@ void DLOG_VALUE_LABEL_value_to_text(const Value &value, char *text, int count) {
     dlog_view::getLabel(dlog_view::getRecording(), value.getInt(), text, count);
 }
 
+bool compare_FIRMWARE_VERSION_value(const Value &a, const Value &b) {
+    return a.getUInt16() == b.getUInt16();
+}
+
+void FIRMWARE_VERSION_value_to_text(const Value &value, char *text, int count) {
+    uint8_t majorVersion = value.getUInt16() >> 8;
+    uint8_t minorVersion = value.getUInt16() & 0xFF;
+    snprintf(text, count - 1, "%d.%d", (int)majorVersion, (int)minorVersion);
+    text[count - 1] = 0;
+}
+
 static double g_savedCurrentTime;
 
 bool compare_DLOG_CURRENT_TIME_value(const Value &a, const Value &b) {
@@ -817,7 +837,8 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_DLOG_VALUE_LABEL_value,
     compare_DLOG_CURRENT_TIME_value,
     compare_FILE_LENGTH_value,
-    compare_FILE_DATE_TIME_value
+    compare_FILE_DATE_TIME_value,
+    compare_FIRMWARE_VERSION_value
 };
 
 ValueToTextFunction g_userValueToTextFunctions[] = { 
@@ -860,7 +881,8 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     DLOG_VALUE_LABEL_value_to_text,
     DLOG_CURRENT_TIME_value_to_text,
     FILE_LENGTH_value_to_text,
-    FILE_DATE_TIME_value_to_text
+    FILE_DATE_TIME_value_to_text,
+    FIRMWARE_VERSION_value_to_text
 };
 
 } // namespace data
@@ -2679,11 +2701,68 @@ void data_event_queue_page_info(data::DataOperationEnum operation, data::Cursor 
     }
 }
 
-void data_channel_has_advanced_options(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_module_specific_ch_settings(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        value = channel.params.features & (CH_FEATURE_DPROG | CH_FEATURE_RPROG | CH_FEATURE_RPOL) ? 1 : 0;
+        auto modulType = g_slots[channel.slotIndex].moduleInfo->moduleType;
+        if (modulType == MODULE_TYPE_DCP405) {
+            value = PAGE_ID_CH_SETTINGS_DCP405_SPECIFIC;
+        } else if (modulType == MODULE_TYPE_DCP405B) {
+            value = PAGE_ID_CH_SETTINGS_DCP405B_SPECIFIC;
+        } else if (modulType == MODULE_TYPE_DCM220) {
+            value = PAGE_ID_CH_SETTINGS_DCM220_SPECIFIC;
+        } else {
+            value = INTERNAL_PAGE_ID_NONE;
+        }
+    }
+}
+
+void data_channel_has_error_settings(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        auto modulType = g_slots[channel.slotIndex].moduleInfo->moduleType;
+        if (modulType == MODULE_TYPE_DCM220) {
+            value = 1;
+        } else {
+            value = 0;
+        }
+    }
+}
+
+void data_channel_settings_page(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        if (channel.isOk()) {
+            value = PAGE_ID_CH_SETTINGS_OK;
+        } else {
+            auto modulType = g_slots[channel.slotIndex].moduleInfo->moduleType;
+            if (modulType == MODULE_TYPE_DCM220) {
+            	uint8_t firmwareMajorVersion;
+            	uint8_t firmwareMinorVersion;
+            	channel.getFirmwareVersion(firmwareMajorVersion, firmwareMinorVersion);
+            	if (!bp3c::flash_slave::g_bootloaderMode || (firmwareMajorVersion == 0 && firmwareMinorVersion == 0)) {
+            		value = PAGE_ID_CH_SETTINGS_ERROR_DCM220;
+            	} else {
+            		value = PAGE_ID_CH_SETTINGS_OK;
+            	}
+            } else {
+                value = PAGE_ID_CH_SETTINGS_ERROR;
+            }
+        }
+    }
+}
+
+void data_channel_firmware_version(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+        uint8_t majorVersion;
+        uint8_t minorVersion;
+        channel.getFirmwareVersion(majorVersion, minorVersion);
+        value = MakeFirmwareVersionValue(majorVersion, minorVersion);
     }
 }
 
@@ -5081,7 +5160,7 @@ void data_file_manager_files(data::DataOperationEnum operation, data::Cursor &cu
     } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
         file_manager::setFilesStartPosition(value.getUInt32());
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
-        value = Value(file_manager::FILES_PAGE_SIZE, VALUE_TYPE_UINT32);
+        value = Value(file_manager::getFilesPageSize(), VALUE_TYPE_UINT32);
     }
 #endif
 }
@@ -5126,6 +5205,15 @@ void data_file_manager_file_date_time(data::DataOperationEnum operation, data::C
 #endif
 }
 
+void data_file_manager_file_selected(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::isFileSelected(cursor.i);
+    }
+#endif
+}
+
+
 void data_file_manager_open_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
@@ -5168,6 +5256,12 @@ void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cur
         value = Value(272, VALUE_TYPE_UINT16);
     }
 #endif
+}
+
+void data_file_manager_browser_title(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::g_fileBrowserTitle;
+    }
 }
 
 void data_script_is_started(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {

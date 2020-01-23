@@ -44,6 +44,7 @@
 #include <eez/modules/psu/gui/page_self_test_result.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
+#include <eez/modules/psu/gui/file_manager.h>
 using namespace eez::psu::gui;
 #endif
 
@@ -61,9 +62,6 @@ namespace eez {
 ChannelInterface::ChannelInterface(int slotIndex_) 
     : slotIndex(slotIndex_) 
 {
-}
-
-void ChannelInterface::onAfterOutputEnableSync(int subchannelIndex) {
 }
 
 unsigned ChannelInterface::getRPol(int subchannelIndex) {
@@ -230,6 +228,7 @@ static SysSettingsSerialPage g_SysSettingsSerialPage;
 static SysSettingsTrackingPage g_sysSettingsTrackingPage;
 static SysSettingsCouplingPage g_sysSettingsCouplingPage;
 static UserProfilesPage g_UserProfilesPage;
+static file_manager::FileBrowserPage g_FileBrowserPage;
 
 Page *getPageFromId(int pageId) {
     Page *page = nullptr;
@@ -315,6 +314,9 @@ Page *getPageFromId(int pageId) {
     case PAGE_ID_USER_PROFILE_0_SETTINGS:
     case PAGE_ID_USER_PROFILE_SETTINGS:
         page = &g_UserProfilesPage;
+        break;
+    case PAGE_ID_FILE_BROWSER:
+        page = &g_FileBrowserPage;
         break;
     }
 

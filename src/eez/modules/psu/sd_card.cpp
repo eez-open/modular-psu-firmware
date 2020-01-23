@@ -341,6 +341,8 @@ bool catalog(const char *dirPath, void *param,
                 type = FILE_TYPE_IMAGE;
             } else if (endsWithNoCase(name, ".py")) {
                 type = FILE_TYPE_MICROPYTHON;
+            } else if (endsWithNoCase(name, ".hex")) {
+                type = FILE_TYPE_HEX;
             } else {
                 type = FILE_TYPE_OTHER;
             }

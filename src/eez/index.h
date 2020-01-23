@@ -158,7 +158,6 @@ struct ChannelInterface {
     virtual void adcMeasureAll(int subchannelIndex) = 0;
 
     virtual void setOutputEnable(int subchannelIndex, bool enable, uint16_t tasks) = 0;
-    virtual void onAfterOutputEnableSync(int subchannelIndex);
 
     virtual void setDprogState(DprogState dprogState) = 0;
 
@@ -182,6 +181,8 @@ struct ChannelInterface {
     virtual void readAllRegisters(int subchannelIndex, uint8_t ioexpRegisters[], uint8_t adcRegisters[]);
 
     virtual void onSpiIrq();
+
+    virtual void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) = 0;
 
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     virtual int getIoExpBitDirection(int subchannelIndex, int io_bit);

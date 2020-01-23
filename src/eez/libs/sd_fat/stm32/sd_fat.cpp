@@ -153,6 +153,10 @@ bool File::seek(uint32_t pos) {
     return f_lseek(&m_file, pos) == FR_OK;
 }
 
+size_t File::tell() {
+    return f_tell(&m_file);
+}
+
 int File::peek() {
     auto pos = f_tell(&m_file);
     int result = read();

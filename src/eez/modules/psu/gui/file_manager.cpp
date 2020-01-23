@@ -71,14 +71,23 @@ static uint8_t *g_backBufferPosition;
 uint32_t g_filesCount;
 uint32_t g_filesStartPosition;
 
-uint32_t g_selectedFileIndex;
+int32_t g_selectedFileIndex = -1;
 
 bool g_imageLoadFailed;
 uint8_t *g_openedImagePixels;
 
-void catalogCallback(void *param, const char *name, FileType type, size_t size) {
-    auto fileInfo = (FileInfo *)param;
+bool g_fileBrowserMode;
+const char *g_fileBrowserTitle;
+FileType g_fileBrowserFileType;
+static void (*g_fileBrowserOnFileSelected)(const char *filePath);
 
+void catalogCallback(void *param, const char *name, FileType type, size_t size) {
+    if (g_fileBrowserMode && type != FILE_TYPE_DIRECTORY && type != g_fileBrowserFileType) {
+        return;
+    }
+
+    auto fileInfo = (FileInfo *)param;
+ 
     size_t nameLen = 4 * ((strlen(name) + 1 + 3) / 4);
 
     if (g_frontBufferPosition + sizeof(FileItem) > g_backBufferPosition - nameLen) {
@@ -146,6 +155,7 @@ void loadDirectory() {
     g_backBufferPosition = FILE_MANAGER_MEMORY + FILE_MANAGER_MEMORY_SIZE;
 
     g_filesCount = 0;
+    g_selectedFileIndex = -1;
 
     int numFiles;
     int err;
@@ -229,13 +239,20 @@ uint32_t getFilesStartPosition() {
 
 void setFilesStartPosition(uint32_t position) {
     g_filesStartPosition = position;
-    if (g_filesStartPosition + FILES_PAGE_SIZE > getFilesCount()) {
-        if (getFilesCount() > FILES_PAGE_SIZE) {
-            g_filesStartPosition = getFilesCount() - FILES_PAGE_SIZE;
+    if (g_filesStartPosition + getFilesPageSize() > getFilesCount()) {
+        if (getFilesCount() > getFilesPageSize()) {
+            g_filesStartPosition = getFilesCount() - getFilesPageSize();
         } else {
             g_filesStartPosition = 0;
         }
     }
+}
+
+uint32_t getFilesPageSize() {
+    static const uint32_t FILE_BROWSER_FILES_PAGE_SIZE = 5;
+    static const uint32_t FILE_MANAGER_FILES_PAGE_SIZE = 6;
+
+    return g_fileBrowserMode ? FILE_BROWSER_FILES_PAGE_SIZE : FILE_MANAGER_FILES_PAGE_SIZE;
 }
 
 bool isDirectory(uint32_t fileIndex) {
@@ -263,6 +280,10 @@ const uint32_t getFileDataTime(uint32_t fileIndex) {
     return fileItem ? fileItem->dateTime : 0;
 }
 
+bool isFileSelected(uint32_t fileIndex) {
+    return (isPageOnStack(PAGE_ID_FILE_BROWSER) || isPageOnStack(PAGE_ID_FILE_MENU)) && g_selectedFileIndex == fileIndex;
+}
+
 void selectFile(uint32_t fileIndex) {
     if (g_state != STATE_READY) {
         return;
@@ -277,7 +298,9 @@ void selectFile(uint32_t fileIndex) {
         }
     } else {
         g_selectedFileIndex = fileIndex;
-        pushPage(PAGE_ID_FILE_MENU);
+        if (!g_fileBrowserMode) {
+            pushPage(PAGE_ID_FILE_MENU);
+        }
     }
 }
 
@@ -455,6 +478,48 @@ void onEncoder(int counter) {
         newPosition = 0;
     }
     setFilesStartPosition(newPosition);
+}
+
+void openFileManager() {
+    g_fileBrowserMode = false;
+    loadDirectory();
+    showPage(PAGE_ID_FILE_MANAGER);
+}
+
+int FileBrowserPage::getDirty() {
+    return g_selectedFileIndex != -1;
+}
+
+bool FileBrowserPage::showAreYouSureOnDiscard() {
+    return false;
+}
+
+void FileBrowserPage::set() {
+    popPage();
+
+    auto fileItem = getFileItem(g_selectedFileIndex);
+    if (!fileItem) {
+        return;
+    }
+
+    char filePath[MAX_PATH_LENGTH + 1];
+    strcpy(filePath, g_currentDirectory);
+    strcat(filePath, "/");
+    strcat(filePath, fileItem->name);
+
+    g_fileBrowserOnFileSelected(filePath);
+}
+
+void browseForFile(const char *title, const char *directory, FileType fileType, void(*onFileSelected)(const char *filePath)) {
+    g_fileBrowserMode = true;
+    g_fileBrowserTitle = title;
+    g_fileBrowserFileType = fileType;
+    g_fileBrowserOnFileSelected = onFileSelected;
+
+    strcpy(g_currentDirectory, directory);
+    loadDirectory();
+
+    pushPage(PAGE_ID_FILE_BROWSER);
 }
 
 }

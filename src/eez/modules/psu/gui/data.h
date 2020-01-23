@@ -88,6 +88,7 @@ enum UserValueType {
     VALUE_TYPE_DLOG_CURRENT_TIME,
     VALUE_TYPE_FILE_LENGTH,
     VALUE_TYPE_FILE_DATE_TIME,
+    VALUE_TYPE_FIRMWARE_VERSION
 };
 
 Value MakeValue(float value, Unit unit);
@@ -97,6 +98,7 @@ Value MakeEventValue(eez::psu::event_queue::Event *e);
 Value MakeLessThenMinMessageValue(float float_, const Value &value_);
 Value MakeGreaterThenMaxMessageValue(float float_, const Value &value_);
 Value MakeMacAddressValue(uint8_t *macAddress);
+Value MakeFirmwareVersionValue(uint8_t majorVersion, uint8_t minorVersion);
 
 void editValue(uint16_t dataId);
 

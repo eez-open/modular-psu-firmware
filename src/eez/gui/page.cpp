@@ -59,6 +59,10 @@ int Page::getDirty() {
     return 0;
 }
 
+bool Page::showAreYouSureOnDiscard() {
+    return true;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void SetPage::edit() {

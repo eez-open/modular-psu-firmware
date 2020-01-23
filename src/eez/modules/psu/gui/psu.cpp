@@ -270,12 +270,12 @@ void PsuAppContext::stateManagment() {
     if (m_pushProgressPage) {
         data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage), 0);
         g_appContext->m_dialogCancelCallback = m_progressAbortCallback;
-        pushPage(PAGE_ID_PROGRESS);
+        pushPage(m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
         m_pushProgressPage = false;
     }
 
     if (m_popProgressPage) {
-        if (getActivePageId() == PAGE_ID_PROGRESS) {
+        if (getActivePageId() == (m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS)) {
             popPage();
         }
         m_popProgressPage = false;
@@ -611,7 +611,14 @@ uint32_t PsuAppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uin
 
 void PsuAppContext::showProgressPage(const char *message, void (*abortCallback)()) {
     g_psuAppContext.m_progressMessage = message;
+    g_psuAppContext.m_progressWithoutAbort = false;
     g_psuAppContext.m_progressAbortCallback = abortCallback;
+    g_psuAppContext.m_pushProgressPage = true;
+}
+
+void PsuAppContext::showProgressPageWithoutAbort(const char *message) {
+    g_psuAppContext.m_progressMessage = message;
+    g_psuAppContext.m_progressWithoutAbort = true;
     g_psuAppContext.m_pushProgressPage = true;
 }
 
@@ -626,7 +633,7 @@ bool PsuAppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) 
         return true;
     }
 
-    return g_psuAppContext.isPageOnStack(PAGE_ID_PROGRESS);
+    return g_psuAppContext.isPageOnStack(g_psuAppContext.m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
 }
 
 void PsuAppContext::hideProgressPage() {

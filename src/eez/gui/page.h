@@ -41,6 +41,7 @@ class Page {
     virtual Unit getEncoderUnit();
 
     virtual int getDirty();
+    virtual bool showAreYouSureOnDiscard();
 };
 
 class SetPage : public Page {

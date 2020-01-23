@@ -337,6 +337,10 @@ bool File::seek(uint32_t pos) {
     return fseek(m_fp, pos, SEEK_SET) == 0;
 }
 
+size_t File::tell() {
+    return ftell(m_fp);
+}
+
 int File::peek() {
     int c = getc(m_fp);
 

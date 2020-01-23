@@ -1629,5 +1629,9 @@ void Channel::setDprogState(DprogState dprogState) {
     channelInterface->setDprogState(dprogState);
 }
 
+void Channel::getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) {
+    channelInterface->getFirmwareVersion(majorVersion, minorVersion);
+}
+
 } // namespace psu
 } // namespace eez

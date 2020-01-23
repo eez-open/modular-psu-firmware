@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <assert.h>
 
 #include "eez/modules/bp3c/flash_slave.h"
 #include "eez/system.h"
@@ -25,12 +25,12 @@
 #include "eez/modules/psu/io_pins.h"
 #include "eez/modules/psu/datetime.h"
 #include <eez/modules/psu/scpi/psu.h>
-#include "eez/modules/bp3c/io_exp.h"
+#include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/bp3c/io_exp.h>
 #include <eez/libs/sd_fat/sd_fat.h>
 
 #ifdef EEZ_PLATFORM_STM32
 
-#include <assert.h>
 #include <memory.h>
 
 #include "main.h"
@@ -46,6 +46,8 @@ namespace bp3c {
 namespace flash_slave {
 
 bool g_bootloaderMode = false;
+static int g_slotIndex;
+static char g_hexFilePath[MAX_PATH_LENGTH + 1];
 
 #ifdef EEZ_PLATFORM_STM32
 
@@ -71,9 +73,6 @@ static const uint32_t SYNC_TIMEOUT = 3000;
 static const uint32_t CMD_TIMEOUT = 100;
 
 static UART_HandleTypeDef *phuart = &huart7;
-
-static int g_slotIndex;
-static char g_hexFilePath[MAX_PATH_LENGTH + 1];
 
 static uint8_t rxData[128];
 
@@ -106,20 +105,6 @@ void sendDataNoCRC(uint8_t data) {
 	uint8_t sendData[1];
 	sendData[0] = data;
 	HAL_UART_Transmit(phuart, sendData, 1, 20);
-}
-
-bool syncWithSlave() {
-	uint32_t startTime = HAL_GetTick();
-	do {
-		taskENTER_CRITICAL();
-		sendDataNoCRC(ENTER_BOOTLOADER);
-		HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 1, 100);
-		taskEXIT_CRITICAL();
-		if (result == HAL_OK && rxData[0] == ACK) {
-			return true;
-		}
-	} while (HAL_GetTick() - startTime < SYNC_TIMEOUT);
-	return false;
 }
 
 bool execGetCmd(BootloaderInfo &bootloaderInfo) {
@@ -167,88 +152,6 @@ bool execGetCmd(BootloaderInfo &bootloaderInfo) {
 			bootloaderInfo.readoutUnprotectCmdSupported = true;
 		}
 	}
-
-	return true;
-}
-
-void enterBootloaderMode(int slotIndex) {
-	g_bootloaderMode = true;
-
-	psu::reset();
-
-	// power down channels
-	psu::powerDownChannels();
-
-	osDelay(25);
-
-	// enable BOOT0 flag for selected slot and reset modules
-
-	if (slotIndex == 0) {
-		io_exp::writeToOutputPort(0b10010000);
-	} else if (slotIndex == 1) {
-		io_exp::writeToOutputPort(0b10100000);
-	} else if (slotIndex == 2) {
-		io_exp::writeToOutputPort(0b11000000);
-	}
-
-	osDelay(5);
-
-	if (slotIndex == 0) {
-		io_exp::writeToOutputPort(0b00010000);
-	} else if (slotIndex == 1) {
-		io_exp::writeToOutputPort(0b00100000);
-	} else if (slotIndex == 2) {
-		io_exp::writeToOutputPort(0b01000000);
-	}
-
-	osDelay(25);
-
-	if (slotIndex == 0) {
-		io_exp::writeToOutputPort(0b10010000);
-	} else if (slotIndex == 1) {
-		io_exp::writeToOutputPort(0b10100000);
-	} else if (slotIndex == 2) {
-		io_exp::writeToOutputPort(0b11000000);
-	}
-
-	osDelay(25);
-
-	MX_UART7_Init();
-}
-
-void leaveBootloaderMode() {
-	// disable BOOT0 flag for selected slot and reset modules
-	io_exp::writeToOutputPort(0b10000000);
-	osDelay(5);
-	io_exp::writeToOutputPort(0b00000000);
-	osDelay(25);
-	io_exp::writeToOutputPort(0b10000000);
-
-	psu::initChannels();
-	psu::testChannels();
-
-	HAL_UART_DeInit(phuart);
-
-	g_bootloaderMode = false;
-
-	psu::io_pins::refresh();
-}
-
-bool start(int slotIndex, const char *hexFilePath, int *err) {
-	enterBootloaderMode(slotIndex);
-
-	if (!syncWithSlave()) {
-		DebugTrace("Failed to sync with slave\n");
-		if (err) {
-			*err = SCPI_ERROR_EXECUTION_ERROR;
-		}
-		return false;
-	}
-
-	g_slotIndex = slotIndex;
-	strcpy(g_hexFilePath, hexFilePath);
-
-	osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE, 0), osWaitForever);
 
 	return true;
 }
@@ -303,8 +206,32 @@ bool readMemory(uint32_t address, uint8_t *buffer, uint32_t bufferSize) {
 	return true;
 }
 
+#endif
+
+bool syncWithSlave() {
+#if defined(EEZ_PLATFORM_STM32)
+    uint32_t startTime = HAL_GetTick();
+    do {
+        taskENTER_CRITICAL();
+        sendDataNoCRC(ENTER_BOOTLOADER);
+        HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 1, 100);
+        taskEXIT_CRITICAL();
+        if (result == HAL_OK && rxData[0] == ACK) {
+            return true;
+        }
+    } while (HAL_GetTick() - startTime < SYNC_TIMEOUT);
+    return false;
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    return true;
+#endif
+}
+
+
 bool eraseAll() {
-	taskENTER_CRITICAL();
+#if defined(EEZ_PLATFORM_STM32)
+    taskENTER_CRITICAL();
 
 	sendDataAndCRC(CMD_EXTENDED_ERASE);
 
@@ -325,12 +252,18 @@ bool eraseAll() {
 
 	taskEXIT_CRITICAL();
 	return true;
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    return true;
+#endif
 }
 
 bool writeMemory(uint32_t address, const uint8_t *buffer, uint32_t bufferSize) {
 	assert(bufferSize <= 256);
 
-	uint8_t addressAndCrc[5] = {
+#if defined(EEZ_PLATFORM_STM32)
+    uint8_t addressAndCrc[5] = {
 		(uint8_t)(address >> 24),
 		(uint8_t)((address >> 16) & 0xFF),
 		(uint8_t)((address >> 8) & 0xFF),
@@ -375,37 +308,81 @@ bool writeMemory(uint32_t address, const uint8_t *buffer, uint32_t bufferSize) {
 
 	taskEXIT_CRITICAL();
 	return true;
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    osDelay(1);
+    return true;
+#endif
 }
 
-bool execGoCmd(uint32_t address) {
-	uint8_t addressAndCrc[5] = {
-		(uint8_t)(address >> 24),
-		(uint8_t)((address >> 16) & 0xFF),
-		(uint8_t)((address >> 8) & 0xFF),
-		(uint8_t)(address & 0xFF)
-	};
-	addressAndCrc[4] = addressAndCrc[0] ^ addressAndCrc[1] ^ addressAndCrc[2] ^ addressAndCrc[3];
+void enterBootloaderMode(int slotIndex) {
+    g_bootloaderMode = true;
 
-	taskENTER_CRITICAL();
+#if defined(EEZ_PLATFORM_STM32)
+    psu::reset();
 
-	sendDataAndCRC(CMD_GO);
+    // power down channels
+    psu::powerDownChannels();
 
-	HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
-	if (result != HAL_OK || rxData[0] != ACK) {
-		taskEXIT_CRITICAL();
-		return false;
-	}
+    osDelay(25);
 
-	HAL_UART_Transmit(phuart, addressAndCrc, 5, 20);
+    // enable BOOT0 flag for selected slot and reset modules
 
-	result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
-	if (result != HAL_OK || rxData[0] != ACK) {
-		taskEXIT_CRITICAL();
-		return false;
-	}
+    if (slotIndex == 0) {
+        io_exp::writeToOutputPort(0b10010000);
+    } else if (slotIndex == 1) {
+        io_exp::writeToOutputPort(0b10100000);
+    } else if (slotIndex == 2) {
+        io_exp::writeToOutputPort(0b11000000);
+    }
 
-	taskEXIT_CRITICAL();
-	return true;
+    osDelay(5);
+
+    if (slotIndex == 0) {
+        io_exp::writeToOutputPort(0b00010000);
+    } else if (slotIndex == 1) {
+        io_exp::writeToOutputPort(0b00100000);
+    } else if (slotIndex == 2) {
+        io_exp::writeToOutputPort(0b01000000);
+    }
+
+    osDelay(25);
+
+    if (slotIndex == 0) {
+        io_exp::writeToOutputPort(0b10010000);
+    } else if (slotIndex == 1) {
+        io_exp::writeToOutputPort(0b10100000);
+    } else if (slotIndex == 2) {
+        io_exp::writeToOutputPort(0b11000000);
+    }
+
+    osDelay(25);
+
+    MX_UART7_Init();
+#endif
+}
+
+void leaveBootloaderMode() {
+#if defined(EEZ_PLATFORM_STM32)
+    // disable BOOT0 flag for selected slot and reset modules
+    io_exp::writeToOutputPort(0b10000000);
+    osDelay(5);
+    io_exp::writeToOutputPort(0b00000000);
+    osDelay(25);
+    io_exp::writeToOutputPort(0b10000000);
+
+    psu::initChannels();
+    psu::testChannels();
+
+    HAL_UART_DeInit(phuart);
+#endif
+
+    g_bootloaderMode = false;
+
+#if defined(EEZ_PLATFORM_STM32)
+    psu::io_pins::refresh();
+#endif
 }
 
 struct HexRecord {
@@ -468,6 +445,25 @@ bool readHexRecord(File &file, HexRecord &hexRecord) {
 	return true;
 }
 
+bool start(int slotIndex, const char *hexFilePath, int *err) {
+	enterBootloaderMode(slotIndex);
+
+	if (!syncWithSlave()) {
+		DebugTrace("Failed to sync with slave\n");
+		if (err) {
+			*err = SCPI_ERROR_EXECUTION_ERROR;
+		}
+		return false;
+	}
+
+	g_slotIndex = slotIndex;
+	strcpy(g_hexFilePath, hexFilePath);
+
+	osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE, 0), osWaitForever);
+
+	return true;
+}
+
 void uploadHexFile() {
 //	uint8_t buffer[256];
 //	if (readMemory(0x08000000, buffer, sizeof(buffer))) {
@@ -489,12 +485,22 @@ void uploadHexFile() {
         return;
     }
 
+#if OPTION_DISPLAY
+    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Downloading firmware...");
+    size_t totalSize = file.size();
+#endif
+
     eraseAll();
 
 	HexRecord hexRecord;
 	uint32_t addressUpperBits = 0;
 	bool eofReached = false;
 	while (!eofReached && readHexRecord(file, hexRecord)) {
+
+#if OPTION_DISPLAY
+        eez::psu::gui::PsuAppContext::updateProgressPage(file.tell(), totalSize);
+#endif
+
 		if (hexRecord.recordType == 0x04) {
 			addressUpperBits = ((hexRecord.data[0] << 8) + hexRecord.data[1]) << 16;
 		} else if (hexRecord.recordType == 0x00) {
@@ -518,12 +524,14 @@ void uploadHexFile() {
 		DebugTrace("[%02d:%02d:%02d] Flash failed\n", hour, minute, second);
 	}
 
+#if OPTION_DISPLAY
+    eez::psu::gui::g_psuAppContext.hideProgressPage();
+#endif
+
 	file.close();
 
 	leaveBootloaderMode();
 }
-
-#endif // EEZ_PLATFORM_STM32
 
 } // namespace flash_slave
 } // namespace bp3c

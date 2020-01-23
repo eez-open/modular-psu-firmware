@@ -69,6 +69,7 @@
 #include <eez/modules/psu/sd_card.h>
 #endif
 
+#include <eez/modules/bp3c/flash_slave.h>
 #include <eez/modules/bp3c/io_exp.h>
 
 using namespace eez::gui;
@@ -457,11 +458,12 @@ void discard() {
 
 void action_discard() {
 	Page *page = getActivePage();
-	if (page && page->getDirty()) {
-		areYouSureWithMessage(g_discardMessage, discard);
-	}
-	else {
-		discard();
+	if (page) {
+        if (page->getDirty() && page->showAreYouSureOnDiscard()) {
+            areYouSureWithMessage(g_discardMessage, discard);
+        } else {
+            discard();
+        }
 	}
 }
 
@@ -1218,8 +1220,7 @@ void action_dlog_upload() {
 
 void action_show_file_manager() {
 #if OPTION_SD_CARD
-    file_manager::loadDirectory();
-    showPage(PAGE_ID_FILE_MANAGER);
+    file_manager::openFileManager();
 #endif
 }
 
@@ -1317,6 +1318,16 @@ void action_mqtt_edit_period() {
 
 void action_debug_trace_log_toggle() {
     debug::g_stopDebugTraceLog = !debug::g_stopDebugTraceLog;
+}
+
+void onFirmwareSelected(const char *filePath) {
+    int err;
+    if (!bp3c::flash_slave::start(g_channel->slotIndex, filePath, &err)) {
+    }
+}
+
+void action_channel_update_firmware() {
+    file_manager::browseForFile("Select DCM220 firmware file", "/Updates", FILE_TYPE_HEX, onFirmwareSelected);
 }
 
 } // namespace gui
