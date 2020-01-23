@@ -371,6 +371,7 @@ void leaveBootloaderMode() {
     io_exp::writeToOutputPort(0b00000000);
     osDelay(25);
     io_exp::writeToOutputPort(0b10000000);
+	osDelay(25);
 
     psu::initChannels();
     psu::testChannels();
