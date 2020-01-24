@@ -175,10 +175,10 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
             channel.p_limit = MIN(profile->channels[i].p_limit, channel.u.max * channel.i.max);
 
             channel.prot_conf.u_delay = profile->channels[i].u_delay;
-            channel.prot_conf.u_level = MAX(profile->channels[i].u_level, channel.u.limit);
+            channel.prot_conf.u_level = profile->channels[i].u_level;
             channel.prot_conf.i_delay = profile->channels[i].i_delay;
             channel.prot_conf.p_delay = profile->channels[i].p_delay;
-            channel.prot_conf.p_level = MAX(profile->channels[i].p_level, channel.p_limit);
+            channel.prot_conf.p_level = profile->channels[i].p_level;
 
             channel.prot_conf.flags.u_state = profile->channels[i].flags.u_state;
             channel.prot_conf.flags.u_type = profile->channels[i].flags.u_type;
