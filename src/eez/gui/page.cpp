@@ -29,6 +29,9 @@
 #include <eez/gui/app_context.h>
 #include <eez/modules/mcu/display.h>
 
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/gui/psu.h>
+
 using namespace eez::mcu;
 
 namespace eez {
@@ -108,7 +111,7 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1)
     page->message3 = nullptr;
 
     page->actionWidget.action = 0;
-    page->appContext = g_appContext;
+    page->appContext = &eez::psu::gui::g_psuAppContext;
 
     return page;
 }

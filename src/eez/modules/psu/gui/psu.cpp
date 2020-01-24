@@ -144,6 +144,21 @@ PsuAppContext::PsuAppContext() {
 }
 
 void PsuAppContext::stateManagment() {
+    if (m_popProgressPage) {
+        if (getActivePageId() == (m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS)) {
+            popPage();
+        }
+        m_popProgressPage = false;
+    }
+
+    if (m_clearTextMessage) {
+        m_clearTextMessage = false;
+        if (getActivePageId() == PAGE_ID_TEXT_MESSAGE) {
+            popPage();
+            m_textMessage[0] = 0;
+        }
+    }
+
     AppContext::stateManagment();
 
     uint32_t tickCount = micros();
@@ -274,25 +289,12 @@ void PsuAppContext::stateManagment() {
         m_pushProgressPage = false;
     }
 
-    if (m_popProgressPage) {
-        if (getActivePageId() == (m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS)) {
-            popPage();
-        }
-        m_popProgressPage = false;
-    }
-
     if (m_showTextMessage) {
         m_showTextMessage = false;
         if (getActivePageId() != PAGE_ID_TEXT_MESSAGE) {
             pushPage(PAGE_ID_TEXT_MESSAGE);
         } else {
             ++m_textMessageVersion;
-        }
-    } else if (m_clearTextMessage) {
-        m_clearTextMessage = false;
-        if (getActivePageId() == PAGE_ID_TEXT_MESSAGE) {
-            popPage();
-            m_textMessage[0] = 0;
         }
     } else {
         // clear text message if active page is not PAGE_ID_TEXT_MESSAGE

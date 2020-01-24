@@ -463,36 +463,44 @@ bool start(int slotIndex, const char *hexFilePath, int *err) {
 }
 
 void uploadHexFile() {
-//	uint8_t buffer[256];
-//	if (readMemory(0x08000000, buffer, sizeof(buffer))) {
-//		for (size_t i = 0; i < sizeof(buffer) / 16; i++) {
-//			for (size_t j = 0; j < 16; j++) {
-//				DebugTrace("%02x", (int)buffer[i * 16 + j]);
-//			}
-//			DebugTrace("\n");
-//		}
-//	}
+	// uint8_t buffer[256];
+	// if (readMemory(0x08000000, buffer, sizeof(buffer))) {
+	// 	for (size_t i = 0; i < sizeof(buffer) / 16; i++) {
+	// 		for (size_t j = 0; j < 16; j++) {
+	// 			DebugTrace("%02x", (int)buffer[i * 16 + j]);
+	// 		}
+	// 		DebugTrace("\n");
+	// 	}
+	// }
 
-    uint8_t hour, minute, second;
-    psu::datetime::getTime(hour, minute, second);
-    DebugTrace("[%02d:%02d:%02d] Flash started\n", hour, minute, second);
+    // uint8_t hour, minute, second;
+    // psu::datetime::getTime(hour, minute, second);
+    // DebugTrace("[%02d:%02d:%02d] Flash started\n", hour, minute, second);
 
+	bool eofReached = false;
     File file;
-    if (!file.open(g_hexFilePath, FILE_OPEN_EXISTING | FILE_READ)) {
-		DebugTrace("Can't open firmware hex file!\n");
-        return;
-    }
+	size_t totalSize = 0;
+	HexRecord hexRecord;
+	uint32_t addressUpperBits = 0;
 
 #if OPTION_DISPLAY
     eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Downloading firmware...");
-    size_t totalSize = file.size();
 #endif
 
-    eraseAll();
+    if (!eraseAll()) {
+		DebugTrace("Failed to erase all!\n");
+		goto Exit;
+	}
 
-	HexRecord hexRecord;
-	uint32_t addressUpperBits = 0;
-	bool eofReached = false;
+    if (!file.open(g_hexFilePath, FILE_OPEN_EXISTING | FILE_READ)) {
+		DebugTrace("Can't open firmware hex file!\n");
+		goto Exit;
+    }
+
+#if OPTION_DISPLAY
+    totalSize = file.size();
+#endif
+
 	while (!eofReached && readHexRecord(file, hexRecord)) {
 
 #if OPTION_DISPLAY
@@ -512,23 +520,22 @@ void uploadHexFile() {
 		}
 	}
 
-	if (eofReached) {
-	    uint8_t hour, minute, second;
-	    psu::datetime::getTime(hour, minute, second);
-	    DebugTrace("[%02d:%02d:%02d] Flash finished\n", hour, minute, second);
-	} else {
-	    uint8_t hour, minute, second;
-	    psu::datetime::getTime(hour, minute, second);
-		DebugTrace("[%02d:%02d:%02d] Flash failed\n", hour, minute, second);
-	}
+	// uint8_t hour, minute, second;
+	// psu::datetime::getTime(hour, minute, second);
+	// DebugTrace("[%02d:%02d:%02d] Flash finished\n", hour, minute, second);
+
+	file.close();
+
+Exit:
+	leaveBootloaderMode();
 
 #if OPTION_DISPLAY
     eez::psu::gui::g_psuAppContext.hideProgressPage();
 #endif
 
-	file.close();
-
-	leaveBootloaderMode();
+	if (!eofReached) {
+		errorMessage("Downloading failed!");
+	}
 }
 
 } // namespace flash_slave

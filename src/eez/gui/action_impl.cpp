@@ -1322,6 +1322,7 @@ void action_debug_trace_log_toggle() {
 void onFirmwareSelected(const char *filePath) {
     int err;
     if (!bp3c::flash_slave::start(g_channel->slotIndex, filePath, &err)) {
+		errorMessage("Failed to start update!");
     }
 }
 

@@ -60,6 +60,15 @@ AppContext::AppContext() {
 
 
 void AppContext::stateManagment() {
+    // remove alert message after period of time
+    uint32_t inactivityPeriod = psu::idle::getGuiAndEncoderInactivityPeriod();
+    if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
+        ToastMessagePage *page = (ToastMessagePage *)getActivePage();
+        if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
+            popPage();
+        }
+    }
+
     if (m_nextIterOperation == NEXT_ITER_OPERATION_SET) {
         setPage(m_pageIdToSetOnNextIter);
         if (m_pageIdToSetOnNextIter == PAGE_ID_WELCOME) {
@@ -75,16 +84,6 @@ void AppContext::stateManagment() {
     if (getActivePageId() == PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
         if (m_checkAsyncOperationStatus) {
             m_checkAsyncOperationStatus();
-        }
-    }
-
-    // remove alert message after period of time
-    uint32_t inactivityPeriod = psu::idle::getGuiAndEncoderInactivityPeriod();
-    if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
-        ToastMessagePage *page = (ToastMessagePage *)getActivePage();
-        if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
-            popPage();
-            return;
         }
     }
 
