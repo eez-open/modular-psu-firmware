@@ -633,10 +633,11 @@ void Channel::reset() {
 
 void Channel::resetHistory() {
     for (int i = 0; i < CHANNEL_HISTORY_SIZE; ++i) {
-        uHistory[i] = NAN;
-        iHistory[i] = NAN;
+        uHistory[i] = 0;
+        iHistory[i] = 0;
     }
     flags.historyStarted = 0;
+    historyPosition = 0;
 }
 
 void Channel::clearCalibrationConf() {
