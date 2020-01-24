@@ -32,12 +32,6 @@ static const int CHIP_DCM220 = 4;
 
 void init(uint8_t slotIndex, int chip);
 
-void selectA(uint8_t slotIndex);
-void deselectA(uint8_t slotIndex);
-
-void selectB(uint8_t slotIndex);
-void deselectB(uint8_t slotIndex);
-
 void select(uint8_t slotIndex, int chip);
 void deselect(uint8_t slotIndex);
 
