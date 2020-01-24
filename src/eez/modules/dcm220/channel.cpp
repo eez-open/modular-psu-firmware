@@ -35,6 +35,7 @@
 #include <eez/system.h>
 
 #define CONF_MASTER_SYNC_TIMEOUT_MS 500
+#define CONF_MASTER_SYNC_IRQ_TIMEOUT_MS 50
 
 namespace eez {
 
@@ -77,9 +78,19 @@ bool masterSynchro(int slotIndex, uint8_t &firmwareMajorVersion, uint8_t &firmwa
 	    spi::deselect(slotIndex);
 
 	    if (rxBuffer[0] == SPI_SLAVE_SYNBYTE) {
-			firmwareMajorVersion = rxBuffer[1];
-			firmwareMinorVersion = rxBuffer[2];
-	    	break;
+			uint32_t startIrq = millis();
+			while (true) {
+				if (HAL_GPIO_ReadPin(SPI_IRQ_GPIO_Port[slotIndex], SPI_IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
+					firmwareMajorVersion = rxBuffer[1];
+					firmwareMinorVersion = rxBuffer[2];
+					return true;
+				}
+
+				int32_t diff = millis() - startIrq;
+				if (diff > CONF_MASTER_SYNC_IRQ_TIMEOUT_MS) {
+					break;
+				}
+			}
 	    }
 
 	    int32_t diff = millis() - start;
@@ -87,15 +98,6 @@ bool masterSynchro(int slotIndex, uint8_t &firmwareMajorVersion, uint8_t &firmwa
 	    	return false;
 	    }
 	}
-
-	while (HAL_GPIO_ReadPin(SPI_IRQ_GPIO_Port[slotIndex], SPI_IRQ_Pin[slotIndex]) != GPIO_PIN_SET) {
-	    int32_t diff = millis() - start;
-	    if (diff > CONF_MASTER_SYNC_TIMEOUT_MS) {
-	    	return false;
-	    }
-	}
-
-	return true;
 }
 
 float calcTemperature(uint16_t adcValue) {
@@ -256,8 +258,6 @@ struct Channel : ChannelInterface {
 	void init(int subchannelIndex) {
 #if defined(EEZ_PLATFORM_STM32)
 		if (!synchronized) {
-			spi::deselectA(slotIndex);
-			spi::init(slotIndex, spi::CHIP_DCM220);
 			if (masterSynchro(slotIndex, firmwareMajorVersion, firmwareMinorVersion)) {
 	    		DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)firmwareMajorVersion, (int)firmwareMinorVersion);
 				synchronized = true;

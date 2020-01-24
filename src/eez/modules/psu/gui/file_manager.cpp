@@ -281,7 +281,7 @@ const uint32_t getFileDataTime(uint32_t fileIndex) {
 }
 
 bool isFileSelected(uint32_t fileIndex) {
-    return (isPageOnStack(PAGE_ID_FILE_BROWSER) || isPageOnStack(PAGE_ID_FILE_MENU)) && g_selectedFileIndex == fileIndex;
+    return (isPageOnStack(PAGE_ID_FILE_BROWSER) || isPageOnStack(PAGE_ID_FILE_MENU)) && g_selectedFileIndex == (int32_t)fileIndex;
 }
 
 void selectFile(uint32_t fileIndex) {

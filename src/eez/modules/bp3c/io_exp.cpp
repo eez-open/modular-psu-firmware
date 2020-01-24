@@ -108,15 +108,13 @@ void init() {
 	if (write(REG_CONFIGURATION, configValue) == HAL_OK) {
 		// check if configuration register is properly set
 		uint8_t value;
-		if (read(REG_CONFIGURATION, &value) == HAL_OK) {
-			if (value == configValue) {
-				// all good, now set coupling mode to NONE
-				if (write(REG_OUTPUT_PORT, COUPLING_MODE_NONE) == HAL_OK) {
-					g_testResult = TEST_OK;
-				}
-			}
+		if (read(REG_CONFIGURATION, &value) == HAL_OK && value == configValue) {
+			// all good
+			g_testResult = TEST_OK;
+			hardResetModules();
 		}
 	}
+	
 #else
 	g_testResult = TEST_OK;
 #endif
@@ -144,7 +142,10 @@ void switchChannelCoupling(int channelCoupling) {
 
 void hardResetModules() {
 #ifdef EEZ_PLATFORM_STM32
-	write(REG_OUTPUT_PORT, 0);
+    io_exp::writeToOutputPort(0b00000000);
+    osDelay(5);
+    io_exp::writeToOutputPort(0b10000000);
+	osDelay(5);
 #endif
 }
 

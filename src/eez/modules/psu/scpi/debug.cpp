@@ -63,8 +63,6 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
 
             mcu::eeprom::resetAllExceptOnTimeCounters();
 
-            bp3c::io_exp::hardResetModules();
-
 #if defined(EEZ_PLATFORM_STM32)
             NVIC_SystemReset();
 #endif

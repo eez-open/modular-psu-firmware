@@ -365,13 +365,10 @@ void enterBootloaderMode(int slotIndex) {
 
 void leaveBootloaderMode() {
 #if defined(EEZ_PLATFORM_STM32)
-    // disable BOOT0 flag for selected slot and reset modules
+    // disable BOOT0 flag
     io_exp::writeToOutputPort(0b10000000);
     osDelay(5);
-    io_exp::writeToOutputPort(0b00000000);
-    osDelay(25);
-    io_exp::writeToOutputPort(0b10000000);
-	osDelay(25);
+	io_exp::hardResetModules();
 
     psu::initChannels();
     psu::testChannels();

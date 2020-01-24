@@ -845,7 +845,6 @@ void action_reset() {
 }
 
 void hard_reset() {
-    bp3c::io_exp::hardResetModules();
 #if defined(EEZ_PLATFORM_STM32)
     NVIC_SystemReset();
 #endif
