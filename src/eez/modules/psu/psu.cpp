@@ -282,10 +282,6 @@ bool testChannels() {
         return true;
     }
 
-    psu::profile::saveAtLocation(10);
-    psuReset();
-    bool wasSaveProfileEnabled = profile::enableSave(false);
-
     bool result = true;
 
     channel_dispatcher::disableOutputForAllChannels();
@@ -293,10 +289,6 @@ bool testChannels() {
     for (int i = 0; i < CH_NUM; ++i) {
         result &= Channel::get(i).test();
     }
-
-    profile::enableSave(wasSaveProfileEnabled);
-    int err;
-    psu::profile::recall(10, &err);
 
     return result;
 }
@@ -528,14 +520,11 @@ bool powerUp() {
     eez::gui::showWelcomePage();
 #endif
 
-    // reset channels
-    for (int i = 0; i < CH_NUM; ++i) {
-        Channel::get(i).reset();
-    }
-
     // turn power on
     board::powerUp();
     g_powerIsUp = true;
+
+    psuReset();
 
     ontime::g_mcuCounter.start();
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {

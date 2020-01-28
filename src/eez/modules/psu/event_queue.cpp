@@ -20,12 +20,15 @@
 
 #include <scpi/scpi.h>
 
+#include <eez/firmware.h>
+#include <eez/sound.h>
+
+#include <eez/scpi/scpi.h>
+
 #include <eez/modules/mcu/eeprom.h>
 
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/event_queue.h>
-#include <eez/sound.h>
-#include <eez/scpi/scpi.h>
 
 #if OPTION_ETHERNET
 #include <eez/modules/mcu/ethernet.h>
@@ -247,6 +250,10 @@ void pushEvent(int16_t eventId) {
 #if OPTION_ETHERNET
     eez::mcu::ethernet::pushEvent(eventId);
 #endif
+
+	if (!g_isBooted) {
+		tick();
+	}
 }
 
 void markAsRead() {

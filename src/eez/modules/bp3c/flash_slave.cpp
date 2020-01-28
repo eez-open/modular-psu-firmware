@@ -25,6 +25,8 @@
 #include "eez/modules/psu/psu.h"
 #include "eez/modules/psu/io_pins.h"
 #include "eez/modules/psu/datetime.h"
+#include "eez/modules/psu/profile.h"
+#include "eez/modules/psu/channel_dispatcher.h"
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/bp3c/io_exp.h>
@@ -321,6 +323,8 @@ void enterBootloaderMode(int slotIndex) {
     g_bootloaderMode = true;
 
 #if defined(EEZ_PLATFORM_STM32)
+    psu::profile::saveAtLocation(10);
+
     reset();
 
     // power down channels
@@ -373,13 +377,16 @@ void leaveBootloaderMode() {
 
     psu::initChannels();
     psu::testChannels();
-
-    HAL_UART_DeInit(phuart);
 #endif
 
     g_bootloaderMode = false;
 
 #if defined(EEZ_PLATFORM_STM32)
+    int err;
+    psu::profile::recall(10, &err);
+
+    HAL_UART_DeInit(phuart);
+
     psu::io_pins::refresh();
 #endif
 }
@@ -445,6 +452,8 @@ bool readHexRecord(File &file, HexRecord &hexRecord) {
 }
 
 bool start(int slotIndex, const char *hexFilePath, int *err) {
+	psu::channel_dispatcher::disableOutputForAllChannels();
+
 	enterBootloaderMode(slotIndex);
 
 	if (!syncWithSlave()) {

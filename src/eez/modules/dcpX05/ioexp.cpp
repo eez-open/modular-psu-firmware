@@ -220,10 +220,6 @@ void IOExpander::init() {
 #endif
 
 #endif
-
-#if defined(EEZ_PLATFORM_STM32)
-    gpio = 0B0000000100000000; // 5A
-#endif
 }
 
 bool IOExpander::test() {
@@ -384,9 +380,9 @@ void IOExpander::changeBit(int io_bit, bool set) {
             write(REG_GPIOB, newValue);
 	    }
     }
+#endif
 
     gpio = set ? (gpio | (1 << io_bit)) : (gpio & ~(1 << io_bit));
-#endif
 }
 
 #if defined(EEZ_PLATFORM_STM32)

@@ -269,9 +269,17 @@ bool testMaster() {
 bool test() {
     bool testResult = true;
 
+    psu::profile::saveAtLocation(10);
+    bool wasSaveProfileEnabled = psu::profile::enableSave(false);
+    psu::psuReset();
+
     testResult &= testMaster();
 
     testResult &= psu::testChannels();
+
+    psu::profile::enableSave(wasSaveProfileEnabled);
+    int err;
+    psu::profile::recall(10, &err);
 
     if (!testResult) {
         sound::playBeep();

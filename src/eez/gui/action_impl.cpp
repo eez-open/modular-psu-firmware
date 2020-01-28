@@ -1332,8 +1332,12 @@ void onFirmwareSelected(const char *filePath) {
     }
 }
 
-void action_channel_update_firmware() {
+void onSelectFirmware() {
     file_manager::browseForFile("Select DCM220 firmware file", "/Updates", FILE_TYPE_HEX, onFirmwareSelected);
+}
+
+void action_channel_update_firmware() {
+    yesNoDialog(PAGE_ID_YES_NO_FLASH_SLAVE, nullptr, onSelectFirmware, nullptr, nullptr);
 }
 
 } // namespace gui

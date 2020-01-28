@@ -36,6 +36,7 @@
 #endif
 
 #include <eez/sound.h>
+#include <eez/firmware.h>
 #include <eez/system.h>
 #include <eez/memory.h>
 #include <eez/modules/psu/psu.h>
@@ -1614,7 +1615,12 @@ void tick() {
 static void playTune(int iTune) {
 	if (iTune > g_playNextTuneIndex && iTune > g_currentTuneIndex) {
 		g_playNextTuneIndex = iTune;
-    	if (osThreadGetId() == scpi::g_scpiTaskHandle || osThreadGetId() == psu::g_psuTaskHandle || g_playNextTuneIndex == POWER_UP_TUNE) {
+    	if (
+			osThreadGetId() == scpi::g_scpiTaskHandle ||
+			osThreadGetId() == psu::g_psuTaskHandle ||
+			g_playNextTuneIndex == POWER_UP_TUNE ||
+			(g_playNextTuneIndex == BEEP_TUNE && !g_isBooted)
+		) {
 			tick();
 		}
 	}
