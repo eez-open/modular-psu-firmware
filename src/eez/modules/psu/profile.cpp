@@ -247,7 +247,7 @@ void recallChannelsFromProfile(Parameters &profile, int location) {
 
         int j = channelsMap[i];
 
-        if (j != -1) {
+        if (profile.channels[j].flags.parameters_are_valid) {
             channel.u.set = MIN(profile.channels[j].u_set, channel.u.max);
             channel.u.step = profile.channels[j].u_step;
             channel.u.limit = MIN(profile.channels[j].u_limit, channel.u.max);

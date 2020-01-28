@@ -749,7 +749,7 @@ profile::Parameters *loadProfile(int location) {
         if (location != NUM_PROFILE_LOCATIONS - 1) { // last location is not stored in EEPROM
             profile::Parameters profile;
             if (confRead((uint8_t *)&profile, sizeof(profile::Parameters), getProfileAddress(location), profile::PROFILE_VERSION)) {
-            memcpy(&g_profilesCache[location].profile, &profile, sizeof(profile::Parameters));
+                memcpy(&g_profilesCache[location].profile, &profile, sizeof(profile::Parameters));
             }
         }
         g_profilesCache[location].loaded = true;
