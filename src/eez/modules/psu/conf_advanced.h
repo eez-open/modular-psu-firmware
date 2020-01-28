@@ -206,8 +206,8 @@
 /// down-programmer circuit has to be switched off.
 #define DP_NEG_LEV -5 // -5 W
 
-/// See DP_NEG_LEV.
-#define DP_NEG_DELAY 5 // 5 s
+/// See DP_NEG_LEV in seconds.
+#define DP_NEG_DELAY 1
 
 /// Number of history values shown in YT diagram. This value must be power of 2 and
 /// greater then width of YT widget.
@@ -287,7 +287,7 @@
 #define CONF_SERIAL_BUFFER_SIZE 1024
 
 // Default duration of all animations in seconds
-#define CONF_DEFAULT_ANIMATIONS_DURATION 0.25f
+#define CONF_DEFAULT_ANIMATIONS_DURATION 0.15f
 
 #define CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD 5 // 5 seconds
 

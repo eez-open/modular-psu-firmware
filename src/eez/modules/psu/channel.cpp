@@ -569,7 +569,7 @@ void Channel::reset() {
     opp.flags.alarmed = 0;
 
     flags.currentCurrentRange = CURRENT_RANGE_HIGH;
-    flags.currentRangeSelectionMode = CURRENT_RANGE_SELECTION_ALWAYS_HIGH;
+    flags.currentRangeSelectionMode = CURRENT_RANGE_SELECTION_USE_BOTH;
     flags.autoSelectCurrentRange = 0;
 
     flags.dprogState = DPROG_STATE_ON;

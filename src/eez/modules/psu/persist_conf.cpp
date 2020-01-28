@@ -149,7 +149,7 @@ void initDefaultDevConf() {
     g_defaultDevConf.encoderConfirmationMode = 0;
 
     g_defaultDevConf.isSoundEnabled = 1;
-    g_defaultDevConf.isClickSoundEnabled = 1;
+    g_defaultDevConf.isClickSoundEnabled = 0;
 
     g_defaultDevConf.serialBaud = getIndexFromBaud(SERIAL_SPEED);
     g_defaultDevConf.serialParity = serial::PARITY_NONE;
