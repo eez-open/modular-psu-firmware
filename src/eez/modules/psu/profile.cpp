@@ -51,17 +51,83 @@ static bool g_freeze;
 
 #if OPTION_SD_CARD
 
-static void getChannelProfileListFilePath(Channel &channel, int location, char *filePath) {
+void mapCurrentChannelsToProfileChannels(Parameters &profile, int channelsMap[]) {
+    bool profileChannelAlreadyUsed[CH_MAX];
+    for (int j = 0; j < CH_MAX; ++j) {
+        profileChannelAlreadyUsed[j] = false;
+    }
+
+    for (int i = 0; i < CH_MAX; ++i) {
+        channelsMap[i] = -1;
+    }
+
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel &channel = Channel::get(i);
+        if (
+            profile.channels[i].flags.parameters_are_valid &&
+            profile.channels[i].moduleType == g_slots[channel.slotIndex].moduleInfo->moduleType
+        ) {
+            profileChannelAlreadyUsed[i] = true;
+            channelsMap[i] = i;
+            break;
+        }
+    }
+
+    for (int i = 0; i < CH_NUM; ++i) {
+        if (channelsMap[i] == -1) {
+            Channel &channel = Channel::get(i);
+            for (int j = 0; j < CH_MAX; ++j) {
+                if (
+                    !profileChannelAlreadyUsed[j] &&
+                    profile.channels[j].flags.parameters_are_valid &&
+                    profile.channels[j].moduleType == g_slots[channel.slotIndex].moduleInfo->moduleType
+                    ) {
+                    profileChannelAlreadyUsed[j] = true;
+                    channelsMap[i] = j;
+                    break;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < CH_NUM; ++i) {
+        if (channelsMap[i] == -1) {
+            for (int j = 0; j < CH_MAX; ++j) {
+                if (!profileChannelAlreadyUsed[j] && !profile.channels[j].flags.parameters_are_valid) {
+                    profileChannelAlreadyUsed[j] = true;
+                    channelsMap[i] = j;
+                    break;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < CH_MAX; ++i) {
+        if (channelsMap[i] == -1) {
+            for (int j = 0; j < CH_MAX; ++j) {
+                if (!profileChannelAlreadyUsed[j]) {
+                    profileChannelAlreadyUsed[j] = true;
+                    channelsMap[i] = j;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static void getChannelProfileListFilePath(int channelIndex, int location, char *filePath) {
     strcpy(filePath, LISTS_DIR);
     strcat(filePath, PATH_SEPARATOR);
     strcat(filePath, "PROFILE_");
-    strcatInt(filePath, channel.channelIndex + 1);
+    strcatInt(filePath, channelIndex + 1);
     strcat(filePath, "_");
     strcatInt(filePath, location);
     strcat(filePath, LIST_EXT);
 }
 
-void loadProfileList(Parameters &profile, Channel &channel, int location) {
+void loadProfileList(Parameters &profile, Channel &channel, int profileChannelIndex, int location) {
     int err;
     if (!sd_card::isMounted(&err)) {
         if (err != SCPI_ERROR_MISSING_MASS_MEDIA && err != SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM) {
@@ -71,7 +137,7 @@ void loadProfileList(Parameters &profile, Channel &channel, int location) {
     }
 
     char filePath[MAX_PATH_LENGTH];
-    getChannelProfileListFilePath(channel, location, filePath);
+    getChannelProfileListFilePath(profileChannelIndex, location, filePath);
 
     if (!sd_card::exists(filePath, &err)) {
         return;
@@ -87,13 +153,13 @@ void loadProfileList(Parameters &profile, Channel &channel, int location) {
     }
 }
 
-void saveProfileList(Parameters &profile, Channel &channel, int location) {
+void saveProfileList(Parameters &profile, Channel &channel, int profileChannelIndex, int location) {
     if (location == 0 && !list::getListsChanged(channel)) {
         return;
     }
 
     char filePath[MAX_PATH_LENGTH];
-    getChannelProfileListFilePath(channel, location, filePath);
+    getChannelProfileListFilePath(profileChannelIndex, location, filePath);
     
     int err;
     if (list::saveList(channel.channelIndex, filePath, &err)) {
@@ -109,15 +175,18 @@ void saveProfileList(Parameters &profile, Channel &channel, int location) {
 }
 
 void saveProfileListForAllChannels(Parameters &profile, int location) {
+    int channelsMap[CH_MAX];
+    mapCurrentChannelsToProfileChannels(profile, channelsMap);
+
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
-        saveProfileList(profile, channel, location);
+        saveProfileList(profile, channel, channelsMap[i], location);
     }
 }
 
-void deleteProfileList(Channel &channel, int location) {
+void deleteProfileList(int channelIndex, int location) {
     char filePath[MAX_PATH_LENGTH];
-    getChannelProfileListFilePath(channel, location, filePath);
+    getChannelProfileListFilePath(channelIndex, location, filePath);
 
     int err;
 
@@ -140,9 +209,8 @@ void deleteProfileLists(int location) {
         return;
     }
 
-    for (int i = 0; i < CH_NUM; ++i) {
-        Channel &channel = Channel::get(i);
-        deleteProfileList(channel, location);
+    for (int i = 0; i < CH_MAX; ++i) {
+        deleteProfileList(i, location);
     }
 #endif
 }
@@ -151,60 +219,75 @@ void deleteProfileLists(int location) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void recallChannelsFromProfile(Parameters *profile, int location) {
+void recallChannelsFromProfile(Parameters &profile, int location) {
     bool wasSaveProfileEnabled = enableSave(false);
 
     trigger::abort();
 
     int err;
-    if (!channel_dispatcher::setCouplingType((channel_dispatcher::CouplingType)profile->flags.couplingType, &err)) {
+    if (!channel_dispatcher::setCouplingType((channel_dispatcher::CouplingType)profile.flags.couplingType, &err)) {
         event_queue::pushEvent(err);
     }
+
+    int channelsMap[CH_MAX];
+    mapCurrentChannelsToProfileChannels(profile, channelsMap);
+
+    bool mismatch = false;
+    for (int i = 0; i < CH_NUM; ++i) {
+        if (channelsMap[i] != i) {
+            mismatch = true;
+            break;
+        }
+    }
+
+    int numTrackingChannels = 0;
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
 
-        if (profile->channels[i].flags.parameters_are_valid) {
-            channel.u.set = MIN(profile->channels[i].u_set, channel.u.max);
-            channel.u.step = profile->channels[i].u_step;
-            channel.u.limit = MIN(profile->channels[i].u_limit, channel.u.max);
+        int j = channelsMap[i];
 
-            channel.i.set = MIN(profile->channels[i].i_set, channel.i.max);
-            channel.i.step = profile->channels[i].i_step;
+        if (j != -1) {
+            channel.u.set = MIN(profile.channels[j].u_set, channel.u.max);
+            channel.u.step = profile.channels[j].u_step;
+            channel.u.limit = MIN(profile.channels[j].u_limit, channel.u.max);
 
-            channel.p_limit = MIN(profile->channels[i].p_limit, channel.u.max * channel.i.max);
+            channel.i.set = MIN(profile.channels[j].i_set, channel.i.max);
+            channel.i.step = profile.channels[j].i_step;
 
-            channel.prot_conf.u_delay = profile->channels[i].u_delay;
-            channel.prot_conf.u_level = profile->channels[i].u_level;
-            channel.prot_conf.i_delay = profile->channels[i].i_delay;
-            channel.prot_conf.p_delay = profile->channels[i].p_delay;
-            channel.prot_conf.p_level = profile->channels[i].p_level;
+            channel.p_limit = MIN(profile.channels[j].p_limit, channel.u.max * channel.i.max);
 
-            channel.prot_conf.flags.u_state = profile->channels[i].flags.u_state;
-            channel.prot_conf.flags.u_type = profile->channels[i].flags.u_type;
-            channel.prot_conf.flags.i_state = profile->channels[i].flags.i_state;
-            channel.prot_conf.flags.p_state = profile->channels[i].flags.p_state;
+            channel.prot_conf.u_delay = profile.channels[j].u_delay;
+            channel.prot_conf.u_level = profile.channels[j].u_level;
+            channel.prot_conf.i_delay = profile.channels[j].i_delay;
+            channel.prot_conf.p_delay = profile.channels[j].p_delay;
+            channel.prot_conf.p_level = profile.channels[j].p_level;
 
-            channel.setCurrentLimit(profile->channels[i].i_limit);
+            channel.prot_conf.flags.u_state = profile.channels[j].flags.u_state;
+            channel.prot_conf.flags.u_type = profile.channels[j].flags.u_type;
+            channel.prot_conf.flags.i_state = profile.channels[j].flags.i_state;
+            channel.prot_conf.flags.p_state = profile.channels[j].flags.p_state;
+
+            channel.setCurrentLimit(profile.channels[j].i_limit);
 
 #ifdef EEZ_PLATFORM_SIMULATOR
-            channel.simulator.load_enabled = profile->channels[i].load_enabled;
-            channel.simulator.load = profile->channels[i].load;
-            channel.simulator.voltProgExt = profile->channels[i].voltProgExt;
+            channel.simulator.load_enabled = profile.channels[j].load_enabled;
+            channel.simulator.load = profile.channels[j].load;
+            channel.simulator.voltProgExt = profile.channels[j].voltProgExt;
 #endif
 
-            channel.flags.outputEnabled = channel.isTripped() ? 0 : profile->channels[i].flags.output_enabled;
-            channel.flags.senseEnabled = profile->channels[i].flags.sense_enabled;
+            channel.flags.outputEnabled = channel.isTripped() || mismatch ? 0 : profile.channels[j].flags.output_enabled;
+            channel.flags.senseEnabled = profile.channels[j].flags.sense_enabled;
 
             if (channel.params.features & CH_FEATURE_RPROG) {
-                channel.flags.rprogEnabled = profile->channels[i].flags.rprog_enabled;
+                channel.flags.rprogEnabled = profile.channels[j].flags.rprog_enabled;
             } else {
                 channel.flags.rprogEnabled = 0;
             }
 
-            channel.flags.displayValue1 = profile->channels[i].flags.displayValue1;
-            channel.flags.displayValue2 = profile->channels[i].flags.displayValue2;
-            channel.ytViewRate = profile->channels[i].ytViewRate;
+            channel.flags.displayValue1 = profile.channels[j].flags.displayValue1;
+            channel.flags.displayValue2 = profile.channels[j].flags.displayValue2;
+            channel.ytViewRate = profile.channels[j].ytViewRate;
             if (channel.flags.displayValue1 == 0 && channel.flags.displayValue2 == 0) {
                 channel.flags.displayValue1 = DISPLAY_VALUE_VOLTAGE;
                 channel.flags.displayValue2 = DISPLAY_VALUE_CURRENT;
@@ -213,24 +296,37 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
                 channel.ytViewRate = GUI_YT_VIEW_RATE_DEFAULT;
             }
 
-            channel.flags.voltageTriggerMode = (TriggerMode)profile->channels[i].flags.u_triggerMode;
-            channel.flags.currentTriggerMode = (TriggerMode)profile->channels[i].flags.i_triggerMode;
-            channel.flags.triggerOutputState = profile->channels[i].flags.triggerOutputState;
-            channel.flags.triggerOnListStop = profile->channels[i].flags.triggerOnListStop;
-            trigger::setVoltage(channel, profile->channels[i].u_triggerValue);
-            trigger::setCurrent(channel, profile->channels[i].i_triggerValue);
-            list::setListCount(channel, profile->channels[i].listCount);
+            channel.flags.voltageTriggerMode = (TriggerMode)profile.channels[j].flags.u_triggerMode;
+            channel.flags.currentTriggerMode = (TriggerMode)profile.channels[j].flags.i_triggerMode;
+            channel.flags.triggerOutputState = profile.channels[j].flags.triggerOutputState;
+            channel.flags.triggerOnListStop = profile.channels[j].flags.triggerOnListStop;
+            trigger::setVoltage(channel, profile.channels[j].u_triggerValue);
+            trigger::setCurrent(channel, profile.channels[j].i_triggerValue);
+            list::setListCount(channel, profile.channels[j].listCount);
 
-            channel.flags.currentRangeSelectionMode = profile->channels[i].flags.currentRangeSelectionMode;
-            channel.flags.autoSelectCurrentRange = profile->channels[i].flags.autoSelectCurrentRange;
+            channel.flags.currentRangeSelectionMode = profile.channels[j].flags.currentRangeSelectionMode;
+            channel.flags.autoSelectCurrentRange = profile.channels[j].flags.autoSelectCurrentRange;
 
-            channel.flags.dprogState = profile->channels[i].flags.dprogState;
+            channel.flags.dprogState = profile.channels[j].flags.dprogState;
             
-            channel.flags.trackingEnabled = profile->channels[i].flags.trackingEnabled;
+            channel.flags.trackingEnabled = profile.channels[j].flags.trackingEnabled;
+            if (channel.flags.trackingEnabled) {
+                ++numTrackingChannels;
+            }
 
 #if OPTION_SD_CARD
-            loadProfileList(*profile, channel, location);
+            loadProfileList(profile, channel, j, location);
 #endif
+        }
+    }
+
+    if (numTrackingChannels == 1) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &channel = Channel::get(i);
+            if (channel.flags.trackingEnabled) {
+                channel.flags.trackingEnabled = 0;
+                break;
+            }
         }
     }
 
@@ -239,96 +335,99 @@ void recallChannelsFromProfile(Parameters *profile, int location) {
     enableSave(wasSaveProfileEnabled);
 }
 
-void fillProfile(Parameters *pProfile) {
-    Parameters &profile = *pProfile;
+void fillProfile(Parameters &profile) {
+    int channelsMap[CH_MAX];
+    mapCurrentChannelsToProfileChannels(profile, channelsMap);
 
-    memset(&profile, 0, sizeof(Parameters));
+    Parameters savedProfile;
+    memcpy(&savedProfile, &profile, sizeof(Parameters));
 
     profile.flags.couplingType = channel_dispatcher::getCouplingType();
-
     profile.flags.powerIsUp = isPowerUp();
 
     for (int i = 0; i < CH_MAX; ++i) {
-        Channel &channel = Channel::get(i);
-        if (i < CH_NUM && channel.isInstalled()) {
-            profile.channels[i].moduleType = g_slots[channel.slotIndex].moduleInfo->moduleType;
-            profile.channels[i].moduleRevision = g_slots[channel.slotIndex].moduleRevision;
+        int j = i;
 
-            profile.channels[i].flags.parameters_are_valid = 1;
+        if (i < CH_NUM) {
+            Channel &channel = Channel::get(i);
 
-            profile.channels[i].flags.output_enabled = channel.flags.outputEnabled;
-            profile.channels[i].flags.sense_enabled = channel.flags.senseEnabled;
+            profile.channels[j].moduleType = g_slots[channel.slotIndex].moduleInfo->moduleType;
+            profile.channels[j].moduleRevision = g_slots[channel.slotIndex].moduleRevision;
+
+            profile.channels[j].flags.parameters_are_valid = 1;
+
+            profile.channels[j].flags.output_enabled = channel.flags.outputEnabled;
+            profile.channels[j].flags.sense_enabled = channel.flags.senseEnabled;
 
             if (channel.params.features & CH_FEATURE_RPROG) {
-                profile.channels[i].flags.rprog_enabled = channel.flags.rprogEnabled;
+                profile.channels[j].flags.rprog_enabled = channel.flags.rprogEnabled;
+            } else {
+                profile.channels[j].flags.rprog_enabled = 0;
             }
-            else {
-                profile.channels[i].flags.rprog_enabled = 0;
-            }
 
-            profile.channels[i].flags.u_state = channel.prot_conf.flags.u_state;
-            profile.channels[i].flags.u_type = channel.prot_conf.flags.u_type;
-            profile.channels[i].flags.i_state = channel.prot_conf.flags.i_state;
-            profile.channels[i].flags.p_state = channel.prot_conf.flags.p_state;
+            profile.channels[j].flags.u_state = channel.prot_conf.flags.u_state;
+            profile.channels[j].flags.u_type = channel.prot_conf.flags.u_type;
+            profile.channels[j].flags.i_state = channel.prot_conf.flags.i_state;
+            profile.channels[j].flags.p_state = channel.prot_conf.flags.p_state;
 
-            profile.channels[i].u_set = channel.getUSetUnbalanced();
-            profile.channels[i].u_step = channel.u.step;
-            profile.channels[i].u_limit = channel.u.limit;
+            profile.channels[j].u_set = channel.getUSetUnbalanced();
+            profile.channels[j].u_step = channel.u.step;
+            profile.channels[j].u_limit = channel.u.limit;
 
-            profile.channels[i].i_set = channel.getISetUnbalanced();
-            profile.channels[i].i_step = channel.i.step;
-            profile.channels[i].i_limit = channel.i.limit;
+            profile.channels[j].i_set = channel.getISetUnbalanced();
+            profile.channels[j].i_step = channel.i.step;
+            profile.channels[j].i_limit = channel.i.limit;
 
-            profile.channels[i].p_limit = channel.p_limit;
+            profile.channels[j].p_limit = channel.p_limit;
 
-            profile.channels[i].u_delay = channel.prot_conf.u_delay;
-            profile.channels[i].u_level = channel.prot_conf.u_level;
-            profile.channels[i].i_delay = channel.prot_conf.i_delay;
-            profile.channels[i].p_delay = channel.prot_conf.p_delay;
-            profile.channels[i].p_level = channel.prot_conf.p_level;
+            profile.channels[j].u_delay = channel.prot_conf.u_delay;
+            profile.channels[j].u_level = channel.prot_conf.u_level;
+            profile.channels[j].i_delay = channel.prot_conf.i_delay;
+            profile.channels[j].p_delay = channel.prot_conf.p_delay;
+            profile.channels[j].p_level = channel.prot_conf.p_level;
 
-            profile.channels[i].flags.displayValue1 = channel.flags.displayValue1;
-            profile.channels[i].flags.displayValue2 = channel.flags.displayValue2;
-            profile.channels[i].ytViewRate = channel.ytViewRate;
+            profile.channels[j].flags.displayValue1 = channel.flags.displayValue1;
+            profile.channels[j].flags.displayValue2 = channel.flags.displayValue2;
+            profile.channels[j].ytViewRate = channel.ytViewRate;
 
 #ifdef EEZ_PLATFORM_SIMULATOR
-            profile.channels[i].load_enabled = channel.simulator.load_enabled;
-            profile.channels[i].load = channel.simulator.load;
-            profile.channels[i].voltProgExt = channel.simulator.voltProgExt;
+            profile.channels[j].load_enabled = channel.simulator.load_enabled;
+            profile.channels[j].load = channel.simulator.load;
+            profile.channels[j].voltProgExt = channel.simulator.voltProgExt;
 #endif
 
-            profile.channels[i].flags.u_triggerMode = channel.flags.voltageTriggerMode;
-            profile.channels[i].flags.i_triggerMode = channel.flags.currentTriggerMode;
-            profile.channels[i].flags.triggerOutputState = channel.flags.triggerOutputState;
-            profile.channels[i].flags.triggerOnListStop = channel.flags.triggerOnListStop;
-            profile.channels[i].u_triggerValue = trigger::getVoltage(channel);
-            profile.channels[i].i_triggerValue = trigger::getCurrent(channel);
-            profile.channels[i].listCount = list::getListCount(channel);
+            profile.channels[j].flags.u_triggerMode = channel.flags.voltageTriggerMode;
+            profile.channels[j].flags.i_triggerMode = channel.flags.currentTriggerMode;
+            profile.channels[j].flags.triggerOutputState = channel.flags.triggerOutputState;
+            profile.channels[j].flags.triggerOnListStop = channel.flags.triggerOnListStop;
+            profile.channels[j].u_triggerValue = trigger::getVoltage(channel);
+            profile.channels[j].i_triggerValue = trigger::getCurrent(channel);
+            profile.channels[j].listCount = list::getListCount(channel);
 
-            profile.channels[i].flags.currentRangeSelectionMode = channel.flags.currentRangeSelectionMode;
-            profile.channels[i].flags.autoSelectCurrentRange = channel.flags.autoSelectCurrentRange;
+            profile.channels[j].flags.currentRangeSelectionMode = channel.flags.currentRangeSelectionMode;
+            profile.channels[j].flags.autoSelectCurrentRange = channel.flags.autoSelectCurrentRange;
 
-            profile.channels[i].flags.dprogState = channel.flags.dprogState;
-            profile.channels[i].flags.trackingEnabled = channel.flags.trackingEnabled;
-        }
-        else {
-            profile.channels[i].flags.parameters_are_valid = 0;
+            profile.channels[j].flags.dprogState = channel.flags.dprogState;
+            profile.channels[j].flags.trackingEnabled = channel.flags.trackingEnabled;
+
+            if (j != channelsMap[i]) {
+                list::setListsChanged(channel, true);
+            }
+        } else {
+            memcpy(&profile.channels[j], &savedProfile.channels[channelsMap[i]], sizeof(ChannelParameters));
         }
     }
 
     for (int i = 0; i < temp_sensor::MAX_NUM_TEMP_SENSORS; ++i) {
         if (i < temp_sensor::NUM_TEMP_SENSORS) {
-            memcpy(profile.temp_prot + i, &temperature::sensors[i].prot_conf,
-                sizeof(temperature::ProtectionConfiguration));
-        }
-        else {
+            memcpy(profile.temp_prot + i, &temperature::sensors[i].prot_conf, sizeof(temperature::ProtectionConfiguration));
+        } else {
             profile.temp_prot[i].sensor = i;
             if (profile.temp_prot[i].sensor == temp_sensor::AUX) {
                 profile.temp_prot[i].delay = OTP_AUX_DEFAULT_DELAY;
                 profile.temp_prot[i].level = OTP_AUX_DEFAULT_LEVEL;
                 profile.temp_prot[i].state = OTP_AUX_DEFAULT_STATE;
-            }
-            else {
+            } else {
                 profile.temp_prot[i].delay = OTP_CH_DEFAULT_DELAY;
                 profile.temp_prot[i].level = OTP_CH_DEFAULT_LEVEL;
                 profile.temp_prot[i].state = OTP_CH_DEFAULT_STATE;
@@ -353,8 +452,18 @@ bool enableSave(bool enable) {
 
 void doSave() {
     Parameters profile;
-    fillProfile(&profile);
+
+    Parameters *existingProfile = load(0);
+    if (existingProfile) {
+        memcpy(&profile, existingProfile, sizeof(Parameters));
+    } else {
+        memset(&profile, 0, sizeof(Parameters));
+    }
+
+    fillProfile(profile);
+
     persist_conf::saveProfile(0, &profile);
+
 #if OPTION_SD_CARD
     saveProfileListForAllChannels(profile, 0);
 #endif
@@ -393,29 +502,23 @@ void tick() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool checkProfileModuleMatch(Parameters *profile) {
-    for (int i = 0; i < CH_NUM; ++i) {
-        Channel &channel = Channel::get(i);
-        if (profile->channels[i].flags.parameters_are_valid && profile->channels[i].moduleType != g_slots[channel.slotIndex].moduleInfo->moduleType) {
-            return false; // mismatch
-        }
-    }
+bool checkProfileModuleMatch(Parameters &profile) {
     return true;
 }
 
-bool recallFromProfile(Parameters *profile, int location) {
+bool recallFromProfile(Parameters &profile, int location) {
     bool wasSaveProfileEnabled = enableSave(false);
 
     bool result = true;
 
-    if (profile->flags.powerIsUp) {
+    if (profile.flags.powerIsUp) {
         result &= powerUp();
     } else {
         powerDown();
     }
 
     for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-        memcpy(&temperature::sensors[i].prot_conf, profile->temp_prot + i, sizeof(temperature::ProtectionConfiguration));
+        memcpy(&temperature::sensors[i].prot_conf, profile.temp_prot + i, sizeof(temperature::ProtectionConfiguration));
     }
 
     recallChannelsFromProfile(profile, location);
@@ -429,12 +532,7 @@ bool recall(int location, int *err) {
     if (location > 0 && location < NUM_PROFILE_LOCATIONS) {
         Parameters *profile = persist_conf::loadProfile(location);
         if (profile && profile->flags.isValid) {
-            if (!checkProfileModuleMatch(profile)) {
-                *err = SCPI_ERROR_PROFILE_MODULE_MISMATCH;
-                return false;
-            }
-
-            if (recallFromProfile(profile, location)) {
+            if (recallFromProfile(*profile, location)) {
                 save();
                 event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_PROFILE_0 + location);
                 return true;
@@ -478,15 +576,9 @@ bool recallFromFile(const char *filePath, int *err) {
         return false;
     }
 
-    if (!checkProfileModuleMatch(&profile)) {
-        if (err)
-            *err = SCPI_ERROR_PROFILE_MODULE_MISMATCH;
-        return false;
-    }
-
     persist_conf::saveProfile(0, &profile);
 
-    if (!recallFromProfile(&profile, 0)) {
+    if (!recallFromProfile(profile, 0)) {
         // TODO replace with more specific error
         if (err)
             *err = SCPI_ERROR_EXECUTION_ERROR;
@@ -528,7 +620,8 @@ void getSaveName(int location, char *name) {
 bool saveAtLocation(int location, const char *name) {
     if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
         Parameters profile;
-        fillProfile(&profile);
+        memset(&profile, 0, sizeof(Parameters));
+        fillProfile(profile);
 
         if (name) {
             strcpy(profile.name, name);
@@ -564,7 +657,8 @@ bool saveToFile(const char *filePath, int *err) {
     }
 
     Parameters profile;
-    fillProfile(&profile);
+    memset(&profile, 0, sizeof(Parameters));
+    fillProfile(profile);
 
     profile.header.version = PROFILE_VERSION;
     profile.header.checksum = persist_conf::calcChecksum((const persist_conf::BlockHeader *)&profile, sizeof(profile));

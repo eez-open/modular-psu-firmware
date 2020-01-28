@@ -105,10 +105,10 @@ void saveIfDirty();
 void init();
 void tick();
 
-bool checkProfileModuleMatch(Parameters *profile);
+bool checkProfileModuleMatch(Parameters &profile);
 
-void recallChannelsFromProfile(Parameters *profile, int location);
-bool recallFromProfile(Parameters *profile, int location);
+void recallChannelsFromProfile(Parameters &profile, int location);
+bool recallFromProfile(Parameters &profile, int location);
 bool recall(int location, int *err);
 bool recallFromFile(const char *filePath, int *err);
 

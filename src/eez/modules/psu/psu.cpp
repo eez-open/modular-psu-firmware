@@ -497,12 +497,12 @@ bool autoRecall() {
     int location;
     profile::Parameters *profile = loadAutoRecallProfile(&location);
     if (profile) {
-        if (!checkProfileModuleMatch(profile)) {
+        if (!checkProfileModuleMatch(*profile)) {
             event_queue::pushEvent(event_queue::EVENT_WARNING_AUTO_RECALL_MODULE_MISMATCH);
             return false;
         }
 
-        if (profile::recallFromProfile(profile, location)) {
+        if (profile::recallFromProfile(*profile, location)) {
             return true;
         }
     }
@@ -671,15 +671,11 @@ void changePowerState(bool up) {
 
         // auto recall channels parameters from profile
         if (profile) {
-            if (!checkProfileModuleMatch(profile)) {
-                event_queue::pushEvent(event_queue::EVENT_WARNING_AUTO_RECALL_MODULE_MISMATCH);
-            } else {
-                for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-                    memcpy(&temperature::sensors[i].prot_conf, profile->temp_prot + i, sizeof(temperature::ProtectionConfiguration));
-                }
-
-                profile::recallChannelsFromProfile(profile, location);
+            for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
+                memcpy(&temperature::sensors[i].prot_conf, profile->temp_prot + i, sizeof(temperature::ProtectionConfiguration));
             }
+
+            profile::recallChannelsFromProfile(*profile, location);
         }
 
         profile::save();

@@ -83,7 +83,7 @@ void resetChannelList(Channel &channel) {
     g_channelsLists[i].currentListLength = 0;
     g_channelsLists[i].dwellListLength = 0;
 
-    g_channelsLists[i].changed = false;
+    g_channelsLists[i].changed = true;
 
     g_channelsLists[i].count = 1;
 
@@ -622,14 +622,17 @@ bool getCurrentDwellTime(Channel &channel, int32_t &remaining, uint32_t &total) 
 }
 
 void abort() {
+    bool sync = false;
     for (int i = 0; i < CH_NUM; ++i) {
         if (g_execution[i].counter >= 0) {
             g_execution[i].counter = -1;
             channel_dispatcher::outputEnableOnNextSync(Channel::get(i), false);
+            sync = true;
         }
     }
-
-    channel_dispatcher::syncOutputEnable();
+    if (sync) {
+        channel_dispatcher::syncOutputEnable();
+    }
 }
 
 } // namespace list

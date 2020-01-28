@@ -86,7 +86,7 @@ osThreadDef(g_ethernetTask, mainLoop, osPriorityNormal, 0, 1024);
 #pragma GCC diagnostic pop
 #endif
 
-osMessageQDef(g_ethernetMessageQueue, 10, uint32_t);
+osMessageQDef(g_ethernetMessageQueue, 20, uint32_t);
 osMessageQId(g_ethernetMessageQueueId);
 
 static osThreadId g_ethernetTaskHandle;
