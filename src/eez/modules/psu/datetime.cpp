@@ -208,6 +208,10 @@ bool test() {
         g_testResult = TEST_SKIPPED;
     }
 
+    if (g_testResult == TEST_FAILED) {
+        event_queue::pushEvent(event_queue::EVENT_ERROR_INVALID_DATETIME);
+    }
+
     setQuesBits(QUES_TIME, g_testResult != TEST_OK);
 
     return g_testResult != TEST_FAILED && g_testResult != TEST_WARNING;

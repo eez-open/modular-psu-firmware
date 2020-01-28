@@ -534,7 +534,9 @@ bool recall(int location, int *err) {
         if (profile && profile->flags.isValid) {
             if (recallFromProfile(*profile, location)) {
                 save();
-                event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_PROFILE_0 + location);
+                if (location >= 0 && location <= 9) {
+                    event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_PROFILE_0 + location);
+                }
                 return true;
             } else {
                 return false;

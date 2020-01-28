@@ -1072,7 +1072,9 @@ void Channel::syncOutputEnable() {
                     channel.flags.doOutputEnableOnNextSync = 0;
                 } else {
                     channel.flags.outputEnabled = channel.flags.outputEnabledValueOnNextSync;
-                    event_queue::pushEvent((channel.flags.outputEnabled ? event_queue::EVENT_INFO_CH1_OUTPUT_ENABLED : event_queue::EVENT_INFO_CH1_OUTPUT_DISABLED) + channel.channelIndex);
+                    if (channel.flags.outputEnabled || g_isBooted) {
+                        event_queue::pushEvent((channel.flags.outputEnabled ? event_queue::EVENT_INFO_CH1_OUTPUT_ENABLED : event_queue::EVENT_INFO_CH1_OUTPUT_DISABLED) + channel.channelIndex);
+                    }
                 }
             } else {
                 channel.flags.doOutputEnableOnNextSync = 0;
