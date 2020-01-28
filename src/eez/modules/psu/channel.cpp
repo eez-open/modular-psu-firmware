@@ -22,12 +22,12 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include <eez/firmware.h>
 #include <eez/system.h>
 #include <eez/modules/psu/board.h>
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
-#include <eez/modules/psu/init.h>
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/persist_conf.h>

@@ -18,19 +18,14 @@
 
 #include <eez/index.h>
 
-#include <eez/mp.h>
-
 #include <eez/modules/psu/psu.h>
 
 #if OPTION_DISPLAY
 #include <eez/modules/psu/gui/psu.h>
 #endif
 
-#include <eez/modules/psu/init.h>
 #include <eez/gui/gui.h>
 #include <eez/modules/mcu/display.h>
-#include <eez/modules/mcu/touch.h>
-#include <eez/scpi/scpi.h>
 
 #include <eez/gui/document.h>
 
@@ -115,26 +110,6 @@ void ChannelInterface::changeIoExpBit(int subchannelIndex, int io_bit, bool set)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-
-OnSystemStateChangedCallback g_onSystemStateChangedCallbacks[] = {
-    // modules
-#if OPTION_ETHERNET
-    mcu::ethernet::onSystemStateChanged,
-#endif    
-    mcu::touch::onSystemStateChanged,
-
-    // subsystems
-#if OPTION_DISPLAY
-    gui::onSystemStateChanged,
-#endif
-    scpi::onSystemStateChanged,
-    mp::onSystemStateChanged,
-
-    // applications
-    psu::onSystemStateChanged,
-};
-
-int g_numOnSystemStateChangedCallbacks = sizeof(g_onSystemStateChangedCallbacks) / sizeof(OnSystemStateChangedCallback);
 
 static ModuleInfo g_modules[] = {
     { 

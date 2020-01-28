@@ -24,8 +24,7 @@ Thread *g_currentThread;
 osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *argument) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
     DWORD threadId;
-    CreateThread(NULL, thread_def->stacksize, (LPTHREAD_START_ROUTINE)thread_def->pthread,
-                        argument, 0, &threadId);
+    CreateThread(NULL, thread_def->stacksize, (LPTHREAD_START_ROUTINE)thread_def->pthread, argument, 0, &threadId);
     return threadId;
 #elif defined(__EMSCRIPTEN__)
     for (int i = 0; i < MAX_THREADS; ++i) {

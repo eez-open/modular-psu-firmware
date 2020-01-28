@@ -32,7 +32,8 @@ enum State {
 extern State g_state;
 extern char *g_scriptPath;
 
-bool onSystemStateChanged();
+void initMessageQueue();
+void startThread();
 
 void onQueueMessage(uint32_t type, uint32_t param);
 

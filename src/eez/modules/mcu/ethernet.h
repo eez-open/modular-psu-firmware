@@ -26,7 +26,8 @@ namespace eez {
 namespace mcu {
 namespace ethernet {
 
-bool onSystemStateChanged();
+void initMessageQueue();
+void startThread();
 
 struct IPAddress {
     IPAddress() {

@@ -20,12 +20,12 @@
 
 #include <stdio.h>
 
-#include <eez/modules/psu/psu.h>
+#include <eez/firmware.h>
 
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/serial_psu.h>
-
 #include <eez/modules/psu/ethernet.h>
 
 #include <eez/modules/mcu/ethernet.h>

@@ -17,138 +17,10 @@
 */
 
 #include <stdio.h>
-#if defined(EEZ_PLATFORM_SIMULATOR)
-#include <stdlib.h>
-#endif
-
-#if defined(EEZ_PLATFORM_STM32)
-#include <usb_device.h>
-#include <sdmmc.h>
-#include <fatfs.h>
-// #include <eez/platform/stm32/dwt_delay.h>
-#endif
 
 #include <eez/system.h>
-#include <eez/index.h>
-
-#if OPTION_SDRAM
-#include <eez/modules/mcu/sdram.h>
-#endif
-
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/serial_psu.h>
-#include <eez/scpi/scpi.h>
-using namespace eez::psu::serial;
-using namespace eez::scpi;
 
 namespace eez {
-
-SystemState g_systemState;
-int g_systemStatePhase;
-
-static bool g_shutdown = false;
-
-void mainTask(const void *);
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#endif
-
-osThreadDef(g_mainTask, mainTask, osPriorityNormal, 0, 2048);
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic pop
-#endif
-
-osThreadId g_mainTaskHandle;
-
-#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
-void consoleInputTask(const void *);
-osThreadDef(g_consoleInputTask, consoleInputTask, osPriorityNormal, 0, 1024);
-osThreadId g_consoleInputTaskHandle;
-#endif
-
-void setSystemState(SystemState systemState) {
-    g_systemState = systemState;
-
-    g_systemStatePhase = 0;
-
-    while (true) {
-        bool finalPhase = true;
-
-        for (int i = 0; i < g_numOnSystemStateChangedCallbacks; ++i) {
-            if (!g_onSystemStateChangedCallbacks[i]()) {
-                finalPhase = false;
-            }
-        }
-
-        if (finalPhase) {
-            break;
-        }
-
-        g_systemStatePhase++;
-    }
-
-#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
-    g_consoleInputTaskHandle = osThreadCreate(osThread(g_consoleInputTask), nullptr);
-#endif
-}
-
-void mainTask(const void *) {
-#if defined(__EMSCRIPTEN__)
-    if (!g_systemState) {
-        setSystemState(BOOTING);
-    }
-#else
-
-#if OPTION_SDRAM
-    mcu::sdram::init();
-    //mcu::sdram::test();
-#endif
-
-#if defined(EEZ_PLATFORM_STM32)
-    MX_USB_DEVICE_Init();
-#endif
-
-    setSystemState(BOOTING);
-    while (1) {
-        osDelay(1000);
-    }
-#endif
-}
-
-#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
-void consoleInputTask(const void *) {
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_SERIAL_MESSAGE(SERIAL_LINE_STATE_CHANGED, 1), osWaitForever);
-
-    while (1) {
-        int ch = getchar();
-        if (ch == EOF) {
-            break;
-        }
-        Serial.put(ch);
-    }
-}
-#endif
-
-void boot() {
-    g_mainTaskHandle = osThreadCreate(osThread(g_mainTask), nullptr);
-
-    // mainTask(nullptr);
-    osKernelStart();
-
-#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
-    while (!g_shutdown) {
-        osDelay(100);
-    }
-    setSystemState(SHUTING_DOWN);
-#endif
-}
-
-void shutdown() {
-    g_shutdown = true;
-}
 
 uint32_t millis() {
 #if defined(EEZ_PLATFORM_STM32)
@@ -173,7 +45,6 @@ void delay(uint32_t millis) {
 
 uint32_t micros() {
 #if defined(EEZ_PLATFORM_STM32)	
-    // return DWT_micros();
     return millis() * 1000;
 #endif
 
@@ -184,10 +55,6 @@ uint32_t micros() {
 
 void delayMicroseconds(uint32_t microseconds) {
 #if defined(EEZ_PLATFORM_STM32)
-	// DWT_Delay_us(microseconds);
-
-    // delay((microseconds + 500) / 1000);
-
 	while (microseconds--) {
 		// 216 NOP's
 

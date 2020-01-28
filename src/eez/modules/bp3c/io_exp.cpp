@@ -143,9 +143,9 @@ void switchChannelCoupling(int channelCoupling) {
 void hardResetModules() {
 #ifdef EEZ_PLATFORM_STM32
     io_exp::writeToOutputPort(0b00000000);
-    osDelay(5);
+    delay(5);
     io_exp::writeToOutputPort(0b10000000);
-	osDelay(5);
+	delay(5);
 #endif
 }
 

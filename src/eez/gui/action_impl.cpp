@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 
+#include <eez/firmware.h>
 #include <eez/system.h>
 
 #include <eez/gui/dialogs.h>
@@ -192,11 +193,6 @@ void action_cancel() {
 
 void action_later() {
     dialogLater();
-}
-
-void action_stand_by() {
-	popPage();
-    standBy();
 }
 
 void action_show_previous_page() {
@@ -725,11 +721,6 @@ void action_sys_settings_encoder_toggle_confirmation_mode() {
     #endif
 }
 
-void action_turn_display_off() {
-    popPage();    
-    turnDisplayOff();
-}
-
 void action_ch_settings_trigger_edit_trigger_mode() {
     ((ChSettingsTriggerPage *)getActivePage())->editTriggerMode();
 }
@@ -841,17 +832,28 @@ void action_show_stand_by_menu() {
 }
 
 void action_reset() {
-    eez::gui::reset();
+    popPage();
+    eez::reset();
 }
 
-void hard_reset() {
-#if defined(EEZ_PLATFORM_STM32)
-    NVIC_SystemReset();
-#endif
+void action_stand_by() {
+	popPage();
+    eez::standBy();
 }
 
 void action_hard_reset() {
-    areYouSure(hard_reset);
+    popPage();
+    yesNoDialog(PAGE_ID_YES_NO, "Do you want to reset?", eez::hardReset, nullptr, nullptr);
+}
+
+void action_shutdown() {
+    popPage();
+    yesNoDialog(PAGE_ID_YES_NO, "Do you want to shutdown?", eez::shutdown, nullptr, nullptr);
+}
+
+void action_turn_display_off() {
+    popPage();    
+    psu::persist_conf::setDisplayState(0);
 }
 
 void action_ch_settings_adv_ranges_select_mode() {
@@ -985,6 +987,10 @@ void action_test() {
 }
 
 void action_user_switch_clicked() {
+	if (g_shutdownInProgress) {
+		return;
+	}
+
 #if EEZ_PLATFORM_SIMULATOR
     AppContext *saved = g_appContext;
     g_appContext = &psu::gui::g_psuAppContext;

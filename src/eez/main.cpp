@@ -17,12 +17,11 @@
  */
 
 #include <assert.h>
+#include <stdio.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
-
 #include <stm32f7xx_hal.h>
-
 #include <adc.h>
 #include <crc.h>
 #include <dac.h>
@@ -40,26 +39,131 @@
 #include <tim.h>
 #include <usart.h>
 #include <usb_device.h>
-
-#include "FreeRTOS.h"
-
-#include <eez/platform/stm32/dwt_delay.h>
 #endif
 
-#include <eez/system.h>
+#include <eez/firmware.h>
 #include <eez/memory.h>
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/init.h>
+#include <eez/scpi/scpi.h>
 
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/serial_psu.h>
 #if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
 #endif
 
+ ////////////////////////////////////////////////////////////////////////////////
+
+#if !defined(__EMSCRIPTEN__)
+
+void mainTask(const void *);
+
+#if defined(EEZ_PLATFORM_STM32)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wwrite-strings"
+#endif
+
+osThreadDef(g_mainTask, mainTask, osPriorityNormal, 0, 2048);
+
+#if defined(EEZ_PLATFORM_STM32)
+#pragma GCC diagnostic pop
+#endif
+
+osThreadId g_mainTaskHandle;
+
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+
+#if defined(EEZ_PLATFORM_STM32)
+extern "C" void SystemClock_Config(void);
+#endif
+
+#ifdef __EMSCRIPTEN__
+void startEmscripten();
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+
+int main(int argc, char **argv) {
+    assert(MEMORY_END - MEMORY_BEGIN <= MEMORY_SIZE);
+
+#ifdef __EMSCRIPTEN__
+
+    startEmscripten();
+
+#else
+
+#if defined(EEZ_PLATFORM_STM32)
+    HAL_Init();
+    SystemClock_Config();
+    MX_GPIO_Init();
+    MX_DMA_Init();
+    MX_CRC_Init();
+    MX_DAC_Init();
+    MX_DMA2D_Init();
+    MX_FMC_Init();
+    MX_I2C1_Init();
+    MX_LTDC_Init();
+    MX_RNG_Init();
+    MX_RTC_Init();
+    MX_SPI2_Init();
+    MX_SPI4_Init();
+    MX_SPI5_Init();
+    MX_TIM6_Init();
+    MX_TIM8_Init();
+    MX_TIM12_Init();
+#endif
+
+    g_mainTaskHandle = osThreadCreate(osThread(g_mainTask), nullptr);
+
+    osKernelStart();
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    while (!eez::g_shutdown) {
+#else
+    while (true) {
+#endif
+        osDelay(100);
+    }
+
+#endif
+
+    return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
+void consoleInputTask(const void *);
+osThreadDef(g_consoleInputTask, consoleInputTask, osPriorityNormal, 0, 1024);
+osThreadId g_consoleInputTaskHandle;
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+
+#if !defined(__EMSCRIPTEN__)
+
+void mainTask(const void *) {
+    eez::boot();
+
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
+    g_consoleInputTaskHandle = osThreadCreate(osThread(g_consoleInputTask), nullptr);
+#endif
+
+    while (true) {
+        osDelay(1000);
+    }
+}
+
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+
 #if defined(EEZ_PLATFORM_STM32)
 extern "C" void SystemClock_Config(void);
 
-extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName ) {
+extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName) {
     while (true) {}
 }
 
@@ -67,11 +171,11 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     int slotIndex = -1;
 
     if (GPIO_Pin == SPI2_IRQ_Pin) {
-    	slotIndex = 0;
+        slotIndex = 0;
     } else if (GPIO_Pin == SPI4_IRQ_Pin) {
-    	slotIndex = 1;
+        slotIndex = 1;
     } else if (GPIO_Pin == SPI5_IRQ_Pin) {
-    	slotIndex = 2;
+        slotIndex = 2;
     }
 
 #if OPTION_SD_CARD
@@ -80,12 +184,26 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         return;
     }
 #endif
-    
+
     if (slotIndex != -1) {
-    	osMessagePut(eez::psu::g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_SPI_IRQ, slotIndex), 0);
+        osMessagePut(eez::psu::g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_SPI_IRQ, slotIndex), 0);
     }
 }
+#endif
 
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
+void consoleInputTask(const void *) {
+    using namespace eez::scpi;
+    osMessagePut(eez::scpi::g_scpiMessageQueueId, SCPI_QUEUE_SERIAL_MESSAGE(SERIAL_LINE_STATE_CHANGED, 1), osWaitForever);
+
+    while (1) {
+        int ch = getchar();
+        if (ch == EOF) {
+            break;
+        }
+        Serial.put(ch);
+    }
+}
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -103,26 +221,26 @@ extern void eez_system_tick();
 static int g_initialized = false;
 
 // clang-format off
-void mount_file_system() {
-	EM_ASM(
-		FS.mkdir("/eez_modular_firmware"); 
-		FS.mount(IDBFS, {}, "/eez_modular_firmware");
+void mountFileSystem() {
+    EM_ASM(
+        FS.mkdir("/eez_modular_firmware");
+    FS.mount(IDBFS, {}, "/eez_modular_firmware");
 
-		//Module.print("start file sync..");
+    //Module.print("start file sync..");
 
-		//flag to check when data are synchronized
-		Module.syncdone = 0;
+    //flag to check when data are synchronized
+    Module.syncdone = 0;
 
-		FS.syncfs(true, function(err) {
-			assert(!err);
-			//Module.print("end file sync..");
-			Module.syncdone = 1;
-		});
-	);
+    FS.syncfs(true, function(err) {
+        assert(!err);
+        //Module.print("end file sync..");
+        Module.syncdone = 1;
+    });
+    );
 }
 // clang-format on
 
-void main_loop() {
+void mainLoop() {
     if (emscripten_run_script_int("Module.syncdone") == 1) {
         if (!g_initialized) {
             g_initialized = true;
@@ -143,8 +261,8 @@ void main_loop() {
                 if (Module.syncdone) {
                     //Module.print("Start File sync..");
                     Module.syncdone = 0;
-                    
-                    FS.syncfs(false, function (err) {
+
+                    FS.syncfs(false, function(err) {
                         assert(!err);
                         //Module.print("End File sync..");
                         Module.syncdone = 1;
@@ -155,44 +273,9 @@ void main_loop() {
         }
     }
 }
-#endif
 
-int main(int argc, char **argv) {
-    assert(MEMORY_END - MEMORY_BEGIN <= MEMORY_SIZE);
-
-#if defined(EEZ_PLATFORM_STM32)
-    HAL_Init();
-
-    SystemClock_Config();
-
-    // DWT_Delay_Init();
-
-    MX_GPIO_Init();
-    MX_DMA_Init();
-    MX_CRC_Init();
-    MX_DAC_Init();
-    MX_DMA2D_Init();
-    MX_FMC_Init();
-    MX_I2C1_Init();
-    MX_LTDC_Init();
-    MX_RNG_Init();
-    MX_RTC_Init();
-
-    MX_SPI2_Init();
-    MX_SPI4_Init();
-    MX_SPI5_Init();
-
-    MX_TIM6_Init();
-    MX_TIM8_Init();
-    MX_TIM12_Init();
-#endif
-
-#ifdef __EMSCRIPTEN__
-    mount_file_system();
-    emscripten_set_main_loop(main_loop, 4, true);
-#else
-    eez::boot();
-#endif
-
-    return 0;
+void startEmscripten() {
+    mountFileSystem();
+    emscripten_set_main_loop(mainLoop, 4, true);
 }
+#endif

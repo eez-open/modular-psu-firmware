@@ -487,12 +487,13 @@ void sync() {
     }
 
     if (g_displayState == TURNING_ON) {
+        uint32_t max = __HAL_TIM_GET_AUTORELOAD(&htim12);
+        max = psu::persist_conf::devConf.displayBrightness * max / 20;
         int32_t diff = millis() - g_displayStateTransitionStartTime;
         if (diff >= CONF_TURN_ON_OFF_ANIMATION_DURATION) {
             g_displayState = ON;
+            __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, max);
         } else {
-            uint32_t max = __HAL_TIM_GET_AUTORELOAD(&htim12);
-            max = psu::persist_conf::devConf.displayBrightness * max / 20;
             __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, (uint32_t)remapQuad(1.0f * diff / CONF_TURN_ON_OFF_ANIMATION_DURATION, 0.0f, 0.0f, 1.0f, 1.0f * max));
         }
     }

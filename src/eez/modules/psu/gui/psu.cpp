@@ -18,6 +18,7 @@
 
 #if OPTION_DISPLAY
 
+#include <eez/firmware.h>
 #include <eez/modules/psu/psu.h>
 
 #include <eez/modules/psu/calibration.h>
@@ -192,7 +193,7 @@ void PsuAppContext::stateManagment() {
 
     // turn the screen off if power is down and system is booted
     if (!psu::isPowerUp()) {
-    	if (psu::g_isBooted && getActivePageId() != INTERNAL_PAGE_ID_NONE) {
+    	if (g_isBooted && !g_shutdownInProgress && getActivePageId() != INTERNAL_PAGE_ID_NONE) {
     		showPage(INTERNAL_PAGE_ID_NONE);
     		eez::mcu::display::turnOff();
     	}
@@ -1147,7 +1148,7 @@ Unit getCurrentEncoderUnit() {
 }
 
 void onEncoder(int counter, bool clicked) {
-    if (isFrontPanelLocked()) {
+    if (g_shutdownInProgress || isFrontPanelLocked()) {
         return;
     }
 

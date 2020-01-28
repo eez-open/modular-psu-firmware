@@ -26,10 +26,6 @@
 
 namespace eez {
 
-typedef bool (*OnSystemStateChangedCallback)();
-extern OnSystemStateChangedCallback g_onSystemStateChangedCallbacks[];
-extern int g_numOnSystemStateChangedCallbacks;
-
 enum TestResult {
     TEST_NONE,
     TEST_FAILED,
@@ -227,8 +223,6 @@ static const int NUM_SLOTS = 3;
 extern SlotInfo g_slots[NUM_SLOTS];
 
 #if OPTION_DISPLAY
-
-typedef bool (*OnSystemStateChangedCallback)();
 
 namespace gui {
 

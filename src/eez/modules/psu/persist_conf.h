@@ -191,6 +191,8 @@ extern const DeviceConfiguration &devConf;
 void init();
 void tick();
 
+bool saveAllDirtyBlocks(); // returns true if there are still more dirty blocks
+
 bool checkBlock(const BlockHeader *block, uint16_t size, uint16_t version);
 uint32_t calcChecksum(const BlockHeader *block, uint16_t size);
 

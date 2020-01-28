@@ -1467,6 +1467,8 @@ Tune g_tunes[] = {
 #endif
 
 static int g_playNextTuneIndex = -1;
+static int g_currentTuneIndex = -1;
+static uint32_t g_currentTuneStartPlayTime;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1475,7 +1477,7 @@ static int g_playNextTuneIndex = -1;
 #if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
 static const uint32_t g_memoryForTuneSamplesSize = 256000;
 int16_t g_memoryForTuneSamples[g_memoryForTuneSamplesSize];
-SDL_AudioDeviceID g_dev;
+SDL_AudioDeviceID g_audioDevice;
 #elif defined(EEZ_PLATFORM_STM32)
 static const uint32_t g_memoryForTuneSamplesSize = SOUND_TUNES_MEMORY_SIZE;
 uint8_t *g_memoryForTuneSamples = SOUND_TUNES_MEMORY;
@@ -1557,8 +1559,8 @@ void init() {
 
 	SDL_AudioSpec obtainedSpec;
 
-	g_dev = SDL_OpenAudioDevice(NULL, 0, &desiredSpec, &obtainedSpec, 0);
-	if (g_dev == 0) {
+	g_audioDevice = SDL_OpenAudioDevice(NULL, 0, &desiredSpec, &obtainedSpec, 0);
+	if (g_audioDevice == 0) {
 		printf("Failed to open audio: %s\n", SDL_GetError());
 	}
 #endif
@@ -1569,8 +1571,8 @@ void startPlay(int iTune) {
     Tune &tuneDef = g_tunes[iTune];
 	initTune(tuneDef);
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    SDL_QueueAudio(g_dev, tuneDef.pSamples, tuneDef.numSamples * 2);
-    SDL_PauseAudioDevice(g_dev, 0);
+    SDL_QueueAudio(g_audioDevice, tuneDef.pSamples, tuneDef.numSamples * 2);
+    SDL_PauseAudioDevice(g_audioDevice, 0);
 #elif defined(EEZ_PLATFORM_STM32)
 	HAL_DAC_Stop_DMA(&hdac, DAC_CHANNEL_1);
 	HAL_TIM_Base_Stop(&htim6);
@@ -1585,21 +1587,34 @@ void startPlay(int iTune) {
 
 void tick() {
 #if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
-	if (!g_dev) {
+	if (!g_audioDevice) {
 		return;
 	}
 #endif
 
-	if (g_playNextTuneIndex != -1) {
-    	startPlay(g_playNextTuneIndex);
+	if (g_currentTuneIndex != -1) {
+		Tune &tuneDef = g_tunes[g_currentTuneIndex];
+		uint32_t duration = tuneDef.numSamples * 1000 / tuneDef.sampleRate;
+		if (millis() - g_currentTuneStartPlayTime > duration) {
+			g_currentTuneIndex = -1;
+		}
+	}
+
+	int iTune = g_playNextTuneIndex;
+	if (iTune != -1) {
+		g_currentTuneIndex = g_playNextTuneIndex;
 		g_playNextTuneIndex = -1;
+
+    	startPlay(g_currentTuneIndex);
+
+        g_currentTuneStartPlayTime = millis();
 	}
 }
 
 static void playTune(int iTune) {
-	if (iTune > g_playNextTuneIndex) {
+	if (iTune > g_playNextTuneIndex && iTune > g_currentTuneIndex) {
 		g_playNextTuneIndex = iTune;
-    	if (osThreadGetId() == scpi::g_scpiTaskHandle) {
+    	if (osThreadGetId() == scpi::g_scpiTaskHandle || osThreadGetId() == psu::g_psuTaskHandle || g_playNextTuneIndex == POWER_UP_TUNE) {
 			tick();
 		}
 	}

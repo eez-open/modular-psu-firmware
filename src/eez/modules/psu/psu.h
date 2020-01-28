@@ -50,12 +50,34 @@ void generateError(int16_t error);
 /// PSU firmware.
 namespace psu {
 
-void boot();
+void startThread();
+
+extern osThreadId g_psuTaskHandle;
+extern osMessageQId g_psuMessageQueueId;
+
+#define PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE 1
+#define PSU_QUEUE_MESSAGE_TYPE_RESET 2
+#define PSU_QUEUE_MESSAGE_SPI_IRQ 3
+#define PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL 4
+#define PSU_QUEUE_TRIGGER_START_IMMEDIATELY 5
+#define PSU_QUEUE_TRIGGER_ABORT 6
+#define PSU_QUEUE_TRIGGER_CHANNEL_SAVE_AND_DISABLE_OE 7
+#define PSU_QUEUE_TRIGGER_CHANNEL_RESTORE_OE 7
+#define PSU_QUEUE_SET_COUPLING_TYPE 8
+#define PSU_QUEUE_SET_TRACKING_CHANNELS 9
+#define PSU_QUEUE_CHANNEL_OUTPUT_ENABLE 10
+#define PSU_QUEUE_SYNC_OUTPUT_ENABLE 11
+#define PSU_QUEUE_MESSAGE_TYPE_HARD_RESET 12
+#define PSU_QUEUE_MESSAGE_TYPE_SHUTDOWN 13
+
+#define PSU_QUEUE_MESSAGE(type, param) (((param) << 4) | (type))
+#define PSU_QUEUE_MESSAGE_TYPE(message) ((message) & 0xF)
+#define PSU_QUEUE_MESSAGE_PARAM(param) ((message) >> 4)
+
+bool measureAllAdcValuesOnChannel(int channelIndex);
 
 void initChannels();
 bool testChannels();
-
-extern bool g_isBooted;
 
 bool powerUp();
 void powerDown();
@@ -64,9 +86,9 @@ bool isPowerUp();
 void changePowerState(bool up);
 void powerDownBySensor();
 
-bool reset();
+bool psuReset();
 
-bool test();
+bool autoRecall();
 
 void onProtectionTripped();
 

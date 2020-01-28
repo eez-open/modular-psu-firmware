@@ -45,7 +45,7 @@ static EventQueueHeader g_eventQueue;
 
 static Event g_events[MAX_EVENTS];
 
-static const int MAX_EVENTS_TO_PUSH = 10;
+static const int MAX_EVENTS_TO_PUSH = 50;
 static int16_t g_eventsToPush[MAX_EVENTS_TO_PUSH];
 static uint8_t g_eventsToPushHead = 0;
 

@@ -56,6 +56,7 @@ extern struct netif gnetif;
 #endif
 #endif
 
+#include <eez/firmware.h>
 #include <eez/system.h>
 #include <eez/scpi/scpi.h>
 #include <eez/modules/mcu/ethernet.h>
@@ -90,17 +91,12 @@ osMessageQId(g_ethernetMessageQueueId);
 
 static osThreadId g_ethernetTaskHandle;
 
-bool onSystemStateChanged() {
-    if (g_systemState == SystemState::BOOTING) {
-        if (eez::g_systemStatePhase == 0) {
-        	g_ethernetMessageQueueId = osMessageCreate(osMessageQ(g_ethernetMessageQueue), NULL);
-            return false;
-        } else if (eez::g_systemStatePhase == 1) {
-            g_ethernetTaskHandle = osThreadCreate(osThread(g_ethernetTask), nullptr);
-        }
-    }
+void initMessageQueue() {
+    g_ethernetMessageQueueId = osMessageCreate(osMessageQ(g_ethernetMessageQueue), NULL);
+}
 
-    return true;
+void startThread() {
+    g_ethernetTaskHandle = osThreadCreate(osThread(g_ethernetTask), nullptr);
 }
 
 enum {
@@ -720,7 +716,9 @@ int writeBuffer(const char *buffer, uint32_t length) {
 }
 
 void pushEvent(int16_t eventId) {
-    osMessagePut(g_ethernetMessageQueueId, ((uint32_t)(uint16_t)eventId << 8) | QUEUE_MESSAGE_PUSH_EVENT, 0);
+    if (!g_shutdownInProgress) {
+        osMessagePut(g_ethernetMessageQueueId, ((uint32_t)(uint16_t)eventId << 8) | QUEUE_MESSAGE_PUSH_EVENT, 0);
+    }
 }
 
 } // namespace ethernet

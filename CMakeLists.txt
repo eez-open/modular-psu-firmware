@@ -84,6 +84,7 @@ set(src_files)
 set(header_files)
 
 set(src_eez
+    src/eez/firmware.cpp
     src/eez/debug.cpp
     src/eez/index.cpp
     src/eez/main.cpp
@@ -97,6 +98,7 @@ set(src_eez
 )
 list (APPEND src_files ${src_eez})
 set(header_eez
+    src/eez/firmware.h
     src/eez/debug.h
     src/eez/file_type.h
     src/eez/index.h
@@ -124,7 +126,6 @@ set(src_eez_modules_psu
     src/eez/modules/psu/ethernet.cpp
     src/eez/modules/psu/event_queue.cpp
     src/eez/modules/psu/idle.cpp
-    src/eez/modules/psu/init.cpp
     src/eez/modules/psu/io_pins.cpp
     src/eez/modules/psu/lcd.cpp
     src/eez/modules/psu/list_program.cpp
@@ -160,7 +161,6 @@ set(header_eez_modules_psu
     src/eez/modules/psu/ethernet.h
     src/eez/modules/psu/event_queue.h
     src/eez/modules/psu/idle.h
-    src/eez/modules/psu/init.h
     src/eez/modules/psu/io_pins.h
     src/eez/modules/psu/list_program.h
     src/eez/modules/psu/ntp.h

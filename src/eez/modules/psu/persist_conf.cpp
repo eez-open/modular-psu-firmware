@@ -411,7 +411,9 @@ void init() {
     }
 }
 
-void tick() {
+bool saveAll(bool force) {
+    bool moreDirtyBlocks = false;
+
     uint32_t tickCountMillis = millis();
 
     // write dirty device configuration blocks
@@ -434,7 +436,7 @@ void tick() {
         if (
             g_devConfBlocks[i].dirty && 
             g_devConfBlocks[i].numSaveErrors < CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED && 
-			tickCountMillis - g_devConfBlocks[i].lastSaveTickCount >= g_devConfBlocks[i].minTickCountsBetweenSaves
+			(force || (tickCountMillis - g_devConfBlocks[i].lastSaveTickCount >= g_devConfBlocks[i].minTickCountsBetweenSaves))
         ) {
         	memset(blockData, 0, blockStorageSize);
             memcpy(blockData + sizeof(BlockHeader), (uint8_t *)&devConf + blockStart, blockSize);
@@ -450,6 +452,8 @@ void tick() {
             } else {
                 if (++g_devConfBlocks[i].numSaveErrors == CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED) {
                     event_queue::pushEvent(event_queue::EVENT_ERROR_SAVE_DEV_CONF_BLOCK_0 + i);
+                } else {
+                    moreDirtyBlocks = true;
                 }
             }
         }
@@ -467,10 +471,22 @@ void tick() {
             } else {
                 if (++g_profilesCache[i].numSaveErrors == CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED) {
                     event_queue::pushEvent(event_queue::EVENT_ERROR_SAVE_PROFILE_0 + i);
+                } else {
+                    moreDirtyBlocks = true;
                 }
             }
         }
     }
+
+    return moreDirtyBlocks;
+}
+
+void tick() {
+    saveAll(false);
+}
+
+bool saveAllDirtyBlocks() {
+    return saveAll(true);
 }
 
 bool isSystemPasswordValid(const char *new_password, size_t new_password_len, int16_t &err) {

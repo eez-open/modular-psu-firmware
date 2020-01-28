@@ -43,10 +43,8 @@ void errorMessage(data::Value value);
 void errorMessageWithAction(data::Value value, void (*action)(int param), const char *actionLabel, int actionParam);
 void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel);
 
-void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(),
-                 void (*no_callback)(), void (*cancel_callback)());
-void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(),
-                void (*later_callback)() = 0);
+void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)());
+void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*later_callback)() = 0);
 void areYouSure(void (*yes_callback)());
 void areYouSureWithMessage(const char *message, void (*yes_callback)());
 

@@ -26,7 +26,6 @@
 #endif
 
 #include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/init.h>
 #include <eez/modules/psu/serial_psu.h>
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/ontime.h>

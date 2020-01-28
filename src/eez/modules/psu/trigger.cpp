@@ -18,7 +18,6 @@
 
 #include <eez/modules/psu/psu.h>
 
-#include <eez/modules/psu/init.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/list_program.h>

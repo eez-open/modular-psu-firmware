@@ -26,10 +26,6 @@ namespace eez {
 namespace mcu {
 namespace touch {
 
-bool onSystemStateChanged() {
-    return true;
-}
-
 void read(bool &isPressed, int &x, int &y) {
     readEvents();
 

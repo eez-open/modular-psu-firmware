@@ -26,7 +26,8 @@
 namespace eez {
 namespace scpi {
 
-bool onSystemStateChanged();
+void initMessageQueue();
+void startThread();
 
 void resetContext();
 void generateError(int error);
@@ -41,10 +42,10 @@ extern osMessageQId g_scpiMessageQueueId;
 #define SCPI_QUEUE_MESSAGE_TARGET_ETHERNET 2
 #define SCPI_QUEUE_MESSAGE_TARGET_MP 3
 
-#define SCPI_QUEUE_MESSAGE(target, type, param) (((target) << 30) | (((param) << 4) & ~0xC0000000) | (type))
+#define SCPI_QUEUE_MESSAGE(target, type, param) (((target) << 30) | (((param) << 8) & ~0xC0000000) | (type))
 #define SCPI_QUEUE_MESSAGE_TARGET(message) ((message) >> 30)
-#define SCPI_QUEUE_MESSAGE_TYPE(message) ((message) & 0xF)
-#define SCPI_QUEUE_MESSAGE_PARAM(param) (((message) & 0x3FFFFFFF) >> 4)
+#define SCPI_QUEUE_MESSAGE_TYPE(message) ((message) & 0xFF)
+#define SCPI_QUEUE_MESSAGE_PARAM(param) (((message) & 0x3FFFFFFF) >> 8)
 
 #define SCPI_QUEUE_SERIAL_MESSAGE(type, param) SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_SERIAL, type, param)
 #define SCPI_QUEUE_ETHERNET_MESSAGE(type, param) SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_ETHERNET, type, param)
@@ -65,8 +66,11 @@ extern osMessageQId g_scpiMessageQueueId;
 #define SCPI_QUEUE_MESSAGE_FILE_MANAGER_DELETE_FILE 13
 #define SCPI_QUEUE_MESSAGE_DLOG_UPLOAD_FILE 14
 #define SCPI_QUEUE_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE 15
+#define SCPI_QUEUE_MESSAGE_TYPE_SHUTDOWN 16
 
 extern char g_listFilePath[CH_MAX][MAX_PATH_LENGTH];
+
+bool isThreadAlive();
 
 }
 }

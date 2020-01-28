@@ -28,16 +28,6 @@ namespace eez {
 namespace mcu {
 namespace touch {
 
-bool onSystemStateChanged() {
-    if (g_systemState == SystemState::BOOTING) {
-        if (g_systemStatePhase == 0) {
-            // TODO check if any initialization of touch interface is required
-        }
-    }
-
-    return true;
-}
-
 static const int CONF_TOUCH_DEBOUNCE_THRESHOLD = 25;
 
 static const int CONF_TOUCH_Z1_THRESHOLD = 100;

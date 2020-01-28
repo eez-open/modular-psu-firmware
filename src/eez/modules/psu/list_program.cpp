@@ -22,6 +22,7 @@
 
 #include <scpi/scpi.h>
 
+#include <eez/firmware.h>
 #include <eez/scpi/scpi.h>
 
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -349,7 +350,7 @@ bool loadList(int iChannel, const char *filePath, int *err) {
 
 bool saveList(int iChannel, const char *filePath, int *err) {
 #if OPTION_SD_CARD
-    if (osThreadGetId() != g_scpiTaskHandle) {
+    if (!g_shutdownInProgress && osThreadGetId() != g_scpiTaskHandle) {
         strcpy(&g_listFilePath[iChannel][0], filePath);
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST, iChannel), osWaitForever);
         return true;

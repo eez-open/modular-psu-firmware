@@ -20,10 +20,14 @@
 
 #include <SDL.h>
 
+#include <eez/firmware.h>
 #include <eez/system.h>
 #include <eez/modules/mcu/encoder.h>
 
+extern void shutdown();
+
 namespace eez {
+
 namespace platform {
 namespace simulator {
 

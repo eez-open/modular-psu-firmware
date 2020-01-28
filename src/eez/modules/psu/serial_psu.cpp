@@ -18,8 +18,8 @@
 
 #include <stdio.h>
 
+#include <eez/firmware.h>
 #include <eez/modules/psu/psu.h>
-
 #include <eez/modules/psu/serial_psu.h>
 
 #define CONF_CHUNK_SIZE CONF_SERIAL_BUFFER_SIZE
@@ -138,8 +138,6 @@ void init() {
 #ifdef EEZ_PLATFORM_SIMULATOR
     Serial.print("EEZ BB3 software simulator ver. ");
     Serial.println(FIRMWARE);
-#else
-    Serial.println("EEZ BB3 serial com ready");
 #endif
 
     g_testResult = TEST_OK;

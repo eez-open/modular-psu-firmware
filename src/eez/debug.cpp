@@ -30,8 +30,9 @@
 // TODO these includes should not be inside apps/psu
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/datetime.h>
-
+#if OPTION_DISPLAY
 #include <eez/gui/assets.h>
+#endif
 
 using namespace eez::psu;
 
@@ -55,6 +56,7 @@ static uint32_t g_startPosition = 0;
 static const uint32_t TRACE_LOG_PAGE_SIZE = 10;
 
 void addCharToLog(char ch) {
+#if OPTION_DISPLAY
     // wrap line if doesn't fit
     static gui::font::Font g_traceLogFont;
     static uint16_t lineWidth = 0;
@@ -70,6 +72,7 @@ void addCharToLog(char ch) {
             addCharToLog(0);
         }
     }
+#endif
 
     *(g_log + g_head) = ch;
 

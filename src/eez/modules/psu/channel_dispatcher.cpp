@@ -20,7 +20,6 @@
 #include <assert.h>
 
 #include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/init.h>
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>

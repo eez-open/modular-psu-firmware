@@ -42,7 +42,7 @@ namespace eez {
 
 namespace gui {
 
-bool onSystemStateChanged();
+void startThread();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -78,9 +78,10 @@ void executeAction(int actionId);
 void showWelcomePage();
 void showStandbyPage();
 void showEnteringStandbyPage();
+void showSavingPage();
+void showShutdownPage();
 
 void standBy();
-void turnDisplayOff();
 void reset();
 
 void lockFrontPanel();

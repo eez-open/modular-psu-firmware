@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 
+#include <eez/firmware.h>
 #include <eez/system.h>
 
 #include <eez/gui/app_context.h>
@@ -259,6 +260,10 @@ void processTouchEvent(EventType type) {
 }
 
 void touchHandling() {
+	if (g_shutdownInProgress) {
+		return;
+	}
+
     using namespace eez::gui::touch;
 
     if (g_eventType != EVENT_TYPE_TOUCH_NONE) {

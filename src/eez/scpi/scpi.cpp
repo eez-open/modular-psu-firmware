@@ -82,28 +82,33 @@ char g_listFilePath[CH_MAX][MAX_PATH_LENGTH];
 
 uint32_t g_timer1LastTickCount;
 
-bool onSystemStateChanged() {
-    if (eez::g_systemState == eez::SystemState::BOOTING) {
-        if (eez::g_systemStatePhase == 0) {
-            g_scpiMessageQueueId = osMessageCreate(osMessageQ(g_scpiMessageQueue), NULL);
-            return false;
-        } else {
-            g_timer1LastTickCount = micros();
-            g_scpiTaskHandle = osThreadCreate(osThread(g_scpiTask), nullptr);
-        }
-    }
+static bool g_shutingDown;
+static bool g_isThreadAlive;
 
-    return true;
+void initMessageQueue() {
+    g_scpiMessageQueueId = osMessageCreate(osMessageQ(g_scpiMessageQueue), NULL);
+}
+
+void startThread() {
+    g_isThreadAlive = true;
+    g_timer1LastTickCount = micros();
+    g_scpiTaskHandle = osThreadCreate(osThread(g_scpiTask), nullptr);
 }
 
 void oneIter();
 
 void mainLoop(const void *) {
 #ifdef __EMSCRIPTEN__
-    oneIter();
-#else
-    while (1) {
+    if (g_isThreadAlive) {
         oneIter();
+    }
+#else
+    while (g_isThreadAlive) {
+    	oneIter();
+    }
+
+    while (true) {
+    	osDelay(1);
     }
 #endif
 }
@@ -133,6 +138,8 @@ void oneIter() {
                 }
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_DELETE_PROFILE_LISTS) {
                 profile::deleteProfileLists(param);
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_SHUTDOWN) {
+                g_shutingDown = true;
             }
 #if defined(EEZ_PLATFORM_STM32) && OPTION_SD_CARD
 			else if (type == SCPI_QUEUE_MESSAGE_TYPE_SD_DETECT_IRQ) {
@@ -209,6 +216,10 @@ void oneIter() {
 #endif // OPTION_SD_CARD
         }
     } else {
+        if (g_shutingDown) {
+            g_isThreadAlive = false;
+            return;
+        }
     	uint32_t tickCount = micros();
     	int32_t diff = tickCount - g_timer1LastTickCount;
 
@@ -245,6 +256,8 @@ void oneIter() {
         psu::debug::tick(tickCount);
 #endif
     }
+
+    return;
 }
 
 void resetContext(scpi_t *context) {
@@ -279,6 +292,10 @@ void generateError(int error) {
     }
 #endif
     event_queue::pushEvent(error);
+}
+
+bool isThreadAlive() {
+    return g_isThreadAlive;
 }
 
 }

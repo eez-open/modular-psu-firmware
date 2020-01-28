@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/firmware.h>
+
 #include <eez/modules/psu/psu.h>
 
 #include <eez/modules/mcu/eeprom.h>

@@ -371,6 +371,13 @@ void save(bool immediately) {
     }
 }
 
+void saveIfDirty() {
+    if (g_profileDirty) {
+        doSave();
+        g_profileDirty = false;
+    }
+}
+
 void init() {
     for (int profileIndex = 0; profileIndex < NUM_PROFILE_LOCATIONS; profileIndex++) {
         persist_conf::loadProfile(profileIndex);

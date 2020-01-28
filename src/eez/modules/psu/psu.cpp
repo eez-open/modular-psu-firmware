@@ -16,45 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/modules/psu/psu.h>
-
+#include <eez/firmware.h>
 #include <eez/system.h>
+#include <eez/sound.h>
+#include <eez/index.h>
 
-#include <eez/modules/psu/init.h>
+#include <eez/scpi/scpi.h>
+
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/serial_psu.h>
-
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
 #include <eez/modules/psu/ntp.h>
 #endif
-
 #include <eez/modules/psu/board.h>
-#include <eez/modules/dcpX05/dac.h>
 #include <eez/modules/psu/datetime.h>
-#include <eez/modules/mcu/eeprom.h>
-#include <eez/modules/dcpX05/ioexp.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/rtc.h>
 #include <eez/modules/psu/temperature.h>
-#include <eez/modules/dcpX05/adc.h>
-#include <eez/sound.h>
-
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/profile.h>
-
-#if OPTION_DISPLAY
-#include <eez/modules/psu/gui/psu.h>
-#endif
-
 #if OPTION_SD_CARD
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/sd_card.h>
 #endif
-
-#if OPTION_FAN
-#include <eez/modules/aux_ps/fan.h>
-#endif
-
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/idle.h>
@@ -63,18 +48,26 @@
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ontime.h>
 
-#include <eez/modules/bp3c/io_exp.h>
-#include <eez/modules/bp3c/eeprom.h>
-#include <eez/index.h>
+#if OPTION_DISPLAY
+#include <eez/modules/psu/gui/psu.h>
+#endif
 
-// TODO move this to some other place
+#if OPTION_FAN
+#include <eez/modules/aux_ps/fan.h>
+#endif
+
+#include <eez/modules/mcu/battery.h>
+#include <eez/modules/mcu/eeprom.h>
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif
 
-#include <eez/modules/mcu/battery.h>
+#include <eez/modules/dcpX05/ioexp.h>
+#include <eez/modules/dcpX05/dac.h>
+#include <eez/modules/dcpX05/adc.h>
 
-#include <eez/scpi/scpi.h>
+#include <eez/modules/bp3c/io_exp.h>
+#include <eez/modules/bp3c/eeprom.h>
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 
@@ -158,10 +151,32 @@ namespace psu {
 
 using namespace scpi;
 
-bool g_isBooted = false;
-static bool g_bootTestSuccess;
-static bool g_powerIsUp = false;
-static bool g_testPowerUpDelay = false;
+////////////////////////////////////////////////////////////////////////////////
+
+void mainLoop(const void *);
+
+#if defined(EEZ_PLATFORM_STM32)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wwrite-strings"
+#endif
+
+osThreadDef(g_psuTask, mainLoop, osPriorityAboveNormal, 0, 2048);
+
+#if defined(EEZ_PLATFORM_STM32)
+#pragma GCC diagnostic pop
+#endif
+
+osThreadId g_psuTaskHandle;
+
+#define PSU_QUEUE_SIZE 10
+
+osMessageQDef(g_psuMessageQueue, PSU_QUEUE_SIZE, uint32_t);
+osMessageQId g_psuMessageQueueId;
+
+////////////////////////////////////////////////////////////////////////////////
+
+static bool g_powerIsUp;
+static bool g_testPowerUpDelay;
 static uint32_t g_powerDownTime;
 
 static MaxCurrentLimitCause g_maxCurrentLimitCause;
@@ -174,109 +189,83 @@ void (*g_diagCallback)();
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool testMaster();
+void startThread() {
+    g_psuMessageQueueId = osMessageCreate(osMessageQ(g_psuMessageQueue), NULL);
+    g_psuTaskHandle = osThreadCreate(osThread(g_psuTask), nullptr);
+}
 
-////////////////////////////////////////////////////////////////////////////////
+void oneIter();
 
-////////////////////////////////////////////////////////////////////////////////
-
-void init() {
-    for (int i = 0; i < CH_MAX; i++) {
-    	Channel::get(i).setChannelIndex(i);
-    }
-
-    sound::init();
-
-    mcu::eeprom::init();
-    mcu::eeprom::test();
-
-    bp3c::eeprom::init();
-    bp3c::eeprom::test();
-
-#if OPTION_SD_CARD
-    sd_card::init();
-#endif
-
-    bp3c::io_exp::init();
-
-    // inst:memo 1,0,2,406
-    // 1: slot no. (1, 2 or 3)
-    // 0: address
-    // 2: size of value (1 byte or 2 bytes)
-    // 406: value
-
-    ontime::g_mcuCounter.init();
-
-    int channelIndex = 0;
-    int uninstalledChannelIndex = CH_MAX - 1;
-    for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        auto& slot = g_slots[slotIndex];
-
-        static const uint16_t ADDRESS = 0;
-        uint16_t value[2];
-        if (!bp3c::eeprom::read(slotIndex, (uint8_t *)&value, sizeof(value), ADDRESS)) {
-            value[0] = MODULE_TYPE_NONE;
-            value[1] = 0;
-        }
-
-        uint16_t moduleType = value[0];
-        uint16_t moduleRevision = value[1];
-
-        slot.moduleInfo = getModuleInfo(moduleType);
-        slot.moduleRevision = moduleRevision;
-
-        if (slot.moduleInfo->moduleType != MODULE_TYPE_NONE) {
-            slot.channelIndex = channelIndex;
-
-            for (uint8_t subchannelIndex = 0; subchannelIndex < slot.moduleInfo->numChannels; subchannelIndex++) {
-                Channel::get(channelIndex++).set(slotIndex, subchannelIndex);
-            }
-
-            persist_conf::loadModuleConf(slotIndex);
-            ontime::g_moduleCounters[slotIndex].init();
-            CH_NUM = channelIndex;
-        } else {
-            slot.channelIndex = uninstalledChannelIndex;
-            Channel::get(uninstalledChannelIndex).set(slotIndex, 0);
-            uninstalledChannelIndex--;
-        }
-    }
-
-    persist_conf::init();
-
-    serial::init();
-
-    rtc::init();
-    datetime::init();
-
-    event_queue::init();
-    profile::init();
-
-    io_pins::init();
-
-    list::init();
-
-#if OPTION_ETHERNET
-    ethernet::init();
-    ntp::init();
+void mainLoop(const void *) {
+#ifdef __EMSCRIPTEN__
+    oneIter();
 #else
-    // DebugTrace("Ethernet initialization skipped!");
+    while (1) {
+        oneIter();
+    }
 #endif
+}
 
-#if OPTION_FAN
-    aux_ps::fan::init();
-#endif
+bool g_adcMeasureAllFinished = false;
 
-    temperature::init();
+void oneIter() {
+    osEvent event = osMessageGet(g_psuMessageQueueId, 1);
+    if (event.status == osEventMessage) {
+    	uint32_t message = event.value.v;
+    	uint32_t type = PSU_QUEUE_MESSAGE_TYPE(message);
+    	uint32_t param = PSU_QUEUE_MESSAGE_PARAM(message);
+        if (type == PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE) {
+            changePowerState(param ? true : false);
+        } else if (type == PSU_QUEUE_MESSAGE_TYPE_RESET) {
+            reset();
+        } else if (type == PSU_QUEUE_MESSAGE_SPI_IRQ) {
+            auto channelInterface = eez::psu::Channel::getBySlotIndex(param).channelInterface;
+            if (channelInterface) {
+            	channelInterface->onSpiIrq();
+            }
+        } else if (type == PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL) {
+            eez::psu::Channel::get(param).adcMeasureAll();
+            g_adcMeasureAllFinished = true;
+        } else if (type == PSU_QUEUE_TRIGGER_START_IMMEDIATELY) {
+            trigger::startImmediatelyInPsuThread();
+        } else if (type == PSU_QUEUE_TRIGGER_ABORT) {
+            trigger::abort();
+        } else if (type == PSU_QUEUE_TRIGGER_CHANNEL_SAVE_AND_DISABLE_OE) {
+            Channel::saveAndDisableOE();
+        } else if (type == PSU_QUEUE_TRIGGER_CHANNEL_RESTORE_OE) {
+            Channel::restoreOE();
+        } else if (type == PSU_QUEUE_SET_COUPLING_TYPE) {
+            channel_dispatcher::setCouplingTypeInPsuThread((channel_dispatcher::CouplingType)param);
+        } else if (type == PSU_QUEUE_SET_TRACKING_CHANNELS) {
+            channel_dispatcher::setTrackingChannels((uint16_t)param);
+        } else if (type == PSU_QUEUE_CHANNEL_OUTPUT_ENABLE) {
+            channel_dispatcher::outputEnable(Channel::get((param >> 8) & 0xFF), param & 0xFF ? true : false);
+        } else if (type == PSU_QUEUE_SYNC_OUTPUT_ENABLE) {
+            channel_dispatcher::syncOutputEnable();
+        } else if (type == PSU_QUEUE_MESSAGE_TYPE_HARD_RESET) {
+            hardReset();
+        } else if (type == PSU_QUEUE_MESSAGE_TYPE_SHUTDOWN) {
+            shutdown();
+        }
+    } else if (g_isBooted) {
+        tick();
+    }
+}
 
-    mcu::battery::init();
+bool measureAllAdcValuesOnChannel(int channelIndex) {
+	if (g_slots[Channel::get(channelIndex).slotIndex].moduleInfo->moduleType == MODULE_TYPE_NONE) {
+		return true;
+	}
 
-    trigger::init();
+    g_adcMeasureAllFinished = false;
+    osMessagePut(eez::psu::g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL, channelIndex), 0);
 
-    // TODO move this to some other place
-#if OPTION_DISPLAY && OPTION_ENCODER
-    mcu::encoder::init();
-#endif
+    int i;
+    for (i = 0; i < 100 && !g_adcMeasureAllFinished; ++i) {
+        osDelay(10);
+    }
+
+    return g_adcMeasureAllFinished;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -293,9 +282,11 @@ bool testChannels() {
         return true;
     }
 
-    bool result = true;
-
+    psu::profile::saveAtLocation(10);
+    psuReset();
     bool wasSaveProfileEnabled = profile::enableSave(false);
+
+    bool result = true;
 
     channel_dispatcher::disableOutputForAllChannels();
 
@@ -304,65 +295,15 @@ bool testChannels() {
     }
 
     profile::enableSave(wasSaveProfileEnabled);
-    profile::save();
-
-    return result;
-}
-
-static bool testMaster() {
-    bool result = true;
-
-#if OPTION_FAN
-    result &= aux_ps::fan::test();
-#endif
-
-    result &= rtc::test();
-    result &= datetime::test();
-    result &= mcu::eeprom::test();
-
-#if OPTION_SD_CARD
-    result &= sd_card::test();
-#endif
-
-#if OPTION_ETHERNET
-    result &= ethernet::test();
-#endif
-
-    result &= temperature::test();
-
-    result &= mcu::battery::test();
-
-    // test BP3c
-    result &= bp3c::io_exp::test();
-
-    g_masterTestResult = result ? TEST_OK : TEST_FAILED;
-
-    return result;
-}
-
-bool test() {
-    bool testResult = true;
-
-    profile::saveAtLocation(10);
-    reset();
-
-    testResult &= testMaster();
-
-    testResult &= testChannels();
-
-    if (!testResult) {
-        sound::playBeep();
-    }
-
     int err;
-    profile::recall(10, &err);
+    psu::profile::recall(10, &err);
 
-    return testResult;
+    return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool psuReset() {
+bool psuReset() {
     // *ESE 0
     scpi_reg_set(SCPI_REG_ESE, 0);
 
@@ -552,7 +493,7 @@ static profile::Parameters *loadAutoRecallProfile(int *location) {
     return nullptr;
 }
 
-static bool autoRecall() {
+bool autoRecall() {
     int location;
     profile::Parameters *profile = loadAutoRecallProfile(&location);
     if (profile) {
@@ -566,28 +507,6 @@ static bool autoRecall() {
         }
     }
     return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void boot() {
-    init();
-
-    // test
-    g_bootTestSuccess = true;
-
-    g_bootTestSuccess &= testMaster();
-
-    if (!autoRecall()) {
-        psuReset();
-    }
-
-    // play beep if there is an error during boot procedure
-    if (!g_bootTestSuccess) {
-        sound::playBeep();
-    }
-
-    g_isBooted = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -661,10 +580,12 @@ bool powerUp() {
 
 void powerDown() {
 #if OPTION_DISPLAY
-    if (g_isBooted) {
-        eez::gui::showEnteringStandbyPage();
-    } else {
-        eez::gui::showStandbyPage();
+    if (!g_shutdownInProgress) {
+        if (g_isBooted) {
+            eez::gui::showEnteringStandbyPage();
+        } else {
+            eez::gui::showStandbyPage();
+        }
     }
 #endif
 
@@ -764,11 +685,16 @@ void changePowerState(bool up) {
         profile::save();
     } else {
 #if OPTION_DISPLAY
-        eez::gui::showEnteringStandbyPage();
+        if (!g_shutdownInProgress) {
+            eez::gui::showEnteringStandbyPage();
+        }
 #endif
-        g_powerIsUp = false;
-        profile::save(true);
-        g_powerIsUp = true;
+
+        if (!g_shutdownInProgress) {
+            g_powerIsUp = false;
+            profile::save(true);
+            g_powerIsUp = true;
+        }
 
         profile::enableSave(false);
         powerDown();
@@ -795,21 +721,6 @@ void powerDownBySensor() {
         powerDown();
         profile::enableSave(true);
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-bool reset() {
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_RESET, 0), osWaitForever);
-        return true;
-    }
-
-    if (psuReset()) {
-        profile::save();
-        return true;
-    }
-    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

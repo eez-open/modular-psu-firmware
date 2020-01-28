@@ -19,6 +19,7 @@
 #include <assert.h>
 
 #include "eez/modules/bp3c/flash_slave.h"
+#include "eez/firmware.h"
 #include "eez/system.h"
 #include <eez/scpi/scpi.h>
 #include "eez/modules/psu/psu.h"
@@ -320,7 +321,7 @@ void enterBootloaderMode(int slotIndex) {
     g_bootloaderMode = true;
 
 #if defined(EEZ_PLATFORM_STM32)
-    psu::reset();
+    reset();
 
     // power down channels
     psu::powerDownChannels();

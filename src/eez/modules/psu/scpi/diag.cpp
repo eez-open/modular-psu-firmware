@@ -22,7 +22,6 @@
 #include <eez/index.h>
 
 #include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/init.h>
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/devices.h>
 #include <eez/modules/psu/scpi/psu.h>

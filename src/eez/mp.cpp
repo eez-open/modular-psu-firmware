@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <eez/firmware.h>
 #include <eez/mp.h>
 #include <eez/system.h>
 #include <eez/scpi/scpi.h>
@@ -122,7 +123,7 @@ scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_
 }
 
 scpi_result_t SCPI_Reset(scpi_t *context) {
-    return eez::psu::reset() ? SCPI_RES_OK : SCPI_RES_ERR;
+    return eez::reset() ? SCPI_RES_OK : SCPI_RES_ERR;
 }
 
 static scpi_reg_val_t g_scpiPsuRegs[SCPI_PSU_REG_COUNT];
@@ -139,17 +140,13 @@ scpi_t g_scpiContext;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool onSystemStateChanged() {
-    if (eez::g_systemState == eez::SystemState::BOOTING) {
-        if (eez::g_systemStatePhase == 0) {
-            eez::psu::scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer, SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
+void initMessageQueue() {
+    eez::psu::scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer, SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
+    g_mpMessageQueueId = osMessageCreate(osMessageQ(g_mpMessageQueue), NULL);
+}
 
-            g_mpMessageQueueId = osMessageCreate(osMessageQ(g_mpMessageQueue), NULL);
-            g_mpTaskHandle = osThreadCreate(osThread(g_mpTask), nullptr);
-        }
-    }
-
-    return true;
+void startThread() {
+    g_mpTaskHandle = osThreadCreate(osThread(g_mpTask), nullptr);
 }
 
 void oneIter();

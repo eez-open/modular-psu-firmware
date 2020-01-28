@@ -100,6 +100,7 @@ static const uint16_t PROFILE_VERSION = 11;
 extern bool g_profileDirty;
 bool enableSave(bool enable);
 void save(bool immediately = false);
+void saveIfDirty();
 
 void init();
 void tick();

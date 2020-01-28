@@ -27,14 +27,6 @@
 
 namespace eez {
 
-enum SystemState { BOOTING = 1, SHUTING_DOWN };
-
-extern SystemState g_systemState;
-extern int g_systemStatePhase;
-
-void boot();
-void shutdown();
-
 uint32_t micros();
 uint32_t millis();
 void delay(uint32_t millis);

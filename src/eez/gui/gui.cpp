@@ -23,11 +23,14 @@
 #include <math.h>
 #include <string.h>
 
+
 #include <eez/gui/app_context.h>
 #include <eez/gui/dialogs.h>
 #include <eez/gui/event.h>
 #include <eez/gui/touch.h>
 #include <eez/gui/update.h>
+
+#include <eez/firmware.h>
 #include <eez/sound.h>
 #include <eez/system.h>
 #include <eez/util.h>
@@ -66,28 +69,15 @@ osThreadDef(g_guiTask, mainLoop, osPriorityNormal, 0, 4096);
 
 osThreadId g_guiTaskHandle;
 
-bool onSystemStateChanged() {
-    if (eez::g_systemState == eez::SystemState::BOOTING) {
-        if (eez::g_systemStatePhase == 0) {
-            g_guiTaskHandle = osThreadCreate(osThread(g_guiTask), nullptr);
-        }
-    }
-
-    return true;
+void startThread() {
+    decompressAssets();
+    mcu::display::onThemeChanged();
+    g_guiTaskHandle = osThreadCreate(osThread(g_guiTask), nullptr);
 }
-
 
 void oneIter();
 
-static bool g_assetsInitialized = false;
-
 void mainLoop(const void *) {
-	if (!g_assetsInitialized) {
-		g_assetsInitialized = true;
-		decompressAssets();
-		mcu::display::onThemeChanged();
-		mcu::display::updateBrightness();
-	}
 #ifdef __EMSCRIPTEN__
 	oneIter();
 #else
@@ -255,29 +245,20 @@ void showWelcomePage() {
     psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_WELCOME);
 }
 
-void showStandbyPage() {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_STANDBY);
-}
-
 void showEnteringStandbyPage() {
     psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_ENTERING_STANDBY);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-// TODO move these to actions.cpp
-
-void standBy() {
-    psu::changePowerState(false);
+void showStandbyPage() {
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_STANDBY);
 }
 
-void turnDisplayOff() {
-    psu::persist_conf::setDisplayState(0);
+void showSavingPage() {
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_SAVING);
 }
 
-void reset() {
-    popPage();
-    psu::reset();
+void showShutdownPage() {
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_SHUTDOWN);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
