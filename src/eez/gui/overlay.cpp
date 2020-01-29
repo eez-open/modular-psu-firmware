@@ -18,9 +18,7 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/overlay.h>
-#include <eez/gui/data.h>
-#include <eez/gui/app_context.h>
+#include <eez/gui/gui.h>
 #include <eez/gui/widgets/container.h>
 
 namespace eez {

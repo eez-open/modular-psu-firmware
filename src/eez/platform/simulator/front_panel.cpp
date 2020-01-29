@@ -22,8 +22,7 @@
 
 #include <eez/index.h>
 
-#include <eez/gui/assets.h>
-#include <eez/gui/document.h>
+#include <eez/gui/gui.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/gui/psu.h>

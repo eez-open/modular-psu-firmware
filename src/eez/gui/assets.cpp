@@ -18,19 +18,16 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/assets.h>
-
 #include <assert.h>
 #include <stdlib.h>
 #include <memory.h>
 
+#include <eez/system.h>
+#include <eez/memory.h>
+
 #include <eez/libs/lz4/lz4.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/document.h>
-#include <eez/system.h>
-
-#include <eez/memory.h>
 
 namespace eez {
 namespace gui {

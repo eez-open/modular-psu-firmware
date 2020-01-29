@@ -18,16 +18,13 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/widgets/yt_graph.h>
-
 #include <math.h>
 #include <limits.h>
 
-#include <eez/gui/draw.h>
-#include <eez/gui/gui.h>
-#include <eez/gui/app_context.h>
-#include <eez/modules/mcu/display.h>
 #include <eez/util.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/yt_graph.h>
 
 using namespace eez::mcu;
 

@@ -18,20 +18,17 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/dialogs.h>
-
 #include <math.h>
 #include <string.h>
 
-#include <eez/gui/app_context.h>
 #include <eez/system.h>
 #include <eez/util.h>
-
-// TODO this must be removed from here
-#include <eez/modules/psu/psu.h>
-
-#include <eez/modules/psu/gui/psu.h>
 #include <eez/sound.h>
+
+#include <eez/gui/gui.h>
+
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/gui/psu.h>
 
 namespace eez {
 namespace gui {

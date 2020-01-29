@@ -18,12 +18,6 @@
 
 #pragma once
 
-#include <stdlib.h>
-
-#include <eez/gui/gui.h>
-#include <eez/gui/page.h>
-#include <eez/modules/mcu/display.h>
-
 #define CONF_GUI_PAGE_NAVIGATION_STACK_SIZE 5
 #define CONF_MAX_STATE_SIZE (10 * 1024)
 

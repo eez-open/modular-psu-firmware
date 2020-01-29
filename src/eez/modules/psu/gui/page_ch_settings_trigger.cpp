@@ -27,15 +27,11 @@
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/datetime.h>
-#if OPTION_ENCODER
-#include <eez/modules/mcu/encoder.h>
-#endif
 
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/page_ch_settings_trigger.h>
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/dialogs.h>
 
 namespace eez {
 namespace psu {
@@ -500,7 +496,7 @@ void ChSettingsListsPage::onEncoder(int counter) {
     data::Value min = data::getMin(cursor, dataId);
     data::Value max = data::getMax(cursor, dataId);
 
-    float newValue = mcu::encoder::increment(value, counter, min.getFloat(), max.getFloat(), g_channel->channelIndex, 0);
+    float newValue = encoderIncrement(value, counter, min.getFloat(), max.getFloat(), g_channel->channelIndex, 0);
 
     setFocusedValue(newValue);
 #endif

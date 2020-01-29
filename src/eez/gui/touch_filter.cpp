@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/gui/touch_filter.h>
-
 #include <eez/util.h>
+
+#include <eez/gui/touch_filter.h>
 
 //
 // Thanks to: http://dlbeer.co.nz/articles/tsf.html

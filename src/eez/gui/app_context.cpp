@@ -16,33 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_DISPLAY
+
 #include <math.h>
 #include <assert.h>
 
-#include <eez/gui/app_context.h>
-
-#if OPTION_DISPLAY
-
-// TODO this must be removed from here
-#include <eez/modules/psu/psu.h>
-
-#include <eez/modules/psu/devices.h>
-#include <eez/modules/psu/idle.h>
-
-#include <eez/modules/psu/gui/psu.h>
-//
-
-#include <eez/gui/assets.h>
-#include <eez/gui/dialogs.h>
-#include <eez/gui/draw.h>
-#include <eez/gui/gui.h>
-#include <eez/gui/touch.h>
-#include <eez/gui/update.h>
-#include <eez/gui/widgets/button.h>
 #include <eez/index.h>
-#include <eez/modules/mcu/display.h>
 #include <eez/sound.h>
 #include <eez/system.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/button.h>
+
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/devices.h>
+#include <eez/modules/psu/idle.h>
+#include <eez/modules/psu/gui/psu.h>
 
 #define CONF_GUI_TOAST_DURATION_MS 2000L
 
@@ -163,7 +152,7 @@ void AppContext::onPageChanged(int previousPageId, int activePageId) {
 }
 
 void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
-    page = page ? page : getPageFromId(pageId);
+    page = page ? page : getPageFromIdHook(pageId);
 
     m_pageNavigationStack[m_pageNavigationStackPointer].page = page;
     m_pageNavigationStack[m_pageNavigationStackPointer].pageId = pageId;

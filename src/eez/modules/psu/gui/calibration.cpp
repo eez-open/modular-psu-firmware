@@ -18,19 +18,19 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/modules/psu/psu.h>
-
 #include <string.h>
 
+#include <eez/sound.h>
+
+#include <eez/gui/gui.h>
+
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/trigger.h>
-#include <eez/sound.h>
 
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/dialogs.h>
-
 #include <eez/modules/psu/gui/calibration.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/keypad.h>

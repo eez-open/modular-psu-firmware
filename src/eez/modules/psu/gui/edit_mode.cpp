@@ -23,12 +23,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <eez/sound.h>
+
+#include <eez/gui/gui.h>
+
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #if OPTION_SD_CARD
 #include <eez/modules/psu/dlog_record.h>
 #endif
-#include <eez/sound.h>
 
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
@@ -37,7 +40,6 @@
 #include <eez/modules/psu/gui/edit_mode_step.h>
 #include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/app_context.h>
 
 namespace eez {
 namespace psu {

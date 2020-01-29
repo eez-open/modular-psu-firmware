@@ -24,8 +24,7 @@
 
 #include <eez/sound.h>
 
-#include <eez/gui/touch.h>
-#include <eez/gui/dialogs.h>
+#include <eez/gui/gui.h>
 
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>

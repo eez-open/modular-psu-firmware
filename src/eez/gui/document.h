@@ -18,11 +18,13 @@
 
 #pragma once
 
-#include <eez/gui/action.h>
 #include <eez/gui/data.h>
 #include <eez/gui/widget.h>
 
 namespace eez {
+
+typedef void (*ActionExecFunc)();
+
 namespace gui {
 
 using eez::gui::data::DataOperationEnum;

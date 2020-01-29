@@ -19,18 +19,18 @@
 #if OPTION_DISPLAY
 #include <assert.h>
 
-#include <eez/modules/psu/psu.h>
-
 #include <ctype.h>
 #include <string.h>
 
-#include <eez/modules/psu/gui/edit_mode_keypad.h>
-#include <eez/modules/psu/gui/keypad.h>
-#include <eez/modules/psu/gui/numeric_keypad.h>
-#include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/widgets/text.h>
 #include <eez/sound.h>
 #include <eez/system.h>
+
+#include <eez/modules/psu/psu.h>
+
+#include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/keypad.h>
+#include <eez/modules/psu/gui/numeric_keypad.h>
+#include <eez/modules/psu/gui/edit_mode_keypad.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4996)

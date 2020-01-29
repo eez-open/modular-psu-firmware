@@ -18,7 +18,6 @@
 
 #if OPTION_DISPLAY
 
-#include <stdint.h>
 #include <math.h>
 
 #include <eez/system.h>
@@ -37,7 +36,6 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/persist_conf.h>
-#include <eez/modules/psu/gui/edit_mode_step.h>
 
 namespace eez {
 namespace mcu {
@@ -121,7 +119,13 @@ struct CalcAutoModeStepLevel {
     }
 };
 
-static CalcAutoModeStepLevel g_calcAutoModeStepLevel;
+CalcAutoModeStepLevel g_calcAutoModeStepLevel;
+
+////////////////////////////////////////////////////////////////////////////////
+
+int getAutoModeStepLevel() {
+    return g_calcAutoModeStepLevel.stepLevel();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -197,30 +201,6 @@ void switchEncoderMode() {
 
 void setUseSameSpeed(bool enable) {
     g_useSameSpeed = enable;
-}
-
-float increment(gui::data::Value value, int counter, float min, float max, int channelIndex, float precision) {
-    if (channelIndex != -1) {
-        precision = psu::channel_dispatcher::getValuePrecision(psu::Channel::get(channelIndex), value.getUnit(), value.getFloat());
-    }
-
-    // TODO 
-    if (precision == 0) {
-        precision = 0.001f;
-    }
-
-    float step;
-
-    if (g_encoderMode == ENCODER_MODE_AUTO) {
-        step = precision * powf(10.0f, 1.0f * g_calcAutoModeStepLevel.stepLevel());
-    } else {
-        step = psu::gui::edit_mode_step::getCurrentEncoderStepValue().getFloat(); 
-    }
-
-    float newValue = value.getFloat() + step * counter;
-    newValue = roundPrec(newValue, step);
-
-    return clamp(newValue, min, max);
 }
 
 } // namespace encoder

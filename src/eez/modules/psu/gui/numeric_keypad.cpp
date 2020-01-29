@@ -19,15 +19,13 @@
 #if OPTION_DISPLAY
 #include <assert.h>
 #include <math.h>
-
-#include <eez/modules/psu/psu.h>
-
 #include <string.h>
 
-#if OPTION_ENCODER
-#include <eez/modules/mcu/encoder.h>
-#endif
 #include <eez/sound.h>
+
+#include <eez/gui/gui.h>
+
+#include <eez/modules/psu/psu.h>
 
 #include <eez/modules/psu/channel_dispatcher.h>
 
@@ -36,7 +34,6 @@
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/dialogs.h>
 
 namespace eez {
 namespace psu {
@@ -595,7 +592,7 @@ void NumericKeypad::onEncoder(int counter) {
         }
 
         if (m_startValue.getType() == VALUE_TYPE_FLOAT) {
-            float newValue = mcu::encoder::increment(m_startValue, counter, m_options.min, m_options.max, m_options.channelIndex, 0.01f);
+            float newValue = encoderIncrement(m_startValue, counter, m_options.min, m_options.max, m_options.channelIndex, 0.01f);
             m_startValue = MakeValue(newValue, m_startValue.getUnit());
             return;
         } else if (m_startValue.getType() == VALUE_TYPE_INT) {

@@ -24,6 +24,8 @@
 #define EEZ_PLATFORM_STM32
 #endif
 
+#include <eez/system.h>
+
 #include <eez/modules/psu/conf.h>
 #include <eez/modules/psu/conf_advanced.h>
 #include <eez/modules/psu/conf_user.h>

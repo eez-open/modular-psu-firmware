@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/gui/app_context.h>
+#include <eez/gui/gui.h>
 
 using namespace eez::gui;
 

@@ -18,20 +18,12 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/widgets/container.h>
-#include <eez/gui/widgets/layout_view.h>
-
-#include <eez/gui/assets.h>
-#include <eez/gui/draw.h>
-#include <eez/gui/app_context.h>
-#include <eez/gui/overlay.h>
-
 #include <eez/system.h>
 #include <eez/debug.h>
 
-#if OPTION_SDRAM
-#include <eez/modules/mcu/display.h>
-#endif
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/container.h>
+#include <eez/gui/widgets/layout_view.h>
 
 namespace eez {
 namespace gui {

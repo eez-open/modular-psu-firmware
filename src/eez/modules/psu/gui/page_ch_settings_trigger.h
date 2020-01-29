@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/gui/page.h>
+#include <eez/gui/gui.h>
 using namespace eez::gui;
 
 #define LIST_ITEMS_PER_PAGE 5

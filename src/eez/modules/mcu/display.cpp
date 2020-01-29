@@ -18,13 +18,9 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/modules/mcu/display.h>
-
 #include <eez/util.h>
 
-#include <eez/gui/assets.h>
-#include <eez/gui/draw.h>
-#include <eez/gui/widget.h>
+#include <eez/gui/gui.h>
 
 // TODO
 #include <eez/modules/psu/psu.h>

@@ -34,7 +34,6 @@
 #include <eez/modules/psu/event_queue.h>
 #if OPTION_DISPLAY
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/document.h>
 #endif
 
 #include <eez/modules/mcu/eeprom.h>

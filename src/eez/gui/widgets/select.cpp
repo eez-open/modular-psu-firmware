@@ -18,12 +18,9 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/widgets/select.h>
-
-#include <eez/gui/assets.h>
-#include <eez/gui/draw.h>
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/container.h>
+#include <eez/gui/widgets/select.h>
 
 namespace eez {
 namespace gui {

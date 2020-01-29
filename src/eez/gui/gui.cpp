@@ -18,31 +18,20 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/gui.h>
-
 #include <math.h>
 #include <string.h>
-
-
-#include <eez/gui/app_context.h>
-#include <eez/gui/dialogs.h>
-#include <eez/gui/event.h>
-#include <eez/gui/touch.h>
-#include <eez/gui/update.h>
 
 #include <eez/firmware.h>
 #include <eez/sound.h>
 #include <eez/system.h>
 #include <eez/util.h>
 
-// TODO this must be removed from here
-#include <eez/modules/psu/psu.h>
+#include <eez/gui/gui.h>
 
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/password.h>
-#include <eez/modules/psu/persist_conf.h>
-
-#include <eez/modules/mcu/display.h>
 
 #define CONF_GUI_BLINK_TIME 400 // 400ms
 

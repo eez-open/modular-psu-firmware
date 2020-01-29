@@ -18,15 +18,13 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/widgets/list_graph.h>
-
 #include <math.h>
 #include <stdlib.h>
 
-#include <eez/gui/gui.h>
-#include <eez/gui/widget.h>
-#include <eez/modules/mcu/display.h>
 #include <eez/sound.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/list_graph.h>
 
 using namespace eez::mcu;
 

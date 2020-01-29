@@ -18,11 +18,9 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/update.h>
-
 #include <eez/debug.h>
-#include <eez/gui/app_context.h>
-#include <eez/gui/draw.h>
+
+#include <eez/gui/gui.h>
 
 namespace eez {
 namespace gui {

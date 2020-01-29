@@ -23,20 +23,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <eez/gui/data.h>
-
-#include <scpi/scpi.h>
-
-#include <eez/gui/app_context.h>
-#include <eez/gui/dialogs.h>
-#include <eez/gui/document.h>
-#include <eez/gui/gui.h>
 #include <eez/system.h>
 #include <eez/util.h>
 #include <eez/index.h>
 #include <eez/memory.h>
 
-// TODO
+#include <scpi/scpi.h>
+
+#include <eez/gui/gui.h>
+
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/persist_conf.h>
 

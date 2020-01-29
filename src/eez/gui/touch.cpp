@@ -16,10 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/gui/touch.h>
-
-#include <eez/gui/app_context.h>
+#include <eez/gui/gui.h>
 #include <eez/gui/touch_filter.h>
+
 #include <eez/modules/mcu/touch.h>
 
 ////////////////////////////////////////////////////////////////////////////////

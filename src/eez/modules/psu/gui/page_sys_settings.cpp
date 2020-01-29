@@ -41,7 +41,6 @@
 #include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/dialogs.h>
 #include <eez/gui/gui.h>
 
 #include <eez/modules/aux_ps/fan.h>

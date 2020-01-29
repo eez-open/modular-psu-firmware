@@ -35,7 +35,6 @@
 
 #if OPTION_DISPLAY
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/mcu/display.h>
 using namespace eez::mcu::display;
 #endif
 

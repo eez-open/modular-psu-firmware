@@ -20,14 +20,9 @@
 
 #include <string.h>
 
-#include <eez/gui/draw.h>
-
-#include <eez/gui/document.h>
-#include <eez/gui/font.h>
-#include <eez/gui/gui.h>
-#include <eez/gui/widget.h>
-#include <eez/modules/mcu/display.h>
 #include <eez/util.h>
+
+#include <eez/gui/gui.h>
 
 using namespace eez::mcu;
 

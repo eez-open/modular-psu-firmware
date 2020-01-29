@@ -20,11 +20,8 @@
 
 #include <assert.h>
 
+#include <eez/gui/gui.h>
 #include <eez/gui/widgets/app_view.h>
-
-#include <eez/gui/app_context.h>
-#include <eez/gui/assets.h>
-#include <eez/gui/widget.h>
 
 namespace eez {
 namespace gui {

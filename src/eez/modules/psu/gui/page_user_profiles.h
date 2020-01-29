@@ -19,7 +19,7 @@
 #pragma once
 
 #include <eez/modules/psu/profile.h>
-#include <eez/gui/page.h>
+#include <eez/gui/gui.h>
 using namespace eez::gui;
 
 namespace eez {

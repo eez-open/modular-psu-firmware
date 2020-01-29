@@ -18,13 +18,10 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/widgets/button.h>
-
-#include <eez/gui/assets.h>
-#include <eez/gui/draw.h>
-#include <eez/gui/gui.h>
-#include <eez/gui/widget.h>
 #include <eez/util.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/button.h>
 
 namespace eez {
 namespace gui {

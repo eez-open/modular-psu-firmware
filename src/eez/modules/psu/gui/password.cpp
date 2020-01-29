@@ -27,7 +27,6 @@
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/password.h>
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/dialogs.h>
 
 namespace eez {
 namespace psu {

@@ -18,17 +18,13 @@
 
 #pragma once
 
-#include <eez/gui/data.h>
-
-using eez::gui::data::Value;
-
 namespace eez {
 namespace psu {
 namespace gui {
 namespace calibration_wizard {
 
 void start();
-Value getLevelValue();
+eez::gui::data::Value getLevelValue();
 void setLevelValue();
 void set();
 void previousStep();

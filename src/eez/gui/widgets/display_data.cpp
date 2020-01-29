@@ -20,13 +20,10 @@
 
 #include <string.h>
 
-#include <eez/gui/widgets/display_data.h>
-
-#include <eez/gui/app_context.h>
-#include <eez/gui/draw.h>
-#include <eez/gui/gui.h>
-#include <eez/gui/widget.h>
 #include <eez/util.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/display_data.h>
 
 namespace eez {
 namespace gui {

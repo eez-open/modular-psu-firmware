@@ -21,8 +21,9 @@
 #include <cmsis_os.h>
 
 #include <eez/gui/assets.h>
-#include <eez/gui/data.h>
+#include <eez/gui/dialogs.h>
 #include <eez/gui/page.h>
+
 #include <eez/modules/mcu/display.h>
 
 #define INTERNAL_PAGE_ID_NONE -1
@@ -146,5 +147,14 @@ void animateRects(Buffer startBuffer, int numRects, float duration = -1);
 int getCurrentStateBufferIndex();
 uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor);
 
+Page *getPageFromIdHook(int pageId);
+
 } // namespace gui
 } // namespace eez
+
+#include <eez/gui/app_context.h>
+#include <eez/gui/update.h>
+#include <eez/gui/touch.h>
+#include <eez/gui/overlay.h>
+#include <eez/gui/font.h>
+#include <eez/gui/draw.h>

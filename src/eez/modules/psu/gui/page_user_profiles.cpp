@@ -27,8 +27,6 @@
 #include <eez/modules/psu/gui/page_user_profiles.h>
 
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/dialogs.h>
-#include <eez/gui/document.h>
 
 #include <scpi/scpi.h>
 

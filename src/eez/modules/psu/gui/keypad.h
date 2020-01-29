@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/gui/page.h>
+#include <eez/gui/gui.h>
 #include <eez/modules/psu/conf_advanced.h>
 
 namespace eez {

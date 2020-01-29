@@ -25,6 +25,9 @@
 
 #include <eez/system.h>
 #include <eez/mp.h>
+#include <eez/memory.h>
+
+#include <eez/gui/gui.h>
 
 #include <eez/scpi/scpi.h>
 
@@ -41,9 +44,6 @@
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/dlog_view.h>
 
-#include <eez/gui/dialogs.h>
-
-#include <eez/memory.h>
 
 #include <eez/libs/sd_fat/sd_fat.h>
 

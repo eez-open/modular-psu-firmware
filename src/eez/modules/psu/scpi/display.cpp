@@ -22,11 +22,8 @@
 #include <eez/modules/psu/scpi/psu.h>
 
 #if OPTION_DISPLAY
-#include <eez/gui/dialogs.h>
 #include <eez/gui/gui.h>
-#include <eez/gui/dialogs.h>
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/mcu/display.h>
 #include <eez/system.h>
 #endif
 

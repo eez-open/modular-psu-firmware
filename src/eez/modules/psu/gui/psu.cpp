@@ -19,12 +19,23 @@
 #if OPTION_DISPLAY
 
 #include <eez/firmware.h>
-#include <eez/modules/psu/psu.h>
+#include <eez/sound.h>
+#include <eez/system.h>
 
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/devices.h>
 #include <eez/modules/psu/event_queue.h>
+#include <eez/modules/psu/idle.h>
+#include <eez/modules/psu/temperature.h>
+#include <eez/modules/psu/trigger.h>
+#include <eez/modules/psu/dlog_view.h>
+#if OPTION_SD_CARD
+#include <eez/modules/psu/dlog_record.h>
+#endif
+#include <eez/modules/psu/dlog_view.h>
+
 #include <eez/modules/psu/gui/animations.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
@@ -42,26 +53,11 @@
 #include <eez/modules/psu/gui/password.h>
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
-#include <eez/modules/psu/idle.h>
-#include <eez/modules/psu/temperature.h>
-#include <eez/modules/psu/trigger.h>
-#include <eez/modules/psu/dlog_view.h>
-#include <eez/gui/dialogs.h>
-#include <eez/gui/document.h>
-#include <eez/gui/gui.h>
-#include <eez/gui/touch.h>
-#include <eez/modules/mcu/display.h>
-#include <eez/sound.h>
-#include <eez/system.h>
+#include <eez/modules/psu/gui/touch_calibration.h>
 
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif
-
-#if OPTION_SD_CARD
-#include <eez/modules/psu/dlog_record.h>
-#endif
-
 #if EEZ_PLATFORM_STM32
 #include <eez/modules/mcu/button.h>
 #endif
@@ -69,10 +65,6 @@
 #if defined(EEZ_PLATFORM_SIMULATOR)
 #include <eez/platform/simulator/front_panel.h>
 #endif
-
-#include <eez/modules/psu/gui/touch_calibration.h>
-
-#include <eez/modules/psu/dlog_view.h>
 
 #define CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT 2000000L // 2s
 #define CONF_GUI_STANDBY_PAGE_TIMEOUT 4000000L          // 4s
@@ -111,7 +103,143 @@ void stateManagmentHook() {
     g_appContext = saved;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+using namespace eez::psu::gui;
+
+static SelfTestResultPage g_SelfTestResultPage;
+static EventQueuePage g_EventQueuePage;
+static ChSettingsOvpProtectionPage g_ChSettingsOvpProtectionPage;
+static ChSettingsOcpProtectionPage g_ChSettingsOcpProtectionPage;
+static ChSettingsOppProtectionPage g_ChSettingsOppProtectionPage;
+static ChSettingsOtpProtectionPage g_ChSettingsOtpProtectionPage;
+static ChSettingsAdvOptionsPage g_ChSettingsAdvOptionPage;
+static ChSettingsAdvRangesPage g_ChSettingsAdvRangesPage;
+static ChSettingsAdvViewPage g_ChSettingsAdvViewPage;
+static ChSettingsTriggerPage g_ChSettingsTriggerPage;
+static ChSettingsListsPage g_ChSettingsListsPage;
+static SysSettingsDateTimePage g_SysSettingsDateTimePage;
+#if OPTION_ETHERNET
+static SysSettingsEthernetPage g_SysSettingsEthernetPage;
+static SysSettingsEthernetStaticPage g_SysSettingsEthernetStaticPage;
+static SysSettingsMqttPage g_SysSettingsMqttPage;
+#endif
+static SysSettingsProtectionsPage g_SysSettingsProtectionsPage;
+static SysSettingsTriggerPage g_SysSettingsTriggerPage;
+static SysSettingsIOPinsPage g_SysSettingsIOPinsPage;
+static SysSettingsTemperaturePage g_SysSettingsTemperaturePage;
+static SysSettingsSoundPage g_SysSettingsSoundPage;
+#if OPTION_ENCODER
+static SysSettingsEncoderPage g_SysSettingsEncoderPage;
+#endif
+static SysSettingsSerialPage g_SysSettingsSerialPage;
+static SysSettingsTrackingPage g_sysSettingsTrackingPage;
+static SysSettingsCouplingPage g_sysSettingsCouplingPage;
+static UserProfilesPage g_UserProfilesPage;
+static file_manager::FileBrowserPage g_FileBrowserPage;
+
+////////////////////////////////////////////////////////////////////////////////
+
+Page *getPageFromIdHook(int pageId) {
+    Page *page = nullptr;
+
+    switch (pageId) {
+    case PAGE_ID_SELF_TEST_RESULT:
+        page = &g_SelfTestResultPage;
+        break;
+    case PAGE_ID_EVENT_QUEUE:
+        page = &g_EventQueuePage;
+        break;
+    case PAGE_ID_CH_SETTINGS_PROT_OVP:
+        page = &g_ChSettingsOvpProtectionPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_PROT_OCP:
+        page = &g_ChSettingsOcpProtectionPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_PROT_OPP:
+        page = &g_ChSettingsOppProtectionPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_PROT_OTP:
+        page = &g_ChSettingsOtpProtectionPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_ADV_OPTIONS:
+        page = &g_ChSettingsAdvOptionPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_ADV_RANGES:
+        page = &g_ChSettingsAdvRangesPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_TRACKING:
+        page = &g_sysSettingsTrackingPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_COUPLING:
+        page = &g_sysSettingsCouplingPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_ADV_VIEW:
+        page = &g_ChSettingsAdvViewPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_TRIGGER:
+        page = &g_ChSettingsTriggerPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_LISTS:
+        page = &g_ChSettingsListsPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_DATE_TIME:
+        page = &g_SysSettingsDateTimePage;
+        break;
+#if OPTION_ETHERNET
+    case PAGE_ID_SYS_SETTINGS_ETHERNET:
+        page = &g_SysSettingsEthernetPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC:
+        page = &g_SysSettingsEthernetStaticPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_MQTT:
+        page = &g_SysSettingsMqttPage;
+        break;
+#endif
+    case PAGE_ID_SYS_SETTINGS_PROTECTIONS:
+        page = &g_SysSettingsProtectionsPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_TRIGGER:
+        page = &g_SysSettingsTriggerPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_IO:
+        page = &g_SysSettingsIOPinsPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_TEMPERATURE:
+        page = &g_SysSettingsTemperaturePage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_SOUND:
+        page = &g_SysSettingsSoundPage;
+        break;
+#if OPTION_ENCODER
+    case PAGE_ID_SYS_SETTINGS_ENCODER:
+        page = &g_SysSettingsEncoderPage;
+        break;
+#endif
+    case PAGE_ID_SYS_SETTINGS_SERIAL:
+        page = &g_SysSettingsSerialPage;
+        break;
+    case PAGE_ID_USER_PROFILES:
+    case PAGE_ID_USER_PROFILE_0_SETTINGS:
+    case PAGE_ID_USER_PROFILE_SETTINGS:
+        page = &g_UserProfilesPage;
+        break;
+    case PAGE_ID_FILE_BROWSER:
+        page = &g_FileBrowserPage;
+        break;
+    }
+
+    if (page) {
+        page->pageAlloc();
+    }
+
+    return page;
 }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 namespace psu {
 
@@ -135,7 +263,6 @@ static mcu::Button g_userSwitch(USER_SW_GPIO_Port, USER_SW_Pin, true, true);
 
 bool showSetupWizardQuestion();
 void onEncoder(int counter, bool clicked);
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1059,6 +1186,31 @@ bool isFocusChanged() {
 static bool g_isEncoderEnabledInActivePage;
 uint32_t g_focusEditValueChangedTime;
 
+float encoderIncrement(Value value, int counter, float min, float max, int channelIndex, float precision) {
+    if (channelIndex != -1) {
+        precision = psu::channel_dispatcher::getValuePrecision(psu::Channel::get(channelIndex), value.getUnit(), value.getFloat());
+    }
+
+    // TODO 
+    if (precision == 0) {
+        precision = 0.001f;
+    }
+
+    float step;
+
+    if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
+        step = precision * powf(10.0f, 1.0f * mcu::encoder::getAutoModeStepLevel());
+    } else {
+        step = psu::gui::edit_mode_step::getCurrentEncoderStepValue().getFloat();
+    }
+
+    float newValue = value.getFloat() + step * counter;
+    newValue = roundPrec(newValue, step);
+
+    return clamp(newValue, min, max);
+}
+
+
 bool isEncoderEnabledForWidget(const Widget *widget) {
     return widget->action == ACTION_ID_EDIT;
 }
@@ -1195,7 +1347,7 @@ void onEncoder(int counter, bool clicked) {
                 newValue = clamp(value.getFloat() + counter * step, min, max);
 
             } else {
-                newValue = mcu::encoder::increment(value, counter, min, max, g_focusCursor.i, 0);
+                newValue = encoderIncrement(value, counter, min, max, g_focusCursor.i, 0);
             }
 
             Value limitValue = data::getLimit(g_focusCursor, g_focusDataId);

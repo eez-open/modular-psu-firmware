@@ -18,27 +18,16 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/event.h>
-
-#include <stdint.h>
-
 #include <eez/firmware.h>
 #include <eez/system.h>
 
-#include <eez/gui/app_context.h>
 #include <eez/gui/gui.h>
-#include <eez/gui/touch.h>
-#include <eez/gui/update.h>
-#include <eez/gui/dialogs.h>
-#include <eez/gui/overlay.h>
 #include <eez/gui/widgets/container.h>
 
-// TODO this must be removed from here
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/idle.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/gui/psu.h>
-//
 
 #define CONF_GUI_LONG_TOUCH_TIMEOUT              1000000L // 1s
 #define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY   300000L // 300ms

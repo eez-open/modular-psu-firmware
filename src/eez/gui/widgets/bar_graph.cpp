@@ -18,18 +18,13 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/widgets/bar_graph.h>
-
 #include <math.h>
 #include <memory.h>
 
-#include <eez/gui/assets.h>
-#include <eez/gui/document.h>
-#include <eez/gui/draw.h>
-#include <eez/gui/gui.h>
-#include <eez/gui/widget.h>
-#include <eez/modules/mcu/display.h>
 #include <eez/util.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/bar_graph.h>
 
 using namespace eez::mcu;
 

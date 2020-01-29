@@ -20,10 +20,6 @@
 
 #include <stdint.h>
 
-#if OPTION_DISPLAY
-#include <eez/gui/app_context.h>
-#endif
-
 namespace eez {
 
 enum TestResult {
@@ -221,17 +217,5 @@ struct SlotInfo {
 
 static const int NUM_SLOTS = 3;
 extern SlotInfo g_slots[NUM_SLOTS];
-
-#if OPTION_DISPLAY
-
-namespace gui {
-
-class Page;
-
-Page *getPageFromId(int pageId);
-
-} // namespace gui
-
-#endif
 
 } // namespace eez

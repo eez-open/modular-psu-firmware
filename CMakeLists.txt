@@ -278,7 +278,6 @@ set(src_eez_gui
 )
 list (APPEND src_files ${src_eez_gui})
 set(header_eez_gui
-    src/eez/gui/action.h
     src/eez/gui/app_context.h
     src/eez/gui/assets.h
     src/eez/gui/data.h

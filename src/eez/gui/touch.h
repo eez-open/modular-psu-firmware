@@ -20,8 +20,6 @@
 
 #include <stdint.h>
 
-#include <eez/gui/event.h>
-
 namespace eez {
 namespace gui {
 namespace touch {

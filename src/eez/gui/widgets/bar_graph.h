@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <eez/gui/widget.h>
-
 #define BAR_GRAPH_ORIENTATION_LEFT_RIGHT 1
 #define BAR_GRAPH_ORIENTATION_RIGHT_LEFT 2
 #define BAR_GRAPH_ORIENTATION_TOP_BOTTOM 3

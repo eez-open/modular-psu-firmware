@@ -18,22 +18,27 @@
 
 #include <stdio.h> // sprintf
 
-#include <eez/scpi/scpi.h>
-
 #include <eez/system.h>
 #include <eez/sound.h>
 #include <eez/mp.h>
+
+#include <eez/scpi/scpi.h>
+
+#include <eez/gui/gui.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/serial_psu.h>
+
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
 #include <eez/modules/psu/ntp.h>
 #endif
+
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/profile.h>
+
 #if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
 #include <eez/libs/sd_fat/sd_fat.h>
@@ -41,6 +46,7 @@
 #include <eez/modules/psu/dlog_view.h>
 #include <eez/libs/image/jpeg.h>
 #endif
+
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/ontime.h>
@@ -48,9 +54,6 @@
 #include <eez/modules/psu/gui/file_manager.h>
 
 #include <eez/modules/bp3c/flash_slave.h>
-
-#include <eez/gui/data.h>
-#include <eez/gui/dialogs.h>
 
 #include <eez/modules/mcu/battery.h>
 

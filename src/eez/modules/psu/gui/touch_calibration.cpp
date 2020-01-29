@@ -18,18 +18,15 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/modules/psu/gui/touch_calibration.h>
+#include <eez/system.h>
+#include <eez/sound.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/touch_filter.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/sound.h>
-
-#include <eez/gui/dialogs.h>
-#include <eez/gui/document.h>
-#include <eez/gui/touch.h>
-#include <eez/gui/touch_filter.h>
-#include <eez/modules/mcu/display.h>
-#include <eez/system.h>
+#include <eez/modules/psu/gui/touch_calibration.h>
 
 #define CONF_GUI_TOUCH_CALIBRATION_M 17
 #define TOUCH_POINT_ACTIVATION_THRESHOLD 200

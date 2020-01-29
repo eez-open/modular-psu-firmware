@@ -41,7 +41,6 @@
 
 #if OPTION_DISPLAY
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/dialogs.h>
 #endif
 
 #include <eez/libs/sd_fat/sd_fat.h>

@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <eez/gui/data.h>
-#include <eez/gui/event.h>
 #include <eez/gui/geometry.h>
 
 namespace eez {

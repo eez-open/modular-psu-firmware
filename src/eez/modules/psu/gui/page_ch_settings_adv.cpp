@@ -18,6 +18,8 @@
 
 #if OPTION_DISPLAY
 
+#include <eez/system.h>
+
 #include <eez/modules/psu/psu.h>
 
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -27,8 +29,6 @@
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/trigger.h>
-#include <eez/gui/dialogs.h>
-#include <eez/system.h>
 
 namespace eez {
 namespace psu {

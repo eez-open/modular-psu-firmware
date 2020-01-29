@@ -18,8 +18,6 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/widget.h>
-
 #include <assert.h>
 #include <cstddef>
 #include <limits.h>
@@ -27,14 +25,8 @@
 #include <eez/debug.h>
 #include <eez/system.h>
 
-#include <eez/modules/mcu/display.h>
-
-#include <eez/gui/app_context.h>
-#include <eez/gui/assets.h>
-#include <eez/gui/draw.h>
 #include <eez/gui/gui.h>
-#include <eez/gui/touch.h>
-#include <eez/gui/overlay.h>
+
 #include <eez/gui/widgets/app_view.h>
 #include <eez/gui/widgets/bar_graph.h>
 #include <eez/gui/widgets/bitmap.h>

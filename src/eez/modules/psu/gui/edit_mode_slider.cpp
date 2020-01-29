@@ -23,8 +23,6 @@
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/edit_mode_step.h>
-#include <eez/gui/touch.h>
-#include <eez/modules/mcu/display.h>
 
 namespace eez {
 namespace psu {

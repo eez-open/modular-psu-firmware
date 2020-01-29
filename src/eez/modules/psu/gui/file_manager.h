@@ -18,12 +18,6 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <eez/file_type.h>
-#include <eez/modules/psu/persist_conf.h>
-#include <eez/gui/page.h>
-
 namespace eez {
 namespace gui {
 namespace file_manager {

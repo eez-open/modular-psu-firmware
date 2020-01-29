@@ -18,8 +18,6 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/modules/psu/psu.h>
-
 #include <math.h>
 #include <stdio.h>
 
@@ -27,12 +25,23 @@
 #include <eez/util.h>
 #include <eez/index.h>
 #include <eez/file_type.h>
+#include <eez/mp.h>
 
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/container.h>
+#include <eez/gui/widgets/yt_graph.h>
+
+#if OPTION_FAN
+#include <eez/modules/aux_ps/fan.h>
+#endif
+
+#include <eez/modules/bp3c/flash_slave.h>
+
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/dlog_view.h>
-#include <eez/mp.h>
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif
@@ -42,14 +51,14 @@
 #include <eez/mqtt.h>
 #endif
 #include <eez/modules/psu/event_queue.h>
-#if OPTION_FAN
-#include <eez/modules/aux_ps/fan.h>
-#endif
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/serial_psu.h>
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ontime.h>
+#if OPTION_SD_CARD
+#include <eez/modules/psu/sd_card.h>
+#endif
 
 #include <eez/modules/psu/gui/calibration.h>
 #include <eez/modules/psu/gui/data.h>
@@ -65,16 +74,6 @@
 #include <eez/modules/psu/gui/page_sys_settings.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/dialogs.h>
-#if OPTION_SD_CARD
-#include <eez/modules/psu/sd_card.h>
-#endif
-#include <eez/gui/overlay.h>
-#include <eez/gui/assets.h>
-#include <eez/gui/widgets/container.h>
-#include <eez/gui/widgets/yt_graph.h>
-
-#include <eez/modules/bp3c/flash_slave.h>
 
 using namespace eez::gui;
 using namespace eez::gui::data;

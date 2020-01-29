@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <eez/gui/document.h>
-
 using namespace eez::gui;
 
 namespace eez {

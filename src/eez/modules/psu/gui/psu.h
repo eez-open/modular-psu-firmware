@@ -18,9 +18,7 @@
 
 #pragma once
 
-#include <eez/gui/app_context.h>
 #include <eez/gui/gui.h>
-#include <eez/gui/dialogs.h>
 
 #include <eez/modules/psu/gui/numeric_keypad.h>
 
@@ -59,6 +57,8 @@ void changeTemperatureTripDelay(int iChannel);
 void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_callback)() = 0);
 
 Unit getCurrentEncoderUnit();
+
+float encoderIncrement(data::Value value, int counter, float min, float max, int channelIndex, float precision = 1.0f);
 
 class PsuAppContext : public AppContext {
 public:

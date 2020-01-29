@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/gui/page.h>
+#include <eez/gui/gui.h>
 using namespace eez::gui;
 
 #include <eez/modules/psu/datetime.h>

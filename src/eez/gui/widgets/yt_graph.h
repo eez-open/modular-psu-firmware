@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <eez/gui/widget.h>
-
 static const int MAX_NUM_OF_Y_VALUES = 10;
 
 namespace eez {

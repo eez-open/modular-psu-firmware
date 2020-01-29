@@ -22,22 +22,22 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
+#include <eez/sound.h>
+#include <eez/index.h>
 
-#include <eez/gui/dialogs.h>
 #include <eez/gui/gui.h>
 
-#include <eez/modules/psu/psu.h>
+#include <eez/scpi/scpi.h>
 
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/persist_conf.h>
-#include <eez/sound.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/dlog_view.h>
 
 #include <eez/modules/psu/gui/psu.h>
-
 #include <eez/modules/psu/gui/animations.h>
 #include <eez/modules/psu/gui/calibration.h>
 #include <eez/modules/psu/gui/data.h>
@@ -55,21 +55,15 @@
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/touch_calibration.h>
 #include <eez/modules/psu/gui/file_manager.h>
+#if OPTION_SD_CARD
+#include <eez/modules/psu/sd_card.h>
+#endif
 
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif
 
-#include <eez/index.h>
-
 #include <eez/modules/bp3c/eeprom.h>
-
-#include <eez/scpi/scpi.h>
-
-#if OPTION_SD_CARD
-#include <eez/modules/psu/sd_card.h>
-#endif
-
 #include <eez/modules/bp3c/flash_slave.h>
 #include <eez/modules/bp3c/io_exp.h>
 

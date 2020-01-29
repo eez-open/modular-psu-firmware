@@ -18,8 +18,6 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/modules/mcu/display.h>
-
 #include <math.h>
 #include <memory.h>
 #include <stdio.h>
@@ -30,14 +28,13 @@
 #include <SDL_image.h>
 
 #include <cmsis_os.h>
+
+#include <eez/modules/mcu/display.h>
+
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/debug.h>
 #include <eez/memory.h>
-#include <eez/gui/app_context.h>
-#include <eez/gui/data.h>
-#include <eez/gui/document.h>
-#include <eez/gui/font.h>
-#include <eez/gui/widget.h>
+#include <eez/gui/gui.h>
 #include <eez/platform/simulator/front_panel.h>
 #include <eez/system.h>
 #include <eez/util.h>

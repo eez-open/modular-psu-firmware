@@ -18,15 +18,11 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/widgets/button_group.h>
-
-#include <eez/gui/assets.h>
-#include <eez/gui/draw.h>
-#include <eez/gui/gui.h>
-#include <eez/gui/widget.h>
-#include <eez/modules/mcu/display.h>
 #include <eez/sound.h>
 #include <eez/util.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/button_group.h>
 
 using namespace eez::mcu;
 

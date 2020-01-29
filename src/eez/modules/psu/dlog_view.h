@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/gui/data.h>
+#include <eez/gui/gui.h>
 #include <eez/gui/widgets/yt_graph.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/dlog_view.h>

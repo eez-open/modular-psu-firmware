@@ -58,9 +58,6 @@
 
 #include <eez/modules/mcu/battery.h>
 #include <eez/modules/mcu/eeprom.h>
-#if OPTION_ENCODER
-#include <eez/modules/mcu/encoder.h>
-#endif
 
 #include <eez/modules/dcpX05/ioexp.h>
 #include <eez/modules/dcpX05/dac.h>

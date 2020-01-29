@@ -28,7 +28,6 @@
 #include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/page_ch_settings_protection.h>
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/dialogs.h>
 
 namespace eez {
 namespace psu {

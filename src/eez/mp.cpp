@@ -30,8 +30,7 @@
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/scpi/psu.h>
 
-#include <eez/gui/dialogs.h>
-#include <eez/gui/document.h>
+#include <eez/gui/gui.h>
 
 #include <eez/memory.h>
 

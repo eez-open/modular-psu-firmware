@@ -29,17 +29,16 @@
 #include <tim.h>
 
 #include <cmsis_os.h>
-#include <eez/gui/app_context.h>
-#include <eez/gui/font.h>
-#include <eez/gui/touch.h>
-#include <eez/modules/mcu/display.h>
+
 #include <eez/system.h>
 #include <eez/util.h>
+#include <eez/memory.h>
+
+#include <eez/gui/gui.h>
+#include <eez/modules/mcu/display.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/persist_conf.h>
-
-#include <eez/memory.h>
 
 using namespace eez::gui;
 

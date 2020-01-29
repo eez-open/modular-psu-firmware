@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <eez/gui/data.h>
-
 namespace eez {
 namespace mcu {
 namespace encoder {
@@ -42,6 +40,7 @@ enum EncoderMode {
 };
 
 extern EncoderMode g_encoderMode;
+int getAutoModeStepLevel();
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 void write(int counter, bool clicked);
@@ -49,8 +48,6 @@ void write(int counter, bool clicked);
 
 void switchEncoderMode();
 void setUseSameSpeed(bool enable);
-
-float increment(gui::data::Value value, int counter, float min, float max, int channelIndex, float precision = 1.0f);
 
 } // namespace encoder
 } // namespace mcu

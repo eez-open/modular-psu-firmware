@@ -18,12 +18,11 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/widgets/up_down.h>
-
-#include <eez/gui/draw.h>
-#include <eez/gui/gui.h>
 #include <eez/util.h>
 #include <eez/sound.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/up_down.h>
 
 namespace eez {
 namespace gui {

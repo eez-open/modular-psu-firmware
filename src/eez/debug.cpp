@@ -30,8 +30,9 @@
 // TODO these includes should not be inside apps/psu
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/datetime.h>
+
 #if OPTION_DISPLAY
-#include <eez/gui/assets.h>
+#include <eez/gui/gui.h>
 #endif
 
 using namespace eez::psu;

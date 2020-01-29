@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <eez/gui/dialogs.h>
-#include <eez/gui/widget.h>
 #include <eez/gui/widgets/text.h>
 #include <eez/gui/widgets/rectangle.h>
 

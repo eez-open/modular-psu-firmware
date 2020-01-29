@@ -20,14 +20,9 @@
 
 #include <string.h>
 
-#include <eez/gui/page.h>
-
 #include <eez/util.h>
 
-#include <eez/gui/draw.h>
 #include <eez/gui/gui.h>
-#include <eez/gui/app_context.h>
-#include <eez/modules/mcu/display.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/gui/psu.h>

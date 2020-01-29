@@ -20,14 +20,12 @@
 
 #include <math.h>
 
-#include <eez/gui/widgets/scroll_bar.h>
-
-#include <eez/gui/draw.h>
-#include <eez/gui/gui.h>
-#include <eez/modules/mcu/display.h>
 #include <eez/util.h>
 #include <eez/sound.h>
 #include <eez/debug.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/scroll_bar.h>
 
 using namespace eez::mcu;
 

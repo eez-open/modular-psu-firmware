@@ -18,12 +18,10 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/widgets/rectangle.h>
-
-#include <eez/gui/draw.h>
-#include <eez/gui/gui.h>
-#include <eez/gui/widget.h>
 #include <eez/util.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/rectangle.h>
 
 namespace eez {
 namespace gui {
