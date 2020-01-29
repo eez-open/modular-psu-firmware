@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/firmware.h>
 #include <eez/system.h>
 
 #include <eez/modules/psu/psu.h>
@@ -1523,7 +1524,7 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarityQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_systemReset(scpi_t *context) {
 #if defined(EEZ_PLATFORM_STM32)
-	NVIC_SystemReset();
+	restart();
 	return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

@@ -19,6 +19,7 @@
 #include <math.h>
 #include <stdio.h>
 
+#include <eez/firmware.h>
 #include <eez/system.h>
 
 #if OPTION_FAN
@@ -63,7 +64,7 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             mcu::eeprom::resetAllExceptOnTimeCounters();
 
 #if defined(EEZ_PLATFORM_STM32)
-            NVIC_SystemReset();
+            restart();
 #endif
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
