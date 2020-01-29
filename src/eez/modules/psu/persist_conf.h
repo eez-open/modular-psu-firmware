@@ -277,6 +277,7 @@ bool setEthernetMacAddress(uint8_t macAddress[]);
 bool setEthernetIpAddress(uint32_t ipAddress);
 bool setEthernetDns(uint32_t dns);
 bool setEthernetGateway(uint32_t gateway);
+bool setEthernetHostName(const char *hostName);
 bool setEthernetSubnetMask(uint32_t subnetMask);
 bool setEthernetScpiPort(uint16_t scpiPort);
 bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint32_t dns,

@@ -34,7 +34,7 @@ bool testMaster();
 bool reset();
 
 void standBy();
-void hardReset();
+void restart();
 void shutdown();
 
 } // namespace eez

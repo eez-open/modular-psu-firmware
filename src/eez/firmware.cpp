@@ -74,7 +74,11 @@
 #include <eez/modules/bp3c/eeprom.h>
 #include <eez/modules/bp3c/io_exp.h>
 
- ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+#if defined(EEZ_PLATFORM_STM32)
+extern bool g_isResetByIWDG;
+#endif
 
 namespace eez {
 
@@ -82,8 +86,6 @@ bool g_isBooted;
 bool g_bootTestSuccess;
 bool g_shutdownInProgress;
 bool g_shutdown;
-
-extern bool g_isResetByIWDG;
 
 void boot() {
     assert(MEMORY_END - MEMORY_BEGIN <= MEMORY_SIZE);
@@ -184,9 +186,11 @@ void boot() {
     eez::gui::showWelcomePage();
 #endif
 
+#if defined(EEZ_PLATFORM_STM32)
     if (g_isResetByIWDG) {
         DebugTrace("Reset by IWDG detected\n");
     }
+#endif
 
     sound::init();
 
@@ -318,10 +322,10 @@ void standBy() {
     psu::changePowerState(false);
 }
 
-static bool g_reset;
+static bool g_restart;
 
-void hardReset() {
-    g_reset = true;
+void restart() {
+    g_restart = true;
     shutdown();
 }
 
@@ -367,7 +371,7 @@ void shutdown() {
         delay(1);
     }
 
-    if (g_reset) {
+    if (g_restart) {
         delay(1000);
 
 #if defined(EEZ_PLATFORM_STM32)

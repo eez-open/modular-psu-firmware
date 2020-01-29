@@ -30,6 +30,9 @@
 #include <ip_addr.h>
 #include <netif.h>
 extern struct netif gnetif;
+extern ip4_addr_t ipaddr;
+extern ip4_addr_t netmask;
+extern ip4_addr_t gw;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -155,12 +158,47 @@ static void onEvent(uint8_t eventType) {
 	switch (eventType) {
 	case QUEUE_MESSAGE_CONNECT:
 		{
-			MX_LWIP_Init();
+            // MX_LWIP_Init();
+
+            // Initilialize the LwIP stack with RTOS
+            tcpip_init(NULL, NULL);
+
 			netif_set_hostname(&gnetif, psu::persist_conf::devConf.ethernetHostName);
-			while(!dhcp_supplied_address(&gnetif)) {
-				osDelay(10);
-			}
+
+            if (psu::persist_conf::isEthernetDhcpEnabled()) {            
+                ipaddr.addr = 0;
+                netmask.addr = 0;
+                gw.addr = 0;
+            } else {
+            	ipaddr.addr = psu::persist_conf::devConf.ethernetIpAddress;
+            	netmask.addr = psu::persist_conf::devConf.ethernetSubnetMask;
+            	gw.addr = psu::persist_conf::devConf.ethernetGateway;
+            }
+
+            // add the network interface (IPv4/IPv6) with RTOS
+            netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
+
+            // Registers the default network interface
+            netif_set_default(&gnetif);
+
+            if (netif_is_link_up(&gnetif)) {
+                // When the netif is fully configured this function must be called
+                netif_set_up(&gnetif);
+            } else {
+                // When the netif link is down this function must be called
+                netif_set_down(&gnetif);
+            }
+
+            if (psu::persist_conf::isEthernetDhcpEnabled()) {
+                // Start DHCP negotiation for a network interface (IPv4)
+                dhcp_start(&gnetif);
+                while(!dhcp_supplied_address(&gnetif)) {
+                    osDelay(10);
+                }
+            }
+
 			g_connectionState = CONNECTION_STATE_CONNECTED;
+
 			osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 1), osWaitForever);
 		}
 		break;

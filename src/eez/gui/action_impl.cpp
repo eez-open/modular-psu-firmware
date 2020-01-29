@@ -841,9 +841,9 @@ void action_stand_by() {
     eez::standBy();
 }
 
-void action_hard_reset() {
+void action_restart() {
     popPage();
-    yesNoDialog(PAGE_ID_YES_NO, "Do you want to reset?", eez::hardReset, nullptr, nullptr);
+    yesNoDialog(PAGE_ID_YES_NO, "Do you want to reset?", eez::restart, nullptr, nullptr);
 }
 
 void action_shutdown() {

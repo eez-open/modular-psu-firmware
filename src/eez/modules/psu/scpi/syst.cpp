@@ -1116,6 +1116,52 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetGatewayQ(scpi_t *context) {
 #endif
 }
 
+scpi_result_t scpi_cmd_systemCommunicateEthernetHostname(scpi_t *context) {
+#if OPTION_ETHERNET
+    if (!persist_conf::isEthernetEnabled()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        return SCPI_RES_ERR;
+    }
+
+    const char *hostNameStr;
+    size_t hostNameStrLength;
+
+    if (!SCPI_ParamCharacters(context, &hostNameStr, &hostNameStrLength, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (hostNameStrLength > 32) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CHARACTER_DATA_TOO_LONG);
+        return SCPI_RES_ERR;
+    }
+
+    char hostName[32 + 1];
+    strncpy(hostName, hostNameStr, hostNameStrLength);
+    hostName[hostNameStrLength] = 1;
+
+    persist_conf::setEthernetHostName(hostName);
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+scpi_result_t scpi_cmd_systemCommunicateEthernetHostnameQ(scpi_t *context) {
+#if OPTION_ETHERNET
+    if (!persist_conf::isEthernetEnabled()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        return SCPI_RES_ERR;
+    }
+    SCPI_ResultText(context, persist_conf::devConf.ethernetHostName);
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
 scpi_result_t scpi_cmd_systemCommunicateEthernetSmask(scpi_t *context) {
     // TODO migrate to generic firmware
 #if OPTION_ETHERNET

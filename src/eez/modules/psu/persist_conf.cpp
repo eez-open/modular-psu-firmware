@@ -1095,6 +1095,19 @@ bool setEthernetGateway(uint32_t gateway) {
 #endif
 }
 
+bool setEthernetHostName(const char *hostName) {
+#if OPTION_ETHERNET
+    if (!g_devConf.skipEthernetSetup) {
+        strcpy(g_devConf.ethernetHostName, hostName);
+        g_devConf.skipEthernetSetup = 1;
+        ethernet::update();
+    }
+    return true;
+#else
+    return false;
+#endif
+}
+
 bool setEthernetSubnetMask(uint32_t subnetMask) {
 #if OPTION_ETHERNET
     if (!g_devConf.skipEthernetSetup || g_devConf.ethernetSubnetMask != subnetMask) {
@@ -1149,9 +1162,9 @@ bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint3
         g_devConf.ethernetGateway = gateway;
         g_devConf.ethernetSubnetMask = subnetMask;
         g_devConf.ethernetScpiPort = scpiPort;
-        g_devConf.skipEthernetSetup = 1;
         strcpy(g_devConf.ethernetHostName, hostName);
 
+        g_devConf.skipEthernetSetup = 1;
         ethernet::update();
     }
 

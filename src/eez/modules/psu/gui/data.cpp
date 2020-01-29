@@ -3438,6 +3438,8 @@ void data_ethernet_ip_address(data::DataOperationEnum operation, data::Cursor &c
             if (page) {
                 if (page->m_dhcpEnabled) {
                     value = data::Value(ethernet::getIpAddress(), VALUE_TYPE_IP_ADDRESS);
+                } else {
+                    value = data::Value(psu::persist_conf::devConf.ethernetIpAddress, VALUE_TYPE_IP_ADDRESS);
                 }
             }
         }

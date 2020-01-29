@@ -18,6 +18,8 @@
 
 #if OPTION_DISPLAY
 
+#include <eez/firmware.h>
+
 #include <eez/modules/psu/psu.h>
 
 #include <math.h>
@@ -354,9 +356,14 @@ void SysSettingsEthernetPage::editMacAddress() {
 }
 
 int SysSettingsEthernetPage::getDirty() {
-    return m_enabledOrig != m_enabled || m_dhcpEnabledOrig != m_dhcpEnabled ||
-        m_ipAddressOrig != m_ipAddress || m_dnsOrig != m_dns || m_gatewayOrig != m_gateway ||
-        m_subnetMaskOrig != m_subnetMask || m_scpiPortOrig != m_scpiPort ||
+    return 
+        m_enabledOrig != m_enabled ||
+        m_dhcpEnabledOrig != m_dhcpEnabled ||
+        m_ipAddressOrig != m_ipAddress ||
+        m_dnsOrig != m_dns ||
+        m_gatewayOrig != m_gateway ||
+        m_subnetMaskOrig != m_subnetMask ||
+        m_scpiPortOrig != m_scpiPort ||
         memcmp(m_macAddress, m_macAddressOrig, 6) != 0 ||
         strcmp(m_hostName, m_hostNameOrig) != 0;
 }
@@ -364,8 +371,7 @@ int SysSettingsEthernetPage::getDirty() {
 void SysSettingsEthernetPage::set() {
     if (getDirty()) {
         if (persist_conf::setEthernetSettings(m_enabled, m_dhcpEnabled, m_ipAddress, m_dns, m_gateway, m_subnetMask, m_scpiPort, m_macAddress, m_hostName)) {
-            popPage();
-            infoMessage("Turn off and on power or", "press reset to apply changes!");
+            yesNoDialog(PAGE_ID_INFO_RESTART, "", eez::restart, 0, 0);
         }
     }
 }

@@ -440,7 +440,7 @@ scpi_result_t scpi_cmd_debugDcm220Q(scpi_t *context) {
 #endif // DEBUG
 }
 
-scpi_result_t scpi_cmd_debugBoot(scpi_t *context) {
+scpi_result_t scpi_cmd_debugDownloadFirmware(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     int32_t slotIndex;
     if (!SCPI_ParamInt32(context, &slotIndex, true)) {

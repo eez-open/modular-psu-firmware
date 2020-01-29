@@ -243,7 +243,7 @@ void oneIter() {
         } else if (type == PSU_QUEUE_SYNC_OUTPUT_ENABLE) {
             channel_dispatcher::syncOutputEnable();
         } else if (type == PSU_QUEUE_MESSAGE_TYPE_HARD_RESET) {
-            hardReset();
+            restart();
         } else if (type == PSU_QUEUE_MESSAGE_TYPE_SHUTDOWN) {
             shutdown();
         }
@@ -287,7 +287,7 @@ bool testChannels() {
     channel_dispatcher::disableOutputForAllChannels();
 
     for (int i = 0; i < CH_NUM; ++i) {
-        //WATCHDOG_RESET();
+        WATCHDOG_RESET();
         result &= Channel::get(i).test();
     }
 
@@ -738,7 +738,7 @@ static const int NUM_TICK_FUNCS = sizeof(g_tickFuncs) / sizeof(TickFunc);
 static int g_tickFuncIndex = 0;
 
 void tick() {
-    //WATCHDOG_RESET();
+    WATCHDOG_RESET();
 
     uint32_t tickCount = micros();
 

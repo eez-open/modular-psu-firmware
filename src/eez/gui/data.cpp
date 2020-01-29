@@ -40,7 +40,9 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/persist_conf.h>
 
+#if defined(EEZ_PLATFORM_STM32)
 extern bool g_isResetByIWDG;
+#endif
 
 namespace eez {
 namespace gui {
@@ -947,7 +949,9 @@ void data_slot3_test_result(data::DataOperationEnum operation, data::Cursor &cur
 
 void data_is_reset_by_iwdg(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = g_isResetByIWDG ? 1 : 0;
+        #if defined(EEZ_PLATFORM_STM32)
+            value = g_isResetByIWDG ? 1 : 0;
+        #endif
     }
 }
 
