@@ -368,11 +368,27 @@ int SysSettingsEthernetPage::getDirty() {
         strcmp(m_hostName, m_hostNameOrig) != 0;
 }
 
+void SysSettingsEthernetPage::applyAndRestart() {
+    SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getActivePage();
+
+    persist_conf::setEthernetSettings(
+        page->m_enabled, 
+        page->m_dhcpEnabled, 
+        page->m_ipAddress, 
+        page->m_dns, 
+        page->m_gateway, 
+        page->m_subnetMask, 
+        page->m_scpiPort, 
+        page->m_macAddress, 
+        page->m_hostName
+    );
+
+    eez::restart();
+}
+
 void SysSettingsEthernetPage::set() {
     if (getDirty()) {
-        if (persist_conf::setEthernetSettings(m_enabled, m_dhcpEnabled, m_ipAddress, m_dns, m_gateway, m_subnetMask, m_scpiPort, m_macAddress, m_hostName)) {
-            yesNoDialog(PAGE_ID_INFO_RESTART, "", eez::restart, 0, 0);
-        }
+        yesNoDialog(PAGE_ID_INFO_RESTART, "", applyAndRestart, popPage, popPage);
     }
 }
 

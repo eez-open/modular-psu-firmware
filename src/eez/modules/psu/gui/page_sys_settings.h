@@ -124,6 +124,8 @@ class SysSettingsEthernetPage : public SetPage {
 
     static void onSetScpiPort(float value);
     static void onSetMacAddress(char *value);
+
+    static void applyAndRestart();
 };
 
 class SysSettingsEthernetStaticPage : public SetPage {
