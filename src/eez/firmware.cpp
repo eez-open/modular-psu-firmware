@@ -28,6 +28,7 @@
 #include <eez/system.h>
 #include <eez/mp.h>
 #include <eez/sound.h>
+#include <eez/memory.h>
 
 #include <eez/scpi/scpi.h>
 
@@ -82,7 +83,11 @@ bool g_bootTestSuccess;
 bool g_shutdownInProgress;
 bool g_shutdown;
 
+extern bool g_isResetByIWDG;
+
 void boot() {
+    assert(MEMORY_END - MEMORY_BEGIN <= MEMORY_SIZE);
+
 #if OPTION_SDRAM
     mcu::sdram::init();
     //mcu::sdram::test();
@@ -113,7 +118,10 @@ void boot() {
         psu::Channel::get(i).setChannelIndex(i);
     }
 
-    sound::init();
+    psu::rtc::init();
+    psu::datetime::init();
+
+    psu::event_queue::init();
 
     mcu::eeprom::init();
     mcu::eeprom::test();
@@ -176,12 +184,14 @@ void boot() {
     eez::gui::showWelcomePage();
 #endif
 
+    if (g_isResetByIWDG) {
+        DebugTrace("Reset by IWDG detected\n");
+    }
+
+    sound::init();
+
     psu::serial::init();
 
-    psu::rtc::init();
-    psu::datetime::init();
-
-    psu::event_queue::init();
     psu::profile::init();
 
     psu::io_pins::init();

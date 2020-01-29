@@ -287,6 +287,7 @@ bool testChannels() {
     channel_dispatcher::disableOutputForAllChannels();
 
     for (int i = 0; i < CH_NUM; ++i) {
+        //WATCHDOG_RESET();
         result &= Channel::get(i).test();
     }
 
@@ -737,6 +738,8 @@ static const int NUM_TICK_FUNCS = sizeof(g_tickFuncs) / sizeof(TickFunc);
 static int g_tickFuncIndex = 0;
 
 void tick() {
+    //WATCHDOG_RESET();
+
     uint32_t tickCount = micros();
 
     dlog_record::tick(tickCount);

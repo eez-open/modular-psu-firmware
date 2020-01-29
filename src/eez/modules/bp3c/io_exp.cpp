@@ -21,6 +21,8 @@
 #include <cmsis_os.h>
 #endif
 
+#include <scpi/scpi.h>
+
 #include <eez/system.h>
 
 // TODO
@@ -113,6 +115,10 @@ void init() {
 			g_testResult = TEST_OK;
 			hardResetModules();
 		}
+	}
+
+	if (g_testResult == TEST_FAILED) {
+		generateError(SCPI_ERROR_BACKPLANE_IOEXP_TEST_FAILED);
 	}
 	
 #else

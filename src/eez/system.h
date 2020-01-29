@@ -23,6 +23,10 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
+#include <iwdg.h>
+#define WATCHDOG_RESET(...) HAL_IWDG_Refresh(&hiwdg)
+#else
+#define WATCHDOG_RESET(...) 0
 #endif
 
 namespace eez {

@@ -140,7 +140,6 @@ static const int EVENT_TYPE_ERROR = 3;
 	EVENT_ERROR(SLOT1_SYNC_ERROR, 140, "Sync error on module 1")                                   \
 	EVENT_ERROR(SLOT2_SYNC_ERROR, 141, "Sync error on module 2")                                   \
 	EVENT_ERROR(SLOT3_SYNC_ERROR, 142, "Sync error on module 3")                                   \
-    EVENT_ERROR(INVALID_DATETIME,   143, "Invalid date & time ")                                   \
     EVENT_WARNING(CH1_CALIBRATION_DISABLED, 0, "Ch1 calibration disabled")                         \
     EVENT_WARNING(CH2_CALIBRATION_DISABLED, 1, "Ch2 calibration disabled")                         \
     EVENT_WARNING(CH3_CALIBRATION_DISABLED, 2, "Ch3 calibration disabled")                         \

@@ -31,6 +31,7 @@
 #include <fmc.h>
 #include <gpio.h>
 #include <i2c.h>
+#include <iwdg.h>
 #include <ltdc.h>
 #include <rng.h>
 #include <rtc.h>
@@ -42,7 +43,6 @@
 #endif
 
 #include <eez/firmware.h>
-#include <eez/memory.h>
 
 #include <eez/scpi/scpi.h>
 
@@ -85,16 +85,22 @@ void startEmscripten();
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool g_isResetByIWDG;
+
 int main(int argc, char **argv) {
-    assert(MEMORY_END - MEMORY_BEGIN <= MEMORY_SIZE);
-
 #ifdef __EMSCRIPTEN__
-
     startEmscripten();
-
 #else
 
 #if defined(EEZ_PLATFORM_STM32)
+	if (RCC->CSR & RCC_CSR_IWDGRSTF) {	
+		/* Reset by IWDG */
+		g_isResetByIWDG = true;
+		/* Clear reset flags */
+		RCC->CSR |= RCC_CSR_RMVF;
+	}
+
+    MX_IWDG_Init();
     HAL_Init();
     SystemClock_Config();
     MX_GPIO_Init();

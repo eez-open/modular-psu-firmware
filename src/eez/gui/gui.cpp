@@ -89,6 +89,8 @@ void mainLoop(const void *) {
 }
 
 void oneIter() {
+    WATCHDOG_RESET();
+
     mcu::display::sync();
 
     g_wasBlinkTime = g_isBlinkTime;

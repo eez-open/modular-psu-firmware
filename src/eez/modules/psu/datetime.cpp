@@ -209,7 +209,7 @@ bool test() {
     }
 
     if (g_testResult == TEST_FAILED) {
-        event_queue::pushEvent(event_queue::EVENT_ERROR_INVALID_DATETIME);
+        generateError(SCPI_ERROR_DATETIME_TEST_FAILED);
     }
 
     setQuesBits(QUES_TIME, g_testResult != TEST_OK);
