@@ -1447,12 +1447,8 @@ void Channel::limitMaxCurrent(MaxCurrentLimitCause cause) {
         maxCurrentLimitCause = cause;
 
         if (isMaxCurrentLimited()) {
-            if (isOutputEnabled() && i.mon_last > ERR_MAX_CURRENT) {
-                setCurrent(0);
-            }
-
             if (i.limit > ERR_MAX_CURRENT) {
-                setCurrentLimit(ERR_MAX_CURRENT);
+                channel_dispatcher::setCurrentLimit(*this, ERR_MAX_CURRENT);
             }
         }
     }
