@@ -215,7 +215,7 @@ struct Channel : ChannelInterface {
 		params.OPP_DEFAULT_LEVEL = 80.0f;
 		params.OPP_MAX_LEVEL = 80.0f;
 
-		params.PTOT = 80.0f;
+		params.PTOT = 77.5f;
 
 		params.U_RESOLUTION = 0.01f;
 		params.I_RESOLUTION = 0.02f;
