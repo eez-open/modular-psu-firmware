@@ -21,6 +21,10 @@
 namespace eez {
 namespace gui {
 
+struct ButtonGroupWidget {
+    uint16_t selectedStyle;
+};
+
 struct ButtonGroupWidgetState {
     WidgetState genericState;
     const data::Value *labels;

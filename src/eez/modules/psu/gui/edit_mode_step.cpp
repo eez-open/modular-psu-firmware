@@ -44,56 +44,56 @@ namespace edit_mode_step {
 
 using data::Value;
 
-#define NUM_UNITS 6
+#define NUM_UNITS 7
 
 static const Value CONF_GUI_UNIT_STEPS_LIST[NUM_UNITS][NUM_STEPS_PER_UNIT] = {
     { 
-        Value(5.0f, UNIT_VOLT), 
         Value(2.0f, UNIT_VOLT), 
         Value(1.0f, UNIT_VOLT), 
         Value(0.5f, UNIT_VOLT), 
         Value(0.1f, UNIT_VOLT) 
     },
     { 
-        Value(0.5f, UNIT_AMPER), 
         Value(0.25f, UNIT_AMPER), 
         Value(0.1f, UNIT_AMPER), 
         Value(0.05f, UNIT_AMPER), 
         Value(0.01f, UNIT_AMPER) 
     },
     { 
-        Value(0.005f, UNIT_AMPER), 
         Value(0.0025f, UNIT_AMPER), 
         Value(0.001f, UNIT_AMPER), 
         Value(0.0005f, UNIT_AMPER), 
         Value(0.0001f, UNIT_AMPER) 
     },
     { 
-        Value(10.0f, UNIT_WATT), 
         Value(5.0f, UNIT_WATT), 
         Value(2.0f, UNIT_WATT), 
         Value(1.0f, UNIT_WATT), 
         Value(0.5f, UNIT_WATT) 
     },
     { 
-        Value(20.0f, UNIT_CELSIUS), 
         Value(10.0f, UNIT_CELSIUS), 
         Value(5.0f, UNIT_CELSIUS), 
         Value(2.0f, UNIT_CELSIUS), 
         Value(1.0f, UNIT_CELSIUS) 
     },
     { 
-        Value(30.0f, UNIT_SECOND), 
         Value(20.0f, UNIT_SECOND), 
         Value(10.0f, UNIT_SECOND), 
         Value(5.0f, UNIT_SECOND), 
         Value(1.0f, UNIT_SECOND) 
     },
+    { 
+        Value(0.2f, UNIT_AMPER), 
+        Value(0.1f, UNIT_AMPER), 
+        Value(0.04f, UNIT_AMPER), 
+        Value(0.02f, UNIT_AMPER) 
+    }
 };
 
 static int g_stepIndexes[NUM_UNITS][CH_MAX];
 
-static const int DEFAULT_INDEX = 2;
+static const int DEFAULT_INDEX = 1;
 
 static bool g_changed;
 static int g_startPos;
@@ -104,9 +104,18 @@ int getUnitStepValuesIndex(Unit unit) {
     } 
     
     if (unit == UNIT_AMPER) {
-        if (Channel::get(g_focusCursor.i).flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
+        Channel &channel = Channel::get(g_focusCursor.i);
+        if (channel.flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
             return 2;
         }
+
+        // DCM220
+        int slotIndex = Channel::get(channel.channelIndex).slotIndex;
+        auto &slot = g_slots[slotIndex];
+        if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220) {
+            return 6;
+        }
+
         return 1;
     } 
     
@@ -228,7 +237,7 @@ Value getCurrentEncoderStepValue() {
     if (!data::getEncoderStepValues(g_focusCursor, g_focusDataId, stepValues)) {
         getUnitStepValues(getCurrentEncoderUnit(), stepValues);
     }
-    int stepValueIndex = mcu::encoder::ENCODER_MODE_STEP5 - mcu::encoder::g_encoderMode;
+    int stepValueIndex = mcu::encoder::ENCODER_MODE_STEP4 - mcu::encoder::g_encoderMode;
     if (stepValueIndex >= stepValues.count) {
         stepValueIndex = stepValues.count - 1;
     }

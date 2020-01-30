@@ -1000,8 +1000,14 @@ void action_user_switch_clicked() {
         if (getActivePageId() == PAGE_ID_EDIT_MODE_STEP) {
             psu::gui::edit_mode_step::switchToNextStepIndex();
         } else {
-            mcu::encoder::switchEncoderMode();
-            psu::gui::edit_mode_step::showCurrentEncoderMode();
+            if (g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE && !((ToastMessagePage *)g_appContext->getActivePage())->hasAction()) {
+                popPage();
+            }
+
+            if (psu::gui::isEncoderEnabledInActivePage()) {
+                mcu::encoder::switchEncoderMode();
+                psu::gui::edit_mode_step::showCurrentEncoderMode();
+            }
         }
 #endif
         break;

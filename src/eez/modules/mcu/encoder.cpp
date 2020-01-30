@@ -192,7 +192,7 @@ void write(int counter, bool clicked) {
 #endif
 
 void switchEncoderMode() {
-    if (g_encoderMode == ENCODER_MODE_STEP5) {
+    if (g_encoderMode == ENCODER_MODE_STEP4) {
         g_encoderMode = ENCODER_MODE_AUTO;
     } else {
         g_encoderMode = EncoderMode(g_encoderMode + 1);

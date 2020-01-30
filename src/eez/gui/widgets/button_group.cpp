@@ -29,8 +29,7 @@ using namespace eez::mcu;
 namespace eez {
 namespace gui {
 
-void drawButtons(const Widget *widget, int x, int y, const Style *style, int selectedButton,
-                 const data::Value *labels, int count) {
+void drawButtons(const Widget *widget, int x, int y, const Style *style, const Style *selectedStyle, int selectedButton, const data::Value *labels, int count) {
     if (widget->w > widget->h) {
         // horizontal orientation
         display::setColor(style->background_color);
@@ -42,7 +41,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, int sel
         for (int i = 0; i < count; ++i) {
             char text[32];
             labels[i].toText(text, 32);
-            drawText(text, -1, x, y, w, h, style, i == selectedButton, false, false, nullptr, nullptr, nullptr, nullptr);
+            drawText(text, -1, x, y, w, h, i == selectedButton ? selectedStyle : style, false, false, false, nullptr, nullptr, nullptr, nullptr);
             x += w;
         }
     } else {
@@ -71,7 +70,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, int sel
 
             char text[32];
             labels[i].toText(text, 32);
-            drawText(text, -1, x, y + yOffset, w, labelHeight, style, i == selectedButton, false, false, nullptr, nullptr, nullptr, nullptr);
+            drawText(text, -1, x, y + yOffset, w, labelHeight, i == selectedButton ? selectedStyle: style, false, false, false, nullptr, nullptr, nullptr, nullptr);
 
             int b = y + yOffset + labelHeight;
 
@@ -92,6 +91,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, int sel
 
 void ButtonGroupWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
+    const ButtonGroupWidget *buttonGroupWidget = GET_WIDGET_PROPERTY(widget, specific, const ButtonGroupWidget *);
 
     widgetCursor.currentState->size = sizeof(ButtonGroupWidgetState);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
@@ -111,7 +111,8 @@ void ButtonGroupWidget_draw(const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         const Style* style = getStyle(widget->style);
-        drawButtons(widget, widgetCursor.x, widgetCursor.y, style,
+        const Style* selectedStyle = getStyle(buttonGroupWidget->selectedStyle);
+        drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle,
                     widgetCursor.currentState->data.getInt(), labels, count);
     }
 }

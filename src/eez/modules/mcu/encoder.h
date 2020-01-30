@@ -35,8 +35,7 @@ enum EncoderMode {
     ENCODER_MODE_STEP1,
     ENCODER_MODE_STEP2,
     ENCODER_MODE_STEP3,
-    ENCODER_MODE_STEP4,
-    ENCODER_MODE_STEP5
+    ENCODER_MODE_STEP4
 };
 
 extern EncoderMode g_encoderMode;

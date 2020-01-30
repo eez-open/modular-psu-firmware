@@ -60,6 +60,8 @@ Unit getCurrentEncoderUnit();
 
 float encoderIncrement(data::Value value, int counter, float min, float max, int channelIndex, float precision = 1.0f);
 
+bool isEncoderEnabledInActivePage();
+
 class PsuAppContext : public AppContext {
 public:
     PsuAppContext();

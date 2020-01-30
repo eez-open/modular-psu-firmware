@@ -189,7 +189,7 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, 
 }
 
 void ToastMessagePage::onEncoder(int counter) {
-    if (counter < 0) {
+    if (counter < 0 || !hasAction()) {
         popPage();
     }
 }

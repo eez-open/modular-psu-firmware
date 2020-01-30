@@ -18,7 +18,7 @@
 
 #pragma once
 
-#define NUM_STEPS_PER_UNIT 5
+#define NUM_STEPS_PER_UNIT 4
 
 namespace eez {
 namespace psu {
@@ -28,7 +28,6 @@ namespace edit_mode_step {
 int getStepIndex();
 
 void getStepValues(eez::gui::data::StepValues &stepValues);
-void getUnitStepValues(Unit unit, eez::gui::data::StepValues &stepValues);
 
 void setStepIndex(int value);
 
