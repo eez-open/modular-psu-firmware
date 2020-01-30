@@ -112,6 +112,10 @@ void strcatFloat(char *str, float value) {
     sprintf(str + strlen(str), "%g", value);
 }
 
+void strcatFloat(char *str, float value, int numDecimalPlaces) {
+    sprintf(str + strlen(str), "%.*f", numDecimalPlaces, value);
+}
+
 #if defined(EEZ_PLATFORM_STM32)
 uint32_t crc32(const uint8_t *mem_block, size_t block_size) {
 	return HAL_CRC_Calculate(&hcrc, (uint32_t *)mem_block, block_size);

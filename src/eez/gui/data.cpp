@@ -118,11 +118,6 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
             if (fabs(floatValue) < 1) {
                 unit = UNIT_MILLI_WATT;
                 floatValue *= 1000.0f;
-                floatValue = roundPrec(floatValue, 1.0f);
-            } else if (fabs(floatValue) < 100) {
-                floatValue = roundPrec(floatValue, 0.01f);
-            } else {
-                floatValue = roundPrec(floatValue, 0.1f);
             }
         } else if (unit == UNIT_SECOND) {
             if (fabs(floatValue) < 1) {
@@ -133,7 +128,11 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
     }
 
     if (!isNaN(floatValue)) {
-        strcatFloat(text, floatValue);
+        if (unit == UNIT_WATT || unit == UNIT_MILLI_WATT) {
+            strcatFloat(text, floatValue, 2);
+        } else {
+            strcatFloat(text, floatValue);
+        }
         removeTrailingZerosFromFloat(text);
         strcat(text, getUnitName(unit));
     } else {

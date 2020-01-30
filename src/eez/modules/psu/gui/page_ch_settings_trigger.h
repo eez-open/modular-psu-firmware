@@ -35,8 +35,6 @@ class ChSettingsTriggerPage : public Page {
     void editVoltageTriggerValue();
     void editCurrentTriggerValue();
 
-    void toggleOutputState();
-
     void editTriggerOnListStop();
 
     void editListCount();

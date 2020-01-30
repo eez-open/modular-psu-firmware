@@ -259,12 +259,13 @@ Unit NumericKeypad::getSwitchToUnit() {
             return UNIT_AMPER;
         }
     }
-    if (m_options.editValueUnit == UNIT_MICRO_AMPER)
+    if (m_options.editValueUnit == UNIT_MICRO_AMPER) {
         if (m_options.channelIndex == -1 || Channel::get(m_options.channelIndex).isAmperAllowed()) {
             return UNIT_AMPER;
         } else {
             return UNIT_MILLI_AMPER;
         }
+    }
     if (m_options.editValueUnit == UNIT_WATT)
         return UNIT_MILLI_WATT;
     if (m_options.editValueUnit == UNIT_MILLI_WATT)

@@ -2437,7 +2437,7 @@ void data_channel_protection_ocp_limit(data::DataOperationEnum operation, data::
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
+        value = MakeValue(channel_dispatcher::getIMaxLimit(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setCurrentLimit(channel, value.getFloat());
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
@@ -3744,12 +3744,6 @@ void data_channel_trigger_mode(data::DataOperationEnum operation, data::Cursor &
     }
 }
 
-void data_channel_trigger_output_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = channel_dispatcher::getTriggerOutputState(*g_channel);
-    }
-}
-
 void data_channel_trigger_on_list_stop(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeEnumDefinitionValue(channel_dispatcher::getTriggerOnListStop(*g_channel),
@@ -4532,6 +4526,17 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
         value = Value(psu::persist_conf::devConf.ytGraphUpdateMethod, VALUE_TYPE_UINT8);
     }
+}
+
+void data_dlog_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+#if OPTION_SD_CARD
+    if (operation == data::DATA_OPERATION_GET) {
+        value = (
+                channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || 
+                channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES
+            ) && cursor.i == 1 ? 0 : 1;
+    }
+#endif
 }
 
 void data_dlog_voltage_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {

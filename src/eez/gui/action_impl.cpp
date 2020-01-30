@@ -731,10 +731,6 @@ void action_ch_settings_trigger_edit_list_count() {
     ((ChSettingsTriggerPage *)getActivePage())->editListCount();
 }
 
-void action_ch_settings_trigger_toggle_output_state() {
-    ((ChSettingsTriggerPage *)getActivePage())->toggleOutputState();
-}
-
 void action_ch_settings_trigger_edit_on_list_stop() {
     ((ChSettingsTriggerPage *)getActivePage())->editTriggerOnListStop();
 }

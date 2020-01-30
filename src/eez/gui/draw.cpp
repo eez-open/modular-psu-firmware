@@ -90,7 +90,7 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
     if (styleIsHorzAlignLeft(style))
         x_offset = x1 + style->padding_left;
     else if (styleIsHorzAlignRight(style))
-        x_offset = x2 - style->padding_left - width;
+        x_offset = x2 - style->padding_right - width;
     else
         x_offset = x1 + ((x2 - x1 + 1) - width) / 2;
     if (x_offset < 0)
@@ -100,7 +100,7 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
     if (styleIsVertAlignTop(style))
         y_offset = y1 + style->padding_top;
     else if (styleIsVertAlignBottom(style))
-        y_offset = y2 - style->padding_top - height;
+        y_offset = y2 - style->padding_bottom - height;
     else
         y_offset = y1 + ((y2 - y1 + 1) - height) / 2;
     if (y_offset < 0)

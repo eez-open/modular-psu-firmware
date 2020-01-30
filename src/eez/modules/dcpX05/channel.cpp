@@ -547,9 +547,13 @@ struct Channel : ChannelInterface {
 	void setDacVoltageFloat(int subchannelIndex, float value) {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
+		float previousUSet = uSet;
+
+		uSet = value;
+
 		if (channel.params.features & CH_FEATURE_HW_OVP) {
 			if (channel.isOutputEnabled()) {
-				if (value < uSet) {
+				if (value < previousUSet) {
 					fallingEdge = true;
 					if (channel.isHwOvpEnabled()) {
 						// deactivate HW OVP
@@ -564,8 +568,6 @@ struct Channel : ChannelInterface {
 		} else {
 			dac.setDacVoltage(0);
 		}
-
-		uSet = value;
 
 		uBeforeBalancing = NAN;
 		restoreCurrentToValueBeforeBalancing(psu::Channel::getBySlotIndex(slotIndex));

@@ -45,19 +45,18 @@ void ChSettingsTriggerPage::onFinishTriggerModeSet() {
     trigger::abort();
     channel_dispatcher::setVoltageTriggerMode(*g_channel, (TriggerMode)g_newTriggerMode);
     channel_dispatcher::setCurrentTriggerMode(*g_channel, (TriggerMode)g_newTriggerMode);
+    channel_dispatcher::setTriggerOutputState(*g_channel, true);
     profile::save();
 }
 
 void ChSettingsTriggerPage::onTriggerModeSet(uint16_t value) {
     popPage();
 
-    if (channel_dispatcher::getVoltageTriggerMode(*g_channel) != value ||
-        channel_dispatcher::getCurrentTriggerMode(*g_channel) != value) {
+    if (channel_dispatcher::getVoltageTriggerMode(*g_channel) != value || channel_dispatcher::getCurrentTriggerMode(*g_channel) != value) {
         g_newTriggerMode = (uint8_t)value;
 
         if (trigger::isInitiated() || list::isActive()) {
-            yesNoDialog(PAGE_ID_YES_NO, "Trigger is active. Are you sure?", onFinishTriggerModeSet,
-                        0, 0);
+            yesNoDialog(PAGE_ID_YES_NO, "Trigger is active. Are you sure?", onFinishTriggerModeSet, 0, 0);
         } else {
             onFinishTriggerModeSet();
         }
@@ -114,12 +113,6 @@ void ChSettingsTriggerPage::editCurrentTriggerValue() {
     options.flags.dotButtonEnabled = true;
 
     NumericKeypad::start(0, MakeValue(trigger::getCurrent(*g_channel), UNIT_AMPER), options, onCurrentTriggerValueSet, 0, 0);
-}
-
-void ChSettingsTriggerPage::toggleOutputState() {
-    channel_dispatcher::setTriggerOutputState(
-        *g_channel, !channel_dispatcher::getTriggerOutputState(*g_channel));
-    profile::save();
 }
 
 void ChSettingsTriggerPage::onTriggerOnListStopSet(uint16_t value) {

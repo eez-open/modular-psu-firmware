@@ -59,7 +59,7 @@ void enter(int channelIndex, const eez::gui::data::Value &editValue, const eez::
 
     options.enableMaxButton();
     options.enableMinButton();
-    options.flags.signButtonEnabled = true;
+    options.flags.signButtonEnabled = options.min < 0;
     options.flags.dotButtonEnabled = true;
 
     g_keypad->init(0, editValue, options, onKeypadOk, 0, 0);

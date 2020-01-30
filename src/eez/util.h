@@ -58,6 +58,7 @@ void strcatInt(char *str, int value);
 void strcatInt32(char *str, int32_t value);
 void strcatUInt32(char *str, uint32_t value);
 void strcatFloat(char *str, float value);
+void strcatFloat(char *str, float value, int numDecimalPlaces);
 
 uint32_t crc32(const uint8_t *message, size_t size);
 
