@@ -327,17 +327,6 @@ void PsuAppContext::stateManagment() {
         return;
     }
 
-    // select page to go after transitional page
-    if (activePageId == PAGE_ID_WELCOME || activePageId == PAGE_ID_STANDBY || activePageId == PAGE_ID_ENTERING_STANDBY) {
-        if (!isTouchCalibrated()) {
-            // touch screen is not calibrated
-            showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
-        } else {
-            showPage(getMainPageId());
-        }
-        return;
-    }
-
     // turn display on/off depending on displayState
     if (psu::persist_conf::devConf.displayState == 0 &&
         (activePageId != PAGE_ID_DISPLAY_OFF && activePageId != PAGE_ID_SELF_TEST_RESULT &&
@@ -348,6 +337,17 @@ void PsuAppContext::stateManagment() {
                activePageId == PAGE_ID_DISPLAY_OFF) {
         eez::mcu::display::turnOn();
         showPage(getMainPageId());
+        return;
+    }
+
+    // select page to go after transitional page
+    if (activePageId == PAGE_ID_WELCOME || activePageId == PAGE_ID_STANDBY || activePageId == PAGE_ID_ENTERING_STANDBY) {
+        if (!isTouchCalibrated()) {
+            // touch screen is not calibrated
+            showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
+        } else {
+            showPage(getMainPageId());
+        }
         return;
     }
 
@@ -1553,8 +1553,6 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
     }
     return styleId;
 }
-
-
 
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {

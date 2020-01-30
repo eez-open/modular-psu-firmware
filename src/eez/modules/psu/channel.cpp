@@ -824,7 +824,11 @@ float Channel::getPowerResolution() const {
 }
 
 bool Channel::isMicroAmperAllowed() const {
-    return flags.currentRangeSelectionMode != CURRENT_RANGE_SELECTION_ALWAYS_HIGH;
+    return hasSupportForCurrentDualRange() ? flags.currentRangeSelectionMode != CURRENT_RANGE_SELECTION_ALWAYS_HIGH : false;
+}
+
+bool Channel::isAmperAllowed() const {
+    return hasSupportForCurrentDualRange() ? flags.currentRangeSelectionMode != CURRENT_RANGE_SELECTION_ALWAYS_LOW : true;
 }
 
 float Channel::roundChannelValue(Unit unit, float value) const {

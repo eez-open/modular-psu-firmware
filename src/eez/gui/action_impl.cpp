@@ -985,6 +985,11 @@ void action_user_switch_clicked() {
 		return;
 	}
 
+    if (g_psuAppContext.getActiveSelectEnumDefinition() == g_userSwitchActionEnumDefinition) {
+        g_psuAppContext.popPage();
+        return;
+    }
+
 #if EEZ_PLATFORM_SIMULATOR
     AppContext *saved = g_appContext;
     g_appContext = &psu::gui::g_psuAppContext;

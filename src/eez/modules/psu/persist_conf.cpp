@@ -167,6 +167,9 @@ void initDefaultDevConf() {
     g_defaultDevConf.selectedThemeIndex = THEME_ID_DARK;
     g_defaultDevConf.animationsDuration = CONF_DEFAULT_ANIMATIONS_DURATION;
 
+    g_defaultDevConf.encoderMovingSpeedDown = mcu::encoder::DEFAULT_MOVING_DOWN_SPEED;
+    g_defaultDevConf.encoderMovingSpeedUp = mcu::encoder::DEFAULT_MOVING_UP_SPEED;
+
     // block 5
     g_defaultDevConf.triggerContinuousInitializationEnabled = 0;
 

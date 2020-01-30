@@ -257,21 +257,24 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 		const WidgetCursor &foundWidget = ((InternalPage *)g_appContext->getActivePage())->findWidget(g_findWidgetAtX, g_findWidgetAtY);
 		if (foundWidget) {
             g_foundWidget = foundWidget;
-			return;
+            return;
 		}
 
-		// pass click through if active page is toast page and clicked outside
-        bool passThrough = 
-            g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE && 
+        if (!g_foundWidget || g_foundWidget.appContext != g_appContext) {
+            return;
+        }
+
+        // pass click through if active page is toast page and clicked outside
+        bool passThrough =
+            g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE &&
             !((ToastMessagePage *)g_appContext->getActivePage())->hasAction();
 
+        // clicked outside internal page, close internal page
+        popPage();
 
-		// clicked outside internal page, close internal page
-		popPage();
-
-		if (!passThrough) {
-			return;
-		}
+        if (!passThrough) {
+            return;
+        }
     }
 
     if (g_appContext->getActivePageId() == INTERNAL_PAGE_ID_NONE) {

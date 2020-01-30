@@ -102,6 +102,8 @@ public:
     static void executeAction();
     static void executeActionWithoutParam();
 
+    AppContext *getAppContext() { return appContext; }
+
 private:
     ToastType type;
 

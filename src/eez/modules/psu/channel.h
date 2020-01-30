@@ -528,6 +528,7 @@ class Channel {
     float getPowerResolution() const;
 
     bool isMicroAmperAllowed() const;
+    bool isAmperAllowed() const;
 
     float getValuePrecision(Unit unit, float value) const;
 
