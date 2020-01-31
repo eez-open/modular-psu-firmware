@@ -39,14 +39,28 @@ extern "C" {
 #include <posix_sockets.h>
 #endif
 
+#include <eez/firmware.h>
 #include <eez/debug.h>
 #include <eez/mqtt.h>
 #include <eez/system.h>
+
+#include <eez/scpi/scpi.h>
+
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ethernet.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
+#include <eez/modules/psu/profile.h>
+#include <eez/modules/psu/temperature.h>
+#include <eez/modules/psu/ontime.h>
+#include <eez/modules/psu/gui/psu.h>
+
+#include <eez/modules/mcu/battery.h>
+
+#if OPTION_FAN
+#include <eez/modules/aux_ps/fan.h>
+#endif
 
 namespace eez {
 
@@ -57,16 +71,28 @@ namespace mqtt {
 static const uint32_t RECONNECT_AFTER_ERROR_MS = 1000;
 
 static const size_t MAX_PUB_TOPIC_LENGTH = 50;
-static const char *PUB_TOPIC_POW = "%s/pow";
-static const char *PUB_TOPIC_EVENT = "%s/event";
-static const char *PUB_TOPIC_OE = "%s/ch/%d/oe";
-static const char *PUB_TOPIC_U_SET = "%s/ch/%d/uset";
-static const char *PUB_TOPIC_I_SET = "%s/ch/%d/iset";
-static const char *PUB_TOPIC_U_MON = "%s/ch/%d/umon";
-static const char *PUB_TOPIC_I_MON = "%s/ch/%d/imon";
+
+static const char *PUB_TOPIC_SYSTEM_POW = "%s/system/pow";
+static const char *PUB_TOPIC_SYSTEM_EVENT = "%s/system/event";
+static const char *PUB_TOPIC_SYSTEM_BATTERY = "%s/system/vbat";
+static const char *PUB_TOPIC_SYSTEM_AUXTEMP = "%s/system/auxtemp";
+static const char *PUB_TOPIC_SYSTEM_TOTAL_ONTIME = "%s/system/total_ontime";
+static const char *PUB_TOPIC_SYSTEM_LAST_ONTIME = "%s/system/last_ontime";
+static const char *PUB_TOPIC_SYSTEM_FAN_STATUS = "%s/system/fan";
+
+static const char *PUB_TOPIC_DCPSUPPLY_OE = "%s/dcpsupply/ch/%d/oe";
+static const char *PUB_TOPIC_DCPSUPPLY_U_SET = "%s/dcpsupply/ch/%d/uset";
+static const char *PUB_TOPIC_DCPSUPPLY_I_SET = "%s/dcpsupply/ch/%d/iset";
+static const char *PUB_TOPIC_DCPSUPPLY_U_MON = "%s/dcpsupply/ch/%d/umon";
+static const char *PUB_TOPIC_DCPSUPPLY_I_MON = "%s/dcpsupply/ch/%d/imon";
+static const char *PUB_TOPIC_DCPSUPPLY_TEMP = "%s/dcpsupply/ch/%d/temp";
+static const char *PUB_TOPIC_DCPSUPPLY_TOTAL_ONTIME = "%s/dcpsupply/ch/%d/total_ontime";
+static const char *PUB_TOPIC_DCPSUPPLY_LAST_ONTIME = "%s/dcpsupply/ch/%d/last_ontime";
 
 static const size_t MAX_SUB_TOPIC_LENGTH = 50;
-static const char *SUB_TOPIC = "%s/ch/+/set/+"; // for example: <host_name>/ch/1/set/oe, <host_name>/ch/1/set/u, ch/1/set/i
+
+static const char *SUB_TOPIC_SYSTEM_PATTERN = "%s/system/exec/#";
+static const char *SUB_TOPIC_DCPSUPPLY_PATTERN = "%s/dcpsupply/ch/+/set/+";
 
 static const size_t MAX_PAYLOAD_LENGTH = 100;
 
@@ -79,6 +105,16 @@ ConnectionState g_connectionState = CONNECTION_STATE_IDLE;
 uint32_t g_connectionStateChangedTickCount;
 
 static int g_powState = -1;
+static float g_battery = NAN;
+static float g_auxTemperature = NAN;
+static uint32_t g_auxTemperatureTick;
+static uint32_t g_totalOnTime = 0xFFFFFFFF;
+static uint32_t g_lastOnTime = 0xFFFFFFFF;
+#if OPTION_FAN
+static TestResult g_fanTestResult;
+static int g_fanRpm;
+static uint32_t g_fanStatusTick;
+#endif
 
 static const size_t EVENT_QUEUE_SIZE = 10;
 struct {
@@ -92,14 +128,20 @@ static struct {
     int oe;
 
     float uSet;
-    uint32_t g_uSetTick;
+    uint32_t uSetTick;
 
     float iSet;
-    uint32_t g_iSetTick;
+    uint32_t iSetTick;
 
-    uint32_t g_uMonTick;
+    uint32_t uMonTick;
 
-    uint32_t g_iMonTick;
+    uint32_t iMonTick;
+
+    float temperature;
+    uint32_t temperatureTick;
+
+    uint32_t totalOnTime;
+    uint32_t lastOnTime;
 } g_channelStates[CH_MAX];
 
 static uint8_t g_lastChannelIndex = 0;
@@ -108,105 +150,141 @@ static bool g_publishing;
 
 void setState(ConnectionState connectionState);
 
-const char *matchSeparator(const char *p) {
-    for (; *p; p++) {
+bool matchSeparator(const char **pTopic) {
+    for (const char *p = *pTopic; *p; p++) {
         if (*p == '/') {
-            return p + 1;
+            *pTopic = p + 1;
+            return true;
         }
     }
-    return nullptr;
+    return false;
+}
+
+bool match(const char **pTopic, const char *pattern) {
+    auto length = strlen(pattern);
+    if (strncmp(*pTopic, pattern, length) != 0) {
+        return false;
+    }
+    *pTopic += length;
+    return true;
 }
 
 void onIncomingPublish(const char *topic, const char *payload) {
-    const char *p = matchSeparator(topic);
-    if (!p) {
+    const char *p = topic;
+    
+    if (!matchSeparator(&p)) {
         return;
     }
 
-    if (strncmp(p, "ch/", 3) != 0) {
-        return;
-    }
-    p += 3;
-
-    char *endptr;
-    int channelIndex = strtol(p, &endptr, 10);
-
-    if (endptr > p && *endptr == '/' && channelIndex > 0 && channelIndex <= CH_NUM) {
-        channelIndex--;
-        
-        p = endptr + 1;
-        if (strncmp(p, "set/", 4) != 0) {
-            return;
-        }
-        p += 4;
-
-        Channel &channel = Channel::get(channelIndex);
-
-        if (strcmp(p, "oe") == 0) {
-            int oe = strtol(payload, &endptr, 10);
+    if (match(&p, "system/exec/")) {
+        if (strcmp(p, "restart") == 0) {
+            restart();
+        } else if (strcmp(p, "power") == 0) {
+            char *endptr;
+            int powerUp = strtol(payload, &endptr, 10);
             if (endptr > payload) {
-                channel_dispatcher::outputEnable(channel, oe != 0, nullptr);
+                if (powerUp && !isPowerUp()) {
+                    changePowerState(1);
+                } else if (!powerUp && isPowerUp()) {
+                    standBy();
+                }
             }
-        } else if (strcmp(p, "u") == 0) {
-            if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
+        } else if (strcmp(p, "display/window/text") == 0) {
+            int length = strlen(payload);
+            if (length > 0) {
+                eez::psu::gui::g_psuAppContext.setTextMessage(payload, length);
+            }
+        } else if (strcmp(p, "display/window/text/clear") == 0) {
+            eez::psu::gui::g_psuAppContext.clearTextMessage();
+        } else if (strcmp(p, "profile/recall") == 0) {
+            char *endptr;
+            int location = strtol(payload, &endptr, 10);
+            if (endptr > payload) {
+                using namespace eez::scpi;
+                osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_RECALL_PROFILE, location), 0);
+            }
+        }
+    } else if (match(&p, "dcpsupply/ch/")) {
+        char *endptr;
+        int channelIndex = strtol(p, &endptr, 10);
+
+        if (endptr > p && *endptr == '/' && channelIndex > 0 && channelIndex <= CH_NUM) {
+            channelIndex--;
+
+            p = endptr + 1;
+
+            if (!match(&p, "set/")) {
                 return;
             }
 
-            if (channel.isRemoteProgrammingEnabled()) {
-                return;
+            Channel &channel = Channel::get(channelIndex);
+
+            if (strcmp(p, "oe") == 0) {
+                int oe = strtol(payload, &endptr, 10);
+                if (endptr > payload) {
+                    channel_dispatcher::outputEnable(channel, oe != 0, nullptr);
+                }
+            } else if (strcmp(p, "u") == 0) {
+                if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
+                    return;
+                }
+
+                if (channel.isRemoteProgrammingEnabled()) {
+                    return;
+                }
+
+                float voltage = (float)strtof(payload, &endptr);
+
+                if (endptr == payload) {
+                    return;
+                }
+
+                if (isNaN(voltage)) {
+                    return;
+                }
+
+                if (voltage < channel_dispatcher::getUMin(channel)) {
+                    return;
+                }
+
+                if (voltage > channel_dispatcher::getULimit(channel)) {
+                    return;
+                }
+
+                if (voltage * channel_dispatcher::getISetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
+                    return;
+                }
+
+                channel_dispatcher::setVoltage(channel, voltage);
+            } else if (strcmp(p, "i") == 0) {
+                if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
+                    return;
+                }
+
+                float current = (float)strtof(payload, &endptr);
+
+                if (endptr == payload) {
+                    return;
+                }
+
+                if (isNaN(current)) {
+                    return;
+                }
+
+                if (current < channel_dispatcher::getIMin(channel)) {
+                    return;
+                }
+
+                if (current > channel_dispatcher::getILimit(channel)) {
+                    return;
+                }
+
+                if (current * channel_dispatcher::getUSetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
+                    return;
+                }
+
+                channel_dispatcher::setCurrent(channel, current);
             }
-
-            float voltage = (float)strtof(payload, &endptr);
-
-            if (endptr == payload) {
-                return;
-            }
-
-            if (isNaN(voltage)) {
-                return;
-            }
-
-            if (voltage < channel_dispatcher::getUMin(channel)) {
-                return;
-            }
-
-            if (voltage > channel_dispatcher::getULimit(channel)) {
-                return;
-            }
-
-            if (voltage * channel_dispatcher::getISetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
-                return;
-            }
-
-            channel_dispatcher::setVoltage(channel, voltage);
-        } else if (strcmp(p, "i") == 0) {
-            if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
-                return;
-            }
-
-            float current = (float)strtof(payload, &endptr);
-
-            if (endptr == payload) {
-                return;
-            }
-
-            if (isNaN(current)) {
-                return;
-            }
-
-            if (current < channel_dispatcher::getIMin(channel)) {
-                return;
-            }
-
-            if (current > channel_dispatcher::getILimit(channel)) {
-                return;
-            }
-
-            if (current * channel_dispatcher::getUSetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
-                return;
-            }
-
-            channel_dispatcher::setCurrent(channel, current);
         }
     }
 }    
@@ -273,7 +351,9 @@ void incomingPublishCallback(void** unused, struct mqtt_response_publish *publis
     g_topic[topicLen] = 0;
 
     size_t payloadLen = MIN(published->application_message_size, MAX_PAYLOAD_LEN);
-    strncpy(g_payload, (const char *)published->application_message, payloadLen);
+    if (payloadLen > 0) {
+        strncpy(g_payload, (const char *)published->application_message, payloadLen);
+    }
     g_payload[payloadLen] = 0;
 
     onIncomingPublish(g_topic, g_payload);
@@ -307,19 +387,39 @@ bool publish(char *topic, char *payload, bool retain) {
     return true;
 }
 
-bool publish(const char *pubTopic, int value) {
+bool publish(const char *pubTopic, int value, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
     sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
     sprintf(payload, "%d", value);
 
-    return publish(topic, payload, false);
+    return publish(topic, payload, retain);
 }
 
-bool publishEvent(int16_t eventId) {
+bool publishOnTimeCounter(const char *pubTopic, uint32_t value, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
-    sprintf(topic, PUB_TOPIC_EVENT, persist_conf::devConf.ethernetHostName);
+    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName);
+
+    char payload[MAX_PAYLOAD_LENGTH + 1];
+    ontime::counterToString(payload, MAX_PAYLOAD_LENGTH, value);
+
+    return publish(topic, payload, retain);
+}
+
+bool publish(const char *pubTopic, float value, bool retain) {
+    char topic[MAX_PUB_TOPIC_LENGTH + 1];
+    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName);
+
+    char payload[MAX_PAYLOAD_LENGTH + 1];
+    sprintf(payload, "%g", value);
+
+    return publish(topic, payload, retain);
+}
+
+bool publishEvent(int16_t eventId, bool retain) {
+    char topic[MAX_PUB_TOPIC_LENGTH + 1];
+    sprintf(topic, PUB_TOPIC_SYSTEM_EVENT, persist_conf::devConf.ethernetHostName);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
     static const char *g_eventTypes[] = {
@@ -331,36 +431,62 @@ bool publishEvent(int16_t eventId) {
     snprintf(payload, MAX_PAYLOAD_LENGTH, "[%d, \"%s\", \"%s\"]", (int)eventId, g_eventTypes[event_queue::getEventType(eventId)], event_queue::getEventMessage(eventId));
     payload[MAX_PAYLOAD_LENGTH] = 0;
 
-    return publish(topic, payload, false);
+    return publish(topic, payload, retain);
 }
 
+bool publishFanStatus(const char *pubTopic, TestResult fanTestResult, int rpm, bool retain) {
+    char topic[MAX_PUB_TOPIC_LENGTH + 1];
+    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName);
 
-bool publish(int channelIndex, const char *pubTopic, int value) {
+    char payload[MAX_PAYLOAD_LENGTH + 1];
+
+    if (fanTestResult == TEST_FAILED || fanTestResult == TEST_WARNING) {
+        strcpy(payload, "Fault");
+    } else if (fanTestResult == TEST_OK) {
+#if FAN_OPTION_RPM_MEASUREMENT
+        snprintf(payload, MAX_PAYLOAD_LENGTH, "%drpm", rpm);
+#else
+        strcpy(payload, "Unsupported");
+#endif
+    } else if (fanTestResult == TEST_NONE) {
+        strcpy(payload, "Testing...");
+    } else {
+        strcpy(payload, "Not installed");
+    }
+
+    payload[MAX_PAYLOAD_LENGTH] = 0;
+
+    return publish(topic, payload, retain);
+}
+
+bool publish(int channelIndex, const char *pubTopic, int value, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
     sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
     sprintf(payload, "%d", value);
 
-    return publish(topic, payload, true);
+    return publish(topic, payload, retain);
 }
 
-bool publish(int channelIndex, const char *pubTopic, float value) {
+bool publish(int channelIndex, const char *pubTopic, float value, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
     sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
     sprintf(payload, "%g", value);
 
-    return publish(topic, payload, false);
+    return publish(topic, payload, retain);
 }
 
-const char *getSubTopic() {
-    static char g_subTopic[MAX_SUB_TOPIC_LENGTH + 1] = { 0 };
-    if (!g_subTopic[0]) {
-        sprintf(g_subTopic, SUB_TOPIC, persist_conf::devConf.ethernetHostName);
-    }
-    return g_subTopic;
+bool publishOnTimeCounter(int channelIndex, const char *pubTopic, uint32_t value, bool retain) {
+    char topic[MAX_PUB_TOPIC_LENGTH + 1];
+    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
+
+    char payload[MAX_PAYLOAD_LENGTH + 1];
+    ontime::counterToString(payload, MAX_PAYLOAD_LENGTH, value);
+
+    return publish(topic, payload, retain);
 }
 
 const char *getClientId() {
@@ -385,19 +511,30 @@ bool getEvent(int16_t &eventId);
 
 void setState(ConnectionState connectionState) {
     if (connectionState == CONNECTION_STATE_CONNECTED) {
+        char subTopicSystem[MAX_SUB_TOPIC_LENGTH + 1];
+        sprintf(subTopicSystem, SUB_TOPIC_SYSTEM_PATTERN, persist_conf::devConf.ethernetHostName);
+
+        char subTopicDcpsupply[MAX_SUB_TOPIC_LENGTH + 1];
+        sprintf(subTopicDcpsupply, SUB_TOPIC_DCPSUPPLY_PATTERN, persist_conf::devConf.ethernetHostName);
+
 #if defined(EEZ_PLATFORM_STM32)
         mqtt_set_inpub_callback(&g_client, incomingPublishCallback, incomingDataCallback, nullptr);
-        mqtt_subscribe(&g_client, getSubTopic(), 0, requestCallback, nullptr);
+        mqtt_subscribe(&g_client, subTopicSystem, 0, requestCallback, nullptr);
+        mqtt_subscribe(&g_client, subTopicDcpsupply, 0, requestCallback, nullptr);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        mqtt_subscribe(&g_client, getSubTopic(), 0);
+        mqtt_subscribe(&g_client, subTopicSystem, 0);
+        mqtt_subscribe(&g_client, subTopicDcpsupply, 0);
 #endif
 
         for(int i = 0; i < CH_NUM; i++) {
             g_channelStates[i].oe = -1;
             g_channelStates[i].uSet = NAN;
             g_channelStates[i].iSet = NAN;
+            g_channelStates[i].temperature = NAN;
+            g_channelStates[i].totalOnTime = 0xFFFFFFFF;
+            g_channelStates[i].lastOnTime = 0xFFFFFFFF;
         }
 
         g_lastChannelIndex = 0;
@@ -414,10 +551,12 @@ void tick(uint32_t tickCount) {
     }
 
     else if (g_connectionState == CONNECTION_STATE_CONNECTED && !g_publishing) {
+        uint32_t period = (uint32_t)roundf(persist_conf::devConf.mqttPeriod * 1000000);
+
         // publish power state
         int powState = isPowerUp() ? 1 : 0;
         if (powState != g_powState) {
-            if (publish(PUB_TOPIC_POW, powState)) {
+            if (publish(PUB_TOPIC_SYSTEM_POW, powState, true)) {
                 g_powState = powState;
                 if (g_publishing) {
                     return;
@@ -428,8 +567,79 @@ void tick(uint32_t tickCount) {
         // publish events from event view
         int16_t eventId;
         if (peekEvent(eventId)) {
-            if (publishEvent(eventId)) {
+            if (publishEvent(eventId, true)) {
                 getEvent(eventId);
+                if (g_publishing) {
+                    return;
+                }
+            }
+        }
+
+        // publish battery
+        if (mcu::battery::g_battery != g_battery) {
+            if (publish(PUB_TOPIC_SYSTEM_BATTERY, mcu::battery::g_battery, true)) {
+                g_battery = mcu::battery::g_battery;
+                if (g_publishing) {
+                    return;
+                }
+            }
+        }
+
+        // publish aux temperature
+        if ((tickCount - g_auxTemperatureTick) >= period) {
+            float temperature;
+            temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::AUX];
+            if (tempSensor.isInstalled() && tempSensor.isTestOK()) {
+                temperature = tempSensor.temperature;
+            } else {
+                temperature = NAN;
+            }
+            if (temperature != g_auxTemperature) {
+                if (publish(PUB_TOPIC_SYSTEM_AUXTEMP, temperature, true)) {
+                    g_auxTemperature = temperature;
+                    g_auxTemperatureTick = tickCount;
+                    if (g_publishing) {
+                        return;
+                    }
+                }
+            }
+        }
+
+#if OPTION_FAN
+        // publish fan status
+        if ((tickCount - g_fanStatusTick) >= period) {
+            TestResult fanTestResult = aux_ps::fan::g_testResult;
+            int fanRpm = aux_ps::fan::g_rpm;
+
+            if (fanTestResult != g_fanTestResult || fanRpm != g_fanRpm) {
+                if (publishFanStatus(PUB_TOPIC_SYSTEM_FAN_STATUS, fanTestResult, fanRpm, true)) {
+                    g_fanTestResult = fanTestResult;
+                    g_fanRpm = fanRpm;
+                    g_fanStatusTick = tickCount;
+                    if (g_publishing) {
+                        return;
+                    }
+                }
+            }
+        }
+#endif
+
+        // publish total on-time counter
+        uint32_t totalOnTime = ontime::g_mcuCounter.getTotalTime();
+        if (totalOnTime != g_totalOnTime) {
+            if (publishOnTimeCounter(PUB_TOPIC_SYSTEM_TOTAL_ONTIME, totalOnTime, true)) {
+                g_totalOnTime = totalOnTime;
+                if (g_publishing) {
+                    return;
+                }
+            }
+        }
+
+        // publish last on-time counter
+        uint32_t lastOnTime = ontime::g_mcuCounter.getLastTime();
+        if (lastOnTime != g_lastOnTime) {
+            if (publishOnTimeCounter(PUB_TOPIC_SYSTEM_LAST_ONTIME, lastOnTime, true)) {
+                g_lastOnTime = lastOnTime;
                 if (g_publishing) {
                     return;
                 }
@@ -444,51 +654,88 @@ void tick(uint32_t tickCount) {
 
         if (g_lastValueIndex == 0) {
             if (oe != g_channelStates[channelIndex].oe) {
-                if (publish(channelIndex, PUB_TOPIC_OE, oe)) {
+                if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_OE, oe, true)) {
                     g_channelStates[channelIndex].oe = oe;
                 }
             }
         } else {
-            uint32_t period = (uint32_t)roundf(persist_conf::devConf.mqttPeriod * 1000000);
-
             if (g_lastValueIndex == 1) {
-                if (oe && (tickCount - g_channelStates[channelIndex].g_uMonTick) >= period) {
+                if (oe && (tickCount - g_channelStates[channelIndex].uMonTick) >= period) {
                     float uMon = channel_dispatcher::getUMonLast(channel);
-                    if (publish(channelIndex, PUB_TOPIC_U_MON, uMon)) {
-                        g_channelStates[channelIndex].g_uMonTick = tickCount;
+                    if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_U_MON, uMon, true)) {
+                        g_channelStates[channelIndex].uMonTick = tickCount;
                     }
                 }
             } else if (g_lastValueIndex == 2) {
-                if (oe && (tickCount - g_channelStates[channelIndex].g_iMonTick) >= period) {
+                if (oe && (tickCount - g_channelStates[channelIndex].iMonTick) >= period) {
                     float iMon = channel_dispatcher::getIMonLast(channel);
-                    if (publish(channelIndex, PUB_TOPIC_I_MON, iMon)) {
-                        g_channelStates[channelIndex].g_iMonTick = tickCount;
+                    if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_I_MON, iMon, true)) {
+                        g_channelStates[channelIndex].iMonTick = tickCount;
                     }
                 }
             } else if (g_lastValueIndex == 3) {
-                if ((tickCount - g_channelStates[channelIndex].g_uSetTick) >= period) {
+                if ((tickCount - g_channelStates[channelIndex].uSetTick) >= period) {
 					float uSet = channel_dispatcher::getUSet(channel);
 					if (isNaN(g_channelStates[channelIndex].uSet) || uSet != g_channelStates[channelIndex].uSet) {
-						if (publish(channelIndex, PUB_TOPIC_U_SET, uSet)) {
+						if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_U_SET, uSet, true)) {
 							g_channelStates[channelIndex].uSet = uSet;
-							g_channelStates[channelIndex].g_uSetTick = tickCount;
+							g_channelStates[channelIndex].uSetTick = tickCount;
 						}
 					}
                 }
-            } else {
-                if ((tickCount - g_channelStates[channelIndex].g_iSetTick) >= period) {
+            } else if (g_lastValueIndex == 4) {
+                if ((tickCount - g_channelStates[channelIndex].iSetTick) >= period) {
 					float iSet = channel_dispatcher::getISet(channel);
 					if (isNaN(g_channelStates[channelIndex].iSet) || iSet != g_channelStates[channelIndex].iSet) {
-						if (publish(channelIndex, PUB_TOPIC_I_SET, iSet)) {
+						if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_I_SET, iSet, true)) {
 							g_channelStates[channelIndex].iSet = iSet;
-							g_channelStates[channelIndex].g_iSetTick = tickCount;
+							g_channelStates[channelIndex].iSetTick = tickCount;
 						}
 					}
 				}
-			}
+            } else if (g_lastValueIndex == 5) {
+                // publish channel temperature
+                if ((tickCount - g_channelStates[channelIndex].temperatureTick) >= period) {
+                    float temperature;
+                    temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::CH1 + channelIndex];
+                    if (tempSensor.isInstalled() && tempSensor.isTestOK()) {
+                        temperature = tempSensor.temperature;
+                    } else {
+                        temperature = NAN;
+                    }
+                    if (isNaN(g_channelStates[channelIndex].temperature) || temperature != g_channelStates[channelIndex].temperature) {
+                        if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_TEMP, temperature, true)) {
+                            g_channelStates[channelIndex].temperature = temperature;
+                            g_channelStates[channelIndex].temperatureTick = tickCount;
+                        }
+                    }
+                }
+            } else if (g_lastValueIndex == 6) {
+                // publish total on-time counter
+                uint32_t totalOnTime = ontime::g_moduleCounters[channel.slotIndex].getTotalTime();
+                if (totalOnTime != g_channelStates[channelIndex].totalOnTime) {
+                    if (publishOnTimeCounter(channelIndex, PUB_TOPIC_DCPSUPPLY_TOTAL_ONTIME, totalOnTime, true)) {
+                        g_channelStates[channelIndex].totalOnTime = totalOnTime;
+                        if (g_publishing) {
+                            return;
+                        }
+                    }
+                }
+            } else if (g_lastValueIndex == 7) {
+                // publish last on-time counter
+                uint32_t lastOnTime = ontime::g_moduleCounters[channel.slotIndex].getLastTime();
+                if (lastOnTime != g_channelStates[channelIndex].lastOnTime) {
+                    if (publishOnTimeCounter(channelIndex, PUB_TOPIC_DCPSUPPLY_LAST_ONTIME, lastOnTime, true)) {
+                        g_channelStates[channelIndex].lastOnTime = lastOnTime;
+                        if (g_publishing) {
+                            return;
+                        }
+                    }
+                }
+            }
         }
 
-        if (++g_lastValueIndex == 5) {
+        if (++g_lastValueIndex == 8) {
             g_lastValueIndex = 0;
             if (++g_lastChannelIndex == CH_NUM) {
                 g_lastChannelIndex = 0;
@@ -613,7 +860,7 @@ void reconnect() {
 }
 
 void pushEvent(int16_t eventId) {
-    if (g_connectionState == CONNECTION_STATE_CONNECTED && publishEvent(eventId)) {
+    if (g_connectionState == CONNECTION_STATE_CONNECTED && publishEvent(eventId, true)) {
         return;
     }
 

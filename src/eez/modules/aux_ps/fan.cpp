@@ -486,7 +486,7 @@ float readTemperature() {
 #if defined(EEZ_PLATFORM_STM32)
 	float temperature;
 	if (readLocalTemp(&temperature) == HAL_OK) {
-		return roundPrec(temperature, 0.1);
+		return roundPrec(temperature, 1.0f);
 	}
 #endif
 	return NAN;

@@ -215,6 +215,9 @@ void oneIter() {
                 dlog_view::uploadFile();
             } else if (type == SCPI_QUEUE_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE) {
                 bp3c::flash_slave::uploadHexFile();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_RECALL_PROFILE) {
+                int err;
+                profile::recall(param, &err);
             }
 #endif // OPTION_SD_CARD
         }
