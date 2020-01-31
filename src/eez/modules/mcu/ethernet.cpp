@@ -163,8 +163,6 @@ static void onEvent(uint8_t eventType) {
             // Initilialize the LwIP stack with RTOS
             tcpip_init(NULL, NULL);
 
-			netif_set_hostname(&gnetif, psu::persist_conf::devConf.ethernetHostName);
-
             if (psu::persist_conf::isEthernetDhcpEnabled()) {            
                 ipaddr.addr = 0;
                 netmask.addr = 0;
@@ -177,6 +175,8 @@ static void onEvent(uint8_t eventType) {
 
             // add the network interface (IPv4/IPv6) with RTOS
             netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
+
+			netif_set_hostname(&gnetif, psu::persist_conf::devConf.ethernetHostName);
 
             // Registers the default network interface
             netif_set_default(&gnetif);

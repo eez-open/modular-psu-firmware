@@ -69,6 +69,8 @@ using namespace psu;
 namespace mqtt {
 
 static const uint32_t RECONNECT_AFTER_ERROR_MS = 1000;
+static const uint32_t CONF_DNS_TIMEOUT_MS = 10000;
+static const uint32_t CONF_STARTING_TIMEOUT_MS = 2000; // wait a acouple of seconds, after ethernet is ready, before starting MQTT connect 
 
 static const size_t MAX_PUB_TOPIC_LENGTH = 50;
 
@@ -101,8 +103,9 @@ static char g_topic[MAX_TOPIC_LEN + 1];
 static const size_t MAX_PAYLOAD_LEN = 128;
 static char g_payload[MAX_PAYLOAD_LEN + 1];
 
-ConnectionState g_connectionState = CONNECTION_STATE_IDLE;
+ConnectionState g_connectionState = CONNECTION_STATE_ETHERNET_NOT_READY;
 uint32_t g_connectionStateChangedTickCount;
+uint32_t g_ethernetReadyTime;
 
 static int g_powState = -1;
 static float g_battery = NAN;
@@ -293,6 +296,7 @@ void onIncomingPublish(const char *topic, const char *payload) {
 static ip_addr_t g_ipaddr;
 static mqtt_client_t g_client;
 static size_t g_payloadLen;
+static uint32_t g_dnsStartedTick;
 
 static void dnsFoundCallback(const char* hostname, const ip_addr_t *ipaddr, void *arg) {
     if (ipaddr != NULL) {
@@ -747,6 +751,17 @@ void tick(uint32_t tickCount) {
 #endif
     }
 
+    else if (g_connectionState == CONNECTION_STATE_ETHERNET_NOT_READY) {
+        g_ethernetReadyTime = millis();
+        setState(CONNECTION_STATE_STARTING);
+    }
+
+    else if (g_connectionState == CONNECTION_STATE_STARTING) {
+        if (millis() - g_ethernetReadyTime > CONF_STARTING_TIMEOUT_MS) {
+            setState(CONNECTION_STATE_IDLE);
+        }
+    }
+
     else if (g_connectionState == CONNECTION_STATE_IDLE) {
         if (persist_conf::devConf.mqttEnabled) {
             setState(CONNECTION_STATE_CONNECT);
@@ -762,6 +777,7 @@ void tick(uint32_t tickCount) {
             setState(CONNECTION_STATE_DNS_FOUND);
             g_ipaddr = ipaddr;
         } else if (err == ERR_INPROGRESS) {
+            g_dnsStartedTick = millis();
             setState(CONNECTION_STATE_DNS_IN_PROGRESS);
         } else {
             setState(CONNECTION_STATE_ERROR);
@@ -840,6 +856,10 @@ void tick(uint32_t tickCount) {
         } else {
             setState(CONNECTION_STATE_ERROR);
             DebugTrace("mqtt connect error: %d\n", (int)result);
+        }
+    } else if (g_connectionState == CONNECTION_STATE_DNS_IN_PROGRESS) {
+        if (millis() - g_dnsStartedTick > CONF_DNS_TIMEOUT_MS) {
+            reconnect();
         }
     }
 #endif
