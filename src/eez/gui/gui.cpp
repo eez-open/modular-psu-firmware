@@ -30,8 +30,6 @@
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/persist_conf.h>
-#include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/gui/password.h>
 
 #define CONF_GUI_BLINK_TIME 400 // 400ms
 
@@ -228,59 +226,6 @@ void executeAction(int actionId) {
     g_appContext = saved;
 
     sound::playClick();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void showWelcomePage() {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_WELCOME);
-}
-
-void showEnteringStandbyPage() {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_ENTERING_STANDBY);
-}
-
-void showStandbyPage() {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_STANDBY);
-}
-
-void showSavingPage() {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_SAVING);
-}
-
-void showShutdownPage() {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_SHUTDOWN);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-static void doUnlockFrontPanel() {
-    popPage();
-
-    psu::persist_conf::lockFrontPanel(false);
-    infoMessage("Front panel is unlocked!");
-}
-
-static void checkPasswordToUnlockFrontPanel() {
-    psu::gui::checkPassword("Password: ", psu::persist_conf::devConf.systemPassword, doUnlockFrontPanel);
-}
-
-void lockFrontPanel() {
-    psu::persist_conf::lockFrontPanel(true);
-    infoMessage("Front panel is locked!");
-}
-
-void unlockFrontPanel() {
-    if (strlen(psu::persist_conf::devConf.systemPassword) > 0) {
-        checkPasswordToUnlockFrontPanel();
-    } else {
-        psu::persist_conf::lockFrontPanel(false);
-        infoMessage("Front panel is unlocked!");
-    }
-}
-
-bool isFrontPanelLocked() {
-    return psu::g_rlState != psu::RL_STATE_LOCAL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -29,9 +29,7 @@
 #include <eez/gui/widgets/button.h>
 
 #include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/devices.h>
 #include <eez/modules/psu/idle.h>
-#include <eez/modules/psu/gui/psu.h>
 
 #define CONF_GUI_TOAST_DURATION_MS 2000L
 
@@ -93,21 +91,6 @@ bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
     if (widget->action) {
         AppContext *saved = g_appContext;
         g_appContext = this;
-
-        if (isFrontPanelLocked()) {
-            int activePageId = getActivePageId();
-            if (activePageId == PAGE_ID_KEYPAD ||
-                activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO ||
-                activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
-                g_appContext = saved;
-                return true;
-            }
-            
-            if (widget->action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
-                g_appContext = saved;
-                return false;
-            }
-        }
 
         if (widget->type == WIDGET_TYPE_BUTTON) {
             const ButtonWidget *buttonWidget = GET_WIDGET_PROPERTY(widget, specific, const ButtonWidget *);
@@ -301,6 +284,16 @@ bool AppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
 }
 
 void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
+    int activePageId = getActivePageId();
+    if (!isPageInternal(activePageId)) {
+        const Widget *page = getPageWidget(activePageId);
+		const PageWidget *pageSpecific = GET_WIDGET_PROPERTY(page, specific, const PageWidget *);
+        if ((pageSpecific->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
+            if (!pointInsideRect(touchEvent.x, touchEvent.y, g_appContext->x + page->x, g_appContext->y + page->y, page->w, page->h)) {
+                popPage();
+            }
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

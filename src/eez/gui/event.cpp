@@ -26,8 +26,6 @@
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/idle.h>
-#include <eez/modules/psu/persist_conf.h>
-#include <eez/modules/psu/gui/psu.h>
 
 #define CONF_GUI_LONG_TOUCH_TIMEOUT              1000000L // 1s
 #define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY   300000L // 300ms
@@ -125,29 +123,6 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
 }
 
 void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
-    int activePageId = getActivePageId();
-
-    if (touchEvent.type == EVENT_TYPE_LONG_TOUCH) {
-        if (activePageId == INTERNAL_PAGE_ID_NONE || activePageId == PAGE_ID_STANDBY) {
-            // wake up on long touch
-            psu::changePowerState(true);
-        } else if (activePageId == PAGE_ID_DISPLAY_OFF) {
-            // turn ON display on long touch
-            psu::persist_conf::setDisplayState(1);
-        }
-    } else if (touchEvent.type == EVENT_TYPE_EXTRA_LONG_TOUCH) {
-        // start touch screen calibration in case of really long touch
-        showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
-    } else if (!isPageInternal(activePageId)) {
-        const Widget *page = getPageWidget(activePageId);
-		const PageWidget *pageSpecific = GET_WIDGET_PROPERTY(page, specific, const PageWidget *);
-        if ((pageSpecific->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
-            if (!pointInsideRect(touchEvent.x, touchEvent.y, g_appContext->x + page->x, g_appContext->y + page->y, page->w, page->h)) {
-                popPage();
-            }
-        }
-    }
-
     g_appContext->onPageTouch(foundWidget, touchEvent);
 }
 
@@ -214,12 +189,6 @@ void processTouchEvent(EventType type) {
         m_onTouchFunction = getTouchFunction(m_foundWidgetAtDown);
 
         if (!m_onTouchFunction) {
-            if (isFrontPanelLocked()) {
-                auto savedAppContext = g_appContext;
-                g_appContext = &psu::gui::g_psuAppContext;
-                errorMessage("Front panel is locked!");                
-                g_appContext = savedAppContext;
-            }
             m_onTouchFunction = onPageTouch;
         }
     }

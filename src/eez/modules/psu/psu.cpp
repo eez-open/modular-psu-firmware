@@ -515,7 +515,7 @@ bool powerUp() {
     g_rlState = persist_conf::devConf.isFrontPanelLocked ? RL_STATE_REMOTE : RL_STATE_LOCAL;
 
 #if OPTION_DISPLAY
-    eez::gui::showWelcomePage();
+    gui::showWelcomePage();
 #endif
 
     // turn power on
@@ -569,9 +569,9 @@ void powerDown() {
 #if OPTION_DISPLAY
     if (!g_shutdownInProgress) {
         if (g_isBooted) {
-            eez::gui::showEnteringStandbyPage();
+            gui::showEnteringStandbyPage();
         } else {
-            eez::gui::showStandbyPage();
+            gui::showStandbyPage();
         }
     }
 #endif
@@ -669,7 +669,7 @@ void changePowerState(bool up) {
     } else {
 #if OPTION_DISPLAY
         if (!g_shutdownInProgress) {
-            eez::gui::showEnteringStandbyPage();
+            gui::showEnteringStandbyPage();
         }
 #endif
 
@@ -691,7 +691,7 @@ void changePowerState(bool up) {
 void powerDownBySensor() {
     if (g_powerIsUp) {
 #if OPTION_DISPLAY
-        eez::gui::showEnteringStandbyPage();
+        gui::showEnteringStandbyPage();
 #endif
 
         channel_dispatcher::disableOutputForAllChannels();

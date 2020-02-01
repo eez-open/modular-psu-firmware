@@ -663,39 +663,20 @@ bool PsuAppContext::isAutoRepeatAction(int action) {
 }
 
 void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
-#ifdef DEBUG
-    if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE &&
-        (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO ||
-         getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL)) {
-        int x = touchEvent.x;
-        if (x < 1)
-            x = 1;
-        else if (x > eez::mcu::display::getDisplayWidth() - 2)
-            x = eez::mcu::display::getDisplayWidth() - 2;
-
-        int y = touchEvent.y;
-        if (y < 1)
-            y = 1;
-        else if (y > eez::mcu::display::getDisplayHeight() - 2)
-            y = eez::mcu::display::getDisplayHeight() - 2;
-        
-#if OPTION_SDRAM
-        mcu::display::selectBuffer(m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex);
-#endif
-        eez::mcu::display::setColor(255, 255, 255);
-        eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+    if (isFrontPanelLocked()) {
+        auto savedAppContext = g_appContext;
+        g_appContext = &psu::gui::g_psuAppContext;
+        errorMessage("Front panel is locked!");                
+        g_appContext = savedAppContext;
+        return;
     }
-#endif
 
-    if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_INTRO) {
-        if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
-            enterTouchCalibration();
-        }
-    } else if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION) {
-        onTouchCalibrationPageTouch(foundWidget, touchEvent);
-    }
-    
     int activePageId = getActivePageId();
+
+    if (activePageId == PAGE_ID_TOUCH_CALIBRATION) {
+        onTouchCalibrationPageTouch(foundWidget, touchEvent);
+        return;
+    }
 
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         if (activePageId == PAGE_ID_EDIT_MODE_SLIDER) {
@@ -708,14 +689,52 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
             edit_mode_slider::onTouchMove();
         } else if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
             edit_mode_step::onTouchMove();
+        }        
+#ifdef DEBUG
+        else if (activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
+            int x = touchEvent.x;
+            if (x < 1) {
+                x = 1;
+            } else if (x > eez::mcu::display::getDisplayWidth() - 2) {
+                x = eez::mcu::display::getDisplayWidth() - 2;
+            }
+
+            int y = touchEvent.y;
+            if (y < 1) {
+                y = 1;
+            } else if (y > eez::mcu::display::getDisplayHeight() - 2) {
+                y = eez::mcu::display::getDisplayHeight() - 2;
+            }
+        
+#if OPTION_SDRAM
+            mcu::display::selectBuffer(m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex);
+#endif
+            eez::mcu::display::setColor(255, 255, 255);
+            eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
+#endif
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         if (activePageId == PAGE_ID_EDIT_MODE_SLIDER) {
             edit_mode_slider::onTouchUp();
         } else if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
             edit_mode_step::onTouchUp();
+        } else if (activePageId == PAGE_ID_TOUCH_CALIBRATION_INTRO) {
+            enterTouchCalibration();
         }
+    } else if (touchEvent.type == EVENT_TYPE_LONG_TOUCH) {
+        if (activePageId == INTERNAL_PAGE_ID_NONE || activePageId == PAGE_ID_STANDBY) {
+            // wake up on long touch
+            psu::changePowerState(true);
+        } else if (activePageId == PAGE_ID_DISPLAY_OFF) {
+            // turn ON display on long touch
+            psu::persist_conf::setDisplayState(1);
+        }
+    } else if (touchEvent.type == EVENT_TYPE_EXTRA_LONG_TOUCH) {
+        // start touch screen calibration in case of really long touch
+        showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
     }
+
+    AppContext::onPageTouch(foundWidget, touchEvent);
 }
 
 bool PsuAppContext::testExecuteActionOnTouchDown(int action) {
@@ -737,6 +756,33 @@ uint32_t PsuAppContext::getNumHistoryValues(uint16_t id) {
 uint32_t PsuAppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) {
     int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
     return Channel::get(iChannel).getCurrentHistoryValuePosition();
+}
+
+bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
+    const Widget *widget = widgetCursor.widget;
+    if (widget->action) {
+        AppContext *saved = g_appContext;
+        g_appContext = this;
+
+        if (isFrontPanelLocked()) {
+            int activePageId = getActivePageId();
+            if (activePageId == PAGE_ID_KEYPAD ||
+                activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO ||
+                activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
+                g_appContext = saved;
+                return true;
+            }
+            
+            if (widget->action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
+                g_appContext = saved;
+                return false;
+            }
+        }
+
+        g_appContext = saved;
+    }
+
+    return AppContext::isWidgetActionEnabled(widgetCursor);
 }
 
 void PsuAppContext::showProgressPage(const char *message, void (*abortCallback)()) {
@@ -1243,6 +1289,61 @@ bool isEncoderEnabledInActivePage() {
     enumWidgets(isEncoderEnabledInActivePageCheckWidget);
     return g_isEncoderEnabledInActivePage;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+static void doUnlockFrontPanel() {
+    popPage();
+
+    psu::persist_conf::lockFrontPanel(false);
+    infoMessage("Front panel is unlocked!");
+}
+
+static void checkPasswordToUnlockFrontPanel() {
+    psu::gui::checkPassword("Password: ", psu::persist_conf::devConf.systemPassword, doUnlockFrontPanel);
+}
+
+void lockFrontPanel() {
+    psu::persist_conf::lockFrontPanel(true);
+    infoMessage("Front panel is locked!");
+}
+
+void unlockFrontPanel() {
+    if (strlen(psu::persist_conf::devConf.systemPassword) > 0) {
+        checkPasswordToUnlockFrontPanel();
+    } else {
+        psu::persist_conf::lockFrontPanel(false);
+        infoMessage("Front panel is unlocked!");
+    }
+}
+
+bool isFrontPanelLocked() {
+    return psu::g_rlState != psu::RL_STATE_LOCAL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void showWelcomePage() {
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_WELCOME);
+}
+
+void showEnteringStandbyPage() {
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_ENTERING_STANDBY);
+}
+
+void showStandbyPage() {
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_STANDBY);
+}
+
+void showSavingPage() {
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_SAVING);
+}
+
+void showShutdownPage() {
+    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_SHUTDOWN);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 static int g_findNextFocusCursorState = 0; 
 static data::Cursor g_nextFocusCursor = Cursor(0);

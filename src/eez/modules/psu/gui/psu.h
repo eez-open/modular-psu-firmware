@@ -62,6 +62,16 @@ float encoderIncrement(data::Value value, int counter, float min, float max, int
 
 bool isEncoderEnabledInActivePage();
 
+void lockFrontPanel();
+void unlockFrontPanel();
+bool isFrontPanelLocked();
+
+void showWelcomePage();
+void showStandbyPage();
+void showEnteringStandbyPage();
+void showSavingPage();
+void showShutdownPage();
+
 class PsuAppContext : public AppContext {
 public:
     PsuAppContext();
@@ -76,6 +86,8 @@ public:
 
     uint32_t getNumHistoryValues(uint16_t id) override;
     uint32_t getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) override;
+
+    bool isWidgetActionEnabled(const WidgetCursor &widgetCursor) override;
     
     static void showProgressPage(const char *message, void (*abortCallback)() = 0);
     static void showProgressPageWithoutAbort(const char *message);

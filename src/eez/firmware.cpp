@@ -56,6 +56,7 @@
 #include <eez/modules/psu/ethernet.h>
 #include <eez/modules/psu/ntp.h>
 #endif
+#include <eez/modules/psu/gui/psu.h>
 
 #if OPTION_FAN
 #include <eez/modules/aux_ps/fan.h>
@@ -183,7 +184,7 @@ void boot() {
     psu::persist_conf::init();
 
 #if OPTION_DISPLAY
-    eez::gui::showWelcomePage();
+    eez::psu::gui::showWelcomePage();
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -333,7 +334,7 @@ void shutdown() {
     using namespace psu;
 
     if (osThreadGetId() != g_psuTaskHandle) {
-        gui::showSavingPage();
+        psu::gui::showSavingPage();
         osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_SHUTDOWN, 0), osWaitForever);
         return;
     }
@@ -380,7 +381,7 @@ void shutdown() {
 
         g_shutdown = true;
     } else {
-        gui::showShutdownPage();
+        psu::gui::showShutdownPage();
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
         osDelay(100);

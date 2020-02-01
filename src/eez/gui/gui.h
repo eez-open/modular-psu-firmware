@@ -76,18 +76,8 @@ void executeAction(int actionId);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void showWelcomePage();
-void showStandbyPage();
-void showEnteringStandbyPage();
-void showSavingPage();
-void showShutdownPage();
-
 void standBy();
 void reset();
-
-void lockFrontPanel();
-void unlockFrontPanel();
-bool isFrontPanelLocked();
 
 enum Buffer {
     BUFFER_OLD,

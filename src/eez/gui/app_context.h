@@ -100,7 +100,7 @@ public:
 
     virtual bool isAutoRepeatAction(int action);
 
-    bool isWidgetActionEnabled(const WidgetCursor &widgetCursor);
+    virtual bool isWidgetActionEnabled(const WidgetCursor &widgetCursor);
 
     void updateAppView(WidgetCursor &widgetCursor);
 
