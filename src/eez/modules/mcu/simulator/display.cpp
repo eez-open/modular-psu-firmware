@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <utility>
+#include <string>
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -38,8 +39,6 @@
 #include <eez/platform/simulator/front_panel.h>
 #include <eez/system.h>
 #include <eez/util.h>
-
-#include "texture.h"
 
 using namespace eez::gui;
 using namespace eez::psu::gui;

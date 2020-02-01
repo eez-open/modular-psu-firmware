@@ -127,7 +127,6 @@ set(src_eez_modules_psu
     src/eez/modules/psu/event_queue.cpp
     src/eez/modules/psu/idle.cpp
     src/eez/modules/psu/io_pins.cpp
-    src/eez/modules/psu/lcd.cpp
     src/eez/modules/psu/list_program.cpp
     src/eez/modules/psu/ntp.cpp
     src/eez/modules/psu/ontime.cpp
@@ -476,14 +475,12 @@ set(src_eez_platform_simulator
     src/eez/platform/simulator/cmsis_os.cpp
     src/eez/platform/simulator/events.cpp
     src/eez/platform/simulator/front_panel.cpp
-    src/eez/platform/simulator/texture.cpp
 ) 
 list (APPEND src_files ${src_eez_platform_simulator})
 set(header_eez_platform_simulator
     src/eez/platform/simulator/cmsis_os.h
     src/eez/platform/simulator/events.h
     src/eez/platform/simulator/front_panel.h
-    src/eez/platform/simulator/texture.h
 ) 
 list (APPEND header_files ${header_eez_platform_simulator})
 source_group("eez\\platform\\simulator" FILES ${src_eez_platform_simulator} ${header_eez_platform_simulator})
