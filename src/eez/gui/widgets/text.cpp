@@ -47,7 +47,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
     const TextWidgetSpecific *textWidget = GET_WIDGET_PROPERTY(widget, specific, const TextWidgetSpecific *);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
-    widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
+    widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
     
     const Style *style = getStyle(widgetCursor.currentState->flags.focused ? textWidget->focusStyle : widget->style);
 

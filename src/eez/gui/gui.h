@@ -56,6 +56,7 @@ void stateManagmentHook();
 WidgetCursor &getFoundWidgetAtDown();
 void clearFoundWidgetAtDown();
 bool isActiveWidget(const WidgetCursor &widgetCursor);
+bool isFocusWidget(const WidgetCursor &widgetCursor);
 uint32_t getShowPageTime();
 void setShowPageTime(uint32_t time);
 void refreshScreen();

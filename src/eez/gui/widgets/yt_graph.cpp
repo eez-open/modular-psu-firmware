@@ -455,7 +455,7 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     YTGraphWidgetState *previousState = (YTGraphWidgetState *)widgetCursor.previousState;
 
     widgetCursor.currentState->size = sizeof(YTGraphWidgetState);
-    widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
+    widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
 
     currentState->refreshCounter = data::ytDataGetRefreshCounter(widgetCursor.cursor, widget->data);

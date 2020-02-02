@@ -70,9 +70,6 @@ public:
     Page *getActivePage();
 
     bool isActivePageInternal();
-    InternalPage *getActivePageInternal() {
-        return (InternalPage *)getActivePage();
-    }
 
     void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,
                                 bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t),

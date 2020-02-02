@@ -47,7 +47,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
     DisplayDataState *previousState = (DisplayDataState *)widgetCursor.previousState;
 
     widgetCursor.currentState->size = sizeof(DisplayDataState);
-    widgetCursor.currentState->flags.focused = g_appContext->isFocusWidget(widgetCursor);
+    widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->style));
 

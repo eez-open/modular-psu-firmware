@@ -64,6 +64,10 @@ bool isActiveWidget(const WidgetCursor &widgetCursor) {
     return result;
 }
 
+bool isFocusWidget(const WidgetCursor &widgetCursor) {
+    return g_appContext->isFocusWidget(widgetCursor);
+}
+
 int getAction(const WidgetCursor &widgetCursor) {
     return (int16_t)widgetCursor.widget->action;
 }
