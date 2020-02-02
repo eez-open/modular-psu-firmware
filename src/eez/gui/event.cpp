@@ -47,29 +47,148 @@ static bool m_extraLongTouchGenerated;
 static int m_lastTouchMoveX = -1;
 static int m_lastTouchMoveY = -1;
 
-WidgetCursor &getFoundWidgetAtDown() {
-    return m_foundWidgetAtDown;
-}
+void processTouchEvent(EventType type);
+void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
+void onInternalPageTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
+void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 
-void clearFoundWidgetAtDown() {
-    m_foundWidgetAtDown = WidgetCursor();
-}
+void eventHandling() {
+	if (g_shutdownInProgress) {
+		return;
+	}
 
-bool isActiveWidget(const WidgetCursor &widgetCursor) {
-    if (widgetCursor.appContext->isActiveWidget(widgetCursor)) {
-        return true;
+    using namespace eez::gui::touch;
+
+    if (g_eventType != EVENT_TYPE_TOUCH_NONE) {
+        psu::idle::noteGuiActivity();
     }
 
-    bool result = widgetCursor == m_activeWidget;
-    return result;
+    uint32_t tickCount = micros();
+
+    if (g_eventType == EVENT_TYPE_TOUCH_DOWN) {
+        m_touchDownTime = tickCount;
+        m_lastAutoRepeatEventTime = tickCount;
+        m_longTouchGenerated = false;
+        m_extraLongTouchGenerated = false;
+        processTouchEvent(EVENT_TYPE_TOUCH_DOWN);
+    } else if (g_eventType == EVENT_TYPE_TOUCH_MOVE) {
+        processTouchEvent(EVENT_TYPE_TOUCH_MOVE);
+
+        if (!m_longTouchGenerated &&
+            int32_t(tickCount - m_touchDownTime) >= CONF_GUI_LONG_TOUCH_TIMEOUT) {
+            m_longTouchGenerated = true;
+            processTouchEvent(EVENT_TYPE_LONG_TOUCH);
+        }
+
+        if (m_longTouchGenerated && !m_extraLongTouchGenerated &&
+            int32_t(tickCount - m_touchDownTime) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT) {
+            m_extraLongTouchGenerated = true;
+            processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH);
+        }
+
+        if (int32_t(tickCount - m_lastAutoRepeatEventTime) >= (m_lastAutoRepeatEventTime == m_touchDownTime ? CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY : CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY)) {
+            processTouchEvent(EVENT_TYPE_AUTO_REPEAT);
+            m_lastAutoRepeatEventTime = tickCount;
+        }
+
+    } else if (g_eventType == EVENT_TYPE_TOUCH_UP) {
+        processTouchEvent(EVENT_TYPE_TOUCH_UP);
+    }
 }
 
-bool isFocusWidget(const WidgetCursor &widgetCursor) {
-    return g_appContext->isFocusWidget(widgetCursor);
+void processTouchEvent(EventType type) {
+    int x = touch::getX();
+    int y = touch::getY();
+
+    if (type == EVENT_TYPE_TOUCH_DOWN) {
+        m_foundWidgetAtDown = findWidget(x, y);
+        m_onTouchFunction = getTouchFunction(m_foundWidgetAtDown);
+        if (!m_onTouchFunction) {
+            m_onTouchFunction = onPageTouch;
+        }
+    } 
+#if defined(EEZ_PLATFORM_STM32)    
+    else if (type == EVENT_TYPE_TOUCH_MOVE) {
+        // ignore EVENT_TYPE_TOUCH_MOVE if it is the same as the last event
+        // or change is too big
+    	int dx = (m_lastTouchMoveX - x);
+    	int dy = (m_lastTouchMoveY - y);
+    	int d = dx * dx + dy * dy;
+        if (d == 0 || d > 1000) {
+            return;
+        }
+    }
+#endif
+    else if (type == EVENT_TYPE_TOUCH_UP) {
+        m_activeWidget = 0;
+    }
+
+    if (m_onTouchFunction) {
+        AppContext *saved = g_appContext;
+        if (m_foundWidgetAtDown) {
+            g_appContext = m_foundWidgetAtDown.appContext;
+        }
+
+        Event event;
+        event.type = type;
+        event.x = x;
+        event.y = y;
+
+        m_onTouchFunction(m_foundWidgetAtDown, event);
+
+        g_appContext = saved;
+    }
+
+    m_lastTouchMoveX = x;
+    m_lastTouchMoveY = y;
+}
+
+OnTouchFunctionType getTouchFunction(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.appContext && widgetCursor.appContext->isActivePageInternal()) {
+        return onInternalPageTouch;
+    }
+
+    if (widgetCursor) {
+        if (g_onTouchFunctions[widgetCursor.widget->type]) {
+            return g_onTouchFunctions[widgetCursor.widget->type];
+        }
+
+		if (widgetCursor.widget->action) {
+			if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
+				return onWidgetDefaultTouch;
+			}
+		}
+    }
+
+    return nullptr;
 }
 
 int getAction(const WidgetCursor &widgetCursor) {
     return (int16_t)widgetCursor.widget->action;
+}
+
+void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
+    g_appContext->onPageTouch(foundWidget, touchEvent);
+}
+
+void onInternalPageTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+    if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
+        if (m_foundWidgetAtDown) {
+            m_activeWidget = m_foundWidgetAtDown;
+        }
+    } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
+        if (m_foundWidgetAtDown) {
+            m_activeWidget = 0;
+            int action = getAction(m_foundWidgetAtDown);
+            executeAction(action);
+        } else {
+            InternalPage *page = (InternalPage *)widgetCursor.appContext->getActivePage();
+            if (!pointInsideRect(touchEvent.x, touchEvent.y, page->x, page->y, page->width,
+                page->height)) {
+                widgetCursor.appContext->popPage();
+            }
+        }
+    }
 }
 
 void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
@@ -126,147 +245,23 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     }
 }
 
-void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
-    g_appContext->onPageTouch(foundWidget, touchEvent);
+WidgetCursor &getFoundWidgetAtDown() {
+    return m_foundWidgetAtDown;
 }
 
-void onInternalPageTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
-    if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-        if (m_foundWidgetAtDown) {
-            m_activeWidget = m_foundWidgetAtDown;
-        }
-    } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
-        if (m_foundWidgetAtDown) {
-            m_activeWidget = 0;
-            int action = getAction(m_foundWidgetAtDown);
-            executeAction(action);
-        } else {
-        	InternalPage *page = (InternalPage *)widgetCursor.appContext->getActivePage();
-			if (!pointInsideRect(touchEvent.x, touchEvent.y, page->x, page->y, page->width,
-								 page->height)) {
-				widgetCursor.appContext->popPage();
-			}
-        }
-    }
+void clearFoundWidgetAtDown() {
+    m_foundWidgetAtDown = WidgetCursor();
 }
 
-OnTouchFunctionType getTouchFunction(const WidgetCursor &widgetCursor) {
-    if (widgetCursor.appContext && widgetCursor.appContext->isActivePageInternal()) {
-        return onInternalPageTouch;
+bool isActiveWidget(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.appContext->isActiveWidget(widgetCursor)) {
+        return true;
     }
-
-    if (widgetCursor) {
-        if (g_onTouchFunctions[widgetCursor.widget->type]) {
-            return g_onTouchFunctions[widgetCursor.widget->type];
-        }
-
-		if (widgetCursor.widget->action) {
-			if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
-				return onWidgetDefaultTouch;
-			}
-		}
-    }
-
-    return nullptr;
+    return widgetCursor == m_activeWidget;
 }
 
-void processTouchEvent(EventType type) {
-    int x = touch::getX();
-    int y = touch::getY();
-
-#if defined(EEZ_PLATFORM_STM32)    
-    if (type == EVENT_TYPE_TOUCH_MOVE) {
-        // ignore EVENT_TYPE_TOUCH_MOVE if it is the same as the last event
-        // or change is too big
-    	int dx = (m_lastTouchMoveX - x);
-    	int dy = (m_lastTouchMoveY - y);
-    	int d = dx * dx + dy * dy;
-        if (d == 0 || d > 1000) {
-            return;
-        }
-    }
-#endif
-
-    if (type == EVENT_TYPE_TOUCH_DOWN) {
-        m_foundWidgetAtDown = findWidget(x, y);
-
-        m_onTouchFunction = getTouchFunction(m_foundWidgetAtDown);
-
-        if (!m_onTouchFunction) {
-            m_onTouchFunction = onPageTouch;
-        }
-    }
-
-    if (type == EVENT_TYPE_TOUCH_UP) {
-        m_activeWidget = 0;
-    }
-
-    if (m_onTouchFunction) {
-        AppContext *saved = g_appContext;
-        if (m_foundWidgetAtDown) {
-            g_appContext = m_foundWidgetAtDown.appContext;
-        }
-
-        Event event;
-        event.type = type;
-        event.x = x;
-        event.y = y;
-
-        m_onTouchFunction(m_foundWidgetAtDown, event);
-
-        g_appContext = saved;
-    }
-
-    m_lastTouchMoveX = x;
-    m_lastTouchMoveY = y;
-}
-
-void touchHandling() {
-	if (g_shutdownInProgress) {
-		return;
-	}
-
-    using namespace eez::gui::touch;
-
-    if (g_eventType != EVENT_TYPE_TOUCH_NONE) {
-        psu::idle::noteGuiActivity();
-    }
-
-    uint32_t tickCount = micros();
-
-    if (g_eventType == EVENT_TYPE_TOUCH_DOWN) {
-        m_touchDownTime = tickCount;
-        m_lastAutoRepeatEventTime = tickCount;
-        m_longTouchGenerated = false;
-        m_extraLongTouchGenerated = false;
-        processTouchEvent(EVENT_TYPE_TOUCH_DOWN);
-    } else if (g_eventType == EVENT_TYPE_TOUCH_MOVE) {
-        processTouchEvent(EVENT_TYPE_TOUCH_MOVE);
-
-        if (!m_longTouchGenerated &&
-            int32_t(tickCount - m_touchDownTime) >= CONF_GUI_LONG_TOUCH_TIMEOUT) {
-            m_longTouchGenerated = true;
-            processTouchEvent(EVENT_TYPE_LONG_TOUCH);
-        }
-
-        if (m_longTouchGenerated && !m_extraLongTouchGenerated &&
-            int32_t(tickCount - m_touchDownTime) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT) {
-            m_extraLongTouchGenerated = true;
-            processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH);
-        }
-
-        if (int32_t(tickCount - m_lastAutoRepeatEventTime) >= (m_lastAutoRepeatEventTime == m_touchDownTime ? CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY : CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY)) {
-            processTouchEvent(EVENT_TYPE_AUTO_REPEAT);
-            m_lastAutoRepeatEventTime = tickCount;
-        }
-
-    } else if (g_eventType == EVENT_TYPE_TOUCH_UP) {
-        processTouchEvent(EVENT_TYPE_TOUCH_UP);
-    }
-}
-
-void eventHandling() {
-    touchHandling();
+bool isFocusWidget(const WidgetCursor &widgetCursor) {
+    return g_appContext->isFocusWidget(widgetCursor);
 }
 
 } // namespace gui
