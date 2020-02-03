@@ -147,11 +147,11 @@ void oneIter() {
 				eez::psu::sd_card::onSdDetectInterruptHandler();
 			}
 #endif
-			else if (type == SCPI_QUEUE_MESSAGE_DLOG_FILE_WRITE) {
+			else if (type == SCPI_QUEUE_MESSAGE_TYPE_DLOG_FILE_WRITE) {
 				eez::psu::dlog_record::fileWrite();
 			}
-            else if (type == SCPI_QUEUE_MESSAGE_DLOG_TOGGLE) {
-                eez::psu::dlog_record::toggle();
+            else if (type == SCPI_QUEUE_MESSAGE_TYPE_DLOG_STATE_TRANSITION) {
+                eez::psu::dlog_record::stateTransition(param);
             } else if (type == SCPI_QUEUE_MESSAGE_DLOG_SHOW_FILE) {
                 eez::psu::dlog_view::openFile(nullptr);
             } else if (type == SCPI_QUEUE_MESSAGE_DLOG_LOAD_BLOCK) {

@@ -31,11 +31,6 @@ scpi_result_t scpi_cmd_abortDlog(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_initiateDlog(scpi_t *context) {
-    if (!dlog_record::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
-        return SCPI_RES_ERR;
-    }
-
     char filePath[MAX_PATH_LENGTH + 1];
     if (!getFilePath(context, filePath, true)) {
         return SCPI_RES_ERR;
@@ -738,11 +733,6 @@ scpi_result_t scpi_cmd_senseDlogTraceYScaleQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_initiateDlogTrace(scpi_t *context) {
-    if (!dlog_record::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
-        return SCPI_RES_ERR;
-    }
-
     char filePath[MAX_PATH_LENGTH + 1];
     if (!getFilePath(context, filePath, true)) {
         return SCPI_RES_ERR;

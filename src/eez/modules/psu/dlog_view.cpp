@@ -82,7 +82,7 @@ static bool g_wasExecuting;
 
 State getState() {
     if (g_showLatest) {
-        if (dlog_record::isExecuting()) {
+        if (g_wasExecuting) {
             return STATE_READY;
         }
     }
@@ -751,7 +751,7 @@ void openFile(const char *filePath) {
 }
 
 Recording &getRecording() {
-    return g_showLatest && dlog_record::isExecuting() ? dlog_record::g_recording : g_recording;
+    return g_showLatest && g_wasExecuting ? dlog_record::g_recording : g_recording;
 }
 
 float roundValue(float value) {

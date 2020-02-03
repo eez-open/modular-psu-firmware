@@ -19,19 +19,11 @@
 #pragma once
 
 #include <eez/modules/psu/trigger.h>
-
-
 #include <eez/modules/psu/dlog_view.h>
 
 namespace eez {
 namespace psu {
 namespace dlog_record {
-
-enum State {
-    STATE_IDLE,
-    STATE_INITIATED,
-    STATE_EXECUTING
-};
 
 static const float PERIOD_MIN = 0.005f;
 static const float PERIOD_MAX = 120.0f;
@@ -42,33 +34,38 @@ static const float TIME_MAX = 86400000.0f;
 static const float TIME_DEFAULT = 60.0f;
 
 extern double g_currentTime;
-
 extern uint32_t g_fileLength;
-
 extern dlog_view::Parameters g_parameters;
 extern dlog_view::Parameters g_guiParameters;
-
 extern dlog_view::Recording g_recording;
 
+enum State {
+    STATE_IDLE,
+    STATE_INITIATED,
+    STATE_EXECUTING
+};
+
 State getState();
-int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath, bool forTraceUsage);
 bool isIdle();
 bool isInitiated();
 bool isExecuting();
 bool isTraceExecuting();
+
+int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath, bool forTraceUsage);
+
 int initiate();
 int initiateTrace();
 int startImmediately();
 void triggerGenerated();
 void toggle();
-void abort(bool flush = true);
-
-void tick(uint32_t tick_usec);
+void abort();
 void reset();
 
+void tick(uint32_t tick_usec);
 void log(float *values);
 
 void fileWrite();
+void stateTransition(int action, int *perr = nullptr);
 
 const char *getLatestFilePath();
 

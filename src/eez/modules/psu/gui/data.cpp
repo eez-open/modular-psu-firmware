@@ -4472,7 +4472,7 @@ void data_dlog_toggle_state(data::DataOperationEnum operation, data::Cursor &cur
 
 void data_is_show_live_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        dlog_view::Recording &recording = dlog_view::getRecording();
+        auto &recording = dlog_view::getRecording();
         value = &recording == &dlog_record::g_recording;
     }
 }
@@ -4606,7 +4606,7 @@ void data_is_single_page_on_stack(data::DataOperationEnum operation, data::Curso
 }
 
 void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    dlog_view::Recording &recording = dlog_view::getRecording();
+    auto &recording = dlog_view::getRecording();
 
     if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
         value = Value(recording.refreshCounter, VALUE_TYPE_UINT32);
@@ -4786,7 +4786,7 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
     if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
-        dlog_view::Recording &recording = dlog_view::getRecording();
+        auto &recording = dlog_view::getRecording();
         
         int state = 0;
         int numVisibleDlogValues = dlog_view::getNumVisibleDlogValues(recording);
@@ -4835,7 +4835,7 @@ void data_dlog_overlay_over_4(data::DataOperationEnum operation, data::Cursor &c
     if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
-        dlog_view::Recording &recording = dlog_view::getRecording();
+        auto &recording = dlog_view::getRecording();
         overlay.state = dlog_view::g_showLegend && !dlog_view::yAxisHasDifferentUnits(recording);
         
         WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
@@ -4848,21 +4848,21 @@ void data_dlog_overlay_over_4(data::DataOperationEnum operation, data::Cursor &c
 
 void data_dlog_visible_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
-        dlog_view::Recording &recording = dlog_view::getRecording();
+        auto &recording = dlog_view::getRecording();
         value = getNumVisibleDlogValues(recording);
     }
 }
 
 void data_dlog_visible_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        dlog_view::Recording &recording = dlog_view::getRecording();
+        auto &recording = dlog_view::getRecording();
         int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : cursor.i);
         value = Value(dlogValueIndex, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
 
 void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    dlog_view::Recording &recording = dlog_view::getRecording();
+    auto &recording = dlog_view::getRecording();
     int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : cursor.i);
 
     if (operation == data::DATA_OPERATION_GET) {
@@ -4896,7 +4896,7 @@ void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor
 }
 
 void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    dlog_view::Recording &recording = dlog_view::getRecording();
+    auto &recording = dlog_view::getRecording();
     int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : cursor.i);
 
     if (operation == data::DATA_OPERATION_GET) {
@@ -4929,7 +4929,7 @@ void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cur
 }
 
 void data_dlog_x_axis_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    dlog_view::Recording &recording = dlog_view::getRecording();
+    auto &recording = dlog_view::getRecording();
 
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_OFFSET;
@@ -4954,7 +4954,7 @@ void data_dlog_x_axis_offset(data::DataOperationEnum operation, data::Cursor &cu
 }
 
 void data_dlog_x_axis_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    dlog_view::Recording &recording = dlog_view::getRecording();
+    auto &recording = dlog_view::getRecording();
 
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV;
@@ -4980,7 +4980,7 @@ void data_dlog_x_axis_div(data::DataOperationEnum operation, data::Cursor &curso
 
 void data_dlog_x_axis_max_value(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        dlog_view::Recording &recording = dlog_view::getRecording();
+        auto &recording = dlog_view::getRecording();
 
         float maxValue = dlog_view::getDuration(recording);
 
@@ -4994,7 +4994,7 @@ void data_dlog_x_axis_max_value(data::DataOperationEnum operation, data::Cursor 
 
 void data_dlog_x_axis_max_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        dlog_view::Recording &recording = dlog_view::getRecording();
+        auto &recording = dlog_view::getRecording();
         if (recording.parameters.xAxis.unit == UNIT_SECOND) {
             value = "Total duration";
         } else {
@@ -5005,7 +5005,7 @@ void data_dlog_x_axis_max_value_label(data::DataOperationEnum operation, data::C
 
 void data_dlog_visible_value_cursor(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        dlog_view::Recording &recording = dlog_view::getRecording();
+        auto &recording = dlog_view::getRecording();
         int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : cursor.i);
         auto ytDataGetValue = data::ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
         float max;
@@ -5046,7 +5046,7 @@ void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor &curs
 
 void data_dlog_value_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        dlog_view::Recording &recording = dlog_view::getRecording();
+        auto &recording = dlog_view::getRecording();
         value = cursor.i < recording.parameters.numYAxes ? recording.dlogValues[cursor.i].isVisible : 2;
     }
 }

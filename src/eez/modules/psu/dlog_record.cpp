@@ -42,6 +42,19 @@ using namespace scpi;
 namespace psu {
 namespace dlog_record {
 
+#define CHUNK_SIZE 4096
+
+enum StateTransition {
+    TRANSITION_INITIATE,
+    TRANSITION_INITIATE_TRACE,
+    TRANSITION_START,
+    TRANSITION_TRIGGER,
+    TRANSITION_TOGGLE,
+    TRANSITION_FINISH,
+    TRANSITION_ABORT,
+    TRANSITION_RESET
+};
+
 dlog_view::Parameters g_parameters = {
     { 0 },
     { 0 },
@@ -81,24 +94,35 @@ dlog_view::Recording g_recording;
 static State g_state = STATE_IDLE;
 static bool g_traceInitiated;
 
+static uint32_t g_lastSyncTickCount;
 static uint32_t g_lastTickCount;
 static uint32_t g_seconds;
 static uint32_t g_micros;
 static uint32_t g_iSample;
 double g_currentTime;
 static double g_nextTime;
-static uint32_t g_lastSyncTickCount;
-
 uint32_t g_fileLength;
-
-#define CHUNK_SIZE 4096
-
 static unsigned int g_bufferIndex;
-
 static unsigned int g_lastSavedBufferIndex;
 static unsigned int g_saveUpToBufferIndex;
 
-int fileOpen() {
+////////////////////////////////////////////////////////////////////////////////
+
+static float getValue(int rowIndex, int columnIndex, float *max) {
+    float value = *(float *)(DLOG_RECORD_BUFFER + (g_recording.dataOffset + (rowIndex * g_recording.parameters.numYAxes + columnIndex) * 4) % DLOG_RECORD_BUFFER_SIZE);
+
+    if (g_recording.parameters.yAxisScale == dlog_view::SCALE_LOGARITHMIC) {
+        float logOffset = 1 - g_recording.parameters.yAxes[columnIndex].range.min;
+        value = log10f(logOffset + value);
+    }
+
+    *max = value;
+    return value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static int fileTruncate() {
     File file;
     if (!file.open(g_parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
         event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_OPEN_ERROR);
@@ -118,13 +142,17 @@ int fileOpen() {
 }
 
 void fileWrite() {
+    if (g_state != STATE_EXECUTING) {
+        return;
+    }
+
     auto saveUpToBufferIndex = g_saveUpToBufferIndex;
     size_t length = saveUpToBufferIndex - g_lastSavedBufferIndex;
     if (length > 0) {
         File file;
         if (!file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
             event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR);
-            abort(false);
+            abort();
             return;
         }
 
@@ -144,20 +172,24 @@ void fileWrite() {
 
         if (written != length) {
             event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_WRITE_ERROR);
-            abort(false);
+            abort();
         }
     }
 }
 
-void flushData() {
+////////////////////////////////////////////////////////////////////////////////
+
+static void flushData() {
     if (osThreadGetId() != g_scpiTaskHandle) {
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_FILE_WRITE, 0), osWaitForever);
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DLOG_FILE_WRITE, 0), osWaitForever);
     } else {
         fileWrite();
     }
 }
 
-void writeUint8(uint8_t value) {
+////////////////////////////////////////////////////////////////////////////////
+
+static void writeUint8(uint8_t value) {
     *(DLOG_RECORD_BUFFER + (g_bufferIndex % DLOG_RECORD_BUFFER_SIZE)) = value;
 
     g_bufferIndex++;
@@ -171,62 +203,62 @@ void writeUint8(uint8_t value) {
     ++g_fileLength;
 }
 
-void writeUint16(uint16_t value) {
+static void writeUint16(uint16_t value) {
     writeUint8(value & 0xFF);
     writeUint8((value >> 8) & 0xFF);
 }
 
-void writeUint32(uint32_t value) {
+static void writeUint32(uint32_t value) {
     writeUint8(value & 0xFF);
     writeUint8((value >> 8) & 0xFF);
     writeUint8((value >> 16) & 0xFF);
     writeUint8(value >> 24);
 }
 
-void writeFloat(float value) {
+static void writeFloat(float value) {
     writeUint32(*((uint32_t *)&value));
 }
 
-void writeUint8Field(uint8_t id, uint8_t value) {
+static void writeUint8Field(uint8_t id, uint8_t value) {
     writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t));
     writeUint8(id);
     writeUint8(value);
 }
 
-void writeUint8FieldWithIndex(uint8_t id, uint8_t value, uint8_t index) {
+static void writeUint8FieldWithIndex(uint8_t id, uint8_t value, uint8_t index) {
     writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint8_t));
     writeUint8(id);
     writeUint8(index);
     writeUint8(value);
 }
 
-void writeUint16Field(uint8_t id, uint16_t value) {
-    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint16_t));
-    writeUint8(id);
-    writeUint16(value);
-}
+//static void writeUint16Field(uint8_t id, uint16_t value) {
+//    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint16_t));
+//    writeUint8(id);
+//    writeUint16(value);
+//}
 
-void writeUint16FieldWithIndex(uint8_t id, uint16_t value, uint8_t index) {
+static void writeUint16FieldWithIndex(uint8_t id, uint16_t value, uint8_t index) {
     writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t));
     writeUint8(id);
     writeUint8(index);
     writeUint16(value);
 }
 
-void writeFloatField(uint8_t id, float value) {
+static void writeFloatField(uint8_t id, float value) {
     writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(float));
     writeUint8(id);
     writeFloat(value);
 }
 
-void writeFloatFieldWithIndex(uint8_t id, float value, uint8_t index) {
+static void writeFloatFieldWithIndex(uint8_t id, float value, uint8_t index) {
     writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t) + sizeof(float));
     writeUint8(id);
     writeUint8(index);
     writeFloat(value);
 }
 
-void writeStringField(uint8_t id, const char *str) {
+static void writeStringField(uint8_t id, const char *str) {
     writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + (uint16_t)strlen(str));
     writeUint8(id);
     while (*str) {
@@ -234,7 +266,7 @@ void writeStringField(uint8_t id, const char *str) {
     }
 }
 
-void writeStringFieldWithIndex(uint8_t id, const char *str, uint8_t index) {
+static void writeStringFieldWithIndex(uint8_t id, const char *str, uint8_t index) {
     writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t) + (uint16_t)strlen(str));
     writeUint8(id);
     writeUint8(index);
@@ -243,151 +275,20 @@ void writeStringFieldWithIndex(uint8_t id, const char *str, uint8_t index) {
     }
 }
 
-void setState(State newState) {
-    if (g_state != newState) {
-        if (newState == STATE_EXECUTING) {
-            setOperBits(OPER_DLOG, true);
-        } else if (g_state == STATE_EXECUTING) {
-            setOperBits(OPER_DLOG, false);
-        }
+////////////////////////////////////////////////////////////////////////////////
 
-        g_state = newState;
-    }
-}
-
-State getState() {
-    return g_state;
-}
-
-int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath, bool forTraceUsage) {
-    if (forTraceUsage) {
-        if (parameters.xAxis.step <= 0) {
-            // TODO replace with more specific error
-            return SCPI_ERROR_EXECUTION_ERROR;
-        }
-
-        if (parameters.xAxis.range.min >= parameters.xAxis.range.max) {
-            return SCPI_ERROR_DATA_OUT_OF_RANGE;
-        }
-
-        if (parameters.numYAxes == 0) {
-            // TODO replace with more specific error
-            return SCPI_ERROR_EXECUTION_ERROR;
-        }
-
-        for (int i = 0; i < parameters.numYAxes; i++) {
-            if (parameters.yAxes[i].range.min >= parameters.yAxes[i].range.max) {
-                return SCPI_ERROR_DATA_OUT_OF_RANGE;
-            }
-        }
-    } else {
-        bool somethingToLog = false;
-        for (int i = 0; i < CH_NUM; ++i) {
-            if (parameters.logVoltage[i] || parameters.logCurrent[i] || parameters.logPower[i]) {
-                somethingToLog = true;
-                break;
-            }
-        }
-
-        if (!somethingToLog) {
-            // TODO replace with more specific error
-            return SCPI_ERROR_EXECUTION_ERROR;
-        }
-    }
-
-    if (!doNotCheckFilePath) {
-        if (!parameters.filePath[0]) {
-            // TODO replace with more specific error
-            return SCPI_ERROR_EXECUTION_ERROR;
-        }
-    }
-
-    return SCPI_RES_OK;
-}
-
-bool isIdle() {
-    return g_state == STATE_IDLE;
-}
-
-bool isInitiated() {
-    return g_state == STATE_INITIATED;
-}
-
-bool isExecuting() {
-    return g_state == STATE_EXECUTING;
-}
-
-bool isTraceExecuting() {
-    return g_state == STATE_EXECUTING && g_traceInitiated;
-}
-
-static int doInitiate() {
-    int error = SCPI_RES_OK;
-
-    if (g_parameters.triggerSource == trigger::SOURCE_IMMEDIATE) {
-        error = startImmediately();
-    } else {
-        error = checkDlogParameters(g_parameters, false, g_traceInitiated);
-        if (error == SCPI_RES_OK) {
-            setState(STATE_INITIATED);
-        }
-    }
-
-    if (error != SCPI_RES_OK) {
-        g_parameters.filePath[0] = 0;
-    }
-
-    return error;
-}
-
-int initiate() {
-    g_traceInitiated = false;
-    return doInitiate();
-}
-
-int initiateTrace() {
-    g_traceInitiated = true;
-    return doInitiate();
-}
-
-float getValue(int rowIndex, int columnIndex, float *max) {
-    float value = *(float *)(DLOG_RECORD_BUFFER + (g_recording.dataOffset + (rowIndex * g_recording.parameters.numYAxes + columnIndex) * 4) % DLOG_RECORD_BUFFER_SIZE);
-
-    if (g_recording.parameters.yAxisScale == dlog_view::SCALE_LOGARITHMIC) {
-        float logOffset = 1 - g_recording.parameters.yAxes[columnIndex].range.min;
-        value = log10f(logOffset + value);
-    }
-
-    *max = value;
-    return value;
-}
-
-void log(uint32_t tickCount);
-
-int startImmediately() {
-    int err;
-
-    err = checkDlogParameters(g_parameters, false, g_traceInitiated);
-    if (err != SCPI_RES_OK) {
-        return err;
-    }
-
-    err = fileOpen();
-    if (err != SCPI_RES_OK) {
-        return err;
-    }
-
-    g_bufferIndex = 0;
-    g_lastSavedBufferIndex = 0;
-    g_saveUpToBufferIndex = 0;
+static void initRecordingStart() {
     g_lastSyncTickCount = micros();
-    g_fileLength = 0;
-    g_lastTickCount = micros();
+    g_lastTickCount = g_lastSyncTickCount;
     g_seconds = 0;
     g_micros = 0;
     g_iSample = 0;
     g_currentTime = 0;
     g_nextTime = 0;
+    g_fileLength = 0;
+    g_bufferIndex = 0;
+    g_lastSavedBufferIndex = 0;
+    g_saveUpToBufferIndex = 0;
 
     memcpy(&g_recording.parameters, &g_parameters, sizeof(dlog_view::Parameters));
 
@@ -404,7 +305,9 @@ int startImmediately() {
     dlog_view::initDlogValues(g_recording);
 
     g_recording.getValue = getValue;
+}
 
+static void writeFileHeaderAndMetaFields() {
     // header
     writeUint32(dlog_view::MAGIC1);
     writeUint32(dlog_view::MAGIC2);
@@ -478,64 +381,23 @@ int startImmediately() {
     g_bufferIndex = savedBufferIndex;
     writeUint32(g_recording.dataOffset);
     g_bufferIndex = g_recording.dataOffset;
-
-    setState(STATE_EXECUTING);
-
-    log(g_lastTickCount);
-
-    return SCPI_RES_OK;
 }
 
-void triggerGenerated() {
-    int err = startImmediately();
-    if (err != SCPI_RES_OK) {
-        generateError(err);
+////////////////////////////////////////////////////////////////////////////////
+
+static void setState(State newState) {
+    if (g_state != newState) {
+        if (newState == STATE_EXECUTING) {
+            setOperBits(OPER_DLOG, true);
+        } else if (g_state == STATE_EXECUTING) {
+            setOperBits(OPER_DLOG, false);
+        }
+
+        g_state = newState;
     }
 }
 
-void toggle() {
-    if (osThreadGetId() != g_scpiTaskHandle) {
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_TOGGLE, 0), osWaitForever);
-        return;
-    }
-
-    if (isExecuting()) {
-        abort();
-    } else if (isInitiated()) {
-        triggerGenerated();
-    } else {
-        initiate();
-    }
-}
-
-void resetParameters() {
-    memset(&g_parameters, 0, sizeof(g_parameters));
-
-    g_parameters.period = PERIOD_DEFAULT;
-    g_parameters.time = TIME_DEFAULT;
-    g_parameters.triggerSource = trigger::SOURCE_IMMEDIATE;
-}
-
-void finishLogging(bool flush) {
-	setState(STATE_IDLE);
-
-	if (flush) {
-        g_saveUpToBufferIndex = g_bufferIndex;
-        flushData();
-	}
-
-    reset();
-}
-
-void abort(bool flush) {
-    if (g_state == STATE_EXECUTING) {
-        finishLogging(flush);
-    } else {
-        setState(STATE_IDLE);
-    }
-}
-
-void log(uint32_t tickCount) {
+static void log(uint32_t tickCount) {
     g_micros += tickCount - g_lastTickCount;
     g_lastTickCount = tickCount;
 
@@ -635,7 +497,7 @@ void log(uint32_t tickCount) {
         ++g_recording.size;
 
         if (g_nextTime > g_recording.parameters.time) {
-            finishLogging(true);
+            stateTransition(TRANSITION_FINISH);
         } else {
             int32_t diff = tickCount - g_lastSyncTickCount;
             if (diff > CONF_DLOG_SYNC_FILE_TIME * 1000000L) {
@@ -647,23 +509,255 @@ void log(uint32_t tickCount) {
     }
 }
 
-void log(float *values) {
-    for (int yAxisIndex = 0; yAxisIndex < dlog_record::g_recording.parameters.numYAxes; yAxisIndex++) {
-        writeFloat(values[yAxisIndex]);
+static int doStartImmediately() {
+    int err;
+
+    err = checkDlogParameters(g_parameters, false, g_traceInitiated);
+    if (err != SCPI_RES_OK) {
+        return err;
     }
-    ++g_recording.size;
+
+    err = fileTruncate();
+    if (err != SCPI_RES_OK) {
+        return err;
+    }
+
+    initRecordingStart();
+
+    setState(STATE_EXECUTING);
+
+    writeFileHeaderAndMetaFields();
+
+    log(g_lastTickCount);
+
+    return SCPI_RES_OK;
 }
 
+static int doInitiate(bool traceInitiated) {
+    int err;
+
+    if (g_parameters.triggerSource == trigger::SOURCE_IMMEDIATE) {
+        err = doStartImmediately();
+    } else {
+        err = checkDlogParameters(g_parameters, false, g_traceInitiated);
+        if (err == SCPI_RES_OK) {
+            setState(STATE_INITIATED);
+        }
+    }
+
+    if (err == SCPI_RES_OK) {
+        g_traceInitiated = traceInitiated;
+    } else {
+        g_parameters.filePath[0] = 0;
+    }
+
+    return err;
+}
+
+static void resetParameters() {
+    memset(&g_parameters, 0, sizeof(g_parameters));
+    g_parameters.period = PERIOD_DEFAULT;
+    g_parameters.time = TIME_DEFAULT;
+    g_parameters.triggerSource = trigger::SOURCE_IMMEDIATE;
+}
+
+static void doFinish() {
+    g_saveUpToBufferIndex = g_bufferIndex;
+    flushData();
+    resetParameters();
+    setState(STATE_IDLE);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+State getState() {
+    return g_state;
+}
+
+bool isIdle() {
+    return g_state == STATE_IDLE;
+}
+
+bool isInitiated() {
+    return g_state == STATE_INITIATED;
+}
+
+bool isExecuting() {
+    return g_state == STATE_EXECUTING;
+}
+
+bool isTraceExecuting() {
+    return g_state == STATE_EXECUTING && g_traceInitiated;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath, bool forTraceUsage) {
+    if (forTraceUsage) {
+        if (parameters.xAxis.step <= 0) {
+            // TODO replace with more specific error
+            return SCPI_ERROR_EXECUTION_ERROR;
+        }
+
+        if (parameters.xAxis.range.min >= parameters.xAxis.range.max) {
+            return SCPI_ERROR_DATA_OUT_OF_RANGE;
+        }
+
+        if (parameters.numYAxes == 0) {
+            // TODO replace with more specific error
+            return SCPI_ERROR_EXECUTION_ERROR;
+        }
+
+        for (int i = 0; i < parameters.numYAxes; i++) {
+            if (parameters.yAxes[i].range.min >= parameters.yAxes[i].range.max) {
+                return SCPI_ERROR_DATA_OUT_OF_RANGE;
+            }
+        }
+    } else {
+        bool somethingToLog = false;
+        for (int i = 0; i < CH_NUM; ++i) {
+            if (parameters.logVoltage[i] || parameters.logCurrent[i] || parameters.logPower[i]) {
+                somethingToLog = true;
+                break;
+            }
+        }
+
+        if (!somethingToLog) {
+            // TODO replace with more specific error
+            return SCPI_ERROR_EXECUTION_ERROR;
+        }
+    }
+
+    if (!doNotCheckFilePath) {
+        if (!parameters.filePath[0]) {
+            // TODO replace with more specific error
+            return SCPI_ERROR_EXECUTION_ERROR;
+        }
+    }
+
+    return SCPI_RES_OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void stateTransition(int transition, int* perr) {
+    if (osThreadGetId() != g_scpiTaskHandle) {
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DLOG_STATE_TRANSITION, transition), osWaitForever);
+        return;
+    }
+
+    int err = SCPI_RES_OK;
+
+    if (transition == TRANSITION_INITIATE || transition == TRANSITION_INITIATE_TRACE) {
+        if (g_state == STATE_IDLE) {
+            err = doInitiate(transition == TRANSITION_INITIATE_TRACE);
+        } else {
+            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
+        }
+    } else if (transition == TRANSITION_START) {
+        if (g_state == STATE_IDLE || g_state == STATE_INITIATED) {
+            err = doStartImmediately();
+        } else {
+            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
+        }
+    } else if (transition == TRANSITION_TRIGGER) {
+        if (g_state == STATE_INITIATED) {
+            err = doStartImmediately();
+        } else {
+            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
+        }
+    } else if (transition == TRANSITION_TOGGLE) {
+        if (g_state == STATE_IDLE) {
+            err = doInitiate(transition == TRANSITION_INITIATE_TRACE);
+        } else if (g_state == STATE_INITIATED) {
+            err = doStartImmediately();
+        } else if (g_state == STATE_EXECUTING) {
+            doFinish();
+        } else {
+            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
+        }
+    } else if (transition == TRANSITION_FINISH) {
+        if (g_state == STATE_EXECUTING) {
+            doFinish();
+        } else {
+            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
+        }
+    } else if (transition == TRANSITION_ABORT || transition == TRANSITION_RESET) {
+        if (g_state == STATE_IDLE && transition == TRANSITION_RESET) {
+            resetParameters();
+        } else if (g_state == STATE_INITIATED || g_state == STATE_EXECUTING) {
+            resetParameters();
+            setState(STATE_IDLE);
+        } else {
+            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
+        }
+    } else {
+        err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
+    }
+
+    if (perr) {
+        *perr = err;
+    } else {
+        if (err != SCPI_RES_OK) {
+            generateError(err);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int initiate() {
+    int err;
+    stateTransition(TRANSITION_INITIATE, &err);
+    return err;
+}
+
+int initiateTrace() {
+    int err;
+    stateTransition(TRANSITION_INITIATE_TRACE, &err);
+    return err;
+}
+
+int startImmediately() {
+    int err;
+    stateTransition(TRANSITION_START, &err);
+    return err;
+}
+
+void triggerGenerated() {
+    stateTransition(TRANSITION_TRIGGER);
+}
+
+void toggle() {
+    stateTransition(TRANSITION_TOGGLE);
+}
+
+void abort() {
+    stateTransition(TRANSITION_ABORT);
+}
+
+void reset() {
+    stateTransition(TRANSITION_RESET);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void tick(uint32_t tickCount) {
-    if (g_state == STATE_EXECUTING) {
+    if (g_state == STATE_EXECUTING && g_nextTime <= g_recording.parameters.time) {
         log(tickCount);
     }
 }
 
-void reset() {
-    abort(false);
-    resetParameters();
+void log(float *values) {
+    if (g_state == STATE_EXECUTING) {
+        for (int yAxisIndex = 0; yAxisIndex < dlog_record::g_recording.parameters.numYAxes; yAxisIndex++) {
+            writeFloat(values[yAxisIndex]);
+        }
+        ++g_recording.size;
+    }
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 const char *getLatestFilePath() {
     return g_recording.parameters.filePath[0] != 0 ? g_recording.parameters.filePath : nullptr;
