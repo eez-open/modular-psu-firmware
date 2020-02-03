@@ -681,7 +681,7 @@ void stateTransition(int transition, int* perr) {
             err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
         }
     } else if (transition == TRANSITION_ABORT || transition == TRANSITION_RESET) {
-        if (g_state == STATE_IDLE && transition == TRANSITION_RESET) {
+        if (g_state == STATE_IDLE) {
             resetParameters();
         } else if (g_state == STATE_INITIATED || g_state == STATE_EXECUTING) {
             resetParameters();
