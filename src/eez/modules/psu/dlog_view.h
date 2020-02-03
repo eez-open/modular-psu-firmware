@@ -227,7 +227,7 @@ int getNumVisibleDlogValues(const Recording &recording);
 int getDlogValueIndex(Recording &recording, int visibleDlogValueIndex);
 int getVisibleDlogValueIndex(Recording &recording, int dlogValueIndex);
 DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex);
-bool yAxisHasDifferentUnits(Recording &recording);
+bool isMulipleValuesOverlayHeuristic(Recording &recording);
 Unit getXAxisUnit(Recording& recording);
 Unit getYAxisUnit(Recording& recording, int dlogValueIndex);
 

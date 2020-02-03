@@ -4641,7 +4641,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         uint8_t dlogValueIndex = value.getUInt8();
         uint8_t visibleDlogValueIndex = dlog_view::getVisibleDlogValueIndex(recording, dlogValueIndex);
         uint8_t numYtGraphStyles = sizeof(g_ytGraphStyles) / sizeof(uint16_t);
-        if (psu::dlog_view::yAxisHasDifferentUnits(recording)) {
+        if (psu::dlog_view::isMulipleValuesOverlayHeuristic(recording)) {
             value = Value(g_ytGraphStyles[visibleDlogValueIndex % numYtGraphStyles], VALUE_TYPE_UINT16);
         } else {
             if (dlog_view::g_showLegend && visibleDlogValueIndex == recording.selectedVisibleValueIndex) {
@@ -4674,7 +4674,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         static int yAtTouchDown;
         
         if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET) {
-            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : g_focusCursor.i);
+            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : g_focusCursor.i);
 
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
                 valueAtTouchDown = dlogValueParams->offset;
@@ -4690,7 +4690,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
                 dlogValueParams->offset = newOffset;
             }
         } else if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV) {
-            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : g_focusCursor.i);
+            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : g_focusCursor.i);
 
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
                 valueAtTouchDown = dlogValueParams->div;
@@ -4774,7 +4774,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
     }
 }
 
-void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_multiple_values_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     static const int NUM_WIDGETS = 2;
 
     static const int LABELS_CONTAINER_WIDGET = 0;
@@ -4791,7 +4791,7 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
         int state = 0;
         int numVisibleDlogValues = dlog_view::getNumVisibleDlogValues(recording);
         
-        if (dlog_view::g_showLegend && dlog_view::yAxisHasDifferentUnits(recording)) {
+        if (dlog_view::g_showLegend && dlog_view::isMulipleValuesOverlayHeuristic(recording)) {
             state = numVisibleDlogValues;
         }
 
@@ -4829,14 +4829,14 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
     }
 }
 
-void data_dlog_overlay_over_4(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_dlog_single_value_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     static Overlay overlay;
 
     if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
         auto &recording = dlog_view::getRecording();
-        overlay.state = dlog_view::g_showLegend && !dlog_view::yAxisHasDifferentUnits(recording);
+        overlay.state = dlog_view::g_showLegend && !dlog_view::isMulipleValuesOverlayHeuristic(recording);
         
         WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
         overlay.width = widgetCursor.widget->w;
@@ -4856,14 +4856,14 @@ void data_dlog_visible_values(data::DataOperationEnum operation, data::Cursor &c
 void data_dlog_visible_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
-        int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : cursor.i);
+        int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor.i);
         value = Value(dlogValueIndex, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
 
 void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     auto &recording = dlog_view::getRecording();
-    int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : cursor.i);
+    int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor.i);
 
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
@@ -4897,7 +4897,7 @@ void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor
 
 void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     auto &recording = dlog_view::getRecording();
-    int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : cursor.i);
+    int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor.i);
 
     if (operation == data::DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
@@ -5006,7 +5006,7 @@ void data_dlog_x_axis_max_value_label(data::DataOperationEnum operation, data::C
 void data_dlog_visible_value_cursor(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
-        int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : cursor.i);
+        int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor.i);
         auto ytDataGetValue = data::ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
         float max;
         float min = ytDataGetValue(ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, dlogValueIndex, &max);

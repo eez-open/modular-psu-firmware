@@ -524,11 +524,9 @@ static int doStartImmediately() {
 
     initRecordingStart();
 
-    setState(STATE_EXECUTING);
-
     writeFileHeaderAndMetaFields();
 
-    log(g_lastTickCount);
+    setState(STATE_EXECUTING);
 
     return SCPI_RES_OK;
 }

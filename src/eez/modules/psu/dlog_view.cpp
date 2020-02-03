@@ -493,12 +493,19 @@ DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlog
     return nullptr;
 }
 
-bool yAxisHasDifferentUnits(Recording &recording) {
+bool isMulipleValuesOverlayHeuristic(Recording &recording) {
+    // return true if X axis is time
+    if (recording.parameters.xAxis.unit == UNIT_SECOND) {
+        return true;
+    }
+
+    // return true if Y axis values have different units
     for (auto yAxisIndex = 1; yAxisIndex < recording.parameters.numYAxes; yAxisIndex++) {
         if (recording.parameters.yAxes[yAxisIndex].unit != recording.parameters.yAxes[0].unit) {
             return true;
         }
     }
+
     return false;
 }
 
@@ -731,7 +738,7 @@ void openFile(const char *filePath) {
                     g_recording.getValue = getValue;
                     g_isLoading = false;
 
-                    if (yAxisHasDifferentUnits(g_recording)) {
+                    if (isMulipleValuesOverlayHeuristic(g_recording)) {
                         autoScale(g_recording);
                     }
 
