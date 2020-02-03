@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if OPTION_SD_CARD
-
 #include <string.h>
 #include <stdio.h>
 #include <float.h>
@@ -122,11 +120,11 @@ float readFloat(uint8_t *buffer, uint32_t &offset) {
     return *((float *)&value);
 }
 
-BlockElement *getCacheBlock(unsigned blockIndex) {
+inline BlockElement *getCacheBlock(unsigned blockIndex) {
     return (BlockElement *)(FILE_VIEW_BUFFER + NUM_BLOCKS * sizeof(CacheBlock) + blockIndex * BLOCK_SIZE);
 }
 
-unsigned getNumElementsPerRow() {
+inline unsigned getNumElementsPerRow() {
     return MIN(g_recording.parameters.numYAxes, MAX_NUM_OF_Y_VALUES);
 }
 
@@ -262,7 +260,7 @@ float getValue(int rowIndex, int columnIndex, float *max) {
         g_cacheBlocks[blockIndex].startAddress = blockStartAddress;
     }
 
-    if (!g_isLoading && g_cacheBlocks[blockIndex].loadedValues < NUM_ELEMENTS_PER_BLOCKS) {
+    if (g_cacheBlocks[blockIndex].loadedValues < NUM_ELEMENTS_PER_BLOCKS && !g_isLoading) {
         g_isLoading = true;
         g_interruptLoading = false;
         g_blockIndexToLoad = blockIndex;
@@ -794,9 +792,6 @@ void uploadFile() {
     psu::scpi::mmemUpload(g_filePath, context, &err);
 }
 
-
 } // namespace dlog_view
 } // namespace psu
 } // namespace eez
-
-#endif // OPTION_SD_CARD

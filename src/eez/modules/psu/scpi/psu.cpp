@@ -51,9 +51,7 @@ void init(scpi_t &scpi_context, scpi_psu_t &scpi_psu_context, scpi_interface_t *
               error_queue_data, error_queue_size);
 
     scpi_psu_context.selected_channel_index = 0;
-#if OPTION_SD_CARD
     scpi_psu_context.currentDirectory[0] = 0;
-#endif
     scpi_psu_context.isBufferOverrun = false;
     scpi_psu_context.bufferOverrunTime = 0;
 

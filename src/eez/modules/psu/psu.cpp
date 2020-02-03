@@ -36,10 +36,8 @@
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/profile.h>
-#if OPTION_SD_CARD
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/sd_card.h>
-#endif
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/idle.h>
@@ -411,9 +409,7 @@ bool psuReset() {
     list::reset();
 
     //
-#if OPTION_SD_CARD
     dlog_record::reset();
-#endif
 
     // SYST:POW ON
     if (powerUp()) {
@@ -580,9 +576,7 @@ void powerDown() {
         return;
 
     trigger::abort();
-#if OPTION_SD_CARD
     dlog_record::abort();
-#endif
 
     int err;
     if (!channel_dispatcher::setCouplingType(channel_dispatcher::COUPLING_TYPE_NONE, &err)) {

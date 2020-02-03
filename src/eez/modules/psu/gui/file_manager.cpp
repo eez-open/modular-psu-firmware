@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_SD_CARD
-
 #include <eez/modules/psu/psu.h>
 
 #include <string.h>
@@ -525,5 +523,3 @@ void browseForFile(const char *title, const char *directory, FileType fileType, 
 }
 }
 } // namespace eez::gui::file_manager
-
-#endif

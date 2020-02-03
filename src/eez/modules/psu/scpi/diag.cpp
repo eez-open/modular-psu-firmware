@@ -173,7 +173,6 @@ void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_diagnosticInformationAdcQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -206,7 +205,6 @@ scpi_result_t scpi_cmd_diagnosticInformationAdcQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_diagnosticInformationCalibrationQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -247,7 +245,6 @@ scpi_result_t scpi_cmd_diagnosticInformationCalibrationQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     char buffer[256] = { 0 };
 
     for (int i = 0; i < CH_NUM; ++i) {
@@ -317,7 +314,6 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     char buffer[128] = { 0 };
 
     for (int i = 0; i < devices::numDevices; ++i) {
@@ -394,7 +390,6 @@ scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_diagnosticInformationFanQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_FAN && FAN_OPTION_RPM_MEASUREMENT
     SCPI_ResultInt(context, aux_ps::fan::g_rpm);
 #else

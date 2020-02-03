@@ -114,7 +114,6 @@ static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calib
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_calibrationClear(scpi_t *context) {
-    // TODO migrate to generic firmware
     if (calibration::isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
@@ -136,7 +135,6 @@ scpi_result_t scpi_cmd_calibrationClear(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
-    // TODO migrate to generic firmware
     if (!trigger::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -184,23 +182,19 @@ scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationModeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, calibration::isEnabled());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_calibrationCurrentData(scpi_t *context) {
-    // TODO migrate to generic firmware
     return calibration_data(context, calibration::getCurrent());
 }
 
 scpi_result_t scpi_cmd_calibrationCurrentLevel(scpi_t *context) {
-    // TODO migrate to generic firmware
     return calibration_level(context, calibration::getCurrent());
 }
 
 scpi_result_t scpi_cmd_calibrationCurrentRange(scpi_t *context) {
-    // TODO migrate to generic firmware
     if (!calibration::isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CALIBRATION_STATE_IS_OFF);
         return SCPI_RES_ERR;
@@ -222,7 +216,6 @@ scpi_result_t scpi_cmd_calibrationCurrentRange(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationPasswordNew(scpi_t *context) {
-    // TODO migrate to generic firmware
     if (!checkPassword(context, persist_conf::devConf.calibration_password)) {
         return SCPI_RES_ERR;
     }
@@ -246,7 +239,6 @@ scpi_result_t scpi_cmd_calibrationPasswordNew(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationRemark(scpi_t *context) {
-    // TODO migrate to generic firmware
     if (!calibration::isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CALIBRATION_STATE_IS_OFF);
         return SCPI_RES_ERR;
@@ -269,7 +261,6 @@ scpi_result_t scpi_cmd_calibrationRemark(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationRemarkQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     const char *remark;
 
     if (calibration::isEnabled()) {
@@ -286,7 +277,6 @@ scpi_result_t scpi_cmd_calibrationRemarkQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationSave(scpi_t *context) {
-    // TODO migrate to generic firmware
     int16_t err;
     if (!calibration::canSave(err)) {
         SCPI_ErrorPush(context, err);
@@ -302,7 +292,6 @@ scpi_result_t scpi_cmd_calibrationSave(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
-    // TODO migrate to generic firmware
     if (calibration::isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
@@ -342,7 +331,6 @@ scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationStateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
@@ -352,18 +340,15 @@ scpi_result_t scpi_cmd_calibrationStateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationVoltageData(scpi_t *context) {
-    // TODO migrate to generic firmware
     return calibration_data(context, calibration::getVoltage());
 }
 
 scpi_result_t scpi_cmd_calibrationVoltageLevel(scpi_t *context) {
-    // TODO migrate to generic firmware
     return calibration_level(context, calibration::getVoltage());
     ;
 }
 
 scpi_result_t scpi_cmd_calibrationScreenInit(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_DISPLAY
     showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
     return SCPI_RES_OK;

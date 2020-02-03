@@ -150,6 +150,7 @@ void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color
 
 void fillRect(void *dst, int x1, int y1, int x2, int y2) {
 	fillRect((uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
+    g_painted = true;
 }
 
 void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x, int y, int width, int height) {
@@ -205,6 +206,7 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
 
 void bitBlt(void *src, int x1, int y1, int x2, int y2) {
     bitBlt(src, g_buffer, x1, y1, x2, y2);
+    g_painted = true;
 }
 
 void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
@@ -246,6 +248,7 @@ void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, int heig
 
 void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
     bitBlt((uint16_t *)src, (uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1);
+    g_painted = true;
 }
 
 void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, int dstx, int dsty) {
@@ -310,6 +313,8 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
 		HAL_DMA2D_ConfigLayer(&hdma2d, 0);
 		HAL_DMA2D_BlendingStart(&hdma2d, srcOffset, dstOffset, dstOffset, sw, sh);
 	}
+
+    g_painted = true;
 }
 
 void bitBltA8Init(uint16_t color) {

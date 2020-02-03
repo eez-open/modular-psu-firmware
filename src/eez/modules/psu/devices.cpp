@@ -24,9 +24,7 @@
 
 #include <eez/modules/mcu/eeprom.h>
 
-#if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
-#endif
 
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
@@ -59,11 +57,7 @@ Device devices[] = {
     { "EEPROM", 0, 0 },
 #endif
 
-#if OPTION_SD_CARD
-    { "SD card", OPTION_SD_CARD, &sd_card::g_testResult },
-#else
-    { "SD card", 0, 0 },
-#endif
+    { "SD card", 1, &sd_card::g_testResult },
 
 #if OPTION_ETHERNET
     { "Ethernet", 1, &ethernet::g_testResult },

@@ -61,7 +61,6 @@ static void select_channel(scpi_t *context, uint8_t channelIndex) {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_instrumentSelect(scpi_t *context) {
-    // TODO migrate to generic firmware
     if (calibration::isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
@@ -78,7 +77,6 @@ scpi_result_t scpi_cmd_instrumentSelect(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentSelectQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     char buffer[256] = { 0 };
@@ -89,7 +87,6 @@ scpi_result_t scpi_cmd_instrumentSelectQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentNselect(scpi_t *context) {
-    // TODO migrate to generic firmware
     if (calibration::isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
@@ -112,7 +109,6 @@ scpi_result_t scpi_cmd_instrumentNselect(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentNselectQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     SCPI_ResultInt(context, psu_context->selected_channel_index + 1);
@@ -121,7 +117,6 @@ scpi_result_t scpi_cmd_instrumentNselectQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentCoupleTracking(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t type;
     if (!SCPI_ParamChoice(context, channelsCouplingChoice, &type, true)) {
         return SCPI_RES_ERR;
@@ -139,7 +134,6 @@ scpi_result_t scpi_cmd_instrumentCoupleTracking(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentCoupleTrackingQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     char result[16];
 
     channel_dispatcher::CouplingType couplingType = channel_dispatcher::getCouplingType();
@@ -161,7 +155,6 @@ scpi_result_t scpi_cmd_instrumentCoupleTrackingQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentDisplayTrace(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
@@ -199,7 +192,6 @@ scpi_result_t scpi_cmd_instrumentDisplayTrace(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentDisplayTraceQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
@@ -233,7 +225,6 @@ scpi_result_t scpi_cmd_instrumentDisplayTraceQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentDisplayTraceSwap(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
@@ -245,7 +236,6 @@ scpi_result_t scpi_cmd_instrumentDisplayTraceSwap(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentDisplayYtRate(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
@@ -263,7 +253,6 @@ scpi_result_t scpi_cmd_instrumentDisplayYtRate(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentDisplayYtRateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     Channel *channel = &Channel::get(psu_context->selected_channel_index);
 

@@ -82,7 +82,6 @@
 									<listOptionValue builtIn="false" value="SCPI_USER_CONFIG=1" />
 									<listOptionValue builtIn="false" value="OPTION_ETHERNET=1" />
 									<listOptionValue builtIn="false" value="OPTION_EXT_RTC=1" />
-									<listOptionValue builtIn="false" value="OPTION_SD_CARD=1" />
 									<listOptionValue builtIn="false" value="OPTION_BP=0" />
 									<listOptionValue builtIn="false" value="OPTION_DISPLAY=1" />
 									<listOptionValue builtIn="false" value="OPTION_FAN=1" />
@@ -146,7 +145,6 @@
 									<listOptionValue builtIn="false" value="__weak=__attribute__((__weak__))" />
 									<listOptionValue builtIn="false" value="OPTION_ETHERNET=1" />
 									<listOptionValue builtIn="false" value="OPTION_EXT_RTC=1" />
-									<listOptionValue builtIn="false" value="OPTION_SD_CARD=1" />
 									<listOptionValue builtIn="false" value="OPTION_EXT_EEPROM=1" />
 									<listOptionValue builtIn="false" value="OPTION_BP=0" />
 									<listOptionValue builtIn="false" value="OPTION_DISPLAY=1" />
@@ -342,7 +340,6 @@
 									<listOptionValue builtIn="false" value="SCPI_USER_CONFIG=1" />
 									<listOptionValue builtIn="false" value="OPTION_ETHERNET=0" />
 									<listOptionValue builtIn="false" value="OPTION_EXT_RTC=1" />
-									<listOptionValue builtIn="false" value="OPTION_SD_CARD=1" />
 									<listOptionValue builtIn="false" value="OPTION_BP=0" />
 									<listOptionValue builtIn="false" value="OPTION_DISPLAY=1" />
 									<listOptionValue builtIn="false" value="OPTION_FAN=1" />
@@ -401,7 +398,6 @@
 									<listOptionValue builtIn="false" value="__weak=__attribute__((__weak__))" />
 									<listOptionValue builtIn="false" value="OPTION_ETHERNET=0" />
 									<listOptionValue builtIn="false" value="OPTION_EXT_RTC=1" />
-									<listOptionValue builtIn="false" value="OPTION_SD_CARD=1" />
 									<listOptionValue builtIn="false" value="OPTION_EXT_EEPROM=1" />
 									<listOptionValue builtIn="false" value="OPTION_BP=0" />
 									<listOptionValue builtIn="false" value="OPTION_DISPLAY=1" />

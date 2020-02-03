@@ -31,9 +31,7 @@
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/dlog_view.h>
-#if OPTION_SD_CARD
 #include <eez/modules/psu/dlog_record.h>
-#endif
 #include <eez/modules/psu/dlog_view.h>
 
 #include <eez/modules/psu/gui/animations.h>

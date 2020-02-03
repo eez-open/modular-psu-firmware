@@ -143,7 +143,6 @@ scpi_result_t get_tripped(scpi_t *context, ProtectionValue &cpv) {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitude(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -176,7 +175,6 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitude(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitudeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -189,7 +187,6 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitudeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitude(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -227,7 +224,6 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitude(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitudeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -248,7 +244,6 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitudeQ(scpi_t *context) {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_sourceCurrentLevelImmediateStepIncrement(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -258,7 +253,6 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateStepIncrement(scpi_t *context)
 }
 
 scpi_result_t scpi_cmd_sourceCurrentLevelImmediateStepIncrementQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -268,7 +262,6 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateStepIncrementQ(scpi_t *context
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrement(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -278,7 +271,6 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrement(scpi_t *context)
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrementQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -290,7 +282,6 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrementQ(scpi_t *context
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_sourceCurrentProtectionDelayTime(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -309,7 +300,6 @@ scpi_result_t scpi_cmd_sourceCurrentProtectionDelayTime(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceCurrentProtectionDelayTimeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -319,7 +309,6 @@ scpi_result_t scpi_cmd_sourceCurrentProtectionDelayTimeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceCurrentProtectionState(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -336,7 +325,6 @@ scpi_result_t scpi_cmd_sourceCurrentProtectionState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceCurrentProtectionStateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -346,7 +334,6 @@ scpi_result_t scpi_cmd_sourceCurrentProtectionStateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceCurrentProtectionTrippedQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -356,7 +343,6 @@ scpi_result_t scpi_cmd_sourceCurrentProtectionTrippedQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourcePowerProtectionLevel(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -376,7 +362,6 @@ scpi_result_t scpi_cmd_sourcePowerProtectionLevel(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourcePowerProtectionLevelQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -389,7 +374,6 @@ scpi_result_t scpi_cmd_sourcePowerProtectionLevelQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourcePowerProtectionDelayTime(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -408,7 +392,6 @@ scpi_result_t scpi_cmd_sourcePowerProtectionDelayTime(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourcePowerProtectionDelayTimeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -418,7 +401,6 @@ scpi_result_t scpi_cmd_sourcePowerProtectionDelayTimeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourcePowerProtectionState(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -435,7 +417,6 @@ scpi_result_t scpi_cmd_sourcePowerProtectionState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourcePowerProtectionStateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -445,7 +426,6 @@ scpi_result_t scpi_cmd_sourcePowerProtectionStateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourcePowerProtectionTrippedQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -455,7 +435,6 @@ scpi_result_t scpi_cmd_sourcePowerProtectionTrippedQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageProtectionLevel(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -479,7 +458,6 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionLevel(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageProtectionLevelQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -492,7 +470,6 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionLevelQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageProtectionDelayTime(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -511,7 +488,6 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionDelayTime(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageProtectionDelayTimeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -521,7 +497,6 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionDelayTimeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageProtectionState(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -538,7 +513,6 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageProtectionStateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -548,7 +522,6 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionStateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageProtectionTrippedQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -601,7 +574,6 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionTypeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageSenseSource(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -622,7 +594,6 @@ scpi_result_t scpi_cmd_sourceVoltageSenseSource(scpi_t *context) {
     return SCPI_RES_OK;}
 
 scpi_result_t scpi_cmd_sourceVoltageSenseSourceQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -639,7 +610,6 @@ scpi_result_t scpi_cmd_sourceVoltageSenseSourceQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageProgramSource(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -671,7 +641,6 @@ scpi_result_t scpi_cmd_sourceVoltageProgramSource(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageProgramSourceQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -698,7 +667,6 @@ scpi_result_t scpi_cmd_sourceVoltageProgramSourceQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitude(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -715,7 +683,6 @@ scpi_result_t scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitude(scpi_t *cont
 }
 
 scpi_result_t scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitudeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -727,7 +694,6 @@ scpi_result_t scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitudeQ(scpi_t *con
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLimitPositiveImmediateAmplitude(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -744,7 +710,6 @@ scpi_result_t scpi_cmd_sourceVoltageLimitPositiveImmediateAmplitude(scpi_t *cont
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLimitPositiveImmediateAmplitudeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -756,7 +721,6 @@ scpi_result_t scpi_cmd_sourceVoltageLimitPositiveImmediateAmplitudeQ(scpi_t *con
 }
 
 scpi_result_t scpi_cmd_sourcePowerLimit(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -773,7 +737,6 @@ scpi_result_t scpi_cmd_sourcePowerLimit(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourcePowerLimitQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -789,7 +752,6 @@ scpi_result_t scpi_cmd_sourcePowerLimitQ(scpi_t *context) {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_sourceCurrentLevelTriggeredAmplitude(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -807,7 +769,6 @@ scpi_result_t scpi_cmd_sourceCurrentLevelTriggeredAmplitude(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceCurrentLevelTriggeredAmplitudeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -820,7 +781,6 @@ scpi_result_t scpi_cmd_sourceCurrentLevelTriggeredAmplitudeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelTriggeredAmplitude(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -838,7 +798,6 @@ scpi_result_t scpi_cmd_sourceVoltageLevelTriggeredAmplitude(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelTriggeredAmplitudeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -858,7 +817,6 @@ static scpi_choice_def_t triggerModeChoice[] = {
 };
 
 scpi_result_t scpi_cmd_sourceCurrentMode(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -881,7 +839,6 @@ scpi_result_t scpi_cmd_sourceCurrentMode(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceCurrentModeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -894,7 +851,6 @@ scpi_result_t scpi_cmd_sourceCurrentModeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageMode(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -917,7 +873,6 @@ scpi_result_t scpi_cmd_sourceVoltageMode(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageModeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -930,7 +885,6 @@ scpi_result_t scpi_cmd_sourceVoltageModeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceListCount(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -977,7 +931,6 @@ scpi_result_t scpi_cmd_sourceListCount(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceListCountQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -989,7 +942,6 @@ scpi_result_t scpi_cmd_sourceListCountQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceListCurrentLevel(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -1051,7 +1003,6 @@ scpi_result_t scpi_cmd_sourceListCurrentLevel(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceListCurrentLevelQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -1065,7 +1016,6 @@ scpi_result_t scpi_cmd_sourceListCurrentLevelQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceListDwell(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -1112,7 +1062,6 @@ scpi_result_t scpi_cmd_sourceListDwell(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceListDwellQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -1126,7 +1075,6 @@ scpi_result_t scpi_cmd_sourceListDwellQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceListVoltageLevel(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -1188,7 +1136,6 @@ scpi_result_t scpi_cmd_sourceListVoltageLevel(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceListVoltageLevelQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;

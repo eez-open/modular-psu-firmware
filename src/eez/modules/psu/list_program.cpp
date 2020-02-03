@@ -28,10 +28,8 @@
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/trigger.h>
-#if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
 #include <eez/libs/sd_fat/sd_fat.h>
-#endif
 #include <eez/modules/psu/io_pins.h>
 #include <eez/system.h>
 
@@ -226,7 +224,6 @@ int checkLimits(int iChannel) {
 }
 
 bool loadList(int iChannel, const char *filePath, int *err) {
-#if OPTION_SD_CARD
     Channel &channel = Channel::get(iChannel);
 
     if (!sd_card::isMounted(err)) {
@@ -340,16 +337,9 @@ bool loadList(int iChannel, const char *filePath, int *err) {
     }
 
     return success;
-#else
-    if (err) {
-        *err = SCPI_ERROR_HARDWARE_MISSING;
-    }
-    return false;
-#endif
 }
 
 bool saveList(int iChannel, const char *filePath, int *err) {
-#if OPTION_SD_CARD
     if (!g_shutdownInProgress && osThreadGetId() != g_scpiTaskHandle) {
         strcpy(&g_listFilePath[iChannel][0], filePath);
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST, iChannel), osWaitForever);
@@ -409,12 +399,6 @@ bool saveList(int iChannel, const char *filePath, int *err) {
     file.close();
 
     return true;
-#else
-    if (err) {
-        *err = SCPI_ERROR_HARDWARE_MISSING;
-    }
-    return false;
-#endif
 }
 
 void updateChannelsWithVisibleCountersList();

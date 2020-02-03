@@ -27,9 +27,7 @@
 #include <eez/system.h>
 #endif
 
-#if OPTION_SD_CARD
 #include <eez/modules/psu/dlog_view.h>
-#endif
 
 #include <eez/libs/image/jpeg.h>
 
@@ -38,7 +36,6 @@ namespace psu {
 namespace scpi {
 
 scpi_result_t scpi_cmd_displayBrightness(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_DISPLAY
     int32_t param;
     if (!SCPI_ParamInt(context, &param, true)) {
@@ -60,7 +57,6 @@ scpi_result_t scpi_cmd_displayBrightness(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_displayBrightnessQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_DISPLAY
     SCPI_ResultInt(context, persist_conf::devConf.displayBrightness);
     return SCPI_RES_OK;
@@ -71,7 +67,6 @@ scpi_result_t scpi_cmd_displayBrightnessQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_displayView(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_DISPLAY
     int32_t param;
     if (!SCPI_ParamInt(context, &param, true)) {
@@ -93,7 +88,6 @@ scpi_result_t scpi_cmd_displayView(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_displayViewQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_DISPLAY
     SCPI_ResultInt(context, persist_conf::getChannelsViewMode() + 1);
     return SCPI_RES_OK;
@@ -104,7 +98,6 @@ scpi_result_t scpi_cmd_displayViewQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_displayWindowState(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_DISPLAY
     bool onOff;
     if (!SCPI_ParamBool(context, &onOff, TRUE)) {
@@ -121,7 +114,6 @@ scpi_result_t scpi_cmd_displayWindowState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_displayWindowStateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_DISPLAY
     SCPI_ResultBool(context, persist_conf::devConf.displayState);
     return SCPI_RES_OK;
@@ -132,7 +124,6 @@ scpi_result_t scpi_cmd_displayWindowStateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_displayWindowText(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_DISPLAY
     const char *text;
     size_t len;
@@ -155,7 +146,6 @@ scpi_result_t scpi_cmd_displayWindowText(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_displayWindowTextQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_DISPLAY
     SCPI_ResultText(context, eez::psu::gui::g_psuAppContext.getTextMessage());
     return SCPI_RES_OK;
@@ -166,7 +156,6 @@ scpi_result_t scpi_cmd_displayWindowTextQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_displayWindowTextClear(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_DISPLAY
     eez::psu::gui::g_psuAppContext.clearTextMessage();
     return SCPI_RES_OK;
@@ -177,7 +166,6 @@ scpi_result_t scpi_cmd_displayWindowTextClear(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_DISPLAY
     const uint8_t *screenshotPixels = mcu::display::takeScreenshot();
 
@@ -208,7 +196,7 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_displayWindowDlog(scpi_t *context) {
-#if OPTION_DISPLAY && OPTION_SD_CARD
+#if OPTION_DISPLAY
     dlog_view::g_showLatest = true;
     psu::gui::g_psuAppContext.pushPageOnNextIter(PAGE_ID_DLOG_VIEW);
     return SCPI_RES_OK;

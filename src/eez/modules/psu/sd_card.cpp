@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_SD_CARD
-
 #include <stdio.h>
 #include <string.h>
 
@@ -740,5 +738,3 @@ bool confWrite(const uint8_t *buffer, uint16_t buffer_size, uint16_t address) {
 } // namespace sd_card
 } // namespace psu
 } // namespace eez
-
-#endif

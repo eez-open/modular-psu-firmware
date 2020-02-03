@@ -520,6 +520,8 @@ void fillRect(void *dstBuffer, int x1, int y1, int x2, int y2) {
         }
         dst += nl;
     }
+
+    g_painted = true;
 }
 
 void drawHLine(int x, int y, int l) {
@@ -568,6 +570,7 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
 
 void bitBlt(void *src, int x1, int y1, int x2, int y2) {
     bitBlt(src, g_buffer, x1, y1, x2, y2);
+    g_painted = true;
 }
 
 void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
@@ -577,6 +580,8 @@ void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
             ((uint32_t *)dst)[i] = ((uint32_t *)src)[i];
         }
     }
+
+    g_painted = true;
 }
 
 void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity) {
@@ -602,6 +607,8 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
             }
         }
     }
+
+    g_painted = true;
 }
 
 void drawBitmap(void *bitmapData, int bitmapBpp, int bitmapWidth, int x, int y, int width, int height) {

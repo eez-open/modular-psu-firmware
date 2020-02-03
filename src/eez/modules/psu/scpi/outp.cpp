@@ -31,7 +31,6 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_outputModeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -43,7 +42,6 @@ scpi_result_t scpi_cmd_outputModeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputProtectionClear(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -55,7 +53,6 @@ scpi_result_t scpi_cmd_outputProtectionClear(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputState(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -76,7 +73,6 @@ scpi_result_t scpi_cmd_outputState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputStateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -88,7 +84,6 @@ scpi_result_t scpi_cmd_outputStateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
-    // TODO migrate to generic firmware
     if (channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
         return SCPI_RES_ERR;
@@ -119,7 +114,6 @@ scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputTrackStateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -131,7 +125,6 @@ scpi_result_t scpi_cmd_outputTrackStateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputProtectionCouple(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -143,14 +136,12 @@ scpi_result_t scpi_cmd_outputProtectionCouple(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputProtectionCoupleQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, persist_conf::isOutputProtectionCoupleEnabled());
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_outputStateTriggered(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -167,7 +158,6 @@ scpi_result_t scpi_cmd_outputStateTriggered(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputStateTriggeredQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;

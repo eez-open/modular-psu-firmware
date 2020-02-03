@@ -28,10 +28,8 @@
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/trigger.h>
-#if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
 #include <eez/libs/sd_fat/sd_fat.h>
-#endif
 #include <eez/scpi/scpi.h>
 
 namespace eez {
@@ -48,8 +46,6 @@ bool g_profileDirty;
 static bool g_freeze;
 
 ////////////////////////////////////////////////////////////////////////////////
-
-#if OPTION_SD_CARD
 
 void mapCurrentChannelsToProfileChannels(Parameters &profile, int channelsMap[]) {
     bool profileChannelAlreadyUsed[CH_MAX];
@@ -200,7 +196,6 @@ void deleteProfileList(int channelIndex, int location) {
 }
 
 void deleteProfileLists(int location) {
-#if OPTION_SD_CARD
     int err;
     if (!sd_card::isMounted(&err)) {
         if (err != SCPI_ERROR_MISSING_MASS_MEDIA && err != SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM) {
@@ -212,10 +207,7 @@ void deleteProfileLists(int location) {
     for (int i = 0; i < CH_MAX; ++i) {
         deleteProfileList(i, location);
     }
-#endif
 }
-
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -314,9 +306,7 @@ void recallChannelsFromProfile(Parameters &profile, int location) {
                 ++numTrackingChannels;
             }
 
-#if OPTION_SD_CARD
             loadProfileList(profile, channel, j, location);
-#endif
         }
     }
 
@@ -464,9 +454,7 @@ void doSave() {
 
     persist_conf::saveProfile(0, &profile);
 
-#if OPTION_SD_CARD
     saveProfileListForAllChannels(profile, 0);
-#endif
 }
 
 void save(bool immediately) {
@@ -549,7 +537,6 @@ bool recall(int location, int *err) {
 }
 
 bool recallFromFile(const char *filePath, int *err) {
-#if OPTION_SD_CARD
     if (!sd_card::isMounted(err)) {
         return false;
     }
@@ -589,11 +576,6 @@ bool recallFromFile(const char *filePath, int *err) {
 
     event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_FILE);
     return true;
-#else
-    if (err)
-        *err = SCPI_ERROR_HARDWARE_MISSING;
-    return false;
-#endif
 }
 
 Parameters *load(int location) {
@@ -641,7 +623,6 @@ bool saveAtLocation(int location, const char *name) {
 }
 
 bool saveToFile(const char *filePath, int *err) {
-#if OPTION_SD_CARD
     if (!sd_card::isMounted(err)) {
         return false;
     }
@@ -674,12 +655,6 @@ bool saveToFile(const char *filePath, int *err) {
     }
 
     return true;
-#else
-    if (err) {
-        *err = SCPI_ERROR_HARDWARE_MISSING;
-    }
-    return false;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

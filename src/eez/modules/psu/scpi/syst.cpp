@@ -49,7 +49,6 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_systemCapabilityQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     char text[sizeof(STR_SYST_CAP)];
     strcpy(text, STR_SYST_CAP);
     SCPI_ResultText(context, text);
@@ -58,22 +57,18 @@ scpi_result_t scpi_cmd_systemCapabilityQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemErrorNextQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     return SCPI_SystemErrorNextQ(context);
 }
 
 scpi_result_t scpi_cmd_systemErrorCountQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     return SCPI_SystemErrorCountQ(context);
 }
 
 scpi_result_t scpi_cmd_systemVersionQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     return SCPI_SystemVersionQ(context);
 }
 
 scpi_result_t scpi_cmd_systemPower(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool up;
     if (!SCPI_ParamBool(context, &up, TRUE)) {
         return SCPI_RES_ERR;
@@ -99,13 +94,11 @@ scpi_result_t scpi_cmd_systemPower(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemPowerQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, isPowerUp());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemDate(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t year;
     if (!SCPI_ParamInt(context, &year, TRUE)) {
         return SCPI_RES_ERR;
@@ -141,13 +134,11 @@ scpi_result_t scpi_cmd_systemDate(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemDateClear(scpi_t *context) {
-    // TODO migrate to generic firmware
     persist_conf::setDateValid(0);
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemDateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     uint8_t year, month, day;
     if (!datetime::getDate(year, month, day)) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -162,7 +153,6 @@ scpi_result_t scpi_cmd_systemDateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemTime(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t hour;
     if (!SCPI_ParamInt(context, &hour, TRUE)) {
         return SCPI_RES_ERR;
@@ -192,13 +182,11 @@ scpi_result_t scpi_cmd_systemTime(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemTimeClear(scpi_t *context) {
-    // TODO migrate to generic firmware
     persist_conf::setTimeValid(0);
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemTimeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     uint8_t hour, minute, second;
     if (!datetime::getTime(hour, minute, second)) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -220,7 +208,6 @@ static scpi_choice_def_t dstChoice[] = { { "OFF", datetime::DST_RULE_OFF },
                                          SCPI_CHOICE_LIST_END };
 
 scpi_result_t scpi_cmd_systemTimeDst(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t dstRule;
     if (!SCPI_ParamChoice(context, dstChoice, &dstRule, true)) {
         return SCPI_RES_ERR;
@@ -236,13 +223,11 @@ scpi_result_t scpi_cmd_systemTimeDst(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemTimeDstQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     resultChoiceName(context, dstChoice, persist_conf::devConf.dstRule);
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemTimeZone(scpi_t *context) {
-    // TODO migrate to generic firmware
     const char *timeZoneStr;
     size_t timeZoneStrLength;
 
@@ -266,7 +251,6 @@ scpi_result_t scpi_cmd_systemTimeZone(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemTimeZoneQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     char timeZoneStr[32];
     formatTimeZone(persist_conf::devConf.time_zone, timeZoneStr, 32);
     SCPI_ResultText(context, timeZoneStr);
@@ -274,13 +258,11 @@ scpi_result_t scpi_cmd_systemTimeZoneQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemBeeperImmediate(scpi_t *context) {
-    // TODO migrate to generic firmware
     sound::playBeep(true);
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemBeeperState(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -294,13 +276,11 @@ scpi_result_t scpi_cmd_systemBeeperState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemBeeperStateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, persist_conf::isSoundEnabled());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemBeeperKeyState(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -314,13 +294,11 @@ scpi_result_t scpi_cmd_systemBeeperKeyState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemBeeperKeyStateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, persist_conf::isClickSoundEnabled());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemTemperatureProtectionHighClear(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t sensor;
     if (!param_temp_sensor(context, sensor)) {
         return SCPI_RES_ERR;
@@ -332,7 +310,6 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighClear(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemTemperatureProtectionHighLevel(scpi_t *context) {
-    // TODO migrate to generic firmware
     float level;
     if (!get_temperature_param(context, level, OTP_AUX_MIN_LEVEL, OTP_AUX_MAX_LEVEL,
                                OTP_AUX_DEFAULT_LEVEL)) {
@@ -351,7 +328,6 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighLevel(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemTemperatureProtectionHighLevelQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t sensor;
     if (!param_temp_sensor(context, sensor)) {
         return SCPI_RES_ERR;
@@ -361,7 +337,6 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighLevelQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemTemperatureProtectionHighState(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool state;
     if (!SCPI_ParamBool(context, &state, TRUE)) {
         return SCPI_RES_ERR;
@@ -379,7 +354,6 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemTemperatureProtectionHighStateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t sensor;
     if (!param_temp_sensor(context, sensor)) {
         return SCPI_RES_ERR;
@@ -391,7 +365,6 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighStateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemTemperatureProtectionHighDelayTime(scpi_t *context) {
-    // TODO migrate to generic firmware
     float delay;
     if (!get_duration_param(context, delay, OTP_AUX_MIN_DELAY, OTP_AUX_MAX_DELAY,
                             OTP_AUX_DEFAULT_DELAY)) {
@@ -410,7 +383,6 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighDelayTime(scpi_t *context)
 }
 
 scpi_result_t scpi_cmd_systemTemperatureProtectionHighDelayTimeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t sensor;
     if (!param_temp_sensor(context, sensor)) {
         return SCPI_RES_ERR;
@@ -422,7 +394,6 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighDelayTimeQ(scpi_t *context
 }
 
 scpi_result_t scpi_cmd_systemTemperatureProtectionHighTrippedQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t sensor;
     if (!param_temp_sensor(context, sensor)) {
         return SCPI_RES_ERR;
@@ -434,14 +405,12 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighTrippedQ(scpi_t *context) 
 }
 
 scpi_result_t scpi_cmd_systemChannelCountQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultInt(context, CH_NUM);
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemChannelInformationCurrentQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -453,7 +422,6 @@ scpi_result_t scpi_cmd_systemChannelInformationCurrentQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelInformationPowerQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -465,7 +433,6 @@ scpi_result_t scpi_cmd_systemChannelInformationPowerQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelInformationProgramQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -527,7 +494,6 @@ scpi_result_t scpi_cmd_systemChannelInformationProgramQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelInformationVoltageQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -539,7 +505,6 @@ scpi_result_t scpi_cmd_systemChannelInformationVoltageQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelInformationOntimeTotalQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -551,7 +516,6 @@ scpi_result_t scpi_cmd_systemChannelInformationOntimeTotalQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelInformationOntimeLastQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -581,31 +545,26 @@ scpi_result_t scpi_cmd_systemChannelModelQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCpuInformationTypeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultText(context, getCpuType());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemCpuInformationOntimeTotalQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     outputOnTime(context, ontime::g_mcuCounter.getTotalTime());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemCpuInformationOntimeLastQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     outputOnTime(context, ontime::g_mcuCounter.getLastTime());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemCpuModelQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultText(context, getCpuModel());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemCpuOptionQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     char strFeatures[128] = { 0 };
 
 #if OPTION_BP
@@ -629,12 +588,10 @@ scpi_result_t scpi_cmd_systemCpuOptionQ(scpi_t *context) {
     strcat(strFeatures, "RTC");
 #endif
 
-#if OPTION_SD_CARD
     if (strFeatures[0]) {
         strcat(strFeatures, ", ");
     }
     strcat(strFeatures, "SDcard");
-#endif
 
 #if OPTION_ETHERNET
     if (strFeatures[0]) {
@@ -656,13 +613,11 @@ scpi_result_t scpi_cmd_systemCpuOptionQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemSerialQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultText(context, getSerialNumber());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemPowerProtectionTrip(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -674,14 +629,12 @@ scpi_result_t scpi_cmd_systemPowerProtectionTrip(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemPowerProtectionTripQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, persist_conf::isShutdownWhenProtectionTrippedEnabled());
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemPonOutputDisable(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -693,14 +646,12 @@ scpi_result_t scpi_cmd_systemPonOutputDisable(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemPonOutputDisableQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, persist_conf::isForceDisablingAllOutputsOnPowerUpEnabled());
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemPasswordNew(scpi_t *context) {
-    // TODO migrate to generic firmware
     if (!checkPassword(context, persist_conf::devConf.systemPassword)) {
         return SCPI_RES_ERR;
     }
@@ -734,7 +685,6 @@ scpi_result_t scpi_cmd_systemPasswordCalibrationReset(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemKlock(scpi_t *context) {
-    // TODO migrate to generic firmware
     persist_conf::lockFrontPanel(true);
 
 #if OPTION_DISPLAY
@@ -752,7 +702,6 @@ scpi_choice_def_t rlStateChoice[] = {
 };
 
 scpi_result_t scpi_cmd_systemCommunicateRlstate(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t rlState;
     if (!SCPI_ParamChoice(context, rlStateChoice, &rlState, true)) {
         return SCPI_RES_ERR;
@@ -768,13 +717,11 @@ scpi_result_t scpi_cmd_systemCommunicateRlstate(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateRlstateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     resultChoiceName(context, rlStateChoice, g_rlState);
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemLocal(scpi_t *context) {
-    // TODO migrate to generic firmware
     g_rlState = RL_STATE_LOCAL;
 
 #if OPTION_DISPLAY
@@ -785,7 +732,6 @@ scpi_result_t scpi_cmd_systemLocal(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemRemote(scpi_t *context) {
-    // TODO migrate to generic firmware
     g_rlState = RL_STATE_REMOTE;
 
 #if OPTION_DISPLAY
@@ -796,7 +742,6 @@ scpi_result_t scpi_cmd_systemRemote(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemRwlock(scpi_t *context) {
-    // TODO migrate to generic firmware
     g_rlState = RL_STATE_RW_LOCK;
 
 #if OPTION_DISPLAY
@@ -807,7 +752,6 @@ scpi_result_t scpi_cmd_systemRwlock(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateSerialBaud(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t baud;
     if (!SCPI_ParamInt(context, &baud, TRUE)) {
         return SCPI_RES_ERR;
@@ -828,7 +772,6 @@ scpi_result_t scpi_cmd_systemCommunicateSerialBaud(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateSerialBaudQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultInt(context, persist_conf::getBaudFromIndex(persist_conf::getSerialBaudIndex()));
     return SCPI_RES_OK;
 }
@@ -841,7 +784,6 @@ static scpi_choice_def_t parityChoice[] = {
 };
 
 scpi_result_t scpi_cmd_systemCommunicateSerialParity(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t parity;
     if (!SCPI_ParamChoice(context, parityChoice, &parity, true)) {
         return SCPI_RES_ERR;
@@ -856,7 +798,6 @@ scpi_result_t scpi_cmd_systemCommunicateSerialParity(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateSerialParityQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     resultChoiceName(context, parityChoice, persist_conf::getSerialParity());
     return SCPI_RES_OK;
 }
@@ -871,7 +812,6 @@ static scpi_choice_def_t commInterfaceChoice[] = {
 };
 
 scpi_result_t scpi_cmd_systemCommunicateEnable(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -901,7 +841,6 @@ scpi_result_t scpi_cmd_systemCommunicateEnable(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEnableQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t commInterface;
     if (!SCPI_ParamChoice(context, commInterfaceChoice, &commInterface, true)) {
         return SCPI_RES_ERR;
@@ -924,7 +863,6 @@ scpi_result_t scpi_cmd_systemCommunicateEnableQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetDhcp(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -946,7 +884,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetDhcp(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetDhcpQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -962,7 +899,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetDhcpQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetAddress(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled() || persist_conf::devConf.ethernetDhcpEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -992,7 +928,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetAddress(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetAddressQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -1014,7 +949,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetAddressQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetDns(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled() || persist_conf::devConf.ethernetDhcpEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -1044,7 +978,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetDns(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetDnsQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -1066,7 +999,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetDnsQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetGateway(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled() || persist_conf::devConf.ethernetDhcpEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -1096,7 +1028,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetGateway(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetGatewayQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -1164,7 +1095,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetHostnameQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetSmask(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled() || persist_conf::devConf.ethernetDhcpEnabled) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -1194,7 +1124,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetSmask(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetSmaskQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -1216,7 +1145,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetSmaskQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetPort(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -1243,7 +1171,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetPort(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetPortQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -1259,7 +1186,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetPortQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetMac(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     if (!persist_conf::isEthernetEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -1289,7 +1215,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetMac(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateEthernetMacQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     char macAddressStr[18];
     macAddressToString(persist_conf::devConf.ethernetMacAddress, macAddressStr);
@@ -1302,7 +1227,6 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetMacQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateNtp(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     const char *ntpServer;
     size_t ntpServerLength;
@@ -1326,7 +1250,6 @@ scpi_result_t scpi_cmd_systemCommunicateNtp(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateNtpQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #if OPTION_ETHERNET
     SCPI_ResultText(context, persist_conf::devConf.ntpServer);
     return SCPI_RES_OK;
@@ -1337,13 +1260,11 @@ scpi_result_t scpi_cmd_systemCommunicateNtpQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemInhibitQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, io_pins::isInhibited());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemDigitalInputDataQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t pin;
     if (!SCPI_ParamInt(context, &pin, TRUE)) {
         return SCPI_RES_ERR;
@@ -1367,7 +1288,6 @@ scpi_result_t scpi_cmd_systemDigitalInputDataQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemDigitalOutputData(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t pin;
     if (!SCPI_ParamInt(context, &pin, TRUE)) {
         return SCPI_RES_ERR;
@@ -1396,7 +1316,6 @@ scpi_result_t scpi_cmd_systemDigitalOutputData(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemDigitalOutputDataQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t pin;
     if (!SCPI_ParamInt(context, &pin, TRUE)) {
         return SCPI_RES_ERR;
@@ -1430,7 +1349,6 @@ static scpi_choice_def_t functionChoice[] = { { "NONE", io_pins::FUNCTION_NONE }
                                               SCPI_CHOICE_LIST_END };
 
 scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t pin;
     SCPI_CommandNumbers(context, &pin, 1, 1);
     if (pin < 1 || pin > 4) {
@@ -1466,7 +1384,6 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemDigitalPinFunctionQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t pin;
     SCPI_CommandNumbers(context, &pin, 1, 1);
     if (pin < 1 || pin > 4) {
@@ -1486,7 +1403,6 @@ static scpi_choice_def_t polarityChoice[] = { { "POSitive", io_pins::POLARITY_PO
                                               SCPI_CHOICE_LIST_END };
 
 scpi_result_t scpi_cmd_systemDigitalPinPolarity(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t pin;
     SCPI_CommandNumbers(context, &pin, 1, 1);
     if (pin < 1 || pin > 4) {
@@ -1507,7 +1423,6 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarity(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemDigitalPinPolarityQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t pin;
     SCPI_CommandNumbers(context, &pin, 1, 1);
     if (pin < 1 || pin > 4) {
@@ -1539,7 +1454,6 @@ static scpi_choice_def_t systemMeasureVoltageChoice[] = {
 
 scpi_result_t scpi_cmd_systemMeasureScalarVoltageDcQ(scpi_t *context) {
 #if defined(EEZ_PLATFORM_STM32)
-    // TODO migrate to generic firmware
     int32_t choice;
     if (!SCPI_ParamChoice(context, systemMeasureVoltageChoice, &choice, true)) {
         return SCPI_RES_ERR;

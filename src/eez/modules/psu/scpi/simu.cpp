@@ -84,7 +84,6 @@ static bool get_resistance_param(scpi_t *context, float &value) {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_simulatorLoadState(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool state;
     if (!SCPI_ParamBool(context, &state, TRUE)) {
         return SCPI_RES_ERR;
@@ -101,7 +100,6 @@ scpi_result_t scpi_cmd_simulatorLoadState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorLoadStateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -113,7 +111,6 @@ scpi_result_t scpi_cmd_simulatorLoadStateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorLoad(scpi_t *context) {
-    // TODO migrate to generic firmware
     float value;
     if (!get_resistance_param(context, value)) {
         return SCPI_RES_ERR;
@@ -130,7 +127,6 @@ scpi_result_t scpi_cmd_simulatorLoad(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorLoadQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -162,7 +158,6 @@ scpi_result_t scpi_cmd_simulatorLoadQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorVoltageProgramExternal(scpi_t *context) {
-    // TODO migrate to generic firmware
 
     float value;
     if (!get_voltage_param(context, value, 0, 0)) {
@@ -190,7 +185,6 @@ scpi_result_t scpi_cmd_simulatorVoltageProgramExternal(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorVoltageProgramExternalQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -210,7 +204,6 @@ scpi_result_t scpi_cmd_simulatorVoltageProgramExternalQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorPwrgood(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool on;
     if (!SCPI_ParamBool(context, &on, TRUE)) {
         return SCPI_RES_ERR;
@@ -227,7 +220,6 @@ scpi_result_t scpi_cmd_simulatorPwrgood(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorPwrgoodQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -239,7 +231,6 @@ scpi_result_t scpi_cmd_simulatorPwrgoodQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorRpol(scpi_t *context) {
-    // TODO migrate to generic firmware
 
     bool on;
     if (!SCPI_ParamBool(context, &on, TRUE)) {
@@ -267,7 +258,6 @@ scpi_result_t scpi_cmd_simulatorRpol(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorRpolQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -289,7 +279,6 @@ scpi_result_t scpi_cmd_simulatorRpolQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorTemperature(scpi_t *context) {
-    // TODO migrate to generic firmware
     float value;
     if (!get_temperature_param(context, value, -100.0f, 200.0f, 25.0f)) {
         return SCPI_RES_ERR;
@@ -306,7 +295,6 @@ scpi_result_t scpi_cmd_simulatorTemperature(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorTemperatureQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t sensor;
     if (!param_temp_sensor(context, sensor)) {
         return SCPI_RES_ERR;
@@ -338,25 +326,21 @@ scpi_result_t scpi_cmd_simulatorTemperatureQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorGui(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
     return SCPI_RES_ERR;
 }
 
 scpi_result_t scpi_cmd_simulatorExit(scpi_t *context) {
-    // TODO migrate to generic firmware
     simulator::exit();
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_simulatorQuit(scpi_t *context) {
-    // TODO migrate to generic firmware
     return scpi_cmd_simulatorExit(context);
 }
 
 scpi_result_t scpi_cmd_simulatorPin1(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool value;
     if (!SCPI_ParamBool(context, &value, TRUE)) {
         return SCPI_RES_ERR;
@@ -368,13 +352,11 @@ scpi_result_t scpi_cmd_simulatorPin1(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorPin1Q(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, io_pins::ioPinRead(EXT_TRIG1) ? 1 : 0);
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_simulatorPin2(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool value;
     if (!SCPI_ParamBool(context, &value, TRUE)) {
         return SCPI_RES_ERR;
@@ -386,7 +368,6 @@ scpi_result_t scpi_cmd_simulatorPin2(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorPin2Q(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, io_pins::ioPinRead(EXT_TRIG2) ? 1 : 0);
     return SCPI_RES_OK;
 }

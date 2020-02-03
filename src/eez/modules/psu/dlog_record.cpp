@@ -16,7 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if OPTION_SD_CARD
 #include <eez/modules/psu/psu.h>
 #include <eez/libs/sd_fat/sd_fat.h>
 
@@ -673,5 +672,3 @@ const char *getLatestFilePath() {
 } // namespace dlog_record
 } // namespace psu
 } // namespace eez
-
-#endif // OPTION_SD_CARD

@@ -56,9 +56,7 @@
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ontime.h>
-#if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
-#endif
 
 #include <eez/modules/psu/gui/calibration.h>
 #include <eez/modules/psu/gui/data.h>
@@ -3086,7 +3084,6 @@ void data_battery(data::DataOperationEnum operation, data::Cursor &cursor, data:
 
 void data_sys_info_sdcard_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-#if OPTION_SD_CARD
     	int err;
         if (eez::psu::sd_card::isMounted(&err)) {
             if (eez::psu::sd_card::isBusy()) {
@@ -3101,9 +3098,6 @@ void data_sys_info_sdcard_status(data::DataOperationEnum operation, data::Cursor
 		} else {
 			value = 4; // failed
 		}
-#else
-        value = 0; // unsupported
-#endif
     }
 }
 
@@ -4457,15 +4451,12 @@ void data_nondrag_overlay(data::DataOperationEnum operation, data::Cursor &curso
 }
 
 void data_dlog_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = dlog_record::getState();
     }
-#endif
 }
 
 void data_dlog_toggle_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         if (dlog_record::isIdle()) {
             value = 0;
@@ -4477,16 +4468,13 @@ void data_dlog_toggle_state(data::DataOperationEnum operation, data::Cursor &cur
             value = 3;
         }
     }
-#endif
 }
 
 void data_is_show_live_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
         value = &recording == &dlog_record::g_recording;
     }
-#endif
 }
 
 void data_channel_history_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -4529,42 +4517,33 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
 }
 
 void data_dlog_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = (
                 channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || 
                 channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES
             ) && cursor.i == 1 ? 0 : 1;
     }
-#endif
 }
 
 void data_dlog_voltage_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = dlog_record::g_guiParameters.logVoltage[cursor.i];
     }
-#endif
 }
 
 void data_dlog_current_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = dlog_record::g_guiParameters.logCurrent[cursor.i];
     }
-#endif
 }
 
 void data_dlog_power_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = dlog_record::g_guiParameters.logPower[cursor.i];
     }
-#endif
 }
 
 void data_dlog_period(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(dlog_record::g_guiParameters.period, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
@@ -4576,11 +4555,9 @@ void data_dlog_period(data::DataOperationEnum operation, data::Cursor &cursor, d
     } else if (operation == data::DATA_OPERATION_SET) {
         dlog_record::g_guiParameters.period = value.getFloat();
     }
-#endif
 }
 
 void data_dlog_duration(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(dlog_record::g_guiParameters.time, UNIT_SECOND);
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
@@ -4592,11 +4569,9 @@ void data_dlog_duration(data::DataOperationEnum operation, data::Cursor &cursor,
     } else if (operation == data::DATA_OPERATION_SET) {
         dlog_record::g_guiParameters.time = value.getFloat();
     }
-#endif
 }
 
 void data_dlog_file_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = dlog_record::g_guiParameters.filePath;
     } else if (operation == data::DATA_OPERATION_SET) {
@@ -4604,31 +4579,24 @@ void data_dlog_file_name(data::DataOperationEnum operation, data::Cursor &cursor
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
         value = Value(MAX_PATH_LENGTH, VALUE_TYPE_UINT32);
     }
-#endif
 }
 
 void data_dlog_start_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = dlog_record::checkDlogParameters(dlog_record::g_guiParameters, true, false) == SCPI_RES_OK ? 1 : 0;
     }
-#endif
 }
 
 void data_dlog_view_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == DATA_OPERATION_GET) {
         value = dlog_view::getState();
     }
-#endif
 }
 
 void data_recording_ready(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == DATA_OPERATION_GET) {
         value = dlog_record::isExecuting() || dlog_record::getLatestFilePath() ? 1 : 0;
     }
-#endif
 }
 
 void data_is_single_page_on_stack(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -4638,7 +4606,6 @@ void data_is_single_page_on_stack(data::DataOperationEnum operation, data::Curso
 }
 
 void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     dlog_view::Recording &recording = dlog_view::getRecording();
 
     if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
@@ -4805,11 +4772,9 @@ void data_recording(data::DataOperationEnum operation, data::Cursor &cursor, dat
         stepValues->values = values;
         value = 1;
     }
-#endif
 }
 
 void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     static const int NUM_WIDGETS = 2;
 
     static const int LABELS_CONTAINER_WIDGET = 0;
@@ -4862,11 +4827,9 @@ void data_dlog_overlay(data::DataOperationEnum operation, data::Cursor &cursor, 
 
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     }
-#endif
 }
 
 void data_dlog_overlay_over_4(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     static Overlay overlay;
 
     if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
@@ -4881,16 +4844,13 @@ void data_dlog_overlay_over_4(data::DataOperationEnum operation, data::Cursor &c
         
         value = data::Value(&overlay, VALUE_TYPE_POINTER);
     }
-#endif
 }
 
 void data_dlog_visible_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_COUNT) {
         dlog_view::Recording &recording = dlog_view::getRecording();
         value = getNumVisibleDlogValues(recording);
     }
-#endif
 }
 
 void data_dlog_visible_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
@@ -4902,7 +4862,6 @@ void data_dlog_visible_value_label(data::DataOperationEnum operation, data::Curs
 }
 
 void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     dlog_view::Recording &recording = dlog_view::getRecording();
     int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : cursor.i);
 
@@ -4934,11 +4893,9 @@ void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor
     } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
-#endif
 }
 
 void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     dlog_view::Recording &recording = dlog_view::getRecording();
     int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : cursor.i);
 
@@ -4969,11 +4926,9 @@ void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cur
     } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
-#endif
 }
 
 void data_dlog_x_axis_offset(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     dlog_view::Recording &recording = dlog_view::getRecording();
 
     if (operation == data::DATA_OPERATION_GET) {
@@ -4996,11 +4951,9 @@ void data_dlog_x_axis_offset(data::DataOperationEnum operation, data::Cursor &cu
     } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
-#endif
 }
 
 void data_dlog_x_axis_div(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     dlog_view::Recording &recording = dlog_view::getRecording();
 
     if (operation == data::DATA_OPERATION_GET) {
@@ -5023,11 +4976,9 @@ void data_dlog_x_axis_div(data::DataOperationEnum operation, data::Cursor &curso
     } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
-#endif
 }
 
 void data_dlog_x_axis_max_value(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
 
@@ -5039,11 +4990,9 @@ void data_dlog_x_axis_max_value(data::DataOperationEnum operation, data::Cursor 
 
         value = Value(maxValue, recording.parameters.xAxis.unit);
     }
-#endif
 }
 
 void data_dlog_x_axis_max_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
         if (recording.parameters.xAxis.unit == UNIT_SECOND) {
@@ -5052,11 +5001,9 @@ void data_dlog_x_axis_max_value_label(data::DataOperationEnum operation, data::C
             value = "Max.";
         }
     }
-#endif
 }
 
 void data_dlog_visible_value_cursor(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
         int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::yAxisHasDifferentUnits(recording) ? recording.selectedVisibleValueIndex : cursor.i);
@@ -5071,92 +5018,70 @@ void data_dlog_visible_value_cursor(data::DataOperationEnum operation, data::Cur
         value = Value(cursorValue, recording.parameters.yAxes[dlogValueIndex].unit);
 
     }
-#endif
 }
 
 void data_dlog_current_time(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(0, VALUE_TYPE_DLOG_CURRENT_TIME);
     }
-#endif
 }
 
 void data_dlog_file_length(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(dlog_record::g_fileLength, VALUE_TYPE_FILE_LENGTH);
     }
-#endif
 }
 
 void data_dlog_all_values(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_COUNT) {
         value = MAX_NUM_OF_Y_VALUES;
     }
-#endif
 }
 
 void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(cursor.i, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
-#endif
 }
 
 void data_dlog_value_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         dlog_view::Recording &recording = dlog_view::getRecording();
         value = cursor.i < recording.parameters.numYAxes ? recording.dlogValues[cursor.i].isVisible : 2;
     }
-#endif
 }
 
 void data_dlog_view_show_legend(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = dlog_view::g_showLegend ? 1 : 0;
     }
-#endif
 }
 
 void data_dlog_view_show_labels(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = dlog_view::g_showLabels ? 1 : 0;
     }
-#endif
 }
 
 void data_file_manager_current_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::getCurrentDirectory();
     }
-#endif
 }
 
 void data_file_manager_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::getState();
     }
-#endif
 }
 
 void data_file_manager_is_root_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::isRootDirectory() ? 1 : 0;
     }
-#endif
 }
 
 void data_file_manager_files(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_COUNT) {
         value = (int)file_manager::getFilesCount();
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
@@ -5168,92 +5093,70 @@ void data_file_manager_files(data::DataOperationEnum operation, data::Cursor &cu
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
         value = Value(file_manager::getFilesPageSize(), VALUE_TYPE_UINT32);
     }
-#endif
 }
 
 void data_file_manager_is_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::isDirectory(cursor.i) ? 1 : 0;
     }
-#endif
 }
 
 void data_file_manager_file_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::getFileType(cursor.i);
     }
-#endif
 }
 
 void data_file_manager_file_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(file_manager::getFileName(cursor.i), VALUE_TYPE_STR, STRING_OPTIONS_FILE_ELLIPSIS);
     }
-#endif
 }
 
 void data_file_manager_file_size(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(file_manager::getFileSize(cursor.i), VALUE_TYPE_FILE_LENGTH);
     }
-#endif
 }
 
 void data_file_manager_file_date_time(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(file_manager::getFileDataTime(cursor.i), VALUE_TYPE_FILE_DATE_TIME);
     }
-#endif
 }
 
 void data_file_manager_file_selected(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::isFileSelected(cursor.i);
     }
-#endif
 }
 
 
 void data_file_manager_open_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::isOpenFileEnabled();
     }
-#endif
 }
 
 void data_file_manager_upload_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::isUploadFileEnabled();
     }
-#endif
 }
 
 void data_file_manager_rename_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::isRenameFileEnabled();
     }
-#endif
 }
 
 void data_file_manager_delete_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::isDeleteFileEnabled();
     }
-#endif
 }
 
 void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_SD_CARD
     if (operation == data::DATA_OPERATION_GET_BITMAP_PIXELS) {
         value = Value(file_manager::getOpenedImagePixels(), VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_GET_BITMAP_WIDTH) {
@@ -5261,7 +5164,6 @@ void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cur
     } else if (operation == data::DATA_OPERATION_GET_BITMAP_HEIGHT) {
         value = Value(272, VALUE_TYPE_UINT16);
     }
-#endif
 }
 
 void data_file_manager_browser_title(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {

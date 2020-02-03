@@ -35,13 +35,9 @@
 #include <eez/gui/gui.h>
 
 #include <eez/modules/psu/psu.h>
-#if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
-#endif
 #include <eez/modules/psu/serial_psu.h>
-#if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
-#endif
 #include <eez/modules/psu/ontime.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/serial_psu.h>
@@ -132,9 +128,7 @@ void boot() {
     bp3c::eeprom::init();
     bp3c::eeprom::test();
 
-#if OPTION_SD_CARD
     psu::sd_card::init();
-#endif
 
     bp3c::io_exp::init();
 
@@ -261,9 +255,7 @@ bool testMaster() {
     result &= psu::datetime::test();
     result &= mcu::eeprom::test();
 
-#if OPTION_SD_CARD
     result &= psu::sd_card::test();
-#endif
 
 #if OPTION_ETHERNET
     result &= psu::ethernet::test();

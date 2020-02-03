@@ -48,9 +48,7 @@
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/serial_psu.h>
-#if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
-#endif
 
  ////////////////////////////////////////////////////////////////////////////////
 
@@ -184,14 +182,10 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         slotIndex = 1;
     } else if (GPIO_Pin == SPI5_IRQ_Pin) {
         slotIndex = 2;
-    }
-
-#if OPTION_SD_CARD
-    else if (GPIO_Pin == SD_DETECT_Pin) {
+    } else if (GPIO_Pin == SD_DETECT_Pin) {
         eez::psu::sd_card::onSdDetectInterrupt();
         return;
     }
-#endif
 
     if (slotIndex != -1) {
         osMessagePut(eez::psu::g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_SPI_IRQ, slotIndex), 0);

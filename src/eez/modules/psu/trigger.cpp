@@ -28,9 +28,7 @@
 #include <eez/modules/psu/trigger.h>
 #include <eez/system.h>
 
-#if OPTION_SD_CARD
 #include <eez/modules/psu/dlog_record.h>
-#endif
 
 namespace eez {
 namespace psu {
@@ -124,25 +122,15 @@ void check(uint32_t currentTime) {
 int generateTrigger(Source source, bool checkImmediatelly) {
     bool seqTriggered = persist_conf::devConf.triggerSource == source && g_state == STATE_INITIATED;
 
-#if OPTION_SD_CARD
     bool dlogTriggered = dlog_record::g_parameters.triggerSource == source && dlog_record::isInitiated();
-#endif
 
-    if (!seqTriggered) {
-#if OPTION_SD_CARD
-        if (!dlogTriggered) {
-            return SCPI_ERROR_TRIGGER_IGNORED;
-        }
-#else
+    if (!seqTriggered && !dlogTriggered) {
         return SCPI_ERROR_TRIGGER_IGNORED;
-#endif
     }
 
-#if OPTION_SD_CARD
     if (dlogTriggered) {
         dlog_record::triggerGenerated();
     }
-#endif
 
     if (seqTriggered) {
         setState(STATE_TRIGGERED);

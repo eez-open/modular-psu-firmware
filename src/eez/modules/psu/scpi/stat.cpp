@@ -30,7 +30,6 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_statusQuestionableEventQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, SCPI_RegGet(context, SCPI_REG_QUES));
 
@@ -41,7 +40,6 @@ scpi_result_t scpi_cmd_statusQuestionableEventQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusQuestionableConditionQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, SCPI_PSU_REG_QUES_COND));
 
@@ -49,7 +47,6 @@ scpi_result_t scpi_cmd_statusQuestionableConditionQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusQuestionableEnable(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t new_QUESE;
     if (SCPI_ParamInt32(context, &new_QUESE, TRUE)) {
         SCPI_RegSet(context, SCPI_REG_QUESE, (scpi_reg_val_t)new_QUESE);
@@ -59,7 +56,6 @@ scpi_result_t scpi_cmd_statusQuestionableEnable(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusQuestionableEnableQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, SCPI_RegGet(context, SCPI_REG_QUESE));
 
@@ -67,7 +63,6 @@ scpi_result_t scpi_cmd_statusQuestionableEnableQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusOperationEventQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, SCPI_RegGet(context, SCPI_REG_OPER));
 
@@ -78,7 +73,6 @@ scpi_result_t scpi_cmd_statusOperationEventQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusOperationConditionQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, SCPI_PSU_REG_OPER_COND));
 
@@ -86,7 +80,6 @@ scpi_result_t scpi_cmd_statusOperationConditionQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusOperationEnable(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t new_OPERE;
     if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
         SCPI_RegSet(context, SCPI_REG_OPERE, (scpi_reg_val_t)new_OPERE);
@@ -96,7 +89,6 @@ scpi_result_t scpi_cmd_statusOperationEnable(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusOperationEnableQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, SCPI_RegGet(context, SCPI_REG_OPERE));
 
@@ -104,7 +96,6 @@ scpi_result_t scpi_cmd_statusOperationEnableQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentEventQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, SCPI_PSU_REG_QUES_INST_EVENT));
 
@@ -115,7 +106,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentEventQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentConditionQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, SCPI_PSU_REG_QUES_INST_COND));
 
@@ -123,7 +113,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentConditionQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentEnable(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t newVal;
     if (SCPI_ParamInt32(context, &newVal, TRUE)) {
         reg_set(context, SCPI_PSU_REG_QUES_INST_ENABLE, (scpi_reg_val_t)newVal);
@@ -133,7 +122,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentEnable(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentEnableQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, SCPI_PSU_REG_QUES_INST_ENABLE));
 
@@ -141,7 +129,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentEnableQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentEventQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, SCPI_PSU_REG_OPER_INST_EVENT));
 
@@ -152,7 +139,6 @@ scpi_result_t scpi_cmd_statusOperationInstrumentEventQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentConditionQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, SCPI_PSU_REG_OPER_INST_COND));
 
@@ -160,7 +146,6 @@ scpi_result_t scpi_cmd_statusOperationInstrumentConditionQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentEnable(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t newVal;
     if (SCPI_ParamInt32(context, &newVal, TRUE)) {
         reg_set(context, SCPI_PSU_REG_OPER_INST_ENABLE, (scpi_reg_val_t)newVal);
@@ -170,7 +155,6 @@ scpi_result_t scpi_cmd_statusOperationInstrumentEnable(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentEnableQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, SCPI_PSU_REG_OPER_INST_ENABLE));
 
@@ -178,7 +162,6 @@ scpi_result_t scpi_cmd_statusOperationInstrumentEnableQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEventQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     int32_t channelIndex;
@@ -202,7 +185,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEventQ(scpi_t *contex
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryConditionQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     int32_t channelIndex;
@@ -223,7 +205,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryConditionQ(scpi_t *co
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnable(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     int32_t channelIndex;
@@ -246,7 +227,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnable(scpi_t *contex
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnableQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     int32_t channelIndex;
@@ -267,7 +247,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnableQ(scpi_t *conte
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEventQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     int32_t channelIndex;
@@ -291,7 +270,6 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEventQ(scpi_t *context) 
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryConditionQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     int32_t channelIndex;
@@ -312,7 +290,6 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryConditionQ(scpi_t *conte
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnable(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     int32_t channelIndex;
@@ -335,7 +312,6 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnable(scpi_t *context) 
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnableQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     int32_t channelIndex;
@@ -356,7 +332,6 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnableQ(scpi_t *context)
 }
 
 scpi_result_t scpi_cmd_statusPreset(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_RegSet(context, SCPI_REG_ESE, 0);
 
     SCPI_RegSet(context, SCPI_REG_QUESE, 0);

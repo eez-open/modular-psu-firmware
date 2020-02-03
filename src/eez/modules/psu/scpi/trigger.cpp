@@ -23,9 +23,7 @@
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/trigger.h>
-#if OPTION_SD_CARD
 #include <eez/modules/psu/dlog_record.h>
-#endif
 
 namespace eez {
 namespace psu {
@@ -43,7 +41,6 @@ static scpi_choice_def_t sourceChoice[] = { { "BUS", trigger::SOURCE_BUS },
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_triggerSequenceImmediate(scpi_t *context) {
-    // TODO migrate to generic firmware
     int result = trigger::generateTrigger(trigger::SOURCE_IMMEDIATE);
     if (result != SCPI_RES_OK) {
         SCPI_ErrorPush(context, result);
@@ -54,7 +51,6 @@ scpi_result_t scpi_cmd_triggerSequenceImmediate(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_triggerSequenceDelay(scpi_t *context) {
-    // TODO migrate to generic firmware
     float delay;
     if (!get_duration_param(context, delay, trigger::DELAY_MIN, trigger::DELAY_MAX,
                             trigger::DELAY_DEFAULT)) {
@@ -67,13 +63,11 @@ scpi_result_t scpi_cmd_triggerSequenceDelay(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_triggerSequenceDelayQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultFloat(context, trigger::getDelay());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_triggerSequenceSource(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t source;
     if (!SCPI_ParamChoice(context, sourceChoice, &source, true)) {
         return SCPI_RES_ERR;
@@ -93,7 +87,6 @@ scpi_result_t scpi_cmd_triggerSequenceSource(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_triggerSequenceSourceQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     resultChoiceName(context, sourceChoice, trigger::getSource());
     return SCPI_RES_OK;
 }
@@ -107,7 +100,6 @@ static scpi_choice_def_t triggerOnListStopChoice[] = {
 };
 
 scpi_result_t scpi_cmd_triggerSequenceExitCondition(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t triggerOnListStop;
     if (!SCPI_ParamChoice(context, triggerOnListStopChoice, &triggerOnListStop, true)) {
         return SCPI_RES_ERR;
@@ -130,7 +122,6 @@ scpi_result_t scpi_cmd_triggerSequenceExitCondition(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_triggerSequenceExitConditionQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -143,7 +134,6 @@ scpi_result_t scpi_cmd_triggerSequenceExitConditionQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_initiateImmediate(scpi_t *context) {
-    // TODO migrate to generic firmware
     int result = trigger::initiate();
     if (result != SCPI_RES_OK) {
         SCPI_ErrorPush(context, result);
@@ -154,7 +144,6 @@ scpi_result_t scpi_cmd_initiateImmediate(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_initiateContinuous(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -171,20 +160,17 @@ scpi_result_t scpi_cmd_initiateContinuous(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_initiateContinuousQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, trigger::isContinuousInitializationEnabled() ? 1 : 0);
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_abort(scpi_t *context) {
-    // TODO migrate to generic firmware
     trigger::abort();
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_coreTrg(scpi_t *context) {
-    // TODO migrate to generic firmware
     int result = trigger::generateTrigger(trigger::SOURCE_BUS);
     if (result != SCPI_RES_OK) {
         SCPI_ErrorPush(context, result);
@@ -194,23 +180,15 @@ scpi_result_t scpi_cmd_coreTrg(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_triggerDlogImmediate(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     int result = dlog_record::startImmediately();
     if (result != SCPI_RES_OK) {
         SCPI_ErrorPush(context, result);
         return SCPI_RES_ERR;
     }
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_triggerDlogSource(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     int32_t source;
     if (!SCPI_ParamChoice(context, sourceChoice, &source, true)) {
         return SCPI_RES_ERR;
@@ -227,21 +205,11 @@ scpi_result_t scpi_cmd_triggerDlogSource(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_triggerDlogSourceQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     resultChoiceName(context, sourceChoice, dlog_record::g_parameters.triggerSource);
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 } // namespace scpi

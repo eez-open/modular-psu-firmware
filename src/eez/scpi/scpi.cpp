@@ -39,13 +39,11 @@
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/profile.h>
 
-#if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
 #include <eez/libs/sd_fat/sd_fat.h>
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/dlog_view.h>
 #include <eez/libs/image/jpeg.h>
-#endif
 
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/datetime.h>
@@ -144,12 +142,11 @@ void oneIter() {
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_SHUTDOWN) {
                 g_shutingDown = true;
             }
-#if defined(EEZ_PLATFORM_STM32) && OPTION_SD_CARD
+#if defined(EEZ_PLATFORM_STM32)
 			else if (type == SCPI_QUEUE_MESSAGE_TYPE_SD_DETECT_IRQ) {
 				eez::psu::sd_card::onSdDetectInterruptHandler();
 			}
 #endif
-#if OPTION_SD_CARD
 			else if (type == SCPI_QUEUE_MESSAGE_DLOG_FILE_WRITE) {
 				eez::psu::dlog_record::fileWrite();
 			}
@@ -219,7 +216,6 @@ void oneIter() {
                 int err;
                 profile::recall(param, &err);
             }
-#endif // OPTION_SD_CARD
         }
     } else {
         if (g_shutingDown) {
@@ -254,9 +250,7 @@ void oneIter() {
 
         persist_conf::tick();
 
-#if OPTION_SD_CARD
         sd_card::tick();
-#endif
 
 #ifdef DEBUG
         psu::debug::tick(tickCount);
@@ -269,9 +263,7 @@ void oneIter() {
 void resetContext(scpi_t *context) {
     scpi_psu_t *psuContext = (scpi_psu_t *)context->user_context;
     psuContext->selected_channel_index = 0;
-#if OPTION_SD_CARD
     psuContext->currentDirectory[0] = 0;
-#endif
     SCPI_ErrorClear(context);
 }
 

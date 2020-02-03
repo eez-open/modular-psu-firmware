@@ -51,7 +51,6 @@ using namespace debug;
 namespace scpi {
 
 scpi_result_t scpi_cmd_debug(scpi_t *context) {
-    // TODO migrate to generic firmware
 #ifdef DEBUG
     int32_t cmd;
     if (SCPI_ParamInt32(context, &cmd, false)) {
@@ -81,7 +80,6 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #ifdef DEBUG
     static char buffer[2048];
 
@@ -106,7 +104,6 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugOntimeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
 #ifdef DEBUG
     char buffer[512] = { 0 };
     char *p = buffer;
@@ -131,7 +128,6 @@ scpi_result_t scpi_cmd_debugOntimeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugVoltage(scpi_t *context) {
-    // TODO migrate to generic firmware
 #ifdef DEBUG
     Channel *channel = param_channel(context);
     if (!channel) {
@@ -153,7 +149,6 @@ scpi_result_t scpi_cmd_debugVoltage(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugCurrent(scpi_t *context) {
-    // TODO migrate to generic firmware
 #ifdef DEBUG
     Channel *channel = param_channel(context);
     if (!channel) {
@@ -175,7 +170,6 @@ scpi_result_t scpi_cmd_debugCurrent(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugMeasureVoltage(scpi_t *context) {
-    // TODO migrate to generic firmware
 #ifdef DEBUG
     if (serial::g_testResult != TEST_OK) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -216,7 +210,6 @@ scpi_result_t scpi_cmd_debugMeasureVoltage(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
-    // TODO migrate to generic firmware
 #ifdef DEBUG
     if (serial::g_testResult != TEST_OK) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -258,7 +251,6 @@ scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugFan(scpi_t *context) {
 #if OPTION_FAN
-    // TODO migrate to generic firmware
     int32_t fanSpeed;
     if (!SCPI_ParamInt(context, &fanSpeed, TRUE)) {
         return SCPI_RES_ERR;
@@ -279,7 +271,6 @@ scpi_result_t scpi_cmd_debugFan(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugFanQ(scpi_t *context) {
 #if OPTION_FAN
-    // TODO migrate to generic firmware
     SCPI_ResultInt(context, persist_conf::devConf.fanMode == FAN_MODE_MANUAL ? persist_conf::devConf.fanSpeed : -1);
 
     return SCPI_RES_OK;
@@ -291,7 +282,6 @@ scpi_result_t scpi_cmd_debugFanQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugFanPid(scpi_t *context) {
 #if OPTION_FAN
-    // TODO migrate to generic firmware
     double Kp;
     if (!SCPI_ParamDouble(context, &Kp, TRUE)) {
         return SCPI_RES_ERR;
@@ -323,7 +313,6 @@ scpi_result_t scpi_cmd_debugFanPid(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugFanPidQ(scpi_t *context) {
 #if OPTION_FAN
-    // TODO migrate to generic firmware
     double Kp[4] = { aux_ps::fan::g_Kp, aux_ps::fan::g_Ki, aux_ps::fan::g_Kd, aux_ps::fan::g_POn * 1.0f };
 
     SCPI_ResultArrayDouble(context, Kp, 4, SCPI_FORMAT_ASCII);
@@ -336,7 +325,6 @@ scpi_result_t scpi_cmd_debugFanPidQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugCsvQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     const int count = 1000;
     double *arr = (double *)malloc(count * sizeof(double));
     for (int i = 0; i < count; ++i) {

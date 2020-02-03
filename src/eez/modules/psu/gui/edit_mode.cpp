@@ -29,9 +29,7 @@
 
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
-#if OPTION_SD_CARD
 #include <eez/modules/psu/dlog_record.h>
-#endif
 
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>

@@ -26,9 +26,7 @@
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/trigger.h>
 
-#if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
-#endif
 
 #if OPTION_DISPLAY
 #include <eez/modules/psu/gui/psu.h>
@@ -46,19 +44,13 @@ namespace scpi {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if OPTION_SD_CARD
-
 void addExtension(char *filePath, const char *ext) {
     if (!endsWith(filePath, ext)) {
         strcat(filePath, ext);
     }
 }
 
-#endif
-
 scpi_result_t scpi_cmd_mmemoryCdirectory(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     char dirPath[MAX_PATH_LENGTH + 1];
     if (!getFilePath(context, dirPath, true)) {
         return SCPI_RES_ERR;
@@ -76,15 +68,9 @@ scpi_result_t scpi_cmd_mmemoryCdirectory(scpi_t *context) {
     strcpy(psuContext->currentDirectory, dirPath);
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryCdirectoryQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     scpi_psu_t *psuContext = (scpi_psu_t *)context->user_context;
     if (psuContext->currentDirectory[0]) {
         SCPI_ResultText(context, psuContext->currentDirectory);
@@ -93,10 +79,6 @@ scpi_result_t scpi_cmd_mmemoryCdirectoryQ(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -141,8 +123,6 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
 }
 
 scpi_result_t scpi_cmd_mmemoryCatalogQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     char dirPath[MAX_PATH_LENGTH + 1];
     if (!getFilePath(context, dirPath, false)) {
         return SCPI_RES_ERR;
@@ -162,15 +142,9 @@ scpi_result_t scpi_cmd_mmemoryCatalogQ(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryCatalogLengthQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     char dirPath[MAX_PATH_LENGTH + 1];
     if (!getFilePath(context, dirPath, false)) {
         return SCPI_RES_ERR;
@@ -188,15 +162,9 @@ scpi_result_t scpi_cmd_mmemoryCatalogLengthQ(scpi_t *context) {
     SCPI_ResultUInt32(context, (uint32_t)length);
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryInformationQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     uint64_t usedSpace, freeSpace;
     if (!sd_card::getInfo(usedSpace, freeSpace)) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -207,15 +175,10 @@ scpi_result_t scpi_cmd_mmemoryInformationQ(scpi_t *context) {
     SCPI_ResultUInt64(context, freeSpace);
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if OPTION_SD_CARD
 void uploadCallback(void *param, const void *buffer, int size) {
     if (buffer == NULL && size == -1) {
         return;
@@ -236,11 +199,7 @@ bool mmemUpload(const char *filePath, scpi_t *context, int *err) {
     return sd_card::upload(filePath, context, uploadCallback, err);
 }
 
-#endif
-
 scpi_result_t scpi_cmd_mmemoryUploadQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     char filePath[MAX_PATH_LENGTH + 1];
     if (!getFilePath(context, filePath, true)) {
         return SCPI_RES_ERR;
@@ -262,15 +221,10 @@ scpi_result_t scpi_cmd_mmemoryUploadQ(scpi_t *context) {
     event_queue::pushEvent(event_queue::EVENT_INFO_FILE_UPLOAD_SUCCEEDED);
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if OPTION_SD_CARD
 static char g_downloadFilePath[MAX_PATH_LENGTH + 1];
 static uint32_t g_downloadSize;
 static bool g_downloading;
@@ -309,11 +263,8 @@ void abortDownloading() {
         g_aborted = true;
     }    
 }
-#endif
 
 scpi_result_t scpi_cmd_mmemoryDownloadFname(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     if (!getFilePath(context, g_downloadFilePath, true)) {
         return SCPI_RES_ERR;
     }
@@ -327,15 +278,9 @@ scpi_result_t scpi_cmd_mmemoryDownloadFname(scpi_t *context) {
     g_aborted = false;
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryDownloadSize(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     uint32_t size;
     if (!SCPI_ParamUInt32(context, &size, true)) {
         return SCPI_RES_ERR;
@@ -349,15 +294,9 @@ scpi_result_t scpi_cmd_mmemoryDownloadSize(scpi_t *context) {
     g_downloadSize = size;
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryDownloadData(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     if (persist_conf::isSdLocked()) {
         SCPI_ErrorPush(context, SCPI_ERROR_MEDIA_PROTECTED);
         return SCPI_RES_ERR;
@@ -399,28 +338,16 @@ scpi_result_t scpi_cmd_mmemoryDownloadData(scpi_t *context) {
 #endif
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryDownloadAbort(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     abortDownloading();
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_mmemoryMove(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     if (persist_conf::isSdLocked()) {
         SCPI_ErrorPush(context, SCPI_ERROR_MEDIA_PROTECTED);
         return SCPI_RES_ERR;
@@ -445,15 +372,9 @@ scpi_result_t scpi_cmd_mmemoryMove(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryCopy(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     if (persist_conf::isSdLocked()) {
         SCPI_ErrorPush(context, SCPI_ERROR_MEDIA_PROTECTED);
         return SCPI_RES_ERR;
@@ -478,15 +399,9 @@ scpi_result_t scpi_cmd_mmemoryCopy(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryDelete(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     if (persist_conf::isSdLocked()) {
         SCPI_ErrorPush(context, SCPI_ERROR_MEDIA_PROTECTED);
         return SCPI_RES_ERR;
@@ -506,15 +421,9 @@ scpi_result_t scpi_cmd_mmemoryDelete(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryMdirectory(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     if (persist_conf::isSdLocked()) {
         SCPI_ErrorPush(context, SCPI_ERROR_MEDIA_PROTECTED);
         return SCPI_RES_ERR;
@@ -534,15 +443,9 @@ scpi_result_t scpi_cmd_mmemoryMdirectory(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryRdirectory(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     if (persist_conf::isSdLocked()) {
         SCPI_ErrorPush(context, SCPI_ERROR_MEDIA_PROTECTED);
         return SCPI_RES_ERR;
@@ -562,17 +465,11 @@ scpi_result_t scpi_cmd_mmemoryRdirectory(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_mmemoryDateQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     char filePath[MAX_PATH_LENGTH + 1];
     if (!getFilePath(context, filePath, true)) {
         return SCPI_RES_ERR;
@@ -592,15 +489,9 @@ scpi_result_t scpi_cmd_mmemoryDateQ(scpi_t *context) {
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryTimeQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     char filePath[MAX_PATH_LENGTH + 1];
     if (!getFilePath(context, filePath, true)) {
         return SCPI_RES_ERR;
@@ -620,17 +511,11 @@ scpi_result_t scpi_cmd_mmemoryTimeQ(scpi_t *context) {
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_mmemoryLock(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     if (!checkPassword(context, persist_conf::devConf.systemPassword)) {
         return SCPI_RES_ERR;
     }
@@ -638,26 +523,14 @@ scpi_result_t scpi_cmd_mmemoryLock(scpi_t *context) {
     persist_conf::setSdLocked(true);
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryLockQ(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     SCPI_ResultBool(context, persist_conf::isSdLocked());
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryUnlock(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     if (!checkPassword(context, persist_conf::devConf.systemPassword)) {
         return SCPI_RES_ERR;
     }
@@ -665,17 +538,11 @@ scpi_result_t scpi_cmd_mmemoryUnlock(scpi_t *context) {
     persist_conf::setSdLocked(false);
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_mmemoryLoadList(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     Channel *channel = set_channel_from_command_number(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -698,15 +565,9 @@ scpi_result_t scpi_cmd_mmemoryLoadList(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryStoreList(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     if (persist_conf::isSdLocked()) {
         SCPI_ErrorPush(context, SCPI_ERROR_MEDIA_PROTECTED);
         return SCPI_RES_ERR;
@@ -736,17 +597,11 @@ scpi_result_t scpi_cmd_mmemoryStoreList(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_mmemoryLoadProfile(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     char filePath[MAX_PATH_LENGTH + 1];
     if (!getFilePath(context, filePath, true)) {
         return SCPI_RES_ERR;
@@ -759,15 +614,9 @@ scpi_result_t scpi_cmd_mmemoryLoadProfile(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_mmemoryStoreProfile(scpi_t *context) {
-    // TODO migrate to generic firmware
-#if OPTION_SD_CARD
     if (persist_conf::isSdLocked()) {
         SCPI_ErrorPush(context, SCPI_ERROR_MEDIA_PROTECTED);
         return SCPI_RES_ERR;
@@ -787,10 +636,6 @@ scpi_result_t scpi_cmd_mmemoryStoreProfile(scpi_t *context) {
     }
 
     return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 } // namespace scpi

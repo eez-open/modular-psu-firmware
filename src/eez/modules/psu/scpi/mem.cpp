@@ -28,14 +28,12 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_memoryNstatesQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultInt(context, NUM_PROFILE_LOCATIONS);
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_memoryStateCatalogQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     char name[PROFILE_NAME_MAX_LENGTH + 1];
 
     for (int i = 0; i < NUM_PROFILE_LOCATIONS; ++i) {
@@ -47,7 +45,6 @@ scpi_result_t scpi_cmd_memoryStateCatalogQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_memoryStateDelete(scpi_t *context) {
-    // TODO migrate to generic firmware
     int location;
     if (!get_profile_location_param(context, location)) {
         return SCPI_RES_ERR;
@@ -62,7 +59,6 @@ scpi_result_t scpi_cmd_memoryStateDelete(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_memoryStateDeleteAll(scpi_t *context) {
-    // TODO migrate to generic firmware
     if (!profile::deleteAll()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
@@ -72,7 +68,6 @@ scpi_result_t scpi_cmd_memoryStateDeleteAll(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_memoryStateName(scpi_t *context) {
-    // TODO migrate to generic firmware
     int location;
     if (!get_profile_location_param(context, location)) {
         return SCPI_RES_ERR;
@@ -103,7 +98,6 @@ scpi_result_t scpi_cmd_memoryStateName(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_memoryStateNameQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int location;
     if (!get_profile_location_param(context, location, true)) {
         return SCPI_RES_ERR;
@@ -118,7 +112,6 @@ scpi_result_t scpi_cmd_memoryStateNameQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_memoryStateRecallAuto(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -130,14 +123,12 @@ scpi_result_t scpi_cmd_memoryStateRecallAuto(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_memoryStateRecallAutoQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultBool(context, persist_conf::isProfileAutoRecallEnabled());
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_memoryStateRecallSelect(scpi_t *context) {
-    // TODO migrate to generic firmware
     int location;
     if (!get_profile_location_param(context, location, true)) {
         return SCPI_RES_ERR;
@@ -154,14 +145,12 @@ scpi_result_t scpi_cmd_memoryStateRecallSelect(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_memoryStateRecallSelectQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     SCPI_ResultInt(context, persist_conf::getProfileAutoRecallLocation());
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_memoryStateValidQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int location;
     if (!get_profile_location_param(context, location, true)) {
         return SCPI_RES_ERR;

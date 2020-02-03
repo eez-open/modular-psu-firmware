@@ -564,8 +564,6 @@ bool checkPassword(scpi_t *context, const char *againstPassword) {
     return true;
 }
 
-#if OPTION_SD_CARD
-
 void cleanupPath(char *filePath) {
     replaceCharacter(filePath, '\\', '/');
 
@@ -661,8 +659,6 @@ bool getFilePath(scpi_t *context, char *filePath, bool mandatory) {
 
     return true;
 }
-
-#endif // OPTION_SD_CARD
 
 } // namespace scpi
 } // namespace psu

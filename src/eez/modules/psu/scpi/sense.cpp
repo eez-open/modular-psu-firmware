@@ -29,7 +29,6 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_senseCurrentDcRangeUpper(scpi_t *context) {
-    // TODO migrate to generic firmware
     CurrentRangeSelectionMode mode;
 
     scpi_number_t param;
@@ -85,7 +84,6 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpper(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_senseCurrentDcRangeUpperQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -115,7 +113,6 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpperQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_senseCurrentDcRangeAuto(scpi_t *context) {
-    // TODO migrate to generic firmware
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {
         return SCPI_RES_ERR;
@@ -142,7 +139,6 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeAuto(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_senseCurrentDcRangeAutoQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;

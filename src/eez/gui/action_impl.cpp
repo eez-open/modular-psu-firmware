@@ -55,9 +55,7 @@
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/touch_calibration.h>
 #include <eez/modules/psu/gui/file_manager.h>
-#if OPTION_SD_CARD
 #include <eez/modules/psu/sd_card.h>
-#endif
 
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
@@ -1014,10 +1012,8 @@ void action_user_switch_clicked() {
         break;
 
     case persist_conf::USER_SWITCH_ACTION_SCREENSHOT:
-#if OPTION_SD_CARD
         using namespace scpi;
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_SCREENSHOT, 0), osWaitForever);
-#endif
         break;
 
     case persist_conf::USER_SWITCH_ACTION_MANUAL_TRIGGER:
@@ -1121,9 +1117,7 @@ void action_drag_overlay() {
 }
 
 void action_show_dlog_params() {
-#if OPTION_SD_CARD
     pushPage(PAGE_ID_DLOG_PARAMS);
-#endif
 }
 
 void action_dlog_voltage_toggle() {
@@ -1151,9 +1145,7 @@ void action_dlog_edit_file_name() {
 }
 
 void action_dlog_toggle() {
-#if OPTION_SD_CARD
     dlog_record::toggle();
-#endif
 }
 
 void action_show_dlog_view() {
@@ -1165,7 +1157,6 @@ void action_show_dlog_view() {
 }
 
 void action_dlog_start_recording() {
-#if OPTION_SD_CARD
     popPage();
 
     char filePath[MAX_PATH_LENGTH + 1];
@@ -1186,7 +1177,6 @@ void action_dlog_start_recording() {
     strcpy(dlog_record::g_parameters.filePath, filePath);
 
     dlog_record::toggle();
-#endif
 }
 
 void action_dlog_view_show_overlay_options() {
@@ -1225,45 +1215,31 @@ void action_dlog_upload() {
 }
 
 void action_show_file_manager() {
-#if OPTION_SD_CARD
     file_manager::openFileManager();
-#endif
 }
 
 void action_file_manager_go_to_parent_directory() {
-#if OPTION_SD_CARD
     file_manager::goToParentDirectory();
-#endif
 }
 
 void action_file_manager_select_file() {
-#if OPTION_SD_CARD
     file_manager::selectFile(getFoundWidgetAtDown().cursor.i);
-#endif
 }
 
 void action_file_manager_open_file() {
-#if OPTION_SD_CARD
     file_manager::openFile();
-#endif
 }
 
 void action_file_manager_upload_file() {
-#if OPTION_SD_CARD
     file_manager::uploadFile();
-#endif
 }
 
 void action_file_manager_rename_file() {
-#if OPTION_SD_CARD
     file_manager::renameFile();
-#endif
 }
 
 void action_file_manager_delete_file() {
-#if OPTION_SD_CARD
     file_manager::deleteFile();
-#endif
 }
 
 void onSetFileManagerSortBy(uint16_t value) {
@@ -1272,9 +1248,7 @@ void onSetFileManagerSortBy(uint16_t value) {
 }
 
 void action_file_manager_sort_by() {
-#if OPTION_SD_CARD
     pushSelectFromEnumPage(g_fileManagerSortByEnumDefinition, file_manager::getSortFilesOption(), NULL, onSetFileManagerSortBy, true);
-#endif
 }
 
 void action_show_debug_trace_log() {
@@ -1287,39 +1261,27 @@ void action_show_sys_settings_mqtt() {
 }
 
 void action_mqtt_toggle() {
-#if OPTION_ETHERNET
     ((SysSettingsMqttPage *)getActivePage())->toggle();
-#endif
 }
 
 void action_mqtt_edit_host() {
-#if OPTION_ETHERNET
     editValue(DATA_ID_MQTT_HOST);
-#endif
 }
 
 void action_mqtt_edit_port() {
-#if OPTION_ETHERNET
     editValue(DATA_ID_MQTT_PORT);
-#endif
 }
 
 void action_mqtt_edit_username() {
-#if OPTION_ETHERNET
     editValue(DATA_ID_MQTT_USERNAME);
-#endif
 }
 
 void action_mqtt_edit_password() {
-#if OPTION_ETHERNET
     editValue(DATA_ID_MQTT_PASSWORD);
-#endif
 }
 
 void action_mqtt_edit_period() {
-#if OPTION_ETHERNET
     editValue(DATA_ID_MQTT_PERIOD);
-#endif
 }
 
 void action_debug_trace_log_toggle() {

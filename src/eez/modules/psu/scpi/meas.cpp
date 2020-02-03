@@ -29,7 +29,6 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_measureScalarCurrentDcQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -43,7 +42,6 @@ scpi_result_t scpi_cmd_measureScalarCurrentDcQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_measureScalarPowerDcQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -57,7 +55,6 @@ scpi_result_t scpi_cmd_measureScalarPowerDcQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     Channel *channel = param_channel(context);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -71,7 +68,6 @@ scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_measureScalarTemperatureThermistorDcQ(scpi_t *context) {
-    // TODO migrate to generic firmware
     int32_t sensor;
     if (!param_temp_sensor(context, sensor)) {
         return SCPI_RES_ERR;
