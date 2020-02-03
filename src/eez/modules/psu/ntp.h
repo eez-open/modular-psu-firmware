@@ -28,7 +28,7 @@ void testNtpServer(const char *ntpServer);
 // returns true if test is done and sets result to true if successfull
 bool isTestNtpServerDone(bool &testResult);
 
-void stateTransition(int transition);
+void stateTransition(int event);
 
 }
 } // namespace eez::psu::ntp

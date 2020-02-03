@@ -44,15 +44,15 @@ namespace dlog_record {
 
 #define CHUNK_SIZE 4096
 
-enum StateTransition {
-    TRANSITION_INITIATE,
-    TRANSITION_INITIATE_TRACE,
-    TRANSITION_START,
-    TRANSITION_TRIGGER,
-    TRANSITION_TOGGLE,
-    TRANSITION_FINISH,
-    TRANSITION_ABORT,
-    TRANSITION_RESET
+enum Event {
+    EVENT_INITIATE,
+    EVENT_INITIATE_TRACE,
+    EVENT_START,
+    EVENT_TRIGGER,
+    EVENT_TOGGLE,
+    EVENT_FINISH,
+    EVENT_ABORT,
+    EVENT_RESET
 };
 
 dlog_view::Parameters g_parameters = {
@@ -497,7 +497,7 @@ static void log(uint32_t tickCount) {
         ++g_recording.size;
 
         if (g_nextTime > g_recording.parameters.time) {
-            stateTransition(TRANSITION_FINISH);
+            stateTransition(EVENT_FINISH);
         } else {
             int32_t diff = tickCount - g_lastSyncTickCount;
             if (diff > CONF_DLOG_SYNC_FILE_TIME * 1000000L) {
@@ -638,59 +638,42 @@ int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePa
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void stateTransition(int transition, int* perr) {
+void stateTransition(int event, int* perr) {
     if (osThreadGetId() != g_scpiTaskHandle) {
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DLOG_STATE_TRANSITION, transition), osWaitForever);
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DLOG_STATE_TRANSITION, event), osWaitForever);
         return;
     }
 
-    int err = SCPI_RES_OK;
+    int err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
 
-    if (transition == TRANSITION_INITIATE || transition == TRANSITION_INITIATE_TRACE) {
-        if (g_state == STATE_IDLE) {
-            err = doInitiate(transition == TRANSITION_INITIATE_TRACE);
-        } else {
-            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
-        }
-    } else if (transition == TRANSITION_START) {
-        if (g_state == STATE_IDLE || g_state == STATE_INITIATED) {
+    if (g_state == STATE_IDLE) {
+        if (event == EVENT_INITIATE || event == EVENT_INITIATE_TRACE) {
+            err = doInitiate(event == EVENT_INITIATE_TRACE);
+        } else if (event == EVENT_START) {
             err = doStartImmediately();
-        } else {
-            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
-        }
-    } else if (transition == TRANSITION_TRIGGER) {
-        if (g_state == STATE_INITIATED) {
-            err = doStartImmediately();
-        } else {
-            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
-        }
-    } else if (transition == TRANSITION_TOGGLE) {
-        if (g_state == STATE_IDLE) {
-            err = doInitiate(transition == TRANSITION_INITIATE_TRACE);
-        } else if (g_state == STATE_INITIATED) {
-            err = doStartImmediately();
-        } else if (g_state == STATE_EXECUTING) {
-            doFinish();
-        } else {
-            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
-        }
-    } else if (transition == TRANSITION_FINISH) {
-        if (g_state == STATE_EXECUTING) {
-            doFinish();
-        } else {
-            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
-        }
-    } else if (transition == TRANSITION_ABORT || transition == TRANSITION_RESET) {
-        if (g_state == STATE_IDLE) {
+        } else if (event == EVENT_TOGGLE) {
+            err = doInitiate(false);
+        } else if (event == EVENT_ABORT || event == EVENT_RESET) {
             resetParameters();
-        } else if (g_state == STATE_INITIATED || g_state == STATE_EXECUTING) {
+            err = SCPI_RES_OK;
+        }
+    } else if (g_state == STATE_INITIATED) {
+        if (event == EVENT_START || event == EVENT_TRIGGER || event == EVENT_TOGGLE) {
+            err = doStartImmediately();
+        } else if (event == EVENT_ABORT || event == EVENT_RESET) {
             resetParameters();
             setState(STATE_IDLE);
-        } else {
-            err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
+            err = SCPI_RES_OK;
         }
-    } else {
-        err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
+    } else if (g_state == STATE_EXECUTING) {
+        if (event == EVENT_TOGGLE || event == EVENT_FINISH) {
+            doFinish();
+            err = SCPI_RES_OK;
+        } else if (event == EVENT_ABORT || event == EVENT_RESET) {
+            resetParameters();
+            setState(STATE_IDLE);
+            err = SCPI_RES_OK;
+        }
     }
 
     if (perr) {
@@ -706,36 +689,36 @@ void stateTransition(int transition, int* perr) {
 
 int initiate() {
     int err;
-    stateTransition(TRANSITION_INITIATE, &err);
+    stateTransition(EVENT_INITIATE, &err);
     return err;
 }
 
 int initiateTrace() {
     int err;
-    stateTransition(TRANSITION_INITIATE_TRACE, &err);
+    stateTransition(EVENT_INITIATE_TRACE, &err);
     return err;
 }
 
 int startImmediately() {
     int err;
-    stateTransition(TRANSITION_START, &err);
+    stateTransition(EVENT_START, &err);
     return err;
 }
 
 void triggerGenerated() {
-    stateTransition(TRANSITION_TRIGGER);
+    stateTransition(EVENT_TRIGGER);
 }
 
 void toggle() {
-    stateTransition(TRANSITION_TOGGLE);
+    stateTransition(EVENT_TOGGLE);
 }
 
 void abort() {
-    stateTransition(TRANSITION_ABORT);
+    stateTransition(EVENT_ABORT);
 }
 
 void reset() {
-    stateTransition(TRANSITION_RESET);
+    stateTransition(EVENT_RESET);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -65,7 +65,7 @@ void tick(uint32_t tick_usec);
 void log(float *values);
 
 void fileWrite();
-void stateTransition(int action, int *perr = nullptr);
+void stateTransition(int event, int *perr = nullptr);
 
 const char *getLatestFilePath();
 

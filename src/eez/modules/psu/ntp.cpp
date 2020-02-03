@@ -60,14 +60,14 @@ enum State {
 	STATE_WAIT_TEST
 };
 
-enum Transition {
-	TRANSITION_READY,
-	TRANSITION_NOT_READY,
-	TRANSITION_SUCCEEDED,
-	TRANSITION_TEST_NTP_SERVER,
-	TRANSITION_TIMEOUT1,
-	TRANSITION_TIMEOUT2,
-	TRANSITION_RESET
+enum Event {
+	EVENT_READY,
+	EVENT_NOT_READY,
+	EVENT_SUCCEEDED,
+	EVENT_TEST_NTP_SERVER,
+	EVENT_TIMEOUT1,
+	EVENT_TIMEOUT2,
+	EVENT_RESET
 };
 
 static State g_state;
@@ -82,7 +82,7 @@ static int g_ntpServerTestResult;
 
 extern "C" void sntpSetSystemTimeUs(uint32_t utc, uint32_t us) {
 	g_utc = utc;
-	mcu::ethernet::ntpStateTransition(TRANSITION_SUCCEEDED);
+	mcu::ethernet::ntpStateTransition(EVENT_SUCCEEDED);
 }
 
 static bool isReady() {
@@ -129,29 +129,29 @@ static void startAndWait() {
 	setState(STATE_WAIT);
 }
 
+static void startAndWaitTest() {
+	start();
+	setTimeout(g_timeout1, CONF_TEST_NTP_SERVER_TIMEOUT);
+	setState(STATE_WAIT_TEST);			
+}
+
 static void stop() {
 	sntp_stop();
 }
 
 #endif
 
-void stateTransition(int transition) {
+void stateTransition(int event) {
 #ifdef EEZ_PLATFORM_STM32
-	if (transition == TRANSITION_READY) {
-		if (g_state == STATE_NOT_READY) {
+	if (g_state == STATE_NOT_READY) {
+		if (event == EVENT_READY) {
 			startAndWait();
 		}
-	} else if (transition == TRANSITION_NOT_READY) {
-		if (g_state == STATE_WAIT) {
+	} else if (g_state == STATE_WAIT) {
+		if (event == EVENT_NOT_READY) {
 			stop();
-		} else if (g_state == STATE_WAIT_TEST) {
-			stop();
-			g_ntpServerToTest = nullptr;
-			g_ntpServerTestResult = 0;
-		}
-		setState(STATE_NOT_READY);
-	} else if (transition == TRANSITION_SUCCEEDED) {
-		if (g_state == STATE_WAIT) {
+			setState(STATE_NOT_READY);
+		} else if (event == EVENT_SUCCEEDED) {
 			stop();
 
 			uint32_t local = datetime::utcToLocal(g_utc, persist_conf::devConf.time_zone, (datetime::DstRule)persist_conf::devConf.dstRule);
@@ -161,45 +161,55 @@ void stateTransition(int transition) {
 
 			setTimeout(g_timeout1, CONF_TIMEOUT_AFTER_SUCCESS_MS);
 			setState(STATE_SUCCESS);
-		} else if (g_state == STATE_WAIT_TEST) {
+		} else if (event == EVENT_TEST_NTP_SERVER) {
 			stop();
-
-			g_ntpServerToTest = nullptr;
-			g_ntpServerTestResult = 1;
-
-			startAndWait();
-		}
-	} else if (transition == TRANSITION_TEST_NTP_SERVER) {
-		if (g_state == STATE_WAIT || g_state == STATE_SUCCESS || g_state == STATE_ERROR || g_state == STATE_WAIT_TEST) {
-			if (g_state == STATE_WAIT || g_state == STATE_WAIT_TEST) {
-				stop();
-			}
-			start();
-			setTimeout(g_timeout1, CONF_TEST_NTP_SERVER_TIMEOUT);
-			setState(STATE_WAIT_TEST);
-		}
-	} else if (transition == TRANSITION_TIMEOUT1) {
-		if (g_state == STATE_WAIT) {
+			startAndWaitTest();
+		} else if (event == EVENT_TIMEOUT1) {
 			stop();
 			start();
 			setTimeout(g_timeout1, CONF_TEST_NTP_SERVER_TIMEOUT);
-		} else if (g_state == STATE_WAIT_TEST) {
-			g_ntpServerToTest = nullptr;
-			g_ntpServerTestResult = 0;
-			startAndWait();
-		}
-	} else if (transition == TRANSITION_TIMEOUT2) {
-		if (g_state == STATE_WAIT) {
+		} else if (event == EVENT_TIMEOUT2) {
 			stop();
 			event_queue::pushEvent(event_queue::EVENT_WARNING_NTP_REFRESH_FAILED);
 			setTimeout(g_timeout1, CONF_TIMEOUT_AFTER_ERROR_MS);
 			setState(STATE_ERROR);
+		} else if (event == EVENT_RESET) {
+			stop();
+			startAndWait();
 		}
-	} else if (transition == TRANSITION_RESET) {
-		if (g_state == STATE_WAIT || g_state == STATE_SUCCESS || g_state == STATE_ERROR) {
-			if (g_state == STATE_WAIT) {
-				stop();
-			}
+	} else if (g_state == STATE_SUCCESS) {
+		if (event == EVENT_TEST_NTP_SERVER) {
+			startAndWaitTest();
+		} else if (event == EVENT_TIMEOUT1) {
+			startAndWait();
+		} else if (event == EVENT_RESET) {
+			startAndWait();
+		}
+	} else if (g_state == STATE_ERROR) {
+		if (event == EVENT_TEST_NTP_SERVER) {
+			startAndWaitTest();
+		} else if (event == EVENT_TIMEOUT1) {
+			startAndWait();
+		} else if (event == EVENT_RESET) {
+			startAndWait();
+		}
+	} else if (g_state == STATE_WAIT_TEST) {
+		if (event == EVENT_NOT_READY) {
+			stop();
+			g_ntpServerToTest = nullptr;
+			g_ntpServerTestResult = 0;
+			setState(STATE_NOT_READY);
+		} else if (event == EVENT_SUCCEEDED) {
+			stop();
+			g_ntpServerToTest = nullptr;
+			g_ntpServerTestResult = 1;
+			startAndWait();
+		} else if (event == EVENT_TEST_NTP_SERVER) {
+			stop();
+			startAndWaitTest();
+		} else if (event == EVENT_TIMEOUT1) {
+			g_ntpServerToTest = nullptr;
+			g_ntpServerTestResult = 0;
 			startAndWait();
 		}
 	}
@@ -210,29 +220,29 @@ void tick() {
 #ifdef EEZ_PLATFORM_STM32
 	if (g_state == STATE_NOT_READY) {
 		if (isReady()) {
-			stateTransition(TRANSITION_READY);
+			stateTransition(EVENT_READY);
 		}
 	} else {
 		if (!isReady()) {
-			stateTransition(TRANSITION_NOT_READY);
+			stateTransition(EVENT_NOT_READY);
 		}
 	}
 
 	if (g_timeout1 && millis() >= g_timeout1) {
 		g_timeout1 = 0;
-		stateTransition(TRANSITION_TIMEOUT1);
+		stateTransition(EVENT_TIMEOUT1);
 	}
 
 	if (g_timeout2 && millis() >= g_timeout2) {
 		g_timeout2 = 0;
-		stateTransition(TRANSITION_TIMEOUT2);
+		stateTransition(EVENT_TIMEOUT2);
 	}
 #endif
 }
 
 void reset() {
 #ifdef EEZ_PLATFORM_STM32
-	mcu::ethernet::ntpStateTransition(TRANSITION_RESET);
+	mcu::ethernet::ntpStateTransition(EVENT_RESET);
 #endif
 }
 
@@ -240,7 +250,7 @@ void testNtpServer(const char *ntpServer) {
 #ifdef EEZ_PLATFORM_STM32
     g_ntpServerToTest = ntpServer;
 	g_ntpServerTestResult = 2;
-	mcu::ethernet::ntpStateTransition(TRANSITION_TEST_NTP_SERVER);
+	mcu::ethernet::ntpStateTransition(EVENT_TEST_NTP_SERVER);
 #endif
 }
 
