@@ -549,13 +549,15 @@ void setState(ConnectionState connectionState) {
     g_connectionStateChangedTickCount = millis();
 }
 
-void tick(uint32_t tickCount) {
+void tick() {
+    uint32_t tickCount = millis();
+
     if (ethernet::g_testResult != TEST_OK) {
         // pass
     }
 
     else if (g_connectionState == CONNECTION_STATE_CONNECTED && !g_publishing) {
-        uint32_t period = (uint32_t)roundf(persist_conf::devConf.mqttPeriod * 1000000);
+        uint32_t period = (uint32_t)roundf(persist_conf::devConf.mqttPeriod * 1000);
 
         // publish power state
         int powState = isPowerUp() ? 1 : 0;
@@ -833,7 +835,7 @@ void tick(uint32_t tickCount) {
 
     else if (g_connectionState == CONNECTION_STATE_ERROR) {
         if (persist_conf::devConf.mqttEnabled) {
-            if (millis() - g_connectionStateChangedTickCount > RECONNECT_AFTER_ERROR_MS) {
+            if (tickCount - g_connectionStateChangedTickCount > RECONNECT_AFTER_ERROR_MS) {
                 setState(CONNECTION_STATE_CONNECT);
             }
         }
@@ -858,7 +860,7 @@ void tick(uint32_t tickCount) {
             DebugTrace("mqtt connect error: %d\n", (int)result);
         }
     } else if (g_connectionState == CONNECTION_STATE_DNS_IN_PROGRESS) {
-        if (millis() - g_dnsStartedTick > CONF_DNS_TIMEOUT_MS) {
+        if (tickCount - g_dnsStartedTick > CONF_DNS_TIMEOUT_MS) {
             reconnect();
         }
     }

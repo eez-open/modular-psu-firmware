@@ -199,9 +199,6 @@ void boot() {
 
 #if OPTION_ETHERNET
     psu::ethernet::init();
-    psu::ntp::init();
-#else
-    // DebugTrace("Ethernet initialization skipped!");
 #endif
 
 #if OPTION_FAN

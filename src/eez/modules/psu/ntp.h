@@ -19,10 +19,8 @@
 #pragma once
 
 namespace eez {
-namespace psu {
 namespace ntp {
 
-void init();
 void tick();
 void reset();
 
@@ -30,7 +28,8 @@ void testNtpServer(const char *ntpServer);
 // returns true if test is done and sets result to true if successfull
 bool isTestNtpServerDone(bool &testResult);
 
-}
+void stateTransition(int transition);
+
 }
 } // namespace eez::psu::ntp
 

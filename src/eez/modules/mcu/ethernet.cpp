@@ -68,6 +68,7 @@ extern ip4_addr_t gw;
 #include <eez/modules/psu/persist_conf.h>
 
 #include <eez/mqtt.h>
+#include <eez/modules/psu/ntp.h>
 
 using namespace eez::psu::ethernet;
 using namespace eez::scpi;
@@ -107,7 +108,8 @@ enum {
 	QUEUE_MESSAGE_CREATE_TCP_SERVER,
 	QUEUE_MESSAGE_ACCEPT_CLIENT,
 	QUEUE_MESSAGE_CLIENT_MESSAGE,
-    QUEUE_MESSAGE_PUSH_EVENT
+    QUEUE_MESSAGE_PUSH_EVENT,
+    QUEUE_MESSAGE_NTP_STATE_TRANSITION
 };
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -615,19 +617,22 @@ void mainLoop(const void *) {
             uint8_t eventType = event.value.v & 0xFF;
             if (eventType == QUEUE_MESSAGE_PUSH_EVENT) {
                 mqtt::pushEvent((int16_t)(event.value.v >> 8));
+            } else if (eventType == QUEUE_MESSAGE_NTP_STATE_TRANSITION) {
+                ntp::stateTransition(event.value.v >> 8);
             } else {
                 onEvent(eventType);
             }
         } else {
             onIdle();
-            mqtt::tick(micros());
+            mqtt::tick();
+            ntp::tick();
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void begin(const uint8_t *mac, const uint8_t *, const uint8_t *, const uint8_t *, const uint8_t *) {
+void begin() {
 #if defined(EEZ_PLATFORM_STM32)
 	g_connectionState = CONNECTION_STATE_CONNECTING;
 #endif
@@ -756,6 +761,12 @@ int writeBuffer(const char *buffer, uint32_t length) {
 void pushEvent(int16_t eventId) {
     if (!g_shutdownInProgress) {
         osMessagePut(g_ethernetMessageQueueId, ((uint32_t)(uint16_t)eventId << 8) | QUEUE_MESSAGE_PUSH_EVENT, 0);
+    }
+}
+
+void ntpStateTransition(int transition) {
+    if (!g_shutdownInProgress) {
+        osMessagePut(g_ethernetMessageQueueId, (transition << 8) | QUEUE_MESSAGE_NTP_STATE_TRANSITION, 0);
     }
 }
 

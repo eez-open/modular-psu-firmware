@@ -48,7 +48,7 @@ struct IPAddress {
     };
 };
 
-void begin(const uint8_t *mac, const uint8_t *ipAddress = 0, const uint8_t *dns = 0, const uint8_t *gateway = 0, const uint8_t *subnetMask = 0);
+void begin();
 
 IPAddress localIP();
 IPAddress subnetMask();
@@ -63,6 +63,8 @@ void releaseInputBuffer();
 int writeBuffer(const char *buffer, uint32_t length);
 
 void pushEvent(int16_t eventId);
+
+void ntpStateTransition(int transition);
 
 }
 }

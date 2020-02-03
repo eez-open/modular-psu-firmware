@@ -120,31 +120,14 @@ scpi_t g_scpiContext;
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
-    scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer,
-        SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
+    scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer, SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
 
     if (!persist_conf::isEthernetEnabled()) {
         g_testResult = TEST_SKIPPED;
         return;
     }
 
-    if (persist_conf::isEthernetDhcpEnabled()) {
-        eez::mcu::ethernet::begin(persist_conf::devConf.ethernetMacAddress);
-    } else {
-        uint8_t ipAddress[4];
-        ipAddressToArray(persist_conf::devConf.ethernetIpAddress, ipAddress);
-
-        uint8_t dns[4];
-        ipAddressToArray(persist_conf::devConf.ethernetIpAddress, ipAddress);
-
-        uint8_t gateway[4];
-        ipAddressToArray(persist_conf::devConf.ethernetIpAddress, ipAddress);
-
-        uint8_t subnetMask[4];
-        ipAddressToArray(persist_conf::devConf.ethernetIpAddress, ipAddress);
-
-        eez::mcu::ethernet::begin(persist_conf::devConf.ethernetMacAddress, ipAddress, dns, gateway, subnetMask);
-    }
+    eez::mcu::ethernet::begin();
 
     g_testResult = TEST_CONNECTING;
 }

@@ -33,7 +33,6 @@
 
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
-#include <eez/modules/psu/ntp.h>
 #endif
 
 #include <eez/modules/psu/event_queue.h>
@@ -233,10 +232,6 @@ void oneIter() {
             g_timer1LastTickCount = tickCount;
 
     		profile::tick();
-
-#if OPTION_ETHERNET
-    		ntp::tick();
-#endif
 
             ontime::g_mcuCounter.tick(tickCount);
             for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
