@@ -45,11 +45,16 @@ enum State {
     STATE_EXECUTING
 };
 
-State getState();
-bool isIdle();
-bool isInitiated();
-bool isExecuting();
-bool isTraceExecuting();
+extern State g_state;
+extern bool g_inStateTransition;
+extern bool g_traceInitiated;
+
+inline State getState() { return g_state; }
+inline bool isIdle() { return g_state == STATE_IDLE; }
+inline bool isInitiated() { return g_state == STATE_INITIATED; }
+inline bool isExecuting() { return g_state == STATE_EXECUTING; }
+inline bool isTraceExecuting() { return g_state == STATE_EXECUTING && g_traceInitiated; }
+inline bool isInStateTransition() { return g_inStateTransition; }
 
 int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath, bool forTraceUsage);
 

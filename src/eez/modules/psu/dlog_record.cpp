@@ -91,8 +91,9 @@ trigger::Source g_triggerSource = trigger::SOURCE_IMMEDIATE;
 
 dlog_view::Recording g_recording; 
 
-static State g_state = STATE_IDLE;
-static bool g_traceInitiated;
+State g_state = STATE_IDLE;
+bool g_inStateTransition;
+bool g_traceInitiated;
 
 static uint32_t g_lastSyncTickCount;
 static uint32_t g_lastTickCount;
@@ -568,28 +569,6 @@ static void doFinish() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-State getState() {
-    return g_state;
-}
-
-bool isIdle() {
-    return g_state == STATE_IDLE;
-}
-
-bool isInitiated() {
-    return g_state == STATE_INITIATED;
-}
-
-bool isExecuting() {
-    return g_state == STATE_EXECUTING;
-}
-
-bool isTraceExecuting() {
-    return g_state == STATE_EXECUTING && g_traceInitiated;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath, bool forTraceUsage) {
     if (forTraceUsage) {
         if (parameters.xAxis.step <= 0) {
@@ -639,6 +618,8 @@ int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePa
 ////////////////////////////////////////////////////////////////////////////////
 
 void stateTransition(int event, int* perr) {
+    g_inStateTransition = true;
+
     if (osThreadGetId() != g_scpiTaskHandle) {
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DLOG_STATE_TRANSITION, event), osWaitForever);
         return;
@@ -683,6 +664,8 @@ void stateTransition(int event, int* perr) {
             generateError(err);
         }
     }
+
+    g_inStateTransition = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -4458,7 +4458,9 @@ void data_dlog_state(data::DataOperationEnum operation, data::Cursor &cursor, da
 
 void data_dlog_toggle_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        if (dlog_record::isIdle()) {
+    	if (dlog_record::isInStateTransition()) {
+    		value = 4;
+    	} else if (dlog_record::isIdle()) {
             value = 0;
         } else if (dlog_record::isExecuting()) {
             value = 1;
