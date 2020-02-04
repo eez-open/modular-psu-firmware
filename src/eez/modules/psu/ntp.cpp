@@ -92,7 +92,7 @@ static bool isReady() {
 static void setState(State state) {
 	if (state != g_state) {
 		g_state = state;
-		DebugTrace("NTP state: %d\n", g_state);
+		//DebugTrace("NTP state: %d\n", g_state);
 	}
 }
 

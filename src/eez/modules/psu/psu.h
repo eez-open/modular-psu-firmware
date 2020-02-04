@@ -49,6 +49,8 @@ char *getConfFilePath(const char *file_name);
 
 void generateError(int16_t error);
 
+void onSdCardFileChangeHook(const char *filePath1, const char *filePath2 = nullptr);
+
 /// PSU firmware.
 namespace psu {
 

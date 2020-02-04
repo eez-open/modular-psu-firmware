@@ -191,6 +191,7 @@ void oneIter() {
                     if (written == imageDataSize) {
                     	// success!
                     	event_queue::pushEvent(event_queue::EVENT_INFO_SCREENSHOT_SAVED);
+                        onSdCardFileChangeHook(filePath);
                     } else {
                         int err;
                         sd_card::deleteFile(filePath, &err);
@@ -199,14 +200,16 @@ void oneIter() {
                 } else {
                     event_queue::pushEvent(SCPI_ERROR_FILE_NAME_NOT_FOUND);
                 }
-            } else if (type == SCPI_QUEUE_MESSAGE_FILE_MANAGER_LOAD_DIRECTORY) {
-                file_manager::loadDirectory();
-            } else if (type == SCPI_QUEUE_MESSAGE_FILE_MANAGER_UPLOAD_FILE) {
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_LOAD_DIRECTORY) {
+                file_manager::doLoadDirectory();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_UPLOAD_FILE) {
                 file_manager::uploadFile();
-            } else if (type == SCPI_QUEUE_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE) {
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_OPEN_IMAGE_FILE) {
                 file_manager::openImageFile();
-            } else if (type == SCPI_QUEUE_MESSAGE_FILE_MANAGER_DELETE_FILE) {
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_DELETE_FILE) {
                 file_manager::deleteFile();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_RENAME_FILE) {
+                file_manager::doRenameFile();
             } else if (type == SCPI_QUEUE_MESSAGE_DLOG_UPLOAD_FILE) {
                 dlog_view::uploadFile();
             } else if (type == SCPI_QUEUE_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE) {

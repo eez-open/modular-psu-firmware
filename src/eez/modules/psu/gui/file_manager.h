@@ -28,7 +28,6 @@ enum State {
     STATE_READY
 };
 
-void loadDirectory();
 SortFilesOption getSortFilesOption();
 void setSortFilesOption(SortFilesOption sortFilesOption);
 const char *getCurrentDirectory();
@@ -72,6 +71,9 @@ public:
 void browseForFile(const char *title, const char *directory, FileType fileType, void (*onFileSelected)(const char *filePath));
 
 extern const char *g_fileBrowserTitle;
+
+void doLoadDirectory();
+void doRenameFile();
 
 } // namespace file_manager
 } // namespace gui

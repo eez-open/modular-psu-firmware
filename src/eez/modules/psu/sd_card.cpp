@@ -283,7 +283,11 @@ bool match(File &file, float &result) {
 bool makeParentDir(const char *filePath) {
     char dirPath[MAX_PATH_LENGTH];
     getParentDir(filePath, dirPath);
-    return SD.mkdir(dirPath);
+    if (!SD.mkdir(dirPath)) {
+        return false;
+    }
+    onSdCardFileChangeHook(dirPath);
+    return true;
 }
 
 bool exists(const char *dirPath, int *err) {
@@ -449,7 +453,8 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
     return result;
 }
 
-File file;
+static File g_downloadFile;
+static char g_downloadFilePath[MAX_PATH_LENGTH + 1];
 
 bool download(const char *filePath, bool truncate, const void *buffer, size_t size, int *err) {
     if (!sd_card::isMounted(err)) {
@@ -457,14 +462,15 @@ bool download(const char *filePath, bool truncate, const void *buffer, size_t si
     }
 
 	if (truncate) {
-	    if (!file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
+	    if (!g_downloadFile.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
 			if (err)
 				*err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
 			return false;
 		}
+        strcpy(g_downloadFilePath, filePath);
 	}
 
-    size_t written = file.write((const uint8_t *)buffer, size);
+    size_t written = g_downloadFile.write((const uint8_t *)buffer, size);
 
     if (written != size) {
         if (err)
@@ -476,7 +482,8 @@ bool download(const char *filePath, bool truncate, const void *buffer, size_t si
 }
 
 void downloadFinished() {
-    file.close();
+    g_downloadFile.close();
+    onSdCardFileChangeHook(g_downloadFilePath);
 }
 
 bool moveFile(const char *sourcePath, const char *destinationPath, int *err) {
@@ -495,6 +502,8 @@ bool moveFile(const char *sourcePath, const char *destinationPath, int *err) {
             *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
     }
+
+    onSdCardFileChangeHook(sourcePath, destinationPath);
 
     return true;
 }
@@ -579,6 +588,8 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
         return false;
     }
 
+    onSdCardFileChangeHook(destinationPath);
+
     return true;
 }
 
@@ -599,6 +610,8 @@ bool deleteFile(const char *filePath, int *err) {
         return false;
     }
 
+    onSdCardFileChangeHook(filePath);
+
     return true;
 }
 
@@ -613,6 +626,8 @@ bool makeDir(const char *dirPath, int *err) {
         return false;
     }
 
+    onSdCardFileChangeHook(dirPath);
+
     return true;
 }
 
@@ -626,6 +641,8 @@ bool removeDir(const char *dirPath, int *err) {
             *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
     }
+
+    onSdCardFileChangeHook(dirPath);
 
     return true;
 }

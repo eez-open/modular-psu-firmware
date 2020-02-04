@@ -259,7 +259,7 @@ struct Channel : ChannelInterface {
 #if defined(EEZ_PLATFORM_STM32)
 		if (!synchronized && subchannelIndex == 0) {
 			if (masterSynchro(slotIndex, firmwareMajorVersion, firmwareMinorVersion)) {
-	    		DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)firmwareMajorVersion, (int)firmwareMinorVersion);
+	    		//DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)firmwareMajorVersion, (int)firmwareMinorVersion);
 				synchronized = true;
 				numCrcErrors = 0;
 			} else {

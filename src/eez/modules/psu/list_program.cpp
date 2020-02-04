@@ -25,6 +25,7 @@
 #include <eez/firmware.h>
 #include <eez/scpi/scpi.h>
 
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/trigger.h>
@@ -397,6 +398,8 @@ bool saveList(int iChannel, const char *filePath, int *err) {
     }
 
     file.close();
+
+    onSdCardFileChangeHook(filePath);
 
     return true;
 }

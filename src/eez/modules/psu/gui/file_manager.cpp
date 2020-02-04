@@ -37,9 +37,11 @@
 #include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/datetime.h>
+#include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
+#include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/dlog_view.h>
 
 
@@ -139,28 +141,36 @@ void sort() {
 }
 
 void loadDirectory() {
+    if (g_state == STATE_LOADING) {
+        return;
+    }
+
+    g_state = STATE_LOADING;
+    g_filesCount = 0;
+    g_selectedFileIndex = -1;
+    g_filesStartPosition = 0;
+    g_loadingStartTickCount = millis();
+
     if (osThreadGetId() != scpi::g_scpiTaskHandle) {
-        if (g_state == STATE_LOADING) {
-            return;
-        }
-        g_state = STATE_LOADING;
-        g_loadingStartTickCount = millis();
-        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FILE_MANAGER_LOAD_DIRECTORY, 0), osWaitForever);
+        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_LOAD_DIRECTORY, 0), osWaitForever);
+    } else {
+        doLoadDirectory();
+    }
+}
+
+void doLoadDirectory() {
+    if (g_state != STATE_LOADING) {
         return;
     }
 
     g_frontBufferPosition = FILE_MANAGER_MEMORY;
     g_backBufferPosition = FILE_MANAGER_MEMORY + FILE_MANAGER_MEMORY_SIZE;
 
-    g_filesCount = 0;
-    g_selectedFileIndex = -1;
-
     int numFiles;
     int err;
     psu::sd_card::catalog(g_currentDirectory, 0, catalogCallback, &numFiles, &err);
 
     sort();
-    g_filesStartPosition = 0;
 
     g_state = STATE_READY;
 }
@@ -341,6 +351,11 @@ void openFile() {
         return;
     }
 
+    if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+        return;
+    }
+
     char filePath[MAX_PATH_LENGTH + 1];
     strcpy(filePath, g_currentDirectory);
     strcat(filePath, "/");
@@ -353,7 +368,7 @@ void openFile() {
     } else if (fileItem->type == FILE_TYPE_IMAGE) {
         g_imageLoadFailed = false;
         g_openedImagePixels = nullptr;
-        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
+        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
         gui::showAsyncOperationInProgress("Loading...", checkImageLoadingStatus);
     } else if (fileItem->type == FILE_TYPE_MICROPYTHON) {
         mp::startScript(filePath);
@@ -363,10 +378,16 @@ void openFile() {
 void openImageFile() {
     auto fileItem = getFileItem(g_selectedFileIndex);
     if (fileItem) {
+        if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+            errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+            return;
+        }
+
         char filePath[MAX_PATH_LENGTH + 1];
         strcpy(filePath, g_currentDirectory);
         strcat(filePath, "/");
         strcat(filePath, fileItem->name);
+        
         g_openedImagePixels = jpegDecode(filePath);
         if (!g_openedImagePixels) {
             g_imageLoadFailed = true;
@@ -397,7 +418,7 @@ bool isUploadFileEnabled() {
 void uploadFile() {
     if (osThreadGetId() != scpi::g_scpiTaskHandle) {
         popPage();
-        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FILE_MANAGER_UPLOAD_FILE, 0), osWaitForever);
+        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_UPLOAD_FILE, 0), osWaitForever);
         return;
     }
 
@@ -424,20 +445,95 @@ void uploadFile() {
         return;
     }
 
+    if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+        return;
+    }
+
     char filePath[MAX_PATH_LENGTH + 1];
     strcpy(filePath, g_currentDirectory);
     strcat(filePath, "/");
     strcat(filePath, fileItem->name);
 
     int err;
-    psu::scpi::mmemUpload(filePath, context, &err);
+    if (!psu::scpi::mmemUpload(filePath, context, &err)) {
+        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+    }
 }
 
 bool isRenameFileEnabled() {
     return true;
 }
 
+static char g_fileNameWithoutExtension[MAX_PATH_LENGTH + 1];
+
+void onRenameFileOk(char *fileNameWithoutExtension) {
+    strcpy(g_fileNameWithoutExtension, fileNameWithoutExtension);
+
+    if (osThreadGetId() != scpi::g_scpiTaskHandle) {
+        popPage();
+        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_RENAME_FILE, 0), osWaitForever);
+    } else {
+        doRenameFile();
+    }
+}
+
+void doRenameFile() {
+    auto fileItem = getFileItem(g_selectedFileIndex);
+    if (!fileItem) {
+        return;
+    }
+
+    // source file path
+    if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+        return;
+    }
+    char srcFilePath[MAX_PATH_LENGTH + 1];
+    strcpy(srcFilePath, g_currentDirectory);
+    strcat(srcFilePath, "/");
+    strcat(srcFilePath, fileItem->name);
+
+    // destination file path
+    const char *extension = strrchr(fileItem->name, '.');
+    if (strlen(g_currentDirectory) + 1 + strlen(g_fileNameWithoutExtension) + (extension ? strlen(extension) : 0) > MAX_PATH_LENGTH) {
+        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+        return;
+    }
+    char dstFilePath[MAX_PATH_LENGTH + 1];
+    strcpy(dstFilePath, g_currentDirectory);
+    strcat(dstFilePath, "/");
+    strcat(dstFilePath, g_fileNameWithoutExtension);
+    if (extension) {
+        strcat(dstFilePath, extension);
+    }
+
+    int err;
+    if (!psu::sd_card::moveFile(srcFilePath, dstFilePath, &err)) {
+        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+    }
+}
+
 void renameFile() {
+    popPage();
+
+    auto fileItem = getFileItem(g_selectedFileIndex);
+    if (!fileItem) {
+        return;
+    }
+
+    char fileNameWithoutExtension[MAX_PATH_LENGTH + 1];
+    
+    const char *str = strrchr(fileItem->name, '.');
+    if (str) {
+        auto n = str - fileItem->name;
+        strncpy(fileNameWithoutExtension, fileItem->name, n);
+        fileNameWithoutExtension[n] = 0;
+    } else {
+        strcpy(fileNameWithoutExtension, fileItem->name);
+    }
+
+    psu::gui::Keypad::startPush(0, fileNameWithoutExtension, 1, MAX_PATH_LENGTH, false, onRenameFileOk, popPage);
 }
 
 bool isDeleteFileEnabled() {
@@ -447,12 +543,17 @@ bool isDeleteFileEnabled() {
 void deleteFile() {
     if (osThreadGetId() != scpi::g_scpiTaskHandle) {
         popPage();
-        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FILE_MANAGER_DELETE_FILE, 0), osWaitForever);
+        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_DELETE_FILE, 0), osWaitForever);
         return;
     }
 
     auto fileItem = getFileItem(g_selectedFileIndex);
     if (!fileItem) {
+        return;
+    }
+
+    if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
 
@@ -462,9 +563,9 @@ void deleteFile() {
     strcat(filePath, fileItem->name);
 
     int err;
-    psu::sd_card::deleteFile(filePath, &err);
-
-    loadDirectory();
+    if (!psu::sd_card::deleteFile(filePath, &err)) {
+        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+    }
 }
 
 void onEncoder(int counter) {
@@ -500,6 +601,11 @@ void FileBrowserPage::set() {
         return;
     }
 
+    if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+        return;
+    }
+
     char filePath[MAX_PATH_LENGTH + 1];
     strcpy(filePath, g_currentDirectory);
     strcat(filePath, "/");
@@ -522,4 +628,24 @@ void browseForFile(const char *title, const char *directory, FileType fileType, 
 
 }
 }
+
+using namespace gui::file_manager;
+
+void onSdCardFileChangeHook(const char *filePath1, const char *filePath2) {
+	if (g_fileBrowserMode) {
+		return;
+	}
+
+	char parentDirPath1[MAX_PATH_LENGTH + 1];
+    getParentDir(filePath1, parentDirPath1);
+    if (strcmp(parentDirPath1, g_currentDirectory) == 0) {
+        loadDirectory();
+        return;
+    }
+
+    if (filePath2) {
+        onSdCardFileChangeHook(filePath2);
+    }
+}
+
 } // namespace eez::gui::file_manager

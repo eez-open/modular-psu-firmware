@@ -6,11 +6,3 @@ modular-psu-firmware.eez-project-ui-state
 src/third_party/micropython/ports/bare-arm/build
 src/third_party/stm32_cubeide/Debug
 src/third_party/stm32_truestudio/Debug
-
-src/eez/gui/document_stm32.h
-src/eez/gui/document_stm32.cpp
-src/eez/scpi/commands_stm32.h
-
-src/eez/gui/document_simulator.h
-src/eez/gui/document_simulator.cpp
-src/eez/scpi/commands_simulator.h

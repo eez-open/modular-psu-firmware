@@ -654,6 +654,8 @@ bool saveToFile(const char *filePath, int *err) {
         return false;
     }
 
+    onSdCardFileChangeHook(filePath);
+
     return true;
 }
 

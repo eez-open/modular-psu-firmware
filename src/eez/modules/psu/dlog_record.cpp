@@ -24,6 +24,7 @@
 #include <eez/index.h>
 #include <eez/scpi/scpi.h>
 
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/scpi/psu.h>
@@ -563,6 +564,7 @@ static void resetParameters() {
 static void doFinish() {
     g_saveUpToBufferIndex = g_bufferIndex;
     flushData();
+    onSdCardFileChangeHook(g_parameters.filePath);
     resetParameters();
     setState(STATE_IDLE);
 }
@@ -651,6 +653,7 @@ void stateTransition(int event, int* perr) {
             doFinish();
             err = SCPI_RES_OK;
         } else if (event == EVENT_ABORT || event == EVENT_RESET) {
+            onSdCardFileChangeHook(g_parameters.filePath);
             resetParameters();
             setState(STATE_IDLE);
             err = SCPI_RES_OK;

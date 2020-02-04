@@ -15,12 +15,6 @@ _For existing Programmable Power supply (EEZ H24005) firmware visit [psu-firmwar
 
 ## Build
 
-### Prerequisites
-
-- Open `/path/to/modular-psu-firmware/modular-psu-firmware.eez-project` in latest [Studio](https://github.com/eez-open/studio/releases/tag/nightly-build) and build it.
-
-![Build instructions](images/studio-build-instructions.png)
-
 ### Linux
 
 ```

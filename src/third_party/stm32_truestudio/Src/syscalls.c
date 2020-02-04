@@ -85,7 +85,6 @@ int _kill(int pid, int sig)
 void _exit (int status)
 {
 	_kill(status, -1);
-	NVIC_SystemReset();
 	while (1) {}		/* Make sure we hang here */
 }
 
@@ -117,9 +116,9 @@ caddr_t _sbrk(int incr)
 		heap_end = &end;
 
 	prev_heap_end = heap_end;
-	if (heap_end + incr > stack_ptr)
+	if (heap_end + incr > (char *)0x2007FFFF /*stack_ptr*/) /* 0x2007FFFF is end of SRAM since our stack is inside FreeRTOS heap */
 	{
-//		write(1, "Heap and stack collision\n", 25);
+		_write(1, "Heap and stack collision\n", 25);
 //		abort();
 		errno = ENOMEM;
 		return (caddr_t) -1;
