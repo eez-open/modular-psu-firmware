@@ -86,6 +86,7 @@ set(header_files)
 set(src_eez
     src/eez/firmware.cpp
     src/eez/debug.cpp
+    src/eez/file_type.cpp
     src/eez/index.cpp
     src/eez/main.cpp
     src/eez/memory.cpp

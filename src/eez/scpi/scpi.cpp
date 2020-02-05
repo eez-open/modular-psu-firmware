@@ -30,29 +30,27 @@
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/serial_psu.h>
-
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
 #endif
-
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/profile.h>
-
 #include <eez/modules/psu/sd_card.h>
-#include <eez/libs/sd_fat/sd_fat.h>
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/dlog_view.h>
-#include <eez/libs/image/jpeg.h>
-
-#include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/ontime.h>
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
+#include <eez/modules/psu/gui/page_ch_settings_trigger.h>
+#include <eez/modules/psu/scpi/psu.h>
 
 #include <eez/modules/bp3c/flash_slave.h>
 
 #include <eez/modules/mcu/battery.h>
+
+#include <eez/libs/sd_fat/sd_fat.h>
+#include <eez/libs/image/jpeg.h>
 
 using namespace eez::psu;
 using namespace eez::psu::scpi;
@@ -217,6 +215,10 @@ void oneIter() {
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_RECALL_PROFILE) {
                 int err;
                 profile::recall(param, &err);
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_LOAD_LIST) {
+                psu::gui::ChSettingsListsPage::doLoadList();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST) {
+                psu::gui::ChSettingsListsPage::doSaveList();
             }
         }
     } else {

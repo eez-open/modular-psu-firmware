@@ -77,6 +77,7 @@ bool g_imageLoadFailed;
 uint8_t *g_openedImagePixels;
 
 bool g_fileBrowserMode;
+DialogType g_dialogType;
 const char *g_fileBrowserTitle;
 FileType g_fileBrowserFileType;
 static void (*g_fileBrowserOnFileSelected)(const char *filePath);
@@ -614,8 +615,9 @@ void FileBrowserPage::set() {
     g_fileBrowserOnFileSelected(filePath);
 }
 
-void browseForFile(const char *title, const char *directory, FileType fileType, void(*onFileSelected)(const char *filePath)) {
+void browseForFile(const char *title, const char *directory, FileType fileType, DialogType dialogType, void(*onFileSelected)(const char *filePath)) {
     g_fileBrowserMode = true;
+    g_dialogType = dialogType;
     g_fileBrowserTitle = title;
     g_fileBrowserFileType = fileType;
     g_fileBrowserOnFileSelected = onFileSelected;
@@ -624,6 +626,39 @@ void browseForFile(const char *title, const char *directory, FileType fileType, 
     loadDirectory();
 
     pushPage(PAGE_ID_FILE_BROWSER);
+}
+
+bool isSaveDialog() {
+    return g_fileBrowserMode && g_dialogType == DIALOG_TYPE_SAVE;
+}
+
+void onNewFileOk(char *fileNameWithoutExtension) {
+    popPage();
+
+    const char *extension = getExtensionFromFileType(g_fileBrowserFileType);
+    if (endsWithNoCase(fileNameWithoutExtension, extension)) {
+        extension = "";
+    }
+
+    if (strlen(g_currentDirectory) + 1 + strlen(fileNameWithoutExtension) + strlen(extension) > MAX_PATH_LENGTH) {
+        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+        return;
+    }
+
+    char filePath[MAX_PATH_LENGTH + 1];
+    strcpy(filePath, g_currentDirectory);
+    strcat(filePath, "/");
+    strcat(filePath, fileNameWithoutExtension);
+    strcat(filePath, extension);
+
+    g_fileBrowserOnFileSelected(filePath);
+}
+
+void newFile() {
+    if (isSaveDialog()) {
+        popPage();
+        psu::gui::Keypad::startPush(0, 0, 1, MAX_PATH_LENGTH, false, onNewFileOk, popPage);
+    }
 }
 
 }

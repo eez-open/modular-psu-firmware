@@ -68,9 +68,17 @@ public:
     void set();
 };
 
-void browseForFile(const char *title, const char *directory, FileType fileType, void (*onFileSelected)(const char *filePath));
+enum DialogType {
+    DIALOG_TYPE_OPEN,
+    DIALOG_TYPE_SAVE
+};
+
+void browseForFile(const char *title, const char *directory, FileType fileType, DialogType dialogType, void (*onFileSelected)(const char *filePath));
 
 extern const char *g_fileBrowserTitle;
+
+bool isSaveDialog();
+void newFile();
 
 void doLoadDirectory();
 void doRenameFile();

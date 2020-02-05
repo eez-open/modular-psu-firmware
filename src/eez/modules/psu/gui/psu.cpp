@@ -1671,6 +1671,14 @@ uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const St
     return style->active_color;
 }
 
+void onGuiQueueMessageHook(uint8_t type, int16_t param) {
+    if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_LOAD_LIST_FINISHED) {
+        g_ChSettingsListsPage.onLoadListFinished(param);
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST_FINISHED) {
+        g_ChSettingsListsPage.onSaveListFinished(param);
+    }
+}
+
 }
 
 } // namespace eez

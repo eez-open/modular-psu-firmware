@@ -43,11 +43,24 @@ namespace eez {
 
 namespace gui {
 
+////////////////////////////////////////////////////////////////////////////////
+
 void startThread();
+
+extern osThreadId g_guiTaskHandle;
+extern osMessageQId g_guiMessageQueueId;
+
+#define GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_LOAD_LIST_FINISHED 1
+#define GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST_FINISHED 2
+
+#define GUI_QUEUE_MESSAGE(type, param) ((((uint32_t)(uint16_t)(int16_t)param) << 8) | (type))
+#define GUI_QUEUE_MESSAGE_TYPE(message) ((message) & 0xFF)
+#define GUI_QUEUE_MESSAGE_PARAM(param) ((int16_t)(message >> 8))
+
+void onGuiQueueMessageHook(uint8_t type, int16_t param);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-extern osThreadId g_guiTaskHandle;
 extern bool g_isBlinkTime;
 
 ////////////////////////////////////////////////////////////////////////////////

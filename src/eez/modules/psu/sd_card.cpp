@@ -193,8 +193,41 @@ bool isBusy() {
     return false;
 }
 
-void dumpInfo(char *buffer) {
+////////////////////////////////////////////////////////////////////////////////
+
+BufferedFile::BufferedFile(File &file_)
+    : file(file_)
+    , position(BUFFER_SIZE)
+    , end(BUFFER_SIZE)
+{
 }
+
+void BufferedFile::readNextChunk() {
+    if (position == end && end == BUFFER_SIZE) {
+        position = 0;
+        end = file.read(buffer, BUFFER_SIZE);
+    }
+}
+
+int BufferedFile::peek() {
+    readNextChunk();
+    return position < end ? buffer[position] : -1;
+}
+
+int BufferedFile::read() {
+    readNextChunk();
+    int ch = peek();
+    if (ch != -1) {
+        position++;
+    }
+    return ch;
+}
+
+bool BufferedFile::available() {
+    return peek() != -1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef isSpace
 bool isSpace(int c) {
@@ -202,7 +235,7 @@ bool isSpace(int c) {
 }
 #endif
 
-void matchZeroOrMoreSpaces(File &file) {
+void matchZeroOrMoreSpaces(BufferedFile &file) {
     while (true) {
         int c = file.peek();
         if (!isSpace(c)) {
@@ -212,7 +245,7 @@ void matchZeroOrMoreSpaces(File &file) {
     }
 }
 
-bool match(File &file, char c) {
+bool match(BufferedFile &file, char c) {
     matchZeroOrMoreSpaces(file);
     if (file.peek() == c) {
         file.read();
@@ -221,7 +254,7 @@ bool match(File &file, char c) {
     return false;
 }
 
-bool match(File &file, float &result) {
+bool match(BufferedFile &file, float &result) {
     matchZeroOrMoreSpaces(file);
 
     int c = file.peek();
@@ -280,6 +313,8 @@ bool match(File &file, float &result) {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 bool makeParentDir(const char *filePath) {
     char dirPath[MAX_PATH_LENGTH];
     getParentDir(filePath, dirPath);
@@ -332,20 +367,8 @@ bool catalog(const char *dirPath, void *param,
             FileType type;
             if (fileInfo.isDirectory()) {
                 type = FILE_TYPE_DIRECTORY;
-            } else if (endsWithNoCase(name, LIST_EXT)) {
-                type = FILE_TYPE_LIST;
-            } else if (endsWithNoCase(name, PROFILE_EXT)) {
-                type = FILE_TYPE_PROFILE;
-            } else if (endsWithNoCase(name, ".dlog")) {
-                type = FILE_TYPE_DLOG;
-            } else if (endsWithNoCase(name, ".jpg")) {
-                type = FILE_TYPE_IMAGE;
-            } else if (endsWithNoCase(name, ".py")) {
-                type = FILE_TYPE_MICROPYTHON;
-            } else if (endsWithNoCase(name, ".hex")) {
-                type = FILE_TYPE_HEX;
             } else {
-                type = FILE_TYPE_OTHER;
+                type = getFileTypeFromExtension(name);
             }
 
             callback(param != nullptr ? param : &fileInfo, name, type, fileInfo.getSize());

@@ -5174,6 +5174,12 @@ void data_file_manager_browser_title(data::DataOperationEnum operation, data::Cu
     }
 }
 
+void data_file_manager_browser_is_save_dialog(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::isSaveDialog();
+    }
+}
+
 void data_script_is_started(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = mp::isIdle() ? 0 : 1;

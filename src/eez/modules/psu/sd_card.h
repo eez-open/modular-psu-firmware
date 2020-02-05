@@ -49,9 +49,27 @@ bool isBusy();
 
 void dumpInfo(char *buffer);
 
-void matchZeroOrMoreSpaces(File &file);
-bool match(File &file, float &result);
-bool match(File &file, char c);
+class BufferedFile {
+public:
+    BufferedFile(File &file);
+
+    int peek();
+    int read();
+    bool available();
+
+private:
+    File &file;
+    static const uint32_t BUFFER_SIZE = 512;
+    uint8_t buffer[BUFFER_SIZE];
+    uint32_t position;
+    uint32_t end;
+
+    void readNextChunk();
+};
+
+void matchZeroOrMoreSpaces(BufferedFile &file);
+bool match(BufferedFile &file, float &result);
+bool match(BufferedFile &file, char c);
 
 bool makeParentDir(const char *filePath);
 

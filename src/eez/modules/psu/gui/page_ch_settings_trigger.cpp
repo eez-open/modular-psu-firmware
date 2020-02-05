@@ -18,10 +18,9 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/modules/psu/psu.h>
-
 #include <string.h>
 
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/profile.h>
@@ -32,6 +31,10 @@
 #include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/page_ch_settings_trigger.h>
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/file_manager.h>
+
+#include <scpi/scpi.h>
+#include <eez/scpi/scpi.h>
 
 namespace eez {
 namespace psu {
@@ -543,12 +546,6 @@ void ChSettingsListsPage::showInsertMenu() {
     }
 }
 
-void ChSettingsListsPage::showDeleteMenu() {
-    if (getMaxListLength()) {
-        pushPage(PAGE_ID_CH_SETTINGS_LISTS_DELETE_MENU);
-    }
-}
-
 void ChSettingsListsPage::insertRow(int iRow, int iCopyRow) {
     if (getMaxListLength() < MAX_LIST_LENGTH) {
         for (int i = MAX_LIST_LENGTH - 2; i >= iRow; --i) {
@@ -586,6 +583,12 @@ void ChSettingsListsPage::insertRowBelow() {
     if (iRow < getMaxListLength()) {
         m_iCursor += 3;
         insertRow(getRowIndex(), iRow);
+    }
+}
+
+void ChSettingsListsPage::showDeleteMenu() {
+    if (getMaxListLength()) {
+        pushPage(PAGE_ID_CH_SETTINGS_LISTS_DELETE_MENU);
     }
 }
 
@@ -668,6 +671,99 @@ void ChSettingsListsPage::doDeleteAll() {
 
 void ChSettingsListsPage::deleteAll() {
     yesNoDialog(PAGE_ID_YES_NO, "Are you sure?", onDeleteAll, 0, 0);
+}
+
+void ChSettingsListsPage::showFileMenu() {
+    pushPage(PAGE_ID_CH_SETTINGS_LISTS_FILE_MENU);
+}
+
+void ChSettingsListsPage::onOpenListFileSelected(const char *listFilePath) {
+    auto *page = (ChSettingsListsPage *)getActivePage();
+    strcpy(page->m_listFilePath, listFilePath);
+
+    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Opening list...");
+
+    using namespace eez::scpi;
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_LOAD_LIST, 0), osWaitForever);
+}
+
+void ChSettingsListsPage::doLoadList() {
+    auto *page = (ChSettingsListsPage *)g_psuAppContext.getPage(PAGE_ID_CH_SETTINGS_LISTS);
+
+    int err;
+    list::loadList(
+        page->m_listFilePath,
+        page->m_dwellListLoad, page->m_dwellListLengthLoad,
+        page->m_voltageListLoad, page->m_voltageListLengthLoad,
+        page->m_currentListLoad, page->m_currentListLengthLoad,
+        true,
+        &err
+    );
+
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_LOAD_LIST_FINISHED, err), osWaitForever);
+}
+
+void ChSettingsListsPage::onLoadListFinished(int16_t err) {
+    eez::psu::gui::g_psuAppContext.hideProgressPage();
+
+    if (err == SCPI_RES_OK) {
+        m_dwellListLength = m_dwellListLengthLoad;
+        memcpy(m_dwellList, m_dwellListLoad, m_dwellListLength * sizeof(float));
+
+        m_voltageListLength = m_voltageListLengthLoad;
+        memcpy(m_voltageList, m_voltageListLoad, m_voltageListLength * sizeof(float));
+
+        m_currentListLength = m_currentListLengthLoad;
+        memcpy(m_currentList, m_currentListLoad, m_currentListLength * sizeof(float));
+
+        ++m_listVersion;
+
+        m_iCursor = 0;
+    } else {
+        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+    }
+}
+
+void ChSettingsListsPage::fileOpen() {
+    file_manager::browseForFile("Open list", "/Lists", FILE_TYPE_LIST, file_manager::DIALOG_TYPE_OPEN, onOpenListFileSelected);
+}
+
+void ChSettingsListsPage::onSaveListFileSelected(const char *listFilePath) {
+    auto *page = (ChSettingsListsPage *)getActivePage();
+    strcpy(page->m_listFilePath, listFilePath);
+    
+    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Saving list...");
+
+    using namespace eez::scpi;
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST, 0), osWaitForever);
+}
+
+void ChSettingsListsPage::doSaveList() {
+    auto *page = (ChSettingsListsPage *)g_psuAppContext.getPage(PAGE_ID_CH_SETTINGS_LISTS);
+
+    int err;
+    list::saveList(
+        page->m_listFilePath,
+        page->m_dwellList, page->m_dwellListLength,
+        page->m_voltageList, page->m_voltageListLength,
+        page->m_currentList, page->m_currentListLength,
+        true,
+        &err
+    );
+
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST_FINISHED, err), osWaitForever);
+}
+
+void ChSettingsListsPage::onSaveListFinished(int16_t err) {
+    eez::psu::gui::g_psuAppContext.hideProgressPage();
+
+    if (err != SCPI_RES_OK) {
+        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+    }
+}
+
+void ChSettingsListsPage::fileSave() {
+    file_manager::browseForFile("Save list as", "/Lists", FILE_TYPE_LIST, file_manager::DIALOG_TYPE_SAVE, onSaveListFileSelected);
 }
 
 } // namespace gui

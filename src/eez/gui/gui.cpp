@@ -56,9 +56,15 @@ osThreadDef(g_guiTask, mainLoop, osPriorityNormal, 0, 4096);
 
 osThreadId g_guiTaskHandle;
 
+#define GUI_QUEUE_SIZE 10
+
+osMessageQDef(g_guiMessageQueue, GUI_QUEUE_SIZE, uint32_t);
+osMessageQId g_guiMessageQueueId;
+
 void startThread() {
     decompressAssets();
     mcu::display::onThemeChanged();
+    g_guiMessageQueueId = osMessageCreate(osMessageQ(g_guiMessageQueue), NULL);
     g_guiTaskHandle = osThreadCreate(osThread(g_guiTask), nullptr);
 }
 
@@ -76,6 +82,15 @@ void mainLoop(const void *) {
 }
 
 void oneIter() {
+    osEvent event = osMessageGet(g_guiMessageQueueId, 0);
+
+    if (event.status == osEventMessage) {
+    	uint32_t message = event.value.v;
+    	uint8_t type = GUI_QUEUE_MESSAGE_TYPE(message);
+    	int16_t param = GUI_QUEUE_MESSAGE_PARAM(message);
+        onGuiQueueMessageHook(type, param);
+    }
+
     WATCHDOG_RESET();
 
     mcu::display::sync();

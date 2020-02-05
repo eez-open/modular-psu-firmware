@@ -22,6 +22,7 @@
 
 #include <scpi/scpi.h>
 
+#include <eez/system.h>
 #include <eez/firmware.h>
 #include <eez/scpi/scpi.h>
 
@@ -30,9 +31,11 @@
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/sd_card.h>
-#include <eez/libs/sd_fat/sd_fat.h>
 #include <eez/modules/psu/io_pins.h>
-#include <eez/system.h>
+
+#include <eez/modules/psu/gui/psu.h>
+
+#include <eez/libs/sd_fat/sd_fat.h>
 
 #define CONF_COUNTER_THRESHOLD_IN_SECONDS 5
 
@@ -224,9 +227,14 @@ int checkLimits(int iChannel) {
     return 0;
 }
 
-bool loadList(int iChannel, const char *filePath, int *err) {
-    Channel &channel = Channel::get(iChannel);
-
+bool loadList(
+    const char *filePath,
+    float *dwellList, uint16_t &dwellListLength,
+    float *voltageList, uint16_t &voltageListLength,
+    float *currentList, uint16_t &currentListLength,
+    bool showProgress,
+    int *err
+) {
     if (!sd_card::isMounted(err)) {
         return false;
     }
@@ -246,31 +254,38 @@ bool loadList(int iChannel, const char *filePath, int *err) {
         return false;
     }
 
-    float dwellList[MAX_LIST_LENGTH];
-    uint16_t dwellListLength = 0;
-
-    float voltageList[MAX_LIST_LENGTH];
-    uint16_t voltageListLength = 0;
-
-    float currentList[MAX_LIST_LENGTH];
-    uint16_t currentListLength = 0;
+    dwellListLength = 0;
+    voltageListLength = 0;
+    currentListLength = 0;
 
     bool success = true;
 
+#if OPTION_DISPLAY
+    size_t totalSize = file.size();
+#endif
+
+    sd_card::BufferedFile bufferedFile(file);
+
     for (int i = 0; i < MAX_LIST_LENGTH; ++i) {
-        sd_card::matchZeroOrMoreSpaces(file);
-        if (!file.available()) {
+#if OPTION_DISPLAY
+        if (showProgress) {
+            eez::psu::gui::PsuAppContext::updateProgressPage(file.tell(), totalSize);
+        }
+#endif
+
+        sd_card::matchZeroOrMoreSpaces(bufferedFile);
+        if (!bufferedFile.available()) {
             break;
         }
 
         float value;
 
-        if (sd_card::match(file, LIST_CSV_FILE_NO_VALUE_CHAR)) {
+        if (sd_card::match(bufferedFile, LIST_CSV_FILE_NO_VALUE_CHAR)) {
             if (i < dwellListLength) {
                 success = false;
                 break;
             }
-        } else if (sd_card::match(file, value)) {
+        } else if (sd_card::match(bufferedFile, value)) {
             if (i == dwellListLength) {
                 dwellList[i] = value;
                 dwellListLength = i + 1;
@@ -283,14 +298,14 @@ bool loadList(int iChannel, const char *filePath, int *err) {
             break;
         }
 
-        sd_card::match(file, CSV_SEPARATOR);
+        sd_card::match(bufferedFile, CSV_SEPARATOR);
 
-        if (sd_card::match(file, LIST_CSV_FILE_NO_VALUE_CHAR)) {
+        if (sd_card::match(bufferedFile, LIST_CSV_FILE_NO_VALUE_CHAR)) {
             if (i < voltageListLength) {
                 success = false;
                 break;
             }
-        } else if (sd_card::match(file, value)) {
+        } else if (sd_card::match(bufferedFile, value)) {
             if (i == voltageListLength) {
                 voltageList[i] = value;
                 ++voltageListLength;
@@ -303,14 +318,14 @@ bool loadList(int iChannel, const char *filePath, int *err) {
             break;
         }
 
-        sd_card::match(file, CSV_SEPARATOR);
+        sd_card::match(bufferedFile, CSV_SEPARATOR);
 
-        if (sd_card::match(file, LIST_CSV_FILE_NO_VALUE_CHAR)) {
+        if (sd_card::match(bufferedFile, LIST_CSV_FILE_NO_VALUE_CHAR)) {
             if (i < currentListLength) {
                 success = false;
                 break;
             }
-        } else if (sd_card::match(file, value)) {
+        } else if (sd_card::match(bufferedFile, value)) {
             if (i == currentListLength) {
                 currentList[i] = value;
                 ++currentListLength;
@@ -326,13 +341,11 @@ bool loadList(int iChannel, const char *filePath, int *err) {
 
     file.close();
 
-    if (success) {
-        channel_dispatcher::setDwellList(channel, dwellList, dwellListLength);
-        channel_dispatcher::setVoltageList(channel, voltageList, voltageListLength);
-        channel_dispatcher::setCurrentList(channel, currentList, currentListLength);
-    } else {
-        // TODO replace with more specific error
-        if (err) {
+    if (err) {
+        if (success) {
+            *err = SCPI_RES_OK;
+        } else {
+            // TODO replace with more specific error
             *err = SCPI_ERROR_EXECUTION_ERROR;
         }
     }
@@ -340,15 +353,35 @@ bool loadList(int iChannel, const char *filePath, int *err) {
     return success;
 }
 
-bool saveList(int iChannel, const char *filePath, int *err) {
-    if (!g_shutdownInProgress && osThreadGetId() != g_scpiTaskHandle) {
-        strcpy(&g_listFilePath[iChannel][0], filePath);
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST, iChannel), osWaitForever);
+bool loadList(int iChannel, const char *filePath, int *err) {
+    float dwellList[MAX_LIST_LENGTH];
+    uint16_t dwellListLength = 0;
+
+    float voltageList[MAX_LIST_LENGTH];
+    uint16_t voltageListLength = 0;
+
+    float currentList[MAX_LIST_LENGTH];
+    uint16_t currentListLength = 0;
+    
+    if (loadList(filePath, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, false, err)) {
+        Channel &channel = Channel::get(iChannel);
+        channel_dispatcher::setDwellList(channel, dwellList, dwellListLength);
+        channel_dispatcher::setVoltageList(channel, voltageList, voltageListLength);
+        channel_dispatcher::setCurrentList(channel, currentList, currentListLength);
         return true;
     }
 
-    Channel &channel = Channel::get(iChannel);
+    return false;
+}
 
+bool saveList(
+    const char *filePath,
+    float *dwellList, uint16_t &dwellListLength,
+    float *voltageList, uint16_t &voltageListLength,
+    float *currentList, uint16_t &currentListLength,
+    bool showProgress,
+    int *err
+) {
     if (!sd_card::isMounted(err)) {
         return false;
     }
@@ -365,31 +398,33 @@ bool saveList(int iChannel, const char *filePath, int *err) {
         return false;
     }
 
-    for (
-        int i = 0; 
-        i < g_channelsLists[channel.channelIndex].dwellListLength ||
-        i < g_channelsLists[channel.channelIndex].voltageListLength ||
-        i < g_channelsLists[channel.channelIndex].currentListLength;
-        i++
-    ) {
-        if (i < g_channelsLists[channel.channelIndex].dwellListLength) {
-            file.print(g_channelsLists[channel.channelIndex].dwellList[i], 4);
+    uint16_t maxListLength = MAX(MAX(dwellListLength, voltageListLength), currentListLength);
+
+    for (int i = 0; i < dwellListLength || i < voltageListLength || i < currentListLength; i++) {
+#if OPTION_DISPLAY
+        if (showProgress) {
+            eez::psu::gui::PsuAppContext::updateProgressPage(i + 1, maxListLength);
+        }
+#endif
+
+        if (i < dwellListLength) {
+            file.print(dwellList[i], 4);
         } else {
             file.print(LIST_CSV_FILE_NO_VALUE_CHAR);
         }
 
         file.print(CSV_SEPARATOR);
 
-        if (i < g_channelsLists[channel.channelIndex].voltageListLength) {
-            file.print(g_channelsLists[channel.channelIndex].voltageList[i], 4);
+        if (i < voltageListLength) {
+            file.print(voltageList[i], 4);
         } else {
             file.print(LIST_CSV_FILE_NO_VALUE_CHAR);
         }
 
         file.print(CSV_SEPARATOR);
 
-        if (i < g_channelsLists[channel.channelIndex].currentListLength) {
-            file.print(g_channelsLists[channel.channelIndex].currentList[i], 4);
+        if (i < currentListLength) {
+            file.print(currentList[i], 4);
         } else {
             file.print(LIST_CSV_FILE_NO_VALUE_CHAR);
         }
@@ -401,7 +436,29 @@ bool saveList(int iChannel, const char *filePath, int *err) {
 
     onSdCardFileChangeHook(filePath);
 
+    if (err) {
+        *err = SCPI_RES_OK;
+    }
+
     return true;
+}
+
+bool saveList(int iChannel, const char *filePath, int *err) {
+    if (!g_shutdownInProgress && osThreadGetId() != g_scpiTaskHandle) {
+        strcpy(&g_listFilePath[iChannel][0], filePath);
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST, iChannel), osWaitForever);
+        return true;
+    }
+
+    auto &channelList = g_channelsLists[iChannel];
+    return saveList(
+        filePath,
+        channelList.dwellList, channelList.dwellListLength,
+        channelList.voltageList, channelList.voltageListLength,
+        channelList.currentList, channelList.currentListLength,
+        false,
+        err
+    );
 }
 
 void updateChannelsWithVisibleCountersList();

@@ -55,7 +55,24 @@ bool areVoltageAndCurrentListLengthsEquivalent(Channel &channel);
 
 int checkLimits(int iChannel);
 
+bool loadList(
+    const char *filePath,
+    float *dwellList, uint16_t &dwellListLength,
+    float *voltageList, uint16_t &voltageListLength,
+    float *currentList, uint16_t &currentListLength,
+    bool showProgress,
+    int *err
+);
 bool loadList(int iChannel, const char *filePath, int *err);
+
+bool saveList(
+    const char *filePath,
+    float *dwellList, uint16_t &dwellListLength,
+    float *voltageList, uint16_t &voltageListLength,
+    float *currentList, uint16_t &currentListLength,
+    bool showProgress,
+    int *err
+);
 bool saveList(int iChannel, const char *filePath, int *err);
 
 void executionStart(Channel &channel);

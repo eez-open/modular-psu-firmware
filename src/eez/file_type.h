@@ -40,4 +40,8 @@ enum SortFilesOption {
     SORT_FILES_BY_TIME_DESC
 };
 
+FileType getFileTypeFromExtension(const char *filePath);
+const char *getExtensionFromFileType(FileType fileType);
+const char *getFileTypeScpiName(FileType fileType);
+
 } // eez

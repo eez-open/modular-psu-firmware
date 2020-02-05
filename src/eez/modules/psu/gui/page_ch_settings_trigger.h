@@ -53,7 +53,7 @@ class ChSettingsTriggerPage : public Page {
 };
 
 class ChSettingsListsPage : public SetPage {
-  public:
+public:
     void pageAlloc();
 
     void previousPage();
@@ -71,21 +71,30 @@ class ChSettingsListsPage : public SetPage {
     Unit getEncoderUnit();
 
     void showInsertMenu();
-    void showDeleteMenu();
-
     void insertRowAbove();
     void insertRowBelow();
 
+    void showDeleteMenu();
     void deleteRow();
     void clearColumn();
     void deleteRows();
     void deleteAll();
+
+    void showFileMenu();
+    void fileOpen();
+    void fileSave();
 
     uint16_t getMaxListLength();
     int getPageIndex();
     uint16_t getNumPages();
     int getRowIndex();
     void moveCursorToFirstAvailableCell();
+
+    static void doLoadList();
+    void onLoadListFinished(int16_t err);
+
+    static void doSaveList();
+    void onSaveListFinished(int16_t err);
 
     int m_listVersion;
 
@@ -100,7 +109,15 @@ class ChSettingsListsPage : public SetPage {
 
     int m_iCursor;
 
-  private:
+private:
+    char m_listFilePath[MAX_PATH_LENGTH + 1];
+    float m_voltageListLoad[MAX_LIST_LENGTH];
+    uint16_t m_voltageListLengthLoad;
+    float m_currentListLoad[MAX_LIST_LENGTH];
+    uint16_t m_currentListLengthLoad;
+    float m_dwellListLoad[MAX_LIST_LENGTH];
+    uint16_t m_dwellListLengthLoad;
+
     int getColumnIndex();
     int getCursorIndexWithinPage();
     uint8_t getDataIdAtCursor();
@@ -122,6 +139,9 @@ class ChSettingsListsPage : public SetPage {
 
     static void onDeleteAll();
     void doDeleteAll();
+
+    static void onOpenListFileSelected(const char *listFilePath);
+    static void onSaveListFileSelected(const char *listFilePath);
 };
 
 } // namespace gui

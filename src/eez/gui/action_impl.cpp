@@ -749,10 +749,6 @@ void action_show_channel_lists_insert_menu() {
     ((ChSettingsListsPage *)getActivePage())->showInsertMenu();
 }
 
-void action_show_channel_lists_delete_menu() {
-    ((ChSettingsListsPage *)getActivePage())->showDeleteMenu();
-}
-
 void action_channel_lists_insert_row_above() {
     popPage();
     ((ChSettingsListsPage *)getActivePage())->insertRowAbove();
@@ -761,6 +757,10 @@ void action_channel_lists_insert_row_above() {
 void action_channel_lists_insert_row_below() {
     popPage();
     ((ChSettingsListsPage *)getActivePage())->insertRowBelow();
+}
+
+void action_show_channel_lists_delete_menu() {
+    ((ChSettingsListsPage *)getActivePage())->showDeleteMenu();
 }
 
 void action_channel_lists_delete_row() {
@@ -781,6 +781,20 @@ void action_channel_lists_delete_rows() {
 void action_channel_lists_delete_all() {
     popPage();
     ((ChSettingsListsPage *)getActivePage())->deleteAll();
+}
+
+void action_show_channel_lists_file_menu() {
+    ((ChSettingsListsPage *)getActivePage())->showFileMenu();
+}
+
+void action_channel_lists_file_open() {
+    popPage();
+    ((ChSettingsListsPage *)getActivePage())->fileOpen();
+}
+
+void action_channel_lists_file_save() {
+    popPage();
+    ((ChSettingsListsPage *)getActivePage())->fileSave();
 }
 
 void action_channel_initiate_trigger() {
@@ -1251,6 +1265,10 @@ void action_file_manager_sort_by() {
     pushSelectFromEnumPage(g_fileManagerSortByEnumDefinition, file_manager::getSortFilesOption(), NULL, onSetFileManagerSortBy, true);
 }
 
+void action_file_manager_new_file() {
+    file_manager::newFile();
+}
+
 void action_show_debug_trace_log() {
     eez::debug::resetTraceLogStartPosition();
     pushPage(PAGE_ID_DEBUG_TRACE_LOG);
@@ -1296,7 +1314,7 @@ void onFirmwareSelected(const char *filePath) {
 }
 
 void onSelectFirmware() {
-    file_manager::browseForFile("Select DCM220 firmware file", "/Updates", FILE_TYPE_HEX, onFirmwareSelected);
+    file_manager::browseForFile("Select DCM220 firmware file", "/Updates", FILE_TYPE_HEX, file_manager::DIALOG_TYPE_OPEN, onFirmwareSelected);
 }
 
 void action_channel_update_firmware() {

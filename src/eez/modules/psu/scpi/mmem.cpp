@@ -18,6 +18,8 @@
 
 #include <stdio.h>
 
+#include <eez/file_type.h>
+
 #include <eez/modules/psu/psu.h>
 
 #include <eez/modules/psu/event_queue.h>
@@ -100,20 +102,11 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
     }
 
     // max. 10 characters
-    static const char *typeNames[] = {
-        "FOLD",
-        "LIST",
-        "PROF",
-        "DLOG",
-        "IMG",
-        "MP",
-        "HEX",
-        "BIN",
-    };
+    static const char *scpiTypeName = getFileTypeScpiName(type);
 
     buffer[position++] = ',';
-    strcpy(buffer + position, typeNames[type]);
-    position += strlen(typeNames[type]);
+    strcpy(buffer + position, scpiTypeName);
+    position += strlen(scpiTypeName);
     buffer[position++] = ',';
 
     // max. 10 characters (for 4294967296)
