@@ -70,6 +70,7 @@ static uint8_t *g_backBufferPosition;
 
 uint32_t g_filesCount;
 uint32_t g_filesStartPosition;
+uint32_t g_savedFilesStartPosition;
 
 int32_t g_selectedFileIndex = -1;
 
@@ -119,22 +120,51 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
     g_filesCount++;
 }
 
-int compareFunc(const void *p1, const void *p2) {
+int compareFunc(const void *p1, const void *p2, SortFilesOption sortFilesOption) {
     FileItem *item1 = (FileItem *)p1;
     FileItem *item2 = (FileItem *)p2;
-    if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_NAME_ASC) {
+    if (sortFilesOption == SORT_FILES_BY_NAME_ASC) {
         return strcicmp(item1->name, item2->name);
-    } else if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_NAME_DESC) {
+    } else if (sortFilesOption == SORT_FILES_BY_NAME_DESC) {
         return -strcicmp(item1->name, item2->name);
-    } else if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_SIZE_ASC) {
+    } else if (sortFilesOption == SORT_FILES_BY_SIZE_ASC) {
         return item1->size - item2->size;
-    } else if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_SIZE_DESC) {
+    } else if (sortFilesOption == SORT_FILES_BY_SIZE_DESC) {
         return item2->size - item1->size;
-    } else if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_TIME_ASC) {
+    } else if (sortFilesOption == SORT_FILES_BY_TIME_ASC) {
         return item1->dateTime - item2->dateTime;
     } else {
         return item2->dateTime - item1->dateTime;
     }
+} 
+
+
+int compareFunc(const void *p1, const void *p2) {
+    int result = compareFunc(p1, p2, psu::persist_conf::devConf.sortFilesOption);
+    if (result != 0) {
+        return result;
+    }
+
+    if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_NAME_ASC || psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_NAME_DESC) {
+        int result = compareFunc(p1, p2, SORT_FILES_BY_SIZE_ASC);
+        if (result != 0) {
+            return result;
+        }
+        return compareFunc(p1, p2, SORT_FILES_BY_TIME_ASC);
+    } else if (psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_SIZE_ASC || psu::persist_conf::devConf.sortFilesOption == SORT_FILES_BY_SIZE_DESC) {
+        int result = compareFunc(p1, p2, SORT_FILES_BY_NAME_ASC);
+        if (result != 0) {
+            return result;
+        }
+        return compareFunc(p1, p2, SORT_FILES_BY_TIME_ASC);
+    } else {
+        int result = compareFunc(p1, p2, SORT_FILES_BY_NAME_ASC);
+        if (result != 0) {
+            return result;
+        }
+        return compareFunc(p1, p2, SORT_FILES_BY_SIZE_ASC);
+    }
+
 } 
 
 void sort() {
@@ -149,6 +179,7 @@ void loadDirectory() {
     g_state = STATE_LOADING;
     g_filesCount = 0;
     g_selectedFileIndex = -1;
+    g_savedFilesStartPosition = g_filesStartPosition;
     g_filesStartPosition = 0;
     g_loadingStartTickCount = millis();
 
@@ -172,6 +203,8 @@ void doLoadDirectory() {
     psu::sd_card::catalog(g_currentDirectory, 0, catalogCallback, &numFiles, &err);
 
     sort();
+
+    setFilesStartPosition(g_savedFilesStartPosition);
 
     g_state = STATE_READY;
 }
