@@ -60,6 +60,7 @@ public:
 
 	TempSensorTemperature(int sensorIndex);
 
+    const char *getName();
 	bool isInstalled();
 	bool isTestOK();
 	void tick(uint32_t tick_usec);

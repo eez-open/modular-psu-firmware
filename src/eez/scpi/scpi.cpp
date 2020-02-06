@@ -43,6 +43,7 @@
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/gui/page_ch_settings_trigger.h>
+#include <eez/modules/psu/gui/page_user_profiles.h>
 #include <eez/modules/psu/scpi/psu.h>
 
 #include <eez/modules/bp3c/flash_slave.h>
@@ -219,6 +220,10 @@ void oneIter() {
                 psu::gui::ChSettingsListsPage::doLoadList();
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST) {
                 psu::gui::ChSettingsListsPage::doSaveList();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_IMPORT) {
+                psu::gui::UserProfilesPage::doImportProfile();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EXPORT) {
+                psu::gui::UserProfilesPage::doExportProfile();
             }
         }
     } else {

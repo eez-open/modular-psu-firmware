@@ -975,7 +975,9 @@ enum ActionsEnum {
     ACTION_ID_SHOW_CHANNEL_LISTS_FILE_MENU = 219,
     ACTION_ID_CHANNEL_LISTS_FILE_OPEN = 220,
     ACTION_ID_CHANNEL_LISTS_FILE_SAVE = 221,
-    ACTION_ID_FILE_MANAGER_NEW_FILE = 222
+    ACTION_ID_FILE_MANAGER_NEW_FILE = 222,
+    ACTION_ID_PROFILE_IMPORT = 223,
+    ACTION_ID_PROFILE_EXPORT = 224
 };
 
 void action_channel_toggle_output();
@@ -1200,6 +1202,8 @@ void action_show_channel_lists_file_menu();
 void action_channel_lists_file_open();
 void action_channel_lists_file_save();
 void action_file_manager_new_file();
+void action_profile_import();
+void action_profile_export();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -1604,7 +1608,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[392800];
+extern const uint8_t assets[392978];
 #else
-extern const uint8_t assets[3864504];
+extern const uint8_t assets[3864576];
 #endif

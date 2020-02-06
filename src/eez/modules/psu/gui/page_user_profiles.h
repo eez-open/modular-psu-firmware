@@ -27,7 +27,7 @@ namespace psu {
 namespace gui {
 
 class UserProfilesPage : public Page {
-  public:
+public:
     static int getSelectedProfileLocation();
     
     void showProfile();
@@ -39,10 +39,22 @@ class UserProfilesPage : public Page {
     void deleteProfile();
     void editRemark();
 
-  private:
+    void importProfile();
+    static void doImportProfile();
+    void onImportProfileFinished(int16_t err);
+
+    void exportProfile();
+    static void doExportProfile();
+    void onExportProfileFinished(int16_t err);
+
+private:
+    char m_profileFilePath[MAX_PATH_LENGTH + 1];
+
     static void onSaveFinish(char *remark = 0, void (*callback)() = 0);
     static void onSaveEditRemarkOk(char *remark);
     static void onSaveYes();
+    static void onImportProfileFileSelected(const char *listFilePath);
+    static void onExportProfileFileSelected(const char *listFilePath);
     static void onDeleteProfileYes();
     static void onEditRemarkOk(char *newRemark);
 };

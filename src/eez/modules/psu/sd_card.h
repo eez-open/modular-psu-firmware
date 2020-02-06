@@ -47,8 +47,6 @@ void onSdDetectInterruptHandler();
 bool isMounted(int *err);
 bool isBusy();
 
-void dumpInfo(char *buffer);
-
 class BufferedFile {
 public:
     BufferedFile(File &file);
@@ -56,6 +54,9 @@ public:
     int peek();
     int read();
     bool available();
+
+    size_t size();
+    size_t tell();
 
 private:
     File &file;
@@ -68,8 +69,13 @@ private:
 };
 
 void matchZeroOrMoreSpaces(BufferedFile &file);
-bool match(BufferedFile &file, float &result);
 bool match(BufferedFile &file, char c);
+bool match(BufferedFile &file, const char *str);
+bool matchUntil(BufferedFile &file, char c, char *result);
+void skipUntilEOL(BufferedFile &file);
+bool matchQuotedString(BufferedFile &file, char *str, unsigned int strLength);
+bool match(BufferedFile &file, unsigned int &result);
+bool match(BufferedFile &file, float &result);
 
 bool makeParentDir(const char *filePath);
 

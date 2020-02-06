@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+
 #include <eez/modules/psu/psu.h>
 
 #include <eez/modules/psu/calibration.h>
@@ -29,6 +31,7 @@
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/sd_card.h>
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/libs/sd_fat/sd_fat.h>
 #include <eez/scpi/scpi.h>
 
@@ -536,14 +539,342 @@ bool recall(int location, int *err) {
     return false;
 }
 
-bool recallFromFile(const char *filePath, int *err) {
+////////////////////////////////////////////////////////////////////////////////
+
+class ReadContext {
+public:
+    ReadContext(File &file_);
+
+    bool doRead(void (*callback)(ReadContext &ctx, Parameters &parameters), int location, Parameters &parameters, bool showProgress);
+
+    bool matchGroup(const char *groupName);
+    bool matchGroup(const char *groupNamePrefix, int &index);
+
+    bool property(const char *name, unsigned int &value);
+    bool property(const char *name, uint16_t &value);
+    bool property(const char *name, bool &value);
+
+    bool property(const char *name, float &value);
+    bool property(const char *name, char *str, unsigned int strLength);
+
+    bool listProperty(const char *name, int channelIndex);
+
+    bool skipProperty(const char *name);
+
+    bool result;
+
+private:
+    sd_card::BufferedFile file;
+    char groupName[100];
+    char propertyName[100];
+    int location;
+};
+
+ReadContext::ReadContext(File &file_)
+    : result(true)
+    , file(file_)
+{
+}
+
+bool ReadContext::doRead(void (*callback)(ReadContext &ctx, Parameters &parameters), int location_, Parameters &parameters, bool showProgress) {
+    location = location_;
+
+#if OPTION_DISPLAY
+    size_t totalSize = file.size();
+#endif
+
+    while (true) {
+#if OPTION_DISPLAY
+        if (showProgress) {
+            eez::psu::gui::PsuAppContext::updateProgressPage(file.tell(), totalSize);
+        }
+#endif
+
+        sd_card::matchZeroOrMoreSpaces(file);
+        if (!file.available()) {
+            break;
+        }
+
+        if (sd_card::match(file, '[')) {
+            if (!sd_card::matchUntil(file, ']', groupName)) {
+                return false;
+            }
+        } else {
+            if (!sd_card::matchUntil(file, '=', propertyName)) {
+                return false;
+            }
+            callback(*this, parameters);
+            if (!result) {
+                return false;
+            }
+        }
+    }
+    
+    parameters.flags.isValid = 1;
+
+    return true;
+}
+
+bool ReadContext::matchGroup(const char *groupName_) {
+    return strcmp(groupName, groupName_) == 0;
+}
+
+bool ReadContext::matchGroup(const char *groupNamePrefix, int &index) {
+    auto prefixLength = strlen(groupNamePrefix);
+    if (strncmp(groupName, groupNamePrefix, prefixLength) != 0) {
+        return false;
+    }
+
+    const char *startptr = groupName + prefixLength;
+    char *endptr;
+    index = strtol(startptr, &endptr, 10);
+    return endptr > startptr;
+}
+
+bool ReadContext::property(const char *name, unsigned int &value) {
+    if (strcmp(propertyName, name) != 0) {
+        return false;
+    }
+
+    unsigned int temp;
+    if (sd_card::match(file, temp)) {
+        value = temp;
+    } else {
+        result = false;
+    }
+       
+    return true;
+}
+
+bool ReadContext::property(const char *name, uint16_t &value) {
+    if (strcmp(propertyName, name) != 0) {
+        return false;
+    }
+
+    unsigned int temp;
+    if (sd_card::match(file, temp)) {
+        value = (uint16_t)temp;
+    } else {
+        result = false;
+    }
+
+    return true;
+}
+
+bool ReadContext::property(const char *name, bool &value) {
+    if (strcmp(propertyName, name) != 0) {
+        return false;
+    }
+
+    unsigned int temp;
+    if (sd_card::match(file, temp)) {
+        value = temp;
+    } else {
+        result = false;
+    }
+
+    return true;
+}
+
+bool ReadContext::property(const char *name, float &value) {
+    if (strcmp(propertyName, name) != 0) {
+        return false;
+    }
+
+    float temp;
+    if (sd_card::match(file, temp)) {
+        value = temp;
+    } else {
+        result = false;
+    }
+
+    return true;
+}
+
+bool ReadContext::property(const char *name, char *str, unsigned int strLength) {
+    if (strcmp(propertyName, name) != 0) {
+        return false;
+    }
+
+    if (!sd_card::matchQuotedString(file, str, strLength)) {
+        result = false;
+    }
+
+    return true;
+}
+
+bool ReadContext::listProperty(const char *name, int channelIndex) {
+    if (strcmp(propertyName, name) != 0) {
+        return false;
+    }
+
+    if (!sd_card::match(file, "```")) {
+        result = false;
+    }
+
+    float dwellList[MAX_LIST_LENGTH];
+    uint16_t dwellListLength = 0;
+
+    float voltageList[MAX_LIST_LENGTH];
+    uint16_t voltageListLength = 0;
+
+    float currentList[MAX_LIST_LENGTH];
+    uint16_t currentListLength = 0;
+
+    int err;
+    if (!list::loadList(file, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, false, &err)) {
+        result = false;
+        return true;
+    }
+
+    if (!sd_card::match(file, "```")) {
+        result = false;
+        return true;
+    }
+
+    char filePath[MAX_PATH_LENGTH];
+    getChannelProfileListFilePath(channelIndex, location, filePath);
+
+    if (!list::saveList(filePath, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, false, &err)) {
+        result = false;
+        return true;
+    }
+
+    return true;
+}
+
+bool ReadContext::skipProperty(const char *name) {
+    if (strcmp(propertyName, name) != 0) {
+        return false;
+    }
+
+    sd_card::skipUntilEOL(file);
+
+    return true;
+}
+
+#define READ_FLAG(name, value) \
+    auto name = value; \
+    if (ctx.property(#name, name)) { \
+        value = name; \
+        return; \
+    }
+
+#define READ_PROPERTY(name, value) \
+    if (ctx.property(#name, value)) { \
+        return; \
+    }
+
+#define READ_STRING_PROPERTY(name, str, strLength) \
+    if (ctx.property(#name, str, strLength)) { \
+        return; \
+    }
+
+#define READ_LIST_PROPERTY(name, channelIndex) \
+    if (ctx.listProperty(#name, channelIndex)) { \
+        return; \
+    }
+
+#define SKIP_PROPERTY(name) \
+    if (ctx.skipProperty(#name)) { \
+        return; \
+    }
+
+////////////////////////////////////////////////////////////////////////////////
+
+void profileReadCallback(ReadContext &ctx, Parameters &parameters) {
+    if (ctx.matchGroup("system")) {
+        READ_FLAG(powerIsUp, parameters.flags.powerIsUp);
+        READ_STRING_PROPERTY(profileName, parameters.name, PROFILE_NAME_MAX_LENGTH);
+    }
+
+    if (ctx.matchGroup("dcpsupply")) {
+        READ_FLAG(couplingType, parameters.flags.couplingType);
+    }
+
+    int channelIndex;
+    if (ctx.matchGroup("dcpsupply.ch", channelIndex)) {
+        --channelIndex;
+
+        auto &channel = parameters.channels[channelIndex];
+        
+        channel.flags.parameters_are_valid = 1;
+
+        READ_PROPERTY(moduleType, channel.moduleType);
+        READ_PROPERTY(moduleRevision, channel.moduleRevision);
+
+        READ_FLAG(output_enabled, channel.flags.output_enabled);
+        READ_FLAG(sense_enabled, channel.flags.sense_enabled);
+        READ_FLAG(u_state, channel.flags.u_state);
+        READ_FLAG(i_state, channel.flags.i_state);
+        READ_FLAG(p_state, channel.flags.p_state);
+        READ_FLAG(rprog_enabled, channel.flags.rprog_enabled);
+        READ_FLAG(displayValue1, channel.flags.displayValue1);
+        READ_FLAG(displayValue2, channel.flags.displayValue2);
+        READ_FLAG(u_triggerMode, channel.flags.u_triggerMode);
+        READ_FLAG(i_triggerMode, channel.flags.i_triggerMode);
+        READ_FLAG(currentRangeSelectionMode, channel.flags.currentRangeSelectionMode);
+        READ_FLAG(autoSelectCurrentRange, channel.flags.autoSelectCurrentRange);
+        READ_FLAG(triggerOutputState, channel.flags.triggerOutputState);
+        READ_FLAG(triggerOnListStop, channel.flags.triggerOnListStop);
+        READ_FLAG(u_type, channel.flags.u_type);
+        READ_FLAG(dprogState, channel.flags.dprogState);
+        READ_FLAG(trackingEnabled, channel.flags.trackingEnabled);
+
+        READ_PROPERTY(u_set, channel.u_set);
+        READ_PROPERTY(u_step, channel.u_step);
+        READ_PROPERTY(u_limit, channel.u_limit);
+        READ_PROPERTY(u_delay, channel.u_delay);
+        READ_PROPERTY(u_level, channel.u_level);
+        READ_PROPERTY(i_set, channel.i_set);
+        READ_PROPERTY(i_step, channel.i_step);
+        READ_PROPERTY(i_limit, channel.i_limit);
+        READ_PROPERTY(i_delay, channel.i_delay);
+        READ_PROPERTY(p_limit, channel.p_limit);
+        READ_PROPERTY(p_delay, channel.p_delay);
+        READ_PROPERTY(p_level, channel.p_level);
+        READ_PROPERTY(ytViewRate, channel.ytViewRate);
+        READ_PROPERTY(u_triggerValue, channel.u_triggerValue);
+        READ_PROPERTY(i_triggerValue, channel.i_triggerValue);
+        READ_PROPERTY(listCount, channel.listCount);
+
+        READ_LIST_PROPERTY(list, channelIndex);
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+        READ_PROPERTY(load_enabled, channel.load_enabled);
+        READ_PROPERTY(load, channel.load);
+        READ_PROPERTY(voltProgExt, channel.voltProgExt);
+#endif
+    }
+
+    int tempSensorIndex;
+    if (ctx.matchGroup("tempsensor", tempSensorIndex)) {
+        --tempSensorIndex;
+
+        auto &tempSensorProt = parameters.temp_prot[tempSensorIndex];
+
+        tempSensorProt.sensor = tempSensorIndex;
+
+        SKIP_PROPERTY(name)
+        READ_PROPERTY(delay, tempSensorProt.delay);
+        READ_PROPERTY(level, tempSensorProt.level);
+        READ_PROPERTY(state, tempSensorProt.state);
+    }
+}
+
+bool profileRead(ReadContext &ctx, int location, Parameters &parameters, bool showProgress) {
+    return ctx.doRead(profileReadCallback, location, parameters, showProgress);
+}
+
+
+bool recallFromFile(int location, const char *filePath, bool showProgress, int *err) {
     if (!sd_card::isMounted(err)) {
         return false;
     }
 
     if (!sd_card::exists(filePath, NULL)) {
         if (err)
-            *err = SCPI_ERROR_LIST_NOT_FOUND;
+            *err = SCPI_ERROR_FILE_NOT_FOUND;
         return false;
     }
 
@@ -556,25 +887,33 @@ bool recallFromFile(const char *filePath, int *err) {
     }
 
     Parameters profile;
-    int size = file.read(&profile, sizeof(profile));
+    memset(&profile, 0, sizeof(Parameters));
+
+    ReadContext ctx(file);
+    bool result = profileRead(ctx, location, profile, showProgress);
+
     file.close();
 
-    if (size != sizeof(profile) || !persist_conf::checkBlock((const persist_conf::BlockHeader *)&profile, sizeof(profile), PROFILE_VERSION)) {
-        if (err)
+    if (!result) {
+        if (err) {
             *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+        }
         return false;
     }
 
-    persist_conf::saveProfile(0, &profile);
+    persist_conf::saveProfile(location, &profile);
 
-    if (!recallFromProfile(profile, 0)) {
-        // TODO replace with more specific error
-        if (err)
-            *err = SCPI_ERROR_EXECUTION_ERROR;
-        return false;
+    if (location == 0) {
+        if (!recallFromProfile(profile, 0)) {
+            // TODO replace with more specific error
+            if (err)
+                *err = SCPI_ERROR_EXECUTION_ERROR;
+            return false;
+        }
+
+        event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_FILE);
     }
 
-    event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_FILE);
     return true;
 }
 
@@ -622,7 +961,226 @@ bool saveAtLocation(int location, const char *name) {
     return false;
 }
 
-bool saveToFile(const char *filePath, int *err) {
+////////////////////////////////////////////////////////////////////////////////
+
+class WriteContext {
+public:
+    WriteContext(File &file_);
+
+    bool group(const char *groupName);
+    bool group(const char *groupNamePrefix, unsigned int index);
+
+    void property(const char *propertyName, int value);
+    void property(const char *propertyName, unsigned int value);
+    void property(const char *propertyName, float value);
+    void property(const char *propertyName, const char *str);
+    void property(
+        const char *propertyName,
+        float *dwellList, uint16_t &dwellListLength,
+        float *voltageList, uint16_t &voltageListLength,
+        float *currentList, uint16_t &currentListLength
+    );
+
+private:
+    File &file;
+};
+
+WriteContext::WriteContext(File &file_)
+    : file(file_)
+{
+}
+
+bool WriteContext::group(const char *groupName) {
+    char line[256 + 1];
+    sprintf(line, "[%s]\n", groupName);
+    file.write((uint8_t *)line, strlen(line));
+    return true;
+}
+
+bool WriteContext::group(const char *groupNamePrefix, unsigned int index) {
+    char line[256 + 1];
+    sprintf(line, "[%s%d]\n", groupNamePrefix, index);
+    file.write((uint8_t *)line, strlen(line));
+    return true;
+}
+
+void WriteContext::property(const char *propertyName, int value) {
+    char line[256 + 1];
+    sprintf(line, "\t%s=%d\n", propertyName, (int)value);
+    file.write((uint8_t *)line, strlen(line));
+}
+
+void WriteContext::property(const char *propertyName, unsigned int value) {
+    char line[256 + 1];
+    sprintf(line, "\t%s=%u\n", propertyName, (int)value);
+    file.write((uint8_t *)line, strlen(line));
+}
+
+void WriteContext::property(const char *propertyName, float value) {
+    char line[256 + 1];
+    sprintf(line, "\t%s=%g\n", propertyName, value);
+    file.write((uint8_t *)line, strlen(line));
+}
+
+void WriteContext::property(const char *propertyName, const char *str) {
+    char line[256 + 1];
+    sprintf(line, "\t%s=\"%s\"\n", propertyName, str);
+    file.write((uint8_t *)line, strlen(line));
+}
+
+void WriteContext::property(
+    const char *propertyName,
+    float *dwellList, uint16_t &dwellListLength,
+    float *voltageList, uint16_t &voltageListLength,
+    float *currentList, uint16_t &currentListLength
+) {
+    char line[256 + 1];
+    sprintf(line, "\t%s=```\n", propertyName);
+    file.write((uint8_t *)line, strlen(line));
+
+    int err;
+    list::saveList(file, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, false, &err);
+
+    sprintf(line, "```\n");
+    file.write((uint8_t *)line, strlen(line));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool profileWrite(WriteContext &ctx, int location, const Parameters &parameters, bool showProgress) {
+#if OPTION_DISPLAY
+    size_t processedSoFar = 0;
+    static const int CH_PROGRESS_WEIGHT = 20;
+    static const int TEMP_SENSOR_PROGRESS_WEIGHT = 5;
+    size_t totalSize = 2 + CH_MAX * CH_PROGRESS_WEIGHT + temp_sensor::NUM_TEMP_SENSORS * TEMP_SENSOR_PROGRESS_WEIGHT;
+    if (showProgress) {
+        eez::psu::gui::PsuAppContext::updateProgressPage(processedSoFar, totalSize);
+    }
+#endif
+
+    ctx.group("system");
+    ctx.property("powerIsUp", parameters.flags.powerIsUp);
+    ctx.property("profileName", parameters.name);
+
+#if OPTION_DISPLAY
+    if (showProgress) {
+        processedSoFar++;
+        eez::psu::gui::PsuAppContext::updateProgressPage(1, totalSize);
+    }
+#endif
+
+    ctx.group("dcpsupply");
+    ctx.property("couplingType", parameters.flags.couplingType);
+
+#if OPTION_DISPLAY
+    if (showProgress) {
+        processedSoFar++;
+        eez::psu::gui::PsuAppContext::updateProgressPage(2, totalSize);
+    }
+#endif
+
+    for (int channelIndex = 0; channelIndex < CH_MAX; channelIndex++) {
+        auto &channel = parameters.channels[channelIndex];
+        if (channel.flags.parameters_are_valid) {
+            ctx.group("dcpsupply.ch", channelIndex + 1);
+
+            ctx.property("moduleType", channel.moduleType);
+            ctx.property("moduleRevision", channel.moduleRevision);
+
+            ctx.property("output_enabled", channel.flags.output_enabled);
+            ctx.property("sense_enabled", channel.flags.sense_enabled);
+            ctx.property("u_state", channel.flags.u_state);
+            ctx.property("i_state", channel.flags.i_state);
+            ctx.property("p_state", channel.flags.p_state);
+            ctx.property("rprog_enabled", channel.flags.rprog_enabled);
+            ctx.property("displayValue1", channel.flags.displayValue1);
+            ctx.property("displayValue2", channel.flags.displayValue2);
+            ctx.property("u_triggerMode", channel.flags.u_triggerMode);
+            ctx.property("i_triggerMode", channel.flags.i_triggerMode);
+            ctx.property("currentRangeSelectionMode", channel.flags.currentRangeSelectionMode);
+            ctx.property("autoSelectCurrentRange", channel.flags.autoSelectCurrentRange);
+            ctx.property("triggerOutputState", channel.flags.triggerOutputState);
+            ctx.property("triggerOnListStop", channel.flags.triggerOnListStop);
+            ctx.property("u_type", channel.flags.u_type);
+            ctx.property("dprogState", channel.flags.dprogState);
+            ctx.property("trackingEnabled", channel.flags.trackingEnabled);
+
+            ctx.property("u_set", channel.u_set);
+            ctx.property("u_step", channel.u_step);
+            ctx.property("u_limit", channel.u_limit);
+            ctx.property("u_delay", channel.u_delay);
+            ctx.property("u_level", channel.u_level);
+            ctx.property("i_set", channel.i_set);
+            ctx.property("i_step", channel.i_step);
+            ctx.property("i_limit", channel.i_limit);
+            ctx.property("i_delay", channel.i_delay);
+            ctx.property("p_limit", channel.p_limit);
+            ctx.property("p_delay", channel.p_delay);
+            ctx.property("p_level", channel.p_level);
+            ctx.property("ytViewRate", channel.ytViewRate);
+            ctx.property("u_triggerValue", channel.u_triggerValue);
+            ctx.property("i_triggerValue", channel.i_triggerValue);
+            ctx.property("listCount", channel.listCount);
+
+            char filePath[MAX_PATH_LENGTH];
+            getChannelProfileListFilePath(channelIndex, location, filePath);
+            int err;
+            if (sd_card::exists(filePath, &err)) {
+                float dwellList[MAX_LIST_LENGTH];
+                uint16_t dwellListLength = 0;
+
+                float voltageList[MAX_LIST_LENGTH];
+                uint16_t voltageListLength = 0;
+
+                float currentList[MAX_LIST_LENGTH];
+                uint16_t currentListLength = 0;
+
+                if (list::loadList(filePath, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, false, &err)) {
+                    if (dwellListLength + voltageListLength + currentListLength > 0) {
+                        ctx.property("list", dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength);
+                    }
+                }
+            }
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+            ctx.property("load_enabled", channel.load_enabled);
+            ctx.property("load", channel.load);
+            ctx.property("voltProgExt", channel.voltProgExt);
+#endif
+        }
+
+#if OPTION_DISPLAY
+        if (showProgress) {
+            processedSoFar += CH_PROGRESS_WEIGHT;
+            eez::psu::gui::PsuAppContext::updateProgressPage(processedSoFar, totalSize);
+        }
+#endif
+    }
+
+    for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
+        auto &tempSensorProt = parameters.temp_prot[i];
+        auto &sensor = temperature::sensors[tempSensorProt.sensor];
+        if (sensor.isInstalled()) {
+            ctx.group("tempsensor", tempSensorProt.sensor + 1);
+
+            ctx.property("name", sensor.getName());
+            ctx.property("delay", tempSensorProt.delay);
+            ctx.property("level", tempSensorProt.level);
+            ctx.property("state", tempSensorProt.state);
+        }
+
+#if OPTION_DISPLAY
+        if (showProgress) {
+            processedSoFar += TEMP_SENSOR_PROGRESS_WEIGHT;
+            eez::psu::gui::PsuAppContext::updateProgressPage(processedSoFar, totalSize);
+        }
+#endif
+    }
+
+    return true;
+}
+
+bool saveToFile(int location, const char *filePath, bool showProgress, int *err) {
     if (!sd_card::isMounted(err)) {
         return false;
     }
@@ -639,17 +1197,23 @@ bool saveToFile(const char *filePath, int *err) {
         return false;
     }
 
-    Parameters profile;
-    memset(&profile, 0, sizeof(Parameters));
-    fillProfile(profile);
+    WriteContext ctx(file);
 
-    profile.header.version = PROFILE_VERSION;
-    profile.header.checksum = persist_conf::calcChecksum((const persist_conf::BlockHeader *)&profile, sizeof(profile));
+    bool result;
 
-    size_t size = file.write((const uint8_t *)&profile, sizeof(profile));
+    if (location == 0) {
+        Parameters profile;
+        memset(&profile, 0, sizeof(Parameters));
+        fillProfile(profile);
+        result = profileWrite(ctx, location, profile, showProgress);
+    } else {
+        Parameters *profile = persist_conf::loadProfile(location);
+        result = profileWrite(ctx, location, *profile, showProgress);
+    }
+
     file.close();
 
-    if (size != sizeof(profile)) {
+    if (!result) {
         *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
     }

@@ -110,14 +110,14 @@ bool checkProfileModuleMatch(Parameters &profile);
 void recallChannelsFromProfile(Parameters &profile, int location);
 bool recallFromProfile(Parameters &profile, int location);
 bool recall(int location, int *err);
-bool recallFromFile(const char *filePath, int *err);
+bool recallFromFile(int location, const char *filePath, bool showProgress, int *err);
 
 Parameters *load(int location);
 
 void getSaveName(int location, char *name);
 bool saveAtLocation(int location, const char *name = nullptr);
 
-bool saveToFile(const char *filePath, int *err);
+bool saveToFile(int location, const char *filePath, bool showProgress, int *err);
 
 void deleteProfileLists(int location);
 

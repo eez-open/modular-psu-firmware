@@ -227,6 +227,15 @@ bool BufferedFile::available() {
     return peek() != -1;
 }
 
+size_t BufferedFile::size() {
+    return file.size();
+}
+
+size_t BufferedFile::tell() {
+    return file.tell();
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef isSpace
@@ -245,14 +254,117 @@ void matchZeroOrMoreSpaces(BufferedFile &file) {
     }
 }
 
-bool match(BufferedFile &file, char c) {
+bool match(BufferedFile &file, char ch) {
     matchZeroOrMoreSpaces(file);
-    if (file.peek() == c) {
+    if (file.peek() == ch) {
         file.read();
         return true;
     }
     return false;
 }
+
+bool match(BufferedFile &file, const char *str) {
+    matchZeroOrMoreSpaces(file);
+
+    for (; *str; str++) {
+        if (file.peek() != *str) {
+            return false;
+        }
+        file.read();
+    }
+
+    return true;
+}
+
+bool matchUntil(BufferedFile &file, char ch, char *result) {
+    while (true) {
+        int next = file.peek();
+        if (next == -1) {
+            return false;
+        }
+
+        file.read();
+
+        if (next == ch) {
+            *result = 0;
+            return true;
+        }
+        
+        *result++ = (char)next;
+    }
+}
+
+void skipUntilEOL(BufferedFile &file) {
+    while (true) {
+        int next = file.peek();
+        if (next == -1 || next == '\r' || next == '\n') {
+            return;
+        }
+        file.read();
+    }
+}
+
+bool matchQuotedString(BufferedFile &file, char *str, unsigned int strLength) {
+    if (!match(file, '"')) {
+        return false;
+    }
+
+    bool escape = false;
+
+    while (true) {
+        int next = file.peek();
+        if (next == -1) {
+            return false;
+        }
+
+        file.read();
+
+        if (escape) {
+            escape = false;
+        } else {
+            if (next == '"') {
+                *str = 0;
+                return true;
+            } else if (next == '\\') {
+                escape = true;
+                continue;
+            }
+        }
+
+        if (strLength-- == 0) {
+            return false;
+        }
+
+        *str++ = (char)next;
+    }
+}
+
+bool match(BufferedFile &file, unsigned int &result) {
+    matchZeroOrMoreSpaces(file);
+
+    int c = file.peek();
+    if (c == -1) {
+        return false;
+    }
+
+    bool isNumber = false;
+    unsigned int value = 0;
+
+    while (true) {
+        if (c >= '0' && c <= '9') {
+            value = value * 10 + (c - '0');
+            isNumber = true;
+        } else {
+            if (isNumber) {
+                result = value;
+            }
+            return isNumber;
+        }
+        file.read();
+        c = file.peek();
+    }
+}
+
 
 bool match(BufferedFile &file, float &result) {
     matchZeroOrMoreSpaces(file);

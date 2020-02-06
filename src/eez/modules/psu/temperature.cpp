@@ -163,6 +163,10 @@ TempSensorTemperature::TempSensorTemperature(int sensorIndex_)
     : temperature(NAN), sensorIndex(sensorIndex_) {
 }
 
+const char *TempSensorTemperature::getName() {
+    return temp_sensor::sensors[sensorIndex].name;
+}
+
 bool TempSensorTemperature::isInstalled() {
     return temp_sensor::sensors[sensorIndex].isInstalled();
 }

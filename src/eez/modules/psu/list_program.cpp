@@ -228,6 +228,101 @@ int checkLimits(int iChannel) {
 }
 
 bool loadList(
+    sd_card::BufferedFile &file,
+    float *dwellList, uint16_t &dwellListLength,
+    float *voltageList, uint16_t &voltageListLength,
+    float *currentList, uint16_t &currentListLength,
+    bool showProgress,
+    int *err
+) {
+    dwellListLength = 0;
+    voltageListLength = 0;
+    currentListLength = 0;
+
+    bool success = true;
+
+#if OPTION_DISPLAY
+    size_t totalSize = file.size();
+#endif
+
+    for (int i = 0; i < MAX_LIST_LENGTH; ++i) {
+        sd_card::matchZeroOrMoreSpaces(file);
+        if (!file.available() || file.peek() == '`') {
+            break;
+        }
+
+        float value;
+
+        if (sd_card::match(file, LIST_CSV_FILE_NO_VALUE_CHAR)) {
+            if (i < dwellListLength) {
+                success = false;
+                break;
+            }
+        } else if (sd_card::match(file, value)) {
+            if (i == dwellListLength) {
+                dwellList[i] = value;
+                dwellListLength = i + 1;
+            } else {
+                success = false;
+                break;
+            }
+        } else {
+            success = false;
+            break;
+        }
+
+        sd_card::match(file, CSV_SEPARATOR);
+
+        if (sd_card::match(file, LIST_CSV_FILE_NO_VALUE_CHAR)) {
+            if (i < voltageListLength) {
+                success = false;
+                break;
+            }
+        } else if (sd_card::match(file, value)) {
+            if (i == voltageListLength) {
+                voltageList[i] = value;
+                ++voltageListLength;
+            } else {
+                success = false;
+                break;
+            }
+        } else {
+            success = false;
+            break;
+        }
+
+        sd_card::match(file, CSV_SEPARATOR);
+
+        if (sd_card::match(file, LIST_CSV_FILE_NO_VALUE_CHAR)) {
+            if (i < currentListLength) {
+                success = false;
+                break;
+            }
+        } else if (sd_card::match(file, value)) {
+            if (i == currentListLength) {
+                currentList[i] = value;
+                ++currentListLength;
+            } else {
+                success = false;
+                break;
+            }
+        } else {
+            success = false;
+            break;
+        }
+
+#if OPTION_DISPLAY
+        if (showProgress) {
+            eez::psu::gui::PsuAppContext::updateProgressPage(file.tell(), totalSize);
+        }
+#endif
+    }
+
+    return success;
+}
+
+
+bool loadList(
     const char *filePath,
     float *dwellList, uint16_t &dwellListLength,
     float *voltageList, uint16_t &voltageListLength,
@@ -241,7 +336,7 @@ bool loadList(
 
     if (!sd_card::exists(filePath, err)) {
         if (err) {
-            *err = SCPI_ERROR_LIST_NOT_FOUND;
+            *err = SCPI_ERROR_FILE_NOT_FOUND;
         }
         return false;
     }
@@ -254,90 +349,9 @@ bool loadList(
         return false;
     }
 
-    dwellListLength = 0;
-    voltageListLength = 0;
-    currentListLength = 0;
-
-    bool success = true;
-
-#if OPTION_DISPLAY
-    size_t totalSize = file.size();
-#endif
-
     sd_card::BufferedFile bufferedFile(file);
 
-    for (int i = 0; i < MAX_LIST_LENGTH; ++i) {
-#if OPTION_DISPLAY
-        if (showProgress) {
-            eez::psu::gui::PsuAppContext::updateProgressPage(file.tell(), totalSize);
-        }
-#endif
-
-        sd_card::matchZeroOrMoreSpaces(bufferedFile);
-        if (!bufferedFile.available()) {
-            break;
-        }
-
-        float value;
-
-        if (sd_card::match(bufferedFile, LIST_CSV_FILE_NO_VALUE_CHAR)) {
-            if (i < dwellListLength) {
-                success = false;
-                break;
-            }
-        } else if (sd_card::match(bufferedFile, value)) {
-            if (i == dwellListLength) {
-                dwellList[i] = value;
-                dwellListLength = i + 1;
-            } else {
-                success = false;
-                break;
-            }
-        } else {
-            success = false;
-            break;
-        }
-
-        sd_card::match(bufferedFile, CSV_SEPARATOR);
-
-        if (sd_card::match(bufferedFile, LIST_CSV_FILE_NO_VALUE_CHAR)) {
-            if (i < voltageListLength) {
-                success = false;
-                break;
-            }
-        } else if (sd_card::match(bufferedFile, value)) {
-            if (i == voltageListLength) {
-                voltageList[i] = value;
-                ++voltageListLength;
-            } else {
-                success = false;
-                break;
-            }
-        } else {
-            success = false;
-            break;
-        }
-
-        sd_card::match(bufferedFile, CSV_SEPARATOR);
-
-        if (sd_card::match(bufferedFile, LIST_CSV_FILE_NO_VALUE_CHAR)) {
-            if (i < currentListLength) {
-                success = false;
-                break;
-            }
-        } else if (sd_card::match(bufferedFile, value)) {
-            if (i == currentListLength) {
-                currentList[i] = value;
-                ++currentListLength;
-            } else {
-                success = false;
-                break;
-            }
-        } else {
-            success = false;
-            break;
-        }
-    }
+    bool success = loadList(bufferedFile, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, showProgress, err);
 
     file.close();
 
@@ -375,38 +389,18 @@ bool loadList(int iChannel, const char *filePath, int *err) {
 }
 
 bool saveList(
-    const char *filePath,
+    File &file,
     float *dwellList, uint16_t &dwellListLength,
     float *voltageList, uint16_t &voltageListLength,
     float *currentList, uint16_t &currentListLength,
     bool showProgress,
     int *err
 ) {
-    if (!sd_card::isMounted(err)) {
-        return false;
-    }
-
-    sd_card::makeParentDir(filePath);
-
-    sd_card::deleteFile(filePath, NULL);
-
-    File file;
-    if (!file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
-        if (err) {
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
-        }
-        return false;
-    }
-
-    uint16_t maxListLength = MAX(MAX(dwellListLength, voltageListLength), currentListLength);
-
-    for (int i = 0; i < dwellListLength || i < voltageListLength || i < currentListLength; i++) {
 #if OPTION_DISPLAY
-        if (showProgress) {
-            eez::psu::gui::PsuAppContext::updateProgressPage(i + 1, maxListLength);
-        }
+    uint16_t maxListLength = MAX(MAX(dwellListLength, voltageListLength), currentListLength);
 #endif
 
+    for (int i = 0; i < dwellListLength || i < voltageListLength || i < currentListLength; i++) {
         if (i < dwellListLength) {
             file.print(dwellList[i], 4);
         } else {
@@ -430,7 +424,42 @@ bool saveList(
         }
 
         file.print('\n');
+
+#if OPTION_DISPLAY
+        if (showProgress) {
+            eez::psu::gui::PsuAppContext::updateProgressPage(i, maxListLength);
+        }
+#endif
     }
+
+    return true;
+}
+
+bool saveList(
+    const char *filePath,
+    float *dwellList, uint16_t &dwellListLength,
+    float *voltageList, uint16_t &voltageListLength,
+    float *currentList, uint16_t &currentListLength,
+    bool showProgress,
+    int *err
+) {
+    if (!sd_card::isMounted(err)) {
+        return false;
+    }
+
+    sd_card::makeParentDir(filePath);
+
+    sd_card::deleteFile(filePath, NULL);
+
+    File file;
+    if (!file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
+        if (err) {
+            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+        }
+        return false;
+    }
+
+    saveList(file, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, showProgress, err);
 
     file.close();
 

@@ -891,17 +891,6 @@ namespace gui {
 
 using namespace eez::psu;
 
-Page *getUserProfilesPage() {
-    Page *page = getPage(PAGE_ID_USER_PROFILE_SETTINGS);
-    if (!page) {
-        page = getPage(PAGE_ID_USER_PROFILE_0_SETTINGS);
-    }
-    if (!page) {
-        page = getPage(PAGE_ID_USER_PROFILES);
-    }
-    return page;
-}
-
 static Cursor g_editValueCursor;
 static uint16_t g_editValueDataId;
 

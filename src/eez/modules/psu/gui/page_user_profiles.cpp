@@ -22,11 +22,14 @@
 
 #include <string.h>
 
+#include <eez/scpi/scpi.h>
+
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
 
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/file_manager.h>
 
 #include <scpi/scpi.h>
 
@@ -37,6 +40,15 @@ namespace psu {
 namespace gui {
 
 static int g_selectedProfileLocation = -1;
+
+UserProfilesPage *getUserProfileSettingsPage() {
+    Page *page = g_psuAppContext.getPage(PAGE_ID_USER_PROFILE_SETTINGS);
+    if (!page) {
+        page = g_psuAppContext.getPage(PAGE_ID_USER_PROFILE_0_SETTINGS);
+    }
+    return (UserProfilesPage *)page;
+}
+
 
 int UserProfilesPage::getSelectedProfileLocation() {
     if (getActivePageId() == PAGE_ID_USER_PROFILE_0_SETTINGS || getActivePageId() == PAGE_ID_USER_PROFILE_SETTINGS) {
@@ -107,6 +119,82 @@ void UserProfilesPage::save() {
         } else {
             onSaveYes();
         }
+    }
+}
+
+void UserProfilesPage::onImportProfileFileSelected(const char *profileFilePath) {
+    auto *page = (UserProfilesPage *)getUserProfileSettingsPage();
+    strcpy(page->m_profileFilePath, profileFilePath);
+    
+    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Importing profile...");
+
+    using namespace eez::scpi;
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_IMPORT, 0), osWaitForever);
+}
+
+void UserProfilesPage::doImportProfile() {
+    auto *page = (UserProfilesPage *)getUserProfileSettingsPage();
+
+    int err;
+    profile::recallFromFile(
+        g_selectedProfileLocation,
+        page->m_profileFilePath,
+        true,
+        &err
+    );
+
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_IMPORT, err), osWaitForever);
+}
+
+void UserProfilesPage::onImportProfileFinished(int16_t err) {
+    eez::psu::gui::g_psuAppContext.hideProgressPage();
+
+    if (err != SCPI_RES_OK) {
+        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+    }
+}
+
+void UserProfilesPage::importProfile() {
+    if (g_selectedProfileLocation > 0) {
+        file_manager::browseForFile("Import profile", "/Profiles", FILE_TYPE_PROFILE, file_manager::DIALOG_TYPE_OPEN, onImportProfileFileSelected);
+    }
+}
+
+void UserProfilesPage::onExportProfileFileSelected(const char *profileFilePath) {
+    auto *page = (UserProfilesPage *)getUserProfileSettingsPage();
+    strcpy(page->m_profileFilePath, profileFilePath);
+    
+    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Exporting profile...");
+
+    using namespace eez::scpi;
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EXPORT, 0), osWaitForever);
+}
+
+void UserProfilesPage::doExportProfile() {
+    auto *page = (UserProfilesPage *)getUserProfileSettingsPage();
+
+    int err;
+    profile::saveToFile(
+        g_selectedProfileLocation,
+        page->m_profileFilePath,
+        true,
+        &err
+    );
+
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EXPORT, err), osWaitForever);
+}
+
+void UserProfilesPage::onExportProfileFinished(int16_t err) {
+    eez::psu::gui::g_psuAppContext.hideProgressPage();
+
+    if (err != SCPI_RES_OK) {
+        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+    }
+}
+
+void UserProfilesPage::exportProfile() {
+    if (profile::isValid(g_selectedProfileLocation)) {
+        file_manager::browseForFile("Export profile as", "/Profiles", FILE_TYPE_PROFILE, file_manager::DIALOG_TYPE_SAVE, onExportProfileFileSelected);
     }
 }
 

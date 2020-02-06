@@ -509,6 +509,14 @@ void action_profile_save() {
     ((UserProfilesPage *)getActivePage())->save();
 }
 
+void action_profile_import() {
+    ((UserProfilesPage *)getActivePage())->importProfile();
+}
+
+void action_profile_export() {
+    ((UserProfilesPage *)getActivePage())->exportProfile();
+}
+
 void action_profile_delete() {
     ((UserProfilesPage *)getActivePage())->deleteProfile();
 }

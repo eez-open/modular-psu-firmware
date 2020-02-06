@@ -21,7 +21,17 @@
 #define LIST_EXT ".list"
 
 namespace eez {
+
+// forward declaration
+class File;
+    
 namespace psu {
+
+// forward declaration
+namespace sd_card {
+class BufferedFile;
+}
+
 namespace list {
 
 void init();
@@ -56,6 +66,14 @@ bool areVoltageAndCurrentListLengthsEquivalent(Channel &channel);
 int checkLimits(int iChannel);
 
 bool loadList(
+    sd_card::BufferedFile &file,
+    float *dwellList, uint16_t &dwellListLength,
+    float *voltageList, uint16_t &voltageListLength,
+    float *currentList, uint16_t &currentListLength,
+    bool showProgress,
+    int *err
+);
+bool loadList(
     const char *filePath,
     float *dwellList, uint16_t &dwellListLength,
     float *voltageList, uint16_t &voltageListLength,
@@ -65,6 +83,14 @@ bool loadList(
 );
 bool loadList(int iChannel, const char *filePath, int *err);
 
+bool saveList(
+    File &file,
+    float *dwellList, uint16_t &dwellListLength,
+    float *voltageList, uint16_t &voltageListLength,
+    float *currentList, uint16_t &currentListLength,
+    bool showProgress,
+    int *err
+);
 bool saveList(
     const char *filePath,
     float *dwellList, uint16_t &dwellListLength,

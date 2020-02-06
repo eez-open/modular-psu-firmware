@@ -117,7 +117,7 @@ extern "C" {
     X(SCPI_ERROR_LIST_LENGTHS_NOT_EQUIVALENT,                307, "List lengths are not equivalent")              \
     X(SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER,            308, "Cannot be changed while transient trigger is initiated") \
     X(SCPI_ERROR_CANNOT_INITIATE_WHILE_IN_FIXED_MODE,        309, "Cannot initiate while in fixed mode")          \
-    X(SCPI_ERROR_LIST_NOT_FOUND,                             310, "List not found")                               \
+    X(SCPI_ERROR_FILE_NOT_FOUND,                             310, "File not found")                               \
     X(SCPI_ERROR_LIST_IS_EMPTY,                              311, "List is empty")                                \
     X(SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED,         312, "Cannot execute when the channels are coupled") \
     X(SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE,             313, "Cannot execute in tracking mode")              \

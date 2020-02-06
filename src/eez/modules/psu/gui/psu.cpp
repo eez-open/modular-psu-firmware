@@ -811,7 +811,11 @@ bool PsuAppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) 
 }
 
 void PsuAppContext::hideProgressPage() {
-    g_psuAppContext.m_popProgressPage = true;
+    if (g_psuAppContext.m_pushProgressPage) {
+        g_psuAppContext.m_pushProgressPage = false;
+    } else {
+        g_psuAppContext.m_popProgressPage = true;
+    }
 }
 
 void PsuAppContext::setTextMessage(const char *message, unsigned int len) {
@@ -1676,6 +1680,10 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
         g_ChSettingsListsPage.onLoadListFinished(param);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST_FINISHED) {
         g_ChSettingsListsPage.onSaveListFinished(param);
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_IMPORT) {
+        g_UserProfilesPage.onImportProfileFinished(param);
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EXPORT) {
+        g_UserProfilesPage.onExportProfileFinished(param);
     }
 }
 
