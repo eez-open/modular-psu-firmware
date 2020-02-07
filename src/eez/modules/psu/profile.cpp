@@ -1026,13 +1026,13 @@ bool profileWrite(WriteContext &ctx, const Parameters &parameters, bool showProg
                 auto &channel = Channel::get(channelIndex);
 
                 uint16_t dwellListLength;
-                float *dwellList = list::getDwellList(Channel::get(channelIndex), &dwellListLength);
+                float *dwellList = list::getDwellList(channel, &dwellListLength);
 
                 uint16_t voltageListLength;
-                float *voltageList = list::getVoltageList(Channel::get(channelIndex), &voltageListLength);
+                float *voltageList = list::getVoltageList(channel, &voltageListLength);
 
                 uint16_t currentListLength;
-                float *currentList = list::getCurrentList(Channel::get(channelIndex), &currentListLength);
+                float *currentList = list::getCurrentList(channel, &currentListLength);
 
                 ctx.property(
                     "list",

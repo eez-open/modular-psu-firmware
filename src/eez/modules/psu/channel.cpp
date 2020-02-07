@@ -634,7 +634,7 @@ void Channel::resetHistory() {
         iHistory[i] = 0;
     }
     flags.historyStarted = 0;
-    historyPosition = 0;
+    historyPosition = 1;
 }
 
 void Channel::clearCalibrationConf() {
@@ -760,7 +760,7 @@ void Channel::tick(uint32_t tick_usec) {
     if (!flags.historyStarted) {
         flags.historyStarted = 1;
         historyLastTick = tick_usec;
-        historyPosition = 0;
+        historyPosition = 1;
     } else {
         uint32_t ytViewRateMicroseconds = (int)round(ytViewRate * 1000000L);
         while (tick_usec - historyLastTick >= ytViewRateMicroseconds) {

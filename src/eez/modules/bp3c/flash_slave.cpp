@@ -382,7 +382,6 @@ void leaveBootloaderMode() {
     g_bootloaderMode = false;
 
 #if defined(EEZ_PLATFORM_STM32)
-    int err;
     psu::profile::recallFromLocation(10);
 
     HAL_UART_DeInit(phuart);
