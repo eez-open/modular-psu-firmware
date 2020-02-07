@@ -40,6 +40,7 @@ namespace psu {
 namespace gui {
 
 static int g_selectedProfileLocation = -1;
+char g_remark[PROFILE_NAME_MAX_LENGTH + 1];
 
 UserProfilesPage *getUserProfileSettingsPage() {
     Page *page = g_psuAppContext.getPage(PAGE_ID_USER_PROFILE_SETTINGS);
@@ -62,6 +63,8 @@ void UserProfilesPage::showProfile() {
     pushPage(g_selectedProfileLocation == 0 ? PAGE_ID_USER_PROFILE_0_SETTINGS : PAGE_ID_USER_PROFILE_SETTINGS);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 void UserProfilesPage::toggleAutoRecall() {
     bool enable = persist_conf::isProfileAutoRecallEnabled() ? false : true;
     persist_conf::enableProfileAutoRecall(enable);
@@ -73,32 +76,16 @@ void UserProfilesPage::toggleIsAutoRecallLocation() {
     }
 }
 
-void UserProfilesPage::recall() {
-    if (g_selectedProfileLocation > 0 && profile::isValid(g_selectedProfileLocation)) {
-        int err;
-        if (profile::recall(g_selectedProfileLocation, &err)) {
-            infoMessage("Profile parameters loaded");
+////////////////////////////////////////////////////////////////////////////////
+
+void UserProfilesPage::saveProfile() {
+    if (g_selectedProfileLocation > 0) {
+        if (profile::isValid(g_selectedProfileLocation)) {
+            areYouSure(onSaveYes);
         } else {
-            if (err == SCPI_ERROR_PROFILE_MODULE_MISMATCH) {
-                errorMessage("Module mismatch in profile!");
-            } else {
-                errorMessage("Failed!");
-            }
+            onSaveYes();
         }
     }
-}
-
-void UserProfilesPage::onSaveFinish(char *remark, void (*callback)()) {
-    callback();
-    if (profile::saveAtLocation(g_selectedProfileLocation, remark)) {
-        infoMessage("Current parameters saved");
-    } else {
-        errorMessage("EEPROM save failed!");
-    }
-}
-
-void UserProfilesPage::onSaveEditRemarkOk(char *remark) {
-    onSaveFinish(remark, popPage);
 }
 
 void UserProfilesPage::onSaveYes() {
@@ -112,13 +99,53 @@ void UserProfilesPage::onSaveYes() {
     }
 }
 
-void UserProfilesPage::save() {
+void UserProfilesPage::onSaveEditRemarkOk(char *remark) {
+    onSaveFinish(remark, popPage);
+}
+
+void UserProfilesPage::onSaveFinish(char *remark, void (*callback)()) {
+    if (callback) {
+        callback();
+    }
+
+    strcpy(g_remark, remark);
+
+    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Saving profile...");
+
+    using namespace eez::scpi;
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_SAVE, 0), osWaitForever);
+}
+
+void UserProfilesPage::doSaveProfile() {
+    int err;
+    profile::saveToLocation(g_selectedProfileLocation, g_remark, true, &err);
+
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void UserProfilesPage::recallProfile() {
+    if (g_selectedProfileLocation > 0 && profile::isValid(g_selectedProfileLocation)) {
+        eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Recalling profile...");
+
+        using namespace eez::scpi;
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_RECALL, 0), osWaitForever);
+    }
+}
+
+void UserProfilesPage::doRecallProfile() {
+    int err;
+    profile::recallFromLocation(g_selectedProfileLocation, 0, true, &err);
+
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void UserProfilesPage::importProfile() {
     if (g_selectedProfileLocation > 0) {
-        if (profile::isValid(g_selectedProfileLocation)) {
-            areYouSure(onSaveYes);
-        } else {
-            onSaveYes();
-        }
+        file_manager::browseForFile("Import profile", "/Profiles", FILE_TYPE_PROFILE, file_manager::DIALOG_TYPE_OPEN, onImportProfileFileSelected);
     }
 }
 
@@ -136,27 +163,16 @@ void UserProfilesPage::doImportProfile() {
     auto *page = (UserProfilesPage *)getUserProfileSettingsPage();
 
     int err;
-    profile::recallFromFile(
-        g_selectedProfileLocation,
-        page->m_profileFilePath,
-        true,
-        &err
-    );
+    profile::importFileToLocation(page->m_profileFilePath, g_selectedProfileLocation, true, &err);
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_IMPORT, err), osWaitForever);
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
 }
 
-void UserProfilesPage::onImportProfileFinished(int16_t err) {
-    eez::psu::gui::g_psuAppContext.hideProgressPage();
+////////////////////////////////////////////////////////////////////////////////
 
-    if (err != SCPI_RES_OK) {
-        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
-    }
-}
-
-void UserProfilesPage::importProfile() {
-    if (g_selectedProfileLocation > 0) {
-        file_manager::browseForFile("Import profile", "/Profiles", FILE_TYPE_PROFILE, file_manager::DIALOG_TYPE_OPEN, onImportProfileFileSelected);
+void UserProfilesPage::exportProfile() {
+    if (profile::isValid(g_selectedProfileLocation)) {
+        file_manager::browseForFile("Export profile as", "/Profiles", FILE_TYPE_PROFILE, file_manager::DIALOG_TYPE_SAVE, onExportProfileFileSelected);
     }
 }
 
@@ -174,39 +190,12 @@ void UserProfilesPage::doExportProfile() {
     auto *page = (UserProfilesPage *)getUserProfileSettingsPage();
 
     int err;
-    profile::saveToFile(
-        g_selectedProfileLocation,
-        page->m_profileFilePath,
-        true,
-        &err
-    );
+    profile::exportLocationToFile(g_selectedProfileLocation, page->m_profileFilePath, true, &err);
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EXPORT, err), osWaitForever);
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
 }
 
-void UserProfilesPage::onExportProfileFinished(int16_t err) {
-    eez::psu::gui::g_psuAppContext.hideProgressPage();
-
-    if (err != SCPI_RES_OK) {
-        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
-    }
-}
-
-void UserProfilesPage::exportProfile() {
-    if (profile::isValid(g_selectedProfileLocation)) {
-        file_manager::browseForFile("Export profile as", "/Profiles", FILE_TYPE_PROFILE, file_manager::DIALOG_TYPE_SAVE, onExportProfileFileSelected);
-    }
-}
-
-void UserProfilesPage::onDeleteProfileYes() {
-    if (g_selectedProfileLocation > 0 && profile::isValid(g_selectedProfileLocation)) {
-        if (profile::deleteLocation(g_selectedProfileLocation)) {
-            infoMessage("Profile deleted");
-        } else {
-            errorMessage("Failed!");
-        }
-    }
-}
+////////////////////////////////////////////////////////////////////////////////
 
 void UserProfilesPage::deleteProfile() {
     if (g_selectedProfileLocation > 0 && profile::isValid(g_selectedProfileLocation)) {
@@ -214,21 +203,54 @@ void UserProfilesPage::deleteProfile() {
     }
 }
 
-void UserProfilesPage::onEditRemarkOk(char *newRemark) {
-    popPage();
+void UserProfilesPage::onDeleteProfileYes() {
+    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Deleting profile...");
 
-    if (profile::setName(g_selectedProfileLocation, newRemark, strlen(newRemark))) {
-        infoMessage("Remark changed");
-    } else {
-        errorMessage("Failed!");
-    }
+    using namespace eez::scpi;
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_DELETE, 0), osWaitForever);
 }
+
+void UserProfilesPage::doDeleteProfile() {
+    int err;
+    profile::deleteLocation(g_selectedProfileLocation, true, &err);
+
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 void UserProfilesPage::editRemark() {
     if (g_selectedProfileLocation > 0 && profile::isValid(g_selectedProfileLocation)) {
         char remark[PROFILE_NAME_MAX_LENGTH + 1];
         profile::getName(g_selectedProfileLocation, remark, sizeof(remark));
         Keypad::startPush(0, remark, 0, PROFILE_NAME_MAX_LENGTH, false, onEditRemarkOk, 0);
+    }
+}
+
+void UserProfilesPage::onEditRemarkOk(char *newRemark) {
+    popPage();
+
+    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Saving profile remark...");
+
+    using namespace eez::scpi;
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EDIT_REMARK, 0), osWaitForever);
+}
+
+void UserProfilesPage::doEditRemark() {
+    int err;
+    profile::setName(g_selectedProfileLocation, g_remark, strlen(g_remark), true, &err);
+
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void UserProfilesPage::onAsyncOperationFinished(int16_t err) {
+    eez::psu::gui::g_psuAppContext.hideProgressPage();
+    if (err == SCPI_RES_OK) {
+        // infoMessage("Done!");
+    } else {
+        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
     }
 }
 

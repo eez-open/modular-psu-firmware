@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
 		/* Clear reset flags */
 		RCC->CSR |= RCC_CSR_RMVF;
 	}
-	MX_IWDG_Init();
+	//MX_IWDG_Init();
 
     HAL_Init();
     SystemClock_Config();

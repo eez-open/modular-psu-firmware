@@ -195,26 +195,26 @@ bool isBusy() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-BufferedFile::BufferedFile(File &file_)
+BufferedFileRead::BufferedFileRead(File &file_)
     : file(file_)
     , position(BUFFER_SIZE)
     , end(BUFFER_SIZE)
 {
 }
 
-void BufferedFile::readNextChunk() {
+void BufferedFileRead::readNextChunk() {
     if (position == end && end == BUFFER_SIZE) {
         position = 0;
         end = file.read(buffer, BUFFER_SIZE);
     }
 }
 
-int BufferedFile::peek() {
+int BufferedFileRead::peek() {
     readNextChunk();
     return position < end ? buffer[position] : -1;
 }
 
-int BufferedFile::read() {
+int BufferedFileRead::read() {
     readNextChunk();
     int ch = peek();
     if (ch != -1) {
@@ -223,18 +223,75 @@ int BufferedFile::read() {
     return ch;
 }
 
-bool BufferedFile::available() {
+bool BufferedFileRead::available() {
     return peek() != -1;
 }
 
-size_t BufferedFile::size() {
+size_t BufferedFileRead::size() {
     return file.size();
 }
 
-size_t BufferedFile::tell() {
+size_t BufferedFileRead::tell() {
     return file.tell();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+BufferedFileWrite::BufferedFileWrite(File &file_)
+    : file(file_)
+    , position(0)
+{
+}
+
+size_t BufferedFileWrite::write(const uint8_t *buf, size_t size) {
+    size_t written = 0;
+
+    while (position + size >= BUFFER_SIZE) {
+        size_t partialSize = BUFFER_SIZE - position;
+        memcpy(buffer + position, buf, partialSize);
+        position += partialSize;
+        written += partialSize;
+        if (flush() == 0) {
+            return written;
+        }
+        buf += partialSize;
+        size -= partialSize;
+    } 
+    
+    if (size > 0) {
+        memcpy(buffer + position, buf, size);
+        position += size;
+        written += size;
+    }
+
+    return written;
+}
+
+size_t BufferedFileWrite::print(float value, int numDecimalDigits) {
+    char buf[32];
+    sprintf(buf, "%.*f", numDecimalDigits, value);
+    return write((const uint8_t *)buf, strlen(buf));
+}
+
+size_t BufferedFileWrite::print(char value) {
+    return write((const uint8_t *)&value, 1);
+}
+
+size_t BufferedFileWrite::flush() {
+    if (position == 0) {
+        return 0;
+    }
+    size_t written = file.write(buffer, position);
+    if (written < position) {
+        if (written > 0) {
+            position -= written;
+            memmove(buffer, buffer + written, position);
+        }
+    } else {
+        position = 0;
+    }
+    return written;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -244,7 +301,7 @@ bool isSpace(int c) {
 }
 #endif
 
-void matchZeroOrMoreSpaces(BufferedFile &file) {
+void matchZeroOrMoreSpaces(BufferedFileRead &file) {
     while (true) {
         int c = file.peek();
         if (!isSpace(c)) {
@@ -254,7 +311,7 @@ void matchZeroOrMoreSpaces(BufferedFile &file) {
     }
 }
 
-bool match(BufferedFile &file, char ch) {
+bool match(BufferedFileRead &file, char ch) {
     matchZeroOrMoreSpaces(file);
     if (file.peek() == ch) {
         file.read();
@@ -263,7 +320,7 @@ bool match(BufferedFile &file, char ch) {
     return false;
 }
 
-bool match(BufferedFile &file, const char *str) {
+bool match(BufferedFileRead &file, const char *str) {
     matchZeroOrMoreSpaces(file);
 
     for (; *str; str++) {
@@ -276,7 +333,7 @@ bool match(BufferedFile &file, const char *str) {
     return true;
 }
 
-bool matchUntil(BufferedFile &file, char ch, char *result) {
+bool matchUntil(BufferedFileRead &file, char ch, char *result) {
     while (true) {
         int next = file.peek();
         if (next == -1) {
@@ -294,7 +351,7 @@ bool matchUntil(BufferedFile &file, char ch, char *result) {
     }
 }
 
-void skipUntilEOL(BufferedFile &file) {
+void skipUntilEOL(BufferedFileRead &file) {
     while (true) {
         int next = file.peek();
         if (next == -1 || next == '\r' || next == '\n') {
@@ -304,7 +361,7 @@ void skipUntilEOL(BufferedFile &file) {
     }
 }
 
-bool matchQuotedString(BufferedFile &file, char *str, unsigned int strLength) {
+bool matchQuotedString(BufferedFileRead &file, char *str, unsigned int strLength) {
     if (!match(file, '"')) {
         return false;
     }
@@ -339,7 +396,7 @@ bool matchQuotedString(BufferedFile &file, char *str, unsigned int strLength) {
     }
 }
 
-bool match(BufferedFile &file, unsigned int &result) {
+bool match(BufferedFileRead &file, unsigned int &result) {
     matchZeroOrMoreSpaces(file);
 
     int c = file.peek();
@@ -366,7 +423,7 @@ bool match(BufferedFile &file, unsigned int &result) {
 }
 
 
-bool match(BufferedFile &file, float &result) {
+bool match(BufferedFileRead &file, float &result) {
     matchZeroOrMoreSpaces(file);
 
     int c = file.peek();
@@ -427,13 +484,18 @@ bool match(BufferedFile &file, float &result) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool makeParentDir(const char *filePath) {
+bool makeParentDir(const char *filePath, int *err) {
     char dirPath[MAX_PATH_LENGTH];
     getParentDir(filePath, dirPath);
-    if (!SD.mkdir(dirPath)) {
-        return false;
+    if (!SD.exists(dirPath)) {
+		if (!SD.mkdir(dirPath)) {
+			if (err) {
+				*err = SCPI_ERROR_MASS_STORAGE_ERROR;
+			}
+			return false;
+		}
+	    onSdCardFileChangeHook(dirPath);
     }
-    onSdCardFileChangeHook(dirPath);
     return true;
 }
 
@@ -793,8 +855,7 @@ void getDateTime(FileInfo &fileInfo, uint8_t *resultYear, uint8_t *resultMonth, 
     int second = fileInfo.getModifiedSecond();
 
     uint32_t utc = datetime::makeTime(year, month, day, hour, minute, second);
-    uint32_t local = datetime::utcToLocal(utc, persist_conf::devConf.time_zone,
-                                          (datetime::DstRule)persist_conf::devConf.dstRule);
+    uint32_t local = datetime::utcToLocal(utc, persist_conf::devConf.timeZone, (datetime::DstRule)persist_conf::devConf.dstRule);
     datetime::breakTime(local, year, month, day, hour, minute, second);
 
     if (resultYear) {

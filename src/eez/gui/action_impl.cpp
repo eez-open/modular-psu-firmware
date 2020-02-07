@@ -420,7 +420,6 @@ void action_ch_settings_prot_toggle_type() {
     } else {
         selectChannel();
         channel_dispatcher::setOvpType(*g_channel, g_channel->prot_conf.flags.u_type ? 0 : 1);
-        profile::save();
     }
 }
 
@@ -502,11 +501,11 @@ void action_profile_toggle_is_auto_recall_location() {
 }
 
 void action_profile_recall() {
-    ((UserProfilesPage *)getActivePage())->recall();
+    ((UserProfilesPage *)getActivePage())->recallProfile();
 }
 
 void action_profile_save() {
-    ((UserProfilesPage *)getActivePage())->save();
+    ((UserProfilesPage *)getActivePage())->saveProfile();
 }
 
 void action_profile_import() {

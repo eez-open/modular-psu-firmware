@@ -323,7 +323,7 @@ void enterBootloaderMode(int slotIndex) {
     g_bootloaderMode = true;
 
 #if defined(EEZ_PLATFORM_STM32)
-    psu::profile::saveAtLocation(10);
+    psu::profile::saveToLocation(10);
 
     reset();
 
@@ -383,7 +383,7 @@ void leaveBootloaderMode() {
 
 #if defined(EEZ_PLATFORM_STM32)
     int err;
-    psu::profile::recall(10, &err);
+    psu::profile::recallFromLocation(10);
 
     HAL_UART_DeInit(phuart);
 

@@ -130,7 +130,7 @@ void editSystemPassword() {
 }
 
 void editCalibrationPassword() {
-    editPassword(persist_conf::devConf.calibration_password);
+    editPassword(persist_conf::devConf.calibrationPassword);
 }
 
 } // namespace gui

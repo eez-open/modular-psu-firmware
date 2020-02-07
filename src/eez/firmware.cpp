@@ -273,17 +273,14 @@ bool testMaster() {
 bool test() {
     bool testResult = true;
 
-    psu::profile::saveAtLocation(10);
-    bool wasSaveProfileEnabled = psu::profile::enableSave(false);
+    psu::profile::saveToLocation(10);
     psu::psuReset();
 
     testResult &= testMaster();
 
     testResult &= psu::testChannels();
 
-    psu::profile::enableSave(wasSaveProfileEnabled);
-    int err;
-    psu::profile::recall(10, &err);
+    psu::profile::recallFromLocation(10);
 
     if (!testResult) {
         sound::playBeep();
@@ -300,12 +297,7 @@ bool reset() {
         return true;
     }
 
-    if (psuReset()) {
-        profile::save();
-        return true;
-    }
-
-    return false;
+    return psuReset();
 }
 
 void standBy() {
@@ -332,12 +324,10 @@ void shutdown() {
 
     g_shutdownInProgress = true;
 
+    profile::shutdownSave();
+
     if (psu::isPowerUp()) {
-    	profile::saveIfDirty();
-    	profile::enableSave(false);
     	psu::changePowerState(false);
-    } else {
-    	profile::saveIfDirty();
     }
 
     osDelay(50);

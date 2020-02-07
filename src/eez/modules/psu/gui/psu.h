@@ -147,6 +147,10 @@ protected:
     bool isAutoRepeatAction(int action) override;
     void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) override;
     bool testExecuteActionOnTouchDown(int action) override;
+    
+private:
+    void doShowProgressPage();
+    void doHideProgressPage();
 };
 
 extern PsuAppContext g_psuAppContext;

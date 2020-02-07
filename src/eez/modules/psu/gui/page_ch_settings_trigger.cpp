@@ -49,7 +49,6 @@ void ChSettingsTriggerPage::onFinishTriggerModeSet() {
     channel_dispatcher::setVoltageTriggerMode(*g_channel, (TriggerMode)g_newTriggerMode);
     channel_dispatcher::setCurrentTriggerMode(*g_channel, (TriggerMode)g_newTriggerMode);
     channel_dispatcher::setTriggerOutputState(*g_channel, true);
-    profile::save();
 }
 
 void ChSettingsTriggerPage::onTriggerModeSet(uint16_t value) {
@@ -73,7 +72,6 @@ void ChSettingsTriggerPage::editTriggerMode() {
 void ChSettingsTriggerPage::onVoltageTriggerValueSet(float value) {
     popPage();
     channel_dispatcher::setTriggerVoltage(*g_channel, value);
-    profile::save();
 }
 
 void ChSettingsTriggerPage::editVoltageTriggerValue() {
@@ -96,7 +94,6 @@ void ChSettingsTriggerPage::editVoltageTriggerValue() {
 void ChSettingsTriggerPage::onCurrentTriggerValueSet(float value) {
     popPage();
     channel_dispatcher::setTriggerCurrent(*g_channel, value);
-    profile::save();
 }
 
 void ChSettingsTriggerPage::editCurrentTriggerValue() {
@@ -121,7 +118,6 @@ void ChSettingsTriggerPage::editCurrentTriggerValue() {
 void ChSettingsTriggerPage::onTriggerOnListStopSet(uint16_t value) {
     popPage();
     channel_dispatcher::setTriggerOnListStop(*g_channel, (TriggerOnListStop)value);
-    profile::save();
 }
 
 void ChSettingsTriggerPage::editTriggerOnListStop() {
@@ -131,13 +127,11 @@ void ChSettingsTriggerPage::editTriggerOnListStop() {
 void ChSettingsTriggerPage::onListCountSet(float value) {
     popPage();
     channel_dispatcher::setListCount(*g_channel, (uint16_t)value);
-    profile::save();
 }
 
 void ChSettingsTriggerPage::onListCountSetToInfinity() {
     popPage();
     channel_dispatcher::setListCount(*g_channel, 0);
-    profile::save();
 }
 
 void ChSettingsTriggerPage::editListCount() {
@@ -463,8 +457,6 @@ void ChSettingsListsPage::set() {
             channel_dispatcher::setDwellList(*g_channel, m_dwellList, m_dwellListLength);
             channel_dispatcher::setVoltageList(*g_channel, m_voltageList, m_voltageListLength);
             channel_dispatcher::setCurrentList(*g_channel, m_currentList, m_currentListLength);
-
-            profile::save();
 
             popPage();
             infoMessage("Lists changed!");

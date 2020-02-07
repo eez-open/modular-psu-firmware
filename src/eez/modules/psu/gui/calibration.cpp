@@ -70,7 +70,7 @@ void onStartPasswordOk() {
 }
 
 void start() {
-    checkPassword("Password: ", persist_conf::devConf.calibration_password, onStartPasswordOk);
+    checkPassword("Password: ", persist_conf::devConf.calibrationPassword, onStartPasswordOk);
 }
 
 data::Value getLevelValue() {

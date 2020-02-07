@@ -50,8 +50,9 @@ scpi_result_t scpi_cmd_memoryStateDelete(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!profile::deleteLocation(location)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+    int err;
+    if (!profile::deleteLocation(location, false, &err)) {
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
@@ -59,8 +60,9 @@ scpi_result_t scpi_cmd_memoryStateDelete(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_memoryStateDeleteAll(scpi_t *context) {
-    if (!profile::deleteAll()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+    int err;
+    if (!profile::deleteAllLocations(&err)) {
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
@@ -89,8 +91,9 @@ scpi_result_t scpi_cmd_memoryStateName(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!profile::setName(location, name, name_len)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+    int err;
+    if (!profile::setName(location, name, name_len, false, &err)) {
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 

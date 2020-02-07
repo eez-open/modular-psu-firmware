@@ -3321,7 +3321,7 @@ void data_profile_remark(data::DataOperationEnum operation, data::Cursor &cursor
     if (operation == data::DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1) {
-            profile::Parameters *profile = profile::load(selectedProfileLocation);
+            profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
             if (profile) {
                 value = data::Value(profile->name);
             }
@@ -3344,7 +3344,7 @@ void data_profile_channel_u_set(data::DataOperationEnum operation, data::Cursor 
     if (operation == data::DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
-            profile::Parameters *profile = profile::load(selectedProfileLocation);
+            profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
             if (profile) {
                 value = MakeValue(profile->channels[cursor.i].u_set, UNIT_VOLT);
             }
@@ -3356,7 +3356,7 @@ void data_profile_channel_i_set(data::DataOperationEnum operation, data::Cursor 
     if (operation == data::DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
-            profile::Parameters *profile = profile::load(selectedProfileLocation);
+            profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
             if (profile) {
                 value = MakeValue(profile->channels[cursor.i].i_set, UNIT_AMPER);
             }
@@ -3368,17 +3368,11 @@ void data_profile_channel_output_state(data::DataOperationEnum operation, data::
     if (operation == data::DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1 && (cursor.i >= 0 && cursor.i < CH_MAX)) {
-            profile::Parameters *profile = profile::load(selectedProfileLocation);
+            profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
             if (profile) {
                 value = (int)profile->channels[cursor.i].flags.output_enabled;
             }
         }
-    }
-}
-
-void data_profile_dirty(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = profile::g_profileDirty ? 1 : 0;
     }
 }
 

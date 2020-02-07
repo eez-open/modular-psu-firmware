@@ -92,7 +92,7 @@ void powerDownBySensor();
 
 bool psuReset();
 
-bool autoRecall();
+bool autoRecall(int recallOptions = 0);
 
 void onProtectionTripped();
 

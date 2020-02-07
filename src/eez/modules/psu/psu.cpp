@@ -423,75 +423,19 @@ bool psuReset() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static profile::Parameters *loadAutoRecallProfile(int *location) {
+bool autoRecall(int recallOptions) {
     if (persist_conf::isProfileAutoRecallEnabled()) {
-        *location = persist_conf::getProfileAutoRecallLocation();
-        profile::Parameters *profile = profile::load(*location);
-        if (profile) {
-            bool outputEnabled = false;
-
-            for (int i = 0; i < CH_NUM; ++i) {
-                if (profile->channels[i].flags.output_enabled) {
-                    outputEnabled = true;
-                    break;
-                }
-            }
-
-            if (outputEnabled) {
-                bool disableOutputs = false;
-
-                if (persist_conf::isForceDisablingAllOutputsOnPowerUpEnabled() || !g_bootTestSuccess) {
-                    disableOutputs = true;
-                } else {
-                    if (*location != 0) {
-                        profile::Parameters *defaultProfile = profile::load(0);
-                        if (defaultProfile) {
-                            if (profile->flags.couplingType != defaultProfile->flags.couplingType) {
-                                disableOutputs = true;
-                                event_queue::pushEvent(event_queue::EVENT_WARNING_AUTO_RECALL_VALUES_MISMATCH);
-                            } else {
-                                for (int i = 0; i < CH_NUM; ++i) {
-                                    if (profile->channels[i].u_set != defaultProfile->channels[i].u_set ||
-                                        profile->channels[i].i_set != defaultProfile->channels[i].i_set) {
-                                        disableOutputs = true;
-                                        event_queue::pushEvent( event_queue::EVENT_WARNING_AUTO_RECALL_VALUES_MISMATCH);
-                                        break;
-                                    }
-                                }
-                            }
-                        } else {
-                            disableOutputs = true;
-                        }
-                    }
-                }
-
-                if (disableOutputs) {
-                    for (int i = 0; i < CH_NUM; ++i) {
-                        profile->channels[i].flags.output_enabled = false;
-                    }
-                }
-            }
-
-            return profile;
-        }
-    }
-
-    return nullptr;
-}
-
-bool autoRecall() {
-    int location;
-    profile::Parameters *profile = loadAutoRecallProfile(&location);
-    if (profile) {
-        if (!checkProfileModuleMatch(*profile)) {
-            event_queue::pushEvent(event_queue::EVENT_WARNING_AUTO_RECALL_MODULE_MISMATCH);
-            return false;
-        }
-
-        if (profile::recallFromProfile(*profile, location)) {
+        int location = persist_conf::getProfileAutoRecallLocation();
+        int err;
+        auto forceDisableOutput = persist_conf::isForceDisablingAllOutputsOnPowerUpEnabled() || !g_bootTestSuccess;
+        if (profile::recallFromLocation(location, recallOptions | (forceDisableOutput ? profile::RECALL_OPTION_FORCE_DISABLE_OUTPUT : 0), false, &err)) {
             return true;
         }
+        if (err != SCPI_ERROR_FILE_NOT_FOUND) {
+            generateError(err);
+        }
     }
+
     return false;
 }
 
@@ -608,15 +552,11 @@ void powerDown() {
 }
 
 void powerDownChannels() {
-    bool wasSaveProfileEnabled = profile::enableSave(false);
-
     channel_dispatcher::disableOutputForAllChannels();
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel::get(i).onPowerDown();
     }
-
-    profile::enableSave(wasSaveProfileEnabled);
 }
 
 bool isPowerUp() {
@@ -642,24 +582,11 @@ void changePowerState(bool up) {
     if (up) {
         g_bootTestSuccess = true;
 
-        // auto recall channels parameters from profile
-        int location;
-        profile::Parameters *profile = loadAutoRecallProfile(&location);
-
         if (!powerUp()) {
             return;
         }
 
-        // auto recall channels parameters from profile
-        if (profile) {
-            for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-                memcpy(&temperature::sensors[i].prot_conf, profile->temp_prot + i, sizeof(temperature::ProtectionConfiguration));
-            }
-
-            profile::recallChannelsFromProfile(*profile, location);
-        }
-
-        profile::save();
+        autoRecall(profile::RECALL_OPTION_IGNORE_POWER);
     } else {
 #if OPTION_DISPLAY
         if (!g_shutdownInProgress) {
@@ -667,15 +594,7 @@ void changePowerState(bool up) {
         }
 #endif
 
-        if (!g_shutdownInProgress) {
-            g_powerIsUp = false;
-            profile::save(true);
-            g_powerIsUp = true;
-        }
-
-        profile::enableSave(false);
         powerDown();
-        profile::enableSave(true);
 
         g_testPowerUpDelay = true;
         g_powerDownTime = millis();
@@ -690,13 +609,7 @@ void powerDownBySensor() {
 
         channel_dispatcher::disableOutputForAllChannels();
 
-        g_powerIsUp = false;
-        profile::save(true);
-        g_powerIsUp = true;
-
-        profile::enableSave(false);
         powerDown();
-        profile::enableSave(true);
     }
 }
 

@@ -601,7 +601,7 @@ scpi_result_t scpi_cmd_mmemoryLoadProfile(scpi_t *context) {
     }
 
     int err;
-    if (!profile::recallFromFile(0, filePath, false, &err)) {
+    if (!profile::recallFromFile(filePath, 0, false, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -623,7 +623,7 @@ scpi_result_t scpi_cmd_mmemoryStoreProfile(scpi_t *context) {
     addExtension(filePath, PROFILE_EXT);
 
     int err;
-    if (!profile::saveToFile(0, filePath, false, &err)) {
+    if (!profile::saveToFile(filePath, false, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }

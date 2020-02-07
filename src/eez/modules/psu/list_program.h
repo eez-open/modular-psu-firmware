@@ -29,7 +29,8 @@ namespace psu {
 
 // forward declaration
 namespace sd_card {
-class BufferedFile;
+class BufferedFileRead;
+class BufferedFileWrite;
 }
 
 namespace list {
@@ -48,9 +49,6 @@ float *getVoltageList(Channel &channel, uint16_t *listLength);
 void setCurrentList(Channel &channel, float *list, uint16_t listLength);
 float *getCurrentList(Channel &channel, uint16_t *listLength);
 
-bool getListsChanged(Channel &channel);
-void setListsChanged(Channel &channel, bool changed);
-
 uint16_t getListCount(Channel &channel);
 void setListCount(Channel &channel, uint16_t value);
 
@@ -66,7 +64,7 @@ bool areVoltageAndCurrentListLengthsEquivalent(Channel &channel);
 int checkLimits(int iChannel);
 
 bool loadList(
-    sd_card::BufferedFile &file,
+    sd_card::BufferedFileRead &file,
     float *dwellList, uint16_t &dwellListLength,
     float *voltageList, uint16_t &voltageListLength,
     float *currentList, uint16_t &currentListLength,
@@ -84,7 +82,7 @@ bool loadList(
 bool loadList(int iChannel, const char *filePath, int *err);
 
 bool saveList(
-    File &file,
+    sd_card::BufferedFileWrite &file,
     float *dwellList, uint16_t &dwellListLength,
     float *voltageList, uint16_t &voltageListLength,
     float *currentList, uint16_t &currentListLength,

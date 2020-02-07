@@ -30,63 +30,37 @@ namespace idle {
 
 enum ActivityType {
     ACTIVITY_TYPE_NONE,
-    ACTIVITY_TYPE_SCPI,
-    ACTIVITY_TYPE_GUI,
-    ACTIVITY_TYPE_ENCODER
+    ACTIVITY_TYPE_HMI
 };
-static uint32_t g_idleTimeout[3] = { SCPI_IDLE_TIMEOUT, GUI_IDLE_TIMEOUT, ENCODER_IDLE_TIMEOUT };
 static ActivityType g_lastActivityType = ACTIVITY_TYPE_NONE;
 static uint32_t g_timeOfLastActivity;
 
 #define MAX_GUI_OR_ENCODER_INACTIVITY_TIME 60 * 1000
-static bool g_guiOrEncoderInactivityTimeMaxed = true;
-static uint32_t g_timeOfLastGuiOrEncoderActivity;
+static bool g_hmiInactivityTimeMaxed = true;
+static uint32_t g_timeOfLastHmiActivity;
 
 void tick(uint32_t tickCount) {
-    if (g_lastActivityType != ACTIVITY_TYPE_NONE) {
-        if (tickCount - g_timeOfLastActivity >=
-            g_idleTimeout[g_lastActivityType - 1] * 1000 * 1000) {
-            g_lastActivityType = ACTIVITY_TYPE_NONE;
-        }
-    }
-
-    if (!g_guiOrEncoderInactivityTimeMaxed) {
-        uint32_t guiOrEncoderInactivityPeriod = getGuiAndEncoderInactivityPeriod();
-        if (guiOrEncoderInactivityPeriod >= MAX_GUI_OR_ENCODER_INACTIVITY_TIME) {
-            g_guiOrEncoderInactivityTimeMaxed = true;
+    if (!g_hmiInactivityTimeMaxed) {
+        uint32_t hmiInactivityPeriod = getHmiInactivityPeriod();
+        if (hmiInactivityPeriod >= MAX_GUI_OR_ENCODER_INACTIVITY_TIME) {
+            g_hmiInactivityTimeMaxed = true;
         }
     }
 }
 
-void noteScpiActivity() {
-    g_lastActivityType = ACTIVITY_TYPE_SCPI;
+void noteHmiActivity() {
+    g_lastActivityType = ACTIVITY_TYPE_HMI;
     g_timeOfLastActivity = micros();
+    g_hmiInactivityTimeMaxed = false;
+    g_timeOfLastHmiActivity = g_timeOfLastActivity;
 }
 
-void noteGuiActivity() {
-    g_lastActivityType = ACTIVITY_TYPE_GUI;
-    g_timeOfLastActivity = micros();
-    g_guiOrEncoderInactivityTimeMaxed = false;
-    g_timeOfLastGuiOrEncoderActivity = g_timeOfLastActivity;
-}
-
-void noteEncoderActivity() {
-    g_lastActivityType = ACTIVITY_TYPE_ENCODER;
-    g_timeOfLastActivity = micros();
-    g_guiOrEncoderInactivityTimeMaxed = false;
-    g_timeOfLastGuiOrEncoderActivity = g_timeOfLastActivity;
-}
-
-uint32_t getGuiAndEncoderInactivityPeriod() {
-    if (g_guiOrEncoderInactivityTimeMaxed) {
+uint32_t getHmiInactivityPeriod() {
+    if (g_hmiInactivityTimeMaxed) {
         return MAX_GUI_OR_ENCODER_INACTIVITY_TIME;
     } else {
-        return (micros() - g_timeOfLastGuiOrEncoderActivity) / 1000;
+        return (micros() - g_timeOfLastHmiActivity) / 1000;
     }
-}
-
-bool isIdle() {
-    return g_lastActivityType == ACTIVITY_TYPE_NONE;
 }
 
 } // namespace idle

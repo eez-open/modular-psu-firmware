@@ -119,7 +119,7 @@ scpi_result_t scpi_cmd_calibrationClear(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!checkPassword(context, persist_conf::devConf.calibration_password)) {
+    if (!checkPassword(context, persist_conf::devConf.calibrationPassword)) {
         return SCPI_RES_ERR;
     }
 
@@ -150,7 +150,7 @@ scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!checkPassword(context, persist_conf::devConf.calibration_password)) {
+    if (!checkPassword(context, persist_conf::devConf.calibrationPassword)) {
         return SCPI_RES_ERR;
     }
 
@@ -216,7 +216,7 @@ scpi_result_t scpi_cmd_calibrationCurrentRange(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationPasswordNew(scpi_t *context) {
-    if (!checkPassword(context, persist_conf::devConf.calibration_password)) {
+    if (!checkPassword(context, persist_conf::devConf.calibrationPassword)) {
         return SCPI_RES_ERR;
     }
 

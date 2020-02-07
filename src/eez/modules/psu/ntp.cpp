@@ -154,7 +154,7 @@ void stateTransition(int event) {
 		} else if (event == EVENT_SUCCEEDED) {
 			stop();
 
-			uint32_t local = datetime::utcToLocal(g_utc, persist_conf::devConf.time_zone, (datetime::DstRule)persist_conf::devConf.dstRule);
+			uint32_t local = datetime::utcToLocal(g_utc, persist_conf::devConf.timeZone, (datetime::DstRule)persist_conf::devConf.dstRule);
 			int year, month, day, hour, minute, second;
 			datetime::breakTime(local, year, month, day, hour, minute, second);
 			datetime::setDateTime(year - 2000, month, day, hour, minute, second, false, 2);

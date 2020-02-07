@@ -96,37 +96,36 @@ struct Parameters {
 
 static const uint16_t PROFILE_VERSION = 11;
 
-// auto save support
-extern bool g_profileDirty;
-bool enableSave(bool enable);
-void save(bool immediately = false);
-void saveIfDirty();
-
 void init();
 void tick();
 
-bool checkProfileModuleMatch(Parameters &profile);
+void shutdownSave();
 
-void recallChannelsFromProfile(Parameters &profile, int location);
-bool recallFromProfile(Parameters &profile, int location);
-bool recall(int location, int *err);
-bool recallFromFile(int location, const char *filePath, bool showProgress, int *err);
+Parameters *getProfileParameters(int location);
 
-Parameters *load(int location);
+enum {
+    RECALL_OPTION_FORCE_DISABLE_OUTPUT = 0x01,
+    RECALL_OPTION_IGNORE_POWER = 0x02
+};
+
+bool recallFromLocation(int location);
+bool recallFromLocation(int location, int recallOptions, bool showProgress, int *err);
+bool recallFromFile(const char *filePath, int recallOptions, bool showProgress, int *err);
 
 void getSaveName(int location, char *name);
-bool saveAtLocation(int location, const char *name = nullptr);
+bool saveToLocation(int location);
+bool saveToLocation(int location, const char *name, bool showProgress, int *err);
+bool saveToFile(const char *filePath, bool showProgress, int *err);
 
-bool saveToFile(int location, const char *filePath, bool showProgress, int *err);
+bool importFileToLocation(const char *filePath, int location, bool showProgress, int *err);
+bool exportLocationToFile(int location, const char *filePath, bool showProgress, int *err);
 
-void deleteProfileLists(int location);
-
-bool deleteLocation(int location);
-bool deleteAll();
+bool deleteLocation(int location, bool showProgress, int *err);
+bool deleteAllLocations(int *err);
 
 bool isValid(int location);
 
-bool setName(int location, const char *name, size_t nameLength);
+bool setName(int location, const char *name, size_t nameLength, bool showProgress, int *err);
 void getName(int location, char *name, int count);
 
 bool getFreezeState();

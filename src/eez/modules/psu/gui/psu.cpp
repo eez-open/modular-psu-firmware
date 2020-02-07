@@ -271,10 +271,7 @@ PsuAppContext::PsuAppContext() {
 
 void PsuAppContext::stateManagment() {
     if (m_popProgressPage) {
-        if (getActivePageId() == (m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS)) {
-            popPage();
-        }
-        m_popProgressPage = false;
+        doHideProgressPage();
     }
 
     if (m_clearTextMessage) {
@@ -350,7 +347,7 @@ void PsuAppContext::stateManagment() {
     }
 
     // start touch screen calibration automatically after period of time
-    uint32_t inactivityPeriod = psu::idle::getGuiAndEncoderInactivityPeriod();
+    uint32_t inactivityPeriod = psu::idle::getHmiInactivityPeriod();
     if (activePageId == PAGE_ID_TOUCH_CALIBRATION_INTRO) {
         if (inactivityPeriod >= 20 * 1000UL) {
             enterTouchCalibration();
@@ -375,13 +372,13 @@ void PsuAppContext::stateManagment() {
     bool clicked;
     mcu::encoder::read(counter, clicked);
     if (counter != 0 || clicked) {
-        idle::noteEncoderActivity();
+        idle::noteHmiActivity();
     }
     onEncoder(counter, clicked);
 #endif
 
 #if GUI_BACK_TO_MAIN_ENABLED
-    uint32_t inactivityPeriod = psu::idle::getGuiAndEncoderInactivityPeriod();
+    uint32_t inactivityPeriod = psu::idle::getHmiInactivityPeriod();
 
     if (
         activePageId == PAGE_ID_EVENT_QUEUE ||
@@ -409,10 +406,7 @@ void PsuAppContext::stateManagment() {
     }
 
     if (m_pushProgressPage) {
-        data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage), 0);
-        g_appContext->m_dialogCancelCallback = m_progressAbortCallback;
-        pushPage(m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
-        m_pushProgressPage = false;
+        doShowProgressPage();
     }
 
     if (m_showTextMessage) {
@@ -783,17 +777,32 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
     return AppContext::isWidgetActionEnabled(widgetCursor);
 }
 
+void PsuAppContext::doShowProgressPage() {
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage), 0);
+    g_appContext->m_dialogCancelCallback = m_progressAbortCallback;
+    pushPage(m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
+    m_pushProgressPage = false;
+}
+
 void PsuAppContext::showProgressPage(const char *message, void (*abortCallback)()) {
     g_psuAppContext.m_progressMessage = message;
     g_psuAppContext.m_progressWithoutAbort = false;
     g_psuAppContext.m_progressAbortCallback = abortCallback;
     g_psuAppContext.m_pushProgressPage = true;
+
+    if (osThreadGetId() == g_guiTaskHandle) {
+    	g_psuAppContext.doShowProgressPage();
+    }
 }
 
 void PsuAppContext::showProgressPageWithoutAbort(const char *message) {
     g_psuAppContext.m_progressMessage = message;
     g_psuAppContext.m_progressWithoutAbort = true;
     g_psuAppContext.m_pushProgressPage = true;
+
+    if (osThreadGetId() == g_guiTaskHandle) {
+    	g_psuAppContext.doShowProgressPage();
+    }
 }
 
 bool PsuAppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) {
@@ -810,11 +819,22 @@ bool PsuAppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) 
     return g_psuAppContext.isPageOnStack(g_psuAppContext.m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
 }
 
+void PsuAppContext::doHideProgressPage() {
+    if (getActivePageId() == (m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS)) {
+        popPage();
+    }
+    m_popProgressPage = false;
+}
+
 void PsuAppContext::hideProgressPage() {
     if (g_psuAppContext.m_pushProgressPage) {
         g_psuAppContext.m_pushProgressPage = false;
     } else {
         g_psuAppContext.m_popProgressPage = true;
+    }
+
+    if (osThreadGetId() == g_guiTaskHandle) {
+    	g_psuAppContext.doHideProgressPage();
     }
 }
 
@@ -1680,10 +1700,8 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
         g_ChSettingsListsPage.onLoadListFinished(param);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST_FINISHED) {
         g_ChSettingsListsPage.onSaveListFinished(param);
-    } else if (type == GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_IMPORT) {
-        g_UserProfilesPage.onImportProfileFinished(param);
-    } else if (type == GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EXPORT) {
-        g_UserProfilesPage.onExportProfileFinished(param);
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED) {
+        g_UserProfilesPage.onAsyncOperationFinished(param);
     }
 }
 

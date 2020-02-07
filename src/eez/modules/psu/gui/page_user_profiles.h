@@ -34,18 +34,26 @@ public:
 
     void toggleAutoRecall();
     void toggleIsAutoRecallLocation();
-    void recall();
-    void save();
-    void deleteProfile();
-    void editRemark();
+
+    void saveProfile();
+    static void doSaveProfile();
+
+    void recallProfile();
+    static void doRecallProfile();
 
     void importProfile();
     static void doImportProfile();
-    void onImportProfileFinished(int16_t err);
 
     void exportProfile();
     static void doExportProfile();
-    void onExportProfileFinished(int16_t err);
+
+    void deleteProfile();
+    static void doDeleteProfile();
+    
+    void editRemark();
+    static void doEditRemark();
+
+    void onAsyncOperationFinished(int16_t err);
 
 private:
     char m_profileFilePath[MAX_PATH_LENGTH + 1];

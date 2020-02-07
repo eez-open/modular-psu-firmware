@@ -235,15 +235,6 @@
 #define CSV_SEPARATOR ','
 #define LIST_CSV_FILE_NO_VALUE_CHAR '='
 
-/// Time in seconds of SCPI inactivity to declare SCPI to be idle.
-#define SCPI_IDLE_TIMEOUT 60
-
-/// Time in seconds of GUI inactivity to declare GUI to be idle.
-#define GUI_IDLE_TIMEOUT 1
-
-/// Time in seconds of Encoder inactivity to declare Encoder to be idle.
-#define ENCODER_IDLE_TIMEOUT 60
-
 /// Changed but not confirmed value will be reset to current one
 /// after this timeout in seconds.
 /// See https://github.com/eez-open/psu-firmware/issues/84

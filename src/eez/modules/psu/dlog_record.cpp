@@ -110,7 +110,7 @@ static unsigned int g_saveUpToBufferIndex;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static float getValue(int rowIndex, int columnIndex, float *max) {
+static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
     float value = *(float *)(DLOG_RECORD_BUFFER + (g_recording.dataOffset + (rowIndex * g_recording.parameters.numYAxes + columnIndex) * 4) % DLOG_RECORD_BUFFER_SIZE);
 
     if (g_recording.parameters.yAxisScale == dlog_view::SCALE_LOGARITHMIC) {

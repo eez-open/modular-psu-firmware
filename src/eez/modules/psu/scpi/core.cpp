@@ -73,7 +73,7 @@ scpi_result_t scpi_cmd_coreRcl(scpi_t *context) {
     }
 
     int err;
-    if (!profile::recall(location, &err)) {
+    if (!profile::recallFromLocation(location, 0, false, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -98,8 +98,9 @@ scpi_result_t scpi_cmd_coreSav(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!profile::saveAtLocation(location)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXTERNAL_EEPROM_SAVE_FAILED);
+    int err;
+    if (!profile::saveToLocation(location, nullptr, false, &err)) {
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 

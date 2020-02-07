@@ -45,7 +45,6 @@ void ChSettingsProtectionPage::clear() {
 void onClearAndDisableYes() {
     channel_dispatcher::clearProtection(*g_channel);
     channel_dispatcher::disableProtection(*g_channel);
-    profile::save();
 
     popPage();
     infoMessage("Cleared and disabled!");
@@ -62,7 +61,6 @@ int ChSettingsProtectionSetPage::getDirty() {
 }
 
 void ChSettingsProtectionSetPage::onSetFinish(bool showInfo) {
-    profile::save();
     g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS]();
     if (showInfo) {
         infoMessage("Protection params changed!");

@@ -135,8 +135,6 @@ void oneIter() {
                 if (!eez::psu::list::saveList(param, &g_listFilePath[param][0], &err)) {
                     generateError(err);
                 }
-            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_DELETE_PROFILE_LISTS) {
-                profile::deleteProfileLists(param);
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_SHUTDOWN) {
                 g_shutingDown = true;
             }
@@ -215,16 +213,26 @@ void oneIter() {
                 bp3c::flash_slave::uploadHexFile();
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_RECALL_PROFILE) {
                 int err;
-                profile::recall(param, &err);
+                if (!profile::recallFromLocation(param, 0, false, &err)) {
+                    generateError(err);
+                }
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_LOAD_LIST) {
                 psu::gui::ChSettingsListsPage::doLoadList();
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST) {
                 psu::gui::ChSettingsListsPage::doSaveList();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_SAVE) {
+                psu::gui::UserProfilesPage::doSaveProfile();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_RECALL) {
+                psu::gui::UserProfilesPage::doRecallProfile();
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_IMPORT) {
                 psu::gui::UserProfilesPage::doImportProfile();
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EXPORT) {
                 psu::gui::UserProfilesPage::doExportProfile();
-            }
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_DELETE) {
+                psu::gui::UserProfilesPage::doDeleteProfile();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EDIT_REMARK) {
+                psu::gui::UserProfilesPage::doEditRemark();
+            } 
         }
     } else {
         if (g_shutingDown) {

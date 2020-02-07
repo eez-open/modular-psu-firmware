@@ -18,6 +18,8 @@
 
 #include <stdio.h>
 
+#include <eez/file_type.h>
+
 #include <eez/modules/psu/psu.h>
 
 #include <eez/modules/psu/calibration.h>
@@ -44,9 +46,25 @@ namespace profile {
 
 #define AUTO_NAME_PREFIX "Saved at "
 
-static bool g_saveEnabled = true;
-bool g_profileDirty;
 static bool g_freeze;
+
+static struct {
+    bool loaded;
+    profile::Parameters profile;
+    bool dirty;
+    unsigned numSaveErrors;
+} g_profilesCache[NUM_PROFILE_LOCATIONS];
+
+static struct {
+    float dwellList[MAX_LIST_LENGTH];
+    uint16_t dwellListLength;
+
+    float voltageList[MAX_LIST_LENGTH];
+    uint16_t voltageListLength;
+
+    float currentList[MAX_LIST_LENGTH];
+    uint16_t currentListLength;
+} g_channelsLists[CH_MAX];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -116,107 +134,37 @@ void mapCurrentChannelsToProfileChannels(Parameters &profile, int channelsMap[])
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void getChannelProfileListFilePath(int channelIndex, int location, char *filePath) {
-    strcpy(filePath, LISTS_DIR);
+static void getProfileFilePath(int location, char *filePath) {
+    strcpy(filePath, PROFILES_DIR);
     strcat(filePath, PATH_SEPARATOR);
-    strcat(filePath, "PROFILE_");
-    strcatInt(filePath, channelIndex + 1);
-    strcat(filePath, "_");
     strcatInt(filePath, location);
-    strcat(filePath, LIST_EXT);
+    strcat(filePath, getExtensionFromFileType(FILE_TYPE_PROFILE));
 }
 
-void loadProfileList(Parameters &profile, Channel &channel, int profileChannelIndex, int location) {
+////////////////////////////////////////////////////////////////////////////////
+
+bool saveProfile(int location, bool showProgres, int *err) {
+    if (location == 0) {
+        return saveToLocation(0, nullptr, false, err);
+    }
+
+    if (err) {
+        *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    }
+
+    return false;
+}
+
+void doSave() {
     int err;
-    if (!sd_card::isMounted(&err)) {
-        if (err != SCPI_ERROR_MISSING_MASS_MEDIA && err != SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM) {
-    	    generateError(err);
-        }
-        return;
-    }
-
-    char filePath[MAX_PATH_LENGTH];
-    getChannelProfileListFilePath(profileChannelIndex, location, filePath);
-
-    if (!sd_card::exists(filePath, &err)) {
-        return;
-    }
-    
-    if (list::loadList(channel.channelIndex, filePath, &err)) {
-        if (location == 0) {
-            list::setListsChanged(channel, false);
-        }
-    }
-    else {
+    if (!saveProfile(0, false, &err)) {
         generateError(err);
-    }
-}
-
-void saveProfileList(Parameters &profile, Channel &channel, int profileChannelIndex, int location) {
-    if (location == 0 && !list::getListsChanged(channel)) {
-        return;
-    }
-
-    char filePath[MAX_PATH_LENGTH];
-    getChannelProfileListFilePath(profileChannelIndex, location, filePath);
-    
-    int err;
-    if (list::saveList(channel.channelIndex, filePath, &err)) {
-        if (location == 0) {
-            list::setListsChanged(channel, false);
-        }
-        uint8_t hour, minute, second;
-        datetime::getTime(hour, minute, second);
-        DebugTrace("[%02d:%02d:%02d] List for profile at location %d and channel %d saved!\n", hour, minute, second, location, channel.channelIndex + 1);
-    } else {
-        generateError(err);
-    }
-}
-
-void saveProfileListForAllChannels(Parameters &profile, int location) {
-    int channelsMap[CH_MAX];
-    mapCurrentChannelsToProfileChannels(profile, channelsMap);
-
-    for (int i = 0; i < CH_NUM; ++i) {
-        Channel &channel = Channel::get(i);
-        saveProfileList(profile, channel, channelsMap[i], location);
-    }
-}
-
-void deleteProfileList(int channelIndex, int location) {
-    char filePath[MAX_PATH_LENGTH];
-    getChannelProfileListFilePath(channelIndex, location, filePath);
-
-    int err;
-
-    if (!sd_card::exists(filePath, &err)) {
-        return;
-    }
-
-    if (!sd_card::deleteFile(filePath, &err)) {
-        generateError(err);
-    }
-}
-
-void deleteProfileLists(int location) {
-    int err;
-    if (!sd_card::isMounted(&err)) {
-        if (err != SCPI_ERROR_MISSING_MASS_MEDIA && err != SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM) {
-    	    generateError(err);
-        }
-        return;
-    }
-
-    for (int i = 0; i < CH_MAX; ++i) {
-        deleteProfileList(i, location);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void recallChannelsFromProfile(Parameters &profile, int location) {
-    bool wasSaveProfileEnabled = enableSave(false);
-
+void recallChannelsFromProfile(Parameters &profile, int recallOptions) {
     trigger::abort();
 
     int err;
@@ -271,7 +219,7 @@ void recallChannelsFromProfile(Parameters &profile, int location) {
             channel.simulator.voltProgExt = profile.channels[j].voltProgExt;
 #endif
 
-            channel.flags.outputEnabled = channel.isTripped() || mismatch ? 0 : profile.channels[j].flags.output_enabled;
+            channel.flags.outputEnabled = channel.isTripped() || mismatch || (recallOptions & RECALL_OPTION_FORCE_DISABLE_OUTPUT) ? 0 : profile.channels[j].flags.output_enabled;
             channel.flags.senseEnabled = profile.channels[j].flags.sense_enabled;
 
             if (channel.params.features & CH_FEATURE_RPROG) {
@@ -309,7 +257,10 @@ void recallChannelsFromProfile(Parameters &profile, int location) {
                 ++numTrackingChannels;
             }
 
-            loadProfileList(profile, channel, j, location);
+            auto &list = g_channelsLists[j];
+            channel_dispatcher::setDwellList(channel, list.dwellList, list.dwellListLength);
+            channel_dispatcher::setVoltageList(channel, list.voltageList, list.voltageListLength);
+            channel_dispatcher::setCurrentList(channel, list.currentList, list.currentListLength);
         }
     }
 
@@ -324,8 +275,6 @@ void recallChannelsFromProfile(Parameters &profile, int location) {
     }
 
     Channel::updateAllChannels();
-
-    enableSave(wasSaveProfileEnabled);
 }
 
 void fillProfile(Parameters &profile) {
@@ -402,10 +351,6 @@ void fillProfile(Parameters &profile) {
 
             profile.channels[j].flags.dprogState = channel.flags.dprogState;
             profile.channels[j].flags.trackingEnabled = channel.flags.trackingEnabled;
-
-            if (j != channelsMap[i]) {
-                list::setListsChanged(channel, true);
-            }
         } else {
             memcpy(&profile.channels[j], &savedProfile.channels[channelsMap[i]], sizeof(ChannelParameters));
         }
@@ -433,110 +378,86 @@ void fillProfile(Parameters &profile) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool isAutoSaveAllowed() {
-    return persist_conf::devConf.profileAutoRecallEnabled && persist_conf::devConf.profile_auto_recall_location == 0;
+void loadProfileParameters(int location) {
 }
 
-bool enableSave(bool enable) {
-    bool wasEnabled = g_saveEnabled;
-    g_saveEnabled = enable;
-    return wasEnabled;
-}
-
-void doSave() {
-    Parameters profile;
-
-    Parameters *existingProfile = load(0);
-    if (existingProfile) {
-        memcpy(&profile, existingProfile, sizeof(Parameters));
-    } else {
-        memset(&profile, 0, sizeof(Parameters));
-    }
-
-    fillProfile(profile);
-
-    persist_conf::saveProfile(0, &profile);
-
-    saveProfileListForAllChannels(profile, 0);
-}
-
-void save(bool immediately) {
-    if (g_saveEnabled && !g_freeze && isAutoSaveAllowed()) {
-        if (immediately) {
-            doSave();
-            g_profileDirty = false;
-        } else {
-            g_profileDirty = true;
+Parameters *getProfileParameters(int location) {
+    if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
+        if (g_profilesCache[location].loaded) {
+            Parameters *profile = &g_profilesCache[location].profile;
+            if (profile->flags.isValid) {
+                return profile;
+            }
         }
     }
+    return nullptr;
 }
 
-void saveIfDirty() {
-    if (g_profileDirty) {
-        doSave();
-        g_profileDirty = false;
-    }
+////////////////////////////////////////////////////////////////////////////////
+
+bool isTickSaveAllowed() {
+    return !list::isActive() && !calibration::isEnabled();
 }
+
+bool isAutoSaveAllowed() {
+    return !g_freeze && persist_conf::devConf.profileAutoRecallEnabled && persist_conf::devConf.profileAutoRecallLocation == 0;
+}
+
+bool isProfileDirty() {
+    // TODO
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 void init() {
     for (int profileIndex = 0; profileIndex < NUM_PROFILE_LOCATIONS; profileIndex++) {
-        persist_conf::loadProfile(profileIndex);
+        loadProfileParameters(profileIndex);
     }
 }
 
 void tick() {
-    if (g_profileDirty && !list::isActive() && !calibration::isEnabled() && idle::isIdle()) {
-        doSave();
-        g_profileDirty = false;
+    // TODO autoSave if dirty every 60 seconds
+    if (isTickSaveAllowed() && isAutoSaveAllowed() && isProfileDirty()) {
+
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool checkProfileModuleMatch(Parameters &profile) {
-    return true;
+void shutdownSave() {
+    if (isAutoSaveAllowed() && isProfileDirty()) {
+        doSave();
+    }
 }
 
-bool recallFromProfile(Parameters &profile, int location) {
-    bool wasSaveProfileEnabled = enableSave(false);
+////////////////////////////////////////////////////////////////////////////////
 
+bool doRecall(Parameters &profile, int recallOptions, int *err) {
     bool result = true;
 
-    if (profile.flags.powerIsUp) {
-        result &= powerUp();
-    } else {
-        powerDown();
-    }
-
-    for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-        memcpy(&temperature::sensors[i].prot_conf, profile.temp_prot + i, sizeof(temperature::ProtectionConfiguration));
-    }
-
-    recallChannelsFromProfile(profile, location);
-
-    enableSave(wasSaveProfileEnabled);
-
-    return result;
-}
-
-bool recall(int location, int *err) {
-    if (location > 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters *profile = persist_conf::loadProfile(location);
-        if (profile && profile->flags.isValid) {
-            if (recallFromProfile(*profile, location)) {
-                save();
-                if (location >= 0 && location <= 9) {
-                    event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_PROFILE_0 + location);
+    if (!(recallOptions & RECALL_OPTION_IGNORE_POWER)) {
+        if (profile.flags.powerIsUp) {
+            result &= powerUp();
+            if (!result) {
+                if (err) {
+                    *err = SCPI_ERROR_EXECUTION_ERROR;
                 }
-                return true;
-            } else {
-                return false;
             }
+        } else {
+            powerDown();
         }
     }
 
-    *err = SCPI_ERROR_CANNOT_LOAD_EMPTY_PROFILE;
-    return false;
+    if (result) {
+        for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
+            memcpy(&temperature::sensors[i].prot_conf, profile.temp_prot + i, sizeof(temperature::ProtectionConfiguration));
+        }
+
+        recallChannelsFromProfile(profile, recallOptions);
+    }
+
+    return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -545,7 +466,7 @@ class ReadContext {
 public:
     ReadContext(File &file_);
 
-    bool doRead(void (*callback)(ReadContext &ctx, Parameters &parameters), int location, Parameters &parameters, bool showProgress);
+    bool doRead(void (*callback)(ReadContext &ctx, Parameters &parameters), Parameters &parameters, bool showProgress);
 
     bool matchGroup(const char *groupName);
     bool matchGroup(const char *groupNamePrefix, int &index);
@@ -564,10 +485,9 @@ public:
     bool result;
 
 private:
-    sd_card::BufferedFile file;
+    sd_card::BufferedFileRead file;
     char groupName[100];
     char propertyName[100];
-    int location;
 };
 
 ReadContext::ReadContext(File &file_)
@@ -576,9 +496,7 @@ ReadContext::ReadContext(File &file_)
 {
 }
 
-bool ReadContext::doRead(void (*callback)(ReadContext &ctx, Parameters &parameters), int location_, Parameters &parameters, bool showProgress) {
-    location = location_;
-
+bool ReadContext::doRead(void (*callback)(ReadContext &ctx, Parameters &parameters), Parameters &parameters, bool showProgress) {
 #if OPTION_DISPLAY
     size_t totalSize = file.size();
 #endif
@@ -712,17 +630,9 @@ bool ReadContext::listProperty(const char *name, int channelIndex) {
         result = false;
     }
 
-    float dwellList[MAX_LIST_LENGTH];
-    uint16_t dwellListLength = 0;
-
-    float voltageList[MAX_LIST_LENGTH];
-    uint16_t voltageListLength = 0;
-
-    float currentList[MAX_LIST_LENGTH];
-    uint16_t currentListLength = 0;
-
+    auto &list = g_channelsLists[channelIndex];
     int err;
-    if (!list::loadList(file, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, false, &err)) {
+    if (!list::loadList(file, list.dwellList, list.dwellListLength, list.voltageList, list.voltageListLength, list.currentList, list.currentListLength, false, &err)) {
         result = false;
         return true;
     }
@@ -732,13 +642,6 @@ bool ReadContext::listProperty(const char *name, int channelIndex) {
         return true;
     }
 
-    char filePath[MAX_PATH_LENGTH];
-    getChannelProfileListFilePath(channelIndex, location, filePath);
-
-    if (!list::saveList(filePath, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, false, &err)) {
-        result = false;
-        return true;
-    }
 
     return true;
 }
@@ -862,27 +765,31 @@ void profileReadCallback(ReadContext &ctx, Parameters &parameters) {
     }
 }
 
-bool profileRead(ReadContext &ctx, int location, Parameters &parameters, bool showProgress) {
-    return ctx.doRead(profileReadCallback, location, parameters, showProgress);
+bool profileRead(ReadContext &ctx, Parameters &parameters, bool showProgress) {
+    return ctx.doRead(profileReadCallback, parameters, showProgress);
 }
 
-
-bool recallFromFile(int location, const char *filePath, bool showProgress, int *err) {
+bool doRecallFromFile(const char *filePath, int recallOptions, bool showProgress, int *err) {
     if (!sd_card::isMounted(err)) {
+        if (err) {
+            *err = SCPI_ERROR_FILE_NOT_FOUND;
+        }
         return false;
     }
 
     if (!sd_card::exists(filePath, NULL)) {
-        if (err)
+        if (err) {
             *err = SCPI_ERROR_FILE_NOT_FOUND;
+        }
         return false;
     }
 
     File file;
 
     if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        if (err)
+        if (err) {
             *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+        }
         return false;
     }
 
@@ -890,7 +797,8 @@ bool recallFromFile(int location, const char *filePath, bool showProgress, int *
     memset(&profile, 0, sizeof(Parameters));
 
     ReadContext ctx(file);
-    bool result = profileRead(ctx, location, profile, showProgress);
+
+    bool result = profileRead(ctx, profile, showProgress);
 
     file.close();
 
@@ -901,36 +809,43 @@ bool recallFromFile(int location, const char *filePath, bool showProgress, int *
         return false;
     }
 
-    persist_conf::saveProfile(location, &profile);
-
-    if (location == 0) {
-        if (!recallFromProfile(profile, 0)) {
-            // TODO replace with more specific error
-            if (err)
-                *err = SCPI_ERROR_EXECUTION_ERROR;
-            return false;
-        }
-
-        event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_FILE);
+    if (!doRecall(profile, recallOptions, err)) {
+        return false;
     }
 
     return true;
 }
 
-Parameters *load(int location) {
-    if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters *profile = persist_conf::loadProfile(location);
-        if (profile && profile->flags.isValid) {
-            return profile;
-        }
+bool recallFromLocation(int location) {
+    if (location == 10) {
+        // TODO
+        return true;
     }
-    return nullptr;
+    return recallFromLocation(location, 0, false, nullptr);
+}
+
+bool recallFromLocation(int location, int recallOptions, bool showProgress, int *err) {
+    char filePath[MAX_PATH_LENGTH];
+    getProfileFilePath(location, filePath);
+    if (doRecallFromFile(filePath, recallOptions, showProgress, err)) {
+        event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_PROFILE_0 + location);
+        return true;
+    }
+    return false;
+}
+
+bool recallFromFile(const char *filePath, int recallOptions, bool showProgress, int *err) {
+    if (doRecallFromFile(filePath, recallOptions, showProgress, err)) {
+        event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_FILE);
+        return true;
+    }
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void getSaveName(int location, char *name) {
-    Parameters *profile = persist_conf::loadProfile(location);
+    Parameters *profile = profile::getProfileParameters(location);
 
     if (!profile || !profile->flags.isValid || strncmp(profile->name, AUTO_NAME_PREFIX, strlen(AUTO_NAME_PREFIX)) == 0) {
         strcpy(name, AUTO_NAME_PREFIX);
@@ -938,27 +853,6 @@ void getSaveName(int location, char *name) {
     } else {
         strcpy(name, profile->name);
     }
-}
-
-bool saveAtLocation(int location, const char *name) {
-    if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters profile;
-        memset(&profile, 0, sizeof(Parameters));
-        fillProfile(profile);
-
-        if (name) {
-            strcpy(profile.name, name);
-        } else {
-            getSaveName(location, profile.name);
-        }
-
-        persist_conf::saveProfile(location, &profile);
-        saveProfileListForAllChannels(profile, location);
-
-        return true;
-    }
-
-    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -981,8 +875,10 @@ public:
         float *currentList, uint16_t &currentListLength
     );
 
+    void flush();
+
 private:
-    File &file;
+    sd_card::BufferedFileWrite file;
 };
 
 WriteContext::WriteContext(File &file_)
@@ -1045,9 +941,13 @@ void WriteContext::property(
     file.write((uint8_t *)line, strlen(line));
 }
 
+void WriteContext::flush() {
+    file.flush();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
-bool profileWrite(WriteContext &ctx, int location, const Parameters &parameters, bool showProgress) {
+bool profileWrite(WriteContext &ctx, const Parameters &parameters, bool showProgress) {
 #if OPTION_DISPLAY
     size_t processedSoFar = 0;
     static const int CH_PROGRESS_WEIGHT = 20;
@@ -1122,24 +1022,27 @@ bool profileWrite(WriteContext &ctx, int location, const Parameters &parameters,
             ctx.property("i_triggerValue", channel.i_triggerValue);
             ctx.property("listCount", channel.listCount);
 
-            char filePath[MAX_PATH_LENGTH];
-            getChannelProfileListFilePath(channelIndex, location, filePath);
-            int err;
-            if (sd_card::exists(filePath, &err)) {
-                float dwellList[MAX_LIST_LENGTH];
-                uint16_t dwellListLength = 0;
+            {
+                auto &channel = Channel::get(channelIndex);
 
-                float voltageList[MAX_LIST_LENGTH];
-                uint16_t voltageListLength = 0;
+                uint16_t dwellListLength;
+                float *dwellList = list::getDwellList(Channel::get(channelIndex), &dwellListLength);
 
-                float currentList[MAX_LIST_LENGTH];
-                uint16_t currentListLength = 0;
+                uint16_t voltageListLength;
+                float *voltageList = list::getVoltageList(Channel::get(channelIndex), &voltageListLength);
 
-                if (list::loadList(filePath, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, false, &err)) {
-                    if (dwellListLength + voltageListLength + currentListLength > 0) {
-                        ctx.property("list", dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength);
-                    }
-                }
+                uint16_t currentListLength;
+                float *currentList = list::getCurrentList(Channel::get(channelIndex), &currentListLength);
+
+                ctx.property(
+                    "list",
+                    dwellList,
+                    dwellListLength,
+                    voltageList,
+                    voltageListLength,
+                    currentList,
+                    currentListLength
+                );
             }
 
 #ifdef EEZ_PLATFORM_SIMULATOR
@@ -1180,14 +1083,28 @@ bool profileWrite(WriteContext &ctx, int location, const Parameters &parameters,
     return true;
 }
 
-bool saveToFile(int location, const char *filePath, bool showProgress, int *err) {
+bool saveToLocation(int location) {
+    if (location == 10) {
+        // TODO
+        return true;
+    }
+    return saveToLocation(location, nullptr, false, nullptr);
+}
+
+bool saveToLocation(int location, const char *name, bool showProgress, int *err) {
+    char filePath[MAX_PATH_LENGTH];
+    getProfileFilePath(location, filePath);
+    return saveToFile(filePath, showProgress, err);
+}
+
+bool saveToFile(const char *filePath, bool showProgress, int *err) {
     if (!sd_card::isMounted(err)) {
         return false;
     }
 
-    sd_card::makeParentDir(filePath);
-
-    sd_card::deleteFile(filePath, NULL);
+    if (!sd_card::makeParentDir(filePath, err)) {
+        return false;
+    }
 
     File file;
 
@@ -1201,15 +1118,12 @@ bool saveToFile(int location, const char *filePath, bool showProgress, int *err)
 
     bool result;
 
-    if (location == 0) {
-        Parameters profile;
-        memset(&profile, 0, sizeof(Parameters));
-        fillProfile(profile);
-        result = profileWrite(ctx, location, profile, showProgress);
-    } else {
-        Parameters *profile = persist_conf::loadProfile(location);
-        result = profileWrite(ctx, location, *profile, showProgress);
-    }
+    Parameters profile;
+    memset(&profile, 0, sizeof(Parameters));
+    fillProfile(profile);
+    result = profileWrite(ctx, profile, showProgress);
+
+    ctx.flush();
 
     file.close();
 
@@ -1225,36 +1139,64 @@ bool saveToFile(int location, const char *filePath, bool showProgress, int *err)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool deleteLocation(int location) {
+bool importFileToLocation(const char *filePath, int location, bool showProgress, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    }
+    return false;
+}
+
+bool exportLocationToFile(int location, const char *filePath, bool showProgress, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    }
+    return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool deleteLocation(int location, bool showProgress, int *err) {
     if (location > 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters profile;
-        profile.flags.isValid = false;
+        if (g_profilesCache[location].loaded) {
+            g_profilesCache[location].profile.flags.isValid = false;
+        }
+
         if (location == persist_conf::getProfileAutoRecallLocation()) {
             persist_conf::setProfileAutoRecallLocation(0);
         }
-        persist_conf::saveProfile(location, &profile);
 
-        if (osThreadGetId() != g_scpiTaskHandle) {
-            osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DELETE_PROFILE_LISTS, location), osWaitForever);
-            return true;
+        char filePath[MAX_PATH_LENGTH];
+        getProfileFilePath(location, filePath);
+        if (!sd_card::exists(filePath, err)) {
+            return false;
         }
-    }
 
-    return true;
+        if (!sd_card::deleteFile(filePath, err)) {
+            return false;
+        }
+
+        return true;
+    } else {
+        *err = SCPI_ERROR_EXECUTION_ERROR;
+        return false;
+    }
 }
 
-bool deleteAll() {
+bool deleteAllLocations(int *err) {
     for (int i = 1; i < NUM_PROFILE_LOCATIONS; ++i) {
-        if (!deleteLocation(i)) {
+        if (!deleteLocation(i, false, err)) {
             return false;
         }
     }
+
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 bool isValid(int location) {
     if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters *profile = persist_conf::loadProfile(location);
+        Parameters *profile = getProfileParameters(location);
         if (profile) {
             return profile->flags.isValid;
         }
@@ -1262,22 +1204,35 @@ bool isValid(int location) {
     return false;
 }
 
-bool setName(int location, const char *name, size_t name_len) {
+////////////////////////////////////////////////////////////////////////////////
+
+bool setName(int location, const char *name, size_t name_len, bool showProgress, int *err) {
     if (location > 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters *profile = persist_conf::loadProfile(location);
+        Parameters *profile = getProfileParameters(location);
         if (profile && profile->flags.isValid) {
-            memset(profile->name, 0, sizeof(profile->name));
+            char savedName[PROFILE_NAME_MAX_LENGTH + 1];
+
+            strcpy(savedName, profile->name);
+
             strncpy(profile->name, name, name_len);
-            persist_conf::saveProfile(location, profile);
+            profile->name[name_len] = 0;
+
+            if (!saveProfile(location, showProgress, err)) {
+                strcpy(profile->name, savedName);
+                return false;
+            }
+
             return true;
         }
     }
+
+    *err = SCPI_ERROR_EXECUTION_ERROR;
     return false;
 }
 
 void getName(int location, char *name, int count) {
     if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters *profile = persist_conf::loadProfile(location);
+        Parameters *profile = getProfileParameters(location);
         if (profile && profile->flags.isValid) {
             strncpy(name, profile->name, count - 1);
             name[count - 1] = 0;
@@ -1291,6 +1246,8 @@ void getName(int location, char *name, int count) {
     }
     name[count - 1] = 0;
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 bool getFreezeState() {
     return g_freeze;

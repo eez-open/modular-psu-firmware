@@ -57,8 +57,6 @@ static struct {
     uint16_t currentListLength;
 
     uint16_t count;
-
-    bool changed;
 } g_channelsLists[CH_MAX];
 
 static struct {
@@ -85,8 +83,6 @@ void resetChannelList(Channel &channel) {
     g_channelsLists[i].currentListLength = 0;
     g_channelsLists[i].dwellListLength = 0;
 
-    g_channelsLists[i].changed = true;
-
     g_channelsLists[i].count = 1;
 
     g_execution[i].counter = -1;
@@ -101,7 +97,6 @@ void reset() {
 void setDwellList(Channel &channel, float *list, uint16_t listLength) {
     memcpy(g_channelsLists[channel.channelIndex].dwellList, list, listLength * sizeof(float));
     g_channelsLists[channel.channelIndex].dwellListLength = listLength;
-    g_channelsLists[channel.channelIndex].changed = true;
 }
 
 float *getDwellList(Channel &channel, uint16_t *listLength) {
@@ -112,7 +107,6 @@ float *getDwellList(Channel &channel, uint16_t *listLength) {
 void setVoltageList(Channel &channel, float *list, uint16_t listLength) {
     memcpy(g_channelsLists[channel.channelIndex].voltageList, list, listLength * sizeof(float));
     g_channelsLists[channel.channelIndex].voltageListLength = listLength;
-    g_channelsLists[channel.channelIndex].changed = true;
 }
 
 float *getVoltageList(Channel &channel, uint16_t *listLength) {
@@ -123,20 +117,11 @@ float *getVoltageList(Channel &channel, uint16_t *listLength) {
 void setCurrentList(Channel &channel, float *list, uint16_t listLength) {
     memcpy(g_channelsLists[channel.channelIndex].currentList, list, listLength * sizeof(float));
     g_channelsLists[channel.channelIndex].currentListLength = listLength;
-    g_channelsLists[channel.channelIndex].changed = true;
 }
 
 float *getCurrentList(Channel &channel, uint16_t *listLength) {
     *listLength = g_channelsLists[channel.channelIndex].currentListLength;
     return g_channelsLists[channel.channelIndex].currentList;
-}
-
-bool getListsChanged(Channel &channel) {
-    return g_channelsLists[channel.channelIndex].changed;
-}
-
-void setListsChanged(Channel &channel, bool changed) {
-    g_channelsLists[channel.channelIndex].changed = changed;
 }
 
 uint16_t getListCount(Channel &channel) {
@@ -228,7 +213,7 @@ int checkLimits(int iChannel) {
 }
 
 bool loadList(
-    sd_card::BufferedFile &file,
+    sd_card::BufferedFileRead &file,
     float *dwellList, uint16_t &dwellListLength,
     float *voltageList, uint16_t &voltageListLength,
     float *currentList, uint16_t &currentListLength,
@@ -349,7 +334,7 @@ bool loadList(
         return false;
     }
 
-    sd_card::BufferedFile bufferedFile(file);
+    sd_card::BufferedFileRead bufferedFile(file);
 
     bool success = loadList(bufferedFile, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, showProgress, err);
 
@@ -389,7 +374,7 @@ bool loadList(int iChannel, const char *filePath, int *err) {
 }
 
 bool saveList(
-    File &file,
+    sd_card::BufferedFileWrite &file,
     float *dwellList, uint16_t &dwellListLength,
     float *voltageList, uint16_t &voltageListLength,
     float *currentList, uint16_t &currentListLength,
@@ -447,9 +432,9 @@ bool saveList(
         return false;
     }
 
-    sd_card::makeParentDir(filePath);
-
-    sd_card::deleteFile(filePath, NULL);
+    if (!sd_card::makeParentDir(filePath, err)) {
+        return false;
+    }
 
     File file;
     if (!file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
@@ -459,7 +444,11 @@ bool saveList(
         return false;
     }
 
-    saveList(file, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, showProgress, err);
+    sd_card::BufferedFileWrite bufferedFile(file);
+
+    saveList(bufferedFile, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, showProgress, err);
+
+    bufferedFile.flush();
 
     file.close();
 

@@ -252,7 +252,7 @@ scpi_result_t scpi_cmd_systemTimeZone(scpi_t *context) {
 
 scpi_result_t scpi_cmd_systemTimeZoneQ(scpi_t *context) {
     char timeZoneStr[32];
-    formatTimeZone(persist_conf::devConf.time_zone, timeZoneStr, 32);
+    formatTimeZone(persist_conf::devConf.timeZone, timeZoneStr, 32);
     SCPI_ResultText(context, timeZoneStr);
     return SCPI_RES_OK;
 }
@@ -322,7 +322,6 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighLevel(scpi_t *context) {
     }
 
     channel_dispatcher::setOtpLevel(sensor, level);
-    profile::save();
 
     return SCPI_RES_OK;
 }
@@ -348,7 +347,6 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighState(scpi_t *context) {
     }
 
     channel_dispatcher::setOtpState(sensor, state);
-    profile::save();
 
     return SCPI_RES_OK;
 }
@@ -377,7 +375,6 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighDelayTime(scpi_t *context)
     }
 
     channel_dispatcher::setOtpDelay(sensor, delay);
-    profile::save();
 
     return SCPI_RES_OK;
 }

@@ -142,9 +142,7 @@ int ChSettingsAdvViewPage::getDirty() {
 
 void ChSettingsAdvViewPage::set() {
     if (getDirty()) {
-        channel_dispatcher::setDisplayViewSettings(*g_channel, displayValue1, displayValue2,
-                                                   ytViewRate);
-        profile::save();
+        channel_dispatcher::setDisplayViewSettings(*g_channel, displayValue1, displayValue2, ytViewRate);
         g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS]();
         infoMessage("View settings changed!");
     }

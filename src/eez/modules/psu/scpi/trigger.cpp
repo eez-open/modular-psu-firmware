@@ -116,7 +116,6 @@ scpi_result_t scpi_cmd_triggerSequenceExitCondition(scpi_t *context) {
     }
 
     channel_dispatcher::setTriggerOnListStop(*channel, (TriggerOnListStop)triggerOnListStop);
-    profile::save();
 
     return SCPI_RES_OK;
 }

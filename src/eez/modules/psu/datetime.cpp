@@ -303,8 +303,7 @@ uint32_t nowUtc() {
     uint8_t year, month, day, hour, minute, second;
     rtc::readDateTime(year, month, day, hour, minute, second);
     uint32_t now = makeTime(2000 + year, month, day, hour, minute, second);
-    return localToUtc(now, persist_conf::devConf.time_zone,
-                      (DstRule)persist_conf::devConf.dstRule);
+    return localToUtc(now, persist_conf::devConf.timeZone, (DstRule)persist_conf::devConf.dstRule);
 }
 
 uint32_t makeTime(int year, int month, int day, int hour, int minute, int second) {

@@ -174,7 +174,7 @@ void Channel::restoreOE() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-float Channel::getChannel0HistoryValue(int rowIndex, int columnIndex, float *max) {
+float Channel::getChannel0HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
     Channel &channel = g_channels[0];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
@@ -190,7 +190,7 @@ float Channel::getChannel0HistoryValue(int rowIndex, int columnIndex, float *max
         if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
             return channel.uHistory[position];
         }
-        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
             return channel.iHistory[position];
         }
     }
@@ -198,7 +198,7 @@ float Channel::getChannel0HistoryValue(int rowIndex, int columnIndex, float *max
     return channel.uHistory[position] * channel.iHistory[position];
 }
 
-float Channel::getChannel1HistoryValue(int rowIndex, int columnIndex, float *max) {
+float Channel::getChannel1HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
     Channel &channel = g_channels[1];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
@@ -214,7 +214,7 @@ float Channel::getChannel1HistoryValue(int rowIndex, int columnIndex, float *max
         if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
             return channel.uHistory[position];
         }
-        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
             return channel.iHistory[position];
         }
     }
@@ -222,7 +222,7 @@ float Channel::getChannel1HistoryValue(int rowIndex, int columnIndex, float *max
     return channel.uHistory[position] * channel.iHistory[position];
 }
 
-float Channel::getChannel2HistoryValue(int rowIndex, int columnIndex, float *max) {
+float Channel::getChannel2HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
     Channel &channel = g_channels[2];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
@@ -238,7 +238,7 @@ float Channel::getChannel2HistoryValue(int rowIndex, int columnIndex, float *max
         if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
             return channel.uHistory[position];
         }
-        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
             return channel.iHistory[position];
         }
     }
@@ -246,7 +246,7 @@ float Channel::getChannel2HistoryValue(int rowIndex, int columnIndex, float *max
     return channel.uHistory[position] * channel.iHistory[position];
 }
 
-float Channel::getChannel3HistoryValue(int rowIndex, int columnIndex, float *max) {
+float Channel::getChannel3HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
     Channel &channel = g_channels[3];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
@@ -262,7 +262,7 @@ float Channel::getChannel3HistoryValue(int rowIndex, int columnIndex, float *max
         if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
             return channel.uHistory[position];
         }
-        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
             return channel.iHistory[position];
         }
     }
@@ -270,7 +270,7 @@ float Channel::getChannel3HistoryValue(int rowIndex, int columnIndex, float *max
     return channel.uHistory[position] * channel.iHistory[position];
 }
 
-float Channel::getChannel4HistoryValue(int rowIndex, int columnIndex, float *max) {
+float Channel::getChannel4HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
     Channel &channel = g_channels[4];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
@@ -286,7 +286,7 @@ float Channel::getChannel4HistoryValue(int rowIndex, int columnIndex, float *max
         if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
             return channel.uHistory[position];
         }
-        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
             return channel.iHistory[position];
         }
     }
@@ -294,7 +294,7 @@ float Channel::getChannel4HistoryValue(int rowIndex, int columnIndex, float *max
     return channel.uHistory[position] * channel.iHistory[position];
 }
 
-float Channel::getChannel5HistoryValue(int rowIndex, int columnIndex, float *max) {
+float Channel::getChannel5HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
     Channel &channel = g_channels[5];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
@@ -307,11 +307,11 @@ float Channel::getChannel5HistoryValue(int rowIndex, int columnIndex, float *max
             return channel.iHistory[position];
         }
     } else {
+        if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+            return channel.iHistory[position];
+        }
         if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
             return channel.uHistory[position];
-        }
-        if (g_channels[0].flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
-            return channel.iHistory[position];
         }
     }
 
@@ -340,7 +340,6 @@ Channel::YtDataGetValueFunctionPointer Channel::getChannelHistoryValueFuncs(int 
 
 void Channel::Simulator::setLoadEnabled(bool value) {
     load_enabled = value;
-    profile::save();
 }
 
 bool Channel::Simulator::getLoadEnabled() {
@@ -349,7 +348,6 @@ bool Channel::Simulator::getLoadEnabled() {
 
 void Channel::Simulator::setLoad(float value) {
     load = value;
-    profile::save();
 }
 
 float Channel::Simulator::getLoad() {
@@ -358,7 +356,6 @@ float Channel::Simulator::getLoad() {
 
 void Channel::Simulator::setVoltProgExt(float value) {
     voltProgExt = value;
-    profile::save();
 }
 
 float Channel::Simulator::getVoltProgExt() {
@@ -527,11 +524,7 @@ void Channel::init() {
     if (!isInstalled()) {
         return;
     }
-    bool wasSaveProfileEnabled = profile::enableSave(false);
-
     channelInterface->init(subchannelIndex);
-
-    profile::enableSave(wasSaveProfileEnabled);
 }
 
 void Channel::onPowerDown() {
@@ -629,6 +622,10 @@ void Channel::reset() {
 #endif
 
     channelInterface->reset(subchannelIndex);
+}
+
+uint32_t Channel::getCurrentHistoryValuePosition() {
+	return historyPosition;
 }
 
 void Channel::resetHistory() {
@@ -770,7 +767,7 @@ void Channel::tick(uint32_t tick_usec) {
             uint32_t historyIndex = historyPosition % CHANNEL_HISTORY_SIZE;
             uHistory[historyIndex] = channel_dispatcher::getUMonLast(*this);
             iHistory[historyIndex] = channel_dispatcher::getIMonLast(*this);
-            ++historyPosition;
+            historyPosition++;
             historyLastTick += ytViewRateMicroseconds;
         }
     }
@@ -951,8 +948,6 @@ void Channel::adcMeasureAll() {
 }
 
 void Channel::updateAllChannels() {
-    bool wasSaveProfileEnabled = profile::enableSave(false);
-
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
         if (channel.isOk()) {
@@ -980,8 +975,6 @@ void Channel::updateAllChannels() {
             channel.doRemoteProgrammingEnable(channel.flags.rprogEnabled);
         }
     }
-
-    profile::enableSave(wasSaveProfileEnabled);
 }
 
 void Channel::executeOutputEnable(bool enable, uint16_t tasks) {
@@ -1094,8 +1087,6 @@ void Channel::syncOutputEnable() {
             channel.flags.doOutputEnableOnNextSync = 0;
         }
     }
-
-    profile::save();
 }
 
 void Channel::onInhibitedChanged(bool inhibited) {
@@ -1232,7 +1223,6 @@ void Channel::remoteSensingEnable(bool enable) {
     if (enable != flags.senseEnabled) {
         doRemoteSensingEnable(enable);
         event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_REMOTE_SENSE_ENABLED : event_queue::EVENT_INFO_CH1_REMOTE_SENSE_DISABLED) + channelIndex);
-        profile::save();
     }
 }
 
@@ -1247,7 +1237,6 @@ void Channel::remoteProgrammingEnable(bool enable) {
         }
         doRemoteProgrammingEnable(enable);
         event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_REMOTE_PROG_ENABLED : event_queue::EVENT_INFO_CH1_REMOTE_PROG_DISABLED) + channelIndex);
-        profile::save();
     }
 }
 
@@ -1284,8 +1273,6 @@ void Channel::setVoltage(float value) {
     value = roundPrec(value, getVoltageResolution());
 
     doSetVoltage(value);
-
-    profile::save();
 }
 
 void Channel::doSetCurrent(float value) {
@@ -1320,8 +1307,6 @@ void Channel::setCurrent(float value) {
     value = roundPrec(value, getCurrentResolution(value));
 
     doSetCurrent(value);
-
-    profile::save();
 }
 
 bool Channel::isCalibrationExists() {
@@ -1405,7 +1390,6 @@ void Channel::setVoltageLimit(float limit) {
     if (u.set > u.limit) {
         setVoltage(u.limit);
     }
-    profile::save();
 }
 
 float Channel::getCurrentLimit() const {
@@ -1422,7 +1406,6 @@ void Channel::setCurrentLimit(float limit) {
     if (i.set > i.limit) {
         setCurrent(i.limit);
     }
-    profile::save();
 }
 
 float Channel::getMaxCurrentLimit() const {
@@ -1478,7 +1461,6 @@ void Channel::setPowerLimit(float limit) {
         // setVoltage(p_limit / i.set);
         setCurrent(p_limit / u.set);
     }
-    profile::save();
 }
 
 bool Channel::isVoltageBalanced() {
@@ -1556,7 +1538,6 @@ bool Channel::hasSupportForCurrentDualRange() const {
 
 void Channel::setCurrentRangeSelectionMode(CurrentRangeSelectionMode mode) {
     flags.currentRangeSelectionMode = mode;
-    profile::save();
 
     if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
         if (i.set > 0.05f) {
@@ -1573,7 +1554,6 @@ void Channel::setCurrentRangeSelectionMode(CurrentRangeSelectionMode mode) {
 
 void Channel::enableAutoSelectCurrentRange(bool enable) {
     flags.autoSelectCurrentRange = enable;
-    profile::save();
 
     if (!flags.autoSelectCurrentRange) {
         setCurrent(i.set);

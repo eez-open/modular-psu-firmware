@@ -64,7 +64,7 @@ void SysSettingsDateTimePage::pageAlloc() {
     strcpy(origNtpServer, "");
 #endif
     dateTimeModified = false;
-    timeZone = origTimeZone = persist_conf::devConf.time_zone;
+    timeZone = origTimeZone = persist_conf::devConf.timeZone;
     dstRule = origDstRule = (datetime::DstRule)persist_conf::devConf.dstRule;
 }
 
@@ -625,8 +625,6 @@ void SysSettingsTemperaturePage::setParams() {
     temperature::sensors[temp_sensor::AUX].prot_conf.level = level.getFloat();
     temperature::sensors[temp_sensor::AUX].prot_conf.delay = delay.getFloat();
 
-    profile::save();
-
     persist_conf::setFanSettings(fanMode, (uint8_t)roundf(fanSpeed.getFloat()));
 
     popPage();
@@ -864,7 +862,6 @@ void SysSettingsTrackingPage::set() {
             errorMessage("At least 2 channels must be enabled!");
         } else {
             channel_dispatcher::setTrackingChannels(m_trackingEnabled);
-            profile::save();
 
             popPage();
 
@@ -918,8 +915,6 @@ void SysSettingsCouplingPage::set() {
                     channel_dispatcher::setTrackingChannels(trackingEnabled);
                 }
             }
-
-            profile::save();
 
             popPage();
 

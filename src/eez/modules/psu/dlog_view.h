@@ -190,7 +190,7 @@ struct Recording {
 
     uint32_t cursorOffset;
 
-    float (*getValue)(int rowIndex, int columnIndex, float *max);
+    float (*getValue)(uint32_t rowIndex, uint8_t columnIndex, float *max);
 
     uint32_t refreshCounter;
 

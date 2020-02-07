@@ -281,7 +281,7 @@ class Channel {
     /// Restore previously saved OE state for all the channels.
     static void restoreOE();
 
-    typedef float(*YtDataGetValueFunctionPointer)(int rowIndex, int columnIndex, float *max);
+    typedef float(*YtDataGetValueFunctionPointer)(uint32_t rowIndex, uint8_t columnIndex, float *max);
 
     static YtDataGetValueFunctionPointer getChannelHistoryValueFuncs(int channelIndex);
 
@@ -487,15 +487,7 @@ class Channel {
     float getUSetUnbalanced();
     float getISetUnbalanced();
 
-    uint32_t getCurrentHistoryValuePosition() {
-        return historyPosition;
-    }
-    float getUMonHistory(uint32_t position) const {
-        return uHistory[position % CHANNEL_HISTORY_SIZE];
-    }
-    float getIMonHistory(uint32_t position) const {
-        return iHistory[position % CHANNEL_HISTORY_SIZE];
-    }
+    uint32_t getCurrentHistoryValuePosition();
 
     void resetHistory();
 
@@ -558,12 +550,12 @@ class Channel {
 
     int reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionValue &cpv);
 
-    static float getChannel0HistoryValue(int rowIndex, int columnIndex, float *max);
-    static float getChannel1HistoryValue(int rowIndex, int columnIndex, float *max);
-    static float getChannel2HistoryValue(int rowIndex, int columnIndex, float *max);
-    static float getChannel3HistoryValue(int rowIndex, int columnIndex, float *max);
-    static float getChannel4HistoryValue(int rowIndex, int columnIndex, float *max);
-    static float getChannel5HistoryValue(int rowIndex, int columnIndex, float *max);
+    static float getChannel0HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
+    static float getChannel1HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
+    static float getChannel2HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
+    static float getChannel3HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
+    static float getChannel4HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
+    static float getChannel5HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
 
     void clearProtectionConf();
     void protectionEnter(ProtectionValue &cpv);

@@ -60,7 +60,7 @@ void eventHandling() {
     using namespace eez::gui::touch;
 
     if (g_eventType != EVENT_TYPE_TOUCH_NONE) {
-        psu::idle::noteGuiActivity();
+        psu::idle::noteHmiActivity();
     }
 
     uint32_t tickCount = micros();

@@ -184,7 +184,8 @@ void loadDirectory() {
     g_loadingStartTickCount = millis();
 
     if (osThreadGetId() != scpi::g_scpiTaskHandle) {
-        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_LOAD_DIRECTORY, 0), osWaitForever);
+        using namespace scpi;
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_LOAD_DIRECTORY, 0), osWaitForever);
     } else {
         doLoadDirectory();
     }
@@ -402,7 +403,8 @@ void openFile() {
     } else if (fileItem->type == FILE_TYPE_IMAGE) {
         g_imageLoadFailed = false;
         g_openedImagePixels = nullptr;
-        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
+        using namespace scpi;
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
         gui::showAsyncOperationInProgress("Loading...", checkImageLoadingStatus);
     } else if (fileItem->type == FILE_TYPE_MICROPYTHON) {
         mp::startScript(filePath);
@@ -452,6 +454,7 @@ bool isUploadFileEnabled() {
 void uploadFile() {
     if (osThreadGetId() != scpi::g_scpiTaskHandle) {
         popPage();
+        using namespace scpi;
         osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_UPLOAD_FILE, 0), osWaitForever);
         return;
     }
@@ -506,7 +509,8 @@ void onRenameFileOk(char *fileNameWithoutExtension) {
 
     if (osThreadGetId() != scpi::g_scpiTaskHandle) {
         popPage();
-        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_RENAME_FILE, 0), osWaitForever);
+        using namespace scpi;
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_RENAME_FILE, 0), osWaitForever);
     } else {
         doRenameFile();
     }
@@ -577,7 +581,8 @@ bool isDeleteFileEnabled() {
 void deleteFile() {
     if (osThreadGetId() != scpi::g_scpiTaskHandle) {
         popPage();
-        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_DELETE_FILE, 0), osWaitForever);
+        using namespace scpi;
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_DELETE_FILE, 0), osWaitForever);
         return;
     }
 

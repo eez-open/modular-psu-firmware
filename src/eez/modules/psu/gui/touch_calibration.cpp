@@ -51,9 +51,9 @@ static int g_currentPoint;
 bool isTouchCalibrated() {
     bool success;
     success = touch::calibrateTransform(
-        persist_conf::devConf.touch_screen_cal_tlx, persist_conf::devConf.touch_screen_cal_tly,
-        persist_conf::devConf.touch_screen_cal_brx, persist_conf::devConf.touch_screen_cal_bry,
-        persist_conf::devConf.touch_screen_cal_trx, persist_conf::devConf.touch_screen_cal_try,
+        persist_conf::devConf.touchScreenCalTlx, persist_conf::devConf.touchScreenCalTly,
+        persist_conf::devConf.touchScreenCalBrx, persist_conf::devConf.touchScreenCalBry,
+        persist_conf::devConf.touchScreenCalTrx, persist_conf::devConf.touchScreenCalTry,
         CONF_GUI_TOUCH_CALIBRATION_M, getDisplayWidth(), getDisplayHeight());
     return success;
 }

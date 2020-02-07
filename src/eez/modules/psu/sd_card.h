@@ -47,9 +47,9 @@ void onSdDetectInterruptHandler();
 bool isMounted(int *err);
 bool isBusy();
 
-class BufferedFile {
+class BufferedFileRead {
 public:
-    BufferedFile(File &file);
+    BufferedFileRead(File &file);
 
     int peek();
     int read();
@@ -60,24 +60,42 @@ public:
 
 private:
     File &file;
-    static const uint32_t BUFFER_SIZE = 512;
+    static const size_t BUFFER_SIZE = 512;
     uint8_t buffer[BUFFER_SIZE];
-    uint32_t position;
-    uint32_t end;
+    size_t position;
+    size_t end;
 
     void readNextChunk();
 };
 
-void matchZeroOrMoreSpaces(BufferedFile &file);
-bool match(BufferedFile &file, char c);
-bool match(BufferedFile &file, const char *str);
-bool matchUntil(BufferedFile &file, char c, char *result);
-void skipUntilEOL(BufferedFile &file);
-bool matchQuotedString(BufferedFile &file, char *str, unsigned int strLength);
-bool match(BufferedFile &file, unsigned int &result);
-bool match(BufferedFile &file, float &result);
+class BufferedFileWrite {
+public:
+    BufferedFileWrite(File &file);
 
-bool makeParentDir(const char *filePath);
+    size_t write(const uint8_t *buf, size_t size);
+
+    size_t print(float value, int numDecimalDigits);
+    size_t print(char value);
+
+    size_t flush();
+
+private:
+    File &file;
+    static const size_t BUFFER_SIZE = 512;
+    uint8_t buffer[BUFFER_SIZE];
+    size_t position;
+};
+
+void matchZeroOrMoreSpaces(BufferedFileRead &file);
+bool match(BufferedFileRead &file, char c);
+bool match(BufferedFileRead &file, const char *str);
+bool matchUntil(BufferedFileRead &file, char c, char *result);
+void skipUntilEOL(BufferedFileRead &file);
+bool matchQuotedString(BufferedFileRead &file, char *str, unsigned int strLength);
+bool match(BufferedFileRead &file, unsigned int &result);
+bool match(BufferedFileRead &file, float &result);
+
+bool makeParentDir(const char *filePath, int *err);
 
 bool exists(const char *dirPath, int *err);
 bool catalog(const char *dirPath, void *param,

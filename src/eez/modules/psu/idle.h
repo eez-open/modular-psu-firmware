@@ -24,15 +24,10 @@ namespace idle {
 
 void tick(uint32_t tickCount);
 
-void noteScpiActivity();
+void noteHmiActivity();
+void noteHmiActivity();
 
-void noteGuiActivity();
-
-void noteEncoderActivity();
-
-uint32_t getGuiAndEncoderInactivityPeriod();
-
-bool isIdle();
+uint32_t getHmiInactivityPeriod();
 
 }
 }

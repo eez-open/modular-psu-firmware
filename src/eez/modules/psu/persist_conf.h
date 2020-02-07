@@ -38,18 +38,12 @@ namespace psu {
 
 class Channel;
 
-namespace profile {
-
-struct Parameters;
-
-}
 } // namespace psu
 } // namespace eez
 
 namespace eez {
 namespace psu {
-/// Store/restore of persistent configuration data (device configuration, calibration parameters,
-/// profiles) using external EEPROM.
+/// Store/restore of persistent configuration data (device configuration, calibration parameters, ...) using external EEPROM.
 namespace persist_conf {
 
 /// Header of the every block stored in EEPROM. It contains checksum and version.
@@ -79,14 +73,14 @@ struct DeviceConfiguration {
     // block 1
     char reserved1[7 + 1]; // was serialNumber
     char systemPassword[PASSWORD_MAX_LENGTH + 1];
-    char calibration_password[PASSWORD_MAX_LENGTH + 1];
+    char calibrationPassword[PASSWORD_MAX_LENGTH + 1];
 
-    int16_t touch_screen_cal_tlx;
-    int16_t touch_screen_cal_tly;
-    int16_t touch_screen_cal_brx;
-    int16_t touch_screen_cal_bry;
-    int16_t touch_screen_cal_trx;
-    int16_t touch_screen_cal_try;
+    int16_t touchScreenCalTlx;
+    int16_t touchScreenCalTly;
+    int16_t touchScreenCalBrx;
+    int16_t touchScreenCalBry;
+    int16_t touchScreenCalTrx;
+    int16_t touchScreenCalTry;
 
     unsigned skipChannelCalibrations : 1;
     unsigned skipDateTimeSetup : 1;
@@ -94,13 +88,13 @@ struct DeviceConfiguration {
     unsigned skipEthernetSetup : 1;
 
     // block 2
-    uint8_t date_year;
-    uint8_t date_month;
-    uint8_t date_day;
-    uint8_t time_hour;
-    uint8_t time_minute;
-    uint8_t time_second;
-    int16_t time_zone;
+    uint8_t dateYear;
+    uint8_t dateMonth;
+    uint8_t dateDay;
+    uint8_t timeHour;
+    uint8_t timeMinute;
+    uint8_t timeSecond;
+    int16_t timeZone;
     uint8_t dstRule;
 
     unsigned dateValid : 1;
@@ -108,7 +102,7 @@ struct DeviceConfiguration {
     unsigned dst : 1;
 
     // block 3
-    int8_t profile_auto_recall_location;
+    int8_t profileAutoRecallLocation;
 
     unsigned profileAutoRecallEnabled : 1;
 
@@ -238,9 +232,6 @@ int getMin2ChannelIndex();
 void setMaxChannelIndex(int channelIndex);
 void toggleMaxChannelIndex(int channelIndex);
 
-profile::Parameters *loadProfile(int location);
-void saveProfile(int location, profile::Parameters *profile);
-
 uint32_t readTotalOnTime(int type);
 bool writeTotalOnTime(int type, uint32_t time);
 
@@ -297,7 +288,7 @@ bool isSdLocked();
 
 void setAnimationsDuration(float value);
 
-void setTouchscreenCalParams(int16_t touch_screen_cal_tlx, int16_t touch_screen_cal_tly, int16_t touch_screen_cal_brx, int16_t touch_screen_cal_bry, int16_t touch_screen_cal_trx, int16_t touch_screen_cal_try);
+void setTouchscreenCalParams(int16_t touchScreenCalTlx, int16_t touchScreenCalTly, int16_t touchScreenCalBrx, int16_t touchScreenCalBry, int16_t touchScreenCalTrx, int16_t touchScreenCalTry);
 
 void setFanSettings(uint8_t fanMode, uint8_t fanSpeed);
 

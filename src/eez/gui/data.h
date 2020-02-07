@@ -153,7 +153,7 @@ struct Value {
     {
     }
 
-    typedef float (*YtDataGetValueFunctionPointer)(int rowIndex, int columnIndex, float *max);
+    typedef float (*YtDataGetValueFunctionPointer)(uint32_t rowIndex, uint8_t columnIndex, float *max);
 
     Value(YtDataGetValueFunctionPointer ytDataGetValueFunctionPointer)
         : type_(VALUE_TYPE_YT_DATA_GET_VALUE_FUNCTION_POINTER), pVoid_((void *)ytDataGetValueFunctionPointer)

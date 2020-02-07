@@ -70,8 +70,6 @@ void onBufferOverrun(scpi_t &context) {
 }
 
 void input(scpi_t &context, const char *str, size_t size) {
-    idle::noteScpiActivity();
-
     scpi_psu_t *psu_context = (scpi_psu_t *)context.user_context;
     if (psu_context->isBufferOverrun) {
         // wait for 500ms of idle input to declare buffer overrun finished

@@ -688,9 +688,7 @@ struct Channel : ChannelInterface {
 	void restoreVoltageToValueBeforeBalancing(psu::Channel &channel) {
 		if (!isNaN(uBeforeBalancing)) {
 			// DebugTrace("Restore voltage to value before balancing: %f", uBeforeBalancing);
-			profile::enableSave(false);
 			channel.setVoltage(uBeforeBalancing);
-			profile::enableSave(true);
 			uBeforeBalancing = NAN;
 		}
 	}
@@ -698,9 +696,7 @@ struct Channel : ChannelInterface {
 	void restoreCurrentToValueBeforeBalancing(psu::Channel &channel) {
 		if (!isNaN(iBeforeBalancing)) {
 			// DebugTrace("Restore current to value before balancing: %f", index, iBeforeBalancing);
-			profile::enableSave(false);
             channel.setCurrent(iBeforeBalancing);
-			profile::enableSave(true);
 			iBeforeBalancing = NAN;
 		}
 	}

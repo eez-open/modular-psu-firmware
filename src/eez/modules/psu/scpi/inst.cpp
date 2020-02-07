@@ -123,9 +123,7 @@ scpi_result_t scpi_cmd_instrumentCoupleTracking(scpi_t *context) {
     }
 
     int err;
-    if (channel_dispatcher::setCouplingType((channel_dispatcher::CouplingType)type, &err)) {
-        profile::save();
-    } else {
+    if (!channel_dispatcher::setCouplingType((channel_dispatcher::CouplingType)type, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -186,8 +184,6 @@ scpi_result_t scpi_cmd_instrumentDisplayTrace(scpi_t *context) {
                                                    traceValue, channel->ytViewRate);
     }
 
-    profile::save();
-
     return SCPI_RES_OK;
 }
 
@@ -228,9 +224,7 @@ scpi_result_t scpi_cmd_instrumentDisplayTraceSwap(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     Channel *channel = &Channel::get(psu_context->selected_channel_index);
 
-    channel_dispatcher::setDisplayViewSettings(*channel, channel->flags.displayValue2,
-                                               channel->flags.displayValue1, channel->ytViewRate);
-    profile::save();
+    channel_dispatcher::setDisplayViewSettings(*channel, channel->flags.displayValue2, channel->flags.displayValue1, channel->ytViewRate);
 
     return SCPI_RES_OK;
 }
@@ -245,9 +239,7 @@ scpi_result_t scpi_cmd_instrumentDisplayYtRate(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    channel_dispatcher::setDisplayViewSettings(*channel, channel->flags.displayValue1,
-                                               channel->flags.displayValue2, ytViewRate);
-    profile::save();
+    channel_dispatcher::setDisplayViewSettings(*channel, channel->flags.displayValue1, channel->flags.displayValue2, ytViewRate);
 
     return SCPI_RES_OK;
 }

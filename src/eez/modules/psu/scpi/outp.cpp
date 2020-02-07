@@ -107,7 +107,6 @@ scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
 
     if (enable != channel->flags.trackingEnabled) {
         channel->flags.trackingEnabled = enable;
-        profile::save();
     }
 
     return SCPI_RES_OK;

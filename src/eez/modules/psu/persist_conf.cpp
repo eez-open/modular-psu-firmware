@@ -26,7 +26,6 @@
 #include <eez/modules/bp3c/eeprom.h>
 
 #include <eez/modules/psu/event_queue.h>
-#include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/serial_psu.h>
 
 #if OPTION_ENCODER
@@ -64,8 +63,6 @@ static const uint16_t MODULE_CONF_VERSION = 1;
 static const uint16_t CH_CAL_CONF_VERSION = 3;
 
 static const uint16_t PERSIST_CONF_DEV_CONF_ADDRESS = 128;
-static const uint16_t PERSIST_CONF_FIRST_PROFILE_ADDRESS = 5120;
-static const uint16_t PERSIST_CONF_PROFILE_BLOCK_SIZE = 1024;
 
 static const uint32_t ONTIME_MAGIC = 0xA7F31B3CL;
 
@@ -86,8 +83,8 @@ struct DevConfBlock {
 };
 
 static DevConfBlock g_devConfBlocks[] = {
-    { offsetof(DeviceConfiguration, date_year), 1, false, 0, 0, 0 },
-    { offsetof(DeviceConfiguration, profile_auto_recall_location), 1, false, 0, 0, 0 },
+    { offsetof(DeviceConfiguration, dateYear), 1, false, 0, 0, 0 },
+    { offsetof(DeviceConfiguration, profileAutoRecallLocation), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, serialBaud), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, triggerSource), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, ytGraphUpdateMethod), 1, false, 0, 0, 0 },
@@ -96,34 +93,27 @@ static DevConfBlock g_devConfBlocks[] = {
     { sizeof(DeviceConfiguration), 1, false, 0, 0, 0 },
 };
 
-static struct {
-    bool loaded;
-    profile::Parameters profile;
-    bool dirty;
-    unsigned numSaveErrors;
-} g_profilesCache[NUM_PROFILE_LOCATIONS];
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void initDefaultDevConf() {
     memset(&g_defaultDevConf, 0, sizeof(g_defaultDevConf));
 
     // block 1
-    strcpy(g_defaultDevConf.calibration_password, CALIBRATION_PASSWORD_DEFAULT);
+    strcpy(g_defaultDevConf.calibrationPassword, CALIBRATION_PASSWORD_DEFAULT);
 
-    g_defaultDevConf.touch_screen_cal_tlx = 0;
-    g_defaultDevConf.touch_screen_cal_tly = 0;
-    g_defaultDevConf.touch_screen_cal_brx = 0;
-    g_defaultDevConf.touch_screen_cal_bry = 0;
-    g_defaultDevConf.touch_screen_cal_trx = 0;
-    g_defaultDevConf.touch_screen_cal_try = 0;
+    g_defaultDevConf.touchScreenCalTlx = 0;
+    g_defaultDevConf.touchScreenCalTly = 0;
+    g_defaultDevConf.touchScreenCalBrx = 0;
+    g_defaultDevConf.touchScreenCalBry = 0;
+    g_defaultDevConf.touchScreenCalTrx = 0;
+    g_defaultDevConf.touchScreenCalTry = 0;
 
     // block2
     g_defaultDevConf.dateValid = 0;
     g_defaultDevConf.timeValid = 0;
     g_defaultDevConf.dst = 0;
 
-    g_defaultDevConf.time_zone = 0;
+    g_defaultDevConf.timeZone = 0;
     g_defaultDevConf.dstRule = datetime::DST_RULE_OFF;
 
     // block 3
@@ -133,7 +123,7 @@ void initDefaultDevConf() {
     g_defaultDevConf.shutdownWhenProtectionTripped = 0;
     g_defaultDevConf.forceDisablingAllOutputsOnPowerUp = 0;
 
-    g_defaultDevConf.profile_auto_recall_location = 0;
+    g_defaultDevConf.profileAutoRecallLocation = 0;
 
     // block 4
     g_defaultDevConf.serialEnabled = 1;
@@ -351,12 +341,6 @@ static bool moduleSave(int slotIndex, BlockHeader *block, uint16_t size, uint16_
 
 ////////////////////////////////////////////////////////////////////////////////
 
-uint16_t getProfileAddress(int location) {
-    return PERSIST_CONF_FIRST_PROFILE_ADDRESS + location * PERSIST_CONF_PROFILE_BLOCK_SIZE;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 static const unsigned PERSISTENT_STORAGE_ADDRESS_ALIGNMENT = 32;
 
 void init() {
@@ -464,22 +448,6 @@ bool saveAll(bool force) {
         blockStart = blockEnd;
     }
 
-    // write dirty profiles, last location should not be stored in EEPROM
-    for (unsigned i = 0; i < NUM_PROFILE_LOCATIONS - 1; i++) {
-        if (g_profilesCache[i].dirty && g_profilesCache[i].numSaveErrors < CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED) {
-            if (save((BlockHeader *)&g_profilesCache[i].profile, sizeof(profile::Parameters), getProfileAddress(i), profile::PROFILE_VERSION)) {
-                g_profilesCache[i].dirty = false;
-                g_profilesCache[i].numSaveErrors = 0;
-            } else {
-                if (++g_profilesCache[i].numSaveErrors == CONF_MAX_NUMBER_OF_SAVE_ERRORS_ALLOWED) {
-                    event_queue::pushEvent(event_queue::EVENT_ERROR_SAVE_PROFILE_0 + i);
-                } else {
-                    moreDirtyBlocks = true;
-                }
-            }
-        }
-    }
-
     return moreDirtyBlocks;
 }
 
@@ -526,8 +494,8 @@ bool isCalibrationPasswordValid(const char *new_password, size_t new_password_le
 }
 
 void changeCalibrationPassword(const char *new_password, size_t new_password_len) {
-    memset(&g_devConf.calibration_password, 0, sizeof(g_devConf.calibration_password));
-    strncpy(g_devConf.calibration_password, new_password, new_password_len);
+    memset(&g_devConf.calibrationPassword, 0, sizeof(g_devConf.calibrationPassword));
+    strncpy(g_devConf.calibrationPassword, new_password, new_password_len);
     event_queue::pushEvent(event_queue::EVENT_INFO_CALIBRATION_PASSWORD_CHANGED);
 }
 
@@ -550,9 +518,9 @@ bool isClickSoundEnabled() {
 
 bool readSystemDate(uint8_t &year, uint8_t &month, uint8_t &day) {
     if (g_devConf.dateValid) {
-        year = g_devConf.date_year;
-        month = g_devConf.date_month;
-        day = g_devConf.date_day;
+        year = g_devConf.dateYear;
+        month = g_devConf.dateMonth;
+        day = g_devConf.dateDay;
         return true;
     }
     return false;
@@ -561,12 +529,12 @@ bool readSystemDate(uint8_t &year, uint8_t &month, uint8_t &day) {
 bool isDst() {
     return datetime::isDst(
         datetime::makeTime(
-            2000 + g_devConf.date_year,
-            g_devConf.date_month,
-            g_devConf.date_day,
-            g_devConf.time_hour,
-            g_devConf.time_minute,
-            g_devConf.time_second
+            2000 + g_devConf.dateYear,
+            g_devConf.dateMonth,
+            g_devConf.dateDay,
+            g_devConf.timeHour,
+            g_devConf.timeMinute,
+            g_devConf.timeSecond
         ),
         (datetime::DstRule)g_devConf.dstRule
     );
@@ -583,9 +551,9 @@ void setDst(unsigned dst) {
 }
 
 void writeSystemDate(uint8_t year, uint8_t month, uint8_t day, unsigned dst) {
-    g_devConf.date_year = year;
-    g_devConf.date_month = month;
-    g_devConf.date_day = day;
+    g_devConf.dateYear = year;
+    g_devConf.dateMonth = month;
+    g_devConf.dateDay = day;
 
     g_devConf.dateValid = 1;
 
@@ -594,18 +562,18 @@ void writeSystemDate(uint8_t year, uint8_t month, uint8_t day, unsigned dst) {
 
 bool readSystemTime(uint8_t &hour, uint8_t &minute, uint8_t &second) {
     if (g_devConf.timeValid) {
-        hour = g_devConf.time_hour;
-        minute = g_devConf.time_minute;
-        second = g_devConf.time_second;
+        hour = g_devConf.timeHour;
+        minute = g_devConf.timeMinute;
+        second = g_devConf.timeSecond;
         return true;
     }
     return false;
 }
 
 void writeSystemTime(uint8_t hour, uint8_t minute, uint8_t second, unsigned dst) {
-    g_devConf.time_hour = hour;
-    g_devConf.time_minute = minute;
-    g_devConf.time_second = second;
+    g_devConf.timeHour = hour;
+    g_devConf.timeMinute = minute;
+    g_devConf.timeSecond = second;
 
     g_devConf.timeValid = 1;
 
@@ -614,15 +582,15 @@ void writeSystemTime(uint8_t hour, uint8_t minute, uint8_t second, unsigned dst)
 
 void writeSystemDateTime(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute,
                          uint8_t second, unsigned dst) {
-    g_devConf.date_year = year;
-    g_devConf.date_month = month;
-    g_devConf.date_day = day;
+    g_devConf.dateYear = year;
+    g_devConf.dateMonth = month;
+    g_devConf.dateDay = day;
 
     g_devConf.dateValid = 1;
 
-    g_devConf.time_hour = hour;
-    g_devConf.time_minute = minute;
-    g_devConf.time_second = second;
+    g_devConf.timeHour = hour;
+    g_devConf.timeMinute = minute;
+    g_devConf.timeSecond = second;
 
     g_devConf.timeValid = 1;
 
@@ -638,15 +606,12 @@ bool isProfileAutoRecallEnabled() {
 }
 
 void setProfileAutoRecallLocation(int location) {
-    g_devConf.profile_auto_recall_location = (int8_t)location;
+    g_devConf.profileAutoRecallLocation = (int8_t)location;
     event_queue::pushEvent(event_queue::EVENT_INFO_DEFAULE_PROFILE_CHANGED_TO_0 + location);
-    if (location == 0) {
-        profile::save();
-    }
 }
 
 int getProfileAutoRecallLocation() {
-    return g_devConf.profile_auto_recall_location;
+    return g_devConf.profileAutoRecallLocation;
 }
 
 void setChannelsViewMode(unsigned int channelsViewMode) {
@@ -740,30 +705,6 @@ void toggleMaxChannelIndex(int channelIndex) {
     } else {
         g_devConf.maxChannel = channelIndex + 1;
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-profile::Parameters *loadProfile(int location) {
-    assert(location < NUM_PROFILE_LOCATIONS && sizeof(profile::Parameters) <= PERSIST_CONF_PROFILE_BLOCK_SIZE);
-    
-    if (!g_profilesCache[location].loaded) {
-        if (location != NUM_PROFILE_LOCATIONS - 1) { // last location is not stored in EEPROM
-            profile::Parameters profile;
-            if (confRead((uint8_t *)&profile, sizeof(profile::Parameters), getProfileAddress(location), profile::PROFILE_VERSION)) {
-                memcpy(&g_profilesCache[location].profile, &profile, sizeof(profile::Parameters));
-            }
-        }
-        g_profilesCache[location].loaded = true;
-    }
-
-    return &g_profilesCache[location].profile;
-}
-
-void saveProfile(int location, profile::Parameters *profile) {
-    memcpy(&g_profilesCache[location].profile, profile, sizeof(profile::Parameters));
-    g_profilesCache[location].loaded = true;
-    g_profilesCache[location].dirty = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1235,13 +1176,13 @@ void setAnimationsDuration(float value) {
     g_devConf.animationsDuration = value;
 }
 
-void setTouchscreenCalParams(int16_t touch_screen_cal_tlx, int16_t touch_screen_cal_tly, int16_t touch_screen_cal_brx, int16_t touch_screen_cal_bry, int16_t touch_screen_cal_trx, int16_t touch_screen_cal_try) {
-    g_devConf.touch_screen_cal_tlx = touch_screen_cal_tlx;
-    g_devConf.touch_screen_cal_tly = touch_screen_cal_tly;
-    g_devConf.touch_screen_cal_brx = touch_screen_cal_brx;
-    g_devConf.touch_screen_cal_bry = touch_screen_cal_bry;
-    g_devConf.touch_screen_cal_trx = touch_screen_cal_trx;
-    g_devConf.touch_screen_cal_try = touch_screen_cal_try;
+void setTouchscreenCalParams(int16_t touchScreenCalTlx, int16_t touchScreenCalTly, int16_t touchScreenCalBrx, int16_t touchScreenCalBry, int16_t touchScreenCalTrx, int16_t touchScreenCalTry) {
+    g_devConf.touchScreenCalTlx = touchScreenCalTlx;
+    g_devConf.touchScreenCalTly = touchScreenCalTly;
+    g_devConf.touchScreenCalBrx = touchScreenCalBrx;
+    g_devConf.touchScreenCalBry = touchScreenCalBry;
+    g_devConf.touchScreenCalTrx = touchScreenCalTrx;
+    g_devConf.touchScreenCalTry = touchScreenCalTry;
 }
 
 void setFanSettings(uint8_t fanMode, uint8_t fanSpeed) {
@@ -1257,8 +1198,8 @@ void setTimeValid(unsigned timeValid) {
     g_devConf.timeValid = timeValid;
 }
 
-void setTimeZone(int16_t time_zone) {
-    g_devConf.time_zone = time_zone;
+void setTimeZone(int16_t timeZone) {
+    g_devConf.timeZone = timeZone;
 }
 
 void setDstRule(uint8_t dstRule) {
