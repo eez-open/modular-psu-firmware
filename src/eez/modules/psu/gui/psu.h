@@ -72,6 +72,10 @@ void showEnteringStandbyPage();
 void showSavingPage();
 void showShutdownPage();
 
+void showAsyncOperationInProgress(const char *message, void (*checkStatus)() = 0);
+void hideAsyncOperationInProgress();
+extern data::Value g_progress;
+
 class PsuAppContext : public AppContext {
 public:
     PsuAppContext();
@@ -83,9 +87,6 @@ public:
     bool isFocusWidget(const WidgetCursor &widgetCursor) override;
 
     bool isBlinking(const data::Cursor &cursor, uint16_t id) override;
-
-    uint32_t getNumHistoryValues(uint16_t id) override;
-    uint32_t getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) override;
 
     bool isWidgetActionEnabled(const WidgetCursor &widgetCursor) override;
     

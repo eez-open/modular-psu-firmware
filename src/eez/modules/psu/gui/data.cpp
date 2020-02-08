@@ -4468,9 +4468,10 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
     } else if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
         value = Value(0, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
-        value = Value(g_appContext->getNumHistoryValues(DATA_ID_CHANNEL_DISPLAY_VALUE1), VALUE_TYPE_UINT32);
+        value = Value(CHANNEL_HISTORY_SIZE, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
-        value = Value(g_appContext->getCurrentHistoryValuePosition(cursor, DATA_ID_CHANNEL_DISPLAY_VALUE1) - 1, VALUE_TYPE_UINT32);
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        value = Value(Channel::get(iChannel).getCurrentHistoryValuePosition() - 1, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
@@ -5335,6 +5336,12 @@ void data_mqtt_period(data::DataOperationEnum operation, data::Cursor &cursor, d
 void data_debug_trace_log_is_stopped(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = eez::debug::g_stopDebugTraceLog ? 1 : 0;
+    }
+}
+
+void data_progress(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = g_progress;
     }
 }
 

@@ -82,13 +82,13 @@ public:
 
     Page *getPage(int pageId);
     bool isPageOnStack(int pageId);
+    int getNumPagesOnStack() {
+        return m_pageNavigationStackPointer + 1;
+    }
 
     virtual bool isFocusWidget(const WidgetCursor &widgetCursor);
 
     virtual bool isBlinking(const data::Cursor &cursor, uint16_t id);
-
-    virtual uint32_t getNumHistoryValues(uint16_t id);
-    virtual uint32_t getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id);
 
     virtual bool isActiveWidget(const WidgetCursor &widgetCursor);
     virtual void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
@@ -102,12 +102,6 @@ public:
     void updateAppView(WidgetCursor &widgetCursor);
 
     virtual int getLongTouchActionHook(const WidgetCursor &widgetCursor);
-
-    int getNumPagesOnStack() {
-        return m_pageNavigationStackPointer + 1;
-    }
-
-    void infoMessage(const char *message);
 
     const data::EnumItem *getActiveSelectEnumDefinition();
 
@@ -123,8 +117,6 @@ protected:
 
     SelectFromEnumPage m_selectFromEnumPage;
 
-    const char *m_showInfoMessageOnNextIter;
-      
     virtual int getMainPageId() = 0;
     virtual void onPageChanged(int previousPageId, int activePageId);
 

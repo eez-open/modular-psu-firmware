@@ -543,7 +543,7 @@ Exit:
 #endif
 
 	if (!eofReached) {
-		errorMessage("Downloading failed!");
+		gui::errorMessage("Downloading failed!");
 	}
 }
 

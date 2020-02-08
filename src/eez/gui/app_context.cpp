@@ -73,11 +73,6 @@ void AppContext::stateManagment() {
             m_checkAsyncOperationStatus();
         }
     }
-
-    if (m_showInfoMessageOnNextIter) {
-        gui::infoMessage(m_showInfoMessageOnNextIter);
-        m_showInfoMessageOnNextIter = nullptr;
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -271,14 +266,6 @@ bool AppContext::isBlinking(const data::Cursor &cursor, uint16_t id) {
     return false;
 }
 
-uint32_t AppContext::getNumHistoryValues(uint16_t id) {
-    return 0;
-}
-
-uint32_t AppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) {
-    return 0;
-}
-
 bool AppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
     return false;
 }
@@ -411,10 +398,6 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 
 int AppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {
     return ACTION_ID_NONE;
-}
-
-void AppContext::infoMessage(const char *message) {
-    m_showInfoMessageOnNextIter = message;
 }
 
 const data::EnumItem *AppContext::getActiveSelectEnumDefinition() {

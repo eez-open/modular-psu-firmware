@@ -548,6 +548,14 @@ void SelectFromEnumPage::getItemLabel(int itemIndex, char *text, int count) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void showMenu(AppContext *appContext, const char *message, MenuType menuType, const char **menuItems, void(*callback)(int)) {
+    if (menuType == MENU_TYPE_BUTTON) {
+        pushPage(INTERNAL_PAGE_ID_MENU_WITH_BUTTONS, MenuWithButtonsPage::create(appContext, message, menuItems, callback));
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 static MenuWithButtonsPage g_menuWithButtonsPage;
 
 MenuWithButtonsPage *MenuWithButtonsPage::create(AppContext *appContext, const char *message, const char **menuItems, void(*callback)(int)) {

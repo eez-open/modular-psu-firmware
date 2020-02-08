@@ -20,22 +20,13 @@
 
 #include <eez/platform/simulator/front_panel.h>
 
-#include <eez/index.h>
-
 #include <eez/gui/gui.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/gui/psu.h>
 
-using namespace eez::gui;
-
 namespace eez {
 namespace gui {
-
-using data::Cursor;
-using data::DataOperationEnum;
-using data::Value;
-using namespace mcu::display;
 
 FrontPanelAppContext g_frontPanelAppContext;
 

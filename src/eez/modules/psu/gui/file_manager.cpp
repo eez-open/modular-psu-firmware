@@ -40,10 +40,10 @@
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/scpi/psu.h>
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/dlog_view.h>
-
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
@@ -405,7 +405,7 @@ void openFile() {
         g_openedImagePixels = nullptr;
         using namespace scpi;
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
-        gui::showAsyncOperationInProgress("Loading...", checkImageLoadingStatus);
+        psu::gui::showAsyncOperationInProgress("Loading...", checkImageLoadingStatus);
     } else if (fileItem->type == FILE_TYPE_MICROPYTHON) {
         mp::startScript(filePath);
     }

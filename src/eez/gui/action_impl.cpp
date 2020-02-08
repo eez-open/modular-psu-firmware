@@ -991,10 +991,6 @@ void action_edit_animations_duration() {
     NumericKeypad::start(0, data::Value(psu::persist_conf::devConf.animationsDuration, UNIT_SECOND), options, onSetAnimationsDuration, 0, 0);
 }
 
-void action_test() {
-    infoMessage("Hello, world!");
-}
-
 void action_user_switch_clicked() {
 	if (g_shutdownInProgress) {
 		return;

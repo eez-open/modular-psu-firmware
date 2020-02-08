@@ -259,6 +259,8 @@ static WidgetCursor g_toggleOutputWidgetCursor;
 static mcu::Button g_userSwitch(USER_SW_GPIO_Port, USER_SW_Pin, true, true);
 #endif
 
+Value g_progress;
+
 bool showSetupWizardQuestion();
 void onEncoder(int counter, bool clicked);
 
@@ -739,15 +741,6 @@ bool PsuAppContext::isBlinking(const data::Cursor &cursor, uint16_t id) {
     }
 
     return AppContext::isBlinking(cursor, id);
-}
-
-uint32_t PsuAppContext::getNumHistoryValues(uint16_t id) {
-    return CHANNEL_HISTORY_SIZE;
-}
-
-uint32_t PsuAppContext::getCurrentHistoryValuePosition(const Cursor &cursor, uint16_t id) {
-    int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-    return Channel::get(iChannel).getCurrentHistoryValuePosition();
 }
 
 bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
@@ -1363,6 +1356,16 @@ void showSavingPage() {
 
 void showShutdownPage() {
     psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_SHUTDOWN);
+}
+
+void showAsyncOperationInProgress(const char *message, void (*checkStatus)()) {
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message), 0);
+    g_appContext->m_checkAsyncOperationStatus = checkStatus;
+    pushPage(PAGE_ID_ASYNC_OPERATION_IN_PROGRESS);
+}
+
+void hideAsyncOperationInProgress() {
+    popPage();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -166,6 +166,14 @@ class SelectFromEnumPage : public InternalPage {
     void getItemLabel(int itemIndex, char *text, int count);
 };
 
+enum MenuType {
+    MENU_TYPE_BUTTON
+};
+
+static const size_t MAX_MENU_ITEMS = 4;
+
+void showMenu(AppContext *appContext, const char *message, MenuType menuType, const char **menuItems, void(*callback)(int));
+
 class MenuWithButtonsPage : public InternalPage {
 public:
     static MenuWithButtonsPage *create(AppContext *appContext, const char *message, const char **menuItems, void (*callback)(int));

@@ -27,28 +27,12 @@
 
 #include <eez/gui/gui.h>
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/gui/psu.h>
-
 namespace eez {
 namespace gui {
 
 Value g_alertMessage;
 Value g_alertMessage2;
 Value g_alertMessage3;
-Value g_progress;
-
-////////////////////////////////////////////////////////////////////////////////
-
-void showAsyncOperationInProgress(const char *message, void (*checkStatus)()) {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message), 0);
-    g_appContext->m_checkAsyncOperationStatus = checkStatus;
-    pushPage(PAGE_ID_ASYNC_OPERATION_IN_PROGRESS);
-}
-
-void hideAsyncOperationInProgress() {
-    popPage();
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -172,14 +156,6 @@ void dialogLater() {
 
     if (callback) {
         callback();
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void showMenu(AppContext *appContext, const char *message, MenuType menuType, const char **menuItems, void(*callback)(int)) {
-    if (menuType == MENU_TYPE_BUTTON) {
-        pushPage(INTERNAL_PAGE_ID_MENU_WITH_BUTTONS, MenuWithButtonsPage::create(appContext, message, menuItems, callback));
     }
 }
 

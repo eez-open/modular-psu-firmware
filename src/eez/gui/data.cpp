@@ -862,12 +862,6 @@ void data_alert_message_3(data::DataOperationEnum operation, data::Cursor &curso
     }
 }
 
-void data_progress(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = g_progress;
-    }
-}
-
 void data_async_operation_throbber(data::DataOperationEnum operation, data::Cursor &cursor,
                                    data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {

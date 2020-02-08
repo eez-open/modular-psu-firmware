@@ -21,13 +21,11 @@
 namespace eez {
 namespace gui {
 
+using namespace eez::gui;
+
 extern data::Value g_alertMessage;
 extern data::Value g_alertMessage2;
 extern data::Value g_alertMessage3;
-extern data::Value g_progress;
-
-void showAsyncOperationInProgress(const char *message, void (*checkStatus)() = 0);
-void hideAsyncOperationInProgress();
 
 void infoMessage(const char *message);
 void infoMessage(data::Value value);
@@ -49,14 +47,6 @@ void dialogNo();
 void dialogCancel();
 void dialogOk();
 void dialogLater();
-
-enum MenuType {
-    MENU_TYPE_BUTTON
-};
-
-static const size_t MAX_MENU_ITEMS = 4;
-
-void showMenu(AppContext *appContext, const char *message, MenuType menuType, const char **menuItems, void(*callback)(int));
 
 } // namespace gui
 } // namespace eez
