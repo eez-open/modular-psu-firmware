@@ -228,6 +228,8 @@ void UserProfilesPage::editRemark() {
 }
 
 void UserProfilesPage::onEditRemarkOk(char *newRemark) {
+    strcpy(g_remark, newRemark);
+
     popPage();
 
     eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Saving profile remark...");
@@ -238,7 +240,7 @@ void UserProfilesPage::onEditRemarkOk(char *newRemark) {
 
 void UserProfilesPage::doEditRemark() {
     int err;
-    profile::setName(g_selectedProfileLocation, g_remark, strlen(g_remark), true, &err);
+    profile::setName(g_selectedProfileLocation, g_remark, true, &err);
 
     osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
 }

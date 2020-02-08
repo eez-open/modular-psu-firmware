@@ -90,6 +90,7 @@ void matchZeroOrMoreSpaces(BufferedFileRead &file);
 bool match(BufferedFileRead &file, char c);
 bool match(BufferedFileRead &file, const char *str);
 bool matchUntil(BufferedFileRead &file, char c, char *result);
+void skipUntil(BufferedFileRead &file, const char *str);
 void skipUntilEOL(BufferedFileRead &file);
 bool matchQuotedString(BufferedFileRead &file, char *str, unsigned int strLength);
 bool match(BufferedFileRead &file, unsigned int &result);

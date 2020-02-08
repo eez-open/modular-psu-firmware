@@ -125,7 +125,7 @@ bool deleteAllLocations(int *err);
 
 bool isValid(int location);
 
-bool setName(int location, const char *name, size_t nameLength, bool showProgress, int *err);
+bool setName(int location, const char *name, bool showProgress, int *err);
 void getName(int location, char *name, int count);
 
 bool getFreezeState();

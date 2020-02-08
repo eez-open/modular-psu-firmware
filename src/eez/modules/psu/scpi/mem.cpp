@@ -81,18 +81,22 @@ scpi_result_t scpi_cmd_memoryStateName(scpi_t *context) {
     }
 
     const char *name;
-    size_t name_len;
-    if (!SCPI_ParamCharacters(context, &name, &name_len, true)) {
+    size_t nameLength;
+    if (!SCPI_ParamCharacters(context, &name, &nameLength, true)) {
         return SCPI_RES_ERR;
     }
 
-    if (name_len > PROFILE_NAME_MAX_LENGTH) {
+    if (nameLength > PROFILE_NAME_MAX_LENGTH) {
         SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
         return SCPI_RES_ERR;
     }
 
+    char profileName[PROFILE_NAME_MAX_LENGTH + 1];
+    strncpy(profileName, name, nameLength);
+    profileName[nameLength] = 0;
+
     int err;
-    if (!profile::setName(location, name, name_len, false, &err)) {
+    if (!profile::setName(location, profileName, false, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }

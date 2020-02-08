@@ -351,6 +351,29 @@ bool matchUntil(BufferedFileRead &file, char ch, char *result) {
     }
 }
 
+void skipUntil(BufferedFileRead &file, const char *str) {
+    while (true) {
+        int next = file.peek();
+        if (next == -1) {
+            return;
+        }
+        file.read();
+        if (next == *str) {
+            bool match = true;
+            for (const char *p = str + 1; *p; p++) {
+                if (file.peek() != *p) {
+                    match = false;
+                    break;
+                }
+                file.read();
+            }
+            if (match) {
+                return;
+            }
+        }
+    }
+}
+
 void skipUntilEOL(BufferedFileRead &file) {
     while (true) {
         int next = file.peek();
@@ -383,6 +406,11 @@ bool matchQuotedString(BufferedFileRead &file, char *str, unsigned int strLength
                 *str = 0;
                 return true;
             } else if (next == '\\') {
+                next = file.peek();
+                if (next == -1) {
+                    return false;
+                }
+                *str = next;
                 escape = true;
                 continue;
             }
