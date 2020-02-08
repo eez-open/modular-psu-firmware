@@ -88,17 +88,20 @@ enum UserValueType {
     VALUE_TYPE_DLOG_CURRENT_TIME,
     VALUE_TYPE_FILE_LENGTH,
     VALUE_TYPE_FILE_DATE_TIME,
-    VALUE_TYPE_FIRMWARE_VERSION
+    VALUE_TYPE_FIRMWARE_VERSION,
+    VALUE_TYPE_SLOT_INFO,
+    VALUE_TYPE_SLOT_INFO2,
+    VALUE_TYPE_MASTER_INFO,
+    VALUE_TYPE_PAGE_INFO,
+    VALUE_TYPE_DEBUG_TRACE_LOG_STR,
+    VALUE_TYPE_TEST_RESULT,
+    VALUE_TYPE_SCPI_ERROR,
 };
 
 Value MakeValue(float value, Unit unit);
-Value MakeValueListValue(const Value *values);
-Value MakeFloatListValue(float *pFloat);
-Value MakeEventValue(eez::psu::event_queue::Event *e);
 Value MakeLessThenMinMessageValue(float float_, const Value &value_);
 Value MakeGreaterThenMaxMessageValue(float float_, const Value &value_);
-Value MakeMacAddressValue(uint8_t *macAddress);
-Value MakeFirmwareVersionValue(uint8_t majorVersion, uint8_t minorVersion);
+Value MakeScpiErrorValue(int16_t errorCode);
 
 void editValue(uint16_t dataId);
 

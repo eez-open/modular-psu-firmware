@@ -28,9 +28,6 @@
 
 #include <eez/gui/gui.h>
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/persist_conf.h>
-
 #define CONF_GUI_BLINK_TIME 400 // 400ms
 
 namespace eez {
@@ -364,7 +361,7 @@ void animate(Buffer startBuffer, void(*callback)(float t, void *bufferOld, void 
     }
     g_animationState.enabled = true;
     g_animationState.startTime = millis();
-    g_animationState.duration = duration != -1 ? duration : psu::persist_conf::devConf.animationsDuration;
+    g_animationState.duration = duration != -1 ? duration : getDefaultAnimationDurationHook();
     g_animationState.startBuffer = startBuffer;
     g_animationState.callback = callback;
     g_animationState.easingRects = remapOutQuad;

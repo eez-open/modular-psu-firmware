@@ -282,5 +282,4 @@
 
 #define CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD 5 // 5 seconds
 
-#define INF_TEXT "\x91"
 

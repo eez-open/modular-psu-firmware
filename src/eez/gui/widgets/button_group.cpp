@@ -138,7 +138,7 @@ void ButtonGroupWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEve
         }
 
         if (selectedButton >= 0 && selectedButton < count) {
-            data::set(widgetCursor.cursor, widget->data, selectedButton, 0);
+            data::set(widgetCursor.cursor, widget->data, selectedButton);
             sound::playClick();
         }
     }

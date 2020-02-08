@@ -85,7 +85,7 @@ void errorMessageWithAction(const char *message, void (*action)(), const char *a
 
 void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(),
                  void (*no_callback)(), void (*cancel_callback)()) {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message), 0);
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message));
 
     g_appContext->m_dialogYesCallback = yes_callback;
     g_appContext->m_dialogNoCallback = no_callback;
@@ -96,7 +96,7 @@ void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(),
 
 void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(),
                 void (*later_callback)()) {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message), 0);
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message));
 
     g_appContext->m_dialogYesCallback = yes_callback;
     g_appContext->m_dialogNoCallback = no_callback;

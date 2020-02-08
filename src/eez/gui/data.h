@@ -23,6 +23,8 @@
 #include <eez/unit.h>
 #include <eez/gui/event.h>
 
+#define INFINITY_TEXT "\x91"
+
 namespace eez {
 
 enum BuiltInValueType {
@@ -35,18 +37,11 @@ enum BuiltInValueType {
     VALUE_TYPE_STR,
     VALUE_TYPE_PASSWORD,
     VALUE_TYPE_ENUM,
-    VALUE_TYPE_SCPI_ERROR,
     VALUE_TYPE_PERCENTAGE,
     VALUE_TYPE_SIZE,
     VALUE_TYPE_POINTER,
-    VALUE_TYPE_PAGE_INFO,
-    VALUE_TYPE_MASTER_INFO,
-    VALUE_TYPE_SLOT_INFO,
-    VALUE_TYPE_SLOT_INFO2,
-    VALUE_TYPE_TEST_RESULT,
     VALUE_TYPE_TIME_SECONDS,
     VALUE_TYPE_YT_DATA_GET_VALUE_FUNCTION_POINTER,
-    VALUE_TYPE_DEBUG_TRACE_LOG_STR,
     VALUE_TYPE_USER,
 };
 
@@ -274,8 +269,6 @@ struct Value {
 };
 
 Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition);
-Value MakeScpiErrorValue(int16_t errorCode);
-Value MakePageInfoValue(uint8_t pageIndex, uint8_t numPages);
 
 typedef bool (*CompareValueFunction)(const Value &a, const Value &b);
 typedef void (*ValueToTextFunction)(const Value &value, char *text, int count);
@@ -405,7 +398,7 @@ bool getEncoderStepValues(const Cursor &cursor, uint16_t id, StepValues &stepVal
 void getList(const Cursor &cursor, uint16_t id, const Value **labels, int &count);
 
 Value get(const Cursor &cursor, uint16_t id);
-bool set(const Cursor &cursor, uint16_t id, Value value, int16_t *error);
+Value set(const Cursor &cursor, uint16_t id, Value value);
 
 uint16_t getColor(const Cursor &cursor, uint16_t id, const Style *style);
 uint16_t getBackgroundColor(const Cursor &cursor, uint16_t id, const Style *style);

@@ -110,7 +110,7 @@ void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment) {
     }
 
     if (newValue != value) {
-        data::set(widgetCursor.cursor, widget->data, newValue, 0);
+        data::set(widgetCursor.cursor, widget->data, newValue);
     }
 }
 

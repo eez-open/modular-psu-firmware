@@ -18,26 +18,13 @@
 
 #if OPTION_DISPLAY
 
-#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 
-#include <eez/system.h>
 #include <eez/util.h>
-#include <eez/index.h>
-#include <eez/memory.h>
-
-#include <scpi/scpi.h>
 
 #include <eez/gui/gui.h>
-
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/persist_conf.h>
-
-#if defined(EEZ_PLATFORM_STM32)
-extern bool g_isResetByIWDG;
-#endif
 
 namespace eez {
 namespace gui {
@@ -93,10 +80,12 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
 
     float floatValue = value.getFloat();
 
+#if defined(INFINITY_TEXT)
     if (isinf(floatValue)) {
-        strcat(text, INF_TEXT);
+        strcat(text, INFINITY_TEXT);
         return;
     }
+#endif
 
     Unit unit = value.getUnit();
 
@@ -181,15 +170,6 @@ void ENUM_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
-bool compare_SCPI_ERROR_value(const Value &a, const Value &b) {
-    return a.getInt16() == b.getInt16();
-}
-
-void SCPI_ERROR_value_to_text(const Value &value, char *text, int count) {
-    strncpy(text, SCPI_ErrorTranslate(value.getInt16()), count - 1);
-    text[count - 1] = 0;
-}
-
 bool compare_PERCENTAGE_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -216,80 +196,6 @@ void POINTER_value_to_text(const Value &value, char *text, int count) {
     text[0] = 0;
 }
 
-bool compare_PAGE_INFO_value(const Value &a, const Value &b) {
-    return getPageIndexFromValue(a) == getPageIndexFromValue(b) &&
-           getNumPagesFromValue(a) == getNumPagesFromValue(b);
-}
-
-void PAGE_INFO_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "Page #%d of %d", getPageIndexFromValue(value) + 1,
-             getNumPagesFromValue(value));
-    text[count - 1] = 0;
-}
-
-bool compare_MASTER_INFO_value(const Value &a, const Value &b) {
-    return true;
-}
-
-void MASTER_INFO_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%s %s", MCU_NAME, MCU_REVISION);
-    text[count - 1] = 0;
-}
-
-bool compare_SLOT_INFO_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
-}
-
-void SLOT_INFO_value_to_text(const Value &value, char *text, int count) {
-    int slotIndex = value.getInt();
-    auto &slot = g_slots[slotIndex];
-    psu::Channel &channel = psu::Channel::get(slot.channelIndex);
-    if (channel.isInstalled()) {
-        snprintf(text, count - 1, "%s R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
-    } else {
-        strncpy(text, "Not installed", count - 1);
-    }
-    text[count - 1] = 0;
-}
-
-bool compare_SLOT_INFO2_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
-}
-
-void SLOT_INFO2_value_to_text(const Value &value, char *text, int count) {
-    int slotIndex = value.getInt();
-    auto &slot = g_slots[slotIndex];
-    psu::Channel &channel = psu::Channel::get(slot.channelIndex);
-    if (channel.isInstalled()) {
-        snprintf(text, count - 1, "%s_R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
-    } else {
-        strncpy(text, "None", count - 1);
-    }
-    text[count - 1] = 0;
-}
-
-bool compare_TEST_RESULT_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
-}
-
-void TEST_RESULT_value_to_text(const Value &value, char *text, int count) {
-    TestResult testResult = (TestResult)value.getInt();
-    if (testResult == TEST_FAILED) {
-        strncpy(text, "Failed", count - 1);
-    } else if (testResult == TEST_OK) {
-        strncpy(text, "OK", count - 1);
-    } else if (testResult == TEST_CONNECTING) {
-        strncpy(text, "Connecting", count - 1);
-    } else if (testResult == TEST_SKIPPED) {
-        strncpy(text, "Skipped", count - 1);
-    } else if (testResult == TEST_WARNING) {
-        strncpy(text, "Warning", count - 1);
-    } else {
-        strncpy(text, "", count - 1);
-    }
-    text[count - 1] = 0;
-}
-
 bool compare_TIME_SECONDS_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
@@ -312,26 +218,6 @@ void YT_DATA_GET_VALUE_FUNCTION_POINTER_value_to_text(const Value &value, char *
     text[0] = 0;
 }
 
-bool compare_DEBUG_TRACE_LOG_STR_value(const Value &a, const Value &b) {
-    return strcmp(a.getString(), b.getString()) == 0;
-}
-
-void DEBUG_TRACE_LOG_STR_value_to_text(const Value &value, char *text, int count) {
-    const char *p = value.getString();
-
-    while (--count) {
-        *text++ = *p;
-        if (*p == 0) {
-            break;
-        }
-        if (++p == (const char *)DEBUG_TRACE_LOG + DEBUG_TRACE_LOG_SIZE) {
-            p = (const char *)DEBUG_TRACE_LOG;
-        }
-    }
-
-    *text = 0;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 static CompareValueFunction g_compareBuiltInValueFunctions[] = {
@@ -344,17 +230,10 @@ static CompareValueFunction g_compareBuiltInValueFunctions[] = {
     compare_STR_value,
     compare_PASSWORD_value,
     compare_ENUM_value,
-    compare_SCPI_ERROR_value,
     compare_PERCENTAGE_value,
     compare_SIZE_value, compare_POINTER_value,
-    compare_PAGE_INFO_value,
-    compare_MASTER_INFO_value,
-    compare_SLOT_INFO_value,
-    compare_SLOT_INFO2_value,
-    compare_TEST_RESULT_value,
     compare_TIME_SECONDS_value,
     compare_YT_DATA_GET_VALUE_FUNCTION_POINTER_value,
-    compare_DEBUG_TRACE_LOG_STR_value
 };
 
 static ValueToTextFunction g_builtInValueToTextFunctions[] = {
@@ -367,18 +246,11 @@ static ValueToTextFunction g_builtInValueToTextFunctions[] = {
     STR_value_to_text,
     PASSWORD_value_to_text,
     ENUM_value_to_text,
-    SCPI_ERROR_value_to_text,
     PERCENTAGE_value_to_text,
     SIZE_value_to_text,
     POINTER_value_to_text,
-    PAGE_INFO_value_to_text,
-    MASTER_INFO_value_to_text,
-    SLOT_INFO_value_to_text,
-    SLOT_INFO2_value_to_text,
-    TEST_RESULT_value_to_text,
     TIME_SECONDS_value_to_text,
     YT_DATA_GET_VALUE_FUNCTION_POINTER_value_to_text,
-    DEBUG_TRACE_LOG_STR_value_to_text
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -398,21 +270,6 @@ Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition) {
     value.type_ = VALUE_TYPE_ENUM;
     value.enum_.enumValue = enumValue;
     value.enum_.enumDefinition = enumDefinition;
-    return value;
-}
-
-Value MakeScpiErrorValue(int16_t errorCode) {
-    Value value;
-    value.int16_ = errorCode;
-    value.type_ = VALUE_TYPE_SCPI_ERROR;
-    return value;
-}
-
-Value MakePageInfoValue(uint8_t pageIndex, uint8_t numPages) {
-    Value value;
-    value.pairOfUint8_.first = pageIndex;
-    value.pairOfUint8_.second = numPages;
-    value.type_ = VALUE_TYPE_PAGE_INFO;
     return value;
 }
 
@@ -601,14 +458,9 @@ Value get(const Cursor &cursor, uint16_t id) {
     return value;
 }
 
-bool set(const Cursor &cursor, uint16_t id, Value value, int16_t *error) {
+Value set(const Cursor &cursor, uint16_t id, Value value) {
     g_dataOperationsFunctions[id](data::DATA_OPERATION_SET, (Cursor &)cursor, value);
-    if (value.getType() == VALUE_TYPE_SCPI_ERROR) {
-        if (error)
-            *error = value.getScpiError();
-        return false;
-    }
-    return true;
+    return value;
 }
 
 uint16_t getColor(const Cursor &cursor, uint16_t id, const Style *style) {
@@ -859,92 +711,6 @@ void data_alert_message_3(data::DataOperationEnum operation, data::Cursor &curso
         value = g_alertMessage3;
     } else if (operation == data::DATA_OPERATION_SET) {
         g_alertMessage3 = value;
-    }
-}
-
-void data_async_operation_throbber(data::DataOperationEnum operation, data::Cursor &cursor,
-                                   data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        static const char *g_throbber[8] = { "|", "/", "-", "\\", "|", "/", "-", "\\" };
-        value = data::Value(g_throbber[(millis() % 1000) / 125]);
-    }
-}
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-
-void data_slots(DataOperationEnum operation, Cursor &cursor, Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
-        value = CH_MAX;
-    }
-}
-
-#endif
-
-void data_selected_theme(DataOperationEnum operation, Cursor &cursor, Value &value) {
-	if (operation == data::DATA_OPERATION_GET) {
-		value = getThemeName(psu::persist_conf::devConf.selectedThemeIndex);
-	}
-}
-
-void data_animations_duration(DataOperationEnum operation, Cursor &cursor, Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(psu::persist_conf::devConf.animationsDuration, UNIT_SECOND);
-    }
-}
-
-void data_master_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = Value(0, VALUE_TYPE_MASTER_INFO);
-    }
-}
-
-void data_master_test_result(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = Value((int)g_masterTestResult, VALUE_TYPE_TEST_RESULT);
-    }
-}
-
-void data_slot1_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = Value(0, VALUE_TYPE_SLOT_INFO);
-    }
-}
-
-void data_slot1_test_result (data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = Value((int)psu::Channel::get(0).getTestResult(), VALUE_TYPE_TEST_RESULT);
-    }
-}
-
-void data_slot2_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = Value(1, VALUE_TYPE_SLOT_INFO);
-    }
-}
-
-void data_slot2_test_result(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = Value((int)psu::Channel::get(1).getTestResult(), VALUE_TYPE_TEST_RESULT);
-    }
-}
-
-void data_slot3_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = Value(2, VALUE_TYPE_SLOT_INFO);
-    }
-}
-
-void data_slot3_test_result(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = Value((int)psu::Channel::get(2).getTestResult(), VALUE_TYPE_TEST_RESULT);
-    }
-}
-
-void data_is_reset_by_iwdg(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        #if defined(EEZ_PLATFORM_STM32)
-            value = g_isResetByIWDG ? 1 : 0;
-        #endif
     }
 }
 

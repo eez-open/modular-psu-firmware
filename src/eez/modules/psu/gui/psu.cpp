@@ -771,7 +771,7 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
 }
 
 void PsuAppContext::doShowProgressPage() {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage), 0);
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage));
     g_appContext->m_dialogCancelCallback = m_progressAbortCallback;
     pushPage(m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
     m_pushProgressPage = false;
@@ -1359,7 +1359,7 @@ void showShutdownPage() {
 }
 
 void showAsyncOperationInProgress(const char *message, void (*checkStatus)()) {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message), 0);
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message));
     g_appContext->m_checkAsyncOperationStatus = checkStatus;
     pushPage(PAGE_ID_ASYNC_OPERATION_IN_PROGRESS);
 }
@@ -1488,9 +1488,9 @@ void onEncoder(int counter, bool clicked) {
                 g_focusEditValue = MakeValue(newValue, value.getUnit());
                 g_focusEditValueChangedTime = micros();
             } else {
-                int16_t error;
-                if (!data::set(g_focusCursor, g_focusDataId, MakeValue(newValue, value.getUnit()), &error)) {
-                    psuErrorMessage(g_focusCursor, data::MakeScpiErrorValue(error));
+                Value result = data::set(g_focusCursor, g_focusDataId, MakeValue(newValue, value.getUnit()));
+                if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
+                    psuErrorMessage(g_focusCursor, result);
                 }
             }
         }
@@ -1520,9 +1520,9 @@ void onEncoder(int counter, bool clicked) {
         if (isEncoderEnabledInActivePage()) {
             if (isFocusChanged()) {
                 // confirmation
-                int16_t error;
-                if (!data::set(g_focusCursor, g_focusDataId, g_focusEditValue, &error)) {
-                    psuErrorMessage(g_focusCursor, data::MakeScpiErrorValue(error));
+                Value result = data::set(g_focusCursor, g_focusDataId, g_focusEditValue);
+                if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
+                    psuErrorMessage(g_focusCursor, result);
                 } else {
                     g_focusEditValue = data::Value();
                 }
@@ -1593,7 +1593,7 @@ void channelInitiateTrigger() {
     popPage();
     int err = trigger::initiate();
     if (err != SCPI_RES_OK) {
-        psuErrorMessage(g_toggleOutputWidgetCursor.cursor, data::MakeScpiErrorValue(err));
+        psuErrorMessage(g_toggleOutputWidgetCursor.cursor, MakeScpiErrorValue(err));
     }
 }
 
@@ -1706,6 +1706,10 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED) {
         g_UserProfilesPage.onAsyncOperationFinished(param);
     }
+}
+
+float getDefaultAnimationDurationHook() {
+    return psu::persist_conf::devConf.animationsDuration;
 }
 
 }

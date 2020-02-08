@@ -257,8 +257,7 @@ void nextStep() {
     if (g_stepNum == MAX_STEP_NUM - 1) {
         int16_t scpiErr;
         if (!calibration::canSave(scpiErr)) {
-            psuErrorMessage(data::Cursor(calibration::getCalibrationChannel().channelIndex),
-                            data::MakeScpiErrorValue(scpiErr));
+            psuErrorMessage(data::Cursor(calibration::getCalibrationChannel().channelIndex), MakeScpiErrorValue(scpiErr));
             return;
         }
     }

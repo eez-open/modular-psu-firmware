@@ -113,9 +113,9 @@ void exit() {
 }
 
 void nonInteractiveSet() {
-    int16_t error;
-    if (!data::set(g_focusCursor, g_focusDataId, g_editValue, &error)) {
-        psuErrorMessage(g_focusCursor, data::MakeScpiErrorValue(error));
+    Value result = data::set(g_focusCursor, g_focusDataId, g_editValue);
+    if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
+        psuErrorMessage(g_focusCursor, result);
     } else {
         popPage();
     }
@@ -123,7 +123,7 @@ void nonInteractiveSet() {
 
 void nonInteractiveDiscard() {
     g_editValue = g_undoValue;
-    data::set(g_focusCursor, g_focusDataId, g_undoValue, 0);
+    data::set(g_focusCursor, g_focusDataId, g_undoValue);
 }
 
 bool isInteractiveMode() {
@@ -163,9 +163,9 @@ bool setValue(float floatValue) {
 
     data::Value value = MakeValue(floatValue, getUnit());
     if (g_isInteractiveMode || g_tabIndex == PAGE_ID_EDIT_MODE_KEYPAD) {
-        int16_t error;
-        if (!data::set(g_focusCursor, g_focusDataId, value, &error)) {
-            psuErrorMessage(g_focusCursor, data::MakeScpiErrorValue(error));
+        Value result = data::set(g_focusCursor, g_focusDataId, value);
+        if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
+            psuErrorMessage(g_focusCursor, value);
             return false;
         }
     }

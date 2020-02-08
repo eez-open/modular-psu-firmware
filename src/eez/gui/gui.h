@@ -147,6 +147,8 @@ void animateOpen(const Rect &srcRect, const Rect &dstRect);
 void animateClose(const Rect &srcRect, const Rect &dstRect);
 void animateRects(Buffer startBuffer, int numRects, float duration = -1);
 
+float getDefaultAnimationDurationHook();
+
 ////////////////////////////////////////////////////////////////////////////////
 
 int getCurrentStateBufferIndex();

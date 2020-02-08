@@ -239,7 +239,7 @@ void ListGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
             }
 
             if (iCursor >= 0) {
-                data::set(widgetCursor.cursor, listGraphWidget->cursorData, data::Value(iCursor), 0);
+                data::set(widgetCursor.cursor, listGraphWidget->cursorData, data::Value(iCursor));
                 if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                     sound::playClick();
                 }

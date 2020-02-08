@@ -41,6 +41,7 @@
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/dlog_view.h>
