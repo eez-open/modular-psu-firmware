@@ -324,6 +324,13 @@ void shutdown() {
 
     g_shutdownInProgress = true;
 
+    // shutdown SCPI thread
+    using namespace eez::scpi;
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SHUTDOWN, 0), osWaitForever);
+    do {
+        osDelay(10);
+    } while (isThreadAlive());
+
     profile::shutdownSave();
 
     if (psu::isPowerUp()) {
@@ -331,13 +338,6 @@ void shutdown() {
     }
 
     osDelay(50);
-
-    // shutdown SCPI thread
-    using namespace eez::scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SHUTDOWN, 0), osWaitForever);
-    do {
-        osDelay(10);
-    } while (isThreadAlive());
 
     // save on-time counters
     persist_conf::writeTotalOnTime(ontime::g_mcuCounter.getType(), ontime::g_mcuCounter.getTotalTime());

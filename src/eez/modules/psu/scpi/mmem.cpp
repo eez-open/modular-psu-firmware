@@ -383,8 +383,18 @@ scpi_result_t scpi_cmd_mmemoryCopy(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    int err;
-    if (!sd_card::copyFile(sourcePath, destinationPath, &err)) {
+#if OPTION_DISPLAY
+    eez::psu::gui::g_psuAppContext.showProgressPage("Copying...");
+#endif
+
+    int err = 0;
+    bool result = sd_card::copyFile(sourcePath, destinationPath, true, &err);
+
+#if OPTION_DISPLAY
+    eez::psu::gui::g_psuAppContext.hideProgressPage();
+#endif
+
+    if (!result) {
         if (err != 0) {
             SCPI_ErrorPush(context, err);
         }

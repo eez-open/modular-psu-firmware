@@ -87,14 +87,11 @@ struct ProfileFlags {
 
 /// Profile parameters.
 struct Parameters {
-    persist_conf::BlockHeader header;
     ProfileFlags flags;
     char name[PROFILE_NAME_MAX_LENGTH + 1];
     ChannelParameters channels[CH_MAX];
-    temperature::ProtectionConfiguration temp_prot[temp_sensor::MAX_NUM_TEMP_SENSORS];
+    temperature::ProtectionConfiguration tempProt[temp_sensor::MAX_NUM_TEMP_SENSORS];
 };
-
-static const uint16_t PROFILE_VERSION = 11;
 
 void init();
 void tick();
@@ -112,7 +109,6 @@ bool recallFromLocation(int location);
 bool recallFromLocation(int location, int recallOptions, bool showProgress, int *err);
 bool recallFromFile(const char *filePath, int recallOptions, bool showProgress, int *err);
 
-void getSaveName(int location, char *name);
 bool saveToLocation(int location);
 bool saveToLocation(int location, const char *name, bool showProgress, int *err);
 bool saveToFile(const char *filePath, bool showProgress, int *err);
@@ -124,6 +120,8 @@ bool deleteLocation(int location, bool showProgress, int *err);
 bool deleteAllLocations(int *err);
 
 bool isValid(int location);
+
+void getSaveName(int location, char *name);
 
 bool setName(int location, const char *name, bool showProgress, int *err);
 void getName(int location, char *name, int count);

@@ -733,7 +733,7 @@ bool moveFile(const char *sourcePath, const char *destinationPath, int *err) {
     return true;
 }
 
-bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
+bool copyFile(const char *sourcePath, const char *destinationPath, bool showProgress, int *err) {
     if (!sd_card::isMounted(err)) {
         return false;
     }
@@ -753,10 +753,6 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
         return false;
     }
 
-#if OPTION_DISPLAY
-    eez::psu::gui::g_psuAppContext.showProgressPage("Copying...");
-#endif
-
     const int CHUNK_SIZE = 512;
     uint8_t buffer[CHUNK_SIZE];
     size_t totalSize = sourceFile.size();
@@ -767,9 +763,6 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
 
         size_t written = destinationFile.write((const uint8_t *)buffer, size);
         if (size < 0 || written != (size_t)size) {
-#if OPTION_DISPLAY
-            eez::psu::gui::g_psuAppContext.hideProgressPage();
-#endif
             sourceFile.close();
             destinationFile.close();
             deleteFile(destinationPath, NULL);
@@ -781,16 +774,18 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
         totalWritten += written;
 
 #if OPTION_DISPLAY
-        if (!eez::psu::gui::g_psuAppContext.updateProgressPage(totalWritten, totalSize)) {
-            sourceFile.close();
-            destinationFile.close();
+        if (showProgress) {
+            if (!eez::psu::gui::g_psuAppContext.updateProgressPage(totalWritten, totalSize)) {
+                sourceFile.close();
+                destinationFile.close();
 
-            deleteFile(destinationPath, NULL);
-            if (err)
-                *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+                deleteFile(destinationPath, NULL);
+                if (err)
+                    *err = SCPI_ERROR_MASS_STORAGE_ERROR;
 
-            eez::psu::gui::g_psuAppContext.hideProgressPage();
-            return false;
+                eez::psu::gui::g_psuAppContext.hideProgressPage();
+                return false;
+            }
         }
 #endif
 
@@ -801,10 +796,6 @@ bool copyFile(const char *sourcePath, const char *destinationPath, int *err) {
 
     sourceFile.close();
     destinationFile.close();
-
-#if OPTION_DISPLAY
-    eez::psu::gui::g_psuAppContext.hideProgressPage();
-#endif
 
     if (totalWritten != totalSize) {
         deleteFile(destinationPath, NULL);

@@ -99,16 +99,13 @@ bool match(BufferedFileRead &file, float &result);
 bool makeParentDir(const char *filePath, int *err);
 
 bool exists(const char *dirPath, int *err);
-bool catalog(const char *dirPath, void *param,
-             void (*callback)(void *param, const char *name, FileType type, size_t size),
-			 int *numFiles, int *err);
+bool catalog(const char *dirPath, void *param, void (*callback)(void *param, const char *name, FileType type, size_t size), int *numFiles, int *err);
 bool catalogLength(const char *dirPath, size_t *length, int *err);
-bool upload(const char *filePath, void *param,
-            void (*callback)(void *param, const void *buffer, int size), int *err);
+bool upload(const char *filePath, void *param, void (*callback)(void *param, const void *buffer, int size), int *err);
 bool download(const char *filePath, bool truncate, const void *buffer, size_t size, int *err);
 void downloadFinished();
 bool moveFile(const char *sourcePath, const char *destinationPath, int *err);
-bool copyFile(const char *sourcePath, const char *destinationPath, int *err);
+bool copyFile(const char *sourcePath, const char *destinationPath, bool showProgress, int *err);
 bool deleteFile(const char *filePath, int *err);
 bool makeDir(const char *dirPath, int *err);
 bool removeDir(const char *dirPath, int *err);
