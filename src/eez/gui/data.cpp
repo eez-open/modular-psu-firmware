@@ -80,9 +80,9 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
 
     float floatValue = value.getFloat();
 
-#if defined(INFINITY_TEXT)
+#if defined(INFINITY_SYMBOL)
     if (isinf(floatValue)) {
-        strcat(text, INFINITY_TEXT);
+        strcat(text, INFINITY_SYMBOL);
         return;
     }
 #endif

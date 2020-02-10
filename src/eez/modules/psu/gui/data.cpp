@@ -1065,7 +1065,7 @@ void editValue(uint16_t dataId) {
         if (max.getType() != VALUE_TYPE_NONE) {
             if (isinf(max.getFloat())) {
                 options.flags.option1ButtonEnabled = true;
-                options.option1ButtonText = INFINITY_TEXT;
+                options.option1ButtonText = INFINITY_SYMBOL;
                 options.option1 = onSetInfinityValue;
             } else {
                 options.max = max.getFloat();
@@ -3900,7 +3900,7 @@ void data_channel_list_count(data::DataOperationEnum operation, data::Cursor &cu
         if (count > 0) {
             value = data::Value(count);
         } else {
-            value = INFINITY_TEXT;
+            value = INFINITY_SYMBOL;
         }
     }
 }

@@ -142,7 +142,7 @@ void ChSettingsTriggerPage::editListCount() {
     options.def = 0;
 
     options.flags.option1ButtonEnabled = true;
-    options.option1ButtonText = INFINITY_TEXT;
+    options.option1ButtonText = INFINITY_SYMBOL;
     options.option1 = onListCountSetToInfinity;
 
     NumericKeypad::start(0, data::Value((uint16_t)list::getListCount(*g_channel)), options, onListCountSet, 0, 0);

@@ -33,7 +33,7 @@ const char *g_unitNames[] = {
     "mW",
     "s",
     "ms",
-    "oC",
+    DEGREE_SYMBOL"C",
     "rpm",
     "ohm",
     "Kohm",

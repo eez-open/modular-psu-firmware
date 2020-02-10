@@ -23,8 +23,6 @@
 #include <eez/unit.h>
 #include <eez/gui/event.h>
 
-#define INFINITY_TEXT "\x91"
-
 namespace eez {
 
 enum BuiltInValueType {

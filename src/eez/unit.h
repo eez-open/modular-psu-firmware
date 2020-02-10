@@ -18,6 +18,9 @@
 
 #pragma once
 
+#define INFINITY_SYMBOL "\x91"
+#define DEGREE_SYMBOL "\x8a"
+
 namespace eez {
 
 enum Unit {
