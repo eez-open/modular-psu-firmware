@@ -62,8 +62,7 @@ static scpi_result_t calibration_level(scpi_t *context, calibration::Value &cali
         return SCPI_RES_ERR;
     }
 
-    if ((level == calibration::LEVEL_MID || level == calibration::LEVEL_MAX) &&
-        !calibrationValue.min_set) {
+    if ((level == calibration::LEVEL_MID || level == calibration::LEVEL_MAX) && !calibrationValue.min_set) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
     }

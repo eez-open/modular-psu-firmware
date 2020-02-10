@@ -221,10 +221,11 @@ void set() {
         options.flags.signButtonEnabled = true;
         options.flags.dotButtonEnabled = true;
 
-        NumericKeypad *numericKeypad =
-            NumericKeypad::start(0, data::Value(), options, onSetOk, 0, showCurrentStep);
+        NumericKeypad *numericKeypad = NumericKeypad::start(0, data::Value(), options, onSetOk, 0, showCurrentStep);
 
-        if (getLevelValue().getFloat() < 1) {
+        if (getLevelValue().getFloat() < 0.001) {
+            numericKeypad->switchToMicro();
+        } else if (getLevelValue().getFloat() < 1) {
             numericKeypad->switchToMilli();
         }
     } else if (g_stepNum == MAX_STEP_NUM - 1) {
@@ -256,8 +257,9 @@ void nextStep() {
 
     if (g_stepNum == MAX_STEP_NUM - 1) {
         int16_t scpiErr;
-        if (!calibration::canSave(scpiErr)) {
-            psuErrorMessage(data::Cursor(calibration::getCalibrationChannel().channelIndex), MakeScpiErrorValue(scpiErr));
+        int16_t uiErr;
+        if (!calibration::canSave(scpiErr, &uiErr)) {
+            psuErrorMessage(data::Cursor(calibration::getCalibrationChannel().channelIndex), MakeScpiErrorValue(uiErr));
             return;
         }
     }
@@ -299,6 +301,13 @@ void stop(void (*callback)()) {
 void toggleEnable() {
     Channel &channel = g_channel ? *g_channel : Channel::get(getFoundWidgetAtDown().cursor.i);
     channel.calibrationEnable(!channel.isCalibrationEnabled());
+}
+
+const char *getStepNote() {
+    if (g_stepNum >= 3 && g_stepNum <= 8) {
+        return "Please use power resistor (lower then 5 Ohms) connected in series with external ammeter";
+    }
+    return nullptr;
 }
 
 } // namespace calibration_wizard

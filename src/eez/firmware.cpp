@@ -324,12 +324,14 @@ void shutdown() {
 
     g_shutdownInProgress = true;
 
+#if !defined(__EMSCRIPTEN__)
     // shutdown SCPI thread
     using namespace eez::scpi;
     osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SHUTDOWN, 0), osWaitForever);
     do {
         osDelay(10);
     } while (isThreadAlive());
+#endif
 
     profile::shutdownSave();
 

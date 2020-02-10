@@ -1282,7 +1282,9 @@ void action_show_sys_settings_mqtt() {
 }
 
 void action_mqtt_toggle() {
+#if OPTION_ETHERNET
     ((SysSettingsMqttPage *)getActivePage())->toggle();
+#endif
 }
 
 void action_mqtt_edit_host() {

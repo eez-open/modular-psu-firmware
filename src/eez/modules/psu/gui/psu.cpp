@@ -1579,8 +1579,7 @@ void channelToggleOutput() {
                 } else if (trigger::isInitiated()) {
                     trigger::abort();
                 } else {
-                    yesNoDialog(PAGE_ID_YES_NO, "Trigger is active. Re-initiate trigger?",
-                                channelReinitiateTrigger, 0, 0);
+                    yesNoDialog(PAGE_ID_YES_NO_L, "Trigger is active. Re-initiate trigger?", channelReinitiateTrigger, 0, 0);
                 }
             } else {
                 channel_dispatcher::outputEnable(channel, true);

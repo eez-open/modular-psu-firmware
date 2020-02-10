@@ -88,6 +88,12 @@ extern "C" {
     X(SCPI_ERROR_POWER_LIMIT_EXCEEDED,                       150, "Power limit exceeded")                         \
 	X(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED,                     151, "Voltage limit exceeded")                       \
 	X(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED,                     152, "Current limit exceeded")                       \
+    X(SCPI_ERROR_CALIBRATION_REMARK_NOT_SET,                 153, "Remark not set")                               \
+    X(SCPI_ERROR_CALIBRATION_INVALID_VOLTAGE_CAL_DATA,       154, "Invalid voltage calibration data")             \
+    X(SCPI_ERROR_CALIBRATION_INVALID_CURRENT_CAL_DATA,       155, "Invalid current calibration data")             \
+    X(SCPI_ERROR_CALIBRATION_INVALID_CURRENT_H_CAL_DATA,     156, "Invalid current (high range) calibration data")\
+    X(SCPI_ERROR_CALIBRATION_INVALID_CURRENT_L_CAL_DATA,     157, "Invalid current (low range) calibration data") \
+    X(SCPI_ERROR_CALIBRATION_NO_CAL_DATA,                    158, "Incomplete calibration data")                  \
     X(SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION,  201, "Cannot execute before clearing protection")    \
     X(SCPI_ERROR_CH1_IOEXP_TEST_FAILED,                      210, "CH1 IOEXP test failed")                        \
     X(SCPI_ERROR_CH2_IOEXP_TEST_FAILED,                      211, "CH2 IOEXP test failed")                        \

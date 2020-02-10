@@ -36,6 +36,8 @@ void toggleEnable();
 static const int MAX_STEP_NUM = 10;
 extern int g_stepNum;
 
+const char *getStepNote();
+
 } // namespace calibration_wizard
 } // namespace gui
 } // namespace psu

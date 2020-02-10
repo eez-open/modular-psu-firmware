@@ -61,7 +61,7 @@ int ChSettingsProtectionSetPage::getDirty() {
 }
 
 void ChSettingsProtectionSetPage::onSetFinish(bool showInfo) {
-    g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS]();
+    popPage();
     if (showInfo) {
         infoMessage("Protection params changed!");
     }

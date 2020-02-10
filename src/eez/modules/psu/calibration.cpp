@@ -39,6 +39,9 @@ static char g_remark[CALIBRATION_REMARK_MAX_LENGTH + 1];
 
 static int8_t g_currentRangeSelected = 0;
 
+static int8_t g_currentRangeSaved;
+static CurrentRangeSelectionMode g_currentRangeSelectionModeSaved;
+
 static Value g_voltage(true);
 static Value g_currents[] = { Value(false, 0), Value(false, 1) };
 
@@ -215,8 +218,11 @@ void start(Channel *channel_) {
 
     g_enabled = true;
     g_channel = channel_;
-    g_currentRangeSelected = 0;
-    g_channel->setCurrentRange(g_currentRangeSelected);
+
+    g_currentRangeSaved = g_channel->flags.currentCurrentRange;
+    g_currentRangeSelectionModeSaved = g_channel->getCurrentRangeSelectionMode();
+    selectCurrentRange(0);
+
     g_remarkSet = false;
     g_remark[0] = 0;
 
@@ -241,6 +247,10 @@ void stop() {
     if (g_channel->isCalibrationExists()) {
         g_channel->calibrationEnable(true);
     }
+
+    g_channel->setCurrentRange(g_currentRangeSaved);
+    g_channel->setCurrentRangeSelectionMode(g_currentRangeSelectionModeSaved);
+
     resetChannelToZero();
 
     g_channel->setOperBits(OPER_ISUM_CALI, false);
@@ -253,6 +263,7 @@ bool hasSupportForCurrentDualRange() {
 void selectCurrentRange(int8_t range) {
     g_currentRangeSelected = range;
     g_channel->setCurrentRange(range);
+    g_channel->setCurrentRangeSelectionMode(range == CURRENT_RANGE_LOW ? CURRENT_RANGE_SELECTION_ALWAYS_LOW : CURRENT_RANGE_SELECTION_ALWAYS_HIGH);
 }
 
 Value &getVoltage() {
@@ -299,14 +310,12 @@ bool isCurrentCalibrated(Value &current) {
     return current.min_set && current.mid_set && current.max_set;
 }
 
-bool canSave(int16_t &scpiErr) {
+bool canSave(int16_t &scpiErr, int16_t *uiErr) {
     if (!isEnabled()) {
         scpiErr = SCPI_ERROR_CALIBRATION_STATE_IS_OFF;
-        return false;
-    }
-
-    if (!isRemarkSet()) {
-        scpiErr = SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS;
+        if (uiErr) {
+            *uiErr = scpiErr;
+        }
         return false;
     }
 
@@ -315,6 +324,9 @@ bool canSave(int16_t &scpiErr) {
 
     if (isVoltageCalibrated()) {
         if (!checkCalibrationValue(calibration::g_voltage, scpiErr)) {
+            if (uiErr) {
+                *uiErr = SCPI_ERROR_CALIBRATION_INVALID_VOLTAGE_CAL_DATA;
+            }
             return false;
         }
         valueCalibrated = true;
@@ -322,6 +334,9 @@ bool canSave(int16_t &scpiErr) {
 
     if (isCurrentCalibrated(g_currents[0])) {
         if (!checkCalibrationValue(g_currents[0], scpiErr)) {
+            if (uiErr) {
+                *uiErr = hasSupportForCurrentDualRange() ? SCPI_ERROR_CALIBRATION_INVALID_CURRENT_H_CAL_DATA : SCPI_ERROR_CALIBRATION_INVALID_CURRENT_CAL_DATA;
+            }
             return false;
         }
         valueCalibrated = true;
@@ -330,6 +345,9 @@ bool canSave(int16_t &scpiErr) {
     if (hasSupportForCurrentDualRange()) {
         if (isCurrentCalibrated(g_currents[1])) {
             if (!checkCalibrationValue(g_currents[1], scpiErr)) {
+                if (uiErr) {
+                    *uiErr = SCPI_ERROR_CALIBRATION_INVALID_CURRENT_L_CAL_DATA;
+                }
                 return false;
             }
             valueCalibrated = true;
@@ -338,6 +356,17 @@ bool canSave(int16_t &scpiErr) {
 
     if (!valueCalibrated) {
         scpiErr = SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS;
+        if (uiErr) {
+            *uiErr = SCPI_ERROR_CALIBRATION_NO_CAL_DATA;
+        }
+        return false;
+    }
+
+    if (!isRemarkSet()) {
+        scpiErr = SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS;
+        if (uiErr) {
+            *uiErr = SCPI_ERROR_CALIBRATION_REMARK_NOT_SET;
+        }
         return false;
     }
 

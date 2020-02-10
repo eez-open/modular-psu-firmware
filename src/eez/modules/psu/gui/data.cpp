@@ -1112,11 +1112,11 @@ void data_edit_enabled(data::DataOperationEnum operation, data::Cursor &cursor, 
 
         if ((channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) || isPageOnStack(PAGE_ID_CH_SETTINGS_LISTS)) {
             value = 0;
-        }
-        if (psu::calibration::isEnabled()) {
+        } else if (psu::calibration::isEnabled()) {
             value = 0;
+        } else {
+            value = 1;
         }
-        value = 1;
     }
 }
 
@@ -2282,6 +2282,18 @@ void data_channel_calibration_step_prev_enabled(data::DataOperationEnum operatio
 void data_channel_calibration_step_next_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = calibration_wizard::g_stepNum < calibration_wizard::MAX_STEP_NUM;
+    }
+}
+
+void data_channel_calibration_has_step_note(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = calibration_wizard::getStepNote() != nullptr;
+    }
+}
+
+void data_channel_calibration_step_note(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = calibration_wizard::getStepNote();
     }
 }
 

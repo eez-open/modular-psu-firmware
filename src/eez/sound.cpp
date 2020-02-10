@@ -1587,7 +1587,8 @@ void startPlay(int iTune) {
 }
 
 void tick() {
-#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
+#if !defined(__EMSCRIPTEN__)
+#if defined(EEZ_PLATFORM_SIMULATOR)
 	if (!g_audioDevice) {
 		return;
 	}
@@ -1610,6 +1611,7 @@ void tick() {
 
         g_currentTuneStartPlayTime = millis();
 	}
+#endif
 }
 
 static void playTune(int iTune) {
