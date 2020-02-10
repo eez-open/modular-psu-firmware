@@ -85,8 +85,15 @@ struct ProfileFlags {
     unsigned reserverd : 11;
 };
 
+enum LoadStatus {
+    LOAD_STATUS_ONLY_NAME,
+    LOAD_STATUS_LOADING,
+    LOAD_STATUS_LOADED
+};
+
 /// Profile parameters.
 struct Parameters {
+    LoadStatus loadStatus;
     ProfileFlags flags;
     char name[PROFILE_NAME_MAX_LENGTH + 1];
     ChannelParameters channels[CH_MAX];
@@ -119,6 +126,7 @@ bool exportLocationToFile(int location, const char *filePath, bool showProgress,
 bool deleteLocation(int location, bool showProgress, int *err);
 bool deleteAllLocations(int *err);
 
+bool isLoaded(int location);
 bool isValid(int location);
 
 void getSaveName(int location, char *name);
@@ -128,6 +136,8 @@ void getName(int location, char *name, int count);
 
 bool getFreezeState();
 void setFreezeState(bool value);
+
+void loadProfileParametersToCache(int location);
 
 }
 }

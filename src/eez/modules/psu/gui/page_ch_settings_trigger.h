@@ -81,8 +81,8 @@ public:
     void deleteAll();
 
     void showFileMenu();
-    void fileOpen();
-    void fileSave();
+    void fileImport();
+    void fileExport();
 
     uint16_t getMaxListLength();
     int getPageIndex();
@@ -90,11 +90,11 @@ public:
     int getRowIndex();
     void moveCursorToFirstAvailableCell();
 
-    static void doLoadList();
-    void onLoadListFinished(int16_t err);
+    static void doImportList();
+    void onImportListFinished(int16_t err);
 
-    static void doSaveList();
-    void onSaveListFinished(int16_t err);
+    static void doExportList();
+    void onExportListFinished(int16_t err);
 
     int m_listVersion;
 
@@ -140,8 +140,8 @@ private:
     static void onDeleteAll();
     void doDeleteAll();
 
-    static void onOpenListFileSelected(const char *listFilePath);
-    static void onSaveListFileSelected(const char *listFilePath);
+    static void onImportListFileSelected(const char *listFilePath);
+    static void onExportListFileSelected(const char *listFilePath);
 };
 
 } // namespace gui

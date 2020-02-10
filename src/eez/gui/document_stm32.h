@@ -949,8 +949,8 @@ enum ActionsEnum {
     ACTION_ID_CHANNEL_UPDATE_FIRMWARE = 213,
     ACTION_ID_SHUTDOWN = 214,
     ACTION_ID_SHOW_CHANNEL_LISTS_FILE_MENU = 215,
-    ACTION_ID_CHANNEL_LISTS_FILE_OPEN = 216,
-    ACTION_ID_CHANNEL_LISTS_FILE_SAVE = 217,
+    ACTION_ID_CHANNEL_LISTS_FILE_IMPORT = 216,
+    ACTION_ID_CHANNEL_LISTS_FILE_EXPORT = 217,
     ACTION_ID_FILE_MANAGER_NEW_FILE = 218,
     ACTION_ID_PROFILE_IMPORT = 219,
     ACTION_ID_PROFILE_EXPORT = 220
@@ -1171,8 +1171,8 @@ void action_dlog_view_select_visible_value();
 void action_channel_update_firmware();
 void action_shutdown();
 void action_show_channel_lists_file_menu();
-void action_channel_lists_file_open();
-void action_channel_lists_file_save();
+void action_channel_lists_file_import();
+void action_channel_lists_file_export();
 void action_file_manager_new_file();
 void action_profile_import();
 void action_profile_export();
@@ -1571,7 +1571,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[300310];
+extern const uint8_t assets[300325];
 #else
-extern const uint8_t assets[1314152];
+extern const uint8_t assets[1314296];
 #endif

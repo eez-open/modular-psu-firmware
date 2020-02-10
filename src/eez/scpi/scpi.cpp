@@ -216,10 +216,12 @@ void oneIter() {
                 if (!profile::recallFromLocation(param, 0, false, &err)) {
                     generateError(err);
                 }
-            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_LOAD_LIST) {
-                psu::gui::ChSettingsListsPage::doLoadList();
-            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST) {
-                psu::gui::ChSettingsListsPage::doSaveList();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST) {
+                psu::gui::ChSettingsListsPage::doImportList();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST) {
+                psu::gui::ChSettingsListsPage::doExportList();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_LOAD_PROFILE) {
+                profile::loadProfileParametersToCache(param);
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_SAVE) {
                 psu::gui::UserProfilesPage::doSaveProfile();
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_RECALL) {

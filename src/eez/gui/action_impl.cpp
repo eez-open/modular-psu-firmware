@@ -794,14 +794,14 @@ void action_show_channel_lists_file_menu() {
     ((ChSettingsListsPage *)getActivePage())->showFileMenu();
 }
 
-void action_channel_lists_file_open() {
+void action_channel_lists_file_import() {
     popPage();
-    ((ChSettingsListsPage *)getActivePage())->fileOpen();
+    ((ChSettingsListsPage *)getActivePage())->fileImport();
 }
 
-void action_channel_lists_file_save() {
+void action_channel_lists_file_export() {
     popPage();
-    ((ChSettingsListsPage *)getActivePage())->fileSave();
+    ((ChSettingsListsPage *)getActivePage())->fileExport();
 }
 
 void action_channel_initiate_trigger() {

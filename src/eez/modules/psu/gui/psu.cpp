@@ -1699,10 +1699,10 @@ uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const St
 }
 
 void onGuiQueueMessageHook(uint8_t type, int16_t param) {
-    if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_LOAD_LIST_FINISHED) {
-        g_ChSettingsListsPage.onLoadListFinished(param);
-    } else if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST_FINISHED) {
-        g_ChSettingsListsPage.onSaveListFinished(param);
+    if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST_FINISHED) {
+        g_ChSettingsListsPage.onImportListFinished(param);
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST_FINISHED) {
+        g_ChSettingsListsPage.onExportListFinished(param);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED) {
         g_UserProfilesPage.onAsyncOperationFinished(param);
     }

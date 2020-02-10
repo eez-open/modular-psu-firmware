@@ -3439,7 +3439,11 @@ void data_profile_status(data::DataOperationEnum operation, data::Cursor &cursor
     if (operation == data::DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1) {
-            value = profile::isValid(selectedProfileLocation);
+            if (profile::isLoaded(selectedProfileLocation)) {
+                value = profile::isValid(selectedProfileLocation);
+            } else {
+                value = 2;
+            }
         }
     }
 }

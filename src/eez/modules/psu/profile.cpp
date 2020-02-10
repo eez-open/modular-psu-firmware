@@ -1,5 +1,4 @@
 /*
-/*
  * EEZ Modular Firmware
  * Copyright (C) 2015-present, Envox d.o.o.
  *
@@ -67,33 +66,34 @@ static List g_listsProfile10[CH_MAX];
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void getProfileFilePath(int location, char *filePath);
+static void loadProfileName(int location);
+static Parameters *getProfileParametersFromCache(int location);
 
-void saveState(Parameters &profile, List *lists);
-bool recallState(Parameters &profile, List *lists, int recallOptions, int *err);
+static void getProfileFilePath(int location, char *filePath);
 
-bool saveProfileToFile(const char *filePath, Parameters &profile, List *lists, bool showProgress, int *err);
-void saveStateToProfile0(bool merge);
+static void saveState(Parameters &profile, List *lists);
+static bool recallState(Parameters &profile, List *lists, int recallOptions, int *err);
 
-bool loadProfileFromFile(const char *filePath, Parameters &profile, List *lists, bool showProgress, int *err);
+static bool saveProfileToFile(const char *filePath, Parameters &profile, List *lists, bool showProgress, int *err);
+static void saveStateToProfile0(bool merge);
 
-bool doSaveToLocation10(int *err);
-bool doRecallFromLocation10(int *err);
+enum {
+    LOAD_PROFILE_FROM_FILE_OPTION_ONLY_NAME = 0x01
+};
+static bool loadProfileFromFile(const char *filePath, Parameters &profile, List *lists, int options, bool showProgress, int *err);
 
-void loadProfileParametersToCache(int location);
-Parameters *getProfileParametersFromCache(int location);
+static bool doSaveToLastLocation(int *err);
+static bool doRecallFromLastLocation(int *err);
 
-bool isTickSaveAllowed();
-bool isAutoSaveAllowed();
-bool isProfile0Dirty();
+static bool isTickSaveAllowed();
+static bool isAutoSaveAllowed();
+static bool isProfile0Dirty();
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
-    for (int profileIndex = 0; profileIndex < NUM_PROFILE_LOCATIONS; profileIndex++) {
-        if (!g_profilesCache[profileIndex].flags.isValid) {
-            loadProfileParametersToCache(profileIndex);
-        }
+    for (int profileIndex = 1; profileIndex < NUM_PROFILE_LOCATIONS; profileIndex++) {
+		loadProfileName(profileIndex);
     }
 }
 
@@ -120,9 +120,9 @@ Parameters *getProfileParameters(int location) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool recallFromLocation(int location) {
-    if (location == 10) {
+    if (location == NUM_PROFILE_LOCATIONS - 1) {
         int err;
-        if (!doRecallFromLocation10(&err)) {
+        if (!doRecallFromLastLocation(&err)) {
             generateError(err);
             return false;
         }
@@ -133,8 +133,8 @@ bool recallFromLocation(int location) {
 }
 
 bool recallFromLocation(int location, int recallOptions, bool showProgress, int *err) {
-    if (location == 10) {
-        return doRecallFromLocation10(err);
+    if (location == NUM_PROFILE_LOCATIONS - 1) {
+        return doRecallFromLastLocation(err);
     }
 
     char filePath[MAX_PATH_LENGTH];
@@ -142,7 +142,8 @@ bool recallFromLocation(int location, int recallOptions, bool showProgress, int 
 
 
     Parameters profile;
-    if (!loadProfileFromFile(filePath, profile, g_listsProfile0, showProgress, err)) {
+    memset(&profile, 0, sizeof(Parameters));
+    if (!loadProfileFromFile(filePath, profile, g_listsProfile0, 0, showProgress, err)) {
         return false;
     }
 
@@ -154,6 +155,7 @@ bool recallFromLocation(int location, int recallOptions, bool showProgress, int 
         // save to cache
         memcpy(&g_profilesCache[0], &profile, sizeof(profile));
         saveState(g_profilesCache[0], g_listsProfile0);
+        g_profilesCache[0].loadStatus = LOAD_STATUS_LOADED;
     } else {
         event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_PROFILE_0 + location);
 
@@ -167,7 +169,8 @@ bool recallFromLocation(int location, int recallOptions, bool showProgress, int 
 
 bool recallFromFile(const char *filePath, int recallOptions, bool showProgress, int *err) {
     Parameters profile;
-    if (!loadProfileFromFile(filePath, profile, g_listsProfile0, showProgress, err)) {
+    memset(&profile, 0, sizeof(Parameters));
+    if (!loadProfileFromFile(filePath, profile, g_listsProfile0, 0, showProgress, err)) {
         return false;
     }
 
@@ -187,9 +190,9 @@ bool recallFromFile(const char *filePath, int recallOptions, bool showProgress, 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool saveToLocation(int location) {
-    if (location == 10) {
+    if (location == NUM_PROFILE_LOCATIONS - 1) {
         int err;
-        if (!doSaveToLocation10(&err)) {
+        if (!doSaveToLastLocation(&err)) {
             generateError(err);
             return false;
         }
@@ -200,8 +203,8 @@ bool saveToLocation(int location) {
 }
 
 bool saveToLocation(int location, const char *name, bool showProgress, int *err) {
-    if (location == 10) {
-        return doSaveToLocation10(err);
+    if (location == NUM_PROFILE_LOCATIONS - 1) {
+        return doSaveToLastLocation(err);
     }
 
     char filePath[MAX_PATH_LENGTH];
@@ -288,6 +291,16 @@ bool deleteAllLocations(int *err) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool isLoaded(int location) {
+    if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
+        if (g_profilesCache[location].loadStatus == LOAD_STATUS_LOADED) {
+            return true;
+        }
+        loadProfileParametersToCache(location);
+    }
+    return false;
+}
+
 bool isValid(int location) {
     if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
         Parameters *profile = getProfileParametersFromCache(location);
@@ -323,8 +336,8 @@ bool setName(int location, const char *name, bool showProgress, int *err) {
             getProfileFilePath(location, filePath);
 
             Parameters profile;
-
-            if (!loadProfileFromFile(filePath, profile, g_listsProfile10, false, err)) {
+            memset(&profile, 0, sizeof(Parameters));
+            if (!loadProfileFromFile(filePath, profile, g_listsProfile10, 0, false, err)) {
                 return false;
             }
 
@@ -349,9 +362,8 @@ bool setName(int location, const char *name, bool showProgress, int *err) {
 
 void getName(int location, char *name, int count) {
     if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters *profile = getProfileParametersFromCache(location);
-        if (profile && profile->flags.isValid) {
-            strncpy(name, profile->name, count - 1);
+        if (g_profilesCache[location].flags.isValid) {
+            strncpy(name, g_profilesCache[location].name, count - 1);
             name[count - 1] = 0;
             return;
         }
@@ -372,6 +384,61 @@ bool getFreezeState() {
 
 void setFreezeState(bool value) {
     g_freeze = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void loadProfileParametersToCache(int location) {
+    using namespace eez::scpi;
+
+    if (osThreadGetId() != g_scpiTaskHandle) {
+        if (g_profilesCache[location].loadStatus == LOAD_STATUS_LOADING) {
+            return;
+        }
+       
+        g_profilesCache[location].loadStatus = LOAD_STATUS_LOADING;
+        
+        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LOAD_PROFILE, location), osWaitForever);
+    } else {
+        char filePath[MAX_PATH_LENGTH];
+        getProfileFilePath(location, filePath);
+        int err;
+        if (!loadProfileFromFile(filePath, g_profilesCache[location], nullptr, 0, false, &err)) {
+            if (err != SCPI_ERROR_FILE_NOT_FOUND && err != SCPI_ERROR_MISSING_MASS_MEDIA) {
+                generateError(err);
+            }
+        }
+
+        g_profilesCache[location].loadStatus = LOAD_STATUS_LOADED;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static void loadProfileName(int location) {
+    char filePath[MAX_PATH_LENGTH];
+    getProfileFilePath(location, filePath);
+    int err;
+    if (!loadProfileFromFile(filePath, g_profilesCache[location], nullptr, LOAD_PROFILE_FROM_FILE_OPTION_ONLY_NAME, false, &err)) {
+        if (err != SCPI_ERROR_FILE_NOT_FOUND && err != SCPI_ERROR_MISSING_MASS_MEDIA) {
+            generateError(err);
+        }
+    }
+    g_profilesCache[location].loadStatus = LOAD_STATUS_ONLY_NAME;
+}
+
+static Parameters *getProfileParametersFromCache(int location) {
+    if (location >= 0 && location < NUM_PROFILE_LOCATIONS - 1) {
+        if (g_profilesCache[location].loadStatus == LOAD_STATUS_LOADED) {
+            Parameters *profile = &g_profilesCache[location];
+            if (profile->flags.isValid) {
+                return profile;
+            }
+        } else {
+            loadProfileParametersToCache(location);
+        }
+    }
+    return nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1013,7 +1080,7 @@ class ReadContext {
 public:
     ReadContext(File &file_);
 
-    bool doRead(bool (*callback)(ReadContext &ctx, Parameters &parameters, List *lists), Parameters &parameters, List *lists, bool showProgress);
+    bool doRead(bool (*callback)(ReadContext &ctx, Parameters &parameters, List *lists), Parameters &parameters, List *lists, int options, bool showProgress);
 
     bool matchGroup(const char *groupName);
     bool matchGroup(const char *groupNamePrefix, int &index);
@@ -1043,7 +1110,7 @@ ReadContext::ReadContext(File &file_)
 {
 }
 
-bool ReadContext::doRead(bool (*callback)(ReadContext &ctx, Parameters &parameters, List *lists), Parameters &parameters, List *lists, bool showProgress) {
+bool ReadContext::doRead(bool (*callback)(ReadContext &ctx, Parameters &parameters, List *lists), Parameters &parameters, List *lists, int options, bool showProgress) {
 #if OPTION_DISPLAY
     size_t totalSize = file.size();
 #endif
@@ -1075,6 +1142,12 @@ bool ReadContext::doRead(bool (*callback)(ReadContext &ctx, Parameters &paramete
                 }
             } else {
                 skipPropertyValue();
+            }
+
+            if (options & LOAD_PROFILE_FROM_FILE_OPTION_ONLY_NAME) {
+                if (strcmp(propertyName, "profileName") == 0) {
+                    break;
+                }
             }
         }
     }
@@ -1317,13 +1390,11 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
     return false;
 }
 
-static bool profileRead(ReadContext &ctx, Parameters &parameters, List *lists, bool showProgress) {
-    return ctx.doRead(profileReadCallback, parameters, lists, showProgress);
+static bool profileRead(ReadContext &ctx, Parameters &parameters, List *lists, int options, bool showProgress) {
+    return ctx.doRead(profileReadCallback, parameters, lists, options, showProgress);
 }
 
-static bool loadProfileFromFile(const char *filePath, Parameters &profile, List *lists, bool showProgress, int *err) {
-    memset(&profile, 0, sizeof(Parameters));
-
+static bool loadProfileFromFile(const char *filePath, Parameters &profile, List *lists, int options, bool showProgress, int *err) {
     if (!sd_card::isMounted(err)) {
         if (err) {
             *err = SCPI_ERROR_MISSING_MASS_MEDIA;
@@ -1349,7 +1420,7 @@ static bool loadProfileFromFile(const char *filePath, Parameters &profile, List 
 
     ReadContext ctx(file);
 
-    bool result = profileRead(ctx, profile, lists, showProgress);
+    bool result = profileRead(ctx, profile, lists, options, showProgress);
 
     file.close();
 
@@ -1365,38 +1436,15 @@ static bool loadProfileFromFile(const char *filePath, Parameters &profile, List 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool doSaveToLocation10(int *err) {
+static bool doSaveToLastLocation(int *err) {
     Parameters profile;
-    memset(&g_profilesCache[10], 0, sizeof(Parameters));
+    memset(&g_profilesCache[NUM_PROFILE_LOCATIONS - 1], 0, sizeof(Parameters));
     saveState(profile, g_listsProfile10);
     return true;
 }
 
-static bool doRecallFromLocation10(int *err) {
-    return recallState(g_profilesCache[10], g_listsProfile10, 0, err);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-static void loadProfileParametersToCache(int location) {
-    char filePath[MAX_PATH_LENGTH];
-    getProfileFilePath(location, filePath);
-    int err;
-    if (!loadProfileFromFile(filePath, g_profilesCache[location], nullptr, false, &err)) {
-        if (err != SCPI_ERROR_FILE_NOT_FOUND && err != SCPI_ERROR_MISSING_MASS_MEDIA) {
-            generateError(err);
-        }
-    }
-}
-
-static Parameters *getProfileParametersFromCache(int location) {
-    if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
-        Parameters *profile = &g_profilesCache[location];
-        if (profile->flags.isValid) {
-            return profile;
-        }
-    }
-    return nullptr;
+static bool doRecallFromLastLocation(int *err) {
+    return recallState(g_profilesCache[NUM_PROFILE_LOCATIONS - 1], g_listsProfile10, 0, err);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

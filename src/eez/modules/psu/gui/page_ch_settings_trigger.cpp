@@ -669,17 +669,17 @@ void ChSettingsListsPage::showFileMenu() {
     pushPage(PAGE_ID_CH_SETTINGS_LISTS_FILE_MENU);
 }
 
-void ChSettingsListsPage::onOpenListFileSelected(const char *listFilePath) {
+void ChSettingsListsPage::onImportListFileSelected(const char *listFilePath) {
     auto *page = (ChSettingsListsPage *)getActivePage();
     strcpy(page->m_listFilePath, listFilePath);
 
-    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Opening list...");
+    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Import list...");
 
     using namespace eez::scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_LOAD_LIST, 0), osWaitForever);
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST, 0), osWaitForever);
 }
 
-void ChSettingsListsPage::doLoadList() {
+void ChSettingsListsPage::doImportList() {
     auto *page = (ChSettingsListsPage *)g_psuAppContext.getPage(PAGE_ID_CH_SETTINGS_LISTS);
 
     int err;
@@ -692,10 +692,10 @@ void ChSettingsListsPage::doLoadList() {
         &err
     );
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_LOAD_LIST_FINISHED, err), osWaitForever);
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST_FINISHED, err), osWaitForever);
 }
 
-void ChSettingsListsPage::onLoadListFinished(int16_t err) {
+void ChSettingsListsPage::onImportListFinished(int16_t err) {
     eez::psu::gui::g_psuAppContext.hideProgressPage();
 
     if (err == SCPI_RES_OK) {
@@ -716,21 +716,21 @@ void ChSettingsListsPage::onLoadListFinished(int16_t err) {
     }
 }
 
-void ChSettingsListsPage::fileOpen() {
-    file_manager::browseForFile("Open list", "/Lists", FILE_TYPE_LIST, file_manager::DIALOG_TYPE_OPEN, onOpenListFileSelected);
+void ChSettingsListsPage::fileImport() {
+    file_manager::browseForFile("Import list", "/Lists", FILE_TYPE_LIST, file_manager::DIALOG_TYPE_OPEN, onImportListFileSelected);
 }
 
-void ChSettingsListsPage::onSaveListFileSelected(const char *listFilePath) {
+void ChSettingsListsPage::onExportListFileSelected(const char *listFilePath) {
     auto *page = (ChSettingsListsPage *)getActivePage();
     strcpy(page->m_listFilePath, listFilePath);
     
-    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Saving list...");
+    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Exporting list...");
 
     using namespace eez::scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST, 0), osWaitForever);
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST, 0), osWaitForever);
 }
 
-void ChSettingsListsPage::doSaveList() {
+void ChSettingsListsPage::doExportList() {
     auto *page = (ChSettingsListsPage *)g_psuAppContext.getPage(PAGE_ID_CH_SETTINGS_LISTS);
 
     int err;
@@ -743,10 +743,10 @@ void ChSettingsListsPage::doSaveList() {
         &err
     );
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_SAVE_LIST_FINISHED, err), osWaitForever);
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST_FINISHED, err), osWaitForever);
 }
 
-void ChSettingsListsPage::onSaveListFinished(int16_t err) {
+void ChSettingsListsPage::onExportListFinished(int16_t err) {
     eez::psu::gui::g_psuAppContext.hideProgressPage();
 
     if (err != SCPI_RES_OK) {
@@ -754,8 +754,8 @@ void ChSettingsListsPage::onSaveListFinished(int16_t err) {
     }
 }
 
-void ChSettingsListsPage::fileSave() {
-    file_manager::browseForFile("Save list as", "/Lists", FILE_TYPE_LIST, file_manager::DIALOG_TYPE_SAVE, onSaveListFileSelected);
+void ChSettingsListsPage::fileExport() {
+    file_manager::browseForFile("Export list as", "/Lists", FILE_TYPE_LIST, file_manager::DIALOG_TYPE_SAVE, onExportListFileSelected);
 }
 
 } // namespace gui
