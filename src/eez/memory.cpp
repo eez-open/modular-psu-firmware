@@ -19,5 +19,5 @@
 #include <eez/memory.h>
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-uint8_t g_memory[MEMORY_SIZE];
+uint8_t g_memory[MEMORY_SIZE] = { 0 };
 #endif
