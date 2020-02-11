@@ -34,6 +34,11 @@
 #include <eez/modules/mcu/ethernet.h>
 #endif
 
+#if OPTION_DISPLAY
+#include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/data.h>
+#endif
+
 namespace eez {
 namespace psu {
 namespace event_queue {
@@ -251,7 +256,13 @@ void pushEvent(int16_t eventId) {
     eez::mcu::ethernet::pushEvent(eventId);
 #endif
 
-	if (!g_isBooted) {
+    if (g_isBooted) {
+#if OPTION_DISPLAY
+        if (getEventType(eventId) == EVENT_TYPE_ERROR) {
+            eez::psu::gui::psuErrorMessage(0, MakeEventMessageValue(eventId));
+        }
+#endif
+    } else {
 		tick();
 	}
 }

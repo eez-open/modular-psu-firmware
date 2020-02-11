@@ -1555,11 +1555,17 @@ void channelReinitiateTrigger() {
     channelInitiateTrigger();
 }
 
+void clearTrip(int channelIndex) {
+    Channel &channel = Channel::get(channelIndex);
+    channel_dispatcher::clearProtection(channel);
+    channelToggleOutput();
+}
+
 void channelToggleOutput() {
     Channel &channel =
         Channel::get(getFoundWidgetAtDown().cursor.i >= 0 ? getFoundWidgetAtDown().cursor.i : 0);
     if (channel_dispatcher::isTripped(channel)) {
-        errorMessage("Channel is tripped!");
+        errorMessageWithAction("Channel is tripped!", clearTrip, "Clear", channel.channelIndex);
     } else {
         bool triggerModeEnabled =
             (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||

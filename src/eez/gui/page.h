@@ -111,6 +111,7 @@ private:
     data::Value message1Value;
     const char *message2;
     const char *message3;
+    const char *actionLabel;
 
     Widget actionWidget;
     bool actionWidgetIsActive;

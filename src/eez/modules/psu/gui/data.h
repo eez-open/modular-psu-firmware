@@ -58,6 +58,7 @@ enum UserValueType {
     VALUE_TYPE_GREATER_THEN_MAX_INT,
     VALUE_TYPE_GREATER_THEN_MAX_TIME_ZONE,
     VALUE_TYPE_EVENT,
+    VALUE_TYPE_EVENT_MESSAGE,
     VALUE_TYPE_ON_TIME_COUNTER,
     VALUE_TYPE_COUNTDOWN,
     VALUE_TYPE_TIME_ZONE,
@@ -102,6 +103,7 @@ Value MakeValue(float value, Unit unit);
 Value MakeLessThenMinMessageValue(float float_, const Value &value_);
 Value MakeGreaterThenMaxMessageValue(float float_, const Value &value_);
 Value MakeScpiErrorValue(int16_t errorCode);
+Value MakeEventMessageValue(int16_t eventId);
 
 void editValue(uint16_t dataId);
 

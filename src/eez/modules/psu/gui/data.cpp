@@ -320,6 +320,13 @@ Value MakeScpiErrorValue(int16_t errorCode) {
     return value;
 }
 
+Value MakeEventMessageValue(int16_t eventId) {
+    Value value;
+    value.int16_ = eventId;
+    value.type_ = VALUE_TYPE_EVENT_MESSAGE;
+    return value;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void printTime(double time, char *text, int count) {
@@ -494,6 +501,15 @@ void EVENT_value_to_text(const Value &value, char *text, int count) {
                  event_queue::getEventMessage(event));
     }
 
+    text[count - 1] = 0;
+}
+
+bool compare_EVENT_MESSAGE_value(const Value &a, const Value &b) {
+    return a.getInt16() == b.getInt16();
+}
+
+void EVENT_MESSAGE_value_to_text(const Value &value, char *text, int count) {
+    strncpy(text, event_queue::getEventMessage(value.getInt16()), count - 1);
     text[count - 1] = 0;
 }
 
@@ -927,6 +943,7 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_GREATER_THEN_MAX_INT_value,
     compare_GREATER_THEN_MAX_TIME_ZONE_value,
     compare_EVENT_value,
+    compare_EVENT_MESSAGE_value,
     compare_ON_TIME_COUNTER_value,
     compare_COUNTDOWN_value,
     compare_TIME_ZONE_value,
@@ -978,6 +995,7 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     GREATER_THEN_MAX_INT_value_to_text,
     GREATER_THEN_MAX_TIME_ZONE_value_to_text,
     EVENT_value_to_text,
+    EVENT_MESSAGE_value_to_text,
     ON_TIME_COUNTER_value_to_text,
     COUNTDOWN_value_to_text,
     TIME_ZONE_value_to_text,

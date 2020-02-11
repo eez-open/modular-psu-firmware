@@ -27,6 +27,10 @@
 
 #include <eez/gui/gui.h>
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+#include <eez/modules/psu/gui/psu.h>
+#endif
+
 namespace eez {
 namespace gui {
 
@@ -41,42 +45,78 @@ void pushToastMessage(ToastMessagePage *toastMessage) {
 }
 
 void infoMessage(const char *message) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_appContext = &eez::psu::gui::g_psuAppContext;
+#endif
+
     pushToastMessage(ToastMessagePage::create(INFO_TOAST, message));
 }
 
 void infoMessage(data::Value value) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_appContext = &eez::psu::gui::g_psuAppContext;
+#endif
+
     pushToastMessage(ToastMessagePage::create(INFO_TOAST, value));
 }
 
 void infoMessage(const char *message1, const char *message2) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_appContext = &eez::psu::gui::g_psuAppContext;
+#endif
+
     pushToastMessage(ToastMessagePage::create(INFO_TOAST, message1, message2));
 }
 
 void errorMessage(const char *message) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_appContext = &eez::psu::gui::g_psuAppContext;
+#endif
+
     pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message));
     sound::playBeep();
 }
 
 void errorMessage(const char *message1, const char *message2) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_appContext = &eez::psu::gui::g_psuAppContext;
+#endif
+
     pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message1, message2));
     sound::playBeep();
 }
 
 void errorMessage(const char *message1, const char *message2, const char *message3) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_appContext = &eez::psu::gui::g_psuAppContext;
+#endif
+
     pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message1, message2, message3));
     sound::playBeep();
 }
 void errorMessage(data::Value value) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_appContext = &eez::psu::gui::g_psuAppContext;
+#endif
+
     pushToastMessage(ToastMessagePage::create(ERROR_TOAST, value));
     sound::playBeep();
 }
 
 void errorMessageWithAction(data::Value value, void (*action)(int param), const char *actionLabel, int actionParam) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_appContext = &eez::psu::gui::g_psuAppContext;
+#endif
+
     pushToastMessage(ToastMessagePage::create(ERROR_TOAST, value, action, actionLabel, actionParam));
     sound::playBeep();
 }
 
 void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_appContext = &eez::psu::gui::g_psuAppContext;
+#endif
+
     pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message, action, actionLabel));
     sound::playBeep();
 }

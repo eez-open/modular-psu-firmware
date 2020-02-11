@@ -97,6 +97,8 @@ void ToastMessagePage::pageFree() {
     appContext = nullptr;
 }
 
+////////////////////////////////////////
+
 ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1) {
     ToastMessagePage *page = ToastMessagePage::findFreePage();
     
@@ -104,9 +106,11 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1)
     page->message1 = message1;
     page->message2 = nullptr;
     page->message3 = nullptr;
-
-    page->actionWidget.action = 0;
-    page->appContext = &eez::psu::gui::g_psuAppContext;
+    page->actionLabel = type == ERROR_TOAST ? "Close" : nullptr;
+    page->actionWidgetIsActive = false;
+    page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
+    page->appContext = g_appContext;
+    page->appContext->m_toastActionWithoutParam = nullptr;
 
     return page;
 }
@@ -119,9 +123,11 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, data::Value message1V
     page->message1Value = message1Value;
     page->message2 = nullptr;
     page->message3 = nullptr;
-
-    page->actionWidget.action = 0;
+    page->actionLabel = type == ERROR_TOAST ? "Close" : nullptr;
+    page->actionWidgetIsActive = false;
+    page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
     page->appContext = g_appContext;
+    page->appContext->m_toastActionWithoutParam = nullptr;
 
     return page;
 }
@@ -133,9 +139,11 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1,
     page->message1 = message1;
     page->message2 = message2;
     page->message3 = nullptr;
-
-    page->actionWidget.action = 0;
+    page->actionLabel = type == ERROR_TOAST ? "Close" : nullptr;
+    page->actionWidgetIsActive = false;
+    page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
     page->appContext = g_appContext;
+    page->appContext->m_toastActionWithoutParam = nullptr;
 
     return page;
 }
@@ -147,9 +155,11 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1,
     page->message1 = message1;
     page->message2 = message2;
     page->message3 = message3;
-
-    page->actionWidget.action = 0;
+    page->actionLabel = type == ERROR_TOAST ? "Close" : nullptr;
+    page->actionWidgetIsActive = false;
+    page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
     page->appContext = g_appContext;
+    page->appContext->m_toastActionWithoutParam = nullptr;
 
     return page;
 }
@@ -160,10 +170,10 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, data::Value message1V
     page->type = type;
     page->message1 = nullptr;
     page->message1Value = message1Value;
-    page->message2 = actionLabel;
+    page->message2 = nullptr;
     page->message3 = nullptr;
+    page->actionLabel = actionLabel;
     page->actionWidgetIsActive = false;
-
     page->actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION;
     page->appContext = g_appContext;
     page->appContext->m_toastAction = action;
@@ -177,16 +187,18 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, 
 
     page->type = type;
     page->message1 = message;
-    page->message2 = actionLabel;
+    page->message2 = nullptr;
     page->message3 = nullptr;
+    page->actionLabel = actionLabel;
     page->actionWidgetIsActive = false;
-
     page->actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM;
     page->appContext = g_appContext;
     page->appContext->m_toastActionWithoutParam = action;
 
     return page;
 }
+
+////////////////////////////////////////
 
 void ToastMessagePage::onEncoder(int counter) {
     if (counter < 0 || !hasAction()) {
@@ -204,6 +216,7 @@ void ToastMessagePage::onEncoderClicked() {
 
 void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
     const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
+    const Style *actionStyle = getStyle(STYLE_ID_ERROR_ALERT_BUTTON);
 
     font::Font font = styleGetFont(style);
 
@@ -218,15 +231,20 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
     int textWidth1 = display::measureStr(message1, -1, font, 0);
     int textWidth2 = message2 ? display::measureStr(message2, -1, font, 0) : 0;
     int textWidth3 = message3 ? display::measureStr(message3, -1, font, 0) : 0;
-    int textWidth = MAX(minTextWidth, MAX(MAX(textWidth1, textWidth2), textWidth3));
+    int actionLabelWidth = actionLabel ? (actionStyle->padding_left + display::measureStr(actionLabel, -1, font, 0) + actionStyle->padding_right) : 0;
+
+    int textWidth = MAX(MAX(MAX(MAX(minTextWidth, textWidth1), textWidth2), textWidth3), actionLabelWidth);
+  
     int textHeight = font.getHeight();
 
     width = style->border_size_left + style->padding_left +
         textWidth +
         style->padding_right + style->border_size_right;
 
+    int numLines = (message3 ? 3 : message2 ? 2 : 1);
+
     height = style->border_size_top + style->padding_top +
-        ((message3 || actionWidget.action) ? 3 : message2 ? 2 : 1) * textHeight +
+        numLines * textHeight + (actionLabel ? (style->padding_top + textHeight) : 0) +
         style->padding_bottom + style->border_size_bottom;
 
 	x = appContext->x + (appContext->width - width) / 2;
@@ -259,53 +277,58 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
     // draw text message
     display::setColor(style->color);
 
+    int yText = y1 + style->padding_top;
+
     display::drawStr(message1, -1, 
         x1 + style->padding_left + (textWidth - textWidth1) / 2, 
-        y1 + style->padding_top, 
+        yText, 
         x1, y1, x2, y2, font);
 
+    yText += textHeight;
+
     if (message2) {
-        if (actionWidget.action) {
-            const Style *activeStyle = getStyle(STYLE_ID_ERROR_ALERT_BUTTON);
-            
-            actionWidget.x = x1 + style->padding_left;
-            actionWidget.y = y1 + style->padding_top + textHeight + style->padding_top;
-            actionWidget.w = x2 - x1 - style->padding_left - style->padding_right;
-            actionWidget.h = textHeight;
-            
-            if (actionWidgetIsActive) {
-                display::setColor(activeStyle->color);
+        display::drawStr(message2, -1,
+            x1 + style->padding_left + (textWidth - textWidth2) / 2,
+            yText,
+            x1, y1, x2, y2, font);
 
-                display::fillRect(
-                    actionWidget.x,
-                    actionWidget.y,
-                    actionWidget.x + actionWidget.w - 1,
-                    actionWidget.y + actionWidget.h - 1,
-                    0);
-
-                display::setBackColor(activeStyle->color);
-                display::setColor(activeStyle->background_color);
-            } else {
-                display::setBackColor(activeStyle->background_color);
-                display::setColor(activeStyle->color);
-            }
-
-            display::drawStr(message2, -1, 
-                actionWidget.x + (textWidth - textWidth2) / 2, actionWidget.y, 
-                x1, y1, x2, y2, font);
-        }
-        else {
-            display::drawStr(message2, -1,
-                x1 + style->padding_left + (textWidth - textWidth2) / 2,
-                y1 + style->padding_top + textHeight,
-                x1, y1, x2, y2, font);
-        }
+        yText += textHeight;
     }
 
     if (message3) {
         display::drawStr(message3, -1, 
             x1 + style->padding_left + (textWidth - textWidth2) / 2, 
-            y1 + style->padding_top + 2 * textHeight, 
+            yText, 
+            x1, y1, x2, y2, font);
+
+        yText += textHeight;
+    }
+
+    if (actionLabel) {
+        actionWidget.x = x1 + style->padding_left + (textWidth - actionLabelWidth) / 2;
+        actionWidget.y = yText + style->padding_top;
+        actionWidget.w = actionLabelWidth;
+        actionWidget.h = textHeight;
+        
+        if (actionWidgetIsActive) {
+            display::setColor(actionStyle->color);
+
+            display::fillRect(
+                actionWidget.x,
+                actionWidget.y - textHeight / 4,
+                actionWidget.x + actionWidget.w - 1,
+                actionWidget.y + actionWidget.h - 1 + textHeight / 4,
+                0);
+
+            display::setBackColor(actionStyle->color);
+            display::setColor(actionStyle->background_color);
+        } else {
+            display::setBackColor(actionStyle->background_color);
+            display::setColor(actionStyle->color);
+        }
+
+        display::drawStr(actionLabel, -1,
+            actionWidget.x + actionStyle->padding_left, actionWidget.y,
             x1, y1, x2, y2, font);
     }
 }
@@ -319,7 +342,16 @@ void ToastMessagePage::updatePage(const WidgetCursor& widgetCursor) {
 
 WidgetCursor ToastMessagePage::findWidget(int x, int y) {
     if (x >= this->x && x < this->x + width && y >= this->y && y < this->y + height) {
-        if (actionWidget.action && x >= actionWidget.x && x < actionWidget.x + actionWidget.w && y >= actionWidget.y && y < actionWidget.y + actionWidget.h) {
+        const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
+        font::Font font = styleGetFont(style);
+        int textHeight = font.getHeight();
+        if (
+            actionWidget.action &&
+            x >= actionWidget.x &&
+            x < actionWidget.x + actionWidget.w &&
+            y >= (actionWidget.y - textHeight / 4) &&
+            y < (actionWidget.y + actionWidget.h - 1 + textHeight / 4)
+        ) {
             return WidgetCursor(appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0);
         }
         widget.action = ACTION_ID_INTERNAL_DIALOG_CLOSE;
@@ -330,13 +362,15 @@ WidgetCursor ToastMessagePage::findWidget(int x, int y) {
 }
 
 void ToastMessagePage::executeAction() {
-    popPage();
+    g_appContext->popPage();
     g_appContext->m_toastAction(g_appContext->m_toastActionParam);
 }
 
 void ToastMessagePage::executeActionWithoutParam() {
-    popPage();
-    g_appContext->m_toastActionWithoutParam();
+    g_appContext->popPage();
+    if (g_appContext->m_toastActionWithoutParam) {
+        g_appContext->m_toastActionWithoutParam();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
