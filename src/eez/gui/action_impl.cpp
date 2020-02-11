@@ -732,12 +732,12 @@ void action_ch_settings_trigger_edit_current_trigger_value() {
     ((ChSettingsTriggerPage *)getActivePage())->editCurrentTriggerValue();
 }
 
-void action_ch_settings_trigger_edit_list_count() {
-    ((ChSettingsTriggerPage *)getActivePage())->editListCount();
+void action_ch_settings_lists_edit_list_count() {
+    ((ChSettingsListsPage *)getActivePage())->editListCount();
 }
 
-void action_ch_settings_trigger_edit_on_list_stop() {
-    ((ChSettingsTriggerPage *)getActivePage())->editTriggerOnListStop();
+void action_ch_settings_lists_edit_on_list_stop() {
+    ((ChSettingsListsPage *)getActivePage())->editTriggerOnListStop();
 }
 
 void action_channel_lists_previous_page() {

@@ -3875,13 +3875,6 @@ void data_channel_trigger_mode(data::DataOperationEnum operation, data::Cursor &
     }
 }
 
-void data_channel_trigger_on_list_stop(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = MakeEnumDefinitionValue(channel_dispatcher::getTriggerOnListStop(*g_channel),
-                                        ENUM_DEFINITION_CHANNEL_TRIGGER_ON_LIST_STOP);
-    }
-}
-
 void data_channel_u_trigger_value(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getTriggerVoltage(*g_channel), UNIT_VOLT);
@@ -3896,12 +3889,35 @@ void data_channel_i_trigger_value(data::DataOperationEnum operation, data::Curso
 
 void data_channel_list_count(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        uint16_t count = list::getListCount(*g_channel);
-        if (count > 0) {
-            value = data::Value(count);
+        uint16_t listCount;
+
+        ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
+        if (page) {
+            listCount = page->m_listCount;
+        } else {
+            listCount = list::getListCount(*g_channel);
+        }
+        
+        if (listCount > 0) {
+            value = data::Value(listCount);
         } else {
             value = INFINITY_SYMBOL;
         }
+    }
+}
+
+void data_channel_trigger_on_list_stop(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        TriggerOnListStop triggerOnListStop;
+
+        ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
+        if (page) {
+            triggerOnListStop = page->m_triggerOnListStop;
+        } else {
+            triggerOnListStop = channel_dispatcher::getTriggerOnListStop(*g_channel);
+        }
+        
+        value = MakeEnumDefinitionValue(triggerOnListStop, ENUM_DEFINITION_CHANNEL_TRIGGER_ON_LIST_STOP);
     }
 }
 
@@ -4595,7 +4611,9 @@ void data_dlog_state(data::DataOperationEnum operation, data::Cursor &cursor, da
 
 void data_dlog_toggle_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-    	if (dlog_record::isInStateTransition()) {
+    	if (CH_NUM == 0) {
+            value = 5;
+        } else if (dlog_record::isInStateTransition()) {
     		value = 4;
     	} else if (dlog_record::isIdle()) {
             value = 0;
@@ -4650,7 +4668,7 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
     } else if (operation == DATA_OPERATION_YT_DATA_GET_MIN) {
         value = getMin(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_MAX) {
-        value = getMax(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
+        value = getLimit(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
         value = Value(psu::persist_conf::devConf.ytGraphUpdateMethod, VALUE_TYPE_UINT8);
     }
@@ -5531,7 +5549,7 @@ void data_slot1_info(data::DataOperationEnum operation, data::Cursor &cursor, da
 
 void data_slot1_test_result (data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = Value((int)psu::Channel::get(0).getTestResult(), VALUE_TYPE_TEST_RESULT);
+        value = Value((int)psu::Channel::getBySlotIndex(0).getTestResult(), VALUE_TYPE_TEST_RESULT);
     }
 }
 
@@ -5543,7 +5561,7 @@ void data_slot2_info(data::DataOperationEnum operation, data::Cursor &cursor, da
 
 void data_slot2_test_result(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = Value((int)psu::Channel::get(1).getTestResult(), VALUE_TYPE_TEST_RESULT);
+        value = Value((int)psu::Channel::getBySlotIndex(1).getTestResult(), VALUE_TYPE_TEST_RESULT);
     }
 }
 
@@ -5555,7 +5573,7 @@ void data_slot3_info(data::DataOperationEnum operation, data::Cursor &cursor, da
 
 void data_slot3_test_result(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = Value((int)psu::Channel::get(2).getTestResult(), VALUE_TYPE_TEST_RESULT);
+        value = Value((int)psu::Channel::getBySlotIndex(2).getTestResult(), VALUE_TYPE_TEST_RESULT);
     }
 }
 

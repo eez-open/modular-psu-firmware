@@ -864,8 +864,8 @@ enum ActionsEnum {
     ACTION_ID_CH_SETTINGS_TRIGGER_EDIT_TRIGGER_MODE = 124,
     ACTION_ID_CH_SETTINGS_TRIGGER_EDIT_VOLTAGE_TRIGGER_VALUE = 125,
     ACTION_ID_CH_SETTINGS_TRIGGER_EDIT_CURRENT_TRIGGER_VALUE = 126,
-    ACTION_ID_CH_SETTINGS_TRIGGER_EDIT_LIST_COUNT = 127,
-    ACTION_ID_CH_SETTINGS_TRIGGER_EDIT_ON_LIST_STOP = 128,
+    ACTION_ID_CH_SETTINGS_LISTS_EDIT_LIST_COUNT = 127,
+    ACTION_ID_CH_SETTINGS_LISTS_EDIT_ON_LIST_STOP = 128,
     ACTION_ID_CHANNEL_LISTS_PREVIOUS_PAGE = 129,
     ACTION_ID_CHANNEL_LISTS_NEXT_PAGE = 130,
     ACTION_ID_CHANNEL_LISTS_EDIT = 131,
@@ -1086,8 +1086,8 @@ void action_turn_display_off();
 void action_ch_settings_trigger_edit_trigger_mode();
 void action_ch_settings_trigger_edit_voltage_trigger_value();
 void action_ch_settings_trigger_edit_current_trigger_value();
-void action_ch_settings_trigger_edit_list_count();
-void action_ch_settings_trigger_edit_on_list_stop();
+void action_ch_settings_lists_edit_list_count();
+void action_ch_settings_lists_edit_on_list_stop();
 void action_channel_lists_previous_page();
 void action_channel_lists_next_page();
 void action_channel_lists_edit();
@@ -1576,7 +1576,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[300854];
+extern const uint8_t assets[300799];
 #else
-extern const uint8_t assets[1313740];
+extern const uint8_t assets[1313748];
 #endif

@@ -35,21 +35,12 @@ class ChSettingsTriggerPage : public Page {
     void editVoltageTriggerValue();
     void editCurrentTriggerValue();
 
-    void editTriggerOnListStop();
-
-    void editListCount();
-
   private:
     static void onFinishTriggerModeSet();
     static void onTriggerModeSet(uint16_t value);
 
-    static void onTriggerOnListStopSet(uint16_t value);
-
     static void onVoltageTriggerValueSet(float value);
     static void onCurrentTriggerValueSet(float value);
-
-    static void onListCountSet(float value);
-    static void onListCountSetToInfinity();
 };
 
 class ChSettingsListsPage : public SetPage {
@@ -109,6 +100,12 @@ public:
 
     int m_iCursor;
 
+    void editListCount();
+    void editTriggerOnListStop();
+
+    uint16_t m_listCount;
+    TriggerOnListStop m_triggerOnListStop;
+
 private:
     char m_listFilePath[MAX_PATH_LENGTH + 1];
     float m_voltageListLoad[MAX_LIST_LENGTH];
@@ -117,6 +114,9 @@ private:
     uint16_t m_currentListLengthLoad;
     float m_dwellListLoad[MAX_LIST_LENGTH];
     uint16_t m_dwellListLengthLoad;
+
+    uint16_t m_listCountOrig;
+    TriggerOnListStop m_triggerOnListStopOrig;
 
     int getColumnIndex();
     int getCursorIndexWithinPage();
@@ -142,6 +142,13 @@ private:
 
     static void onImportListFileSelected(const char *listFilePath);
     static void onExportListFileSelected(const char *listFilePath);
+
+    static void setTriggerListMode();
+
+    static void onListCountSet(float value);
+    static void onListCountSetToInfinity();
+
+    static void onTriggerOnListStopSet(uint16_t value);
 };
 
 } // namespace gui

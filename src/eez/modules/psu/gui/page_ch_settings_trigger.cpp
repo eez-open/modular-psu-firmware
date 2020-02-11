@@ -115,39 +115,6 @@ void ChSettingsTriggerPage::editCurrentTriggerValue() {
     NumericKeypad::start(0, MakeValue(trigger::getCurrent(*g_channel), UNIT_AMPER), options, onCurrentTriggerValueSet, 0, 0);
 }
 
-void ChSettingsTriggerPage::onTriggerOnListStopSet(uint16_t value) {
-    popPage();
-    channel_dispatcher::setTriggerOnListStop(*g_channel, (TriggerOnListStop)value);
-}
-
-void ChSettingsTriggerPage::editTriggerOnListStop() {
-    pushSelectFromEnumPage(g_channelTriggerOnListStopEnumDefinition, channel_dispatcher::getTriggerOnListStop(*g_channel), 0, onTriggerOnListStopSet);
-}
-
-void ChSettingsTriggerPage::onListCountSet(float value) {
-    popPage();
-    channel_dispatcher::setListCount(*g_channel, (uint16_t)value);
-}
-
-void ChSettingsTriggerPage::onListCountSetToInfinity() {
-    popPage();
-    channel_dispatcher::setListCount(*g_channel, 0);
-}
-
-void ChSettingsTriggerPage::editListCount() {
-    NumericKeypadOptions options;
-
-    options.min = 0;
-    options.max = MAX_LIST_COUNT;
-    options.def = 0;
-
-    options.flags.option1ButtonEnabled = true;
-    options.option1ButtonText = INFINITY_SYMBOL;
-    options.option1 = onListCountSetToInfinity;
-
-    NumericKeypad::start(0, data::Value((uint16_t)list::getListCount(*g_channel)), options, onListCountSet, 0, 0);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void ChSettingsListsPage::pageAlloc() {
@@ -162,6 +129,9 @@ void ChSettingsListsPage::pageAlloc() {
 
     float *currentList = list::getCurrentList(*g_channel, &m_currentListLength);
     memcpy(m_currentList, currentList, m_currentListLength * sizeof(float));
+
+    m_listCount = m_listCountOrig = list::getListCount(*g_channel);
+    m_triggerOnListStop = m_triggerOnListStopOrig = channel_dispatcher::getTriggerOnListStop(*g_channel);
 }
 
 void ChSettingsListsPage::previousPage() {
@@ -446,7 +416,7 @@ void ChSettingsListsPage::moveCursorToFirstAvailableCell() {
 }
 
 int ChSettingsListsPage::getDirty() {
-    return m_listVersion > 0;
+    return m_listVersion > 0 || m_listCount != m_listCountOrig || m_triggerOnListStop || m_triggerOnListStopOrig;
 }
 
 void ChSettingsListsPage::set() {
@@ -458,17 +428,34 @@ void ChSettingsListsPage::set() {
             channel_dispatcher::setVoltageList(*g_channel, m_voltageList, m_voltageListLength);
             channel_dispatcher::setCurrentList(*g_channel, m_currentList, m_currentListLength);
 
+            channel_dispatcher::setListCount(*g_channel, m_listCount);
+            channel_dispatcher::setTriggerOnListStop(*g_channel, m_triggerOnListStop);
+
             popPage();
-            infoMessage("Lists changed!");
+
+            if (
+                channel_dispatcher::getVoltageTriggerMode(*g_channel) != TRIGGER_MODE_LIST && 
+                channel_dispatcher::getCurrentTriggerMode(*g_channel) != TRIGGER_MODE_LIST
+            ) {
+                yesNoDialog(PAGE_ID_YES_NO_L, "Do you want to set list trigger mode?", setTriggerListMode, nullptr, nullptr);
+            } else {
+                infoMessage("Lists changed!");
+            }
 
             uint8_t hour, minute, second;
             datetime::getTime(hour, minute, second);
             DebugTrace("[%02d:%02d:%02d] List changed for channel %d!\n", hour, minute, second, g_channel->channelIndex + 1);
-
         } else {
             errorMessage("List lengths are not equivalent!");
         }
     }
+}
+
+void ChSettingsListsPage::setTriggerListMode() {
+    trigger::abort();
+    channel_dispatcher::setVoltageTriggerMode(*g_channel, TRIGGER_MODE_LIST);
+    channel_dispatcher::setCurrentTriggerMode(*g_channel, TRIGGER_MODE_LIST);
+    channel_dispatcher::setTriggerOutputState(*g_channel, true);
 }
 
 void ChSettingsListsPage::onEncoder(int counter) {
@@ -756,6 +743,42 @@ void ChSettingsListsPage::onExportListFinished(int16_t err) {
 
 void ChSettingsListsPage::fileExport() {
     file_manager::browseForFile("Export list as", "/Lists", FILE_TYPE_LIST, file_manager::DIALOG_TYPE_SAVE, onExportListFileSelected);
+}
+
+void ChSettingsListsPage::editListCount() {
+    NumericKeypadOptions options;
+
+    options.min = 0;
+    options.max = MAX_LIST_COUNT;
+    options.def = 0;
+
+    options.flags.option1ButtonEnabled = true;
+    options.option1ButtonText = INFINITY_SYMBOL;
+    options.option1 = onListCountSetToInfinity;
+
+    NumericKeypad::start(0, data::Value((uint16_t)m_listCount), options, onListCountSet, 0, 0);
+}
+
+void ChSettingsListsPage::onListCountSet(float value) {
+    popPage();
+    ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
+    page->m_listCount = (uint16_t)value;
+}
+
+void ChSettingsListsPage::onListCountSetToInfinity() {
+    popPage();
+    ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
+    page->m_listCount = 0;
+}
+
+void ChSettingsListsPage::editTriggerOnListStop() {
+    pushSelectFromEnumPage(g_channelTriggerOnListStopEnumDefinition, m_triggerOnListStop, 0, onTriggerOnListStopSet);
+}
+
+void ChSettingsListsPage::onTriggerOnListStopSet(uint16_t value) {
+    popPage();
+    ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
+    page->m_triggerOnListStop = (TriggerOnListStop)value;
 }
 
 } // namespace gui

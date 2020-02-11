@@ -652,99 +652,101 @@ void tick() {
             }
         }
 
-        // publish channel state (oe, u_mon, i_mon, u_set, i_set)
-        uint8_t channelIndex = g_lastChannelIndex;
-        Channel &channel = Channel::get(channelIndex);
+        if (CH_NUM > 0) {
+            // publish channel state (oe, u_mon, i_mon, u_set, i_set)
+            uint8_t channelIndex = g_lastChannelIndex;
+            Channel &channel = Channel::get(channelIndex);
 
-        int oe = channel.isOutputEnabled() ? 1 : 0;
+            int oe = channel.isOutputEnabled() ? 1 : 0;
 
-        if (g_lastValueIndex == 0) {
-            if (oe != g_channelStates[channelIndex].oe) {
-                if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_OE, oe, true)) {
-                    g_channelStates[channelIndex].oe = oe;
+            if (g_lastValueIndex == 0) {
+                if (oe != g_channelStates[channelIndex].oe) {
+                    if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_OE, oe, true)) {
+                        g_channelStates[channelIndex].oe = oe;
+                    }
+                }
+            } else {
+                if (g_lastValueIndex == 1) {
+                    if (oe && (tickCount - g_channelStates[channelIndex].uMonTick) >= period) {
+                        float uMon = channel_dispatcher::getUMonLast(channel);
+                        if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_U_MON, uMon, true)) {
+                            g_channelStates[channelIndex].uMonTick = tickCount;
+                        }
+                    }
+                } else if (g_lastValueIndex == 2) {
+                    if (oe && (tickCount - g_channelStates[channelIndex].iMonTick) >= period) {
+                        float iMon = channel_dispatcher::getIMonLast(channel);
+                        if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_I_MON, iMon, true)) {
+                            g_channelStates[channelIndex].iMonTick = tickCount;
+                        }
+                    }
+                } else if (g_lastValueIndex == 3) {
+                    if ((tickCount - g_channelStates[channelIndex].uSetTick) >= period) {
+                        float uSet = channel_dispatcher::getUSet(channel);
+                        if (isNaN(g_channelStates[channelIndex].uSet) || uSet != g_channelStates[channelIndex].uSet) {
+                            if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_U_SET, uSet, true)) {
+                                g_channelStates[channelIndex].uSet = uSet;
+                                g_channelStates[channelIndex].uSetTick = tickCount;
+                            }
+                        }
+                    }
+                } else if (g_lastValueIndex == 4) {
+                    if ((tickCount - g_channelStates[channelIndex].iSetTick) >= period) {
+                        float iSet = channel_dispatcher::getISet(channel);
+                        if (isNaN(g_channelStates[channelIndex].iSet) || iSet != g_channelStates[channelIndex].iSet) {
+                            if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_I_SET, iSet, true)) {
+                                g_channelStates[channelIndex].iSet = iSet;
+                                g_channelStates[channelIndex].iSetTick = tickCount;
+                            }
+                        }
+                    }
+                } else if (g_lastValueIndex == 5) {
+                    // publish channel temperature
+                    if ((tickCount - g_channelStates[channelIndex].temperatureTick) >= period) {
+                        float temperature;
+                        temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::CH1 + channelIndex];
+                        if (tempSensor.isInstalled() && tempSensor.isTestOK()) {
+                            temperature = tempSensor.temperature;
+                        } else {
+                            temperature = NAN;
+                        }
+                        if (isNaN(g_channelStates[channelIndex].temperature) || temperature != g_channelStates[channelIndex].temperature) {
+                            if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_TEMP, temperature, true)) {
+                                g_channelStates[channelIndex].temperature = temperature;
+                                g_channelStates[channelIndex].temperatureTick = tickCount;
+                            }
+                        }
+                    }
+                } else if (g_lastValueIndex == 6) {
+                    // publish total on-time counter
+                    uint32_t totalOnTime = ontime::g_moduleCounters[channel.slotIndex].getTotalTime();
+                    if (totalOnTime != g_channelStates[channelIndex].totalOnTime) {
+                        if (publishOnTimeCounter(channelIndex, PUB_TOPIC_DCPSUPPLY_TOTAL_ONTIME, totalOnTime, true)) {
+                            g_channelStates[channelIndex].totalOnTime = totalOnTime;
+                            if (g_publishing) {
+                                return;
+                            }
+                        }
+                    }
+                } else if (g_lastValueIndex == 7) {
+                    // publish last on-time counter
+                    uint32_t lastOnTime = ontime::g_moduleCounters[channel.slotIndex].getLastTime();
+                    if (lastOnTime != g_channelStates[channelIndex].lastOnTime) {
+                        if (publishOnTimeCounter(channelIndex, PUB_TOPIC_DCPSUPPLY_LAST_ONTIME, lastOnTime, true)) {
+                            g_channelStates[channelIndex].lastOnTime = lastOnTime;
+                            if (g_publishing) {
+                                return;
+                            }
+                        }
+                    }
                 }
             }
-        } else {
-            if (g_lastValueIndex == 1) {
-                if (oe && (tickCount - g_channelStates[channelIndex].uMonTick) >= period) {
-                    float uMon = channel_dispatcher::getUMonLast(channel);
-                    if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_U_MON, uMon, true)) {
-                        g_channelStates[channelIndex].uMonTick = tickCount;
-                    }
-                }
-            } else if (g_lastValueIndex == 2) {
-                if (oe && (tickCount - g_channelStates[channelIndex].iMonTick) >= period) {
-                    float iMon = channel_dispatcher::getIMonLast(channel);
-                    if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_I_MON, iMon, true)) {
-                        g_channelStates[channelIndex].iMonTick = tickCount;
-                    }
-                }
-            } else if (g_lastValueIndex == 3) {
-                if ((tickCount - g_channelStates[channelIndex].uSetTick) >= period) {
-					float uSet = channel_dispatcher::getUSet(channel);
-					if (isNaN(g_channelStates[channelIndex].uSet) || uSet != g_channelStates[channelIndex].uSet) {
-						if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_U_SET, uSet, true)) {
-							g_channelStates[channelIndex].uSet = uSet;
-							g_channelStates[channelIndex].uSetTick = tickCount;
-						}
-					}
-                }
-            } else if (g_lastValueIndex == 4) {
-                if ((tickCount - g_channelStates[channelIndex].iSetTick) >= period) {
-					float iSet = channel_dispatcher::getISet(channel);
-					if (isNaN(g_channelStates[channelIndex].iSet) || iSet != g_channelStates[channelIndex].iSet) {
-						if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_I_SET, iSet, true)) {
-							g_channelStates[channelIndex].iSet = iSet;
-							g_channelStates[channelIndex].iSetTick = tickCount;
-						}
-					}
-				}
-            } else if (g_lastValueIndex == 5) {
-                // publish channel temperature
-                if ((tickCount - g_channelStates[channelIndex].temperatureTick) >= period) {
-                    float temperature;
-                    temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::CH1 + channelIndex];
-                    if (tempSensor.isInstalled() && tempSensor.isTestOK()) {
-                        temperature = tempSensor.temperature;
-                    } else {
-                        temperature = NAN;
-                    }
-                    if (isNaN(g_channelStates[channelIndex].temperature) || temperature != g_channelStates[channelIndex].temperature) {
-                        if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_TEMP, temperature, true)) {
-                            g_channelStates[channelIndex].temperature = temperature;
-                            g_channelStates[channelIndex].temperatureTick = tickCount;
-                        }
-                    }
-                }
-            } else if (g_lastValueIndex == 6) {
-                // publish total on-time counter
-                uint32_t totalOnTime = ontime::g_moduleCounters[channel.slotIndex].getTotalTime();
-                if (totalOnTime != g_channelStates[channelIndex].totalOnTime) {
-                    if (publishOnTimeCounter(channelIndex, PUB_TOPIC_DCPSUPPLY_TOTAL_ONTIME, totalOnTime, true)) {
-                        g_channelStates[channelIndex].totalOnTime = totalOnTime;
-                        if (g_publishing) {
-                            return;
-                        }
-                    }
-                }
-            } else if (g_lastValueIndex == 7) {
-                // publish last on-time counter
-                uint32_t lastOnTime = ontime::g_moduleCounters[channel.slotIndex].getLastTime();
-                if (lastOnTime != g_channelStates[channelIndex].lastOnTime) {
-                    if (publishOnTimeCounter(channelIndex, PUB_TOPIC_DCPSUPPLY_LAST_ONTIME, lastOnTime, true)) {
-                        g_channelStates[channelIndex].lastOnTime = lastOnTime;
-                        if (g_publishing) {
-                            return;
-                        }
-                    }
-                }
-            }
-        }
 
-        if (++g_lastValueIndex == 8) {
-            g_lastValueIndex = 0;
-            if (++g_lastChannelIndex == CH_NUM) {
-                g_lastChannelIndex = 0;
+            if (++g_lastValueIndex == 8) {
+                g_lastValueIndex = 0;
+                if (++g_lastChannelIndex == CH_NUM) {
+                    g_lastChannelIndex = 0;
+                }
             }
         }
 

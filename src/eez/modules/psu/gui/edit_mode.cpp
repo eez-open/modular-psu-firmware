@@ -165,7 +165,7 @@ bool setValue(float floatValue) {
     if (g_isInteractiveMode || g_tabIndex == PAGE_ID_EDIT_MODE_KEYPAD) {
         Value result = data::set(g_focusCursor, g_focusDataId, value);
         if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
-            psuErrorMessage(g_focusCursor, value);
+            psuErrorMessage(g_focusCursor, result);
             return false;
         }
     }
