@@ -85,6 +85,12 @@ void ChSettingsProtectionSetPage::onLimitSet(float value) {
     popPage();
     ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getActivePage();
     page->limit = MakeValue(value, page->limit.getUnit());
+
+    if (page->isLevelLimited) {
+        if (page->level.getFloat() > page->limit.getFloat()) {
+            page->level = page->limit;
+        }
+    }
 }
 
 void ChSettingsProtectionSetPage::editLimit() {
@@ -122,6 +128,10 @@ void ChSettingsProtectionSetPage::editLevel() {
     options.min = minLevel;
     options.max = maxLevel;
     options.def = defLevel;
+
+    if (isLevelLimited) {
+        options.max = limit.getFloat();
+    }
 
     options.enableMaxButton();
     options.enableDefButton();
@@ -174,6 +184,8 @@ void ChSettingsOvpProtectionPage::pageAlloc() {
     minDelay = g_channel->params.OVP_MIN_DELAY;
     maxDelay = g_channel->params.OVP_MAX_DELAY;
     defaultDelay = g_channel->params.OVP_DEFAULT_DELAY;
+
+    isLevelLimited = false;
 }
 
 void ChSettingsOvpProtectionPage::onSetParamsOk() {
@@ -209,6 +221,8 @@ void ChSettingsOcpProtectionPage::pageAlloc() {
     minDelay = g_channel->params.OCP_MIN_DELAY;
     maxDelay = g_channel->params.OCP_MAX_DELAY;
     defaultDelay = g_channel->params.OCP_DEFAULT_DELAY;
+
+    isLevelLimited = false;
 }
 
 void ChSettingsOcpProtectionPage::onSetParamsOk() {
@@ -246,6 +260,8 @@ void ChSettingsOppProtectionPage::pageAlloc() {
     minDelay = g_channel->params.OPP_MIN_DELAY;
     maxDelay = g_channel->params.OPP_MAX_DELAY;
     defaultDelay = g_channel->params.OPP_DEFAULT_DELAY;
+
+    isLevelLimited = true;
 }
 
 void ChSettingsOppProtectionPage::onSetParamsOk() {
@@ -254,8 +270,7 @@ void ChSettingsOppProtectionPage::onSetParamsOk() {
 
 void ChSettingsOppProtectionPage::setParams(bool checkLoad) {
     if (checkLoad && g_channel->isOutputEnabled()) {
-        float pMon =
-            channel_dispatcher::getUMon(*g_channel) * channel_dispatcher::getIMon(*g_channel);
+        float pMon = channel_dispatcher::getUMon(*g_channel) * channel_dispatcher::getIMon(*g_channel);
         if (limit.getFloat() < pMon && channel_dispatcher::getIMon(*g_channel) >= 0) {
             areYouSureWithMessage("This change will affect current load.", onSetParamsOk);
             return;
@@ -287,6 +302,8 @@ void ChSettingsOtpProtectionPage::pageAlloc() {
     minDelay = OTP_AUX_MIN_DELAY;
     maxDelay = OTP_AUX_MAX_DELAY;
     defaultDelay = OTP_CH_DEFAULT_DELAY;
+
+    isLevelLimited = false;
 }
 
 void ChSettingsOtpProtectionPage::setParams(bool checkLoad) {

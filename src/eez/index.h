@@ -100,7 +100,6 @@ struct ChannelParams {
     float OPP_MAX_DELAY;
     float OPP_MIN_LEVEL;
     float OPP_DEFAULT_LEVEL;
-    float OPP_MAX_LEVEL;
 
     float PTOT;
 

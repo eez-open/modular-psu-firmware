@@ -988,6 +988,10 @@ void setPowerLimit(Channel &channel, float limit) {
     } else {
         channel.setPowerLimit(limit);
     }
+
+    if (getOppLevel(channel) > getPowerLimit(channel)) {
+        setOppLevel(channel, getPowerLimit(channel));
+    }
 }
 
 float getOppLevel(Channel &channel) {
@@ -1005,10 +1009,7 @@ float getOppMinLevel(Channel &channel) {
 }
 
 float getOppMaxLevel(Channel &channel) {
-    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        return 2 * MIN(Channel::get(0).params.OPP_MAX_LEVEL, Channel::get(1).params.OPP_MAX_LEVEL);
-    }
-    return channel.params.OPP_MAX_LEVEL;
+    return getPowerLimit(channel);
 }
 
 float getOppDefaultLevel(Channel &channel) {

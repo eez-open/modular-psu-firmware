@@ -213,7 +213,6 @@ struct Channel : ChannelInterface {
 		params.OPP_MAX_DELAY = 300.0f;
 		params.OPP_MIN_LEVEL = 0.0f;
 		params.OPP_DEFAULT_LEVEL = 80.0f;
-		params.OPP_MAX_LEVEL = 80.0f;
 
 		params.PTOT = 77.5f;
 

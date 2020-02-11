@@ -67,6 +67,8 @@ class ChSettingsProtectionSetPage : public SetPage {
     float maxDelay;
     float defaultDelay;
 
+    bool isLevelLimited;
+
     virtual void setParams(bool checkLoad) = 0;
 
     static void onLimitSet(float value);
