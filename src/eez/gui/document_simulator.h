@@ -371,7 +371,9 @@ enum DataEnum {
     DATA_ID_DLOG_ENABLED = 369,
     DATA_ID_FILE_MANAGER_BROWSER_IS_SAVE_DIALOG = 370,
     DATA_ID_CHANNEL_CALIBRATION_STEP_NOTE = 371,
-    DATA_ID_CHANNEL_CALIBRATION_HAS_STEP_NOTE = 372
+    DATA_ID_CHANNEL_CALIBRATION_HAS_STEP_NOTE = 372,
+    DATA_ID_FILE_MANAGER_STORAGE_INFO = 373,
+    DATA_ID_FILE_MANAGER_STORAGE_ALARM = 374
 };
 
 void data_none(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -747,6 +749,8 @@ void data_dlog_enabled(DataOperationEnum operation, Cursor &cursor, Value &value
 void data_file_manager_browser_is_save_dialog(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_channel_calibration_step_note(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_channel_calibration_has_step_note(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_file_manager_storage_info(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_file_manager_storage_alarm(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -1609,7 +1613,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[393373];
+extern const uint8_t assets[393495];
 #else
-extern const uint8_t assets[3864200];
+extern const uint8_t assets[3864408];
 #endif

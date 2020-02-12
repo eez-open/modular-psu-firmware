@@ -83,6 +83,9 @@ void newFile();
 void doLoadDirectory();
 void doRenameFile();
 
+bool isStorageAlarm();
+void getStorageInfo(Value &value);
+
 } // namespace file_manager
 } // namespace gui
 } // namespace eez

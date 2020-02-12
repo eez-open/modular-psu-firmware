@@ -97,6 +97,7 @@ enum UserValueType {
     VALUE_TYPE_DEBUG_TRACE_LOG_STR,
     VALUE_TYPE_TEST_RESULT,
     VALUE_TYPE_SCPI_ERROR,
+    VALUE_TYPE_STORAGE_INFO,
 };
 
 Value MakeValue(float value, Unit unit);

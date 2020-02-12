@@ -700,6 +700,25 @@ void newFile() {
     }
 }
 
+bool isStorageAlarm() {
+    uint64_t usedSpace;
+    uint64_t freeSpace;
+    if (psu::sd_card::getInfo(usedSpace, freeSpace, true)) { // "true" means get storage info from cache
+        auto totalSpace = usedSpace + freeSpace;
+        auto percent = (int)floor(100.0 * freeSpace / totalSpace);
+        if (percent >= 10) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void getStorageInfo(Value& value) {
+    if (!g_fileBrowserMode && (isStorageAlarm() || !*g_currentDirectory || strcmp(g_currentDirectory, "/") == 0)) {
+        value = Value(millis(), VALUE_TYPE_STORAGE_INFO);
+    }
+}
+
 }
 }
 
@@ -720,6 +739,11 @@ void onSdCardFileChangeHook(const char *filePath1, const char *filePath2) {
     if (filePath2) {
         onSdCardFileChangeHook(filePath2);
     }
+
+    // invalidate storage info cache
+    uint64_t usedSpace;
+    uint64_t freeSpace;
+    psu::sd_card::getInfo(usedSpace, freeSpace, false); // "false" means **do not** get storage info from cache
 }
 
 } // namespace eez::gui::file_manager

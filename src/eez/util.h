@@ -123,6 +123,6 @@ bool startsWith(const char *str, const char *prefix);
 bool endsWith(const char *str, const char *suffix);
 bool endsWithNoCase(const char *str, const char *suffix);
 
-void formatBytes(uint32_t bytes, char *text, int count);
+void formatBytes(uint64_t bytes, char *text, int count);
 
 } // namespace eez

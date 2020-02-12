@@ -923,6 +923,35 @@ void SCPI_ERROR_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
+bool compare_STORAGE_INFO_value(const Value &a, const Value &b) {
+    return abs((int)(a.getUInt32() - b.getUInt32())) <= 1000;
+}
+
+void STORAGE_INFO_value_to_text(const Value &value, char *text, int count) {
+    uint64_t usedSpace;
+    uint64_t freeSpace;
+    if (sd_card::getInfo(usedSpace, freeSpace, true)) { // "true" means get storage info from cache
+        auto totalSpace = usedSpace + freeSpace;
+
+        formatBytes(freeSpace, text, count -1);
+        auto n = strlen(text);
+        auto countLeft = count - n - 1;
+        if (countLeft > 0) {
+            auto percent = (int)floor(100.0 * freeSpace / totalSpace);
+            snprintf(text + n, countLeft, " (%d%%) free of ", percent);
+            text[count - 1] = 0;
+            n = strlen(text);
+            countLeft = count - n - 1;
+            if (countLeft > 0) {
+                formatBytes(totalSpace, text + n, countLeft);
+            }
+        }
+    } else {
+        strncpy(text, "Calculating storage info...", count - 1);
+        text[count - 1] = 0;
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 } // namespace gui
@@ -982,6 +1011,7 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_DEBUG_TRACE_LOG_STR_value,
     compare_TEST_RESULT_value,
     compare_SCPI_ERROR_value,
+    compare_STORAGE_INFO_value,
 };
 
 ValueToTextFunction g_userValueToTextFunctions[] = { 
@@ -1034,6 +1064,7 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     DEBUG_TRACE_LOG_STR_value_to_text,
     TEST_RESULT_value_to_text,
     SCPI_ERROR_value_to_text,
+    STORAGE_INFO_value_to_text,
 };
 
 } // namespace data
@@ -5347,6 +5378,18 @@ void data_file_manager_browser_title(data::DataOperationEnum operation, data::Cu
 void data_file_manager_browser_is_save_dialog(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = file_manager::isSaveDialog();
+    }
+}
+
+void data_file_manager_storage_alarm(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_manager::isStorageAlarm();
+    }
+}
+
+void data_file_manager_storage_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        file_manager::getStorageInfo(value);
     }
 }
 

@@ -924,8 +924,18 @@ bool getTime(const char *filePath, uint8_t &hour, uint8_t &minute, uint8_t &seco
     return true;
 }
 
-bool getInfo(uint64_t &usedSpace, uint64_t &freeSpace) {
-    return SD.getInfo(usedSpace, freeSpace);
+bool getInfo(uint64_t &usedSpace, uint64_t &freeSpace, bool fromCache) {
+    static bool g_result;
+    static uint64_t g_usedSpace;
+    static uint64_t g_freeSpace;
+
+    if (!g_result || !fromCache) {
+        g_result = SD.getInfo(g_usedSpace, g_freeSpace);
+    }
+
+    usedSpace = g_usedSpace;
+    freeSpace = g_freeSpace;
+    return g_result;
 }
 
 bool confRead(uint8_t *buffer, uint16_t buffer_size, uint16_t address) {

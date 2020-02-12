@@ -575,21 +575,17 @@ bool endsWithNoCase(const char *str, const char *suffix) {
     return strncicmp(str + strLen - suffixLen, suffix, suffixLen) == 0;
 }
 
-void formatBytes(uint32_t bytes, char *text, int count) {
+void formatBytes(uint64_t bytes, char *text, int count) {
     if (bytes == 0) {
-        strcpy(text, "0 Bytes");
-        return;
+        strncpy(text, "0 Bytes", count - 1);
+    } else {
+        double c = 1024.0;
+        const char *e[] = { "Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+        uint64_t f = (uint64_t)floor(log((double)bytes) / log(c));
+        double g = round((bytes / pow(c, (double)f)) * 100) / 100;
+        snprintf(text, count - 1, "%g %s", g, e[f]);
     }
-
-    float c = 1024.0f;
-
-    const char *e[] = { "Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-
-    uint32_t f = (int)floorf(logf((float)bytes) / logf(c));
-
-    float g = roundf((bytes / powf(c, (float)f)) * 100) / 100;
-
-    snprintf(text, count - 1, "%g %s", g, e[f]);
+    text[count - 1] = 0;
 }
 
 } // namespace eez
