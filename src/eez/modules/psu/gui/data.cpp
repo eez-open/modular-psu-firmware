@@ -3265,11 +3265,7 @@ void data_sys_info_fan_status(data::DataOperationEnum operation, data::Cursor &c
         if (aux_ps::fan::g_testResult == TEST_FAILED || aux_ps::fan::g_testResult == TEST_WARNING) {
             value = 0;
         } else if (aux_ps::fan::g_testResult == TEST_OK) {
-#if FAN_OPTION_RPM_MEASUREMENT
             value = 1;
-#else
-            value = 2;
-#endif
         } else if (aux_ps::fan::g_testResult == TEST_NONE) {
             value = 3;
         } else {
@@ -3282,7 +3278,7 @@ void data_sys_info_fan_status(data::DataOperationEnum operation, data::Cursor &c
 }
 
 void data_sys_info_fan_speed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-#if OPTION_FAN && FAN_OPTION_RPM_MEASUREMENT
+#if OPTION_FAN 
     if (operation == data::DATA_OPERATION_GET) {
         if (aux_ps::fan::g_testResult == TEST_OK) {
             value = MakeValue((float)aux_ps::fan::g_rpm, UNIT_RPM);
@@ -3304,7 +3300,7 @@ void data_sys_fan_speed(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
         if (page) {
-            value = page->fanSpeed;
+            value = page->fanSpeedPercentage;
         }
     }
 }

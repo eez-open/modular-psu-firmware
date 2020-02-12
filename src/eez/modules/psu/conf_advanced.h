@@ -136,7 +136,7 @@
 #define FAN_SPEED_ADJUSTMENT_INTERVAL 500
 
 /// Interval at which fan speed should be measured
-#define FAN_SPEED_MEASURMENT_INTERVAL 5000
+#define FAN_SPEED_MEASURMENT_INTERVAL 1500
 
 /// Fan switch-on temperature (in oC)
 #define FAN_MIN_TEMP 50
@@ -175,10 +175,6 @@
 /// Temperature drop (in oC) below FAN_MAX_TEMP to turn again main power on. Premature attempt to
 /// turn power on will report error -200.
 #define FAN_MAX_TEMP_DROP 15
-
-/// Enable/disable RPM measurement during work - it will still be enabled at the boot during fan
-/// test.
-#define FAN_OPTION_RPM_MEASUREMENT 1
 
 /// Interval (in minutes) at which "on time" will be written to EEPROM
 #define WRITE_ONTIME_INTERVAL 10

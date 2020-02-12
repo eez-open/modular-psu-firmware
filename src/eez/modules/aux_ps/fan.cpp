@@ -112,6 +112,64 @@ uint8_t g_cr3 = 0;
 
 uint32_t g_fanSpeedLastMeasuredTick;
 
+////////////////////////////////////////////////////////////////////////////////
+
+class PWMMeasurement {
+public:
+	void addMeasurement(int pwm, int rpm) {
+		// DebugTrace("%d pwm = %d rpm\n", pwm, rpm);
+		measurements[pwm] = rpm;
+	}
+
+	int measurePWM(int speedPercentage, int &rpm) {
+    	rpm = 0;
+
+    	int a = FAN_MIN_PWM;
+        int b = FAN_MAX_PWM;
+
+        if (measurements[a] == 0) {
+        	return a;
+		}
+
+        if (measurements[b] == 0) {
+        	return b;
+		}
+
+        int target = measurements[a] + (speedPercentage - 1) * (measurements[b] - measurements[a]) / 99;
+
+        for (int i = a; i < b; i++) {
+			if (measurements[i] != 0) {
+				if (measurements[i] >= target)  {
+					break;
+				}
+				a = i;
+			}
+        }
+
+        for (int i = b; i > a; i--) {
+			if (measurements[i] != 0) {
+				if (measurements[i] <= target)  {
+					break;
+				}
+				b = i;
+			}
+        }
+
+		int pwm = (a + b) / 2;
+
+        rpm = measurements[pwm];
+
+        return pwm;
+	}
+
+private:
+	int measurements[256];
+};
+
+PWMMeasurement g_pwmMeasurement;
+
+////////////////////////////////////////////////////////////////////////////////
+
 HAL_StatusTypeDef readReg(uint8_t reg, uint8_t *value) {
     HAL_StatusTypeDef returnValue = HAL_I2C_Master_Transmit(&hi2c1, MAX31760_DEVICE_ADDRESS, &reg, 1, 5);
     if (returnValue != HAL_OK) {
@@ -373,7 +431,7 @@ void checkTest() {
 
 #endif
 
-void updateFanSpeed() {
+int updateFanSpeed() {
     int newFanSpeedPWM = g_fanSpeedPWM;
 
     uint8_t fanMode;
@@ -381,20 +439,34 @@ void updateFanSpeed() {
     auto page = (psu::gui::SysSettingsTemperaturePage *)psu::gui::g_psuAppContext.getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
     if (page) {
         fanMode = page->fanMode;
-        fanSpeed = (uint8_t)page->fanSpeed.getFloat();
+        fanSpeed = page->fanSpeedPWM;
     } else {
         fanMode = psu::persist_conf::devConf.fanMode;
-        fanSpeed = psu::persist_conf::devConf.fanSpeed;
+        fanSpeed = psu::persist_conf::devConf.fanSpeedPWM;
     }
 
     if (fanMode == FAN_MODE_MANUAL) {
         if (fanSpeed == 0) {
             newFanSpeedPWM = 0;
         } else {
-            newFanSpeedPWM = FAN_MIN_PWM + fanSpeed * (FAN_MAX_PWM - FAN_MIN_PWM) / 100;
-            if (newFanSpeedPWM > FAN_MAX_PWM) {
+        	if (page && page->fanPWMMeasuringInProgress) {
+#if defined(EEZ_PLATFORM_STM32)
+        		int rpm;
+				newFanSpeedPWM = g_pwmMeasurement.measurePWM((uint8_t)page->fanSpeedPercentage.getFloat(), rpm);
+				if (rpm != 0) {
+					page->fanSpeedPWM = newFanSpeedPWM;
+					page->fanPWMMeasuringInProgress = false;
+					g_rpm = rpm;
+				}
+#else
                 newFanSpeedPWM = FAN_MAX_PWM;
-            }
+				page->fanSpeedPWM = newFanSpeedPWM;
+				page->fanPWMMeasuringInProgress = false;
+#endif
+        		page->fanSpeedPWM = newFanSpeedPWM;
+        	} else {
+        		newFanSpeedPWM = fanSpeed;
+        	}
         }
     } else {
         // adjust fan speed depending on max. channel temperature
@@ -425,12 +497,7 @@ void updateFanSpeed() {
         }
     }
 
-    if (newFanSpeedPWM != g_fanSpeedPWM) {
-        g_fanSpeedPWM = newFanSpeedPWM;
-#if defined(EEZ_PLATFORM_STM32)
-        setPwmDutyCycle(g_fanSpeedPWM);
-#endif
-    }
+	return newFanSpeedPWM;
 }
 
 void tick(uint32_t tickCount) {
@@ -445,26 +512,34 @@ void tick(uint32_t tickCount) {
         return;
     }
 
-    updateFanSpeed();
+#if defined(EEZ_PLATFORM_STM32)
+	int32_t diff = tickCount - g_fanSpeedLastMeasuredTick;
+	if (diff >= FAN_SPEED_MEASURMENT_INTERVAL * 1000L) {
+	    g_fanSpeedLastMeasuredTick = tickCount;
 
-#if FAN_OPTION_RPM_MEASUREMENT && defined(EEZ_PLATFORM_STM32)
-	if (g_fanSpeedPWM != 0) {
-		int32_t diff = tickCount - g_fanSpeedLastMeasuredTick;
-		if (diff >= FAN_SPEED_MEASURMENT_INTERVAL * 1000L) {
-			g_fanSpeedLastMeasuredTick = tickCount;
+	    if (g_fanSpeedPWM != 0) {
 			if (checkStatus()) {
 				float rpm;
 				if (readRpm(REG_TC1H, CONF_NUM_TACH_PULSES_PER_REVOLUTION, &rpm) == HAL_OK) {
 					g_rpm = (int)roundf(rpm);
+					g_pwmMeasurement.addMeasurement(g_fanSpeedPWM, g_rpm);
 				}
 			}
 		}
-	} else {
-		g_rpm = 0;
+
+	    int newFanSpeedPWM = updateFanSpeed();
+	    if (newFanSpeedPWM != g_fanSpeedPWM) {
+	    	g_fanSpeedPWM = newFanSpeedPWM;
+	    	setPwmDutyCycle(g_fanSpeedPWM);
+	    	if (g_fanSpeedPWM == 0) {
+	    		g_rpm = 0;
+	    	}
+	    }
 	}
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
+	g_fanSpeedPWM = updateFanSpeed();
     if (g_fanSpeedPWM != 0) {
         g_rpm = (int)roundf(remap(1.0f * g_fanSpeedPWM, FAN_MIN_PWM, 500, FAN_MAX_PWM, 3200));
     } else {

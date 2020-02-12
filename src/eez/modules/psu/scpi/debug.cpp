@@ -250,34 +250,13 @@ scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_debugFan(scpi_t *context) {
-#if OPTION_FAN
-    int32_t fanSpeed;
-    if (!SCPI_ParamInt(context, &fanSpeed, TRUE)) {
-        return SCPI_RES_ERR;
-    }
-
-    if (fanSpeed < 0) {
-        persist_conf::setFanSettings(FAN_MODE_AUTO, 100);
-    } else {
-        persist_conf::setFanSettings(FAN_MODE_MANUAL, (uint8_t)MIN(fanSpeed, 100));
-    }
-
-    return SCPI_RES_OK;
-#else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
     return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_debugFanQ(scpi_t *context) {
-#if OPTION_FAN
-    SCPI_ResultInt(context, persist_conf::devConf.fanMode == FAN_MODE_MANUAL ? persist_conf::devConf.fanSpeed : -1);
-
-    return SCPI_RES_OK;
-#else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
     return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_debugFanPid(scpi_t *context) {

@@ -49,6 +49,8 @@ using namespace eez::mcu::display;
 
 #include <eez/gui/widgets/yt_graph.h>
 
+#include <eez/modules/aux_ps/fan.h>
+
 #define NUM_RETRIES 3
 
 namespace eez {
@@ -90,6 +92,7 @@ static DevConfBlock g_devConfBlocks[] = {
     { offsetof(DeviceConfiguration, ytGraphUpdateMethod), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, userSwitchAction), 1, false, 0, 60 * 1000, 0 },
     { offsetof(DeviceConfiguration, ethernetHostName), 1, false, 0, 0, 0 },
+    { offsetof(DeviceConfiguration, fanMode), 1, false, 0, 0, 0 },
     { sizeof(DeviceConfiguration), 1, false, 0, 0, 0 },
 };
 
@@ -178,12 +181,17 @@ void initDefaultDevConf() {
     g_defaultDevConf.userSwitchAction = USER_SWITCH_ACTION_ENCODER_STEP;
     g_defaultDevConf.sortFilesOption = SORT_FILES_BY_TIME_DESC;
 
-    // block 7
+    // block 8
     strcpy(g_defaultDevConf.ethernetHostName, DEFAULT_ETHERNET_HOST_NAME);
     
     g_defaultDevConf.mqttEnabled = 0;
     g_defaultDevConf.mqttPort = 1883;
     g_defaultDevConf.mqttPeriod = 1.0f;
+
+    // block 9
+    g_defaultDevConf.fanMode = FAN_MODE_AUTO;
+    g_defaultDevConf.fanSpeedPercentage = 100;
+    g_defaultDevConf.fanSpeedPWM = FAN_MAX_PWM;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1185,9 +1193,10 @@ void setTouchscreenCalParams(int16_t touchScreenCalTlx, int16_t touchScreenCalTl
     g_devConf.touchScreenCalTry = touchScreenCalTry;
 }
 
-void setFanSettings(uint8_t fanMode, uint8_t fanSpeed) {
+void setFanSettings(uint8_t fanMode, uint8_t fanSpeedPercentage, uint8_t fanSpeedPWM) {
     g_devConf.fanMode = fanMode;
-    g_devConf.fanSpeed = fanSpeed;
+    g_devConf.fanSpeedPercentage = fanSpeedPercentage;
+    g_devConf.fanSpeedPWM = fanSpeedPWM;
 }
 
 void setDateValid(unsigned dateValid) {

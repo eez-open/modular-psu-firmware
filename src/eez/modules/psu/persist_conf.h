@@ -122,8 +122,8 @@ struct DeviceConfiguration {
     char ntpServer[32 + 1];
     uint8_t ethernetMacAddress[6];
 
-    uint8_t fanMode;
-    uint8_t fanSpeed;
+    uint8_t reserved2;
+    uint8_t reserved3;
 
     uint8_t encoderMovingSpeedDown;
     uint8_t encoderMovingSpeedUp;
@@ -178,6 +178,11 @@ struct DeviceConfiguration {
     char mqttUsername[32 + 1];
     char mqttPassword[32 + 1];
     float mqttPeriod;
+
+    // block 9
+    uint8_t fanMode;
+    uint8_t fanSpeedPercentage;
+    uint8_t fanSpeedPWM;
 };
 
 extern const DeviceConfiguration &devConf;
@@ -290,7 +295,7 @@ void setAnimationsDuration(float value);
 
 void setTouchscreenCalParams(int16_t touchScreenCalTlx, int16_t touchScreenCalTly, int16_t touchScreenCalBrx, int16_t touchScreenCalBry, int16_t touchScreenCalTrx, int16_t touchScreenCalTry);
 
-void setFanSettings(uint8_t fanMode, uint8_t fanSpeed);
+void setFanSettings(uint8_t fanMode, uint8_t fanSpeedPercentage, uint8_t fanSpeedPWM);
 
 void setDateValid(unsigned dateValid);
 void setTimeValid(unsigned timeValid);

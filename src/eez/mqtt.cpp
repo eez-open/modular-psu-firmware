@@ -447,11 +447,7 @@ bool publishFanStatus(const char *pubTopic, TestResult fanTestResult, int rpm, b
     if (fanTestResult == TEST_FAILED || fanTestResult == TEST_WARNING) {
         strcpy(payload, "Fault");
     } else if (fanTestResult == TEST_OK) {
-#if FAN_OPTION_RPM_MEASUREMENT
         snprintf(payload, MAX_PAYLOAD_LENGTH, "%drpm", rpm);
-#else
-        strcpy(payload, "Unsupported");
-#endif
     } else if (fanTestResult == TEST_NONE) {
         strcpy(payload, "Testing...");
     } else {

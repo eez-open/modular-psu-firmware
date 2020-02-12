@@ -390,11 +390,7 @@ scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_diagnosticInformationFanQ(scpi_t *context) {
-#if OPTION_FAN && FAN_OPTION_RPM_MEASUREMENT
     SCPI_ResultInt(context, aux_ps::fan::g_rpm);
-#else
-    SCPI_ResultInt(context, -1);
-#endif
 
     return SCPI_RES_OK;
 }

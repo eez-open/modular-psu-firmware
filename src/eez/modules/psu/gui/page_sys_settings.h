@@ -213,7 +213,9 @@ class SysSettingsTemperaturePage : public SetPage {
     data::Value delay;
 
     int fanMode;
-    data::Value fanSpeed;
+    data::Value fanSpeedPercentage;
+    int fanSpeedPWM;
+    bool fanPWMMeasuringInProgress;
 
   protected:
     int origState;
@@ -229,13 +231,14 @@ class SysSettingsTemperaturePage : public SetPage {
     float defaultDelay;
 
     int origFanMode;
-    data::Value origFanSpeed;
+    data::Value origFanSpeedPercentage;
 
     virtual void setParams();
 
     static void onLevelSet(float value);
     static void onDelaySet(float value);
     static void onFanSpeedSet(float value);
+    static void isFanPWMMeasuringDone();
 };
 
 class SysSettingsSoundPage : public Page {

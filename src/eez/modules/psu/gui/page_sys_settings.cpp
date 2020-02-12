@@ -530,11 +530,13 @@ void SysSettingsTemperaturePage::pageAlloc() {
     defaultDelay = OTP_CH_DEFAULT_DELAY;
 
     origFanMode = fanMode = persist_conf::devConf.fanMode;
-    origFanSpeed = fanSpeed = MakeValue(fanMode == FAN_MODE_AUTO ? 100.0f : 1.0f * persist_conf::devConf.fanSpeed, UNIT_PERCENT);
+    origFanSpeedPercentage = fanSpeedPercentage = MakeValue(fanMode == FAN_MODE_AUTO ? 100.0f : 1.0f * persist_conf::devConf.fanSpeedPercentage, UNIT_PERCENT);
+    fanSpeedPWM = persist_conf::devConf.fanSpeedPWM;
+    fanPWMMeasuringInProgress = false;
 }
 
 int SysSettingsTemperaturePage::getDirty() {
-    return (origState != state || origLevel != level || origDelay != delay || origFanMode != fanMode || origFanSpeed != fanSpeed) ? 1 : 0;
+    return (origState != state || origLevel != level || origDelay != delay || origFanMode != fanMode || origFanSpeedPercentage != fanSpeedPercentage) ? 1 : 0;
 }
 
 void SysSettingsTemperaturePage::set() {
@@ -600,7 +602,25 @@ void SysSettingsTemperaturePage::toggleFanMode() {
 void SysSettingsTemperaturePage::onFanSpeedSet(float value) {
     popPage();
     SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getActivePage();
-    page->fanSpeed = MakeValue(value, UNIT_PERCENT);
+    if (value != page->fanSpeedPercentage.getFloat()) {
+        page->fanSpeedPercentage = MakeValue(value, UNIT_PERCENT);
+        if ((uint8_t)value == 0) {
+            page->fanSpeedPWM = 0;
+        } else if ((uint8_t)value == 100) {
+            page->fanSpeedPWM = FAN_MAX_PWM;
+        } else {
+            page->fanSpeedPWM = FAN_MAX_PWM;
+            page->fanPWMMeasuringInProgress = true;
+            showAsyncOperationInProgress("Measuring PWM...", isFanPWMMeasuringDone);
+        }
+    }
+}
+
+void SysSettingsTemperaturePage::isFanPWMMeasuringDone() {
+    auto page = (psu::gui::SysSettingsTemperaturePage *)psu::gui::g_psuAppContext.getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
+    if (!page->fanPWMMeasuringInProgress) {
+        hideAsyncOperationInProgress();
+    }
 }
 
 void SysSettingsTemperaturePage::editFanSpeed() {
@@ -617,7 +637,7 @@ void SysSettingsTemperaturePage::editFanSpeed() {
     options.flags.signButtonEnabled = false;
     options.flags.dotButtonEnabled = false;
 
-    NumericKeypad::start(0, fanSpeed, options, onFanSpeedSet, 0, 0);
+    NumericKeypad::start(0, fanSpeedPercentage, options, onFanSpeedSet, 0, 0);
 }
 
 void SysSettingsTemperaturePage::setParams() {
@@ -625,7 +645,7 @@ void SysSettingsTemperaturePage::setParams() {
     temperature::sensors[temp_sensor::AUX].prot_conf.level = level.getFloat();
     temperature::sensors[temp_sensor::AUX].prot_conf.delay = delay.getFloat();
 
-    persist_conf::setFanSettings(fanMode, (uint8_t)roundf(fanSpeed.getFloat()));
+    persist_conf::setFanSettings(fanMode, (uint8_t)roundf(fanSpeedPercentage.getFloat()), fanSpeedPWM);
 
     popPage();
     infoMessage("Aux temp. protection changed!");

@@ -16,15 +16,13 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if OPTION_DISPLAY
+#if OPTION_DISPLAY && OPTION_ENCODER
 
 #include <math.h>
 
 #include <eez/system.h>
 #include <eez/debug.h>
 #include <eez/util.h>
-
-#if OPTION_ENCODER
 
 #include <eez/modules/mcu/encoder.h>
 
@@ -206,7 +204,5 @@ void setUseSameSpeed(bool enable) {
 } // namespace encoder
 } // namespace mcu
 } // namespace eez
-
-#endif
 
 #endif
