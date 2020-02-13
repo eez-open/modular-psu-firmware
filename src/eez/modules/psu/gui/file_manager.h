@@ -25,7 +25,8 @@ namespace file_manager {
 enum State {
     STATE_STARTING,
     STATE_LOADING,
-    STATE_READY
+    STATE_READY,
+    STATE_NOT_PRESENT
 };
 
 SortFilesOption getSortFilesOption();
@@ -82,6 +83,7 @@ void newFile();
 
 void doLoadDirectory();
 void doRenameFile();
+void onSdCardMountedChange();
 
 bool isStorageAlarm();
 void getStorageInfo(Value &value);

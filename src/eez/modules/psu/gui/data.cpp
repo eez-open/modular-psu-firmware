@@ -924,7 +924,7 @@ void SCPI_ERROR_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_STORAGE_INFO_value(const Value &a, const Value &b) {
-    return abs((int)(a.getUInt32() - b.getUInt32())) <= 1000;
+    return a.getInt() == b.getInt();
 }
 
 void STORAGE_INFO_value_to_text(const Value &value, char *text, int count) {

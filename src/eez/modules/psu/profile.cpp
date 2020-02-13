@@ -92,9 +92,7 @@ static bool isProfile0Dirty();
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
-    for (int profileIndex = 1; profileIndex < NUM_PROFILE_LOCATIONS; profileIndex++) {
-		loadProfileName(profileIndex);
-    }
+	onAfterSdCardMounted();
 }
 
 void tick() {
@@ -104,6 +102,12 @@ void tick() {
         if (isTickSaveAllowed() && isAutoSaveAllowed() && isProfile0Dirty()) {
             saveStateToProfile0(true);
         }
+    }
+}
+
+void onAfterSdCardMounted() {
+    for (int profileIndex = 1; profileIndex < NUM_PROFILE_LOCATIONS; profileIndex++) {
+		loadProfileName(profileIndex);
     }
 }
 
@@ -152,10 +156,12 @@ bool recallFromLocation(int location, int recallOptions, bool showProgress, int 
     }
 
     if (location == 0) {
-        // save to cache
-        memcpy(&g_profilesCache[0], &profile, sizeof(profile));
-        saveState(g_profilesCache[0], g_listsProfile0);
-        g_profilesCache[0].loadStatus = LOAD_STATUS_LOADED;
+        if (!(recallOptions & profile::RECALL_OPTION_IGNORE_POWER)) {
+            // save to cache
+            memcpy(&g_profilesCache[0], &profile, sizeof(profile));
+            saveState(g_profilesCache[0], g_listsProfile0);
+            g_profilesCache[0].loadStatus = LOAD_STATUS_LOADED;
+        }
     } else {
         event_queue::pushEvent(event_queue::EVENT_INFO_RECALL_FROM_PROFILE_0 + location);
 
@@ -1437,9 +1443,8 @@ static bool loadProfileFromFile(const char *filePath, Parameters &profile, List 
 ////////////////////////////////////////////////////////////////////////////////
 
 static bool doSaveToLastLocation(int *err) {
-    Parameters profile;
     memset(&g_profilesCache[NUM_PROFILE_LOCATIONS - 1], 0, sizeof(Parameters));
-    saveState(profile, g_listsProfile10);
+    saveState(g_profilesCache[NUM_PROFILE_LOCATIONS - 1], g_listsProfile10);
     return true;
 }
 

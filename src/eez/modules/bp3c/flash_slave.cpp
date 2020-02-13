@@ -27,6 +27,7 @@
 #include "eez/modules/psu/datetime.h"
 #include "eez/modules/psu/profile.h"
 #include "eez/modules/psu/channel_dispatcher.h"
+#include "eez/modules/psu/sd_card.h"
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/bp3c/io_exp.h>
@@ -322,8 +323,9 @@ bool writeMemory(uint32_t address, const uint8_t *buffer, uint32_t bufferSize) {
 void enterBootloaderMode(int slotIndex) {
     g_bootloaderMode = true;
 
-#if defined(EEZ_PLATFORM_STM32)
     psu::profile::saveToLocation(10);
+
+#if defined(EEZ_PLATFORM_STM32)
 
     reset();
 
@@ -380,12 +382,10 @@ void leaveBootloaderMode() {
 #endif
 
     g_bootloaderMode = false;
-
-#if defined(EEZ_PLATFORM_STM32)
     psu::profile::recallFromLocation(10);
 
+#if defined(EEZ_PLATFORM_STM32)
     HAL_UART_DeInit(phuart);
-
     psu::io_pins::refresh();
 #endif
 }
@@ -408,7 +408,7 @@ uint8_t hex(uint8_t digit) {
 	}
 }
 
-bool readHexRecord(File &file, HexRecord &hexRecord) {
+bool readHexRecord(psu::sd_card::BufferedFileRead &file, HexRecord &hexRecord) {
 	uint8_t buffer[512];
 
 	int bytes = file.read(buffer, 9);
@@ -488,7 +488,8 @@ void uploadHexFile() {
 
 	bool eofReached = false;
     File file;
-	size_t totalSize = 0;
+    psu::sd_card::BufferedFileRead bufferedFile(file);
+    size_t totalSize = 0;
 	HexRecord hexRecord;
 	uint32_t addressUpperBits = 0;
 
@@ -510,7 +511,7 @@ void uploadHexFile() {
     totalSize = file.size();
 #endif
 
-	while (!eofReached && readHexRecord(file, hexRecord)) {
+	while (!eofReached && readHexRecord(bufferedFile, hexRecord)) {
 
 #if OPTION_DISPLAY
         eez::psu::gui::PsuAppContext::updateProgressPage(file.tell(), totalSize);

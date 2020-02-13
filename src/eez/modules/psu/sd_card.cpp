@@ -25,6 +25,8 @@
 #include <fatfs.h>
 #endif
 
+#include <eez/firmware.h>
+
 #include <eez/modules/psu/psu.h>
 
 #include <scpi/scpi.h>
@@ -36,6 +38,8 @@
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/scpi/psu.h>
+#include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/file_manager.h>
 
 #if OPTION_DISPLAY
 #include <eez/modules/psu/gui/psu.h>
@@ -43,7 +47,11 @@
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
+#if defined(EEZ_PLATFORM_STM32)
 extern "C" int g_sdCardIsPresent;
+#endif
+
+#define CONF_DEBOUNCE_TIMEOUT_MS 500
 
 namespace eez {
 
@@ -54,98 +62,47 @@ using namespace scpi;
 namespace psu {
 namespace sd_card {
 
-bool g_mounted;
+enum State {
+    STATE_START,
+    STATE_MOUNTED,
+    STATE_MOUNT_FAILED,
+    STATE_UNMOUNTED,
+    STATE_DEBOUNCE
+};
 
+enum Event {
+    EVENT_CARD_PRESENT,
+    EVENT_CARD_NOT_PRESENT,
+    EVENT_DEBOUNCE_TIMEOUT
+};
+
+static State g_state;
 TestResult g_testResult = TEST_FAILED;
 int g_lastError;
 
+static File g_downloadFile;
+static char g_downloadFilePath[MAX_PATH_LENGTH + 1];
+
+static uint32_t g_getInfoVersion;
+
+static uint32_t g_debounceTimeout;
+
 ////////////////////////////////////////////////////////////////////////////////
 
-bool prepareCard() {
-    int err;
+static void stateTransition(Event event);
+static void testTimeoutEvent(uint32_t &timeout, Event timeoutEvent);
 
-    if (!exists(LISTS_DIR, &err)) {
-        if (!makeDir(LISTS_DIR, &err)) {
-            return false;
-        }
-    }
-
-    if (!exists(PROFILES_DIR, &err)) {
-        if (!makeDir(PROFILES_DIR, &err)) {
-            return false;
-        }
-    }
-
-    if (!exists(RECORDINGS_DIR, &err)) {
-        if (!makeDir(RECORDINGS_DIR, &err)) {
-            return false;
-        }
-    }
-
-    if (!exists(SCREENSHOTS_DIR, &err)) {
-        if (!makeDir(SCREENSHOTS_DIR, &err)) {
-            return false;
-        }
-    }
-
-    if (!exists(SCRIPTS_DIR, &err)) {
-        if (!makeDir(SCRIPTS_DIR, &err)) {
-            return false;
-        }
-    }
-
-    if (!exists(UPDATES_DIR, &err)) {
-        if (!makeDir(UPDATES_DIR, &err)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void mount() {
-#if defined(EEZ_PLATFORM_STM32)
-	MX_FATFS_Init();
-#endif
-	if (SD.mount(&g_lastError)) {
-        g_mounted = true;
-        if (prepareCard()) {
-            g_testResult = TEST_OK;
-            setQuesBits(QUES_MMEM, false);
-        } else {
-            g_mounted = false;
-            g_testResult = TEST_FAILED;
-        }
-	} else {
-		g_testResult = TEST_FAILED;
-	}
-}
-
-void unmount() {
-    SD.unmount();
-#if defined(EEZ_PLATFORM_STM32)
-	FATFS_UnLinkDriver(SDPath);
-#endif
-	g_mounted = false;
-    g_lastError = SCPI_ERROR_MISSING_MASS_MEDIA;
-	g_testResult = TEST_FAILED;
-	setQuesBits(QUES_MMEM, true);
-}
+////////////////////////////////////////////////////////////////////////////////
 
 void init() {
 #if defined(EEZ_PLATFORM_STM32)
     MX_SDMMC1_SD_Init();
 	g_sdCardIsPresent = HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin) == GPIO_PIN_RESET ? 1 : 0;
-	if (g_sdCardIsPresent) {
-		mount();
-	} else {
-        g_lastError = SCPI_ERROR_MISSING_MASS_MEDIA;
-        g_testResult = TEST_FAILED;
-	}
+    stateTransition(g_sdCardIsPresent ? EVENT_CARD_PRESENT : EVENT_CARD_NOT_PRESENT);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-	mount();
+    stateTransition(EVENT_CARD_PRESENT);
 #endif
 }
 
@@ -156,9 +113,8 @@ bool test() {
 void tick() {
 #if defined(EEZ_PLATFORM_STM32)
 	g_sdCardIsPresent = HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin) == GPIO_PIN_RESET ? 1 : 0;
-	if (g_sdCardIsPresent && !g_mounted && g_lastError == SCPI_ERROR_MISSING_MASS_MEDIA) {
-		mount();
-	}
+    stateTransition(g_sdCardIsPresent ? EVENT_CARD_PRESENT : EVENT_CARD_NOT_PRESENT);
+    testTimeoutEvent(g_debounceTimeout, EVENT_DEBOUNCE_TIMEOUT);
 #endif
 }
 
@@ -169,14 +125,13 @@ void onSdDetectInterrupt() {
 }
 
 void onSdDetectInterruptHandler() {
-	if (g_mounted || g_testResult == TEST_FAILED) {
-		unmount();
-	}
+    g_sdCardIsPresent = HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin) == GPIO_PIN_RESET ? 1 : 0;
+    stateTransition(g_sdCardIsPresent ? EVENT_CARD_PRESENT : EVENT_CARD_NOT_PRESENT);
 }
 #endif
 
 bool isMounted(int *err) {
-	if (g_mounted) {
+	if (g_state == STATE_MOUNTED) {
         if (err != nullptr) {
             *err = SCPI_RES_OK;
         }
@@ -191,323 +146,6 @@ bool isMounted(int *err) {
 
 bool isBusy() {
     return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-BufferedFileRead::BufferedFileRead(File &file_)
-    : file(file_)
-    , position(BUFFER_SIZE)
-    , end(BUFFER_SIZE)
-{
-}
-
-void BufferedFileRead::readNextChunk() {
-    if (position == end && end == BUFFER_SIZE) {
-        position = 0;
-        end = file.read(buffer, BUFFER_SIZE);
-    }
-}
-
-int BufferedFileRead::peek() {
-    readNextChunk();
-    return position < end ? buffer[position] : -1;
-}
-
-int BufferedFileRead::read() {
-    readNextChunk();
-    int ch = peek();
-    if (ch != -1) {
-        position++;
-    }
-    return ch;
-}
-
-bool BufferedFileRead::available() {
-    return peek() != -1;
-}
-
-size_t BufferedFileRead::size() {
-    return file.size();
-}
-
-size_t BufferedFileRead::tell() {
-    return file.tell();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-BufferedFileWrite::BufferedFileWrite(File &file_)
-    : file(file_)
-    , position(0)
-{
-}
-
-size_t BufferedFileWrite::write(const uint8_t *buf, size_t size) {
-    size_t written = 0;
-
-    while (position + size >= BUFFER_SIZE) {
-        size_t partialSize = BUFFER_SIZE - position;
-        memcpy(buffer + position, buf, partialSize);
-        position += partialSize;
-        written += partialSize;
-        if (flush() == 0) {
-            return written;
-        }
-        buf += partialSize;
-        size -= partialSize;
-    } 
-    
-    if (size > 0) {
-        memcpy(buffer + position, buf, size);
-        position += size;
-        written += size;
-    }
-
-    return written;
-}
-
-size_t BufferedFileWrite::print(float value, int numDecimalDigits) {
-    char buf[32];
-    sprintf(buf, "%.*f", numDecimalDigits, value);
-    return write((const uint8_t *)buf, strlen(buf));
-}
-
-size_t BufferedFileWrite::print(char value) {
-    return write((const uint8_t *)&value, 1);
-}
-
-size_t BufferedFileWrite::flush() {
-    if (position == 0) {
-        return 0;
-    }
-    size_t written = file.write(buffer, position);
-    if (written < position) {
-        if (written > 0) {
-            position -= written;
-            memmove(buffer, buffer + written, position);
-        }
-    } else {
-        position = 0;
-    }
-    return written;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-#ifndef isSpace
-bool isSpace(int c) {
-    return c == '\r' || c == '\n' || c == '\t' || c == ' ';
-}
-#endif
-
-void matchZeroOrMoreSpaces(BufferedFileRead &file) {
-    while (true) {
-        int c = file.peek();
-        if (!isSpace(c)) {
-            return;
-        }
-        file.read();
-    }
-}
-
-bool match(BufferedFileRead &file, char ch) {
-    matchZeroOrMoreSpaces(file);
-    if (file.peek() == ch) {
-        file.read();
-        return true;
-    }
-    return false;
-}
-
-bool match(BufferedFileRead &file, const char *str) {
-    matchZeroOrMoreSpaces(file);
-
-    for (; *str; str++) {
-        if (file.peek() != *str) {
-            return false;
-        }
-        file.read();
-    }
-
-    return true;
-}
-
-bool matchUntil(BufferedFileRead &file, char ch, char *result) {
-    while (true) {
-        int next = file.peek();
-        if (next == -1) {
-            return false;
-        }
-
-        file.read();
-
-        if (next == ch) {
-            *result = 0;
-            return true;
-        }
-        
-        *result++ = (char)next;
-    }
-}
-
-void skipUntil(BufferedFileRead &file, const char *str) {
-    while (true) {
-        int next = file.peek();
-        if (next == -1) {
-            return;
-        }
-        file.read();
-        if (next == *str) {
-            bool match = true;
-            for (const char *p = str + 1; *p; p++) {
-                if (file.peek() != *p) {
-                    match = false;
-                    break;
-                }
-                file.read();
-            }
-            if (match) {
-                return;
-            }
-        }
-    }
-}
-
-void skipUntilEOL(BufferedFileRead &file) {
-    while (true) {
-        int next = file.peek();
-        if (next == -1 || next == '\r' || next == '\n') {
-            return;
-        }
-        file.read();
-    }
-}
-
-bool matchQuotedString(BufferedFileRead &file, char *str, unsigned int strLength) {
-    if (!match(file, '"')) {
-        return false;
-    }
-
-    bool escape = false;
-
-    while (true) {
-        int next = file.peek();
-        if (next == -1) {
-            return false;
-        }
-
-        file.read();
-
-        if (escape) {
-            escape = false;
-        } else {
-            if (next == '"') {
-                *str = 0;
-                return true;
-            } else if (next == '\\') {
-                next = file.peek();
-                if (next == -1) {
-                    return false;
-                }
-                *str = next;
-                escape = true;
-                continue;
-            }
-        }
-
-        if (strLength-- == 0) {
-            return false;
-        }
-
-        *str++ = (char)next;
-    }
-}
-
-bool match(BufferedFileRead &file, unsigned int &result) {
-    matchZeroOrMoreSpaces(file);
-
-    int c = file.peek();
-    if (c == -1) {
-        return false;
-    }
-
-    bool isNumber = false;
-    unsigned int value = 0;
-
-    while (true) {
-        if (c >= '0' && c <= '9') {
-            value = value * 10 + (c - '0');
-            isNumber = true;
-        } else {
-            if (isNumber) {
-                result = value;
-            }
-            return isNumber;
-        }
-        file.read();
-        c = file.peek();
-    }
-}
-
-
-bool match(BufferedFileRead &file, float &result) {
-    matchZeroOrMoreSpaces(file);
-
-    int c = file.peek();
-    if (c == -1) {
-        return false;
-    }
-
-    bool isNegative;
-    if (c == '-') {
-        file.read();
-        isNegative = true;
-        c = file.peek();
-    } else {
-        isNegative = false;
-    }
-
-    bool isFraction = false;
-    float fraction = 1.0;
-
-    long value = -1;
-
-    while (true) {
-        if (c == '.') {
-            if (isFraction) {
-                return false;
-            }
-            isFraction = true;
-        } else if (c >= '0' && c <= '9') {
-            if (value == -1) {
-                value = 0;
-            }
-
-            value = value * 10 + c - '0';
-
-            if (isFraction) {
-                fraction *= 0.1f;
-            }
-        } else {
-            if (value == -1) {
-                return false;
-            }
-
-            result = (float)value;
-            if (isNegative) {
-                result = -result;
-            }
-            if (isFraction) {
-                result *= fraction;
-            }
-
-            return true;
-        }
-
-        file.read();
-        c = file.peek();
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -677,9 +315,6 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
 
     return result;
 }
-
-static File g_downloadFile;
-static char g_downloadFilePath[MAX_PATH_LENGTH + 1];
 
 bool download(const char *filePath, bool truncate, const void *buffer, size_t size, int *err) {
     if (!sd_card::isMounted(err)) {
@@ -863,8 +498,7 @@ bool removeDir(const char *dirPath, int *err) {
     return true;
 }
 
-void getDateTime(FileInfo &fileInfo, uint8_t *resultYear, uint8_t *resultMonth, uint8_t *resultDay,
-                 uint8_t *resultHour, uint8_t *resultMinute, uint8_t *resultSecond) {
+void getDateTime(FileInfo &fileInfo, uint8_t *resultYear, uint8_t *resultMonth, uint8_t *resultDay, uint8_t *resultHour, uint8_t *resultMinute, uint8_t *resultSecond) {
     int year = fileInfo.getModifiedYear();
     int month = fileInfo.getModifiedMonth();
     int day = fileInfo.getModifiedDay();
@@ -924,6 +558,10 @@ bool getTime(const char *filePath, uint8_t &hour, uint8_t &minute, uint8_t &seco
     return true;
 }
 
+int getInfoVersion() {
+	return g_getInfoVersion;
+}
+
 bool getInfo(uint64_t &usedSpace, uint64_t &freeSpace, bool fromCache) {
     static bool g_result;
     static uint64_t g_usedSpace;
@@ -931,6 +569,7 @@ bool getInfo(uint64_t &usedSpace, uint64_t &freeSpace, bool fromCache) {
 
     if (!g_result || !fromCache) {
         g_result = SD.getInfo(g_usedSpace, g_freeSpace);
+        ++g_getInfoVersion;
     }
 
     usedSpace = g_usedSpace;
@@ -938,43 +577,489 @@ bool getInfo(uint64_t &usedSpace, uint64_t &freeSpace, bool fromCache) {
     return g_result;
 }
 
-bool confRead(uint8_t *buffer, uint16_t buffer_size, uint16_t address) {
-    int err;
-    if (!sd_card::isMounted(&err)) {
-        return false;
-    }
+////////////////////////////////////////////////////////////////////////////////
 
-    File file;
-
-    // TODO move "/.EEZCONF" to conf file
-    if (!file.open("/.EEZCONF", FILE_OPEN_EXISTING | FILE_READ)) {
-        return false;
-    }
-
-    if (!file.seek(address)) {
-        return false;
-    }
-
-    return file.read(buffer, buffer_size) == buffer_size;
+BufferedFileRead::BufferedFileRead(File &file_)
+    : file(file_)
+    , position(BUFFER_SIZE)
+    , end(BUFFER_SIZE)
+{
 }
 
-bool confWrite(const uint8_t *buffer, uint16_t buffer_size, uint16_t address) {
+void BufferedFileRead::readNextChunk() {
+    if (position == end && end == BUFFER_SIZE) {
+        position = 0;
+        end = file.read(buffer, BUFFER_SIZE);
+    }
+}
+
+int BufferedFileRead::peek() {
+    readNextChunk();
+    return position < end ? buffer[position] : -1;
+}
+
+int BufferedFileRead::read() {
+    readNextChunk();
+    int ch = peek();
+    if (ch != -1) {
+        position++;
+    }
+    return ch;
+}
+
+int BufferedFileRead::read(void *buf, uint32_t nbyte) {
+    uint8_t *pBegin = (uint8_t *)buf;
+    uint8_t *pEnd = pBegin + nbyte;
+    uint8_t *p;
+    for (p = pBegin; p < pEnd; p++) {
+        if (!available()) {
+            break;
+        }
+        *p = (uint8_t)read();
+    }
+    return p - pBegin;
+}
+
+bool BufferedFileRead::available() {
+    return peek() != -1;
+}
+
+size_t BufferedFileRead::size() {
+    return file.size();
+}
+
+size_t BufferedFileRead::tell() {
+    return file.tell();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+BufferedFileWrite::BufferedFileWrite(File &file_)
+    : file(file_)
+    , position(0)
+{
+}
+
+size_t BufferedFileWrite::write(const uint8_t *buf, size_t size) {
+    size_t written = 0;
+
+    while (position + size >= BUFFER_SIZE) {
+        size_t partialSize = BUFFER_SIZE - position;
+        memcpy(buffer + position, buf, partialSize);
+        position += partialSize;
+        written += partialSize;
+        if (flush() == 0) {
+            return written;
+        }
+        buf += partialSize;
+        size -= partialSize;
+    }
+
+    if (size > 0) {
+        memcpy(buffer + position, buf, size);
+        position += size;
+        written += size;
+    }
+
+    return written;
+}
+
+size_t BufferedFileWrite::print(float value, int numDecimalDigits) {
+    char buf[32];
+    sprintf(buf, "%.*f", numDecimalDigits, value);
+    return write((const uint8_t *)buf, strlen(buf));
+}
+
+size_t BufferedFileWrite::print(char value) {
+    return write((const uint8_t *)&value, 1);
+}
+
+size_t BufferedFileWrite::flush() {
+    if (position == 0) {
+        return 0;
+    }
+    size_t written = file.write(buffer, position);
+    if (written < position) {
+        if (written > 0) {
+            position -= written;
+            memmove(buffer, buffer + written, position);
+        }
+    } else {
+        position = 0;
+    }
+    return written;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#ifndef isSpace
+bool isSpace(int c) {
+    return c == '\r' || c == '\n' || c == '\t' || c == ' ';
+}
+#endif
+
+void matchZeroOrMoreSpaces(BufferedFileRead &file) {
+    while (true) {
+        int c = file.peek();
+        if (!isSpace(c)) {
+            return;
+        }
+        file.read();
+    }
+}
+
+bool match(BufferedFileRead &file, char ch) {
+    matchZeroOrMoreSpaces(file);
+    if (file.peek() == ch) {
+        file.read();
+        return true;
+    }
+    return false;
+}
+
+bool match(BufferedFileRead &file, const char *str) {
+    matchZeroOrMoreSpaces(file);
+
+    for (; *str; str++) {
+        if (file.peek() != *str) {
+            return false;
+        }
+        file.read();
+    }
+
+    return true;
+}
+
+bool matchUntil(BufferedFileRead &file, char ch, char *result) {
+    while (true) {
+        int next = file.peek();
+        if (next == -1) {
+            return false;
+        }
+
+        file.read();
+
+        if (next == ch) {
+            *result = 0;
+            return true;
+        }
+
+        *result++ = (char)next;
+    }
+}
+
+void skipUntil(BufferedFileRead &file, const char *str) {
+    while (true) {
+        int next = file.peek();
+        if (next == -1) {
+            return;
+        }
+        file.read();
+        if (next == *str) {
+            bool match = true;
+            for (const char *p = str + 1; *p; p++) {
+                if (file.peek() != *p) {
+                    match = false;
+                    break;
+                }
+                file.read();
+            }
+            if (match) {
+                return;
+            }
+        }
+    }
+}
+
+void skipUntilEOL(BufferedFileRead &file) {
+    while (true) {
+        int next = file.peek();
+        if (next == -1 || next == '\r' || next == '\n') {
+            return;
+        }
+        file.read();
+    }
+}
+
+bool matchQuotedString(BufferedFileRead &file, char *str, unsigned int strLength) {
+    if (!match(file, '"')) {
+        return false;
+    }
+
+    bool escape = false;
+
+    while (true) {
+        int next = file.peek();
+        if (next == -1) {
+            return false;
+        }
+
+        file.read();
+
+        if (escape) {
+            escape = false;
+        } else {
+            if (next == '"') {
+                *str = 0;
+                return true;
+            } else if (next == '\\') {
+                next = file.peek();
+                if (next == -1) {
+                    return false;
+                }
+                *str = next;
+                escape = true;
+                continue;
+            }
+        }
+
+        if (strLength-- == 0) {
+            return false;
+        }
+
+        *str++ = (char)next;
+    }
+}
+
+bool match(BufferedFileRead &file, unsigned int &result) {
+    matchZeroOrMoreSpaces(file);
+
+    int c = file.peek();
+    if (c == -1) {
+        return false;
+    }
+
+    bool isNumber = false;
+    unsigned int value = 0;
+
+    while (true) {
+        if (c >= '0' && c <= '9') {
+            value = value * 10 + (c - '0');
+            isNumber = true;
+        } else {
+            if (isNumber) {
+                result = value;
+            }
+            return isNumber;
+        }
+        file.read();
+        c = file.peek();
+    }
+}
+
+
+bool match(BufferedFileRead &file, float &result) {
+    matchZeroOrMoreSpaces(file);
+
+    int c = file.peek();
+    if (c == -1) {
+        return false;
+    }
+
+    bool isNegative;
+    if (c == '-') {
+        file.read();
+        isNegative = true;
+        c = file.peek();
+    } else {
+        isNegative = false;
+    }
+
+    bool isFraction = false;
+    float fraction = 1.0;
+
+    long value = -1;
+
+    while (true) {
+        if (c == '.') {
+            if (isFraction) {
+                return false;
+            }
+            isFraction = true;
+        } else if (c >= '0' && c <= '9') {
+            if (value == -1) {
+                value = 0;
+            }
+
+            value = value * 10 + c - '0';
+
+            if (isFraction) {
+                fraction *= 0.1f;
+            }
+        } else {
+            if (value == -1) {
+                return false;
+            }
+
+            result = (float)value;
+            if (isNegative) {
+                result = -result;
+            }
+            if (isFraction) {
+                result *= fraction;
+            }
+
+            return true;
+        }
+
+        file.read();
+        c = file.peek();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static void setState(State state) {
+    if (state != g_state) {
+        g_state = state;
+
+        if (g_state == STATE_MOUNTED) {
+            g_testResult = TEST_OK;
+            setQuesBits(QUES_MMEM, false);
+
+            uint64_t usedSpace;
+            uint64_t freeSpace;
+            getInfo(usedSpace, freeSpace, false); // "false" means **do not** get storage info from cache
+
+            if (g_isBooted) {
+                profile::onAfterSdCardMounted();
+                eez::gui::file_manager::onSdCardMountedChange();
+            }
+        } else {
+            g_testResult = TEST_FAILED;
+            setQuesBits(QUES_MMEM, true);
+
+            eez::gui::file_manager::onSdCardMountedChange();
+        }
+    }
+}
+
+static bool prepareCard() {
     int err;
-    if (!sd_card::isMounted(&err)) {
+
+    if (!exists(LISTS_DIR, &err)) {
+        if (!makeDir(LISTS_DIR, &err)) {
+            return false;
+        }
+    }
+
+    if (!exists(PROFILES_DIR, &err)) {
+        if (!makeDir(PROFILES_DIR, &err)) {
+            return false;
+        }
+    }
+
+    if (!exists(RECORDINGS_DIR, &err)) {
+        if (!makeDir(RECORDINGS_DIR, &err)) {
+            return false;
+        }
+    }
+
+    if (!exists(SCREENSHOTS_DIR, &err)) {
+        if (!makeDir(SCREENSHOTS_DIR, &err)) {
+            return false;
+        }
+    }
+
+    if (!exists(SCRIPTS_DIR, &err)) {
+        if (!makeDir(SCRIPTS_DIR, &err)) {
+            return false;
+        }
+    }
+
+    if (!exists(UPDATES_DIR, &err)) {
+        if (!makeDir(UPDATES_DIR, &err)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static void unmount() {
+    SD.unmount();
+#if defined(EEZ_PLATFORM_STM32)
+    FATFS_UnLinkDriver(SDPath);
+#endif
+    g_lastError = SCPI_ERROR_MISSING_MASS_MEDIA;
+}
+
+static bool mount() {
+#if defined(EEZ_PLATFORM_STM32)
+    MX_FATFS_Init();
+#endif
+    if (!SD.mount(&g_lastError)) {
         return false;
     }
 
-    File file;
-
-    if (!file.open("/.EEZCONF", FILE_OPEN_ALWAYS | FILE_WRITE)) {
+    auto savedState = g_state;
+    g_state = STATE_MOUNTED;
+    bool result = prepareCard();
+    g_state = savedState;
+    
+    if (!result) {
+        unmount();
         return false;
     }
 
-    if (!file.seek(address)) {
-        return false;
-    }
+    return true;
+}
 
-    return file.write(buffer, buffer_size) == buffer_size;
+static void setTimeout(uint32_t &timeout, uint32_t timeoutDuration) {
+    timeout = millis() + timeoutDuration;
+    if (timeout == 0) {
+        timeout = 1;
+    }
+}
+
+static void clearTimeout(uint32_t &timeout) {
+    timeout = 0;
+}
+
+static void testTimeoutEvent(uint32_t &timeout, Event timeoutEvent) {
+    if (timeout && (int32_t)(timeout - millis()) >= 0) {
+        clearTimeout(timeout);
+        stateTransition(timeoutEvent);
+    }
+}
+
+static void stateTransition(Event event) {
+    if (g_state == STATE_START) {
+        if (event == EVENT_CARD_PRESENT) {
+            if (mount()) {
+                setState(STATE_MOUNTED);
+            } else {
+                setState(STATE_MOUNT_FAILED);
+            }
+        } else if (event == EVENT_CARD_NOT_PRESENT) {
+            setState(STATE_UNMOUNTED);
+        }
+    } else if (g_state == STATE_MOUNTED) {
+        if (event == EVENT_CARD_NOT_PRESENT) {
+            unmount();
+            setState(STATE_UNMOUNTED);
+        }
+    } else if (g_state == STATE_MOUNT_FAILED) {
+        if (event == EVENT_CARD_NOT_PRESENT) {
+            setState(STATE_UNMOUNTED);
+        }
+    } else if (g_state == STATE_UNMOUNTED) {
+        if (event == EVENT_CARD_PRESENT) {
+            setState(STATE_DEBOUNCE);
+            setTimeout(g_debounceTimeout, CONF_DEBOUNCE_TIMEOUT_MS);
+        }
+    } else if (g_state == STATE_DEBOUNCE) {
+        if (event == EVENT_CARD_NOT_PRESENT) {
+            setState(STATE_UNMOUNTED);
+            clearTimeout(g_debounceTimeout);
+        } else if (event == EVENT_DEBOUNCE_TIMEOUT) {
+            if (mount()) {
+                setState(STATE_MOUNTED);
+            } else {
+                setState(STATE_MOUNT_FAILED);
+            }
+        }
+    }
 }
 
 } // namespace sd_card

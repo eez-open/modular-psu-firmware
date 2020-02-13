@@ -103,6 +103,14 @@ static void setTimeout(uint32_t &timeout, uint32_t timeoutDuration) {
 	}
 }
 
+static void testTimeoutEvent(uint32_t &timeout, Event timeoutEvent) {
+	if (timeout && (int32_t)(millis() - timeout) >= 0) {
+		timeout = 0;
+		stateTransition(timeoutEvent);
+	}
+
+}
+
 static const char *getNtpServer() {
     if (g_ntpServerToTest) {
         if (g_ntpServerToTest[0]) {
@@ -228,15 +236,9 @@ void tick() {
 		}
 	}
 
-	if (g_timeout1 && millis() >= g_timeout1) {
-		g_timeout1 = 0;
-		stateTransition(EVENT_TIMEOUT1);
-	}
+	testTimeoutEvent(g_timeout1, EVENT_TIMEOUT1);
 
-	if (g_timeout2 && millis() >= g_timeout2) {
-		g_timeout2 = 0;
-		stateTransition(EVENT_TIMEOUT2);
-	}
+	testTimeoutEvent(g_timeout2, EVENT_TIMEOUT2);
 #endif
 }
 

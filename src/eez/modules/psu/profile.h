@@ -103,6 +103,8 @@ struct Parameters {
 void init();
 void tick();
 
+void onAfterSdCardMounted();
+
 void shutdownSave();
 
 Parameters *getProfileParameters(int location);

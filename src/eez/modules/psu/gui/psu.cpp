@@ -33,6 +33,7 @@
 #include <eez/modules/psu/dlog_view.h>
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/dlog_view.h>
+#include <eez/modules/psu/sd_card.h>
 
 #include <eez/modules/psu/gui/animations.h>
 #include <eez/modules/psu/gui/data.h>
@@ -446,6 +447,18 @@ void PsuAppContext::stateManagment() {
     if (m_showMenuInputOnNextIter) {
         m_showMenuInputOnNextIter = false;
         showMenu(this, m_inputLabel, m_menuType, m_menuItems, onSetMenuInputResult);
+    }
+
+    if (!sd_card::isMounted(nullptr)) {
+        if (
+            isPageOnStack(PAGE_ID_DLOG_PARAMS) ||
+            isPageOnStack(PAGE_ID_DLOG_VIEW) ||
+            isPageOnStack(PAGE_ID_USER_PROFILES) ||
+            isPageOnStack(PAGE_ID_USER_PROFILE_SETTINGS) ||
+            isPageOnStack(PAGE_ID_USER_PROFILE_0_SETTINGS)
+        ) {
+            showPage(PAGE_ID_MAIN);
+        }
     }
 }
 

@@ -202,13 +202,22 @@ void doLoadDirectory() {
 
     int numFiles;
     int err;
-    psu::sd_card::catalog(g_currentDirectory, 0, catalogCallback, &numFiles, &err);
+    if (psu::sd_card::catalog(g_currentDirectory, 0, catalogCallback, &numFiles, &err)) {
+        sort();
+        setFilesStartPosition(g_savedFilesStartPosition);
+        g_state = STATE_READY;
+    } else {
+    	g_state = STATE_NOT_PRESENT;
+    }
 
-    sort();
+}
 
-    setFilesStartPosition(g_savedFilesStartPosition);
-
-    g_state = STATE_READY;
+void onSdCardMountedChange() {
+	if (psu::sd_card::isMounted(nullptr)) {
+		g_state = STATE_STARTING;
+	} else {
+		g_state = STATE_NOT_PRESENT;
+	}
 }
 
 SortFilesOption getSortFilesOption() {
@@ -250,7 +259,7 @@ State getState() {
         return STATE_LOADING;
     }
     
-    return STATE_READY;
+    return g_state;
 }
 
 bool isRootDirectory() {
@@ -714,8 +723,8 @@ bool isStorageAlarm() {
 }
 
 void getStorageInfo(Value& value) {
-    if (!g_fileBrowserMode && (isStorageAlarm() || !*g_currentDirectory || strcmp(g_currentDirectory, "/") == 0)) {
-        value = Value(millis(), VALUE_TYPE_STORAGE_INFO);
+    if (!g_fileBrowserMode && g_state == STATE_READY && (isStorageAlarm() || !*g_currentDirectory || strcmp(g_currentDirectory, "/") == 0)) {
+        value = Value(psu::sd_card::getInfoVersion(), VALUE_TYPE_STORAGE_INFO);
     }
 }
 
