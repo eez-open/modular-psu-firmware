@@ -241,6 +241,10 @@ void oneIter() {
             restart();
         } else if (type == PSU_QUEUE_MESSAGE_TYPE_SHUTDOWN) {
             shutdown();
+        } else if (type == PSU_QUEUE_MESSAGE_TYPE_SET_VOLTAGE) {
+            channel_dispatcher::setVoltageInPsuThread((int)param);
+        } else if (type == PSU_QUEUE_MESSAGE_TYPE_SET_CURRENT) {
+            channel_dispatcher::setCurrentInPsuThread((int)param);
         }
     } else if (g_isBooted) {
         tick();

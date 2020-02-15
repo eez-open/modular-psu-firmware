@@ -163,6 +163,9 @@ void setLoadEnabled(Channel &channel, bool state);
 void setLoad(Channel &channel, float load);
 #endif
 
+void setVoltageInPsuThread(int channelIndex);
+void setCurrentInPsuThread(int channelIndex);
+
 } // namespace channel_dispatcher
 } // namespace psu
 } // namespace eez

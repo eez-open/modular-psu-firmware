@@ -860,61 +860,26 @@ void Channel::addIMonDacAdcValue(float value) {
     i.addMonDacValue(value, getCurrentResolution());
 }
 
-AdcDataType Channel::onAdcData(AdcDataType adcDataType, float value) {
-    AdcDataType nextAdcDataType = ADC_DATA_TYPE_NONE;
+void Channel::onAdcData(AdcDataType adcDataType, float value) {
+    switch (adcDataType) {
+    case ADC_DATA_TYPE_U_MON:
+        addUMonAdcValue(value);
+        break;
 
-    if (isPowerUp()) {
-        switch (adcDataType) {
-        case ADC_DATA_TYPE_NONE:
-        	break;
+    case ADC_DATA_TYPE_I_MON:
+        addIMonAdcValue(value);
+        break;
 
-        case ADC_DATA_TYPE_U_MON:
-            addUMonAdcValue(value);
-            nextAdcDataType = ADC_DATA_TYPE_I_MON;
-            break;
+    case ADC_DATA_TYPE_U_MON_DAC:
+        addUMonDacAdcValue(value);
+        break;
 
-        case ADC_DATA_TYPE_I_MON:
-            addIMonAdcValue(value);
-
-            if (isOutputEnabled()) {
-                if (isRemoteProgrammingEnabled()) {
-                    nextAdcDataType = ADC_DATA_TYPE_U_MON_DAC;
-                } else {
-                    nextAdcDataType = ADC_DATA_TYPE_U_MON;
-                }
-            } else {
-                u.resetMonValues();
-                i.resetMonValues();
-                nextAdcDataType = ADC_DATA_TYPE_I_MON_DAC;
-            }
-
-            break;
-
-        case ADC_DATA_TYPE_U_MON_DAC:
-            addUMonDacAdcValue(value);
-
-            if (isOutputEnabled() && isRemoteProgrammingEnabled()) {
-                nextAdcDataType = ADC_DATA_TYPE_U_MON;
-            } else {
-                nextAdcDataType = ADC_DATA_TYPE_I_MON_DAC;
-            }
-
-            break;
-
-        case ADC_DATA_TYPE_I_MON_DAC:
-            addIMonDacAdcValue(value);
-
-            if (isOutputEnabled()) {
-                nextAdcDataType = ADC_DATA_TYPE_U_MON;
-            }
-
-            break;
-        }
-
-        protectionCheck();
+    case ADC_DATA_TYPE_I_MON_DAC:
+        addIMonDacAdcValue(value);
+        break;
     }
 
-    return nextAdcDataType;
+    protectionCheck();
 }
 
 void Channel::setCcMode(bool cc_mode) {
@@ -1024,7 +989,7 @@ void Channel::executeOutputEnable(bool inhibited) {
 
         // AFTER sync
         if (anyToEnable) {
-            delayMicroseconds(500);
+            delayMicroseconds(3000);
 
             // DAC and current range for enabled
             for (int i = 0; i < CH_NUM; i++) {
@@ -1039,16 +1004,39 @@ void Channel::executeOutputEnable(bool inhibited) {
             delayMicroseconds(500);
         }
 
+        for (int i = 0; i < CH_NUM; i++) {
+            Channel &channel = Channel::get(i);
+            if (channel.flags.doOutputEnableOnNextSync) {
+                if (channel.flags.outputEnabled && !inhibited) {
+                    // DP and ADC start for enabled
+                    channel.executeOutputEnable(true, OUTPUT_ENABLE_TASK_DP | OUTPUT_ENABLE_TASK_ADC_START);
+                } else if ((channel.flags.outputEnabled && inhibited) || (!channel.flags.outputEnabled && !inhibited)) {
+                    // current range and DP for disabled
+                    channel.executeOutputEnable(false, OUTPUT_ENABLE_TASK_CURRENT_RANGE | OUTPUT_ENABLE_TASK_DP);
+                }
+            }
+        }
+
+        if (anyToEnable) {
+            for (int i = 0; i < CH_NUM; i++) {
+                Channel &channel = Channel::get(i);
+                if (channel.flags.doOutputEnableOnNextSync) {
+                    if (channel.flags.outputEnabled && !inhibited) {
+                        // OVP for enabled
+                        channel.executeOutputEnable(true, OUTPUT_ENABLE_TASK_OVP);
+                    }
+                }
+            }
+        }
+
         // FINALIZE
         for (int i = 0; i < CH_NUM; i++) {
             Channel &channel = Channel::get(i);
             if (channel.flags.doOutputEnableOnNextSync) {
                 if (channel.flags.outputEnabled && !inhibited) {
-                    // OVP, DP for enabled
-                    channel.executeOutputEnable(true, OUTPUT_ENABLE_TASK_OVP | OUTPUT_ENABLE_TASK_DP | OUTPUT_ENABLE_TASK_FINALIZE);
+                    channel.executeOutputEnable(true, OUTPUT_ENABLE_TASK_FINALIZE);
                 } else if ((channel.flags.outputEnabled && inhibited) || (!channel.flags.outputEnabled && !inhibited)) {
-                    // current range and DP for disabled
-                    channel.executeOutputEnable(false, OUTPUT_ENABLE_TASK_CURRENT_RANGE | OUTPUT_ENABLE_TASK_DP | OUTPUT_ENABLE_TASK_FINALIZE);
+                    channel.executeOutputEnable(false, OUTPUT_ENABLE_TASK_FINALIZE);
                 }
 
                 channel.flags.doOutputEnableOnNextSync = 0;

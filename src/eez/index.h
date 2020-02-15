@@ -32,7 +32,6 @@ enum TestResult {
 };
 
 enum AdcDataType {
-    ADC_DATA_TYPE_NONE,
     ADC_DATA_TYPE_U_MON,
     ADC_DATA_TYPE_I_MON,
     ADC_DATA_TYPE_U_MON_DAC,

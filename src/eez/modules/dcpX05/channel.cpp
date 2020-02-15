@@ -22,6 +22,7 @@
 #include <eez/modules/dcpX05/ioexp.h>
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/debug.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 
@@ -30,7 +31,11 @@
 #include <eez/system.h>
 #include <eez/index.h>
 
-#define CONF_OVP_PERCENTAGE 2.0f
+/// ADC conversion should be finished after ADC_CONVERSION_MAX_TIME_MS milliseconds.
+#define CONF_ADC_CONVERSION_MAX_TIME_MS 10
+
+#define CONF_FALLING_EDGE_OVP_PERCENTAGE 2.0f
+#define CONF_FALLING_EDGE_OVP_DELAY_MS 5
 #define CONF_OVP_SW_OVP_AT_START_DURATION_MS 5
 #define CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD 1.2f
 #define CONF_OVP_SW_OVP_AT_START_U_PROTECTION_LEVEL 1.55f
@@ -56,7 +61,9 @@ struct Channel : ChannelInterface {
 	float uBeforeBalancing = NAN;
 	float iBeforeBalancing = NAN;
 
-	bool fallingEdge = true;
+	bool fallingEdge;
+	uint32_t fallingEdgeStart;
+	float fallingEdgePreviousUMonAdc;
 
 	Channel(int slotIndex_) : ChannelInterface(slotIndex_), uSet(0) {}
 
@@ -201,6 +208,19 @@ struct Channel : ChannelInterface {
 		return TEST_FAILED;
 	}
 
+	AdcDataType getNextAdcDataType(AdcDataType adcDataType) {
+		if (adcDataType == ADC_DATA_TYPE_U_MON) {
+			return ADC_DATA_TYPE_I_MON;
+		}
+
+		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
+		if (adcDataType == ADC_DATA_TYPE_I_MON && channel.isRemoteProgrammingEnabled()) {
+			return ADC_DATA_TYPE_U_MON_DAC;
+		}
+
+		return ADC_DATA_TYPE_U_MON;
+	}
+
 	void tick(int subchannelIndex, uint32_t tickCount) {
 		if (isDacTesting(subchannelIndex)) {
 			return;
@@ -220,17 +240,13 @@ struct Channel : ChannelInterface {
 		}
 #endif
 
-		AdcDataType adcDataType = adc.adcDataType;
-
-		if (adcDataType) {
-#if defined(EEZ_PLATFORM_STM32)
-			if (ioexp.isAdcReady()) {
-#endif
-				float value = adc.read(channel);
-				AdcDataType nextAdcDataType = channel.onAdcData(adcDataType, value);
-				adc.start(nextAdcDataType);
-#if defined(EEZ_PLATFORM_STM32)
-			}
+		if (channel.isOutputEnabled() && ioexp.isAdcReady()) {
+			auto adcDataType = adc.adcDataType;
+			float value = adc.read(channel);
+			adc.start(getNextAdcDataType(adcDataType));
+			channel.onAdcData(adcDataType, value);
+#ifdef DEBUG
+			psu::debug::g_adcCounter.inc();
 #endif
 		}
 
@@ -294,8 +310,20 @@ struct Channel : ChannelInterface {
 		}
 
 		if (channel.params.features & CH_FEATURE_HW_OVP) {
+			bool fallingEdgeChange = false;
+
 			if (fallingEdge) {
-				fallingEdge = channel.u.mon_last > channel.u.set * (1.0f + CONF_OVP_PERCENTAGE / 100.0f);
+				fallingEdge =
+					((millis() - fallingEdgeStart) < CONF_FALLING_EDGE_OVP_DELAY_MS) ||
+					(fallingEdgePreviousUMonAdc > channel.u.mon_adc) ||
+					(channel.u.mon_adc > uSet * (1.0f + CONF_FALLING_EDGE_OVP_PERCENTAGE / 100.0f));
+
+				if (fallingEdge) {
+					fallingEdgePreviousUMonAdc = channel.u.mon_adc;
+				} else {
+					DebugTrace("DAC=%g, ADC=%g\n", uSet, channel.u.mon_adc);
+					fallingEdgeChange = true;
+				}
 			}
 
 			// HW OVP handling
@@ -303,9 +331,15 @@ struct Channel : ChannelInterface {
 				if (!fallingEdge && channel.isHwOvpEnabled() && !ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
 					// activate HW OVP
 					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+					if (fallingEdgeChange) {
+						DebugTrace("HW OVP ON falling edge\n");
+					} else {
+						DebugTrace("HW OVP ON\n");
+					}
 				} else if ((fallingEdge || !channel.isHwOvpEnabled()) && ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
 					// deactivate HW OVP
 					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+					DebugTrace("HW OVP OFF\n");
 				}
 			}
 		}
@@ -325,7 +359,7 @@ struct Channel : ChannelInterface {
 
 	void waitConversionEnd() {
 #if defined(EEZ_PLATFORM_STM32)
-        for (int i = 0; i < ADC_CONVERSION_MAX_TIME_MS; i++) {
+        for (int i = 0; i < CONF_ADC_CONVERSION_MAX_TIME_MS; i++) {
             ioexp.tick(micros());
             if (ioexp.isAdcReady()) {
 				break;
@@ -341,6 +375,10 @@ struct Channel : ChannelInterface {
 		adc.start(ADC_DATA_TYPE_U_MON);
 		waitConversionEnd();
 		channel.onAdcData(ADC_DATA_TYPE_U_MON, adc.read(channel));
+
+		if (channel.isOutputEnabled()) {
+			adc.start(ADC_DATA_TYPE_U_MON);
+		}
 	}
 
 	void adcMeasureIMon(int subchannelIndex) {
@@ -349,6 +387,10 @@ struct Channel : ChannelInterface {
 		adc.start(ADC_DATA_TYPE_U_MON);
 		waitConversionEnd();
 		channel.onAdcData(ADC_DATA_TYPE_U_MON, adc.read(channel));
+
+		if (channel.isOutputEnabled()) {
+			adc.start(ADC_DATA_TYPE_U_MON);
+		}
 	}
 
 	void adcMeasureMonDac(int subchannelIndex) {
@@ -362,6 +404,10 @@ struct Channel : ChannelInterface {
 			adc.start(ADC_DATA_TYPE_I_MON_DAC);
 			waitConversionEnd();
 			channel.onAdcData(ADC_DATA_TYPE_I_MON_DAC, adc.read(channel));
+
+			if (channel.isOutputEnabled()) {
+				adc.start(ADC_DATA_TYPE_U_MON);
+			}
 		}
 	}
 
@@ -383,6 +429,10 @@ struct Channel : ChannelInterface {
 		adc.start(ADC_DATA_TYPE_I_MON_DAC);
 		waitConversionEnd();
 		channel.onAdcData(ADC_DATA_TYPE_I_MON_DAC, adc.read(channel));
+
+		if (channel.isOutputEnabled()) {
+			adc.start(ADC_DATA_TYPE_U_MON);
+		}
 	}
 
 	void setDpEnable(bool enable) {
@@ -425,6 +475,7 @@ struct Channel : ChannelInterface {
 					if (channel.isHwOvpEnabled()) {
 						// OVP has to be enabled after OE activation
 						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+						DebugTrace("HW OVP ON output enable\n");
 					}
 				}
 			}
@@ -441,7 +492,7 @@ struct Channel : ChannelInterface {
 				}
 			}
 
-			if (tasks & OUTPUT_ENABLE_TASK_FINALIZE) {
+			if (tasks & OUTPUT_ENABLE_TASK_ADC_START) {
 				adc.start(ADC_DATA_TYPE_U_MON);
 			}
 		} else {
@@ -451,6 +502,7 @@ struct Channel : ChannelInterface {
 					if (channel.isHwOvpEnabled()) {
 						// OVP has to be disabled before OE deactivation
 						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+						DebugTrace("HW OVP OFF output disable\n");
 					}
 				}
 			}
@@ -463,6 +515,9 @@ struct Channel : ChannelInterface {
 			// OE
 			if (tasks & OUTPUT_ENABLE_TASK_OE) {
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, false);
+
+				channel.u.resetMonValues();
+				channel.i.resetMonValues();
 			}
 
 			// Current range
@@ -550,15 +605,14 @@ struct Channel : ChannelInterface {
 
 		uSet = value;
 
-		if (channel.params.features & CH_FEATURE_HW_OVP) {
-			if (channel.isOutputEnabled()) {
-				if (value < previousUSet) {
-					fallingEdge = true;
-					if (channel.isHwOvpEnabled()) {
-						// deactivate HW OVP
-						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
-					}
-				}
+		if ((channel.params.features & CH_FEATURE_HW_OVP) && channel.isOutputEnabled() && value < previousUSet) {
+			fallingEdge = true;
+			fallingEdgePreviousUMonAdc = channel.u.mon_adc;
+			fallingEdgeStart = millis();
+			if (channel.isHwOvpEnabled()) {
+				// deactivate HW OVP
+				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+				DebugTrace("HW OVP OFF falling edge\n");
 			}
 		}
 
@@ -619,8 +673,6 @@ struct Channel : ChannelInterface {
 				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_5A, false);
 				// calculateNegligibleAdcDiffForCurrent();
 			}
-
-			adc.start(ADC_DATA_TYPE_U_MON);
 		} else {
 			ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_CURRENT_RANGE_5A, true);
 			ioexp.changeBit(slot.moduleRevision == MODULE_REVISION_DCP405_R1B1 ?
@@ -708,6 +760,7 @@ struct Channel : ChannelInterface {
 		if (channel.params.features & CH_FEATURE_HW_OVP) {
 			if (!(intcap & (1 << IOExpander::DCP405_R2B5_IO_BIT_IN_OVP_FAULT))) {
 				if (channel.isOutputEnabled()) {
+					DebugTrace("HW OVP trip MON=%g ADC=%g\n", channel.u.mon_last, channel.u.mon_adc);
 					channel.enterOvpProtection();
 				}
 			}

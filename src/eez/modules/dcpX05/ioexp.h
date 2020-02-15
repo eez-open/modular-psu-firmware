@@ -75,9 +75,10 @@ public:
 
 #if defined(EEZ_PLATFORM_STM32)
     int getBitDirection(int io_bit); // 0: output, 1: input
-    bool isAdcReady();
     uint8_t readIntcapRegister();
 #endif
+
+    bool isAdcReady();
 
     void readAllRegisters(uint8_t registers[]);
 

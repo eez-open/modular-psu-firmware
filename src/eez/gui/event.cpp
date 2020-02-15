@@ -254,7 +254,7 @@ void clearFoundWidgetAtDown() {
 }
 
 bool isActiveWidget(const WidgetCursor &widgetCursor) {
-    if (widgetCursor.appContext->isActiveWidget(widgetCursor)) {
+    if (widgetCursor.appContext && widgetCursor.appContext->isActiveWidget(widgetCursor)) {
         return true;
     }
     return widgetCursor == m_activeWidget;

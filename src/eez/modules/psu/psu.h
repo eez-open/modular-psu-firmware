@@ -73,6 +73,8 @@ extern osMessageQId g_psuMessageQueueId;
 #define PSU_QUEUE_SYNC_OUTPUT_ENABLE 11
 #define PSU_QUEUE_MESSAGE_TYPE_HARD_RESET 12
 #define PSU_QUEUE_MESSAGE_TYPE_SHUTDOWN 13
+#define PSU_QUEUE_MESSAGE_TYPE_SET_VOLTAGE 14
+#define PSU_QUEUE_MESSAGE_TYPE_SET_CURRENT 15
 
 #define PSU_QUEUE_MESSAGE(type, param) (((param) << 4) | (type))
 #define PSU_QUEUE_MESSAGE_TYPE(message) ((message) & 0xF)

@@ -28,6 +28,7 @@ namespace eez {
 namespace psu {
 namespace debug {
 
+DebugCounterVariable g_adcCounter("ADC_COUNTER");
 DebugValueVariable g_uDac[CH_MAX] = { DebugValueVariable("CH1 U_DAC"), DebugValueVariable("CH2 U_DAC"), DebugValueVariable("CH3 U_DAC"), DebugValueVariable("CH4 U_DAC"), DebugValueVariable("CH5 U_DAC"), DebugValueVariable("CH6 U_DAC") };
 DebugValueVariable g_uMon[CH_MAX] = { DebugValueVariable("CH1 U_MON"), DebugValueVariable("CH2 U_MON"), DebugValueVariable("CH3 U_MON"), DebugValueVariable("CH4 U_MON"), DebugValueVariable("CH5 U_MON"), DebugValueVariable("CH6 U_MON") };
 DebugValueVariable g_uMonDac[CH_MAX] = { DebugValueVariable("CH1 U_MON_DAC"), DebugValueVariable("CH2 U_MON_DAC"), DebugValueVariable("CH3 U_MON_DAC"), DebugValueVariable("CH4 U_MON_DAC"), DebugValueVariable("CH5 U_MON_DAC"), DebugValueVariable("CH6 U_MON_DAC") };
@@ -36,12 +37,13 @@ DebugValueVariable g_iMon[CH_MAX] = { DebugValueVariable("CH1 I_MON"), DebugValu
 DebugValueVariable g_iMonDac[CH_MAX] = { DebugValueVariable("CH1 I_MON_DAC"), DebugValueVariable("CH2 I_MON_DAC"), DebugValueVariable("CH3 I_MON_DAC"), DebugValueVariable("CH4 I_MON_DAC"), DebugValueVariable("CH5 I_MON_DAC"), DebugValueVariable("CH6 I_MON_DAC") };
 
 DebugVariable *g_variables[] = { 
+    &g_adcCounter,
     &g_uDac[0], &g_uMon[0], &g_uMonDac[0], &g_iDac[0], &g_iMon[0], &g_iMonDac[0],
     &g_uDac[1], &g_uMon[1], &g_uMonDac[1], &g_iDac[1], &g_iMon[1], &g_iMonDac[1],
     &g_uDac[2], &g_uMon[2], &g_uMonDac[2], &g_iDac[2], &g_iMon[2], &g_iMonDac[2],
     &g_uDac[3], &g_uMon[3], &g_uMonDac[3], &g_iDac[3], &g_iMon[3], &g_iMonDac[3],
     &g_uDac[4], &g_uMon[4], &g_uMonDac[4], &g_iDac[4], &g_iMon[4], &g_iMonDac[4],
-    &g_uDac[5], &g_uMon[5], &g_uMonDac[5], &g_iDac[5], &g_iMon[5], &g_iMonDac[5] 
+    &g_uDac[5], &g_uMon[5], &g_uMonDac[5], &g_iDac[5], &g_iMon[5], &g_iMonDac[5],
 };
 
 static uint32_t g_previousTickCount1sec;
@@ -50,7 +52,7 @@ static uint32_t g_previousTickCount10sec;
 void dumpVariables(char *buffer) {
     buffer[0] = 0;
 
-    for (int i = 0; i < CH_NUM * 6; ++i) {
+    for (unsigned i = 0; i < sizeof(g_variables) / sizeof(DebugVariable *) - (CH_MAX - CH_NUM) * 6; ++i) {
         strcat(buffer, g_variables[i]->name());
         strcat(buffer, " = ");
         g_variables[i]->dump(buffer);

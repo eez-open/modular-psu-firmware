@@ -28,6 +28,15 @@
 #include <eez/index.h>
 #endif
 
+/// How many times per second will ADC take snapshot value?
+/// Normal: 0: 20 SPS, 1: 45 SPS, 2:  90 SPS, 3: 175 SPS, 4: 330 SPS, 5:  600 SPS, 6: 1000 SPS
+/// Turbo:  0: 40 SPS, 1: 90 SPS, 2: 180 SPS, 3: 350 SPS, 4: 660 SPS, 5: 1200 SPS, 6: 2000 SPS
+#define CONF_ADC_SPS 5
+
+/// Operating mode.
+/// 0: Normal, 1: Duty cycle, 2: Turbo
+#define CONF_ADC_MODE 0
+
 namespace eez {
 namespace psu {
 
@@ -81,7 +90,7 @@ static const uint8_t ADC_REG3_VAL = 0B00000000;
 ////////////////////////////////////////////////////////////////////////////////
 
 uint8_t AnalogDigitalConverter::getReg1Val() {
-    return (ADC_SPS << 5) | 0B00000000;
+    return (CONF_ADC_SPS << 5) | (CONF_ADC_MODE << 3) | 0B00000000;
 }
 
 #endif
@@ -271,28 +280,26 @@ void AnalogDigitalConverter::start(AdcDataType adcDataType_) {
     adcDataType = adcDataType_;
 
 #if defined(EEZ_PLATFORM_STM32)
-    if (adcDataType) {
-        uint8_t data[3];
-        uint8_t result[3];
+	uint8_t data[3];
+	uint8_t result[3];
 
-        data[0] = ADC_WR1S0;
+	data[0] = ADC_WR1S0;
 
-        if (adcDataType == ADC_DATA_TYPE_U_MON) {
-            data[1] = ADC_REG0_READ_U_MON;
-        } else if (adcDataType == ADC_DATA_TYPE_I_MON) {
-            data[1] = ADC_REG0_READ_I_MON;
-        } else if (adcDataType == ADC_DATA_TYPE_U_MON_DAC) {
-            data[1] = ADC_REG0_READ_U_SET;
-        } else {
-            data[1] = ADC_REG0_READ_I_SET;
-        }
+	if (adcDataType == ADC_DATA_TYPE_U_MON) {
+		data[1] = ADC_REG0_READ_U_MON;
+	} else if (adcDataType == ADC_DATA_TYPE_I_MON) {
+		data[1] = ADC_REG0_READ_I_MON;
+	} else if (adcDataType == ADC_DATA_TYPE_U_MON_DAC) {
+		data[1] = ADC_REG0_READ_U_SET;
+	} else {
+		data[1] = ADC_REG0_READ_I_SET;
+	}
 
-        data[2] = ADC_START;
+	data[2] = ADC_START;
 
-        spi::select(slotIndex, spi::CHIP_ADC);
-        spi::transfer(slotIndex, data, result, 3);
-        spi::deselect(slotIndex);
-    }
+	spi::select(slotIndex, spi::CHIP_ADC);
+	spi::transfer(slotIndex, data, result, 3);
+	spi::deselect(slotIndex);
 #endif
 }
 
@@ -317,14 +324,14 @@ float AnalogDigitalConverter::read(Channel& channel) {
     float value;
 
     if (adcDataType == ADC_DATA_TYPE_U_MON) {
-        channel.u.mon_adc = adcValue;
         value = remapAdcDataToVoltage(channel, adcDataType, adcValue);
+        channel.u.mon_adc = value;
 #ifdef DEBUG
         debug::g_uMon[channel.channelIndex].set(adcValue);
 #endif
     } else if (adcDataType == ADC_DATA_TYPE_I_MON) {
-        channel.i.mon_adc = adcValue;
         value = remapAdcDataToCurrent(channel, adcDataType, adcValue);
+        channel.i.mon_adc = value;
 #ifdef DEBUG
         debug::g_iMon[channel.channelIndex].set(adcValue);
 #endif

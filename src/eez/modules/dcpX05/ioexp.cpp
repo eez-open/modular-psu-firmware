@@ -357,13 +357,15 @@ bool IOExpander::testBit(int io_bit) {
     return (gpio & (1 << io_bit)) ? true : false;
 }
 
-#if defined(EEZ_PLATFORM_STM32)
 bool IOExpander::isAdcReady() {
+#if defined(EEZ_PLATFORM_STM32)
     // ready = !HAL_GPIO_ReadPin(SPI2_IRQ_GPIO_Port, SPI2_IRQ_Pin);
 	auto &slot = g_slots[slotIndex];
     return !testBit(slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 || slot.moduleInfo->moduleType == MODULE_TYPE_DCP405B ? DCP405_IO_BIT_IN_ADC_DRDY : DCP505_IO_BIT_IN_ADC_DRDY);
-}
+#else
+    return true;
 #endif
+}
 
 void IOExpander::changeBit(int io_bit, bool set) {
 #if defined(EEZ_PLATFORM_STM32)

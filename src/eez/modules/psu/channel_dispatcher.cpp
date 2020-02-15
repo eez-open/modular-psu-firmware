@@ -118,7 +118,7 @@ bool setCouplingType(CouplingType couplingType, int *err) {
         }
 
         if (osThreadGetId() != g_psuTaskHandle) {
-            osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SET_COUPLING_TYPE, couplingType), 0);
+            osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SET_COUPLING_TYPE, couplingType), osWaitForever);
         } else {
             setCouplingTypeInPsuThread(couplingType);
         }
@@ -224,7 +224,7 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
 
 void setTrackingChannels(uint16_t trackingEnabled) {
     if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SET_TRACKING_CHANNELS, trackingEnabled), 0);
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SET_TRACKING_CHANNELS, trackingEnabled), osWaitForever);
     } else {
         bool resetTrackingChannels = false;
         for (int i = 0; i < CH_NUM; i++) {
@@ -570,7 +570,19 @@ float getUProtectionLevel(const Channel &channel) {
     return channel.prot_conf.u_level;
 }
 
+static float g_setVoltageValues[CH_MAX];
+
+void setVoltageInPsuThread(int channelIndex) {
+    setVoltage(Channel::get(channelIndex), g_setVoltageValues[channelIndex]);
+}
+
 void setVoltage(Channel &channel, float voltage) {
+    if (osThreadGetId() != g_psuTaskHandle) {
+        g_setVoltageValues[channel.channelIndex] = voltage;
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_SET_VOLTAGE, channel.channelIndex), osWaitForever);
+        return;
+    }
+
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
         Channel::get(0).setVoltage(voltage / 2);
         Channel::get(1).setVoltage(voltage / 2);
@@ -848,7 +860,19 @@ float getIMax(const Channel &channel) {
     return channel.i.max;
 }
 
+static float g_setCurrentValues[CH_MAX];
+
+void setCurrentInPsuThread(int channelIndex) {
+    setCurrent(Channel::get(channelIndex), g_setCurrentValues[channelIndex]);
+}
+
 void setCurrent(Channel &channel, float current) {
+    if (osThreadGetId() != g_psuTaskHandle) {
+        g_setCurrentValues[channel.channelIndex] = current;
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_SET_CURRENT, channel.channelIndex), osWaitForever);
+        return;
+    }
+
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_PARALLEL) {
         Channel::get(0).setCurrent(current / 2);
         Channel::get(1).setCurrent(current / 2);
@@ -1181,7 +1205,7 @@ void outputEnableOnNextSync(Channel &channel, bool enable) {
 
 void syncOutputEnable() {
     if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SYNC_OUTPUT_ENABLE, 0), 0);
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SYNC_OUTPUT_ENABLE, 0), osWaitForever);
     } else {
         Channel::syncOutputEnable();
     }

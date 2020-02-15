@@ -61,13 +61,6 @@
 
 #define ADC_READ_TIME_US 1800
 
-/// How many times per second will ADC take snapshot value?
-/// 0: 20 SPS, 1: 45 SPS, 2: 90 SPS, 3: 175 SPS, 4: 330 SPS, 5: 600 SPS, 6: 1000 SPS
-#define ADC_SPS 5
-
-/// ADC conversion should be finished after ADC_CONVERSION_MAX_TIME_MS milliseconds.
-#define ADC_CONVERSION_MAX_TIME_MS 10
-
 /// Maximum number of attempts to recover from ADC timeout before giving up.
 #define MAX_ADC_TIMEOUT_RECOVERY_ATTEMPTS 3
 

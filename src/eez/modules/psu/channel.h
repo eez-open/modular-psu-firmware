@@ -207,7 +207,7 @@ class Channel {
     struct Value {
         float set;
 
-        int16_t mon_adc;
+        float mon_adc;
 
         bool mon_measured;
 
@@ -356,8 +356,7 @@ class Channel {
     void tick(uint32_t tick_usec);
 
     /// Called from channel driver when ADC data is ready.
-    /// Returns what to read next.
-    AdcDataType onAdcData(AdcDataType adcDataType, float value);
+    void onAdcData(AdcDataType adcDataType, float value);
 
     /// Called when device power is turned off, so channel
     /// can do its own housekeeping.
@@ -589,7 +588,8 @@ class Channel {
 #define OUTPUT_ENABLE_TASK_CURRENT_RANGE (1 << 2)
 #define OUTPUT_ENABLE_TASK_OVP           (1 << 3)
 #define OUTPUT_ENABLE_TASK_DP            (1 << 4)
-#define OUTPUT_ENABLE_TASK_FINALIZE      (1 << 5)
+#define OUTPUT_ENABLE_TASK_ADC_START     (1 << 5)
+#define OUTPUT_ENABLE_TASK_FINALIZE      (1 << 6)
 
 } // namespace psu
 } // namespace eez
