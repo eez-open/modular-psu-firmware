@@ -41,6 +41,7 @@ struct DisplayDataState {
     uint16_t backgroundColor;
     uint16_t activeColor;
     uint16_t activeBackgroundColor;
+    uint32_t dataRefreshLastTime;
 };
 
 void DisplayDataWidget_draw(const WidgetCursor &widgetCursor);

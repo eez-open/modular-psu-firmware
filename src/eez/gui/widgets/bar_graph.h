@@ -43,6 +43,8 @@ struct BarGraphWidgetState {
     uint16_t activeBackgroundColor;
     data::Value line1Data;
     data::Value line2Data;
+    data::Value textData;
+    uint32_t textDataRefreshLastTime;
 };
 
 void BarGraphWidget_draw(const WidgetCursor &widgetCursor);

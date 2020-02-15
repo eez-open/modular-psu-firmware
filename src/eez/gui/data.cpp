@@ -463,6 +463,15 @@ Value set(const Cursor &cursor, uint16_t id, Value value) {
     return value;
 }
 
+uint32_t getTextRefreshRate(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](DATA_OPERATION_GET_TEXT_REFRESH_RATE, (Cursor &)cursor, value);
+    if (value.getType() == VALUE_TYPE_UINT32) {
+        return value.getUInt32();
+    }
+    return 0;
+}
+
 uint16_t getColor(const Cursor &cursor, uint16_t id, const Style *style) {
     Value value((void *)style, VALUE_TYPE_POINTER);
     g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_COLOR, (Cursor &)cursor, value);

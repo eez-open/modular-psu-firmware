@@ -20,6 +20,7 @@
 
 #include <string.h>
 
+#include <eez/system.h>
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
@@ -52,8 +53,30 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widgetCursor.currentState->flags.focused ? display_data_widget->focusStyle : widget->style));
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
-    widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
     
+    auto data = data::get(widgetCursor.cursor, widget->data);
+    bool refreshData;
+    if (widgetCursor.previousState) {
+        refreshData = widgetCursor.previousState->data != data;
+        if (refreshData) {
+            uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
+            if (refreshRate != 0) {
+                refreshData = (millis() - currentState->dataRefreshLastTime) > refreshRate;
+            }
+        }
+        if (refreshData) {
+            widgetCursor.currentState->data = data;
+        } else {
+            widgetCursor.currentState->data = widgetCursor.previousState->data;
+        }
+    } else {
+        refreshData = true;
+        widgetCursor.currentState->data = data;
+    }
+    if (refreshData) {
+        currentState->dataRefreshLastTime = millis();
+    }
+
     currentState->color = data::getColor(widgetCursor.cursor, widget->data, style);
     currentState->backgroundColor = data::getBackgroundColor(widgetCursor.cursor, widget->data, style);
     currentState->activeColor = data::getActiveColor(widgetCursor.cursor, widget->data, style);
@@ -64,7 +87,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
         widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data ||
+        refreshData ||
         currentState->color != previousState->color ||
         currentState->backgroundColor != previousState->backgroundColor ||
         currentState->activeColor != previousState->activeColor ||

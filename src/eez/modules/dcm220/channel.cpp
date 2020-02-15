@@ -229,6 +229,8 @@ struct Channel : ChannelInterface {
 		params.CALIBRATION_MID_TOLERANCE_PERCENT = 3.0f;
 
 		params.features = CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE;
+
+		params.MON_REFRESH_RATE_MS = 500;
 	}
 
 #if defined(EEZ_PLATFORM_STM32)

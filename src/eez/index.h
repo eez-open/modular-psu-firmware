@@ -120,6 +120,8 @@ struct ChannelParams {
 
     /// Returns features present (check ChannelFeatures) in board revision of this channel.
     uint32_t features;
+
+    uint32_t MON_REFRESH_RATE_MS;
 };
 
 struct ChannelInterface {

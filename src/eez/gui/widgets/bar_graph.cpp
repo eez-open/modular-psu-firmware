@@ -21,6 +21,7 @@
 #include <math.h>
 #include <memory.h>
 
+#include <eez/system.h>
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
@@ -81,6 +82,29 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
     currentState->line1Data = data::get(widgetCursor.cursor, barGraphWidget->line1Data);
     currentState->line2Data = data::get(widgetCursor.cursor, barGraphWidget->line2Data);
 
+    auto textData = widgetCursor.currentState->data;
+    bool refreshTextData;
+    if (previousState) {
+        refreshTextData = previousState->textData != textData;
+        if (refreshTextData) {
+            uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
+            if (refreshRate != 0) {
+                refreshTextData = (millis() - currentState->textDataRefreshLastTime) > refreshRate;
+            }
+        }
+        if (refreshTextData) {
+            currentState->textData = textData;
+        } else {
+            currentState->textData = previousState->textData;
+        }
+    } else {
+        refreshTextData = true;
+        currentState->textData = textData;
+    }
+    if (refreshTextData) {
+        currentState->textDataRefreshLastTime = millis();
+    }
+   
     bool refresh =
         !widgetCursor.previousState ||
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
@@ -91,7 +115,8 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
         currentState->activeColor != previousState->activeColor ||
         currentState->activeBackgroundColor != previousState->activeBackgroundColor ||
         previousState->line1Data != currentState->line1Data ||
-        previousState->line2Data != currentState->line2Data;
+        previousState->line2Data != currentState->line2Data ||
+        refreshTextData;
 
     if (refresh) {
         int x = widgetCursor.x;
@@ -146,7 +171,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
             if (barGraphWidget->textStyle) {
                 font::Font font = styleGetFont(&textStyle);
 
-                widgetCursor.currentState->data.toText(valueText, sizeof(valueText));
+                currentState->textData.toText(valueText, sizeof(valueText));
                 wText = display::measureStr(valueText, -1, font, w);
 
                 int padding = textStyle.padding_left;
@@ -245,7 +270,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
             if (barGraphWidget->textStyle) {
                 font::Font font = styleGetFont(&textStyle);
 
-                widgetCursor.currentState->data.toText(valueText, sizeof(valueText));
+                currentState->textData.toText(valueText, sizeof(valueText));
                 hText = font.getHeight();
 
                 int padding = textStyle.padding_top;

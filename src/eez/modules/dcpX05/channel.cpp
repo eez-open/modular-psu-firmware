@@ -168,6 +168,8 @@ struct Channel : ChannelInterface {
 			params.features = CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE | 
 				CH_FEATURE_CURRENT_DUAL_RANGE | CH_FEATURE_COUPLING;
 		}
+
+		params.MON_REFRESH_RATE_MS = 250;
 	}
 
 	void init(int subchannelIndex) {

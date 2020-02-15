@@ -337,6 +337,7 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_CONTEXT,
     DATA_OPERATION_SET_CONTEXT,
     DATA_OPERATION_RESTORE_CONTEXT,
+    DATA_OPERATION_GET_TEXT_REFRESH_RATE,
     DATA_OPERATION_GET_COLOR,
     DATA_OPERATION_GET_BACKGROUND_COLOR,
     DATA_OPERATION_GET_ACTIVE_COLOR,
@@ -397,6 +398,8 @@ void getList(const Cursor &cursor, uint16_t id, const Value **labels, int &count
 
 Value get(const Cursor &cursor, uint16_t id);
 Value set(const Cursor &cursor, uint16_t id, Value value);
+
+uint32_t getTextRefreshRate(const Cursor &cursor, uint16_t id);
 
 uint16_t getColor(const Cursor &cursor, uint16_t id, const Style *style);
 uint16_t getBackgroundColor(const Cursor &cursor, uint16_t id, const Style *style);

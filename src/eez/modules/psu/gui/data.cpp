@@ -1252,6 +1252,8 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         }
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;
+    } else if (operation == data::DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+        value = Value(channel.params.MON_REFRESH_RATE_MS, VALUE_TYPE_UINT32);
     }
 }
 
@@ -1363,6 +1365,8 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         }
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;
+    } else if (operation == data::DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+        value = Value(channel.params.MON_REFRESH_RATE_MS, VALUE_TYPE_UINT32);
     }
 }
 
@@ -1465,6 +1469,8 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         }
     } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;
+    } else if (operation == data::DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+        value = Value(channel.params.MON_REFRESH_RATE_MS, VALUE_TYPE_UINT32);
     }
 }
 

@@ -193,9 +193,12 @@ void ChSettingsOvpProtectionPage::onSetParamsOk() {
 }
 
 void ChSettingsOvpProtectionPage::setParams(bool checkLoad) {
-    if (checkLoad && g_channel->isOutputEnabled() &&
+    if (
+        checkLoad && 
+        g_channel->isOutputEnabled() &&
         limit.getFloat() < channel_dispatcher::getUMon(*g_channel) &&
-        channel_dispatcher::getIMon(*g_channel) >= 0) {
+        channel_dispatcher::getIMon(*g_channel) >= 0
+    ) {
         areYouSureWithMessage("This change will affect current load.", onSetParamsOk);
     } else {
         channel_dispatcher::setVoltageLimit(*g_channel, limit.getFloat());
