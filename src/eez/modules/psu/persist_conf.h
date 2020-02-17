@@ -111,8 +111,8 @@ struct DeviceConfiguration {
     unsigned forceDisablingAllOutputsOnPowerUp : 1;
 
     // block 4
-    uint8_t serialBaud;
-    uint8_t serialParity;
+    uint8_t startOfBlock4; // was serialBaud
+    uint8_t reserved3; // was serialParity
     
     uint32_t ethernetIpAddress;
     uint32_t ethernetDns;
@@ -122,8 +122,8 @@ struct DeviceConfiguration {
     char ntpServer[32 + 1];
     uint8_t ethernetMacAddress[6];
 
-    uint8_t reserved2;
-    uint8_t reserved3;
+    uint8_t reserved4;
+    uint8_t reserved5;
 
     uint8_t encoderMovingSpeedDown;
     uint8_t encoderMovingSpeedUp;
@@ -167,7 +167,7 @@ struct DeviceConfiguration {
     // block 7
     UserSwitchAction userSwitchAction;
     SortFilesOption sortFilesOption;
-    uint8_t reserved7[56];
+    uint8_t reserved6[56];
 
     // block 8
     char ethernetHostName[32 + 1];
@@ -259,13 +259,6 @@ void setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep)
 
 bool enableSerial(bool enable);
 bool isSerialEnabled();
-int getIndexFromBaud(long baud);
-long getBaudFromIndex(int index);
-int getSerialBaudIndex();
-bool setSerialBaudIndex(int baudIndex);
-int getSerialParity();
-bool setSerialParity(int parity);
-bool setSerialSettings(bool enable, int baudIndex, int parity);
 
 bool enableEthernetDhcp(bool enable);
 bool isEthernetDhcpEnabled();

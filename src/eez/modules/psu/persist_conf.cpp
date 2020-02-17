@@ -87,7 +87,7 @@ struct DevConfBlock {
 static DevConfBlock g_devConfBlocks[] = {
     { offsetof(DeviceConfiguration, dateYear), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, profileAutoRecallLocation), 1, false, 0, 0, 0 },
-    { offsetof(DeviceConfiguration, serialBaud), 1, false, 0, 0, 0 },
+    { offsetof(DeviceConfiguration, startOfBlock4), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, triggerSource), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, ytGraphUpdateMethod), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, userSwitchAction), 1, false, 0, 60 * 1000, 0 },
@@ -142,9 +142,6 @@ void initDefaultDevConf() {
 
     g_defaultDevConf.isSoundEnabled = 1;
     g_defaultDevConf.isClickSoundEnabled = 0;
-
-    g_defaultDevConf.serialBaud = getIndexFromBaud(SERIAL_SPEED);
-    g_defaultDevConf.serialParity = serial::PARITY_NONE;
 
     g_defaultDevConf.ethernetIpAddress = getIpAddress(192, 168, 1, 100);
     g_defaultDevConf.ethernetDns = getIpAddress(192, 168, 1, 1);
@@ -896,62 +893,6 @@ bool enableSerial(bool enable) {
 
 bool isSerialEnabled() {
     return g_devConf.serialEnabled ? true : false;
-}
-
-int getIndexFromBaud(long baud) {
-    for (size_t i = 0; i < serial::g_baudsSize; ++i) {
-        if (serial::g_bauds[i] == baud) {
-            return i + 1;
-        }
-    }
-    return 0;
-}
-
-long getBaudFromIndex(int index) {
-    return serial::g_bauds[index - 1];
-}
-
-int getSerialBaudIndex() {
-    return g_devConf.serialBaud;
-}
-
-bool setSerialBaudIndex(int baudIndex) {
-    uint8_t serialBaud = (uint8_t)baudIndex;
-    if (!g_devConf.skipSerialSetup || g_devConf.serialBaud != serialBaud) {
-        g_devConf.serialBaud = serialBaud;
-        g_devConf.skipSerialSetup = 1;
-        serial::update();
-    }
-    return true;
-}
-
-int getSerialParity() {
-    return g_devConf.serialParity;
-}
-
-bool setSerialParity(int parity) {
-    unsigned serialParity = (unsigned)parity;
-    if (!g_devConf.skipSerialSetup || g_devConf.serialParity != serialParity) {
-        g_devConf.serialParity = serialParity;
-        g_devConf.skipSerialSetup = 1;
-        serial::update();
-    }
-    return true;
-}
-
-bool setSerialSettings(bool enabled, int baudIndex, int parity) {
-    unsigned serialEnabled = enabled ? 1 : 0;
-    uint8_t serialBaud = (uint8_t)baudIndex;
-    unsigned serialParity = (unsigned)parity;
-    if (!g_devConf.skipSerialSetup || g_devConf.serialEnabled != serialEnabled ||
-        g_devConf.serialBaud != serialBaud || g_devConf.serialParity != serialParity) {
-        g_devConf.serialEnabled = enabled;
-        g_devConf.serialBaud = serialBaud;
-        g_devConf.serialParity = serialParity;
-        g_devConf.skipSerialSetup = 1;
-        serial::update();
-    }
-    return true;
 }
 
 bool enableEthernet(bool enable) {

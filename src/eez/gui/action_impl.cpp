@@ -887,11 +887,7 @@ void action_io_pin_select_function() {
 }
 
 void action_serial_toggle() {
-    ((SysSettingsSerialPage *)getActivePage())->toggle();
-}
-
-void action_serial_select_parity() {
-    ((SysSettingsSerialPage *)getActivePage())->selectParity();
+    persist_conf::enableSerial(!persist_conf::isSerialEnabled());
 }
 
 void action_ntp_toggle() {

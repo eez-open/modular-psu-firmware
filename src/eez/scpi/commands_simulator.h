@@ -276,10 +276,6 @@
     SCPI_COMMAND("SYSTem:COMMunicate:NTP?", scpi_cmd_systemCommunicateNtpQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:RLSTate", scpi_cmd_systemCommunicateRlstate) \
     SCPI_COMMAND("SYSTem:COMMunicate:RLSTate?", scpi_cmd_systemCommunicateRlstateQ) \
-    SCPI_COMMAND("SYSTem:COMMunicate:SERial:BAUD", scpi_cmd_systemCommunicateSerialBaud) \
-    SCPI_COMMAND("SYSTem:COMMunicate:SERial:BAUD?", scpi_cmd_systemCommunicateSerialBaudQ) \
-    SCPI_COMMAND("SYSTem:COMMunicate:SERial:PARity", scpi_cmd_systemCommunicateSerialParity) \
-    SCPI_COMMAND("SYSTem:COMMunicate:SERial:PARity?", scpi_cmd_systemCommunicateSerialParityQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:MQTT:SETTings", scpi_cmd_systemCommunicateMqttSettings) \
     SCPI_COMMAND("SYSTem:COMMunicate:MQTT:STATe?", scpi_cmd_systemCommunicateMqttStateQ) \
     SCPI_COMMAND("SYSTem:CPU:INFOrmation:ONTime:LAST?", scpi_cmd_systemCpuInformationOntimeLastQ) \

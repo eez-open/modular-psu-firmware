@@ -62,12 +62,6 @@ extern "C" void notifySerialInput(uint8_t *buffer, uint32_t length) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void UARTClass::begin(unsigned long baud, UARTModes config) {
-}
-
-void UARTClass::end() {
-}
-
 #if defined(EEZ_PLATFORM_STM32)
 extern USBD_HandleTypeDef hUsbDeviceFS;
 #endif

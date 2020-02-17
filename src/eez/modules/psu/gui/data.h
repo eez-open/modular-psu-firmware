@@ -20,7 +20,6 @@ enum EnumDefinition {
     ENUM_DEFINITION_IO_PINS_POLARITY,
     ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION,
     ENUM_DEFINITION_IO_PINS_OUTPUT_FUNCTION,
-    ENUM_DEFINITION_SERIAL_PARITY,
     ENUM_DEFINITION_DST_RULE,
     ENUM_DEFINITION_USER_SWITCH_ACTION,
     ENUM_DEFINITION_FILE_MANAGER_SORT_BY,
@@ -38,7 +37,6 @@ extern EnumItem g_channelTriggerOnListStopEnumDefinition[];
 extern EnumItem g_ioPinsPolarityEnumDefinition[];
 extern EnumItem g_ioPinsInputFunctionEnumDefinition[];
 extern EnumItem g_ioPinsOutputFunctionEnumDefinition[];
-extern EnumItem g_serialParityEnumDefinition[];
 extern EnumItem g_dstRuleEnumDefinition[];
 extern EnumItem g_userSwitchActionEnumDefinition[];
 extern EnumItem g_fileManagerSortByEnumDefinition[];
@@ -77,7 +75,6 @@ enum UserValueType {
     VALUE_TYPE_IP_ADDRESS,
     VALUE_TYPE_PORT,
     VALUE_TYPE_TEXT_MESSAGE,
-    VALUE_TYPE_SERIAL_BAUD_INDEX,
     VALUE_TYPE_VALUE_LIST,
     VALUE_TYPE_FLOAT_LIST,
     VALUE_TYPE_CHANNEL_TITLE,

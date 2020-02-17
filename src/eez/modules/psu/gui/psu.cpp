@@ -131,7 +131,6 @@ static SysSettingsSoundPage g_SysSettingsSoundPage;
 #if OPTION_ENCODER
 static SysSettingsEncoderPage g_SysSettingsEncoderPage;
 #endif
-static SysSettingsSerialPage g_SysSettingsSerialPage;
 static SysSettingsTrackingPage g_sysSettingsTrackingPage;
 static SysSettingsCouplingPage g_sysSettingsCouplingPage;
 static UserProfilesPage g_UserProfilesPage;
@@ -216,9 +215,6 @@ Page *getPageFromIdHook(int pageId) {
         page = &g_SysSettingsEncoderPage;
         break;
 #endif
-    case PAGE_ID_SYS_SETTINGS_SERIAL:
-        page = &g_SysSettingsSerialPage;
-        break;
     case PAGE_ID_USER_PROFILES:
     case PAGE_ID_USER_PROFILE_0_SETTINGS:
     case PAGE_ID_USER_PROFILE_SETTINGS:

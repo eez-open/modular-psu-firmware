@@ -316,28 +316,6 @@ class SysSettingsIOPinsPage : public SetPage {
     static void onFunctionSet(uint16_t value);
 };
 
-class SysSettingsSerialPage : public SetPage {
-  public:
-    void pageAlloc();
-
-    void toggle();
-    void selectParity();
-
-    int getDirty();
-    void set();
-
-    bool m_enabled;
-    uint8_t m_baudIndex;
-    serial::Parity m_parity;
-
-  private:
-    bool m_enabledOrig;
-    uint8_t m_baudIndexOrig;
-    serial::Parity m_parityOrig;
-
-    static void onParitySet(uint16_t value);
-};
-
 class SysSettingsTrackingPage : public SetPage {
     friend class SysSettingsCouplingPage;
 

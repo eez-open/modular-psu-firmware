@@ -99,7 +99,6 @@ const EnumItem *g_enumDefinitions[] = {
     g_ioPinsPolarityEnumDefinition,
     g_ioPinsInputFunctionEnumDefinition,
     g_ioPinsOutputFunctionEnumDefinition,
-    g_serialParityEnumDefinition,
     g_dstRuleEnumDefinition,
     g_userSwitchActionEnumDefinition,
     g_fileManagerSortByEnumDefinition,
@@ -180,12 +179,6 @@ EnumItem g_ioPinsOutputFunctionEnumDefinition[] = {
     { io_pins::FUNCTION_ON_COUPLE, "Channel ON couple", "ONcoup" },
     { io_pins::FUNCTION_TOUTPUT, "Trigger output", "Toutput" },
     { 0, 0 }
-};
-
-EnumItem g_serialParityEnumDefinition[] = {
-    { serial::PARITY_NONE, "None" },   { serial::PARITY_EVEN, "Even" },
-    { serial::PARITY_ODD, "Odd" },     { serial::PARITY_MARK, "Mark" },
-    { serial::PARITY_SPACE, "Space" }, { 0, 0 }
 };
 
 EnumItem g_dstRuleEnumDefinition[] = {
@@ -672,15 +665,6 @@ void TEXT_MESSAGE_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
-bool compare_SERIAL_BAUD_INDEX_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
-}
-
-void SERIAL_BAUD_INDEX_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%ld", serial::g_bauds[value.getInt() - 1]);
-    text[count - 1] = 0;
-}
-
 bool compare_VALUE_LIST_value(const Value &a, const Value &b) {
     return a.getValueList() == b.getValueList();
 }
@@ -991,7 +975,6 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_IP_ADDRESS_value,
     compare_PORT_value,
     compare_TEXT_MESSAGE_value,
-    compare_SERIAL_BAUD_INDEX_value,
     compare_VALUE_LIST_value,
     compare_FLOAT_LIST_value,
     compare_CHANNEL_TITLE_value,
@@ -1044,7 +1027,6 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     IP_ADDRESS_value_to_text,
     PORT_value_to_text,
     TEXT_MESSAGE_value_to_text,
-    SERIAL_BAUD_INDEX_value_to_text,
     VALUE_LIST_value_to_text,
     FLOAT_LIST_value_to_text,
     CHANNEL_TITLE_value_to_text,
@@ -4265,43 +4247,13 @@ void data_serial_status(data::DataOperationEnum operation, data::Cursor &cursor,
 
 void data_serial_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        SysSettingsSerialPage *page = (SysSettingsSerialPage *)getPage(PAGE_ID_SYS_SETTINGS_SERIAL);
-        if (page) {
-            value = page->m_enabled;
-        }
+        value = persist_conf::isSerialEnabled();
     }
 }
 
 void data_serial_is_connected(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = data::Value(serial::isConnected());
-    }
-}
-
-void data_serial_baud(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        SysSettingsSerialPage *page = (SysSettingsSerialPage *)getPage(PAGE_ID_SYS_SETTINGS_SERIAL);
-        if (page) {
-            value = data::Value((int)page->m_baudIndex, VALUE_TYPE_SERIAL_BAUD_INDEX);
-        }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = 1;
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = (int)serial::g_baudsSize;
-    } else if (operation == data::DATA_OPERATION_SET) {
-        SysSettingsSerialPage *page = (SysSettingsSerialPage *)getPage(PAGE_ID_SYS_SETTINGS_SERIAL);
-        if (page) {
-            page->m_baudIndex = (uint8_t)value.getInt();
-        }
-    }
-}
-
-void data_serial_parity(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        SysSettingsSerialPage *page = (SysSettingsSerialPage *)getPage(PAGE_ID_SYS_SETTINGS_SERIAL);
-        if (page) {
-            value = MakeEnumDefinitionValue(page->m_parity, ENUM_DEFINITION_SERIAL_PARITY);
-        }
     }
 }
 

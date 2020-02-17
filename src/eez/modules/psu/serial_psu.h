@@ -38,17 +38,6 @@ bool isConnected();
 
 void update();
 
-extern long g_bauds[];
-extern size_t g_baudsSize;
-
-enum Parity {
-    PARITY_NONE,
-    PARITY_EVEN,
-    PARITY_ODD,
-    PARITY_MARK,
-    PARITY_SPACE
-};
-
 }
 }
 } // namespace eez::psu::serial

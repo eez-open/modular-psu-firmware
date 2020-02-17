@@ -820,41 +820,6 @@ void SysSettingsIOPinsPage::set() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void SysSettingsSerialPage::pageAlloc() {
-    m_enabledOrig = m_enabled = persist_conf::isSerialEnabled();
-    m_baudIndexOrig = m_baudIndex = persist_conf::getSerialBaudIndex();
-    m_parityOrig = m_parity = (serial::Parity)persist_conf::getSerialParity();
-}
-
-void SysSettingsSerialPage::toggle() {
-    m_enabled = !m_enabled;
-}
-
-void SysSettingsSerialPage::onParitySet(uint16_t value) {
-    popPage();
-    SysSettingsSerialPage *page = (SysSettingsSerialPage *)getActivePage();
-    page->m_parity = (serial::Parity)value;
-}
-
-void SysSettingsSerialPage::selectParity() {
-    pushSelectFromEnumPage(g_serialParityEnumDefinition, m_parity, 0, onParitySet);
-}
-
-int SysSettingsSerialPage::getDirty() {
-    return m_enabledOrig != m_enabled || m_baudIndexOrig != m_baudIndex || m_parityOrig != m_parity;
-}
-
-void SysSettingsSerialPage::set() {
-    if (getDirty()) {
-        if (persist_conf::setSerialSettings(m_enabled, m_baudIndex, m_parity)) {
-            popPage();
-            infoMessage("Serial settings saved!");
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void SysSettingsTrackingPage::pageAlloc() {
     m_trackingEnabled = 0;
     for (int i = 0; i < CH_MAX; i++) {

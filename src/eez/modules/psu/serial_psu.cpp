@@ -36,9 +36,6 @@ namespace serial {
 
 TestResult g_testResult = TEST_FAILED;
 
-long g_bauds[] = { 4800, 9600, 19200, 38400, 57600, 115200 };
-size_t g_baudsSize = sizeof(g_bauds) / sizeof(long);
-
 size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
     Serial.write(data, len);
     return len;
@@ -100,63 +97,38 @@ scpi_t g_scpiContext;
 
 static bool g_isConnected;
 
+static void initScpi();
+
 ////////////////////////////////////////////////////////////////////////////////
 
-UARTClass::UARTModes getConfig() {
-    switch (persist_conf::getSerialParity()) {
-    case PARITY_NONE:
-        return UARTClass::Mode_8N1;
-    case PARITY_EVEN:
-        return UARTClass::Mode_8E1;
-    case PARITY_ODD:
-        return UARTClass::Mode_8O1;
-    case PARITY_MARK:
-        return UARTClass::Mode_8M1;
-    case PARITY_SPACE:
-        return UARTClass::Mode_8S1;
-    }
-
-    return UARTClass::Mode_8N1;
-}
-
 void init() {
-    scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer,
-        SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
-
-    if (g_testResult == TEST_OK) {
-        Serial.end();
-    }
-
-    if (!persist_conf::isSerialEnabled()) {
-        g_testResult = TEST_SKIPPED;
-        return;
-    }
-
-    Serial.begin(persist_conf::getBaudFromIndex(persist_conf::getSerialBaudIndex()),
-                      getConfig());
+    if (persist_conf::isSerialEnabled()) {
+        initScpi();
 
 #ifdef EEZ_PLATFORM_SIMULATOR
-    Serial.print("EEZ BB3 software simulator ver. ");
-    Serial.println(FIRMWARE);
+        Serial.print("EEZ BB3 software simulator ver. ");
+        Serial.println(FIRMWARE);
 #endif
 
-    g_testResult = TEST_OK;
+        g_testResult = TEST_OK;
+    } else {
+        g_testResult = TEST_SKIPPED;
+    }
 }
 
 void onQueueMessage(uint32_t type, uint32_t param) {
     if (type == SERIAL_LINE_STATE_CHANGED) {
-        bool isConnected = param ? true : false;
-        if (isConnected != g_isConnected) {
-            g_isConnected = isConnected;
-            if (g_isConnected) {
-                scpi::emptyBuffer(g_scpiContext);
-            }
+        g_isConnected = param ? true : false;
+        if (isConnected()) {
+            scpi::emptyBuffer(g_scpiContext);
         }
     } else if (type == SERIAL_INPUT_AVAILABLE) {
         uint8_t *buffer;
         uint32_t length;
         Serial.getInputBuffer(param, &buffer, &length);
-        input(g_scpiContext, (const char *)buffer, length);
+        if (g_testResult == TEST_OK) {
+            input(g_scpiContext, (const char *)buffer, length);
+        }
         Serial.releaseInputBuffer();
     }
 }
@@ -166,7 +138,16 @@ bool isConnected() {
 }
 
 void update() {
-    init();
+    if (persist_conf::isSerialEnabled()) {
+        initScpi();
+        g_testResult = TEST_OK;
+    } else {
+        g_testResult = TEST_SKIPPED;
+    }
+}
+
+void initScpi() {
+    scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer, SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
 }
 
 } // namespace serial

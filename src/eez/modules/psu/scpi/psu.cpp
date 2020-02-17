@@ -56,6 +56,8 @@ void init(scpi_t &scpi_context, scpi_psu_t &scpi_psu_context, scpi_interface_t *
     scpi_psu_context.bufferOverrunTime = 0;
 
     scpi_context.user_context = &scpi_psu_context;
+
+    emptyBuffer(scpi_context);
 }
 
 void emptyBuffer(scpi_t &context) {

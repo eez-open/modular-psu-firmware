@@ -748,57 +748,6 @@ scpi_result_t scpi_cmd_systemRwlock(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemCommunicateSerialBaud(scpi_t *context) {
-    int32_t baud;
-    if (!SCPI_ParamInt(context, &baud, TRUE)) {
-        return SCPI_RES_ERR;
-    }
-
-    int baudIndex = persist_conf::getIndexFromBaud(baud);
-    if (baudIndex == 0) {
-        SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
-        return SCPI_RES_ERR;
-    }
-
-    if (!persist_conf::setSerialBaudIndex(baudIndex)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_systemCommunicateSerialBaudQ(scpi_t *context) {
-    SCPI_ResultInt(context, persist_conf::getBaudFromIndex(persist_conf::getSerialBaudIndex()));
-    return SCPI_RES_OK;
-}
-
-// NONE|ODD|EVEN
-static scpi_choice_def_t parityChoice[] = {
-    { "NONE", serial::PARITY_NONE },   { "EVEN", serial::PARITY_EVEN },
-    { "ODD", serial::PARITY_ODD },     { "MARK", serial::PARITY_MARK },
-    { "SPACE", serial::PARITY_SPACE }, SCPI_CHOICE_LIST_END
-};
-
-scpi_result_t scpi_cmd_systemCommunicateSerialParity(scpi_t *context) {
-    int32_t parity;
-    if (!SCPI_ParamChoice(context, parityChoice, &parity, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    if (!persist_conf::setSerialParity(parity)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_systemCommunicateSerialParityQ(scpi_t *context) {
-    resultChoiceName(context, parityChoice, persist_conf::getSerialParity());
-    return SCPI_RES_OK;
-}
-
 // NONE|ODD|EVEN
 static scpi_choice_def_t commInterfaceChoice[] = {
     { "SERial", 1 }, 
