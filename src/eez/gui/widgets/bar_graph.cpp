@@ -82,24 +82,21 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
     currentState->line1Data = data::get(widgetCursor.cursor, barGraphWidget->line1Data);
     currentState->line2Data = data::get(widgetCursor.cursor, barGraphWidget->line2Data);
 
-    auto textData = widgetCursor.currentState->data;
+    currentState->textData = widgetCursor.currentState->data;
     bool refreshTextData;
     if (previousState) {
-        refreshTextData = previousState->textData != textData;
+        refreshTextData = currentState->textData != previousState->textData;
         if (refreshTextData) {
             uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
             if (refreshRate != 0) {
                 refreshTextData = (millis() - currentState->textDataRefreshLastTime) > refreshRate;
+                if (!refreshTextData) {
+                    currentState->textData = previousState->textData;
+                }
             }
-        }
-        if (refreshTextData) {
-            currentState->textData = textData;
-        } else {
-            currentState->textData = previousState->textData;
         }
     } else {
         refreshTextData = true;
-        currentState->textData = textData;
     }
     if (refreshTextData) {
         currentState->textDataRefreshLastTime = millis();

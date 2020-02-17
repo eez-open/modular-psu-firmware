@@ -241,7 +241,7 @@
 #define DISPLAY_BACKGROUND_COLOR_B 255
 
 /// Number of values used for ADC averaging
-#define NUM_ADC_AVERAGING_VALUES 30
+#define NUM_ADC_AVERAGING_VALUES 10
 
 /// Width of the trigger output pulse, in milliseconds.
 #define CONF_TOUTPUT_PULSE_WIDTH_MS 100

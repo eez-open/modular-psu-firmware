@@ -1201,7 +1201,7 @@ void data_channel_is_cc(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        value = channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_CC;
+        value = channel.getMode() == CHANNEL_MODE_CC;
     }
 }
 
@@ -1209,7 +1209,7 @@ void data_channel_is_cv(data::DataOperationEnum operation, data::Cursor &cursor,
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        value = channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_CV;
+        value = channel.getMode() == CHANNEL_MODE_CV;
     }
 }
 
@@ -1235,7 +1235,7 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
     } else if (operation == data::DATA_OPERATION_GET_COLOR) {
-        if (io_pins::isInhibited() || channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
+        if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
@@ -1254,16 +1254,6 @@ void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         value = io_pins::isInhibited() ? 1 : 0;
     } else if (operation == data::DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
         value = Value(channel.params.MON_REFRESH_RATE_MS, VALUE_TYPE_UINT32);
-    }
-}
-
-void data_channel_u_mon_snapshot(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (false && operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        value = MakeValue(channel_dispatcher::getUMonSnapshot(channel), UNIT_VOLT);
-    } else {
-        data_channel_u_mon(operation, cursor, value);
     }
 }
 
@@ -1348,7 +1338,7 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
     } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
     } else if (operation == data::DATA_OPERATION_GET_COLOR) {
-        if (io_pins::isInhibited() || channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
+        if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
@@ -1367,16 +1357,6 @@ void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         value = io_pins::isInhibited() ? 1 : 0;
     } else if (operation == data::DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
         value = Value(channel.params.MON_REFRESH_RATE_MS, VALUE_TYPE_UINT32);
-    }
-}
-
-void data_channel_i_mon_snapshot(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (false && operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        value = MakeValue(channel_dispatcher::getIMonSnapshot(channel), UNIT_AMPER);
-    } else {
-        data_channel_i_mon(operation, cursor, value);
     }
 }
 
@@ -1452,7 +1432,7 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
     } else if (operation == data::DATA_OPERATION_GET_UNIT) {
     } else if (operation == data::DATA_OPERATION_GET_COLOR) {
-        if (io_pins::isInhibited() || channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
+        if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
@@ -1471,16 +1451,6 @@ void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor &cursor,
         value = io_pins::isInhibited() ? 1 : 0;
     } else if (operation == data::DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
         value = Value(channel.params.MON_REFRESH_RATE_MS, VALUE_TYPE_UINT32);
-    }
-}
-
-void data_channel_p_mon_snapshot(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (false && operation == data::DATA_OPERATION_GET) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        value = MakeValue(channel_dispatcher::getUMonSnapshot(channel) * channel_dispatcher::getIMonSnapshot(channel), UNIT_WATT);
-    } else {
-        data_channel_p_mon(operation, cursor, value);
     }
 }
 
@@ -4698,7 +4668,7 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
     } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        if (channel_dispatcher::getChannelMode(channel) == channel_dispatcher::CHANNEL_MODE_UR) {
+        if (channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(STYLE_ID_YT_GRAPH_UNREGULATED, VALUE_TYPE_UINT16);
         } else {
             if (value.getUInt8() == 0) {

@@ -1356,13 +1356,25 @@ void Channel::setOperBits(int bit_mask, bool on) {
     reg_set_oper_isum_bit(channelIndex, bit_mask, on);
 }
 
+ChannelMode Channel::getMode() const {
+    if (isCvMode()) {
+        return CHANNEL_MODE_CV;;
+    }
+    if (isCcMode()) {
+        return CHANNEL_MODE_CC;
+    }
+    return CHANNEL_MODE_UR;
+}
+
 const char *Channel::getModeStr() const {
-    if (isCvMode())
+    ChannelMode mode = getMode();
+    if (mode == CHANNEL_MODE_CV) {
         return "CV";
-    else if (isCcMode())
+    }
+    if (mode == CHANNEL_MODE_CC) {
         return "CC";
-    else
-        return "UR";
+    }
+    return "UR";
 }
 
 float Channel::getVoltageLimit() const {

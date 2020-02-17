@@ -78,6 +78,12 @@ struct ProtectionValue {
     uint32_t alarm_started;
 };
 
+enum ChannelMode {
+    CHANNEL_MODE_UR,
+    CHANNEL_MODE_CC,
+    CHANNEL_MODE_CV
+};
+
 /// PSU channel.
 class Channel {
     friend class DigitalAnalogConverter;
@@ -207,13 +213,16 @@ class Channel {
     struct Value {
         float set;
 
-        float mon_adc;
-
         bool mon_measured;
 
-        float mon;
+        float mon_adc; // uncalibrated
+
+        float mon_last; // calibrated, latest measurement
+
+        float mon; // calibrated, average value
+
+        // used for calculating average value
         float mon_prev;
-        float mon_last;
         int8_t mon_index;
         float mon_arr[NUM_ADC_AVERAGING_VALUES];
         float mon_total;
@@ -440,6 +449,7 @@ class Channel {
     }
 
     /// Returns "CC", "CV" or "UR"
+    ChannelMode getMode() const;
     const char *getModeStr() const;
 
     /// Returns currently set voltage limit

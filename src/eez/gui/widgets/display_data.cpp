@@ -54,24 +54,21 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
     
-    auto data = data::get(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
     bool refreshData;
     if (widgetCursor.previousState) {
-        refreshData = widgetCursor.previousState->data != data;
+        refreshData = widgetCursor.currentState->data != widgetCursor.previousState->data;
         if (refreshData) {
             uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
             if (refreshRate != 0) {
                 refreshData = (millis() - currentState->dataRefreshLastTime) > refreshRate;
+                if (!refreshData) {
+                    widgetCursor.currentState->data = widgetCursor.previousState->data;
+                }
             }
-        }
-        if (refreshData) {
-            widgetCursor.currentState->data = data;
-        } else {
-            widgetCursor.currentState->data = widgetCursor.previousState->data;
         }
     } else {
         refreshData = true;
-        widgetCursor.currentState->data = data;
     }
     if (refreshData) {
         currentState->dataRefreshLastTime = millis();

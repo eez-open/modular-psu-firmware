@@ -361,48 +361,6 @@ CouplingType getType() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define CONF_GUI_REFRESH_EVERY_MS 250
-
-uint32_t g_lastSnapshotTime;
-
-static struct ChannelSnapshot {
-    ChannelMode channelMode;
-    float uMon;
-    float iMon;
-    float pMon;
-} g_channelSnapshots[CH_MAX];
-
-ChannelSnapshot &getChannelSnapshot(int channelIndex) {
-    uint32_t currentTime = micros();
-    if (!g_lastSnapshotTime || currentTime - g_lastSnapshotTime >= CONF_GUI_REFRESH_EVERY_MS * 1000UL) {
-        for (int i = 0; i < CH_NUM; i++) {
-            Channel &channel = Channel::get(i);
-            ChannelSnapshot &channelSnapshot = g_channelSnapshots[i];
-            const char *mode_str = channel.getModeStr();
-            channelSnapshot.uMon = channel_dispatcher::getUMon(channel);
-            channelSnapshot.iMon = channel_dispatcher::getIMon(channel);
-            if (strcmp(mode_str, "CC") == 0) {
-                channelSnapshot.channelMode = CHANNEL_MODE_CC;
-            } else if (strcmp(mode_str, "CV") == 0) {
-                channelSnapshot.channelMode = CHANNEL_MODE_CV;
-            } else {
-                channelSnapshot.channelMode = CHANNEL_MODE_UR;
-            }
-            channelSnapshot.pMon = roundPrec(channelSnapshot.uMon * channelSnapshot.iMon, channel.getPowerResolution());
-        }
-
-        g_lastSnapshotTime = currentTime;
-    }
-
-    return g_channelSnapshots[channelIndex];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-ChannelMode getChannelMode(const Channel &channel) {
-    return getChannelSnapshot(channel.channelIndex).channelMode;
-}
-
 float getTrackingValuePrecision(Unit unit, float value) {
     float precision = 0;
     for (int i = 0; i < CH_NUM; ++i) {
@@ -448,13 +406,6 @@ float getUMon(const Channel &channel) {
         return Channel::get(0).u.mon + Channel::get(1).u.mon;
     }
     return channel.u.mon;
-}
-
-float getUMonSnapshot(const Channel &channel) {
-    if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
-        return getChannelSnapshot(0).uMon + getChannelSnapshot(1).uMon;
-    }
-    return getChannelSnapshot(channel.channelIndex).uMon;
 }
 
 float getUMonLast(const Channel &channel) {
@@ -763,13 +714,6 @@ float getIMon(const Channel &channel) {
         return Channel::get(0).i.mon + Channel::get(1).i.mon;
     }
     return channel.i.mon;
-}
-
-float getIMonSnapshot(const Channel &channel) {
-    if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_PARALLEL) {
-        return getChannelSnapshot(0).iMon + getChannelSnapshot(1).iMon;
-    }
-    return getChannelSnapshot(channel.channelIndex).iMon;
 }
 
 float getIMonLast(const Channel &channel) {

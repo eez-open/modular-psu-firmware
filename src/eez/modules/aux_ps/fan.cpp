@@ -382,8 +382,8 @@ void getIMonMax(float &iMonMax, float &iMax) {
 	for (int i = 0; i < CH_NUM; ++i) {
 		Channel& channel = Channel::get(i);
         if (channel.isOutputEnabled()) {
-            if (channel.i.mon > iMonMax) {
-                iMonMax = channel.i.mon;
+            if (channel.i.mon_last > iMonMax) {
+                iMonMax = channel.i.mon_last;
             }
         }
         if (channel.params.I_MAX > iMax) {
