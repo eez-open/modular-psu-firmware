@@ -244,7 +244,6 @@ PsuAppContext g_psuAppContext;
 
 static unsigned g_skipChannelCalibrations;
 static unsigned g_skipDateTimeSetup;
-static unsigned g_skipSerialSetup;
 static unsigned g_skipEthernetSetup;
 
 static bool g_showSetupWizardQuestionCalled;
@@ -482,7 +481,6 @@ bool isSysSettingsSubPage(int pageId) {
         pageId == PAGE_ID_SYS_SETTINGS_ENCODER ||
         pageId == PAGE_ID_SYS_SETTINGS_SERIAL ||
         pageId == PAGE_ID_SYS_SETTINGS_ETHERNET ||
-        pageId == PAGE_ID_SYS_SETTINGS_CAL ||
         pageId == PAGE_ID_SYS_SETTINGS_TRIGGER ||
         pageId == PAGE_ID_SYS_SETTINGS_DISPLAY ||
         pageId == PAGE_ID_SYS_SETTINGS_SOUND ||
@@ -968,28 +966,12 @@ bool isDateTimeSetupDone() {
     return persist_conf::devConf.dateValid && persist_conf::devConf.timeValid;
 }
 
-void channelCalibrationsYes() {
-    executeAction(ACTION_ID_SHOW_SYS_SETTINGS_CAL);
-}
-
-void channelCalibrationsNo() {
-    persist_conf::setSkipChannelCalibrations(1);
-}
-
 void dateTimeYes() {
     executeAction(ACTION_ID_SHOW_SYS_SETTINGS_DATE_TIME);
 }
 
 void dateTimeNo() {
     persist_conf::setSkipDateTimeSetup(1);
-}
-
-void serialYes() {
-    executeAction(ACTION_ID_SHOW_SYS_SETTINGS_SERIAL);
-}
-
-void serialNo() {
-    persist_conf::setSkipSerialSetup(1);
 }
 
 void ethernetYes() {
@@ -1006,26 +988,9 @@ bool showSetupWizardQuestion() {
         
         g_skipChannelCalibrations = persist_conf::devConf.skipChannelCalibrations;
         g_skipDateTimeSetup = persist_conf::devConf.skipDateTimeSetup;
-        g_skipSerialSetup = persist_conf::devConf.skipSerialSetup;
         g_skipEthernetSetup = persist_conf::devConf.skipEthernetSetup;
     }
 
-    if (!g_skipChannelCalibrations) {
-        g_skipChannelCalibrations = 1;
-        if (!isChannelCalibrationsDone()) {
-            yesNoLater("Do you want to calibrate channels?", channelCalibrationsYes,
-                        channelCalibrationsNo);
-            return true;
-        }
-    }
-
-    if (!g_skipSerialSetup) {
-        g_skipSerialSetup = 1;
-        if (!persist_conf::isSerialEnabled()) {
-            yesNoLater("Do you want to setup serial port?", serialYes, serialNo);
-            return true;
-        }
-    }
 
 #if OPTION_ETHERNET
     if (!g_skipEthernetSetup) {
@@ -1570,36 +1535,58 @@ void clearTrip(int channelIndex) {
     channelToggleOutput();
 }
 
+void doChannelToggleOutput() {
+    Channel &channel = *g_channel;
+    bool triggerModeEnabled =
+        (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||
+        channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) && !channel.isRemoteProgrammingEnabled();
+
+    if (channel.isOutputEnabled()) {
+        if (triggerModeEnabled) {
+            trigger::abort();
+        }
+
+        channel_dispatcher::outputEnable(channel, false);
+    } else {
+        if (triggerModeEnabled) {
+            if (trigger::isIdle()) {
+                g_toggleOutputWidgetCursor = getFoundWidgetAtDown();
+                pushPage(PAGE_ID_CH_START_LIST);
+            } else if (trigger::isInitiated()) {
+                trigger::abort();
+            } else {
+                yesNoDialog(PAGE_ID_YES_NO_L, "Trigger is active. Re-initiate trigger?", channelReinitiateTrigger, 0, 0);
+            }
+        } else {
+            channel_dispatcher::outputEnable(channel, true);
+        }
+    }
+}
+
+void channelCalibrationsYes() {
+    executeAction(ACTION_ID_SHOW_CH_SETTINGS_CAL);
+}
+
+void channelCalibrationsNo() {
+    persist_conf::setSkipChannelCalibrations(persist_conf::devConf.skipChannelCalibrations | (1 << g_channel->channelIndex));
+    doChannelToggleOutput();
+}
+
 void channelToggleOutput() {
-    Channel &channel =
-        Channel::get(getFoundWidgetAtDown().cursor.i >= 0 ? getFoundWidgetAtDown().cursor.i : 0);
+    selectChannel();
+    Channel &channel = *g_channel;
     if (channel_dispatcher::isTripped(channel)) {
         errorMessageWithAction("Channel is tripped!", clearTrip, "Clear", channel.channelIndex);
     } else {
-        bool triggerModeEnabled =
-            (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||
-            channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) && !channel.isRemoteProgrammingEnabled();
-
-        if (channel.isOutputEnabled()) {
-            if (triggerModeEnabled) {
-                trigger::abort();
-            }
-
-            channel_dispatcher::outputEnable(channel, false);
-        } else {
-            if (triggerModeEnabled) {
-                if (trigger::isIdle()) {
-                    g_toggleOutputWidgetCursor = getFoundWidgetAtDown();
-                    pushPage(PAGE_ID_CH_START_LIST);
-                } else if (trigger::isInitiated()) {
-                    trigger::abort();
-                } else {
-                    yesNoDialog(PAGE_ID_YES_NO_L, "Trigger is active. Re-initiate trigger?", channelReinitiateTrigger, 0, 0);
-                }
-            } else {
-                channel_dispatcher::outputEnable(channel, true);
+        if (!channel.isOutputEnabled() && !channel.isCalibrationExists()) {
+            if (!(g_skipChannelCalibrations & (1 << channel.channelIndex))) {
+                g_skipChannelCalibrations |= 1 << channel.channelIndex;
+                yesNoLater("Do you want to calibrate channel?", channelCalibrationsYes, channelCalibrationsNo, doChannelToggleOutput);
+                return;
             }
         }
+
+        doChannelToggleOutput();
     }
 }
 

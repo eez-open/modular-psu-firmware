@@ -230,15 +230,6 @@ void action_show_sys_settings_date_time() {
     pushPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
 }
 
-void action_show_sys_settings_cal() {
-    pushPage(PAGE_ID_SYS_SETTINGS_CAL);
-}
-
-void action_show_sys_settings_cal_ch() {
-    selectChannel();
-    pushPage(PAGE_ID_SYS_SETTINGS_CAL_CH);
-}
-
 void action_show_sys_settings_screen_calibration() {
     pushPage(PAGE_ID_SYS_SETTINGS_SCREEN_CALIBRATION);
 }
@@ -362,43 +353,43 @@ void action_show_ch_settings_cal() {
     pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
 }
 
-void action_sys_settings_cal_edit_password() {
+void action_edit_calibration_password() {
     editCalibrationPassword();
 }
 
-void action_sys_settings_cal_ch_wiz_start() {
+void action_ch_settings_calibration_wiz_start() {
     calibration_wizard::start();
 }
 
-void action_sys_settings_cal_ch_wiz_step_previous() {
+void action_ch_settings_calibration_wiz_step_previous() {
     calibration_wizard::previousStep();
 }
 
-void action_sys_settings_cal_ch_wiz_step_next() {
+void action_ch_settings_calibration_wiz_step_next() {
     calibration_wizard::nextStep();
 }
 
-void action_sys_settings_cal_ch_wiz_stop_and_show_previous_page() {
+void action_ch_settings_calibration_wiz_stop_and_show_previous_page() {
     calibration_wizard::stop(popPage);
 }
 
-void action_sys_settings_cal_ch_wiz_stop_and_show_main_page() {
+void action_ch_settings_calibration_wiz_stop_and_show_main_page() {
     calibration_wizard::stop(action_show_main_page);
 }
 
-void action_sys_settings_cal_ch_wiz_step_set() {
+void action_ch_settings_calibration_wiz_step_set() {
     calibration_wizard::set();
 }
 
-void action_sys_settings_cal_ch_wiz_step_set_level_value() {
+void action_ch_settings_calibration_wiz_step_set_level_value() {
     calibration_wizard::setLevelValue();
 }
 
-void action_sys_settings_cal_ch_wiz_save() {
+void action_ch_settings_calibration_wiz_save() {
     calibration_wizard::save();
 }
 
-void action_sys_settings_cal_toggle_enable() {
+void action_ch_settings_calibration_toggle_enable() {
     calibration_wizard::toggleEnable();
 }
 

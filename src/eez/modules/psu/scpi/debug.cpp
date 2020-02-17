@@ -62,6 +62,7 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             mcu::eeprom::resetAllExceptOnTimeCounters();
 
 #if defined(EEZ_PLATFORM_STM32)
+            taskEXIT_CRITICAL();
             restart();
 #endif
         } else {

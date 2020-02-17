@@ -883,9 +883,8 @@ void setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep)
 
 bool enableSerial(bool enable) {
     unsigned serialEnabled = enable ? 1 : 0;
-    if (!g_devConf.skipSerialSetup || g_devConf.serialEnabled != serialEnabled) {
+    if (g_devConf.serialEnabled != serialEnabled) {
         g_devConf.serialEnabled = serialEnabled;
-        g_devConf.skipSerialSetup = 1;
         serial::update();
     }
     return true;
@@ -1194,10 +1193,6 @@ void setSkipChannelCalibrations(unsigned skipChannelCalibrations) {
 
 void setSkipDateTimeSetup(unsigned skipDateTimeSetup) {
     g_devConf.skipDateTimeSetup = skipDateTimeSetup;
-}
-
-void setSkipSerialSetup(unsigned skipSerialSetup) {
-    g_devConf.skipSerialSetup = skipSerialSetup;
 }
 
 void setSkipEthernetSetup(unsigned skipEthernetSetup) {

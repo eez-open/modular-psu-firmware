@@ -120,9 +120,9 @@ void showCurrentStep() {
             break;
         }
 
-        replacePage(PAGE_ID_SYS_SETTINGS_CAL_CH_WIZ_STEP);
+        replacePage(PAGE_ID_CH_SETTINGS_CALIBRATION_WIZ_STEP);
     } else {
-        replacePage(PAGE_ID_SYS_SETTINGS_CAL_CH_WIZ_FINISH);
+        replacePage(PAGE_ID_CH_SETTINGS_CALIBRATION_WIZ_FINISH);
     }
 }
 

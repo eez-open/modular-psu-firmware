@@ -82,9 +82,8 @@ struct DeviceConfiguration {
     int16_t touchScreenCalTrx;
     int16_t touchScreenCalTry;
 
-    unsigned skipChannelCalibrations : 1;
+    unsigned skipChannelCalibrations : 6;
     unsigned skipDateTimeSetup : 1;
-    unsigned skipSerialSetup : 1;
     unsigned skipEthernetSetup : 1;
 
     // block 2
@@ -307,7 +306,6 @@ void setTriggerSource(uint8_t triggerSource);
 
 void setSkipChannelCalibrations(unsigned skipChannelCalibrations);
 void setSkipDateTimeSetup(unsigned skipDateTimeSetup);
-void setSkipSerialSetup(unsigned skipSerialSetup);
 void setSkipEthernetSetup(unsigned skipEthernetSetup);
 
 void setUserSwitchAction(UserSwitchAction userSwitchAction);
