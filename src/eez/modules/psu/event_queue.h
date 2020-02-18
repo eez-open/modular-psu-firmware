@@ -23,9 +23,11 @@ namespace psu {
 namespace event_queue {
 
 static const int EVENT_TYPE_NONE = 0;
-static const int EVENT_TYPE_INFO = 1;
-static const int EVENT_TYPE_WARNING = 2;
-static const int EVENT_TYPE_ERROR = 3;
+static const int EVENT_TYPE_DEBUG = 1;
+static const int EVENT_TYPE_INFO = 2;
+static const int EVENT_TYPE_WARNING = 3;
+static const int EVENT_TYPE_ERROR = 4;
+static const int EVENT_TYPE_UNKNOWN = 5;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -140,6 +142,7 @@ static const int EVENT_TYPE_ERROR = 3;
 	EVENT_ERROR(SLOT1_SYNC_ERROR, 140, "Sync error on module 1")                                   \
 	EVENT_ERROR(SLOT2_SYNC_ERROR, 141, "Sync error on module 2")                                   \
 	EVENT_ERROR(SLOT3_SYNC_ERROR, 142, "Sync error on module 3")                                   \
+    EVENT_ERROR(TOO_MANY_LOG_EVENTS, 150, "To many log events")                                    \
     EVENT_WARNING(CH1_CALIBRATION_DISABLED, 0, "Ch1 calibration disabled")                         \
     EVENT_WARNING(CH2_CALIBRATION_DISABLED, 1, "Ch2 calibration disabled")                         \
     EVENT_WARNING(CH3_CALIBRATION_DISABLED, 2, "Ch3 calibration disabled")                         \
@@ -268,35 +271,22 @@ enum Events { LIST_OF_EVENTS };
 
 static const int EVENTS_PER_PAGE = 8;
 
-////////////////////////////////////////////////////////////////////////////////
-
-struct EventQueueHeader {
-    uint32_t magicNumber;
-    uint16_t version;
-    uint16_t head;
-    uint16_t size;
-    uint16_t lastErrorEventIndex;
-    uint32_t reserved;
-};
-
-struct Event {
-    uint32_t dateTime;
-    int16_t eventId;
-    int16_t reserved1;
-    uint32_t reserved2;
-    uint32_t reserved3;
-};
+struct Event;
 
 void init();
 void tick();
 
-Event *getLastErrorEvent();
+int16_t getLastErrorEventId();
+
+uint32_t getEventDateTime(Event *e);
 
 int getEventType(int16_t eventId);
 int getEventType(Event *e);
 
 const char *getEventMessage(int16_t eventId);
 const char *getEventMessage(Event *e);
+
+bool compareEvents(Event *aEvent, Event *bEvent);
 
 void pushEvent(int16_t eventId);
 

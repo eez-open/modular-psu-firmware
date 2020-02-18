@@ -120,8 +120,6 @@ void boot() {
     psu::rtc::init();
     psu::datetime::init();
 
-    psu::event_queue::init();
-
     mcu::eeprom::init();
     mcu::eeprom::test();
 
@@ -220,6 +218,8 @@ void boot() {
     g_bootTestSuccess = true;
 
     g_bootTestSuccess &= testMaster();
+
+    psu::event_queue::init();
 
     if (!psu::autoRecall()) {
         psu::psuReset();

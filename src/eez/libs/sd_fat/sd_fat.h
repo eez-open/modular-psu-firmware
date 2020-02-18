@@ -128,6 +128,8 @@ class File {
     ~File();
     void close();
 
+    bool isOpen();
+
     bool truncate(uint32_t length);
 
     bool available();
@@ -144,6 +146,7 @@ class File {
     void print(char value);
 
   private:
+    bool m_isOpen;
 #ifdef EEZ_PLATFORM_SIMULATOR
     FILE *m_fp;
 #else

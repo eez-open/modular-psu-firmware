@@ -468,7 +468,7 @@ bool compare_EVENT_value(const Value &a, const Value &b) {
         return false;
     }
 
-    return aEvent->dateTime == bEvent->dateTime && aEvent->eventId == bEvent->eventId;
+    return event_queue::compareEvents(aEvent, bEvent);
 }
 
 void EVENT_value_to_text(const Value &value, char *text, int count) {
@@ -479,19 +479,17 @@ void EVENT_value_to_text(const Value &value, char *text, int count) {
     }
 
     int year, month, day, hour, minute, second;
-    datetime::breakTime(event->dateTime, year, month, day, hour, minute, second);
+    datetime::breakTime(getEventDateTime(event), year, month, day, hour, minute, second);
 
     int yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow;
     datetime::breakTime(datetime::now(), yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow);
 
+    using namespace event_queue;
+
     if (yearNow == year && monthNow == month && dayNow == day) {
-        snprintf(text, count - 1, "%c [%02d:%02d:%02d] %s",
-                 127 + event_queue::getEventType(event), hour, minute, second,
-                 event_queue::getEventMessage(event));
+        snprintf(text, count - 1, "%c [%02d:%02d:%02d] %s", 127 + getEventType(event) - EVENT_TYPE_DEBUG, hour, minute, second, getEventMessage(event));
     } else {
-        snprintf(text, count - 1, "%c [%02d-%02d-%02d] %s",
-                 127 + event_queue::getEventType(event), day, month, year % 100,
-                 event_queue::getEventMessage(event));
+        snprintf(text, count - 1, "%c [%02d-%02d-%02d] %s", 127 + getEventType(event) - EVENT_TYPE_DEBUG, day, month, year % 100, getEventMessage(event));
     }
 
     text[count - 1] = 0;
@@ -856,26 +854,6 @@ void PAGE_INFO_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
-bool compare_DEBUG_TRACE_LOG_STR_value(const Value &a, const Value &b) {
-    return strcmp(a.getString(), b.getString()) == 0;
-}
-
-void DEBUG_TRACE_LOG_STR_value_to_text(const Value &value, char *text, int count) {
-    const char *p = value.getString();
-
-    while (--count) {
-        *text++ = *p;
-        if (*p == 0) {
-            break;
-        }
-        if (++p == (const char *)DEBUG_TRACE_LOG + DEBUG_TRACE_LOG_SIZE) {
-            p = (const char *)DEBUG_TRACE_LOG;
-        }
-    }
-
-    *text = 0;
-}
-
 bool compare_TEST_RESULT_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -991,7 +969,6 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_SLOT_INFO2_value,
     compare_MASTER_INFO_value,
     compare_PAGE_INFO_value,
-    compare_DEBUG_TRACE_LOG_STR_value,
     compare_TEST_RESULT_value,
     compare_SCPI_ERROR_value,
     compare_STORAGE_INFO_value,
@@ -1043,7 +1020,6 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     SLOT_INFO2_value_to_text,
     MASTER_INFO_value_to_text,
     PAGE_INFO_value_to_text,
-    DEBUG_TRACE_LOG_STR_value_to_text,
     TEST_RESULT_value_to_text,
     SCPI_ERROR_value_to_text,
     STORAGE_INFO_value_to_text,
@@ -2776,17 +2752,7 @@ void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::
 
 void data_event_queue_last_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        auto *lastEvent = event_queue::getLastErrorEvent();
-        value = data::Value(lastEvent ? event_queue::getEventType(lastEvent) : event_queue::EVENT_TYPE_NONE);
-    }
-}
-
-void data_event_queue_last_event_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        auto lastEvent = event_queue::getLastErrorEvent();
-        if (lastEvent && event_queue::getEventType(lastEvent) != event_queue::EVENT_TYPE_NONE) {
-            value = MakeEventValue(lastEvent);
-        }
+        value = data::Value(event_queue::getEventType(event_queue::getLastErrorEventId()));
     }
 }
 
@@ -2796,7 +2762,7 @@ void data_event_queue_events(data::DataOperationEnum operation, data::Cursor &cu
     }
 }
 
-void data_event_queue_events_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_event_queue_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (cursor.i >= 0) {
             event_queue::Event *event = event_queue::getActivePageEvent(cursor.i);
@@ -2805,7 +2771,7 @@ void data_event_queue_events_type(data::DataOperationEnum operation, data::Curso
     }
 }
 
-void data_event_queue_events_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_event_queue_event_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (cursor.i >= 0) {
             value = MakeEventValue(event_queue::getActivePageEvent(cursor.i));
@@ -5338,26 +5304,6 @@ void data_script_info(data::DataOperationEnum operation, data::Cursor &cursor, d
     }
 }
 
-void data_debug_trace_log(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
-        value = (int)eez::debug::getNumTraceLogLines();
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
-        value = Value(eez::debug::getNumTraceLogLines(), VALUE_TYPE_UINT32);
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
-        value = Value(eez::debug::getTraceLogStartPosition(), VALUE_TYPE_UINT32);
-    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
-        eez::debug::setTraceLogStartPosition(value.getUInt32());
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
-        value = Value(eez::debug::getTraceLogPageSize(), VALUE_TYPE_UINT32);
-    }
-}
-
-void data_debug_trace_log_line(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = Value(eez::debug::getTraceLogLine(cursor.i), VALUE_TYPE_DEBUG_TRACE_LOG_STR);
-    }
-}
-
 void data_mqtt_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_ETHERNET
     if (operation == data::DATA_OPERATION_GET) {
@@ -5488,12 +5434,6 @@ void data_mqtt_period(data::DataOperationEnum operation, data::Cursor &cursor, d
         }
     }
 #endif
-}
-
-void data_debug_trace_log_is_stopped(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = eez::debug::g_stopDebugTraceLog ? 1 : 0;
-    }
 }
 
 void data_progress(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {

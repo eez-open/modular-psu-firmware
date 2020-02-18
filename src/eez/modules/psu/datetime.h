@@ -49,8 +49,7 @@ uint32_t now();
 uint32_t nowUtc();
 
 uint32_t makeTime(int year, int month, int day, int hour, int minute, int second);
-void breakTime(uint32_t time, int &resultYear, int &resultMonth, int &resultDay, int &resultHour,
-               int &resultMinute, int &resultSecond);
+void breakTime(uint32_t time, int &resultYear, int &resultMonth, int &resultDay, int &resultHour, int &resultMinute, int &resultSecond);
 
 enum DstRule { DST_RULE_OFF, DST_RULE_EUROPE, DST_RULE_USA, DST_RULE_AUSTRALIA };
 

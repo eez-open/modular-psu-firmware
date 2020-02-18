@@ -428,6 +428,7 @@ bool publishEvent(int16_t eventId, bool retain) {
     char payload[MAX_PAYLOAD_LENGTH + 1];
     static const char *g_eventTypes[] = {
         "None",
+        "Debug",
         "Info",
         "Warning",
         "Error"

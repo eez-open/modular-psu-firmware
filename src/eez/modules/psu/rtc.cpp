@@ -199,10 +199,6 @@ bool writeTime(uint8_t hour, uint8_t minute, uint8_t second) {
 }
 
 bool readDateTime(uint8_t &year, uint8_t &month, uint8_t &day, uint8_t &hour, uint8_t &minute, uint8_t &second) {
-    if (g_testResult != TEST_OK) {
-        return false;
-    }
-
 #if defined(EEZ_PLATFORM_STM32)
     readTime(hour, minute, second);
     readDate(year, month, day);

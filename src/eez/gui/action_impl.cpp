@@ -1259,11 +1259,6 @@ void action_file_manager_new_file() {
     file_manager::newFile();
 }
 
-void action_show_debug_trace_log() {
-    eez::debug::resetTraceLogStartPosition();
-    pushPage(PAGE_ID_DEBUG_TRACE_LOG);
-}
-
 void action_show_sys_settings_mqtt() {
     pushPage(PAGE_ID_SYS_SETTINGS_MQTT);
 }
@@ -1292,10 +1287,6 @@ void action_mqtt_edit_password() {
 
 void action_mqtt_edit_period() {
     editValue(DATA_ID_MQTT_PERIOD);
-}
-
-void action_debug_trace_log_toggle() {
-    debug::g_stopDebugTraceLog = !debug::g_stopDebugTraceLog;
 }
 
 void onFirmwareSelected(const char *filePath) {

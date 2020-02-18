@@ -122,12 +122,13 @@ SdFatResult Directory::findNext(FileInfo &fileInfo) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-File::File() {
+File::File() : m_isOpen(false) {
 }
 
 bool File::open(const char *path, uint8_t mode) {
 	FRESULT result = f_open(&m_file, path, mode);
-	return result == FR_OK;
+    m_isOpen = result == FR_OK;
+	return m_isOpen;
 }
 
 File::~File() {
@@ -135,6 +136,11 @@ File::~File() {
 
 void File::close() {
     f_close(&m_file);
+    m_isOpen = false;
+}
+
+bool File::isOpen() {
+    return m_isOpen;
 }
 
 bool File::truncate(uint32_t length) {

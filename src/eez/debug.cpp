@@ -31,200 +31,22 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/datetime.h>
 
-#if OPTION_DISPLAY
-#include <eez/gui/gui.h>
-#endif
-
 using namespace eez::psu;
 
 namespace eez {
 namespace debug {
 
-bool g_stopDebugTraceLog;
-
-static char *g_log = (char *)DEBUG_TRACE_LOG;
-static uint32_t g_head;
-static uint32_t g_tail;
-static bool g_full;
-
-static uint32_t g_numLines;
-static uint32_t g_changed;
-
-static uint32_t g_lastLineIndex;
-static uint32_t g_lastLineCharPosition;
-
-static uint32_t g_startPosition = 0;
-static const uint32_t TRACE_LOG_PAGE_SIZE = 10;
-
-void addCharToLog(char ch) {
-#if OPTION_DISPLAY
-    // wrap line if doesn't fit
-    static gui::font::Font g_traceLogFont;
-    static uint16_t lineWidth = 0;
-    static const uint16_t TRACE_LOG_LINE_WIDTH = 448;
-    if (ch == 0) {
-        lineWidth = 0;
-    } else {
-        if (!g_traceLogFont.fontData) {
-            g_traceLogFont.fontData = gui::getFontData(gui::FONT_ID_ROBOTO_CONDENSED_REGULAR);
-        }
-        lineWidth += mcu::display::measureGlyph(ch, g_traceLogFont);
-        if (lineWidth >= TRACE_LOG_LINE_WIDTH) {
-            addCharToLog(0);
-        }
-    }
-#endif
-
-    *(g_log + g_head) = ch;
-
-    // advance pointer
-    if (g_full) {
-        g_tail = (g_tail + 1) % DEBUG_TRACE_LOG_SIZE;
-    }
-    g_head = (g_head + 1) % DEBUG_TRACE_LOG_SIZE;
-    g_full = g_head == g_tail;
-}
-
 void Trace(const char *format, ...) {
     va_list args;
     va_start(args, format);
 
-    static const size_t BUFFER_SIZE = 128;
+    static const size_t BUFFER_SIZE = 256;
     char buffer[BUFFER_SIZE + 1];
 
 	vsnprintf(buffer, BUFFER_SIZE, format, args);
 	buffer[BUFFER_SIZE] = 0;
 
     va_end(args);
-
-	if (g_stopDebugTraceLog) {
-		return;
-	}
-
-    for (char *p = buffer; *p; p++) {
-        if (*p == '\r') {
-            continue;
-        }
-        if (*p == '\n') {
-            addCharToLog(0);
-        } else if (*p == '\t') {
-            static const int TAB_SIZE = 4;
-            for (int i = 0; i < TAB_SIZE; i++) {
-                addCharToLog(' ');
-            }
-        } else {
-            addCharToLog(*p);
-        }
-    }
-
-    g_changed = true;
-
-    g_lastLineIndex = 0;
-    g_lastLineCharPosition = g_tail;
-}
-
-uint32_t getNumTraceLogLines() {
-    if (g_changed) {
-        bool scrollLock = true;
-        if (g_numLines > TRACE_LOG_PAGE_SIZE) {
-            scrollLock = g_startPosition == g_numLines - TRACE_LOG_PAGE_SIZE;
-        }
-
-        g_changed = false;
-
-		g_numLines = 1;
-
-		if (g_full || g_head != g_tail) {
-			uint32_t from = g_tail;
-			uint32_t to = g_head > 0 ? g_head - 1 : DEBUG_TRACE_LOG_SIZE - 1;
-			for (uint32_t i = from; i != to; i = (i + 1) % DEBUG_TRACE_LOG_SIZE) {
-				if (!g_log[i]) {
-					g_numLines++;
-				}
-			}
-        }
-
-        if (scrollLock) {
-            if (g_numLines > TRACE_LOG_PAGE_SIZE) {
-                g_startPosition = g_numLines - TRACE_LOG_PAGE_SIZE;
-            }
-        }
-    }
-    return g_numLines;
-}
-
-const char *getTraceLogLine(uint32_t lineIndex) {
-    uint32_t lastLineIndex = g_lastLineIndex;
-    uint32_t lastLineCharPosition = g_lastLineCharPosition;
-    uint32_t tail = g_tail;
-
-    if (lineIndex > lastLineIndex) {
-        do {
-            if (g_log[lastLineCharPosition] == 0) {
-                lastLineIndex++;
-            }
-
-            lastLineCharPosition = (lastLineCharPosition + 1) % DEBUG_TRACE_LOG_SIZE;
-        } while (lastLineIndex != lineIndex);
-    } else if (lineIndex < lastLineIndex) {
-        if (lineIndex == 0) {
-            lastLineIndex = 0;
-            lastLineCharPosition = tail;
-        } else {
-            lastLineCharPosition = (lastLineCharPosition + DEBUG_TRACE_LOG_SIZE - 2) % DEBUG_TRACE_LOG_SIZE;
-
-            do {
-                if (g_log[lastLineCharPosition] == 0) {
-                    lastLineIndex--;
-                }
-
-                lastLineCharPosition = (lastLineCharPosition + DEBUG_TRACE_LOG_SIZE - 1) % DEBUG_TRACE_LOG_SIZE;
-            } while (lastLineIndex != lineIndex);
-                
-            lastLineCharPosition = (lastLineCharPosition + 2) % DEBUG_TRACE_LOG_SIZE;
-        }
-    }
-
-    return g_log + lastLineCharPosition;
-}
-
-uint32_t getTraceLogStartPosition() {
-    uint32_t position = g_startPosition;
-    uint32_t count = getNumTraceLogLines();
-    if (count <= TRACE_LOG_PAGE_SIZE) {
-        position = 0;
-    } else if (position > count - TRACE_LOG_PAGE_SIZE) {
-        position = count - TRACE_LOG_PAGE_SIZE;
-    }
-    return position;
-}
-
-void setTraceLogStartPosition(uint32_t position) {
-    g_startPosition = position;
-}
-
-void resetTraceLogStartPosition() {
-    uint32_t count = getNumTraceLogLines();
-    if (count <= TRACE_LOG_PAGE_SIZE) {
-        g_startPosition = 0;
-    } else {
-        g_startPosition = count - TRACE_LOG_PAGE_SIZE;
-    }
-}
-
-uint32_t getTraceLogPageSize() {
-    return TRACE_LOG_PAGE_SIZE;
-}
-
-void onEncoder(int counter) {
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    counter = -counter;
-#endif
-    int32_t newPosition = getTraceLogStartPosition() + counter;
-    if (newPosition < 0) {
-        newPosition = 0;
-    }
-    setTraceLogStartPosition(newPosition);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

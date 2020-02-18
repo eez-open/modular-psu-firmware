@@ -144,7 +144,6 @@ bool recallFromLocation(int location, int recallOptions, bool showProgress, int 
     char filePath[MAX_PATH_LENGTH];
     getProfileFilePath(location, filePath);
 
-
     Parameters profile;
     memset(&profile, 0, sizeof(Parameters));
     if (!loadProfileFromFile(filePath, profile, g_listsProfile0, 0, showProgress, err)) {

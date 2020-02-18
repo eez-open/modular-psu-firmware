@@ -28,7 +28,6 @@
 |64     |  24|[Total ON-time counter](#ontime-counter)  |
 |1024   |  64|[Device configuration](#device)           |
 |1536   | 128|[Device configuration 2](#device2)        |
-|16384  | 610|[Event Queue](#event-queue)               |
 
 ## <a name="ontime-counter">ON-time counter</a>
 
@@ -97,24 +96,6 @@
 |0     |4   |int |Checksum   |
 |4     |2   |int |Version    |
 
-## <a name="event-queue">Event queue</a>
-
-|Offset|Size |Type                     |Description                  |
-|------|-----|-------------------------|-----------------------------|
-|0     |4    |int                      |Magic number                 |
-|4     |2    |int                      |Version                      |
-|6     |2    |int                      |Queue head                   |
-|8     |2    |int                      |Queue size                   |
-|10    |2    |int                      |Last error event index       |
-|12    |1600 |[struct](#event)         |Max. 200 events              |
-
-## <a name="event">Event</a>
-
-|Offset|Size|Type                     |Description                  |
-|------|----|-------------------------|-----------------------------|
-|0     |4   |datetime                 |Event date and time          |
-|4     |2   |int                      |Event ID                     |
-
 */
 
 namespace eez {
@@ -130,7 +111,6 @@ static const uint8_t READ = 3;
 static const uint8_t WRITE = 2;
 
 static const uint16_t EEPROM_ONTIME_START_ADDRESS = 64;
-static const uint16_t EEPROM_EVENT_QUEUE_START_ADDRESS = 16384;
 
 static const uint16_t EEPROM_SIZE = 32768;
 

@@ -29,6 +29,9 @@
 
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/event_queue.h>
+#include <eez/modules/psu/sd_card.h>
+
+#include <eez/libs/sd_fat/sd_fat.h>
 
 #if OPTION_ETHERNET
 #include <eez/modules/mcu/ethernet.h>
@@ -43,111 +46,107 @@ namespace eez {
 namespace psu {
 namespace event_queue {
 
-static const uint32_t MAGIC = 0xD8152FC3L;
-static const uint16_t VERSION = 6;
+static const char *LOG_FILE_NAME = "log.txt";
 
-static const uint16_t MAX_EVENTS = 200;
-static const uint16_t NULL_INDEX = MAX_EVENTS;
+static const char *LOG_DEBUG_INDEX_FILE_NAME   = "index1";
+static const char *LOG_INFO_INDEX_FILE_NAME    = "index2";
+static const char *LOG_WARNING_INDEX_FILE_NAME = "index3";
+static const char *LOG_ERROR_INDEX_FILE_NAME   = "index4";
 
-static EventQueueHeader g_eventQueue;
+static const char *EVENT_TYPE_NAMES[] = {
+    "NONE",
+    "DEBUG",
+    "INFO",
+    "WARNING",
+    "ERROR",
+    "UNKNOWN"
+};
 
-static Event g_events[MAX_EVENTS];
+static const size_t EVENT_MESSAGE_MAX_SIZE = 128;
 
-static const int MAX_EVENTS_TO_PUSH = 50;
-static int16_t g_eventsToPush[MAX_EVENTS_TO_PUSH];
-static uint8_t g_eventsToPushHead = 0;
+struct Event {
+    uint32_t eventIndex;
+    uint32_t dateTime;
+    int eventType;
+    char message[EVENT_MESSAGE_MAX_SIZE];
+};
 
-static uint8_t g_pageIndex = 0;
+static const int WRITE_QUEUE_MAX_SIZE = 50;
+struct QueueEvent {
+    uint32_t dateTime;
+    int16_t eventId;
+};
+static QueueEvent g_writeQueue[WRITE_QUEUE_MAX_SIZE];
+static uint8_t g_writeQueueSize = 0;
 
-void readHeader() {
-    mcu::eeprom::read((uint8_t *)&g_eventQueue, sizeof(EventQueueHeader), mcu::eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS);
-}
+static uint32_t g_numEvents = 0;
+static uint32_t g_pageIndex = 0;
 
-void writeHeader() {
-    if (mcu::eeprom::g_testResult == TEST_OK) {
-        mcu::eeprom::write((uint8_t *)&g_eventQueue, sizeof(EventQueueHeader), mcu::eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS);
-    }
-}
+static int16_t g_lastErrorEventId;
 
-Event *readEvent(uint16_t eventIndex) {
-    return &g_events[eventIndex];
-}
+static const int EVENTS_CACHE_SIZE = EVENTS_PER_PAGE;
+static Event g_eventsCache[EVENTS_CACHE_SIZE];
 
-void writeEvent(uint16_t eventIndex, Event *e) {
-    memcpy(&g_events[eventIndex], e, sizeof(Event));
+////////////////////////////////////////////////////////////////////////////////
 
-    if (mcu::eeprom::g_testResult == TEST_OK) {
-        mcu::eeprom::write((uint8_t *)e, sizeof(Event), mcu::eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS + sizeof(EventQueueHeader) + eventIndex * sizeof(Event));
-    }
-}
+static void writeEvent(QueueEvent *event);
+static void readEvent(Event &event);
+
+static Event *getEvent(uint32_t eventIndex);
+
+////////////////////////////////////////////////////////////////////////////////
 
 void init() {
-    readHeader();
+    for (int i = 0; i < EVENTS_CACHE_SIZE; i++) {
+        g_eventsCache[i].eventIndex = 0xFFFFFFFF;
+    }
 
-    if (g_eventQueue.magicNumber != MAGIC || g_eventQueue.version != VERSION ||
-        g_eventQueue.head >= MAX_EVENTS || g_eventQueue.size > MAX_EVENTS) {
-        g_eventQueue.magicNumber = MAGIC;
-        g_eventQueue.version = VERSION;
-        g_eventQueue.head = 0;
-        g_eventQueue.size = 0;
-        g_eventQueue.lastErrorEventIndex = NULL_INDEX;
+    g_numEvents = 0;
 
+    char filePath[MAX_PATH_LENGTH];
+
+    strcpy(filePath, LOGS_DIR);
+    strcat(filePath, PATH_SEPARATOR);
+    strcat(filePath, LOG_DEBUG_INDEX_FILE_NAME);
+
+    File file;
+    if (file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+        g_numEvents = file.size() / 4;
+        file.close();
+    }
+
+    if (g_numEvents == 0) {
         pushEvent(EVENT_INFO_WELCOME);
-    } else {
-        // read all events
-        mcu::eeprom::read((uint8_t *)g_events, sizeof(g_events), mcu::eeprom::EEPROM_EVENT_QUEUE_START_ADDRESS + sizeof(EventQueueHeader));
-    }
-}
-
-void doPushEvent(int16_t eventId) {
-    Event e;
-
-    e.dateTime = datetime::now();
-    e.eventId = eventId;
-
-    writeEvent(g_eventQueue.head, &e);
-
-    if (g_eventQueue.lastErrorEventIndex == g_eventQueue.head) {
-        // this event overwrote last error event, therefore:
-        g_eventQueue.lastErrorEventIndex = NULL_INDEX;
-    }
-
-    int eventType = getEventType(&e);
-    int lastEventType = getEventType(getLastErrorEvent());
-    if (eventType >= lastEventType) {
-        g_eventQueue.lastErrorEventIndex = g_eventQueue.head;
-    }
-
-    g_eventQueue.head = (g_eventQueue.head + 1) % MAX_EVENTS;
-    if (g_eventQueue.size < MAX_EVENTS) {
-        ++g_eventQueue.size;
-    }
-
-    writeHeader();
-
-    if (getEventType(&e) == EVENT_TYPE_ERROR) {
-        sound::playBeep();
     }
 }
 
 void tick() {
-    for (int i = 0; i < g_eventsToPushHead; ++i) {
-        doPushEvent(g_eventsToPush[i]);
+    if (g_writeQueueSize > 0) {
+        for (int i = 0; i < g_writeQueueSize; ++i) {
+            writeEvent(&g_writeQueue[i]);
+            ++g_numEvents;
+        }
+        g_writeQueueSize = 0;
+        
+        // invalidate cache
+        for (int i = 0; i < EVENTS_CACHE_SIZE; ++i) {
+            g_eventsCache[i].eventIndex = 0xFFFFFFFF;
+        }
+    } else {
+        for (int i = 0; i < EVENTS_CACHE_SIZE; ++i) {
+            if (g_eventsCache[i].eventType == EVENT_TYPE_UNKNOWN) {
+                readEvent(g_eventsCache[i]);
+            }
+        }
     }
-    g_eventsToPushHead = 0;
 }
 
-int getNumEvents() {
-    return g_eventQueue.size;
+int16_t getLastErrorEventId() {
+    return g_lastErrorEventId;
 }
 
-Event *getEvent(uint16_t index) {
-    uint16_t eventIndex = (g_eventQueue.head - (index + 1) + MAX_EVENTS) % MAX_EVENTS;
-    return readEvent(eventIndex);
-}
-
-Event *getLastErrorEvent() {
-    return g_eventQueue.lastErrorEventIndex != NULL_INDEX ? readEvent(g_eventQueue.lastErrorEventIndex) : nullptr;
+uint32_t getEventDateTime(Event *e) {
+    return e->dateTime;
 }
 
 int getEventType(int16_t eventId) {
@@ -166,7 +165,7 @@ int getEventType(Event *e) {
     if (!e) {
         return EVENT_TYPE_NONE;
     }
-    return getEventType(e->eventId);
+    return e->eventType;
 }
 
 const char *getEventMessage(int16_t eventId) {
@@ -241,48 +240,54 @@ const char *getEventMessage(Event *e) {
     if (!e) {
         return nullptr;
     }
-    return getEventMessage(e->eventId);
+    return e->message;
+}
+
+bool compareEvents(Event *aEvent, Event *bEvent) {
+    return aEvent->eventIndex == bEvent->eventIndex;
 }
 
 void pushEvent(int16_t eventId) {
-    if (g_eventsToPushHead < MAX_EVENTS_TO_PUSH) {
-        g_eventsToPush[g_eventsToPushHead] = eventId;
-        ++g_eventsToPushHead;
+    if (g_writeQueueSize < WRITE_QUEUE_MAX_SIZE) {
+        g_writeQueue[g_writeQueueSize].dateTime = datetime::now();
+        g_writeQueue[g_writeQueueSize].eventId = eventId;
+        ++g_writeQueueSize;
     } else {
-        DebugTrace("MAX_EVENTS_TO_PUSH exceeded");
+        g_writeQueue[g_writeQueueSize - 1].dateTime = datetime::now();
+        g_writeQueue[g_writeQueueSize - 1].eventId = EVENT_ERROR_TOO_MANY_LOG_EVENTS;
     }
 
 #if OPTION_ETHERNET
     eez::mcu::ethernet::pushEvent(eventId);
 #endif
 
-    if (g_isBooted) {
+    if (getEventType(eventId) == EVENT_TYPE_ERROR) {
+        g_lastErrorEventId  = g_writeQueue[g_writeQueueSize - 1].eventId;
+
+        sound::playBeep();
+
 #if OPTION_DISPLAY
-        if (getEventType(eventId) == EVENT_TYPE_ERROR) {
+        if (g_isBooted) {
             eez::psu::gui::psuErrorMessage(0, MakeEventMessageValue(eventId));
         }
 #endif
-    } else {
-		tick();
-	}
+    }
+
 }
 
 void markAsRead() {
-    if (g_eventQueue.lastErrorEventIndex != NULL_INDEX) {
-        g_eventQueue.lastErrorEventIndex = NULL_INDEX;
-        writeHeader();
-    }
+    g_lastErrorEventId = EVENT_TYPE_NONE;
 }
 
 int getNumPages() {
-    return (getNumEvents() + EVENTS_PER_PAGE - 1) / EVENTS_PER_PAGE;
+    return (g_numEvents + EVENTS_PER_PAGE - 1) / EVENTS_PER_PAGE;
 }
 
 int getActivePageNumEvents() {
-    if (g_pageIndex < getNumPages() - 1) {
+    if ((int)g_pageIndex < getNumPages() - 1) {
         return EVENTS_PER_PAGE;
     } else {
-        return getNumEvents() - (getNumPages() - 1) * EVENTS_PER_PAGE;
+        return g_numEvents - (getNumPages() - 1) * EVENTS_PER_PAGE;
     }
 }
 
@@ -299,7 +304,7 @@ void moveToFirstPage() {
 }
 
 void moveToNextPage() {
-    if (g_pageIndex < getNumPages() - 1) {
+    if ((int)g_pageIndex < getNumPages() - 1) {
         ++g_pageIndex;
     }
 }
@@ -312,6 +317,211 @@ void moveToPreviousPage() {
 
 int getActivePageIndex() {
     return g_pageIndex;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {
+    char filePath[MAX_PATH_LENGTH];
+
+    strcpy(filePath, LOGS_DIR);
+    strcat(filePath, PATH_SEPARATOR);
+    strcat(filePath, LOG_FILE_NAME);
+
+    File file;
+    if (!file.open(filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+        return false;
+    }
+
+    logOffset = file.size();
+
+    using namespace sd_card;
+    BufferedFileWrite bufferedFile(file);
+
+    int year, month, day, hour, minute, second;
+    datetime::breakTime(event->dateTime, year, month, day, hour, minute, second);
+
+    eventType = getEventType(event->eventId);
+
+    char dateTimeAndEventTypeStr[32];
+    sprintf(dateTimeAndEventTypeStr, "%04d-%02d-%02d %02d:%02d:%02d %s ", year, month, day, hour, minute, second, EVENT_TYPE_NAMES[eventType]);
+    bufferedFile.write((const uint8_t *)dateTimeAndEventTypeStr, strlen(dateTimeAndEventTypeStr));
+
+    const char *message = getEventMessage(event->eventId);
+    bufferedFile.write((const uint8_t *)message, strlen(message));
+
+    bufferedFile.write((const uint8_t *)"\n", 1);
+
+    bufferedFile.flush();
+
+    file.close();
+
+    return true;
+}
+
+static void writeToIndex(const char *indexFileName, uint32_t logOffset) {
+    char filePath[MAX_PATH_LENGTH];
+
+    strcpy(filePath, LOGS_DIR);
+    strcat(filePath, PATH_SEPARATOR);
+    strcat(filePath, indexFileName);
+
+    File file;
+    if (file.open(filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+        file.write((const uint8_t *)&logOffset, sizeof(uint32_t));
+        file.close();
+    }
+}
+
+static void writeEvent(QueueEvent *event) {
+    uint32_t logOffset;
+    int eventType;
+    if (!writeToLog(event, logOffset, eventType)) {
+        return;
+    }
+
+    writeToIndex(LOG_DEBUG_INDEX_FILE_NAME, logOffset);
+
+    if (eventType == EVENT_TYPE_DEBUG) {
+        return;
+    }
+
+    writeToIndex(LOG_INFO_INDEX_FILE_NAME, logOffset);
+
+    if (eventType == EVENT_TYPE_INFO) {
+        return;
+    }
+
+    writeToIndex(LOG_WARNING_INDEX_FILE_NAME, logOffset);
+
+    if (eventType == EVENT_TYPE_WARNING) {
+        return;
+    }
+
+    writeToIndex(LOG_ERROR_INDEX_FILE_NAME, logOffset);
+}
+
+static void readEvent(Event &event) {
+    char filePath[MAX_PATH_LENGTH];
+
+    uint32_t logOffset;
+
+    {
+        strcpy(filePath, LOGS_DIR);
+        strcat(filePath, PATH_SEPARATOR);
+        strcat(filePath, LOG_DEBUG_INDEX_FILE_NAME);
+
+        File file;
+        if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+            return;
+        }
+
+        file.seek(4 * (g_numEvents - 1 - event.eventIndex));
+
+        bool result = file.read(&logOffset, sizeof(uint32_t)) == sizeof(uint32_t);
+
+        file.close();
+
+        if (!result) {
+            return;
+        }
+    }
+
+    int eventType = EVENT_TYPE_NONE;
+
+    strcpy(filePath, LOGS_DIR);
+    strcat(filePath, PATH_SEPARATOR);
+    strcat(filePath, LOG_FILE_NAME);
+
+    File file;
+    if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+        return;
+    }
+
+    file.seek(logOffset);
+
+    using namespace sd_card;
+    BufferedFileRead bufferedFile(file, 64);
+
+    unsigned int year;
+    if (!match(bufferedFile, year)) {
+        goto Error;
+    }
+    if (!match(bufferedFile, '-')) {
+        goto Error;
+    }
+    unsigned int month;
+    if (!match(bufferedFile, month)) {
+        goto Error;
+    }
+    if (!match(bufferedFile, '-')) {
+        goto Error;
+    }
+    unsigned int day;
+    if (!match(bufferedFile, day)) {
+        goto Error;
+    }
+
+    unsigned int hour;
+    if (!match(bufferedFile, hour)) {
+        goto Error;
+    }
+    if (!match(bufferedFile, ':')) {
+        goto Error;
+    }
+    unsigned int minute;
+    if (!match(bufferedFile, minute)) {
+        goto Error;
+    }
+    if (!match(bufferedFile, ':')) {
+        goto Error;
+    }
+    unsigned int second;
+    if (!match(bufferedFile, second)) {
+        goto Error;
+    }
+
+    matchZeroOrMoreSpaces(bufferedFile);
+
+    char eventTypeStr[9];
+    matchUntil(bufferedFile, ' ', eventTypeStr, sizeof(eventTypeStr) - 1);
+    eventTypeStr[sizeof(eventTypeStr) - 1] = 0;
+
+    for (int i = EVENT_TYPE_DEBUG; i <= EVENT_TYPE_ERROR; i++) {
+        if (strcmp(eventTypeStr, EVENT_TYPE_NAMES[i]) == 0) {
+            eventType = i;
+            break;
+        }
+    }
+
+    if (eventType == EVENT_TYPE_NONE) {
+        goto Error;
+    }
+
+    char message[EVENT_MESSAGE_MAX_SIZE];
+    matchUntil(bufferedFile, '\n', message, sizeof(message) - 1);
+    message[sizeof(message) - 1] = 0;
+
+    event.dateTime = datetime::makeTime(year, month, day, hour, minute, second);
+    event.eventType = eventType;
+    strcpy(event.message, message);
+
+Error:
+    file.close();
+}
+
+static Event *getEvent(uint32_t eventIndex) {
+    int i = eventIndex % EVENTS_CACHE_SIZE;
+
+    auto &event = g_eventsCache[i];
+
+    if (event.eventIndex != eventIndex) {
+        event.eventIndex = eventIndex;
+        event.eventType = EVENT_TYPE_UNKNOWN;
+        event.message[0] = 0;
+    }
+
+    return &event;
 }
 
 } // namespace event_queue

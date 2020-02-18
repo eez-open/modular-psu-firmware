@@ -425,10 +425,6 @@ scpi_result_t scpi_cmd_debugDownloadFirmware(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-#if OPTION_DISPLAY
-    psu::gui::g_psuAppContext.pushPageOnNextIter(PAGE_ID_DEBUG_TRACE_LOG);
-#endif
-
     int err;
     if (!bp3c::flash_slave::start(slotIndex - 1, hexFilePath, &err)) {
         SCPI_ErrorPush(context, err);

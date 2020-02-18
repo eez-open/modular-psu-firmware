@@ -70,7 +70,7 @@ bool getInfo(uint64_t &usedSpace, uint64_t &freeSpace, bool fromCache);
 
 class BufferedFileRead {
 public:
-    BufferedFileRead(File &file);
+    BufferedFileRead(File &file, size_t bufferSize = BUFFER_SIZE);
 
     int peek();
     int read();
@@ -84,6 +84,7 @@ private:
     File &file;
     static const size_t BUFFER_SIZE = 512;
     uint8_t buffer[BUFFER_SIZE];
+    uint32_t bufferSize;
     size_t position;
     size_t end;
 
@@ -111,7 +112,7 @@ private:
 void matchZeroOrMoreSpaces(BufferedFileRead &file);
 bool match(BufferedFileRead &file, char c);
 bool match(BufferedFileRead &file, const char *str);
-bool matchUntil(BufferedFileRead &file, char c, char *result);
+bool matchUntil(BufferedFileRead &file, char c, char *result, int count = -1);
 void skipUntil(BufferedFileRead &file, const char *str);
 void skipUntilEOL(BufferedFileRead &file);
 bool matchQuotedString(BufferedFileRead &file, char *str, unsigned int strLength);

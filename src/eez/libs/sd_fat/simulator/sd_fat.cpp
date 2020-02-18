@@ -274,7 +274,7 @@ SdFatResult Directory::findNext(FileInfo &fileInfo) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-File::File() : m_fp(NULL) {
+File::File() : m_fp(NULL), m_isOpen(false) {
 }
 
 bool File::open(const char *path, uint8_t mode) {
@@ -299,6 +299,8 @@ bool File::open(const char *path, uint8_t mode) {
 
     m_fp = fopen(getRealPath(path).c_str(), fmode);
 
+    m_isOpen = m_fp != nullptr;
+
     return m_fp != nullptr;
 }
 
@@ -311,6 +313,11 @@ void File::close() {
         fclose(m_fp);
         m_fp = NULL;
     }
+    m_isOpen = false;
+}
+
+bool File::isOpen() {
+    return m_isOpen;
 }
 
 bool File::truncate(uint32_t length) {

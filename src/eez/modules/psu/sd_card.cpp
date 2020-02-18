@@ -579,17 +579,18 @@ bool getInfo(uint64_t &usedSpace, uint64_t &freeSpace, bool fromCache) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-BufferedFileRead::BufferedFileRead(File &file_)
+BufferedFileRead::BufferedFileRead(File &file_, size_t bufferSize_)
     : file(file_)
-    , position(BUFFER_SIZE)
-    , end(BUFFER_SIZE)
+    , bufferSize(bufferSize_)
+    , position(bufferSize_)
+    , end(bufferSize_)
 {
 }
 
 void BufferedFileRead::readNextChunk() {
-    if (position == end && end == BUFFER_SIZE) {
+    if (position == end && end == bufferSize) {
         position = 0;
-        end = file.read(buffer, BUFFER_SIZE);
+        end = file.read(buffer, bufferSize);
     }
 }
 
@@ -730,8 +731,10 @@ bool match(BufferedFileRead &file, const char *str) {
     return true;
 }
 
-bool matchUntil(BufferedFileRead &file, char ch, char *result) {
-    while (true) {
+bool matchUntil(BufferedFileRead &file, char ch, char *result, int count) {
+    char *end = result + count;
+
+    while (count == -1 || result < end) {
         int next = file.peek();
         if (next == -1) {
             return false;
@@ -746,6 +749,8 @@ bool matchUntil(BufferedFileRead &file, char ch, char *result) {
 
         *result++ = (char)next;
     }
+
+    return true;
 }
 
 void skipUntil(BufferedFileRead &file, const char *str) {
@@ -969,6 +974,12 @@ static bool prepareCard() {
 
     if (!exists(UPDATES_DIR, &err)) {
         if (!makeDir(UPDATES_DIR, &err)) {
+            return false;
+        }
+    }
+
+    if (!exists(LOGS_DIR, &err)) {
+        if (!makeDir(LOGS_DIR, &err)) {
             return false;
         }
     }

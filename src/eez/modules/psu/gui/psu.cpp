@@ -425,7 +425,7 @@ void PsuAppContext::stateManagment() {
 
     if (m_showUncaughtScriptExceptionMessage) {
         m_showUncaughtScriptExceptionMessage = false;
-        errorMessageWithAction("Uncaught script exception!", action_show_debug_trace_log, "Show debug trace log");
+        errorMessageWithAction("Uncaught script exception!", action_show_event_queue, "Show debug trace log");
     }
 
     if (m_showTextInputOnNextIter) {
@@ -1483,8 +1483,6 @@ void onEncoder(int counter, bool clicked) {
             edit_mode_step::onEncoder(counter);
         } else if (activePageId == PAGE_ID_FILE_MANAGER) {
             file_manager::onEncoder(counter);
-        } else if (activePageId == PAGE_ID_DEBUG_TRACE_LOG) {
-            eez::debug::onEncoder(counter);
         } else if (activePage) {
             activePage->onEncoder(counter);
         }
