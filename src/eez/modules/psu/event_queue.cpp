@@ -21,6 +21,7 @@
 #include <scpi/scpi.h>
 
 #include <eez/firmware.h>
+#include <eez/system.h>
 #include <eez/sound.h>
 
 #include <eez/scpi/scpi.h>
@@ -80,7 +81,11 @@ struct QueueEvent {
     char message[EVENT_MESSAGE_MAX_SIZE];
 };
 static QueueEvent g_writeQueue[WRITE_QUEUE_MAX_SIZE];
-static uint8_t g_writeQueueSize = 0;
+static uint8_t g_writeQueueHead = 0;
+static uint8_t g_writeQueueTail = 0;
+static bool g_writeQueueFull;
+osMutexId(g_writeQueueMutexId);
+osMutexDef(g_writeQueueMutex);
 
 static bool g_refreshEvents;
 
@@ -98,6 +103,9 @@ static int g_selectedEventIndexWithinPage;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static void addEventToWriteQueue(int16_t eventId, char *message);
+static bool getEventFromWriteQueue(QueueEvent *queueEvent);
+
 static void getIndexFilePath(int indexType, char *filePath);
 static void getLogFilePath(char *filePath);
 
@@ -112,33 +120,42 @@ static Event *getEvent(uint32_t eventIndex);
 
 void init() {
     g_refreshEvents = true;
+    g_writeQueueMutexId = osMutexCreate(osMutex(g_writeQueueMutex));
 }
 
 void tick() {
-    if (g_writeQueueSize > 0) {
-        for (int i = 0; i < g_writeQueueSize; ++i) {
-            writeEvent(&g_writeQueue[i]);
+    if (sd_card::isMounted(nullptr)) {
+        QueueEvent queueEvent;
+        if (getEventFromWriteQueue(&queueEvent)) {
+            writeEvent(&queueEvent);
+            g_previousPageIndex = -1;
         }
-        g_writeQueueSize = 0;
-        
-        g_previousPageIndex = -1;
-    } 
 #if OPTION_DISPLAY
-    else {
-        if (gui::g_psuAppContext.getActivePageId() == PAGE_ID_EVENT_QUEUE) {
-            if (g_refreshEvents) {
-                refreshEvents();
-                g_refreshEvents = false;
-            } else {
-                auto pageIndex = g_pageIndex;
-                if (pageIndex != g_previousPageIndex) {
-                    readEvents(pageIndex);
-                    g_previousPageIndex = pageIndex;
+        else {
+            if (gui::g_psuAppContext.getActivePageId() == PAGE_ID_EVENT_QUEUE) {
+                if (g_refreshEvents) {
+                    refreshEvents();
+                    g_refreshEvents = false;
+                } else {
+                    auto pageIndex = g_pageIndex;
+                    if (pageIndex != g_previousPageIndex) {
+                        readEvents(pageIndex);
+                        g_previousPageIndex = pageIndex;
+                    }
                 }
             }
         }
-    }
 #endif
+    } else {
+        g_refreshEvents = true;
+    }
+}
+
+void shutdownSave() {
+    QueueEvent queueEvent;
+    while (getEventFromWriteQueue(&queueEvent)) {
+        writeEvent(&queueEvent);
+    }
 }
 
 int getFilter() {
@@ -177,6 +194,10 @@ int getEventType(Event *e) {
         return EVENT_TYPE_NONE;
     }
     return e->eventType;
+}
+
+const char *getEventTypeName(int16_t eventId) {
+    return EVENT_TYPE_NAMES[getEventType(eventId)];
 }
 
 const char *getEventMessage(int16_t eventId) {
@@ -262,21 +283,14 @@ bool isLongMessageText(Event *e) {
 }
 
 void pushEvent(int16_t eventId) {
-    if (g_writeQueueSize < WRITE_QUEUE_MAX_SIZE) {
-        g_writeQueue[g_writeQueueSize].dateTime = datetime::now();
-        g_writeQueue[g_writeQueueSize].eventId = eventId;
-        ++g_writeQueueSize;
-    } else {
-        g_writeQueue[g_writeQueueSize - 1].dateTime = datetime::now();
-        g_writeQueue[g_writeQueueSize - 1].eventId = EVENT_ERROR_TOO_MANY_LOG_EVENTS;
-    }
+    addEventToWriteQueue(eventId, nullptr);
 
 #if OPTION_ETHERNET
     eez::mcu::ethernet::pushEvent(eventId);
 #endif
 
     if (getEventType(eventId) == EVENT_TYPE_ERROR) {
-        g_lastErrorEventId  = g_writeQueue[g_writeQueueSize - 1].eventId;
+        g_lastErrorEventId  = eventId;
 
         sound::playBeep();
 
@@ -303,12 +317,7 @@ void pushDebugTrace(const char *message) {
                 buffer[bufferIndex] = 0;
                 bufferIndex = 0;
 
-                if (g_writeQueueSize < WRITE_QUEUE_MAX_SIZE) {
-                    g_writeQueue[g_writeQueueSize].dateTime = datetime::now();
-                    g_writeQueue[g_writeQueueSize].eventId = EVENT_DEBUG_TRACE;
-                    strcpy(g_writeQueue[g_writeQueueSize].message, buffer);
-                    ++g_writeQueueSize;
-                }
+                addEventToWriteQueue(EVENT_DEBUG_TRACE, buffer);
             }
         }
     }
@@ -378,6 +387,48 @@ int getSelectedEventIndexWithinPage() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+static bool getEventFromWriteQueue(QueueEvent *queueEvent) {
+    bool result = false;
+
+    osMutexWait(g_writeQueueMutexId, 0);
+
+    if (g_writeQueueFull || g_writeQueueTail != g_writeQueueHead) {
+        memcpy(queueEvent, &g_writeQueue[g_writeQueueTail], sizeof(QueueEvent));
+        g_writeQueueTail = (g_writeQueueTail + 1) % WRITE_QUEUE_MAX_SIZE;
+        g_writeQueueFull = false;
+        result = true;
+    }
+
+    osMutexRelease(g_writeQueueMutexId);
+
+    return result;
+}
+
+static void addEventToWriteQueue(int16_t eventId, char *message) {
+    osMutexWait(g_writeQueueMutexId, 0);
+
+    g_writeQueue[g_writeQueueHead].dateTime = datetime::now();
+    g_writeQueue[g_writeQueueHead].eventId = eventId;
+
+    if (message) {
+        strcpy(g_writeQueue[g_writeQueueHead].message, message);
+    } else {
+        g_writeQueue[g_writeQueueHead].message[0] = 0;
+    }
+
+    if (g_writeQueueFull) {
+        g_writeQueueTail = (g_writeQueueTail + 1) % WRITE_QUEUE_MAX_SIZE;    
+    }
+
+    g_writeQueueHead = (g_writeQueueHead + 1) % WRITE_QUEUE_MAX_SIZE;
+
+    if (g_writeQueueHead == g_writeQueueTail) {
+        g_writeQueueFull = true;
+    }
+
+    osMutexRelease(g_writeQueueMutexId);
+}
 
 static void getIndexFilePath(int indexType, char *filePath) {
     strcpy(filePath, LOGS_DIR);

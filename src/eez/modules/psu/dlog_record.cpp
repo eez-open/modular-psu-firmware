@@ -94,6 +94,7 @@ dlog_view::Recording g_recording;
 
 State g_state = STATE_IDLE;
 bool g_inStateTransition;
+int g_stateTransitionError;
 bool g_traceInitiated;
 
 static uint32_t g_lastSyncTickCount;
@@ -659,6 +660,8 @@ void stateTransition(int event, int* perr) {
         }
     }
 
+    g_stateTransitionError = err;
+
     if (perr) {
         *perr = err;
     } else {
@@ -679,9 +682,11 @@ int initiate() {
 }
 
 int initiateTrace() {
-    int err;
-    stateTransition(EVENT_INITIATE_TRACE, &err);
-    return err;
+    stateTransition(EVENT_INITIATE_TRACE, nullptr);
+    while (g_inStateTransition) {
+        osDelay(1);
+    }
+    return g_stateTransitionError;
 }
 
 int startImmediately() {

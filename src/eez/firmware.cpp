@@ -343,16 +343,18 @@ void shutdown() {
 
     osDelay(50);
 
+    while (persist_conf::saveAllDirtyBlocks()) {
+        delay(1);
+    }
+
+    event_queue::shutdownSave();
+
     // save on-time counters
     persist_conf::writeTotalOnTime(ontime::g_mcuCounter.getType(), ontime::g_mcuCounter.getTotalTime());
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
             persist_conf::writeTotalOnTime(ontime::g_moduleCounters[slotIndex].getType(), ontime::g_moduleCounters[slotIndex].getTotalTime());
         }
-    }
-
-    while (persist_conf::saveAllDirtyBlocks()) {
-        delay(1);
     }
 
     if (g_restart) {

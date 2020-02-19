@@ -426,14 +426,7 @@ bool publishEvent(int16_t eventId, bool retain) {
     sprintf(topic, PUB_TOPIC_SYSTEM_EVENT, persist_conf::devConf.ethernetHostName);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
-    static const char *g_eventTypes[] = {
-        "None",
-        "Debug",
-        "Info",
-        "Warning",
-        "Error"
-    };
-    snprintf(payload, MAX_PAYLOAD_LENGTH, "[%d, \"%s\", \"%s\"]", (int)eventId, g_eventTypes[event_queue::getEventType(eventId)], event_queue::getEventMessage(eventId));
+    snprintf(payload, MAX_PAYLOAD_LENGTH, "[%d, \"%s\", \"%s\"]", (int)eventId, event_queue::getEventTypeName(eventId), event_queue::getEventMessage(eventId));
     payload[MAX_PAYLOAD_LENGTH] = 0;
 
     return publish(topic, payload, retain);
