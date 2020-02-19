@@ -72,7 +72,7 @@ if diodeName != None:
                 mode = getOutputMode(ch)
                 #mode = scpi("OUTP:MODE?")
 
-                print(uSet, iMon, mode)
+                #print(uSet, iMon, mode)
 
                 #if mode == "CC":
                 #    break

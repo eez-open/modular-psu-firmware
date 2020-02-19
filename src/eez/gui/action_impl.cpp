@@ -459,6 +459,19 @@ void action_event_queue_next_page() {
     animateSlideLeft();
 }
 
+void onSetEventQueueFilter(uint16_t value) {
+    popPage();
+    event_queue::setFilter((int)value);
+}
+
+void action_event_queue_filter() {
+    pushSelectFromEnumPage(g_eventQueueFilterEnumDefinition, (uint16_t)event_queue::getFilter(), NULL, onSetEventQueueFilter);
+}
+
+void action_event_queue_select_event() {
+    event_queue::toggleSelectedEvent(getFoundWidgetAtDown().cursor.i);
+}
+
 void action_ch_settings_adv_remote_toggle_sense() {
     ((ChSettingsAdvOptionsPage *)getActivePage())->toggleSense();
 }

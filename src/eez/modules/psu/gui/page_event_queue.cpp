@@ -27,7 +27,7 @@ namespace eez {
 namespace psu {
 namespace gui {
 
-void EventQueuePage::pageWillAppear() {
+void EventQueuePage::pageAlloc() {
 	event_queue::moveToFirstPage();
 	event_queue::markAsRead();
 }

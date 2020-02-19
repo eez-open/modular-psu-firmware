@@ -27,7 +27,6 @@ static const int EVENT_TYPE_DEBUG = 1;
 static const int EVENT_TYPE_INFO = 2;
 static const int EVENT_TYPE_WARNING = 3;
 static const int EVENT_TYPE_ERROR = 4;
-static const int EVENT_TYPE_UNKNOWN = 5;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -251,11 +250,14 @@ static const int EVENT_TYPE_UNKNOWN = 5;
     EVENT_INFO(FILE_DOWNLOAD_SUCCEEDED, 124, "File download succeeded")                            \
     EVENT_INFO(COUPLED_IN_COMMON_GND, 125, "Coupled in common GND")                                \
     EVENT_INFO(COUPLED_IN_SPLIT_RAILS, 126, "Coupled in split rails")                              \
-	EVENT_INFO(SCREENSHOT_SAVED, 127, "A screenshot was saved")
+	EVENT_INFO(SCREENSHOT_SAVED, 127, "A screenshot was saved")                                    \
+    EVENT_INFO(SYSTEM_RESTART, 128, "System restart")                                              \
+    EVENT_INFO(SYSTEM_SHUTDOWN, 129, "System shutdown")
 
 #define EVENT_ERROR_START_ID 10000
 #define EVENT_WARNING_START_ID 12000
 #define EVENT_INFO_START_ID 14000
+#define EVENT_DEBUG_TRACE 32000
 
 #define EVENT_SCPI_ERROR(ID, TEXT)
 #define EVENT_ERROR(NAME, ID, TEXT) EVENT_ERROR_##NAME = EVENT_ERROR_START_ID + ID,
@@ -276,6 +278,9 @@ struct Event;
 void init();
 void tick();
 
+int getFilter();
+void setFilter(int filter);
+
 int16_t getLastErrorEventId();
 
 uint32_t getEventDateTime(Event *e);
@@ -286,19 +291,24 @@ int getEventType(Event *e);
 const char *getEventMessage(int16_t eventId);
 const char *getEventMessage(Event *e);
 
-bool compareEvents(Event *aEvent, Event *bEvent);
+bool isLongMessageText(Event *e);
 
 void pushEvent(int16_t eventId);
+void pushDebugTrace(const char *message);
 
 void markAsRead();
 
 int getNumPages();
 int getActivePageNumEvents();
-Event *getActivePageEvent(int i);
+Event *getActivePageEvent(int eventIndexWithinActivePage);
 void moveToFirstPage();
 void moveToNextPage();
 void moveToPreviousPage();
 int getActivePageIndex();
+
+void toggleSelectedEvent(int eventIndexWithinActivePage);
+Event *getSelectedEvent();
+int getSelectedEventIndexWithinPage();
 
 } // namespace event_queue
 } // namespace psu

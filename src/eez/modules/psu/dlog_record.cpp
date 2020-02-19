@@ -536,6 +536,8 @@ static int doStartImmediately() {
 static int doInitiate(bool traceInitiated) {
     int err;
 
+    g_traceInitiated = traceInitiated;
+
     if (g_parameters.triggerSource == trigger::SOURCE_IMMEDIATE) {
         err = doStartImmediately();
     } else {
@@ -545,10 +547,9 @@ static int doInitiate(bool traceInitiated) {
         }
     }
 
-    if (err == SCPI_RES_OK) {
-        g_traceInitiated = traceInitiated;
-    } else {
+    if (err != SCPI_RES_OK) {
         g_parameters.filePath[0] = 0;
+        g_traceInitiated = false;
     }
 
     return err;
@@ -624,6 +625,9 @@ void stateTransition(int event, int* perr) {
 
     if (osThreadGetId() != g_scpiTaskHandle) {
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DLOG_STATE_TRANSITION, event), osWaitForever);
+        if (perr) {
+            *perr = SCPI_RES_OK;
+        }
         return;
     }
 
@@ -649,13 +653,8 @@ void stateTransition(int event, int* perr) {
             err = SCPI_RES_OK;
         }
     } else if (g_state == STATE_EXECUTING) {
-        if (event == EVENT_TOGGLE || event == EVENT_FINISH) {
+        if (event == EVENT_TOGGLE || event == EVENT_FINISH || event == EVENT_ABORT || event == EVENT_RESET) {
             doFinish();
-            err = SCPI_RES_OK;
-        } else if (event == EVENT_ABORT || event == EVENT_RESET) {
-            onSdCardFileChangeHook(g_parameters.filePath);
-            resetParameters();
-            setState(STATE_IDLE);
             err = SCPI_RES_OK;
         }
     }

@@ -265,6 +265,33 @@ struct MultilineTextRender {
         return textHeight + font.getHeight() - lineHeight;
     }
 
+    int measure() {
+        if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
+            x1 += style->border_size_left;
+            y1 += style->border_size_top;
+            x2 -= style->border_size_right;
+            y2 -= style->border_size_bottom;
+        }
+
+        font = styleGetFont(style);
+        
+        lineHeight = (int)(0.9 * font.getHeight());
+        if (lineHeight <= 0) {
+            return 0;
+        }
+
+        font::Glyph space_glyph;
+        font.getGlyph(' ', space_glyph);
+        spaceWidth = space_glyph.dx;
+
+        x1 += style->padding_left;
+        x2 -= style->padding_right;
+        y1 += style->padding_top;
+        y2 -= style->padding_bottom;
+
+        return executeStep(MEASURE);
+    }
+
     void render() {
         int borderRadius = style->border_radius;
         if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
@@ -317,7 +344,6 @@ struct MultilineTextRender {
         y2 = y1 + textHeight - 1;
 
         executeStep(RENDER);
-
     }
 };
 
@@ -335,6 +361,22 @@ void drawMultilineText(const char *text, int x, int y, int w, int h, const Style
     multilineTextRender.hangingIndent = hangingIndent;
 
     multilineTextRender.render();
+}
+
+int measureMultilineText(const char *text, int x, int y, int w, int h, const Style *style, int firstLineIndent, int hangingIndent) {
+    MultilineTextRender multilineTextRender;
+
+    multilineTextRender.text = text;
+    multilineTextRender.x1 = x;
+    multilineTextRender.y1 = y;
+    multilineTextRender.x2 = x + w - 1;
+    multilineTextRender.y2 = y + h - 1;
+    multilineTextRender.style = style;
+    multilineTextRender.active = false;
+    multilineTextRender.firstLineIndent = firstLineIndent;
+    multilineTextRender.hangingIndent = hangingIndent;
+
+    return multilineTextRender.measure();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

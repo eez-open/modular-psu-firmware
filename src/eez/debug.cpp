@@ -29,6 +29,7 @@
 
 // TODO these includes should not be inside apps/psu
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/datetime.h>
 
 using namespace eez::psu;
@@ -47,6 +48,8 @@ void Trace(const char *format, ...) {
 	buffer[BUFFER_SIZE] = 0;
 
     va_end(args);
+
+    event_queue::pushDebugTrace(buffer);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -26,6 +26,7 @@ bool styleIsBlink(const Style *style);
 
 void drawText(const char *text, int textLength, int x, int y, int w, int h, const Style *style, bool active, bool blink, bool ignoreLuminocity, uint16_t *overrideColor, uint16_t *overrideBackgroundColor, uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor);
 void drawMultilineText(const char *text, int x, int y, int w, int h, const Style *style, bool active, int firstLineIndent, int hangingIndent);
+int measureMultilineText(const char *text, int x, int y, int w, int h, const Style *style, int firstLineIndent, int hangingIndent);
 void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, int x, int y, int w, int h, const Style *style, bool active);
 void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, bool ignoreLuminocity, bool invertColors);
 void drawShadow(int x1, int y1, int x2, int y2);

@@ -40,7 +40,7 @@ extern EnumItem g_ioPinsOutputFunctionEnumDefinition[];
 extern EnumItem g_dstRuleEnumDefinition[];
 extern EnumItem g_userSwitchActionEnumDefinition[];
 extern EnumItem g_fileManagerSortByEnumDefinition[];
-
+extern EnumItem g_eventQueueFilterEnumDefinition[];
 #if defined(EEZ_PLATFORM_SIMULATOR)
 extern EnumItem g_moduleTypeEnumDefinition[];
 #endif
@@ -100,9 +100,13 @@ Value MakeValue(float value, Unit unit);
 Value MakeLessThenMinMessageValue(float float_, const Value &value_);
 Value MakeGreaterThenMaxMessageValue(float float_, const Value &value_);
 Value MakeScpiErrorValue(int16_t errorCode);
-Value MakeEventMessageValue(int16_t eventId);
 
 void editValue(uint16_t dataId);
+
+Value MakeEventValue(psu::event_queue::Event *e);
+void eventValueToText(const Value &value, char *text, int count);
+bool compareEventValues(const Value &a, const Value &b);
+Value MakeEventMessageValue(int16_t eventId);
 
 } // namespace gui
 } // namespace eez

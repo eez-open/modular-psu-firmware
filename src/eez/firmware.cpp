@@ -320,6 +320,8 @@ void shutdown() {
         return;
     }
 
+    event_queue::pushEvent(g_restart ? event_queue::EVENT_INFO_SYSTEM_RESTART : event_queue::EVENT_INFO_SYSTEM_SHUTDOWN);
+
     osDelay(50);
 
     g_shutdownInProgress = true;

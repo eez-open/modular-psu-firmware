@@ -46,6 +46,8 @@ namespace eez {
 namespace psu {
 namespace event_queue {
 
+static const int CONF_EVENT_LINE_WIDTH_PX = 480;
+
 static const char *LOG_FILE_NAME = "log.txt";
 
 static const char *LOG_DEBUG_INDEX_FILE_NAME   = "index1";
@@ -58,87 +60,94 @@ static const char *EVENT_TYPE_NAMES[] = {
     "DEBUG",
     "INFO",
     "WARNING",
-    "ERROR",
-    "UNKNOWN"
+    "ERROR"
 };
 
-static const size_t EVENT_MESSAGE_MAX_SIZE = 128;
+static const size_t EVENT_MESSAGE_MAX_SIZE = 256;
 
 struct Event {
-    uint32_t eventIndex;
     uint32_t dateTime;
     int eventType;
     char message[EVENT_MESSAGE_MAX_SIZE];
+    bool isLongMessageText;
+    uint32_t logOffset;
 };
 
 static const int WRITE_QUEUE_MAX_SIZE = 50;
 struct QueueEvent {
     uint32_t dateTime;
     int16_t eventId;
+    char message[EVENT_MESSAGE_MAX_SIZE];
 };
 static QueueEvent g_writeQueue[WRITE_QUEUE_MAX_SIZE];
 static uint8_t g_writeQueueSize = 0;
 
-static uint32_t g_numEvents = 0;
-static uint32_t g_pageIndex = 0;
+static bool g_refreshEvents;
+
+static int g_filter = EVENT_TYPE_INFO;
+
+static uint32_t g_numEvents;
+static uint32_t g_pageIndex;
+static uint32_t g_previousPageIndex;
 
 static int16_t g_lastErrorEventId;
 
-static const int EVENTS_CACHE_SIZE = EVENTS_PER_PAGE;
-static Event g_eventsCache[EVENTS_CACHE_SIZE];
+static Event g_events[EVENTS_PER_PAGE];
+
+static int g_selectedEventIndexWithinPage;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static void getIndexFilePath(int indexType, char *filePath);
+static void getLogFilePath(char *filePath);
+
+static void refreshEvents();
+
 static void writeEvent(QueueEvent *event);
-static void readEvent(Event &event);
+static void readEvents(int pageIndex);
 
 static Event *getEvent(uint32_t eventIndex);
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
-    for (int i = 0; i < EVENTS_CACHE_SIZE; i++) {
-        g_eventsCache[i].eventIndex = 0xFFFFFFFF;
-    }
-
-    g_numEvents = 0;
-
-    char filePath[MAX_PATH_LENGTH];
-
-    strcpy(filePath, LOGS_DIR);
-    strcat(filePath, PATH_SEPARATOR);
-    strcat(filePath, LOG_DEBUG_INDEX_FILE_NAME);
-
-    File file;
-    if (file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        g_numEvents = file.size() / 4;
-        file.close();
-    }
-
-    if (g_numEvents == 0) {
-        pushEvent(EVENT_INFO_WELCOME);
-    }
+    g_refreshEvents = true;
 }
 
 void tick() {
     if (g_writeQueueSize > 0) {
         for (int i = 0; i < g_writeQueueSize; ++i) {
             writeEvent(&g_writeQueue[i]);
-            ++g_numEvents;
         }
         g_writeQueueSize = 0;
         
-        // invalidate cache
-        for (int i = 0; i < EVENTS_CACHE_SIZE; ++i) {
-            g_eventsCache[i].eventIndex = 0xFFFFFFFF;
-        }
-    } else {
-        for (int i = 0; i < EVENTS_CACHE_SIZE; ++i) {
-            if (g_eventsCache[i].eventType == EVENT_TYPE_UNKNOWN) {
-                readEvent(g_eventsCache[i]);
+        g_previousPageIndex = -1;
+    } 
+#if OPTION_DISPLAY
+    else {
+        if (gui::g_psuAppContext.getActivePageId() == PAGE_ID_EVENT_QUEUE) {
+            if (g_refreshEvents) {
+                refreshEvents();
+                g_refreshEvents = false;
+            } else {
+                auto pageIndex = g_pageIndex;
+                if (pageIndex != g_previousPageIndex) {
+                    readEvents(pageIndex);
+                    g_previousPageIndex = pageIndex;
+                }
             }
         }
     }
+#endif
+}
+
+int getFilter() {
+    return g_filter;
+}
+
+void setFilter(int filter) {
+    persist_conf::setEventQueueFilter(filter);
+    g_refreshEvents = true;
 }
 
 int16_t getLastErrorEventId() {
@@ -150,7 +159,9 @@ uint32_t getEventDateTime(Event *e) {
 }
 
 int getEventType(int16_t eventId) {
-    if (eventId >= EVENT_INFO_START_ID) {
+    if (eventId == EVENT_DEBUG_TRACE) {
+        return EVENT_TYPE_DEBUG;
+    } else if (eventId >= EVENT_INFO_START_ID) {
         return EVENT_TYPE_INFO;
     } else if (eventId >= EVENT_WARNING_START_ID) {
         return EVENT_TYPE_WARNING;
@@ -243,8 +254,11 @@ const char *getEventMessage(Event *e) {
     return e->message;
 }
 
-bool compareEvents(Event *aEvent, Event *bEvent) {
-    return aEvent->eventIndex == bEvent->eventIndex;
+bool isLongMessageText(Event *e) {
+    if (e) {
+        return e->isLongMessageText;
+    }
+    return false;
 }
 
 void pushEvent(int16_t eventId) {
@@ -272,7 +286,32 @@ void pushEvent(int16_t eventId) {
         }
 #endif
     }
+}
 
+void pushDebugTrace(const char *message) {
+    static char buffer[EVENT_MESSAGE_MAX_SIZE];
+    static int bufferIndex = 0;
+
+    while (*message) {
+        char ch = *message++;
+        bool isNewLine = ch == '\n';
+        if (!isNewLine) {
+            buffer[bufferIndex++] = ch;
+        }
+        if (isNewLine || bufferIndex == EVENT_MESSAGE_MAX_SIZE - 1) {
+            if (bufferIndex > 0) {
+                buffer[bufferIndex] = 0;
+                bufferIndex = 0;
+
+                if (g_writeQueueSize < WRITE_QUEUE_MAX_SIZE) {
+                    g_writeQueue[g_writeQueueSize].dateTime = datetime::now();
+                    g_writeQueue[g_writeQueueSize].eventId = EVENT_DEBUG_TRACE;
+                    strcpy(g_writeQueue[g_writeQueueSize].message, buffer);
+                    ++g_writeQueueSize;
+                }
+            }
+        }
+    }
 }
 
 void markAsRead() {
@@ -291,27 +330,30 @@ int getActivePageNumEvents() {
     }
 }
 
-Event *getActivePageEvent(int i) {
+Event *getActivePageEvent(int eventIndexWithinActivePage) {
     int n = event_queue::getActivePageNumEvents();
-    if (i < n) {
-        return getEvent(g_pageIndex * EVENTS_PER_PAGE + i);
+    if (eventIndexWithinActivePage >= 0 && eventIndexWithinActivePage < n) {
+        return getEvent(g_pageIndex * EVENTS_PER_PAGE + eventIndexWithinActivePage);
     }
     return nullptr;
 }
 
 void moveToFirstPage() {
     g_pageIndex = 0;
+    g_selectedEventIndexWithinPage = -1;
 }
 
 void moveToNextPage() {
     if ((int)g_pageIndex < getNumPages() - 1) {
         ++g_pageIndex;
+        g_selectedEventIndexWithinPage = -1;
     }
 }
 
 void moveToPreviousPage() {
     if (g_pageIndex > 0) {
         --g_pageIndex;
+        g_selectedEventIndexWithinPage = -1;
     }
 }
 
@@ -319,14 +361,74 @@ int getActivePageIndex() {
     return g_pageIndex;
 }
 
+void toggleSelectedEvent(int eventIndexWithinActivePage) {
+    if (g_selectedEventIndexWithinPage == eventIndexWithinActivePage) {
+        g_selectedEventIndexWithinPage = -1;
+    } else {
+        g_selectedEventIndexWithinPage = eventIndexWithinActivePage;
+    }
+}
+
+Event *getSelectedEvent() {
+    return getActivePageEvent(g_selectedEventIndexWithinPage);
+}
+
+int getSelectedEventIndexWithinPage() {
+    return g_selectedEventIndexWithinPage;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {
-    char filePath[MAX_PATH_LENGTH];
+static void getIndexFilePath(int indexType, char *filePath) {
+    strcpy(filePath, LOGS_DIR);
 
+    strcat(filePath, PATH_SEPARATOR);
+
+    if (indexType == EVENT_TYPE_DEBUG) {
+        strcat(filePath, LOG_DEBUG_INDEX_FILE_NAME);
+    } else if (indexType == EVENT_TYPE_INFO) {
+        strcat(filePath, LOG_INFO_INDEX_FILE_NAME);
+    } else if (indexType == EVENT_TYPE_WARNING) {
+        strcat(filePath, LOG_WARNING_INDEX_FILE_NAME);
+    } else {
+        strcat(filePath, LOG_ERROR_INDEX_FILE_NAME);
+    }
+}
+
+static void getLogFilePath(char *filePath) {
     strcpy(filePath, LOGS_DIR);
     strcat(filePath, PATH_SEPARATOR);
     strcat(filePath, LOG_FILE_NAME);
+}
+
+static void refreshEvents() {
+    g_filter = persist_conf::devConf.eventQueueFilter;
+    if (g_filter < EVENT_TYPE_DEBUG || g_filter > EVENT_TYPE_ERROR) {
+        g_filter = EVENT_TYPE_INFO;
+    }
+
+    g_numEvents = 0;
+    g_pageIndex = 0;
+    g_previousPageIndex = -1;
+    g_selectedEventIndexWithinPage = -1;
+    
+    char filePath[MAX_PATH_LENGTH];
+    getIndexFilePath(g_filter, filePath);
+
+    File file;
+    if (file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+        g_numEvents = file.size() / 4;
+        file.close();
+    }
+
+    if (g_numEvents == 0) {
+        pushEvent(EVENT_INFO_WELCOME);
+    }
+}
+
+static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {
+    char filePath[MAX_PATH_LENGTH];
+    getLogFilePath(filePath);
 
     File file;
     if (!file.open(filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
@@ -347,8 +449,12 @@ static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {
     sprintf(dateTimeAndEventTypeStr, "%04d-%02d-%02d %02d:%02d:%02d %s ", year, month, day, hour, minute, second, EVENT_TYPE_NAMES[eventType]);
     bufferedFile.write((const uint8_t *)dateTimeAndEventTypeStr, strlen(dateTimeAndEventTypeStr));
 
-    const char *message = getEventMessage(event->eventId);
-    bufferedFile.write((const uint8_t *)message, strlen(message));
+    if (event->eventId == EVENT_DEBUG_TRACE) {
+        bufferedFile.write((const uint8_t *)event->message, strlen(event->message));
+    } else {
+        const char *message = getEventMessage(event->eventId);
+        bufferedFile.write((const uint8_t *)message, strlen(message));
+    }
 
     bufferedFile.write((const uint8_t *)"\n", 1);
 
@@ -359,12 +465,9 @@ static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {
     return true;
 }
 
-static void writeToIndex(const char *indexFileName, uint32_t logOffset) {
+static void writeToIndex(int indexType, uint32_t logOffset) {
     char filePath[MAX_PATH_LENGTH];
-
-    strcpy(filePath, LOGS_DIR);
-    strcat(filePath, PATH_SEPARATOR);
-    strcat(filePath, indexFileName);
+    getIndexFilePath(indexType, filePath);
 
     File file;
     if (file.open(filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
@@ -380,105 +483,94 @@ static void writeEvent(QueueEvent *event) {
         return;
     }
 
-    writeToIndex(LOG_DEBUG_INDEX_FILE_NAME, logOffset);
+    if (eventType >= g_filter) {
+        ++g_numEvents;
+    }
+
+    writeToIndex(EVENT_TYPE_DEBUG, logOffset);
 
     if (eventType == EVENT_TYPE_DEBUG) {
         return;
     }
 
-    writeToIndex(LOG_INFO_INDEX_FILE_NAME, logOffset);
+    writeToIndex(EVENT_TYPE_INFO, logOffset);
 
     if (eventType == EVENT_TYPE_INFO) {
         return;
     }
 
-    writeToIndex(LOG_WARNING_INDEX_FILE_NAME, logOffset);
+    writeToIndex(EVENT_TYPE_WARNING, logOffset);
 
     if (eventType == EVENT_TYPE_WARNING) {
         return;
     }
 
-    writeToIndex(LOG_ERROR_INDEX_FILE_NAME, logOffset);
+    writeToIndex(EVENT_TYPE_ERROR, logOffset);
 }
 
-static void readEvent(Event &event) {
-    char filePath[MAX_PATH_LENGTH];
+static void getEventInfoText(Event *e, char *text, int count) {
+    int year, month, day, hour, minute, second;
+    datetime::breakTime(getEventDateTime(e), year, month, day, hour, minute, second);
 
+    int yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow;
+    datetime::breakTime(datetime::now(), yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow);
+
+    if (yearNow == year && monthNow == month && dayNow == day) {
+        snprintf(text, count - 1, "%c [%02d:%02d:%02d] %s", 127 + getEventType(e) - EVENT_TYPE_DEBUG, hour, minute, second, getEventMessage(e));
+    } else {
+        snprintf(text, count - 1, "%c [%02d-%02d-%02d] %s", 127 + getEventType(e) - EVENT_TYPE_DEBUG, day, month, year % 100, getEventMessage(e));
+    }
+
+    text[count - 1] = 0;
+}
+
+static bool readEvent(File &indexFile, File &logFile, int eventIndex, Event &event) {
+    indexFile.seek(4 * (g_numEvents - 1 - eventIndex));
     uint32_t logOffset;
-
-    {
-        strcpy(filePath, LOGS_DIR);
-        strcat(filePath, PATH_SEPARATOR);
-        strcat(filePath, LOG_DEBUG_INDEX_FILE_NAME);
-
-        File file;
-        if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-            return;
-        }
-
-        file.seek(4 * (g_numEvents - 1 - event.eventIndex));
-
-        bool result = file.read(&logOffset, sizeof(uint32_t)) == sizeof(uint32_t);
-
-        file.close();
-
-        if (!result) {
-            return;
-        }
+    if (indexFile.read(&logOffset, sizeof(uint32_t)) != sizeof(uint32_t)) {
+        return false;
     }
 
-    int eventType = EVENT_TYPE_NONE;
-
-    strcpy(filePath, LOGS_DIR);
-    strcat(filePath, PATH_SEPARATOR);
-    strcat(filePath, LOG_FILE_NAME);
-
-    File file;
-    if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        return;
-    }
-
-    file.seek(logOffset);
-
+    logFile.seek(logOffset);
     using namespace sd_card;
-    BufferedFileRead bufferedFile(file, 64);
+    BufferedFileRead bufferedFile(logFile, 64);
 
     unsigned int year;
     if (!match(bufferedFile, year)) {
-        goto Error;
+        return false;
     }
     if (!match(bufferedFile, '-')) {
-        goto Error;
+        return false;
     }
     unsigned int month;
     if (!match(bufferedFile, month)) {
-        goto Error;
+        return false;
     }
     if (!match(bufferedFile, '-')) {
-        goto Error;
+        return false;
     }
     unsigned int day;
     if (!match(bufferedFile, day)) {
-        goto Error;
+        return false;
     }
 
     unsigned int hour;
     if (!match(bufferedFile, hour)) {
-        goto Error;
+        return false;
     }
     if (!match(bufferedFile, ':')) {
-        goto Error;
+        return false;
     }
     unsigned int minute;
     if (!match(bufferedFile, minute)) {
-        goto Error;
+        return false;
     }
     if (!match(bufferedFile, ':')) {
-        goto Error;
+        return false;
     }
     unsigned int second;
     if (!match(bufferedFile, second)) {
-        goto Error;
+        return false;
     }
 
     matchZeroOrMoreSpaces(bufferedFile);
@@ -486,6 +578,8 @@ static void readEvent(Event &event) {
     char eventTypeStr[9];
     matchUntil(bufferedFile, ' ', eventTypeStr, sizeof(eventTypeStr) - 1);
     eventTypeStr[sizeof(eventTypeStr) - 1] = 0;
+
+    int eventType = EVENT_TYPE_NONE;
 
     for (int i = EVENT_TYPE_DEBUG; i <= EVENT_TYPE_ERROR; i++) {
         if (strcmp(eventTypeStr, EVENT_TYPE_NAMES[i]) == 0) {
@@ -495,7 +589,7 @@ static void readEvent(Event &event) {
     }
 
     if (eventType == EVENT_TYPE_NONE) {
-        goto Error;
+        return false;
     }
 
     char message[EVENT_MESSAGE_MAX_SIZE];
@@ -506,24 +600,81 @@ static void readEvent(Event &event) {
     event.eventType = eventType;
     strcpy(event.message, message);
 
-Error:
-    file.close();
+    char text[256];
+    getEventInfoText(&event, text, sizeof(text));
+    eez::gui::font::Font font(getFontData(FONT_ID_OSWALD14));
+    event.isLongMessageText = mcu::display::measureStr(text, -1, font) > CONF_EVENT_LINE_WIDTH_PX;
+    event.logOffset = logOffset;
+
+    return true;
+}
+
+static void readEvents(int pageIndex) {
+    char filePath[MAX_PATH_LENGTH];
+    getIndexFilePath(g_filter, filePath);
+    File indexFile;
+    if (indexFile.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+        getLogFilePath(filePath);
+        File logFile;
+        if (logFile.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+            uint32_t eventIndex = pageIndex * EVENTS_PER_PAGE;
+            for (int i = 0; i < EVENTS_PER_PAGE; i++) {
+                auto &event = g_events[i];
+                if (eventIndex + i < g_numEvents) {
+                    if (readEvent(indexFile, logFile, eventIndex + i, event)) {
+                        continue;
+                    }
+                }
+                memset(&event, 0, sizeof(event));
+            }
+            logFile.close();
+        }
+        indexFile.close();
+    }
 }
 
 static Event *getEvent(uint32_t eventIndex) {
-    int i = eventIndex % EVENTS_CACHE_SIZE;
-
-    auto &event = g_eventsCache[i];
-
-    if (event.eventIndex != eventIndex) {
-        event.eventIndex = eventIndex;
-        event.eventType = EVENT_TYPE_UNKNOWN;
-        event.message[0] = 0;
-    }
-
-    return &event;
+    return &g_events[eventIndex % EVENTS_PER_PAGE];
 }
 
 } // namespace event_queue
 } // namespace psu
+
+namespace gui {
+
+using namespace psu::event_queue;
+
+Value MakeEventValue(eez::psu::event_queue::Event *e) {
+    Value value;
+    value.type_ = VALUE_TYPE_EVENT;
+    value.options_ = 0;
+    value.unit_ = UNIT_UNKNOWN;
+    value.uint32_ = e->logOffset;
+    return value;
+}
+
+static eez::psu::event_queue::Event *getEventFromValue(const Value &value) {
+    for (int i = 0; i < EVENTS_PER_PAGE; i++) {
+        if (g_events[i].logOffset == value.getUInt32()) {
+            return &g_events[i];
+        }
+    }
+    return nullptr;
+}
+
+bool compareEventValues(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void eventValueToText(const Value &value, char *text, int count) {
+    auto event = getEventFromValue(value);
+    if (event) {
+        getEventInfoText(event, text, count);
+    } else {
+        text[0] = 0;
+    }
+}
+
+} // namespace gui
+
 } // namespace eez

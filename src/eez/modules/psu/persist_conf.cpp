@@ -177,6 +177,7 @@ void initDefaultDevConf() {
     // block 7
     g_defaultDevConf.userSwitchAction = USER_SWITCH_ACTION_ENCODER_STEP;
     g_defaultDevConf.sortFilesOption = SORT_FILES_BY_TIME_DESC;
+    g_defaultDevConf.eventQueueFilter = event_queue::EVENT_TYPE_INFO;
 
     // block 8
     strcpy(g_defaultDevConf.ethernetHostName, DEFAULT_ETHERNET_HOST_NAME);
@@ -1205,6 +1206,10 @@ void setUserSwitchAction(UserSwitchAction userSwitchAction) {
 
 void setSortFilesOption(SortFilesOption sortFilesOption) {
     g_devConf.sortFilesOption = sortFilesOption;
+}
+
+void setEventQueueFilter(int eventQueueFilter) {
+    g_devConf.eventQueueFilter = eventQueueFilter;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

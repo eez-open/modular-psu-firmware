@@ -255,12 +255,12 @@ static ValueToTextFunction g_builtInValueToTextFunctions[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-uint8_t getPageIndexFromValue(const Value &value) {
-    return value.getFirstUInt8();
+uint16_t getPageIndexFromValue(const Value &value) {
+    return value.getFirstUInt16();
 }
 
-uint8_t getNumPagesFromValue(const Value &value) {
-    return value.getSecondUInt8();
+uint16_t getNumPagesFromValue(const Value &value) {
+    return value.getSecondUInt16();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -26,8 +26,8 @@ namespace psu {
 namespace gui {
 
 class EventQueuePage : public Page {
-  public:
-    void pageWillAppear();
+public:
+    void pageAlloc();
 };
 
 } // namespace gui

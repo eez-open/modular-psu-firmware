@@ -732,9 +732,9 @@ bool match(BufferedFileRead &file, const char *str) {
 }
 
 bool matchUntil(BufferedFileRead &file, char ch, char *result, int count) {
-    char *end = result + count;
+    char *end = count == -1 ? (char *)0xFFFFFFFF : result + count;
 
-    while (count == -1 || result < end) {
+    while (true) {
         int next = file.peek();
         if (next == -1) {
             return false;
@@ -747,7 +747,9 @@ bool matchUntil(BufferedFileRead &file, char ch, char *result, int count) {
             return true;
         }
 
-        *result++ = (char)next;
+        if (result < end) {
+            *result++ = (char)next;
+        }
     }
 
     return true;

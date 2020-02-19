@@ -102,6 +102,7 @@ const EnumItem *g_enumDefinitions[] = {
     g_dstRuleEnumDefinition,
     g_userSwitchActionEnumDefinition,
     g_fileManagerSortByEnumDefinition,
+    g_eventQueueFilterEnumDefinition,
 #if defined(EEZ_PLATFORM_SIMULATOR)
     g_moduleTypeEnumDefinition,
 #endif
@@ -211,6 +212,14 @@ EnumItem g_fileManagerSortByEnumDefinition[] = {
     { 0, 0 }
 };
 
+EnumItem g_eventQueueFilterEnumDefinition[] = {
+	{ event_queue::EVENT_TYPE_DEBUG, "Debug" },
+    { event_queue::EVENT_TYPE_INFO, "Info" },
+    { event_queue::EVENT_TYPE_WARNING, "Warning" },
+    { event_queue::EVENT_TYPE_ERROR, "Error" },
+    { 0, 0 }
+};
+
 #if defined(EEZ_PLATFORM_SIMULATOR)
 EnumItem g_moduleTypeEnumDefinition[] = {
     { MODULE_TYPE_NONE, "None" },
@@ -242,15 +251,6 @@ Value MakeFloatListValue(float *pFloat) {
     value.options_ = 0;
     value.unit_ = UNIT_UNKNOWN;
     value.pFloat_ = pFloat;
-    return value;
-}
-
-Value MakeEventValue(event_queue::Event *e) {
-    Value value;
-    value.type_ = VALUE_TYPE_EVENT;
-    value.options_ = 0;
-    value.unit_ = UNIT_UNKNOWN;
-    value.pVoid_ = e;
     return value;
 }
 
@@ -298,10 +298,10 @@ Value MakeFirmwareVersionValue(uint8_t majorVersion, uint8_t minorVersion) {
     return value;
 }
 
-Value MakePageInfoValue(uint8_t pageIndex, uint8_t numPages) {
+Value MakePageInfoValue(uint16_t pageIndex, uint16_t numPages) {
     Value value;
-    value.pairOfUint8_.first = pageIndex;
-    value.pairOfUint8_.second = numPages;
+    value.pairOfUint16_.first = pageIndex;
+    value.pairOfUint16_.second = numPages;
     value.type_ = VALUE_TYPE_PAGE_INFO;
     return value;
 }
@@ -361,12 +361,6 @@ void printTime(double time, char *text, int count) {
 
 void printTime(uint32_t time, char *text, int count) {
     printTime((double)time, text, count);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-event_queue::Event *getEventFromValue(const Value &value) {
-    return (event_queue::Event *)value.getVoidPointer();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -457,42 +451,11 @@ void GREATER_THEN_MAX_TIME_ZONE_value_to_text(const Value &value, char *text, in
 }
 
 bool compare_EVENT_value(const Value &a, const Value &b) {
-    auto aEvent = getEventFromValue(a);
-    auto bEvent = getEventFromValue(b);
-
-    if (aEvent == bEvent) {
-        return true;
-    }
-
-    if (!aEvent || !bEvent) {
-        return false;
-    }
-
-    return event_queue::compareEvents(aEvent, bEvent);
+    return compareEventValues(a, b);
 }
 
 void EVENT_value_to_text(const Value &value, char *text, int count) {
-    auto event = getEventFromValue(value);
-    if (!event) {
-        text[0] = 0;
-        return;
-    }
-
-    int year, month, day, hour, minute, second;
-    datetime::breakTime(getEventDateTime(event), year, month, day, hour, minute, second);
-
-    int yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow;
-    datetime::breakTime(datetime::now(), yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow);
-
-    using namespace event_queue;
-
-    if (yearNow == year && monthNow == month && dayNow == day) {
-        snprintf(text, count - 1, "%c [%02d:%02d:%02d] %s", 127 + getEventType(event) - EVENT_TYPE_DEBUG, hour, minute, second, getEventMessage(event));
-    } else {
-        snprintf(text, count - 1, "%c [%02d-%02d-%02d] %s", 127 + getEventType(event) - EVENT_TYPE_DEBUG, day, month, year % 100, getEventMessage(event));
-    }
-
-    text[count - 1] = 0;
+    eventValueToText(value, text, count);
 }
 
 bool compare_EVENT_MESSAGE_value(const Value &a, const Value &b) {
@@ -2779,6 +2742,21 @@ void data_event_queue_event_message(data::DataOperationEnum operation, data::Cur
     }
 }
 
+void data_event_queue_is_long_message_text(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        event_queue::Event *event = event_queue::getActivePageEvent(cursor.i);
+        value = event_queue::isLongMessageText(event);
+    }
+}
+
+void data_event_queue_event_is_selected(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        event_queue::Event *event = event_queue::getActivePageEvent(cursor.i);
+        event_queue::Event *selectedEvent = event_queue::getSelectedEvent();
+        value = event == selectedEvent;
+    }
+}
+
 void data_event_queue_multiple_pages(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         data::Value eventQueuePageInfo =
@@ -2807,6 +2785,74 @@ void data_event_queue_next_page_enabled(data::DataOperationEnum operation, data:
 void data_event_queue_page_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = MakePageInfoValue(event_queue::getActivePageIndex(), event_queue::getNumPages());
+    }
+}
+
+void data_event_queue_selected_event_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        event_queue::Event *selectedEvent = event_queue::getSelectedEvent();
+        if (selectedEvent) {
+            value = event_queue::getEventMessage(selectedEvent);
+        }
+    }
+}
+
+void data_event_queue_event_long_message_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    static const int NUM_WIDGETS = 1;
+
+    static const int MULTI_LINE_TEXT_WIDGET = 0;
+
+    static Overlay overlay;
+    static WidgetOverride widgetOverrides[NUM_WIDGETS];
+
+    if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = data::Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+        overlay.widgetOverrides = widgetOverrides;
+
+        int selectedEventIndexWithinPage = event_queue::getSelectedEventIndexWithinPage();
+        int state = selectedEventIndexWithinPage + 1;
+
+        if (overlay.state != state) {
+            overlay.state = state;
+            if (state) {
+                event_queue::Event *selectedEvent = event_queue::getSelectedEvent();
+
+                WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
+
+                const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+
+                const Widget *multiLineTextWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, MULTI_LINE_TEXT_WIDGET);
+
+                static const int CONF_EVENT_LINE_HEIGHT_PX = 30;
+                static const int CONF_EVENTS_LIST_HEIGHT_PX = 240;
+
+                auto style = getStyle(multiLineTextWidget->style);
+                int height = measureMultilineText(
+                    event_queue::getEventMessage(selectedEvent), 
+                    0, 0, multiLineTextWidget->w, CONF_EVENTS_LIST_HEIGHT_PX,
+                    style, 0, 0
+                ) + style->padding_top + style->padding_bottom + style->border_size_top + style->border_size_bottom;
+                
+                int y = selectedEventIndexWithinPage * CONF_EVENT_LINE_HEIGHT_PX;
+                if (y + height > CONF_EVENTS_LIST_HEIGHT_PX) {
+                    y = CONF_EVENTS_LIST_HEIGHT_PX - height;
+                }
+
+                overlay.yOffset = y;
+
+                overlay.width = widgetCursor.widget->w;
+                overlay.height = height;
+
+                widgetOverrides[MULTI_LINE_TEXT_WIDGET].isVisible = true;
+                widgetOverrides[MULTI_LINE_TEXT_WIDGET].x = 0;
+                widgetOverrides[MULTI_LINE_TEXT_WIDGET].y = 0;
+                widgetOverrides[MULTI_LINE_TEXT_WIDGET].w = overlay.width;
+                widgetOverrides[MULTI_LINE_TEXT_WIDGET].h = height;
+            }
+        }
+
+        value = data::Value(&overlay, VALUE_TYPE_POINTER);
     }
 }
 

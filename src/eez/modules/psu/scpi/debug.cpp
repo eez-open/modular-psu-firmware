@@ -65,6 +65,8 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             taskEXIT_CRITICAL();
             restart();
 #endif
+        } else if (cmd == 24) {
+        	DebugTrace("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tristique, nisl vitae interdum molestie, tortor nulla condimentum ligula, et egestas risus tortor sodales augue. Proin a congue arcu. Morbi in odio eu eros tincidunt dictum et at metus. In at quam erat. Mauris est ligula, consequat vehicula felis sit amet, blandit sollicitudin augue. Sed ornare purus ut nisi euismod ultrices. Sed rhoncus eros sapien, ac ullamcorper risus blandit ac. Nulla ac aliquam sapien, nec euismod nibh. Fusce volutpat fermentum libero sit amet iaculis. Donec in augue sapien. Vivamus vitae urna sodales, dapibus nisi sed, rhoncus urna.");
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;

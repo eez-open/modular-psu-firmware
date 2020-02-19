@@ -166,7 +166,8 @@ struct DeviceConfiguration {
     // block 7
     UserSwitchAction userSwitchAction;
     SortFilesOption sortFilesOption;
-    uint8_t reserved6[56];
+    int eventQueueFilter;
+    uint8_t reserved6[52];
 
     // block 8
     char ethernetHostName[32 + 1];
@@ -311,6 +312,8 @@ void setSkipEthernetSetup(unsigned skipEthernetSetup);
 void setUserSwitchAction(UserSwitchAction userSwitchAction);
 
 void setSortFilesOption(SortFilesOption sortFilesOption);
+
+void setEventQueueFilter(int eventQueueFilter);
 
 ////////////////////////////////////////////////////////////////////////////////
 

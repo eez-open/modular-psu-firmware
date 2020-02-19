@@ -69,6 +69,11 @@ struct PairOfUint8Value {
     uint8_t second;
 };
 
+struct PairOfUint16Value {
+    uint16_t first;
+    uint16_t second;
+};
+
 typedef uint8_t ValueType;
 
 #define STRING_OPTIONS_FILE_ELLIPSIS 1
@@ -239,6 +244,13 @@ struct Value {
         return pairOfUint8_.second;
     }
 
+    uint16_t getFirstUInt16() const {
+        return pairOfUint16_.first;
+    }
+    uint16_t getSecondUInt16() const {
+        return pairOfUint16_.second;
+    }
+
     void toText(char *text, int count) const;
 
     uint16_t getOptions() const {
@@ -263,6 +275,7 @@ struct Value {
         float *pFloat_;
         void *pVoid_;
         PairOfUint8Value pairOfUint8_;
+        PairOfUint16Value pairOfUint16_;
     };
 };
 
@@ -274,8 +287,8 @@ typedef void (*ValueToTextFunction)(const Value &value, char *text, int count);
 extern CompareValueFunction g_compareUserValueFunctions[];
 extern ValueToTextFunction g_userValueToTextFunctions[];
 
-uint8_t getPageIndexFromValue(const Value &value);
-uint8_t getNumPagesFromValue(const Value &value);
+uint16_t getPageIndexFromValue(const Value &value);
+uint16_t getNumPagesFromValue(const Value &value);
 
 ////////////////////////////////////////////////////////////////////////////////
 
