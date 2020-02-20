@@ -242,8 +242,7 @@ int checkTrigger() {
 
         if (channel.getVoltageTriggerMode() != TRIGGER_MODE_FIXED) {
             if (channel.isRemoteProgrammingEnabled()) {
-                // TODO replace with more specific error
-                return SCPI_ERROR_EXECUTION_ERROR;
+                return SCPI_ERROR_CANNOT_INIT_TRIGGER_WHILE_RPROG_IS_ENABLED;
             }
 
             if (channel.getVoltageTriggerMode() == TRIGGER_MODE_LIST) {
