@@ -298,14 +298,6 @@ Value MakeFirmwareVersionValue(uint8_t majorVersion, uint8_t minorVersion) {
     return value;
 }
 
-Value MakePageInfoValue(uint16_t pageIndex, uint16_t numPages) {
-    Value value;
-    value.pairOfUint16_.first = pageIndex;
-    value.pairOfUint16_.second = numPages;
-    value.type_ = VALUE_TYPE_PAGE_INFO;
-    return value;
-}
-
 Value MakeScpiErrorValue(int16_t errorCode) {
     Value value;
     value.int16_ = errorCode;
@@ -808,15 +800,6 @@ void MASTER_INFO_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
-bool compare_PAGE_INFO_value(const Value &a, const Value &b) {
-    return getPageIndexFromValue(a) == getPageIndexFromValue(b) && getNumPagesFromValue(a) == getNumPagesFromValue(b);
-}
-
-void PAGE_INFO_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "Page #%d of %d", getPageIndexFromValue(value) + 1, getNumPagesFromValue(value));
-    text[count - 1] = 0;
-}
-
 bool compare_TEST_RESULT_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -931,7 +914,6 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_SLOT_INFO_value,
     compare_SLOT_INFO2_value,
     compare_MASTER_INFO_value,
-    compare_PAGE_INFO_value,
     compare_TEST_RESULT_value,
     compare_SCPI_ERROR_value,
     compare_STORAGE_INFO_value,
@@ -982,7 +964,6 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     SLOT_INFO_value_to_text,
     SLOT_INFO2_value_to_text,
     MASTER_INFO_value_to_text,
-    PAGE_INFO_value_to_text,
     TEST_RESULT_value_to_text,
     SCPI_ERROR_value_to_text,
     STORAGE_INFO_value_to_text,
@@ -2710,149 +2691,6 @@ void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::
         value = UNIT_SECOND;
     } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
-    }
-}
-
-void data_event_queue_last_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(event_queue::getEventType(event_queue::getLastErrorEventId()));
-    }
-}
-
-void data_event_queue_events(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
-        value = event_queue::EVENTS_PER_PAGE;
-    }
-}
-
-void data_event_queue_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        if (cursor.i >= 0) {
-            event_queue::Event *event = event_queue::getActivePageEvent(cursor.i);
-            value = data::Value(event ? event_queue::getEventType(event) : event_queue::EVENT_TYPE_NONE);
-        }
-    }
-}
-
-void data_event_queue_event_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        if (cursor.i >= 0) {
-            value = MakeEventValue(event_queue::getActivePageEvent(cursor.i));
-        }
-    }
-}
-
-void data_event_queue_is_long_message_text(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        event_queue::Event *event = event_queue::getActivePageEvent(cursor.i);
-        value = event_queue::isLongMessageText(event);
-    }
-}
-
-void data_event_queue_event_is_selected(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        event_queue::Event *event = event_queue::getActivePageEvent(cursor.i);
-        event_queue::Event *selectedEvent = event_queue::getSelectedEvent();
-        value = event == selectedEvent;
-    }
-}
-
-void data_event_queue_multiple_pages(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        data::Value eventQueuePageInfo =
-            MakePageInfoValue(event_queue::getActivePageIndex(), event_queue::getNumPages());
-        value = getNumPagesFromValue(eventQueuePageInfo) > 1;
-    }
-}
-
-void data_event_queue_previous_page_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        data::Value eventQueuePageInfo =
-            MakePageInfoValue(event_queue::getActivePageIndex(), event_queue::getNumPages());
-        value = getPageIndexFromValue(eventQueuePageInfo) > 0;
-    }
-}
-
-void data_event_queue_next_page_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        data::Value eventQueuePageInfo =
-            MakePageInfoValue(event_queue::getActivePageIndex(), event_queue::getNumPages());
-        value = getPageIndexFromValue(eventQueuePageInfo) <
-                getNumPagesFromValue(eventQueuePageInfo) - 1;
-    }
-}
-
-void data_event_queue_page_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = MakePageInfoValue(event_queue::getActivePageIndex(), event_queue::getNumPages());
-    }
-}
-
-void data_event_queue_selected_event_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        event_queue::Event *selectedEvent = event_queue::getSelectedEvent();
-        if (selectedEvent) {
-            value = event_queue::getEventMessage(selectedEvent);
-        }
-    }
-}
-
-void data_event_queue_event_long_message_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    static const int NUM_WIDGETS = 1;
-
-    static const int MULTI_LINE_TEXT_WIDGET = 0;
-
-    static Overlay overlay;
-    static WidgetOverride widgetOverrides[NUM_WIDGETS];
-
-    if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
-        value = data::Value(&overlay, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
-        overlay.widgetOverrides = widgetOverrides;
-
-        int selectedEventIndexWithinPage = event_queue::getSelectedEventIndexWithinPage();
-        int state = selectedEventIndexWithinPage + 1;
-
-        if (overlay.state != state) {
-            overlay.state = state;
-            if (state) {
-                event_queue::Event *selectedEvent = event_queue::getSelectedEvent();
-
-                WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
-
-                const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
-
-                const Widget *multiLineTextWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, MULTI_LINE_TEXT_WIDGET);
-
-                static const int CONF_EVENT_LINE_HEIGHT_PX = 30;
-                static const int CONF_EVENTS_LIST_HEIGHT_PX = 240;
-
-                auto style = getStyle(multiLineTextWidget->style);
-                int height = measureMultilineText(
-                    event_queue::getEventMessage(selectedEvent), 
-                    0, 0, multiLineTextWidget->w, CONF_EVENTS_LIST_HEIGHT_PX,
-                    style, 0, 0
-                ) + style->padding_top + style->padding_bottom + style->border_size_top + style->border_size_bottom;
-                
-                int y = selectedEventIndexWithinPage * CONF_EVENT_LINE_HEIGHT_PX;
-                if (y + height > CONF_EVENTS_LIST_HEIGHT_PX) {
-                    y = CONF_EVENTS_LIST_HEIGHT_PX - height;
-                }
-
-                overlay.yOffset = y;
-
-                overlay.width = widgetCursor.widget->w;
-                overlay.height = height;
-
-                widgetOverrides[MULTI_LINE_TEXT_WIDGET].isVisible = true;
-                widgetOverrides[MULTI_LINE_TEXT_WIDGET].x = 0;
-                widgetOverrides[MULTI_LINE_TEXT_WIDGET].y = 0;
-                widgetOverrides[MULTI_LINE_TEXT_WIDGET].w = overlay.width;
-                widgetOverrides[MULTI_LINE_TEXT_WIDGET].h = height;
-            }
-        }
-
-        value = data::Value(&overlay, VALUE_TYPE_POINTER);
     }
 }
 

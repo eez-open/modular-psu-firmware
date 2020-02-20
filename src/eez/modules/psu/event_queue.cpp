@@ -39,15 +39,21 @@
 #endif
 
 #if OPTION_DISPLAY
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/container.h>
+
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/data.h>
+#include <eez/modules/psu/gui/animations.h>
 #endif
 
 namespace eez {
 namespace psu {
 namespace event_queue {
 
-static const int CONF_EVENT_LINE_WIDTH_PX = 480;
+static const int EVENTS_PER_PAGE = 8;
+
+static const int CONF_EVENT_LINE_WIDTH_PX = 448;
 
 static const char *LOG_FILE_NAME = "log.txt";
 
@@ -64,17 +70,11 @@ static const char *EVENT_TYPE_NAMES[] = {
     "ERROR"
 };
 
+static const int WRITE_QUEUE_MAX_SIZE = 50;
 static const size_t EVENT_MESSAGE_MAX_SIZE = 256;
 
-struct Event {
-    uint32_t dateTime;
-    int eventType;
-    char message[EVENT_MESSAGE_MAX_SIZE];
-    bool isLongMessageText;
-    uint32_t logOffset;
-};
+////////////////////////////////////////////////////////////////////////////////
 
-static const int WRITE_QUEUE_MAX_SIZE = 50;
 struct QueueEvent {
     uint32_t dateTime;
     int16_t eventId;
@@ -87,19 +87,29 @@ static bool g_writeQueueFull;
 osMutexId(g_writeQueueMutexId);
 osMutexDef(g_writeQueueMutex);
 
+////////////////////////////////////////////////////////////////////////////////
+
 static bool g_refreshEvents;
 
 static int g_filter = EVENT_TYPE_INFO;
 
 static uint32_t g_numEvents;
-static uint32_t g_pageIndex;
-static uint32_t g_previousPageIndex;
+
+static uint32_t g_displayFromPosition;
+static uint32_t g_previousDisplayFromPosition;
 
 static int16_t g_lastErrorEventId;
 
+struct Event {
+    uint32_t dateTime;
+    int eventType;
+    char message[EVENT_MESSAGE_MAX_SIZE];
+    bool isLongMessageText;
+    uint32_t logOffset;
+};
 static Event g_events[EVENTS_PER_PAGE];
 
-static int g_selectedEventIndexWithinPage;
+static int g_selectedEventIndex;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -109,10 +119,14 @@ static bool getEventFromWriteQueue(QueueEvent *queueEvent);
 static void getIndexFilePath(int indexType, char *filePath);
 static void getLogFilePath(char *filePath);
 
+static int getEventType(int16_t eventId);
+
+static void setDisplayFromPosition(uint32_t position);
+
 static void refreshEvents();
 
 static void writeEvent(QueueEvent *event);
-static void readEvents(int pageIndex);
+static void readEvents(uint32_t fromPosition);
 
 static Event *getEvent(uint32_t eventIndex);
 
@@ -128,7 +142,7 @@ void tick() {
         QueueEvent queueEvent;
         if (getEventFromWriteQueue(&queueEvent)) {
             writeEvent(&queueEvent);
-            g_previousPageIndex = -1;
+            g_previousDisplayFromPosition = -1;
         }
 #if OPTION_DISPLAY
         else {
@@ -137,10 +151,10 @@ void tick() {
                     refreshEvents();
                     g_refreshEvents = false;
                 } else {
-                    auto pageIndex = g_pageIndex;
-                    if (pageIndex != g_previousPageIndex) {
-                        readEvents(pageIndex);
-                        g_previousPageIndex = pageIndex;
+                    auto fromPosition = g_displayFromPosition;
+                    if (fromPosition != g_previousDisplayFromPosition) {
+                        readEvents(fromPosition);
+                        g_previousDisplayFromPosition = fromPosition;
                     }
                 }
             }
@@ -158,42 +172,8 @@ void shutdownSave() {
     }
 }
 
-int getFilter() {
-    return g_filter;
-}
-
-void setFilter(int filter) {
-    persist_conf::setEventQueueFilter(filter);
-    g_refreshEvents = true;
-}
-
 int16_t getLastErrorEventId() {
     return g_lastErrorEventId;
-}
-
-uint32_t getEventDateTime(Event *e) {
-    return e->dateTime;
-}
-
-int getEventType(int16_t eventId) {
-    if (eventId == EVENT_DEBUG_TRACE) {
-        return EVENT_TYPE_DEBUG;
-    } else if (eventId >= EVENT_INFO_START_ID) {
-        return EVENT_TYPE_INFO;
-    } else if (eventId >= EVENT_WARNING_START_ID) {
-        return EVENT_TYPE_WARNING;
-    } else if (eventId != EVENT_TYPE_NONE) {
-        return EVENT_TYPE_ERROR;
-    } else {
-        return EVENT_TYPE_NONE;
-    }
-}
-
-int getEventType(Event *e) {
-    if (!e) {
-        return EVENT_TYPE_NONE;
-    }
-    return e->eventType;
 }
 
 const char *getEventTypeName(int16_t eventId) {
@@ -268,20 +248,6 @@ const char *getEventMessage(int16_t eventId) {
     return 0;
 }
 
-const char *getEventMessage(Event *e) {
-    if (!e) {
-        return nullptr;
-    }
-    return e->message;
-}
-
-bool isLongMessageText(Event *e) {
-    if (e) {
-        return e->isLongMessageText;
-    }
-    return false;
-}
-
 void pushEvent(int16_t eventId) {
     addEventToWriteQueue(eventId, nullptr);
 
@@ -327,63 +293,19 @@ void markAsRead() {
     g_lastErrorEventId = EVENT_TYPE_NONE;
 }
 
-int getNumPages() {
-    return (g_numEvents + EVENTS_PER_PAGE - 1) / EVENTS_PER_PAGE;
+void moveToTop() {
+    setDisplayFromPosition(0);
 }
 
-int getActivePageNumEvents() {
-    if ((int)g_pageIndex < getNumPages() - 1) {
-        return EVENTS_PER_PAGE;
-    } else {
-        return g_numEvents - (getNumPages() - 1) * EVENTS_PER_PAGE;
+void onEncoder(int counter) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    counter = -counter;
+#endif
+    int32_t position = g_displayFromPosition + counter;
+    if (position < 0) {
+        position = 0;
     }
-}
-
-Event *getActivePageEvent(int eventIndexWithinActivePage) {
-    int n = event_queue::getActivePageNumEvents();
-    if (eventIndexWithinActivePage >= 0 && eventIndexWithinActivePage < n) {
-        return getEvent(g_pageIndex * EVENTS_PER_PAGE + eventIndexWithinActivePage);
-    }
-    return nullptr;
-}
-
-void moveToFirstPage() {
-    g_pageIndex = 0;
-    g_selectedEventIndexWithinPage = -1;
-}
-
-void moveToNextPage() {
-    if ((int)g_pageIndex < getNumPages() - 1) {
-        ++g_pageIndex;
-        g_selectedEventIndexWithinPage = -1;
-    }
-}
-
-void moveToPreviousPage() {
-    if (g_pageIndex > 0) {
-        --g_pageIndex;
-        g_selectedEventIndexWithinPage = -1;
-    }
-}
-
-int getActivePageIndex() {
-    return g_pageIndex;
-}
-
-void toggleSelectedEvent(int eventIndexWithinActivePage) {
-    if (g_selectedEventIndexWithinPage == eventIndexWithinActivePage) {
-        g_selectedEventIndexWithinPage = -1;
-    } else {
-        g_selectedEventIndexWithinPage = eventIndexWithinActivePage;
-    }
-}
-
-Event *getSelectedEvent() {
-    return getActivePageEvent(g_selectedEventIndexWithinPage);
-}
-
-int getSelectedEventIndexWithinPage() {
-    return g_selectedEventIndexWithinPage;
+    setDisplayFromPosition(position);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -452,6 +374,70 @@ static void getLogFilePath(char *filePath) {
     strcat(filePath, LOG_FILE_NAME);
 }
 
+static int getFilter() {
+    return g_filter;
+}
+
+static void setFilter(int filter) {
+    persist_conf::setEventQueueFilter(filter);
+    g_refreshEvents = true;
+}
+
+static uint32_t getEventDateTime(Event *e) {
+    return e->dateTime;
+}
+
+static int getEventType(int16_t eventId) {
+    if (eventId == EVENT_DEBUG_TRACE) {
+        return EVENT_TYPE_DEBUG;
+    } else if (eventId >= EVENT_INFO_START_ID) {
+        return EVENT_TYPE_INFO;
+    } else if (eventId >= EVENT_WARNING_START_ID) {
+        return EVENT_TYPE_WARNING;
+    } else if (eventId != EVENT_TYPE_NONE) {
+        return EVENT_TYPE_ERROR;
+    } else {
+        return EVENT_TYPE_NONE;
+    }
+}
+
+static int getEventType(Event *e) {
+    if (!e) {
+        return EVENT_TYPE_NONE;
+    }
+    return e->eventType;
+}
+
+static const char *getEventMessage(Event *e) {
+    if (!e) {
+        return nullptr;
+    }
+    return e->message;
+}
+
+static bool isLongMessageText(Event *e) {
+    if (e) {
+        return e->isLongMessageText;
+    }
+    return false;
+}
+
+static void setDisplayFromPosition(uint32_t position) {
+    if (position + EVENTS_PER_PAGE > g_numEvents) {
+        if (g_numEvents > EVENTS_PER_PAGE) {
+            position = g_numEvents - EVENTS_PER_PAGE;
+        } else {
+            position = 0;
+        }
+    }
+
+    if (position != g_displayFromPosition) {
+        g_displayFromPosition = position;
+        g_previousDisplayFromPosition = -1;
+        g_selectedEventIndex = -1;
+    }
+}
+
 static void refreshEvents() {
     g_filter = persist_conf::devConf.eventQueueFilter;
     if (g_filter < EVENT_TYPE_DEBUG || g_filter > EVENT_TYPE_ERROR) {
@@ -459,10 +445,10 @@ static void refreshEvents() {
     }
 
     g_numEvents = 0;
-    g_pageIndex = 0;
-    g_previousPageIndex = -1;
-    g_selectedEventIndexWithinPage = -1;
-    
+    g_displayFromPosition = 0;
+    g_previousDisplayFromPosition = -1;
+    g_selectedEventIndex = -1;
+
     char filePath[MAX_PATH_LENGTH];
     getIndexFilePath(g_filter, filePath);
 
@@ -660,7 +646,7 @@ static bool readEvent(File &indexFile, File &logFile, int eventIndex, Event &eve
     return true;
 }
 
-static void readEvents(int pageIndex) {
+static void readEvents(uint32_t fromPosition) {
     char filePath[MAX_PATH_LENGTH];
     getIndexFilePath(g_filter, filePath);
     File indexFile;
@@ -668,11 +654,10 @@ static void readEvents(int pageIndex) {
         getLogFilePath(filePath);
         File logFile;
         if (logFile.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-            uint32_t eventIndex = pageIndex * EVENTS_PER_PAGE;
             for (int i = 0; i < EVENTS_PER_PAGE; i++) {
                 auto &event = g_events[i];
-                if (eventIndex + i < g_numEvents) {
-                    if (readEvent(indexFile, logFile, eventIndex + i, event)) {
+                if (fromPosition + i < g_numEvents) {
+                    if (readEvent(indexFile, logFile, fromPosition + i, event)) {
                         continue;
                     }
                 }
@@ -685,7 +670,19 @@ static void readEvents(int pageIndex) {
 }
 
 static Event *getEvent(uint32_t eventIndex) {
-    return &g_events[eventIndex % EVENTS_PER_PAGE];
+    return &g_events[(eventIndex - g_displayFromPosition) % EVENTS_PER_PAGE];
+}
+
+static void toggleSelectedEvent(int eventIndex) {
+    if (g_selectedEventIndex == eventIndex) {
+        g_selectedEventIndex = -1;
+    } else {
+        g_selectedEventIndex = eventIndex;
+    }
+}
+
+static Event *getSelectedEvent() {
+    return &g_events[g_selectedEventIndex - g_displayFromPosition];
 }
 
 } // namespace event_queue
@@ -693,18 +690,11 @@ static Event *getEvent(uint32_t eventIndex) {
 
 namespace gui {
 
+using namespace psu;
 using namespace psu::event_queue;
+using namespace psu::gui;
 
-Value MakeEventValue(eez::psu::event_queue::Event *e) {
-    Value value;
-    value.type_ = VALUE_TYPE_EVENT;
-    value.options_ = 0;
-    value.unit_ = UNIT_UNKNOWN;
-    value.uint32_ = e->logOffset;
-    return value;
-}
-
-static eez::psu::event_queue::Event *getEventFromValue(const Value &value) {
+static event_queue::Event *getEventFromValue(const Value &value) {
     for (int i = 0; i < EVENTS_PER_PAGE; i++) {
         if (g_events[i].logOffset == value.getUInt32()) {
             return &g_events[i];
@@ -724,6 +714,144 @@ void eventValueToText(const Value &value, char *text, int count) {
     } else {
         text[0] = 0;
     }
+}
+
+Value MakeEventValue(event_queue::Event *e) {
+    Value value;
+    value.type_ = VALUE_TYPE_EVENT;
+    value.options_ = 0;
+    value.unit_ = UNIT_UNKNOWN;
+    value.uint32_ = e->logOffset;
+    return value;
+}
+
+void data_event_queue_last_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = data::Value(getEventType(getLastErrorEventId()));
+    }
+}
+
+void data_event_queue_events(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_COUNT) {
+        value = (int)g_numEvents;
+    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_SIZE) {
+        value = Value(g_numEvents, VALUE_TYPE_UINT32);
+    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_POSITION) {
+        value = Value(g_displayFromPosition, VALUE_TYPE_UINT32);
+    } else if (operation == data::DATA_OPERATION_YT_DATA_SET_POSITION) {
+        setDisplayFromPosition(value.getUInt32());
+    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+        value = Value(EVENTS_PER_PAGE, VALUE_TYPE_UINT32);
+    }
+}
+
+void data_event_queue_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        event_queue::Event *event = getEvent(cursor.i);
+        value = data::Value(event ? getEventType(event) : EVENT_TYPE_NONE);
+    }
+}
+
+void data_event_queue_event_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = MakeEventValue(getEvent(cursor.i));
+    }
+}
+
+void data_event_queue_is_long_message_text(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        event_queue::Event *event = getEvent(cursor.i);
+        value = isLongMessageText(event);
+    }
+}
+
+void data_event_queue_event_is_selected(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        event_queue::Event *event = getEvent(cursor.i);
+        event_queue::Event *selectedEvent = getSelectedEvent();
+        value = event == selectedEvent;
+    }
+}
+
+void data_event_queue_selected_event_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        event_queue::Event *selectedEvent = getSelectedEvent();
+        if (selectedEvent) {
+            value = getEventMessage(selectedEvent);
+        }
+    }
+}
+
+void data_event_queue_event_long_message_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    static const int NUM_WIDGETS = 1;
+
+    static const int MULTI_LINE_TEXT_WIDGET = 0;
+
+    static Overlay overlay;
+    static WidgetOverride widgetOverrides[NUM_WIDGETS];
+
+    if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = data::Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+        overlay.widgetOverrides = widgetOverrides;
+
+        int selectedEventIndexWithinPage = g_selectedEventIndex != -1 ? g_selectedEventIndex - g_displayFromPosition : -1;
+        int state = selectedEventIndexWithinPage + 1;
+
+        if (overlay.state != state) {
+            overlay.state = state;
+            if (state) {
+                event_queue::Event *selectedEvent = getSelectedEvent();
+
+                WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
+
+                const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+
+                const Widget *multiLineTextWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, MULTI_LINE_TEXT_WIDGET);
+
+                static const int CONF_EVENT_LINE_HEIGHT_PX = 30;
+                static const int CONF_EVENTS_LIST_HEIGHT_PX = 240;
+
+                auto style = getStyle(multiLineTextWidget->style);
+                int height = measureMultilineText(
+                    getEventMessage(selectedEvent), 
+                    0, 0, multiLineTextWidget->w, CONF_EVENTS_LIST_HEIGHT_PX,
+                    style, 0, 0
+                ) + style->padding_top + style->padding_bottom + style->border_size_top + style->border_size_bottom;
+                
+                int y = selectedEventIndexWithinPage * CONF_EVENT_LINE_HEIGHT_PX;
+                if (y + height > CONF_EVENTS_LIST_HEIGHT_PX) {
+                    y = CONF_EVENTS_LIST_HEIGHT_PX - height;
+                }
+
+                overlay.yOffset = y;
+
+                overlay.width = widgetCursor.widget->w;
+                overlay.height = height;
+
+                widgetOverrides[MULTI_LINE_TEXT_WIDGET].isVisible = true;
+                widgetOverrides[MULTI_LINE_TEXT_WIDGET].x = 0;
+                widgetOverrides[MULTI_LINE_TEXT_WIDGET].y = 0;
+                widgetOverrides[MULTI_LINE_TEXT_WIDGET].w = overlay.width;
+                widgetOverrides[MULTI_LINE_TEXT_WIDGET].h = height;
+            }
+        }
+
+        value = data::Value(&overlay, VALUE_TYPE_POINTER);
+    }
+}
+
+void onSetEventQueueFilter(uint16_t value) {
+    popPage();
+    event_queue::setFilter((int)value);
+}
+
+void action_event_queue_filter() {
+    pushSelectFromEnumPage(g_eventQueueFilterEnumDefinition, (uint16_t)event_queue::getFilter(), NULL, onSetEventQueueFilter);
+}
+
+void action_event_queue_select_event() {
+    event_queue::toggleSelectedEvent(getFoundWidgetAtDown().cursor.i);
 }
 
 } // namespace gui

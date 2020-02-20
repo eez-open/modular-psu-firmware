@@ -95,6 +95,7 @@ extern "C" {
     X(SCPI_ERROR_CALIBRATION_INVALID_CURRENT_L_CAL_DATA,     157, "Invalid current (low range) calibration data") \
     X(SCPI_ERROR_CALIBRATION_NO_CAL_DATA,                    158, "Incomplete calibration data")                  \
     X(SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION,  201, "Cannot execute before clearing protection")    \
+    X(SCPI_ERROR_CANNOT_INIT_TRIGGER_WHILE_RPROG_IS_ENABLED, 202, "Cannot init trigger while Rprog is enabled")   \
     X(SCPI_ERROR_CH1_IOEXP_TEST_FAILED,                      210, "CH1 IOEXP test failed")                        \
     X(SCPI_ERROR_CH2_IOEXP_TEST_FAILED,                      211, "CH2 IOEXP test failed")                        \
     X(SCPI_ERROR_CH3_IOEXP_TEST_FAILED,                      212, "CH3 IOEXP test failed")                        \

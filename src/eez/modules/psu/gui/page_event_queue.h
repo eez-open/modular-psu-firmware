@@ -28,6 +28,7 @@ namespace gui {
 class EventQueuePage : public Page {
 public:
     void pageAlloc();
+    void onEncoder(int counter);
 };
 
 } // namespace gui

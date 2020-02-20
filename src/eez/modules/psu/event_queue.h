@@ -271,47 +271,24 @@ enum Events { LIST_OF_EVENTS };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const int EVENTS_PER_PAGE = 8;
-
 struct Event;
 
 void init();
 void tick();
 void shutdownSave();
 
-int getFilter();
-void setFilter(int filter);
-
 int16_t getLastErrorEventId();
 
-uint32_t getEventDateTime(Event *e);
-
-int getEventType(int16_t eventId);
-int getEventType(Event *e);
-
 const char *getEventTypeName(int16_t eventId);
-
 const char *getEventMessage(int16_t eventId);
-const char *getEventMessage(Event *e);
-
-bool isLongMessageText(Event *e);
 
 void pushEvent(int16_t eventId);
 void pushDebugTrace(const char *message);
 
 void markAsRead();
+void moveToTop();
 
-int getNumPages();
-int getActivePageNumEvents();
-Event *getActivePageEvent(int eventIndexWithinActivePage);
-void moveToFirstPage();
-void moveToNextPage();
-void moveToPreviousPage();
-int getActivePageIndex();
-
-void toggleSelectedEvent(int eventIndexWithinActivePage);
-Event *getSelectedEvent();
-int getSelectedEventIndexWithinPage();
+void onEncoder(int couter);
 
 } // namespace event_queue
 } // namespace psu

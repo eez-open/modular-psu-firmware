@@ -28,8 +28,12 @@ namespace psu {
 namespace gui {
 
 void EventQueuePage::pageAlloc() {
-	event_queue::moveToFirstPage();
+	event_queue::moveToTop();
 	event_queue::markAsRead();
+}
+
+void EventQueuePage::onEncoder(int counter) {
+	event_queue::onEncoder(counter);
 }
 
 }

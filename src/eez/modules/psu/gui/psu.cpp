@@ -659,9 +659,9 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
 }
 
 bool PsuAppContext::isAutoRepeatAction(int action) {
-    return action == ACTION_ID_KEYPAD_BACK || 
-        action == ACTION_ID_EVENT_QUEUE_PREVIOUS_PAGE || action == ACTION_ID_EVENT_QUEUE_NEXT_PAGE || 
-        action == ACTION_ID_CHANNEL_LISTS_PREVIOUS_PAGE || action == ACTION_ID_CHANNEL_LISTS_NEXT_PAGE;
+    return action == ACTION_ID_KEYPAD_BACK ||
+        action == ACTION_ID_CHANNEL_LISTS_PREVIOUS_PAGE ||
+        action == ACTION_ID_CHANNEL_LISTS_NEXT_PAGE;
 }
 
 void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
