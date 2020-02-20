@@ -211,7 +211,7 @@ void action_show_main_page() {
 }
 
 void action_show_event_queue() {
-	showPage(PAGE_ID_EVENT_QUEUE);
+    showPage(PAGE_ID_EVENT_QUEUE);
 }
 
 void action_show_sys_settings() {

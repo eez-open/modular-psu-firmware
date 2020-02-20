@@ -168,11 +168,14 @@ void onSetOk(float value) {
     float adc = calibrationValue->getAdcValue();
     if (calibrationValue->checkRange(dac, value, adc)) {
         calibrationValue->setData(dac, value, adc);
-
         popPage();
         nextStep();
     } else {
-        errorMessage("Value out of range!");
+        if (calibrationValue->voltOrCurr) {
+            errorMessage("Value out of range!");
+        } else {
+            errorMessage("Value out of range!", "Check the connection of power resistor.");
+        }
     }
 }
 

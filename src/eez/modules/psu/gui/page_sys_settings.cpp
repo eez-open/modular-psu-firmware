@@ -611,7 +611,7 @@ void SysSettingsTemperaturePage::onFanSpeedSet(float value) {
         } else {
             page->fanSpeedPWM = FAN_MAX_PWM;
             page->fanPWMMeasuringInProgress = true;
-            showAsyncOperationInProgress("Measuring PWM...", isFanPWMMeasuringDone);
+            showAsyncOperationInProgress("Calibrating PWM...", isFanPWMMeasuringDone);
         }
     }
 }

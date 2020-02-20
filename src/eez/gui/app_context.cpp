@@ -142,7 +142,7 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
         page->pageWillAppear();
     }
 
-    m_showPageTime = micros();
+    m_showPageTime = millis();
 
     onPageChanged(previousPageId, pageId);
 

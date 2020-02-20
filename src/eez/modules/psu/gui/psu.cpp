@@ -65,10 +65,10 @@
 #include <eez/platform/simulator/front_panel.h>
 #endif
 
-#define CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT 2000000L // 2s
-#define CONF_GUI_STANDBY_PAGE_TIMEOUT 4000000L          // 4s
-#define CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT 2000000L      // 2s
-#define CONF_GUI_WELCOME_PAGE_TIMEOUT 2000000L          // 2s
+#define CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT_MS 2000
+#define CONF_GUI_STANDBY_PAGE_TIMEOUT_MS 4000
+#define CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT_MS 2000
+#define CONF_GUI_WELCOME_PAGE_TIMEOUT_MS 2000
 
 namespace eez {
 
@@ -282,23 +282,23 @@ void PsuAppContext::stateManagment() {
 
     AppContext::stateManagment();
 
-    uint32_t tickCount = micros();
+    uint32_t tickCount = millis();
 
     // wait some time for transitional pages
     int activePageId = getActivePageId();
     if (activePageId == PAGE_ID_STANDBY) {
-        if (int32_t(tickCount - getShowPageTime()) < CONF_GUI_STANDBY_PAGE_TIMEOUT) {
+        if (int32_t(tickCount - getShowPageTime()) < CONF_GUI_STANDBY_PAGE_TIMEOUT_MS) {
             return;
         }
     } else if (activePageId == PAGE_ID_ENTERING_STANDBY) {
-        if (int32_t(tickCount - getShowPageTime()) >= CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT) {
+        if (int32_t(tickCount - getShowPageTime()) >= CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT_MS) {
             uint32_t saved_showPageTime = getShowPageTime();
             showStandbyPage();
             setShowPageTime(saved_showPageTime);
         }
         return;
     } else if (activePageId == PAGE_ID_WELCOME) {
-        if (int32_t(tickCount - getShowPageTime()) < CONF_GUI_WELCOME_PAGE_TIMEOUT) {
+        if (int32_t(tickCount - getShowPageTime()) < CONF_GUI_WELCOME_PAGE_TIMEOUT_MS) {
             return;
         }
     }
@@ -356,7 +356,7 @@ void PsuAppContext::stateManagment() {
     // handling of display off page
     if (activePageId == PAGE_ID_DISPLAY_OFF) {
         if (eez::mcu::display::isOn()) {
-            if (int32_t(tickCount - getShowPageTime()) >= CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT) {
+            if (int32_t(tickCount - getShowPageTime()) >= CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT_MS) {
                 eez::mcu::display::turnOff();
                 setShowPageTime(tickCount);
             }
@@ -768,6 +768,13 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
             
             if (widget->action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
                 g_appContext = saved;
+                return false;
+            }
+        }
+
+        if (widget->action == ACTION_ID_SHOW_EVENT_QUEUE) {
+            static const uint32_t CONF_SHOW_EVENT_QUEUE_INACTIVITY_TIMESPAN_SINCE_LAST_SHOW_PAGE_MS = 500;
+            if (millis() - getShowPageTime() < CONF_SHOW_EVENT_QUEUE_INACTIVITY_TIMESPAN_SINCE_LAST_SHOW_PAGE_MS) {
                 return false;
             }
         }
@@ -1405,10 +1412,10 @@ void onEncoder(int counter, bool clicked) {
         return;
     }
 
-    uint32_t tickCount = micros();
+    uint32_t tickCount = millis();
 
     // wait for confirmation of changed value ...
-    if (isFocusChanged() && tickCount - g_focusEditValueChangedTime >= ENCODER_CHANGE_TIMEOUT * 1000000L) {
+    if (isFocusChanged() && tickCount - g_focusEditValueChangedTime >= ENCODER_CHANGE_TIMEOUT * 1000L) {
         // ... on timeout discard changed value
         g_focusEditValue = data::Value();
     }
@@ -1461,7 +1468,7 @@ void onEncoder(int counter, bool clicked) {
 
             if (persist_conf::devConf.encoderConfirmationMode) {
                 g_focusEditValue = MakeValue(newValue, value.getUnit());
-                g_focusEditValueChangedTime = micros();
+                g_focusEditValueChangedTime = millis();
             } else {
                 Value result = data::set(g_focusCursor, g_focusDataId, MakeValue(newValue, value.getUnit()));
                 if (result.getType() == VALUE_TYPE_SCPI_ERROR) {

@@ -457,16 +457,13 @@ static void getProfileFilePath(int location, char *filePath) {
 
 static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parameters &profile, List *lists) {
     bool profileChannelAlreadyUsed[CH_MAX];
-    for (int j = 0; j < CH_MAX; ++j) {
-        profileChannelAlreadyUsed[j] = false;
-    }
-
     int channelsMap[CH_MAX];
-    for (int i = 0; i < CH_MAX; ++i) {
+    for (int i = 0; i < CH_MAX; i++) {
+        profileChannelAlreadyUsed[i] = false;
         channelsMap[i] = -1;
     }
 
-    for (int i = 0; i < CH_NUM; ++i) {
+    for (int i = 0; i < CH_NUM; i++) {
         Channel &channel = Channel::get(i);
         if (
             profile.channels[i].flags.parameters_are_valid &&
@@ -474,14 +471,15 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
         ) {
             profileChannelAlreadyUsed[i] = true;
             channelsMap[i] = i;
+        } else {
             break;
         }
     }
 
-    for (int i = 0; i < CH_NUM; ++i) {
+    for (int i = 0; i < CH_NUM; i++) {
         if (channelsMap[i] == -1) {
             Channel &channel = Channel::get(i);
-            for (int j = 0; j < CH_MAX; ++j) {
+            for (int j = 0; j < CH_MAX; j++) {
                 if (
                     !profileChannelAlreadyUsed[j] &&
                     profile.channels[j].flags.parameters_are_valid &&
@@ -495,9 +493,9 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
         }
     }
 
-    for (int i = 0; i < CH_NUM; ++i) {
+    for (int i = 0; i < CH_NUM; i++) {
         if (channelsMap[i] == -1) {
-            for (int j = 0; j < CH_MAX; ++j) {
+            for (int j = 0; j < CH_MAX; j++) {
                 if (!profileChannelAlreadyUsed[j] && !profile.channels[j].flags.parameters_are_valid) {
                     profileChannelAlreadyUsed[j] = true;
                     channelsMap[i] = j;
@@ -507,9 +505,9 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
         }
     }
 
-    for (int i = 0; i < CH_MAX; ++i) {
+    for (int i = 0; i < CH_MAX; i++) {
         if (channelsMap[i] == -1) {
-            for (int j = 0; j < CH_MAX; ++j) {
+            for (int j = 0; j < CH_MAX; j++) {
                 if (!profileChannelAlreadyUsed[j]) {
                     profileChannelAlreadyUsed[j] = true;
                     channelsMap[i] = j;
@@ -521,29 +519,34 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
 
     bool mismatch = false;
 
-    for (int i = 0; i < CH_MAX - 1; ++i) {
-        for (int j = i + 1; j < CH_MAX; ++j) {
-            if (channelsMap[j] == i) {
-                mismatch = true;
+    for (int i = 0; i < CH_MAX - 1; i++) {
+        if (channelsMap[i] != i) {
+            for (int j = i + 1; j < CH_MAX; j++) {
+                if (channelsMap[j] == i) {
+                    mismatch = true;
 
-                ChannelParameters channelParameters;
-                memcpy(&channelParameters, &profile.channels[i], sizeof(ChannelParameters));
-                memcpy(&profile.channels[i], &profile.channels[j], sizeof(ChannelParameters));
-                memcpy(&profile.channels[j], &channelParameters, sizeof(ChannelParameters));
+                    int a = channelsMap[i];
+                    int b = channelsMap[j];
 
-                temperature::ProtectionConfiguration tempProt;
-                memcpy(&tempProt, &profile.tempProt[temp_sensor::CH1 + i], sizeof(temperature::ProtectionConfiguration));
-                memcpy(&profile.tempProt[temp_sensor::CH1 + i], &profile.tempProt[temp_sensor::CH1 + j], sizeof(temperature::ProtectionConfiguration));
-                memcpy(&profile.tempProt[temp_sensor::CH1 + j], &tempProt, sizeof(temperature::ProtectionConfiguration));
+                    ChannelParameters channelParameters;
+                    memcpy(&channelParameters, &profile.channels[a], sizeof(ChannelParameters));
+                    memcpy(&profile.channels[a], &profile.channels[b], sizeof(ChannelParameters));
+                    memcpy(&profile.channels[b], &channelParameters, sizeof(ChannelParameters));
 
-                List list;
-                memcpy(&list, &lists[i], sizeof(List));
-                memcpy(&lists[i], &lists[j], sizeof(List));
-                memcpy(&lists[j], &list, sizeof(List));
+                    temperature::ProtectionConfiguration tempProt;
+                    memcpy(&tempProt, &profile.tempProt[temp_sensor::CH1 + a], sizeof(temperature::ProtectionConfiguration));
+                    memcpy(&profile.tempProt[temp_sensor::CH1 + a], &profile.tempProt[temp_sensor::CH1 + b], sizeof(temperature::ProtectionConfiguration));
+                    memcpy(&profile.tempProt[temp_sensor::CH1 + b], &tempProt, sizeof(temperature::ProtectionConfiguration));
 
-                channelsMap[j] = channelsMap[i];
-                channelsMap[i] = i;
-                break;
+                    List list;
+                    memcpy(&list, &lists[a], sizeof(List));
+                    memcpy(&lists[a], &lists[b], sizeof(List));
+                    memcpy(&lists[b], &list, sizeof(List));
+
+                    channelsMap[j] = channelsMap[i];
+                    channelsMap[i] = i;
+                    break;
+                }
             }
         }
     }
