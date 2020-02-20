@@ -148,7 +148,8 @@ protected:
     bool isAutoRepeatAction(int action) override;
     void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) override;
     bool testExecuteActionOnTouchDown(int action) override;
-    
+    bool canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action);
+
 private:
     void doShowProgressPage();
     void doHideProgressPage();

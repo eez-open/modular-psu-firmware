@@ -128,6 +128,8 @@ protected:
     void updatePage(int i, WidgetCursor &widgetCursor);
 
     bool isPageFullyCovered(int pageNavigationStackIndex);
+    
+    virtual bool canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action);
 }; // namespace gui
 
 extern AppContext *g_appContext;

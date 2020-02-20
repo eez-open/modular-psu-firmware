@@ -270,6 +270,10 @@ bool AppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
     return false;
 }
 
+bool AppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action) {
+    return false;
+}
+
 void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
     int activePageId = getActivePageId();
     if (!isPageInternal(activePageId)) {
@@ -277,7 +281,20 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 		const PageWidget *pageSpecific = GET_WIDGET_PROPERTY(page, specific, const PageWidget *);
         if ((pageSpecific->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
             if (!pointInsideRect(touchEvent.x, touchEvent.y, g_appContext->x + page->x, g_appContext->y + page->y, page->w, page->h)) {
+                int activePageId = getActivePageId();
+                
                 popPage();
+
+                g_appContext = &getRootAppContext();
+                auto widgetCursor = findWidget(touchEvent.x, touchEvent.y);
+
+                if (
+                    widgetCursor.widget &&
+                    widgetCursor.widget->action != ACTION_ID_NONE &&
+                    canExecuteActionWhenTouchedOutsideOfActivePage(activePageId, widgetCursor.widget->action)
+                ) {
+                    eventHandling();
+                }
             }
         }
     }

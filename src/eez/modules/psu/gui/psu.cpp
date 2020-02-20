@@ -958,6 +958,22 @@ int PsuAppContext::menuInput(const char *label, MenuType menuType, const char **
     return m_menuInput;
 }
 
+bool PsuAppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action) {
+    if (pageId == PAGE_ID_CH_SETTINGS_LISTS_INSERT_MENU) {
+        return action == ACTION_ID_SHOW_CHANNEL_LISTS_DELETE_MENU || action == ACTION_ID_SHOW_CHANNEL_LISTS_FILE_MENU;
+    }
+
+    if (pageId == PAGE_ID_CH_SETTINGS_LISTS_DELETE_MENU) {
+        return action == ACTION_ID_SHOW_CHANNEL_LISTS_INSERT_MENU || action == ACTION_ID_SHOW_CHANNEL_LISTS_FILE_MENU;
+    }
+
+    if (pageId == PAGE_ID_CH_SETTINGS_LISTS_FILE_MENU) {
+        return action == ACTION_ID_SHOW_CHANNEL_LISTS_INSERT_MENU || action == ACTION_ID_SHOW_CHANNEL_LISTS_DELETE_MENU;
+    }
+
+    return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 bool isChannelCalibrationsDone() {
