@@ -162,6 +162,7 @@ struct DeviceConfiguration {
     unsigned channelsViewMode : 3;
     unsigned maxChannel : 3; // 0: default view, 1: Ch1 maxed, 2: Ch2 maxed, ...
     unsigned channelsViewModeInMax : 3;
+    unsigned isInhibitedByUser : 1;
 
     // block 7
     UserSwitchAction userSwitchAction;
@@ -314,6 +315,8 @@ void setUserSwitchAction(UserSwitchAction userSwitchAction);
 void setSortFilesOption(SortFilesOption sortFilesOption);
 
 void setEventQueueFilter(int eventQueueFilter);
+
+void setIsInhibitedByUser(int isInhibitedByUser);
 
 ////////////////////////////////////////////////////////////////////////////////
 

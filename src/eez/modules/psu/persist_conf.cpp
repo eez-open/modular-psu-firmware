@@ -1212,6 +1212,10 @@ void setEventQueueFilter(int eventQueueFilter) {
     g_devConf.eventQueueFilter = eventQueueFilter;
 }
 
+void setIsInhibitedByUser(int isInhibitedByUser) {
+    g_devConf.isInhibitedByUser = isInhibitedByUser;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 64;

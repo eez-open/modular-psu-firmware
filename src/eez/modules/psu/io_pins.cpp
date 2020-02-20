@@ -53,8 +53,6 @@ static uint32_t g_toutputPulseStartTickCount;
 
 static bool g_pinState[NUM_IO_PINS] = { false, false, false, false };
 
-static bool g_isInhibitedByUser;
-
 #if defined EEZ_PLATFORM_STM32
 
 int ioPinRead(int pin) {
@@ -181,7 +179,7 @@ void tick(uint32_t tickCount) {
     int inputPin2Value = ioPinRead(EXT_TRIG2);
     bool inputPin2State = (inputPin2Value && inputPin2.polarity == io_pins::POLARITY_POSITIVE) || (!inputPin2Value && inputPin2.polarity == io_pins::POLARITY_NEGATIVE);
 
-    unsigned inhibited = g_isInhibitedByUser;
+    unsigned inhibited = persist_conf::devConf.isInhibitedByUser;
 
     if (!inhibited) {
         if (inputPin1.function == io_pins::FUNCTION_INHIBIT) {
@@ -295,11 +293,11 @@ void refresh() {
 }
 
 bool getIsInhibitedByUser() {
-    return g_isInhibitedByUser;
+    return persist_conf::devConf.isInhibitedByUser;
 }
 
 void setIsInhibitedByUser(bool isInhibitedByUser) {
-    g_isInhibitedByUser = isInhibitedByUser;
+    persist_conf::setIsInhibitedByUser(isInhibitedByUser);
 }
 
 bool isInhibited() {
