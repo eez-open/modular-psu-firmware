@@ -321,13 +321,13 @@ void PsuAppContext::stateManagment() {
     }
 
     // turn display on/off depending on displayState
-    if (psu::persist_conf::devConf.displayState == 0 &&
-        (activePageId != PAGE_ID_DISPLAY_OFF && activePageId != PAGE_ID_SELF_TEST_RESULT &&
-         isTouchCalibrated())) {
+    if (
+        psu::persist_conf::devConf.displayState == 0 && 
+        (activePageId != PAGE_ID_DISPLAY_OFF && activePageId != PAGE_ID_SELF_TEST_RESULT && isTouchCalibrated())
+    ) {
         showPage(PAGE_ID_DISPLAY_OFF);
         return;
-    } else if (psu::persist_conf::devConf.displayState == 1 &&
-               activePageId == PAGE_ID_DISPLAY_OFF) {
+    } else if (psu::persist_conf::devConf.displayState == 1 && activePageId == PAGE_ID_DISPLAY_OFF) {
         eez::mcu::display::turnOn();
         showPage(getMainPageId());
         return;
@@ -353,6 +353,13 @@ void PsuAppContext::stateManagment() {
         }
     }
 
+    // TODO move this to some other place
+#if OPTION_ENCODER
+    int counter;
+    bool clicked;
+    mcu::encoder::read(counter, clicked);
+#endif
+
     // handling of display off page
     if (activePageId == PAGE_ID_DISPLAY_OFF) {
         if (eez::mcu::display::isOn()) {
@@ -366,9 +373,6 @@ void PsuAppContext::stateManagment() {
 
     // TODO move this to some other place
 #if OPTION_ENCODER
-    int counter;
-    bool clicked;
-    mcu::encoder::read(counter, clicked);
     if (counter != 0 || clicked) {
         idle::noteHmiActivity();
     }
@@ -668,7 +672,7 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
     if (isFrontPanelLocked()) {
         auto savedAppContext = g_appContext;
         g_appContext = &psu::gui::g_psuAppContext;
-        errorMessage("Front panel is locked!");                
+        errorMessage("Front panel is locked!");
         g_appContext = savedAppContext;
         return;
     }
@@ -1402,8 +1406,7 @@ void moveToNextFocusCursor() {
 }
 
 bool onEncoderConfirmation() {
-    if (edit_mode::isActive() && !edit_mode::isInteractiveMode() &&
-        edit_mode::getEditValue() != edit_mode::getCurrentValue()) {
+    if (edit_mode::isActive() && !edit_mode::isInteractiveMode() && edit_mode::getEditValue() != edit_mode::getCurrentValue()) {
         edit_mode::nonInteractiveSet();
         return true;
     }

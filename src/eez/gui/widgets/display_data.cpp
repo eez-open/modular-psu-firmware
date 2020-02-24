@@ -54,6 +54,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
     
+    uint32_t currentTime = millis();
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
     bool refreshData;
     if (widgetCursor.previousState) {
@@ -61,7 +62,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
         if (refreshData) {
             uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
             if (refreshRate != 0) {
-                refreshData = (millis() - currentState->dataRefreshLastTime) > refreshRate;
+                refreshData = (currentTime - previousState->dataRefreshLastTime) > refreshRate;
                 if (!refreshData) {
                     widgetCursor.currentState->data = widgetCursor.previousState->data;
                 }
@@ -70,9 +71,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
     } else {
         refreshData = true;
     }
-    if (refreshData) {
-        currentState->dataRefreshLastTime = millis();
-    }
+    currentState->dataRefreshLastTime = refreshData ? currentTime : previousState->dataRefreshLastTime;
 
     currentState->color = data::getColor(widgetCursor.cursor, widget->data, style);
     currentState->backgroundColor = data::getBackgroundColor(widgetCursor.cursor, widget->data, style);

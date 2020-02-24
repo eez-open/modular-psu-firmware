@@ -149,8 +149,10 @@ OnTouchFunctionType getTouchFunction(const WidgetCursor &widgetCursor) {
     }
 
     if (widgetCursor) {
-        if (g_onTouchFunctions[widgetCursor.widget->type]) {
-            return g_onTouchFunctions[widgetCursor.widget->type];
+		if (!widgetCursor.widget->action || widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
+            if (g_onTouchFunctions[widgetCursor.widget->type]) {
+                return g_onTouchFunctions[widgetCursor.widget->type];
+            }
         }
 
 		if (widgetCursor.widget->action) {

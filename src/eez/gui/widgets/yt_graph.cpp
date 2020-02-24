@@ -557,7 +557,7 @@ void YTGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) 
         }
     } else {
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-            if (widgetCursor.widget->action) {
+            if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
                 executeAction(widgetCursor.widget->action);
             }
         }

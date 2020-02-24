@@ -969,7 +969,7 @@ void action_edit_animations_duration() {
 }
 
 void action_user_switch_clicked() {
-	if (g_shutdownInProgress) {
+	if (g_shutdownInProgress || psu::persist_conf::devConf.displayState == 0) {
 		return;
 	}
 

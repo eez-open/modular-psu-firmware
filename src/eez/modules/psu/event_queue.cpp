@@ -96,7 +96,7 @@ static int g_filter = EVENT_TYPE_INFO;
 static uint32_t g_numEvents;
 
 static uint32_t g_displayFromPosition;
-static uint32_t g_previousDisplayFromPosition;
+static uint32_t g_previousDisplayFromPosition = -1;
 
 static int16_t g_lastErrorEventId;
 
@@ -109,7 +109,7 @@ struct Event {
 };
 static Event g_events[EVENTS_PER_PAGE];
 
-static int g_selectedEventIndex;
+static int g_selectedEventIndex = -1;
 
 ////////////////////////////////////////////////////////////////////////////////
 

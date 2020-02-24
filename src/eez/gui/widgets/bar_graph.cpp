@@ -82,6 +82,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
     currentState->line1Data = data::get(widgetCursor.cursor, barGraphWidget->line1Data);
     currentState->line2Data = data::get(widgetCursor.cursor, barGraphWidget->line2Data);
 
+    uint32_t currentTime = millis();
     currentState->textData = widgetCursor.currentState->data;
     bool refreshTextData;
     if (previousState) {
@@ -89,7 +90,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
         if (refreshTextData) {
             uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
             if (refreshRate != 0) {
-                refreshTextData = (millis() - currentState->textDataRefreshLastTime) > refreshRate;
+                refreshTextData = (currentTime - previousState->textDataRefreshLastTime) > refreshRate;
                 if (!refreshTextData) {
                     currentState->textData = previousState->textData;
                 }
@@ -98,9 +99,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
     } else {
         refreshTextData = true;
     }
-    if (refreshTextData) {
-        currentState->textDataRefreshLastTime = millis();
-    }
+    currentState->textDataRefreshLastTime = refreshTextData ? currentTime : previousState->textDataRefreshLastTime;
    
     bool refresh =
         !widgetCursor.previousState ||
