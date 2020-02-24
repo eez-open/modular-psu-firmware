@@ -283,7 +283,7 @@ const char *getEventTypeName(int16_t eventId);
 const char *getEventMessage(int16_t eventId);
 
 void pushEvent(int16_t eventId);
-void pushDebugTrace(const char *message);
+void pushDebugTrace(const char *message, size_t messageLength);
 
 void markAsRead();
 void moveToTop();

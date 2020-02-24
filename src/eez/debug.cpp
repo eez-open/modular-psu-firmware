@@ -49,7 +49,7 @@ void Trace(const char *format, ...) {
 
     va_end(args);
 
-    event_queue::pushDebugTrace(buffer);
+    event_queue::pushDebugTrace(buffer, strlen(buffer));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -226,7 +226,7 @@ void DebugCounterVariable::dump(char *buffer) {
 } // namespace eez
 
 extern "C" void debug_trace(const char *str, size_t len) {
-    DebugTrace("%.*s", len, str);
+    eez::psu::event_queue::pushDebugTrace(str, len);
 }
 
 #endif // DEBUG

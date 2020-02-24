@@ -268,12 +268,13 @@ void pushEvent(int16_t eventId) {
     }
 }
 
-void pushDebugTrace(const char *message) {
+void pushDebugTrace(const char *message, size_t messageLength) {
     static char buffer[EVENT_MESSAGE_MAX_SIZE];
     static int bufferIndex = 0;
-
-    while (*message) {
-        char ch = *message++;
+    
+    const char *messageEnd = message + messageLength;
+    for (const char *p = message; p < messageEnd; p++) {
+        char ch = *p;
         bool isNewLine = ch == '\n';
         if (!isNewLine) {
             buffer[bufferIndex++] = ch;

@@ -312,8 +312,6 @@ struct Channel : ChannelInterface {
 		}
 
 		if (channel.params.features & CH_FEATURE_HW_OVP) {
-			bool fallingEdgeChange = false;
-
 			if (fallingEdge) {
 				fallingEdge =
 					((millis() - fallingEdgeStart) < CONF_FALLING_EDGE_OVP_DELAY_MS) ||
@@ -322,9 +320,6 @@ struct Channel : ChannelInterface {
 
 				if (fallingEdge) {
 					fallingEdgePreviousUMonAdc = channel.u.mon_adc;
-				} else {
-					DebugTrace("DAC=%g, ADC=%g\n", uSet, channel.u.mon_adc);
-					fallingEdgeChange = true;
 				}
 			}
 
@@ -333,15 +328,9 @@ struct Channel : ChannelInterface {
 				if (!fallingEdge && channel.isHwOvpEnabled() && !ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
 					// activate HW OVP
 					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
-					if (fallingEdgeChange) {
-						DebugTrace("HW OVP ON falling edge\n");
-					} else {
-						DebugTrace("HW OVP ON\n");
-					}
 				} else if ((fallingEdge || !channel.isHwOvpEnabled()) && ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
 					// deactivate HW OVP
 					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
-					DebugTrace("HW OVP OFF\n");
 				}
 			}
 		}
@@ -477,7 +466,6 @@ struct Channel : ChannelInterface {
 					if (channel.isHwOvpEnabled()) {
 						// OVP has to be enabled after OE activation
 						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
-						DebugTrace("HW OVP ON output enable\n");
 					}
 				}
 			}
@@ -504,7 +492,6 @@ struct Channel : ChannelInterface {
 					if (channel.isHwOvpEnabled()) {
 						// OVP has to be disabled before OE deactivation
 						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
-						DebugTrace("HW OVP OFF output disable\n");
 					}
 				}
 			}
@@ -614,7 +601,6 @@ struct Channel : ChannelInterface {
 			if (channel.isHwOvpEnabled()) {
 				// deactivate HW OVP
 				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
-				DebugTrace("HW OVP OFF falling edge\n");
 			}
 		}
 
@@ -762,7 +748,6 @@ struct Channel : ChannelInterface {
 		if (channel.params.features & CH_FEATURE_HW_OVP) {
 			if (!(intcap & (1 << IOExpander::DCP405_R2B5_IO_BIT_IN_OVP_FAULT))) {
 				if (channel.isOutputEnabled()) {
-					DebugTrace("HW OVP trip MON=%g ADC=%g\n", channel.u.mon_last, channel.u.mon_adc);
 					channel.enterOvpProtection();
 				}
 			}
