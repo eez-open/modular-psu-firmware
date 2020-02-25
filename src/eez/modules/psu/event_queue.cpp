@@ -554,9 +554,19 @@ static void getEventInfoText(Event *e, char *text, int count) {
     datetime::breakTime(datetime::now(), yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow);
 
     if (yearNow == year && monthNow == month && dayNow == day) {
-        snprintf(text, count - 1, "%c [%02d:%02d:%02d] %s", 127 + getEventType(e) - EVENT_TYPE_DEBUG, hour, minute, second, getEventMessage(e));
+        if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_24) {
+            snprintf(text, count - 1, "%c [%02d:%02d:%02d] %s", 127 + getEventType(e) - EVENT_TYPE_DEBUG, hour, minute, second, getEventMessage(e));
+        } else {
+            bool am;
+            datetime::convertTime24to12(hour, am);
+            snprintf(text, count - 1, "%c [%02d:%02d:%02d %s] %s", 127 + getEventType(e) - EVENT_TYPE_DEBUG, hour, minute, second, am ? "AM" : "PM", getEventMessage(e));
+        }
     } else {
-        snprintf(text, count - 1, "%c [%02d-%02d-%02d] %s", 127 + getEventType(e) - EVENT_TYPE_DEBUG, day, month, year % 100, getEventMessage(e));
+        if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
+            snprintf(text, count - 1, "%c [%02d-%02d-%02d] %s", 127 + getEventType(e) - EVENT_TYPE_DEBUG, day, month, year % 100, getEventMessage(e));
+        } else {
+            snprintf(text, count - 1, "%c [%02d-%02d-%02d] %s", 127 + getEventType(e) - EVENT_TYPE_DEBUG, month, day, year % 100, getEventMessage(e));
+        }
     }
 
     text[count - 1] = 0;

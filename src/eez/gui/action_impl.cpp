@@ -465,6 +465,14 @@ void action_date_time_select_dst_rule() {
     ((SysSettingsDateTimePage *)getActivePage())->selectDstRule();
 }
 
+void action_date_time_select_format() {
+    ((SysSettingsDateTimePage *)getActivePage())->selectFormat();
+}
+
+void action_date_time_toggle_am_pm() {
+    ((SysSettingsDateTimePage *)getActivePage())->toggleAmPm();
+}
+
 void action_show_user_profiles() {
     showPage(PAGE_ID_USER_PROFILES);
 }
@@ -833,7 +841,7 @@ void action_stand_by() {
 
 void action_restart() {
     popPage();
-    yesNoDialog(PAGE_ID_YES_NO, "Do you want to reset?", eez::restart, nullptr, nullptr);
+    yesNoDialog(PAGE_ID_YES_NO, "Do you want to restart?", eez::restart, nullptr, nullptr);
 }
 
 void action_shutdown() {
@@ -1158,11 +1166,36 @@ void action_dlog_start_recording() {
     if (isStringEmpty(dlog_record::g_guiParameters.filePath)) {
         uint8_t year, month, day, hour, minute, second;
         datetime::getDateTime(year, month, day, hour, minute, second);
-        sprintf(filePath, "%s/%s%d_%02d_%02d-%02d_%02d_%02d.dlog",
-            RECORDINGS_DIR,
-            dlog_record::g_guiParameters.filePath,
-            (int)(year + 2000), (int)month, (int)day,
-            (int)hour, (int)minute, (int)second);
+
+        if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24) {
+            sprintf(filePath, "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+                RECORDINGS_DIR,
+                dlog_record::g_guiParameters.filePath,
+                (int)day, (int)month, (int)year,
+                (int)hour, (int)minute, (int)second);
+        } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_24) {
+            sprintf(filePath, "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+                RECORDINGS_DIR,
+                dlog_record::g_guiParameters.filePath,
+                (int)month, (int)day, (int)year,
+                (int)hour, (int)minute, (int)second);
+        } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
+            bool am;
+            datetime::convertTime24to12(hour, am);
+            sprintf(filePath, "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+                RECORDINGS_DIR,
+                dlog_record::g_guiParameters.filePath,
+                (int)day, (int)month, (int)year,
+                (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+        } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_12) {
+            bool am;
+            datetime::convertTime24to12(hour, am);
+            sprintf(filePath, "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+                RECORDINGS_DIR,
+                dlog_record::g_guiParameters.filePath,
+                (int)month, (int)day, (int)year,
+                (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+        }
     } else {
         sprintf(filePath, "%s/%s.dlog", RECORDINGS_DIR, dlog_record::g_guiParameters.filePath);
     }

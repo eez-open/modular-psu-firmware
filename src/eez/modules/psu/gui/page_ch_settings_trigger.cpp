@@ -441,10 +441,6 @@ void ChSettingsListsPage::set() {
             } else {
                 infoMessage("Lists changed!");
             }
-
-            uint8_t hour, minute, second;
-            datetime::getTime(hour, minute, second);
-            DebugTrace("[%02d:%02d:%02d] List changed for channel %d!\n", hour, minute, second, g_channel->channelIndex + 1);
         } else {
             errorMessage("List lengths are not equivalent!");
         }

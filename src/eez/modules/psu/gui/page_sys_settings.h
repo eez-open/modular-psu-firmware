@@ -43,12 +43,15 @@ class SysSettingsDateTimePage : public SetPage {
     void toggleNtp();
     void editNtpServer();
     void selectDstRule();
+    void selectFormat();
+    void toggleAmPm();
 
     bool ntpEnabled;
     char ntpServer[32 + 1];
     datetime::DateTime dateTime;
     int16_t timeZone;
     datetime::DstRule dstRule;
+    datetime::Format dateTimeFormat;
     bool dateTimeModified;
 
   private:
@@ -56,8 +59,10 @@ class SysSettingsDateTimePage : public SetPage {
     char origNtpServer[32 + 1];
     int16_t origTimeZone;
     datetime::DstRule origDstRule;
+    datetime::Format origDateTimeFormat;
 
     static void onDstRuleSet(uint16_t value);
+    static void onDateTimeFormatSet(uint16_t value);
 
 #if OPTION_ETHERNET
     enum {

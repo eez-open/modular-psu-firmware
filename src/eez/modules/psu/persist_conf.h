@@ -99,6 +99,7 @@ struct DeviceConfiguration {
     unsigned dateValid : 1;
     unsigned timeValid : 1;
     unsigned dst : 1;
+    unsigned dateTimeFormat: 5;
 
     // block 3
     int8_t profileAutoRecallLocation;
@@ -295,6 +296,7 @@ void setDateValid(unsigned dateValid);
 void setTimeValid(unsigned timeValid);
 void setTimeZone(int16_t time_zone);
 void setDstRule(uint8_t dstRule);
+void setDateTimeFormat(unsigned dstRule);
 
 void setIoPinPolarity(int pin, unsigned polarity);
 void setIoPinFunction(int pin, unsigned function);

@@ -100,6 +100,7 @@ const EnumItem *g_enumDefinitions[] = {
     g_ioPinsInputFunctionEnumDefinition,
     g_ioPinsOutputFunctionEnumDefinition,
     g_dstRuleEnumDefinition,
+    g_dateTimeFormatEnumDefinition,
     g_userSwitchActionEnumDefinition,
     g_fileManagerSortByEnumDefinition,
     g_eventQueueFilterEnumDefinition,
@@ -187,6 +188,14 @@ EnumItem g_dstRuleEnumDefinition[] = {
     { datetime::DST_RULE_EUROPE, "Europe" },
     { datetime::DST_RULE_USA, "USA" },
     { datetime::DST_RULE_AUSTRALIA, "Australia" },
+    { 0, 0 }
+};
+
+EnumItem g_dateTimeFormatEnumDefinition[] = {
+    { datetime::FORMAT_DMY_24, "DD-MM-YY 24H" },
+    { datetime::FORMAT_MDY_24, "MM-DD-YY 24H" },
+    { datetime::FORMAT_DMY_12, "DD-MM-YY 12H" },
+    { datetime::FORMAT_MDY_12, "MM-DD-YY 12H" },
     { 0, 0 }
 };
 
@@ -483,14 +492,25 @@ void TIME_ZONE_value_to_text(const Value &value, char *text, int count) {
     formatTimeZone(value.getInt16(), text, count);
 }
 
-bool compare_DATE_value(const Value &a, const Value &b) {
+bool compare_DATE_DMY_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
 
-void DATE_value_to_text(const Value &value, char *text, int count) {
+void DATE_DMY_value_to_text(const Value &value, char *text, int count) {
     int year, month, day, hour, minute, second;
     datetime::breakTime(value.getUInt32(), year, month, day, hour, minute, second);
-    snprintf(text, count - 1, "%d - %02d - %02d", year, month, day);
+    snprintf(text, count - 1, "%02d - %02d - %d", day, month, year);
+    text[count - 1] = 0;
+}
+
+bool compare_DATE_MDY_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void DATE_MDY_value_to_text(const Value &value, char *text, int count) {
+    int year, month, day, hour, minute, second;
+    datetime::breakTime(value.getUInt32(), year, month, day, hour, minute, second);
+    snprintf(text, count - 1, "%02d - %02d - %d", month, day, year);
     text[count - 1] = 0;
 }
 
@@ -529,6 +549,19 @@ void TIME_value_to_text(const Value &value, char *text, int count) {
     int year, month, day, hour, minute, second;
     datetime::breakTime(value.getUInt32(), year, month, day, hour, minute, second);
     snprintf(text, count - 1, "%02d : %02d : %02d", hour, minute, second);
+    text[count - 1] = 0;
+}
+
+bool compare_TIME12_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void TIME12_value_to_text(const Value &value, char *text, int count) {
+    int year, month, day, hour, minute, second;
+    datetime::breakTime(value.getUInt32(), year, month, day, hour, minute, second);
+    bool am;
+    datetime::convertTime24to12(hour, am);
+    snprintf(text, count - 1, "%02d : %02d : %02d %s", hour, minute, second, am ? "AM" : "PM");
     text[count - 1] = 0;
 }
 
@@ -751,9 +784,19 @@ void FILE_DATE_TIME_value_to_text(const Value &value, char *text, int count) {
     datetime::breakTime(datetime::now(), yearNow, monthNow, dayNow, hourNow, minuteNow, secondNow);
 
     if (yearNow == year && monthNow == month && dayNow == day) {
-        snprintf(text, count - 1, "%02d:%02d:%02d", hour, minute, second);
+        if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_24) {
+            snprintf(text, count - 1, "%02d:%02d:%02d", hour, minute, second);
+        } else {
+            bool am;
+            datetime::convertTime24to12(hour, am);
+            snprintf(text, count - 1, "%02d:%02d:%02d %s", hour, minute, second, am ? "AM" : "PM");
+        }
     } else {
-        snprintf(text, count - 1, "%02d-%02d-%02d", day, month, year % 100);
+        if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
+            snprintf(text, count - 1, "%02d-%02d-%02d", day, month, year % 100);
+        } else {
+            snprintf(text, count - 1, "%02d-%02d-%02d", month, day, year % 100);
+        }
     }
 
     text[count - 1] = 0;
@@ -884,11 +927,13 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_ON_TIME_COUNTER_value,
     compare_COUNTDOWN_value,
     compare_TIME_ZONE_value,
-    compare_DATE_value,
+    compare_DATE_DMY_value,
+    compare_DATE_MDY_value,
     compare_YEAR_value,
     compare_MONTH_value,
     compare_DAY_value,
     compare_TIME_value,
+    compare_TIME12_value,
     compare_HOUR_value,
     compare_MINUTE_value,
     compare_SECOND_value,
@@ -934,11 +979,13 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     ON_TIME_COUNTER_value_to_text,
     COUNTDOWN_value_to_text,
     TIME_ZONE_value_to_text,
-    DATE_value_to_text,
+    DATE_DMY_value_to_text,
+    DATE_MDY_value_to_text,
     YEAR_value_to_text,
     MONTH_value_to_text,
     DAY_value_to_text,
     TIME_value_to_text,
+    TIME12_value_to_text,
     HOUR_value_to_text,
     MINUTE_value_to_text,
     SECOND_value_to_text,
@@ -3166,7 +3213,7 @@ void data_date_time_date(data::DataOperationEnum operation, data::Cursor &cursor
         if (page && page->ntpEnabled) {
             uint32_t nowUtc = datetime::nowUtc();
             uint32_t nowLocal = datetime::utcToLocal(nowUtc, page->timeZone, page->dstRule);
-            value = data::Value(nowLocal, VALUE_TYPE_DATE);
+            value = data::Value(nowLocal, page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_DMY_12 ? VALUE_TYPE_DATE_DMY : VALUE_TYPE_DATE_MDY);
         }
     }
 }
@@ -3214,7 +3261,7 @@ void data_date_time_time(data::DataOperationEnum operation, data::Cursor &cursor
         if (page && page->ntpEnabled) {
             uint32_t nowUtc = datetime::nowUtc();
             uint32_t nowLocal = datetime::utcToLocal(nowUtc, page->timeZone, page->dstRule);
-            value = data::Value(nowLocal, VALUE_TYPE_TIME);
+            value = data::Value(nowLocal, page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_MDY_24 ? VALUE_TYPE_TIME : VALUE_TYPE_TIME12);
         }
     }
 }
@@ -3226,7 +3273,14 @@ void data_date_time_hour(data::DataOperationEnum operation, data::Cursor &cursor
             if (!page->dateTimeModified) {
                 page->dateTime = datetime::DateTime::now();
             }
-            value = data::Value(page->dateTime.hour, VALUE_TYPE_HOUR);
+            if (page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_MDY_24) {
+                value = data::Value(page->dateTime.hour, VALUE_TYPE_HOUR);
+            } else {
+                uint8_t hour = page->dateTime.hour;
+                bool am;
+                datetime::convertTime24to12(hour, am);
+                value = data::Value(hour, VALUE_TYPE_HOUR);
+            }
         }
     }
 }
@@ -3269,6 +3323,45 @@ void data_date_time_dst(data::DataOperationEnum operation, data::Cursor &cursor,
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page) {
             value = MakeEnumDefinitionValue(page->dstRule, ENUM_DEFINITION_DST_RULE);
+        }
+    }
+}
+
+void data_date_time_format(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
+        if (page) {
+            value = g_dateTimeFormatEnumDefinition[page->dateTimeFormat].menuLabel;
+        }
+    }
+}
+
+void data_date_time_format_is_dmy(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
+        if (page) {
+            value = page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_DMY_12 ? 1 : 0;
+        }
+    }
+}
+
+void data_date_time_format_is_24h(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
+        if (page) {
+            value = page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_MDY_24 ? 1 : 0;
+        }
+    }
+}
+
+void data_date_time_am_pm(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
+        if (page) {
+            uint8_t hour = page->dateTime.hour;
+            bool am;
+            datetime::convertTime24to12(hour, am);
+            value = am ? "AM" : "PM";
         }
     }
 }
@@ -3392,10 +3485,11 @@ void data_ethernet_installed(data::DataOperationEnum operation, data::Cursor &cu
 void data_ethernet_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_ETHERNET
     if (operation == data::DATA_OPERATION_GET) {
-        SysSettingsEthernetPage *page =
-            (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
+        SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
             value = page->m_enabled;
+        } else {
+            value = persist_conf::isEthernetEnabled();
         }
     }
 #endif
@@ -4189,10 +4283,11 @@ void data_io_pin_state(data::DataOperationEnum operation, data::Cursor &cursor, 
 
 void data_ntp_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        SysSettingsDateTimePage *page =
-            (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
+        SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page) {
             value = page->ntpEnabled;
+        } else {
+            value = persist_conf::isNtpEnabled();
         }
     }
 }

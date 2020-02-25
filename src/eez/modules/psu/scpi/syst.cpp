@@ -1522,6 +1522,62 @@ scpi_result_t scpi_cmd_systemCommunicateMqttStateQ(scpi_t *context) {
 #endif
 }
 
+scpi_choice_def_t dateFormatChoice[] = {
+    { "DMY", 1 },
+    { "MDY", 2 },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_systemDateFormat(scpi_t *context) {
+    int32_t dateFormat;
+    if (!SCPI_ParamChoice(context, dateFormatChoice, &dateFormat, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    using namespace datetime;
+
+    if (persist_conf::devConf.dateTimeFormat == FORMAT_DMY_12 || persist_conf::devConf.dateTimeFormat == FORMAT_MDY_12) {
+        persist_conf::setDateTimeFormat(dateFormat == 1 ? FORMAT_DMY_12 : FORMAT_MDY_12);
+    } else {
+        persist_conf::setDateTimeFormat(dateFormat == 1 ? FORMAT_DMY_24 : FORMAT_MDY_24);
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemDateFormatQ(scpi_t *context) {
+    using namespace datetime;
+    resultChoiceName(context, dateFormatChoice, persist_conf::devConf.dateTimeFormat == FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == FORMAT_DMY_12 ? 1 : 2);
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemTimeFormat(scpi_t *context) {
+    int32_t timeFormat;
+    if (!SCPI_ParamInt(context, &timeFormat, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (timeFormat != 12 && timeFormat != 24) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    using namespace datetime;
+    if (persist_conf::devConf.dateTimeFormat == FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == FORMAT_DMY_12) {
+        persist_conf::setDateTimeFormat(timeFormat == 24 ? FORMAT_DMY_24 : FORMAT_DMY_12);
+    } else {
+        persist_conf::setDateTimeFormat(timeFormat == 24 ? FORMAT_MDY_24 : FORMAT_MDY_12);
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemTimeFormatQ(scpi_t *context) {
+    using namespace datetime;
+    SCPI_ResultInt(context, persist_conf::devConf.dateTimeFormat == FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == FORMAT_MDY_24 ? 24 : 12);
+    return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

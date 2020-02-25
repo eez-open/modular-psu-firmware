@@ -283,6 +283,8 @@
     SCPI_COMMAND("SYSTem:CPU:MODel?", scpi_cmd_systemCpuModelQ) \
     SCPI_COMMAND("SYSTem:DATE", scpi_cmd_systemDate) \
     SCPI_COMMAND("SYSTem:DATE?", scpi_cmd_systemDateQ) \
+    SCPI_COMMAND("SYSTem:DATE:FORMat", scpi_cmd_systemDateFormat) \
+    SCPI_COMMAND("SYSTem:DATE:FORMat?", scpi_cmd_systemDateFormatQ) \
     SCPI_COMMAND("SYSTem:DIGital:INPut:DATA?", scpi_cmd_systemDigitalInputDataQ) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:DATA", scpi_cmd_systemDigitalOutputData) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:DATA?", scpi_cmd_systemDigitalOutputDataQ) \
@@ -321,6 +323,8 @@
     SCPI_COMMAND("SYSTem:TIME:ZONE", scpi_cmd_systemTimeZone) \
     SCPI_COMMAND("SYSTem:TIME:ZONE?", scpi_cmd_systemTimeZoneQ) \
     SCPI_COMMAND("SYSTem:TIME?", scpi_cmd_systemTimeQ) \
+    SCPI_COMMAND("SYSTem:TIME:FORMat", scpi_cmd_systemTimeFormat) \
+    SCPI_COMMAND("SYSTem:TIME:FORMat?", scpi_cmd_systemTimeFormatQ) \
     SCPI_COMMAND("SYSTem:VERSion?", scpi_cmd_systemVersionQ) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce", scpi_cmd_triggerDlogSource) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce?", scpi_cmd_triggerDlogSourceQ) \

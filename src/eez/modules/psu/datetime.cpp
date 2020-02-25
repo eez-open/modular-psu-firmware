@@ -283,11 +283,60 @@ bool setDateTime(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t
     return false;
 }
 
+void convertTime24to12(int &hour, bool &am) {
+    if (hour == 0) {
+        hour = 12;
+        am = true;
+    } else if (hour < 12) {
+        am = true;
+    } else if (hour == 12) {
+        am = false;
+    } else {
+        hour = hour - 12;
+        am = false;
+    }
+}
+
+void convertTime24to12(uint8_t &hour, bool &am) {
+    int h = hour;
+    convertTime24to12(h, am);
+    hour = h;
+}
+
+void convertTime12to24(int &hour, bool am) {
+    if (am) {
+        if (hour == 12) {
+            hour = 0;
+        }
+    } else {
+        if (hour < 12) {
+            hour += 12;
+        }
+    }
+}
+
+void convertTime12to24(uint8_t &hour, bool am) {
+    int h = hour;
+    convertTime12to24(h, am);
+    hour = h;
+}
+
 bool getDateTimeAsString(char *buffer) {
     uint8_t year, month, day, hour, minute, second;
     if (datetime::getDateTime(year, month, day, hour, minute, second)) {
-        sprintf(buffer, "%d-%02d-%02d %02d:%02d:%02d", (int)(year + 2000), (int)month, (int)day,
-                (int)hour, (int)minute, (int)second);
+        if (persist_conf::devConf.dateTimeFormat == FORMAT_DMY_24) {
+            sprintf(buffer, "%02d-%02d-%02d %02d:%02d:%02d", (int)day, (int)month, (int)year, (int)hour, (int)minute, (int)second);
+        } else if (persist_conf::devConf.dateTimeFormat == FORMAT_MDY_24) {
+            sprintf(buffer, "%02d-%02d-%02d %02d:%02d:%02d", (int)month, (int)day, (int)year, (int)hour, (int)minute, (int)second);
+        } else if (persist_conf::devConf.dateTimeFormat == FORMAT_DMY_12) {
+            bool am;
+            convertTime24to12(hour, am);
+            sprintf(buffer, "%02d-%02d-%02d %02d:%02d:%02d %s", (int)day, (int)month, (int)year, (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+        } else if (persist_conf::devConf.dateTimeFormat == FORMAT_MDY_12) {
+            bool am;
+            convertTime24to12(hour, am);
+            sprintf(buffer, "%02d-%02d-%02d %02d:%02d:%02d %s", (int)month, (int)day, (int)year, (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+        }
         return true;
     }
     return false;

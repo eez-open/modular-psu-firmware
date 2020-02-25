@@ -55,7 +55,7 @@ namespace gui {
 
 void SysSettingsDateTimePage::pageAlloc() {
 #if OPTION_ETHERNET
-    ntpEnabled = origNtpEnabled = persist_conf::isNtpEnabled();
+    ntpEnabled = origNtpEnabled = persist_conf::isEthernetEnabled() && persist_conf::isNtpEnabled();
     strcpy(ntpServer, persist_conf::devConf.ntpServer);
     strcpy(origNtpServer, persist_conf::devConf.ntpServer);
 #else
@@ -66,6 +66,7 @@ void SysSettingsDateTimePage::pageAlloc() {
     dateTimeModified = false;
     timeZone = origTimeZone = persist_conf::devConf.timeZone;
     dstRule = origDstRule = (datetime::DstRule)persist_conf::devConf.dstRule;
+    dateTimeFormat = origDateTimeFormat = (datetime::Format)persist_conf::devConf.dateTimeFormat;
 }
 
 void SysSettingsDateTimePage::toggleNtp() {
@@ -118,11 +119,24 @@ void SysSettingsDateTimePage::edit() {
         options.def = 1;
         value = data::Value((int)dateTime.day);
     } else if (id == DATA_ID_DATE_TIME_HOUR) {
-        label = "Hour (0-23): ";
-        options.min = 0;
-        options.max = 23;
-        options.def = 12;
-        value = data::Value((int)dateTime.hour);
+        if (dateTimeFormat == datetime::FORMAT_DMY_24 || dateTimeFormat == datetime::FORMAT_MDY_24) {
+            label = "Hour (0-23): ";
+            options.min = 0;
+            options.max = 23;
+            options.def = 12;
+            value = data::Value((int)dateTime.hour);
+        } else {
+            label = "Hour (1-12): ";
+            options.min = 1;
+            options.max = 12;
+            options.def = 12;
+
+            int hour = dateTime.hour;
+            bool am;
+            datetime::convertTime24to12(hour, am);
+
+            value = data::Value(hour);
+        }
     } else if (id == DATA_ID_DATE_TIME_MINUTE) {
         label = "Minute (0-59): ";
         options.min = 0;
@@ -161,6 +175,26 @@ void SysSettingsDateTimePage::selectDstRule() {
     pushSelectFromEnumPage(g_dstRuleEnumDefinition, dstRule, 0, onDstRuleSet);
 }
 
+void SysSettingsDateTimePage::onDateTimeFormatSet(uint16_t value) {
+    popPage();
+    SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getActivePage();
+    page->dateTimeFormat = (datetime::Format)value;
+}
+
+void SysSettingsDateTimePage::selectFormat() {
+    pushSelectFromEnumPage(g_dateTimeFormatEnumDefinition, dateTimeFormat, 0, onDateTimeFormatSet);
+}
+
+void SysSettingsDateTimePage::toggleAmPm() {
+    int hour = dateTime.hour;
+    bool am;
+    datetime::convertTime24to12(hour, am);
+    am = !am;
+    datetime::convertTime12to24(hour, am);
+    dateTime.hour = uint8_t(hour);
+    dateTimeModified = true;
+}
+
 void SysSettingsDateTimePage::setValue(float value) {
     if (editDataId == DATA_ID_DATE_TIME_YEAR) {
         dateTime.year = uint16_t(value);
@@ -172,7 +206,16 @@ void SysSettingsDateTimePage::setValue(float value) {
         dateTime.day = uint8_t(value);
         dateTimeModified = true;
     } else if (editDataId == DATA_ID_DATE_TIME_HOUR) {
-        dateTime.hour = uint8_t(value);
+        if (dateTimeFormat == datetime::FORMAT_DMY_24 || dateTimeFormat == datetime::FORMAT_MDY_24) {
+            dateTime.hour = uint8_t(value);
+        } else {
+            int hour = dateTime.hour;
+            bool am;
+            datetime::convertTime24to12(hour, am);
+            hour = (int)value;
+            datetime::convertTime12to24(hour, am);
+            dateTime.hour = uint8_t(hour);
+        }
         dateTimeModified = true;
     } else if (editDataId == DATA_ID_DATE_TIME_MINUTE) {
         dateTime.minute = uint8_t(value);
@@ -204,7 +247,7 @@ int SysSettingsDateTimePage::getDirty() {
         }
     }
 
-    return (timeZone != origTimeZone || dstRule != origDstRule) ? 1 : 0;
+    return (timeZone != origTimeZone || dstRule != origDstRule || dateTimeFormat != origDateTimeFormat) ? 1 : 0;
 }
 
 #if OPTION_ETHERNET
@@ -263,6 +306,10 @@ void SysSettingsDateTimePage::doSet() {
 
     if (dstRule != origDstRule) {
         persist_conf::setDstRule(dstRule);
+    }
+
+    if (dateTimeFormat != origDateTimeFormat) {
+        persist_conf::setDateTimeFormat(dateTimeFormat);
     }
 
     if (!ntpEnabled && dateTimeModified) {

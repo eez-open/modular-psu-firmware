@@ -99,7 +99,7 @@ void printError(int_fast16_t err) {
 
         Serial.print("**ERROR");
 
-        char datetime_buffer[20] = { 0 };
+        char datetime_buffer[32] = { 0 };
         if (datetime::getDateTimeAsString(datetime_buffer)) {
             sprintf(errorOutputBuffer, " [%s]", datetime_buffer);
             Serial.print(errorOutputBuffer);

@@ -356,7 +356,11 @@ enum DataEnum {
     DATA_ID_FILE_MANAGER_STORAGE_ALARM = 354,
     DATA_ID_EVENT_QUEUE_IS_LONG_MESSAGE_TEXT = 355,
     DATA_ID_EVENT_QUEUE_EVENT_LONG_MESSAGE_OVERLAY = 356,
-    DATA_ID_EVENT_QUEUE_EVENT_IS_SELECTED = 357
+    DATA_ID_EVENT_QUEUE_EVENT_IS_SELECTED = 357,
+    DATA_ID_DATE_TIME_FORMAT = 358,
+    DATA_ID_DATE_TIME_FORMAT_IS_DMY = 359,
+    DATA_ID_DATE_TIME_FORMAT_IS_24H = 360,
+    DATA_ID_DATE_TIME_AM_PM = 361
 };
 
 void data_none(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -717,6 +721,10 @@ void data_file_manager_storage_alarm(DataOperationEnum operation, Cursor &cursor
 void data_event_queue_is_long_message_text(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_event_queue_event_long_message_overlay(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_event_queue_event_is_selected(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_date_time_format(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_date_time_format_is_dmy(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_date_time_format_is_24h(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_date_time_am_pm(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -938,7 +946,9 @@ enum ActionsEnum {
     ACTION_ID_PROFILE_IMPORT = 212,
     ACTION_ID_PROFILE_EXPORT = 213,
     ACTION_ID_EVENT_QUEUE_FILTER = 214,
-    ACTION_ID_EVENT_QUEUE_SELECT_EVENT = 215
+    ACTION_ID_EVENT_QUEUE_SELECT_EVENT = 215,
+    ACTION_ID_DATE_TIME_SELECT_FORMAT = 216,
+    ACTION_ID_DATE_TIME_TOGGLE_AM_PM = 217
 };
 
 void action_channel_toggle_output();
@@ -1156,6 +1166,8 @@ void action_profile_import();
 void action_profile_export();
 void action_event_queue_filter();
 void action_event_queue_select_event();
+void action_date_time_select_format();
+void action_date_time_toggle_am_pm();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -1549,7 +1561,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[301461];
+extern const uint8_t assets[301590];
 #else
-extern const uint8_t assets[1314436];
+extern const uint8_t assets[1314440];
 #endif

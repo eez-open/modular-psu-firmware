@@ -40,7 +40,13 @@ bool setTime(uint8_t hour, uint8_t minute, uint8_t second, unsigned dst);
 bool getDateTime(uint8_t &year, uint8_t &month, uint8_t &day, uint8_t &hour, uint8_t &minute, uint8_t &second);
 bool setDateTime(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second, bool pushChangedEvent, unsigned dst);
 
-/// Returns date time as string in format YYYY-MM-DD HH:MM:SS.
+void convertTime24to12(int &hour, bool &am);
+void convertTime24to12(uint8_t &hour, bool &am);
+
+void convertTime12to24(int &hour, bool am);
+void convertTime12to24(uint8_t &hour, bool am);
+
+/// Returns date time as string in system date time format.
 /// \param buffer Pointer to the buffer of at least 20 characters.
 /// \returns true if successful.
 bool getDateTimeAsString(char *buffer);
@@ -52,6 +58,7 @@ uint32_t makeTime(int year, int month, int day, int hour, int minute, int second
 void breakTime(uint32_t time, int &resultYear, int &resultMonth, int &resultDay, int &resultHour, int &resultMinute, int &resultSecond);
 
 enum DstRule { DST_RULE_OFF, DST_RULE_EUROPE, DST_RULE_USA, DST_RULE_AUSTRALIA };
+enum Format { FORMAT_DMY_24, FORMAT_MDY_24, FORMAT_DMY_12, FORMAT_MDY_12 };
 
 uint32_t utcToLocal(uint32_t utc, int16_t timeZone, DstRule dstRule);
 uint32_t localToUtc(uint32_t local, int16_t timeZone, DstRule dstRule);

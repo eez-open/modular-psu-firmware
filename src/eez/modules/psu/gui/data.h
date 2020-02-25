@@ -21,6 +21,7 @@ enum EnumDefinition {
     ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION,
     ENUM_DEFINITION_IO_PINS_OUTPUT_FUNCTION,
     ENUM_DEFINITION_DST_RULE,
+    ENUM_DEFINITION_DATE_TIME_FORMAT_RULE,
     ENUM_DEFINITION_USER_SWITCH_ACTION,
     ENUM_DEFINITION_FILE_MANAGER_SORT_BY,
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -38,6 +39,7 @@ extern EnumItem g_ioPinsPolarityEnumDefinition[];
 extern EnumItem g_ioPinsInputFunctionEnumDefinition[];
 extern EnumItem g_ioPinsOutputFunctionEnumDefinition[];
 extern EnumItem g_dstRuleEnumDefinition[];
+extern EnumItem g_dateTimeFormatEnumDefinition[];
 extern EnumItem g_userSwitchActionEnumDefinition[];
 extern EnumItem g_fileManagerSortByEnumDefinition[];
 extern EnumItem g_eventQueueFilterEnumDefinition[];
@@ -60,11 +62,13 @@ enum UserValueType {
     VALUE_TYPE_ON_TIME_COUNTER,
     VALUE_TYPE_COUNTDOWN,
     VALUE_TYPE_TIME_ZONE,
-    VALUE_TYPE_DATE,
+    VALUE_TYPE_DATE_DMY,
+    VALUE_TYPE_DATE_MDY,
     VALUE_TYPE_YEAR,
     VALUE_TYPE_MONTH,
     VALUE_TYPE_DAY,
     VALUE_TYPE_TIME,
+    VALUE_TYPE_TIME12,
     VALUE_TYPE_HOUR,
     VALUE_TYPE_MINUTE,
     VALUE_TYPE_SECOND,

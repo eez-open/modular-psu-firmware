@@ -1156,6 +1156,10 @@ void setDstRule(uint8_t dstRule) {
     g_devConf.dstRule = dstRule;
 }
 
+void setDateTimeFormat(unsigned dateTimeFormat) {
+    g_devConf.dateTimeFormat = dateTimeFormat;
+}
+
 void setIoPinPolarity(int pin, unsigned polarity) {
     g_devConf.ioPins[pin].polarity = polarity;
     io_pins::refresh();
