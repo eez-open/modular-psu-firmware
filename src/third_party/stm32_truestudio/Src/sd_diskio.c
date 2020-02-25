@@ -54,7 +54,7 @@ See BSP_SD_ErrorCallback() and BSP_SD_AbortCallback() below
  * in case of errors in either BSP_SD_ReadCpltCallback() or BSP_SD_WriteCpltCallback()
  * the value by default is as defined in the BSP platform driver otherwise 30 secs
  */
-#define SD_TIMEOUT 3 * 1000
+#define SD_TIMEOUT 5 * 1000
 
 #define SD_DEFAULT_BLOCK_SIZE 512
 

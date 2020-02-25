@@ -2486,8 +2486,8 @@ static void SD_DMAReceiveCplt(DMA_HandleTypeDef *hdma)
     if (__HAL_SD_GET_FLAG(hsd, SDMMC_FLAG_CMDREND)) {
       /* Clear only selected flags */
       __HAL_SD_CLEAR_FLAG(hsd, ((uint32_t)(SDMMC_FLAG_DCRCFAIL | SDMMC_FLAG_DTIMEOUT |
-      SDMMC_FLAG_TXUNDERR | SDMMC_FLAG_RXOVERR |
-      SDMMC_FLAG_CMDSENT | SDMMC_FLAG_DATAEND | SDMMC_FLAG_DBCKEND)));
+        SDMMC_FLAG_TXUNDERR | SDMMC_FLAG_RXOVERR |
+        SDMMC_FLAG_CMDSENT | SDMMC_FLAG_DATAEND | SDMMC_FLAG_DBCKEND)));
     } else {
       /* Clear all the static flags */
       __HAL_SD_CLEAR_FLAG(hsd, SDMMC_STATIC_FLAGS);
