@@ -968,7 +968,8 @@ enum ActionsEnum {
     ACTION_ID_EVENT_QUEUE_FILTER = 218,
     ACTION_ID_EVENT_QUEUE_SELECT_EVENT = 219,
     ACTION_ID_DATE_TIME_SELECT_FORMAT = 220,
-    ACTION_ID_DATE_TIME_TOGGLE_AM_PM = 221
+    ACTION_ID_DATE_TIME_TOGGLE_AM_PM = 221,
+    ACTION_ID_EDIT_NO_FOCUS = 222
 };
 
 void action_channel_toggle_output();
@@ -1192,6 +1193,7 @@ void action_event_queue_filter();
 void action_event_queue_select_event();
 void action_date_time_select_format();
 void action_date_time_toggle_am_pm();
+void action_edit_no_focus();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -1594,7 +1596,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[394438];
+extern const uint8_t assets[394446];
 #else
 extern const uint8_t assets[3864892];
 #endif

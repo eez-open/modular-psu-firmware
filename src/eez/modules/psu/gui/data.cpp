@@ -2149,7 +2149,16 @@ void data_channel_calibration_date(data::DataOperationEnum operation, data::Curs
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        value = data::Value(channel.cal_conf.calibration_date);
+
+        char *p = channel.cal_conf.calibration_date;
+
+        int year = (p[0] - '0') * 1000 + (p[1] - '0') * 100 + (p[2] - '0') * 10 + (p[3] - '0');
+        int month = (p[4] - '0') * 10 + (p[5] - '0');
+        int day = (p[6] - '0') * 10 + (p[7] - '0');
+
+        uint32_t time = datetime::makeTime(year, month, day, 0, 0, 0);
+        
+        value = data::Value(time, persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12 ? VALUE_TYPE_DATE_DMY : VALUE_TYPE_DATE_MDY);
     }
 }
 

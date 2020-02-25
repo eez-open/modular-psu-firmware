@@ -378,11 +378,7 @@ bool save() {
     uint8_t month;
     uint8_t day;
     if (datetime::getDate(year, month, day)) {
-        if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
-            sprintf(g_channel->cal_conf.calibration_date, "%02d%02d%02d", (int)day, (int)month, (int)year);
-        } else {
-            sprintf(g_channel->cal_conf.calibration_date, "%02d%02d%02d", (int)month, (int)day, (int)year);
-        }
+        sprintf(g_channel->cal_conf.calibration_date, "%d%02d%02d", (int)(2000 + year), (int)month, (int)day);
     } else {
         strcpy(g_channel->cal_conf.calibration_date, "");
     }

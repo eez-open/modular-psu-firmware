@@ -82,6 +82,10 @@ void action_edit() {
     edit_mode::enter();
 }
 
+void action_edit_no_focus() {
+    edit_mode::enter();
+}
+
 void action_edit_mode_slider() {
     edit_mode::enter(PAGE_ID_EDIT_MODE_SLIDER);
 }
