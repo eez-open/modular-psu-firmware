@@ -646,6 +646,8 @@ static const int NUM_TICK_FUNCS = sizeof(g_tickFuncs) / sizeof(TickFunc);
 static int g_tickFuncIndex = 0;
 
 void tick() {
+    WATCHDOG_RESET();
+
     uint32_t tickCount = micros();
 
     dlog_record::tick(tickCount);

@@ -119,5 +119,5 @@ struct Mutex {
 #define osMutex(mutex) mutex
 
 Mutex *osMutexCreate(Mutex &mutex);
-void osMutexWait(Mutex *mutex, unsigned int timeout);
+osStatus osMutexWait(Mutex *mutex, unsigned int timeout);
 void osMutexRelease(Mutex *mutex);

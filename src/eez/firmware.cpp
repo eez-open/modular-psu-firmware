@@ -179,12 +179,6 @@ void boot() {
     eez::psu::gui::showWelcomePage();
 #endif
 
-#if defined(EEZ_PLATFORM_STM32)
-    if (g_isResetByIWDG) {
-        DebugTrace("Reset by IWDG detected\n");
-    }
-#endif
-
     sound::init();
 
     psu::serial::init();
@@ -220,6 +214,12 @@ void boot() {
     g_bootTestSuccess &= testMaster();
 
     psu::event_queue::init();
+
+#if defined(EEZ_PLATFORM_STM32)
+    if (g_isResetByIWDG) {
+        psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_WATCHDOG_RESET);
+    }
+#endif
 
     if (!psu::autoRecall()) {
         psu::psuReset();

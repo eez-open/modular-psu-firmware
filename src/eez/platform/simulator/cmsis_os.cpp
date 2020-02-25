@@ -175,18 +175,19 @@ osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec) {
     if (queue_id->head == queue_id->tail) {
         queue_id->overflow = 1;
     }
-    return osOK; 
+    return osOK;
 }
 
 Mutex *osMutexCreate(Mutex &mutex) {
     return &mutex;
 }
 
-void osMutexWait(Mutex *mutex, unsigned int timeout) {
+osStatus osMutexWait(Mutex *mutex, unsigned int timeout) {
     while (mutex->locked) {
     	osDelay(1);
     }
-    mutex->locked = true;    
+    mutex->locked = true;
+    return osOK;
 }
 
 void osMutexRelease(Mutex *mutex) {

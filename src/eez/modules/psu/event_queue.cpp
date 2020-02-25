@@ -314,43 +314,43 @@ void onEncoder(int counter) {
 static bool getEventFromWriteQueue(QueueEvent *queueEvent) {
     bool result = false;
 
-    osMutexWait(g_writeQueueMutexId, 0);
+    if (osMutexWait(g_writeQueueMutexId, 5) == osOK) {
+		if (g_writeQueueFull || g_writeQueueTail != g_writeQueueHead) {
+			memcpy(queueEvent, &g_writeQueue[g_writeQueueTail], sizeof(QueueEvent));
+			g_writeQueueTail = (g_writeQueueTail + 1) % WRITE_QUEUE_MAX_SIZE;
+			g_writeQueueFull = false;
+			result = true;
+		}
 
-    if (g_writeQueueFull || g_writeQueueTail != g_writeQueueHead) {
-        memcpy(queueEvent, &g_writeQueue[g_writeQueueTail], sizeof(QueueEvent));
-        g_writeQueueTail = (g_writeQueueTail + 1) % WRITE_QUEUE_MAX_SIZE;
-        g_writeQueueFull = false;
-        result = true;
+		osMutexRelease(g_writeQueueMutexId);
     }
-
-    osMutexRelease(g_writeQueueMutexId);
 
     return result;
 }
 
 static void addEventToWriteQueue(int16_t eventId, char *message) {
-    osMutexWait(g_writeQueueMutexId, 0);
+    if (osMutexWait(g_writeQueueMutexId, 5) == osOK) {
+        g_writeQueue[g_writeQueueHead].dateTime = datetime::now();
+        g_writeQueue[g_writeQueueHead].eventId = eventId;
 
-    g_writeQueue[g_writeQueueHead].dateTime = datetime::now();
-    g_writeQueue[g_writeQueueHead].eventId = eventId;
+        if (message) {
+            strcpy(g_writeQueue[g_writeQueueHead].message, message);
+        } else {
+            g_writeQueue[g_writeQueueHead].message[0] = 0;
+        }
 
-    if (message) {
-        strcpy(g_writeQueue[g_writeQueueHead].message, message);
-    } else {
-        g_writeQueue[g_writeQueueHead].message[0] = 0;
+        if (g_writeQueueFull) {
+            g_writeQueueTail = (g_writeQueueTail + 1) % WRITE_QUEUE_MAX_SIZE;    
+        }
+
+        g_writeQueueHead = (g_writeQueueHead + 1) % WRITE_QUEUE_MAX_SIZE;
+
+        if (g_writeQueueHead == g_writeQueueTail) {
+            g_writeQueueFull = true;
+        }
+
+        osMutexRelease(g_writeQueueMutexId);
     }
-
-    if (g_writeQueueFull) {
-        g_writeQueueTail = (g_writeQueueTail + 1) % WRITE_QUEUE_MAX_SIZE;    
-    }
-
-    g_writeQueueHead = (g_writeQueueHead + 1) % WRITE_QUEUE_MAX_SIZE;
-
-    if (g_writeQueueHead == g_writeQueueTail) {
-        g_writeQueueFull = true;
-    }
-
-    osMutexRelease(g_writeQueueMutexId);
 }
 
 static void getIndexFilePath(int indexType, char *filePath) {
@@ -519,10 +519,6 @@ static void writeEvent(QueueEvent *event) {
     int eventType;
     if (!writeToLog(event, logOffset, eventType)) {
         return;
-    }
-
-    if (eventType >= g_filter) {
-        ++g_numEvents;
     }
 
     writeToIndex(EVENT_TYPE_DEBUG, logOffset);

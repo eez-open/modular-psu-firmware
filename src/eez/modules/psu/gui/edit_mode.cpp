@@ -54,6 +54,10 @@ static bool g_isInteractiveMode = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static void update();
+
+////////////////////////////////////////////////////////////////////////////////
+
 bool isActive() {
     return getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD ||
            getActivePageId() == PAGE_ID_EDIT_MODE_STEP ||
@@ -65,9 +69,9 @@ void initEditValue() {
     g_undoValue = g_editValue;
 }
 
-void enter(int tabIndex) {
+void enter(int tabIndex, bool setFocus) {
 #if OPTION_ENCODER
-    if (!isActive()) {
+    if (setFocus && !isActive()) {
         if (!g_appContext->isFocusWidget(getFoundWidgetAtDown()) || g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             setFocusCursor(getFoundWidgetAtDown().cursor, getFoundWidgetAtDown().widget->data);
             return;
@@ -95,15 +99,6 @@ void enter(int tabIndex) {
         edit_mode_keypad::enter(isChannelData(cursor, g_focusDataId) ? g_focusCursor.i : -1, g_editValue, g_minValue, g_maxValue);
     } else {
         edit_mode_keypad::exit();
-    }
-}
-
-void update() {
-    initEditValue();
-    g_minValue = data::getMin(g_focusCursor, g_focusDataId);
-    g_maxValue = data::getMax(g_focusCursor, g_focusDataId);
-    if (edit_mode_keypad::g_keypad) {
-        edit_mode_keypad::g_keypad->m_options.editValueUnit = g_editValue.getUnit();
     }
 }
 
@@ -207,6 +202,15 @@ void getInfoText(char *infoText, int count) {
     strcatFloat(infoText, maxValue);
     strcat(infoText, unitName);
     strcat(infoText, "]");
+}
+
+static void update() {
+    initEditValue();
+    g_minValue = data::getMin(g_focusCursor, g_focusDataId);
+    g_maxValue = data::getMax(g_focusCursor, g_focusDataId);
+    if (edit_mode_keypad::g_keypad) {
+        edit_mode_keypad::g_keypad->m_options.editValueUnit = g_editValue.getUnit();
+    }
 }
 
 } // namespace edit_mode

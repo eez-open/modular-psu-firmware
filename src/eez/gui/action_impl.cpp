@@ -83,7 +83,7 @@ void action_edit() {
 }
 
 void action_edit_no_focus() {
-    edit_mode::enter();
+    edit_mode::enter(-1, false);
 }
 
 void action_edit_mode_slider() {

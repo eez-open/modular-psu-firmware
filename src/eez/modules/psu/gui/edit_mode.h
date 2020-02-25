@@ -24,8 +24,7 @@ namespace gui {
 namespace edit_mode {
 
 bool isActive();
-void enter(int tabIndex = -1);
-void update();
+void enter(int tabIndex = -1, bool setFocus = true);
 void exit();
 bool isInteractiveMode();
 void toggleInteractiveMode();

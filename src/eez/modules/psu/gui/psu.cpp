@@ -659,7 +659,7 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
         }
     }
 
-    return (widgetCursor.cursor == -1 || widgetCursor.cursor == g_focusCursor) && widgetCursor.widget->data == g_focusDataId;
+    return (widgetCursor.cursor == -1 || widgetCursor.cursor == g_focusCursor) && widgetCursor.widget->data == g_focusDataId && widgetCursor.widget->action == ACTION_ID_EDIT;
 }
 
 bool PsuAppContext::isAutoRepeatAction(int action) {
