@@ -175,26 +175,26 @@ void oneIter() {
                 uint8_t year, month, day, hour, minute, second;
                 datetime::getDateTime(year, month, day, hour, minute, second);
                 if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24) {
-                    sprintf(filePath, "%s/%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+                    sprintf(filePath, "%s/%02d_%02d_%02d-%02d_%02d_%02d.jpg",
                         SCREENSHOTS_DIR,
                         (int)day, (int)month, (int)year,
                         (int)hour, (int)minute, (int)second);
                 } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_24) {
-                    sprintf(filePath, "%s/%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+                    sprintf(filePath, "%s/%02d_%02d_%02d-%02d_%02d_%02d.jpg",
                         SCREENSHOTS_DIR,
                         (int)month, (int)day, (int)year,
                         (int)hour, (int)minute, (int)second);
                 } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
                     bool am;
                     datetime::convertTime24to12(hour, am);
-                    sprintf(filePath, "%s/%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+                    sprintf(filePath, "%s/%02d_%02d_%02d-%02d_%02d_%02d_%s.jpg",
                         SCREENSHOTS_DIR,
                         (int)day, (int)month, (int)year,
                         (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
                 } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_12) {
                     bool am;
                     datetime::convertTime24to12(hour, am);
-                    sprintf(filePath, "%s/%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+                    sprintf(filePath, "%s/%02d_%02d_%02d-%02d_%02d_%02d_%s.jpg",
                         SCREENSHOTS_DIR,
                         (int)month, (int)day, (int)year,
                         (int)hour, (int)minute, (int)second, am ? "AM" : "PM");

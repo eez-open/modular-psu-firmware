@@ -2480,9 +2480,25 @@ static void SD_DMAReceiveCplt(DMA_HandleTypeDef *hdma)
   in the SD DCTRL register */
   hsd->Instance->DCTRL &= (uint32_t)~((uint32_t)SDMMC_DCTRL_DMAEN);
   
-  /* Clear all the static flags */
-  __HAL_SD_CLEAR_FLAG(hsd, SDMMC_STATIC_FLAGS);
-  
+  /* Check current state of Command Register and don't clear those flags */
+  if (hsd->Context == (SD_CONTEXT_READ_SINGLE_BLOCK | SD_CONTEXT_DMA))
+  {
+    if (__HAL_SD_GET_FLAG(hsd, SDMMC_FLAG_CMDREND)) {
+      /* Clear only selected flags */
+      __HAL_SD_CLEAR_FLAG(hsd, ((uint32_t)(SDMMC_FLAG_DCRCFAIL | SDMMC_FLAG_DTIMEOUT |
+      SDMMC_FLAG_TXUNDERR | SDMMC_FLAG_RXOVERR |
+      SDMMC_FLAG_CMDSENT | SDMMC_FLAG_DATAEND | SDMMC_FLAG_DBCKEND)));
+    } else {
+      /* Clear all the static flags */
+      __HAL_SD_CLEAR_FLAG(hsd, SDMMC_STATIC_FLAGS);
+    }
+  }
+  else
+  {
+    /* Clear all the static flags */
+    __HAL_SD_CLEAR_FLAG(hsd, SDMMC_STATIC_FLAGS);
+  }
+
   hsd->State = HAL_SD_STATE_READY;
 
 #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)

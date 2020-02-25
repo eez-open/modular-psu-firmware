@@ -145,20 +145,18 @@ void tick() {
             g_previousDisplayFromPosition = -1;
         }
 #if OPTION_DISPLAY
-        else {
-            if (gui::g_psuAppContext.getActivePageId() == PAGE_ID_EVENT_QUEUE) {
-                if (g_refreshEvents) {
-                    refreshEvents();
-                    g_refreshEvents = false;
-                } else {
-                    auto fromPosition = g_displayFromPosition;
-                    if (fromPosition != g_previousDisplayFromPosition) {
-                        readEvents(fromPosition);
-                        g_previousDisplayFromPosition = fromPosition;
-                    }
-                }
-            }
-        }
+		if (gui::g_psuAppContext.getActivePageId() == PAGE_ID_EVENT_QUEUE) {
+			if (g_refreshEvents) {
+				refreshEvents();
+				g_refreshEvents = false;
+			} else {
+				auto fromPosition = g_displayFromPosition;
+				if (fromPosition != g_previousDisplayFromPosition) {
+					readEvents(fromPosition);
+					g_previousDisplayFromPosition = fromPosition;
+				}
+			}
+		}
 #endif
     } else {
         g_refreshEvents = true;

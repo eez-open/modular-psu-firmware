@@ -270,10 +270,10 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
     bool result = true;
 
     size_t totalSize = file.size();
+    size_t uploaded = 0;
 
 #if OPTION_DISPLAY
     eez::psu::gui::PsuAppContext::showProgressPage("Uploading...");
-    size_t uploaded = 0;
 #endif
 
     *err = SCPI_RES_OK;
@@ -288,19 +288,27 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
 
         callback(param, buffer, size);
 
-#if OPTION_DISPLAY
         uploaded += size;
+
+#if OPTION_DISPLAY
         if (!eez::psu::gui::PsuAppContext::updateProgressPage(uploaded, totalSize)) {
             eez::psu::gui::PsuAppContext::hideProgressPage();
             event_queue::pushEvent(event_queue::EVENT_WARNING_FILE_UPLOAD_ABORTED);
-            if (err)
+            if (err) {
                 *err = SCPI_ERROR_FILE_TRANSFER_ABORTED;
+            }
             result = false;
             break;
         }
 #endif
 
         if (size < CHUNK_SIZE) {
+        	if (uploaded < totalSize) {
+                if (err) {
+                    *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+                }
+                result = false;
+        	}
             break;
         }
     }
