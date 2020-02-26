@@ -330,6 +330,11 @@ public:
     int getDirty();
     void set();
 
+    int getNumTrackingChannels();
+    
+    void toggleChannelTracking(int channelIndex);
+    void untrackAll();
+
     uint16_t m_trackingEnabled;
 
 private:

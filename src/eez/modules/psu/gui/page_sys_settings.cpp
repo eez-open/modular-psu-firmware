@@ -907,6 +907,24 @@ void SysSettingsTrackingPage::set() {
     }
 }
 
+int SysSettingsTrackingPage::getNumTrackingChannels() {
+    int count = 0;
+    for (int i = 0; i < CH_MAX; i++) {
+        if (m_trackingEnabled & (1 << i)) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+void SysSettingsTrackingPage::toggleChannelTracking(int channelIndex) {
+    m_trackingEnabled ^= 1 << channelIndex;
+}
+
+void SysSettingsTrackingPage::untrackAll() {
+    m_trackingEnabled = 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void SysSettingsCouplingPage::pageAlloc() {

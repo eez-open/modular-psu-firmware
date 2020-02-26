@@ -140,7 +140,7 @@ EnumItem g_triggerSourceEnumDefinition[] = {
 };
 
 EnumItem g_channelCurrentRangeSelectionModeEnumDefinition[] = {
-    { CURRENT_RANGE_SELECTION_USE_BOTH, "Best (default)" },
+    { CURRENT_RANGE_SELECTION_USE_BOTH, "Best" },
     { CURRENT_RANGE_SELECTION_ALWAYS_HIGH, "High (5A)" },
     { CURRENT_RANGE_SELECTION_ALWAYS_LOW, "Low (50mA)" },
     { 0, 0 }
@@ -2910,6 +2910,15 @@ void data_channel_tracking_is_allowed(data::DataOperationEnum operation, data::C
     if (operation == data::DATA_OPERATION_GET) {
         auto channel = Channel::get(cursor.i);
         value = channel_dispatcher::isTrackingAllowed(channel, nullptr) ? 1 : 0;
+    }
+}
+
+void data_is_multi_tracking(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        auto page = (SysSettingsTrackingPage *)getPage(PAGE_ID_SYS_SETTINGS_TRACKING);
+        if (page) {
+            value = page->getNumTrackingChannels() >= 2 ? 1 : 0;
+        }
     }
 }
 

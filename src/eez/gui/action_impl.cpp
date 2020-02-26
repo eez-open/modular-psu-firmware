@@ -632,7 +632,12 @@ void action_toggle_enable_tracking_mode_in_coupling() {
 void action_toggle_channel_tracking() {
     selectChannel();
     auto page = (SysSettingsTrackingPage *)getActivePage();
-    page->m_trackingEnabled ^= (1 << g_channel->channelIndex);
+    page->toggleChannelTracking(g_channel->channelIndex);
+}
+
+void action_untrack_all() {
+    auto page = (SysSettingsTrackingPage *)getActivePage();
+    page->untrackAll();
 }
 
 void action_sys_settings_protections_toggle_output_protection_couple() {
