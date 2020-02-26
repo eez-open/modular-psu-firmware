@@ -280,7 +280,7 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
 
     callback(param, NULL, totalSize);
 
-    const int CHUNK_SIZE = CONF_SERIAL_BUFFER_SIZE;
+    const int CHUNK_SIZE = MIN(CONF_SERIAL_BUFFER_SIZE, 512);
     uint8_t buffer[CHUNK_SIZE];
 
     while (true) {
@@ -1038,7 +1038,7 @@ static void clearTimeout(uint32_t &timeout) {
 }
 
 static void testTimeoutEvent(uint32_t &timeout, Event timeoutEvent) {
-    if (timeout && (int32_t)(timeout - millis()) >= 0) {
+    if (timeout && (int32_t)(millis() - timeout) >= 0) {
         clearTimeout(timeout);
         stateTransition(timeoutEvent);
     }
