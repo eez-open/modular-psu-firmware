@@ -554,6 +554,24 @@ void setVoltage(Channel &channel, float voltage) {
     }
 }
 
+void setVoltageStep(Channel &channel, float voltageStep) {
+    voltageStep = roundTrackingValuePrecision(UNIT_VOLT, voltageStep);
+
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        Channel::get(0).u.step = voltageStep;
+        Channel::get(1).u.step = voltageStep;
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                trackingChannel.u.step = voltageStep;
+            }
+        }
+    } else {
+        channel.u.step = voltageStep;
+    }
+}
+
 void setVoltageLimit(Channel &channel, float limit) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
         Channel::get(0).setVoltageLimit(limit / 2);
@@ -833,6 +851,24 @@ void setCurrent(Channel &channel, float current) {
         }
     } else {
         channel.setCurrent(current);
+    }
+}
+
+void setCurrentStep(Channel &channel, float currentStep) {
+    currentStep = roundTrackingValuePrecision(UNIT_AMPER, currentStep);
+
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        Channel::get(0).i.step = currentStep;
+        Channel::get(1).i.step = currentStep;
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                trackingChannel.i.step = currentStep;
+            }
+        }
+    } else {
+        channel.i.step = currentStep;
     }
 }
 
@@ -1695,6 +1731,136 @@ void setLoad(Channel &channel, float load) {
     channel.simulator.setLoad(load);
 }
 #endif
+
+const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
+    Channel &srcChannel = Channel::get(srcChannelIndex);
+    Channel &dstChannel = Channel::get(dstChannelIndex);
+
+    float voltageLimit;
+    if (srcChannel.u.limit < channel_dispatcher::getUMaxLimit(dstChannel)) {
+        voltageLimit = srcChannel.u.limit;
+    } else {
+        voltageLimit = channel_dispatcher::getUMaxLimit(dstChannel);
+    }
+
+    float currentLimit;
+    if (srcChannel.i.limit < channel_dispatcher::getIMaxLimit(dstChannel)) {
+        currentLimit = srcChannel.i.limit;
+    } else {
+        currentLimit = channel_dispatcher::getIMaxLimit(dstChannel);
+    }
+
+    float powerLimit;
+    if (srcChannel.p_limit < channel_dispatcher::getPowerMaxLimit(dstChannel)) {
+        powerLimit = srcChannel.p_limit;
+    } else {
+        powerLimit = channel_dispatcher::getPowerMaxLimit(dstChannel);
+    }
+
+    if (srcChannel.u.set > voltageLimit) {
+        return "Voltage overflow.";
+    }
+
+    if (srcChannel.i.set > currentLimit) {
+        return "Current overflow.";
+    }
+
+    if (srcChannel.u.set * srcChannel.i.set > powerLimit) {
+        return "Power overflow.";
+    }
+
+    if (
+        srcChannel.flags.rprogEnabled &&
+        (dstChannel.params.features & CH_FEATURE_RPROG) &&
+        (
+            dstChannel.flags.trackingEnabled || 
+            (dstChannel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL))
+        )
+    ) {
+        return "Can not enable remote programming.";
+    }
+
+    uint16_t dwellListLength;
+    float *dwellList = list::getDwellList(srcChannel, &dwellListLength);
+
+    uint16_t voltageListLength;
+    float *voltageList = list::getVoltageList(srcChannel, &voltageListLength);
+
+    for (int i = 0; i < voltageListLength; i++) {
+        if (voltageList[i] > channel_dispatcher::getUMaxLimit(dstChannel)) {
+            return "Voltage list value overflow.";
+        }
+    }
+
+    uint16_t currentListLength;
+    float *currentList = list::getCurrentList(srcChannel, &currentListLength);
+
+    for (int i = 0; i < currentListLength; i++) {
+        if (currentList[i] > channel_dispatcher::getIMaxLimit(dstChannel)) {
+            return "Current list value overflow.";
+        }
+    }
+
+    channel_dispatcher::outputEnable(dstChannel, false);
+
+    channel_dispatcher::setVoltage(dstChannel, srcChannel.u.set);
+    channel_dispatcher::setVoltageStep(dstChannel, srcChannel.u.step);
+    channel_dispatcher::setVoltageLimit(dstChannel, voltageLimit);
+
+    channel_dispatcher::setCurrent(dstChannel, srcChannel.i.set);
+    channel_dispatcher::setCurrentStep(dstChannel, srcChannel.i.step);
+    channel_dispatcher::setCurrentLimit(dstChannel, currentLimit);
+
+    channel_dispatcher::setPowerLimit(dstChannel, powerLimit);
+
+    channel_dispatcher::setOvpParameters(dstChannel, srcChannel.prot_conf.flags.u_type, srcChannel.prot_conf.flags.u_state, srcChannel.prot_conf.u_level, srcChannel.prot_conf.u_delay);
+    channel_dispatcher::setOcpParameters(dstChannel, srcChannel.prot_conf.flags.i_state, srcChannel.prot_conf.i_delay);
+    channel_dispatcher::setOppParameters(dstChannel, srcChannel.prot_conf.flags.p_state, srcChannel.prot_conf.p_level, srcChannel.prot_conf.p_delay);
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+    channel_dispatcher::setLoadEnabled(dstChannel, srcChannel.simulator.load_enabled);
+    channel_dispatcher::setLoad(dstChannel, srcChannel.simulator.load);
+#endif
+
+    channel_dispatcher::remoteSensingEnable(dstChannel, srcChannel.flags.senseEnabled);
+
+    if (dstChannel.params.features & CH_FEATURE_RPROG) {
+        dstChannel.flags.rprogEnabled = srcChannel.flags.rprogEnabled;
+    }
+
+    auto displayValue1 = srcChannel.flags.displayValue1;
+    auto displayValue2 = srcChannel.flags.displayValue2;
+    auto ytViewRate = srcChannel.ytViewRate;
+    if (displayValue1 == 0 && displayValue2 == 0) {
+        displayValue1 = DISPLAY_VALUE_VOLTAGE;
+        displayValue2 = DISPLAY_VALUE_CURRENT;
+    }
+    if (ytViewRate == 0) {
+        ytViewRate = GUI_YT_VIEW_RATE_DEFAULT;
+    }
+    channel_dispatcher::setDisplayViewSettings(dstChannel, displayValue1, displayValue2, ytViewRate);
+
+    channel_dispatcher::setVoltageTriggerMode(dstChannel, (TriggerMode)srcChannel.flags.voltageTriggerMode);
+    channel_dispatcher::setCurrentTriggerMode(dstChannel, (TriggerMode)srcChannel.flags.currentTriggerMode);
+    channel_dispatcher::setTriggerOutputState(dstChannel, srcChannel.flags.triggerOutputState);
+    channel_dispatcher::setTriggerOnListStop(dstChannel, (TriggerOnListStop)srcChannel.flags.triggerOnListStop);
+
+    channel_dispatcher::setTriggerVoltage(dstChannel, trigger::getVoltage(srcChannel));
+    channel_dispatcher::setTriggerCurrent(dstChannel, trigger::getCurrent(srcChannel));
+
+    channel_dispatcher::setListCount(dstChannel, list::getListCount(srcChannel));
+
+    channel_dispatcher::setCurrentRangeSelectionMode(dstChannel, (CurrentRangeSelectionMode)srcChannel.flags.currentRangeSelectionMode);
+    channel_dispatcher::enableAutoSelectCurrentRange(dstChannel, srcChannel.flags.autoSelectCurrentRange);
+
+    dstChannel.setDprogState((DprogState)srcChannel.flags.dprogState);
+
+    channel_dispatcher::setDwellList(dstChannel, dwellList, dwellListLength);
+    channel_dispatcher::setVoltageList(dstChannel, voltageList, voltageListLength);
+    channel_dispatcher::setCurrentList(dstChannel, currentList, currentListLength);
+
+    return nullptr;
+}
 
 } // namespace channel_dispatcher
 } // namespace psu

@@ -361,6 +361,34 @@ void action_edit_calibration_password() {
     editCalibrationPassword();
 }
 
+void onChannelCopyDestinationSelected(uint16_t value) {
+    popPage();
+    const char *err = channel_dispatcher::copyChannelToChannel(g_channel->channelIndex, value);
+    if (err) {
+        errorMessage("Copying is not possible!", err);
+    }
+}
+
+void channelsEnumDefinition(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    int channelIndex = cursor.i < g_channel->channelIndex ? cursor.i : cursor.i + 1;
+
+    if (operation == data::DATA_OPERATION_GET_VALUE) {
+        value = (uint8_t)channelIndex;
+    } else if (operation == data::DATA_OPERATION_GET_LABEL) {
+		if (channelIndex < CH_NUM) {
+			value = Value(channelIndex, VALUE_TYPE_CHANNEL_SHORT_LABEL_WITHOUT_COLUMN);
+		}
+    }
+}
+
+void action_ch_settings_copy() {
+    if (CH_NUM >= 3) {
+        pushSelectFromEnumPage(channelsEnumDefinition, -1, nullptr, onChannelCopyDestinationSelected, false, false);
+    } else {
+        onChannelCopyDestinationSelected(g_channel->channelIndex ? 0 : 1);
+    }
+}
+
 void action_ch_settings_calibration_wiz_start() {
     calibration_wizard::start();
 }
@@ -946,12 +974,9 @@ void themesEnumDefinition(data::DataOperationEnum operation, data::Cursor &curso
     } else if (operation == data::DATA_OPERATION_GET_LABEL) {
 		if (cursor.i < getThemesCount()) {
 			value = getThemeName(cursor.i);
-		} else {
-			value = (const char *)NULL;
 		}
     }
 }
-
 
 void onSetSelectedThemeIndex(uint16_t value) {
     popPage();

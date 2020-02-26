@@ -376,7 +376,7 @@ void ToastMessagePage::executeActionWithoutParam() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void SelectFromEnumPage::init(const data::EnumItem *enumDefinition_, uint16_t currentValue_,
-		bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t), bool smallFont_)
+		bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t), bool smallFont_, bool showRadioButtonIcon_)
 {
 	enumDefinition = enumDefinition_;
 	enumDefinitionFunc = nullptr;
@@ -384,12 +384,13 @@ void SelectFromEnumPage::init(const data::EnumItem *enumDefinition_, uint16_t cu
 	disabledCallback = disabledCallback_;
 	onSet = onSet_;
     smallFont = smallFont_;
+    showRadioButtonIcon = showRadioButtonIcon_;
 
 	init();
 }
 
 void SelectFromEnumPage::init(void (*enumDefinitionFunc_)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
-    uint16_t currentValue_, bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t), bool smallFont_)
+    uint16_t currentValue_, bool (*disabledCallback_)(uint16_t value), void (*onSet_)(uint16_t), bool smallFont_, bool showRadioButtonIcon_)
 {
 	enumDefinition = nullptr;
 	enumDefinitionFunc = enumDefinitionFunc_;
@@ -397,6 +398,7 @@ void SelectFromEnumPage::init(void (*enumDefinitionFunc_)(data::DataOperationEnu
 	disabledCallback = disabledCallback_;
 	onSet = onSet_;
     smallFont = smallFont_;
+    showRadioButtonIcon = showRadioButtonIcon_;
 
     init();
 }
@@ -408,6 +410,8 @@ void SelectFromEnumPage::init() {
         numColumns = 2;
         calcSize();
     }
+
+    activeItemIndex = -1;
 
     findPagePosition();
 }
@@ -423,15 +427,29 @@ uint16_t SelectFromEnumPage::getValue(int i) {
     return enumDefinition[i].value;
 }
 
-const char *SelectFromEnumPage::getLabel(int i) {
+bool SelectFromEnumPage::getLabel(int i, char *text, int count) {
     if (enumDefinitionFunc) {
         data::Value value;
         data::Cursor cursor(i);
         enumDefinitionFunc(data::DATA_OPERATION_GET_LABEL, cursor, value);
-        return value.getString();
+        if (value.getType() != VALUE_TYPE_NONE) {
+            if (text) {
+                value.toText(text, count);
+            }
+            return true;
+        }
+        return false;
     }
 
-    return enumDefinition[i].menuLabel;
+    if (enumDefinition[i].menuLabel) {
+        if (text) {
+            strncpy(text, enumDefinition[i].menuLabel, count - 1);
+            text[count - 1] = 0;
+        }
+        return true;
+    }
+
+    return false;
 }
 
 bool SelectFromEnumPage::isDisabled(int i) {
@@ -451,7 +469,7 @@ bool SelectFromEnumPage::calcSize() {
     char text[64];
 
     numItems = 0;
-    for (int i = 0; getLabel(i); ++i) {
+    for (int i = 0; getLabel(i, nullptr, 0); ++i) {
         ++numItems;
     }
 
@@ -513,12 +531,12 @@ void SelectFromEnumPage::refresh(const WidgetCursor& widgetCursor) {
 
     // draw labels
     char text[64];
-    for (int i = 0; getLabel(i); ++i) {
+    for (int i = 0; getLabel(i, nullptr, 0); ++i) {
         int xItem, yItem;
         getItemPosition(i, xItem, yItem);
 
         getItemLabel(i, text, sizeof(text));
-        drawText(text, -1, xItem, yItem, itemWidth, itemHeight, isDisabled(i) ? disabledItemStyle : itemStyle, false, false, false, nullptr, nullptr, nullptr, nullptr);
+        drawText(text, -1, xItem, yItem, itemWidth, itemHeight, isDisabled(i) ? disabledItemStyle : itemStyle, i == activeItemIndex, false, false, nullptr, nullptr, nullptr, nullptr);
     }
 
     dirty = false;
@@ -536,6 +554,7 @@ WidgetCursor SelectFromEnumPage::findWidget(int x, int y) {
         getItemPosition(i, xItem, yItem);
         if (!isDisabled(i)) {
         	if (x >= xItem && x < xItem + itemWidth && y >= yItem && y < yItem + itemHeight) {
+                activeItemIndex = i;
                 currentValue = getValue(i);
                 dirty = true;
 
@@ -567,17 +586,19 @@ void SelectFromEnumPage::getItemPosition(int itemIndex, int &xItem, int &yItem) 
 }
 
 void SelectFromEnumPage::getItemLabel(int itemIndex, char *text, int count) {
-    if (getValue(itemIndex) == currentValue) {
-        text[0] = (char)142;
+    if (showRadioButtonIcon) {
+        if (getValue(itemIndex) == currentValue) {
+            text[0] = (char)142;
+        } else {
+            text[0] = (char)141;
+        }
+
+        text[1] = ' ';
+
+        getLabel(itemIndex, text + 2, count - 2);
     } else {
-        text[0] = (char)141;
+        getLabel(itemIndex, text, count);
     }
-
-    text[1] = ' ';
-
-    strncpy(text + 2, getLabel(itemIndex), count - 3);
-
-    text[count - 1] = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

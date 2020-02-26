@@ -519,6 +519,10 @@ static void writeEvent(QueueEvent *event) {
         return;
     }
 
+    if (eventType >= g_filter) {
+        g_refreshEvents = true;
+    }
+
     writeToIndex(EVENT_TYPE_DEBUG, logOffset);
 
     if (eventType == EVENT_TYPE_DEBUG) {

@@ -402,7 +402,16 @@ bool compare_CHANNEL_SHORT_LABEL_value(const Value &a, const Value &b) {
 }
 
 void CHANNEL_SHORT_LABEL_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "Ch%d:", value.getUInt8());
+    snprintf(text, count - 1, "Ch%d:", value.getUInt8() + 1);
+    text[count - 1] = 0;
+}
+
+bool compare_CHANNEL_SHORT_LABEL_WITHOUT_COLUMN_value(const Value &a, const Value &b) {
+    return a.getUInt8() == b.getUInt8();
+}
+
+void CHANNEL_SHORT_LABEL_WITHOUT_COLUMN_value_to_text(const Value &value, char *text, int count) {
+    snprintf(text, count - 1, "Ch. %d", value.getUInt8() + 1);
     text[count - 1] = 0;
 }
 
@@ -917,6 +926,7 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_GREATER_THEN_MAX_FLOAT_value,
     compare_CHANNEL_LABEL_value,
     compare_CHANNEL_SHORT_LABEL_value,
+    compare_CHANNEL_SHORT_LABEL_WITHOUT_COLUMN_value,
     compare_CHANNEL_BOARD_INFO_LABEL_value,
     compare_LESS_THEN_MIN_INT_value,
     compare_LESS_THEN_MIN_TIME_ZONE_value,
@@ -969,6 +979,7 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     GREATER_THEN_MAX_FLOAT_value_to_text,
     CHANNEL_LABEL_value_to_text,
     CHANNEL_SHORT_LABEL_value_to_text,
+    CHANNEL_SHORT_LABEL_WITHOUT_COLUMN_value_to_text,
     CHANNEL_BOARD_INFO_LABEL_value_to_text,
     LESS_THEN_MIN_INT_value_to_text,
     LESS_THEN_MIN_TIME_ZONE_value_to_text,
@@ -2042,7 +2053,7 @@ void data_channel_label(data::DataOperationEnum operation, data::Cursor &cursor,
 void data_channel_short_label(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
-        value = data::Value(iChannel + 1, VALUE_TYPE_CHANNEL_SHORT_LABEL);
+        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_LABEL);
     }
 }
 
@@ -2815,6 +2826,19 @@ void data_channel_firmware_version(data::DataOperationEnum operation, data::Curs
     }
 }
 
+void data_channel_rsense_installed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+		Channel &channel = Channel::get(iChannel);
+        auto modulType = g_slots[channel.slotIndex].moduleInfo->moduleType;
+        if (modulType == MODULE_TYPE_DCP405) {
+            value = 1;
+        } else {
+            value = 0;
+        }
+    }
+}
+
 void data_channel_rsense_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
 		int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
@@ -2992,6 +3016,12 @@ void data_is_coupling_type_common_gnd(data::DataOperationEnum operation, data::C
 void data_is_coupling_type_split_rails(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS ? 1 : 0;
+    }
+}
+
+void data_channel_copy_available(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = CH_NUM >= 2 ? 1 : 0;
     }
 }
 

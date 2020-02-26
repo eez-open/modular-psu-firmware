@@ -71,12 +71,8 @@ public:
 
     bool isActivePageInternal();
 
-    void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,
-                                bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t),
-                                bool smallFont);
-    void pushSelectFromEnumPage(void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), 
-                                uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t),
-                                bool smallFont);
+    void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont, bool showRadioButtonIcon);
+    void pushSelectFromEnumPage(void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont, bool showRadioButtonIcon);
 
     void replacePage(int pageId, Page *page = nullptr);
 

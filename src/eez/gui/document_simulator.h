@@ -369,7 +369,9 @@ enum DataEnum {
     DATA_ID_DATE_TIME_FORMAT_IS_DMY = 367,
     DATA_ID_DATE_TIME_FORMAT_IS_24H = 368,
     DATA_ID_DATE_TIME_AM_PM = 369,
-    DATA_ID_IS_MULTI_TRACKING = 370
+    DATA_ID_IS_MULTI_TRACKING = 370,
+    DATA_ID_CHANNEL_COPY_AVAILABLE = 371,
+    DATA_ID_CHANNEL_RSENSE_INSTALLED = 372
 };
 
 void data_none(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -743,6 +745,8 @@ void data_date_time_format_is_dmy(DataOperationEnum operation, Cursor &cursor, V
 void data_date_time_format_is_24h(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_date_time_am_pm(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_is_multi_tracking(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_channel_copy_available(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_channel_rsense_installed(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -972,7 +976,8 @@ enum ActionsEnum {
     ACTION_ID_DATE_TIME_SELECT_FORMAT = 220,
     ACTION_ID_DATE_TIME_TOGGLE_AM_PM = 221,
     ACTION_ID_EDIT_NO_FOCUS = 222,
-    ACTION_ID_UNTRACK_ALL = 223
+    ACTION_ID_UNTRACK_ALL = 223,
+    ACTION_ID_CH_SETTINGS_COPY = 224
 };
 
 void action_channel_toggle_output();
@@ -1198,6 +1203,7 @@ void action_date_time_select_format();
 void action_date_time_toggle_am_pm();
 void action_edit_no_focus();
 void action_untrack_all();
+void action_ch_settings_copy();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -1599,7 +1605,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[394367];
+extern const uint8_t assets[394904];
 #else
-extern const uint8_t assets[3865036];
+extern const uint8_t assets[3866388];
 #endif

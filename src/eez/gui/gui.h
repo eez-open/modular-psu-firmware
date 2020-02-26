@@ -82,10 +82,8 @@ int getActivePageId();
 Page *getActivePage();
 Page *getPage(int pageId);
 bool isPageOnStack(int pageId);
-void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue,
-                            bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont = false);
-void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
-	                        uint16_t currentValue, bool(*disabledCallback)(uint16_t value), void(*onSet)(uint16_t), bool smallFont = false); 
+void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont = false, bool showRadioButtonIcon = true);
+void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), uint16_t currentValue, bool(*disabledCallback)(uint16_t value), void(*onSet)(uint16_t), bool smallFont = false, bool showRadioButtonIcon = true);
 bool isPageInternal(int pageId);
 void executeAction(int actionId);
 

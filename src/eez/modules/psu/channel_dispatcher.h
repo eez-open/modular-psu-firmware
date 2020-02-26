@@ -57,6 +57,7 @@ float getUMaxOvpLimit(const Channel &channel);
 float getUMaxOvpLevel(const Channel &channel);
 float getUProtectionLevel(const Channel &channel);
 void setVoltage(Channel &channel, float voltage);
+void setVoltageStep(Channel &channel, float voltageStep);
 void setVoltageLimit(Channel &channel, float limit);
 void setOvpParameters(Channel &channel, int type, int state, float level, float delay);
 void setOvpState(Channel &channel, int state);
@@ -75,6 +76,7 @@ float getIMin(const Channel &channel);
 float getIDef(const Channel &channel);
 float getIMax(const Channel &channel);
 void setCurrent(Channel &channel, float current);
+void setCurrentStep(Channel &channel, float currentStep);
 void setCurrentLimit(Channel &channel, float limit);
 void setOcpParameters(Channel &channel, int state, float delay);
 void setOcpState(Channel &channel, int state);
@@ -155,6 +157,8 @@ void setLoad(Channel &channel, float load);
 
 void setVoltageInPsuThread(int channelIndex);
 void setCurrentInPsuThread(int channelIndex);
+
+const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex);
 
 } // namespace channel_dispatcher
 } // namespace psu
