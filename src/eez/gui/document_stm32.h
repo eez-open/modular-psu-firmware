@@ -1576,7 +1576,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[304458];
+extern const uint8_t assets[304457];
 #else
 extern const uint8_t assets[1321252];
 #endif

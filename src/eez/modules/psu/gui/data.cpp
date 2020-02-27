@@ -212,12 +212,12 @@ EnumItem g_userSwitchActionEnumDefinition[] = {
 };
 
 EnumItem g_fileManagerSortByEnumDefinition[] = {
-	{ SORT_FILES_BY_NAME_ASC, "Name \xaa" },
-    { SORT_FILES_BY_NAME_DESC, "Name \xab" },
-    { SORT_FILES_BY_SIZE_ASC, "Size \xac" },
-    { SORT_FILES_BY_SIZE_DESC, "Size \xad" },
-    { SORT_FILES_BY_TIME_ASC, "Time \xae" },
-    { SORT_FILES_BY_TIME_DESC, "Time \xaf" },
+	{ SORT_FILES_BY_NAME_ASC,  "\xaa Name" },
+    { SORT_FILES_BY_NAME_DESC, "\xab Name" },
+    { SORT_FILES_BY_SIZE_ASC,  "\xac Size" },
+    { SORT_FILES_BY_SIZE_DESC, "\xad Size" },
+    { SORT_FILES_BY_TIME_ASC,  "\xae Time" },
+    { SORT_FILES_BY_TIME_DESC, "\xaf Time" },
     { 0, 0 }
 };
 
@@ -912,6 +912,19 @@ void STORAGE_INFO_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+bool compare_FOLDER_INFO_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void FOLDER_INFO_value_to_text(const Value &value, char *text, int count) {
+    if (value.getUInt32() == 1) {
+        strncpy(text, "1 item", count - 1);
+    } else {
+        snprintf(text, count - 1, "%u items", value.getUInt32());
+    }
+    text[count - 1] = 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 } // namespace gui
@@ -972,6 +985,7 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_TEST_RESULT_value,
     compare_SCPI_ERROR_value,
     compare_STORAGE_INFO_value,
+    compare_FOLDER_INFO_value,
 };
 
 ValueToTextFunction g_userValueToTextFunctions[] = { 
@@ -1025,6 +1039,7 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     TEST_RESULT_value_to_text,
     SCPI_ERROR_value_to_text,
     STORAGE_INFO_value_to_text,
+    FOLDER_INFO_value_to_text,
 };
 
 } // namespace data
@@ -5333,7 +5348,7 @@ void data_file_manager_storage_info(data::DataOperationEnum operation, data::Cur
 
 void data_file_manager_sort_files_option(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = file_managergetSortFilesOption();
+        value = file_manager::getSortFilesOption();
     }
 }
 

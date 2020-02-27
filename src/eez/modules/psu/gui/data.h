@@ -98,6 +98,7 @@ enum UserValueType {
     VALUE_TYPE_TEST_RESULT,
     VALUE_TYPE_SCPI_ERROR,
     VALUE_TYPE_STORAGE_INFO,
+    VALUE_TYPE_FOLDER_INFO,
 };
 
 Value MakeValue(float value, Unit unit);

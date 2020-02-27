@@ -263,7 +263,7 @@ State getState() {
 }
 
 bool isRootDirectory() {
-    return g_currentDirectory[0] == 0;
+    return g_currentDirectory[0] == 0 || strcmp(g_currentDirectory, "/") == 0;
 }
 
 void goToParentDirectory() {
@@ -723,8 +723,12 @@ bool isStorageAlarm() {
 }
 
 void getStorageInfo(Value& value) {
-    if (!g_fileBrowserMode && g_state == STATE_READY && (isStorageAlarm() || !*g_currentDirectory || strcmp(g_currentDirectory, "/") == 0)) {
-        value = Value(psu::sd_card::getInfoVersion(), VALUE_TYPE_STORAGE_INFO);
+    if (!g_fileBrowserMode && g_state == STATE_READY) {
+        if (isStorageAlarm() || isRootDirectory()) {
+            value = Value(psu::sd_card::getInfoVersion(), VALUE_TYPE_STORAGE_INFO);
+        } else {
+            value = Value(g_filesCount, VALUE_TYPE_FOLDER_INFO);
+        }
     }
 }
 
