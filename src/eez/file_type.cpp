@@ -27,6 +27,7 @@ namespace eez {
 
 static const char *fileTypeExtension[] = {
     nullptr,
+    nullptr,
     LIST_EXT,
     PROFILE_EXT,
     ".dlog",
@@ -37,6 +38,7 @@ static const char *fileTypeExtension[] = {
 };
 
 static const char *scpiFileTypeNames[] = {
+    nullptr,
     "FOLD",
     "LIST",
     "PROF",

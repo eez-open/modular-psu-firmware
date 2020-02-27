@@ -24,6 +24,7 @@
 #include <eez/system.h>
 #include <eez/sound.h>
 #include <eez/index.h>
+#include <eez/mqtt.h>
 
 #include <eez/gui/gui.h>
 
@@ -248,6 +249,14 @@ void action_show_sys_settings_serial() {
 
 void action_show_sys_settings_ethernet() {
     pushPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
+}
+
+void action_show_sys_settings_ethernet_error() {
+    if (persist_conf::devConf.mqttEnabled && mqtt::g_connectionState == mqtt::CONNECTION_STATE_ERROR) {
+        pushPage(PAGE_ID_SYS_SETTINGS_MQTT);
+    } else {
+        pushPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
+    }
 }
 
 void action_show_sys_settings_protections() {

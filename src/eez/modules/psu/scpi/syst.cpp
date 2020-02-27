@@ -531,7 +531,7 @@ scpi_result_t scpi_cmd_systemChannelModelQ(scpi_t *context) {
 
     if (channel->isInstalled()) {
         auto &slot = g_slots[channel->slotIndex];
-        char text[100];
+        char text[50];
         sprintf(text, "%s_R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
         SCPI_ResultText(context, text);
     } else {

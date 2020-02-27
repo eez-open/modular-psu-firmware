@@ -456,10 +456,6 @@ static void refreshEvents() {
         g_numEvents = file.size() / 4;
         file.close();
     }
-
-    if (g_numEvents == 0) {
-        pushEvent(EVENT_INFO_WELCOME);
-    }
 }
 
 static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {

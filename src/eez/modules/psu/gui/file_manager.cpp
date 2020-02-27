@@ -315,7 +315,7 @@ bool isDirectory(uint32_t fileIndex) {
 
 FileType getFileType(uint32_t fileIndex) {
     auto fileItem = getFileItem(fileIndex);
-    return fileItem ? fileItem->type : FILE_TYPE_OTHER;
+    return fileItem ? fileItem->type : FILE_TYPE_NONE;
 }
 
 const char *getFileName(uint32_t fileIndex) {

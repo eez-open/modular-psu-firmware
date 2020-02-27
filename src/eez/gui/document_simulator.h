@@ -977,7 +977,8 @@ enum ActionsEnum {
     ACTION_ID_DATE_TIME_TOGGLE_AM_PM = 221,
     ACTION_ID_EDIT_NO_FOCUS = 222,
     ACTION_ID_UNTRACK_ALL = 223,
-    ACTION_ID_CH_SETTINGS_COPY = 224
+    ACTION_ID_CH_SETTINGS_COPY = 224,
+    ACTION_ID_SHOW_SYS_SETTINGS_ETHERNET_ERROR = 225
 };
 
 void action_channel_toggle_output();
@@ -1204,6 +1205,7 @@ void action_date_time_toggle_am_pm();
 void action_edit_no_focus();
 void action_untrack_all();
 void action_ch_settings_copy();
+void action_show_sys_settings_ethernet_error();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -1605,7 +1607,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[394904];
+extern const uint8_t assets[396147];
 #else
-extern const uint8_t assets[3866388];
+extern const uint8_t assets[3869828];
 #endif

@@ -68,7 +68,7 @@ using namespace psu;
 
 namespace mqtt {
 
-static const uint32_t RECONNECT_AFTER_ERROR_MS = 1000;
+static const uint32_t RECONNECT_AFTER_ERROR_MS = 10000;
 static const uint32_t CONF_DNS_TIMEOUT_MS = 10000;
 static const uint32_t CONF_STARTING_TIMEOUT_MS = 2000; // wait a acouple of seconds, after ethernet is ready, before starting MQTT connect 
 
@@ -82,6 +82,7 @@ static const char *PUB_TOPIC_SYSTEM_TOTAL_ONTIME = "%s/system/total_ontime";
 static const char *PUB_TOPIC_SYSTEM_LAST_ONTIME = "%s/system/last_ontime";
 static const char *PUB_TOPIC_SYSTEM_FAN_STATUS = "%s/system/fan";
 
+static const char *PUB_TOPIC_DCPSUPPLY_MODEL = "%s/dcpsupply/ch/%d/model";
 static const char *PUB_TOPIC_DCPSUPPLY_OE = "%s/dcpsupply/ch/%d/oe";
 static const char *PUB_TOPIC_DCPSUPPLY_U_SET = "%s/dcpsupply/ch/%d/uset";
 static const char *PUB_TOPIC_DCPSUPPLY_I_SET = "%s/dcpsupply/ch/%d/iset";
@@ -128,6 +129,8 @@ struct {
 } g_eventQueue;
 
 static struct {
+    bool modelPublished;
+
     int oe;
 
     float uSet;
@@ -473,6 +476,13 @@ bool publish(int channelIndex, const char *pubTopic, float value, bool retain) {
     return publish(topic, payload, retain);
 }
 
+bool publish(int channelIndex, const char *pubTopic, char *payload, bool retain) {
+    char topic[MAX_PUB_TOPIC_LENGTH + 1];
+    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
+
+    return publish(topic, payload, retain);
+}
+
 bool publishOnTimeCounter(int channelIndex, const char *pubTopic, uint32_t value, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
     sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
@@ -523,6 +533,7 @@ void setState(ConnectionState connectionState) {
 #endif
 
         for(int i = 0; i < CH_NUM; i++) {
+            g_channelStates[i].modelPublished = false;
             g_channelStates[i].oe = -1;
             g_channelStates[i].uSet = NAN;
             g_channelStates[i].iSet = NAN;
@@ -650,6 +661,15 @@ void tick() {
             int oe = channel.isOutputEnabled() ? 1 : 0;
 
             if (g_lastValueIndex == 0) {
+                if (!g_channelStates[channelIndex].modelPublished) {
+                    char moduleInfo[50];
+                    auto &slot = g_slots[channel.slotIndex];
+                    sprintf(moduleInfo, "%s_R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+                    if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_MODEL, moduleInfo, true)) {
+                        g_channelStates[channelIndex].modelPublished = true;
+                    }
+                }
+
                 if (oe != g_channelStates[channelIndex].oe) {
                     if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_OE, oe, true)) {
                         g_channelStates[channelIndex].oe = oe;

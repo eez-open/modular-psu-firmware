@@ -21,6 +21,7 @@
 namespace eez {
 
 enum FileType {
+    FILE_TYPE_NONE,
     FILE_TYPE_DIRECTORY,
     FILE_TYPE_LIST,
     FILE_TYPE_PROFILE,

@@ -3546,7 +3546,24 @@ void data_ethernet_enabled(data::DataOperationEnum operation, data::Cursor &curs
 void data_ethernet_status(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
 #if OPTION_ETHERNET
     if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(ethernet::g_testResult);
+        if (
+            ethernet::g_testResult == TEST_CONNECTING ||
+            (
+                persist_conf::devConf.mqttEnabled &&
+                (
+                    mqtt::g_connectionState == mqtt::CONNECTION_STATE_STARTING || 
+                    mqtt::g_connectionState == mqtt::CONNECTION_STATE_DNS_IN_PROGRESS ||
+                    mqtt::g_connectionState == mqtt::CONNECTION_STATE_DNS_FOUND ||
+                    mqtt::g_connectionState == mqtt::CONNECTION_STATE_CONNECTING
+                )
+            )
+        ) {
+            value = data::Value(TEST_CONNECTING);
+        } else if (ethernet::g_testResult == TEST_FAILED || (persist_conf::devConf.mqttEnabled && mqtt::g_connectionState == mqtt::CONNECTION_STATE_ERROR)) {
+            value = data::Value(TEST_FAILED);
+        } else {
+            value = data::Value(ethernet::g_testResult);
+        }
     }
 #endif
 }
@@ -5207,7 +5224,7 @@ void data_file_manager_is_root_directory(data::DataOperationEnum operation, data
 
 void data_file_manager_files(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
-        value = (int)file_manager::getFilesCount();
+        value = (int)MAX(file_manager::getFilesCount(), file_manager::getFilesPageSize());
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
         value = Value(file_manager::getFilesCount(), VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
