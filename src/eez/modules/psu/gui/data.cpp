@@ -212,12 +212,12 @@ EnumItem g_userSwitchActionEnumDefinition[] = {
 };
 
 EnumItem g_fileManagerSortByEnumDefinition[] = {
-	{ SORT_FILES_BY_NAME_ASC, "Name \xa5" },
-    { SORT_FILES_BY_NAME_DESC, "Name \xa6" },
-    { SORT_FILES_BY_SIZE_ASC, "Size \xa5" },
-    { SORT_FILES_BY_SIZE_DESC, "Size \xa6" },
-    { SORT_FILES_BY_TIME_ASC, "Time \xa5" },
-    { SORT_FILES_BY_TIME_DESC, "Time \xa6" },
+	{ SORT_FILES_BY_NAME_ASC, "Name \xaa" },
+    { SORT_FILES_BY_NAME_DESC, "Name \xab" },
+    { SORT_FILES_BY_SIZE_ASC, "Size \xac" },
+    { SORT_FILES_BY_SIZE_DESC, "Size \xad" },
+    { SORT_FILES_BY_TIME_ASC, "Time \xae" },
+    { SORT_FILES_BY_TIME_DESC, "Time \xaf" },
     { 0, 0 }
 };
 
@@ -5328,6 +5328,12 @@ void data_file_manager_storage_alarm(data::DataOperationEnum operation, data::Cu
 void data_file_manager_storage_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         file_manager::getStorageInfo(value);
+    }
+}
+
+void data_file_manager_sort_files_option(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = file_managergetSortFilesOption();
     }
 }
 
