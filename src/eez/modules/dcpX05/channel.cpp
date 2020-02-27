@@ -765,7 +765,7 @@ struct Channel : ChannelInterface {
 	}
     
 	void getSerial(char *text) {
-		strcpy(text, "000000000000000000000000");
+		strcpy(text, "N/A");
 	}
 };
 

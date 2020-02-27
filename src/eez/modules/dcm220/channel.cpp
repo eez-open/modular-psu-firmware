@@ -574,9 +574,13 @@ struct Channel : ChannelInterface {
 	}
     
 	void getSerial(char *text) {
+#if defined(EEZ_PLATFORM_STM32)		
 		sprintf(text, "%08X", (unsigned int)idw0);
 		sprintf(text + 8, "%08X", (unsigned int)idw1);
 		sprintf(text + 16, "%08X", (unsigned int)idw2);
+#else
+		strcpy(text, "N/A");
+#endif
 	}
 };
 
