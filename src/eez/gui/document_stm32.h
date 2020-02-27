@@ -364,7 +364,9 @@ enum DataEnum {
     DATA_ID_IS_MULTI_TRACKING = 362,
     DATA_ID_CHANNEL_COPY_AVAILABLE = 363,
     DATA_ID_CHANNEL_RSENSE_INSTALLED = 364,
-    DATA_ID_FILE_MANAGER_SORT_FILES_OPTION = 365
+    DATA_ID_FILE_MANAGER_SORT_FILES_OPTION = 365,
+    DATA_ID_CHANNEL_INFO_BRAND = 366,
+    DATA_ID_CHANNEL_INFO_SERIAL = 367
 };
 
 void data_none(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -733,6 +735,8 @@ void data_is_multi_tracking(DataOperationEnum operation, Cursor &cursor, Value &
 void data_channel_copy_available(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_channel_rsense_installed(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_file_manager_sort_files_option(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_channel_info_brand(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_channel_info_serial(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -1576,7 +1580,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[304457];
+extern const uint8_t assets[304453];
 #else
 extern const uint8_t assets[1321252];
 #endif

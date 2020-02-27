@@ -1618,5 +1618,14 @@ void Channel::getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) {
     channelInterface->getFirmwareVersion(majorVersion, minorVersion);
 }
 
+const char *Channel::getBrand() {
+    return channelInterface->getBrand();
+}
+
+void Channel::getSerial(char *text) {
+    channelInterface->getSerial(text);
+}
+
+
 } // namespace psu
 } // namespace eez

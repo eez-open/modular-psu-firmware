@@ -253,6 +253,7 @@
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:PROGram?", scpi_cmd_systemChannelInformationProgramQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:VOLTage?", scpi_cmd_systemChannelInformationVoltageQ) \
     SCPI_COMMAND("SYSTem:CHANnel:MODel?", scpi_cmd_systemChannelModelQ) \
+    SCPI_COMMAND("SYSTem:CHANnel:SERial?", scpi_cmd_systemChannelSerialQ) \
     SCPI_COMMAND("SYSTem:CHANnel[:COUNt]?", scpi_cmd_systemChannelCountQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:ENABle", scpi_cmd_systemCommunicateEnable) \
     SCPI_COMMAND("SYSTem:COMMunicate:ENABle?", scpi_cmd_systemCommunicateEnableQ) \

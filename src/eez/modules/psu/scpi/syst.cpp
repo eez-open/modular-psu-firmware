@@ -541,6 +541,23 @@ scpi_result_t scpi_cmd_systemChannelModelQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_systemChannelSerialQ(scpi_t *context) {
+    Channel *channel = param_channel(context, false, true);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (channel->isInstalled()) {
+        char text[50];
+        channel->getSerial(text);
+        SCPI_ResultText(context, text);
+    } else {
+        SCPI_ResultText(context, "None");
+    }
+
+    return SCPI_RES_OK;
+}
+
 scpi_result_t scpi_cmd_systemCpuInformationTypeQ(scpi_t *context) {
     SCPI_ResultText(context, getCpuType());
     return SCPI_RES_OK;

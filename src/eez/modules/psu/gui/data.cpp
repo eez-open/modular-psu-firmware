@@ -920,9 +920,18 @@ void FOLDER_INFO_value_to_text(const Value &value, char *text, int count) {
     if (value.getUInt32() == 1) {
         strncpy(text, "1 item", count - 1);
     } else {
-        snprintf(text, count - 1, "%u items", value.getUInt32());
+        snprintf(text, count - 1, "%lu items ", value.getUInt32());
     }
     text[count - 1] = 0;
+}
+
+bool compare_CHANNEL_INFO_SERIAL_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void CHANNEL_INFO_SERIAL_value_to_text(const Value &value, char *text, int count) {
+    auto &channel = Channel::get(value.getInt());
+    channel.getSerial(text);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -986,6 +995,7 @@ CompareValueFunction g_compareUserValueFunctions[] = {
     compare_SCPI_ERROR_value,
     compare_STORAGE_INFO_value,
     compare_FOLDER_INFO_value,
+    compare_CHANNEL_INFO_SERIAL_value
 };
 
 ValueToTextFunction g_userValueToTextFunctions[] = { 
@@ -1040,6 +1050,7 @@ ValueToTextFunction g_userValueToTextFunctions[] = {
     SCPI_ERROR_value_to_text,
     STORAGE_INFO_value_to_text,
     FOLDER_INFO_value_to_text,
+    CHANNEL_INFO_SERIAL_value_to_text
 };
 
 } // namespace data
@@ -2104,6 +2115,21 @@ void data_channel_long_title(data::DataOperationEnum operation, data::Cursor &cu
     if (operation == data::DATA_OPERATION_GET) {
         int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
         value = data::Value(iChannel, VALUE_TYPE_CHANNEL_LONG_TITLE);
+    }
+}
+
+void data_channel_info_brand(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        auto &channel = Channel::get(iChannel);
+        value = channel.getBrand();
+    }
+}
+
+void data_channel_info_serial(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_INFO_SERIAL);
     }
 }
 

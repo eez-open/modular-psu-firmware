@@ -99,6 +99,7 @@ enum UserValueType {
     VALUE_TYPE_SCPI_ERROR,
     VALUE_TYPE_STORAGE_INFO,
     VALUE_TYPE_FOLDER_INFO,
+    VALUE_TYPE_CHANNEL_INFO_SERIAL,
 };
 
 Value MakeValue(float value, Unit unit);

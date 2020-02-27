@@ -545,6 +545,8 @@ class Channel {
     void setDprogState(DprogState dprogState);
 
     void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion);
+    const char *getBrand();
+    void getSerial(char *text);
 
   private:
     bool delayLowRippleCheck;

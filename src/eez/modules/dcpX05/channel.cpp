@@ -759,6 +759,14 @@ struct Channel : ChannelInterface {
 		majorVersion = 0;
 		minorVersion = 0;
 	}
+
+    const char *getBrand() {
+		return "Envox";
+	}
+    
+	void getSerial(char *text) {
+		strcpy(text, "000000000000000000000000");
+	}
 };
 
 static Channel g_channel0(0);

@@ -16,14 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+#include <string.h>
+
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
 #include <crc.h>
 #include <eez/platform/stm32/spi.h>
 #include <memory.h>
-#include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 #endif
 
 #include <eez/modules/dcpX05/channel.h>
@@ -66,15 +67,15 @@ namespace dcm220 {
 static GPIO_TypeDef *SPI_IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
 static const uint16_t SPI_IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
 
-bool masterSynchro(int slotIndex, uint8_t &firmwareMajorVersion, uint8_t &firmwareMinorVersion) {
+bool masterSynchro(int slotIndex, uint8_t &firmwareMajorVersion, uint8_t &firmwareMinorVersion, uint32_t &idw0, uint32_t &idw1, uint32_t &idw2) {
 	uint32_t start = millis();
 
-    uint8_t txBuffer[3] = { SPI_MASTER_SYNBYTE, 0, 0 };
-    uint8_t rxBuffer[3] = { 0, 0, 0 };
+    uint8_t txBuffer[15] = { SPI_MASTER_SYNBYTE, 0, 0 };
+    uint8_t rxBuffer[15] = { 0, 0, 0 };
 
 	while (true) {
 	    spi::select(slotIndex, spi::CHIP_DCM220);
-	    spi::transfer(slotIndex, txBuffer, rxBuffer, 3);
+	    spi::transfer(slotIndex, txBuffer, rxBuffer, sizeof(rxBuffer));
 	    spi::deselect(slotIndex);
 
 	    if (rxBuffer[0] == SPI_SLAVE_SYNBYTE) {
@@ -83,6 +84,9 @@ bool masterSynchro(int slotIndex, uint8_t &firmwareMajorVersion, uint8_t &firmwa
 				if (HAL_GPIO_ReadPin(SPI_IRQ_GPIO_Port[slotIndex], SPI_IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
 					firmwareMajorVersion = rxBuffer[1];
 					firmwareMinorVersion = rxBuffer[2];
+					idw0 = (rxBuffer[3] << 24) | (rxBuffer[4] << 16) | (rxBuffer[5] << 8) | rxBuffer[6];
+					idw1 = (rxBuffer[7] << 24) | (rxBuffer[8] << 16) | (rxBuffer[9] << 8) | rxBuffer[10];
+					idw2 = (rxBuffer[11] << 24) | (rxBuffer[12] << 16) | (rxBuffer[13] << 8) | rxBuffer[14];
 					return true;
 				}
 
@@ -156,6 +160,9 @@ struct Channel : ChannelInterface {
 
 	uint8_t firmwareMajorVersion = 0;
 	uint8_t firmwareMinorVersion = 0;
+	uint32_t idw0 = 0;
+	uint32_t idw1 = 0;
+	uint32_t idw2 = 0;
 
     Channel(int slotIndex_)
 		: ChannelInterface(slotIndex_)
@@ -259,7 +266,7 @@ struct Channel : ChannelInterface {
 	void init(int subchannelIndex) {
 #if defined(EEZ_PLATFORM_STM32)
 		if (!synchronized && subchannelIndex == 0) {
-			if (masterSynchro(slotIndex, firmwareMajorVersion, firmwareMinorVersion)) {
+			if (masterSynchro(slotIndex, firmwareMajorVersion, firmwareMinorVersion, idw0, idw1, idw2)) {
 	    		//DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)firmwareMajorVersion, (int)firmwareMinorVersion);
 				synchronized = true;
 				numCrcErrors = 0;
@@ -267,6 +274,9 @@ struct Channel : ChannelInterface {
 				event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
 			    firmwareMinorVersion = 0;
 			    firmwareMajorVersion = 0;
+				idw0 = 0;
+				idw1 = 0;
+				idw2 = 0;
 			}
 		}
 #endif
@@ -274,6 +284,9 @@ struct Channel : ChannelInterface {
 #if defined(EEZ_PLATFORM_SIMULATOR)
         firmwareMajorVersion = 1;
 		firmwareMinorVersion = 0;
+		idw0 = 0;
+		idw1 = 0;
+		idw2 = 0;
 #endif
     }
 
@@ -554,6 +567,16 @@ struct Channel : ChannelInterface {
 	void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) {
 		majorVersion = firmwareMajorVersion;
 		minorVersion = firmwareMinorVersion;
+	}
+
+    const char *getBrand() {
+		return "Envox";
+	}
+    
+	void getSerial(char *text) {
+		sprintf(text, "%08X", (unsigned int)idw0);
+		sprintf(text + 8, "%08X", (unsigned int)idw1);
+		sprintf(text + 16, "%08X", (unsigned int)idw2);
 	}
 };
 

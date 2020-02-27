@@ -537,11 +537,11 @@ void uploadHexFile() {
 	file.close();
 
 Exit:
-	leaveBootloaderMode();
-
 #if OPTION_DISPLAY
     eez::psu::gui::g_psuAppContext.hideProgressPage();
 #endif
+
+	leaveBootloaderMode();
 
 	if (!eofReached) {
 		gui::errorMessage("Downloading failed!");

@@ -175,6 +175,8 @@ struct ChannelInterface {
     virtual void onSpiIrq();
 
     virtual void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) = 0;
+    virtual const char *getBrand() = 0;
+    virtual void getSerial(char *text) = 0;
 
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     virtual int getIoExpBitDirection(int subchannelIndex, int io_bit);
