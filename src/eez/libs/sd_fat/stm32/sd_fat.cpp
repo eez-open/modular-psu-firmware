@@ -179,27 +179,9 @@ int File::read() {
 }
 
 int File::read(void *buf, uint32_t nbyte) {
-    static const uint32_t CHUNK_SIZE = 512;
-
-    UINT brTotal = 0;
-
-    for (uint32_t i = 0; i < nbyte; i += CHUNK_SIZE) {
-        uint32_t n = MIN(CHUNK_SIZE, nbyte - i);
-
-        UINT br;
-
-        if (f_read(&m_file, (uint8_t *)buf + i, n, &br) != FR_OK) {
-            return 0;
-        }
-
-        brTotal += br;
-
-        if (br < n) {
-            break;
-        }
-    }
-
-    return brTotal;
+    UINT br;
+    auto result = f_read(&m_file, buf, nbyte, &br);
+    return result == FR_OK ? br : 0;
 }
 
 size_t File::write(const uint8_t *buf, size_t size) {
