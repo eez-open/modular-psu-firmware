@@ -23,6 +23,7 @@
 #if defined(EEZ_PLATFORM_STM32)
 #include <api.h>
 #include <mqtt.h>
+#include <mqtt_priv.h>
 #include <ip_addr.h>
 #include <dns.h>
 #endif

@@ -25,7 +25,7 @@
 #include "main.h"
 
 /*-----------------------------------------------------------------------------*/
-/* Current version of LwIP supported by CubeMx: 2.0.3 -*/
+/* Current version of LwIP supported by CubeMx: 2.1.2 -*/
 /*-----------------------------------------------------------------------------*/
 
 /* Within 'USER CODE' section, code will be kept by default at each generation */
@@ -79,7 +79,7 @@ void sntpSetSystemTimeUs(uint32_t t, uint32_t us);
 /*----- Value in opt.h for TCPIP_THREAD_STACKSIZE: 0 -----*/
 #define TCPIP_THREAD_STACKSIZE 1024
 /*----- Value in opt.h for TCPIP_THREAD_PRIO: 1 -----*/
-#define TCPIP_THREAD_PRIO 3
+#define TCPIP_THREAD_PRIO osPriorityNormal
 /*----- Value in opt.h for TCPIP_MBOX_SIZE: 0 -----*/
 #define TCPIP_MBOX_SIZE 6
 /*----- Value in opt.h for SLIPIF_THREAD_STACKSIZE: 0 -----*/

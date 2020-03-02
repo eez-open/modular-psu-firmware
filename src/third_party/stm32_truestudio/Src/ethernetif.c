@@ -28,6 +28,7 @@
 #include "ethernetif.h"
 #include <string.h>
 #include "cmsis_os.h"
+#include "lwip/tcpip.h"
 /* Within 'USER CODE' section, code will be kept by default at each generation */
 /* USER CODE BEGIN 0 */
 /* USER CODE END 0 */
@@ -35,8 +36,10 @@
 /* Private define ------------------------------------------------------------*/
 /* The time to block waiting for input. */
 #define TIME_WAITING_FOR_INPUT ( portMAX_DELAY )
+/* USER CODE BEGIN OS_THREAD_STACK_SIZE_WITH_RTOS */
 /* Stack size of the interface thread */
 #define INTERFACE_THREAD_STACK_SIZE ( 350 )
+/* USER CODE END OS_THREAD_STACK_SIZE_WITH_RTOS */
 /* Network interface name */
 #define IFNAME0 's'
 #define IFNAME1 't'
@@ -349,8 +352,10 @@ static void low_level_init(struct netif *netif)
   s_xSemaphore = osSemaphoreCreate(osSemaphore(SEM), 1);
 
 /* create the task that handles the ETH_MAC */
+/* USER CODE BEGIN OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
   osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
   osThreadCreate (osThread(EthIf), netif);
+/* USER CODE END OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */  
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
 
@@ -501,6 +506,7 @@ static struct pbuf * low_level_input(struct netif *netif)
 
   /* get received frame */
   if (HAL_ETH_GetReceivedFrame_IT(&heth) != HAL_OK)
+  
     return NULL;
   
   /* Obtain the size of the packet and put it into the "len" variable. */
@@ -586,6 +592,7 @@ void ethernetif_input(void const * argument)
     {
       do
       {   
+        LOCK_TCPIP_CORE();
         p = low_level_input( netif );
         if   (p != NULL)
         {
@@ -594,6 +601,7 @@ void ethernetif_input(void const * argument)
             pbuf_free(p);
           }
         }
+        UNLOCK_TCPIP_CORE();
       } while(p!=NULL);
     }
   }
