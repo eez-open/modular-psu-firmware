@@ -280,7 +280,7 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
 
     callback(param, NULL, totalSize);
 
-    const int CHUNK_SIZE = MIN(CONF_SERIAL_BUFFER_SIZE, 512);
+    const int CHUNK_SIZE = CONF_SERIAL_BUFFER_SIZE;
     uint8_t buffer[CHUNK_SIZE];
 
     while (true) {

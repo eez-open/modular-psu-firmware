@@ -279,6 +279,7 @@ void goToParentDirectory() {
 
     *p = 0;
 
+    g_filesStartPosition = 0;
     loadDirectory();
 }
 
@@ -347,6 +348,7 @@ void selectFile(uint32_t fileIndex) {
         if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) <= MAX_PATH_LENGTH) {
             strcat(g_currentDirectory, "/");
             strcat(g_currentDirectory, fileItem->name);
+            g_filesStartPosition = 0;
             loadDirectory();
         }
     } else {
