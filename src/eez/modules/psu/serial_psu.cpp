@@ -22,8 +22,6 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/serial_psu.h>
 
-#define CONF_CHUNK_SIZE CONF_SERIAL_BUFFER_SIZE
-
 namespace eez {
 
 using namespace scpi;

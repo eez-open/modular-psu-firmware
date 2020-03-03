@@ -364,11 +364,11 @@ int File::read() {
     return getc(m_fp);
 }
 
-int File::read(void *buf, uint32_t nbyte) {
+size_t File::read(void *buf, uint32_t nbyte) {
     return fread(buf, 1, nbyte, m_fp);
 }
 
-size_t File::write(const uint8_t *buf, size_t size) {
+size_t File::write(const void *buf, size_t size) {
     return fwrite(buf, 1, size, m_fp);
 }
 

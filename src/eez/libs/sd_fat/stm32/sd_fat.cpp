@@ -178,51 +178,94 @@ int File::read() {
     return result != FR_OK || br != 1 ? EOF : (int)value;
 }
 
-int File::read(void *buf, uint32_t nbyte) {
-    UINT br;
-    auto result = f_read(&m_file, buf, nbyte, &br);
-    return result == FR_OK ? br : 0;
+size_t File::read(void *buf, uint32_t size) {
+    static const uint32_t CHUNK_SIZE = 512;
+
+    UINT brTotal = 0;
+
+	size_t unalignedLength = ((uint32_t)buf) & 3;
+	if (unalignedLength > 0) {
+    	unalignedLength = MIN(4 - unalignedLength, size);
+		uint8_t unalignedBuffer[4] __attribute__((aligned));
+        UINT br;
+        auto result = f_read(&m_file, unalignedBuffer, unalignedLength, &br);
+        if (result != FR_OK) {
+            return 0;
+        }
+
+		for (size_t i = 0; i < br; i++) {
+			((uint8_t *)buf)[i] = unalignedBuffer[i];
+		}
+
+		brTotal += br;
+
+        if (br < unalignedLength) {
+            return brTotal;
+        }
+    }
+    
+    while (brTotal < size) {
+        uint32_t btr = MIN(CHUNK_SIZE, size - brTotal);
+
+        UINT br;
+        auto result = f_read(&m_file, (uint8_t *)buf + brTotal, btr, &br);
+        if (result != FR_OK) {
+            return brTotal;
+        }
+
+        brTotal += br;
+
+        if (br < btr) {
+            break;
+        }
+    }
+
+    return brTotal;    
 }
 
-size_t File::write(const uint8_t *buf, size_t size) {
-	size_t unalignedLength = 4 - (((uint32_t)buf) & 3);
+size_t File::write(const void *buf, size_t size) {
+	static const uint32_t CHUNK_SIZE = 512;
+
+    UINT bwTotal = 0;
+
+	size_t unalignedLength = ((uint32_t)buf) & 3;
 	if (unalignedLength > 0) {
-		uint8_t unalignedBuffer[4];
-		for (size_t i = 0; i < unalignedLength; i ++) {
-			unalignedBuffer[i] = buf[i];
+        unalignedLength = MIN(4 - unalignedLength, size);
+		uint8_t unalignedBuffer[4] __attribute__((aligned));
+		for (size_t i = 0; i < unalignedLength; i++) {
+			unalignedBuffer[i] = ((uint8_t *)buf)[i];
 		}
 
 		UINT bw;
 		auto result = f_write(&m_file, unalignedBuffer, unalignedLength, &bw);
-
-		if (result != FR_OK || bw != unalignedLength) {
+		if (result != FR_OK) {
 			return 0;
 		}
 
-		buf += unalignedLength;
-		size -= unalignedLength;
+		bwTotal += bw;
 
-		if (size == 0) {
-			return unalignedLength;
-		}
+        if (bw < unalignedLength) {
+            return bwTotal;
+        }        
 	}
 
-	static const int CHUNK_SIZE = 512;
+	while (bwTotal < size) {
+		auto btw = MIN(CHUNK_SIZE, size - bwTotal);
 
-	for (size_t i = 0; i < size; i += CHUNK_SIZE) {
-		auto btw = size - i;
-		if (btw > CHUNK_SIZE) {
-			btw = CHUNK_SIZE;
-		}
 		UINT bw;
-		auto result = f_write(&m_file, buf, btw, &bw);
-		if (result != FR_OK || bw != btw) {
-			return 0;
+		auto result = f_write(&m_file, (const uint8_t *)buf + bwTotal, btw, &bw);
+		if (result != FR_OK) {
+			return bwTotal;
 		}
-		buf += CHUNK_SIZE;
+
+        bwTotal += bw;
+
+        if (bw < btw) {
+            break;
+        }
 	}
 
-	return size + unalignedLength;
+	return bwTotal;
 }
 
 void File::sync() {
