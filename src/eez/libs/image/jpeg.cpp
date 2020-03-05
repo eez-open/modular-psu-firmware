@@ -21,6 +21,10 @@
 #include <memory.h>
 #include <assert.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <jpeglib.h>
+#endif
+
 #include "toojpeg.h"
 
 #include <eez/system.h>
@@ -86,6 +90,14 @@ uint8_t *jpegDecode(const char *filePath, int *imageWidth, int *imageHeight) {
     uint32_t fileSize;
     uint32_t bytesRead;
 
+#if defined(EEZ_PLATFORM_STM32)
+    struct jpeg_decompress_struct cinfo;
+    int rc;
+    int width;
+    int height;
+    int pixelSize;
+#endif
+
     eez::File file;
     if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
         goto ErrorNoClose;
@@ -104,6 +116,30 @@ uint8_t *jpegDecode(const char *filePath, int *imageWidth, int *imageHeight) {
 
     file.close();
 
+#if defined(EEZ_PLATFORM_STM32)
+    jpeg_create_decompress(&cinfo);
+    jpeg_mem_src(&cinfo, g_fileData, fileSize);
+    rc = jpeg_read_header(&cinfo, TRUE);
+    if (rc != 1) {
+        goto ErrorNoClose;
+    }
+    jpeg_start_decompress(&cinfo);
+    width = cinfo.output_width;
+	height = cinfo.output_height;
+	pixelSize = cinfo.output_components;
+    if (width > 480 || height > 272 || pixelSize != 4) {
+        goto Error;
+    }
+    while (cinfo.output_scanline < cinfo.output_height) {
+		unsigned char *buffer_array[1];
+		buffer_array[0] = g_decodeBuffer + cinfo.output_scanline * width * pixelSize;
+		jpeg_read_scanlines(&cinfo, buffer_array, 1);
+
+	}    
+    *imageWidth = width;
+    *imageHeight = height;
+    return g_decodeBuffer;
+#else
     g_decodeDynamicMemory = g_decodeBuffer;
 
     njInit();
@@ -120,6 +156,7 @@ uint8_t *jpegDecode(const char *filePath, int *imageWidth, int *imageHeight) {
     *imageHeight = njGetHeight();
 
     return njGetImage();
+#endif
 
 Error:
     file.close();
