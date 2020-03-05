@@ -53,6 +53,7 @@
 #include <eez/libs/sd_fat/sd_fat.h>
 
 #include <eez/libs/image/jpeg.h>
+#include <eez/libs/image/bitmap.h>
 
 namespace eez {
 namespace gui {
@@ -85,6 +86,8 @@ int32_t g_selectedFileIndex = -1;
 
 bool g_imageLoadFailed;
 uint8_t *g_openedImagePixels;
+int g_openedImageWidth;
+int g_openedImageHeight;
 
 bool g_fileBrowserMode;
 DialogType g_dialogType;
@@ -673,16 +676,18 @@ void openImageFile() {
         strcpy(filePath, g_currentDirectory);
         strcat(filePath, "/");
         strcat(filePath, fileItem->name);
-        
-        g_openedImagePixels = jpegDecode(filePath);
+
+        if (endsWithNoCase(fileItem->name, ".bmp")) {
+            g_openedImagePixels = bitmapDecode(filePath, &g_openedImageWidth, &g_openedImageHeight);
+        } else {
+
+            g_openedImagePixels = jpegDecode(filePath, &g_openedImageWidth, &g_openedImageHeight);
+        }
+
         if (!g_openedImagePixels) {
             g_imageLoadFailed = true;
-        }
+        }            
     }
-}
-
-uint8_t *getOpenedImagePixels() {
-    return g_openedImagePixels;
 }
 
 bool isUploadFileEnabled() {
@@ -1106,11 +1111,11 @@ void data_file_manager_delete_file_enabled(data::DataOperationEnum operation, da
 
 void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET_BITMAP_PIXELS) {
-        value = Value(getOpenedImagePixels(), VALUE_TYPE_POINTER);
+        value = Value(g_openedImagePixels, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_GET_BITMAP_WIDTH) {
-        value = Value(480, VALUE_TYPE_UINT16);
+        value = Value(g_openedImageWidth, VALUE_TYPE_UINT16);
     } else if (operation == data::DATA_OPERATION_GET_BITMAP_HEIGHT) {
-        value = Value(272, VALUE_TYPE_UINT16);
+        value = Value(g_openedImageHeight, VALUE_TYPE_UINT16);
     }
 }
 

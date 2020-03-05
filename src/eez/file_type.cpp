@@ -90,6 +90,11 @@ FileType getFileTypeFromExtension(const char *filePath) {
             return (FileType)fileType;
         }    
     }
+
+    if (endsWithNoCase(filePath, ".bmp")) {
+        return FILE_TYPE_IMAGE;
+    }
+
     return FILE_TYPE_OTHER;
 }
 

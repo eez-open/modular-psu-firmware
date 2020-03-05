@@ -1,6 +1,6 @@
 /*
  * EEZ Modular Firmware
- * Copyright (C) 2015-present, Envox d.o.o.
+ * Copyright (C) 2020-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,4 @@
 
 #pragma once
 
-int jpegEncode(const uint8_t *screenshotPixels, unsigned char **imageData, size_t *imageDataSize);
-
-uint8_t *jpegDecode(const char *filePath, int *imageWidth, int *imageHeight);
+uint8_t *bitmapDecode(const char *filePath, int *imageWidth, int *imageHeight);

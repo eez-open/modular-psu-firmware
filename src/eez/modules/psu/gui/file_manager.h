@@ -72,7 +72,6 @@ bool isDeleteFileEnabled();
 void deleteFile();
 
 void openImageFile();
-uint8_t *getOpenedImagePixels();
 
 void onEncoder(int couter);
 

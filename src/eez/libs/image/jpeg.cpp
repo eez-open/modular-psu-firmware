@@ -25,9 +25,8 @@
 
 #include <eez/system.h>
 #include <eez/debug.h>
-#include <eez/libs/sd_fat/sd_fat.h>
-
 #include <eez/memory.h>
+#include <eez/libs/sd_fat/sd_fat.h>
 
 static size_t g_imageDataSize;
 
@@ -81,7 +80,7 @@ extern "C" void njCopyMem(void* dest, const void* src, int size) {
     memcpy(dest, src, size);
 }
 
-uint8_t *jpegDecode(const char *filePath) {
+uint8_t *jpegDecode(const char *filePath, int *imageWidth, int *imageHeight) {
     // DebugTrace("context size: %d\n", sizeof(nj_context_t));
 
     uint32_t fileSize;
@@ -113,9 +112,12 @@ uint8_t *jpegDecode(const char *filePath) {
         goto Error;
     }
 
-    if (njGetWidth() != 480 || njGetHeight() != 272 || !njIsColor() || njGetImageSize() != 480 * 272 * 3) {
+    if (njGetWidth() > 480 || njGetHeight() > 272 || !njIsColor() || njGetImageSize() > 480 * 272 * 3) {
         goto Error;
     }
+
+    *imageWidth = njGetWidth();
+    *imageHeight = njGetHeight();
 
     return njGetImage();
 
