@@ -361,6 +361,7 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_GET_SIZE,
     DATA_OPERATION_YT_DATA_GET_POSITION,
     DATA_OPERATION_YT_DATA_SET_POSITION,
+    DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT,
     DATA_OPERATION_YT_DATA_GET_PAGE_SIZE,
     DATA_OPERATION_YT_DATA_GET_STYLE,
     DATA_OPERATION_YT_DATA_GET_MIN,
@@ -430,6 +431,7 @@ uint32_t ytDataGetRefreshCounter(const Cursor &cursor, uint16_t id);
 uint32_t ytDataGetSize(const Cursor &cursor, uint16_t id);
 uint32_t ytDataGetPosition(const Cursor &cursor, uint16_t id);
 void ytDataSetPosition(const Cursor &cursor, uint16_t id, uint32_t newPosition);
+uint32_t ytDataGetPositionIncrement(const Cursor &cursor, uint16_t id);
 uint32_t ytDataGetPageSize(const Cursor &cursor, uint16_t id);
 const Style *ytDataGetStyle(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
 Value ytDataGetMin(const Cursor &cursor, uint16_t id, uint8_t valueIndex);

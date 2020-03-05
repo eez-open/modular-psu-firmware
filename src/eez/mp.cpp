@@ -272,6 +272,7 @@ Error:
 
 ErrorNoClose:
     // TODO error report
+    g_state = STATE_IDLE;
     return;
 }
 

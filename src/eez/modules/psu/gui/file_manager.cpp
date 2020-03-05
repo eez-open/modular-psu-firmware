@@ -26,6 +26,7 @@
 #include <eez/memory.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/container.h>
 
 #include <eez/scpi/scpi.h>
 
@@ -39,12 +40,15 @@
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/persist_conf.h>
+#include <eez/modules/psu/sd_card.h>
+#include <eez/modules/psu/dlog_view.h>
+
 #include <eez/modules/psu/scpi/psu.h>
+
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/gui/keypad.h>
-#include <eez/modules/psu/dlog_view.h>
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
@@ -53,6 +57,9 @@
 namespace eez {
 namespace gui {
 namespace file_manager {
+
+static const int CONF_FILE_DESCRIPTION_WIDTH_PX = 243;
+static const size_t MAX_FILE_DESCRIPTION_LENGTH = 80;
 
 static State g_state;
 static uint32_t g_loadingStartTickCount;
@@ -64,6 +71,7 @@ struct FileItem {
     const char *name;
     uint32_t size;
     uint32_t dateTime;
+    const char *description;
 };
 
 static uint8_t *g_frontBufferPosition;
@@ -84,6 +92,9 @@ const char *g_fileBrowserTitle;
 FileType g_fileBrowserFileType;
 static void (*g_fileBrowserOnFileSelected)(const char *filePath);
 
+static ListViewOption g_rootDirectoryListViewOption = LIST_VIEW_LARGE_ICONS;
+static ListViewOption g_scriptsDirectoryListViewOption = LIST_VIEW_SCRIPTS;
+
 void catalogCallback(void *param, const char *name, FileType type, size_t size) {
     if (g_fileBrowserMode && type != FILE_TYPE_DIRECTORY && type != g_fileBrowserFileType) {
         return;
@@ -91,9 +102,53 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
 
     auto fileInfo = (FileInfo *)param;
  
+    char fileNameWithoutExtension[MAX_PATH_LENGTH + 1];
+
+    char description[MAX_FILE_DESCRIPTION_LENGTH + 1];
+    size_t descriptionLen = 0;
+
+    if (getListViewOption() == LIST_VIEW_SCRIPTS) {
+        if (type != FILE_TYPE_MICROPYTHON) {
+            return;
+        }
+
+        description[0] = 0;
+
+        char filePath[MAX_PATH_LENGTH + 1];
+        strcpy(filePath, g_currentDirectory);
+        strcat(filePath, "/");
+        strcat(filePath, name);
+        File file;
+        if (file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+            psu::sd_card::BufferedFileRead bufferedFile(file);
+
+            psu::sd_card::matchZeroOrMoreSpaces(bufferedFile);
+            if (psu::sd_card::match(bufferedFile, '#')) {
+                psu::sd_card::matchZeroOrMoreSpaces(bufferedFile);
+                psu::sd_card::matchUntil(bufferedFile, '\n', description, MAX_FILE_DESCRIPTION_LENGTH);
+                description[MAX_FILE_DESCRIPTION_LENGTH] = 0;
+            }
+
+            file.close();
+        }
+
+        descriptionLen = strlen(description);
+        if (descriptionLen > 0) {
+            descriptionLen = 4 * ((descriptionLen + 1 + 3) / 4);
+        }
+
+        const char *str = strrchr(name, '.');
+        if (str) {
+            auto n = str - name;
+            strncpy(fileNameWithoutExtension, name, n);
+            fileNameWithoutExtension[n] = 0;
+            name = fileNameWithoutExtension;
+        }
+    }
+
     size_t nameLen = 4 * ((strlen(name) + 1 + 3) / 4);
 
-    if (g_frontBufferPosition + sizeof(FileItem) > g_backBufferPosition - nameLen) {
+    if (g_frontBufferPosition + sizeof(FileItem) > g_backBufferPosition - nameLen - descriptionLen) {
         return;
     }
 
@@ -105,6 +160,14 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
     g_backBufferPosition -= nameLen;
     strcpy((char *)g_backBufferPosition, name);
     fileItem->name = (const char *)g_backBufferPosition;
+
+    if (descriptionLen > 0) {
+        g_backBufferPosition -= descriptionLen;
+        strcpy((char *)g_backBufferPosition, description);
+        fileItem->description = (const char *)g_backBufferPosition;
+    } else {
+        fileItem->description = nullptr;
+    }
 
     fileItem->size = size;
 
@@ -121,9 +184,61 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
     g_filesCount++;
 }
 
+RootDirectoryType getRootDirectoryType(FileItem *item) {
+	if (strcmp(item->name, "Scripts") == 0) {
+		return ROOT_DIRECTORY_TYPE_SCRIPTS;
+	}
+	if (strcmp(item->name, "Screenshots") == 0) {
+		return ROOT_DIRECTORY_TYPE_SCREENSHOTS;
+	}
+	if (strcmp(item->name, "Recordings") == 0) {
+		return ROOT_DIRECTORY_TYPE_RECORDINGS;
+	}
+	if (strcmp(item->name, "Lists") == 0) {
+		return ROOT_DIRECTORY_TYPE_LISTS;
+	}
+	if (strcmp(item->name, "Profiles") == 0) {
+		return ROOT_DIRECTORY_TYPE_PROFILES;
+	}
+	if (strcmp(item->name, "Logs") == 0) {
+		return ROOT_DIRECTORY_TYPE_LOGS;
+	}
+	if (strcmp(item->name, "Updates") == 0) {
+		return ROOT_DIRECTORY_TYPE_UPDATES;
+	}
+	return ROOT_DIRECTORY_TYPE_NONE;
+}
+
 int compareFunc(const void *p1, const void *p2, SortFilesOption sortFilesOption) {
     FileItem *item1 = (FileItem *)p1;
     FileItem *item2 = (FileItem *)p2;
+
+    if (getListViewOption() == LIST_VIEW_LARGE_ICONS) {
+    	// root directory has special sort order
+    	int sortOrder1 = getRootDirectoryType(item1);
+    	int sortOrder2 = getRootDirectoryType(item2);
+    	if (sortOrder1 && !sortOrder2) {
+            return -1;
+        }
+        if (!sortOrder1 && sortOrder2) {
+            return 1;
+        }
+        if (sortOrder1 && sortOrder2) {
+        	return sortOrder1 - sortOrder2;
+        }
+
+        if (item1->type == FILE_TYPE_DIRECTORY && item2->type != FILE_TYPE_DIRECTORY) {
+            return -1;
+        }
+        if (item1->type != FILE_TYPE_DIRECTORY && item2->type == FILE_TYPE_DIRECTORY) {
+            return 1;
+        }
+    }
+
+    if (getListViewOption() == LIST_VIEW_SCRIPTS) {
+        sortFilesOption = SORT_FILES_BY_NAME_ASC;
+    }
+
     if (sortFilesOption == SORT_FILES_BY_NAME_ASC) {
         return strcicmp(item1->name, item2->name);
     } else if (sortFilesOption == SORT_FILES_BY_NAME_DESC) {
@@ -220,14 +335,65 @@ void onSdCardMountedChange() {
 	}
 }
 
+bool isListViewOptionAvailable() {
+    return isRootDirectory() || isScriptsDirectory();
+}
+
+ListViewOption getListViewOption() {
+    if (g_fileBrowserMode) {
+        return LIST_VIEW_DETAILS;
+    }
+    if (isRootDirectory()) {
+        return g_rootDirectoryListViewOption;
+    }
+    if (isScriptsDirectory()) {
+        return g_scriptsDirectoryListViewOption;
+    }
+    return LIST_VIEW_DETAILS;
+}
+
+int getListViewLayout() {
+    if (getListViewOption() == LIST_VIEW_LARGE_ICONS) {
+        return PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW;
+    }
+    if (getListViewOption() == LIST_VIEW_SCRIPTS) {
+        return PAGE_ID_FILE_MANAGER_SCRIPTS_VIEW;
+    }
+    return PAGE_ID_FILE_MANAGER_DETAILS_VIEW;
+}
+
+void toggleListViewOption() {
+    if (isRootDirectory()) {
+        if (g_rootDirectoryListViewOption == LIST_VIEW_DETAILS) {
+            g_rootDirectoryListViewOption = LIST_VIEW_LARGE_ICONS;
+        } else {
+            g_rootDirectoryListViewOption = LIST_VIEW_DETAILS;
+        }
+    } else {
+        if (g_scriptsDirectoryListViewOption == LIST_VIEW_DETAILS) {
+            g_scriptsDirectoryListViewOption = LIST_VIEW_SCRIPTS;
+        } else {
+            g_scriptsDirectoryListViewOption = LIST_VIEW_DETAILS;
+        }
+    }
+
+    loadDirectory();
+}
+
 SortFilesOption getSortFilesOption() {
     return psu::persist_conf::devConf.sortFilesOption;
 }
 
 void setSortFilesOption(SortFilesOption sortFilesOption) {
     psu::persist_conf::setSortFilesOption(sortFilesOption);
+
     sort();
+
     g_filesStartPosition = 0;
+
+    if (!g_fileBrowserMode) {
+        g_selectedFileIndex = -1;
+    }
 }
 
 const char *getCurrentDirectory() {
@@ -266,6 +432,10 @@ bool isRootDirectory() {
     return g_currentDirectory[0] == 0 || strcmp(g_currentDirectory, "/") == 0;
 }
 
+bool isScriptsDirectory() {
+    return strcmp(g_currentDirectory, SCRIPTS_DIR) == 0;
+}
+
 void goToParentDirectory() {
     if (g_state != STATE_READY) {
         return;
@@ -284,7 +454,7 @@ void goToParentDirectory() {
 }
 
 uint32_t getFilesCount() {
-    return g_filesCount;
+    return (g_filesCount + getFilesPositionIncrement() - 1) / getFilesPositionIncrement() * getFilesPositionIncrement();
 }
 
 uint32_t getFilesStartPosition() {
@@ -292,7 +462,7 @@ uint32_t getFilesStartPosition() {
 }
 
 void setFilesStartPosition(uint32_t position) {
-    g_filesStartPosition = position;
+    g_filesStartPosition = (position + getFilesPositionIncrement() - 1) / getFilesPositionIncrement() * getFilesPositionIncrement();
     if (g_filesStartPosition + getFilesPageSize() > getFilesCount()) {
         if (getFilesCount() > getFilesPageSize()) {
             g_filesStartPosition = getFilesCount() - getFilesPageSize();
@@ -300,13 +470,38 @@ void setFilesStartPosition(uint32_t position) {
             g_filesStartPosition = 0;
         }
     }
+
+    if (!g_fileBrowserMode) {
+        g_selectedFileIndex = -1;
+    }
+}
+
+static const int NUM_COLUMNS_IN_LARGE_ICONS_VIEW = 4;
+static const int NUM_ROWS_IN_LARGE_ICONS_VIEW = 2;
+
+uint32_t getFilesPositionIncrement() {
+    return getListViewOption() == LIST_VIEW_LARGE_ICONS ? NUM_COLUMNS_IN_LARGE_ICONS_VIEW : 1;
 }
 
 uint32_t getFilesPageSize() {
     static const uint32_t FILE_BROWSER_FILES_PAGE_SIZE = 5;
-    static const uint32_t FILE_MANAGER_FILES_PAGE_SIZE = 6;
+    static const uint32_t FILE_MANAGER_FILES_PAGE_SIZE_IN_DETAILS_VIEW = 6;
+    static const uint32_t FILE_MANAGER_FILES_PAGE_SIZE_IN_LARGE_ICONS_VIEW = NUM_COLUMNS_IN_LARGE_ICONS_VIEW * NUM_ROWS_IN_LARGE_ICONS_VIEW;
+    static const uint32_t FILE_MANAGER_FILES_PAGE_SIZE_IN_SCRIPTS_VIEW = 3;
 
-    return g_fileBrowserMode ? FILE_BROWSER_FILES_PAGE_SIZE : FILE_MANAGER_FILES_PAGE_SIZE;
+    if (g_fileBrowserMode) {
+        return FILE_BROWSER_FILES_PAGE_SIZE;
+    }
+
+    if (getListViewOption() == LIST_VIEW_LARGE_ICONS) {
+        return FILE_MANAGER_FILES_PAGE_SIZE_IN_LARGE_ICONS_VIEW;
+    }
+    
+    if (getListViewOption() == LIST_VIEW_SCRIPTS) {
+        return FILE_MANAGER_FILES_PAGE_SIZE_IN_SCRIPTS_VIEW;
+    }
+
+    return FILE_MANAGER_FILES_PAGE_SIZE_IN_DETAILS_VIEW;
 }
 
 bool isDirectory(uint32_t fileIndex) {
@@ -319,6 +514,24 @@ FileType getFileType(uint32_t fileIndex) {
     return fileItem ? fileItem->type : FILE_TYPE_NONE;
 }
 
+RootDirectoryType getRootDirectoryType(uint32_t fileIndex) {
+    auto fileItem = getFileItem(fileIndex);
+    return fileItem ? getRootDirectoryType(fileItem) : ROOT_DIRECTORY_TYPE_NONE;
+}
+
+const char *getFileIcon(uint32_t fileIndex) {
+    auto fileType = getFileType(fileIndex);
+
+    if (getListViewOption() == LIST_VIEW_DETAILS || getListViewOption() == LIST_VIEW_SCRIPTS) {
+        return getFileTypeSmallIcon(fileType);
+    } 
+    
+    if (fileType == FILE_TYPE_DIRECTORY) {
+        return getRootDirectoryIcon(getRootDirectoryType(fileIndex));
+    }
+
+    return getFileTypeLargeIcon(fileType);
+}
 const char *getFileName(uint32_t fileIndex) {
     auto fileItem = getFileItem(fileIndex);
     return fileItem ? fileItem->name : "";
@@ -334,8 +547,17 @@ const uint32_t getFileDataTime(uint32_t fileIndex) {
     return fileItem ? fileItem->dateTime : 0;
 }
 
+const char *getFileDescription(uint32_t fileIndex) {
+    auto fileItem = getFileItem(fileIndex);
+    return fileItem && fileItem->description ? fileItem->description : "";
+}
+
 bool isFileSelected(uint32_t fileIndex) {
     return (isPageOnStack(PAGE_ID_FILE_BROWSER) || isPageOnStack(PAGE_ID_FILE_MENU)) && g_selectedFileIndex == (int32_t)fileIndex;
+}
+
+bool isSelectFileActionEnabled(uint32_t fileIndex) {
+    return fileIndex < g_filesCount;
 }
 
 void selectFile(uint32_t fileIndex) {
@@ -343,18 +565,34 @@ void selectFile(uint32_t fileIndex) {
         return;
     }
 
-    auto fileItem = getFileItem(fileIndex);
-    if (fileItem && fileItem->type == FILE_TYPE_DIRECTORY) {
-        if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) <= MAX_PATH_LENGTH) {
-            strcat(g_currentDirectory, "/");
-            strcat(g_currentDirectory, fileItem->name);
-            g_filesStartPosition = 0;
-            loadDirectory();
-        }
-    } else {
-        g_selectedFileIndex = fileIndex;
-        if (!g_fileBrowserMode) {
-            pushPage(PAGE_ID_FILE_MENU);
+    if (fileIndex < g_filesCount) {
+        auto fileItem = getFileItem(fileIndex);
+        if (fileItem && fileItem->type == FILE_TYPE_DIRECTORY) {
+            if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) <= MAX_PATH_LENGTH) {
+                strcat(g_currentDirectory, "/");
+                strcat(g_currentDirectory, fileItem->name);
+                g_filesStartPosition = 0;
+                loadDirectory();
+            }
+        } else {
+            g_selectedFileIndex = fileIndex;
+            if (!g_fileBrowserMode) {
+                if (getListViewOption() == LIST_VIEW_SCRIPTS) {
+                    if (mp::isIdle()) {
+                        char filePath[MAX_PATH_LENGTH + 1];
+                        strcpy(filePath, g_currentDirectory);
+                        strcat(filePath, "/");
+                        strcat(filePath, fileItem->name);
+                        strcat(filePath, ".py");
+
+                        mp::startScript(filePath);
+                    } else {
+                        infoMessage("Script is already running!");
+                    }
+                } else {
+                    pushPage(PAGE_ID_FILE_MENU);
+                }
+            }
         }
     }
 }
@@ -623,6 +861,7 @@ void onEncoder(int counter) {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     counter = -counter;
 #endif
+    counter *= getFilesPositionIncrement();
     int32_t newPosition = getFilesStartPosition() + counter;
     if (newPosition < 0) {
         newPosition = 0;
@@ -734,8 +973,232 @@ void getStorageInfo(Value& value) {
     }
 }
 
+} // namespace file_manager
+
+using namespace file_manager;
+
+void data_file_manager_current_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getCurrentDirectory();
+    }
 }
+
+void data_file_manager_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getState();
+    }
 }
+
+void data_file_manager_is_root_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = isRootDirectory() ? 1 : 0;
+    }
+}
+
+void data_file_manager_layout(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getListViewLayout();
+    }
+}
+
+void data_file_manager_files(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_COUNT) {
+        value = (int)MAX(getFilesCount(), getFilesPageSize());
+    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_SIZE) {
+        value = Value(getFilesCount(), VALUE_TYPE_UINT32);
+    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_POSITION) {
+        value = Value(getFilesStartPosition(), VALUE_TYPE_UINT32);
+    } else if (operation == data::DATA_OPERATION_YT_DATA_SET_POSITION) {
+        setFilesStartPosition(value.getUInt32());
+    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT) {
+        value = Value(getFilesPositionIncrement(), VALUE_TYPE_UINT32);
+    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+        value = Value(getFilesPageSize(), VALUE_TYPE_UINT32);
+    }
+}
+
+void data_file_manager_is_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = isDirectory(cursor.i) ? 1 : 0;
+    }
+}
+
+void data_file_manager_file_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getFileType(cursor.i);
+    }
+}
+
+void data_file_manager_file_icon(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getFileIcon(cursor.i);
+    }
+}
+
+void data_file_manager_file_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        auto fileType = getFileType(cursor.i);
+        if (fileType != FILE_TYPE_NONE) {
+            value = Value(getFileName(cursor.i), VALUE_TYPE_STR, STRING_OPTIONS_FILE_ELLIPSIS);
+        }
+    }
+}
+
+void data_file_manager_file_description(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        auto fileType = getFileType(cursor.i);
+        if (fileType != FILE_TYPE_NONE) {
+            value = getFileDescription(cursor.i);
+        }
+    }
+}
+
+void data_file_manager_file_size(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        auto fileType = getFileType(cursor.i);
+        if (fileType == FILE_TYPE_DIRECTORY) {
+            value = "<dir>";
+        } else if (fileType != FILE_TYPE_NONE) {
+            value = Value(getFileSize(cursor.i), VALUE_TYPE_FILE_LENGTH);
+        }
+    }
+}
+
+void data_file_manager_file_date_time(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        auto fileType = getFileType(cursor.i);
+        if (fileType != FILE_TYPE_NONE) {
+            value = Value(getFileDataTime(cursor.i), VALUE_TYPE_FILE_DATE_TIME);
+        }
+    }
+}
+
+void data_file_manager_file_selected(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = isFileSelected(cursor.i);
+    }
+}
+
+
+void data_file_manager_open_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = isOpenFileEnabled();
+    }
+}
+
+void data_file_manager_upload_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = isUploadFileEnabled();
+    }
+}
+
+void data_file_manager_rename_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = isRenameFileEnabled();
+    }
+}
+
+void data_file_manager_delete_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = isDeleteFileEnabled();
+    }
+}
+
+void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET_BITMAP_PIXELS) {
+        value = Value(getOpenedImagePixels(), VALUE_TYPE_POINTER);
+    } else if (operation == data::DATA_OPERATION_GET_BITMAP_WIDTH) {
+        value = Value(480, VALUE_TYPE_UINT16);
+    } else if (operation == data::DATA_OPERATION_GET_BITMAP_HEIGHT) {
+        value = Value(272, VALUE_TYPE_UINT16);
+    }
+}
+
+void data_file_manager_browser_title(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = g_fileBrowserTitle;
+    }
+}
+
+void data_file_manager_browser_is_save_dialog(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = isSaveDialog();
+    }
+}
+
+void data_file_manager_storage_alarm(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = isStorageAlarm();
+    }
+}
+
+void data_file_manager_storage_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        getStorageInfo(value);
+    }
+}
+
+void data_file_manager_is_list_view_option_available(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = isListViewOptionAvailable();
+    }
+}
+
+void data_file_manager_list_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getListViewOption();
+    }
+}
+
+void data_file_manager_sort_files_option(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getSortFilesOption();
+    }
+}
+
+
+void action_file_manager_go_to_parent_directory() {
+    goToParentDirectory();
+}
+
+void action_file_manager_select_file() {
+    selectFile(getFoundWidgetAtDown().cursor.i);
+}
+
+void action_file_manager_open_file() {
+    openFile();
+}
+
+void action_file_manager_upload_file() {
+    uploadFile();
+}
+
+void action_file_manager_rename_file() {
+    renameFile();
+}
+
+void action_file_manager_delete_file() {
+    deleteFile();
+}
+
+void action_file_manager_select_list_view() {
+    toggleListViewOption();
+}
+
+void onSetFileManagerSortBy(uint16_t value) {
+    popPage();
+    setSortFilesOption((SortFilesOption)value);
+}
+
+void action_file_manager_sort_by() {
+    pushSelectFromEnumPage(g_fileManagerSortByEnumDefinition, getSortFilesOption(), NULL, onSetFileManagerSortBy, true);
+}
+
+void action_file_manager_new_file() {
+    newFile();
+}
+
+} // namespace gui
 
 using namespace gui::file_manager;
 
@@ -761,4 +1224,4 @@ void onSdCardFileChangeHook(const char *filePath1, const char *filePath2) {
     psu::sd_card::getInfo(usedSpace, freeSpace, false); // "false" means **do not** get storage info from cache
 }
 
-} // namespace eez::gui::file_manager
+} // namespace eez

@@ -1,3 +1,4 @@
+# Plot output characteristic for NPN and N-ch MOSFET devices
 import math
 from utime import ticks_ms, ticks_add, ticks_diff, sleep_ms
 from eez import scpi, setU, setI, getOutputMode, getI, dlogTraceData

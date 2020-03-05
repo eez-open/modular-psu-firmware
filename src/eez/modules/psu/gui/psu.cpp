@@ -779,8 +779,14 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
         if (widget->action == ACTION_ID_SHOW_EVENT_QUEUE) {
             static const uint32_t CONF_SHOW_EVENT_QUEUE_INACTIVITY_TIMESPAN_SINCE_LAST_SHOW_PAGE_MS = 500;
             if (millis() - getShowPageTime() < CONF_SHOW_EVENT_QUEUE_INACTIVITY_TIMESPAN_SINCE_LAST_SHOW_PAGE_MS) {
+                g_appContext = saved;
                 return false;
             }
+        }
+
+        if (widget->action == ACTION_ID_FILE_MANAGER_SELECT_FILE) {
+            g_appContext = saved;
+            return file_manager::isSelectFileActionEnabled(widgetCursor.cursor.i);
         }
 
         g_appContext = saved;

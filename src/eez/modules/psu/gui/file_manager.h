@@ -29,22 +29,38 @@ enum State {
     STATE_NOT_PRESENT
 };
 
+enum ListViewOption {
+    LIST_VIEW_DETAILS,
+    LIST_VIEW_LARGE_ICONS,
+    LIST_VIEW_SCRIPTS
+};
+
+bool isListViewOptionAvailable();
+ListViewOption getListViewOption();
+int getListViewLayout();
+void toggleListViewOption();
 SortFilesOption getSortFilesOption();
 void setSortFilesOption(SortFilesOption sortFilesOption);
 const char *getCurrentDirectory();
 State getState();
 bool isRootDirectory();
+bool isScriptsDirectory();
 void goToParentDirectory();
 uint32_t getFilesCount();
 uint32_t getFilesStartPosition();
 void setFilesStartPosition(uint32_t position);
+uint32_t getFilesPositionIncrement();
 uint32_t getFilesPageSize();
 bool isDirectory(uint32_t fileIndex);
 FileType getFileType(uint32_t fileIndex);
+RootDirectoryType getRootDirectoryType(uint32_t fileIndex);
+const char *getFileIcon(uint32_t fileIndex);
 const char *getFileName(uint32_t fileIndex);
 const uint32_t getFileSize(uint32_t fileIndex);
 const uint32_t getFileDataTime(uint32_t fileIndex);
+const char *getFileDescription(uint32_t fileIndex);
 bool isFileSelected(uint32_t fileIndex);
+bool isSelectFileActionEnabled(uint32_t fileIndex);
 void selectFile(uint32_t fileIndex);
 bool isOpenFileEnabled();
 void openFile();

@@ -126,7 +126,8 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                     }
 
                 } else {
-                    drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,
+                    const char *str = widgetCursor.currentState->data.getString();
+                    drawText(str ? str : "", -1, widgetCursor.x,
                         widgetCursor.y, (int)widget->w, (int)widget->h, style,
                         widgetCursor.currentState->flags.active,
                         widgetCursor.currentState->flags.blinking,

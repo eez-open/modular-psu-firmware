@@ -366,7 +366,12 @@ enum DataEnum {
     DATA_ID_CHANNEL_RSENSE_INSTALLED = 364,
     DATA_ID_FILE_MANAGER_SORT_FILES_OPTION = 365,
     DATA_ID_CHANNEL_INFO_BRAND = 366,
-    DATA_ID_CHANNEL_INFO_SERIAL = 367
+    DATA_ID_CHANNEL_INFO_SERIAL = 367,
+    DATA_ID_FILE_MANAGER_LIST_VIEW = 368,
+    DATA_ID_FILE_MANAGER_IS_LIST_VIEW_OPTION_AVAILABLE = 369,
+    DATA_ID_FILE_MANAGER_FILE_ICON = 370,
+    DATA_ID_FILE_MANAGER_LAYOUT = 371,
+    DATA_ID_FILE_MANAGER_FILE_DESCRIPTION = 372
 };
 
 void data_none(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -737,6 +742,11 @@ void data_channel_rsense_installed(DataOperationEnum operation, Cursor &cursor, 
 void data_file_manager_sort_files_option(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_channel_info_brand(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_channel_info_serial(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_file_manager_list_view(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_file_manager_is_list_view_option_available(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_file_manager_file_icon(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_file_manager_layout(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_file_manager_file_description(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -964,7 +974,8 @@ enum ActionsEnum {
     ACTION_ID_EDIT_NO_FOCUS = 218,
     ACTION_ID_UNTRACK_ALL = 219,
     ACTION_ID_CH_SETTINGS_COPY = 220,
-    ACTION_ID_SHOW_SYS_SETTINGS_ETHERNET_ERROR = 221
+    ACTION_ID_SHOW_SYS_SETTINGS_ETHERNET_ERROR = 221,
+    ACTION_ID_FILE_MANAGER_SELECT_LIST_VIEW = 222
 };
 
 void action_channel_toggle_output();
@@ -1188,6 +1199,7 @@ void action_edit_no_focus();
 void action_untrack_all();
 void action_ch_settings_copy();
 void action_show_sys_settings_ethernet_error();
+void action_file_manager_select_list_view();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -1576,11 +1588,14 @@ enum PagesEnum {
     PAGE_ID_FILE_BROWSER = 152,
     PAGE_ID_FILE_MENU = 153,
     PAGE_ID_FRONT_PANEL_EMPTY_SLOT = 154,
-    PAGE_ID_DCM220_FRONT_PANEL_LED = 155
+    PAGE_ID_DCM220_FRONT_PANEL_LED = 155,
+    PAGE_ID_FILE_MANAGER_DETAILS_VIEW = 156,
+    PAGE_ID_FILE_MANAGER_SCRIPTS_VIEW = 157,
+    PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW = 158
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[304453];
+extern const uint8_t assets[310359];
 #else
-extern const uint8_t assets[1321252];
+extern const uint8_t assets[1360644];
 #endif

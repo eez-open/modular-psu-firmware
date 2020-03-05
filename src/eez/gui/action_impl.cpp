@@ -1288,43 +1288,6 @@ void action_show_file_manager() {
     file_manager::openFileManager();
 }
 
-void action_file_manager_go_to_parent_directory() {
-    file_manager::goToParentDirectory();
-}
-
-void action_file_manager_select_file() {
-    file_manager::selectFile(getFoundWidgetAtDown().cursor.i);
-}
-
-void action_file_manager_open_file() {
-    file_manager::openFile();
-}
-
-void action_file_manager_upload_file() {
-    file_manager::uploadFile();
-}
-
-void action_file_manager_rename_file() {
-    file_manager::renameFile();
-}
-
-void action_file_manager_delete_file() {
-    file_manager::deleteFile();
-}
-
-void onSetFileManagerSortBy(uint16_t value) {
-    popPage();
-    file_manager::setSortFilesOption((SortFilesOption)value);
-}
-
-void action_file_manager_sort_by() {
-    pushSelectFromEnumPage(g_fileManagerSortByEnumDefinition, file_manager::getSortFilesOption(), NULL, onSetFileManagerSortBy, true);
-}
-
-void action_file_manager_new_file() {
-    file_manager::newFile();
-}
-
 void action_show_sys_settings_mqtt() {
     pushPage(PAGE_ID_SYS_SETTINGS_MQTT);
 }

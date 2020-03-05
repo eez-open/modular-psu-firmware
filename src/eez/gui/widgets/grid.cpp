@@ -55,6 +55,8 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
     const GridWidget *gridWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const GridWidget *);
 
+    int startPosition = data::ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+
 	const Widget *childWidget = GET_WIDGET_PROPERTY(gridWidget, itemWidget, const Widget *);
 
     widgetCursor.widget = childWidget;
@@ -68,7 +70,7 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
     Value oldValue;
 
-    for (int index = 0; index < count; ++index) {
+    for (int index = startPosition; index < count; ++index) {
         data::select(widgetCursor.cursor, parentWidget->data, index, oldValue);
 
 		widgetCursor.x = savedX + xOffset;
@@ -84,7 +86,6 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
                     yOffset += childWidget->h;
                     xOffset = 0;
                 } else {
-                    // TODO: add vertical scroll
                     break;
                 }
             }
@@ -96,7 +97,6 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
                     yOffset = 0;
                     xOffset += childWidget->w;
                 } else {
-                    // TODO: add horizontal scroll
                     break;
                 }
             }

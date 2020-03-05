@@ -49,6 +49,41 @@ static const char *scpiFileTypeNames[] = {
     "BIN",
 };
 
+static const char *smallIcons[] = {
+    nullptr,
+    "\x46",
+    "\x85",
+    "\x30",
+    "\x27",
+    "\x5b",
+    "\x7d",
+    "\x6a",
+    "\x6a",
+};
+
+static const char *largeIcons[] = {
+    nullptr,
+    "\x80",
+    "\x81",
+    "\x82",
+    "\x83",
+    "\x84",
+    "\x85",
+    "\x86",
+    "\x86",
+};
+
+static const char *rootDirectoryIcons[] = {
+    "\x80",
+    "\x87",
+    "\x88",
+    "\x89",
+    "\x8A",
+    "\x8B",
+    "\x8C",
+    "\x8D"
+};
+
 FileType getFileTypeFromExtension(const char *filePath) {
     for (int fileType = 0; fileType < FILE_TYPE_OTHER; fileType++) {
         if (fileTypeExtension[fileType] && endsWithNoCase(filePath, fileTypeExtension[fileType])) {
@@ -65,5 +100,18 @@ const char *getExtensionFromFileType(FileType fileType) {
 const char *getFileTypeScpiName(FileType fileType) {
     return scpiFileTypeNames[fileType];
 }
+
+const char *getFileTypeSmallIcon(FileType fileType) {
+    return smallIcons[fileType];
+}
+
+const char *getFileTypeLargeIcon(FileType fileType) {
+    return largeIcons[fileType];
+}
+
+const char *getRootDirectoryIcon(RootDirectoryType fileType) {
+    return rootDirectoryIcons[fileType];
+}
+
 
 } // eez

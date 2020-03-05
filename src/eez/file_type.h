@@ -41,8 +41,23 @@ enum SortFilesOption {
     SORT_FILES_BY_TIME_DESC
 };
 
+enum RootDirectoryType {
+    ROOT_DIRECTORY_TYPE_NONE,
+    ROOT_DIRECTORY_TYPE_SCRIPTS,
+    ROOT_DIRECTORY_TYPE_SCREENSHOTS,
+    ROOT_DIRECTORY_TYPE_RECORDINGS,
+    ROOT_DIRECTORY_TYPE_LISTS,
+    ROOT_DIRECTORY_TYPE_PROFILES,
+    ROOT_DIRECTORY_TYPE_LOGS,
+    ROOT_DIRECTORY_TYPE_UPDATES
+};
+
 FileType getFileTypeFromExtension(const char *filePath);
 const char *getExtensionFromFileType(FileType fileType);
 const char *getFileTypeScpiName(FileType fileType);
+
+const char *getFileTypeSmallIcon(FileType fileType);
+const char *getFileTypeLargeIcon(FileType fileType);
+const char *getRootDirectoryIcon(RootDirectoryType fileType);
 
 } // eez

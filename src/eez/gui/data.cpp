@@ -130,12 +130,25 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_STR_value(const Value &a, const Value &b) {
-    return strcmp(a.getString(), b.getString()) == 0;
+    const char *astr = a.getString();
+    const char *bstr = b.getString();
+    if (!astr && !bstr) {
+        return true;
+    }
+    if ((!astr && bstr) || (astr && !bstr)) {
+        return false;
+    }
+    return strcmp(astr, bstr) == 0;
 }
 
 void STR_value_to_text(const Value &value, char *text, int count) {
-    strncpy(text, value.getString(), count - 1);
-    text[count - 1] = 0;
+    const char *str = value.getString();
+    if (str) {
+        strncpy(text, str, count - 1);
+        text[count - 1] = 0;
+    } else {
+        text[0] = 0;
+    }
 }
 
 bool compare_PASSWORD_value(const Value &a, const Value &b) {
@@ -569,6 +582,15 @@ uint32_t ytDataGetPosition(const Cursor &cursor, uint16_t id) {
 void ytDataSetPosition(const Cursor &cursor, uint16_t id, uint32_t newPosition) {
 	Value value(newPosition, VALUE_TYPE_UINT32);
     g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_SET_POSITION, (Cursor &)cursor, value);
+}
+
+uint32_t ytDataGetPositionIncrement(const Cursor &cursor, uint16_t id) {
+    Value value;
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT, (Cursor &)cursor, value);
+    if (value.getType() == VALUE_TYPE_UINT32) {
+        return value.getUInt32();
+    }
+    return 1;
 }
 
 uint32_t ytDataGetPageSize(const Cursor &cursor, uint16_t id) {

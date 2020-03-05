@@ -1,3 +1,4 @@
+# Plot N-type device current transfer characteristic
 import math
 from utime import ticks_ms, ticks_add, ticks_diff, sleep_ms
 from eez import scpi, setU, setI, getOutputMode, getI, dlogTraceData

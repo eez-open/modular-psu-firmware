@@ -77,7 +77,6 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
                 enumWidget(widgetCursor, callback);
 				offset += childWidget->h + listWidget->gap;
             } else {
-                // TODO: add vertical scroll
                 break;
             }
         } else {
@@ -86,7 +85,6 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 				enumWidget(widgetCursor, callback);
 				offset += childWidget->w + listWidget->gap;
             } else {
-                // TODO: add horizontal scroll
                 break;
             }
         }
