@@ -21,6 +21,7 @@
 #include <stdlib.h>
 
 #if defined(EEZ_PLATFORM_STM32)
+#include <tcpip.h>
 #include <api.h>
 #include <mqtt.h>
 #include <mqtt_priv.h>
@@ -371,7 +372,9 @@ void incomingPublishCallback(void** unused, struct mqtt_response_publish *publis
 bool publish(char *topic, char *payload, bool retain) {
 #if defined(EEZ_PLATFORM_STM32)
 	g_publishing = true;
+    LOCK_TCPIP_CORE();
     err_t result = mqtt_publish(&g_client, topic, payload, strlen(payload), 0, retain ? 1 : 0, requestCallback, nullptr);
+    UNLOCK_TCPIP_CORE();
     if (result != ERR_OK) {
     	g_publishing = false;
         if (result != ERR_MEM) {
@@ -831,7 +834,9 @@ void tick() {
     else if (g_connectionState == CONNECTION_STATE_DISCONNECT || g_connectionState == CONNECTION_STATE_RECONNECT) {
 #if defined(EEZ_PLATFORM_STM32)
         if (mqtt_client_is_connected(&g_client)) {
+            LOCK_TCPIP_CORE();
             mqtt_disconnect(&g_client);
+            UNLOCK_TCPIP_CORE();
         }
 #endif
 
