@@ -368,12 +368,14 @@ source_group("eez\\libs\\sd_fat" FILES ${src_eez_libs_sd_fat} ${header_eez_libs_
 
 set(src_eez_libs_image
     src/eez/libs/image/bitmap.cpp
+    src/eez/libs/image/image.cpp
     src/eez/libs/image/jpeg.cpp
     src/eez/libs/image/toojpeg.cpp
 )
 list (APPEND src_files ${src_eez_libs_image})
 set(header_eez_libs_image
     src/eez/libs/image/bitmap.h
+    src/eez/libs/image/image.h
     src/eez/libs/image/jpeg.h
     src/eez/libs/image/toojpeg.h
 )

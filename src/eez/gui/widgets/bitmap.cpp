@@ -24,6 +24,8 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/bitmap.h>
 
+#include <eez/libs/image/image.h>
+
 namespace eez {
 namespace gui {
 
@@ -32,7 +34,7 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
 
 	widgetCursor.currentState->size = sizeof(WidgetState);
 
-    widgetCursor.currentState->data = widget->data ? data::getBitmapPixels(widgetCursor.cursor, widget->data) : 0;
+    widgetCursor.currentState->data = widget->data ? data::getBitmapImage(widgetCursor.cursor, widget->data) : 0;
 
     bool refresh = !widgetCursor.previousState ||
     		widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
@@ -46,23 +48,16 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
 
         if (widget->data) {
             if (widgetCursor.currentState->data.getType() != VALUE_TYPE_NONE) {
-                auto pixels = (uint8_t *)widgetCursor.currentState->data.getVoidPointer();
-                if (pixels) {
-                    drawBitmap(pixels, 24,
-                    	getBitmapWidth(widgetCursor.cursor, widget->data),
-                        getBitmapHeight(widgetCursor.cursor, widget->data),
-						widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-						style, widgetCursor.currentState->flags.active
-					);
+                auto image = (Image *)widgetCursor.currentState->data.getVoidPointer();
+                if (image) {
+                    drawBitmap(image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active);
                 } else {
                     drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, true, true);
                 }
                 return;
             } else {
                 Value valueBitmapId;
-                g_dataOperationsFunctions[widget->data](
-                    data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, valueBitmapId);
-
+                g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, valueBitmapId);
                 bitmap = getBitmap(valueBitmapId.getInt());
             }
         } else if (display_bitmap_widget->bitmap != 0) {
@@ -70,9 +65,15 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
         }
 
         if (bitmap) {
-            drawBitmap((uint16_t *)&bitmap->pixels[0], bitmap->bpp, bitmap->w, bitmap->h,
-                       widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                       widgetCursor.currentState->flags.active);
+            Image image;
+
+            image.width = bitmap->w;
+            image.height = bitmap->h;
+            image.bpp = bitmap->bpp;
+            image.lineOffset = 0;
+            image.pixels = (uint8_t *)bitmap->pixels;
+
+            drawBitmap(&image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active);
         }
     }
 }

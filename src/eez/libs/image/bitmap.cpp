@@ -70,18 +70,10 @@ uint16_t readUint16(const uint8_t *bytes) {
     return bytes[0] | (bytes[1] << 8);
 }
 
-uint8_t *bitmapDecode(const char *filePath, int *imageWidth, int *imageHeight) {
-    uint32_t offset;
-    uint32_t width;
-    uint32_t height;
-    uint16_t numColorPlanes;
-    uint16_t bitsPerPixel;
-    uint32_t lineBytes;
-    auto lineBuffer = FILE_VIEW_BUFFER;
-
+bool bitmapDecode(const char *filePath, Image *image) {
     eez::File file;
     if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        goto ErrorNoClose;
+        return false;
     }
 
     uint32_t bytesRead;
@@ -90,51 +82,61 @@ uint8_t *bitmapDecode(const char *filePath, int *imageWidth, int *imageHeight) {
 
     bytesRead = file.read(bmpHeader, sizeof(bmpHeader));
     if (bytesRead != sizeof(bmpHeader)) {
-        goto Error;
+        file.close();
+        return false;
     }
 
     uint8_t dibHeader[40];
 
     bytesRead = file.read(dibHeader, sizeof(dibHeader));
     if (bytesRead != sizeof(dibHeader)) {
-        goto Error;
+        file.close();
+        return false;
     }
 
-    offset = readUint32(bmpHeader + 10);
+    uint32_t offset = readUint32(bmpHeader + 10);
 
-    width = readUint32(dibHeader + 4);
+    uint32_t width = readUint32(dibHeader + 4);
     if (width > 480) {
-        goto Error;
+        file.close();
+        return false;
     }
 
-    height = readUint32(dibHeader + 8);
+    uint32_t height = readUint32(dibHeader + 8);
     if (height > 272) {
-        goto Error;
+        file.close();
+        return false;
     }
 
-    numColorPlanes = readUint16(dibHeader + 12);
+    uint16_t numColorPlanes = readUint16(dibHeader + 12);
     if (numColorPlanes != 1) {
-        goto Error;
+        file.close();
+        return false;
     }
 
-    bitsPerPixel = readUint16(dibHeader + 14);
+    uint16_t bitsPerPixel = readUint16(dibHeader + 14);
     if (bitsPerPixel != 24) {
-        goto Error;
+        file.close();
+        return false;
     }
 
-    lineBytes = width * 3;
+    uint32_t lineBytes = width * 3;
 
     offset += height * lineBytes;
+
+    auto lineBuffer = FILE_VIEW_BUFFER;
 
     for (uint32_t line = 0; line < height; line++) {
         offset -= lineBytes;
         if (!file.seek(offset)) {
-            goto Error;
+            file.close();
+            return false;
         }
 
         bytesRead = file.read(lineBuffer, lineBytes);
         if (bytesRead != lineBytes) {
-            goto Error;
+            file.close();
+            return false;
         }
 
         for (uint32_t i = 0; i < lineBytes; i += 3) {
@@ -146,18 +148,13 @@ uint8_t *bitmapDecode(const char *filePath, int *imageWidth, int *imageHeight) {
         lineBuffer += lineBytes;
     }
 
-    // FILE_VIEW_BUFFER_SIZE
-
     file.close();
 
-    *imageWidth = width;
-    *imageHeight = height;
-    
-    return FILE_VIEW_BUFFER;
+    image->width = width;
+    image->height = height;
+    image->bpp = 24;
+    image->lineOffset = 0;
+    image->pixels = FILE_VIEW_BUFFER;
 
-Error:
-    file.close();
-
-ErrorNoClose:
-    return nullptr;
+    return true;
 }

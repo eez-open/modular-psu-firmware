@@ -337,9 +337,7 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_VALUE_LIST,
     DATA_OPERATION_GET_FLOAT_LIST_LENGTH,
     DATA_OPERATION_GET_FLOAT_LIST,
-    DATA_OPERATION_GET_BITMAP_WIDTH,
-    DATA_OPERATION_GET_BITMAP_HEIGHT,
-    DATA_OPERATION_GET_BITMAP_PIXELS,
+    DATA_OPERATION_GET_BITMAP_IMAGE,
 	DATA_OPERATION_GET_VALUE,
 	DATA_OPERATION_GET_LABEL,
     DATA_OPERATION_GET_OVERLAY_DATA,
@@ -423,9 +421,7 @@ uint16_t getActiveBackgroundColor(const Cursor &cursor, uint16_t id, const Style
 bool isBlinking(const Cursor &cursor, uint16_t id);
 Value getEditValue(const Cursor &cursor, uint16_t id);
 
-uint16_t getBitmapWidth(const Cursor &cursor, uint16_t id);
-uint16_t getBitmapHeight(const Cursor &cursor, uint16_t id);
-Value getBitmapPixels(const Cursor &cursor, uint16_t id);
+Value getBitmapImage(const Cursor &cursor, uint16_t id);
 
 uint32_t ytDataGetRefreshCounter(const Cursor &cursor, uint16_t id);
 uint32_t ytDataGetSize(const Cursor &cursor, uint16_t id);

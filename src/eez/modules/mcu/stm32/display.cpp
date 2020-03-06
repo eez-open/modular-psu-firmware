@@ -670,8 +670,8 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
     g_painted = true;
 }
 
-void drawBitmap(void *bitmapData, int bitmapBpp, int bitmapWidth, int x, int y, int width, int height) {
-    bitBlt(bitmapData, bitmapBpp, bitmapWidth - width, g_buffer, x, y, width, height);
+void drawBitmap(Image *image, int x, int y) {
+    bitBlt(image->pixels, image->bpp, image->lineOffset, g_buffer, x, y, image->width, image->height);
     g_painted = true;
 }
 

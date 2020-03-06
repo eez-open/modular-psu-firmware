@@ -22,7 +22,13 @@
 #include <assert.h>
 
 #if defined(EEZ_PLATFORM_STM32)
-#include <jpeglib.h>
+#include <jpeg.h>
+extern "C" {
+#include <jpeg_utils.h>
+#define YCBCR_420_BLOCK_SIZE       384     /* YCbCr 4:2:0 MCU : 4 8x8 blocks of Y + 1 8x8 block of Cb + 1 8x8 block of Cr   */
+#define YCBCR_422_BLOCK_SIZE       256     /* YCbCr 4:2:2 MCU : 2 8x8 blocks of Y + 1 8x8 block of Cb + 1 8x8 block of Cr   */
+#define YCBCR_444_BLOCK_SIZE       192     /* YCbCr 4:4:4 MCU : 1 8x8 block of Y + 1 8x8 block of Cb + 1 8x8 block of Cr   */
+}
 #endif
 
 #include "toojpeg.h"
@@ -30,7 +36,9 @@
 #include <eez/system.h>
 #include <eez/debug.h>
 #include <eez/memory.h>
+#include <eez/util.h>
 #include <eez/libs/sd_fat/sd_fat.h>
+#include <eez/libs/image/jpeg.h>
 
 static size_t g_imageDataSize;
 
@@ -46,6 +54,14 @@ int jpegEncode(const uint8_t *screenshotPixels, unsigned char **imageData, size_
     return 0;
 }
 
+uint8_t *g_fileData;
+
+#if defined(EEZ_PLATFORM_STM32)
+
+static bool g_jpegInitialized;
+
+#else
+
 extern "C" void * const g_jpegDecodeContext = (void *)FILE_VIEW_BUFFER;
 
 #define NJ_USE_LIBC 0
@@ -58,7 +74,6 @@ static uint8_t *g_decodeBuffer = FILE_VIEW_BUFFER + sizeof(nj_context_t);
 static const size_t DECODE_BUFFER_SIZE = FILE_VIEW_BUFFER_SIZE - sizeof(nj_context_t);
 
 uint8_t *g_decodeDynamicMemory;
-uint8_t *g_fileData;
 
 extern "C" void* njAllocMem(int size) {
     if (g_decodeDynamicMemory + size > g_fileData) {
@@ -84,83 +99,116 @@ extern "C" void njCopyMem(void* dest, const void* src, int size) {
     memcpy(dest, src, size);
 }
 
-uint8_t *jpegDecode(const char *filePath, int *imageWidth, int *imageHeight) {
-    // DebugTrace("context size: %d\n", sizeof(nj_context_t));
-
-    uint32_t fileSize;
-    uint32_t bytesRead;
-
-#if defined(EEZ_PLATFORM_STM32)
-    struct jpeg_decompress_struct cinfo;
-    int rc;
-    int width;
-    int height;
-    int pixelSize;
 #endif
 
+bool jpegDecode(const char *filePath, Image *image) {
     eez::File file;
     if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        goto ErrorNoClose;
+        return false;
     }
 
-    fileSize = file.size();
-    if (fileSize == 0 || fileSize > DECODE_BUFFER_SIZE) {
-        goto Error;
+    uint32_t fileSize = file.size();
+
+    if (fileSize == 0 || fileSize > FILE_VIEW_BUFFER_SIZE) {
+        file.close();
+        return false;
     }
 
-    g_fileData = g_decodeBuffer + DECODE_BUFFER_SIZE - fileSize;
-    bytesRead = file.read(g_fileData, fileSize);
-    if (bytesRead != fileSize) {
-        goto Error;
-    }
-
+    g_fileData = FILE_VIEW_BUFFER + FILE_VIEW_BUFFER_SIZE - fileSize;
+    uint32_t bytesRead = file.read(g_fileData, fileSize);
     file.close();
 
-#if defined(EEZ_PLATFORM_STM32)
-    jpeg_create_decompress(&cinfo);
-    jpeg_mem_src(&cinfo, g_fileData, fileSize);
-    rc = jpeg_read_header(&cinfo, TRUE);
-    if (rc != 1) {
-        goto ErrorNoClose;
+    if (bytesRead != fileSize) {
+        return false;
     }
-    jpeg_start_decompress(&cinfo);
-    width = cinfo.output_width;
-	height = cinfo.output_height;
-	pixelSize = cinfo.output_components;
-    if (width > 480 || height > 272 || pixelSize != 4) {
-        goto Error;
-    }
-    while (cinfo.output_scanline < cinfo.output_height) {
-		unsigned char *buffer_array[1];
-		buffer_array[0] = g_decodeBuffer + cinfo.output_scanline * width * pixelSize;
-		jpeg_read_scanlines(&cinfo, buffer_array, 1);
 
-	}    
-    *imageWidth = width;
-    *imageHeight = height;
-    return g_decodeBuffer;
+#if defined(EEZ_PLATFORM_STM32)
+    if (!g_jpegInitialized) {
+    	JPEG_InitColorTables();
+
+    	hjpeg.Instance = JPEG;
+    	HAL_JPEG_Init(&hjpeg);
+
+    	g_jpegInitialized = true;
+    }
+
+    if (HAL_JPEG_Decode(&hjpeg, g_fileData, fileSize, FILE_VIEW_BUFFER, g_fileData - FILE_VIEW_BUFFER, HAL_MAX_DELAY) != HAL_OK) {
+        return false;
+    }
+
+    JPEG_ConfTypeDef jpegInfo;
+	if (HAL_JPEG_GetInfo(&hjpeg, &jpegInfo) != HAL_OK) {
+        return false;
+	}
+
+    uint32_t width = jpegInfo.ImageWidth;
+    uint32_t height = jpegInfo.ImageHeight;
+    if (width > 480 || height > 272) {
+        return false;
+    }
+
+    uint32_t blockSize;
+    uint32_t lineOffset = 0;
+
+    if (jpegInfo.ChromaSubsampling == JPEG_420_SUBSAMPLING) {
+        blockSize = YCBCR_420_BLOCK_SIZE;
+        if ((width % 16) != 0) {
+            //lineOffset = 16 - (width % 16);
+        }
+    } else if (jpegInfo.ChromaSubsampling == JPEG_422_SUBSAMPLING) {
+        blockSize = YCBCR_422_BLOCK_SIZE;
+        if ((width % 16) != 0) {
+            //lineOffset = 16 - (width % 16);
+        }
+    } else {
+    	// JPEG_444_SUBSAMPLING
+    	blockSize = YCBCR_444_BLOCK_SIZE;
+        if ((width % 8) != 0) {
+            //lineOffset = 8 - (width % 8);
+        }
+    }
+
+    JPEG_YCbCrToRGB_Convert_Function convertFunction;
+    uint32_t numMCUs;
+    if (JPEG_GetDecodeColorConvertFunc(&jpegInfo, &convertFunction, &numMCUs) != HAL_OK) {
+        return false;
+    }
+
+    uint32_t inputBufferSize = numMCUs * blockSize;
+    uint8_t *outputBuffer = FILE_VIEW_BUFFER + inputBufferSize;
+
+    uint32_t convertedDataCount;
+    convertFunction(FILE_VIEW_BUFFER, outputBuffer, 0, inputBufferSize, &convertedDataCount);
+
+    image->width = width;
+    image->height = height;
+    image->bpp = 16;
+    image->lineOffset = lineOffset;
+    image->pixels = outputBuffer;
+
+    return true;
+
 #else
+
     g_decodeDynamicMemory = g_decodeBuffer;
 
     njInit();
 
     if (njDecode(g_fileData, fileSize) != NJ_OK) {
-        goto Error;
+        return false;
     }
 
     if (njGetWidth() > 480 || njGetHeight() > 272 || !njIsColor() || njGetImageSize() > 480 * 272 * 3) {
-        goto Error;
+        return false;
     }
 
-    *imageWidth = njGetWidth();
-    *imageHeight = njGetHeight();
+    image->width = njGetWidth();
+    image->height = njGetHeight();
+    image->bpp = 24;
+    image->lineOffset = 0;
+    image->pixels = njGetImage();
 
-    return njGetImage();
+    return true;
+
 #endif
-
-Error:
-    file.close();
-
-ErrorNoClose:
-    return nullptr;
 }

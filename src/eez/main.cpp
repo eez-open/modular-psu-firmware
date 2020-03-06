@@ -119,6 +119,12 @@ int main(int argc, char **argv) {
     MX_TIM6_Init();
     MX_TIM8_Init();
     MX_TIM12_Init();
+
+    /* Enable I-Cache */
+    SCB_EnableICache();
+
+    /* Enable D-Cache */
+    //SCB_EnableDCache();
 #endif
 
     g_mainTaskHandle = osThreadCreate(osThread(g_mainTask), nullptr);

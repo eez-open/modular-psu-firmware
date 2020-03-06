@@ -1,6 +1,6 @@
 /*
  * EEZ Modular Firmware
- * Copyright (C) 2020-present, Envox d.o.o.
+ * Copyright (C) 2015-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <eez/util.h>
 
 #include <eez/libs/image/image.h>
+#include <eez/libs/image/bitmap.h>
+#include <eez/libs/image/jpeg.h>
 
-bool bitmapDecode(const char *filePath, Image *image);
+bool imageDecode(const char *filePath, Image *image) {
+    if (eez::endsWithNoCase(filePath, ".bmp")) {
+        return bitmapDecode(filePath, image);
+    }
+    return jpegDecode(filePath, image);
+}

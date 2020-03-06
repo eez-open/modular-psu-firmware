@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <eez/libs/image/image.h>
+
 int jpegEncode(const uint8_t *screenshotPixels, unsigned char **imageData, size_t *imageDataSize);
 
-uint8_t *jpegDecode(const char *filePath, int *imageWidth, int *imageHeight);
+bool jpegDecode(const char *filePath, Image *image);

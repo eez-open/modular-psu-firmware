@@ -542,21 +542,9 @@ Value getEditValue(const Cursor &cursor, uint16_t id) {
     return value;
 }
 
-uint16_t getBitmapWidth(const Cursor &cursor, uint16_t id) {
+Value getBitmapImage(const Cursor &cursor, uint16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_BITMAP_WIDTH, (Cursor &)cursor, value);
-    return value.getUInt16();
-}
-
-uint16_t getBitmapHeight(const Cursor &cursor, uint16_t id) {
-    Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_BITMAP_HEIGHT, (Cursor &)cursor, value);
-    return value.getUInt16();
-}
-
-Value getBitmapPixels(const Cursor &cursor, uint16_t id) {
-    Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_BITMAP_PIXELS, (Cursor &)cursor, value);
+    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_BITMAP_IMAGE, (Cursor &)cursor, value);
     return value;
 }
 

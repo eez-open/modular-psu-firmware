@@ -52,8 +52,7 @@
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
-#include <eez/libs/image/jpeg.h>
-#include <eez/libs/image/bitmap.h>
+#include <eez/libs/image/image.h>
 
 namespace eez {
 namespace gui {
@@ -85,9 +84,7 @@ uint32_t g_savedFilesStartPosition;
 int32_t g_selectedFileIndex = -1;
 
 bool g_imageLoadFailed;
-uint8_t *g_openedImagePixels;
-int g_openedImageWidth;
-int g_openedImageHeight;
+Image g_openedImage;
 
 bool g_fileBrowserMode;
 DialogType g_dialogType;
@@ -622,7 +619,7 @@ bool isOpenFileEnabled() {
 }
 
 static void checkImageLoadingStatus() {
-    if (g_openedImagePixels) {
+    if (g_openedImage.pixels) {
         gui::popPage();
         gui::pushPage(gui::PAGE_ID_IMAGE_VIEW);
     } else if (g_imageLoadFailed) {
@@ -655,7 +652,7 @@ void openFile() {
         gui::pushPage(gui::PAGE_ID_DLOG_VIEW);
     } else if (fileItem->type == FILE_TYPE_IMAGE) {
         g_imageLoadFailed = false;
-        g_openedImagePixels = nullptr;
+        g_openedImage.pixels = nullptr;
         using namespace scpi;
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
         psu::gui::showAsyncOperationInProgress("Loading...", checkImageLoadingStatus);
@@ -677,14 +674,7 @@ void openImageFile() {
         strcat(filePath, "/");
         strcat(filePath, fileItem->name);
 
-        if (endsWithNoCase(fileItem->name, ".bmp")) {
-            g_openedImagePixels = bitmapDecode(filePath, &g_openedImageWidth, &g_openedImageHeight);
-        } else {
-
-            g_openedImagePixels = jpegDecode(filePath, &g_openedImageWidth, &g_openedImageHeight);
-        }
-
-        if (!g_openedImagePixels) {
+        if (!imageDecode(filePath, &g_openedImage)) {
             g_imageLoadFailed = true;
         }            
     }
@@ -1110,12 +1100,10 @@ void data_file_manager_delete_file_enabled(data::DataOperationEnum operation, da
 }
 
 void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET_BITMAP_PIXELS) {
-        value = Value(g_openedImagePixels, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_GET_BITMAP_WIDTH) {
-        value = Value(g_openedImageWidth, VALUE_TYPE_UINT16);
-    } else if (operation == data::DATA_OPERATION_GET_BITMAP_HEIGHT) {
-        value = Value(g_openedImageHeight, VALUE_TYPE_UINT16);
+    if (operation == data::DATA_OPERATION_GET_BITMAP_IMAGE) {
+        if (g_openedImage.pixels) {
+            value = Value(&g_openedImage, VALUE_TYPE_POINTER);
+        }
     }
 }
 

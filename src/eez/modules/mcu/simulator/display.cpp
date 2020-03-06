@@ -611,30 +611,30 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
     g_painted = true;
 }
 
-void drawBitmap(void *bitmapData, int bitmapBpp, int bitmapWidth, int x, int y, int width, int height) {
+void drawBitmap(Image *image, int x, int y) {
     uint32_t *dst = g_buffer + y * DISPLAY_WIDTH + x;
-    int nlDst = DISPLAY_WIDTH - width;
+    int nlDst = DISPLAY_WIDTH - image->width;
 
-    if (bitmapBpp == 32) {
-        uint32_t *src = (uint32_t *)bitmapData;
-        int nlSrc = bitmapWidth - width;
+    if (image->bpp == 32) {
+        uint32_t *src = (uint32_t *)image->pixels;
+        int nlSrc = image->lineOffset;
 
         uint32_t pixel;
         uint8_t *pixelAlpha = ((uint8_t *)&pixel) + 3;
 
-        for (uint32_t *srcEnd = src + bitmapWidth * height; src != srcEnd; src += nlSrc, dst += nlDst) {
-            for (uint32_t *lineEnd = dst + width; dst != lineEnd; src++, dst++) {
+        for (uint32_t *srcEnd = src + (image->width + nlSrc) * image->height; src != srcEnd; src += nlSrc, dst += nlDst) {
+            for (uint32_t *lineEnd = dst + image->width; dst != lineEnd; src++, dst++) {
                 pixel = *src;
                 *pixelAlpha = *pixelAlpha * g_opacity / 255;
                 *dst = blendColor(pixel, *dst);
             }
         }
-    } else if (bitmapBpp == 24) {
-        uint8_t *src = (uint8_t *)bitmapData;
-        int nlSrc = 3 * (bitmapWidth - width);
+    } else if (image->bpp == 24) {
+        uint8_t *src = (uint8_t *)image->pixels;
+        int nlSrc = 3 * image->lineOffset;
 
-        for (uint8_t *srcEnd = src + 3 * bitmapWidth * height; src != srcEnd; src += nlSrc, dst += nlDst) {
-            for (uint32_t *lineEnd = dst + width; dst != lineEnd; src += 3, dst++) {
+        for (uint8_t *srcEnd = src + 3 * (image->width + nlSrc) * image->height; src != srcEnd; src += nlSrc, dst += nlDst) {
+            for (uint32_t *lineEnd = dst + image->width; dst != lineEnd; src += 3, dst++) {
                 ((uint8_t *)dst)[0] = ((uint8_t *)src)[2];
                 ((uint8_t *)dst)[1] = ((uint8_t *)src)[1];
                 ((uint8_t *)dst)[2] = ((uint8_t *)src)[0];
@@ -642,11 +642,11 @@ void drawBitmap(void *bitmapData, int bitmapBpp, int bitmapWidth, int x, int y, 
             }
         }
     } else {
-        uint16_t *src = (uint16_t *)bitmapData;
-        int nlSrc = bitmapWidth - width;
+        uint16_t *src = (uint16_t *)image->pixels;
+        int nlSrc = image->lineOffset;
 
-        for (uint16_t *srcEnd = src + bitmapWidth * height; src != srcEnd; src += nlSrc, dst += nlDst) {
-            for (uint32_t *lineEnd = dst + width; dst != lineEnd; src++, dst++) {
+        for (uint16_t *srcEnd = src + (image->width + nlSrc) * image->height; src != srcEnd; src += nlSrc, dst += nlDst) {
+            for (uint32_t *lineEnd = dst + image->width; dst != lineEnd; src++, dst++) {
                 *dst = color16to32(*src);
             }
         }

@@ -59,6 +59,7 @@
 #include "fatfs.h"
 #include "i2c.h"
 #include "iwdg.h"
+#include "jpeg.h"
 #include "libjpeg.h"
 #include "ltdc.h"
 #include "lwip.h"

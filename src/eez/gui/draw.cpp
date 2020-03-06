@@ -381,7 +381,7 @@ int measureMultilineText(const char *text, int x, int y, int w, int h, const Sty
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, int x, int y, int w, int h, const Style *style, bool active) {
+void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bool active) {
     int x1 = x;
     int y1 = y;
     int x2 = x + w - 1;
@@ -401,8 +401,8 @@ void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, 
 		y2 -= style->border_size_bottom;
 	}
 
-    int width = bitmapWidth;
-    int height = bitmapHeight;
+    int width = image->width;
+    int height = image->height;
 
     int x_offset;
     if (styleIsHorzAlignLeft(style))
@@ -438,7 +438,7 @@ void drawBitmap(void *bitmapPixels, int bpp, int bitmapWidth, int bitmapHeight, 
         display::setOpacity(style->opacity);
     }
 
-    display::drawBitmap(bitmapPixels, bpp, width, x_offset, y_offset, width, height);
+    display::drawBitmap(image, x_offset, y_offset);
 
     display::setOpacity(savedOpacity);
 }

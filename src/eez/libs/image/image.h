@@ -18,6 +18,14 @@
 
 #pragma once
 
-#include <eez/libs/image/image.h>
+#include <stdint.h>
 
-bool bitmapDecode(const char *filePath, Image *image);
+struct Image {
+    uint32_t width;
+    uint32_t height;
+    uint32_t bpp;
+    uint32_t lineOffset;
+    uint8_t *pixels;
+};
+
+bool imageDecode(const char *filePath, Image *image);
