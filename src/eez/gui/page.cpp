@@ -148,16 +148,16 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1,
     return page;
 }
 
-ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1, const char *message2, const char *message3)  {
+ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1, const char *message2, const char *message3, bool autoDismiss)  {
     ToastMessagePage *page = ToastMessagePage::findFreePage();
 
     page->type = type;
     page->message1 = message1;
     page->message2 = message2;
     page->message3 = message3;
-    page->actionLabel = type == ERROR_TOAST ? "Close" : nullptr;
+    page->actionLabel = type == ERROR_TOAST && !autoDismiss ? "Close" : nullptr;
     page->actionWidgetIsActive = false;
-    page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
+    page->actionWidget.action = type == ERROR_TOAST && !autoDismiss ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
     page->appContext = g_appContext;
     page->appContext->m_toastActionWithoutParam = nullptr;
 

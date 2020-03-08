@@ -86,14 +86,15 @@ void errorMessage(const char *message1, const char *message2) {
     sound::playBeep();
 }
 
-void errorMessage(const char *message1, const char *message2, const char *message3) {
+void errorMessage(const char *message1, const char *message2, const char *message3, bool autoDismiss) {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     g_appContext = &eez::psu::gui::g_psuAppContext;
 #endif
 
-    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message1, message2, message3));
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message1, message2, message3, autoDismiss));
     sound::playBeep();
 }
+
 void errorMessage(data::Value value) {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     g_appContext = &eez::psu::gui::g_psuAppContext;

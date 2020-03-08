@@ -32,7 +32,7 @@ void infoMessage(data::Value value);
 void infoMessage(const char *message1, const char *message2);
 void errorMessage(const char *message);
 void errorMessage(const char *message1, const char *message2);
-void errorMessage(const char *message1, const char *message2, const char *message3);
+void errorMessage(const char *message1, const char *message2, const char *message3, bool autoDismiss = false);
 void errorMessage(data::Value value);
 void errorMessageWithAction(data::Value value, void (*action)(int param), const char *actionLabel, int actionParam);
 void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel);

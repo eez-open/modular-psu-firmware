@@ -121,7 +121,7 @@ protected:
 
     int getActivePageStackPointer();
 
-    void updatePage(int i, WidgetCursor &widgetCursor);
+    virtual void updatePage(int i, WidgetCursor &widgetCursor);
 
     bool isPageFullyCovered(int pageNavigationStackIndex);
     

@@ -371,7 +371,17 @@ enum DataEnum {
     DATA_ID_FILE_MANAGER_IS_LIST_VIEW_OPTION_AVAILABLE = 369,
     DATA_ID_FILE_MANAGER_FILE_ICON = 370,
     DATA_ID_FILE_MANAGER_LAYOUT = 371,
-    DATA_ID_FILE_MANAGER_FILE_DESCRIPTION = 372
+    DATA_ID_FILE_MANAGER_FILE_DESCRIPTION = 372,
+    DATA_ID_TOUCH_RAW_X = 373,
+    DATA_ID_TOUCH_RAW_Y = 374,
+    DATA_ID_TOUCH_RAW_Z1 = 375,
+    DATA_ID_TOUCH_RAW_PRESSED = 376,
+    DATA_ID_TOUCH_CALIBRATED_X = 377,
+    DATA_ID_TOUCH_CALIBRATED_Y = 378,
+    DATA_ID_TOUCH_CALIBRATED_PRESSED = 379,
+    DATA_ID_TOUCH_FILTERED_X = 380,
+    DATA_ID_TOUCH_FILTERED_Y = 381,
+    DATA_ID_TOUCH_FILTERED_PRESSED = 382
 };
 
 void data_none(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -747,6 +757,16 @@ void data_file_manager_is_list_view_option_available(DataOperationEnum operation
 void data_file_manager_file_icon(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_file_manager_layout(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_file_manager_file_description(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_touch_raw_x(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_touch_raw_y(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_touch_raw_z1(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_touch_raw_pressed(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_touch_calibrated_x(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_touch_calibrated_y(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_touch_calibrated_pressed(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_touch_filtered_x(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_touch_filtered_y(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_touch_filtered_pressed(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -1591,11 +1611,12 @@ enum PagesEnum {
     PAGE_ID_DCM220_FRONT_PANEL_LED = 155,
     PAGE_ID_FILE_MANAGER_DETAILS_VIEW = 156,
     PAGE_ID_FILE_MANAGER_SCRIPTS_VIEW = 157,
-    PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW = 158
+    PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW = 158,
+    PAGE_ID_TOUCH_TEST = 159
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[310359];
+extern const uint8_t assets[310765];
 #else
-extern const uint8_t assets[1360644];
+extern const uint8_t assets[1361584];
 #endif
