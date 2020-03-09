@@ -82,7 +82,7 @@ public:
     static ToastMessagePage *create(ToastType type, const char *message1);
     static ToastMessagePage *create(ToastType type, data::Value message1Value);
     static ToastMessagePage *create(ToastType type, const char *message1, const char *message2);
-    static ToastMessagePage *create(ToastType type, const char *message1, const char *message2, const char *message3);
+    static ToastMessagePage *create(ToastType type, const char *message1, const char *message2, const char *message3, bool autoDismiss = false);
     static ToastMessagePage *create(ToastType type, data::Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam);
     static ToastMessagePage *create(ToastType type, const char *message, void (*action)(), const char *actionLabel);
 

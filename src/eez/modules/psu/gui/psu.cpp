@@ -696,29 +696,6 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
         } else if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
             edit_mode_step::onTouchMove();
         }        
-#ifdef DEBUG
-        else if (activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
-            int x = touchEvent.x;
-            if (x < 1) {
-                x = 1;
-            } else if (x > eez::mcu::display::getDisplayWidth() - 2) {
-                x = eez::mcu::display::getDisplayWidth() - 2;
-            }
-
-            int y = touchEvent.y;
-            if (y < 1) {
-                y = 1;
-            } else if (y > eez::mcu::display::getDisplayHeight() - 2) {
-                y = eez::mcu::display::getDisplayHeight() - 2;
-            }
-        
-#if OPTION_SDRAM
-            mcu::display::selectBuffer(m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex);
-#endif
-            eez::mcu::display::setColor(255, 255, 255);
-            eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
-        }
-#endif
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         if (activePageId == PAGE_ID_EDIT_MODE_SLIDER) {
             edit_mode_slider::onTouchUp();
@@ -982,6 +959,58 @@ bool PsuAppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, i
     }
 
     return false;
+}
+
+void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
+    AppContext::updatePage(i, widgetCursor);
+
+    if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
+        if (touch::g_eventType != EVENT_TYPE_TOUCH_DOWN || touch::g_eventType != EVENT_TYPE_TOUCH_MOVE) {
+#if OPTION_SDRAM
+            mcu::display::selectBuffer(m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex);
+#endif
+            int x = MIN(MAX(touch::getX(), 1), eez::mcu::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(touch::getY(), 1), eez::mcu::display::getDisplayHeight() - 2);
+            eez::mcu::display::setColor(255, 255, 255);
+            eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+        }
+    } else if (getActivePageId() == PAGE_ID_TOUCH_TEST) {
+#if OPTION_SDRAM
+        mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
+#endif
+
+        bool anyPressed = false;
+
+        Cursor cursor;
+
+        if (get(cursor, DATA_ID_TOUCH_RAW_PRESSED).getInt()) {
+            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_RAW_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_RAW_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
+            eez::mcu::display::setColor(255, 0, 0);
+            eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+            anyPressed = true;
+        }
+
+        if (get(cursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
+            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
+            eez::mcu::display::setColor(0, 255, 0);
+            eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+            anyPressed = true;
+        }
+
+        if (get(cursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
+            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
+            eez::mcu::display::setColor(0, 0, 255);
+            eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+            anyPressed = true;
+        }
+
+        if (!anyPressed) {
+            refreshScreen();
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
