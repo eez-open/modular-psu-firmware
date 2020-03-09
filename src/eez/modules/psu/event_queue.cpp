@@ -377,7 +377,7 @@ static int getFilter() {
     return g_filter;
 }
 
-static void setFilter(int filter) {
+void setFilter(int filter) {
     persist_conf::setEventQueueFilter(filter);
     g_refreshEvents = true;
 }

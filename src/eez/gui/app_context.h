@@ -56,8 +56,10 @@ public:
 
     void showPage(int pageId);
     void doShowPage();
+    
     void pushPage(int pageId, Page *page = nullptr);
     void doPushPage();
+    
     void popPage();
 
     int getActivePageId();
@@ -71,6 +73,7 @@ public:
     void replacePage(int pageId, Page *page = nullptr);
 
     Page *getPage(int pageId);
+    int getNumPagesOnStack();
     bool isPageOnStack(int pageId);
     int getNumPagesOnStack() {
         return m_pageNavigationStackPointer + 1;

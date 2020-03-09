@@ -381,7 +381,8 @@ enum DataEnum {
     DATA_ID_TOUCH_CALIBRATED_PRESSED = 379,
     DATA_ID_TOUCH_FILTERED_X = 380,
     DATA_ID_TOUCH_FILTERED_Y = 381,
-    DATA_ID_TOUCH_FILTERED_PRESSED = 382
+    DATA_ID_TOUCH_FILTERED_PRESSED = 382,
+    DATA_ID_CAN_SHOW_PREVIOUS_PAGE = 383
 };
 
 void data_none(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -767,6 +768,7 @@ void data_touch_calibrated_pressed(DataOperationEnum operation, Cursor &cursor, 
 void data_touch_filtered_x(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_touch_filtered_y(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_touch_filtered_pressed(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_can_show_previous_page(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -1616,7 +1618,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[310823];
+extern const uint8_t assets[310927];
 #else
-extern const uint8_t assets[1361584];
+extern const uint8_t assets[1361644];
 #endif

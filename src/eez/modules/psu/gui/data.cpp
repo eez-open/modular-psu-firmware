@@ -5475,6 +5475,12 @@ void data_async_operation_throbber(data::DataOperationEnum operation, data::Curs
     }
 }
 
+void data_can_show_previous_page(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = getNumPagesOnStack() > 1;
+    }
+}
+
 } // namespace gui
 } // namespace eez
 

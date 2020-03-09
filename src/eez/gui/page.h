@@ -70,6 +70,8 @@ class InternalPage : public Page {
     Widget widget;
 };
 
+////////////////////////////////////////////////////////////////////////////////
+
 enum ToastType {
     INFO_TOAST,
     ERROR_TOAST
@@ -118,6 +120,8 @@ private:
 
     AppContext *appContext;
 };
+
+////////////////////////////////////////////////////////////////////////////////
 
 class SelectFromEnumPage : public InternalPage {
   public:
@@ -170,6 +174,8 @@ class SelectFromEnumPage : public InternalPage {
     void getItemLabel(int itemIndex, char *text, int count);
 };
 
+////////////////////////////////////////////////////////////////////////////////
+
 enum MenuType {
     MENU_TYPE_BUTTON
 };
@@ -197,6 +203,14 @@ private:
     void (*m_callback)(int);
 
     void init(AppContext *appContext, const char *message, const char **menuItems, void(*callback)(int));
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+class DialogPage : public InternalPage {
+public:
+
+private:
 };
 
 } // namespace gui

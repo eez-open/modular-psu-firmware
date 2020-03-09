@@ -283,6 +283,8 @@ int16_t getLastErrorEventId();
 const char *getEventTypeName(int16_t eventId);
 const char *getEventMessage(int16_t eventId);
 
+void setFilter(int filter);
+
 void pushEvent(int16_t eventId);
 void pushDebugTrace(const char *message, size_t messageLength);
 

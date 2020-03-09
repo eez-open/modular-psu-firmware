@@ -262,6 +262,13 @@ void onEncoder(int counter, bool clicked);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void showDebugTraceLog() {
+    event_queue::setFilter(event_queue::EVENT_TYPE_DEBUG);
+    pushPage(PAGE_ID_EVENT_QUEUE);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 PsuAppContext::PsuAppContext() {
     m_pushProgressPage = false;
     m_popProgressPage = false;
@@ -429,7 +436,7 @@ void PsuAppContext::stateManagment() {
 
     if (m_showUncaughtScriptExceptionMessage) {
         m_showUncaughtScriptExceptionMessage = false;
-        errorMessageWithAction("Uncaught script exception!", action_show_event_queue, "Show debug trace log");
+        errorMessageWithAction("Uncaught script exception!", showDebugTraceLog, "Show debug trace log");
     }
 
     if (!sd_card::isMounted(nullptr)) {

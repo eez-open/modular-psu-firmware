@@ -211,6 +211,10 @@ Page *AppContext::getPage(int pageId) {
     return nullptr;
 }
 
+int AppContext::getNumPagesOnStack() {
+    return m_pageNavigationStackPointer + 1;
+}
+
 bool AppContext::isPageOnStack(int pageId) {
     for (int i = 0; i <= m_pageNavigationStackPointer; ++i) {
         if (m_pageNavigationStack[i].pageId == pageId) {

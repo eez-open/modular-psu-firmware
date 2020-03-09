@@ -758,6 +758,10 @@ void MenuWithButtonsPage::executeAction() {
     (*g_menuWithButtonsPage.m_callback)(getFoundWidgetAtDown().cursor.i);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 } // namespace gui
 } // namespace eez

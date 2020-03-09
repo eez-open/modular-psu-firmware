@@ -186,6 +186,10 @@ Page *getPage(int pageId) {
     return g_appContext->getPage(pageId);
 }
 
+int getNumPagesOnStack() {
+    return g_appContext->getNumPagesOnStack();
+}
+
 bool isPageOnStack(int pageId) {
     return g_appContext->isPageOnStack(pageId);
 }
