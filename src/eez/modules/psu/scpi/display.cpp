@@ -198,7 +198,7 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
 scpi_result_t scpi_cmd_displayWindowDlog(scpi_t *context) {
 #if OPTION_DISPLAY
     dlog_view::g_showLatest = true;
-    psu::gui::g_psuAppContext.pushPageOnNextIter(PAGE_ID_DLOG_VIEW);
+    psu::gui::g_psuAppContext.pushPage(PAGE_ID_DLOG_VIEW);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

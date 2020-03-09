@@ -41,10 +41,8 @@ AppContext *g_appContext;
 ////////////////////////////////////////////////////////////////////////////////
 
 AppContext::AppContext() {
-    m_nextIterOperation = NEXT_ITER_OPERATION_NONE;
     m_updatePageIndex = -1;
 }
-
 
 void AppContext::stateManagment() {
     // remove alert message after period of time
@@ -54,17 +52,6 @@ void AppContext::stateManagment() {
         if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
             popPage();
         }
-    }
-
-    if (m_nextIterOperation == NEXT_ITER_OPERATION_SET) {
-        setPage(m_pageIdToSetOnNextIter);
-        if (m_pageIdToSetOnNextIter == PAGE_ID_WELCOME) {
-            playPowerUp(sound::PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE);
-        } 
-        m_nextIterOperation = NEXT_ITER_OPERATION_NONE;
-    } else if (m_nextIterOperation == NEXT_ITER_OPERATION_PUSH) {
-        pushPage(m_pageIdToSetOnNextIter, m_pageToSetOnNextIter);
-        m_nextIterOperation = NEXT_ITER_OPERATION_NONE;
     }
 
     // call m_checkAsyncOperationStatus
@@ -177,7 +164,9 @@ void AppContext::replacePage(int pageId, Page *page) {
 
 void AppContext::pushPage(int pageId, Page *page) {
     if (osThreadGetId() != g_guiTaskHandle) {
-        pushPageOnNextIter(pageId, page);
+        m_pageIdToSetOnNextIter = pageId;
+        m_pageToSetOnNextIter = page;
+        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE, getAppContextId(this)), osWaitForever);
     } else {
         int previousPageId = getActivePageId();
 
@@ -189,6 +178,14 @@ void AppContext::pushPage(int pageId, Page *page) {
 
         doShowPage(pageId, page, previousPageId);
     }
+}
+
+void AppContext::doShowPage() {
+    setPage(m_pageIdToSetOnNextIter);
+    
+    if (m_pageIdToSetOnNextIter == PAGE_ID_WELCOME) {
+        playPowerUp(sound::PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE);
+    } 
 }
 
 void AppContext::popPage() {
@@ -224,21 +221,19 @@ bool AppContext::isPageOnStack(int pageId) {
 }
 
 void AppContext::showPage(int pageId) {
-	if (pageId != getActivePageId()) {
-		setPage(pageId);
-	}
+    if (osThreadGetId() != g_guiTaskHandle) {
+        m_pageIdToSetOnNextIter = pageId;
+        m_pageToSetOnNextIter = nullptr;
+        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE, getAppContextId(this)), osWaitForever);
+    } else {
+        if (pageId != getActivePageId()) {
+            setPage(pageId);
+        }
+    }
 }
 
-void AppContext::showPageOnNextIter(int pageId, Page *page) {
-    m_pageIdToSetOnNextIter = pageId;
-    m_pageToSetOnNextIter = page;
-    m_nextIterOperation = NEXT_ITER_OPERATION_SET;
-}
-
-void AppContext::pushPageOnNextIter(int pageId, Page *page) {
-    m_pageIdToSetOnNextIter = pageId;
-    m_pageToSetOnNextIter = page;
-    m_nextIterOperation = NEXT_ITER_OPERATION_PUSH;
+void AppContext::doPushPage() {
+    pushPage(m_pageIdToSetOnNextIter, m_pageToSetOnNextIter);
 }
 
 void AppContext::pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont, bool showRadioButtonIcon) {

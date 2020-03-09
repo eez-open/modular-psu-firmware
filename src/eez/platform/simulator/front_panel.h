@@ -27,7 +27,7 @@ namespace gui {
 
 class FrontPanelAppContext : public AppContext {
 public:
-    FrontPanelAppContext();
+    void stateManagment();
 
     int getLongTouchActionHook(const WidgetCursor &widgetCursor) override;
 

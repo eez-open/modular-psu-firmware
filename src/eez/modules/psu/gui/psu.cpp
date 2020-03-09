@@ -432,22 +432,6 @@ void PsuAppContext::stateManagment() {
         errorMessageWithAction("Uncaught script exception!", action_show_event_queue, "Show debug trace log");
     }
 
-    if (m_showTextInputOnNextIter) {
-        m_showTextInputOnNextIter = false;
-        Keypad::startPush(m_inputLabel, m_textInput, m_textInputMinChars, m_textInputMaxChars, false, onSetTextInputResult, onCancelTextInput);
-
-    }
-
-    if (m_showNumberInputOnNextIter) {
-        m_showNumberInputOnNextIter = false;
-        NumericKeypad::start(m_inputLabel, Value(m_numberInput, m_numberInputOptions.editValueUnit), m_numberInputOptions, onSetNumberInputResult, nullptr, onCancelNumberInput);
-    }
-
-    if (m_showMenuInputOnNextIter) {
-        m_showMenuInputOnNextIter = false;
-        showMenu(this, m_inputLabel, m_menuType, m_menuItems, onSetMenuInputResult);
-    }
-
     if (!sd_card::isMounted(nullptr)) {
         if (
             isPageOnStack(PAGE_ID_EVENT_QUEUE) ||
@@ -855,94 +839,107 @@ void PsuAppContext::showUncaughtScriptExceptionMessage() {
     m_showUncaughtScriptExceptionMessage = true;
 }
 
-void PsuAppContext::onSetTextInputResult(char *value) {
+void TextInputParams::onSet(char *value) {
     g_psuAppContext.popPage();
 
-    g_psuAppContext.m_textInput = value;
+    g_psuAppContext.m_textInputParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
 }
 
-void PsuAppContext::onCancelTextInput() {
+void TextInputParams::onCancel() {
     g_psuAppContext.popPage();
 
-    g_psuAppContext.m_textInput = nullptr;
+    g_psuAppContext.m_textInputParams.m_input = nullptr;
     g_psuAppContext.m_inputReady = true;
 }
 
 const char *PsuAppContext::textInput(const char *label, size_t minChars, size_t maxChars, const char *value) {
     m_inputLabel = label;
-    m_textInputMinChars = minChars;
-    m_textInputMaxChars = maxChars;
-    m_textInput = value;
+    m_textInputParams.m_minChars = minChars;
+    m_textInputParams.m_maxChars = maxChars;
+    m_textInputParams.m_input = value;
 
     m_inputReady = false;
-    m_showTextInputOnNextIter = true;
+
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_TEXT_INPUT, 0), osWaitForever);
 
     while (!m_inputReady) {
         osDelay(1);
     }
 
-    return m_textInput;
+    return m_textInputParams.m_input;
 }
 
-void PsuAppContext::onSetNumberInputResult(float value) {
+void PsuAppContext::doShowTextInput() {
+    Keypad::startPush(m_inputLabel, m_textInputParams.m_input, m_textInputParams.m_minChars, m_textInputParams.m_maxChars, false, m_textInputParams.onSet, m_textInputParams.onCancel);
+}
+
+void NumberInputParams::onSet(float value) {
     g_psuAppContext.popPage();
 
-    g_psuAppContext.m_numberInput = value;
+    g_psuAppContext.m_numberInputParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
 }
 
-void PsuAppContext::onCancelNumberInput() {
+void NumberInputParams::onCancel() {
     g_psuAppContext.popPage();
 
-    g_psuAppContext.m_numberInput = NAN;
+    g_psuAppContext.m_numberInputParams.m_input = NAN;
     g_psuAppContext.m_inputReady = true;
 }
 
 float PsuAppContext::numberInput(const char *label, Unit unit, float min, float max, float value) {
     m_inputLabel = label;
 
-    m_numberInputOptions.editValueUnit = unit;
-    m_numberInputOptions.min = min;
-    m_numberInputOptions.enableMinButton();
-    m_numberInputOptions.max = max;
-    m_numberInputOptions.enableMaxButton();
-    m_numberInputOptions.flags.signButtonEnabled = m_numberInputOptions.min < 0;
-    m_numberInputOptions.flags.dotButtonEnabled = true;
+    m_numberInputParams.m_options.editValueUnit = unit;
+    m_numberInputParams.m_options.min = min;
+    m_numberInputParams.m_options.enableMinButton();
+    m_numberInputParams.m_options.max = max;
+    m_numberInputParams.m_options.enableMaxButton();
+    m_numberInputParams.m_options.flags.signButtonEnabled = m_numberInputParams.m_options.min < 0;
+    m_numberInputParams.m_options.flags.dotButtonEnabled = true;
 
-    m_numberInput = value;
+    m_numberInputParams.m_input = value;
 
     m_inputReady = false;
-    m_showNumberInputOnNextIter = true;
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT, 0), osWaitForever);
 
     while (!m_inputReady) {
         osDelay(1);
     }
 
-    return m_numberInput;
+    return m_numberInputParams.m_input;
 }
 
-void PsuAppContext::onSetMenuInputResult(int value) {
+void PsuAppContext::doShowNumberInput() {
+    NumericKeypad::start(m_inputLabel, Value(m_numberInputParams.m_input, m_numberInputParams.m_options.editValueUnit), m_numberInputParams.m_options, m_numberInputParams.onSet, nullptr, m_numberInputParams.onCancel);
+}
+
+void MenuInputParams::onSet(int value) {
     g_psuAppContext.popPage();
 
-    g_psuAppContext.m_menuInput = value;
+    g_psuAppContext.m_menuInputParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
 }
 
 int PsuAppContext::menuInput(const char *label, MenuType menuType, const char **menuItems) {
     m_inputLabel = label;
 
-    m_menuType = menuType;
-    m_menuItems = menuItems;
+    m_menuInputParams.m_type = menuType;
+    m_menuInputParams.m_items = menuItems;
 
     m_inputReady = false;
-    m_showMenuInputOnNextIter = true;
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT, 0), osWaitForever);
 
     while (!m_inputReady) {
         osDelay(1);
     }
 
-    return m_menuInput;
+    return m_menuInputParams.m_input;
+}
+
+void PsuAppContext::doShowMenuInput() {
+    showMenu(this, m_inputLabel, m_menuInputParams.m_type, m_menuInputParams.m_items, m_menuInputParams.onSet);
 }
 
 bool PsuAppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action) {
@@ -1360,23 +1357,23 @@ bool isFrontPanelLocked() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void showWelcomePage() {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_WELCOME);
+    psu::gui::g_psuAppContext.showPage(PAGE_ID_WELCOME);
 }
 
 void showEnteringStandbyPage() {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_ENTERING_STANDBY);
+    psu::gui::g_psuAppContext.showPage(PAGE_ID_ENTERING_STANDBY);
 }
 
 void showStandbyPage() {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_STANDBY);
+    psu::gui::g_psuAppContext.showPage(PAGE_ID_STANDBY);
 }
 
 void showSavingPage() {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_SAVING);
+    psu::gui::g_psuAppContext.showPage(PAGE_ID_SAVING);
 }
 
 void showShutdownPage() {
-    psu::gui::g_psuAppContext.showPageOnNextIter(PAGE_ID_SHUTDOWN);
+    psu::gui::g_psuAppContext.showPage(PAGE_ID_SHUTDOWN);
 }
 
 void showAsyncOperationInProgress(const char *message, void (*checkStatus)()) {
@@ -1743,6 +1740,24 @@ uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const St
     return style->active_color;
 }
 
+int16_t getAppContextId(AppContext *pAppContext) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    if (pAppContext == &g_frontPanelAppContext) {
+        return 2;
+    }
+#endif
+    return 1;
+}
+
+AppContext *getAppContextFromId(int16_t id) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    if (id == 2) {
+        return &g_frontPanelAppContext;
+    }
+#endif
+    return &g_psuAppContext;
+}
+
 void onGuiQueueMessageHook(uint8_t type, int16_t param) {
     if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST_FINISHED) {
         g_ChSettingsListsPage.onImportListFinished(param);
@@ -1750,6 +1765,15 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
         g_ChSettingsListsPage.onExportListFinished(param);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED) {
         g_UserProfilesPage.onAsyncOperationFinished(param);
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_TEXT_INPUT) {
+        g_appContext = &g_psuAppContext;
+        g_psuAppContext.doShowTextInput();
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT) {
+        g_appContext = &g_psuAppContext;
+        g_psuAppContext.doShowNumberInput();
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT) {
+        g_appContext = &g_psuAppContext;
+        g_psuAppContext.doShowMenuInput();
     }
 }
 

@@ -50,9 +50,8 @@ void startThread();
 extern osThreadId g_guiTaskHandle;
 extern osMessageQId g_guiMessageQueueId;
 
-#define GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST_FINISHED 1
-#define GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST_FINISHED 2
-#define GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED 3
+#define GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE 1
+#define GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE 2
 
 #define GUI_QUEUE_MESSAGE(type, param) ((((uint32_t)(uint16_t)(int16_t)param) << 8) | (type))
 #define GUI_QUEUE_MESSAGE_TYPE(message) ((message) & 0xFF)
@@ -86,6 +85,9 @@ void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t curre
 void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), uint16_t currentValue, bool(*disabledCallback)(uint16_t value), void(*onSet)(uint16_t), bool smallFont = false, bool showRadioButtonIcon = true);
 bool isPageInternal(int pageId);
 void executeAction(int actionId);
+
+int16_t getAppContextId(AppContext *pAppContext);
+AppContext *getAppContextFromId(int16_t id);
 
 ////////////////////////////////////////////////////////////////////////////////
 

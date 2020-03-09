@@ -78,14 +78,30 @@ void mainLoop(const void *) {
 #endif
 }
 
-void oneIter() {
-    osEvent event = osMessageGet(g_guiMessageQueueId, 0);
-
-    if (event.status == osEventMessage) {
-    	uint32_t message = event.value.v;
-    	uint8_t type = GUI_QUEUE_MESSAGE_TYPE(message);
-    	int16_t param = GUI_QUEUE_MESSAGE_PARAM(message);
+void onGuiQueueMessage(uint8_t type, int16_t param) {
+    if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE) {
+        g_appContext = getAppContextFromId(param);
+        g_appContext->doShowPage();
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE) {
+        g_appContext = getAppContextFromId(param);
+        g_appContext->doPushPage();
+    } else {
         onGuiQueueMessageHook(type, param);
+    }
+}
+
+void oneIter() {
+    while (true) {
+        osEvent event = osMessageGet(g_guiMessageQueueId, 0);
+
+        if (event.status != osEventMessage) {
+            break;
+        }
+
+        uint32_t message = event.value.v;
+        uint8_t type = GUI_QUEUE_MESSAGE_TYPE(message);
+        int16_t param = GUI_QUEUE_MESSAGE_PARAM(message);
+        onGuiQueueMessage(type, param);
     }
 
     WATCHDOG_RESET();

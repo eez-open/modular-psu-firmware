@@ -76,6 +76,28 @@ void showAsyncOperationInProgress(const char *message, void (*checkStatus)() = 0
 void hideAsyncOperationInProgress();
 extern data::Value g_progress;
 
+struct TextInputParams {
+    size_t m_minChars;
+    size_t m_maxChars;
+    const char *m_input;
+    static void onSet(char *);
+    static void onCancel();
+};
+
+struct NumberInputParams {
+    NumericKeypadOptions m_options;
+    float m_input;
+    static void onSet(float value);
+    static void onCancel();
+};
+
+struct MenuInputParams {
+    MenuType m_type;
+    const char **m_items;
+    int m_input;
+    static void onSet(int value);
+};
+
 class PsuAppContext : public AppContext {
 public:
     PsuAppContext();
@@ -103,8 +125,13 @@ public:
     void showUncaughtScriptExceptionMessage();
 
     const char *textInput(const char *label, size_t minChars, size_t maxChars, const char *value);
+    void doShowTextInput();
+    
     float numberInput(const char *label, Unit unit, float min, float max, float value);
+    void doShowNumberInput();
+    
     int menuInput(const char *label, MenuType menuType, const char **menuItems);
+    void doShowMenuInput();
 
 protected:
     bool m_pushProgressPage;
@@ -122,24 +149,14 @@ protected:
 
     const char *m_inputLabel;
 
-    bool m_showTextInputOnNextIter;
-    size_t m_textInputMinChars;
-    size_t m_textInputMaxChars;
-    const char *m_textInput;
-    static void onSetTextInputResult(char *);
-    static void onCancelTextInput();
-
-    bool m_showNumberInputOnNextIter;
-    NumericKeypadOptions m_numberInputOptions;
-    float m_numberInput;
-    static void onSetNumberInputResult(float value);
-    static void onCancelNumberInput();
-
-    bool m_showMenuInputOnNextIter;
-    MenuType m_menuType;
-    const char **m_menuItems;
-    int m_menuInput;
-    static void onSetMenuInputResult(int value);
+    friend struct TextInputParams;
+    TextInputParams m_textInputParams;
+    
+    friend struct NumberInputParams;
+    NumberInputParams m_numberInputParams;
+    
+    friend struct MenuInputParams;
+    MenuInputParams m_menuInputParams;
 
     bool m_inputReady;
 
@@ -164,6 +181,13 @@ static const uint16_t g_ytGraphStyles[] = {
     STYLE_ID_YT_GRAPH_Y3,
     STYLE_ID_YT_GRAPH_Y4
 };
+
+#define GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST_FINISHED 100
+#define GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST_FINISHED 101
+#define GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED 102
+#define GUI_QUEUE_MESSAGE_TYPE_SHOW_TEXT_INPUT 103
+#define GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT 104
+#define GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT 105
 
 } // namespace gui
 } // namespace psu

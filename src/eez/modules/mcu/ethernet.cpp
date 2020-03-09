@@ -151,6 +151,7 @@ static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t le
 		break;
 
 	case NETCONN_EVT_ERROR:
+        DebugTrace("NETCONN_EVT_ERROR\n");
 		osDelay(0);
 		break;
 	}

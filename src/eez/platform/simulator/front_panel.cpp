@@ -38,8 +38,10 @@ AppContext &getRootAppContext() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-FrontPanelAppContext::FrontPanelAppContext() {
-    showPageOnNextIter(PAGE_ID_FRONT_PANEL);
+void FrontPanelAppContext::stateManagment() {
+    if (!isPageOnStack(PAGE_ID_FRONT_PANEL)) {
+        showPage(PAGE_ID_FRONT_PANEL);
+    }
 }
 
 int FrontPanelAppContext::getMainPageId() {

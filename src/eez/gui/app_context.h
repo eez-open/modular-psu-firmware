@@ -32,12 +32,6 @@ struct PageOnStack {
 #endif
 };
 
-enum NextIterOperation {
-    NEXT_ITER_OPERATION_NONE,
-    NEXT_ITER_OPERATION_SET,
-    NEXT_ITER_OPERATION_PUSH
-};
-
 class AppContext {
 public:
 	int x;
@@ -61,9 +55,9 @@ public:
     virtual void stateManagment();
 
     void showPage(int pageId);
-    void showPageOnNextIter(int pageId, Page *page = nullptr);
-    void pushPageOnNextIter(int pageId, Page *page = nullptr);
-    void pushPage(int pageId, Page *page = 0);
+    void doShowPage();
+    void pushPage(int pageId, Page *page = nullptr);
+    void doPushPage();
     void popPage();
 
     int getActivePageId();
@@ -107,7 +101,6 @@ protected:
     int m_activePageIndex;
     int m_updatePageIndex;
 
-    NextIterOperation m_nextIterOperation;
     int m_pageIdToSetOnNextIter;
     Page *m_pageToSetOnNextIter;
 
