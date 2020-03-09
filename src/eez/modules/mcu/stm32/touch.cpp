@@ -21,6 +21,9 @@
 #include <i2c.h>
 #include <eez/system.h>
 #include <eez/debug.h>
+#include <eez/gui/gui.h>
+
+// TSC2007IPW - Touch Screen Controller
 
 const uint16_t TOUCH_DEVICE_ADDRESS = 0x90;
 
@@ -28,13 +31,13 @@ namespace eez {
 namespace mcu {
 namespace touch {
 
-static const int CONF_TOUCH_PRESSED_DEBOUNCE_TIMEOUT_MS = 20;
-static const int CONF_TOUCH_NOT_PRESSED_DEBOUNCE_TIMEOUT_MS = 50;
+static const int CONF_TOUCH_PRESSED_DEBOUNCE_TIMEOUT_MS = 10;
+static const int CONF_TOUCH_NOT_PRESSED_DEBOUNCE_TIMEOUT_MS = 25;
 
-static const int CONF_TOUCH_Z1_THRESHOLD = 100;
+static const int CONF_TOUCH_Z1_THRESHOLD = 50;
 
-static const uint8_t X_DATA_ID = 0b11000010;
-static const uint8_t Y_DATA_ID = 0b11010010;
+static const uint8_t  X_DATA_ID = 0b11000010;
+static const uint8_t  Y_DATA_ID = 0b11010010;
 static const uint8_t Z1_DATA_ID = 0b11100010;
 
 enum State {
@@ -53,43 +56,29 @@ enum Event {
 static State g_state;
 static uint32_t g_debounceTimeout;
 
-static int16_t g_lastZ1Data = 0;
-static int16_t g_lastYData = -1;
 static int16_t g_lastXData = -1;
+static int16_t g_lastYData = -1;
+static int16_t g_lastZ1Data = 0;
 
-int16_t touchMeasure(uint8_t data) {
+void touchMeasure() {
     taskENTER_CRITICAL();
-    HAL_StatusTypeDef returnValue = HAL_I2C_Master_Transmit(&hi2c1, TOUCH_DEVICE_ADDRESS, &data, 1, 5);
-    if (returnValue == HAL_OK) {
-        uint8_t result[2];
-        result[0] = 0;
-        result[1] = 0;
-        returnValue = HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result, 2, 5);
-        if (returnValue == HAL_OK) {
-            taskEXIT_CRITICAL();
+    
+    uint8_t result[8];
 
-            int16_t value = (((int16_t)result[0]) << 3) | ((int16_t)result[1]);
+    HAL_I2C_Master_Transmit(&hi2c1, TOUCH_DEVICE_ADDRESS, (uint8_t *)&X_DATA_ID, 1, 5);
+    HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result, 2, 5);
 
-            if (data == X_DATA_ID) {
-                g_lastXData = value;
-            } else if (data == Y_DATA_ID) {
-                g_lastYData = value;
-            } else {
-                g_lastZ1Data = value;
-            }
+    HAL_I2C_Master_Transmit(&hi2c1, TOUCH_DEVICE_ADDRESS, (uint8_t *)&Y_DATA_ID, 1, 5);
+    HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result + 2, 2, 5);
 
-            return value;
-        }
-    }
+    HAL_I2C_Master_Transmit(&hi2c1, TOUCH_DEVICE_ADDRESS, (uint8_t *)&Z1_DATA_ID, 1, 5);
+    HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result + 4, 2, 5);
+
     taskEXIT_CRITICAL();
 
-    if (data == X_DATA_ID) {
-        return g_lastXData;
-    } else if (data == Y_DATA_ID) {
-        return g_lastYData;
-    } else {
-        return g_lastZ1Data;
-    }
+    g_lastXData  = (((int16_t)result[0]) << 3) | ((int16_t)result[1]);
+    g_lastYData  = (((int16_t)result[2]) << 3) | ((int16_t)result[3]);
+    g_lastZ1Data = (((int16_t)result[4]) << 3) | ((int16_t)result[5]);
 }
 
 static void setTimeout(uint32_t &timeout, uint32_t timeoutDuration) {
@@ -145,23 +134,23 @@ static void testTimeoutEvent(uint32_t &timeout, Event timeoutEvent) {
 }
 
 void read(bool &isPressed, int &x, int &y) {
-    bool isPressedNow = touchMeasure(Z1_DATA_ID) > CONF_TOUCH_Z1_THRESHOLD;
-    
-    stateTransition(isPressedNow ? EVENT_PRESSED : EVENT_NOT_PRESSED);
+    touchMeasure();
+
+    stateTransition(g_lastZ1Data > CONF_TOUCH_Z1_THRESHOLD ? EVENT_PRESSED : EVENT_NOT_PRESSED);
 
     testTimeoutEvent(g_debounceTimeout, EVENT_DEBOUNCE_TIMEOUT);
 
     isPressed = g_state == STATE_PRESSED;
-    if (isPressed && isPressedNow) {
-        x = touchMeasure(X_DATA_ID);
-        y = touchMeasure(Y_DATA_ID);
-    }
+    x = g_lastXData;
+    y = g_lastYData;
 }
 
 } // namespace touch
 } // namespace mcu
 
 namespace gui {
+
+using namespace mcu::touch;
 
 void data_touch_raw_x(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {

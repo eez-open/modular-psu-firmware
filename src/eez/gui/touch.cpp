@@ -33,13 +33,13 @@ int g_x;
 int g_y;
 bool g_pressed;
 
-int g_filteredX = -1;
-int g_filteredY = -1;
-bool g_filteredPressed;
-
 int g_calibratedX = -1;
 int g_calibratedY = -1;
 bool g_calibratedPressed;
+
+int g_filteredX = -1;
+int g_filteredY = -1;
+bool g_filteredPressed;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -49,18 +49,18 @@ void tick() {
     int y;
     mcu::touch::read(pressed, x, y);
 
-    g_filteredX = x;
-    g_filteredY = y;
-    g_filteredPressed = filter(pressed, g_filteredX, g_filteredY);
-
-    g_calibratedPressed = g_filteredPressed;
-    g_calibratedX = g_filteredX;
-    g_calibratedY = g_filteredY;
+    g_calibratedPressed = pressed;
+    g_calibratedX = x;
+    g_calibratedY = y;
     transform(g_calibratedX, g_calibratedY);
 
-    g_x = g_calibratedX;
-    g_y = g_calibratedY;
-    g_pressed = g_calibratedPressed;
+    g_filteredX = g_calibratedX;
+    g_filteredY = g_calibratedY;
+    g_filteredPressed = filter(g_calibratedPressed, g_filteredX, g_filteredY);
+
+    g_x = g_filteredX;
+    g_y = g_filteredY;
+    g_pressed = g_filteredPressed;
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     g_x = x;
@@ -95,6 +95,24 @@ int getY() {
 
 } // namespace touch
 
+void data_touch_calibrated_x(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = touch::g_calibratedX;
+    }
+}
+
+void data_touch_calibrated_y(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = touch::g_calibratedY;
+    }
+}
+
+void data_touch_calibrated_pressed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = touch::g_calibratedPressed;
+    }
+}
+
 void data_touch_filtered_x(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = touch::g_filteredX;
@@ -110,24 +128,6 @@ void data_touch_filtered_y(data::DataOperationEnum operation, data::Cursor &curs
 void data_touch_filtered_pressed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = touch::g_filteredPressed;
-    }
-}
-
-void data_touch_calibrated_x(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = touch::g_x;
-    }
-}
-
-void data_touch_calibrated_y(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = touch::g_y;
-    }
-}
-
-void data_touch_calibrated_pressed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = touch::g_pressed;
     }
 }
 

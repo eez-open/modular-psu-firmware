@@ -979,16 +979,13 @@ void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
         mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
 #endif
 
-        bool anyPressed = false;
-
         Cursor cursor;
 
-        if (get(cursor, DATA_ID_TOUCH_RAW_PRESSED).getInt()) {
-            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_RAW_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_RAW_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
-            eez::mcu::display::setColor(255, 0, 0);
+        if (get(cursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
+            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
+            eez::mcu::display::setColor(0, 0, 255);
             eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
-            anyPressed = true;
         }
 
         if (get(cursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
@@ -996,19 +993,6 @@ void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
             int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
             eez::mcu::display::setColor(0, 255, 0);
             eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
-            anyPressed = true;
-        }
-
-        if (get(cursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
-            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
-            eez::mcu::display::setColor(0, 0, 255);
-            eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
-            anyPressed = true;
-        }
-
-        if (!anyPressed) {
-            refreshScreen();
         }
     }
 }
