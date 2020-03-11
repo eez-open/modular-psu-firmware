@@ -24,7 +24,9 @@
       "active": true,
       "permanent": true,
       "state": {
-        "1": {}
+        "3": {
+          "$selected": true
+        }
       }
     }
   ],
@@ -35,10 +37,10 @@
       "pageEditorCanvasViewState": {
         "transform": {
           "translate": {
-            "x": -815.0999999999999,
-            "y": -640.0545454545453
+            "x": -240,
+            "y": -136
           },
-          "scale": 16
+          "scale": 1
         }
       }
     }

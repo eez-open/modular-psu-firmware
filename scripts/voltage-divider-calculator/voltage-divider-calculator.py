@@ -61,23 +61,27 @@ def can_calc_Vin():
 
 def calc_Vin():
     if can_calc_Vin():
-        Vin = round(Vout * (R1 + R2) / R2, 3)
-        scpi("DISP:DIALog:DATA \"Vin\",FLOAT,VOLT," + str(Vin))
+        global Vin
+        Vin = Vout * (R1 + R2) / R2
+        scpi("DISP:DIALog:DATA \"Vin\",FLOAT,VOLT," + str(round(Vin, 3)))
 
 def calc_R1():
     if can_calc_R1():
-        R1 = round(R2 * (Vin - Vout) / Vout, 3)
-        scpi("DISP:DIALog:DATA \"R1\",FLOAT,OHM," + str(R1))
+        global R1
+        R1 = R2 * (Vin - Vout) / Vout
+        scpi("DISP:DIALog:DATA \"R1\",FLOAT,OHM," + str(round(R1, 3)))
 
 def calc_R2():
     if can_calc_R2():
-        R2 = round(R1 * Vout / (Vin - Vout), 3)
-        scpi("DISP:DIALog:DATA \"R2\",FLOAT,OHM," + str(R2))
+        global R2
+        R2 = R1 * Vout / (Vin - Vout)
+        scpi("DISP:DIALog:DATA \"R2\",FLOAT,OHM," + str(round(R2, 3)))
 
 def calc_Vout():
     if can_calc_Vout():
-        Vout = round(Vin * R2 / (R1 + R2), 3)
-        scpi("DISP:DIALog:DATA \"Vout\",FLOAT,VOLT," + str(Vout))
+        global Vout
+        Vout = Vin * R2 / (R1 + R2)
+        scpi("DISP:DIALog:DATA \"Vout\",FLOAT,VOLT," + str(round(Vout, 3)))
 
 scpi("DISP:DIALog:OPEN \"/Scripts/voltage-divider-calculator.res\"")
 while True:
