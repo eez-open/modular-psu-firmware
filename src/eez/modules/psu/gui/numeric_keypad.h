@@ -130,6 +130,8 @@ class NumericKeypad : public Keypad {
     char getDotSign();
     bool isMilli();
     bool isMicro();
+    bool isKilo();
+    bool isMega();
     Unit getMilliUnit();
     Unit getMicroUnit();
     void toggleEditUnit();

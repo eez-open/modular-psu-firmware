@@ -107,7 +107,7 @@ Value MakeLessThenMinMessageValue(float float_, const Value &value_);
 Value MakeGreaterThenMaxMessageValue(float float_, const Value &value_);
 Value MakeScpiErrorValue(int16_t errorCode);
 
-void editValue(uint16_t dataId);
+void editValue(int16_t dataId);
 
 Value MakeEventValue(psu::event_queue::Event *e);
 void eventValueToText(const Value &value, char *text, int count);

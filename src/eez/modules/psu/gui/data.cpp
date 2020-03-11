@@ -1063,7 +1063,7 @@ namespace gui {
 using namespace eez::psu;
 
 static Cursor g_editValueCursor;
-static uint16_t g_editValueDataId;
+static int16_t g_editValueDataId;
 
 void onSetFloatValue(float value) {
     popPage();
@@ -1085,7 +1085,7 @@ void onSetStringValue(char *value) {
     set(g_editValueCursor, g_editValueDataId, value);
 }
 
-void editValue(uint16_t dataId) {
+void editValue(int16_t dataId) {
     g_editValueDataId = dataId;
     Value value = get(g_editValueCursor, g_editValueDataId);
 
@@ -2049,7 +2049,10 @@ void data_keypad_unit_enabled(data::DataOperationEnum operation, data::Cursor &c
                     keypad->m_options.editValueUnit == UNIT_WATT ||
                     keypad->m_options.editValueUnit == UNIT_MILLI_WATT ||
                     keypad->m_options.editValueUnit == UNIT_SECOND ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_SECOND;
+                    keypad->m_options.editValueUnit == UNIT_MILLI_SECOND ||
+                    keypad->m_options.editValueUnit == UNIT_OHM ||
+                    keypad->m_options.editValueUnit == UNIT_KOHM ||
+                    keypad->m_options.editValueUnit == UNIT_MOHM;
         }
     }
 }
@@ -2814,7 +2817,7 @@ void data_module_specific_ch_settings(data::DataOperationEnum operation, data::C
         } else if (modulType == MODULE_TYPE_DCM220) {
             value = PAGE_ID_CH_SETTINGS_DCM220_SPECIFIC;
         } else {
-            value = INTERNAL_PAGE_ID_NONE;
+            value = PAGE_ID_NONE;
         }
     }
 }

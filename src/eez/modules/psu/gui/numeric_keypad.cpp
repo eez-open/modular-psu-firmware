@@ -204,6 +204,12 @@ Unit NumericKeypad::getValueUnit() {
         return UNIT_SECOND;
     if (m_options.editValueUnit == UNIT_MILLI_WATT)
         return UNIT_WATT;
+    if (m_options.editValueUnit == UNIT_OHM)
+        return UNIT_KOHM;
+    if (m_options.editValueUnit == UNIT_KOHM)
+        return UNIT_MOHM;
+    if (m_options.editValueUnit == UNIT_MOHM)
+        return UNIT_OHM;
     return m_options.editValueUnit;
 }
 
@@ -216,6 +222,14 @@ bool NumericKeypad::isMilli() {
 
 bool NumericKeypad::isMicro() {
     return m_options.editValueUnit == UNIT_MICRO_AMPER;
+}
+
+bool NumericKeypad::isKilo() {
+    return m_options.editValueUnit == UNIT_KOHM;
+}
+
+bool NumericKeypad::isMega() {
+    return m_options.editValueUnit == UNIT_MOHM;
 }
 
 Unit NumericKeypad::getMilliUnit() {
@@ -274,6 +288,12 @@ Unit NumericKeypad::getSwitchToUnit() {
         return UNIT_MILLI_SECOND;
     if (m_options.editValueUnit == UNIT_MILLI_SECOND)
         return UNIT_SECOND;
+    if (m_options.editValueUnit == UNIT_OHM)
+        return UNIT_KOHM;
+    if (m_options.editValueUnit == UNIT_KOHM)
+        return UNIT_MOHM;
+    if (m_options.editValueUnit == UNIT_MOHM)
+        return UNIT_OHM;
     return m_options.editValueUnit;
 }
 
@@ -316,6 +336,10 @@ float NumericKeypad::getValue() {
         value /= 1000000.0f;
     } else if (isMilli()) {
         value /= 1000.0f;
+    } else if (isKilo()) {
+        value *= 1000.0f;
+    } else if (isMega()) {
+        value *= 1000000.0f;
     }
 
     return value;
@@ -570,12 +594,10 @@ void NumericKeypad::ok() {
 }
 
 void NumericKeypad::cancel() {
-    void (*cancel)() = m_cancelCallback;
-
-    popPage();
-
-    if (cancel) {
-        cancel();
+    if (m_cancelCallback) {
+        m_cancelCallback();
+    } else {
+        popPage();
     }
 }
 

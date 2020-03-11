@@ -25,12 +25,6 @@ namespace gui {
 
 void decompressAssets();
 
-extern Document *g_document;
-extern StyleList *g_styles;
-extern uint8_t *g_fontsData;
-extern uint8_t *g_bitmapsData;
-extern Colors *g_colorsData;
-
 extern bool g_assetsLoaded;
 
 const Style *getStyle(int styleID);
@@ -43,9 +37,15 @@ const uint16_t *getThemeColors(int themeIndex);
 const uint32_t getThemeColorsCount(int themeIndex);
 const uint16_t *getColors();
 
+const char *getActionName(int16_t actionId);
+int16_t getDataIdFromName(const char *name);
+
+int getExternalAssetsFirstPageId();
+
 #if OPTION_SDRAM
 #define GET_WIDGET_PROPERTY(widget, propertyName, type) ((type)widget->propertyName)
 #else
+extern Document *g_document;
 #define GET_WIDGET_PROPERTY(widget, propertyName, type) ((type)((uint8_t *)g_document + (uint32_t)(widget)->propertyName##Offset))
 #endif
 
@@ -54,6 +54,8 @@ const uint16_t *getColors();
 #else
 #define GET_WIDGET_LIST_ELEMENT(list, index) (((const Widget *)((uint8_t *)g_document + (uint32_t)(list.firstOffset))) + index)
 #endif
+
+bool loadExternalAssets(const char *filePath, int *err);
 
 ////////////////////////////////////////////////////////////////////////////////
 

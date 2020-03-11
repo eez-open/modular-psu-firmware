@@ -381,83 +381,83 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_TOUCH_DRAG
 };
 
-int count(uint16_t id);
-void select(Cursor &cursor, uint16_t id, int index, Value &oldValue);
-void deselect(Cursor &cursor, uint16_t id, Value &oldValue);
+int count(int16_t id);
+void select(Cursor &cursor, int16_t id, int index, Value &oldValue);
+void deselect(Cursor &cursor, int16_t id, Value &oldValue);
 
-void setContext(Cursor &cursor, uint16_t id, Value &oldContext, Value &newContext);
-void restoreContext(Cursor &cursor, uint16_t id, Value &oldContext);
+void setContext(Cursor &cursor, int16_t id, Value &oldContext, Value &newContext);
+void restoreContext(Cursor &cursor, int16_t id, Value &oldContext);
 
-int getFloatListLength(uint16_t id);
-float *getFloatList(uint16_t id);
+int getFloatListLength(int16_t id);
+float *getFloatList(int16_t id);
 
-Value getMin(const Cursor &cursor, uint16_t id);
-Value getMax(const Cursor &cursor, uint16_t id);
-Value getDef(const Cursor &cursor, uint16_t id);
-Value getLimit(const Cursor &cursor, uint16_t id);
-const char *getName(const Cursor &cursor, uint16_t id);
-Unit getUnit(const Cursor &cursor, uint16_t id);
-bool isChannelData(const Cursor &cursor, uint16_t id);
+Value getMin(const Cursor &cursor, int16_t id);
+Value getMax(const Cursor &cursor, int16_t id);
+Value getDef(const Cursor &cursor, int16_t id);
+Value getLimit(const Cursor &cursor, int16_t id);
+const char *getName(const Cursor &cursor, int16_t id);
+Unit getUnit(const Cursor &cursor, int16_t id);
+bool isChannelData(const Cursor &cursor, int16_t id);
 
-Value getEncoderStep(const Cursor &cursor, uint16_t id);
+Value getEncoderStep(const Cursor &cursor, int16_t id);
 struct StepValues {
     int count;
     const eez::gui::data::Value *values;
 };
-bool getEncoderStepValues(const Cursor &cursor, uint16_t id, StepValues &stepValues);
+bool getEncoderStepValues(const Cursor &cursor, int16_t id, StepValues &stepValues);
 
-void getList(const Cursor &cursor, uint16_t id, const Value **labels, int &count);
+void getList(const Cursor &cursor, int16_t id, const Value **labels, int &count);
 
-Value get(const Cursor &cursor, uint16_t id);
-Value set(const Cursor &cursor, uint16_t id, Value value);
+Value get(const Cursor &cursor, int16_t id);
+Value set(const Cursor &cursor, int16_t id, Value value);
 
-uint32_t getTextRefreshRate(const Cursor &cursor, uint16_t id);
+uint32_t getTextRefreshRate(const Cursor &cursor, int16_t id);
 
-uint16_t getColor(const Cursor &cursor, uint16_t id, const Style *style);
-uint16_t getBackgroundColor(const Cursor &cursor, uint16_t id, const Style *style);
-uint16_t getActiveColor(const Cursor &cursor, uint16_t id, const Style *style);
-uint16_t getActiveBackgroundColor(const Cursor &cursor, uint16_t id, const Style *style);
+uint16_t getColor(const Cursor &cursor, int16_t id, const Style *style);
+uint16_t getBackgroundColor(const Cursor &cursor, int16_t id, const Style *style);
+uint16_t getActiveColor(const Cursor &cursor, int16_t id, const Style *style);
+uint16_t getActiveBackgroundColor(const Cursor &cursor, int16_t id, const Style *style);
 
-bool isBlinking(const Cursor &cursor, uint16_t id);
-Value getEditValue(const Cursor &cursor, uint16_t id);
+bool isBlinking(const Cursor &cursor, int16_t id);
+Value getEditValue(const Cursor &cursor, int16_t id);
 
-Value getBitmapImage(const Cursor &cursor, uint16_t id);
+Value getBitmapImage(const Cursor &cursor, int16_t id);
 
-uint32_t ytDataGetRefreshCounter(const Cursor &cursor, uint16_t id);
-uint32_t ytDataGetSize(const Cursor &cursor, uint16_t id);
-uint32_t ytDataGetPosition(const Cursor &cursor, uint16_t id);
-void ytDataSetPosition(const Cursor &cursor, uint16_t id, uint32_t newPosition);
-uint32_t ytDataGetPositionIncrement(const Cursor &cursor, uint16_t id);
-uint32_t ytDataGetPageSize(const Cursor &cursor, uint16_t id);
-const Style *ytDataGetStyle(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
-Value ytDataGetMin(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
-Value ytDataGetMax(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
-int ytDataGetVertDivisions(const Cursor &cursor, uint16_t id);
-int ytDataGetHorzDivisions(const Cursor &cursor, uint16_t id);
-float ytDataGetDiv(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
-float ytDataGetOffset(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
-bool ytDataDataValueIsVisible(const Cursor &cursor, uint16_t id, uint8_t valueIndex);
-bool ytDataGetShowLabels(const Cursor &cursor, uint16_t id);
-int8_t ytDataGetSelectedValueIndex(const Cursor &cursor, uint16_t id);
+uint32_t ytDataGetRefreshCounter(const Cursor &cursor, int16_t id);
+uint32_t ytDataGetSize(const Cursor &cursor, int16_t id);
+uint32_t ytDataGetPosition(const Cursor &cursor, int16_t id);
+void ytDataSetPosition(const Cursor &cursor, int16_t id, uint32_t newPosition);
+uint32_t ytDataGetPositionIncrement(const Cursor &cursor, int16_t id);
+uint32_t ytDataGetPageSize(const Cursor &cursor, int16_t id);
+const Style *ytDataGetStyle(const Cursor &cursor, int16_t id, uint8_t valueIndex);
+Value ytDataGetMin(const Cursor &cursor, int16_t id, uint8_t valueIndex);
+Value ytDataGetMax(const Cursor &cursor, int16_t id, uint8_t valueIndex);
+int ytDataGetVertDivisions(const Cursor &cursor, int16_t id);
+int ytDataGetHorzDivisions(const Cursor &cursor, int16_t id);
+float ytDataGetDiv(const Cursor &cursor, int16_t id, uint8_t valueIndex);
+float ytDataGetOffset(const Cursor &cursor, int16_t id, uint8_t valueIndex);
+bool ytDataDataValueIsVisible(const Cursor &cursor, int16_t id, uint8_t valueIndex);
+bool ytDataGetShowLabels(const Cursor &cursor, int16_t id);
+int8_t ytDataGetSelectedValueIndex(const Cursor &cursor, int16_t id);
 struct YtDataGetLabelParams {
     uint8_t valueIndex;
     char *text;
     int count;
 };
-void ytDataGetLabel(const Cursor &cursor, uint16_t id, uint8_t valueIndex, char *text, int count);
-Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(const Cursor &cursor, uint16_t id);
-uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, uint16_t id);
-float ytDataGetPeriod(const Cursor &cursor, uint16_t id);
-bool ytDataIsCursorVisible(const Cursor &cursor, uint16_t id);
-uint32_t ytDataGetCursorOffset(const Cursor &cursor, uint16_t id);
-Value ytDataGetCursorXValue(const Cursor &cursor, uint16_t id);
+void ytDataGetLabel(const Cursor &cursor, int16_t id, uint8_t valueIndex, char *text, int count);
+Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(const Cursor &cursor, int16_t id);
+uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, int16_t id);
+float ytDataGetPeriod(const Cursor &cursor, int16_t id);
+bool ytDataIsCursorVisible(const Cursor &cursor, int16_t id);
+uint32_t ytDataGetCursorOffset(const Cursor &cursor, int16_t id);
+Value ytDataGetCursorXValue(const Cursor &cursor, int16_t id);
 
 struct TouchDrag {
     EventType type;
     int x;
     int y;
 };
-void ytDataTouchDrag(const Cursor &cursor, uint16_t id, TouchDrag *touchDrag);
+void ytDataTouchDrag(const Cursor &cursor, int16_t id, TouchDrag *touchDrag);
 
 } // namespace data
 } // namespace gui

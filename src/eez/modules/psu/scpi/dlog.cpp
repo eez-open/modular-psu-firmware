@@ -265,6 +265,7 @@ scpi_choice_def_t unitChoice[] = {
     { "WATT", UNIT_WATT },
     { "JOULe", UNIT_JOULE },
     { "SECOnd", UNIT_SECOND },
+    { "OHM", UNIT_OHM },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 

@@ -24,6 +24,7 @@
 #if OPTION_DISPLAY
 #include <eez/gui/gui.h>
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/data.h>
 #include <eez/system.h>
 #endif
 
@@ -404,6 +405,141 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
         int result = psu::gui::g_psuAppContext.menuInput(label, (eez::gui::MenuType)menuType, menuItems);
         SCPI_ResultInt(context, result + 1);
     }
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+scpi_result_t scpi_cmd_displayWindowDialogOpen(scpi_t *context) {
+#if OPTION_DISPLAY
+    char filePath[MAX_PATH_LENGTH + 1];
+    if (!getFilePath(context, filePath, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (eez::gui::loadExternalAssets(filePath, &err)) {
+        psu::gui::g_psuAppContext.dialogOpen();
+    } else {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+scpi_result_t scpi_cmd_displayWindowDialogActionQ(scpi_t *context) {
+#if OPTION_DISPLAY
+    // timeout
+    uint32_t timeoutMs = 0;
+    scpi_number_t param;
+    if (SCPI_ParamNumber(context, scpi_special_numbers_def, &param, false)) {
+        if (param.unit != SCPI_UNIT_NONE && param.unit != SCPI_UNIT_SECOND) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+        timeoutMs = (uint32_t)round(param.content.value * 1000);
+    } else {
+        if (SCPI_ParamErrorOccurred(context)) {
+            return SCPI_RES_ERR;
+        }
+    }
+
+    const char *action = psu::gui::g_psuAppContext.dialogAction(timeoutMs);
+    if (action) {
+        SCPI_ResultText(context, action);
+    } else {
+        SCPI_ResultBool(context, 0);
+    }
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+scpi_choice_def_t dataTypeChoice[] = {
+    { "FLOAt", VALUE_TYPE_FLOAT },
+    { "STRIng", VALUE_TYPE_STR },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_displayWindowDialogData(scpi_t *context) {
+#if OPTION_DISPLAY
+    const char *valueText;
+    size_t valueTextLen;
+    if (!SCPI_ParamCharacters(context, &valueText, &valueTextLen, true)) {
+        return SCPI_RES_ERR;
+    }
+    if (valueTextLen > 128) {
+        SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+        return SCPI_RES_ERR;
+    }
+    char dataItemName[128 + 1];
+    strncpy(dataItemName, valueText, valueTextLen);
+    dataItemName[valueTextLen] = 0;
+    int16_t dataId = eez::gui::getDataIdFromName(dataItemName);
+    if (dataId == 0) {
+        // TODO
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t type;
+    if (!SCPI_ParamChoice(context, dataTypeChoice, &type, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (type == VALUE_TYPE_FLOAT) {
+        int32_t unit;
+        if (!SCPI_ParamChoice(context, unitChoice, &unit, true)) {
+            return SCPI_RES_ERR;
+        }
+
+        scpi_number_t param;
+        if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+            return SCPI_RES_ERR;
+        }
+    
+        float value;
+        if (param.special) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        } else {
+            if (param.unit != SCPI_UNIT_NONE && param.unit != getScpiUnit((Unit)unit)) {
+                SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+                return SCPI_RES_ERR;
+            }
+ 
+            value = (float)param.content.value;
+        }
+
+        Value dataValue = eez::gui::MakeValue(value, (Unit)unit);
+        psu::gui::g_psuAppContext.dialogSetDataItemValue(dataId, dataValue);
+    } else {
+        // TODO
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+scpi_result_t scpi_cmd_displayWindowDialogClose(scpi_t *context) {
+#if OPTION_DISPLAY
+    psu::gui::g_psuAppContext.dialogClose();
 
     return SCPI_RES_OK;
 #else

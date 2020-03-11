@@ -26,16 +26,19 @@
 
 #include <eez/modules/mcu/display.h>
 
-#define INTERNAL_PAGE_ID_NONE -1
-#define INTERNAL_PAGE_ID_SELECT_FROM_ENUM -2
-#define INTERNAL_PAGE_ID_TOAST_MESSAGE -3
-#define INTERNAL_PAGE_ID_MENU_WITH_BUTTONS -4
+enum {
+    FIRST_INTERNAL_PAGE_ID = 32000,
+    INTERNAL_PAGE_ID_SELECT_FROM_ENUM,
+    INTERNAL_PAGE_ID_TOAST_MESSAGE,
+    INTERNAL_PAGE_ID_MENU_WITH_BUTTONS
+};
 
 enum InternalActionsEnum {
-    ACTION_ID_INTERNAL_SELECT_ENUM_ITEM = -1,
-    ACTION_ID_INTERNAL_DIALOG_CLOSE = -2,
-    ACTION_ID_INTERNAL_TOAST_ACTION = -3,
-    ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM = -4,
+    FIRST_INTERNAL_ACTION_ID = 32000,
+    ACTION_ID_INTERNAL_SELECT_ENUM_ITEM,
+    ACTION_ID_INTERNAL_DIALOG_CLOSE,
+    ACTION_ID_INTERNAL_TOAST_ACTION,
+    ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM,
     ACTION_ID_INTERNAL_MENU_WITH_BUTTONS = -5
 };
 
@@ -150,6 +153,9 @@ void animateRects(Buffer startBuffer, int numRects, float duration = -1);
 
 float getDefaultAnimationDurationHook();
 
+void executeExternalActionHook(int32_t actionId);
+void externalDataHook(int16_t id, data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value);
+
 ////////////////////////////////////////////////////////////////////////////////
 
 int getCurrentStateBufferIndex();
@@ -166,3 +172,5 @@ Page *getPageFromIdHook(int pageId);
 #include <eez/gui/overlay.h>
 #include <eez/gui/font.h>
 #include <eez/gui/draw.h>
+
+#define DATA_OPERATION_FUNCTION(id, operation, cursor, value) (id >= 0 ? g_dataOperationsFunctions[id](operation, cursor, value) : externalDataHook(id, operation, cursor, value))

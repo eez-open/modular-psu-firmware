@@ -41,9 +41,9 @@ extern Channel *g_channel;
 extern int g_channelIndex;
 
 extern data::Cursor g_focusCursor;
-extern uint16_t g_focusDataId;
+extern int16_t g_focusDataId;
 extern data::Value g_focusEditValue;
-void setFocusCursor(const data::Cursor &cursor, uint16_t dataId);
+void setFocusCursor(const data::Cursor &cursor, int16_t dataId);
 bool isFocusChanged();
 
 void changeVoltageLimit(int iChannel);
@@ -108,7 +108,7 @@ public:
 
     bool isFocusWidget(const WidgetCursor &widgetCursor) override;
 
-    bool isBlinking(const data::Cursor &cursor, uint16_t id) override;
+    bool isBlinking(const data::Cursor &cursor, int16_t id) override;
 
     bool isWidgetActionEnabled(const WidgetCursor &widgetCursor) override;
     
@@ -132,6 +132,12 @@ public:
     
     int menuInput(const char *label, MenuType menuType, const char **menuItems);
     void doShowMenuInput();
+
+    void dialogOpen();
+    const char *dialogAction(uint32_t timeoutMs);
+    void dialogResetDataItemValues();
+    void dialogSetDataItemValue(int16_t dataId, Value& value);
+    void dialogClose();
 
 protected:
     bool m_pushProgressPage;
@@ -182,12 +188,16 @@ static const uint16_t g_ytGraphStyles[] = {
     STYLE_ID_YT_GRAPH_Y4
 };
 
-#define GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST_FINISHED 100
-#define GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST_FINISHED 101
-#define GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED 102
-#define GUI_QUEUE_MESSAGE_TYPE_SHOW_TEXT_INPUT 103
-#define GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT 104
-#define GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT 105
+enum {
+    GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST_FINISHED = 100,
+    GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST_FINISHED,
+    GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED,
+    GUI_QUEUE_MESSAGE_TYPE_SHOW_TEXT_INPUT,
+    GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT,
+    GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT,
+    GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN,
+    GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE
+};
 
 } // namespace gui
 } // namespace psu

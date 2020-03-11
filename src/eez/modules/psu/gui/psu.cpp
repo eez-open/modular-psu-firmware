@@ -75,6 +75,7 @@ namespace eez {
 namespace mp {
 
 void onUncaughtScriptExceptionHook() {
+    eez::psu::gui::g_psuAppContext.dialogClose();
     eez::psu::gui::g_psuAppContext.showUncaughtScriptExceptionMessage();
 }
 
@@ -257,6 +258,10 @@ static mcu::Button g_userSwitch(USER_SW_GPIO_Port, USER_SW_Pin, true, true);
 
 Value g_progress;
 
+static int16_t g_externalActionId = ACTION_ID_NONE;
+static const size_t MAX_NUM_EXTERNAL_DATA_ITEM_VALUES = 10;
+static Value g_externalDataItemValues[MAX_NUM_EXTERNAL_DATA_ITEM_VALUES];
+
 bool showSetupWizardQuestion();
 void onEncoder(int counter, bool clicked);
 
@@ -320,8 +325,8 @@ void PsuAppContext::stateManagment() {
 
     // turn the screen off if power is down and system is booted
     if (!psu::isPowerUp()) {
-    	if (g_isBooted && !g_shutdownInProgress && getActivePageId() != INTERNAL_PAGE_ID_NONE) {
-    		showPage(INTERNAL_PAGE_ID_NONE);
+    	if (g_isBooted && !g_shutdownInProgress && getActivePageId() != PAGE_ID_NONE) {
+    		showPage(PAGE_ID_NONE);
     		eez::mcu::display::turnOff();
     	}
         return;
@@ -696,7 +701,7 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
             enterTouchCalibration();
         }
     } else if (touchEvent.type == EVENT_TYPE_LONG_TOUCH) {
-        if (activePageId == INTERNAL_PAGE_ID_NONE || activePageId == PAGE_ID_STANDBY) {
+        if (activePageId == PAGE_ID_NONE || activePageId == PAGE_ID_STANDBY) {
             // wake up on long touch
             psu::changePowerState(true);
         } else if (activePageId == PAGE_ID_DISPLAY_OFF) {
@@ -715,7 +720,7 @@ bool PsuAppContext::testExecuteActionOnTouchDown(int action) {
     return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT || isAutoRepeatAction(action);
 }
 
-bool PsuAppContext::isBlinking(const data::Cursor &cursor, uint16_t id) {
+bool PsuAppContext::isBlinking(const data::Cursor &cursor, int16_t id) {
     if (g_focusCursor == cursor && g_focusDataId == id && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
         return true;
     }
@@ -920,6 +925,64 @@ float PsuAppContext::numberInput(const char *label, Unit unit, float min, float 
 
 void PsuAppContext::doShowNumberInput() {
     NumericKeypad::start(m_inputLabel, Value(m_numberInputParams.m_input, m_numberInputParams.m_options.editValueUnit), m_numberInputParams.m_options, m_numberInputParams.onSet, nullptr, m_numberInputParams.onCancel);
+}
+
+void PsuAppContext::dialogOpen() {
+    if (osThreadGetId() == g_guiTaskHandle) {
+        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN, 0), osWaitForever);
+    } else {
+        if (g_psuAppContext.getActivePageId() != getExternalAssetsFirstPageId()) {
+            dialogResetDataItemValues();
+            g_psuAppContext.pushPage(getExternalAssetsFirstPageId());
+        }
+    }
+}
+
+const char *PsuAppContext::dialogAction(uint32_t timeoutMs) {
+    if (timeoutMs != 0) {
+        timeoutMs = millis() + timeoutMs;
+        if (timeoutMs == 0) {
+            timeoutMs = 1;
+        }
+    }
+
+    while ((timeoutMs == 0 || (int32_t)(millis() - timeoutMs) < 0) && g_externalActionId == ACTION_ID_NONE) {
+        osDelay(1);
+    }
+
+    if (g_externalActionId != ACTION_ID_NONE) {
+        const char *actionName = getActionName(g_externalActionId);
+        g_externalActionId = ACTION_ID_NONE;
+        return actionName;
+    }
+
+    return nullptr;
+}
+
+void PsuAppContext::dialogResetDataItemValues() {
+    for (int i = 0; i < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES; i++) {
+        g_externalDataItemValues[i] = Value();
+    }
+}
+
+void PsuAppContext::dialogSetDataItemValue(int16_t dataId, Value& value) {
+    if (dataId < 0) {
+        dataId = -dataId;
+    }
+    dataId--;
+    if (dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
+        g_externalDataItemValues[dataId] = value;
+    }
+}
+
+void PsuAppContext::dialogClose() {
+    if (osThreadGetId() == g_guiTaskHandle) {
+        if (g_psuAppContext.getActivePageId() == getExternalAssetsFirstPageId()) {
+            g_psuAppContext.popPage();
+        }
+    } else {
+        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE, 0), osWaitForever);
+    }
 }
 
 void MenuInputParams::onSet(int value) {
@@ -1252,10 +1315,10 @@ void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_ca
 ////////////////////////////////////////////////////////////////////////////////
 
 data::Cursor g_focusCursor = Cursor(0);
-uint16_t g_focusDataId = DATA_ID_CHANNEL_U_EDIT;
+int16_t g_focusDataId = DATA_ID_CHANNEL_U_EDIT;
 data::Value g_focusEditValue;
 
-void setFocusCursor(const data::Cursor &cursor, uint16_t dataId) {
+void setFocusCursor(const data::Cursor &cursor, int16_t dataId) {
     g_focusCursor = cursor;
     g_focusDataId = dataId;
     g_focusEditValue = data::Value();
@@ -1311,7 +1374,7 @@ void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
     }
 }
 
-bool isEnabledFocusCursor(data::Cursor &cursor, uint16_t dataId) {
+bool isEnabledFocusCursor(data::Cursor &cursor, int16_t dataId) {
     g_focusCursorIsEnabled = false;
     enumWidgets(isEnabledFocusCursorStep);
     return g_focusCursorIsEnabled;
@@ -1781,6 +1844,10 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT) {
         g_appContext = &g_psuAppContext;
         g_psuAppContext.doShowMenuInput();
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN) {
+        g_psuAppContext.dialogOpen();
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE) {
+        g_psuAppContext.dialogClose();
     }
 }
 
@@ -1788,7 +1855,23 @@ float getDefaultAnimationDurationHook() {
     return psu::persist_conf::devConf.animationsDuration;
 }
 
+void executeExternalActionHook(int32_t actionId) {
+    g_externalActionId = actionId;
 }
+
+void externalDataHook(int16_t dataId, data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (dataId < 0) {
+        dataId = -dataId;
+    }
+    dataId--;
+    if (dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
+        if (operation == data::DATA_OPERATION_GET) {
+            value = g_externalDataItemValues[dataId];
+        }
+    }
+}
+
+} // namespace gui
 
 } // namespace eez
 

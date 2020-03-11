@@ -255,7 +255,7 @@ void oneIter() {
                 psu::gui::UserProfilesPage::doDeleteProfile();
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EDIT_REMARK) {
                 psu::gui::UserProfilesPage::doEditRemark();
-            } 
+            }
         }
     } else {
         if (g_shutingDown) {

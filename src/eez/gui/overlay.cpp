@@ -41,7 +41,7 @@ Overlay *getOverlay(const WidgetCursor &widgetCursor) {
         return nullptr;
     }
     data::Value overlayValue;
-    g_dataOperationsFunctions[containerWidget->overlay](data::DATA_OPERATION_GET_OVERLAY_DATA, (data::Cursor &)widgetCursor.cursor, overlayValue);
+    DATA_OPERATION_FUNCTION(containerWidget->overlay, data::DATA_OPERATION_GET_OVERLAY_DATA, (data::Cursor &)widgetCursor.cursor, overlayValue);
     return (Overlay *)overlayValue.getVoidPointer();
 }
 
@@ -95,7 +95,7 @@ void overlayEnumWidgetHook(WidgetCursor &widgetCursor, EnumWidgetsCallback callb
     // update overlay data
     const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
     data::Value widgetCursorValue((void *)&widgetCursor, VALUE_TYPE_POINTER);
-    g_dataOperationsFunctions[containerWidget->overlay](data::DATA_OPERATION_UPDATE_OVERLAY_DATA, widgetCursor.cursor, widgetCursorValue);
+    DATA_OPERATION_FUNCTION(containerWidget->overlay, data::DATA_OPERATION_UPDATE_OVERLAY_DATA, widgetCursor.cursor, widgetCursorValue);
 
     if (callback == findWidgetStep) {
         int xOverlayOffset = 0;

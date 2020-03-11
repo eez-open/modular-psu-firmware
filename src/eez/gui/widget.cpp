@@ -63,33 +63,6 @@ bool g_isActiveWidget;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if OPTION_SDRAM
-typedef void (*FixWidgetPointersFunction)(Widget *widget);
-static FixWidgetPointersFunction g_fixWidgetPointersFunctions[] = {
-    nullptr,                         // WIDGET_TYPE_NONE
-    ContainerWidget_fixPointers,     // WIDGET_TYPE_CONTAINER
-    ListWidget_fixPointers,          // WIDGET_TYPE_LIST
-    GridWidget_fixPointers,          // WIDGET_TYPE_GRID
-    SelectWidget_fixPointers,        // WIDGET_TYPE_SELECT
-    nullptr,                         // WIDGET_TYPE_DISPLAY_DATA
-    TextWidget_fixPointers,          // WIDGET_TYPE_TEXT
-    MultilineTextWidget_fixPointers, // WIDGET_TYPE_MULTILINE_TEXT
-    nullptr,                         // WIDGET_TYPE_RECTANGLE
-    nullptr,                         // WIDGET_TYPE_BITMAP
-    ButtonWidget_fixPointers,        // WIDGET_TYPE_BUTTON
-    ToggleButtonWidget_fixPointers,  // WIDGET_TYPE_TOGGLE_BUTTON
-    nullptr,                         // WIDGET_TYPE_BUTTON_GROUP
-    nullptr,                         // WIDGET_TYPE_RESERVED
-    nullptr,                         // WIDGET_TYPE_BAR_GRAPH
-    nullptr,                         // WIDGET_TYPE_LAYOUT_VIEW
-    nullptr,                         // WIDGET_TYPE_YT_GRAPH
-    UpDownWidget_fixPointers,        // WIDGET_TYPE_UP_DOWN
-    nullptr,                         // WIDGET_TYPE_LIST_GRAPH
-    nullptr,                         // WIDGET_TYPE_APP_VIEW
-    ScrollBarWidget_fixPointers,     // WIDGET_TYPE_SCROLL_BAR
-};
-#endif
-
 typedef void (*EnumFunctionType)(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 static EnumFunctionType g_enumWidgetFunctions[] = {
     nullptr,               // WIDGET_TYPE_NONE
@@ -163,17 +136,6 @@ OnTouchFunctionType g_onTouchFunctions[] = {
     nullptr,                   // WIDGET_TYPE_APP_VIEW
     ScrollBarWidget_onTouch,   // WIDGET_TYPE_SCROLL_BAR
 };
-
-////////////////////////////////////////////////////////////////////////////////
-
-#if OPTION_SDRAM
-void Widget_fixPointers(Widget *widget) {
-    widget->specific = (void *)((uint8_t *)g_document + (uint32_t)widget->specific);
-    if (g_fixWidgetPointersFunctions[widget->type]) {
-        g_fixWidgetPointersFunctions[widget->type](widget);
-    }
-}
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -277,7 +239,7 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
         }
     }
 
-    if (g_appContext->getActivePageId() == INTERNAL_PAGE_ID_NONE) {
+    if (g_appContext->getActivePageId() == PAGE_ID_NONE) {
         return;
     }
 
@@ -288,7 +250,7 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 }
 
 void enumWidgets(EnumWidgetsCallback callback) {
-	if (g_appContext->getActivePageId() <= INTERNAL_PAGE_ID_NONE) {
+	if (g_appContext->getActivePageId() == PAGE_ID_NONE || g_appContext->isActivePageInternal()) {
 		return;
 	}
 	WidgetCursor widgetCursor;
@@ -343,7 +305,7 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
                 // if found widget is AppView, make sure we set right AppContext
                 if (widget->type == WIDGET_TYPE_APP_VIEW) {
                     Value appContextValue;
-                    g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, appContextValue);
+                    DATA_OPERATION_FUNCTION(widget->data, data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, appContextValue);
                     g_foundWidget.appContext = appContextValue.getAppContext();
                 }
             }

@@ -166,7 +166,7 @@ OnTouchFunctionType getTouchFunction(const WidgetCursor &widgetCursor) {
 }
 
 int getAction(const WidgetCursor &widgetCursor) {
-    return (int16_t)widgetCursor.widget->action;
+    return widgetCursor.widget->action;
 }
 
 void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {

@@ -49,7 +49,7 @@ class SetPage : public Page {
     virtual void discard();
 
   protected:
-    int editDataId;
+    int16_t editDataId;
 
     static void onSetValue(float value);
     virtual void setValue(float value);

@@ -31,11 +31,11 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
 
     const Widget *widget = widgetCursor.widget;
     Value appContextValue;
-    g_dataOperationsFunctions[widget->data](data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, appContextValue);
+    DATA_OPERATION_FUNCTION(widget->data, data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
     bool refresh = !widgetCursor.previousState;
-    if (refresh && !appContext->isActivePageInternal() && appContext->getActivePageId() != INTERNAL_PAGE_ID_NONE) {
+    if (refresh && !appContext->isActivePageInternal() && appContext->getActivePageId() != PAGE_ID_NONE) {
         appContext->x = widgetCursor.x;
         appContext->y = widgetCursor.y;
         appContext->width = widget->w;
@@ -52,7 +52,7 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
 
 void AppViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     Value appContextValue;
-    g_dataOperationsFunctions[widgetCursor.widget->data](data::DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
+    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, data::DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
     WidgetCursor savedWidgetCursor = widgetCursor;

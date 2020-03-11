@@ -26,14 +26,6 @@
 namespace eez {
 namespace gui {
 
-#if OPTION_SDRAM
-void ToggleButtonWidget_fixPointers(Widget *widget) {
-    ToggleButtonWidget *toggleButtonWidget = (ToggleButtonWidget *)widget->specific;
-    toggleButtonWidget->text1 = (const char *)((uint8_t *)g_document + (uint32_t)toggleButtonWidget->text1);
-    toggleButtonWidget->text2 = (const char *)((uint8_t *)g_document + (uint32_t)toggleButtonWidget->text2);
-}
-#endif
-
 void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 

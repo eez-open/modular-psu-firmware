@@ -29,9 +29,9 @@ namespace gui {
 struct BarGraphWidget {
     uint8_t orientation; // BAR_GRAPH_ORIENTATION_...
     uint16_t textStyle;
-    uint16_t line1Data;
+    int16_t line1Data;
     uint16_t line1Style;
-    uint16_t line2Data;
+    int16_t line2Data;
     uint16_t line2Style;
 };
 

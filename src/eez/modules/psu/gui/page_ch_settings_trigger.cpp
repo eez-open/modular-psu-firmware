@@ -173,7 +173,7 @@ float ChSettingsListsPage::getFocusedValue() {
 void ChSettingsListsPage::setFocusedValue(float value) {
     data::Cursor cursor(getCursorIndexWithinPage());
 
-    uint16_t dataId = getDataIdAtCursor();
+    int16_t dataId = getDataIdAtCursor();
 
     data::Value min = data::getMin(cursor, dataId);
     data::Value max = data::getMax(cursor, dataId);
@@ -208,7 +208,7 @@ void ChSettingsListsPage::onValueSet(float value) {
 }
 
 void ChSettingsListsPage::doValueSet(float value) {
-    uint16_t dataId = getDataIdAtCursor();
+    int16_t dataId = getDataIdAtCursor();
 
     if (dataId != DATA_ID_CHANNEL_LIST_DWELL) {
         int iRow = getRowIndex();
@@ -267,7 +267,7 @@ void ChSettingsListsPage::edit() {
 
         data::Cursor cursor(getCursorIndexWithinPage());
 
-        uint16_t dataId = getDataIdAtCursor();
+        int16_t dataId = getDataIdAtCursor();
 
         data::Value value = data::get(cursor, dataId);
 
@@ -359,7 +359,7 @@ int ChSettingsListsPage::getCursorIndexWithinPage() {
     return getRowIndex() % LIST_ITEMS_PER_PAGE;
 }
 
-uint8_t ChSettingsListsPage::getDataIdAtCursor() {
+int16_t ChSettingsListsPage::getDataIdAtCursor() {
     int iColumn = getColumnIndex();
     if (iColumn == 0) {
         return DATA_ID_CHANNEL_LIST_DWELL;
@@ -370,7 +370,7 @@ uint8_t ChSettingsListsPage::getDataIdAtCursor() {
     }
 }
 
-int ChSettingsListsPage::getCursorIndex(const data::Cursor &cursor, uint16_t id) {
+int ChSettingsListsPage::getCursorIndex(const data::Cursor &cursor, int16_t id) {
     int iCursor = (getPageIndex() * LIST_ITEMS_PER_PAGE + cursor.i) * 3;
     if (id == DATA_ID_CHANNEL_LIST_DWELL) {
         return iCursor;
@@ -457,7 +457,7 @@ void ChSettingsListsPage::setTriggerListMode() {
 void ChSettingsListsPage::onEncoder(int counter) {
 #if OPTION_ENCODER
     data::Cursor cursor(getCursorIndexWithinPage());
-    uint16_t dataId = getDataIdAtCursor();
+    int16_t dataId = getDataIdAtCursor();
 
     data::Value value = data::get(cursor, dataId);
     if (value.getType() == VALUE_TYPE_STR) {
@@ -474,7 +474,7 @@ void ChSettingsListsPage::onEncoder(int counter) {
 }
 
 void ChSettingsListsPage::onEncoderClicked() {
-    uint16_t dataId = getDataIdAtCursor();
+    int16_t dataId = getDataIdAtCursor();
     int iRow = getRowIndex();
 
     if (dataId == DATA_ID_CHANNEL_LIST_DWELL) {

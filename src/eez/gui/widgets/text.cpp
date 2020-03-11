@@ -28,13 +28,6 @@
 namespace eez {
 namespace gui {
 
-#if OPTION_SDRAM
-void TextWidget_fixPointers(Widget *widget) {
-    TextWidgetSpecific *textWidget = (TextWidgetSpecific *)widget->specific;
-    textWidget->text = (const char *)((uint8_t *)g_document + (uint32_t)textWidget->text);
-}
-#endif
-
 void TextWidget_autoSize(TextWidget& widget) {
     const Style *style = getStyle(widget.common.style);
     font::Font font = styleGetFont(style);

@@ -114,7 +114,7 @@ bool jpegDecode(const char *filePath, Image *image) {
         return false;
     }
 
-    g_fileData = FILE_VIEW_BUFFER + FILE_VIEW_BUFFER_SIZE - fileSize;
+    g_fileData = FILE_VIEW_BUFFER + FILE_VIEW_BUFFER_SIZE - ((fileSize + 3) / 4) * 4;
     uint32_t bytesRead = file.read(g_fileData, fileSize);
     file.close();
 

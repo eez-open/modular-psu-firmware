@@ -35,9 +35,9 @@ const char *g_unitNames[] = {
     "ms",
     DEGREE_SYMBOL"C",
     "rpm",
-    "ohm",
-    "Kohm",
-    "Mohm",
+    "\xb4",
+    "K\xb4",
+    "M\xb4",
     "%",
     "Hz",
     "J"

@@ -50,6 +50,7 @@ extern "C" {
 #define LIST_OF_USER_ERRORS \
     X(SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE,                  -114, "Header suffix out of range")                   \
     X(SCPI_ERROR_CHARACTER_DATA_TOO_LONG,                   -144, "Character data too long")                      \
+    X(SCPI_ERROR_INVALID_BLOCK_DATA,                        -161, "Invalid block data")                           \
     X(SCPI_ERROR_TRIGGER_IGNORED,                           -211, "Trigger ignored")                              \
     X(SCPI_ERROR_DATA_OUT_OF_RANGE,                         -222, "Data out of range")                            \
     X(SCPI_ERROR_TOO_MUCH_DATA,                             -223, "Too much data")                                \
@@ -75,6 +76,7 @@ extern "C" {
     X(SCPI_ERROR_CH4_OUTPUT_FAULT_DETECTED,                 -273, "CH4 output fault detected")                    \
     X(SCPI_ERROR_CH5_OUTPUT_FAULT_DETECTED,                 -274, "CH5 output fault detected")                    \
     X(SCPI_ERROR_CH6_OUTPUT_FAULT_DETECTED,                 -275, "CH6 output fault detected")                    \
+    X(SCPI_ERROR_OUT_OF_DEVICE_MEMORY,                      -321, "Out of memory")                                \
     X(SCPI_ERROR_CHANNEL_NOT_FOUND,                          100, "Channel not found")                            \
     X(SCPI_ERROR_CALIBRATION_STATE_IS_OFF,                   101, "Calibration state is off")                     \
     X(SCPI_ERROR_INVALID_PASSWORD,                           102, "Invalid password")                             \

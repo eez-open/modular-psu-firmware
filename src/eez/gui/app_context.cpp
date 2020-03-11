@@ -171,7 +171,7 @@ void AppContext::pushPage(int pageId, Page *page) {
         int previousPageId = getActivePageId();
 
         // advance stack pointre
-        if (getActivePageId() != INTERNAL_PAGE_ID_NONE) {
+        if (getActivePageId() != PAGE_ID_NONE) {
             m_pageNavigationStackPointer++;
             assert (m_pageNavigationStackPointer < CONF_GUI_PAGE_NAVIGATION_STACK_SIZE);
         }
@@ -209,10 +209,6 @@ Page *AppContext::getPage(int pageId) {
         }
     }
     return nullptr;
-}
-
-int AppContext::getNumPagesOnStack() {
-    return m_pageNavigationStackPointer + 1;
 }
 
 bool AppContext::isPageOnStack(int pageId) {
@@ -256,7 +252,7 @@ bool AppContext::testExecuteActionOnTouchDown(int action) {
     return false;
 }
 
-bool AppContext::isBlinking(const data::Cursor &cursor, uint16_t id) {
+bool AppContext::isBlinking(const data::Cursor &cursor, int16_t id) {
     return false;
 }
 
@@ -394,7 +390,7 @@ bool AppContext::isPageFullyCovered(int pageNavigationStackIndex) {
 }
 
 void AppContext::updateAppView(WidgetCursor &widgetCursor) {
-    if (getActivePageId() == INTERNAL_PAGE_ID_NONE) {
+    if (getActivePageId() == PAGE_ID_NONE) {
         return;
     }
 

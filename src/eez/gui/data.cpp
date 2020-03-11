@@ -113,6 +113,15 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
                 unit = UNIT_MILLI_SECOND;
                 floatValue *= 1000.0f;
             }
+        } else if (unit == UNIT_OHM) {
+            if (fabs(floatValue) >= 1000000) {
+                unit = UNIT_MOHM;
+                floatValue /= 1000000.0f;
+            } else if (fabs(floatValue) >= 1000) {
+                unit = UNIT_KOHM;
+                floatValue /= 1000.0f;
+            }
+
         }
     }
 
@@ -357,171 +366,171 @@ bool Value::isMicro() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int count(uint16_t id) {
+int count(int16_t id) {
     Cursor dummyCursor;
     Value countValue = 0;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_COUNT, dummyCursor, countValue);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_COUNT, dummyCursor, countValue);
     return countValue.getInt();
 }
 
-void select(Cursor &cursor, uint16_t id, int index, Value &oldValue) {
+void select(Cursor &cursor, int16_t id, int index, Value &oldValue) {
     cursor.i = index;
     Value indexValue = index;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_SELECT, cursor, indexValue);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_SELECT, cursor, indexValue);
     if (index == 0) {
         oldValue = indexValue;
     }
 }
 
-void deselect(Cursor &cursor, uint16_t id, Value &oldValue) {
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_DESELECT, cursor, oldValue);
+void deselect(Cursor &cursor, int16_t id, Value &oldValue) {
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_DESELECT, cursor, oldValue);
 }
 
-void setContext(Cursor &cursor, uint16_t id, Value &oldContext, Value &newContext) {
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_SET_CONTEXT, cursor, oldContext);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_CONTEXT, cursor, newContext);
+void setContext(Cursor &cursor, int16_t id, Value &oldContext, Value &newContext) {
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_SET_CONTEXT, cursor, oldContext);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_CONTEXT, cursor, newContext);
 }
 
-void restoreContext(Cursor &cursor, uint16_t id, Value &oldContext) {
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_RESTORE_CONTEXT, cursor, oldContext);
+void restoreContext(Cursor &cursor, int16_t id, Value &oldContext) {
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_RESTORE_CONTEXT, cursor, oldContext);
 }
 
-int getFloatListLength(uint16_t id) {
+int getFloatListLength(int16_t id) {
     Cursor dummyCursor;
     Value listLengthValue = 0;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_FLOAT_LIST_LENGTH, dummyCursor,
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_FLOAT_LIST_LENGTH, dummyCursor,
                                   listLengthValue);
     return listLengthValue.getInt();
 }
 
-float *getFloatList(uint16_t id) {
+float *getFloatList(int16_t id) {
     Cursor dummyCursor;
     Value floatListValue((float *)0);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_FLOAT_LIST, dummyCursor, floatListValue);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_FLOAT_LIST, dummyCursor, floatListValue);
     return floatListValue.getFloatList();
 }
 
-Value getMin(const Cursor &cursor, uint16_t id) {
+Value getMin(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_MIN, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_MIN, (Cursor &)cursor, value);
     return value;
 }
 
-Value getMax(const Cursor &cursor, uint16_t id) {
+Value getMax(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_MAX, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_MAX, (Cursor &)cursor, value);
     return value;
 }
 
-Value getDef(const Cursor &cursor, uint16_t id) {
+Value getDef(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_DEF, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_DEF, (Cursor &)cursor, value);
     return value;
 }
 
-Value getLimit(const Cursor &cursor, uint16_t id) {
+Value getLimit(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_LIMIT, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_LIMIT, (Cursor &)cursor, value);
     return value;
 }
 
-const char *getName(const Cursor &cursor, uint16_t id) {
+const char *getName(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_NAME, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_NAME, (Cursor &)cursor, value);
     return value.getString();
 }
 
-Unit getUnit(const Cursor &cursor, uint16_t id) {
+Unit getUnit(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_UNIT, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_UNIT, (Cursor &)cursor, value);
     return (Unit)value.getInt();
 }
 
-bool isChannelData(const Cursor &cursor, uint16_t id) {
+bool isChannelData(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_IS_CHANNEL_DATA, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_IS_CHANNEL_DATA, (Cursor &)cursor, value);
     return value.getInt() != 0;
 }
 
-Value getEncoderStep(const Cursor &cursor, uint16_t id) {
+Value getEncoderStep(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_ENCODER_STEP, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_ENCODER_STEP, (Cursor &)cursor, value);
     return value;
 }
 
-bool getEncoderStepValues(const Cursor &cursor, uint16_t id, StepValues &stepValues) {
+bool getEncoderStepValues(const Cursor &cursor, int16_t id, StepValues &stepValues) {
     Value value(&stepValues, VALUE_TYPE_POINTER);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_ENCODER_STEP_VALUES, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_ENCODER_STEP_VALUES, (Cursor &)cursor, value);
     return value.getType() == VALUE_TYPE_INT && value.getInt();
 }
 
-void getList(const Cursor &cursor, uint16_t id, const Value **values, int &count) {
+void getList(const Cursor &cursor, int16_t id, const Value **values, int &count) {
     Value listValue;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_VALUE_LIST, (Cursor &)cursor, listValue);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_VALUE_LIST, (Cursor &)cursor, listValue);
     *values = listValue.getValueList();
 
     Value countValue;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_COUNT, (Cursor &)cursor, countValue);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_COUNT, (Cursor &)cursor, countValue);
     count = countValue.getInt();
 }
 
-Value get(const Cursor &cursor, uint16_t id) {
+Value get(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET, (Cursor &)cursor, value);
     return value;
 }
 
-Value set(const Cursor &cursor, uint16_t id, Value value) {
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_SET, (Cursor &)cursor, value);
+Value set(const Cursor &cursor, int16_t id, Value value) {
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_SET, (Cursor &)cursor, value);
     return value;
 }
 
-uint32_t getTextRefreshRate(const Cursor &cursor, uint16_t id) {
+uint32_t getTextRefreshRate(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](DATA_OPERATION_GET_TEXT_REFRESH_RATE, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_TEXT_REFRESH_RATE, (Cursor &)cursor, value);
     if (value.getType() == VALUE_TYPE_UINT32) {
         return value.getUInt32();
     }
     return 0;
 }
 
-uint16_t getColor(const Cursor &cursor, uint16_t id, const Style *style) {
+uint16_t getColor(const Cursor &cursor, int16_t id, const Style *style) {
     Value value((void *)style, VALUE_TYPE_POINTER);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_COLOR, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_COLOR, (Cursor &)cursor, value);
     if (value.getType() == VALUE_TYPE_UINT16) {
         return value.getUInt16();
     }
     return style->color;
 }
 
-uint16_t getBackgroundColor(const Cursor &cursor, uint16_t id, const Style *style) {
+uint16_t getBackgroundColor(const Cursor &cursor, int16_t id, const Style *style) {
     Value value((void *)style, VALUE_TYPE_POINTER);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_BACKGROUND_COLOR, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_BACKGROUND_COLOR, (Cursor &)cursor, value);
     if (value.getType() == VALUE_TYPE_UINT16) {
         return value.getUInt16();
     }
     return style->background_color;
 }
 
-uint16_t getActiveColor(const Cursor &cursor, uint16_t id, const Style *style) {
+uint16_t getActiveColor(const Cursor &cursor, int16_t id, const Style *style) {
     Value value((void *)style, VALUE_TYPE_POINTER);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_ACTIVE_COLOR, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_ACTIVE_COLOR, (Cursor &)cursor, value);
     if (value.getType() == VALUE_TYPE_UINT16) {
         return value.getUInt16();
     }
     return style->active_color;
 }
 
-uint16_t getActiveBackgroundColor(const Cursor &cursor, uint16_t id, const Style *style) {
+uint16_t getActiveBackgroundColor(const Cursor &cursor, int16_t id, const Style *style) {
     Value value((void *)style, VALUE_TYPE_POINTER);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR, (Cursor &)cursor, value);
     if (value.getType() == VALUE_TYPE_UINT16) {
         return value.getUInt16();
     }
     return style->active_background_color;
 }
 
-bool isBlinking(const Cursor &cursor, uint16_t id) {
+bool isBlinking(const Cursor &cursor, int16_t id) {
     if (id == DATA_ID_NONE) {
         return false;
     }
@@ -531,123 +540,123 @@ bool isBlinking(const Cursor &cursor, uint16_t id) {
     }
 
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_IS_BLINKING, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_IS_BLINKING, (Cursor &)cursor, value);
     return value.getInt() ? true : false;
 }
 
-Value getEditValue(const Cursor &cursor, uint16_t id) {
+Value getEditValue(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET, (Cursor &)cursor, value);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_EDIT_VALUE, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_EDIT_VALUE, (Cursor &)cursor, value);
     return value;
 }
 
-Value getBitmapImage(const Cursor &cursor, uint16_t id) {
+Value getBitmapImage(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_GET_BITMAP_IMAGE, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_BITMAP_IMAGE, (Cursor &)cursor, value);
     return value;
 }
 
-uint32_t ytDataGetRefreshCounter(const Cursor &cursor, uint16_t id) {
+uint32_t ytDataGetRefreshCounter(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER, (Cursor &)cursor, value);
     return value.getUInt32();
 }
 
-uint32_t ytDataGetSize(const Cursor &cursor, uint16_t id) {
+uint32_t ytDataGetSize(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_SIZE, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_SIZE, (Cursor &)cursor, value);
     return value.getUInt32();
 
 }
 
-uint32_t ytDataGetPosition(const Cursor &cursor, uint16_t id) {
+uint32_t ytDataGetPosition(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_POSITION, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_POSITION, (Cursor &)cursor, value);
     return value.getUInt32();
 }
 
-void ytDataSetPosition(const Cursor &cursor, uint16_t id, uint32_t newPosition) {
+void ytDataSetPosition(const Cursor &cursor, int16_t id, uint32_t newPosition) {
 	Value value(newPosition, VALUE_TYPE_UINT32);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_SET_POSITION, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_SET_POSITION, (Cursor &)cursor, value);
 }
 
-uint32_t ytDataGetPositionIncrement(const Cursor &cursor, uint16_t id) {
+uint32_t ytDataGetPositionIncrement(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT, (Cursor &)cursor, value);
     if (value.getType() == VALUE_TYPE_UINT32) {
         return value.getUInt32();
     }
     return 1;
 }
 
-uint32_t ytDataGetPageSize(const Cursor &cursor, uint16_t id) {
+uint32_t ytDataGetPageSize(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_PAGE_SIZE, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_PAGE_SIZE, (Cursor &)cursor, value);
     return value.getUInt32();
 }
 
-const Style *ytDataGetStyle(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+const Style *ytDataGetStyle(const Cursor &cursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_STYLE, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_STYLE, (Cursor &)cursor, value);
     return getStyle(value.getUInt16());
 }
 
-Value ytDataGetMin(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+Value ytDataGetMin(const Cursor &cursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_MIN, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_MIN, (Cursor &)cursor, value);
     return value;
 }
 
-Value ytDataGetMax(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+Value ytDataGetMax(const Cursor &cursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_MAX, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_MAX, (Cursor &)cursor, value);
     return value;
 }
 
-int ytDataGetVertDivisions(const Cursor &cursor, uint16_t id) {
+int ytDataGetVertDivisions(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS, (Cursor &)cursor, value);
     return value.getInt();
 }
 
-int ytDataGetHorzDivisions(const Cursor &cursor, uint16_t id) {
+int ytDataGetHorzDivisions(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_HORZ_DIVISIONS, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_HORZ_DIVISIONS, (Cursor &)cursor, value);
     return value.getInt();
 }
 
-float ytDataGetDiv(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+float ytDataGetDiv(const Cursor &cursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_DIV, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_DIV, (Cursor &)cursor, value);
     return value.getFloat();
 }
 
-float ytDataGetOffset(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+float ytDataGetOffset(const Cursor &cursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_OFFSET, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_OFFSET, (Cursor &)cursor, value);
     return value.getFloat();
 }
 
-bool ytDataDataValueIsVisible(const Cursor &cursor, uint16_t id, uint8_t valueIndex) {
+bool ytDataDataValueIsVisible(const Cursor &cursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
-    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE), (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, (DataOperationEnum)(data::DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE), (Cursor &)cursor, value);
     return value.getInt();
 }
 
-bool ytDataGetShowLabels(const Cursor &cursor, uint16_t id) {
+bool ytDataGetShowLabels(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_SHOW_LABELS), (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, (DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_SHOW_LABELS), (Cursor &)cursor, value);
     return value.getInt();
 }
 
-int8_t ytDataGetSelectedValueIndex(const Cursor &cursor, uint16_t id) {
+int8_t ytDataGetSelectedValueIndex(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_SELECTED_VALUE_INDEX), (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, (DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_SELECTED_VALUE_INDEX), (Cursor &)cursor, value);
     return (int8_t)value.getInt();
 }
 
-void ytDataGetLabel(const Cursor &cursor, uint16_t id, uint8_t valueIndex, char *text, int count) {
+void ytDataGetLabel(const Cursor &cursor, int16_t id, uint8_t valueIndex, char *text, int count) {
     text[0] = 0;
     YtDataGetLabelParams params = {
         valueIndex,
@@ -655,48 +664,48 @@ void ytDataGetLabel(const Cursor &cursor, uint16_t id, uint8_t valueIndex, char 
         count
     };
     Value value(&params, VALUE_TYPE_POINTER);
-    g_dataOperationsFunctions[id]((DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_LABEL), (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, (DataOperationEnum)(data::DATA_OPERATION_YT_DATA_GET_LABEL), (Cursor &)cursor, value);
 }
 
-Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(const Cursor &cursor, uint16_t id) {
+Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC, (Cursor &)cursor, value);
     return value.getYtDataGetValueFunctionPointer();
 }
 
-uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, uint16_t id) {
+uint8_t ytDataGetGraphUpdateMethod(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD, (Cursor &)cursor, value);
     return value.getUInt8();
 }
 
-float ytDataGetPeriod(const Cursor &cursor, uint16_t id) {
+float ytDataGetPeriod(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_PERIOD, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_PERIOD, (Cursor &)cursor, value);
     return value.getFloat();
 }
 
-bool ytDataIsCursorVisible(const Cursor &cursor, uint16_t id) {
+bool ytDataIsCursorVisible(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE, (Cursor &)cursor, value);
     return value.getInt() == 1;
 }
 
-uint32_t ytDataGetCursorOffset(const Cursor &cursor, uint16_t id) {
+uint32_t ytDataGetCursorOffset(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET, (Cursor &)cursor, value);
     return value.getUInt32();
 }
 
-Value ytDataGetCursorXValue(const Cursor &cursor, uint16_t id) {
+Value ytDataGetCursorXValue(const Cursor &cursor, int16_t id) {
     Value value;
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE, (Cursor &)cursor, value);
     return value;
 }
 
-void ytDataTouchDrag(const Cursor &cursor, uint16_t id, TouchDrag *touchDrag) {
+void ytDataTouchDrag(const Cursor &cursor, int16_t id, TouchDrag *touchDrag) {
     Value value = Value(touchDrag, VALUE_TYPE_POINTER);
-    g_dataOperationsFunctions[id](data::DATA_OPERATION_YT_DATA_TOUCH_DRAG, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_YT_DATA_TOUCH_DRAG, (Cursor &)cursor, value);
 }
 
 } // namespace data

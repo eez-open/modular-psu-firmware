@@ -23,7 +23,7 @@ namespace gui {
 
 struct ContainerWidget {
     WidgetList widgets;
-    uint16_t overlay;
+    int16_t overlay;
     uint8_t flags;
 };
 

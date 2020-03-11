@@ -120,8 +120,8 @@ private:
 
     int getColumnIndex();
     int getCursorIndexWithinPage();
-    uint8_t getDataIdAtCursor();
-    int getCursorIndex(const eez::gui::data::Cursor &cursor, uint16_t id);
+    int16_t getDataIdAtCursor();
+    int getCursorIndex(const eez::gui::data::Cursor &cursor, int16_t id);
 
     bool isFocusedValueEmpty();
     float getFocusedValue();

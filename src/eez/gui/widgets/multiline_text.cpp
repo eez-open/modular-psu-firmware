@@ -26,13 +26,6 @@
 namespace eez {
 namespace gui {
 
-#if OPTION_SDRAM
-void MultilineTextWidget_fixPointers(Widget *widget) {
-    MultilineTextWidget *multilineTextWidget = (MultilineTextWidget *)widget->specific;
-    multilineTextWidget->text = (const char *)((uint8_t *)g_document + (uint32_t)multilineTextWidget->text);
-}
-#endif
-
 void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 

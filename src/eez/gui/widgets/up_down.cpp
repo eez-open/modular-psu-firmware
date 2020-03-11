@@ -36,14 +36,6 @@ enum UpDownWidgetSegment {
 static UpDownWidgetSegment g_segment;
 static WidgetCursor g_selectedWidget;
 
-#if OPTION_SDRAM
-void UpDownWidget_fixPointers(Widget *widget) {
-    UpDownWidget *upDownWidget = (UpDownWidget *)widget->specific;
-    upDownWidget->downButtonText = (const char *)((uint8_t *)g_document + (uint32_t)upDownWidget->downButtonText);
-    upDownWidget->upButtonText = (const char *)((uint8_t *)g_document + (uint32_t)upDownWidget->upButtonText);
-}
-#endif
-
 void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const UpDownWidget *upDownWidget = GET_WIDGET_PROPERTY(widget, specific, const UpDownWidget *);

@@ -50,6 +50,10 @@
     SCPI_COMMAND("DISPlay:DATA?", scpi_cmd_displayDataQ) \
     SCPI_COMMAND("DISPlay[:WINdow]:DLOG", scpi_cmd_displayWindowDlog) \
     SCPI_COMMAND("DISPlay[:WINdow]:INPUt?", scpi_cmd_displayWindowInputQ) \
+    SCPI_COMMAND("DISPlay[:WINdow]:DIALog[:OPEN]", scpi_cmd_displayWindowDialogOpen) \
+    SCPI_COMMAND("DISPlay[:WINdow]:DIALog:ACTIon?", scpi_cmd_displayWindowDialogActionQ) \
+    SCPI_COMMAND("DISPlay[:WINdow]:DIALog:DATA", scpi_cmd_displayWindowDialogData) \
+    SCPI_COMMAND("DISPlay[:WINdow]:DIALog:CLOSe", scpi_cmd_displayWindowDialogClose) \
     SCPI_COMMAND("INITiate:CONTinuous", scpi_cmd_initiateContinuous) \
     SCPI_COMMAND("INITiate:CONTinuous?", scpi_cmd_initiateContinuousQ) \
     SCPI_COMMAND("INITiate:DLOG", scpi_cmd_initiateDlog) \

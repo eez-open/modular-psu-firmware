@@ -22,12 +22,12 @@ namespace eez {
 namespace gui {
 
 struct ListGraphWidget {
-    uint16_t dwellData;
-    uint16_t y1Data;
+    int16_t dwellData;
+    int16_t y1Data;
     uint16_t y1Style;
-    uint16_t y2Data;
+    int16_t y2Data;
     uint16_t y2Style;
-    uint16_t cursorData;
+    int16_t cursorData;
     uint16_t cursorStyle;
 };
 

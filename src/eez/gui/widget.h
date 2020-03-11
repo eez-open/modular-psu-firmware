@@ -102,8 +102,8 @@ void StyleList_fixPointers(StyleList &styleList);
 
 struct Widget {
     uint8_t type;
-    uint16_t data;
-    uint16_t action;
+    int16_t data;
+    int16_t action;
     int16_t x;
     int16_t y;
     int16_t w;

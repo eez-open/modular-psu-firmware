@@ -26,13 +26,6 @@
 namespace eez {
 namespace gui {
 
-#if OPTION_SDRAM
-void ButtonWidget_fixPointers(Widget *widget) {
-    ButtonWidget *buttonWidget = (ButtonWidget *)widget->specific;
-    buttonWidget->text = (const char *)((uint8_t *)g_document + (uint32_t)buttonWidget->text);
-}
-#endif
-
 void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const ButtonWidget *button_widget = GET_WIDGET_PROPERTY(widget, specific, const ButtonWidget *);

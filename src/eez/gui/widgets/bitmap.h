@@ -22,7 +22,7 @@ namespace eez {
 namespace gui {
 
 struct BitmapWidget {
-    uint8_t bitmap;
+    int8_t bitmap;
 };
 
 void BitmapWidget_draw(const WidgetCursor &widgetCursor);

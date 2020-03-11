@@ -51,7 +51,7 @@ void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callb
     }
 
     int layoutId = getLayoutId(widgetCursor);
-    const Widget *layout = layoutId != -1 ? getPageWidget(layoutId) : nullptr;
+    const Widget *layout = layoutId != 0 ? getPageWidget(layoutId) : nullptr;
 
     if (layout) {
 		const PageWidget *layoutSpecific = GET_WIDGET_PROPERTY(layout, specific, const PageWidget *);

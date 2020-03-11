@@ -203,7 +203,7 @@ void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum op
 }
 
 bool isPageInternal(int pageId) {
-    return pageId < INTERNAL_PAGE_ID_NONE;
+    return pageId > FIRST_INTERNAL_PAGE_ID;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -232,11 +232,11 @@ static ActionExecFunc g_internalActionExecFunctions[] = {
 };
 
 bool isInternalAction(int actionId) {
-    return actionId < 0;
+    return actionId > FIRST_INTERNAL_ACTION_ID;
 }
 
 void executeInternalAction(int actionId) {
-    g_internalActionExecFunctions[-actionId]();
+    g_internalActionExecFunctions[actionId - FIRST_INTERNAL_ACTION_ID]();
 }
 
 void executeAction(int actionId) {
@@ -250,7 +250,11 @@ void executeAction(int actionId) {
     if (isInternalAction(actionId)) {
         executeInternalAction(actionId);
     } else {
-        g_actionExecFunctions[actionId]();
+        if (actionId >= 0) {
+            g_actionExecFunctions[actionId]();
+        } else {
+            executeExternalActionHook(actionId);
+        }
     }
 
     g_appContext = saved;

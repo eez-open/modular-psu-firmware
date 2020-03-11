@@ -37,14 +37,6 @@ static WidgetCursor g_selectedWidget;
 static int g_dragStartX;
 static int g_dragStartPosition;
 
-#if OPTION_SDRAM
-void ScrollBarWidget_fixPointers(Widget *widget) {
-    ScrollBarWidget *scrollBarWidget = (ScrollBarWidget *)widget->specific;
-    scrollBarWidget->leftButtonText = (const char *)((uint8_t *)g_document + (uint32_t)scrollBarWidget->leftButtonText);
-    scrollBarWidget->rightButtonText = (const char *)((uint8_t *)g_document + (uint32_t)scrollBarWidget->rightButtonText);
-}
-#endif
-
 int getSize(const WidgetCursor &widgetCursor) {
     return data::ytDataGetSize(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 }

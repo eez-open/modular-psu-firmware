@@ -24,14 +24,6 @@
 namespace eez {
 namespace gui {
 
-#if OPTION_SDRAM
-void ListWidget_fixPointers(Widget *widget) {
-    ListWidget *listWidget = (ListWidget *)widget->specific;
-    listWidget->itemWidget = (Widget *)((uint8_t *)g_document + (uint32_t)listWidget->itemWidget);
-    Widget_fixPointers((Widget *)listWidget->itemWidget);
-}
-#endif
-
 void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;

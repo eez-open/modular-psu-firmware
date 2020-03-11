@@ -27,7 +27,7 @@ struct ButtonWidget {
 #else
     uint32_t textOffset;
 #endif
-    uint16_t enabled;
+    int16_t enabled;
     uint16_t disabledStyle;
 };
 
