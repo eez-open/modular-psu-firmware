@@ -929,16 +929,16 @@ void PsuAppContext::doShowNumberInput() {
 
 void PsuAppContext::dialogOpen() {
     if (osThreadGetId() == g_guiTaskHandle) {
-        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN, 0), osWaitForever);
-    } else {
         if (g_psuAppContext.getActivePageId() != getExternalAssetsFirstPageId()) {
             dialogResetDataItemValues();
             g_psuAppContext.pushPage(getExternalAssetsFirstPageId());
         }
+    } else {
+        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN, 0), osWaitForever);
     }
 }
 
-const char *PsuAppContext::dialogAction(uint32_t timeoutMs) {
+DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&selectedActionName) {
     if (timeoutMs != 0) {
         timeoutMs = millis() + timeoutMs;
         if (timeoutMs == 0) {
@@ -946,21 +946,25 @@ const char *PsuAppContext::dialogAction(uint32_t timeoutMs) {
         }
     }
 
-    while ((timeoutMs == 0 || (int32_t)(millis() - timeoutMs) < 0) && g_externalActionId == ACTION_ID_NONE) {
+    while (
+        (timeoutMs == 0 || (int32_t)(millis() - timeoutMs) < 0) &&
+        g_externalActionId == ACTION_ID_NONE &&
+        (isPageOnStack(getExternalAssetsFirstPageId()) || osMessageWaiting(g_guiMessageQueueId) > 0)
+    ) {
         osDelay(1);
     }
 
     if (g_externalActionId != ACTION_ID_NONE) {
-        const char *actionName = getActionName(g_externalActionId);
+        selectedActionName = getActionName(g_externalActionId);
         g_externalActionId = ACTION_ID_NONE;
-        return actionName;
+        return DIALOG_ACTION_RESULT_SELECTED_ACTION;
     }
 
-    return nullptr;
+    return isPageOnStack(getExternalAssetsFirstPageId()) ? DIALOG_ACTION_RESULT_TIMEOUT : DIALOG_ACTION_RESULT_EXIT;
 }
 
 void PsuAppContext::dialogResetDataItemValues() {
-    for (int i = 0; i < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES; i++) {
+    for (uint32_t i = 0; i < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES; i++) {
         g_externalDataItemValues[i] = Value();
     }
 }
@@ -970,7 +974,7 @@ void PsuAppContext::dialogSetDataItemValue(int16_t dataId, Value& value) {
         dataId = -dataId;
     }
     dataId--;
-    if (dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
+    if ((uint16_t)dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
         g_externalDataItemValues[dataId] = value;
     }
 }
@@ -1864,7 +1868,7 @@ void externalDataHook(int16_t dataId, data::DataOperationEnum operation, data::C
         dataId = -dataId;
     }
     dataId--;
-    if (dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
+    if ((uint16_t)dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
         if (operation == data::DATA_OPERATION_GET) {
             value = g_externalDataItemValues[dataId];
         }

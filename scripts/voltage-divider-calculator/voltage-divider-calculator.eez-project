@@ -18,22 +18,22 @@
     {
       "name": "R1",
       "type": "float",
-      "defaultValue": "50\\u00b4"
+      "defaultValue": "50 \\u00b4"
     },
     {
       "name": "R2",
       "type": "float",
-      "defaultValue": "10\\u00b4"
+      "defaultValue": "10 \\u00b4"
     },
     {
       "name": "Vin",
       "type": "float",
-      "defaultValue": "10V"
+      "defaultValue": "10 V"
     },
     {
       "name": "Vout",
       "type": "float",
-      "defaultValue": "1.667V"
+      "defaultValue": "1.667 V"
     }
   ],
   "actions": [

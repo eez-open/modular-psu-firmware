@@ -178,6 +178,10 @@ osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec) {
     return osOK;
 }
 
+uint32_t osMessageWaiting(osMessageQId queue_id) {
+    return queue_id->head - queue_id->tail;
+}
+
 Mutex *osMutexCreate(Mutex &mutex) {
     return &mutex;
 }

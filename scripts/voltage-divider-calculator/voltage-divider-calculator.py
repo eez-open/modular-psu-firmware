@@ -1,16 +1,4 @@
-# Calculate resitor valus for voltage divider
-
-#
-# 1) Dodati SCPI komande:
-#       DISP:DIALog:OPEN <file_path>
-#       DISP:DIALog:DATA <data_name>,<value>
-#       DISP:DIALog:ACTIon? <timeout>
-#       DISP:DIALog:CLOSe
-#
-# 2) upisati u buildani projekt ime od: action i data (i page?)
-#
-# 3) odabir ohm, kilohms i megaohms za resistance
-#
+# This calculator helps calculate values of resistive voltage divider
 
 from eez import scpi
 
@@ -64,34 +52,43 @@ def calc_Vin():
         global Vin
         Vin = Vout * (R1 + R2) / R2
         scpi("DISP:DIALog:DATA \"Vin\",FLOAT,VOLT," + str(round(Vin, 3)))
+    else:
+        scpi("DISP:ERROR \"Enter R1, R2 and Vout\"")
 
 def calc_R1():
     if can_calc_R1():
         global R1
         R1 = R2 * (Vin - Vout) / Vout
         scpi("DISP:DIALog:DATA \"R1\",FLOAT,OHM," + str(round(R1, 3)))
+    else:
+        if Vin != None and Vout != None and R2 != None:
+            scpi("DISP:ERROR \"Vout must be less then Vin\"")
+        else:
+            scpi("DISP:ERROR \"Enter Vin, R2 and Vout\"")
 
 def calc_R2():
     if can_calc_R2():
         global R2
         R2 = R1 * Vout / (Vin - Vout)
         scpi("DISP:DIALog:DATA \"R2\",FLOAT,OHM," + str(round(R2, 3)))
+    else:
+        if Vin != None and Vout != None and R1 != None:
+            scpi("DISP:ERROR \"Vout must be less then Vin\"")
+        else:
+            scpi("DISP:ERROR \"Enter Vin, R1 and Vout\"")
 
 def calc_Vout():
     if can_calc_Vout():
         global Vout
         Vout = Vin * R2 / (R1 + R2)
         scpi("DISP:DIALog:DATA \"Vout\",FLOAT,VOLT," + str(round(Vout, 3)))
+    else:
+        scpi("DISP:ERROR \"Enter Vin, R1 and R2\"")
 
 scpi("DISP:DIALog:OPEN \"/Scripts/voltage-divider-calculator.res\"")
 while True:
     action = scpi("DISP:DIALog:ACTIon?")
-
-    if action == "close":
-        scpi("DISP:DIALog:CLOSe")
-        break
-
-    elif action == "input_Vin":
+    if action == "input_Vin":
         input_Vin()
     elif action == "input_R1":
         input_R1()
@@ -99,7 +96,6 @@ while True:
         input_R2()
     elif action == "input_Vout":
         input_Vout()
-
     elif action == "calc_Vin":
         calc_Vin()
     elif action == "calc_R1":
@@ -108,3 +104,7 @@ while True:
         calc_R2()
     elif action == "calc_Vout":
         calc_Vout()
+    elif action == "close" or action == 0:
+        scpi("DISP:DIALog:CLOSe")
+        break
+

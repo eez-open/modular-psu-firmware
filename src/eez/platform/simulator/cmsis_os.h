@@ -107,6 +107,7 @@ typedef MessageQueue *osMessageQId;
 osMessageQId osMessageCreate(osMessageQId queue_id, osThreadId thread_id);
 osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec);
 osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec);
+uint32_t osMessageWaiting(osMessageQId queue_id);
 
 // Mutex
 

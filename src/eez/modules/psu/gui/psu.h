@@ -98,6 +98,12 @@ struct MenuInputParams {
     static void onSet(int value);
 };
 
+enum DialogActionResult {
+    DIALOG_ACTION_RESULT_EXIT,
+    DIALOG_ACTION_RESULT_TIMEOUT,
+    DIALOG_ACTION_RESULT_SELECTED_ACTION
+};
+
 class PsuAppContext : public AppContext {
 public:
     PsuAppContext();
@@ -134,7 +140,7 @@ public:
     void doShowMenuInput();
 
     void dialogOpen();
-    const char *dialogAction(uint32_t timeoutMs);
+    DialogActionResult dialogAction(uint32_t timeoutMs, const char *&selectedActionName);
     void dialogResetDataItemValues();
     void dialogSetDataItemValue(int16_t dataId, Value& value);
     void dialogClose();

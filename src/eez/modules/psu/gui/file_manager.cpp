@@ -107,29 +107,31 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
     char description[MAX_FILE_DESCRIPTION_LENGTH + 1];
     size_t descriptionLen = 0;
 
-    if (getListViewOption() == LIST_VIEW_SCRIPTS) {
+    if (isScriptsDirectory() && (getListViewOption() == LIST_VIEW_SCRIPTS || getListViewOption() == LIST_VIEW_LARGE_ICONS)) {
         if (type != FILE_TYPE_MICROPYTHON) {
             return;
         }
 
         description[0] = 0;
 
-        char filePath[MAX_PATH_LENGTH + 1];
-        strcpy(filePath, g_currentDirectory);
-        strcat(filePath, "/");
-        strcat(filePath, name);
-        File file;
-        if (file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-            psu::sd_card::BufferedFileRead bufferedFile(file);
+        if (getListViewOption() == LIST_VIEW_SCRIPTS) {
+            char filePath[MAX_PATH_LENGTH + 1];
+            strcpy(filePath, g_currentDirectory);
+            strcat(filePath, "/");
+            strcat(filePath, name);
+            File file;
+            if (file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+                psu::sd_card::BufferedFileRead bufferedFile(file);
 
-            psu::sd_card::matchZeroOrMoreSpaces(bufferedFile);
-            if (psu::sd_card::match(bufferedFile, '#')) {
                 psu::sd_card::matchZeroOrMoreSpaces(bufferedFile);
-                psu::sd_card::matchUntil(bufferedFile, '\n', description, MAX_FILE_DESCRIPTION_LENGTH);
-                description[MAX_FILE_DESCRIPTION_LENGTH] = 0;
-            }
+                if (psu::sd_card::match(bufferedFile, '#')) {
+                    psu::sd_card::matchZeroOrMoreSpaces(bufferedFile);
+                    psu::sd_card::matchUntil(bufferedFile, '\n', description, MAX_FILE_DESCRIPTION_LENGTH);
+                    description[MAX_FILE_DESCRIPTION_LENGTH] = 0;
+                }
 
-            file.close();
+                file.close();
+            }
         }
 
         descriptionLen = strlen(description);
@@ -235,7 +237,7 @@ int compareFunc(const void *p1, const void *p2, SortFilesOption sortFilesOption)
         }
     }
 
-    if (getListViewOption() == LIST_VIEW_SCRIPTS) {
+    if (isScriptsDirectory() && (getListViewOption() == LIST_VIEW_SCRIPTS || getListViewOption() == LIST_VIEW_LARGE_ICONS)) {
         sortFilesOption = SORT_FILES_BY_NAME_ASC;
     }
 
@@ -357,7 +359,7 @@ int getListViewLayout() {
         return PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW;
     }
     if (getListViewOption() == LIST_VIEW_SCRIPTS) {
-        return PAGE_ID_FILE_MANAGER_SCRIPTS_VIEW;
+        return PAGE_ID_FILE_MANAGER_SCRIPTS_ALTER_VIEW;
     }
     return PAGE_ID_FILE_MANAGER_DETAILS_VIEW;
 }
@@ -370,6 +372,14 @@ void toggleListViewOption() {
             g_rootDirectoryListViewOption = LIST_VIEW_DETAILS;
         }
     } else {
+        // if (g_scriptsDirectoryListViewOption == LIST_VIEW_DETAILS) {
+        //     g_scriptsDirectoryListViewOption = LIST_VIEW_SCRIPTS;
+        // } else if (g_scriptsDirectoryListViewOption == LIST_VIEW_SCRIPTS) {
+        //     g_scriptsDirectoryListViewOption = LIST_VIEW_LARGE_ICONS;
+        // } else {
+        //     g_scriptsDirectoryListViewOption = LIST_VIEW_DETAILS;
+        // }
+
         if (g_scriptsDirectoryListViewOption == LIST_VIEW_DETAILS) {
             g_scriptsDirectoryListViewOption = LIST_VIEW_SCRIPTS;
         } else {
@@ -479,8 +489,23 @@ void setFilesStartPosition(uint32_t position) {
 static const int NUM_COLUMNS_IN_LARGE_ICONS_VIEW = 4;
 static const int NUM_ROWS_IN_LARGE_ICONS_VIEW = 2;
 
+static const int NUM_COLUMNS_IN_SCRIPTS_ALTER_VIEW = 2;
+static const int NUM_ROWS_IN_SCRIPTS_ALTER_VIEW = 3;
+
 uint32_t getFilesPositionIncrement() {
-    return getListViewOption() == LIST_VIEW_LARGE_ICONS ? NUM_COLUMNS_IN_LARGE_ICONS_VIEW : 1;
+    if (getListViewOption() == LIST_VIEW_LARGE_ICONS) {
+        return NUM_COLUMNS_IN_LARGE_ICONS_VIEW;
+    }
+
+    if (getListViewOption() == LIST_VIEW_SCRIPTS) {
+        if (getListViewLayout() == PAGE_ID_FILE_MANAGER_SCRIPTS_ALTER_VIEW) {
+            return NUM_COLUMNS_IN_SCRIPTS_ALTER_VIEW;
+        } else {
+            return 1;
+        }
+    }
+
+    return 1;
 }
 
 uint32_t getFilesPageSize() {
@@ -488,6 +513,7 @@ uint32_t getFilesPageSize() {
     static const uint32_t FILE_MANAGER_FILES_PAGE_SIZE_IN_DETAILS_VIEW = 6;
     static const uint32_t FILE_MANAGER_FILES_PAGE_SIZE_IN_LARGE_ICONS_VIEW = NUM_COLUMNS_IN_LARGE_ICONS_VIEW * NUM_ROWS_IN_LARGE_ICONS_VIEW;
     static const uint32_t FILE_MANAGER_FILES_PAGE_SIZE_IN_SCRIPTS_VIEW = 3;
+    static const uint32_t FILE_MANAGER_FILES_PAGE_SIZE_IN_SCRIPTS_ALTER_VIEW = NUM_COLUMNS_IN_SCRIPTS_ALTER_VIEW * NUM_ROWS_IN_SCRIPTS_ALTER_VIEW;
 
     if (g_fileBrowserMode) {
         return FILE_BROWSER_FILES_PAGE_SIZE;
@@ -498,7 +524,11 @@ uint32_t getFilesPageSize() {
     }
     
     if (getListViewOption() == LIST_VIEW_SCRIPTS) {
-        return FILE_MANAGER_FILES_PAGE_SIZE_IN_SCRIPTS_VIEW;
+        if (getListViewLayout() == PAGE_ID_FILE_MANAGER_SCRIPTS_ALTER_VIEW) {
+            return FILE_MANAGER_FILES_PAGE_SIZE_IN_SCRIPTS_ALTER_VIEW;
+        } else {
+            return FILE_MANAGER_FILES_PAGE_SIZE_IN_SCRIPTS_VIEW;
+        }
     }
 
     return FILE_MANAGER_FILES_PAGE_SIZE_IN_DETAILS_VIEW;
@@ -521,11 +551,18 @@ RootDirectoryType getRootDirectoryType(uint32_t fileIndex) {
 
 const char *getFileIcon(uint32_t fileIndex) {
     auto fileType = getFileType(fileIndex);
+    if (fileType == FILE_TYPE_NONE) {
+        return nullptr;
+    }
 
-    if (getListViewOption() == LIST_VIEW_DETAILS || getListViewOption() == LIST_VIEW_SCRIPTS) {
+    if (getListViewOption() == LIST_VIEW_DETAILS) {
         return getFileTypeSmallIcon(fileType);
-    } 
-    
+    }
+
+    if (getListViewOption() == LIST_VIEW_SCRIPTS) {
+        return "\x94";
+    }
+
     if (fileType == FILE_TYPE_DIRECTORY) {
         return getRootDirectoryIcon(getRootDirectoryType(fileIndex));
     }
@@ -577,7 +614,7 @@ void selectFile(uint32_t fileIndex) {
         } else {
             g_selectedFileIndex = fileIndex;
             if (!g_fileBrowserMode) {
-                if (getListViewOption() == LIST_VIEW_SCRIPTS) {
+                if (isScriptsDirectory() && (getListViewOption() == LIST_VIEW_SCRIPTS || getListViewOption() == LIST_VIEW_LARGE_ICONS)) {
                     if (mp::isIdle()) {
                         char filePath[MAX_PATH_LENGTH + 1];
                         strcpy(filePath, g_currentDirectory);
@@ -1035,6 +1072,15 @@ void data_file_manager_file_name(data::DataOperationEnum operation, data::Cursor
         auto fileType = getFileType(cursor.i);
         if (fileType != FILE_TYPE_NONE) {
             value = Value(getFileName(cursor.i), VALUE_TYPE_STR, STRING_OPTIONS_FILE_ELLIPSIS);
+        }
+    }
+}
+
+void data_file_manager_file_has_description(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        auto fileType = getFileType(cursor.i);
+        if (fileType != FILE_TYPE_NONE) {
+            value = strlen(getFileDescription(cursor.i)) > 0;
         }
     }
 }

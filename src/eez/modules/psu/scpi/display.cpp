@@ -452,11 +452,12 @@ scpi_result_t scpi_cmd_displayWindowDialogActionQ(scpi_t *context) {
         }
     }
 
-    const char *action = psu::gui::g_psuAppContext.dialogAction(timeoutMs);
-    if (action) {
-        SCPI_ResultText(context, action);
+    const char *selectedActionName;
+    int result = psu::gui::g_psuAppContext.dialogAction(timeoutMs, selectedActionName);
+    if (result == psu::gui::DIALOG_ACTION_RESULT_SELECTED_ACTION) {
+        SCPI_ResultText(context, selectedActionName);
     } else {
-        SCPI_ResultBool(context, 0);
+        SCPI_ResultBool(context, result);
     }
 
     return SCPI_RES_OK;
@@ -540,6 +541,30 @@ scpi_result_t scpi_cmd_displayWindowDialogData(scpi_t *context) {
 scpi_result_t scpi_cmd_displayWindowDialogClose(scpi_t *context) {
 #if OPTION_DISPLAY
     psu::gui::g_psuAppContext.dialogClose();
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+scpi_result_t scpi_cmd_displayWindowError(scpi_t *context) {
+#if OPTION_DISPLAY
+    const char *valueText;
+    size_t valueTextLen;
+    if (!SCPI_ParamCharacters(context, &valueText, &valueTextLen, true)) {
+        return SCPI_RES_ERR;
+    }
+    if (valueTextLen > 128) {
+        SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+        return SCPI_RES_ERR;
+    }
+    char message[128 + 1];
+    strncpy(message, valueText, valueTextLen);
+    message[valueTextLen] = 0;
+    
+    eez::gui::errorMessage(message);
 
     return SCPI_RES_OK;
 #else

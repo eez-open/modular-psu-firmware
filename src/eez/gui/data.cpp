@@ -132,6 +132,7 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
             strcatFloat(text, floatValue);
         }
         removeTrailingZerosFromFloat(text);
+        strcat(text, " ");
         strcat(text, getUnitName(unit));
     } else {
         text[0] = 0;

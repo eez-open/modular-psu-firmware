@@ -390,7 +390,8 @@ enum DataEnum {
     DATA_ID_TOUCH_FILTERED_X = 388,
     DATA_ID_TOUCH_FILTERED_Y = 389,
     DATA_ID_TOUCH_FILTERED_PRESSED = 390,
-    DATA_ID_CAN_SHOW_PREVIOUS_PAGE = 391
+    DATA_ID_CAN_SHOW_PREVIOUS_PAGE = 391,
+    DATA_ID_FILE_MANAGER_FILE_HAS_DESCRIPTION = 392
 };
 
 void data_none(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -785,6 +786,7 @@ void data_touch_filtered_x(DataOperationEnum operation, Cursor &cursor, Value &v
 void data_touch_filtered_y(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_touch_filtered_pressed(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_can_show_previous_page(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_file_manager_file_has_description(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -1650,12 +1652,13 @@ enum PagesEnum {
     PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD = 161,
     PAGE_ID_FILE_MANAGER_DETAILS_VIEW = 162,
     PAGE_ID_FILE_MANAGER_SCRIPTS_VIEW = 163,
-    PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW = 164,
-    PAGE_ID_TOUCH_TEST = 165
+    PAGE_ID_FILE_MANAGER_SCRIPTS_ALTER_VIEW = 164,
+    PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW = 165,
+    PAGE_ID_TOUCH_TEST = 166
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[403827];
+extern const uint8_t assets[404235];
 #else
-extern const uint8_t assets[3915168];
+extern const uint8_t assets[3915880];
 #endif
