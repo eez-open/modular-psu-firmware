@@ -98,6 +98,14 @@ struct MenuInputParams {
     static void onSet(int value);
 };
 
+struct SelectParams {
+    const char **m_options;
+    int m_defaultSelection;
+    int m_input;
+    static void enumDefinition(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value);
+    static void onSelect(uint16_t value);
+};
+
 enum DialogActionResult {
     DIALOG_ACTION_RESULT_EXIT,
     DIALOG_ACTION_RESULT_TIMEOUT,
@@ -139,6 +147,9 @@ public:
     int menuInput(const char *label, MenuType menuType, const char **menuItems);
     void doShowMenuInput();
 
+    int select(const char **options, int defaultSelection);
+    void doShowSelect();
+
     void dialogOpen();
     DialogActionResult dialogAction(uint32_t timeoutMs, const char *&selectedActionName);
     void dialogResetDataItemValues();
@@ -170,7 +181,13 @@ protected:
     friend struct MenuInputParams;
     MenuInputParams m_menuInputParams;
 
+    friend struct SelectParams;
+    SelectParams m_selectParams;
+
     bool m_inputReady;
+
+    bool g_dialogOpening;
+    bool g_selectOpening;
 
     int getMainPageId() override;
     void onPageChanged(int previousPageId, int activePageId) override;
@@ -201,6 +218,7 @@ enum {
     GUI_QUEUE_MESSAGE_TYPE_SHOW_TEXT_INPUT,
     GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT,
     GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT,
+    GUI_QUEUE_MESSAGE_TYPE_SHOW_SELECT,
     GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN,
     GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE
 };

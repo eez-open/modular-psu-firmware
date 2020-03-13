@@ -40,7 +40,12 @@ const char *g_unitNames[] = {
     "M\xb4",
     "%",
     "Hz",
-    "J"
+    "J",
+    "F",
+    "mF",
+    "uF",
+    "nF",
+    "pF"
 };
 
 static const int g_scpiUnits[] = {
@@ -61,7 +66,12 @@ static const int g_scpiUnits[] = {
     SCPI_UNIT_OHM,
     SCPI_UNIT_NONE,
     SCPI_UNIT_HERTZ,
-    SCPI_UNIT_JOULE
+    SCPI_UNIT_JOULE,
+    SCPI_UNIT_FARAD,
+    SCPI_UNIT_FARAD,
+    SCPI_UNIT_FARAD,
+    SCPI_UNIT_FARAD,
+    SCPI_UNIT_FARAD
 };
 
 int getScpiUnit(Unit unit) {

@@ -41,7 +41,12 @@ enum Unit {
     UNIT_MOHM,
     UNIT_PERCENT,
     UNIT_FREQUENCY,
-    UNIT_JOULE
+    UNIT_JOULE,
+    UNIT_FARAD,
+    UNIT_MILLI_FARAD,
+    UNIT_MICRO_FARAD,
+    UNIT_NANO_FARAD,
+    UNIT_PICO_FARAD
 };
 
 extern const char *g_unitNames[];

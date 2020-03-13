@@ -210,6 +210,16 @@ Unit NumericKeypad::getValueUnit() {
         return UNIT_MOHM;
     if (m_options.editValueUnit == UNIT_MOHM)
         return UNIT_OHM;
+    if (m_options.editValueUnit == UNIT_FARAD)
+        return UNIT_MILLI_FARAD;
+    if (m_options.editValueUnit == UNIT_MILLI_FARAD)
+        return UNIT_MICRO_FARAD;
+    if (m_options.editValueUnit == UNIT_MICRO_FARAD)
+        return UNIT_NANO_FARAD;
+    if (m_options.editValueUnit == UNIT_NANO_FARAD)
+        return UNIT_PICO_FARAD;
+    if (m_options.editValueUnit == UNIT_PICO_FARAD)
+        return UNIT_FARAD;
     return m_options.editValueUnit;
 }
 
@@ -217,11 +227,20 @@ bool NumericKeypad::isMilli() {
     return m_options.editValueUnit == UNIT_MILLI_VOLT ||
            m_options.editValueUnit == UNIT_MILLI_AMPER ||
            m_options.editValueUnit == UNIT_MILLI_WATT ||
-           m_options.editValueUnit == UNIT_MILLI_SECOND;
+           m_options.editValueUnit == UNIT_MILLI_SECOND ||
+           m_options.editValueUnit == UNIT_MILLI_FARAD;
 }
 
 bool NumericKeypad::isMicro() {
-    return m_options.editValueUnit == UNIT_MICRO_AMPER;
+    return m_options.editValueUnit == UNIT_MICRO_AMPER || m_options.editValueUnit == UNIT_MICRO_FARAD;
+}
+
+bool NumericKeypad::isNano() {
+    return m_options.editValueUnit == UNIT_NANO_FARAD;
+}
+
+bool NumericKeypad::isPico() {
+    return m_options.editValueUnit == UNIT_PICO_FARAD;
 }
 
 bool NumericKeypad::isKilo() {
@@ -294,6 +313,16 @@ Unit NumericKeypad::getSwitchToUnit() {
         return UNIT_MOHM;
     if (m_options.editValueUnit == UNIT_MOHM)
         return UNIT_OHM;
+    if (m_options.editValueUnit == UNIT_FARAD)
+        return UNIT_MILLI_FARAD;
+    if (m_options.editValueUnit == UNIT_MILLI_FARAD)
+        return UNIT_MICRO_FARAD;
+    if (m_options.editValueUnit == UNIT_MICRO_FARAD)
+        return UNIT_NANO_FARAD;
+    if (m_options.editValueUnit == UNIT_NANO_FARAD)
+        return UNIT_PICO_FARAD;
+    if (m_options.editValueUnit == UNIT_PICO_FARAD)
+        return UNIT_FARAD;
     return m_options.editValueUnit;
 }
 
@@ -332,14 +361,18 @@ float NumericKeypad::getValue() {
 
     float value = sign * (a + b);
 
-    if (isMicro()) {
-        value /= 1000000.0f;
+    if (isPico()) {
+        value *= 1E-12f;
+    } else if (isNano()) {
+        value *= 1E-9f;
+    } else if (isMicro()) {
+        value *= 1E-6f;
     } else if (isMilli()) {
-        value /= 1000.0f;
+        value *= 1E-3f;
     } else if (isKilo()) {
-        value *= 1000.0f;
+        value *= 1E3f;
     } else if (isMega()) {
-        value *= 1000000.0f;
+        value *= 1E6f;
     }
 
     return value;

@@ -50,6 +50,7 @@
     SCPI_COMMAND("DISPlay:DATA?", scpi_cmd_displayDataQ) \
     SCPI_COMMAND("DISPlay[:WINdow]:DLOG", scpi_cmd_displayWindowDlog) \
     SCPI_COMMAND("DISPlay[:WINdow]:INPUt?", scpi_cmd_displayWindowInputQ) \
+    SCPI_COMMAND("DISPlay[:WINdow]:SELEct?", scpi_cmd_displayWindowSelectQ) \
     SCPI_COMMAND("DISPlay[:WINdow]:DIALog[:OPEN]", scpi_cmd_displayWindowDialogOpen) \
     SCPI_COMMAND("DISPlay[:WINdow]:DIALog:ACTIon?", scpi_cmd_displayWindowDialogActionQ) \
     SCPI_COMMAND("DISPlay[:WINdow]:DIALog:DATA", scpi_cmd_displayWindowDialogData) \

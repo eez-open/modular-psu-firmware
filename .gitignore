@@ -6,3 +6,4 @@ modular-psu-firmware.eez-project-ui-state
 src/third_party/micropython/ports/bare-arm/build
 src/third_party/stm32_cubeide/Debug
 src/third_party/stm32_truestudio/Debug
+scripts/voltage-divider-calculator/voltage-divider-calculator.eez-project-ui-state

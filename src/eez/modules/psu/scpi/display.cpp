@@ -413,6 +413,63 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
 #endif
 }
 
+scpi_result_t scpi_cmd_displayWindowSelectQ(scpi_t *context) {
+#if OPTION_DISPLAY
+    int32_t defaultSelection;
+    if (!SCPI_ParamInt(context, &defaultSelection, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    static const int MAX_OPTION_TEXTS_LENGTH = 256;
+    static char optionTexts[MAX_OPTION_TEXTS_LENGTH];
+    static const int MAX_OPTIONS = 8;
+    static const char *options[MAX_OPTIONS + 1] = {};
+
+    int optionTextsLen = 0;
+
+    size_t i;
+    for (i = 0; i < MAX_OPTIONS; i++) {
+        const char *optionText;
+        size_t optionTextLen;
+        if (!SCPI_ParamCharacters(context, &optionText, &optionTextLen, i == 0 ? true : false)) {
+            if (SCPI_ParamErrorOccurred(context)) {
+                return SCPI_RES_ERR;
+            }
+            if (i < 2) {
+                SCPI_ErrorPush(context, SCPI_ERROR_MISSING_PARAMETER);
+                return SCPI_RES_ERR;
+            }
+            break;
+        }
+
+        if (optionTextsLen + optionTextLen + 1 > MAX_OPTION_TEXTS_LENGTH) {
+            SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+            return SCPI_RES_ERR;
+        }
+
+        options[i] = optionTexts + optionTextsLen;
+        strncpy((char *)options[i], optionText, optionTextLen);
+        optionTextsLen += optionTextLen;
+        optionTexts[optionTextsLen++] = 0;
+    }
+
+    options[i] = nullptr;
+
+    if (defaultSelection < 1 || defaultSelection > (int32_t)i) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    int result = psu::gui::g_psuAppContext.select(options, defaultSelection);
+    SCPI_ResultInt(context, result);
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
 scpi_result_t scpi_cmd_displayWindowDialogOpen(scpi_t *context) {
 #if OPTION_DISPLAY
     char filePath[MAX_PATH_LENGTH + 1];
@@ -468,6 +525,7 @@ scpi_result_t scpi_cmd_displayWindowDialogActionQ(scpi_t *context) {
 }
 
 scpi_choice_def_t dataTypeChoice[] = {
+    { "INTEger", VALUE_TYPE_INT },
     { "FLOAt", VALUE_TYPE_FLOAT },
     { "STRIng", VALUE_TYPE_STR },
     SCPI_CHOICE_LIST_END /* termination of option list */
@@ -524,6 +582,14 @@ scpi_result_t scpi_cmd_displayWindowDialogData(scpi_t *context) {
         }
 
         Value dataValue = eez::gui::MakeValue(value, (Unit)unit);
+        psu::gui::g_psuAppContext.dialogSetDataItemValue(dataId, dataValue);
+    } else if (type == VALUE_TYPE_INT) {
+        int32_t value;
+        if (!SCPI_ParamInt(context, &value, true)) {
+            return SCPI_RES_ERR;
+        }
+
+        Value dataValue = (int)value;
         psu::gui::g_psuAppContext.dialogSetDataItemValue(dataId, dataValue);
     } else {
         // TODO

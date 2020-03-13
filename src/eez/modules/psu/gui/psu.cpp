@@ -933,7 +933,9 @@ void PsuAppContext::dialogOpen() {
             dialogResetDataItemValues();
             g_psuAppContext.pushPage(getExternalAssetsFirstPageId());
         }
+        g_dialogOpening = false;
     } else {
+        g_dialogOpening = true;
         osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN, 0), osWaitForever);
     }
 }
@@ -949,7 +951,7 @@ DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&
     while (
         (timeoutMs == 0 || (int32_t)(millis() - timeoutMs) < 0) &&
         g_externalActionId == ACTION_ID_NONE &&
-        (isPageOnStack(getExternalAssetsFirstPageId()) || osMessageWaiting(g_guiMessageQueueId) > 0)
+        (isPageOnStack(getExternalAssetsFirstPageId()) || g_dialogOpening)
     ) {
         osDelay(1);
     }
@@ -1014,6 +1016,49 @@ int PsuAppContext::menuInput(const char *label, MenuType menuType, const char **
 
 void PsuAppContext::doShowMenuInput() {
     showMenu(this, m_inputLabel, m_menuInputParams.m_type, m_menuInputParams.m_items, m_menuInputParams.onSet);
+}
+
+int PsuAppContext::select(const char **options, int defaultSelection) {
+    m_selectParams.m_options = options;
+    m_selectParams.m_defaultSelection = defaultSelection;
+
+    m_inputReady = false;
+    g_selectOpening = true;
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_SELECT, 0), osWaitForever);
+
+    while (!m_inputReady && (isPageOnStack(INTERNAL_PAGE_ID_SELECT_FROM_ENUM) || g_selectOpening)) {
+        osDelay(1);
+    }
+
+    if (m_inputReady) {
+        return m_selectParams.m_input;
+    }
+    
+    return 0;
+}
+
+void SelectParams::enumDefinition(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET_VALUE) {
+        value = (uint16_t)(cursor.i + 1);
+    } else if (operation == data::DATA_OPERATION_GET_LABEL) {
+        const char *label = g_psuAppContext.m_selectParams.m_options[cursor.i];
+        if (label) {
+            value = label;
+        }
+    }
+}
+
+void SelectParams::onSelect(uint16_t value) {
+    g_psuAppContext.popPage();
+
+    g_psuAppContext.m_selectParams.m_input = value;
+    g_psuAppContext.m_inputReady = true;
+}
+
+
+void PsuAppContext::doShowSelect() {
+    pushSelectFromEnumPage(SelectParams::enumDefinition, m_selectParams.m_defaultSelection, nullptr, SelectParams::onSelect, false, true);
+    g_selectOpening = false;
 }
 
 bool PsuAppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action) {
@@ -1848,6 +1893,9 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT) {
         g_appContext = &g_psuAppContext;
         g_psuAppContext.doShowMenuInput();
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_SELECT) {
+        g_appContext = &g_psuAppContext;
+        g_psuAppContext.doShowSelect();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN) {
         g_psuAppContext.dialogOpen();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE) {

@@ -93,35 +93,48 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
         if (unit == UNIT_VOLT) {
             if (fabs(floatValue) < 1) {
                 unit = UNIT_MILLI_VOLT;
-                floatValue *= 1000.0f;
+                floatValue *= 1E3f;
             }
         } else if (unit == UNIT_AMPER) {
             if (fabs(floatValue) < 0.001f && fabs(floatValue) != 0.0005f) {
                 unit = UNIT_MICRO_AMPER;
-                floatValue *= 1000000.0f;
+                floatValue *= 1E6f;
             } else if (fabs(floatValue) < 1) {
                 unit = UNIT_MILLI_AMPER;
-                floatValue *= 1000.0f;
+                floatValue *= 1E3f;
             }
         } else if (unit == UNIT_WATT) {
             if (fabs(floatValue) < 1) {
                 unit = UNIT_MILLI_WATT;
-                floatValue *= 1000.0f;
+                floatValue *= 1E3f;
             }
         } else if (unit == UNIT_SECOND) {
             if (fabs(floatValue) < 1) {
                 unit = UNIT_MILLI_SECOND;
-                floatValue *= 1000.0f;
+                floatValue *= 1E3f;
             }
         } else if (unit == UNIT_OHM) {
             if (fabs(floatValue) >= 1000000) {
                 unit = UNIT_MOHM;
-                floatValue /= 1000000.0f;
+                floatValue *= 1E-6F;
             } else if (fabs(floatValue) >= 1000) {
                 unit = UNIT_KOHM;
-                floatValue /= 1000.0f;
+                floatValue *= 1E-3f;
             }
-
+        } else if (unit == UNIT_FARAD) {
+            if (fabs(floatValue) < 1E-9f) {
+                unit = UNIT_PICO_FARAD;
+                floatValue *= 1E12F;
+            } else if (fabs(floatValue) < 1E-6f) {
+                unit = UNIT_NANO_FARAD;
+                floatValue *= 1E9F;
+            } else if (fabs(floatValue) < 1E-3f) {
+                unit = UNIT_MICRO_FARAD;
+                floatValue *= 1E6f;
+            } else if (fabs(floatValue) < 1) {
+                unit = UNIT_MILLI_FARAD;
+                floatValue *= 1E3f;
+            }
         }
     }
 
