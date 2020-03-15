@@ -112,8 +112,7 @@
             "top": 5,
             "width": 50,
             "height": 38,
-            "text": "Type:",
-            
+            "text": "Type:"
           },
           {
             "type": "Select",
@@ -138,8 +137,7 @@
                 "top": 0,
                 "width": 166,
                 "height": 38,
-                "text": "R or L in parallel",
-                
+                "text": "R or L in parallel"
               },
               {
                 "type": "Text",
@@ -152,8 +150,7 @@
                 "top": 0,
                 "width": 166,
                 "height": 38,
-                "text": "C in series",
-                
+                "text": "C in series"
               }
             ]
           },
@@ -241,15 +238,14 @@
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "status_icon"
+                  "inheritFrom": "status_icon_enabled"
                 },
                 "action": "close",
                 "left": 0,
                 "top": 0,
                 "width": 41,
                 "height": 32,
-                "text": "E",
-                
+                "text": "E"
               },
               {
                 "type": "Text",
@@ -261,8 +257,7 @@
                 "top": 0,
                 "width": 439,
                 "height": 32,
-                "text": "Parallel/series calculator",
-                
+                "text": "Parallel/series calculator"
               }
             ]
           }
@@ -286,8 +281,7 @@
             "top": 49,
             "width": 50,
             "height": 38,
-            "text": "R1:",
-            
+            "text": "R1:"
           },
           {
             "type": "Text",
@@ -300,8 +294,7 @@
             "top": 49,
             "width": 116,
             "height": 38,
-            "text": "",
-            
+            "text": ""
           },
           {
             "type": "Text",
@@ -314,8 +307,7 @@
             "top": 49,
             "width": 38,
             "height": 38,
-            "text": "\\u00b3",
-            
+            "text": "\\u00b3"
           },
           {
             "type": "Text",
@@ -328,8 +320,7 @@
             "top": 96,
             "width": 50,
             "height": 38,
-            "text": "R2:",
-            
+            "text": "R2:"
           },
           {
             "type": "Text",
@@ -342,8 +333,7 @@
             "top": 96,
             "width": 116,
             "height": 38,
-            "text": "",
-            
+            "text": ""
           },
           {
             "type": "Text",
@@ -356,8 +346,7 @@
             "top": 96,
             "width": 38,
             "height": 38,
-            "text": "\\u00b3",
-            
+            "text": "\\u00b3"
           },
           {
             "type": "Text",
@@ -370,8 +359,7 @@
             "top": 143,
             "width": 49,
             "height": 38,
-            "text": "Rtot:",
-            
+            "text": "Rtot:"
           },
           {
             "type": "Text",
@@ -384,8 +372,7 @@
             "top": 143,
             "width": 116,
             "height": 38,
-            "text": "",
-            
+            "text": ""
           },
           {
             "type": "Text",
@@ -398,8 +385,7 @@
             "top": 143,
             "width": 38,
             "height": 38,
-            "text": "\\u00b3",
-            
+            "text": "\\u00b3"
           }
         ],
         "left": 0,
@@ -421,8 +407,7 @@
             "top": 49,
             "width": 50,
             "height": 38,
-            "text": "C1:",
-            
+            "text": "C1:"
           },
           {
             "type": "Text",
@@ -435,8 +420,7 @@
             "top": 49,
             "width": 116,
             "height": 38,
-            "text": "",
-            
+            "text": ""
           },
           {
             "type": "Text",
@@ -449,8 +433,7 @@
             "top": 49,
             "width": 38,
             "height": 38,
-            "text": "\\u00b3",
-            
+            "text": "\\u00b3"
           },
           {
             "type": "Text",
@@ -463,8 +446,7 @@
             "top": 96,
             "width": 50,
             "height": 38,
-            "text": "C2:",
-            
+            "text": "C2:"
           },
           {
             "type": "Text",
@@ -477,8 +459,7 @@
             "top": 96,
             "width": 116,
             "height": 38,
-            "text": "",
-            
+            "text": ""
           },
           {
             "type": "Text",
@@ -491,8 +472,7 @@
             "top": 96,
             "width": 38,
             "height": 38,
-            "text": "\\u00b3",
-            
+            "text": "\\u00b3"
           },
           {
             "type": "Text",
@@ -505,8 +485,7 @@
             "top": 143,
             "width": 49,
             "height": 38,
-            "text": "Ctot:",
-            
+            "text": "Ctot:"
           },
           {
             "type": "Text",
@@ -519,8 +498,7 @@
             "top": 143,
             "width": 116,
             "height": 38,
-            "text": "",
-            
+            "text": ""
           },
           {
             "type": "Text",
@@ -533,8 +511,7 @@
             "top": 143,
             "width": 38,
             "height": 38,
-            "text": "\\u00b3",
-            
+            "text": "\\u00b3"
           }
         ],
         "left": 0,

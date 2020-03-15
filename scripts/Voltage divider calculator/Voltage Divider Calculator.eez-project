@@ -102,8 +102,7 @@
                 "top": 0,
                 "width": 50,
                 "height": 38,
-                "text": "Vin:",
-                
+                "text": "Vin:"
               },
               {
                 "type": "Text",
@@ -116,8 +115,7 @@
                 "top": 0,
                 "width": 116,
                 "height": 38,
-                "text": "",
-                
+                "text": ""
               },
               {
                 "type": "Text",
@@ -130,8 +128,7 @@
                 "top": 0,
                 "width": 38,
                 "height": 38,
-                "text": "\\u00b3",
-                
+                "text": "\\u00b3"
               },
               {
                 "type": "Text",
@@ -144,8 +141,7 @@
                 "top": 54,
                 "width": 50,
                 "height": 38,
-                "text": "R1:",
-                
+                "text": "R1:"
               },
               {
                 "type": "Text",
@@ -158,8 +154,7 @@
                 "top": 54,
                 "width": 116,
                 "height": 38,
-                "text": "",
-                
+                "text": ""
               },
               {
                 "type": "Text",
@@ -172,8 +167,7 @@
                 "top": 54,
                 "width": 38,
                 "height": 38,
-                "text": "\\u00b3",
-                
+                "text": "\\u00b3"
               },
               {
                 "type": "Text",
@@ -186,8 +180,7 @@
                 "top": 106,
                 "width": 50,
                 "height": 38,
-                "text": "R2:",
-                
+                "text": "R2:"
               },
               {
                 "type": "Text",
@@ -200,8 +193,7 @@
                 "top": 106,
                 "width": 116,
                 "height": 38,
-                "text": "",
-                
+                "text": ""
               },
               {
                 "type": "Text",
@@ -214,8 +206,7 @@
                 "top": 106,
                 "width": 38,
                 "height": 38,
-                "text": "\\u00b3",
-                
+                "text": "\\u00b3"
               },
               {
                 "type": "Text",
@@ -228,8 +219,7 @@
                 "top": 158,
                 "width": 49,
                 "height": 38,
-                "text": "Vout:",
-                
+                "text": "Vout:"
               },
               {
                 "type": "Text",
@@ -242,8 +232,7 @@
                 "top": 158,
                 "width": 116,
                 "height": 38,
-                "text": "",
-                
+                "text": ""
               },
               {
                 "type": "Text",
@@ -256,8 +245,7 @@
                 "top": 158,
                 "width": 38,
                 "height": 38,
-                "text": "\\u00b3",
-                
+                "text": "\\u00b3"
               }
             ]
           },
@@ -275,15 +263,14 @@
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "status_icon"
+                  "inheritFrom": "status_icon_enabled"
                 },
                 "action": "close",
                 "left": 0,
                 "top": 0,
                 "width": 41,
                 "height": 32,
-                "text": "E",
-                
+                "text": "E"
               },
               {
                 "type": "Text",
@@ -295,8 +282,7 @@
                 "top": 0,
                 "width": 439,
                 "height": 32,
-                "text": "Voltage divider calculator",
-                
+                "text": "Voltage divider calculator"
               }
             ]
           }
