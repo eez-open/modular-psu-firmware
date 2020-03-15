@@ -201,7 +201,7 @@ def calc_R1():
             scpi("DISP:ERROR \"Enter Vin1, Vin2, R2, Rf, Rg and Vout\"")
 
 def calc_R2():
-    if can_calc_R1():
+    if can_calc_R2():
         global R1
         if opAmpType == TYPE_NON_INV:
             R2 = R1 * Vin / (Vout - Vin)
@@ -221,7 +221,7 @@ def calc_R2():
             scpi("DISP:ERROR \"Enter Vin1, Vin2, R1, Rf, Rg and Vout\"")
 
 def calc_Rf():
-    if can_calc_R2():
+    if can_calc_Rf():
         global Rf
         Rf = (Vout * R2 * (R1 + Rg) - Vin1 * R2 * Rg) / (Vin1 * Rg - Vin2 * (R1 + Rg))
         scpi("DISP:DIALog:DATA \"Rf\",FLOAT,OHM," + str(round(Rf, 3)))
@@ -229,7 +229,7 @@ def calc_Rf():
         scpi("DISP:ERROR \"Enter Vin1, Vin2, R1, R2, Rg and Vout\"")
 
 def calc_Rg():
-    if can_calc_R2():
+    if can_calc_Rg():
         global Rg
         x = (Vout * R2 + Vin2 * Rf) / (Vin1 * (R2 + Rf))
         Rg = R1 * x / (1 - x)
