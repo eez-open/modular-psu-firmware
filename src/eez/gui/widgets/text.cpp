@@ -42,7 +42,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
     
-    const Style *style = getStyle(widgetCursor.currentState->flags.focused ? textWidget->focusStyle : widget->style);
+    const Style *style = getStyle(widget->style);
 
     const char *text = GET_WIDGET_PROPERTY(textWidget, text, const char *);
 
@@ -59,15 +59,16 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
     static const size_t MAX_TEXT_LEN = 128;
 
     if (refresh) {
-        uint16_t overrideColor = overrideStyleColorHook(widgetCursor, style);
-        uint16_t overrideActiveColor = overrideActiveStyleColorHook(widgetCursor, style);
+        uint16_t overrideColor = widgetCursor.currentState->flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
+        uint16_t overrideBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : style->background_color;
+        uint16_t overrideActiveColor =  widgetCursor.currentState->flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
 
         bool ignoreLuminosity = (textWidget->flags & IGNORE_LUMINOSITY_FLAG) != 0;
         if (text && text[0]) {
             drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                 style, widgetCursor.currentState->flags.active,
                 widgetCursor.currentState->flags.blinking,
-                ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
+                ignoreLuminosity, &overrideColor, &overrideBackgroundColor, nullptr, nullptr);
         } else if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
                 if (widgetCursor.currentState->data.getOptions() & STRING_OPTIONS_FILE_ELLIPSIS) {
@@ -80,7 +81,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                             widgetCursor.y, (int)widget->w, (int)widget->h, style,
                             widgetCursor.currentState->flags.active,
                             widgetCursor.currentState->flags.blinking,
-                            ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
+                            ignoreLuminosity, &overrideColor, &overrideBackgroundColor, nullptr, nullptr);
 
                     } else {
                         char text[MAX_TEXT_LEN + 1];
@@ -115,7 +116,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                             widgetCursor.y, (int)widget->w, (int)widget->h, style,
                             widgetCursor.currentState->flags.active,
                             widgetCursor.currentState->flags.blinking,
-                            ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
+                            ignoreLuminosity, &overrideColor, &overrideBackgroundColor, nullptr, nullptr);
                     }
 
                 } else {
@@ -124,7 +125,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                         widgetCursor.y, (int)widget->w, (int)widget->h, style,
                         widgetCursor.currentState->flags.active,
                         widgetCursor.currentState->flags.blinking,
-                        ignoreLuminosity, &overrideColor, nullptr, nullptr, nullptr);
+                        ignoreLuminosity, &overrideColor, &overrideBackgroundColor, nullptr, nullptr);
                 }
             } else {
                 char text[MAX_TEXT_LEN + 1];
@@ -132,7 +133,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
                 drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                     style, widgetCursor.currentState->flags.active,
                     widgetCursor.currentState->flags.blinking,
-                    ignoreLuminosity, &overrideColor, nullptr, &overrideActiveColor, nullptr);
+                    ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, nullptr);
             }
         }
     }

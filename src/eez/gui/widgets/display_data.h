@@ -31,7 +31,6 @@ enum {
 };
 
 struct DisplayDataWidget {
-    uint16_t focusStyle;
     uint8_t displayOption;
 };
 

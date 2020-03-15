@@ -639,7 +639,6 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
     m_messageTextWidget.common.style = STYLE_ID_MENU_WITH_BUTTONS_MESSAGE;
     m_messageTextWidget.common.specific = &m_messageTextWidget.specific;
     m_messageTextWidget.specific.text = message;
-    m_messageTextWidget.specific.focusStyle = STYLE_ID_NONE;
     m_messageTextWidget.specific.flags = 0;
     TextWidget_autoSize(m_messageTextWidget);
 
@@ -652,7 +651,6 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
         m_buttonTextWidgets[i].common.style = STYLE_ID_MENU_WITH_BUTTONS_BUTTON;
         m_buttonTextWidgets[i].common.specific = &m_buttonTextWidgets[i].specific;
         m_buttonTextWidgets[i].specific.text = menuItems[i];
-        m_buttonTextWidgets[i].specific.focusStyle = STYLE_ID_NONE;
         m_buttonTextWidgets[i].specific.flags = 0;
         TextWidget_autoSize(m_buttonTextWidgets[i]);
     }

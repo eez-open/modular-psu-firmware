@@ -29,7 +29,6 @@ struct TextWidgetSpecific {
 #else
     uint32_t textOffset;
 #endif
-    uint16_t focusStyle;
     uint8_t flags;
 };
 

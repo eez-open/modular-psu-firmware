@@ -113,7 +113,7 @@
             "width": 50,
             "height": 38,
             "text": "Type:",
-            "focusStyle": {}
+            
           },
           {
             "type": "Select",
@@ -139,7 +139,7 @@
                 "width": 166,
                 "height": 38,
                 "text": "R or L in parallel",
-                "focusStyle": {}
+                
               },
               {
                 "type": "Text",
@@ -153,7 +153,7 @@
                 "width": 166,
                 "height": 38,
                 "text": "C in series",
-                "focusStyle": {}
+                
               }
             ]
           },
@@ -249,7 +249,7 @@
                 "width": 41,
                 "height": 32,
                 "text": "E",
-                "focusStyle": {}
+                
               },
               {
                 "type": "Text",
@@ -262,7 +262,7 @@
                 "width": 439,
                 "height": 32,
                 "text": "Parallel/series calculator",
-                "focusStyle": {}
+                
               }
             ]
           }
@@ -287,7 +287,7 @@
             "width": 50,
             "height": 38,
             "text": "R1:",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -301,7 +301,7 @@
             "width": 116,
             "height": 38,
             "text": "",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -315,7 +315,7 @@
             "width": 38,
             "height": 38,
             "text": "\\u00b3",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -329,7 +329,7 @@
             "width": 50,
             "height": 38,
             "text": "R2:",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -343,7 +343,7 @@
             "width": 116,
             "height": 38,
             "text": "",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -357,7 +357,7 @@
             "width": 38,
             "height": 38,
             "text": "\\u00b3",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -371,7 +371,7 @@
             "width": 49,
             "height": 38,
             "text": "Rtot:",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -385,7 +385,7 @@
             "width": 116,
             "height": 38,
             "text": "",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -399,7 +399,7 @@
             "width": 38,
             "height": 38,
             "text": "\\u00b3",
-            "focusStyle": {}
+            
           }
         ],
         "left": 0,
@@ -422,7 +422,7 @@
             "width": 50,
             "height": 38,
             "text": "C1:",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -436,7 +436,7 @@
             "width": 116,
             "height": 38,
             "text": "",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -450,7 +450,7 @@
             "width": 38,
             "height": 38,
             "text": "\\u00b3",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -464,7 +464,7 @@
             "width": 50,
             "height": 38,
             "text": "C2:",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -478,7 +478,7 @@
             "width": 116,
             "height": 38,
             "text": "",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -492,7 +492,7 @@
             "width": 38,
             "height": 38,
             "text": "\\u00b3",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -506,7 +506,7 @@
             "width": 49,
             "height": 38,
             "text": "Ctot:",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -520,7 +520,7 @@
             "width": 116,
             "height": 38,
             "text": "",
-            "focusStyle": {}
+            
           },
           {
             "type": "Text",
@@ -534,7 +534,7 @@
             "width": 38,
             "height": 38,
             "text": "\\u00b3",
-            "focusStyle": {}
+            
           }
         ],
         "left": 0,

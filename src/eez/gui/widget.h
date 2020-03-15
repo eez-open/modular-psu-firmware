@@ -71,6 +71,8 @@ struct Style {
     uint16_t color;
     uint16_t active_background_color;
     uint16_t active_color;
+    uint16_t focus_background_color;
+    uint16_t focus_color;
     uint8_t border_size_top;
     uint8_t border_size_right;
     uint8_t border_size_bottom;
