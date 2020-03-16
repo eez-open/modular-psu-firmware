@@ -150,7 +150,7 @@ void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color
 
 void fillRect(void *dst, int x1, int y1, int x2, int y2) {
 	fillRect((uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
-    g_painted = true;
+    markDirty(x1, y1, x2, y2);
 }
 
 void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x, int y, int width, int height) {
@@ -206,7 +206,7 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
 
 void bitBlt(void *src, int x1, int y1, int x2, int y2) {
     bitBlt(src, g_buffer, x1, y1, x2, y2);
-    g_painted = true;
+    markDirty(x1, y1, x2, y2);
 }
 
 void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
@@ -248,7 +248,7 @@ void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, int heig
 
 void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
     bitBlt((uint16_t *)src, (uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1);
-    g_painted = true;
+    markDirty(x1, y1, x2, y2);
 }
 
 void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, int dstx, int dsty) {
@@ -314,7 +314,7 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
 		HAL_DMA2D_BlendingStart(&hdma2d, srcOffset, dstOffset, dstOffset, sw, sh);
 	}
 
-    g_painted = true;
+    markDirty(dx, dy, dx + sx - 1, dy + sy - 1);
 }
 
 void bitBltA8Init(uint16_t color) {
@@ -509,12 +509,12 @@ void sync() {
         if (!g_animationState.enabled) {
             finishAnimation();
         }
-        g_painted = false;
+        clearDirty();
         return;
     }
 
-    if (g_painted) {
-        g_painted = false;
+    if (isDirty()) {
+        clearDirty();
 
         swapBuffers();
     }
@@ -611,7 +611,7 @@ void drawPixel(int x, int y) {
     DMA2D_WAIT;
     *(g_buffer + y * DISPLAY_WIDTH + x) = g_fc;
 
-    g_painted = true;
+    markDirty(x, y, x, y);
 }
 
 void drawRect(int x1, int y1, int x2, int y2) {
@@ -627,7 +627,7 @@ void drawRect(int x1, int y1, int x2, int y2) {
     drawVLine(x1, y1, y2 - y1);
     drawVLine(x2, y1, y2 - y1);
 
-    g_painted = true;
+    markDirty(x1, y1, x2, y2);
 }
 
 void fillRect(int x1, int y1, int x2, int y2, int r) {
@@ -649,30 +649,30 @@ void fillRect(int x1, int y1, int x2, int y2, int r) {
         }
     }
 
-    g_painted = true;
+    markDirty(x1, y1, x2, y2);
 }
 
 void drawHLine(int x, int y, int l) {
     fillRect(x, y, x + l, y);
 
-    g_painted = true;
+    markDirty(x, y, x + l, y);
 }
 
 void drawVLine(int x, int y, int l) {
     fillRect(x, y, x, y + l);
 
-    g_painted = true;
+    markDirty(x, y, x, y + l);
 }
 
 void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
     bitBlt(g_buffer, g_buffer, x1, y1, x2-x1+1, y2-y1+1, dstx, dsty);
 
-    g_painted = true;
+    markDirty(dstx, dsty, dstx + x2 - x1, dsty + y2 - y1);
 }
 
 void drawBitmap(Image *image, int x, int y) {
     bitBlt(image->pixels, image->bpp, image->lineOffset, g_buffer, x, y, image->width, image->height);
-    g_painted = true;
+    markDirty(x, y, x + image->width - 1, y + image->height - 1);
 }
 
 void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,
@@ -693,7 +693,7 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
         }
     }
 
-    g_painted = true;
+    markDirty(clip_x1, clip_y1, clip_x2, clip_y2);
 }
 
 } // namespace display

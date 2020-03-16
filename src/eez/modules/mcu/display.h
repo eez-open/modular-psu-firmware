@@ -58,8 +58,6 @@ extern uint8_t g_opacity;
 
 extern gui::font::Font g_font;
 
-extern bool g_painted;
-
 int getDisplayWidth();
 int getDisplayHeight();
 
@@ -80,6 +78,10 @@ uint8_t setOpacity(uint8_t opacity);
 uint8_t getOpacity();
 
 const uint8_t * takeScreenshot();
+
+void clearDirty();
+void markDirty(int x1, int y1, int x2, int y2);
+bool isDirty();
 
 void drawPixel(int x, int y);
 void drawRect(int x1, int y1, int x2, int y2);

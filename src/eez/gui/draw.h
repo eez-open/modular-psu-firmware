@@ -32,6 +32,7 @@ int measureMultilineText(const char *text, int x, int y, int w, int h, const Sty
 void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bool active);
 void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, bool ignoreLuminocity, bool invertColors);
 void drawShadow(int x1, int y1, int x2, int y2);
+void expandRectWithShadow(int &x1, int &y1, int &x2, int &y2);
 
 } // namespace gui
 } // namespace eez

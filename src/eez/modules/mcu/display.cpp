@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+
 #if OPTION_DISPLAY
 
 #include <eez/util.h>
@@ -31,8 +33,6 @@ using namespace eez::gui;
 namespace eez {
 namespace mcu {
 namespace display {
-
-bool g_painted;
 
 uint16_t g_fc, g_bc;
 uint8_t g_opacity = 255;
@@ -237,6 +237,41 @@ uint8_t getOpacity() {
     return g_opacity;
 }
 
+static int g_dirtyX1;
+static int g_dirtyY1;
+static int g_dirtyX2;
+static int g_dirtyY2;
+
+void clearDirty() {
+    g_dirtyX1 = getDisplayWidth();
+    g_dirtyY1 = getDisplayHeight();
+    g_dirtyX2 = -1;
+    g_dirtyY2 = -1;
+}
+
+void markDirty(int x1, int y1, int x2, int y2) {
+    if (x1 < g_dirtyX1) {
+        g_dirtyX1 = x1;
+    }
+    if (x2 > g_dirtyX2) {
+        g_dirtyX2 = x2;
+    }
+    if (y1 < g_dirtyY1) {
+        g_dirtyY1 = y1;
+    }
+    if (y2 > g_dirtyY2) {
+        g_dirtyY2 = y2;
+    }
+}
+
+bool isDirty() {
+    if (g_dirtyX1 <= g_dirtyX2 && g_dirtyY1 <= g_dirtyY2) {
+        printf("%d x %d\n", g_dirtyX2 - g_dirtyX1 + 1, g_dirtyY2 - g_dirtyY1 + 1);
+        return true;
+    }
+    return false;
+}
+
 static int8_t measureGlyph(uint8_t encoding) {
     gui::font::Glyph glyph;
     g_font.getGlyph(encoding, glyph);
@@ -346,7 +381,14 @@ void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool 
         buffer.xOffset = xOffset;
         buffer.yOffset = yOffset;
 
-        g_painted = true;
+        int x1 = x + xOffset;
+        int y1 = y + yOffset;
+        int x2 = x1 + width - 1;
+        int y2 = y1 + height - 1;
+        if (withShadow) {
+            expandRectWithShadow(x1, y1, x2, y2);
+        }
+        markDirty(x1, y1, x2, y2);
     }
 
     for (int i = 0; i < g_numBuffersToDraw; i++) {
@@ -383,14 +425,44 @@ void beginBuffersDrawing() {
 void endBuffersDrawing() {
     setBufferPointer(g_bufferPointer);
 
-    if (g_painted) {
+    if (isDirty()) {
         for (int i = 0; i < g_numBuffersToDraw; i++) {
             int bufferIndex = g_bufferToDrawIndexes[i];
             Buffer &buffer = g_buffers[bufferIndex];
             if (buffer.withShadow) {
                 drawShadow(buffer.x + buffer.xOffset, buffer.y + buffer.yOffset, buffer.x + buffer.xOffset + buffer.width - 1, buffer.y + buffer.yOffset + buffer.height - 1);
+                bitBlt(buffer.bufferPointer, nullptr, buffer.x, buffer.y, buffer.width, buffer.height, buffer.x + buffer.xOffset, buffer.y + buffer.yOffset, buffer.opacity);
+            } else {
+                int sx = buffer.x;
+                int sy = buffer.y;
+
+                int x1 = buffer.x + buffer.xOffset;
+                int y1 = buffer.y + buffer.yOffset;
+                int x2 = x1 + buffer.width - 1;
+                int y2 = y1 + buffer.height - 1;
+
+                if (x1 < g_dirtyX1) {
+                    int xd = g_dirtyX1 - x1;
+                    sx += xd;
+                    x1 += xd;
+                }
+
+                if (y1 < g_dirtyY1) {
+                    int yd = g_dirtyY1 - y1;
+                    sy += yd;
+                    y1 += yd;
+                }
+
+                if (x2 > g_dirtyX2) {
+                    x2 = g_dirtyX2;
+                }
+
+                if (y2 > g_dirtyY2) {
+                    y2 = g_dirtyY2;
+                }
+
+                bitBlt(buffer.bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, buffer.opacity);
             }
-            bitBlt(buffer.bufferPointer, nullptr, buffer.x, buffer.y, buffer.width, buffer.height, buffer.x + buffer.xOffset, buffer.y + buffer.yOffset, buffer.opacity);
         }
     }
 

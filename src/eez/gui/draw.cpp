@@ -532,6 +532,13 @@ void drawShadow(int x1, int y1, int x2, int y2) {
     drawShadowGlyph(39, right, bottom);
 }
 
+void expandRectWithShadow(int &x1, int &y1, int &x2, int &y2) {
+    x1 -= L;
+    y1 -= T;
+    x2 += R;
+    y2 += B;
+}
+
 } // namespace gui
 } // namespace eez
 
