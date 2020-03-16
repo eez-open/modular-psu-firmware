@@ -24,7 +24,7 @@ namespace eez {
 namespace sound {
 
 void init();
-void doPlay();
+void tick();
 
 /// Play power up tune.
 enum PlayPowerUpCondition {

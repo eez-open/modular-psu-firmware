@@ -255,8 +255,8 @@ void oneIter() {
                 psu::gui::UserProfilesPage::doDeleteProfile();
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EDIT_REMARK) {
                 psu::gui::UserProfilesPage::doEditRemark();
-            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_SOUND_PLAY) {
-                sound::doPlay();
+            } else if (type == SCPI_QUEUE_MESSAGE_TYPE_SOUND_TICK) {
+                sound::tick();
             }
         }
     } else {
@@ -268,6 +268,8 @@ void oneIter() {
     	int32_t diff = tickCount - g_timer1LastTickCount;
 
         event_queue::tick();
+
+        sound::tick();
 
     	if (diff >= 1000000L) { // 1 sec
             g_timer1LastTickCount = tickCount;

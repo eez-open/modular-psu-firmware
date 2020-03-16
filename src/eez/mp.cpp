@@ -211,6 +211,7 @@ void oneIter() {
 				qstr source_name = lex->source_name;
 				mp_parse_tree_t parse_tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
 				mp_obj_t module_fun = mp_compile(&parse_tree, source_name/*, MP_EMIT_OPT_NONE*/, true);
+                //DebugTrace("T3 %d\n", millis());
 				mp_call_function_0(module_fun);
 				nlr_pop();
 			} else {
@@ -238,6 +239,7 @@ void startScript(const char *filePath) {
     if (g_state == STATE_IDLE) {
         g_state = STATE_EXECUTING;
         strcpy(g_scriptPath, filePath);
+        //DebugTrace("T1 %d\n", millis());
         osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MP_MESSAGE(LOAD_SCRIPT, 0), osWaitForever);
 
         psu::gui::g_psuAppContext.showAsyncOperationInProgress();
@@ -268,6 +270,7 @@ void loadScript() {
 
     g_scriptSourceLength = fileSize;
 
+    //DebugTrace("T2 %d\n", millis());
     osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_START_SCRIPT, osWaitForever);
 
     return;
@@ -295,6 +298,8 @@ void onQueueMessage(uint32_t type, uint32_t param) {
 }
 
 bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen) {
+    //DebugTrace("T4 %d\n", millis());
+
     g_scpiDataLen = 0;
 
     // g_commandOrQueryText = commandOrQueryText;
