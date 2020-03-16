@@ -313,6 +313,7 @@ set(src_eez_gui_widgets
     src/eez/gui/widgets/list.cpp
     src/eez/gui/widgets/list_graph.cpp
     src/eez/gui/widgets/multiline_text.cpp
+    src/eez/gui/widgets/progress.cpp
     src/eez/gui/widgets/rectangle.cpp
     src/eez/gui/widgets/scroll_bar.cpp
     src/eez/gui/widgets/select.cpp
@@ -335,6 +336,7 @@ set(header_eez_gui_widgets
     src/eez/gui/widgets/list.h
     src/eez/gui/widgets/list_graph.h
     src/eez/gui/widgets/multiline_text.h
+    src/eez/gui/widgets/progress.h
     src/eez/gui/widgets/rectangle.h
     src/eez/gui/widgets/scroll_bar.h
     src/eez/gui/widgets/select.h

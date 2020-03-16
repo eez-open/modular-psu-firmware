@@ -152,6 +152,14 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+bool compare_RANGE_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void RANGE_value_to_text(const Value &value, char *text, int count) {
+    text[0] = 0;
+}
+
 bool compare_STR_value(const Value &a, const Value &b) {
     const char *astr = a.getString();
     const char *bstr = b.getString();
@@ -263,11 +271,13 @@ static CompareValueFunction g_compareBuiltInValueFunctions[] = {
     compare_UINT16_value,
     compare_UINT32_value,
     compare_FLOAT_value,
+    compare_RANGE_value,
     compare_STR_value,
     compare_PASSWORD_value,
     compare_ENUM_value,
     compare_PERCENTAGE_value,
-    compare_SIZE_value, compare_POINTER_value,
+    compare_SIZE_value,
+    compare_POINTER_value,
     compare_TIME_SECONDS_value,
     compare_YT_DATA_GET_VALUE_FUNCTION_POINTER_value,
 };
@@ -279,6 +289,7 @@ static ValueToTextFunction g_builtInValueToTextFunctions[] = {
     UINT16_value_to_text,
     UINT32_value_to_text,
     FLOAT_value_to_text,
+    RANGE_value_to_text,
     STR_value_to_text,
     PASSWORD_value_to_text,
     ENUM_value_to_text,
@@ -301,6 +312,13 @@ uint16_t getNumPagesFromValue(const Value &value) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+Value MakeRangeValue(uint16_t from, uint16_t to) {
+    Value value;
+    value.type_ = VALUE_TYPE_RANGE;
+    value.uint32_ = (from << 16) | to;
+    return value;
+}
+
 Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition) {
     Value value;
     value.type_ = VALUE_TYPE_ENUM;
@@ -319,11 +337,21 @@ void Value::toText(char *text, int count) const {
 }
 
 bool Value::operator==(const Value &other) const {
+    auto a = this;
+    auto b = this->type_;
+
     if (type_ != other.type_) {
         return false;
     }
+
     if (type_ < VALUE_TYPE_USER) {
-        return g_compareBuiltInValueFunctions[type_](*this, other);
+        auto result = g_compareBuiltInValueFunctions[type_](*this, other);
+
+        if ((void *)&a == (void *)&b) {
+            osDelay(1);
+        }
+
+        return result;
     } else {
         return g_compareUserValueFunctions[type_ - VALUE_TYPE_USER](*this, other);
     }
@@ -728,6 +756,13 @@ void ytDataTouchDrag(const Cursor &cursor, int16_t id, TouchDrag *touchDrag) {
 
 namespace eez {
 namespace gui {
+
+void data_alert_message_is_set(data::DataOperationEnum operation, data::Cursor &cursor,
+                        data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = g_alertMessage.getString() != nullptr;
+    }
+}
 
 void data_alert_message(data::DataOperationEnum operation, data::Cursor &cursor,
                         data::Value &value) {

@@ -39,6 +39,7 @@
 #include <eez/gui/widgets/list.h>
 #include <eez/gui/widgets/list_graph.h>
 #include <eez/gui/widgets/multiline_text.h>
+#include <eez/gui/widgets/progress.h>
 #include <eez/gui/widgets/rectangle.h>
 #include <eez/gui/widgets/scroll_bar.h>
 #include <eez/gui/widgets/select.h>
@@ -86,6 +87,7 @@ static EnumFunctionType g_enumWidgetFunctions[] = {
     nullptr,               // WIDGET_TYPE_LIST_GRAPH
     AppViewWidget_enum,    // WIDGET_TYPE_APP_VIEW
     nullptr,               // WIDGET_TYPE_SCROLL_BAR
+    nullptr,               // WIDGET_TYPE_PROGRESS
 };
 
 typedef void (*DrawFunctionType)(const WidgetCursor &widgetCursor);
@@ -111,6 +113,7 @@ static DrawFunctionType g_drawWidgetFunctions[] = {
     ListGraphWidget_draw,     // WIDGET_TYPE_LIST_GRAPH
     AppViewWidget_draw,       // WIDGET_TYPE_APP_VIEW
     ScrollBarWidget_draw,     // WIDGET_TYPE_SCROLL_BAR
+    ProgressWidget_draw,      // WIDGET_TYPE_PROGRESS
 };
 
 OnTouchFunctionType g_onTouchFunctions[] = {
@@ -135,6 +138,7 @@ OnTouchFunctionType g_onTouchFunctions[] = {
     ListGraphWidget_onTouch,   // WIDGET_TYPE_LIST_GRAPH
     nullptr,                   // WIDGET_TYPE_APP_VIEW
     ScrollBarWidget_onTouch,   // WIDGET_TYPE_SCROLL_BAR
+    nullptr,                   // WIDGET_TYPE_PROGRESS
 };
 
 ////////////////////////////////////////////////////////////////////////////////

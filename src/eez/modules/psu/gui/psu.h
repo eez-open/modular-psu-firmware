@@ -72,9 +72,13 @@ void showEnteringStandbyPage();
 void showSavingPage();
 void showShutdownPage();
 
-void showAsyncOperationInProgress(const char *message, void (*checkStatus)() = 0);
-void hideAsyncOperationInProgress();
 extern data::Value g_progress;
+
+struct AsyncOperationInProgressParams {
+    const char *message;
+    void (*checkStatus)();
+    uint32_t startTime;
+};
 
 struct TextInputParams {
     size_t m_minChars;
@@ -113,6 +117,8 @@ enum DialogActionResult {
 };
 
 class PsuAppContext : public AppContext {
+    friend void eez::gui::onGuiQueueMessageHook(uint8_t type, int16_t param);
+
 public:
     PsuAppContext();
 
@@ -131,6 +137,10 @@ public:
     static bool updateProgressPage(size_t processedSoFar, size_t totalSize);
     static void hideProgressPage();
 
+    static void showAsyncOperationInProgress(const char *message = nullptr, void (*checkStatus)() = nullptr);
+    static void hideAsyncOperationInProgress();
+    uint32_t getAsyncInProgressStartTime();
+
     static void setTextMessage(const char *message, unsigned int len);
     static void clearTextMessage();
     static const char *getTextMessage();
@@ -139,16 +149,9 @@ public:
     void showUncaughtScriptExceptionMessage();
 
     const char *textInput(const char *label, size_t minChars, size_t maxChars, const char *value);
-    void doShowTextInput();
-    
     float numberInput(const char *label, Unit unit, float min, float max, float value);
-    void doShowNumberInput();
-    
     int menuInput(const char *label, MenuType menuType, const char **menuItems);
-    void doShowMenuInput();
-
     int select(const char **options, int defaultSelection);
-    void doShowSelect();
 
     void dialogOpen();
     DialogActionResult dialogAction(uint32_t timeoutMs, const char *&selectedActionName);
@@ -172,6 +175,8 @@ protected:
 
     const char *m_inputLabel;
 
+    AsyncOperationInProgressParams m_asyncOperationInProgressParams;
+
     friend struct TextInputParams;
     TextInputParams m_textInputParams;
     
@@ -188,7 +193,6 @@ protected:
 
     bool g_dialogOpening;
     bool g_selectOpening;
-
     int getMainPageId() override;
     void onPageChanged(int previousPageId, int activePageId) override;
     bool isAutoRepeatAction(int action) override;
@@ -200,6 +204,14 @@ protected:
 private:
     void doShowProgressPage();
     void doHideProgressPage();
+
+    void doShowAsyncOperationInProgress();
+    void doHideAsyncOperationInProgress();
+
+    void doShowTextInput();
+    void doShowNumberInput();
+    void doShowMenuInput();
+    void doShowSelect();
 };
 
 extern PsuAppContext g_psuAppContext;
@@ -220,7 +232,9 @@ enum {
     GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT,
     GUI_QUEUE_MESSAGE_TYPE_SHOW_SELECT,
     GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN,
-    GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE
+    GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE,
+    GUI_QUEUE_MESSAGE_TYPE_SHOW_ASYNC_OPERATION_IN_PROGRESS,
+    GUI_QUEUE_MESSAGE_TYPE_HIDE_ASYNC_OPERATION_IN_PROGRESS
 };
 
 } // namespace gui

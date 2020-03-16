@@ -1586,7 +1586,7 @@ void startPlay(int iTune) {
 #endif
 }
 
-void tick() {
+void doPlay() {
 #if !defined(__EMSCRIPTEN__)
 #if defined(EEZ_PLATFORM_SIMULATOR)
 	if (!g_audioDevice) {
@@ -1623,7 +1623,10 @@ static void playTune(int iTune) {
 			g_playNextTuneIndex == POWER_UP_TUNE ||
 			(g_playNextTuneIndex == BEEP_TUNE && !g_isBooted)
 		) {
-			tick();
+			doPlay();
+		} else {
+			using namespace scpi;
+			osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SOUND_PLAY, 0), osWaitForever);
 		}
 	}
 }

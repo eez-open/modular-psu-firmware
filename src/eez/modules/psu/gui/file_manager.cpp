@@ -83,6 +83,7 @@ uint32_t g_savedFilesStartPosition;
 
 int32_t g_selectedFileIndex = -1;
 
+uint32_t g_imageLoadStartTime;
 bool g_imageLoadFailed;
 Image g_openedImage;
 
@@ -655,16 +656,6 @@ bool isOpenFileEnabled() {
     return false;
 }
 
-static void checkImageLoadingStatus() {
-    if (g_openedImage.pixels) {
-        gui::popPage();
-        gui::pushPage(gui::PAGE_ID_IMAGE_VIEW);
-    } else if (g_imageLoadFailed) {
-        gui::popPage();
-        gui::errorMessage("Failed to load image!");
-    }
-}
-
 void openFile() {
     popPage();
 
@@ -688,11 +679,14 @@ void openFile() {
         psu::dlog_view::openFile(filePath);
         gui::pushPage(gui::PAGE_ID_DLOG_VIEW);
     } else if (fileItem->type == FILE_TYPE_IMAGE) {
+        g_imageLoadStartTime = millis();
         g_imageLoadFailed = false;
         g_openedImage.pixels = nullptr;
+
+        gui::pushPage(gui::PAGE_ID_IMAGE_VIEW);
+
         using namespace scpi;
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
-        psu::gui::showAsyncOperationInProgress("Loading...", checkImageLoadingStatus);
     } else if (fileItem->type == FILE_TYPE_MICROPYTHON) {
         mp::startScript(filePath);
     }
@@ -702,7 +696,7 @@ void openImageFile() {
     auto fileItem = getFileItem(g_selectedFileIndex);
     if (fileItem) {
         if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
-            errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+            g_imageLoadFailed = true;
             return;
         }
 
@@ -1195,6 +1189,36 @@ void data_file_manager_sort_files_option(data::DataOperationEnum operation, data
     }
 }
 
+void data_file_manager_image_open_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        if (g_openedImage.pixels) {
+            value = 1;
+        } else if (g_imageLoadFailed) {
+            value = 2;
+        } else {
+            value = 0;
+        }
+    }
+}
+
+void data_file_manager_image_open_progress(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        int progress = (millis() - g_imageLoadStartTime) / 10;
+        if (progress > 140) {
+            progress = 95 + (progress - 140) / 100;
+        } else if (progress > 90) {
+            progress = 90 + (progress - 90) / 10;
+        }
+        
+        if (progress > 100) {
+            progress = 100;
+        } else if (progress < 0) {
+            progress = 0;
+        }
+
+        value = progress;
+    }
+}
 
 void action_file_manager_go_to_parent_directory() {
     goToParentDirectory();

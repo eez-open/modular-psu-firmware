@@ -268,7 +268,7 @@ void SysSettingsDateTimePage::checkTestNtpServerStatus() {
 
 void SysSettingsDateTimePage::testNtpServer() {
     ntp::testNtpServer(ntpServer);
-    showAsyncOperationInProgress("Testing NTP server...", checkTestNtpServerStatus);
+    g_psuAppContext.showAsyncOperationInProgress("Testing NTP server...", checkTestNtpServerStatus);
 }
 #endif
 
@@ -658,7 +658,7 @@ void SysSettingsTemperaturePage::onFanSpeedSet(float value) {
         } else {
             page->fanSpeedPWM = FAN_MAX_PWM;
             page->fanPWMMeasuringInProgress = true;
-            showAsyncOperationInProgress("Calibrating PWM...", isFanPWMMeasuringDone);
+            g_psuAppContext.showAsyncOperationInProgress("Calibrating PWM...", isFanPWMMeasuringDone);
         }
     }
 }
@@ -666,7 +666,7 @@ void SysSettingsTemperaturePage::onFanSpeedSet(float value) {
 void SysSettingsTemperaturePage::isFanPWMMeasuringDone() {
     auto page = (psu::gui::SysSettingsTemperaturePage *)psu::gui::g_psuAppContext.getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
     if (!page->fanPWMMeasuringInProgress) {
-        hideAsyncOperationInProgress();
+        g_psuAppContext.hideAsyncOperationInProgress();
     }
 }
 

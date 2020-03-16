@@ -50,7 +50,6 @@ public:
     void(*m_toastAction)(int param);
     int m_toastActionParam;
     void(*m_toastActionWithoutParam)();
-    void (*m_checkAsyncOperationStatus)();
 
     virtual void stateManagment();
 

@@ -32,6 +32,7 @@ enum BuiltInValueType {
     VALUE_TYPE_UINT16,
     VALUE_TYPE_UINT32,
     VALUE_TYPE_FLOAT,
+    VALUE_TYPE_RANGE,
     VALUE_TYPE_STR,
     VALUE_TYPE_PASSWORD,
     VALUE_TYPE_ENUM,
@@ -257,6 +258,14 @@ struct Value {
         return options_;
     }
 
+    uint16_t getRangeFrom() {
+        return uint32_ >> 16;
+    }
+
+    uint16_t getRangeTo() {
+        return uint32_ & 0xFFFF;
+    }
+
   public:
     ValueType type_;
     uint16_t options_;
@@ -279,6 +288,7 @@ struct Value {
     };
 };
 
+Value MakeRangeValue(uint16_t from, uint16_t to);
 Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition);
 
 typedef bool (*CompareValueFunction)(const Value &a, const Value &b);

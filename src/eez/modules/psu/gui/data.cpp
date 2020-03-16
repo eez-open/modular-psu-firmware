@@ -2052,7 +2052,12 @@ void data_keypad_unit_enabled(data::DataOperationEnum operation, data::Cursor &c
                     keypad->m_options.editValueUnit == UNIT_MILLI_SECOND ||
                     keypad->m_options.editValueUnit == UNIT_OHM ||
                     keypad->m_options.editValueUnit == UNIT_KOHM ||
-                    keypad->m_options.editValueUnit == UNIT_MOHM;
+                    keypad->m_options.editValueUnit == UNIT_MOHM ||
+                    keypad->m_options.editValueUnit == UNIT_FARAD ||
+                    keypad->m_options.editValueUnit == UNIT_MILLI_FARAD ||
+                    keypad->m_options.editValueUnit == UNIT_MICRO_FARAD ||
+                    keypad->m_options.editValueUnit == UNIT_NANO_FARAD ||
+                    keypad->m_options.editValueUnit == UNIT_PICO_FARAD;
         }
     }
 }
@@ -5471,16 +5476,21 @@ void data_is_reset_by_iwdg(data::DataOperationEnum operation, data::Cursor &curs
     }
 }
 
-void data_async_operation_throbber(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        static const char *g_throbber[8] = { "|", "/", "-", "\\", "|", "/", "-", "\\" };
-        value = data::Value(g_throbber[(millis() % 1000) / 125]);
-    }
-}
-
 void data_can_show_previous_page(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getNumPagesOnStack() > 1;
+    }
+}
+
+void data_async_progress(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        auto x = (millis() - g_psuAppContext.getAsyncInProgressStartTime()) % 1000;
+        if (x < 500) {
+            x = x * 75 / 500;
+        } else {
+            x = (1000 - x) * 75 / 500;
+        }
+        value = MakeRangeValue(x, x + 25);
     }
 }
 

@@ -456,6 +456,13 @@ void PsuAppContext::stateManagment() {
             showPage(PAGE_ID_MAIN);
         }
     }
+
+    // call m_checkAsyncOperationStatus
+    if (getActivePageId() == PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
+        if (m_asyncOperationInProgressParams.checkStatus) {
+            m_asyncOperationInProgressParams.checkStatus();
+        }
+    }
 }
 
 bool PsuAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
@@ -829,6 +836,44 @@ void PsuAppContext::hideProgressPage() {
     }
 }
 
+void PsuAppContext::showAsyncOperationInProgress(const char *message, void (*checkStatus)()) {
+    g_psuAppContext.m_asyncOperationInProgressParams.message = message;
+    g_psuAppContext.m_asyncOperationInProgressParams.checkStatus = checkStatus;
+
+    if (osThreadGetId() == g_guiTaskHandle) {
+        g_psuAppContext.doShowAsyncOperationInProgress();
+    } else {
+        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_ASYNC_OPERATION_IN_PROGRESS, 0), osWaitForever);
+    }
+}
+
+void PsuAppContext::doShowAsyncOperationInProgress() {
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(g_psuAppContext.m_asyncOperationInProgressParams.message));
+
+    if (getActivePageId() != PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
+        g_psuAppContext.m_asyncOperationInProgressParams.startTime = millis();
+        pushPage(PAGE_ID_ASYNC_OPERATION_IN_PROGRESS);
+    }
+}
+
+void PsuAppContext::hideAsyncOperationInProgress() {
+    if (osThreadGetId() == g_guiTaskHandle) {
+        g_psuAppContext.doHideAsyncOperationInProgress();
+    } else {
+        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_HIDE_ASYNC_OPERATION_IN_PROGRESS, 0), osWaitForever);
+    }
+}
+
+void PsuAppContext::doHideAsyncOperationInProgress() {
+    if (getActivePageId() == PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
+        popPage();
+    }
+}
+
+uint32_t PsuAppContext::getAsyncInProgressStartTime() {
+    return m_asyncOperationInProgressParams.startTime;
+}
+
 void PsuAppContext::setTextMessage(const char *message, unsigned int len) {
     strncpy(g_psuAppContext.m_textMessage, message, len);
     g_psuAppContext.m_textMessage[len] = 0;
@@ -876,7 +921,7 @@ const char *PsuAppContext::textInput(const char *label, size_t minChars, size_t 
     osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_TEXT_INPUT, 0), osWaitForever);
 
     while (!m_inputReady) {
-        osDelay(1);
+        osDelay(5);
     }
 
     return m_textInputParams.m_input;
@@ -917,7 +962,7 @@ float PsuAppContext::numberInput(const char *label, Unit unit, float min, float 
     osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT, 0), osWaitForever);
 
     while (!m_inputReady) {
-        osDelay(1);
+        osDelay(5);
     }
 
     return m_numberInputParams.m_input;
@@ -953,7 +998,7 @@ DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&
         g_externalActionId == ACTION_ID_NONE &&
         (isPageOnStack(getExternalAssetsFirstPageId()) || g_dialogOpening)
     ) {
-        osDelay(1);
+        osDelay(5);
     }
 
     if (g_externalActionId != ACTION_ID_NONE) {
@@ -1008,7 +1053,7 @@ int PsuAppContext::menuInput(const char *label, MenuType menuType, const char **
     osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT, 0), osWaitForever);
 
     while (!m_inputReady) {
-        osDelay(1);
+        osDelay(5);
     }
 
     return m_menuInputParams.m_input;
@@ -1027,7 +1072,7 @@ int PsuAppContext::select(const char **options, int defaultSelection) {
     osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_SELECT, 0), osWaitForever);
 
     while (!m_inputReady && (isPageOnStack(INTERNAL_PAGE_ID_SELECT_FROM_ENUM) || g_selectOpening)) {
-        osDelay(1);
+        osDelay(5);
     }
 
     if (m_inputReady) {
@@ -1495,16 +1540,6 @@ void showShutdownPage() {
     psu::gui::g_psuAppContext.showPage(PAGE_ID_SHUTDOWN);
 }
 
-void showAsyncOperationInProgress(const char *message, void (*checkStatus)()) {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message));
-    g_appContext->m_checkAsyncOperationStatus = checkStatus;
-    pushPage(PAGE_ID_ASYNC_OPERATION_IN_PROGRESS);
-}
-
-void hideAsyncOperationInProgress() {
-    popPage();
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 static int g_findNextFocusCursorState = 0; 
@@ -1900,6 +1935,10 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
         g_psuAppContext.dialogOpen();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE) {
         g_psuAppContext.dialogClose();
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_ASYNC_OPERATION_IN_PROGRESS) {
+        g_psuAppContext.doShowAsyncOperationInProgress();
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_HIDE_ASYNC_OPERATION_IN_PROGRESS) {
+        g_psuAppContext.doHideAsyncOperationInProgress();
     }
 }
 

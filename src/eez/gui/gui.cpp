@@ -247,6 +247,9 @@ void executeAction(int actionId) {
     AppContext *saved = g_appContext;
     g_appContext = getFoundWidgetAtDown().appContext;
 
+    sound::playClick();
+    osDelay(1);
+
     if (isInternalAction(actionId)) {
         executeInternalAction(actionId);
     } else {
@@ -258,8 +261,6 @@ void executeAction(int actionId) {
     }
 
     g_appContext = saved;
-
-    sound::playClick();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

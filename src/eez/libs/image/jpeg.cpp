@@ -132,7 +132,7 @@ bool jpegDecode(const char *filePath, Image *image) {
     	g_jpegInitialized = true;
     }
 
-    if (HAL_JPEG_Decode(&hjpeg, g_fileData, fileSize, FILE_VIEW_BUFFER, g_fileData - FILE_VIEW_BUFFER, HAL_MAX_DELAY) != HAL_OK) {
+    if (HAL_JPEG_Decode(&hjpeg, g_fileData, fileSize, FILE_VIEW_BUFFER, g_fileData - FILE_VIEW_BUFFER, 5000) != HAL_OK) {
         return false;
     }
 

@@ -26,6 +26,7 @@ namespace mp {
 
 enum State {
     STATE_IDLE,
+    STATE_STARTING,
     STATE_EXECUTING
 };
 

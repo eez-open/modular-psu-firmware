@@ -53,13 +53,6 @@ void AppContext::stateManagment() {
             popPage();
         }
     }
-
-    // call m_checkAsyncOperationStatus
-    if (getActivePageId() == PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
-        if (m_checkAsyncOperationStatus) {
-            m_checkAsyncOperationStatus();
-        }
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +164,7 @@ void AppContext::pushPage(int pageId, Page *page) {
         int previousPageId = getActivePageId();
 
         // advance stack pointre
-        if (getActivePageId() != PAGE_ID_NONE) {
+        if (getActivePageId() != PAGE_ID_NONE && getActivePageId() != PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
             m_pageNavigationStackPointer++;
             assert (m_pageNavigationStackPointer < CONF_GUI_PAGE_NAVIGATION_STACK_SIZE);
         }

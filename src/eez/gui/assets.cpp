@@ -146,6 +146,7 @@ static FixWidgetPointersFunction g_fixWidgetPointersFunctions[] = {
     nullptr,                         // WIDGET_TYPE_LIST_GRAPH
     nullptr,                         // WIDGET_TYPE_APP_VIEW
     ScrollBarWidget_fixPointers,     // WIDGET_TYPE_SCROLL_BAR
+    nullptr,                         // WIDGET_TYPE_SCROLL_BAR
 };
 
 void Widget_fixPointers(Widget *widget) {

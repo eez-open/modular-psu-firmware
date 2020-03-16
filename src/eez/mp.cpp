@@ -29,8 +29,7 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/scpi/psu.h>
-
-#include <eez/gui/gui.h>
+#include <eez/modules/psu/gui/psu.h>
 
 #include <eez/memory.h>
 
@@ -221,6 +220,8 @@ void oneIter() {
 			}
 #endif
 
+            psu::gui::g_psuAppContext.hideAsyncOperationInProgress();
+
             g_state = STATE_IDLE;
 
             break;
@@ -234,9 +235,13 @@ enum {
 };
 
 void startScript(const char *filePath) {
-    g_state = STATE_EXECUTING;
-    strcpy(g_scriptPath, filePath);
-    osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MP_MESSAGE(LOAD_SCRIPT, 0), osWaitForever);
+    if (g_state == STATE_IDLE) {
+        g_state = STATE_EXECUTING;
+        strcpy(g_scriptPath, filePath);
+        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MP_MESSAGE(LOAD_SCRIPT, 0), osWaitForever);
+
+        psu::gui::g_psuAppContext.showAsyncOperationInProgress();
+    }
 }
 
 void loadScript() {

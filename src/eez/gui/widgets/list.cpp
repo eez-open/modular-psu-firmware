@@ -83,7 +83,7 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
         if (widgetCursor.previousState) {
 			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
-            if (widgetCursor.previousState >= endOfContainerInPreviousState) {
+            if (widgetCursor.previousState > endOfContainerInPreviousState) {
 				widgetCursor.previousState = 0;
             }
         }

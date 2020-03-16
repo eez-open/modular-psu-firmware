@@ -50,7 +50,6 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     int startPosition = data::ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 
 	const Widget *childWidget = GET_WIDGET_PROPERTY(gridWidget, itemWidget, const Widget *);
-
     widgetCursor.widget = childWidget;
 
 	auto savedX = widgetCursor.x;
@@ -69,7 +68,18 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 		widgetCursor.y = savedY + yOffset;
 
 		enumWidget(widgetCursor, callback);
-		
+
+        if (widgetCursor.previousState) {
+			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
+            if (widgetCursor.previousState > endOfContainerInPreviousState) {
+				widgetCursor.previousState = 0;
+            }
+        }
+
+        if (widgetCursor.currentState) {
+			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
+        }
+
         if (gridWidget->gridFlow == GRID_FLOW_ROW) {
             if (xOffset + childWidget->w < parentWidget->w) {
                 xOffset += childWidget->w;
@@ -92,17 +102,6 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
                     break;
                 }
             }
-        }
-
-        if (widgetCursor.previousState) {
-			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
-            if (widgetCursor.previousState >= endOfContainerInPreviousState) {
-				widgetCursor.previousState = 0;
-            }
-        }
-
-        if (widgetCursor.currentState) {
-			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
         }
     }
 
