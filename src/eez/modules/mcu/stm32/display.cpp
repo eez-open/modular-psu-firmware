@@ -313,8 +313,6 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
 		HAL_DMA2D_ConfigLayer(&hdma2d, 0);
 		HAL_DMA2D_BlendingStart(&hdma2d, srcOffset, dstOffset, dstOffset, sw, sh);
 	}
-
-    markDirty(dx, dy, dx + sx - 1, dy + sy - 1);
 }
 
 void bitBltA8Init(uint16_t color) {
@@ -510,6 +508,7 @@ void sync() {
             finishAnimation();
         }
         clearDirty();
+        clearDirty();
         return;
     }
 
@@ -529,7 +528,9 @@ void sync() {
 }
 
 void finishAnimation() {
+    auto oldBuffer = g_buffer;
     swapBuffers();
+    bitBlt(oldBuffer, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -675,8 +676,7 @@ void drawBitmap(Image *image, int x, int y) {
     markDirty(x, y, x + image->width - 1, y + image->height - 1);
 }
 
-void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,
-             int clip_y2, gui::font::Font &font) {
+void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font) {
     g_font = font;
 
     bitBltA8Init(g_fc);

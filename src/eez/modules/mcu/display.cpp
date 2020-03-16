@@ -237,38 +237,59 @@ uint8_t getOpacity() {
     return g_opacity;
 }
 
+static int g_prevDirtyX1;
+static int g_prevDirtyY1;
+static int g_prevDirtyX2;
+static int g_prevDirtyY2;
+
+static int g_nextDirtyX1 = getDisplayWidth();
+static int g_nextDirtyY1 = getDisplayHeight();
+static int g_nextDirtyX2 = -1;
+static int g_nextDirtyY2 = -1;
+
 static int g_dirtyX1;
 static int g_dirtyY1;
 static int g_dirtyX2;
 static int g_dirtyY2;
 
 void clearDirty() {
-    g_dirtyX1 = getDisplayWidth();
-    g_dirtyY1 = getDisplayHeight();
-    g_dirtyX2 = -1;
-    g_dirtyY2 = -1;
+    g_prevDirtyX1 = g_nextDirtyX1;
+    g_prevDirtyY1 = g_nextDirtyY1;
+    g_prevDirtyX2 = g_nextDirtyX2;
+    g_prevDirtyY2 = g_nextDirtyY2;
+
+    g_nextDirtyX1 = getDisplayWidth();
+    g_nextDirtyY1 = getDisplayHeight();
+    g_nextDirtyX2 = -1;
+    g_nextDirtyY2 = -1;
 }
 
 void markDirty(int x1, int y1, int x2, int y2) {
-    if (x1 < g_dirtyX1) {
-        g_dirtyX1 = x1;
+    if (x1 < g_nextDirtyX1) {
+        g_nextDirtyX1 = x1;
     }
-    if (x2 > g_dirtyX2) {
-        g_dirtyX2 = x2;
+    if (y1 < g_nextDirtyY1) {
+        g_nextDirtyY1 = y1;
     }
-    if (y1 < g_dirtyY1) {
-        g_dirtyY1 = y1;
+    if (x2 > g_nextDirtyX2) {
+        g_nextDirtyX2 = x2;
     }
-    if (y2 > g_dirtyY2) {
-        g_dirtyY2 = y2;
+    if (y2 > g_nextDirtyY2) {
+        g_nextDirtyY2 = y2;
     }
 }
 
 bool isDirty() {
+    g_dirtyX1 = MIN(g_prevDirtyX1, g_nextDirtyX1);
+    g_dirtyY1 = MIN(g_prevDirtyY1, g_nextDirtyY1);
+    g_dirtyX2 = MAX(g_prevDirtyX2, g_nextDirtyX2);
+    g_dirtyY2 = MAX(g_prevDirtyY2, g_nextDirtyY2);
+
     if (g_dirtyX1 <= g_dirtyX2 && g_dirtyY1 <= g_dirtyY2) {
-        printf("%d x %d\n", g_dirtyX2 - g_dirtyX1 + 1, g_dirtyY2 - g_dirtyY1 + 1);
+        // printf("%d x %d\n", g_dirtyX2 - g_dirtyX1 + 1, g_dirtyY2 - g_dirtyY1 + 1);
         return true;
     }
+
     return false;
 }
 

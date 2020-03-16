@@ -327,6 +327,7 @@ void sync() {
             finishAnimation();
         }
         clearDirty();
+        clearDirty();
         return;
     }
 
@@ -351,11 +352,15 @@ void sync() {
 void finishAnimation() {
     updateScreen(g_buffer);
 
+    auto oldBuffer = g_buffer;
+
     if (g_buffer == (uint32_t *)VRAM_BUFFER1_START_ADDRESS) {
         g_buffer = (uint32_t *)VRAM_BUFFER2_START_ADDRESS;
     } else {
         g_buffer = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
     }
+
+    bitBlt(oldBuffer, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -607,8 +612,6 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
             }
         }
     }
-
-    markDirty(dx, dy, dx + sx - 1, dy + sy - 1);
 }
 
 void drawBitmap(Image *image, int x, int y) {
