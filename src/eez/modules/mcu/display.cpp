@@ -414,9 +414,12 @@ void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool 
         int y1 = y + yOffset;
         int x2 = x1 + width - 1;
         int y2 = y1 + height - 1;
+
         if (withShadow) {
             expandRectWithShadow(x1, y1, x2, y2);
         }
+
+        markDirty(x1, y1, x2, y2);
     }
 
     for (int i = 0; i < g_numBuffersToDraw; i++) {

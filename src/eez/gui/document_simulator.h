@@ -1427,7 +1427,7 @@ enum StylesEnum {
     STYLE_ID_STATUS_LINE_SMALL_TITLE = 274,
     STYLE_ID_EDIT_VALUE_S_CENTERED_STATUS_LINE = 275,
     STYLE_ID_SCROLLBAR_TRACK = 276,
-    STYLE_ID_NON_INTERACTIVE_BUTTON_S_DISABLED = 288
+    STYLE_ID_NON_INTERACTIVE_BUTTON_S_DISABLED = 289
 };
 
 enum ThemesEnum {
@@ -1666,7 +1666,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[403762];
+extern const uint8_t assets[403774];
 #else
-extern const uint8_t assets[3916944];
+extern const uint8_t assets[3916976];
 #endif
