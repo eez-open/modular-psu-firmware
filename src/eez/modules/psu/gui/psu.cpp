@@ -260,7 +260,10 @@ Value g_progress;
 
 static int16_t g_externalActionId = ACTION_ID_NONE;
 static const size_t MAX_NUM_EXTERNAL_DATA_ITEM_VALUES = 10;
-static Value g_externalDataItemValues[MAX_NUM_EXTERNAL_DATA_ITEM_VALUES];
+static struct {
+    Value value;
+    char text[128 + 1];
+} g_externalDataItemValues[MAX_NUM_EXTERNAL_DATA_ITEM_VALUES];
 
 bool showSetupWizardQuestion();
 void onEncoder(int counter, bool clicked);
@@ -1012,17 +1015,34 @@ DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&
 
 void PsuAppContext::dialogResetDataItemValues() {
     for (uint32_t i = 0; i < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES; i++) {
-        g_externalDataItemValues[i] = Value();
+        g_externalDataItemValues[i].value = Value();
     }
 }
 
 void PsuAppContext::dialogSetDataItemValue(int16_t dataId, Value& value) {
+    while (g_dialogOpening) {
+        osDelay(5);
+    }
     if (dataId < 0) {
         dataId = -dataId;
     }
     dataId--;
     if ((uint16_t)dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
-        g_externalDataItemValues[dataId] = value;
+        g_externalDataItemValues[dataId].value = value;
+    }
+}
+
+void PsuAppContext::dialogSetDataItemValue(int16_t dataId, const char *str) {
+    while (g_dialogOpening) {
+        osDelay(5);
+    }
+    if (dataId < 0) {
+        dataId = -dataId;
+    }
+    dataId--;
+    if ((uint16_t)dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
+        strcpy(g_externalDataItemValues[dataId].text, str);
+        g_externalDataItemValues[dataId].value = (const char *)g_externalDataItemValues[dataId].text;
     }
 }
 
@@ -1957,7 +1977,7 @@ void externalDataHook(int16_t dataId, data::DataOperationEnum operation, data::C
     dataId--;
     if ((uint16_t)dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
         if (operation == data::DATA_OPERATION_GET) {
-            value = g_externalDataItemValues[dataId];
+            value = g_externalDataItemValues[dataId].value;
         }
     }
 }

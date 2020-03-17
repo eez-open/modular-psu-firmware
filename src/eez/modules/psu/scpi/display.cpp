@@ -591,10 +591,21 @@ scpi_result_t scpi_cmd_displayWindowDialogData(scpi_t *context) {
 
         Value dataValue = (int)value;
         psu::gui::g_psuAppContext.dialogSetDataItemValue(dataId, dataValue);
-    } else {
-        // TODO
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-        return SCPI_RES_ERR;
+    } else if (type == VALUE_TYPE_STR) {
+        const char *valueText;
+        size_t valueTextLen;
+        if (!SCPI_ParamCharacters(context, &valueText, &valueTextLen, true)) {
+            return SCPI_RES_ERR;
+        }
+        if (valueTextLen > 128) {
+            SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+            return SCPI_RES_ERR;
+        }
+        char dataItemValue[128 + 1];
+        strncpy(dataItemValue, valueText, valueTextLen);
+        dataItemValue[valueTextLen] = 0;
+
+        psu::gui::g_psuAppContext.dialogSetDataItemValue(dataId, dataItemValue);
     }
 
     return SCPI_RES_OK;

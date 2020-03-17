@@ -93,7 +93,7 @@ mp_obj_t modeez_setU(mp_obj_t channelIndexObj, mp_obj_t value) {
         mp_raise_ValueError("Remote programming enabled");
     }
 
-    float voltage = mp_obj_get_float(value);
+    float voltage = (float)mp_obj_get_float(value);
 
     if (voltage > channel_dispatcher::getULimit(channel)) {
         mp_raise_ValueError("Voltage limit exceeded");
@@ -129,7 +129,7 @@ mp_obj_t modeez_setI(mp_obj_t channelIndexObj, mp_obj_t value) {
         mp_raise_ValueError("Can not change transient trigger");
     }
 
-    float current = mp_obj_get_float(value);
+    float current = (float)mp_obj_get_float(value);
 
     if (current > channel_dispatcher::getILimit(channel)) {
         mp_raise_ValueError("Current limit exceeded");
@@ -179,7 +179,7 @@ mp_obj_t modeez_dlogTraceData(size_t n_args, const mp_obj_t *args) {
         if (!mp_obj_is_type(args[i], &mp_type_float)) {
             mp_raise_ValueError("Argument is not float");
         }
-        values[i] = mp_obj_get_float(args[i]);
+        values[i] = (float)mp_obj_get_float(args[i]);
     }
 
     dlog_record::log(values);

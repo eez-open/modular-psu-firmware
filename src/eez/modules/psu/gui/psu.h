@@ -157,6 +157,7 @@ public:
     DialogActionResult dialogAction(uint32_t timeoutMs, const char *&selectedActionName);
     void dialogResetDataItemValues();
     void dialogSetDataItemValue(int16_t dataId, Value& value);
+    void dialogSetDataItemValue(int16_t dataId, const char *str);
     void dialogClose();
 
 protected:
