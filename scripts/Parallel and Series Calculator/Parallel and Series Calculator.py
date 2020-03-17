@@ -15,6 +15,29 @@ C1 = None
 C2 = None
 Ctot = None
 
+def inputResistance(name, resistance):
+    value = scpi('DISP:INPUT? "' + name + '",NUMBER,OHM,-1E15,1E15,' + (str(resistance) if resistance != None else "1E3"))
+    if value != None:
+        resistance = float(value)
+        scpi('DISP:DIALog:DATA "' + name + '",FLOAT,OHM,' + str(resistance))
+    return resistance
+
+def inputCapacitance(name, capacitance):
+    value = scpi('DISP:INPUT? "' + name + '",NUMBER,FARAD,-1E15,1E15,' + (str(capacitance) if capacitance != None else "1E-6"))
+    if value != None:
+        capacitance = float(value)
+        scpi('DISP:DIALog:DATA "' + name + '",FLOAT,FARAD,' + str(capacitance))
+    return capacitance
+
+def setResistanceData(name, value):
+    scpi('DISP:DIALog:DATA "' + name + '",FLOAT,OHM,' + str(round(value, 4)))
+
+def setCapacitanceData(name, value):
+    scpi('DISP:DIALog:DATA "' + name + '",FLOAT,FARAD,' + str(round(value, 15)))
+
+def error(message):
+    scpi('DISP:ERROR "' + message + '"')
+
 def select_type():
     global circuitType
     value = scpi('DISP:SELECT? ' + str(circuitType + 1) + ',"R or L in parallel","C in series"')
@@ -24,45 +47,27 @@ def select_type():
 
 def input_R1():
     global R1
-    value = scpi('DISP:INPUT? "R1",NUMBER,OHM,-1E15,1E15,' + (str(R1) if R1 != None else "1"))
-    if value != None:
-        R1 = float(value)
-        scpi("DISP:DIALog:DATA \"R1\",FLOAT,OHM," + str(R1))
+    R1 = inputResistance("R1", R1)
 
 def input_R2():
     global R2
-    value = scpi('DISP:INPUT? "R2",NUMBER,OHM,-1E15,1E15,' + (str(R2) if R2 != None else "1"))
-    if value != None:
-        R2 = float(value)
-        scpi("DISP:DIALog:DATA \"R2\",FLOAT,OHM," + str(R2))
+    R2 = inputResistance("R2", R2)
 
 def input_Rtot():
     global Rtot
-    value = scpi('DISP:INPUT? "Rtot",NUMBER,OHM,-1E15,1E15,' + (str(Rtot) if Rtot != None else "1"))
-    if value != None:
-        Rtot = float(value)
-        scpi("DISP:DIALog:DATA \"Rtot\",FLOAT,OHM," + str(Rtot))
+    Rtot = inputResistance("Rtot", Rtot)
 
 def input_C1():
     global C1
-    value = scpi('DISP:INPUT? "C1",NUMBER,FARAD,-1E15,1E15,' + (str(C1) if C1 != None else "1E-6"))
-    if value != None:
-        C1 = float(value)
-        scpi("DISP:DIALog:DATA \"C1\",FLOAT,FARAD," + str(C1))
+    C1 = inputCapacitance("C1", C1)
 
 def input_C2():
     global C2
-    value = scpi('DISP:INPUT? "C2",NUMBER,FARAD,-1E15,1E15,' + (str(C2) if C2 != None else "1E-6"))
-    if value != None:
-        C2 = float(value)
-        scpi("DISP:DIALog:DATA \"C2\",FLOAT,FARAD," + str(C2))
+    C2 = inputCapacitance("C2", C2)
 
 def input_Ctot():
     global Ctot
-    value = scpi('DISP:INPUT? "Ctot",NUMBER,FARAD,-1E15,1E15,' + (str(Ctot) if Ctot != None else "1E-6"))
-    if value != None:
-        Ctot = float(value)
-        scpi("DISP:DIALog:DATA \"Ctot\",FLOAT,FARAD," + str(Ctot))
+    Ctot = inputCapacitance("Ctot", Ctot)
 
 def can_calc_R1():
     return R2 != None and Rtot != None
@@ -86,7 +91,7 @@ def calc_R1():
     if can_calc_R1():
         global R1
         R1 = R2 * Rtot / (R2 - Rtot)
-        scpi("DISP:DIALog:DATA \"R1\",FLOAT,OHM," + str(round(R1, 3)))
+        setResistanceData("R1", R1)
     else:
         scpi("DISP:ERROR \"Enter R2 and Rtot\"")
 
@@ -94,7 +99,7 @@ def calc_R2():
     if can_calc_R2():
         global R2
         R2 = R1 * Rtot / (R1 - Rtot)
-        scpi("DISP:DIALog:DATA \"R2\",FLOAT,OHM," + str(round(R2, 3)))
+        setResistanceData("R2", R2)
     else:
         scpi("DISP:ERROR \"Enter R1 and Rtot\"")
 
@@ -102,7 +107,7 @@ def calc_Rtot():
     if can_calc_Rtot():
         global Rtot
         Rtot = R1 * R2 / (R1 + R2)
-        scpi("DISP:DIALog:DATA \"Rtot\",FLOAT,OHM," + str(round(Rtot, 3)))
+        setResistanceData("Rtot", Rtot)
     else:
         scpi("DISP:ERROR \"Enter R1 and R2\"")
 
@@ -110,7 +115,7 @@ def calc_C1():
     if can_calc_C1():
         global C1
         C1 = C2 * Ctot / (C2 - Ctot)
-        scpi("DISP:DIALog:DATA \"C1\",FLOAT,FARAD," + str(round(C1, 15)))
+        setCapacitanceData("C1", C1)
     else:
         scpi("DISP:ERROR \"Enter C2 and Ctot\"")
 
@@ -118,7 +123,7 @@ def calc_C2():
     if can_calc_C2():
         global C2
         C2 = C1 * Ctot / (C1 - Ctot)
-        scpi("DISP:DIALog:DATA \"C2\",FLOAT,FARAD," + str(round(C2, 15)))
+        setCapacitanceData("C2", C2)
     else:
         scpi("DISP:ERROR \"Enter C1 and Ctot\"")
 
@@ -126,7 +131,7 @@ def calc_Ctot():
     if can_calc_Ctot():
         global Ctot
         Ctot = C1 * C2 / (C1 + C2)
-        scpi("DISP:DIALog:DATA \"Ctot\",FLOAT,FARAD," + str(round(Ctot, 15)))
+        setCapacitanceData("Ctot", Ctot)
     else:
         scpi("DISP:ERROR \"Enter C1 and C2\"")
 

@@ -20,6 +20,29 @@ Rg = None
 
 Vout = None
 
+def inputVoltage(name, voltage):
+    value = scpi('DISP:INPUT? "' + name + '",NUMBER,VOLT,-1E6,1E6,' + (str(voltage) if voltage != None else "1"))
+    if value != None:
+        voltage = float(value)
+        scpi('DISP:DIALog:DATA "' + name + '",FLOAT,VOLT,' + str(voltage))
+    return voltage
+
+def inputResistance(name, resistance):
+    value = scpi('DISP:INPUT? "' + name + '",NUMBER,OHM,-1E15,1E15,' + (str(resistance) if resistance != None else "1E3"))
+    if value != None:
+        resistance = float(value)
+        scpi('DISP:DIALog:DATA "' + name + '",FLOAT,OHM,' + str(resistance))
+    return resistance
+
+def setVoltageData(name, value):
+    scpi('DISP:DIALog:DATA "' + name + '",FLOAT,VOLT,' + str(round(value, 4)))
+
+def setResistanceData(name, value):
+    scpi('DISP:DIALog:DATA "' + name + '",FLOAT,OHM,' + str(round(value, 4)))
+
+def error(message):
+    scpi('DISP:ERROR "' + message + '"')
+
 def select_type():
     global opAmpType
     value = scpi('DISP:SELECT? ' + str(opAmpType + 1) + ',"Non-inverting","Inverting","Diff. simplified","Differential"')
@@ -29,59 +52,35 @@ def select_type():
 
 def input_Vin():
     global Vin
-    value = scpi('DISP:INPUT? "Vin",NUMBER,VOLT,-1E3,1E3,' + (str(Vin) if Vin != None else "1"))
-    if value != None:
-        Vin = float(value)
-        scpi("DISP:DIALog:DATA \"Vin\",FLOAT,VOLT," + str(Vin))
+    Vin = inputVoltage("Vin", Vin)
 
 def input_Vin1():
     global Vin1
-    value = scpi('DISP:INPUT? "Vin1",NUMBER,VOLT,-1E3,1E3,' + (str(Vin1) if Vin1 != None else "1"))
-    if value != None:
-        Vin1 = float(value)
-        scpi("DISP:DIALog:DATA \"Vin1\",FLOAT,VOLT," + str(Vin1))
+    Vin1 = inputVoltage("Vin1", Vin1)
 
 def input_Vin2():
     global Vin2
-    value = scpi('DISP:INPUT? "Vin2",NUMBER,VOLT,-1E3,1E3,' + (str(Vin2) if Vin2 != None else "1"))
-    if value != None:
-        Vin2 = float(value)
-        scpi("DISP:DIALog:DATA \"Vin2\",FLOAT,VOLT," + str(Vin2))
+    Vin2 = inputVoltage("Vin2", Vin2)
 
 def input_R1():
     global R1
-    value = scpi('DISP:INPUT? "R1",NUMBER,OHM,-1E12,1E12,' + (str(R1) if R1 != None else "1"))
-    if value != None:
-        R1 = float(value)
-        scpi("DISP:DIALog:DATA \"R1\",FLOAT,OHM," + str(R1))
+    R1 = inputResistance("R1", R1)
 
 def input_R2():
     global R2
-    value = scpi('DISP:INPUT? "R2",NUMBER,OHM,-1E12,1E12,' + (str(R2) if R2 != None else "1"))
-    if value != None:
-        R2 = float(value)
-        scpi("DISP:DIALog:DATA \"R2\",FLOAT,OHM," + str(R2))
+    R2 = inputResistance("R2", R2)
 
 def input_Rf():
     global Rf
-    value = scpi('DISP:INPUT? "Rf",NUMBER,OHM,-1E12,1E12,' + (str(Rf) if Rf != None else "1"))
-    if value != None:
-        Rf = float(value)
-        scpi("DISP:DIALog:DATA \"Rf\",FLOAT,OHM," + str(Rf))
+    Rf = inputResistance("Rf", Rf)
 
 def input_Rg():
     global Rg
-    value = scpi('DISP:INPUT? "Rg",NUMBER,OHM,-1E12,1E12,' + (str(Rg) if Rg != None else "1"))
-    if value != None:
-        Rg = float(value)
-        scpi("DISP:DIALog:DATA \"Rg\",FLOAT,OHM," + str(Rg))
+    Rg = inputResistance("Rg", Rg)
         
 def input_Vout():
     global Vout
-    value = scpi('DISP:INPUT? "Vout",NUMBER,VOLT,-1E3,1E3,' + (str(Vout) if Vout != None else "1"))
-    if value != None:
-        Vout = float(value)
-        scpi("DISP:DIALog:DATA \"Vout\",FLOAT,VOLT," + str(Vout))
+    Vout = inputVoltage("Vout", Vout)
 
 def can_calc_Vout():
     if opAmpType == TYPE_NON_INV or opAmpType == TYPE_INV:
@@ -148,9 +147,9 @@ def calc_Vin():
             Vin = Vout * R2 / (R1 + R2)
         else:
             Vin = -Vout * R1 / R2
-        scpi("DISP:DIALog:DATA \"Vin\",FLOAT,VOLT," + str(round(Vin, 3)))
+        setVoltageData("Vin", Vin)
     else:
-        scpi("DISP:ERROR \"Enter R1, R2 and Vout\"")
+        error("Enter R1, R2 and Vout")
 
 def calc_Vin1():
     if can_calc_Vin1():
@@ -159,12 +158,12 @@ def calc_Vin1():
             Vin1 = Vout * R1 / R2 + Vin2
         else:
             Vin1 = (Vout + Vin2 * Rf / R2) * ((R1 + Rg) * R2) / (Rg * (R2 + Rf))
-        scpi("DISP:DIALog:DATA \"Vin1\",FLOAT,VOLT," + str(round(Vin1, 3)))
+        setVoltageData("Vin1", Vin1)
     else:
         if opAmpType == TYPE_DIFF_SIMPL:
-            scpi("DISP:ERROR \"Enter Vin2, R1, R2 and Vout\"")
+            error("Enter Vin2, R1, R2 and Vout")
         else:
-            scpi("DISP:ERROR \"Enter Vin2, R1, R2, Rf, Rg and Vout\"")
+            error("Enter Vin2, R1, R2, Rf, Rg and Vout")
 
 def calc_Vin2():
     if can_calc_Vin2():
@@ -172,13 +171,13 @@ def calc_Vin2():
         if opAmpType == TYPE_DIFF_SIMPL:
             Vin2 = Vin1 - Vout * R1 / R2
         else:
-            Vin2 = (Vin1 * Rg / (R1 + Rg) * (R2 + Rf) / R2 - Vout) * R2 / Rf
-        scpi("DISP:DIALog:DATA \"Vin2\",FLOAT,VOLT," + str(round(Vin2, 3)))
+            Vin2 = ((Vin1 * Rg * (R2 + Rf) / (R1 + Rg)) - Vout * R2) / Rf
+        setVoltageData("Vin2", Vin2)
     else:
         if opAmpType == TYPE_DIFF_SIMPL:
-            scpi("DISP:ERROR \"Enter Vin1, R1, R2 and Vout\"")
+            error("Enter Vin1, R1, R2 and Vout")
         else:
-            scpi("DISP:ERROR \"Enter Vin2, R1, R2, Rf, Rg and Vout\"")
+            error("Enter Vin2, R1, R2, Rf, Rg and Vout")
 
 def calc_R1():
     if can_calc_R1():
@@ -191,18 +190,18 @@ def calc_R1():
             R1 = R2 * (Vin1 - Vin2) / Vout
         else:
             R1 = (Vin1 * (R2 + Rf) * Rg) / (Vout * R2 + Vin2 * Rf) - Rg
-        scpi("DISP:DIALog:DATA \"R1\",FLOAT,OHM," + str(round(R1, 3)))
+        setResistanceData("R1", R1)
     else:
         if opAmpType == TYPE_NON_INV or opAmpType == TYPE_INV:
-            scpi("DISP:ERROR \"Enter Vin, R2 and Vout\"")
+            error("Enter Vin, R2 and Vout")
         elif opAmpType == TYPE_DIFF_SIMPL:
-            scpi("DISP:ERROR \"Enter Vin1, Vin2, R2 and Vout\"")
+            error("Enter Vin1, Vin2, R2 and Vout")
         else:
-            scpi("DISP:ERROR \"Enter Vin1, Vin2, R2, Rf, Rg and Vout\"")
+            error("Enter Vin1, Vin2, R2, Rf, Rg and Vout")
 
 def calc_R2():
     if can_calc_R2():
-        global R1
+        global R2
         if opAmpType == TYPE_NON_INV:
             R2 = R1 * Vin / (Vout - Vin)
         elif opAmpType == TYPE_INV:
@@ -211,31 +210,31 @@ def calc_R2():
             R2 = R1 * Vout / (Vin1 - Vin2)
         else:
             R2 = Rf * (Vin1 * Rg - Vin2 * (R1 + Rg)) / (Vout * (R1 + Rg) - Vin1 * Rg)
-        scpi("DISP:DIALog:DATA \"R2\",FLOAT,OHM," + str(round(R2, 3)))
+        setResistanceData("R2", R2)
     else:
         if opAmpType == TYPE_NON_INV or opAmpType == TYPE_INV:
-            scpi("DISP:ERROR \"Enter Vin, R1 and Vout\"")
+            error("Enter Vin, R1 and Vout")
         elif opAmpType == TYPE_DIFF_SIMPL:
-            scpi("DISP:ERROR \"Enter Vin1, Vin2, R1 and Vout\"")
+            error("Enter Vin1, Vin2, R1 and Vout")
         else:
-            scpi("DISP:ERROR \"Enter Vin1, Vin2, R1, Rf, Rg and Vout\"")
+            error("Enter Vin1, Vin2, R1, Rf, Rg and Vout")
 
 def calc_Rf():
     if can_calc_Rf():
         global Rf
         Rf = (Vout * R2 * (R1 + Rg) - Vin1 * R2 * Rg) / (Vin1 * Rg - Vin2 * (R1 + Rg))
-        scpi("DISP:DIALog:DATA \"Rf\",FLOAT,OHM," + str(round(Rf, 3)))
+        setResistanceData("Rf", Rf)
     else:
-        scpi("DISP:ERROR \"Enter Vin1, Vin2, R1, R2, Rg and Vout\"")
+        error("Enter Vin1, Vin2, R1, R2, Rg and Vout")
 
 def calc_Rg():
     if can_calc_Rg():
         global Rg
         x = (Vout * R2 + Vin2 * Rf) / (Vin1 * (R2 + Rf))
         Rg = R1 * x / (1 - x)
-        scpi("DISP:DIALog:DATA \"Rg\",FLOAT,OHM," + str(round(Rg, 3)))
+        setResistanceData("Rg", Rg)
     else:
-        scpi("DISP:ERROR \"Enter Vin1, Vin2, R1, R2, Rf and Vout\"")
+        error("Enter Vin1, Vin2, R1, R2, Rf and Vout")
 
 def calc_Vout():
     if can_calc_Vout():
@@ -248,14 +247,14 @@ def calc_Vout():
             Vout = R2 / R1 * (Vin1 - Vin2)
         else:
             Vout = -Vin2 * Rf / R2 + Vin1 * Rg / (R1 + Rg) * (R2 + Rf) / R2
-        scpi("DISP:DIALog:DATA \"Vout\",FLOAT,VOLT," + str(round(Vout, 3)))
+        setVoltageData("Vout", Vout)
     else:
         if opAmpType == TYPE_NON_INV or opAmpType == TYPE_INV:
-            scpi("DISP:ERROR \"Enter Vin, R1 and R2\"")
+            error("Enter Vin, R1 and R2")
         elif opAmpType == TYPE_DIFF_SIMPL:
-            scpi("DISP:ERROR \"Enter Vin1, Vin2, R1 and R2\"")
+            error("Enter Vin1, Vin2, R1 and R2")
         else:
-            scpi("DISP:ERROR \"Enter Vin1, Vin2, R1, R2, Rf and Rg\"")
+            error("Enter Vin1, Vin2, R1, R2, Rf and Rg")
 
 scpi("DISP:DIALog:OPEN \"/Scripts/Op-Amp Calculator.res\"")
 while True:

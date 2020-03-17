@@ -117,10 +117,18 @@ void NumericKeypad::init(const char *label, const data::Value &value, NumericKey
         m_options.flags.dotButtonEnabled = true;
     }
 
-    if (m_startValue.isMicro()) {
+    if (m_startValue.isPico()) {
+        switchToPico();
+    } else if (m_startValue.isNano()) {
+        switchToNano();
+    } else if (m_startValue.isMicro()) {
         switchToMicro();
     } else if (m_startValue.isMilli()) {
         switchToMilli();
+    } else if (m_startValue.isKilo()) {
+        switchToKilo();
+    } else if (m_startValue.isMega()) {
+        switchToMega();
     }
 
     m_minChars = 0;
@@ -223,6 +231,18 @@ Unit NumericKeypad::getValueUnit() {
     return m_options.editValueUnit;
 }
 
+bool NumericKeypad::isPico() {
+    return m_options.editValueUnit == UNIT_PICO_FARAD;
+}
+
+bool NumericKeypad::isNano() {
+    return m_options.editValueUnit == UNIT_NANO_FARAD;
+}
+
+bool NumericKeypad::isMicro() {
+    return m_options.editValueUnit == UNIT_MICRO_AMPER || m_options.editValueUnit == UNIT_MICRO_FARAD;
+}
+
 bool NumericKeypad::isMilli() {
     return m_options.editValueUnit == UNIT_MILLI_VOLT ||
            m_options.editValueUnit == UNIT_MILLI_AMPER ||
@@ -231,24 +251,32 @@ bool NumericKeypad::isMilli() {
            m_options.editValueUnit == UNIT_MILLI_FARAD;
 }
 
-bool NumericKeypad::isMicro() {
-    return m_options.editValueUnit == UNIT_MICRO_AMPER || m_options.editValueUnit == UNIT_MICRO_FARAD;
-}
-
-bool NumericKeypad::isNano() {
-    return m_options.editValueUnit == UNIT_NANO_FARAD;
-}
-
-bool NumericKeypad::isPico() {
-    return m_options.editValueUnit == UNIT_PICO_FARAD;
-}
-
 bool NumericKeypad::isKilo() {
     return m_options.editValueUnit == UNIT_KOHM;
 }
 
 bool NumericKeypad::isMega() {
     return m_options.editValueUnit == UNIT_MOHM;
+}
+
+Unit NumericKeypad::getPicoUnit() {
+    if (m_options.editValueUnit == UNIT_FARAD || m_options.editValueUnit == UNIT_MILLI_FARAD || m_options.editValueUnit == UNIT_MICRO_FARAD || m_options.editValueUnit == UNIT_NANO_FARAD || m_options.editValueUnit == UNIT_PICO_FARAD)
+        return UNIT_PICO_FARAD;
+    return m_options.editValueUnit;
+}
+
+Unit NumericKeypad::getNanoUnit() {
+    if (m_options.editValueUnit == UNIT_FARAD || m_options.editValueUnit == UNIT_MILLI_FARAD || m_options.editValueUnit == UNIT_MICRO_FARAD || m_options.editValueUnit == UNIT_NANO_FARAD || m_options.editValueUnit == UNIT_PICO_FARAD)
+        return UNIT_NANO_FARAD;
+    return m_options.editValueUnit;
+}
+
+Unit NumericKeypad::getMicroUnit() {
+    if (m_options.editValueUnit == UNIT_AMPER || m_options.editValueUnit == UNIT_MILLI_AMPER)
+        return UNIT_MICRO_AMPER;
+    if (m_options.editValueUnit == UNIT_FARAD || m_options.editValueUnit == UNIT_MILLI_FARAD || m_options.editValueUnit == UNIT_MICRO_FARAD || m_options.editValueUnit == UNIT_NANO_FARAD || m_options.editValueUnit == UNIT_PICO_FARAD)
+        return UNIT_MICRO_FARAD;
+    return m_options.editValueUnit;
 }
 
 Unit NumericKeypad::getMilliUnit() {
@@ -260,22 +288,45 @@ Unit NumericKeypad::getMilliUnit() {
         return UNIT_MILLI_WATT;
     if (m_options.editValueUnit == UNIT_SECOND)
         return UNIT_MILLI_SECOND;
+    if (m_options.editValueUnit == UNIT_FARAD || m_options.editValueUnit == UNIT_MILLI_FARAD || m_options.editValueUnit == UNIT_MICRO_FARAD || m_options.editValueUnit == UNIT_NANO_FARAD || m_options.editValueUnit == UNIT_PICO_FARAD)
+        return UNIT_MILLI_FARAD;
     return m_options.editValueUnit;
 }
 
-Unit NumericKeypad::getMicroUnit() {
-    if (m_options.editValueUnit == UNIT_AMPER || m_options.editValueUnit == UNIT_MILLI_AMPER)
-        return UNIT_MICRO_AMPER;
+Unit NumericKeypad::getKiloUnit() {
+    if (m_options.editValueUnit == UNIT_OHM || m_options.editValueUnit == UNIT_KOHM || m_options.editValueUnit == UNIT_MOHM)
+        return UNIT_KOHM;
     return m_options.editValueUnit;
 }
 
+Unit NumericKeypad::getMegaUnit() {
+    if (m_options.editValueUnit == UNIT_OHM || m_options.editValueUnit == UNIT_KOHM || m_options.editValueUnit == UNIT_MOHM)
+        return UNIT_MOHM;
+    return m_options.editValueUnit;
+}
+
+void NumericKeypad::switchToPico() {
+    m_options.editValueUnit = getPicoUnit();
+}
+
+void NumericKeypad::switchToNano() {
+    m_options.editValueUnit = getNanoUnit();
+}
+
+void NumericKeypad::switchToMicro() {
+    m_options.editValueUnit = getMicroUnit();
+}
 
 void NumericKeypad::switchToMilli() {
     m_options.editValueUnit = getMilliUnit();
 }
 
-void NumericKeypad::switchToMicro() {
-    m_options.editValueUnit = getMicroUnit();
+void NumericKeypad::switchToKilo() {
+    m_options.editValueUnit = getKiloUnit();
+}
+
+void NumericKeypad::switchToMega() {
+    m_options.editValueUnit = getMegaUnit();
 }
 
 Unit NumericKeypad::getSwitchToUnit() {

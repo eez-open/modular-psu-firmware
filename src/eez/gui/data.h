@@ -179,9 +179,12 @@ struct Value {
         return (Unit)unit_;
     }
 
-    bool isMilli() const;
-
+    bool isPico() const;
+    bool isNano() const;
     bool isMicro() const;
+    bool isMilli() const;
+    bool isKilo() const;
+    bool isMega() const;
 
     float getFloat() const {
         return float_;

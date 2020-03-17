@@ -87,8 +87,12 @@ class NumericKeypad : public Keypad {
     Unit getEditUnit();
     Unit getValueUnit();
     
-    void switchToMilli();
+    void switchToPico();
+    void switchToNano();
     void switchToMicro();
+    void switchToMilli();
+    void switchToKilo();
+    void switchToMega();
 
     void getKeypadText(char *text);
     bool getText(char *text, int count);
@@ -128,14 +132,21 @@ class NumericKeypad : public Keypad {
     void appendEditUnit(char *text);
     float getValue();
     char getDotSign();
-    bool isMilli();
-    bool isMicro();
-    bool isNano();
+
     bool isPico();
+    bool isNano();
+    bool isMicro();
+    bool isMilli();
     bool isKilo();
     bool isMega();
-    Unit getMilliUnit();
+
+    Unit getPicoUnit();
+    Unit getNanoUnit();
     Unit getMicroUnit();
+    Unit getMilliUnit();
+    Unit getKiloUnit();
+    Unit getMegaUnit();
+
     void toggleEditUnit();
     int getNumDecimalDigits();
     bool isValueValid();

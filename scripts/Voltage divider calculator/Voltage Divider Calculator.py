@@ -7,33 +7,44 @@ R1 = None
 R2 = None
 Vout = None
 
+def inputVoltage(name, voltage):
+    value = scpi('DISP:INPUT? "' + name + '",NUMBER,VOLT,-1E6,1E6,' + (str(voltage) if voltage != None else "1"))
+    if value != None:
+        voltage = float(value)
+        scpi('DISP:DIALog:DATA "' + name + '",FLOAT,VOLT,' + str(voltage))
+    return voltage
+
+def inputResistance(name, resistance):
+    value = scpi('DISP:INPUT? "' + name + '",NUMBER,OHM,-1E15,1E15,' + (str(resistance) if resistance != None else "1E3"))
+    if value != None:
+        resistance = float(value)
+        scpi('DISP:DIALog:DATA "' + name + '",FLOAT,OHM,' + str(resistance))
+    return resistance
+
+def setVoltageData(name, value):
+    scpi('DISP:DIALog:DATA "' + name + '",FLOAT,VOLT,' + str(round(value, 4)))
+
+def setResistanceData(name, value):
+    scpi('DISP:DIALog:DATA "' + name + '",FLOAT,OHM,' + str(round(value, 4)))
+
+def error(message):
+    scpi('DISP:ERROR "' + message + '"')
+
 def input_Vin():
     global Vin
-    value = scpi('DISP:INPUT? "Vin", NUMBER,VOLT,1E-6,1E6,' + (str(Vin) if Vin != None else "1"))
-    if value != None:
-        Vin = float(value)
-        scpi("DISP:DIALog:DATA \"Vin\",FLOAT,VOLT," + str(Vin))
+    Vin = inputVoltage("Vin", Vin)
 
 def input_R1():
     global R1
-    value = scpi('DISP:INPUT? "R1",NUMBER,OHM,1E-12,1E15,' + (str(R1) if R1 != None else "1"))
-    if value != None:
-        R1 = float(value)
-        scpi("DISP:DIALog:DATA \"R1\",FLOAT,OHM," + str(R1))
+    R1 = inputResistance("R1", R1)
 
 def input_R2():
     global R2
-    value = scpi('DISP:INPUT? "R2",NUMBER,OHM,1E-12,1E15,' + (str(R2) if R2 != None else "1"))
-    if value != None:
-        R2 = float(value)
-        scpi("DISP:DIALog:DATA \"R2\",FLOAT,OHM," + str(R2))
+    R2 = inputResistance("R2", R2)
 
 def input_Vout():
     global Vout
-    value = scpi('DISP:INPUT? "Vout",NUMBER,VOLT,1E-6,1E6,' + (str(Vout) if Vout != None else "1"))
-    if value != None:
-        Vout = float(value)
-        scpi("DISP:DIALog:DATA \"Vout\",FLOAT,VOLT," + str(Vout))
+    Vout = inputVoltage("Vout", Vout)
 
 def can_calc_Vout():
     return Vin != None and R1 != None and R2 != None
@@ -51,39 +62,39 @@ def calc_Vin():
     if can_calc_Vin():
         global Vin
         Vin = Vout * (R1 + R2) / R2
-        scpi("DISP:DIALog:DATA \"Vin\",FLOAT,VOLT," + str(round(Vin, 3)))
+        setVoltageData("Vin", Vin)
     else:
-        scpi("DISP:ERROR \"Enter R1, R2 and Vout\"")
+        error("Enter R1, R2 and Vout")
 
 def calc_R1():
     if can_calc_R1():
         global R1
         R1 = R2 * (Vin - Vout) / Vout
-        scpi("DISP:DIALog:DATA \"R1\",FLOAT,OHM," + str(round(R1, 3)))
+        setResistanceData("R1", R1)
     else:
         if Vin != None and Vout != None and R2 != None:
-            scpi("DISP:ERROR \"Vout must be less then Vin\"")
+            error("Vout must be less then Vin")
         else:
-            scpi("DISP:ERROR \"Enter Vin, R2 and Vout\"")
+            error("Enter Vin, R2 and Vout")
 
 def calc_R2():
     if can_calc_R2():
         global R2
         R2 = R1 * Vout / (Vin - Vout)
-        scpi("DISP:DIALog:DATA \"R2\",FLOAT,OHM," + str(round(R2, 3)))
+        setResistanceData("R2", R2)
     else:
         if Vin != None and Vout != None and R1 != None:
-            scpi("DISP:ERROR \"Vout must be less then Vin\"")
+            error("Vout must be less then Vin")
         else:
-            scpi("DISP:ERROR \"Enter Vin, R1 and Vout\"")
+            error("Enter Vin, R1 and Vout")
 
 def calc_Vout():
     if can_calc_Vout():
         global Vout
         Vout = Vin * R2 / (R1 + R2)
-        scpi("DISP:DIALog:DATA \"Vout\",FLOAT,VOLT," + str(round(Vout, 3)))
+        setVoltageData("Vout", Vout)
     else:
-        scpi("DISP:ERROR \"Enter Vin, R1 and R2\"")
+        error("Enter Vin, R1 and R2")
 
 scpi("DISP:DIALog:OPEN \"/Scripts/Voltage Divider Calculator.res\"")
 while True:

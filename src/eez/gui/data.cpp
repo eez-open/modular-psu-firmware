@@ -364,25 +364,28 @@ int Value::getInt() const {
     return int_;
 }
 
-bool Value::isMilli() const {
+bool Value::isPico() const {
     float floatValue = getFloat();
     Unit unit = getUnit();
 
     if (floatValue != 0) {
-        if (unit == UNIT_VOLT) {
-            if (fabs(floatValue) < 1) {
+        if (unit == UNIT_FARAD) {
+            if (fabs(floatValue) < 1E-9f) {
                 return true;
             }
-        } else if (unit == UNIT_AMPER) {
-            if (fabs(floatValue) < 1 && !(fabs(floatValue) < 0.001f && fabs(floatValue) != 0.0005f)) {
-                return true;
-            }
-        } else if (unit == UNIT_WATT) {
-            if (fabs(floatValue) < 1) {
-                return true;
-            }
-        } else if (unit == UNIT_SECOND) {
-            if (fabs(floatValue) < 1) {
+        }
+    }
+
+    return false;
+}
+
+bool Value::isNano() const {
+    float floatValue = getFloat();
+    Unit unit = getUnit();
+
+    if (floatValue != 0) {
+        if (unit == UNIT_FARAD) {
+            if (fabs(floatValue) < 1E-6f) {
                 return true;
             }
         }
@@ -397,13 +400,67 @@ bool Value::isMicro() const {
 
     if (floatValue != 0) {
         if (unit == UNIT_AMPER) {
-            if (fabs(floatValue) < 0.001f && fabs(floatValue) != 0.0005f) {
+            if (fabs(floatValue) < 1E-3f && fabs(floatValue) != 0.0005f) {
+                return true;
+            }
+        } else if (unit == UNIT_FARAD) {
+            if (fabs(floatValue) < 1E-3f) {
                 return true;
             }
         }
     }
 
     return false;
+}
+
+bool Value::isMilli() const {
+    float floatValue = getFloat();
+    Unit unit = getUnit();
+
+    if (floatValue != 0) {
+        if (unit == UNIT_AMPER) {
+            if (fabs(floatValue) < 1 && !(fabs(floatValue) < 1E-3f && fabs(floatValue) != 0.0005f)) {
+                return true;
+            }
+        } else if (unit == UNIT_VOLT || unit == UNIT_WATT || unit == UNIT_SECOND || unit == UNIT_FARAD) {
+            if (fabs(floatValue) < 1) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool Value::isKilo() const {
+    float floatValue = getFloat();
+    Unit unit = getUnit();
+
+    if (floatValue != 0) {
+        if (unit == UNIT_OHM) {
+            if (fabs(floatValue) >= 1E3f) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool Value::isMega() const {
+    float floatValue = getFloat();
+    Unit unit = getUnit();
+
+    if (floatValue != 0) {
+        if (unit == UNIT_OHM) {
+            if (fabs(floatValue) >= 1E6f) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
