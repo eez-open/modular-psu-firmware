@@ -80,7 +80,9 @@ uint8_t getOpacity();
 const uint8_t * takeScreenshot();
 
 void clearDirty();
-void markDirty(int x1, int y1, int x2, int y2);
+// void markDirty(int x1, int y1, int x2, int y2);
+extern bool g_dirty;
+#define markDirty(x1, y1, x2, y2) g_dirty = true
 bool isDirty();
 
 void drawPixel(int x, int y);

@@ -508,7 +508,7 @@ void sync() {
             finishAnimation();
         }
         clearDirty();
-        clearDirty();
+        // clearDirty();
         return;
     }
 

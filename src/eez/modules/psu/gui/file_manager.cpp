@@ -1203,7 +1203,7 @@ void data_file_manager_image_open_state(data::DataOperationEnum operation, data:
 
 void data_file_manager_image_open_progress(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        int progress = ((millis() / 100) * 100 - g_imageLoadStartTime) / 10;
+        int progress = ((millis() / 40) * 40 - g_imageLoadStartTime) / 5;
         if (progress > 140) {
             progress = 95 + (progress - 140) / 100;
         } else if (progress > 90) {

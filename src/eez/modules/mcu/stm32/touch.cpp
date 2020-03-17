@@ -63,22 +63,27 @@ static int16_t g_lastZ1Data = 0;
 void touchMeasure() {
     taskENTER_CRITICAL();
     
-    uint8_t result[8];
-
-    HAL_I2C_Master_Transmit(&hi2c1, TOUCH_DEVICE_ADDRESS, (uint8_t *)&X_DATA_ID, 1, 5);
-    HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result, 2, 5);
-
-    HAL_I2C_Master_Transmit(&hi2c1, TOUCH_DEVICE_ADDRESS, (uint8_t *)&Y_DATA_ID, 1, 5);
-    HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result + 2, 2, 5);
+    uint8_t result[4];
 
     HAL_I2C_Master_Transmit(&hi2c1, TOUCH_DEVICE_ADDRESS, (uint8_t *)&Z1_DATA_ID, 1, 5);
-    HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result + 4, 2, 5);
+    HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result, 2, 5);
+
+    g_lastZ1Data = (((int16_t)result[0]) << 3) | ((int16_t)result[1]);
+
+    if (g_lastZ1Data > CONF_TOUCH_Z1_THRESHOLD) {
+        HAL_I2C_Master_Transmit(&hi2c1, TOUCH_DEVICE_ADDRESS, (uint8_t *)&X_DATA_ID, 1, 5);
+        HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result, 2, 5);
+
+        HAL_I2C_Master_Transmit(&hi2c1, TOUCH_DEVICE_ADDRESS, (uint8_t *)&Y_DATA_ID, 1, 5);
+        HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result + 2, 2, 5);
+    }
 
     taskEXIT_CRITICAL();
 
-    g_lastXData  = (((int16_t)result[0]) << 3) | ((int16_t)result[1]);
-    g_lastYData  = (((int16_t)result[2]) << 3) | ((int16_t)result[3]);
-    g_lastZ1Data = (((int16_t)result[4]) << 3) | ((int16_t)result[5]);
+    if (g_lastZ1Data > CONF_TOUCH_Z1_THRESHOLD) {
+        g_lastXData  = (((int16_t)result[0]) << 3) | ((int16_t)result[1]);
+        g_lastYData  = (((int16_t)result[2]) << 3) | ((int16_t)result[3]);
+    }
 }
 
 static void setTimeout(uint32_t &timeout, uint32_t timeoutDuration) {

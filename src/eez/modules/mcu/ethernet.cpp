@@ -613,7 +613,7 @@ void onIdle() {
 
 void mainLoop(const void *) {
     while (1) {
-        osEvent event = osMessageGet(g_ethernetMessageQueueId, 0);
+        osEvent event = osMessageGet(g_ethernetMessageQueueId, 10);
         if (event.status == osEventMessage) {
             uint8_t eventType = event.value.v & 0xFF;
             if (eventType == QUEUE_MESSAGE_PUSH_EVENT) {

@@ -72,7 +72,6 @@ void mainLoop(const void *) {
 	oneIter();
 #else
     while (1) {
-        osDelay(1);
         oneIter();
     }
 #endif
@@ -91,8 +90,25 @@ void onGuiQueueMessage(uint8_t type, int16_t param) {
 }
 
 void oneIter() {
+    uint32_t timeout = 5;
+
+    // static uint32_t lastTime;
+    // uint32_t tickCount = millis();
+    // if (lastTime != 0) {
+    //     uint32_t diff = tickCount - lastTime;
+    //     if (diff < 40) {
+    //         timeout = 40 - diff;
+    //     }
+    // }
+    // lastTime = tickCount;
+    // if (lastTime == 0) {
+    //     lastTime = 1;
+    // }
+
     while (true) {
-        osEvent event = osMessageGet(g_guiMessageQueueId, 0);
+        osEvent event = osMessageGet(g_guiMessageQueueId, timeout);
+
+        timeout = 0;
 
         if (event.status != osEventMessage) {
             break;

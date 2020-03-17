@@ -5484,7 +5484,7 @@ void data_can_show_previous_page(data::DataOperationEnum operation, data::Cursor
 
 void data_async_progress(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        auto x = (100 * (millis() / 100) - g_psuAppContext.getAsyncInProgressStartTime()) % 1000;
+        auto x = ((millis() / 40) * 40 - g_psuAppContext.getAsyncInProgressStartTime()) % 1000;
         if (x < 500) {
             x = x * 75 / 500;
         } else {

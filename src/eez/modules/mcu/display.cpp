@@ -237,60 +237,68 @@ uint8_t getOpacity() {
     return g_opacity;
 }
 
-static int g_prevDirtyX1;
-static int g_prevDirtyY1;
-static int g_prevDirtyX2;
-static int g_prevDirtyY2;
+// static int g_prevDirtyX1;
+// static int g_prevDirtyY1;
+// static int g_prevDirtyX2;
+// static int g_prevDirtyY2;
 
-static int g_nextDirtyX1 = getDisplayWidth();
-static int g_nextDirtyY1 = getDisplayHeight();
-static int g_nextDirtyX2 = -1;
-static int g_nextDirtyY2 = -1;
+// static int g_nextDirtyX1 = getDisplayWidth();
+// static int g_nextDirtyY1 = getDisplayHeight();
+// static int g_nextDirtyX2 = -1;
+// static int g_nextDirtyY2 = -1;
 
-static int g_dirtyX1;
-static int g_dirtyY1;
-static int g_dirtyX2;
-static int g_dirtyY2;
+// static int g_dirtyX1;
+// static int g_dirtyY1;
+// static int g_dirtyX2;
+// static int g_dirtyY2;
+
+bool g_dirty;
 
 void clearDirty() {
-    g_prevDirtyX1 = g_nextDirtyX1;
-    g_prevDirtyY1 = g_nextDirtyY1;
-    g_prevDirtyX2 = g_nextDirtyX2;
-    g_prevDirtyY2 = g_nextDirtyY2;
+    g_dirty = false;
 
-    g_nextDirtyX1 = getDisplayWidth();
-    g_nextDirtyY1 = getDisplayHeight();
-    g_nextDirtyX2 = -1;
-    g_nextDirtyY2 = -1;
+    // g_prevDirtyX1 = g_nextDirtyX1;
+    // g_prevDirtyY1 = g_nextDirtyY1;
+    // g_prevDirtyX2 = g_nextDirtyX2;
+    // g_prevDirtyY2 = g_nextDirtyY2;
+
+    // g_nextDirtyX1 = getDisplayWidth();
+    // g_nextDirtyY1 = getDisplayHeight();
+    // g_nextDirtyX2 = -1;
+    // g_nextDirtyY2 = -1;
 }
 
-void markDirty(int x1, int y1, int x2, int y2) {
-    if (x1 < g_nextDirtyX1) {
-        g_nextDirtyX1 = x1;
-    }
-    if (y1 < g_nextDirtyY1) {
-        g_nextDirtyY1 = y1;
-    }
-    if (x2 > g_nextDirtyX2) {
-        g_nextDirtyX2 = x2;
-    }
-    if (y2 > g_nextDirtyY2) {
-        g_nextDirtyY2 = y2;
-    }
-}
+// void markDirty(int x1, int y1, int x2, int y2) {
+//     if (x1 < g_nextDirtyX1) {
+//         g_nextDirtyX1 = x1;
+//     }
+//     if (y1 < g_nextDirtyY1) {
+//         g_nextDirtyY1 = y1;
+//     }
+//     if (x2 > g_nextDirtyX2) {
+//         g_nextDirtyX2 = x2;
+//     }
+//     if (y2 > g_nextDirtyY2) {
+//         g_nextDirtyY2 = y2;
+//     }
+// }
 
 bool isDirty() {
-    g_dirtyX1 = MIN(g_prevDirtyX1, g_nextDirtyX1);
-    g_dirtyY1 = MIN(g_prevDirtyY1, g_nextDirtyY1);
-    g_dirtyX2 = MAX(g_prevDirtyX2, g_nextDirtyX2);
-    g_dirtyY2 = MAX(g_prevDirtyY2, g_nextDirtyY2);
+    // g_dirtyX1 = MIN(g_prevDirtyX1, g_nextDirtyX1);
+    // g_dirtyY1 = MIN(g_prevDirtyY1, g_nextDirtyY1);
+    // g_dirtyX2 = MAX(g_prevDirtyX2, g_nextDirtyX2);
+    // g_dirtyY2 = MAX(g_prevDirtyY2, g_nextDirtyY2);
 
-    if (g_dirtyX1 <= g_dirtyX2 && g_dirtyY1 <= g_dirtyY2) {
-        // printf("%d x %d\n", g_dirtyX2 - g_dirtyX1 + 1, g_dirtyY2 - g_dirtyY1 + 1);
-        return true;
-    }
+    // if (g_dirtyX1 <= g_dirtyX2 && g_dirtyY1 <= g_dirtyY2) {
+    //     // char msg[50];
+    //     // sprintf(msg, "%d x %d\n", g_dirtyX2 - g_dirtyX1 + 1, g_dirtyY2 - g_dirtyY1 + 1);
+    //     // Serial.println(msg);
+    //     return true;
+    // }
 
-    return false;
+    // return false;
+
+    return g_dirty;
 }
 
 static int8_t measureGlyph(uint8_t encoding) {
@@ -409,7 +417,6 @@ void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool 
         if (withShadow) {
             expandRectWithShadow(x1, y1, x2, y2);
         }
-        markDirty(x1, y1, x2, y2);
     }
 
     for (int i = 0; i < g_numBuffersToDraw; i++) {
@@ -450,40 +457,42 @@ void endBuffersDrawing() {
         for (int i = 0; i < g_numBuffersToDraw; i++) {
             int bufferIndex = g_bufferToDrawIndexes[i];
             Buffer &buffer = g_buffers[bufferIndex];
+
+            int sx = buffer.x;
+            int sy = buffer.y;
+
+            int x1 = buffer.x + buffer.xOffset;
+            int y1 = buffer.y + buffer.yOffset;
+            int x2 = x1 + buffer.width - 1;
+            int y2 = y1 + buffer.height - 1;
+
             if (buffer.withShadow) {
-                drawShadow(buffer.x + buffer.xOffset, buffer.y + buffer.yOffset, buffer.x + buffer.xOffset + buffer.width - 1, buffer.y + buffer.yOffset + buffer.height - 1);
-                bitBlt(buffer.bufferPointer, nullptr, buffer.x, buffer.y, buffer.width, buffer.height, buffer.x + buffer.xOffset, buffer.y + buffer.yOffset, buffer.opacity);
-            } else {
-                int sx = buffer.x;
-                int sy = buffer.y;
-
-                int x1 = buffer.x + buffer.xOffset;
-                int y1 = buffer.y + buffer.yOffset;
-                int x2 = x1 + buffer.width - 1;
-                int y2 = y1 + buffer.height - 1;
-
-                if (x1 < g_dirtyX1) {
-                    int xd = g_dirtyX1 - x1;
-                    sx += xd;
-                    x1 += xd;
-                }
-
-                if (y1 < g_dirtyY1) {
-                    int yd = g_dirtyY1 - y1;
-                    sy += yd;
-                    y1 += yd;
-                }
-
-                if (x2 > g_dirtyX2) {
-                    x2 = g_dirtyX2;
-                }
-
-                if (y2 > g_dirtyY2) {
-                    y2 = g_dirtyY2;
-                }
-
-                bitBlt(buffer.bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, buffer.opacity);
+                // if (x1 > g_dirtyY1 || y1 > g_dirtyY1 || x2 < g_dirtyX2 || y2 < g_dirtyY2) {
+                    drawShadow(x1, y1, x2, y2);
+                // }
             }
+
+            // if (x1 < g_dirtyX1) {
+            //     int xd = g_dirtyX1 - x1;
+            //     sx += xd;
+            //     x1 += xd;
+            // }
+
+            // if (y1 < g_dirtyY1) {
+            //     int yd = g_dirtyY1 - y1;
+            //     sy += yd;
+            //     y1 += yd;
+            // }
+
+            // if (x2 > g_dirtyX2) {
+            //     x2 = g_dirtyX2;
+            // }
+
+            // if (y2 > g_dirtyY2) {
+            //     y2 = g_dirtyY2;
+            // }
+
+            bitBlt(buffer.bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, buffer.opacity);
         }
     }
 
