@@ -5,7 +5,9 @@ from utime import ticks_ms, ticks_add, ticks_diff, sleep_ms
 from eez import scpi, setU, setI, getOutputMode, getI, dlogTraceData
 
 TYPE_NPN = 0
-TYPE_N_TYPE = 1
+TYPE_PNP = 1
+TYPE_N_CH = 2
+TYPE_P_CH = 3
 
 deviceType = TYPE_NPN
 
@@ -39,7 +41,7 @@ def inputAmperage(name, amperage, min, max):
     
 def select_device_type():
     global deviceType
-    value = scpi('DISP:SELECT? ' + str(deviceType + 1) + ',"NPN BJT","N-Ch MOSFET"')
+    value = scpi('DISP:SELECT? ' + str(deviceType + 1) + ',"NPN BJT","PNP BJT","N-Ch MOSFET","P-Ch MOSFET"')
     if value != None and value != 0:
         deviceType = value - 1
         scpi("DISP:DIALog:DATA \"device_type\",INTEGER," + str(deviceType))
@@ -80,15 +82,19 @@ def start():
         scpi("MEM:STAT:FREEze ON")
 
         if deviceType == TYPE_NPN:
-            start_NPN()
-        elif deviceType == TYPE_N_TYPE:
-            start_N_type()
+            start_BJT(True)
+        elif deviceType == TYPE_PNP:
+            start_BJT(False)
+        elif deviceType == TYPE_N_CH:
+            start_MOSFET(True)
+        elif deviceType == TYPE_P_CH:
+            start_MOSFET(False)
     finally:
         scpi("ABOR:DLOG")
         scpi("*RCL 10")
         scpi("MEM:STAT:FREEze OFF")
 
-def start_NPN():
+def start_BJT(cgnd):
     global deviceName, Uce_max, Ic_max
 
     TIME_ON_MS = 30
@@ -104,7 +110,8 @@ def start_NPN():
 
     Uce_step = Uce_max / NUM_U_DS_STEPS
 
-    scpi("INST:COUP:TRAC CGND")
+    if cgnd:
+        scpi("INST:COUP:TRAC CGND")
 
     scpi("INST ch1")
     scpi("OUTP 0")
@@ -170,7 +177,7 @@ def start_NPN():
 
         dlogTraceData(iMonValues)
 
-def start_N_type():
+def start_MOSFET(cgnd):
     global deviceName, Uds_max, Id_max
 
     TIME_ON_MS = 15
@@ -196,7 +203,8 @@ def start_N_type():
     Uds_logMax = math.log(Uds_max) / math.log(10)
     Uds_step = (Uds_logMax - Uds_logMin) / (NUM_U_DS_STEPS - 1)
 
-    scpi("INST:COUP:TRAC CGND")
+    if cgnd:
+        scpi("INST:COUP:TRAC CGND")
 
     scpi("INST ch1")
     scpi("OUTP 0")
