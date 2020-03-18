@@ -252,11 +252,13 @@ void action_show_sys_settings_ethernet() {
 }
 
 void action_show_sys_settings_ethernet_error() {
+#if OPTION_ETHERNET    
     if (persist_conf::devConf.mqttEnabled && mqtt::g_connectionState == mqtt::CONNECTION_STATE_ERROR) {
         pushPage(PAGE_ID_SYS_SETTINGS_MQTT);
     } else {
         pushPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
     }
+#endif
 }
 
 void action_show_sys_settings_protections() {
