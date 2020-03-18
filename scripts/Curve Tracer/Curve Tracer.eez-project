@@ -18,7 +18,7 @@
     {
       "name": "device_type",
       "type": "enum",
-      "enumItems": "[\n    \"NPN\",\n    \"N-type\"\n]",
+      "enumItems": "[\n    \"NPN\",\n    \"N-Ch MOSFET\"\n]",
       "defaultValue": "0"
     },
     {
@@ -132,7 +132,7 @@
                 "top": 0,
                 "width": 166,
                 "height": 38,
-                "text": "N-type"
+                "text": "N-Ch MOSFET"
               }
             ]
           },
