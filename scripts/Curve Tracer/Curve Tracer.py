@@ -39,7 +39,7 @@ def inputAmperage(name, amperage, min, max):
     
 def select_device_type():
     global deviceType
-    value = scpi('DISP:SELECT? ' + str(deviceType + 1) + ',"NPN","N-Ch MOSFET"')
+    value = scpi('DISP:SELECT? ' + str(deviceType + 1) + ',"NPN BJT","N-Ch MOSFET"')
     if value != None and value != 0:
         deviceType = value - 1
         scpi("DISP:DIALog:DATA \"device_type\",INTEGER," + str(deviceType))

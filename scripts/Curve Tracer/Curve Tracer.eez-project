@@ -18,7 +18,7 @@
     {
       "name": "device_type",
       "type": "enum",
-      "enumItems": "[\n    \"NPN\",\n    \"N-Ch MOSFET\"\n]",
+      "enumItems": "[\n    \"NPN BJT\",\n    \"N-Ch MOSFET\"\n]",
       "defaultValue": "0"
     },
     {
@@ -119,7 +119,7 @@
                 "top": 0,
                 "width": 166,
                 "height": 38,
-                "text": "NPN"
+                "text": "NPN BJT"
               },
               {
                 "type": "Text",
