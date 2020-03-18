@@ -79,9 +79,9 @@ enum {
     PSU_QUEUE_MESSAGE_TYPE_SET_CURRENT
 };
 
-#define PSU_QUEUE_MESSAGE(type, param) (((param) << 4) | (type))
-#define PSU_QUEUE_MESSAGE_TYPE(message) ((message) & 0xF)
-#define PSU_QUEUE_MESSAGE_PARAM(param) ((message) >> 4)
+#define PSU_QUEUE_MESSAGE(type, param) (((param) << 8) | (type))
+#define PSU_QUEUE_MESSAGE_TYPE(message) ((message) & 0xFF)
+#define PSU_QUEUE_MESSAGE_PARAM(param) ((message) >> 8)
 
 bool measureAllAdcValuesOnChannel(int channelIndex);
 

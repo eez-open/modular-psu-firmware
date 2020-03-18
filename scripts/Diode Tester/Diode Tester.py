@@ -38,7 +38,7 @@ def can_start():
 
 def start():
     if not can_start():
-        error("Enter diode name and U step")
+        error("Enter diode name")
         return
 
     scpi("DISP:DIALog:CLOSe")

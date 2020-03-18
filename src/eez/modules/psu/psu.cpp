@@ -163,7 +163,13 @@ osThreadDef(g_psuTask, mainLoop, osPriorityAboveNormal, 0, 2048);
 
 osThreadId g_psuTaskHandle;
 
+#if defined(EEZ_PLATFORM_STM32)
 #define PSU_QUEUE_SIZE 10
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+#define PSU_QUEUE_SIZE 100
+#endif
 
 osMessageQDef(g_psuMessageQueue, PSU_QUEUE_SIZE, uint32_t);
 osMessageQId g_psuMessageQueueId;
