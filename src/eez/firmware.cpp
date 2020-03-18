@@ -270,7 +270,7 @@ bool testMaster() {
     return result;
 }
 
-bool test() {
+bool doTest() {
     bool testResult = true;
 
     psu::profile::saveToLocation(10);
@@ -278,6 +278,8 @@ bool test() {
 
     testResult &= testMaster();
 
+    psu::initChannels();
+    osDelay(100);
     testResult &= psu::testChannels();
 
     psu::profile::recallFromLocation(10);
@@ -287,6 +289,29 @@ bool test() {
     }
 
     return testResult;
+}
+
+bool test() {
+    using namespace psu;
+
+    static bool g_testResult;
+    static bool g_testFinished;
+
+    if (osThreadGetId() != g_psuTaskHandle) {
+        g_testFinished = false;
+        
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_TEST, 0), osWaitForever);
+        
+        while (!g_testFinished) {
+            osDelay(10);
+        }
+
+        return g_testResult;
+    } else {
+        g_testResult = doTest();
+        g_testFinished = true;
+        return g_testResult;
+    }
 }
 
 bool reset() {
@@ -358,7 +383,7 @@ void shutdown() {
     }
 
     if (g_restart) {
-        delay(1000);
+        delay(800);
 
 #if defined(EEZ_PLATFORM_STM32)
         NVIC_SystemReset();

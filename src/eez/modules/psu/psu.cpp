@@ -213,6 +213,8 @@ void oneIter() {
             changePowerState(param ? true : false);
         } else if (type == PSU_QUEUE_MESSAGE_TYPE_RESET) {
             reset();
+        } else if (type == PSU_QUEUE_MESSAGE_TYPE_TEST) {
+            test();
         } else if (type == PSU_QUEUE_MESSAGE_SPI_IRQ) {
             auto channelInterface = eez::psu::Channel::getBySlotIndex(param).channelInterface;
             if (channelInterface) {

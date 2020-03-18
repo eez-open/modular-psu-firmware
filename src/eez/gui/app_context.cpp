@@ -284,7 +284,7 @@ bool AppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int 
 
 void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
     int activePageId = getActivePageId();
-    if (!isPageInternal(activePageId)) {
+    if (activePageId != PAGE_ID_NONE && !isPageInternal(activePageId)) {
         const Widget *page = getPageWidget(activePageId);
 		const PageWidget *pageSpecific = GET_WIDGET_PROPERTY(page, specific, const PageWidget *);
         if ((pageSpecific->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {

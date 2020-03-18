@@ -259,7 +259,17 @@ void pushEvent(int16_t eventId) {
         sound::playBeep();
 
 #if OPTION_DISPLAY
-        if (g_isBooted) {
+        int activePageId = getActivePageId();
+        if (
+            g_isBooted && 
+            activePageId != PAGE_ID_NONE &&
+            activePageId != PAGE_ID_STANDBY &&
+            activePageId != PAGE_ID_ENTERING_STANDBY &&
+            activePageId != PAGE_ID_WELCOME &&
+            activePageId != PAGE_ID_SAVING &&
+            activePageId != PAGE_ID_SHUTDOWN &&
+            activePageId != PAGE_ID_DISPLAY_OFF
+        ) {
             eez::psu::gui::psuErrorMessage(0, MakeEventMessageValue(eventId));
         }
 #endif
