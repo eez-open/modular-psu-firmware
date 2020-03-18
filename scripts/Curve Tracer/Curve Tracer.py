@@ -1,4 +1,4 @@
-# Plot output characteristic for NPN, PNP, N-ch or P-ch MOSFET devices
+# Plot output characteristic for BJTs and MOSFETs
 
 import math
 from utime import ticks_ms, ticks_add, ticks_diff, sleep_ms
