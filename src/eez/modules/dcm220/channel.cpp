@@ -35,7 +35,7 @@
 #include <eez/scpi/regs.h>
 #include <eez/system.h>
 
-#define CONF_MASTER_SYNC_TIMEOUT_MS 500
+#define CONF_MASTER_SYNC_TIMEOUT_MS 1000
 #define CONF_MASTER_SYNC_IRQ_TIMEOUT_MS 50
 
 namespace eez {

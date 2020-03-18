@@ -665,7 +665,7 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
         }
     }
 
-    return (widgetCursor.cursor == -1 || widgetCursor.cursor == g_focusCursor) && widgetCursor.widget->data == g_focusDataId && widgetCursor.widget->action != ACTION_ID_EDIT_NO_FOCUS;
+    return (widgetCursor.cursor == -1 || widgetCursor.cursor == g_focusCursor) && widgetCursor.widget->data == g_focusDataId && widgetCursor.widget->action != ACTION_ID_EDIT_NO_FOCUS && isEncoderEnabledInActivePage();
 }
 
 bool PsuAppContext::isAutoRepeatAction(int action) {
@@ -821,9 +821,7 @@ bool PsuAppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) 
 }
 
 void PsuAppContext::doHideProgressPage() {
-    if (getActivePageId() == (m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS)) {
-        popPage();
-    }
+    removePageFromStack(m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
     m_popProgressPage = false;
 }
 
@@ -868,9 +866,7 @@ void PsuAppContext::hideAsyncOperationInProgress() {
 }
 
 void PsuAppContext::doHideAsyncOperationInProgress() {
-    if (getActivePageId() == PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
-        popPage();
-    }
+    removePageFromStack(PAGE_ID_ASYNC_OPERATION_IN_PROGRESS);
 }
 
 uint32_t PsuAppContext::getAsyncInProgressStartTime() {

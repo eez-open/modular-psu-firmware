@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include <assert.h>
+#include <memory.h>
 
 #include <eez/index.h>
 #include <eez/sound.h>
@@ -192,6 +193,30 @@ void AppContext::popPage() {
         --m_pageNavigationStackPointer;
 
         doShowPage(m_pageNavigationStack[m_pageNavigationStackPointer].pageId, m_pageNavigationStack[m_pageNavigationStackPointer].page, previousPageId);
+    }
+}
+
+void AppContext::removePageFromStack(int pageId) {
+    for (int i = m_pageNavigationStackPointer; i > 0; i--) {
+        if (m_pageNavigationStack[i].pageId == pageId) {
+            if (i == m_pageNavigationStackPointer) {
+                popPage();
+            } else {
+                if (m_pageNavigationStack[i].page) {
+                    m_pageNavigationStack[i].page->pageFree();
+                }
+
+                for (int j = i + 1; j <= m_pageNavigationStackPointer; j++) {
+                    memcpy(m_pageNavigationStack + j - 1, m_pageNavigationStack + j, sizeof(PageOnStack));
+                }
+
+                m_pageNavigationStack[m_pageNavigationStackPointer].page = nullptr;
+
+                --m_pageNavigationStackPointer;
+            }
+            refreshScreen();
+            break;
+        }
     }
 }
 

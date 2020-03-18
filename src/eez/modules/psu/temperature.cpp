@@ -264,6 +264,8 @@ void TempSensorTemperature::protection_enter(TempSensorTemperature &sensor) {
                     sensor.protection_enter();
                 }
             }
+        } else {
+            sensor.protection_enter();
         }
     } else {
         sensor.protection_enter();
@@ -278,13 +280,15 @@ void TempSensorTemperature::protection_enter() {
     Channel *channel = temp_sensor::sensors[sensorIndex].getChannel();
     if (channel) {
         channel_dispatcher::outputEnable(*channel, false);
+
+        event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_OTP_TRIPPED + channel->channelIndex);
     } else {
         channel_dispatcher::disableOutputForAllChannels();
+
+        event_queue::pushEvent(event_queue::EVENT_ERROR_AUX_OTP_TRIPPED);
     }
 
     set_otp_reg(true);
-
-    event_queue::pushEvent(event_queue::EVENT_ERROR_AUX_OTP_TRIPPED + sensorIndex);
 }
 
 } // namespace temperature

@@ -99,7 +99,12 @@ int main(int argc, char **argv) {
 		/* Clear reset flags */
 		RCC->CSR |= RCC_CSR_RMVF;
 	}
-	MX_IWDG_Init();
+
+	volatile unsigned int* const SCB_DHCSR = (volatile unsigned int *)0xE000EDF0;
+	bool debugger = *SCB_DHCSR & 1;
+	if (!debugger) {
+		MX_IWDG_Init();
+	}
 
     HAL_Init();
     SystemClock_Config();

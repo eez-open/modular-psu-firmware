@@ -60,6 +60,7 @@ public:
     void doPushPage();
     
     void popPage();
+    void removePageFromStack(int pageId);
 
     int getActivePageId();
     Page *getActivePage();
