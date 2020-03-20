@@ -1309,6 +1309,7 @@ static scpi_choice_def_t functionChoice[] = { { "NONE", io_pins::FUNCTION_NONE }
                                               { "ONCouple", io_pins::FUNCTION_ON_COUPLE },
                                               { "TINPut", io_pins::FUNCTION_TINPUT },
                                               { "TOUTput", io_pins::FUNCTION_TOUTPUT },
+                                              { "PWM", io_pins::FUNCTION_PWM },
                                               SCPI_CHOICE_LIST_END };
 
 scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
@@ -1335,7 +1336,7 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
     } else {
         if (function != io_pins::FUNCTION_NONE && function != io_pins::FUNCTION_OUTPUT &&
             function != io_pins::FUNCTION_FAULT && function != io_pins::FUNCTION_ON_COUPLE &&
-            function != io_pins::FUNCTION_TOUTPUT) {
+            function != io_pins::FUNCTION_TOUTPUT && !(pin == DOUT2 && function == io_pins::FUNCTION_PWM)) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
         }
@@ -1396,6 +1397,160 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarityQ(scpi_t *context) {
     pin--;
 
     resultChoiceName(context, polarityChoice, persist_conf::devConf.ioPins[pin].polarity);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemDigitalOutputPwmFrequency(scpi_t *context) {
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin != 4) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    pin--;
+
+    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_PWM) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
+        return SCPI_RES_ERR;
+    }
+
+    float frequency;
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (param.special) {
+        if (param.content.tag == SCPI_NUM_MIN) {
+            frequency = io_pins::PWM_MIN_FREQUENCY;
+        } else if (param.content.tag == SCPI_NUM_MAX) {
+            frequency = io_pins::PWM_MAX_FREQUENCY;
+        } else if (param.content.tag == SCPI_NUM_DEF) {
+            frequency = io_pins::PWM_DEFAULT_FREQUENCY;
+        } else {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
+    } else {
+        if (param.unit != SCPI_UNIT_NONE && param.unit != SCPI_UNIT_HERTZ) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+
+        frequency = (float)param.content.value;
+    }
+    
+    if (frequency != 0 && (frequency < io_pins::PWM_MIN_FREQUENCY || frequency > io_pins::PWM_MAX_FREQUENCY)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    io_pins::setPwmFrequency(pin, frequency);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemDigitalOutputPwmFrequencyQ(scpi_t *context) {
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin != 4) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    pin--;
+
+    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_PWM) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, io_pins::getPwmFrequency(pin));
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemDigitalOutputPwmDuty(scpi_t *context) {
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin != 4) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    pin--;
+
+    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_PWM) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
+        return SCPI_RES_ERR;
+    }
+
+    float duty;
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (param.special) {
+        if (param.content.tag == SCPI_NUM_MIN) {
+            duty = io_pins::PWM_MIN_DUTY;
+        } else if (param.content.tag == SCPI_NUM_MAX) {
+            duty = io_pins::PWM_MAX_DUTY;
+        } else if (param.content.tag == SCPI_NUM_DEF) {
+            duty = io_pins::PWM_DEFAULT_DUTY;
+        } else {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
+    } else {
+        if (param.unit != SCPI_UNIT_NONE) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+
+        duty = (float)param.content.value;
+    }
+
+    if (duty < io_pins::PWM_MIN_DUTY || duty > io_pins::PWM_MAX_DUTY) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    io_pins::setPwmDuty(pin, duty);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemDigitalOutputPwmDutyQ(scpi_t *context) {
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin != 4) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    pin--;
+
+    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_PWM) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, io_pins::getPwmDuty(pin));
 
     return SCPI_RES_OK;
 }

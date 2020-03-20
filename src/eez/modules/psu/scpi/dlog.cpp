@@ -267,6 +267,7 @@ scpi_choice_def_t unitChoice[] = {
     { "SECOnd", UNIT_SECOND },
     { "OHM", UNIT_OHM },
     { "FARAD", UNIT_FARAD },
+    { "HERTZ", UNIT_HERTZ },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 

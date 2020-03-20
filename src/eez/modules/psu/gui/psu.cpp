@@ -1657,8 +1657,12 @@ void onEncoder(int counter, bool clicked) {
                 } else {
                     step = psu::gui::edit_mode_step::getCurrentEncoderStepValue().getFloat();
                 }
-                newValue = clamp(value.getFloat() + counter * step, min, max);
-
+                newValue = roundPrec(value.getFloat() + counter * step, step);
+                if (data::getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
+                    newValue = 0;
+                } else {
+                    newValue = clamp(newValue, min, max);
+                }
             } else {
                 newValue = encoderIncrement(value, counter, min, max, g_focusCursor.i, 0);
             }

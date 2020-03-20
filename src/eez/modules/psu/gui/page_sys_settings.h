@@ -306,6 +306,12 @@ class SysSettingsIOPinsPage : public SetPage {
     void togglePolarity();
     void selectFunction();
 
+    void setPwmFrequency(int pin, float frequency);
+    float getPwmFrequency(int pin);
+
+    void setPwmDuty(int pin, float duty);
+    float getPwmDuty(int pin);
+
     int getDirty();
     void set();
 
@@ -317,6 +323,12 @@ class SysSettingsIOPinsPage : public SetPage {
 
     io_pins::Polarity m_polarityOrig[NUM_IO_PINS];
     io_pins::Function m_functionOrig[NUM_IO_PINS];
+
+    float g_pwmFrequencyOrig[NUM_IO_PINS - DOUT1];
+    float g_pwmFrequency[NUM_IO_PINS - DOUT1];
+
+    float g_pwmDutyOrig[NUM_IO_PINS - DOUT1];
+    float g_pwmDuty[NUM_IO_PINS - DOUT1];
 
     static void onFunctionSet(uint16_t value);
 };

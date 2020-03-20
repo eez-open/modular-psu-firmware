@@ -99,6 +99,7 @@ const EnumItem *g_enumDefinitions[] = {
     g_ioPinsPolarityEnumDefinition,
     g_ioPinsInputFunctionEnumDefinition,
     g_ioPinsOutputFunctionEnumDefinition,
+    g_ioPinsOutput2FunctionEnumDefinition,
     g_dstRuleEnumDefinition,
     g_dateTimeFormatEnumDefinition,
     g_userSwitchActionEnumDefinition,
@@ -180,6 +181,16 @@ EnumItem g_ioPinsOutputFunctionEnumDefinition[] = {
     { io_pins::FUNCTION_FAULT, "Fault" },
     { io_pins::FUNCTION_ON_COUPLE, "Channel ON couple", "ONcoup" },
     { io_pins::FUNCTION_TOUTPUT, "Trigger output", "Toutput" },
+    { 0, 0 }
+};
+
+EnumItem g_ioPinsOutput2FunctionEnumDefinition[] = {
+    { io_pins::FUNCTION_NONE, "None" },
+    { io_pins::FUNCTION_OUTPUT, "Output" },
+    { io_pins::FUNCTION_FAULT, "Fault" },
+    { io_pins::FUNCTION_ON_COUPLE, "Channel ON couple", "ONcoup" },
+    { io_pins::FUNCTION_TOUTPUT, "Trigger output", "Toutput" },
+    { io_pins::FUNCTION_PWM, "PWM" },
     { 0, 0 }
 };
 
@@ -2053,6 +2064,10 @@ void data_keypad_unit_enabled(data::DataOperationEnum operation, data::Cursor &c
                     keypad->m_options.editValueUnit == UNIT_OHM ||
                     keypad->m_options.editValueUnit == UNIT_KOHM ||
                     keypad->m_options.editValueUnit == UNIT_MOHM ||
+                    keypad->m_options.editValueUnit == UNIT_HERTZ ||
+                    keypad->m_options.editValueUnit == UNIT_MILLI_HERTZ ||
+                    keypad->m_options.editValueUnit == UNIT_KHERTZ ||
+                    keypad->m_options.editValueUnit == UNIT_MHERTZ ||
                     keypad->m_options.editValueUnit == UNIT_FARAD ||
                     keypad->m_options.editValueUnit == UNIT_MILLI_FARAD ||
                     keypad->m_options.editValueUnit == UNIT_MICRO_FARAD ||
@@ -2766,9 +2781,9 @@ void data_channel_protection_otp_level(data::DataOperationEnum operation, data::
             }
         }
     } else if (operation == data::DATA_OPERATION_GET_MIN) {
-        value = MakeValue(OTP_AUX_MIN_LEVEL, UNIT_SECOND);
+        value = MakeValue(OTP_AUX_MIN_LEVEL, UNIT_CELSIUS);
     } else if (operation == data::DATA_OPERATION_GET_MAX) {
-        value = MakeValue(OTP_AUX_MAX_LEVEL, UNIT_SECOND);
+        value = MakeValue(OTP_AUX_MAX_LEVEL, UNIT_CELSIUS);
     } else if (operation == data::DATA_OPERATION_SET) {
         channel_dispatcher::setOtpParameters(channel, temperature::getChannelSensorState(&channel) ? 1 : 0, value.getFloat(), temperature::getChannelSensorDelay(&channel));
     } else if (operation == data::DATA_OPERATION_GET_NAME) {
@@ -4358,8 +4373,23 @@ void data_io_pin_function(data::DataOperationEnum operation, data::Cursor &curso
     if (operation == data::DATA_OPERATION_GET) {
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page) {
-            if (cursor.i < 2) {
+            if (page->m_function[cursor.i] == io_pins::FUNCTION_PWM) {
+                value = 0;
+            } else {
+                value = 1;
+            }
+        }
+    }
+}
+
+void data_io_pin_function_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+        if (page) {
+            if (cursor.i < DOUT1) {
                 value = MakeEnumDefinitionValue(page->m_function[cursor.i], ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION);
+            } else if (cursor.i == DOUT2) {
+                value = MakeEnumDefinitionValue(page->m_function[cursor.i], ENUM_DEFINITION_IO_PINS_OUTPUT2_FUNCTION);
             } else {
                 value = MakeEnumDefinitionValue(page->m_function[cursor.i], ENUM_DEFINITION_IO_PINS_OUTPUT_FUNCTION);
             }
@@ -4392,6 +4422,109 @@ void data_io_pin_state(data::DataOperationEnum operation, data::Cursor &cursor, 
                 }
             }
         }
+    }
+}
+
+void data_io_pin_pwm_frequency(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_IO_PIN_PWM_FREQUENCY;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
+            data_keypad_text(operation, cursor, value);
+        } else {
+            SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+            if (page && page->getDirty()) {
+                value = MakeValue(page->getPwmFrequency(cursor.i), UNIT_HERTZ);
+            } else {
+                value = MakeValue(io_pins::getPwmFrequency(cursor.i), UNIT_HERTZ);
+            }
+        }
+    } else if (operation == data::DATA_OPERATION_GET_ALLOW_ZERO) {
+        value = 1;
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = MakeValue(io_pins::PWM_MIN_FREQUENCY, UNIT_HERTZ);
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = MakeValue(io_pins::PWM_MAX_FREQUENCY, UNIT_HERTZ);
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "PWM frequency";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_HERTZ;
+    } else if (operation == data::DATA_OPERATION_SET) {
+        SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+        if (page && page->getDirty()) {
+            page->setPwmFrequency(cursor.i, value.getFloat());
+        } else {
+            io_pins::setPwmFrequency(cursor.i, value.getFloat());
+        }
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
+        float fvalue;
+
+        SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+        if (page && page->getDirty()) {
+            fvalue = page->getPwmFrequency(cursor.i);
+        } else {
+            fvalue = io_pins::getPwmFrequency(cursor.i);
+        }
+
+        value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        static const int COUNT = 4;
+        static data::Value values[COUNT];
+        values[0] = Value(10000.0f, UNIT_HERTZ);
+        values[1] = Value(1000.0f, UNIT_HERTZ);
+        values[2] = Value(100.0f, UNIT_HERTZ);
+        values[3] = Value(1.0f, UNIT_HERTZ);
+        data::StepValues *stepValues = (data::StepValues *)value.getVoidPointer();
+        stepValues->count = COUNT;
+        stepValues->values = values;
+        value = 1;
+    }
+}
+
+void data_io_pin_pwm_duty(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_IO_PIN_PWM_DUTY;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
+            data_keypad_text(operation, cursor, value);
+        } else {
+            SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+            if (page && page->getDirty()) {
+                value = MakeValue(page->getPwmDuty(cursor.i), UNIT_PERCENT);
+            } else {
+                value = MakeValue(io_pins::getPwmDuty(cursor.i), UNIT_PERCENT);
+            }
+        }
+    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+        value = MakeValue(io_pins::PWM_MIN_DUTY, UNIT_PERCENT);
+    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+        value = MakeValue(io_pins::PWM_MAX_DUTY, UNIT_PERCENT);
+    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+        value = "PWM duty cycle";
+    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+        value = UNIT_PERCENT;
+    } else if (operation == data::DATA_OPERATION_SET) {
+        SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+        if (page && page->getDirty()) {
+            page->setPwmDuty(cursor.i, value.getFloat());
+        } else {
+            io_pins::setPwmDuty(cursor.i, value.getFloat());
+        }
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
+        value = Value(1.0f, UNIT_HERTZ);
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        static const int COUNT = 4;
+        static data::Value values[COUNT];
+        values[0] = Value(5.0f, UNIT_PERCENT);
+        values[1] = Value(1.0f, UNIT_PERCENT);
+        values[2] = Value(0.5f, UNIT_PERCENT);
+        values[3] = Value(0.1f, UNIT_PERCENT);
+        data::StepValues *stepValues = (data::StepValues *)value.getVoidPointer();
+        stepValues->count = COUNT;
+        stepValues->values = values;
+        value = 1;
     }
 }
 

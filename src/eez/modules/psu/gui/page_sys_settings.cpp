@@ -823,6 +823,11 @@ void SysSettingsIOPinsPage::pageAlloc() {
     for (int i = 0; i < NUM_IO_PINS; i++) {
         m_polarityOrig[i] = m_polarity[i] = (io_pins::Polarity)persist_conf::devConf.ioPins[i].polarity;
         m_functionOrig[i] = m_function[i] = (io_pins::Function)persist_conf::devConf.ioPins[i].function;
+        if (i >= DOUT1) {
+            g_pwmFrequencyOrig[i - DOUT1] = g_pwmFrequency[i - DOUT1] = io_pins::getPwmFrequency(i);
+            g_pwmDutyOrig[i - DOUT1] = g_pwmDuty[i - DOUT1] = io_pins::getPwmDuty(i);
+
+        }
     }
 }
 
@@ -839,16 +844,40 @@ void SysSettingsIOPinsPage::onFunctionSet(uint16_t value) {
 
 void SysSettingsIOPinsPage::selectFunction() {
     pinNumber = getFoundWidgetAtDown().cursor.i;
-    pushSelectFromEnumPage(
-        pinNumber < 2 ? g_ioPinsInputFunctionEnumDefinition : g_ioPinsOutputFunctionEnumDefinition,
-        m_function[pinNumber], 0, onFunctionSet
-    );
+    if (pinNumber < DOUT1) {
+        pushSelectFromEnumPage(g_ioPinsInputFunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
+    } else if (pinNumber == DOUT2) {
+        pushSelectFromEnumPage( g_ioPinsOutput2FunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
+    } else {
+        pushSelectFromEnumPage( g_ioPinsOutputFunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
+    }
+}
+
+void SysSettingsIOPinsPage::setPwmFrequency(int pin, float frequency) {
+    g_pwmFrequency[pin - DOUT1] = frequency;
+}
+
+float SysSettingsIOPinsPage::getPwmFrequency(int pin) {
+    return g_pwmFrequency[pin - DOUT1];
+}
+
+void SysSettingsIOPinsPage::setPwmDuty(int pin, float duty) {
+    g_pwmDuty[pin - DOUT1] = duty;
+}
+
+float SysSettingsIOPinsPage::getPwmDuty(int pin) {
+    return g_pwmDuty[pin - DOUT1];
 }
 
 int SysSettingsIOPinsPage::getDirty() {
     for (int i = 0; i < NUM_IO_PINS; ++i) {
         if (m_polarityOrig[i] != m_polarity[i] || m_functionOrig[i] != m_function[i]) {
             return true;
+        }
+        if (i >= DOUT1) {
+            if (g_pwmFrequencyOrig[i - DOUT1] != g_pwmFrequency[i - DOUT1] || g_pwmDutyOrig[i - DOUT1] != g_pwmDuty[i - DOUT1]) {
+                return true;
+            }
         }
     }
     return false;
@@ -859,9 +888,16 @@ void SysSettingsIOPinsPage::set() {
         for (int i = 0; i < NUM_IO_PINS; i++) {
             persist_conf::setIoPinPolarity(i, m_polarity[i]);
             persist_conf::setIoPinFunction(i, m_function[i]);
+            if (i >= DOUT1) {
+                if (g_pwmFrequencyOrig[i - DOUT1] != g_pwmFrequency[i - DOUT1]) {
+                    io_pins::setPwmFrequency(i, g_pwmFrequency[i - DOUT1]);
+                }
+                if (g_pwmDutyOrig[i - DOUT1] != g_pwmDuty[i - DOUT1]) {
+                    io_pins::setPwmDuty(i, g_pwmDuty[i - DOUT1]);
+                }
+            }
         }
-
-        popPage();
+        pageAlloc();
     }
 }
 

@@ -20,6 +20,7 @@ enum EnumDefinition {
     ENUM_DEFINITION_IO_PINS_POLARITY,
     ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION,
     ENUM_DEFINITION_IO_PINS_OUTPUT_FUNCTION,
+    ENUM_DEFINITION_IO_PINS_OUTPUT2_FUNCTION,
     ENUM_DEFINITION_DST_RULE,
     ENUM_DEFINITION_DATE_TIME_FORMAT_RULE,
     ENUM_DEFINITION_USER_SWITCH_ACTION,
@@ -38,6 +39,7 @@ extern EnumItem g_channelTriggerOnListStopEnumDefinition[];
 extern EnumItem g_ioPinsPolarityEnumDefinition[];
 extern EnumItem g_ioPinsInputFunctionEnumDefinition[];
 extern EnumItem g_ioPinsOutputFunctionEnumDefinition[];
+extern EnumItem g_ioPinsOutput2FunctionEnumDefinition[];
 extern EnumItem g_dstRuleEnumDefinition[];
 extern EnumItem g_dateTimeFormatEnumDefinition[];
 extern EnumItem g_userSwitchActionEnumDefinition[];

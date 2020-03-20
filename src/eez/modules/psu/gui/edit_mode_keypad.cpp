@@ -44,7 +44,7 @@ void onKeypadOk(float value) {
     }
 }
 
-void enter(int channelIndex, const eez::gui::data::Value &editValue, const eez::gui::data::Value &minValue, eez::gui::data::Value &maxValue) {
+void enter(int channelIndex, const eez::gui::data::Value &editValue, bool allowZero, const eez::gui::data::Value &minValue, eez::gui::data::Value &maxValue) {
     g_keypad = &g_theKeypad;
 
     NumericKeypadOptions options;
@@ -53,6 +53,7 @@ void enter(int channelIndex, const eez::gui::data::Value &editValue, const eez::
 
     options.editValueUnit = editValue.getUnit();
 
+    options.allowZero = allowZero;
     options.min = minValue.getFloat();
     options.max = maxValue.getFloat();
     options.def = options.min;

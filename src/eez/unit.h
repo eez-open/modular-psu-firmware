@@ -24,6 +24,7 @@
 namespace eez {
 
 enum Unit {
+    UNIT_NONE,
     UNIT_UNKNOWN,
     UNIT_VOLT,
     UNIT_MILLI_VOLT,
@@ -40,7 +41,10 @@ enum Unit {
     UNIT_KOHM,
     UNIT_MOHM,
     UNIT_PERCENT,
-    UNIT_FREQUENCY,
+    UNIT_HERTZ,
+    UNIT_MILLI_HERTZ,
+    UNIT_KHERTZ,
+    UNIT_MHERTZ,
     UNIT_JOULE,
     UNIT_FARAD,
     UNIT_MILLI_FARAD,

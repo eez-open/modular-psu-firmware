@@ -96,7 +96,7 @@ void enter(int tabIndex, bool setFocus) {
 
     if (g_tabIndex == PAGE_ID_EDIT_MODE_KEYPAD) {
         Cursor cursor(g_focusCursor.i);
-        edit_mode_keypad::enter(isChannelData(cursor, g_focusDataId) ? g_focusCursor.i : -1, g_editValue, g_minValue, g_maxValue);
+        edit_mode_keypad::enter(isChannelData(cursor, g_focusDataId) ? g_focusCursor.i : -1, g_editValue, data::getAllowZero(g_focusCursor, g_focusDataId), g_minValue, g_maxValue);
     } else {
         edit_mode_keypad::exit();
     }
@@ -177,11 +177,10 @@ void getInfoText(char *infoText, int count) {
     if (!dataName) {
         dataName = "Unknown";
     }
-    const char *unitName = getUnitName(getUnit(cursor, g_focusDataId));
 
-    float minValue = data::getMin(cursor, g_focusDataId).getFloat();
-    float maxValue = (g_focusDataId == DATA_ID_CHANNEL_U_EDIT || g_focusDataId == DATA_ID_CHANNEL_I_EDIT) ?
-        data::getLimit(cursor, g_focusDataId).getFloat() : data::getMax(cursor, g_focusDataId).getFloat();
+    Value minValue = data::getMin(cursor, g_focusDataId);
+    Value maxValue = (g_focusDataId == DATA_ID_CHANNEL_U_EDIT || g_focusDataId == DATA_ID_CHANNEL_I_EDIT) ?
+        data::getLimit(cursor, g_focusDataId) : data::getMax(cursor, g_focusDataId);
 
     if (isChannelData(cursor, g_focusDataId)) {
         Channel& channel = Channel::get(g_focusCursor.i);
@@ -197,10 +196,9 @@ void getInfoText(char *infoText, int count) {
     }
 
     strcat(infoText, " [");
-    strcatFloat(infoText, minValue);
-    strcat(infoText, "-");
-    strcatFloat(infoText, maxValue);
-    strcat(infoText, unitName);
+    minValue.toText(infoText + strlen(infoText), count - strlen(infoText));
+    strcat(infoText, " - ");
+    maxValue.toText(infoText + strlen(infoText), count - strlen(infoText));
     strcat(infoText, "]");
 }
 

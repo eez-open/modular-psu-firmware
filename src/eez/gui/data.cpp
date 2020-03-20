@@ -135,7 +135,18 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
                 unit = UNIT_MILLI_FARAD;
                 floatValue *= 1E3f;
             }
-        }
+        } else if (unit == UNIT_HERTZ) {
+            if (fabs(floatValue) >= 1000000) {
+                unit = UNIT_MHERTZ;
+                floatValue *= 1E-6F;
+            } else if (fabs(floatValue) >= 1000) {
+                unit = UNIT_KHERTZ;
+                floatValue *= 1E-3f;
+            } else if (fabs(floatValue) < 1) {
+                unit = UNIT_MILLI_HERTZ;
+                floatValue *= 1E3f;
+            }
+        } 
     }
 
     if (!isNaN(floatValue)) {
@@ -422,7 +433,7 @@ bool Value::isMilli() const {
             if (fabs(floatValue) < 1 && !(fabs(floatValue) < 1E-3f && fabs(floatValue) != 0.0005f)) {
                 return true;
             }
-        } else if (unit == UNIT_VOLT || unit == UNIT_WATT || unit == UNIT_SECOND || unit == UNIT_FARAD) {
+        } else if (unit == UNIT_VOLT || unit == UNIT_WATT || unit == UNIT_SECOND || unit == UNIT_FARAD || unit == UNIT_HERTZ) {
             if (fabs(floatValue) < 1) {
                 return true;
             }
@@ -437,7 +448,7 @@ bool Value::isKilo() const {
     Unit unit = getUnit();
 
     if (floatValue != 0) {
-        if (unit == UNIT_OHM) {
+        if (unit == UNIT_OHM || unit == UNIT_HERTZ) {
             if (fabs(floatValue) >= 1E3f) {
                 return true;
             }
@@ -452,7 +463,7 @@ bool Value::isMega() const {
     Unit unit = getUnit();
 
     if (floatValue != 0) {
-        if (unit == UNIT_OHM) {
+        if (unit == UNIT_OHM || unit == UNIT_HERTZ) {
             if (fabs(floatValue) >= 1E6f) {
                 return true;
             }
@@ -507,6 +518,12 @@ float *getFloatList(int16_t id) {
     Value floatListValue((float *)0);
     DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_FLOAT_LIST, dummyCursor, floatListValue);
     return floatListValue.getFloatList();
+}
+
+bool getAllowZero(const Cursor &cursor, int16_t id) {
+    Value value;
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_GET_ALLOW_ZERO, (Cursor &)cursor, value);
+    return value.getInt() != 0;
 }
 
 Value getMin(const Cursor &cursor, int16_t id) {

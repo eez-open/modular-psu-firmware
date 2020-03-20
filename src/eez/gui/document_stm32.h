@@ -225,7 +225,7 @@ enum DataEnum {
     DATA_ID_IO_PINS_INHIBIT_STATE = 223,
     DATA_ID_IO_PIN_NUMBER = 224,
     DATA_ID_IO_PIN_POLARITY = 225,
-    DATA_ID_IO_PIN_FUNCTION = 226,
+    DATA_ID_IO_PIN_FUNCTION_NAME = 226,
     DATA_ID_NTP_ENABLED = 227,
     DATA_ID_NTP_SERVER = 228,
     DATA_ID_SYS_DISPLAY_BACKGROUND_LUMINOSITY_STEP = 229,
@@ -386,7 +386,10 @@ enum DataEnum {
     DATA_ID_FILE_MANAGER_IMAGE_OPEN_STATE = 384,
     DATA_ID_FILE_MANAGER_IMAGE_OPEN_PROGRESS = 385,
     DATA_ID_ALERT_MESSAGE_IS_SET = 386,
-    DATA_ID_ASYNC_PROGRESS = 387
+    DATA_ID_ASYNC_PROGRESS = 387,
+    DATA_ID_IO_PIN_FUNCTION = 388,
+    DATA_ID_IO_PIN_PWM_FREQUENCY = 389,
+    DATA_ID_IO_PIN_PWM_DUTY = 390
 };
 
 void data_none(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -615,7 +618,7 @@ void data_io_pins(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_io_pins_inhibit_state(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_io_pin_number(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_io_pin_polarity(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_io_pin_function(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_io_pin_function_name(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_ntp_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_ntp_server(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_sys_display_background_luminosity_step(DataOperationEnum operation, Cursor &cursor, Value &value);
@@ -777,6 +780,9 @@ void data_file_manager_image_open_state(DataOperationEnum operation, Cursor &cur
 void data_file_manager_image_open_progress(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_alert_message_is_set(DataOperationEnum operation, Cursor &cursor, Value &value);
 void data_async_progress(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_io_pin_function(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_io_pin_pwm_frequency(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor &cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
 
@@ -1634,7 +1640,7 @@ enum PagesEnum {
 };
 
 #ifdef OPTION_SDRAM
-extern const uint8_t assets[311104];
+extern const uint8_t assets[311272];
 #else
-extern const uint8_t assets[1366468];
+extern const uint8_t assets[1366672];
 #endif

@@ -338,6 +338,7 @@ struct Cursor {
 enum DataOperationEnum {
     DATA_OPERATION_GET,
     DATA_OPERATION_GET_EDIT_VALUE,
+    DATA_OPERATION_GET_ALLOW_ZERO,
     DATA_OPERATION_GET_MIN,
     DATA_OPERATION_GET_MAX,
     DATA_OPERATION_GET_DEF,
@@ -404,6 +405,7 @@ void restoreContext(Cursor &cursor, int16_t id, Value &oldContext);
 int getFloatListLength(int16_t id);
 float *getFloatList(int16_t id);
 
+bool getAllowZero(const Cursor &cursor, int16_t id);
 Value getMin(const Cursor &cursor, int16_t id);
 Value getMax(const Cursor &cursor, int16_t id);
 Value getDef(const Cursor &cursor, int16_t id);

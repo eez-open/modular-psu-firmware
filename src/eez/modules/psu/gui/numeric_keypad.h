@@ -33,6 +33,7 @@ struct NumericKeypadOptions {
 
     Unit editValueUnit;
 
+    bool allowZero;
     float min;
     float max;
     float def;

@@ -41,7 +41,8 @@ enum Function {
     FUNCTION_INHIBIT,
     FUNCTION_ON_COUPLE,
     FUNCTION_TINPUT,
-    FUNCTION_TOUTPUT
+    FUNCTION_TOUTPUT,
+    FUNCTION_PWM
 };
 
 void init();
@@ -54,6 +55,20 @@ bool isInhibited();
 
 void setPinState(int pin, bool state);
 bool getPinState(int pin);
+
+static const float PWM_MIN_FREQUENCY = 0.03f;
+static const float PWM_MAX_FREQUENCY = 5000000.0f;
+static const float PWM_DEFAULT_FREQUENCY = 0.0f;
+
+void setPwmFrequency(int pin, float frequency);
+float getPwmFrequency(int pin);
+
+static const float PWM_MIN_DUTY = 0.0f;
+static const float PWM_MAX_DUTY = 100.0f;
+static const float PWM_DEFAULT_DUTY = 50.0f;
+
+void setPwmDuty(int pin, float duty);
+float getPwmDuty(int pin);
 
 int ioPinRead(int pin);
 void ioPinWrite(int pin, int state);

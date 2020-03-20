@@ -21,6 +21,7 @@
 #if defined EEZ_PLATFORM_STM32
 #include <main.h>
 #include <gpio.h>
+#include <tim.h>
 #endif
 
 #include <eez/modules/psu/psu.h>
@@ -52,6 +53,12 @@ static struct {
 static uint32_t g_toutputPulseStartTickCount;
 
 static bool g_pinState[NUM_IO_PINS] = { false, false, false, false };
+
+static float g_pwmFrequency[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_FREQUENCY, PWM_DEFAULT_FREQUENCY };
+static float g_pwmDuty[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_DUTY, PWM_DEFAULT_DUTY };
+static uint32_t g_pwmPeriodInt[NUM_IO_PINS - DOUT1];
+static bool m_gPwmStarted;
+static float g_pwmStartedFrequency;
 
 #if defined EEZ_PLATFORM_STM32
 
@@ -146,26 +153,127 @@ void initInputPin(int pin) {
 #endif
 }
 
-void initOutputPins() {
+uint32_t calcPwmDutyInt(float duty, uint32_t periodInt) {
+    return MIN((uint32_t)round((duty / 100.0f) * (periodInt + 1)), 65535);
+}
+
+void updatePwmDuty(int pin) {
+    float duty = g_pwmDuty[pin - DOUT1];
+    uint32_t periodInt = g_pwmPeriodInt[pin - DOUT1];
+    uint32_t dutyInt = calcPwmDutyInt(duty, periodInt);
 #if defined EEZ_PLATFORM_STM32
-	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-
-    // Configure DOUT1 GPIO pin
-    if (!bp3c::flash_slave::g_bootloaderMode) {
-        GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-        HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
-        HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin, GPIO_PIN_RESET);
-    }
-
-    // DOUT2 is already initialized
+    /* Set the Capture Compare Register value */
+    TIM3->CCR2 = dutyInt;
 #endif
 }
 
+void calcPwmPrescalerAndPeriod(float frequency, uint32_t &prescalerInt, uint32_t &periodInt) {
+    if (frequency > 0) {
+        double clockFrequency = 216000000.0;
+        double prescaler = frequency < 2000.0 ? 108 : 0;
+        double period = (clockFrequency / 2) / ((prescaler + 1) * frequency) - 1;
+        if (period > 65535.0) {
+            period = 65535.0;
+            prescaler = (clockFrequency / 2) / (frequency * (period + 1)) - 1;
+            if (prescaler > 65535.0) {
+                prescaler = 65535.0;
+            }
+        }
+
+        prescalerInt = MIN((uint32_t)round(prescaler), 65535);
+        periodInt = MIN((uint32_t)round(period), 65535);
+    } else {
+        prescalerInt = 0;
+        periodInt = 0;
+    }
+}
+
+void pwmStop(int pin) {
+    if (m_gPwmStarted) {    
+#if defined EEZ_PLATFORM_STM32
+        HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_2);
+        HAL_TIM_PWM_DeInit(&htim3);
+#endif
+        m_gPwmStarted = false;
+    }
+
+#if defined EEZ_PLATFORM_STM32
+    // Configure DOUT2 GPIO pin
+    GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+    GPIO_InitStruct.Pin = DOUT2_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
+#endif
+
+    ioPinWrite(pin, 0);
+}
+
+void updatePwmFrequency(int pin) {
+	float frequency = g_pwmFrequency[pin - DOUT1];
+    uint32_t prescalerInt;
+    uint32_t periodInt;
+    calcPwmPrescalerAndPeriod(frequency, prescalerInt, periodInt);
+
+    g_pwmPeriodInt[pin - DOUT1] = periodInt; 
+
+#if defined EEZ_PLATFORM_STM32
+    if (!m_gPwmStarted) {
+        MX_TIM3_Init();
+    }
+
+    /* Set the Prescaler value */
+    TIM3->PSC = prescalerInt;
+
+    /* Set the Autoreload value */
+    TIM3->ARR = periodInt;
+
+    updatePwmDuty(pin);
+
+    if (frequency > 0) {
+        if (!m_gPwmStarted) {
+            HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+            m_gPwmStarted = true;
+        } else {
+    		if (g_pwmStartedFrequency < 1 && frequency > 2 * g_pwmStartedFrequency) {
+    			// forces an update event
+            	TIM3->EGR |= TIM_EGR_UG;
+    		}
+        }
+
+        g_pwmStartedFrequency = frequency;
+    } else {
+        pwmStop(pin);
+    }
+#endif
+}
+
+void initOutputPin(int pin) {
+    if (pin == DOUT1) {
+#if defined EEZ_PLATFORM_STM32
+        if (!bp3c::flash_slave::g_bootloaderMode) {
+            // Configure DOUT1 GPIO pin
+	        GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+            GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
+            GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+            GPIO_InitStruct.Pull = GPIO_NOPULL;
+            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+            HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
+            HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin, GPIO_PIN_RESET);
+        }
+#endif
+    } else if (pin == DOUT2) {
+        const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
+        if (ioPin.function == io_pins::FUNCTION_PWM) {
+            updatePwmFrequency(pin);
+        } else {
+            pwmStop(pin);
+        }
+    }
+}
+
 void init() {
-    initOutputPins();
     refresh(); // this will initialize input pins
 }
 
@@ -278,6 +386,8 @@ void refresh() {
         if (pin < 2) {
         	initInputPin(pin);
         } else {
+            initOutputPin(pin);
+
             const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
             if (ioPin.function == io_pins::FUNCTION_NONE) {
                 setPinState(pin, false);
@@ -334,6 +444,38 @@ bool getPinState(int pin) {
     }
 
     return g_pinState[pin];
+}
+
+void setPwmFrequency(int pin, float frequency) {
+    if (pin >= DOUT1) {
+        if (g_pwmFrequency[pin - DOUT1] != frequency) {
+            g_pwmFrequency[pin - DOUT1] = frequency;
+            updatePwmFrequency(pin);
+        }
+    }
+}
+
+float getPwmFrequency(int pin) {
+    if (pin >= DOUT1) {
+        return g_pwmFrequency[pin - DOUT1];
+    }
+    return 0;
+}
+
+void setPwmDuty(int pin, float duty) {
+    if (pin >= DOUT1) {
+        if (g_pwmDuty[pin - DOUT1] != duty) {
+            g_pwmDuty[pin - DOUT1] = duty;
+            updatePwmDuty(pin);
+        }
+    }
+}
+
+float getPwmDuty(int pin) {
+    if (pin >= DOUT1) {
+        return g_pwmDuty[pin - DOUT1];
+    }
+    return 0;
 }
 
 } // namespace io_pins

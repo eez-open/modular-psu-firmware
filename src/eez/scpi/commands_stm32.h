@@ -299,6 +299,10 @@
     SCPI_COMMAND("SYSTem:DIGital:PIN#:FUNCtion?", scpi_cmd_systemDigitalPinFunctionQ) \
     SCPI_COMMAND("SYSTem:DIGital:PIN#:POLarity", scpi_cmd_systemDigitalPinPolarity) \
     SCPI_COMMAND("SYSTem:DIGital:PIN#:POLarity?", scpi_cmd_systemDigitalPinPolarityQ) \
+    SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:FREQuency", scpi_cmd_systemDigitalOutputPwmFrequency) \
+    SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:FREQuency?", scpi_cmd_systemDigitalOutputPwmFrequencyQ) \
+    SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:DUTY", scpi_cmd_systemDigitalOutputPwmDuty) \
+    SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:DUTY?", scpi_cmd_systemDigitalOutputPwmDutyQ) \
     SCPI_COMMAND("SYSTem:ERRor:COUNt?", scpi_cmd_systemErrorCountQ) \
     SCPI_COMMAND("SYSTem:ERRor[:NEXT]?", scpi_cmd_systemErrorNextQ) \
     SCPI_COMMAND("SYSTem:INHibit?", scpi_cmd_systemInhibitQ) \

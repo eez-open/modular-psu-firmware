@@ -1,4 +1,4 @@
-/*
+    /*
 * EEZ Generic Firmware
 * Copyright (C) 2018-present, Envox d.o.o.
 *
@@ -23,6 +23,7 @@
 namespace eez {
 
 const char *g_unitNames[] = {
+    nullptr,
     "",
     "V",
     "mV",
@@ -40,6 +41,9 @@ const char *g_unitNames[] = {
     "M\xb4",
     "%",
     "Hz",
+    "mHz",
+    "KHz",
+    "MHz",
     "J",
     "F",
     "mF",
@@ -49,6 +53,7 @@ const char *g_unitNames[] = {
 };
 
 static const int g_scpiUnits[] = {
+    SCPI_UNIT_NONE,
     SCPI_UNIT_NONE,
     SCPI_UNIT_VOLT,
     SCPI_UNIT_VOLT,
@@ -65,6 +70,9 @@ static const int g_scpiUnits[] = {
     SCPI_UNIT_OHM,
     SCPI_UNIT_OHM,
     SCPI_UNIT_NONE,
+    SCPI_UNIT_HERTZ,
+    SCPI_UNIT_HERTZ,
+    SCPI_UNIT_HERTZ,
     SCPI_UNIT_HERTZ,
     SCPI_UNIT_JOULE,
     SCPI_UNIT_FARAD,

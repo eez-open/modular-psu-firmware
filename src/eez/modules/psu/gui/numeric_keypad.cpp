@@ -58,6 +58,7 @@ NumericKeypadOptions::NumericKeypadOptions() {
 
     this->channelIndex = -1;
 
+    allowZero = false;
     min = NAN;
     max = NAN;
 
@@ -218,6 +219,14 @@ Unit NumericKeypad::getValueUnit() {
         return UNIT_MOHM;
     if (m_options.editValueUnit == UNIT_MOHM)
         return UNIT_OHM;
+    if (m_options.editValueUnit == UNIT_HERTZ)
+        return UNIT_KHERTZ;
+    if (m_options.editValueUnit == UNIT_KHERTZ)
+        return UNIT_MHERTZ;
+    if (m_options.editValueUnit == UNIT_MHERTZ)
+        return UNIT_MILLI_HERTZ;
+    if (m_options.editValueUnit == UNIT_MILLI_HERTZ)
+        return UNIT_HERTZ;
     if (m_options.editValueUnit == UNIT_FARAD)
         return UNIT_MILLI_FARAD;
     if (m_options.editValueUnit == UNIT_MILLI_FARAD)
@@ -248,15 +257,16 @@ bool NumericKeypad::isMilli() {
            m_options.editValueUnit == UNIT_MILLI_AMPER ||
            m_options.editValueUnit == UNIT_MILLI_WATT ||
            m_options.editValueUnit == UNIT_MILLI_SECOND ||
-           m_options.editValueUnit == UNIT_MILLI_FARAD;
+           m_options.editValueUnit == UNIT_MILLI_FARAD ||
+           m_options.editValueUnit == UNIT_MILLI_HERTZ;
 }
 
 bool NumericKeypad::isKilo() {
-    return m_options.editValueUnit == UNIT_KOHM;
+    return m_options.editValueUnit == UNIT_KOHM || m_options.editValueUnit == UNIT_KHERTZ;
 }
 
 bool NumericKeypad::isMega() {
-    return m_options.editValueUnit == UNIT_MOHM;
+    return m_options.editValueUnit == UNIT_MOHM || m_options.editValueUnit == UNIT_MHERTZ;
 }
 
 Unit NumericKeypad::getPicoUnit() {
@@ -290,18 +300,24 @@ Unit NumericKeypad::getMilliUnit() {
         return UNIT_MILLI_SECOND;
     if (m_options.editValueUnit == UNIT_FARAD || m_options.editValueUnit == UNIT_MILLI_FARAD || m_options.editValueUnit == UNIT_MICRO_FARAD || m_options.editValueUnit == UNIT_NANO_FARAD || m_options.editValueUnit == UNIT_PICO_FARAD)
         return UNIT_MILLI_FARAD;
+    if (m_options.editValueUnit == UNIT_HERTZ || m_options.editValueUnit == UNIT_MILLI_HERTZ || m_options.editValueUnit == UNIT_KHERTZ || m_options.editValueUnit == UNIT_MHERTZ)
+        return UNIT_MILLI_HERTZ;
     return m_options.editValueUnit;
 }
 
 Unit NumericKeypad::getKiloUnit() {
     if (m_options.editValueUnit == UNIT_OHM || m_options.editValueUnit == UNIT_KOHM || m_options.editValueUnit == UNIT_MOHM)
         return UNIT_KOHM;
+    if (m_options.editValueUnit == UNIT_HERTZ || m_options.editValueUnit == UNIT_MILLI_HERTZ || m_options.editValueUnit == UNIT_KHERTZ || m_options.editValueUnit == UNIT_MHERTZ)
+        return UNIT_KHERTZ;
     return m_options.editValueUnit;
 }
 
 Unit NumericKeypad::getMegaUnit() {
     if (m_options.editValueUnit == UNIT_OHM || m_options.editValueUnit == UNIT_KOHM || m_options.editValueUnit == UNIT_MOHM)
         return UNIT_MOHM;
+    if (m_options.editValueUnit == UNIT_HERTZ || m_options.editValueUnit == UNIT_MILLI_HERTZ || m_options.editValueUnit == UNIT_KHERTZ || m_options.editValueUnit == UNIT_MHERTZ)
+        return UNIT_MHERTZ;
     return m_options.editValueUnit;
 }
 
@@ -364,6 +380,14 @@ Unit NumericKeypad::getSwitchToUnit() {
         return UNIT_MOHM;
     if (m_options.editValueUnit == UNIT_MOHM)
         return UNIT_OHM;
+    if (m_options.editValueUnit == UNIT_HERTZ)
+        return UNIT_KHERTZ;
+    if (m_options.editValueUnit == UNIT_KHERTZ)
+        return UNIT_MHERTZ;
+    if (m_options.editValueUnit == UNIT_MHERTZ)
+        return UNIT_MILLI_HERTZ;
+    if (m_options.editValueUnit == UNIT_MILLI_HERTZ)
+        return UNIT_HERTZ;
     if (m_options.editValueUnit == UNIT_FARAD)
         return UNIT_MILLI_FARAD;
     if (m_options.editValueUnit == UNIT_MILLI_FARAD)
@@ -449,7 +473,7 @@ bool NumericKeypad::isValueValid() {
 
     float value = getValue();
 
-    if (value < m_options.min || value > m_options.max) {
+    if ((value < m_options.min || value > m_options.max) && !(value == 0 && m_options.allowZero)) {
         return false;
     }
 
@@ -658,8 +682,7 @@ void NumericKeypad::ok() {
             return;
         } else {
             float value = getValue();
-
-            if (!isNaN(m_options.min) && value < m_options.min) {
+            if (!isNaN(m_options.min) && value < m_options.min && !(value == 0 && m_options.allowZero)) {
                 psuErrorMessage(0, MakeLessThenMinMessageValue(m_options.min, m_startValue));
             } else if (!isNaN(m_options.max) && value > m_options.max) {
                 psuErrorMessage(0, MakeGreaterThenMaxMessageValue(m_options.max, m_startValue));
