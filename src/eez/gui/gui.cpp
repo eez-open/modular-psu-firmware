@@ -61,6 +61,7 @@ osMessageQId g_guiMessageQueueId;
 void startThread() {
     decompressAssets();
     mcu::display::onThemeChanged();
+    touch::init();
     g_guiMessageQueueId = osMessageCreate(osMessageQ(g_guiMessageQueue), NULL);
     g_guiTaskHandle = osThreadCreate(osThread(g_guiTask), nullptr);
 }
