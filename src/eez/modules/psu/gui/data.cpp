@@ -80,7 +80,6 @@ extern bool g_isResetByIWDG;
 #endif
 
 namespace eez {
-
 namespace gui {
 namespace data {
 
@@ -371,6 +370,8 @@ void printTime(uint32_t time, char *text, int count) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+namespace data {
 
 bool compare_LESS_THEN_MIN_FLOAT_value(const Value &a, const Value &b) {
     return a.getUnit() == b.getUnit() && a.getFloat() == b.getFloat();
@@ -940,131 +941,8 @@ void CHANNEL_INFO_SERIAL_value_to_text(const Value &value, char *text, int count
     channel.getSerial(text);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-} // namespace gui
-} // namespace eez
-
-namespace eez {
-namespace gui {
-namespace data {
-
-CompareValueFunction g_compareUserValueFunctions[] = {
-    compare_LESS_THEN_MIN_FLOAT_value,
-    compare_GREATER_THEN_MAX_FLOAT_value,
-    compare_CHANNEL_LABEL_value,
-    compare_CHANNEL_SHORT_LABEL_value,
-    compare_CHANNEL_SHORT_LABEL_WITHOUT_COLUMN_value,
-    compare_CHANNEL_BOARD_INFO_LABEL_value,
-    compare_LESS_THEN_MIN_INT_value,
-    compare_LESS_THEN_MIN_TIME_ZONE_value,
-    compare_GREATER_THEN_MAX_INT_value,
-    compare_GREATER_THEN_MAX_TIME_ZONE_value,
-    compare_EVENT_value,
-    compare_EVENT_MESSAGE_value,
-    compare_ON_TIME_COUNTER_value,
-    compare_COUNTDOWN_value,
-    compare_TIME_ZONE_value,
-    compare_DATE_DMY_value,
-    compare_DATE_MDY_value,
-    compare_YEAR_value,
-    compare_MONTH_value,
-    compare_DAY_value,
-    compare_TIME_value,
-    compare_TIME12_value,
-    compare_HOUR_value,
-    compare_MINUTE_value,
-    compare_SECOND_value,
-    compare_USER_PROFILE_LABEL_value,
-    compare_USER_PROFILE_REMARK_value,
-    compare_EDIT_INFO_value,
-    compare_MAC_ADDRESS_value,
-    compare_IP_ADDRESS_value,
-    compare_PORT_value,
-    compare_TEXT_MESSAGE_value,
-    compare_VALUE_LIST_value,
-    compare_FLOAT_LIST_value,
-    compare_CHANNEL_TITLE_value,
-    compare_CHANNEL_SHORT_TITLE_value,
-    compare_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value,
-    compare_CHANNEL_SHORT_TITLE_WITH_COLON_value,
-    compare_CHANNEL_LONG_TITLE_value,
-    compare_DLOG_VALUE_LABEL_value,
-    compare_DLOG_CURRENT_TIME_value,
-    compare_FILE_LENGTH_value,
-    compare_FILE_DATE_TIME_value,
-    compare_FIRMWARE_VERSION_value,
-    compare_SLOT_INFO_value,
-    compare_SLOT_INFO2_value,
-    compare_MASTER_INFO_value,
-    compare_TEST_RESULT_value,
-    compare_SCPI_ERROR_value,
-    compare_STORAGE_INFO_value,
-    compare_FOLDER_INFO_value,
-    compare_CHANNEL_INFO_SERIAL_value
-};
-
-ValueToTextFunction g_userValueToTextFunctions[] = { 
-    LESS_THEN_MIN_FLOAT_value_to_text,
-    GREATER_THEN_MAX_FLOAT_value_to_text,
-    CHANNEL_LABEL_value_to_text,
-    CHANNEL_SHORT_LABEL_value_to_text,
-    CHANNEL_SHORT_LABEL_WITHOUT_COLUMN_value_to_text,
-    CHANNEL_BOARD_INFO_LABEL_value_to_text,
-    LESS_THEN_MIN_INT_value_to_text,
-    LESS_THEN_MIN_TIME_ZONE_value_to_text,
-    GREATER_THEN_MAX_INT_value_to_text,
-    GREATER_THEN_MAX_TIME_ZONE_value_to_text,
-    EVENT_value_to_text,
-    EVENT_MESSAGE_value_to_text,
-    ON_TIME_COUNTER_value_to_text,
-    COUNTDOWN_value_to_text,
-    TIME_ZONE_value_to_text,
-    DATE_DMY_value_to_text,
-    DATE_MDY_value_to_text,
-    YEAR_value_to_text,
-    MONTH_value_to_text,
-    DAY_value_to_text,
-    TIME_value_to_text,
-    TIME12_value_to_text,
-    HOUR_value_to_text,
-    MINUTE_value_to_text,
-    SECOND_value_to_text,
-    USER_PROFILE_LABEL_value_to_text,
-    USER_PROFILE_REMARK_value_to_text,
-    EDIT_INFO_value_to_text,
-    MAC_ADDRESS_value_to_text,
-    IP_ADDRESS_value_to_text,
-    PORT_value_to_text,
-    TEXT_MESSAGE_value_to_text,
-    VALUE_LIST_value_to_text,
-    FLOAT_LIST_value_to_text,
-    CHANNEL_TITLE_value_to_text,
-    CHANNEL_SHORT_TITLE_value_to_text,
-    CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_to_text,
-    CHANNEL_SHORT_TITLE_WITH_COLON_value_to_text,
-    CHANNEL_LONG_TITLE_value_to_text,
-    DLOG_VALUE_LABEL_value_to_text,
-    DLOG_CURRENT_TIME_value_to_text,
-    FILE_LENGTH_value_to_text,
-    FILE_DATE_TIME_value_to_text,
-    FIRMWARE_VERSION_value_to_text,
-    SLOT_INFO_value_to_text,
-    SLOT_INFO2_value_to_text,
-    MASTER_INFO_value_to_text,
-    TEST_RESULT_value_to_text,
-    SCPI_ERROR_value_to_text,
-    STORAGE_INFO_value_to_text,
-    FOLDER_INFO_value_to_text,
-    CHANNEL_INFO_SERIAL_value_to_text
-};
-
 } // namespace data
-} // namespace gui
-} // namespace eez
 
-namespace eez {
-namespace gui {
 
 using namespace eez::psu;
 

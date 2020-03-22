@@ -110,6 +110,7 @@ set(header_eez
     src/eez/system.h
     src/eez/unit.h
     src/eez/util.h
+    src/eez/value_types.h
 )
 list (APPEND header_files ${header_eez})
 source_group("eez" FILES ${src_eez} ${header_eez})

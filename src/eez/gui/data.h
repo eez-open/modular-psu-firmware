@@ -23,27 +23,9 @@
 #include <eez/unit.h>
 #include <eez/gui/event.h>
 
+#include <eez/value_types.h>
+
 namespace eez {
-
-enum BuiltInValueType {
-    VALUE_TYPE_NONE,
-    VALUE_TYPE_INT,
-    VALUE_TYPE_UINT8,
-    VALUE_TYPE_UINT16,
-    VALUE_TYPE_UINT32,
-    VALUE_TYPE_FLOAT,
-    VALUE_TYPE_RANGE,
-    VALUE_TYPE_STR,
-    VALUE_TYPE_PASSWORD,
-    VALUE_TYPE_ENUM,
-    VALUE_TYPE_PERCENTAGE,
-    VALUE_TYPE_SIZE,
-    VALUE_TYPE_POINTER,
-    VALUE_TYPE_TIME_SECONDS,
-    VALUE_TYPE_YT_DATA_GET_VALUE_FUNCTION_POINTER,
-    VALUE_TYPE_USER,
-};
-
 namespace gui {
 
 class AppContext;
@@ -58,7 +40,7 @@ struct EnumItem {
     const char *widgetLabel;
 };
 
-extern const data::EnumItem *g_enumDefinitions[];
+extern const EnumItem *g_enumDefinitions[];
 
 struct EnumValue {
     uint16_t enumValue;
@@ -297,8 +279,8 @@ Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition);
 typedef bool (*CompareValueFunction)(const Value &a, const Value &b);
 typedef void (*ValueToTextFunction)(const Value &value, char *text, int count);
 
-extern CompareValueFunction g_compareUserValueFunctions[];
-extern ValueToTextFunction g_userValueToTextFunctions[];
+extern CompareValueFunction g_valueTypeCompareFunctions[];
+extern ValueToTextFunction g_valueTypeToTextFunctions[];
 
 uint16_t getPageIndexFromValue(const Value &value);
 uint16_t getNumPagesFromValue(const Value &value);

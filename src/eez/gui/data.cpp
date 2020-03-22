@@ -275,41 +275,26 @@ void YT_DATA_GET_VALUE_FUNCTION_POINTER_value_to_text(const Value &value, char *
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static CompareValueFunction g_compareBuiltInValueFunctions[] = {
-    compare_NONE_value,
-    compare_INT_value,
-    compare_UINT8_value,
-    compare_UINT16_value,
-    compare_UINT32_value,
-    compare_FLOAT_value,
-    compare_RANGE_value,
-    compare_STR_value,
-    compare_PASSWORD_value,
-    compare_ENUM_value,
-    compare_PERCENTAGE_value,
-    compare_SIZE_value,
-    compare_POINTER_value,
-    compare_TIME_SECONDS_value,
-    compare_YT_DATA_GET_VALUE_FUNCTION_POINTER_value,
-};
+#define VALUE_TYPE(NAME) bool compare_##NAME##_value(const Value &a, const Value &b);
+VALUE_TYPES
+#undef VALUE_TYPE
 
-static ValueToTextFunction g_builtInValueToTextFunctions[] = {
-    NONE_value_to_text,
-    INT_value_to_text,
-    UINT8_value_to_text,
-    UINT16_value_to_text,
-    UINT32_value_to_text,
-    FLOAT_value_to_text,
-    RANGE_value_to_text,
-    STR_value_to_text,
-    PASSWORD_value_to_text,
-    ENUM_value_to_text,
-    PERCENTAGE_value_to_text,
-    SIZE_value_to_text,
-    POINTER_value_to_text,
-    TIME_SECONDS_value_to_text,
-    YT_DATA_GET_VALUE_FUNCTION_POINTER_value_to_text,
+#define VALUE_TYPE(NAME) compare_##NAME##_value,
+extern CompareValueFunction g_valueTypeCompareFunctions[] = {
+	VALUE_TYPES
 };
+#undef VALUE_TYPE
+
+
+#define VALUE_TYPE(NAME) void NAME##_value_to_text(const Value &value, char *text, int count);
+VALUE_TYPES
+#undef VALUE_TYPE
+
+#define VALUE_TYPE(NAME) NAME##_value_to_text,
+extern ValueToTextFunction g_valueTypeToTextFunctions[] = {
+	VALUE_TYPES
+};
+#undef VALUE_TYPE
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -340,32 +325,14 @@ Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition) {
 
 void Value::toText(char *text, int count) const {
     *text = 0;
-    if (type_ < VALUE_TYPE_USER) {
-        g_builtInValueToTextFunctions[type_](*this, text, count);
-    } else {
-        g_userValueToTextFunctions[type_ - VALUE_TYPE_USER](*this, text, count);
-    }
+    g_valueTypeToTextFunctions[type_](*this, text, count);
 }
 
 bool Value::operator==(const Value &other) const {
-    auto a = this;
-    auto b = this->type_;
-
     if (type_ != other.type_) {
         return false;
     }
-
-    if (type_ < VALUE_TYPE_USER) {
-        auto result = g_compareBuiltInValueFunctions[type_](*this, other);
-
-        if ((void *)&a == (void *)&b) {
-            osDelay(1);
-        }
-
-        return result;
-    } else {
-        return g_compareUserValueFunctions[type_ - VALUE_TYPE_USER](*this, other);
-    }
+    return g_valueTypeCompareFunctions[type_](*this, other);
 }
 
 int Value::getInt() const {
