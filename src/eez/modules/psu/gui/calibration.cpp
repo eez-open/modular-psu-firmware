@@ -153,8 +153,7 @@ void setLevelValue() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad *numericKeypad =
-        NumericKeypad::start(0, levelValue, options, onSetLevelOk, 0, showCurrentStep);
+    NumericKeypad *numericKeypad = NumericKeypad::start(0, levelValue, options, onSetLevelOk, 0, showCurrentStep);
 
     if (levelValue.getFloat() < 1) {
         numericKeypad->switchToMilli();

@@ -32,12 +32,8 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/idle.h>
 
-#define CONF_GUI_TOAST_DURATION_MS 2000L
-
 namespace eez {
 namespace gui {
-
-AppContext *g_appContext;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -46,14 +42,6 @@ AppContext::AppContext() {
 }
 
 void AppContext::stateManagment() {
-    // remove alert message after period of time
-    uint32_t inactivityPeriod = psu::idle::getHmiInactivityPeriod();
-    if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
-        ToastMessagePage *page = (ToastMessagePage *)getActivePage();
-        if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
-            popPage();
-        }
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,18 +53,13 @@ bool AppContext::isActivePageInternal() {
 bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     if (widget->action) {
-        AppContext *saved = g_appContext;
-        g_appContext = this;
-
         if (widget->type == WIDGET_TYPE_BUTTON) {
             const ButtonWidget *buttonWidget = GET_WIDGET_PROPERTY(widget, specific, const ButtonWidget *);
             if (!data::get(widgetCursor.cursor, buttonWidget->enabled).getInt()) {
-                g_appContext = saved;
                 return false;
             }
         }
 
-        g_appContext = saved;
         return true;
     }
 
@@ -254,16 +237,6 @@ void AppContext::doPushPage() {
     pushPage(m_pageIdToSetOnNextIter, m_pageToSetOnNextIter);
 }
 
-void AppContext::pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont, bool showRadioButtonIcon) {
-	m_selectFromEnumPage.init(enumDefinition, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
-    pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &m_selectFromEnumPage);
-}
-
-void AppContext::pushSelectFromEnumPage(void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont, bool showRadioButtonIcon) {
-	m_selectFromEnumPage.init(enumDefinitionFunc, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
-    pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &m_selectFromEnumPage);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 bool AppContext::testExecuteActionOnTouchDown(int action) {
@@ -288,13 +261,12 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
         const Widget *page = getPageWidget(activePageId);
 		const PageWidget *pageSpecific = GET_WIDGET_PROPERTY(page, specific, const PageWidget *);
         if ((pageSpecific->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
-            if (!pointInsideRect(touchEvent.x, touchEvent.y, g_appContext->x + page->x, g_appContext->y + page->y, page->w, page->h)) {
+            if (!pointInsideRect(touchEvent.x, touchEvent.y, foundWidget.appContext->x + page->x, foundWidget.appContext->y + page->y, page->w, page->h)) {
                 int activePageId = getActivePageId();
                 
                 popPage();
 
-                g_appContext = &getRootAppContext();
-                auto widgetCursor = findWidget(touchEvent.x, touchEvent.y);
+                auto widgetCursor = findWidget(&getRootAppContext(), touchEvent.x, touchEvent.y);
 
                 if (
                     widgetCursor.widget &&
@@ -423,13 +395,6 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 
 int AppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {
     return ACTION_ID_NONE;
-}
-
-const data::EnumItem *AppContext::getActiveSelectEnumDefinition() {
-    if (getActivePageId() == INTERNAL_PAGE_ID_SELECT_FROM_ENUM) {
-        return m_selectFromEnumPage.getEnumDefinition();
-    }
-    return nullptr;
 }
 
 } // namespace gui

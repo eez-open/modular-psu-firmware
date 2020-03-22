@@ -884,7 +884,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
     static const int TEMP_SENSOR_PROGRESS_WEIGHT = 5;
     size_t totalSize = 2 + CH_MAX * CH_PROGRESS_WEIGHT + temp_sensor::NUM_TEMP_SENSORS * TEMP_SENSOR_PROGRESS_WEIGHT;
     if (showProgress) {
-        eez::psu::gui::PsuAppContext::updateProgressPage(processedSoFar, totalSize);
+        psu::gui::updateProgressPage(processedSoFar, totalSize);
     }
 #endif
 
@@ -895,7 +895,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
 #if OPTION_DISPLAY
     if (showProgress) {
         processedSoFar++;
-        eez::psu::gui::PsuAppContext::updateProgressPage(1, totalSize);
+        psu::gui::updateProgressPage(1, totalSize);
     }
 #endif
 
@@ -905,7 +905,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
 #if OPTION_DISPLAY
     if (showProgress) {
         processedSoFar++;
-        eez::psu::gui::PsuAppContext::updateProgressPage(2, totalSize);
+        psu::gui::updateProgressPage(2, totalSize);
     }
 #endif
 
@@ -996,7 +996,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
 #if OPTION_DISPLAY
         if (showProgress) {
             processedSoFar += CH_PROGRESS_WEIGHT;
-            eez::psu::gui::PsuAppContext::updateProgressPage(processedSoFar, totalSize);
+            psu::gui::updateProgressPage(processedSoFar, totalSize);
         }
 #endif
     }
@@ -1016,7 +1016,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
 #if OPTION_DISPLAY
         if (showProgress) {
             processedSoFar += TEMP_SENSOR_PROGRESS_WEIGHT;
-            eez::psu::gui::PsuAppContext::updateProgressPage(processedSoFar, totalSize);
+            psu::gui::updateProgressPage(processedSoFar, totalSize);
         }
 #endif
     }
@@ -1126,7 +1126,7 @@ bool ReadContext::doRead(bool (*callback)(ReadContext &ctx, Parameters &paramete
     while (true) {
 #if OPTION_DISPLAY
         if (showProgress) {
-            eez::psu::gui::PsuAppContext::updateProgressPage(file.tell(), totalSize);
+            psu::gui::updateProgressPage(file.tell(), totalSize);
         }
 #endif
 

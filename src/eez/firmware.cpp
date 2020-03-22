@@ -176,7 +176,7 @@ void boot() {
     psu::persist_conf::init();
 
 #if OPTION_DISPLAY
-    eez::psu::gui::showWelcomePage();
+    psu::gui::showWelcomePage();
 #endif
 
     sound::init();

@@ -23,12 +23,10 @@
 
 #include <eez/sound.h>
 
-#include <eez/gui/gui.h>
-
 #include <eez/modules/psu/psu.h>
-
 #include <eez/modules/psu/channel_dispatcher.h>
 
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/keypad.h>
@@ -39,17 +37,7 @@ namespace eez {
 namespace psu {
 namespace gui {
 
-static NumericKeypad g_numericKeypadsPool[1];
-
-NumericKeypad* getFreeNumericKeypad() {
-    for (unsigned int i = 0; i < sizeof (g_numericKeypadsPool) / sizeof(NumericKeypad); ++i) {
-        if (g_numericKeypadsPool[i].m_isFree) {
-            return &g_numericKeypadsPool[i];
-        }
-    }
-    assert(false);
-    return nullptr;
-}
+static NumericKeypad g_numericKeypad;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -102,9 +90,16 @@ void NumericKeypadOptions::defOption() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void NumericKeypad::init(const char *label, const data::Value &value, NumericKeypadOptions &options,
-                         void (*okFloat)(float), void (*okUint32)(uint32_t), void (*cancel)()) {
-    Keypad::init(label);
+void NumericKeypad::init(
+    eez::gui::AppContext *appContext,
+    const char *label,
+    const eez::gui::data::Value &value,
+    NumericKeypadOptions &options,
+    void(*okFloat)(float),
+    void(*okUint32)(uint32_t),
+    void(*cancel)()
+) {
+    Keypad::init(appContext, label);
 
     m_okFloatCallback = okFloat;
     m_okUint32Callback = okUint32;
@@ -143,16 +138,29 @@ void NumericKeypad::init(const char *label, const data::Value &value, NumericKey
     }
 }
 
-NumericKeypad *NumericKeypad::start(const char *label, const data::Value &value,
-                                    NumericKeypadOptions &options, void (*okFloat)(float),
-                                    void (*okUint32)(uint32_t), void (*cancel)()) {
-    NumericKeypad *page = getFreeNumericKeypad();
+NumericKeypad *NumericKeypad::start(
+    AppContext *appContext,
+    const char *label,
+    const data::Value &value,
+    NumericKeypadOptions &options,
+    void (*okFloat)(float),
+    void (*okUint32)(uint32_t),
+    void (*cancel)()
+) {
+    g_numericKeypad.init(appContext, label, value, options, okFloat, okUint32, cancel);
+    appContext->pushPage(options.pageId, &g_numericKeypad);
+    return &g_numericKeypad;
+}
 
-    page->init(label, value, options, okFloat, okUint32, cancel);
-
-    pushPage(options.pageId, page);
-
-    return page;
+NumericKeypad *NumericKeypad::start(
+    const char *label,
+    const data::Value &value,
+    NumericKeypadOptions &options,
+    void (*okFloat)(float),
+    void (*okUint32)(uint32_t), 
+    void (*cancel)()
+) {
+    return start(&g_psuAppContext, label, value, options, okFloat, okUint32, cancel);
 }
 
 bool NumericKeypad::isEditing() {
@@ -181,7 +189,7 @@ void NumericKeypad::getKeypadText(char *text) {
 
 bool NumericKeypad::getText(char *text, int count) {
     if (m_state == START) {
-        if (getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD) {
+        if (m_appContext->getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD) {
             edit_mode::getCurrentValue().toText(text, count);
         } else {
             m_startValue.toText(text, count);
@@ -467,7 +475,7 @@ int NumericKeypad::getNumDecimalDigits() {
 }
 
 bool NumericKeypad::isValueValid() {
-    if (getActivePageId() != PAGE_ID_EDIT_MODE_KEYPAD) {
+    if (m_appContext->getActivePageId() != PAGE_ID_EDIT_MODE_KEYPAD) {
         return true;
     }
 
@@ -704,7 +712,7 @@ void NumericKeypad::cancel() {
     if (m_cancelCallback) {
         m_cancelCallback();
     } else {
-        popPage();
+        m_appContext->popPage();
     }
 }
 
@@ -712,7 +720,7 @@ void NumericKeypad::cancel() {
 
 void NumericKeypad::onEncoderClicked() {
     if (m_state == START) {
-        if (getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD) {
+        if (m_appContext->getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD) {
             return;
         }
     }
@@ -721,7 +729,7 @@ void NumericKeypad::onEncoderClicked() {
 
 void NumericKeypad::onEncoder(int counter) {
     if (m_state == START) {
-        if (getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD) {
+        if (m_appContext->getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD) {
             return;
         }
 

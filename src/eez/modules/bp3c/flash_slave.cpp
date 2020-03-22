@@ -494,7 +494,7 @@ void uploadHexFile() {
 	uint32_t addressUpperBits = 0;
 
 #if OPTION_DISPLAY
-    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Downloading firmware...");
+    psu::gui::showProgressPageWithoutAbort("Downloading firmware...");
 #endif
 
     if (!eraseAll()) {
@@ -514,7 +514,7 @@ void uploadHexFile() {
 	while (!eofReached && readHexRecord(bufferedFile, hexRecord)) {
 
 #if OPTION_DISPLAY
-        eez::psu::gui::PsuAppContext::updateProgressPage(file.tell(), totalSize);
+        psu::gui::updateProgressPage(file.tell(), totalSize);
 #endif
 
 		if (hexRecord.recordType == 0x04) {
@@ -537,14 +537,15 @@ void uploadHexFile() {
 	file.close();
 
 Exit:
+
 #if OPTION_DISPLAY
-    eez::psu::gui::g_psuAppContext.hideProgressPage();
+    psu::gui::hideProgressPage();
 #endif
 
 	leaveBootloaderMode();
 
 	if (!eofReached) {
-		gui::errorMessage("Downloading failed!");
+		psu::gui::errorMessage("Downloading failed!");
 	}
 }
 

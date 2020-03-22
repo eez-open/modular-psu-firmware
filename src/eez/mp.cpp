@@ -221,7 +221,7 @@ void oneIter() {
 			}
 #endif
 
-            psu::gui::g_psuAppContext.hideAsyncOperationInProgress();
+            psu::gui::hideAsyncOperationInProgress();
 
             g_state = STATE_IDLE;
 
@@ -242,7 +242,7 @@ void startScript(const char *filePath) {
         //DebugTrace("T1 %d\n", millis());
         osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MP_MESSAGE(LOAD_SCRIPT, 0), osWaitForever);
 
-        psu::gui::g_psuAppContext.showAsyncOperationInProgress();
+        psu::gui::showAsyncOperationInProgress();
     }
 }
 
@@ -252,11 +252,13 @@ void loadScript() {
 
     eez::File file;
     if (!file.open(g_scriptPath, FILE_OPEN_EXISTING | FILE_READ)) {
+        generateError(SCPI_ERROR_FILE_NOT_FOUND);
         goto ErrorNoClose;
     }
 
     fileSize = file.size();
     if (fileSize > MAX_SCRIPT_LENGTH) {
+        generateError(SCPI_ERROR_OUT_OF_DEVICE_MEMORY);
         goto Error;
     }
 
@@ -265,6 +267,7 @@ void loadScript() {
     file.close();
 
     if (bytesRead != fileSize) {
+        generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
         goto Error;
     }
 
@@ -279,8 +282,10 @@ Error:
     file.close();
 
 ErrorNoClose:
-    // TODO error report
+    psu::gui::hideAsyncOperationInProgress();
+
     g_state = STATE_IDLE;
+    
     return;
 }
 

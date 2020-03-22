@@ -68,7 +68,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(BarGraphWidgetState);
 
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor, widget->data);
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
     
     auto currentState = (BarGraphWidgetState *)widgetCursor.currentState;

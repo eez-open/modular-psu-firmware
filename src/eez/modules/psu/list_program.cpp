@@ -298,7 +298,7 @@ bool loadList(
 
 #if OPTION_DISPLAY
         if (showProgress) {
-            eez::psu::gui::PsuAppContext::updateProgressPage(file.tell(), totalSize);
+            psu::gui::updateProgressPage(file.tell(), totalSize);
         }
 #endif
     }
@@ -412,7 +412,7 @@ bool saveList(
 
 #if OPTION_DISPLAY
         if (showProgress) {
-            eez::psu::gui::PsuAppContext::updateProgressPage(i, maxListLength);
+            psu::gui::updateProgressPage(i, maxListLength);
         }
 #endif
     }

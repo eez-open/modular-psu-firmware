@@ -47,6 +47,8 @@
 #include <eez/modules/psu/gui/animations.h>
 #endif
 
+using namespace eez::psu::gui;
+
 namespace eez {
 namespace psu {
 namespace event_queue {
@@ -145,7 +147,7 @@ void tick() {
             g_previousDisplayFromPosition = -1;
         }
 #if OPTION_DISPLAY
-		if (gui::g_psuAppContext.getActivePageId() == PAGE_ID_EVENT_QUEUE) {
+		if (gui::getActivePageId() == PAGE_ID_EVENT_QUEUE) {
 			if (g_refreshEvents) {
 				refreshEvents();
 				g_refreshEvents = false;
@@ -270,7 +272,7 @@ void pushEvent(int16_t eventId) {
             activePageId != PAGE_ID_SHUTDOWN &&
             activePageId != PAGE_ID_DISPLAY_OFF
         ) {
-            eez::psu::gui::psuErrorMessage(0, MakeEventMessageValue(eventId));
+            psuErrorMessage(0, MakeEventMessageValue(eventId));
         }
 #endif
     }
@@ -707,7 +709,6 @@ namespace gui {
 
 using namespace psu;
 using namespace psu::event_queue;
-using namespace psu::gui;
 
 static event_queue::Event *getEventFromValue(const Value &value) {
     for (int i = 0; i < EVENTS_PER_PAGE; i++) {

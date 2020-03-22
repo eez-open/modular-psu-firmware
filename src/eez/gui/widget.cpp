@@ -215,51 +215,52 @@ void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 }
 
 void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    if (g_appContext->isActivePageInternal()) {
+    auto appContext = widgetCursor.appContext;
+
+    if (appContext->isActivePageInternal()) {
     	if (callback != findWidgetStep) {
     		return;
     	}
 
-		const WidgetCursor &foundWidget = ((InternalPage *)g_appContext->getActivePage())->findWidget(g_findWidgetAtX, g_findWidgetAtY);
+        auto internalPage = ((InternalPage *)appContext->getActivePage());
+
+		const WidgetCursor &foundWidget = internalPage->findWidget(g_findWidgetAtX, g_findWidgetAtY);
 		if (foundWidget) {
             g_foundWidget = foundWidget;
             return;
 		}
 
-        if (!g_foundWidget || g_foundWidget.appContext != g_appContext) {
+        if (!g_foundWidget || g_foundWidget.appContext != appContext) {
             return;
         }
 
-        // pass click through if active page is toast page and clicked outside
-        bool passThrough =
-            g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE &&
-            !((ToastMessagePage *)g_appContext->getActivePage())->hasAction();
+        bool passThrough = internalPage->canClickPassThrough();
 
         // clicked outside internal page, close internal page
-        popPage();
+        appContext->popPage();
 
         if (!passThrough) {
             return;
         }
     }
 
-    if (g_appContext->getActivePageId() == PAGE_ID_NONE) {
+    if (appContext->getActivePageId() == PAGE_ID_NONE) {
         return;
     }
 
     auto savedWidget = widgetCursor.widget;
-    widgetCursor.widget = getPageWidget(g_appContext->getActivePageId());
+    widgetCursor.widget = getPageWidget(appContext->getActivePageId());
     enumWidget(widgetCursor, callback);
     widgetCursor.widget = savedWidget;
 }
 
-void enumWidgets(EnumWidgetsCallback callback) {
-	if (g_appContext->getActivePageId() == PAGE_ID_NONE || g_appContext->isActivePageInternal()) {
+void enumWidgets(AppContext* appContext, EnumWidgetsCallback callback) {
+	if (appContext->getActivePageId() == PAGE_ID_NONE || appContext->isActivePageInternal()) {
 		return;
 	}
 	WidgetCursor widgetCursor;
-	widgetCursor.appContext = g_appContext;
-	widgetCursor.widget = getPageWidget(g_appContext->getActivePageId());
+	widgetCursor.appContext = appContext;
+	widgetCursor.widget = getPageWidget(appContext->getActivePageId());
 	enumWidget(widgetCursor, callback);
 }
 
@@ -317,19 +318,19 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
     }
 }
 
-WidgetCursor findWidget(int16_t x, int16_t y) {
+WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y) {
     g_foundWidget = 0;
 
-    if (g_appContext->isActivePageInternal()) {
-        WidgetCursor widgetCursor = ((InternalPage *)g_appContext->getActivePage())->findWidget(x, y);
+    if (appContext->isActivePageInternal()) {
+        auto internalPage = ((InternalPage *)appContext->getActivePage());
+
+        WidgetCursor widgetCursor = internalPage->findWidget(x, y);
 
         if (!widgetCursor) {
             // clicked outside internal page, close internal page
-        	bool passThrough = 
-                g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE && 
-                !((ToastMessagePage *)g_appContext->getActivePage())->hasAction();
+        	bool passThrough = internalPage->canClickPassThrough();
 
-            popPage();
+            appContext->popPage();
 
             if (!passThrough) {
     			return g_foundWidget;
@@ -343,7 +344,7 @@ WidgetCursor findWidget(int16_t x, int16_t y) {
     g_findWidgetAtX = x;
     g_findWidgetAtY = y;
 
-    enumWidgets(findWidgetStep);
+    enumWidgets(appContext, findWidgetStep);
 
     return g_foundWidget;
 }

@@ -21,7 +21,6 @@
 #include <cmsis_os.h>
 
 #include <eez/gui/assets.h>
-#include <eez/gui/dialogs.h>
 #include <eez/gui/page.h>
 
 #include <eez/modules/mcu/display.h>
@@ -73,20 +72,7 @@ WidgetCursor &getFoundWidgetAtDown();
 void clearFoundWidgetAtDown();
 bool isActiveWidget(const WidgetCursor &widgetCursor);
 bool isFocusWidget(const WidgetCursor &widgetCursor);
-uint32_t getShowPageTime();
-void setShowPageTime(uint32_t time);
 void refreshScreen();
-void showPage(int pageId);
-void pushPage(int pageId, Page *page = 0);
-void popPage();
-void replacePage(int pageId, Page *page = nullptr);
-int getActivePageId();
-Page *getActivePage();
-Page *getPage(int pageId);
-int getNumPagesOnStack();
-bool isPageOnStack(int pageId);
-void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont = false, bool showRadioButtonIcon = true);
-void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), uint16_t currentValue, bool(*disabledCallback)(uint16_t value), void(*onSet)(uint16_t), bool smallFont = false, bool showRadioButtonIcon = true);
 bool isPageInternal(int pageId);
 void executeAction(int actionId);
 
@@ -94,9 +80,6 @@ int16_t getAppContextId(AppContext *pAppContext);
 AppContext *getAppContextFromId(int16_t id);
 
 ////////////////////////////////////////////////////////////////////////////////
-
-void standBy();
-void reset();
 
 enum Buffer {
     BUFFER_OLD,
@@ -149,7 +132,7 @@ extern AnimRect g_animRects[MAX_ANIM_RECTS];
 
 void animateOpen(const Rect &srcRect, const Rect &dstRect);
 void animateClose(const Rect &srcRect, const Rect &dstRect);
-void animateRects(Buffer startBuffer, int numRects, float duration = -1);
+void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, float duration = -1);
 
 float getDefaultAnimationDurationHook();
 
@@ -162,6 +145,8 @@ int getCurrentStateBufferIndex();
 uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor);
 
 Page *getPageFromIdHook(int pageId);
+
+void executeInternalActionHook(int actionId);
 
 } // namespace gui
 } // namespace eez

@@ -31,13 +31,13 @@
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/dlog_record.h>
 
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/edit_mode_keypad.h>
 #include <eez/modules/psu/gui/edit_mode_slider.h>
 #include <eez/modules/psu/gui/edit_mode_step.h>
 #include <eez/modules/psu/gui/numeric_keypad.h>
-#include <eez/modules/psu/gui/psu.h>
 
 namespace eez {
 namespace psu {
@@ -58,10 +58,10 @@ static void update();
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool isActive() {
-    return getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD ||
-           getActivePageId() == PAGE_ID_EDIT_MODE_STEP ||
-           getActivePageId() == PAGE_ID_EDIT_MODE_SLIDER;
+bool isActive(AppContext *appContext) {
+    return appContext->getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD ||
+           appContext->getActivePageId() == PAGE_ID_EDIT_MODE_STEP ||
+           appContext->getActivePageId() == PAGE_ID_EDIT_MODE_SLIDER;
 }
 
 void initEditValue() {
@@ -71,8 +71,8 @@ void initEditValue() {
 
 void enter(int tabIndex, bool setFocus) {
 #if OPTION_ENCODER
-    if (setFocus && !isActive()) {
-        if (!g_appContext->isFocusWidget(getFoundWidgetAtDown()) || g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+    if (setFocus && !isActive(&g_psuAppContext)) {
+        if (!g_psuAppContext.isFocusWidget(getFoundWidgetAtDown()) || g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             setFocusCursor(getFoundWidgetAtDown().cursor, getFoundWidgetAtDown().widget->data);
             return;
         }
@@ -86,7 +86,7 @@ void enter(int tabIndex, bool setFocus) {
         setFocusCursor(newDataCursor, newDataId);
         update();
 
-        if (!isActive()) {
+        if (!isActive(&g_psuAppContext)) {
             pushPage(g_tabIndex);
         }
     } else {

@@ -229,7 +229,7 @@ void loadBlock() {
 
 void stateManagment() {
     auto isExecuting = dlog_record::isExecuting();
-    if (!isExecuting && g_wasExecuting && g_showLatest && eez::psu::gui::g_psuAppContext.isPageOnStack(PAGE_ID_DLOG_VIEW)) {
+    if (!isExecuting && g_wasExecuting && g_showLatest && psu::gui::isPageOnStack(PAGE_ID_DLOG_VIEW)) {
         openFile(dlog_record::getLatestFilePath());
     }
     g_wasExecuting = isExecuting;

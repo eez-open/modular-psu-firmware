@@ -59,6 +59,7 @@
 #include <eez/modules/psu/ontime.h>
 #include <eez/modules/psu/sd_card.h>
 
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/calibration.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
@@ -72,7 +73,6 @@
 #include <eez/modules/psu/gui/page_self_test_result.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
-#include <eez/modules/psu/gui/psu.h>
 
 using namespace eez::gui;
 using namespace eez::gui::data;
@@ -667,7 +667,7 @@ bool compare_TEXT_MESSAGE_value(const Value &a, const Value &b) {
 }
 
 void TEXT_MESSAGE_value_to_text(const Value &value, char *text, int count) {
-    strncpy(text, g_psuAppContext.getTextMessage(), count - 1);
+    strncpy(text, getTextMessage(), count - 1);
     text[count - 1] = 0;
 }
 
@@ -4308,7 +4308,7 @@ void data_channel_ranges_currently_selected(data::DataOperationEnum operation, d
 
 void data_text_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(g_psuAppContext.getTextMessageVersion(), VALUE_TYPE_TEXT_MESSAGE);
+        value = data::Value(getTextMessageVersion(), VALUE_TYPE_TEXT_MESSAGE);
     }
 }
 
@@ -4924,7 +4924,7 @@ void data_recording_ready(data::DataOperationEnum operation, data::Cursor &curso
 
 void data_is_single_page_on_stack(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = g_psuAppContext.getNumPagesOnStack() == 1 ? 1 : 0;
+        value = getNumPagesOnStack() == 1 ? 1 : 0;
     }
 }
 
@@ -5624,6 +5624,40 @@ void data_async_progress(data::DataOperationEnum operation, data::Cursor &cursor
             x = (1000 - x) * 75 / 500;
         }
         value = MakeRangeValue(x, x + 25);
+    }
+}
+
+void data_alert_message_is_set(data::DataOperationEnum operation, data::Cursor &cursor,
+                        data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = g_alertMessage.getString() != nullptr;
+    }
+}
+
+void data_alert_message(data::DataOperationEnum operation, data::Cursor &cursor,
+                        data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = psu::gui::g_alertMessage;
+    } else if (operation == data::DATA_OPERATION_SET) {
+        g_alertMessage = value;
+    }
+}
+
+void data_alert_message_2(data::DataOperationEnum operation, data::Cursor &cursor,
+                          data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = g_alertMessage2;
+    } else if (operation == data::DATA_OPERATION_SET) {
+        g_alertMessage2 = value;
+    }
+}
+
+void data_alert_message_3(data::DataOperationEnum operation, data::Cursor &cursor,
+                          data::Value &value) {
+    if (operation == data::DATA_OPERATION_GET) {
+        value = g_alertMessage3;
+    } else if (operation == data::DATA_OPERATION_SET) {
+        g_alertMessage3 = value;
     }
 }
 

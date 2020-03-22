@@ -24,8 +24,7 @@
 #include <eez/modules/psu/trigger.h>
 
 #if OPTION_DISPLAY
-#include <eez/gui/gui.h>
-using namespace eez::gui;
+#include <eez/modules/psu/gui/psu.h>
 #endif
 
 namespace eez {
@@ -349,7 +348,7 @@ scpi_result_t scpi_cmd_calibrationVoltageLevel(scpi_t *context) {
 
 scpi_result_t scpi_cmd_calibrationScreenInit(scpi_t *context) {
 #if OPTION_DISPLAY
-    showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
+    psu::gui::showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

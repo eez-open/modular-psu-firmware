@@ -41,16 +41,6 @@ public:
 
     AppContext();
 
-    // TODO these should be private
-    uint32_t m_showPageTime;
-    void (*m_dialogYesCallback)();
-    void (*m_dialogNoCallback)();
-    void (*m_dialogCancelCallback)();
-    void (*m_dialogLaterCallback)();
-    void(*m_toastAction)(int param);
-    int m_toastActionParam;
-    void(*m_toastActionWithoutParam)();
-
     virtual void stateManagment();
 
     void showPage(int pageId);
@@ -66,9 +56,6 @@ public:
     Page *getActivePage();
 
     bool isActivePageInternal();
-
-    void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont, bool showRadioButtonIcon);
-    void pushSelectFromEnumPage(void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont, bool showRadioButtonIcon);
 
     void replacePage(int pageId, Page *page = nullptr);
 
@@ -95,8 +82,6 @@ public:
 
     virtual int getLongTouchActionHook(const WidgetCursor &widgetCursor);
 
-    const data::EnumItem *getActiveSelectEnumDefinition();
-
 protected:
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
@@ -106,7 +91,7 @@ protected:
     int m_pageIdToSetOnNextIter;
     Page *m_pageToSetOnNextIter;
 
-    SelectFromEnumPage m_selectFromEnumPage;
+    uint32_t m_showPageTime;
 
     virtual int getMainPageId() = 0;
     virtual void onPageChanged(int previousPageId, int activePageId);
@@ -121,9 +106,7 @@ protected:
     bool isPageFullyCovered(int pageNavigationStackIndex);
     
     virtual bool canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action);
-}; // namespace gui
-
-extern AppContext *g_appContext;
+};
 
 AppContext &getRootAppContext();
 

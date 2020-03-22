@@ -20,7 +20,7 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/gui/gui.h>
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/edit_mode_keypad.h>
 #include <eez/modules/psu/gui/numeric_keypad.h>
@@ -40,7 +40,7 @@ NumericKeypad *g_keypad;
 
 void onKeypadOk(float value) {
     if (edit_mode::setValue(value)) {
-        popPage();
+        g_keypad->getAppContext()->popPage();
     }
 }
 
@@ -63,7 +63,7 @@ void enter(int channelIndex, const eez::gui::data::Value &editValue, bool allowZ
     options.flags.signButtonEnabled = options.min < 0;
     options.flags.dotButtonEnabled = true;
 
-    g_keypad->init(0, editValue, options, onKeypadOk, 0, 0);
+    g_keypad->init(&g_psuAppContext, 0, editValue, options, onKeypadOk, 0, 0);
 }
 
 void exit() {

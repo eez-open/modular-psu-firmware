@@ -101,7 +101,7 @@ void processTouchEvent(EventType type) {
     int y = touch::getY();
 
     if (type == EVENT_TYPE_TOUCH_DOWN) {
-        m_foundWidgetAtDown = findWidget(x, y);
+        m_foundWidgetAtDown = findWidget(&getRootAppContext(), x, y);
         m_onTouchFunction = getTouchFunction(m_foundWidgetAtDown);
         if (!m_onTouchFunction) {
             m_onTouchFunction = onPageTouch;
@@ -124,19 +124,12 @@ void processTouchEvent(EventType type) {
     }
 
     if (m_onTouchFunction) {
-        AppContext *saved = g_appContext;
-        if (m_foundWidgetAtDown) {
-            g_appContext = m_foundWidgetAtDown.appContext;
-        }
-
         Event event;
         event.type = type;
         event.x = x;
         event.y = y;
 
         m_onTouchFunction(m_foundWidgetAtDown, event);
-
-        g_appContext = saved;
     }
 
     m_lastTouchMoveX = x;
@@ -170,7 +163,7 @@ int getAction(const WidgetCursor &widgetCursor) {
 }
 
 void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
-    g_appContext->onPageTouch(foundWidget, touchEvent);
+    foundWidget.appContext->onPageTouch(foundWidget, touchEvent);
 }
 
 void onInternalPageTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
@@ -263,7 +256,7 @@ bool isActiveWidget(const WidgetCursor &widgetCursor) {
 }
 
 bool isFocusWidget(const WidgetCursor &widgetCursor) {
-    return g_appContext->isFocusWidget(widgetCursor);
+    return widgetCursor.appContext->isFocusWidget(widgetCursor);
 }
 
 } // namespace gui

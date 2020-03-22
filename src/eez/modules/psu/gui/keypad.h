@@ -18,8 +18,9 @@
 
 #pragma once
 
-#include <eez/gui/gui.h>
 #include <eez/modules/psu/conf_advanced.h>
+
+using namespace eez::gui;
 
 namespace eez {
 namespace psu {
@@ -33,9 +34,9 @@ enum KeypadMode {
     KEYPAD_MODE_SYMBOL
 };
 
-class Keypad : public eez::gui::Page {
+class Keypad : public Page {
   public:
-    bool m_isFree = true;
+    AppContext *getAppContext() { return m_appContext;  }
 
     void pageAlloc();
     void pageFree();
@@ -71,16 +72,18 @@ class Keypad : public eez::gui::Page {
 
     KeypadMode m_keypadMode;
 
-  protected:
+protected:
+    AppContext *m_appContext;
+
     char m_stateText[2][MAX_KEYPAD_TEXT_LENGTH + 2];
     char m_label[MAX_KEYPAD_LABEL_LENGTH + 1];
     char m_keypadText[MAX_KEYPAD_TEXT_LENGTH + 2];
     int m_minChars;
     int m_maxChars;
 
-    void init(const char *label);
+    void init(AppContext *appContext, const char *label);
 
-  private:
+private:
     bool m_isPassword;
     uint32_t m_lastKeyAppendTime;
     bool m_cursor;
@@ -89,7 +92,7 @@ class Keypad : public eez::gui::Page {
     void (*m_okCallback)(char *); // +2 for cursor and zero at the end
     void (*m_cancelCallback)();
 
-    void start(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)());
+    void start(AppContext *appContext, const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)());
 };
 
 class NumericKeypad;

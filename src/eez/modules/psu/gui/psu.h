@@ -20,9 +20,10 @@
 
 #include <eez/gui/gui.h>
 
-#include <eez/modules/psu/gui/numeric_keypad.h>
-
 using namespace eez::gui;
+
+#include <eez/modules/psu/gui/numeric_keypad.h>
+#include <eez/modules/psu/gui/page.h>
 
 namespace eez {
 namespace psu {
@@ -71,6 +72,53 @@ void showStandbyPage();
 void showEnteringStandbyPage();
 void showSavingPage();
 void showShutdownPage();
+
+extern data::Value g_alertMessage;
+extern data::Value g_alertMessage2;
+extern data::Value g_alertMessage3;
+
+void infoMessage(const char *message);
+void infoMessage(data::Value value);
+void infoMessage(const char *message1, const char *message2);
+void errorMessage(const char *message);
+void errorMessage(const char *message1, const char *message2);
+void errorMessage(const char *message1, const char *message2, const char *message3, bool autoDismiss = false);
+void errorMessage(data::Value value);
+void errorMessageWithAction(data::Value value, void (*action)(int param), const char *actionLabel, int actionParam);
+void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel);
+
+void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)());
+void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*later_callback)() = 0);
+void areYouSure(void (*yes_callback)());
+void areYouSureWithMessage(const char *message, void (*yes_callback)());
+
+void dialogYes();
+void dialogNo();
+void dialogCancel();
+void dialogOk();
+void dialogLater();
+
+void pushSelectFromEnumPage(
+    AppContext *appContext,
+    const data::EnumItem *enumDefinition,
+    uint16_t currentValue, 
+    bool (*disabledCallback)(uint16_t value), 
+    void (*onSet)(uint16_t),
+    bool smallFont = false,
+    bool showRadioButtonIcon = true
+);
+void pushSelectFromEnumPage(
+    AppContext *appContext,
+    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
+    uint16_t currentValue,
+    bool(*disabledCallback)(uint16_t value),
+    void(*onSet)(uint16_t),
+    bool smallFont = false,
+    bool showRadioButtonIcon = true
+);
+
+const data::EnumItem *getActiveSelectEnumDefinition();
+void popSelectFromEnumPage();
 
 extern data::Value g_progress;
 
@@ -132,19 +180,19 @@ public:
 
     bool isWidgetActionEnabled(const WidgetCursor &widgetCursor) override;
     
-    static void showProgressPage(const char *message, void (*abortCallback)() = 0);
-    static void showProgressPageWithoutAbort(const char *message);
-    static bool updateProgressPage(size_t processedSoFar, size_t totalSize);
-    static void hideProgressPage();
+    void showProgressPage(const char *message, void (*abortCallback)() = 0);
+    void showProgressPageWithoutAbort(const char *message);
+    bool updateProgressPage(size_t processedSoFar, size_t totalSize);
+    void hideProgressPage();
 
-    static void showAsyncOperationInProgress(const char *message = nullptr, void (*checkStatus)() = nullptr);
-    static void hideAsyncOperationInProgress();
+    void showAsyncOperationInProgress(const char *message = nullptr, void (*checkStatus)() = nullptr);
+    void hideAsyncOperationInProgress();
     uint32_t getAsyncInProgressStartTime();
 
-    static void setTextMessage(const char *message, unsigned int len);
-    static void clearTextMessage();
-    static const char *getTextMessage();
-    static uint8_t getTextMessageVersion();
+    void setTextMessage(const char *message, unsigned int len);
+    void clearTextMessage();
+    const char *getTextMessage();
+    uint8_t getTextMessageVersion();
 
     void showUncaughtScriptExceptionMessage();
 
@@ -159,6 +207,12 @@ public:
     void dialogSetDataItemValue(int16_t dataId, Value& value);
     void dialogSetDataItemValue(int16_t dataId, const char *str);
     void dialogClose();
+
+    // TODO these should be private
+    void (*m_dialogYesCallback)();
+    void (*m_dialogNoCallback)();
+    void (*m_dialogCancelCallback)();
+    void (*m_dialogLaterCallback)();
 
 protected:
     bool m_pushProgressPage;
@@ -194,6 +248,7 @@ protected:
 
     bool g_dialogOpening;
     bool g_selectOpening;
+
     int getMainPageId() override;
     void onPageChanged(int previousPageId, int activePageId) override;
     bool isAutoRepeatAction(int action) override;
@@ -216,6 +271,104 @@ private:
 };
 
 extern PsuAppContext g_psuAppContext;
+
+inline int getActivePageId() {
+    return g_psuAppContext.getActivePageId();
+}
+
+inline Page *getActivePage() {
+    return g_psuAppContext.getActivePage();
+}
+
+inline bool isPageOnStack(int pageId) {
+    return g_psuAppContext.isPageOnStack(pageId);
+}
+
+inline Page *getPage(int pageId) {
+    return g_psuAppContext.getPage(pageId);
+}
+
+inline int getNumPagesOnStack() {
+    return g_psuAppContext.getNumPagesOnStack();
+}
+
+inline void showPage(int pageId) {
+    g_psuAppContext.showPage(pageId);
+}
+
+inline void pushPage(int pageId, Page *page = nullptr) {
+    g_psuAppContext.pushPage(pageId, page);
+}
+
+inline void popPage() {
+    g_psuAppContext.popPage();
+}
+
+inline void replacePage(int pageId, Page *page = nullptr) {
+    g_psuAppContext.replacePage(pageId, page);
+}
+
+inline void showProgressPage(const char *message, void (*abortCallback)() = 0) {
+    g_psuAppContext.showProgressPage(message, abortCallback);
+}
+
+inline void showProgressPageWithoutAbort(const char *message) {
+    g_psuAppContext.showProgressPageWithoutAbort(message);
+}
+
+inline bool updateProgressPage(size_t processedSoFar, size_t totalSize) {
+    return g_psuAppContext.updateProgressPage(processedSoFar, totalSize);
+}
+
+inline void hideProgressPage() {
+    g_psuAppContext.hideProgressPage();
+}
+
+inline void pushSelectFromEnumPage(
+    const data::EnumItem *enumDefinition,
+    uint16_t currentValue, 
+    bool (*disabledCallback)(uint16_t value), 
+    void (*onSet)(uint16_t),
+    bool smallFont = false,
+    bool showRadioButtonIcon = true
+) {
+    pushSelectFromEnumPage(&g_psuAppContext, enumDefinition, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
+}
+
+inline void pushSelectFromEnumPage(
+    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
+    uint16_t currentValue,
+    bool(*disabledCallback)(uint16_t value),
+    void(*onSet)(uint16_t),
+    bool smallFont = false,
+    bool showRadioButtonIcon = true
+) {
+    pushSelectFromEnumPage(&g_psuAppContext, enumDefinitionFunc, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
+}
+
+inline void showAsyncOperationInProgress(const char *message = nullptr, void (*checkStatus)() = nullptr) {
+    g_psuAppContext.showAsyncOperationInProgress(message, checkStatus);
+}
+
+inline void hideAsyncOperationInProgress() {
+    g_psuAppContext.hideAsyncOperationInProgress();
+}
+
+inline void setTextMessage(const char *message, unsigned int len) {
+    g_psuAppContext.setTextMessage(message, len); 
+}
+
+inline void clearTextMessage() {
+    g_psuAppContext.clearTextMessage();
+}
+
+inline const char *getTextMessage() {
+    return g_psuAppContext.getTextMessage();
+}
+
+inline uint8_t getTextMessageVersion() {
+    return g_psuAppContext.getTextMessageVersion();
+}
 
 static const uint16_t g_ytGraphStyles[] = {
     STYLE_ID_YT_GRAPH_Y1,

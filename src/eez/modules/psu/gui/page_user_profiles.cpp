@@ -18,18 +18,17 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/modules/psu/psu.h>
-
 #include <string.h>
 
 #include <eez/scpi/scpi.h>
 
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
+
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
-
-#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
 
 #include <scpi/scpi.h>
@@ -44,9 +43,9 @@ static int g_selectedProfileLocation = -1;
 char g_remark[PROFILE_NAME_MAX_LENGTH + 1];
 
 UserProfilesPage *getUserProfileSettingsPage() {
-    Page *page = g_psuAppContext.getPage(PAGE_ID_USER_PROFILE_SETTINGS);
+    Page *page = getPage(PAGE_ID_USER_PROFILE_SETTINGS);
     if (!page) {
-        page = g_psuAppContext.getPage(PAGE_ID_USER_PROFILE_0_SETTINGS);
+        page = getPage(PAGE_ID_USER_PROFILE_0_SETTINGS);
     }
     return (UserProfilesPage *)page;
 }
@@ -111,7 +110,7 @@ void UserProfilesPage::onSaveFinish(char *remark, void (*callback)()) {
 
     strcpy(g_remark, remark);
 
-    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Saving profile...");
+    showProgressPageWithoutAbort("Saving profile...");
 
     using namespace eez::scpi;
     osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_SAVE, 0), osWaitForever);
@@ -128,7 +127,7 @@ void UserProfilesPage::doSaveProfile() {
 
 void UserProfilesPage::recallProfile() {
     if (g_selectedProfileLocation > 0 && profile::isValid(g_selectedProfileLocation)) {
-        eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Recalling profile...");
+        showProgressPageWithoutAbort("Recalling profile...");
 
         using namespace eez::scpi;
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_RECALL, 0), osWaitForever);
@@ -154,7 +153,7 @@ void UserProfilesPage::onImportProfileFileSelected(const char *profileFilePath) 
     auto *page = (UserProfilesPage *)getUserProfileSettingsPage();
     strcpy(page->m_profileFilePath, profileFilePath);
     
-    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Importing profile...");
+    showProgressPageWithoutAbort("Importing profile...");
 
     using namespace eez::scpi;
     osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_IMPORT, 0), osWaitForever);
@@ -181,7 +180,7 @@ void UserProfilesPage::onExportProfileFileSelected(const char *profileFilePath) 
     auto *page = (UserProfilesPage *)getUserProfileSettingsPage();
     strcpy(page->m_profileFilePath, profileFilePath);
     
-    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Exporting profile...");
+    showProgressPageWithoutAbort("Exporting profile...");
 
     using namespace eez::scpi;
     osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EXPORT, 0), osWaitForever);
@@ -205,7 +204,7 @@ void UserProfilesPage::deleteProfile() {
 }
 
 void UserProfilesPage::onDeleteProfileYes() {
-    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Deleting profile...");
+    showProgressPageWithoutAbort("Deleting profile...");
 
     using namespace eez::scpi;
     osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_DELETE, 0), osWaitForever);
@@ -233,7 +232,7 @@ void UserProfilesPage::onEditRemarkOk(char *newRemark) {
 
     popPage();
 
-    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Saving profile remark...");
+    showProgressPageWithoutAbort("Saving profile remark...");
 
     using namespace eez::scpi;
     osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EDIT_REMARK, 0), osWaitForever);
@@ -249,7 +248,7 @@ void UserProfilesPage::doEditRemark() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void UserProfilesPage::onAsyncOperationFinished(int16_t err) {
-    eez::psu::gui::g_psuAppContext.hideProgressPage();
+    hideProgressPage();
     if (err == SCPI_RES_OK) {
         // infoMessage("Done!");
     } else {

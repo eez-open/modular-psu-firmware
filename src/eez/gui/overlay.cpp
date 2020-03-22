@@ -49,19 +49,19 @@ void getOverlayOffset(WidgetCursor &widgetCursor, int &xOffset, int &yOffset) {
     Overlay *overlay = getOverlay(widgetCursor);
     if (overlay) {
         int x = widgetCursor.x + overlay->xOffset;
-        if (x < g_appContext->x) {
-            x = g_appContext->x;
+        if (x < widgetCursor.appContext->x) {
+            x = widgetCursor.appContext->x;
         }
-        if (x + overlay->width > g_appContext->x + g_appContext->width) {
-            x = g_appContext->x + g_appContext->width - overlay->width;
+        if (x + overlay->width > widgetCursor.appContext->x + widgetCursor.appContext->width) {
+            x = widgetCursor.appContext->x + widgetCursor.appContext->width - overlay->width;
         }
 
         int y = widgetCursor.y + overlay->yOffset;
-        if (y < g_appContext->y) {
-            y = g_appContext->y;
+        if (y < widgetCursor.appContext->y) {
+            y = widgetCursor.appContext->y;
         }
-        if (y + overlay->height > g_appContext->y + g_appContext->height) {
-            y = g_appContext->y + g_appContext->height - overlay->height;
+        if (y + overlay->height > widgetCursor.appContext->y + widgetCursor.appContext->height) {
+            y = widgetCursor.appContext->y + widgetCursor.appContext->height - overlay->height;
         }
 
         xOffset = overlay->xOffset = x - widgetCursor.x;

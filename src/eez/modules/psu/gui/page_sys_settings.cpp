@@ -37,11 +37,10 @@
 #endif
 #include <eez/modules/psu/channel_dispatcher.h>
 
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
-#include <eez/modules/psu/gui/psu.h>
-#include <eez/gui/gui.h>
 
 #include <eez/modules/aux_ps/fan.h>
 
@@ -268,7 +267,7 @@ void SysSettingsDateTimePage::checkTestNtpServerStatus() {
 
 void SysSettingsDateTimePage::testNtpServer() {
     ntp::testNtpServer(ntpServer);
-    g_psuAppContext.showAsyncOperationInProgress("Testing NTP server...", checkTestNtpServerStatus);
+    showAsyncOperationInProgress("Testing NTP server...", checkTestNtpServerStatus);
 }
 #endif
 
@@ -457,11 +456,8 @@ void SysSettingsEthernetStaticPage::onAddressSet(uint32_t address) {
 
 void SysSettingsEthernetStaticPage::editAddress(uint32_t &address) {
     m_editAddress = &address;
-
     NumericKeypadOptions options;
-
-    NumericKeypad::start(0, data::Value((uint32_t)address, VALUE_TYPE_IP_ADDRESS), options, 0,
-                         onAddressSet, 0);
+    NumericKeypad::start(0, data::Value((uint32_t)address, VALUE_TYPE_IP_ADDRESS), options, 0, onAddressSet, 0);
 }
 
 void SysSettingsEthernetStaticPage::editIpAddress() {
@@ -658,15 +654,15 @@ void SysSettingsTemperaturePage::onFanSpeedSet(float value) {
         } else {
             page->fanSpeedPWM = FAN_MAX_PWM;
             page->fanPWMMeasuringInProgress = true;
-            g_psuAppContext.showAsyncOperationInProgress("Calibrating PWM...", isFanPWMMeasuringDone);
+            showAsyncOperationInProgress("Calibrating PWM...", isFanPWMMeasuringDone);
         }
     }
 }
 
 void SysSettingsTemperaturePage::isFanPWMMeasuringDone() {
-    auto page = (psu::gui::SysSettingsTemperaturePage *)psu::gui::g_psuAppContext.getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
+    auto page = (psu::gui::SysSettingsTemperaturePage *)psu::gui::getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
     if (!page->fanPWMMeasuringInProgress) {
-        g_psuAppContext.hideAsyncOperationInProgress();
+        hideAsyncOperationInProgress();
     }
 }
 
@@ -847,9 +843,9 @@ void SysSettingsIOPinsPage::selectFunction() {
     if (pinNumber < DOUT1) {
         pushSelectFromEnumPage(g_ioPinsInputFunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
     } else if (pinNumber == DOUT2) {
-        pushSelectFromEnumPage( g_ioPinsOutput2FunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
+        pushSelectFromEnumPage(g_ioPinsOutput2FunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
     } else {
-        pushSelectFromEnumPage( g_ioPinsOutputFunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
+        pushSelectFromEnumPage(g_ioPinsOutputFunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
     }
 }
 

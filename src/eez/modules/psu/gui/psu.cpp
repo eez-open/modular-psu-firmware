@@ -35,6 +35,7 @@
 #include <eez/modules/psu/dlog_view.h>
 #include <eez/modules/psu/sd_card.h>
 
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/animations.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
@@ -50,7 +51,6 @@
 #include <eez/modules/psu/gui/page_sys_settings.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
 #include <eez/modules/psu/gui/password.h>
-#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/gui/touch_calibration.h>
 
@@ -65,180 +65,19 @@
 #include <eez/platform/simulator/front_panel.h>
 #endif
 
+#define CONF_GUI_TOAST_DURATION_MS 2000L
+
 #define CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT_MS 2000
 #define CONF_GUI_STANDBY_PAGE_TIMEOUT_MS 4000
 #define CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT_MS 2000
 #define CONF_GUI_WELCOME_PAGE_TIMEOUT_MS 2000
 
-namespace eez {
-
-namespace mp {
-
-void onUncaughtScriptExceptionHook() {
-    eez::psu::gui::g_psuAppContext.dialogClose();
-    eez::psu::gui::g_psuAppContext.showUncaughtScriptExceptionMessage();
-}
-
-}
-
-namespace gui {
-
-#if EEZ_PLATFORM_STM32
-AppContext &getRootAppContext() {
-    return psu::gui::g_psuAppContext;
-}
-#endif
-
-void stateManagmentHook() {
-    AppContext *saved = g_appContext;
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    g_appContext = &g_frontPanelAppContext;
-    g_frontPanelAppContext.stateManagment();
-#endif
-
-    g_appContext = &psu::gui::g_psuAppContext;
-    psu::gui::g_psuAppContext.stateManagment();
-
-    g_appContext = saved;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 using namespace eez::psu::gui;
 
-static SelfTestResultPage g_SelfTestResultPage;
-static EventQueuePage g_EventQueuePage;
-static ChSettingsOvpProtectionPage g_ChSettingsOvpProtectionPage;
-static ChSettingsOcpProtectionPage g_ChSettingsOcpProtectionPage;
-static ChSettingsOppProtectionPage g_ChSettingsOppProtectionPage;
-static ChSettingsOtpProtectionPage g_ChSettingsOtpProtectionPage;
-static ChSettingsAdvOptionsPage g_ChSettingsAdvOptionPage;
-static ChSettingsAdvRangesPage g_ChSettingsAdvRangesPage;
-static ChSettingsAdvViewPage g_ChSettingsAdvViewPage;
-static ChSettingsTriggerPage g_ChSettingsTriggerPage;
-static ChSettingsListsPage g_ChSettingsListsPage;
-static SysSettingsDateTimePage g_SysSettingsDateTimePage;
-#if OPTION_ETHERNET
-static SysSettingsEthernetPage g_SysSettingsEthernetPage;
-static SysSettingsEthernetStaticPage g_SysSettingsEthernetStaticPage;
-static SysSettingsMqttPage g_SysSettingsMqttPage;
-#endif
-static SysSettingsProtectionsPage g_SysSettingsProtectionsPage;
-static SysSettingsTriggerPage g_SysSettingsTriggerPage;
-static SysSettingsIOPinsPage g_SysSettingsIOPinsPage;
-static SysSettingsTemperaturePage g_SysSettingsTemperaturePage;
-static SysSettingsSoundPage g_SysSettingsSoundPage;
-#if OPTION_ENCODER
-static SysSettingsEncoderPage g_SysSettingsEncoderPage;
-#endif
-static SysSettingsTrackingPage g_sysSettingsTrackingPage;
-static SysSettingsCouplingPage g_sysSettingsCouplingPage;
-static UserProfilesPage g_UserProfilesPage;
-static file_manager::FileBrowserPage g_FileBrowserPage;
-
 ////////////////////////////////////////////////////////////////////////////////
 
-Page *getPageFromIdHook(int pageId) {
-    Page *page = nullptr;
-
-    switch (pageId) {
-    case PAGE_ID_SELF_TEST_RESULT:
-        page = &g_SelfTestResultPage;
-        break;
-    case PAGE_ID_EVENT_QUEUE:
-        page = &g_EventQueuePage;
-        break;
-    case PAGE_ID_CH_SETTINGS_PROT_OVP:
-        page = &g_ChSettingsOvpProtectionPage;
-        break;
-    case PAGE_ID_CH_SETTINGS_PROT_OCP:
-        page = &g_ChSettingsOcpProtectionPage;
-        break;
-    case PAGE_ID_CH_SETTINGS_PROT_OPP:
-        page = &g_ChSettingsOppProtectionPage;
-        break;
-    case PAGE_ID_CH_SETTINGS_PROT_OTP:
-        page = &g_ChSettingsOtpProtectionPage;
-        break;
-    case PAGE_ID_CH_SETTINGS_ADV_OPTIONS:
-        page = &g_ChSettingsAdvOptionPage;
-        break;
-    case PAGE_ID_CH_SETTINGS_ADV_RANGES:
-        page = &g_ChSettingsAdvRangesPage;
-        break;
-    case PAGE_ID_SYS_SETTINGS_TRACKING:
-        page = &g_sysSettingsTrackingPage;
-        break;
-    case PAGE_ID_SYS_SETTINGS_COUPLING:
-        page = &g_sysSettingsCouplingPage;
-        break;
-    case PAGE_ID_CH_SETTINGS_ADV_VIEW:
-        page = &g_ChSettingsAdvViewPage;
-        break;
-    case PAGE_ID_CH_SETTINGS_TRIGGER:
-        page = &g_ChSettingsTriggerPage;
-        break;
-    case PAGE_ID_CH_SETTINGS_LISTS:
-        page = &g_ChSettingsListsPage;
-        break;
-    case PAGE_ID_SYS_SETTINGS_DATE_TIME:
-        page = &g_SysSettingsDateTimePage;
-        break;
-#if OPTION_ETHERNET
-    case PAGE_ID_SYS_SETTINGS_ETHERNET:
-        page = &g_SysSettingsEthernetPage;
-        break;
-    case PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC:
-        page = &g_SysSettingsEthernetStaticPage;
-        break;
-    case PAGE_ID_SYS_SETTINGS_MQTT:
-        page = &g_SysSettingsMqttPage;
-        break;
-#endif
-    case PAGE_ID_SYS_SETTINGS_PROTECTIONS:
-        page = &g_SysSettingsProtectionsPage;
-        break;
-    case PAGE_ID_SYS_SETTINGS_TRIGGER:
-        page = &g_SysSettingsTriggerPage;
-        break;
-    case PAGE_ID_SYS_SETTINGS_IO:
-        page = &g_SysSettingsIOPinsPage;
-        break;
-    case PAGE_ID_SYS_SETTINGS_TEMPERATURE:
-        page = &g_SysSettingsTemperaturePage;
-        break;
-    case PAGE_ID_SYS_SETTINGS_SOUND:
-        page = &g_SysSettingsSoundPage;
-        break;
-#if OPTION_ENCODER
-    case PAGE_ID_SYS_SETTINGS_ENCODER:
-        page = &g_SysSettingsEncoderPage;
-        break;
-#endif
-    case PAGE_ID_USER_PROFILES:
-    case PAGE_ID_USER_PROFILE_0_SETTINGS:
-    case PAGE_ID_USER_PROFILE_SETTINGS:
-        page = &g_UserProfilesPage;
-        break;
-    case PAGE_ID_FILE_BROWSER:
-        page = &g_FileBrowserPage;
-        break;
-    }
-
-    if (page) {
-        page->pageAlloc();
-    }
-
-    return page;
-}
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
+namespace eez {
 namespace psu {
-
 namespace gui {
 
 PsuAppContext g_psuAppContext;
@@ -264,6 +103,8 @@ static struct {
     Value value;
     char text[128 + 1];
 } g_externalDataItemValues[MAX_NUM_EXTERNAL_DATA_ITEM_VALUES];
+
+SelectFromEnumPage g_selectFromEnumPage;
 
 bool showSetupWizardQuestion();
 void onEncoder(int counter, bool clicked);
@@ -295,25 +136,32 @@ void PsuAppContext::stateManagment() {
         }
     }
 
-    AppContext::stateManagment();
+    // remove alert message after period of time
+    uint32_t inactivityPeriod = psu::idle::getHmiInactivityPeriod();
+    if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
+        ToastMessagePage *page = (ToastMessagePage *)getActivePage();
+        if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
+            popPage();
+        }
+    }
 
     uint32_t tickCount = millis();
 
     // wait some time for transitional pages
     int activePageId = getActivePageId();
     if (activePageId == PAGE_ID_STANDBY) {
-        if (int32_t(tickCount - getShowPageTime()) < CONF_GUI_STANDBY_PAGE_TIMEOUT_MS) {
+        if (int32_t(tickCount - m_showPageTime) < CONF_GUI_STANDBY_PAGE_TIMEOUT_MS) {
             return;
         }
     } else if (activePageId == PAGE_ID_ENTERING_STANDBY) {
-        if (int32_t(tickCount - getShowPageTime()) >= CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT_MS) {
-            uint32_t saved_showPageTime = getShowPageTime();
+        if (int32_t(tickCount - m_showPageTime) >= CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT_MS) {
+            uint32_t saved_showPageTime = m_showPageTime;
             showStandbyPage();
-            setShowPageTime(saved_showPageTime);
+            m_showPageTime = saved_showPageTime;
         }
         return;
     } else if (activePageId == PAGE_ID_WELCOME) {
-        if (int32_t(tickCount - getShowPageTime()) < CONF_GUI_WELCOME_PAGE_TIMEOUT_MS) {
+        if (int32_t(tickCount - m_showPageTime) < CONF_GUI_WELCOME_PAGE_TIMEOUT_MS) {
             return;
         }
     }
@@ -360,7 +208,6 @@ void PsuAppContext::stateManagment() {
     }
 
     // start touch screen calibration automatically after period of time
-    uint32_t inactivityPeriod = psu::idle::getHmiInactivityPeriod();
     if (activePageId == PAGE_ID_TOUCH_CALIBRATION_INTRO) {
         if (inactivityPeriod >= 20 * 1000UL) {
             enterTouchCalibration();
@@ -378,9 +225,9 @@ void PsuAppContext::stateManagment() {
     // handling of display off page
     if (activePageId == PAGE_ID_DISPLAY_OFF) {
         if (eez::mcu::display::isOn()) {
-            if (int32_t(tickCount - getShowPageTime()) >= CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT_MS) {
+            if (int32_t(tickCount - m_showPageTime) >= CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT_MS) {
                 eez::mcu::display::turnOff();
-                setShowPageTime(tickCount);
+                m_showPageTime = tickCount;
             }
         }
         return;
@@ -416,7 +263,7 @@ void PsuAppContext::stateManagment() {
     }
 
     // show startup wizard
-    if (!isFrontPanelLocked() && activePageId == PAGE_ID_MAIN && int32_t(micros() - getShowPageTime()) >= 50000L) {
+    if (!isFrontPanelLocked() && activePageId == PAGE_ID_MAIN && int32_t(micros() - m_showPageTime) >= 50000L) {
         if (showSetupWizardQuestion()) {
             return;
         }
@@ -676,10 +523,7 @@ bool PsuAppContext::isAutoRepeatAction(int action) {
 
 void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
     if (isFrontPanelLocked()) {
-        auto savedAppContext = g_appContext;
-        g_appContext = &psu::gui::g_psuAppContext;
         errorMessage("Front panel is locked!");
-        g_appContext = savedAppContext;
         return;
     }
 
@@ -741,38 +585,29 @@ bool PsuAppContext::isBlinking(const data::Cursor &cursor, int16_t id) {
 bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     if (widget->action) {
-        AppContext *saved = g_appContext;
-        g_appContext = this;
-
         if (isFrontPanelLocked()) {
             int activePageId = getActivePageId();
             if (activePageId == PAGE_ID_KEYPAD ||
                 activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO ||
                 activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
-                g_appContext = saved;
                 return true;
             }
             
             if (widget->action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
-                g_appContext = saved;
                 return false;
             }
         }
-
+    
         if (widget->action == ACTION_ID_SHOW_EVENT_QUEUE) {
             static const uint32_t CONF_SHOW_EVENT_QUEUE_INACTIVITY_TIMESPAN_SINCE_LAST_SHOW_PAGE_MS = 500;
-            if (millis() - getShowPageTime() < CONF_SHOW_EVENT_QUEUE_INACTIVITY_TIMESPAN_SINCE_LAST_SHOW_PAGE_MS) {
-                g_appContext = saved;
+            if (millis() - m_showPageTime < CONF_SHOW_EVENT_QUEUE_INACTIVITY_TIMESPAN_SINCE_LAST_SHOW_PAGE_MS) {
                 return false;
             }
         }
 
         if (widget->action == ACTION_ID_FILE_MANAGER_SELECT_FILE) {
-            g_appContext = saved;
             return file_manager::isSelectFileActionEnabled(widgetCursor.cursor.i);
         }
-
-        g_appContext = saved;
     }
 
     return AppContext::isWidgetActionEnabled(widgetCursor);
@@ -780,29 +615,29 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
 
 void PsuAppContext::doShowProgressPage() {
     data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage));
-    g_appContext->m_dialogCancelCallback = m_progressAbortCallback;
+    m_dialogCancelCallback = m_progressAbortCallback;
     pushPage(m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
     m_pushProgressPage = false;
 }
 
 void PsuAppContext::showProgressPage(const char *message, void (*abortCallback)()) {
-    g_psuAppContext.m_progressMessage = message;
-    g_psuAppContext.m_progressWithoutAbort = false;
-    g_psuAppContext.m_progressAbortCallback = abortCallback;
-    g_psuAppContext.m_pushProgressPage = true;
+    m_progressMessage = message;
+    m_progressWithoutAbort = false;
+    m_progressAbortCallback = abortCallback;
+    m_pushProgressPage = true;
 
     if (osThreadGetId() == g_guiTaskHandle) {
-    	g_psuAppContext.doShowProgressPage();
+    	doShowProgressPage();
     }
 }
 
 void PsuAppContext::showProgressPageWithoutAbort(const char *message) {
-    g_psuAppContext.m_progressMessage = message;
-    g_psuAppContext.m_progressWithoutAbort = true;
-    g_psuAppContext.m_pushProgressPage = true;
+    m_progressMessage = message;
+    m_progressWithoutAbort = true;
+    m_pushProgressPage = true;
 
     if (osThreadGetId() == g_guiTaskHandle) {
-    	g_psuAppContext.doShowProgressPage();
+    	doShowProgressPage();
     }
 }
 
@@ -813,11 +648,11 @@ bool PsuAppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) 
         g_progress = data::Value((uint32_t)processedSoFar, VALUE_TYPE_SIZE);
     }
 
-    if (g_psuAppContext.m_pushProgressPage) {
+    if (m_pushProgressPage) {
         return true;
     }
 
-    return g_psuAppContext.isPageOnStack(g_psuAppContext.m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
+    return isPageOnStack(m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
 }
 
 void PsuAppContext::doHideProgressPage() {
@@ -826,40 +661,40 @@ void PsuAppContext::doHideProgressPage() {
 }
 
 void PsuAppContext::hideProgressPage() {
-    if (g_psuAppContext.m_pushProgressPage) {
-        g_psuAppContext.m_pushProgressPage = false;
+    if (m_pushProgressPage) {
+        m_pushProgressPage = false;
     } else {
-        g_psuAppContext.m_popProgressPage = true;
+        m_popProgressPage = true;
     }
 
     if (osThreadGetId() == g_guiTaskHandle) {
-    	g_psuAppContext.doHideProgressPage();
+    	doHideProgressPage();
     }
 }
 
 void PsuAppContext::showAsyncOperationInProgress(const char *message, void (*checkStatus)()) {
-    g_psuAppContext.m_asyncOperationInProgressParams.message = message;
-    g_psuAppContext.m_asyncOperationInProgressParams.checkStatus = checkStatus;
+    m_asyncOperationInProgressParams.message = message;
+    m_asyncOperationInProgressParams.checkStatus = checkStatus;
 
     if (osThreadGetId() == g_guiTaskHandle) {
-        g_psuAppContext.doShowAsyncOperationInProgress();
+        doShowAsyncOperationInProgress();
     } else {
         osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_ASYNC_OPERATION_IN_PROGRESS, 0), osWaitForever);
     }
 }
 
 void PsuAppContext::doShowAsyncOperationInProgress() {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(g_psuAppContext.m_asyncOperationInProgressParams.message));
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_asyncOperationInProgressParams.message));
 
     if (getActivePageId() != PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
-        g_psuAppContext.m_asyncOperationInProgressParams.startTime = millis();
+        m_asyncOperationInProgressParams.startTime = millis();
         pushPage(PAGE_ID_ASYNC_OPERATION_IN_PROGRESS);
     }
 }
 
 void PsuAppContext::hideAsyncOperationInProgress() {
     if (osThreadGetId() == g_guiTaskHandle) {
-        g_psuAppContext.doHideAsyncOperationInProgress();
+        doHideAsyncOperationInProgress();
     } else {
         osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_HIDE_ASYNC_OPERATION_IN_PROGRESS, 0), osWaitForever);
     }
@@ -874,21 +709,21 @@ uint32_t PsuAppContext::getAsyncInProgressStartTime() {
 }
 
 void PsuAppContext::setTextMessage(const char *message, unsigned int len) {
-    strncpy(g_psuAppContext.m_textMessage, message, len);
-    g_psuAppContext.m_textMessage[len] = 0;
-    g_psuAppContext.m_showTextMessage = true;
+    strncpy(m_textMessage, message, len);
+    m_textMessage[len] = 0;
+    m_showTextMessage = true;
 }
 
 void PsuAppContext::clearTextMessage() {
-    g_psuAppContext.m_clearTextMessage =  true;
+    m_clearTextMessage =  true;
 }
 
 const char *PsuAppContext::getTextMessage() {
-    return g_psuAppContext.m_textMessage;
+    return m_textMessage;
 }
 
 uint8_t PsuAppContext::getTextMessageVersion() {
-    return g_psuAppContext.m_textMessageVersion;
+    return m_textMessageVersion;
 }
 
 void PsuAppContext::showUncaughtScriptExceptionMessage() {
@@ -896,14 +731,14 @@ void PsuAppContext::showUncaughtScriptExceptionMessage() {
 }
 
 void TextInputParams::onSet(char *value) {
-    g_psuAppContext.popPage();
+    popPage();
 
     g_psuAppContext.m_textInputParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
 }
 
 void TextInputParams::onCancel() {
-    g_psuAppContext.popPage();
+    popPage();
 
     g_psuAppContext.m_textInputParams.m_input = nullptr;
     g_psuAppContext.m_inputReady = true;
@@ -931,14 +766,14 @@ void PsuAppContext::doShowTextInput() {
 }
 
 void NumberInputParams::onSet(float value) {
-    g_psuAppContext.popPage();
+    popPage();
 
     g_psuAppContext.m_numberInputParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
 }
 
 void NumberInputParams::onCancel() {
-    g_psuAppContext.popPage();
+    popPage();
 
     g_psuAppContext.m_numberInputParams.m_input = NAN;
     g_psuAppContext.m_inputReady = true;
@@ -968,14 +803,14 @@ float PsuAppContext::numberInput(const char *label, Unit unit, float min, float 
 }
 
 void PsuAppContext::doShowNumberInput() {
-    NumericKeypad::start(m_inputLabel, Value(m_numberInputParams.m_input, m_numberInputParams.m_options.editValueUnit), m_numberInputParams.m_options, m_numberInputParams.onSet, nullptr, m_numberInputParams.onCancel);
+    NumericKeypad::start(this, m_inputLabel, Value(m_numberInputParams.m_input, m_numberInputParams.m_options.editValueUnit), m_numberInputParams.m_options, m_numberInputParams.onSet, nullptr, m_numberInputParams.onCancel);
 }
 
 void PsuAppContext::dialogOpen() {
     if (osThreadGetId() == g_guiTaskHandle) {
-        if (g_psuAppContext.getActivePageId() != getExternalAssetsFirstPageId()) {
+        if (getActivePageId() != getExternalAssetsFirstPageId()) {
             dialogResetDataItemValues();
-            g_psuAppContext.pushPage(getExternalAssetsFirstPageId());
+            pushPage(getExternalAssetsFirstPageId());
         }
         g_dialogOpening = false;
     } else {
@@ -1044,8 +879,8 @@ void PsuAppContext::dialogSetDataItemValue(int16_t dataId, const char *str) {
 
 void PsuAppContext::dialogClose() {
     if (osThreadGetId() == g_guiTaskHandle) {
-        if (g_psuAppContext.getActivePageId() == getExternalAssetsFirstPageId()) {
-            g_psuAppContext.popPage();
+        if (getActivePageId() == getExternalAssetsFirstPageId()) {
+            popPage();
         }
     } else {
         osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE, 0), osWaitForever);
@@ -1053,7 +888,7 @@ void PsuAppContext::dialogClose() {
 }
 
 void MenuInputParams::onSet(int value) {
-    g_psuAppContext.popPage();
+    popPage();
 
     g_psuAppContext.m_menuInputParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
@@ -1110,7 +945,7 @@ void SelectParams::enumDefinition(data::DataOperationEnum operation, data::Curso
 }
 
 void SelectParams::onSelect(uint16_t value) {
-    g_psuAppContext.popPage();
+    popPage();
 
     g_psuAppContext.m_selectParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
@@ -1460,7 +1295,7 @@ float encoderIncrement(Value value, int counter, float min, float max, int chann
     if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
         step = precision * powf(10.0f, 1.0f * mcu::encoder::getAutoModeStepLevel());
     } else {
-        step = psu::gui::edit_mode_step::getCurrentEncoderStepValue().getFloat();
+        step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
     }
 
     float newValue = value.getFloat() + step * counter;
@@ -1486,7 +1321,7 @@ void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
 
 bool isEnabledFocusCursor(data::Cursor &cursor, int16_t dataId) {
     g_focusCursorIsEnabled = false;
-    enumWidgets(isEnabledFocusCursorStep);
+    enumWidgets(&g_psuAppContext, isEnabledFocusCursorStep);
     return g_focusCursorIsEnabled;
 }
 
@@ -1499,7 +1334,7 @@ void isEncoderEnabledInActivePageCheckWidget(const WidgetCursor &widgetCursor) {
 bool isEncoderEnabledInActivePage() {
     // encoder is enabled if active page contains widget with "edit" action
     g_isEncoderEnabledInActivePage = false;
-    enumWidgets(isEncoderEnabledInActivePageCheckWidget);
+    enumWidgets(&g_psuAppContext, isEncoderEnabledInActivePageCheckWidget);
     return g_isEncoderEnabledInActivePage;
 }
 
@@ -1513,7 +1348,7 @@ static void doUnlockFrontPanel() {
 }
 
 static void checkPasswordToUnlockFrontPanel() {
-    psu::gui::checkPassword("Password: ", psu::persist_conf::devConf.systemPassword, doUnlockFrontPanel);
+    checkPassword("Password: ", psu::persist_conf::devConf.systemPassword, doUnlockFrontPanel);
 }
 
 void lockFrontPanel() {
@@ -1537,23 +1372,194 @@ bool isFrontPanelLocked() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void showWelcomePage() {
-    psu::gui::g_psuAppContext.showPage(PAGE_ID_WELCOME);
+    showPage(PAGE_ID_WELCOME);
 }
 
 void showEnteringStandbyPage() {
-    psu::gui::g_psuAppContext.showPage(PAGE_ID_ENTERING_STANDBY);
+    showPage(PAGE_ID_ENTERING_STANDBY);
 }
 
 void showStandbyPage() {
-    psu::gui::g_psuAppContext.showPage(PAGE_ID_STANDBY);
+    showPage(PAGE_ID_STANDBY);
 }
 
 void showSavingPage() {
-    psu::gui::g_psuAppContext.showPage(PAGE_ID_SAVING);
+    showPage(PAGE_ID_SAVING);
 }
 
 void showShutdownPage() {
-    psu::gui::g_psuAppContext.showPage(PAGE_ID_SHUTDOWN);
+    showPage(PAGE_ID_SHUTDOWN);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+Value g_alertMessage;
+Value g_alertMessage2;
+Value g_alertMessage3;
+
+////////////////////////////////////////////////////////////////////////////////
+
+void pushToastMessage(ToastMessagePage *toastMessage) {
+    pushPage(INTERNAL_PAGE_ID_TOAST_MESSAGE, toastMessage);
+}
+
+void infoMessage(const char *message) {
+    pushToastMessage(ToastMessagePage::create(INFO_TOAST, message));
+}
+
+void infoMessage(data::Value value) {
+    pushToastMessage(ToastMessagePage::create(INFO_TOAST, value));
+}
+
+void infoMessage(const char *message1, const char *message2) {
+    pushToastMessage(ToastMessagePage::create(INFO_TOAST, message1, message2));
+}
+
+void errorMessage(const char *message) {
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message));
+    sound::playBeep();
+}
+
+void errorMessage(const char *message1, const char *message2) {
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message1, message2));
+    sound::playBeep();
+}
+
+void errorMessage(const char *message1, const char *message2, const char *message3, bool autoDismiss) {
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message1, message2, message3, autoDismiss));
+    sound::playBeep();
+}
+
+void errorMessage(data::Value value) {
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, value));
+    sound::playBeep();
+}
+
+void errorMessageWithAction(data::Value value, void (*action)(int param), const char *actionLabel, int actionParam) {
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, value, action, actionLabel, actionParam));
+    sound::playBeep();
+}
+
+void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel) {
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message, action, actionLabel));
+    sound::playBeep();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)()) {
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message));
+
+    g_psuAppContext.m_dialogYesCallback = yes_callback;
+    g_psuAppContext.m_dialogNoCallback = no_callback;
+    g_psuAppContext.m_dialogCancelCallback = cancel_callback;
+
+    pushPage(yesNoPageId);
+}
+
+void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*later_callback)()) {
+    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message));
+
+    g_psuAppContext.m_dialogYesCallback = yes_callback;
+    g_psuAppContext.m_dialogNoCallback = no_callback;
+    g_psuAppContext.m_dialogLaterCallback = later_callback;
+
+    pushPage(PAGE_ID_YES_NO_LATER);
+}
+
+void areYouSure(void (*yes_callback)()) {
+    yesNoDialog(PAGE_ID_YES_NO, "Are you sure?", yes_callback, 0, 0);
+}
+
+void areYouSureWithMessage(const char *message, void (*yes_callback)()) {
+    yesNoDialog(PAGE_ID_ARE_YOU_SURE_WITH_MESSAGE, message, yes_callback, 0, 0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void dialogYes() {
+    auto callback = g_psuAppContext.m_dialogYesCallback;
+
+    popPage();
+
+    if (callback) {
+        callback();
+    }
+}
+
+void dialogNo() {
+    auto callback = g_psuAppContext.m_dialogNoCallback;
+
+    popPage();
+
+    if (callback) {
+        callback();
+    }
+}
+
+void dialogCancel() {
+    auto callback = g_psuAppContext.m_dialogCancelCallback;
+
+    popPage();
+
+    if (callback) {
+        callback();
+    }
+}
+
+void dialogOk() {
+    dialogYes();
+}
+
+void dialogLater() {
+    auto callback = g_psuAppContext.m_dialogLaterCallback;
+
+    popPage();
+
+    if (callback) {
+        callback();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void pushSelectFromEnumPage(
+    AppContext *appContext,
+    const data::EnumItem *enumDefinition,
+    uint16_t currentValue,
+    bool (*disabledCallback)(uint16_t value),
+    void (*onSet)(uint16_t),
+    bool smallFont,
+    bool showRadioButtonIcon
+) {
+	g_selectFromEnumPage.init(appContext, enumDefinition, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
+    appContext->pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &g_selectFromEnumPage);
+}
+
+void pushSelectFromEnumPage(
+    AppContext *appContext,
+    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
+    uint16_t currentValue,
+    bool(*disabledCallback)(uint16_t value),
+    void(*onSet)(uint16_t),
+    bool smallFont,
+    bool showRadioButtonIcon
+) {
+	g_selectFromEnumPage.init(appContext, enumDefinitionFunc, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
+    appContext->pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &g_selectFromEnumPage);
+}
+
+const data::EnumItem *getActiveSelectEnumDefinition() {
+    if (g_selectFromEnumPage.appContext && g_selectFromEnumPage.appContext->getActivePage() == &g_selectFromEnumPage) {
+        return g_selectFromEnumPage.getEnumDefinition();
+    }
+    return nullptr;
+}
+
+void popSelectFromEnumPage() {
+    if (g_selectFromEnumPage.appContext) {
+        g_selectFromEnumPage.appContext->popPage();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1584,7 +1590,7 @@ void findNextFocusCursor(const WidgetCursor &widgetCursor) {
 
 void moveToNextFocusCursor() {
     g_findNextFocusCursorState = 0;
-    enumWidgets(findNextFocusCursor);
+    enumWidgets(&g_psuAppContext, findNextFocusCursor);
     if (g_findNextFocusCursorState > 0) {
         g_focusCursor = g_nextFocusCursor;
         g_focusDataId = g_nextFocusDataId;
@@ -1592,7 +1598,7 @@ void moveToNextFocusCursor() {
 }
 
 bool onEncoderConfirmation() {
-    if (edit_mode::isActive() && !edit_mode::isInteractiveMode() && edit_mode::getEditValue() != edit_mode::getCurrentValue()) {
+    if (edit_mode::isActive(&g_psuAppContext) && !edit_mode::isInteractiveMode() && edit_mode::getEditValue() != edit_mode::getCurrentValue()) {
         edit_mode::nonInteractiveSet();
         return true;
     }
@@ -1655,7 +1661,7 @@ void onEncoder(int counter, bool clicked) {
                 if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
                     step = stepValue.getFloat();
                 } else {
-                    step = psu::gui::edit_mode_step::getCurrentEncoderStepValue().getFloat();
+                    step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
                 }
                 newValue = roundPrec(value.getFloat() + counter * step, step);
                 if (data::getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
@@ -1816,8 +1822,7 @@ void channelInitiateTrigger() {
 void channelSetToFixed() {
     popPage();
 
-    Channel &channel = Channel::get(
-        g_toggleOutputWidgetCursor.cursor.i >= 0 ? g_toggleOutputWidgetCursor.cursor.i : 0);
+    Channel &channel = Channel::get(g_toggleOutputWidgetCursor.cursor.i >= 0 ? g_toggleOutputWidgetCursor.cursor.i : 0);
     if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED) {
         channel_dispatcher::setVoltageTriggerMode(channel, TRIGGER_MODE_FIXED);
     }
@@ -1829,8 +1834,7 @@ void channelSetToFixed() {
 
 void channelEnableOutput() {
     popPage();
-    Channel &channel = Channel::get(
-        g_toggleOutputWidgetCursor.cursor.i >= 0 ? g_toggleOutputWidgetCursor.cursor.i : 0);
+    Channel &channel = Channel::get(g_toggleOutputWidgetCursor.cursor.i >= 0 ? g_toggleOutputWidgetCursor.cursor.i : 0);
     channel_dispatcher::outputEnable(channel, true);
 }
 
@@ -1854,21 +1858,200 @@ void selectChannel(Channel *channel) {
 
 } // namespace gui
 } // namespace psu
+} // namespace eez
 
+////////////////////////////////////////////////////////////////////////////////
+
+namespace eez {
 namespace mcu {
 namespace display {
 
 uint16_t transformColorHook(uint16_t color) {
-    if (color == COLOR_ID_CHANNEL1 && eez::psu::gui::g_channelIndex >= 0 && eez::psu::gui::g_channelIndex < CH_MAX) {
-        return COLOR_ID_CHANNEL1 + eez::psu::gui::g_channelIndex;
+    if (color == COLOR_ID_CHANNEL1 && g_channelIndex >= 0 && g_channelIndex < CH_MAX) {
+        return COLOR_ID_CHANNEL1 + g_channelIndex;
     }
     return color;
 }
 
 }
 }
+}
 
+////////////////////////////////////////////////////////////////////////////////
+
+namespace eez {
 namespace gui {
+
+#if EEZ_PLATFORM_STM32
+AppContext &getRootAppContext() {
+    return g_psuAppContext;
+}
+#endif
+
+void stateManagmentHook() {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_frontPanelAppContext.stateManagment();
+#endif
+
+    g_psuAppContext.stateManagment();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+using namespace eez::psu::gui;
+
+static SelfTestResultPage g_SelfTestResultPage;
+static EventQueuePage g_EventQueuePage;
+static ChSettingsOvpProtectionPage g_ChSettingsOvpProtectionPage;
+static ChSettingsOcpProtectionPage g_ChSettingsOcpProtectionPage;
+static ChSettingsOppProtectionPage g_ChSettingsOppProtectionPage;
+static ChSettingsOtpProtectionPage g_ChSettingsOtpProtectionPage;
+static ChSettingsAdvOptionsPage g_ChSettingsAdvOptionPage;
+static ChSettingsAdvRangesPage g_ChSettingsAdvRangesPage;
+static ChSettingsAdvViewPage g_ChSettingsAdvViewPage;
+static ChSettingsTriggerPage g_ChSettingsTriggerPage;
+static ChSettingsListsPage g_ChSettingsListsPage;
+static SysSettingsDateTimePage g_SysSettingsDateTimePage;
+#if OPTION_ETHERNET
+static SysSettingsEthernetPage g_SysSettingsEthernetPage;
+static SysSettingsEthernetStaticPage g_SysSettingsEthernetStaticPage;
+static SysSettingsMqttPage g_SysSettingsMqttPage;
+#endif
+static SysSettingsProtectionsPage g_SysSettingsProtectionsPage;
+static SysSettingsTriggerPage g_SysSettingsTriggerPage;
+static SysSettingsIOPinsPage g_SysSettingsIOPinsPage;
+static SysSettingsTemperaturePage g_SysSettingsTemperaturePage;
+static SysSettingsSoundPage g_SysSettingsSoundPage;
+#if OPTION_ENCODER
+static SysSettingsEncoderPage g_SysSettingsEncoderPage;
+#endif
+static SysSettingsTrackingPage g_sysSettingsTrackingPage;
+static SysSettingsCouplingPage g_sysSettingsCouplingPage;
+static UserProfilesPage g_UserProfilesPage;
+static file_manager::FileBrowserPage g_FileBrowserPage;
+
+////////////////////////////////////////////////////////////////////////////////
+
+Page *getPageFromIdHook(int pageId) {
+    Page *page = nullptr;
+
+    switch (pageId) {
+    case PAGE_ID_SELF_TEST_RESULT:
+        page = &g_SelfTestResultPage;
+        break;
+    case PAGE_ID_EVENT_QUEUE:
+        page = &g_EventQueuePage;
+        break;
+    case PAGE_ID_CH_SETTINGS_PROT_OVP:
+        page = &g_ChSettingsOvpProtectionPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_PROT_OCP:
+        page = &g_ChSettingsOcpProtectionPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_PROT_OPP:
+        page = &g_ChSettingsOppProtectionPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_PROT_OTP:
+        page = &g_ChSettingsOtpProtectionPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_ADV_OPTIONS:
+        page = &g_ChSettingsAdvOptionPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_ADV_RANGES:
+        page = &g_ChSettingsAdvRangesPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_TRACKING:
+        page = &g_sysSettingsTrackingPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_COUPLING:
+        page = &g_sysSettingsCouplingPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_ADV_VIEW:
+        page = &g_ChSettingsAdvViewPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_TRIGGER:
+        page = &g_ChSettingsTriggerPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_LISTS:
+        page = &g_ChSettingsListsPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_DATE_TIME:
+        page = &g_SysSettingsDateTimePage;
+        break;
+#if OPTION_ETHERNET
+    case PAGE_ID_SYS_SETTINGS_ETHERNET:
+        page = &g_SysSettingsEthernetPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC:
+        page = &g_SysSettingsEthernetStaticPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_MQTT:
+        page = &g_SysSettingsMqttPage;
+        break;
+#endif
+    case PAGE_ID_SYS_SETTINGS_PROTECTIONS:
+        page = &g_SysSettingsProtectionsPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_TRIGGER:
+        page = &g_SysSettingsTriggerPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_IO:
+        page = &g_SysSettingsIOPinsPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_TEMPERATURE:
+        page = &g_SysSettingsTemperaturePage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_SOUND:
+        page = &g_SysSettingsSoundPage;
+        break;
+#if OPTION_ENCODER
+    case PAGE_ID_SYS_SETTINGS_ENCODER:
+        page = &g_SysSettingsEncoderPage;
+        break;
+#endif
+    case PAGE_ID_USER_PROFILES:
+    case PAGE_ID_USER_PROFILE_0_SETTINGS:
+    case PAGE_ID_USER_PROFILE_SETTINGS:
+        page = &g_UserProfilesPage;
+        break;
+    case PAGE_ID_FILE_BROWSER:
+        page = &g_FileBrowserPage;
+        break;
+    }
+
+    if (page) {
+        page->pageAlloc();
+    }
+
+    return page;
+}
+
+void action_internal_select_enum_item() {
+    g_selectFromEnumPage.selectEnumItem();
+}
+
+// from InternalActionsEnum
+static ActionExecFunc g_internalActionExecFunctions[] = {
+    0,
+    // ACTION_ID_INTERNAL_SELECT_ENUM_ITEM
+    action_internal_select_enum_item,
+
+    // ACTION_ID_INTERNAL_DIALOG_CLOSE
+    popPage,
+
+    // ACTION_ID_INTERNAL_TOAST_ACTION
+    ToastMessagePage::executeAction,
+
+    // ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM
+    ToastMessagePage::executeActionWithoutParam,
+
+    // ACTION_ID_INTERNAL_MENU_WITH_BUTTONS
+    MenuWithButtonsPage::executeAction
+};
+
+void executeInternalActionHook(int actionId) {
+    g_internalActionExecFunctions[actionId - FIRST_INTERNAL_ACTION_ID]();
+}
 
 uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
     if (widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE1 || widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE2) {
@@ -1940,16 +2123,12 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED) {
         g_UserProfilesPage.onAsyncOperationFinished(param);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_TEXT_INPUT) {
-        g_appContext = &g_psuAppContext;
         g_psuAppContext.doShowTextInput();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT) {
-        g_appContext = &g_psuAppContext;
         g_psuAppContext.doShowNumberInput();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT) {
-        g_appContext = &g_psuAppContext;
         g_psuAppContext.doShowMenuInput();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_SELECT) {
-        g_appContext = &g_psuAppContext;
         g_psuAppContext.doShowSelect();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN) {
         g_psuAppContext.dialogOpen();
@@ -1983,7 +2162,19 @@ void externalDataHook(int16_t dataId, data::DataOperationEnum operation, data::C
 }
 
 } // namespace gui
-
 } // namespace eez
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace eez {
+namespace mp {
+
+void onUncaughtScriptExceptionHook() {
+    g_psuAppContext.dialogClose();
+    g_psuAppContext.showUncaughtScriptExceptionMessage();
+}
+
+}
+}
 
 #endif

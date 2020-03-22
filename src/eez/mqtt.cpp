@@ -200,10 +200,10 @@ void onIncomingPublish(const char *topic, const char *payload) {
         } else if (strcmp(p, "display/window/text") == 0) {
             int length = strlen(payload);
             if (length > 0) {
-                eez::psu::gui::g_psuAppContext.setTextMessage(payload, length);
+                psu::gui::setTextMessage(payload, length);
             }
         } else if (strcmp(p, "display/window/text/clear") == 0) {
-            eez::psu::gui::g_psuAppContext.clearTextMessage();
+            psu::gui::clearTextMessage();
         } else if (strcmp(p, "profile/recall") == 0) {
             char *endptr;
             int location = strtol(payload, &endptr, 10);

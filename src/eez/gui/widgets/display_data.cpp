@@ -52,7 +52,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
 
 	const Style *style = getStyle(widget->style);
 
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor, widget->data);
     
     uint32_t currentTime = millis();
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);

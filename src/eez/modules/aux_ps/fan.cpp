@@ -436,7 +436,7 @@ int updateFanSpeed() {
 
     uint8_t fanMode;
     uint8_t fanSpeed;
-    auto page = (psu::gui::SysSettingsTemperaturePage *)psu::gui::g_psuAppContext.getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
+    auto page = (psu::gui::SysSettingsTemperaturePage *)psu::gui::getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
     if (page) {
         fanMode = page->fanMode;
         fanSpeed = page->fanSpeedPWM;

@@ -191,6 +191,7 @@ set(src_eez_modules_psu_gui
     src/eez/modules/psu/gui/file_manager.cpp
     src/eez/modules/psu/gui/keypad.cpp
     src/eez/modules/psu/gui/numeric_keypad.cpp
+    src/eez/modules/psu/gui/page.cpp
     src/eez/modules/psu/gui/page_ch_settings_adv.cpp
     src/eez/modules/psu/gui/page_ch_settings_protection.cpp
     src/eez/modules/psu/gui/page_ch_settings_trigger.cpp
@@ -214,6 +215,7 @@ set(header_eez_modules_psu_gui
     src/eez/modules/psu/gui/file_manager.h
     src/eez/modules/psu/gui/keypad.h
     src/eez/modules/psu/gui/numeric_keypad.h
+    src/eez/modules/psu/gui/page.h
     src/eez/modules/psu/gui/page_ch_settings_adv.h
     src/eez/modules/psu/gui/page_ch_settings_protection.h
     src/eez/modules/psu/gui/page_ch_settings_trigger.h
@@ -263,7 +265,6 @@ set(src_eez_gui
     src/eez/gui/app_context.cpp
     src/eez/gui/assets.cpp
     src/eez/gui/data.cpp
-    src/eez/gui/dialogs.cpp
     src/eez/gui/document.cpp
     src/eez/gui/draw.cpp
     src/eez/gui/event.cpp
@@ -281,7 +282,6 @@ set(header_eez_gui
     src/eez/gui/app_context.h
     src/eez/gui/assets.h
     src/eez/gui/data.h
-    src/eez/gui/dialogs.h
     src/eez/gui/document.h
     src/eez/gui/document_simulator.h
     src/eez/gui/document_stm32.h

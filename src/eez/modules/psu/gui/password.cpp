@@ -19,14 +19,13 @@
 #if OPTION_DISPLAY
 
 #include <eez/modules/psu/psu.h>
-
-#include <scpi/scpi.h>
-
 #include <eez/modules/psu/persist_conf.h>
 
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/password.h>
-#include <eez/modules/psu/gui/psu.h>
+
+#include <scpi/scpi.h>
 
 namespace eez {
 namespace psu {

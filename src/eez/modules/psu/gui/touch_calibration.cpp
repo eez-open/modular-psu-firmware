@@ -25,6 +25,7 @@
 #include <eez/gui/touch_filter.h>
 
 #include <eez/modules/psu/psu.h>
+
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/touch_calibration.h>
 
@@ -65,33 +66,33 @@ void startCalibration() {
 }
 
 void enterTouchCalibration() {
-    psu::gui::g_psuAppContext.replacePage(PAGE_ID_TOUCH_CALIBRATION);
+    replacePage(PAGE_ID_TOUCH_CALIBRATION);
     Channel::saveAndDisableOE();
     startCalibration();
 }
 
-void dialogYes() {
+static void touchCalibrationDialogYes() {
     persist_conf::setTouchscreenCalParams(g_points[0].x, g_points[0].y, g_points[1].x, g_points[1].y, g_points[2].x, g_points[2].y);
 
     if (isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY)) {
         popPage();
         infoMessage("Touch screen is calibrated.");
     } else {
-	    showPage(PAGE_ID_MAIN);
+        showPage(PAGE_ID_MAIN);
     }
 
     Channel::restoreOE();
 }
 
-void dialogNo() {
+static void touchCalibrationDialogNo() {
     startCalibration();
 }
 
-void dialogCancel() {
+static void touchCalibrationDialogCancel() {
     if (isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY)) {
         popPage();
     } else {
-	    showPage(PAGE_ID_MAIN);
+        showPage(PAGE_ID_MAIN);
     }
 
     Channel::restoreOE();
@@ -114,7 +115,7 @@ void selectTouchCalibrationPoint() {
         if (success) {
             yesNoDialog(
                 isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY) ? PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL : PAGE_ID_TOUCH_CALIBRATION_YES_NO,
-                "Save changes?", dialogYes, dialogNo, dialogCancel
+                "Save changes?", touchCalibrationDialogYes, touchCalibrationDialogNo, touchCalibrationDialogCancel
             );
         } else {
             startCalibration();

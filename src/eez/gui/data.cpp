@@ -646,17 +646,17 @@ uint16_t getActiveBackgroundColor(const Cursor &cursor, int16_t id, const Style 
     return style->active_background_color;
 }
 
-bool isBlinking(const Cursor &cursor, int16_t id) {
+bool isBlinking(const WidgetCursor &widgetCursor, int16_t id) {
     if (id == DATA_ID_NONE) {
         return false;
     }
 
-    if (g_appContext->isBlinking(cursor, id)) {
+    if (widgetCursor.appContext->isBlinking(widgetCursor.cursor, id)) {
         return true;
     }
 
     Value value;
-    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_IS_BLINKING, (Cursor &)cursor, value);
+    DATA_OPERATION_FUNCTION(id, data::DATA_OPERATION_IS_BLINKING, (Cursor &)widgetCursor.cursor, value);
     return value.getInt() ? true : false;
 }
 
@@ -825,46 +825,6 @@ void ytDataTouchDrag(const Cursor &cursor, int16_t id, TouchDrag *touchDrag) {
 }
 
 } // namespace data
-} // namespace gui
-} // namespace eez
-
-namespace eez {
-namespace gui {
-
-void data_alert_message_is_set(data::DataOperationEnum operation, data::Cursor &cursor,
-                        data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = g_alertMessage.getString() != nullptr;
-    }
-}
-
-void data_alert_message(data::DataOperationEnum operation, data::Cursor &cursor,
-                        data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = g_alertMessage;
-    } else if (operation == data::DATA_OPERATION_SET) {
-        g_alertMessage = value;
-    }
-}
-
-void data_alert_message_2(data::DataOperationEnum operation, data::Cursor &cursor,
-                          data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = g_alertMessage2;
-    } else if (operation == data::DATA_OPERATION_SET) {
-        g_alertMessage2 = value;
-    }
-}
-
-void data_alert_message_3(data::DataOperationEnum operation, data::Cursor &cursor,
-                          data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = g_alertMessage3;
-    } else if (operation == data::DATA_OPERATION_SET) {
-        g_alertMessage3 = value;
-    }
-}
-
 } // namespace gui
 } // namespace eez
 

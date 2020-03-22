@@ -96,7 +96,7 @@ void animateFromDefaultViewToMaxView() {
     g_animRects[i++] = { BUFFER_NEW, g_defRects[iMin2], g_minRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_defRects[iMax], g_maxRect, 0, OPACITY_FADE_IN, POSITION_BOTTOM};
     
-    animateRects(BUFFER_OLD, i);
+    animateRects(&g_psuAppContext, BUFFER_OLD, i);
 }
 
 void animateFromMaxViewToDefaultView() {
@@ -119,7 +119,7 @@ void animateFromMaxViewToDefaultView() {
     g_animRects[i++] = { BUFFER_NEW, g_minRects[1], g_defRects[iMin2], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_maxRect, g_defRects[iMax], 0, OPACITY_FADE_IN, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
 
-    animateRects(BUFFER_OLD, i);
+    animateRects(&g_psuAppContext, BUFFER_OLD, i);
 }
 
 void animateFromMinViewToMaxView(int maxChannelIndexBefore) {
@@ -173,7 +173,7 @@ void animateFromMinViewToMaxView(int maxChannelIndexBefore) {
         g_animRects[i++] = { BUFFER_NEW, g_maxRectMin, g_maxRectMax, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
     }
 
-    animateRects(BUFFER_OLD, i);
+    animateRects(&g_psuAppContext, BUFFER_OLD, i);
 }
 
 void animateFromMicroViewToMaxView() {
@@ -193,7 +193,7 @@ void animateFromMicroViewToMaxView() {
     g_animRects[i++] = { BUFFER_NEW, g_microRects[iMin2], g_minRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_microRects[iMax], g_maxRect, 0, OPACITY_FADE_IN, POSITION_BOTTOM};
     
-    animateRects(BUFFER_OLD, i);
+    animateRects(&g_psuAppContext, BUFFER_OLD, i);
 }
 
 void animateShowSysSettings() {
@@ -216,7 +216,7 @@ void animateShowSysSettings() {
 
     g_animRects[i++] = { BUFFER_NEW, g_statusLineRectBottom, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    animateRects(BUFFER_OLD, i);
+    animateRects(&g_psuAppContext, BUFFER_OLD, i);
 }
 
 void animateHideSysSettings() {
@@ -239,7 +239,7 @@ void animateHideSysSettings() {
 
     g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectBottom, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    animateRects(BUFFER_NEW, i);
+    animateRects(&g_psuAppContext, BUFFER_NEW, i);
 }
 
 void animateSettingsSlideLeft(bool noChannels) {
@@ -251,7 +251,7 @@ void animateSettingsSlideLeft(bool noChannels) {
     g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectLeft, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_statusLineRectRight, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    animateRects(BUFFER_NEW, i);
+    animateRects(&g_psuAppContext, BUFFER_NEW, i);
 }
 
 void animateSettingsSlideRight(bool noChannels) {
@@ -263,7 +263,7 @@ void animateSettingsSlideRight(bool noChannels) {
     g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectRight, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_statusLineRectLeft, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    animateRects(BUFFER_NEW, i);
+    animateRects(&g_psuAppContext, BUFFER_NEW, i);
 }
 
 void animateSlideUp() {
@@ -273,7 +273,7 @@ void animateSlideUp() {
 
     g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectBottom, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    animateRects(BUFFER_NEW, i);
+    animateRects(&g_psuAppContext, BUFFER_NEW, i);
 }
 
 void animateSlideDown() {
@@ -283,7 +283,7 @@ void animateSlideDown() {
 
     g_animRects[i++] = { BUFFER_NEW, g_statusLineRectBottom, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    animateRects(BUFFER_OLD, i);
+    animateRects(&g_psuAppContext, BUFFER_OLD, i);
 }
 
 void animateSlideLeft() {
@@ -292,7 +292,7 @@ void animateSlideLeft() {
     g_animRects[i++] = { BUFFER_OLD, g_workingAreaRect, g_workingAreaRectLeft, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_workingAreaRectRight, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    animateRects(BUFFER_NEW, i);
+    animateRects(&g_psuAppContext, BUFFER_NEW, i);
 
     g_animationState.easingRects = remapInOutQuad;
 }
@@ -303,7 +303,7 @@ void animateSlideRight() {
     g_animRects[i++] = { BUFFER_OLD, g_workingAreaRect, g_workingAreaRectRight, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_workingAreaRectLeft, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    animateRects(BUFFER_NEW, i);
+    animateRects(&g_psuAppContext, BUFFER_NEW, i);
 
     g_animationState.easingRects = remapInOutQuad;
 }
@@ -313,7 +313,7 @@ void animateFadeOutFadeIn() {
     g_animRects[i++] = { BUFFER_SOLID_COLOR, g_displayRect, g_displayRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_OLD, g_displayRect, g_displayRect, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_displayRect, g_displayRect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    animateRects(BUFFER_NEW, i, 2 * psu::persist_conf::devConf.animationsDuration);
+    animateRects(&g_psuAppContext, BUFFER_NEW, i, 2 * psu::persist_conf::devConf.animationsDuration);
 }
 
 void animateFadeOutFadeInWorkingArea() {
@@ -321,7 +321,7 @@ void animateFadeOutFadeInWorkingArea() {
     g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_OLD, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
     g_animRects[i++] = { BUFFER_NEW, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    animateRects(BUFFER_NEW, i, 2 * psu::persist_conf::devConf.animationsDuration);
+    animateRects(&g_psuAppContext, BUFFER_NEW, i, 2 * psu::persist_conf::devConf.animationsDuration);
 }
 
 } // namespace gui

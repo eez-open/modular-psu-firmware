@@ -27,10 +27,10 @@
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/datetime.h>
 
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/page_ch_settings_trigger.h>
-#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
 
 #include <scpi/scpi.h>
@@ -656,14 +656,14 @@ void ChSettingsListsPage::onImportListFileSelected(const char *listFilePath) {
     auto *page = (ChSettingsListsPage *)getActivePage();
     strcpy(page->m_listFilePath, listFilePath);
 
-    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Import list...");
+    showProgressPageWithoutAbort("Import list...");
 
     using namespace eez::scpi;
     osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST, 0), osWaitForever);
 }
 
 void ChSettingsListsPage::doImportList() {
-    auto *page = (ChSettingsListsPage *)g_psuAppContext.getPage(PAGE_ID_CH_SETTINGS_LISTS);
+    auto *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
 
     int err;
     list::loadList(
@@ -679,7 +679,7 @@ void ChSettingsListsPage::doImportList() {
 }
 
 void ChSettingsListsPage::onImportListFinished(int16_t err) {
-    eez::psu::gui::g_psuAppContext.hideProgressPage();
+    hideProgressPage();
 
     if (err == SCPI_RES_OK) {
         m_dwellListLength = m_dwellListLengthLoad;
@@ -707,14 +707,14 @@ void ChSettingsListsPage::onExportListFileSelected(const char *listFilePath) {
     auto *page = (ChSettingsListsPage *)getActivePage();
     strcpy(page->m_listFilePath, listFilePath);
     
-    eez::psu::gui::PsuAppContext::showProgressPageWithoutAbort("Exporting list...");
+    showProgressPageWithoutAbort("Exporting list...");
 
     using namespace eez::scpi;
     osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST, 0), osWaitForever);
 }
 
 void ChSettingsListsPage::doExportList() {
-    auto *page = (ChSettingsListsPage *)g_psuAppContext.getPage(PAGE_ID_CH_SETTINGS_LISTS);
+    auto *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
 
     int err;
     list::saveList(
@@ -730,7 +730,7 @@ void ChSettingsListsPage::doExportList() {
 }
 
 void ChSettingsListsPage::onExportListFinished(int16_t err) {
-    eez::psu::gui::g_psuAppContext.hideProgressPage();
+    hideProgressPage();
 
     if (err != SCPI_RES_OK) {
         errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));

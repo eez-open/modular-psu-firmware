@@ -26,8 +26,6 @@
 #include <eez/index.h>
 #include <eez/mqtt.h>
 
-#include <eez/gui/gui.h>
-
 #include <eez/scpi/scpi.h>
 
 #include <eez/modules/psu/psu.h>
@@ -56,6 +54,7 @@
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/touch_calibration.h>
 #include <eez/modules/psu/gui/file_manager.h>
+
 #include <eez/modules/psu/sd_card.h>
 
 #if OPTION_ENCODER
@@ -65,6 +64,10 @@
 #include <eez/modules/bp3c/eeprom.h>
 #include <eez/modules/bp3c/flash_slave.h>
 #include <eez/modules/bp3c/io_exp.h>
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+#include <eez/platform/simulator/front_panel.h>
+#endif
 
 using namespace eez::gui;
 using namespace eez::psu;
@@ -100,7 +103,7 @@ void action_edit_mode_keypad() {
 }
 
 void action_exit_edit_mode() {
-    if (edit_mode::isActive()) {
+    if (edit_mode::isActive(&g_psuAppContext)) {
         edit_mode::exit();
     }
 }
@@ -202,7 +205,7 @@ void action_show_previous_page() {
 }
 
 void showMainPage() {
-	showPage(PAGE_ID_MAIN);
+    showPage(PAGE_ID_MAIN);
 }
 
 void action_show_main_page() {
@@ -665,7 +668,8 @@ void action_set_coupling_split_rails() {
 }
 
 void action_toggle_enable_tracking_mode_in_coupling() {
-    ((SysSettingsCouplingPage *)getActivePage())->m_enableTrackingMode = !((SysSettingsCouplingPage *)getActivePage())->m_enableTrackingMode;
+    auto page = (SysSettingsCouplingPage *)getActivePage();
+    page->m_enableTrackingMode = !page->m_enableTrackingMode;
 }
 
 void action_toggle_channel_tracking() {
@@ -883,7 +887,7 @@ void action_reset() {
 }
 
 void action_stand_by() {
-	popPage();
+    popPage();
     eez::standBy();
 }
 
@@ -898,7 +902,7 @@ void action_shutdown() {
 }
 
 void action_turn_display_off() {
-    popPage();    
+    popPage();
     psu::persist_conf::setDisplayState(0);
 }
 
@@ -938,13 +942,13 @@ void action_ntp_edit_server() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
 
 void onSimulatorLoadSet(float value) {
-	popPage();
+	g_frontPanelAppContext.popPage();
 	channel_dispatcher::setLoadEnabled(*g_channel, true);
 	channel_dispatcher::setLoad(*g_channel, value);
 }
 
 void onSimulatorDisconnectLoad() {
-	popPage();
+    g_frontPanelAppContext.popPage();
 	channel_dispatcher::setLoadEnabled(*g_channel, false);
 }
 
@@ -963,9 +967,7 @@ void selectSimulatorLoad() {
     options.option1ButtonText = "Off";
     options.option1 = onSimulatorDisconnectLoad;
 
-    NumericKeypad::start(
-        0, MakeValue(g_channel->simulator.getLoad(), UNIT_OHM), options,
-        onSimulatorLoadSet, 0, 0);
+    NumericKeypad::start(&g_frontPanelAppContext, 0, MakeValue(g_channel->simulator.getLoad(), UNIT_OHM), options, onSimulatorLoadSet, 0, 0);
 }
 
 void action_simulator_load() {
@@ -1026,15 +1028,10 @@ void action_user_switch_clicked() {
 		return;
 	}
 
-    if (g_psuAppContext.getActiveSelectEnumDefinition() == g_userSwitchActionEnumDefinition) {
-        g_psuAppContext.popPage();
+    if (getActiveSelectEnumDefinition() == g_userSwitchActionEnumDefinition) {
+        popSelectFromEnumPage();
         return;
     }
-
-#if EEZ_PLATFORM_SIMULATOR
-    AppContext *saved = g_appContext;
-    g_appContext = &psu::gui::g_psuAppContext;
-#endif
 
     switch (persist_conf::devConf.userSwitchAction) {
     case persist_conf::USER_SWITCH_ACTION_NONE:
@@ -1046,7 +1043,7 @@ void action_user_switch_clicked() {
         if (getActivePageId() == PAGE_ID_EDIT_MODE_STEP) {
             psu::gui::edit_mode_step::switchToNextStepIndex();
         } else {
-            if (g_appContext->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE && !((ToastMessagePage *)g_appContext->getActivePage())->hasAction()) {
+            if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE && !((ToastMessagePage *)getActivePage())->hasAction()) {
                 popPage();
             }
 
@@ -1079,7 +1076,7 @@ void action_user_switch_clicked() {
         break;
 
     case persist_conf::USER_SWITCH_ACTION_HOME:
-        if (g_appContext->getNumPagesOnStack() > 1) {
+        if (getNumPagesOnStack() > 1) {
             action_show_previous_page();
         } else if (getActivePageId() != PAGE_ID_MAIN) {
             showMainPage();
@@ -1096,10 +1093,6 @@ void action_user_switch_clicked() {
     	changePowerState(isPowerUp() ? false : true);
     	break;
     }
-
-#if EEZ_PLATFORM_SIMULATOR
-    g_appContext = saved;
-#endif
 }
 
 void onSetUserSwitchAction(uint16_t value) {
@@ -1108,21 +1101,12 @@ void onSetUserSwitchAction(uint16_t value) {
 }
 
 void action_select_user_switch_action() {
-#if EEZ_PLATFORM_SIMULATOR
-    AppContext *saved = g_appContext;
-    g_appContext = &psu::gui::g_psuAppContext;
-#endif
-
-    if (g_appContext->getActiveSelectEnumDefinition() == g_userSwitchActionEnumDefinition) {
-    	popPage();
+    if (getActiveSelectEnumDefinition() == g_userSwitchActionEnumDefinition) {
+    	popSelectFromEnumPage();
     } else {
         clearFoundWidgetAtDown();
         pushSelectFromEnumPage(g_userSwitchActionEnumDefinition, persist_conf::devConf.userSwitchAction, nullptr, onSetUserSwitchAction);
     }
-
-#if EEZ_PLATFORM_SIMULATOR
-    g_appContext = saved;
-#endif
 }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -1130,7 +1114,7 @@ void action_select_user_switch_action() {
 static int g_slotIndex;
 
 void onSetModuleType(uint16_t moduleType) {
-    popPage();
+    g_frontPanelAppContext.popPage();
 
     bp3c::eeprom::writeModuleType(g_slotIndex, moduleType);
 
@@ -1143,7 +1127,7 @@ void onSetModuleType(uint16_t moduleType) {
 
 void selectSlot(int slotIndex) {
     g_slotIndex = slotIndex;
-    pushSelectFromEnumPage(g_moduleTypeEnumDefinition, g_slots[slotIndex].moduleInfo->moduleType, NULL, onSetModuleType);
+    pushSelectFromEnumPage(&g_frontPanelAppContext, g_moduleTypeEnumDefinition, g_slots[slotIndex].moduleInfo->moduleType, NULL, onSetModuleType);
 }
 
 void action_front_panel_select_slot1() {

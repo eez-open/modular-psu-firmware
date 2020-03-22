@@ -57,10 +57,9 @@ void AppViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback
 
     WidgetCursor savedWidgetCursor = widgetCursor;
     widgetCursor.appContext = appContext;
-    g_appContext = appContext;
 
     if (callback == drawWidgetCallback) {
-        g_appContext->updateAppView(widgetCursor);
+        appContext->updateAppView(widgetCursor);
     } else {
 		enumWidgets(widgetCursor, callback);
     }
@@ -70,7 +69,6 @@ void AppViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback
     }
 
     widgetCursor = savedWidgetCursor;
-    g_appContext = widgetCursor.appContext;
 }
 
 } // namespace gui

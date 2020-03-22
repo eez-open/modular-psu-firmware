@@ -38,11 +38,10 @@
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/scpi/psu.h>
-#include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/gui/file_manager.h>
 
 #if OPTION_DISPLAY
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/file_manager.h>
 #endif
 
 #include <eez/libs/sd_fat/sd_fat.h>
@@ -273,7 +272,7 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
     size_t uploaded = 0;
 
 #if OPTION_DISPLAY
-    eez::psu::gui::PsuAppContext::showProgressPage("Uploading...");
+    psu::gui::showProgressPage("Uploading...");
 #endif
 
     *err = SCPI_RES_OK;
@@ -291,8 +290,8 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
         uploaded += size;
 
 #if OPTION_DISPLAY
-        if (!eez::psu::gui::PsuAppContext::updateProgressPage(uploaded, totalSize)) {
-            eez::psu::gui::PsuAppContext::hideProgressPage();
+        if (!psu::gui::updateProgressPage(uploaded, totalSize)) {
+            psu::gui::hideProgressPage();
             event_queue::pushEvent(event_queue::EVENT_WARNING_FILE_UPLOAD_ABORTED);
             if (err) {
                 *err = SCPI_ERROR_FILE_TRANSFER_ABORTED;
@@ -318,7 +317,7 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
     callback(param, NULL, -1);
 
 #if OPTION_DISPLAY
-    eez::psu::gui::g_psuAppContext.hideProgressPage();
+    psu::gui::hideProgressPage();
 #endif
 
     return result;
@@ -418,15 +417,16 @@ bool copyFile(const char *sourcePath, const char *destinationPath, bool showProg
 
 #if OPTION_DISPLAY
         if (showProgress) {
-            if (!eez::psu::gui::g_psuAppContext.updateProgressPage(totalWritten, totalSize)) {
+            if (!psu::gui::updateProgressPage(totalWritten, totalSize)) {
                 sourceFile.close();
                 destinationFile.close();
 
                 deleteFile(destinationPath, NULL);
-                if (err)
+                if (err) {
                     *err = SCPI_ERROR_MASS_STORAGE_ERROR;
-
-                eez::psu::gui::g_psuAppContext.hideProgressPage();
+                }
+                
+                psu::gui::hideProgressPage();
                 return false;
             }
         }

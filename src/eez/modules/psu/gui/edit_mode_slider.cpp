@@ -42,7 +42,7 @@ void onTouchDown() {
     startValue = edit_mode::getEditValue().getFloat();
     startX = eez::gui::touch::getX();
 
-    int y = eez::gui::touch::getY() - g_appContext->y;
+    int y = eez::gui::touch::getY() - g_psuAppContext.y;
     if (y < TOP_BORDER) {
         y = TOP_BORDER;
     } else if (y > BOTTOM_BORDER) {

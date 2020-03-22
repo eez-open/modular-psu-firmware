@@ -54,6 +54,8 @@
 
 #include <eez/libs/image/image.h>
 
+using namespace eez::psu::gui;
+
 namespace eez {
 namespace gui {
 namespace file_manager {
@@ -677,13 +679,13 @@ void openFile() {
     if (fileItem->type == FILE_TYPE_DLOG) {
         psu::dlog_view::g_showLatest = false;
         psu::dlog_view::openFile(filePath);
-        gui::pushPage(gui::PAGE_ID_DLOG_VIEW);
+        pushPage(gui::PAGE_ID_DLOG_VIEW);
     } else if (fileItem->type == FILE_TYPE_IMAGE) {
         g_imageLoadStartTime = millis();
         g_imageLoadFailed = false;
         g_openedImage.pixels = nullptr;
 
-        gui::pushPage(gui::PAGE_ID_IMAGE_VIEW);
+        pushPage(gui::PAGE_ID_IMAGE_VIEW);
 
         using namespace scpi;
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
@@ -847,7 +849,7 @@ void renameFile() {
         strcpy(fileNameWithoutExtension, fileItem->name);
     }
 
-    psu::gui::Keypad::startPush(0, fileNameWithoutExtension, 1, MAX_PATH_LENGTH, false, onRenameFileOk, popPage);
+    Keypad::startPush(0, fileNameWithoutExtension, 1, MAX_PATH_LENGTH, false, onRenameFileOk, popPage);
 }
 
 bool isDeleteFileEnabled() {
@@ -972,7 +974,7 @@ void onNewFileOk(char *fileNameWithoutExtension) {
 void newFile() {
     if (isSaveDialog()) {
         popPage();
-        psu::gui::Keypad::startPush(0, 0, 1, MAX_PATH_LENGTH, false, onNewFileOk, popPage);
+        Keypad::startPush(0, 0, 1, MAX_PATH_LENGTH, false, onNewFileOk, popPage);
     }
 }
 

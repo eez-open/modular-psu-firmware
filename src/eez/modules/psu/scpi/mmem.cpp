@@ -230,7 +230,7 @@ void startDownloading() {
     g_downloading = true;
     g_downloaded = 0;
 #if OPTION_DISPLAY
-    eez::psu::gui::PsuAppContext::showProgressPage("Downloading...", abortDownloading);
+    psu::gui::showProgressPage("Downloading...", abortDownloading);
 #endif
 }
 
@@ -242,7 +242,7 @@ void finishDownloading(int16_t eventId) {
     }
     event_queue::pushEvent(eventId);
 #if OPTION_DISPLAY
-    eez::psu::gui::PsuAppContext::hideProgressPage();
+    psu::gui::hideProgressPage();
 #endif
     g_downloading = false;
     g_downloadFilePath[0] = 0;
@@ -327,7 +327,7 @@ scpi_result_t scpi_cmd_mmemoryDownloadData(scpi_t *context) {
 
 #if OPTION_DISPLAY
     g_downloaded += size;
-    eez::psu::gui::PsuAppContext::updateProgressPage(g_downloaded, g_downloadSize);
+    psu::gui::updateProgressPage(g_downloaded, g_downloadSize);
 #endif
 
     return SCPI_RES_OK;
@@ -384,14 +384,14 @@ scpi_result_t scpi_cmd_mmemoryCopy(scpi_t *context) {
     }
 
 #if OPTION_DISPLAY
-    eez::psu::gui::g_psuAppContext.showProgressPage("Copying...");
+    psu::gui::showProgressPage("Copying...");
 #endif
 
     int err = 0;
     bool result = sd_card::copyFile(sourcePath, destinationPath, true, &err);
 
 #if OPTION_DISPLAY
-    eez::psu::gui::g_psuAppContext.hideProgressPage();
+    psu::gui::hideProgressPage();
 #endif
 
     if (!result) {

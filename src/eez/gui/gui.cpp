@@ -80,11 +80,9 @@ void mainLoop(const void *) {
 
 void onGuiQueueMessage(uint8_t type, int16_t param) {
     if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE) {
-        g_appContext = getAppContextFromId(param);
-        g_appContext->doShowPage();
+        getAppContextFromId(param)->doShowPage();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE) {
-        g_appContext = getAppContextFromId(param);
-        g_appContext->doPushPage();
+        getAppContextFromId(param)->doPushPage();
     } else {
         onGuiQueueMessageHook(type, param);
     }
@@ -130,12 +128,12 @@ void oneIter() {
 
     touch::tick();
 
-    g_appContext = &getRootAppContext();
+    AppContext *appContext = &getRootAppContext();
 
-    g_appContext->x = 0;
-    g_appContext->y = 0;
-    g_appContext->width = mcu::display::getDisplayWidth();
-    g_appContext->height = mcu::display::getDisplayHeight();
+    appContext->x = 0;
+    appContext->y = 0;
+    appContext->width = mcu::display::getDisplayWidth();
+    appContext->height = mcu::display::getDisplayHeight();
 
     eventHandling();
     stateManagmentHook();
@@ -165,95 +163,14 @@ void oneIter() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-uint32_t getShowPageTime() {
-    return g_appContext->m_showPageTime;
-}
-
-void setShowPageTime(uint32_t time) {
-    g_appContext->m_showPageTime = time;
-}
-
-void showPage(int pageId) {
-    if (g_appContext) {
-        g_appContext->showPage(pageId);
-    }
-}
-
-void pushPage(int pageId, Page *page) {
-    g_appContext->pushPage(pageId, page);
-}
-
-void popPage() {
-    g_appContext->popPage();
-}
-
-void replacePage(int pageId, Page *page) {
-    g_appContext->replacePage(pageId, page);
-}
-
-int getActivePageId() {
-    return g_appContext->getActivePageId();
-}
-
-Page *getActivePage() {
-    return g_appContext->getActivePage();
-}
-
-Page *getPage(int pageId) {
-    return g_appContext->getPage(pageId);
-}
-
-int getNumPagesOnStack() {
-    return g_appContext->getNumPagesOnStack();
-}
-
-bool isPageOnStack(int pageId) {
-    return g_appContext->isPageOnStack(pageId);
-}
-
-void pushSelectFromEnumPage(const data::EnumItem *enumDefinition, uint16_t currentValue, bool (*disabledCallback)(uint16_t value), void (*onSet)(uint16_t), bool smallFont, bool showRadioButtonIcon) {
-    g_appContext->pushSelectFromEnumPage(enumDefinition, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
-}
-
-void pushSelectFromEnumPage(void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value), uint16_t currentValue, bool(*disabledCallback)(uint16_t value), void(*onSet)(uint16_t), bool smallFont, bool showRadioButtonIcon) {
-	g_appContext->pushSelectFromEnumPage(enumDefinitionFunc, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
-}
-
 bool isPageInternal(int pageId) {
     return pageId > FIRST_INTERNAL_PAGE_ID;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void action_internal_select_enum_item() {
-    ((SelectFromEnumPage *)g_appContext->getActivePage())->selectEnumItem();
-}
-
-// from InternalActionsEnum
-static ActionExecFunc g_internalActionExecFunctions[] = {
-    0,
-    // ACTION_ID_INTERNAL_SELECT_ENUM_ITEM
-    action_internal_select_enum_item,
-
-    // ACTION_ID_INTERNAL_DIALOG_CLOSE
-    popPage,
-
-    // ACTION_ID_INTERNAL_TOAST_ACTION
-    ToastMessagePage::executeAction,
-
-    // ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM
-    ToastMessagePage::executeActionWithoutParam,
-
-    // ACTION_ID_INTERNAL_MENU_WITH_BUTTONS
-    MenuWithButtonsPage::executeAction
-};
-
 bool isInternalAction(int actionId) {
     return actionId > FIRST_INTERNAL_ACTION_ID;
-}
-
-void executeInternalAction(int actionId) {
-    g_internalActionExecFunctions[actionId - FIRST_INTERNAL_ACTION_ID]();
 }
 
 void executeAction(int actionId) {
@@ -261,14 +178,11 @@ void executeAction(int actionId) {
         return;
     }
 
-    AppContext *saved = g_appContext;
-    g_appContext = getFoundWidgetAtDown().appContext;
-
     sound::playClick();
     osDelay(1);
 
     if (isInternalAction(actionId)) {
-        executeInternalAction(actionId);
+        executeInternalActionHook(actionId);
     } else {
         if (actionId >= 0) {
             g_actionExecFunctions[actionId]();
@@ -276,8 +190,6 @@ void executeAction(int actionId) {
             executeExternalActionHook(actionId);
         }
     }
-
-    g_appContext = saved;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -592,28 +504,28 @@ void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst
     }
 }
 
-void prepareRect(Rect &rect) {
-    if (g_appContext->x > 0) {
-        rect.x += g_appContext->x;
+void prepareRect(AppContext *appContext, Rect &rect) {
+    if (appContext->x > 0) {
+        rect.x += appContext->x;
     }
-    if (g_appContext->y > 0) {
-        rect.y += g_appContext->y;
+    if (appContext->y > 0) {
+        rect.y += appContext->y;
     }
 }
 
-void animateRects(Buffer startBuffer, int numRects, float duration) {
+void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, float duration) {
     animate(startBuffer, animateRectsStep, duration);
 
     g_numRects = numRects;
 
-    g_clipRect.x = g_appContext->x;
-    g_clipRect.y = g_appContext->y;
-    g_clipRect.w = g_appContext->width;
-    g_clipRect.h = g_appContext->height;
+    g_clipRect.x = appContext->x;
+    g_clipRect.y = appContext->y;
+    g_clipRect.w = appContext->width;
+    g_clipRect.h = appContext->height;
 
     for (int i = 0; i < numRects; i++) {
-        prepareRect(g_animRects[i].srcRect);
-        prepareRect(g_animRects[i].dstRect);
+        prepareRect(appContext, g_animRects[i].srcRect);
+        prepareRect(appContext, g_animRects[i].dstRect);
     }
 }
 

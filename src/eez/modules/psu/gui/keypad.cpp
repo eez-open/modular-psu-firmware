@@ -32,6 +32,10 @@
 #include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/edit_mode_keypad.h>
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+#include <eez/platform/simulator/front_panel.h>
+#endif
+
 #ifdef _MSC_VER
 #pragma warning(disable : 4996)
 #endif
@@ -46,17 +50,7 @@ namespace eez {
 namespace psu {
 namespace gui {
 
-static Keypad g_keypadsPool[1];
-
-Keypad* getFreeKeypad() {
-    for (unsigned int i = 0; i < sizeof (g_keypadsPool) / sizeof(Keypad); ++i) {
-        if (g_keypadsPool[i].m_isFree) {
-            return &g_keypadsPool[i];
-        }
-    }
-    assert(false);
-    return nullptr;
-}
+static Keypad g_keypad;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -66,8 +60,8 @@ Keypad *getActiveKeypad() {
     }
     
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    if (getActivePageId() == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
-        return (Keypad *)getActivePage();
+    if (g_frontPanelAppContext.getActivePageId() == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
+        return (Keypad *)g_frontPanelAppContext.getActivePage();
     }
 #endif
 
@@ -84,8 +78,8 @@ NumericKeypad *getActiveNumericKeypad() {
     }
     
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    if (getActivePageId() == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
-        return (NumericKeypad *)getActivePage();
+    if (g_frontPanelAppContext.getActivePageId() == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
+        return (NumericKeypad *)g_frontPanelAppContext.getActivePage();
     }
 #endif
 
@@ -100,14 +94,20 @@ NumericKeypad *getActiveNumericKeypad() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Keypad::pageAlloc() {
-    m_isFree = false;
 }
 
 void Keypad::pageFree() {
-    m_isFree = true;
+    m_appContext = nullptr;
 }
 
-void Keypad::init(const char *label_) {
+void Keypad::init(AppContext *appContext, const char *label_) {
+    if (m_appContext != appContext) {
+        if (m_appContext) {
+            m_appContext->popPage();
+        }
+        m_appContext = appContext;
+    }
+
     m_label[0] = 0;
     m_keypadText[0] = 0;
     m_okCallback = 0;
@@ -167,8 +167,8 @@ void Keypad::getKeypadText(char *text) {
     appendCursor(text);
 }
 
-void Keypad::start(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
-    init(label);
+void Keypad::start(AppContext *appContext, const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
+    init(appContext, label);
 
     m_okCallback = ok;
     m_cancelCallback = cancel;
@@ -186,15 +186,13 @@ void Keypad::start(const char *label, const char *text, int minChars_, int maxCh
 }
 
 void Keypad::startPush(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
-    Keypad *page = getFreeKeypad();
-    page->start(label, text, minChars_, maxChars_, isPassword_, ok, cancel);
-    pushPage(PAGE_ID_KEYPAD, page);
+    g_keypad.start(&g_psuAppContext, label, text, minChars_, maxChars_, isPassword_, ok, cancel);
+    pushPage(PAGE_ID_KEYPAD, &g_keypad);
 }
 
 void Keypad::startReplace(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
-    Keypad *page = getFreeKeypad();
-    page->start(label, text, minChars_, maxChars_, isPassword_, ok, cancel);
-    replacePage(PAGE_ID_KEYPAD, page);
+    g_keypad.start(&g_psuAppContext, label, text, minChars_, maxChars_, isPassword_, ok, cancel);
+    replacePage(PAGE_ID_KEYPAD, &g_keypad);
 }
 
 void Keypad::appendChar(char c) {
@@ -268,7 +266,7 @@ void Keypad::cancel() {
     if (m_cancelCallback) {
         m_cancelCallback();
     } else {
-        popPage();
+        m_appContext->popPage();
     }
 }
 

@@ -137,7 +137,7 @@ scpi_result_t scpi_cmd_displayWindowText(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    eez::psu::gui::g_psuAppContext.setTextMessage(text, len);
+    psu::gui::setTextMessage(text, len);
 
     return SCPI_RES_OK;
 #else
@@ -148,7 +148,7 @@ scpi_result_t scpi_cmd_displayWindowText(scpi_t *context) {
 
 scpi_result_t scpi_cmd_displayWindowTextQ(scpi_t *context) {
 #if OPTION_DISPLAY
-    SCPI_ResultText(context, eez::psu::gui::g_psuAppContext.getTextMessage());
+    SCPI_ResultText(context, psu::gui::getTextMessage());
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -158,7 +158,7 @@ scpi_result_t scpi_cmd_displayWindowTextQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_displayWindowTextClear(scpi_t *context) {
 #if OPTION_DISPLAY
-    eez::psu::gui::g_psuAppContext.clearTextMessage();
+    psu::gui::clearTextMessage();
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -199,7 +199,7 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
 scpi_result_t scpi_cmd_displayWindowDlog(scpi_t *context) {
 #if OPTION_DISPLAY
     dlog_view::g_showLatest = true;
-    psu::gui::g_psuAppContext.pushPage(PAGE_ID_DLOG_VIEW);
+    psu::gui::pushPage(PAGE_ID_DLOG_VIEW);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -221,7 +221,7 @@ static scpi_choice_def_t inputTypeChoice[] = {
 };
 
 static scpi_choice_def_t menuTypeChoice[] = {
-    { "BUTTon", eez::gui::MENU_TYPE_BUTTON },
+    { "BUTTon", psu::gui::MENU_TYPE_BUTTON },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
@@ -374,6 +374,8 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
             return SCPI_RES_ERR;
         }
 
+        using namespace eez::psu::gui;
+
         static const int MAX_MENU_ITEM_TEXT_LENGTH = 20;
         static char menuItemTexts[MAX_MENU_ITEMS][MAX_MENU_ITEM_TEXT_LENGTH + 1];
         static const char *menuItems[MAX_MENU_ITEMS + 1] = {};
@@ -402,7 +404,7 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
 
         menuItems[i] = nullptr;
 
-        int result = psu::gui::g_psuAppContext.menuInput(label, (eez::gui::MenuType)menuType, menuItems);
+        int result = psu::gui::g_psuAppContext.menuInput(label, (MenuType)menuType, menuItems);
         SCPI_ResultInt(context, result + 1);
     }
 
@@ -641,7 +643,7 @@ scpi_result_t scpi_cmd_displayWindowError(scpi_t *context) {
     strncpy(message, valueText, valueTextLen);
     message[valueTextLen] = 0;
     
-    eez::gui::errorMessage(message);
+    psu::gui::errorMessage(message);
 
     return SCPI_RES_OK;
 #else

@@ -433,7 +433,7 @@ uint16_t getBackgroundColor(const Cursor &cursor, int16_t id, const Style *style
 uint16_t getActiveColor(const Cursor &cursor, int16_t id, const Style *style);
 uint16_t getActiveBackgroundColor(const Cursor &cursor, int16_t id, const Style *style);
 
-bool isBlinking(const Cursor &cursor, int16_t id);
+bool isBlinking(const WidgetCursor &widgetCursor, int16_t id);
 Value getEditValue(const Cursor &cursor, int16_t id);
 
 Value getBitmapImage(const Cursor &cursor, int16_t id);

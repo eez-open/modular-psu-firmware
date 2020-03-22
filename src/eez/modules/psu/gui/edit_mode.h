@@ -23,7 +23,7 @@ namespace psu {
 namespace gui {
 namespace edit_mode {
 
-bool isActive();
+bool isActive(eez::gui::AppContext *appContext);
 void enter(int tabIndex = -1, bool setFocus = true);
 void exit();
 bool isInteractiveMode();

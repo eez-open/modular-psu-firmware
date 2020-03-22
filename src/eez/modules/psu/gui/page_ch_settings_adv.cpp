@@ -21,14 +21,14 @@
 #include <eez/system.h>
 
 #include <eez/modules/psu/psu.h>
-
 #include <eez/modules/psu/channel_dispatcher.h>
+#include <eez/modules/psu/profile.h>
+#include <eez/modules/psu/trigger.h>
+
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/page_ch_settings_adv.h>
-#include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/profile.h>
-#include <eez/modules/psu/trigger.h>
 
 namespace eez {
 namespace psu {
@@ -134,10 +134,7 @@ void ChSettingsAdvViewPage::editYTViewRate() {
 }
 
 int ChSettingsAdvViewPage::getDirty() {
-    return (origDisplayValue1 != displayValue1 || origDisplayValue2 != displayValue2 ||
-            origYTViewRate != ytViewRate)
-               ? 1
-               : 0;
+    return (origDisplayValue1 != displayValue1 || origDisplayValue2 != displayValue2 || origYTViewRate != ytViewRate) ? 1 : 0;
 }
 
 void ChSettingsAdvViewPage::set() {

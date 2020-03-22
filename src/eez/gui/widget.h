@@ -250,11 +250,11 @@ struct WidgetCursor {
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef void (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
-void enumWidgets(EnumWidgetsCallback callback);
+void enumWidgets(AppContext* appContext, EnumWidgetsCallback callback);
 void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 
 void findWidgetStep(const WidgetCursor &widgetCursor);
-WidgetCursor findWidget(int16_t x, int16_t y);
+WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y);
 
 typedef void (*OnTouchFunctionType)(const WidgetCursor &widgetCursor, Event &touchEvent);
 

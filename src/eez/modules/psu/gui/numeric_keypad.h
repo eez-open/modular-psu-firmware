@@ -20,6 +20,8 @@
 
 #include <eez/modules/psu/gui/keypad.h>
 
+using namespace eez::gui;
+
 namespace eez {
 namespace psu {
 namespace gui {
@@ -76,12 +78,34 @@ enum NumericKeypadState {
 };
 
 class NumericKeypad : public Keypad {
-  public:
-    void init(const char *label, const eez::gui::data::Value &value, NumericKeypadOptions &options,
-              void (*okFloat)(float), void (*okUint32)(uint32_t), void (*cancel)());
-    static NumericKeypad *start(const char *label, const eez::gui::data::Value &value,
-                                NumericKeypadOptions &options, void (*okFloat)(float),
-                                void (*okUint32)(uint32_t), void (*cancel)());
+public:
+    void init(
+        AppContext *appContext,
+        const char *label,
+        const eez::gui::data::Value &value,
+        NumericKeypadOptions &options,
+        void (*okFloat)(float),
+        void (*okUint32)(uint32_t),
+        void (*cancel)()
+    );
+
+    static NumericKeypad *start(
+        AppContext *appContext,
+        const char *label,
+        const eez::gui::data::Value &value,
+        NumericKeypadOptions &options,
+        void(*okFloat)(float),
+        void(*okUint32)(uint32_t), void(*cancel)()
+    );
+
+    static NumericKeypad *start(
+        const char *label,
+        const eez::gui::data::Value &value,
+        NumericKeypadOptions &options,
+        void(*okFloat)(float),
+        void(*okUint32)(uint32_t),
+        void(*cancel)()
+    );
 
     bool isEditing();
 
@@ -123,7 +147,7 @@ class NumericKeypad : public Keypad {
 
     NumericKeypadOptions m_options;
 
-  private:
+private:
     eez::gui::data::Value m_startValue;
     NumericKeypadState m_state;
     void (*m_okFloatCallback)(float);
