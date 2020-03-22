@@ -35,7 +35,6 @@
 
 #include <eez/modules/psu/channel.h>
 #include <eez/modules/psu/debug.h>
-#include <eez/modules/psu/util.h>
 #include <eez/modules/psu/serial.h>
 
 /// Namespace for the everything from the EEZ.

@@ -142,7 +142,6 @@ set(src_eez_modules_psu
     src/eez/modules/psu/temperature.cpp
     src/eez/modules/psu/timer.cpp
     src/eez/modules/psu/trigger.cpp
-    src/eez/modules/psu/util.cpp
 )
 list (APPEND src_files ${src_eez_modules_psu})
 set(header_eez_modules_psu
@@ -175,7 +174,6 @@ set(header_eez_modules_psu
     src/eez/modules/psu/temperature.h
     src/eez/modules/psu/timer.h
     src/eez/modules/psu/trigger.h
-    src/eez/modules/psu/util.h
 )
 list (APPEND header_files ${header_eez_modules_psu})
 source_group("eez\\modules\\psu" FILES ${src_eez_modules_psu} ${header_eez_modules_psu})
@@ -185,18 +183,11 @@ set(src_eez_modules_psu_gui
     src/eez/modules/psu/gui/calibration.cpp
     src/eez/modules/psu/gui/data.cpp
     src/eez/modules/psu/gui/edit_mode.cpp
-    src/eez/modules/psu/gui/edit_mode_keypad.cpp
-    src/eez/modules/psu/gui/edit_mode_slider.cpp
-    src/eez/modules/psu/gui/edit_mode_step.cpp
     src/eez/modules/psu/gui/file_manager.cpp
     src/eez/modules/psu/gui/keypad.cpp
-    src/eez/modules/psu/gui/numeric_keypad.cpp
     src/eez/modules/psu/gui/page.cpp
-    src/eez/modules/psu/gui/page_ch_settings_adv.cpp
-    src/eez/modules/psu/gui/page_ch_settings_protection.cpp
-    src/eez/modules/psu/gui/page_ch_settings_trigger.cpp
+    src/eez/modules/psu/gui/page_ch_settings.cpp
     src/eez/modules/psu/gui/page_event_queue.cpp
-    src/eez/modules/psu/gui/page_self_test_result.cpp
     src/eez/modules/psu/gui/page_sys_settings.cpp
     src/eez/modules/psu/gui/page_user_profiles.cpp
     src/eez/modules/psu/gui/password.cpp
@@ -209,18 +200,11 @@ set(header_eez_modules_psu_gui
     src/eez/modules/psu/gui/calibration.h
     src/eez/modules/psu/gui/data.h
     src/eez/modules/psu/gui/edit_mode.h
-    src/eez/modules/psu/gui/edit_mode_keypad.h
-    src/eez/modules/psu/gui/edit_mode_slider.h
-    src/eez/modules/psu/gui/edit_mode_step.h
     src/eez/modules/psu/gui/file_manager.h
     src/eez/modules/psu/gui/keypad.h
-    src/eez/modules/psu/gui/numeric_keypad.h
     src/eez/modules/psu/gui/page.h
-    src/eez/modules/psu/gui/page_ch_settings_adv.h
-    src/eez/modules/psu/gui/page_ch_settings_protection.h
-    src/eez/modules/psu/gui/page_ch_settings_trigger.h
+    src/eez/modules/psu/gui/page_ch_settings.h
     src/eez/modules/psu/gui/page_event_queue.h
-    src/eez/modules/psu/gui/page_self_test_result.h
     src/eez/modules/psu/gui/page_sys_settings.h
     src/eez/modules/psu/gui/page_user_profiles.h
     src/eez/modules/psu/gui/password.h

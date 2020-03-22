@@ -67,8 +67,6 @@ static Assets g_mainAssets;
 
 static Assets g_externalAssets;
 
-#if OPTION_SDRAM
-
 static Assets *g_fixPointersAssets;
 
 void StyleList_fixPointers() {
@@ -201,8 +199,6 @@ void UpDownWidget_fixPointers(Widget *widget) {
     upDownWidget->upButtonText = (const char *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)upDownWidget->upButtonText);
 }
 
-#endif
-
 void initAssets(Assets &assets, bool external, uint8_t *decompressedAssets) {
     assets.document = (Document *)(decompressedAssets + ((uint32_t *)decompressedAssets)[0]);
     assets.styles = (StyleList *)(decompressedAssets + ((uint32_t *)decompressedAssets)[1]);
@@ -221,7 +217,6 @@ void initAssets(Assets &assets, bool external, uint8_t *decompressedAssets) {
 void decompressAssets() {
     uint8_t *decompressedAssets;
 
-#if OPTION_SDRAM
     int compressedSize = sizeof(assets) - 4;
 
     // first 4 bytes (uint32_t) are decompressed size
@@ -231,25 +226,16 @@ void decompressAssets() {
 
     int result = LZ4_decompress_safe((const char *)assets + 4, (char *)decompressedAssets, compressedSize, (int)decompressedSize);
     assert(result == (int)decompressedSize);
-#else
-    g_decompressedAssets = (uint8_t *)assets;
-#endif
 
     initAssets(g_mainAssets, false, decompressedAssets);
 
-#if OPTION_SDRAM
     fixPointers(g_mainAssets);
-#endif
 
     g_assetsLoaded = true;
 }
 
 const Style *getStyle(int styleID) {
-#if OPTION_SDRAM
     return g_mainAssets.styles->first + styleID - 1;
-#else
-    return (Style *)((uint8_t *)g_styles + (uint32_t)g_styles->firstOffset) + styleID - 1;
-#endif
 }
 
 const Widget* getPageWidget(int pageId) {
@@ -282,27 +268,15 @@ int getThemesCount() {
 }
 
 const Theme *getTheme(int i) {
-#if OPTION_SDRAM
     return g_mainAssets.colorsData->themes.first + i;
-#else
-    return (const Theme *)((uint8_t *)g_colorsData + (uint32_t)(g_colorsData->themes).firstOffset) + i;
-#endif
 }
 
 const char *getThemeName(int i) {
-#if OPTION_SDRAM
     return getTheme(i)->name;
-#else
-    return (const char *)((uint8_t *)g_colorsData + (uint32_t)getTheme(i)->nameOffset);
-#endif
 }
 
 const uint16_t *getThemeColors(int themeIndex) {
-#if OPTION_SDRAM
     return getTheme(themeIndex)->colors.first;
-#else
-    return (const uint16_t *)((uint8_t *)g_colorsData + (uint32_t)getTheme(themeIndex)->colors.firstOffset);
-#endif
 }
 
 const uint32_t getThemeColorsCount(int themeIndex) {
@@ -310,11 +284,7 @@ const uint32_t getThemeColorsCount(int themeIndex) {
 }
 
 const uint16_t *getColors() {
-#if OPTION_SDRAM
     return g_mainAssets.colorsData->colors.first;
-#else
-    return (const uint16_t *)((uint8_t *)g_colorsData + (uint32_t)g_colorsData->colors.firstOffset);
-#endif
 }
 
 const char *getActionName(int16_t actionId) {

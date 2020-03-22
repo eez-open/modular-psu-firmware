@@ -1005,31 +1005,31 @@ void getStorageInfo(Value& value) {
 
 using namespace file_manager;
 
-void data_file_manager_current_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_current_directory(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getCurrentDirectory();
     }
 }
 
-void data_file_manager_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getState();
     }
 }
 
-void data_file_manager_is_root_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_is_root_directory(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = isRootDirectory() ? 1 : 0;
     }
 }
 
-void data_file_manager_layout(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_layout(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getListViewLayout();
     }
 }
 
-void data_file_manager_files(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_files(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
         value = (int)MAX(getFilesCount(), getFilesPageSize());
     } else if (operation == data::DATA_OPERATION_YT_DATA_GET_SIZE) {
@@ -1045,103 +1045,103 @@ void data_file_manager_files(data::DataOperationEnum operation, data::Cursor &cu
     }
 }
 
-void data_file_manager_is_directory(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_is_directory(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = isDirectory(cursor.i) ? 1 : 0;
+        value = isDirectory(cursor) ? 1 : 0;
     }
 }
 
-void data_file_manager_file_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_file_type(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = getFileType(cursor.i);
+        value = getFileType(cursor);
     }
 }
 
-void data_file_manager_file_icon(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_file_icon(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = getFileIcon(cursor.i);
+        value = getFileIcon(cursor);
     }
 }
 
-void data_file_manager_file_name(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_file_name(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        auto fileType = getFileType(cursor.i);
+        auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
-            value = Value(getFileName(cursor.i), VALUE_TYPE_STR, STRING_OPTIONS_FILE_ELLIPSIS);
+            value = Value(getFileName(cursor), VALUE_TYPE_STR, STRING_OPTIONS_FILE_ELLIPSIS);
         }
     }
 }
 
-void data_file_manager_file_has_description(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_file_has_description(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        auto fileType = getFileType(cursor.i);
+        auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
-            value = strlen(getFileDescription(cursor.i)) > 0;
+            value = strlen(getFileDescription(cursor)) > 0;
         }
     }
 }
 
-void data_file_manager_file_description(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_file_description(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        auto fileType = getFileType(cursor.i);
+        auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
-            value = getFileDescription(cursor.i);
+            value = getFileDescription(cursor);
         }
     }
 }
 
-void data_file_manager_file_size(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_file_size(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        auto fileType = getFileType(cursor.i);
+        auto fileType = getFileType(cursor);
         if (fileType == FILE_TYPE_DIRECTORY) {
             value = "<dir>";
         } else if (fileType != FILE_TYPE_NONE) {
-            value = Value(getFileSize(cursor.i), VALUE_TYPE_FILE_LENGTH);
+            value = Value(getFileSize(cursor), VALUE_TYPE_FILE_LENGTH);
         }
     }
 }
 
-void data_file_manager_file_date_time(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_file_date_time(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        auto fileType = getFileType(cursor.i);
+        auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
-            value = Value(getFileDataTime(cursor.i), VALUE_TYPE_FILE_DATE_TIME);
+            value = Value(getFileDataTime(cursor), VALUE_TYPE_FILE_DATE_TIME);
         }
     }
 }
 
-void data_file_manager_file_selected(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_file_selected(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = isFileSelected(cursor.i);
+        value = isFileSelected(cursor);
     }
 }
 
 
-void data_file_manager_open_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_open_file_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = isOpenFileEnabled();
     }
 }
 
-void data_file_manager_upload_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_upload_file_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = isUploadFileEnabled();
     }
 }
 
-void data_file_manager_rename_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_rename_file_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = isRenameFileEnabled();
     }
 }
 
-void data_file_manager_delete_file_enabled(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_delete_file_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = isDeleteFileEnabled();
     }
 }
 
-void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET_BITMAP_IMAGE) {
         if (g_openedImage.pixels) {
             value = Value(&g_openedImage, VALUE_TYPE_POINTER);
@@ -1149,49 +1149,49 @@ void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cur
     }
 }
 
-void data_file_manager_browser_title(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_browser_title(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = g_fileBrowserTitle;
     }
 }
 
-void data_file_manager_browser_is_save_dialog(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_browser_is_save_dialog(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = isSaveDialog();
     }
 }
 
-void data_file_manager_storage_alarm(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_storage_alarm(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = isStorageAlarm();
     }
 }
 
-void data_file_manager_storage_info(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_storage_info(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         getStorageInfo(value);
     }
 }
 
-void data_file_manager_is_list_view_option_available(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_is_list_view_option_available(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = isListViewOptionAvailable();
     }
 }
 
-void data_file_manager_list_view(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_list_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getListViewOption();
     }
 }
 
-void data_file_manager_sort_files_option(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_sort_files_option(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = getSortFilesOption();
     }
 }
 
-void data_file_manager_image_open_state(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_image_open_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         if (g_openedImage.pixels) {
             value = 1;
@@ -1203,7 +1203,7 @@ void data_file_manager_image_open_state(data::DataOperationEnum operation, data:
     }
 }
 
-void data_file_manager_image_open_progress(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_file_manager_image_open_progress(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         int progress = ((millis() / 40) * 40 - g_imageLoadStartTime) / 5;
         if (progress > 140) {
@@ -1227,7 +1227,7 @@ void action_file_manager_go_to_parent_directory() {
 }
 
 void action_file_manager_select_file() {
-    selectFile(getFoundWidgetAtDown().cursor.i);
+    selectFile(getFoundWidgetAtDown().cursor);
 }
 
 void action_file_manager_open_file() {

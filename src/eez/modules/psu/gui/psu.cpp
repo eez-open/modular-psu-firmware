@@ -39,15 +39,9 @@
 #include <eez/modules/psu/gui/animations.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
-#include <eez/modules/psu/gui/edit_mode_keypad.h>
-#include <eez/modules/psu/gui/edit_mode_slider.h>
-#include <eez/modules/psu/gui/edit_mode_step.h>
-#include <eez/modules/psu/gui/numeric_keypad.h>
-#include <eez/modules/psu/gui/page_ch_settings_adv.h>
-#include <eez/modules/psu/gui/page_ch_settings_protection.h>
-#include <eez/modules/psu/gui/page_ch_settings_trigger.h>
+#include <eez/modules/psu/gui/keypad.h>
+#include <eez/modules/psu/gui/page_ch_settings.h>
 #include <eez/modules/psu/gui/page_event_queue.h>
-#include <eez/modules/psu/gui/page_self_test_result.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
 #include <eez/modules/psu/gui/password.h>
@@ -186,7 +180,7 @@ void PsuAppContext::stateManagment() {
     // turn display on/off depending on displayState
     if (
         psu::persist_conf::devConf.displayState == 0 && 
-        (activePageId != PAGE_ID_DISPLAY_OFF && activePageId != PAGE_ID_SELF_TEST_RESULT && isTouchCalibrated())
+        (activePageId != PAGE_ID_DISPLAY_OFF && isTouchCalibrated())
     ) {
         showPage(PAGE_ID_DISPLAY_OFF);
         return;
@@ -502,8 +496,8 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
     }
 
     if (getActivePageId() != PAGE_ID_DLOG_VIEW) {
-        // TODO this is not valid, how can we know cursor.i is channels index and not index of some other collection?
-        int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        // TODO this is not valid, how can we know cursor is channels index and not index of some other collection?
+        int iChannel = widgetCursor.cursor >= 0 ? widgetCursor.cursor : (g_channel ? g_channel->channelIndex : 0);
         if (iChannel >= 0 && iChannel < CH_NUM) {
             if (channel_dispatcher::getVoltageTriggerMode(Channel::get(iChannel)) != TRIGGER_MODE_FIXED &&
                 !trigger::isIdle()) {
@@ -574,7 +568,7 @@ bool PsuAppContext::testExecuteActionOnTouchDown(int action) {
     return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT || isAutoRepeatAction(action);
 }
 
-bool PsuAppContext::isBlinking(const data::Cursor &cursor, int16_t id) {
+bool PsuAppContext::isBlinking(const data::Cursor cursor, int16_t id) {
     if (g_focusCursor == cursor && g_focusDataId == id && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
         return true;
     }
@@ -606,7 +600,7 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
         }
 
         if (widget->action == ACTION_ID_FILE_MANAGER_SELECT_FILE) {
-            return file_manager::isSelectFileActionEnabled(widgetCursor.cursor.i);
+            return file_manager::isSelectFileActionEnabled(widgetCursor.cursor);
         }
     }
 
@@ -614,7 +608,7 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
 }
 
 void PsuAppContext::doShowProgressPage() {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage));
+    data::set(data::Cursor(-1), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage));
     m_dialogCancelCallback = m_progressAbortCallback;
     pushPage(m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
     m_pushProgressPage = false;
@@ -684,7 +678,7 @@ void PsuAppContext::showAsyncOperationInProgress(const char *message, void (*che
 }
 
 void PsuAppContext::doShowAsyncOperationInProgress() {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(m_asyncOperationInProgressParams.message));
+    data::set(data::Cursor(-1), DATA_ID_ALERT_MESSAGE, data::Value(m_asyncOperationInProgressParams.message));
 
     if (getActivePageId() != PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
         m_asyncOperationInProgressParams.startTime = millis();
@@ -933,11 +927,11 @@ int PsuAppContext::select(const char **options, int defaultSelection) {
     return 0;
 }
 
-void SelectParams::enumDefinition(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void SelectParams::enumDefinition(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET_VALUE) {
-        value = (uint16_t)(cursor.i + 1);
+        value = (uint16_t)(cursor + 1);
     } else if (operation == data::DATA_OPERATION_GET_LABEL) {
-        const char *label = g_psuAppContext.m_selectParams.m_options[cursor.i];
+        const char *label = g_psuAppContext.m_selectParams.m_options[cursor];
         if (label) {
             value = label;
         }
@@ -978,31 +972,27 @@ void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
     if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
         if (touch::g_eventType != EVENT_TYPE_TOUCH_DOWN || touch::g_eventType != EVENT_TYPE_TOUCH_MOVE) {
-#if OPTION_SDRAM
             mcu::display::selectBuffer(m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex);
-#endif
             int x = MIN(MAX(touch::getX(), 1), eez::mcu::display::getDisplayWidth() - 2);
             int y = MIN(MAX(touch::getY(), 1), eez::mcu::display::getDisplayHeight() - 2);
             eez::mcu::display::setColor(255, 255, 255);
             eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
     } else if (getActivePageId() == PAGE_ID_TOUCH_TEST) {
-#if OPTION_SDRAM
         mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
-#endif
 
-        Cursor cursor;
+        Cursor cursor(-1);
 
-        if (get(cursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
-            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
+        if (data::get(cursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
+            int x = MIN(MAX(data::get(cursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(data::get(cursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
             eez::mcu::display::setColor(0, 0, 255);
             eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
 
-        if (get(cursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
-            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
+        if (data::get(cursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
+            int x = MIN(MAX(data::get(cursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(data::get(cursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
             eez::mcu::display::setColor(0, 255, 0);
             eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
@@ -1219,9 +1209,9 @@ void changeTemperatureTripDelay(int iChannel) {
         minDelay, maxDelay, defaultDelay, onSetTemperatureTripDelay);
 }
 
-void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_callback)()) {
+void psuErrorMessage(const data::Cursor cursor, data::Value value, void (*ok_callback)()) {
     if (value.getType() == VALUE_TYPE_SCPI_ERROR) {
-        int iChannel = cursor.i >= 0 ? cursor.i : (g_channel ? g_channel->channelIndex : 0);
+        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         if (value.getScpiError() == SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED) {
             if (channel_dispatcher::getULimit(channel) < channel_dispatcher::getUMaxLimit(channel)) {
@@ -1263,7 +1253,7 @@ data::Cursor g_focusCursor = Cursor(0);
 int16_t g_focusDataId = DATA_ID_CHANNEL_U_EDIT;
 data::Value g_focusEditValue;
 
-void setFocusCursor(const data::Cursor &cursor, int16_t dataId) {
+void setFocusCursor(const data::Cursor cursor, int16_t dataId) {
     g_focusCursor = cursor;
     g_focusDataId = dataId;
     g_focusEditValue = data::Value();
@@ -1319,7 +1309,7 @@ void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
     }
 }
 
-bool isEnabledFocusCursor(data::Cursor &cursor, int16_t dataId) {
+bool isEnabledFocusCursor(data::Cursor cursor, int16_t dataId) {
     g_focusCursorIsEnabled = false;
     enumWidgets(&g_psuAppContext, isEnabledFocusCursorStep);
     return g_focusCursorIsEnabled;
@@ -1448,7 +1438,7 @@ void errorMessageWithAction(const char *message, void (*action)(), const char *a
 ////////////////////////////////////////////////////////////////////////////////
 
 void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)()) {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message));
+    data::set(data::Cursor(-1), DATA_ID_ALERT_MESSAGE, data::Value(message));
 
     g_psuAppContext.m_dialogYesCallback = yes_callback;
     g_psuAppContext.m_dialogNoCallback = no_callback;
@@ -1458,7 +1448,7 @@ void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), v
 }
 
 void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*later_callback)()) {
-    data::set(data::Cursor(), DATA_ID_ALERT_MESSAGE, data::Value(message));
+    data::set(data::Cursor(-1), DATA_ID_ALERT_MESSAGE, data::Value(message));
 
     g_psuAppContext.m_dialogYesCallback = yes_callback;
     g_psuAppContext.m_dialogNoCallback = no_callback;
@@ -1538,7 +1528,7 @@ void pushSelectFromEnumPage(
 
 void pushSelectFromEnumPage(
     AppContext *appContext,
-    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
+    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value),
     uint16_t currentValue,
     bool(*disabledCallback)(uint16_t value),
     void(*onSet)(uint16_t),
@@ -1670,7 +1660,7 @@ void onEncoder(int counter, bool clicked) {
                     newValue = clamp(newValue, min, max);
                 }
             } else {
-                newValue = encoderIncrement(value, counter, min, max, g_focusCursor.i, 0);
+                newValue = encoderIncrement(value, counter, min, max, g_focusCursor, 0);
             }
 
             Value limitValue = data::getLimit(g_focusCursor, g_focusDataId);
@@ -1822,7 +1812,7 @@ void channelInitiateTrigger() {
 void channelSetToFixed() {
     popPage();
 
-    Channel &channel = Channel::get(g_toggleOutputWidgetCursor.cursor.i >= 0 ? g_toggleOutputWidgetCursor.cursor.i : 0);
+    Channel &channel = Channel::get(g_toggleOutputWidgetCursor.cursor >= 0 ? g_toggleOutputWidgetCursor.cursor : 0);
     if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED) {
         channel_dispatcher::setVoltageTriggerMode(channel, TRIGGER_MODE_FIXED);
     }
@@ -1834,7 +1824,7 @@ void channelSetToFixed() {
 
 void channelEnableOutput() {
     popPage();
-    Channel &channel = Channel::get(g_toggleOutputWidgetCursor.cursor.i >= 0 ? g_toggleOutputWidgetCursor.cursor.i : 0);
+    Channel &channel = Channel::get(g_toggleOutputWidgetCursor.cursor >= 0 ? g_toggleOutputWidgetCursor.cursor : 0);
     channel_dispatcher::outputEnable(channel, true);
 }
 
@@ -1842,8 +1832,8 @@ void selectChannel(Channel *channel) {
     if (channel) {
         g_channel = channel;
     } else {
-        if (getFoundWidgetAtDown().cursor.i >= 0) {
-            g_channel = &Channel::get(getFoundWidgetAtDown().cursor.i);
+        if (getFoundWidgetAtDown().cursor >= 0) {
+            g_channel = &Channel::get(getFoundWidgetAtDown().cursor);
         } else if (!g_channel) {
             g_channel = &Channel::get(0);
         }
@@ -1900,7 +1890,6 @@ void stateManagmentHook() {
 
 using namespace eez::psu::gui;
 
-static SelfTestResultPage g_SelfTestResultPage;
 static EventQueuePage g_EventQueuePage;
 static ChSettingsOvpProtectionPage g_ChSettingsOvpProtectionPage;
 static ChSettingsOcpProtectionPage g_ChSettingsOcpProtectionPage;
@@ -1936,9 +1925,6 @@ Page *getPageFromIdHook(int pageId) {
     Page *page = nullptr;
 
     switch (pageId) {
-    case PAGE_ID_SELF_TEST_RESULT:
-        page = &g_SelfTestResultPage;
-        break;
     case PAGE_ID_EVENT_QUEUE:
         page = &g_EventQueuePage;
         break;
@@ -2058,7 +2044,7 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
         if (styleId == STYLE_ID_YT_GRAPH_U_DEFAULT || styleId == STYLE_ID_YT_GRAPH_I_DEFAULT) {
             using namespace psu;
             using namespace psu::gui;
-            int iChannel = widgetCursor.cursor.i >= 0 ? widgetCursor.cursor.i : (g_channel ? g_channel->channelIndex : 0);
+            int iChannel = widgetCursor.cursor >= 0 ? widgetCursor.cursor : (g_channel ? g_channel->channelIndex : 0);
             Channel &channel = Channel::get(iChannel);
             if (widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE1) {
                 if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
@@ -2082,8 +2068,8 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
         auto &recording = psu::dlog_view::getRecording();
-        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) ? widgetCursor.cursor.i : recording.selectedVisibleValueIndex);
-        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
+        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) ? widgetCursor.cursor : recording.selectedVisibleValueIndex);
+        style = data::ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->color;
 }
@@ -2091,8 +2077,8 @@ uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *s
 uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
         auto &recording = psu::dlog_view::getRecording();
-        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) ? widgetCursor.cursor.i : recording.selectedVisibleValueIndex);
-        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
+        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) ? widgetCursor.cursor : recording.selectedVisibleValueIndex);
+        style = data::ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->active_color;
 }
@@ -2149,7 +2135,7 @@ void executeExternalActionHook(int32_t actionId) {
     g_externalActionId = actionId;
 }
 
-void externalDataHook(int16_t dataId, data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void externalDataHook(int16_t dataId, data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (dataId < 0) {
         dataId = -dataId;
     }

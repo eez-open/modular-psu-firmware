@@ -60,7 +60,7 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
     if (widgetCursor.previousState) {
         refreshData = widgetCursor.currentState->data != widgetCursor.previousState->data;
         if (refreshData) {
-            uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
+            uint32_t refreshRate = data::getTextRefreshRate(widgetCursor.cursor, widget->data);
             if (refreshRate != 0) {
                 refreshData = (currentTime - previousState->dataRefreshLastTime) > refreshRate;
                 if (!refreshData) {

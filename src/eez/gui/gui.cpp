@@ -138,27 +138,21 @@ void oneIter() {
     eventHandling();
     stateManagmentHook();
 
-#if OPTION_SDRAM
     bool wasOn = mcu::display::isOn();
     if (wasOn) {
         mcu::display::beginBuffersDrawing();
     }
-#endif
 
     if (mcu::display::isOn()) {
-#if OPTION_SDRAM
         if (!wasOn) {
             mcu::display::beginBuffersDrawing();
         }
-#endif
         updateScreen();
     }
 
-#if OPTION_SDRAM
     if (wasOn || mcu::display::isOn()) {
         mcu::display::endBuffersDrawing();
     }
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

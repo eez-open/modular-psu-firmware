@@ -459,7 +459,7 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
 
     currentState->refreshCounter = data::ytDataGetRefreshCounter(widgetCursor.cursor, widget->data);
-    currentState->iChannel = widgetCursor.cursor.i;
+    currentState->iChannel = widgetCursor.cursor;
     currentState->numHistoryValues = data::ytDataGetSize(widgetCursor.cursor, widget->data);
     currentState->historyValuePosition = data::ytDataGetPosition(widgetCursor.cursor, widget->data);
     currentState->ytGraphUpdateMethod = data::ytDataGetGraphUpdateMethod(widgetCursor.cursor, widget->data);

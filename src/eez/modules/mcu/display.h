@@ -101,7 +101,6 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
 int8_t measureGlyph(uint8_t encoding, gui::font::Font &font);
 int measureStr(const char *text, int textLength, gui::font::Font &font, int max_width = 0);
 
-#if OPTION_SDRAM
 static const int NUM_BUFFERS = 8;
 struct BufferFlags {
     unsigned allocated : 1;
@@ -131,7 +130,6 @@ void endBuffersDrawing();
 
 void *getBufferPointer();
 void setBufferPointer(void *buffer);
-#endif
 
 } // namespace display
 } // namespace mcu

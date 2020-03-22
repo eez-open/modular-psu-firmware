@@ -60,9 +60,7 @@
 
 #include <eez/modules/mcu/battery.h>
 #include <eez/modules/mcu/eeprom.h>
-#if OPTION_SDRAM
 #include <eez/modules/mcu/sdram.h>
-#endif
 #include <eez/modules/mcu/ethernet.h>
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
@@ -87,7 +85,7 @@ bool g_shutdown;
 void boot() {
     assert(MEMORY_END - MEMORY_BEGIN <= MEMORY_SIZE);
 
-#if OPTION_SDRAM
+#if defined(EEZ_PLATFORM_STM32)
     mcu::sdram::init();
     //mcu::sdram::test();
 #endif

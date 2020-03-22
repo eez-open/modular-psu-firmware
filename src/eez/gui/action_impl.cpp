@@ -41,13 +41,8 @@
 #include <eez/modules/psu/gui/calibration.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
-#include <eez/modules/psu/gui/edit_mode_keypad.h>
-#include <eez/modules/psu/gui/edit_mode_step.h>
 #include <eez/modules/psu/gui/keypad.h>
-#include <eez/modules/psu/gui/numeric_keypad.h>
-#include <eez/modules/psu/gui/page_ch_settings_adv.h>
-#include <eez/modules/psu/gui/page_ch_settings_protection.h>
-#include <eez/modules/psu/gui/page_ch_settings_trigger.h>
+#include <eez/modules/psu/gui/page_ch_settings.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
 #include <eez/modules/psu/gui/password.h>
@@ -383,8 +378,8 @@ void onChannelCopyDestinationSelected(uint16_t value) {
     }
 }
 
-void channelsEnumDefinition(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
-    int channelIndex = cursor.i < g_channel->channelIndex ? cursor.i : cursor.i + 1;
+void channelsEnumDefinition(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+    int channelIndex = cursor < g_channel->channelIndex ? cursor : cursor + 1;
 
     if (operation == data::DATA_OPERATION_GET_VALUE) {
         value = (uint8_t)channelIndex;
@@ -919,7 +914,7 @@ void action_io_pin_toggle_polarity() {
 }
 
 void action_io_pin_toggle_state() {
-    int pin = getFoundWidgetAtDown().cursor.i;
+    int pin = getFoundWidgetAtDown().cursor;
     io_pins::setPinState(pin, io_pins::getPinState(pin) ? 0 : 1);
 }
 
@@ -971,7 +966,7 @@ void selectSimulatorLoad() {
 }
 
 void action_simulator_load() {
-    int channelIndex = getFoundWidgetAtDown().cursor.i;
+    int channelIndex = getFoundWidgetAtDown().cursor;
     if (getFoundWidgetAtDown().widget->data == DATA_ID_SIMULATOR_LOAD_STATE2) {
         channelIndex++;
     }
@@ -981,12 +976,12 @@ void action_simulator_load() {
 
 #endif
 
-void themesEnumDefinition(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void themesEnumDefinition(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET_VALUE) {
-        value = (uint8_t)cursor.i;
+        value = (uint8_t)cursor;
     } else if (operation == data::DATA_OPERATION_GET_LABEL) {
-		if (cursor.i < getThemesCount()) {
-			value = getThemeName(cursor.i);
+		if (cursor < getThemesCount()) {
+			value = getThemeName(cursor);
 		}
     }
 }
@@ -1152,15 +1147,15 @@ void action_show_dlog_params() {
 }
 
 void action_dlog_voltage_toggle() {
-    dlog_record::g_guiParameters.logVoltage[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_guiParameters.logVoltage[getFoundWidgetAtDown().cursor.i];
+    dlog_record::g_guiParameters.logVoltage[getFoundWidgetAtDown().cursor] = !dlog_record::g_guiParameters.logVoltage[getFoundWidgetAtDown().cursor];
 }
 
 void action_dlog_current_toggle() {
-    dlog_record::g_guiParameters.logCurrent[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_guiParameters.logCurrent[getFoundWidgetAtDown().cursor.i];
+    dlog_record::g_guiParameters.logCurrent[getFoundWidgetAtDown().cursor] = !dlog_record::g_guiParameters.logCurrent[getFoundWidgetAtDown().cursor];
 }
 
 void action_dlog_power_toggle() {
-    dlog_record::g_guiParameters.logPower[getFoundWidgetAtDown().cursor.i] = !dlog_record::g_guiParameters.logPower[getFoundWidgetAtDown().cursor.i];
+    dlog_record::g_guiParameters.logPower[getFoundWidgetAtDown().cursor] = !dlog_record::g_guiParameters.logPower[getFoundWidgetAtDown().cursor];
 }
 
 void action_dlog_edit_period() {
@@ -1241,7 +1236,7 @@ void action_dlog_view_show_overlay_options() {
 
 void action_dlog_value_toggle() {
     dlog_view::Recording &recording = dlog_view::getRecording();
-    int dlogValueIndex = getFoundWidgetAtDown().cursor.i;
+    int dlogValueIndex = getFoundWidgetAtDown().cursor;
     recording.dlogValues[dlogValueIndex].isVisible = !recording.dlogValues[dlogValueIndex].isVisible;
 }
 

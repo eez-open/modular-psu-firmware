@@ -41,7 +41,7 @@ Overlay *getOverlay(const WidgetCursor &widgetCursor) {
         return nullptr;
     }
     data::Value overlayValue;
-    DATA_OPERATION_FUNCTION(containerWidget->overlay, data::DATA_OPERATION_GET_OVERLAY_DATA, (data::Cursor &)widgetCursor.cursor, overlayValue);
+    DATA_OPERATION_FUNCTION(containerWidget->overlay, data::DATA_OPERATION_GET_OVERLAY_DATA, (data::Cursor )widgetCursor.cursor, overlayValue);
     return (Overlay *)overlayValue.getVoidPointer();
 }
 

@@ -18,28 +18,27 @@
 
 #if OPTION_DISPLAY
 
+#include <math.h>
+
 #include <eez/firmware.h>
 
 #include <eez/modules/psu/psu.h>
-
-#include <math.h>
-
+#include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/ethernet.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/temperature.h>
-#if OPTION_ENCODER
-#include <eez/modules/mcu/encoder.h>
-#endif
-#include <eez/modules/psu/util.h>
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ntp.h>
 #endif
-#include <eez/modules/psu/channel_dispatcher.h>
+
+#if OPTION_ENCODER
+#include <eez/modules/mcu/encoder.h>
+#endif
 
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/data.h>
-#include <eez/modules/psu/gui/numeric_keypad.h>
+#include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
 
 #include <eez/modules/aux_ps/fan.h>
@@ -828,7 +827,7 @@ void SysSettingsIOPinsPage::pageAlloc() {
 }
 
 void SysSettingsIOPinsPage::togglePolarity() {
-    int i = getFoundWidgetAtDown().cursor.i;
+    int i = getFoundWidgetAtDown().cursor;
     m_polarity[i] = m_polarity[i] == io_pins::POLARITY_NEGATIVE ? io_pins::POLARITY_POSITIVE : io_pins::POLARITY_NEGATIVE;
 }
 
@@ -839,7 +838,7 @@ void SysSettingsIOPinsPage::onFunctionSet(uint16_t value) {
 }
 
 void SysSettingsIOPinsPage::selectFunction() {
-    pinNumber = getFoundWidgetAtDown().cursor.i;
+    pinNumber = getFoundWidgetAtDown().cursor;
     if (pinNumber < DOUT1) {
         pushSelectFromEnumPage(g_ioPinsInputFunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
     } else if (pinNumber == DOUT2) {

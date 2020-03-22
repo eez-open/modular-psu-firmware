@@ -28,12 +28,10 @@
 namespace eez {
 namespace gui {
 
-#if OPTION_SDRAM
 void ContainerWidget_fixPointers(Widget *widget) {
     ContainerWidget *containerWidget = (ContainerWidget *)widget->specific;
     WidgetList_fixPointers(containerWidget->widgets);
 }
-#endif
 
 void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const WidgetList &widgets) {
     auto savedCurrentState = widgetCursor.currentState;
@@ -74,19 +72,16 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
     for (uint32_t index = 0; index < widgets.count; ++index) {
         widgetCursor.widget = GET_WIDGET_LIST_ELEMENT(widgets, index);
 
-#if OPTION_SDRAM
         int xSaved = 0;
         int ySaved = 0;
         int wSaved = 0;
         int hSaved = 0;
-#endif
 
         if (overlay && overlay->widgetOverrides) {
             if (!overlay->widgetOverrides[index].isVisible) {
                 continue;
             }
 
-#if OPTION_SDRAM
             xSaved = widgetCursor.widget->x;
             ySaved = widgetCursor.widget->y;
             wSaved = widgetCursor.widget->w;
@@ -96,19 +91,16 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
             ((Widget*)widgetCursor.widget)->y = overlay->widgetOverrides[index].y;
             ((Widget*)widgetCursor.widget)->w = overlay->widgetOverrides[index].w;
             ((Widget*)widgetCursor.widget)->h = overlay->widgetOverrides[index].h;
-#endif
         }
 
         enumWidget(widgetCursor, callback);
 
-#if OPTION_SDRAM
         if (overlay && overlay->widgetOverrides) {
             ((Widget*)widgetCursor.widget)->x = xSaved;
             ((Widget*)widgetCursor.widget)->y = ySaved;
             ((Widget*)widgetCursor.widget)->w = wSaved;
             ((Widget*)widgetCursor.widget)->h = hSaved;
         }
-#endif
 
         if (widgetCursor.previousState) {
 			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
@@ -159,7 +151,6 @@ void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callba
     const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
     enumContainer(widgetCursor, callback, containerWidget->widgets);
 
-#if OPTION_SDRAM
     if (isOverlay(widgetCursor)) {
         auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
         if (currentState) {
@@ -172,7 +163,6 @@ void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callba
             mcu::display::setBufferBounds(currentState->displayBufferIndex, widgetCursor.x, widgetCursor.y, overlay ? overlay->width: widgetCursor.widget->w, overlay ? overlay->height : widgetCursor.widget->h, (containerWidget->flags & SHADOW_FLAG) != 0, style->opacity, xOffset, yOffset);
         }
     }
-#endif
 }
 
 void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
@@ -203,7 +193,6 @@ void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
         w = overlay ? overlay->width : widget->w;
         h = overlay ? overlay->height : widget->h;
 
-#if OPTION_SDRAM
         if (!previousState || previousState->displayBufferIndex == -1) {
             currentState->displayBufferIndex = mcu::display::allocBuffer();
             refresh = true;
@@ -211,7 +200,6 @@ void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
             currentState->displayBufferIndex = previousState->displayBufferIndex;
         }
         mcu::display::selectBuffer(currentState->displayBufferIndex);
-#endif
     }
 
     if (refresh) {

@@ -25,12 +25,10 @@
 namespace eez {
 namespace gui {
 
-#if OPTION_SDRAM
 void SelectWidget_fixPointers(Widget *widget) {
     SelectWidget *selectWidget = (SelectWidget *)widget->specific;
     WidgetList_fixPointers(selectWidget->widgets);
 }
-#endif
 
 void SelectWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;

@@ -116,6 +116,44 @@ void strcatFloat(char *str, float value, int numDecimalPlaces) {
     sprintf(str + strlen(str), "%.*f", numDecimalPlaces, value);
 }
 
+void strcatVoltage(char *str, float value) {
+    strcatFloat(str, value);
+    strcat(str, "V");
+}
+
+void strcatCurrent(char *str, float value) {
+    strcatFloat(str, value);
+    strcat(str, "A");
+}
+
+void strcatPower(char *str, float value) {
+    strcatFloat(str, value);
+    strcat(str, "W");
+}
+
+void strcatDuration(char *str, float value) {
+    if (value > 0.1) {
+        strcatFloat(str, value);
+        strcat(str, " s");
+    } else {
+        strcatFloat(str, value * 1000);
+        strcat(str, " ms");
+    }
+}
+
+void strcatLoad(char *str, float value) {
+    if (value < 1000) {
+        strcatFloat(str, value);
+        strcat(str, " ohm");
+    } else if (value < 1000000) {
+        strcatFloat(str, value / 1000);
+        strcat(str, " Kohm");
+    } else {
+        strcatFloat(str, value / 1000000);
+        strcat(str, " Mohm");
+    }
+}
+
 #if defined(EEZ_PLATFORM_STM32)
 uint32_t crc32(const uint8_t *mem_block, size_t block_size) {
 	return HAL_CRC_Calculate(&hcrc, (uint32_t *)mem_block, block_size);

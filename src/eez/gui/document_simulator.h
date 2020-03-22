@@ -49,758 +49,756 @@ enum DataEnum {
     DATA_ID_MASTER_INFO = 47,
     DATA_ID_MASTER_TEST_RESULT = 48,
     DATA_ID_FIRMWARE_INFO = 49,
-    DATA_ID_SELF_TEST_RESULT = 50,
-    DATA_ID_KEYPAD_TEXT = 51,
-    DATA_ID_KEYPAD_MODE = 52,
-    DATA_ID_KEYPAD_OPTION1_TEXT = 53,
-    DATA_ID_KEYPAD_OPTION1_ENABLED = 54,
-    DATA_ID_KEYPAD_OPTION2_TEXT = 55,
-    DATA_ID_KEYPAD_OPTION2_ENABLED = 56,
-    DATA_ID_KEYPAD_SIGN_ENABLED = 57,
-    DATA_ID_KEYPAD_DOT_ENABLED = 58,
-    DATA_ID_KEYPAD_UNIT_ENABLED = 59,
-    DATA_ID_CHANNEL_LABEL = 60,
-    DATA_ID_CHANNEL_SHORT_LABEL = 61,
-    DATA_ID_CHANNEL_TEMP_STATUS = 62,
-    DATA_ID_CHANNEL_TEMP = 63,
-    DATA_ID_CHANNEL_ON_TIME_TOTAL = 64,
-    DATA_ID_CHANNEL_ON_TIME_LAST = 65,
-    DATA_ID_CHANNEL_CALIBRATION_STATUS = 66,
-    DATA_ID_CHANNEL_CALIBRATION_STATE = 67,
-    DATA_ID_CHANNEL_CALIBRATION_DATE = 68,
-    DATA_ID_CHANNEL_CALIBRATION_REMARK = 69,
-    DATA_ID_CHANNEL_CALIBRATION_STEP_IS_SET_REMARK_STEP = 70,
-    DATA_ID_CHANNEL_CALIBRATION_STEP_NUM = 71,
-    DATA_ID_CHANNEL_CALIBRATION_STEP_STATUS = 72,
-    DATA_ID_CHANNEL_CALIBRATION_STEP_LEVEL_VALUE = 73,
-    DATA_ID_CHANNEL_CALIBRATION_STEP_VALUE = 74,
-    DATA_ID_CHANNEL_CALIBRATION_STEP_PREV_ENABLED = 75,
-    DATA_ID_CHANNEL_CALIBRATION_STEP_NEXT_ENABLED = 76,
-    DATA_ID_CAL_CH_U_MIN = 77,
-    DATA_ID_CAL_CH_U_MID = 78,
-    DATA_ID_CAL_CH_U_MAX = 79,
-    DATA_ID_CAL_CH_I0_MIN = 80,
-    DATA_ID_CAL_CH_I0_MID = 81,
-    DATA_ID_CAL_CH_I0_MAX = 82,
-    DATA_ID_CAL_CH_I1_MIN = 83,
-    DATA_ID_CAL_CH_I1_MID = 84,
-    DATA_ID_CAL_CH_I1_MAX = 85,
-    DATA_ID_CHANNEL_PROTECTION_STATUS = 86,
-    DATA_ID_CHANNEL_PROTECTION_OVP_STATE = 87,
-    DATA_ID_CHANNEL_PROTECTION_OVP_TYPE = 88,
-    DATA_ID_CHANNEL_PROTECTION_OVP_LEVEL = 89,
-    DATA_ID_CHANNEL_PROTECTION_OVP_DELAY = 90,
-    DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT = 91,
-    DATA_ID_CHANNEL_PROTECTION_OCP_STATE = 92,
-    DATA_ID_CHANNEL_PROTECTION_OCP_DELAY = 93,
-    DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT = 94,
-    DATA_ID_CHANNEL_PROTECTION_OCP_MAX_CURRENT_LIMIT_CAUSE = 95,
-    DATA_ID_CHANNEL_PROTECTION_OPP_STATE = 96,
-    DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL = 97,
-    DATA_ID_CHANNEL_PROTECTION_OPP_DELAY = 98,
-    DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT = 99,
-    DATA_ID_CHANNEL_PROTECTION_OTP_INSTALLED = 100,
-    DATA_ID_CHANNEL_PROTECTION_OTP_STATE = 101,
-    DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL = 102,
-    DATA_ID_CHANNEL_PROTECTION_OTP_DELAY = 103,
-    DATA_ID_EVENT_QUEUE_LAST_EVENT_TYPE = 104,
-    DATA_ID_EVENT_QUEUE_EVENTS = 105,
-    DATA_ID_EVENT_QUEUE_EVENT_TYPE = 106,
-    DATA_ID_EVENT_QUEUE_EVENT_MESSAGE = 107,
-    DATA_ID_EVENT_QUEUE_SELECTED_EVENT_MESSAGE = 108,
-    DATA_ID_CHANNEL_RSENSE_STATUS = 109,
-    DATA_ID_CHANNEL_RPROG_INSTALLED = 110,
-    DATA_ID_CHANNEL_RPROG_STATUS = 111,
-    DATA_ID_CHANNEL_TRACKING_IS_ENABLED = 112,
-    DATA_ID_CHANNEL_TRACKING_IS_ALLOWED = 113,
-    DATA_ID_CHANNEL_IS_PAR_SER_COUPLED_OR_TRACKED = 114,
-    DATA_ID_COUPLING_TYPE = 115,
-    DATA_ID_CHANNEL_COUPLING_IS_SERIES = 116,
-    DATA_ID_SYS_ON_TIME_TOTAL = 117,
-    DATA_ID_SYS_ON_TIME_LAST = 118,
-    DATA_ID_SYS_TEMP_AUX_STATUS = 119,
-    DATA_ID_SYS_TEMP_AUX_OTP_STATE = 120,
-    DATA_ID_SYS_TEMP_AUX_OTP_LEVEL = 121,
-    DATA_ID_SYS_TEMP_AUX_OTP_DELAY = 122,
-    DATA_ID_SYS_TEMP_AUX_OTP_IS_TRIPPED = 123,
-    DATA_ID_SYS_TEMP_AUX = 124,
-    DATA_ID_SYS_INFO_FIRMWARE_VER = 125,
-    DATA_ID_SYS_INFO_SERIAL_NO = 126,
-    DATA_ID_SYS_INFO_SCPI_VER = 127,
-    DATA_ID_SYS_INFO_CPU = 128,
-    DATA_ID_SYS_INFO_FAN_STATUS = 129,
-    DATA_ID_SYS_INFO_FAN_SPEED = 130,
-    DATA_ID_CHANNEL_BOARD_INFO_LABEL = 131,
-    DATA_ID_CHANNEL_BOARD_INFO_REVISION = 132,
-    DATA_ID_DATE_TIME_DATE = 133,
-    DATA_ID_DATE_TIME_YEAR = 134,
-    DATA_ID_DATE_TIME_MONTH = 135,
-    DATA_ID_DATE_TIME_DAY = 136,
-    DATA_ID_DATE_TIME_TIME = 137,
-    DATA_ID_DATE_TIME_HOUR = 138,
-    DATA_ID_DATE_TIME_MINUTE = 139,
-    DATA_ID_DATE_TIME_SECOND = 140,
-    DATA_ID_DATE_TIME_TIME_ZONE = 141,
-    DATA_ID_DATE_TIME_DST = 142,
-    DATA_ID_SET_PAGE_DIRTY = 143,
-    DATA_ID_PROFILES_LIST = 144,
-    DATA_ID_PROFILES_AUTO_RECALL_STATUS = 145,
-    DATA_ID_PROFILES_AUTO_RECALL_LOCATION = 146,
-    DATA_ID_PROFILE_STATUS = 147,
-    DATA_ID_PROFILE_LABEL = 148,
-    DATA_ID_PROFILE_REMARK = 149,
-    DATA_ID_PROFILE_IS_AUTO_RECALL_LOCATION = 150,
-    DATA_ID_PROFILE_CHANNEL_U_SET = 151,
-    DATA_ID_PROFILE_CHANNEL_I_SET = 152,
-    DATA_ID_PROFILE_CHANNEL_OUTPUT_STATE = 153,
-    DATA_ID_ETHERNET_INSTALLED = 154,
-    DATA_ID_ETHERNET_ENABLED = 155,
-    DATA_ID_MQTT_ENABLED = 156,
-    DATA_ID_ETHERNET_STATUS = 157,
-    DATA_ID_MQTT_CONNECTION_STATE = 158,
-    DATA_ID_ETHERNET_IP_ADDRESS = 159,
-    DATA_ID_ETHERNET_DNS = 160,
-    DATA_ID_ETHERNET_GATEWAY = 161,
-    DATA_ID_ETHERNET_SUBNET_MASK = 162,
-    DATA_ID_ETHERNET_SCPI_PORT = 163,
-    DATA_ID_ETHERNET_IS_CONNECTED = 164,
-    DATA_ID_ETHERNET_DHCP = 165,
-    DATA_ID_ETHERNET_MAC = 166,
-    DATA_ID_CHANNEL_IS_VOLTAGE_BALANCED = 167,
-    DATA_ID_CHANNEL_IS_CURRENT_BALANCED = 168,
-    DATA_ID_SYS_OUTPUT_PROTECTION_COUPLED = 169,
-    DATA_ID_SYS_SHUTDOWN_WHEN_PROTECTION_TRIPPED = 170,
-    DATA_ID_SYS_FORCE_DISABLING_ALL_OUTPUTS_ON_POWER_UP = 171,
-    DATA_ID_SYS_PASSWORD_IS_SET = 172,
-    DATA_ID_SYS_RL_STATE = 173,
-    DATA_ID_SYS_SOUND_IS_ENABLED = 174,
-    DATA_ID_SYS_SOUND_IS_CLICK_ENABLED = 175,
-    DATA_ID_SYS_SOUND_ENABLED = 176,
-    DATA_ID_CHANNEL_DISPLAY_VIEW_SETTINGS_DISPLAY_VALUE1 = 177,
-    DATA_ID_CHANNEL_DISPLAY_VIEW_SETTINGS_DISPLAY_VALUE2 = 178,
-    DATA_ID_CHANNEL_DISPLAY_VIEW_SETTINGS_YT_VIEW_RATE = 179,
-    DATA_ID_SYS_ENCODER_CONFIRMATION_MODE = 180,
-    DATA_ID_SYS_ENCODER_MOVING_UP_SPEED = 181,
-    DATA_ID_SYS_ENCODER_MOVING_DOWN_SPEED = 182,
-    DATA_ID_SYS_ENCODER_INSTALLED = 183,
-    DATA_ID_SYS_DISPLAY_STATE = 184,
-    DATA_ID_SYS_DISPLAY_BRIGHTNESS = 185,
-    DATA_ID_CHANNEL_TRIGGER_MODE = 186,
-    DATA_ID_CHANNEL_TRIGGER_ON_LIST_STOP = 187,
-    DATA_ID_CHANNEL_U_TRIGGER_VALUE = 188,
-    DATA_ID_CHANNEL_I_TRIGGER_VALUE = 189,
-    DATA_ID_CHANNEL_LIST_COUNT = 190,
-    DATA_ID_CHANNEL_LISTS = 191,
-    DATA_ID_CHANNEL_LIST_INDEX = 192,
-    DATA_ID_CHANNEL_LIST_DWELL = 193,
-    DATA_ID_CHANNEL_LIST_DWELL_ENABLED = 194,
-    DATA_ID_CHANNEL_LIST_VOLTAGE = 195,
-    DATA_ID_CHANNEL_LIST_VOLTAGE_ENABLED = 196,
-    DATA_ID_CHANNEL_LIST_CURRENT = 197,
-    DATA_ID_CHANNEL_LIST_CURRENT_ENABLED = 198,
-    DATA_ID_CHANNEL_LISTS_PREVIOUS_PAGE_ENABLED = 199,
-    DATA_ID_CHANNEL_LISTS_NEXT_PAGE_ENABLED = 200,
-    DATA_ID_CHANNEL_LISTS_CURSOR = 201,
-    DATA_ID_CHANNEL_LISTS_INSERT_MENU_ENABLED = 202,
-    DATA_ID_CHANNEL_LISTS_DELETE_MENU_ENABLED = 203,
-    DATA_ID_CHANNEL_LISTS_DELETE_ROW_ENABLED = 204,
-    DATA_ID_CHANNEL_LISTS_CLEAR_COLUMN_ENABLED = 205,
-    DATA_ID_CHANNEL_LISTS_DELETE_ROWS_ENABLED = 206,
-    DATA_ID_TRIGGER_SOURCE = 207,
-    DATA_ID_TRIGGER_DELAY = 208,
-    DATA_ID_TRIGGER_INITIATE_CONTINUOUSLY = 209,
-    DATA_ID_TRIGGER_IS_INITIATED = 210,
-    DATA_ID_TRIGGER_IS_MANUAL = 211,
-    DATA_ID_CHANNEL_HAS_SUPPORT_FOR_CURRENT_DUAL_RANGE = 212,
-    DATA_ID_CHANNEL_RANGES_SUPPORTED = 213,
-    DATA_ID_CHANNEL_RANGES_MODE = 214,
-    DATA_ID_CHANNEL_RANGES_AUTO_RANGING = 215,
-    DATA_ID_CHANNEL_RANGES_CURRENTLY_SELECTED = 216,
-    DATA_ID_TEXT_MESSAGE = 217,
-    DATA_ID_SERIAL_STATUS = 218,
-    DATA_ID_SERIAL_ENABLED = 219,
-    DATA_ID_SERIAL_IS_CONNECTED = 220,
-    DATA_ID_CHANNEL_LIST_COUNTDOWN = 221,
-    DATA_ID_IO_PINS = 222,
-    DATA_ID_IO_PINS_INHIBIT_STATE = 223,
-    DATA_ID_IO_PIN_NUMBER = 224,
-    DATA_ID_IO_PIN_POLARITY = 225,
-    DATA_ID_IO_PIN_FUNCTION_NAME = 226,
-    DATA_ID_NTP_ENABLED = 227,
-    DATA_ID_NTP_SERVER = 228,
-    DATA_ID_SYS_DISPLAY_BACKGROUND_LUMINOSITY_STEP = 229,
-    DATA_ID_PROGRESS = 230,
-    DATA_ID_MAIN_APP_VIEW = 231,
-    DATA_ID_TOUCH_CALIBRATION_POINT = 232,
-    DATA_ID_SIMULATOR_LOAD_STATE = 233,
-    DATA_ID_SIMULATOR_LOAD_STATE2 = 234,
-    DATA_ID_SIMULATOR_LOAD = 235,
-    DATA_ID_SIMULATOR_LOAD2 = 236,
-    DATA_ID_SELECTED_THEME = 237,
-    DATA_ID_CHANNEL_TITLE = 238,
-    DATA_ID_CHANNEL_SHORT_TITLE = 239,
-    DATA_ID_CHANNEL_SHORT_TITLE_WITH_COLON = 240,
-    DATA_ID_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON = 241,
-    DATA_ID_CHANNEL_LONG_TITLE = 242,
-    DATA_ID_ANIMATIONS_DURATION = 243,
-    DATA_ID_SLOT1_INFO = 244,
-    DATA_ID_SLOT2_INFO = 245,
-    DATA_ID_SLOT3_INFO = 246,
-    DATA_ID_SLOT1_TEST_RESULT = 247,
-    DATA_ID_SLOT2_TEST_RESULT = 248,
-    DATA_ID_SLOT3_TEST_RESULT = 249,
-    DATA_ID_SLOT_DEFAULT1_VIEW = 250,
-    DATA_ID_SLOT_DEFAULT2_VIEW = 251,
-    DATA_ID_SLOT_DEFAULT3_VIEW = 252,
-    DATA_ID_SLOT1_CHANNEL_INDEX = 253,
-    DATA_ID_SLOT2_CHANNEL_INDEX = 254,
-    DATA_ID_SLOT3_CHANNEL_INDEX = 255,
-    DATA_ID_SLOT_DEF_2CH_VIEW = 256,
-    DATA_ID_SLOT_MAX_2CH_VIEW = 257,
-    DATA_ID_SLOT_MIN_2CH_VIEW = 258,
-    DATA_ID_SLOT_MICRO_2CH_VIEW = 259,
-    DATA_ID_SLOT_2CH_CH1_INDEX = 260,
-    DATA_ID_SLOT_2CH_CH2_INDEX = 261,
-    DATA_ID_FRONT_PANEL_SLOT1_VIEW = 262,
-    DATA_ID_FRONT_PANEL_SLOT2_VIEW = 263,
-    DATA_ID_FRONT_PANEL_SLOT3_VIEW = 264,
-    DATA_ID_BATTERY = 265,
-    DATA_ID_IO_PIN_STATE = 266,
-    DATA_ID_CHANNEL_DPROG = 267,
-    DATA_ID_CHANNEL_DPROG_INSTALLED = 268,
-    DATA_ID_SYS_INFO_SDCARD_STATUS = 269,
-    DATA_ID_SYS_INFO_HAS_ERROR = 270,
-    DATA_ID_SYS_INFO_BATTERY_STATUS = 271,
-    DATA_ID_SYS_FAN_MODE = 272,
-    DATA_ID_SYS_FAN_SPEED = 273,
-    DATA_ID_IS_COUPLING_TYPE_UNCOUPLED = 274,
-    DATA_ID_IS_COUPLING_TYPE_PARALLEL = 275,
-    DATA_ID_IS_COUPLING_TYPE_COMMON_GND = 276,
-    DATA_ID_IS_COUPLING_TYPE_SPLIT_RAILS = 277,
-    DATA_ID_IS_TRACKING_ALLOWED = 278,
-    DATA_ID_IS_COUPLING_PARALLEL_ALLOWED = 279,
-    DATA_ID_IS_COUPLING_SERIES_ALLOWED = 280,
-    DATA_ID_CHANNEL_COUPLING_ENABLE_TRACKING_MODE = 281,
-    DATA_ID_CHANNEL_ACTIVE_COUPLED_LED = 282,
-    DATA_ID_IS_COUPLING_TYPE_SERIES = 283,
-    DATA_ID_IS_COUPLED_OR_TRACKED = 284,
-    DATA_ID_OVERLAY = 285,
-    DATA_ID_CHANNELS_WITH_LIST_COUNTER_VISIBLE = 286,
-    DATA_ID_DLOG_STATE = 287,
-    DATA_ID_DLOG_TOGGLE_STATE = 288,
-    DATA_ID_RECORDING = 289,
-    DATA_ID_CHANNEL_HISTORY_VALUES = 290,
-    DATA_ID_RECORDING_READY = 291,
-    DATA_ID_NONDRAG_OVERLAY = 292,
-    DATA_ID_DLOG_SINGLE_VALUE_OVERLAY = 293,
-    DATA_ID_DLOG_MULTIPLE_VALUES_OVERLAY = 294,
-    DATA_ID_DLOG_VISIBLE_VALUES = 295,
-    DATA_ID_DLOG_VISIBLE_VALUE_LABEL = 296,
-    DATA_ID_DLOG_VISIBLE_VALUE_DIV = 297,
-    DATA_ID_DLOG_VISIBLE_VALUE_OFFSET = 298,
-    DATA_ID_DLOG_VISIBLE_VALUE_CURSOR = 299,
-    DATA_ID_DLOG_ALL_VALUES = 300,
-    DATA_ID_DLOG_VALUE_LABEL = 301,
-    DATA_ID_DLOG_CURRENT_TIME = 302,
-    DATA_ID_DLOG_FILE_LENGTH = 303,
-    DATA_ID_DLOG_X_AXIS_OFFSET = 304,
-    DATA_ID_DLOG_X_AXIS_DIV = 305,
-    DATA_ID_DLOG_X_AXIS_MAX_VALUE = 306,
-    DATA_ID_DLOG_X_AXIS_MAX_VALUE_LABEL = 307,
-    DATA_ID_IS_SINGLE_PAGE_ON_STACK = 308,
-    DATA_ID_IS_SHOW_LIVE_RECORDING = 309,
-    DATA_ID_DLOG_VIEW_STATE = 310,
-    DATA_ID_DLOG_PERIOD = 311,
-    DATA_ID_DLOG_DURATION = 312,
-    DATA_ID_DLOG_VOLTAGE_ENABLED = 313,
-    DATA_ID_DLOG_CURRENT_ENABLED = 314,
-    DATA_ID_DLOG_POWER_ENABLED = 315,
-    DATA_ID_DLOG_START_ENABLED = 316,
-    DATA_ID_DLOG_FILE_NAME = 317,
-    DATA_ID_DLOG_VALUE_STATE = 318,
-    DATA_ID_SLOT_MAX_2CH_MIN_VIEW = 319,
-    DATA_ID_CHANNEL_OFF_LABEL = 320,
-    DATA_ID_FILE_MANAGER_FILES = 321,
-    DATA_ID_FILE_MANAGER_FILE_NAME = 322,
-    DATA_ID_FILE_MANAGER_FILE_DATE_TIME = 323,
-    DATA_ID_FILE_MANAGER_FILE_SIZE = 324,
-    DATA_ID_FILE_MANAGER_FILE_SELECTED = 325,
-    DATA_ID_FILE_MANAGER_STATE = 326,
-    DATA_ID_FILE_MANAGER_IS_ROOT_DIRECTORY = 327,
-    DATA_ID_FILE_MANAGER_CURRENT_DIRECTORY = 328,
-    DATA_ID_FILE_MANAGER_IS_DIRECTORY = 329,
-    DATA_ID_FILE_MANAGER_FILE_TYPE = 330,
-    DATA_ID_FILE_MANAGER_OPEN_FILE_ENABLED = 331,
-    DATA_ID_FILE_MANAGER_UPLOAD_FILE_ENABLED = 332,
-    DATA_ID_FILE_MANAGER_RENAME_FILE_ENABLED = 333,
-    DATA_ID_FILE_MANAGER_DELETE_FILE_ENABLED = 334,
-    DATA_ID_FILE_MANAGER_OPENED_IMAGE = 335,
-    DATA_ID_SCRIPT_INFO = 336,
-    DATA_ID_SCRIPT_IS_STARTED = 337,
-    DATA_ID_KEYPAD_OK_ENABLED = 338,
-    DATA_ID_ETHERNET_HOST_NAME = 339,
-    DATA_ID_MQTT_HOST = 340,
-    DATA_ID_MQTT_PORT = 341,
-    DATA_ID_MQTT_USERNAME = 342,
-    DATA_ID_MQTT_PASSWORD = 343,
-    DATA_ID_MQTT_PERIOD = 344,
-    DATA_ID_DLOG_VIEW_SHOW_LEGEND = 345,
-    DATA_ID_DLOG_VIEW_SHOW_LABELS = 346,
-    DATA_ID_IS_ANY_COUPLING_ALLOWED = 347,
-    DATA_ID_IS_COUPLING_SPLIT_RAILS_ALLOWED = 348,
-    DATA_ID_LIST_COUNTER_LABEL = 349,
-    DATA_ID_MODULE_SPECIFIC_CH_SETTINGS = 350,
-    DATA_ID_CHANNEL_FIRMWARE_VERSION = 351,
-    DATA_ID_FILE_MANAGER_BROWSER_TITLE = 352,
-    DATA_ID_CHANNEL_HAS_ERROR_SETTINGS = 353,
-    DATA_ID_CHANNEL_SETTINGS_PAGE = 354,
-    DATA_ID_IS_RESET_BY_IWDG = 355,
-    DATA_ID_DLOG_ENABLED = 356,
-    DATA_ID_FILE_MANAGER_BROWSER_IS_SAVE_DIALOG = 357,
-    DATA_ID_CHANNEL_CALIBRATION_STEP_NOTE = 358,
-    DATA_ID_CHANNEL_CALIBRATION_HAS_STEP_NOTE = 359,
-    DATA_ID_FILE_MANAGER_STORAGE_INFO = 360,
-    DATA_ID_FILE_MANAGER_STORAGE_ALARM = 361,
-    DATA_ID_EVENT_QUEUE_IS_LONG_MESSAGE_TEXT = 362,
-    DATA_ID_EVENT_QUEUE_EVENT_LONG_MESSAGE_OVERLAY = 363,
-    DATA_ID_EVENT_QUEUE_EVENT_IS_SELECTED = 364,
-    DATA_ID_DATE_TIME_FORMAT = 365,
-    DATA_ID_DATE_TIME_FORMAT_IS_DMY = 366,
-    DATA_ID_DATE_TIME_FORMAT_IS_24H = 367,
-    DATA_ID_DATE_TIME_AM_PM = 368,
-    DATA_ID_IS_MULTI_TRACKING = 369,
-    DATA_ID_CHANNEL_COPY_AVAILABLE = 370,
-    DATA_ID_CHANNEL_RSENSE_INSTALLED = 371,
-    DATA_ID_FILE_MANAGER_SORT_FILES_OPTION = 372,
-    DATA_ID_CHANNEL_INFO_BRAND = 373,
-    DATA_ID_CHANNEL_INFO_SERIAL = 374,
-    DATA_ID_FILE_MANAGER_LIST_VIEW = 375,
-    DATA_ID_FILE_MANAGER_IS_LIST_VIEW_OPTION_AVAILABLE = 376,
-    DATA_ID_FILE_MANAGER_FILE_ICON = 377,
-    DATA_ID_FILE_MANAGER_LAYOUT = 378,
-    DATA_ID_FILE_MANAGER_FILE_DESCRIPTION = 379,
-    DATA_ID_TOUCH_RAW_X = 380,
-    DATA_ID_TOUCH_RAW_Y = 381,
-    DATA_ID_TOUCH_RAW_Z1 = 382,
-    DATA_ID_TOUCH_RAW_PRESSED = 383,
-    DATA_ID_TOUCH_CALIBRATED_X = 384,
-    DATA_ID_TOUCH_CALIBRATED_Y = 385,
-    DATA_ID_TOUCH_CALIBRATED_PRESSED = 386,
-    DATA_ID_TOUCH_FILTERED_X = 387,
-    DATA_ID_TOUCH_FILTERED_Y = 388,
-    DATA_ID_TOUCH_FILTERED_PRESSED = 389,
-    DATA_ID_CAN_SHOW_PREVIOUS_PAGE = 390,
-    DATA_ID_FILE_MANAGER_FILE_HAS_DESCRIPTION = 391,
-    DATA_ID_FILE_MANAGER_IMAGE_OPEN_STATE = 392,
-    DATA_ID_FILE_MANAGER_IMAGE_OPEN_PROGRESS = 393,
-    DATA_ID_ALERT_MESSAGE_IS_SET = 394,
-    DATA_ID_ASYNC_PROGRESS = 395,
-    DATA_ID_IO_PIN_FUNCTION = 396,
-    DATA_ID_IO_PIN_PWM_FREQUENCY = 397,
-    DATA_ID_IO_PIN_PWM_DUTY = 398
+    DATA_ID_KEYPAD_TEXT = 50,
+    DATA_ID_KEYPAD_MODE = 51,
+    DATA_ID_KEYPAD_OPTION1_TEXT = 52,
+    DATA_ID_KEYPAD_OPTION1_ENABLED = 53,
+    DATA_ID_KEYPAD_OPTION2_TEXT = 54,
+    DATA_ID_KEYPAD_OPTION2_ENABLED = 55,
+    DATA_ID_KEYPAD_SIGN_ENABLED = 56,
+    DATA_ID_KEYPAD_DOT_ENABLED = 57,
+    DATA_ID_KEYPAD_UNIT_ENABLED = 58,
+    DATA_ID_CHANNEL_LABEL = 59,
+    DATA_ID_CHANNEL_SHORT_LABEL = 60,
+    DATA_ID_CHANNEL_TEMP_STATUS = 61,
+    DATA_ID_CHANNEL_TEMP = 62,
+    DATA_ID_CHANNEL_ON_TIME_TOTAL = 63,
+    DATA_ID_CHANNEL_ON_TIME_LAST = 64,
+    DATA_ID_CHANNEL_CALIBRATION_STATUS = 65,
+    DATA_ID_CHANNEL_CALIBRATION_STATE = 66,
+    DATA_ID_CHANNEL_CALIBRATION_DATE = 67,
+    DATA_ID_CHANNEL_CALIBRATION_REMARK = 68,
+    DATA_ID_CHANNEL_CALIBRATION_STEP_IS_SET_REMARK_STEP = 69,
+    DATA_ID_CHANNEL_CALIBRATION_STEP_NUM = 70,
+    DATA_ID_CHANNEL_CALIBRATION_STEP_STATUS = 71,
+    DATA_ID_CHANNEL_CALIBRATION_STEP_LEVEL_VALUE = 72,
+    DATA_ID_CHANNEL_CALIBRATION_STEP_VALUE = 73,
+    DATA_ID_CHANNEL_CALIBRATION_STEP_PREV_ENABLED = 74,
+    DATA_ID_CHANNEL_CALIBRATION_STEP_NEXT_ENABLED = 75,
+    DATA_ID_CAL_CH_U_MIN = 76,
+    DATA_ID_CAL_CH_U_MID = 77,
+    DATA_ID_CAL_CH_U_MAX = 78,
+    DATA_ID_CAL_CH_I0_MIN = 79,
+    DATA_ID_CAL_CH_I0_MID = 80,
+    DATA_ID_CAL_CH_I0_MAX = 81,
+    DATA_ID_CAL_CH_I1_MIN = 82,
+    DATA_ID_CAL_CH_I1_MID = 83,
+    DATA_ID_CAL_CH_I1_MAX = 84,
+    DATA_ID_CHANNEL_PROTECTION_STATUS = 85,
+    DATA_ID_CHANNEL_PROTECTION_OVP_STATE = 86,
+    DATA_ID_CHANNEL_PROTECTION_OVP_TYPE = 87,
+    DATA_ID_CHANNEL_PROTECTION_OVP_LEVEL = 88,
+    DATA_ID_CHANNEL_PROTECTION_OVP_DELAY = 89,
+    DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT = 90,
+    DATA_ID_CHANNEL_PROTECTION_OCP_STATE = 91,
+    DATA_ID_CHANNEL_PROTECTION_OCP_DELAY = 92,
+    DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT = 93,
+    DATA_ID_CHANNEL_PROTECTION_OCP_MAX_CURRENT_LIMIT_CAUSE = 94,
+    DATA_ID_CHANNEL_PROTECTION_OPP_STATE = 95,
+    DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL = 96,
+    DATA_ID_CHANNEL_PROTECTION_OPP_DELAY = 97,
+    DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT = 98,
+    DATA_ID_CHANNEL_PROTECTION_OTP_INSTALLED = 99,
+    DATA_ID_CHANNEL_PROTECTION_OTP_STATE = 100,
+    DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL = 101,
+    DATA_ID_CHANNEL_PROTECTION_OTP_DELAY = 102,
+    DATA_ID_EVENT_QUEUE_LAST_EVENT_TYPE = 103,
+    DATA_ID_EVENT_QUEUE_EVENTS = 104,
+    DATA_ID_EVENT_QUEUE_EVENT_TYPE = 105,
+    DATA_ID_EVENT_QUEUE_EVENT_MESSAGE = 106,
+    DATA_ID_EVENT_QUEUE_SELECTED_EVENT_MESSAGE = 107,
+    DATA_ID_CHANNEL_RSENSE_STATUS = 108,
+    DATA_ID_CHANNEL_RPROG_INSTALLED = 109,
+    DATA_ID_CHANNEL_RPROG_STATUS = 110,
+    DATA_ID_CHANNEL_TRACKING_IS_ENABLED = 111,
+    DATA_ID_CHANNEL_TRACKING_IS_ALLOWED = 112,
+    DATA_ID_CHANNEL_IS_PAR_SER_COUPLED_OR_TRACKED = 113,
+    DATA_ID_COUPLING_TYPE = 114,
+    DATA_ID_CHANNEL_COUPLING_IS_SERIES = 115,
+    DATA_ID_SYS_ON_TIME_TOTAL = 116,
+    DATA_ID_SYS_ON_TIME_LAST = 117,
+    DATA_ID_SYS_TEMP_AUX_STATUS = 118,
+    DATA_ID_SYS_TEMP_AUX_OTP_STATE = 119,
+    DATA_ID_SYS_TEMP_AUX_OTP_LEVEL = 120,
+    DATA_ID_SYS_TEMP_AUX_OTP_DELAY = 121,
+    DATA_ID_SYS_TEMP_AUX_OTP_IS_TRIPPED = 122,
+    DATA_ID_SYS_TEMP_AUX = 123,
+    DATA_ID_SYS_INFO_FIRMWARE_VER = 124,
+    DATA_ID_SYS_INFO_SERIAL_NO = 125,
+    DATA_ID_SYS_INFO_SCPI_VER = 126,
+    DATA_ID_SYS_INFO_CPU = 127,
+    DATA_ID_SYS_INFO_FAN_STATUS = 128,
+    DATA_ID_SYS_INFO_FAN_SPEED = 129,
+    DATA_ID_CHANNEL_BOARD_INFO_LABEL = 130,
+    DATA_ID_CHANNEL_BOARD_INFO_REVISION = 131,
+    DATA_ID_DATE_TIME_DATE = 132,
+    DATA_ID_DATE_TIME_YEAR = 133,
+    DATA_ID_DATE_TIME_MONTH = 134,
+    DATA_ID_DATE_TIME_DAY = 135,
+    DATA_ID_DATE_TIME_TIME = 136,
+    DATA_ID_DATE_TIME_HOUR = 137,
+    DATA_ID_DATE_TIME_MINUTE = 138,
+    DATA_ID_DATE_TIME_SECOND = 139,
+    DATA_ID_DATE_TIME_TIME_ZONE = 140,
+    DATA_ID_DATE_TIME_DST = 141,
+    DATA_ID_SET_PAGE_DIRTY = 142,
+    DATA_ID_PROFILES_LIST = 143,
+    DATA_ID_PROFILES_AUTO_RECALL_STATUS = 144,
+    DATA_ID_PROFILES_AUTO_RECALL_LOCATION = 145,
+    DATA_ID_PROFILE_STATUS = 146,
+    DATA_ID_PROFILE_LABEL = 147,
+    DATA_ID_PROFILE_REMARK = 148,
+    DATA_ID_PROFILE_IS_AUTO_RECALL_LOCATION = 149,
+    DATA_ID_PROFILE_CHANNEL_U_SET = 150,
+    DATA_ID_PROFILE_CHANNEL_I_SET = 151,
+    DATA_ID_PROFILE_CHANNEL_OUTPUT_STATE = 152,
+    DATA_ID_ETHERNET_INSTALLED = 153,
+    DATA_ID_ETHERNET_ENABLED = 154,
+    DATA_ID_MQTT_ENABLED = 155,
+    DATA_ID_ETHERNET_STATUS = 156,
+    DATA_ID_MQTT_CONNECTION_STATE = 157,
+    DATA_ID_ETHERNET_IP_ADDRESS = 158,
+    DATA_ID_ETHERNET_DNS = 159,
+    DATA_ID_ETHERNET_GATEWAY = 160,
+    DATA_ID_ETHERNET_SUBNET_MASK = 161,
+    DATA_ID_ETHERNET_SCPI_PORT = 162,
+    DATA_ID_ETHERNET_IS_CONNECTED = 163,
+    DATA_ID_ETHERNET_DHCP = 164,
+    DATA_ID_ETHERNET_MAC = 165,
+    DATA_ID_CHANNEL_IS_VOLTAGE_BALANCED = 166,
+    DATA_ID_CHANNEL_IS_CURRENT_BALANCED = 167,
+    DATA_ID_SYS_OUTPUT_PROTECTION_COUPLED = 168,
+    DATA_ID_SYS_SHUTDOWN_WHEN_PROTECTION_TRIPPED = 169,
+    DATA_ID_SYS_FORCE_DISABLING_ALL_OUTPUTS_ON_POWER_UP = 170,
+    DATA_ID_SYS_PASSWORD_IS_SET = 171,
+    DATA_ID_SYS_RL_STATE = 172,
+    DATA_ID_SYS_SOUND_IS_ENABLED = 173,
+    DATA_ID_SYS_SOUND_IS_CLICK_ENABLED = 174,
+    DATA_ID_SYS_SOUND_ENABLED = 175,
+    DATA_ID_CHANNEL_DISPLAY_VIEW_SETTINGS_DISPLAY_VALUE1 = 176,
+    DATA_ID_CHANNEL_DISPLAY_VIEW_SETTINGS_DISPLAY_VALUE2 = 177,
+    DATA_ID_CHANNEL_DISPLAY_VIEW_SETTINGS_YT_VIEW_RATE = 178,
+    DATA_ID_SYS_ENCODER_CONFIRMATION_MODE = 179,
+    DATA_ID_SYS_ENCODER_MOVING_UP_SPEED = 180,
+    DATA_ID_SYS_ENCODER_MOVING_DOWN_SPEED = 181,
+    DATA_ID_SYS_ENCODER_INSTALLED = 182,
+    DATA_ID_SYS_DISPLAY_STATE = 183,
+    DATA_ID_SYS_DISPLAY_BRIGHTNESS = 184,
+    DATA_ID_CHANNEL_TRIGGER_MODE = 185,
+    DATA_ID_CHANNEL_TRIGGER_ON_LIST_STOP = 186,
+    DATA_ID_CHANNEL_U_TRIGGER_VALUE = 187,
+    DATA_ID_CHANNEL_I_TRIGGER_VALUE = 188,
+    DATA_ID_CHANNEL_LIST_COUNT = 189,
+    DATA_ID_CHANNEL_LISTS = 190,
+    DATA_ID_CHANNEL_LIST_INDEX = 191,
+    DATA_ID_CHANNEL_LIST_DWELL = 192,
+    DATA_ID_CHANNEL_LIST_DWELL_ENABLED = 193,
+    DATA_ID_CHANNEL_LIST_VOLTAGE = 194,
+    DATA_ID_CHANNEL_LIST_VOLTAGE_ENABLED = 195,
+    DATA_ID_CHANNEL_LIST_CURRENT = 196,
+    DATA_ID_CHANNEL_LIST_CURRENT_ENABLED = 197,
+    DATA_ID_CHANNEL_LISTS_PREVIOUS_PAGE_ENABLED = 198,
+    DATA_ID_CHANNEL_LISTS_NEXT_PAGE_ENABLED = 199,
+    DATA_ID_CHANNEL_LISTS_CURSOR = 200,
+    DATA_ID_CHANNEL_LISTS_INSERT_MENU_ENABLED = 201,
+    DATA_ID_CHANNEL_LISTS_DELETE_MENU_ENABLED = 202,
+    DATA_ID_CHANNEL_LISTS_DELETE_ROW_ENABLED = 203,
+    DATA_ID_CHANNEL_LISTS_CLEAR_COLUMN_ENABLED = 204,
+    DATA_ID_CHANNEL_LISTS_DELETE_ROWS_ENABLED = 205,
+    DATA_ID_TRIGGER_SOURCE = 206,
+    DATA_ID_TRIGGER_DELAY = 207,
+    DATA_ID_TRIGGER_INITIATE_CONTINUOUSLY = 208,
+    DATA_ID_TRIGGER_IS_INITIATED = 209,
+    DATA_ID_TRIGGER_IS_MANUAL = 210,
+    DATA_ID_CHANNEL_HAS_SUPPORT_FOR_CURRENT_DUAL_RANGE = 211,
+    DATA_ID_CHANNEL_RANGES_SUPPORTED = 212,
+    DATA_ID_CHANNEL_RANGES_MODE = 213,
+    DATA_ID_CHANNEL_RANGES_AUTO_RANGING = 214,
+    DATA_ID_CHANNEL_RANGES_CURRENTLY_SELECTED = 215,
+    DATA_ID_TEXT_MESSAGE = 216,
+    DATA_ID_SERIAL_STATUS = 217,
+    DATA_ID_SERIAL_ENABLED = 218,
+    DATA_ID_SERIAL_IS_CONNECTED = 219,
+    DATA_ID_CHANNEL_LIST_COUNTDOWN = 220,
+    DATA_ID_IO_PINS = 221,
+    DATA_ID_IO_PINS_INHIBIT_STATE = 222,
+    DATA_ID_IO_PIN_NUMBER = 223,
+    DATA_ID_IO_PIN_POLARITY = 224,
+    DATA_ID_IO_PIN_FUNCTION_NAME = 225,
+    DATA_ID_NTP_ENABLED = 226,
+    DATA_ID_NTP_SERVER = 227,
+    DATA_ID_SYS_DISPLAY_BACKGROUND_LUMINOSITY_STEP = 228,
+    DATA_ID_PROGRESS = 229,
+    DATA_ID_MAIN_APP_VIEW = 230,
+    DATA_ID_TOUCH_CALIBRATION_POINT = 231,
+    DATA_ID_SIMULATOR_LOAD_STATE = 232,
+    DATA_ID_SIMULATOR_LOAD_STATE2 = 233,
+    DATA_ID_SIMULATOR_LOAD = 234,
+    DATA_ID_SIMULATOR_LOAD2 = 235,
+    DATA_ID_SELECTED_THEME = 236,
+    DATA_ID_CHANNEL_TITLE = 237,
+    DATA_ID_CHANNEL_SHORT_TITLE = 238,
+    DATA_ID_CHANNEL_SHORT_TITLE_WITH_COLON = 239,
+    DATA_ID_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON = 240,
+    DATA_ID_CHANNEL_LONG_TITLE = 241,
+    DATA_ID_ANIMATIONS_DURATION = 242,
+    DATA_ID_SLOT1_INFO = 243,
+    DATA_ID_SLOT2_INFO = 244,
+    DATA_ID_SLOT3_INFO = 245,
+    DATA_ID_SLOT1_TEST_RESULT = 246,
+    DATA_ID_SLOT2_TEST_RESULT = 247,
+    DATA_ID_SLOT3_TEST_RESULT = 248,
+    DATA_ID_SLOT_DEFAULT1_VIEW = 249,
+    DATA_ID_SLOT_DEFAULT2_VIEW = 250,
+    DATA_ID_SLOT_DEFAULT3_VIEW = 251,
+    DATA_ID_SLOT1_CHANNEL_INDEX = 252,
+    DATA_ID_SLOT2_CHANNEL_INDEX = 253,
+    DATA_ID_SLOT3_CHANNEL_INDEX = 254,
+    DATA_ID_SLOT_DEF_2CH_VIEW = 255,
+    DATA_ID_SLOT_MAX_2CH_VIEW = 256,
+    DATA_ID_SLOT_MIN_2CH_VIEW = 257,
+    DATA_ID_SLOT_MICRO_2CH_VIEW = 258,
+    DATA_ID_SLOT_2CH_CH1_INDEX = 259,
+    DATA_ID_SLOT_2CH_CH2_INDEX = 260,
+    DATA_ID_FRONT_PANEL_SLOT1_VIEW = 261,
+    DATA_ID_FRONT_PANEL_SLOT2_VIEW = 262,
+    DATA_ID_FRONT_PANEL_SLOT3_VIEW = 263,
+    DATA_ID_BATTERY = 264,
+    DATA_ID_IO_PIN_STATE = 265,
+    DATA_ID_CHANNEL_DPROG = 266,
+    DATA_ID_CHANNEL_DPROG_INSTALLED = 267,
+    DATA_ID_SYS_INFO_SDCARD_STATUS = 268,
+    DATA_ID_SYS_INFO_HAS_ERROR = 269,
+    DATA_ID_SYS_INFO_BATTERY_STATUS = 270,
+    DATA_ID_SYS_FAN_MODE = 271,
+    DATA_ID_SYS_FAN_SPEED = 272,
+    DATA_ID_IS_COUPLING_TYPE_UNCOUPLED = 273,
+    DATA_ID_IS_COUPLING_TYPE_PARALLEL = 274,
+    DATA_ID_IS_COUPLING_TYPE_COMMON_GND = 275,
+    DATA_ID_IS_COUPLING_TYPE_SPLIT_RAILS = 276,
+    DATA_ID_IS_TRACKING_ALLOWED = 277,
+    DATA_ID_IS_COUPLING_PARALLEL_ALLOWED = 278,
+    DATA_ID_IS_COUPLING_SERIES_ALLOWED = 279,
+    DATA_ID_CHANNEL_COUPLING_ENABLE_TRACKING_MODE = 280,
+    DATA_ID_CHANNEL_ACTIVE_COUPLED_LED = 281,
+    DATA_ID_IS_COUPLING_TYPE_SERIES = 282,
+    DATA_ID_IS_COUPLED_OR_TRACKED = 283,
+    DATA_ID_OVERLAY = 284,
+    DATA_ID_CHANNELS_WITH_LIST_COUNTER_VISIBLE = 285,
+    DATA_ID_DLOG_STATE = 286,
+    DATA_ID_DLOG_TOGGLE_STATE = 287,
+    DATA_ID_RECORDING = 288,
+    DATA_ID_CHANNEL_HISTORY_VALUES = 289,
+    DATA_ID_RECORDING_READY = 290,
+    DATA_ID_NONDRAG_OVERLAY = 291,
+    DATA_ID_DLOG_SINGLE_VALUE_OVERLAY = 292,
+    DATA_ID_DLOG_MULTIPLE_VALUES_OVERLAY = 293,
+    DATA_ID_DLOG_VISIBLE_VALUES = 294,
+    DATA_ID_DLOG_VISIBLE_VALUE_LABEL = 295,
+    DATA_ID_DLOG_VISIBLE_VALUE_DIV = 296,
+    DATA_ID_DLOG_VISIBLE_VALUE_OFFSET = 297,
+    DATA_ID_DLOG_VISIBLE_VALUE_CURSOR = 298,
+    DATA_ID_DLOG_ALL_VALUES = 299,
+    DATA_ID_DLOG_VALUE_LABEL = 300,
+    DATA_ID_DLOG_CURRENT_TIME = 301,
+    DATA_ID_DLOG_FILE_LENGTH = 302,
+    DATA_ID_DLOG_X_AXIS_OFFSET = 303,
+    DATA_ID_DLOG_X_AXIS_DIV = 304,
+    DATA_ID_DLOG_X_AXIS_MAX_VALUE = 305,
+    DATA_ID_DLOG_X_AXIS_MAX_VALUE_LABEL = 306,
+    DATA_ID_IS_SINGLE_PAGE_ON_STACK = 307,
+    DATA_ID_IS_SHOW_LIVE_RECORDING = 308,
+    DATA_ID_DLOG_VIEW_STATE = 309,
+    DATA_ID_DLOG_PERIOD = 310,
+    DATA_ID_DLOG_DURATION = 311,
+    DATA_ID_DLOG_VOLTAGE_ENABLED = 312,
+    DATA_ID_DLOG_CURRENT_ENABLED = 313,
+    DATA_ID_DLOG_POWER_ENABLED = 314,
+    DATA_ID_DLOG_START_ENABLED = 315,
+    DATA_ID_DLOG_FILE_NAME = 316,
+    DATA_ID_DLOG_VALUE_STATE = 317,
+    DATA_ID_SLOT_MAX_2CH_MIN_VIEW = 318,
+    DATA_ID_CHANNEL_OFF_LABEL = 319,
+    DATA_ID_FILE_MANAGER_FILES = 320,
+    DATA_ID_FILE_MANAGER_FILE_NAME = 321,
+    DATA_ID_FILE_MANAGER_FILE_DATE_TIME = 322,
+    DATA_ID_FILE_MANAGER_FILE_SIZE = 323,
+    DATA_ID_FILE_MANAGER_FILE_SELECTED = 324,
+    DATA_ID_FILE_MANAGER_STATE = 325,
+    DATA_ID_FILE_MANAGER_IS_ROOT_DIRECTORY = 326,
+    DATA_ID_FILE_MANAGER_CURRENT_DIRECTORY = 327,
+    DATA_ID_FILE_MANAGER_IS_DIRECTORY = 328,
+    DATA_ID_FILE_MANAGER_FILE_TYPE = 329,
+    DATA_ID_FILE_MANAGER_OPEN_FILE_ENABLED = 330,
+    DATA_ID_FILE_MANAGER_UPLOAD_FILE_ENABLED = 331,
+    DATA_ID_FILE_MANAGER_RENAME_FILE_ENABLED = 332,
+    DATA_ID_FILE_MANAGER_DELETE_FILE_ENABLED = 333,
+    DATA_ID_FILE_MANAGER_OPENED_IMAGE = 334,
+    DATA_ID_SCRIPT_INFO = 335,
+    DATA_ID_SCRIPT_IS_STARTED = 336,
+    DATA_ID_KEYPAD_OK_ENABLED = 337,
+    DATA_ID_ETHERNET_HOST_NAME = 338,
+    DATA_ID_MQTT_HOST = 339,
+    DATA_ID_MQTT_PORT = 340,
+    DATA_ID_MQTT_USERNAME = 341,
+    DATA_ID_MQTT_PASSWORD = 342,
+    DATA_ID_MQTT_PERIOD = 343,
+    DATA_ID_DLOG_VIEW_SHOW_LEGEND = 344,
+    DATA_ID_DLOG_VIEW_SHOW_LABELS = 345,
+    DATA_ID_IS_ANY_COUPLING_ALLOWED = 346,
+    DATA_ID_IS_COUPLING_SPLIT_RAILS_ALLOWED = 347,
+    DATA_ID_LIST_COUNTER_LABEL = 348,
+    DATA_ID_MODULE_SPECIFIC_CH_SETTINGS = 349,
+    DATA_ID_CHANNEL_FIRMWARE_VERSION = 350,
+    DATA_ID_FILE_MANAGER_BROWSER_TITLE = 351,
+    DATA_ID_CHANNEL_HAS_ERROR_SETTINGS = 352,
+    DATA_ID_CHANNEL_SETTINGS_PAGE = 353,
+    DATA_ID_IS_RESET_BY_IWDG = 354,
+    DATA_ID_DLOG_ENABLED = 355,
+    DATA_ID_FILE_MANAGER_BROWSER_IS_SAVE_DIALOG = 356,
+    DATA_ID_CHANNEL_CALIBRATION_STEP_NOTE = 357,
+    DATA_ID_CHANNEL_CALIBRATION_HAS_STEP_NOTE = 358,
+    DATA_ID_FILE_MANAGER_STORAGE_INFO = 359,
+    DATA_ID_FILE_MANAGER_STORAGE_ALARM = 360,
+    DATA_ID_EVENT_QUEUE_IS_LONG_MESSAGE_TEXT = 361,
+    DATA_ID_EVENT_QUEUE_EVENT_LONG_MESSAGE_OVERLAY = 362,
+    DATA_ID_EVENT_QUEUE_EVENT_IS_SELECTED = 363,
+    DATA_ID_DATE_TIME_FORMAT = 364,
+    DATA_ID_DATE_TIME_FORMAT_IS_DMY = 365,
+    DATA_ID_DATE_TIME_FORMAT_IS_24H = 366,
+    DATA_ID_DATE_TIME_AM_PM = 367,
+    DATA_ID_IS_MULTI_TRACKING = 368,
+    DATA_ID_CHANNEL_COPY_AVAILABLE = 369,
+    DATA_ID_CHANNEL_RSENSE_INSTALLED = 370,
+    DATA_ID_FILE_MANAGER_SORT_FILES_OPTION = 371,
+    DATA_ID_CHANNEL_INFO_BRAND = 372,
+    DATA_ID_CHANNEL_INFO_SERIAL = 373,
+    DATA_ID_FILE_MANAGER_LIST_VIEW = 374,
+    DATA_ID_FILE_MANAGER_IS_LIST_VIEW_OPTION_AVAILABLE = 375,
+    DATA_ID_FILE_MANAGER_FILE_ICON = 376,
+    DATA_ID_FILE_MANAGER_LAYOUT = 377,
+    DATA_ID_FILE_MANAGER_FILE_DESCRIPTION = 378,
+    DATA_ID_TOUCH_RAW_X = 379,
+    DATA_ID_TOUCH_RAW_Y = 380,
+    DATA_ID_TOUCH_RAW_Z1 = 381,
+    DATA_ID_TOUCH_RAW_PRESSED = 382,
+    DATA_ID_TOUCH_CALIBRATED_X = 383,
+    DATA_ID_TOUCH_CALIBRATED_Y = 384,
+    DATA_ID_TOUCH_CALIBRATED_PRESSED = 385,
+    DATA_ID_TOUCH_FILTERED_X = 386,
+    DATA_ID_TOUCH_FILTERED_Y = 387,
+    DATA_ID_TOUCH_FILTERED_PRESSED = 388,
+    DATA_ID_CAN_SHOW_PREVIOUS_PAGE = 389,
+    DATA_ID_FILE_MANAGER_FILE_HAS_DESCRIPTION = 390,
+    DATA_ID_FILE_MANAGER_IMAGE_OPEN_STATE = 391,
+    DATA_ID_FILE_MANAGER_IMAGE_OPEN_PROGRESS = 392,
+    DATA_ID_ALERT_MESSAGE_IS_SET = 393,
+    DATA_ID_ASYNC_PROGRESS = 394,
+    DATA_ID_IO_PIN_FUNCTION = 395,
+    DATA_ID_IO_PIN_PWM_FREQUENCY = 396,
+    DATA_ID_IO_PIN_PWM_DUTY = 397
 };
 
-void data_none(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_edit_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channels(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_output_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_is_cc(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_is_cv(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_u_set(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_u_mon(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_u_mon_dac(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_u_limit(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_u_edit(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_i_set(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_i_mon(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_i_mon_dac(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_i_limit(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_i_edit(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_p_mon(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_other_value_mon(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channels_is_max_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channels_view_mode(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channels_view_mode_in_default(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channels_view_mode_in_max(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_max_channel_index(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_max_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_min1_channel_index(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_min1_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_min2_channel_index(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_min2_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_micro1_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_micro2_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_micro3_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_display_value1(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_display_value2(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ovp(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ocp(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_opp(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_otp_ch(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_otp_aux(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_alert_message(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_alert_message_2(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_alert_message_3(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_edit_value(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_edit_unit(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_edit_info(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_edit_mode_interactive_mode_selector(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_edit_steps(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_master_info(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_master_test_result(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_firmware_info(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_self_test_result(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_keypad_text(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_keypad_mode(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_keypad_option1_text(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_keypad_option1_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_keypad_option2_text(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_keypad_option2_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_keypad_sign_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_keypad_dot_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_keypad_unit_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_label(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_short_label(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_temp_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_temp(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_on_time_total(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_on_time_last(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_date(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_remark(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_step_is_set_remark_step(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_step_num(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_step_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_step_level_value(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_step_value(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_step_prev_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_step_next_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_cal_ch_u_min(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_cal_ch_u_mid(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_cal_ch_u_max(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_cal_ch_i0_min(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_cal_ch_i0_mid(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_cal_ch_i0_max(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_cal_ch_i1_min(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_cal_ch_i1_mid(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_cal_ch_i1_max(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_ovp_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_ovp_type(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_ovp_level(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_ovp_delay(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_ovp_limit(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_ocp_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_ocp_delay(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_ocp_limit(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_ocp_max_current_limit_cause(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_opp_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_opp_level(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_opp_delay(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_opp_limit(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_otp_installed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_otp_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_otp_level(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_protection_otp_delay(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_event_queue_last_event_type(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_event_queue_events(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_event_queue_event_type(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_event_queue_event_message(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_event_queue_selected_event_message(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_rsense_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_rprog_installed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_rprog_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_tracking_is_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_tracking_is_allowed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_is_par_ser_coupled_or_tracked(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_coupling_type(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_coupling_is_series(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_on_time_total(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_on_time_last(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_temp_aux_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_temp_aux_otp_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_temp_aux_otp_level(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_temp_aux_otp_delay(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_temp_aux_otp_is_tripped(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_temp_aux(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_info_firmware_ver(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_info_serial_no(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_info_scpi_ver(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_info_cpu(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_info_fan_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_info_fan_speed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_board_info_label(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_board_info_revision(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_date(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_year(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_month(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_day(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_time(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_hour(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_minute(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_second(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_time_zone(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_dst(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_set_page_dirty(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_profiles_list(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_profiles_auto_recall_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_profiles_auto_recall_location(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_profile_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_profile_label(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_profile_remark(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_profile_is_auto_recall_location(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_profile_channel_u_set(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_profile_channel_i_set(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_profile_channel_output_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_installed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_mqtt_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_mqtt_connection_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_ip_address(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_dns(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_gateway(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_subnet_mask(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_scpi_port(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_is_connected(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_dhcp(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_mac(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_is_voltage_balanced(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_is_current_balanced(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_output_protection_coupled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_shutdown_when_protection_tripped(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_force_disabling_all_outputs_on_power_up(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_password_is_set(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_rl_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_sound_is_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_sound_is_click_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_sound_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_display_view_settings_display_value1(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_display_view_settings_display_value2(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_display_view_settings_yt_view_rate(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_encoder_confirmation_mode(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_encoder_moving_up_speed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_encoder_moving_down_speed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_encoder_installed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_display_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_display_brightness(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_trigger_mode(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_trigger_on_list_stop(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_u_trigger_value(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_i_trigger_value(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_list_count(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_lists(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_list_index(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_list_dwell(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_list_dwell_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_list_voltage(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_list_voltage_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_list_current(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_list_current_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_lists_previous_page_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_lists_next_page_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_lists_cursor(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_lists_insert_menu_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_lists_delete_menu_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_lists_delete_row_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_lists_clear_column_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_lists_delete_rows_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_trigger_source(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_trigger_delay(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_trigger_initiate_continuously(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_trigger_is_initiated(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_trigger_is_manual(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_has_support_for_current_dual_range(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_ranges_supported(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_ranges_mode(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_ranges_auto_ranging(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_ranges_currently_selected(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_text_message(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_serial_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_serial_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_serial_is_connected(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_list_countdown(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_io_pins(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_io_pins_inhibit_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_io_pin_number(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_io_pin_polarity(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_io_pin_function_name(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ntp_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ntp_server(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_display_background_luminosity_step(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_progress(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_main_app_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_touch_calibration_point(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_simulator_load_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_simulator_load_state2(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_simulator_load(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_simulator_load2(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_selected_theme(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_title(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_short_title(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_short_title_with_colon(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_short_title_without_tracking_icon(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_long_title(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_animations_duration(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot1_info(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot2_info(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot3_info(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot1_test_result(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot2_test_result(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot3_test_result(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_default1_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_default2_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_default3_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot1_channel_index(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot2_channel_index(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot3_channel_index(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_def_2ch_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_max_2ch_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_min_2ch_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_micro_2ch_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_2ch_ch1_index(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_2ch_ch2_index(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_front_panel_slot1_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_front_panel_slot2_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_front_panel_slot3_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_battery(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_io_pin_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_dprog(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_dprog_installed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_info_sdcard_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_info_has_error(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_info_battery_status(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_fan_mode(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_sys_fan_speed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_coupling_type_uncoupled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_coupling_type_parallel(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_coupling_type_common_gnd(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_coupling_type_split_rails(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_tracking_allowed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_coupling_parallel_allowed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_coupling_series_allowed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_coupling_enable_tracking_mode(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_active_coupled_led(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_coupling_type_series(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_coupled_or_tracked(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_overlay(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channels_with_list_counter_visible(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_toggle_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_recording(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_history_values(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_recording_ready(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_nondrag_overlay(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_single_value_overlay(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_multiple_values_overlay(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_visible_values(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_visible_value_label(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_visible_value_div(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_visible_value_offset(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_visible_value_cursor(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_all_values(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_value_label(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_current_time(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_file_length(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_x_axis_offset(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_x_axis_div(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_x_axis_max_value(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_x_axis_max_value_label(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_single_page_on_stack(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_show_live_recording(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_view_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_period(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_duration(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_voltage_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_current_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_power_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_start_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_file_name(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_value_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_slot_max_2ch_min_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_off_label(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_files(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_file_name(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_file_date_time(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_file_size(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_file_selected(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_is_root_directory(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_current_directory(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_is_directory(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_file_type(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_open_file_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_upload_file_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_rename_file_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_delete_file_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_opened_image(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_script_info(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_script_is_started(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_keypad_ok_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_ethernet_host_name(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_mqtt_host(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_mqtt_port(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_mqtt_username(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_mqtt_password(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_mqtt_period(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_view_show_legend(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_view_show_labels(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_any_coupling_allowed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_coupling_split_rails_allowed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_list_counter_label(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_module_specific_ch_settings(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_firmware_version(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_browser_title(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_has_error_settings(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_settings_page(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_reset_by_iwdg(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_dlog_enabled(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_browser_is_save_dialog(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_step_note(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_calibration_has_step_note(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_storage_info(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_storage_alarm(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_event_queue_is_long_message_text(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_event_queue_event_long_message_overlay(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_event_queue_event_is_selected(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_format(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_format_is_dmy(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_format_is_24h(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_date_time_am_pm(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_is_multi_tracking(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_copy_available(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_rsense_installed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_sort_files_option(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_info_brand(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_channel_info_serial(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_list_view(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_is_list_view_option_available(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_file_icon(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_layout(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_file_description(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_touch_raw_x(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_touch_raw_y(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_touch_raw_z1(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_touch_raw_pressed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_touch_calibrated_x(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_touch_calibrated_y(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_touch_calibrated_pressed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_touch_filtered_x(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_touch_filtered_y(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_touch_filtered_pressed(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_can_show_previous_page(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_file_has_description(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_image_open_state(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_file_manager_image_open_progress(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_alert_message_is_set(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_async_progress(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_io_pin_function(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_io_pin_pwm_frequency(DataOperationEnum operation, Cursor &cursor, Value &value);
-void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor &cursor, Value &value);
+void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_edit_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channels(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_output_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_is_cc(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_is_cv(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_u_set(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_u_mon(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_u_mon_dac(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_u_limit(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_i_set(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_i_mon(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_i_mon_dac(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_i_limit(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_p_mon(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_other_value_mon(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channels_is_max_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channels_view_mode(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channels_view_mode_in_default(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channels_view_mode_in_max(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_max_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_max_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_min1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_min1_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_min2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_min2_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_micro1_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_micro2_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_micro3_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_display_value1(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_display_value2(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ovp(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ocp(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_opp(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_otp_ch(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_otp_aux(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_alert_message(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_alert_message_2(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_alert_message_3(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_edit_value(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_edit_unit(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_edit_info(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_edit_mode_interactive_mode_selector(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_edit_steps(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_master_info(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_master_test_result(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_firmware_info(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_keypad_text(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_keypad_mode(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_keypad_option1_text(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_keypad_option1_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_keypad_option2_text(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_keypad_option2_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_keypad_sign_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_keypad_dot_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_keypad_unit_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_short_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_temp_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_temp(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_on_time_total(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_on_time_last(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_date(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_remark(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_step_is_set_remark_step(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_step_num(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_step_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_step_level_value(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_step_value(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_step_prev_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_step_next_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_cal_ch_u_min(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_cal_ch_u_mid(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_cal_ch_u_max(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_cal_ch_i0_min(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_cal_ch_i0_mid(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_cal_ch_i0_max(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_cal_ch_i1_min(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_cal_ch_i1_mid(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_cal_ch_i1_max(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_ovp_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_ovp_type(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_ovp_level(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_ovp_delay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_ovp_limit(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_ocp_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_ocp_delay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_ocp_limit(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_ocp_max_current_limit_cause(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_opp_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_opp_level(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_opp_delay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_opp_limit(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_otp_installed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_otp_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_otp_level(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_protection_otp_delay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_event_queue_last_event_type(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_event_queue_events(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_event_queue_event_type(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_event_queue_event_message(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_event_queue_selected_event_message(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_rsense_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_rprog_installed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_rprog_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_tracking_is_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_tracking_is_allowed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_is_par_ser_coupled_or_tracked(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_coupling_type(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_coupling_is_series(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_on_time_total(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_on_time_last(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_temp_aux_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_temp_aux_otp_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_temp_aux_otp_level(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_temp_aux_otp_delay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_temp_aux_otp_is_tripped(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_temp_aux(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_info_firmware_ver(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_info_serial_no(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_info_scpi_ver(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_info_cpu(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_info_fan_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_info_fan_speed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_board_info_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_board_info_revision(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_date(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_year(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_month(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_day(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_time(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_hour(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_minute(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_second(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_time_zone(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_dst(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_set_page_dirty(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_profiles_list(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_profiles_auto_recall_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_profiles_auto_recall_location(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_profile_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_profile_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_profile_remark(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_profile_is_auto_recall_location(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_profile_channel_u_set(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_profile_channel_i_set(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_profile_channel_output_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_installed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mqtt_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mqtt_connection_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_ip_address(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_dns(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_gateway(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_subnet_mask(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_scpi_port(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_is_connected(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_dhcp(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_mac(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_is_voltage_balanced(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_is_current_balanced(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_output_protection_coupled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_shutdown_when_protection_tripped(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_force_disabling_all_outputs_on_power_up(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_password_is_set(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_rl_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_sound_is_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_sound_is_click_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_sound_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_display_view_settings_display_value1(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_display_view_settings_display_value2(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_display_view_settings_yt_view_rate(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_encoder_confirmation_mode(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_encoder_moving_up_speed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_encoder_moving_down_speed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_encoder_installed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_display_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_display_brightness(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_trigger_mode(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_trigger_on_list_stop(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_u_trigger_value(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_i_trigger_value(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_list_count(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_lists(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_list_index(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_list_dwell(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_list_dwell_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_list_voltage(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_list_voltage_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_list_current(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_list_current_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_lists_previous_page_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_lists_next_page_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_lists_cursor(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_lists_insert_menu_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_lists_delete_menu_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_lists_delete_row_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_lists_clear_column_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_lists_delete_rows_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_trigger_source(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_trigger_delay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_trigger_initiate_continuously(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_trigger_is_initiated(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_trigger_is_manual(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_has_support_for_current_dual_range(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_ranges_supported(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_ranges_mode(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_ranges_auto_ranging(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_ranges_currently_selected(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_text_message(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_serial_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_serial_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_serial_is_connected(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_list_countdown(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_io_pins(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_io_pins_inhibit_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_io_pin_number(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_io_pin_polarity(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_io_pin_function_name(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ntp_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ntp_server(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_display_background_luminosity_step(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_progress(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_main_app_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_touch_calibration_point(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_simulator_load_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_simulator_load_state2(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_simulator_load(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_simulator_load2(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_selected_theme(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_title(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_short_title(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_short_title_with_colon(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_short_title_without_tracking_icon(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_long_title(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_animations_duration(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot1_info(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot2_info(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot3_info(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot1_test_result(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot2_test_result(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot3_test_result(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_default1_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_default2_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_default3_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot3_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_max_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_min_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_micro_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_2ch_ch1_index(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_2ch_ch2_index(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_front_panel_slot1_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_front_panel_slot2_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_front_panel_slot3_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_battery(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_io_pin_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_dprog(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_dprog_installed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_info_sdcard_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_info_has_error(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_info_battery_status(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_fan_mode(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_sys_fan_speed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_coupling_type_uncoupled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_coupling_type_parallel(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_coupling_type_common_gnd(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_coupling_type_split_rails(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_tracking_allowed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_coupling_parallel_allowed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_coupling_series_allowed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_coupling_enable_tracking_mode(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_active_coupled_led(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_coupling_type_series(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_coupled_or_tracked(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channels_with_list_counter_visible(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_toggle_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_recording(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_history_values(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_recording_ready(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_nondrag_overlay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_single_value_overlay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_multiple_values_overlay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_visible_values(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_visible_value_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_visible_value_div(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_visible_value_offset(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_visible_value_cursor(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_all_values(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_value_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_current_time(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_file_length(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_x_axis_offset(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_x_axis_div(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_x_axis_max_value(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_x_axis_max_value_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_single_page_on_stack(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_show_live_recording(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_view_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_voltage_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_current_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_power_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_start_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_file_name(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_value_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_max_2ch_min_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_off_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_files(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_file_name(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_file_date_time(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_file_size(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_file_selected(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_is_root_directory(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_current_directory(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_is_directory(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_file_type(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_open_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_upload_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_rename_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_delete_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_opened_image(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_script_info(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_script_is_started(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_keypad_ok_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ethernet_host_name(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mqtt_host(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mqtt_port(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mqtt_username(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mqtt_password(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mqtt_period(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_view_show_legend(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_view_show_labels(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_any_coupling_allowed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_coupling_split_rails_allowed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_list_counter_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_module_specific_ch_settings(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_firmware_version(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_browser_title(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_has_error_settings(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_settings_page(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_reset_by_iwdg(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dlog_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_browser_is_save_dialog(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_step_note(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_calibration_has_step_note(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_storage_info(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_storage_alarm(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_event_queue_is_long_message_text(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_event_queue_event_long_message_overlay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_event_queue_event_is_selected(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_format(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_format_is_dmy(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_format_is_24h(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_date_time_am_pm(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_is_multi_tracking(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_copy_available(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_rsense_installed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_sort_files_option(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_info_brand(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_info_serial(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_list_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_is_list_view_option_available(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_file_icon(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_layout(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_file_description(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_touch_raw_x(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_touch_raw_y(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_touch_raw_z1(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_touch_raw_pressed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_touch_calibrated_x(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_touch_calibrated_y(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_touch_calibrated_pressed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_touch_filtered_x(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_touch_filtered_y(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_touch_filtered_pressed(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_can_show_previous_page(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_file_has_description(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_image_open_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_file_manager_image_open_progress(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_alert_message_is_set(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_async_progress(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_io_pin_function(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_io_pin_pwm_frequency(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &value);
 
-typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor &cursor, Value &value);
+typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor cursor, Value &value);
 
 extern DataOperationsFunction g_dataOperationsFunctions[];
 
@@ -1350,15 +1348,15 @@ enum StylesEnum {
     STYLE_ID_CHANNEL6_INVERSE = 46,
     STYLE_ID_STATUS_ICON_ENABLED_AND_ERROR = 80,
     STYLE_ID_TOUCH_CALIBRATION = 99,
-    STYLE_ID_BOTTOM_BUTTON_BACKGROUND = 104,
-    STYLE_ID_BOTTOM_BUTTON = 105,
-    STYLE_ID_STATUS_ICON_DISABLED = 106,
-    STYLE_ID_STATUS_ICON_ENABLED_WITH_NEED_ATTENTION = 107,
-    STYLE_ID_STATUS_ICON_ENABLED_AND_ACTIVE = 109,
-    STYLE_ID_STATUS_ICON_ENABLED_BLINK = 111,
-    STYLE_ID_STATUS_ICON_DISABLED_BLINK = 112,
-    STYLE_ID_OVERLAY = 113,
-    STYLE_ID_EDIT_VALUE_S_LEFT = 116,
+    STYLE_ID_STATUS_ICON_DISABLED = 104,
+    STYLE_ID_STATUS_ICON_ENABLED_WITH_NEED_ATTENTION = 105,
+    STYLE_ID_STATUS_ICON_ENABLED_AND_ACTIVE = 107,
+    STYLE_ID_STATUS_ICON_ENABLED_BLINK = 109,
+    STYLE_ID_STATUS_ICON_DISABLED_BLINK = 110,
+    STYLE_ID_OVERLAY = 111,
+    STYLE_ID_EDIT_VALUE_S_LEFT = 114,
+    STYLE_ID_BOTTOM_BUTTON_BACKGROUND = 115,
+    STYLE_ID_BOTTOM_BUTTON = 116,
     STYLE_ID_VALUE_S = 117,
     STYLE_ID_EDIT_VALUE_M_LEFT = 118,
     STYLE_ID_KEY_ICONS = 119,
@@ -1511,169 +1509,164 @@ enum PagesEnum {
     PAGE_ID_TOUCH_CALIBRATION = 5,
     PAGE_ID_TOUCH_CALIBRATION_YES_NO = 6,
     PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL = 7,
-    PAGE_ID_SELF_TEST_RESULT = 8,
-    PAGE_ID_MAIN = 9,
-    PAGE_ID_MAIN_HELP = 10,
-    PAGE_ID_EDIT_MODE_KEYPAD = 11,
-    PAGE_ID_EDIT_MODE_STEP = 12,
-    PAGE_ID_EDIT_MODE_STEP_HELP = 13,
-    PAGE_ID_EDIT_MODE_SLIDER = 14,
-    PAGE_ID_EDIT_MODE_SLIDER_HELP = 15,
-    PAGE_ID_YES_NO = 16,
-    PAGE_ID_YES_NO_L = 17,
-    PAGE_ID_ARE_YOU_SURE_WITH_MESSAGE = 18,
-    PAGE_ID_YES_NO_LATER = 19,
-    PAGE_ID_YES_NO_FLASH_SLAVE = 20,
-    PAGE_ID_INFO_RESTART = 21,
-    PAGE_ID_TEXT_MESSAGE = 22,
-    PAGE_ID_ASYNC_OPERATION_IN_PROGRESS = 23,
-    PAGE_ID_PROGRESS = 24,
-    PAGE_ID_PROGRESS_WITHOUT_ABORT = 25,
-    PAGE_ID_EVENT_QUEUE = 26,
-    PAGE_ID_KEYPAD = 27,
-    PAGE_ID_NUMERIC_KEYPAD = 28,
-    PAGE_ID_CH_SETTINGS = 29,
-    PAGE_ID_CH_SETTINGS_OK = 30,
-    PAGE_ID_CH_SETTINGS_ERROR = 31,
-    PAGE_ID_CH_SETTINGS_ERROR_DCM220 = 32,
-    PAGE_ID_CH_SETTINGS_DCP405_SPECIFIC = 33,
-    PAGE_ID_CH_SETTINGS_DCP405B_SPECIFIC = 34,
-    PAGE_ID_CH_SETTINGS_DCM220_SPECIFIC = 35,
-    PAGE_ID_CH_SETTINGS_PROT_CLEAR = 36,
-    PAGE_ID_CH_SETTINGS_PROT_OVP = 37,
-    PAGE_ID_CH_SETTINGS_PROT_OCP = 38,
-    PAGE_ID_CH_SETTINGS_PROT_OPP = 39,
-    PAGE_ID_CH_SETTINGS_PROT_OTP = 40,
-    PAGE_ID_CH_SETTINGS_TRIGGER = 41,
-    PAGE_ID_CH_SETTINGS_LISTS = 42,
-    PAGE_ID_CH_SETTINGS_LISTS_INSERT_MENU = 43,
-    PAGE_ID_CH_SETTINGS_LISTS_FILE_MENU = 44,
-    PAGE_ID_CH_SETTINGS_LISTS_DELETE_MENU = 45,
-    PAGE_ID_CH_SETTINGS_CALIBRATION = 46,
-    PAGE_ID_CH_SETTINGS_CALIBRATION_WIZ_STEP = 47,
-    PAGE_ID_CH_SETTINGS_CALIBRATION_WIZ_FINISH = 48,
-    PAGE_ID_CH_START_LIST = 49,
-    PAGE_ID_CH_SETTINGS_ADV_OPTIONS = 50,
-    PAGE_ID_CH_SETTINGS_ADV_RANGES = 51,
-    PAGE_ID_CH_SETTINGS_ADV_VIEW = 52,
-    PAGE_ID_CH_SETTINGS_INFO = 53,
-    PAGE_ID_SYS_SETTINGS = 54,
-    PAGE_ID_SYS_SETTINGS_TEMPERATURE = 55,
-    PAGE_ID_SYS_SETTINGS_PROTECTIONS = 56,
-    PAGE_ID_SYS_SETTINGS_TRIGGER = 57,
-    PAGE_ID_SYS_SETTINGS_IO = 58,
-    PAGE_ID_SYS_SETTINGS_DATE_TIME = 59,
-    PAGE_ID_SYS_SETTINGS_ENCODER = 60,
-    PAGE_ID_SYS_SETTINGS_SERIAL = 61,
-    PAGE_ID_SYS_SETTINGS_ETHERNET = 62,
-    PAGE_ID_SYS_SETTINGS_MQTT = 63,
-    PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC = 64,
-    PAGE_ID_SYS_SETTINGS_SCREEN_CALIBRATION = 65,
-    PAGE_ID_SYS_SETTINGS_DISPLAY = 66,
-    PAGE_ID_SYS_SETTINGS_SOUND = 67,
-    PAGE_ID_SYS_SETTINGS_TRACKING = 68,
-    PAGE_ID_SYS_SETTINGS_COUPLING = 69,
-    PAGE_ID_USER_PROFILES = 70,
-    PAGE_ID_USER_PROFILE_SETTINGS = 71,
-    PAGE_ID_USER_PROFILE_0_SETTINGS = 72,
-    PAGE_ID_PROFILE_BASIC_INFO = 73,
-    PAGE_ID_SYS_INFO = 74,
-    PAGE_ID_STAND_BY_MENU = 75,
-    PAGE_ID_ENTERING_STANDBY = 76,
-    PAGE_ID_STANDBY = 77,
-    PAGE_ID_SAVING = 78,
-    PAGE_ID_SHUTDOWN = 79,
-    PAGE_ID_DISPLAY_OFF = 80,
-    PAGE_ID_MINIMIZED_CHANNELS = 81,
-    PAGE_ID_SLOT_DEF_VERT = 82,
-    PAGE_ID_SLOT_DEF_VERT_TITLE = 83,
-    PAGE_ID_SLOT_DEF_1CH_NUM_ON = 84,
-    PAGE_ID_SLOT_DEF_1CH_VBAR_ON = 85,
-    PAGE_ID_SLOT_DEF_1CH_VERT_OFF = 86,
-    PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_SERIES = 87,
-    PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_PARALLEL = 88,
-    PAGE_ID_SLOT_DEF_2CH_VERT = 89,
-    PAGE_ID_SLOT_DEF_2CH_VERT_ON = 90,
-    PAGE_ID_SLOT_DEF_2CH_VERT_OFF = 91,
-    PAGE_ID_SLOT_DEF_VERT_ERROR = 92,
-    PAGE_ID_SLOT_DEF_VERT_NOT_INSTALLED = 93,
-    PAGE_ID_SLOT_DEF_HORZ = 94,
-    PAGE_ID_SLOT_DEF_HORZ_TITLE = 95,
-    PAGE_ID_SLOT_DEF_1CH_HBAR_ON = 96,
-    PAGE_ID_SLOT_DEF_1CH_YT_ON = 97,
-    PAGE_ID_SLOT_DEF_1CH_HORZ_OFF = 98,
-    PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_SERIES = 99,
-    PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_PARALLEL = 100,
-    PAGE_ID_SLOT_DEF_2CH_HORZ = 101,
-    PAGE_ID_SLOT_DEF_2CH_HORZ_ON = 102,
-    PAGE_ID_SLOT_DEF_2CH_HORZ_OFF = 103,
-    PAGE_ID_SLOT_DEF_HORZ_ERROR = 104,
-    PAGE_ID_SLOT_DEF_HORZ_NOT_INSTALLED = 105,
-    PAGE_ID_SLOT_MAX_1CH_TITLE = 106,
-    PAGE_ID_SLOT_MAX_1CH_NUM_ON = 107,
-    PAGE_ID_SLOT_MAX_1CH_NUM_OFF = 108,
-    PAGE_ID_SLOT_MAX_1CH_HBAR_ON = 109,
-    PAGE_ID_SLOT_MAX_1CH_HBAR_OFF = 110,
-    PAGE_ID_SLOT_MAX_1CH_YT_ON = 111,
-    PAGE_ID_SLOT_MAX_1CH_YT_OFF = 112,
-    PAGE_ID_SLOT_MAX_2CH = 113,
-    PAGE_ID_SLOT_MAX_2CH_TITLE = 114,
-    PAGE_ID_SLOT_MAX_2CH_NUM_ON = 115,
-    PAGE_ID_SLOT_MAX_2CH_NUM_OFF = 116,
-    PAGE_ID_SLOT_MAX_2CH_HBAR_ON = 117,
-    PAGE_ID_SLOT_MAX_2CH_HBAR_OFF = 118,
-    PAGE_ID_SLOT_MAX_2CH_YT_ON = 119,
-    PAGE_ID_SLOT_MAX_2CH_YT_OFF = 120,
-    PAGE_ID_SLOT_MAX_2CH_MIN_TITLE = 121,
-    PAGE_ID_SLOT_MAX_2CH_MIN_ON = 122,
-    PAGE_ID_SLOT_MAX_2CH_MIN_OFF = 123,
-    PAGE_ID_SLOT_MAX_ERROR = 124,
-    PAGE_ID_SLOT_MAX_NOT_INSTALLED = 125,
-    PAGE_ID_SLOT_MIN_1CH_TITLE = 126,
-    PAGE_ID_SLOT_MIN_1CH_ON = 127,
-    PAGE_ID_SLOT_MIN_1CH_OFF = 128,
-    PAGE_ID_SLOT_MIN_1CH_COUPLED_SERIES = 129,
-    PAGE_ID_SLOT_MIN_1CH_COUPLED_PARALLEL = 130,
-    PAGE_ID_SLOT_MIN_2CH_TITLE = 131,
-    PAGE_ID_SLOT_MIN_2CH = 132,
-    PAGE_ID_SLOT_MIN_2CH_ON = 133,
-    PAGE_ID_SLOT_MIN_2CH_OFF = 134,
-    PAGE_ID_SLOT_MIN_ERROR = 135,
-    PAGE_ID_SLOT_MIN_NOT_INSTALLED = 136,
-    PAGE_ID_SLOT_MICRO_1CH_TITLE = 137,
-    PAGE_ID_SLOT_MICRO_1CH_ON = 138,
-    PAGE_ID_SLOT_MICRO_1CH_OFF = 139,
-    PAGE_ID_SLOT_MICRO_1CH_COUPLED_SERIES = 140,
-    PAGE_ID_SLOT_MICRO_1CH_COUPLED_PARALLEL = 141,
-    PAGE_ID_SLOT_MICRO_2CH = 142,
-    PAGE_ID_SLOT_MICRO_2CH_TITLE = 143,
-    PAGE_ID_SLOT_MICRO_2CH_ON = 144,
-    PAGE_ID_SLOT_MICRO_2CH_OFF = 145,
-    PAGE_ID_SLOT_MICRO_ERROR = 146,
-    PAGE_ID_SLOT_MICRO_NOT_INSTALLED = 147,
-    PAGE_ID_DLOG_VIEW = 148,
-    PAGE_ID_IMAGE_VIEW = 149,
-    PAGE_ID_DLOG_PARAMS = 150,
-    PAGE_ID_DLOG_VIEW_OVERLAY_OPTIONS = 151,
-    PAGE_ID_FILE_MANAGER = 152,
-    PAGE_ID_FILE_BROWSER = 153,
-    PAGE_ID_FILE_MENU = 154,
-    PAGE_ID_FRONT_PANEL = 155,
-    PAGE_ID_FRONT_PANEL_EMPTY_SLOT = 156,
-    PAGE_ID_DCP405_FRONT_PANEL = 157,
-    PAGE_ID_DCP405B_FRONT_PANEL = 158,
-    PAGE_ID_DCM220_FRONT_PANEL = 159,
-    PAGE_ID_DCM220_FRONT_PANEL_LED = 160,
-    PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD = 161,
-    PAGE_ID_FILE_MANAGER_DETAILS_VIEW = 162,
-    PAGE_ID_FILE_MANAGER_SCRIPTS_VIEW = 163,
-    PAGE_ID_FILE_MANAGER_SCRIPTS_ALTER_VIEW = 164,
-    PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW = 165,
-    PAGE_ID_TOUCH_TEST = 166
+    PAGE_ID_MAIN = 8,
+    PAGE_ID_MAIN_HELP = 9,
+    PAGE_ID_EDIT_MODE_KEYPAD = 10,
+    PAGE_ID_EDIT_MODE_STEP = 11,
+    PAGE_ID_EDIT_MODE_STEP_HELP = 12,
+    PAGE_ID_EDIT_MODE_SLIDER = 13,
+    PAGE_ID_EDIT_MODE_SLIDER_HELP = 14,
+    PAGE_ID_YES_NO = 15,
+    PAGE_ID_YES_NO_L = 16,
+    PAGE_ID_ARE_YOU_SURE_WITH_MESSAGE = 17,
+    PAGE_ID_YES_NO_LATER = 18,
+    PAGE_ID_YES_NO_FLASH_SLAVE = 19,
+    PAGE_ID_INFO_RESTART = 20,
+    PAGE_ID_TEXT_MESSAGE = 21,
+    PAGE_ID_ASYNC_OPERATION_IN_PROGRESS = 22,
+    PAGE_ID_PROGRESS = 23,
+    PAGE_ID_PROGRESS_WITHOUT_ABORT = 24,
+    PAGE_ID_EVENT_QUEUE = 25,
+    PAGE_ID_KEYPAD = 26,
+    PAGE_ID_NUMERIC_KEYPAD = 27,
+    PAGE_ID_CH_SETTINGS = 28,
+    PAGE_ID_CH_SETTINGS_OK = 29,
+    PAGE_ID_CH_SETTINGS_ERROR = 30,
+    PAGE_ID_CH_SETTINGS_ERROR_DCM220 = 31,
+    PAGE_ID_CH_SETTINGS_DCP405_SPECIFIC = 32,
+    PAGE_ID_CH_SETTINGS_DCP405B_SPECIFIC = 33,
+    PAGE_ID_CH_SETTINGS_DCM220_SPECIFIC = 34,
+    PAGE_ID_CH_SETTINGS_PROT_CLEAR = 35,
+    PAGE_ID_CH_SETTINGS_PROT_OVP = 36,
+    PAGE_ID_CH_SETTINGS_PROT_OCP = 37,
+    PAGE_ID_CH_SETTINGS_PROT_OPP = 38,
+    PAGE_ID_CH_SETTINGS_PROT_OTP = 39,
+    PAGE_ID_CH_SETTINGS_TRIGGER = 40,
+    PAGE_ID_CH_SETTINGS_LISTS = 41,
+    PAGE_ID_CH_SETTINGS_LISTS_INSERT_MENU = 42,
+    PAGE_ID_CH_SETTINGS_LISTS_FILE_MENU = 43,
+    PAGE_ID_CH_SETTINGS_LISTS_DELETE_MENU = 44,
+    PAGE_ID_CH_SETTINGS_CALIBRATION = 45,
+    PAGE_ID_CH_SETTINGS_CALIBRATION_WIZ_STEP = 46,
+    PAGE_ID_CH_SETTINGS_CALIBRATION_WIZ_FINISH = 47,
+    PAGE_ID_CH_START_LIST = 48,
+    PAGE_ID_CH_SETTINGS_ADV_OPTIONS = 49,
+    PAGE_ID_CH_SETTINGS_ADV_RANGES = 50,
+    PAGE_ID_CH_SETTINGS_ADV_VIEW = 51,
+    PAGE_ID_CH_SETTINGS_INFO = 52,
+    PAGE_ID_SYS_SETTINGS = 53,
+    PAGE_ID_SYS_SETTINGS_TEMPERATURE = 54,
+    PAGE_ID_SYS_SETTINGS_PROTECTIONS = 55,
+    PAGE_ID_SYS_SETTINGS_TRIGGER = 56,
+    PAGE_ID_SYS_SETTINGS_IO = 57,
+    PAGE_ID_SYS_SETTINGS_DATE_TIME = 58,
+    PAGE_ID_SYS_SETTINGS_ENCODER = 59,
+    PAGE_ID_SYS_SETTINGS_SERIAL = 60,
+    PAGE_ID_SYS_SETTINGS_ETHERNET = 61,
+    PAGE_ID_SYS_SETTINGS_MQTT = 62,
+    PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC = 63,
+    PAGE_ID_SYS_SETTINGS_SCREEN_CALIBRATION = 64,
+    PAGE_ID_SYS_SETTINGS_DISPLAY = 65,
+    PAGE_ID_SYS_SETTINGS_SOUND = 66,
+    PAGE_ID_SYS_SETTINGS_TRACKING = 67,
+    PAGE_ID_SYS_SETTINGS_COUPLING = 68,
+    PAGE_ID_USER_PROFILES = 69,
+    PAGE_ID_USER_PROFILE_SETTINGS = 70,
+    PAGE_ID_USER_PROFILE_0_SETTINGS = 71,
+    PAGE_ID_PROFILE_BASIC_INFO = 72,
+    PAGE_ID_SYS_INFO = 73,
+    PAGE_ID_STAND_BY_MENU = 74,
+    PAGE_ID_ENTERING_STANDBY = 75,
+    PAGE_ID_STANDBY = 76,
+    PAGE_ID_SAVING = 77,
+    PAGE_ID_SHUTDOWN = 78,
+    PAGE_ID_DISPLAY_OFF = 79,
+    PAGE_ID_MINIMIZED_CHANNELS = 80,
+    PAGE_ID_SLOT_DEF_VERT = 81,
+    PAGE_ID_SLOT_DEF_VERT_TITLE = 82,
+    PAGE_ID_SLOT_DEF_1CH_NUM_ON = 83,
+    PAGE_ID_SLOT_DEF_1CH_VBAR_ON = 84,
+    PAGE_ID_SLOT_DEF_1CH_VERT_OFF = 85,
+    PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_SERIES = 86,
+    PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_PARALLEL = 87,
+    PAGE_ID_SLOT_DEF_2CH_VERT = 88,
+    PAGE_ID_SLOT_DEF_2CH_VERT_ON = 89,
+    PAGE_ID_SLOT_DEF_2CH_VERT_OFF = 90,
+    PAGE_ID_SLOT_DEF_VERT_ERROR = 91,
+    PAGE_ID_SLOT_DEF_VERT_NOT_INSTALLED = 92,
+    PAGE_ID_SLOT_DEF_HORZ = 93,
+    PAGE_ID_SLOT_DEF_HORZ_TITLE = 94,
+    PAGE_ID_SLOT_DEF_1CH_HBAR_ON = 95,
+    PAGE_ID_SLOT_DEF_1CH_YT_ON = 96,
+    PAGE_ID_SLOT_DEF_1CH_HORZ_OFF = 97,
+    PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_SERIES = 98,
+    PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_PARALLEL = 99,
+    PAGE_ID_SLOT_DEF_2CH_HORZ = 100,
+    PAGE_ID_SLOT_DEF_2CH_HORZ_ON = 101,
+    PAGE_ID_SLOT_DEF_2CH_HORZ_OFF = 102,
+    PAGE_ID_SLOT_DEF_HORZ_ERROR = 103,
+    PAGE_ID_SLOT_DEF_HORZ_NOT_INSTALLED = 104,
+    PAGE_ID_SLOT_MAX_1CH_TITLE = 105,
+    PAGE_ID_SLOT_MAX_1CH_NUM_ON = 106,
+    PAGE_ID_SLOT_MAX_1CH_NUM_OFF = 107,
+    PAGE_ID_SLOT_MAX_1CH_HBAR_ON = 108,
+    PAGE_ID_SLOT_MAX_1CH_HBAR_OFF = 109,
+    PAGE_ID_SLOT_MAX_1CH_YT_ON = 110,
+    PAGE_ID_SLOT_MAX_1CH_YT_OFF = 111,
+    PAGE_ID_SLOT_MAX_2CH = 112,
+    PAGE_ID_SLOT_MAX_2CH_TITLE = 113,
+    PAGE_ID_SLOT_MAX_2CH_NUM_ON = 114,
+    PAGE_ID_SLOT_MAX_2CH_NUM_OFF = 115,
+    PAGE_ID_SLOT_MAX_2CH_HBAR_ON = 116,
+    PAGE_ID_SLOT_MAX_2CH_HBAR_OFF = 117,
+    PAGE_ID_SLOT_MAX_2CH_YT_ON = 118,
+    PAGE_ID_SLOT_MAX_2CH_YT_OFF = 119,
+    PAGE_ID_SLOT_MAX_2CH_MIN_TITLE = 120,
+    PAGE_ID_SLOT_MAX_2CH_MIN_ON = 121,
+    PAGE_ID_SLOT_MAX_2CH_MIN_OFF = 122,
+    PAGE_ID_SLOT_MAX_ERROR = 123,
+    PAGE_ID_SLOT_MAX_NOT_INSTALLED = 124,
+    PAGE_ID_SLOT_MIN_1CH_TITLE = 125,
+    PAGE_ID_SLOT_MIN_1CH_ON = 126,
+    PAGE_ID_SLOT_MIN_1CH_OFF = 127,
+    PAGE_ID_SLOT_MIN_1CH_COUPLED_SERIES = 128,
+    PAGE_ID_SLOT_MIN_1CH_COUPLED_PARALLEL = 129,
+    PAGE_ID_SLOT_MIN_2CH_TITLE = 130,
+    PAGE_ID_SLOT_MIN_2CH = 131,
+    PAGE_ID_SLOT_MIN_2CH_ON = 132,
+    PAGE_ID_SLOT_MIN_2CH_OFF = 133,
+    PAGE_ID_SLOT_MIN_ERROR = 134,
+    PAGE_ID_SLOT_MIN_NOT_INSTALLED = 135,
+    PAGE_ID_SLOT_MICRO_1CH_TITLE = 136,
+    PAGE_ID_SLOT_MICRO_1CH_ON = 137,
+    PAGE_ID_SLOT_MICRO_1CH_OFF = 138,
+    PAGE_ID_SLOT_MICRO_1CH_COUPLED_SERIES = 139,
+    PAGE_ID_SLOT_MICRO_1CH_COUPLED_PARALLEL = 140,
+    PAGE_ID_SLOT_MICRO_2CH = 141,
+    PAGE_ID_SLOT_MICRO_2CH_TITLE = 142,
+    PAGE_ID_SLOT_MICRO_2CH_ON = 143,
+    PAGE_ID_SLOT_MICRO_2CH_OFF = 144,
+    PAGE_ID_SLOT_MICRO_ERROR = 145,
+    PAGE_ID_SLOT_MICRO_NOT_INSTALLED = 146,
+    PAGE_ID_DLOG_VIEW = 147,
+    PAGE_ID_IMAGE_VIEW = 148,
+    PAGE_ID_DLOG_PARAMS = 149,
+    PAGE_ID_DLOG_VIEW_OVERLAY_OPTIONS = 150,
+    PAGE_ID_FILE_MANAGER = 151,
+    PAGE_ID_FILE_BROWSER = 152,
+    PAGE_ID_FILE_MENU = 153,
+    PAGE_ID_FRONT_PANEL = 154,
+    PAGE_ID_FRONT_PANEL_EMPTY_SLOT = 155,
+    PAGE_ID_DCP405_FRONT_PANEL = 156,
+    PAGE_ID_DCP405B_FRONT_PANEL = 157,
+    PAGE_ID_DCM220_FRONT_PANEL = 158,
+    PAGE_ID_DCM220_FRONT_PANEL_LED = 159,
+    PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD = 160,
+    PAGE_ID_FILE_MANAGER_DETAILS_VIEW = 161,
+    PAGE_ID_FILE_MANAGER_SCRIPTS_VIEW = 162,
+    PAGE_ID_FILE_MANAGER_SCRIPTS_ALTER_VIEW = 163,
+    PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW = 164,
+    PAGE_ID_TOUCH_TEST = 165
 };
 
-#ifdef OPTION_SDRAM
-extern const uint8_t assets[403759];
-#else
-extern const uint8_t assets[3917180];
-#endif
+extern const uint8_t assets[403467];

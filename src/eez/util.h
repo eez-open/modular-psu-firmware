@@ -60,6 +60,12 @@ void strcatUInt32(char *str, uint32_t value);
 void strcatFloat(char *str, float value);
 void strcatFloat(char *str, float value, int numDecimalPlaces);
 
+void strcatVoltage(char *str, float value);
+void strcatCurrent(char *str, float value);
+void strcatPower(char *str, float value);
+void strcatDuration(char *str, float value);
+void strcatLoad(char *str, float value);
+
 uint32_t crc32(const uint8_t *message, size_t size);
 
 uint8_t toBCD(uint8_t bin);

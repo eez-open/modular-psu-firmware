@@ -58,14 +58,10 @@ static enum {
 } g_displayState;
 static uint32_t g_displayStateTransitionStartTime;
 
-#if OPTION_SDRAM
 static uint16_t *g_bufferOld;
 static uint16_t *g_bufferNew;
 static uint16_t *g_buffer;
 static uint16_t *g_animationBuffer;
-#else
-static uint16_t g_buffer[480 * 272];
-#endif
 
 static bool g_takeScreenshot;
 
@@ -364,7 +360,6 @@ void bitBltA8(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int widt
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if OPTION_SDRAM
 void *getBufferPointer() {
     return g_buffer;
 }
@@ -372,14 +367,12 @@ void *getBufferPointer() {
 void setBufferPointer(void *buffer) {
     g_buffer = (uint16_t *)buffer;
 }
-#endif
 
 void turnOn() {
     if (g_displayState != ON && g_displayState != TURNING_ON) {
         __HAL_RCC_DMA2D_CLK_ENABLE();
 
         // clear video RAM
-#if OPTION_SDRAM
         g_bufferOld = (uint16_t *)VRAM_BUFFER2_START_ADDRESS;
         g_bufferNew = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
         g_buffer = g_bufferNew;
@@ -392,7 +385,7 @@ void turnOn() {
 		g_buffers[5].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER6_START_ADDRESS);
 		g_buffers[6].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER7_START_ADDRESS);
 		g_buffers[7].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER8_START_ADDRESS);
-#endif
+
         fillRect(g_buffer, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
 
         // set video RAM address
@@ -428,7 +421,6 @@ void updateBrightness() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void animate() {
-#if OPTION_SDRAM
 	float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
 	if (t < 1.0f) {
 		g_animationBuffer = g_animationBuffer == (uint16_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS
@@ -446,13 +438,9 @@ void animate() {
 	} else {
 		g_animationState.enabled = false;
 	}
-#else
-	g_animationState.enabled = false;
-#endif
 }
 
 void swapBuffers() {
-#if OPTION_SDRAM
     // wait for VSYNC
     while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {}
 
@@ -463,7 +451,6 @@ void swapBuffers() {
     g_bufferOld = temp;
 
     g_buffer = g_bufferNew;
-#endif
 }
 
 void sync() {
@@ -519,10 +506,8 @@ void sync() {
     }
 
     if (g_takeScreenshot) {
-#if OPTION_SDRAM
     	bitBltRGB888(g_bufferOld, SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
         DMA2D_WAIT;
-#endif
     	g_takeScreenshot = false;
     }
 }

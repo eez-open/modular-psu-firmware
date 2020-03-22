@@ -42,18 +42,8 @@ int16_t getDataIdFromName(const char *name);
 
 int getExternalAssetsFirstPageId();
 
-#if OPTION_SDRAM
 #define GET_WIDGET_PROPERTY(widget, propertyName, type) ((type)widget->propertyName)
-#else
-extern Document *g_document;
-#define GET_WIDGET_PROPERTY(widget, propertyName, type) ((type)((uint8_t *)g_document + (uint32_t)(widget)->propertyName##Offset))
-#endif
-
-#if OPTION_SDRAM
 #define GET_WIDGET_LIST_ELEMENT(list, index) ((list).first + (index))
-#else
-#define GET_WIDGET_LIST_ELEMENT(list, index) (((const Widget *)((uint8_t *)g_document + (uint32_t)(list.firstOffset))) + index)
-#endif
 
 bool loadExternalAssets(const char *filePath, int *err);
 

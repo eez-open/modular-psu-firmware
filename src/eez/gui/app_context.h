@@ -27,9 +27,7 @@ namespace gui {
 struct PageOnStack {
     int pageId = PAGE_ID_NONE;
     Page *page = nullptr;
-#if OPTION_SDRAM    
     int displayBufferIndex = -1;
-#endif
 };
 
 class AppContext {
@@ -67,7 +65,7 @@ public:
 
     virtual bool isFocusWidget(const WidgetCursor &widgetCursor);
 
-    virtual bool isBlinking(const data::Cursor &cursor, int16_t id);
+    virtual bool isBlinking(const data::Cursor cursor, int16_t id);
 
     virtual bool isActiveWidget(const WidgetCursor &widgetCursor);
     virtual void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);

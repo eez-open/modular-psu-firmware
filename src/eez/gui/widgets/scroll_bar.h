@@ -24,18 +24,8 @@ namespace gui {
 struct ScrollBarWidget {
     uint16_t thumbStyle;
     uint16_t buttonsStyle;
-
-#if OPTION_SDRAM    
     const char *leftButtonText;
-#else
-    uint32_t leftButtonTextOffset;
-#endif
-
-#if OPTION_SDRAM    
 	const char *rightButtonText;
-#else
-    uint32_t rightButtonTextOffset;
-#endif
 };
 
 enum ScrollBarWidgetSegment {

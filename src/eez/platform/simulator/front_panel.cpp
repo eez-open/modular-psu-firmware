@@ -57,7 +57,7 @@ int FrontPanelAppContext::getLongTouchActionHook(const WidgetCursor &widgetCurso
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void data_main_app_view(DataOperationEnum operation, Cursor &cursor, Value &value) {
+void data_main_app_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(&psu::gui::g_psuAppContext);
     }
@@ -77,21 +77,21 @@ int getSlotView(int channelIndex) {
     }
 }
 
-void data_front_panel_slot1_view(DataOperationEnum operation, Cursor &cursor, Value &value) {
+void data_front_panel_slot1_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = getSlotView(cursor.i);
+        value = getSlotView(cursor);
     }
 }
 
-void data_front_panel_slot2_view(DataOperationEnum operation, Cursor &cursor, Value &value) {
+void data_front_panel_slot2_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = getSlotView(cursor.i);
+        value = getSlotView(cursor);
     }
 }
 
-void data_front_panel_slot3_view(DataOperationEnum operation, Cursor &cursor, Value &value) {
+void data_front_panel_slot3_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = getSlotView(cursor.i);
+        value = getSlotView(cursor);
     }
 }
 

@@ -741,13 +741,13 @@ Value MakeEventValue(event_queue::Event *e) {
     return value;
 }
 
-void data_event_queue_last_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_event_queue_last_event_type(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = data::Value(getEventType(getLastErrorEventId()));
     }
 }
 
-void data_event_queue_events(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_event_queue_events(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_COUNT) {
         value = (int)g_numEvents;
     } else if (operation == data::DATA_OPERATION_YT_DATA_GET_SIZE) {
@@ -761,35 +761,35 @@ void data_event_queue_events(data::DataOperationEnum operation, data::Cursor &cu
     }
 }
 
-void data_event_queue_event_type(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_event_queue_event_type(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        event_queue::Event *event = getEvent(cursor.i);
+        event_queue::Event *event = getEvent(cursor);
         value = data::Value(event ? getEventType(event) : EVENT_TYPE_NONE);
     }
 }
 
-void data_event_queue_event_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_event_queue_event_message(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        value = MakeEventValue(getEvent(cursor.i));
+        value = MakeEventValue(getEvent(cursor));
     }
 }
 
-void data_event_queue_is_long_message_text(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_event_queue_is_long_message_text(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        event_queue::Event *event = getEvent(cursor.i);
+        event_queue::Event *event = getEvent(cursor);
         value = isLongMessageText(event);
     }
 }
 
-void data_event_queue_event_is_selected(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_event_queue_event_is_selected(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
-        event_queue::Event *event = getEvent(cursor.i);
+        event_queue::Event *event = getEvent(cursor);
         event_queue::Event *selectedEvent = getSelectedEvent();
         value = event == selectedEvent;
     }
 }
 
-void data_event_queue_selected_event_message(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_event_queue_selected_event_message(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         event_queue::Event *selectedEvent = getSelectedEvent();
         if (selectedEvent) {
@@ -798,7 +798,7 @@ void data_event_queue_selected_event_message(data::DataOperationEnum operation, 
     }
 }
 
-void data_event_queue_event_long_message_overlay(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_event_queue_event_long_message_overlay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     static const int NUM_WIDGETS = 1;
 
     static const int MULTI_LINE_TEXT_WIDGET = 0;
@@ -867,7 +867,7 @@ void action_event_queue_filter() {
 }
 
 void action_event_queue_select_event() {
-    event_queue::toggleSelectedEvent(getFoundWidgetAtDown().cursor.i);
+    event_queue::toggleSelectedEvent(getFoundWidgetAtDown().cursor);
 }
 
 } // namespace gui

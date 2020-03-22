@@ -88,7 +88,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
     if (previousState) {
         refreshTextData = currentState->textData != previousState->textData;
         if (refreshTextData) {
-            uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
+            uint32_t refreshRate = data::getTextRefreshRate(widgetCursor.cursor, widget->data);
             if (refreshRate != 0) {
                 refreshTextData = (currentTime - previousState->textDataRefreshLastTime) > refreshRate;
                 if (!refreshTextData) {

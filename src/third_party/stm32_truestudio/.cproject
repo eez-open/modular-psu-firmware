@@ -78,7 +78,6 @@
 								<option id="com.atollic.truestudio.gcc.symbols.defined.1670122205" name="Defined symbols" superClass="com.atollic.truestudio.gcc.symbols.defined" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
 									<listOptionValue builtIn="false" value="EEZ_BP3C_REVISION_R3B1=1"/>
-									<listOptionValue builtIn="false" value="OPTION_SDRAM=1"/>
 									<listOptionValue builtIn="false" value="LWIP_NETIF_HOSTNAME=1"/>
 									<listOptionValue builtIn="false" value="STM32F769xx"/>
 									<listOptionValue builtIn="false" value="EEZ_PLATFORM_STM32"/>
@@ -135,7 +134,6 @@
 								<option id="com.atollic.truestudio.gpp.symbols.defined.1619552487" name="Defined symbols" superClass="com.atollic.truestudio.gpp.symbols.defined" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="STM32F769xx"/>
 									<listOptionValue builtIn="false" value="EEZ_BP3C_REVISION_R3B1=1"/>
-									<listOptionValue builtIn="false" value="OPTION_SDRAM=1"/>
 									<listOptionValue builtIn="false" value="EEZ_MCU_REVISION_R1B5=1"/>
 									<listOptionValue builtIn="false" value="LWIP_NETIF_HOSTNAME=1"/>
 									<listOptionValue builtIn="false" value="SCPI_USER_CONFIG=1"/>

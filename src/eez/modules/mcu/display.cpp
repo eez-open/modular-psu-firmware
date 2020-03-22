@@ -347,8 +347,6 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
     return width;
 }
 
-#if OPTION_SDRAM
-
 Buffer g_buffers[NUM_BUFFERS];
 
 static void *g_bufferPointer;
@@ -503,8 +501,6 @@ void endBuffersDrawing() {
 
     freeUnusedBuffers();
 }
-
-#endif
 
 } // namespace display
 } // namespace mcu

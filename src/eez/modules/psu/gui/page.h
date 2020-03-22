@@ -99,7 +99,7 @@ public:
     
     void init(
         AppContext *appContext_,
-        void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
+        void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value),
         uint16_t currentValue_,
         bool (*disabledCallback_)(uint16_t value),
         void (*onSet_)(uint16_t),
@@ -123,7 +123,7 @@ public:
 
 private:
     const data::EnumItem *enumDefinition;
-    void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value);
+    void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value);
 
     int numItems;
     int numColumns;

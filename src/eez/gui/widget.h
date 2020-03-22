@@ -94,11 +94,7 @@ struct Style {
 
 struct StyleList {
     uint32_t count;
-#if OPTION_SDRAM
     const Style *first;
-#else
-    uint32_t firstOffset;
-#endif
 };
 
 void StyleList_fixPointers(StyleList &styleList);
@@ -112,24 +108,14 @@ struct Widget {
     int16_t w;
     int16_t h;
     uint16_t style;
-#if OPTION_SDRAM
     const void *specific;
-#else
-    uint32_t specificOffset;
-#endif
 };
 
-#if OPTION_SDRAM
 void Widget_fixPointers(Widget *widget);
-#endif
 
 struct WidgetList {
     uint32_t count;
-#if OPTION_SDRAM
     const Widget *first;
-#else
-    uint32_t firstOffset;
-#endif
 };
 
 void WidgetList_fixPointers(WidgetList &widgetList);
@@ -149,21 +135,13 @@ struct Document {
 
 struct ColorList {
     uint32_t count;
-#if OPTION_SDRAM
     const uint16_t *first;
-#else
-    uint32_t firstOffset;
-#endif
 };
 
 void ColorList_fixPointers(ColorList &colorList);
 
 struct Theme {
-#if OPTION_SDRAM
     const char *name;
-#else
-    uint32_t nameOffset;
-#endif
     ColorList colors;
 };
 
@@ -171,11 +149,7 @@ void Theme_fixPointers(Theme *theme);
 
 struct ThemeList {
     uint32_t count;
-#if OPTION_SDRAM
     const Theme *first;
-#else
-    uint32_t firstOffset;
-#endif
 };
 
 void ThemeList_fixPointers(ThemeList &themeList);
@@ -214,21 +188,38 @@ struct WidgetCursor {
     WidgetState *currentState;
 
     WidgetCursor() 
-		: appContext(nullptr), widget(nullptr), x(0), y(0),
-		previousState(nullptr), currentState(nullptr)
+		: appContext(nullptr)
+        , widget(nullptr)
+        , x(0)
+        , y(0)
+        , cursor(-1)
+        , previousState(nullptr)
+        , currentState(nullptr)
 	{
     }
 
-    WidgetCursor(AppContext *appContext_, const Widget *widget_, int x_, int y_,
-                 const data::Cursor &cursor_, WidgetState *previousState_,
-                 WidgetState *currentState_)
-        : appContext(appContext_), widget(widget_), x(x_), y(y_), cursor(cursor_),
-          previousState(previousState_), currentState(currentState_) {
+    WidgetCursor(
+        AppContext *appContext_,
+        const Widget *widget_,
+        int x_,
+        int y_,
+        const data::Cursor cursor_,
+        WidgetState *previousState_,
+        WidgetState *currentState_
+    )
+        : appContext(appContext_)
+        , widget(widget_)
+        , x(x_)
+        , y(y_)
+        , cursor(cursor_)
+        , previousState(previousState_)
+        , currentState(currentState_)
+    {
     }
 
     WidgetCursor &operator=(int) {
         widget = nullptr;
-        cursor.i = -1;
+        cursor = -1;
         return *this;
     }
 

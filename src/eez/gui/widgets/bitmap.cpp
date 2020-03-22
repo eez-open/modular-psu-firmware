@@ -57,7 +57,7 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
                 return;
             } else {
                 Value valueBitmapId;
-                DATA_OPERATION_FUNCTION(widget->data,  data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, valueBitmapId);
+                DATA_OPERATION_FUNCTION(widget->data,  data::DATA_OPERATION_GET, widgetCursor.cursor, valueBitmapId);
                 bitmap = getBitmap(valueBitmapId.getInt());
             }
         } else if (display_bitmap_widget->bitmap != 0) {

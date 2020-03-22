@@ -24,11 +24,7 @@ namespace gui {
 #define IGNORE_LUMINOSITY_FLAG 1
 
 struct TextWidgetSpecific {
-#if OPTION_SDRAM    
     const char *text;
-#else
-    uint32_t textOffset;
-#endif
     uint8_t flags;
 };
 

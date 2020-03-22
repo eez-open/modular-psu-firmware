@@ -137,7 +137,7 @@ void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, floa
 float getDefaultAnimationDurationHook();
 
 void executeExternalActionHook(int32_t actionId);
-void externalDataHook(int16_t id, data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value);
+void externalDataHook(int16_t id, data::DataOperationEnum operation, data::Cursor cursor, data::Value &value);
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -31,7 +31,7 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
 
     const Widget *widget = widgetCursor.widget;
     Value appContextValue;
-    DATA_OPERATION_FUNCTION(widget->data, data::DATA_OPERATION_GET, (Cursor &)widgetCursor.cursor, appContextValue);
+    DATA_OPERATION_FUNCTION(widget->data, data::DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
     bool refresh = !widgetCursor.previousState;

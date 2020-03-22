@@ -18,15 +18,17 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/modules/psu/psu.h>
-
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include <eez/sound.h>
 
-#include <eez/gui/gui.h>
+#if OPTION_ENCODER
+#include <eez/modules/mcu/encoder.h>
+#endif
 
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/dlog_record.h>
@@ -34,10 +36,9 @@
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
-#include <eez/modules/psu/gui/edit_mode_keypad.h>
-#include <eez/modules/psu/gui/edit_mode_slider.h>
-#include <eez/modules/psu/gui/edit_mode_step.h>
-#include <eez/modules/psu/gui/numeric_keypad.h>
+#include <eez/modules/psu/gui/keypad.h>
+
+#define CONF_GUI_EDIT_MODE_STEP_THRESHOLD_PX 5
 
 namespace eez {
 namespace psu {
@@ -95,8 +96,8 @@ void enter(int tabIndex, bool setFocus) {
     }
 
     if (g_tabIndex == PAGE_ID_EDIT_MODE_KEYPAD) {
-        Cursor cursor(g_focusCursor.i);
-        edit_mode_keypad::enter(isChannelData(cursor, g_focusDataId) ? g_focusCursor.i : -1, g_editValue, data::getAllowZero(g_focusCursor, g_focusDataId), g_minValue, g_maxValue);
+        Cursor cursor(g_focusCursor);
+        edit_mode_keypad::enter(data::isChannelData(cursor, g_focusDataId) ? g_focusCursor : -1, g_editValue, data::getAllowZero(g_focusCursor, g_focusDataId), g_minValue, g_maxValue);
     } else {
         edit_mode_keypad::exit();
     }
@@ -151,9 +152,8 @@ Unit getUnit() {
 }
 
 bool setValue(float floatValue) {
-    Cursor cursor(g_focusCursor.i);
-    if (isChannelData(cursor, g_focusDataId)) {
-        floatValue = channel_dispatcher::roundChannelValue(Channel::get(g_focusCursor.i), getUnit(), floatValue);
+    if (data::isChannelData(g_focusCursor, g_focusDataId)) {
+        floatValue = channel_dispatcher::roundChannelValue(Channel::get(g_focusCursor), getUnit(), floatValue);
     }
 
     data::Value value = MakeValue(floatValue, getUnit());
@@ -171,23 +171,21 @@ bool setValue(float floatValue) {
 #define NUM_PARTS 15
 
 void getInfoText(char *infoText, int count) {
-    Cursor cursor(g_focusCursor.i);
-
-    const char *dataName = getName(cursor, g_focusDataId);
+    const char *dataName = data::getName(g_focusCursor, g_focusDataId);
     if (!dataName) {
         dataName = "Unknown";
     }
 
-    Value minValue = data::getMin(cursor, g_focusDataId);
+    Value minValue = data::getMin(g_focusCursor, g_focusDataId);
     Value maxValue = (g_focusDataId == DATA_ID_CHANNEL_U_EDIT || g_focusDataId == DATA_ID_CHANNEL_I_EDIT) ?
-        data::getLimit(cursor, g_focusDataId) : data::getMax(cursor, g_focusDataId);
+        data::getLimit(g_focusCursor, g_focusDataId) : data::getMax(g_focusCursor, g_focusDataId);
 
-    if (isChannelData(cursor, g_focusDataId)) {
-        Channel& channel = Channel::get(g_focusCursor.i);
+    if (data::isChannelData(g_focusCursor, g_focusDataId)) {
+        Channel& channel = Channel::get(g_focusCursor);
         if ((channel.channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel.flags.trackingEnabled) {
             strcpy(infoText, "Set ");
         } else {
-            sprintf(infoText, "Set Ch%d ", g_focusCursor.i + 1);
+            sprintf(infoText, "Set Ch%d ", g_focusCursor + 1);
         }
         
         strcat(infoText, dataName);
@@ -212,6 +210,323 @@ static void update() {
 }
 
 } // namespace edit_mode
+
+namespace edit_mode_keypad {
+
+NumericKeypad g_theKeypad;
+NumericKeypad *g_keypad;
+
+////////////////////////////////////////////////////////////////////////////////
+
+void onKeypadOk(float value) {
+    if (edit_mode::setValue(value)) {
+        g_keypad->getAppContext()->popPage();
+    }
+}
+
+void enter(int channelIndex, const eez::gui::data::Value &editValue, bool allowZero, const eez::gui::data::Value &minValue, eez::gui::data::Value &maxValue) {
+    g_keypad = &g_theKeypad;
+
+    NumericKeypadOptions options;
+
+    options.channelIndex = channelIndex;
+
+    options.editValueUnit = editValue.getUnit();
+
+    options.allowZero = allowZero;
+    options.min = minValue.getFloat();
+    options.max = maxValue.getFloat();
+    options.def = options.min;
+
+    options.enableMaxButton();
+    options.enableMinButton();
+    options.flags.signButtonEnabled = options.min < 0;
+    options.flags.dotButtonEnabled = true;
+
+    g_keypad->init(&g_psuAppContext, 0, editValue, options, onKeypadOk, 0, 0);
+}
+
+void exit() {
+    if (g_keypad) {
+        g_keypad = 0;
+    }
+}
+
+} // namespace edit_mode_keypad
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace edit_mode_step {
+
+using data::Value;
+
+#define NUM_UNITS 7
+
+static const Value CONF_GUI_UNIT_STEPS_LIST[NUM_UNITS][NUM_STEPS_PER_UNIT] = {
+    { 
+        Value(2.0f, UNIT_VOLT), 
+        Value(1.0f, UNIT_VOLT), 
+        Value(0.5f, UNIT_VOLT), 
+        Value(0.1f, UNIT_VOLT) 
+    },
+    { 
+        Value(0.25f, UNIT_AMPER), 
+        Value(0.1f, UNIT_AMPER), 
+        Value(0.05f, UNIT_AMPER), 
+        Value(0.01f, UNIT_AMPER) 
+    },
+    { 
+        Value(0.0025f, UNIT_AMPER), 
+        Value(0.001f, UNIT_AMPER), 
+        Value(0.0005f, UNIT_AMPER), 
+        Value(0.0001f, UNIT_AMPER) 
+    },
+    { 
+        Value(5.0f, UNIT_WATT), 
+        Value(2.0f, UNIT_WATT), 
+        Value(1.0f, UNIT_WATT), 
+        Value(0.5f, UNIT_WATT) 
+    },
+    { 
+        Value(10.0f, UNIT_CELSIUS), 
+        Value(5.0f, UNIT_CELSIUS), 
+        Value(2.0f, UNIT_CELSIUS), 
+        Value(1.0f, UNIT_CELSIUS) 
+    },
+    { 
+        Value(20.0f, UNIT_SECOND), 
+        Value(10.0f, UNIT_SECOND), 
+        Value(5.0f, UNIT_SECOND), 
+        Value(1.0f, UNIT_SECOND) 
+    },
+    { 
+        Value(0.2f, UNIT_AMPER), 
+        Value(0.1f, UNIT_AMPER), 
+        Value(0.04f, UNIT_AMPER), 
+        Value(0.02f, UNIT_AMPER) 
+    }
+};
+
+static int g_stepIndexes[NUM_UNITS][CH_MAX];
+
+static const int DEFAULT_INDEX = 1;
+
+static bool g_changed;
+static int g_startPos;
+
+int getUnitStepValuesIndex(Unit unit) {
+    if (unit == UNIT_VOLT) {
+        return 0;
+    } 
+    
+    if (unit == UNIT_AMPER) {
+        Channel &channel = Channel::get(g_focusCursor);
+        if (channel.flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
+            return 2;
+        }
+
+        // DCM220
+        int slotIndex = Channel::get(channel.channelIndex).slotIndex;
+        auto &slot = g_slots[slotIndex];
+        if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220) {
+            return 6;
+        }
+
+        return 1;
+    } 
+    
+    if (unit == UNIT_WATT) {
+        return 3;
+    } 
+    
+    if (unit == UNIT_CELSIUS) {
+        return 4;
+    } 
+    
+    if (unit == UNIT_SECOND) {
+        return 5;
+    }
+
+    return 0;
+}
+
+void getUnitStepValues(Unit unit, eez::gui::data::StepValues &stepValues) {
+    stepValues.count = NUM_STEPS_PER_UNIT;
+    stepValues.values = &CONF_GUI_UNIT_STEPS_LIST[getUnitStepValuesIndex(unit)][0];
+}
+
+int getStepIndex() {
+    int stepIndex = g_stepIndexes[getUnitStepValuesIndex(edit_mode::getUnit())][g_focusCursor];
+    if (stepIndex == 0) {
+        return DEFAULT_INDEX;
+    }
+    return stepIndex - 1;
+}
+
+void setStepIndex(int value) {
+    int unitStepValuesIndex = getUnitStepValuesIndex(edit_mode::getUnit());
+    g_stepIndexes[unitStepValuesIndex][g_focusCursor] = 1 + value;
+}
+
+void switchToNextStepIndex() {
+    g_stepIndexes[getUnitStepValuesIndex(edit_mode::getUnit())][g_focusCursor] = 1 + ((getStepIndex() + 1) % NUM_STEPS_PER_UNIT);
+}
+
+void getStepValues(eez::gui::data::StepValues &stepValues) {
+    return getUnitStepValues(edit_mode::getUnit(), stepValues);
+}
+
+float getStepValue() {
+    eez::gui::data::StepValues stepValues;
+    getStepValues(stepValues);
+    return stepValues.values[MIN(getStepIndex(), stepValues.count - 1)].getFloat();
+}
+
+void increment(int counter, bool playClick) {
+    float min = edit_mode::getMin().getFloat();
+    float max = edit_mode::getMax().getFloat();
+    float stepValue = getStepValue();
+
+    float value = edit_mode::getEditValue().getFloat();
+
+    for (int i = 0; i < abs(counter); ++i) {
+        if (counter > 0) {
+            if (value == min) {
+                value = (floorf(min / stepValue) + 1) * stepValue;
+            } else {
+                value += stepValue;
+            }
+            if (value > max) {
+                value = max;
+            }
+        } else {
+            if (value == max) {
+                value = (ceilf(max / stepValue) - 1) * stepValue;
+            } else {
+                value -= stepValue;
+            }
+            if (value < min) {
+                value = min;
+            }
+        }
+    }
+
+    if (edit_mode::setValue(value)) {
+        g_changed = true;
+        if (playClick) {
+            sound::playClick();
+        }
+    }
+}
+
+#if OPTION_ENCODER
+
+void onEncoder(int counter) {
+    increment(counter, false);
+}
+
+#endif
+
+void test() {
+    if (!g_changed) {
+        int d = eez::gui::touch::getX() - g_startPos;
+        if (abs(d) >= CONF_GUI_EDIT_MODE_STEP_THRESHOLD_PX) {
+            increment(d > 0 ? 1 : -1, true);
+        }
+    }
+}
+
+void onTouchDown() {
+    g_startPos = eez::gui::touch::getX();
+    g_changed = false;
+}
+
+void onTouchMove() {
+    test();
+}
+
+void onTouchUp() {
+}
+
+Value getCurrentEncoderStepValue() {
+    data::StepValues stepValues;
+    if (!data::getEncoderStepValues(g_focusCursor, g_focusDataId, stepValues)) {
+        getUnitStepValues(getCurrentEncoderUnit(), stepValues);
+    }
+    int stepValueIndex = mcu::encoder::ENCODER_MODE_STEP4 - mcu::encoder::g_encoderMode;
+    if (stepValueIndex >= stepValues.count) {
+        stepValueIndex = stepValues.count - 1;
+    }
+    return stepValues.values[stepValueIndex];
+}
+
+void showCurrentEncoderMode() {
+#if OPTION_ENCODER
+    if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
+        infoMessage("Auto");
+    } else {
+        infoMessage(getCurrentEncoderStepValue());
+    }
+#endif
+}
+
+} // namespace edit_mode_step
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace edit_mode_slider {
+
+static const int TOP_BORDER = 51;
+static const int BOTTOM_BORDER = 255;
+
+static const int DX = 10;
+
+static float startValue;
+static int startX;
+static float stepValue;
+
+void onTouchDown() {
+    startValue = edit_mode::getEditValue().getFloat();
+    startX = eez::gui::touch::getX();
+
+    int y = eez::gui::touch::getY() - g_psuAppContext.y;
+    if (y < TOP_BORDER) {
+        y = TOP_BORDER;
+    } else if (y > BOTTOM_BORDER) {
+        y = BOTTOM_BORDER;
+    }
+    y -= TOP_BORDER;
+
+    int stepIndex = NUM_STEPS_PER_UNIT * y / (BOTTOM_BORDER - TOP_BORDER);
+    stepIndex = MAX(MIN(stepIndex, NUM_STEPS_PER_UNIT - 1), 0);
+    data::StepValues stepValues;
+    edit_mode_step::getStepValues(stepValues);
+    stepValue = stepValues.values[MIN(stepIndex, stepValues.count - 1)].getFloat();
+}
+
+void onTouchMove() {
+    float min = edit_mode::getMin().getFloat();
+    float max = edit_mode::getMax().getFloat();
+
+    int counter = (eez::gui::touch::getX() - startX) / DX;
+
+    float value = roundPrec(startValue + counter * stepValue, stepValue);
+
+    if (value < min) {
+        value = min;
+    }
+    if (value > max) {
+        value = max;
+    }
+
+    edit_mode::setValue(value);
+}
+
+void onTouchUp() {
+}
+
+} // namespace edit_mode_slider
+
 } // namespace gui
 } // namespace psu
 } // namespace eez

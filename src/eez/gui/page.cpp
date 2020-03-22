@@ -18,16 +18,7 @@
 
 #if OPTION_DISPLAY
 
-#include <string.h>
-
-#include <eez/util.h>
-
 #include <eez/gui/gui.h>
-
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/gui/psu.h>
-
-using namespace eez::mcu;
 
 namespace eez {
 namespace gui {

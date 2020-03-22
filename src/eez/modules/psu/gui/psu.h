@@ -22,7 +22,7 @@
 
 using namespace eez::gui;
 
-#include <eez/modules/psu/gui/numeric_keypad.h>
+#include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/page.h>
 
 namespace eez {
@@ -44,7 +44,7 @@ extern int g_channelIndex;
 extern data::Cursor g_focusCursor;
 extern int16_t g_focusDataId;
 extern data::Value g_focusEditValue;
-void setFocusCursor(const data::Cursor &cursor, int16_t dataId);
+void setFocusCursor(const data::Cursor cursor, int16_t dataId);
 bool isFocusChanged();
 
 void changeVoltageLimit(int iChannel);
@@ -55,7 +55,7 @@ void changePowerTripDelay(int iChannel);
 void changeTemperatureTripLevel(int iChannel);
 void changeTemperatureTripDelay(int iChannel);
 
-void psuErrorMessage(const data::Cursor &cursor, data::Value value, void (*ok_callback)() = 0);
+void psuErrorMessage(const data::Cursor cursor, data::Value value, void (*ok_callback)() = 0);
 
 Unit getCurrentEncoderUnit();
 
@@ -109,7 +109,7 @@ void pushSelectFromEnumPage(
 );
 void pushSelectFromEnumPage(
     AppContext *appContext,
-    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
+    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value),
     uint16_t currentValue,
     bool(*disabledCallback)(uint16_t value),
     void(*onSet)(uint16_t),
@@ -154,7 +154,7 @@ struct SelectParams {
     const char **m_options;
     int m_defaultSelection;
     int m_input;
-    static void enumDefinition(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value);
+    static void enumDefinition(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value);
     static void onSelect(uint16_t value);
 };
 
@@ -176,7 +176,7 @@ public:
 
     bool isFocusWidget(const WidgetCursor &widgetCursor) override;
 
-    bool isBlinking(const data::Cursor &cursor, int16_t id) override;
+    bool isBlinking(const data::Cursor cursor, int16_t id) override;
 
     bool isWidgetActionEnabled(const WidgetCursor &widgetCursor) override;
     
@@ -336,7 +336,7 @@ inline void pushSelectFromEnumPage(
 }
 
 inline void pushSelectFromEnumPage(
-    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
+    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value),
     uint16_t currentValue,
     bool(*disabledCallback)(uint16_t value),
     void(*onSet)(uint16_t),

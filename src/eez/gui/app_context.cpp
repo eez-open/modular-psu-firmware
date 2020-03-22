@@ -98,9 +98,7 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
 
     m_pageNavigationStack[m_pageNavigationStackPointer].page = page;
     m_pageNavigationStack[m_pageNavigationStackPointer].pageId = pageId;
-#if OPTION_SDRAM
     m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex = mcu::display::allocBuffer();
-#endif
 
     if (page) {
         page->pageWillAppear();
@@ -243,7 +241,7 @@ bool AppContext::testExecuteActionOnTouchDown(int action) {
     return false;
 }
 
-bool AppContext::isBlinking(const data::Cursor &cursor, int16_t id) {
+bool AppContext::isBlinking(const data::Cursor cursor, int16_t id) {
     return false;
 }
 
@@ -285,9 +283,7 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
     m_updatePageIndex = i;
 
-#if OPTION_SDRAM
     mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
-#endif
 
     int x;
     int y;
@@ -334,9 +330,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 		widgetCursor.previousState = savedPreviousState;
     }
 
-#if OPTION_SDRAM
     mcu::display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow);
-#endif
 
     m_updatePageIndex = -1;
 }
@@ -386,7 +380,7 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
 
     for (int i = 0; i <= m_pageNavigationStackPointer; i++) {
         if (!isPageFullyCovered(i)) {
-            widgetCursor.cursor = Cursor();
+            widgetCursor.cursor = -1;
             updatePage(i, widgetCursor);
             widgetCursor.nextState();
         }

@@ -356,7 +356,7 @@ void SelectFromEnumPage::init(
 
 void SelectFromEnumPage::init(
     AppContext *appContext_,
-    void (*enumDefinitionFunc_)(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value),
+    void (*enumDefinitionFunc_)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value),
     uint16_t currentValue_,
     bool (*disabledCallback_)(uint16_t value),
     void (*onSet_)(uint16_t),
@@ -689,7 +689,7 @@ void MenuWithButtonsPage::refresh(const WidgetCursor &widgetCursor2) {
         widgetCursor.widget = &m_buttonTextWidgets[i].common;
         widgetCursor.x = x + m_buttonTextWidgets[i].common.x;
         widgetCursor.y = y + m_buttonTextWidgets[i].common.y;
-        widgetCursor.cursor.i = i;
+        widgetCursor.cursor = i;
         widgetCursor.currentState->flags.active = isActiveWidget(widgetCursor);
         TextWidget_draw(widgetCursor);
     }
@@ -708,7 +708,7 @@ WidgetCursor MenuWithButtonsPage::findWidget(int x, int y) {
         widgetCursor.widget = &m_buttonTextWidgets[i].common;
         widgetCursor.x = this->x + m_buttonTextWidgets[i].common.x;
         widgetCursor.y = this->y + m_buttonTextWidgets[i].common.y;
-        widgetCursor.cursor.i = i;
+        widgetCursor.cursor = i;
         if (
             x >= widgetCursor.x && x < widgetCursor.x + m_buttonTextWidgets[i].common.w && 
             y >= widgetCursor.y && y < widgetCursor.y + m_buttonTextWidgets[i].common.h
@@ -724,7 +724,7 @@ WidgetCursor MenuWithButtonsPage::findWidget(int x, int y) {
 }
 
 void MenuWithButtonsPage::executeAction() {
-    (*g_menuWithButtonsPage.m_callback)(getFoundWidgetAtDown().cursor.i);
+    (*g_menuWithButtonsPage.m_callback)(getFoundWidgetAtDown().cursor);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -42,7 +42,7 @@
 #include <eez/modules/psu/ontime.h>
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
-#include <eez/modules/psu/gui/page_ch_settings_trigger.h>
+#include <eez/modules/psu/gui/page_ch_settings.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
 #include <eez/modules/psu/scpi/psu.h>
 

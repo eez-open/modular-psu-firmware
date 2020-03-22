@@ -34,7 +34,6 @@
 #include <eez/modules/psu/gui/calibration.h>
 #include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/keypad.h>
-#include <eez/modules/psu/gui/numeric_keypad.h>
 #include <eez/modules/psu/gui/password.h>
 
 namespace eez {
@@ -301,7 +300,7 @@ void stop(void (*callback)()) {
 }
 
 void toggleEnable() {
-    Channel &channel = g_channel ? *g_channel : Channel::get(getFoundWidgetAtDown().cursor.i);
+    Channel &channel = g_channel ? *g_channel : Channel::get(getFoundWidgetAtDown().cursor);
     channel.calibrationEnable(!channel.isCalibrationEnabled());
 }
 

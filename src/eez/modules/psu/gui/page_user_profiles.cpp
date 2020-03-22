@@ -59,7 +59,7 @@ int UserProfilesPage::getSelectedProfileLocation() {
 }
 
 void UserProfilesPage::showProfile() {
-    g_selectedProfileLocation = getFoundWidgetAtDown().cursor.i;
+    g_selectedProfileLocation = getFoundWidgetAtDown().cursor;
     pushPage(g_selectedProfileLocation == 0 ? PAGE_ID_USER_PROFILE_0_SETTINGS : PAGE_ID_USER_PROFILE_SETTINGS);
 }
 

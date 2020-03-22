@@ -178,7 +178,6 @@ bool init() {
     return true;
 }
 
-#if OPTION_SDRAM
 void *getBufferPointer() {
     return g_buffer;
 }
@@ -186,7 +185,6 @@ void *getBufferPointer() {
 void setBufferPointer(void *buffer) {
     g_buffer = (uint32_t *)buffer;
 }
-#endif
 
 void turnOn() {
     if (!isOn()) {

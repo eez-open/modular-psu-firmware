@@ -145,7 +145,7 @@ bool isTouchPointActivated() {
 namespace eez {
 namespace gui {
 
-void data_touch_calibration_point(data::DataOperationEnum operation, data::Cursor &cursor,
+void data_touch_calibration_point(data::DataOperationEnum operation, data::Cursor cursor,
                                   data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = Value(psu::gui::g_currentPoint);

@@ -26,11 +26,7 @@ namespace gui {
 
 struct GridWidget {
     uint8_t gridFlow; // GRID_FLOW_ROW or GRID_FLOW_COLUMN
-#if OPTION_SDRAM    
     const Widget *itemWidget;
-#else
-    uint32_t itemWidgetOffset;
-#endif
 };
 
 void GridWidget_fixPointers(Widget *widget);

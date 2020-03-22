@@ -21,6 +21,7 @@
 namespace eez {
 namespace psu {
 namespace gui {
+
 namespace edit_mode {
 
 bool isActive(eez::gui::AppContext *appContext);
@@ -42,6 +43,57 @@ void nonInteractiveSet();
 void nonInteractiveDiscard();
 
 } // namespace edit_mode
+
+////////////////////////////////////////////////////////////////////////////////
+
+class NumericKeypad;
+
+namespace edit_mode_keypad {
+
+void enter(int channelIndex, const eez::gui::data::Value &editValue, bool allowZero, const eez::gui::data::Value &minValue, eez::gui::data::Value &maxValue);
+void exit();
+
+extern NumericKeypad *g_keypad;
+
+} // namespace edit_mode_keypad
+
+////////////////////////////////////////////////////////////////////////////////
+
+#define NUM_STEPS_PER_UNIT 4
+
+namespace edit_mode_step {
+
+int getStepIndex();
+
+void getStepValues(eez::gui::data::StepValues &stepValues);
+
+void setStepIndex(int value);
+
+#if OPTION_ENCODER
+void onEncoder(int counter);
+#endif
+
+void onTouchDown();
+void onTouchMove();
+void onTouchUp();
+
+void switchToNextStepIndex();
+
+eez::gui::data::Value getCurrentEncoderStepValue();
+void showCurrentEncoderMode();
+
+} // namespace edit_mode_step
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace edit_mode_slider {
+
+void onTouchDown();
+void onTouchMove();
+void onTouchUp();
+
+}
+
 } // namespace gui
 } // namespace psu
 } // namespace eez

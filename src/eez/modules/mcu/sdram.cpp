@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_SDRAM
-
 #include <eez/modules/mcu/sdram.h>
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -36,8 +34,6 @@
 #define SDRAM_MODEREG_CAS_LATENCY_3 ((uint16_t)0x0030)
 #define SDRAM_MODEREG_OPERATING_MODE_STANDARD ((uint16_t)0x0000)
 #define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE ((uint16_t)0x0200)
-
-#endif
 
 namespace eez {
 namespace mcu {

@@ -22,10 +22,10 @@
 #include <eez/modules/dcpX05/adc.h>
 
 #if defined(EEZ_PLATFORM_STM32)
-#include <scpi/scpi.h>
 #include <eez/platform/stm32/spi.h>
 #include <eez/system.h>
 #include <eez/index.h>
+#include <scpi/scpi.h>
 #endif
 
 /// How many times per second will ADC take snapshot value?

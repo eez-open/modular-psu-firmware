@@ -216,37 +216,37 @@ int getY() {
 
 } // namespace touch
 
-void data_touch_calibrated_x(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_touch_calibrated_x(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = touch::g_calibratedX;
     }
 }
 
-void data_touch_calibrated_y(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_touch_calibrated_y(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = touch::g_calibratedY;
     }
 }
 
-void data_touch_calibrated_pressed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_touch_calibrated_pressed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = touch::g_calibratedPressed;
     }
 }
 
-void data_touch_filtered_x(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_touch_filtered_x(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = touch::g_filteredX;
     }
 }
 
-void data_touch_filtered_y(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_touch_filtered_y(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = touch::g_filteredY;
     }
 }
 
-void data_touch_filtered_pressed(data::DataOperationEnum operation, data::Cursor &cursor, data::Value &value) {
+void data_touch_filtered_pressed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
     if (operation == data::DATA_OPERATION_GET) {
         value = touch::g_filteredPressed;
     }

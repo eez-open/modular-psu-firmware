@@ -22,11 +22,7 @@ namespace eez {
 namespace gui {
 
 struct ButtonWidget {
-#if OPTION_SDRAM    
     const char *text;
-#else
-    uint32_t textOffset;
-#endif
     int16_t enabled;
     uint16_t disabledStyle;
 };

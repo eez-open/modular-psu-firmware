@@ -22,18 +22,8 @@ namespace eez {
 namespace gui {
 
 struct ToggleButtonWidget {
-#if OPTION_SDRAM    
     const char *text1;
-#else
-    uint32_t text1Offset;
-#endif
-
-#if OPTION_SDRAM    
     const char *text2;
-#else
-    uint32_t text2Offset;
-#endif
-
 };
 
 void ToggleButtonWidget_fixPointers(Widget *widget);
