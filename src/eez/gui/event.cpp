@@ -57,21 +57,21 @@ void eventHandling() {
 		return;
 	}
 
-    using namespace eez::gui::touch;
+    auto eventType = touch::getEventType();
 
-    if (g_eventType != EVENT_TYPE_TOUCH_NONE) {
+    if (eventType != EVENT_TYPE_TOUCH_NONE) {
         psu::idle::noteHmiActivity();
     }
 
     uint32_t tickCount = micros();
 
-    if (g_eventType == EVENT_TYPE_TOUCH_DOWN) {
+    if (eventType == EVENT_TYPE_TOUCH_DOWN) {
         m_touchDownTime = tickCount;
         m_lastAutoRepeatEventTime = tickCount;
         m_longTouchGenerated = false;
         m_extraLongTouchGenerated = false;
         processTouchEvent(EVENT_TYPE_TOUCH_DOWN);
-    } else if (g_eventType == EVENT_TYPE_TOUCH_MOVE) {
+    } else if (eventType == EVENT_TYPE_TOUCH_MOVE) {
         processTouchEvent(EVENT_TYPE_TOUCH_MOVE);
 
         if (!m_longTouchGenerated &&
@@ -91,7 +91,7 @@ void eventHandling() {
             m_lastAutoRepeatEventTime = tickCount;
         }
 
-    } else if (g_eventType == EVENT_TYPE_TOUCH_UP) {
+    } else if (eventType == EVENT_TYPE_TOUCH_UP) {
         processTouchEvent(EVENT_TYPE_TOUCH_UP);
     }
 }

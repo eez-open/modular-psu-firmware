@@ -43,9 +43,9 @@ static bool g_filteredPressed = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-EventType g_eventType = EVENT_TYPE_TOUCH_NONE;
-int g_eventX = -1;
-int g_eventY = -1;
+static EventType g_eventType = EVENT_TYPE_TOUCH_NONE;
+static int g_eventX = -1;
+static int g_eventY = -1;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -204,6 +204,10 @@ void tick() {
     g_eventX = g_x;
     g_eventY = g_y;
 #endif
+}
+
+EventType getEventType() {
+    return g_eventType;
 }
 
 int getX() {

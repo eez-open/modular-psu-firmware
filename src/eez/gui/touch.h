@@ -27,8 +27,7 @@ namespace touch {
 void init();
 void tick();
 
-extern EventType g_eventType;
-
+EventType getEventType();
 int getX();
 int getY();
 
