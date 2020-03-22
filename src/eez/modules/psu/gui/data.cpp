@@ -334,8 +334,6 @@ void printTime(double time, char *text, int count) {
     text[count - 1] = 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 void printTime(uint32_t time, char *text, int count) {
     printTime((double)time, text, count);
 }

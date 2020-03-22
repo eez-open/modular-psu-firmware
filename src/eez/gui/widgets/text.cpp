@@ -42,7 +42,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
     
-    const Style *style = getStyle(widget->style);
+    const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
     const char *text = GET_WIDGET_PROPERTY(textWidget, text, const char *);
 

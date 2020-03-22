@@ -28,9 +28,13 @@
 namespace eez {
 namespace gui {
 
+////////////////////////////////////////////////////////////////////////////////
+
 class AppContext;
 struct WidgetCursor;
 struct Style;
+
+////////////////////////////////////////////////////////////////////////////////
 
 struct EnumItem {
     uint16_t value;
@@ -45,6 +49,8 @@ struct EnumValue {
     uint16_t enumDefinition;
 };
 
+////////////////////////////////////////////////////////////////////////////////
+
 struct PairOfUint8Value {
     uint8_t first;
     uint8_t second;
@@ -56,6 +62,8 @@ struct PairOfUint16Value {
 };
 
 typedef uint8_t ValueType;
+
+////////////////////////////////////////////////////////////////////////////////
 
 #define STRING_OPTIONS_FILE_ELLIPSIS 1
 
@@ -242,11 +250,11 @@ struct Value {
     }
 
     uint16_t getRangeFrom() {
-        return uint32_ >> 16;
+        return pairOfUint16_.first;
     }
 
     uint16_t getRangeTo() {
-        return uint32_ & 0xFFFF;
+        return pairOfUint16_.second;
     }
 
   public:
@@ -271,8 +279,7 @@ struct Value {
     };
 };
 
-Value MakeRangeValue(uint16_t from, uint16_t to);
-Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition);
+////////////////////////////////////////////////////////////////////////////////
 
 typedef bool (*CompareValueFunction)(const Value &a, const Value &b);
 typedef void (*ValueToTextFunction)(const Value &value, char *text, int count);
@@ -280,8 +287,15 @@ typedef void (*ValueToTextFunction)(const Value &value, char *text, int count);
 extern CompareValueFunction g_valueTypeCompareFunctions[];
 extern ValueToTextFunction g_valueTypeToTextFunctions[];
 
+////////////////////////////////////////////////////////////////////////////////
+
 uint16_t getPageIndexFromValue(const Value &value);
 uint16_t getNumPagesFromValue(const Value &value);
+
+////////////////////////////////////////////////////////////////////////////////
+
+Value MakeRangeValue(uint16_t from, uint16_t to);
+Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition);
 
 ////////////////////////////////////////////////////////////////////////////////
 

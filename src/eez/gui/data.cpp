@@ -310,7 +310,8 @@ uint16_t getNumPagesFromValue(const Value &value) {
 Value MakeRangeValue(uint16_t from, uint16_t to) {
     Value value;
     value.type_ = VALUE_TYPE_RANGE;
-    value.uint32_ = (from << 16) | to;
+    value.pairOfUint16_.first = from;
+    value.pairOfUint16_.second = to;
     return value;
 }
 
@@ -321,6 +322,8 @@ Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition) {
     value.enum_.enumDefinition = enumDefinition;
     return value;
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 void Value::toText(char *text, int count) const {
     *text = 0;
