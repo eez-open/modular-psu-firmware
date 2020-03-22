@@ -23,8 +23,9 @@
 
 namespace eez {
 
+// order of units should not be changed since it is used in DLOG files
 enum Unit {
-    UNIT_NONE,
+    UNIT_NONE = -1,
     UNIT_UNKNOWN,
     UNIT_VOLT,
     UNIT_MILLI_VOLT,

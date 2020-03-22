@@ -22,8 +22,8 @@
 
 namespace eez {
 
+
 const char *g_unitNames[] = {
-    nullptr,
     "",
     "V",
     "mV",

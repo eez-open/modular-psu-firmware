@@ -1752,7 +1752,6 @@ void data_slot_2ch_ch1_index(data::DataOperationEnum operation, data::Cursor cur
     } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
         value = data::Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == data::DATA_OPERATION_GET_CONTEXT_CURSOR) {
-        Channel &channel = Channel::get(persist_conf::getMin2ChannelIndex());
         value = cursor;
     } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
         selectChannel((Channel *)value.getVoidPointer());
