@@ -40,9 +40,9 @@ void ListGraphWidget_draw(const WidgetCursor &widgetCursor) {
 	const Style* cursorStyle = getStyle(listGraphWidget->cursorStyle);
 
     widgetCursor.currentState->size = sizeof(ListGraphWidgetState);
-    widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
     ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData =
-        data::get(widgetCursor.cursor, listGraphWidget->cursorData);
+        get(widgetCursor.cursor, listGraphWidget->cursorData);
 
     bool refreshAll = !widgetCursor.previousState ||
                       widgetCursor.previousState->data != widgetCursor.currentState->data;
@@ -70,29 +70,29 @@ void ListGraphWidget_draw(const WidgetCursor &widgetCursor) {
                               widgetCursor.y + (int)widget->h - 1);
         }
 
-        int dwellListLength = data::getFloatListLength(listGraphWidget->dwellData);
+        int dwellListLength = getFloatListLength(listGraphWidget->dwellData);
         if (dwellListLength > 0) {
-            float *dwellList = data::getFloatList(listGraphWidget->dwellData);
+            float *dwellList = getFloatList(listGraphWidget->dwellData);
 
             const Style *styles[2] = { y1Style, y2Style };
 
-            int listLength[2] = { data::getFloatListLength(listGraphWidget->y1Data),
-                                  data::getFloatListLength(listGraphWidget->y2Data) };
+            int listLength[2] = { getFloatListLength(listGraphWidget->y1Data),
+                                  getFloatListLength(listGraphWidget->y2Data) };
 
-            float *list[2] = { data::getFloatList(listGraphWidget->y1Data),
-                               data::getFloatList(listGraphWidget->y2Data) };
+            float *list[2] = { getFloatList(listGraphWidget->y1Data),
+                               getFloatList(listGraphWidget->y2Data) };
 
             float min[2] = {
-                data::getMin(widgetCursor.cursor, listGraphWidget->y1Data).getFloat(),
-                data::getMin(widgetCursor.cursor, listGraphWidget->y2Data).getFloat()
+                getMin(widgetCursor.cursor, listGraphWidget->y1Data).getFloat(),
+                getMin(widgetCursor.cursor, listGraphWidget->y2Data).getFloat()
             };
 
             float max[2] = {
-                data::getMax(widgetCursor.cursor, listGraphWidget->y1Data).getFloat(),
-                data::getMax(widgetCursor.cursor, listGraphWidget->y2Data).getFloat()
+                getMax(widgetCursor.cursor, listGraphWidget->y1Data).getFloat(),
+                getMax(widgetCursor.cursor, listGraphWidget->y2Data).getFloat()
             };
 
-            int maxListLength = data::getFloatListLength(widget->data);
+            int maxListLength = getFloatListLength(widget->data);
 
             float dwellSum = 0;
             for (int i = 0; i < maxListLength; ++i) {
@@ -196,13 +196,13 @@ void ListGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
             return;
         }
 
-        int dwellListLength = data::getFloatListLength(listGraphWidget->dwellData);
+        int dwellListLength = getFloatListLength(listGraphWidget->dwellData);
         if (dwellListLength > 0) {
             int iCursor = -1;
 
-            float *dwellList = data::getFloatList(listGraphWidget->dwellData);
+            float *dwellList = getFloatList(listGraphWidget->dwellData);
 
-            int maxListLength = data::getFloatListLength(widget->data);
+            int maxListLength = getFloatListLength(widget->data);
 
             float dwellSum = 0;
             for (int i = 0; i < maxListLength; ++i) {
@@ -232,14 +232,14 @@ void ListGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
 
                 if (touchEvent.x >= x1 && touchEvent.x < x2) {
                     int iCurrentCursor =
-                        data::get(widgetCursor.cursor, listGraphWidget->cursorData).getInt();
+                        get(widgetCursor.cursor, listGraphWidget->cursorData).getInt();
                     iCursor = i * 3 + iCurrentCursor % 3;
                     break;
                 }
             }
 
             if (iCursor >= 0) {
-                data::set(widgetCursor.cursor, listGraphWidget->cursorData, data::Value(iCursor));
+                set(widgetCursor.cursor, listGraphWidget->cursorData, Value(iCursor));
                 if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                     sound::playClick();
                 }

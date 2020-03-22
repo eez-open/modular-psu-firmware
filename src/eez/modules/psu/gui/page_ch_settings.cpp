@@ -33,7 +33,6 @@
 #include <eez/modules/psu/trigger.h>
 
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/page_ch_settings.h>
@@ -72,7 +71,7 @@ void ChSettingsAdvRangesPage::onModeSet(uint16_t value) {
 }
 
 void ChSettingsAdvRangesPage::selectMode() {
-    pushSelectFromEnumPage(g_channelCurrentRangeSelectionModeEnumDefinition, g_channel->getCurrentRangeSelectionMode(), 0, onModeSet);
+    pushSelectFromEnumPage(ENUM_DEFINITION_CHANNEL_CURRENT_RANGE_SELECTION_MODE, g_channel->getCurrentRangeSelectionMode(), 0, onModeSet);
 }
 
 void ChSettingsAdvRangesPage::toggleAutoRanging() {
@@ -99,7 +98,7 @@ void ChSettingsAdvViewPage::onDisplayValue1Set(uint16_t value) {
 }
 
 void ChSettingsAdvViewPage::editDisplayValue1() {
-    pushSelectFromEnumPage(g_channelDisplayValueEnumDefinition, displayValue1, isDisabledDisplayValue1, onDisplayValue1Set);
+    pushSelectFromEnumPage(ENUM_DEFINITION_CHANNEL_DISPLAY_VALUE, displayValue1, isDisabledDisplayValue1, onDisplayValue1Set);
 }
 
 bool ChSettingsAdvViewPage::isDisabledDisplayValue2(uint16_t value) {
@@ -114,7 +113,7 @@ void ChSettingsAdvViewPage::onDisplayValue2Set(uint16_t value) {
 }
 
 void ChSettingsAdvViewPage::editDisplayValue2() {
-    pushSelectFromEnumPage(g_channelDisplayValueEnumDefinition, displayValue2, isDisabledDisplayValue2, onDisplayValue2Set);
+    pushSelectFromEnumPage(ENUM_DEFINITION_CHANNEL_DISPLAY_VALUE, displayValue2, isDisabledDisplayValue2, onDisplayValue2Set);
 }
 
 void ChSettingsAdvViewPage::onYTViewRateSet(float value) {
@@ -462,7 +461,7 @@ void ChSettingsTriggerPage::onTriggerModeSet(uint16_t value) {
 }
 
 void ChSettingsTriggerPage::editTriggerMode() {
-    pushSelectFromEnumPage(g_channelTriggerModeEnumDefinition, channel_dispatcher::getVoltageTriggerMode(*g_channel), 0, onTriggerModeSet);
+    pushSelectFromEnumPage(ENUM_DEFINITION_CHANNEL_TRIGGER_MODE, channel_dispatcher::getVoltageTriggerMode(*g_channel), 0, onTriggerModeSet);
 }
 
 void ChSettingsTriggerPage::onVoltageTriggerValueSet(float value) {
@@ -549,30 +548,30 @@ void ChSettingsListsPage::nextPage() {
 }
 
 bool ChSettingsListsPage::isFocusedValueEmpty() {
-    data::Cursor cursor(getCursorIndexWithinPage());
-    data::Value value = data::get(cursor, getDataIdAtCursor());
+    Cursor cursor(getCursorIndexWithinPage());
+    Value value = get(cursor, getDataIdAtCursor());
     return value.getType() == VALUE_TYPE_STR;
 }
 
 float ChSettingsListsPage::getFocusedValue() {
-    data::Cursor cursor(getCursorIndexWithinPage());
+    Cursor cursor(getCursorIndexWithinPage());
 
-    data::Value value = data::get(cursor, getDataIdAtCursor());
+    Value value = get(cursor, getDataIdAtCursor());
 
     if (value.getType() == VALUE_TYPE_STR) {
-        value = data::getDef(cursor, getDataIdAtCursor());
+        value = getDef(cursor, getDataIdAtCursor());
     }
 
     return value.getFloat();
 }
 
 void ChSettingsListsPage::setFocusedValue(float value) {
-    data::Cursor cursor(getCursorIndexWithinPage());
+    Cursor cursor(getCursorIndexWithinPage());
 
     int16_t dataId = getDataIdAtCursor();
 
-    data::Value min = data::getMin(cursor, dataId);
-    data::Value max = data::getMax(cursor, dataId);
+    Value min = getMin(cursor, dataId);
+    Value max = getMax(cursor, dataId);
 
     if (value >= min.getFloat() && value <= max.getFloat()) {
         int iRow = getRowIndex();
@@ -661,23 +660,23 @@ void ChSettingsListsPage::edit() {
 
         options.channelIndex = g_channel->channelIndex;
 
-        data::Cursor cursor(getCursorIndexWithinPage());
+        Cursor cursor(getCursorIndexWithinPage());
 
         int16_t dataId = getDataIdAtCursor();
 
-        data::Value value = data::get(cursor, dataId);
+        Value value = get(cursor, dataId);
 
-        data::Value def = data::getDef(cursor, dataId);
+        Value def = getDef(cursor, dataId);
 
         if (value.getType() == VALUE_TYPE_STR) {
-            value = data::Value();
+            value = Value();
             options.editValueUnit = def.getUnit();
         } else {
             options.editValueUnit = value.getUnit();
         }
 
-        data::Value min = data::getMin(cursor, dataId);
-        data::Value max = data::getMax(cursor, dataId);
+        Value min = getMin(cursor, dataId);
+        Value max = getMax(cursor, dataId);
 
         options.def = def.getFloat();
         options.min = min.getFloat();
@@ -766,7 +765,7 @@ int16_t ChSettingsListsPage::getDataIdAtCursor() {
     }
 }
 
-int ChSettingsListsPage::getCursorIndex(const data::Cursor cursor, int16_t id) {
+int ChSettingsListsPage::getCursorIndex(const Cursor cursor, int16_t id) {
     int iCursor = (getPageIndex() * LIST_ITEMS_PER_PAGE + cursor) * 3;
     if (id == DATA_ID_CHANNEL_LIST_DWELL) {
         return iCursor;
@@ -852,16 +851,16 @@ void ChSettingsListsPage::setTriggerListMode() {
 
 void ChSettingsListsPage::onEncoder(int counter) {
 #if OPTION_ENCODER
-    data::Cursor cursor(getCursorIndexWithinPage());
+    Cursor cursor(getCursorIndexWithinPage());
     int16_t dataId = getDataIdAtCursor();
 
-    data::Value value = data::get(cursor, dataId);
+    Value value = get(cursor, dataId);
     if (value.getType() == VALUE_TYPE_STR) {
-        value = data::getDef(cursor, dataId);
+        value = getDef(cursor, dataId);
     }
 
-    data::Value min = data::getMin(cursor, dataId);
-    data::Value max = data::getMax(cursor, dataId);
+    Value min = getMin(cursor, dataId);
+    Value max = getMax(cursor, dataId);
 
     float newValue = encoderIncrement(value, counter, min.getFloat(), max.getFloat(), g_channel->channelIndex, 0);
 
@@ -900,12 +899,12 @@ void ChSettingsListsPage::onEncoderClicked() {
 }
 
 Unit ChSettingsListsPage::getEncoderUnit() {
-    data::Cursor cursor(getCursorIndexWithinPage());
+    Cursor cursor(getCursorIndexWithinPage());
 
-    data::Value value = data::get(cursor, getDataIdAtCursor());
+    Value value = get(cursor, getDataIdAtCursor());
 
     if (value.getType() == VALUE_TYPE_STR) {
-        value = data::getDef(cursor, getDataIdAtCursor());
+        value = getDef(cursor, getDataIdAtCursor());
     }
 
     return value.getUnit();
@@ -925,7 +924,7 @@ void ChSettingsListsPage::insertRow(int iRow, int iCopyRow) {
             m_currentList[i + 1] = m_currentList[i];
         }
 
-        data::Cursor cursor(getCursorIndexWithinPage());
+        Cursor cursor(getCursorIndexWithinPage());
 
         if (iCopyRow < m_dwellListLength && iRow <= m_dwellListLength) {
             m_dwellList[iRow] = m_dwellList[iCopyRow];
@@ -1148,7 +1147,7 @@ void ChSettingsListsPage::editListCount() {
     options.option1ButtonText = INFINITY_SYMBOL;
     options.option1 = onListCountSetToInfinity;
 
-    NumericKeypad::start(0, data::Value((uint16_t)m_listCount), options, onListCountSet, 0, 0);
+    NumericKeypad::start(0, Value((uint16_t)m_listCount), options, onListCountSet, 0, 0);
 }
 
 void ChSettingsListsPage::onListCountSet(float value) {
@@ -1164,7 +1163,7 @@ void ChSettingsListsPage::onListCountSetToInfinity() {
 }
 
 void ChSettingsListsPage::editTriggerOnListStop() {
-    pushSelectFromEnumPage(g_channelTriggerOnListStopEnumDefinition, m_triggerOnListStop, 0, onTriggerOnListStopSet);
+    pushSelectFromEnumPage(ENUM_DEFINITION_CHANNEL_TRIGGER_ON_LIST_STOP, m_triggerOnListStop, 0, onTriggerOnListStopSet);
 }
 
 void ChSettingsListsPage::onTriggerOnListStopSet(uint16_t value) {

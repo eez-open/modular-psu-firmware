@@ -91,25 +91,25 @@ class ChSettingsProtectionSetPage : public SetPage {
 
     int state;
     int type;
-    data::Value limit;
-    data::Value level;
-    data::Value delay;
+    Value limit;
+    Value level;
+    Value delay;
 
   protected:
     int origType;
     int origState;
 
-    data::Value origLimit;
+    Value origLimit;
     float minLimit;
     float maxLimit;
     float defLimit;
 
-    data::Value origLevel;
+    Value origLevel;
     float minLevel;
     float maxLevel;
     float defLevel;
 
-    data::Value origDelay;
+    Value origDelay;
     float minDelay;
     float maxDelay;
     float defaultDelay;
@@ -258,7 +258,7 @@ private:
     int getColumnIndex();
     int getCursorIndexWithinPage();
     int16_t getDataIdAtCursor();
-    int getCursorIndex(const eez::gui::data::Cursor cursor, int16_t id);
+    int getCursorIndex(const eez::gui::Cursor cursor, int16_t id);
 
     bool isFocusedValueEmpty();
     float getFocusedValue();

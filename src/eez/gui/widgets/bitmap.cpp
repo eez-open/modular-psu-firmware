@@ -34,7 +34,7 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
 
 	widgetCursor.currentState->size = sizeof(WidgetState);
 
-    widgetCursor.currentState->data = widget->data ? data::getBitmapImage(widgetCursor.cursor, widget->data) : 0;
+    widgetCursor.currentState->data = widget->data ? getBitmapImage(widgetCursor.cursor, widget->data) : 0;
 
     bool refresh = !widgetCursor.previousState ||
     		widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
@@ -57,7 +57,7 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
                 return;
             } else {
                 Value valueBitmapId;
-                DATA_OPERATION_FUNCTION(widget->data,  data::DATA_OPERATION_GET, widgetCursor.cursor, valueBitmapId);
+                DATA_OPERATION_FUNCTION(widget->data,  DATA_OPERATION_GET, widgetCursor.cursor, valueBitmapId);
                 bitmap = getBitmap(valueBitmapId.getInt());
             }
         } else if (display_bitmap_widget->bitmap != 0) {

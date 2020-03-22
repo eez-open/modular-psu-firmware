@@ -47,7 +47,7 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
     const GridWidget *gridWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const GridWidget *);
 
-    int startPosition = data::ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+    int startPosition = ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 
 	const Widget *childWidget = GET_WIDGET_PROPERTY(gridWidget, itemWidget, const Widget *);
     widgetCursor.widget = childWidget;
@@ -57,12 +57,12 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
     int xOffset = 0;
     int yOffset = 0;
-    int count = data::count(parentWidget->data);
+    int count = eez::gui::count(parentWidget->data);
 
     Value oldValue;
 
     for (int index = startPosition; index < count; ++index) {
-        data::select(widgetCursor.cursor, parentWidget->data, index, oldValue);
+        select(widgetCursor.cursor, parentWidget->data, index, oldValue);
 
 		widgetCursor.x = savedX + xOffset;
 		widgetCursor.y = savedY + yOffset;
@@ -115,7 +115,7 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     }
 
     if (count > 0) {
-        data::deselect(widgetCursor.cursor, widgetCursor.widget->data, oldValue);
+        deselect(widgetCursor.cursor, widgetCursor.widget->data, oldValue);
     }
 
 	widgetCursor.currentState = savedCurrentState;

@@ -40,10 +40,10 @@ class ToastMessagePage : public InternalPage {
 
 public:
     static ToastMessagePage *create(ToastType type, const char *message1);
-    static ToastMessagePage *create(ToastType type, data::Value message1Value);
+    static ToastMessagePage *create(ToastType type, Value message1Value);
     static ToastMessagePage *create(ToastType type, const char *message1, const char *message2);
     static ToastMessagePage *create(ToastType type, const char *message1, const char *message2, const char *message3, bool autoDismiss = false);
-    static ToastMessagePage *create(ToastType type, data::Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam);
+    static ToastMessagePage *create(ToastType type, Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam);
     static ToastMessagePage *create(ToastType type, const char *message, void (*action)(), const char *actionLabel);
 
     void pageFree();
@@ -69,7 +69,7 @@ private:
     ToastType type;
 
     const char *message1;
-    data::Value message1Value;
+    Value message1Value;
     const char *message2;
     const char *message3;
     const char *actionLabel;
@@ -89,7 +89,7 @@ class SelectFromEnumPage : public InternalPage {
 public:
     void init(
         AppContext *appContext_,
-        const data::EnumItem *enumDefinition_,
+        const EnumItem *enumDefinition_,
         uint16_t currentValue_,
     	bool (*disabledCallback_)(uint16_t value),
         void (*onSet_)(uint16_t),
@@ -99,7 +99,7 @@ public:
     
     void init(
         AppContext *appContext_,
-        void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value),
+        void (*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value),
         uint16_t currentValue_,
         bool (*disabledCallback_)(uint16_t value),
         void (*onSet_)(uint16_t),
@@ -115,15 +115,15 @@ public:
 
     void selectEnumItem();
 
-    const data::EnumItem *getEnumDefinition() {
+    const EnumItem *getEnumDefinition() {
         return enumDefinition;
     }
 
     AppContext *appContext;
 
 private:
-    const data::EnumItem *enumDefinition;
-    void (*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value);
+    const EnumItem *enumDefinition;
+    void (*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value);
 
     int numItems;
     int numColumns;

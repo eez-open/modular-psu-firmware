@@ -37,7 +37,6 @@
 #endif
 
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
 
@@ -96,33 +95,33 @@ void SysSettingsDateTimePage::edit() {
 
     const char *label = 0;
 
-    data::Value value;
+    Value value;
 
     if (id == DATA_ID_DATE_TIME_YEAR) {
         label = "Year (2016-2036): ";
         options.min = 2017;
         options.max = 2036;
         options.def = 2017;
-        value = data::Value((int)dateTime.year);
+        value = Value((int)dateTime.year);
     } else if (id == DATA_ID_DATE_TIME_MONTH) {
         label = "Month (1-12): ";
         options.min = 1;
         options.max = 12;
         options.def = 1;
-        value = data::Value((int)dateTime.month);
+        value = Value((int)dateTime.month);
     } else if (id == DATA_ID_DATE_TIME_DAY) {
         label = "Day (1-31): ";
         options.min = 1;
         options.max = 31;
         options.def = 1;
-        value = data::Value((int)dateTime.day);
+        value = Value((int)dateTime.day);
     } else if (id == DATA_ID_DATE_TIME_HOUR) {
         if (dateTimeFormat == datetime::FORMAT_DMY_24 || dateTimeFormat == datetime::FORMAT_MDY_24) {
             label = "Hour (0-23): ";
             options.min = 0;
             options.max = 23;
             options.def = 12;
-            value = data::Value((int)dateTime.hour);
+            value = Value((int)dateTime.hour);
         } else {
             label = "Hour (1-12): ";
             options.min = 1;
@@ -133,20 +132,20 @@ void SysSettingsDateTimePage::edit() {
             bool am;
             datetime::convertTime24to12(hour, am);
 
-            value = data::Value(hour);
+            value = Value(hour);
         }
     } else if (id == DATA_ID_DATE_TIME_MINUTE) {
         label = "Minute (0-59): ";
         options.min = 0;
         options.max = 59;
         options.def = 0;
-        value = data::Value((int)dateTime.minute);
+        value = Value((int)dateTime.minute);
     } else if (id == DATA_ID_DATE_TIME_SECOND) {
         label = "Second (0-59): ";
         options.min = 0;
         options.max = 59;
         options.def = 0;
-        value = data::Value((int)dateTime.second);
+        value = Value((int)dateTime.second);
     } else if (id == DATA_ID_DATE_TIME_TIME_ZONE) {
         label = "Time zone: ";
         options.min = -12.00;
@@ -154,7 +153,7 @@ void SysSettingsDateTimePage::edit() {
         options.def = 0;
         options.flags.dotButtonEnabled = true;
         options.flags.signButtonEnabled = true;
-        value = data::Value(timeZone, VALUE_TYPE_TIME_ZONE);
+        value = Value(timeZone, VALUE_TYPE_TIME_ZONE);
     }
 
     if (label) {
@@ -170,7 +169,7 @@ void SysSettingsDateTimePage::onDstRuleSet(uint16_t value) {
 }
 
 void SysSettingsDateTimePage::selectDstRule() {
-    pushSelectFromEnumPage(g_dstRuleEnumDefinition, dstRule, 0, onDstRuleSet);
+    pushSelectFromEnumPage(ENUM_DEFINITION_DST_RULE, dstRule, 0, onDstRuleSet);
 }
 
 void SysSettingsDateTimePage::onDateTimeFormatSet(uint16_t value) {
@@ -180,7 +179,7 @@ void SysSettingsDateTimePage::onDateTimeFormatSet(uint16_t value) {
 }
 
 void SysSettingsDateTimePage::selectFormat() {
-    pushSelectFromEnumPage(g_dateTimeFormatEnumDefinition, dateTimeFormat, 0, onDateTimeFormatSet);
+    pushSelectFromEnumPage(ENUM_DEFINITION_DATE_TIME_FORMAT, dateTimeFormat, 0, onDateTimeFormatSet);
 }
 
 void SysSettingsDateTimePage::toggleAmPm() {
@@ -377,7 +376,7 @@ void SysSettingsEthernetPage::editScpiPort() {
 
     options.enableDefButton();
 
-    NumericKeypad::start(0, data::Value((int)m_scpiPort, VALUE_TYPE_PORT), options, onSetScpiPort, 0, 0);
+    NumericKeypad::start(0, Value((int)m_scpiPort, VALUE_TYPE_PORT), options, onSetScpiPort, 0, 0);
 }
 
 void SysSettingsEthernetPage::onSetMacAddress(char *value) {
@@ -456,7 +455,7 @@ void SysSettingsEthernetStaticPage::onAddressSet(uint32_t address) {
 void SysSettingsEthernetStaticPage::editAddress(uint32_t &address) {
     m_editAddress = &address;
     NumericKeypadOptions options;
-    NumericKeypad::start(0, data::Value((uint32_t)address, VALUE_TYPE_IP_ADDRESS), options, 0, onAddressSet, 0);
+    NumericKeypad::start(0, Value((uint32_t)address, VALUE_TYPE_IP_ADDRESS), options, 0, onAddressSet, 0);
 }
 
 void SysSettingsEthernetStaticPage::editIpAddress() {
@@ -761,7 +760,7 @@ void SysSettingsTriggerPage::onTriggerSourceSet(uint16_t value) {
 }
 
 void SysSettingsTriggerPage::selectSource() {
-    pushSelectFromEnumPage(g_triggerSourceEnumDefinition, m_source, 0, onTriggerSourceSet);
+    pushSelectFromEnumPage(ENUM_DEFINITION_TRIGGER_SOURCE, m_source, 0, onTriggerSourceSet);
 }
 
 void SysSettingsTriggerPage::onDelaySet(float value) {
@@ -840,11 +839,11 @@ void SysSettingsIOPinsPage::onFunctionSet(uint16_t value) {
 void SysSettingsIOPinsPage::selectFunction() {
     pinNumber = getFoundWidgetAtDown().cursor;
     if (pinNumber < DOUT1) {
-        pushSelectFromEnumPage(g_ioPinsInputFunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
+        pushSelectFromEnumPage(ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION, m_function[pinNumber], 0, onFunctionSet);
     } else if (pinNumber == DOUT2) {
-        pushSelectFromEnumPage(g_ioPinsOutput2FunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
+        pushSelectFromEnumPage(ENUM_DEFINITION_IO_PINS_OUTPUT2_FUNCTION, m_function[pinNumber], 0, onFunctionSet);
     } else {
-        pushSelectFromEnumPage(g_ioPinsOutputFunctionEnumDefinition, m_function[pinNumber], 0, onFunctionSet);
+        pushSelectFromEnumPage(ENUM_DEFINITION_IO_PINS_OUTPUT_FUNCTION, m_function[pinNumber], 0, onFunctionSet);
     }
 }
 

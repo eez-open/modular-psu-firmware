@@ -46,7 +46,6 @@
 #include <eez/modules/psu/scpi/psu.h>
 
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/gui/keypad.h>
 
@@ -1005,66 +1004,66 @@ void getStorageInfo(Value& value) {
 
 using namespace file_manager;
 
-void data_file_manager_current_directory(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_current_directory(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getCurrentDirectory();
     }
 }
 
-void data_file_manager_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getState();
     }
 }
 
-void data_file_manager_is_root_directory(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_is_root_directory(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = isRootDirectory() ? 1 : 0;
     }
 }
 
-void data_file_manager_layout(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_layout(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getListViewLayout();
     }
 }
 
-void data_file_manager_files(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
+void data_file_manager_files(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
         value = (int)MAX(getFilesCount(), getFilesPageSize());
-    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_SIZE) {
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
         value = Value(getFilesCount(), VALUE_TYPE_UINT32);
-    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_POSITION) {
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
         value = Value(getFilesStartPosition(), VALUE_TYPE_UINT32);
-    } else if (operation == data::DATA_OPERATION_YT_DATA_SET_POSITION) {
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
         setFilesStartPosition(value.getUInt32());
-    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT) {
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT) {
         value = Value(getFilesPositionIncrement(), VALUE_TYPE_UINT32);
-    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
         value = Value(getFilesPageSize(), VALUE_TYPE_UINT32);
     }
 }
 
-void data_file_manager_is_directory(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_is_directory(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = isDirectory(cursor) ? 1 : 0;
     }
 }
 
-void data_file_manager_file_type(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_file_type(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getFileType(cursor);
     }
 }
 
-void data_file_manager_file_icon(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_file_icon(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getFileIcon(cursor);
     }
 }
 
-void data_file_manager_file_name(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_file_name(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
             value = Value(getFileName(cursor), VALUE_TYPE_STR, STRING_OPTIONS_FILE_ELLIPSIS);
@@ -1072,8 +1071,8 @@ void data_file_manager_file_name(data::DataOperationEnum operation, data::Cursor
     }
 }
 
-void data_file_manager_file_has_description(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_file_has_description(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
             value = strlen(getFileDescription(cursor)) > 0;
@@ -1081,8 +1080,8 @@ void data_file_manager_file_has_description(data::DataOperationEnum operation, d
     }
 }
 
-void data_file_manager_file_description(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_file_description(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
             value = getFileDescription(cursor);
@@ -1090,8 +1089,8 @@ void data_file_manager_file_description(data::DataOperationEnum operation, data:
     }
 }
 
-void data_file_manager_file_size(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_file_size(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto fileType = getFileType(cursor);
         if (fileType == FILE_TYPE_DIRECTORY) {
             value = "<dir>";
@@ -1101,8 +1100,8 @@ void data_file_manager_file_size(data::DataOperationEnum operation, data::Cursor
     }
 }
 
-void data_file_manager_file_date_time(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_file_date_time(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
             value = Value(getFileDataTime(cursor), VALUE_TYPE_FILE_DATE_TIME);
@@ -1110,89 +1109,89 @@ void data_file_manager_file_date_time(data::DataOperationEnum operation, data::C
     }
 }
 
-void data_file_manager_file_selected(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_file_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = isFileSelected(cursor);
     }
 }
 
 
-void data_file_manager_open_file_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_open_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = isOpenFileEnabled();
     }
 }
 
-void data_file_manager_upload_file_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_upload_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = isUploadFileEnabled();
     }
 }
 
-void data_file_manager_rename_file_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_rename_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = isRenameFileEnabled();
     }
 }
 
-void data_file_manager_delete_file_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_delete_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = isDeleteFileEnabled();
     }
 }
 
-void data_file_manager_opened_image(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET_BITMAP_IMAGE) {
+void data_file_manager_opened_image(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET_BITMAP_IMAGE) {
         if (g_openedImage.pixels) {
             value = Value(&g_openedImage, VALUE_TYPE_POINTER);
         }
     }
 }
 
-void data_file_manager_browser_title(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_browser_title(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = g_fileBrowserTitle;
     }
 }
 
-void data_file_manager_browser_is_save_dialog(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_browser_is_save_dialog(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = isSaveDialog();
     }
 }
 
-void data_file_manager_storage_alarm(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_storage_alarm(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = isStorageAlarm();
     }
 }
 
-void data_file_manager_storage_info(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_storage_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         getStorageInfo(value);
     }
 }
 
-void data_file_manager_is_list_view_option_available(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_is_list_view_option_available(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = isListViewOptionAvailable();
     }
 }
 
-void data_file_manager_list_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_list_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getListViewOption();
     }
 }
 
-void data_file_manager_sort_files_option(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_sort_files_option(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getSortFilesOption();
     }
 }
 
-void data_file_manager_image_open_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_image_open_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         if (g_openedImage.pixels) {
             value = 1;
         } else if (g_imageLoadFailed) {
@@ -1203,8 +1202,8 @@ void data_file_manager_image_open_state(data::DataOperationEnum operation, data:
     }
 }
 
-void data_file_manager_image_open_progress(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_file_manager_image_open_progress(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int progress = ((millis() / 40) * 40 - g_imageLoadStartTime) / 5;
         if (progress > 140) {
             progress = 95 + (progress - 140) / 100;
@@ -1256,7 +1255,7 @@ void onSetFileManagerSortBy(uint16_t value) {
 }
 
 void action_file_manager_sort_by() {
-    pushSelectFromEnumPage(g_fileManagerSortByEnumDefinition, getSortFilesOption(), NULL, onSetFileManagerSortBy, true);
+    pushSelectFromEnumPage(ENUM_DEFINITION_FILE_MANAGER_SORT_BY, getSortFilesOption(), NULL, onSetFileManagerSortBy, true);
 }
 
 void action_file_manager_new_file() {

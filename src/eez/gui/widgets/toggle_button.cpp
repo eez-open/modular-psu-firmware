@@ -31,7 +31,7 @@ void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.enabled =
-        data::get(widgetCursor.cursor, widget->data).getInt() ? 1 : 0;
+        get(widgetCursor.cursor, widget->data).getInt() ? 1 : 0;
 
     bool refresh =
         !widgetCursor.previousState ||

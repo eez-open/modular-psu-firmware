@@ -47,7 +47,7 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
     const ListWidget *listWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ListWidget *);
 
-    int startPosition = data::ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+    int startPosition = ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 
     const Widget *childWidget = GET_WIDGET_PROPERTY(listWidget, itemWidget, const Widget *);
     widgetCursor.widget = childWidget;
@@ -56,12 +56,12 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedY = widgetCursor.y;
 
     int offset = 0;
-    int count = data::count(parentWidget->data);
+    int count = eez::gui::count(parentWidget->data);
 
     Value oldValue;
 
     for (int index = startPosition; index < count; ++index) {
-        data::select(widgetCursor.cursor, parentWidget->data, index, oldValue);
+        select(widgetCursor.cursor, parentWidget->data, index, oldValue);
 
         if (listWidget->listType == LIST_TYPE_VERTICAL) {
             if (offset < parentWidget->h) {
@@ -103,7 +103,7 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     }
 
     if (count > 0) {
-        data::deselect(widgetCursor.cursor, widgetCursor.widget->data, oldValue);
+        deselect(widgetCursor.cursor, widgetCursor.widget->data, oldValue);
     }
 
 	widgetCursor.currentState = savedCurrentState;

@@ -30,10 +30,10 @@ void exit();
 bool isInteractiveMode();
 void toggleInteractiveMode();
 
-const eez::gui::data::Value &getEditValue();
-eez::gui::data::Value getCurrentValue();
-const eez::gui::data::Value &getMin();
-const eez::gui::data::Value &getMax();
+const Value &getEditValue();
+Value getCurrentValue();
+const Value &getMin();
+const Value &getMax();
 Unit getUnit();
 bool setValue(float value);
 
@@ -50,7 +50,7 @@ class NumericKeypad;
 
 namespace edit_mode_keypad {
 
-void enter(int channelIndex, const eez::gui::data::Value &editValue, bool allowZero, const eez::gui::data::Value &minValue, eez::gui::data::Value &maxValue);
+void enter(int channelIndex, const Value &editValue, bool allowZero, const Value &minValue, Value &maxValue);
 void exit();
 
 extern NumericKeypad *g_keypad;
@@ -65,7 +65,7 @@ namespace edit_mode_step {
 
 int getStepIndex();
 
-void getStepValues(eez::gui::data::StepValues &stepValues);
+void getStepValues(StepValues &stepValues);
 
 void setStepIndex(int value);
 
@@ -79,7 +79,7 @@ void onTouchUp();
 
 void switchToNextStepIndex();
 
-eez::gui::data::Value getCurrentEncoderStepValue();
+Value getCurrentEncoderStepValue();
 void showCurrentEncoderMode();
 
 } // namespace edit_mode_step

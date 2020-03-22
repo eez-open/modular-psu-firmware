@@ -31,7 +31,7 @@ void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->data =
-        widget->data ? data::get(widgetCursor.cursor, widget->data) : 0;
+        widget->data ? get(widgetCursor.cursor, widget->data) : 0;
 
     bool refresh =
         !widgetCursor.previousState ||

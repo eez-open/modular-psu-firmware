@@ -33,7 +33,7 @@ struct ListGraphWidget {
 
 struct ListGraphWidgetState {
     WidgetState genericState;
-    data::Value cursorData;
+    Value cursorData;
 };
 
 void ListGraphWidget_draw(const WidgetCursor &widgetCursor);

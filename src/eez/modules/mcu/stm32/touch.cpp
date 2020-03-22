@@ -157,26 +157,26 @@ namespace gui {
 
 using namespace mcu::touch;
 
-void data_touch_raw_x(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_touch_raw_x(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = (int)g_lastXData;
     }
 }
 
-void data_touch_raw_y(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_touch_raw_y(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = (int)g_lastYData;
     }
 }
 
-void data_touch_raw_z1(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_touch_raw_z1(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = (int)g_lastZ1Data;
     }
 }
 
-void data_touch_raw_pressed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_touch_raw_pressed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = g_state == STATE_PRESSED;
     }
 }

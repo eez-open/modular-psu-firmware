@@ -27,7 +27,7 @@ struct ButtonGroupWidget {
 
 struct ButtonGroupWidgetState {
     WidgetState genericState;
-    const data::Value *labels;
+    const Value *labels;
 };
 
 void ButtonGroupWidget_draw(const WidgetCursor &widgetCursor);

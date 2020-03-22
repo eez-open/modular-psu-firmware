@@ -30,7 +30,6 @@
 #include <eez/modules/psu/channel_dispatcher.h>
 
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/keypad.h>
 
@@ -127,10 +126,10 @@ void Keypad::init(AppContext *appContext, const char *label_) {
     m_lastCursorChangeTime = micros();
 }
 
-data::Value Keypad::getKeypadTextValue() {
+Value Keypad::getKeypadTextValue() {
     char *text = &m_stateText[getCurrentStateBufferIndex()][0];
     getKeypadText(text);
-    return data::Value(text);
+    return Value(text);
 }
 
 void Keypad::getKeypadText(char *text) {
@@ -339,9 +338,9 @@ void NumericKeypadOptions::defOption() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void NumericKeypad::init(
-    eez::gui::AppContext *appContext,
+    AppContext *appContext,
     const char *label,
-    const eez::gui::data::Value &value,
+    const Value &value,
     NumericKeypadOptions &options,
     void(*okFloat)(float),
     void(*okUint32)(uint32_t),
@@ -389,7 +388,7 @@ void NumericKeypad::init(
 NumericKeypad *NumericKeypad::start(
     AppContext *appContext,
     const char *label,
-    const data::Value &value,
+    const Value &value,
     NumericKeypadOptions &options,
     void (*okFloat)(float),
     void (*okUint32)(uint32_t),
@@ -402,7 +401,7 @@ NumericKeypad *NumericKeypad::start(
 
 NumericKeypad *NumericKeypad::start(
     const char *label,
-    const data::Value &value,
+    const Value &value,
     NumericKeypadOptions &options,
     void (*okFloat)(float),
     void (*okUint32)(uint32_t), 
@@ -996,7 +995,7 @@ void NumericKeypad::onEncoder(int counter) {
                 newValue = (int)m_options.max;
             }
 
-            m_startValue = data::Value(newValue);
+            m_startValue = Value(newValue);
             return;
         }
     }

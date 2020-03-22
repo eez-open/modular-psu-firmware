@@ -41,9 +41,9 @@ struct BarGraphWidgetState {
     uint16_t backgroundColor;
     uint16_t activeColor;
     uint16_t activeBackgroundColor;
-    data::Value line1Data;
-    data::Value line2Data;
-    data::Value textData;
+    Value line1Data;
+    Value line2Data;
+    Value textData;
     uint32_t textDataRefreshLastTime;
 };
 

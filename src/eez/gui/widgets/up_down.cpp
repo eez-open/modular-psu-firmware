@@ -41,7 +41,7 @@ void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
     const UpDownWidget *upDownWidget = GET_WIDGET_PROPERTY(widget, specific, const UpDownWidget *);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
-    widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
     widgetCursor.currentState->flags.active = g_selectedWidget == widgetCursor;
 
     bool refresh =
@@ -81,7 +81,7 @@ void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment) {
 
     const Widget *widget = widgetCursor.widget;
 
-    int value = data::get(widgetCursor.cursor, widget->data).getInt();
+    int value = get(widgetCursor.cursor, widget->data).getInt();
 
     int newValue = value;
 
@@ -91,18 +91,18 @@ void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment) {
         ++newValue;
     }
 
-    int min = data::getMin(widgetCursor.cursor, widget->data).getInt();
+    int min = getMin(widgetCursor.cursor, widget->data).getInt();
     if (newValue < min) {
         newValue = min;
     }
 
-    int max = data::getMax(widgetCursor.cursor, widget->data).getInt();
+    int max = getMax(widgetCursor.cursor, widget->data).getInt();
     if (newValue > max) {
         newValue = max;
     }
 
     if (newValue != value) {
-        data::set(widgetCursor.cursor, widget->data, newValue);
+        set(widgetCursor.cursor, widget->data, newValue);
     }
 }
 

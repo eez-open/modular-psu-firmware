@@ -31,7 +31,7 @@ void ProgressWidget_draw(const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(WidgetState);
 
-    widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
 
     bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != widgetCursor.currentState->data;
 

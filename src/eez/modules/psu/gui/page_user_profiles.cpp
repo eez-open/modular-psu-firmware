@@ -27,7 +27,6 @@
 
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/keypad.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
 #include <eez/modules/psu/gui/file_manager.h>
 

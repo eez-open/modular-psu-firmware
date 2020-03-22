@@ -61,7 +61,6 @@
 
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/calibration.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/gui/keypad.h>
@@ -69,9 +68,6 @@
 #include <eez/modules/psu/gui/page_sys_settings.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
 
-using namespace eez::gui;
-using namespace eez::gui::data;
-using data::EnumItem;
 using namespace eez::psu;
 using namespace eez::psu::gui;
 
@@ -81,51 +77,28 @@ extern bool g_isResetByIWDG;
 
 namespace eez {
 namespace gui {
-namespace data {
 
+#define ENUM_DEFINITION(NAME) g_enumDefinition_##NAME,
 const EnumItem *g_enumDefinitions[] = { 
-    g_channelDisplayValueEnumDefinition,
-    g_channelTriggerModeEnumDefinition,
-    g_triggerSourceEnumDefinition,
-    g_channelCurrentRangeSelectionModeEnumDefinition,
-    g_channelCurrentRangeEnumDefinition,
-    g_channelTriggerOnListStopEnumDefinition,
-    g_ioPinsPolarityEnumDefinition,
-    g_ioPinsInputFunctionEnumDefinition,
-    g_ioPinsOutputFunctionEnumDefinition,
-    g_ioPinsOutput2FunctionEnumDefinition,
-    g_dstRuleEnumDefinition,
-    g_dateTimeFormatEnumDefinition,
-    g_userSwitchActionEnumDefinition,
-    g_fileManagerSortByEnumDefinition,
-    g_eventQueueFilterEnumDefinition,
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    g_moduleTypeEnumDefinition,
-#endif
+	ENUM_DEFINITIONS
 };
+#undef ENUM_DEFINITION
 
-} // namespace data
-} // namespace gui
-} // namespace eez
-
-namespace eez {
-namespace gui {
-
-EnumItem g_channelDisplayValueEnumDefinition[] = {
+EnumItem g_enumDefinition_CHANNEL_DISPLAY_VALUE[] = {
     { DISPLAY_VALUE_VOLTAGE, "Voltage (V)" },
     { DISPLAY_VALUE_CURRENT, "Current (A)" },
     { DISPLAY_VALUE_POWER, "Power (W)" },
     { 0, 0 }
 };
 
-EnumItem g_channelTriggerModeEnumDefinition[] = {
+EnumItem g_enumDefinition_CHANNEL_TRIGGER_MODE[] = {
     { TRIGGER_MODE_FIXED, "Fixed" },
     { TRIGGER_MODE_LIST, "List" },
     { TRIGGER_MODE_STEP, "Step" },
     { 0, 0 } 
 };
 
-EnumItem g_triggerSourceEnumDefinition[] = {
+EnumItem g_enumDefinition_TRIGGER_SOURCE[] = {
     { trigger::SOURCE_BUS, "Bus" },
     { trigger::SOURCE_IMMEDIATE, "Immediate" },
     { trigger::SOURCE_MANUAL, "Manual" },
@@ -134,20 +107,20 @@ EnumItem g_triggerSourceEnumDefinition[] = {
     { 0, 0 }
 };
 
-EnumItem g_channelCurrentRangeSelectionModeEnumDefinition[] = {
+EnumItem g_enumDefinition_CHANNEL_CURRENT_RANGE_SELECTION_MODE[] = {
     { CURRENT_RANGE_SELECTION_USE_BOTH, "Best" },
     { CURRENT_RANGE_SELECTION_ALWAYS_HIGH, "High (5A)" },
     { CURRENT_RANGE_SELECTION_ALWAYS_LOW, "Low (50mA)" },
     { 0, 0 }
 };
 
-EnumItem g_channelCurrentRangeEnumDefinition[] = {
+EnumItem g_enumDefinition_CHANNEL_CURRENT_RANGE[] = {
     { CURRENT_RANGE_HIGH, "High" },
     { CURRENT_RANGE_LOW, "Low" },
     { 0, 0 }
 };
 
-EnumItem g_channelTriggerOnListStopEnumDefinition[] = {
+EnumItem g_enumDefinition_CHANNEL_TRIGGER_ON_LIST_STOP[] = {
     { TRIGGER_ON_LIST_STOP_OUTPUT_OFF, "Output OFF" },
     { TRIGGER_ON_LIST_STOP_SET_TO_FIRST_STEP, "Set to first step" },
     { TRIGGER_ON_LIST_STOP_SET_TO_LAST_STEP, "Set to last step" },
@@ -155,13 +128,13 @@ EnumItem g_channelTriggerOnListStopEnumDefinition[] = {
     { 0, 0 }
 };
 
-EnumItem g_ioPinsPolarityEnumDefinition[] = {
+EnumItem g_enumDefinition_IO_PINS_POLARITY[] = {
     { io_pins::POLARITY_NEGATIVE, "Negative" },
     { io_pins::POLARITY_POSITIVE, "Positive" },
     { 0, 0 }
 };
 
-EnumItem g_ioPinsInputFunctionEnumDefinition[] = {
+EnumItem g_enumDefinition_IO_PINS_INPUT_FUNCTION[] = {
     { io_pins::FUNCTION_NONE, "None" },
     { io_pins::FUNCTION_INPUT, "Input" },
     { io_pins::FUNCTION_INHIBIT, "Inhibit" },
@@ -169,7 +142,7 @@ EnumItem g_ioPinsInputFunctionEnumDefinition[] = {
     { 0, 0 }
 };
 
-EnumItem g_ioPinsOutputFunctionEnumDefinition[] = {
+EnumItem g_enumDefinition_IO_PINS_OUTPUT_FUNCTION[] = {
     { io_pins::FUNCTION_NONE, "None" },
     { io_pins::FUNCTION_OUTPUT, "Output" },
     { io_pins::FUNCTION_FAULT, "Fault" },
@@ -178,7 +151,7 @@ EnumItem g_ioPinsOutputFunctionEnumDefinition[] = {
     { 0, 0 }
 };
 
-EnumItem g_ioPinsOutput2FunctionEnumDefinition[] = {
+EnumItem g_enumDefinition_IO_PINS_OUTPUT2_FUNCTION[] = {
     { io_pins::FUNCTION_NONE, "None" },
     { io_pins::FUNCTION_OUTPUT, "Output" },
     { io_pins::FUNCTION_FAULT, "Fault" },
@@ -188,7 +161,7 @@ EnumItem g_ioPinsOutput2FunctionEnumDefinition[] = {
     { 0, 0 }
 };
 
-EnumItem g_dstRuleEnumDefinition[] = {
+EnumItem g_enumDefinition_DST_RULE[] = {
     { datetime::DST_RULE_OFF, "Off" },
     { datetime::DST_RULE_EUROPE, "Europe" },
     { datetime::DST_RULE_USA, "USA" },
@@ -196,7 +169,7 @@ EnumItem g_dstRuleEnumDefinition[] = {
     { 0, 0 }
 };
 
-EnumItem g_dateTimeFormatEnumDefinition[] = {
+EnumItem g_enumDefinition_DATE_TIME_FORMAT[] = {
     { datetime::FORMAT_DMY_24, "DD-MM-YY 24H" },
     { datetime::FORMAT_MDY_24, "MM-DD-YY 24H" },
     { datetime::FORMAT_DMY_12, "DD-MM-YY 12H" },
@@ -204,7 +177,7 @@ EnumItem g_dateTimeFormatEnumDefinition[] = {
     { 0, 0 }
 };
 
-EnumItem g_userSwitchActionEnumDefinition[] = {
+EnumItem g_enumDefinition_USER_SWITCH_ACTION[] = {
 	{ persist_conf::USER_SWITCH_ACTION_NONE, "None" },
     { persist_conf::USER_SWITCH_ACTION_ENCODER_STEP, "Encoder Step" },
     { persist_conf::USER_SWITCH_ACTION_SCREENSHOT, "Screenshot" },
@@ -216,7 +189,7 @@ EnumItem g_userSwitchActionEnumDefinition[] = {
     { 0, 0 }
 };
 
-EnumItem g_fileManagerSortByEnumDefinition[] = {
+EnumItem g_enumDefinition_FILE_MANAGER_SORT_BY[] = {
 	{ SORT_FILES_BY_NAME_ASC,  "\xaa Name" },
     { SORT_FILES_BY_NAME_DESC, "\xab Name" },
     { SORT_FILES_BY_SIZE_ASC,  "\xac Size" },
@@ -226,7 +199,7 @@ EnumItem g_fileManagerSortByEnumDefinition[] = {
     { 0, 0 }
 };
 
-EnumItem g_eventQueueFilterEnumDefinition[] = {
+EnumItem g_enumDefinition_QUEUE_FILTER[] = {
 	{ event_queue::EVENT_TYPE_DEBUG, "Debug" },
     { event_queue::EVENT_TYPE_INFO, "Info" },
     { event_queue::EVENT_TYPE_WARNING, "Warning" },
@@ -234,15 +207,13 @@ EnumItem g_eventQueueFilterEnumDefinition[] = {
     { 0, 0 }
 };
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
-EnumItem g_moduleTypeEnumDefinition[] = {
+EnumItem g_enumDefinition_MODULE_TYPE[] = {
     { MODULE_TYPE_NONE, "None" },
     { MODULE_TYPE_DCP405, "DCP405" },
     { MODULE_TYPE_DCP405B, "DCP405B" },
     { MODULE_TYPE_DCM220, "DCM220" },
     { 0, 0 }
 };
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -370,8 +341,6 @@ void printTime(uint32_t time, char *text, int count) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-namespace data {
 
 bool compare_LESS_THEN_MIN_FLOAT_value(const Value &a, const Value &b) {
     return a.getUnit() == b.getUnit() && a.getFloat() == b.getFloat();
@@ -941,11 +910,6 @@ void CHANNEL_INFO_SERIAL_value_to_text(const Value &value, char *text, int count
     channel.getSerial(text);
 }
 
-} // namespace data
-
-
-using namespace eez::psu;
-
 static Cursor g_editValueCursor(-1);
 static int16_t g_editValueDataId;
 
@@ -1020,12 +984,12 @@ void editValue(int16_t dataId) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void data_none(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_none(DataOperationEnum operation, Cursor cursor, Value &value) {
     value = Value();
 }
 
-void data_edit_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_edit_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
 
@@ -1039,19 +1003,19 @@ void data_edit_enabled(data::DataOperationEnum operation, data::Cursor cursor, d
     }
 }
 
-void data_channels(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
+void data_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
         value = CH_NUM;
-    } else if (operation == data::DATA_OPERATION_SELECT) {
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_SELECT) {
+        value = Value(g_channel, VALUE_TYPE_POINTER);
         selectChannel(&Channel::get(cursor));
-    } else if (operation == data::DATA_OPERATION_DESELECT) {
+    } else if (operation == DATA_OPERATION_DESELECT) {
         selectChannel((Channel * )value.getVoidPointer());
     }
 }
 
-void data_channel_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         int channelStatus = channel.isInstalled() ? (channel.isOk() ? 1 : 2) : 0;
@@ -1059,98 +1023,98 @@ void data_channel_status(data::DataOperationEnum operation, data::Cursor cursor,
     }
 }
 
-void data_channel_output_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_output_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = channel.isOutputEnabled();
     }
 }
 
-void data_channel_is_cc(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_is_cc(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = channel.getMode() == CHANNEL_MODE_CC;
     }
 }
 
-void data_channel_is_cv(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_is_cv(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = channel.getMode() == CHANNEL_MODE_CV;
     }
 }
 
-void data_channel_u_set(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_u_set(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
     } else {
         data_channel_u_edit(operation, cursor, value);
     }
 }
 
-void data_channel_u_mon(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_u_mon(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMon(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(0, UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
+    } else if (operation == DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
             value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
         if (io_pins::isInhibited()) {
             value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
+    } else if (operation == DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;
-    } else if (operation == data::DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+    } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
         value = Value(channel.params.MON_REFRESH_RATE_MS, VALUE_TYPE_UINT32);
     }
 }
 
-void data_channel_u_mon_dac(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_u_mon_dac(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMonDac(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     }
 }
 
-void data_channel_u_limit(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_u_limit(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
     }
 }
 
-void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
@@ -1159,21 +1123,21 @@ void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor cursor,
         } else {
             value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
         }
-    } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
+    } else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
         value = MakeValue(channel_dispatcher::getUSetUnbalanced(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
+    } else if (operation == DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "Voltage";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         if (!between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
         } else if (value.getFloat() > channel_dispatcher::getULimit(channel)) {
@@ -1186,74 +1150,74 @@ void data_channel_u_edit(data::DataOperationEnum operation, data::Cursor cursor,
     }
 }
 
-void data_channel_i_set(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_i_set(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER);
     } else {
         data_channel_i_edit(operation, cursor, value);
     }
 }
 
-void data_channel_i_mon(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_i_mon(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMon(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(0, UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
+    } else if (operation == DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
             value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
         if (io_pins::isInhibited()) {
             value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
+    } else if (operation == DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;
-    } else if (operation == data::DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+    } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
         value = Value(channel.params.MON_REFRESH_RATE_MS, VALUE_TYPE_UINT32);
     }
 }
 
-void data_channel_i_mon_dac(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_i_mon_dac(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMonDac(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } 
 }
 
-void data_channel_i_limit(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_i_limit(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
     }
 }
 
-void data_channel_i_edit(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_I_EDIT;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
@@ -1262,21 +1226,21 @@ void data_channel_i_edit(data::DataOperationEnum operation, data::Cursor cursor,
         } else {
             value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER);
         }
-    } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
+    } else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
         value = MakeValue(channel_dispatcher::getISetUnbalanced(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
+    } else if (operation == DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "Current";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_AMPER;
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         if (!between(value.getFloat(), channel_dispatcher::getIMin(channel), channel_dispatcher::getIMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
         } else if (value.getFloat() > channel_dispatcher::getILimit(channel)) {
@@ -1289,42 +1253,42 @@ void data_channel_i_edit(data::DataOperationEnum operation, data::Cursor cursor,
     }
 }
 
-void data_channel_p_mon(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_p_mon(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMon(channel) * channel_dispatcher::getIMon(channel), UNIT_WATT);
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(0, UNIT_WATT);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getPowerMaxLimit(channel), UNIT_WATT);
-    } else if (operation == data::DATA_OPERATION_GET_LIMIT) {
+    } else if (operation == DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
-    } else if (operation == data::DATA_OPERATION_GET_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_GET_BACKGROUND_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logPower[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
             value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
         if (io_pins::isInhibited()) {
             value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
+    } else if (operation == DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;
-    } else if (operation == data::DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+    } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
         value = Value(channel.params.MON_REFRESH_RATE_MS, VALUE_TYPE_UINT32);
     }
 }
 
-void data_channel_other_value_mon(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_other_value_mon(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (g_focusDataId == DATA_ID_CHANNEL_U_EDIT) {
         data_channel_i_mon(operation, cursor, value);
     } else if (g_focusDataId == DATA_ID_CHANNEL_I_EDIT) {
@@ -1332,26 +1296,26 @@ void data_channel_other_value_mon(data::DataOperationEnum operation, data::Curso
     }
 }
 
-void data_channels_is_max_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channels_is_max_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = (int)persist_conf::isMaxChannelView();
     }
 }
 
-void data_channels_view_mode(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channels_view_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = (int)persist_conf::devConf.channelsViewMode;
     }
 }
 
-void data_channels_view_mode_in_default(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channels_view_mode_in_default(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = (int)persist_conf::devConf.channelsViewMode;
     }
 }
 
-void data_channels_view_mode_in_max(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channels_view_mode_in_max(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = (int)persist_conf::devConf.channelsViewModeInMax;
     }
 }
@@ -1400,86 +1364,86 @@ int getDefaultView(int channelIndex) {
     }
 }
 
-void data_slot1_channel_index(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+void data_slot1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::getBySlotIndex(0);
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        value = Value(g_channel, VALUE_TYPE_POINTER);
         selectChannel(&channel);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT_CURSOR) {
+    } else if (operation == DATA_OPERATION_GET_CONTEXT) {
+        value = Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
         Channel &channel = Channel::getBySlotIndex(0);
         value = channel.channelIndex;
-    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+    } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
         selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
-void data_slot2_channel_index(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+void data_slot2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::getBySlotIndex(1);
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        value = Value(g_channel, VALUE_TYPE_POINTER);
         selectChannel(&channel);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT_CURSOR) {
+    } else if (operation == DATA_OPERATION_GET_CONTEXT) {
+        value = Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
         Channel &channel = Channel::getBySlotIndex(1);
         value = channel.channelIndex;
-    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+    } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
         selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
-void data_slot3_channel_index(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+void data_slot3_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::getBySlotIndex(2);
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        value = Value(g_channel, VALUE_TYPE_POINTER);
         selectChannel(&channel);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT_CURSOR) {
+    } else if (operation == DATA_OPERATION_GET_CONTEXT) {
+        value = Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
         Channel &channel = Channel::getBySlotIndex(2);
         value = channel.channelIndex;
-    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+    } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
         selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
-void data_slot_default1_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_default1_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getDefaultView(cursor);
     }
 }
 
-void data_slot_default2_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_default2_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getDefaultView(cursor);
     }
 }
 
-void data_slot_default3_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_default3_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getDefaultView(cursor);
     }
 }
 
-void data_slot_max_channel_index(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+void data_slot_max_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::get(persist_conf::getMaxChannelIndex());
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        value = Value(g_channel, VALUE_TYPE_POINTER);
         selectChannel(&channel);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT_CURSOR) {
+    } else if (operation == DATA_OPERATION_GET_CONTEXT) {
+        value = Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
         Channel &channel = Channel::get(persist_conf::getMaxChannelIndex());
         value = channel.channelIndex;
-    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+    } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
         selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
-void data_slot_max_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_max_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
         if (channel.isInstalled()) {
             if (channel.isOk()) {
@@ -1534,46 +1498,46 @@ int getMinView(int channelIndex) {
     }
 }
 
-void data_slot_min1_channel_index(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+void data_slot_min1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::get(persist_conf::getMin1ChannelIndex());
         cursor = channel.channelIndex;
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        value = Value(g_channel, VALUE_TYPE_POINTER);
         selectChannel(&channel);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT_CURSOR) {
+    } else if (operation == DATA_OPERATION_GET_CONTEXT) {
+        value = Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
         Channel &channel = Channel::get(persist_conf::getMin1ChannelIndex());
         value = channel.channelIndex;
-    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+    } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
         selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
-void data_slot_min1_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_min1_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getMinView(cursor);
     }
 }
 
-void data_slot_min2_channel_index(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+void data_slot_min2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::get(persist_conf::getMin2ChannelIndex());
         cursor = channel.channelIndex;
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        value = Value(g_channel, VALUE_TYPE_POINTER);
         selectChannel(&channel);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT_CURSOR) {
+    } else if (operation == DATA_OPERATION_GET_CONTEXT) {
+        value = Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
         Channel &channel = Channel::get(persist_conf::getMin2ChannelIndex());
         value = channel.channelIndex;
-    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+    } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
         selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
-void data_slot_min2_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_min2_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getMinView(cursor);
     }
 }
@@ -1604,64 +1568,64 @@ int getMicroView(int channelIndex) {
     }
 }
 
-void data_slot_micro1_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_micro1_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getMicroView(cursor);
     }
 }
 
-void data_slot_micro2_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_micro2_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getMicroView(cursor);
     }
 }
 
-void data_slot_micro3_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_micro3_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getMicroView(cursor);
     }
 }
 
-void data_slot_2ch_ch1_index(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+void data_slot_2ch_ch1_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_SET_CONTEXT) {
         Channel &channel = Channel::get(cursor);
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        value = Value(g_channel, VALUE_TYPE_POINTER);
         selectChannel(&channel);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT_CURSOR) {
+    } else if (operation == DATA_OPERATION_GET_CONTEXT) {
+        value = Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
         value = cursor;
-    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+    } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
         selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
-void data_slot_2ch_ch2_index(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_SET_CONTEXT) {
+void data_slot_2ch_ch2_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_SET_CONTEXT) {
         if (cursor == persist_conf::getMaxChannelIndex() && Channel::get(cursor).subchannelIndex == 1) {
             cursor = cursor - 1;
         } else {
             cursor = cursor + 1;
         }
         Channel &channel = Channel::get(cursor);
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
+        value = Value(g_channel, VALUE_TYPE_POINTER);
         selectChannel(&channel);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT) {
-        value = data::Value(g_channel, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_GET_CONTEXT_CURSOR) {
+    } else if (operation == DATA_OPERATION_GET_CONTEXT) {
+        value = Value(g_channel, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
         if (cursor == persist_conf::getMaxChannelIndex() && Channel::get(cursor).subchannelIndex == 1) {
             cursor = cursor - 1;
         } else {
             cursor = cursor + 1;
         }
         value = cursor;
-    } else if (operation == data::DATA_OPERATION_RESTORE_CONTEXT) {
+    } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
         selectChannel((Channel *)value.getVoidPointer());
     }
 }
 
-void data_slot_def_2ch_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
         int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
         value = channel.isOutputEnabled() ? 
@@ -1670,8 +1634,8 @@ void data_slot_def_2ch_view(data::DataOperationEnum operation, data::Cursor curs
     }
 }
 
-void data_slot_max_2ch_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_max_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
 
         if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
@@ -1684,29 +1648,29 @@ void data_slot_max_2ch_view(data::DataOperationEnum operation, data::Cursor curs
     }
 }
 
-void data_slot_max_2ch_min_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_max_2ch_min_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
         value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_2CH_MIN_ON : PAGE_ID_SLOT_MAX_2CH_MIN_OFF;
     }
 }
 
 
-void data_slot_min_2ch_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_min_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
         value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MIN_2CH_ON : PAGE_ID_SLOT_MIN_2CH_OFF;
     }
 }
 
-void data_slot_micro_2ch_view(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot_micro_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
         value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MICRO_2CH_ON : PAGE_ID_SLOT_MICRO_2CH_OFF;
     }
 }
 
-void data_channel_display_value1(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_display_value1(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
@@ -1718,7 +1682,7 @@ void data_channel_display_value1(data::DataOperationEnum operation, data::Cursor
     }
 }
 
-void data_channel_display_value2(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_display_value2(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
@@ -1730,10 +1694,10 @@ void data_channel_display_value2(data::DataOperationEnum operation, data::Cursor
     }
 }
 
-void data_ovp(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ovp(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         if (!channel.prot_conf.flags.u_state) {
             value = 0;
         } else if (!channel_dispatcher::isOvpTripped(channel)) {
@@ -1744,10 +1708,10 @@ void data_ovp(data::DataOperationEnum operation, data::Cursor cursor, data::Valu
     }
 }
 
-void data_ocp(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ocp(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         if (!channel.prot_conf.flags.i_state) {
             value = 0;
         } else if (!channel_dispatcher::isOcpTripped(channel)) {
@@ -1758,10 +1722,10 @@ void data_ocp(data::DataOperationEnum operation, data::Cursor cursor, data::Valu
     }
 }
 
-void data_opp(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_opp(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         if (!channel.prot_conf.flags.p_state) {
             value = 0;
         } else if (!channel_dispatcher::isOppTripped(channel)) {
@@ -1772,10 +1736,10 @@ void data_opp(data::DataOperationEnum operation, data::Cursor cursor, data::Valu
     }
 }
 
-void data_otp_ch(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_otp_ch(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::CH1 + iChannel];
         if (!tempSensor.isInstalled() || !tempSensor.isTestOK() || !tempSensor.prot_conf.state) {
             value = 0;
@@ -1787,8 +1751,8 @@ void data_otp_ch(data::DataOperationEnum operation, data::Cursor cursor, data::V
     }
 }
 
-void data_otp_aux(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_otp_aux(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::AUX];
         if (!tempSensor.prot_conf.state) {
             value = 0;
@@ -1800,20 +1764,20 @@ void data_otp_aux(data::DataOperationEnum operation, data::Cursor cursor, data::
     }
 }
 
-void data_edit_value(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_edit_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = edit_mode::getEditValue();
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = edit_mode::getMin();
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = edit_mode::getMax();
-    } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
+    } else if (operation == DATA_OPERATION_IS_BLINKING) {
         value = !edit_mode::isInteractiveMode() && (edit_mode::getEditValue() != edit_mode::getCurrentValue());
     }
 }
 
-void data_edit_unit(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_edit_unit(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Keypad *keypad = getActiveKeypad();
         if (keypad) {
             value = getUnitName(keypad->getSwitchToUnit());
@@ -1821,36 +1785,36 @@ void data_edit_unit(data::DataOperationEnum operation, data::Cursor cursor, data
     }
 }
 
-void data_edit_info(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(0, VALUE_TYPE_EDIT_INFO);
+void data_edit_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(0, VALUE_TYPE_EDIT_INFO);
     }
 }
 
-void data_edit_mode_interactive_mode_selector(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_edit_mode_interactive_mode_selector(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = edit_mode::isInteractiveMode() ? 0 : 1;
     }
 }
 
-void data_edit_steps(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_edit_steps(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = edit_mode_step::getStepIndex();
-    } else if (operation == data::DATA_OPERATION_GET_VALUE_LIST) {
-        data::StepValues stepValues;
+    } else if (operation == DATA_OPERATION_GET_VALUE_LIST) {
+        StepValues stepValues;
         edit_mode_step::getStepValues(stepValues);
         value = MakeValueListValue(stepValues.values);
-    } else if (operation == data::DATA_OPERATION_COUNT) {
-        data::StepValues stepValues;
+    } else if (operation == DATA_OPERATION_COUNT) {
+        StepValues stepValues;
         edit_mode_step::getStepValues(stepValues);
         value = stepValues.count;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         edit_mode_step::setStepIndex(value.getInt());
     }
 }
 
-void data_firmware_info(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_firmware_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         static const char FIRMWARE_LABEL[] = "Firmware: ";
         static char firmware_info[sizeof(FIRMWARE_LABEL) - 1 + sizeof(FIRMWARE) - 1 + 1];
 
@@ -1863,8 +1827,8 @@ void data_firmware_info(data::DataOperationEnum operation, data::Cursor cursor, 
     }
 }
 
-void data_keypad_text(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_keypad_text(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Keypad *keypad = getActiveKeypad();
         if (keypad) {
             value = keypad->getKeypadTextValue();
@@ -1872,8 +1836,8 @@ void data_keypad_text(data::DataOperationEnum operation, data::Cursor cursor, da
     }
 }
 
-void data_keypad_mode(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_keypad_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Keypad *keypad = getActiveKeypad();
         if (keypad) {
             value = keypad->m_keypadMode;
@@ -1881,17 +1845,17 @@ void data_keypad_mode(data::DataOperationEnum operation, data::Cursor cursor, da
     }
 }
 
-void data_keypad_option1_text(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_keypad_option1_text(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         NumericKeypad *keypad = getActiveNumericKeypad();
         if (keypad) {
-            value = data::Value(keypad->m_options.flags.option1ButtonEnabled ? keypad->m_options.option1ButtonText : "");
+            value = Value(keypad->m_options.flags.option1ButtonEnabled ? keypad->m_options.option1ButtonText : "");
         }
     }
 }
 
-void data_keypad_option1_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_keypad_option1_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         NumericKeypad *keypad = getActiveNumericKeypad();
         if (keypad) {
             value = (int)keypad->m_options.flags.option1ButtonEnabled;
@@ -1899,17 +1863,17 @@ void data_keypad_option1_enabled(data::DataOperationEnum operation, data::Cursor
     }
 }
 
-void data_keypad_option2_text(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_keypad_option2_text(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         NumericKeypad *keypad = getActiveNumericKeypad();
         if (keypad) {
-            value = data::Value(keypad->m_options.flags.option2ButtonEnabled ? keypad->m_options.option2ButtonText : "");
+            value = Value(keypad->m_options.flags.option2ButtonEnabled ? keypad->m_options.option2ButtonText : "");
         }
     }
 }
 
-void data_keypad_option2_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_keypad_option2_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         NumericKeypad *keypad = getActiveNumericKeypad();
         if (keypad) {
             value = (int)keypad->m_options.flags.option2ButtonEnabled;
@@ -1917,8 +1881,8 @@ void data_keypad_option2_enabled(data::DataOperationEnum operation, data::Cursor
     }
 }
 
-void data_keypad_sign_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_keypad_sign_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         NumericKeypad *keypad = getActiveNumericKeypad();
         if (keypad) {
             value = (int)keypad->m_options.flags.signButtonEnabled;
@@ -1926,8 +1890,8 @@ void data_keypad_sign_enabled(data::DataOperationEnum operation, data::Cursor cu
     }
 }
 
-void data_keypad_dot_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_keypad_dot_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         NumericKeypad *keypad = getActiveNumericKeypad();
         if (keypad) {
             value = (int)keypad->m_options.flags.dotButtonEnabled;
@@ -1935,8 +1899,8 @@ void data_keypad_dot_enabled(data::DataOperationEnum operation, data::Cursor cur
     }
 }
 
-void data_keypad_unit_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_keypad_unit_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         NumericKeypad *keypad = getActiveNumericKeypad();
         if (keypad) {
             value = keypad->m_options.editValueUnit == UNIT_VOLT ||
@@ -1964,8 +1928,8 @@ void data_keypad_unit_enabled(data::DataOperationEnum operation, data::Cursor cu
     }
 }
 
-void data_keypad_ok_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_keypad_ok_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Keypad *keypad = getActiveKeypad();
         if (keypad) {
             value = keypad->isOkEnabled() ? 1 : 0;
@@ -1973,78 +1937,78 @@ void data_keypad_ok_enabled(data::DataOperationEnum operation, data::Cursor curs
     }
 }
 
-void data_channel_off_label(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_off_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = io_pins::isInhibited() ? "INH" : "OFF";
     }
 }
 
-void data_channel_label(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = data::Value(iChannel + 1, VALUE_TYPE_CHANNEL_LABEL);
+        value = Value(iChannel + 1, VALUE_TYPE_CHANNEL_LABEL);
     }
 }
 
-void data_channel_short_label(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_short_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_LABEL);
+        value = Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_LABEL);
     }
 }
 
-void data_channel_title(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_title(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_TITLE);
+        value = Value(iChannel, VALUE_TYPE_CHANNEL_TITLE);
     }
 }
 
-void data_channel_short_title(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_short_title(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE);
+        value = Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE);
     }
 }
 
-void data_channel_short_title_without_tracking_icon(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_short_title_without_tracking_icon(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON);
+        value = Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON);
     }
 }
 
-void data_channel_short_title_with_colon(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_short_title_with_colon(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITH_COLON);
+        value = Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITH_COLON);
     }
 }
 
-void data_channel_long_title(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_long_title(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_LONG_TITLE);
+        value = Value(iChannel, VALUE_TYPE_CHANNEL_LONG_TITLE);
     }
 }
 
-void data_channel_info_brand(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_info_brand(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         auto &channel = Channel::get(iChannel);
         value = channel.getBrand();
     }
 }
 
-void data_channel_info_serial(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_info_serial(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = data::Value(iChannel, VALUE_TYPE_CHANNEL_INFO_SERIAL);
+        value = Value(iChannel, VALUE_TYPE_CHANNEL_INFO_SERIAL);
     }
 }
 
-void data_channel_temp_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_temp_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::CH1 + iChannel];
         if (tempSensor.isInstalled()) {
@@ -2059,8 +2023,8 @@ void data_channel_temp_status(data::DataOperationEnum operation, data::Cursor cu
     }
 }
 
-void data_channel_temp(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_temp(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         float temperature = 0;
 
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
@@ -2073,42 +2037,42 @@ void data_channel_temp(data::DataOperationEnum operation, data::Cursor cursor, d
     }
 }
 
-void data_channel_on_time_total(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_on_time_total(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value =
-            data::Value((uint32_t)ontime::g_moduleCounters[channel.slotIndex].getTotalTime(), VALUE_TYPE_ON_TIME_COUNTER);
+            Value((uint32_t)ontime::g_moduleCounters[channel.slotIndex].getTotalTime(), VALUE_TYPE_ON_TIME_COUNTER);
     }
 }
 
-void data_channel_on_time_last(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_on_time_last(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value =
-            data::Value((uint32_t)ontime::g_moduleCounters[channel.slotIndex].getLastTime(), VALUE_TYPE_ON_TIME_COUNTER);
+            Value((uint32_t)ontime::g_moduleCounters[channel.slotIndex].getLastTime(), VALUE_TYPE_ON_TIME_COUNTER);
     }
 }
 
-void data_channel_calibration_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = channel.isCalibrationExists();
     }
 }
 
-void data_channel_calibration_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = channel.isCalibrationEnabled();
     }
 }
 
-void data_channel_calibration_date(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_date(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
 
@@ -2120,32 +2084,32 @@ void data_channel_calibration_date(data::DataOperationEnum operation, data::Curs
 
         uint32_t time = datetime::makeTime(year, month, day, 0, 0, 0);
         
-        value = data::Value(time, persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12 ? VALUE_TYPE_DATE_DMY : VALUE_TYPE_DATE_MDY);
+        value = Value(time, persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12 ? VALUE_TYPE_DATE_DMY : VALUE_TYPE_DATE_MDY);
     }
 }
 
-void data_channel_calibration_remark(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_remark(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        value = data::Value(channel.cal_conf.calibration_remark);
+        value = Value(channel.cal_conf.calibration_remark);
     }
 }
 
-void data_channel_calibration_step_is_set_remark_step(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_step_is_set_remark_step(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = calibration_wizard::g_stepNum == calibration_wizard::MAX_STEP_NUM - 1;
     }
 }
 
-void data_channel_calibration_step_num(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(calibration_wizard::g_stepNum);
+void data_channel_calibration_step_num(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(calibration_wizard::g_stepNum);
     }
 }
 
-void data_channel_calibration_step_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_step_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         switch (calibration_wizard::g_stepNum) {
         case 0:
             value = psu::calibration::getVoltage().min_set;
@@ -2175,14 +2139,14 @@ void data_channel_calibration_step_status(data::DataOperationEnum operation, dat
     }
 }
 
-void data_channel_calibration_step_level_value(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_step_level_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = calibration_wizard::getLevelValue();
     }
 }
 
-void data_channel_calibration_step_value(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_step_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         switch (calibration_wizard::g_stepNum) {
         case 0:
             value = MakeValue(psu::calibration::getVoltage().min_val, UNIT_VOLT);
@@ -2212,122 +2176,122 @@ void data_channel_calibration_step_value(data::DataOperationEnum operation, data
             value = MakeValue(psu::calibration::getCurrent().max_val, UNIT_AMPER);
             break;
         case 9:
-            value = data::Value(psu::calibration::getRemark());
+            value = Value(psu::calibration::getRemark());
             break;
         }
     }
 }
 
-void data_channel_calibration_step_prev_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_step_prev_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = calibration_wizard::g_stepNum > 0;
     }
 }
 
-void data_channel_calibration_step_next_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_step_next_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = calibration_wizard::g_stepNum < calibration_wizard::MAX_STEP_NUM;
     }
 }
 
-void data_channel_calibration_has_step_note(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_has_step_note(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = calibration_wizard::getStepNote() != nullptr;
     }
 }
 
-void data_channel_calibration_step_note(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_calibration_step_note(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = calibration_wizard::getStepNote();
     }
 }
 
-void data_cal_ch_u_min(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_cal_ch_u_min(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.u.min.val, UNIT_VOLT);
     }
 }
 
-void data_cal_ch_u_mid(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_cal_ch_u_mid(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.u.mid.val, UNIT_VOLT);
     }
 }
 
-void data_cal_ch_u_max(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_cal_ch_u_max(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.u.max.val, UNIT_VOLT);
     }
 }
 
-void data_cal_ch_i0_min(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_cal_ch_i0_min(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.i[0].min.val, UNIT_AMPER);
     }
 }
 
-void data_cal_ch_i0_mid(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_cal_ch_i0_mid(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.i[0].mid.val, UNIT_AMPER);
     }
 }
 
-void data_cal_ch_i0_max(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_cal_ch_i0_max(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeValue(channel.cal_conf.i[0].max.val, UNIT_AMPER);
     }
 }
 
-void data_cal_ch_i1_min(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_cal_ch_i1_min(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.hasSupportForCurrentDualRange()) {
             value = MakeValue(channel.cal_conf.i[1].min.val, UNIT_AMPER);
         } else {
-            value = data::Value("");
+            value = Value("");
         }
     }
 }
 
-void data_cal_ch_i1_mid(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_cal_ch_i1_mid(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.hasSupportForCurrentDualRange()) {
             value = MakeValue(channel.cal_conf.i[1].mid.val, UNIT_AMPER);
         } else {
-            value = data::Value("");
+            value = Value("");
         }
     }
 }
 
-void data_cal_ch_i1_max(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_cal_ch_i1_max(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.hasSupportForCurrentDualRange()) {
             value = MakeValue(channel.cal_conf.i[1].max.val, UNIT_AMPER);
         } else {
-            value = data::Value("");
+            value = Value("");
         }
     }
 }
 
-void data_channel_protection_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_protection_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
 
@@ -2352,8 +2316,8 @@ void data_channel_protection_status(data::DataOperationEnum operation, data::Cur
     }
 }
 
-void data_channel_protection_ovp_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_protection_ovp_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
         if (page) {
             value = page->state;
@@ -2361,8 +2325,8 @@ void data_channel_protection_ovp_state(data::DataOperationEnum operation, data::
     }
 }
 
-void data_channel_protection_ovp_type(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_protection_ovp_type(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.params.features & CH_FEATURE_HW_OVP) {
@@ -2378,10 +2342,10 @@ void data_channel_protection_ovp_type(data::DataOperationEnum operation, data::C
     }
 }
 
-void data_channel_protection_ovp_level(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_protection_ovp_level(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
         if (page) {
             value = page->level;
@@ -2393,19 +2357,19 @@ void data_channel_protection_ovp_level(data::DataOperationEnum operation, data::
                 value = MakeValue(channel.prot_conf.u_level, UNIT_VOLT);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getUMaxOvpLevel(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         channel_dispatcher::setOvpLevel(channel, value.getFloat());
     }
 }
 
-void data_channel_protection_ovp_delay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_protection_ovp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
         if (page) {
             value = page->delay;
@@ -2417,25 +2381,25 @@ void data_channel_protection_ovp_delay(data::DataOperationEnum operation, data::
                 value = MakeValue(channel.prot_conf.u_delay, UNIT_SECOND);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel.params.OVP_MIN_DELAY, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel.params.OVP_MAX_DELAY, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         channel_dispatcher::setOvpDelay(channel, value.getFloat());
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "OVP Delay";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     }
 }
 
-void data_channel_protection_ovp_limit(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_protection_ovp_limit(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
         if (page) {
             value = page->limit;
@@ -2447,23 +2411,23 @@ void data_channel_protection_ovp_limit(data::DataOperationEnum operation, data::
                 value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getUMaxOvpLimit(channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         channel_dispatcher::setVoltageLimit(channel, value.getFloat());
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "OVP Limit";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } 
 }
 
-void data_channel_protection_ocp_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_protection_ocp_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OCP);
         if (page) {
             value = page->state;
@@ -2471,10 +2435,10 @@ void data_channel_protection_ocp_state(data::DataOperationEnum operation, data::
     }
 }
 
-void data_channel_protection_ocp_delay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_protection_ocp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OCP);
         if (page) {
             value = page->delay;
@@ -2486,25 +2450,25 @@ void data_channel_protection_ocp_delay(data::DataOperationEnum operation, data::
                 value = MakeValue(channel.prot_conf.i_delay, UNIT_SECOND);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel.params.OCP_MIN_DELAY, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel.params.OCP_MAX_DELAY, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         channel_dispatcher::setOcpParameters(channel, channel.prot_conf.flags.i_state ? 1 : 0, value.getFloat());
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "OCP Delay";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } 
 }
 
-void data_channel_protection_ocp_limit(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_protection_ocp_limit(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OCP);
         if (page) {
             value = page->limit;
@@ -2516,29 +2480,29 @@ void data_channel_protection_ocp_limit(data::DataOperationEnum operation, data::
                 value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getIMaxLimit(channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         channel_dispatcher::setCurrentLimit(channel, value.getFloat());
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "OCP Limit";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_AMPER;
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     }
 }
 
-void data_channel_protection_ocp_max_current_limit_cause(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(g_channel->getMaxCurrentLimitCause());
+void data_channel_protection_ocp_max_current_limit_cause(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(g_channel->getMaxCurrentLimitCause());
     }
 }
 
-void data_channel_protection_opp_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_protection_opp_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
         if (page) {
             value = page->state;
@@ -2546,10 +2510,10 @@ void data_channel_protection_opp_state(data::DataOperationEnum operation, data::
     }
 }
 
-void data_channel_protection_opp_level(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_protection_opp_level(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
         if (page) {
             value = page->level;
@@ -2561,25 +2525,25 @@ void data_channel_protection_opp_level(data::DataOperationEnum operation, data::
                 value = MakeValue(channel_dispatcher::getOppLevel(channel), UNIT_WATT);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getOppMinLevel(channel), UNIT_WATT);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getOppMaxLevel(channel), UNIT_WATT);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, value.getFloat(), channel.prot_conf.p_delay);
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "OPP Level";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_WATT;
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     }
 }
 
-void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_protection_opp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
         if (page) {
             value = page->delay;
@@ -2591,25 +2555,25 @@ void data_channel_protection_opp_delay(data::DataOperationEnum operation, data::
                 value = MakeValue(channel.prot_conf.p_delay, UNIT_SECOND);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel.params.OPP_MIN_DELAY, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel.params.OPP_MAX_DELAY, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, channel_dispatcher::getPowerProtectionLevel(channel), value.getFloat());
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "OPP Delay";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     }
 }
 
-void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_protection_opp_limit(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
         if (page) {
             value = page->limit;
@@ -2621,29 +2585,29 @@ void data_channel_protection_opp_limit(data::DataOperationEnum operation, data::
                 value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getPowerMinLimit(channel), UNIT_WATT);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getPowerMaxLimit(channel), UNIT_WATT);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         channel_dispatcher::setPowerLimit(channel, value.getFloat());
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "OPP Limit";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_WATT;
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     }
 }
 
-void data_channel_protection_otp_installed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_protection_otp_installed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = temperature::isChannelSensorInstalled(g_channel);
     }
 }
 
-void data_channel_protection_otp_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_protection_otp_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page =
             (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OTP);
         if (page) {
@@ -2652,10 +2616,10 @@ void data_channel_protection_otp_state(data::DataOperationEnum operation, data::
     }
 }
 
-void data_channel_protection_otp_level(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_protection_otp_level(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OTP);
         if (page) {
             value = page->level;
@@ -2667,25 +2631,25 @@ void data_channel_protection_otp_level(data::DataOperationEnum operation, data::
                 value = MakeValue(temperature::getChannelSensorLevel(&channel), UNIT_CELSIUS);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(OTP_AUX_MIN_LEVEL, UNIT_CELSIUS);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(OTP_AUX_MAX_LEVEL, UNIT_CELSIUS);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         channel_dispatcher::setOtpParameters(channel, temperature::getChannelSensorState(&channel) ? 1 : 0, value.getFloat(), temperature::getChannelSensorDelay(&channel));
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "OTP Level";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_CELSIUS;
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     }
 }
     
-void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_protection_otp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OTP);
         if (page) {
             value = page->delay;
@@ -2697,23 +2661,23 @@ void data_channel_protection_otp_delay(data::DataOperationEnum operation, data::
                 value = MakeValue(temperature::getChannelSensorDelay(&channel), UNIT_SECOND);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(OTP_AUX_MIN_DELAY, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(OTP_AUX_MAX_DELAY, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         channel_dispatcher::setOtpParameters(channel, temperature::getChannelSensorState(&channel) ? 1 : 0, temperature::getChannelSensorLevel(&channel), value.getFloat());
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "OTP Delay";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     }
 }
 
-void data_module_specific_ch_settings(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_module_specific_ch_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         auto modulType = g_slots[channel.slotIndex].moduleInfo->moduleType;
@@ -2729,8 +2693,8 @@ void data_module_specific_ch_settings(data::DataOperationEnum operation, data::C
     }
 }
 
-void data_channel_has_error_settings(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_has_error_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         auto modulType = g_slots[channel.slotIndex].moduleInfo->moduleType;
@@ -2742,8 +2706,8 @@ void data_channel_has_error_settings(data::DataOperationEnum operation, data::Cu
     }
 }
 
-void data_channel_settings_page(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_settings_page(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.isOk()) {
@@ -2766,8 +2730,8 @@ void data_channel_settings_page(data::DataOperationEnum operation, data::Cursor 
     }
 }
 
-void data_channel_firmware_version(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_firmware_version(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         uint8_t majorVersion;
@@ -2777,8 +2741,8 @@ void data_channel_firmware_version(data::DataOperationEnum operation, data::Curs
     }
 }
 
-void data_channel_rsense_installed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_rsense_installed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
 		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
 		Channel &channel = Channel::get(iChannel);
         auto modulType = g_slots[channel.slotIndex].moduleInfo->moduleType;
@@ -2790,46 +2754,46 @@ void data_channel_rsense_installed(data::DataOperationEnum operation, data::Curs
     }
 }
 
-void data_channel_rsense_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_rsense_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
 		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
 		Channel &channel = Channel::get(iChannel);
         value = channel.isRemoteSensingEnabled();
     }	
 }
 
-void data_channel_rprog_installed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_rprog_installed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = g_channel->params.features & CH_FEATURE_RPROG ? 1 : 0;
     }
 }
 
-void data_channel_rprog_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_rprog_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
 		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
 		Channel &channel = Channel::get(iChannel);
 		value = (int)channel.flags.rprogEnabled;
     }
 }
 
-void data_channel_dprog_installed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_dprog_installed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = channel.params.features & CH_FEATURE_DPROG ? 1 : 0;
     }
 }
 
-void data_channel_dprog(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_dprog(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = (int)channel.flags.dprogState;
     }
 }
 
-void data_is_coupled_or_tracked(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_coupled_or_tracked(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         if (channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
             value = 1;
         } else {
@@ -2844,8 +2808,8 @@ void data_is_coupled_or_tracked(data::DataOperationEnum operation, data::Cursor 
     }
 }
 
-void data_channel_is_par_ser_coupled_or_tracked(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_is_par_ser_coupled_or_tracked(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         if (channel.flags.trackingEnabled || (iChannel < 2 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES))) {
@@ -2856,8 +2820,8 @@ void data_channel_is_par_ser_coupled_or_tracked(data::DataOperationEnum operatio
     }
 }
 
-void data_is_tracking_allowed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_tracking_allowed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int n = 0;
         for (int i = 0; i < CH_NUM; i++) {
             if (Channel::get(i).isOk()) {
@@ -2868,8 +2832,8 @@ void data_is_tracking_allowed(data::DataOperationEnum operation, data::Cursor cu
     }
 }
 
-void data_channel_tracking_is_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_tracking_is_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         auto page = (SysSettingsTrackingPage *)getPage(PAGE_ID_SYS_SETTINGS_TRACKING);
@@ -2881,15 +2845,15 @@ void data_channel_tracking_is_enabled(data::DataOperationEnum operation, data::C
     }
 }
 
-void data_channel_tracking_is_allowed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_tracking_is_allowed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto channel = Channel::get(cursor);
         value = channel_dispatcher::isTrackingAllowed(channel, nullptr) ? 1 : 0;
     }
 }
 
-void data_is_multi_tracking(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_multi_tracking(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto page = (SysSettingsTrackingPage *)getPage(PAGE_ID_SYS_SETTINGS_TRACKING);
         if (page) {
             value = page->getNumTrackingChannels() >= 2 ? 1 : 0;
@@ -2897,8 +2861,8 @@ void data_is_multi_tracking(data::DataOperationEnum operation, data::Cursor curs
     }
 }
 
-void data_is_any_coupling_allowed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_any_coupling_allowed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_PARALLEL, nullptr) ||
                 channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_SERIES, nullptr) ||
                 channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_COMMON_GND, nullptr) ||
@@ -2906,21 +2870,21 @@ void data_is_any_coupling_allowed(data::DataOperationEnum operation, data::Curso
     }
 }
 
-void data_is_coupling_parallel_allowed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_coupling_parallel_allowed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_PARALLEL, nullptr) ? 1 : 0;
     }
 }
 
-void data_is_coupling_split_rails_allowed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_coupling_split_rails_allowed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS, nullptr) ? 1 : 0;
     }
 }
 
 
-void data_is_coupling_series_allowed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_coupling_series_allowed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = channel_dispatcher::isCouplingTypeAllowed(channel_dispatcher::COUPLING_TYPE_SERIES, nullptr) ? 1 : 0;
     }
 }
@@ -2934,57 +2898,57 @@ channel_dispatcher::CouplingType getCouplingType() {
     }
 }
 
-void data_coupling_type(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_coupling_type(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = (int)getCouplingType();
     }
 }
 
-void data_is_coupling_type_uncoupled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_coupling_type_uncoupled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_NONE ? 1 : 0;
     }
 }
 
-void data_is_coupling_type_series(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_coupling_type_series(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES ? 1 : 0;
     }
 }
 
-void data_is_coupling_type_parallel(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_coupling_type_parallel(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL ? 1 : 0;
     }
 }
 
-void data_is_coupling_type_common_gnd(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_coupling_type_common_gnd(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_COMMON_GND ? 1 : 0;
     }
 }
 
-void data_is_coupling_type_split_rails(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_coupling_type_split_rails(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS ? 1 : 0;
     }
 }
 
-void data_channel_copy_available(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_copy_available(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = CH_NUM >= 2 ? 1 : 0;
     }
 }
 
-void data_channel_coupling_is_series(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_coupling_is_series(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
 		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         value = iChannel < 2 && getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES ? 1 : 0;
     }
 }
 
-void data_channel_coupling_enable_tracking_mode(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_coupling_enable_tracking_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto page = (SysSettingsCouplingPage *)getPage(PAGE_ID_SYS_SETTINGS_COUPLING);
         if (page) {
             value = page->m_enableTrackingMode ? 1 : 0;
@@ -2992,22 +2956,22 @@ void data_channel_coupling_enable_tracking_mode(data::DataOperationEnum operatio
     }
 }
 
-void data_sys_on_time_total(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_on_time_total(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value =
-            data::Value((uint32_t)ontime::g_mcuCounter.getTotalTime(), VALUE_TYPE_ON_TIME_COUNTER);
+            Value((uint32_t)ontime::g_mcuCounter.getTotalTime(), VALUE_TYPE_ON_TIME_COUNTER);
     }
 }
 
-void data_sys_on_time_last(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_on_time_last(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value =
-            data::Value((uint32_t)ontime::g_mcuCounter.getLastTime(), VALUE_TYPE_ON_TIME_COUNTER);
+            Value((uint32_t)ontime::g_mcuCounter.getLastTime(), VALUE_TYPE_ON_TIME_COUNTER);
     }
 }
 
-void data_sys_temp_aux_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_temp_aux_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::AUX];
         if (tempSensor.isInstalled()) {
             if (tempSensor.isTestOK()) {
@@ -3021,8 +2985,8 @@ void data_sys_temp_aux_status(data::DataOperationEnum operation, data::Cursor cu
     }
 }
 
-void data_sys_temp_aux_otp_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_temp_aux_otp_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
         if (page) {
             value = page->state;
@@ -3030,8 +2994,8 @@ void data_sys_temp_aux_otp_state(data::DataOperationEnum operation, data::Cursor
     }
 }
 
-void data_sys_temp_aux_otp_level(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_temp_aux_otp_level(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
         if (page) {
             value = page->level;
@@ -3039,8 +3003,8 @@ void data_sys_temp_aux_otp_level(data::DataOperationEnum operation, data::Cursor
     }
 }
 
-void data_sys_temp_aux_otp_delay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_temp_aux_otp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
         if (page) {
             value = page->delay;
@@ -3048,14 +3012,14 @@ void data_sys_temp_aux_otp_delay(data::DataOperationEnum operation, data::Cursor
     }
 }
 
-void data_sys_temp_aux_otp_is_tripped(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_temp_aux_otp_is_tripped(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = temperature::sensors[temp_sensor::AUX].isTripped();
     }
 }
 
-void data_sys_temp_aux(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_temp_aux(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         float auxTemperature = 0;
         temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::AUX];
         if (tempSensor.isInstalled() && tempSensor.isTestOK()) {
@@ -3065,8 +3029,8 @@ void data_sys_temp_aux(data::DataOperationEnum operation, data::Cursor cursor, d
     }
 }
 
-void data_sys_info_has_error(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_info_has_error(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::AUX];
         int err;
         value = (
@@ -3082,32 +3046,32 @@ void data_sys_info_has_error(data::DataOperationEnum operation, data::Cursor cur
     }
 }
 
-void data_sys_info_firmware_ver(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(FIRMWARE);
+void data_sys_info_firmware_ver(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(FIRMWARE);
     }
 }
 
-void data_sys_info_serial_no(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(getSerialNumber());
+void data_sys_info_serial_no(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(getSerialNumber());
     }
 }
 
-void data_sys_info_scpi_ver(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(SCPI_STD_VERSION_REVISION);
+void data_sys_info_scpi_ver(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(SCPI_STD_VERSION_REVISION);
     }
 }
 
-void data_sys_info_cpu(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(getCpuModel());
+void data_sys_info_cpu(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(getCpuModel());
     }
 }
 
-void data_sys_info_battery_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_info_battery_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         if (mcu::battery::g_testResult == TEST_FAILED) {
             value = 0;
         } else if (mcu::battery::g_testResult == TEST_OK) {
@@ -3118,14 +3082,14 @@ void data_sys_info_battery_status(data::DataOperationEnum operation, data::Curso
     }
 }
 
-void data_battery(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_battery(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(mcu::battery::g_battery, UNIT_VOLT);
     }
 }
 
-void data_sys_info_sdcard_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_info_sdcard_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
     	int err;
         if (eez::psu::sd_card::isMounted(&err)) {
             if (eez::psu::sd_card::isBusy()) {
@@ -3144,8 +3108,8 @@ void data_sys_info_sdcard_status(data::DataOperationEnum operation, data::Cursor
 }
 
 
-void data_sys_info_fan_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_info_fan_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
 #if OPTION_FAN
         if (aux_ps::fan::g_testResult == TEST_FAILED || aux_ps::fan::g_testResult == TEST_WARNING) {
             value = 0;
@@ -3162,9 +3126,9 @@ void data_sys_info_fan_status(data::DataOperationEnum operation, data::Cursor cu
     }
 }
 
-void data_sys_info_fan_speed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_sys_info_fan_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_FAN 
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         if (aux_ps::fan::g_testResult == TEST_OK) {
             value = MakeValue((float)aux_ps::fan::g_rpm, UNIT_RPM);
         }
@@ -3172,8 +3136,8 @@ void data_sys_info_fan_speed(data::DataOperationEnum operation, data::Cursor cur
 #endif
 }
 
-void data_sys_fan_mode(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_fan_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
         if (page) {
             value = page->fanMode;
@@ -3181,8 +3145,8 @@ void data_sys_fan_mode(data::DataOperationEnum operation, data::Cursor cursor, d
     }
 }
 
-void data_sys_fan_speed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_fan_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsTemperaturePage *page = (SysSettingsTemperaturePage *)getPage(PAGE_ID_SYS_SETTINGS_TEMPERATURE);
         if (page) {
             value = page->fanSpeedPercentage;
@@ -3190,135 +3154,135 @@ void data_sys_fan_speed(data::DataOperationEnum operation, data::Cursor cursor, 
     }
 }
 
-void data_channel_board_info_label(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_board_info_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         if (cursor >= 0 && cursor < CH_NUM) {
-            value = data::Value(cursor, VALUE_TYPE_CHANNEL_BOARD_INFO_LABEL);
+            value = Value(cursor, VALUE_TYPE_CHANNEL_BOARD_INFO_LABEL);
         }
     }
 }
 
-void data_channel_board_info_revision(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_board_info_revision(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         if (cursor >= 0 && cursor < CH_NUM) {
             value = Value((int)Channel::get(cursor).slotIndex, VALUE_TYPE_SLOT_INFO);
         }
     }
 }
 
-void data_date_time_date(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_date(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page && page->ntpEnabled) {
             uint32_t nowUtc = datetime::nowUtc();
             uint32_t nowLocal = datetime::utcToLocal(nowUtc, page->timeZone, page->dstRule);
-            value = data::Value(nowLocal, page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_DMY_12 ? VALUE_TYPE_DATE_DMY : VALUE_TYPE_DATE_MDY);
+            value = Value(nowLocal, page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_DMY_12 ? VALUE_TYPE_DATE_DMY : VALUE_TYPE_DATE_MDY);
         }
     }
 }
 
-void data_date_time_year(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_year(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page =
             (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page && !page->ntpEnabled) {
             if (!page->dateTimeModified) {
                 page->dateTime = datetime::DateTime::now();
             }
-            value = data::Value(page->dateTime.year, VALUE_TYPE_YEAR);
+            value = Value(page->dateTime.year, VALUE_TYPE_YEAR);
         }
     }
 }
 
-void data_date_time_month(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_month(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page && !page->ntpEnabled) {
             if (!page->dateTimeModified) {
                 page->dateTime = datetime::DateTime::now();
             }
-            value = data::Value(page->dateTime.month, VALUE_TYPE_MONTH);
+            value = Value(page->dateTime.month, VALUE_TYPE_MONTH);
         }
     }
 }
 
-void data_date_time_day(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_day(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page && !page->ntpEnabled) {
             if (!page->dateTimeModified) {
                 page->dateTime = datetime::DateTime::now();
             }
-            value = data::Value(page->dateTime.day, VALUE_TYPE_DAY);
+            value = Value(page->dateTime.day, VALUE_TYPE_DAY);
         }
     }
 }
 
-void data_date_time_time(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_time(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page && page->ntpEnabled) {
             uint32_t nowUtc = datetime::nowUtc();
             uint32_t nowLocal = datetime::utcToLocal(nowUtc, page->timeZone, page->dstRule);
-            value = data::Value(nowLocal, page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_MDY_24 ? VALUE_TYPE_TIME : VALUE_TYPE_TIME12);
+            value = Value(nowLocal, page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_MDY_24 ? VALUE_TYPE_TIME : VALUE_TYPE_TIME12);
         }
     }
 }
 
-void data_date_time_hour(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_hour(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page && !page->ntpEnabled) {
             if (!page->dateTimeModified) {
                 page->dateTime = datetime::DateTime::now();
             }
             if (page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_MDY_24) {
-                value = data::Value(page->dateTime.hour, VALUE_TYPE_HOUR);
+                value = Value(page->dateTime.hour, VALUE_TYPE_HOUR);
             } else {
                 uint8_t hour = page->dateTime.hour;
                 bool am;
                 datetime::convertTime24to12(hour, am);
-                value = data::Value(hour, VALUE_TYPE_HOUR);
+                value = Value(hour, VALUE_TYPE_HOUR);
             }
         }
     }
 }
 
-void data_date_time_minute(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_minute(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page && !page->ntpEnabled) {
             if (!page->dateTimeModified) {
                 page->dateTime = datetime::DateTime::now();
             }
-            value = data::Value(page->dateTime.minute, VALUE_TYPE_MINUTE);
+            value = Value(page->dateTime.minute, VALUE_TYPE_MINUTE);
         }
     }
 }
 
-void data_date_time_second(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_second(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page && !page->ntpEnabled) {
             if (!page->dateTimeModified) {
                 page->dateTime = datetime::DateTime::now();
             }
-            value = data::Value(page->dateTime.second, VALUE_TYPE_SECOND);
+            value = Value(page->dateTime.second, VALUE_TYPE_SECOND);
         }
     }
 }
 
-void data_date_time_time_zone(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_time_zone(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page) {
-            value = data::Value(page->timeZone, VALUE_TYPE_TIME_ZONE);
+            value = Value(page->timeZone, VALUE_TYPE_TIME_ZONE);
         }
     }
 }
 
-void data_date_time_dst(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_dst(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page) {
             value = MakeEnumDefinitionValue(page->dstRule, ENUM_DEFINITION_DST_RULE);
@@ -3326,17 +3290,17 @@ void data_date_time_dst(data::DataOperationEnum operation, data::Cursor cursor, 
     }
 }
 
-void data_date_time_format(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_format(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page) {
-            value = g_dateTimeFormatEnumDefinition[page->dateTimeFormat].menuLabel;
+            value = g_enumDefinitions[ENUM_DEFINITION_DATE_TIME_FORMAT][page->dateTimeFormat].menuLabel;
         }
     }
 }
 
-void data_date_time_format_is_dmy(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_format_is_dmy(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page) {
             value = page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_DMY_12 ? 1 : 0;
@@ -3344,8 +3308,8 @@ void data_date_time_format_is_dmy(data::DataOperationEnum operation, data::Curso
     }
 }
 
-void data_date_time_format_is_24h(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_format_is_24h(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page) {
             value = page->dateTimeFormat == datetime::FORMAT_DMY_24 || page->dateTimeFormat == datetime::FORMAT_MDY_24 ? 1 : 0;
@@ -3353,8 +3317,8 @@ void data_date_time_format_is_24h(data::DataOperationEnum operation, data::Curso
     }
 }
 
-void data_date_time_am_pm(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_date_time_am_pm(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page) {
             uint8_t hour = page->dateTime.hour;
@@ -3365,35 +3329,35 @@ void data_date_time_am_pm(data::DataOperationEnum operation, data::Cursor cursor
     }
 }
 
-void data_set_page_dirty(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_set_page_dirty(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SetPage *page = (SetPage *)getActivePage();
         if (page) {
-            value = data::Value(page->getDirty());
+            value = Value(page->getDirty());
         }
     }
 }
 
-void data_profiles_list(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
+void data_profiles_list(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
         value = NUM_PROFILE_LOCATIONS - 1; // do not show last location in GUI
     }
 }
 
-void data_profiles_auto_recall_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(persist_conf::isProfileAutoRecallEnabled());
+void data_profiles_auto_recall_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(persist_conf::isProfileAutoRecallEnabled());
     }
 }
 
-void data_profiles_auto_recall_location(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(persist_conf::getProfileAutoRecallLocation());
+void data_profiles_auto_recall_location(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(persist_conf::getProfileAutoRecallLocation());
     }
 }
 
-void data_profile_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_profile_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1) {
             if (profile::isLoaded(selectedProfileLocation)) {
@@ -3405,33 +3369,33 @@ void data_profile_status(data::DataOperationEnum operation, data::Cursor cursor,
     }
 }
 
-void data_profile_label(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_profile_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1) {
-            value = data::Value(selectedProfileLocation, VALUE_TYPE_USER_PROFILE_LABEL);
+            value = Value(selectedProfileLocation, VALUE_TYPE_USER_PROFILE_LABEL);
         } else if (cursor >= 0) {
-            value = data::Value(cursor, VALUE_TYPE_USER_PROFILE_LABEL);
+            value = Value(cursor, VALUE_TYPE_USER_PROFILE_LABEL);
         }
     }
 }
 
-void data_profile_remark(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_profile_remark(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1) {
             profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
             if (profile) {
-                value = data::Value(profile->name);
+                value = Value(profile->name);
             }
         } else if (cursor >= 0) {
-            value = data::Value(cursor, VALUE_TYPE_USER_PROFILE_REMARK);
+            value = Value(cursor, VALUE_TYPE_USER_PROFILE_REMARK);
         }
     }
 }
 
-void data_profile_is_auto_recall_location(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_profile_is_auto_recall_location(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1) {
             value = persist_conf::getProfileAutoRecallLocation() == selectedProfileLocation;
@@ -3439,8 +3403,8 @@ void data_profile_is_auto_recall_location(data::DataOperationEnum operation, dat
     }
 }
 
-void data_profile_channel_u_set(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_profile_channel_u_set(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1 && (cursor >= 0 && cursor < CH_MAX)) {
             profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
@@ -3451,8 +3415,8 @@ void data_profile_channel_u_set(data::DataOperationEnum operation, data::Cursor 
     }
 }
 
-void data_profile_channel_i_set(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_profile_channel_i_set(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1 && (cursor >= 0 && cursor < CH_MAX)) {
             profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
@@ -3463,8 +3427,8 @@ void data_profile_channel_i_set(data::DataOperationEnum operation, data::Cursor 
     }
 }
 
-void data_profile_channel_output_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_profile_channel_output_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int selectedProfileLocation = UserProfilesPage::getSelectedProfileLocation();
         if (selectedProfileLocation != -1 && (cursor >= 0 && cursor < CH_MAX)) {
             profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
@@ -3475,15 +3439,15 @@ void data_profile_channel_output_state(data::DataOperationEnum operation, data::
     }
 }
 
-void data_ethernet_installed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(OPTION_ETHERNET);
+void data_ethernet_installed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(OPTION_ETHERNET);
     }
 }
 
-void data_ethernet_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ethernet_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
             value = page->m_enabled;
@@ -3494,9 +3458,9 @@ void data_ethernet_enabled(data::DataOperationEnum operation, data::Cursor curso
 #endif
 }
 
-void data_ethernet_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ethernet_status(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         if (
             ethernet::g_testResult == TEST_CONNECTING ||
             (
@@ -3509,30 +3473,30 @@ void data_ethernet_status(data::DataOperationEnum operation, data::Cursor cursor
                 )
             )
         ) {
-            value = data::Value(TEST_CONNECTING);
+            value = Value(TEST_CONNECTING);
         } else if (ethernet::g_testResult == TEST_FAILED || (persist_conf::devConf.mqttEnabled && mqtt::g_connectionState == mqtt::CONNECTION_STATE_ERROR)) {
-            value = data::Value(TEST_FAILED);
+            value = Value(TEST_FAILED);
         } else {
-            value = data::Value(ethernet::g_testResult);
+            value = Value(ethernet::g_testResult);
         }
     }
 #endif
 }
 
-void data_ethernet_ip_address(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ethernet_ip_address(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEthernetStaticPage *page = (SysSettingsEthernetStaticPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC);
         if (page) {
-            value = data::Value(page->m_ipAddress, VALUE_TYPE_IP_ADDRESS);
+            value = Value(page->m_ipAddress, VALUE_TYPE_IP_ADDRESS);
         } else {
             SysSettingsEthernetPage *page =
                 (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
             if (page) {
                 if (page->m_dhcpEnabled) {
-                    value = data::Value(ethernet::getIpAddress(), VALUE_TYPE_IP_ADDRESS);
+                    value = Value(ethernet::getIpAddress(), VALUE_TYPE_IP_ADDRESS);
                 } else {
-                    value = data::Value(psu::persist_conf::devConf.ethernetIpAddress, VALUE_TYPE_IP_ADDRESS);
+                    value = Value(psu::persist_conf::devConf.ethernetIpAddress, VALUE_TYPE_IP_ADDRESS);
                 }
             }
         }
@@ -3540,83 +3504,83 @@ void data_ethernet_ip_address(data::DataOperationEnum operation, data::Cursor cu
 #endif
 }
 
-void data_ethernet_host_name(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ethernet_host_name(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
             value = page->m_hostName;
         }
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
             strcpy(page->m_hostName, value.getString());
         }
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(32, VALUE_TYPE_UINT32);
     }
 #endif
 }
 
-void data_ethernet_dns(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ethernet_dns(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEthernetStaticPage *page =
             (SysSettingsEthernetStaticPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC);
         if (page) {
-            value = data::Value(page->m_dns, VALUE_TYPE_IP_ADDRESS);
+            value = Value(page->m_dns, VALUE_TYPE_IP_ADDRESS);
         }
     }
 #endif
 }
 
-void data_ethernet_gateway(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ethernet_gateway(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEthernetStaticPage *page =
             (SysSettingsEthernetStaticPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC);
         if (page) {
-            value = data::Value(page->m_gateway, VALUE_TYPE_IP_ADDRESS);
+            value = Value(page->m_gateway, VALUE_TYPE_IP_ADDRESS);
         }
     }
 #endif
 }
 
-void data_ethernet_subnet_mask(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ethernet_subnet_mask(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEthernetStaticPage *page =
             (SysSettingsEthernetStaticPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET_STATIC);
         if (page) {
-            value = data::Value(page->m_subnetMask, VALUE_TYPE_IP_ADDRESS);
+            value = Value(page->m_subnetMask, VALUE_TYPE_IP_ADDRESS);
         }
     }
 #endif
 }
 
-void data_ethernet_scpi_port(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ethernet_scpi_port(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEthernetPage *page =
             (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
-            value = data::Value((uint16_t)page->m_scpiPort, VALUE_TYPE_PORT);
+            value = Value((uint16_t)page->m_scpiPort, VALUE_TYPE_PORT);
         }
     }
 #endif
 }
 
-void data_ethernet_is_connected(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ethernet_is_connected(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(ethernet::isConnected());
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(ethernet::isConnected());
     }
 #endif
 }
 
-void data_ethernet_dhcp(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ethernet_dhcp(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEthernetPage *page =
             (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
@@ -3626,11 +3590,11 @@ void data_ethernet_dhcp(data::DataOperationEnum operation, data::Cursor cursor, 
 #endif
 }
 
-void data_ethernet_mac(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_ethernet_mac(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
     static uint8_t s_macAddressData[2][6];
 
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEthernetPage *page =
             (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
@@ -3642,8 +3606,8 @@ void data_ethernet_mac(data::DataOperationEnum operation, data::Cursor cursor, d
 #endif
 }
 
-void data_channel_is_voltage_balanced(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_is_voltage_balanced(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
             value = Channel::get(0).isVoltageBalanced() || Channel::get(1).isVoltageBalanced();
         } else {
@@ -3652,8 +3616,8 @@ void data_channel_is_voltage_balanced(data::DataOperationEnum operation, data::C
     }
 }
 
-void data_channel_is_current_balanced(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_is_current_balanced(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
             value = Channel::get(0).isCurrentBalanced() || Channel::get(1).isCurrentBalanced();
         } else {
@@ -3662,38 +3626,38 @@ void data_channel_is_current_balanced(data::DataOperationEnum operation, data::C
     }
 }
 
-void data_sys_output_protection_coupled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_output_protection_coupled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = persist_conf::isOutputProtectionCoupleEnabled();
     }
 }
 
-void data_sys_shutdown_when_protection_tripped(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_shutdown_when_protection_tripped(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = persist_conf::isShutdownWhenProtectionTrippedEnabled();
     }
 }
 
-void data_sys_force_disabling_all_outputs_on_power_up(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_force_disabling_all_outputs_on_power_up(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = persist_conf::isForceDisablingAllOutputsOnPowerUpEnabled();
     }
 }
 
-void data_sys_password_is_set(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_password_is_set(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = strlen(persist_conf::devConf.systemPassword) > 0;
     }
 }
 
-void data_sys_rl_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(g_rlState);
+void data_sys_rl_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(g_rlState);
     }
 }
 
-void data_sys_sound_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_sound_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         if (!persist_conf::isSoundEnabled() && !persist_conf::isClickSoundEnabled()) {
             // both disabled
             value = 0;
@@ -3707,20 +3671,20 @@ void data_sys_sound_enabled(data::DataOperationEnum operation, data::Cursor curs
     }
 }
 
-void data_sys_sound_is_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_sound_is_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = persist_conf::isSoundEnabled();
     }
 }
 
-void data_sys_sound_is_click_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_sound_is_click_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = persist_conf::isClickSoundEnabled();
     }
 }
 
-void data_channel_display_view_settings_display_value1(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_display_view_settings_display_value1(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsAdvViewPage *page =
             (ChSettingsAdvViewPage *)getPage(PAGE_ID_CH_SETTINGS_ADV_VIEW);
         if (page) {
@@ -3730,8 +3694,8 @@ void data_channel_display_view_settings_display_value1(data::DataOperationEnum o
     }
 }
 
-void data_channel_display_view_settings_display_value2(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_display_view_settings_display_value2(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsAdvViewPage *page =
             (ChSettingsAdvViewPage *)getPage(PAGE_ID_CH_SETTINGS_ADV_VIEW);
         if (page) {
@@ -3741,8 +3705,8 @@ void data_channel_display_view_settings_display_value2(data::DataOperationEnum o
     }
 }
 
-void data_channel_display_view_settings_yt_view_rate(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_display_view_settings_yt_view_rate(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsAdvViewPage *page =
             (ChSettingsAdvViewPage *)getPage(PAGE_ID_CH_SETTINGS_ADV_VIEW);
         if (page) {
@@ -3751,31 +3715,31 @@ void data_channel_display_view_settings_yt_view_rate(data::DataOperationEnum ope
     }
 }
 
-void data_sys_encoder_confirmation_mode(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_sys_encoder_confirmation_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ENCODER
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEncoderPage *page =
             (SysSettingsEncoderPage *)getPage(PAGE_ID_SYS_SETTINGS_ENCODER);
         if (page) {
-            value = data::Value((int)page->confirmationMode);
+            value = Value((int)page->confirmationMode);
         }
     }
 #endif
 }
 
-void data_sys_encoder_moving_up_speed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_sys_encoder_moving_up_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ENCODER
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEncoderPage *page =
             (SysSettingsEncoderPage *)getPage(PAGE_ID_SYS_SETTINGS_ENCODER);
         if (page) {
-            value = data::Value((int)page->movingSpeedUp);
+            value = Value((int)page->movingSpeedUp);
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = mcu::encoder::MIN_MOVING_SPEED;
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = mcu::encoder::MAX_MOVING_SPEED;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         SysSettingsEncoderPage *page =
             (SysSettingsEncoderPage *)getPage(PAGE_ID_SYS_SETTINGS_ENCODER);
         if (page) {
@@ -3785,19 +3749,19 @@ void data_sys_encoder_moving_up_speed(data::DataOperationEnum operation, data::C
 #endif
 }
 
-void data_sys_encoder_moving_down_speed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_sys_encoder_moving_down_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ENCODER
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsEncoderPage *page =
             (SysSettingsEncoderPage *)getPage(PAGE_ID_SYS_SETTINGS_ENCODER);
         if (page) {
-            value = data::Value((int)page->movingSpeedDown);
+            value = Value((int)page->movingSpeedDown);
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = mcu::encoder::MIN_MOVING_SPEED;
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = mcu::encoder::MAX_MOVING_SPEED;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         SysSettingsEncoderPage *page =
             (SysSettingsEncoderPage *)getPage(PAGE_ID_SYS_SETTINGS_ENCODER);
         if (page) {
@@ -3807,51 +3771,51 @@ void data_sys_encoder_moving_down_speed(data::DataOperationEnum operation, data:
 #endif
 }
 
-void data_sys_encoder_installed(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(OPTION_ENCODER);
+void data_sys_encoder_installed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(OPTION_ENCODER);
     }
 }
 
-void data_sys_display_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_sys_display_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = (int)persist_conf::devConf.displayState;
     }
 }
 
-void data_sys_display_brightness(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(persist_conf::devConf.displayBrightness);
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+void data_sys_display_brightness(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(persist_conf::devConf.displayBrightness);
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = DISPLAY_BRIGHTNESS_MIN;
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = DISPLAY_BRIGHTNESS_MAX;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         persist_conf::setDisplayBrightness((uint8_t)value.getInt());
     }
 }
 
-void data_channel_trigger_mode(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_trigger_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeEnumDefinitionValue(channel_dispatcher::getVoltageTriggerMode(*g_channel),
                                         ENUM_DEFINITION_CHANNEL_TRIGGER_MODE);
     }
 }
 
-void data_channel_u_trigger_value(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_u_trigger_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getTriggerVoltage(*g_channel), UNIT_VOLT);
     }
 }
 
-void data_channel_i_trigger_value(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_i_trigger_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getTriggerCurrent(*g_channel), UNIT_AMPER);
     }
 }
 
-void data_channel_list_count(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_list_count(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         uint16_t listCount;
 
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
@@ -3862,15 +3826,15 @@ void data_channel_list_count(data::DataOperationEnum operation, data::Cursor cur
         }
         
         if (listCount > 0) {
-            value = data::Value(listCount);
+            value = Value(listCount);
         } else {
             value = INFINITY_SYMBOL;
         }
     }
 }
 
-void data_channel_trigger_on_list_stop(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_trigger_on_list_stop(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         TriggerOnListStop triggerOnListStop;
 
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
@@ -3884,10 +3848,10 @@ void data_channel_trigger_on_list_stop(data::DataOperationEnum operation, data::
     }
 }
 
-void data_channel_lists(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
+void data_channel_lists(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
         value = LIST_ITEMS_PER_PAGE;
-    } else if (operation == data::DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
+    } else if (operation == DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             value = page->getMaxListLength();
@@ -3895,8 +3859,8 @@ void data_channel_lists(data::DataOperationEnum operation, data::Cursor cursor, 
     }
 }
 
-void data_channel_list_index(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_list_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             int iPage = page->getPageIndex();
@@ -3906,8 +3870,8 @@ void data_channel_list_index(data::DataOperationEnum operation, data::Cursor cur
     }
 }
 
-void data_channel_list_dwell(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_list_dwell(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             int iPage = page->getPageIndex();
@@ -3915,21 +3879,21 @@ void data_channel_list_dwell(data::DataOperationEnum operation, data::Cursor cur
             if (iRow < page->m_dwellListLength) {
                 value = MakeValue(page->m_dwellList[iRow], UNIT_SECOND);
             } else {
-                value = data::Value(EMPTY_VALUE);
+                value = Value(EMPTY_VALUE);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(LIST_DWELL_MIN, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(LIST_DWELL_MAX, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_DEF) {
+    } else if (operation == DATA_OPERATION_GET_DEF) {
         value = MakeValue(LIST_DWELL_DEF, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
+    } else if (operation == DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             value = page->m_dwellListLength;
         }
-    } else if (operation == data::DATA_OPERATION_GET_FLOAT_LIST) {
+    } else if (operation == DATA_OPERATION_GET_FLOAT_LIST) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             value = MakeFloatListValue(page->m_dwellList);
@@ -3937,8 +3901,8 @@ void data_channel_list_dwell(data::DataOperationEnum operation, data::Cursor cur
     }
 }
 
-void data_channel_list_dwell_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_list_dwell_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             int iPage = page->getPageIndex();
@@ -3948,8 +3912,8 @@ void data_channel_list_dwell_enabled(data::DataOperationEnum operation, data::Cu
     }
 }
 
-void data_channel_list_voltage(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_list_voltage(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             int iPage = page->getPageIndex();
@@ -3957,21 +3921,21 @@ void data_channel_list_voltage(data::DataOperationEnum operation, data::Cursor c
             if (iRow < page->m_voltageListLength) {
                 value = MakeValue(page->m_voltageList[iRow], UNIT_VOLT);
             } else {
-                value = data::Value(EMPTY_VALUE);
+                value = Value(EMPTY_VALUE);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getUMin(*g_channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(channel_dispatcher::getUMax(*g_channel), UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_DEF) {
+    } else if (operation == DATA_OPERATION_GET_DEF) {
         value = MakeValue(g_channel->u.def, UNIT_VOLT);
-    } else if (operation == data::DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
+    } else if (operation == DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             value = page->m_voltageListLength;
         }
-    } else if (operation == data::DATA_OPERATION_GET_FLOAT_LIST) {
+    } else if (operation == DATA_OPERATION_GET_FLOAT_LIST) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             value = MakeFloatListValue(page->m_voltageList);
@@ -3979,8 +3943,8 @@ void data_channel_list_voltage(data::DataOperationEnum operation, data::Cursor c
     }
 }
 
-void data_channel_list_voltage_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_list_voltage_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             int iPage = page->getPageIndex();
@@ -3990,8 +3954,8 @@ void data_channel_list_voltage_enabled(data::DataOperationEnum operation, data::
     }
 }
 
-void data_channel_list_current(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_list_current(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             int iPage = page->getPageIndex();
@@ -3999,23 +3963,23 @@ void data_channel_list_current(data::DataOperationEnum operation, data::Cursor c
             if (iRow < page->m_currentListLength) {
                 value = MakeValue(page->m_currentList[iRow], UNIT_AMPER);
             } else {
-                value = data::Value(EMPTY_VALUE);
+                value = Value(EMPTY_VALUE);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value =
             MakeValue(channel_dispatcher::getIMin(*g_channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value =
             MakeValue(channel_dispatcher::getIMax(*g_channel), UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_DEF) {
+    } else if (operation == DATA_OPERATION_GET_DEF) {
         value = MakeValue(g_channel->i.def, UNIT_AMPER);
-    } else if (operation == data::DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
+    } else if (operation == DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             value = page->m_currentListLength;
         }
-    } else if (operation == data::DATA_OPERATION_GET_FLOAT_LIST) {
+    } else if (operation == DATA_OPERATION_GET_FLOAT_LIST) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             ChSettingsListsPage *page = (ChSettingsListsPage *)getActivePage();
@@ -4024,8 +3988,8 @@ void data_channel_list_current(data::DataOperationEnum operation, data::Cursor c
     }
 }
 
-void data_channel_list_current_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_list_current_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             int iPage = page->getPageIndex();
@@ -4035,8 +3999,8 @@ void data_channel_list_current_enabled(data::DataOperationEnum operation, data::
     }
 }
 
-void data_channel_lists_previous_page_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_lists_previous_page_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             int iPage = page->getPageIndex();
@@ -4045,8 +4009,8 @@ void data_channel_lists_previous_page_enabled(data::DataOperationEnum operation,
     }
 }
 
-void data_channel_lists_next_page_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_lists_next_page_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             int iPage = page->getPageIndex();
@@ -4055,20 +4019,20 @@ void data_channel_lists_next_page_enabled(data::DataOperationEnum operation, dat
     }
 }
 
-void data_channel_lists_cursor(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_lists_cursor(DataOperationEnum operation, Cursor cursor, Value &value) {
     ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
     if (page) {
-        if (operation == data::DATA_OPERATION_GET) {
-            value = data::Value(page->m_iCursor);
-        } else if (operation == data::DATA_OPERATION_SET) {
+        if (operation == DATA_OPERATION_GET) {
+            value = Value(page->m_iCursor);
+        } else if (operation == DATA_OPERATION_SET) {
             page->m_iCursor = value.getInt();
             page->moveCursorToFirstAvailableCell();
         }
     }
 }
 
-void data_channel_lists_insert_menu_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_lists_insert_menu_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             value = page->getRowIndex() < page->getMaxListLength();
@@ -4076,8 +4040,8 @@ void data_channel_lists_insert_menu_enabled(data::DataOperationEnum operation, d
     }
 }
 
-void data_channel_lists_delete_menu_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_lists_delete_menu_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             value = page->getMaxListLength();
@@ -4085,8 +4049,8 @@ void data_channel_lists_delete_menu_enabled(data::DataOperationEnum operation, d
     }
 }
 
-void data_channel_lists_delete_row_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_lists_delete_row_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             value = page->getRowIndex() < page->getMaxListLength();
@@ -4094,8 +4058,8 @@ void data_channel_lists_delete_row_enabled(data::DataOperationEnum operation, da
     }
 }
 
-void data_channel_lists_clear_column_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_lists_clear_column_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             value = page->getRowIndex() < page->getMaxListLength();
@@ -4103,8 +4067,8 @@ void data_channel_lists_clear_column_enabled(data::DataOperationEnum operation, 
     }
 }
 
-void data_channel_lists_delete_rows_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_lists_delete_rows_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
         if (page) {
             value = page->getRowIndex() < page->getMaxListLength();
@@ -4112,8 +4076,8 @@ void data_channel_lists_delete_rows_enabled(data::DataOperationEnum operation, d
     }
 }
 
-void data_trigger_source(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_trigger_source(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsTriggerPage *page =
             (SysSettingsTriggerPage *)getPage(PAGE_ID_SYS_SETTINGS_TRIGGER);
         if (page) {
@@ -4122,8 +4086,8 @@ void data_trigger_source(data::DataOperationEnum operation, data::Cursor cursor,
     }
 }
 
-void data_trigger_delay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_trigger_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsTriggerPage *page =
             (SysSettingsTriggerPage *)getPage(PAGE_ID_SYS_SETTINGS_TRIGGER);
         if (page) {
@@ -4132,8 +4096,8 @@ void data_trigger_delay(data::DataOperationEnum operation, data::Cursor cursor, 
     }
 }
 
-void data_trigger_initiate_continuously(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_trigger_initiate_continuously(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsTriggerPage *page =
             (SysSettingsTriggerPage *)getPage(PAGE_ID_SYS_SETTINGS_TRIGGER);
         if (page) {
@@ -4142,89 +4106,89 @@ void data_trigger_initiate_continuously(data::DataOperationEnum operation, data:
     }
 }
 
-void data_trigger_is_initiated(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_trigger_is_initiated(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = (trigger::isInitiated() || trigger::isTriggered()) && channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED;
-    } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
+    } else if (operation == DATA_OPERATION_IS_BLINKING) {
         value = trigger::isInitiated();
     }
 }
 
-void data_trigger_is_manual(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_trigger_is_manual(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = trigger::getSource() == trigger::SOURCE_MANUAL && !trigger::isTriggered();
     }
 }
 
-void data_channel_has_support_for_current_dual_range(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_has_support_for_current_dual_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = channel.hasSupportForCurrentDualRange();
     }
 }
 
-void data_channel_ranges_supported(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_ranges_supported(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = g_channel->hasSupportForCurrentDualRange();
     }
 }
 
-void data_channel_ranges_mode(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_ranges_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeEnumDefinitionValue(g_channel->getCurrentRangeSelectionMode(),
                                         ENUM_DEFINITION_CHANNEL_CURRENT_RANGE_SELECTION_MODE);
     }
 }
 
-void data_channel_ranges_auto_ranging(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_ranges_auto_ranging(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = g_channel->isAutoSelectCurrentRangeEnabled();
     }
 }
 
-void data_channel_ranges_currently_selected(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_ranges_currently_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = MakeEnumDefinitionValue(channel.flags.currentCurrentRange, ENUM_DEFINITION_CHANNEL_CURRENT_RANGE);
     }
 }
 
-void data_text_message(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(getTextMessageVersion(), VALUE_TYPE_TEXT_MESSAGE);
+void data_text_message(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(getTextMessageVersion(), VALUE_TYPE_TEXT_MESSAGE);
     }
 }
 
-void data_serial_status(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(serial::g_testResult);
+void data_serial_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(serial::g_testResult);
     }
 }
 
-void data_serial_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_serial_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = persist_conf::isSerialEnabled();
     }
 }
 
-void data_serial_is_connected(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(serial::isConnected());
+void data_serial_is_connected(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(serial::isConnected());
     }
 }
 
-void data_io_pins(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
+void data_io_pins(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
         value = 4;
     }
 }
 
-void data_io_pins_inhibit_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_io_pins_inhibit_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         if (io_pins::isInhibited()) {
             value = 1;
         } else {
@@ -4236,19 +4200,19 @@ void data_io_pins_inhibit_state(data::DataOperationEnum operation, data::Cursor 
                 value = 2;
             }
         }
-    } else if (operation == data::DATA_OPERATION_IS_BLINKING) {
+    } else if (operation == DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited();
     }
 }
 
-void data_io_pin_number(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(cursor + 1);
+void data_io_pin_number(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(cursor + 1);
     }
 }
 
-void data_io_pin_polarity(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_io_pin_polarity(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page) {
             value = MakeEnumDefinitionValue(page->m_polarity[cursor], ENUM_DEFINITION_IO_PINS_POLARITY);
@@ -4256,8 +4220,8 @@ void data_io_pin_polarity(data::DataOperationEnum operation, data::Cursor cursor
     }
 }
 
-void data_io_pin_function(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_io_pin_function(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page) {
             if (page->m_function[cursor] == io_pins::FUNCTION_PWM) {
@@ -4269,8 +4233,8 @@ void data_io_pin_function(data::DataOperationEnum operation, data::Cursor cursor
     }
 }
 
-void data_io_pin_function_name(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_io_pin_function_name(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page) {
             if (cursor < DOUT1) {
@@ -4284,8 +4248,8 @@ void data_io_pin_function_name(data::DataOperationEnum operation, data::Cursor c
     }
 }
 
-void data_io_pin_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_io_pin_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page) {
             int pin = cursor;
@@ -4312,8 +4276,8 @@ void data_io_pin_state(data::DataOperationEnum operation, data::Cursor cursor, d
     }
 }
 
-void data_io_pin_pwm_frequency(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_io_pin_pwm_frequency(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_IO_PIN_PWM_FREQUENCY;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
@@ -4327,17 +4291,17 @@ void data_io_pin_pwm_frequency(data::DataOperationEnum operation, data::Cursor c
                 value = MakeValue(io_pins::getPwmFrequency(cursor), UNIT_HERTZ);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_ALLOW_ZERO) {
+    } else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
         value = 1;
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(io_pins::PWM_MIN_FREQUENCY, UNIT_HERTZ);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(io_pins::PWM_MAX_FREQUENCY, UNIT_HERTZ);
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "PWM frequency";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_HERTZ;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page && page->getDirty()) {
             page->setPwmFrequency(cursor, value.getFloat());
@@ -4357,20 +4321,20 @@ void data_io_pin_pwm_frequency(data::DataOperationEnum operation, data::Cursor c
         value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static const int COUNT = 4;
-        static data::Value values[COUNT];
+        static Value values[COUNT];
         values[0] = Value(10000.0f, UNIT_HERTZ);
         values[1] = Value(1000.0f, UNIT_HERTZ);
         values[2] = Value(100.0f, UNIT_HERTZ);
         values[3] = Value(1.0f, UNIT_HERTZ);
-        data::StepValues *stepValues = (data::StepValues *)value.getVoidPointer();
+        StepValues *stepValues = (StepValues *)value.getVoidPointer();
         stepValues->count = COUNT;
         stepValues->values = values;
         value = 1;
     }
 }
 
-void data_io_pin_pwm_duty(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_IO_PIN_PWM_DUTY;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
@@ -4384,15 +4348,15 @@ void data_io_pin_pwm_duty(data::DataOperationEnum operation, data::Cursor cursor
                 value = MakeValue(io_pins::getPwmDuty(cursor), UNIT_PERCENT);
             }
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(io_pins::PWM_MIN_DUTY, UNIT_PERCENT);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(io_pins::PWM_MAX_DUTY, UNIT_PERCENT);
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "PWM duty cycle";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_PERCENT;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page && page->getDirty()) {
             page->setPwmDuty(cursor, value.getFloat());
@@ -4403,20 +4367,20 @@ void data_io_pin_pwm_duty(data::DataOperationEnum operation, data::Cursor cursor
         value = Value(1.0f, UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static const int COUNT = 4;
-        static data::Value values[COUNT];
+        static Value values[COUNT];
         values[0] = Value(5.0f, UNIT_PERCENT);
         values[1] = Value(1.0f, UNIT_PERCENT);
         values[2] = Value(0.5f, UNIT_PERCENT);
         values[3] = Value(0.1f, UNIT_PERCENT);
-        data::StepValues *stepValues = (data::StepValues *)value.getVoidPointer();
+        StepValues *stepValues = (StepValues *)value.getVoidPointer();
         stepValues->count = COUNT;
         stepValues->values = values;
         value = 1;
     }
 }
 
-void data_ntp_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_ntp_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page) {
             value = page->ntpEnabled;
@@ -4426,8 +4390,8 @@ void data_ntp_enabled(data::DataOperationEnum operation, data::Cursor cursor, da
     }
 }
 
-void data_ntp_server(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_ntp_server(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page =
             (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         if (page) {
@@ -4436,43 +4400,43 @@ void data_ntp_server(data::DataOperationEnum operation, data::Cursor cursor, dat
     }
 }
 
-void data_sys_display_background_luminosity_step(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(persist_conf::devConf.displayBackgroundLuminosityStep);
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+void data_sys_display_background_luminosity_step(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(persist_conf::devConf.displayBackgroundLuminosityStep);
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = DISPLAY_BACKGROUND_LUMINOSITY_STEP_MIN;
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = DISPLAY_BACKGROUND_LUMINOSITY_STEP_MAX;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         persist_conf::setDisplayBackgroundLuminosityStep((uint8_t)value.getInt());
     }
 }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 
-void data_simulator_load_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-	if (operation == data::DATA_OPERATION_GET) {
+void data_simulator_load_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
 		value = channel.simulator.getLoadEnabled() ? 1 : 0;
 	}
 }
 
-void data_simulator_load(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-	if (operation == data::DATA_OPERATION_GET) {
+void data_simulator_load(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
 		value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
 	}
 }
 
-void data_simulator_load_state2(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_simulator_load_state2(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor + 1);
         value = channel.simulator.getLoadEnabled() ? 1 : 0;
     }
 }
 
-void data_simulator_load2(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_simulator_load2(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor + 1);
         value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
     }
@@ -4480,8 +4444,8 @@ void data_simulator_load2(data::DataOperationEnum operation, data::Cursor cursor
 
 #endif
 
-void data_channel_active_coupled_led(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_active_coupled_led(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
         if (channel.isOutputEnabled()) {
             if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
@@ -4505,37 +4469,37 @@ void data_channel_active_coupled_led(data::DataOperationEnum operation, data::Cu
     }
 }
 
-void data_channels_with_list_counter_visible(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
+void data_channels_with_list_counter_visible(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
         value = list::g_numChannelsWithVisibleCounters;
     }
 }
 
-void data_list_counter_label(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_list_counter_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         if (cursor >= 0 && cursor < list::g_numChannelsWithVisibleCounters) {
             int iChannel = list::g_channelsWithVisibleCounters[cursor];
-            value = data::Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON);
+            value = Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON);
         }
     }
 }
 
 
-void data_channel_list_countdown(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_channel_list_countdown(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         if (cursor >= 0 && cursor < list::g_numChannelsWithVisibleCounters) {
             int iChannel = list::g_channelsWithVisibleCounters[cursor];
             Channel &channel = Channel::get(iChannel);
             int32_t remaining;
             uint32_t total;
             if (list::getCurrentDwellTime(channel, remaining, total) && total >= CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD) {
-                value = data::Value((uint32_t)remaining, VALUE_TYPE_COUNTDOWN);
+                value = Value((uint32_t)remaining, VALUE_TYPE_COUNTDOWN);
             }
         }
     }
 }
 
-void data_overlay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
     static const int NUM_WIDGETS = 4;
 
     static const int LIST_ICON_WIDGET = 0;
@@ -4546,9 +4510,9 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor cursor, data::
     static Overlay overlay;
     static WidgetOverride widgetOverrides[NUM_WIDGETS];
 
-    if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
-        value = data::Value(&overlay, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+    if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
         overlay.widgetOverrides = widgetOverrides;
 
         bool areListCountersVisible = list::g_numChannelsWithVisibleCounters > 0;
@@ -4648,21 +4612,21 @@ void data_overlay(data::DataOperationEnum operation, data::Cursor cursor, data::
             }
         }
 
-        value = data::Value(&overlay, VALUE_TYPE_POINTER);
+        value = Value(&overlay, VALUE_TYPE_POINTER);
     }
 }
 
-void data_nondrag_overlay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_nondrag_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
 }
 
-void data_dlog_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = dlog_record::getState();
     }
 }
 
-void data_dlog_toggle_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_toggle_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
     	if (CH_NUM == 0) {
             value = 5;
         } else if (dlog_record::isInStateTransition()) {
@@ -4679,14 +4643,14 @@ void data_dlog_toggle_state(data::DataOperationEnum operation, data::Cursor curs
     }
 }
 
-void data_is_show_live_recording(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_show_live_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
         value = &recording == &dlog_record::g_recording;
     }
 }
 
-void data_channel_history_values(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_channel_history_values(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC) {
         value = Channel::getChannelHistoryValueFuncs(cursor);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
@@ -4726,8 +4690,8 @@ void data_channel_history_values(data::DataOperationEnum operation, data::Cursor
     }
 }
 
-void data_dlog_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = (
                 channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || 
                 channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES
@@ -4735,87 +4699,87 @@ void data_dlog_enabled(data::DataOperationEnum operation, data::Cursor cursor, d
     }
 }
 
-void data_dlog_voltage_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_voltage_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = dlog_record::g_guiParameters.logVoltage[cursor];
     }
 }
 
-void data_dlog_current_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_current_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = dlog_record::g_guiParameters.logCurrent[cursor];
     }
 }
 
-void data_dlog_power_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_power_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = dlog_record::g_guiParameters.logPower[cursor];
     }
 }
 
-void data_dlog_period(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(dlog_record::g_guiParameters.period, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(dlog_record::PERIOD_MIN, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(dlog_record::PERIOD_MAX, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         dlog_record::g_guiParameters.period = value.getFloat();
     }
 }
 
-void data_dlog_duration(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeValue(dlog_record::g_guiParameters.time, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(dlog_record::TIME_MIN, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(INFINITY, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         dlog_record::g_guiParameters.time = value.getFloat();
     }
 }
 
-void data_dlog_file_name(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_file_name(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = dlog_record::g_guiParameters.filePath;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         strcpy(dlog_record::g_guiParameters.filePath, value.getString());
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(MAX_PATH_LENGTH, VALUE_TYPE_UINT32);
     }
 }
 
-void data_dlog_start_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_start_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = dlog_record::checkDlogParameters(dlog_record::g_guiParameters, true, false) == SCPI_RES_OK ? 1 : 0;
     }
 }
 
-void data_dlog_view_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_dlog_view_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = dlog_view::getState();
     }
 }
 
-void data_recording_ready(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_recording_ready(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = dlog_record::isExecuting() || dlog_record::getLatestFilePath() ? 1 : 0;
     }
 }
 
-void data_is_single_page_on_stack(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_is_single_page_on_stack(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = getNumPagesOnStack() == 1 ? 1 : 0;
     }
 }
 
-void data_recording(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     auto &recording = dlog_view::getRecording();
 
     if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
@@ -4906,7 +4870,7 @@ void data_recording(data::DataOperationEnum operation, data::Cursor cursor, data
                 valueAtTouchDown = dlogValueParams->div;
 
                 //uint32_t position = ytDataGetPosition(cursor, DATA_ID_RECORDING);
-                //Value::YtDataGetValueFunctionPointer ytDataGetValue = data::ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
+                //Value::YtDataGetValueFunctionPointer ytDataGetValue = ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
                 //for (int i = position + touchDrag->x - 10; i < position + touchDrag->x + 10; )
 
                 yAtTouchDown = touchDrag->y;
@@ -4971,20 +4935,20 @@ void data_recording(data::DataOperationEnum operation, data::Cursor cursor, data
         value = Value(recording.parameters.xAxis.step, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static const int COUNT = 5;
-        static data::Value values[COUNT];
+        static Value values[COUNT];
         values[0] = Value(recording.parameters.xAxis.step * 100, dlog_view::getXAxisUnit(recording));
         values[1] = Value(recording.parameters.xAxis.step * 50, dlog_view::getXAxisUnit(recording));
         values[2] = Value(recording.parameters.xAxis.step * 10, dlog_view::getXAxisUnit(recording));
         values[3] = Value(recording.parameters.xAxis.step * 5, dlog_view::getXAxisUnit(recording));
         values[4] = Value(recording.parameters.xAxis.step, dlog_view::getXAxisUnit(recording));
-        data::StepValues *stepValues = (data::StepValues *)value.getVoidPointer();
+        StepValues *stepValues = (StepValues *)value.getVoidPointer();
         stepValues->count = COUNT;
         stepValues->values = values;
         value = 1;
     }
 }
 
-void data_dlog_multiple_values_overlay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_dlog_multiple_values_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
     static const int NUM_WIDGETS = 2;
 
     static const int LABELS_CONTAINER_WIDGET = 0;
@@ -4993,9 +4957,9 @@ void data_dlog_multiple_values_overlay(data::DataOperationEnum operation, data::
     static Overlay overlay;
     static WidgetOverride widgetOverrides[NUM_WIDGETS];
 
-    if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
-        value = data::Value(&overlay, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+    if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
         auto &recording = dlog_view::getRecording();
         
         int state = 0;
@@ -5035,16 +4999,16 @@ void data_dlog_multiple_values_overlay(data::DataOperationEnum operation, data::
             }
         }
 
-        value = data::Value(&overlay, VALUE_TYPE_POINTER);
+        value = Value(&overlay, VALUE_TYPE_POINTER);
     }
 }
 
-void data_dlog_single_value_overlay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_dlog_single_value_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
     static Overlay overlay;
 
-    if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
-        value = data::Value(&overlay, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+    if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
         auto &recording = dlog_view::getRecording();
         overlay.state = dlog_view::g_showLegend && !dlog_view::isMulipleValuesOverlayHeuristic(recording);
         
@@ -5052,144 +5016,144 @@ void data_dlog_single_value_overlay(data::DataOperationEnum operation, data::Cur
         overlay.width = widgetCursor.widget->w;
         overlay.height = widgetCursor.widget->h;
         
-        value = data::Value(&overlay, VALUE_TYPE_POINTER);
+        value = Value(&overlay, VALUE_TYPE_POINTER);
     }
 }
 
-void data_dlog_visible_values(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
+void data_dlog_visible_values(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
         auto &recording = dlog_view::getRecording();
         value = getNumVisibleDlogValues(recording);
     }
 }
 
-void data_dlog_visible_value_label(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_visible_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
         int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor);
         value = Value(dlogValueIndex, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
 
-void data_dlog_visible_value_div(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_dlog_visible_value_div(DataOperationEnum operation, Cursor cursor, Value &value) {
     auto &recording = dlog_view::getRecording();
     int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor);
 
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
             value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].div), getYAxisUnit(recording, dlogValueIndex));
         }
-    } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
+    } else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
             value = Value(recording.dlogValues[dlogValueIndex].div, getYAxisUnit(recording, dlogValueIndex));
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = Value(0.001f, getYAxisUnit(recording, dlogValueIndex));
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(100.0f, getYAxisUnit(recording, dlogValueIndex));
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         recording.dlogValues[dlogValueIndex].offset = recording.dlogValues[dlogValueIndex].offset * value.getFloat() / recording.dlogValues[dlogValueIndex].div;
         recording.dlogValues[dlogValueIndex].div = value.getFloat();
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "Div";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = getYAxisUnit(recording, dlogValueIndex);
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
 }
 
-void data_dlog_visible_value_offset(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_dlog_visible_value_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
     auto &recording = dlog_view::getRecording();
     int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor);
 
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
             value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].offset), getYAxisUnit(recording, dlogValueIndex));
         }
-    } else if (operation == data::DATA_OPERATION_GET_EDIT_VALUE) {
+    } else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
             value = Value(recording.dlogValues[dlogValueIndex].offset, getYAxisUnit(recording, dlogValueIndex));
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = Value(-100.0f, getYAxisUnit(recording, dlogValueIndex));
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(100.0f, getYAxisUnit(recording, dlogValueIndex));
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         recording.dlogValues[dlogValueIndex].offset = value.getFloat();
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "Offset";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = getYAxisUnit(recording, dlogValueIndex);
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
 }
 
-void data_dlog_x_axis_offset(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_dlog_x_axis_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
     auto &recording = dlog_view::getRecording();
 
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
             value = Value(recording.xAxisOffset, dlog_view::getXAxisUnit(recording));
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = Value(recording.parameters.xAxis.range.min, dlog_view::getXAxisUnit(recording));
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(recording.parameters.xAxis.range.max - recording.pageSize * recording.parameters.period, dlog_view::getXAxisUnit(recording));
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         dlog_view::changeXAxisOffset(recording, value.getFloat());
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "Offset";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = dlog_view::getXAxisUnit(recording);
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
 }
 
-void data_dlog_x_axis_div(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_dlog_x_axis_div(DataOperationEnum operation, Cursor cursor, Value &value) {
     auto &recording = dlog_view::getRecording();
 
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else {
             value = Value(recording.xAxisDiv, dlog_view::getXAxisUnit(recording));
         }
-    } else if (operation == data::DATA_OPERATION_GET_MIN || operation == data::DATA_OPERATION_GET_DEF) {
+    } else if (operation == DATA_OPERATION_GET_MIN || operation == DATA_OPERATION_GET_DEF) {
         value = Value(recording.xAxisDivMin, dlog_view::getXAxisUnit(recording));
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(recording.xAxisDivMax, dlog_view::getXAxisUnit(recording));
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         dlog_view::changeXAxisDiv(recording, value.getFloat());
-    } else if (operation == data::DATA_OPERATION_GET_NAME) {
+    } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "Div";
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = dlog_view::getXAxisUnit(recording);
-    } else if (operation == data::DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     }
 }
 
-void data_dlog_x_axis_max_value(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_x_axis_max_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
 
         float maxValue = dlog_view::getDuration(recording);
@@ -5202,8 +5166,8 @@ void data_dlog_x_axis_max_value(data::DataOperationEnum operation, data::Cursor 
     }
 }
 
-void data_dlog_x_axis_max_value_label(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_x_axis_max_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
         if (recording.parameters.xAxis.unit == UNIT_SECOND) {
             value = "Total duration";
@@ -5213,11 +5177,11 @@ void data_dlog_x_axis_max_value_label(data::DataOperationEnum operation, data::C
     }
 }
 
-void data_dlog_visible_value_cursor(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_visible_value_cursor(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
         int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor);
-        auto ytDataGetValue = data::ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
+        auto ytDataGetValue = ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
         float max;
         float min = ytDataGetValue(ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, dlogValueIndex, &max);
         float cursorValue = (min + max) / 2;
@@ -5230,57 +5194,57 @@ void data_dlog_visible_value_cursor(data::DataOperationEnum operation, data::Cur
     }
 }
 
-void data_dlog_current_time(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_current_time(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = Value(0, VALUE_TYPE_DLOG_CURRENT_TIME);
     }
 }
 
-void data_dlog_file_length(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_file_length(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = Value(dlog_record::g_fileLength, VALUE_TYPE_FILE_LENGTH);
     }
 }
 
-void data_dlog_all_values(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
+void data_dlog_all_values(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
         value = MAX_NUM_OF_Y_VALUES;
     }
 }
 
-void data_dlog_value_label(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = Value(cursor, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
 
-void data_dlog_value_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_value_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
         value = cursor < recording.parameters.numYAxes ? recording.dlogValues[cursor].isVisible : 2;
     }
 }
 
-void data_dlog_view_show_legend(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_view_show_legend(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = dlog_view::g_showLegend ? 1 : 0;
     }
 }
 
-void data_dlog_view_show_labels(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_dlog_view_show_labels(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = dlog_view::g_showLabels ? 1 : 0;
     }
 }
 
-void data_script_is_started(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_script_is_started(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = mp::isIdle() ? 0 : 1;
     }
 }
 
-void data_script_info(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_script_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         // get script file name
         const char *p = mp::g_scriptPath + strlen(mp::g_scriptPath) - 1;
         while (p >= mp::g_scriptPath && *p != '/' && *p != '\\') {
@@ -5290,9 +5254,9 @@ void data_script_info(data::DataOperationEnum operation, data::Cursor cursor, da
     }
 }
 
-void data_mqtt_enabled(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_mqtt_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
             value = page->m_enabled ? 1 : 0;
@@ -5303,52 +5267,52 @@ void data_mqtt_enabled(data::DataOperationEnum operation, data::Cursor cursor, d
 #endif
 }
 
-void data_mqtt_connection_state(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_mqtt_connection_state(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         value = mqtt::g_connectionState + 1;
     }
 #endif
 }
 
-void data_mqtt_host(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_mqtt_host(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
             value = page->m_host;
         } else {
             value = persist_conf::devConf.mqttHost;
         }
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
             strcpy(page->m_host, value.getString());
         }
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(64, VALUE_TYPE_UINT32);
     }
 #endif
 }
 
-void data_mqtt_port(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_mqtt_port(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
             value = Value(page->m_port, VALUE_TYPE_UINT16);
         } else {
             value = Value(persist_conf::devConf.mqttPort, VALUE_TYPE_UINT16);
         }
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = Value(0, VALUE_TYPE_UINT16);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(65535, VALUE_TYPE_UINT16);
-    } else if (operation == data::DATA_OPERATION_GET_DEF) {
+    } else if (operation == DATA_OPERATION_GET_DEF) {
         value = Value(1883, VALUE_TYPE_UINT16);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
             page->m_port = value.getUInt16();
@@ -5358,62 +5322,62 @@ void data_mqtt_port(data::DataOperationEnum operation, data::Cursor cursor, data
 #endif
 }
 
-void data_mqtt_username(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_mqtt_username(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
             value = page->m_username;
         } else {
             value = persist_conf::devConf.mqttUsername;
         }
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
             strcpy(page->m_username, value.getString());
         }
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(32, VALUE_TYPE_UINT32);
     }
 #endif
 }
 
-void data_mqtt_password(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_mqtt_password(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
             value = Value(page->m_password, VALUE_TYPE_PASSWORD);
         } else {
             value = Value(persist_conf::devConf.mqttPassword, VALUE_TYPE_PASSWORD);
         }
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
             strcpy(page->m_password, value.getString());
         }
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(32, VALUE_TYPE_UINT32);
     }
 #endif
 }
 
-void data_mqtt_period(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_mqtt_period(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
-    if (operation == data::DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
             value = Value(page->m_period, UNIT_SECOND);
         } else {
             value = Value(persist_conf::devConf.mqttPeriod, UNIT_SECOND);
         }
-    } else if (operation == data::DATA_OPERATION_GET_UNIT) {
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
-    } else if (operation == data::DATA_OPERATION_GET_MIN) {
+    } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(mqtt::PERIOD_MIN, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_GET_MAX) {
+    } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(mqtt::PERIOD_MAX, UNIT_SECOND);
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
             page->m_period = value.getFloat();
@@ -5422,88 +5386,88 @@ void data_mqtt_period(data::DataOperationEnum operation, data::Cursor cursor, da
 #endif
 }
 
-void data_progress(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_progress(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = g_progress;
     }
 }
 
 void data_selected_theme(DataOperationEnum operation, Cursor cursor, Value &value) {
-	if (operation == data::DATA_OPERATION_GET) {
+	if (operation == DATA_OPERATION_GET) {
 		value = getThemeName(psu::persist_conf::devConf.selectedThemeIndex);
 	}
 }
 
 void data_animations_duration(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(psu::persist_conf::devConf.animationsDuration, UNIT_SECOND);
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(psu::persist_conf::devConf.animationsDuration, UNIT_SECOND);
     }
 }
 
-void data_master_info(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_master_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = Value(0, VALUE_TYPE_MASTER_INFO);
     }
 }
 
-void data_master_test_result(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_master_test_result(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = Value((int)g_masterTestResult, VALUE_TYPE_TEST_RESULT);
     }
 }
 
-void data_slot1_info(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot1_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = Value(0, VALUE_TYPE_SLOT_INFO);
     }
 }
 
-void data_slot1_test_result (data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot1_test_result (DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = Value((int)psu::Channel::getBySlotIndex(0).getTestResult(), VALUE_TYPE_TEST_RESULT);
     }
 }
 
-void data_slot2_info(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot2_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = Value(1, VALUE_TYPE_SLOT_INFO);
     }
 }
 
-void data_slot2_test_result(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot2_test_result(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = Value((int)psu::Channel::getBySlotIndex(1).getTestResult(), VALUE_TYPE_TEST_RESULT);
     }
 }
 
-void data_slot3_info(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot3_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = Value(2, VALUE_TYPE_SLOT_INFO);
     }
 }
 
-void data_slot3_test_result(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_slot3_test_result(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = Value((int)psu::Channel::getBySlotIndex(2).getTestResult(), VALUE_TYPE_TEST_RESULT);
     }
 }
 
-void data_is_reset_by_iwdg(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_is_reset_by_iwdg(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         #if defined(EEZ_PLATFORM_STM32)
             value = g_isResetByIWDG ? 1 : 0;
         #endif
     }
 }
 
-void data_can_show_previous_page(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_can_show_previous_page(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = getNumPagesOnStack() > 1;
     }
 }
 
-void data_async_progress(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_async_progress(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         auto x = ((millis() / 40) * 40 - g_psuAppContext.getAsyncInProgressStartTime()) % 1000;
         if (x < 500) {
             x = x * 75 / 500;
@@ -5514,36 +5478,36 @@ void data_async_progress(data::DataOperationEnum operation, data::Cursor cursor,
     }
 }
 
-void data_alert_message_is_set(data::DataOperationEnum operation, data::Cursor cursor,
-                        data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_alert_message_is_set(DataOperationEnum operation, Cursor cursor,
+                        Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = g_alertMessage.getString() != nullptr;
     }
 }
 
-void data_alert_message(data::DataOperationEnum operation, data::Cursor cursor,
-                        data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_alert_message(DataOperationEnum operation, Cursor cursor,
+                        Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = psu::gui::g_alertMessage;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         g_alertMessage = value;
     }
 }
 
-void data_alert_message_2(data::DataOperationEnum operation, data::Cursor cursor,
-                          data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_alert_message_2(DataOperationEnum operation, Cursor cursor,
+                          Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = g_alertMessage2;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         g_alertMessage2 = value;
     }
 }
 
-void data_alert_message_3(data::DataOperationEnum operation, data::Cursor cursor,
-                          data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_alert_message_3(DataOperationEnum operation, Cursor cursor,
+                          Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = g_alertMessage3;
-    } else if (operation == data::DATA_OPERATION_SET) {
+    } else if (operation == DATA_OPERATION_SET) {
         g_alertMessage3 = value;
     }
 }

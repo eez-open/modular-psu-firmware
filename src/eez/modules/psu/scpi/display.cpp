@@ -24,7 +24,6 @@
 #if OPTION_DISPLAY
 #include <eez/gui/gui.h>
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/system.h>
 #endif
 

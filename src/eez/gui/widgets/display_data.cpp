@@ -52,15 +52,15 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
 
 	const Style *style = getStyle(widget->style);
 
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor, widget->data);
+    widgetCursor.currentState->flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
     
     uint32_t currentTime = millis();
-    widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
     bool refreshData;
     if (widgetCursor.previousState) {
         refreshData = widgetCursor.currentState->data != widgetCursor.previousState->data;
         if (refreshData) {
-            uint32_t refreshRate = data::getTextRefreshRate(widgetCursor.cursor, widget->data);
+            uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
             if (refreshRate != 0) {
                 refreshData = (currentTime - previousState->dataRefreshLastTime) > refreshRate;
                 if (!refreshData) {
@@ -73,10 +73,10 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
     }
     currentState->dataRefreshLastTime = refreshData ? currentTime : previousState->dataRefreshLastTime;
 
-    currentState->color = widgetCursor.currentState->flags.focused ? style->focus_color : data::getColor(widgetCursor.cursor, widget->data, style);
-    currentState->backgroundColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : data::getBackgroundColor(widgetCursor.cursor, widget->data, style);
-    currentState->activeColor = data::getActiveColor(widgetCursor.cursor, widget->data, style);
-    currentState->activeBackgroundColor = data::getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
+    currentState->color = widgetCursor.currentState->flags.focused ? style->focus_color : getColor(widgetCursor.cursor, widget->data, style);
+    currentState->backgroundColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : getBackgroundColor(widgetCursor.cursor, widget->data, style);
+    currentState->activeColor = getActiveColor(widgetCursor.cursor, widget->data, style);
+    currentState->activeBackgroundColor = getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
 
     bool refresh =
         !widgetCursor.previousState ||

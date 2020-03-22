@@ -27,10 +27,6 @@ typedef void (*ActionExecFunc)();
 
 namespace gui {
 
-using eez::gui::data::DataOperationEnum;
-using eez::gui::data::Cursor;
-using eez::gui::data::Value;
-
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/gui/document_stm32.h>
 #elif defined(EEZ_PLATFORM_SIMULATOR)

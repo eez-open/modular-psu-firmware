@@ -28,7 +28,7 @@ struct LayoutViewWidgetSpecific {
 
 struct LayoutViewWidgetState {
     WidgetState genericState;
-    data::Value context;
+    Value context;
 };
 
 void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);

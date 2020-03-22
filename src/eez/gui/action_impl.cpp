@@ -39,14 +39,12 @@
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/animations.h>
 #include <eez/modules/psu/gui/calibration.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/page_ch_settings.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
 #include <eez/modules/psu/gui/password.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/touch_calibration.h>
 #include <eez/modules/psu/gui/file_manager.h>
 
@@ -378,12 +376,12 @@ void onChannelCopyDestinationSelected(uint16_t value) {
     }
 }
 
-void channelsEnumDefinition(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void channelsEnumDefinition(DataOperationEnum operation, Cursor cursor, Value &value) {
     int channelIndex = cursor < g_channel->channelIndex ? cursor : cursor + 1;
 
-    if (operation == data::DATA_OPERATION_GET_VALUE) {
+    if (operation == DATA_OPERATION_GET_VALUE) {
         value = (uint8_t)channelIndex;
-    } else if (operation == data::DATA_OPERATION_GET_LABEL) {
+    } else if (operation == DATA_OPERATION_GET_LABEL) {
 		if (channelIndex < CH_NUM) {
 			value = Value(channelIndex, VALUE_TYPE_CHANNEL_SHORT_LABEL_WITHOUT_COLUMN);
 		}
@@ -976,10 +974,10 @@ void action_simulator_load() {
 
 #endif
 
-void themesEnumDefinition(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET_VALUE) {
+void themesEnumDefinition(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET_VALUE) {
         value = (uint8_t)cursor;
-    } else if (operation == data::DATA_OPERATION_GET_LABEL) {
+    } else if (operation == DATA_OPERATION_GET_LABEL) {
 		if (cursor < getThemesCount()) {
 			value = getThemeName(cursor);
 		}
@@ -1015,7 +1013,7 @@ void action_edit_animations_duration() {
     options.flags.signButtonEnabled = false;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, data::Value(psu::persist_conf::devConf.animationsDuration, UNIT_SECOND), options, onSetAnimationsDuration, 0, 0);
+    NumericKeypad::start(0, Value(psu::persist_conf::devConf.animationsDuration, UNIT_SECOND), options, onSetAnimationsDuration, 0, 0);
 }
 
 void action_user_switch_clicked() {
@@ -1023,7 +1021,7 @@ void action_user_switch_clicked() {
 		return;
 	}
 
-    if (getActiveSelectEnumDefinition() == g_userSwitchActionEnumDefinition) {
+    if (getActiveSelectEnumDefinition() == g_enumDefinitions[ENUM_DEFINITION_USER_SWITCH_ACTION]) {
         popSelectFromEnumPage();
         return;
     }
@@ -1096,11 +1094,11 @@ void onSetUserSwitchAction(uint16_t value) {
 }
 
 void action_select_user_switch_action() {
-    if (getActiveSelectEnumDefinition() == g_userSwitchActionEnumDefinition) {
+    if (getActiveSelectEnumDefinition() == g_enumDefinitions[ENUM_DEFINITION_USER_SWITCH_ACTION]) {
     	popSelectFromEnumPage();
     } else {
         clearFoundWidgetAtDown();
-        pushSelectFromEnumPage(g_userSwitchActionEnumDefinition, persist_conf::devConf.userSwitchAction, nullptr, onSetUserSwitchAction);
+        pushSelectFromEnumPage(ENUM_DEFINITION_USER_SWITCH_ACTION, persist_conf::devConf.userSwitchAction, nullptr, onSetUserSwitchAction);
     }
 }
 
@@ -1122,7 +1120,7 @@ void onSetModuleType(uint16_t moduleType) {
 
 void selectSlot(int slotIndex) {
     g_slotIndex = slotIndex;
-    pushSelectFromEnumPage(&g_frontPanelAppContext, g_moduleTypeEnumDefinition, g_slots[slotIndex].moduleInfo->moduleType, NULL, onSetModuleType);
+    pushSelectFromEnumPage(&g_frontPanelAppContext, ENUM_DEFINITION_MODULE_TYPE, g_slots[slotIndex].moduleInfo->moduleType, NULL, onSetModuleType);
 }
 
 void action_front_panel_select_slot1() {

@@ -67,7 +67,7 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1)
     return page;
 }
 
-ToastMessagePage *ToastMessagePage::create(ToastType type, data::Value message1Value)  {
+ToastMessagePage *ToastMessagePage::create(ToastType type, Value message1Value)  {
     ToastMessagePage *page = ToastMessagePage::findFreePage();
 
     page->type = type;
@@ -116,7 +116,7 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1,
     return page;
 }
 
-ToastMessagePage *ToastMessagePage::create(ToastType type, data::Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam) {
+ToastMessagePage *ToastMessagePage::create(ToastType type, Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam) {
     ToastMessagePage *page = ToastMessagePage::findFreePage();
 
     page->type = type;
@@ -335,7 +335,7 @@ void ToastMessagePage::executeActionWithoutParam() {
 
 void SelectFromEnumPage::init(
     AppContext *appContext_,
-    const data::EnumItem *enumDefinition_,
+    const EnumItem *enumDefinition_,
     uint16_t currentValue_,
     bool (*disabledCallback_)(uint16_t value),
     void (*onSet_)(uint16_t),
@@ -356,7 +356,7 @@ void SelectFromEnumPage::init(
 
 void SelectFromEnumPage::init(
     AppContext *appContext_,
-    void (*enumDefinitionFunc_)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value),
+    void (*enumDefinitionFunc_)(DataOperationEnum operation, Cursor cursor, Value &value),
     uint16_t currentValue_,
     bool (*disabledCallback_)(uint16_t value),
     void (*onSet_)(uint16_t),
@@ -390,9 +390,9 @@ void SelectFromEnumPage::init() {
 
 uint16_t SelectFromEnumPage::getValue(int i) {
     if (enumDefinitionFunc) {
-        data::Value value;
-        data::Cursor cursor(i);
-        enumDefinitionFunc(data::DATA_OPERATION_GET_VALUE, cursor, value);
+        Value value;
+        Cursor cursor(i);
+        enumDefinitionFunc(DATA_OPERATION_GET_VALUE, cursor, value);
         return value.getUInt8();
     }
     
@@ -401,9 +401,9 @@ uint16_t SelectFromEnumPage::getValue(int i) {
 
 bool SelectFromEnumPage::getLabel(int i, char *text, int count) {
     if (enumDefinitionFunc) {
-        data::Value value;
-        data::Cursor cursor(i);
-        enumDefinitionFunc(data::DATA_OPERATION_GET_LABEL, cursor, value);
+        Value value;
+        Cursor cursor(i);
+        enumDefinitionFunc(DATA_OPERATION_GET_LABEL, cursor, value);
         if (value.getType() != VALUE_TYPE_NONE) {
             if (text) {
                 value.toText(text, count);

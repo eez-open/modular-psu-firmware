@@ -32,7 +32,7 @@ using namespace eez::mcu;
 namespace eez {
 namespace gui {
 
-int calcValuePosInBarGraphWidget(data::Value &value, float min, float max, int d) {
+int calcValuePosInBarGraphWidget(Value &value, float min, float max, int d) {
     int p = (int)roundf((value.getFloat() - min) * d / (max - min));
 
     if (p < 0) {
@@ -68,19 +68,19 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(BarGraphWidgetState);
 
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor, widget->data);
-    widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
+    widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
     
     auto currentState = (BarGraphWidgetState *)widgetCursor.currentState;
     auto previousState = (BarGraphWidgetState *)widgetCursor.previousState;
 
-    currentState->color = data::getColor(widgetCursor.cursor, widget->data, style);
-    currentState->backgroundColor = data::getBackgroundColor(widgetCursor.cursor, widget->data, style);
-    currentState->activeColor = data::getActiveColor(widgetCursor.cursor, widget->data, style);
-    currentState->activeBackgroundColor = data::getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
+    currentState->color = getColor(widgetCursor.cursor, widget->data, style);
+    currentState->backgroundColor = getBackgroundColor(widgetCursor.cursor, widget->data, style);
+    currentState->activeColor = getActiveColor(widgetCursor.cursor, widget->data, style);
+    currentState->activeBackgroundColor = getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
 
-    currentState->line1Data = data::get(widgetCursor.cursor, barGraphWidget->line1Data);
-    currentState->line2Data = data::get(widgetCursor.cursor, barGraphWidget->line2Data);
+    currentState->line1Data = get(widgetCursor.cursor, barGraphWidget->line1Data);
+    currentState->line2Data = get(widgetCursor.cursor, barGraphWidget->line2Data);
 
     uint32_t currentTime = millis();
     currentState->textData = widgetCursor.currentState->data;
@@ -88,7 +88,7 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
     if (previousState) {
         refreshTextData = currentState->textData != previousState->textData;
         if (refreshTextData) {
-            uint32_t refreshRate = data::getTextRefreshRate(widgetCursor.cursor, widget->data);
+            uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
             if (refreshRate != 0) {
                 refreshTextData = (currentTime - previousState->textDataRefreshLastTime) > refreshRate;
                 if (!refreshTextData) {
@@ -120,8 +120,8 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
         const int w = widget->w;
         const int h = widget->h;
 
-        float min = data::getMin(widgetCursor.cursor, widget->data).getFloat();
-        float max = fullScale ? currentState->line2Data.getFloat() : data::getMax(widgetCursor.cursor, widget->data).getFloat();
+        float min = getMin(widgetCursor.cursor, widget->data).getFloat();
+        float max = fullScale ? currentState->line2Data.getFloat() : getMax(widgetCursor.cursor, widget->data).getFloat();
 
         bool horizontal = barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_LEFT_RIGHT || barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_RIGHT_LEFT;
 

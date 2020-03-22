@@ -43,7 +43,6 @@
 #include <eez/gui/widgets/container.h>
 
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/animations.h>
 #endif
 
@@ -741,56 +740,56 @@ Value MakeEventValue(event_queue::Event *e) {
     return value;
 }
 
-void data_event_queue_last_event_type(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
-        value = data::Value(getEventType(getLastErrorEventId()));
+void data_event_queue_last_event_type(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(getEventType(getLastErrorEventId()));
     }
 }
 
-void data_event_queue_events(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_COUNT) {
+void data_event_queue_events(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
         value = (int)g_numEvents;
-    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_SIZE) {
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
         value = Value(g_numEvents, VALUE_TYPE_UINT32);
-    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_POSITION) {
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
         value = Value(g_displayFromPosition, VALUE_TYPE_UINT32);
-    } else if (operation == data::DATA_OPERATION_YT_DATA_SET_POSITION) {
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
         setDisplayFromPosition(value.getUInt32());
-    } else if (operation == data::DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
         value = Value(EVENTS_PER_PAGE, VALUE_TYPE_UINT32);
     }
 }
 
-void data_event_queue_event_type(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_event_queue_event_type(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         event_queue::Event *event = getEvent(cursor);
-        value = data::Value(event ? getEventType(event) : EVENT_TYPE_NONE);
+        value = Value(event ? getEventType(event) : EVENT_TYPE_NONE);
     }
 }
 
-void data_event_queue_event_message(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_event_queue_event_message(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         value = MakeEventValue(getEvent(cursor));
     }
 }
 
-void data_event_queue_is_long_message_text(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_event_queue_is_long_message_text(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         event_queue::Event *event = getEvent(cursor);
         value = isLongMessageText(event);
     }
 }
 
-void data_event_queue_event_is_selected(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_event_queue_event_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         event_queue::Event *event = getEvent(cursor);
         event_queue::Event *selectedEvent = getSelectedEvent();
         value = event == selectedEvent;
     }
 }
 
-void data_event_queue_selected_event_message(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET) {
+void data_event_queue_selected_event_message(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
         event_queue::Event *selectedEvent = getSelectedEvent();
         if (selectedEvent) {
             value = getEventMessage(selectedEvent);
@@ -798,7 +797,7 @@ void data_event_queue_selected_event_message(data::DataOperationEnum operation, 
     }
 }
 
-void data_event_queue_event_long_message_overlay(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void data_event_queue_event_long_message_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
     static const int NUM_WIDGETS = 1;
 
     static const int MULTI_LINE_TEXT_WIDGET = 0;
@@ -806,9 +805,9 @@ void data_event_queue_event_long_message_overlay(data::DataOperationEnum operati
     static Overlay overlay;
     static WidgetOverride widgetOverrides[NUM_WIDGETS];
 
-    if (operation == data::DATA_OPERATION_GET_OVERLAY_DATA) {
-        value = data::Value(&overlay, VALUE_TYPE_POINTER);
-    } else if (operation == data::DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+    if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
         overlay.widgetOverrides = widgetOverrides;
 
         int selectedEventIndexWithinPage = g_selectedEventIndex != -1 ? g_selectedEventIndex - g_displayFromPosition : -1;
@@ -853,7 +852,7 @@ void data_event_queue_event_long_message_overlay(data::DataOperationEnum operati
             }
         }
 
-        value = data::Value(&overlay, VALUE_TYPE_POINTER);
+        value = Value(&overlay, VALUE_TYPE_POINTER);
     }
 }
 
@@ -863,7 +862,7 @@ void onSetEventQueueFilter(uint16_t value) {
 }
 
 void action_event_queue_filter() {
-    pushSelectFromEnumPage(g_eventQueueFilterEnumDefinition, (uint16_t)event_queue::getFilter(), NULL, onSetEventQueueFilter);
+    pushSelectFromEnumPage(ENUM_DEFINITION_QUEUE_FILTER, (uint16_t)event_queue::getFilter(), NULL, onSetEventQueueFilter);
 }
 
 void action_event_queue_select_event() {

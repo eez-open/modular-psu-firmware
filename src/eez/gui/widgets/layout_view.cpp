@@ -27,7 +27,7 @@ namespace gui {
 
 int getLayoutId(const WidgetCursor &widgetCursor) {
     if (widgetCursor.widget->data) {
-        auto layoutValue = data::get(widgetCursor.cursor, widgetCursor.widget->data);
+        auto layoutValue = get(widgetCursor.cursor, widgetCursor.widget->data);
         return layoutValue.getInt();
     }
     
@@ -47,7 +47,7 @@ void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callb
     Value oldContext;
     Value newContext;
     if (layoutViewSpecific->context) {
-        data::setContext(widgetCursor.cursor, layoutViewSpecific->context, oldContext, newContext);
+        setContext(widgetCursor.cursor, layoutViewSpecific->context, oldContext, newContext);
     }
 
     int layoutId = getLayoutId(widgetCursor);
@@ -59,7 +59,7 @@ void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callb
 	}
 
     if (layoutViewSpecific->context) {
-        data::restoreContext(widgetCursor.cursor, layoutViewSpecific->context, oldContext);
+        restoreContext(widgetCursor.cursor, layoutViewSpecific->context, oldContext);
     }
 
     widgetCursor.cursor = cursor;
@@ -72,7 +72,7 @@ void LayoutViewWidget_draw(const WidgetCursor &widgetCursor) {
     Value oldContext;
     Value newContext;
     if (layoutViewSpecific->context) {
-        data::setContext(((WidgetCursor &)widgetCursor).cursor, layoutViewSpecific->context, oldContext, newContext);
+        setContext(((WidgetCursor &)widgetCursor).cursor, layoutViewSpecific->context, oldContext, newContext);
         ((LayoutViewWidgetState *)widgetCursor.currentState)->context = newContext;
     } else {
         ((LayoutViewWidgetState *)widgetCursor.currentState)->context = Value();
@@ -81,7 +81,7 @@ void LayoutViewWidget_draw(const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->data = getLayoutId(widgetCursor);
 
     if (layoutViewSpecific->context) {
-        data::restoreContext(((WidgetCursor &)widgetCursor).cursor, layoutViewSpecific->context, oldContext);
+        restoreContext(((WidgetCursor &)widgetCursor).cursor, layoutViewSpecific->context, oldContext);
     }
 
     bool refresh =

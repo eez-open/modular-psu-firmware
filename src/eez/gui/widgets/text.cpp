@@ -47,7 +47,7 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
     const char *text = GET_WIDGET_PROPERTY(textWidget, text, const char *);
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);
-    widgetCursor.currentState->data = !(text && text[0]) && widget->data ? data::get(widgetCursor.cursor, widget->data) : 0;
+    widgetCursor.currentState->data = !(text && text[0]) && widget->data ? get(widgetCursor.cursor, widget->data) : 0;
 
     bool refresh =
         !widgetCursor.previousState ||

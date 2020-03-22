@@ -171,7 +171,7 @@ struct WidgetStateFlags {
 struct WidgetState {
     uint16_t size;
     WidgetStateFlags flags;
-    data::Value data;
+    Value data;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,7 +183,7 @@ struct WidgetCursor {
     const Widget *widget;
     int16_t x;
     int16_t y;
-    data::Cursor cursor;
+    Cursor cursor;
     WidgetState *previousState;
     WidgetState *currentState;
 
@@ -203,7 +203,7 @@ struct WidgetCursor {
         const Widget *widget_,
         int x_,
         int y_,
-        const data::Cursor cursor_,
+        const Cursor cursor_,
         WidgetState *previousState_,
         WidgetState *currentState_
     )

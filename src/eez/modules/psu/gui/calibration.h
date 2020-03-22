@@ -24,7 +24,7 @@ namespace gui {
 namespace calibration_wizard {
 
 void start();
-eez::gui::data::Value getLevelValue();
+Value getLevelValue();
 void setLevelValue();
 void set();
 void previousStep();

@@ -32,8 +32,6 @@ class AppContext;
 struct WidgetCursor;
 struct Style;
 
-namespace data {
-
 struct EnumItem {
     uint16_t value;
     const char *menuLabel;
@@ -374,7 +372,7 @@ bool isChannelData(Cursor cursor, int16_t id);
 Value getEncoderStep(Cursor cursor, int16_t id);
 struct StepValues {
     int count;
-    const eez::gui::data::Value *values;
+    const Value *values;
 };
 bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues);
 
@@ -431,6 +429,5 @@ struct TouchDrag {
 };
 void ytDataTouchDrag(Cursor cursor, int16_t id, TouchDrag *touchDrag);
 
-} // namespace data
 } // namespace gui
 } // namespace eez

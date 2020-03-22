@@ -31,7 +31,7 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
 
     const Widget *widget = widgetCursor.widget;
     Value appContextValue;
-    DATA_OPERATION_FUNCTION(widget->data, data::DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
+    DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
     bool refresh = !widgetCursor.previousState;
@@ -52,7 +52,7 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
 
 void AppViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     Value appContextValue;
-    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, data::DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
+    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
     WidgetCursor savedWidgetCursor = widgetCursor;

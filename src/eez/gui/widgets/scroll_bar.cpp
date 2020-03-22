@@ -38,23 +38,23 @@ static int g_dragStartX;
 static int g_dragStartPosition;
 
 int getSize(const WidgetCursor &widgetCursor) {
-    return data::ytDataGetSize(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+    return ytDataGetSize(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 }
 
 int getPosition(const WidgetCursor &widgetCursor) {
-    return data::ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+    return ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 }
 
 int getPositionIncrement(const WidgetCursor &widgetCursor) {
-    return data::ytDataGetPositionIncrement(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+    return ytDataGetPositionIncrement(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 }
 
 int getPageSize(const WidgetCursor &widgetCursor) {
-    return data::ytDataGetPageSize(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+    return ytDataGetPageSize(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 }
 
 void setPosition(const WidgetCursor &widgetCursor, int position) {
-    data::ytDataSetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data, position < 0 ? 0 : position);
+    ytDataSetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data, position < 0 ? 0 : position);
 }
 
 void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTrack, int minThumbWidth, int &xThumb, int &widthThumb) {

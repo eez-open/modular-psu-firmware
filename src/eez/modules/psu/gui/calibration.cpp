@@ -32,7 +32,6 @@
 
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/calibration.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/password.h>
 
@@ -72,7 +71,7 @@ void start() {
     checkPassword("Password: ", persist_conf::devConf.calibrationPassword, onStartPasswordOk);
 }
 
-data::Value getLevelValue() {
+Value getLevelValue() {
     if (g_stepNum < 3) {
         return MakeValue(calibration::getVoltage().getLevelValue(), UNIT_VOLT);
     }
@@ -139,7 +138,7 @@ void onSetLevelOk(float value) {
 }
 
 void setLevelValue() {
-    data::Value levelValue = getLevelValue();
+    Value levelValue = getLevelValue();
 
     NumericKeypadOptions options;
 
@@ -222,7 +221,7 @@ void set() {
         options.flags.signButtonEnabled = true;
         options.flags.dotButtonEnabled = true;
 
-        NumericKeypad *numericKeypad = NumericKeypad::start(0, data::Value(), options, onSetOk, 0, showCurrentStep);
+        NumericKeypad *numericKeypad = NumericKeypad::start(0, Value(), options, onSetOk, 0, showCurrentStep);
 
         if (getLevelValue().getFloat() < 0.001) {
             numericKeypad->switchToMicro();
@@ -260,7 +259,7 @@ void nextStep() {
         int16_t scpiErr;
         int16_t uiErr;
         if (!calibration::canSave(scpiErr, &uiErr)) {
-            psuErrorMessage(data::Cursor(calibration::getCalibrationChannel().channelIndex), MakeScpiErrorValue(uiErr));
+            psuErrorMessage(Cursor(calibration::getCalibrationChannel().channelIndex), MakeScpiErrorValue(uiErr));
             return;
         }
     }

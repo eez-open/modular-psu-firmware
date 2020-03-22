@@ -61,7 +61,7 @@ class Keypad : public Page {
     virtual void cancel();
 
     virtual void getKeypadText(char *text);
-    eez::gui::data::Value getKeypadTextValue();
+    Value getKeypadTextValue();
 
     void appendChar(char c);
     void appendCursor(char *text);
@@ -153,7 +153,7 @@ public:
     void init(
         AppContext *appContext,
         const char *label,
-        const eez::gui::data::Value &value,
+        const Value &value,
         NumericKeypadOptions &options,
         void (*okFloat)(float),
         void (*okUint32)(uint32_t),
@@ -163,7 +163,7 @@ public:
     static NumericKeypad *start(
         AppContext *appContext,
         const char *label,
-        const eez::gui::data::Value &value,
+        const Value &value,
         NumericKeypadOptions &options,
         void(*okFloat)(float),
         void(*okUint32)(uint32_t), void(*cancel)()
@@ -171,7 +171,7 @@ public:
 
     static NumericKeypad *start(
         const char *label,
-        const eez::gui::data::Value &value,
+        const Value &value,
         NumericKeypadOptions &options,
         void(*okFloat)(float),
         void(*okUint32)(uint32_t),
@@ -219,7 +219,7 @@ public:
     NumericKeypadOptions m_options;
 
 private:
-    eez::gui::data::Value m_startValue;
+    Value m_startValue;
     NumericKeypadState m_state;
     void (*m_okFloatCallback)(float);
     void (*m_okUint32Callback)(uint32_t);

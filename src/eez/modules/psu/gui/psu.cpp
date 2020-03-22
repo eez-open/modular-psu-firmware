@@ -37,7 +37,6 @@
 
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/animations.h>
-#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/page_ch_settings.h>
@@ -361,7 +360,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         animateFadeOutFadeIn();
     }
 
-    g_focusEditValue = data::Value();
+    g_focusEditValue = Value();
 
     if (previousPageId == PAGE_ID_EVENT_QUEUE) {
         if (getActivePageId() == PAGE_ID_MAIN) {
@@ -568,7 +567,7 @@ bool PsuAppContext::testExecuteActionOnTouchDown(int action) {
     return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT || isAutoRepeatAction(action);
 }
 
-bool PsuAppContext::isBlinking(const data::Cursor cursor, int16_t id) {
+bool PsuAppContext::isBlinking(const Cursor cursor, int16_t id) {
     if (g_focusCursor == cursor && g_focusDataId == id && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
         return true;
     }
@@ -608,7 +607,7 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
 }
 
 void PsuAppContext::doShowProgressPage() {
-    data::set(data::Cursor(-1), DATA_ID_ALERT_MESSAGE, data::Value(m_progressMessage));
+    set(Cursor(-1), DATA_ID_ALERT_MESSAGE, Value(m_progressMessage));
     m_dialogCancelCallback = m_progressAbortCallback;
     pushPage(m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
     m_pushProgressPage = false;
@@ -637,9 +636,9 @@ void PsuAppContext::showProgressPageWithoutAbort(const char *message) {
 
 bool PsuAppContext::updateProgressPage(size_t processedSoFar, size_t totalSize) {
     if (totalSize > 0) {
-        g_progress = data::Value((int)round((processedSoFar * 1.0f / totalSize) * 100.0f), VALUE_TYPE_PERCENTAGE);
+        g_progress = Value((int)round((processedSoFar * 1.0f / totalSize) * 100.0f), VALUE_TYPE_PERCENTAGE);
     } else {
-        g_progress = data::Value((uint32_t)processedSoFar, VALUE_TYPE_SIZE);
+        g_progress = Value((uint32_t)processedSoFar, VALUE_TYPE_SIZE);
     }
 
     if (m_pushProgressPage) {
@@ -678,7 +677,7 @@ void PsuAppContext::showAsyncOperationInProgress(const char *message, void (*che
 }
 
 void PsuAppContext::doShowAsyncOperationInProgress() {
-    data::set(data::Cursor(-1), DATA_ID_ALERT_MESSAGE, data::Value(m_asyncOperationInProgressParams.message));
+    set(Cursor(-1), DATA_ID_ALERT_MESSAGE, Value(m_asyncOperationInProgressParams.message));
 
     if (getActivePageId() != PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
         m_asyncOperationInProgressParams.startTime = millis();
@@ -927,10 +926,10 @@ int PsuAppContext::select(const char **options, int defaultSelection) {
     return 0;
 }
 
-void SelectParams::enumDefinition(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
-    if (operation == data::DATA_OPERATION_GET_VALUE) {
+void SelectParams::enumDefinition(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET_VALUE) {
         value = (uint16_t)(cursor + 1);
-    } else if (operation == data::DATA_OPERATION_GET_LABEL) {
+    } else if (operation == DATA_OPERATION_GET_LABEL) {
         const char *label = g_psuAppContext.m_selectParams.m_options[cursor];
         if (label) {
             value = label;
@@ -983,16 +982,16 @@ void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
         Cursor cursor(-1);
 
-        if (data::get(cursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
-            int x = MIN(MAX(data::get(cursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(data::get(cursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
+        if (get(cursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
+            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
             eez::mcu::display::setColor(0, 0, 255);
             eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
 
-        if (data::get(cursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
-            int x = MIN(MAX(data::get(cursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(data::get(cursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
+        if (get(cursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
+            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
             eez::mcu::display::setColor(0, 255, 0);
             eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
@@ -1064,7 +1063,7 @@ bool showSetupWizardQuestion() {
 
 static int g_iChannelSetValue;
 
-void changeValue(Channel &channel, const data::Value &value, float minValue, float maxValue, float defValue, void (*onSetValue)(float)) {
+void changeValue(Channel &channel, const Value &value, float minValue, float maxValue, float defValue, void (*onSetValue)(float)) {
     NumericKeypadOptions options;
 
     options.channelIndex = channel.channelIndex;
@@ -1209,7 +1208,7 @@ void changeTemperatureTripDelay(int iChannel) {
         minDelay, maxDelay, defaultDelay, onSetTemperatureTripDelay);
 }
 
-void psuErrorMessage(const data::Cursor cursor, data::Value value, void (*ok_callback)()) {
+void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)()) {
     if (value.getType() == VALUE_TYPE_SCPI_ERROR) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
@@ -1249,14 +1248,14 @@ void psuErrorMessage(const data::Cursor cursor, data::Value value, void (*ok_cal
 
 ////////////////////////////////////////////////////////////////////////////////
 
-data::Cursor g_focusCursor = Cursor(0);
+Cursor g_focusCursor = Cursor(0);
 int16_t g_focusDataId = DATA_ID_CHANNEL_U_EDIT;
-data::Value g_focusEditValue;
+Value g_focusEditValue;
 
-void setFocusCursor(const data::Cursor cursor, int16_t dataId) {
+void setFocusCursor(const Cursor cursor, int16_t dataId) {
     g_focusCursor = cursor;
     g_focusDataId = dataId;
-    g_focusEditValue = data::Value();
+    g_focusEditValue = Value();
 }
 
 bool isFocusChanged() {
@@ -1309,7 +1308,7 @@ void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
     }
 }
 
-bool isEnabledFocusCursor(data::Cursor cursor, int16_t dataId) {
+bool isEnabledFocusCursor(Cursor cursor, int16_t dataId) {
     g_focusCursorIsEnabled = false;
     enumWidgets(&g_psuAppContext, isEnabledFocusCursorStep);
     return g_focusCursorIsEnabled;
@@ -1397,7 +1396,7 @@ void infoMessage(const char *message) {
     pushToastMessage(ToastMessagePage::create(INFO_TOAST, message));
 }
 
-void infoMessage(data::Value value) {
+void infoMessage(Value value) {
     pushToastMessage(ToastMessagePage::create(INFO_TOAST, value));
 }
 
@@ -1420,12 +1419,12 @@ void errorMessage(const char *message1, const char *message2, const char *messag
     sound::playBeep();
 }
 
-void errorMessage(data::Value value) {
+void errorMessage(Value value) {
     pushToastMessage(ToastMessagePage::create(ERROR_TOAST, value));
     sound::playBeep();
 }
 
-void errorMessageWithAction(data::Value value, void (*action)(int param), const char *actionLabel, int actionParam) {
+void errorMessageWithAction(Value value, void (*action)(int param), const char *actionLabel, int actionParam) {
     pushToastMessage(ToastMessagePage::create(ERROR_TOAST, value, action, actionLabel, actionParam));
     sound::playBeep();
 }
@@ -1438,7 +1437,7 @@ void errorMessageWithAction(const char *message, void (*action)(), const char *a
 ////////////////////////////////////////////////////////////////////////////////
 
 void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)()) {
-    data::set(data::Cursor(-1), DATA_ID_ALERT_MESSAGE, data::Value(message));
+    set(Cursor(-1), DATA_ID_ALERT_MESSAGE, Value(message));
 
     g_psuAppContext.m_dialogYesCallback = yes_callback;
     g_psuAppContext.m_dialogNoCallback = no_callback;
@@ -1448,7 +1447,7 @@ void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), v
 }
 
 void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*later_callback)()) {
-    data::set(data::Cursor(-1), DATA_ID_ALERT_MESSAGE, data::Value(message));
+    set(Cursor(-1), DATA_ID_ALERT_MESSAGE, Value(message));
 
     g_psuAppContext.m_dialogYesCallback = yes_callback;
     g_psuAppContext.m_dialogNoCallback = no_callback;
@@ -1515,20 +1514,20 @@ void dialogLater() {
 
 void pushSelectFromEnumPage(
     AppContext *appContext,
-    const data::EnumItem *enumDefinition,
+    EnumDefinition enumDefinition,
     uint16_t currentValue,
     bool (*disabledCallback)(uint16_t value),
     void (*onSet)(uint16_t),
     bool smallFont,
     bool showRadioButtonIcon
 ) {
-	g_selectFromEnumPage.init(appContext, enumDefinition, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
+	g_selectFromEnumPage.init(appContext, g_enumDefinitions[enumDefinition], currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
     appContext->pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &g_selectFromEnumPage);
 }
 
 void pushSelectFromEnumPage(
     AppContext *appContext,
-    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value),
+    void(*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value),
     uint16_t currentValue,
     bool(*disabledCallback)(uint16_t value),
     void(*onSet)(uint16_t),
@@ -1539,7 +1538,7 @@ void pushSelectFromEnumPage(
     appContext->pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &g_selectFromEnumPage);
 }
 
-const data::EnumItem *getActiveSelectEnumDefinition() {
+const EnumItem *getActiveSelectEnumDefinition() {
     if (g_selectFromEnumPage.appContext && g_selectFromEnumPage.appContext->getActivePage() == &g_selectFromEnumPage) {
         return g_selectFromEnumPage.getEnumDefinition();
     }
@@ -1555,7 +1554,7 @@ void popSelectFromEnumPage() {
 ////////////////////////////////////////////////////////////////////////////////
 
 static int g_findNextFocusCursorState = 0; 
-static data::Cursor g_nextFocusCursor = Cursor(0);
+static Cursor g_nextFocusCursor = Cursor(0);
 static uint16_t g_nextFocusDataId = DATA_ID_CHANNEL_U_EDIT;
 
 void findNextFocusCursor(const WidgetCursor &widgetCursor) {
@@ -1604,7 +1603,7 @@ Unit getCurrentEncoderUnit() {
         }
     }
 
-    auto editValue = data::getEditValue(g_focusCursor, g_focusDataId);
+    auto editValue = getEditValue(g_focusCursor, g_focusDataId);
     return editValue.getUnit();
 }
 
@@ -1618,7 +1617,7 @@ void onEncoder(int counter, bool clicked) {
     // wait for confirmation of changed value ...
     if (isFocusChanged() && tickCount - g_focusEditValueChangedTime >= ENCODER_CHANGE_TIMEOUT * 1000L) {
         // ... on timeout discard changed value
-        g_focusEditValue = data::Value();
+        g_focusEditValue = Value();
     }
 
     if (!isEnabledFocusCursor(g_focusCursor, g_focusDataId)) {
@@ -1633,19 +1632,19 @@ void onEncoder(int counter, bool clicked) {
         }
 
         if (isEncoderEnabledInActivePage()) {
-            data::Value value;
+            Value value;
             if (persist_conf::devConf.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
                 value = g_focusEditValue;
             } else {
-                value = data::getEditValue(g_focusCursor, g_focusDataId);
+                value = getEditValue(g_focusCursor, g_focusDataId);
             }
 
-            float min = data::getMin(g_focusCursor, g_focusDataId).getFloat();
-            float max = data::getMax(g_focusCursor, g_focusDataId).getFloat();
+            float min = getMin(g_focusCursor, g_focusDataId).getFloat();
+            float max = getMax(g_focusCursor, g_focusDataId).getFloat();
 
             float newValue;
 
-            Value stepValue = data::getEncoderStep(g_focusCursor, g_focusDataId);
+            Value stepValue = getEncoderStep(g_focusCursor, g_focusDataId);
             if (stepValue.getType() != VALUE_TYPE_NONE) {
                 float step;
                 if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
@@ -1654,7 +1653,7 @@ void onEncoder(int counter, bool clicked) {
                     step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
                 }
                 newValue = roundPrec(value.getFloat() + counter * step, step);
-                if (data::getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
+                if (getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
                     newValue = 0;
                 } else {
                     newValue = clamp(newValue, min, max);
@@ -1663,7 +1662,7 @@ void onEncoder(int counter, bool clicked) {
                 newValue = encoderIncrement(value, counter, min, max, g_focusCursor, 0);
             }
 
-            Value limitValue = data::getLimit(g_focusCursor, g_focusDataId);
+            Value limitValue = getLimit(g_focusCursor, g_focusDataId);
             if (limitValue.getType() != VALUE_TYPE_NONE) {
                 float limit = limitValue.getFloat();
                 if (newValue > limit && value.getFloat() < limit) {
@@ -1675,7 +1674,7 @@ void onEncoder(int counter, bool clicked) {
                 g_focusEditValue = MakeValue(newValue, value.getUnit());
                 g_focusEditValueChangedTime = millis();
             } else {
-                Value result = data::set(g_focusCursor, g_focusDataId, MakeValue(newValue, value.getUnit()));
+                Value result = set(g_focusCursor, g_focusDataId, MakeValue(newValue, value.getUnit()));
                 if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
                     psuErrorMessage(g_focusCursor, result);
                 }
@@ -1705,11 +1704,11 @@ void onEncoder(int counter, bool clicked) {
         if (isEncoderEnabledInActivePage()) {
             if (isFocusChanged()) {
                 // confirmation
-                Value result = data::set(g_focusCursor, g_focusDataId, g_focusEditValue);
+                Value result = set(g_focusCursor, g_focusDataId, g_focusEditValue);
                 if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
                     psuErrorMessage(g_focusCursor, result);
                 } else {
-                    g_focusEditValue = data::Value();
+                    g_focusEditValue = Value();
                 }
             } else if (!onEncoderConfirmation()) {
                 moveToNextFocusCursor();
@@ -2069,7 +2068,7 @@ uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *s
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
         auto &recording = psu::dlog_view::getRecording();
         int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) ? widgetCursor.cursor : recording.selectedVisibleValueIndex);
-        style = data::ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
+        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->color;
 }
@@ -2078,7 +2077,7 @@ uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const St
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
         auto &recording = psu::dlog_view::getRecording();
         int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) ? widgetCursor.cursor : recording.selectedVisibleValueIndex);
-        style = data::ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
+        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->active_color;
 }
@@ -2135,13 +2134,13 @@ void executeExternalActionHook(int32_t actionId) {
     g_externalActionId = actionId;
 }
 
-void externalDataHook(int16_t dataId, data::DataOperationEnum operation, data::Cursor cursor, data::Value &value) {
+void externalDataHook(int16_t dataId, DataOperationEnum operation, Cursor cursor, Value &value) {
     if (dataId < 0) {
         dataId = -dataId;
     }
     dataId--;
     if ((uint16_t)dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
-        if (operation == data::DATA_OPERATION_GET) {
+        if (operation == DATA_OPERATION_GET) {
             value = g_externalDataItemValues[dataId].value;
         }
     }

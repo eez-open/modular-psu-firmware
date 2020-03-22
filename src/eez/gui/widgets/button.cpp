@@ -31,9 +31,9 @@ void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
     const ButtonWidget *button_widget = GET_WIDGET_PROPERTY(widget, specific, const ButtonWidget *);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
-    widgetCursor.currentState->flags.enabled = data::get(widgetCursor.cursor, button_widget->enabled).getInt() ? 1 : 0;
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && data::isBlinking(widgetCursor, widget->data);
-    widgetCursor.currentState->data = widget->data ? data::get(widgetCursor.cursor, widget->data) : 0;
+    widgetCursor.currentState->flags.enabled = get(widgetCursor.cursor, button_widget->enabled).getInt() ? 1 : 0;
+    widgetCursor.currentState->flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
+    widgetCursor.currentState->data = widget->data ? get(widgetCursor.cursor, widget->data) : 0;
 
     bool refresh =
         !widgetCursor.previousState ||

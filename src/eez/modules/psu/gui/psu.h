@@ -22,6 +22,7 @@
 
 using namespace eez::gui;
 
+#include <eez/modules/psu/gui/data.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/page.h>
 
@@ -41,10 +42,10 @@ void selectChannel(Channel *channel = nullptr);
 extern Channel *g_channel;
 extern int g_channelIndex;
 
-extern data::Cursor g_focusCursor;
+extern Cursor g_focusCursor;
 extern int16_t g_focusDataId;
-extern data::Value g_focusEditValue;
-void setFocusCursor(const data::Cursor cursor, int16_t dataId);
+extern Value g_focusEditValue;
+void setFocusCursor(const Cursor cursor, int16_t dataId);
 bool isFocusChanged();
 
 void changeVoltageLimit(int iChannel);
@@ -55,11 +56,11 @@ void changePowerTripDelay(int iChannel);
 void changeTemperatureTripLevel(int iChannel);
 void changeTemperatureTripDelay(int iChannel);
 
-void psuErrorMessage(const data::Cursor cursor, data::Value value, void (*ok_callback)() = 0);
+void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)() = 0);
 
 Unit getCurrentEncoderUnit();
 
-float encoderIncrement(data::Value value, int counter, float min, float max, int channelIndex, float precision = 1.0f);
+float encoderIncrement(Value value, int counter, float min, float max, int channelIndex, float precision = 1.0f);
 
 bool isEncoderEnabledInActivePage();
 
@@ -73,18 +74,18 @@ void showEnteringStandbyPage();
 void showSavingPage();
 void showShutdownPage();
 
-extern data::Value g_alertMessage;
-extern data::Value g_alertMessage2;
-extern data::Value g_alertMessage3;
+extern Value g_alertMessage;
+extern Value g_alertMessage2;
+extern Value g_alertMessage3;
 
 void infoMessage(const char *message);
-void infoMessage(data::Value value);
+void infoMessage(Value value);
 void infoMessage(const char *message1, const char *message2);
 void errorMessage(const char *message);
 void errorMessage(const char *message1, const char *message2);
 void errorMessage(const char *message1, const char *message2, const char *message3, bool autoDismiss = false);
-void errorMessage(data::Value value);
-void errorMessageWithAction(data::Value value, void (*action)(int param), const char *actionLabel, int actionParam);
+void errorMessage(Value value);
+void errorMessageWithAction(Value value, void (*action)(int param), const char *actionLabel, int actionParam);
 void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel);
 
 void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)());
@@ -100,7 +101,7 @@ void dialogLater();
 
 void pushSelectFromEnumPage(
     AppContext *appContext,
-    const data::EnumItem *enumDefinition,
+    EnumDefinition enumDefinition,
     uint16_t currentValue, 
     bool (*disabledCallback)(uint16_t value), 
     void (*onSet)(uint16_t),
@@ -109,7 +110,7 @@ void pushSelectFromEnumPage(
 );
 void pushSelectFromEnumPage(
     AppContext *appContext,
-    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value),
+    void(*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value),
     uint16_t currentValue,
     bool(*disabledCallback)(uint16_t value),
     void(*onSet)(uint16_t),
@@ -117,10 +118,10 @@ void pushSelectFromEnumPage(
     bool showRadioButtonIcon = true
 );
 
-const data::EnumItem *getActiveSelectEnumDefinition();
+const EnumItem *getActiveSelectEnumDefinition();
 void popSelectFromEnumPage();
 
-extern data::Value g_progress;
+extern Value g_progress;
 
 struct AsyncOperationInProgressParams {
     const char *message;
@@ -154,7 +155,7 @@ struct SelectParams {
     const char **m_options;
     int m_defaultSelection;
     int m_input;
-    static void enumDefinition(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value);
+    static void enumDefinition(DataOperationEnum operation, Cursor cursor, Value &value);
     static void onSelect(uint16_t value);
 };
 
@@ -176,7 +177,7 @@ public:
 
     bool isFocusWidget(const WidgetCursor &widgetCursor) override;
 
-    bool isBlinking(const data::Cursor cursor, int16_t id) override;
+    bool isBlinking(const Cursor cursor, int16_t id) override;
 
     bool isWidgetActionEnabled(const WidgetCursor &widgetCursor) override;
     
@@ -325,7 +326,7 @@ inline void hideProgressPage() {
 }
 
 inline void pushSelectFromEnumPage(
-    const data::EnumItem *enumDefinition,
+    EnumDefinition enumDefinition,
     uint16_t currentValue, 
     bool (*disabledCallback)(uint16_t value), 
     void (*onSet)(uint16_t),
@@ -336,7 +337,7 @@ inline void pushSelectFromEnumPage(
 }
 
 inline void pushSelectFromEnumPage(
-    void(*enumDefinitionFunc)(data::DataOperationEnum operation, data::Cursor cursor, data::Value &value),
+    void(*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value),
     uint16_t currentValue,
     bool(*disabledCallback)(uint16_t value),
     void(*onSet)(uint16_t),

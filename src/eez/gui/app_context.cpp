@@ -55,7 +55,7 @@ bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
     if (widget->action) {
         if (widget->type == WIDGET_TYPE_BUTTON) {
             const ButtonWidget *buttonWidget = GET_WIDGET_PROPERTY(widget, specific, const ButtonWidget *);
-            if (!data::get(widgetCursor.cursor, buttonWidget->enabled).getInt()) {
+            if (!get(widgetCursor.cursor, buttonWidget->enabled).getInt()) {
                 return false;
             }
         }
@@ -241,7 +241,7 @@ bool AppContext::testExecuteActionOnTouchDown(int action) {
     return false;
 }
 
-bool AppContext::isBlinking(const data::Cursor cursor, int16_t id) {
+bool AppContext::isBlinking(const Cursor cursor, int16_t id) {
     return false;
 }
 

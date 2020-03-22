@@ -29,7 +29,7 @@ using namespace eez::mcu;
 namespace eez {
 namespace gui {
 
-void drawButtons(const Widget *widget, int x, int y, const Style *style, const Style *selectedStyle, int selectedButton, const data::Value *labels, int count) {
+void drawButtons(const Widget *widget, int x, int y, const Style *style, const Style *selectedStyle, int selectedButton, const Value *labels, int count) {
     if (widget->w > widget->h) {
         // horizontal orientation
         display::setColor(style->background_color);
@@ -94,11 +94,11 @@ void ButtonGroupWidget_draw(const WidgetCursor &widgetCursor) {
     const ButtonGroupWidget *buttonGroupWidget = GET_WIDGET_PROPERTY(widget, specific, const ButtonGroupWidget *);
 
     widgetCursor.currentState->size = sizeof(ButtonGroupWidgetState);
-    widgetCursor.currentState->data = data::get(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
 
-    const data::Value *labels;
+    const Value *labels;
     int count;
-    data::getList(widgetCursor.cursor, widget->data, &labels, count);
+    getList(widgetCursor.cursor, widget->data, &labels, count);
 
     ((ButtonGroupWidgetState *)widgetCursor.currentState)->labels = labels;
 
@@ -121,9 +121,9 @@ void ButtonGroupWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEve
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         const Widget *widget = widgetCursor.widget;
 
-        const data::Value *labels;
+        const Value *labels;
         int count;
-        data::getList(widgetCursor.cursor, widget->data, &labels, count);
+        getList(widgetCursor.cursor, widget->data, &labels, count);
 
         int selectedButton;
         if (widget->w > widget->h) {
@@ -138,7 +138,7 @@ void ButtonGroupWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEve
         }
 
         if (selectedButton >= 0 && selectedButton < count) {
-            data::set(widgetCursor.cursor, widget->data, selectedButton);
+            set(widgetCursor.cursor, widget->data, selectedButton);
             sound::playClick();
         }
     }
