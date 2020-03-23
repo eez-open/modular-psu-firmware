@@ -34,7 +34,6 @@
     SCPI_COMMAND("CALibration:SCReen:INIT", scpi_cmd_calibrationScreenInit) \
     SCPI_COMMAND("DIAGnostic[:INFOrmation]:ADC?", scpi_cmd_diagnosticInformationAdcQ) \
     SCPI_COMMAND("DIAGnostic[:INFOrmation]:CALibration?", scpi_cmd_diagnosticInformationCalibrationQ) \
-    SCPI_COMMAND("DIAGnostic[:INFOrmation]:FAN?", scpi_cmd_diagnosticInformationFanQ) \
     SCPI_COMMAND("DIAGnostic[:INFOrmation]:PROTection?", scpi_cmd_diagnosticInformationProtectionQ) \
     SCPI_COMMAND("DIAGnostic[:INFOrmation]:TEST?", scpi_cmd_diagnosticInformationTestQ) \
     SCPI_COMMAND("DIAGnostic[:INFOrmation]:REGS?", scpi_cmd_diagnosticInformationRegsQ) \
@@ -78,7 +77,6 @@
     SCPI_COMMAND("INSTrument:MEMOry", scpi_cmd_instrumentMemory) \
     SCPI_COMMAND("MEASure[:SCALar]:CURRent[:DC]?", scpi_cmd_measureScalarCurrentDcQ) \
     SCPI_COMMAND("MEASure[:SCALar]:POWer[:DC]?", scpi_cmd_measureScalarPowerDcQ) \
-    SCPI_COMMAND("MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]?", scpi_cmd_measureScalarTemperatureThermistorDcQ) \
     SCPI_COMMAND("MEASure[:SCALar][:VOLTage][:DC]?", scpi_cmd_measureScalarVoltageDcQ) \
     SCPI_COMMAND("MEMory:NSTates?", scpi_cmd_memoryNstatesQ) \
     SCPI_COMMAND("MEMory:STATe:CATalog?", scpi_cmd_memoryStateCatalogQ) \
@@ -337,6 +335,9 @@
     SCPI_COMMAND("SYSTem:TIME:FORMat", scpi_cmd_systemTimeFormat) \
     SCPI_COMMAND("SYSTem:TIME:FORMat?", scpi_cmd_systemTimeFormatQ) \
     SCPI_COMMAND("SYSTem:VERSion?", scpi_cmd_systemVersionQ) \
+    SCPI_COMMAND("SYSTem:FAN:STATus?", scpi_cmd_systemFanStatusQ) \
+    SCPI_COMMAND("SYSTem:FAN:SPEed?", scpi_cmd_systemFanSpeedQ) \
+    SCPI_COMMAND("SYSTem:MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]?", scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce", scpi_cmd_triggerDlogSource) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce?", scpi_cmd_triggerDlogSourceQ) \
     SCPI_COMMAND("TRIGger:DLOG[:IMMediate]", scpi_cmd_triggerDlogImmediate) \

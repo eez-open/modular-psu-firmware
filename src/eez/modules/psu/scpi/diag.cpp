@@ -389,12 +389,6 @@ scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_diagnosticInformationFanQ(scpi_t *context) {
-    SCPI_ResultInt(context, aux_ps::fan::g_rpm);
-
-    return SCPI_RES_OK;
-}
-
 static uint8_t g_ioexpRegisters[CH_MAX][32];
 static uint8_t g_adcRegisters[CH_MAX][4];
 

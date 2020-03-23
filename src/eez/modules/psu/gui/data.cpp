@@ -3108,19 +3108,7 @@ void data_sys_info_sdcard_status(DataOperationEnum operation, Cursor cursor, Val
 
 void data_sys_info_fan_status(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-#if OPTION_FAN
-        if (aux_ps::fan::g_testResult == TEST_FAILED || aux_ps::fan::g_testResult == TEST_WARNING) {
-            value = 0;
-        } else if (aux_ps::fan::g_testResult == TEST_OK) {
-            value = 1;
-        } else if (aux_ps::fan::g_testResult == TEST_NONE) {
-            value = 3;
-        } else {
-            value = 4;
-        }
-#else
-        value = 3;
-#endif
+        value = aux_ps::fan::getStatus();
     }
 }
 

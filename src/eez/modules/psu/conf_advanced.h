@@ -116,7 +116,7 @@
 #define DP_OFF_DELAY_PERIOD 10
 
 /// Text returned by the SYStem:CAPability command
-#define STR_SYST_CAP "DCSUPPLY WITH (MEASURE|MULTIPLE|TRIGGER)"
+#define STR_SYST_CAP "DCPSUPPLY WITH (MEASURE|MULTIPLE|TRIGGER)"
 
 /// Set to 1 to skip the test of PWRGOOD signal
 #define CONF_SKIP_PWRGOOD_TEST 0

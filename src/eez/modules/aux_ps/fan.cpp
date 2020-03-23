@@ -572,3 +572,27 @@ float readTemperature() {
 } // namespace eez
 
 #endif
+
+namespace eez {
+namespace aux_ps {
+namespace fan {
+
+FanStatus getStatus() {
+#if OPTION_FAN
+	if (aux_ps::fan::g_testResult == TEST_FAILED || aux_ps::fan::g_testResult == TEST_WARNING) {
+		return FAN_STATUS_INVALID;
+	} else if (aux_ps::fan::g_testResult == TEST_OK) {
+		return FAN_STATUS_VALID;
+	} else if (aux_ps::fan::g_testResult == TEST_NONE) {
+		return FAN_STATUS_TESTING;
+	} else {
+		return FAN_STATUS_NOT_INSTALLED;
+	}
+#else
+	return FAN_STATUS_NOT_INSTALLED;
+#endif
+}
+
+} // namespace fan
+} // namespace aux_ps
+} // namespace eez

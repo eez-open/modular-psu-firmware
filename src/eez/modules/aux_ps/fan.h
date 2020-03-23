@@ -25,6 +25,13 @@
 #define FAN_MODE_AUTO 0
 #define FAN_MODE_MANUAL 1
 
+enum FanStatus {
+    FAN_STATUS_INVALID,
+    FAN_STATUS_VALID,
+    FAN_STATUS_TESTING,
+    FAN_STATUS_NOT_INSTALLED
+};
+
 namespace eez {
 namespace aux_ps {
 namespace fan {
@@ -44,6 +51,8 @@ extern int g_POn;
 void setPidTunings(double Kp, double Ki, double Kd, int POn);
 
 float readTemperature();
+
+FanStatus getStatus();
 
 } // namespace fan
 } // namespace aux_ps
