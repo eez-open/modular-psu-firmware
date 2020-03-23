@@ -163,7 +163,11 @@ int getAction(const WidgetCursor &widgetCursor) {
 }
 
 void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
-    foundWidget.appContext->onPageTouch(foundWidget, touchEvent);
+	if (foundWidget.appContext) {
+		foundWidget.appContext->onPageTouch(foundWidget, touchEvent);
+	} else {
+		getRootAppContext().onPageTouch(foundWidget, touchEvent);
+	}
 }
 
 void onInternalPageTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
