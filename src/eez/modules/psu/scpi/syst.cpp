@@ -1567,26 +1567,6 @@ scpi_result_t scpi_cmd_systemReset(scpi_t *context) {
 #endif
 }
 
-static scpi_choice_def_t systemMeasureVoltageChoice[] = { 
-    { "VBAT", 1 },
-    SCPI_CHOICE_LIST_END 
-};
-
-scpi_result_t scpi_cmd_systemMeasureScalarVoltageDcQ(scpi_t *context) {
-#if defined(EEZ_PLATFORM_STM32)
-    int32_t choice;
-    if (!SCPI_ParamChoice(context, systemMeasureVoltageChoice, &choice, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    // only choice for now is VBAT
-    return result_float(context, 0, mcu::battery::g_battery, UNIT_VOLT);
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
-}
-
 scpi_result_t scpi_cmd_systemCommunicateMqttSettings(scpi_t *context) {
 #if OPTION_ETHERNET
     const char *addr;
@@ -1783,6 +1763,29 @@ scpi_result_t scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ(scpi_t *conte
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
+}
+
+static scpi_choice_def_t systemMeasureVoltageChoice[] = { 
+    { "RTC", 1 },
+    SCPI_CHOICE_LIST_END 
+};
+
+
+scpi_result_t scpi_cmd_systemMeasureScalarVoltageDcQ(scpi_t *context) {
+#if defined(EEZ_PLATFORM_STM32)
+    int32_t choice = 1;
+    if (!SCPI_ParamChoice(context, systemMeasureVoltageChoice, &choice, false)) {
+        if (SCPI_ParamErrorOccurred(context)) {
+            return SCPI_RES_ERR;
+        }
+    }
+
+    // only choice for now is RTC
+    return result_float(context, 0, mcu::battery::g_battery, UNIT_VOLT);
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
 }
 
 } // namespace scpi
