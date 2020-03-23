@@ -141,6 +141,8 @@ struct WidgetList {
 
 void WidgetList_fixPointers(WidgetList &widgetList);
 
+////////////////////////////////////////////////////////////////////////////////
+
 #define SHADOW_FLAG 1
 #define CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG 2
 
@@ -213,8 +215,6 @@ struct WidgetState {
     WidgetStateFlags flags;
     Value data;
 };
-
-////////////////////////////////////////////////////////////////////////////////
 
 class AppContext;
 

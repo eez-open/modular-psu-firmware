@@ -22,7 +22,6 @@
 #include <cstddef>
 #include <limits.h>
 
-#include <eez/debug.h>
 #include <eez/system.h>
 
 #include <eez/gui/gui.h>

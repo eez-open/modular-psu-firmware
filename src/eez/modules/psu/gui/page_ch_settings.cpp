@@ -924,8 +924,6 @@ void ChSettingsListsPage::insertRow(int iRow, int iCopyRow) {
             m_currentList[i + 1] = m_currentList[i];
         }
 
-        Cursor cursor(getCursorIndexWithinPage());
-
         if (iCopyRow < m_dwellListLength && iRow <= m_dwellListLength) {
             m_dwellList[iRow] = m_dwellList[iCopyRow];
             ++m_dwellListLength;
