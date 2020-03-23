@@ -20,7 +20,6 @@
 
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/scpi/psu.h>
-#include <eez/modules/psu/temperature.h>
 
 namespace eez {
 namespace psu {
@@ -62,19 +61,6 @@ scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
 
     char buffer[256] = { 0 };
     strcatFloat(buffer, channel_dispatcher::getUMonLast(*channel));
-    SCPI_ResultCharacters(context, buffer, strlen(buffer));
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_measureScalarTemperatureThermistorDcQ(scpi_t *context) {
-    int32_t sensor;
-    if (!param_temp_sensor(context, sensor)) {
-        return SCPI_RES_ERR;
-    }
-
-    char buffer[256] = { 0 };
-    strcatFloat(buffer, temperature::sensors[sensor].measure());
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;

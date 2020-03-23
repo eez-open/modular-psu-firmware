@@ -218,6 +218,7 @@ struct SlotInfo {
 };
 
 static const int NUM_SLOTS = 3;
-extern SlotInfo g_slots[NUM_SLOTS];
+static const int INVALID_SLOT_INDEX = NUM_SLOTS;
+extern SlotInfo g_slots[NUM_SLOTS + 1]; // one more for invalid slot
 
 } // namespace eez

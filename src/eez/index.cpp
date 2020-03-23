@@ -135,13 +135,17 @@ ModuleInfo *getModuleInfo(uint16_t moduleType) {
     return &g_modules[0];
 }
 
-SlotInfo g_slots[NUM_SLOTS] = {
+SlotInfo g_slots[NUM_SLOTS + 1] = {
     {
         &g_modules[0]
     },
     {
         &g_modules[0]
     },
+    {
+        &g_modules[0]
+    },
+    // invalid slot
     {
         &g_modules[0]
     }

@@ -30,7 +30,6 @@ namespace temperature {
 
 /// Configuration data for the temperature protection.
 struct ProtectionConfiguration {
-    int8_t sensor;
     float delay;
     float level;
     bool state;

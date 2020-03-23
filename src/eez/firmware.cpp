@@ -171,6 +171,10 @@ void boot() {
         }
     }
 
+    for (int i = psu::CH_NUM; i < CH_MAX; i++) {
+        psu::Channel::get(i).slotIndex = INVALID_SLOT_INDEX;
+    }
+
     psu::persist_conf::init();
 
 #if OPTION_DISPLAY

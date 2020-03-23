@@ -39,7 +39,9 @@
 #endif
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/ontime.h>
+#include <eez/modules/psu/temperature.h>
 
+#include <eez/modules/aux_ps/fan.h>
 #include <eez/modules/mcu/battery.h>
 
 namespace eez {
@@ -1747,6 +1749,39 @@ scpi_result_t scpi_cmd_systemTimeFormat(scpi_t *context) {
 scpi_result_t scpi_cmd_systemTimeFormatQ(scpi_t *context) {
     using namespace datetime;
     SCPI_ResultInt(context, persist_conf::devConf.dateTimeFormat == FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == FORMAT_MDY_24 ? 24 : 12);
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemFanStatusQ(scpi_t *context) {
+    SCPI_ResultInt(context, aux_ps::fan::getStatus());
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemFanSpeedQ(scpi_t *context) {
+    SCPI_ResultInt(context, aux_ps::fan::g_rpm);
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ(scpi_t *context) {
+    int32_t sensor;
+    if (!param_temp_sensor(context, sensor)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (!temperature::sensors[sensor].isInstalled()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    if (!temperature::sensors[sensor].isTestOK()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_ERROR);
+        return SCPI_RES_ERR;
+    }
+
+    char buffer[256] = { 0 };
+    strcatFloat(buffer, temperature::sensors[sensor].measure());
+    SCPI_ResultCharacters(context, buffer, strlen(buffer));
+
     return SCPI_RES_OK;
 }
 

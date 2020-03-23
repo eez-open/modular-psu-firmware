@@ -636,8 +636,7 @@ static void saveState(Parameters &profile, List *lists) {
         if (i < temp_sensor::NUM_TEMP_SENSORS) {
             memcpy(profile.tempProt + i, &temperature::sensors[i].prot_conf, sizeof(temperature::ProtectionConfiguration));
         } else {
-            profile.tempProt[i].sensor = i;
-            if (profile.tempProt[i].sensor == temp_sensor::AUX) {
+            if (i == temp_sensor::AUX) {
                 profile.tempProt[i].delay = OTP_AUX_DEFAULT_DELAY;
                 profile.tempProt[i].level = OTP_AUX_DEFAULT_LEVEL;
                 profile.tempProt[i].state = OTP_AUX_DEFAULT_STATE;
@@ -1002,10 +1001,11 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
     }
 
     for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-        auto &tempSensorProt = parameters.tempProt[i];
-        auto &sensor = temperature::sensors[tempSensorProt.sensor];
+        auto &sensor = temperature::sensors[i];
         if (sensor.isInstalled()) {
-            ctx.group("tempsensor", tempSensorProt.sensor + 1);
+            auto &tempSensorProt = parameters.tempProt[i];
+
+            ctx.group("tempsensor", i + 1);
 
             ctx.property("name", sensor.getName());
             ctx.property("delay", tempSensorProt.delay);
@@ -1387,8 +1387,6 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
         --tempSensorIndex;
 
         auto &tempSensorProt = parameters.tempProt[tempSensorIndex];
-
-        tempSensorProt.sensor = tempSensorIndex;
 
         READ_PROPERTY(delay, tempSensorProt.delay);
         READ_PROPERTY(level, tempSensorProt.level);

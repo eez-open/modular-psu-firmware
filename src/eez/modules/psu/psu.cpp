@@ -387,8 +387,7 @@ bool psuReset() {
     // TEMP:PROT:STAT[AUX]
     for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
         temperature::ProtectionConfiguration &temp_prot = temperature::sensors[i].prot_conf;
-        temp_prot.sensor = i;
-        if (temp_prot.sensor == temp_sensor::AUX) {
+        if (i == temp_sensor::AUX) {
             temp_prot.delay = OTP_AUX_DEFAULT_DELAY;
             temp_prot.level = OTP_AUX_DEFAULT_LEVEL;
             temp_prot.state = OTP_AUX_DEFAULT_STATE;
