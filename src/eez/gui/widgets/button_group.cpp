@@ -22,12 +22,25 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/button_group.h>
 
 using namespace eez::mcu;
 
 namespace eez {
 namespace gui {
+
+struct ButtonGroupWidget {
+    uint16_t selectedStyle;
+};
+
+struct ButtonGroupWidgetState {
+    WidgetState genericState;
+    const Value *labels;
+};
+
+
+FixPointersFunctionType BUTTON_GROUP_fixPointers = nullptr;
+
+EnumFunctionType BUTTON_GROUP_enum = nullptr;
 
 void drawButtons(const Widget *widget, int x, int y, const Style *style, const Style *selectedStyle, int selectedButton, const Value *labels, int count) {
     if (widget->w > widget->h) {
@@ -89,7 +102,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
     }
 }
 
-void ButtonGroupWidget_draw(const WidgetCursor &widgetCursor) {
+DrawFunctionType BUTTON_GROUP_draw = [] (const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const ButtonGroupWidget *buttonGroupWidget = GET_WIDGET_PROPERTY(widget, specific, const ButtonGroupWidget *);
 
@@ -115,9 +128,9 @@ void ButtonGroupWidget_draw(const WidgetCursor &widgetCursor) {
         drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle,
                     widgetCursor.currentState->data.getInt(), labels, count);
     }
-}
+};
 
-void ButtonGroupWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+OnTouchFunctionType BUTTON_GROUP_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         const Widget *widget = widgetCursor.widget;
 
@@ -142,7 +155,7 @@ void ButtonGroupWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEve
             sound::playClick();
         }
     }
-}
+};
 
 } // namespace gui
 } // namespace eez

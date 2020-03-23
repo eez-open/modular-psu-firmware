@@ -19,12 +19,26 @@
 #if OPTION_DISPLAY
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/list.h>
 
 namespace eez {
 namespace gui {
 
-void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+#define LIST_TYPE_VERTICAL 1
+#define LIST_TYPE_HORIZONTAL 2
+
+struct ListWidget {
+    uint8_t listType; // LIST_TYPE_VERTICAL or LIST_TYPE_HORIZONTAL
+    const Widget *itemWidget;
+    uint8_t gap;
+};
+
+FixPointersFunctionType LIST_fixPointers = [](Widget *widget, Assets *assets) {
+    ListWidget *listWidget = (ListWidget *)widget->specific;
+    listWidget->itemWidget = (Widget *)((uint8_t *)assets->document + (uint32_t)listWidget->itemWidget);
+    Widget_fixPointers((Widget *)listWidget->itemWidget);
+};
+
+EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
 	
@@ -108,7 +122,11 @@ void ListWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
 	widgetCursor.currentState = savedCurrentState;
 	widgetCursor.previousState = savedPreviousState;
-}
+};
+
+DrawFunctionType LIST_draw = nullptr;
+
+OnTouchFunctionType LIST_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

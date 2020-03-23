@@ -30,6 +30,15 @@
 using namespace eez::mcu;
 
 namespace eez {
+namespace gui {
+
+extern DrawFunctionType RECTANGLE_draw;
+extern DrawFunctionType TEXT_draw;
+
+}
+}
+
+namespace eez {
 namespace psu {
 namespace gui {
 
@@ -677,12 +686,12 @@ void MenuWithButtonsPage::refresh(const WidgetCursor &widgetCursor2) {
         widgetCursor.widget = &m_containerRectangleWidget.common;
         widgetCursor.x = x + m_containerRectangleWidget.common.x;
         widgetCursor.y = y + m_containerRectangleWidget.common.y;
-        RectangleWidget_draw(widgetCursor);
+        RECTANGLE_draw(widgetCursor);
 
         widgetCursor.widget = &m_messageTextWidget.common;
         widgetCursor.x = x + m_messageTextWidget.common.x;
         widgetCursor.y = y + m_messageTextWidget.common.y;
-        TextWidget_draw(widgetCursor);
+        TEXT_draw(widgetCursor);
     }
 
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
@@ -691,7 +700,7 @@ void MenuWithButtonsPage::refresh(const WidgetCursor &widgetCursor2) {
         widgetCursor.y = y + m_buttonTextWidgets[i].common.y;
         widgetCursor.cursor = i;
         widgetCursor.currentState->flags.active = isActiveWidget(widgetCursor);
-        TextWidget_draw(widgetCursor);
+        TEXT_draw(widgetCursor);
     }
 }
 

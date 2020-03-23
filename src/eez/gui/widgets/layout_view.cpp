@@ -25,6 +25,13 @@
 namespace eez {
 namespace gui {
 
+struct LayoutViewWidgetSpecific {
+    int16_t layout; // page ID
+    int16_t context; // data ID
+};
+
+FixPointersFunctionType LAYOUT_VIEW_fixPointers = nullptr;
+
 int getLayoutId(const WidgetCursor &widgetCursor) {
     if (widgetCursor.widget->data) {
         auto layoutValue = get(widgetCursor.cursor, widgetCursor.widget->data);
@@ -35,7 +42,7 @@ int getLayoutId(const WidgetCursor &widgetCursor) {
     return layoutViewSpecific->layout;
 }
 
-void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     auto cursor = widgetCursor.cursor;
 
     const LayoutViewWidgetSpecific *layoutViewSpecific = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const LayoutViewWidgetSpecific *);
@@ -63,9 +70,9 @@ void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callb
     }
 
     widgetCursor.cursor = cursor;
-}
+};
 
-void LayoutViewWidget_draw(const WidgetCursor &widgetCursor) {
+DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const LayoutViewWidgetSpecific *layoutViewSpecific = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const LayoutViewWidgetSpecific *);
 
@@ -94,7 +101,9 @@ void LayoutViewWidget_draw(const WidgetCursor &widgetCursor) {
         const Style* style = getStyle(widget->style);
         drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, false, true);
     }
-}
+};
+
+OnTouchFunctionType LAYOUT_VIEW_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

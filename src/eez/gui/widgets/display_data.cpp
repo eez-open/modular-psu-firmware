@@ -24,10 +24,35 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/display_data.h>
 
 namespace eez {
 namespace gui {
+
+enum {
+    DISPLAY_OPTION_ALL = 0,
+    DISPLAY_OPTION_INTEGER = 1,
+    DISPLAY_OPTION_FRACTION = 2,
+    DISPLAY_OPTION_FRACTION_AND_UNIT = 3,
+    DISPLAY_OPTION_UNIT = 4,
+    DISPLAY_OPTION_INTEGER_AND_FRACTION = 5
+};
+
+struct DisplayDataWidget {
+    uint8_t displayOption;
+};
+
+struct DisplayDataState {
+    WidgetState genericState;
+    uint16_t color;
+    uint16_t backgroundColor;
+    uint16_t activeColor;
+    uint16_t activeBackgroundColor;
+    uint32_t dataRefreshLastTime;
+};
+
+FixPointersFunctionType DISPLAY_DATA_fixPointers = nullptr;
+
+EnumFunctionType DISPLAY_DATA_enum = nullptr;
 
 int findStartOfFraction(char *text) {
     int i;
@@ -40,7 +65,7 @@ int findStartOfUnit(char *text, int i) {
     return i;
 }
 
-void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
+DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const DisplayDataWidget *display_data_widget = GET_WIDGET_PROPERTY(widget, specific, const DisplayDataWidget *);
 
@@ -123,7 +148,9 @@ void DisplayDataWidget_draw(const WidgetCursor &widgetCursor) {
                  widgetCursor.currentState->flags.blinking, false,
                  &currentState->color, &currentState->backgroundColor, &currentState->activeColor, &currentState->activeBackgroundColor);
     }
-}
+};
+
+OnTouchFunctionType DISPLAY_DATA_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

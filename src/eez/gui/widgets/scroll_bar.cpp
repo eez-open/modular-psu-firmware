@@ -25,12 +25,43 @@
 #include <eez/debug.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/scroll_bar.h>
 
 using namespace eez::mcu;
 
 namespace eez {
 namespace gui {
+
+struct ScrollBarWidget {
+    uint16_t thumbStyle;
+    uint16_t buttonsStyle;
+    const char *leftButtonText;
+	const char *rightButtonText;
+};
+
+enum ScrollBarWidgetSegment {
+    SCROLL_BAR_WIDGET_SEGMENT_NONE,
+    SCROLL_BAR_WIDGET_SEGMENT_TRACK_LEFT,
+    SCROLL_BAR_WIDGET_SEGMENT_TRACK_RIGHT,
+    SCROLL_BAR_WIDGET_SEGMENT_THUMB,
+    SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON,
+    SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON
+};
+
+struct ScrollBarWidgetState {
+    WidgetState genericState;
+    int size;
+    int position;
+    int pageSize;
+    ScrollBarWidgetSegment segment;
+};
+
+FixPointersFunctionType SCROLL_BAR_fixPointers = [](Widget *widget, Assets *assets) {
+    ScrollBarWidget *scrollBarWidget = (ScrollBarWidget *)widget->specific;
+    scrollBarWidget->leftButtonText = (const char *)((uint8_t *)assets->document + (uint32_t)scrollBarWidget->leftButtonText);
+    scrollBarWidget->rightButtonText = (const char *)((uint8_t *)assets->document + (uint32_t)scrollBarWidget->rightButtonText);
+};
+
+EnumFunctionType SCROLL_BAR_enum = nullptr;
 
 static ScrollBarWidgetSegment g_segment;
 static WidgetCursor g_selectedWidget;
@@ -72,7 +103,7 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
     xThumb += xTrack;
 }
 
-void ScrollBarWidget_draw(const WidgetCursor &widgetCursor) {
+DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const ScrollBarWidget *scrollBarWidget = GET_WIDGET_PROPERTY(widget, specific, const ScrollBarWidget *);
 
@@ -159,9 +190,9 @@ void ScrollBarWidget_draw(const WidgetCursor &widgetCursor) {
             display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1, 0);
         }
     }
-}
+};
 
-void ScrollBarWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+OnTouchFunctionType SCROLL_BAR_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
     int size = getSize(widgetCursor);
     int pageSize = getPageSize(widgetCursor);
 
@@ -242,7 +273,7 @@ void ScrollBarWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
             g_segment = SCROLL_BAR_WIDGET_SEGMENT_NONE;
         }
     }
-}
+};
 
 } // namespace gui
 } // namespace eez

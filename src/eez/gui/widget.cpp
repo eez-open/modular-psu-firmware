@@ -27,27 +27,6 @@
 
 #include <eez/gui/gui.h>
 
-#include <eez/gui/widgets/app_view.h>
-#include <eez/gui/widgets/bar_graph.h>
-#include <eez/gui/widgets/bitmap.h>
-#include <eez/gui/widgets/button.h>
-#include <eez/gui/widgets/button_group.h>
-#include <eez/gui/widgets/container.h>
-#include <eez/gui/widgets/display_data.h>
-#include <eez/gui/widgets/grid.h>
-#include <eez/gui/widgets/layout_view.h>
-#include <eez/gui/widgets/list.h>
-#include <eez/gui/widgets/list_graph.h>
-#include <eez/gui/widgets/multiline_text.h>
-#include <eez/gui/widgets/progress.h>
-#include <eez/gui/widgets/rectangle.h>
-#include <eez/gui/widgets/scroll_bar.h>
-#include <eez/gui/widgets/select.h>
-#include <eez/gui/widgets/text.h>
-#include <eez/gui/widgets/toggle_button.h>
-#include <eez/gui/widgets/up_down.h>
-#include <eez/gui/widgets/yt_graph.h>
-
 using namespace eez::mcu;
 
 namespace eez {
@@ -64,82 +43,44 @@ bool g_isActiveWidget;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-typedef void (*EnumFunctionType)(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
-static EnumFunctionType g_enumWidgetFunctions[] = {
-    nullptr,               // WIDGET_TYPE_NONE
-    ContainerWidget_enum,  // WIDGET_TYPE_CONTAINER
-    ListWidget_enum,       // WIDGET_TYPE_LIST
-    GridWidget_enum,       // WIDGET_TYPE_GRID
-    SelectWidget_enum,     // WIDGET_TYPE_SELECT
-    nullptr,               // WIDGET_TYPE_DISPLAY_DATA
-    nullptr,               // WIDGET_TYPE_TEXT
-    nullptr,               // WIDGET_TYPE_MULTILINE_TEXT
-    nullptr,               // WIDGET_TYPE_RECTANGLE
-    nullptr,               // WIDGET_TYPE_BITMAP
-    nullptr,               // WIDGET_TYPE_BUTTON
-    nullptr,               // WIDGET_TYPE_TOGGLE_BUTTON
-    nullptr,               // WIDGET_TYPE_BUTTON_GROUP
-    nullptr,               // WIDGET_TYPE_RESERVED
-    nullptr,               // WIDGET_TYPE_BAR_GRAPH
-    LayoutViewWidget_enum, // WIDGET_TYPE_LAYOUT_VIEW
-    nullptr,               // WIDGET_TYPE_YT_GRAPH
-    nullptr,               // WIDGET_TYPE_UP_DOWN
-    nullptr,               // WIDGET_TYPE_LIST_GRAPH
-    AppViewWidget_enum,    // WIDGET_TYPE_APP_VIEW
-    nullptr,               // WIDGET_TYPE_SCROLL_BAR
-    nullptr,               // WIDGET_TYPE_PROGRESS
-};
+FixPointersFunctionType NONE_fixPointers = nullptr;
+EnumFunctionType NONE_enum = nullptr;
+DrawFunctionType NONE_draw = nullptr;
+OnTouchFunctionType NONE_onTouch = nullptr;
 
-typedef void (*DrawFunctionType)(const WidgetCursor &widgetCursor);
-static DrawFunctionType g_drawWidgetFunctions[] = {
-    nullptr,                  // WIDGET_TYPE_NONE
-    ContainerWidget_draw,     // WIDGET_TYPE_CONTAINER
-    nullptr,                  // WIDGET_TYPE_LIST
-    nullptr,                  // WIDGET_TYPE_GRID
-    nullptr,                  // WIDGET_TYPE_SELECT
-    DisplayDataWidget_draw,   // WIDGET_TYPE_DISPLAY_DATA
-    TextWidget_draw,          // WIDGET_TYPE_TEXT
-    MultilineTextWidget_draw, // WIDGET_TYPE_MULTILINE_TEXT
-    RectangleWidget_draw,     // WIDGET_TYPE_RECTANGLE
-    BitmapWidget_draw,        // WIDGET_TYPE_BITMAP
-    ButtonWidget_draw,        // WIDGET_TYPE_BUTTON
-    ToggleButtonWidget_draw,  // WIDGET_TYPE_TOGGLE_BUTTON
-    ButtonGroupWidget_draw,   // WIDGET_TYPE_BUTTON_GROUP
-    nullptr,                  // WIDGET_TYPE_RESERVED
-    BarGraphWidget_draw,      // WIDGET_TYPE_BAR_GRAPH
-    LayoutViewWidget_draw,    // WIDGET_TYPE_LAYOUT_VIEW
-    YTGraphWidget_draw,       // WIDGET_TYPE_YT_GRAPH
-    UpDownWidget_draw,        // WIDGET_TYPE_UP_DOWN
-    ListGraphWidget_draw,     // WIDGET_TYPE_LIST_GRAPH
-    AppViewWidget_draw,       // WIDGET_TYPE_APP_VIEW
-    ScrollBarWidget_draw,     // WIDGET_TYPE_SCROLL_BAR
-    ProgressWidget_draw,      // WIDGET_TYPE_PROGRESS
-};
+FixPointersFunctionType RESERVED_fixPointers = nullptr;
+EnumFunctionType RESERVED_enum = nullptr;
+DrawFunctionType RESERVED_draw = nullptr;
+OnTouchFunctionType RESERVED_onTouch = nullptr;
 
-OnTouchFunctionType g_onTouchFunctions[] = {
-    nullptr,                   // WIDGET_TYPE_NONE
-    nullptr,                   // WIDGET_TYPE_CONTAINER
-    nullptr,                   // WIDGET_TYPE_LIST
-    nullptr,                   // WIDGET_TYPE_GRID
-    nullptr,                   // WIDGET_TYPE_SELECT
-    nullptr,                   // WIDGET_TYPE_DISPLAY_DATA
-    nullptr,                   // WIDGET_TYPE_TEXT
-    nullptr,                   // WIDGET_TYPE_MULTILINE_TEXT
-    nullptr,                   // WIDGET_TYPE_RECTANGLE
-    nullptr,                   // WIDGET_TYPE_BITMAP
-    nullptr,                   // WIDGET_TYPE_BUTTON
-    nullptr,                   // WIDGET_TYPE_TOGGLE_BUTTON
-    ButtonGroupWidget_onTouch, // WIDGET_TYPE_BUTTON_GROUP
-    nullptr,                   // WIDGET_TYPE_RESERVED
-    nullptr,                   // WIDGET_TYPE_BAR_GRAPH
-    nullptr,                   // WIDGET_TYPE_LAYOUT_VIEW
-    YTGraphWidget_onTouch,     // WIDGET_TYPE_YT_GRAPH
-    UpDownWidget_onTouch,      // WIDGET_TYPE_UP_DOWN
-    ListGraphWidget_onTouch,   // WIDGET_TYPE_LIST_GRAPH
-    nullptr,                   // WIDGET_TYPE_APP_VIEW
-    ScrollBarWidget_onTouch,   // WIDGET_TYPE_SCROLL_BAR
-    nullptr,                   // WIDGET_TYPE_PROGRESS
+////////////////////////////////////////////////////////////////////////////////
+
+#define WIDGET_TYPE(NAME, ID) extern EnumFunctionType NAME##_enum;
+WIDGET_TYPES
+#undef WIDGET_TYPE
+#define WIDGET_TYPE(NAME, ID) &NAME##_enum,
+static EnumFunctionType *g_enumWidgetFunctions[] = {
+    WIDGET_TYPES
 };
+#undef WIDGET_TYPE
+
+#define WIDGET_TYPE(NAME, ID) extern DrawFunctionType NAME##_draw;
+WIDGET_TYPES
+#undef WIDGET_TYPE
+#define WIDGET_TYPE(NAME, ID) &NAME##_draw,
+static DrawFunctionType *g_drawWidgetFunctions[] = {
+    WIDGET_TYPES
+};
+#undef WIDGET_TYPE
+
+#define WIDGET_TYPE(NAME, ID) extern OnTouchFunctionType NAME##_onTouch;
+WIDGET_TYPES
+#undef WIDGET_TYPE
+#define WIDGET_TYPE(NAME, ID) &NAME##_onTouch,
+OnTouchFunctionType *g_onTouchWidgetFunctions[] = {
+    WIDGET_TYPES
+};
+#undef WIDGET_TYPE
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -166,8 +107,8 @@ void drawWidgetCallback(const WidgetCursor &widgetCursor_) {
     widgetCursor.currentState->flags.active = g_isActiveWidget;
 
     const Widget *widget = widgetCursor.widget;
-    if (g_drawWidgetFunctions[widget->type]) {
-        g_drawWidgetFunctions[widget->type](widgetCursor);
+    if (*g_drawWidgetFunctions[widget->type]) {
+        (*g_drawWidgetFunctions[widget->type])(widgetCursor);
     } else {
         defaultWidgetDraw(widgetCursor);
     }
@@ -204,8 +145,8 @@ void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
     callback(widgetCursor);
 
-    if (g_enumWidgetFunctions[widgetCursor.widget->type]) {
-       g_enumWidgetFunctions[widgetCursor.widget->type](widgetCursor, callback);
+    if (*g_enumWidgetFunctions[widgetCursor.widget->type]) {
+       (*g_enumWidgetFunctions[widgetCursor.widget->type])(widgetCursor, callback);
     }
 
     g_isActiveWidget = savedIsActiveWidget;

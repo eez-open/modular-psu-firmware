@@ -35,7 +35,5 @@ struct RectangleWidget {
     RectangleWidgetSpecific specific;
 };
 
-void RectangleWidget_draw(const WidgetCursor &widgetCursor);
-
 } // namespace gui
 } // namespace eez

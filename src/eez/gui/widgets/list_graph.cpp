@@ -24,14 +24,32 @@
 #include <eez/sound.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/list_graph.h>
 
 using namespace eez::mcu;
 
 namespace eez {
 namespace gui {
 
-void ListGraphWidget_draw(const WidgetCursor &widgetCursor) {
+struct ListGraphWidget {
+    int16_t dwellData;
+    int16_t y1Data;
+    uint16_t y1Style;
+    int16_t y2Data;
+    uint16_t y2Style;
+    int16_t cursorData;
+    uint16_t cursorStyle;
+};
+
+struct ListGraphWidgetState {
+    WidgetState genericState;
+    Value cursorData;
+};
+
+FixPointersFunctionType LIST_GRAPH_fixPointers = nullptr;
+
+EnumFunctionType LIST_GRAPH_enum = nullptr;
+
+DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const ListGraphWidget *listGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const ListGraphWidget *);
     const Style* style = getStyle(widget->style);
@@ -182,9 +200,9 @@ void ListGraphWidget_draw(const WidgetCursor &widgetCursor) {
             }
         }
     }
-}
+};
 
-void ListGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
         const Widget *widget = widgetCursor.widget;
         const ListGraphWidget *listGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const ListGraphWidget *);
@@ -246,7 +264,7 @@ void ListGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent
             }
         }
     }
-}
+};
 
 } // namespace gui
 } // namespace eez

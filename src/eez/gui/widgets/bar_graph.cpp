@@ -25,12 +25,41 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/bar_graph.h>
 
 using namespace eez::mcu;
 
 namespace eez {
 namespace gui {
+
+#define BAR_GRAPH_ORIENTATION_LEFT_RIGHT 1
+#define BAR_GRAPH_ORIENTATION_RIGHT_LEFT 2
+#define BAR_GRAPH_ORIENTATION_TOP_BOTTOM 3
+#define BAR_GRAPH_ORIENTATION_BOTTOM_TOP 4
+
+struct BarGraphWidget {
+    uint8_t orientation; // BAR_GRAPH_ORIENTATION_...
+    uint16_t textStyle;
+    int16_t line1Data;
+    uint16_t line1Style;
+    int16_t line2Data;
+    uint16_t line2Style;
+};
+
+struct BarGraphWidgetState {
+    WidgetState genericState;
+    uint16_t color;
+    uint16_t backgroundColor;
+    uint16_t activeColor;
+    uint16_t activeBackgroundColor;
+    Value line1Data;
+    Value line2Data;
+    Value textData;
+    uint32_t textDataRefreshLastTime;
+};
+
+FixPointersFunctionType BAR_GRAPH_fixPointers = nullptr;    
+
+EnumFunctionType BAR_GRAPH_enum = nullptr;
 
 int calcValuePosInBarGraphWidget(Value &value, float min, float max, int d) {
     int p = (int)roundf((value.getFloat() - min) * d / (max - min));
@@ -59,7 +88,7 @@ void drawLineInBarGraphWidget(const BarGraphWidget *barGraphWidget, int p, uint1
     }
 }
 
-void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
+DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
     bool fullScale = true;
 
     const Widget *widget = widgetCursor.widget;
@@ -359,7 +388,9 @@ void BarGraphWidget_draw(const WidgetCursor &widgetCursor) {
             }
         }
     }
-}
+};
+
+OnTouchFunctionType BAR_GRAPH_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

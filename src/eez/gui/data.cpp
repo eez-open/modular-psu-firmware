@@ -279,7 +279,7 @@ VALUE_TYPES
 #undef VALUE_TYPE
 
 #define VALUE_TYPE(NAME) compare_##NAME##_value,
-extern CompareValueFunction g_valueTypeCompareFunctions[] = {
+CompareValueFunction g_valueTypeCompareFunctions[] = {
 	VALUE_TYPES
 };
 #undef VALUE_TYPE
@@ -290,7 +290,7 @@ VALUE_TYPES
 #undef VALUE_TYPE
 
 #define VALUE_TYPE(NAME) NAME##_value_to_text,
-extern ValueToTextFunction g_valueTypeToTextFunctions[] = {
+ValueToTextFunction g_valueTypeToTextFunctions[] = {
 	VALUE_TYPES
 };
 #undef VALUE_TYPE

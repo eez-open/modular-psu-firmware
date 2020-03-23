@@ -28,17 +28,7 @@
 #include <eez/libs/lz4/lz4.h>
 
 #include <eez/gui/gui.h>
-
-#include <eez/gui/widgets/button.h>
-#include <eez/gui/widgets/container.h>
-#include <eez/gui/widgets/grid.h>
-#include <eez/gui/widgets/list.h>
-#include <eez/gui/widgets/multiline_text.h>
-#include <eez/gui/widgets/scroll_bar.h>
-#include <eez/gui/widgets/select.h>
-#include <eez/gui/widgets/text.h>
-#include <eez/gui/widgets/toggle_button.h>
-#include <eez/gui/widgets/up_down.h>
+#include <eez/gui/widget.h>
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
@@ -46,21 +36,6 @@
 
 namespace eez {
 namespace gui {
-
-struct NameList {
-    uint32_t count;
-    const char **first;
-};
-
-struct Assets {
-    Document *document;
-    StyleList *styles;
-    uint8_t *fontsData;
-    uint8_t *bitmapsData;
-    Colors *colorsData;
-    NameList *actionNames;
-    NameList *dataItemNames;
-};
 
 bool g_assetsLoaded;
 static Assets g_mainAssets;
@@ -120,83 +95,45 @@ void fixPointers(Assets &assets) {
     NameList_fixPointers(g_fixPointersAssets->dataItemNames);
 }
 
-typedef void (*FixWidgetPointersFunction)(Widget *widget);
-
-static FixWidgetPointersFunction g_fixWidgetPointersFunctions[] = {
-    nullptr,                         // WIDGET_TYPE_NONE
-    ContainerWidget_fixPointers,     // WIDGET_TYPE_CONTAINER
-    ListWidget_fixPointers,          // WIDGET_TYPE_LIST
-    GridWidget_fixPointers,          // WIDGET_TYPE_GRID
-    SelectWidget_fixPointers,        // WIDGET_TYPE_SELECT
-    nullptr,                         // WIDGET_TYPE_DISPLAY_DATA
-    TextWidget_fixPointers,          // WIDGET_TYPE_TEXT
-    MultilineTextWidget_fixPointers, // WIDGET_TYPE_MULTILINE_TEXT
-    nullptr,                         // WIDGET_TYPE_RECTANGLE
-    nullptr,                         // WIDGET_TYPE_BITMAP
-    ButtonWidget_fixPointers,        // WIDGET_TYPE_BUTTON
-    ToggleButtonWidget_fixPointers,  // WIDGET_TYPE_TOGGLE_BUTTON
-    nullptr,                         // WIDGET_TYPE_BUTTON_GROUP
-    nullptr,                         // WIDGET_TYPE_RESERVED
-    nullptr,                         // WIDGET_TYPE_BAR_GRAPH
-    nullptr,                         // WIDGET_TYPE_LAYOUT_VIEW
-    nullptr,                         // WIDGET_TYPE_YT_GRAPH
-    UpDownWidget_fixPointers,        // WIDGET_TYPE_UP_DOWN
-    nullptr,                         // WIDGET_TYPE_LIST_GRAPH
-    nullptr,                         // WIDGET_TYPE_APP_VIEW
-    ScrollBarWidget_fixPointers,     // WIDGET_TYPE_SCROLL_BAR
-    nullptr,                         // WIDGET_TYPE_SCROLL_BAR
+#define WIDGET_TYPE(NAME, ID) extern FixPointersFunctionType NAME##_fixPointers;
+WIDGET_TYPES
+#undef WIDGET_TYPE
+#define WIDGET_TYPE(NAME, ID) &NAME##_fixPointers,
+static FixPointersFunctionType *g_fixWidgetPointersFunctions[] = {
+    WIDGET_TYPES
 };
+#undef WIDGET_TYPE
+
+// static FixWidgetPointersFunction g_fixWidgetPointersFunctions[] = {
+//     nullptr,                         // WIDGET_TYPE_NONE
+//     ContainerWidget_fixPointers,     // WIDGET_TYPE_CONTAINER
+//     ListWidget_fixPointers,          // WIDGET_TYPE_LIST
+//     GridWidget_fixPointers,          // WIDGET_TYPE_GRID
+//     SelectWidget_fixPointers,        // WIDGET_TYPE_SELECT
+//     nullptr,                         // WIDGET_TYPE_DISPLAY_DATA
+//     TextWidget_fixPointers,          // WIDGET_TYPE_TEXT
+//     MultilineTextWidget_fixPointers, // WIDGET_TYPE_MULTILINE_TEXT
+//     nullptr,                         // WIDGET_TYPE_RECTANGLE
+//     nullptr,                         // WIDGET_TYPE_BITMAP
+//     ButtonWidget_fixPointers,        // WIDGET_TYPE_BUTTON
+//     ToggleButtonWidget_fixPointers,  // WIDGET_TYPE_TOGGLE_BUTTON
+//     nullptr,                         // WIDGET_TYPE_BUTTON_GROUP
+//     nullptr,                         // WIDGET_TYPE_RESERVED
+//     nullptr,                         // WIDGET_TYPE_BAR_GRAPH
+//     nullptr,                         // WIDGET_TYPE_LAYOUT_VIEW
+//     nullptr,                         // WIDGET_TYPE_YT_GRAPH
+//     UpDownWidget_fixPointers,        // WIDGET_TYPE_UP_DOWN
+//     nullptr,                         // WIDGET_TYPE_LIST_GRAPH
+//     nullptr,                         // WIDGET_TYPE_APP_VIEW
+//     ScrollBarWidget_fixPointers,     // WIDGET_TYPE_SCROLL_BAR
+//     nullptr,                         // WIDGET_TYPE_SCROLL_BAR
+// };
 
 void Widget_fixPointers(Widget *widget) {
     widget->specific = (void *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)widget->specific);
-    if (g_fixWidgetPointersFunctions[widget->type]) {
-        g_fixWidgetPointersFunctions[widget->type](widget);
+    if (*g_fixWidgetPointersFunctions[widget->type]) {
+        (*g_fixWidgetPointersFunctions[widget->type])(widget, g_fixPointersAssets);
     }
-}
-
-void ButtonWidget_fixPointers(Widget *widget) {
-    ButtonWidget *buttonWidget = (ButtonWidget *)widget->specific;
-    buttonWidget->text = (const char *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)buttonWidget->text);
-}
-
-void GridWidget_fixPointers(Widget *widget) {
-    GridWidget *gridWidget = (GridWidget *)widget->specific;
-	gridWidget->itemWidget = (Widget *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)gridWidget->itemWidget);
-    Widget_fixPointers((Widget *)gridWidget->itemWidget);
-}
-
-void ListWidget_fixPointers(Widget *widget) {
-    ListWidget *listWidget = (ListWidget *)widget->specific;
-    listWidget->itemWidget = (Widget *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)listWidget->itemWidget);
-    Widget_fixPointers((Widget *)listWidget->itemWidget);
-}
-
-void MultilineTextWidget_fixPointers(Widget *widget) {
-    MultilineTextWidget *multilineTextWidget = (MultilineTextWidget *)widget->specific;
-    multilineTextWidget->text = (const char *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)multilineTextWidget->text);
-}
-
-void ScrollBarWidget_fixPointers(Widget *widget) {
-    ScrollBarWidget *scrollBarWidget = (ScrollBarWidget *)widget->specific;
-    scrollBarWidget->leftButtonText = (const char *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)scrollBarWidget->leftButtonText);
-    scrollBarWidget->rightButtonText = (const char *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)scrollBarWidget->rightButtonText);
-}
-
-void TextWidget_fixPointers(Widget *widget) {
-    TextWidgetSpecific *textWidget = (TextWidgetSpecific *)widget->specific;
-    textWidget->text = (const char *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)textWidget->text);
-}
-
-void ToggleButtonWidget_fixPointers(Widget *widget) {
-    ToggleButtonWidget *toggleButtonWidget = (ToggleButtonWidget *)widget->specific;
-    toggleButtonWidget->text1 = (const char *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)toggleButtonWidget->text1);
-    toggleButtonWidget->text2 = (const char *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)toggleButtonWidget->text2);
-}
-
-void UpDownWidget_fixPointers(Widget *widget) {
-    UpDownWidget *upDownWidget = (UpDownWidget *)widget->specific;
-    upDownWidget->downButtonText = (const char *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)upDownWidget->downButtonText);
-    upDownWidget->upButtonText = (const char *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)upDownWidget->upButtonText);
 }
 
 void initAssets(Assets &assets, bool external, uint8_t *decompressedAssets) {

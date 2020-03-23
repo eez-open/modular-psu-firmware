@@ -20,17 +20,20 @@
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/container.h>
-#include <eez/gui/widgets/select.h>
 
 namespace eez {
 namespace gui {
 
-void SelectWidget_fixPointers(Widget *widget) {
+struct SelectWidget {
+    WidgetList widgets;
+};
+
+FixPointersFunctionType SELECT_fixPointers = [](Widget *widget, Assets *assets) {
     SelectWidget *selectWidget = (SelectWidget *)widget->specific;
     WidgetList_fixPointers(selectWidget->widgets);
-}
+};
 
-void SelectWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
 
@@ -71,7 +74,11 @@ void SelectWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback)
 
 	widgetCursor.currentState = savedCurrentState;
 	widgetCursor.previousState = savedPreviousState;
-}
+};
+
+DrawFunctionType SELECT_draw = nullptr;
+
+OnTouchFunctionType SELECT_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

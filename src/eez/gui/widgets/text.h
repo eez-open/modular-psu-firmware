@@ -21,8 +21,6 @@
 namespace eez {
 namespace gui {
 
-#define IGNORE_LUMINOSITY_FLAG 1
-
 struct TextWidgetSpecific {
     const char *text;
     uint8_t flags;
@@ -33,9 +31,7 @@ struct TextWidget {
     TextWidgetSpecific specific;
 }; 
 
-void TextWidget_fixPointers(Widget *widget);
 void TextWidget_autoSize(TextWidget& widget);
-void TextWidget_draw(const WidgetCursor &widgetCursor);
 
 } // namespace gui
 } // namespace eez

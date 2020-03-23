@@ -309,25 +309,11 @@ set(src_eez_gui_widgets
 )
 list (APPEND src_files ${src_eez_gui_widgets})
 set(header_eez_gui_widgets
-    src/eez/gui/widgets/app_view.h
-    src/eez/gui/widgets/bar_graph.h
-    src/eez/gui/widgets/bitmap.h
     src/eez/gui/widgets/button.h
-    src/eez/gui/widgets/button_group.h
     src/eez/gui/widgets/container.h
-    src/eez/gui/widgets/display_data.h
-    src/eez/gui/widgets/grid.h
     src/eez/gui/widgets/layout_view.h
-    src/eez/gui/widgets/list.h
-    src/eez/gui/widgets/list_graph.h
-    src/eez/gui/widgets/multiline_text.h
-    src/eez/gui/widgets/progress.h
     src/eez/gui/widgets/rectangle.h
-    src/eez/gui/widgets/scroll_bar.h
-    src/eez/gui/widgets/select.h
     src/eez/gui/widgets/text.h
-    src/eez/gui/widgets/toggle_button.h
-    src/eez/gui/widgets/up_down.h
     src/eez/gui/widgets/yt_graph.h
 )
 list (APPEND header_files ${header_eez_gui_widgets})

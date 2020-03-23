@@ -22,14 +22,21 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/bitmap.h>
 
 #include <eez/libs/image/image.h>
 
 namespace eez {
 namespace gui {
 
-void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
+struct BitmapWidget {
+    int8_t bitmap;
+};
+
+FixPointersFunctionType BITMAP_fixPointers = nullptr;
+
+EnumFunctionType BITMAP_enum = nullptr;
+
+DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
 	const Widget *widget = widgetCursor.widget;
 
 	widgetCursor.currentState->size = sizeof(WidgetState);
@@ -76,7 +83,9 @@ void BitmapWidget_draw(const WidgetCursor &widgetCursor) {
             drawBitmap(&image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active);
         }
     }
-}
+};
+
+OnTouchFunctionType BITMAP_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

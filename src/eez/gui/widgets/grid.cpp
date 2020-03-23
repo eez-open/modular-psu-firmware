@@ -19,12 +19,25 @@
 #if OPTION_DISPLAY
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/grid.h>
 
 namespace eez {
 namespace gui {
 
-void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+#define GRID_FLOW_ROW 1
+#define GRID_FLOW_COLUMN 2
+
+struct GridWidget {
+    uint8_t gridFlow; // GRID_FLOW_ROW or GRID_FLOW_COLUMN
+    const Widget *itemWidget;
+};
+
+FixPointersFunctionType GRID_fixPointers = [](Widget *widget, Assets *assets) {
+    GridWidget *gridWidget = (GridWidget *)widget->specific;
+	gridWidget->itemWidget = (Widget *)((uint8_t *)assets->document + (uint32_t)gridWidget->itemWidget);
+    Widget_fixPointers((Widget *)gridWidget->itemWidget);
+};
+
+EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
 
@@ -120,7 +133,11 @@ void GridWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
 	widgetCursor.currentState = savedCurrentState;
 	widgetCursor.previousState = savedPreviousState;
-}
+};
+
+DrawFunctionType GRID_draw = nullptr;
+
+OnTouchFunctionType GRID_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

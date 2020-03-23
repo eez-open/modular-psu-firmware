@@ -27,8 +27,5 @@ struct ButtonWidget {
     uint16_t disabledStyle;
 };
 
-void ButtonWidget_fixPointers(Widget *widget);
-void ButtonWidget_draw(const WidgetCursor &widgetCursor);
-
 } // namespace gui
 } // namespace eez

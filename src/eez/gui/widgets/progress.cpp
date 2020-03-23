@@ -21,12 +21,15 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/progress.h>
 
 namespace eez {
 namespace gui {
 
-void ProgressWidget_draw(const WidgetCursor &widgetCursor) {
+FixPointersFunctionType PROGRESS_fixPointers = nullptr;
+
+EnumFunctionType PROGRESS_enum = nullptr;
+
+DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
@@ -61,7 +64,9 @@ void ProgressWidget_draw(const WidgetCursor &widgetCursor) {
             drawRectangle(widgetCursor.x, widgetCursor.y - yFrom, yTo - yFrom, (int)widget->h, getStyle(widget->style), true, false, true);
         }
     }
-}
+};
+
+OnTouchFunctionType PROGRESS_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

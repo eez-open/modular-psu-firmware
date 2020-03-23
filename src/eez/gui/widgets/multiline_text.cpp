@@ -21,12 +21,24 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/multiline_text.h>
 
 namespace eez {
 namespace gui {
 
-void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
+struct MultilineTextWidget {
+    const char *text;
+    int16_t firstLineIndent;
+    int16_t hangingIndent;
+};
+
+FixPointersFunctionType MULTILINE_TEXT_fixPointers = [](Widget *widget, Assets *assets) {
+    MultilineTextWidget *multilineTextWidget = (MultilineTextWidget *)widget->specific;
+    multilineTextWidget->text = (const char *)((uint8_t *)assets->document + (uint32_t)multilineTextWidget->text);
+};
+
+EnumFunctionType MULTILINE_TEXT_enum = nullptr;
+
+DrawFunctionType MULTILINE_TEXT_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
@@ -65,7 +77,9 @@ void MultilineTextWidget_draw(const WidgetCursor &widgetCursor) {
                 display_string_widget->firstLineIndent, display_string_widget->hangingIndent);
         }
     }
-}
+};
+
+OnTouchFunctionType MULTILINE_TEXT_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

@@ -21,12 +21,24 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/toggle_button.h>
 
 namespace eez {
 namespace gui {
 
-void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor) {
+struct ToggleButtonWidget {
+    const char *text1;
+    const char *text2;
+};
+
+FixPointersFunctionType TOGGLE_BUTTON_fixPointers = [](Widget *widget, Assets *assets) {
+    ToggleButtonWidget *toggleButtonWidget = (ToggleButtonWidget *)widget->specific;
+    toggleButtonWidget->text1 = (const char *)((uint8_t *)assets->document + (uint32_t)toggleButtonWidget->text1);
+    toggleButtonWidget->text2 = (const char *)((uint8_t *)assets->document + (uint32_t)toggleButtonWidget->text2);
+};
+
+EnumFunctionType TOGGLE_BUTTON_enum = nullptr;
+
+DrawFunctionType TOGGLE_BUTTON_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
@@ -49,7 +61,9 @@ void ToggleButtonWidget_draw(const WidgetCursor &widgetCursor) {
 			widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
             widgetCursor.currentState->flags.active, false, false, nullptr, nullptr, nullptr, nullptr);
     }
-}
+};
+
+OnTouchFunctionType TOGGLE_BUTTON_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

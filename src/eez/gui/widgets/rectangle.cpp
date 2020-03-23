@@ -26,7 +26,11 @@
 namespace eez {
 namespace gui {
 
-void RectangleWidget_draw(const WidgetCursor &widgetCursor) {
+FixPointersFunctionType RECTANGLE_fixPointers = nullptr;
+
+EnumFunctionType RECTANGLE_enum = nullptr;
+
+DrawFunctionType RECTANGLE_draw = [](const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->size = sizeof(WidgetState);
 
     bool refresh = !widgetCursor.previousState || widgetCursor.previousState->flags.active !=widgetCursor.currentState->flags.active;
@@ -42,7 +46,9 @@ void RectangleWidget_draw(const WidgetCursor &widgetCursor) {
             rectangle_widget->flags.ignoreLuminosity,
             rectangle_widget->flags.invertColors);
     }
-}
+};
+
+OnTouchFunctionType RECTANGLE_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

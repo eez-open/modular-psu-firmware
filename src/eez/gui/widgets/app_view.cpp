@@ -21,12 +21,34 @@
 #include <assert.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/app_view.h>
 
 namespace eez {
 namespace gui {
 
-void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
+FixPointersFunctionType APP_VIEW_fixPointers = nullptr;
+
+EnumFunctionType APP_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+    Value appContextValue;
+    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
+    AppContext *appContext = appContextValue.getAppContext();
+
+    WidgetCursor savedWidgetCursor = widgetCursor;
+    widgetCursor.appContext = appContext;
+
+    if (callback == drawWidgetCallback) {
+        appContext->updateAppView(widgetCursor);
+    } else {
+		enumWidgets(widgetCursor, callback);
+    }
+
+    if (widgetCursor.currentState) {
+        savedWidgetCursor.currentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedWidgetCursor.currentState);
+    }
+
+    widgetCursor = savedWidgetCursor;
+};
+
+DrawFunctionType APP_VIEW_draw = [](const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->size = sizeof(WidgetState);
 
     const Widget *widget = widgetCursor.widget;
@@ -48,28 +70,9 @@ void AppViewWidget_draw(const WidgetCursor &widgetCursor) {
 
 		mcu::display::fillRect(appContext->x, appContext->y, appContext->x + page->w - 1, appContext->y + page->h - 1);
     }
-}
+};
 
-void AppViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    Value appContextValue;
-    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
-    AppContext *appContext = appContextValue.getAppContext();
-
-    WidgetCursor savedWidgetCursor = widgetCursor;
-    widgetCursor.appContext = appContext;
-
-    if (callback == drawWidgetCallback) {
-        appContext->updateAppView(widgetCursor);
-    } else {
-		enumWidgets(widgetCursor, callback);
-    }
-
-    if (widgetCursor.currentState) {
-        savedWidgetCursor.currentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedWidgetCursor.currentState);
-    }
-
-    widgetCursor = savedWidgetCursor;
-}
+OnTouchFunctionType APP_VIEW_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

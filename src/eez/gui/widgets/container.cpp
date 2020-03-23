@@ -28,10 +28,16 @@
 namespace eez {
 namespace gui {
 
-void ContainerWidget_fixPointers(Widget *widget) {
+struct ContainerWidgetState {
+    WidgetState genericState;
+    int overlayState;
+    int displayBufferIndex;
+};
+
+FixPointersFunctionType CONTAINER_fixPointers = [](Widget *widget, Assets *assets) {
     ContainerWidget *containerWidget = (ContainerWidget *)widget->specific;
     WidgetList_fixPointers(containerWidget->widgets);
-}
+};
 
 void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const WidgetList &widgets) {
     auto savedCurrentState = widgetCursor.currentState;
@@ -124,7 +130,7 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
 	widgetCursor.previousState = savedPreviousState;
 }
 
-void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     Overlay *overlay = nullptr;
     if (isOverlay(widgetCursor)) {
         overlay = getOverlay(widgetCursor);
@@ -163,9 +169,9 @@ void ContainerWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callba
             mcu::display::setBufferBounds(currentState->displayBufferIndex, widgetCursor.x, widgetCursor.y, overlay ? overlay->width: widgetCursor.widget->w, overlay ? overlay->height : widgetCursor.widget->h, (containerWidget->flags & SHADOW_FLAG) != 0, style->opacity, xOffset, yOffset);
         }
     }
-}
+};
 
-void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
+DrawFunctionType CONTAINER_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
     bool refresh = 
@@ -208,7 +214,9 @@ void ContainerWidget_draw(const WidgetCursor &widgetCursor) {
             getStyle(widget->style), widgetCursor.currentState->flags.active, false, true
         );
     }
-}
+};
+
+OnTouchFunctionType CONTAINER_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

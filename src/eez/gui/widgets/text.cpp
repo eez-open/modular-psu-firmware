@@ -25,8 +25,17 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/text.h>
 
+#define IGNORE_LUMINOSITY_FLAG 1
+
 namespace eez {
 namespace gui {
+
+FixPointersFunctionType TEXT_fixPointers = [](Widget *widget, Assets *assets) {
+    TextWidgetSpecific *textWidget = (TextWidgetSpecific *)widget->specific;
+    textWidget->text = (const char *)((uint8_t *)assets->document + (uint32_t)textWidget->text);
+};
+
+EnumFunctionType TEXT_enum = nullptr;
 
 void TextWidget_autoSize(TextWidget& widget) {
     const Style *style = getStyle(widget.common.style);
@@ -35,7 +44,7 @@ void TextWidget_autoSize(TextWidget& widget) {
     widget.common.h = style->border_size_top + style->padding_top + font.getHeight() + style->border_size_bottom + style->padding_bottom;
 }
 
-void TextWidget_draw(const WidgetCursor &widgetCursor) {
+DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const TextWidgetSpecific *textWidget = GET_WIDGET_PROPERTY(widget, specific, const TextWidgetSpecific *);
 
@@ -137,7 +146,9 @@ void TextWidget_draw(const WidgetCursor &widgetCursor) {
             }
         }
     }
-}
+};
+
+OnTouchFunctionType TEXT_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

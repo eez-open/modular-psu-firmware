@@ -22,10 +22,23 @@
 #include <eez/sound.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/up_down.h>
 
 namespace eez {
 namespace gui {
+
+struct UpDownWidget {
+    uint16_t buttonsStyle;
+    const char *downButtonText;
+	const char *upButtonText;
+};
+
+FixPointersFunctionType UP_DOWN_fixPointers = [](Widget *widget, Assets *assets) {
+    UpDownWidget *upDownWidget = (UpDownWidget *)widget->specific;
+    upDownWidget->downButtonText = (const char *)((uint8_t *)assets->document + (uint32_t)upDownWidget->downButtonText);
+    upDownWidget->upButtonText = (const char *)((uint8_t *)assets->document + (uint32_t)upDownWidget->upButtonText);
+};
+
+EnumFunctionType UP_DOWN_enum = nullptr;
 
 enum UpDownWidgetSegment {
     UP_DOWN_WIDGET_SEGMENT_TEXT,
@@ -36,7 +49,7 @@ enum UpDownWidgetSegment {
 static UpDownWidgetSegment g_segment;
 static WidgetCursor g_selectedWidget;
 
-void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
+DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const UpDownWidget *upDownWidget = GET_WIDGET_PROPERTY(widget, specific, const UpDownWidget *);
 
@@ -74,7 +87,7 @@ void UpDownWidget_draw(const WidgetCursor &widgetCursor) {
                      g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
                  false, false, nullptr, nullptr, nullptr, nullptr);
     }
-}
+};
 
 void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment) {
     g_segment = segment;
@@ -106,7 +119,7 @@ void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment) {
     }
 }
 
-void UpDownWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+OnTouchFunctionType UP_DOWN_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
     const Widget *widget = widgetCursor.widget;
 
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
@@ -124,7 +137,7 @@ void UpDownWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         g_selectedWidget = 0;
     }
-}
+};
 
 } // namespace gui
 } // namespace eez

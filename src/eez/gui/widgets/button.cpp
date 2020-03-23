@@ -26,7 +26,14 @@
 namespace eez {
 namespace gui {
 
-void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
+FixPointersFunctionType BUTTON_fixPointers = [](Widget *widget, Assets *assets) {
+    ButtonWidget *buttonWidget = (ButtonWidget *)widget->specific;
+    buttonWidget->text = (const char *)((uint8_t *)assets->document + (uint32_t)buttonWidget->text);
+};
+
+EnumFunctionType BUTTON_enum = nullptr;
+
+DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const ButtonWidget *button_widget = GET_WIDGET_PROPERTY(widget, specific, const ButtonWidget *);
 
@@ -63,7 +70,9 @@ void ButtonWidget_draw(const WidgetCursor &widgetCursor) {
                      widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
         }
     }
-}
+};
+
+OnTouchFunctionType BUTTON_onTouch = nullptr;
 
 } // namespace gui
 } // namespace eez

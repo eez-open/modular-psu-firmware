@@ -33,7 +33,24 @@ using namespace eez::mcu;
 namespace eez {
 namespace gui {
 
-////////////////////////////////////////////////////////////////////////////////
+struct YTGraphWidgetState {
+    WidgetState genericState;
+    uint32_t refreshCounter;
+    uint8_t iChannel;
+    uint32_t numHistoryValues;
+    uint32_t historyValuePosition;
+    uint8_t ytGraphUpdateMethod;
+    uint32_t cursorPosition;
+    bool showLabels;
+    int8_t selectedValueIndex;
+    bool valueIsVisible[MAX_NUM_OF_Y_VALUES];
+    float valueDiv[MAX_NUM_OF_Y_VALUES];
+    float valueOffset[MAX_NUM_OF_Y_VALUES];
+};
+
+FixPointersFunctionType YT_GRAPH_fixPointers = nullptr;
+
+EnumFunctionType YT_GRAPH_enum = nullptr;
 
 struct YTGraphDrawHelper {
     const WidgetCursor &widgetCursor;
@@ -448,7 +465,7 @@ struct YTGraphStaticDrawHelper {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
+DrawFunctionType YT_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
     YTGraphWidgetState *currentState = (YTGraphWidgetState *)widgetCursor.currentState;
@@ -544,9 +561,9 @@ void YTGraphWidget_draw(const WidgetCursor &widgetCursor) {
             }
         }
     }
-}
+};
 
-void YTGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+OnTouchFunctionType YT_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (ytDataGetGraphUpdateMethod(widgetCursor.cursor, widgetCursor.widget->data) == YT_GRAPH_UPDATE_METHOD_STATIC) {
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
             TouchDrag touchDrag;
@@ -562,7 +579,7 @@ void YTGraphWidget_onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) 
             }
         }
     }
-}
+};
 
 } // namespace gui
 } // namespace eez

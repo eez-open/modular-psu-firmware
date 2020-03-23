@@ -21,18 +21,10 @@
 namespace eez {
 namespace gui {
 
-struct LayoutViewWidgetSpecific {
-    int16_t layout; // page ID
-    int16_t context; // data ID
-};
-
 struct LayoutViewWidgetState {
     WidgetState genericState;
     Value context;
 };
-
-void LayoutViewWidget_enum(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
-void LayoutViewWidget_draw(const WidgetCursor &widgetCursor);
 
 } // namespace gui
 } // namespace eez
