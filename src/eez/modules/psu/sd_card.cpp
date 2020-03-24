@@ -129,6 +129,14 @@ void onSdDetectInterruptHandler() {
 }
 #endif
 
+static bool mount();
+static void unmount();
+
+bool remount() {
+    unmount();
+    return mount();
+}
+
 bool isMounted(int *err) {
 	if (g_state == STATE_MOUNTED) {
         if (err != nullptr) {
