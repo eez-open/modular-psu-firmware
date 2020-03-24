@@ -184,7 +184,7 @@ void initDefaultDevConf() {
     
     g_defaultDevConf.mqttEnabled = 0;
     g_defaultDevConf.mqttPort = 1883;
-    g_defaultDevConf.mqttPeriod = 1.0f;
+    g_defaultDevConf.mqttPeriod = 15.0f;
 
     // block 9
     g_defaultDevConf.fanMode = FAN_MODE_AUTO;
