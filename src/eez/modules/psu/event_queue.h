@@ -117,7 +117,8 @@ static const int EVENT_TYPE_ERROR = 4;
 	EVENT_ERROR(DLOG_FILE_OPEN_ERROR, 110, "DLOG file open error")                                 \
 	EVENT_ERROR(DLOG_TRUNCATE_ERROR, 111, "DLOG truncate error")                                   \
 	EVENT_ERROR(DLOG_FILE_REOPEN_ERROR, 112, "DLOG file reopen error")                             \
-	EVENT_ERROR(DLOG_WRITE_ERROR, 113, "DLOG write")                                               \
+	EVENT_ERROR(DLOG_WRITE_ERROR, 113, "DLOG write error")                                         \
+    EVENT_ERROR(DLOG_SEEK_ERROR, 114, "DLOG seek error")                                           \
     EVENT_ERROR(SAVE_DEV_CONF_BLOCK_0, 120, "Failed to save configuration block 0")                \
     EVENT_ERROR(SAVE_DEV_CONF_BLOCK_1, 121, "Failed to save configuration block 1")                \
     EVENT_ERROR(SAVE_DEV_CONF_BLOCK_2, 122, "Failed to save configuration block 2")                \

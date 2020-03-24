@@ -90,6 +90,7 @@ osMutexDef(g_writeQueueMutex);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static bool g_isSdCardMounted = false;
 static bool g_refreshEvents;
 
 static int g_filter = EVENT_TYPE_INFO;
@@ -139,29 +140,33 @@ void init() {
 }
 
 void tick() {
-    if (sd_card::isMounted(nullptr)) {
+    bool isSdCardMounted = sd_card::isMounted(nullptr);
+    if (isSdCardMounted != g_isSdCardMounted) {
+        g_refreshEvents = true;
+    }
+    g_isSdCardMounted = isSdCardMounted;
+
+    if (g_isSdCardMounted) {
         QueueEvent queueEvent;
         if (getEventFromWriteQueue(&queueEvent)) {
             writeEvent(&queueEvent);
             g_previousDisplayFromPosition = -1;
         }
-#if OPTION_DISPLAY
-		if (gui::getActivePageId() == PAGE_ID_EVENT_QUEUE) {
-			if (g_refreshEvents) {
-				refreshEvents();
-				g_refreshEvents = false;
-			} else {
-				auto fromPosition = g_displayFromPosition;
-				if (fromPosition != g_previousDisplayFromPosition) {
-					readEvents(fromPosition);
-					g_previousDisplayFromPosition = fromPosition;
-				}
-			}
-		}
-#endif
-    } else {
-        g_refreshEvents = true;
     }
+
+#if OPTION_DISPLAY
+    if (gui::getActivePageId() == PAGE_ID_EVENT_QUEUE) {
+        if (g_refreshEvents) {
+            refreshEvents();
+        } else {
+            auto fromPosition = g_displayFromPosition;
+            if (fromPosition != g_previousDisplayFromPosition) {
+                readEvents(fromPosition);
+                g_previousDisplayFromPosition = fromPosition;
+            }
+        }
+    } 
+#endif
 }
 
 void shutdownSave() {
@@ -255,7 +260,7 @@ void pushEvent(int16_t eventId) {
 #endif
 
     if (getEventType(eventId) == EVENT_TYPE_ERROR) {
-        g_lastErrorEventId  = eventId;
+        g_lastErrorEventId = eventId;
 
         sound::playBeep();
 
@@ -356,6 +361,10 @@ static void addEventToWriteQueue(int16_t eventId, char *message) {
 
         if (g_writeQueueHead == g_writeQueueTail) {
             g_writeQueueFull = true;
+        }
+
+        if (!g_isSdCardMounted) {
+            g_refreshEvents = true;
         }
 
         osMutexRelease(g_writeQueueMutexId);
@@ -459,13 +468,32 @@ static void refreshEvents() {
     g_previousDisplayFromPosition = -1;
     g_selectedEventIndex = -1;
 
-    char filePath[MAX_PATH_LENGTH];
-    getIndexFilePath(g_filter, filePath);
+    if (g_isSdCardMounted) {
+        char filePath[MAX_PATH_LENGTH];
+        getIndexFilePath(g_filter, filePath);
 
-    File file;
-    if (file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        g_numEvents = file.size() / 4;
-        file.close();
+        File file;
+        if (file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+            g_numEvents = file.size() / 4;
+            file.close();
+        }
+
+        g_refreshEvents = false;
+    } else {
+        if (osMutexWait(g_writeQueueMutexId, 5) == osOK) {
+            if (g_writeQueueFull || g_writeQueueTail != g_writeQueueHead) {
+                int i = g_writeQueueTail;
+                do {
+                    if (getEventType(g_writeQueue[i].eventId) >= g_filter) {
+                        g_numEvents++;
+                    }
+                    i = (i + 1) % WRITE_QUEUE_MAX_SIZE;
+                } while (i != g_writeQueueHead);
+            }
+
+            g_refreshEvents = false;
+            osMutexRelease(g_writeQueueMutexId);
+        }        
     }
 }
 
@@ -577,6 +605,13 @@ static void getEventInfoText(Event *e, char *text, int count) {
     text[count - 1] = 0;
 }
 
+static void updateIsLongMessageText(Event &event) {
+    char text[256];
+    getEventInfoText(&event, text, sizeof(text));
+    eez::gui::font::Font font(getFontData(FONT_ID_OSWALD14));
+    event.isLongMessageText = mcu::display::measureStr(text, -1, font) > CONF_EVENT_LINE_WIDTH_PX;
+}
+
 static bool readEvent(File &indexFile, File &logFile, int eventIndex, Event &event) {
     indexFile.seek(4 * (g_numEvents - 1 - eventIndex));
     uint32_t logOffset;
@@ -653,35 +688,63 @@ static bool readEvent(File &indexFile, File &logFile, int eventIndex, Event &eve
     event.eventType = eventType;
     strcpy(event.message, message);
 
-    char text[256];
-    getEventInfoText(&event, text, sizeof(text));
-    eez::gui::font::Font font(getFontData(FONT_ID_OSWALD14));
-    event.isLongMessageText = mcu::display::measureStr(text, -1, font) > CONF_EVENT_LINE_WIDTH_PX;
+    updateIsLongMessageText(event);
+
     event.logOffset = logOffset;
 
     return true;
 }
 
 static void readEvents(uint32_t fromPosition) {
-    char filePath[MAX_PATH_LENGTH];
-    getIndexFilePath(g_filter, filePath);
-    File indexFile;
-    if (indexFile.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        getLogFilePath(filePath);
-        File logFile;
-        if (logFile.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-            for (int i = 0; i < EVENTS_PER_PAGE; i++) {
-                auto &event = g_events[i];
-                if (fromPosition + i < g_numEvents) {
-                    if (readEvent(indexFile, logFile, fromPosition + i, event)) {
-                        continue;
+    if (g_isSdCardMounted) {
+        char filePath[MAX_PATH_LENGTH];
+        getIndexFilePath(g_filter, filePath);
+        File indexFile;
+        if (indexFile.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+            getLogFilePath(filePath);
+            File logFile;
+            if (logFile.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+                for (int i = 0; i < EVENTS_PER_PAGE; i++) {
+                    auto &event = g_events[i];
+                    if (fromPosition + i < g_numEvents) {
+                        if (readEvent(indexFile, logFile, fromPosition + i, event)) {
+                            continue;
+                        }
                     }
+                    memset(&event, 0, sizeof(event));
                 }
-                memset(&event, 0, sizeof(event));
+                logFile.close();
             }
-            logFile.close();
+            indexFile.close();
         }
-        indexFile.close();
+    } else {
+        if (osMutexWait(g_writeQueueMutexId, 5) == osOK) {
+            uint32_t j = 0;
+            uint32_t k = 0;
+            if (g_writeQueueFull || g_writeQueueTail != g_writeQueueHead) {
+                uint32_t i = g_writeQueueTail;
+                do {
+                    int eventType = getEventType(g_writeQueue[i].eventId);
+                    if (eventType >= g_filter) {
+                        if (j >= fromPosition + k) {
+                            auto &event = g_events[k];
+                            event.dateTime = g_writeQueue[i].dateTime;
+                            event.eventType = eventType;
+                            strcpy(event.message, eventType == EVENT_DEBUG_TRACE ? g_writeQueue[i].message : getEventMessage(g_writeQueue[i].eventId));
+                            updateIsLongMessageText(event);
+                            event.logOffset = i;
+                            if (++k == EVENTS_PER_PAGE) {
+                                break;
+                            }
+                        }
+                        j++;
+                    }
+                    i = (i + 1) % WRITE_QUEUE_MAX_SIZE;
+                } while (i != g_writeQueueHead);
+            }
+
+            osMutexRelease(g_writeQueueMutexId);
+        }                
     }
 }
 

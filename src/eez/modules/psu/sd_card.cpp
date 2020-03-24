@@ -106,6 +106,10 @@ void init() {
 }
 
 bool test() {
+    if (g_testResult == TEST_FAILED) {
+        generateError(SCPI_ERROR_MISSING_MASS_MEDIA);
+    }
+
     return g_testResult != TEST_FAILED;
 }
 

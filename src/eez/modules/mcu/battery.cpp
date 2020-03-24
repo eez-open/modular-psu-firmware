@@ -18,12 +18,12 @@
 
 #include <eez/modules/mcu/battery.h>
 
+#include <eez/modules/psu/psu.h>
+#include <scpi/scpi.h>
+
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/system.h>
 #include <eez/util.h>
-
-#include <eez/modules/psu/psu.h>
-#include <scpi/scpi.h>
 
 #include <adc.h>
 #include <dma.h>
