@@ -140,7 +140,7 @@ class File {
     int read();
     size_t read(void *buf, uint32_t nbyte);
     size_t write(const void *buf, size_t size);
-    void sync();
+    bool sync();
 
     void print(float value, int numDecimalDigits);
     void print(char value);

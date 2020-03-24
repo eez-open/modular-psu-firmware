@@ -268,8 +268,8 @@ size_t File::write(const void *buf, size_t size) {
 	return bwTotal;
 }
 
-void File::sync() {
-    f_sync(&m_file);
+bool File::sync() {
+    return f_sync(&m_file) == FR_OK;
 }
 
 void File::print(float value, int numDecimalDigits) {

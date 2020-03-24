@@ -372,8 +372,8 @@ size_t File::write(const void *buf, size_t size) {
     return fwrite(buf, 1, size, m_fp);
 }
 
-void File::sync() {
-    fflush(m_fp);
+bool File::sync() {
+    return !fflush(m_fp);
 }
 
 void File::print(float value, int numDecimalDigits) {
