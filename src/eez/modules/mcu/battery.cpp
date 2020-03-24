@@ -22,6 +22,9 @@
 #include <eez/system.h>
 #include <eez/util.h>
 
+#include <eez/modules/psu/psu.h>
+#include <scpi/scpi.h>
+
 #include <adc.h>
 #include <dma.h>
 
@@ -96,7 +99,13 @@ bool test() {
 #else
 	g_testResult = TEST_SKIPPED;
 #endif
-	return g_testResult != TEST_FAILED;
+
+    if (g_testResult == TEST_FAILED) {
+        generateError(SCPI_ERROR_BATTERY_TEST_FAILED);
+		return false;
+    }
+
+	return true;
 }
 
 void tick() {

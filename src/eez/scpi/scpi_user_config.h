@@ -116,11 +116,13 @@ extern "C" {
     X(SCPI_ERROR_CH4_DAC_TEST_FAILED,                        234, "CH4 DAC test failed")                          \
     X(SCPI_ERROR_CH5_DAC_TEST_FAILED,                        235, "CH5 DAC test failed")                          \
     X(SCPI_ERROR_CH6_DAC_TEST_FAILED,                        236, "CH6 DAC test failed")                          \
-    X(SCPI_ERROR_EXT_EEPROM_TEST_FAILED,                     240, "External EEPROM test failed")                  \
+    X(SCPI_ERROR_MCU_EEPROM_TEST_FAILED,                     240, "MCU EEPROM test failed")                       \
     X(SCPI_ERROR_RTC_TEST_FAILED,                            250, "RTC test failed")                              \
 	X(SCPI_ERROR_ETHERNET_TEST_FAILED,                       260, "Ethernet test failed")                         \
     X(SCPI_ERROR_BACKPLANE_IOEXP_TEST_FAILED,                261, "Backplane IOEXP test failed")                  \
     X(SCPI_ERROR_DATETIME_TEST_FAILED,                       262, "Date and time test failed")                    \
+    X(SCPI_ERROR_BP3C_EEPROM_TEST_FAILED,                    263, "Backplane EEPROM test failed")                 \
+    X(SCPI_ERROR_BATTERY_TEST_FAILED,                        264, "Battery test failed")                          \
     X(SCPI_ERROR_INCOMPATIBLE_TRANSIENT_MODES,               304, "Incompatible transient modes")                 \
     X(SCPI_ERROR_TOO_MANY_LIST_POINTS,                       306, "Too many list points")                         \
     X(SCPI_ERROR_LIST_LENGTHS_NOT_EQUIVALENT,                307, "List lengths are not equivalent")              \
