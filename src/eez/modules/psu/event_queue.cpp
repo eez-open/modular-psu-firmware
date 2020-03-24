@@ -482,13 +482,19 @@ static void refreshEvents() {
     } else {
         if (osMutexWait(g_writeQueueMutexId, 5) == osOK) {
             if (g_writeQueueFull || g_writeQueueTail != g_writeQueueHead) {
-                int i = g_writeQueueTail;
+                int i = g_writeQueueFull ? (g_writeQueueHead + 1) % WRITE_QUEUE_MAX_SIZE : g_writeQueueHead;
                 do {
+                    if (i > 0) {
+                        i--;
+                    } else {
+                        i = WRITE_QUEUE_MAX_SIZE - 1;
+                    }
+
                     if (getEventType(g_writeQueue[i].eventId) >= g_filter) {
                         g_numEvents++;
                     }
-                    i = (i + 1) % WRITE_QUEUE_MAX_SIZE;
-                } while (i != g_writeQueueHead);
+
+                } while (i != g_writeQueueTail);
             }
 
             g_refreshEvents = false;
@@ -722,8 +728,14 @@ static void readEvents(uint32_t fromPosition) {
             uint32_t j = 0;
             uint32_t k = 0;
             if (g_writeQueueFull || g_writeQueueTail != g_writeQueueHead) {
-                uint32_t i = g_writeQueueTail;
+                int i = g_writeQueueFull ? (g_writeQueueHead + 1) % WRITE_QUEUE_MAX_SIZE : g_writeQueueHead;
                 do {
+                    if (i > 0) {
+                        i--;
+                    } else {
+                        i = WRITE_QUEUE_MAX_SIZE - 1;
+                    }
+
                     int eventType = getEventType(g_writeQueue[i].eventId);
                     if (eventType >= g_filter) {
                         if (j >= fromPosition + k) {
@@ -739,8 +751,8 @@ static void readEvents(uint32_t fromPosition) {
                         }
                         j++;
                     }
-                    i = (i + 1) % WRITE_QUEUE_MAX_SIZE;
-                } while (i != g_writeQueueHead);
+
+                } while (i != g_writeQueueTail);
             }
 
             osMutexRelease(g_writeQueueMutexId);
