@@ -98,7 +98,7 @@
 #define PROFILE_NAME_MAX_LENGTH 32
 
 /// Size in number characters of SCPI parser input buffer.
-#define SCPI_PARSER_INPUT_BUFFER_LENGTH 2048
+#define SCPI_PARSER_INPUT_BUFFER_LENGTH 5000
 
 /// Size of SCPI parser error queue.
 #define SCPI_PARSER_ERROR_QUEUE_SIZE 20
