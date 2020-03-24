@@ -120,7 +120,7 @@ def start():
         scpi("MEM:STAT:FREEze OFF")
 
     if uBreakdown != None:
-        scpi('DISP:INPUT? "Breakdown voltage is ' + str(uBreakdown) + 'V", MENU, BUTTON, "Close"')
+        scpi('DISP:INPUT? "Breakdown voltage is ' + str(round(uBreakdown, 2)) + 'V", MENU, BUTTON, "Close"')
     else:
         scpi('DISP:INPUT? "Breakdown voltage not found", MENU, BUTTON, "Close"')    
 
