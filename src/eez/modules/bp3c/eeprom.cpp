@@ -210,10 +210,6 @@ bool test() {
     g_testResult = TEST_SKIPPED;
 #endif
 
-    if (g_testResult == TEST_FAILED) {
-        generateError(SCPI_ERROR_BP3C_EEPROM_TEST_FAILED);
-    }
-
     return g_testResult != TEST_FAILED;
 }
 

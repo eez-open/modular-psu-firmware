@@ -85,6 +85,8 @@ bool g_shutdown;
 void boot() {
     assert(MEMORY_END - MEMORY_BEGIN <= MEMORY_SIZE);
 
+    psu::event_queue::init();
+
 #if defined(EEZ_PLATFORM_STM32)
     mcu::sdram::init();
     //mcu::sdram::test();
@@ -214,8 +216,6 @@ void boot() {
     g_bootTestSuccess = true;
 
     g_bootTestSuccess &= testMaster();
-
-    psu::event_queue::init();
 
 #if defined(EEZ_PLATFORM_STM32)
     if (g_isResetByIWDG) {

@@ -121,7 +121,6 @@ extern "C" {
 	X(SCPI_ERROR_ETHERNET_TEST_FAILED,                       260, "Ethernet test failed")                         \
     X(SCPI_ERROR_BACKPLANE_IOEXP_TEST_FAILED,                261, "Backplane IOEXP test failed")                  \
     X(SCPI_ERROR_DATETIME_TEST_FAILED,                       262, "Date and time test failed")                    \
-    X(SCPI_ERROR_BP3C_EEPROM_TEST_FAILED,                    263, "Backplane EEPROM test failed")                 \
     X(SCPI_ERROR_BATTERY_TEST_FAILED,                        264, "Battery test failed")                          \
     X(SCPI_ERROR_INCOMPATIBLE_TRANSIENT_MODES,               304, "Incompatible transient modes")                 \
     X(SCPI_ERROR_TOO_MANY_LIST_POINTS,                       306, "Too many list points")                         \
