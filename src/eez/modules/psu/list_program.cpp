@@ -38,6 +38,7 @@
 #include <eez/libs/sd_fat/sd_fat.h>
 
 #define CONF_COUNTER_THRESHOLD_IN_SECONDS 5
+#define CONF_SAVE_LIST_TIMEOUT_MS 2000
 
 namespace eez {
 
@@ -387,28 +388,46 @@ bool saveList(
 
     for (int i = 0; i < dwellListLength || i < voltageListLength || i < currentListLength; i++) {
         if (i < dwellListLength) {
-            file.print(dwellList[i], 4);
+            if (!file.print(dwellList[i], 4)) {
+                return false;
+            }
         } else {
-            file.print(LIST_CSV_FILE_NO_VALUE_CHAR);
+            if (!file.print(LIST_CSV_FILE_NO_VALUE_CHAR)) {
+                return false;
+            }
         }
 
-        file.print(CSV_SEPARATOR);
+        if (!file.print(CSV_SEPARATOR)) {
+            return false;
+        }
 
         if (i < voltageListLength) {
-            file.print(voltageList[i], 4);
+            if (!file.print(voltageList[i], 4)) {
+                return false;
+            }
         } else {
-            file.print(LIST_CSV_FILE_NO_VALUE_CHAR);
+            if (!file.print(LIST_CSV_FILE_NO_VALUE_CHAR)) {
+                return false;
+            }
         }
 
-        file.print(CSV_SEPARATOR);
+        if (!file.print(CSV_SEPARATOR)) {
+            return false;
+        }
 
         if (i < currentListLength) {
-            file.print(currentList[i], 4);
+            if (!file.print(currentList[i], 4)) {
+                return false;
+            }
         } else {
-            file.print(LIST_CSV_FILE_NO_VALUE_CHAR);
+            if (!file.print(LIST_CSV_FILE_NO_VALUE_CHAR)) {
+                return false;
+            }
         }
 
-        file.print('\n');
+        if (!file.print('\n')) {
+            return false;
+        }
 
 #if OPTION_DISPLAY
         if (showProgress) {
@@ -436,29 +455,34 @@ bool saveList(
         return false;
     }
 
-    File file;
-    if (!file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
-        if (err) {
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+    uint32_t timeout = millis() + CONF_SAVE_LIST_TIMEOUT_MS;
+    while (millis() < timeout) {
+        File file;
+        if (file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
+            sd_card::BufferedFileWrite bufferedFile(file);
+
+            if (saveList(bufferedFile, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, showProgress, err)) {
+                if (bufferedFile.flush()) {
+                    if (file.close()) {
+                        onSdCardFileChangeHook(filePath);
+                        if (err) {
+                            *err = SCPI_RES_OK;
+                        }
+                        return true;
+                    }
+                }
+            }
         }
-        return false;
+
+        if (!sd_card::remount()) {
+            break;
+        }        
     }
-
-    sd_card::BufferedFileWrite bufferedFile(file);
-
-    saveList(bufferedFile, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, showProgress, err);
-
-    bufferedFile.flush();
-
-    file.close();
-
-    onSdCardFileChangeHook(filePath);
 
     if (err) {
-        *err = SCPI_RES_OK;
+        *err = SCPI_ERROR_MASS_STORAGE_ERROR;
     }
-
-    return true;
+    return false;
 }
 
 bool saveList(int iChannel, const char *filePath, int *err) {

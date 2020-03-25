@@ -97,12 +97,12 @@ class BufferedFileWrite {
 public:
     BufferedFileWrite(File &file);
 
-    size_t write(const uint8_t *buf, size_t size);
+    bool write(const uint8_t *buf, size_t size);
 
-    size_t print(float value, int numDecimalDigits);
-    size_t print(char value);
+    bool print(float value, int numDecimalDigits);
+    bool print(char value);
 
-    size_t flush();
+    bool flush();
 
 private:
     File &file;

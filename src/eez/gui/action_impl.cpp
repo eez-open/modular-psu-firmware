@@ -1050,7 +1050,10 @@ void action_user_switch_clicked() {
 
     case persist_conf::USER_SWITCH_ACTION_SCREENSHOT:
         using namespace scpi;
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_SCREENSHOT, 0), osWaitForever);
+        if (!g_screenshotGenerating) {
+            g_screenshotGenerating = true;
+            osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_SCREENSHOT, 0), osWaitForever);
+        }
         break;
 
     case persist_conf::USER_SWITCH_ACTION_MANUAL_TRIGGER:

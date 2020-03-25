@@ -21,8 +21,12 @@
 
 #include <scpi/scpi.h>
 
+#include <eez/debug.h>
 #include <eez/util.h>
 #include <eez/libs/sd_fat/sd_fat.h>
+
+#define CHECK_ERROR(desc, err) (void)(desc); (void)(err);
+//#define CHECK_ERROR(desc, err) if (err != FR_OK) DebugTrace("%s: %d\n", desc, (int)err)
 
 namespace eez {
 
@@ -33,7 +37,9 @@ FileInfo::FileInfo() {
 }
 
 SdFatResult FileInfo::fstat(const char *filePath) {
-    return (SdFatResult)f_stat(filePath, &m_fno);
+    auto result = f_stat(filePath, &m_fno);
+    CHECK_ERROR("FileInfo::fstat", result);
+    return (SdFatResult)result;
 }
 
 FileInfo::operator bool() {
@@ -106,11 +112,14 @@ Directory::~Directory() {
 }
 
 void Directory::close() {
-    f_closedir(&m_dj);
+    auto result = f_closedir(&m_dj);
+    CHECK_ERROR("Directory::close", result);
 }
 
 SdFatResult Directory::findFirst(const char *path, const char *pattern, FileInfo &fileInfo) {
-    return (SdFatResult)f_findfirst(&m_dj, &fileInfo.m_fno, path, pattern ? pattern : "*");
+    auto result = f_findfirst(&m_dj, &fileInfo.m_fno, path, pattern ? pattern : "*");
+    CHECK_ERROR("Directory::findFirst", result);
+    return (SdFatResult)result;
 }
 
 SdFatResult Directory::findFirst(const char *path, FileInfo &fileInfo) {
@@ -118,7 +127,9 @@ SdFatResult Directory::findFirst(const char *path, FileInfo &fileInfo) {
 }
 
 SdFatResult Directory::findNext(FileInfo &fileInfo) {
-    return (SdFatResult)f_findnext(&m_dj, &fileInfo.m_fno);
+    auto result = f_findnext(&m_dj, &fileInfo.m_fno);
+    CHECK_ERROR("Directory::findNext", result);
+    return (SdFatResult)result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +138,8 @@ File::File() : m_isOpen(false) {
 }
 
 bool File::open(const char *path, uint8_t mode) {
-	FRESULT result = f_open(&m_file, path, mode);
+	auto result = f_open(&m_file, path, mode);
+    CHECK_ERROR("File::open", result);
     m_isOpen = result == FR_OK;
 	return m_isOpen;
 }
@@ -135,9 +147,11 @@ bool File::open(const char *path, uint8_t mode) {
 File::~File() {
 }
 
-void File::close() {
-    f_close(&m_file);
+bool File::close() {
+    auto result = f_close(&m_file);
+    CHECK_ERROR("File::close", result);
     m_isOpen = false;
+    return result == FR_OK;
 }
 
 bool File::isOpen() {
@@ -145,7 +159,11 @@ bool File::isOpen() {
 }
 
 bool File::truncate(uint32_t length) {
-    return f_lseek(&m_file, length) == FR_OK && f_truncate(&m_file) == FR_OK;
+    auto result1 = f_lseek(&m_file, length);
+    CHECK_ERROR("File::truncate 1", result1);
+    auto result2 = f_truncate(&m_file);
+    CHECK_ERROR("File::truncate 2", result2);
+    return result1 == FR_OK && result2 == FR_OK;
 }
 
 size_t File::size() {
@@ -157,24 +175,30 @@ bool File::available() {
 }
 
 bool File::seek(uint32_t pos) {
-    return f_lseek(&m_file, pos) == FR_OK;
+    auto result = f_lseek(&m_file, pos);
+    CHECK_ERROR("File::seek", result);
+    return result == FR_OK;
 }
 
 size_t File::tell() {
-    return f_tell(&m_file);
+    auto result = f_tell(&m_file);
+    CHECK_ERROR("File::tell", result);
+    return result;
 }
 
 int File::peek() {
     auto pos = f_tell(&m_file);
-    int result = read();
-    f_lseek(&m_file, pos);
-    return result;
+    int ch = read();
+    auto result = f_lseek(&m_file, pos);
+    CHECK_ERROR("File::peek", result);
+    return ch;
 }
 
 int File::read() {
     uint8_t value;
     UINT br;
     auto result = f_read(&m_file, &value, 1, &br);
+    CHECK_ERROR("File::read", result);
     return result != FR_OK || br != 1 ? EOF : (int)value;
 }
 
@@ -189,6 +213,7 @@ size_t File::read(void *buf, uint32_t size) {
 		uint8_t unalignedBuffer[4] __attribute__((aligned));
         UINT br;
         auto result = f_read(&m_file, unalignedBuffer, unalignedLength, &br);
+        CHECK_ERROR("File::read 1", result);
         if (result != FR_OK) {
             return 0;
         }
@@ -209,6 +234,7 @@ size_t File::read(void *buf, uint32_t size) {
 
         UINT br;
         auto result = f_read(&m_file, (uint8_t *)buf + brTotal, btr, &br);
+        CHECK_ERROR("File::read 2", result);
         if (result != FR_OK) {
             return brTotal;
         }
@@ -238,6 +264,7 @@ size_t File::write(const void *buf, size_t size) {
 
 		UINT bw;
 		auto result = f_write(&m_file, unalignedBuffer, unalignedLength, &bw);
+        CHECK_ERROR("File::write 1", result);
 		if (result != FR_OK) {
 			return 0;
 		}
@@ -254,6 +281,7 @@ size_t File::write(const void *buf, size_t size) {
 
 		UINT bw;
 		auto result = f_write(&m_file, (const uint8_t *)buf + bwTotal, btw, &bw);
+        CHECK_ERROR("File::write 2", result);
 		if (result != FR_OK) {
 			return bwTotal;
 		}
@@ -269,7 +297,9 @@ size_t File::write(const void *buf, size_t size) {
 }
 
 bool File::sync() {
-    return f_sync(&m_file) == FR_OK;
+    auto result = f_sync(&m_file);
+    CHECK_ERROR("File::sync", result);
+    return result == FR_OK;
 }
 
 void File::print(float value, int numDecimalDigits) {
@@ -279,15 +309,17 @@ void File::print(float value, int numDecimalDigits) {
 }
 
 void File::print(char value) {
-    f_printf(&m_file, "%c", value);
+    auto result = f_printf(&m_file, "%c", value);
+    CHECK_ERROR("File:print", result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool SdFat::mount(int *err) {
-	auto res = f_mount(&SDFatFS, SDPath, 1);
-	if (res != FR_OK) {
-		if (res == FR_NO_FILESYSTEM) {
+	auto result = f_mount(&SDFatFS, SDPath, 1);
+    CHECK_ERROR("SdFat::mount", result);
+	if (result != FR_OK) {
+		if (result == FR_NO_FILESYSTEM) {
 			*err = SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM;
 		} else {
 			*err = SCPI_ERROR_MASS_STORAGE_ERROR;
@@ -300,7 +332,8 @@ bool SdFat::mount(int *err) {
 }
 
 void SdFat::unmount() {
-    f_mount(0, "", 0);
+    auto result = f_mount(0, "", 0);
+    CHECK_ERROR("SdFat::unmount", result);
     memset(&SDFatFS, 0, sizeof(SDFatFS));
 }
 
@@ -309,29 +342,41 @@ bool SdFat::exists(const char *path) {
         return true;
     }
     FILINFO fno;
-    return f_stat(path, &fno) == FR_OK;
+    auto result = f_stat(path, &fno);
+    CHECK_ERROR("SdFat::exists", result);
+    return result == FR_OK;
 }
 
 bool SdFat::rename(const char *sourcePath, const char *destinationPath) {
-    return f_rename(sourcePath, destinationPath) == FR_OK;
+    auto result = f_rename(sourcePath, destinationPath);
+    CHECK_ERROR("SdFat::rename", result);
+    return result == FR_OK;
 }
 
 bool SdFat::remove(const char *path) {
-    return f_unlink(path) == FR_OK;
+    auto result = f_unlink(path);
+    CHECK_ERROR("SdFat::remove", result);
+    return result == FR_OK;
 }
 
 bool SdFat::mkdir(const char *path) {
-    return f_mkdir(path) == FR_OK;
+    auto result = f_mkdir(path);
+    CHECK_ERROR("SdFat::mkdir", result);
+    return result == FR_OK;
 }
 
 bool SdFat::rmdir(const char *path) {
-    return f_unlink(path) == FR_OK;
+    auto result = f_unlink(path);
+    CHECK_ERROR("SdFat::rmdir", result);
+    return result == FR_OK;
 }
 
 bool SdFat::getInfo(uint64_t &usedSpace, uint64_t &freeSpace) {
     DWORD freeClusters;
     FATFS *fs;
-    if (f_getfree(SDPath, &freeClusters, &fs) != FR_OK) {
+    auto result = f_getfree(SDPath, &freeClusters, &fs);
+    CHECK_ERROR("SdFat::getInfo", result);
+    if (result != FR_OK) {
         return false;
     }
 

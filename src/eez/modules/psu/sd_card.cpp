@@ -51,6 +51,7 @@ extern "C" int g_sdCardIsPresent;
 #endif
 
 #define CONF_DEBOUNCE_TIMEOUT_MS 500
+#define CONF_DOWNLOAD_TIMEOUT_MS 10000
 
 namespace eez {
 
@@ -80,6 +81,7 @@ TestResult g_testResult = TEST_FAILED;
 int g_lastError;
 
 static File g_downloadFile;
+static uint32_t g_downloadedFileOffset;
 static char g_downloadFilePath[MAX_PATH_LENGTH + 1];
 
 static uint32_t g_getInfoVersion;
@@ -133,12 +135,13 @@ void onSdDetectInterruptHandler() {
 }
 #endif
 
-static bool mount();
-static void unmount();
-
 bool remount() {
-    unmount();
-    return mount();
+    SD.unmount();
+#if defined(EEZ_PLATFORM_STM32)
+    FATFS_UnLinkDriver(SDPath);
+    MX_FATFS_Init();
+#endif
+    return SD.mount(&g_lastError);
 }
 
 bool isMounted(int *err) {
@@ -335,29 +338,67 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
     return result;
 }
 
-bool download(const char *filePath, bool truncate, const void *buffer, size_t size, int *err) {
-    if (!sd_card::isMounted(err)) {
+bool download(const char *filePath, bool truncate, const void *buffer, size_t size, int *perr) {
+    if (!sd_card::isMounted(perr)) {
         return false;
     }
 
 	if (truncate) {
 	    if (!g_downloadFile.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
-			if (err)
-				*err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
+			if (perr) {
+				*perr = SCPI_ERROR_FILE_NAME_NOT_FOUND;
+            }
 			return false;
 		}
         strcpy(g_downloadFilePath, filePath);
+        g_downloadedFileOffset = 0;
 	}
 
-    size_t written = g_downloadFile.write((const uint8_t *)buffer, size);
+    int err = 0;
 
-    if (written != size) {
-        if (err)
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
-        return false;
+    uint32_t timeout = millis() + CONF_DOWNLOAD_TIMEOUT_MS;
+    while (millis() < timeout) {
+        size_t written = g_downloadFile.write((const uint8_t *)buffer, size);
+        if (written == size) {
+            if (g_downloadFile.sync()) {
+                g_downloadedFileOffset += size;
+                return true;
+            }
+        }
+
+        if (!sd_card::remount()) {
+            err = SCPI_ERROR_MASS_STORAGE_ERROR;
+            break;
+        }
+
+
+        bool ropened = false;
+
+        while (millis() < timeout) {
+            if (g_downloadFile.open(filePath, FILE_OPEN_EXISTING | FILE_WRITE)) {
+                if (g_downloadFile.seek(g_downloadedFileOffset)) {
+                    ropened = true;
+                    break;
+                }
+            }
+
+            if (!sd_card::remount()) {
+                err = SCPI_ERROR_MASS_STORAGE_ERROR;
+                break;
+            }
+        }
+
+        if (!ropened) {
+            break;
+        }
     }
 
-    return true;
+    sd_card::remount();
+
+    if (perr) {
+        *perr = err;
+    }
+    return false;
 }
 
 void downloadFinished() {
@@ -661,7 +702,7 @@ BufferedFileWrite::BufferedFileWrite(File &file_)
 {
 }
 
-size_t BufferedFileWrite::write(const uint8_t *buf, size_t size) {
+bool BufferedFileWrite::write(const uint8_t *buf, size_t size) {
     size_t written = 0;
 
     while (position + size >= BUFFER_SIZE) {
@@ -669,8 +710,8 @@ size_t BufferedFileWrite::write(const uint8_t *buf, size_t size) {
         memcpy(buffer + position, buf, partialSize);
         position += partialSize;
         written += partialSize;
-        if (flush() == 0) {
-            return written;
+        if (!flush()) {
+            return false;
         }
         buf += partialSize;
         size -= partialSize;
@@ -682,33 +723,29 @@ size_t BufferedFileWrite::write(const uint8_t *buf, size_t size) {
         written += size;
     }
 
-    return written;
+    return true;
 }
 
-size_t BufferedFileWrite::print(float value, int numDecimalDigits) {
+bool BufferedFileWrite::print(float value, int numDecimalDigits) {
     char buf[32];
     sprintf(buf, "%.*f", numDecimalDigits, value);
-    return write((const uint8_t *)buf, strlen(buf));
+    int len = strlen(buf);
+    return write((const uint8_t *)buf, len);
 }
 
-size_t BufferedFileWrite::print(char value) {
+bool BufferedFileWrite::print(char value) {
     return write((const uint8_t *)&value, 1);
 }
 
-size_t BufferedFileWrite::flush() {
+bool BufferedFileWrite::flush() {
     if (position == 0) {
-        return 0;
+        return true;
     }
-    size_t written = file.write(buffer, position);
-    if (written < position) {
-        if (written > 0) {
-            position -= written;
-            memmove(buffer, buffer + written, position);
-        }
-    } else {
+    if (file.write(buffer, position) == position) {
         position = 0;
+        return true;
     }
-    return written;
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

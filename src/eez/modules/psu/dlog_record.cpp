@@ -44,6 +44,7 @@ namespace psu {
 namespace dlog_record {
 
 #define CHUNK_SIZE 4096
+#define CONF_WRITE_TIMEOUT_MS 10000
 
 enum Event {
     EVENT_INITIATE,
@@ -53,6 +54,7 @@ enum Event {
     EVENT_TOGGLE,
     EVENT_FINISH,
     EVENT_ABORT,
+    EVENT_ABORT_AFTER_ERROR,
     EVENT_RESET
 };
 
@@ -108,6 +110,9 @@ uint32_t g_fileLength;
 static unsigned int g_bufferIndex;
 static unsigned int g_lastSavedBufferIndex;
 static unsigned int g_saveUpToBufferIndex;
+size_t g_writeOffset = 0;
+
+void abortAfterError();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -151,40 +156,63 @@ void fileWrite() {
 
     auto saveUpToBufferIndex = g_saveUpToBufferIndex;
     size_t length = saveUpToBufferIndex - g_lastSavedBufferIndex;
-    if (length > 0) {
+    if (length == 0) {
+        return;
+    }
+    int i = g_lastSavedBufferIndex % DLOG_RECORD_BUFFER_SIZE;
+    int j = saveUpToBufferIndex % DLOG_RECORD_BUFFER_SIZE;
+
+    int err = 0;
+
+    uint32_t timeout = millis() + CONF_WRITE_TIMEOUT_MS;
+    while (millis() < timeout) {
         File file;
-        if (!file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-            event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR);
-            abort();
-            return;
-        }
+        if (file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+            if (file.seek(g_writeOffset)) {
+                size_t written;
+                
+                if (i < j || j == 0) {
+                    written = file.write(DLOG_RECORD_BUFFER + i, length);
+                } else {
+                    written = file.write(DLOG_RECORD_BUFFER + i, DLOG_RECORD_BUFFER_SIZE - i);
+                    if (written == DLOG_RECORD_BUFFER_SIZE - i) {
+                        written += file.write(DLOG_RECORD_BUFFER, j);
+                    }
+                }
 
-        int i = g_lastSavedBufferIndex % DLOG_RECORD_BUFFER_SIZE;
-        int j = saveUpToBufferIndex % DLOG_RECORD_BUFFER_SIZE;
+                if (written == length) {
+                    if (file.close()) {
+                        g_writeOffset += length;
+                        g_lastSavedBufferIndex = saveUpToBufferIndex;
+                        return;
+                    }
+                } 
 
-        size_t written;
-        if (i < j || j == 0) {
-            written = file.write(DLOG_RECORD_BUFFER + i, length);
+                err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
+            } else {
+                err = event_queue::EVENT_ERROR_DLOG_SEEK_ERROR;
+            }
         } else {
-            written = file.write(DLOG_RECORD_BUFFER + i, DLOG_RECORD_BUFFER_SIZE - i) + file.write(DLOG_RECORD_BUFFER, j);
+            err = event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR;
         }
 
-        g_lastSavedBufferIndex = saveUpToBufferIndex;
-
-        file.close();
-
-        if (written != length) {
-            event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_WRITE_ERROR);
-            abort();
+        if (!sd_card::remount()) {
+            err = SCPI_ERROR_MASS_STORAGE_ERROR;
+            break;
         }
     }
+
+    event_queue::pushEvent(err);
+    abortAfterError();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 static void flushData() {
     if (osThreadGetId() != g_scpiTaskHandle) {
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DLOG_FILE_WRITE, 0), osWaitForever);
+        if (osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DLOG_FILE_WRITE, 0), 5) != osOK) {
+            //DebugTrace("DLOG trace write overflow\n");
+        }
     } else {
         fileWrite();
     }
@@ -194,16 +222,8 @@ static void flushData() {
 
 static void writeUint8(uint8_t value) {
     *(DLOG_RECORD_BUFFER + (g_bufferIndex % DLOG_RECORD_BUFFER_SIZE)) = value;
-
     g_bufferIndex++;
-
-    if (g_state == STATE_EXECUTING && (g_bufferIndex - g_saveUpToBufferIndex) >= CHUNK_SIZE) {
-        g_lastSyncTickCount = micros();
-        g_saveUpToBufferIndex = g_bufferIndex;
-        flushData();
-    }
-
-    ++g_fileLength;
+    g_fileLength++;
 }
 
 static void writeUint16(uint16_t value) {
@@ -292,6 +312,7 @@ static void initRecordingStart() {
     g_bufferIndex = 0;
     g_lastSavedBufferIndex = 0;
     g_saveUpToBufferIndex = 0;
+    g_writeOffset = 0;
 
     memcpy(&g_recording.parameters, &g_parameters, sizeof(dlog_view::Parameters));
 
@@ -384,6 +405,10 @@ static void writeFileHeaderAndMetaFields() {
     g_bufferIndex = savedBufferIndex;
     writeUint32(g_recording.dataOffset);
     g_bufferIndex = g_recording.dataOffset;
+
+    g_lastSyncTickCount = micros();
+    g_saveUpToBufferIndex = g_bufferIndex;
+    flushData();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -503,7 +528,7 @@ static void log(uint32_t tickCount) {
             stateTransition(EVENT_FINISH);
         } else {
             int32_t diff = tickCount - g_lastSyncTickCount;
-            if (diff > CONF_DLOG_SYNC_FILE_TIME * 1000000L) {
+            if (diff > CONF_DLOG_SYNC_FILE_TIME * 1000000L && (g_bufferIndex - g_saveUpToBufferIndex) >= CHUNK_SIZE) {
                 g_lastSyncTickCount = tickCount;
                 g_saveUpToBufferIndex = g_bufferIndex;
                 flushData();
@@ -563,10 +588,12 @@ static void resetParameters() {
     g_parameters.triggerSource = trigger::SOURCE_IMMEDIATE;
 }
 
-static void doFinish() {
-    g_saveUpToBufferIndex = g_bufferIndex;
-    flushData();
-    onSdCardFileChangeHook(g_parameters.filePath);
+static void doFinish(bool afterError) {
+    if (!afterError) {
+        g_saveUpToBufferIndex = g_bufferIndex;
+        flushData();
+        onSdCardFileChangeHook(g_parameters.filePath);
+    }
     resetParameters();
     setState(STATE_IDLE);
 }
@@ -655,8 +682,11 @@ void stateTransition(int event, int* perr) {
         }
     } else if (g_state == STATE_EXECUTING) {
         if (event == EVENT_TOGGLE || event == EVENT_FINISH || event == EVENT_ABORT || event == EVENT_RESET) {
-            doFinish();
+            doFinish(false);
             err = SCPI_RES_OK;
+        } else if (event == EVENT_ABORT_AFTER_ERROR) {
+            doFinish(true);
+            err = SCPI_ERROR_MASS_STORAGE_ERROR;
         }
     }
 
@@ -705,6 +735,10 @@ void toggle() {
 
 void abort() {
     stateTransition(EVENT_ABORT);
+}
+
+void abortAfterError() {
+    stateTransition(EVENT_ABORT_AFTER_ERROR);
 }
 
 void reset() {

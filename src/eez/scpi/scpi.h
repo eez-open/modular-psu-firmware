@@ -86,5 +86,7 @@ extern char g_listFilePath[CH_MAX][MAX_PATH_LENGTH];
 
 bool isThreadAlive();
 
+extern bool g_screenshotGenerating;
+
 }
 }

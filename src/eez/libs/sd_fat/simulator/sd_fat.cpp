@@ -308,12 +308,14 @@ File::~File() {
     close();
 }
 
-void File::close() {
+bool File::close() {
+    int result = 0;
     if (m_fp) {
-        fclose(m_fp);
+        result = fclose(m_fp);
         m_fp = NULL;
     }
     m_isOpen = false;
+    return !result;
 }
 
 bool File::isOpen() {

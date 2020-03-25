@@ -289,7 +289,6 @@ void PsuAppContext::stateManagment() {
 
     if (!sd_card::isMounted(nullptr)) {
         if (
-            isPageOnStack(PAGE_ID_EVENT_QUEUE) ||
             isPageOnStack(PAGE_ID_DLOG_PARAMS) ||
             isPageOnStack(PAGE_ID_DLOG_VIEW) ||
             isPageOnStack(PAGE_ID_USER_PROFILES) ||

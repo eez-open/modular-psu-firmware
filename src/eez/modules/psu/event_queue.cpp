@@ -524,22 +524,27 @@ static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {
 
     char dateTimeAndEventTypeStr[32];
     sprintf(dateTimeAndEventTypeStr, "%04d-%02d-%02d %02d:%02d:%02d %s ", year, month, day, hour, minute, second, EVENT_TYPE_NAMES[eventType]);
-    bufferedFile.write((const uint8_t *)dateTimeAndEventTypeStr, strlen(dateTimeAndEventTypeStr));
+    bool result = bufferedFile.write((const uint8_t *)dateTimeAndEventTypeStr, strlen(dateTimeAndEventTypeStr));
 
-    if (event->eventId == EVENT_DEBUG_TRACE) {
-        bufferedFile.write((const uint8_t *)event->message, strlen(event->message));
-    } else {
-        const char *message = getEventMessage(event->eventId);
-        bufferedFile.write((const uint8_t *)message, strlen(message));
+    if (result) {
+        if (event->eventId == EVENT_DEBUG_TRACE) {
+            result = bufferedFile.write((const uint8_t *)event->message, strlen(event->message));
+        } else {
+            const char *message = getEventMessage(event->eventId);
+            result = bufferedFile.write((const uint8_t *)message, strlen(message));
+        }
+
+        if (result) {
+            result = bufferedFile.write((const uint8_t *)"\n", 1);
+            if (result) {
+                result = bufferedFile.flush();
+            }
+        }
     }
-
-    bufferedFile.write((const uint8_t *)"\n", 1);
-
-    bufferedFile.flush();
 
     file.close();
 
-    return true;
+    return result;
 }
 
 static void writeToIndex(int indexType, uint32_t logOffset) {

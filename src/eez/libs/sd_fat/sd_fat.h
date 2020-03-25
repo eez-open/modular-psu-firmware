@@ -126,7 +126,7 @@ class File {
     bool open(const char *path, uint8_t mode = FILE_READ);
 
     ~File();
-    void close();
+    bool close();
 
     bool isOpen();
 

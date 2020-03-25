@@ -550,12 +550,12 @@ void setVoltage(Channel &channel, float voltage) {
 }
 
 void setVoltageStep(Channel &channel, float voltageStep) {
-    voltageStep = roundTrackingValuePrecision(UNIT_VOLT, voltageStep);
-
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
         Channel::get(0).u.step = voltageStep;
         Channel::get(1).u.step = voltageStep;
     } else if (channel.flags.trackingEnabled) {
+        voltageStep = roundTrackingValuePrecision(UNIT_VOLT, voltageStep);
+
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
@@ -850,12 +850,12 @@ void setCurrent(Channel &channel, float current) {
 }
 
 void setCurrentStep(Channel &channel, float currentStep) {
-    currentStep = roundTrackingValuePrecision(UNIT_AMPER, currentStep);
-
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
         Channel::get(0).i.step = currentStep;
         Channel::get(1).i.step = currentStep;
     } else if (channel.flags.trackingEnabled) {
+        currentStep = roundTrackingValuePrecision(UNIT_AMPER, currentStep);
+
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {

@@ -5448,7 +5448,7 @@ void data_is_reset_by_iwdg(DataOperationEnum operation, Cursor cursor, Value &va
 
 void data_can_show_previous_page(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getNumPagesOnStack() > 1;
+        value = (getActivePageId() == PAGE_ID_EVENT_QUEUE) && getNumPagesOnStack() > 1;
     }
 }
 

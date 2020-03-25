@@ -56,6 +56,8 @@
 using namespace eez::psu;
 using namespace eez::psu::scpi;
 
+#define CONF_SCREENSHOT_TIMEOUT_MS 2000
+
 namespace eez {
 namespace scpi {
 
@@ -83,6 +85,8 @@ uint32_t g_timer1LastTickCount;
 
 static bool g_shutingDown;
 static bool g_isThreadAlive;
+
+bool g_screenshotGenerating;
 
 void initMessageQueue() {
     g_scpiMessageQueueId = osMessageCreate(osMessageQ(g_scpiMessageQueue), NULL);
@@ -156,6 +160,7 @@ void oneIter() {
                 abortDownloading();
             } else if (type == SCPI_QUEUE_MESSAGE_SCREENSHOT) {
                 if (!sd_card::isMounted(nullptr)) {
+                    g_screenshotGenerating = false;
                     return;
                 }
 
@@ -168,6 +173,7 @@ void oneIter() {
 
                 if (jpegEncode(screenshotPixels, &imageData, &imageDataSize)) {
                     event_queue::pushEvent(SCPI_ERROR_OUT_OF_MEMORY_FOR_REQ_OP);
+                    g_screenshotGenerating = false;
                     return;
                 }
 
@@ -200,24 +206,32 @@ void oneIter() {
                         (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
                 }
 
-                File file;
-                if (file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
-                    size_t written = file.write(imageData, imageDataSize);
-
-                    file.close();
-
-                    if (written == imageDataSize) {
-                    	// success!
-                    	event_queue::pushEvent(event_queue::EVENT_INFO_SCREENSHOT_SAVED);
-                        onSdCardFileChangeHook(filePath);
-                    } else {
-                        int err;
-                        sd_card::deleteFile(filePath, &err);
-                        event_queue::pushEvent(SCPI_ERROR_MASS_STORAGE_ERROR);
+                uint32_t timeout = millis() + CONF_SCREENSHOT_TIMEOUT_MS;
+                while (millis() < timeout) {
+                    File file;
+                    if (file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
+                        size_t written = file.write(imageData, imageDataSize);
+                        if (written == imageDataSize) {
+                            if (file.close()) {
+                                // success!
+                                event_queue::pushEvent(event_queue::EVENT_INFO_SCREENSHOT_SAVED);
+                                onSdCardFileChangeHook(filePath);
+                                g_screenshotGenerating = false;
+                                return;
+                            }
+                        }
                     }
-                } else {
-                    event_queue::pushEvent(SCPI_ERROR_FILE_NAME_NOT_FOUND);
+
+                    if (!sd_card::remount()) {
+                        event_queue::pushEvent(SCPI_ERROR_MASS_STORAGE_ERROR);
+                        g_screenshotGenerating = false;
+                        return;
+                    }
                 }
+
+                // timeout
+                event_queue::pushEvent(SCPI_ERROR_MASS_STORAGE_ERROR);
+                g_screenshotGenerating = false;
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_LOAD_DIRECTORY) {
                 file_manager::doLoadDirectory();
             } else if (type == SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_UPLOAD_FILE) {

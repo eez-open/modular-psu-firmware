@@ -42,6 +42,8 @@
 #define CONF_AUTO_SAVE_TIMEOUT_MS 60 * 1000
 #define CONF_AUTO_NAME_PREFIX "Saved at "
 
+#define CONF_PROFILE_SAVE_TIMEOUT_MS 2000
+
 namespace eez {
 namespace psu {
 namespace profile {
@@ -781,18 +783,18 @@ public:
     bool group(const char *groupName);
     bool group(const char *groupNamePrefix, unsigned int index);
 
-    void property(const char *propertyName, int value);
-    void property(const char *propertyName, unsigned int value);
-    void property(const char *propertyName, float value);
-    void property(const char *propertyName, const char *str);
-    void property(
+    bool property(const char *propertyName, int value);
+    bool property(const char *propertyName, unsigned int value);
+    bool property(const char *propertyName, float value);
+    bool property(const char *propertyName, const char *str);
+    bool property(
         const char *propertyName,
         float *dwellList, uint16_t &dwellListLength,
         float *voltageList, uint16_t &voltageListLength,
         float *currentList, uint16_t &currentListLength
     );
 
-    void flush();
+    bool flush();
 
 private:
     sd_card::BufferedFileWrite file;
@@ -806,54 +808,64 @@ WriteContext::WriteContext(File &file_)
 bool WriteContext::group(const char *groupName) {
     char line[256 + 1];
     sprintf(line, "[%s]\n", groupName);
-    file.write((uint8_t *)line, strlen(line));
-    return true;
+    return file.write((uint8_t *)line, strlen(line));
 }
 
 bool WriteContext::group(const char *groupNamePrefix, unsigned int index) {
     char line[256 + 1];
     sprintf(line, "[%s%d]\n", groupNamePrefix, index);
-    file.write((uint8_t *)line, strlen(line));
-    return true;
+    return file.write((uint8_t *)line, strlen(line));
 }
 
-void WriteContext::property(const char *propertyName, int value) {
+bool WriteContext::property(const char *propertyName, int value) {
     char line[256 + 1];
     sprintf(line, "\t%s=%d\n", propertyName, (int)value);
-    file.write((uint8_t *)line, strlen(line));
+    return file.write((uint8_t *)line, strlen(line));
 }
 
-void WriteContext::property(const char *propertyName, unsigned int value) {
+bool WriteContext::property(const char *propertyName, unsigned int value) {
     char line[256 + 1];
     sprintf(line, "\t%s=%u\n", propertyName, (int)value);
-    file.write((uint8_t *)line, strlen(line));
+    return file.write((uint8_t *)line, strlen(line));
 }
 
-void WriteContext::property(const char *propertyName, float value) {
+bool WriteContext::property(const char *propertyName, float value) {
     char line[256 + 1];
     sprintf(line, "\t%s=%g\n", propertyName, value);
-    file.write((uint8_t *)line, strlen(line));
+    return file.write((uint8_t *)line, strlen(line));
 }
 
-void WriteContext::property(const char *propertyName, const char *str) {
+bool WriteContext::property(const char *propertyName, const char *str) {
     char line[256 + 1];
     sprintf(line, "\t%s=\"", propertyName);
-    file.write((uint8_t *)line, strlen(line));
+    if (!file.write((uint8_t *)line, strlen(line))) {
+        return false;
+    }
 
     for (; *str; str++) {
         if (*str == '"') {
-            file.write((uint8_t *)"\\\"", 2);
+            if (!file.write((uint8_t *)"\\\"", 2)) {
+                return false;
+            }
         } else if (*str == '\\') {
-            file.write((uint8_t *)"\\\\", 2);
+            if (!file.write((uint8_t *)"\\\\", 2)) {
+                return false;
+            }
         } else {
-            file.write((uint8_t *)str, 1);
+            if (!file.write((uint8_t *)str, 1)) {
+                return false;
+            }
         }
     }
 
-    file.write((uint8_t *)"\"\n", strlen("\"\n"));
+    if (!file.write((uint8_t *)"\"\n", 2)) {
+        return false;
+    }
+
+    return true;
 }
 
-void WriteContext::property(
+bool WriteContext::property(
     const char *propertyName,
     float *dwellList, uint16_t &dwellListLength,
     float *voltageList, uint16_t &voltageListLength,
@@ -861,20 +873,32 @@ void WriteContext::property(
 ) {
     char line[256 + 1];
     sprintf(line, "\t%s=```\n", propertyName);
-    file.write((uint8_t *)line, strlen(line));
+    if (!file.write((uint8_t *)line, strlen(line))) {
+        return false;
+    }
 
     int err;
-    list::saveList(file, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, false, &err);
+    if (!list::saveList(file, dwellList, dwellListLength, voltageList, voltageListLength, currentList, currentListLength, false, &err)) {
+        return false;
+    }
 
     sprintf(line, "```\n");
-    file.write((uint8_t *)line, strlen(line));
+    if (!file.write((uint8_t *)line, strlen(line))) {
+        return false;
+    }
+
+    return true;
 }
 
-void WriteContext::flush() {
-    file.flush();
+bool WriteContext::flush() {
+    return file.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+#define WRITE_GROUP(p) if (!ctx.group(name)) return false
+#define WRITE_PROPERTY(p1, p2) if (!ctx.property(p1, p2)) return false
+#define WRITE_LIST_PROPERTY(p1, p2, p3, p4, p5, p6, p7) if (!ctx.property(p1, p2, p3, p4, p5, p6, p7)) return false
 
 static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *lists, bool showProgress) {
 #if OPTION_DISPLAY
@@ -888,8 +912,8 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
 #endif
 
     ctx.group("system");
-    ctx.property("powerIsUp", parameters.flags.powerIsUp);
-    ctx.property("profileName", parameters.name);
+    WRITE_PROPERTY("powerIsUp", parameters.flags.powerIsUp);
+    WRITE_PROPERTY("profileName", parameters.name);
 
 #if OPTION_DISPLAY
     if (showProgress) {
@@ -899,7 +923,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
 #endif
 
     ctx.group("dcpsupply");
-    ctx.property("couplingType", parameters.flags.couplingType);
+    WRITE_PROPERTY("couplingType", parameters.flags.couplingType);
 
 #if OPTION_DISPLAY
     if (showProgress) {
@@ -913,46 +937,46 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
         if (channel.flags.parameters_are_valid) {
             ctx.group("dcpsupply.ch", channelIndex + 1);
 
-            ctx.property("moduleType", channel.moduleType);
-            ctx.property("moduleRevision", channel.moduleRevision);
+            WRITE_PROPERTY("moduleType", channel.moduleType);
+            WRITE_PROPERTY("moduleRevision", channel.moduleRevision);
 
-            ctx.property("output_enabled", channel.flags.output_enabled);
-            ctx.property("sense_enabled", channel.flags.sense_enabled);
-            ctx.property("u_state", channel.flags.u_state);
-            ctx.property("i_state", channel.flags.i_state);
-            ctx.property("p_state", channel.flags.p_state);
-            ctx.property("rprog_enabled", channel.flags.rprog_enabled);
-            ctx.property("displayValue1", channel.flags.displayValue1);
-            ctx.property("displayValue2", channel.flags.displayValue2);
-            ctx.property("u_triggerMode", channel.flags.u_triggerMode);
-            ctx.property("i_triggerMode", channel.flags.i_triggerMode);
-            ctx.property("currentRangeSelectionMode", channel.flags.currentRangeSelectionMode);
-            ctx.property("autoSelectCurrentRange", channel.flags.autoSelectCurrentRange);
-            ctx.property("triggerOutputState", channel.flags.triggerOutputState);
-            ctx.property("triggerOnListStop", channel.flags.triggerOnListStop);
-            ctx.property("u_type", channel.flags.u_type);
-            ctx.property("dprogState", channel.flags.dprogState);
-            ctx.property("trackingEnabled", channel.flags.trackingEnabled);
+            WRITE_PROPERTY("output_enabled", channel.flags.output_enabled);
+            WRITE_PROPERTY("sense_enabled", channel.flags.sense_enabled);
+            WRITE_PROPERTY("u_state", channel.flags.u_state);
+            WRITE_PROPERTY("i_state", channel.flags.i_state);
+            WRITE_PROPERTY("p_state", channel.flags.p_state);
+            WRITE_PROPERTY("rprog_enabled", channel.flags.rprog_enabled);
+            WRITE_PROPERTY("displayValue1", channel.flags.displayValue1);
+            WRITE_PROPERTY("displayValue2", channel.flags.displayValue2);
+            WRITE_PROPERTY("u_triggerMode", channel.flags.u_triggerMode);
+            WRITE_PROPERTY("i_triggerMode", channel.flags.i_triggerMode);
+            WRITE_PROPERTY("currentRangeSelectionMode", channel.flags.currentRangeSelectionMode);
+            WRITE_PROPERTY("autoSelectCurrentRange", channel.flags.autoSelectCurrentRange);
+            WRITE_PROPERTY("triggerOutputState", channel.flags.triggerOutputState);
+            WRITE_PROPERTY("triggerOnListStop", channel.flags.triggerOnListStop);
+            WRITE_PROPERTY("u_type", channel.flags.u_type);
+            WRITE_PROPERTY("dprogState", channel.flags.dprogState);
+            WRITE_PROPERTY("trackingEnabled", channel.flags.trackingEnabled);
 
-            ctx.property("u_set", channel.u_set);
-            ctx.property("u_step", channel.u_step);
-            ctx.property("u_limit", channel.u_limit);
-            ctx.property("u_delay", channel.u_delay);
-            ctx.property("u_level", channel.u_level);
-            ctx.property("i_set", channel.i_set);
-            ctx.property("i_step", channel.i_step);
-            ctx.property("i_limit", channel.i_limit);
-            ctx.property("i_delay", channel.i_delay);
-            ctx.property("p_limit", channel.p_limit);
-            ctx.property("p_delay", channel.p_delay);
-            ctx.property("p_level", channel.p_level);
-            ctx.property("ytViewRate", channel.ytViewRate);
-            ctx.property("u_triggerValue", channel.u_triggerValue);
-            ctx.property("i_triggerValue", channel.i_triggerValue);
-            ctx.property("listCount", channel.listCount);
+            WRITE_PROPERTY("u_set", channel.u_set);
+            WRITE_PROPERTY("u_step", channel.u_step);
+            WRITE_PROPERTY("u_limit", channel.u_limit);
+            WRITE_PROPERTY("u_delay", channel.u_delay);
+            WRITE_PROPERTY("u_level", channel.u_level);
+            WRITE_PROPERTY("i_set", channel.i_set);
+            WRITE_PROPERTY("i_step", channel.i_step);
+            WRITE_PROPERTY("i_limit", channel.i_limit);
+            WRITE_PROPERTY("i_delay", channel.i_delay);
+            WRITE_PROPERTY("p_limit", channel.p_limit);
+            WRITE_PROPERTY("p_delay", channel.p_delay);
+            WRITE_PROPERTY("p_level", channel.p_level);
+            WRITE_PROPERTY("ytViewRate", channel.ytViewRate);
+            WRITE_PROPERTY("u_triggerValue", channel.u_triggerValue);
+            WRITE_PROPERTY("i_triggerValue", channel.i_triggerValue);
+            WRITE_PROPERTY("listCount", channel.listCount);
 
             if (lists) {
-                ctx.property(
+                WRITE_LIST_PROPERTY(
                     "list",
                     lists[channelIndex].dwellList,
                     lists[channelIndex].dwellListLength,
@@ -974,7 +998,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
                 uint16_t currentListLength;
                 float *currentList = list::getCurrentList(channel, &currentListLength);
 
-                ctx.property(
+                WRITE_LIST_PROPERTY(
                     "list",
                     dwellList,
                     dwellListLength,
@@ -986,9 +1010,9 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
             }
 
 #ifdef EEZ_PLATFORM_SIMULATOR
-            ctx.property("load_enabled", channel.load_enabled);
-            ctx.property("load", channel.load);
-            ctx.property("voltProgExt", channel.voltProgExt);
+            WRITE_PROPERTY("load_enabled", channel.load_enabled);
+            WRITE_PROPERTY("load", channel.load);
+            WRITE_PROPERTY("voltProgExt", channel.voltProgExt);
 #endif
         }
 
@@ -1007,10 +1031,10 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
 
             ctx.group("tempsensor", i + 1);
 
-            ctx.property("name", sensor.getName());
-            ctx.property("delay", tempSensorProt.delay);
-            ctx.property("level", tempSensorProt.level);
-            ctx.property("state", tempSensorProt.state);
+            WRITE_PROPERTY("name", sensor.getName());
+            WRITE_PROPERTY("delay", tempSensorProt.delay);
+            WRITE_PROPERTY("level", tempSensorProt.level);
+            WRITE_PROPERTY("state", tempSensorProt.state);
         }
 
 #if OPTION_DISPLAY
@@ -1033,35 +1057,37 @@ static bool saveProfileToFile(const char *filePath, Parameters &profile, List *l
     }
 
     if (!sd_card::makeParentDir(filePath, err)) {
-        return false;
-    }
-
-    File file;
-
-    if (!file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
-        if (err)
+        if (err) {
             *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+        }
         return false;
     }
 
-    WriteContext ctx(file);
+    uint32_t timeout = millis() + CONF_PROFILE_SAVE_TIMEOUT_MS;
+    while (millis() < timeout) {
+        File file;
 
-    bool result;
+        if (file.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
+            WriteContext ctx(file);
 
-    result = profileWrite(ctx, profile, lists, showProgress);
+            if (profileWrite(ctx, profile, lists, showProgress)) {
+                if (ctx.flush()) {
+                    file.close();
+                    onSdCardFileChangeHook(filePath);
+                    return true;
+                }
+            }
+        }
 
-    ctx.flush();
+        if (!sd_card::remount()) {
+            break;
+        }
+    }
 
-    file.close();
-
-    onSdCardFileChangeHook(filePath);
-
-    if (!result) {
+    if (err) {
         *err = SCPI_ERROR_MASS_STORAGE_ERROR;
-        return false;
     }
-
-    return true;
+    return false;
 }
 
 static void saveStateToProfile0(bool merge) {

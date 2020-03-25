@@ -1271,6 +1271,10 @@ void onSdCardFileChangeHook(const char *filePath1, const char *filePath2) {
 		return;
 	}
 
+    if (!isPageOnStack(PAGE_ID_FILE_MANAGER)) {
+        return;
+    }
+
 	char parentDirPath1[MAX_PATH_LENGTH + 1];
     getParentDir(filePath1, parentDirPath1);
     if (strcmp(parentDirPath1, g_currentDirectory) == 0) {
