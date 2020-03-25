@@ -196,10 +196,7 @@ void fileWrite() {
             err = event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR;
         }
 
-        if (!sd_card::remount()) {
-            err = SCPI_ERROR_MASS_STORAGE_ERROR;
-            break;
-        }
+        sd_card::reinitialize();
     }
 
     event_queue::pushEvent(err);

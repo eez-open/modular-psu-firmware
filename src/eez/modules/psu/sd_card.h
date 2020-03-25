@@ -44,7 +44,7 @@ void onSdDetectInterrupt();
 void onSdDetectInterruptHandler();
 #endif
 
-bool remount();
+void reinitialize();
 
 bool isMounted(int *err);
 bool isBusy();

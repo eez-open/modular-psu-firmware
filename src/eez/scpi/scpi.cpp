@@ -222,11 +222,7 @@ void oneIter() {
                         }
                     }
 
-                    if (!sd_card::remount()) {
-                        event_queue::pushEvent(SCPI_ERROR_MASS_STORAGE_ERROR);
-                        g_screenshotGenerating = false;
-                        return;
-                    }
+                    sd_card::reinitialize();
                 }
 
                 // timeout

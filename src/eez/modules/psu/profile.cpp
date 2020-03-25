@@ -1079,9 +1079,7 @@ static bool saveProfileToFile(const char *filePath, Parameters &profile, List *l
             }
         }
 
-        if (!sd_card::remount()) {
-            break;
-        }
+        sd_card::reinitialize();
     }
 
     if (err) {

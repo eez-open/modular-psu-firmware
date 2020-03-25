@@ -135,13 +135,11 @@ void onSdDetectInterruptHandler() {
 }
 #endif
 
-bool remount() {
-    SD.unmount();
+void reinitialize() {
 #if defined(EEZ_PLATFORM_STM32)
     FATFS_UnLinkDriver(SDPath);
     MX_FATFS_Init();
 #endif
-    return SD.mount(&g_lastError);
 }
 
 bool isMounted(int *err) {
@@ -366,11 +364,7 @@ bool download(const char *filePath, bool truncate, const void *buffer, size_t si
             }
         }
 
-        if (!sd_card::remount()) {
-            err = SCPI_ERROR_MASS_STORAGE_ERROR;
-            break;
-        }
-
+        sd_card::reinitialize();
 
         bool ropened = false;
 
@@ -382,10 +376,7 @@ bool download(const char *filePath, bool truncate, const void *buffer, size_t si
                 }
             }
 
-            if (!sd_card::remount()) {
-                err = SCPI_ERROR_MASS_STORAGE_ERROR;
-                break;
-            }
+            sd_card::reinitialize();
         }
 
         if (!ropened) {
@@ -393,7 +384,7 @@ bool download(const char *filePath, bool truncate, const void *buffer, size_t si
         }
     }
 
-    sd_card::remount();
+    sd_card::reinitialize();
 
     if (perr) {
         *perr = err;

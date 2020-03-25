@@ -474,9 +474,7 @@ bool saveList(
             }
         }
 
-        if (!sd_card::remount()) {
-            break;
-        }        
+        sd_card::reinitialize();  
     }
 
     if (err) {

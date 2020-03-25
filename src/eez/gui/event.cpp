@@ -44,8 +44,6 @@ static uint32_t m_touchDownTime;
 static uint32_t m_lastAutoRepeatEventTime;
 static bool m_longTouchGenerated;
 static bool m_extraLongTouchGenerated;
-static int m_lastTouchMoveX = -1;
-static int m_lastTouchMoveY = -1;
 
 void processTouchEvent(EventType type);
 void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
@@ -107,18 +105,6 @@ void processTouchEvent(EventType type) {
             m_onTouchFunction = onPageTouch;
         }
     } 
-#if defined(EEZ_PLATFORM_STM32)    
-    else if (type == EVENT_TYPE_TOUCH_MOVE) {
-        // ignore EVENT_TYPE_TOUCH_MOVE if it is the same as the last event
-        // or change is too big
-    	int dx = (m_lastTouchMoveX - x);
-    	int dy = (m_lastTouchMoveY - y);
-    	int d = dx * dx + dy * dy;
-        if (d == 0 || d > 1000) {
-            return;
-        }
-    }
-#endif
     else if (type == EVENT_TYPE_TOUCH_UP) {
         m_activeWidget = 0;
     }
@@ -131,9 +117,6 @@ void processTouchEvent(EventType type) {
 
         m_onTouchFunction(m_foundWidgetAtDown, event);
     }
-
-    m_lastTouchMoveX = x;
-    m_lastTouchMoveY = y;
 }
 
 OnTouchFunctionType getTouchFunction(const WidgetCursor &widgetCursor) {
