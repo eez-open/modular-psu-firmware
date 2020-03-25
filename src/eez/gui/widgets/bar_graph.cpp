@@ -209,7 +209,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
                     textStyle.background_color = fg;
                     textStyle.color = textStyle.active_color;
                     wText += padding;
-                    pText = pValue - wText;
+                    pText = MAX(pValue - wText, 0);
                 }
             }
 
@@ -308,7 +308,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
                     textStyle.background_color = fg;
                     textStyle.color = textStyle.active_color;
                     hText += padding;
-                    pText = pValue - hText;
+                    pText = MAX(pValue - hText, 0);
                 }
             }
 
