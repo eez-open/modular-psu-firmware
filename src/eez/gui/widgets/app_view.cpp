@@ -58,17 +58,17 @@ DrawFunctionType APP_VIEW_draw = [](const WidgetCursor &widgetCursor) {
 
     bool refresh = !widgetCursor.previousState;
     if (refresh && !appContext->isActivePageInternal() && appContext->getActivePageId() != PAGE_ID_NONE) {
-        appContext->x = widgetCursor.x;
-        appContext->y = widgetCursor.y;
-        appContext->width = widget->w;
-        appContext->height = widget->h;
+        appContext->rect.x = widgetCursor.x;
+        appContext->rect.y = widgetCursor.y;
+        appContext->rect.w = widget->w;
+        appContext->rect.h = widget->h;
 
         // clear background
 		const Widget *page = getPageWidget(appContext->getActivePageId());
         const Style* style = getStyle(page->style);
         mcu::display::setColor(style->background_color);
 
-		mcu::display::fillRect(appContext->x, appContext->y, appContext->x + page->w - 1, appContext->y + page->h - 1);
+		mcu::display::fillRect(appContext->rect.x, appContext->rect.y, appContext->rect.x + page->w - 1, appContext->rect.y + page->h - 1);
     }
 };
 

@@ -28,6 +28,8 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/persist_conf.h>
 
+#define CONF_BACKDROP_OPACITY 128
+
 using namespace eez::gui;
 
 namespace eez {
@@ -395,10 +397,10 @@ void selectBuffer(int bufferIndex) {
     setBufferPointer(g_buffers[bufferIndex].bufferPointer);
 }
 
-void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset) {
+void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset, Rect *backdrop) {
     Buffer &buffer = g_buffers[bufferIndex];
     
-    if (buffer.x != x || buffer.y != y || buffer.width != width || buffer.height != height || buffer.withShadow != withShadow || buffer.opacity != opacity || buffer.xOffset != xOffset || buffer.yOffset != yOffset) {
+    if (buffer.x != x || buffer.y != y || buffer.width != width || buffer.height != height || buffer.withShadow != withShadow || buffer.opacity != opacity || buffer.xOffset != xOffset || buffer.yOffset != yOffset || backdrop != buffer.backdrop) {
         buffer.x = x;
         buffer.y = y;
         buffer.width = width;
@@ -407,6 +409,7 @@ void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool 
         buffer.opacity = opacity;
         buffer.xOffset = xOffset;
         buffer.yOffset = yOffset;
+        buffer.backdrop = backdrop;
 
         int x1 = x + xOffset;
         int y1 = y + yOffset;
@@ -466,6 +469,13 @@ void endBuffersDrawing() {
             int y1 = buffer.y + buffer.yOffset;
             int x2 = x1 + buffer.width - 1;
             int y2 = y1 + buffer.height - 1;
+
+            if (buffer.backdrop) {
+                auto savedOpacity = setOpacity(CONF_BACKDROP_OPACITY);
+                setColor(COLOR_ID_BACKDROP);
+                fillRect(buffer.backdrop->x, buffer.backdrop->y, buffer.backdrop->x + buffer.backdrop->w - 1, buffer.backdrop->y + buffer.backdrop->h - 1);
+                setOpacity(savedOpacity);
+            }
 
             if (buffer.withShadow) {
                 // if (x1 > g_dirtyY1 || y1 > g_dirtyY1 || x2 < g_dirtyX2 || y2 < g_dirtyY2) {

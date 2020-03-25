@@ -90,12 +90,12 @@ static uint32_t blendColor(uint32_t fgColor, uint32_t bgColor) {
     return result;
 }
 
-static uint32_t color16to32(uint16_t color) {
+static uint32_t color16to32(uint16_t color, uint8_t opacity = 255) {
     uint32_t color32;
     ((uint8_t *)&color32)[0] = COLOR_TO_B(color);
     ((uint8_t *)&color32)[1] = COLOR_TO_G(color);
     ((uint8_t *)&color32)[2] = COLOR_TO_R(color);
-    ((uint8_t *)&color32)[3] = 255;
+    ((uint8_t *)&color32)[3] = opacity;
     return color32;
 }
 
@@ -217,7 +217,7 @@ void turnOff() {
 
         // clear screen
         setColor(0, 0, 0);
-        fillRect(g_psuAppContext.x, g_psuAppContext.y, g_psuAppContext.x + g_psuAppContext.width - 1, g_psuAppContext.y + g_psuAppContext.height - 1);
+        fillRect(g_psuAppContext.rect.x, g_psuAppContext.rect.y, g_psuAppContext.rect.x + g_psuAppContext.rect.w - 1, g_psuAppContext.rect.y + g_psuAppContext.rect.h - 1);
         updateScreen(g_buffer);
     }
 }
@@ -279,7 +279,7 @@ void animate() {
 }
 
 void doTakeScreenshot() {
-    uint8_t *src = (uint8_t *)(g_lastBuffer + g_psuAppContext.y * DISPLAY_WIDTH + g_psuAppContext.x);
+    uint8_t *src = (uint8_t *)(g_lastBuffer + g_psuAppContext.rect.y * DISPLAY_WIDTH + g_psuAppContext.rect.x);
     uint8_t *dst = SCREENSHOOT_BUFFER_START_ADDRESS;
 
     int srcAdvance = (DISPLAY_WIDTH - 480) * 4;
@@ -484,14 +484,22 @@ void drawRect(int x1, int y1, int x2, int y2) {
 
 void fillRect(int x1, int y1, int x2, int y2, int r) {
     if (r == 0) {
-        uint32_t color32 = color16to32(g_fc);
+        uint32_t color32 = color16to32(g_fc, g_opacity);
         uint32_t *dst = g_buffer + y1 * DISPLAY_WIDTH + x1;
         int width = x2 - x1 + 1;
         int height = y2 - y1 + 1;
         int nl = DISPLAY_WIDTH - width;
-        for (uint32_t *dstEnd = dst + height * DISPLAY_WIDTH; dst != dstEnd; dst += nl) {
-            for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++) {
-                *dst = color32;
+        if (g_opacity == 255) {
+            for (uint32_t *dstEnd = dst + height * DISPLAY_WIDTH; dst != dstEnd; dst += nl) {
+                for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++) {
+                    *dst = color32;
+                }
+            }
+        } else {
+            for (uint32_t *dstEnd = dst + height * DISPLAY_WIDTH; dst != dstEnd; dst += nl) {
+                for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++) {
+                    *dst = blendColor(color32, *dst);
+                }
             }
         }
     } else {

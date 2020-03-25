@@ -32,10 +32,7 @@ struct PageOnStack {
 
 class AppContext {
 public:
-	int x;
-	int y;
-	int width;
-	int height;
+	Rect rect;
 
     AppContext();
 

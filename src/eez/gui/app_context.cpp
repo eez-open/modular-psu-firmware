@@ -259,7 +259,7 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
         const Widget *page = getPageWidget(activePageId);
 		const PageWidget *pageSpecific = GET_WIDGET_PROPERTY(page, specific, const PageWidget *);
         if ((pageSpecific->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
-            if (!pointInsideRect(touchEvent.x, touchEvent.y, foundWidget.appContext->x + page->x, foundWidget.appContext->y + page->y, page->w, page->h)) {
+            if (!pointInsideRect(touchEvent.x, touchEvent.y, foundWidget.appContext->rect.x + page->x, foundWidget.appContext->rect.y + page->y, page->w, page->h)) {
                 int activePageId = getActivePageId();
                 
                 popPage();
@@ -330,7 +330,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 		widgetCursor.previousState = savedPreviousState;
     }
 
-    mcu::display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow);
+    mcu::display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow ? &rect : nullptr);
 
     m_updatePageIndex = -1;
 }

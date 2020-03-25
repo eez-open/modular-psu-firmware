@@ -21,6 +21,7 @@
 #include <stdint.h>
 
 #include <eez/gui/font.h>
+#include <eez/gui/geometry.h>
 
 #include <eez/libs/image/image.h>
 
@@ -118,13 +119,14 @@ struct Buffer {
     uint8_t opacity;
     int xOffset;
     int yOffset;
+    gui::Rect *backdrop;
 };
 extern Buffer g_buffers[NUM_BUFFERS];
 
 int allocBuffer();
 void freeBuffer(int bufferIndex);
 void selectBuffer(int bufferIndex);
-void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity = 255, int xOffset = 0, int yOffset = 0);
+void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset, gui::Rect *backdrop);
 void beginBuffersDrawing();
 void endBuffersDrawing();
 

@@ -208,8 +208,8 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
         numLines * textHeight + (actionLabel ? (style->padding_top + textHeight) : 0) +
         style->padding_bottom + style->border_size_bottom;
 
-	x = appContext->x + (appContext->width - width) / 2;
-	y = appContext->y + (appContext->height - height) / 2;
+	x = appContext->rect.x + (appContext->rect.w - width) / 2;
+	y = appContext->rect.y + (appContext->rect.h - height) / 2;
 
     int x1 = x;
     int y1 = y;
@@ -465,16 +465,16 @@ bool SelectFromEnumPage::calcSize() {
     itemWidth = itemStyle->padding_left + itemWidth + itemStyle->padding_right;
 
     width = containerStyle->padding_left + (numColumns == 2 ? itemWidth + containerStyle->padding_left + itemWidth : itemWidth) + containerStyle->padding_right;
-    if (width > appContext->width) {
-        width = appContext->width;
+    if (width > appContext->rect.w) {
+        width = appContext->rect.w;
     }
 
     height = containerStyle->padding_top + (numColumns == 2 ? (numItems + 1) / 2 : numItems) * itemHeight + containerStyle->padding_bottom;
-    if (height > appContext->height) {
+    if (height > appContext->rect.h) {
         if (numColumns == 1) {
             return false;
         }
-        height = appContext->height;
+        height = appContext->rect.h;
     }
 
     return true;
@@ -484,19 +484,19 @@ void SelectFromEnumPage::findPagePosition() {
     const WidgetCursor &widgetCursorAtTouchDown = getFoundWidgetAtDown();
     if (widgetCursorAtTouchDown.widget) {
         x = widgetCursorAtTouchDown.x;
-        int right = appContext->x + appContext->width - 22;
+        int right = appContext->rect.x + appContext->rect.w - 22;
         if (x + width > right) {
             x = right - width;
         }
 
         y = widgetCursorAtTouchDown.y + widgetCursorAtTouchDown.widget->h;
-        int bottom = appContext->y + appContext->height - 30;
+        int bottom = appContext->rect.y + appContext->rect.h - 30;
         if (y + height > bottom) {
             y = bottom - height;
         }
     } else {
-        x = appContext->x + (appContext->width - width) / 2;
-        y = appContext->y + (appContext->height - height) / 2;
+        x = appContext->rect.x + (appContext->rect.w - width) / 2;
+        y = appContext->rect.y + (appContext->rect.h - height) / 2;
     }
 }
 
@@ -653,8 +653,8 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
     width = styleContainer->border_size_left + styleContainer->padding_left + contentWidth + styleContainer->padding_right + styleContainer->border_size_right;
     height = styleContainer->border_size_top + styleContainer->padding_top + contentHeight + styleContainer->padding_bottom + styleContainer->border_size_bottom;
 
-    x = m_appContext->x + (m_appContext->width - width) / 2;
-    y = m_appContext->y + (m_appContext->height - height) / 2;
+    x = m_appContext->rect.x + (m_appContext->rect.w - width) / 2;
+    y = m_appContext->rect.y + (m_appContext->rect.h - height) / 2;
 
     m_containerRectangleWidget.common.x = 0;
     m_containerRectangleWidget.common.y = 0;

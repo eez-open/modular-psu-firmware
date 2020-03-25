@@ -130,10 +130,10 @@ void oneIter() {
 
     AppContext *appContext = &getRootAppContext();
 
-    appContext->x = 0;
-    appContext->y = 0;
-    appContext->width = mcu::display::getDisplayWidth();
-    appContext->height = mcu::display::getDisplayHeight();
+    appContext->rect.x = 0;
+    appContext->rect.y = 0;
+    appContext->rect.w = mcu::display::getDisplayWidth();
+    appContext->rect.h = mcu::display::getDisplayHeight();
 
     eventHandling();
     stateManagmentHook();
@@ -499,11 +499,11 @@ void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst
 }
 
 void prepareRect(AppContext *appContext, Rect &rect) {
-    if (appContext->x > 0) {
-        rect.x += appContext->x;
+    if (appContext->rect.x > 0) {
+        rect.x += appContext->rect.x;
     }
-    if (appContext->y > 0) {
-        rect.y += appContext->y;
+    if (appContext->rect.y > 0) {
+        rect.y += appContext->rect.y;
     }
 }
 
@@ -512,10 +512,10 @@ void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, floa
 
     g_numRects = numRects;
 
-    g_clipRect.x = appContext->x;
-    g_clipRect.y = appContext->y;
-    g_clipRect.w = appContext->width;
-    g_clipRect.h = appContext->height;
+    g_clipRect.x = appContext->rect.x;
+    g_clipRect.y = appContext->rect.y;
+    g_clipRect.w = appContext->rect.w;
+    g_clipRect.h = appContext->rect.h;
 
     for (int i = 0; i < numRects; i++) {
         prepareRect(appContext, g_animRects[i].srcRect);
