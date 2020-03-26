@@ -833,8 +833,6 @@ void ChSettingsListsPage::set() {
                 channel_dispatcher::getCurrentTriggerMode(*g_channel) != TRIGGER_MODE_LIST
             ) {
                 yesNoDialog(PAGE_ID_YES_NO_L, "Do you want to set list trigger mode?", setTriggerListMode, nullptr, nullptr);
-            } else {
-                infoMessage("Lists changed!");
             }
         } else {
             errorMessage("List lengths are not equivalent!");

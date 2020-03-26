@@ -337,7 +337,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 		widgetCursor.previousState = savedPreviousState;
     }
 
-    mcu::display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow ? &rect : nullptr);
+    mcu::display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
 
     m_updatePageIndex = -1;
 }

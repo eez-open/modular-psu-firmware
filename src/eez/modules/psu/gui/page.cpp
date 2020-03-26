@@ -60,79 +60,42 @@ void ToastMessagePage::pageFree() {
 
 ////////////////////////////////////////
 
-ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1) {
+ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, bool autoDismiss) {
     ToastMessagePage *page = ToastMessagePage::findFreePage();
     
     page->type = type;
-    page->message1 = message1;
-    page->message2 = nullptr;
-    page->message3 = nullptr;
-    page->actionLabel = type == ERROR_TOAST ? "Close" : nullptr;
-    page->actionWidgetIsActive = false;
-    page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
-    page->actionWithoutParam = nullptr;
-    page->appContext = &g_psuAppContext;
-
-    return page;
-}
-
-ToastMessagePage *ToastMessagePage::create(ToastType type, Value message1Value)  {
-    ToastMessagePage *page = ToastMessagePage::findFreePage();
-
-    page->type = type;
-    page->message1 = nullptr;
-    page->message1Value = message1Value;
-    page->message2 = nullptr;
-    page->message3 = nullptr;
-    page->actionLabel = type == ERROR_TOAST ? "Close" : nullptr;
-    page->actionWidgetIsActive = false;
-    page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
-    page->actionWithoutParam = nullptr;
-    page->appContext = &g_psuAppContext;
-
-    return page;
-}
-
-ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1, const char *message2)  {
-    ToastMessagePage *page = ToastMessagePage::findFreePage();
-
-    page->type = type;
-    page->message1 = message1;
-    page->message2 = message2;
-    page->message3 = nullptr;
-    page->actionLabel = type == ERROR_TOAST ? "Close" : nullptr;
-    page->actionWidgetIsActive = false;
-    page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
-    page->actionWithoutParam = nullptr;
-    page->appContext = &g_psuAppContext;
-
-    return page;
-}
-
-ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message1, const char *message2, const char *message3, bool autoDismiss)  {
-    ToastMessagePage *page = ToastMessagePage::findFreePage();
-
-    page->type = type;
-    page->message1 = message1;
-    page->message2 = message2;
-    page->message3 = message3;
+    page->message = message;
+    page->messageValue = Value();
     page->actionLabel = type == ERROR_TOAST && !autoDismiss ? "Close" : nullptr;
     page->actionWidgetIsActive = false;
-    page->actionWidget.action = type == ERROR_TOAST && !autoDismiss ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
+    page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
     page->actionWithoutParam = nullptr;
     page->appContext = &g_psuAppContext;
 
     return page;
 }
 
-ToastMessagePage *ToastMessagePage::create(ToastType type, Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam) {
+ToastMessagePage *ToastMessagePage::create(ToastType type, Value messageValue)  {
     ToastMessagePage *page = ToastMessagePage::findFreePage();
 
     page->type = type;
-    page->message1 = nullptr;
-    page->message1Value = message1Value;
-    page->message2 = nullptr;
-    page->message3 = nullptr;
+    page->message = nullptr;
+    page->messageValue = messageValue;
+    page->actionLabel = type == ERROR_TOAST ? "Close" : nullptr;
+    page->actionWidgetIsActive = false;
+    page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
+    page->actionWithoutParam = nullptr;
+    page->appContext = &g_psuAppContext;
+
+    return page;
+}
+
+ToastMessagePage *ToastMessagePage::create(ToastType type, Value messageValue, void (*action)(int param), const char *actionLabel, int actionParam) {
+    ToastMessagePage *page = ToastMessagePage::findFreePage();
+
+    page->type = type;
+    page->message = nullptr;
+    page->messageValue = messageValue;
     page->actionLabel = actionLabel;
     page->actionWidgetIsActive = false;
     page->actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION;
@@ -147,9 +110,8 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, 
     ToastMessagePage *page = ToastMessagePage::findFreePage();
 
     page->type = type;
-    page->message1 = message;
-    page->message2 = nullptr;
-    page->message3 = nullptr;
+    page->message = message;
+    page->messageValue = Value();
     page->actionLabel = actionLabel;
     page->actionWidgetIsActive = false;
     page->actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM;
@@ -181,17 +143,40 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
 
     font::Font font = styleGetFont(style);
 
-    const char *message1 = this->message1;
-    char message1TextBuffer[256];
+    const char *message1 = nullptr;
+    size_t message1Len = 0;
+    const char *message2 = nullptr;
+    size_t message2Len = 0;
+    const char *message3 = nullptr;
+    size_t message3Len = 0;
+
+    message1 = this->message;
+    char messageTextBuffer[256];
     if (message1 == nullptr) {
-        message1Value.toText(message1TextBuffer, sizeof(message1TextBuffer));
-        message1 = message1TextBuffer;
+        messageValue.toText(messageTextBuffer, sizeof(messageTextBuffer));
+        message1 = messageTextBuffer;
+    }
+
+    message2 = strchr(message1, '\n');
+    if (message2) {
+        message1Len = message2 - message1;
+        message2++;
+        message3 = strchr(message2, '\n');
+        if (message3) {
+            message3++;
+            message2Len = message3 - message2;
+            message3Len = strlen(message3);
+        } else {
+            message2Len = strlen(message2);
+        }
+    } else {
+        message1Len = strlen(message1);
     }
 
     int minTextWidth = 80;
-    int textWidth1 = display::measureStr(message1, -1, font, 0);
-    int textWidth2 = message2 ? display::measureStr(message2, -1, font, 0) : 0;
-    int textWidth3 = message3 ? display::measureStr(message3, -1, font, 0) : 0;
+    int textWidth1 = display::measureStr(message1, message1Len, font, 0);
+    int textWidth2 = message2 ? display::measureStr(message2, message2Len, font, 0) : 0;
+    int textWidth3 = message3 ? display::measureStr(message3, message3Len, font, 0) : 0;
     int actionLabelWidth = actionLabel ? (actionStyle->padding_left + display::measureStr(actionLabel, -1, font, 0) + actionStyle->padding_right) : 0;
 
     int textWidth = MAX(MAX(MAX(MAX(minTextWidth, textWidth1), textWidth2), textWidth3), actionLabelWidth);
@@ -240,7 +225,7 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
 
     int yText = y1 + style->padding_top;
 
-    display::drawStr(message1, -1, 
+    display::drawStr(message1, message1Len, 
         x1 + style->padding_left + (textWidth - textWidth1) / 2, 
         yText, 
         x1, y1, x2, y2, font);
@@ -248,7 +233,7 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
     yText += textHeight;
 
     if (message2) {
-        display::drawStr(message2, -1,
+        display::drawStr(message2, message2Len,
             x1 + style->padding_left + (textWidth - textWidth2) / 2,
             yText,
             x1, y1, x2, y2, font);
@@ -257,7 +242,7 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
     }
 
     if (message3) {
-        display::drawStr(message3, -1, 
+        display::drawStr(message3, message3Len, 
             x1 + style->padding_left + (textWidth - textWidth2) / 2, 
             yText, 
             x1, y1, x2, y2, font);

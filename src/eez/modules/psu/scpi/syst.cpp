@@ -1027,14 +1027,19 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetHostname(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (hostNameStrLength > 32) {
+    if (hostNameStrLength > ETHERNET_HOST_NAME_SIZE) {
         SCPI_ErrorPush(context, SCPI_ERROR_CHARACTER_DATA_TOO_LONG);
         return SCPI_RES_ERR;
     }
 
-    char hostName[32 + 1];
+    char hostName[ETHERNET_HOST_NAME_SIZE + 1];
     strncpy(hostName, hostNameStr, hostNameStrLength);
     hostName[hostNameStrLength] = 1;
+
+    if (!persist_conf::validateEthernetHostName(hostName)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;        
+    }
 
     persist_conf::setEthernetHostName(hostName);
 

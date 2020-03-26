@@ -17,6 +17,7 @@
  */
 
 #include <assert.h>
+#include <ctype.h> 
 
 #include <eez/system.h>
 
@@ -985,6 +986,22 @@ bool setEthernetGateway(uint32_t gateway) {
 #else
     return false;
 #endif
+}
+
+const char *validateEthernetHostName(const char *hostName) {
+    if (strlen(hostName) > ETHERNET_HOST_NAME_SIZE) {
+#define MSG(X) "Max. "#X" characters are allowed."
+        return MSG(ETHERNET_HOST_NAME_SIZE);
+#undef MSG
+    }
+
+    for (const char *p = hostName; *p; p++) {
+        if (!isalnum(*p) && !(p > hostName && *p == '-')) {
+            return "Valid characters are letters from a to z,\nthe digits from 0 to 9, and the hyphen(-).\nA hostname may not start with a hyphen.";
+        }
+    }
+
+    return nullptr;
 }
 
 bool setEthernetHostName(const char *hostName) {

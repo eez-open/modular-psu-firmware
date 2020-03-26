@@ -80,10 +80,7 @@ extern Value g_alertMessage3;
 
 void infoMessage(const char *message);
 void infoMessage(Value value);
-void infoMessage(const char *message1, const char *message2);
-void errorMessage(const char *message);
-void errorMessage(const char *message1, const char *message2);
-void errorMessage(const char *message1, const char *message2, const char *message3, bool autoDismiss = false);
+void errorMessage(const char *message, bool autoDismiss = false);
 void errorMessage(Value value);
 void errorMessageWithAction(Value value, void (*action)(int param), const char *actionLabel, int actionParam);
 void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel);

@@ -556,6 +556,9 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
     if (x_glyph < clip_x1) {
         int dx_off = clip_x1 - x_glyph;
         iStartByte = dx_off;
+        if (iStartByte >= glyph.width) {
+            return glyph.dx;
+        }
         x_glyph = clip_x1;
     }
 
@@ -567,13 +570,10 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
     }
 
     int width;
-    if (x_glyph + glyph.width - 1 > clip_x2) {
-        // // glyph doesn't fit, don't paint it
-        // return glyph.dx;
-
+    if (x_glyph + (glyph.width - iStartByte) - 1 > clip_x2) {
     	width = clip_x2 - x_glyph + 1;
     } else {
-        width = glyph.width;
+        width = (glyph.width - iStartByte);
     }
 
     int height;
@@ -584,8 +584,7 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
     }
 
     if (width > 0 && height > 0) {
-        bitBltA8(glyph.data + offset + iStartByte, glyph.width - width, x_glyph, y_glyph, width,
-                 height);
+        bitBltA8(glyph.data + offset + iStartByte, glyph.width - width, x_glyph, y_glyph, width,height);
     }
 
     return glyph.dx;

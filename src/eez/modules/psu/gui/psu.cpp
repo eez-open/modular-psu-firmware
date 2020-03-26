@@ -252,7 +252,7 @@ void PsuAppContext::stateManagment() {
     //
     if (g_rprogAlarm) {
         g_rprogAlarm = false;
-        errorMessage("Max. remote prog. voltage exceeded.", "Please remove it immediately!");
+        errorMessage("Max. remote prog. voltage exceeded.\nPlease remove it immediately!");
     }
 
     // show startup wizard
@@ -1400,22 +1400,8 @@ void infoMessage(Value value) {
     pushToastMessage(ToastMessagePage::create(INFO_TOAST, value));
 }
 
-void infoMessage(const char *message1, const char *message2) {
-    pushToastMessage(ToastMessagePage::create(INFO_TOAST, message1, message2));
-}
-
-void errorMessage(const char *message) {
-    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message));
-    sound::playBeep();
-}
-
-void errorMessage(const char *message1, const char *message2) {
-    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message1, message2));
-    sound::playBeep();
-}
-
-void errorMessage(const char *message1, const char *message2, const char *message3, bool autoDismiss) {
-    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message1, message2, message3, autoDismiss));
+void errorMessage(const char *message, bool autoDismiss) {
+    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message, autoDismiss));
     sound::playBeep();
 }
 
@@ -2144,6 +2130,13 @@ void externalDataHook(int16_t dataId, DataOperationEnum operation, Cursor cursor
             value = g_externalDataItemValues[dataId].value;
         }
     }
+}
+
+bool activePageHasBackdropHook() {
+    if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace gui

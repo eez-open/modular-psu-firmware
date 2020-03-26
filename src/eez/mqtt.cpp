@@ -56,6 +56,7 @@ extern "C" {
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/ontime.h>
+#include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/gui/psu.h>
 
 #include <eez/modules/mcu/battery.h>
@@ -74,7 +75,7 @@ static const uint32_t RECONNECT_AFTER_ERROR_MS = 10000;
 static const uint32_t CONF_DNS_TIMEOUT_MS = 10000;
 static const uint32_t CONF_STARTING_TIMEOUT_MS = 2000; // wait a acouple of seconds, after ethernet is ready, before starting MQTT connect 
 
-static const size_t MAX_PUB_TOPIC_LENGTH = 50;
+static const size_t MAX_PUB_TOPIC_LENGTH = 128;
 
 static const char *PUB_TOPIC_SYSTEM_POW = "%s/system/pow";
 static const char *PUB_TOPIC_SYSTEM_EVENT = "%s/system/event";
@@ -211,6 +212,10 @@ void onIncomingPublish(const char *topic, const char *payload) {
                 using namespace eez::scpi;
                 osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_RECALL_PROFILE, location), 0);
             }
+        } else if (strcmp(p, "initiate") == 0) {
+            trigger::initiate();
+        } else if (strcmp(p, "abort") == 0) {
+            trigger::abort();
         }
     } else if (match(&p, "dcpsupply/ch/")) {
         char *endptr;
@@ -448,7 +453,7 @@ bool publishFanStatus(const char *pubTopic, TestResult fanTestResult, int rpm, b
     if (fanTestResult == TEST_FAILED || fanTestResult == TEST_WARNING) {
         strcpy(payload, "Fault");
     } else if (fanTestResult == TEST_OK) {
-        snprintf(payload, MAX_PAYLOAD_LENGTH, "%drpm", rpm);
+        snprintf(payload, MAX_PAYLOAD_LENGTH, "%d rpm", rpm);
     } else if (fanTestResult == TEST_NONE) {
         strcpy(payload, "Testing...");
     } else {

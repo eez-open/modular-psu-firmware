@@ -184,6 +184,7 @@
 #define GUI_BACK_TO_MAIN_DELAY 10
 
 #define DEFAULT_ETHERNET_HOST_NAME "EEZ-BB3"
+#define ETHERNET_HOST_NAME_SIZE 63
 
 /// How much to wait (in seconds) for a lease for an IP address from a DHCP server
 /// until we declare ethernet initialization failure.

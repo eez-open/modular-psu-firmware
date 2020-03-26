@@ -927,8 +927,13 @@ void onSetUInt16Value(float value) {
 }
 
 void onSetStringValue(char *value) {
-    popPage();
-    set(g_editValueCursor, g_editValueDataId, value);
+    const char *errMessage = isValidValue(g_editValueCursor, g_editValueDataId, value);
+    if (!errMessage) {
+        popPage();
+        set(g_editValueCursor, g_editValueDataId, value);
+    } else {
+        errorMessage(errMessage);
+    }
 }
 
 void editValue(int16_t dataId) {
@@ -3497,13 +3502,15 @@ void data_ethernet_host_name(DataOperationEnum operation, Cursor cursor, Value &
         if (page) {
             value = page->m_hostName;
         }
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = Value(ETHERNET_HOST_NAME_SIZE, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_IS_VALID_VALUE) {
+        value = persist_conf::validateEthernetHostName(value.getString());
     } else if (operation == DATA_OPERATION_SET) {
         SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
             strcpy(page->m_hostName, value.getString());
         }
-    } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = Value(32, VALUE_TYPE_UINT32);
     }
 #endif
 }

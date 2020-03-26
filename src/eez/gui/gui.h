@@ -148,6 +148,8 @@ Page *getPageFromIdHook(int pageId);
 
 void executeInternalActionHook(int actionId);
 
+bool activePageHasBackdropHook();
+
 } // namespace gui
 } // namespace eez
 

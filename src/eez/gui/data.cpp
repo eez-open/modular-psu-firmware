@@ -569,6 +569,11 @@ Value get(Cursor cursor, int16_t id) {
     return value;
 }
 
+const char *isValidValue(Cursor cursor, int16_t id, Value value) {
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_IS_VALID_VALUE, cursor, value);
+    return value.getType() == VALUE_TYPE_STR ? value.getString() : nullptr;
+}
+
 Value set(Cursor cursor, int16_t id, Value value) {
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_SET, cursor, value);
     return value;

@@ -171,7 +171,7 @@ void onSetOk(float value) {
         if (calibrationValue->voltOrCurr) {
             errorMessage("Value out of range!");
         } else {
-            errorMessage("Value out of range!", "Check the connection of power resistor.");
+            errorMessage("Value out of range!\nCheck the connection of power resistor.");
         }
     }
 }

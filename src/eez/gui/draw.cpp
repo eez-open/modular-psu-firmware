@@ -32,19 +32,23 @@ namespace gui {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool styleIsHorzAlignLeft(const Style *style) {
-    return (style->flags & STYLE_FLAGS_HORZ_ALIGN) == STYLE_FLAGS_HORZ_ALIGN_LEFT;
+    return (style->flags & STYLE_FLAGS_HORZ_ALIGN_MASK) == STYLE_FLAGS_HORZ_ALIGN_LEFT;
 }
 
 bool styleIsHorzAlignRight(const Style *style) {
-    return (style->flags & STYLE_FLAGS_HORZ_ALIGN) == STYLE_FLAGS_HORZ_ALIGN_RIGHT;
+    return (style->flags & STYLE_FLAGS_HORZ_ALIGN_MASK) == STYLE_FLAGS_HORZ_ALIGN_RIGHT;
+}
+
+bool styleIsHorzAlignLeftRight(const Style *style) {
+    return (style->flags & STYLE_FLAGS_HORZ_ALIGN_MASK) == STYLE_FLAGS_HORZ_ALIGN_LEFT_RIGHT;
 }
 
 bool styleIsVertAlignTop(const Style *style) {
-    return (style->flags & STYLE_FLAGS_VERT_ALIGN) == STYLE_FLAGS_VERT_ALIGN_TOP;
+    return (style->flags & STYLE_FLAGS_VERT_ALIGN_MASK) == STYLE_FLAGS_VERT_ALIGN_TOP;
 }
 
 bool styleIsVertAlignBottom(const Style *style) {
-    return (style->flags & STYLE_FLAGS_VERT_ALIGN) == STYLE_FLAGS_VERT_ALIGN_BOTTOM;
+    return (style->flags & STYLE_FLAGS_VERT_ALIGN_MASK) == STYLE_FLAGS_VERT_ALIGN_BOTTOM;
 }
 
 font::Font styleGetFont(const Style *style) {
@@ -83,28 +87,34 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
 
     font::Font font = styleGetFont(style);
 
-    int width = display::measureStr(text, textLength, font, x2 - x1 + 1);
+    int width = display::measureStr(text, textLength, font, 0);
     int height = font.getHeight();
 
+    bool horizontallyFits = width <= (x2 - x1 + 1);
+
     int x_offset;
-    if (styleIsHorzAlignLeft(style))
+    if (styleIsHorzAlignLeft(style) || (styleIsHorzAlignLeftRight(style) && horizontallyFits)) {
         x_offset = x1 + style->padding_left;
-    else if (styleIsHorzAlignRight(style))
+    } else if (styleIsHorzAlignRight(style) || (styleIsHorzAlignLeftRight(style) && !horizontallyFits)) {
         x_offset = x2 - style->padding_right - width;
-    else
+    } else {
         x_offset = x1 + ((x2 - x1 + 1) - width) / 2;
-    if (x_offset < 0)
-        x_offset = x1;
+        if (x_offset < x1) {
+            x_offset = x1;
+        }
+    }
 
     int y_offset;
-    if (styleIsVertAlignTop(style))
+    if (styleIsVertAlignTop(style)) {
         y_offset = y1 + style->padding_top;
-    else if (styleIsVertAlignBottom(style))
+    } else if (styleIsVertAlignBottom(style)) {
         y_offset = y2 - style->padding_bottom - height;
-    else
+    } else {
         y_offset = y1 + ((y2 - y1 + 1) - height) / 2;
-    if (y_offset < 0)
+    }
+    if (y_offset < 0) {
         y_offset = y1;
+    }
 
     // fill background
     if (active || blink) {

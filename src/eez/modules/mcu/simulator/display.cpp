@@ -410,8 +410,7 @@ static void doDrawGlyph(const gui::font::Glyph &glyph, int x_glyph, int y_glyph,
     }
 }
 
-static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, int clip_y2,
-                        uint8_t encoding) {
+static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, int clip_y2, uint8_t encoding) {
     gui::font::Glyph glyph;
     g_font.getGlyph(encoding, glyph);
     if (!glyph)
@@ -425,6 +424,9 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
     if (x_glyph < clip_x1) {
         int dx_off = clip_x1 - x_glyph;
         iStartByte = dx_off;
+        if (iStartByte >= glyph.width) {
+            return glyph.dx;
+        }
         x_glyph = clip_x1;
     }
 
@@ -436,12 +438,10 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
     }
 
     int width;
-    if (x_glyph + glyph.width - 1 > clip_x2) {
+    if (x_glyph + (glyph.width - iStartByte) - 1 > clip_x2) {
         width = clip_x2 - x_glyph + 1;
-        // if glyph doesn't fit, don't paint it
-        //return glyph.dx;
     } else {
-        width = glyph.width;
+        width = (glyph.width - iStartByte);
     }
 
     int height;
@@ -664,8 +664,7 @@ void drawBitmap(Image *image, int x, int y) {
     markDirty(x, y, x + image->width - 1, y + image->height - 1);
 }
 
-void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,
-             int clip_y2, gui::font::Font &font) {
+void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font) {
     g_font = font;
 
     if (textLength == -1) {

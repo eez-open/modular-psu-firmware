@@ -119,7 +119,7 @@ void selectTouchCalibrationPoint() {
             );
         } else {
             startCalibration();
-            errorMessage("Received data is invalid due to", "imprecise pointing or", "communication problem!", true);
+            errorMessage("Received data is invalid due to\nimprecise pointing or\ncommunication problem!", true);
         }
     }
 }

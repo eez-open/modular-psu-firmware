@@ -102,7 +102,7 @@ class SysSettingsEthernetPage : public SetPage {
 
     uint8_t m_macAddress[6];
 
-    char m_hostName[32 + 1];
+    char m_hostName[ETHERNET_HOST_NAME_SIZE + 1];
 
   private:
     bool m_enabledOrig;
@@ -125,7 +125,7 @@ class SysSettingsEthernetPage : public SetPage {
 
     uint8_t m_macAddressOrig[6];
     
-    char m_hostNameOrig[32 + 1];
+    char m_hostNameOrig[ETHERNET_HOST_NAME_SIZE + 1];
 
     static void onSetScpiPort(float value);
     static void onSetMacAddress(char *value);

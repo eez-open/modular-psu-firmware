@@ -172,7 +172,7 @@ struct DeviceConfiguration {
     uint8_t reserved6[52];
 
     // block 8
-    char ethernetHostName[32 + 1];
+    char ethernetHostName[ETHERNET_HOST_NAME_SIZE + 1];
 
     unsigned mqttEnabled : 1;
     char mqttHost[64 + 1];
@@ -268,6 +268,7 @@ bool setEthernetMacAddress(uint8_t macAddress[]);
 bool setEthernetIpAddress(uint32_t ipAddress);
 bool setEthernetDns(uint32_t dns);
 bool setEthernetGateway(uint32_t gateway);
+const char *validateEthernetHostName(const char *hostName);
 bool setEthernetHostName(const char *hostName);
 bool setEthernetSubnetMask(uint32_t subnetMask);
 bool setEthernetScpiPort(uint16_t scpiPort);

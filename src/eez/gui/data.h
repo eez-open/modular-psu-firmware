@@ -337,6 +337,7 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_ACTIVE_COLOR,
     DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR,
     DATA_OPERATION_IS_BLINKING,
+    DATA_OPERATION_IS_VALID_VALUE,
     DATA_OPERATION_SET,
     DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER,
     DATA_OPERATION_YT_DATA_GET_SIZE,
@@ -393,6 +394,7 @@ bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues);
 void getList(Cursor cursor, int16_t id, const Value **labels, int &count);
 
 Value get(Cursor cursor, int16_t id);
+const char *isValidValue(Cursor cursor, int16_t id, Value value);
 Value set(Cursor cursor, int16_t id, Value value);
 
 uint32_t getTextRefreshRate(Cursor cursor, int16_t id);

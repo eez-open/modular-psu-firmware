@@ -39,10 +39,8 @@ class ToastMessagePage : public InternalPage {
     static ToastMessagePage *findFreePage();
 
 public:
-    static ToastMessagePage *create(ToastType type, const char *message1);
+    static ToastMessagePage *create(ToastType type, const char *message, bool autoDismiss = false);
     static ToastMessagePage *create(ToastType type, Value message1Value);
-    static ToastMessagePage *create(ToastType type, const char *message1, const char *message2);
-    static ToastMessagePage *create(ToastType type, const char *message1, const char *message2, const char *message3, bool autoDismiss = false);
     static ToastMessagePage *create(ToastType type, Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam);
     static ToastMessagePage *create(ToastType type, const char *message, void (*action)(), const char *actionLabel);
 
@@ -68,10 +66,8 @@ public:
 private:
     ToastType type;
 
-    const char *message1;
-    Value message1Value;
-    const char *message2;
-    const char *message3;
+    const char *message;
+    Value messageValue;
     const char *actionLabel;
 
     Widget actionWidget;
