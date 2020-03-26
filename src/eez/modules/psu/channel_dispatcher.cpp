@@ -1124,7 +1124,7 @@ bool outputEnable(Channel &channel, bool enable, int *err) {
                 return false;
             }
 
-            if (triggerModeEnabled) {
+            if (triggerModeEnabled && !trigger::isIdle()) {
                 trigger::abort();
             } else {
                 channel_dispatcher::outputEnable(channel, false);
