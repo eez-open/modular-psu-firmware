@@ -88,6 +88,13 @@ Page *AppContext::getActivePage() {
     return m_pageNavigationStack[getActivePageStackPointer()].page;
 }
 
+int AppContext::getPreviousPageId() {
+    if (getActivePageStackPointer() == 0) {
+        return PAGE_ID_NONE;
+    }
+    return m_pageNavigationStack[getActivePageStackPointer() - 1].pageId;
+}
+
 void AppContext::onPageChanged(int previousPageId, int activePageId) {
     eez::mcu::display::turnOn();
     psu::idle::noteHmiActivity();

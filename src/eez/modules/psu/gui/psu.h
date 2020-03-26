@@ -281,6 +281,10 @@ inline Page *getActivePage() {
     return g_psuAppContext.getActivePage();
 }
 
+inline int getPreviousPageId() {
+    return g_psuAppContext.getPreviousPageId();
+}
+
 inline bool isPageOnStack(int pageId) {
     return g_psuAppContext.isPageOnStack(pageId);
 }

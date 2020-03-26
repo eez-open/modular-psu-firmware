@@ -1670,4 +1670,4 @@ enum PagesEnum {
     PAGE_ID_TOUCH_TEST = 165
 };
 
-extern const uint8_t assets[403410];
+extern const uint8_t assets[403416];

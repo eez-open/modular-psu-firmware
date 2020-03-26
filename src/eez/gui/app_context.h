@@ -52,6 +52,8 @@ public:
 
     bool isActivePageInternal();
 
+    int getPreviousPageId();
+
     void replacePage(int pageId, Page *page = nullptr);
 
     Page *getPage(int pageId);
