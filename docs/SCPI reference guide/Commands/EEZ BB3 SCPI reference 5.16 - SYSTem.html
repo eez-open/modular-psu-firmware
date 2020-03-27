@@ -31,9 +31,6 @@
 			.scpi4 { text-align: left; margin-left: 18mm; }
 			.scpi5 { margin-left: 22.491mm; }
 			.table_header { text-align: center; }
-			.DCM220 { font-family: "Arial"; font-size: 10.8pt; font-weight: bold; font-style: normal; background-color: #66ccff; color: #ffffff; }
-			.DCP405 { font-family: "Arial"; font-size: 10.8pt; font-weight: bold; font-style: normal; background-color: #ff6600; color: #ffffff; }
-			.DCP405B { font-family: "Arial"; font-size: 10.8pt; font-weight: bold; font-style: normal; background-color: #cc9900; color: #ffffff; }
 			.backtick { font-family: "Courier New"; font-size: 9.0pt; font-weight: normal; font-style: normal; background-color: #dddddd; }
 			
 			/* Footnotes & endnotes */
@@ -255,14 +252,6 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
-					<p class="scpi3"><a href="#syst_chan_prog"><span style="text-decoration: underline;">:PROGram?</span></a></p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
-					<p>Returns programmable features of the channel</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
 					<p class="scpi3"><a href="#syst_chan_volt"><span style="text-decoration: underline;">:VOLTage?</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
@@ -307,6 +296,14 @@ a:hover {
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
 					<p>Returns the channel serial number </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi2"><a href="#syst_chan_vers"><span style="text-decoration: underline;">:</span></a><a href="#syst_chan_vers"><span style="text-decoration: underline;">VERSion?</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Returns the channel version number </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -375,6 +372,14 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_comm_etc_host"><span style="text-decoration: underline;">:HOSTname {&lt;name&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Sets the Ethernet communication host name</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
 					<p class="scpi3"><a href="#syst_comm_eth_mac"><span style="text-decoration: underline;">:MAC?</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
@@ -415,18 +420,10 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
-					<p class="scpi3"><a href="#syst_comm_mqtt_conn"><span style="text-decoration: underline;">:CONNect {&lt;address&gt;, &lt;port&gt;, </span></a><a href="#syst_comm_mqtt_conn"><span style="text-decoration: underline;">&lt;user&gt;, &lt;password&gt;}</span></a></p>
+					<p class="scpi3"><a href="#syst_comm_mqtt_conn"><span style="text-decoration: underline;">:SETTings {&lt;address&gt;, &lt;port&gt;, </span></a><a href="#syst_comm_mqtt_conn"><span style="text-decoration: underline;">&lt;user&gt;, &lt;password&gt;, &lt;period&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
-					<p>Initiates MQTT connection</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
-					<p class="scpi3"><a href="#syst_comm_mqtt_disc"><span style="text-decoration: underline;">:DISConnect</span></a></p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
-					<p>Closes MQTT connection</p>
+					<p>Sets MQTT connection parameters</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -443,30 +440,6 @@ a:hover {
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
 					<p>Places the instrument in remote or local mode</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
-					<p class="scpi2">:SERial</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
-					<p class="scpi3"><a href="#syst_comm_ser_baud"><span style="text-decoration: underline;">:BAUD {&lt;speed&gt;}</span></a></p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
-					<p>Sets the baud rate (speed)</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
-					<p class="scpi3"><a href="#syst_comm_ser_par"><span style="text-decoration: underline;">:PARity {&lt;parity&gt;}</span></a></p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
-					<p>Sets the parity mode</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -559,10 +532,42 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
-					<p class="scpi2"><a href="#syst_dig_outp_data"><span style="text-decoration: underline;">:OUTPut:DATA {&lt;pin&gt;}, {&lt;state&gt;}</span></a></p>
+					<p class="scpi2"><a href="#syst_dig_outp_data"><span style="text-decoration: underline;">:OUTPut</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_dig_outp_data"><span style="text-decoration: underline;">:DATA {&lt;pin&gt;}, {&lt;state&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
 					<p>Sets the state of the digital port pins</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3">:PWM</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi4"><a href="#syst_dig_outp_pwm_duty"><span style="text-decoration: underline;">:DUTY {&lt;pin&gt;}, {&lt;duty&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Sets square wave generator duty cycle</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi4"><a href="#syst_dig_outp_pwm_freq"><span style="text-decoration: underline;">:FREQuency {&lt;pin&gt;}, {&lt;frequency&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Sets square wave generator frequency</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -611,6 +616,54 @@ a:hover {
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
 					<p>Queries the error/event queue for the number of unread items</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi1">:FAN</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi2"><a href="#syst_fan_spe"><span style="text-decoration: underline;">:SPEed</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Returns speed of the cooling fan</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi2"><a href="#syst_fan_stat"><span style="text-decoration: underline;">:STATus</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Returns status of the cooling fan</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi1">:FORMat</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi2"><a href="#syst_form_date"><span style="text-decoration: underline;">:DATE</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Sets format for displaying date</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi2"><a href="#syst_form_time"><span style="text-decoration: underline;">:TIME</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Sets 12h or 24h clock format</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -675,6 +728,22 @@ a:hover {
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
 					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3">:TEMPerature</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi4"><a href="#syst_meas_temp"><span style="text-decoration: underline;">[:DC]? {&lt;sensor&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Takes a measurement; returns the average temperature</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -775,7 +844,7 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
-					<p class="scpi1">:RESet</p>
+					<p class="scpi1"><a href="#syst_res"><span style="text-decoration: underline;">:RES</span></a><a href="#syst_res"><span style="text-decoration: underline;">tart</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
 					<p>Initiate low-level (hardware) reset</p>
@@ -1090,7 +1159,7 @@ a:hover {
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_code">SYSTem:CAPability?</p>
-					<p class="cmd_code_Start">DCSUPPLY WITH (MEASURE|MULTIPLE|TRIGGER)</p>
+					<p class="cmd_code_Start">DCPSUPPLY WITH (MEASURE|MULTIPLE|TRIGGER)</p>
 				</td>
 			</tr>
 		</table>
@@ -1102,14 +1171,6 @@ a:hover {
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">SYSTem:CHANnel[:COUNt]?</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1147,14 +1208,6 @@ a:hover {
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">SYSTem:CHANnel:INFOrmation:AHOur:TOTal? [&lt;channel&gt;]</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1233,14 +1286,6 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
@@ -1296,14 +1341,6 @@ a:hover {
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">SYSTem:CHANnel:INFOrmation:ONTime:LAST? [&lt;channel&gt;]</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1367,14 +1404,6 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
@@ -1434,14 +1463,6 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
@@ -1489,98 +1510,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.11. <a name="syst_chan_prog"></a>SYSTem:CHANnel:INFOrmation:PROGram?</p>
-		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SYSTem:CHANnel:INFOrmation:PROGram? [&lt;channel&gt;]</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This query returns names of all selected channel's functionality that can be controlled by firmware. Depending of the module model (see the SYSTem:CHANnel:MODel? query) various combination of the following features can be returned:</p>
-					<ul>
-						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">Volt – program the output voltage while channel is in the CV mode of operation (see [SOURce[&lt;n&gt;]]:VOLTage and APPLy commands)</li>
-						<li class="List_1" style="text-indent: 0; list-style-type: disc;">Current – program the output current while channel is in the CC mode of operation (see [SOURce[&lt;n&gt;]]:CURRent and APPLy commands)</li>
-						<li class="List_1" style="text-indent: 0; list-style-type: disc;">Power – set max. allowed output power regardless of the channel mode of operation (see [SOURce[&lt;n&gt;]]:POWer:LIMit)</li>
-						<li class="List_1" style="text-indent: 0; list-style-type: disc;">OE – set channel power output (see OUTPut[:STATe])</li>
-						<li class="List_1" style="text-indent: 0; list-style-type: disc;">Dprog – control down-programmer circuit (see OUTPut:DPRog)</li>
-						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">Rprog – control output voltage programming source (see [SOURce[&lt;n&gt;]]:VOLTage:PROGram[:SOURce])</li>
-					</ul>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Parameters</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Name</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Type</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Range</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Default</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p>&lt;channel&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Discrete</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">CH1|CH2|CH3|CH4|CH5|CH6</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">–</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SYST:CHAN:INFO:PROG? CH1</p>
-					<p class="cmd_code_Start">&quot;Volt&quot;, &quot;Current&quot;, &quot;Power&quot;, &quot;OE&quot;, &quot;DProg&quot;, &quot;Rprog&quot;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>APPLy</p>
-					<p>OUTPut:DPRog</p>
-					<p>OUTPut:MODE?</p>
-					<p>OUTPut[:STATe]</p>
-					<p>[SOURce[&lt;n&gt;]]:CURRent</p>
-					<p>[SOURce[&lt;n&gt;]]:POWer:LIMit</p>
-					<p>[SOURce[&lt;n&gt;]]:VOLTage</p>
-					<p>[SOURce[&lt;n&gt;]]:VOLTage:PROGram[:SOURce])</p>
-					<p>SYSTem:CHANnel:MODel?</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.16.12. <a name="syst_chan_volt"></a>SYSTem:CHANnel:INFOrmation:VOLTage?</p>
+		<p class="Heading_3">5.16.11. <a name="syst_chan_volt"></a>SYSTem:CHANnel:INFOrmation:VOLTage?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1588,14 +1518,6 @@ a:hover {
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">SYSTem:CHANnel:INFOrmation:VOLTage? [&lt;channel&gt;]</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1647,7 +1569,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.13. <a name="syst_chan_who"></a>SYSTem:CHANnel:INFOrmation:WHOur:TOTal?</p>
+		<p class="Heading_3">5.16.12. <a name="syst_chan_who"></a>SYSTem:CHANnel:INFOrmation:WHOur:TOTal?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1655,14 +1577,6 @@ a:hover {
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">SYSTem:CHANnel:INFOrmation:WHOur:TOTal? [&lt;channel&gt;]</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1729,7 +1643,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.14. <a name="syst_chan_mod"></a>SYSTem:CHANnel:MODel?</p>
+		<p class="Heading_3">5.16.13. <a name="syst_chan_mod"></a>SYSTem:CHANnel:MODel?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1737,14 +1651,6 @@ a:hover {
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">SYSTem:CHANnel:MODel? [&lt;channel&gt;]</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1792,7 +1698,7 @@ a:hover {
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_code">SYST:CHAN:MOD?</p>
-					<p class="cmd_code_Start">&quot;DCP405B_R2B7&quot;</p>
+					<p class="cmd_code_Start">&quot;DCP405&quot;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1805,7 +1711,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.15. <a name="syst_chan_slot"></a>SYSTem:CHANnel:SLOT?</p>
+		<p class="Heading_3">5.16.14. <a name="syst_chan_slot"></a>SYSTem:CHANnel:SLOT?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1817,19 +1723,9 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="note">Not implemented yet</p>
-					<p>&#160;</p>
 					<p>This query returns the DIB backplane slot number of the specified channel.</p>
 				</td>
 			</tr>
@@ -1883,7 +1779,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.16. <a name="syst_chan_sno"></a>SYSTem:CHANnel:SNO?</p>
+		<p class="Heading_3">5.16.15. <a name="syst_chan_sno"></a>SYSTem:CHANnel:SNO?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1895,19 +1791,9 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="note">Not implemented yet</p>
-					<p>&#160;</p>
 					<p>This query returns the serial number of the specified channel.</p>
 				</td>
 			</tr>
@@ -1947,8 +1833,76 @@ a:hover {
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SYST:CHAN:SNO?</p>
-					<p class="cmd_code_Start">&quot;000001&quot;</p>
+					<p class="cmd_code">SYST:CHAN:SNO? CH4</p>
+					<p class="cmd_code_Start">&quot;002F0036434E510A20373437&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:CHANnel:SLOT?</p>
+					<p>SYSTem:CHANnel:VERSion?</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.16. <a name="syst_chan_vers"></a>SYSTem:CHANnel:VERSion?</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:CHANnel:VERSion? [&lt;channel&gt;]</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>This query returns the version number of the specified channel.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;channel&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">CH1|CH2|CH3|CH4|CH5|CH6</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:CHAN:VERS? CH4</p>
+					<p class="cmd_code_Start">&quot;R2B6&quot;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1977,7 +1931,9 @@ a:hover {
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Enables or disables the remote interface Serial (via USB), Ethernet, NTP service, or the remote service Sockets. The setting is effective after rebooting the BB3. This command setting is not changed by power off or the <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-common-command-reference.html#rst"><span style="text-decoration: underline;">*RST</span></a> command.</p>
+					<p>Enables or disables the remote interface Serial (via USB), Ethernet, MQTT, NTP service, or the remote service Sockets. The setting is effective after rebooting the BB3. This command setting is not changed by power off or the <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-common-command-reference.html#rst"><span style="text-decoration: underline;">*RST</span></a> command.</p>
+					<p>&#160;</p>
+					<p class="note">Enabling the Ethernet interface (SYSTem:COMMunicate:ENABle 1, ETH) will have no effect until a restart is performed using the SYSTem:REStart command.</p>
 					<p>&#160;</p>
 					<p class="note">Remote service Sockets is not supported yet</p>
 				</td>
@@ -2021,7 +1977,7 @@ a:hover {
 					<p style="text-align: center;">Discrete</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 33%;">
-					<p>SERial|ETHernet|NTP|SOCKets</p>
+					<p>SERial|ETHernet|MQTT|NTP|SOCKets</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
 					<p style="text-align: center;">–</p>
@@ -2040,8 +1996,15 @@ a:hover {
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SYST:COMM:ENAB 1, ETH</p>
 					<p class="cmd_code">SYST:COMM:ENAB 0, SER</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:REStart</p>
 				</td>
 			</tr>
 		</table>
@@ -2061,7 +2024,7 @@ a:hover {
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Set the IP address of the system manually if the DHCP mode is not enabled. If the DHCP mode is enabled setting the IP address using this command will be ignored.</p>
+					<p>Set the IP address of the BB3 manually if the DHCP mode is not enabled. If the DHCP mode is enabled setting the IP address using this command will be ignored.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -2342,7 +2305,84 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.22. <a name="syst_comm_eth_mac"></a>SYSTem:COMMunicate:ETHernet:MAC</p>
+		<p class="Heading_3">5.16.22. <a name="syst_comm_etc_host"></a>SYSTem:COMMunicate:ETHernet:HOSTname</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:COMMunicate:ETHernet:HOSTname {&lt;hostname&gt;}</p>
+					<p class="cmd_root">SYSTem:COMMunicate:ETHernet:HOSTname?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>This command sets the BB3 local area network (LAN) connection hostname.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 25%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;hostname&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Quoted string</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 25%;">
+					<p>1 – 63 characters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: center;">EEZ-BB3</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query returns the BB3 local area network (LAN) connection hostname  as a quoted string.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:COMM:ETH:HOST?</p>
+					<p class="cmd_code_Start">&quot;bb3-test&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:COMMunicate:ETHernet:ADDRess</p>
+					<p>SYSTem:COMMunicate:ETHernet:DHCP</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.23. <a name="syst_comm_eth_mac"></a>SYSTem:COMMunicate:ETHernet:MAC</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2358,7 +2398,7 @@ a:hover {
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p style="font-family: &quot;Arial;Helvetica Neue;Helvetica;sans-serif&quot;; font-size: 10.125pt; color: #242729;">Use this command to set Ethernet MAC address. You can set any combination of six hexadecimal values separated by “-”. The Ethernet connection will work as long as two different machine in the LAN don't have the same MAC address.</p>
+					<p>Use this command to set Ethernet communication port MAC address. You can set any combination of six hexadecimal values separated by “-”. The Ethernet connection will work as long as two different machine in the LAN don't have the same MAC address.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -2410,7 +2450,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.23. <a name="syst_comm_eth_port"></a>SYSTem:COMMunicate:ETHernet:PORT</p>
+		<p class="Heading_3">5.16.24. <a name="syst_comm_eth_port"></a>SYSTem:COMMunicate:ETHernet:PORT</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2487,7 +2527,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.24. <a name="syst_comm_eth_smas"></a>SYSTem:COMMunicate:ETHernet:SMASk</p>
+		<p class="Heading_3">5.16.25. <a name="syst_comm_eth_smas"></a>SYSTem:COMMunicate:ETHernet:SMASk</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2562,14 +2602,14 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.25. <a name="syst_comm_mqtt_conn"></a>SYSTem:COMMunicate:MQTT:CONNect</p>
+		<p class="Heading_3">5.16.26. <a name="syst_comm_mqtt_conn"></a>SYSTem:COMMunicate:MQTT:SETTings</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SYSTem:COMMunicate:MQTT:CONNect</p>
+					<p class="cmd_root">SYSTem:COMMunicate:MQTT:SETTings {&lt;address&gt;}, {&lt;port&gt;}, {&lt;user&gt;}, {&lt;password&gt;}, {&lt;period&gt;}</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -2578,8 +2618,8 @@ a:hover {
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p><a href="https://mqtt.org/" target="_blank"><span style="text-decoration: underline;">MQTT</span></a> (<span style="font-style: italic;">MQ Telemetry Transport</span>) is an open OASIS and ISO standard (ISO/IEC PRF 20922) lightweight, publish-subscribe network protocol that transports messages between devices (i.e. clients). </p>
-					<p>The EEZ BB3 can become a MQTT client (or node) by establishing connection with this command to the MQTT broker. A broker is a server that receives all messages from the clients and then routes the messages to the appropriate destination clients. It acts as a post office, MQTT doesn’t use the address of the intended recipient but uses the subject line called “Topic”, and anyone who wants a copy of that message will subscribe to that topic. EEZ The BB3 can produce and receive data by both publishing and subscribing.</p>
-					<p>MQTT connection is initiated by sending a sequence of four comma separated connection parameters.</p>
+					<p>The EEZ BB3 becomes a MQTT client (or node) by establishing connection with this command to the MQTT broker. A broker is a server that receives all messages from the clients and then routes the messages to the appropriate destination clients. It acts as a post office, MQTT doesn’t use the address of the intended recipient but uses the subject line called “Topic”, and anyone who wants a copy of that message will subscribe to that topic. EEZ The BB3 can produce and receive data by both publishing and subscribing.</p>
+					<p>MQTT connection is initiated by sending a sequence of five comma separated connection parameters.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -2666,62 +2706,43 @@ a:hover {
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+					<p>&#160;</p>
 				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SYST:COMM:MQTT:CONN &quot;farmer.cloudmqtt.com&quot;, 1883, &quot;user&quot;, &quot;password&quot;</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;period&gt;</p>
 				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR2</p>
 				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SYSTem:COMMunicate:MQTT:DISConnect</p>
-					<p>SYSTem:COMMunicate:MQTT:STATe</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 25%;">
+					<p style="text-align: center;">0.1 – 120</p>
 				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.16.26. <a name="syst_comm_mqtt_disc"></a>SYSTem:COMMunicate:MQTT:DISConnect</p>
-		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SYSTem:COMMunicate:MQTT:DISConnect</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Use this command to terminate an existing MQTT connection. If connection is not active, it will generate an execution error.</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: center;">1</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SYST:COMM:MQTT:DISC</p>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:COMM:MQTT:CONN &quot;farmer.cloudmqtt.com&quot;, 1883, &quot;user&quot;, &quot;password&quot;, 10</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Errors</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">-200,&quot;Execution error&quot;</p>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">-104,&quot;Data type error&quot;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Related Commands</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SYSTem:COMMunicate:MQTT:CONNect</p>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:COMMunicate:ENABle</p>
 					<p>SYSTem:COMMunicate:MQTT:STATe</p>
 				</td>
 			</tr>
@@ -2766,8 +2787,8 @@ a:hover {
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SYSTem:COMMunicate:MQTT:CONNect</p>
-					<p>SYSTem:COMMunicate:MQTT:DISConnect</p>
+					<p>SYSTem:COMMunicate:ENABle</p>
+					<p>SYSTem:COMMunicate:MQTT:SETTings</p>
 				</td>
 			</tr>
 		</table>
@@ -2937,160 +2958,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.30. <a name="syst_comm_ser_baud"></a>SYSTem:COMMunicate:SERial:BAUD</p>
-		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SYSTem:COMMunicate:SERial:BAUD {&lt;speed&gt;}</p>
-					<p class="cmd_root">SYSTem:COMMunicate:SERial:BAUD?</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Set the baud rate of the serial (via USB) interface and the unit is Baud.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Parameters</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Name</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Type</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Range</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Default</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p>&lt;speed&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">NR1</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p>4800|9600|19200|38400|57600|115200</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">9600</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Return</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Query the baud rate of the serial interface.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SYST:COMM:SER:BAUD 38400</p>
-					<p class="cmd_code">SYST:COMM:SER:BAUD?</p>
-					<p class="cmd_code_Start">38400</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SYSTem:COMMunicate:ENABle</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.16.31. <a name="syst_comm_ser_par"></a>SYSTem:COMMunicate:SERial:PARity</p>
-		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SYSTem:COMMunicate:SERial:PARity {&lt;parity&gt;}</p>
-					<p class="cmd_root">SYSTem:COMMunicate:SERial:PARity?</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Set the parity mode of the serial (via USB) interface.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Parameters</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Name</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Type</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Range</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Default</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p>&lt;parity&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Discrete</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p>EVEN|MARK|NONE|ODD|SPACE</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">NONE</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Return</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Query the parity mode of the serial interface.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SYST:COMM:SER:PAR?</p>
-					<p class="cmd_code_Start">NONE</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SYSTem:COMMunicate:ENABle</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.16.32. <a name="syst_cpu_ont_last"></a>SYSTem:CPU:INFOrmation:ONTime:LAST?</p>
+		<p class="Heading_3">5.16.30. <a name="syst_cpu_ont_last"></a>SYSTem:CPU:INFOrmation:ONTime:LAST?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3118,7 +2986,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.33. <a name="syst_cpu_ont_tot"></a>SYSTem:CPU:INFOrmation:ONTime:TOTal?</p>
+		<p class="Heading_3">5.16.31. <a name="syst_cpu_ont_tot"></a>SYSTem:CPU:INFOrmation:ONTime:TOTal?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3146,7 +3014,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.34. <a name="syst_cpu_mod"></a>SYSTem:CPU:MODel?</p>
+		<p class="Heading_3">5.16.32. <a name="syst_cpu_mod"></a>SYSTem:CPU:MODel?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3170,7 +3038,7 @@ a:hover {
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_code">SYST:CPU:MOD?</p>
-					<p class="cmd_code_Start">&quot;STM32, M1 0.2&quot;</p>
+					<p class="cmd_code_Start">&quot;STM32F7, M1 0.3&quot;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -3183,7 +3051,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.35. <a name="syst_date"></a>SYSTem:DATE</p>
+		<p class="Heading_3">5.16.33. <a name="syst_date"></a>SYSTem:DATE</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3288,11 +3156,12 @@ a:hover {
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>*TST?</p>
 					<p>DIAGnostic[:INFOrmation]:TEST?</p>
+					<p>SYSTem:FORMat:TIME</p>
 					<p>SYSTem:TIME</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.36. <a name="syst_dig_inp_data"></a>SYSTem:DIGital:INPut:DATA</p>
+		<p class="Heading_3">5.16.34. <a name="syst_dig_inp_data"></a>SYSTem:DIGital:INPut:DATA</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3369,7 +3238,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.37. <a name="syst_dig_outp_data"></a>SYSTem:DIGital:OUTPut:DATA</p>
+		<p class="Heading_3">5.16.35. <a name="syst_dig_outp_data"></a>SYSTem:DIGital:OUTPut:DATA</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3470,6 +3339,210 @@ a:hover {
 				</td>
 			</tr>
 		</table>
+		<p class="Heading_3">5.16.36. <a name="syst_dig_outp_pwm_duty"></a>SYSTem:DIGital:OUTPut:PWM:DUTY</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:DIGital:OUTPut:PWM:DUTY {&lt;pin&gt;}, {&lt;duty&gt;}</p>
+					<p class="cmd_root">SYSTem:DIGital:OUTPut:PWM:DUTY? {&lt;pin&gt;}</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to set duty cycle of the output pin defined as PWM (see the SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion command). Applies only to 4.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;pin&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">4</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;duty&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR3</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">0 – 100</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">50</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query returns the square ware generator duty cycle for the specified output pin.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code_single">SYST:DIG:OUTP:PWM:DUTY 4, 10</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Errors</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">-224,&quot;Illegal parameter value&quot;</p>
+					<p class="cmd_code">-230,&quot;Digital pin function mismatch&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:DIGital:OUTPut:PWM:FREQuency</p>
+					<p>SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.37. <a name="syst_dig_outp_pwm_freq"></a>SYSTem:DIGital:OUTPut:PWM:FREQuency</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:DIGital:OUTPut:PWM:FREQency {&lt;pin&gt;}, {&lt;frequency&gt;}</p>
+					<p class="cmd_root">SYSTem:DIGital:OUTPut:PWM:FREQency? {&lt;pin&gt;}</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to set frequency of the output pin defined as PWM (see the SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion command). Applies only to 4.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;pin&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">4</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;frequency&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR3</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">0.03 – 5000000</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">0</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query returns the square ware generator frequency for the specified output pin.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code_single">SYST:DIG:OUTP:PWM:FREQ 4, 1000</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Errors</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">-224,&quot;Illegal parameter value&quot;</p>
+					<p class="cmd_code">-230,&quot;Digital pin function mismatch&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:DIGital:OUTPut:PWM:DUTY</p>
+					<p>SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion</p>
+				</td>
+			</tr>
+		</table>
 		<p class="Heading_3">5.16.38. <a name="syst_dig_pin_func"></a>SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
@@ -3495,6 +3568,7 @@ a:hover {
 						<li class="List_1" style="text-indent: 0; list-style-type: disc;">FAULt – Setting FAULt means that pin functions as an isolated fault output. The fault signal is true when any output is in a protected state (from OCP, OVP, OTP, OPP) or Fan fault is detected.</li>
 						<li class="List_1" style="text-indent: 0; list-style-type: disc;">INHibit – When pin is configured as an inhibit input, a true signal at the pin will disable all output channels.</li>
 						<li class="List_1" style="text-indent: 0; list-style-type: disc;">ONCouple – output pin synchronize channel output state.</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc;">PWM – (<span style="font-style: italic;">pin 4 only</span>) square wave generator output.</li>
 						<li class="List_1" style="text-indent: 0; list-style-type: disc;">TINPut – The pin is configured as a trigger input. When configured as a trigger input, the pin can be selected as the source for trigger signals. See TRIGger[:SEQuence]:SOURce.</li>
 						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">TOUTput – This allows a BUS trigger to be sent to any digital port pin that has been configured as a trigger output. A trigger out pulse is generated when the state is on and a bus trigger is received. A BUS trigger is generated using the *TRG command.</li>
 					</ul>
@@ -3569,6 +3643,8 @@ a:hover {
 					<p>TRIGger[:SEQuence]:SOURce</p>
 					<p>SYSTem:DIGital:INPut:DATA</p>
 					<p>SYSTem:DIGital:OUTPut:DATA</p>
+					<p>SYSTem:DIGital:OUTPut:PWM:DUTY</p>
+					<p>SYSTem:DIGital:OUTPut:PWM:FREQuency</p>
 				</td>
 			</tr>
 		</table>
@@ -3760,7 +3836,256 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.42. <a name="syst_inh"></a>SYSTem:INHibit?</p>
+		<p class="Heading_3">5.16.42. <a name="syst_fan_spe"></a>SYSTem:FAN:SPEed?</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:FAN:SPEed?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this query to obtain cooling fan speed in rpm.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:FAN:SPE?</p>
+					<p class="cmd_code_Start">1450</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:FAN:STATus?</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.43. <a name="syst_fan_stat"></a>SYSTem:FAN:STATus?</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:FAN:STATus?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this query to obtain information about cooling fan state.</p>
+					<p>Cooling fan is periodically tested while it’s working (that depends of measured channel’s temperature sensor value). When it does not passed the test, programmed output current is automatically limited to 2&#160;A.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Returns numerical status of the cooling fan:</p>
+					<ul>
+						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">0 – fault is detected</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc;">1 – fan is up and running</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc;">2 – fan testing is in progress</li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">3 – fan is not installed</li>
+					</ul>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:FAN:STAT?</p>
+					<p class="cmd_code_Start">1</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:FAN:SPEed?</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.44. <a name="syst_form_date"></a>SYSTem:FORMat:DATE</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:FORMat:DATE {&lt;format&gt;}</p>
+					<p class="cmd_root">SYSTem:FORMat:DATE?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Set format that will be used for displaying date. </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;format&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: left;">DMY|MDY</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query command returns “DMY” or “MDY”.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:FORM:DATE MDY</p>
+					<p class="cmd_code">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:DATE</p>
+					<p>SYSTem:FORMat:DATE</p>
+					<p>SYSTem:FORMat:TIME</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.45. <a name="syst_form_time"></a>SYSTem:FORMat:TIME</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:FORMat:TIME {&lt;format&gt;}</p>
+					<p class="cmd_root">SYSTem:FORMat:TIME?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Set clock format that will be used for displaying time. </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;format&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: left;">12|24</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query command returns 12 or 24 clock format.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:FORM:TIME 12</p>
+					<p class="cmd_code">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:DATE</p>
+					<p>SYSTem:FORMat:DATE</p>
+					<p>SYSTem:FORMat:TIME</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.46. <a name="syst_inh"></a>SYSTem:INHibit?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3807,7 +4132,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.43. <a name="syst_key_def"></a>SYSTem:KEY:DEFine</p>
+		<p class="Heading_3">5.16.47. <a name="syst_key_def"></a>SYSTem:KEY:DEFine</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3904,7 +4229,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.44. <a name="syst_key_del"></a>SYSTem:KEY:DELete</p>
+		<p class="Heading_3">5.16.48. <a name="syst_key_del"></a>SYSTem:KEY:DELete</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3975,7 +4300,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.45. <a name="syst_kloc"></a>SYSTem:KLOCk</p>
+		<p class="Heading_3">5.16.49. <a name="syst_kloc"></a>SYSTem:KLOCk</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4012,7 +4337,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.46. <a name="syst_loc"></a>SYSTem:LOCal</p>
+		<p class="Heading_3">5.16.50. <a name="syst_loc"></a>SYSTem:LOCal</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4049,7 +4374,193 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.47. <a name="syst_meas_volt"></a>SYSTem:MEASure[:SCALar][:VOLTage][:DC]?</p>
+		<p>MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]? {&lt;sensor&gt;}</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Query the temperature measured using the specified temperature sensors as follows:</p>
+					<p>AUX – auxiliary temperature sensor (built-in fan controller) used to monitor temperature inside BB3 chassis</p>
+					<p>CH1, CH2, CH3, CH4, CH5, CH6  – temperature sensor connected to channel power module used to regulate fan speed</p>
+					<p>All installed sensors are periodically tested. When sensor does not passed the test, programmed output current is automatically limited to 2&#160;A. If load that draws more current then 2&#160;A output current will be set to zero.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 28%;">
+					<p>Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 16%;">
+					<p>Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 27%;">
+					<p>Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 17%;">
+					<p>Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
+					<p>&lt;sensor&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
+					<p>Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 27%;">
+					<p>AUX|CH1|CH2|CH3|CH4|CH5|CH6</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 17%;">
+					<p>AUX</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Returns the average temperature value in degrees Celsius (<span style="vertical-align: super;">o</span>C) as decimal number (NR2). If self-test detect selected temperature sensor failure or sensor is not installed a -240 or -241 error will be generated. </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>MEAS:TEMP? CH2</p>
+					<p>49</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>Errors</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>-240,&quot;Hardware error&quot;</p>
+					<p>-241,&quot;Hardware missing<span style="font-family: &quot;Courier New&quot;;">&quot;</span></p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>DIAGnostic[:INFOrmation]:FAN?</p>
+					<p>SYSTem:CPU:OPTion?</p>
+					<p>SYSTem:TEMPerature:PROTection[:HIGH][:LEVel]</p>
+					<p>SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]</p>
+					<p>SYSTem:TEMPerature:PROTection[:HIGH]:STATe</p>
+					<p>SYSTem:TEMPerature:PROTection[:HIGH]:TRIPped?</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.51. <a name="syst_meas_temp"></a>SYSTem:MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]</p>
+		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]? {&lt;sensor&gt;}</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Query the temperature measured using the specified temperature sensors as follows:</p>
+					<ul>
+						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">AUX – auxiliary temperature sensor (built-in fan controller) used to monitor temperature inside BB3 chassis</li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">CH1, CH2, CH3, CH4, CH5, CH6  – temperature sensor connected to channel power module used to regulate fan speed</li>
+					</ul>
+					<p>All installed sensors are periodically tested. When sensor does not passed the test, programmed output current is automatically limited to 2&#160;A. If load that draws more current then 2&#160;A output current will be set to zero.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 28%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 16%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 27%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 17%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
+					<p>&lt;sensor&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 27%;">
+					<p style="text-align: center;">AUX|CH1|CH2|CH3|CH4|CH5|CH6</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 17%;">
+					<p style="text-align: center;">AUX</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Returns the average temperature value in degrees Celsius (<span style="vertical-align: super;">o</span>C) as decimal number (NR2). If self-test detect selected temperature sensor failure or sensor is not installed a -240 or -241 error will be generated. </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:MEAS:TEMP? CH2</p>
+					<p class="cmd_code_Start">49</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Errors</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">-240,&quot;Hardware error&quot;</p>
+					<p class="cmd_code">-241,&quot;Hardware missing&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>DIAGnostic[:INFOrmation]:FAN?</p>
+					<p>SYSTem:CPU:OPTion?</p>
+					<p>SYSTem:TEMPerature:PROTection[:HIGH][:LEVel]</p>
+					<p>SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]</p>
+					<p>SYSTem:TEMPerature:PROTection[:HIGH]:STATe</p>
+					<p>SYSTem:TEMPerature:PROTection[:HIGH]:TRIPped?</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.16.52. <a name="syst_meas_volt"></a>SYSTem:MEASure[:SCALar][:VOLTage][:DC]?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4095,10 +4606,10 @@ a:hover {
 					<p style="text-align: center;">Discrete</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">VBAT</p>
+					<p style="text-align: center;">RTC</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">VBAT</p>
+					<p style="text-align: center;">RTC</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -4106,12 +4617,12 @@ a:hover {
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SYST:MEAS? VBAT</p>
+					<p class="cmd_code">SYST:MEAS? RTC</p>
 					<p class="cmd_code_Start">3.07</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.48. <a name="syst_pass_cal_res"></a>SYSTem:PASSword:CALibration:RESet</p>
+		<p class="Heading_3">5.16.53. <a name="syst_pass_cal_res"></a>SYSTem:PASSword:CALibration:RESet</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4147,7 +4658,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.49. <a name="syst_pass_fpan_res"></a>SYSTem:PASSword:FPANel:RESet</p>
+		<p class="Heading_3">5.16.54. <a name="syst_pass_fpan_res"></a>SYSTem:PASSword:FPANel:RESet</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4183,7 +4694,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.50. <a name="syst_pass_new"></a>SYSTem:PASSword:NEW</p>
+		<p class="Heading_3">5.16.55. <a name="syst_pass_new"></a>SYSTem:PASSword:NEW</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4274,7 +4785,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.51. <a name="syst_pon_outp_dis"></a>SYSTem:PON:OUTPut:DISable</p>
+		<p class="Heading_3">5.16.56. <a name="syst_pon_outp_dis"></a>SYSTem:PON:OUTPut:DISable</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4355,7 +4866,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.52. <a name="syst_pow"></a>SYSTem:POWer</p>
+		<p class="Heading_3">5.16.57. <a name="syst_pow"></a>SYSTem:POWer</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4434,7 +4945,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.53. <a name="syst_pow_prot_trip"></a>SYSTem:POWer:PROTection:TRIP</p>
+		<p class="Heading_3">5.16.58. <a name="syst_pow_prot_trip"></a>SYSTem:POWer:PROTection:TRIP</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4510,7 +5021,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.54. <a name="syst_rem"></a>SYSTem:REMote</p>
+		<p class="Heading_3">5.16.59. <a name="syst_rem"></a>SYSTem:REMote</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4548,14 +5059,14 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.55. <a name="syst_res"></a>SYSTem:RESet</p>
+		<p class="Heading_3">5.16.60. <a name="syst_res"></a>SYSTem:REStart</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SYSTem:RESet</p>
+					<p class="cmd_root">SYSTem:REStart</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -4584,7 +5095,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.56. <a name="syst_rwl"></a>SYSTem:RWLock</p>
+		<p class="Heading_3">5.16.61. <a name="syst_rwl"></a>SYSTem:RWLock</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4621,7 +5132,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.57. <a name="syst_temp_prot"></a>SYSTem:TEMPerature:PROTection[:HIGH][:LEVel]</p>
+		<p class="Heading_3">5.16.62. <a name="syst_temp_prot"></a>SYSTem:TEMPerature:PROTection[:HIGH][:LEVel]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4720,7 +5231,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.58. <a name="syst_temp_prot_cle"></a>SYSTem:TEMPerature:PROTection[:HIGH]:CLEar</p>
+		<p class="Heading_3">5.16.63. <a name="syst_temp_prot_cle"></a>SYSTem:TEMPerature:PROTection[:HIGH]:CLEar</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4787,7 +5298,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.59. <a name="syst_temp_prot_del"></a>SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]</p>
+		<p class="Heading_3">5.16.64. <a name="syst_temp_prot_del"></a>SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4878,7 +5389,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.60. <a name="syst_temp_prot_stat"></a>SYSTem:TEMPerature:PROTection[:HIGH]:STATe </p>
+		<p class="Heading_3">5.16.65. <a name="syst_temp_prot_stat"></a>SYSTem:TEMPerature:PROTection[:HIGH]:STATe </p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4969,7 +5480,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.61. <a name="syst_temp_prot_trip"></a>SYSTem:TEMPerature:PROTection[:HIGH]:TRIPped?</p>
+		<p class="Heading_3">5.16.66. <a name="syst_temp_prot_trip"></a>SYSTem:TEMPerature:PROTection[:HIGH]:TRIPped?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5046,7 +5557,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.62. <a name="syst_time"></a>SYSTem:TIME</p>
+		<p class="Heading_3">5.16.67. <a name="syst_time"></a>SYSTem:TIME</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5152,10 +5663,11 @@ a:hover {
 					<p>*TST?</p>
 					<p>DIAGnostic[:INFOrmation]:TEST?</p>
 					<p>SYSTem:DATE</p>
+					<p>SYSTem:FORMat:TIME</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.63. <a name="syst_time_dst"></a>SYSTem:TIME:DST</p>
+		<p class="Heading_3">5.16.68. <a name="syst_time_dst"></a>SYSTem:TIME:DST</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5234,7 +5746,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.64. <a name="syst_time_zone"></a>SYSTem:TIME:ZONE</p>
+		<p class="Heading_3">5.16.69. <a name="syst_time_zone"></a>SYSTem:TIME:ZONE</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5313,7 +5825,7 @@ a:hover {
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.16.65. <a name="syst_vers"></a>SYSTem:VERSion?</p>
+		<p class="Heading_3">5.16.70. <a name="syst_vers"></a>SYSTem:VERSion?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 152.928mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">

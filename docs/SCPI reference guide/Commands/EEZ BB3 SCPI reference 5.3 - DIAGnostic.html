@@ -27,9 +27,6 @@
 			.scpi1 { text-align: left; margin-left: 4.99mm; }
 			.scpi2 { text-align: left; margin-left: 10mm; }
 			.table_header { text-align: center; }
-			.DCM220 { font-family: "Arial"; font-size: 12.0pt; font-weight: bold; font-style: normal; background-color: #66ccff; color: #ffffff; }
-			.DCP405 { font-family: "Arial"; font-size: 12.0pt; font-weight: bold; font-style: normal; background-color: #ff6600; color: #ffffff; }
-			.DCP405B { font-family: "Arial"; font-size: 12.0pt; font-weight: bold; font-style: normal; background-color: #cc9900; color: #ffffff; }
 			
 			/* Footnotes & endnotes */
 			#webpub_footnotes_divider { clear: both; margin-top: 2em; width: 25%; border-top: 1px solid black; }
@@ -92,14 +89,6 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 54%;">
-					<p class="scpi2"><a href="#diag_fan"><span style="text-decoration: underline;">:FAN?</span></a></p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 46%;">
-					<p>Returns status of the cooling fan.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 54%;">
 					<p class="scpi2"><a href="#diag_prot"><span style="text-decoration: underline;">:PROTection?</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 46%;">
@@ -124,14 +113,6 @@
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">DIAGnostic[:INFOrmation]:ADC? [&lt;channel&gt;]</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -202,54 +183,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.3.2. <a name="diag_fan"></a>DIAGnostic[:INFOrmation]:FAN?</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DIAGnostic[:INFOrmation]:FAN?</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Use this query to obtain information about cooling fan state.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Return</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Returns -1 if cooling fan is not installed (see SYSTem:CPU:[INFOrmation]?), 0 if fan is stalled (fault condition) or measured fan speed in rpm.</p>
-					<p>&#160;</p>
-					<p>Cooling fan is periodically tested while it’s working (that depends of measured channel’s temperature sensor value). When it does not passed the test, programmed output current is automatically limited to 2&#160;A.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">DIAG:FAN?</p>
-					<p class="cmd_code_Start">1205.00</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="scpi2" style="margin-left: 0;">MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]</p>
-					<p class="scpi2" style="margin-left: 0;">SYSTem:CPU:[INFOrmation]</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.3.3. <a name="diag_cal"></a>DIAGnostic[:INFOrmation]:CALibration?</p>
+		<p class="Heading_3">5.3.2. <a name="diag_cal"></a>DIAGnostic[:INFOrmation]:CALibration?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -257,14 +191,6 @@
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">DIAGnostic[:INFOrmation]:CALibration? [&lt;channel&gt;]</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -319,9 +245,10 @@
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Calibration parameters for BB3 when the channel 1 is not in the calibration mode:</p>
-					<p class="cmd_code_Start">DIAG:INFO:CAL? CH1</p>
-					<p class="cmd_code_single">&quot;remark=20161211 he2&quot;,&quot;u_cal_params_exists=1&quot;,&quot;u_min_level=0.15V&quot;,&quot;u_min_data=0.13<br>V&quot;,&quot;u_min_adc=0.11V&quot;,&quot;u_mid_level=19.10V&quot;,&quot;u_mid_data=19.07V&quot;,&quot;u_<br>mid_adc=18.75V&quot;,&quot;u_max_level=38.00V&quot;,&quot;u_max_data=37.90V&quot;,&quot;u_max_a<br>dc=37.35V&quot;,&quot;u_min_range=0.019735V&quot;,&quot;u_max_range=39.997578V&quot;,&quot;i_ca<br>l_params_exists=1&quot;,&quot;i_min_level=0.05A&quot;,&quot;i_min_data=0.04A&quot;,&quot;i_min_<br>adc=0.04A&quot;,&quot;i_mid_level=2.42A&quot;,&quot;i_mid_data=2.42A&quot;,&quot;i_mid_adc=2.42<br>A&quot;,&quot;i_max_level=4.80A&quot;,&quot;i_max_data=4.81A&quot;,&quot;i_max_adc=4.79A&quot;,&quot;i_mi<br>n_range=0.012135A&quot;,&quot;i_max_range=4.999954A&quot;</p>
+					<p>Calibration parameters for BB3 when the channel 2 is not in the calibration mode:</p>
+					<p class="cmd_code_Start">DIAG:INFO:CAL? CH2</p>
+					<p class="cmd_code_single">&quot;remark=20200123 cert&quot;, &quot;u_cal_params_exists=1&quot;, &quot;u_min_level=0.15V&quot;, &quot;u_min_data=0.08V&quot;, &quot;u_min_adc=0.114V&quot;, &quot;u_mid_level=20V&quot;, &quot;u_mid_data=20.597V&quot;, &quot;u_mid_adc=19.9685V&quot;, &quot;u_max_level=38V&quot;, &quot;u_max_data=39.192V&quot;, &quot;u_max_adc=37.973V&quot;, &quot;u_min_range=0V&quot;, &quot;u_max_range=40V&quot;, &quot;i_5A_cal_params_exists=1&quot;, &quot;i_5A_min_level=0.05A&quot;, &quot;i_5A_min_data=0.0405A&quot;, &quot;i_5A_min_adc=0.03695A&quot;, &quot;i_5A_mid_level=2.425A&quot;, &quot;i_5A_mid_data=2.4757A&quot;,</p>
+					<p class="cmd_code_single">&quot;i_5A_mid_adc=2.4125A&quot;, &quot;i_5A_max_level=4.8A&quot;, &quot;i_5A_max_data=4.9122A&quot;, &quot;i_5A_max_adc=4.78855A&quot;, &quot;i_5A_min_range=0A&quot;, &quot;i_5A_max_range=5A&quot;, &quot;i_50mA_cal_params_exists=1&quot;, &quot;i_50mA_min_level=0.0005A&quot;, &quot;i_50mA_min_data=0.00041A&quot;, &quot;i_50mA_min_adc=0.000371A&quot;, &quot;i_50mA_mid_level=0.02425A&quot;, &quot;i_50mA_mid_data=0.02545A&quot;, &quot;i_50mA_mid_adc=0.0240945A&quot;, &quot;i_50mA_max_level=0.048A&quot;, &quot;i_50mA_max_data=0.05052A&quot;, &quot;i_50mA_max_adc=0.047887A&quot;, &quot;i_50mA_min_range=0A&quot;, &quot;i_50mA_max_range=0A&quot;</p>
 					<p>The query results when a channel is just entered the calibration mode:</p>
 					<p class="cmd_code_Start">DIAG:INFO:CAL?</p>
 					<p class="cmd_code_Start">&quot;u_level=none&quot;, &quot;i_level=none&quot;</p>
@@ -340,7 +267,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.3.4. <a name="diag_prot"></a>DIAGnostic[:INFOrmation]:PROTection?</p>
+		<p class="Heading_3">5.3.3. <a name="diag_prot"></a>DIAGnostic[:INFOrmation]:PROTection?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -348,14 +275,6 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">DIAGnostic[:INFOrmation]:PROTection?</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -380,30 +299,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_code_End">DIAG:PROT?</p>
-					<p class="cmd_code">&quot;CH1 u_tripped=0&quot;,</p>
-					<p class="cmd_code">&quot;CH1 u_state=0&quot;,</p>
-					<p class="cmd_code">&quot;CH1 u_type=1&quot;,</p>
-					<p class="cmd_code">&quot;CH1 u_delay=5 ms&quot;,</p>
-					<p class="cmd_code">&quot;CH1 u_level=38V&quot;,</p>
-					<p class="cmd_code">&quot;CH1 i_tripped=0&quot;,</p>
-					<p class="cmd_code">&quot;CH1 i_state=0&quot;,</p>
-					<p class="cmd_code">&quot;CH1 i_delay=20 ms&quot;,</p>
-					<p class="cmd_code">&quot;CH1 p_tripped=0&quot;,</p>
-					<p class="cmd_code">&quot;CH1 p_state=0&quot;,</p>
-					<p class="cmd_code">&quot;CH1 p_delay=10 s&quot;,</p>
-					<p class="cmd_code">&quot;CH1 p_level=155W&quot;,</p>
-					<p class="cmd_code">&quot;CH2 u_tripped=0&quot;,</p>
-					<p class="cmd_code">&quot;CH2 u_state=0&quot;,</p>
-					<p class="cmd_code">&quot;CH2 u_type=0&quot;,</p>
-					<p class="cmd_code">&quot;CH2 u_delay=5 ms&quot;,</p>
-					<p class="cmd_code">&quot;CH2 u_level=40V&quot;,</p>
-					<p class="cmd_code">&quot;CH2 i_tripped=0&quot;,</p>
-					<p class="cmd_code">&quot;CH2 i_state=0&quot;,</p>
-					<p class="cmd_code">&quot;CH2 i_delay=20 ms&quot;,</p>
-					<p class="cmd_code">&quot;CH2 p_tripped=0&quot;,</p>
-					<p class="cmd_code">&quot;CH2 p_state=1&quot;,</p>
-					<p class="cmd_code">&quot;CH2 p_delay=10 s&quot;,</p>
-					<p class="cmd_code">&quot;CH2 p_level=155W&quot;</p>
+					<p class="cmd_code">&quot;CH1 u_tripped=0&quot;, &quot;CH1 u_state=0&quot;, &quot;CH1 u_type=1&quot;, &quot;CH1 u_delay=5 ms&quot;, &quot;CH1 u_level=38V&quot;, &quot;CH1 i_tripped=0&quot;, &quot;CH1 i_state=0&quot;, &quot;CH1 i_delay=20 ms&quot;, &quot;CH1 p_tripped=0&quot;, &quot;CH1 p_state=0&quot;, &quot;CH1 p_delay=10 s&quot;, &quot;CH1 p_level=155W&quot;, &quot;CH2 u_tripped=0&quot;, &quot;CH2 u_state=0&quot;, &quot;CH2 u_type=0&quot;, &quot;CH2 u_delay=5 ms&quot;, &quot;CH2 u_level=40V&quot;, &quot;CH2 i_tripped=0&quot;, &quot;CH2 i_state=0&quot;, &quot;CH2 i_delay=20 ms&quot;, &quot;CH2 p_tripped=0&quot;, &quot;CH2 p_state=1&quot;, &quot;CH2 p_delay=10 s&quot;, &quot;CH2 p_level=155W&quot;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -428,7 +324,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.3.5. <a name="diag_test"></a>DIAGnostic[:INFOrmation]:TEST?</p>
+		<p class="Heading_3">5.3.4. <a name="diag_test"></a>DIAGnostic[:INFOrmation]:TEST?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -436,14 +332,6 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">DIAGnostic[:INFOrmation]:TEST?</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -475,18 +363,7 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>Return self-test results when SD card is not found:</p>
 					<p class="cmd_code_Start">DIAG:TEST?</p>
-					<p class="cmd_code">&quot;2, EEPROM, installed, passed&quot;,</p>
-					<p class="cmd_code">&quot;1, SD card, installed, failed&quot;,</p>
-					<p class="cmd_code">&quot;2, Ethernet, installed, passed&quot;,</p>
-					<p class="cmd_code">&quot;2, RTC, installed, passed&quot;,</p>
-					<p class="cmd_code">&quot;2, DateTime, installed, passed&quot;,</p>
-					<p class="cmd_code">&quot;4, BP option, not installed, failed&quot;,</p>
-					<p class="cmd_code">&quot;2, Fan, installed, passed&quot;,</p>
-					<p class="cmd_code">&quot;2, AUX temp, installed, passed&quot;,</p>
-					<p class="cmd_code">&quot;2, CH1 temp, installed, passed&quot;,</p>
-					<p class="cmd_code">&quot;2, CH2 temp, installed, passed&quot;,</p>
-					<p class="cmd_code">&quot;2, CH3 temp, installed, passed&quot;,</p>
-					<p class="cmd_code">&quot;2, CH4 temp, installed, passed&quot;</p>
+					<p class="cmd_code_Start">&quot;2, EEPROM, installed, passed&quot;, &quot;2, SD card, installed, passed&quot;, &quot;2, Ethernet, installed, passed&quot;, &quot;2, RTC, installed, passed&quot;, &quot;2, DateTime, installed, passed&quot;, &quot;2, Fan, installed, passed&quot;, &quot;2, AUX temp, installed, passed&quot;, &quot;2, CH1 temp, installed, passed&quot;, &quot;2, CH2 temp, installed, passed&quot;, &quot;2, CH3 temp, installed, passed&quot;, &quot;2, CH4 temp, installed, passed&quot;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
