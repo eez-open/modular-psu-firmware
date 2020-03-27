@@ -317,74 +317,16 @@ scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
     char buffer[128] = { 0 };
 
     for (int i = 0; i < devices::numDevices; ++i) {
-        devices::Device &device = devices::devices[i];
+        if (devices::deviceExists(i)) {
+            devices::Device &device = devices::devices[i];
 
-        sprintf(buffer, "%d, %s, %s, %s",
-                device.testResult ? (int)*device.testResult : TEST_SKIPPED, device.deviceName,
-                devices::getInstalledString(device.installed),
-                devices::getTestResultString(*device.testResult));
-        SCPI_ResultText(context, buffer);
+            sprintf(buffer, "%d, %s, %s, %s",
+                    device.testResult ? (int)*device.testResult : TEST_SKIPPED, device.deviceName,
+                    devices::getInstalledString(device.installed),
+                    devices::getTestResultString(*device.testResult));
+            SCPI_ResultText(context, buffer);
+        }
     }
-
-    //    sprintf(buffer, "%d, EEPROM, %s, %s",
-    //        eeprom::g_testResult, get_installed_str(OPTION_EXT_EEPROM),
-    //        get_test_result_str(eeprom::g_testResult));
-    //    SCPI_ResultText(context, buffer);
-    //
-    //    sprintf(buffer, "%d, Ethernet, %s, %s",
-    //        ethernet::g_testResult, get_installed_str(OPTION_ETHERNET),
-    //        get_test_result_str(ethernet::g_testResult));
-    //    SCPI_ResultText(context, buffer);
-    //
-    //    sprintf(buffer, "%d, RTC, %s, %s",
-    //        rtc::g_testResult, get_installed_str(OPTION_EXT_RTC),
-    //        get_test_result_str(rtc::g_testResult));
-    //    SCPI_ResultText(context, buffer);
-    //
-    //    sprintf(buffer, "%d, DateTime, %s, %s",
-    //        datetime::g_testResult, get_installed_str(true),
-    //        get_test_result_str(datetime::g_testResult));
-    //    SCPI_ResultText(context, buffer);
-    //
-    //    sprintf(buffer, "%d, BP option, %s, %s",
-    //        TEST_SKIPPED, get_installed_str(OPTION_BP), get_test_result_str(TEST_SKIPPED));
-    //    SCPI_ResultText(context, buffer);
-    //
-    //	for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-    //		temp_sensor::TempSensor &sensor = temp_sensor::sensors[i];
-    //		sprintf(buffer, "%d, %s temp, %s, %s",
-    //			sensor.g_testResult, sensor.name, get_installed_str(sensor.installed ? true :
-    //false), get_test_result_str(sensor.g_testResult)); 		SCPI_ResultText(context,
-    // buffer);
-    //	}
-    //
-    // #if OPTION_FAN    
-    //  sprintf(buffer, "%d, Fan, %s, %s",
-    //      aux_ps::fan::g_testResult, get_installed_str(OPTION_FAN),
-    //      get_test_result_str(aux_ps::fan::g_testResult));
-    //  SCPI_ResultText(context, buffer);
-    // #endif
-    //
-    //	if (isPowerUp()) {
-    //        for (int i = 0; i < CH_NUM; ++i) {
-    //            Channel *channel = &Channel::get(i);
-    //
-    //            sprintf(buffer, "%d, CH%d IOEXP, installed, %s",
-    //                channel->ioexp.g_testResult, channel->channelIndex + 1,
-    //                get_test_result_str((TestResult)channel->ioexp.g_testResult));
-    //            SCPI_ResultText(context, buffer);
-    //
-    //            sprintf(buffer, "%d, CH%d DAC, installed, %s",
-    //                channel->dac.g_testResult, channel->channelIndex + 1,
-    //                get_test_result_str((TestResult)channel->dac.g_testResult));
-    //            SCPI_ResultText(context, buffer);
-    //
-    //            sprintf(buffer, "%d, CH%d ADC, installed, %s",
-    //                channel->adc.g_testResult, channel->channelIndex + 1,
-    //                get_test_result_str((TestResult)channel->adc.g_testResult));
-    //            SCPI_ResultText(context, buffer);
-    //        }
-    //    }
 
     return SCPI_RES_OK;
 }

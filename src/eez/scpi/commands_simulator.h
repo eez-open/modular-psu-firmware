@@ -257,8 +257,10 @@
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:PROGram?", scpi_cmd_systemChannelInformationProgramQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:VOLTage?", scpi_cmd_systemChannelInformationVoltageQ) \
     SCPI_COMMAND("SYSTem:CHANnel:MODel?", scpi_cmd_systemChannelModelQ) \
-    SCPI_COMMAND("SYSTem:CHANnel:SERial?", scpi_cmd_systemChannelSerialQ) \
+    SCPI_COMMAND("SYSTem:CHANnel:VERSion?", scpi_cmd_systemChannelVersionQ) \
+    SCPI_COMMAND("SYSTem:CHANnel:SNO?", scpi_cmd_systemChannelSnoQ) \
     SCPI_COMMAND("SYSTem:CHANnel[:COUNt]?", scpi_cmd_systemChannelCountQ) \
+    SCPI_COMMAND("SYSTem:CHANnel:SLOT?", scpi_cmd_systemChannelSlotQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:ENABle", scpi_cmd_systemCommunicateEnable) \
     SCPI_COMMAND("SYSTem:COMMunicate:ENABle?", scpi_cmd_systemCommunicateEnableQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:ETHernet:ADDRess", scpi_cmd_systemCommunicateEthernetAddress) \
@@ -288,8 +290,8 @@
     SCPI_COMMAND("SYSTem:CPU:MODel?", scpi_cmd_systemCpuModelQ) \
     SCPI_COMMAND("SYSTem:DATE", scpi_cmd_systemDate) \
     SCPI_COMMAND("SYSTem:DATE?", scpi_cmd_systemDateQ) \
-    SCPI_COMMAND("SYSTem:DATE:FORMat", scpi_cmd_systemDateFormat) \
-    SCPI_COMMAND("SYSTem:DATE:FORMat?", scpi_cmd_systemDateFormatQ) \
+    SCPI_COMMAND("SYSTem:FORMat:DATE", scpi_cmd_systemFormatDate) \
+    SCPI_COMMAND("SYSTem:FORMat:DATE?", scpi_cmd_systemFormatDateQ) \
     SCPI_COMMAND("SYSTem:DIGital:INPut:DATA?", scpi_cmd_systemDigitalInputDataQ) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:DATA", scpi_cmd_systemDigitalOutputData) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:DATA?", scpi_cmd_systemDigitalOutputDataQ) \
@@ -316,7 +318,7 @@
     SCPI_COMMAND("SYSTem:POWer:PROTection:TRIP?", scpi_cmd_systemPowerProtectionTripQ) \
     SCPI_COMMAND("SYSTem:POWer?", scpi_cmd_systemPowerQ) \
     SCPI_COMMAND("SYSTem:REMote", scpi_cmd_systemRemote) \
-    SCPI_COMMAND("SYSTem:RESet", scpi_cmd_systemReset) \
+    SCPI_COMMAND("SYSTem:REStart", scpi_cmd_systemRestart) \
     SCPI_COMMAND("SYSTem:RWLock", scpi_cmd_systemRwlock) \
     SCPI_COMMAND("SYSTem:TEMPerature:PROTection[:HIGH]:CLEar", scpi_cmd_systemTemperatureProtectionHighClear) \
     SCPI_COMMAND("SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]", scpi_cmd_systemTemperatureProtectionHighDelayTime) \
@@ -332,8 +334,8 @@
     SCPI_COMMAND("SYSTem:TIME:ZONE", scpi_cmd_systemTimeZone) \
     SCPI_COMMAND("SYSTem:TIME:ZONE?", scpi_cmd_systemTimeZoneQ) \
     SCPI_COMMAND("SYSTem:TIME?", scpi_cmd_systemTimeQ) \
-    SCPI_COMMAND("SYSTem:TIME:FORMat", scpi_cmd_systemTimeFormat) \
-    SCPI_COMMAND("SYSTem:TIME:FORMat?", scpi_cmd_systemTimeFormatQ) \
+    SCPI_COMMAND("SYSTem:FORMat:TIME", scpi_cmd_systemFormatTime) \
+    SCPI_COMMAND("SYSTem:FORMat:TIME?", scpi_cmd_systemFormatTimeQ) \
     SCPI_COMMAND("SYSTem:VERSion?", scpi_cmd_systemVersionQ) \
     SCPI_COMMAND("SYSTem:FAN:STATus?", scpi_cmd_systemFanStatusQ) \
     SCPI_COMMAND("SYSTem:FAN:SPEed?", scpi_cmd_systemFanSpeedQ) \

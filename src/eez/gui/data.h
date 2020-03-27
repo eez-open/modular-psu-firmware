@@ -100,6 +100,11 @@ struct Value {
     {
     }
 
+    Value(int value, ValueType type, uint16_t options)
+        : type_(type), options_(options), unit_(UNIT_UNKNOWN), int_(value) 
+    {
+    }
+
     Value(uint8_t value, ValueType type)
         : type_(type), options_(0), unit_(UNIT_UNKNOWN), uint8_(value) 
     {

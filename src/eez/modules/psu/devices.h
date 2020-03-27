@@ -31,6 +31,8 @@ struct Device {
 extern Device devices[];
 extern int numDevices;
 
+bool deviceExists(int deviceIndex);
+
 bool anyFailed();
 void getSelfTestResultString(char *, int MAX_LENGTH);
 

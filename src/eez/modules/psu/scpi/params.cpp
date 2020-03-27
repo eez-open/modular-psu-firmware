@@ -87,10 +87,71 @@ Channel *param_channel(scpi_t *context, scpi_bool_t mandatory, scpi_bool_t skip_
         channelIndex--;
     }
 
-    if (!skip_channel_check && !check_channel(context, channelIndex))
+    if (!skip_channel_check && !check_channel(context, channelIndex)) {
         return 0;
+    }
 
     return &Channel::get(channelIndex);
+}
+
+uint16_t param_channels(scpi_t *context, scpi_bool_t mandatory, scpi_bool_t skip_channel_check) {
+    scpi_parameter_t parameter;
+    if (!SCPI_Parameter(context, &parameter, mandatory)) {
+        if (mandatory || SCPI_ParamErrorOccurred(context)) {
+            return 0;
+        }
+        scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
+        int channelIndex = psu_context->selected_channel_index;
+        if (!skip_channel_check && !check_channel(context, channelIndex)) {
+            return 0;
+        }
+        return 1 << channelIndex;
+    }
+    
+    return param_channels(context, &parameter, skip_channel_check);
+}
+
+uint16_t param_channels(scpi_t *context, scpi_parameter_t *parameter, scpi_bool_t skip_channel_check) {
+    uint16_t channels = 0;
+
+    if (parameter->type == SCPI_TOKEN_PROGRAM_EXPRESSION) {
+        bool isRange;
+        int32_t valueFrom;
+        int32_t valueTo;
+        for (int i = 0; ; i++) {
+            scpi_expr_result_t result = SCPI_ExprNumericListEntryInt(context, parameter, i, &isRange, &valueFrom, &valueTo);
+            if (result == SCPI_EXPR_OK) {
+                if (isRange) {
+                    for (int value = valueFrom; value <= valueTo; value++) {
+                        channels |= (1 << (value - 1));
+                    }
+                } else {
+                    channels |= (1 << (valueFrom - 1));
+                }
+            } else if (result == SCPI_EXPR_NO_MORE) {
+                break;
+            } else {
+                return 0;
+            }
+        }
+    } else {
+        int32_t channelIndex;
+        if (!SCPI_ParamToChoice(context, parameter, channel_choice, &channelIndex)) {
+            return 0;
+        }
+        channelIndex--;
+        channels = 1 << channelIndex;
+    }
+
+    if (!skip_channel_check) {
+        for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+            if ((channels & (1 << channelIndex)) && !check_channel(context, channelIndex)) {
+                return 0;
+            }
+        }
+    }
+
+    return channels;
 }
 
 Channel *set_channel_from_command_number(scpi_t *context) {

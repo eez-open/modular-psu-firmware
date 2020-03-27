@@ -651,7 +651,7 @@ void FLOAT_LIST_value_to_text(const Value &value, char *text, int count) {
 bool compare_CHANNEL_TITLE_value(const Value &a, const Value &b) {
     Channel &aChannel = Channel::get(a.getInt());
     Channel &bChannel = Channel::get(b.getInt());
-    return aChannel.channelIndex == bChannel.channelIndex && aChannel.flags.trackingEnabled == bChannel.flags.trackingEnabled;
+    return aChannel.channelIndex == bChannel.channelIndex && a.getOptions() == b.getOptions();
 }
 
 void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
@@ -666,7 +666,7 @@ void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
 bool compare_CHANNEL_SHORT_TITLE_value(const Value &a, const Value &b) {
     Channel &aChannel = Channel::get(a.getInt());
     Channel &bChannel = Channel::get(b.getInt());
-    return aChannel.channelIndex == bChannel.channelIndex && aChannel.flags.trackingEnabled == bChannel.flags.trackingEnabled;
+    return aChannel.channelIndex == bChannel.channelIndex && a.getOptions() == b.getOptions();
 }
 
 void CHANNEL_SHORT_TITLE_value_to_text(const Value &value, char *text, int count) {
@@ -1074,10 +1074,12 @@ void data_channel_u_mon(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
+        } else if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+            value = Value(COLOR_ID_DATA_LOGGING_BACKGROUND, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
@@ -1099,9 +1101,13 @@ void data_channel_u_mon_dac(DataOperationEnum operation, Cursor cursor, Value &v
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMonDac(channel), UNIT_VOLT);
-    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
+            value = Value(COLOR_ID_DATA_LOGGING_BACKGROUND, VALUE_TYPE_UINT16);
         }
     }
 }
@@ -1177,10 +1183,12 @@ void data_channel_i_mon(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
+        } else if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+            value = Value(COLOR_ID_DATA_LOGGING_BACKGROUND, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
@@ -1202,9 +1210,13 @@ void data_channel_i_mon_dac(DataOperationEnum operation, Cursor cursor, Value &v
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMonDac(channel), UNIT_AMPER);
-    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+        }
+    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
+            value = Value(COLOR_ID_DATA_LOGGING_BACKGROUND, VALUE_TYPE_UINT16);
         }
     } 
 }
@@ -1268,13 +1280,16 @@ void data_channel_p_mon(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
     } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = UNIT_WATT;
     } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
+        } else if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logPower[iChannel]) {
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logPower[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+            value = Value(COLOR_ID_DATA_LOGGING_BACKGROUND, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
@@ -1963,14 +1978,14 @@ void data_channel_short_label(DataOperationEnum operation, Cursor cursor, Value 
 void data_channel_title(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = Value(iChannel, VALUE_TYPE_CHANNEL_TITLE);
+        value = Value(iChannel, VALUE_TYPE_CHANNEL_TITLE, Channel::get(iChannel).flags.trackingEnabled);
     }
 }
 
 void data_channel_short_title(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE);
+        value = Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE, Channel::get(iChannel).flags.trackingEnabled);
     }
 }
 

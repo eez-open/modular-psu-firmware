@@ -28,6 +28,8 @@ extern scpi_choice_def_t channel_choice[];
 extern scpi_choice_def_t unitChoice[];
 
 Channel *param_channel(scpi_t *context, scpi_bool_t mandatory = FALSE, scpi_bool_t skip_channel_check = FALSE);
+uint16_t param_channels(scpi_t *context, scpi_bool_t mandatory = FALSE, scpi_bool_t skip_channel_check = FALSE);
+uint16_t param_channels(scpi_t *context, scpi_parameter_t *parameter, scpi_bool_t skip_channel_check = FALSE);
 bool check_channel(scpi_t *context, int32_t channelIndex);
 Channel *set_channel_from_command_number(scpi_t *context);
 

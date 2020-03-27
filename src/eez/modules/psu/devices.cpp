@@ -73,12 +73,6 @@ Device devices[] = {
 
     { "DateTime", true, &datetime::g_testResult },
 
-#if OPTION_BP
-    { "BP option", OPTION_BP, &bp::g_testResult },
-#else
-    { "BP option", 0, 0 },
-#endif
-
 #if OPTION_FAN
     { "Fan", OPTION_FAN, &aux_ps::fan::g_testResult },
 #endif
@@ -90,6 +84,15 @@ Device devices[] = {
 #undef CHANNEL
 
 int numDevices = sizeof(devices) / sizeof(Device);
+
+bool deviceExists(int deviceIndex) {
+    int firstTempSensorDeviceIndex = numDevices - temp_sensor::NUM_TEMP_SENSORS;
+    int tempSensorIndex = deviceIndex - firstTempSensorDeviceIndex;
+    if (tempSensorIndex < 0) {
+        return true;
+    }
+    return temp_sensor::sensors[tempSensorIndex].isInstalled();
+}
 
 bool anyFailed() {
     for (int i = 0; i < numDevices; ++i) {

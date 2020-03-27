@@ -179,7 +179,29 @@ bool isConnected() {
 }
 
 void update() {
-    // TODO
+    static TestResult g_testResultAtBoot;
+
+    if (persist_conf::isEthernetEnabled()) {
+        auto callBeginServer = g_testResult == TEST_SKIPPED && g_testResultAtBoot == TEST_OK;
+
+        g_testResult = g_testResultAtBoot;
+
+        if (callBeginServer) {
+            eez::mcu::ethernet::beginServer(persist_conf::devConf.ethernetScpiPort);
+        }
+    } else {
+        if (g_isConnected) {
+            eez::mcu::ethernet::disconnectClient();
+            g_isConnected = false;
+        }
+
+        eez::mcu::ethernet::endServer();
+
+        if (g_testResult != TEST_SKIPPED) {
+            g_testResultAtBoot = g_testResult;
+        }
+        g_testResult = TEST_SKIPPED;
+    }
 }
 
 } // namespace ethernet

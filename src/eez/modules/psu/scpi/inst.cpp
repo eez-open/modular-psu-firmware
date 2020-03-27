@@ -352,14 +352,34 @@ scpi_result_t scpi_cmd_instrumentMemoryQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_instrumentCatalogFullQ(scpi_t *context) {
-    SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-    return SCPI_RES_ERR;
+scpi_result_t scpi_cmd_instrumentCatalogQ(scpi_t *context) {
+    if (CH_NUM > 0) {
+        for (int i = 0; i < CH_NUM; i++) {
+            auto &channel = Channel::get(i);
+            char channelStr[10];
+            sprintf(channelStr, "CH%d", channel.channelIndex + 1);
+            SCPI_ResultText(context, channelStr);
+        }
+    } else {
+        SCPI_ResultText(context, "");
+    }
+    return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_instrumentCatalogQ(scpi_t *context) {
-    SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-    return SCPI_RES_ERR;
+scpi_result_t scpi_cmd_instrumentCatalogFullQ(scpi_t *context) {
+    if (CH_NUM > 0) {
+        for (int i = 0; i < CH_NUM; i++) {
+            auto &channel = Channel::get(i);
+            char channelStr[10];
+            sprintf(channelStr, "CH%d", channel.channelIndex + 1);
+            SCPI_ResultText(context, channelStr);
+            SCPI_ResultInt(context, channel.channelIndex + 1);
+        }
+    } else {
+        SCPI_ResultText(context, "");
+        SCPI_ResultInt(context, 0);
+    }
+    return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_instrumentCoupleTrigger(scpi_t *context) {

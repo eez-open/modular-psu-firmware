@@ -19,7 +19,6 @@
 #include <eez/modules/mcu/battery.h>
 
 #include <eez/modules/psu/psu.h>
-#include <scpi/scpi.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/system.h>
@@ -27,7 +26,11 @@
 
 #include <adc.h>
 #include <dma.h>
+#endif
 
+#include <scpi/scpi.h>
+
+#if defined(EEZ_PLATFORM_STM32)
 using namespace eez::mcu::battery;
 
 #define VBAT_DIV 4

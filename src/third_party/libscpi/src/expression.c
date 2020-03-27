@@ -96,9 +96,9 @@ scpi_expr_result_t SCPI_ExprNumericListEntry(scpi_t * context, scpi_parameter_t 
         return SCPI_EXPR_ERROR;
     }
 
-    lex.buffer = param->ptr + 1;
+    lex.buffer = param->ptr + 2;
     lex.pos = lex.buffer;
-    lex.len = param->len - 2;
+    lex.len = param->len - 3;
 
     for (i = 0; i <= index; i++) {
         res = numericRange(&lex, isRange, valueFrom, valueTo);

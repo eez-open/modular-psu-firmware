@@ -56,11 +56,13 @@ IPAddress gatewayIP();
 IPAddress dnsServerIP();
 
 void beginServer(uint16_t port);
+void endServer();
 
 void getInputBuffer(int bufferPosition, char **buffer, uint32_t *length);
 void releaseInputBuffer();
 
 int writeBuffer(const char *buffer, uint32_t length);
+void disconnectClient();
 
 void pushEvent(int16_t eventId);
 

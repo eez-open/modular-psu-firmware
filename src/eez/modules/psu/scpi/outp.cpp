@@ -89,24 +89,51 @@ scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    bool enable;
-    if (!SCPI_ParamBool(context, &enable, TRUE)) {
+    scpi_parameter_t parameter;
+    if (!SCPI_Parameter(context, &parameter, true)) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
+    if (parameter.type == SCPI_TOKEN_DECIMAL_NUMERIC_PROGRAM_DATA || parameter.type == SCPI_TOKEN_PROGRAM_MNEMONIC) {
+        int32_t enable;
+        if (
+            parameter.type == SCPI_TOKEN_DECIMAL_NUMERIC_PROGRAM_DATA && !SCPI_ParamToInt32(context, &parameter, &enable) ||
+            !SCPI_ParamToChoice(context, &parameter, scpi_bool_def, &enable)
+        ) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
+        if (enable) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
+        channel_dispatcher::setTrackingChannels(0);
+    } else {
+        uint16_t channels = param_channels(context, &parameter);
+        if (channels == 0) {
+            return SCPI_RES_ERR;
+        }
 
-    int err;
-    if (!channel_dispatcher::isTrackingAllowed(*channel, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
+        int numChannels = 0;
 
-    if (enable != channel->flags.trackingEnabled) {
-        channel->flags.trackingEnabled = enable;
+        for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+            if ((channels & (1 << channelIndex)) != 0) {
+                int err;
+                if (!channel_dispatcher::isTrackingAllowed(Channel::get(channelIndex), &err)) {
+                    SCPI_ErrorPush(context, err);
+                    return SCPI_RES_ERR;
+                }
+
+                numChannels++;
+            }
+        }
+
+        if (numChannels >= 2) {
+            channel_dispatcher::setTrackingChannels(channels);
+        } else {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
     }
 
     return SCPI_RES_OK;

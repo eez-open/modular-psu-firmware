@@ -106,6 +106,7 @@ void startThread() {
 enum {
 	QUEUE_MESSAGE_CONNECT,
 	QUEUE_MESSAGE_CREATE_TCP_SERVER,
+    QUEUE_MESSAGE_DESTROY_TCP_SERVER,
 	QUEUE_MESSAGE_ACCEPT_CLIENT,
 	QUEUE_MESSAGE_CLIENT_MESSAGE,
     QUEUE_MESSAGE_PUSH_EVENT,
@@ -222,6 +223,12 @@ static void onEvent(uint8_t eventType) {
 
 		netconn_listen(g_tcpListenConnection);
 		break;
+
+    case QUEUE_MESSAGE_DESTROY_TCP_SERVER:
+        netconn_close(g_tcpListenConnection);
+        netconn_delete(g_tcpListenConnection);
+        g_tcpListenConnection = nullptr;
+        break;
 
 	case QUEUE_MESSAGE_ACCEPT_CLIENT:
 		{
@@ -586,6 +593,18 @@ void onEvent(uint8_t eventType) {
     case QUEUE_MESSAGE_CREATE_TCP_SERVER:
         bind(g_port);
         break;
+
+    case QUEUE_MESSAGE_DESTROY_TCP_SERVER:
+#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
+        if (listen_socket != INVALID_SOCKET) {
+            closesocket(listen_socket);
+            listen_socket = INVALID_SOCKET;
+        }
+#else
+        close(listen_socket);
+        listen_socket = -1;
+#endif    
+        break;
     }
 }
 
@@ -685,6 +704,10 @@ void beginServer(uint16_t port) {
     osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_CREATE_TCP_SERVER, osWaitForever);
 }
 
+void endServer() {
+    osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_DESTROY_TCP_SERVER, osWaitForever);
+}
+
 void getInputBuffer(int bufferPosition, char **buffer, uint32_t *length) {
 #if defined(EEZ_PLATFORM_STM32)
 	if (!g_tcpClientConnection) {
@@ -757,6 +780,18 @@ int writeBuffer(const char *buffer, uint32_t length) {
     osDelay(1);
     return numWritten;
 #endif
+}
+
+void disconnectClient() {
+#if defined(EEZ_PLATFORM_STM32)
+	netconn_close(g_tcpClientConnection);
+	netconn_delete(g_tcpClientConnection);
+	g_tcpClientConnection = nullptr;
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    stop();
+#endif    
 }
 
 void pushEvent(int16_t eventId) {

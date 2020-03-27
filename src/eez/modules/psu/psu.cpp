@@ -694,7 +694,7 @@ const char *getCpuModel() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     return "Simulator, " FIRMWARE;
 #elif defined(EEZ_PLATFORM_STM32)
-    return "STM32, " FIRMWARE;
+    return "STM32F7, " FIRMWARE;
 #endif
 }
 
@@ -702,7 +702,7 @@ const char *getCpuType() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     return "Simulator";
 #elif defined(EEZ_PLATFORM_STM32)
-    return "STM32";
+    return "STM32F7";
 #endif
 }
 

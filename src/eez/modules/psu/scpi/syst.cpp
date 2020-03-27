@@ -533,8 +533,24 @@ scpi_result_t scpi_cmd_systemChannelModelQ(scpi_t *context) {
 
     if (channel->isInstalled()) {
         auto &slot = g_slots[channel->slotIndex];
+        SCPI_ResultText(context, slot.moduleInfo->moduleName);
+    } else {
+        SCPI_ResultText(context, "None");
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemChannelVersionQ(scpi_t *context) {
+    Channel *channel = param_channel(context, false, true);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (channel->isInstalled()) {
+        auto &slot = g_slots[channel->slotIndex];
         char text[50];
-        sprintf(text, "%s_R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+        sprintf(text, "R%dB%d", (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
         SCPI_ResultText(context, text);
     } else {
         SCPI_ResultText(context, "None");
@@ -543,7 +559,7 @@ scpi_result_t scpi_cmd_systemChannelModelQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemChannelSerialQ(scpi_t *context) {
+scpi_result_t scpi_cmd_systemChannelSnoQ(scpi_t *context) {
     Channel *channel = param_channel(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -556,6 +572,17 @@ scpi_result_t scpi_cmd_systemChannelSerialQ(scpi_t *context) {
     } else {
         SCPI_ResultText(context, "None");
     }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemChannelSlotQ(scpi_t *context) {
+    Channel *channel = param_channel(context, false, true);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultInt(context, channel->slotIndex + 1);
 
     return SCPI_RES_OK;
 }
@@ -1562,14 +1589,9 @@ scpi_result_t scpi_cmd_systemDigitalOutputPwmDutyQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemReset(scpi_t *context) {
-#if defined(EEZ_PLATFORM_STM32)
+scpi_result_t scpi_cmd_systemRestart(scpi_t *context) {
 	restart();
 	return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif
 }
 
 scpi_result_t scpi_cmd_systemCommunicateMqttSettings(scpi_t *context) {
@@ -1687,7 +1709,7 @@ scpi_choice_def_t dateFormatChoice[] = {
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
-scpi_result_t scpi_cmd_systemDateFormat(scpi_t *context) {
+scpi_result_t scpi_cmd_systemFormatDate(scpi_t *context) {
     int32_t dateFormat;
     if (!SCPI_ParamChoice(context, dateFormatChoice, &dateFormat, TRUE)) {
         return SCPI_RES_ERR;
@@ -1704,13 +1726,13 @@ scpi_result_t scpi_cmd_systemDateFormat(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemDateFormatQ(scpi_t *context) {
+scpi_result_t scpi_cmd_systemFormatDateQ(scpi_t *context) {
     using namespace datetime;
     resultChoiceName(context, dateFormatChoice, persist_conf::devConf.dateTimeFormat == FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == FORMAT_DMY_12 ? 1 : 2);
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemTimeFormat(scpi_t *context) {
+scpi_result_t scpi_cmd_systemFormatTime(scpi_t *context) {
     int32_t timeFormat;
     if (!SCPI_ParamInt(context, &timeFormat, TRUE)) {
         return SCPI_RES_ERR;
@@ -1731,7 +1753,7 @@ scpi_result_t scpi_cmd_systemTimeFormat(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemTimeFormatQ(scpi_t *context) {
+scpi_result_t scpi_cmd_systemFormatTimeQ(scpi_t *context) {
     using namespace datetime;
     SCPI_ResultInt(context, persist_conf::devConf.dateTimeFormat == FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == FORMAT_MDY_24 ? 24 : 12);
     return SCPI_RES_OK;

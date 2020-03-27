@@ -35,7 +35,7 @@
 #define IDN_MODEL "EEZ BB3 (Simulator)"
 #endif
 
-#define MCU_NAME "STM32F7"
+#define MCU_NAME "STM32"
 #define MCU_REVISION "R1B6"
 
 /// SCPI TCP server port.
