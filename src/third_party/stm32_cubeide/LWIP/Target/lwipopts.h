@@ -41,6 +41,7 @@ void sntpSetSystemTimeUs(uint32_t t, uint32_t us);
 
 #define SNTP_SET_SYSTEM_TIME_US(t, us) sntpSetSystemTimeUs(t, us)
 #define SNTP_SERVER_DNS 1
+#define SNTP_STARTUP_DELAY 0
 
 /* USER CODE END 0 */
 
