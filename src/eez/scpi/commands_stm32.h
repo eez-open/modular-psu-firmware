@@ -54,7 +54,7 @@
     SCPI_COMMAND("DISPlay[:WINdow]:DIALog:ACTIon?", scpi_cmd_displayWindowDialogActionQ) \
     SCPI_COMMAND("DISPlay[:WINdow]:DIALog:DATA", scpi_cmd_displayWindowDialogData) \
     SCPI_COMMAND("DISPlay[:WINdow]:DIALog:CLOSe", scpi_cmd_displayWindowDialogClose) \
-    SCPI_COMMAND("DISPlay[:WINdow]:ERROr", scpi_cmd_displayWindowError) \
+    SCPI_COMMAND("DISPlay[:WINdow]:ERRor", scpi_cmd_displayWindowError) \
     SCPI_COMMAND("INITiate:CONTinuous", scpi_cmd_initiateContinuous) \
     SCPI_COMMAND("INITiate:CONTinuous?", scpi_cmd_initiateContinuousQ) \
     SCPI_COMMAND("INITiate:DLOG", scpi_cmd_initiateDlog) \
@@ -288,6 +288,7 @@
     SCPI_COMMAND("SYSTem:CPU:INFOrmation:ONTime:LAST?", scpi_cmd_systemCpuInformationOntimeLastQ) \
     SCPI_COMMAND("SYSTem:CPU:INFOrmation:ONTime:TOTal?", scpi_cmd_systemCpuInformationOntimeTotalQ) \
     SCPI_COMMAND("SYSTem:CPU:MODel?", scpi_cmd_systemCpuModelQ) \
+    SCPI_COMMAND("SYSTem:CPU:VERSion?", scpi_cmd_systemCpuVersionQ) \
     SCPI_COMMAND("SYSTem:DATE", scpi_cmd_systemDate) \
     SCPI_COMMAND("SYSTem:DATE?", scpi_cmd_systemDateQ) \
     SCPI_COMMAND("SYSTem:FORMat:DATE", scpi_cmd_systemFormatDate) \

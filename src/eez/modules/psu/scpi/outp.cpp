@@ -97,7 +97,7 @@ scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
     if (parameter.type == SCPI_TOKEN_DECIMAL_NUMERIC_PROGRAM_DATA || parameter.type == SCPI_TOKEN_PROGRAM_MNEMONIC) {
         int32_t enable;
         if (
-            parameter.type == SCPI_TOKEN_DECIMAL_NUMERIC_PROGRAM_DATA && !SCPI_ParamToInt32(context, &parameter, &enable) ||
+            (parameter.type == SCPI_TOKEN_DECIMAL_NUMERIC_PROGRAM_DATA && !SCPI_ParamToInt32(context, &parameter, &enable)) ||
             !SCPI_ParamToChoice(context, &parameter, scpi_bool_def, &enable)
         ) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);

@@ -690,7 +690,7 @@ void setOperBits(int bit_mask, bool on) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const char *getCpuModel() {
+const char *getCpuModelAndVersion() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     return "Simulator, " FIRMWARE;
 #elif defined(EEZ_PLATFORM_STM32)
@@ -704,6 +704,10 @@ const char *getCpuType() {
 #elif defined(EEZ_PLATFORM_STM32)
     return "STM32F7";
 #endif
+}
+
+const char *getCpuVersion() {
+    return FIRMWARE;
 }
 
 bool isMaxCurrentLimited() {

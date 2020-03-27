@@ -292,22 +292,24 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
 
     for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
         temp_sensor::TempSensor &sensor = temp_sensor::sensors[i];
-        temperature::TempSensorTemperature &sensorTemperature = temperature::sensors[i];
+        if (sensor.isInstalled()) {
+            temperature::TempSensorTemperature &sensorTemperature = temperature::sensors[i];
 
-        sprintf(buffer, "temp_%s_tripped=%d", sensor.name, (int)sensorTemperature.isTripped());
-        SCPI_ResultText(context, buffer);
+            sprintf(buffer, "temp_%s_tripped=%d", sensor.name, (int)sensorTemperature.isTripped());
+            SCPI_ResultText(context, buffer);
 
-        sprintf(buffer, "temp_%s_state=%d", sensor.name, (int)sensorTemperature.prot_conf.state);
-        SCPI_ResultText(context, buffer);
+            sprintf(buffer, "temp_%s_state=%d", sensor.name, (int)sensorTemperature.prot_conf.state);
+            SCPI_ResultText(context, buffer);
 
-        sprintf(buffer, "temp_%s_delay=", sensor.name);
-        strcatDuration(buffer, sensorTemperature.prot_conf.delay);
-        SCPI_ResultText(context, buffer);
+            sprintf(buffer, "temp_%s_delay=", sensor.name);
+            strcatDuration(buffer, sensorTemperature.prot_conf.delay);
+            SCPI_ResultText(context, buffer);
 
-        sprintf(buffer, "temp_%s_level=", sensor.name);
-        strcatFloat(buffer, sensorTemperature.prot_conf.level);
-        strcat(buffer, " oC");
-        SCPI_ResultText(context, buffer);
+            sprintf(buffer, "temp_%s_level=", sensor.name);
+            strcatFloat(buffer, sensorTemperature.prot_conf.level);
+            strcat(buffer, " oC");
+            SCPI_ResultText(context, buffer);
+        }
     }
 
     return SCPI_RES_OK;

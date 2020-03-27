@@ -3084,7 +3084,7 @@ void data_sys_info_scpi_ver(DataOperationEnum operation, Cursor cursor, Value &v
 
 void data_sys_info_cpu(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(getCpuModel());
+        value = Value(getCpuModelAndVersion());
     }
 }
 

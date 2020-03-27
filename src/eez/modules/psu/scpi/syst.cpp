@@ -603,7 +603,12 @@ scpi_result_t scpi_cmd_systemCpuInformationOntimeLastQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCpuModelQ(scpi_t *context) {
-    SCPI_ResultText(context, getCpuModel());
+    SCPI_ResultText(context, getCpuType());
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCpuVersionQ(scpi_t *context) {
+    SCPI_ResultText(context, getCpuVersion());
     return SCPI_RES_OK;
 }
 
