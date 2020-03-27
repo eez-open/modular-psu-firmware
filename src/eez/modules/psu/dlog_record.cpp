@@ -44,7 +44,11 @@ namespace psu {
 namespace dlog_record {
 
 #define CHUNK_SIZE 4096
-#define CONF_WRITE_TIMEOUT_MS 10000
+
+#define CONF_DLOG_SYNC_FILE_TIME_MS 10000
+
+#define CONF_WRITE_TIMEOUT_MS 1000
+#define CONF_WRITE_FLUSH_TIMEOUT_MS 10000
 
 enum Event {
     EVENT_INITIATE,
@@ -99,7 +103,7 @@ bool g_inStateTransition;
 int g_stateTransitionError;
 bool g_traceInitiated;
 
-static uint32_t g_lastSyncTickCount;
+static uint32_t g_countingStarted;
 static uint32_t g_lastTickCount;
 static uint32_t g_seconds;
 static uint32_t g_micros;
@@ -108,9 +112,12 @@ double g_currentTime;
 static double g_nextTime;
 uint32_t g_fileLength;
 static unsigned int g_bufferIndex;
+
 static unsigned int g_lastSavedBufferIndex;
-static unsigned int g_saveUpToBufferIndex;
-size_t g_writeOffset = 0;
+static uint32_t g_lastSavedBufferTickCount;
+
+osMutexId(g_mutexId);
+osMutexDef(g_mutex);
 
 void abortAfterError();
 
@@ -149,46 +156,93 @@ static int fileTruncate() {
     return SCPI_RES_OK;
 }
 
-void fileWrite() {
+void getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush) {
+    static uint8_t g_saveBuffer[CHUNK_SIZE];
+
+    buffer = nullptr;
+    bufferSize = 0;
+
+    if (osMutexWait(g_mutexId, 5) == osOK) {
+        int32_t timeDiff = millis() - g_lastSavedBufferTickCount;
+        uint32_t alignedBufferIndex = (g_bufferIndex / 4) * 4;
+        uint32_t indexDiff = alignedBufferIndex - g_lastSavedBufferIndex;
+        if (indexDiff > 0 && (flush || timeDiff >= CONF_DLOG_SYNC_FILE_TIME_MS || indexDiff >= CHUNK_SIZE)) {
+            bufferSize = MIN(indexDiff, CHUNK_SIZE);
+            buffer = g_saveBuffer;
+
+            int32_t i = g_bufferIndex - (g_lastSavedBufferIndex + DLOG_RECORD_BUFFER_SIZE);
+
+            if (i <= 0) {
+                i = 0;
+            } else {
+                if ((uint32_t)i > bufferSize) {
+                    i = bufferSize;
+                }
+                
+                for (int j = 0; j < i / 4; j++) {
+                    ((float *)g_saveBuffer)[j] = NAN;
+                }
+
+                //DebugTrace("NaN's: %d\n", i);
+            }
+
+            if ((uint32_t)i < bufferSize) {
+                uint32_t tail = (g_lastSavedBufferIndex + i) % DLOG_RECORD_BUFFER_SIZE;
+                uint32_t head = (g_lastSavedBufferIndex + bufferSize) % DLOG_RECORD_BUFFER_SIZE;
+                if (tail < head) {
+                    memcpy(g_saveBuffer + i, DLOG_RECORD_BUFFER + tail, head - tail);
+                } else {
+                    uint32_t n = DLOG_RECORD_BUFFER_SIZE - tail;
+                    memcpy(g_saveBuffer, DLOG_RECORD_BUFFER + tail, n);
+                    if (head > 0) {
+                        memcpy(g_saveBuffer + n, DLOG_RECORD_BUFFER, head);
+                        //DebugTrace("boundary: %d\n", n);
+                    }
+                }
+            } 
+            
+            // for (uint32_t i = 0; i < bufferSize; i++) {
+            //     g_saveBuffer[i] = g_lastSavedBufferIndex + i + DLOG_RECORD_BUFFER_SIZE >= g_bufferIndex ? DLOG_RECORD_BUFFER[(g_lastSavedBufferIndex + i) % DLOG_RECORD_BUFFER_SIZE] : 0;
+            // }
+        }
+        osMutexRelease(g_mutexId);
+    }
+}
+
+// returns true if there is more data to write
+void fileWrite(bool flush) {
     if (g_state != STATE_EXECUTING) {
         return;
     }
 
-    auto saveUpToBufferIndex = g_saveUpToBufferIndex;
-    size_t length = saveUpToBufferIndex - g_lastSavedBufferIndex;
-    if (length == 0) {
-        return;
-    }
-    int i = g_lastSavedBufferIndex % DLOG_RECORD_BUFFER_SIZE;
-    int j = saveUpToBufferIndex % DLOG_RECORD_BUFFER_SIZE;
-
-    int err = 0;
-
     uint32_t timeout = millis() + CONF_WRITE_TIMEOUT_MS;
     while (millis() < timeout) {
+        const uint8_t *buffer = nullptr;
+        uint32_t bufferSize = 0;
+        getNextWriteBuffer(buffer, bufferSize, flush);
+        if (!buffer) {
+            return;
+        }
+
+        int err = 0;
+
         File file;
         if (file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-            if (file.seek(g_writeOffset)) {
-                size_t written;
-                
-                if (i < j || j == 0) {
-                    written = file.write(DLOG_RECORD_BUFFER + i, length);
-                } else {
-                    written = file.write(DLOG_RECORD_BUFFER + i, DLOG_RECORD_BUFFER_SIZE - i);
-                    if (written == DLOG_RECORD_BUFFER_SIZE - i) {
-                        written += file.write(DLOG_RECORD_BUFFER, j);
-                    }
+            if (file.seek(g_lastSavedBufferIndex)) {
+                size_t written = file.write(buffer, bufferSize);
+
+                if (written != bufferSize) {
+                    err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
                 }
 
-                if (written == length) {
-                    if (file.close()) {
-                        g_writeOffset += length;
-                        g_lastSavedBufferIndex = saveUpToBufferIndex;
-                        return;
-                    }
-                } 
+                if (!file.close()) {
+                    err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
+                }
 
-                err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
+                if (!err) {
+                    g_lastSavedBufferIndex += bufferSize;
+                    g_lastSavedBufferTickCount = millis();
+                }
             } else {
                 err = event_queue::EVENT_ERROR_DLOG_SEEK_ERROR;
             }
@@ -196,23 +250,25 @@ void fileWrite() {
             err = event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR;
         }
 
-        sd_card::reinitialize();
+        if (err) {
+            //DebugTrace("write error\n");
+            sd_card::reinitialize();
+            return;
+        }
     }
-
-    event_queue::pushEvent(err);
-    abortAfterError();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 static void flushData() {
-    if (osThreadGetId() != g_scpiTaskHandle) {
-        if (osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DLOG_FILE_WRITE, 0), 5) != osOK) {
-            //DebugTrace("DLOG trace write overflow\n");
-        }
-    } else {
-        fileWrite();
+    //DebugTrace("flush before: %d\n", g_bufferIndex - g_lastSavedBufferIndex);
+
+    uint32_t timeout = millis() + CONF_WRITE_FLUSH_TIMEOUT_MS;
+    while (g_lastSavedBufferIndex < g_bufferIndex && millis() < timeout) {
+        fileWrite(true);
     }
+
+    //DebugTrace("flush after: %d\n", g_bufferIndex - g_lastSavedBufferIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -298,8 +354,7 @@ static void writeStringFieldWithIndex(uint8_t id, const char *str, uint8_t index
 ////////////////////////////////////////////////////////////////////////////////
 
 static void initRecordingStart() {
-    g_lastSyncTickCount = micros();
-    g_lastTickCount = g_lastSyncTickCount;
+    g_countingStarted = false;
     g_seconds = 0;
     g_micros = 0;
     g_iSample = 0;
@@ -308,8 +363,6 @@ static void initRecordingStart() {
     g_fileLength = 0;
     g_bufferIndex = 0;
     g_lastSavedBufferIndex = 0;
-    g_saveUpToBufferIndex = 0;
-    g_writeOffset = 0;
 
     memcpy(&g_recording.parameters, &g_parameters, sizeof(dlog_view::Parameters));
 
@@ -402,10 +455,6 @@ static void writeFileHeaderAndMetaFields() {
     g_bufferIndex = savedBufferIndex;
     writeUint32(g_recording.dataOffset);
     g_bufferIndex = g_recording.dataOffset;
-
-    g_lastSyncTickCount = micros();
-    g_saveUpToBufferIndex = g_bufferIndex;
-    flushData();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -423,6 +472,10 @@ static void setState(State newState) {
 }
 
 static void log(uint32_t tickCount) {
+    if (!g_countingStarted) {
+        g_lastTickCount = tickCount;
+        g_countingStarted = true;
+    }
     g_micros += tickCount - g_lastTickCount;
     g_lastTickCount = tickCount;
 
@@ -438,13 +491,30 @@ static void log(uint32_t tickCount) {
     }
 
     if (g_currentTime >= g_nextTime) {
-        while (1) {
-            g_nextTime = ++g_iSample * g_recording.parameters.period;
-            if (g_currentTime < g_nextTime || g_nextTime > g_recording.parameters.time) {
-                break;
+        if (osMutexWait(g_mutexId, 5) == osOK) {
+            while (1) {
+                g_nextTime = ++g_iSample * g_recording.parameters.period;
+                if (g_currentTime < g_nextTime || g_nextTime > g_recording.parameters.time) {
+                    break;
+                }
+
+                // we missed a sample, write NAN's
+                for (int i = 0; i < CH_NUM; ++i) {
+                    if (g_recording.parameters.logVoltage[i]) {
+                        writeFloat(NAN);
+                    }
+                    if (g_recording.parameters.logCurrent[i]) {
+                        writeFloat(NAN);
+                    }
+                    if (g_recording.parameters.logPower[i]) {
+                        writeFloat(NAN);
+                    }
+                }
+
+                ++g_recording.size;
             }
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
+            // write sample
             for (int i = 0; i < CH_NUM; ++i) {
                 Channel &channel = Channel::get(i);
 
@@ -471,65 +541,14 @@ static void log(uint32_t tickCount) {
                     writeFloat(uMon * iMon);
                 }
             }
-
+            
             ++g_recording.size;
-#else
-            // we missed a sample, write NAN's
-            for (int i = 0; i < CH_NUM; ++i) {
-                if (g_recording.parameters.logVoltage[i]) {
-                    writeFloat(NAN);
-                }
-                if (g_recording.parameters.logCurrent[i]) {
-                    writeFloat(NAN);
-                }
-                if (g_recording.parameters.logPower[i]) {
-                    writeFloat(NAN);
-                }
-            }
 
-            ++g_recording.size;
-#endif
-        }
-
-        // write sample
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel &channel = Channel::get(i);
-
-            float uMon = 0;
-            float iMon = 0;
-
-            if (g_recording.parameters.logVoltage[i]) {
-                uMon = channel_dispatcher::getUMonLast(channel);
-                writeFloat(uMon);
-            }
-
-            if (g_recording.parameters.logCurrent[i]) {
-                iMon = channel_dispatcher::getIMonLast(channel);
-                writeFloat(iMon);
-            }
-
-            if (g_recording.parameters.logPower[i]) {
-                if (!g_recording.parameters.logVoltage[i]) {
-                    uMon = channel_dispatcher::getUMonLast(channel);
-                }
-                if (!g_recording.parameters.logCurrent[i]) {
-                    iMon = channel_dispatcher::getIMonLast(channel);
-                }
-                writeFloat(uMon * iMon);
-            }
-        }
-        
-        ++g_recording.size;
+            osMutexRelease(g_mutexId);
+        }        
 
         if (g_nextTime > g_recording.parameters.time) {
             stateTransition(EVENT_FINISH);
-        } else {
-            int32_t diff = tickCount - g_lastSyncTickCount;
-            if (diff > CONF_DLOG_SYNC_FILE_TIME * 1000000L && (g_bufferIndex - g_saveUpToBufferIndex) >= CHUNK_SIZE) {
-                g_lastSyncTickCount = tickCount;
-                g_saveUpToBufferIndex = g_bufferIndex;
-                flushData();
-            }
         }
     }
 }
@@ -551,12 +570,18 @@ static int doStartImmediately() {
 
     writeFileHeaderAndMetaFields();
 
+    g_lastSavedBufferTickCount = millis();
+
     setState(STATE_EXECUTING);
 
     return SCPI_RES_OK;
 }
 
 static int doInitiate(bool traceInitiated) {
+    if (!g_mutexId) {
+        g_mutexId = osMutexCreate(osMutex(g_mutex));
+    }
+
     int err;
 
     g_traceInitiated = traceInitiated;
@@ -587,7 +612,6 @@ static void resetParameters() {
 
 static void doFinish(bool afterError) {
     if (!afterError) {
-        g_saveUpToBufferIndex = g_bufferIndex;
         flushData();
         onSdCardFileChangeHook(g_parameters.filePath);
     }
@@ -745,7 +769,7 @@ void reset() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void tick(uint32_t tickCount) {
-    if (g_state == STATE_EXECUTING && g_nextTime <= g_recording.parameters.time) {
+    if (g_state == STATE_EXECUTING && g_nextTime <= g_recording.parameters.time && !g_inStateTransition) {
         log(tickCount);
     }
 }

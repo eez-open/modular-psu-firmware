@@ -262,9 +262,6 @@
 /// To prevent too fast switching betweeen current ranges
 #define CURRENT_AUTO_RANGE_SWITCHING_DELAY_MS 5
 
-/// During data logging call file.sync every N seconds
-#define CONF_DLOG_SYNC_FILE_TIME 10 // 10 seconds
-
 // Default duration of all animations in seconds
 #define CONF_DEFAULT_ANIMATIONS_DURATION 0.15f
 

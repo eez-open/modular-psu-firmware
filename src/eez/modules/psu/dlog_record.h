@@ -69,7 +69,7 @@ void reset();
 void tick(uint32_t tick_usec);
 void log(float *values);
 
-void fileWrite();
+void fileWrite(bool flush = false);
 void stateTransition(int event, int *perr = nullptr);
 
 const char *getLatestFilePath();

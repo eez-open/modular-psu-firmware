@@ -147,9 +147,6 @@ void oneIter() {
 				eez::psu::sd_card::onSdDetectInterruptHandler();
 			}
 #endif
-			else if (type == SCPI_QUEUE_MESSAGE_TYPE_DLOG_FILE_WRITE) {
-				eez::psu::dlog_record::fileWrite();
-			}
             else if (type == SCPI_QUEUE_MESSAGE_TYPE_DLOG_STATE_TRANSITION) {
                 eez::psu::dlog_record::stateTransition(param);
             } else if (type == SCPI_QUEUE_MESSAGE_DLOG_SHOW_FILE) {
@@ -299,6 +296,8 @@ void oneIter() {
         persist_conf::tick();
 
         sd_card::tick();
+
+        eez::psu::dlog_record::fileWrite();
 
 #ifdef DEBUG
         psu::debug::tick(tickCount);

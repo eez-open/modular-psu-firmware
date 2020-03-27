@@ -158,12 +158,12 @@ void tick() {
     if (gui::getActivePageId() == PAGE_ID_EVENT_QUEUE) {
         if (g_refreshEvents) {
             refreshEvents();
-        } else {
-            auto fromPosition = g_displayFromPosition;
-            if (fromPosition != g_previousDisplayFromPosition) {
-                readEvents(fromPosition);
-                g_previousDisplayFromPosition = fromPosition;
-            }
+        } 
+
+        auto fromPosition = g_displayFromPosition;
+        if (fromPosition != g_previousDisplayFromPosition) {
+            readEvents(fromPosition);
+            g_previousDisplayFromPosition = fromPosition;
         }
     } 
 #endif
@@ -368,6 +368,10 @@ static void addEventToWriteQueue(int16_t eventId, char *message) {
         }
 
         osMutexRelease(g_writeQueueMutexId);
+    }
+
+    if (osThreadGetId() == eez::scpi::g_scpiTaskHandle) {
+        tick();
     }
 }
 
