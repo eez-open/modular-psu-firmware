@@ -199,7 +199,7 @@ public:
     int menuInput(const char *label, MenuType menuType, const char **menuItems);
     int select(const char **options, int defaultSelection);
 
-    void dialogOpen();
+    bool dialogOpen(int *err);
     DialogActionResult dialogAction(uint32_t timeoutMs, const char *&selectedActionName);
     void dialogResetDataItemValues();
     void dialogSetDataItemValue(int16_t dataId, Value& value);

@@ -660,7 +660,7 @@ scpi_result_t scpi_cmd_systemCpuOptionQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemSerialQ(scpi_t *context) {
+scpi_result_t scpi_cmd_systemCpuSnoQ(scpi_t *context) {
     SCPI_ResultText(context, getSerialNumber());
     return SCPI_RES_OK;
 }

@@ -64,7 +64,9 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, 
     ToastMessagePage *page = ToastMessagePage::findFreePage();
     
     page->type = type;
-    page->message = message;
+    strncpy(page->messageBuffer, message, MAX_MESSAGE_LENGTH);
+    page->messageBuffer[ToastMessagePage::MAX_MESSAGE_LENGTH] = 0;
+    page->message = page->messageBuffer;
     page->messageValue = Value();
     page->actionLabel = type == ERROR_TOAST && !autoDismiss ? "Close" : nullptr;
     page->actionWidgetIsActive = false;

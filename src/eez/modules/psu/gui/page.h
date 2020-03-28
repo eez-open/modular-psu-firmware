@@ -66,6 +66,8 @@ public:
 private:
     ToastType type;
 
+    static const size_t MAX_MESSAGE_LENGTH = 200;
+    char messageBuffer[MAX_MESSAGE_LENGTH + 1];
     const char *message;
     Value messageValue;
     const char *actionLabel;

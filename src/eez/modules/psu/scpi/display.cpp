@@ -479,9 +479,7 @@ scpi_result_t scpi_cmd_displayWindowDialogOpen(scpi_t *context) {
     }
 
     int err;
-    if (eez::gui::loadExternalAssets(filePath, &err)) {
-        psu::gui::g_psuAppContext.dialogOpen();
-    } else {
+    if (!eez::gui::loadExternalAssets(filePath, &err) || !psu::gui::g_psuAppContext.dialogOpen(&err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -526,9 +524,9 @@ scpi_result_t scpi_cmd_displayWindowDialogActionQ(scpi_t *context) {
 }
 
 scpi_choice_def_t dataTypeChoice[] = {
-    { "INTEger", VALUE_TYPE_INT },
-    { "FLOAt", VALUE_TYPE_FLOAT },
-    { "STRIng", VALUE_TYPE_STR },
+    { "INTeger", VALUE_TYPE_INT },
+    { "FLOat", VALUE_TYPE_FLOAT },
+    { "STRing", VALUE_TYPE_STR },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
@@ -548,8 +546,7 @@ scpi_result_t scpi_cmd_displayWindowDialogData(scpi_t *context) {
     dataItemName[valueTextLen] = 0;
     int16_t dataId = eez::gui::getDataIdFromName(dataItemName);
     if (dataId == 0) {
-        // TODO
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }
 

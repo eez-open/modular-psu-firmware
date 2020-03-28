@@ -798,7 +798,7 @@ void PsuAppContext::doShowNumberInput() {
     NumericKeypad::start(this, m_inputLabel, Value(m_numberInputParams.m_input, m_numberInputParams.m_options.editValueUnit), m_numberInputParams.m_options, m_numberInputParams.onSet, nullptr, m_numberInputParams.onCancel);
 }
 
-void PsuAppContext::dialogOpen() {
+bool PsuAppContext::dialogOpen(int *err) {
     if (osThreadGetId() == g_guiTaskHandle) {
         if (getActivePageId() != getExternalAssetsFirstPageId()) {
             dialogResetDataItemValues();
@@ -806,9 +806,17 @@ void PsuAppContext::dialogOpen() {
         }
         g_dialogOpening = false;
     } else {
-        g_dialogOpening = true;
-        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN, 0), osWaitForever);
+        if (!g_dialogOpening && getActivePageId() != getExternalAssetsFirstPageId()) {
+            g_dialogOpening = true;
+            osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN, 0), osWaitForever);
+        } else {
+            if (err) {
+                *err = SCPI_ERROR_EXECUTION_ERROR;
+            }
+            return false;
+        }
     }
+    return true;
 }
 
 DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&selectedActionName) {
@@ -875,7 +883,9 @@ void PsuAppContext::dialogClose() {
             popPage();
         }
     } else {
-        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE, 0), osWaitForever);
+        if (getActivePageId() == getExternalAssetsFirstPageId()) {
+            osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE, 0), osWaitForever);
+        }
     }
 }
 
@@ -2102,7 +2112,7 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_SELECT) {
         g_psuAppContext.doShowSelect();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN) {
-        g_psuAppContext.dialogOpen();
+        g_psuAppContext.dialogOpen(nullptr);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE) {
         g_psuAppContext.dialogClose();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_ASYNC_OPERATION_IN_PROGRESS) {

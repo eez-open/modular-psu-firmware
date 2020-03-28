@@ -48,8 +48,8 @@
     SCPI_COMMAND("DISPlay[:WINdow][:STATe]?", scpi_cmd_displayWindowStateQ) \
     SCPI_COMMAND("DISPlay:DATA?", scpi_cmd_displayDataQ) \
     SCPI_COMMAND("DISPlay[:WINdow]:DLOG", scpi_cmd_displayWindowDlog) \
-    SCPI_COMMAND("DISPlay[:WINdow]:INPUt?", scpi_cmd_displayWindowInputQ) \
-    SCPI_COMMAND("DISPlay[:WINdow]:SELEct?", scpi_cmd_displayWindowSelectQ) \
+    SCPI_COMMAND("DISPlay[:WINdow]:INPut?", scpi_cmd_displayWindowInputQ) \
+    SCPI_COMMAND("DISPlay[:WINdow]:SELect?", scpi_cmd_displayWindowSelectQ) \
     SCPI_COMMAND("DISPlay[:WINdow]:DIALog[:OPEN]", scpi_cmd_displayWindowDialogOpen) \
     SCPI_COMMAND("DISPlay[:WINdow]:DIALog:ACTIon?", scpi_cmd_displayWindowDialogActionQ) \
     SCPI_COMMAND("DISPlay[:WINdow]:DIALog:DATA", scpi_cmd_displayWindowDialogData) \
@@ -392,4 +392,4 @@
     SCPI_COMMAND("DEBUg:EVENt", scpi_cmd_debugEvent) \
     SCPI_COMMAND("SYSTem:DATE:CLEar", scpi_cmd_systemDateClear) \
     SCPI_COMMAND("SYSTem:TIME:CLEar", scpi_cmd_systemTimeClear) \
-    SCPI_COMMAND("SYSTem:SERial?", scpi_cmd_systemSerialQ)
+    SCPI_COMMAND("SYSTem:CPU:SNO?", scpi_cmd_systemCpuSnoQ)
