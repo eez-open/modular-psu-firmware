@@ -18,20 +18,44 @@
 
 #pragma once
 
+#include <scpi/scpi.h>
+
 namespace eez {
 namespace psu {
 namespace devices {
 
-struct Device {
-    const char *deviceName;
-    bool installed;
-    TestResult *testResult;
+enum DeviceId {
+    DEVICE_ID_EEPROM,
+    DEVICE_ID_SD_CARD,
+    DEVICE_ID_ETHERNET,
+    DEVICE_ID_RTC,
+    DEVICE_ID_DATETIME,
+    DEVICE_ID_FAN,
+    DEVICE_ID_AUX_TEMP,
+    DEVICE_ID_CH1_TEMP,
+    DEVICE_ID_CH2_TEMP,
+    DEVICE_ID_CH3_TEMP,
+    DEVICE_ID_CH4_TEMP,
+    DEVICE_ID_CH5_TEMP,
+    DEVICE_ID_CH6_TEMP,
+    DEVICE_ID_CH1,
+    DEVICE_ID_CH2,
+    DEVICE_ID_CH3,
+    DEVICE_ID_CH4,
+    DEVICE_ID_CH5,
+    DEVICE_ID_CH6,
 };
 
-extern Device devices[];
-extern int numDevices;
+extern scpi_choice_def_t g_deviceChoice[];
 
-bool deviceExists(int deviceIndex);
+struct Device {
+    DeviceId id;
+    char name[20];
+    bool installed;
+    TestResult testResult;
+};
+
+bool getDevice(int deviceIndex, Device &device);
 
 bool anyFailed();
 void getSelfTestResultString(char *, int MAX_LENGTH);

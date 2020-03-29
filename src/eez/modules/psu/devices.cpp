@@ -16,15 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/modules/psu/psu.h>
-
 #include <string.h>
+#include <stdio.h>
 
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/devices.h>
+#include <eez/modules/psu/sd_card.h>
 
 #include <eez/modules/mcu/eeprom.h>
-
-#include <eez/modules/psu/sd_card.h>
 
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
@@ -42,62 +41,135 @@ namespace eez {
 namespace psu {
 namespace devices {
 
-#define TEMP_SENSOR(NAME, QUES_REG_BIT, SCPI_ERROR) \
-    { #NAME " temp", true, &temp_sensor::sensors[temp_sensor::NAME].g_testResult }
-
-#define CHANNEL(INDEX) \
-    { "CH" #INDEX " IOEXP", true, &(Channel::get(INDEX - 1).ioexp.g_testResult) }, \
-    { "CH" #INDEX " DAC", true, &(Channel::get(INDEX - 1).dac.g_testResult) }, \
-	{ "CH" #INDEX " ADC", true, &(Channel::get(INDEX - 1).adc.g_testResult) }
-
-Device devices[] = {
-#if OPTION_EXT_EEPROM
-    { "EEPROM", OPTION_EXT_EEPROM, &mcu::eeprom::g_testResult },
-#else
-    { "EEPROM", 0, 0 },
-#endif
-
-    { "SD card", 1, &sd_card::g_testResult },
-
-#if OPTION_ETHERNET
-    { "Ethernet", 1, &ethernet::g_testResult },
-#else
-    { "Ethernet", 0, 0 },
-#endif
-
-#if OPTION_EXT_RTC
-    { "RTC", OPTION_EXT_RTC, &rtc::g_testResult },
-#else
-    { "RTC", 0, 0 },
-#endif
-
-    { "DateTime", true, &datetime::g_testResult },
-
-#if OPTION_FAN
-    { "Fan", OPTION_FAN, &aux_ps::fan::g_testResult },
-#endif
-
-    TEMP_SENSORS
+scpi_choice_def_t g_deviceChoice[] = {
+    { "EEProm", DEVICE_ID_EEPROM },
+    { "SDCard", DEVICE_ID_SD_CARD },
+    { "ETHernet", DEVICE_ID_ETHERNET },
+    { "RTC", DEVICE_ID_RTC },
+    { "DATEtime", DEVICE_ID_DATETIME },
+    { "FAN", DEVICE_ID_FAN },
+    { "AUXTemp", DEVICE_ID_AUX_TEMP },
+    { "CH1Temp", DEVICE_ID_CH1_TEMP },
+    { "CH2Temp", DEVICE_ID_CH2_TEMP },
+    { "CH3Temp", DEVICE_ID_CH3_TEMP },
+    { "CH4Temp", DEVICE_ID_CH4_TEMP },
+    { "CH5Temp", DEVICE_ID_CH5_TEMP },
+    { "CH6Temp", DEVICE_ID_CH6_TEMP },
+    { "CH1", DEVICE_ID_CH1 },
+    { "CH2", DEVICE_ID_CH2 },
+    { "CH3", DEVICE_ID_CH3 },
+    { "CH4", DEVICE_ID_CH4 },
+    { "CH5", DEVICE_ID_CH5 },
+    { "CH6", DEVICE_ID_CH6 },
+    SCPI_CHOICE_LIST_END    
 };
 
-#undef TEMP_SENSOR
-#undef CHANNEL
+bool getDevice(int deviceIndex, Device &device) {
+    int i = 0;
 
-int numDevices = sizeof(devices) / sizeof(Device);
-
-bool deviceExists(int deviceIndex) {
-    int firstTempSensorDeviceIndex = numDevices - temp_sensor::NUM_TEMP_SENSORS;
-    int tempSensorIndex = deviceIndex - firstTempSensorDeviceIndex;
-    if (tempSensorIndex < 0) {
+    if (deviceIndex == i++) {
+        device.id = DEVICE_ID_EEPROM;
+        strcpy(device.name, "EEPROM");
+#if OPTION_EXT_EEPROM        
+        device.installed = true;
+        device.testResult = mcu::eeprom::g_testResult;
+#else
+        device.installed = false;
+        device.testResult = TEST_SKIPPED;
+#endif
+        return true;
+    } 
+    
+    if (deviceIndex == i++) {
+        device.id = DEVICE_ID_SD_CARD;
+        strcpy(device.name, "SD card");
+        device.installed = true;
+        device.testResult = sd_card::g_testResult;
+        return true;
+    } 
+    
+    if (deviceIndex == i++) {
+        device.id = DEVICE_ID_ETHERNET;
+        strcpy(device.name, "Ethernet");
+#if OPTION_ETHERNET
+        device.installed = true;
+        device.testResult = ethernet::g_testResult;
+#else
+        device.installed = false;
+        device.testResult = TEST_SKIPPED;
+#endif
+        return true;
+    } 
+    
+    if (deviceIndex == i++) {
+        device.id = DEVICE_ID_RTC;
+        strcpy(device.name, "RTC");
+#if OPTION_EXT_RTC
+        device.installed = true;
+        device.testResult = rtc::g_testResult;
+#else
+        device.installed = false;
+        device.testResult = TEST_SKIPPED;
+#endif
+        return true;
+    } 
+    
+    if (deviceIndex == i++) {
+        device.id = DEVICE_ID_DATETIME;
+        strcpy(device.name, "DateTime");
+        device.installed = true;
+        device.testResult = datetime::g_testResult;
+        return true;
+    } 
+    
+    if (deviceIndex == i++) {
+        device.id = DEVICE_ID_FAN;
+        strcpy(device.name, "Fan");
+#if OPTION_FAN
+        device.installed = true;
+        device.testResult = aux_ps::fan::g_testResult;
+#else
+        device.installed = false;
+        device.testResult = TEST_SKIPPED;
+#endif
         return true;
     }
-    return temp_sensor::sensors[tempSensorIndex].isInstalled();
+
+    if (deviceIndex == i++) {
+        device.id = DEVICE_ID_AUX_TEMP;
+        strcpy(device.name, "AUX temp");
+        device.installed = true;
+        device.testResult = temp_sensor::sensors[temp_sensor::AUX].g_testResult;
+        return true;
+    }
+
+    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+        if (deviceIndex == i++) {
+            device.id = (DeviceId)(DEVICE_ID_CH1_TEMP + channelIndex);
+            sprintf(device.name, "CH%d temp", channelIndex + 1);
+            device.installed = true;
+            device.testResult = temp_sensor::sensors[temp_sensor::CH1 + channelIndex].g_testResult;
+            return true;
+        }
+    }
+
+    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+        if (deviceIndex == i++) {
+            device.id = (DeviceId)(DEVICE_ID_CH1 + channelIndex);
+            sprintf(device.name, "CH%d", channelIndex + 1);
+            device.installed = true;
+            device.testResult = Channel::get(channelIndex).getTestResult();
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool anyFailed() {
-    for (int i = 0; i < numDevices; ++i) {
-        Device &device = devices[i];
-        if (device.testResult != 0 && *device.testResult == TEST_FAILED) {
+    Device device;
+    for (int i = 0; getDevice(i, device); ++i) {
+        if (device.testResult == TEST_FAILED) {
             return true;
         }
     }
@@ -127,17 +199,17 @@ void getSelfTestResultString(char *result, int MAX_LENGTH) {
     const char *str;
     int strLength;
 
-    for (int deviceIndex = 0; deviceIndex < numDevices; ++deviceIndex) {
-        Device &device = devices[deviceIndex];
-        if (device.testResult && *device.testResult == TEST_FAILED) {
+    Device device;
+    for (int deviceIndex = 0; getDevice(deviceIndex, device); deviceIndex++) {
+        if (device.testResult == TEST_FAILED) {
             if (index > 0) {
                 APPEND_CHAR('\n');
             }
             APPEND_CHAR('-');
             APPEND_CHAR(' ');
-            APPEND_STRING(device.deviceName);
+            APPEND_STRING(device.name);
             APPEND_CHAR(' ');
-            APPEND_STRING(getTestResultString(*device.testResult));
+            APPEND_STRING(getTestResultString(device.testResult));
         }
     }
 
@@ -151,13 +223,17 @@ const char *getInstalledString(bool installed) {
 }
 
 const char *getTestResultString(TestResult g_testResult) {
+    if (g_testResult == TEST_FAILED)
+        return "failed";
     if (g_testResult == TEST_OK)
         return "passed";
+    if (g_testResult == TEST_CONNECTING)
+        return "testing";
     if (g_testResult == TEST_SKIPPED)
         return "skipped";
     if (g_testResult == TEST_WARNING)
         return "warning";
-    return "failed";
+    return "";
 }
 
 } // namespace devices

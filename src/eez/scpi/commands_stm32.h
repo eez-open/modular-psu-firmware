@@ -254,7 +254,7 @@
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:ONTime:LAST?", scpi_cmd_systemChannelInformationOntimeLastQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:ONTime:TOTal?", scpi_cmd_systemChannelInformationOntimeTotalQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:POWer?", scpi_cmd_systemChannelInformationPowerQ) \
-    SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:PROGram?", scpi_cmd_systemChannelInformationProgramQ) \
+    SCPI_COMMAND("SYSTem:CHANnel:OPTion?", scpi_cmd_systemChannelOptionQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:VOLTage?", scpi_cmd_systemChannelInformationVoltageQ) \
     SCPI_COMMAND("SYSTem:CHANnel:MODel?", scpi_cmd_systemChannelModelQ) \
     SCPI_COMMAND("SYSTem:CHANnel:VERSion?", scpi_cmd_systemChannelVersionQ) \

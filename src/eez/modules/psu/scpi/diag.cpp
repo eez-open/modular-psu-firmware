@@ -316,18 +316,32 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
-    char buffer[128] = { 0 };
+    int32_t deviceId = -1;
+    if (!SCPI_ParamChoice(context, devices::g_deviceChoice, &deviceId, false)) {
+        if (SCPI_ParamErrorOccurred(context)) {
+            return SCPI_RES_ERR;
+        }
+    }
 
-    for (int i = 0; i < devices::numDevices; ++i) {
-        if (devices::deviceExists(i)) {
-            devices::Device &device = devices::devices[i];
-
+    if (deviceId == -1) {
+        char buffer[128] = { 0 };
+        devices::Device device;
+        for (int i = 0; devices::getDevice(i, device); ++i) {
             sprintf(buffer, "%d, %s, %s, %s",
-                    device.testResult ? (int)*device.testResult : TEST_SKIPPED, device.deviceName,
-                    devices::getInstalledString(device.installed),
-                    devices::getTestResultString(*device.testResult));
+                device.testResult ? (int)device.testResult : TEST_SKIPPED, device.name,
+                devices::getInstalledString(device.installed),
+                devices::getTestResultString(device.testResult));
             SCPI_ResultText(context, buffer);
         }
+    } else {
+        devices::Device device;
+        for (int i = 0; devices::getDevice(i, device); ++i) {
+            if (device.id == (devices::DeviceId)deviceId) {
+                SCPI_ResultInt(context, device.testResult);
+                return SCPI_RES_OK;
+            }
+        }
+        SCPI_ResultInt(context, TEST_NONE);
     }
 
     return SCPI_RES_OK;

@@ -431,7 +431,7 @@ scpi_result_t scpi_cmd_systemChannelInformationPowerQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemChannelInformationProgramQ(scpi_t *context) {
+scpi_result_t scpi_cmd_systemChannelOptionQ(scpi_t *context) {
     Channel *channel = param_channel(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
@@ -439,55 +439,37 @@ scpi_result_t scpi_cmd_systemChannelInformationProgramQ(scpi_t *context) {
 
     uint16_t features = channel->params.features;
 
-    char strFeatures[64] = { 0 };
-
     if (features & CH_FEATURE_VOLT) {
-        strcat(strFeatures, "Volt");
+        SCPI_ResultText(context, "Volt");
     }
 
     if (features & CH_FEATURE_CURRENT) {
-        if (strFeatures[0]) {
-            strcat(strFeatures, ", ");
-        }
-        strcat(strFeatures, "Current");
+        SCPI_ResultText(context, "Current");
     }
 
     if (features & CH_FEATURE_POWER) {
-        if (strFeatures[0]) {
-            strcat(strFeatures, ", ");
-        }
-        strcat(strFeatures, "Power");
+        SCPI_ResultText(context, "Power");
     }
 
     if (features & CH_FEATURE_OE) {
-        if (strFeatures[0]) {
-            strcat(strFeatures, ", ");
-        }
-        strcat(strFeatures, "OE");
+        SCPI_ResultText(context, "OE");
     }
 
     if (features & CH_FEATURE_DPROG) {
-        if (strFeatures[0]) {
-            strcat(strFeatures, ", ");
-        }
-        strcat(strFeatures, "DProg");
+        SCPI_ResultText(context, "DProg");
     }
 
     if (features & CH_FEATURE_RPROG) {
-        if (strFeatures[0]) {
-            strcat(strFeatures, ", ");
-        }
-        strcat(strFeatures, "Rprog");
+        SCPI_ResultText(context, "Rprog");
     }
 
     if (features & CH_FEATURE_RPOL) {
-        if (strFeatures[0]) {
-            strcat(strFeatures, ", ");
-        }
-        strcat(strFeatures, "RPol");
+        SCPI_ResultText(context, "RPol");
     }
 
-    SCPI_ResultText(context, strFeatures);
+    if (features & CH_FEATURE_COUPLING) {
+        SCPI_ResultText(context, "Coupling");
+    }
 
     return SCPI_RES_OK;
 }

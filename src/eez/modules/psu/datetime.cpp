@@ -174,8 +174,7 @@ bool dstCheck() {
 bool test() {
     if (rtc::g_testResult == TEST_OK) {
         uint8_t year, month, day, hour, minute, second;
-        if (persist_conf::readSystemDate(year, month, day) &&
-            persist_conf::readSystemTime(hour, minute, second)) {
+        if (persist_conf::readSystemDate(year, month, day) && persist_conf::readSystemTime(hour, minute, second)) {
             uint8_t rtc_year, rtc_month, rtc_day, rtc_hour, rtc_minute, rtc_second;
             rtc::readDateTime(rtc_year, rtc_month, rtc_day, rtc_hour, rtc_minute, rtc_second);
 
