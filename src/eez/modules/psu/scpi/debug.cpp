@@ -325,8 +325,10 @@ scpi_result_t scpi_cmd_debugCsvQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index);
+    Channel *channel = getSelectedChannel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
     if (!channel->isInstalled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
@@ -367,8 +369,10 @@ scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index);
+    Channel *channel = getSelectedChannel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
     if (!channel->isInstalled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;

@@ -161,19 +161,30 @@ scpi_result_t scpi_cmd_statusOperationInstrumentEnableQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+static int getSelectedChannelIndexFromCommandNumberOrContext(scpi_t *context) {
+    int32_t channelIndex;
+    SCPI_CommandNumbers(context, &channelIndex, 1, -1);
+    if (channelIndex != -1) {
+        channelIndex--;
+        if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
+            SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
+            return -1;
+        }
+        return channelIndex;
+    } 
+
+    return getSelectedChannelIndex(context);
+}
+
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEventQ(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t channelIndex;
-    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
-    channelIndex--;
-    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
-        return SCPI_RES_OK;
+    int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
+    if (channelIndex == -1) {
+        return SCPI_RES_ERR;
     }
 
-    scpi_psu_reg_name_t isumReg =
-        channelIndex == 0 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT2;
+    scpi_psu_reg_name_t isumReg = channelIndex == 0 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT2;
 
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, isumReg));
@@ -187,16 +198,12 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEventQ(scpi_t *contex
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryConditionQ(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t channelIndex;
-    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
-    channelIndex--;
-    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
-        return SCPI_RES_OK;
+    int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
+    if (channelIndex == -1) {
+        return SCPI_RES_ERR;
     }
 
-    scpi_psu_reg_name_t isumReg =
-        channelIndex == 0 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_COND2;
+    scpi_psu_reg_name_t isumReg = channelIndex == 0 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_COND2;
 
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, isumReg));
@@ -207,12 +214,9 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryConditionQ(scpi_t *co
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnable(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t channelIndex;
-    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
-    channelIndex--;
-    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
-        return SCPI_RES_OK;
+    int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
+    if (channelIndex == -1) {
+        return SCPI_RES_ERR;
     }
 
     scpi_psu_reg_name_t isumeReg =
@@ -229,12 +233,9 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnable(scpi_t *contex
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnableQ(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t channelIndex;
-    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
-    channelIndex--;
-    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
-        return SCPI_RES_OK;
+    int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
+    if (channelIndex == -1) {
+        return SCPI_RES_ERR;
     }
 
     scpi_psu_reg_name_t isumeReg =
@@ -249,12 +250,9 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnableQ(scpi_t *conte
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEventQ(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t channelIndex;
-    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
-    channelIndex--;
-    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
-        return SCPI_RES_OK;
+    int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
+    if (channelIndex == -1) {
+        return SCPI_RES_ERR;
     }
 
     scpi_psu_reg_name_t isumReg =
@@ -272,12 +270,9 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEventQ(scpi_t *context) 
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryConditionQ(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t channelIndex;
-    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
-    channelIndex--;
-    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
-        return SCPI_RES_OK;
+    int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
+    if (channelIndex == -1) {
+        return SCPI_RES_ERR;
     }
 
     scpi_psu_reg_name_t isumReg =
@@ -292,16 +287,12 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryConditionQ(scpi_t *conte
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnable(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t channelIndex;
-    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
-    channelIndex--;
-    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
-        return SCPI_RES_OK;
+    int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
+    if (channelIndex == -1) {
+        return SCPI_RES_ERR;
     }
 
-    scpi_psu_reg_name_t isumeReg =
-        channelIndex == 0 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2;
+    scpi_psu_reg_name_t isumeReg = channelIndex == 0 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2;
 
     int32_t newVal;
     if (SCPI_ParamInt32(context, &newVal, TRUE)) {
@@ -314,16 +305,12 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnable(scpi_t *context) 
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnableQ(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    int32_t channelIndex;
-    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
-    channelIndex--;
-    if (channelIndex < 0 || channelIndex > MIN(CH_NUM, 2) - 1) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
-        return SCPI_RES_OK;
+    int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
+    if (channelIndex == -1) {
+        return SCPI_RES_ERR;
     }
 
-    scpi_psu_reg_name_t isumeReg =
-        channelIndex == 0 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2;
+    scpi_psu_reg_name_t isumeReg = channelIndex == 0 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2;
 
     /* return value */
     SCPI_ResultInt32(context, reg_get(context, isumeReg));

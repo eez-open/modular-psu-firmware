@@ -1110,51 +1110,6 @@ void outputEnable(Channel &channel, bool enable) {
     syncOutputEnable();
 }
 
-bool outputEnable(Channel &channel, bool enable, int *err) {
-    if (enable != channel.isOutputEnabled()) {
-        bool triggerModeEnabled =
-            channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||
-            channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED;
-
-        if (channel.isOutputEnabled()) {
-            if (calibration::isEnabled()) {
-                if (err) {
-                    *err = SCPI_ERROR_CAL_OUTPUT_DISABLED;
-                }
-                return false;
-            }
-
-            if (triggerModeEnabled && !trigger::isIdle()) {
-                trigger::abort();
-            } else {
-                channel_dispatcher::outputEnable(channel, false);
-            }
-        } else {
-            if (channel_dispatcher::isTripped(channel)) {
-                if (err) {
-                    *err = SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION;
-                }
-                return false;
-            }
-
-            if (triggerModeEnabled && !trigger::isIdle()) {
-                if (trigger::isInitiated()) {
-                    trigger::abort();
-                } else {
-                    if (err) {
-                        *err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
-                    }
-                    return false;
-                }
-            }
-
-            channel_dispatcher::outputEnable(channel, true);
-        }
-    }
-
-    return true;
-}
-
 void outputEnableOnNextSync(Channel &channel, bool enable) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
         Channel::get(0).flags.doOutputEnableOnNextSync = 1;
@@ -1174,8 +1129,6 @@ void outputEnableOnNextSync(Channel &channel, bool enable) {
         channel.flags.doOutputEnableOnNextSync = 1;
         channel.flags.outputEnabledValueOnNextSync = enable;
     }
-
-    syncOutputEnable();    
 }
 
 void syncOutputEnable() {
@@ -1184,6 +1137,70 @@ void syncOutputEnable() {
     } else {
         Channel::syncOutputEnable();
     }
+}
+
+bool testOutputEnable(Channel &channel, bool enable, bool &callTriggerAbort, int *err) {
+    if (enable != channel.isOutputEnabled()) {
+        bool triggerModeEnabled = getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED;
+
+        if (channel.isOutputEnabled()) {
+            if (calibration::isEnabled()) {
+                if (err) {
+                    *err = SCPI_ERROR_CAL_OUTPUT_DISABLED;
+                }
+                return false;
+            }
+
+            if (triggerModeEnabled && !trigger::isIdle()) {
+                callTriggerAbort = true;
+            }
+        } else {
+            if (isTripped(channel)) {
+                if (err) {
+                    *err = SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION;
+                }
+                return false;
+            }
+
+            if (triggerModeEnabled && !trigger::isIdle()) {
+                if (trigger::isInitiated()) {
+                    callTriggerAbort = true;
+                } else {
+                    if (err) {
+                        *err = SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER;
+                    }
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+bool outputEnable(uint32_t channels, bool enable, int *err) {
+    bool callTriggerAbort = false;
+
+    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+        if ((channels & (1 << channelIndex)) != 0) {
+            if (!testOutputEnable(Channel::get(channelIndex), enable, callTriggerAbort, err)) {
+                return false;
+            }
+        }
+    }
+
+    if (callTriggerAbort) {
+        trigger::abort();
+    } else {
+        for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+            if ((channels & (1 << channelIndex)) != 0) {
+                outputEnableOnNextSync(Channel::get(channelIndex), enable);
+            }
+        }
+        syncOutputEnable();
+    }
+
+    return true;
 }
 
 void disableOutputForAllChannels() {

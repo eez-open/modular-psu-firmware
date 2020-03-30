@@ -42,15 +42,20 @@ scpi_result_t scpi_cmd_outputModeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputProtectionClear(scpi_t *context) {
-    Channel *channel = param_channel(context);
-    if (!channel) {
+    uint32_t channels = param_channels(context);
+    if (channels == 0) {
         return SCPI_RES_ERR;
     }
 
-    channel_dispatcher::clearProtection(*channel);
+    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+        if ((channels & (1 << channelIndex)) != 0) {
+            channel_dispatcher::clearProtection(Channel::get(channelIndex));
+        }
+    }
 
     return SCPI_RES_OK;
 }
+
 
 scpi_result_t scpi_cmd_outputState(scpi_t *context) {
     bool enable;
@@ -58,13 +63,13 @@ scpi_result_t scpi_cmd_outputState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context);
-    if (!channel) {
+    uint32_t channels = param_channels(context);
+    if (channels == 0) {
         return SCPI_RES_ERR;
     }
 
     int err;
-    if (!channel_dispatcher::outputEnable(*channel, enable, &err)) {
+    if (!channel_dispatcher::outputEnable(channels, enable, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -73,15 +78,26 @@ scpi_result_t scpi_cmd_outputState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputStateQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
-    if (!channel) {
+    uint32_t channels = param_channels(context);
+    if (channels == 0) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, channel->isOutputEnabled());
+    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+        if ((channels & (1 << channelIndex)) != 0) {
+            SCPI_ResultBool(context, Channel::get(channelIndex).isOutputEnabled());
+        }
+    }
 
     return SCPI_RES_OK;
 }
+
+static const scpi_choice_def_t outputTackChoices[] = {
+    {"OFF", 0},
+    {"ON",  1},
+    {"ALL", 2},
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
 
 scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
     if (channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
@@ -94,58 +110,71 @@ scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
+    uint32_t channels;
+
     if (parameter.type == SCPI_TOKEN_DECIMAL_NUMERIC_PROGRAM_DATA || parameter.type == SCPI_TOKEN_PROGRAM_MNEMONIC) {
-        int32_t enable;
+        int32_t outputTackChoice;
         if (
-            (parameter.type == SCPI_TOKEN_DECIMAL_NUMERIC_PROGRAM_DATA && !SCPI_ParamToInt32(context, &parameter, &enable)) ||
-            !SCPI_ParamToChoice(context, &parameter, scpi_bool_def, &enable)
+            (parameter.type == SCPI_TOKEN_DECIMAL_NUMERIC_PROGRAM_DATA && !SCPI_ParamToInt32(context, &parameter, &outputTackChoice)) ||
+            !SCPI_ParamToChoice(context, &parameter, outputTackChoices, &outputTackChoice)
         ) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
         }
-        if (enable) {
+
+        if (outputTackChoice != 0 && outputTackChoice != 2) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
         }
-        channel_dispatcher::setTrackingChannels(0);
+
+        if (outputTackChoice == 0) {
+            channel_dispatcher::setTrackingChannels(0);
+            return SCPI_RES_OK;
+        }
+
+        channels = 0xFFFFFFFF; // all channels
     } else {
-        uint16_t channels = param_channels(context, &parameter);
+        channels = param_channels(context, &parameter);
         if (channels == 0) {
             return SCPI_RES_ERR;
         }
+    }
 
-        int numChannels = 0;
+    int numChannels = 0;
 
-        for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-            if ((channels & (1 << channelIndex)) != 0) {
-                int err;
-                if (!channel_dispatcher::isTrackingAllowed(Channel::get(channelIndex), &err)) {
-                    SCPI_ErrorPush(context, err);
-                    return SCPI_RES_ERR;
-                }
-
-                numChannels++;
+    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+        if ((channels & (1 << channelIndex)) != 0) {
+            int err;
+            if (!channel_dispatcher::isTrackingAllowed(Channel::get(channelIndex), &err)) {
+                SCPI_ErrorPush(context, err);
+                return SCPI_RES_ERR;
             }
-        }
 
-        if (numChannels >= 2) {
-            channel_dispatcher::setTrackingChannels(channels);
-        } else {
-            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-            return SCPI_RES_ERR;
+            numChannels++;
         }
+    }
+
+    if (numChannels >= 2) {
+        channel_dispatcher::setTrackingChannels(channels);
+    } else {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
     }
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_outputTrackStateQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
-    if (!channel) {
+    uint32_t channels = param_channels(context);
+    if (channels == 0) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, channel->flags.trackingEnabled ? true : false);
+    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+        if ((channels & (1 << channelIndex)) != 0) {
+            SCPI_ResultBool(context, Channel::get(channelIndex).flags.trackingEnabled ? true : false);
+        }
+    }
 
     return SCPI_RES_OK;
 }

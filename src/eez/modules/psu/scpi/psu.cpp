@@ -50,7 +50,7 @@ void init(scpi_t &scpi_context, scpi_psu_t &scpi_psu_context, scpi_interface_t *
               getSerialNumber(), FIRMWARE, input_buffer, input_buffer_length,
               error_queue_data, error_queue_size);
 
-    scpi_psu_context.selected_channel_index = 0;
+    scpi_psu_context.selectedChannels = 1 << 0; // first channel is selected by default
     scpi_psu_context.currentDirectory[0] = 0;
     scpi_psu_context.isBufferOverrun = false;
     scpi_psu_context.bufferOverrunTime = 0;

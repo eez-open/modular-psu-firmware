@@ -309,7 +309,7 @@ void oneIter() {
 
 void resetContext(scpi_t *context) {
     scpi_psu_t *psuContext = (scpi_psu_t *)context->user_context;
-    psuContext->selected_channel_index = 0;
+    psuContext->selectedChannels = 1 << 0; // first channel is selected by default
     psuContext->currentDirectory[0] = 0;
     SCPI_ErrorClear(context);
 }

@@ -121,8 +121,10 @@ scpi_result_t scpi_cmd_calibrationClear(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index);
+    Channel *channel = getSelectedChannel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
 
     if (!calibration::clear(channel)) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -152,8 +154,10 @@ scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index);
+    Channel *channel = getSelectedChannel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
 
     if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
@@ -264,8 +268,10 @@ scpi_result_t scpi_cmd_calibrationRemarkQ(scpi_t *context) {
     if (calibration::isEnabled()) {
         remark = calibration::getRemark();
     } else {
-        scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-        Channel *channel = &Channel::get(psu_context->selected_channel_index);
+        Channel *channel = getSelectedChannel(context);
+        if (!channel) {
+            return SCPI_RES_ERR;
+        }
         remark = channel->cal_conf.calibration_remark;
     }
 
@@ -295,8 +301,10 @@ scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index);
+    Channel *channel = getSelectedChannel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
 
     if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
@@ -329,8 +337,10 @@ scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationStateQ(scpi_t *context) {
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    Channel *channel = &Channel::get(psu_context->selected_channel_index);
+    Channel *channel = getSelectedChannel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
 
     SCPI_ResultBool(context, channel->isCalibrationEnabled());
 

@@ -21,8 +21,6 @@
 #include <cmsis_os.h>
 #endif
 
-#include <scpi/scpi.h>
-
 #include <eez/system.h>
 
 // TODO
@@ -35,6 +33,8 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel.h>
 #include <eez/modules/psu/io_pins.h>
+
+#include <scpi/scpi.h>
 
 #ifdef EEZ_PLATFORM_STM32
 

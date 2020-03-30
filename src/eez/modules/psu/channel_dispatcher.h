@@ -99,9 +99,9 @@ void setOppLevel(Channel &channel, float level);
 void setOppDelay(Channel &channel, float delay);
 
 void outputEnable(Channel &channel, bool enable);
-bool outputEnable(Channel &channel, bool enable, int *err);
 void outputEnableOnNextSync(Channel &channel, bool enable);
 void syncOutputEnable();
+bool outputEnable(uint32_t channels, bool enable, int *err);
 void disableOutputForAllChannels();
 void disableOutputForAllTrackingChannels();
 

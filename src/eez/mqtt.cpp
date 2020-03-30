@@ -235,7 +235,7 @@ void onIncomingPublish(const char *topic, const char *payload) {
             if (strcmp(p, "oe") == 0) {
                 int oe = strtol(payload, &endptr, 10);
                 if (endptr > payload) {
-                    channel_dispatcher::outputEnable(channel, oe != 0, nullptr);
+                    channel_dispatcher::outputEnable(1 << channel.channelIndex, oe != 0, nullptr);
                 }
             } else if (strcmp(p, "u") == 0) {
                 if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {

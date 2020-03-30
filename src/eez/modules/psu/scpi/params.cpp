@@ -29,8 +29,25 @@ namespace scpi {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-scpi_choice_def_t channel_choice[] = {
-    { "CH1", 1 }, { "CH2", 2 }, { "CH3", 3 }, { "CH4", 4 }, { "CH5", 5 }, { "CH6", 6 }, SCPI_CHOICE_LIST_END /* termination of option list */
+scpi_choice_def_t channelChoice[] = {
+    { "CH1", 1 }, 
+    { "CH2", 2 }, 
+    { "CH3", 3 }, 
+    { "CH4", 4 }, 
+    { "CH5", 5 }, 
+    { "CH6", 6 }, 
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_choice_def_t channelChoiceWithAll[] = {
+    { "ALL", 0 },
+    { "CH1", 1 }, 
+    { "CH2", 2 }, 
+    { "CH3", 3 }, 
+    { "CH4", 4 }, 
+    { "CH5", 5 }, 
+    { "CH6", 6 }, 
+    SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
 #define TEMP_SENSOR(NAME, QUES_REG_BIT, SCPI_ERROR) { #NAME, temp_sensor::NAME }
@@ -74,34 +91,62 @@ bool check_channel(scpi_t *context, int32_t channelIndex) {
     return true;
 }
 
+// returns selected channel index, if multiple channels are selected returns -1
+int getSelectedChannelIndex(scpi_t *context) {
+    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
+    int channelIndex = -1;
+    for (int i = 0; i < CH_NUM; i++) {
+        if ((psu_context->selectedChannels & (1 << i)) != 0) {
+            if (channelIndex != -1) {
+                return -1;
+            }
+            channelIndex = i;
+        }
+    }
+    return channelIndex;
+}
+
+// returns selected channel, if multiple channels are selected returns nullptr
+Channel *getSelectedChannel(scpi_t *context) {
+    int channelIndex = getSelectedChannelIndex(context);
+    if (channelIndex == -1) {
+        return nullptr;
+    }
+    return &Channel::get(channelIndex);
+}
+
 Channel *param_channel(scpi_t *context, scpi_bool_t mandatory, scpi_bool_t skip_channel_check) {
     int32_t channelIndex;
 
-    if (!SCPI_ParamChoice(context, channel_choice, &channelIndex, mandatory)) {
+    if (!SCPI_ParamChoice(context, channelChoice, &channelIndex, mandatory)) {
         if (mandatory || SCPI_ParamErrorOccurred(context)) {
             return 0;
         }
-        scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-        channelIndex = psu_context->selected_channel_index;
+        channelIndex = getSelectedChannelIndex(context);
+        if (channelIndex == -1) {
+            return nullptr;
+        }
     } else {
         channelIndex--;
     }
 
     if (!skip_channel_check && !check_channel(context, channelIndex)) {
-        return 0;
+        return nullptr;
     }
 
     return &Channel::get(channelIndex);
 }
 
-uint16_t param_channels(scpi_t *context, scpi_bool_t mandatory, scpi_bool_t skip_channel_check) {
+uint32_t param_channels(scpi_t *context, scpi_bool_t mandatory, scpi_bool_t skip_channel_check) {
     scpi_parameter_t parameter;
     if (!SCPI_Parameter(context, &parameter, mandatory)) {
         if (mandatory || SCPI_ParamErrorOccurred(context)) {
             return 0;
         }
-        scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-        int channelIndex = psu_context->selected_channel_index;
+        int channelIndex = getSelectedChannelIndex(context);
+        if (channelIndex == -1) {
+            return 0;
+        }
         if (!skip_channel_check && !check_channel(context, channelIndex)) {
             return 0;
         }
@@ -111,8 +156,8 @@ uint16_t param_channels(scpi_t *context, scpi_bool_t mandatory, scpi_bool_t skip
     return param_channels(context, &parameter, skip_channel_check);
 }
 
-uint16_t param_channels(scpi_t *context, scpi_parameter_t *parameter, scpi_bool_t skip_channel_check) {
-    uint16_t channels = 0;
+uint32_t param_channels(scpi_t *context, scpi_parameter_t *parameter, scpi_bool_t skip_channel_check) {
+    uint32_t channels = 0;
 
     if (parameter->type == SCPI_TOKEN_PROGRAM_EXPRESSION) {
         bool isRange;
@@ -136,11 +181,15 @@ uint16_t param_channels(scpi_t *context, scpi_parameter_t *parameter, scpi_bool_
         }
     } else {
         int32_t channelIndex;
-        if (!SCPI_ParamToChoice(context, parameter, channel_choice, &channelIndex)) {
+        if (!SCPI_ParamToChoice(context, parameter, channelChoiceWithAll, &channelIndex)) {
             return 0;
         }
-        channelIndex--;
-        channels = 1 << channelIndex;
+        if (channelIndex > 0) {
+            channelIndex--;
+            channels = 1 << channelIndex;
+        } else {
+            channels = 0xFFFFFFFF; // all channels
+        }
     }
 
     if (!skip_channel_check) {
@@ -158,8 +207,13 @@ Channel *set_channel_from_command_number(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
     int32_t channelIndex;
-    SCPI_CommandNumbers(context, &channelIndex, 1, psu_context->selected_channel_index + 1);
-    channelIndex--;
+    SCPI_CommandNumbers(context, &channelIndex, 1, -1);
+    if (channelIndex != -1) {
+        channelIndex--;
+    } else {
+        channelIndex = getSelectedChannelIndex(context);
+    }
+
     if (channelIndex < 0 || channelIndex > CH_NUM - 1) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return 0;
