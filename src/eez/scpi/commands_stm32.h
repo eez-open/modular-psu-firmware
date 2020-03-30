@@ -163,7 +163,8 @@
     SCPI_COMMAND("SENSe:DLOG:TRACe:Y:SCALe", scpi_cmd_senseDlogTraceYScale) \
     SCPI_COMMAND("SENSe:DLOG:TRACe:Y:SCALe?", scpi_cmd_senseDlogTraceYScaleQ) \
     SCPI_COMMAND("SENSe:DLOG:TRACe[:DATA]", scpi_cmd_senseDlogTraceData) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:COMMent", scpi_cmd_senseDlogTraceComment) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:REMark", scpi_cmd_senseDlogTraceRemark) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:REMark?", scpi_cmd_senseDlogTraceRemarkQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:LIMit[:POSitive][:IMMediate][:AMPLitude]", scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitude) \
     SCPI_COMMAND("[SOURce#]:CURRent:LIMit[:POSitive][:IMMediate][:AMPLitude]?", scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitudeQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:MODE", scpi_cmd_sourceCurrentMode) \

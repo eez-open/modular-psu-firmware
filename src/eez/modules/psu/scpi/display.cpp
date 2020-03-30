@@ -27,6 +27,7 @@
 #include <eez/system.h>
 #endif
 
+#include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/dlog_view.h>
 
 #include <eez/libs/image/jpeg.h>
@@ -197,7 +198,29 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_displayWindowDlog(scpi_t *context) {
 #if OPTION_DISPLAY
-    dlog_view::g_showLatest = true;
+    char filePath[MAX_PATH_LENGTH + 1];
+    bool isFilePathSpecified;
+    if (!getFilePath(context, filePath, false, &isFilePathSpecified)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (isFilePathSpecified) {
+        psu::dlog_view::g_showLatest = false;
+        int err;
+        if (!psu::dlog_view::openFile(filePath, &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
+
+    } else {
+        dlog_view::g_showLatest = true;
+        if (!dlog_record::isExecuting()) {
+            if (dlog_record::getLatestFilePath()) {
+                dlog_view::openFile(dlog_record::getLatestFilePath());
+            }
+        }
+    }
+
     psu::gui::pushPage(PAGE_ID_DLOG_VIEW);
     return SCPI_RES_OK;
 #else

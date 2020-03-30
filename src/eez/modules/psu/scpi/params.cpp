@@ -204,8 +204,6 @@ uint32_t param_channels(scpi_t *context, scpi_parameter_t *parameter, scpi_bool_
 }
 
 Channel *set_channel_from_command_number(scpi_t *context) {
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-
     int32_t channelIndex;
     SCPI_CommandNumbers(context, &channelIndex, 1, -1);
     if (channelIndex != -1) {
@@ -734,7 +732,7 @@ void cleanupPath(char *filePath) {
     *q = 0;
 }
 
-bool getFilePath(scpi_t *context, char *filePath, bool mandatory) {
+bool getFilePath(scpi_t *context, char *filePath, bool mandatory, bool *isParameterSpecified) {
     scpi_psu_t *psuContext = (scpi_psu_t *)context->user_context;
 
     const char *filePathParam;
@@ -763,11 +761,17 @@ bool getFilePath(scpi_t *context, char *filePath, bool mandatory) {
             strncpy(filePath + currentDirectoryLen + 1, filePathParam, filePathParamLen);
             filePath[filePathLen] = 0;
         }
+        if (isParameterSpecified) {
+            *isParameterSpecified = true;
+        }
     } else {
         if (SCPI_ParamErrorOccurred(context)) {
             return false;
         }
         strcpy(filePath, psuContext->currentDirectory);
+        if (isParameterSpecified) {
+            *isParameterSpecified = false;
+        }
     }
 
     cleanupPath(filePath);

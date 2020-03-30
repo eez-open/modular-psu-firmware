@@ -63,7 +63,8 @@ bool get_profile_location_param(scpi_t *context, int &location, bool all_locatio
 void outputOnTime(scpi_t* context, uint32_t time);
 bool checkPassword(scpi_t *context, const char *againstPassword);
 
-bool getFilePath(scpi_t *context, char *filePath, bool mandatory);
+// returns current directory if parameter is not specified
+bool getFilePath(scpi_t *context, char *filePath, bool mandatory, bool *isParameterSpecified = nullptr);
 
 }
 }

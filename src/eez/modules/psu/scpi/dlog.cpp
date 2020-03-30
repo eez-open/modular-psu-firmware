@@ -229,7 +229,7 @@ scpi_result_t scpi_cmd_senseDlogTimeQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_senseDlogTraceComment(scpi_t *context) {
+scpi_result_t scpi_cmd_senseDlogTraceRemark(scpi_t *context) {
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
         return SCPI_RES_ERR;
@@ -252,7 +252,7 @@ scpi_result_t scpi_cmd_senseDlogTraceComment(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_senseDlogTraceCommentQ(scpi_t *context) {
+scpi_result_t scpi_cmd_senseDlogTraceRemarkQ(scpi_t *context) {
     SCPI_ResultText(context, dlog_record::g_parameters.comment);
     return SCPI_RES_OK;
 }

@@ -126,7 +126,7 @@ def start_BJT(cgnd):
     scpi("CURR " + str(Ic_max))
     scpi("SENS:CURR:RANG DEFault")
 
-    scpi('SENS:DLOG:TRAC:COMMent "Device name = ' + deviceName + '; Uce,max = ' + str(Uce_max) + '; Ic,max = ' + str(Ic_max) + '"')
+    scpi('SENS:DLOG:TRAC:REM "Device name = ' + deviceName + '; Uce,max = ' + str(Uce_max) + '; Ic,max = ' + str(Ic_max) + '"')
 
     scpi("SENS:DLOG:TRAC:X:UNIT VOLT")
     scpi("SENS:DLOG:TRAC:X:RANG:MIN " + str(Uce_min))
@@ -217,7 +217,7 @@ def start_MOSFET(cgnd):
     scpi("VOLT 0")
     scpi("CURR " + str(Id_max))
 
-    scpi('SENS:DLOG:TRAC:COMMent "Device name = ' + deviceName + '; Uds,max = ' + str(Uds_max) + '; Id,max = ' + str(Id_max) + '"')
+    scpi('SENS:DLOG:TRAC:REM "Device name = ' + deviceName + '; Uds,max = ' + str(Uds_max) + '; Id,max = ' + str(Id_max) + '"')
 
     scpi("SENS:DLOG:TRAC:X:UNIT VOLT")
     scpi("SENS:DLOG:TRAC:X:RANG:MIN " + str(Uds_logMin))

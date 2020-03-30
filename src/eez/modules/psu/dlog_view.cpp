@@ -563,7 +563,7 @@ void scaleToFit(Recording &recording) {
     }
 }
 
-void openFile(const char *filePath) {
+bool openFile(const char *filePath, int *err) {
     if (osThreadGetId() != g_scpiTaskHandle) {
         g_state = STATE_LOADING;
         g_loadingStartTickCount = millis();
@@ -572,11 +572,13 @@ void openFile(const char *filePath) {
         memset(&g_recording, 0, sizeof(Recording));
 
         osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_SHOW_FILE, 0), osWaitForever);
-        return;
+        return true;
     }
 
+    g_state = STATE_LOADING;
+
     File file;
-    if (file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+    if (file.open(filePath != nullptr ? filePath : g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
         uint8_t * buffer = FILE_VIEW_BUFFER;
         uint32_t read = file.read(buffer, DLOG_VERSION1_HEADER_SIZE);
         if (read == DLOG_VERSION1_HEADER_SIZE) {
@@ -749,13 +751,26 @@ void openFile(const char *filePath) {
                 }
             }
         }
+
+        if (g_state != STATE_READY) {
+            if (err) {
+                // TODO
+                *err = SCPI_ERROR_MASS_STORAGE_ERROR;
+            }
+        }
+    } else {
+        if (err) {
+            *err = SCPI_ERROR_FILE_NOT_FOUND;
+        }
     }
 
     file.close();
 
-    if (g_state == STATE_LOADING) {
+    if (g_state != STATE_READY) {
         g_state = STATE_ERROR;
     }
+
+    return g_state != STATE_ERROR;
 }
 
 Recording &getRecording() {

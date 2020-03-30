@@ -208,7 +208,7 @@ extern bool g_showLegend;
 extern bool g_showLabels;
 
 // open dlog file for viewing
-void openFile(const char *filePath);
+bool openFile(const char *filePath, int *err = nullptr);
 
 extern State getState();
 
