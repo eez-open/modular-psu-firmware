@@ -254,7 +254,9 @@ static const int EVENT_TYPE_ERROR = 4;
     EVENT_INFO(COUPLED_IN_SPLIT_RAILS, 126, "Coupled in split rails")                              \
 	EVENT_INFO(SCREENSHOT_SAVED, 127, "A screenshot was saved")                                    \
     EVENT_INFO(SYSTEM_RESTART, 128, "System restart")                                              \
-    EVENT_INFO(SYSTEM_SHUTDOWN, 129, "System shutdown")
+    EVENT_INFO(SYSTEM_SHUTDOWN, 129, "System shutdown")                                            \
+    EVENT_INFO(DLOG_START, 130, "DLOG recording started")                                          \
+    EVENT_INFO(DLOG_FINISH, 131, "DLOG recording finished")
 
 #define EVENT_ERROR_START_ID 10000
 #define EVENT_WARNING_START_ID 12000

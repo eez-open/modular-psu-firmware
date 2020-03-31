@@ -701,6 +701,7 @@ uint32_t PsuAppContext::getAsyncInProgressStartTime() {
 }
 
 void PsuAppContext::setTextMessage(const char *message, unsigned int len) {
+    len = MIN(len, MAX_TEXT_MESSAGE_LEN);
     strncpy(m_textMessage, message, len);
     m_textMessage[len] = 0;
     m_showTextMessage = true;

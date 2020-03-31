@@ -132,7 +132,7 @@ scpi_result_t scpi_cmd_displayWindowText(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (len > 32) {
+    if (len > psu::gui::PsuAppContext::MAX_TEXT_MESSAGE_LEN) {
         SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
         return SCPI_RES_ERR;
     }

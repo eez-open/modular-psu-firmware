@@ -630,6 +630,12 @@ uint32_t Channel::getCurrentHistoryValuePosition() {
 	return historyPosition;
 }
 
+void Channel::resetHistoryForAllChannels() {
+    for (int i = 0; i < CH_NUM; i++) {
+        Channel::get(i).resetHistory();
+    }
+}
+
 void Channel::resetHistory() {
     for (int i = 0; i < CHANNEL_HISTORY_SIZE; ++i) {
         uHistory[i] = 0;

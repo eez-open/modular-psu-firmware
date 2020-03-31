@@ -187,6 +187,7 @@ public:
     void hideAsyncOperationInProgress();
     uint32_t getAsyncInProgressStartTime();
 
+    static const size_t MAX_TEXT_MESSAGE_LEN = 64;
     void setTextMessage(const char *message, unsigned int len);
     void clearTextMessage();
     const char *getTextMessage();
@@ -219,7 +220,7 @@ protected:
     void (*m_progressAbortCallback)();
     bool m_popProgressPage;
 
-    char m_textMessage[32 + 1];
+    char m_textMessage[MAX_TEXT_MESSAGE_LEN + 1];
     uint8_t m_textMessageVersion;
     bool m_showTextMessage;
     bool m_clearTextMessage;

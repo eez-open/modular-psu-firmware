@@ -463,8 +463,10 @@ static void setState(State newState) {
     if (g_state != newState) {
         if (newState == STATE_EXECUTING) {
             setOperBits(OPER_DLOG, true);
+            event_queue::pushEvent(event_queue::EVENT_INFO_DLOG_START);
         } else if (g_state == STATE_EXECUTING) {
             setOperBits(OPER_DLOG, false);
+            event_queue::pushEvent(event_queue::EVENT_INFO_DLOG_FINISH);
         }
 
         g_state = newState;

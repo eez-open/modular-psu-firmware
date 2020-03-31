@@ -1021,6 +1021,11 @@ void action_user_switch_clicked() {
 		return;
 	}
 
+    if (isFrontPanelLocked()) {
+        errorMessage("Front panel is locked!");
+        return;
+    }
+
     if (getActiveSelectEnumDefinition() == g_enumDefinitions[ENUM_DEFINITION_USER_SWITCH_ACTION]) {
         popSelectFromEnumPage();
         return;

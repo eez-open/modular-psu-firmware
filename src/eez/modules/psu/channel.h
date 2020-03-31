@@ -498,6 +498,7 @@ class Channel {
 
     uint32_t getCurrentHistoryValuePosition();
 
+    static void resetHistoryForAllChannels();
     void resetHistory();
 
     TriggerMode getVoltageTriggerMode();
