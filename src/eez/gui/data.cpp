@@ -541,6 +541,12 @@ bool isChannelData(Cursor cursor, int16_t id) {
     return value.getInt() != 0;
 }
 
+void getLabel(Cursor cursor, int16_t id, char *text, int count) {
+    Value value;
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_LABEL, cursor, value);
+    value.toText(text, count);
+}
+
 Value getEncoderStep(Cursor cursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ENCODER_STEP, cursor, value);
@@ -551,16 +557,6 @@ bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues) {
     Value value(&stepValues, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ENCODER_STEP_VALUES, cursor, value);
     return value.getType() == VALUE_TYPE_INT && value.getInt();
-}
-
-void getList(Cursor cursor, int16_t id, const Value **values, int &count) {
-    Value listValue;
-    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_VALUE_LIST, cursor, listValue);
-    *values = listValue.getValueList();
-
-    Value countValue;
-    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_COUNT, cursor, countValue);
-    count = countValue.getInt();
 }
 
 Value get(Cursor cursor, int16_t id) {

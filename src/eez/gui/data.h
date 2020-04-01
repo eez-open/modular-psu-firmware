@@ -26,6 +26,9 @@
 #include <eez/value_types.h>
 
 namespace eez {
+
+struct StepValues;
+
 namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -215,9 +218,11 @@ struct Value {
     uint8_t *getPUint8() const {
         return puint8_;
     }
-    const Value *getValueList() const {
-        return pValue_;
+    
+    const StepValues *getStepValues() const {
+        return (StepValues *)pVoid_;
     }
+
     float *getFloatList() const {
         return pFloat_;
     }
@@ -276,7 +281,6 @@ struct Value {
         const char *str_;
         EnumValue enum_;
         uint8_t *puint8_;
-        const Value *pValue_;
         float *pFloat_;
         void *pVoid_;
         PairOfUint8Value pairOfUint8_;
@@ -321,7 +325,6 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_IS_CHANNEL_DATA,
     DATA_OPERATION_GET_ENCODER_STEP,
     DATA_OPERATION_GET_ENCODER_STEP_VALUES,
-    DATA_OPERATION_GET_VALUE_LIST,
     DATA_OPERATION_GET_FLOAT_LIST_LENGTH,
     DATA_OPERATION_GET_FLOAT_LIST,
     DATA_OPERATION_GET_BITMAP_IMAGE,
@@ -389,14 +392,10 @@ const char *getName(Cursor cursor, int16_t id);
 Unit getUnit(Cursor cursor, int16_t id);
 bool isChannelData(Cursor cursor, int16_t id);
 
-Value getEncoderStep(Cursor cursor, int16_t id);
-struct StepValues {
-    int count;
-    const Value *values;
-};
-bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues);
+void getLabel(Cursor cursor, int16_t id, char *text, int count);
 
-void getList(Cursor cursor, int16_t id, const Value **labels, int &count);
+Value getEncoderStep(Cursor cursor, int16_t id);
+bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues);
 
 Value get(Cursor cursor, int16_t id);
 const char *isValidValue(Cursor cursor, int16_t id, Value value);

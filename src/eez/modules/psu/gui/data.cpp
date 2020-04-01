@@ -221,12 +221,12 @@ Value MakeValue(float value, Unit unit) {
     return Value(value, unit);
 }
 
-Value MakeValueListValue(const Value *values) {
+Value MakeStepValuesValue(const StepValues *stepValues) {
     Value value;
-    value.type_ = VALUE_TYPE_VALUE_LIST;
+    value.type_ = VALUE_TYPE_STEP_VALUES;
     value.options_ = 0;
     value.unit_ = UNIT_UNKNOWN;
-    value.pValue_ = values;
+    value.pVoid_ = (void *)stepValues;
     return value;
 }
 
@@ -634,11 +634,28 @@ void TEXT_MESSAGE_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
-bool compare_VALUE_LIST_value(const Value &a, const Value &b) {
-    return a.getValueList() == b.getValueList();
+bool compare_STEP_VALUES_value(const Value &a, const Value &b) {
+    const StepValues *aStepValues = a.getStepValues();
+    const StepValues *bStepValues = b.getStepValues();
+
+    if (aStepValues->unit != bStepValues->unit) {
+        return false;
+    }
+
+    if (aStepValues->count != bStepValues->count) {
+        return false;
+    }
+
+    for (int i = 0; i < aStepValues->count; i++) {
+        if (aStepValues->values[i] != bStepValues->values[i]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
-void VALUE_LIST_value_to_text(const Value &value, char *text, int count) {
+void STEP_VALUES_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_FLOAT_LIST_value(const Value &a, const Value &b) {
@@ -1074,12 +1091,10 @@ void data_channel_u_mon(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
-        } else if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING_BACKGROUND, VALUE_TYPE_UINT16);
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
@@ -1101,13 +1116,9 @@ void data_channel_u_mon_dac(DataOperationEnum operation, Cursor cursor, Value &v
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMonDac(channel), UNIT_VOLT);
-    } else if (operation == DATA_OPERATION_GET_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
-        }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING_BACKGROUND, VALUE_TYPE_UINT16);
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     }
 }
@@ -1146,6 +1157,9 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
         value = UNIT_VOLT;
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        channel.getVoltageStepValues(value.getStepValues());
+        value = 1;
     } else if (operation == DATA_OPERATION_SET) {
         if (!between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
@@ -1183,12 +1197,10 @@ void data_channel_i_mon(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
-        } else if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING_BACKGROUND, VALUE_TYPE_UINT16);
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
@@ -1210,13 +1222,9 @@ void data_channel_i_mon_dac(DataOperationEnum operation, Cursor cursor, Value &v
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMonDac(channel), UNIT_AMPER);
-    } else if (operation == DATA_OPERATION_GET_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
-        }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING_BACKGROUND, VALUE_TYPE_UINT16);
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } 
 }
@@ -1255,6 +1263,9 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
         value = UNIT_AMPER;
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        channel.getCurrentStepValues(value.getStepValues());
+        value = 1;
     } else if (operation == DATA_OPERATION_SET) {
         if (!between(value.getFloat(), channel_dispatcher::getIMin(channel), channel_dispatcher::getIMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
@@ -1284,12 +1295,10 @@ void data_channel_p_mon(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
-        } else if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logPower[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logPower[iChannel]) {
-            value = Value(COLOR_ID_DATA_LOGGING_BACKGROUND, VALUE_TYPE_UINT16);
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
@@ -1816,16 +1825,16 @@ void data_edit_mode_interactive_mode_selector(DataOperationEnum operation, Curso
 }
 
 void data_edit_steps(DataOperationEnum operation, Cursor cursor, Value &value) {
+    StepValues stepValues;
+    edit_mode_step::getStepValues(stepValues);
+
     if (operation == DATA_OPERATION_GET) {
-        value = edit_mode_step::getStepIndex();
-    } else if (operation == DATA_OPERATION_GET_VALUE_LIST) {
-        StepValues stepValues;
-        edit_mode_step::getStepValues(stepValues);
-        value = MakeValueListValue(stepValues.values);
+        value = edit_mode_step::getStepIndex() % stepValues.count;
     } else if (operation == DATA_OPERATION_COUNT) {
-        StepValues stepValues;
-        edit_mode_step::getStepValues(stepValues);
         value = stepValues.count;
+    } else if (operation == DATA_OPERATION_GET_LABEL) {
+        edit_mode_step::getStepValues(stepValues);
+        value = Value(stepValues.values[cursor], stepValues.unit);
     } else if (operation == DATA_OPERATION_SET) {
         edit_mode_step::setStepIndex(value.getInt());
     }
@@ -2411,6 +2420,9 @@ void data_channel_protection_ovp_delay(DataOperationEnum operation, Cursor curso
         value = UNIT_SECOND;
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        getProtectionDelayStepValues(value.getStepValues());
+        value = 1;
     }
 }
 
@@ -2441,7 +2453,10 @@ void data_channel_protection_ovp_limit(DataOperationEnum operation, Cursor curso
         value = UNIT_VOLT;
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
-    } 
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        channel.getVoltageStepValues(value.getStepValues());
+        value = 1;
+    }
 }
 
 void data_channel_protection_ocp_state(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2480,7 +2495,10 @@ void data_channel_protection_ocp_delay(DataOperationEnum operation, Cursor curso
         value = UNIT_SECOND;
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
-    } 
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        getProtectionDelayStepValues(value.getStepValues());
+        value = 1;
+    }
 }
 
 void data_channel_protection_ocp_limit(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2509,6 +2527,9 @@ void data_channel_protection_ocp_limit(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_AMPER;
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        channel.getCurrentStepValues(value.getStepValues());
         value = 1;
     }
 }
@@ -2555,7 +2576,17 @@ void data_channel_protection_opp_level(DataOperationEnum operation, Cursor curso
         value = UNIT_WATT;
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        channel.getPowerStepValues(value.getStepValues());
+        value = 1;
     }
+}
+
+void getProtectionDelayStepValues(StepValues *stepValues) {
+    static float values[] = { 20.0f, 10.0f, 5.0f, 1.0f };
+    stepValues->values = values;
+    stepValues->count = sizeof(values) / sizeof(float);
+    stepValues->unit = UNIT_SECOND;
 }
 
 void data_channel_protection_opp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2584,6 +2615,9 @@ void data_channel_protection_opp_delay(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        getProtectionDelayStepValues(value.getStepValues());
         value = 1;
     }
 }
@@ -2614,6 +2648,9 @@ void data_channel_protection_opp_limit(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_WATT;
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        channel.getPowerStepValues(value.getStepValues());
         value = 1;
     }
 }
@@ -2661,6 +2698,15 @@ void data_channel_protection_otp_level(DataOperationEnum operation, Cursor curso
         value = UNIT_CELSIUS;
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        auto stepValues = value.getStepValues();
+
+        static float values[] = { 10.0f, 5.0f, 2.0f, 1.0f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+        stepValues->unit = UNIT_CELSIUS;
+
+        value = 1;
     }
 }
     
@@ -2690,6 +2736,9 @@ void data_channel_protection_otp_delay(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        getProtectionDelayStepValues(value.getStepValues());
         value = 1;
     }
 }
@@ -4328,15 +4377,11 @@ void data_io_pin_pwm_frequency(DataOperationEnum operation, Cursor cursor, Value
 
         value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static const int COUNT = 4;
-        static Value values[COUNT];
-        values[0] = Value(10000.0f, UNIT_HERTZ);
-        values[1] = Value(1000.0f, UNIT_HERTZ);
-        values[2] = Value(100.0f, UNIT_HERTZ);
-        values[3] = Value(1.0f, UNIT_HERTZ);
-        StepValues *stepValues = (StepValues *)value.getVoidPointer();
-        stepValues->count = COUNT;
+        static float values[] = { 10000.0f, 1000.0f, 100.0f, 1.0f };
+        StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+        stepValues->unit = UNIT_HERTZ;
         value = 1;
     }
 }
@@ -4374,15 +4419,11 @@ void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &val
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
         value = Value(1.0f, UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static const int COUNT = 4;
-        static Value values[COUNT];
-        values[0] = Value(5.0f, UNIT_PERCENT);
-        values[1] = Value(1.0f, UNIT_PERCENT);
-        values[2] = Value(0.5f, UNIT_PERCENT);
-        values[3] = Value(0.1f, UNIT_PERCENT);
-        StepValues *stepValues = (StepValues *)value.getVoidPointer();
-        stepValues->count = COUNT;
+        static float values[] = { 5.0f, 1.0f, 0.5f, 0.1f };
+        StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+        stepValues->unit = UNIT_PERCENT;
         value = 1;
     }
 }
@@ -4943,15 +4984,16 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
         value = Value(recording.parameters.xAxis.step, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static const int COUNT = 5;
-        static Value values[COUNT];
-        values[0] = Value(recording.parameters.xAxis.step * 100, dlog_view::getXAxisUnit(recording));
-        values[1] = Value(recording.parameters.xAxis.step * 50, dlog_view::getXAxisUnit(recording));
-        values[2] = Value(recording.parameters.xAxis.step * 10, dlog_view::getXAxisUnit(recording));
-        values[3] = Value(recording.parameters.xAxis.step * 5, dlog_view::getXAxisUnit(recording));
-        values[4] = Value(recording.parameters.xAxis.step, dlog_view::getXAxisUnit(recording));
-        StepValues *stepValues = (StepValues *)value.getVoidPointer();
-        stepValues->count = COUNT;
+        static float values[COUNT];
+        values[0] = recording.parameters.xAxis.step * 100;
+        values[1] = recording.parameters.xAxis.step * 50;
+        values[2] = recording.parameters.xAxis.step * 10;
+        values[3] = recording.parameters.xAxis.step * 5;
+        values[4] = recording.parameters.xAxis.step;
+        StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
+        stepValues->count = COUNT;
+        stepValues->unit = dlog_view::getXAxisUnit(recording);
         value = 1;
     }
 }
@@ -5043,6 +5085,31 @@ void data_dlog_visible_value_label(DataOperationEnum operation, Cursor cursor, V
     }
 }
 
+void guessStepValues(StepValues *stepValues, Unit unit) {
+    if (unit == UNIT_VOLT) {
+        static float values[] = { 2.0f, 1.0f, 0.5f, 0.1f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+    } else if (unit == UNIT_AMPER) {
+        static float values[] = { 0.25f, 0.1f, 0.05f, 0.01f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+    } else if (unit == UNIT_WATT) {
+        static float values[] = { 5.0f, 2.0f, 1.0f, 0.5f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+    } else if (unit == UNIT_SECOND) {
+        static float values[] = { 20.0f, 10.0f, 5.0f, 1.0f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+    } else {
+        static float values[] = { 10.0f, 1.0f, 0.1f, 0.01f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+    }
+    stepValues->unit = unit;
+}
+
 void data_dlog_visible_value_div(DataOperationEnum operation, Cursor cursor, Value &value) {
     auto &recording = dlog_view::getRecording();
     int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor);
@@ -5074,6 +5141,9 @@ void data_dlog_visible_value_div(DataOperationEnum operation, Cursor cursor, Val
         value = getYAxisUnit(recording, dlogValueIndex);
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        guessStepValues(value.getStepValues(), getYAxisUnit(recording, dlogValueIndex));
+        value = 1;
     }
 }
 
@@ -5107,6 +5177,9 @@ void data_dlog_visible_value_offset(DataOperationEnum operation, Cursor cursor, 
         value = getYAxisUnit(recording, dlogValueIndex);
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        guessStepValues(value.getStepValues(), getYAxisUnit(recording, dlogValueIndex));
+        value = 1;
     }
 }
 
@@ -5132,6 +5205,9 @@ void data_dlog_x_axis_offset(DataOperationEnum operation, Cursor cursor, Value &
         value = dlog_view::getXAxisUnit(recording);
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        guessStepValues(value.getStepValues(), dlog_view::getXAxisUnit(recording));
+        value = 1;
     }
 }
 
@@ -5157,6 +5233,9 @@ void data_dlog_x_axis_div(DataOperationEnum operation, Cursor cursor, Value &val
         value = dlog_view::getXAxisUnit(recording);
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        guessStepValues(value.getStepValues(), dlog_view::getXAxisUnit(recording));
+        value = 1;
     }
 }
 

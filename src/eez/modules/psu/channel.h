@@ -549,7 +549,11 @@ class Channel {
     const char *getBrand();
     void getSerial(char *text);
 
-  private:
+    void getVoltageStepValues(StepValues *stepValues);
+    void getCurrentStepValues(StepValues *stepValues);
+    void getPowerStepValues(StepValues *stepValues);
+
+private:
     bool delayLowRippleCheck;
     uint32_t outputEnableStartTime;
     

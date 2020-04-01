@@ -584,6 +584,27 @@ struct Channel : ChannelInterface {
 		strcpy(text, "N/A");
 #endif
 	}
+
+    void getVoltageStepValues(StepValues *stepValues) {
+        static float values[] = { 2.0f, 1.0f, 0.5f, 0.1f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+		stepValues->unit = UNIT_VOLT;
+	}
+    
+	void getCurrentStepValues(StepValues *stepValues) {
+        static float values[] = { 0.2f, 0.1f, 0.04f,  0.02f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+		stepValues->unit = UNIT_AMPER;
+	}
+
+    void getPowerStepValues(StepValues *stepValues) {
+        static float values[] = { 5.0f, 2.0f, 1.0f, 0.5f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+		stepValues->unit = UNIT_WATT;
+	}	
 };
 
 static Channel g_channel0(0);

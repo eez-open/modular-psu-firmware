@@ -257,132 +257,39 @@ void exit() {
 
 namespace edit_mode_step {
 
-#define NUM_UNITS 7
-
-static const Value CONF_GUI_UNIT_STEPS_LIST[NUM_UNITS][NUM_STEPS_PER_UNIT] = {
-    { 
-        Value(2.0f, UNIT_VOLT), 
-        Value(1.0f, UNIT_VOLT), 
-        Value(0.5f, UNIT_VOLT), 
-        Value(0.1f, UNIT_VOLT) 
-    },
-    { 
-        Value(0.25f, UNIT_AMPER), 
-        Value(0.1f, UNIT_AMPER), 
-        Value(0.05f, UNIT_AMPER), 
-        Value(0.01f, UNIT_AMPER) 
-    },
-    { 
-        Value(0.0025f, UNIT_AMPER), 
-        Value(0.001f, UNIT_AMPER), 
-        Value(0.0005f, UNIT_AMPER), 
-        Value(0.0001f, UNIT_AMPER) 
-    },
-    { 
-        Value(5.0f, UNIT_WATT), 
-        Value(2.0f, UNIT_WATT), 
-        Value(1.0f, UNIT_WATT), 
-        Value(0.5f, UNIT_WATT) 
-    },
-    { 
-        Value(10.0f, UNIT_CELSIUS), 
-        Value(5.0f, UNIT_CELSIUS), 
-        Value(2.0f, UNIT_CELSIUS), 
-        Value(1.0f, UNIT_CELSIUS) 
-    },
-    { 
-        Value(20.0f, UNIT_SECOND), 
-        Value(10.0f, UNIT_SECOND), 
-        Value(5.0f, UNIT_SECOND), 
-        Value(1.0f, UNIT_SECOND) 
-    },
-    { 
-        Value(0.2f, UNIT_AMPER), 
-        Value(0.1f, UNIT_AMPER), 
-        Value(0.04f, UNIT_AMPER), 
-        Value(0.02f, UNIT_AMPER) 
-    }
+struct DataIdStepIndex {
+    uint16_t dataId;
+    uint16_t stepIndex;
 };
 
-static int g_stepIndexes[NUM_UNITS][CH_MAX];
-
-static const int DEFAULT_INDEX = 1;
+static int g_stepIndex;
 
 static bool g_changed;
 static int g_startPos;
 
-int getUnitStepValuesIndex(Unit unit) {
-    if (unit == UNIT_VOLT) {
-        return 0;
-    } 
-    
-    if (unit == UNIT_AMPER) {
-        Channel &channel = Channel::get(g_focusCursor);
-        if (channel.flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
-            return 2;
-        }
-
-        // DCM220
-        int slotIndex = Channel::get(channel.channelIndex).slotIndex;
-        auto &slot = g_slots[slotIndex];
-        if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220) {
-            return 6;
-        }
-
-        return 1;
-    } 
-    
-    if (unit == UNIT_WATT) {
-        return 3;
-    } 
-    
-    if (unit == UNIT_CELSIUS) {
-        return 4;
-    } 
-    
-    if (unit == UNIT_SECOND) {
-        return 5;
-    }
-
-    return 0;
-}
-
-void getUnitStepValues(Unit unit, StepValues &stepValues) {
-    stepValues.count = NUM_STEPS_PER_UNIT;
-    stepValues.values = &CONF_GUI_UNIT_STEPS_LIST[getUnitStepValuesIndex(unit)][0];
-}
-
 int getStepIndex() {
-    int stepIndex = g_stepIndexes[getUnitStepValuesIndex(edit_mode::getUnit())][g_focusCursor];
-    if (stepIndex == 0) {
-        return DEFAULT_INDEX;
-    }
-    return stepIndex - 1;
+    return g_stepIndex;
 }
 
 void setStepIndex(int value) {
-    int unitStepValuesIndex = getUnitStepValuesIndex(edit_mode::getUnit());
-    g_stepIndexes[unitStepValuesIndex][g_focusCursor] = 1 + value;
-}
-
-void switchToNextStepIndex() {
-    g_stepIndexes[getUnitStepValuesIndex(edit_mode::getUnit())][g_focusCursor] = 1 + ((getStepIndex() + 1) % NUM_STEPS_PER_UNIT);
+    g_stepIndex = value;
 }
 
 void getStepValues(StepValues &stepValues) {
-    return getUnitStepValues(edit_mode::getUnit(), stepValues);
+    getEncoderStepValues(g_focusCursor, g_focusDataId, stepValues);
 }
 
-float getStepValue() {
-    StepValues stepValues;
-    getStepValues(stepValues);
-    return stepValues.values[MIN(getStepIndex(), stepValues.count - 1)].getFloat();
+void switchToNextStepIndex() {
+    setStepIndex(getStepIndex() + 1);
 }
 
 void increment(int counter, bool playClick) {
     float min = edit_mode::getMin().getFloat();
     float max = edit_mode::getMax().getFloat();
-    float stepValue = getStepValue();
+
+    StepValues stepValues;
+    getStepValues(stepValues);
+    float stepValue = stepValues.values[getStepIndex() % stepValues.count];
 
     float value = edit_mode::getEditValue().getFloat();
 
@@ -447,14 +354,14 @@ void onTouchUp() {
 
 Value getCurrentEncoderStepValue() {
     StepValues stepValues;
-    if (!getEncoderStepValues(g_focusCursor, g_focusDataId, stepValues)) {
-        getUnitStepValues(getCurrentEncoderUnit(), stepValues);
-    }
+    getStepValues(stepValues);
+
     int stepValueIndex = mcu::encoder::ENCODER_MODE_STEP4 - mcu::encoder::g_encoderMode;
     if (stepValueIndex >= stepValues.count) {
         stepValueIndex = stepValues.count - 1;
     }
-    return stepValues.values[stepValueIndex];
+
+    return Value(stepValues.values[stepValueIndex], stepValues.unit);
 }
 
 void showCurrentEncoderMode() {
@@ -498,7 +405,7 @@ void onTouchDown() {
     stepIndex = MAX(MIN(stepIndex, NUM_STEPS_PER_UNIT - 1), 0);
     StepValues stepValues;
     edit_mode_step::getStepValues(stepValues);
-    stepValue = stepValues.values[MIN(stepIndex, stepValues.count - 1)].getFloat();
+    stepValue = stepValues.values[MIN(stepIndex, stepValues.count - 1)];
 }
 
 void onTouchMove() {

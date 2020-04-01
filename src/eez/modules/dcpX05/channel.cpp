@@ -767,6 +767,34 @@ struct Channel : ChannelInterface {
 	void getSerial(char *text) {
 		strcpy(text, "N/A");
 	}
+
+    void getVoltageStepValues(StepValues *stepValues) {
+        static float values[] = { 2.0f, 1.0f, 0.5f, 0.1f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+		stepValues->unit = UNIT_VOLT;
+	}
+    
+	void getCurrentStepValues(StepValues *stepValues) {
+        static float lowRangeValues[] = { 0.0025f, 0.001f, 0.0005f, 0.0001f };
+        static float highRangeValues[] = { 0.25f, 0.1f, 0.05f, 0.01f }; 
+		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
+		if (channel.flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
+        	stepValues->values = lowRangeValues;
+        	stepValues->count = sizeof(lowRangeValues) / sizeof(float);
+		} else {
+        	stepValues->values = highRangeValues;
+			stepValues->count = sizeof(highRangeValues) / sizeof(float);
+		}
+		stepValues->unit = UNIT_AMPER;
+	}
+
+    void getPowerStepValues(StepValues *stepValues) {
+        static float values[] = { 5.0f, 2.0f, 1.0f, 0.5f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+		stepValues->unit = UNIT_WATT;
+	}	
 };
 
 static Channel g_channel0(0);

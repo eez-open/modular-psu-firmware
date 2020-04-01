@@ -20,6 +20,8 @@
 
 #include <stdint.h>
 
+#include <eez/unit.h>
+
 namespace eez {
 
 enum TestResult {
@@ -54,6 +56,12 @@ enum ChannelFeatures {
     CH_FEATURE_CURRENT_DUAL_RANGE = (1 << 7),
     CH_FEATURE_HW_OVP = (1 << 8),
     CH_FEATURE_COUPLING = (1 << 9)
+};
+
+struct StepValues {
+    int count;
+    const float *values;
+    Unit unit;
 };
 
 struct ChannelParams {
@@ -177,6 +185,10 @@ struct ChannelInterface {
     virtual void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) = 0;
     virtual const char *getBrand() = 0;
     virtual void getSerial(char *text) = 0;
+
+    virtual void getVoltageStepValues(StepValues *stepValues) = 0;
+    virtual void getCurrentStepValues(StepValues *stepValues) = 0;
+    virtual void getPowerStepValues(StepValues *stepValues) = 0;
 
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     virtual int getIoExpBitDirection(int subchannelIndex, int io_bit);

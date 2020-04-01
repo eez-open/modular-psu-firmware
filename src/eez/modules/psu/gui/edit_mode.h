@@ -63,10 +63,9 @@ extern NumericKeypad *g_keypad;
 
 namespace edit_mode_step {
 
-int getStepIndex();
-
 void getStepValues(StepValues &stepValues);
 
+int getStepIndex();
 void setStepIndex(int value);
 
 #if OPTION_ENCODER

@@ -32,17 +32,11 @@ struct ButtonGroupWidget {
     uint16_t selectedStyle;
 };
 
-struct ButtonGroupWidgetState {
-    WidgetState genericState;
-    const Value *labels;
-};
-
-
 FixPointersFunctionType BUTTON_GROUP_fixPointers = nullptr;
 
 EnumFunctionType BUTTON_GROUP_enum = nullptr;
 
-void drawButtons(const Widget *widget, int x, int y, const Style *style, const Style *selectedStyle, int selectedButton, const Value *labels, int count) {
+void drawButtons(const Widget *widget, int x, int y, const Style *style, const Style *selectedStyle, int selectedButton, int count) {
     if (widget->w > widget->h) {
         // horizontal orientation
         display::setColor(style->background_color);
@@ -51,9 +45,9 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
         int w = widget->w / count;
         x += (widget->w - w * count) / 2;
         int h = widget->h;
-        for (int i = 0; i < count; ++i) {
+        for (Cursor i = 0; i < count; i++) {
             char text[32];
-            labels[i].toText(text, 32);
+            getLabel(i, widget->data, text, 32);
             drawText(text, -1, x, y, w, h, i == selectedButton ? selectedStyle : style, false, false, false, nullptr, nullptr, nullptr, nullptr);
             x += w;
         }
@@ -75,14 +69,14 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
         int labelHeight = MIN(w, h);
         int yOffset = (h - labelHeight) / 2;
 
-        for (int i = 0; i < count; ++i) {
+        for (Cursor i = 0; i < count; i++) {
             if (yOffset > 0) {
                 display::setColor(style->background_color);
                 display::fillRect(x, y, x + widget->w - 1, y + yOffset - 1);
             }
 
             char text[32];
-            labels[i].toText(text, 32);
+            getLabel(i, widget->data, text, 32);
             drawText(text, -1, x, y + yOffset, w, labelHeight, i == selectedButton ? selectedStyle: style, false, false, false, nullptr, nullptr, nullptr, nullptr);
 
             int b = y + yOffset + labelHeight;
@@ -106,27 +100,19 @@ DrawFunctionType BUTTON_GROUP_draw = [] (const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     const ButtonGroupWidget *buttonGroupWidget = GET_WIDGET_PROPERTY(widget, specific, const ButtonGroupWidget *);
 
-    widgetCursor.currentState->size = sizeof(ButtonGroupWidgetState);
+    widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
-
-    const Value *labels;
-    int count;
-    getList(widgetCursor.cursor, widget->data, &labels, count);
-
-    ((ButtonGroupWidgetState *)widgetCursor.currentState)->labels = labels;
 
     bool refresh =
         !widgetCursor.previousState ||
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data ||
-        ((ButtonGroupWidgetState *)widgetCursor.previousState)->labels !=
-            ((ButtonGroupWidgetState *)widgetCursor.currentState)->labels;
+        widgetCursor.previousState->data != widgetCursor.currentState->data;
 
     if (refresh) {
         const Style* style = getStyle(widget->style);
         const Style* selectedStyle = getStyle(buttonGroupWidget->selectedStyle);
-        drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle,
-                    widgetCursor.currentState->data.getInt(), labels, count);
+
+        drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, widgetCursor.currentState->data.getInt(), count(widget->data));
     }
 };
 
@@ -134,23 +120,21 @@ OnTouchFunctionType BUTTON_GROUP_onTouch = [](const WidgetCursor &widgetCursor, 
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         const Widget *widget = widgetCursor.widget;
 
-        const Value *labels;
-        int count;
-        getList(widgetCursor.cursor, widget->data, &labels, count);
+        int count_ = count(widget->data);
 
         int selectedButton;
         if (widget->w > widget->h) {
-            int w = widget->w / count;
-            int x = widgetCursor.x + (widget->w - w * count) / 2;
+            int w = widget->w / count_;
+            int x = widgetCursor.x + (widget->w - w * count_) / 2;
 
             selectedButton = (touchEvent.x - x) / w;
         } else {
-            int h = widget->h / count;
-            int y = widgetCursor.y + (widget->h - h * count) / 2;
+            int h = widget->h / count_;
+            int y = widgetCursor.y + (widget->h - h * count_) / 2;
             selectedButton = (touchEvent.y - y) / h;
         }
 
-        if (selectedButton >= 0 && selectedButton < count) {
+        if (selectedButton >= 0 && selectedButton < count_) {
             set(widgetCursor.cursor, widget->data, selectedButton);
             sound::playClick();
         }

@@ -1632,6 +1632,17 @@ void Channel::getSerial(char *text) {
     channelInterface->getSerial(text);
 }
 
+void Channel::getVoltageStepValues(StepValues *stepValues) {
+    channelInterface->getVoltageStepValues(stepValues);
+}
+
+void Channel::getCurrentStepValues(StepValues *stepValues) {
+    channelInterface->getCurrentStepValues(stepValues);
+}
+
+void Channel::getPowerStepValues(StepValues *stepValues) {
+    channelInterface->getPowerStepValues(stepValues);
+}
 
 } // namespace psu
 } // namespace eez
