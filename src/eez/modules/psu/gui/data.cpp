@@ -2393,6 +2393,13 @@ void data_channel_protection_ovp_level(DataOperationEnum operation, Cursor curso
     }
 }
 
+void getProtectionDelayStepValues(StepValues *stepValues) {
+    static float values[] = { 20.0f, 10.0f, 5.0f, 1.0f };
+    stepValues->values = values;
+    stepValues->count = sizeof(values) / sizeof(float);
+    stepValues->unit = UNIT_SECOND;
+}
+
 void data_channel_protection_ovp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
@@ -2580,13 +2587,6 @@ void data_channel_protection_opp_level(DataOperationEnum operation, Cursor curso
         channel.getPowerStepValues(value.getStepValues());
         value = 1;
     }
-}
-
-void getProtectionDelayStepValues(StepValues *stepValues) {
-    static float values[] = { 20.0f, 10.0f, 5.0f, 1.0f };
-    stepValues->values = values;
-    stepValues->count = sizeof(values) / sizeof(float);
-    stepValues->unit = UNIT_SECOND;
 }
 
 void data_channel_protection_opp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {

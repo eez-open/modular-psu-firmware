@@ -219,7 +219,7 @@ struct Value {
         return puint8_;
     }
     
-    const StepValues *getStepValues() const {
+    StepValues *getStepValues() const {
         return (StepValues *)pVoid_;
     }
 
