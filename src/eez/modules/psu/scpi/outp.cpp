@@ -260,6 +260,78 @@ scpi_result_t scpi_cmd_outputDprogQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_outputDelayState(scpi_t *context) {
+    bool state;
+    if (!SCPI_ParamBool(context, &state, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    Channel *channel = param_channel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    channel_dispatcher::setOutputDelayState(*channel, state);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_outputDelayStateQ(scpi_t *context) {
+    Channel *channel = param_channel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultBool(context, channel->flags.outputDelayState);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_outputDelayDuration(scpi_t *context) {
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return SCPI_RES_ERR;
+    }
+    float duration;
+    if (param.special) {
+        if (param.content.tag == SCPI_NUM_MIN) {
+            duration = OUTPUT_DELAY_DURATION_MIN_VALUE;
+        } else if (param.content.tag == SCPI_NUM_MAX) {
+            duration = OUTPUT_DELAY_DURATION_MAX_VALUE;
+        } else if (param.content.tag == SCPI_NUM_DEF) {
+            duration = OUTPUT_DELAY_DURATION_DEF_VALUE;
+        } else {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
+    } else {
+        if (param.unit != SCPI_UNIT_NONE && param.unit != SCPI_UNIT_SECOND) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+
+        duration = (float)param.content.value;
+    }
+
+    Channel *channel = param_channel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    channel_dispatcher::setOutputDelayDuration(*channel, duration);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_outputDelayDurationQ(scpi_t *context) {
+    Channel *channel = param_channel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    return get_source_value(context, *channel, UNIT_SECOND, channel->outputDelayDuration, OUTPUT_DELAY_DURATION_MIN_VALUE, OUTPUT_DELAY_DURATION_MAX_VALUE, OUTPUT_DELAY_DURATION_DEF_VALUE);
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

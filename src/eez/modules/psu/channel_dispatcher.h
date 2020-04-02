@@ -98,6 +98,14 @@ void setOppState(Channel &channel, int state);
 void setOppLevel(Channel &channel, float level);
 void setOppDelay(Channel &channel, float delay);
 
+void setVoltageRampState(Channel &channel, bool state);
+void setVoltageRampDuration(Channel &channel, float duration);
+void setCurrentRampState(Channel &channel, bool state);
+void setCurrentRampDuration(Channel &channel, float duration);
+
+void setOutputDelayState(Channel &channel, bool state);
+void setOutputDelayDuration(Channel &channel, float duration);
+
 void outputEnable(Channel &channel, bool enable);
 void outputEnableOnNextSync(Channel &channel, bool enable);
 void syncOutputEnable();

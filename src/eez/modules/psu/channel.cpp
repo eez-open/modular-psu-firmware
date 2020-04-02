@@ -58,6 +58,8 @@ void Channel::Value::init(float set_, float step_, float limit_) {
     step = step_;
     limit = limit_;
     resetMonValues();
+    rampState = false;
+    rampDuration = RAMP_DURATION_DEF_VALUE;
 }
 
 void Channel::Value::resetMonValues() {
@@ -618,6 +620,9 @@ void Channel::reset() {
     trigger::setCurrent(*this, params.I_MIN);
     list::resetChannelList(*this);
 
+    flags.outputDelayState = 0;
+    outputDelayDuration = 0;
+
 #ifdef EEZ_PLATFORM_SIMULATOR
     simulator.setLoadEnabled(false);
     simulator.load = 10;
@@ -1141,7 +1146,7 @@ bool Channel::isOutputEnabled() {
 }
 
 void Channel::doCalibrationEnable(bool enable) {
-    flags._calEnabled = enable;
+    flags.calEnabled = enable;
 
     if (enable) {
         u.min = roundChannelValue(UNIT_VOLT, MAX(cal_conf.u.minPossible, params.U_MIN));
@@ -1201,18 +1206,18 @@ void Channel::calibrationEnableNoEvent(bool enabled) {
 }
 
 bool Channel::isCalibrationEnabled() {
-    return flags._calEnabled;
+    return flags.calEnabled;
 }
 
 bool Channel::isVoltageCalibrationEnabled() {
-    return flags._calEnabled && cal_conf.flags.u_cal_params_exists;
+    return flags.calEnabled && cal_conf.flags.u_cal_params_exists;
 }
 
 bool Channel::isCurrentCalibrationEnabled() {
-    return flags._calEnabled && ((flags.currentCurrentRange == CURRENT_RANGE_HIGH &&
-                                  cal_conf.flags.i_cal_params_exists_range_high) ||
-                                 (flags.currentCurrentRange == CURRENT_RANGE_LOW &&
-                                  cal_conf.flags.i_cal_params_exists_range_low));
+    return flags.calEnabled && (
+        (flags.currentCurrentRange == CURRENT_RANGE_HIGH && cal_conf.flags.i_cal_params_exists_range_high) ||
+        (flags.currentCurrentRange == CURRENT_RANGE_LOW && cal_conf.flags.i_cal_params_exists_range_low)
+    );
 }
 
 void Channel::remoteSensingEnable(bool enable) {

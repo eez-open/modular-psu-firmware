@@ -1320,6 +1320,10 @@ void action_channel_update_firmware() {
     yesNoDialog(PAGE_ID_YES_NO_FLASH_SLAVE, nullptr, onSelectFirmware, nullptr, nullptr);
 }
 
+void action_show_sys_settings_ramp_and_delay() {
+    pushPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+}
+
 } // namespace gui
 } // namespace eez
 

@@ -368,6 +368,46 @@ private:
     bool m_enableTrackingModeOrig;
 };
 
+class SysSettingsRampAndDelayPage : public SetPage {
+public:
+    void pageAlloc();
+
+    int getDirty();
+    void set();
+
+    float triggerVoltage[CH_MAX];
+    void setTriggerVoltage(int channelIndex, float value);
+
+    float triggerCurrent[CH_MAX];
+    void setTriggerCurrent(int channelIndex, float value);
+
+    float voltageRampDuration[CH_MAX];
+    void setVoltageRampDuration(int channelIndex, float value);
+
+    float currentRampDuration[CH_MAX];
+    void setCurrentRampDuration(int channelIndex, float value);
+
+    float outputDelayDuration[CH_MAX];
+    void setOutputDelayDuration(int channelIndex, float value);
+
+    int version;
+
+    uint32_t startChannel;
+
+    Value getRefreshState();
+    static void draw(const WidgetCursor &widgetCursor);
+
+private:
+    float triggerVoltageOrig[CH_MAX];
+    float triggerCurrentOrig[CH_MAX];
+    float voltageRampDurationOrig[CH_MAX];
+    float currentRampDurationOrig[CH_MAX];
+    float outputDelayDurationOrig[CH_MAX];
+
+    static void setTriggerStepMode();
+    void drawRamp(const WidgetCursor &widgetCursor, int channelIndex, bool drawVoltageRamps, float T, float limit, int yOffset = 0);
+};
+
 } // namespace gui
 } // namespace psu
 } // namespace eez

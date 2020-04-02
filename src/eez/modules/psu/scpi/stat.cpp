@@ -177,8 +177,6 @@ static int getSelectedChannelIndexFromCommandNumberOrContext(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEventQ(scpi_t *context) {
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-
     int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
     if (channelIndex == -1) {
         return SCPI_RES_ERR;
@@ -196,8 +194,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEventQ(scpi_t *contex
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryConditionQ(scpi_t *context) {
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-
     int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
     if (channelIndex == -1) {
         return SCPI_RES_ERR;
@@ -212,8 +208,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryConditionQ(scpi_t *co
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnable(scpi_t *context) {
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-
     int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
     if (channelIndex == -1) {
         return SCPI_RES_ERR;
@@ -231,8 +225,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnable(scpi_t *contex
 }
 
 scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnableQ(scpi_t *context) {
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-
     int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
     if (channelIndex == -1) {
         return SCPI_RES_ERR;
@@ -248,8 +240,6 @@ scpi_result_t scpi_cmd_statusQuestionableInstrumentIsummaryEnableQ(scpi_t *conte
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEventQ(scpi_t *context) {
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-
     int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
     if (channelIndex == -1) {
         return SCPI_RES_ERR;
@@ -268,8 +258,6 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEventQ(scpi_t *context) 
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryConditionQ(scpi_t *context) {
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-
     int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
     if (channelIndex == -1) {
         return SCPI_RES_ERR;
@@ -285,8 +273,6 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryConditionQ(scpi_t *conte
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnable(scpi_t *context) {
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-
     int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
     if (channelIndex == -1) {
         return SCPI_RES_ERR;
@@ -303,8 +289,6 @@ scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnable(scpi_t *context) 
 }
 
 scpi_result_t scpi_cmd_statusOperationInstrumentIsummaryEnableQ(scpi_t *context) {
-    scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-
     int32_t channelIndex = getSelectedChannelIndexFromCommandNumberOrContext(context);
     if (channelIndex == -1) {
         return SCPI_RES_ERR;

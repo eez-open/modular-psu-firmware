@@ -1301,9 +1301,14 @@ float encoderIncrement(Value value, int counter, float min, float max, int chann
     float newValue = value.getFloat() + step * counter;
     newValue = roundPrec(newValue, step);
 
-    return clamp(newValue, min, max);
-}
+    if (getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
+        newValue = 0;
+    } else {
+        newValue = clamp(newValue, min, max);
+    }
 
+    return newValue;
+}
 
 bool isEncoderEnabledForWidget(const Widget *widget) {
     return widget->action == ACTION_ID_EDIT;
@@ -1914,6 +1919,7 @@ static SysSettingsTrackingPage g_sysSettingsTrackingPage;
 static SysSettingsCouplingPage g_sysSettingsCouplingPage;
 static UserProfilesPage g_UserProfilesPage;
 static file_manager::FileBrowserPage g_FileBrowserPage;
+static SysSettingsRampAndDelayPage g_sysSettingsRampAndDelayPage;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1998,6 +2004,9 @@ Page *getPageFromIdHook(int pageId) {
         break;
     case PAGE_ID_FILE_BROWSER:
         page = &g_FileBrowserPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY:
+        page = &g_sysSettingsRampAndDelayPage;
         break;
     }
 

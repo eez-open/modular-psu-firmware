@@ -3860,14 +3860,42 @@ void data_channel_trigger_mode(DataOperationEnum operation, Cursor cursor, Value
 }
 
 void data_channel_u_trigger_value(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getTriggerVoltage(*g_channel), UNIT_VOLT);
+    if (operation == DATA_OPERATION_GET || operation == DATA_OPERATION_GET_EDIT_VALUE) {
+        auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+        if (page) {
+            value = MakeValue(page->triggerVoltage[cursor], UNIT_VOLT);
+        } else {
+            value = MakeValue(channel_dispatcher::getTriggerVoltage(*g_channel), UNIT_VOLT);
+        }
+    } else if (operation == DATA_OPERATION_SET) {
+        auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+        if (page) {
+            page->setTriggerVoltage(cursor, value.getFloat());
+        }
+    } else if (operation == DATA_OPERATION_GET_NAME) {
+        value = "Voltage step";
+    } else {
+        data_channel_u_edit(operation, cursor, value);
     }
 }
 
 void data_channel_i_trigger_value(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getTriggerCurrent(*g_channel), UNIT_AMPER);
+    if (operation == DATA_OPERATION_GET || operation == DATA_OPERATION_GET_EDIT_VALUE) {
+        auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+        if (page) {
+            value = MakeValue(page->triggerCurrent[cursor], UNIT_AMPER);
+        } else {
+            value = MakeValue(channel_dispatcher::getTriggerCurrent(*g_channel), UNIT_AMPER);
+        }
+    } else if (operation == DATA_OPERATION_SET) {
+        auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+        if (page) {
+            page->setTriggerCurrent(cursor, value.getFloat());
+        }    
+    } else if (operation == DATA_OPERATION_GET_NAME) {
+        value = "Current step";
+    } else {
+        data_channel_i_edit(operation, cursor, value);
     }
 }
 
@@ -5572,8 +5600,7 @@ void data_alert_message_is_set(DataOperationEnum operation, Cursor cursor,
     }
 }
 
-void data_alert_message(DataOperationEnum operation, Cursor cursor,
-                        Value &value) {
+void data_alert_message(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = psu::gui::g_alertMessage;
     } else if (operation == DATA_OPERATION_SET) {
@@ -5581,8 +5608,7 @@ void data_alert_message(DataOperationEnum operation, Cursor cursor,
     }
 }
 
-void data_alert_message_2(DataOperationEnum operation, Cursor cursor,
-                          Value &value) {
+void data_alert_message_2(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_alertMessage2;
     } else if (operation == DATA_OPERATION_SET) {
@@ -5590,13 +5616,152 @@ void data_alert_message_2(DataOperationEnum operation, Cursor cursor,
     }
 }
 
-void data_alert_message_3(DataOperationEnum operation, Cursor cursor,
-                          Value &value) {
+void data_alert_message_3(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_alertMessage3;
     } else if (operation == DATA_OPERATION_SET) {
         g_alertMessage3 = value;
     }
+}
+
+void data_ramp_and_delay_list(DataOperationEnum operation, Cursor cursor, Value &value) {
+    auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+    if (!page) {
+        return;
+    }
+
+    static const int PAGE_SIZE = 4;
+
+    if (operation == DATA_OPERATION_COUNT) {
+        value = CH_NUM;
+    }  else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
+        value = Value(CH_NUM, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
+        value = Value(page->startChannel, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
+        int32_t newPosition = value.getUInt32();
+        if (newPosition < 0) {
+            page->startChannel = 0;
+        } else if (newPosition + PAGE_SIZE > CH_NUM) {
+            page->startChannel = CH_NUM - PAGE_SIZE;
+        } else {
+            page->startChannel = newPosition;
+        }
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT) {
+        value = Value(1, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+        value = Value(PAGE_SIZE, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_SELECT) {
+        value = Value(g_channel, VALUE_TYPE_POINTER);
+        selectChannel(&Channel::get(page->startChannel + cursor));
+    } else if (operation == DATA_OPERATION_DESELECT) {
+        selectChannel((Channel * )value.getVoidPointer());
+    } else if (operation == DATA_OPERATION_GET) {
+        value = page->getRefreshState();
+    } else if (operation == DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION) {
+        value = Value((void *)SysSettingsRampAndDelayPage::draw, VALUE_TYPE_POINTER);
+    }
+}
+
+void getRampAndDelayDurationStepValues(Value &value) {
+    auto stepValues = value.getStepValues();
+
+    static float values[] = { 1.0f, 0.1f, 0.01f, 0.001f };
+    stepValues->values = values;
+    stepValues->count = sizeof(values) / sizeof(float);
+    stepValues->unit = UNIT_SECOND;
+
+    value = 1;
+}
+
+void data_channel_voltage_ramp_duration(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET || operation == DATA_OPERATION_GET_EDIT_VALUE) {
+        auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+        if (page) {
+            value = MakeValue(page->voltageRampDuration[cursor], UNIT_SECOND);
+        }
+    } else if (operation == DATA_OPERATION_SET) {
+        auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+        if (page) {
+            page->setVoltageRampDuration(cursor, value.getFloat());
+        }
+    } if (operation == DATA_OPERATION_GET_NAME) {
+        value = "U ramp dur.";
+    } else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
+        value = 1;
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = MakeValue(RAMP_DURATION_MIN_VALUE, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = MakeValue(RAMP_DURATION_MAX_VALUE, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_GET_LIMIT) {
+        value = MakeValue(RAMP_DURATION_MAX_VALUE, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        getRampAndDelayDurationStepValues(value);
+    }    
+}
+
+void data_channel_current_ramp_duration(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET || operation == DATA_OPERATION_GET_EDIT_VALUE) {
+        auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+        if (page) {
+            value = MakeValue(page->currentRampDuration[cursor], UNIT_SECOND);
+        }
+    } else if (operation == DATA_OPERATION_SET) {
+        auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+        if (page) {
+            page->setCurrentRampDuration(cursor, value.getFloat());
+        }
+    } if (operation == DATA_OPERATION_GET_NAME) {
+        value = "I ramp dur.";
+    } else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
+        value = 1;
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = MakeValue(RAMP_DURATION_MIN_VALUE, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = MakeValue(RAMP_DURATION_MAX_VALUE, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_GET_LIMIT) {
+        value = MakeValue(RAMP_DURATION_MAX_VALUE, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        getRampAndDelayDurationStepValues(value);
+    }    
+}
+
+void data_channel_output_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET || operation == DATA_OPERATION_GET_EDIT_VALUE) {
+        auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+        if (page) {
+            value = MakeValue(page->outputDelayDuration[cursor], UNIT_SECOND);
+        }
+    } else if (operation == DATA_OPERATION_SET) {
+        auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+        if (page) {
+            page->setOutputDelayDuration(cursor, value.getFloat());
+        }
+    } if (operation == DATA_OPERATION_GET_NAME) {
+        value = "Out. delay";
+    } else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
+        value = 1;
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = MakeValue(RAMP_DURATION_MIN_VALUE, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = MakeValue(RAMP_DURATION_MAX_VALUE, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_GET_LIMIT) {
+        value = MakeValue(RAMP_DURATION_MAX_VALUE, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = UNIT_SECOND;
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 1;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        getRampAndDelayDurationStepValues(value);
+    }    
 }
 
 } // namespace gui

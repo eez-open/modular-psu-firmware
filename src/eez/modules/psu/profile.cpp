@@ -73,6 +73,8 @@ static Parameters *getProfileParametersFromCache(int location);
 
 static void getProfileFilePath(int location, char *filePath);
 
+static void resetProfileToDefaults(Parameters &profile);
+
 static void saveState(Parameters &profile, List *lists);
 static bool recallState(Parameters &profile, List *lists, int recallOptions, int *err);
 
@@ -147,7 +149,7 @@ bool recallFromLocation(int location, int recallOptions, bool showProgress, int 
     getProfileFilePath(location, filePath);
 
     Parameters profile;
-    memset(&profile, 0, sizeof(Parameters));
+    resetProfileToDefaults(profile);
     if (!loadProfileFromFile(filePath, profile, g_listsProfile0, 0, showProgress, err)) {
         return false;
     }
@@ -176,7 +178,7 @@ bool recallFromLocation(int location, int recallOptions, bool showProgress, int 
 
 bool recallFromFile(const char *filePath, int recallOptions, bool showProgress, int *err) {
     Parameters profile;
-    memset(&profile, 0, sizeof(Parameters));
+    resetProfileToDefaults(profile);
     if (!loadProfileFromFile(filePath, profile, g_listsProfile0, 0, showProgress, err)) {
         return false;
     }
@@ -343,7 +345,7 @@ bool setName(int location, const char *name, bool showProgress, int *err) {
             getProfileFilePath(location, filePath);
 
             Parameters profile;
-            memset(&profile, 0, sizeof(Parameters));
+            resetProfileToDefaults(profile);
             if (!loadProfileFromFile(filePath, profile, g_listsProfile10, 0, false, err)) {
                 return false;
             }
@@ -455,6 +457,20 @@ static void getProfileFilePath(int location, char *filePath) {
     strcat(filePath, PATH_SEPARATOR);
     strcatInt(filePath, location);
     strcat(filePath, getExtensionFromFileType(FILE_TYPE_PROFILE));
+}
+
+static void resetProfileToDefaults(Parameters &profile) {
+    memset(&profile, 0, sizeof(Parameters));
+
+    for (int i = 0; i < CH_MAX; i++) {
+        profile.channels[i].u_rampState = false;
+        profile.channels[i].u_rampDuration = RAMP_DURATION_DEF_VALUE;
+        profile.channels[i].i_rampState = false;
+        profile.channels[i].i_rampDuration = RAMP_DURATION_DEF_VALUE;
+
+        profile.channels[i].flags.outputDelayState = 0;
+        profile.channels[i].outputDelayDuration = 0;
+    }
 }
 
 static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parameters &profile, List *lists) {
@@ -625,6 +641,14 @@ static void saveState(Parameters &profile, List *lists) {
             profile.channels[i].flags.dprogState = channel.flags.dprogState;
             profile.channels[i].flags.trackingEnabled = channel.flags.trackingEnabled;
 
+            profile.channels[i].u_rampState = channel.u.rampState;
+            profile.channels[i].u_rampDuration = channel.u.rampDuration;
+            profile.channels[i].i_rampState = channel.i.rampState;
+            profile.channels[i].i_rampDuration = channel.i.rampDuration;
+
+            profile.channels[i].flags.outputDelayState = channel.flags.outputDelayState;
+            profile.channels[i].outputDelayDuration = channel.outputDelayDuration;
+
             if (lists) {
                 auto &list = lists[i];
                 memcpy(list.dwellList, list::getDwellList(channel, &list.dwellListLength), sizeof(list.dwellList));
@@ -751,6 +775,14 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
             if (channel.flags.trackingEnabled) {
                 ++numTrackingChannels;
             }
+
+            channel.u.rampState = profile.channels[i].u_rampState;
+            channel.u.rampDuration = profile.channels[i].u_rampDuration;
+            channel.i.rampState = profile.channels[i].i_rampState;
+            channel.i.rampDuration = profile.channels[i].i_rampDuration;
+
+            channel.flags.outputDelayState = profile.channels[i].flags.outputDelayState;
+            channel.outputDelayDuration = profile.channels[i].outputDelayDuration;
 
             auto &list = lists[i];
             channel_dispatcher::setDwellList(channel, list.dwellList, list.dwellListLength);
@@ -974,6 +1006,14 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
             WRITE_PROPERTY("u_triggerValue", channel.u_triggerValue);
             WRITE_PROPERTY("i_triggerValue", channel.i_triggerValue);
             WRITE_PROPERTY("listCount", channel.listCount);
+
+            WRITE_PROPERTY("u_rampState", channel.u_rampState);
+            WRITE_PROPERTY("u_rampDuration", channel.u_rampDuration);
+            WRITE_PROPERTY("i_rampState", channel.i_rampState);
+            WRITE_PROPERTY("i_rampDuration", channel.i_rampDuration);
+
+            WRITE_PROPERTY("outputDelayState", channel.flags.outputDelayState);
+            WRITE_PROPERTY("outputDelayDuration", channel.outputDelayDuration);
 
             if (lists) {
                 WRITE_LIST_PROPERTY(
@@ -1394,6 +1434,14 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
         READ_PROPERTY(u_triggerValue, channel.u_triggerValue);
         READ_PROPERTY(i_triggerValue, channel.i_triggerValue);
         READ_PROPERTY(listCount, channel.listCount);
+
+        READ_PROPERTY(u_rampState, channel.u_rampState);
+        READ_PROPERTY(u_rampDuration, channel.u_rampDuration);
+        READ_PROPERTY(i_rampState, channel.i_rampState);
+        READ_PROPERTY(i_rampDuration, channel.i_rampDuration);
+
+        READ_FLAG(outputDelayState, channel.flags.outputDelayState);
+        READ_PROPERTY(outputDelayDuration, channel.outputDelayDuration);
 
         if (lists) {
             READ_LIST_PROPERTY(list, channelIndex, lists);

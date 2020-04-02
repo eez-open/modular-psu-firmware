@@ -69,8 +69,7 @@ static scpi_result_t set_step(scpi_t *context, Channel::Value *cv, float min_val
     return SCPI_RES_OK;
 }
 
-static scpi_result_t get_source_value(scpi_t *context, Channel &channel, Unit unit, float value,
-                                      float min, float max, float def) {
+scpi_result_t get_source_value(scpi_t *context, Channel &channel, Unit unit, float value, float min, float max, float def) {
     int32_t spec;
     if (!SCPI_ParamChoice(context, scpi_special_numbers_def, &spec, false)) {
         if (SCPI_ParamErrorOccurred(context)) {
@@ -92,8 +91,7 @@ static scpi_result_t get_source_value(scpi_t *context, Channel &channel, Unit un
     return result_float(context, &channel, value, unit);
 }
 
-static scpi_result_t get_source_value(scpi_t *context, Channel &channel, Unit unit, float value,
-                                      float def) {
+static scpi_result_t get_source_value(scpi_t *context, Channel &channel, Unit unit, float value, float def) {
     int32_t spec;
     if (!SCPI_ParamChoice(context, scpi_special_numbers_def, &spec, false)) {
         if (SCPI_ParamErrorOccurred(context)) {
@@ -1129,6 +1127,150 @@ scpi_result_t scpi_cmd_sourceListVoltageLevelQ(scpi_t *context) {
     SCPI_ResultArrayFloat(context, list, listLength, SCPI_FORMAT_ASCII);
 
     return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentRampState(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    bool state;
+    if (!SCPI_ParamBool(context, &state, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    channel_dispatcher::setCurrentRampState(*channel, state);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentRampStateQ(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultBool(context, channel->i.rampState);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentRampDuration(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return SCPI_RES_ERR;
+    }
+    float duration;
+    if (param.special) {
+        if (param.content.tag == SCPI_NUM_MIN) {
+            duration = RAMP_DURATION_MIN_VALUE;
+        } else if (param.content.tag == SCPI_NUM_MAX) {
+            duration = RAMP_DURATION_MAX_VALUE;
+        } else if (param.content.tag == SCPI_NUM_DEF) {
+            duration = RAMP_DURATION_DEF_VALUE;
+        } else {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
+    } else {
+        if (param.unit != SCPI_UNIT_NONE && param.unit != SCPI_UNIT_SECOND) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+
+        duration = (float)param.content.value;
+    }
+
+    channel_dispatcher::setCurrentRampDuration(*channel, duration);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentRampDurationQ(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    return get_source_value(context, *channel, UNIT_SECOND, channel->i.rampDuration, RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE);
+}
+
+scpi_result_t scpi_cmd_sourceVoltageRampState(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    bool state;
+    if (!SCPI_ParamBool(context, &state, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    channel_dispatcher::setVoltageRampState(*channel, state);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageRampStateQ(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultBool(context, channel->u.rampState);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageRampDuration(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return SCPI_RES_ERR;
+    }
+    float duration;
+    if (param.special) {
+        if (param.content.tag == SCPI_NUM_MIN) {
+            duration = RAMP_DURATION_MIN_VALUE;
+        } else if (param.content.tag == SCPI_NUM_MAX) {
+            duration = RAMP_DURATION_MAX_VALUE;
+        } else if (param.content.tag == SCPI_NUM_DEF) {
+            duration = RAMP_DURATION_DEF_VALUE;
+        } else {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
+    } else {
+        if (param.unit != SCPI_UNIT_NONE && param.unit != SCPI_UNIT_SECOND) {
+            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+            return SCPI_RES_ERR;
+        }
+
+        duration = (float)param.content.value;
+    }
+
+    channel_dispatcher::setVoltageRampDuration(*channel, duration);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageRampDurationQ(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    return get_source_value(context, *channel, UNIT_SECOND, channel->u.rampDuration, RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE);
 }
 
 } // namespace scpi

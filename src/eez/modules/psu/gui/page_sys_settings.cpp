@@ -19,8 +19,11 @@
 #if OPTION_DISPLAY
 
 #include <math.h>
+#include <string.h>
+#include <stdio.h>
 
 #include <eez/firmware.h>
+#include <eez/util.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -1013,6 +1016,279 @@ void SysSettingsCouplingPage::set() {
             event_queue::pushEvent(err);
             infoMessage("Coupling failed!");
         }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void SysSettingsRampAndDelayPage::pageAlloc() {
+    for (int i = 0; i < CH_NUM; i++) {
+        auto &channel = Channel::get(i);
+        
+        triggerVoltage[i] = triggerVoltageOrig[i] = channel_dispatcher::getTriggerVoltage(channel);
+        triggerCurrent[i] = triggerCurrentOrig[i] = channel_dispatcher::getTriggerCurrent(channel);
+        
+        voltageRampDuration[i] = voltageRampDurationOrig[i] = channel.u.rampState ? channel.u.rampDuration : 0;
+        currentRampDuration[i] = currentRampDurationOrig[i] = channel.i.rampState ? channel.i.rampDuration : 0;
+
+        outputDelayDuration[i] = outputDelayDurationOrig[i] = channel.flags.outputDelayState ? channel.outputDelayDuration : 0;
+    }
+
+    version = 1;
+    startChannel = 0;
+}
+
+int SysSettingsRampAndDelayPage::getDirty() {
+    for (int i = 0; i < CH_NUM; i++) {
+        if (triggerVoltage[i] != triggerVoltageOrig[i] || triggerCurrent[i] != triggerCurrentOrig[i]) {
+            return 1;
+        }
+        if (voltageRampDuration[i] != voltageRampDurationOrig[i] || currentRampDuration[i] != currentRampDurationOrig[i]) {
+            return 1;
+        }
+        if (outputDelayDuration[i] != outputDelayDurationOrig[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void SysSettingsRampAndDelayPage::set() {
+    bool askToSwitchToStepTriggerMode = false;
+
+    for (int i = 0; i < CH_NUM; i++) {
+        auto &channel = Channel::get(i);
+
+        channel_dispatcher::setTriggerVoltage(channel, triggerVoltage[i]);
+        channel_dispatcher::setTriggerCurrent(channel, triggerCurrent[i]);
+        
+        channel_dispatcher::setVoltageRampState(channel, voltageRampDuration[i] != 0);
+        channel_dispatcher::setVoltageRampDuration(channel, voltageRampDuration[i]);
+
+        channel_dispatcher::setCurrentRampState(channel, currentRampDuration[i] != 0);
+        channel_dispatcher::setCurrentRampDuration(channel, currentRampDuration[i]);
+
+        channel_dispatcher::setOutputDelayState(channel, outputDelayDuration[i] != 0);
+        channel_dispatcher::setOutputDelayDuration(channel, outputDelayDuration[i]);
+
+        if (
+            ((voltageRampDuration[i] != 0 || triggerVoltage[i] != 0) && channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_STEP) ||
+            ((currentRampDuration[i] != 0 || triggerCurrent[i] != 0) && channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_STEP)
+        ) {
+            askToSwitchToStepTriggerMode = true;
+        }
+    }
+
+    popPage();
+
+    if (askToSwitchToStepTriggerMode) {
+        yesNoDialog(PAGE_ID_YES_NO_L, "Do you want to set step trigger mode?", setTriggerStepMode, nullptr, nullptr);
+    }
+}
+
+void SysSettingsRampAndDelayPage::setTriggerStepMode() {
+    trigger::abort();
+    
+    for (int i = 0; i < CH_NUM; i++) {
+        auto &channel = Channel::get(i);
+        if (
+            ((channel.u.rampDuration != 0 || trigger::getVoltage(channel) != 0) && channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_STEP) ||
+            ((channel.i.rampDuration != 0 || trigger::getCurrent(channel) != 0) && channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_STEP)
+        ) {
+            channel_dispatcher::setVoltageTriggerMode(channel, TRIGGER_MODE_STEP);
+            channel_dispatcher::setCurrentTriggerMode(channel, TRIGGER_MODE_STEP);
+            channel_dispatcher::setTriggerOutputState(channel, true);
+        }
+    }
+}
+
+void SysSettingsRampAndDelayPage::setTriggerVoltage(int channelIndex, float value) {
+    if (channelIndex < 2 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL)) {
+        triggerVoltage[0] = value;
+        triggerVoltage[1] = value;
+    } else if (Channel::get(channelIndex).flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                triggerVoltage[i] = value;
+            }
+        }
+    } else {
+        triggerVoltage[channelIndex] = value;
+    }
+
+    ++version;
+}
+
+void SysSettingsRampAndDelayPage::setTriggerCurrent(int channelIndex, float value) {
+    if (channelIndex < 2 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL)) {
+        triggerCurrent[0] = value;
+        triggerCurrent[1] = value;
+    } else if (Channel::get(channelIndex).flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                triggerCurrent[i] = value;
+            }
+        }
+    } else {
+        triggerCurrent[channelIndex] = value;
+    }
+
+    ++version;
+}
+
+void SysSettingsRampAndDelayPage::setVoltageRampDuration(int channelIndex, float value) {
+    if (channelIndex < 2 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL)) {
+        voltageRampDuration[0] = value;
+        voltageRampDuration[1] = value;
+    } else if (Channel::get(channelIndex).flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                voltageRampDuration[i] = value;
+            }
+        }
+    } else {
+        voltageRampDuration[channelIndex] = value;
+    }
+
+    ++version;
+}
+
+void SysSettingsRampAndDelayPage::setCurrentRampDuration(int channelIndex, float value) {
+    if (channelIndex < 2 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL)) {
+        currentRampDuration[0] = value;
+        currentRampDuration[1] = value;
+    } else if (Channel::get(channelIndex).flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                currentRampDuration[i] = value;
+            }
+        }
+    } else {
+        currentRampDuration[channelIndex] = value;
+    }
+
+    ++version;
+}
+
+void SysSettingsRampAndDelayPage::setOutputDelayDuration(int channelIndex, float value) {
+    if (channelIndex < 2 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL)) {
+        outputDelayDuration[0] = value;
+        outputDelayDuration[1] = value;
+    } else if (Channel::get(channelIndex).flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                outputDelayDuration[i] = value;
+            }
+        }
+    } else {
+        outputDelayDuration[channelIndex] = value;
+    }
+
+    ++version;
+}
+
+Value SysSettingsRampAndDelayPage::getRefreshState() {
+    return Value((version << 24) | (g_focusDataId << 8) | (g_focusCursor & 0xFF), VALUE_TYPE_UINT32);
+}
+
+void SysSettingsRampAndDelayPage::draw(const WidgetCursor &widgetCursor) {
+    auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+
+    const Widget *widget = widgetCursor.widget;
+    const Style* style = getStyle(widget->style);
+    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
+
+    float drawVoltageRamps = (g_focusDataId != DATA_ID_CHANNEL_I_TRIGGER_VALUE && g_focusDataId != DATA_ID_CHANNEL_CURRENT_RAMP_DURATION);
+    float T = 0.0f;
+    float limit = 0.0f;
+
+    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+        T = MAX(T, page->outputDelayDuration[channelIndex] + (drawVoltageRamps ? page->voltageRampDuration[channelIndex] : page->currentRampDuration[channelIndex]));
+        limit = MAX(limit, (drawVoltageRamps ? page->triggerVoltage[channelIndex] : page->triggerCurrent[channelIndex]));
+    }
+
+    T *= 1.1f;
+    limit *= 1.1f;
+
+    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+        if (channelIndex != g_focusCursor) {
+            page->drawRamp(widgetCursor, channelIndex, drawVoltageRamps, T, limit);
+        }
+    }
+    
+    page->drawRamp(widgetCursor, g_focusCursor, drawVoltageRamps, T, limit);
+    page->drawRamp(widgetCursor, g_focusCursor, drawVoltageRamps, T, limit, 1);
+}
+
+
+void drawLine(int x1, int y1, int x2, int y2) {
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+    
+    int length;
+    if (abs(dx) > abs(dy)) {
+        length = abs(dx);
+    } else {
+        length = abs(dy);
+    }
+    
+    float xinc = (float)dx / length;
+    float yinc = (float)dy / length;
+    float x = (float)x1;
+    float y = (float)y1;
+    for (int i = 0; i < length; i++) {
+        mcu::display::drawPixel((int)roundf(x), (int)roundf(y));
+        x += xinc;
+        y += yinc;
+    }
+}
+
+void SysSettingsRampAndDelayPage::drawRamp(const WidgetCursor &widgetCursor, int channelIndex, bool drawVoltageRamps, float T, float limit, int yOffset) {
+    const Widget *widget = widgetCursor.widget;
+    const Style* style = getStyle(widget->style);
+    font::Font font = styleGetFont(style);
+    int textHeight = font.getHeight();
+
+    float delay = outputDelayDuration[channelIndex];
+    float duration = (drawVoltageRamps ? voltageRampDuration[channelIndex] : currentRampDuration[channelIndex]);
+
+    float step = (drawVoltageRamps ? triggerVoltage[channelIndex] : triggerCurrent[channelIndex]);
+
+    int x1 = widgetCursor.x;
+    int x2 = x1 + (int)roundf(delay * (widget->w - 1) / T);
+    int x3 = x1 + (int)roundf((delay + duration)  * (widget->w - 1) / T);
+    int x4 = widgetCursor.x + widget->w - 1;
+
+    int y1 = widgetCursor.y + widget->h - 1;
+    int y2 = y1 - (int)roundf(step * (widget->h - 1) / limit);
+
+    y1 -= yOffset;
+    y2 -= yOffset;
+
+    char label[20];
+    sprintf(label, "Ch%d %s", channelIndex + 1, (drawVoltageRamps ? "U" : "I"));
+
+    auto tmp = g_channelIndex;
+    g_channelIndex = channelIndex;
+    mcu::display::setColor(COLOR_ID_CHANNEL1);
+    g_channelIndex = tmp;
+
+    mcu::display::drawHLine(x1, y1, x2 - x1);
+    drawLine(x2, y1, x3, y2);
+    mcu::display::drawHLine(x3, y2, x4 - x3);
+
+    if (yOffset) {
+        int textWidth = mcu::display::measureStr(label, -1, font, 0);
+        mcu::display::drawStr(label, -1,
+            x4 - textWidth, y2 - textHeight > widgetCursor.y ? y2 - textHeight : y2,
+            widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1,
+            font
+        );
     }
 }
 

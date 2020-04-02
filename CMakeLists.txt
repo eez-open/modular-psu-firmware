@@ -291,6 +291,7 @@ set(src_eez_gui_widgets
     src/eez/gui/widgets/bitmap.cpp
     src/eez/gui/widgets/button.cpp
     src/eez/gui/widgets/button_group.cpp
+    src/eez/gui/widgets/canvas.cpp
     src/eez/gui/widgets/container.cpp
     src/eez/gui/widgets/display_data.cpp
     src/eez/gui/widgets/grid.cpp

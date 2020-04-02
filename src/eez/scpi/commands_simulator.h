@@ -126,6 +126,10 @@
     SCPI_COMMAND("OUTPut[:STATe]:TRIGgered", scpi_cmd_outputStateTriggered) \
     SCPI_COMMAND("OUTPut[:STATe]:TRIGgered?", scpi_cmd_outputStateTriggeredQ) \
     SCPI_COMMAND("OUTPut[:STATe]?", scpi_cmd_outputStateQ) \
+    SCPI_COMMAND("OUTPut:DELay[:STATe]", scpi_cmd_outputDelayState) \
+    SCPI_COMMAND("OUTPut:DELay[:STATe]?", scpi_cmd_outputDelayStateQ) \
+    SCPI_COMMAND("OUTPut:DELay:DURation", scpi_cmd_outputDelayDuration) \
+    SCPI_COMMAND("OUTPut:DELay:DURation?", scpi_cmd_outputDelayDurationQ) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe:AUTO", scpi_cmd_senseCurrentDcRangeAuto) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe:AUTO?", scpi_cmd_senseCurrentDcRangeAutoQ) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe[:UPPer]", scpi_cmd_senseCurrentDcRangeUpper) \
@@ -180,6 +184,10 @@
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel][:IMMediate]:STEP[:INCRement]?", scpi_cmd_sourceCurrentLevelImmediateStepIncrementQ) \
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel][:IMMediate][:AMPLitude]", scpi_cmd_sourceCurrentLevelImmediateAmplitude) \
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel][:IMMediate][:AMPLitude]?", scpi_cmd_sourceCurrentLevelImmediateAmplitudeQ) \
+    SCPI_COMMAND("[SOURce#]:CURRent:RAMP[:STATe]", scpi_cmd_sourceCurrentRampState) \
+    SCPI_COMMAND("[SOURce#]:CURRent:RAMP[:STATe]?", scpi_cmd_sourceCurrentRampStateQ) \
+    SCPI_COMMAND("[SOURce#]:CURRent:RAMP:DURation", scpi_cmd_sourceCurrentRampDuration) \
+    SCPI_COMMAND("[SOURce#]:CURRent:RAMP:DURation?", scpi_cmd_sourceCurrentRampDurationQ) \
     SCPI_COMMAND("[SOURce#]:LIST:COUNt", scpi_cmd_sourceListCount) \
     SCPI_COMMAND("[SOURce#]:LIST:COUNt?", scpi_cmd_sourceListCountQ) \
     SCPI_COMMAND("[SOURce#]:LIST:CURRent[:LEVel]", scpi_cmd_sourceListCurrentLevel) \
@@ -220,6 +228,10 @@
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate]:STEP[:INCRement]?", scpi_cmd_sourceVoltageLevelImmediateStepIncrementQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate][:AMPLitude]", scpi_cmd_sourceVoltageLevelImmediateAmplitude) \
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate][:AMPLitude]?", scpi_cmd_sourceVoltageLevelImmediateAmplitudeQ) \
+    SCPI_COMMAND("[SOURce#]:VOLTage:RAMP[:STATe]", scpi_cmd_sourceVoltageRampState) \
+    SCPI_COMMAND("[SOURce#]:VOLTage:RAMP[:STATe]?", scpi_cmd_sourceVoltageRampStateQ) \
+    SCPI_COMMAND("[SOURce#]:VOLTage:RAMP:DURation", scpi_cmd_sourceVoltageRampDuration) \
+    SCPI_COMMAND("[SOURce#]:VOLTage:RAMP:DURation?", scpi_cmd_sourceVoltageRampDurationQ) \
     SCPI_COMMAND("STATus:OPERation:CONDition?", scpi_cmd_statusOperationConditionQ) \
     SCPI_COMMAND("STATus:OPERation:ENABle", scpi_cmd_statusOperationEnable) \
     SCPI_COMMAND("STATus:OPERation:ENABle?", scpi_cmd_statusOperationEnableQ) \
