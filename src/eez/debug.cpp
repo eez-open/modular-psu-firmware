@@ -54,7 +54,9 @@ void Trace(const char *format, ...) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-DebugVariable::DebugVariable(const char *name) : m_name(name) {
+DebugVariable::DebugVariable(const char *name, uint32_t refreshRateMs)
+    : m_name(name), m_refreshRateMs(refreshRateMs) 
+{
 }
 
 const char *DebugVariable::name() {
@@ -63,7 +65,9 @@ const char *DebugVariable::name() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-DebugValueVariable::DebugValueVariable(const char *name) : DebugVariable(name) {
+DebugValueVariable::DebugValueVariable(const char *name, uint32_t refreshRateMs)
+    : DebugVariable(name, refreshRateMs) 
+{
 }
 
 void DebugValueVariable::tick1secPeriod() {
@@ -122,8 +126,9 @@ void DebugDurationForPeriod::dump(char *buffer) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-DebugDurationVariable::DebugDurationVariable(const char *name)
-    : DebugVariable(name), m_minTotal(4294967295UL), m_maxTotal(0) {
+DebugDurationVariable::DebugDurationVariable(const char *name, uint32_t refreshRateMs)
+    : DebugVariable(name, refreshRateMs), m_minTotal(4294967295UL), m_maxTotal(0) 
+{
 }
 
 void DebugDurationVariable::start() {
@@ -193,7 +198,9 @@ void DebugCounterForPeriod::dump(char *buffer) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-DebugCounterVariable::DebugCounterVariable(const char *name) : DebugVariable(name) {
+DebugCounterVariable::DebugCounterVariable(const char *name, uint32_t refreshRateMs) 
+    : DebugVariable(name, refreshRateMs) 
+{
 }
 
 void DebugCounterVariable::inc() {

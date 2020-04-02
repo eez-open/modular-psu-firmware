@@ -392,7 +392,10 @@ enum DataEnum {
     DATA_ID_IO_PIN_PWM_DUTY = 390,
     DATA_ID_CHANNEL_VOLTAGE_RAMP_DURATION = 391,
     DATA_ID_CHANNEL_CURRENT_RAMP_DURATION = 392,
-    DATA_ID_CHANNEL_OUTPUT_DELAY = 393
+    DATA_ID_CHANNEL_OUTPUT_DELAY = 393,
+    DATA_ID_DEBUG_VARIABLES = 394,
+    DATA_ID_DEBUG_VARIABLE_NAME = 395,
+    DATA_ID_DEBUG_VARIABLE_VALUE = 396
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -789,6 +792,9 @@ void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &val
 void data_channel_voltage_ramp_duration(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channel_current_ramp_duration(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channel_output_delay(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_debug_variables(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_debug_variable_name(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_debug_variable_value(DataOperationEnum operation, Cursor cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor cursor, Value &value);
 
@@ -1645,7 +1651,8 @@ enum PagesEnum {
     PAGE_ID_FILE_MANAGER_SCRIPTS_VIEW = 158,
     PAGE_ID_FILE_MANAGER_SCRIPTS_ALTER_VIEW = 159,
     PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW = 160,
-    PAGE_ID_TOUCH_TEST = 161
+    PAGE_ID_TOUCH_TEST = 161,
+    PAGE_ID_DEBUG_VARIABLES = 162
 };
 
-extern const uint8_t assets[311807];
+extern const uint8_t assets[311799];

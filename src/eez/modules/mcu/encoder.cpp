@@ -47,8 +47,9 @@ namespace encoder {
 
 #if defined(EEZ_PLATFORM_STM32)
 static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true, false);
-static uint16_t g_lastCounter;
 #endif	
+
+static uint16_t g_lastCounter;
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 int g_simulatorCounter;
@@ -133,19 +134,36 @@ void init() {
 	g_lastCounter = __HAL_TIM_GET_COUNTER(&htim8);
 #endif
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    g_lastCounter = 0;
+#endif
+
     g_calcAutoModeStepLevel.reset();
+}
+
+static int16_t g_diffCounter = 0;
+
+void tick() {
+#if defined(EEZ_PLATFORM_STM32)
+    uint16_t counter = __HAL_TIM_GET_COUNTER(&htim8);
+    g_diffCounter += counter - g_lastCounter;
+    g_lastCounter = counter;
+    psu::debug::g_encoderCounter.set(counter);
+#endif
 }
 
 int getCounter() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     int16_t diffCounter = g_simulatorCounter;
     g_simulatorCounter = 0;
+
+    g_lastCounter += diffCounter;
+    psu::debug::g_encoderCounter.set(g_lastCounter);
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
-    uint16_t counter = __HAL_TIM_GET_COUNTER(&htim8);
-    int16_t diffCounter = counter - g_lastCounter;
-    g_lastCounter = counter;
+    int16_t diffCounter = g_diffCounter;
+    g_diffCounter = 0;
 #endif
 
     // update acceleration

@@ -925,6 +925,14 @@ void CHANNEL_INFO_SERIAL_value_to_text(const Value &value, char *text, int count
     channel.getSerial(text);
 }
 
+bool compare_DEBUG_VARIABLE_value(const Value &a, const Value &b) {
+    return false;
+}
+
+void DEBUG_VARIABLE_value_to_text(const Value &value, char *text, int count) {
+    psu::debug::getVariableValue(value.getInt(), text);
+}
+
 static Cursor g_editValueCursor(-1);
 static int16_t g_editValueDataId;
 
@@ -5763,6 +5771,49 @@ void data_channel_output_delay(DataOperationEnum operation, Cursor cursor, Value
         getRampAndDelayDurationStepValues(value);
     }    
 }
+
+void data_debug_variables(DataOperationEnum operation, Cursor cursor, Value &value) {
+    static const uint32_t PAGE_SIZE = 20;
+    static uint32_t g_position = 0;
+
+    using namespace psu::debug;
+
+    if (operation == DATA_OPERATION_COUNT) {
+        value = (int)getNumVariables();
+    }  else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
+        value = Value(getNumVariables(), VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
+        value = Value(g_position, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
+        int32_t newPosition = value.getUInt32();
+        if (newPosition < 0) {
+            g_position = 0;
+        } else if (newPosition + PAGE_SIZE > getNumVariables()) {
+            g_position = getNumVariables() - PAGE_SIZE;
+        } else {
+            g_position = newPosition;
+        }
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT) {
+        value = Value(2, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+        value = Value(PAGE_SIZE, VALUE_TYPE_UINT32);
+    }
+}
+
+void data_debug_variable_name(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = psu::debug::getVariableName(cursor);
+    }
+}
+
+void data_debug_variable_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(cursor, VALUE_TYPE_DEBUG_VARIABLE);
+    } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+        value = Value(psu::debug::getVariableRefreshRateMs(cursor), VALUE_TYPE_UINT32);
+    }
+}
+
 
 } // namespace gui
 } // namespace eez

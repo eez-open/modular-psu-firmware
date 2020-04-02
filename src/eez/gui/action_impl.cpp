@@ -389,11 +389,7 @@ void channelsEnumDefinition(DataOperationEnum operation, Cursor cursor, Value &v
 }
 
 void action_ch_settings_copy() {
-    if (CH_NUM >= 3) {
-        pushSelectFromEnumPage(channelsEnumDefinition, -1, nullptr, onChannelCopyDestinationSelected, false, false);
-    } else {
-        onChannelCopyDestinationSelected(g_channel->channelIndex ? 0 : 1);
-    }
+    pushSelectFromEnumPage(channelsEnumDefinition, -1, nullptr, onChannelCopyDestinationSelected, false, false);
 }
 
 void action_ch_settings_calibration_wiz_start() {

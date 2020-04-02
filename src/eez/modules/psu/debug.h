@@ -35,6 +35,8 @@ namespace debug {
 void tick(uint32_t tickCount);
 
 extern DebugCounterVariable g_adcCounter;
+extern DebugValueVariable g_encoderCounter;
+
 extern DebugValueVariable g_uDac[CH_MAX];
 extern DebugValueVariable g_uMon[CH_MAX];
 extern DebugValueVariable g_uMonDac[CH_MAX];
@@ -43,6 +45,11 @@ extern DebugValueVariable g_iMon[CH_MAX];
 extern DebugValueVariable g_iMonDac[CH_MAX];
 
 void dumpVariables(char *buffer);
+
+uint32_t getNumVariables();
+const char *getVariableName(int variableIndex);
+void getVariableValue(int variableIndex, char *buffer);
+uint32_t getVariableRefreshRateMs(int variableIndex);
 
 } // namespace debug
 } // namespace psu

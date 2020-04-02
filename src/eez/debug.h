@@ -44,8 +44,8 @@ namespace eez {
 namespace debug {
 
 class DebugVariable {
-  public:
-    DebugVariable(const char *name);
+public:
+    DebugVariable(const char *name, uint32_t refreshRateMs);
 
     const char *name();
 
@@ -53,13 +53,16 @@ class DebugVariable {
     virtual void tick10secPeriod() = 0;
     virtual void dump(char *buffer) = 0;
 
-  private:
+    uint32_t getRefreshRateMs() { return m_refreshRateMs; }
+
+private:
     const char *m_name;
+    uint32_t m_refreshRateMs;
 };
 
 class DebugValueVariable : public DebugVariable {
-  public:
-    DebugValueVariable(const char *name);
+public:
+    DebugValueVariable(const char *name, uint32_t refreshRateMs = 1000);
 
     int32_t get() {
         return m_value;
@@ -72,12 +75,12 @@ class DebugValueVariable : public DebugVariable {
     void tick10secPeriod();
     void dump(char *buffer);
 
-  private:
+private:
     int32_t m_value;
 };
 
 class DebugDurationForPeriod {
-  public:
+public:
     DebugDurationForPeriod();
 
     void tick(uint32_t duration);
@@ -85,7 +88,7 @@ class DebugDurationForPeriod {
 
     void dump(char *buffer);
 
-  private:
+private:
     uint32_t m_min;
     uint32_t m_max;
     uint32_t m_total;
@@ -97,8 +100,8 @@ class DebugDurationForPeriod {
 };
 
 class DebugDurationVariable : public DebugVariable {
-  public:
-    DebugDurationVariable(const char *name);
+public:
+    DebugDurationVariable(const char *name, uint32_t refreshRateMs = 1000);
 
     void start();
     void finish();
@@ -108,7 +111,7 @@ class DebugDurationVariable : public DebugVariable {
     void tick10secPeriod();
     void dump(char *buffer);
 
-  private:
+private:
     uint32_t m_lastTickCount;
 
     DebugDurationForPeriod duration1sec;
@@ -119,21 +122,21 @@ class DebugDurationVariable : public DebugVariable {
 };
 
 class DebugCounterForPeriod {
-  public:
+public:
     DebugCounterForPeriod();
 
     void inc();
     void tickPeriod();
     void dump(char *buffer);
 
-  private:
+private:
     uint32_t m_counter;
     uint32_t m_lastCounter;
 };
 
 class DebugCounterVariable : public DebugVariable {
-  public:
-    DebugCounterVariable(const char *name);
+public:
+    DebugCounterVariable(const char *name, uint32_t refreshRateMs = 1000);
 
     void inc();
 
@@ -141,7 +144,7 @@ class DebugCounterVariable : public DebugVariable {
     void tick10secPeriod();
     void dump(char *buffer);
 
-  private:
+private:
     DebugCounterForPeriod counter1sec;
     DebugCounterForPeriod counter10sec;
 

@@ -76,6 +76,8 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
         // } else if (cmd == 26) {
         //     Channel::get(0).enterOvpProtection();
         // 
+        } else if (cmd == 26) {
+        	psu::gui::showPage(PAGE_ID_DEBUG_VARIABLES);
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;
