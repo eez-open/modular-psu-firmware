@@ -29,6 +29,7 @@
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/profile.h>
+#include <eez/modules/psu/ramp.h>
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/trigger.h>
 
@@ -452,7 +453,7 @@ void ChSettingsTriggerPage::onTriggerModeSet(uint16_t value) {
     if (channel_dispatcher::getVoltageTriggerMode(*g_channel) != value || channel_dispatcher::getCurrentTriggerMode(*g_channel) != value) {
         g_newTriggerMode = (uint8_t)value;
 
-        if (trigger::isInitiated() || list::isActive()) {
+        if (trigger::isInitiated() || list::isActive() || ramp::isActive()) {
             yesNoDialog(PAGE_ID_YES_NO, "Trigger is active. Are you sure?", onFinishTriggerModeSet, 0, 0);
         } else {
             onFinishTriggerModeSet();
@@ -483,7 +484,7 @@ void ChSettingsTriggerPage::editVoltageTriggerValue() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, MakeValue(trigger::getVoltage(*g_channel), UNIT_VOLT), options, onVoltageTriggerValueSet, 0, 0);
+    NumericKeypad::start(0, MakeValue(g_channel->u.triggerLevel, UNIT_VOLT), options, onVoltageTriggerValueSet, 0, 0);
 }
 
 void ChSettingsTriggerPage::onCurrentTriggerValueSet(float value) {
@@ -507,7 +508,7 @@ void ChSettingsTriggerPage::editCurrentTriggerValue() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, MakeValue(trigger::getCurrent(*g_channel), UNIT_AMPER), options, onCurrentTriggerValueSet, 0, 0);
+    NumericKeypad::start(0, MakeValue(g_channel->i.triggerLevel, UNIT_AMPER), options, onCurrentTriggerValueSet, 0, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

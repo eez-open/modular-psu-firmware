@@ -32,6 +32,7 @@
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/profile.h>
+#include <eez/modules/psu/ramp.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/scpi/regs.h>
 #include <eez/sound.h>
@@ -50,6 +51,8 @@ namespace psu {
 
 int CH_NUM = 0;
 Channel Channel::g_channels[CH_MAX];
+
+int g_errorChannelIndex = -1;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -616,8 +619,8 @@ void Channel::reset() {
     flags.currentTriggerMode = TRIGGER_MODE_FIXED;
     flags.triggerOutputState = 1;
     flags.triggerOnListStop = TRIGGER_ON_LIST_STOP_OUTPUT_OFF;
-    trigger::setVoltage(*this, params.U_MIN);
-    trigger::setCurrent(*this, params.I_MIN);
+    u.triggerLevel = params.U_MIN;
+    i.triggerLevel = params.I_MIN;
     list::resetChannelList(*this);
 
     flags.outputDelayState = 0;
@@ -1233,7 +1236,7 @@ bool Channel::isRemoteSensingEnabled() {
 
 void Channel::remoteProgrammingEnable(bool enable) {
     if (enable != flags.rprogEnabled) {
-        if (list::isActive(*this)) {
+        if (list::isActive(*this) || ramp::isActive(*this)) {
             trigger::abort();
         }
         doRemoteProgrammingEnable(enable);

@@ -252,6 +252,8 @@ class Channel {
         float def;
         float max;
 
+        float triggerLevel;
+
         bool rampState;
         float rampDuration;
 
@@ -623,6 +625,8 @@ private:
 #define OUTPUT_ENABLE_TASK_DP            (1 << 4)
 #define OUTPUT_ENABLE_TASK_ADC_START     (1 << 5)
 #define OUTPUT_ENABLE_TASK_FINALIZE      (1 << 6)
+
+extern int g_errorChannelIndex;
 
 } // namespace psu
 } // namespace eez

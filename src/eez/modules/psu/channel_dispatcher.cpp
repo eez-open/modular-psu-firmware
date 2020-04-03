@@ -154,8 +154,8 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
         channel.setCurrent(getIMin(channel));
         channel.setCurrentLimit(MIN(Channel::get(0).getCurrentLimit(), Channel::get(1).getCurrentLimit()));
 
-        trigger::setVoltage(channel, getUMin(channel));
-        trigger::setCurrent(channel, getIMin(channel));
+        channel.u.triggerLevel = getUMin(channel);
+        channel.i.triggerLevel = getIMin(channel);
 
         channel.prot_conf.flags.u_state = Channel::get(0).prot_conf.flags.u_state || Channel::get(1).prot_conf.flags.u_state ? 1 : 0;
         if (channel.params.features & CH_FEATURE_HW_OVP) {
@@ -326,8 +326,8 @@ void setTrackingChannels(uint16_t trackingEnabled) {
                     trackingChannel.setCurrent(MAX(iMin, getIMin(trackingChannel)));
                     trackingChannel.setCurrentLimit(MAX(currentLimit, getIMin(trackingChannel)));
 
-                    trigger::setVoltage(trackingChannel, uDef);
-                    trigger::setCurrent(trackingChannel, iDef);
+                    trackingChannel.u.triggerLevel = uDef;
+                    trackingChannel.i.triggerLevel = iDef;
 
                     trackingChannel.prot_conf.flags.u_state = u_state;
                     if (trackingChannel.params.features & CH_FEATURE_HW_OVP) {
@@ -1727,61 +1727,65 @@ void setTriggerOnListStop(Channel &channel, TriggerOnListStop value) {
 
 float getTriggerVoltage(Channel &channel) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        return trigger::getVoltage(Channel::get(0));
+        return Channel::get(0).u.triggerLevel;
     } else if (channel.flags.trackingEnabled) {
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
-                return trigger::getVoltage(trackingChannel);
+                return trackingChannel.u.triggerLevel;
             }
         }
     }
-    return trigger::getVoltage(channel);
+    return channel.u.triggerLevel;
 }
 
 void setTriggerVoltage(Channel &channel, float value) {
+    value = roundChannelValue(channel, UNIT_VOLT, value);
+
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        trigger::setVoltage(Channel::get(0), value);
+        Channel::get(0).u.triggerLevel = value;
     } else if (channel.flags.trackingEnabled) {
         value = roundTrackingValuePrecision(UNIT_VOLT, value);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
-                trigger::setVoltage(trackingChannel, value);
+                trackingChannel.u.triggerLevel = value;
             }
         }
     } else {
-        trigger::setVoltage(channel, value);
+        channel.u.triggerLevel = value;
     }
 }
 
 float getTriggerCurrent(Channel &channel) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        return trigger::getCurrent(Channel::get(0));
+        return Channel::get(0).i.triggerLevel;
     } else if (channel.flags.trackingEnabled) {
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
-                return trigger::getCurrent(trackingChannel);
+                return trackingChannel.i.triggerLevel;
             }
         }
     }
-    return trigger::getCurrent(channel);
+    return channel.i.triggerLevel;
 }
 
 void setTriggerCurrent(Channel &channel, float value) {
+    value = roundChannelValue(channel, UNIT_AMPER, value);
+
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        trigger::setCurrent(Channel::get(0), value);
+        Channel::get(0).i.triggerLevel = value;
     } else if (channel.flags.trackingEnabled) {
         value = roundTrackingValuePrecision(UNIT_AMPER, value);
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
-                trigger::setCurrent(trackingChannel, value);
+                trackingChannel.i.triggerLevel = value;
             }
         }
     } else {
-        trigger::setCurrent(channel, value);
+        channel.i.triggerLevel = value;
     }
 }
 
@@ -1991,8 +1995,8 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
     channel_dispatcher::setTriggerOutputState(dstChannel, srcChannel.flags.triggerOutputState);
     channel_dispatcher::setTriggerOnListStop(dstChannel, (TriggerOnListStop)srcChannel.flags.triggerOnListStop);
 
-    channel_dispatcher::setTriggerVoltage(dstChannel, trigger::getVoltage(srcChannel));
-    channel_dispatcher::setTriggerCurrent(dstChannel, trigger::getCurrent(srcChannel));
+    channel_dispatcher::setTriggerVoltage(dstChannel, srcChannel.u.triggerLevel);
+    channel_dispatcher::setTriggerCurrent(dstChannel, srcChannel.i.triggerLevel);
 
     channel_dispatcher::setListCount(dstChannel, list::getListCount(srcChannel));
 

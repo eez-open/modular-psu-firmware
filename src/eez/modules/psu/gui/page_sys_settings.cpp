@@ -1092,8 +1092,8 @@ void SysSettingsRampAndDelayPage::setTriggerStepMode() {
     for (int i = 0; i < CH_NUM; i++) {
         auto &channel = Channel::get(i);
         if (
-            ((channel.u.rampDuration != 0 || trigger::getVoltage(channel) != 0) && channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_STEP) ||
-            ((channel.i.rampDuration != 0 || trigger::getCurrent(channel) != 0) && channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_STEP)
+            ((channel.u.rampDuration != 0 || channel.u.triggerLevel != getUMin(channel)) && channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_STEP) ||
+            ((channel.i.rampDuration != 0 || channel.i.triggerLevel != getIMin(channel)) && channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_STEP)
         ) {
             channel_dispatcher::setVoltageTriggerMode(channel, TRIGGER_MODE_STEP);
             channel_dispatcher::setCurrentTriggerMode(channel, TRIGGER_MODE_STEP);

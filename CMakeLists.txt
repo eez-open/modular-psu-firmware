@@ -135,6 +135,7 @@ set(src_eez_modules_psu
     src/eez/modules/psu/persist_conf.cpp
     src/eez/modules/psu/profile.cpp
     src/eez/modules/psu/psu.cpp
+    src/eez/modules/psu/ramp.cpp
     src/eez/modules/psu/rtc.cpp
     src/eez/modules/psu/sd_card.cpp
     src/eez/modules/psu/serial.cpp
@@ -168,6 +169,7 @@ set(header_eez_modules_psu
     src/eez/modules/psu/persist_conf.h
     src/eez/modules/psu/profile.h
     src/eez/modules/psu/psu.h
+    src/eez/modules/psu/ramp.h
     src/eez/modules/psu/rtc.h
     src/eez/modules/psu/sd_card.h
     src/eez/modules/psu/serial_psu.h

@@ -198,14 +198,17 @@ int checkLimits(int iChannel) {
         }
 
         if (voltage > channel_dispatcher::getULimit(channel)) {
+            g_errorChannelIndex = channel.channelIndex;
             return SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
         }
 
         if (current > channel_dispatcher::getILimit(channel)) {
+            g_errorChannelIndex = channel.channelIndex;
             return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
         }
 
         if (voltage * current > channel_dispatcher::getPowerLimit(channel)) {
+            g_errorChannelIndex = channel.channelIndex;
             return SCPI_ERROR_POWER_LIMIT_EXCEEDED;
         }
     }
@@ -512,15 +515,14 @@ void setActive(bool active, bool forceUpdate = false) {
             updateChannelsWithVisibleCountersList();
         }
     }
-
 }
 
 void executionStart(Channel &channel) {
     g_execution[channel.channelIndex].it = -1;
     g_execution[channel.channelIndex].counter = g_channelsLists[channel.channelIndex].count;
+    channel_dispatcher::setVoltage(channel, 0);
+    channel_dispatcher::setCurrent(channel, 0);
     setActive(true, true);
-
-    tick(micros());
 }
 
 int maxListsSize(Channel &channel) {
@@ -544,17 +546,20 @@ int maxListsSize(Channel &channel) {
 bool setListValue(Channel &channel, int16_t it, int *err) {
     float voltage = g_channelsLists[channel.channelIndex].voltageList[it % g_channelsLists[channel.channelIndex].voltageListLength];
     if (voltage > channel_dispatcher::getULimit(channel)) {
+        g_errorChannelIndex = channel.channelIndex;
         *err = SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
         return false;
     }
 
     float current = g_channelsLists[channel.channelIndex].currentList[it % g_channelsLists[channel.channelIndex].currentListLength];
     if (current > channel_dispatcher::getILimit(channel)) {
+        g_errorChannelIndex = channel.channelIndex;
         *err = SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
         return false;
     }
 
     if (voltage * current > channel_dispatcher::getPowerLimit(channel)) {
+        g_errorChannelIndex = channel.channelIndex;
         *err = SCPI_ERROR_POWER_LIMIT_EXCEEDED;
         return false;
     }
@@ -717,6 +722,8 @@ void abort() {
     if (sync) {
         channel_dispatcher::syncOutputEnable();
     }
+    
+    setActive(false, true);
 }
 
 } // namespace list

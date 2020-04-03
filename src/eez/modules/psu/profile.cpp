@@ -31,6 +31,7 @@
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/profile.h>
+#include <eez/modules/psu/ramp.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/sd_card.h>
@@ -631,8 +632,8 @@ static void saveState(Parameters &profile, List *lists) {
             profile.channels[i].flags.i_triggerMode = channel.flags.currentTriggerMode;
             profile.channels[i].flags.triggerOutputState = channel.flags.triggerOutputState;
             profile.channels[i].flags.triggerOnListStop = channel.flags.triggerOnListStop;
-            profile.channels[i].u_triggerValue = trigger::getVoltage(channel);
-            profile.channels[i].i_triggerValue = trigger::getCurrent(channel);
+            profile.channels[i].u_triggerValue = channel.u.triggerLevel;
+            profile.channels[i].i_triggerValue = channel.i.triggerLevel;
             profile.channels[i].listCount = list::getListCount(channel);
 
             profile.channels[i].flags.currentRangeSelectionMode = channel.flags.currentRangeSelectionMode;
@@ -762,8 +763,8 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
             channel.flags.currentTriggerMode = (TriggerMode)profile.channels[i].flags.i_triggerMode;
             channel.flags.triggerOutputState = profile.channels[i].flags.triggerOutputState;
             channel.flags.triggerOnListStop = profile.channels[i].flags.triggerOnListStop;
-            trigger::setVoltage(channel, profile.channels[i].u_triggerValue);
-            trigger::setCurrent(channel, profile.channels[i].i_triggerValue);
+            channel.u.triggerLevel = profile.channels[i].u_triggerValue;
+            channel.i.triggerLevel = profile.channels[i].i_triggerValue;
             list::setListCount(channel, profile.channels[i].listCount);
 
             channel.flags.currentRangeSelectionMode = profile.channels[i].flags.currentRangeSelectionMode;
@@ -1527,7 +1528,7 @@ static bool doRecallFromLastLocation(int *err) {
 ////////////////////////////////////////////////////////////////////////////////
 
 static bool isTickSaveAllowed() {
-    return !list::isActive() && !calibration::isEnabled();
+    return !list::isActive() && !ramp::isActive() && !calibration::isEnabled();
 }
 
 static bool isAutoSaveAllowed() {

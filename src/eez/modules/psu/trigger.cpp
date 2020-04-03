@@ -23,9 +23,9 @@
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/profile.h>
+#include <eez/modules/psu/ramp.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/scpi/regs.h>
-#include <eez/modules/psu/trigger.h>
 #include <eez/system.h>
 
 #include <eez/modules/psu/dlog_record.h>
@@ -33,11 +33,6 @@
 namespace eez {
 namespace psu {
 namespace trigger {
-
-static struct {
-    float u;
-    float i;
-} g_levels[CH_MAX];
 
 enum State { STATE_IDLE, STATE_INITIATED, STATE_TRIGGERED, STATE_EXECUTING };
 static State g_state;
@@ -93,24 +88,6 @@ void setSource(Source source) {
 
 Source getSource() {
     return (Source)persist_conf::devConf.triggerSource;
-}
-
-void setVoltage(Channel &channel, float value) {
-    value = roundPrec(value, channel.getVoltageResolution());
-    g_levels[channel.channelIndex].u = value;
-}
-
-float getVoltage(Channel &channel) {
-    return g_levels[channel.channelIndex].u;
-}
-
-void setCurrent(Channel &channel, float value) {
-    value = roundPrec(value, channel.getCurrentResolution(value));
-    g_levels[channel.channelIndex].i = value;
-}
-
-float getCurrent(Channel &channel) {
-    return g_levels[channel.channelIndex].i;
 }
 
 void check(uint32_t currentTime) {
@@ -259,15 +236,18 @@ int checkTrigger() {
                     return err;
                 }
             } else {
-                if (g_levels[i].u > channel_dispatcher::getULimit(channel)) {
+                if (channel.u.triggerLevel > channel_dispatcher::getULimit(channel)) {
+                    g_errorChannelIndex = channel.channelIndex;
                     return SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
                 }
 
-                if (g_levels[i].i > channel_dispatcher::getILimit(channel)) {
+                if (channel.i.triggerLevel > channel_dispatcher::getILimit(channel)) {
+                    g_errorChannelIndex = channel.channelIndex;
                     return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
                 }
 
-                if (g_levels[i].u * g_levels[i].i > channel_dispatcher::getPowerLimit(channel)) {
+                if (channel.u.triggerLevel * channel.i.triggerLevel > channel_dispatcher::getPowerLimit(channel)) {
+                    g_errorChannelIndex = channel.channelIndex;
                     return SCPI_ERROR_POWER_LIMIT_EXCEEDED;
                 }
             }
@@ -330,22 +310,16 @@ void startImmediatelyInPsuThread() {
         }
 
         if (channel.getVoltageTriggerMode() == TRIGGER_MODE_LIST) {
-            //channel_dispatcher::setVoltage(channel, 0);
-            //channel_dispatcher::setCurrent(channel, 0);
-
             list::executionStart(channel);
             
             if (list::isActive()) {
                 channel_dispatcher::outputEnableOnNextSync(channel, channel_dispatcher::getTriggerOutputState(channel));
             }
+        } else if (channel.getVoltageTriggerMode() == TRIGGER_MODE_STEP) {
+            ramp::executionStart(channel);
+
+            channel_dispatcher::outputEnableOnNextSync(channel, channel_dispatcher::getTriggerOutputState(channel));
         } else {
-            if (channel.getVoltageTriggerMode() == TRIGGER_MODE_STEP) {
-                channel_dispatcher::setVoltage(channel, g_levels[i].u);
-                channel_dispatcher::setCurrent(channel, g_levels[i].i);
-
-                channel_dispatcher::outputEnableOnNextSync(channel, channel_dispatcher::getTriggerOutputState(channel));
-            }
-
             setTriggerFinished(channel);
         }
     }
@@ -398,6 +372,7 @@ void abort() {
         osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_TRIGGER_ABORT, 0), 0);
     } else {
         list::abort();
+        ramp::abort();
         setState(STATE_IDLE);
     }
 }

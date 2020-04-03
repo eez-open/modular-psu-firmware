@@ -53,6 +53,7 @@
 #endif
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/list_program.h>
+#include <eez/modules/psu/ramp.h>
 #include <eez/modules/psu/serial_psu.h>
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/trigger.h>
@@ -285,7 +286,9 @@ Value MakeFirmwareVersionValue(uint8_t majorVersion, uint8_t minorVersion) {
 
 Value MakeScpiErrorValue(int16_t errorCode) {
     Value value;
-    value.int16_ = errorCode;
+    value.pairOfInt16_.first = errorCode;
+    value.pairOfInt16_.second = g_errorChannelIndex;
+    g_errorChannelIndex = -1;
     value.type_ = VALUE_TYPE_SCPI_ERROR;
     return value;
 }
@@ -866,11 +869,14 @@ void TEST_RESULT_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_SCPI_ERROR_value(const Value &a, const Value &b) {
-    return a.getInt16() == b.getInt16();
+    return a.getUInt32() == b.getUInt32();
 }
 
 void SCPI_ERROR_value_to_text(const Value &value, char *text, int count) {
-    strncpy(text, SCPI_ErrorTranslate(value.getInt16()), count - 1);
+    if (value.getSecondInt16() != -1) {
+        sprintf(text, "Ch%d: ", value.getSecondInt16() + 1);
+    }
+    strncpy(text + strlen(text), SCPI_ErrorTranslate(value.getFirstInt16()), count - 1 - strlen(text));
     text[count - 1] = 0;
 }
 
@@ -4554,7 +4560,6 @@ void data_list_counter_label(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
-
 void data_channel_list_countdown(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         if (cursor >= 0 && cursor < list::g_numChannelsWithVisibleCounters) {
@@ -4569,13 +4574,45 @@ void data_channel_list_countdown(DataOperationEnum operation, Cursor cursor, Val
     }
 }
 
-void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
-    static const int NUM_WIDGETS = 4;
+void data_channels_with_ramp_counter_visible(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = ramp::g_numChannelsWithVisibleCounters;
+    }
+}
 
-    static const int LIST_ICON_WIDGET = 0;
-    static const int LIST_GRID_WIDGET = 1;
-    static const int DLOG_INFO_WIDGET = 2;
-    static const int SCRIPT_INFO_WIDGET = 3;
+void data_ramp_counter_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        if (cursor >= 0 && cursor < ramp::g_numChannelsWithVisibleCounters) {
+            int iChannel = ramp::g_channelsWithVisibleCounters[cursor];
+            value = Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON);
+        }
+    }
+}
+
+void data_channel_ramp_countdown(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        if (cursor >= 0 && cursor < ramp::g_numChannelsWithVisibleCounters) {
+            int iChannel = ramp::g_channelsWithVisibleCounters[cursor];
+            uint32_t remaining;
+            uint32_t total;
+            ramp::getCountdownTime(iChannel, remaining, total);
+            if (total >= CONF_RAMP_COUNDOWN_DISPLAY_THRESHOLD) {
+                value = Value(remaining, VALUE_TYPE_COUNTDOWN);
+            }
+        }
+    }
+}
+
+void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
+    enum {
+        LIST_ICON_WIDGET,
+        LIST_GRID_WIDGET,
+        RAMP_ICON_WIDGET,
+        RAMP_GRID_WIDGET,
+        DLOG_INFO_WIDGET,
+        SCRIPT_INFO_WIDGET,
+        NUM_WIDGETS
+    };
 
     static Overlay overlay;
     static WidgetOverride widgetOverrides[NUM_WIDGETS];
@@ -4586,20 +4623,35 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
         overlay.widgetOverrides = widgetOverrides;
 
         bool areListCountersVisible = list::g_numChannelsWithVisibleCounters > 0;
+        bool areRampCountersVisible = ramp::g_numChannelsWithVisibleCounters > 0;
         bool isDlogVisible = !dlog_record::isIdle();
         bool isScriptVisible = !mp::isIdle();
 
         int state = 0;
-        if (areListCountersVisible || isDlogVisible || isScriptVisible) {
+        if (areListCountersVisible || areRampCountersVisible || isDlogVisible || isScriptVisible) {
+            state = 0;
+
             if (list::g_numChannelsWithVisibleCounters > 0) {
                 if (list::g_numChannelsWithVisibleCounters > 4) {
-                    state = 1;
+                    state |= 1;
                 } else if (list::g_numChannelsWithVisibleCounters > 2) {
-                    state = 2;
+                    state |= 2;
                 } else if (list::g_numChannelsWithVisibleCounters == 2) {
-                    state = 3;
+                    state |= 3;
                 } else {
-                    state = 4;
+                    state |= 4;
+                }
+            }
+
+            if (ramp::g_numChannelsWithVisibleCounters > 0) {
+                if (ramp::g_numChannelsWithVisibleCounters > 4) {
+                    state |= 1 << 4;
+                } else if (ramp::g_numChannelsWithVisibleCounters > 2) {
+                    state |= 2 << 4;
+                } else if (ramp::g_numChannelsWithVisibleCounters == 2) {
+                    state |= 3 << 4;
+                } else {
+                    state |= 4 << 4;
                 }
             }
 
@@ -4621,10 +4673,16 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
 
                 const Widget *listIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LIST_ICON_WIDGET);
                 const Widget *listGridWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LIST_GRID_WIDGET);
+                const Widget *rampIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, RAMP_ICON_WIDGET);
+                const Widget *rampGridWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, RAMP_GRID_WIDGET);
                 const Widget *dlogInfoWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_INFO_WIDGET);
                 const Widget *scriptInfoWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, SCRIPT_INFO_WIDGET);
 
                 overlay.width = widgetCursor.widget->w;
+                if (list::g_numChannelsWithVisibleCounters <= 1 && ramp::g_numChannelsWithVisibleCounters <= 1 && !isDlogVisible && !isScriptVisible) {
+                    overlay.width -= listGridWidget->w / 2;
+                }
+
                 overlay.height = widgetCursor.widget->h;
 
                 if (list::g_numChannelsWithVisibleCounters > 0) {
@@ -4647,15 +4705,44 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
                         overlay.height += listGridWidget->h;
                     } else {
                         widgetOverrides[LIST_GRID_WIDGET].h = listGridWidget->h;
-                        if (list::g_numChannelsWithVisibleCounters == 1 && !isDlogVisible && !isScriptVisible) {
+                        if (ramp::g_numChannelsWithVisibleCounters == 1) {
                             widgetOverrides[LIST_GRID_WIDGET].w = listGridWidget->w / 2;
-                            overlay.width -= listGridWidget->w / 2;
                         }
                     }
                 } else {
                     widgetOverrides[LIST_ICON_WIDGET].isVisible = false;
                     widgetOverrides[LIST_GRID_WIDGET].isVisible = false;
                     overlay.height -= listGridWidget->h;
+                }
+
+                if (ramp::g_numChannelsWithVisibleCounters > 0) {
+                    widgetOverrides[RAMP_ICON_WIDGET].isVisible = true;
+                    widgetOverrides[RAMP_ICON_WIDGET].x = rampIconWidget->x;
+                    widgetOverrides[RAMP_ICON_WIDGET].y = overlay.height - (widgetCursor.widget->h - rampIconWidget->y);
+                    widgetOverrides[RAMP_ICON_WIDGET].w = rampIconWidget->w;
+                    widgetOverrides[RAMP_ICON_WIDGET].h = rampIconWidget->h;
+
+                    widgetOverrides[RAMP_GRID_WIDGET].isVisible = true;
+                    widgetOverrides[RAMP_GRID_WIDGET].x = rampGridWidget->x;
+                    widgetOverrides[RAMP_GRID_WIDGET].y = overlay.height - (widgetCursor.widget->h - rampGridWidget->y);
+                    widgetOverrides[RAMP_GRID_WIDGET].w = rampGridWidget->w;
+
+                    if (ramp::g_numChannelsWithVisibleCounters > 4) {
+                        widgetOverrides[RAMP_GRID_WIDGET].h = 3 * rampGridWidget->h;
+                        overlay.height += 2 * rampGridWidget->h;
+                    } else if (ramp::g_numChannelsWithVisibleCounters > 2) {
+                        widgetOverrides[RAMP_GRID_WIDGET].h = 2 * rampGridWidget->h;
+                        overlay.height += rampGridWidget->h;
+                    } else {
+                        widgetOverrides[RAMP_GRID_WIDGET].h = rampGridWidget->h;
+                        if (ramp::g_numChannelsWithVisibleCounters == 1) {
+                            widgetOverrides[RAMP_GRID_WIDGET].w = rampGridWidget->w / 2;
+                        }
+                    }
+                } else {
+                    widgetOverrides[RAMP_ICON_WIDGET].isVisible = false;
+                    widgetOverrides[RAMP_GRID_WIDGET].isVisible = false;
+                    overlay.height -= rampGridWidget->h;
                 }
 
                 if (isDlogVisible) {

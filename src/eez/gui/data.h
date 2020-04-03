@@ -64,6 +64,11 @@ struct PairOfUint16Value {
     uint16_t second;
 };
 
+struct PairOfInt16Value {
+    int16_t first;
+    int16_t second;
+};
+
 typedef uint8_t ValueType;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -253,6 +258,13 @@ struct Value {
         return pairOfUint16_.second;
     }
 
+    uint16_t getFirstInt16() const {
+        return pairOfInt16_.first;
+    }
+    uint16_t getSecondInt16() const {
+        return pairOfInt16_.second;
+    }
+
     void toText(char *text, int count) const;
 
     uint16_t getOptions() const {
@@ -285,6 +297,7 @@ struct Value {
         void *pVoid_;
         PairOfUint8Value pairOfUint8_;
         PairOfUint16Value pairOfUint16_;
+        PairOfInt16Value pairOfInt16_;
     };
 };
 

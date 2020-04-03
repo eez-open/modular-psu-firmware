@@ -43,6 +43,7 @@
 #include <eez/modules/psu/idle.h>
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/list_program.h>
+#include <eez/modules/psu/ramp.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ontime.h>
 
@@ -654,18 +655,19 @@ void tick() {
     WATCHDOG_RESET();
 
     uint32_t tickCount = micros();
-
-    dlog_record::tick(tickCount);
+    trigger::tick(tickCount);
+    
+    tickCount = micros();    
+    list::tick(tickCount);
+    ramp::tick(tickCount);
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel::get(i).tick(tickCount);
     }
 
+    dlog_record::tick(tickCount);
+
     io_pins::tick(tickCount);
-
-    trigger::tick(tickCount);
-
-    list::tick(tickCount);
 
     g_tickFuncs[g_tickFuncIndex](tickCount);
     g_tickFuncIndex = (g_tickFuncIndex + 1) % NUM_TICK_FUNCS;
