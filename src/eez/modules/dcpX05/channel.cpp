@@ -769,15 +769,15 @@ struct Channel : ChannelInterface {
 	}
 
     void getVoltageStepValues(StepValues *stepValues) {
-        static float values[] = { 2.0f, 1.0f, 0.5f, 0.1f };
+        static float values[] = { 1.0f, 0.1f, 0.01f, 0.005f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_VOLT;
 	}
     
 	void getCurrentStepValues(StepValues *stepValues) {
-        static float lowRangeValues[] = { 0.0025f, 0.001f, 0.0005f, 0.0001f };
-        static float highRangeValues[] = { 0.25f, 0.1f, 0.05f, 0.01f }; 
+        static float lowRangeValues[] = { 0.001f, 0.0001f, 0.00001f, 0.000005f };
+        static float highRangeValues[] = { 0.1f, 0.01f, 0.001f, 0.0005f }; 
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 		if (channel.flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
         	stepValues->values = lowRangeValues;
@@ -790,7 +790,7 @@ struct Channel : ChannelInterface {
 	}
 
     void getPowerStepValues(StepValues *stepValues) {
-        static float values[] = { 5.0f, 2.0f, 1.0f, 0.5f };
+        static float values[] = { 10.0f, 1.0f, 0.1f, 0.01f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_WATT;

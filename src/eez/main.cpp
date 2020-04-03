@@ -46,6 +46,8 @@
 
 #include <eez/scpi/scpi.h>
 
+#include <eez/modules/mcu/encoder.h>
+
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/serial_psu.h>
 #include <eez/modules/psu/sd_card.h>
@@ -123,7 +125,7 @@ int main(int argc, char **argv) {
     MX_SPI5_Init();
     // MX_TIM3_Init();
     MX_TIM6_Init();
-    MX_TIM8_Init();
+    //MX_TIM8_Init();
     MX_TIM12_Init();
 
     /* Enable I-Cache */
@@ -197,6 +199,8 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     } else if (GPIO_Pin == SD_DETECT_Pin) {
         eez::psu::sd_card::onSdDetectInterrupt();
         return;
+    } else if (GPIO_Pin == ENC_A_Pin || GPIO_Pin == ENC_B_Pin) {
+        eez::mcu::encoder::onPinInterrupt();
     }
 
     if (slotIndex != -1) {

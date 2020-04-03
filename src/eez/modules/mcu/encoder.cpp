@@ -27,7 +27,6 @@
 #include <eez/modules/mcu/encoder.h>
 
 #if defined(EEZ_PLATFORM_STM32)	
-#include <tim.h>
 #include <eez/modules/mcu/button.h>
 #endif
 
@@ -40,7 +39,7 @@ namespace mcu {
 namespace encoder {
 
 #if defined(EEZ_PLATFORM_STM32)
-#define CONF_ENCODER_SPEED_FACTOR 1.0
+#define CONF_ENCODER_SPEED_FACTOR 0.25f
 #else
 #define CONF_ENCODER_SPEED_FACTOR 0.5f
 #endif
@@ -49,26 +48,21 @@ namespace encoder {
 static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true, false);
 #endif	
 
-static uint16_t g_lastCounter;
-
+static uint16_t g_totalCounter;
+static int16_t g_diffCounter;
 #if defined(EEZ_PLATFORM_SIMULATOR)
-int g_simulatorCounter;
 bool g_simulatorClicked;
 #endif	
-
 static float g_accumulatedCounter;
-
 EncoderMode g_encoderMode = ENCODER_MODE_AUTO;
-
-static bool g_useSameSpeed = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 struct CalcAutoModeStepLevel {
-    static const int CONF_NUM_STEP_LEVELS = 3; // 0, 1 and 2
+    static const int CONF_NUM_STEP_LEVELS = 4;
     static const int CONF_NUM_ACCELERATION_STEP_COUNTERS = 10;
     static const int CONF_ACCELERATION_STEP_COUNTER_DURATION_MS = 50;
-    static const int CONF_COUNTER_TO_STEP_DIVISOR = 20;
+    static const int CONF_COUNTER_TO_STEP_DIVISOR = 5;
 
     uint32_t m_lastTick;
     int m_accumulatedCounter;
@@ -129,51 +123,53 @@ int getAutoModeStepLevel() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
-#if defined(EEZ_PLATFORM_STM32)
-	HAL_TIM_Encoder_Start(&htim8, TIM_CHANNEL_ALL);
-	g_lastCounter = __HAL_TIM_GET_COUNTER(&htim8);
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    g_lastCounter = 0;
-#endif
-
     g_calcAutoModeStepLevel.reset();
 }
 
-static int16_t g_diffCounter = 0;
-
-void tick() {
 #if defined(EEZ_PLATFORM_STM32)
-    uint16_t counter = __HAL_TIM_GET_COUNTER(&htim8);
-    g_diffCounter += counter - g_lastCounter;
-    g_lastCounter = counter;
-    psu::debug::g_encoderCounter.set(counter);
-#endif
+
+void onPinInterrupt() {
+    static const uint8_t g_ttable[6][4] = {
+        { 0x3 , 0x2, 0x1,  0x0 },
+        { 0x23, 0x0, 0x1,  0x0 },
+        { 0x13, 0x2, 0x0,  0x0 },
+        { 0x3 , 0x5, 0x4,  0x0 },
+        { 0x3 , 0x3, 0x4, 0x10 },
+        { 0x3 , 0x5, 0x3, 0x20 }
+    };
+    static volatile uint8_t g_rotationState;
+    
+    int offset = 0;
+
+    uint8_t pinState = (HAL_GPIO_ReadPin(ENC_B_GPIO_Port, ENC_B_Pin) << 1) | HAL_GPIO_ReadPin(ENC_A_GPIO_Port, ENC_A_Pin);
+    g_rotationState = g_ttable[g_rotationState & 0xf][pinState];
+    if (g_rotationState == 0x20) {
+        offset = 1;
+    } else if (g_rotationState == 0x10) {
+        offset = -1;
+    }
+
+    if (offset) {
+        g_diffCounter += offset;
+    }
 }
+#endif
 
 int getCounter() {
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    int16_t diffCounter = g_simulatorCounter;
-    g_simulatorCounter = 0;
-
-    g_lastCounter += diffCounter;
-    psu::debug::g_encoderCounter.set(g_lastCounter);
-#endif
-
-#if defined(EEZ_PLATFORM_STM32)
     int16_t diffCounter = g_diffCounter;
-    g_diffCounter = 0;
-#endif
+    g_diffCounter -= diffCounter;
+
+    g_totalCounter += diffCounter;
+    psu::debug::g_encoderCounter.set(g_totalCounter);
 
     // update acceleration
     g_calcAutoModeStepLevel.update(diffCounter);
 
     //
-    g_accumulatedCounter += diffCounter;
-    float speed = 1.0f + (MAX_MOVING_SPEED - (g_useSameSpeed ? MAX(psu::persist_conf::devConf.encoderMovingSpeedUp, psu::persist_conf::devConf.encoderMovingSpeedDown) : g_accumulatedCounter > 0 ? psu::persist_conf::devConf.encoderMovingSpeedUp : psu::persist_conf::devConf.encoderMovingSpeedDown)) * CONF_ENCODER_SPEED_FACTOR;
-    int result = (int)(g_accumulatedCounter > 0 ? floorf(g_accumulatedCounter / speed) : ceilf(g_accumulatedCounter / speed));
-    g_accumulatedCounter -= result * speed;
+    float speedFactor = remap(g_accumulatedCounter > 0 ? psu::persist_conf::devConf.encoderMovingSpeedUp : psu::persist_conf::devConf.encoderMovingSpeedDown, MIN_MOVING_SPEED, 4.0f, MAX_MOVING_SPEED, 1.0f);
+    g_accumulatedCounter += diffCounter / speedFactor;
+    int result = (int)g_accumulatedCounter;
+    g_accumulatedCounter -= result;
 
     return result;
 }
@@ -202,7 +198,7 @@ void read(int &counter, bool &clicked) {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 void write(int counter, bool clicked) {
-	g_simulatorCounter = counter;
+	g_diffCounter = counter;
 	g_simulatorClicked = clicked;
 }
 #endif
@@ -213,10 +209,6 @@ void switchEncoderMode() {
     } else {
         g_encoderMode = EncoderMode(g_encoderMode + 1);
     }
-}
-
-void setUseSameSpeed(bool enable) {
-    g_useSameSpeed = enable;
 }
 
 } // namespace encoder

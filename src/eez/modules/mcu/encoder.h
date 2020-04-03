@@ -28,7 +28,6 @@ static const uint8_t DEFAULT_MOVING_DOWN_SPEED = 8;
 static const uint8_t DEFAULT_MOVING_UP_SPEED = 6;
 
 void init();
-void tick();
 void read(int &counter, bool &clicked);
 
 enum EncoderMode {
@@ -47,7 +46,10 @@ void write(int counter, bool clicked);
 #endif
 
 void switchEncoderMode();
-void setUseSameSpeed(bool enable);
+
+#if defined(EEZ_PLATFORM_STM32)
+void onPinInterrupt();
+#endif
 
 } // namespace encoder
 } // namespace mcu

@@ -20,7 +20,6 @@
 #include <eez/gui/touch_filter.h>
 
 #include <eez/modules/mcu/touch.h>
-#include <eez/modules/mcu/encoder.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -86,7 +85,6 @@ void mainLoop(const void *) {
 #else
     while (1) {
         oneIter();
-        mcu::encoder::tick();
         osDelay(10);
     }
 #endif

@@ -112,8 +112,10 @@ void Error_Handler(void);
 #define PWR_SSTART_GPIO_Port GPIOG
 #define ENC_A_Pin GPIO_PIN_6
 #define ENC_A_GPIO_Port GPIOC
+#define ENC_A_EXTI_IRQn EXTI9_5_IRQn
 #define ENC_B_Pin GPIO_PIN_7
 #define ENC_B_GPIO_Port GPIOC
+#define ENC_B_EXTI_IRQn EXTI9_5_IRQn
 #define MCLK_25_Pin GPIO_PIN_9
 #define MCLK_25_GPIO_Port GPIOC
 #define SPI2_IRQ_Pin GPIO_PIN_8

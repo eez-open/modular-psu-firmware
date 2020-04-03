@@ -600,6 +600,20 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
         if (widget->action == ACTION_ID_FILE_MANAGER_SELECT_FILE) {
             return file_manager::isSelectFileActionEnabled(widgetCursor.cursor);
         }
+
+        if (widget->action == ACTION_ID_EDIT || widget->action == ACTION_ID_EDIT_NO_FOCUS) {
+            if (widget->data == DATA_ID_CHANNEL_U_EDIT) {
+                auto &channel = Channel::get(widgetCursor.cursor);
+                if (channel.flags.rprogEnabled || !channel_dispatcher::isEditEnabled(channel)) {
+                    return false;
+                }
+            } else if (widget->data == DATA_ID_CHANNEL_I_EDIT || widget->data == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT || widget->data == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT || widget->data == DATA_ID_CHANNEL_PROTECTION_OVP_LEVEL || widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT || widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL || widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY || widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL || widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY) {
+                auto &channel = Channel::get(widgetCursor.cursor);
+                if (!channel_dispatcher::isEditEnabled(channel)) {
+                    return false;
+                }
+            }
+        }
     }
 
     return AppContext::isWidgetActionEnabled(widgetCursor);
@@ -1293,7 +1307,9 @@ float encoderIncrement(Value value, int counter, float min, float max, int chann
     float step;
 
     if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
-        step = precision * powf(10.0f, 1.0f * mcu::encoder::getAutoModeStepLevel());
+        StepValues stepValues;
+        edit_mode_step::getStepValues(stepValues);
+        step = stepValues.values[stepValues.count - mcu::encoder::getAutoModeStepLevel() - 1];
     } else {
         step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
     }
@@ -2065,6 +2081,16 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
                 }
             }
             return STYLE_ID_YT_GRAPH_P_DEFAULT;
+        }
+    } else if (widgetCursor.widget->data == DATA_ID_CHANNEL_U_EDIT) {
+        auto &channel = psu::Channel::get(widgetCursor.cursor);
+        if (channel.flags.rprogEnabled || !psu::channel_dispatcher::isEditEnabled(channel)) {
+            return styleId == STYLE_ID_ENCODER_CURSOR_14_ENABLED ? STYLE_ID_ENCODER_CURSOR_14_DISABLED : STYLE_ID_ENCODER_CURSOR_14_RIGHT_DISABLED;
+        }
+    } else if (widgetCursor.widget->data == DATA_ID_CHANNEL_I_EDIT || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OVP_LEVEL || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY) {
+        auto &channel = psu::Channel::get(widgetCursor.cursor);
+        if (!psu::channel_dispatcher::isEditEnabled(channel)) {
+            return styleId == STYLE_ID_ENCODER_CURSOR_14_ENABLED ? STYLE_ID_ENCODER_CURSOR_14_DISABLED : STYLE_ID_ENCODER_CURSOR_14_RIGHT_DISABLED;
         }
     }
     return styleId;

@@ -295,20 +295,12 @@ void increment(int counter, bool playClick) {
 
     for (int i = 0; i < abs(counter); ++i) {
         if (counter > 0) {
-            if (value == min) {
-                value = (floorf(min / stepValue) + 1) * stepValue;
-            } else {
-                value += stepValue;
-            }
+            value += stepValue;
             if (value > max) {
                 value = max;
             }
         } else {
-            if (value == max) {
-                value = (ceilf(max / stepValue) - 1) * stepValue;
-            } else {
-                value -= stepValue;
-            }
+            value -= stepValue;
             if (value < min) {
                 value = min;
             }

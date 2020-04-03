@@ -24,6 +24,7 @@
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/list_program.h>
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/scpi/regs.h>
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/trigger.h>
@@ -2005,6 +2006,20 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
     channel_dispatcher::setCurrentList(dstChannel, currentList, currentListLength);
 
     return nullptr;
+}
+
+bool isEditEnabled(Channel &channel) {
+    using namespace psu::gui;
+
+    if ((getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) || g_psuAppContext.isPageOnStack(PAGE_ID_CH_SETTINGS_LISTS)) {
+        return false;
+    } 
+
+    if (psu::calibration::isEnabled()) {
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace channel_dispatcher

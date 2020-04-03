@@ -168,6 +168,8 @@ void setCurrentInPsuThread(int channelIndex);
 
 const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex);
 
+bool isEditEnabled(Channel &channel);
+
 } // namespace channel_dispatcher
 } // namespace psu
 } // namespace eez

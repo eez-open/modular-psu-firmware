@@ -1016,21 +1016,6 @@ void data_none(DataOperationEnum operation, Cursor cursor, Value &value) {
     value = Value();
 }
 
-void data_edit_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-
-        if ((channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) || isPageOnStack(PAGE_ID_CH_SETTINGS_LISTS)) {
-            value = 0;
-        } else if (psu::calibration::isEnabled()) {
-            value = 0;
-        } else {
-            value = 1;
-        }
-    }
-}
-
 void data_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = CH_NUM;
@@ -5019,13 +5004,12 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
         value = Value(recording.parameters.xAxis.step, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static const int COUNT = 5;
+        static const int COUNT = 4;
         static float values[COUNT];
-        values[0] = recording.parameters.xAxis.step * 100;
-        values[1] = recording.parameters.xAxis.step * 50;
+        values[0] = recording.parameters.xAxis.step * 1000;
+        values[1] = recording.parameters.xAxis.step * 100;
         values[2] = recording.parameters.xAxis.step * 10;
-        values[3] = recording.parameters.xAxis.step * 5;
-        values[4] = recording.parameters.xAxis.step;
+        values[3] = recording.parameters.xAxis.step;
         StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
         stepValues->count = COUNT;
