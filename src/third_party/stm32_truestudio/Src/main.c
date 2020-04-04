@@ -202,7 +202,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void PSU_IncTick();
 /* USER CODE END 4 */
 
  /**
@@ -216,13 +216,14 @@ void SystemClock_Config(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* USER CODE BEGIN Callback 0 */
-
   /* USER CODE END Callback 0 */
   if (htim->Instance == TIM10) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-
+  else if (htim->Instance == TIM7) {
+    PSU_IncTick();
+  }
   /* USER CODE END Callback 1 */
 }
 

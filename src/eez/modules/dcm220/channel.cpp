@@ -134,8 +134,6 @@ float calcTemperature(uint16_t adcValue) {
 #endif
 
 struct Channel : ChannelInterface {
-    uint32_t lastTickCount;
-
     bool outputEnable[2];
 
     uint8_t output[BUFFER_SIZE];
@@ -250,8 +248,6 @@ struct Channel : ChannelInterface {
 		spi::transfer(slotIndex, output, input, BUFFER_SIZE);
 		spi::deselect(slotIndex);
 
-		lastTickCount = micros();
-
 		uint32_t crc = HAL_CRC_Calculate(&hcrc, (uint32_t *)input, BUFFER_SIZE - 4);
 		if (crc == *((uint32_t *)(input + BUFFER_SIZE - 4))) {
 			numCrcErrors = 0;
@@ -341,9 +337,7 @@ struct Channel : ChannelInterface {
 
 	void tick(int subchannelIndex, uint32_t tickCount) {
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-
-        int32_t diff = tickCount - lastTickCount;
-        if (subchannelIndex == 0 && diff > 1000) {
+        if (subchannelIndex == 0) {
         	uint8_t output0 = 0x80 | (outputEnable[0] ? REG0_OE1_MASK : 0) | (outputEnable[1] ? REG0_OE2_MASK : 0);
 
             output[0] = output0;
@@ -465,20 +459,8 @@ struct Channel : ChannelInterface {
 			return;
 		}
 #endif
-
-//		diff = tickCount - dumpTempTickCount;
-//		if (subchannelIndex == 0 && diff > 2000000) {
-//			uint16_t temp0 = *((uint16_t *)(input + 10));
-//			uint16_t temp1 = *((uint16_t *)(input + 12));
-//			uint16_t temp2 = *((uint16_t *)(input + 14));
-//
-//			DebugTrace("CH1=%u, CH2=%u, MCU=%u, %g, %g\n", (unsigned)temp0, (unsigned)temp1, (unsigned)temp2, temperature[0], temperature[1]);
-//			dumpTempTickCount = tickCount;
-//		}
 	}
-
-//	uint32_t dumpTempTickCount;
-
+	
 	bool isCcMode(int subchannelIndex) {
 #if defined(EEZ_PLATFORM_STM32)
         return (input[0] & (subchannelIndex == 0 ? REG0_CC1_MASK : REG0_CC2_MASK)) != 0;

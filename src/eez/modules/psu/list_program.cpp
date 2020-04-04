@@ -711,16 +711,10 @@ bool getCurrentDwellTime(Channel &channel, int32_t &remaining, uint32_t &total) 
 }
 
 void abort() {
-    bool sync = false;
     for (int i = 0; i < CH_NUM; ++i) {
         if (g_execution[i].counter >= 0) {
             g_execution[i].counter = -1;
-            channel_dispatcher::outputEnableOnNextSync(Channel::get(i), false);
-            sync = true;
         }
-    }
-    if (sync) {
-        channel_dispatcher::syncOutputEnable();
     }
     
     setActive(false, true);

@@ -59,6 +59,7 @@ extern osThreadId g_psuTaskHandle;
 extern osMessageQId g_psuMessageQueueId;
 
 enum {
+    PSU_QUEUE_MESSAGE_TYPE_TICK,
     PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE,
     PSU_QUEUE_MESSAGE_TYPE_RESET,
     PSU_QUEUE_MESSAGE_TYPE_TEST,

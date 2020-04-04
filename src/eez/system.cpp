@@ -20,15 +20,18 @@
 
 #include <eez/system.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+volatile uint32_t g_tickCount;
+#endif
+
 namespace eez {
 
 uint32_t millis() {
 #if defined(EEZ_PLATFORM_STM32)
-    return HAL_GetTick();
+    return g_tickCount / 5;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    // osKernelSysTick must be in milliseconds
     return osKernelSysTick();
 #endif
 }
@@ -45,7 +48,7 @@ void delay(uint32_t millis) {
 
 uint32_t micros() {
 #if defined(EEZ_PLATFORM_STM32)	
-    return millis() * 1000;
+    return g_tickCount * 200;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

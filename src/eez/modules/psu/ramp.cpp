@@ -29,7 +29,7 @@ namespace ramp {
 
 static struct {
     int state;
-    uint32_t startTime;
+    float startTime;
     bool voltageRampDone;
     bool currentRampDone;
 } g_execution[CH_MAX];
@@ -51,19 +51,19 @@ void executionStart(Channel &channel) {
 void tick(uint32_t tickUsec) {
     bool active = false;
 
-    auto tickMs = tickUsec / 1000;
+    float tick = tickUsec / 1000000.0f;
 
     for (int i = 0; i < CH_NUM; i++) {
         if (g_execution[i].state) {
             auto &channel = Channel::get(i);
             if (channel.isOutputEnabled()) {
                 if (g_execution[i].state == 1) {
-                    g_execution[i].startTime = tickMs;
+                    g_execution[i].startTime = tick;
                     g_execution[i].state = 2;
                 }
 
                 if (g_execution[i].state == 2) {
-                    if (!channel.flags.outputDelayState || tickMs >= g_execution[i].startTime + channel.outputDelayDuration * 1000) {
+                    if (!channel.flags.outputDelayState || tick >= g_execution[i].startTime + channel.outputDelayDuration) {
                         g_execution[i].state = 3;
                         g_execution[i].voltageRampDone = false;
                         g_execution[i].currentRampDone = false;
@@ -71,15 +71,15 @@ void tick(uint32_t tickUsec) {
                 }
 
                 if (g_execution[i].state == 3) {
-                    if (channel.u.rampState && tickMs < g_execution[i].startTime + (channel.outputDelayDuration + channel.u.rampDuration) * 1000) {
-                        channel_dispatcher::setVoltage(channel, channel.u.triggerLevel * ((tickMs - g_execution[i].startTime) / 1000.0f - channel.outputDelayDuration) / channel.u.rampDuration);
+                    if (channel.u.rampState && tick < g_execution[i].startTime + channel.outputDelayDuration + channel.u.rampDuration) {
+                        channel_dispatcher::setVoltage(channel, channel.u.triggerLevel * (tick - g_execution[i].startTime - channel.outputDelayDuration) / channel.u.rampDuration);
                     } else if (!g_execution[i].voltageRampDone) {
                         channel_dispatcher::setVoltage(channel, channel.u.triggerLevel);
                         g_execution[i].voltageRampDone = true;
                     }
 
-                    if (channel.i.rampState && tickMs < g_execution[i].startTime + (channel.outputDelayDuration + channel.i.rampDuration) * 1000) {
-                        channel_dispatcher::setCurrent(channel, channel.i.triggerLevel * ((tickMs - g_execution[i].startTime) / 1000.0f - channel.outputDelayDuration) / channel.i.rampDuration);
+                    if (channel.i.rampState && tick < g_execution[i].startTime + channel.outputDelayDuration + channel.i.rampDuration) {
+                        channel_dispatcher::setCurrent(channel, channel.i.triggerLevel * (tick - g_execution[i].startTime - channel.outputDelayDuration) / channel.i.rampDuration);
                     } else if (!g_execution[i].currentRampDone) {
                         channel_dispatcher::setCurrent(channel, channel.i.triggerLevel);
                         g_execution[i].currentRampDone = true;
@@ -112,16 +112,10 @@ bool isActive(Channel &channel) {
 }
 
 void abort() {
-    bool sync = false;
     for (int i = 0; i < CH_NUM; ++i) {
         if (g_execution[i].state != 0) {
             g_execution[i].state = 0;
-            channel_dispatcher::outputEnableOnNextSync(Channel::get(i), false);
-            sync = true;
         }
-    }
-    if (sync) {
-        channel_dispatcher::syncOutputEnable();
     }
 
     setActive(false, true);
@@ -135,7 +129,7 @@ void getCountdownTime(int channelIndex, uint32_t &remaining, uint32_t &total) {
         if (g_execution[channelIndex].state == 1) {
             remaining = total;
         } else {
-            remaining = (uint32_t)roundf((g_execution[channelIndex].startTime + duration * 1000.0f - millis()) / 1000.0f);
+            remaining = (uint32_t)roundf(g_execution[channelIndex].startTime + duration - millis() / 1000.0f);
         }
     } else {
         remaining = 0;

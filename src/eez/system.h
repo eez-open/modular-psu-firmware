@@ -25,6 +25,7 @@
 #include <main.h>
 #include <iwdg.h>
 #define WATCHDOG_RESET(...) HAL_IWDG_Refresh(&hiwdg)
+extern volatile uint32_t g_tickCount;
 #else
 #define WATCHDOG_RESET(...) 0
 #endif

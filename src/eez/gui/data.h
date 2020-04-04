@@ -258,10 +258,10 @@ struct Value {
         return pairOfUint16_.second;
     }
 
-    uint16_t getFirstInt16() const {
+    int16_t getFirstInt16() const {
         return pairOfInt16_.first;
     }
-    uint16_t getSecondInt16() const {
+    int16_t getSecondInt16() const {
         return pairOfInt16_.second;
     }
 

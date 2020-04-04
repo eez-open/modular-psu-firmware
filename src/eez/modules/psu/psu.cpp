@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <tim.h>
+#endif
+
 #include <eez/firmware.h>
 #include <eez/system.h>
 #include <eez/sound.h>
@@ -175,6 +179,20 @@ osThreadId g_psuTaskHandle;
 osMessageQDef(g_psuMessageQueue, PSU_QUEUE_SIZE, uint32_t);
 osMessageQId g_psuMessageQueueId;
 
+}
+} // namespacee eez::psu
+
+#if defined(EEZ_PLATFORM_STM32)
+extern "C" void PSU_IncTick() {
+    using namespace eez::psu;
+    g_tickCount++;
+    osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_TICK, 0), 0);
+}
+#endif
+
+namespace eez {
+namespace psu {
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static bool g_powerIsUp;
@@ -194,6 +212,11 @@ void (*g_diagCallback)();
 void startThread() {
     g_psuMessageQueueId = osMessageCreate(osMessageQ(g_psuMessageQueue), NULL);
     g_psuTaskHandle = osThreadCreate(osThread(g_psuTask), nullptr);
+
+#if defined(EEZ_PLATFORM_STM32)
+    MX_TIM7_Init();
+    HAL_TIM_Base_Start_IT(&htim7);
+#endif
 }
 
 void oneIter();
@@ -211,12 +234,21 @@ void mainLoop(const void *) {
 bool g_adcMeasureAllFinished = false;
 
 void oneIter() {
+#if defined(EEZ_PLATFORM_STM32)
+    osEvent event = osMessageGet(g_psuMessageQueueId, osWaitForever);
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
     osEvent event = osMessageGet(g_psuMessageQueueId, 1);
+#endif
+
     if (event.status == osEventMessage) {
     	uint32_t message = event.value.v;
     	uint32_t type = PSU_QUEUE_MESSAGE_TYPE(message);
     	uint32_t param = PSU_QUEUE_MESSAGE_PARAM(message);
-        if (type == PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE) {
+        if (type == PSU_QUEUE_MESSAGE_TYPE_TICK) {
+            tick();
+        } if (type == PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE) {
             changePowerState(param ? true : false);
         } else if (type == PSU_QUEUE_MESSAGE_TYPE_RESET) {
             reset();
@@ -257,9 +289,13 @@ void oneIter() {
         } else if (type == PSU_QUEUE_RESET_CHANNELS_HISTORY) {
             Channel::resetHistoryForAllChannels();
         } 
-    } else if (g_isBooted) {
+    } 
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    else if (g_isBooted) {
         tick();
     }
+#endif
 }
 
 bool measureAllAdcValuesOnChannel(int channelIndex) {
@@ -655,9 +691,16 @@ void tick() {
     WATCHDOG_RESET();
 
     uint32_t tickCount = micros();
+
+#if defined(EEZ_PLATFORM_STM32)
+    if (g_tickCount % 5) {
+        ramp::tick(tickCount);
+        return;
+    }
+#endif
+
     trigger::tick(tickCount);
-    
-    tickCount = micros();    
+    tickCount = micros();
     list::tick(tickCount);
     ramp::tick(tickCount);
 

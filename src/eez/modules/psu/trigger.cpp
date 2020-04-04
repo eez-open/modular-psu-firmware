@@ -373,6 +373,19 @@ void abort() {
     } else {
         list::abort();
         ramp::abort();
+
+        bool sync = false;
+        for (int i = 0; i < CH_NUM; ++i) {
+            auto &channel = Channel::get(i);
+            if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) {
+                channel_dispatcher::outputEnableOnNextSync(channel, false);
+                sync = true;
+            }
+        }
+        if (sync) {
+            channel_dispatcher::syncOutputEnable();
+        }
+        
         setState(STATE_IDLE);
     }
 }
