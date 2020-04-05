@@ -31,7 +31,6 @@
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/profile.h>
-#include <eez/modules/psu/ramp.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/sd_card.h>
@@ -464,12 +463,9 @@ static void resetProfileToDefaults(Parameters &profile) {
     memset(&profile, 0, sizeof(Parameters));
 
     for (int i = 0; i < CH_MAX; i++) {
-        profile.channels[i].u_rampState = false;
         profile.channels[i].u_rampDuration = RAMP_DURATION_DEF_VALUE;
-        profile.channels[i].i_rampState = false;
         profile.channels[i].i_rampDuration = RAMP_DURATION_DEF_VALUE;
 
-        profile.channels[i].flags.outputDelayState = 0;
         profile.channels[i].outputDelayDuration = 0;
     }
 }
@@ -642,12 +638,9 @@ static void saveState(Parameters &profile, List *lists) {
             profile.channels[i].flags.dprogState = channel.flags.dprogState;
             profile.channels[i].flags.trackingEnabled = channel.flags.trackingEnabled;
 
-            profile.channels[i].u_rampState = channel.u.rampState;
             profile.channels[i].u_rampDuration = channel.u.rampDuration;
-            profile.channels[i].i_rampState = channel.i.rampState;
             profile.channels[i].i_rampDuration = channel.i.rampDuration;
 
-            profile.channels[i].flags.outputDelayState = channel.flags.outputDelayState;
             profile.channels[i].outputDelayDuration = channel.outputDelayDuration;
 
             if (lists) {
@@ -777,12 +770,9 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
                 ++numTrackingChannels;
             }
 
-            channel.u.rampState = profile.channels[i].u_rampState;
             channel.u.rampDuration = profile.channels[i].u_rampDuration;
-            channel.i.rampState = profile.channels[i].i_rampState;
             channel.i.rampDuration = profile.channels[i].i_rampDuration;
 
-            channel.flags.outputDelayState = profile.channels[i].flags.outputDelayState;
             channel.outputDelayDuration = profile.channels[i].outputDelayDuration;
 
             auto &list = lists[i];
@@ -1008,12 +998,9 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
             WRITE_PROPERTY("i_triggerValue", channel.i_triggerValue);
             WRITE_PROPERTY("listCount", channel.listCount);
 
-            WRITE_PROPERTY("u_rampState", channel.u_rampState);
             WRITE_PROPERTY("u_rampDuration", channel.u_rampDuration);
-            WRITE_PROPERTY("i_rampState", channel.i_rampState);
             WRITE_PROPERTY("i_rampDuration", channel.i_rampDuration);
 
-            WRITE_PROPERTY("outputDelayState", channel.flags.outputDelayState);
             WRITE_PROPERTY("outputDelayDuration", channel.outputDelayDuration);
 
             if (lists) {
@@ -1436,12 +1423,9 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
         READ_PROPERTY(i_triggerValue, channel.i_triggerValue);
         READ_PROPERTY(listCount, channel.listCount);
 
-        READ_PROPERTY(u_rampState, channel.u_rampState);
         READ_PROPERTY(u_rampDuration, channel.u_rampDuration);
-        READ_PROPERTY(i_rampState, channel.i_rampState);
         READ_PROPERTY(i_rampDuration, channel.i_rampDuration);
 
-        READ_FLAG(outputDelayState, channel.flags.outputDelayState);
         READ_PROPERTY(outputDelayDuration, channel.outputDelayDuration);
 
         if (lists) {
@@ -1528,7 +1512,7 @@ static bool doRecallFromLastLocation(int *err) {
 ////////////////////////////////////////////////////////////////////////////////
 
 static bool isTickSaveAllowed() {
-    return !list::isActive() && !ramp::isActive() && !calibration::isEnabled();
+    return !trigger::isActive() && !calibration::isEnabled();
 }
 
 static bool isAutoSaveAllowed() {

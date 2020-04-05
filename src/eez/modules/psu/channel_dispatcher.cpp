@@ -181,7 +181,6 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
             channel.flags.displayValue2 = channel1.flags.displayValue2;
             channel.ytViewRate = channel1.ytViewRate;
 
-            channel.u.rampState = channel1.u.rampState;
             channel.u.rampDuration = channel1.u.rampDuration;
         }
 
@@ -347,10 +346,8 @@ void setTrackingChannels(uint16_t trackingEnabled) {
                     temperature::sensors[temp_sensor::CH1 + i].prot_conf.level = t_level;
                     temperature::sensors[temp_sensor::CH1 + i].prot_conf.delay = t_delay;
 
-                    trackingChannel.u.rampState = false;
                     trackingChannel.u.rampDuration = RAMP_DURATION_DEF_VALUE;
 
-                    trackingChannel.i.rampState = false;
                     trackingChannel.i.rampDuration = RAMP_DURATION_DEF_VALUE;
 
                     trackingChannel.resetHistory();
@@ -1115,22 +1112,6 @@ void setOppDelay(Channel &channel, float delay) {
     }
 }
 
-void setVoltageRampState(Channel &channel, bool state) {
-    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        Channel::get(0).u.rampState = state;
-        Channel::get(1).u.rampState = state;
-    } else if (channel.flags.trackingEnabled) {
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel &trackingChannel = Channel::get(i);
-            if (trackingChannel.flags.trackingEnabled) {
-                trackingChannel.u.rampState = state;
-            }
-        }
-    } else {
-        channel.u.rampState = state;
-    }
-}
-
 void setVoltageRampDuration(Channel &channel, float duration) {
     duration = roundPrec(duration, RAMP_DURATION_PREC);
 
@@ -1149,22 +1130,6 @@ void setVoltageRampDuration(Channel &channel, float duration) {
     }
 }
 
-void setCurrentRampState(Channel &channel, bool state) {
-    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        Channel::get(0).i.rampState = state;
-        Channel::get(1).i.rampState = state;
-    } else if (channel.flags.trackingEnabled) {
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel &trackingChannel = Channel::get(i);
-            if (trackingChannel.flags.trackingEnabled) {
-                trackingChannel.i.rampState = state;
-            }
-        }
-    } else {
-        channel.i.rampState = state;
-    }
-}
-
 void setCurrentRampDuration(Channel &channel, float duration) {
     duration = roundPrec(duration, RAMP_DURATION_PREC);
 
@@ -1180,22 +1145,6 @@ void setCurrentRampDuration(Channel &channel, float duration) {
         }
     } else {
         channel.i.rampDuration = duration;
-    }
-}
-
-void setOutputDelayState(Channel &channel, bool state) {
-    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        Channel::get(0).flags.outputDelayState = state;
-        Channel::get(1).flags.outputDelayState = state;
-    } else if (channel.flags.trackingEnabled) {
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel &trackingChannel = Channel::get(i);
-            if (trackingChannel.flags.trackingEnabled) {
-                trackingChannel.flags.outputDelayState = state;
-            }
-        }
-    } else {
-        channel.flags.outputDelayState = state;
     }
 }
 
@@ -2015,13 +1964,12 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
 bool isEditEnabled(Channel &channel) {
     using namespace psu::gui;
 
-    if ((getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) || g_psuAppContext.isPageOnStack(PAGE_ID_CH_SETTINGS_LISTS)) {
+    if (
+        (getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) &&
+        g_psuAppContext.getActivePageId() == PAGE_ID_MAIN
+    ) {
         return false;
     } 
-
-    if (psu::calibration::isEnabled()) {
-        return false;
-    }
 
     return true;
 }

@@ -59,6 +59,7 @@ void setTriggerFinished(Channel &channel);
 bool isIdle();
 bool isInitiated();
 bool isTriggered();
+bool isActive();
 void abort();
 
 void tick(uint32_t tick_usec);

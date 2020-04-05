@@ -29,7 +29,6 @@
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/profile.h>
-#include <eez/modules/psu/ramp.h>
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/trigger.h>
 
@@ -453,7 +452,7 @@ void ChSettingsTriggerPage::onTriggerModeSet(uint16_t value) {
     if (channel_dispatcher::getVoltageTriggerMode(*g_channel) != value || channel_dispatcher::getCurrentTriggerMode(*g_channel) != value) {
         g_newTriggerMode = (uint8_t)value;
 
-        if (trigger::isInitiated() || list::isActive() || ramp::isActive()) {
+        if (trigger::isInitiated() || trigger::isActive()) {
             yesNoDialog(PAGE_ID_YES_NO, "Trigger is active. Are you sure?", onFinishTriggerModeSet, 0, 0);
         } else {
             onFinishTriggerModeSet();
@@ -463,52 +462,6 @@ void ChSettingsTriggerPage::onTriggerModeSet(uint16_t value) {
 
 void ChSettingsTriggerPage::editTriggerMode() {
     pushSelectFromEnumPage(ENUM_DEFINITION_CHANNEL_TRIGGER_MODE, channel_dispatcher::getVoltageTriggerMode(*g_channel), 0, onTriggerModeSet);
-}
-
-void ChSettingsTriggerPage::onVoltageTriggerValueSet(float value) {
-    popPage();
-    channel_dispatcher::setTriggerVoltage(*g_channel, value);
-}
-
-void ChSettingsTriggerPage::editVoltageTriggerValue() {
-    NumericKeypadOptions options;
-
-    options.editValueUnit = UNIT_VOLT;
-
-    options.min = channel_dispatcher::getUMin(*g_channel);
-    options.max = channel_dispatcher::getUMax(*g_channel);
-    options.def = channel_dispatcher::getUMax(*g_channel);
-
-    options.enableMaxButton();
-    options.enableMinButton();
-    options.flags.signButtonEnabled = true;
-    options.flags.dotButtonEnabled = true;
-
-    NumericKeypad::start(0, MakeValue(g_channel->u.triggerLevel, UNIT_VOLT), options, onVoltageTriggerValueSet, 0, 0);
-}
-
-void ChSettingsTriggerPage::onCurrentTriggerValueSet(float value) {
-    popPage();
-    channel_dispatcher::setTriggerCurrent(*g_channel, value);
-}
-
-void ChSettingsTriggerPage::editCurrentTriggerValue() {
-    NumericKeypadOptions options;
-
-    options.channelIndex = g_channel->channelIndex;
-
-    options.editValueUnit = UNIT_AMPER;
-
-    options.min = channel_dispatcher::getIMin(*g_channel);
-    options.max = channel_dispatcher::getIMax(*g_channel);
-    options.def = channel_dispatcher::getIMax(*g_channel);
-
-    options.enableMaxButton();
-    options.enableMinButton();
-    options.flags.signButtonEnabled = true;
-    options.flags.dotButtonEnabled = true;
-
-    NumericKeypad::start(0, MakeValue(g_channel->i.triggerLevel, UNIT_AMPER), options, onCurrentTriggerValueSet, 0, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -830,22 +783,18 @@ void ChSettingsListsPage::set() {
             popPage();
 
             if (
-                channel_dispatcher::getVoltageTriggerMode(*g_channel) != TRIGGER_MODE_LIST && 
+                channel_dispatcher::getVoltageTriggerMode(*g_channel) != TRIGGER_MODE_LIST ||
                 channel_dispatcher::getCurrentTriggerMode(*g_channel) != TRIGGER_MODE_LIST
             ) {
-                yesNoDialog(PAGE_ID_YES_NO_L, "Do you want to set list trigger mode?", setTriggerListMode, nullptr, nullptr);
+                trigger::abort();
+                channel_dispatcher::setVoltageTriggerMode(*g_channel, TRIGGER_MODE_LIST);
+                channel_dispatcher::setCurrentTriggerMode(*g_channel, TRIGGER_MODE_LIST);
+                channel_dispatcher::setTriggerOutputState(*g_channel, true);
             }
         } else {
             errorMessage("List lengths are not equivalent!");
         }
     }
-}
-
-void ChSettingsListsPage::setTriggerListMode() {
-    trigger::abort();
-    channel_dispatcher::setVoltageTriggerMode(*g_channel, TRIGGER_MODE_LIST);
-    channel_dispatcher::setCurrentTriggerMode(*g_channel, TRIGGER_MODE_LIST);
-    channel_dispatcher::setTriggerOutputState(*g_channel, true);
 }
 
 void ChSettingsListsPage::onEncoder(int counter) {

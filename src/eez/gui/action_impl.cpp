@@ -754,14 +754,6 @@ void action_ch_settings_trigger_edit_trigger_mode() {
     ((ChSettingsTriggerPage *)getActivePage())->editTriggerMode();
 }
 
-void action_ch_settings_trigger_edit_voltage_trigger_value() {
-    ((ChSettingsTriggerPage *)getActivePage())->editVoltageTriggerValue();
-}
-
-void action_ch_settings_trigger_edit_current_trigger_value() {
-    ((ChSettingsTriggerPage *)getActivePage())->editCurrentTriggerValue();
-}
-
 void action_ch_settings_lists_edit_list_count() {
     ((ChSettingsListsPage *)getActivePage())->editListCount();
 }
@@ -832,18 +824,6 @@ void action_channel_lists_file_import() {
 void action_channel_lists_file_export() {
     popPage();
     ((ChSettingsListsPage *)getActivePage())->fileExport();
-}
-
-void action_channel_initiate_trigger() {
-    channelInitiateTrigger();
-}
-
-void action_channel_set_to_fixed() {
-    channelSetToFixed();
-}
-
-void action_channel_enable_output() {
-    channelEnableOutput();
 }
 
 void action_trigger_select_source() {
@@ -1318,6 +1298,13 @@ void action_channel_update_firmware() {
 
 void action_show_sys_settings_ramp_and_delay() {
     pushPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+}
+
+void action_channel_toggle_ramp_state() {
+    auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+    if (page) {
+        page->toggleRampState(getFoundWidgetAtDown().cursor);
+    }
 }
 
 } // namespace gui

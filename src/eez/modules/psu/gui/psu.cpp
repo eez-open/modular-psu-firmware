@@ -1326,14 +1326,24 @@ float encoderIncrement(Value value, int counter, float min, float max, int chann
     return newValue;
 }
 
-bool isEncoderEnabledForWidget(const Widget *widget) {
-    return widget->action == ACTION_ID_EDIT;
+static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.widget->action != ACTION_ID_EDIT) {
+        return false;
+    }
+
+    if (widgetCursor.cursor >= 0 && widgetCursor.cursor < CH_NUM) {
+        if (!channel_dispatcher::isEditEnabled(Channel::get(widgetCursor.cursor))) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 static bool g_focusCursorIsEnabled;
 
 void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
-    if (isEncoderEnabledForWidget(widgetCursor.widget)) {
+    if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_focusCursor == widgetCursor.cursor && g_focusDataId == widgetCursor.widget->data) {
             g_focusCursorIsEnabled = true;
         }
@@ -1347,7 +1357,7 @@ bool isEnabledFocusCursor(Cursor cursor, int16_t dataId) {
 }
 
 void isEncoderEnabledInActivePageCheckWidget(const WidgetCursor &widgetCursor) {
-    if (isEncoderEnabledForWidget(widgetCursor.widget)) {
+    if (isEncoderEnabledForWidget(widgetCursor)) {
         g_isEncoderEnabledInActivePage = true;
     }
 }
@@ -1576,7 +1586,7 @@ static Cursor g_nextFocusCursor = Cursor(0);
 static uint16_t g_nextFocusDataId = DATA_ID_CHANNEL_U_EDIT;
 
 void findNextFocusCursor(const WidgetCursor &widgetCursor) {
-    if (isEncoderEnabledForWidget(widgetCursor.widget)) {
+    if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_findNextFocusCursorState == 0) {
             g_nextFocusCursor = widgetCursor.cursor;
             g_nextFocusDataId = widgetCursor.widget->data;
@@ -1752,6 +1762,13 @@ void onEncoder(int counter, bool clicked) {
 
 #endif
 
+static void channelInitiateTrigger() {
+    int err = trigger::initiate();
+    if (err != SCPI_RES_OK) {
+        psuErrorMessage(g_toggleOutputWidgetCursor.cursor, MakeScpiErrorValue(err));
+    }
+}
+
 void channelReinitiateTrigger() {
     trigger::abort();
     channelInitiateTrigger();
@@ -1779,7 +1796,7 @@ void doChannelToggleOutput() {
         if (triggerModeEnabled) {
             if (trigger::isIdle()) {
                 g_toggleOutputWidgetCursor = getFoundWidgetAtDown();
-                pushPage(PAGE_ID_CH_START_LIST);
+                channelInitiateTrigger();
             } else if (trigger::isInitiated()) {
                 trigger::abort();
             } else {
@@ -1816,33 +1833,6 @@ void channelToggleOutput() {
 
         doChannelToggleOutput();
     }
-}
-
-void channelInitiateTrigger() {
-    popPage();
-    int err = trigger::initiate();
-    if (err != SCPI_RES_OK) {
-        psuErrorMessage(g_toggleOutputWidgetCursor.cursor, MakeScpiErrorValue(err));
-    }
-}
-
-void channelSetToFixed() {
-    popPage();
-
-    Channel &channel = Channel::get(g_toggleOutputWidgetCursor.cursor >= 0 ? g_toggleOutputWidgetCursor.cursor : 0);
-    if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED) {
-        channel_dispatcher::setVoltageTriggerMode(channel, TRIGGER_MODE_FIXED);
-    }
-    if (channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) {
-        channel_dispatcher::setCurrentTriggerMode(channel, TRIGGER_MODE_FIXED);
-    }
-    channel_dispatcher::outputEnable(channel, true);
-}
-
-void channelEnableOutput() {
-    popPage();
-    Channel &channel = Channel::get(g_toggleOutputWidgetCursor.cursor >= 0 ? g_toggleOutputWidgetCursor.cursor : 0);
-    channel_dispatcher::outputEnable(channel, true);
 }
 
 void selectChannel(Channel *channel) {

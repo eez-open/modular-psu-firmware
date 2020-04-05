@@ -374,6 +374,9 @@ public:
 
     int getDirty();
     void set();
+    
+    bool rampState[CH_MAX];
+    void toggleRampState(int channelIndex);
 
     float triggerVoltage[CH_MAX];
     void setTriggerVoltage(int channelIndex, float value);
@@ -398,13 +401,13 @@ public:
     static void draw(const WidgetCursor &widgetCursor);
 
 private:
+    bool rampStateOrig[CH_MAX];
     float triggerVoltageOrig[CH_MAX];
     float triggerCurrentOrig[CH_MAX];
     float voltageRampDurationOrig[CH_MAX];
     float currentRampDurationOrig[CH_MAX];
     float outputDelayDurationOrig[CH_MAX];
 
-    static void setTriggerStepMode();
     void drawRamp(const WidgetCursor &widgetCursor, int channelIndex, bool drawVoltageRamps, float T, float limit, int yOffset = 0);
 };
 

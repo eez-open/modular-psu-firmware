@@ -61,7 +61,6 @@ void Channel::Value::init(float set_, float step_, float limit_) {
     step = step_;
     limit = limit_;
     resetMonValues();
-    rampState = false;
     rampDuration = RAMP_DURATION_DEF_VALUE;
 }
 
@@ -623,7 +622,6 @@ void Channel::reset() {
     i.triggerLevel = params.I_MIN;
     list::resetChannelList(*this);
 
-    flags.outputDelayState = 0;
     outputDelayDuration = 0;
 
 #ifdef EEZ_PLATFORM_SIMULATOR
@@ -1236,7 +1234,7 @@ bool Channel::isRemoteSensingEnabled() {
 
 void Channel::remoteProgrammingEnable(bool enable) {
     if (enable != flags.rprogEnabled) {
-        if (list::isActive(*this) || ramp::isActive(*this)) {
+        if (trigger::isActive()) {
             trigger::abort();
         }
         doRemoteProgrammingEnable(enable);

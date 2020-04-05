@@ -47,7 +47,6 @@ struct ChannelFlags {
     unsigned u_type : 1;
     unsigned dprogState : 2;
     unsigned trackingEnabled : 1;
-    unsigned outputDelayState: 1;
 };
 
 /// Channel parameters stored in profile.
@@ -71,9 +70,7 @@ struct ChannelParameters {
     float u_triggerValue;
     float i_triggerValue;
     uint16_t listCount;
-    bool u_rampState;
     float u_rampDuration;
-    bool i_rampState;
     float i_rampDuration;
     float outputDelayDuration;
 #ifdef EEZ_PLATFORM_SIMULATOR

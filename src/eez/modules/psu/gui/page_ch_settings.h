@@ -169,15 +169,9 @@ class ChSettingsTriggerPage : public Page {
   public:
     void editTriggerMode();
 
-    void editVoltageTriggerValue();
-    void editCurrentTriggerValue();
-
   private:
     static void onFinishTriggerModeSet();
     static void onTriggerModeSet(uint16_t value);
-
-    static void onVoltageTriggerValueSet(float value);
-    static void onCurrentTriggerValueSet(float value);
 };
 
 class ChSettingsListsPage : public SetPage {
@@ -279,8 +273,6 @@ private:
 
     static void onImportListFileSelected(const char *listFilePath);
     static void onExportListFileSelected(const char *listFilePath);
-
-    static void setTriggerListMode();
 
     static void onListCountSet(float value);
     static void onListCountSetToInfinity();

@@ -63,7 +63,7 @@ void tick(uint32_t tickUsec) {
                 }
 
                 if (g_execution[i].state == 2) {
-                    if (!channel.flags.outputDelayState || tick >= g_execution[i].startTime + channel.outputDelayDuration) {
+                    if (tick >= g_execution[i].startTime + channel.outputDelayDuration) {
                         g_execution[i].state = 3;
                         g_execution[i].voltageRampDone = false;
                         g_execution[i].currentRampDone = false;
@@ -71,14 +71,14 @@ void tick(uint32_t tickUsec) {
                 }
 
                 if (g_execution[i].state == 3) {
-                    if (channel.u.rampState && tick < g_execution[i].startTime + channel.outputDelayDuration + channel.u.rampDuration) {
+                    if (tick < g_execution[i].startTime + channel.outputDelayDuration + channel.u.rampDuration) {
                         channel_dispatcher::setVoltage(channel, channel.u.triggerLevel * (tick - g_execution[i].startTime - channel.outputDelayDuration) / channel.u.rampDuration);
                     } else if (!g_execution[i].voltageRampDone) {
                         channel_dispatcher::setVoltage(channel, channel.u.triggerLevel);
                         g_execution[i].voltageRampDone = true;
                     }
 
-                    if (channel.i.rampState && tick < g_execution[i].startTime + channel.outputDelayDuration + channel.i.rampDuration) {
+                    if (tick < g_execution[i].startTime + channel.outputDelayDuration + channel.i.rampDuration) {
                         channel_dispatcher::setCurrent(channel, channel.i.triggerLevel * (tick - g_execution[i].startTime - channel.outputDelayDuration) / channel.i.rampDuration);
                     } else if (!g_execution[i].currentRampDone) {
                         channel_dispatcher::setCurrent(channel, channel.i.triggerLevel);

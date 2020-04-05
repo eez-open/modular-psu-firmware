@@ -367,6 +367,10 @@ bool isTriggered() {
     return g_state == STATE_TRIGGERED;
 }
 
+bool isActive() {
+    return list::isActive() || ramp::isActive();
+}
+
 void abort() {
     if (osThreadGetId() != g_psuTaskHandle) {
         osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_TRIGGER_ABORT, 0), 0);
@@ -377,7 +381,7 @@ void abort() {
         bool sync = false;
         for (int i = 0; i < CH_NUM; ++i) {
             auto &channel = Channel::get(i);
-            if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) {
+            if ((channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) && channel.isOutputEnabled()) {
                 channel_dispatcher::outputEnableOnNextSync(channel, false);
                 sync = true;
             }

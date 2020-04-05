@@ -1024,14 +1024,16 @@ void SysSettingsCouplingPage::set() {
 void SysSettingsRampAndDelayPage::pageAlloc() {
     for (int i = 0; i < CH_NUM; i++) {
         auto &channel = Channel::get(i);
+
+        rampState[i] = rampStateOrig[i] = channel_dispatcher::getVoltageTriggerMode(channel) == TRIGGER_MODE_STEP || channel_dispatcher::getCurrentTriggerMode(channel) == TRIGGER_MODE_STEP;
         
         triggerVoltage[i] = triggerVoltageOrig[i] = channel_dispatcher::getTriggerVoltage(channel);
         triggerCurrent[i] = triggerCurrentOrig[i] = channel_dispatcher::getTriggerCurrent(channel);
         
-        voltageRampDuration[i] = voltageRampDurationOrig[i] = channel.u.rampState ? channel.u.rampDuration : 0;
-        currentRampDuration[i] = currentRampDurationOrig[i] = channel.i.rampState ? channel.i.rampDuration : 0;
+        voltageRampDuration[i] = voltageRampDurationOrig[i] = channel.u.rampDuration;
+        currentRampDuration[i] = currentRampDurationOrig[i] = channel.i.rampDuration;
 
-        outputDelayDuration[i] = outputDelayDurationOrig[i] = channel.flags.outputDelayState ? channel.outputDelayDuration : 0;
+        outputDelayDuration[i] = outputDelayDurationOrig[i] = channel.outputDelayDuration;
     }
 
     version = 1;
@@ -1040,6 +1042,10 @@ void SysSettingsRampAndDelayPage::pageAlloc() {
 
 int SysSettingsRampAndDelayPage::getDirty() {
     for (int i = 0; i < CH_NUM; i++) {
+        if (rampState[i] != rampStateOrig[i]) {
+            return 1;
+        }
+
         if (triggerVoltage[i] != triggerVoltageOrig[i] || triggerCurrent[i] != triggerCurrentOrig[i]) {
             return 1;
         }
@@ -1054,52 +1060,45 @@ int SysSettingsRampAndDelayPage::getDirty() {
 }
 
 void SysSettingsRampAndDelayPage::set() {
-    bool askToSwitchToStepTriggerMode = false;
+    bool triggerAborted = false;
 
     for (int i = 0; i < CH_NUM; i++) {
         auto &channel = Channel::get(i);
 
-        channel_dispatcher::setTriggerVoltage(channel, triggerVoltage[i]);
-        channel_dispatcher::setTriggerCurrent(channel, triggerCurrent[i]);
-        
-        channel_dispatcher::setVoltageRampState(channel, voltageRampDuration[i] != 0);
-        channel_dispatcher::setVoltageRampDuration(channel, voltageRampDuration[i]);
+        if (rampState[i]) {
+            channel_dispatcher::setTriggerVoltage(channel, triggerVoltage[i]);
+            channel_dispatcher::setVoltageRampDuration(channel, voltageRampDuration[i]);
+            channel_dispatcher::setTriggerCurrent(channel, triggerCurrent[i]);
+            channel_dispatcher::setCurrentRampDuration(channel, currentRampDuration[i]);
+            channel_dispatcher::setOutputDelayDuration(channel, outputDelayDuration[i]);
 
-        channel_dispatcher::setCurrentRampState(channel, currentRampDuration[i] != 0);
-        channel_dispatcher::setCurrentRampDuration(channel, currentRampDuration[i]);
-
-        channel_dispatcher::setOutputDelayState(channel, outputDelayDuration[i] != 0);
-        channel_dispatcher::setOutputDelayDuration(channel, outputDelayDuration[i]);
-
-        if (
-            ((voltageRampDuration[i] != 0 || triggerVoltage[i] != 0) && channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_STEP) ||
-            ((currentRampDuration[i] != 0 || triggerCurrent[i] != 0) && channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_STEP)
-        ) {
-            askToSwitchToStepTriggerMode = true;
+            if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_STEP || channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_STEP) {
+                if (!triggerAborted) {
+                    trigger::abort();
+                    triggerAborted = true;
+                }
+                channel_dispatcher::setVoltageTriggerMode(channel, TRIGGER_MODE_STEP);
+                channel_dispatcher::setCurrentTriggerMode(channel, TRIGGER_MODE_STEP);
+                channel_dispatcher::setTriggerOutputState(channel, true);
+            }
+        } else {
+            if (channel_dispatcher::getVoltageTriggerMode(channel) == TRIGGER_MODE_STEP || channel_dispatcher::getCurrentTriggerMode(channel) == TRIGGER_MODE_STEP) {
+                if (!triggerAborted) {
+                    trigger::abort();
+                    triggerAborted = true;
+                }
+                channel_dispatcher::setVoltageTriggerMode(channel, TRIGGER_MODE_FIXED);
+                channel_dispatcher::setCurrentTriggerMode(channel, TRIGGER_MODE_FIXED);
+            }
         }
     }
 
     popPage();
-
-    if (askToSwitchToStepTriggerMode) {
-        yesNoDialog(PAGE_ID_YES_NO_L, "Do you want to set step trigger mode?", setTriggerStepMode, nullptr, nullptr);
-    }
 }
 
-void SysSettingsRampAndDelayPage::setTriggerStepMode() {
-    trigger::abort();
-    
-    for (int i = 0; i < CH_NUM; i++) {
-        auto &channel = Channel::get(i);
-        if (
-            ((channel.u.rampDuration != 0 || channel.u.triggerLevel != channel_dispatcher::getUMin(channel)) && channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_STEP) ||
-            ((channel.i.rampDuration != 0 || channel.i.triggerLevel != channel_dispatcher::getIMin(channel)) && channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_STEP)
-        ) {
-            channel_dispatcher::setVoltageTriggerMode(channel, TRIGGER_MODE_STEP);
-            channel_dispatcher::setCurrentTriggerMode(channel, TRIGGER_MODE_STEP);
-            channel_dispatcher::setTriggerOutputState(channel, true);
-        }
-    }
+void SysSettingsRampAndDelayPage::toggleRampState(int channelIndex) {
+    rampState[channelIndex] = !rampState[channelIndex];
+    version++;
 }
 
 void SysSettingsRampAndDelayPage::setTriggerVoltage(int channelIndex, float value) {
@@ -1117,7 +1116,7 @@ void SysSettingsRampAndDelayPage::setTriggerVoltage(int channelIndex, float valu
         triggerVoltage[channelIndex] = value;
     }
 
-    ++version;
+    version++;
 }
 
 void SysSettingsRampAndDelayPage::setTriggerCurrent(int channelIndex, float value) {
@@ -1135,7 +1134,7 @@ void SysSettingsRampAndDelayPage::setTriggerCurrent(int channelIndex, float valu
         triggerCurrent[channelIndex] = value;
     }
 
-    ++version;
+    version++;
 }
 
 void SysSettingsRampAndDelayPage::setVoltageRampDuration(int channelIndex, float value) {
@@ -1153,7 +1152,7 @@ void SysSettingsRampAndDelayPage::setVoltageRampDuration(int channelIndex, float
         voltageRampDuration[channelIndex] = value;
     }
 
-    ++version;
+    version++;
 }
 
 void SysSettingsRampAndDelayPage::setCurrentRampDuration(int channelIndex, float value) {
@@ -1171,7 +1170,7 @@ void SysSettingsRampAndDelayPage::setCurrentRampDuration(int channelIndex, float
         currentRampDuration[channelIndex] = value;
     }
 
-    ++version;
+    version++;
 }
 
 void SysSettingsRampAndDelayPage::setOutputDelayDuration(int channelIndex, float value) {
@@ -1189,7 +1188,7 @@ void SysSettingsRampAndDelayPage::setOutputDelayDuration(int channelIndex, float
         outputDelayDuration[channelIndex] = value;
     }
 
-    ++version;
+    version++;
 }
 
 Value SysSettingsRampAndDelayPage::getRefreshState() {
@@ -1204,25 +1203,29 @@ void SysSettingsRampAndDelayPage::draw(const WidgetCursor &widgetCursor) {
     drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
 
     float drawVoltageRamps = (g_focusDataId != DATA_ID_CHANNEL_I_TRIGGER_VALUE && g_focusDataId != DATA_ID_CHANNEL_CURRENT_RAMP_DURATION);
-    float T = 0.0f;
-    float limit = 0.0f;
+    float T = 1E-3f;
+    float limit = 1E-3f;
 
     for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-        T = MAX(T, page->outputDelayDuration[channelIndex] + (drawVoltageRamps ? page->voltageRampDuration[channelIndex] : page->currentRampDuration[channelIndex]));
-        limit = MAX(limit, (drawVoltageRamps ? page->triggerVoltage[channelIndex] : page->triggerCurrent[channelIndex]));
+        if (page->rampState[channelIndex]) {
+            T = MAX(T, page->outputDelayDuration[channelIndex] + (drawVoltageRamps ? page->voltageRampDuration[channelIndex] : page->currentRampDuration[channelIndex]));
+            limit = MAX(limit, (drawVoltageRamps ? page->triggerVoltage[channelIndex] : page->triggerCurrent[channelIndex]));
+        }
     }
 
     T *= 1.1f;
     limit *= 1.1f;
 
     for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-        if (channelIndex != g_focusCursor) {
+        if (page->rampState[channelIndex] && channelIndex != g_focusCursor) {
             page->drawRamp(widgetCursor, channelIndex, drawVoltageRamps, T, limit);
         }
     }
-    
-    page->drawRamp(widgetCursor, g_focusCursor, drawVoltageRamps, T, limit);
-    page->drawRamp(widgetCursor, g_focusCursor, drawVoltageRamps, T, limit, 1);
+
+    if (g_focusCursor != -1 && page->rampState[g_focusCursor]) {
+        page->drawRamp(widgetCursor, g_focusCursor, drawVoltageRamps, T, limit);
+        page->drawRamp(widgetCursor, g_focusCursor, drawVoltageRamps, T, limit, 1);
+    }
 }
 
 

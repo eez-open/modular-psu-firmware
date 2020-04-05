@@ -260,33 +260,6 @@ scpi_result_t scpi_cmd_outputDprogQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_outputDelayState(scpi_t *context) {
-    bool state;
-    if (!SCPI_ParamBool(context, &state, TRUE)) {
-        return SCPI_RES_ERR;
-    }
-
-    Channel *channel = param_channel(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    channel_dispatcher::setOutputDelayState(*channel, state);
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_outputDelayStateQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    SCPI_ResultBool(context, channel->flags.outputDelayState);
-
-    return SCPI_RES_OK;
-}
-
 scpi_result_t scpi_cmd_outputDelayDuration(scpi_t *context) {
     scpi_number_t param;
     if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {

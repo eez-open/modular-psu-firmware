@@ -89,7 +89,7 @@ static const float OUTPUT_DELAY_DURATION_MAX_VALUE = 10.0f;
 static const float OUTPUT_DELAY_DURATION_DEF_VALUE = 0.01f;
 static const float OUTPUT_DELAY_DURATION_PREC = 0.001f;
 
-static const float RAMP_DURATION_MIN_VALUE = 0.001f;
+static const float RAMP_DURATION_MIN_VALUE = 0.002f;
 static const float RAMP_DURATION_MAX_VALUE = 10.0f;
 static const float RAMP_DURATION_DEF_VALUE = 0.01f;
 static const float RAMP_DURATION_PREC = 0.001f;
@@ -204,7 +204,6 @@ class Channel {
         unsigned powerOk : 1;
         unsigned calEnabled : 1;
         unsigned rprogEnabled : 1;
-        unsigned outputDelayState : 1;
         unsigned reserved : 1;
         unsigned rpol : 1; // remote sense reverse polarity is detected
         unsigned displayValue1 : 2;
@@ -253,8 +252,6 @@ class Channel {
         float max;
 
         float triggerLevel;
-
-        bool rampState;
         float rampDuration;
 
         void init(float set_, float step_, float limit_);

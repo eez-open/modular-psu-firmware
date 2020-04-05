@@ -34,9 +34,6 @@ class Channel;
 namespace gui {
 
 void channelToggleOutput();
-void channelInitiateTrigger();
-void channelSetToFixed();
-void channelEnableOutput();
 
 void selectChannel(Channel *channel = nullptr);
 extern Channel *g_channel;
