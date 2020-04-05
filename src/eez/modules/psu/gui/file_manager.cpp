@@ -46,6 +46,7 @@
 #include <eez/modules/psu/scpi/psu.h>
 
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/animations.h>
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/gui/keypad.h>
 
@@ -463,6 +464,7 @@ void goToParentDirectory() {
 
     g_filesStartPosition = 0;
     loadDirectory();
+    animateFadeOutFadeInWorkingArea();
 }
 
 uint32_t getFilesCount() {
@@ -612,6 +614,7 @@ void selectFile(uint32_t fileIndex) {
                 strcat(g_currentDirectory, fileItem->name);
                 g_filesStartPosition = 0;
                 loadDirectory();
+                animateFadeOutFadeInWorkingArea();
             }
         } else {
             g_selectedFileIndex = fileIndex;

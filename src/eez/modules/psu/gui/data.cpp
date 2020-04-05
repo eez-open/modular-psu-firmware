@@ -5750,6 +5750,12 @@ void data_ramp_and_delay_list(DataOperationEnum operation, Cursor cursor, Value 
     }
 }
 
+void data_ramp_and_delay_list_scrollbar_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = (uint32_t)count(DATA_ID_RAMP_AND_DELAY_LIST) > ytDataGetPageSize(cursor, DATA_ID_RAMP_AND_DELAY_LIST);
+    }
+}
+
 void data_channel_ramp_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);

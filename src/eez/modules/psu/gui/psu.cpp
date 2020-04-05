@@ -332,6 +332,7 @@ bool isSysSettingsSubPage(int pageId) {
         pageId == PAGE_ID_SYS_SETTINGS_SERIAL ||
         pageId == PAGE_ID_SYS_SETTINGS_ETHERNET ||
         pageId == PAGE_ID_SYS_SETTINGS_TRIGGER ||
+        pageId == PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY ||
         pageId == PAGE_ID_SYS_SETTINGS_DISPLAY ||
         pageId == PAGE_ID_SYS_SETTINGS_SOUND ||
         pageId == PAGE_ID_SYS_INFO;

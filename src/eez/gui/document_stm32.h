@@ -398,7 +398,8 @@ enum DataEnum {
     DATA_ID_DEBUG_VARIABLES = 396,
     DATA_ID_DEBUG_VARIABLE_NAME = 397,
     DATA_ID_DEBUG_VARIABLE_VALUE = 398,
-    DATA_ID_CHANNEL_RAMP_STATE = 399
+    DATA_ID_CHANNEL_RAMP_STATE = 399,
+    DATA_ID_RAMP_AND_DELAY_LIST_SCROLLBAR_ENABLED = 400
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -801,6 +802,7 @@ void data_debug_variables(DataOperationEnum operation, Cursor cursor, Value &val
 void data_debug_variable_name(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_debug_variable_value(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channel_ramp_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_ramp_and_delay_list_scrollbar_enabled(DataOperationEnum operation, Cursor cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor cursor, Value &value);
 
@@ -1653,4 +1655,4 @@ enum PagesEnum {
     PAGE_ID_FOCUS_VALUE_OVERLAY = 162
 };
 
-extern const uint8_t assets[310126];
+extern const uint8_t assets[310597];

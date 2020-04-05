@@ -765,7 +765,7 @@ void ChSettingsListsPage::moveCursorToFirstAvailableCell() {
 }
 
 int ChSettingsListsPage::getDirty() {
-    return m_listVersion > 0 || m_listCount != m_listCountOrig || m_triggerOnListStop || m_triggerOnListStopOrig;
+    return m_listVersion > 0 || m_listCount != m_listCountOrig || m_triggerOnListStop != m_triggerOnListStopOrig;
 }
 
 void ChSettingsListsPage::set() {
