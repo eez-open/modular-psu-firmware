@@ -424,7 +424,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         } else if (isSysSettingsSubPage(activePageId)) {
             animateSettingsSlideLeft(activePageId == PAGE_ID_SYS_INFO);
         }
-    } else if (previousPageId == PAGE_ID_SYS_SETTINGS_TRIGGER) {
+    } else if (previousPageId == PAGE_ID_SYS_SETTINGS_TRIGGER || previousPageId == PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY) {
         if (activePageId == PAGE_ID_MAIN) {
             animateHideSysSettings();
         } else if (activePageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
@@ -449,7 +449,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
     } else if (previousPageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
         if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
-        } else if (activePageId == PAGE_ID_SYS_SETTINGS_TRIGGER) {
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS_TRIGGER || activePageId == PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY) {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_CH_SETTINGS_LISTS) {
             animateSlideDown();
