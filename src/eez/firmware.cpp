@@ -83,7 +83,7 @@ bool g_shutdownInProgress;
 bool g_shutdown;
 
 void boot() {
-    assert(MEMORY_END - MEMORY_BEGIN <= MEMORY_SIZE);
+    assert((uint32_t)(MEMORY_END - MEMORY_BEGIN) <= MEMORY_SIZE);
 
     psu::event_queue::init();
 
@@ -389,6 +389,10 @@ void shutdown() {
 
 #if defined(EEZ_PLATFORM_STM32)
         NVIC_SystemReset();
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+        psu::gui::showShutdownPage();
 #endif
 
         g_shutdown = true;

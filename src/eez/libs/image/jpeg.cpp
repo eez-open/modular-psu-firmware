@@ -71,7 +71,6 @@ extern "C" {
 }
 
 static uint8_t *g_decodeBuffer = FILE_VIEW_BUFFER + sizeof(nj_context_t);
-static const size_t DECODE_BUFFER_SIZE = FILE_VIEW_BUFFER_SIZE - sizeof(nj_context_t);
 
 uint8_t *g_decodeDynamicMemory;
 

@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+
 #include <eez/util.h>
 
 #include <eez/modules/psu/psu.h>
@@ -30,6 +32,7 @@ namespace ramp {
 static struct {
     int state;
     float startTime;
+    float currentTime;
     bool voltageRampDone;
     bool currentRampDone;
 } g_execution[CH_MAX];
@@ -57,6 +60,8 @@ void tick(uint32_t tickUsec) {
         if (g_execution[i].state) {
             auto &channel = Channel::get(i);
             if (channel.isOutputEnabled()) {
+                g_execution[i].currentTime = tick;
+
                 if (g_execution[i].state == 1) {
                     g_execution[i].startTime = tick;
                     g_execution[i].state = 2;
@@ -129,7 +134,12 @@ void getCountdownTime(int channelIndex, uint32_t &remaining, uint32_t &total) {
         if (g_execution[channelIndex].state == 1) {
             remaining = total;
         } else {
-            remaining = (uint32_t)roundf(g_execution[channelIndex].startTime + duration - millis() / 1000.0f);
+            int32_t aux = (int32_t)roundf(g_execution[channelIndex].startTime + duration - g_execution[channelIndex].currentTime);
+            if (aux > 0) {
+                remaining = aux;
+            } else {
+                remaining = 0;
+            }
         }
     } else {
         remaining = 0;

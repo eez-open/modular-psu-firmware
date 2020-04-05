@@ -101,11 +101,9 @@ void Channel::Value::addMonValue(float value, float prec) {
             mon = 0;
             mon_prev = 0;
         } else {
-            float mon_next = mon_total / NUM_ADC_AVERAGING_VALUES;
-            if (fabs(mon_prev - mon_next) >= prec) {
-                mon = roundPrec(mon_next, prec);
-                mon_prev = mon_next;
-            }
+            float mon_next = roundPrec(mon_total / NUM_ADC_AVERAGING_VALUES, prec);
+            mon = mon_next;
+            mon_prev = mon_next;
         }
     }
 
@@ -129,12 +127,9 @@ void Channel::Value::addMonDacValue(float value, float prec) {
         mon_dac_arr[mon_dac_index] = value;
         mon_dac_index = (mon_dac_index + 1) % NUM_ADC_AVERAGING_VALUES;
 
-        float mon_dac_next = mon_dac_total / NUM_ADC_AVERAGING_VALUES;
-
-		if (fabs(mon_dac_prev - mon_dac_next) >= prec) {
-			mon_dac = roundPrec(mon_dac_next, prec);
-			mon_dac_prev = mon_dac_next;
-		}
+        float mon_dac_next = roundPrec(mon_dac_total / NUM_ADC_AVERAGING_VALUES, prec);
+		mon_dac = mon_dac_next;
+		mon_dac_prev = mon_dac_next;
     }
 }
 
