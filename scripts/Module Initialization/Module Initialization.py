@@ -137,7 +137,7 @@ try:
         elif action == "slot3_input_version_r":
             select_version_r(2)
         elif action == "slot3_input_version_b":
-            select_version_r(2)
+            select_version_b(2)
         elif action == "slot1_init":
             slot_init(0)
         elif action == "slot2_init":
