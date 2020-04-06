@@ -95,6 +95,7 @@ static const size_t MAX_NUM_EXTERNAL_DATA_ITEM_VALUES = 20;
 static struct {
     Value value;
     char text[128 + 1];
+    int textIndex;
 } g_externalDataItemValues[MAX_NUM_EXTERNAL_DATA_ITEM_VALUES];
 
 SelectFromEnumPage g_selectFromEnumPage;
@@ -889,6 +890,7 @@ DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&
 void PsuAppContext::dialogResetDataItemValues() {
     for (uint32_t i = 0; i < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES; i++) {
         g_externalDataItemValues[i].value = Value();
+        g_externalDataItemValues[i].textIndex = 0;
     }
 }
 
@@ -914,8 +916,14 @@ void PsuAppContext::dialogSetDataItemValue(int16_t dataId, const char *str) {
     }
     dataId--;
     if ((uint16_t)dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
-        strcpy(g_externalDataItemValues[dataId].text, str);
-        g_externalDataItemValues[dataId].value = (const char *)g_externalDataItemValues[dataId].text;
+        int textIndex = g_externalDataItemValues[dataId].textIndex;
+        if (textIndex == 4) {
+            g_externalDataItemValues[dataId].textIndex = 0;
+        } else {
+            g_externalDataItemValues[dataId].textIndex++;
+        }
+        strcpy(g_externalDataItemValues[dataId].text + textIndex, str);
+        g_externalDataItemValues[dataId].value = (const char *)g_externalDataItemValues[dataId].text + textIndex;
     }
 }
 

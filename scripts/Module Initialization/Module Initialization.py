@@ -1,4 +1,4 @@
-# Determines diode reverse breakdown voltage
+# Module initialization utility
 
 from utime import ticks_ms, ticks_add, ticks_diff, sleep_ms
 from eez import scpi, setU, getOutputMode, getI, dlogTraceData
