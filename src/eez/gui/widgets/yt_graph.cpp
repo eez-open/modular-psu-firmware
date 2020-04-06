@@ -544,9 +544,10 @@ DrawFunctionType YT_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
                 // draw cursor
                 display::setColor(style->color);
                 display::drawVLine(x + currentState->historyValuePosition % graphWidth, widgetCursor.y, (int)widget->h - 1);
+                display::drawVLine(x + (currentState->historyValuePosition + 1) % graphWidth, widgetCursor.y, (int)widget->h - 1);
 
                 // draw blank lines
-                int x1 = x + (currentState->historyValuePosition + 1) % graphWidth;
+                int x1 = x + (currentState->historyValuePosition + 2) % graphWidth;
                 int x2 = x + (currentState->historyValuePosition + CONF_GUI_YT_GRAPH_BLANK_PIXELS_AFTER_CURSOR) % graphWidth;
 
                 display::setColor(style->background_color);
