@@ -10,14 +10,19 @@
     
     from `/ports/bare-arm/build/genhdr` to `/ports/bb3/genhdr`
 
+- Start build
+
 ```
-cd /mnt/c/Users/mvladic/Dropbox/Code/EEZ/modular-psu-firmware/src/third_party/micropython/ports/bare-arm
+cd /mnt/c/work/eez/modular-psu-firmware/src/third_party/micropython/ports/bare-arm
 cp ../bb3/mpconfigport.h mpconfigport.h
 
 make clean
-make USER_C_MODULES=/mnt/c/Users/mvladic/Dropbox/Code/EEZ/modular-psu-firmware/src/third_party/micropython/ports/bb3/mod
+make USER_C_MODULES=/mnt/c/work/eez/modular-psu-firmware/src/third_party/micropython/ports/bb3/mod
 
 cp build/genhdr/moduledefs.h ../bb3/genhdr/moduledefs.h
 cp build/genhdr/mpversion.h ../bb3/genhdr/mpversion.h
 cp build/genhdr/qstrdefs.generated.h ../bb3/genhdr/qstrdefs.generated.h
 ```
+
+The build doesn't need to succeed or finish - you can stop if after files are generated, i.e. after you see first `CC ..` in terminal.
+
