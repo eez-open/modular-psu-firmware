@@ -3857,8 +3857,8 @@ void data_sys_display_brightness(DataOperationEnum operation, Cursor cursor, Val
 
 void data_channel_trigger_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = MakeEnumDefinitionValue(channel_dispatcher::getVoltageTriggerMode(*g_channel),
-                                        ENUM_DEFINITION_CHANNEL_TRIGGER_MODE);
+        auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+        value = MakeEnumDefinitionValue(page ? page->triggerMode : channel_dispatcher::getVoltageTriggerMode(*g_channel), ENUM_DEFINITION_CHANNEL_TRIGGER_MODE);
     }
 }
 
@@ -3868,14 +3868,24 @@ void data_channel_u_trigger_value(DataOperationEnum operation, Cursor cursor, Va
         if (page) {
             value = MakeValue(page->triggerVoltage[cursor], UNIT_VOLT);
         } else {
-            value = MakeValue(channel_dispatcher::getTriggerVoltage(*g_channel), UNIT_VOLT);
+            auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+            if (page) {
+                value = MakeValue(page->triggerVoltage, UNIT_VOLT);
+            } else {
+                value = MakeValue(channel_dispatcher::getTriggerVoltage(*g_channel), UNIT_VOLT);
+            }
         }
     } else if (operation == DATA_OPERATION_SET) {
         auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
         if (page) {
             page->setTriggerVoltage(cursor, value.getFloat());
         } else {
-            channel_dispatcher::setTriggerVoltage(*g_channel, value.getFloat());
+            auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+            if (page) {
+                page->triggerVoltage = value.getFloat();
+            } else {
+                channel_dispatcher::setTriggerVoltage(*g_channel, value.getFloat());
+            }
         }
     } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "Voltage step";
@@ -3890,14 +3900,24 @@ void data_channel_i_trigger_value(DataOperationEnum operation, Cursor cursor, Va
         if (page) {
             value = MakeValue(page->triggerCurrent[cursor], UNIT_AMPER);
         } else {
-            value = MakeValue(channel_dispatcher::getTriggerCurrent(*g_channel), UNIT_AMPER);
+            auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+            if (page) {
+                value = MakeValue(page->triggerCurrent, UNIT_AMPER);
+            } else {
+                value = MakeValue(channel_dispatcher::getTriggerCurrent(*g_channel), UNIT_AMPER);
+            }
         }
     } else if (operation == DATA_OPERATION_SET) {
         auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
         if (page) {
             page->setTriggerCurrent(cursor, value.getFloat());
         } else {
-            channel_dispatcher::setTriggerCurrent(*g_channel, value.getFloat());
+            auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+            if (page) {
+                page->triggerCurrent = value.getFloat();
+            } else {
+                channel_dispatcher::setTriggerCurrent(*g_channel, value.getFloat());
+            }
         } 
     } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "Current step";
@@ -5782,14 +5802,24 @@ void data_channel_voltage_ramp_duration(DataOperationEnum operation, Cursor curs
         if (page) {
             value = MakeValue(page->voltageRampDuration[cursor], UNIT_SECOND);
         } else {
-            value = MakeValue(g_channel->u.rampDuration, UNIT_SECOND);
+            auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+            if (page) {
+                value = MakeValue(page->voltageRampDuration, UNIT_SECOND);
+            } else {
+                value = MakeValue(g_channel->u.rampDuration, UNIT_SECOND);
+            }
         }
     } else if (operation == DATA_OPERATION_SET) {
         auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
         if (page) {
             page->setVoltageRampDuration(cursor, value.getFloat());
         } else {
-            channel_dispatcher::setVoltageRampDuration(*g_channel, value.getFloat());
+            auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+            if (page) {
+                page->voltageRampDuration = value.getFloat();
+            } else {
+                channel_dispatcher::setVoltageRampDuration(*g_channel, value.getFloat());
+            }
         }
     } if (operation == DATA_OPERATION_GET_NAME) {
         value = "U ramp dur.";
@@ -5816,14 +5846,24 @@ void data_channel_current_ramp_duration(DataOperationEnum operation, Cursor curs
         if (page) {
             value = MakeValue(page->currentRampDuration[cursor], UNIT_SECOND);
         } else {
-            value = MakeValue(g_channel->i.rampDuration, UNIT_SECOND);
+            auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+            if (page) {
+                value = MakeValue(page->currentRampDuration, UNIT_SECOND);
+            } else {
+                value = MakeValue(g_channel->i.rampDuration, UNIT_SECOND);
+            }
         }
     } else if (operation == DATA_OPERATION_SET) {
         auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
         if (page) {
             page->setCurrentRampDuration(cursor, value.getFloat());
         } else {
-            channel_dispatcher::setCurrentRampDuration(*g_channel, value.getFloat());
+            auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+            if (page) {
+                page->currentRampDuration = value.getFloat();
+            } else {
+                channel_dispatcher::setCurrentRampDuration(*g_channel, value.getFloat());
+            }
         }
     } if (operation == DATA_OPERATION_GET_NAME) {
         value = "I ramp dur.";
@@ -5850,14 +5890,24 @@ void data_channel_output_delay(DataOperationEnum operation, Cursor cursor, Value
         if (page) {
             value = MakeValue(page->outputDelayDuration[cursor], UNIT_SECOND);
         } else {
-            value = MakeValue(g_channel->outputDelayDuration, UNIT_SECOND);
+            auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+            if (page) {
+                value = MakeValue(page->outputDelayDuration, UNIT_SECOND);
+            } else {
+                value = MakeValue(g_channel->outputDelayDuration, UNIT_SECOND);
+            }
         }
     } else if (operation == DATA_OPERATION_SET) {
         auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
         if (page) {
             page->setOutputDelayDuration(cursor, value.getFloat());
         } else {
-            channel_dispatcher::setOutputDelayDuration(*g_channel, value.getFloat());
+            auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+            if (page) {
+                page->outputDelayDuration = value.getFloat();
+            } else {
+                channel_dispatcher::setOutputDelayDuration(*g_channel, value.getFloat());
+            }
         }
     } if (operation == DATA_OPERATION_GET_NAME) {
         value = "Out. delay";

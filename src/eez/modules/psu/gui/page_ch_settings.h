@@ -165,12 +165,36 @@ class ChSettingsOtpProtectionPage : public ChSettingsProtectionSetPage {
     void setParams(bool checkLoad);
 };
 
-class ChSettingsTriggerPage : public Page {
-  public:
+class ChSettingsTriggerPage : public SetPage {
+public:
+    void pageAlloc();
+
+    int getDirty();
+    void set();
+
+    TriggerMode triggerMode;
+
+    float triggerVoltage;
+    float voltageRampDuration;
+
+    float triggerCurrent;
+    float currentRampDuration;
+
+    float outputDelayDuration;
+
     void editTriggerMode();
 
-  private:
-    static void onFinishTriggerModeSet();
+private:
+    TriggerMode triggerModeOrig;
+
+    float triggerVoltageOrig;
+    float voltageRampDurationOrig;
+
+    float triggerCurrentOrig;
+    float currentRampDurationOrig;
+
+    float outputDelayDurationOrig;
+
     static void onTriggerModeSet(uint16_t value);
 };
 

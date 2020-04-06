@@ -224,6 +224,7 @@ int checkTrigger() {
 
             if (channel.getVoltageTriggerMode() == TRIGGER_MODE_LIST) {
                 if (list::isListEmpty(channel)) {
+                    g_errorChannelIndex = channel.channelIndex;
                     return SCPI_ERROR_LIST_IS_EMPTY;
                 }
 

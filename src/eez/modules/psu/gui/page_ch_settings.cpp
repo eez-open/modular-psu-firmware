@@ -43,8 +43,6 @@ namespace eez {
 namespace psu {
 namespace gui {
 
-static uint8_t g_newTriggerMode;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void ChSettingsAdvOptionsPage::toggleSense() {
@@ -439,29 +437,53 @@ void ChSettingsOtpProtectionPage::setParams(bool checkLoad) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ChSettingsTriggerPage::onFinishTriggerModeSet() {
+void ChSettingsTriggerPage::pageAlloc() {
+    triggerMode = triggerModeOrig = channel_dispatcher::getVoltageTriggerMode(*g_channel);
+
+    triggerVoltage = triggerVoltageOrig = channel_dispatcher::getTriggerVoltage(*g_channel);
+    voltageRampDuration = voltageRampDurationOrig = g_channel->u.rampDuration;
+
+    triggerCurrent = triggerCurrentOrig = channel_dispatcher::getTriggerCurrent(*g_channel);
+    currentRampDuration = currentRampDurationOrig = g_channel->i.rampDuration;
+
+    outputDelayDuration = outputDelayDurationOrig = g_channel->outputDelayDuration;
+}
+
+int ChSettingsTriggerPage::getDirty() {
+    return 
+        triggerMode != triggerModeOrig ||
+        triggerVoltage != triggerVoltageOrig ||
+        voltageRampDuration != voltageRampDurationOrig ||
+        triggerCurrent != triggerCurrentOrig ||
+        currentRampDuration != currentRampDurationOrig ||
+        outputDelayDuration != outputDelayDurationOrig;
+}
+
+void ChSettingsTriggerPage::set() {
     trigger::abort();
-    channel_dispatcher::setVoltageTriggerMode(*g_channel, (TriggerMode)g_newTriggerMode);
-    channel_dispatcher::setCurrentTriggerMode(*g_channel, (TriggerMode)g_newTriggerMode);
+
+    channel_dispatcher::setVoltageTriggerMode(*g_channel, triggerMode);
+    channel_dispatcher::setCurrentTriggerMode(*g_channel, triggerMode);
     channel_dispatcher::setTriggerOutputState(*g_channel, true);
+
+    channel_dispatcher::setTriggerVoltage(*g_channel, triggerVoltage);
+    channel_dispatcher::setVoltageRampDuration(*g_channel, voltageRampDuration);
+    channel_dispatcher::setTriggerCurrent(*g_channel, triggerCurrent);
+    channel_dispatcher::setCurrentRampDuration(*g_channel, currentRampDuration);
+    channel_dispatcher::setOutputDelayDuration(*g_channel, outputDelayDuration);
+
+    pageAlloc();    
 }
 
 void ChSettingsTriggerPage::onTriggerModeSet(uint16_t value) {
     popPage();
-
-    if (channel_dispatcher::getVoltageTriggerMode(*g_channel) != value || channel_dispatcher::getCurrentTriggerMode(*g_channel) != value) {
-        g_newTriggerMode = (uint8_t)value;
-
-        if (trigger::isInitiated() || trigger::isActive()) {
-            yesNoDialog(PAGE_ID_YES_NO, "Trigger is active. Are you sure?", onFinishTriggerModeSet, 0, 0);
-        } else {
-            onFinishTriggerModeSet();
-        }
-    }
+    auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+    page->triggerMode = (TriggerMode)value;
 }
 
 void ChSettingsTriggerPage::editTriggerMode() {
-    pushSelectFromEnumPage(ENUM_DEFINITION_CHANNEL_TRIGGER_MODE, channel_dispatcher::getVoltageTriggerMode(*g_channel), 0, onTriggerModeSet);
+    auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);
+    pushSelectFromEnumPage(ENUM_DEFINITION_CHANNEL_TRIGGER_MODE, page->triggerMode, 0, onTriggerModeSet);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

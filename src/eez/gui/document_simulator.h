@@ -1688,4 +1688,4 @@ enum PagesEnum {
     PAGE_ID_FOCUS_VALUE_OVERLAY = 167
 };
 
-extern const uint8_t assets[403233];
+extern const uint8_t assets[404004];

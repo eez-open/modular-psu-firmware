@@ -494,17 +494,6 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
         return ((ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS))->isFocusWidget(widgetCursor);
     }
 
-    if (getActivePageId() != PAGE_ID_DLOG_VIEW) {
-        // TODO this is not valid, how can we know cursor is channels index and not index of some other collection?
-        int iChannel = widgetCursor.cursor >= 0 ? widgetCursor.cursor : (g_channel ? g_channel->channelIndex : 0);
-        if (iChannel >= 0 && iChannel < CH_NUM) {
-            if (channel_dispatcher::getVoltageTriggerMode(Channel::get(iChannel)) != TRIGGER_MODE_FIXED &&
-                !trigger::isIdle()) {
-                return false;
-            }
-        }
-    }
-
     return (widgetCursor.cursor == -1 || widgetCursor.cursor == g_focusCursor) && widgetCursor.widget->data == g_focusDataId && widgetCursor.widget->action != ACTION_ID_EDIT_NO_FOCUS && isEncoderEnabledInActivePage();
 }
 
@@ -2170,7 +2159,7 @@ void externalDataHook(int16_t dataId, DataOperationEnum operation, Cursor cursor
 }
 
 bool activePageHasBackdropHook() {
-    if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
+    if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE || getActivePageId() == PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
         return false;
     }
     return true;

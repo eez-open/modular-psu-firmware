@@ -1001,13 +1001,13 @@ void SysSettingsCouplingPage::set() {
 
             popPage();
 
-            if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_NONE) {
+            if (m_couplingType == channel_dispatcher::COUPLING_TYPE_NONE) {
                 infoMessage("Uncoupled!");
-            } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+            } else if (m_couplingType == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
                 infoMessage("Coupled in parallel!");
-            } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+            } else if (m_couplingType == channel_dispatcher::COUPLING_TYPE_SERIES) {
                 infoMessage("Coupled in series!");
-            } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
+            } else if (m_couplingType == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
                 infoMessage("Coupled in split rails!");
             } else {
                 infoMessage("Coupled in common GND!");
