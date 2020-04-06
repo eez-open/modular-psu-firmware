@@ -25,6 +25,11 @@
 #include <eez/modules/dcpX05/adc.h>
 
 namespace eez {
+
+namespace gui {
+struct WidgetCursor;
+}
+
 namespace psu {
 namespace channel_dispatcher {
 
@@ -165,7 +170,7 @@ void setCurrentInPsuThread(int channelIndex);
 
 const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex);
 
-bool isEditEnabled(Channel &channel);
+bool isEditEnabled(const eez::gui::WidgetCursor &widgetCursor);
 
 } // namespace channel_dispatcher
 } // namespace psu

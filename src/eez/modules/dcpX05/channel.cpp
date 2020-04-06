@@ -40,11 +40,17 @@
 #define CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD 1.2f
 #define CONF_OVP_SW_OVP_AT_START_U_PROTECTION_LEVEL 1.55f
 
+#define CONF_OVP_HW_VOLTAGE_THRESHOLD 1.0f
+
 namespace eez {
 
 using namespace psu;
 
 namespace dcpX05 {
+
+bool isHwOvpEnabled(Channel &channel) {
+	return channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type;
+}
 
 struct Channel : ChannelInterface {
 	AnalogDigitalConverter adc;
@@ -325,11 +331,15 @@ struct Channel : ChannelInterface {
 
 			// HW OVP handling
 			if (ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE)) {
-				if (!fallingEdge && channel.isHwOvpEnabled() && !ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
-					// activate HW OVP
-					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
-				} else if ((fallingEdge || !channel.isHwOvpEnabled()) && ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
+				if (!fallingEdge && isHwOvpEnabled(channel) && !ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
+					if (channel.u.set > CONF_OVP_HW_VOLTAGE_THRESHOLD) {
+						// activate HW OVP
+						channel.prot_conf.flags.u_hwOvpDeactivated = 0;
+						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+					}
+				} else if ((fallingEdge || !isHwOvpEnabled(channel)) && ioexp.testBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE)) {
 					// deactivate HW OVP
+					channel.prot_conf.flags.u_hwOvpDeactivated = 1;
 					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
 				}
 			}
@@ -463,9 +473,12 @@ struct Channel : ChannelInterface {
 			// OVP
 			if (tasks & OUTPUT_ENABLE_TASK_OVP) {
 				if (channel.params.features & CH_FEATURE_HW_OVP) {
-					if (channel.isHwOvpEnabled()) {
-						// OVP has to be enabled after OE activation
-						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+					if (isHwOvpEnabled(channel)) {
+						if (channel.u.set > CONF_OVP_HW_VOLTAGE_THRESHOLD) {
+							// OVP has to be enabled after OE activation
+							channel.prot_conf.flags.u_hwOvpDeactivated = 0;
+							ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, true);
+						}
 					}
 				}
 			}
@@ -489,8 +502,9 @@ struct Channel : ChannelInterface {
 			// OVP
 			if (tasks & OUTPUT_ENABLE_TASK_OVP) {
 				if (channel.params.features & CH_FEATURE_HW_OVP) {
-					if (channel.isHwOvpEnabled()) {
+					if (isHwOvpEnabled(channel)) {
 						// OVP has to be disabled before OE deactivation
+						channel.prot_conf.flags.u_hwOvpDeactivated = 1;
 						ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
 					}
 				}
@@ -594,13 +608,22 @@ struct Channel : ChannelInterface {
 
 		uSet = value;
 
-		if ((channel.params.features & CH_FEATURE_HW_OVP) && channel.isOutputEnabled() && value < previousUSet) {
-			fallingEdge = true;
-			fallingEdgePreviousUMonAdc = channel.u.mon_adc;
-			fallingEdgeStart = millis();
-			if (channel.isHwOvpEnabled()) {
-				// deactivate HW OVP
-				ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+		if ((channel.params.features & CH_FEATURE_HW_OVP) && channel.isOutputEnabled()) {
+			if (channel.u.set <= CONF_OVP_HW_VOLTAGE_THRESHOLD) {
+				if (isHwOvpEnabled(channel)) {
+					// deactivate HW OVP
+					channel.prot_conf.flags.u_hwOvpDeactivated = 1;
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+				}
+			} else if (value < previousUSet) {
+				fallingEdge = true;
+				fallingEdgePreviousUMonAdc = channel.u.mon_adc;
+				fallingEdgeStart = millis();
+				if (isHwOvpEnabled(channel)) {
+					// deactivate HW OVP
+					channel.prot_conf.flags.u_hwOvpDeactivated = 1;
+					ioexp.changeBit(IOExpander::DCP405_IO_BIT_OUT_OVP_ENABLE, false);
+				}
 			}
 		}
 

@@ -46,8 +46,23 @@ static void setActive(bool active, bool forceUpdate = false);
 
 void executionStart(Channel &channel) {
     g_execution[channel.channelIndex].state = 1;
-    channel_dispatcher::setVoltage(channel, 0);
-    channel_dispatcher::setCurrent(channel, 0);
+
+    if (channel.outputDelayDuration < OUTPUT_DELAY_DURATION_MIN_VALUE && channel.u.rampDuration < RAMP_DURATION_MIN_VALUE) {
+        channel_dispatcher::setVoltage(channel, channel.u.triggerLevel);
+        g_execution[channel.channelIndex].voltageRampDone = true;
+    } else {
+        channel_dispatcher::setVoltage(channel, 0);
+        g_execution[channel.channelIndex].voltageRampDone = false;
+    }
+
+    if (channel.outputDelayDuration < OUTPUT_DELAY_DURATION_MIN_VALUE && channel.i.rampDuration < RAMP_DURATION_MIN_VALUE) {
+        channel_dispatcher::setCurrent(channel, channel.i.triggerLevel);
+        g_execution[channel.channelIndex].currentRampDone = true;
+    } else {
+        channel_dispatcher::setCurrent(channel, 0);
+        g_execution[channel.channelIndex].currentRampDone = false;
+    }
+
     setActive(true, true);
 }
 
@@ -70,8 +85,6 @@ void tick(uint32_t tickUsec) {
                 if (g_execution[i].state == 2) {
                     if (tick >= g_execution[i].startTime + channel.outputDelayDuration) {
                         g_execution[i].state = 3;
-                        g_execution[i].voltageRampDone = false;
-                        g_execution[i].currentRampDone = false;
                     }
                 }
 

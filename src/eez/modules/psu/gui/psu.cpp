@@ -91,7 +91,7 @@ static mcu::Button g_userSwitch(USER_SW_GPIO_Port, USER_SW_Pin, true, true);
 Value g_progress;
 
 static int16_t g_externalActionId = ACTION_ID_NONE;
-static const size_t MAX_NUM_EXTERNAL_DATA_ITEM_VALUES = 10;
+static const size_t MAX_NUM_EXTERNAL_DATA_ITEM_VALUES = 20;
 static struct {
     Value value;
     char text[128 + 1];
@@ -592,17 +592,7 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
         }
 
         if (widget->action == ACTION_ID_EDIT || widget->action == ACTION_ID_EDIT_NO_FOCUS) {
-            if (widget->data == DATA_ID_CHANNEL_U_EDIT) {
-                auto &channel = Channel::get(widgetCursor.cursor);
-                if (channel.flags.rprogEnabled || !channel_dispatcher::isEditEnabled(channel)) {
-                    return false;
-                }
-            } else if (widget->data == DATA_ID_CHANNEL_I_EDIT || widget->data == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT || widget->data == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT || widget->data == DATA_ID_CHANNEL_PROTECTION_OVP_LEVEL || widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT || widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL || widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY || widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL || widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY) {
-                auto &channel = Channel::get(widgetCursor.cursor);
-                if (!channel_dispatcher::isEditEnabled(channel)) {
-                    return false;
-                }
-            }
+            return channel_dispatcher::isEditEnabled(widgetCursor);
         }
     }
 
@@ -742,7 +732,7 @@ void TextInputParams::onCancel() {
 }
 
 const char *PsuAppContext::textInput(const char *label, size_t minChars, size_t maxChars, const char *value) {
-    m_inputLabel = label;
+    m_inputLabel = label[0] ? label : nullptr;
     m_textInputParams.m_minChars = minChars;
     m_textInputParams.m_maxChars = maxChars;
     m_textInputParams.m_input = value;
@@ -777,7 +767,7 @@ void NumberInputParams::onCancel() {
 }
 
 float PsuAppContext::numberInput(const char *label, Unit unit, float min, float max, float value) {
-    m_inputLabel = label;
+    m_inputLabel = label[0] ? label : nullptr;
 
     m_numberInputParams.m_options.editValueUnit = unit;
     m_numberInputParams.m_options.min = min;
@@ -801,6 +791,53 @@ float PsuAppContext::numberInput(const char *label, Unit unit, float min, float 
 
 void PsuAppContext::doShowNumberInput() {
     NumericKeypad::start(this, m_inputLabel, Value(m_numberInputParams.m_input, m_numberInputParams.m_options.editValueUnit), m_numberInputParams.m_options, m_numberInputParams.onSet, nullptr, m_numberInputParams.onCancel);
+}
+
+void IntegerInputParams::onSet(float value) {
+    popPage();
+
+    g_psuAppContext.m_integerInputParams.m_input = (int32_t)value;
+    g_psuAppContext.m_integerInputParams.canceled = false;
+    g_psuAppContext.m_inputReady = true;
+}
+
+void IntegerInputParams::onCancel() {
+    popPage();
+
+    g_psuAppContext.m_integerInputParams.canceled = true;
+    g_psuAppContext.m_inputReady = true;
+}
+
+bool PsuAppContext::integerInput(const char *label, int32_t min, int32_t max, int32_t &value) {
+    m_inputLabel = label[0] ? label : nullptr;
+
+    m_integerInputParams.m_options.editValueUnit = UNIT_UNKNOWN;
+    m_integerInputParams.m_options.min = (float)min;
+    m_integerInputParams.m_options.enableMinButton();
+    m_integerInputParams.m_options.max = (float)max;
+    m_integerInputParams.m_options.enableMaxButton();
+    m_integerInputParams.m_options.flags.signButtonEnabled = false;
+    m_integerInputParams.m_options.flags.dotButtonEnabled = false;
+
+    m_integerInputParams.m_input = value;
+
+    m_inputReady = false;
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_INTEGER_INPUT, 0), osWaitForever);
+
+    while (!m_inputReady) {
+        osDelay(5);
+    }
+
+    if (!m_integerInputParams.canceled) {
+        value = m_integerInputParams.m_input;
+        return true;
+    }
+
+    return false;
+}
+
+void PsuAppContext::doShowIntegerInput() {
+    NumericKeypad::start(this, m_inputLabel, Value((float)m_integerInputParams.m_input, UNIT_UNKNOWN), m_integerInputParams.m_options, m_integerInputParams.onSet, nullptr, m_integerInputParams.onCancel);
 }
 
 bool PsuAppContext::dialogOpen(int *err) {
@@ -902,7 +939,7 @@ void MenuInputParams::onSet(int value) {
 }
 
 int PsuAppContext::menuInput(const char *label, MenuType menuType, const char **menuItems) {
-    m_inputLabel = label;
+    m_inputLabel = label[0] ? label : nullptr;
 
     m_menuInputParams.m_type = menuType;
     m_menuInputParams.m_items = menuItems;
@@ -1321,10 +1358,8 @@ static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
         return false;
     }
 
-    if (widgetCursor.cursor >= 0 && widgetCursor.cursor < CH_NUM) {
-        if (!channel_dispatcher::isEditEnabled(Channel::get(widgetCursor.cursor))) {
-            return false;
-        }
+    if (!g_psuAppContext.isWidgetActionEnabled(widgetCursor)) {
+        return false;
     }
 
     return true;
@@ -2062,15 +2097,11 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
             }
             return STYLE_ID_YT_GRAPH_P_DEFAULT;
         }
-    } else if (widgetCursor.widget->data == DATA_ID_CHANNEL_U_EDIT) {
-        auto &channel = psu::Channel::get(widgetCursor.cursor);
-        if (channel.flags.rprogEnabled || !psu::channel_dispatcher::isEditEnabled(channel)) {
-            return styleId == STYLE_ID_ENCODER_CURSOR_14_ENABLED ? STYLE_ID_ENCODER_CURSOR_14_DISABLED : STYLE_ID_ENCODER_CURSOR_14_RIGHT_DISABLED;
-        }
-    } else if (widgetCursor.widget->data == DATA_ID_CHANNEL_I_EDIT || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OVP_LEVEL || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL || widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY) {
-        auto &channel = psu::Channel::get(widgetCursor.cursor);
-        if (!psu::channel_dispatcher::isEditEnabled(channel)) {
-            return styleId == STYLE_ID_ENCODER_CURSOR_14_ENABLED ? STYLE_ID_ENCODER_CURSOR_14_DISABLED : STYLE_ID_ENCODER_CURSOR_14_RIGHT_DISABLED;
+    } else if (!g_psuAppContext.isWidgetActionEnabled(widgetCursor)) {
+        if (styleId == STYLE_ID_ENCODER_CURSOR_14_ENABLED) {
+            return STYLE_ID_ENCODER_CURSOR_14_DISABLED;
+        } else if (styleId == STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED) {
+            return STYLE_ID_ENCODER_CURSOR_14_RIGHT_DISABLED;
         }
     }
     return styleId;
@@ -2123,6 +2154,8 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
         g_psuAppContext.doShowTextInput();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT) {
         g_psuAppContext.doShowNumberInput();
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_INTEGER_INPUT) {
+        g_psuAppContext.doShowIntegerInput();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT) {
         g_psuAppContext.doShowMenuInput();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_SELECT) {

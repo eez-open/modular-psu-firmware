@@ -1960,15 +1960,24 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
     return nullptr;
 }
 
-bool isEditEnabled(Channel &channel) {
-    using namespace psu::gui;
+bool isEditEnabled(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.widget->data == DATA_ID_CHANNEL_U_EDIT || widgetCursor.widget->data == DATA_ID_CHANNEL_I_EDIT) {
+        auto &channel = Channel::get(widgetCursor.cursor);
 
-    if (
-        (getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) &&
-        g_psuAppContext.getActivePageId() == PAGE_ID_MAIN
-    ) {
-        return false;
-    } 
+        if (channel.flags.rprogEnabled && widgetCursor.widget->data == DATA_ID_CHANNEL_U_EDIT) {
+            return false;
+        }
+
+        if (channel.isOutputEnabled()) {
+            if (trigger::isActive()) {
+                return false;
+            }
+        } else {
+            if (getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) {
+                return false;
+            }
+        }
+    }
 
     return true;
 }

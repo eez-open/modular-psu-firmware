@@ -232,12 +232,14 @@ scpi_result_t scpi_cmd_displayWindowDlog(scpi_t *context) {
 enum {
     INPUT_TYPE_TEXT,
     INPUT_TYPE_NUMBER,
+    INPUT_TYPE_INTEGER,
     INPUT_TYPE_MENU
 };
 
 static scpi_choice_def_t inputTypeChoice[] = {
     { "TEXT", INPUT_TYPE_TEXT },
     { "NUMBer", INPUT_TYPE_NUMBER },
+    { "INTeger", INPUT_TYPE_INTEGER },
     { "MENU", INPUT_TYPE_MENU },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
@@ -390,6 +392,35 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
         if (!isNaN(result)) {
             SCPI_ResultFloat(context, result);
         }        
+    } else if (type == INPUT_TYPE_INTEGER) {
+        scpi_number_t param;
+
+        // min
+        int32_t min;
+        if (!SCPI_ParamInt(context, &min, true)) {
+            return SCPI_RES_ERR;
+        }
+
+        // max
+        int32_t max;
+        if (!SCPI_ParamInt(context, &max, true)) {
+            return SCPI_RES_ERR;
+        }
+
+        // value
+        int32_t value;
+        if (!SCPI_ParamInt(context, &value, true)) {
+            return SCPI_RES_ERR;
+        }
+
+        if (value < min || value > max) {
+            SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+            return SCPI_RES_ERR;
+        }
+
+        if (psu::gui::g_psuAppContext.integerInput(label, min, max, value)) {
+            SCPI_ResultInt32(context, value);
+        }
     } else {
         int32_t menuType;
         if (!SCPI_ParamChoice(context, menuTypeChoice, &menuType, true)) {
@@ -479,7 +510,7 @@ scpi_result_t scpi_cmd_displayWindowSelectQ(scpi_t *context) {
 
     options[i] = nullptr;
 
-    if (defaultSelection < 1 || defaultSelection > (int32_t)i) {
+    if (defaultSelection < 0 || defaultSelection > (int32_t)i) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }

@@ -138,6 +138,14 @@ struct NumberInputParams {
     static void onCancel();
 };
 
+struct IntegerInputParams {
+    NumericKeypadOptions m_options;
+    int32_t m_input;
+    bool canceled;
+    static void onSet(float value);
+    static void onCancel();
+};
+
 struct MenuInputParams {
     MenuType m_type;
     const char **m_items;
@@ -194,6 +202,7 @@ public:
 
     const char *textInput(const char *label, size_t minChars, size_t maxChars, const char *value);
     float numberInput(const char *label, Unit unit, float min, float max, float value);
+    bool integerInput(const char *label, int32_t min, int32_t max, int32_t &value);
     int menuInput(const char *label, MenuType menuType, const char **menuItems);
     int select(const char **options, int defaultSelection);
 
@@ -234,6 +243,9 @@ protected:
     friend struct NumberInputParams;
     NumberInputParams m_numberInputParams;
     
+    friend struct IntegerInputParams;
+    IntegerInputParams m_integerInputParams;
+
     friend struct MenuInputParams;
     MenuInputParams m_menuInputParams;
 
@@ -262,6 +274,7 @@ private:
 
     void doShowTextInput();
     void doShowNumberInput();
+    void doShowIntegerInput();
     void doShowMenuInput();
     void doShowSelect();
 };
@@ -383,6 +396,7 @@ enum {
     GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED,
     GUI_QUEUE_MESSAGE_TYPE_SHOW_TEXT_INPUT,
     GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT,
+    GUI_QUEUE_MESSAGE_TYPE_SHOW_INTEGER_INPUT,
     GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT,
     GUI_QUEUE_MESSAGE_TYPE_SHOW_SELECT,
     GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN,

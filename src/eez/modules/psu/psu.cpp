@@ -185,8 +185,13 @@ osMessageQId g_psuMessageQueueId;
 #if defined(EEZ_PLATFORM_STM32)
 extern "C" void PSU_IncTick() {
     using namespace eez::psu;
+
     g_tickCount++;
-    osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_TICK, 0), 0);
+
+    auto waiting = osMessageWaiting(g_psuMessageQueueId);
+    if (waiting < 2) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_TICK, 0), 0);
+    }
 }
 #endif
 

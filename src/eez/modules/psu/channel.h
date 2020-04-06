@@ -177,6 +177,7 @@ class Channel {
         unsigned p_state : 1;
         /// HW(1) or SW(0)?
         unsigned u_type : 1;
+        unsigned u_hwOvpDeactivated : 1;
     };
 
     /// Channel OVP, OVP and OPP configuration parameters like level and delay.
@@ -434,10 +435,6 @@ class Channel {
 
     /// Is OVP, OCP or OPP tripped?
     bool isTripped();
-
-    inline bool isHwOvpEnabled() {
-        return prot_conf.flags.u_state && prot_conf.flags.u_type;
-    }
 
     bool checkSwOvpCondition(float uProtectionLevel);
 
