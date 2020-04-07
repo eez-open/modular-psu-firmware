@@ -393,8 +393,6 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
             SCPI_ResultFloat(context, result);
         }        
     } else if (type == INPUT_TYPE_INTEGER) {
-        scpi_number_t param;
-
         // min
         int32_t min;
         if (!SCPI_ParamInt(context, &min, true)) {

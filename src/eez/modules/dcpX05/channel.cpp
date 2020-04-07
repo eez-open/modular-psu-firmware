@@ -367,6 +367,8 @@ struct Channel : ChannelInterface {
 			}
 			delay(1);
 		}
+
+        WATCHDOG_RESET();
 #endif
     }
 

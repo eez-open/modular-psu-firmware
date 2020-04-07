@@ -47,8 +47,14 @@ void delay(uint32_t millis) {
 }
 
 uint32_t micros() {
-#if defined(EEZ_PLATFORM_STM32)	
-    return g_tickCount * 200;
+#if defined(EEZ_PLATFORM_STM32)
+    auto tc1 = g_tickCount;
+	auto cnt = TIM7->CNT;
+	auto tc2 = g_tickCount;
+	if (tc1 == tc2) {
+		return tc1 * 200 + 2 * cnt;
+	}
+	return tc2 * 200;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

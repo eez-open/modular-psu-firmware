@@ -651,7 +651,9 @@ void tick(uint32_t tick_usec) {
         }
     }
 
-    setActive(active);
+    if (active != g_active) {
+        setActive(active);
+    }
 }
 
 bool isActive() {

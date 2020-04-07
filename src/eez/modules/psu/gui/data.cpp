@@ -3863,6 +3863,23 @@ void data_sys_display_brightness(DataOperationEnum operation, Cursor cursor, Val
     }
 }
 
+void data_channel_coupling_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+        if (iChannel == 1) {
+            if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+                value = 1;
+            } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+                value = 2;
+            } else {
+                value = 0;
+            }
+        } else {
+            value = 0;
+        }
+    }
+}
+
 void data_channel_trigger_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto page = (ChSettingsTriggerPage *)getPage(PAGE_ID_CH_SETTINGS_TRIGGER);

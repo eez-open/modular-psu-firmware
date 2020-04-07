@@ -1097,7 +1097,22 @@ void SysSettingsRampAndDelayPage::set() {
 }
 
 void SysSettingsRampAndDelayPage::toggleRampState(int channelIndex) {
-    rampState[channelIndex] = !rampState[channelIndex];
+    bool newRampState = !rampState[channelIndex];
+
+    if (channelIndex < 2 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL)) {
+        rampState[0] = newRampState;
+        rampState[1] = newRampState;
+    } else if (Channel::get(channelIndex).flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                rampState[i] = newRampState;
+            }
+        }
+    } else {
+        rampState[channelIndex] = newRampState;
+    }
+
     version++;
 }
 

@@ -917,10 +917,10 @@ void PsuAppContext::dialogSetDataItemValue(int16_t dataId, const char *str) {
     dataId--;
     if ((uint16_t)dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
         int textIndex = g_externalDataItemValues[dataId].textIndex;
-        if (textIndex == 4) {
+        if (textIndex == 1) {
             g_externalDataItemValues[dataId].textIndex = 0;
         } else {
-            g_externalDataItemValues[dataId].textIndex++;
+            g_externalDataItemValues[dataId].textIndex = 1;
         }
         strcpy(g_externalDataItemValues[dataId].text + textIndex, str);
         g_externalDataItemValues[dataId].value = (const char *)g_externalDataItemValues[dataId].text + textIndex;
