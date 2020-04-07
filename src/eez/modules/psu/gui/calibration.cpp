@@ -48,6 +48,8 @@ void showCurrentStep();
 ////////////////////////////////////////////////////////////////////////////////
 
 void onStartPasswordOk() {
+    popPage();
+
     channel_dispatcher::outputEnable(*g_channel, false);
 
     g_channel->clearProtection();
@@ -151,7 +153,7 @@ void setLevelValue() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad *numericKeypad = NumericKeypad::start(0, levelValue, options, onSetLevelOk, 0, showCurrentStep);
+    NumericKeypad *numericKeypad = NumericKeypad::start(0, levelValue, options, onSetLevelOk, nullptr, nullptr);
 
     if (levelValue.getFloat() < 1) {
         numericKeypad->switchToMilli();
@@ -221,7 +223,7 @@ void set() {
         options.flags.signButtonEnabled = true;
         options.flags.dotButtonEnabled = true;
 
-        NumericKeypad *numericKeypad = NumericKeypad::start(0, Value(), options, onSetOk, 0, showCurrentStep);
+        NumericKeypad *numericKeypad = NumericKeypad::start(0, Value(), options, onSetOk, nullptr, nullptr);
 
         if (getLevelValue().getFloat() < 0.001) {
             numericKeypad->switchToMicro();
