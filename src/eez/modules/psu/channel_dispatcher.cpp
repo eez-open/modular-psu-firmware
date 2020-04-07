@@ -194,6 +194,13 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
         if (persist_conf::getMaxChannelIndex() ==  1) {
             persist_conf::setMaxChannelIndex(0);
         }
+    } else {
+        if (g_couplingType == COUPLING_TYPE_PARALLEL || g_couplingType == COUPLING_TYPE_SERIES) {
+            for (int i = 0; i < 2; ++i) {
+                Channel &channel = Channel::get(i);
+                channel.reset();
+            }
+        }
     }
 
     g_couplingType = couplingType;
