@@ -1088,7 +1088,7 @@ void data_channel_u_mon(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_COLOR) {
-        if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
+        if (io_pins::isInhibited()/* || channel.getMode() == CHANNEL_MODE_UR*/) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
@@ -1196,7 +1196,7 @@ void data_channel_i_mon(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_GET_LIMIT) {
         value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
     } else if (operation == DATA_OPERATION_GET_COLOR) {
-        if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
+        if (io_pins::isInhibited()/* || channel.getMode() == CHANNEL_MODE_UR*/) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
@@ -1296,7 +1296,7 @@ void data_channel_p_mon(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_WATT;
     } else if (operation == DATA_OPERATION_GET_COLOR) {
-        if (io_pins::isInhibited() || channel.getMode() == CHANNEL_MODE_UR) {
+        if (io_pins::isInhibited()/* || channel.getMode() == CHANNEL_MODE_UR*/) {
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
@@ -4873,9 +4873,9 @@ void data_channel_history_values(DataOperationEnum operation, Cursor cursor, Val
     } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        if (channel.getMode() == CHANNEL_MODE_UR) {
-            value = Value(STYLE_ID_YT_GRAPH_UNREGULATED, VALUE_TYPE_UINT16);
-        } else {
+        // if (channel.getMode() == CHANNEL_MODE_UR) {
+        //     value = Value(STYLE_ID_YT_GRAPH_UNREGULATED, VALUE_TYPE_UINT16);
+        // } else {
             if (value.getUInt8() == 0) {
                 value = Value(
                     channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE ? STYLE_ID_YT_GRAPH_U_DEFAULT : 
@@ -4889,8 +4889,7 @@ void data_channel_history_values(DataOperationEnum operation, Cursor cursor, Val
                     STYLE_ID_YT_GRAPH_P_DEFAULT,
                     VALUE_TYPE_UINT16);
             }
-            
-        }
+        // }
     } else if (operation == DATA_OPERATION_YT_DATA_GET_MIN) {
         value = getMin(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_MAX) {
