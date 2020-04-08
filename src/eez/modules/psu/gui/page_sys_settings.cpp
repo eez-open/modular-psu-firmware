@@ -902,7 +902,7 @@ void SysSettingsIOPinsPage::set() {
 
 void SysSettingsTrackingPage::pageAlloc() {
     m_trackingEnabled = 0;
-    for (int i = 0; i < CH_MAX; i++) {
+    for (int i = 0; i < CH_NUM; i++) {
         if (Channel::get(i).flags.trackingEnabled) {
             m_trackingEnabled |= 1 << i;
         }
@@ -911,7 +911,7 @@ void SysSettingsTrackingPage::pageAlloc() {
 }
 
 int SysSettingsTrackingPage::getDirty() {
-    return m_trackingEnabled != m_trackingEnabledOrig;
+    return m_trackingEnabled != m_trackingEnabledOrig && getNumTrackingChannels() != 1;
 }
 
 void SysSettingsTrackingPage::set() {
@@ -977,29 +977,16 @@ void SysSettingsCouplingPage::set() {
         int err;
         if (channel_dispatcher::setCouplingType(m_couplingType, &err)) {
             if (m_couplingType == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
-                auto trackingPage = (SysSettingsTrackingPage *)getPage(PAGE_ID_SYS_SETTINGS_TRACKING);
-                if (trackingPage) {
-                    trackingPage->m_trackingEnabled = 0;
-                    if (m_enableTrackingMode) {
-                        // enable tracking for first two channels
-                        trackingPage->m_trackingEnabled |= (1 << 0);
-                        trackingPage->m_trackingEnabled |= (1 << 1);
-                    }
-                    trackingPage->m_trackingEnabledOrig = trackingPage->m_trackingEnabled;
-                   
-                    channel_dispatcher::setTrackingChannels(trackingPage->m_trackingEnabled);
-                } else {
-                    int trackingEnabled = 0;
-                    if (m_enableTrackingMode) {
-                        // enable tracking for first two channels
-                        trackingEnabled |= (1 << 0);
-                        trackingEnabled |= (1 << 1);
-                    }
-                    channel_dispatcher::setTrackingChannels(trackingEnabled);
+                int trackingEnabled = 0;
+                if (m_enableTrackingMode) {
+                    // enable tracking for first two channels
+                    trackingEnabled |= (1 << 0);
+                    trackingEnabled |= (1 << 1);
                 }
+                channel_dispatcher::setTrackingChannels(trackingEnabled);
             }
-
-            popPage();
+            
+            showPage(PAGE_ID_MAIN);
 
             if (m_couplingType == channel_dispatcher::COUPLING_TYPE_NONE) {
                 infoMessage("Uncoupled!");

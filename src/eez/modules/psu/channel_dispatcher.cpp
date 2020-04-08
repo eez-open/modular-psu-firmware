@@ -194,6 +194,24 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
         if (persist_conf::getMaxChannelIndex() ==  1) {
             persist_conf::setMaxChannelIndex(0);
         }
+
+        // disable tracking if only 1 channel left in tracking mode
+        int numTrackingChannels = 0;
+        for (int i = 0; i < CH_NUM; i++) {
+            Channel &channel = Channel::get(i);
+            if (channel.flags.trackingEnabled) {
+                numTrackingChannels++;
+            }
+        }
+        if (numTrackingChannels == 1) {
+            for (int i = 0; i < CH_NUM; i++) {
+                Channel &channel = Channel::get(i);
+                if (channel.flags.trackingEnabled) {
+                    channel.flags.trackingEnabled = false;
+                    break;
+                }
+            }
+        }
     } else {
         if (g_couplingType == COUPLING_TYPE_PARALLEL || g_couplingType == COUPLING_TYPE_SERIES) {
             for (int i = 0; i < 2; ++i) {
