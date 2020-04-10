@@ -145,9 +145,12 @@ void onQueueMessage(uint32_t type, uint32_t param) {
         bool isConnected = param ? true : false;
         if (!isConnected) {
             g_testResult = TEST_WARNING;
-            DebugTrace("Ethernet not connected!");
             event_queue::pushEvent(event_queue::EVENT_WARNING_ETHERNET_NOT_CONNECTED);
             return;
+        } else {
+            if (g_testResult == TEST_WARNING) {
+                event_queue::pushEvent(event_queue::EVENT_INFO_ETHERNET_CONNECTED);
+            }
         }
 
         g_testResult = TEST_OK;

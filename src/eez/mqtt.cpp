@@ -117,6 +117,7 @@ static float g_auxTemperature = NAN;
 static uint32_t g_auxTemperatureTick;
 static uint32_t g_totalOnTime = 0xFFFFFFFF;
 static uint32_t g_lastOnTime = 0xFFFFFFFF;
+
 #if OPTION_FAN
 static TestResult g_fanTestResult;
 static int g_fanRpm;
@@ -156,6 +157,14 @@ static struct {
 static uint8_t g_lastChannelIndex = 0;
 static uint8_t g_lastValueIndex = 0;
 static bool g_publishing;
+
+enum {
+    EEZ_MQTT_ERROR_NONE,
+    EEZ_MQTT_ERROR_DNS,
+    EEZ_MQTT_ERROR_CONNECT,
+    EEZ_MQTT_ERROR_PUBLISH,
+    EEZ_MQTT_ERROR_SOCKET
+} g_lastError;
 
 void setState(ConnectionState connectionState);
 
@@ -314,7 +323,10 @@ static void dnsFoundCallback(const char* hostname, const ip_addr_t *ipaddr, void
         setState(CONNECTION_STATE_DNS_FOUND);
     } else {
         setState(CONNECTION_STATE_ERROR);
-        DebugTrace("mqtt dns error: server not found\n");
+        if (g_lastError != EEZ_MQTT_ERROR_DNS) {
+            g_lastError = EEZ_MQTT_ERROR_DNS;
+            DebugTrace("mqtt dns error: server not found\n");
+        }
     }
 }
 
@@ -323,7 +335,10 @@ static void connectCallback(mqtt_client_t *client, void *arg, mqtt_connection_st
         setState(CONNECTION_STATE_CONNECTED);
     } else {
         setState(CONNECTION_STATE_ERROR);
-        DebugTrace("mqtt connect error: %d\n", (int)status);
+        if (g_lastError != EEZ_MQTT_ERROR_CONNECT) {
+            g_lastError = EEZ_MQTT_ERROR_CONNECT;
+            DebugTrace("mqtt connect error: %d\n", (int)status);
+        }
     }
 }
 
@@ -383,7 +398,11 @@ bool publish(char *topic, char *payload, bool retain) {
     if (result != ERR_OK) {
     	g_publishing = false;
         if (result != ERR_MEM) {
-            DebugTrace("mqtt publish error: %d\n", (int)result);
+            if (g_lastError != EEZ_MQTT_ERROR_PUBLISH) {
+                g_lastError = EEZ_MQTT_ERROR_PUBLISH;
+                DebugTrace("mqtt publish error: %d\n", (int)result);
+            }
+
             if (result == ERR_CONN) {
                 reconnect();
             }
@@ -395,7 +414,11 @@ bool publish(char *topic, char *payload, bool retain) {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     mqtt_publish(&g_client, topic, payload, strlen(payload), MQTT_PUBLISH_QOS_0 | (retain ? MQTT_PUBLISH_RETAIN : 0));
     if (g_client.error != MQTT_OK) {
-        DebugTrace("mqtt error: %s\n", mqtt_error_str(g_client.error));
+        if (g_lastError != EEZ_MQTT_ERROR_PUBLISH) {
+            g_lastError = EEZ_MQTT_ERROR_PUBLISH;
+            DebugTrace("mqtt publish error: %s\n", mqtt_error_str(g_client.error));
+        }
+        reconnect();
         return false;
     }
 #endif
@@ -524,6 +547,11 @@ bool getEvent(int16_t &eventId);
 
 void setState(ConnectionState connectionState) {
     if (connectionState == CONNECTION_STATE_CONNECTED) {
+        if (g_lastError != EEZ_MQTT_ERROR_NONE) {
+            DebugTrace("mqtt connected\n");
+        }
+        g_lastError = EEZ_MQTT_ERROR_NONE;
+
         char subTopicSystem[MAX_SUB_TOPIC_LENGTH + 1];
         sprintf(subTopicSystem, SUB_TOPIC_SYSTEM_PATTERN, persist_conf::devConf.ethernetHostName);
 
@@ -804,7 +832,10 @@ void tick() {
             setState(CONNECTION_STATE_DNS_IN_PROGRESS);
         } else {
             setState(CONNECTION_STATE_ERROR);
-            DebugTrace("mqtt dns error: %d\n", (int)err);
+            if (g_lastError != EEZ_MQTT_ERROR_DNS) {
+                g_lastError = EEZ_MQTT_ERROR_DNS;
+                DebugTrace("mqtt dns error: %d\n", (int)err);
+            }
         }
 #endif
 
@@ -827,11 +858,17 @@ void tick() {
                 setState(CONNECTION_STATE_CONNECTED);
             } else {
                 setState(CONNECTION_STATE_ERROR);
-                DebugTrace("mqtt error: %s\n", mqtt_error_str(g_client.error));
+                if (g_lastError != EEZ_MQTT_ERROR_CONNECT) {
+                    g_lastError = EEZ_MQTT_ERROR_CONNECT;
+                    DebugTrace("mqtt connect error: %s\n", mqtt_error_str(g_client.error));
+                }
             }
         } else {
             setState(CONNECTION_STATE_ERROR);
-            DebugTrace("mqtt error: failed to open socket\n");
+            if (g_lastError != EEZ_MQTT_ERROR_SOCKET) {
+                g_lastError = EEZ_MQTT_ERROR_SOCKET;
+                DebugTrace("mqtt error: failed to open socket\n");
+            }
         }
 #endif
     }

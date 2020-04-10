@@ -3107,19 +3107,33 @@ void data_sys_temp_aux(DataOperationEnum operation, Cursor cursor, Value &value)
     }
 }
 
+bool getSysInfoHasError() {
+    temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::AUX];
+    int err;
+    return 
+        // AUX temp.
+        (tempSensor.isInstalled() && !tempSensor.isTestOK()) ||
+        // FAN
+        (aux_ps::fan::g_testResult == TEST_FAILED || aux_ps::fan::g_testResult == TEST_WARNING) ||
+        // Battery
+        mcu::battery::g_testResult == TEST_FAILED ||
+        // SD card
+        !eez::psu::sd_card::isMounted(&err);
+}
+
 void data_sys_info_has_error(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::AUX];
-        int err;
-        value = (
-            // AUX temp.
-            (tempSensor.isInstalled() && !tempSensor.isTestOK()) ||
-            // FAN
-            (aux_ps::fan::g_testResult == TEST_FAILED || aux_ps::fan::g_testResult == TEST_WARNING) ||
-            // Battery
-            mcu::battery::g_testResult == TEST_FAILED ||
-            // SD card
-            !eez::psu::sd_card::isMounted(&err)
+        value = getSysInfoHasError();
+    }
+}
+
+void data_sys_settings_has_error(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = (getSysInfoHasError() ||
+            // Ethernet
+            ethernet::g_testResult == TEST_FAILED ||
+            // Mqtt
+            (persist_conf::devConf.mqttEnabled && mqtt::g_connectionState == mqtt::CONNECTION_STATE_ERROR)
         ) ? 1 : 0;
     }
 }
@@ -3527,6 +3541,20 @@ void data_ethernet_enabled(DataOperationEnum operation, Cursor cursor, Value &va
 void data_ethernet_status(DataOperationEnum operation, Cursor cursor, Value &value) {
 #if OPTION_ETHERNET
     if (operation == DATA_OPERATION_GET) {
+        if (ethernet::g_testResult == TEST_CONNECTING) {
+            value = Value(TEST_CONNECTING);
+        } else if (ethernet::g_testResult == TEST_FAILED) {
+            value = Value(TEST_FAILED);
+        } else {
+            value = Value(ethernet::g_testResult);
+        }
+    }
+#endif
+}
+
+void data_ethernet_and_mqtt_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+#if OPTION_ETHERNET
+    if (operation == DATA_OPERATION_GET) {
         if (
             ethernet::g_testResult == TEST_CONNECTING ||
             (
@@ -3545,6 +3573,14 @@ void data_ethernet_status(DataOperationEnum operation, Cursor cursor, Value &val
         } else {
             value = Value(ethernet::g_testResult);
         }
+    }
+#endif
+}
+
+void data_mqtt_in_error(DataOperationEnum operation, Cursor cursor, Value &value) {
+#if OPTION_ETHERNET
+    if (operation == DATA_OPERATION_GET) {
+        value = persist_conf::devConf.mqttEnabled && mqtt::g_connectionState == mqtt::CONNECTION_STATE_ERROR;
     }
 #endif
 }

@@ -30,10 +30,12 @@ extern scpi_t g_scpiContext;
 void init();
 bool test();
 
-#define ETHERNET_CONNECTED 1
-#define ETHERNET_CLIENT_CONNECTED 2
-#define ETHERNET_CLIENT_DISCONNECTED 3
-#define ETHERNET_INPUT_AVAILABLE 4
+enum {
+    ETHERNET_CONNECTED,
+    ETHERNET_CLIENT_CONNECTED,
+    ETHERNET_CLIENT_DISCONNECTED,
+    ETHERNET_INPUT_AVAILABLE
+};
 
 void onQueueMessage(uint32_t type, uint32_t param);
 

@@ -29,6 +29,7 @@
 #include <dhcp.h>
 #include <ip_addr.h>
 #include <netif.h>
+#include <ethernetif.h>
 extern struct netif gnetif;
 extern ip4_addr_t ipaddr;
 extern ip4_addr_t netmask;
@@ -73,6 +74,8 @@ extern ip4_addr_t gw;
 using namespace eez::psu::ethernet;
 using namespace eez::scpi;
 
+#define CONF_CONNECT_TIMEOUT 30000
+
 namespace eez {
 namespace mcu {
 namespace ethernet {
@@ -115,12 +118,13 @@ enum {
 
 #if defined(EEZ_PLATFORM_STM32)
 enum ConnectionState {
-    CONNECTION_STATE_INITIALIZED = 0,
-    CONNECTION_STATE_CONNECTED = 1,
-    CONNECTION_STATE_CONNECTING = 2,
-    CONNECTION_STATE_BEGIN_SERVER = 3,
-    CONNECTION_STATE_CLIENT_AVAILABLE = 4,
-    CONNECTION_STATE_DATA_AVAILABLE = 5
+    CONNECTION_STATE_INITIALIZED,
+    CONNECTION_STATE_CONNECTED,
+    CONNECTION_STATE_CONNECTING,
+    CONNECTION_STATE_CONNECT_ERROR,
+    CONNECTION_STATE_BEGIN_SERVER,
+    CONNECTION_STATE_CLIENT_AVAILABLE,
+    CONNECTION_STATE_DATA_AVAILABLE
 };
 
 static ConnectionState g_connectionState = CONNECTION_STATE_INITIALIZED;
@@ -128,6 +132,7 @@ static uint16_t g_port;
 struct netconn *g_tcpListenConnection;
 struct netconn *g_tcpClientConnection;
 static netbuf *g_inbuf;
+static bool g_checkLinkWhileIdle = false;
 
 static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t len) {
 	switch (evt) {
@@ -152,16 +157,39 @@ static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t le
 		break;
 
 	case NETCONN_EVT_ERROR:
-        DebugTrace("NETCONN_EVT_ERROR\n");
+        // DebugTrace("NETCONN_EVT_ERROR\n");
 		osDelay(0);
 		break;
 	}
+}
+
+static void dhcpStart() {
+    uint32_t connectStart = millis();
+
+    if (psu::persist_conf::isEthernetDhcpEnabled()) {
+        // Start DHCP negotiation for a network interface (IPv4)
+        dhcp_start(&gnetif);
+        while(!dhcp_supplied_address(&gnetif)) {
+            if ((millis() - connectStart) >= CONF_CONNECT_TIMEOUT) {
+                g_connectionState = CONNECTION_STATE_CONNECT_ERROR;
+                osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 0), osWaitForever);
+                return;
+            }
+            osDelay(10);
+        }
+    }
+
+    g_connectionState = CONNECTION_STATE_CONNECTED;
+    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 1), osWaitForever);
+    return;
 }
 
 static void onEvent(uint8_t eventType) {
 	switch (eventType) {
 	case QUEUE_MESSAGE_CONNECT:
 		{
+            g_checkLinkWhileIdle = true;
+
             // MX_LWIP_Init();
 
             // Initilialize the LwIP stack with RTOS
@@ -188,22 +216,14 @@ static void onEvent(uint8_t eventType) {
             if (netif_is_link_up(&gnetif)) {
                 // When the netif is fully configured this function must be called
                 netif_set_up(&gnetif);
+                dhcpStart();
             } else {
                 // When the netif link is down this function must be called
                 netif_set_down(&gnetif);
+                g_connectionState = CONNECTION_STATE_CONNECT_ERROR;
+                osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 0), osWaitForever);
             }
 
-            if (psu::persist_conf::isEthernetDhcpEnabled()) {
-                // Start DHCP negotiation for a network interface (IPv4)
-                dhcp_start(&gnetif);
-                while(!dhcp_supplied_address(&gnetif)) {
-                    osDelay(10);
-                }
-            }
-
-			g_connectionState = CONNECTION_STATE_CONNECTED;
-
-			osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 1), osWaitForever);
 		}
 		break;
 
@@ -250,6 +270,26 @@ static void onEvent(uint8_t eventType) {
 }
 
 void onIdle() {
+	if (g_checkLinkWhileIdle) {
+		uint32_t regvalue = 0;
+
+		/* Read PHY_BSR*/
+		HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue);
+
+		regvalue &= PHY_LINKED_STATUS;
+
+		/* Check whether the netif link down and the PHY link is up */
+		if(!netif_is_link_up(&gnetif) && (regvalue)) {
+			/* network cable is connected */
+			netif_set_link_up(&gnetif);
+            dhcpStart();
+		} else if(netif_is_link_up(&gnetif) && (!regvalue)) {
+			/* network cable is dis-connected */
+			netif_set_link_down(&gnetif);
+            g_connectionState = CONNECTION_STATE_CONNECT_ERROR;
+            osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 0), osWaitForever);
+		}
+	}
 }
 #endif
 

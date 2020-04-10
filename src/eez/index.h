@@ -206,6 +206,7 @@ static const uint16_t MODULE_TYPE_DCM220  = 220;
 static const uint16_t MODULE_REVISION_DCP405_R1B1  = 0x0101;
 static const uint16_t MODULE_REVISION_DCP405_R2B5  = 0x0205;
 static const uint16_t MODULE_REVISION_DCP405_R2B7  = 0x0207;
+static const uint16_t MODULE_REVISION_DCP405_R3B1  = 0x0301;
 
 static const uint16_t MODULE_REVISION_DCP405B_R2B7 = 0x0207;
 
