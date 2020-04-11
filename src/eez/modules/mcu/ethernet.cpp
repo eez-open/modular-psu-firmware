@@ -281,6 +281,7 @@ void onIdle() {
 		/* Check whether the netif link down and the PHY link is up */
 		if(!netif_is_link_up(&gnetif) && (regvalue)) {
 			/* network cable is connected */
+			netif_set_up(&gnetif);
 			netif_set_link_up(&gnetif);
             dhcpStart();
 		} else if(netif_is_link_up(&gnetif) && (!regvalue)) {

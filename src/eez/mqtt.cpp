@@ -591,10 +591,25 @@ void tick() {
     uint32_t tickCount = millis();
 
     if (ethernet::g_testResult != TEST_OK) {
-        // pass
+        if (g_connectionState != CONNECTION_STATE_IDLE && g_connectionState != CONNECTION_STATE_ETHERNET_NOT_READY) {
+			setState(CONNECTION_STATE_ETHERNET_NOT_CONNECTED);
+			return;
+        }
     }
 
     else if (g_connectionState == CONNECTION_STATE_CONNECTED && !g_publishing) {
+        if (!persist_conf::devConf.mqttEnabled) {
+            setState(CONNECTION_STATE_DISCONNECT);
+            return;
+        }
+
+#if defined(EEZ_PLATFORM_STM32)
+        if (!mqtt_client_is_connected(&g_client)) {
+            setState(CONNECTION_STATE_RECONNECT);
+            return;
+        }
+#endif
+
         uint32_t period = (uint32_t)roundf(persist_conf::devConf.mqttPeriod * 1000);
 
         // publish power state
@@ -803,6 +818,23 @@ void tick() {
     }
 
     else if (g_connectionState == CONNECTION_STATE_ETHERNET_NOT_READY) {
+        g_ethernetReadyTime = millis();
+        setState(CONNECTION_STATE_STARTING);
+    }
+
+    else if (g_connectionState == CONNECTION_STATE_ETHERNET_NOT_CONNECTED) {
+#if defined(EEZ_PLATFORM_STM32)
+        if (mqtt_client_is_connected(&g_client)) {
+            LOCK_TCPIP_CORE();
+            mqtt_disconnect(&g_client);
+            UNLOCK_TCPIP_CORE();
+        }
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+        mqtt_disconnect(&g_client);
+#endif
+
         g_ethernetReadyTime = millis();
         setState(CONNECTION_STATE_STARTING);
     }
