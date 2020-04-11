@@ -171,12 +171,16 @@ PWMMeasurement g_pwmMeasurement;
 ////////////////////////////////////////////////////////////////////////////////
 
 HAL_StatusTypeDef readReg(uint8_t reg, uint8_t *value) {
+	taskENTER_CRITICAL();
     HAL_StatusTypeDef returnValue = HAL_I2C_Master_Transmit(&hi2c1, MAX31760_DEVICE_ADDRESS, &reg, 1, 5);
+	taskEXIT_CRITICAL();
     if (returnValue != HAL_OK) {
     	return returnValue;
     }
 
+	taskENTER_CRITICAL();
     returnValue = HAL_I2C_Master_Receive(&hi2c1, MAX31760_DEVICE_ADDRESS, value, 1, 5);
+	taskEXIT_CRITICAL();
     if (returnValue != HAL_OK) {
     	return returnValue;
     }
@@ -188,7 +192,9 @@ HAL_StatusTypeDef writeReg(uint8_t reg, uint8_t value) {
 	uint8_t data[2];
 	data[0] = reg;
 	data[1] = value;
+	taskENTER_CRITICAL();
     HAL_StatusTypeDef returnValue = HAL_I2C_Master_Transmit(&hi2c1, MAX31760_DEVICE_ADDRESS, data, 2, 5);
+	taskEXIT_CRITICAL();
 	return returnValue;
 }
 
