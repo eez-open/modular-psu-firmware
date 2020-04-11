@@ -468,6 +468,25 @@ static void resetProfileToDefaults(Parameters &profile) {
 
         profile.channels[i].outputDelayDuration = 0;
     }
+
+    for (int i = 0; i < CH_MAX; i++) {
+        profile.channels[i].u_rampDuration = RAMP_DURATION_DEF_VALUE;
+        profile.channels[i].i_rampDuration = RAMP_DURATION_DEF_VALUE;
+
+        profile.channels[i].outputDelayDuration = 0;
+    }
+
+    for (int i = 0; i < temp_sensor::MAX_NUM_TEMP_SENSORS; ++i) {
+        if (i == temp_sensor::AUX) {
+            profile.tempProt[i].delay = OTP_AUX_DEFAULT_DELAY;
+            profile.tempProt[i].level = OTP_AUX_DEFAULT_LEVEL;
+            profile.tempProt[i].state = OTP_AUX_DEFAULT_STATE;
+        } else {
+            profile.tempProt[i].delay = OTP_CH_DEFAULT_DELAY;
+            profile.tempProt[i].level = OTP_CH_DEFAULT_LEVEL;
+            profile.tempProt[i].state = OTP_CH_DEFAULT_STATE;
+        }
+    }
 }
 
 static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parameters &profile, List *lists) {
