@@ -270,8 +270,12 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
     char label[MAX_KEYPAD_LABEL_LENGTH + 1];
     strncpy(label, labelText, labelTextLen);
     if (type == INPUT_TYPE_TEXT || type == INPUT_TYPE_NUMBER) {
-        strcpy(label + labelTextLen, ": ");
-        labelTextLen += 2;
+        if (labelTextLen > 0) {
+            strcpy(label + labelTextLen, ": ");
+            labelTextLen += 2;
+        } else {
+            label[labelTextLen] = 0;
+        }
     } else {
         label[labelTextLen] = 0;
     }

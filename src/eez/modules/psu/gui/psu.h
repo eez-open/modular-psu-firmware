@@ -254,9 +254,6 @@ protected:
 
     bool m_inputReady;
 
-    bool g_dialogOpening;
-    bool g_selectOpening;
-
     int getMainPageId() override;
     void onPageChanged(int previousPageId, int activePageId) override;
     bool isAutoRepeatAction(int action) override;
