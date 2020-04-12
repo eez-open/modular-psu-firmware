@@ -1,0 +1,146 @@
+{
+  "settings": {
+    "general": {
+      "projectVersion": "v2",
+      "masterProject": "..\\..\\modular-psu-firmware.eez-project"
+    },
+    "build": {
+      "configurations": [
+        {
+          "name": "Default"
+        }
+      ],
+      "files": []
+    }
+  },
+  "data": [
+    {
+      "name": "voltage",
+      "type": "float",
+      "defaultValue": "3.0 V"
+    },
+    {
+      "name": "can_set_voltage",
+      "type": "boolean",
+      "defaultValue": "0"
+    }
+  ],
+  "actions": [
+    {
+      "name": "set_voltage"
+    },
+    {
+      "name": "input_voltage"
+    },
+    {
+      "name": "close"
+    }
+  ],
+  "gui": {
+    "pages": [
+      {
+        "name": "main",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 138,
+            "top": 75,
+            "width": 204,
+            "height": 90,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 84,
+                "height": 40,
+                "text": "Voltage:"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center"
+                },
+                "data": "voltage",
+                "action": "input_voltage",
+                "left": 84,
+                "top": 0,
+                "width": 120,
+                "height": 40,
+                "text": ""
+              },
+              {
+                "type": "Button",
+                "style": {
+                  "inheritFrom": "button_M"
+                },
+                "action": "set_voltage",
+                "left": 84,
+                "top": 50,
+                "width": 120,
+                "height": 40,
+                "text": "Set",
+                "enabled": "can_set_voltage",
+                "disabledStyle": {
+                  "inheritFrom": "button_M_disabled"
+                }
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "close",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "",
+                "left": 41,
+                "top": 0,
+                "width": 439,
+                "height": 32,
+                "text": "Hello World"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
+      }
+    ],
+    "styles": [],
+    "fonts": [],
+    "bitmaps": [],
+    "colors": [],
+    "themes": []
+  }
+}
