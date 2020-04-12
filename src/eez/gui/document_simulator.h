@@ -1862,4 +1862,4 @@ enum PagesEnum {
     PAGE_ID_OVP_TYPE = 166
 };
 
-extern const uint8_t assets[413666];
+extern const uint8_t assets[413627];
