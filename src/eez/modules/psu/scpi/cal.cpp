@@ -175,7 +175,7 @@ scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
     }
 
     if (enable) {
-        calibration::start(channel);
+        calibration::start(*channel);
     } else {
         calibration::stop();
     }

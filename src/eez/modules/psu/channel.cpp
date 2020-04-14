@@ -439,6 +439,18 @@ int Channel::reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionV
 }
 
 void Channel::protectionEnter(ProtectionValue &cpv) {
+    if (IS_OVP_VALUE(this, cpv)) {
+        if (flags.rprogEnabled) {
+            DebugTrace("OVP condition: %f (I_MON_DAC) > %f (OVP level)\n", channel_dispatcher::getUMonDacLast(*this), channel_dispatcher::getUProtectionLevel(*this));
+        } else {
+            DebugTrace("OVP condition: %f (I_MON) > %f (OVP level)\n", channel_dispatcher::getUMonLast(*this), channel_dispatcher::getUProtectionLevel(*this));
+        }
+    } else if (IS_OCP_VALUE(this, cpv)) {
+        DebugTrace("OCP condition: %f (I_MON) > %f (I_SET)\n", channel_dispatcher::getIMonLast(*this), channel_dispatcher::getISet(*this));
+    } else if (IS_OPP_VALUE(this, cpv)) {
+        DebugTrace("OPP condition: %f (U_MON) * %f (I_MON) > %f (OPP level)\n", channel_dispatcher::getUMonLast(*this), channel_dispatcher::getIMonLast(*this), channel_dispatcher::getPowerProtectionLevel(*this));
+    }
+
     if (getVoltageTriggerMode() != TRIGGER_MODE_FIXED) {
         trigger::abort();
     }
@@ -504,18 +516,6 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
             if (cpv.flags.alarmed) {
                 if (micros() - cpv.alarm_started >= delay * 1000000UL) {
                     cpv.flags.alarmed = 0;
-
-                    // if (IS_OVP_VALUE(this, cpv)) {
-                    //    DebugTrace("OVP condition: CV_MODE=%d, CC_MODE=%d, I DIFF=%d mA, I MON=%d
-                    //    mA", (int)flags.cvMode, (int)flags.ccMode, (int)(fabs(i.mon_last - i.set)
-                    //    * 1000), (int)(i.mon_last * 1000));
-                    //}
-                    // else if (IS_OCP_VALUE(this, cpv)) {
-                    //    DebugTrace("OCP condition: CC_MODE=%d, CV_MODE=%d, U DIFF=%d mV",
-                    //    (int)flags.ccMode, (int)flags.cvMode, (int)(fabs(u.mon_last - u.set) *
-                    //    1000));
-                    //}
-
                     protectionEnter(cpv);
                 }
             } else {
@@ -523,15 +523,6 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
                 cpv.alarm_started = micros();
             }
         } else {
-            // if (IS_OVP_VALUE(this, cpv)) {
-            //    DebugTrace("OVP condition: CV_MODE=%d, CC_MODE=%d, I DIFF=%d mA",
-            //    (int)flags.cvMode, (int)flags.ccMode, (int)(fabs(i.mon_last - i.set) * 1000));
-            //}
-            // else if (IS_OCP_VALUE(this, cpv)) {
-            //    DebugTrace("OCP condition: CC_MODE=%d, CV_MODE=%d, U DIFF=%d mV",
-            //    (int)flags.ccMode, (int)flags.cvMode, (int)(fabs(u.mon_last - u.set) * 1000));
-            //}
-
             protectionEnter(cpv);
         }
     } else {
@@ -833,7 +824,7 @@ float Channel::getCurrentResolution(float value) const {
     float precision = params.I_RESOLUTION; // 0.5mA
 
     if (hasSupportForCurrentDualRange()) {
-        if ((!isNaN(value) && value <= 0.05f && isMicroAmperAllowed()) || flags.currentCurrentRange == CURRENT_RANGE_LOW) {
+        if (!isNaN(value) && value <= 0.05f && isMicroAmperAllowed()) {
             precision = params.I_LOW_RESOLUTION; // 5uA
         }
     }

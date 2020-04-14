@@ -252,10 +252,12 @@ struct Channel : ChannelInterface {
 		if (crc == *((uint32_t *)(input + BUFFER_SIZE - 4))) {
 			numCrcErrors = 0;
 		} else {
-			if (++numCrcErrors >= 3) {
+			if (++numCrcErrors >= 4) {
 				event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
 				synchronized = false;
 				testResult = TEST_FAILED;
+			} else {
+				DebugTrace("CRC %d\n", numCrcErrors);
 			}
 		}
 	}

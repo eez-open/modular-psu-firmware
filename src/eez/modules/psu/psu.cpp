@@ -289,8 +289,10 @@ void oneIter() {
                 channel_dispatcher::setVoltageInPsuThread((int)param);
             } else if (type == PSU_QUEUE_MESSAGE_TYPE_SET_CURRENT) {
                 channel_dispatcher::setCurrentInPsuThread((int)param);
-            } else if (type == PSU_QUEUE_RESET_CHANNELS_HISTORY) {
-                Channel::resetHistoryForAllChannels();
+            } else if (type == PSU_QUEUE_MESSAGE_TYPE_CALIBRATION_START) {
+                calibration::start(Channel::get((int)param));
+            } else if (type == PSU_QUEUE_MESSAGE_TYPE_CALIBRATION_STOP) {
+                calibration::stop();
             }
         }
     } 

@@ -1993,14 +1993,8 @@ bool isEditEnabled(const WidgetCursor &widgetCursor) {
             return false;
         }
 
-        if (channel.isOutputEnabled()) {
-            if (trigger::isActive()) {
-                return false;
-            }
-        } else {
-            if (getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) {
-                return false;
-            }
+        if (getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) {
+            return false;
         }
     }
 

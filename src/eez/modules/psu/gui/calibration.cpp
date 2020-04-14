@@ -50,20 +50,9 @@ void showCurrentStep();
 void onStartPasswordOk() {
     popPage();
 
-    channel_dispatcher::outputEnable(*g_channel, false);
+    calibration::start(*g_channel);
 
-    g_channel->clearProtection();
-    g_channel->prot_conf.flags.u_state = 0;
-    g_channel->prot_conf.flags.i_state = 0;
-    g_channel->prot_conf.flags.p_state = 0;
-
-    g_channel->remoteProgrammingEnable(false);
-
-    channel_dispatcher::outputEnable(*g_channel, true);
-
-    trigger::abort();
-
-    calibration::start(g_channel);
+    osDelay(1);
 
     g_stepNum = 0;
     showCurrentStep();

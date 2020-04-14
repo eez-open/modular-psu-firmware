@@ -23,7 +23,6 @@
 #include <eez/scpi/scpi.h>
 
 #include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/event_queue.h>
@@ -723,14 +722,17 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
         Channel &channel = Channel::get(i);
 
         if (profile.channels[i].flags.parameters_are_valid) {
-            channel.u.set = MIN(profile.channels[i].u_set, channel.u.max);
-            channel.u.step = profile.channels[i].u_step;
-            channel.u.limit = MIN(profile.channels[i].u_limit, channel.u.max);
+            channel.flags.currentRangeSelectionMode = profile.channels[i].flags.currentRangeSelectionMode;
+            channel.flags.autoSelectCurrentRange = profile.channels[i].flags.autoSelectCurrentRange;
 
-            channel.i.set = MIN(profile.channels[i].i_set, channel.i.max);
-            channel.i.step = profile.channels[i].i_step;
+            channel.u.set = channel.roundChannelValue(UNIT_VOLT, MIN(profile.channels[i].u_set, channel.u.max));
+            channel.u.step = channel.roundChannelValue(UNIT_VOLT, profile.channels[i].u_step);
+            channel.u.limit = channel.roundChannelValue(UNIT_VOLT, MIN(profile.channels[i].u_limit, channel.u.max));
 
-            channel.p_limit = MIN(profile.channels[i].p_limit, channel.u.max * channel.i.max);
+            channel.i.set = channel.roundChannelValue(UNIT_AMPER, MIN(profile.channels[i].i_set, channel.i.max));
+            channel.i.step = channel.roundChannelValue(UNIT_AMPER, profile.channels[i].i_step);
+
+            channel.p_limit = channel.roundChannelValue(UNIT_WATT, MIN(profile.channels[i].p_limit, channel.u.max * channel.i.max));
 
             channel.prot_conf.u_delay = profile.channels[i].u_delay;
             channel.prot_conf.u_level = profile.channels[i].u_level;
@@ -775,12 +777,9 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
             channel.flags.currentTriggerMode = (TriggerMode)profile.channels[i].flags.i_triggerMode;
             channel.flags.triggerOutputState = profile.channels[i].flags.triggerOutputState;
             channel.flags.triggerOnListStop = profile.channels[i].flags.triggerOnListStop;
-            channel.u.triggerLevel = profile.channels[i].u_triggerValue;
-            channel.i.triggerLevel = profile.channels[i].i_triggerValue;
+            channel.u.triggerLevel = channel.roundChannelValue(UNIT_VOLT, profile.channels[i].u_triggerValue);
+            channel.i.triggerLevel = channel.roundChannelValue(UNIT_AMPER, profile.channels[i].i_triggerValue);
             list::setListCount(channel, profile.channels[i].listCount);
-
-            channel.flags.currentRangeSelectionMode = profile.channels[i].flags.currentRangeSelectionMode;
-            channel.flags.autoSelectCurrentRange = profile.channels[i].flags.autoSelectCurrentRange;
 
             channel.flags.dprogState = profile.channels[i].flags.dprogState;
 
@@ -1531,7 +1530,7 @@ static bool doRecallFromLastLocation(int *err) {
 ////////////////////////////////////////////////////////////////////////////////
 
 static bool isTickSaveAllowed() {
-    return !trigger::isActive() && !calibration::isEnabled();
+    return !trigger::isActive();
 }
 
 static bool isAutoSaveAllowed() {

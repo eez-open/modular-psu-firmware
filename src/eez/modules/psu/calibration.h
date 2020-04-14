@@ -76,7 +76,7 @@ Channel &getCalibrationChannel();
 
 /// Start calibration procedure on the channel.
 /// /param channel Selected channel
-void start(Channel *channel);
+void start(Channel &channel);
 
 /// Stop calibration procedure.
 void stop();

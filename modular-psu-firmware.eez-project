@@ -5841,7 +5841,7 @@
                     "top": 0,
                     "width": 102,
                     "height": 40,
-                    "text": " Discard"
+                    "text": "\\u009f Discard"
                   }
                 ]
               }
@@ -6349,7 +6349,7 @@
                     "top": 0,
                     "width": 102,
                     "height": 40,
-                    "text": " Discard"
+                    "text": "\\u009f Discard"
                   }
                 ]
               }
@@ -47158,7 +47158,7 @@
           {
             "encoding": 134,
             "x": 1,
-            "y": 0,
+            "y": -1,
             "width": 16,
             "height": 17,
             "dx": 19,
@@ -47608,19 +47608,19 @@
           {
             "encoding": 159,
             "x": 0,
-            "y": -2,
-            "width": 19,
-            "height": 19,
+            "y": -1,
+            "width": 17,
+            "height": 17,
             "dx": 19,
             "glyphBitmap": {
-              "height": 19,
-              "pixelArray": "2cc7fbfcfcfcfcfcfcfcfcfcfcfcfcfcfbc72acbffffffffffffffffffffffffffffffffffcaffffde69606060606060606060606069deffffffff690000000000000000000000000068ffffffff6000001f1a00000000001a1e000060ffffffff600020faf64200000040f5fa220060ffffffff60001ef8fff6410040f5fff8210060ffffffff60000048f8fff675f5fff948000060ffffffff6000000048f8fffffff94a00000060ffffffff60000000007dffffff800000000060ffffffff6000000042f6fffffff74400000060ffffffff60000041f6fff984f9fff743000060ffffffff60001af5fff94c004af9fff61d0060ffffffff60001efaf94c00000049f8fb210060ffffffff600000222200000000001e21000060ffffffff680000000000000000000000000068ffffffffdb655c5c5c5c5c5c5c5c5c5c5c65dbffffcdffffffffffffffffffffffffffffffffffcc30ccffffffffffffffffffffffffffffffcb2e",
-              "width": 19
+              "width": 17,
+              "height": 17,
+              "pixelArray": "40d9fcfcfcfcfcfcfcfcfcfcfcfcfcd940dcffffffffffffffffffffffffffffffdcffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe65ee8ffffffe65de6ffffffffffffffff5a0028e7ffe627005affffffffffffffffe4230028cc270024e4ffffffffffffffffffe22200010024e4ffffffffffffffffffffffc5010001c9ffffffffffffffffffffffe52500010027e6ffffffffffffffffffe6260025c8240027e6ffffffffffffffff590025e4ffe3230059ffffffffffffffffe256e4ffffffe255e2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffdfffffffffffffffffffffffffffffffde45deffffffffffffffffffffffffffde44"
             },
             "source": {
               "filePath": "fonts\\webhostinghub-glyphs.ttf",
-              "size": 14,
-              "encoding": 62225
+              "size": 12,
+              "encoding": 62835
             }
           },
           {

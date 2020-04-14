@@ -21,9 +21,12 @@
 #include <math.h>
 #include <stdio.h>
 
+#include <eez/firmware.h>
+
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/datetime.h>
+#include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/scpi/psu.h>
 
 namespace eez {
@@ -38,9 +41,6 @@ static bool g_remarkSet;
 static char g_remark[CALIBRATION_REMARK_MAX_LENGTH + 1];
 
 static int8_t g_currentRangeSelected = 0;
-
-static int8_t g_currentRangeSaved;
-static CurrentRangeSelectionMode g_currentRangeSelectionModeSaved;
 
 static Value g_voltage(true);
 static Value g_currents[] = { Value(false, 0), Value(false, 1) };
@@ -134,14 +134,14 @@ bool Value::checkRange(float dac, float data, float adc) {
 
     diff = fabsf(dac - data);
     if (diff > allowedDiff) {
-        DebugTrace("Data check failed: level=%f, data=%f, diff=%f, allowedDiff=%f", dac, data, diff, allowedDiff);
+        DebugTrace("Data check failed: level=%f, data=%f, diff=%f, allowedDiff=%f\n", dac, data, diff, allowedDiff);
         return false;
     }
 
     if (g_slots[g_channel->slotIndex].moduleInfo->moduleType != MODULE_TYPE_DCM220) {
         diff = fabsf(dac - adc);
         if (diff > allowedDiff) {
-            DebugTrace("ADC check failed: level=%f, adc=%f, diff=%f, allowedDiff=%f", dac, adc, diff, allowedDiff);
+            DebugTrace("ADC check failed: level=%f, adc=%f, diff=%f, allowedDiff=%f\n", dac, adc, diff, allowedDiff);
             return false;
         }
     }
@@ -212,48 +212,59 @@ Channel &getCalibrationChannel() {
     return *g_channel;
 }
 
-void start(Channel *channel_) {
+void start(Channel &channel) {
+    if (osThreadGetId() != g_psuTaskHandle) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_CALIBRATION_START, channel.channelIndex), osWaitForever);
+        return;
+    }
+
     if (g_enabled)
         return;
 
-    g_enabled = true;
-    g_channel = channel_;
+    profile::saveToLocation(10);
+    profile::setFreezeState(true);
 
-    g_currentRangeSaved = g_channel->flags.currentCurrentRange;
-    g_currentRangeSelectionModeSaved = g_channel->getCurrentRangeSelectionMode();
+    reset();
+
+    g_channel = &channel;
+
     selectCurrentRange(0);
 
-    g_remarkSet = false;
-    g_remark[0] = 0;
-
+    g_voltage.reset();
     g_currents[0].reset();
     if (hasSupportForCurrentDualRange()) {
         g_currents[1].reset();
     }
-    g_voltage.reset();
+    g_remarkSet = false;
+    g_remark[0] = 0;
 
+    g_enabled = true;
     g_channel->calibrationEnable(false);
-    resetChannelToZero();
+
+    channel_dispatcher::outputEnable(*g_channel, true);
 
     g_channel->setOperBits(OPER_ISUM_CALI, true);
 }
 
 void stop() {
+    if (osThreadGetId() != g_psuTaskHandle) {
+        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_CALIBRATION_STOP, 0), osWaitForever);
+        return;
+    }
+
     if (!g_enabled)
         return;
 
     g_enabled = false;
 
+    g_channel->setOperBits(OPER_ISUM_CALI, false);
+
+    profile::recallFromLocation(10);
+    profile::setFreezeState(false);
+
     if (g_channel->isCalibrationExists()) {
         g_channel->calibrationEnable(true);
     }
-
-    g_channel->setCurrentRange(g_currentRangeSaved);
-    g_channel->setCurrentRangeSelectionMode(g_currentRangeSelectionModeSaved);
-
-    resetChannelToZero();
-
-    g_channel->setOperBits(OPER_ISUM_CALI, false);
 }
 
 bool hasSupportForCurrentDualRange() {
@@ -450,8 +461,6 @@ bool save() {
             g_currents[1].level = LEVEL_NONE;
         }
     }
-
-    resetChannelToZero();
 
     // TODO move this to scpi thread
     return persist_conf::saveChannelCalibration(*g_channel);
