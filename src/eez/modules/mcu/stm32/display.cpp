@@ -545,8 +545,9 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
                         uint8_t encoding) {
     gui::font::Glyph glyph;
     g_font.getGlyph(encoding, glyph);
-    if (!glyph)
+    if (!glyph) {
         return 0;
+    }
 
     int x_glyph = x1 + glyph.x;
     int y_glyph = y1 + g_font.getAscent() - (glyph.y + glyph.height);

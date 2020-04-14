@@ -20,10 +20,12 @@
 
 #include <math.h>
 #include <string.h>
-
-#include <eez/firmware.h>
-#include <eez/sound.h>
 #include <eez/system.h>
+#if OPTION_GUI_THREAD
+#include <eez/firmware.h>
+#endif
+
+#include <eez/sound.h>
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
@@ -37,6 +39,8 @@ bool g_isBlinkTime;
 static bool g_wasBlinkTime;
 
 ////////////////////////////////////////////////////////////////////////////////
+
+#if OPTION_GUI_THREAD
 
 void mainLoop(const void *);
 
@@ -155,6 +159,8 @@ void oneIter() {
     }
 }
 
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 
 bool isPageInternal(int pageId) {
@@ -173,7 +179,10 @@ void executeAction(int actionId) {
     }
 
     sound::playClick();
+
+#if OPTION_GUI_THREAD
     osDelay(1);
+#endif
 
     if (isInternalAction(actionId)) {
         executeInternalActionHook(actionId);

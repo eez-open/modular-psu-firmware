@@ -51,6 +51,7 @@
 									<listOptionValue builtIn="false" value="OPTION_EXT_EEPROM=1"/>
 									<listOptionValue builtIn="false" value="OPTION_BP=0"/>
 									<listOptionValue builtIn="false" value="OPTION_DISPLAY=1"/>
+									<listOptionValue builtIn="false" value="OPTION_GUI_THREAD=1"/>
 									<listOptionValue builtIn="false" value="OPTION_FAN=1"/>
 									<listOptionValue builtIn="false" value="OPTION_AUX_TEMP_SENSOR=1"/>
 									<listOptionValue builtIn="false" value="OPTION_WATCHDOG=1"/>
@@ -171,6 +172,7 @@
 									<listOptionValue builtIn="false" value="OPTION_EXT_EEPROM=1"/>
 									<listOptionValue builtIn="false" value="OPTION_BP=0"/>
 									<listOptionValue builtIn="false" value="OPTION_DISPLAY=1"/>
+									<listOptionValue builtIn="false" value="OPTION_GUI_THREAD=1"/>
 									<listOptionValue builtIn="false" value="OPTION_FAN=1"/>
 									<listOptionValue builtIn="false" value="OPTION_AUX_TEMP_SENSOR=1"/>
 									<listOptionValue builtIn="false" value="OPTION_WATCHDOG=1"/>

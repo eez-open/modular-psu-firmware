@@ -145,21 +145,24 @@ void AppContext::replacePage(int pageId, Page *page) {
 }
 
 void AppContext::pushPage(int pageId, Page *page) {
+#if OPTION_GUI_THREAD
     if (osThreadGetId() != g_guiTaskHandle) {
         m_pageIdToSetOnNextIter = pageId;
         m_pageToSetOnNextIter = page;
         osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE, getAppContextId(this)), osWaitForever);
-    } else {
-        int previousPageId = getActivePageId();
-
-        // advance stack pointre
-        if (getActivePageId() != PAGE_ID_NONE && getActivePageId() != PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
-            m_pageNavigationStackPointer++;
-            assert (m_pageNavigationStackPointer < CONF_GUI_PAGE_NAVIGATION_STACK_SIZE);
-        }
-
-        doShowPage(pageId, page, previousPageId);
+        return;
     }
+#endif
+
+    int previousPageId = getActivePageId();
+
+    // advance stack pointre
+    if (getActivePageId() != PAGE_ID_NONE && getActivePageId() != PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
+        m_pageNavigationStackPointer++;
+        assert (m_pageNavigationStackPointer < CONF_GUI_PAGE_NAVIGATION_STACK_SIZE);
+    }
+
+    doShowPage(pageId, page, previousPageId);
 }
 
 void AppContext::doShowPage() {
@@ -227,14 +230,16 @@ bool AppContext::isPageOnStack(int pageId) {
 }
 
 void AppContext::showPage(int pageId) {
+#if OPTION_GUI_THREAD    
     if (osThreadGetId() != g_guiTaskHandle) {
         m_pageIdToSetOnNextIter = pageId;
         m_pageToSetOnNextIter = nullptr;
         osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE, getAppContextId(this)), osWaitForever);
-    } else {
-        if (pageId != getActivePageId()) {
-            setPage(pageId);
-        }
+        return;
+    }
+#endif
+    if (pageId != getActivePageId()) {
+        setPage(pageId);
     }
 }
 

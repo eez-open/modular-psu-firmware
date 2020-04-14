@@ -48,6 +48,13 @@ int Page::getDirty() {
     return 0;
 }
 
+void Page::set() {
+}
+
+void Page::discard() {
+    getFoundWidgetAtDown().appContext->popPage();
+}
+
 bool Page::showAreYouSureOnDiscard() {
     return true;
 }
@@ -64,10 +71,6 @@ void SetPage::onSetValue(float value) {
 }
 
 void SetPage::setValue(float value) {
-}
-
-void SetPage::discard() {
-    getFoundWidgetAtDown().appContext->popPage();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

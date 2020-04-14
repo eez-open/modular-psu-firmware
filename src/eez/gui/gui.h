@@ -18,7 +18,9 @@
 
 #pragma once
 
+#if OPTION_GUI_THREAD
 #include <cmsis_os.h>
+#endif
 
 #include <eez/gui/assets.h>
 #include <eez/gui/page.h>
@@ -47,6 +49,8 @@ namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if OPTION_GUI_THREAD
+
 void startThread();
 
 extern osThreadId g_guiTaskHandle;
@@ -60,6 +64,8 @@ extern osMessageQId g_guiMessageQueueId;
 #define GUI_QUEUE_MESSAGE_PARAM(param) ((int16_t)(message >> 8))
 
 void onGuiQueueMessageHook(uint8_t type, int16_t param);
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 

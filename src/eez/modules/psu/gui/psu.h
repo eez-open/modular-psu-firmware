@@ -168,7 +168,9 @@ enum DialogActionResult {
 };
 
 class PsuAppContext : public AppContext {
+#if OPTION_GUI_THREAD
     friend void eez::gui::onGuiQueueMessageHook(uint8_t type, int16_t param);
+#endif
 
 public:
     PsuAppContext();

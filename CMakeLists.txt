@@ -33,6 +33,7 @@ add_definitions(-DHAVE_STDBOOL)
 add_definitions(-DSCPI_USER_CONFIG)
 
 add_definitions(-DOPTION_DISPLAY=1)
+add_definitions(-DOPTION_GUI_THREAD=1)
 add_definitions(-DOPTION_FAN=1)
 add_definitions(-DOPTION_AUX_TEMP_SENSOR=1)
 add_definitions(-DOPTION_EXT_RTC=1)

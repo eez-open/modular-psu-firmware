@@ -324,22 +324,12 @@ void action_show_ch_settings_trigger() {
     pushPage(PAGE_ID_CH_SETTINGS_TRIGGER);
 }
 
-void do_action_show_ch_settings_lists() {
+void action_show_ch_settings_lists() {
     Page *page = getActivePage();
     if (page && page->getDirty()) {
-        page->pageAlloc();
+        page->set();
     }
     pushPage(PAGE_ID_CH_SETTINGS_LISTS);
-}
-
-void action_show_ch_settings_lists() {
-    selectChannel();
-    Page *page = getActivePage();
-    if (page && page->getDirty()) {
-        areYouSureWithMessage(g_discardMessage, do_action_show_ch_settings_lists);
-    } else {
-        do_action_show_ch_settings_lists();
-    }
 }
 
 void action_show_ch_settings_adv_options() {
@@ -855,21 +845,12 @@ void action_trigger_generate_manual() {
     trigger::generateTrigger(trigger::SOURCE_MANUAL, false);
 }
 
-void do_action_trigger_show_general_settings() {
-    Page *page = getActivePage();
-    if (page && page->getDirty()) {
-        page->pageAlloc();
-    }
-    pushPage(PAGE_ID_SYS_SETTINGS_TRIGGER);
-}
-
 void action_trigger_show_general_settings() {
     Page *page = getActivePage();
     if (page && page->getDirty()) {
-        areYouSureWithMessage(g_discardMessage, do_action_trigger_show_general_settings);
-    } else {
-        do_action_trigger_show_general_settings();
+        page->set();
     }
+    pushPage(PAGE_ID_SYS_SETTINGS_TRIGGER);
 }
 
 void action_show_stand_by_menu() {
@@ -1322,21 +1303,12 @@ void action_channel_update_firmware() {
     yesNoDialog(PAGE_ID_YES_NO_FLASH_SLAVE, nullptr, onSelectFirmware, nullptr, nullptr);
 }
 
-void do_action_show_sys_settings_ramp_and_delay() {
-    Page *page = getActivePage();
-    if (page && page->getDirty()) {
-        page->pageAlloc();
-    }
-    pushPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
-}
-
 void action_show_sys_settings_ramp_and_delay() {
     Page *page = getActivePage();
     if (page && page->getDirty()) {
-        areYouSureWithMessage(g_discardMessage, do_action_show_sys_settings_ramp_and_delay);
-    } else {
-        do_action_show_sys_settings_ramp_and_delay();
+        page->set();
     }
+    pushPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
 }
 
 void action_channel_toggle_ramp_state() {

@@ -25,7 +25,7 @@ namespace eez {
 namespace gui {
 
 class Page {
-  public:
+public:
     virtual ~Page() {
     }
 
@@ -39,16 +39,17 @@ class Page {
     virtual Unit getEncoderUnit();
 
     virtual int getDirty();
+    virtual void set();
+    virtual void discard();
+
     virtual bool showAreYouSureOnDiscard();
 };
 
 class SetPage : public Page {
-  public:
+public:
     virtual void edit();
-    virtual void set() = 0;
-    virtual void discard();
 
-  protected:
+protected:
     int16_t editDataId;
 
     static void onSetValue(float value);
