@@ -441,9 +441,9 @@ int Channel::reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionV
 void Channel::protectionEnter(ProtectionValue &cpv) {
     if (IS_OVP_VALUE(this, cpv)) {
         if (flags.rprogEnabled) {
-            DebugTrace("OVP condition: %f (I_MON_DAC) > %f (OVP level)\n", channel_dispatcher::getUMonDacLast(*this), channel_dispatcher::getUProtectionLevel(*this));
+            DebugTrace("OVP condition: %f (U_MON_DAC) > %f (OVP level)\n", channel_dispatcher::getUMonDacLast(*this), getSwOvpProtectionLevel());
         } else {
-            DebugTrace("OVP condition: %f (I_MON) > %f (OVP level)\n", channel_dispatcher::getUMonLast(*this), channel_dispatcher::getUProtectionLevel(*this));
+            DebugTrace("OVP condition: %f (U_MON) > %f (OVP level)\n", channel_dispatcher::getUMonLast(*this), getSwOvpProtectionLevel());
         }
     } else if (IS_OCP_VALUE(this, cpv)) {
         DebugTrace("OCP condition: %f (I_MON) > %f (I_SET)\n", channel_dispatcher::getIMonLast(*this), channel_dispatcher::getISet(*this));
@@ -486,7 +486,15 @@ void Channel::enterOvpProtection() {
    protectionEnter(ovp);
 }
 
-bool Channel::checkSwOvpCondition(float uProtectionLevel) {
+float Channel::getSwOvpProtectionLevel() {
+    if (prot_conf.flags.u_type) {
+        return channel_dispatcher::getUSet(*this) * 1.03f; // 3%
+    }
+    return channel_dispatcher::getUProtectionLevel(*this);
+}
+
+bool Channel::checkSwOvpCondition() {
+    float uProtectionLevel = getSwOvpProtectionLevel();
     return channel_dispatcher::getUMonLast(*this) >= uProtectionLevel || (flags.rprogEnabled && channel_dispatcher::getUMonDacLast(*this) >= uProtectionLevel);
 }
 
@@ -497,7 +505,7 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
 
     if (IS_OVP_VALUE(this, cpv)) {
         state = (flags.rprogEnabled || prot_conf.flags.u_state) && !((params.features & CH_FEATURE_HW_OVP) && prot_conf.flags.u_type && !prot_conf.flags.u_hwOvpDeactivated);
-        condition = checkSwOvpCondition(channel_dispatcher::getUProtectionLevel(*this));
+        condition = checkSwOvpCondition();
         delay = prot_conf.u_delay;
         delay -= PROT_DELAY_CORRECTION;
     } else if (IS_OCP_VALUE(this, cpv)) {

@@ -436,8 +436,6 @@ class Channel {
     /// Is OVP, OCP or OPP tripped?
     bool isTripped();
 
-    bool checkSwOvpCondition(float uProtectionLevel);
-
     /// Clear channel protection tripp state.
     void clearProtection(bool clearOTP = true);
 
@@ -589,6 +587,9 @@ private:
     void protectionEnter(ProtectionValue &cpv);
     void protectionCheck(ProtectionValue &cpv);
     void protectionCheck();
+
+    bool checkSwOvpCondition();
+    float getSwOvpProtectionLevel();
 
     void doCalibrationEnable(bool enable);
     bool isVoltageCalibrationEnabled();

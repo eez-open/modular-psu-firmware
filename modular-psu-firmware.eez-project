@@ -15318,7 +15318,7 @@
             "data": "channel_calibration_step_status",
             "left": 15,
             "top": 121,
-            "width": 450,
+            "width": 128,
             "height": 40,
             "widgets": [
               {
@@ -15329,7 +15329,7 @@
                 "data": "",
                 "left": 0,
                 "top": 0,
-                "width": 450,
+                "width": 128,
                 "height": 40,
                 "text": "<not set>"
               },
@@ -15341,7 +15341,7 @@
                 "data": "channel_calibration_step_value",
                 "left": 0,
                 "top": 0,
-                "width": 450,
+                "width": 128,
                 "height": 40,
                 "text": ""
               }
@@ -27296,7 +27296,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "72"
+        "height": 72
       },
       {
         "name": "slot_def_vert",
@@ -42505,10 +42505,10 @@
         "usedIn": [
           "simulator"
         ],
-        "left": "1015",
-        "top": "164",
-        "width": "250",
-        "height": "250"
+        "left": 1015,
+        "top": 164,
+        "width": 250,
+        "height": 250
       },
       {
         "name": "Storyboard",
