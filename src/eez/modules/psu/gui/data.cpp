@@ -1166,7 +1166,7 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
         } else if (value.getFloat() > channel_dispatcher::getULimit(channel)) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
-        } else if (value.getFloat() * channel_dispatcher::getISetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
+        } else if (channel.isPowerLimitExceeded(value.getFloat(), channel_dispatcher::getISetUnbalanced(channel))) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {
@@ -1274,7 +1274,7 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
         } else if (value.getFloat() > channel_dispatcher::getILimit(channel)) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
-        } else if (value.getFloat() * channel_dispatcher::getUSetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
+        } else if (channel.isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(channel), value.getFloat())) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {

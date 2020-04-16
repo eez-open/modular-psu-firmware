@@ -49,9 +49,6 @@ struct Value {
     float max_val;
     float max_adc;
 
-    float minPossible;
-    float maxPossible;
-
     Value(bool voltOrCurr, int currentRange_ = -1);
 
     void reset();

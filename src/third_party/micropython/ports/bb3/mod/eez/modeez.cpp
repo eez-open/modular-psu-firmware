@@ -99,7 +99,7 @@ mp_obj_t modeez_setU(mp_obj_t channelIndexObj, mp_obj_t value) {
         mp_raise_ValueError("Voltage limit exceeded");
     }
 
-    if (voltage * channel_dispatcher::getISetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
+    if (channel.isPowerLimitExceeded(voltage, channel_dispatcher::getISetUnbalanced(channel))) {
         mp_raise_ValueError("Power limit exceeded");
     }
 
@@ -135,7 +135,7 @@ mp_obj_t modeez_setI(mp_obj_t channelIndexObj, mp_obj_t value) {
         mp_raise_ValueError("Current limit exceeded");
     }
 
-    if (current * channel_dispatcher::getUSetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
+    if (channel.isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(channel), current)) {
         mp_raise_ValueError("Power limit exceeded");
     }
 

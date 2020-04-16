@@ -138,11 +138,8 @@ class Channel {
         /// Max point.
         CalibrationValuePointConfiguration max;
 
-        /// Real min after calibration
-        float minPossible;
-
-        /// Real max after calibration
-        float maxPossible;
+        float reserved1; // was minPossible
+        float reserved2; // was maxPossible
     };
 
     /// A structure where calibration parameters for the channel are stored.
@@ -501,6 +498,10 @@ class Channel {
 
     /// Change power limit, it will adjust U_SET or I_SET if necessary.
     void setPowerLimit(float limit);
+
+    bool isPowerLimitExceeded(float u, float i) {
+        return channelInterface->isPowerLimitExceeded(subchannelIndex, u, i);
+    }
 
     bool isVoltageBalanced();
     bool isCurrentBalanced();

@@ -247,7 +247,7 @@ int checkTrigger() {
                     return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
                 }
 
-                if (channel.u.triggerLevel * channel.i.triggerLevel > channel_dispatcher::getPowerLimit(channel)) {
+                if (channel.isPowerLimitExceeded(channel.u.triggerLevel, channel.i.triggerLevel)) {
                     g_errorChannelIndex = channel.channelIndex;
                     return SCPI_ERROR_POWER_LIMIT_EXCEEDED;
                 }

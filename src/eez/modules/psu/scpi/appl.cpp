@@ -72,7 +72,7 @@ scpi_result_t scpi_cmd_apply(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (voltage * (call_set_current ? current : channel_dispatcher::getISet(*channel)) > channel_dispatcher::getPowerLimit(*channel)) {
+    if (channel->isPowerLimitExceeded(voltage, (call_set_current ? current : channel_dispatcher::getISet(*channel)))) {
         SCPI_ErrorPush(context, SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         return SCPI_RES_ERR;
     }

@@ -190,6 +190,8 @@ struct ChannelInterface {
     virtual void getCurrentStepValues(StepValues *stepValues) = 0;
     virtual void getPowerStepValues(StepValues *stepValues) = 0;
 
+    virtual bool isPowerLimitExceeded(int subchannelIndex, float u, float i) = 0;
+
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     virtual int getIoExpBitDirection(int subchannelIndex, int io_bit);
     virtual bool testIoExpBit(int subchannelIndex, int io_bit);

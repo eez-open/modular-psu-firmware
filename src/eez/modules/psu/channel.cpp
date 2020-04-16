@@ -675,20 +675,14 @@ void Channel::clearCalibrationConf() {
     cal_conf.u.min.dac = cal_conf.u.min.val = cal_conf.u.min.adc = params.U_CAL_VAL_MIN;
     cal_conf.u.mid.dac = cal_conf.u.mid.val = cal_conf.u.mid.adc = (params.U_CAL_VAL_MIN + params.U_CAL_VAL_MAX) / 2;
     cal_conf.u.max.dac = cal_conf.u.max.val = cal_conf.u.max.adc = params.U_CAL_VAL_MAX;
-    cal_conf.u.minPossible = params.U_MIN;
-    cal_conf.u.maxPossible = params.U_MAX;
 
     cal_conf.i[0].min.dac = cal_conf.i[0].min.val = cal_conf.i[0].min.adc = params.I_CAL_VAL_MIN;
     cal_conf.i[0].mid.dac = cal_conf.i[0].mid.val = cal_conf.i[0].mid.adc = (params.I_CAL_VAL_MIN + params.I_CAL_VAL_MAX) / 2;
     cal_conf.i[0].max.dac = cal_conf.i[0].max.val = cal_conf.i[0].max.adc = params.I_CAL_VAL_MAX;
-    cal_conf.i[0].minPossible = params.I_MIN;
-    cal_conf.i[0].maxPossible = params.I_MAX;
 
     cal_conf.i[1].min.dac = cal_conf.i[1].min.val = cal_conf.i[1].min.adc = params.I_CAL_VAL_MIN / 100;
     cal_conf.i[1].mid.dac = cal_conf.i[1].mid.val = cal_conf.i[1].mid.adc = (params.I_CAL_VAL_MIN + params.I_CAL_VAL_MAX) / 2 / 100;
     cal_conf.i[1].max.dac = cal_conf.i[1].max.val = cal_conf.i[1].max.adc = params.I_CAL_VAL_MAX / 100;
-    cal_conf.i[1].minPossible = params.I_MIN;
-    cal_conf.i[1].maxPossible = params.I_MAX / 100;
 
     strcpy(cal_conf.calibration_date, "");
     strcpy(cal_conf.calibration_remark, CALIBRATION_REMARK_INIT);
@@ -1164,43 +1158,6 @@ bool Channel::isOutputEnabled() {
 
 void Channel::doCalibrationEnable(bool enable) {
     flags.calEnabled = enable;
-
-    if (enable) {
-        u.min = roundChannelValue(UNIT_VOLT, MAX(cal_conf.u.minPossible, params.U_MIN));
-        if (u.limit < u.min)
-            u.limit = u.min;
-        if (u.set < u.min)
-            setVoltage(u.min);
-
-        u.max = roundChannelValue(UNIT_VOLT, MIN(cal_conf.u.maxPossible, params.U_MAX));
-        if (u.limit > u.max)
-            u.limit = u.max;
-        if (u.set > u.max)
-            setVoltage(u.max);
-
-        i.min = roundChannelValue(UNIT_AMPER, MAX(cal_conf.i[0].minPossible, params.I_MIN));
-        if (i.min < params.I_MIN)
-            i.min = params.I_MIN;
-        if (i.limit < i.min)
-            i.limit = i.min;
-        if (i.set < i.min)
-            setCurrent(i.min);
-
-        i.max = roundChannelValue(UNIT_AMPER, MIN(cal_conf.i[0].maxPossible, params.I_MAX));
-        if (i.limit > i.max)
-            i.limit = i.max;
-        if (i.set > i.max)
-            setCurrent(i.max);
-    } else {
-        u.min = roundChannelValue(UNIT_VOLT, params.U_MIN);
-        u.max = roundChannelValue(UNIT_VOLT, params.U_MAX);
-
-        i.min = roundChannelValue(UNIT_AMPER, params.I_MIN);
-        i.max = roundChannelValue(UNIT_AMPER, params.I_MAX);
-    }
-
-    u.def = roundChannelValue(UNIT_VOLT, u.min);
-    i.def = roundChannelValue(UNIT_AMPER, i.min);
 
     if (g_isBooted) {
     	setVoltage(u.set);

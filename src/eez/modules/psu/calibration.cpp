@@ -168,16 +168,7 @@ void Value::setData(float dac, float data, float adc) {
     }
 
     if (min_set && max_set) {
-        if (voltOrCurr) {
-            minPossible = g_channel->params.U_MIN;
-            maxPossible = g_channel->params.U_MAX;
-        } else {
-            if (currentRange == 0) {
-                minPossible = g_channel->params.I_MIN;
-                maxPossible = g_channel->params.I_MAX;
-            }
-        }
-        DebugTrace("ADC=%f", min_adc);
+        DebugTrace("ADC=%f\n", min_adc);
     }
 }
 
@@ -190,7 +181,7 @@ bool Value::checkMid() {
     if (diff <= allowedDiff) {
         return true;
     } else {
-        DebugTrace("%s MID point check failed: level=%f, data=%f, diff=%f, allowedDiff=%f",
+        DebugTrace("%s MID point check failed: level=%f, data=%f, diff=%f, allowedDiff=%f\n",
                     voltOrCurr ? "Volt" : (currentRange == 0 ? "HI Curr" : "LO Curr"), mid, mid_val,
                     diff, allowedDiff);
         return false;
@@ -412,9 +403,6 @@ bool save() {
         g_channel->cal_conf.u.max.val = g_voltage.max_val;
         g_channel->cal_conf.u.max.adc = g_voltage.max_adc;
 
-        g_channel->cal_conf.u.minPossible = g_voltage.minPossible;
-        g_channel->cal_conf.u.maxPossible = g_voltage.maxPossible;
-
         g_voltage.level = LEVEL_NONE;
     }
 
@@ -432,9 +420,6 @@ bool save() {
         g_channel->cal_conf.i[0].max.dac = g_currents[0].max_dac;
         g_channel->cal_conf.i[0].max.val = g_currents[0].max_val;
         g_channel->cal_conf.i[0].max.adc = g_currents[0].max_adc;
-
-        g_channel->cal_conf.i[0].minPossible = g_currents[0].minPossible;
-        g_channel->cal_conf.i[0].maxPossible = g_currents[0].maxPossible;
 
         g_currents[0].level = LEVEL_NONE;
     }
@@ -454,9 +439,6 @@ bool save() {
             g_channel->cal_conf.i[1].max.dac = g_currents[1].max_dac;
             g_channel->cal_conf.i[1].max.val = g_currents[1].max_val;
             g_channel->cal_conf.i[1].max.adc = g_currents[1].max_adc;
-
-            g_channel->cal_conf.i[1].minPossible = g_currents[1].minPossible;
-            g_channel->cal_conf.i[1].maxPossible = g_currents[1].maxPossible;
 
             g_currents[1].level = LEVEL_NONE;
         }

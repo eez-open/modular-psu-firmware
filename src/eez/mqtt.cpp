@@ -273,7 +273,7 @@ void onIncomingPublish(const char *topic, const char *payload) {
                     return;
                 }
 
-                if (voltage * channel_dispatcher::getISetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
+                if (channel.isPowerLimitExceeded(voltage, channel_dispatcher::getISetUnbalanced(channel))) {
                     return;
                 }
 
@@ -301,7 +301,7 @@ void onIncomingPublish(const char *topic, const char *payload) {
                     return;
                 }
 
-                if (current * channel_dispatcher::getUSetUnbalanced(channel) > channel_dispatcher::getPowerLimit(channel)) {
+                if (channel.isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(channel), current)) {
                     return;
                 }
 

@@ -67,6 +67,8 @@ namespace dcm220 {
 static GPIO_TypeDef *SPI_IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
 static const uint16_t SPI_IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
 
+static const float PTOT = 155.0f;
+
 bool masterSynchro(int slotIndex, uint8_t &firmwareMajorVersion, uint8_t &firmwareMinorVersion, uint32_t &idw0, uint32_t &idw1, uint32_t &idw2) {
 	uint32_t start = millis();
 
@@ -164,6 +166,8 @@ struct Channel : ChannelInterface {
 	uint32_t idw1 = 0;
 	uint32_t idw2 = 0;
 
+	float I_MAX_FOR_REMAP;
+
     Channel(int slotIndex_)
 		: ChannelInterface(slotIndex_)
 #if defined(EEZ_PLATFORM_STM32)
@@ -223,7 +227,7 @@ struct Channel : ChannelInterface {
 		params.OPP_MIN_LEVEL = 0.0f;
 		params.OPP_DEFAULT_LEVEL = 80.0f;
 
-		params.PTOT = 77.5f;
+		params.PTOT = MIN(params.U_MAX * params.I_MAX, 155.0f);
 
 		params.U_RESOLUTION = 0.01f;
 		params.I_RESOLUTION = 0.02f;
@@ -240,6 +244,8 @@ struct Channel : ChannelInterface {
 		params.features = CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE;
 
 		params.MON_REFRESH_RATE_MS = 500;
+
+		I_MAX_FOR_REMAP = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 5.0f : 4.1667f;
 	}
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -425,7 +431,7 @@ struct Channel : ChannelInterface {
 
 			const float FULL_SCALE = 2.0F;
 			const float U_REF = 2.5F;
-        	float iMon = remap(iMonAdc, (float)ADC_MIN, 0, FULL_SCALE * ADC_MAX / U_REF, /*channel.params.I_MAX*/ 4.1667f);
+        	float iMon = remap(iMonAdc, (float)ADC_MIN, 0, FULL_SCALE * ADC_MAX / U_REF, /*channel.params.I_MAX*/ I_MAX_FOR_REMAP);
         	channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon);
 
 #ifdef DEBUG
@@ -539,7 +545,7 @@ struct Channel : ChannelInterface {
 	void setDacCurrentFloat(int subchannelIndex, float value) {
 #if defined(EEZ_PLATFORM_STM32)
         psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        value = remap(value, channel.params.I_MIN, (float)DAC_MIN, /*channel.params.I_MAX*/ 4.1667f, (float)DAC_MAX);
+        value = remap(value, channel.params.I_MIN, (float)DAC_MIN, /*channel.params.I_MAX*/ I_MAX_FOR_REMAP, (float)DAC_MAX);
         iSet[subchannelIndex] = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
 #endif
 
@@ -590,7 +596,23 @@ struct Channel : ChannelInterface {
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_WATT;
-	}	
+	}
+	
+	bool isPowerLimitExceeded(int subchannelIndex, float u, float i) {
+		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
+		float power = u * i;
+		if (power > channel_dispatcher::getPowerLimit(channel)) {
+			return true;
+		}
+
+		psu::Channel &otherChannel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex == 0 ? 1 : 0);
+		float powerOtherChannel = channel_dispatcher::getUSet(otherChannel) * channel_dispatcher::getISet(otherChannel);
+		if (power + powerOtherChannel > PTOT) {
+			return true;
+		}
+
+		return false;
+	}
 };
 
 static Channel g_channel0(0);
@@ -606,7 +628,7 @@ float readTemperature(int channelIndex) {
 	auto slot = g_slots[slotIndex];
 	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
 		// TODO this is temporary until module hardware is changed
-		return 25 + 5 * channel.i.set;
+		return 25.0f + (channel.isOutputEnabled() ? 5 * channel.i.set : 0.0f);
 	} else {
 		Channel *dcm220Channel = (Channel *)g_channelInterfaces[slotIndex];
 		return dcm220Channel->temperature[channel.subchannelIndex];

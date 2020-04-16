@@ -827,6 +827,11 @@ struct Channel : ChannelInterface {
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_WATT;
 	}	
+
+	bool isPowerLimitExceeded(int subchannelIndex, float u, float i) {
+		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, 0);
+		return u * i > channel_dispatcher::getPowerLimit(channel);
+	}
 };
 
 static Channel g_channel0(0);

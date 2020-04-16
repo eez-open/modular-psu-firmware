@@ -159,14 +159,6 @@ void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange
         strcat(buffer, "_max_adc=");
         strcat_value(buffer, calibrationValue.max.adc);
         SCPI_ResultText(context, buffer);
-        strcpy(buffer, prefix);
-        strcat(buffer, "_min_range=");
-        strcat_value(buffer, calibrationValue.minPossible);
-        SCPI_ResultText(context, buffer);
-        strcpy(buffer, prefix);
-        strcat(buffer, "_max_range=");
-        strcat_value(buffer, calibrationValue.maxPossible);
-        SCPI_ResultText(context, buffer);
     }
 }
 
