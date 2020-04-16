@@ -178,31 +178,33 @@ struct Channel : ChannelInterface {
     }
 
 	void getParams(int subchannelIndex, ChannelParams &params) {
+		auto slot = g_slots[slotIndex];
+
 		params.U_MIN = 1.0f;
 		params.U_DEF = 1.0f;
-		params.U_MAX = 20.0f;
+		params.U_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 24.0f : 20.0f;
 
 		params.U_MIN_STEP = 0.01f;
 		params.U_DEF_STEP = 0.1f;
 		params.U_MAX_STEP = 5.0f;
 
 		params.U_CAL_VAL_MIN = 2.0f;
-		params.U_CAL_VAL_MID = 10.0f;
-		params.U_CAL_VAL_MAX = 18.0f;
+		params.U_CAL_VAL_MID = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 12.0f : 10.0f;
+		params.U_CAL_VAL_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 22.0f : 18.0f;
 		params.I_VOLT_CAL = 1.0f;
 
 		params.I_MIN = 0.0f;
 		params.I_DEF = 0.0f;
-		params.I_MAX = 4.0f;
+		params.I_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 5.0f : 4.0f;
 
 		params.I_MIN_STEP = 0.01f;
 		params.I_DEF_STEP = 0.01f;
 		params.I_MAX_STEP = 1.0f; 
 
 		params.I_CAL_VAL_MIN = 0.5f;
-		params.I_CAL_VAL_MID = 2.0f;
-		params.I_CAL_VAL_MAX = 3.5f;
-		params.U_CURR_CAL = 20.0f;
+		params.I_CAL_VAL_MID = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 2.5f : 2.0f;
+		params.I_CAL_VAL_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.5f : 3.5f;
+		params.U_CURR_CAL = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 25.0f : 20.0f;
 
 		params.OVP_DEFAULT_STATE = false;
 		params.OVP_MIN_DELAY = 0.0f;
@@ -601,9 +603,14 @@ ChannelInterface *g_channelInterfaces[NUM_SLOTS] = { &g_channel0, &g_channel1, &
 float readTemperature(int channelIndex) {
 	psu::Channel& channel = psu::Channel::get(channelIndex);
 	int slotIndex = channel.slotIndex;
-	int subchannelIndex = channel.subchannelIndex;
-	Channel *dcm220Channel = (Channel *)g_channelInterfaces[slotIndex];
-	return dcm220Channel->temperature[subchannelIndex];
+	auto slot = g_slots[slotIndex];
+	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
+		// TODO this is temporary until module hardware is changed
+		return 25 + 5 * channel.i.set;
+	} else {
+		Channel *dcm220Channel = (Channel *)g_channelInterfaces[slotIndex];
+		return dcm220Channel->temperature[channel.subchannelIndex];
+	}
 }
 
 #endif

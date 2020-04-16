@@ -107,7 +107,7 @@ float TempSensor::doRead() {
 			return drivers::tmp1075::readTemperature(slotIndex);
 		}
 
-		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220) {
+		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220 || slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
 			return dcm220::readTemperature(channelIndex);
 		}
 	}

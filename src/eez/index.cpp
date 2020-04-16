@@ -123,6 +123,13 @@ static ModuleInfo g_modules[] = {
         MODULE_REVISION_DCM220_R2B4,
         2,
         dcm220::g_channelInterfaces
+    },
+    {
+        MODULE_TYPE_DCM224, 
+        "DCM224",
+        MODULE_REVISION_DCM224_R1B1,
+        2,
+        dcm220::g_channelInterfaces
     }
 };
 

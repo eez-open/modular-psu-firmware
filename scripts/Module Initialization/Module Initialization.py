@@ -7,12 +7,14 @@ MODEL_NONE = 0
 MODEL_DCP405  = 1
 MODEL_DCP405B = 2
 MODEL_DCM220  = 3
+MODEL_DCM224  = 4
 
 MODELS = [
     { "name": "None",    "id": 0,   "r": 0, "b": 0  },
     { "name": "DCP405",  "id": 405, "r": 2, "b": 11 },
     { "name": "DCP405B", "id": 406, "r": 2, "b": 11 },
     { "name": "DCM220",  "id": 220, "r": 2, "b": 8  },
+    { "name": "DCM224",  "id": 224, "r": 1, "b": 1  },
 ]
 
 slots = [

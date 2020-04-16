@@ -138,7 +138,7 @@ bool Value::checkRange(float dac, float data, float adc) {
         return false;
     }
 
-    if (g_slots[g_channel->slotIndex].moduleInfo->moduleType != MODULE_TYPE_DCM220) {
+    if (g_slots[g_channel->slotIndex].moduleInfo->moduleType != MODULE_TYPE_DCM220 && g_slots[g_channel->slotIndex].moduleInfo->moduleType != MODULE_TYPE_DCM224) {
         diff = fabsf(dac - adc);
         if (diff > allowedDiff) {
             DebugTrace("ADC check failed: level=%f, adc=%f, diff=%f, allowedDiff=%f\n", dac, adc, diff, allowedDiff);

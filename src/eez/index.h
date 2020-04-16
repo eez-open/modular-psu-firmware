@@ -202,6 +202,7 @@ static const uint16_t MODULE_TYPE_DCP405  = 405;
 static const uint16_t MODULE_TYPE_DCP405B = 406;
 static const uint16_t MODULE_TYPE_DCP505  = 505;
 static const uint16_t MODULE_TYPE_DCM220  = 220;
+static const uint16_t MODULE_TYPE_DCM224  = 224;
 
 static const uint16_t MODULE_REVISION_DCP405_R1B1  = 0x0101;
 static const uint16_t MODULE_REVISION_DCP405_R2B5  = 0x0205;
@@ -213,6 +214,8 @@ static const uint16_t MODULE_REVISION_DCP405B_R2B7 = 0x0207;
 static const uint16_t MODULE_REVISION_DCP505_R1B3  = 0x0103;
 
 static const uint16_t MODULE_REVISION_DCM220_R2B4  = 0x0204;
+
+static const uint16_t MODULE_REVISION_DCM224_R1B1  = 0x0101;
 
 struct ModuleInfo {
     uint16_t moduleType;

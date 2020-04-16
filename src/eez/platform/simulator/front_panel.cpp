@@ -72,6 +72,8 @@ int getSlotView(int channelIndex) {
         return PAGE_ID_DCP405B_FRONT_PANEL;
     } else if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCM220) {
         return PAGE_ID_DCM220_FRONT_PANEL;
+    } else if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCM224) {
+        return PAGE_ID_DCM224_FRONT_PANEL;
     } else {
         return PAGE_ID_FRONT_PANEL_EMPTY_SLOT;
     }

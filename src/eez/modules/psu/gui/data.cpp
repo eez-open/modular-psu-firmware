@@ -213,6 +213,7 @@ EnumItem g_enumDefinition_MODULE_TYPE[] = {
     { MODULE_TYPE_DCP405, "DCP405" },
     { MODULE_TYPE_DCP405B, "DCP405B" },
     { MODULE_TYPE_DCM220, "DCM220" },
+    { MODULE_TYPE_DCM224, "DCM224" },
     { 0, 0 }
 };
 
@@ -2763,7 +2764,7 @@ void data_module_specific_ch_settings(DataOperationEnum operation, Cursor cursor
             value = PAGE_ID_CH_SETTINGS_DCP405_SPECIFIC;
         } else if (modulType == MODULE_TYPE_DCP405B) {
             value = PAGE_ID_CH_SETTINGS_DCP405B_SPECIFIC;
-        } else if (modulType == MODULE_TYPE_DCM220) {
+        } else if (modulType == MODULE_TYPE_DCM220 || modulType == MODULE_TYPE_DCM224) {
             value = PAGE_ID_CH_SETTINGS_DCM220_SPECIFIC;
         } else {
             value = PAGE_ID_NONE;
@@ -2776,7 +2777,7 @@ void data_channel_has_error_settings(DataOperationEnum operation, Cursor cursor,
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         auto modulType = g_slots[channel.slotIndex].moduleInfo->moduleType;
-        if (modulType == MODULE_TYPE_DCM220) {
+        if (modulType == MODULE_TYPE_DCM220 || modulType == MODULE_TYPE_DCM224) {
             value = 1;
         } else {
             value = 0;
@@ -2792,7 +2793,7 @@ void data_channel_settings_page(DataOperationEnum operation, Cursor cursor, Valu
             value = PAGE_ID_CH_SETTINGS_OK;
         } else {
             auto modulType = g_slots[channel.slotIndex].moduleInfo->moduleType;
-            if (modulType == MODULE_TYPE_DCM220) {
+            if (modulType == MODULE_TYPE_DCM220 || modulType == MODULE_TYPE_DCM224) {
             	uint8_t firmwareMajorVersion;
             	uint8_t firmwareMinorVersion;
             	channel.getFirmwareVersion(firmwareMajorVersion, firmwareMinorVersion);

@@ -1296,7 +1296,7 @@ void onFirmwareSelected(const char *filePath) {
 }
 
 void onSelectFirmware() {
-    file_manager::browseForFile("Select DCM220 firmware file", "/Updates", FILE_TYPE_HEX, file_manager::DIALOG_TYPE_OPEN, onFirmwareSelected);
+    file_manager::browseForFile("Select firmware file", "/Updates", FILE_TYPE_HEX, file_manager::DIALOG_TYPE_OPEN, onFirmwareSelected);
 }
 
 void action_channel_update_firmware() {

@@ -87,7 +87,7 @@ void select(uint8_t slotIndex, int chip) {
 
 	auto &slot = g_slots[slotIndex];
 
-	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220) {
+	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220 || slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
 		selectA(slotIndex);
 		return;
 	}
@@ -137,7 +137,7 @@ void select(uint8_t slotIndex, int chip) {
 
 void deselect(uint8_t slotIndex) {
 	auto &slot = g_slots[slotIndex];
-	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220) {
+	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220 || slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
 		deselectA(slotIndex);
 	} else if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 || slot.moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
 		// 01 ADC
