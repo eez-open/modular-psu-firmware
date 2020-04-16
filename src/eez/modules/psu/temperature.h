@@ -50,7 +50,6 @@ void clearChannelProtection(Channel *channel);
 void disableChannelProtection(Channel *channel);
 
 float getMaxChannelTemperature();
-bool isAllowedToPowerUp();
 
 class TempSensorTemperature {
 public:

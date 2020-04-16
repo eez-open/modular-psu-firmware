@@ -44,10 +44,9 @@ TempSensorTemperature sensors[temp_sensor::NUM_TEMP_SENSORS] = { TEMP_SENSORS };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static uint32_t last_measured_tick;
-static float last_max_channel_temperature;
-static uint32_t max_temp_start_tick;
-static bool force_power_down = false;
+static uint32_t g_lastMeasuredTick;
+static uint32_t g_maxTempCheckStartTick;
+static float g_lastMaxChannelTemperature;
 
 void init() {
     for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
@@ -65,45 +64,45 @@ bool test() {
     return success;
 }
 
-void tick(uint32_t tick_usec) {
-    if (tick_usec - last_measured_tick >= TEMP_SENSOR_READ_EVERY_MS * 1000L) {
-        last_measured_tick = tick_usec;
+void tick(uint32_t tickCount) {
+    if (tickCount - g_lastMeasuredTick >= TEMP_SENSOR_READ_EVERY_MS * 1000L) {
+        g_lastMeasuredTick = tickCount;
 
         for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-            sensors[i].tick(tick_usec);
+            sensors[i].tick(tickCount);
         }
 
         // find max. channel temperature
-        float max_channel_temperature = FLT_MIN;
+        float maxChannelTemperature = FLT_MIN;
 
         for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
             temp_sensor::TempSensor &sensor = temp_sensor::sensors[i];
             if (sensor.getChannel()) {
                 if (sensor.g_testResult == TEST_OK) {
                     temperature::TempSensorTemperature &sensorTemperature = temperature::sensors[i];
-                    if (sensorTemperature.temperature > max_channel_temperature) {
-                        max_channel_temperature = sensorTemperature.temperature;
+                    if (sensorTemperature.temperature > maxChannelTemperature) {
+                        maxChannelTemperature = sensorTemperature.temperature;
                     }
                 }
             }
         }
 
         // check if max_channel_temperature is too high
-        if (max_channel_temperature > FAN_MAX_TEMP) {
-            if (last_max_channel_temperature <= FAN_MAX_TEMP) {
-                max_temp_start_tick = tick_usec;
+        if (isPowerUp() && maxChannelTemperature > FAN_MAX_TEMP) {
+            if (g_lastMaxChannelTemperature <= FAN_MAX_TEMP) {
+                g_maxTempCheckStartTick = tickCount;
             }
 
-            if (tick_usec - max_temp_start_tick > FAN_MAX_TEMP_DELAY * 1000000L) {
+            if (tickCount - g_maxTempCheckStartTick > FAN_MAX_TEMP_DELAY * 1000000L) {
                 // turn off power
-                force_power_down = true;
+                event_queue::pushEvent(event_queue::EVENT_ERROR_HIGH_TEMPERATURE);
                 changePowerState(false);
             }
-        } else if (max_channel_temperature <= FAN_MAX_TEMP - FAN_MAX_TEMP_DROP) {
-            force_power_down = false;
+        } else {
+            g_maxTempCheckStartTick = tickCount;
         }
 
-        last_max_channel_temperature = max_channel_temperature;
+        g_lastMaxChannelTemperature = maxChannelTemperature;
     }
 }
 
@@ -150,11 +149,7 @@ void disableChannelProtection(Channel *channel) {
 }
 
 float getMaxChannelTemperature() {
-    return last_max_channel_temperature;
-}
-
-bool isAllowedToPowerUp() {
-    return !force_power_down;
+    return g_lastMaxChannelTemperature;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
