@@ -144,6 +144,7 @@ static const int EVENT_TYPE_ERROR = 4;
 	EVENT_ERROR(SLOT3_SYNC_ERROR, 142, "Sync error on module 3")                                   \
     EVENT_ERROR(TOO_MANY_LOG_EVENTS, 150, "Too many log events")                                   \
 	EVENT_ERROR(WATCHDOG_RESET, 151, "Watchdog reset")                                             \
+    EVENT_ERROR(HIGH_TEMPERATURE, 152, "High temperature")                                         \
     EVENT_WARNING(CH1_CALIBRATION_DISABLED, 0, "Ch1 calibration disabled")                         \
     EVENT_WARNING(CH2_CALIBRATION_DISABLED, 1, "Ch2 calibration disabled")                         \
     EVENT_WARNING(CH3_CALIBRATION_DISABLED, 2, "Ch3 calibration disabled")                         \

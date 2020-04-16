@@ -78,6 +78,11 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
         // 
         } else if (cmd == 26) {
         	psu::gui::showPage(PAGE_ID_DEBUG_VARIABLES);
+        } else if (cmd == 27) {
+            int32_t relay;
+            if (SCPI_ParamInt32(context, &relay, true)) {
+                bp3c::io_exp::switchChannelCoupling(relay);
+            }
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;
@@ -95,6 +100,19 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
 #ifdef DEBUG
+    int32_t cmd;
+    if (SCPI_ParamInt32(context, &cmd, false)) {
+        if (cmd == 23) {
+            bp3c::io_exp::init();
+            bp3c::io_exp::test();
+            SCPI_ResultBool(context, bp3c::io_exp::g_testResult == TEST_OK);
+            return SCPI_RES_OK;
+        } else {
+            SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+            return SCPI_RES_ERR;
+        }
+    }
+
     static char buffer[2048];
 
 #ifndef __EMSCRIPTEN__
