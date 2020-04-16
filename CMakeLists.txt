@@ -85,9 +85,11 @@ set(src_files)
 set(header_files)
 
 set(src_eez
+    src/eez/action_impl.cpp
     src/eez/firmware.cpp
     src/eez/debug.cpp
     src/eez/file_type.cpp
+    src/eez/idle.cpp
     src/eez/index.cpp
     src/eez/main.cpp
     src/eez/memory.cpp
@@ -103,6 +105,7 @@ set(header_eez
     src/eez/firmware.h
     src/eez/debug.h
     src/eez/file_type.h
+    src/eez/idle.h
     src/eez/index.h
     src/eez/memory.h
     src/eez/mp.h
@@ -128,7 +131,6 @@ set(src_eez_modules_psu
     src/eez/modules/psu/dlog_view.cpp
     src/eez/modules/psu/ethernet.cpp
     src/eez/modules/psu/event_queue.cpp
-    src/eez/modules/psu/idle.cpp
     src/eez/modules/psu/io_pins.cpp
     src/eez/modules/psu/list_program.cpp
     src/eez/modules/psu/ntp.cpp
@@ -162,7 +164,6 @@ set(header_eez_modules_psu
     src/eez/modules/psu/dlog_view.h
     src/eez/modules/psu/ethernet.h
     src/eez/modules/psu/event_queue.h
-    src/eez/modules/psu/idle.h
     src/eez/modules/psu/io_pins.h
     src/eez/modules/psu/list_program.h
     src/eez/modules/psu/ntp.h
@@ -249,7 +250,6 @@ list (APPEND header_files ${header_eez_modules_psu_scpi})
 source_group("eez\\modules\\psu\\scpi" FILES ${src_eez_modules_psu_scpi} ${header_eez_modules_psu_scpi})
 
 set(src_eez_gui
-    src/eez/gui/action_impl.cpp
     src/eez/gui/app_context.cpp
     src/eez/gui/assets.cpp
     src/eez/gui/data.cpp

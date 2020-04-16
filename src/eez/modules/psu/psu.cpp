@@ -44,7 +44,6 @@
 #include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
-#include <eez/modules/psu/idle.h>
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/ramp.h>
@@ -500,10 +499,6 @@ bool powerUp() {
         return true;
     }
 
-    if (!temperature::isAllowedToPowerUp()) {
-        return false;
-    }
-
     sound::playPowerUp(sound::PLAY_POWER_UP_CONDITION_NONE);
 
     g_rlState = persist_conf::devConf.isFrontPanelLocked ? RL_STATE_REMOTE : RL_STATE_LOCAL;
@@ -685,8 +680,7 @@ static TickFunc g_tickFuncs[] = {
 #if OPTION_FAN
     aux_ps::fan::tick,
 #endif
-    datetime::tick,
-    idle::tick
+    datetime::tick
 };
 static const int NUM_TICK_FUNCS = sizeof(g_tickFuncs) / sizeof(TickFunc);
 static int g_tickFuncIndex = 0;

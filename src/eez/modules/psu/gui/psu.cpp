@@ -21,13 +21,13 @@
 #include <eez/firmware.h>
 #include <eez/sound.h>
 #include <eez/system.h>
+#include <eez/idle.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/devices.h>
 #include <eez/modules/psu/event_queue.h>
-#include <eez/modules/psu/idle.h>
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/dlog_view.h>
@@ -131,7 +131,7 @@ void PsuAppContext::stateManagment() {
     }
 
     // remove alert message after period of time
-    uint32_t inactivityPeriod = psu::idle::getHmiInactivityPeriod();
+    uint32_t inactivityPeriod = eez::idle::getHmiInactivityPeriod();
     if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
         ToastMessagePage *page = (ToastMessagePage *)getActivePage();
         if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
@@ -230,13 +230,13 @@ void PsuAppContext::stateManagment() {
     // TODO move this to some other place
 #if OPTION_ENCODER
     if (counter != 0 || clicked) {
-        idle::noteHmiActivity();
+        eez::idle::noteHmiActivity();
     }
     onEncoder(counter, clicked);
 #endif
 
 #if GUI_BACK_TO_MAIN_ENABLED
-    uint32_t inactivityPeriod = psu::idle::getHmiInactivityPeriod();
+    uint32_t inactivityPeriod = eez::idle::getHmiInactivityPeriod();
 
     if (
         activePageId == PAGE_ID_EVENT_QUEUE ||
@@ -572,7 +572,9 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
             int activePageId = getActivePageId();
             if (activePageId == PAGE_ID_KEYPAD ||
                 activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO ||
-                activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
+                activePageId == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL ||
+                activePageId == INTERNAL_PAGE_ID_TOAST_MESSAGE
+            ) {
                 return true;
             }
             

@@ -3483,7 +3483,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "touch_calibration_intro",
@@ -5841,7 +5841,7 @@
                     "top": 0,
                     "width": 102,
                     "height": 40,
-                    "text": "\\u009f Discard"
+                    "text": "\\u008b Discard"
                   }
                 ]
               }
@@ -6349,7 +6349,7 @@
                     "top": 0,
                     "width": 102,
                     "height": 40,
-                    "text": "\\u009f Discard"
+                    "text": "\\u008b Discard"
                   }
                 ]
               }
@@ -15550,7 +15550,7 @@
             "top": 141,
             "width": 120,
             "height": 40,
-            "text": "~ Save"
+            "text": "\\u0086 Save"
           },
           {
             "type": "Text",
@@ -15562,7 +15562,7 @@
             "top": 141,
             "width": 120,
             "height": 40,
-            "text": "\\u009f Discard"
+            "text": "\\u008b Discard"
           },
           {
             "type": "Container",
@@ -17878,7 +17878,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_temperature",
@@ -18515,7 +18515,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_protections",
@@ -18879,7 +18879,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_trigger",
@@ -19137,7 +19137,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_io",
@@ -19640,7 +19640,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_date_time",
@@ -20492,7 +20492,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_encoder",
@@ -20795,7 +20795,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_serial",
@@ -21034,7 +21034,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_ethernet",
@@ -21675,7 +21675,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_mqtt",
@@ -22358,7 +22358,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_ethernet_static",
@@ -22618,7 +22618,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_screen_calibration",
@@ -22697,7 +22697,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_display",
@@ -23031,7 +23031,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_sound",
@@ -23201,7 +23201,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": "272"
+        "height": 272
       },
       {
         "name": "sys_settings_tracking",
@@ -41154,8 +41154,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": "1396",
-        "height": "563"
+        "width": 1396,
+        "height": 563
       },
       {
         "name": "front_panel_empty_slot",
@@ -47249,13 +47249,13 @@
             "encoding": 139,
             "x": 0,
             "y": -3,
-            "width": 18,
-            "height": 20,
+            "width": 17,
+            "height": 17,
             "dx": 19,
             "glyphBitmap": {
-              "height": 20,
-              "pixelArray": "00000000000000023a4f110000000000000000000000000008b9fffff13c0000000000000000000024c4faff541bdafdee890300000000000000bdd26ef101009d9d8eff6a00000000000000fd6000a000009a0601ecc114000000000000ff5800980000980000e4fffb790000000000ff5800980000980000d54481fd1e00000000ff58009800009800009a000fff4b00011907ff580098000098000098000cff4c20cafff3ff580098000098000098000cff4cb5d84c99ff580024000024000024000cff4cfa680002be580000000000000000000cff4cd7ae01001d470000000000000000000dff4c53ff6000000100000000000000000022ff3d009af427000000000000000000000050ff11000ad5ce07000000000000000000007ee00000002df78e00000000000000000000acb10000000069ff4a000000000000000000db810000000001adee705c5c5c5c5c5c5c88ff3d00000000000c9ff6ffffffffffffffee790000",
-              "width": 18
+              "width": 17,
+              "height": 17,
+              "pixelArray": "40d9fcfcfcfcfcfcfcfcfcfcfcfcfcd940dcffffffffffffffffffffffffffffffdcffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe65ee8ffffffe65de6ffffffffffffffff5a0028e7ffe627005affffffffffffffffe4230028cc270024e4ffffffffffffffffffe22200010024e4ffffffffffffffffffffffc5010001c9ffffffffffffffffffffffe52500010027e6ffffffffffffffffffe6260025c8240027e6ffffffffffffffff590025e4ffe3230059ffffffffffffffffe256e4ffffffe255e2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffdfffffffffffffffffffffffffffffffde45deffffffffffffffffffffffffffde44"
             },
             "source": {
               "filePath": "fonts\\fontawesome-webfont.ttf",
@@ -47609,13 +47609,13 @@
             "encoding": 159,
             "x": 0,
             "y": -1,
-            "width": 17,
-            "height": 17,
+            "width": 19,
+            "height": 19,
             "dx": 19,
             "glyphBitmap": {
-              "width": 17,
-              "height": 17,
-              "pixelArray": "40d9fcfcfcfcfcfcfcfcfcfcfcfcfcd940dcffffffffffffffffffffffffffffffdcffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe65ee8ffffffe65de6ffffffffffffffff5a0028e7ffe627005affffffffffffffffe4230028cc270024e4ffffffffffffffffffe22200010024e4ffffffffffffffffffffffc5010001c9ffffffffffffffffffffffe52500010027e6ffffffffffffffffffe6260025c8240027e6ffffffffffffffff590025e4ffe3230059ffffffffffffffffe256e4ffffffe255e2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffdfffffffffffffffffffffffffffffffde45deffffffffffffffffffffffffffde44"
+              "width": 19,
+              "height": 19,
+              "pixelArray": "2cc7fbfcfcfcfcfcfcfcfcfcfcfcfcfcfbc72acbffffffffffffffffffffffffffffffffffcaffffde69606060606060606060606069deffffffff690000000000000000000000000068ffffffff6000001f1a00000000001a1e000060ffffffff600020faf64200000040f5fa220060ffffffff60001ef8fff6410040f5fff8210060ffffffff60000048f8fff675f5fff948000060ffffffff6000000048f8fffffff94a00000060ffffffff60000000007dffffff800000000060ffffffff6000000042f6fffffff74400000060ffffffff60000041f6fff984f9fff743000060ffffffff60001af5fff94c004af9fff61d0060ffffffff60001efaf94c00000049f8fb210060ffffffff600000222200000000001e21000060ffffffff680000000000000000000000000068ffffffffdb655c5c5c5c5c5c5c5c5c5c5c65dbffffcdffffffffffffffffffffffffffffffffffcc30ccffffffffffffffffffffffffffffffcb2e"
             },
             "source": {
               "filePath": "fonts\\webhostinghub-glyphs.ttf",
@@ -49726,20 +49726,20 @@
           },
           {
             "encoding": 126,
-            "x": 1,
-            "y": 0,
-            "width": 21,
-            "height": 21,
-            "dx": 24,
+            "x": 0,
+            "y": 7,
+            "width": 11,
+            "height": 5,
+            "dx": 11,
             "glyphBitmap": {
-              "height": 21,
-              "pixelArray": "29c5fafcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfac427c8ffffffffffffffffffffffffffffffffffffffc6fefffffffffffffffffffffffffffffffefffffffdffffffffffffffffffffffffffffffe738e4ffffffffffffffffffffffffffffffffffe6260057ffffffffffffffffffffffffffffffffe82800002bf9ffffffffffffffffffffffffffffeb2a00002fecfffffffffffffffffffffffffffff435000023e8fffffffffffffffffffffffffffffe50000018ddffffffffffffffffff55b1ffffffff8e000007caffffffffffffffffffb6000397ffffd508000094ffffffffffffffffffff450000007cfe37000042feffffffffffffffffffffe63100000038000002d0fffffffffffffffffffffffff44b00000000005ffffffffffffffffffffffffffffffb5c00000003dffffffffffffffffffffffffffffffffd54000050fffffffffffffffffffffffffffffffffff73600b9ffffffffffffffffffffffffffffffffffffe53bfefffffffffffffffffffffefffffffffffffffff8fffffffffffffffffffffeccffffffffffffffffffffffffffffffffffffffcb2fcbfefffffffffffffffffffffffffffffffeca2d",
-              "width": 21
+              "width": 11,
+              "height": 5,
+              "pixelArray": "000275eacf4d00000a3c00019cffffffffb559cdf32a05c8e56697fcffffffdb16001f2000002db7fbb11a000000000000000001000000"
             },
             "source": {
-              "filePath": "fonts/heydings_icons.ttf",
+              "filePath": "fonts\\Oswald-Medium.ttf",
               "size": 17,
-              "encoding": 79
+              "encoding": 126
             }
           },
           {
@@ -49870,20 +49870,20 @@
           },
           {
             "encoding": 134,
-            "x": 0,
+            "x": 1,
             "y": 0,
-            "width": 0,
-            "height": 0,
-            "dx": 0,
+            "width": 21,
+            "height": 21,
+            "dx": 24,
             "glyphBitmap": {
-              "height": 0,
-              "pixelArray": "",
-              "width": 0
+              "width": 21,
+              "height": 21,
+              "pixelArray": "29c5fafcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfac427c8ffffffffffffffffffffffffffffffffffffffc6fefffffffffffffffffffffffffffffffefffffffdffffffffffffffffffffffffffffffe738e4ffffffffffffffffffffffffffffffffffe6260057ffffffffffffffffffffffffffffffffe82800002bf9ffffffffffffffffffffffffffffeb2a00002fecfffffffffffffffffffffffffffff435000023e8fffffffffffffffffffffffffffffe50000018ddffffffffffffffffff55b1ffffffff8e000007caffffffffffffffffffb6000397ffffd508000094ffffffffffffffffffff450000007cfe37000042feffffffffffffffffffffe63100000038000002d0fffffffffffffffffffffffff44b00000000005ffffffffffffffffffffffffffffffb5c00000003dffffffffffffffffffffffffffffffffd54000050fffffffffffffffffffffffffffffffffff73600b9ffffffffffffffffffffffffffffffffffffe53bfefffffffffffffffffffffefffffffffffffffff8fffffffffffffffffffffeccffffffffffffffffffffffffffffffffffffffcb2fcbfefffffffffffffffffffffffffffffffeca2d"
             },
             "source": {
-              "filePath": "fonts\\Oswald-Medium.ttf",
+              "filePath": "fonts\\heydings_icons.ttf",
               "size": 17,
-              "encoding": 127
+              "encoding": 79
             }
           },
           {
@@ -49960,20 +49960,20 @@
           },
           {
             "encoding": 139,
-            "x": 0,
+            "x": 1,
             "y": 0,
-            "width": 0,
-            "height": 0,
-            "dx": 0,
+            "width": 21,
+            "height": 21,
+            "dx": 24,
             "glyphBitmap": {
-              "height": 0,
-              "pixelArray": "",
-              "width": 0
+              "width": 21,
+              "height": 21,
+              "pixelArray": "29c5fafcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfac427c8ffffffffffffffffffffffffffffffffffffffc6fefffffffffefffffffffffffffffffefffffffffdffffffffae3aefffffffffffffffef39aeffffffffffffffae050035f0ffffffffffef340005aefffffffffffd3400000035f0fffffff03500000035fdffffffffffec3000000036f0fff03500000030edffffffffffffffed3000000037e13600000031edffffffffffffffffffed300000000600000031edffffffffffffffffffffffed31000000000032edffffffffffffffffffffffffffde0400000005defffffffffffffffffffffffffff036000000000036f0fffffffffffffffffffffff0350000000300000036f0ffffffffffffffffffef3500000032db3100000036f0ffffffffffffffef3400000031eeffed3100000035effffffffffffd3800000031edffffffed3000000038fdffffffffffa8030030edffffffffffec2f0003a8ffffffffffffffa833ecffffffffffffffec33a8fffffffffefffffffffcfffffffffffffffffffcfffffffffeccffffffffffffffffffffffffffffffffffffffcb2fcbfefffffffffffffffffffffffffffffffeca2d"
             },
             "source": {
-              "filePath": "fonts\\Oswald-Medium.ttf",
+              "filePath": "fonts\\heydings_icons.ttf",
               "size": 17,
-              "encoding": 127
+              "encoding": 88
             }
           },
           {

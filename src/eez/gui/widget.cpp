@@ -231,7 +231,7 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
         g_findWidgetAtX >= x && g_findWidgetAtX < x + w && 
         g_findWidgetAtY >= y && g_findWidgetAtY < y + h;
 
-    if (inside && (widget->type == WIDGET_TYPE_APP_VIEW || getTouchFunction(widgetCursor))) {
+    if (inside && (widget->type == WIDGET_TYPE_APP_VIEW || getWidgetTouchFunction(widgetCursor))) {
         int dx = g_findWidgetAtX - (x + w / 2);
         int dy = g_findWidgetAtY - (y + h / 2);
         int distance = dx * dx + dy * dy;

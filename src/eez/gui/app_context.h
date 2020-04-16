@@ -18,7 +18,7 @@
 
 #pragma once
 
-#define CONF_GUI_PAGE_NAVIGATION_STACK_SIZE 5
+#define CONF_GUI_PAGE_NAVIGATION_STACK_SIZE 10
 #define CONF_MAX_STATE_SIZE (10 * 1024)
 
 namespace eez {

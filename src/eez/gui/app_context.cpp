@@ -25,12 +25,11 @@
 #include <eez/index.h>
 #include <eez/sound.h>
 #include <eez/system.h>
+#include <eez/idle.h>
+#include <eez/util.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/button.h>
-
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/idle.h>
 
 namespace eez {
 namespace gui {
@@ -97,7 +96,7 @@ int AppContext::getPreviousPageId() {
 
 void AppContext::onPageChanged(int previousPageId, int activePageId) {
     eez::mcu::display::turnOn();
-    psu::idle::noteHmiActivity();
+    eez::idle::noteHmiActivity();
 }
 
 void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
@@ -157,7 +156,7 @@ void AppContext::pushPage(int pageId, Page *page) {
     int previousPageId = getActivePageId();
 
     // advance stack pointre
-    if (getActivePageId() != PAGE_ID_NONE && getActivePageId() != PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
+    if (getActivePageId() != PAGE_ID_NONE && getActivePageId() != PAGE_ID_ASYNC_OPERATION_IN_PROGRESS && getActivePageId() != INTERNAL_PAGE_ID_TOAST_MESSAGE) {
         m_pageNavigationStackPointer++;
         assert (m_pageNavigationStackPointer < CONF_GUI_PAGE_NAVIGATION_STACK_SIZE);
     }

@@ -1,4 +1,5 @@
 .vscode
+.history
 build/emscripten
 build/linux
 build/win32

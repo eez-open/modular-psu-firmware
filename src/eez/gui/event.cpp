@@ -20,12 +20,10 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
+#include <eez/idle.h>
+#include <eez/util.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/container.h>
-
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/idle.h>
 
 #define CONF_GUI_LONG_TOUCH_TIMEOUT              1000000L // 1s
 #define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY   300000L // 300ms
@@ -45,10 +43,9 @@ static uint32_t m_lastAutoRepeatEventTime;
 static bool m_longTouchGenerated;
 static bool m_extraLongTouchGenerated;
 
-void processTouchEvent(EventType type);
-void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
-void onInternalPageTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
-void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
+static void processTouchEvent(EventType type);
+static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
+static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 
 void eventHandling() {
 	if (g_shutdownInProgress) {
@@ -58,54 +55,50 @@ void eventHandling() {
     auto eventType = touch::getEventType();
 
     if (eventType != EVENT_TYPE_TOUCH_NONE) {
-        psu::idle::noteHmiActivity();
-    }
+        eez::idle::noteHmiActivity();
 
-    uint32_t tickCount = micros();
+        uint32_t tickCount = micros();
 
-    if (eventType == EVENT_TYPE_TOUCH_DOWN) {
-        m_touchDownTime = tickCount;
-        m_lastAutoRepeatEventTime = tickCount;
-        m_longTouchGenerated = false;
-        m_extraLongTouchGenerated = false;
-        processTouchEvent(EVENT_TYPE_TOUCH_DOWN);
-    } else if (eventType == EVENT_TYPE_TOUCH_MOVE) {
-        processTouchEvent(EVENT_TYPE_TOUCH_MOVE);
-
-        if (!m_longTouchGenerated &&
-            int32_t(tickCount - m_touchDownTime) >= CONF_GUI_LONG_TOUCH_TIMEOUT) {
-            m_longTouchGenerated = true;
-            processTouchEvent(EVENT_TYPE_LONG_TOUCH);
-        }
-
-        if (m_longTouchGenerated && !m_extraLongTouchGenerated &&
-            int32_t(tickCount - m_touchDownTime) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT) {
-            m_extraLongTouchGenerated = true;
-            processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH);
-        }
-
-        if (int32_t(tickCount - m_lastAutoRepeatEventTime) >= (m_lastAutoRepeatEventTime == m_touchDownTime ? CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY : CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY)) {
-            processTouchEvent(EVENT_TYPE_AUTO_REPEAT);
+        if (eventType == EVENT_TYPE_TOUCH_DOWN) {
+            m_touchDownTime = tickCount;
             m_lastAutoRepeatEventTime = tickCount;
-        }
+            m_longTouchGenerated = false;
+            m_extraLongTouchGenerated = false;
+            processTouchEvent(EVENT_TYPE_TOUCH_DOWN);
+        } else if (eventType == EVENT_TYPE_TOUCH_MOVE) {
+            processTouchEvent(EVENT_TYPE_TOUCH_MOVE);
 
-    } else if (eventType == EVENT_TYPE_TOUCH_UP) {
-        processTouchEvent(EVENT_TYPE_TOUCH_UP);
+            if (!m_longTouchGenerated && int32_t(tickCount - m_touchDownTime) >= CONF_GUI_LONG_TOUCH_TIMEOUT) {
+                m_longTouchGenerated = true;
+                processTouchEvent(EVENT_TYPE_LONG_TOUCH);
+            }
+
+            if (m_longTouchGenerated && !m_extraLongTouchGenerated && int32_t(tickCount - m_touchDownTime) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT) {
+                m_extraLongTouchGenerated = true;
+                processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH);
+            }
+
+            if (int32_t(tickCount - m_lastAutoRepeatEventTime) >= (m_lastAutoRepeatEventTime == m_touchDownTime ? CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY : CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY)) {
+                processTouchEvent(EVENT_TYPE_AUTO_REPEAT);
+                m_lastAutoRepeatEventTime = tickCount;
+            }
+        } else if (eventType == EVENT_TYPE_TOUCH_UP) {
+            processTouchEvent(EVENT_TYPE_TOUCH_UP);
+        }
     }
 }
 
-void processTouchEvent(EventType type) {
+static void processTouchEvent(EventType type) {
     int x = touch::getX();
     int y = touch::getY();
 
     if (type == EVENT_TYPE_TOUCH_DOWN) {
         m_foundWidgetAtDown = findWidget(&getRootAppContext(), x, y);
-        m_onTouchFunction = getTouchFunction(m_foundWidgetAtDown);
+        m_onTouchFunction = getWidgetTouchFunction(m_foundWidgetAtDown);
         if (!m_onTouchFunction) {
             m_onTouchFunction = onPageTouch;
         }
-    } 
-    else if (type == EVENT_TYPE_TOUCH_UP) {
+    } else if (type == EVENT_TYPE_TOUCH_UP) {
         m_activeWidget = 0;
     }
 
@@ -119,33 +112,21 @@ void processTouchEvent(EventType type) {
     }
 }
 
-OnTouchFunctionType getTouchFunction(const WidgetCursor &widgetCursor) {
-    if (widgetCursor.appContext && widgetCursor.appContext->isActivePageInternal()) {
-        return onInternalPageTouch;
-    }
-
+OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {
     if (widgetCursor) {
-		if (!widgetCursor.widget->action || widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
-            if (*g_onTouchWidgetFunctions[widgetCursor.widget->type]) {
-                return *g_onTouchWidgetFunctions[widgetCursor.widget->type];
-            }
+        if (*g_onTouchWidgetFunctions[widgetCursor.widget->type]) {
+            return *g_onTouchWidgetFunctions[widgetCursor.widget->type];
         }
 
-		if (widgetCursor.widget->action) {
-			if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
-				return onWidgetDefaultTouch;
-			}
-		}
+        if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
+            return onWidgetDefaultTouch;
+        }
     }
 
     return nullptr;
 }
 
-int getAction(const WidgetCursor &widgetCursor) {
-    return widgetCursor.widget->action;
-}
-
-void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
+static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
 	if (foundWidget.appContext) {
 		foundWidget.appContext->onPageTouch(foundWidget, touchEvent);
 	} else {
@@ -153,27 +134,7 @@ void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
 	}
 }
 
-void onInternalPageTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
-    if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-        if (m_foundWidgetAtDown) {
-            m_activeWidget = m_foundWidgetAtDown;
-        }
-    } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
-        if (m_foundWidgetAtDown) {
-            m_activeWidget = 0;
-            int action = getAction(m_foundWidgetAtDown);
-            executeAction(action);
-        } else {
-            InternalPage *page = (InternalPage *)widgetCursor.appContext->getActivePage();
-            if (!pointInsideRect(touchEvent.x, touchEvent.y, page->x, page->y, page->width,
-                page->height)) {
-                widgetCursor.appContext->popPage();
-            }
-        }
-    }
-}
-
-void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (!widgetCursor.widget) {
         return;
     }
@@ -182,7 +143,7 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
         m_touchActionExecuted = false;
         m_touchActionExecutedAtDown = false;
 
-        int action = getAction(widgetCursor);
+        int action = widgetCursor.widget->action;
         if (action == ACTION_ID_DRAG_OVERLAY) {
             dragOverlay(touchEvent);
             m_activeWidget = widgetCursor;    
@@ -196,12 +157,12 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
             m_activeWidget = widgetCursor;
         }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
-        int action = getAction(widgetCursor);
+        int action = widgetCursor.widget->action;
         if (action == ACTION_ID_DRAG_OVERLAY) {
             dragOverlay(touchEvent);
         }
     } else if (touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
-        int action = getAction(widgetCursor);
+        int action = widgetCursor.widget->action;
         if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor) && widgetCursor.appContext->isAutoRepeatAction(action)) {
             m_touchActionExecuted = true;
             executeAction(action);
@@ -216,7 +177,7 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
         if (!m_touchActionExecutedAtDown) {
             m_activeWidget = 0;
             if (!m_touchActionExecuted) {
-                int action = getAction(widgetCursor);
+                int action = widgetCursor.widget->action;
                 if (action == ACTION_ID_DRAG_OVERLAY) {
                     dragOverlay(touchEvent);
                 } else {
@@ -226,6 +187,8 @@ void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
         }
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 WidgetCursor &getFoundWidgetAtDown() {
     return m_foundWidgetAtDown;

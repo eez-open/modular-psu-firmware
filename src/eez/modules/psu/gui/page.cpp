@@ -45,13 +45,7 @@ namespace gui {
 static ToastMessagePage g_toastMessagePage;
 
 ToastMessagePage *ToastMessagePage::findFreePage() {
-    ToastMessagePage *page = &g_toastMessagePage;
-
-    if (page->appContext && page->appContext->getActivePage() == page) {
-        page->appContext->popPage();
-    }
-
-    return page;
+    return &g_toastMessagePage;
 }
 
 void ToastMessagePage::pageFree() {

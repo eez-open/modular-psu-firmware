@@ -21,6 +21,7 @@
 #include <eez/system.h>
 #include <eez/sound.h>
 #include <eez/mp.h>
+#include <eez/idle.h>
 
 #include <eez/scpi/scpi.h>
 
@@ -298,6 +299,8 @@ void oneIter() {
         sd_card::tick();
 
         eez::psu::dlog_record::fileWrite();
+
+        eez::idle::tick(tickCount);
 
 #ifdef DEBUG
         psu::debug::tick(tickCount);
