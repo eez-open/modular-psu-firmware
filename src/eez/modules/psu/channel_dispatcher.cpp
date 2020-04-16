@@ -370,9 +370,9 @@ void setTrackingChannels(uint16_t trackingEnabled) {
                     temperature::sensors[temp_sensor::CH1 + i].prot_conf.level = t_level;
                     temperature::sensors[temp_sensor::CH1 + i].prot_conf.delay = t_delay;
 
-                    trackingChannel.u.rampDuration = RAMP_DURATION_DEF_VALUE;
+                    trackingChannel.u.rampDuration = RAMP_DURATION_DEF_VALUE_U;
 
-                    trackingChannel.i.rampDuration = RAMP_DURATION_DEF_VALUE;
+                    trackingChannel.i.rampDuration = RAMP_DURATION_DEF_VALUE_I;
 
                     trackingChannel.resetHistory();
                 }

@@ -91,7 +91,8 @@ static const float OUTPUT_DELAY_DURATION_PREC = 0.001f;
 
 static const float RAMP_DURATION_MIN_VALUE = 0.002f;
 static const float RAMP_DURATION_MAX_VALUE = 10.0f;
-static const float RAMP_DURATION_DEF_VALUE = 0.01f;
+static const float RAMP_DURATION_DEF_VALUE_U = 0.01f;
+static const float RAMP_DURATION_DEF_VALUE_I = 0;
 static const float RAMP_DURATION_PREC = 0.001f;
 
 /// PSU channel.

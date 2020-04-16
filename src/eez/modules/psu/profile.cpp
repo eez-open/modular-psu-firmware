@@ -19,6 +19,7 @@
 #include <stdio.h>
 
 #include <eez/file_type.h>
+#include <eez/idle.h>
 
 #include <eez/scpi/scpi.h>
 
@@ -26,7 +27,6 @@
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/event_queue.h>
-#include <eez/modules/psu/idle.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/profile.h>
@@ -462,15 +462,8 @@ static void resetProfileToDefaults(Parameters &profile) {
     memset(&profile, 0, sizeof(Parameters));
 
     for (int i = 0; i < CH_MAX; i++) {
-        profile.channels[i].u_rampDuration = RAMP_DURATION_DEF_VALUE;
-        profile.channels[i].i_rampDuration = RAMP_DURATION_DEF_VALUE;
-
-        profile.channels[i].outputDelayDuration = 0;
-    }
-
-    for (int i = 0; i < CH_MAX; i++) {
-        profile.channels[i].u_rampDuration = RAMP_DURATION_DEF_VALUE;
-        profile.channels[i].i_rampDuration = RAMP_DURATION_DEF_VALUE;
+        profile.channels[i].u_rampDuration = RAMP_DURATION_DEF_VALUE_U;
+        profile.channels[i].i_rampDuration = RAMP_DURATION_DEF_VALUE_I;
 
         profile.channels[i].outputDelayDuration = 0;
     }

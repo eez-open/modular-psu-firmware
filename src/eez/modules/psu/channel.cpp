@@ -61,7 +61,6 @@ void Channel::Value::init(float set_, float step_, float limit_) {
     step = step_;
     limit = limit_;
     resetMonValues();
-    rampDuration = RAMP_DURATION_DEF_VALUE;
 }
 
 void Channel::Value::resetMonValues() {
@@ -618,6 +617,9 @@ void Channel::reset() {
     // [SOUR[n]]:VOLT:STEP -> set all to default
     u.init(params.U_MIN, params.U_DEF_STEP, u.max);
     i.init(params.I_MIN, params.I_DEF_STEP, i.max);
+
+    u.rampDuration = RAMP_DURATION_DEF_VALUE_U;
+    i.rampDuration = RAMP_DURATION_DEF_VALUE_I;
 
     maxCurrentLimitCause = MAX_CURRENT_LIMIT_CAUSE_NONE;
     p_limit = roundChannelValue(UNIT_WATT, params.PTOT);

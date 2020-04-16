@@ -1146,7 +1146,7 @@ scpi_result_t scpi_cmd_sourceCurrentRampDuration(scpi_t *context) {
         } else if (param.content.tag == SCPI_NUM_MAX) {
             duration = RAMP_DURATION_MAX_VALUE;
         } else if (param.content.tag == SCPI_NUM_DEF) {
-            duration = RAMP_DURATION_DEF_VALUE;
+            duration = RAMP_DURATION_DEF_VALUE_I;
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
@@ -1171,7 +1171,7 @@ scpi_result_t scpi_cmd_sourceCurrentRampDurationQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_SECOND, channel->i.rampDuration, RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE);
+    return get_source_value(context, *channel, UNIT_SECOND, channel->i.rampDuration, RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE_I);
 }
 
 scpi_result_t scpi_cmd_sourceVoltageRampDuration(scpi_t *context) {
@@ -1191,7 +1191,7 @@ scpi_result_t scpi_cmd_sourceVoltageRampDuration(scpi_t *context) {
         } else if (param.content.tag == SCPI_NUM_MAX) {
             duration = RAMP_DURATION_MAX_VALUE;
         } else if (param.content.tag == SCPI_NUM_DEF) {
-            duration = RAMP_DURATION_DEF_VALUE;
+            duration = RAMP_DURATION_DEF_VALUE_U;
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
@@ -1216,7 +1216,7 @@ scpi_result_t scpi_cmd_sourceVoltageRampDurationQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_SECOND, channel->u.rampDuration, RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE);
+    return get_source_value(context, *channel, UNIT_SECOND, channel->u.rampDuration, RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE_U);
 }
 
 } // namespace scpi
