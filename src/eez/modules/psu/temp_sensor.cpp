@@ -94,25 +94,23 @@ float TempSensor::doRead() {
     }
 #endif
 
-    if (isPowerUp()) {
-        if (type >= CH1 && type <= CH6) {
-            int channelIndex = type - CH1;
-            int slotIndex = Channel::get(channelIndex).slotIndex;
-            auto &slot = g_slots[slotIndex];
+	if (type >= CH1 && type <= CH6) {
+		int channelIndex = type - CH1;
+		int slotIndex = Channel::get(channelIndex).slotIndex;
+		auto &slot = g_slots[slotIndex];
 
-            if ((slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 && slot.moduleRevision >= MODULE_REVISION_DCP405_R1B1) || slot.moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
-                return drivers::tc77::readTemperature(slotIndex);
-            } 
-            
-            if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 || slot.moduleInfo->moduleType == MODULE_TYPE_DCP505) {
-                return drivers::tmp1075::readTemperature(slotIndex);
-            }
+		if ((slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 && slot.moduleRevision >= MODULE_REVISION_DCP405_R1B1) || slot.moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
+			return drivers::tc77::readTemperature(slotIndex);
+		}
 
-            if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220) {
-                return dcm220::readTemperature(channelIndex);
-            }
-        }
-    }
+		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 || slot.moduleInfo->moduleType == MODULE_TYPE_DCP505) {
+			return drivers::tmp1075::readTemperature(slotIndex);
+		}
+
+		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220) {
+			return dcm220::readTemperature(channelIndex);
+		}
+	}
 #endif
 
     return NAN;
