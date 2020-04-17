@@ -1713,6 +1713,34 @@ void data_channel_display_value1(DataOperationEnum operation, Cursor cursor, Val
     }
 }
 
+void data_channel_display_value1_set(DataOperationEnum operation, Cursor cursor, Value &value) {
+    int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+        data_channel_u_set(operation, cursor, value);
+    } else if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+        data_channel_i_set(operation, cursor, value);
+    } else if (channel.flags.displayValue1 == DISPLAY_VALUE_POWER) {
+        if (operation == DATA_OPERATION_GET) {
+            value = MakeValue(channel_dispatcher::getUSet(channel) * channel_dispatcher::getISet(channel), UNIT_WATT);
+        }
+    }
+}
+
+void data_channel_display_value1_limit(DataOperationEnum operation, Cursor cursor, Value &value) {
+    int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+        data_channel_u_limit(operation, cursor, value);
+    } else if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+        data_channel_i_limit(operation, cursor, value);
+    } else if (channel.flags.displayValue1 == DISPLAY_VALUE_POWER) {
+        if (operation == DATA_OPERATION_GET) {
+            value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
+        }
+    }
+}
+
 void data_channel_display_value2(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
@@ -1722,6 +1750,34 @@ void data_channel_display_value2(DataOperationEnum operation, Cursor cursor, Val
         data_channel_i_mon(operation, cursor, value);
     } else if (channel.flags.displayValue2 == DISPLAY_VALUE_POWER) {
         data_channel_p_mon(operation, cursor, value);
+    }
+}
+
+void data_channel_display_value2_set(DataOperationEnum operation, Cursor cursor, Value &value) {
+    int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+        data_channel_u_set(operation, cursor, value);
+    } else if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+        data_channel_i_set(operation, cursor, value);
+    } else if (channel.flags.displayValue2 == DISPLAY_VALUE_POWER) {
+        if (operation == DATA_OPERATION_GET) {
+            value = MakeValue(channel_dispatcher::getUSet(channel) * channel_dispatcher::getISet(channel), UNIT_WATT);
+        }
+    }
+}
+
+void data_channel_display_value2_limit(DataOperationEnum operation, Cursor cursor, Value &value) {
+    int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+        data_channel_u_limit(operation, cursor, value);
+    } else if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+        data_channel_i_limit(operation, cursor, value);
+    } else if (channel.flags.displayValue2 == DISPLAY_VALUE_POWER) {
+        if (operation == DATA_OPERATION_GET) {
+            value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
+        }
     }
 }
 

@@ -2093,6 +2093,25 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
                 }
             }
             return STYLE_ID_YT_GRAPH_P_DEFAULT;
+        } else if (styleId == STYLE_ID_BAR_GRAPH_U_DEFAULT || styleId == STYLE_ID_BAR_GRAPH_I_DEFAULT) {
+            using namespace psu;
+            using namespace psu::gui;
+            int iChannel = widgetCursor.cursor >= 0 ? widgetCursor.cursor : (g_channel ? g_channel->channelIndex : 0);
+            Channel &channel = Channel::get(iChannel);
+            if (widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE1) {
+                if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+                    return STYLE_ID_BAR_GRAPH_U_DEFAULT;
+                } else if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+                    return STYLE_ID_BAR_GRAPH_I_DEFAULT;
+                }
+            } else {
+                if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+                    return STYLE_ID_BAR_GRAPH_U_DEFAULT;
+                } else if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+                    return STYLE_ID_BAR_GRAPH_I_DEFAULT;
+                }
+            }
+            return STYLE_ID_BAR_GRAPH_P_DEFAULT;
         }
     } else if (!g_psuAppContext.isWidgetActionEnabled(widgetCursor)) {
         if (styleId == STYLE_ID_ENCODER_CURSOR_14_ENABLED) {

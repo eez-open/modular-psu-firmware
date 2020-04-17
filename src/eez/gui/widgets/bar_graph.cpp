@@ -93,7 +93,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 
     const Widget *widget = widgetCursor.widget;
     const BarGraphWidget *barGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const BarGraphWidget *);
-    const Style* style = getStyle(widget->style);
+    const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
     widgetCursor.currentState->size = sizeof(BarGraphWidgetState);
 

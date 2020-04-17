@@ -78,6 +78,14 @@
       "defaultMaxValue": 40
     },
     {
+      "name": "channel_display_value1_set",
+      "description": "scpi: volt? and volt",
+      "type": "float",
+      "defaultValue": "30.00V",
+      "defaultMinValue": 8,
+      "defaultMaxValue": 40
+    },
+    {
       "name": "channel_u_mon",
       "type": "float",
       "defaultValue": "25.83V",
@@ -93,6 +101,13 @@
     },
     {
       "name": "channel_u_limit",
+      "type": "float",
+      "defaultValue": "35.00V",
+      "defaultMinValue": 8,
+      "defaultMaxValue": 40
+    },
+    {
+      "name": "channel_display_value1_limit",
       "type": "float",
       "defaultValue": "35.00V",
       "defaultMinValue": 8,
@@ -115,6 +130,14 @@
       "defaultMaxValue": 5
     },
     {
+      "name": "channel_display_value2_set",
+      "description": "scpi: curr? and curr",
+      "type": "float",
+      "defaultValue": "1.00A",
+      "defaultMinValue": 0,
+      "defaultMaxValue": 5
+    },
+    {
       "name": "channel_i_mon",
       "type": "float",
       "defaultValue": "999.00mA",
@@ -130,6 +153,13 @@
     },
     {
       "name": "channel_i_limit",
+      "type": "float",
+      "defaultValue": "3.00A",
+      "defaultMinValue": 0,
+      "defaultMaxValue": 5
+    },
+    {
+      "name": "channel_display_value2_limit",
       "type": "float",
       "defaultValue": "3.00A",
       "defaultMinValue": 0,
@@ -3787,7 +3817,7 @@
       },
       {
         "name": "main",
-        "description": "When three channels are displayed, each of then hast be 158px wide, separated by 2px rectangle. That occupy 478px of the screen. Therefore the first one has to start on 1px left.",
+        "description": "When three channels are displayed, each of then has to be 158px wide, separated by 2px rectangle. That occupy 478px of the screen. Therefore the first one has to start on 1px left.",
         "style": "default",
         "widgets": [
           {
@@ -16528,7 +16558,7 @@
                 "top": 0,
                 "width": 166,
                 "height": 32,
-                "text": "YT view value #1:"
+                "text": "Display value #1:"
               },
               {
                 "type": "DisplayData",
@@ -16552,7 +16582,7 @@
                 "top": 36,
                 "width": 166,
                 "height": 32,
-                "text": "YT view value #2:"
+                "text": "Display value #2:"
               },
               {
                 "type": "DisplayData",
@@ -27708,7 +27738,7 @@
                 "style": {
                   "inheritFrom": "bar_graph_U_default"
                 },
-                "data": "channel_u_mon",
+                "data": "channel_display_value1",
                 "action": "",
                 "left": 0,
                 "top": 0,
@@ -27718,12 +27748,11 @@
                 "textStyle": {
                   "inheritFrom": "bar_graph_text"
                 },
-                "line1Data": "channel_u_set",
+                "line1Data": "channel_display_value1_set",
                 "line1Style": {
-                  "inheritFrom": "bar_graph_set_line",
-                  "font": "Oswald14"
+                  "inheritFrom": "bar_graph_set_line"
                 },
-                "line2Data": "channel_u_limit",
+                "line2Data": "channel_display_value1_limit",
                 "line2Style": {
                   "inheritFrom": "bar_graph_limit_line"
                 }
@@ -27733,7 +27762,7 @@
                 "style": {
                   "inheritFrom": "bar_graph_I_default"
                 },
-                "data": "channel_i_mon",
+                "data": "channel_display_value2",
                 "action": "",
                 "left": 80,
                 "top": 0,
@@ -27743,12 +27772,11 @@
                 "textStyle": {
                   "inheritFrom": "bar_graph_text"
                 },
-                "line1Data": "channel_i_set",
+                "line1Data": "channel_display_value2_set",
                 "line1Style": {
-                  "inheritFrom": "bar_graph_set_line",
-                  "font": "Oswald14"
+                  "inheritFrom": "bar_graph_set_line"
                 },
-                "line2Data": "channel_i_limit",
+                "line2Data": "channel_display_value2_limit",
                 "line2Style": {
                   "inheritFrom": "bar_graph_limit_line"
                 }
@@ -28714,7 +28742,7 @@
                 "style": {
                   "inheritFrom": "bar_graph_U_default"
                 },
-                "data": "channel_u_mon",
+                "data": "channel_display_value1",
                 "action": "",
                 "left": 0,
                 "top": 0,
@@ -28724,12 +28752,11 @@
                 "textStyle": {
                   "inheritFrom": "bar_graph_text"
                 },
-                "line1Data": "channel_u_set",
+                "line1Data": "channel_display_value1_set",
                 "line1Style": {
-                  "inheritFrom": "bar_graph_set_line",
-                  "font": "Oswald14"
+                  "inheritFrom": "bar_graph_set_line"
                 },
-                "line2Data": "channel_u_limit",
+                "line2Data": "channel_display_value1_limit",
                 "line2Style": {
                   "inheritFrom": "bar_graph_limit_line"
                 }
@@ -28739,7 +28766,7 @@
                 "style": {
                   "inheritFrom": "bar_graph_I_default"
                 },
-                "data": "channel_i_mon",
+                "data": "channel_display_value2",
                 "action": "",
                 "left": 0,
                 "top": 40,
@@ -28749,12 +28776,11 @@
                 "textStyle": {
                   "inheritFrom": "bar_graph_text"
                 },
-                "line1Data": "channel_i_set",
+                "line1Data": "channel_display_value2_set",
                 "line1Style": {
-                  "inheritFrom": "bar_graph_set_line",
-                  "font": "Oswald14"
+                  "inheritFrom": "bar_graph_set_line"
                 },
-                "line2Data": "channel_i_limit",
+                "line2Data": "channel_display_value2_limit",
                 "line2Style": {
                   "inheritFrom": "bar_graph_limit_line"
                 }
@@ -29212,7 +29238,7 @@
                   "activeColor": "bar_graph_background",
                   "activeBackgroundColor": "bar_graph_voltage"
                 },
-                "data": "channel_u_mon",
+                "data": "channel_display_value1",
                 "left": 0,
                 "top": 0,
                 "width": 106,
@@ -29221,12 +29247,11 @@
                 "textStyle": {
                   "inheritFrom": "bar_graph_text"
                 },
-                "line1Data": "channel_u_set",
+                "line1Data": "channel_display_value1_set",
                 "line1Style": {
-                  "inheritFrom": "bar_graph_set_line",
-                  "font": "Oswald14"
+                  "inheritFrom": "bar_graph_set_line"
                 },
-                "line2Data": "channel_u_limit",
+                "line2Data": "channel_display_value1_limit",
                 "line2Style": {
                   "inheritFrom": "bar_graph_limit_line"
                 }
@@ -29241,7 +29266,7 @@
                   "activeColor": "bar_graph_background",
                   "activeBackgroundColor": "bar_graph_current"
                 },
-                "data": "channel_i_mon",
+                "data": "channel_display_value2",
                 "left": 0,
                 "top": 40,
                 "width": 106,
@@ -29250,12 +29275,11 @@
                 "textStyle": {
                   "inheritFrom": "bar_graph_text"
                 },
-                "line1Data": "channel_i_set",
+                "line1Data": "channel_display_value2_set",
                 "line1Style": {
-                  "inheritFrom": "bar_graph_set_line",
-                  "font": "Oswald14"
+                  "inheritFrom": "bar_graph_set_line"
                 },
-                "line2Data": "channel_i_limit",
+                "line2Data": "channel_display_value2_limit",
                 "line2Style": {
                   "inheritFrom": "bar_graph_limit_line"
                 }
@@ -31273,7 +31297,7 @@
                       "activeColor": "bar_graph_background",
                       "activeBackgroundColor": "bar_graph_voltage"
                     },
-                    "data": "channel_u_mon",
+                    "data": "channel_display_value1",
                     "action": "",
                     "left": 0,
                     "top": 0,
@@ -31283,12 +31307,11 @@
                     "textStyle": {
                       "inheritFrom": "bar_graph_text"
                     },
-                    "line1Data": "channel_u_set",
+                    "line1Data": "channel_display_value1_set",
                     "line1Style": {
-                      "inheritFrom": "bar_graph_set_line",
-                      "font": "Oswald14"
+                      "inheritFrom": "bar_graph_set_line"
                     },
-                    "line2Data": "channel_u_limit",
+                    "line2Data": "channel_display_value1_limit",
                     "line2Style": {
                       "inheritFrom": "bar_graph_limit_line"
                     }
@@ -31303,7 +31326,7 @@
                       "activeColor": "bar_graph_background",
                       "activeBackgroundColor": "bar_graph_current"
                     },
-                    "data": "channel_i_mon",
+                    "data": "channel_display_value2",
                     "action": "",
                     "left": 0,
                     "top": 68,
@@ -31313,12 +31336,11 @@
                     "textStyle": {
                       "inheritFrom": "bar_graph_text"
                     },
-                    "line1Data": "channel_i_set",
+                    "line1Data": "channel_display_value2_set",
                     "line1Style": {
-                      "inheritFrom": "bar_graph_set_line",
-                      "font": "Oswald14"
+                      "inheritFrom": "bar_graph_set_line"
                     },
-                    "line2Data": "channel_i_limit",
+                    "line2Data": "channel_display_value2_limit",
                     "line2Style": {
                       "inheritFrom": "bar_graph_limit_line"
                     }
@@ -34478,7 +34500,7 @@
                       "activeColor": "bar_graph_background",
                       "activeBackgroundColor": "bar_graph_voltage"
                     },
-                    "data": "channel_u_mon",
+                    "data": "channel_display_value1",
                     "action": "",
                     "left": 0,
                     "top": 0,
@@ -34488,12 +34510,11 @@
                     "textStyle": {
                       "inheritFrom": "bar_graph_text"
                     },
-                    "line1Data": "channel_u_set",
+                    "line1Data": "channel_display_value1_set",
                     "line1Style": {
-                      "inheritFrom": "bar_graph_set_line",
-                      "font": "Oswald14"
+                      "inheritFrom": "bar_graph_set_line"
                     },
-                    "line2Data": "channel_u_limit",
+                    "line2Data": "channel_display_value1_limit",
                     "line2Style": {
                       "inheritFrom": "bar_graph_limit_line"
                     }
@@ -34508,7 +34529,7 @@
                       "activeColor": "bar_graph_background",
                       "activeBackgroundColor": "bar_graph_current"
                     },
-                    "data": "channel_i_mon",
+                    "data": "channel_display_value2",
                     "action": "",
                     "left": 0,
                     "top": 68,
@@ -34518,12 +34539,11 @@
                     "textStyle": {
                       "inheritFrom": "bar_graph_text"
                     },
-                    "line1Data": "channel_i_set",
+                    "line1Data": "channel_display_value2_set",
                     "line1Style": {
-                      "inheritFrom": "bar_graph_set_line",
-                      "font": "Oswald14"
+                      "inheritFrom": "bar_graph_set_line"
                     },
-                    "line2Data": "channel_i_limit",
+                    "line2Data": "channel_display_value2_limit",
                     "line2Style": {
                       "inheritFrom": "bar_graph_limit_line"
                     }
@@ -44093,6 +44113,18 @@
         "padding": 0
       },
       {
+        "name": "bar_graph_P_default",
+        "description": "",
+        "inheritFrom": "default",
+        "alwaysBuild": true,
+        "font": "Oswald14",
+        "color": "bar_graph_power",
+        "backgroundColor": "bar_graph_background",
+        "activeColor": "bar_graph_background",
+        "activeBackgroundColor": "bar_graph_power",
+        "padding": 0
+      },
+      {
         "name": "bar_graph_limit_line",
         "inheritFrom": "default",
         "color": "status_warning",
@@ -44106,12 +44138,12 @@
       {
         "name": "bar_graph_set_line",
         "inheritFrom": "default",
+        "font": "Oswald14",
         "color": "bar_graph_set_line",
         "backgroundColor": "bar_graph_set_line",
         "activeColor": "bar_graph_set_line",
         "activeBackgroundColor": "bar_graph_set_line",
-        "borderSize": 1,
-        "padding": 0
+        "borderSize": 1
       },
       {
         "name": "bar_graph_text",
@@ -72159,7 +72191,8 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 3,
         "toolbarButtonColor": "#727b84",
-        "requiresConfirmation": false
+        "requiresConfirmation": false,
+        "selected": false
       },
       {
         "id": "88db9b28-1d1c-4096-938c-8142151201cc",
@@ -72211,7 +72244,8 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 12,
         "toolbarButtonColor": "#7BC3D4",
-        "requiresConfirmation": false
+        "requiresConfirmation": false,
+        "selected": false
       },
       {
         "id": "fb1dafad-63ed-403b-a10e-4a09c30c3e85",
@@ -72224,7 +72258,8 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 8,
         "toolbarButtonColor": "#C1D751",
-        "requiresConfirmation": false
+        "requiresConfirmation": false,
+        "selected": true
       },
       {
         "id": "a4e4d6f7-c8e5-4072-c32a-0fe68abbcbf3",
@@ -72237,7 +72272,8 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 9,
         "toolbarButtonColor": "#C1D751",
-        "requiresConfirmation": false
+        "requiresConfirmation": false,
+        "selected": false
       },
       {
         "id": "acc0e50c-fa06-4b3c-85c7-830e5bb9a0c7",
@@ -72289,7 +72325,8 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 14,
         "toolbarButtonColor": "#727b84",
-        "requiresConfirmation": false
+        "requiresConfirmation": false,
+        "selected": false
       },
       {
         "id": "755fe7e0-ca38-4391-d50c-b9cf141ed0b1",
@@ -72302,7 +72339,8 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 6,
         "toolbarButtonColor": "#7BC3D4",
-        "requiresConfirmation": false
+        "requiresConfirmation": false,
+        "selected": false
       }
     ]
   },
