@@ -52,6 +52,8 @@ namespace dcm220 {
 
 #define BUFFER_SIZE 20
 
+static const float PTOT = 155.0f;
+
 #if defined(EEZ_PLATFORM_STM32)
 
 #define REG0_CC1_MASK     (1 << 1)
@@ -66,8 +68,6 @@ namespace dcm220 {
 
 static GPIO_TypeDef *SPI_IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
 static const uint16_t SPI_IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
-
-static const float PTOT = 155.0f;
 
 bool masterSynchro(int slotIndex, uint8_t &firmwareMajorVersion, uint8_t &firmwareMinorVersion, uint32_t &idw0, uint32_t &idw1, uint32_t &idw2) {
 	uint32_t start = millis();
@@ -199,7 +199,7 @@ struct Channel : ChannelInterface {
 
 		params.I_MIN = 0.0f;
 		params.I_DEF = 0.0f;
-		params.I_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 5.0f : 4.0f;
+		params.I_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.9f : 4.0f;
 
 		params.I_MIN_STEP = 0.01f;
 		params.I_DEF_STEP = 0.01f;
@@ -208,7 +208,7 @@ struct Channel : ChannelInterface {
 		params.I_CAL_VAL_MIN = 0.5f;
 		params.I_CAL_VAL_MID = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 2.5f : 2.0f;
 		params.I_CAL_VAL_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.5f : 3.5f;
-		params.U_CURR_CAL = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 25.0f : 20.0f;
+		params.U_CURR_CAL = params.U_MAX;
 
 		params.OVP_DEFAULT_STATE = false;
 		params.OVP_MIN_DELAY = 0.0f;
