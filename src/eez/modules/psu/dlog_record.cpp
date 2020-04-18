@@ -55,7 +55,8 @@ enum Event {
     EVENT_INITIATE_TRACE,
     EVENT_START,
     EVENT_TRIGGER,
-    EVENT_TOGGLE,
+    EVENT_TOGGLE_START,
+    EVENT_TOGGLE_STOP,
     EVENT_FINISH,
     EVENT_ABORT,
     EVENT_ABORT_AFTER_ERROR,
@@ -689,23 +690,29 @@ void stateTransition(int event, int* perr) {
             err = doInitiate(event == EVENT_INITIATE_TRACE);
         } else if (event == EVENT_START) {
             err = doStartImmediately();
-        } else if (event == EVENT_TOGGLE) {
+        } else if (event == EVENT_TOGGLE_START) {
             err = doInitiate(false);
+        } else if (event == EVENT_TOGGLE_STOP) {
+            err = SCPI_RES_OK;
         } else if (event == EVENT_ABORT || event == EVENT_RESET) {
             resetParameters();
             err = SCPI_RES_OK;
         }
     } else if (g_state == STATE_INITIATED) {
-        if (event == EVENT_START || event == EVENT_TRIGGER || event == EVENT_TOGGLE) {
+        if (event == EVENT_START || event == EVENT_TRIGGER || event == EVENT_TOGGLE_START) {
             err = doStartImmediately();
+        } else if (event == EVENT_TOGGLE_START) {
+            err = doInitiate(false);
         } else if (event == EVENT_ABORT || event == EVENT_RESET) {
             resetParameters();
             setState(STATE_IDLE);
             err = SCPI_RES_OK;
         }
     } else if (g_state == STATE_EXECUTING) {
-        if (event == EVENT_TOGGLE || event == EVENT_FINISH || event == EVENT_ABORT || event == EVENT_RESET) {
+        if (event == EVENT_TOGGLE_STOP || event == EVENT_FINISH || event == EVENT_ABORT || event == EVENT_RESET) {
             doFinish(false);
+            err = SCPI_RES_OK;
+        } else if (event == EVENT_TOGGLE_START) {
             err = SCPI_RES_OK;
         } else if (event == EVENT_ABORT_AFTER_ERROR) {
             doFinish(true);
@@ -752,8 +759,12 @@ void triggerGenerated() {
     stateTransition(EVENT_TRIGGER);
 }
 
-void toggle() {
-    stateTransition(EVENT_TOGGLE);
+void toggleStart() {
+    stateTransition(EVENT_TOGGLE_START);
+}
+
+void toggleStop() {
+    stateTransition(EVENT_TOGGLE_STOP);
 }
 
 void abort() {

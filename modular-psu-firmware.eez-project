@@ -35818,7 +35818,7 @@
                             "top": 0,
                             "width": 66,
                             "height": 66,
-                            "text": "\\u00b5"
+                            "text": "\\u00a1"
                           },
                           {
                             "type": "Text",
@@ -35832,7 +35832,7 @@
                             "top": 0,
                             "width": 66,
                             "height": 66,
-                            "text": "\\u00a1"
+                            "text": "\\u00b5"
                           }
                         ]
                       },
@@ -72191,8 +72191,7 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 3,
         "toolbarButtonColor": "#727b84",
-        "requiresConfirmation": false,
-        "selected": false
+        "requiresConfirmation": false
       },
       {
         "id": "88db9b28-1d1c-4096-938c-8142151201cc",
@@ -72244,8 +72243,7 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 12,
         "toolbarButtonColor": "#7BC3D4",
-        "requiresConfirmation": false,
-        "selected": false
+        "requiresConfirmation": false
       },
       {
         "id": "fb1dafad-63ed-403b-a10e-4a09c30c3e85",
@@ -72258,8 +72256,7 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 8,
         "toolbarButtonColor": "#C1D751",
-        "requiresConfirmation": false,
-        "selected": true
+        "requiresConfirmation": false
       },
       {
         "id": "a4e4d6f7-c8e5-4072-c32a-0fe68abbcbf3",
@@ -72272,8 +72269,7 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 9,
         "toolbarButtonColor": "#C1D751",
-        "requiresConfirmation": false,
-        "selected": false
+        "requiresConfirmation": false
       },
       {
         "id": "acc0e50c-fa06-4b3c-85c7-830e5bb9a0c7",
@@ -72325,8 +72321,7 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 14,
         "toolbarButtonColor": "#727b84",
-        "requiresConfirmation": false,
-        "selected": false
+        "requiresConfirmation": false
       },
       {
         "id": "755fe7e0-ca38-4391-d50c-b9cf141ed0b1",
@@ -72339,8 +72334,7 @@
         "showInToolbar": true,
         "toolbarButtonPosition": 6,
         "toolbarButtonColor": "#7BC3D4",
-        "requiresConfirmation": false,
-        "selected": false
+        "requiresConfirmation": false
       }
     ]
   },

@@ -815,7 +815,7 @@ float Channel::getValuePrecision(Unit unit, float value) const {
 }
 
 float Channel::getVoltageResolution() const {
-    float precision = params.U_RESOLUTION; // 5 mV;
+    float precision = params.U_RESOLUTION;
 
     if (calibration::isEnabled()) {
         precision /= 10;

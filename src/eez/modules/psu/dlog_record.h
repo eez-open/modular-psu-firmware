@@ -62,7 +62,8 @@ int initiate();
 int initiateTrace();
 int startImmediately();
 void triggerGenerated();
-void toggle();
+void toggleStart();
+void toggleStop();
 void abort();
 void reset();
 

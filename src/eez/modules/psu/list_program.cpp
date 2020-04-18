@@ -185,6 +185,7 @@ int checkLimits(int iChannel) {
             if (diff > 5E-6f) {
                 return SCPI_ERROR_CANNOT_SET_LIST_VALUE;
             }
+            voltage = roundedValue;
         }
 
         float current = g_channelsLists[iChannel].currentList[j % currentListLength];
@@ -195,6 +196,7 @@ int checkLimits(int iChannel) {
             if (diff > 5E-6f) {
                 return SCPI_ERROR_CANNOT_SET_LIST_VALUE;
             }
+            current = roundedValue;
         }
 
         if (voltage > channel_dispatcher::getULimit(channel)) {

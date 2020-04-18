@@ -1160,7 +1160,7 @@ void action_dlog_edit_file_name() {
 }
 
 void action_dlog_toggle() {
-    dlog_record::toggle();
+    dlog_record::toggleStop();
 }
 
 void action_show_dlog_view() {
@@ -1216,7 +1216,7 @@ void action_dlog_start_recording() {
     memcpy(&dlog_record::g_parameters, &dlog_record::g_guiParameters, sizeof(dlog_record::g_guiParameters));
     strcpy(dlog_record::g_parameters.filePath, filePath);
 
-    dlog_record::toggle();
+    dlog_record::toggleStart();
 }
 
 void action_dlog_view_show_overlay_options() {
