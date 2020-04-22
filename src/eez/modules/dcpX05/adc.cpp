@@ -35,7 +35,7 @@
 
 /// Operating mode.
 /// 0: Normal, 1: Duty cycle, 2: Turbo
-#define CONF_ADC_MODE 0
+#define CONF_ADC_MODE 2
 
 namespace eez {
 namespace psu {

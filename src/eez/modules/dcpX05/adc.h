@@ -27,7 +27,7 @@ class Channel;
 
 /// Analog to digital converter HW used by the channel.
 class AnalogDigitalConverter {
-  public:
+public:
     static const uint16_t ADC_MIN = 0;
     static const uint16_t ADC_MAX = (1L << ADC_RES) - 1;
 
@@ -44,7 +44,7 @@ class AnalogDigitalConverter {
 
     void readAllRegisters(uint8_t registers[]);
 
-  private:
+private:
     uint32_t start_time;
 
 #if defined(EEZ_PLATFORM_STM32)
