@@ -943,8 +943,6 @@ void NumericKeypad::ok() {
                 psuErrorMessage(0, MakeGreaterThenMaxMessageValue(m_options.max, m_startValue));
             } else {
                 m_okFloatCallback(value);
-                m_state = START;
-                m_keypadText[0] = 0;
                 return;
             }
 

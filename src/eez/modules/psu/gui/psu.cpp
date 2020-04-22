@@ -1709,7 +1709,8 @@ void onEncoder(int counter, bool clicked) {
                     newValue = clamp(newValue, min, max);
                 }
             } else {
-                newValue = encoderIncrement(value, counter, min, max, g_focusCursor, 0);
+                float precision = getEncoderPrecision(g_focusCursor, g_focusDataId, 0);
+                newValue = encoderIncrement(value, counter, min, max, g_focusCursor, precision);
             }
 
             Value limitValue = getLimit(g_focusCursor, g_focusDataId);

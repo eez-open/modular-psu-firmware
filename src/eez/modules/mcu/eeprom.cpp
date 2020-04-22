@@ -206,10 +206,12 @@ void resetAllExceptOnTimeCounters() {
     uint32_t address;
 
     for (address = 0; address < EEPROM_ONTIME_START_ADDRESS; address += 64) {
+        WATCHDOG_RESET();
         write(buffer, MIN(EEPROM_ONTIME_START_ADDRESS - address, 64), (uint16_t)address);
     }
 
     for (address = EEPROM_ONTIME_START_ADDRESS + 6 * sizeof(uint32_t); address < EEPROM_SIZE; address += 64) {
+        WATCHDOG_RESET();
         write(buffer, MIN(EEPROM_SIZE - address, 64), (uint16_t)address);
     }
 }

@@ -152,6 +152,14 @@ void setLevelValue() {
 void onSetOk(float value) {
     calibration::Value *calibrationValue = getCalibrationValue();
 
+    if (calibrationValue->voltOrCurr && calibration::getCalibrationChannel().getMode() != CHANNEL_MODE_CV) {
+        errorMessage("Channel is not in CV mode!");
+        return;
+    } else if (!calibrationValue->voltOrCurr && calibration::getCalibrationChannel().getMode() != CHANNEL_MODE_CC) {
+        errorMessage("Channel is not in CC mode!");
+        return;
+    }
+
     float dac = calibrationValue->getDacValue();
     float adc = calibrationValue->getAdcValue();
     if (calibrationValue->checkRange(dac, value, adc)) {
@@ -296,7 +304,7 @@ void toggleEnable() {
 
 const char *getStepNote() {
     if (g_stepNum >= 3 && g_stepNum <= 8) {
-        return "Please use power resistor (lower then 5 Ohms) connected in series with external ammeter";
+        return "Please use power resistor (lower then 5 \xb4) connected in series with external ammeter";
     }
     return nullptr;
 }
