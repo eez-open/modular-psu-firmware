@@ -223,6 +223,10 @@ Value MakeValue(float value, Unit unit) {
     return Value(value, unit);
 }
 
+Value MakeValue(float value, Unit unit, uint16_t options) {
+    return Value(value, unit, options);
+}
+
 Value MakeStepValuesValue(const StepValues *stepValues) {
     Value value;
     value.type_ = VALUE_TYPE_STEP_VALUES;
@@ -1163,7 +1167,7 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
     } else if (operation == DATA_OPERATION_SET) {
         if (!between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
-        } else if (value.getFloat() > channel_dispatcher::getULimit(channel)) {
+        } else if (channel.isVoltageLimitExceeded(value.getFloat())) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
         } else if (channel.isPowerLimitExceeded(value.getFloat(), channel_dispatcher::getISetUnbalanced(channel))) {
@@ -1189,7 +1193,12 @@ void data_channel_i_mon(DataOperationEnum operation, Cursor cursor, Value &value
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getIMon(channel), UNIT_AMPER);
+        float iMon = channel_dispatcher::getIMon(channel);
+        if (iMon < channel.params.I_MON_MIN) {
+            value = MakeValue(channel.params.I_MON_MIN, UNIT_AMPER, FLOAT_OPTIONS_LESS_THEN);
+        } else {
+            value = MakeValue(iMon, UNIT_AMPER);
+        }
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(0, UNIT_AMPER);
     } else if (operation == DATA_OPERATION_GET_MAX) {
@@ -1271,7 +1280,7 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
     } else if (operation == DATA_OPERATION_SET) {
         if (!between(value.getFloat(), channel_dispatcher::getIMin(channel), channel_dispatcher::getIMax(channel))) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
-        } else if (value.getFloat() > channel_dispatcher::getILimit(channel)) {
+        } else if (channel.isCurrentLimitExceeded(value.getFloat())) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
         } else if (channel.isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(channel), value.getFloat())) {
@@ -6087,6 +6096,109 @@ void data_debug_variable_value(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
+void data_debug_u_dac(DataOperationEnum operation, Cursor cursor, Value &value) {
+    Channel &channel = Channel::get(cursor);
+    if (operation == DATA_OPERATION_GET) {
+        value = MakeValue(1.0f * psu::debug::g_uDac[channel.channelIndex].get(), UNIT_UNKNOWN);
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = MakeValue(0.0f, UNIT_UNKNOWN);
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = MakeValue(1.0f * channel.params.DAC_MAX, UNIT_UNKNOWN);
+    } else if (operation == DATA_OPERATION_SET) {
+        channel.channelInterface->setDacVoltage(channel.subchannelIndex, (uint16_t)value.getFloat());
+    } else if (operation == DATA_OPERATION_GET_NAME) {
+        value = "U DAC";
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = UNIT_UNKNOWN;
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 0;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        static float values[] = { 1000.0f, 100.0f, 10.0f, 1.0f };
+        auto stepValues = value.getStepValues();
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+        stepValues->unit = UNIT_UNKNOWN;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
+        value = MakeValue(1.0f, UNIT_UNKNOWN);
+    }
+}
+
+void data_debug_u_dac_voltage(DataOperationEnum operation, Cursor cursor, Value &value) {
+    Channel &channel = Channel::get(cursor);
+    if (operation == DATA_OPERATION_GET) {
+        value = MakeValue(roundPrec(remap(1.0f * psu::debug::g_uDac[channel.channelIndex].get(), 0.0f, 0.0f, 1.0f * channel.params.DAC_MAX, channel.params.U_MAX), channel.params.U_RESOLUTION), UNIT_VOLT);
+    }
+}
+
+void data_debug_u_adc(DataOperationEnum operation, Cursor cursor, Value &value) {
+    Channel &channel = Channel::get(cursor);
+    if (operation == DATA_OPERATION_GET) {
+        value = MakeValue(1.0f * (int)psu::debug::g_uMon[channel.channelIndex].get(), UNIT_UNKNOWN);
+    } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+        value = Value(500, VALUE_TYPE_UINT32);
+    }
+}
+
+void data_debug_u_adc_voltage(DataOperationEnum operation, Cursor cursor, Value &value) {
+    Channel &channel = Channel::get(cursor);
+    if (operation == DATA_OPERATION_GET) {
+        value = MakeValue(roundPrec(remap(1.0f * psu::debug::g_uMon[channel.channelIndex].get(), 0.0f, 0.0f, 1.0f * channel.params.ADC_MAX, channel.params.U_MAX), channel.params.U_RESOLUTION), UNIT_VOLT);
+    } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+        value = Value(500, VALUE_TYPE_UINT32);
+    }
+}
+
+void data_debug_i_dac(DataOperationEnum operation, Cursor cursor, Value &value) {
+    Channel &channel = Channel::get(cursor);
+    if (operation == DATA_OPERATION_GET) {
+        value = MakeValue(1.0f * psu::debug::g_iDac[channel.channelIndex].get(), UNIT_UNKNOWN);
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = MakeValue(0.0f, UNIT_UNKNOWN);
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = MakeValue(1.0f * channel.params.DAC_MAX, UNIT_UNKNOWN);
+    } else if (operation == DATA_OPERATION_SET) {
+        channel.channelInterface->setDacCurrent(channel.subchannelIndex, (uint16_t)value.getFloat());
+    } else if (operation == DATA_OPERATION_GET_NAME) {
+        value = "I DAC";
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = UNIT_UNKNOWN;
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 0;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        static float values[] = { 1000.0f, 100.0f, 10.0f, 1.0f };
+        auto stepValues = value.getStepValues();
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+        stepValues->unit = UNIT_UNKNOWN;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
+        value = MakeValue(1.0f, UNIT_UNKNOWN);
+    }
+}
+
+void data_debug_i_dac_amper(DataOperationEnum operation, Cursor cursor, Value &value) {
+    Channel &channel = Channel::get(cursor);
+    if (operation == DATA_OPERATION_GET) {
+        value = MakeValue(roundPrec(remap(1.0f * psu::debug::g_iDac[channel.channelIndex].get(), 0.0f, 0.0f, 1.0f * channel.params.DAC_MAX, channel.params.I_MAX), channel.params.I_RESOLUTION), UNIT_AMPER);
+    }
+}
+
+void data_debug_i_adc(DataOperationEnum operation, Cursor cursor, Value &value) {
+    Channel &channel = Channel::get(cursor);
+    if (operation == DATA_OPERATION_GET) {
+        value = MakeValue(1.0f * (int)psu::debug::g_iMon[channel.channelIndex].get(), UNIT_UNKNOWN);
+    } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+        value = Value(500, VALUE_TYPE_UINT32);
+    }
+}
+
+void data_debug_i_adc_amper(DataOperationEnum operation, Cursor cursor, Value &value) {
+    Channel &channel = Channel::get(cursor);
+    if (operation == DATA_OPERATION_GET) {
+        value = MakeValue(roundPrec(remap(1.0f * psu::debug::g_iMon[channel.channelIndex].get(), 0.0f, 0.0f, 1.0f * channel.params.ADC_MAX, channel.params.I_MAX), channel.params.I_RESOLUTION), UNIT_AMPER);
+    } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+        value = Value(500, VALUE_TYPE_UINT32);
+    }
+}
 
 } // namespace gui
 } // namespace eez

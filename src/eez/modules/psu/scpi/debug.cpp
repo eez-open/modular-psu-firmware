@@ -83,6 +83,8 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             if (SCPI_ParamInt32(context, &relay, true)) {
                 bp3c::io_exp::switchChannelCoupling(relay);
             }
+        } else if (cmd == 28) {
+        	psu::gui::showPage(PAGE_ID_DEBUG_POWER_CHANNELS);
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;

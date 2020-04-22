@@ -2340,6 +2340,46 @@
       "name": "mqtt_in_error",
       "type": "boolean",
       "defaultValue": "0"
+    },
+    {
+      "name": "debug_i_dac",
+      "type": "integer",
+      "defaultValue": "123"
+    },
+    {
+      "name": "debug_u_dac",
+      "type": "integer",
+      "defaultValue": "123"
+    },
+    {
+      "name": "debug_i_dac_amper",
+      "type": "float",
+      "defaultValue": "123 mA"
+    },
+    {
+      "name": "debug_u_dac_voltage",
+      "type": "float",
+      "defaultValue": "123 mA"
+    },
+    {
+      "name": "debug_i_adc",
+      "type": "integer",
+      "defaultValue": "456"
+    },
+    {
+      "name": "debug_u_adc",
+      "type": "integer",
+      "defaultValue": "456"
+    },
+    {
+      "name": "debug_i_adc_amper",
+      "type": "float",
+      "defaultValue": "456 mV"
+    },
+    {
+      "name": "debug_u_adc_voltage",
+      "type": "float",
+      "defaultValue": "456 mV"
     }
   ],
   "actions": [
@@ -27707,6 +27747,843 @@
         "height": 240
       },
       {
+        "name": "slot_def_mio168",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 160,
+            "height": 32,
+            "layout": "slot_def_vert_title"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 33,
+            "width": 159,
+            "height": 20,
+            "name": "Din",
+            "widgets": [
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 19,
+                "height": 20
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_inverse",
+                  "font": "RobotoCondensed-Regular"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 19,
+                "height": 20,
+                "text": "1"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 20,
+                "top": 0,
+                "width": 19,
+                "height": 20
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default",
+                  "font": "RobotoCondensed-Regular"
+                },
+                "left": 20,
+                "top": 0,
+                "width": 19,
+                "height": 20,
+                "text": "2"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 40,
+                "top": 0,
+                "width": 19,
+                "height": 20
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default",
+                  "font": "RobotoCondensed-Regular"
+                },
+                "left": 40,
+                "top": 0,
+                "width": 19,
+                "height": 20,
+                "text": "3"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 60,
+                "top": 0,
+                "width": 19,
+                "height": 20
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_inverse",
+                  "font": "RobotoCondensed-Regular"
+                },
+                "left": 60,
+                "top": 0,
+                "width": 19,
+                "height": 20,
+                "text": "4"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 80,
+                "top": 0,
+                "width": 19,
+                "height": 20
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default",
+                  "font": "RobotoCondensed-Regular"
+                },
+                "left": 80,
+                "top": 0,
+                "width": 19,
+                "height": 20,
+                "text": "5"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 100,
+                "top": 0,
+                "width": 19,
+                "height": 20
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_inverse",
+                  "font": "RobotoCondensed-Regular"
+                },
+                "left": 100,
+                "top": 0,
+                "width": 19,
+                "height": 20,
+                "text": "6"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 120,
+                "top": 0,
+                "width": 19,
+                "height": 20
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_inverse",
+                  "font": "RobotoCondensed-Regular"
+                },
+                "left": 120,
+                "top": 0,
+                "width": 19,
+                "height": 20,
+                "text": "7"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 140,
+                "top": 0,
+                "width": 19,
+                "height": 20
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_inverse",
+                  "font": "RobotoCondensed-Regular"
+                },
+                "left": 140,
+                "top": 0,
+                "width": 19,
+                "height": 20,
+                "text": "8"
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 54,
+            "width": 159,
+            "height": 79,
+            "name": "Dout",
+            "widgets": [
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 39,
+                "height": 32
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_inverse",
+                  "font": "Oswald17",
+                  "alignVertical": "center"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 39,
+                "height": 32,
+                "text": "1"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 40,
+                "top": 0,
+                "width": 39,
+                "height": 32
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_inverse",
+                  "font": "Oswald17",
+                  "alignVertical": "center"
+                },
+                "left": 40,
+                "top": 0,
+                "width": 39,
+                "height": 32,
+                "text": "2"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 80,
+                "top": 0,
+                "width": 39,
+                "height": 32
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_inverse",
+                  "font": "Oswald17",
+                  "alignVertical": "center"
+                },
+                "left": 80,
+                "top": 0,
+                "width": 39,
+                "height": 32,
+                "text": "3"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 120,
+                "top": 0,
+                "width": 39,
+                "height": 32
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default",
+                  "font": "Oswald17",
+                  "alignVertical": "center"
+                },
+                "left": 120,
+                "top": 0,
+                "width": 39,
+                "height": 32,
+                "text": "4"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 33,
+                "width": 39,
+                "height": 32
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_inverse",
+                  "font": "Oswald17",
+                  "alignVertical": "center"
+                },
+                "left": 0,
+                "top": 33,
+                "width": 39,
+                "height": 32,
+                "text": "5"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 40,
+                "top": 33,
+                "width": 39,
+                "height": 32
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default",
+                  "font": "Oswald17",
+                  "alignVertical": "center"
+                },
+                "left": 40,
+                "top": 33,
+                "width": 39,
+                "height": 32,
+                "text": "6"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 80,
+                "top": 33,
+                "width": 39,
+                "height": 32
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default",
+                  "font": "Oswald17",
+                  "alignVertical": "center"
+                },
+                "left": 80,
+                "top": 33,
+                "width": 39,
+                "height": 32,
+                "text": "7"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 120,
+                "top": 33,
+                "width": 39,
+                "height": 32
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_inverse",
+                  "font": "Oswald17",
+                  "alignVertical": "center"
+                },
+                "left": 120,
+                "top": 33,
+                "width": 39,
+                "height": 32,
+                "text": "8"
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald14"
+            },
+            "data": "channel_p_mon",
+            "left": 0,
+            "top": 121,
+            "width": 78,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald14"
+            },
+            "data": "channel_p_mon",
+            "left": 82,
+            "top": 121,
+            "width": 78,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 3,
+            "top": 169,
+            "width": 78,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 82,
+            "top": 169,
+            "width": 78,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald14"
+            },
+            "data": "channel_p_mon",
+            "left": 0,
+            "top": 145,
+            "width": 78,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald14"
+            },
+            "data": "channel_p_mon",
+            "left": 82,
+            "top": 145,
+            "width": 78,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 3,
+            "top": 193,
+            "width": 78,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 82,
+            "top": 193,
+            "width": 78,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 3,
+            "top": 216,
+            "width": 78,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 82,
+            "top": 216,
+            "width": 78,
+            "height": 24,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 160,
+        "height": 240
+      },
+      {
+        "name": "slot_def_smx46",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 160,
+            "height": 32,
+            "layout": "slot_def_vert_title"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 32,
+            "width": 160,
+            "height": 186,
+            "name": "Dout",
+            "widgets": [
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 1,
+            "top": 218,
+            "width": 79,
+            "height": 22,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 81,
+            "top": 218,
+            "width": 78,
+            "height": 22,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 160,
+        "height": 240
+      },
+      {
         "name": "slot_def_1ch_vbar_on",
         "description": "",
         "widgets": [
@@ -44087,6 +44964,249 @@
         "top": 0,
         "width": 46,
         "height": 32
+      },
+      {
+        "name": "debug_power_channels",
+        "widgets": [
+          {
+            "type": "List",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "channels",
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 240,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 60,
+              "widgets": [
+                {
+                  "type": "Text",
+                  "style": {
+                    "inheritFrom": "default_S"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 64,
+                  "height": 29,
+                  "text": "U_DAC"
+                },
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "color": "overlay_background",
+                    "activeBackgroundColor": "overlay_background",
+                    "focusBackgroundColor": "Action color"
+                  },
+                  "data": "debug_u_dac",
+                  "action": "edit",
+                  "left": 64,
+                  "top": 0,
+                  "width": 84,
+                  "height": 29,
+                  "displayOption": 0
+                },
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "color": "overlay_background",
+                    "activeBackgroundColor": "overlay_background",
+                    "focusBackgroundColor": "Action color"
+                  },
+                  "data": "debug_u_dac_voltage",
+                  "action": "",
+                  "left": 156,
+                  "top": 0,
+                  "width": 84,
+                  "height": 29,
+                  "displayOption": 0
+                },
+                {
+                  "type": "Text",
+                  "style": {
+                    "inheritFrom": "default_S"
+                  },
+                  "left": 0,
+                  "top": 30,
+                  "width": 64,
+                  "height": 29,
+                  "text": "U_ADC"
+                },
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "color": "overlay_background",
+                    "activeBackgroundColor": "overlay_background",
+                    "focusBackgroundColor": "Action color"
+                  },
+                  "data": "debug_u_adc",
+                  "action": "",
+                  "left": 64,
+                  "top": 30,
+                  "width": 84,
+                  "height": 29,
+                  "displayOption": 0
+                },
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "color": "overlay_background",
+                    "activeBackgroundColor": "overlay_background",
+                    "focusBackgroundColor": "Action color"
+                  },
+                  "data": "debug_u_adc_voltage",
+                  "action": "",
+                  "left": 156,
+                  "top": 30,
+                  "width": 84,
+                  "height": 29,
+                  "displayOption": 0
+                },
+                {
+                  "type": "Text",
+                  "style": {
+                    "inheritFrom": "default_S"
+                  },
+                  "left": 240,
+                  "top": 0,
+                  "width": 64,
+                  "height": 29,
+                  "text": "I_DAC"
+                },
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "color": "overlay_background",
+                    "activeBackgroundColor": "overlay_background",
+                    "focusBackgroundColor": "Action color"
+                  },
+                  "data": "debug_i_dac",
+                  "action": "edit",
+                  "left": 304,
+                  "top": 0,
+                  "width": 84,
+                  "height": 29,
+                  "displayOption": 0
+                },
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "color": "overlay_background",
+                    "activeBackgroundColor": "overlay_background",
+                    "focusBackgroundColor": "Action color"
+                  },
+                  "data": "debug_i_dac_amper",
+                  "action": "",
+                  "left": 396,
+                  "top": 0,
+                  "width": 84,
+                  "height": 29,
+                  "displayOption": 0
+                },
+                {
+                  "type": "Text",
+                  "style": {
+                    "inheritFrom": "default_S"
+                  },
+                  "left": 240,
+                  "top": 30,
+                  "width": 64,
+                  "height": 29,
+                  "text": "I_ADC"
+                },
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "color": "overlay_background",
+                    "activeBackgroundColor": "overlay_background",
+                    "focusBackgroundColor": "Action color"
+                  },
+                  "data": "debug_i_adc",
+                  "action": "",
+                  "left": 304,
+                  "top": 30,
+                  "width": 84,
+                  "height": 29,
+                  "displayOption": 0
+                },
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "color": "overlay_background",
+                    "activeBackgroundColor": "overlay_background",
+                    "focusBackgroundColor": "Action color"
+                  },
+                  "data": "debug_i_adc_amper",
+                  "action": "",
+                  "left": 396,
+                  "top": 30,
+                  "width": 84,
+                  "height": 29,
+                  "displayOption": 0
+                }
+              ]
+            },
+            "listType": "vertical",
+            "gap": 0
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "show_main_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "H"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "",
+                "left": 40,
+                "top": 0,
+                "width": 440,
+                "height": 32,
+                "text": "DAC and ADC"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
       }
     ],
     "styles": [
