@@ -149,6 +149,10 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
     }
 
     if (!isNaN(floatValue)) {
+        if ((value.getOptions() & FLOAT_OPTIONS_LESS_THEN) != 0) {
+            strcat(text, "< ");
+        }
+
         if (unit == UNIT_WATT || unit == UNIT_MILLI_WATT) {
             strcatFloat(text, floatValue, 2);
         } else {
@@ -557,6 +561,15 @@ bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues) {
     Value value(&stepValues, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ENCODER_STEP_VALUES, cursor, value);
     return value.getType() == VALUE_TYPE_INT && value.getInt();
+}
+
+float getEncoderPrecision(Cursor cursor, int16_t id, float defaultValue) {
+    Value value;
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ENCODER_PRECISION, cursor, value);
+    if (value.getType() != VALUE_TYPE_FLOAT) {
+        return defaultValue;
+    }
+    return value.getFloat();
 }
 
 Value get(Cursor cursor, int16_t id) {

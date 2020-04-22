@@ -75,6 +75,8 @@ typedef uint8_t ValueType;
 
 #define STRING_OPTIONS_FILE_ELLIPSIS 1
 
+#define FLOAT_OPTIONS_LESS_THEN 1
+
 struct Value {
   public:
     Value() 
@@ -130,6 +132,11 @@ struct Value {
 
     Value(float value, Unit unit)
         : type_(VALUE_TYPE_FLOAT), options_(0), unit_(unit), float_(value) 
+    {
+    }
+
+    Value(float value, Unit unit, uint16_t options)
+        : type_(VALUE_TYPE_FLOAT), options_(options), unit_(unit), float_(value) 
     {
     }
 
@@ -338,6 +345,7 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_IS_CHANNEL_DATA,
     DATA_OPERATION_GET_ENCODER_STEP,
     DATA_OPERATION_GET_ENCODER_STEP_VALUES,
+    DATA_OPERATION_GET_ENCODER_PRECISION,
     DATA_OPERATION_GET_FLOAT_LIST_LENGTH,
     DATA_OPERATION_GET_FLOAT_LIST,
     DATA_OPERATION_GET_BITMAP_IMAGE,
@@ -410,6 +418,7 @@ void getLabel(Cursor cursor, int16_t id, char *text, int count);
 
 Value getEncoderStep(Cursor cursor, int16_t id);
 bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues);
+float getEncoderPrecision(Cursor cursor, int16_t id, float defaultValue);
 
 Value get(Cursor cursor, int16_t id);
 const char *isValidValue(Cursor cursor, int16_t id, Value value);

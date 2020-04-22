@@ -116,6 +116,8 @@ struct Channel : ChannelInterface {
 		params.I_MIN = 0.0f;
 		params.I_DEF = 0.0f;
 		params.I_MAX = 5.0f;
+
+		params.I_MON_MIN = 0.0f;
 		
 		params.I_MIN_STEP = 0.01f;
 		params.I_DEF_STEP = 0.01f;
@@ -124,11 +126,7 @@ struct Channel : ChannelInterface {
 		params.I_CAL_VAL_MIN = 0.05f;
 		params.I_CAL_VAL_MID = 2.425f;
 		params.I_CAL_VAL_MAX = 4.8f;
-		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP505) {
-			params.U_CURR_CAL = 25.0f;
-		} else {
-			params.U_CURR_CAL = 20.0f;
-		}
+		params.U_CURR_CAL = 30.0f;
 
 		params.OVP_DEFAULT_STATE = false;
 		params.OVP_MIN_DELAY = 0.0f;
@@ -179,6 +177,9 @@ struct Channel : ChannelInterface {
 		}
 
 		params.MON_REFRESH_RATE_MS = 250;
+
+		params.DAC_MAX = DigitalAnalogConverter::DAC_MAX;
+		params.ADC_MAX = AnalogDigitalConverter::ADC_MAX;
 	}
 
 	void init(int subchannelIndex) {
@@ -356,11 +357,11 @@ struct Channel : ChannelInterface {
 	}
 
 	bool isCcMode(int subchannelIndex) {
-		return ioexp.testBit(IOExpander::IO_BIT_IN_CV_ACTIVE);
+		return ioexp.testBit(IOExpander::IO_BIT_IN_CC_ACTIVE);
 	}
 
 	bool isCvMode(int subchannelIndex) {
-		return ioexp.testBit(IOExpander::IO_BIT_IN_CC_ACTIVE);
+		return ioexp.testBit(IOExpander::IO_BIT_IN_CV_ACTIVE);
 	}
 
 	void waitConversionEnd() {

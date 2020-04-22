@@ -44,8 +44,11 @@ using namespace psu;
 
 namespace dcm220 {
 
-#define DAC_MIN 0
-#define DAC_MAX 4095
+static const uint16_t DAC_MIN = 0;
+static const uint16_t DAC_MAX = 4095;
+
+static const uint16_t ADC_MIN = 0;
+static const uint16_t ADC_MAX = 65535;
 
 #define REG0_OE1_MASK     (1 << 0)
 #define REG0_OE2_MASK     (1 << 2)
@@ -59,9 +62,6 @@ static const float PTOT = 155.0f;
 #define REG0_CC1_MASK     (1 << 1)
 #define REG0_CC2_MASK     (1 << 3)
 #define REG0_PWRGOOD_MASK (1 << 4)
-
-#define ADC_MIN 0
-#define ADC_MAX 65535
 
 #define SPI_SLAVE_SYNBYTE         0x53
 #define SPI_MASTER_SYNBYTE        0xAC
@@ -197,9 +197,11 @@ struct Channel : ChannelInterface {
 		params.U_CAL_VAL_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 22.0f : 18.0f;
 		params.I_VOLT_CAL = 1.0f;
 
-		params.I_MIN = 0.0f;
-		params.I_DEF = 0.0f;
+		params.I_MIN = 0.3f;
+		params.I_DEF = 0.3f;
 		params.I_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.9f : 4.0f;
+
+    	params.I_MON_MIN = 0.3f;
 
 		params.I_MIN_STEP = 0.01f;
 		params.I_DEF_STEP = 0.01f;
@@ -208,7 +210,7 @@ struct Channel : ChannelInterface {
 		params.I_CAL_VAL_MIN = 0.5f;
 		params.I_CAL_VAL_MID = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 2.5f : 2.0f;
 		params.I_CAL_VAL_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.5f : 3.5f;
-		params.U_CURR_CAL = params.U_MAX;
+		params.U_CURR_CAL = 20.0f;
 
 		params.OVP_DEFAULT_STATE = false;
 		params.OVP_MIN_DELAY = 0.0f;
@@ -244,6 +246,9 @@ struct Channel : ChannelInterface {
 		params.features = CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_POWER | CH_FEATURE_OE;
 
 		params.MON_REFRESH_RATE_MS = 500;
+
+		params.DAC_MAX = DAC_MAX;
+		params.ADC_MAX = ADC_MAX;
 
 		I_MAX_FOR_REMAP = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 5.0f : 4.1667f;
 	}

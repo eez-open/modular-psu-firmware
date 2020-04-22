@@ -82,6 +82,8 @@ struct ChannelParams {
     float I_DEF;
     float I_MAX;
     
+    float I_MON_MIN;
+
     float I_MIN_STEP;
     float I_DEF_STEP;
     float I_MAX_STEP; 
@@ -130,6 +132,9 @@ struct ChannelParams {
     uint32_t features;
 
     uint32_t MON_REFRESH_RATE_MS;
+
+    uint32_t DAC_MAX;
+    uint32_t ADC_MAX;
 };
 
 struct ChannelInterface {

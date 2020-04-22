@@ -26,7 +26,10 @@ class AnalogDigitalConverter;
 
 /// Digital to analog converter HW used by the channel.
 class DigitalAnalogConverter {
-  public:
+public:
+    static const uint16_t DAC_MIN = 0;
+    static const uint16_t DAC_MAX = (1L << DAC_RES) - 1;
+
     uint8_t slotIndex;
     TestResult g_testResult;
 
