@@ -217,6 +217,13 @@ EnumItem g_enumDefinition_MODULE_TYPE[] = {
     { 0, 0 }
 };
 
+EnumItem g_enumDefinition_DLOG_VIEW_LEGEND_VIEW_OPTION[] = {
+    { persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_HIDDEN, "Hidden" },
+    { persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_FLOAT, "Float" },
+    { persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK, "Dock" },
+    { 0, 0 }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Value MakeValue(float value, Unit unit) {
@@ -5100,9 +5107,9 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     } else if (operation == DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE) {
         value = Value(recording.dlogValues[value.getUInt8()].isVisible);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SHOW_LABELS) {
-        value = dlog_view::g_showLabels ? 1 : 0;
+        value = persist_conf::devConf.viewFlags.dlogViewShowLabels ? 1 : 0;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SELECTED_VALUE_INDEX) {
-        value = dlog_view::g_showLegend ? dlog_view::getDlogValueIndex(recording, recording.selectedVisibleValueIndex) : -1;
+        value = persist_conf::devConf.viewFlags.dlogViewLegendViewOption != persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_HIDDEN ? dlog_view::getDlogValueIndex(recording, recording.selectedVisibleValueIndex) : -1;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_LABEL) {
         YtDataGetLabelParams *params = (YtDataGetLabelParams *)value.getVoidPointer();
         dlog_view::getLabel(dlog_view::getRecording(), params->valueIndex, params->text, params->count);
@@ -5129,7 +5136,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
         if (psu::dlog_view::isMulipleValuesOverlayHeuristic(recording)) {
             value = Value(g_ytGraphStyles[visibleDlogValueIndex % numYtGraphStyles], VALUE_TYPE_UINT16);
         } else {
-            if (dlog_view::g_showLegend && visibleDlogValueIndex == recording.selectedVisibleValueIndex) {
+            if (persist_conf::devConf.viewFlags.dlogViewLegendViewOption != persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_HIDDEN && visibleDlogValueIndex == recording.selectedVisibleValueIndex) {
                 value = Value(STYLE_ID_YT_GRAPH_Y1, VALUE_TYPE_UINT16);
             } else {
                 value = Value(STYLE_ID_YT_GRAPH_Y5, VALUE_TYPE_UINT16);
@@ -5159,7 +5166,9 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
         static int yAtTouchDown;
         
         if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET) {
-            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : g_focusCursor);
+            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording,
+                !dlog_view::isMulipleValuesOverlayHeuristic(recording) || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+                ? recording.selectedVisibleValueIndex : g_focusCursor);
 
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
                 valueAtTouchDown = dlogValueParams->offset;
@@ -5175,7 +5184,9 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
                 dlogValueParams->offset = newOffset;
             }
         } else if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV) {
-            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : g_focusCursor);
+            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording,
+                !dlog_view::isMulipleValuesOverlayHeuristic(recording)  || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+                ? recording.selectedVisibleValueIndex : g_focusCursor);
 
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
                 valueAtTouchDown = dlogValueParams->div;
@@ -5276,7 +5287,7 @@ void data_dlog_multiple_values_overlay(DataOperationEnum operation, Cursor curso
         int state = 0;
         int numVisibleDlogValues = dlog_view::getNumVisibleDlogValues(recording);
         
-        if (dlog_view::g_showLegend && dlog_view::isMulipleValuesOverlayHeuristic(recording)) {
+        if (persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_FLOAT && dlog_view::isMulipleValuesOverlayHeuristic(recording)) {
             state = numVisibleDlogValues;
         }
 
@@ -5321,7 +5332,7 @@ void data_dlog_single_value_overlay(DataOperationEnum operation, Cursor cursor, 
         value = Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
         auto &recording = dlog_view::getRecording();
-        overlay.state = dlog_view::g_showLegend && !dlog_view::isMulipleValuesOverlayHeuristic(recording);
+        overlay.state = persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_FLOAT && !dlog_view::isMulipleValuesOverlayHeuristic(recording);
         
         WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
         overlay.width = widgetCursor.widget->w;
@@ -5341,7 +5352,9 @@ void data_dlog_visible_values(DataOperationEnum operation, Cursor cursor, Value 
 void data_dlog_visible_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
-        int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor);
+        int dlogValueIndex = dlog_view::getDlogValueIndex(recording,
+            !dlog_view::isMulipleValuesOverlayHeuristic(recording) || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+            ? recording.selectedVisibleValueIndex : cursor);
         value = Value(dlogValueIndex, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
@@ -5373,7 +5386,9 @@ void guessStepValues(StepValues *stepValues, Unit unit) {
 
 void data_dlog_visible_value_div(DataOperationEnum operation, Cursor cursor, Value &value) {
     auto &recording = dlog_view::getRecording();
-    int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor);
+    int dlogValueIndex = dlog_view::getDlogValueIndex(recording,
+        !dlog_view::isMulipleValuesOverlayHeuristic(recording) || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+        ? recording.selectedVisibleValueIndex : cursor);
 
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
@@ -5410,7 +5425,9 @@ void data_dlog_visible_value_div(DataOperationEnum operation, Cursor cursor, Val
 
 void data_dlog_visible_value_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
     auto &recording = dlog_view::getRecording();
-    int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor);
+    int dlogValueIndex = dlog_view::getDlogValueIndex(recording,
+        !dlog_view::isMulipleValuesOverlayHeuristic(recording) || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+        ? recording.selectedVisibleValueIndex : cursor);
 
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
@@ -5528,7 +5545,9 @@ void data_dlog_x_axis_max_value_label(DataOperationEnum operation, Cursor cursor
 void data_dlog_visible_value_cursor(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
-        int dlogValueIndex = dlog_view::getDlogValueIndex(recording, !dlog_view::isMulipleValuesOverlayHeuristic(recording) ? recording.selectedVisibleValueIndex : cursor);
+        int dlogValueIndex = dlog_view::getDlogValueIndex(recording,
+            !dlog_view::isMulipleValuesOverlayHeuristic(recording) || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+            ? recording.selectedVisibleValueIndex : cursor);
         auto ytDataGetValue = ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
         float max;
         float min = ytDataGetValue(ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, dlogValueIndex, &max);
@@ -5573,15 +5592,15 @@ void data_dlog_value_state(DataOperationEnum operation, Cursor cursor, Value &va
     }
 }
 
-void data_dlog_view_show_legend(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_view_legend_view_option(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = dlog_view::g_showLegend ? 1 : 0;
+        value = (int)persist_conf::devConf.viewFlags.dlogViewLegendViewOption;
     }
 }
 
 void data_dlog_view_show_labels(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = dlog_view::g_showLabels ? 1 : 0;
+        value = (int)persist_conf::devConf.viewFlags.dlogViewShowLabels;
     }
 }
 

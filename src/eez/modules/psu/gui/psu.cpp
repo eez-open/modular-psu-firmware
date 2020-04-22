@@ -2125,18 +2125,22 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
 }
 
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
-    if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
+    if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL) {
         auto &recording = psu::dlog_view::getRecording();
-        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) ? widgetCursor.cursor : recording.selectedVisibleValueIndex);
+        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording,
+            !psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) || psu::persist_conf::devConf.viewFlags.dlogViewLegendViewOption == psu::persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+            ? recording.selectedVisibleValueIndex : widgetCursor.cursor);
         style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->color;
 }
 
 uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
-    if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && (widgetCursor.widget->data == DATA_ID_DLOG_VALUE_LABEL || widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL)) {
+    if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL) {
         auto &recording = psu::dlog_view::getRecording();
-        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording, psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) ? widgetCursor.cursor : recording.selectedVisibleValueIndex);
+        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording,
+            !psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) || psu::persist_conf::devConf.viewFlags.dlogViewLegendViewOption == psu::persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+            ? recording.selectedVisibleValueIndex : widgetCursor.cursor);
         style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->active_color;

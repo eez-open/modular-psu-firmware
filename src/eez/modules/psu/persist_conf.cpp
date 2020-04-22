@@ -179,6 +179,8 @@ void initDefaultDevConf() {
     g_defaultDevConf.userSwitchAction = USER_SWITCH_ACTION_INHIBIT;
     g_defaultDevConf.sortFilesOption = SORT_FILES_BY_TIME_DESC;
     g_defaultDevConf.eventQueueFilter = event_queue::EVENT_TYPE_INFO;
+    g_defaultDevConf.viewFlags.dlogViewLegendViewOption = DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK;
+    g_defaultDevConf.viewFlags.dlogViewShowLabels = 1;
 
     // block 8
     strcpy(g_defaultDevConf.ethernetHostName, DEFAULT_ETHERNET_HOST_NAME);
@@ -1235,6 +1237,14 @@ void setEventQueueFilter(int eventQueueFilter) {
 
 void setIsInhibitedByUser(int isInhibitedByUser) {
     g_devConf.isInhibitedByUser = isInhibitedByUser;
+}
+
+void setDlogViewLegendViewOption(DlogViewLegendViewOption dlogViewLegendViewOption) {
+    g_devConf.viewFlags.dlogViewLegendViewOption = dlogViewLegendViewOption;
+}
+
+void setDlogViewShowLabels(bool showLabels) {
+    g_devConf.viewFlags.dlogViewShowLabels = showLabels;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

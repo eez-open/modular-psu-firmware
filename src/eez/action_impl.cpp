@@ -1229,12 +1229,17 @@ void action_dlog_value_toggle() {
     recording.dlogValues[dlogValueIndex].isVisible = !recording.dlogValues[dlogValueIndex].isVisible;
 }
 
-void action_dlog_view_toggle_legend() {
-    dlog_view::g_showLegend = !dlog_view::g_showLegend;
+void onSelectDlogViewLegendViewOption(uint16_t value) {
+    popPage();
+    persist_conf::setDlogViewLegendViewOption((persist_conf::DlogViewLegendViewOption)value);
+}
+
+void action_dlog_view_select_legend_view_option() {
+    pushSelectFromEnumPage(ENUM_DEFINITION_DLOG_VIEW_LEGEND_VIEW_OPTION, persist_conf::devConf.viewFlags.dlogViewLegendViewOption, nullptr, onSelectDlogViewLegendViewOption);
 }
 
 void action_dlog_view_toggle_labels() {
-    dlog_view::g_showLabels = !dlog_view::g_showLabels;
+    persist_conf::setDlogViewShowLabels(!persist_conf::devConf.viewFlags.dlogViewShowLabels);
 }
 
 void action_dlog_view_select_visible_value() {

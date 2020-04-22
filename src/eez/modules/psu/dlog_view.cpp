@@ -52,8 +52,6 @@ namespace dlog_view {
 static State g_state;
 static uint32_t g_loadingStartTickCount;
 bool g_showLatest = true;
-bool g_showLegend = true;
-bool g_showLabels = false;
 char g_filePath[MAX_PATH_LENGTH + 1];
 Recording g_recording;
 

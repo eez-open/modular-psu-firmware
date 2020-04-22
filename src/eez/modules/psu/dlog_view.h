@@ -204,8 +204,6 @@ struct Recording {
 };
 
 extern bool g_showLatest;
-extern bool g_showLegend;
-extern bool g_showLabels;
 
 // open dlog file for viewing
 bool openFile(const char *filePath, int *err = nullptr);

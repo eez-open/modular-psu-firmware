@@ -68,6 +68,17 @@ enum UserSwitchAction {
     USER_SWITCH_ACTION_STANDBY
 };
 
+enum DlogViewLegendViewOption {
+    DLOG_VIEW_LEGEND_VIEW_OPTION_HIDDEN,
+    DLOG_VIEW_LEGEND_VIEW_OPTION_FLOAT,
+    DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+};
+
+struct ViewFlags {
+    unsigned dlogViewLegendViewOption: 3;
+    unsigned dlogViewShowLabels: 1;
+};
+
 /// Device configuration block.
 struct DeviceConfiguration {
     // block 1
@@ -169,7 +180,8 @@ struct DeviceConfiguration {
     UserSwitchAction userSwitchAction;
     SortFilesOption sortFilesOption;
     int eventQueueFilter;
-    uint8_t reserved6[52];
+    ViewFlags viewFlags;
+    uint8_t reserved6[48];
 
     // block 8
     char ethernetHostName[ETHERNET_HOST_NAME_SIZE + 1];
@@ -320,6 +332,9 @@ void setSortFilesOption(SortFilesOption sortFilesOption);
 void setEventQueueFilter(int eventQueueFilter);
 
 void setIsInhibitedByUser(int isInhibitedByUser);
+
+void setDlogViewLegendViewOption(DlogViewLegendViewOption dlogViewLegendViewOption);
+void setDlogViewShowLabels(bool showLabels);
 
 ////////////////////////////////////////////////////////////////////////////////
 
