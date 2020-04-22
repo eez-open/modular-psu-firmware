@@ -237,12 +237,12 @@ int checkTrigger() {
                     return err;
                 }
             } else {
-                if (channel.u.triggerLevel > channel_dispatcher::getULimit(channel)) {
+                if (channel.isVoltageLimitExceeded(channel.u.triggerLevel)) {
                     g_errorChannelIndex = channel.channelIndex;
                     return SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
                 }
 
-                if (channel.i.triggerLevel > channel_dispatcher::getILimit(channel)) {
+                if (channel.isCurrentLimitExceeded(channel.i.triggerLevel)) {
                     g_errorChannelIndex = channel.channelIndex;
                     return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
                 }

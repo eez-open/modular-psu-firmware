@@ -156,7 +156,7 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitude(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (current > channel_dispatcher::getILimit(*channel)) {
+    if (channel->isCurrentLimitExceeded(current)) {
         SCPI_ErrorPush(context, SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
         return SCPI_RES_ERR;
     }
@@ -205,7 +205,7 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitude(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (voltage > channel_dispatcher::getULimit(*channel)) {
+    if (channel->isVoltageLimitExceeded(voltage)) {
         SCPI_ErrorPush(context, SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
         return SCPI_RES_ERR;
     }
@@ -955,7 +955,7 @@ scpi_result_t scpi_cmd_sourceListCurrentLevel(scpi_t *context) {
             return SCPI_RES_ERR;
         }
 
-        if (current > channel_dispatcher::getIMaxLimit(*channel)) {
+        if (channel->isCurrentLimitExceeded(current)) {
             SCPI_ErrorPush(context, SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
             return SCPI_RES_ERR;
         }
@@ -1086,7 +1086,7 @@ scpi_result_t scpi_cmd_sourceListVoltageLevel(scpi_t *context) {
             return SCPI_RES_ERR;
         }
 
-        if (voltage > channel_dispatcher::getUMaxLimit(*channel)) {
+        if (channel->isVoltageLimitExceeded(voltage)) {
             SCPI_ErrorPush(context, SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
             return SCPI_RES_ERR;
         }

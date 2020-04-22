@@ -776,8 +776,8 @@ void Channel::tick(uint32_t tick_usec) {
     }
 
     if (!io_pins::isInhibited()) {
-        setCvMode(channelInterface->isCcMode(subchannelIndex));
-        setCcMode(channelInterface->isCvMode(subchannelIndex));
+        setCvMode(channelInterface->isCvMode(subchannelIndex));
+        setCcMode(channelInterface->isCcMode(subchannelIndex));
     }
 
     // update history values
@@ -1450,6 +1450,17 @@ void Channel::setPowerLimit(float limit) {
     }
 }
 
+bool Channel::isVoltageLimitExceeded(float u) {
+    return channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, u) >
+        channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, channel_dispatcher::getULimit(*this));
+}
+
+bool Channel::isCurrentLimitExceeded(float i) {
+    return channel_dispatcher::getValuePrecision(*this, UNIT_AMPER, i) >
+        channel_dispatcher::getValuePrecision(*this, UNIT_AMPER, channel_dispatcher::getILimit(*this));
+}
+
+
 bool Channel::isVoltageBalanced() {
 	if (!isInstalled()) {
 		return false;
@@ -1527,12 +1538,12 @@ void Channel::setCurrentRangeSelectionMode(CurrentRangeSelectionMode mode) {
     flags.currentRangeSelectionMode = mode;
 
     if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
-        if (i.set > 0.05f) {
-            i.set = 0.05f;
+        float limit = 0.05f;
+        if (i.set > limit) {
+            i.set = limit;
         }
-
-        if (i.limit > 0.05f) {
-            i.limit = 0.05f;
+        if (i.limit > limit) {
+            i.limit = limit;
         }
     }
 

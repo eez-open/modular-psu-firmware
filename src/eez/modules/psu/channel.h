@@ -499,6 +499,10 @@ class Channel {
     /// Change power limit, it will adjust U_SET or I_SET if necessary.
     void setPowerLimit(float limit);
 
+    bool isVoltageLimitExceeded(float u);
+
+    bool isCurrentLimitExceeded(float i);
+
     bool isPowerLimitExceeded(float u, float i) {
         return channelInterface->isPowerLimitExceeded(subchannelIndex, u, i);
     }

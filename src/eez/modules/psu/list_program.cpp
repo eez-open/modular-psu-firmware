@@ -199,12 +199,13 @@ int checkLimits(int iChannel) {
             current = roundedValue;
         }
 
-        if (voltage > channel_dispatcher::getULimit(channel)) {
+        
+        if (channel.isVoltageLimitExceeded(voltage)) {
             g_errorChannelIndex = channel.channelIndex;
             return SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
         }
 
-        if (current > channel_dispatcher::getILimit(channel)) {
+        if (channel.isCurrentLimitExceeded(current)) {
             g_errorChannelIndex = channel.channelIndex;
             return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
         }
@@ -547,14 +548,14 @@ int maxListsSize(Channel &channel) {
 
 bool setListValue(Channel &channel, int16_t it, int *err) {
     float voltage = channel_dispatcher::roundChannelValue(channel, UNIT_VOLT, g_channelsLists[channel.channelIndex].voltageList[it % g_channelsLists[channel.channelIndex].voltageListLength]);
-    if (voltage > channel_dispatcher::getULimit(channel)) {
+    if (channel.isVoltageLimitExceeded(voltage)) {
         g_errorChannelIndex = channel.channelIndex;
         *err = SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
         return false;
     }
 
     float current = channel_dispatcher::roundChannelValue(channel, UNIT_AMPER, g_channelsLists[channel.channelIndex].currentList[it % g_channelsLists[channel.channelIndex].currentListLength]);
-    if (current > channel_dispatcher::getILimit(channel)) {
+    if (channel.isCurrentLimitExceeded(current)) {
         g_errorChannelIndex = channel.channelIndex;
         *err = SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
         return false;
