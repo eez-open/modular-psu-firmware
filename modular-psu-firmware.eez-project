@@ -2364,7 +2364,7 @@
     {
       "name": "debug_i_adc",
       "type": "integer",
-      "defaultValue": "456"
+      "defaultValue": "65535"
     },
     {
       "name": "debug_u_adc",
@@ -44993,172 +44993,224 @@
                   "style": {
                     "inheritFrom": "default_S"
                   },
+                  "data": "channel_short_title_without_tracking_icon",
                   "left": 0,
                   "top": 0,
-                  "width": 64,
-                  "height": 29,
-                  "text": "U_DAC"
+                  "width": 40,
+                  "height": 58,
+                  "text": ""
                 },
                 {
-                  "type": "DisplayData",
+                  "type": "Container",
                   "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled",
-                    "color": "overlay_background",
-                    "activeBackgroundColor": "overlay_background",
-                    "focusBackgroundColor": "Action color"
+                    "inheritFrom": "default"
                   },
                   "data": "debug_u_dac",
                   "action": "edit",
-                  "left": 64,
+                  "left": 40,
                   "top": 0,
-                  "width": 84,
-                  "height": 29,
-                  "displayOption": 0
+                  "width": 216,
+                  "height": 59,
+                  "name": "Voltage",
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 64,
+                      "height": 29,
+                      "text": "U_DAC"
+                    },
+                    {
+                      "type": "DisplayData",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "color": "overlay_background",
+                        "activeBackgroundColor": "overlay_background",
+                        "focusBackgroundColor": "Action color"
+                      },
+                      "data": "debug_u_dac",
+                      "action": "",
+                      "left": 64,
+                      "top": 0,
+                      "width": 60,
+                      "height": 29,
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "DisplayData",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "color": "overlay_background",
+                        "activeBackgroundColor": "overlay_background",
+                        "focusBackgroundColor": "Action color"
+                      },
+                      "data": "debug_u_dac_voltage",
+                      "action": "",
+                      "left": 132,
+                      "top": 0,
+                      "width": 84,
+                      "height": 29,
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S"
+                      },
+                      "left": 0,
+                      "top": 30,
+                      "width": 64,
+                      "height": 29,
+                      "text": "U_ADC"
+                    },
+                    {
+                      "type": "DisplayData",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "color": "overlay_background",
+                        "activeBackgroundColor": "overlay_background",
+                        "focusBackgroundColor": "Action color"
+                      },
+                      "data": "debug_u_adc",
+                      "action": "",
+                      "left": 64,
+                      "top": 30,
+                      "width": 60,
+                      "height": 29,
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "DisplayData",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "color": "overlay_background",
+                        "activeBackgroundColor": "overlay_background",
+                        "focusBackgroundColor": "Action color"
+                      },
+                      "data": "debug_u_adc_voltage",
+                      "action": "",
+                      "left": 132,
+                      "top": 30,
+                      "width": 84,
+                      "height": 29,
+                      "displayOption": 0
+                    }
+                  ]
                 },
                 {
-                  "type": "DisplayData",
+                  "type": "Container",
                   "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled",
-                    "color": "overlay_background",
-                    "activeBackgroundColor": "overlay_background",
-                    "focusBackgroundColor": "Action color"
-                  },
-                  "data": "debug_u_dac_voltage",
-                  "action": "",
-                  "left": 156,
-                  "top": 0,
-                  "width": 84,
-                  "height": 29,
-                  "displayOption": 0
-                },
-                {
-                  "type": "Text",
-                  "style": {
-                    "inheritFrom": "default_S"
-                  },
-                  "left": 0,
-                  "top": 30,
-                  "width": 64,
-                  "height": 29,
-                  "text": "U_ADC"
-                },
-                {
-                  "type": "DisplayData",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled",
-                    "color": "overlay_background",
-                    "activeBackgroundColor": "overlay_background",
-                    "focusBackgroundColor": "Action color"
-                  },
-                  "data": "debug_u_adc",
-                  "action": "",
-                  "left": 64,
-                  "top": 30,
-                  "width": 84,
-                  "height": 29,
-                  "displayOption": 0
-                },
-                {
-                  "type": "DisplayData",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled",
-                    "color": "overlay_background",
-                    "activeBackgroundColor": "overlay_background",
-                    "focusBackgroundColor": "Action color"
-                  },
-                  "data": "debug_u_adc_voltage",
-                  "action": "",
-                  "left": 156,
-                  "top": 30,
-                  "width": 84,
-                  "height": 29,
-                  "displayOption": 0
-                },
-                {
-                  "type": "Text",
-                  "style": {
-                    "inheritFrom": "default_S"
-                  },
-                  "left": 240,
-                  "top": 0,
-                  "width": 64,
-                  "height": 29,
-                  "text": "I_DAC"
-                },
-                {
-                  "type": "DisplayData",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled",
-                    "color": "overlay_background",
-                    "activeBackgroundColor": "overlay_background",
-                    "focusBackgroundColor": "Action color"
+                    "inheritFrom": "default"
                   },
                   "data": "debug_i_dac",
                   "action": "edit",
-                  "left": 304,
+                  "left": 264,
                   "top": 0,
-                  "width": 84,
-                  "height": 29,
-                  "displayOption": 0
+                  "width": 216,
+                  "height": 59,
+                  "name": "Current",
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 64,
+                      "height": 29,
+                      "text": "I_DAC"
+                    },
+                    {
+                      "type": "DisplayData",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "color": "overlay_background",
+                        "activeBackgroundColor": "overlay_background",
+                        "focusBackgroundColor": "Action color"
+                      },
+                      "data": "debug_i_dac",
+                      "action": "",
+                      "left": 64,
+                      "top": 0,
+                      "width": 60,
+                      "height": 29,
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "DisplayData",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "color": "overlay_background",
+                        "activeBackgroundColor": "overlay_background",
+                        "focusBackgroundColor": "Action color"
+                      },
+                      "data": "debug_i_dac_amper",
+                      "action": "",
+                      "left": 132,
+                      "top": 0,
+                      "width": 84,
+                      "height": 29,
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S"
+                      },
+                      "left": 0,
+                      "top": 30,
+                      "width": 64,
+                      "height": 29,
+                      "text": "I_ADC"
+                    },
+                    {
+                      "type": "DisplayData",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "color": "overlay_background",
+                        "activeBackgroundColor": "overlay_background",
+                        "focusBackgroundColor": "Action color"
+                      },
+                      "data": "debug_i_adc",
+                      "action": "",
+                      "left": 64,
+                      "top": 30,
+                      "width": 60,
+                      "height": 29,
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "DisplayData",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "color": "overlay_background",
+                        "activeBackgroundColor": "overlay_background",
+                        "focusBackgroundColor": "Action color"
+                      },
+                      "data": "debug_i_adc_amper",
+                      "action": "",
+                      "left": 132,
+                      "top": 30,
+                      "width": 84,
+                      "height": 29,
+                      "displayOption": 0
+                    }
+                  ]
                 },
                 {
-                  "type": "DisplayData",
+                  "type": "Rectangle",
                   "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled",
-                    "color": "overlay_background",
-                    "activeBackgroundColor": "overlay_background",
-                    "focusBackgroundColor": "Action color"
+                    "inheritFrom": "default"
                   },
-                  "data": "debug_i_dac_amper",
-                  "action": "",
-                  "left": 396,
-                  "top": 0,
-                  "width": 84,
-                  "height": 29,
-                  "displayOption": 0
-                },
-                {
-                  "type": "Text",
-                  "style": {
-                    "inheritFrom": "default_S"
-                  },
-                  "left": 240,
-                  "top": 30,
-                  "width": 64,
-                  "height": 29,
-                  "text": "I_ADC"
-                },
-                {
-                  "type": "DisplayData",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled",
-                    "color": "overlay_background",
-                    "activeBackgroundColor": "overlay_background",
-                    "focusBackgroundColor": "Action color"
-                  },
-                  "data": "debug_i_adc",
-                  "action": "",
-                  "left": 304,
-                  "top": 30,
-                  "width": 84,
-                  "height": 29,
-                  "displayOption": 0
-                },
-                {
-                  "type": "DisplayData",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled",
-                    "color": "overlay_background",
-                    "activeBackgroundColor": "overlay_background",
-                    "focusBackgroundColor": "Action color"
-                  },
-                  "data": "debug_i_adc_amper",
-                  "action": "",
-                  "left": 396,
-                  "top": 30,
-                  "width": 84,
-                  "height": 29,
-                  "displayOption": 0
+                  "left": 0,
+                  "top": 59,
+                  "width": 480,
+                  "height": 1
                 }
               ]
             },
@@ -45206,7 +45258,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "dataContextOverrides": "{\n    \"channels\": [\n        {\n            \"channel_short_title_without_tracking_icon\": \"#1\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#2\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#3\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#4\"\n        }\n    ]\n}"
       }
     ],
     "styles": [

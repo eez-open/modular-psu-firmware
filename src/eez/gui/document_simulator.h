@@ -1891,4 +1891,4 @@ enum PagesEnum {
     PAGE_ID_DEBUG_POWER_CHANNELS = 170
 };
 
-extern const uint8_t assets[436680];
+extern const uint8_t assets[436715];
