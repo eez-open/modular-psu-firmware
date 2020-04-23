@@ -33,15 +33,6 @@ namespace scpi {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-scpi_choice_def_t calibration_level_choice[] = {
-    { "MINimum", calibration::LEVEL_MIN },
-    { "MIDdle", calibration::LEVEL_MID },
-    { "MAXimum", calibration::LEVEL_MAX },
-    SCPI_CHOICE_LIST_END /* termination of option list */
-};
-
-////////////////////////////////////////////////////////////////////////////////
-
 scpi_choice_def_t calibration_current_range_choice[] = {
     { "HIGH", calibration::CURRENT_RANGE_HIGH },
     { "LOW", calibration::CURRENT_RANGE_LOW },
@@ -56,18 +47,29 @@ static scpi_result_t calibration_level(scpi_t *context, calibration::Value &cali
         return SCPI_RES_ERR;
     }
 
-    int32_t level;
-    if (!SCPI_ParamChoice(context, calibration_level_choice, &level, true)) {
+    int32_t currentPointIndex;
+    if (!SCPI_ParamInt32(context, &currentPointIndex, true)) {
         return SCPI_RES_ERR;
     }
 
-    if ((level == calibration::LEVEL_MID || level == calibration::LEVEL_MAX) && !calibrationValue.min_set) {
-        SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+    if (currentPointIndex < 1 || currentPointIndex > MAX_CALIBRATION_POINTS) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }
 
-    calibrationValue.setLevel(level);
-    calibrationValue.setLevelValue();
+    float dacValue;
+    if (calibrationValue.isVoltage()) {
+        if (!get_voltage_param(context, dacValue, &calibration::getCalibrationChannel(), 0)) {
+            return SCPI_RES_ERR;
+        }
+    } else {
+        if (!get_current_param(context, dacValue, &calibration::getCalibrationChannel(), 0)) {
+            return SCPI_RES_ERR;
+        }
+    }
+
+    calibrationValue.setCurrentPointIndex(currentPointIndex - 1);
+    calibrationValue.setDacValue(dacValue);
 
     return SCPI_RES_OK;
 }
@@ -77,7 +79,7 @@ static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calib
         return SCPI_RES_ERR;
     }
 
-    if (calibrationValue.level == calibration::LEVEL_NONE) {
+    if (calibrationValue.currentPointIndex == -1) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
     }
@@ -88,21 +90,18 @@ static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calib
     }
 
     if (param.unit != SCPI_UNIT_NONE &&
-        param.unit != (calibrationValue.voltOrCurr ? SCPI_UNIT_VOLT : SCPI_UNIT_AMPER)) {
+        param.unit != (calibrationValue.isVoltage() ? SCPI_UNIT_VOLT : SCPI_UNIT_AMPER)) {
         SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
         return SCPI_RES_ERR;
     }
 
-    float dac = calibrationValue.getDacValue();
     float value = (float)param.content.value;
-    float adc = calibrationValue.getAdcValue();
-
-    if (!calibrationValue.checkRange(dac, value, adc)) {
+    float adc = calibrationValue.readAdcValue();
+    if (!calibrationValue.checkValueAndAdc(value, adc)) {
         SCPI_ErrorPush(context, SCPI_ERROR_CAL_VALUE_OUT_OF_RANGE);
         return SCPI_RES_ERR;
     }
-
-    calibrationValue.setData(dac, value, adc);
+    calibrationValue.setValueAndAdc(value, adc);
 
     calibration::resetChannelToZero();
 
@@ -272,7 +271,7 @@ scpi_result_t scpi_cmd_calibrationRemarkQ(scpi_t *context) {
         if (!channel) {
             return SCPI_RES_ERR;
         }
-        remark = channel->cal_conf.calibration_remark;
+        remark = channel->cal_conf.calibrationRemark;
     }
 
     SCPI_ResultText(context, remark);

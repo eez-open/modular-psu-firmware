@@ -490,10 +490,17 @@
       "defaultValue": "0"
     },
     {
-      "name": "channel_calibration_step_num",
+      "name": "channel_calibration_step_group",
       "description": "",
       "type": "enum",
-      "enumItems": "[\n\"U min\",\n\"U mid\",\n\"U max\",\n\"I 5A min\",\n\"I 5A mid\",\n\"I 5A max\",\n\"I 50mA min\",\n\"I 50mA mid\",\n\"I 50mA max\"\n]",
+      "enumItems": "[\n    \"Voltage\",\n    \"Current High Range\",\n    \"Current Low Range\",\n    \"Remark\"\n]",
+      "defaultValue": "1"
+    },
+    {
+      "name": "channel_calibration_current_point_index",
+      "description": "",
+      "type": "enum",
+      "enumItems": "[\n    0,\n    1,\n    2,\n    3,\n    4\n]",
       "defaultValue": "0"
     },
     {
@@ -2375,6 +2382,12 @@
       "name": "dlog_view_legend_view_option",
       "type": "enum",
       "enumItems": "[\n    \"Hidden\",\n    \"Float\",\n    \"Dock\"\n]",
+      "defaultValue": "1"
+    },
+    {
+      "name": "channel_calibration_num_points",
+      "type": "enum",
+      "enumItems": "[\n    2,\n    3,\n    4,\n    5\n]",
       "defaultValue": "1"
     }
   ],
@@ -15116,10 +15129,10 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "channel_calibration_step_is_set_remark_step",
-            "left": 15,
-            "top": 25,
-            "width": 450,
+            "data": "channel_calibration_step_group",
+            "left": 10,
+            "top": 10,
+            "width": 460,
             "height": 76,
             "widgets": [
               {
@@ -15129,192 +15142,66 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 450,
+                "width": 460,
                 "height": 76,
                 "widgets": [
                   {
-                    "type": "Select",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "edit_value_M_left"
                     },
-                    "data": "channel_calibration_step_num",
                     "left": 0,
                     "top": 0,
-                    "width": 270,
-                    "height": 32,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_M_left"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 270,
-                        "height": 32,
-                        "text": "Voltage MIN point"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_M_left"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 270,
-                        "height": 32,
-                        "text": "Voltage MID point"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_M_left"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 270,
-                        "height": 32,
-                        "text": "Voltage MAX point"
-                      },
-                      {
-                        "type": "Select",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "data": "channel_has_support_for_current_dual_range",
-                        "left": 0,
-                        "top": 0,
-                        "width": 270,
-                        "height": 32,
-                        "widgets": [
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "edit_value_M_left"
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 270,
-                            "height": 32,
-                            "text": "Current MIN point"
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "edit_value_M_left"
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 270,
-                            "height": 32,
-                            "text": "Current [0-5A] MIN point"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Select",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "data": "channel_has_support_for_current_dual_range",
-                        "left": 0,
-                        "top": 0,
-                        "width": 270,
-                        "height": 32,
-                        "widgets": [
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "edit_value_M_left"
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 270,
-                            "height": 32,
-                            "text": "Current MID point"
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "edit_value_M_left"
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 270,
-                            "height": 32,
-                            "text": "Current [0-5A] MID point"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Select",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "data": "channel_has_support_for_current_dual_range",
-                        "left": 0,
-                        "top": 0,
-                        "width": 270,
-                        "height": 32,
-                        "widgets": [
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "edit_value_M_left"
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 270,
-                            "height": 32,
-                            "text": "Current MAX point"
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "edit_value_M_left"
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 270,
-                            "height": 32,
-                            "text": "Current [0-5A] MAX point"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_M_left"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 270,
-                        "height": 32,
-                        "text": "Current [0-50mA] MIN point"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_M_left"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 270,
-                        "height": 32,
-                        "text": "Current [0-50mA] MID point"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_M_left"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 270,
-                        "height": 32,
-                        "text": "Current [0-50mA] MAX point"
-                      }
-                    ]
+                    "width": 130,
+                    "height": 40,
+                    "text": "Voltage point"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_M_left"
+                    },
+                    "data": "channel_calibration_current_point_index",
+                    "left": 130,
+                    "top": 0,
+                    "width": 18,
+                    "height": 40,
+                    "text": ""
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_M_left"
+                    },
+                    "data": "",
+                    "left": 148,
+                    "top": 0,
+                    "width": 24,
+                    "height": 40,
+                    "text": "of"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_M_left"
+                    },
+                    "data": "channel_calibration_num_points",
+                    "left": 172,
+                    "top": 0,
+                    "width": 18,
+                    "height": 40,
+                    "text": ""
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "button_S"
+                    },
+                    "left": 190,
+                    "top": 0,
+                    "width": 76,
+                    "height": 40,
+                    "text": "Add"
                   },
                   {
                     "type": "Text",
@@ -15323,10 +15210,10 @@
                     },
                     "data": "channel_calibration_step_level_value",
                     "action": "ch_settings_calibration_wiz_step_set_level_value",
-                    "left": 270,
+                    "left": 350,
                     "top": 0,
                     "width": 110,
-                    "height": 32,
+                    "height": 40,
                     "text": ""
                   },
                   {
@@ -15349,7 +15236,385 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 450,
+                "width": 460,
+                "height": 76,
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_has_support_for_current_dual_range",
+                    "left": 0,
+                    "top": 0,
+                    "width": 370,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 370,
+                        "height": 40,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 132,
+                            "height": 40,
+                            "text": "Current point"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "channel_calibration_current_point_index",
+                            "left": 130,
+                            "top": 0,
+                            "width": 18,
+                            "height": 40,
+                            "text": ""
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "",
+                            "left": 148,
+                            "top": 0,
+                            "width": 24,
+                            "height": 40,
+                            "text": "of"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "channel_calibration_num_points",
+                            "left": 172,
+                            "top": 0,
+                            "width": 18,
+                            "height": 40,
+                            "text": ""
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "button_S"
+                            },
+                            "left": 190,
+                            "top": 0,
+                            "width": 76,
+                            "height": 40,
+                            "text": "Add"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 370,
+                        "height": 40,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 196,
+                            "height": 40,
+                            "text": "Current [0-5A] point"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "channel_calibration_current_point_index",
+                            "left": 196,
+                            "top": 0,
+                            "width": 18,
+                            "height": 40,
+                            "text": ""
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "",
+                            "left": 214,
+                            "top": 0,
+                            "width": 24,
+                            "height": 40,
+                            "text": "of"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "channel_calibration_num_points",
+                            "left": 238,
+                            "top": 0,
+                            "width": 18,
+                            "height": 40,
+                            "text": ""
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "button_S"
+                            },
+                            "left": 256,
+                            "top": 0,
+                            "width": 76,
+                            "height": 40,
+                            "text": "Add"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "channel_calibration_step_level_value",
+                    "action": "ch_settings_calibration_wiz_step_set_level_value",
+                    "left": 369,
+                    "top": 0,
+                    "width": 90,
+                    "height": 40,
+                    "text": ""
+                  },
+                  {
+                    "type": "MultilineText",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 0,
+                    "top": 47,
+                    "width": 459,
+                    "height": 29,
+                    "text": "Enter output value measured with external instrument"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 460,
+                "height": 76,
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_has_support_for_current_dual_range",
+                    "left": 0,
+                    "top": 0,
+                    "width": 370,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 370,
+                        "height": 40,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 132,
+                            "height": 40,
+                            "text": "Current point"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "channel_calibration_current_point_index",
+                            "left": 130,
+                            "top": 0,
+                            "width": 18,
+                            "height": 40,
+                            "text": ""
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "",
+                            "left": 148,
+                            "top": 0,
+                            "width": 24,
+                            "height": 40,
+                            "text": "of"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "channel_calibration_num_points",
+                            "left": 172,
+                            "top": 0,
+                            "width": 18,
+                            "height": 40,
+                            "text": ""
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "button_S"
+                            },
+                            "left": 190,
+                            "top": 0,
+                            "width": 76,
+                            "height": 40,
+                            "text": "Add"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 370,
+                        "height": 40,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 225,
+                            "height": 40,
+                            "text": "Current [0-50mA] point"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "channel_calibration_current_point_index",
+                            "left": 225,
+                            "top": 0,
+                            "width": 18,
+                            "height": 40,
+                            "text": ""
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "",
+                            "left": 243,
+                            "top": 0,
+                            "width": 24,
+                            "height": 40,
+                            "text": "of"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "data": "channel_calibration_num_points",
+                            "left": 267,
+                            "top": 0,
+                            "width": 18,
+                            "height": 40,
+                            "text": ""
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "button_S"
+                            },
+                            "left": 285,
+                            "top": 0,
+                            "width": 76,
+                            "height": 40,
+                            "text": "Add"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "channel_calibration_step_level_value",
+                    "action": "ch_settings_calibration_wiz_step_set_level_value",
+                    "left": 370,
+                    "top": 0,
+                    "width": 90,
+                    "height": 40,
+                    "text": ""
+                  },
+                  {
+                    "type": "MultilineText",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 0,
+                    "top": 47,
+                    "width": 450,
+                    "height": 29,
+                    "text": "Enter output value measured with external instrument"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 460,
                 "height": 76,
                 "widgets": [
                   {
@@ -15594,44 +15859,932 @@
         "height": 272
       },
       {
-        "name": "ch_settings_calibration_wiz_finish",
-        "description": "Channel calibration wizard final step",
+        "name": "ch_settings_calibration_wiz_step_new",
+        "description": "Channel calibration wizard steps",
         "style": "default",
         "widgets": [
           {
-            "type": "Text",
+            "type": "Select",
             "style": {
-              "inheritFrom": "default_M"
+              "inheritFrom": "default"
             },
+            "data": "channel_has_support_for_current_dual_range",
             "left": 0,
-            "top": 77,
+            "top": 0,
             "width": 480,
-            "height": 39,
-            "text": "Save calibration parameters?"
+            "height": 42,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 42,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 160,
+                    "height": 40,
+                    "text": "Voltage"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "left": 160,
+                    "top": 0,
+                    "width": 160,
+                    "height": 40,
+                    "text": "Current"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "left": 320,
+                    "top": 0,
+                    "width": 160,
+                    "height": 40,
+                    "text": "Remark"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_step_group",
+                    "left": 0,
+                    "top": 40,
+                    "width": 480,
+                    "height": 2,
+                    "widgets": [
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 480,
+                        "height": 2,
+                        "widgets": [
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 160,
+                            "height": 2
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 480,
+                        "height": 2,
+                        "widgets": [
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 160,
+                            "top": 0,
+                            "width": 160,
+                            "height": 2
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 480,
+                        "height": 2,
+                        "widgets": [
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 160,
+                            "top": 0,
+                            "width": 160,
+                            "height": 2
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 480,
+                        "height": 2,
+                        "widgets": [
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 320,
+                            "top": 0,
+                            "width": 160,
+                            "height": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 42,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 100,
+                    "height": 40,
+                    "text": "Voltage"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "left": 100,
+                    "top": 0,
+                    "width": 130,
+                    "height": 40,
+                    "text": "Current 5A"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "left": 230,
+                    "top": 0,
+                    "width": 150,
+                    "height": 40,
+                    "text": "Current 50 mA"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "left": 380,
+                    "top": 0,
+                    "width": 100,
+                    "height": 40,
+                    "text": "Remark"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_step_group",
+                    "left": 0,
+                    "top": 40,
+                    "width": 480,
+                    "height": 2,
+                    "widgets": [
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 480,
+                        "height": 2,
+                        "widgets": [
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 100,
+                            "height": 2
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 480,
+                        "height": 2,
+                        "widgets": [
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 100,
+                            "top": 0,
+                            "width": 130,
+                            "height": 2
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 480,
+                        "height": 2,
+                        "widgets": [
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 230,
+                            "top": 0,
+                            "width": 150,
+                            "height": 2
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 480,
+                        "height": 2,
+                        "widgets": [
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 380,
+                            "top": 0,
+                            "width": 100,
+                            "height": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           },
           {
-            "type": "Text",
+            "type": "Select",
             "style": {
-              "inheritFrom": "button_M"
+              "inheritFrom": "default"
             },
-            "action": "ch_settings_calibration_wiz_save",
-            "left": 115,
-            "top": 141,
-            "width": 120,
-            "height": 40,
-            "text": "\\u0086 Save"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "button_M"
-            },
-            "action": "ch_settings_calibration_wiz_stop_and_show_previous_page",
-            "left": 245,
-            "top": 141,
-            "width": 120,
-            "height": 40,
-            "text": "\\u008b Discard"
+            "data": "channel_calibration_step_group",
+            "left": 0,
+            "top": 42,
+            "width": 480,
+            "height": 198,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 198,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 42,
+                    "layout": "ch_settings_calibration_points"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "channel_calibration_step_level_value",
+                    "action": "ch_settings_calibration_wiz_step_set_level_value",
+                    "left": 0,
+                    "top": 42,
+                    "width": 110,
+                    "height": 32,
+                    "text": ""
+                  },
+                  {
+                    "type": "MultilineText",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 0,
+                    "top": 74,
+                    "width": 480,
+                    "height": 29,
+                    "text": "Enter output value measured with external instrument"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_step_status",
+                    "left": 0,
+                    "top": 103,
+                    "width": 128,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "value"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 128,
+                        "height": 40,
+                        "text": "<not set>"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "value"
+                        },
+                        "data": "channel_calibration_step_value",
+                        "left": 0,
+                        "top": 0,
+                        "width": 128,
+                        "height": 40,
+                        "text": ""
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_step_status",
+                    "left": 0,
+                    "top": 143,
+                    "width": 118,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "option_toggle_L",
+                          "alignHorizontal": "center"
+                        },
+                        "data": "",
+                        "action": "ch_settings_calibration_wiz_step_set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 118,
+                        "height": 40,
+                        "text": "Set"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "option_toggle_L",
+                          "alignHorizontal": "center"
+                        },
+                        "data": "",
+                        "action": "ch_settings_calibration_wiz_step_set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 118,
+                        "height": 40,
+                        "text": "Change"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_has_step_note",
+                    "left": 158,
+                    "top": 103,
+                    "width": 322,
+                    "height": 93,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 322,
+                        "height": 93,
+                        "invertColors": true
+                      },
+                      {
+                        "type": "MultilineText",
+                        "style": {
+                          "inheritFrom": "default_M",
+                          "borderSize": "1"
+                        },
+                        "data": "channel_calibration_step_note",
+                        "left": 0,
+                        "top": 0,
+                        "width": 322,
+                        "height": 93,
+                        "text": "",
+                        "firstLineIndent": 0,
+                        "hangingIndent": 0
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 198,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 42,
+                    "layout": "ch_settings_calibration_points"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "channel_calibration_step_level_value",
+                    "action": "ch_settings_calibration_wiz_step_set_level_value",
+                    "left": 0,
+                    "top": 42,
+                    "width": 110,
+                    "height": 32,
+                    "text": ""
+                  },
+                  {
+                    "type": "MultilineText",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 0,
+                    "top": 74,
+                    "width": 480,
+                    "height": 29,
+                    "text": "Enter output value measured with external instrument"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_step_status",
+                    "left": 0,
+                    "top": 103,
+                    "width": 128,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "value"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 128,
+                        "height": 40,
+                        "text": "<not set>"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "value"
+                        },
+                        "data": "channel_calibration_step_value",
+                        "left": 0,
+                        "top": 0,
+                        "width": 128,
+                        "height": 40,
+                        "text": ""
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_step_status",
+                    "left": 0,
+                    "top": 143,
+                    "width": 118,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "option_toggle_L",
+                          "alignHorizontal": "center"
+                        },
+                        "data": "",
+                        "action": "ch_settings_calibration_wiz_step_set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 118,
+                        "height": 40,
+                        "text": "Set"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "option_toggle_L",
+                          "alignHorizontal": "center"
+                        },
+                        "data": "",
+                        "action": "ch_settings_calibration_wiz_step_set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 118,
+                        "height": 40,
+                        "text": "Change"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_has_step_note",
+                    "left": 158,
+                    "top": 105,
+                    "width": 322,
+                    "height": 93,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 322,
+                        "height": 93,
+                        "invertColors": true
+                      },
+                      {
+                        "type": "MultilineText",
+                        "style": {
+                          "inheritFrom": "default_M",
+                          "borderSize": "1"
+                        },
+                        "data": "channel_calibration_step_note",
+                        "left": 0,
+                        "top": 0,
+                        "width": 322,
+                        "height": 93,
+                        "text": "",
+                        "firstLineIndent": 0,
+                        "hangingIndent": 0
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 198,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 42,
+                    "layout": "ch_settings_calibration_points"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "channel_calibration_step_level_value",
+                    "action": "ch_settings_calibration_wiz_step_set_level_value",
+                    "left": 0,
+                    "top": 42,
+                    "width": 110,
+                    "height": 32,
+                    "text": ""
+                  },
+                  {
+                    "type": "MultilineText",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 0,
+                    "top": 74,
+                    "width": 480,
+                    "height": 29,
+                    "text": "Enter output value measured with external instrument"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_step_status",
+                    "left": 0,
+                    "top": 103,
+                    "width": 128,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "value"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 128,
+                        "height": 40,
+                        "text": "<not set>"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "value"
+                        },
+                        "data": "channel_calibration_step_value",
+                        "left": 0,
+                        "top": 0,
+                        "width": 128,
+                        "height": 40,
+                        "text": ""
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_step_status",
+                    "left": 0,
+                    "top": 143,
+                    "width": 118,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "option_toggle_L",
+                          "alignHorizontal": "center"
+                        },
+                        "data": "",
+                        "action": "ch_settings_calibration_wiz_step_set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 118,
+                        "height": 40,
+                        "text": "Set"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "option_toggle_L",
+                          "alignHorizontal": "center"
+                        },
+                        "data": "",
+                        "action": "ch_settings_calibration_wiz_step_set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 118,
+                        "height": 40,
+                        "text": "Change"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_has_step_note",
+                    "left": 158,
+                    "top": 105,
+                    "width": 322,
+                    "height": 93,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 322,
+                        "height": 93,
+                        "invertColors": true
+                      },
+                      {
+                        "type": "MultilineText",
+                        "style": {
+                          "inheritFrom": "default_M",
+                          "borderSize": "1"
+                        },
+                        "data": "channel_calibration_step_note",
+                        "left": 0,
+                        "top": 0,
+                        "width": 322,
+                        "height": 93,
+                        "text": "",
+                        "firstLineIndent": 0,
+                        "hangingIndent": 0
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 198,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "data": "",
+                    "left": 35,
+                    "top": 19,
+                    "width": 304,
+                    "height": 28,
+                    "text": "Calibration remark (max. 32 char.)"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_step_status",
+                    "left": 0,
+                    "top": 103,
+                    "width": 128,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "value"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 128,
+                        "height": 40,
+                        "text": "<not set>"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "value"
+                        },
+                        "data": "channel_calibration_step_value",
+                        "left": 0,
+                        "top": 0,
+                        "width": 128,
+                        "height": 40,
+                        "text": ""
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_calibration_step_status",
+                    "left": 0,
+                    "top": 143,
+                    "width": 118,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "option_toggle_L",
+                          "alignHorizontal": "center"
+                        },
+                        "data": "",
+                        "action": "ch_settings_calibration_wiz_step_set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 118,
+                        "height": 40,
+                        "text": "Set"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "option_toggle_L",
+                          "alignHorizontal": "center"
+                        },
+                        "data": "",
+                        "action": "ch_settings_calibration_wiz_step_set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 118,
+                        "height": 40,
+                        "text": "Change"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           },
           {
             "type": "Container",
@@ -15690,6 +16843,546 @@
                 },
                 "action": "ch_settings_calibration_wiz_step_previous",
                 "left": 383,
+                "top": 0,
+                "width": 48,
+                "height": 32,
+                "text": "(",
+                "enabled": "channel_calibration_step_prev_enabled",
+                "disabledStyle": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "#c0c0c0",
+                  "activeBackgroundColor": "#c0c0c0"
+                }
+              },
+              {
+                "type": "Button",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "ch_settings_calibration_wiz_step_next",
+                "left": 431,
+                "top": 0,
+                "width": 48,
+                "height": 32,
+                "text": ")",
+                "enabled": "channel_calibration_step_next_enabled",
+                "disabledStyle": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "#c0c0c0",
+                  "activeBackgroundColor": "#c0c0c0"
+                }
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
+      },
+      {
+        "name": "ch_settings_calibration_points",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 42,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_S"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 80,
+                "height": 40,
+                "text": "Point:"
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_calibration_num_points",
+                "left": 80,
+                "top": 0,
+                "width": 400,
+                "height": 40,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 400,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#1"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 80,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#2"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "button_S"
+                        },
+                        "left": 162,
+                        "top": 2,
+                        "width": 76,
+                        "height": 36,
+                        "text": "Add"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 400,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#1"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 80,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#2"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 160,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#3"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "button_S"
+                        },
+                        "left": 242,
+                        "top": 2,
+                        "width": 76,
+                        "height": 36,
+                        "text": "Add"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 400,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#1"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 80,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#2"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 160,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#3"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 240,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#4"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "button_S"
+                        },
+                        "left": 322,
+                        "top": 2,
+                        "width": 76,
+                        "height": 36,
+                        "text": "Add"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 400,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#1"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 80,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#2"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 160,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#3"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 240,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#4"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 320,
+                        "top": 0,
+                        "width": 80,
+                        "height": 40,
+                        "text": "#5"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_calibration_current_point_index",
+                "left": 0,
+                "top": 40,
+                "width": 480,
+                "height": 2,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 2,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 80,
+                        "top": 0,
+                        "width": 80,
+                        "height": 2
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 2,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 160,
+                        "top": 0,
+                        "width": 80,
+                        "height": 2
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 2,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 240,
+                        "top": 0,
+                        "width": 80,
+                        "height": 2
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 2,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 320,
+                        "top": 0,
+                        "width": 80,
+                        "height": 2
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 2,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 400,
+                        "top": 0,
+                        "width": 80,
+                        "height": 2
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 40
+      },
+      {
+        "name": "ch_settings_calibration_wiz_finish",
+        "description": "Channel calibration wizard final step",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default_M"
+            },
+            "left": 0,
+            "top": 77,
+            "width": 480,
+            "height": 39,
+            "text": "Save calibration parameters?"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "button_M"
+            },
+            "action": "ch_settings_calibration_wiz_save",
+            "left": 115,
+            "top": 141,
+            "width": 120,
+            "height": 40,
+            "text": "\\u0086 Save"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "button_M"
+            },
+            "action": "ch_settings_calibration_wiz_stop_and_show_previous_page",
+            "left": 245,
+            "top": 141,
+            "width": 120,
+            "height": 40,
+            "text": "\\u008b Discard"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "channel1"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "ch_settings_calibration_wiz_stop_and_show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left"
+                },
+                "data": "channel_short_label",
+                "left": 41,
+                "top": 0,
+                "width": 36,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left"
+                },
+                "left": 77,
+                "top": 0,
+                "width": 305,
+                "height": 32,
+                "text": "Calibration"
+              },
+              {
+                "type": "Button",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "ch_settings_calibration_wiz_step_previous",
+                "left": 382,
                 "top": 0,
                 "width": 48,
                 "height": 32,

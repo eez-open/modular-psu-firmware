@@ -63,10 +63,10 @@ void start() {
 }
 
 Value getLevelValue() {
-    if (g_stepNum < 3) {
-        return MakeValue(calibration::getVoltage().getLevelValue(), UNIT_VOLT);
+    if (g_stepNum < calibration::getVoltage().numPoints) {
+        return MakeValue(calibration::getVoltage().getDacValue(), UNIT_VOLT);
     }
-    return MakeValue(calibration::getCurrent().getLevelValue(), UNIT_AMPER);
+    return MakeValue(calibration::getCurrent().getDacValue(), UNIT_AMPER);
 }
 
 void showCurrentStep() {
@@ -160,10 +160,9 @@ void onSetOk(float value) {
         return;
     }
 
-    float dac = calibrationValue->getDacValue();
     float adc = calibrationValue->getAdcValue();
-    if (calibrationValue->checkRange(dac, value, adc)) {
-        calibrationValue->setData(dac, value, adc);
+    if (calibrationValue->checkValueAndAdc(value, adc)) {
+        calibrationValue->setValueAndAdc(value, adc);
         popPage();
         nextStep();
     } else {

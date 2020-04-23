@@ -63,7 +63,7 @@ namespace persist_conf {
 ////////////////////////////////////////////////////////////////////////////////
 
 static const uint16_t MODULE_CONF_VERSION = 1;
-static const uint16_t CH_CAL_CONF_VERSION = 3;
+static const uint16_t CH_CAL_CONF_VERSION = 4;
 
 static const uint16_t PERSIST_CONF_DEV_CONF_ADDRESS = 128;
 

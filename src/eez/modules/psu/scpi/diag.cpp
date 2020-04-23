@@ -23,6 +23,7 @@
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/calibration.h>
+#include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/devices.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/temperature.h>
@@ -37,70 +38,42 @@ namespace scpi {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void printCalibrationValue(scpi_t *context, char *buffer, calibration::Value &value) {
+static void printCalibrationValue(scpi_t *context, calibration::Value &value) {
     const char *prefix;
     void (*strcat_value)(char *str, float value);
-    if (value.voltOrCurr) {
+    if (value.type == calibration::CALIBRATION_VALUE_U) {
         prefix = "u";
         strcat_value = strcatVoltage;
     } else {
-        prefix = "i";
+        if (calibration::getCalibrationChannel().hasSupportForCurrentDualRange()) {
+            if (value.type == calibration::CALIBRATION_VALUE_I_HI_RANGE) {
+                prefix = "i_5A";
+            } else {
+                prefix = "i_50mA";
+            }
+        } else {
+            prefix = "i";
+        }
         strcat_value = strcatCurrent;
     }
 
-    if (value.min_set) {
-        strcpy(buffer, prefix);
-        strcat(buffer, "_min=");
-        strcat_value(buffer, value.min_val);
-        SCPI_ResultText(context, buffer);
-    }
-    if (value.mid_set) {
-        strcpy(buffer, prefix);
-        strcat(buffer, "_mid=");
-        strcat_value(buffer, value.mid_val);
-        SCPI_ResultText(context, buffer);
-    }
-    if (value.max_set) {
-        strcpy(buffer, prefix);
-        strcat(buffer, "_max=");
-        strcat_value(buffer, value.max_val);
-        SCPI_ResultText(context, buffer);
-    }
+    char buffer[128] = { 0 };
 
-    strcpy(buffer, prefix);
-    strcat(buffer, "_level=");
-    switch (value.level) {
-    case calibration::LEVEL_NONE:
-        strcat(buffer, "none");
-        break;
-    case calibration::LEVEL_MIN:
-        strcat(buffer, "min");
-        break;
-    case calibration::LEVEL_MID:
-        strcat(buffer, "mid");
-        break;
-    case calibration::LEVEL_MAX:
-        strcat(buffer, "max");
-        break;
-    }
-    SCPI_ResultText(context, buffer);
+    for (int i = 0; i < value.numPoints; i++) {
+        if (value.points[i].set) {
+            sprintf(buffer, "%s_point%d_dac=%f", prefix, i + 1, value.points[i].dac);
+            SCPI_ResultText(context, buffer);
 
-    if (value.level != calibration::LEVEL_NONE) {
-        strcpy(buffer, prefix);
-        strcat(buffer, "_level_value=");
-        strcat_value(buffer, value.getLevelValue());
-        SCPI_ResultText(context, buffer);
-        strcpy(buffer, prefix);
-        strcat(buffer, "_adc=");
-        strcat_value(buffer, value.getAdcValue());
-        SCPI_ResultText(context, buffer);
+            sprintf(buffer, "%s_point%d_data=%f", prefix, i + 1, value.points[i].value);
+            SCPI_ResultText(context, buffer);
+
+            sprintf(buffer, "%s_point%d_adc=%f", prefix, i + 1, value.points[i].adc);
+            SCPI_ResultText(context, buffer);
+        }
     }
 }
 
-void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange,
-                                bool calParamsExists,
-                                Channel::CalibrationValueConfiguration &calibrationValue,
-                                char *buffer) {
+void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange, bool calParamsExists, Channel::CalibrationValueConfiguration &calibrationValue) {
     const char *prefix;
     void (*strcat_value)(char *str, float value);
     if (unit == UNIT_VOLT) {
@@ -117,48 +90,22 @@ void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange
         strcat_value = strcatCurrent;
     }
 
-    strcpy(buffer, prefix);
-    strcat(buffer, "_cal_params_exists=");
-    strcatInt(buffer, calParamsExists);
+    char buffer[128] = { 0 };
+
+    sprintf(buffer, "%s_cal_params_exists=%d", prefix, calParamsExists);
     SCPI_ResultText(context, buffer);
 
     if (calParamsExists) {
-        strcpy(buffer, prefix);
-        strcat(buffer, "_min_level=");
-        strcat_value(buffer, calibrationValue.min.dac);
-        SCPI_ResultText(context, buffer);
-        strcpy(buffer, prefix);
-        strcat(buffer, "_min_data=");
-        strcat_value(buffer, calibrationValue.min.val);
-        SCPI_ResultText(context, buffer);
-        strcpy(buffer, prefix);
-        strcat(buffer, "_min_adc=");
-        strcat_value(buffer, calibrationValue.min.adc);
-        SCPI_ResultText(context, buffer);
-        strcpy(buffer, prefix);
-        strcat(buffer, "_mid_level=");
-        strcat_value(buffer, calibrationValue.mid.dac);
-        SCPI_ResultText(context, buffer);
-        strcpy(buffer, prefix);
-        strcat(buffer, "_mid_data=");
-        strcat_value(buffer, calibrationValue.mid.val);
-        SCPI_ResultText(context, buffer);
-        strcpy(buffer, prefix);
-        strcat(buffer, "_mid_adc=");
-        strcat_value(buffer, calibrationValue.mid.adc);
-        SCPI_ResultText(context, buffer);
-        strcpy(buffer, prefix);
-        strcat(buffer, "_max_level=");
-        strcat_value(buffer, calibrationValue.max.dac);
-        SCPI_ResultText(context, buffer);
-        strcpy(buffer, prefix);
-        strcat(buffer, "_max_data=");
-        strcat_value(buffer, calibrationValue.max.val);
-        SCPI_ResultText(context, buffer);
-        strcpy(buffer, prefix);
-        strcat(buffer, "_max_adc=");
-        strcat_value(buffer, calibrationValue.max.adc);
-        SCPI_ResultText(context, buffer);
+        for (unsigned int i = 0; i < calibrationValue.numPoints; i++) {
+            sprintf(buffer, "%s_point%d_dac=%f", prefix, i + 1, calibrationValue.points[i].dac);
+            SCPI_ResultText(context, buffer);
+
+            sprintf(buffer, "%s_point%d_data=%f", prefix, i + 1, calibrationValue.points[i].value);
+            SCPI_ResultText(context, buffer);
+
+            sprintf(buffer, "%s_point%d_adc=%f", prefix, i + 1, calibrationValue.points[i].adc);
+            SCPI_ResultText(context, buffer);
+        }
     }
 }
 
@@ -202,34 +149,29 @@ scpi_result_t scpi_cmd_diagnosticInformationCalibrationQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    char buffer[128] = { 0 };
-
     if (calibration::isEnabled()) {
         if (calibration::isRemarkSet()) {
+            char buffer[128] = { 0 };
             sprintf(buffer, "remark=%s", calibration::getRemark());
             SCPI_ResultText(context, buffer);
         }
-        printCalibrationValue(context, buffer, calibration::getVoltage());
-        printCalibrationValue(context, buffer, calibration::getCurrent());
+        printCalibrationValue(context, calibration::getVoltage());
+        printCalibrationValue(context, calibration::getCurrent());
     } else {
-        sprintf(buffer, "remark=%s %s", channel->cal_conf.calibration_date,
-                channel->cal_conf.calibration_remark);
+        char buffer[128] = { 0 };
+
+        int year, month, day, hour, minute, second;
+        datetime::breakTime(channel->cal_conf.calibrationDate, year, month, day, hour, minute, second);
+
+        sprintf(buffer, "remark=%04d-%02d-%02d %s", year, month, day, channel->cal_conf.calibrationRemark);
         SCPI_ResultText(context, buffer);
 
-        printCalibrationParameters(context, UNIT_VOLT, -1,
-                                   channel->cal_conf.flags.u_cal_params_exists, channel->cal_conf.u,
-                                   buffer);
+        printCalibrationParameters(context, UNIT_VOLT, -1, channel->isVoltageCalibrationExists(), channel->cal_conf.u);
         if (channel->hasSupportForCurrentDualRange()) {
-            printCalibrationParameters(context, UNIT_AMPER, 0,
-                                       channel->cal_conf.flags.i_cal_params_exists_range_high,
-                                       channel->cal_conf.i[0], buffer);
-            printCalibrationParameters(context, UNIT_AMPER, 1,
-                                       channel->cal_conf.flags.i_cal_params_exists_range_low,
-                                       channel->cal_conf.i[1], buffer);
+            printCalibrationParameters(context, UNIT_AMPER, 0, channel->isCurrentCalibrationExists(0), channel->cal_conf.i[0]);
+            printCalibrationParameters(context, UNIT_AMPER, 1, channel->isCurrentCalibrationExists(1), channel->cal_conf.i[1]);
         } else {
-            printCalibrationParameters(context, UNIT_AMPER, -1,
-                                       channel->cal_conf.flags.i_cal_params_exists_range_high,
-                                       channel->cal_conf.i[0], buffer);
+            printCalibrationParameters(context, UNIT_AMPER, -1, channel->isCurrentCalibrationExists(0), channel->cal_conf.i[0]);
         }
     }
 

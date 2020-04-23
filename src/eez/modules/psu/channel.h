@@ -101,23 +101,12 @@ class Channel {
     friend struct calibration::Value;
 
   public:
-    /// Binary flags for the channel calibration configuration.
-    struct CalibrationConfigurationFlags {
-        /// Is voltage calibrated?
-        unsigned u_cal_params_exists : 1;
-        /// Is current in range 0 (5A) calibrated?
-        unsigned i_cal_params_exists_range_high : 1;
-        /// Is current in range 1 (50mA) calibrated?
-        unsigned i_cal_params_exists_range_low : 1;
-    };
-
     /// Calibration parameters for the single point.
     struct CalibrationValuePointConfiguration {
         /// Value set on DAC by the calibration module.
         float dac;
-        /// Real value, in volts, set by the user who reads it on the instrument (voltmeter and
-        /// ampermeter).
-        float val;
+        /// Real value, in volts, set by the user who reads it on the instrument (voltmeter and ampermeter).
+        float value;
         /// Value read from ADC.
         float adc;
     };
@@ -131,24 +120,14 @@ class Channel {
     /// And here is how `real_value` is calculated from the `ADC` value:
     /// `real_value = min.val + (ADC - min.adc) * (max.val - min.val) / (max.adc - min.adc);`
     struct CalibrationValueConfiguration {
-        /// Min point.
-        CalibrationValuePointConfiguration min;
-        /// Mid point.
-        CalibrationValuePointConfiguration mid;
-        /// Max point.
-        CalibrationValuePointConfiguration max;
-
-        float reserved1; // was minPossible
-        float reserved2; // was maxPossible
+        unsigned int numPoints;
+        CalibrationValuePointConfiguration points[MAX_CALIBRATION_POINTS];
     };
 
     /// A structure where calibration parameters for the channel are stored.
     struct CalibrationConfiguration {
         /// Used by the persist_conf.
         persist_conf::BlockHeader header;
-
-        /// Flags
-        CalibrationConfigurationFlags flags;
 
         /// Calibration parameters for the voltage.
         CalibrationValueConfiguration u;
@@ -157,12 +136,10 @@ class Channel {
         CalibrationValueConfiguration i[2];
 
         /// Date when calibration is saved.
-        /// Automatically set if RTC is present.
-        /// Format is YYYYMMDD.
-        char calibration_date[8 + 1];
+        uint32_t calibrationDate;
 
         /// Remark about calibration set by user.
-        char calibration_remark[CALIBRATION_REMARK_MAX_LENGTH + 1];
+        char calibrationRemark[CALIBRATION_REMARK_MAX_LENGTH + 1];
     };
 
     /// Binary flags for the channel protection configuration
@@ -428,8 +405,11 @@ class Channel {
     /// Set channel current level
     void setCurrent(float current);
 
-    /// Is channel calibrated, both voltage and current?
+    /// Is channel calibrated, voltage or current?
     bool isCalibrationExists();
+
+    bool isVoltageCalibrationExists();
+    bool isCurrentCalibrationExists(uint8_t currentRange);
 
     /// Is OVP, OCP or OPP tripped?
     bool isTripped();

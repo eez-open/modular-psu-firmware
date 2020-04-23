@@ -27,45 +27,45 @@ enum Level { LEVEL_NONE, LEVEL_MIN, LEVEL_MID, LEVEL_MAX };
 
 enum CurrentRange { CURRENT_RANGE_HIGH, CURRENT_RANGE_LOW };
 
+struct ValuePoint {
+    bool set;
+    float dac;
+    float value;
+    float adc;
+};
+
+enum CalibrationValueType {
+    CALIBRATION_VALUE_U,
+    CALIBRATION_VALUE_I_HI_RANGE,
+    CALIBRATION_VALUE_I_LOW_RANGE
+};
+
 /// Calibration parameters for the voltage or current during calibration procedure.
 struct Value {
-    bool voltOrCurr;
-    int8_t currentRange;
+    CalibrationValueType type;
+    int8_t numPoints;
+    int8_t currentPointIndex;
+    ValuePoint points[MAX_CALIBRATION_POINTS];
 
-    int8_t level;
+    Value(CalibrationValueType type);
 
-    bool min_set;
-    float min_dac;
-    float min_val;
-    float min_adc;
+    bool isVoltage() { return type == CALIBRATION_VALUE_U; }
 
-    bool mid_set;
-    float mid_dac;
-    float mid_val;
-    float mid_adc;
-
-    bool max_set;
-    float max_dac;
-    float max_val;
-    float max_adc;
-
-    Value(bool voltOrCurr, int currentRange_ = -1);
+    bool isCalibrated();
 
     void reset();
 
-    void setLevel(int8_t level);
-    void setLevelValue();
-
-    float getLevelValue();
-    float getDacValue();
-    float getAdcValue();
+    void setCurrentPointIndex(int8_t currentPointIndex);
 
     void setDacValue(float value);
+    float getDacValue();
 
-    bool checkRange(float dac, float data, float adc);
-    void setData(float dac, float data, float adc);
+    float readAdcValue();
 
-    bool checkMid();
+    bool checkValueAndAdc(float value, float adc);
+    void setValueAndAdc(float value, float adc);
+
+    bool checkPoints();
 };
 
 bool isEnabled();

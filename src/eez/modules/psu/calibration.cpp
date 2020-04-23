@@ -42,89 +42,105 @@ static char g_remark[CALIBRATION_REMARK_MAX_LENGTH + 1];
 
 static int8_t g_currentRangeSelected = 0;
 
-static Value g_voltage(true);
-static Value g_currents[] = { Value(false, 0), Value(false, 1) };
+static Value g_voltage(CALIBRATION_VALUE_U);
+
+static Value g_currents[2] = {
+    Value(CALIBRATION_VALUE_I_HI_RANGE),
+    Value(CALIBRATION_VALUE_I_LOW_RANGE)
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Value::Value(bool voltOrCurr_, int currentRange_)
-    : voltOrCurr(voltOrCurr_), currentRange(currentRange_) {
+Value::Value(CalibrationValueType type_)
+    : type(type_)
+{
 }
 
 void Value::reset() {
-    level = LEVEL_NONE;
+    currentPointIndex = -1;
 
-    min_set = false;
-    mid_set = false;
-    max_set = false;
+    numPoints = 3;
 
-    min_dac = voltOrCurr
-                  ? g_channel->params.U_CAL_VAL_MIN
-                  : (currentRange == 0 ? g_channel->params.I_CAL_VAL_MIN : g_channel->params.I_CAL_VAL_MIN / 100);
-    mid_dac = voltOrCurr
-                  ? g_channel->params.U_CAL_VAL_MID
-                  : (currentRange == 0 ? g_channel->params.I_CAL_VAL_MID : g_channel->params.I_CAL_VAL_MID / 100);
-    max_dac = voltOrCurr
-                  ? g_channel->params.U_CAL_VAL_MAX
-                  : (currentRange == 0 ? g_channel->params.I_CAL_VAL_MAX : g_channel->params.I_CAL_VAL_MAX / 100);
-}
+    points[0].set = false;
+    points[1].set = false;
+    points[3].set = false;
 
-float Value::getLevelValue() {
-    if (level == LEVEL_MIN) {
-        return min_dac;
-    } else if (level == LEVEL_MID) {
-        return mid_dac;
+    if (type == CALIBRATION_VALUE_U) {
+        points[0].dac = g_channel->params.U_CAL_VAL_MIN;
+        points[1].dac = g_channel->params.U_CAL_VAL_MID;
+        points[2].dac = g_channel->params.U_CAL_VAL_MAX;
+    } else if (type == CALIBRATION_VALUE_I_HI_RANGE) {
+        points[0].dac = g_channel->params.I_CAL_VAL_MIN;
+        points[1].dac = g_channel->params.I_CAL_VAL_MID;
+        points[2].dac = g_channel->params.I_CAL_VAL_MAX;
     } else {
-        return max_dac;
+        points[0].dac = g_channel->params.I_CAL_VAL_MIN / 100;
+        points[1].dac = g_channel->params.I_CAL_VAL_MID / 100;
+        points[2].dac = g_channel->params.I_CAL_VAL_MAX / 100;
     }
 }
 
-float Value::getDacValue() {
-    return voltOrCurr ? g_channel->u.set : g_channel->i.set;
+bool Value::isCalibrated() {
+    for (int i = 0; i < numPoints; i++) {
+        if (!points[i].set) {
+            return false;
+        }
+    }
+    return true;
 }
 
-float Value::getAdcValue() {
-    return voltOrCurr ? g_channel->u.mon_last : g_channel->i.mon_last;
-}
-
-void Value::setLevel(int8_t value) {
-    level = value;
-}
-
-void Value::setLevelValue() {
-    if (voltOrCurr) {
-        g_channel->setVoltage(getLevelValue());
-        g_channel->setCurrent(g_channel->params.I_VOLT_CAL);
-    } else {
-        g_channel->setCurrent(getLevelValue());
-        g_channel->setVoltage(g_channel->params.U_CURR_CAL);
+void Value::setCurrentPointIndex(int8_t currentPointIndex_) {
+    if (currentPointIndex_ < MAX_CALIBRATION_POINTS) {
+        currentPointIndex = currentPointIndex_;
+        while (currentPointIndex >= numPoints) {
+            points[numPoints].set = false;
+            points[numPoints].dac = 0;
+            points[numPoints].value = 0;
+            points[numPoints].adc = 0;
+            numPoints++;
+        }
     }
 }
 
 void Value::setDacValue(float value) {
-    if (level == LEVEL_MIN) {
-        min_dac = value;
-    } else if (level == LEVEL_MID) {
-        mid_dac = value;
-    } else {
-        max_dac = value;
+    if (currentPointIndex == -1) {
+        return;
     }
 
-    if (voltOrCurr) {
+    points[currentPointIndex].dac = value;
+
+    if (type == CALIBRATION_VALUE_U) {
         g_channel->setVoltage(value);
+        g_channel->setCurrent(g_channel->params.I_VOLT_CAL);
     } else {
         g_channel->setCurrent(value);
+        g_channel->setVoltage(g_channel->params.U_CURR_CAL);
     }
 }
 
-bool Value::checkRange(float dac, float data, float adc) {
+float Value::getDacValue() {
+    if (currentPointIndex == -1) {
+        return NAN;
+    }
+
+    return points[currentPointIndex].dac;
+}
+
+float Value::readAdcValue() {
+    return type == CALIBRATION_VALUE_U ? g_channel->u.mon_last : g_channel->i.mon_last;
+}
+
+bool Value::checkValueAndAdc(float value, float adc) {
+    if (currentPointIndex == -1) {
+        return false;
+    }
+
     float range;
-    if (voltOrCurr) {
+    if (type == CALIBRATION_VALUE_U) {
         range = g_channel->params.U_CAL_VAL_MAX - g_channel->params.U_CAL_VAL_MIN;
     } else {
         range = g_channel->params.I_CAL_VAL_MAX - g_channel->params.I_CAL_VAL_MIN;
-        if (currentRange == 1) {
-            // range /= 5; // 500mA
+        if (type == CALIBRATION_VALUE_I_LOW_RANGE) {
         	range /= 25; // 50mA
         }
     }
@@ -132,9 +148,11 @@ bool Value::checkRange(float dac, float data, float adc) {
     float allowedDiff = range * g_channel->params.CALIBRATION_DATA_TOLERANCE_PERCENT / 100;
     float diff;
 
-    diff = fabsf(dac - data);
+    float dac = points[currentPointIndex].dac;
+
+    diff = fabsf(dac - value);
     if (diff > allowedDiff) {
-        DebugTrace("Data check failed: level=%f, data=%f, diff=%f, allowedDiff=%f\n", dac, data, diff, allowedDiff);
+        DebugTrace("Data check failed: level=%f, data=%f, diff=%f, allowedDiff=%f\n", dac, value, diff, allowedDiff);
         return false;
     }
 
@@ -149,43 +167,53 @@ bool Value::checkRange(float dac, float data, float adc) {
     return true;
 }
 
-void Value::setData(float dac, float data, float adc) {
-    if (level == LEVEL_MIN) {
-        min_set = true;
-        min_dac = dac;
-        min_val = data;
-        min_adc = adc;
-    } else if (level == LEVEL_MID) {
-        mid_set = true;
-        mid_dac = dac;
-        mid_val = data;
-        mid_adc = adc;
-    } else {
-        max_set = true;
-        max_dac = dac;
-        max_val = data;
-        max_adc = adc;
+void Value::setValueAndAdc(float value, float adc) {
+    if (currentPointIndex == -1) {
+        return;
     }
 
-    if (min_set && max_set) {
-        DebugTrace("ADC=%f\n", min_adc);
-    }
+    points[currentPointIndex].set = true;
+    points[currentPointIndex].value = value;
+    points[currentPointIndex].adc = adc;
 }
 
-bool Value::checkMid() {
-    float mid = remap(mid_dac, min_dac, min_val, max_dac, max_val);
+bool Value::checkPoints() {
+    for (int i = 0; i < numPoints; i++) {
+        if (i > 1) {
+            const char *prefix = type == CALIBRATION_VALUE_U ? "Volt" : (type == CALIBRATION_VALUE_I_HI_RANGE ? "HI Curr" : "LO Curr");
 
-    float allowedDiff = g_channel->params.CALIBRATION_MID_TOLERANCE_PERCENT * (max_val - min_val) / 100.0f;
+            if (points[i].dac < points[i - 1].dac) {
+                DebugTrace("%s DAC at point %d < DAC at point %d\n", prefix, i + 1, i);
+                return false;
+            }
 
-    float diff = fabsf(mid - mid_val);
-    if (diff <= allowedDiff) {
-        return true;
-    } else {
-        DebugTrace("%s MID point check failed: level=%f, data=%f, diff=%f, allowedDiff=%f\n",
-                    voltOrCurr ? "Volt" : (currentRange == 0 ? "HI Curr" : "LO Curr"), mid, mid_val,
-                    diff, allowedDiff);
-        return false;
+            if (points[i].dac < points[i - 1].dac) {
+                DebugTrace("%s data at point %d < data at point %d\n", prefix, i + 1, i);
+                return false;
+            }
+
+            if (points[i].adc < points[i - 1].adc) {
+                DebugTrace("%s ADC at point %d < ADC at point %d\n", prefix, i + 1, i);
+                return false;
+            }
+
+            if (i < numPoints - 1) {
+                float mid = remap(points[i].dac, points[i - 1].dac, points[i - 1].value, points[i + 1].dac, points[i + 1].value);
+
+                float allowedDiff = g_channel->params.CALIBRATION_MID_TOLERANCE_PERCENT * (points[i + 1].value - points[i - 1].value) / 100.0f;
+
+                float diff = fabsf(mid - points[i].value);
+                if (diff > allowedDiff) {
+                    DebugTrace("%s point %d check failed: level=%f, data=%f, diff=%f, allowedDiff=%f\n",
+                        prefix, i + 1,
+                        mid, points[i].value, diff, allowedDiff);
+                    return false;
+                }
+            }
+        }
     }
+
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -291,12 +319,7 @@ void setRemark(const char *value, size_t len) {
 }
 
 static bool checkCalibrationValue(calibration::Value &calibrationValue, int16_t &scpiErr) {
-    if (calibrationValue.min_val >= calibrationValue.max_val) {
-        scpiErr = SCPI_ERROR_INVALID_CAL_DATA;
-        return false;
-    }
-
-    if (!calibrationValue.checkMid()) {
+    if (!calibrationValue.checkPoints()) {
         scpiErr = SCPI_ERROR_INVALID_CAL_DATA;
         return false;
     }
@@ -305,11 +328,11 @@ static bool checkCalibrationValue(calibration::Value &calibrationValue, int16_t 
 }
 
 bool isVoltageCalibrated() {
-    return g_voltage.min_set && g_voltage.mid_set && g_voltage.max_set;
+    return g_voltage.isCalibrated();
 }
 
 bool isCurrentCalibrated(Value &current) {
-    return current.min_set && current.mid_set && current.max_set;
+    return current.isCalibrated();
 }
 
 bool canSave(int16_t &scpiErr, int16_t *uiErr) {
@@ -376,71 +399,35 @@ bool canSave(int16_t &scpiErr, int16_t *uiErr) {
 }
 
 bool save() {
-    uint8_t year;
-    uint8_t month;
-    uint8_t day;
-    if (datetime::getDate(year, month, day)) {
-        sprintf(g_channel->cal_conf.calibration_date, "%d%02d%02d", (int)(2000 + year), (int)month, (int)day);
-    } else {
-        strcpy(g_channel->cal_conf.calibration_date, "");
-    }
+    g_channel->cal_conf.calibrationDate = datetime::now();
 
-    memset(&g_channel->cal_conf.calibration_remark, 0, sizeof(g_channel->cal_conf.calibration_remark));
-    strcpy(g_channel->cal_conf.calibration_remark, g_remark);
+    memset(&g_channel->cal_conf.calibrationRemark, 0, sizeof(g_channel->cal_conf.calibrationRemark));
+    strcpy(g_channel->cal_conf.calibrationRemark, g_remark);
 
     if (isVoltageCalibrated()) {
-        g_channel->cal_conf.flags.u_cal_params_exists = 1;
-
-        g_channel->cal_conf.u.min.dac = g_voltage.min_dac;
-        g_channel->cal_conf.u.min.val = g_voltage.min_val;
-        g_channel->cal_conf.u.min.adc = g_voltage.min_adc;
-
-        g_channel->cal_conf.u.mid.dac = g_voltage.mid_dac;
-        g_channel->cal_conf.u.mid.val = g_voltage.mid_val;
-        g_channel->cal_conf.u.mid.adc = g_voltage.mid_adc;
-
-        g_channel->cal_conf.u.max.dac = g_voltage.max_dac;
-        g_channel->cal_conf.u.max.val = g_voltage.max_val;
-        g_channel->cal_conf.u.max.adc = g_voltage.max_adc;
-
-        g_voltage.level = LEVEL_NONE;
+        g_channel->cal_conf.u.numPoints = g_voltage.numPoints;
+        for (int i = 0; i < g_voltage.numPoints; i++) {
+            g_channel->cal_conf.u.points[i].dac = g_voltage.points[i].dac;
+            g_channel->cal_conf.u.points[i].value = g_voltage.points[i].value;
+            g_channel->cal_conf.u.points[i].adc = g_voltage.points[i].adc;
+        }
     }
 
     if (isCurrentCalibrated(g_currents[0])) {
-        g_channel->cal_conf.flags.i_cal_params_exists_range_high = 1;
-
-        g_channel->cal_conf.i[0].min.dac = g_currents[0].min_dac;
-        g_channel->cal_conf.i[0].min.val = g_currents[0].min_val;
-        g_channel->cal_conf.i[0].min.adc = g_currents[0].min_adc;
-
-        g_channel->cal_conf.i[0].mid.dac = g_currents[0].mid_dac;
-        g_channel->cal_conf.i[0].mid.val = g_currents[0].mid_val;
-        g_channel->cal_conf.i[0].mid.adc = g_currents[0].mid_adc;
-
-        g_channel->cal_conf.i[0].max.dac = g_currents[0].max_dac;
-        g_channel->cal_conf.i[0].max.val = g_currents[0].max_val;
-        g_channel->cal_conf.i[0].max.adc = g_currents[0].max_adc;
-
-        g_currents[0].level = LEVEL_NONE;
+        g_channel->cal_conf.i[0].numPoints = g_currents[0].numPoints;
+        for (int i = 0; i < g_currents[0].numPoints; i++) {
+            g_channel->cal_conf.i[0].points[i].dac = g_currents[0].points[i].dac;
+            g_channel->cal_conf.i[0].points[i].value = g_currents[0].points[i].value;
+            g_channel->cal_conf.i[0].points[i].adc = g_currents[0].points[i].adc;
+        }
     }
 
-    if (hasSupportForCurrentDualRange()) {
-        if (isCurrentCalibrated(g_currents[1])) {
-            g_channel->cal_conf.flags.i_cal_params_exists_range_low = 1;
-
-            g_channel->cal_conf.i[1].min.dac = g_currents[1].min_dac;
-            g_channel->cal_conf.i[1].min.val = g_currents[1].min_val;
-            g_channel->cal_conf.i[1].min.adc = g_currents[1].min_adc;
-
-            g_channel->cal_conf.i[1].mid.dac = g_currents[1].mid_dac;
-            g_channel->cal_conf.i[1].mid.val = g_currents[1].mid_val;
-            g_channel->cal_conf.i[1].mid.adc = g_currents[1].mid_adc;
-
-            g_channel->cal_conf.i[1].max.dac = g_currents[1].max_dac;
-            g_channel->cal_conf.i[1].max.val = g_currents[1].max_val;
-            g_channel->cal_conf.i[1].max.adc = g_currents[1].max_adc;
-
-            g_currents[1].level = LEVEL_NONE;
+    if (hasSupportForCurrentDualRange() && isCurrentCalibrated(g_currents[1])) {
+        g_channel->cal_conf.i[1].numPoints = g_currents[1].numPoints;
+        for (int i = 0; i < g_currents[1].numPoints; i++) {
+            g_channel->cal_conf.i[1].points[i].dac = g_currents[1].points[i].dac;
+            g_channel->cal_conf.i[1].points[i].value = g_currents[1].points[i].value;
+            g_channel->cal_conf.i[1].points[i].adc = g_currents[1].points[i].adc;
         }
     }
 
