@@ -490,11 +490,11 @@
       "defaultValue": "0"
     },
     {
-      "name": "channel_calibration_step_group",
+      "name": "channel_calibration_value",
       "description": "",
-      "type": "enum",
-      "enumItems": "[\n    \"Voltage\",\n    \"Current High Range\",\n    \"Current Low Range\",\n    \"Remark\"\n]",
-      "defaultValue": "1"
+      "type": "string",
+      "enumItems": "",
+      "defaultValue": "Voltage"
     },
     {
       "name": "channel_calibration_current_point_index",
@@ -513,7 +513,7 @@
     {
       "name": "channel_calibration_step_level_value",
       "type": "float",
-      "defaultValue": "50mV"
+      "defaultValue": "50 mV"
     },
     {
       "name": "channel_calibration_step_value",
@@ -2389,6 +2389,16 @@
       "type": "enum",
       "enumItems": "[\n    2,\n    3,\n    4,\n    5\n]",
       "defaultValue": "1"
+    },
+    {
+      "name": "next_calibration_point_enabled",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "previous_calibration_point_enabled",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -3086,6 +3096,9 @@
     },
     {
       "name": "set_focus"
+    },
+    {
+      "name": "select_channel_calibration_value"
     }
   ],
   "gui": {
@@ -15129,7 +15142,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "channel_calibration_step_group",
+            "data": "channel_calibration_value",
             "left": 10,
             "top": 10,
             "width": 460,
@@ -15922,7 +15935,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "channel_calibration_step_group",
+                    "data": "channel_calibration_value",
                     "left": 0,
                     "top": 40,
                     "width": 480,
@@ -16079,7 +16092,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "channel_calibration_step_group",
+                    "data": "channel_calibration_value",
                     "left": 0,
                     "top": 40,
                     "width": 480,
@@ -16184,7 +16197,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "channel_calibration_step_group",
+            "data": "channel_calibration_value",
             "left": 0,
             "top": 42,
             "width": 480,
@@ -16212,106 +16225,52 @@
                     "layout": "ch_settings_calibration_points"
                   },
                   {
-                    "type": "Text",
+                    "type": "MultilineText",
                     "style": {
-                      "inheritFrom": "edit_value_active_M_center"
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 10,
+                    "top": 57,
+                    "width": 103,
+                    "height": 71,
+                    "text": "DAC:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_17_enabled"
                     },
                     "data": "channel_calibration_step_level_value",
-                    "action": "ch_settings_calibration_wiz_step_set_level_value",
-                    "left": 0,
-                    "top": 42,
-                    "width": 110,
+                    "action": "edit",
+                    "left": 117,
+                    "top": 74,
+                    "width": 100,
                     "height": 32,
-                    "text": ""
+                    "displayOption": 0
                   },
                   {
                     "type": "MultilineText",
                     "style": {
                       "inheritFrom": "default_S"
                     },
-                    "left": 0,
+                    "left": 217,
+                    "top": 57,
+                    "width": 143,
+                    "height": 71,
+                    "text": "External instrument:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_17_enabled"
+                    },
+                    "data": "channel_calibration_step_value",
+                    "action": "edit",
+                    "left": 369,
                     "top": 74,
-                    "width": 480,
-                    "height": 29,
-                    "text": "Enter output value measured with external instrument"
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "channel_calibration_step_status",
-                    "left": 0,
-                    "top": 103,
-                    "width": 128,
-                    "height": 40,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "value"
-                        },
-                        "data": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 128,
-                        "height": 40,
-                        "text": "<not set>"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "value"
-                        },
-                        "data": "channel_calibration_step_value",
-                        "left": 0,
-                        "top": 0,
-                        "width": 128,
-                        "height": 40,
-                        "text": ""
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "channel_calibration_step_status",
-                    "left": 0,
-                    "top": 143,
-                    "width": 118,
-                    "height": 40,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "option_toggle_L",
-                          "alignHorizontal": "center"
-                        },
-                        "data": "",
-                        "action": "ch_settings_calibration_wiz_step_set",
-                        "left": 0,
-                        "top": 0,
-                        "width": 118,
-                        "height": 40,
-                        "text": "Set"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "option_toggle_L",
-                          "alignHorizontal": "center"
-                        },
-                        "data": "",
-                        "action": "ch_settings_calibration_wiz_step_set",
-                        "left": 0,
-                        "top": 0,
-                        "width": 118,
-                        "height": 40,
-                        "text": "Change"
-                      }
-                    ]
+                    "width": 100,
+                    "height": 32,
+                    "displayOption": 0
                   },
                   {
                     "type": "Select",
@@ -16319,10 +16278,10 @@
                       "inheritFrom": "default"
                     },
                     "data": "channel_calibration_has_step_note",
-                    "left": 158,
-                    "top": 103,
-                    "width": 322,
-                    "height": 93,
+                    "left": 10,
+                    "top": 142,
+                    "width": 460,
+                    "height": 46,
                     "widgets": [
                       {
                         "type": "Rectangle",
@@ -16331,8 +16290,8 @@
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 322,
-                        "height": 93,
+                        "width": 460,
+                        "height": 46,
                         "invertColors": true
                       },
                       {
@@ -16344,8 +16303,8 @@
                         "data": "channel_calibration_step_note",
                         "left": 0,
                         "top": 0,
-                        "width": 322,
-                        "height": 93,
+                        "width": 460,
+                        "height": 46,
                         "text": "",
                         "firstLineIndent": 0,
                         "hangingIndent": 0
@@ -16884,397 +16843,655 @@
         "height": 272
       },
       {
-        "name": "ch_settings_calibration_points",
+        "name": "ch_settings_calibration_wiz_step_new (1)",
+        "description": "Channel calibration wizard steps",
+        "style": "default",
         "widgets": [
+          {
+            "type": "Canvas",
+            "style": {
+              "inheritFrom": "yt_graph"
+            },
+            "left": 208,
+            "top": 0,
+            "width": 272,
+            "height": 272
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "edit_value_active_S_center"
+            },
+            "data": "channel_calibration_value",
+            "action": "select_channel_calibration_value",
+            "left": 10,
+            "top": 10,
+            "width": 188,
+            "height": 32,
+            "text": ""
+          },
           {
             "type": "Container",
             "style": {
-              "inheritFrom": "default"
+              "inheritFrom": "channel1"
             },
             "left": 0,
-            "top": 0,
-            "width": 480,
-            "height": 42,
+            "top": 240,
+            "width": 208,
+            "height": 32,
+            "name": "Status line",
             "widgets": [
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "default_S"
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
                 },
+                "action": "ch_settings_calibration_wiz_stop_and_show_previous_page",
                 "left": 0,
                 "top": 0,
-                "width": 80,
-                "height": 40,
-                "text": "Point:"
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left"
+                },
+                "data": "channel_short_label",
+                "left": 41,
+                "top": 0,
+                "width": 36,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left"
+                },
+                "left": 78,
+                "top": 0,
+                "width": 48,
+                "height": 32,
+                "text": "Cal."
               },
               {
                 "type": "Select",
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "channel_calibration_num_points",
-                "left": 80,
+                "data": "set_page_dirty",
+                "left": 126,
+                "top": 0,
+                "width": 82,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 82,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "channel1"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 82,
+                        "height": 32,
+                        "invertColors": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 82,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "channel1",
+                          "font": "Heydings14"
+                        },
+                        "action": "set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "_"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "channel1",
+                          "font": "Heydings14"
+                        },
+                        "action": "discard",
+                        "left": 41,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "X"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 104,
+            "top": 52,
+            "width": 94,
+            "height": 32,
+            "displayOption": 0
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default_S_left"
+            },
+            "left": 10,
+            "top": 52,
+            "width": 94,
+            "height": 32,
+            "text": "Set:"
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 104,
+            "top": 88,
+            "width": 94,
+            "height": 32,
+            "displayOption": 0
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default_S_left"
+            },
+            "left": 10,
+            "top": 88,
+            "width": 94,
+            "height": 32,
+            "text": "Mon:"
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 104,
+            "top": 124,
+            "width": 94,
+            "height": 32,
+            "displayOption": 0
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default_S_left"
+            },
+            "left": 10,
+            "top": 124,
+            "width": 94,
+            "height": 32,
+            "text": "Measured:"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default_S_left"
+            },
+            "left": 10,
+            "top": 199,
+            "width": 106,
+            "height": 32,
+            "text": "Point 3 of 5"
+          },
+          {
+            "type": "Button",
+            "style": {
+              "inheritFrom": "button_S"
+            },
+            "left": 118,
+            "top": 199,
+            "width": 36,
+            "height": 32,
+            "text": "\\u008f",
+            "enabled": "previous_calibration_point_enabled",
+            "disabledStyle": {
+              "inheritFrom": "button_S_disabled"
+            }
+          },
+          {
+            "type": "Button",
+            "style": {
+              "inheritFrom": "button_S"
+            },
+            "left": 162,
+            "top": 199,
+            "width": 36,
+            "height": 32,
+            "text": "\\u0090",
+            "enabled": "next_calibration_point_enabled",
+            "disabledStyle": {
+              "inheritFrom": "button_S_disabled"
+            }
+          },
+          {
+            "type": "Button",
+            "style": {
+              "inheritFrom": "button_S"
+            },
+            "left": 162,
+            "top": 160,
+            "width": 36,
+            "height": 32,
+            "text": "\\u00b6",
+            "enabled": "next_calibration_point_enabled",
+            "disabledStyle": {
+              "inheritFrom": "button_S_disabled"
+            }
+          },
+          {
+            "type": "Button",
+            "style": {
+              "inheritFrom": "button_S"
+            },
+            "left": 118,
+            "top": 160,
+            "width": 36,
+            "height": 32,
+            "text": "\\u00b7",
+            "enabled": "next_calibration_point_enabled",
+            "disabledStyle": {
+              "inheritFrom": "button_S_disabled"
+            }
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
+      },
+      {
+        "name": "ch_settings_calibration_points",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "channel_calibration_num_points",
+            "left": 65,
+            "top": 0,
+            "width": 250,
+            "height": 40,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
                 "top": 0,
                 "width": 400,
                 "height": 40,
                 "widgets": [
                   {
-                    "type": "Container",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "default_S"
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 400,
+                    "width": 50,
                     "height": 40,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#1"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 80,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#2"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "button_S"
-                        },
-                        "left": 162,
-                        "top": 2,
-                        "width": 76,
-                        "height": 36,
-                        "text": "Add"
-                      }
-                    ]
+                    "text": "#1"
                   },
                   {
-                    "type": "Container",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "default_S"
                     },
-                    "left": 0,
+                    "left": 50,
                     "top": 0,
-                    "width": 400,
+                    "width": 50,
                     "height": 40,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#1"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 80,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#2"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 160,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#3"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "button_S"
-                        },
-                        "left": 242,
-                        "top": 2,
-                        "width": 76,
-                        "height": 36,
-                        "text": "Add"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Container",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 400,
-                    "height": 40,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#1"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 80,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#2"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 160,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#3"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 240,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#4"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "button_S"
-                        },
-                        "left": 322,
-                        "top": 2,
-                        "width": 76,
-                        "height": 36,
-                        "text": "Add"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Container",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 400,
-                    "height": 40,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#1"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 80,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#2"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 160,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#3"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 240,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#4"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 320,
-                        "top": 0,
-                        "width": 80,
-                        "height": 40,
-                        "text": "#5"
-                      }
-                    ]
+                    "text": "#2"
                   }
                 ]
               },
               {
-                "type": "Select",
+                "type": "Container",
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "channel_calibration_current_point_index",
                 "left": 0,
-                "top": 40,
-                "width": 480,
+                "top": 0,
+                "width": 400,
+                "height": 40,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#1"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 50,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#2"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 100,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#3"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 400,
+                "height": 40,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#1"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 50,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#2"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 100,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#3"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 150,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#4"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 400,
+                "height": 40,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#1"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 50,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#2"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 100,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#3"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 150,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#4"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 200,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "text": "#5"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "button_S"
+            },
+            "left": 377,
+            "top": 3,
+            "width": 100,
+            "height": 36,
+            "text": "Add Point"
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "channel_calibration_current_point_index",
+            "left": 65,
+            "top": 40,
+            "width": 250,
+            "height": 2,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 250,
                 "height": 2,
                 "widgets": [
                   {
-                    "type": "Container",
+                    "type": "Rectangle",
                     "style": {
                       "inheritFrom": "default"
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 480,
-                    "height": 2,
-                    "widgets": [
-                      {
-                        "type": "Rectangle",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "left": 80,
-                        "top": 0,
-                        "width": 80,
-                        "height": 2
-                      }
-                    ]
-                  },
+                    "width": 50,
+                    "height": 2
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 250,
+                "height": 2,
+                "widgets": [
                   {
-                    "type": "Container",
+                    "type": "Rectangle",
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "left": 0,
+                    "left": 50,
                     "top": 0,
-                    "width": 480,
-                    "height": 2,
-                    "widgets": [
-                      {
-                        "type": "Rectangle",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "left": 160,
-                        "top": 0,
-                        "width": 80,
-                        "height": 2
-                      }
-                    ]
-                  },
+                    "width": 50,
+                    "height": 2
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 250,
+                "height": 2,
+                "widgets": [
                   {
-                    "type": "Container",
+                    "type": "Rectangle",
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "left": 0,
+                    "left": 100,
                     "top": 0,
-                    "width": 480,
-                    "height": 2,
-                    "widgets": [
-                      {
-                        "type": "Rectangle",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "left": 240,
-                        "top": 0,
-                        "width": 80,
-                        "height": 2
-                      }
-                    ]
-                  },
+                    "width": 50,
+                    "height": 2
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 250,
+                "height": 2,
+                "widgets": [
                   {
-                    "type": "Container",
+                    "type": "Rectangle",
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "left": 0,
+                    "left": 150,
                     "top": 0,
-                    "width": 480,
-                    "height": 2,
-                    "widgets": [
-                      {
-                        "type": "Rectangle",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "left": 320,
-                        "top": 0,
-                        "width": 80,
-                        "height": 2
-                      }
-                    ]
-                  },
+                    "width": 50,
+                    "height": 2
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 250,
+                "height": 2,
+                "widgets": [
                   {
-                    "type": "Container",
+                    "type": "Rectangle",
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "left": 0,
+                    "left": 200,
                     "top": 0,
-                    "width": 480,
-                    "height": 2,
-                    "widgets": [
-                      {
-                        "type": "Rectangle",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "left": 400,
-                        "top": 0,
-                        "width": 80,
-                        "height": 2
-                      }
-                    ]
+                    "width": 50,
+                    "height": 2
                   }
                 ]
               }
@@ -17284,7 +17501,7 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 40
+        "height": 42
       },
       {
         "name": "ch_settings_calibration_wiz_finish",
@@ -53040,6 +53257,42 @@
               "filePath": "fonts\\OpenSans-SemiBold.ttf",
               "size": 15,
               "encoding": 937
+            }
+          },
+          {
+            "encoding": 182,
+            "x": 0,
+            "y": -2,
+            "width": 21,
+            "height": 21,
+            "dx": 21,
+            "glyphBitmap": {
+              "width": 21,
+              "height": 21,
+              "pixelArray": "0000000000000001a9ecececa80100000000000000499b9c9c9c9c9ca7ffffffffffa69c9c9c9c9c9b47f2fffffffffffffffffffffffffffffffffffffff1a5ffffffffffffffffffffffffffffffffffffffa4000404040404040404040404040404040404040400006c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c6c0000b0ffffffffffffffffffffffffffffffffffb00000b0ffffffffffffffffffffffffffffffffffb00000b0ffff5416c5ffff8f0f91ffffc31557ffffb00000b0fff2000072ffff320032ffff720000f2ffb00000b0fff0000070ffff300030ffff700000f0ffb00000b0fff0000070ffff300030ffff700000f0ffb00000b0fff0000070ffff300030ffff700000f0ffb00000b0fff0000070ffff300030ffff700000f0ffb00000b0fff0000070ffff300030ffff700000f0ffb00000b0fff0000070ffff300030ffff700000f0ffb00000b0fff0000070ffff300030ffff700000f0ffb00000b0fffb12008effff4d004effff8d0013fbffb00000acffffd9aefdffffeea7effffffcaddbffffac000068ffffffffffffffffffffffffffffffffff680000048cf0fffffffffffffffffffffffffff08c0400"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 15,
+              "encoding": 61646
+            }
+          },
+          {
+            "encoding": 183,
+            "x": 0,
+            "y": -2,
+            "width": 21,
+            "height": 21,
+            "dx": 21,
+            "glyphBitmap": {
+              "width": 21,
+              "height": 21,
+              "pixelArray": "0000000000000000a0fcfcfc9e00000000000000000000000000000000ffffffffff00000000000000000000000000000000ffffffffff00000000000000000000000000000000ffffffffff00000000000000000000000000000000ffffffffff00000000000000000000000000000000ffffffffff00000000000000000000000000000000ffffffffff00000000000000000000000000000000ffffffffff00000000000000009efbfcfcfcfcfcfcfffffffffffcfcfcfcfcfcfb9effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa5ffffffffffffffffffffffffffffffffffffffa50004040404040404ffffffffff04040404040404000000000000000000ffffffffff00000000000000000000000000000000ffffffffff00000000000000000000000000000000ffffffffff00000000000000000000000000000000ffffffffff00000000000000000000000000000000ffffffffff00000000000000000000000000000000ffffffffff00000000000000000000000000000000a6ffffffa40000000000000000"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 15,
+              "encoding": 43
             }
           }
         ]
