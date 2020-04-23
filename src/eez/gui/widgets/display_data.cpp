@@ -56,12 +56,12 @@ EnumFunctionType DISPLAY_DATA_enum = nullptr;
 
 int findStartOfFraction(char *text) {
     int i;
-    for (i = 0; text[i] && (text[i] == '-' || (text[i] >= '0' && text[i] <= '9')); i++);
+    for (i = 0; text[i] && (text[i] == '<' || text[i] == ' ' || text[i] == '-' || (text[i] >= '0' && text[i] <= '9')); i++);
     return i;
 }
 
 int findStartOfUnit(char *text, int i) {
-    for (i = 0; text[i] && (text[i] == '-' || (text[i] >= '0' && text[i] <= '9') || text[i] == '.'); i++);
+    for (i = 0; text[i] && (text[i] == '<' || text[i] == ' ' || text[i] == '-' || (text[i] >= '0' && text[i] <= '9') || text[i] == '.'); i++);
     return i;
 }
 
@@ -143,10 +143,22 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
             text[i] = 0;
         }
 
-        drawText(start, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+        // trim left
+        while (*start && *start == ' ') {
+            start++;
+        }
+
+        // trim right
+        int length = strlen(start);
+        if (length > 0 && start[length - 1] == ' ') {
+            length--;
+        }
+
+        drawText(start, length, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                  style, widgetCursor.currentState->flags.active,
                  widgetCursor.currentState->flags.blinking, false,
-                 &currentState->color, &currentState->backgroundColor, &currentState->activeColor, &currentState->activeBackgroundColor);
+                 &currentState->color, &currentState->backgroundColor, &currentState->activeColor, &currentState->activeBackgroundColor,
+                 widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT);
     }
 };
 

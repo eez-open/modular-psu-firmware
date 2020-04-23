@@ -79,6 +79,12 @@ void action_edit() {
     edit_mode::enter();
 }
 
+void action_set_focus() {
+#if OPTION_ENCODER
+    setFocusCursor(getFoundWidgetAtDown().cursor, getFoundWidgetAtDown().widget->data);
+#endif
+}
+
 void action_edit_no_focus() {
     edit_mode::enter(-1, false);
 }

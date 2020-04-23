@@ -1058,7 +1058,8 @@ enum ActionsEnum {
     ACTION_ID_FILE_MANAGER_SELECT_LIST_VIEW = 216,
     ACTION_ID_SHOW_SYS_SETTINGS_RAMP_AND_DELAY = 217,
     ACTION_ID_CHANNEL_TOGGLE_RAMP_STATE = 218,
-    ACTION_ID_DLOG_VIEW_SELECT_LEGEND_VIEW_OPTION = 219
+    ACTION_ID_DLOG_VIEW_SELECT_LEGEND_VIEW_OPTION = 219,
+    ACTION_ID_SET_FOCUS = 220
 };
 
 void action_channel_toggle_output();
@@ -1280,21 +1281,23 @@ void action_file_manager_select_list_view();
 void action_show_sys_settings_ramp_and_delay();
 void action_channel_toggle_ramp_state();
 void action_dlog_view_select_legend_view_option();
+void action_set_focus();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
 enum FontsEnum {
     FONT_ID_NONE = 0,
-    FONT_ID_SHADOW = 1,
-    FONT_ID_OSWALD24 = 2,
-    FONT_ID_OSWALD17 = 3,
-    FONT_ID_OSWALD14 = 4,
-    FONT_ID_HEYDINGS14 = 5,
-    FONT_ID_ROBOTO_CONDENSED_REGULAR = 6,
-    FONT_ID_WEB_HOSTING_HUB24 = 7,
-    FONT_ID_OSWALD48 = 8,
-    FONT_ID_OSWALD20 = 9,
-    FONT_ID_OSWALD38 = 10
+    FONT_ID_OSWALD12 = 1,
+    FONT_ID_SHADOW = 2,
+    FONT_ID_OSWALD24 = 3,
+    FONT_ID_OSWALD17 = 4,
+    FONT_ID_OSWALD14 = 5,
+    FONT_ID_HEYDINGS14 = 6,
+    FONT_ID_ROBOTO_CONDENSED_REGULAR = 7,
+    FONT_ID_WEB_HOSTING_HUB24 = 8,
+    FONT_ID_OSWALD48 = 9,
+    FONT_ID_OSWALD20 = 10,
+    FONT_ID_OSWALD38 = 11
 };
 
 enum BitmapsEnum {
@@ -1553,12 +1556,12 @@ enum StylesEnum {
     STYLE_ID_INLINE235 = 235,
     STYLE_ID_INLINE236 = 236,
     STYLE_ID_INLINE237 = 237,
-    STYLE_ID_INLINE238 = 238,
-    STYLE_ID_INLINE239 = 239,
-    STYLE_ID_INLINE240 = 240,
-    STYLE_ID_STATUS_LINE_SMALL_TITLE = 241,
-    STYLE_ID_EDIT_VALUE_S_CENTERED_STATUS_LINE = 242,
-    STYLE_ID_SCROLLBAR_TRACK = 243,
+    STYLE_ID_STATUS_LINE_SMALL_TITLE = 238,
+    STYLE_ID_EDIT_VALUE_S_CENTERED_STATUS_LINE = 239,
+    STYLE_ID_SCROLLBAR_TRACK = 240,
+    STYLE_ID_INLINE241 = 241,
+    STYLE_ID_INLINE242 = 242,
+    STYLE_ID_INLINE243 = 243,
     STYLE_ID_INLINE244 = 244,
     STYLE_ID_INLINE245 = 245,
     STYLE_ID_INLINE246 = 246,
@@ -1842,4 +1845,4 @@ enum PagesEnum {
     PAGE_ID_DEBUG_POWER_CHANNELS = 164
 };
 
-extern const uint8_t assets[301463];
+extern const uint8_t assets[309033];

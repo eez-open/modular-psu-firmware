@@ -71,7 +71,7 @@ void UINT32_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_FLOAT_value(const Value &a, const Value &b) {
-    return a.getUnit() == b.getUnit() && a.getFloat() == b.getFloat();
+    return a.getUnit() == b.getUnit() && a.getFloat() == b.getFloat() && a.getOptions() == b.getOptions();
 }
 
 void FLOAT_value_to_text(const Value &value, char *text, int count) {

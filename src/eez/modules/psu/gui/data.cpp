@@ -4928,6 +4928,9 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
                     widgetOverrides[SCRIPT_INFO_WIDGET].isVisible = false;
                     overlay.height -= scriptInfoWidget->h;
                 }
+
+                overlay.x = 480 - overlay.width;
+                overlay.y = 240 - overlay.height;
             }
         }
 
@@ -5318,6 +5321,9 @@ void data_dlog_multiple_values_overlay(DataOperationEnum operation, Cursor curso
 
                 overlay.width = widgetCursor.widget->w;
                 overlay.height = widgetOverrides[LABELS_CONTAINER_WIDGET].h + widgetOverrides[DLOG_VALUES_LIST_WIDGET].h;
+
+                overlay.x = 40;
+                overlay.y = 8;
             }
         }
 
@@ -5338,6 +5344,9 @@ void data_dlog_single_value_overlay(DataOperationEnum operation, Cursor cursor, 
         overlay.width = widgetCursor.widget->w;
         overlay.height = widgetCursor.widget->h;
         
+        overlay.x = 40;
+        overlay.y = 8;
+
         value = Value(&overlay, VALUE_TYPE_POINTER);
     }
 }

@@ -30,12 +30,16 @@ struct WidgetOverride {
 };
 
 struct Overlay {
+    int x;
+    int y;
     int width;
     int height;
 
     int state; // if 0 then overlay is not visible
     WidgetOverride *widgetOverrides;
 
+    bool moved = false;
+    
     int xOffset;
     int yOffset;
 

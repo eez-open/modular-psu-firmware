@@ -55,6 +55,27 @@ font::Font styleGetFont(const Style *style) {
     return font::Font(getFontData(style->font));
 }
 
+bool styleGetSmallerFont(font::Font &font) {
+    if (font.fontData == getFontData(FONT_ID_OSWALD48)) {
+        font.fontData = getFontData(FONT_ID_OSWALD38);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD38)) {
+        font.fontData = getFontData(FONT_ID_OSWALD24);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD24)) {
+        font.fontData = getFontData(FONT_ID_OSWALD20);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD20)) {
+        font.fontData = getFontData(FONT_ID_OSWALD17);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD17)) {
+        font.fontData = getFontData(FONT_ID_OSWALD14);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD14)) {
+        font.fontData = getFontData(FONT_ID_OSWALD12);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD12)) {
+        font.fontData = getFontData(FONT_ID_ROBOTO_CONDENSED_REGULAR);
+    } else {
+        return false;
+    }
+    return true;
+}
+
 bool styleIsBlink(const Style *style) {
     return style->flags & STYLE_FLAGS_BLINK ? true : false;
 }
@@ -64,7 +85,8 @@ bool styleIsBlink(const Style *style) {
 void drawText(const char *text, int textLength, int x, int y, int w, int h, const Style *style,
               bool active, bool blink, bool ignoreLuminocity,
               uint16_t *overrideColor, uint16_t *overrideBackgroundColor,
-              uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor) {
+              uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor,
+              bool useSmallerFontIfDoesNotFit) {
     int x1 = x;
     int y1 = y;
     int x2 = x + w - 1;
@@ -88,6 +110,9 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
     font::Font font = styleGetFont(style);
 
     int width = display::measureStr(text, textLength, font, 0);
+    while (useSmallerFontIfDoesNotFit && width > x2 - x1 + 1 && styleGetSmallerFont(font)) {
+        width = display::measureStr(text, textLength, font, 0);
+    }
     int height = font.getHeight();
 
     bool horizontallyFits = width <= (x2 - x1 + 1);

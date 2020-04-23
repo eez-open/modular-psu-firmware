@@ -26,7 +26,7 @@ namespace gui {
 font::Font styleGetFont(const Style *style);
 bool styleIsBlink(const Style *style);
 
-void drawText(const char *text, int textLength, int x, int y, int w, int h, const Style *style, bool active, bool blink, bool ignoreLuminocity, uint16_t *overrideColor, uint16_t *overrideBackgroundColor, uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor);
+void drawText(const char *text, int textLength, int x, int y, int w, int h, const Style *style, bool active, bool blink, bool ignoreLuminocity, uint16_t *overrideColor, uint16_t *overrideBackgroundColor, uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor, bool useSmallerFontIfDoesNotFit = false);
 void drawMultilineText(const char *text, int x, int y, int w, int h, const Style *style, bool active, int firstLineIndent, int hangingIndent);
 int measureMultilineText(const char *text, int x, int y, int w, int h, const Style *style, int firstLineIndent, int hangingIndent);
 void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bool active);

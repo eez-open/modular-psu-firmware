@@ -142,7 +142,8 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
                 drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                     style, widgetCursor.currentState->flags.active,
                     widgetCursor.currentState->flags.blinking,
-                    ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, nullptr);
+                    ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, nullptr,
+                    widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT);
             }
         }
     }

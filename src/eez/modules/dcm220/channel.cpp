@@ -549,8 +549,7 @@ struct Channel : ChannelInterface {
 
 	void setDacCurrentFloat(int subchannelIndex, float value) {
 #if defined(EEZ_PLATFORM_STM32)
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        value = remap(value, channel.params.I_MIN, (float)DAC_MIN, /*channel.params.I_MAX*/ I_MAX_FOR_REMAP, (float)DAC_MAX);
+        value = remap(value, /*channel.params.I_MIN*/ 0, (float)DAC_MIN, /*channel.params.I_MAX*/ I_MAX_FOR_REMAP, (float)DAC_MAX);
         iSet[subchannelIndex] = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
 #endif
 

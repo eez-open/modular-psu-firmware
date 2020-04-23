@@ -48,6 +48,11 @@ Overlay *getOverlay(const WidgetCursor &widgetCursor) {
 void getOverlayOffset(WidgetCursor &widgetCursor, int &xOffset, int &yOffset) {
     Overlay *overlay = getOverlay(widgetCursor);
     if (overlay) {
+        if (!overlay->moved && overlay->state) {
+            overlay->xOffset = overlay->x - widgetCursor.widget->x;
+            overlay->yOffset = overlay->y - widgetCursor.widget->y;
+        }
+
         int x = widgetCursor.x + overlay->xOffset;
         if (x < widgetCursor.appContext->rect.x) {
             x = widgetCursor.appContext->rect.x;
@@ -81,6 +86,7 @@ void dragOverlay(Event &touchEvent) {
             overlay->xOffsetOnTouchDown = overlay->xOffset;
             overlay->yOffsetOnTouchDown = overlay->yOffset;
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
+            overlay->moved = true;
             overlay->xOffset = overlay->xOffsetOnTouchDown + touchEvent.x - overlay->xOnTouchDown;
             overlay->yOffset = overlay->yOffsetOnTouchDown + touchEvent.y - overlay->yOnTouchDown;
         }
