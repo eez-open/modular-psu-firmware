@@ -218,11 +218,6 @@ bool Value::checkPoints() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void resetChannelToZero() {
-    g_channel->setVoltage(g_channel->u.min);
-    g_channel->setCurrent(g_channel->i.min);
-}
-
 bool isEnabled() {
     return g_enabled;
 }

@@ -103,8 +103,6 @@ static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calib
     }
     calibrationValue.setValueAndAdc(value, adc);
 
-    calibration::resetChannelToZero();
-
     return SCPI_RES_OK;
 }
 

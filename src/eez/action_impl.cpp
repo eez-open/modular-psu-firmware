@@ -38,7 +38,6 @@
 
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/animations.h>
-#include <eez/modules/psu/gui/calibration.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/page_ch_settings.h>
@@ -402,39 +401,46 @@ void action_ch_settings_copy() {
 }
 
 void action_ch_settings_calibration_wiz_start() {
-    calibration_wizard::start();
-}
-
-void action_ch_settings_calibration_wiz_step_previous() {
-    calibration_wizard::previousStep();
-}
-
-void action_ch_settings_calibration_wiz_step_next() {
-    calibration_wizard::nextStep();
-}
-
-void action_ch_settings_calibration_wiz_stop_and_show_previous_page() {
-    calibration_wizard::stop(popPage);
-}
-
-void action_ch_settings_calibration_wiz_stop_and_show_main_page() {
-    calibration_wizard::stop(action_show_main_page);
-}
-
-void action_ch_settings_calibration_wiz_step_set() {
-    calibration_wizard::set();
-}
-
-void action_ch_settings_calibration_wiz_step_set_level_value() {
-    calibration_wizard::setLevelValue();
-}
-
-void action_ch_settings_calibration_wiz_save() {
-    calibration_wizard::save();
+    ChSettingsCalibrationPage::start();
 }
 
 void action_ch_settings_calibration_toggle_enable() {
-    calibration_wizard::toggleEnable();
+    ChSettingsCalibrationPage::toggleEnable();
+}
+
+void onSetChannelCalibrationValueType(uint16_t value) {
+    popPage();
+    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+    page->setCalibrationValueType((calibration::CalibrationValueType)value);
+}
+
+void action_select_channel_calibration_value_type() {
+    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+    if (calibration::getCalibrationChannel().hasSupportForCurrentDualRange()) {
+        pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE, page->getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
+    } else {
+        pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE, page->getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
+    }
+}
+
+void action_channel_calibration_point_previous() {
+    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+    page->moveToPreviousPoint();
+}
+
+void action_channel_calibration_point_next() {
+    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+    page->moveToNextPoint();
+}
+
+void action_channel_calibration_point_save() {
+    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+    page->savePoint();
+}
+
+void action_channel_calibration_point_delete() {
+    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+    page->deletePoint();
 }
 
 void action_ch_settings_prot_clear() {

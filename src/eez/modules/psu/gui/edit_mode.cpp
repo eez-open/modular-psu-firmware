@@ -155,7 +155,10 @@ const Value &getMax() {
 }
 
 Unit getUnit() {
-    return g_editValue.getUnit();
+    if (g_editValue.getType() == VALUE_TYPE_FLOAT) {
+        return g_editValue.getUnit();
+    }
+    return getMin().getUnit();
 }
 
 bool setValue(float floatValue) {
@@ -238,7 +241,11 @@ void enter(int channelIndex, const Value &editValue, bool allowZero, const Value
 
     options.channelIndex = channelIndex;
 
-    options.editValueUnit = editValue.getUnit();
+    if (editValue.getType() == VALUE_TYPE_FLOAT) {
+        options.editValueUnit = editValue.getUnit();
+    } else {
+        options.editValueUnit = minValue.getUnit();
+    }
 
     options.allowZero = allowZero;
     options.min = minValue.getFloat();

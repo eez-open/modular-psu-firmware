@@ -1253,7 +1253,7 @@ static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 6
 static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE = 64;
 
 static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = 128;
-static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 256;
+static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 512;
 
 ModuleConfiguration g_moduleConf[NUM_SLOTS];
 
@@ -1320,7 +1320,8 @@ void saveCalibrationEnabledFlag(Channel &channel, bool enabled) {
 }
 
 void loadChannelCalibration(Channel &channel) {
-	assert(MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= sizeof(Channel::CalibrationConfiguration));
+    auto x = sizeof(Channel::CalibrationConfiguration);
+	assert(MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= x);
 
     if (!moduleConfRead(
         channel.slotIndex,

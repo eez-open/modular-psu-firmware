@@ -21,6 +21,8 @@
 #include <eez/gui/gui.h>
 using namespace eez::gui;
 
+#include <eez/modules/psu/calibration.h>
+
 #define LIST_ITEMS_PER_PAGE 5
 #define EMPTY_VALUE "\x92"
 
@@ -302,6 +304,64 @@ private:
     static void onListCountSetToInfinity();
 
     static void onTriggerOnListStopSet(uint16_t value);
+};
+
+class ChSettingsCalibrationPage : public SetPage {
+public:
+    static void start();
+    static void toggleEnable();
+
+    void pageAlloc();
+
+    int getDirty();
+    void set();
+
+    int getChartVersion() { return m_chartVersion; }
+
+    calibration::CalibrationValueType getCalibrationValueType();
+    void setCalibrationValueType(calibration::CalibrationValueType type);
+
+    // get and set value measured with external instrument
+    bool hasMeasuredValue();
+    float getMeasuredValue();
+    void setMeasuredValue(float value);
+
+    static void drawChart(const WidgetCursor &widgetCursor);
+
+    bool canMoveToPreviousPoint();
+    void moveToPreviousPoint();
+
+    bool canMoveToNextPoint();
+    void moveToNextPoint();
+
+    bool canSavePoint();
+    void savePoint();
+
+    bool canDeletePoint();
+    void deletePoint();
+
+    int8_t getCurrentPointIndex();
+    int8_t getNumPoints();
+
+private:
+    uint32_t m_version;
+    calibration::CalibrationValueType m_calibrationValueType;
+    bool m_hasMeasuredValue;
+    float m_measuredValue;
+    uint32_t m_chartVersion;
+
+    static void doStart();
+    static void onStartPasswordOk();
+
+    static void onSetRemarkOk(char *remark);
+
+    void doDrawChart(const WidgetCursor &widgetCursor);
+
+    calibration::Value &getCalibrationValue();
+    float getChannelDacValue();
+    float getChannelAdcValue();
+    int compareDacValues(float dac1, float dac2);
+    void selectPointAtIndex(int8_t i);
 };
 
 } // namespace gui

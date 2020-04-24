@@ -19,6 +19,7 @@
 #if OPTION_DISPLAY
 
 #include <string.h>
+#include <math.h>
 
 #include <eez/util.h>
 
@@ -572,6 +573,28 @@ void expandRectWithShadow(int &x1, int &y1, int &x2, int &y2) {
     y1 -= T;
     x2 += R;
     y2 += B;
+}
+
+void drawLine(int x1, int y1, int x2, int y2) {
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+    
+    int length;
+    if (abs(dx) > abs(dy)) {
+        length = abs(dx);
+    } else {
+        length = abs(dy);
+    }
+    
+    float xinc = (float)dx / length;
+    float yinc = (float)dy / length;
+    float x = (float)x1;
+    float y = (float)y1;
+    for (int i = 0; i < length; i++) {
+        mcu::display::drawPixel((int)roundf(x), (int)roundf(y));
+        x += xinc;
+        y += yinc;
+    }
 }
 
 } // namespace gui

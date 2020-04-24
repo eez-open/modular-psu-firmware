@@ -487,10 +487,6 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
 }
 
 bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
-    if (calibration::isEnabled()) {
-        return false;
-    }
-
     if (isPageOnStack(PAGE_ID_CH_SETTINGS_LISTS)) {
         return ((ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS))->isFocusWidget(widgetCursor);
     }
@@ -1930,6 +1926,7 @@ static ChSettingsAdvRangesPage g_ChSettingsAdvRangesPage;
 static ChSettingsAdvViewPage g_ChSettingsAdvViewPage;
 static ChSettingsTriggerPage g_ChSettingsTriggerPage;
 static ChSettingsListsPage g_ChSettingsListsPage;
+static ChSettingsCalibrationPage g_ChSettingsCalibrationPage;
 static SysSettingsDateTimePage g_SysSettingsDateTimePage;
 #if OPTION_ETHERNET
 static SysSettingsEthernetPage g_SysSettingsEthernetPage;
@@ -1991,6 +1988,9 @@ Page *getPageFromIdHook(int pageId) {
         break;
     case PAGE_ID_CH_SETTINGS_LISTS:
         page = &g_ChSettingsListsPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS:
+        page = &g_ChSettingsCalibrationPage;
         break;
     case PAGE_ID_SYS_SETTINGS_DATE_TIME:
         page = &g_SysSettingsDateTimePage;

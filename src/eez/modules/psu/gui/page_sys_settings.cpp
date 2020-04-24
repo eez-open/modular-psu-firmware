@@ -1230,29 +1230,6 @@ void SysSettingsRampAndDelayPage::draw(const WidgetCursor &widgetCursor) {
     }
 }
 
-
-void drawLine(int x1, int y1, int x2, int y2) {
-    int dx = x2 - x1;
-    int dy = y2 - y1;
-    
-    int length;
-    if (abs(dx) > abs(dy)) {
-        length = abs(dx);
-    } else {
-        length = abs(dy);
-    }
-    
-    float xinc = (float)dx / length;
-    float yinc = (float)dy / length;
-    float x = (float)x1;
-    float y = (float)y1;
-    for (int i = 0; i < length; i++) {
-        mcu::display::drawPixel((int)roundf(x), (int)roundf(y));
-        x += xinc;
-        y += yinc;
-    }
-}
-
 void SysSettingsRampAndDelayPage::drawRamp(const WidgetCursor &widgetCursor, int channelIndex, bool drawVoltageRamps, float T, float limit, int yOffset) {
     const Widget *widget = widgetCursor.widget;
     const Style* style = getStyle(widget->style);
