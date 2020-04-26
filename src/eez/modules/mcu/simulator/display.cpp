@@ -65,42 +65,6 @@ static int g_screenshotY;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static uint32_t blendColor(uint32_t fgColor, uint32_t bgColor) {
-    uint8_t *fg = (uint8_t *)&fgColor;
-    uint8_t *bg = (uint8_t *)&bgColor;
-
-    float alphaMult = fg[3] * bg[3] / 255.0f;
-    float alphaOut = fg[3] + bg[3] - alphaMult;
-
-    float r = (fg[2] * fg[3] + bg[2] * bg[3] - bg[2] * alphaMult) / alphaOut;
-    float g = (fg[1] * fg[3] + bg[1] * bg[3] - bg[1] * alphaMult) / alphaOut;
-    float b = (fg[0] * fg[3] + bg[0] * bg[3] - bg[0] * alphaMult) / alphaOut;
-
-    r = clamp(r, 0.0f, 255.0f);
-    g = clamp(g, 0.0f, 255.0f);
-    b = clamp(b, 0.0f, 255.0f);
-
-    uint32_t result;
-    uint8_t *presult = (uint8_t *)&result;
-    presult[0] = (uint8_t)b;
-    presult[1] = (uint8_t)g;
-    presult[2] = (uint8_t)r;
-    presult[3] = (uint8_t)alphaOut;
-
-    return result;
-}
-
-static uint32_t color16to32(uint16_t color, uint8_t opacity = 255) {
-    uint32_t color32;
-    ((uint8_t *)&color32)[0] = COLOR_TO_B(color);
-    ((uint8_t *)&color32)[1] = COLOR_TO_G(color);
-    ((uint8_t *)&color32)[2] = COLOR_TO_R(color);
-    ((uint8_t *)&color32)[3] = opacity;
-    return color32;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // heuristics to find resource file
 std::string getFullPath(std::string category, std::string path) {
     std::string fullPath = category + "/" + path;
@@ -463,6 +427,16 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
 
 void drawPixel(int x, int y) {
     *(g_buffer + y * DISPLAY_WIDTH + x) = color16to32(g_fc);
+
+    markDirty(x, y, x, y);;
+}
+
+void drawPixel(int x, int y, uint8_t opacity) {
+    auto dest = g_buffer + y * DISPLAY_WIDTH + x;
+    auto destUint8 = (uint8_t *)dest;
+    *dest = blendColor(
+        color16to32(g_fc, opacity), 
+        color16to32(RGB_TO_COLOR(destUint8[0], destUint8[1], destUint8[2]), 255 - opacity));
 
     markDirty(x, y, x, y);;
 }

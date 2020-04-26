@@ -317,14 +317,16 @@ public:
     void set();
 
     int getChartVersion() { return m_chartVersion; }
+    int getChartZoom() { return m_chartZoom; }
+    void zoomChart();
 
     calibration::CalibrationValueType getCalibrationValueType();
     void setCalibrationValueType(calibration::CalibrationValueType type);
 
     // get and set value measured with external instrument
-    bool hasMeasuredValue();
     float getMeasuredValue();
     void setMeasuredValue(float value);
+    bool canEditMeasuredValue();
 
     static void drawChart(const WidgetCursor &widgetCursor);
 
@@ -343,12 +345,14 @@ public:
     int8_t getCurrentPointIndex();
     int8_t getNumPoints();
 
+    void onSetValueChanged(int16_t dataId);
+
 private:
     uint32_t m_version;
     calibration::CalibrationValueType m_calibrationValueType;
-    bool m_hasMeasuredValue;
     float m_measuredValue;
     uint32_t m_chartVersion;
+    uint16_t m_chartZoom;
 
     static void doStart();
     static void onStartPasswordOk();
@@ -362,6 +366,8 @@ private:
     float getChannelAdcValue();
     int compareDacValues(float dac1, float dac2);
     void selectPointAtIndex(int8_t i);
+
+    float remapDacValue(float value);
 };
 
 } // namespace gui

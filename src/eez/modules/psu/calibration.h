@@ -78,6 +78,8 @@ void start(Channel &channel);
 /// Stop calibration procedure.
 void stop();
 
+void copyValuesFromChannel();
+
 bool hasSupportForCurrentDualRange();
 void selectCurrentRange(int8_t range);
 

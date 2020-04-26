@@ -59,24 +59,24 @@ Value::Value(CalibrationValueType type_)
 void Value::reset() {
     currentPointIndex = -1;
 
-    numPoints = 3;
+    numPoints = 2;
 
-    points[0].set = false;
-    points[1].set = false;
-    points[3].set = false;
+    points[0].set = true;
+    points[1].set = true;
 
     if (type == CALIBRATION_VALUE_U) {
         points[0].dac = g_channel->params.U_CAL_VAL_MIN;
-        points[1].dac = g_channel->params.U_CAL_VAL_MID;
-        points[2].dac = g_channel->params.U_CAL_VAL_MAX;
+        points[1].dac = g_channel->params.U_CAL_VAL_MAX;
     } else if (type == CALIBRATION_VALUE_I_HI_RANGE) {
         points[0].dac = g_channel->params.I_CAL_VAL_MIN;
-        points[1].dac = g_channel->params.I_CAL_VAL_MID;
-        points[2].dac = g_channel->params.I_CAL_VAL_MAX;
+        points[1].dac = g_channel->params.I_CAL_VAL_MAX;
     } else {
         points[0].dac = g_channel->params.I_CAL_VAL_MIN / 100;
-        points[1].dac = g_channel->params.I_CAL_VAL_MID / 100;
-        points[2].dac = g_channel->params.I_CAL_VAL_MAX / 100;
+        points[1].dac = g_channel->params.I_CAL_VAL_MAX / 100;
+    }
+
+    for (int i = 0; i < numPoints; i++) {
+        points[i].value = points[i].adc = points[i].dac;
     }
 }
 
@@ -178,40 +178,26 @@ void Value::setValueAndAdc(float value, float adc) {
 }
 
 bool Value::checkPoints() {
-    for (int i = 0; i < numPoints; i++) {
-        if (i > 1) {
-            const char *prefix = type == CALIBRATION_VALUE_U ? "Volt" : (type == CALIBRATION_VALUE_I_HI_RANGE ? "HI Curr" : "LO Curr");
+    //for (int i = 0; i < numPoints; i++) {
+    //    if (i > 1) {
+    //        const char *prefix = type == CALIBRATION_VALUE_U ? "Volt" : (type == CALIBRATION_VALUE_I_HI_RANGE ? "HI Curr" : "LO Curr");
 
-            if (points[i].dac < points[i - 1].dac) {
-                DebugTrace("%s DAC at point %d < DAC at point %d\n", prefix, i + 1, i);
-                return false;
-            }
+    //        if (points[i].dac < points[i - 1].dac) {
+    //            DebugTrace("%s DAC at point %d < DAC at point %d\n", prefix, i + 1, i);
+    //            return false;
+    //        }
 
-            if (points[i].dac < points[i - 1].dac) {
-                DebugTrace("%s data at point %d < data at point %d\n", prefix, i + 1, i);
-                return false;
-            }
+    //        if (points[i].value < points[i - 1].value) {
+    //            DebugTrace("%s data at point %d < data at point %d\n", prefix, i + 1, i);
+    //            return false;
+    //        }
 
-            if (points[i].adc < points[i - 1].adc) {
-                DebugTrace("%s ADC at point %d < ADC at point %d\n", prefix, i + 1, i);
-                return false;
-            }
-
-            if (i < numPoints - 1) {
-                float mid = remap(points[i].dac, points[i - 1].dac, points[i - 1].value, points[i + 1].dac, points[i + 1].value);
-
-                float allowedDiff = g_channel->params.CALIBRATION_MID_TOLERANCE_PERCENT * (points[i + 1].value - points[i - 1].value) / 100.0f;
-
-                float diff = fabsf(mid - points[i].value);
-                if (diff > allowedDiff) {
-                    DebugTrace("%s point %d check failed: level=%f, data=%f, diff=%f, allowedDiff=%f\n",
-                        prefix, i + 1,
-                        mid, points[i].value, diff, allowedDiff);
-                    return false;
-                }
-            }
-        }
-    }
+    //        if (points[i].adc < points[i - 1].adc) {
+    //            DebugTrace("%s ADC at point %d < ADC at point %d\n", prefix, i + 1, i);
+    //            return false;
+    //        }
+    //    }
+    //}
 
     return true;
 }
@@ -278,6 +264,32 @@ void stop() {
 
     if (g_channel->isCalibrationExists()) {
         g_channel->calibrationEnable(true);
+    }
+}
+
+void copyValueFromChannel(Channel::CalibrationValueConfiguration &channelValue, Value &value) {
+    value.numPoints = channelValue.numPoints;
+    for (unsigned int i = 0; i < channelValue.numPoints; i++) {
+        value.points[i].set = true;
+        value.points[i].dac = channelValue.points[i].dac;
+        value.points[i].value = channelValue.points[i].value;
+        value.points[i].adc = channelValue.points[i].adc;
+    }
+}
+
+void copyValuesFromChannel() {
+    if (g_channel->isVoltageCalibrationExists()) {
+        copyValueFromChannel(g_channel->cal_conf.u, g_voltage);
+    }
+
+    if (g_channel->isCurrentCalibrationExists(0)) {
+        copyValueFromChannel(g_channel->cal_conf.i[0], g_currents[0]);
+    }
+
+    if (hasSupportForCurrentDualRange()) {
+        if (g_channel->isCurrentCalibrationExists(1)) {
+            copyValueFromChannel(g_channel->cal_conf.i[1], g_currents[1]);
+        }
     }
 }
 

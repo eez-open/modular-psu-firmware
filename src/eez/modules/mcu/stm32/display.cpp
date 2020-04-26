@@ -600,6 +600,17 @@ void drawPixel(int x, int y) {
     markDirty(x, y, x, y);
 }
 
+void drawPixel(int x, int y, uint8_t opacity) {
+    DMA2D_WAIT;
+
+    auto dest = g_buffer + y * DISPLAY_WIDTH + x;
+    *dest = blendColor(
+        color16to32(g_fc, opacity), 
+        color16to32(*dest, 255 - opacity));
+
+    markDirty(x, y, x, y);
+}
+
 void drawRect(int x1, int y1, int x2, int y2) {
     if (x1 > x2) {
         std::swap<int>(x1, x2);

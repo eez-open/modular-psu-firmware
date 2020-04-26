@@ -576,24 +576,47 @@ void expandRectWithShadow(int &x1, int &y1, int &x2, int &y2) {
 }
 
 void drawLine(int x1, int y1, int x2, int y2) {
-    int dx = x2 - x1;
-    int dy = y2 - y1;
-    
-    int length;
-    if (abs(dx) > abs(dy)) {
-        length = abs(dx);
-    } else {
-        length = abs(dy);
-    }
-    
-    float xinc = (float)dx / length;
-    float yinc = (float)dy / length;
-    float x = (float)x1;
-    float y = (float)y1;
-    for (int i = 0; i < length; i++) {
-        mcu::display::drawPixel((int)roundf(x), (int)roundf(y));
-        x += xinc;
-        y += yinc;
+   int dx = x2 - x1;
+   int dy = y2 - y1;
+   
+   int length;
+   if (abs(dx) > abs(dy)) {
+       length = abs(dx);
+   } else {
+       length = abs(dy);
+   }
+   
+   float xinc = (float)dx / length;
+   float yinc = (float)dy / length;
+   float x = (float)x1;
+   float y = (float)y1;
+   for (int i = 0; i < length; i++) {
+       mcu::display::drawPixel((int)roundf(x), (int)roundf(y));
+       x += xinc;
+       y += yinc;
+   }
+}
+
+// http://members.chello.at/~easyfilter/bresenham.html
+void drawAntialiasedLine(int x0, int y0, int x1, int y1) {
+    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    int err = dx - dy, e2, x2;                       /* error value e_xy */
+    int ed = dx + dy == 0 ? 1 : (int)sqrt((float)dx*dx + (float)dy*dy);
+
+    for (; ; ) {                                         /* pixel loop */
+        mcu::display::drawPixel(x0, y0, 255 - 255 * abs(err - dx + dy) / ed);
+        e2 = err; x2 = x0;
+        if (2 * e2 >= -dx) {                                    /* x step */
+            if (x0 == x1) break;
+            if (e2 + dy < ed) mcu::display::drawPixel(x0, y0 + sy, 255 - 255 * (e2 + dy) / ed);
+            err -= dy; x0 += sx;
+        }
+        if (2 * e2 <= dy) {                                     /* y step */
+            if (y0 == y1) break;
+            if (dx - e2 < ed) mcu::display::drawPixel(x2 + sx, y0, 255 - 255 * (dx - e2) / ed);
+            err += dx; y0 += sy;
+        }
     }
 }
 

@@ -2360,7 +2360,7 @@
       "defaultValue": "10 of 10"
     },
     {
-      "name": "channel_calibration_points",
+      "name": "channel_calibration_chart",
       "type": "list",
       "defaultValue": "[]"
     },
@@ -2368,6 +2368,11 @@
       "name": "channel_calibration_point_can_save",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "channel_calibration_chart_zoom",
+      "type": "string",
+      "defaultValue": "\\u00b8 x64"
     }
   ],
   "actions": [
@@ -3059,6 +3064,9 @@
     },
     {
       "name": "channel_calibration_point_save"
+    },
+    {
+      "name": "channel_calibration_chart_zoom"
     }
   ],
   "gui": {
@@ -15098,17 +15106,43 @@
         "style": "default",
         "widgets": [
           {
-            "type": "DisplayData",
+            "type": "Select",
             "style": {
-              "inheritFrom": "encoder_cursor_14_enabled"
+              "inheritFrom": "default"
             },
-            "data": "calibration_point_measured_value",
-            "action": "edit",
+            "data": "channel_calibration_value_is_voltage",
             "left": 84,
-            "top": 157,
+            "top": 85,
             "width": 105,
             "height": 32,
-            "displayOption": 0
+            "widgets": [
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "encoder_cursor_14_enabled"
+                },
+                "data": "channel_i_edit",
+                "action": "edit",
+                "left": 0,
+                "top": 0,
+                "width": 105,
+                "height": 32,
+                "displayOption": 0
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "encoder_cursor_14_enabled"
+                },
+                "data": "channel_u_edit",
+                "action": "edit",
+                "left": 0,
+                "top": 0,
+                "width": 105,
+                "height": 32,
+                "displayOption": 0
+              }
+            ]
           },
           {
             "type": "Text",
@@ -15164,7 +15198,7 @@
                     "action": "edit",
                     "left": 20,
                     "top": 0,
-                    "width": 105,
+                    "width": 82,
                     "height": 32,
                     "displayOption": 0
                   },
@@ -15175,11 +15209,46 @@
                     },
                     "data": "channel_u_mon",
                     "action": "",
-                    "left": 125,
+                    "left": 102,
                     "top": 0,
-                    "width": 105,
+                    "width": 82,
                     "height": 32,
                     "displayOption": 0
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_is_cc",
+                    "left": 184,
+                    "top": 0,
+                    "width": 46,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_warning"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 46,
+                        "height": 32,
+                        "text": "\\u0081CV"
+                      },
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 46,
+                        "height": 32,
+                        "invertColors": true
+                      }
+                    ]
                   }
                 ]
               },
@@ -15213,7 +15282,7 @@
                     "action": "edit",
                     "left": 20,
                     "top": 0,
-                    "width": 96,
+                    "width": 82,
                     "height": 32,
                     "displayOption": 0
                   },
@@ -15224,11 +15293,46 @@
                     },
                     "data": "channel_i_mon",
                     "action": "",
-                    "left": 124,
+                    "left": 102,
                     "top": 0,
-                    "width": 96,
+                    "width": 82,
                     "height": 32,
                     "displayOption": 0
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_is_cv",
+                    "left": 184,
+                    "top": 0,
+                    "width": 46,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_warning"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 46,
+                        "height": 32,
+                        "text": "\\u0081CC"
+                      },
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 46,
+                        "height": 32,
+                        "invertColors": true
+                      }
+                    ]
                   }
                 ]
               }
@@ -15254,45 +15358,6 @@
             "width": 79,
             "height": 32,
             "text": "Set:"
-          },
-          {
-            "type": "Select",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "channel_calibration_value_is_voltage",
-            "left": 84,
-            "top": 85,
-            "width": 105,
-            "height": 32,
-            "widgets": [
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "encoder_cursor_14_enabled"
-                },
-                "data": "channel_i_edit",
-                "action": "edit",
-                "left": 0,
-                "top": 0,
-                "width": 105,
-                "height": 32,
-                "displayOption": 0
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "encoder_cursor_14_enabled"
-                },
-                "data": "channel_u_edit",
-                "action": "edit",
-                "left": 0,
-                "top": 0,
-                "width": 105,
-                "height": 32,
-                "displayOption": 0
-              }
-            ]
           },
           {
             "type": "Text",
@@ -15354,6 +15419,19 @@
             "width": 79,
             "height": 32,
             "text": "Measured:"
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "calibration_point_measured_value",
+            "action": "edit",
+            "left": 84,
+            "top": 157,
+            "width": 105,
+            "height": 32,
+            "displayOption": 0
           },
           {
             "type": "Button",
@@ -15456,7 +15534,7 @@
             "style": {
               "inheritFrom": "yt_graph"
             },
-            "data": "channel_calibration_points",
+            "data": "channel_calibration_chart",
             "left": 240,
             "top": 0,
             "width": 240,
@@ -15507,9 +15585,24 @@
                 },
                 "left": 78,
                 "top": 0,
-                "width": 320,
+                "width": 162,
                 "height": 32,
                 "text": "Calibration"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 0 0 4"
+                },
+                "data": "channel_calibration_chart_zoom",
+                "action": "channel_calibration_chart_zoom",
+                "left": 240,
+                "top": 0,
+                "width": 60,
+                "height": 32,
+                "text": ""
               },
               {
                 "type": "Select",
@@ -46776,27 +46869,6 @@
         "inheritFrom": "touch_calibration",
         "activeColor": "#00ff00",
         "activeBackgroundColor": "text_disabled_background"
-      },
-      {
-        "name": "calibration_points_x_axis_label_right",
-        "inheritFrom": "yt_graph",
-        "alwaysBuild": true,
-        "font": "RobotoCondensed-Regular",
-        "alignHorizontal": "right"
-      },
-      {
-        "name": "calibration_points_x_axis_marker",
-        "inheritFrom": "yt_graph",
-        "alwaysBuild": true,
-        "font": "RobotoCondensed-Regular"
-      },
-      {
-        "name": "calibration_points_x_axis_marker_selected",
-        "inheritFrom": "yt_graph",
-        "alwaysBuild": true,
-        "font": "RobotoCondensed-Regular",
-        "color": "yt_graph_y2",
-        "activeBackgroundColor": "yt_graph_y2"
       }
     ],
     "fonts": [
@@ -50284,7 +50356,7 @@
           {
             "encoding": 128,
             "x": 0,
-            "y": 0,
+            "y": -2,
             "width": 19,
             "height": 19,
             "dx": 20,
@@ -50302,7 +50374,7 @@
           {
             "encoding": 129,
             "x": 0,
-            "y": 0,
+            "y": -2,
             "width": 19,
             "height": 18,
             "dx": 20,
@@ -50320,7 +50392,7 @@
           {
             "encoding": 130,
             "x": 0,
-            "y": 0,
+            "y": -2,
             "width": 19,
             "height": 19,
             "dx": 20,
@@ -51287,6 +51359,42 @@
               "filePath": "fonts\\webhostinghub-glyphs.ttf",
               "size": 15,
               "encoding": 43
+            }
+          },
+          {
+            "encoding": 184,
+            "x": 0,
+            "y": -3,
+            "width": 22,
+            "height": 22,
+            "dx": 21,
+            "glyphBitmap": {
+              "width": 22,
+              "height": 22,
+              "pixelArray": "00000000002a89c3eff9e2af680d0000000000000000000000109dffffffffffffffffec5c01000000000000000025dfffffffefb6a9c8fdffffffa00400000000000010dfffffd34703000000117af7ffff900000000000009dffffba090000000000000035f0ffff42000000002bffffd109000007afbc130000003ffeffcc010000008bffff440000003dffff5c00000000a7ffff2d000000c6ffec020006396dffff863b0b000050ffff68000000f3ffb20000b0ffffffffffffce000013ffff94000000fdffa50000c4ffffffffffffe3000005ffff9d000000e7ffc3000018618bffff9f6321000023ffff86000000b4fffa0c0000003fffff5f0000000067ffff570000006fffff6f0000000fd8e42000000003d0fff90f00000010f0fff22d00000001010000000081ffff93000000000065ffffeb350000000000000380fffff316000000000001aafffffc9e490e022064cdffffffff7c000000000000069afffffffffffffffffffff5ffffff770000000000000049d3fffffffffffffa951684ffffff710000000000000001336d98a1895a100000007effffff6c0000000000000000000000000000000000007affffff2600000000000000000000000000000000000073fff51b00000000000000000000000000000000000000281a00"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 15,
+              "encoding": 62240
+            }
+          },
+          {
+            "encoding": 185,
+            "x": 0,
+            "y": -3,
+            "width": 22,
+            "height": 22,
+            "dx": 21,
+            "glyphBitmap": {
+              "width": 22,
+              "height": 22,
+              "pixelArray": "00000000002a89c3eff9e2af680d0000000000000000000000109dffffffffffffffffec5b01000000000000000025dfffffffefb6a9c8fdffffff9e0300000000000010dfffffd34703000000117af7ffff8b0000000000009dffffba090000000000000035f0fffe3d000000002bffffd1090000000000000000003ffeffc7000000008bffff440000000000000000000000a7ffff29000000c6ffec02000000000000000000000050ffff64000000f3ffb200007ff9fcfcfcfcfb9a000013ffff92000000fdffa50000d4fffffffffffff3000005ffff9d000000e7ffc300003fa1a4a4a4a4a34f000023ffff89000000b4fffa0c000000000000000000000067ffff5d0000006fffff6f0000000000000000000003d0fffc1400000010f0fff22d00000000000000000081ffffa2000000000065ffffeb350000000000000380fffff520000000000001aafffffc9e490e022064cdfffffffe61000000000000069afffffffffffffffffffff5fffffe600000000000000049d3fffffffffffffa951684fffffe5f0000000000000001336d98a1895a100000007efffffe5f0000000000000000000000000000000000007afffffe2400000000000000000000000000000000000073fff51c00000000000000000000000000000000000000281a00"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 15,
+              "encoding": 62241
             }
           }
         ]
@@ -68016,12 +68124,30 @@
             "x": 0,
             "y": 0,
             "width": 5,
-            "height": 8,
+            "height": 5,
             "dx": 5,
             "glyphBitmap": {
               "width": 5,
-              "height": 8,
-              "pixelArray": "00004800000008e708000044ff4400009bff9b0000e3ffe3003cffffff3c83ffffff83dbffffffdb"
+              "height": 5,
+              "pixelArray": "28c3ffc328c3ffffffc3ffffffffffc7ffffffc728c7ffc728"
+            },
+            "source": {
+              "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+              "size": 10,
+              "encoding": 127
+            }
+          },
+          {
+            "encoding": 129,
+            "x": 0,
+            "y": 0,
+            "width": 7,
+            "height": 7,
+            "dx": 5,
+            "glyphBitmap": {
+              "width": 7,
+              "height": 7,
+              "pixelArray": "0054d7ffd7540054ffffffffff54d7ffffffffffd7ffffffffffffffd7ffffffffffd75cffffffffff5c005cd7ffd75c00"
             },
             "source": {
               "filePath": "fonts\\RobotoCondensed-Regular.ttf",

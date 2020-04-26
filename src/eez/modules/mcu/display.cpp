@@ -51,6 +51,45 @@ static const uint16_t *g_themeColors;
 static uint32_t g_themeColorsCount;
 static const uint16_t *g_colors;
 
+uint32_t color16to32(uint16_t color, uint8_t opacity) {
+    uint32_t color32;
+    ((uint8_t *)&color32)[0] = COLOR_TO_B(color);
+    ((uint8_t *)&color32)[1] = COLOR_TO_G(color);
+    ((uint8_t *)&color32)[2] = COLOR_TO_R(color);
+    ((uint8_t *)&color32)[3] = opacity;
+    return color32;
+}
+
+uint16_t color32to16(uint32_t color) {
+    auto pcolor = (uint8_t *)&color;
+    return RGB_TO_COLOR(pcolor[0], pcolor[1], pcolor[2]);
+}
+
+uint32_t blendColor(uint32_t fgColor, uint32_t bgColor) {
+    uint8_t *fg = (uint8_t *)&fgColor;
+    uint8_t *bg = (uint8_t *)&bgColor;
+
+    float alphaMult = fg[3] * bg[3] / 255.0f;
+    float alphaOut = fg[3] + bg[3] - alphaMult;
+
+    float r = (fg[2] * fg[3] + bg[2] * bg[3] - bg[2] * alphaMult) / alphaOut;
+    float g = (fg[1] * fg[3] + bg[1] * bg[3] - bg[1] * alphaMult) / alphaOut;
+    float b = (fg[0] * fg[3] + bg[0] * bg[3] - bg[0] * alphaMult) / alphaOut;
+
+    r = clamp(r, 0.0f, 255.0f);
+    g = clamp(g, 0.0f, 255.0f);
+    b = clamp(b, 0.0f, 255.0f);
+
+    uint32_t result;
+    uint8_t *presult = (uint8_t *)&result;
+    presult[0] = (uint8_t)b;
+    presult[1] = (uint8_t)g;
+    presult[2] = (uint8_t)r;
+    presult[3] = (uint8_t)alphaOut;
+
+    return result;
+}
+
 void onThemeChanged() {
 	if (g_assetsLoaded) {
 		g_themeColors = getThemeColors(psu::persist_conf::devConf.selectedThemeIndex);

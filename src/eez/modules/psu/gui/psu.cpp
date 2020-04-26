@@ -591,6 +591,10 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
         }
 
         if (widget->action == ACTION_ID_EDIT || widget->action == ACTION_ID_EDIT_NO_FOCUS) {
+            if (widgetCursor.widget->data == DATA_ID_CALIBRATION_POINT_MEASURED_VALUE) {
+                auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+                return page->canEditMeasuredValue();
+            }
             return channel_dispatcher::isEditEnabled(widgetCursor);
         }
     }

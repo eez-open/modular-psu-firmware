@@ -982,6 +982,14 @@ void CALIBRATION_POINT_INFO_value_to_text(const Value &value, char *text, int co
     }
 }
 
+bool compare_ZOOM_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void ZOOM_value_to_text(const Value &value, char *text, int count) {
+    sprintf(text, "\xb8 x%d", value.getInt());
+}
+
 static Cursor g_editValueCursor(-1);
 static int16_t g_editValueDataId;
 
@@ -1213,6 +1221,11 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {
             channel_dispatcher::setVoltage(channel, value.getFloat());
+
+            auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+            if (page) {
+                page->onSetValueChanged(DATA_ID_CHANNEL_U_EDIT);
+            }
         }
     }
 }
@@ -1326,6 +1339,11 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {
             channel_dispatcher::setCurrent(channel, value.getFloat());
+
+            auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+            if (page) {
+                page->onSetValueChanged(DATA_ID_CHANNEL_I_EDIT);
+            }
         }
     }
 }
@@ -2352,21 +2370,19 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
-            if (page->hasMeasuredValue()) {
-                value = MakeValue(page->getMeasuredValue(), page->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER);
-            }
+            value = MakeValue(page->getMeasuredValue(), page->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER);
         }
     } else if (operation == DATA_OPERATION_GET_MIN) {
         if (page->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
-            value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
+            value = MakeValue(channel_dispatcher::getUMin(channel) - channel_dispatcher::getUMax(channel) * 0.1f, UNIT_VOLT);
         } else {
-            value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
+            value = MakeValue(channel_dispatcher::getIMin(channel) - channel_dispatcher::getIMaxLimit(channel) * 0.1f, UNIT_AMPER);
         }
     } else if (operation == DATA_OPERATION_GET_MAX) {
         if (page->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
-            value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
+            value = MakeValue(channel_dispatcher::getUMax(channel) * 1.1f, UNIT_VOLT);
         } else {
-            value = MakeValue(channel_dispatcher::getIMax(channel), UNIT_AMPER);
+            value = MakeValue(channel_dispatcher::getIMaxLimit(channel) * 1.1f, UNIT_AMPER);
         }
     } else if (operation == DATA_OPERATION_GET_NAME) {
         value = page->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? "Voltage" : "Current";
@@ -2430,12 +2446,19 @@ void data_channel_calibration_point_info(DataOperationEnum operation, Cursor cur
     }
 }
 
-void data_channel_calibration_points(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_chart(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
         value = page->getChartVersion();
     } else if (operation == DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION) {
         value = Value((void *)ChSettingsCalibrationPage::drawChart, VALUE_TYPE_POINTER);
+    }
+}
+
+void data_channel_calibration_chart_zoom(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+        value = Value(page->getChartZoom(), VALUE_TYPE_ZOOM);
     }
 }
 

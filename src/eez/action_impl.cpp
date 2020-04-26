@@ -443,6 +443,11 @@ void action_channel_calibration_point_delete() {
     page->deletePoint();
 }
 
+void action_channel_calibration_chart_zoom() {
+    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+    page->zoomChart();
+}
+
 void action_ch_settings_prot_clear() {
     ChSettingsProtectionPage::clear();
 }

@@ -38,5 +38,19 @@ inline bool operator == (const Rect& r1, const Rect& r2) {
     return !(r1 != r2);
 }
 
+struct PointF {
+    float x;
+    float y;
+};
+
+struct RectangleF {
+    float left;
+    float top;
+    float right;
+    float bottom;
+};
+
+bool clipSegment(RectangleF r, PointF &p1, PointF &p2);
+
 } // namespace gui
 } // namespace eez

@@ -255,6 +255,7 @@ set(src_eez_gui
     src/eez/gui/draw.cpp
     src/eez/gui/event.cpp
     src/eez/gui/font.cpp
+    src/eez/gui/geometry.cpp
     src/eez/gui/gui.cpp
     src/eez/gui/overlay.cpp
     src/eez/gui/page.cpp

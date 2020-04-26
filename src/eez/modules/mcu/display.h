@@ -59,6 +59,10 @@ extern uint8_t g_opacity;
 
 extern gui::font::Font g_font;
 
+uint32_t color16to32(uint16_t color, uint8_t opacity = 255);
+uint16_t color32to16(uint32_t color);
+uint32_t blendColor(uint32_t fgColor, uint32_t bgColor);
+
 int getDisplayWidth();
 int getDisplayHeight();
 
@@ -87,6 +91,7 @@ extern bool g_dirty;
 bool isDirty();
 
 void drawPixel(int x, int y);
+void drawPixel(int x, int y, uint8_t opacity);
 void drawRect(int x1, int y1, int x2, int y2);
 void fillRect(int x1, int y1, int x2, int y2, int radius = 0);
 void fillRect(void *dst, int x1, int y1, int x2, int y2);

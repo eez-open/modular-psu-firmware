@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "platform.h": "c",
+        "vector": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp",
+        "xtr1common": "cpp",
+        "xiosbase": "cpp"
+    }
+}
