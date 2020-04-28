@@ -604,9 +604,12 @@ void drawPixel(int x, int y, uint8_t opacity) {
     DMA2D_WAIT;
 
     auto dest = g_buffer + y * DISPLAY_WIDTH + x;
-    *dest = blendColor(
-        color16to32(g_fc, opacity), 
-        color16to32(*dest, 255 - opacity));
+    *dest = color32to16(
+		blendColor(
+			color16to32(g_fc, opacity),
+			color16to32(*dest, 255 - opacity)
+		)
+	);
 
     markDirty(x, y, x, y);
 }

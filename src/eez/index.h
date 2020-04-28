@@ -73,10 +73,9 @@ struct ChannelParams {
     float U_DEF_STEP;
     float U_MAX_STEP;
 
-    float U_CAL_VAL_MIN;
-    float U_CAL_VAL_MID;
-    float U_CAL_VAL_MAX;
-    float U_CURR_CAL;
+    unsigned int U_CAL_NUM_POINTS;
+    float *U_CAL_POINTS;
+    float U_CAL_I_SET;
 
     float I_MIN;
     float I_DEF;
@@ -88,10 +87,13 @@ struct ChannelParams {
     float I_DEF_STEP;
     float I_MAX_STEP; 
     
-    float I_CAL_VAL_MIN;
-    float I_CAL_VAL_MID;
-    float I_CAL_VAL_MAX;
-    float I_VOLT_CAL;
+    unsigned int I_CAL_NUM_POINTS;
+    float *I_CAL_POINTS;
+    float I_CAL_U_SET;
+
+    unsigned int I_LOW_RANGE_CAL_NUM_POINTS;
+    float *I_LOW_RANGE_CAL_POINTS;
+    float I_LOW_RANGE_CAL_U_SET;
 
     bool OVP_DEFAULT_STATE;
     float OVP_MIN_DELAY;
@@ -113,8 +115,11 @@ struct ChannelParams {
     float PTOT;
 
     float U_RESOLUTION;
+    float U_RESOLUTION_DURING_CALIBRATION;
     float I_RESOLUTION;
+    float I_RESOLUTION_DURING_CALIBRATION;
     float I_LOW_RESOLUTION;
+    float I_LOW_RESOLUTION_DURING_CALIBRATION;
     float P_RESOLUTION;
 
     float VOLTAGE_GND_OFFSET; // [V], (1375 / 65535) * (40V | 50V)
@@ -191,8 +196,8 @@ struct ChannelInterface {
     virtual const char *getBrand() = 0;
     virtual void getSerial(char *text) = 0;
 
-    virtual void getVoltageStepValues(StepValues *stepValues) = 0;
-    virtual void getCurrentStepValues(StepValues *stepValues) = 0;
+    virtual void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) = 0;
+    virtual void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) = 0;
     virtual void getPowerStepValues(StepValues *stepValues) = 0;
 
     virtual bool isPowerLimitExceeded(int subchannelIndex, float u, float i) = 0;

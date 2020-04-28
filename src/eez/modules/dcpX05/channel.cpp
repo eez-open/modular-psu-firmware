@@ -74,6 +74,10 @@ struct Channel : ChannelInterface {
 	uint32_t fallingEdgeTimeout;
 	float fallingEdgePreviousUMonAdc;
 
+	float U_CAL_POINTS[2];
+	float I_CAL_POINTS[2];
+	float I_LOW_RANGE_CAL_POINTS[2];
+	
 	Channel(int slotIndex_) : ChannelInterface(slotIndex_), uSet(0) {}
 
 	void getParams(int subchannelIndex, ChannelParams &params) {
@@ -81,37 +85,19 @@ struct Channel : ChannelInterface {
 
 		params.U_MIN = 0.0f;
 		params.U_DEF = 0.0f;
-
-		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP505) {
-			params.U_MAX = 50.0f;
-
-			params.U_CAL_VAL_MIN = 0.15f;
-			params.U_CAL_VAL_MID = 24.1f;
-			params.U_CAL_VAL_MAX = 48.0f;
-			params.U_CURR_CAL = 25.0f;
-		} else {
-			params.U_MAX = 40.0f;
-
-			params.U_CAL_VAL_MIN = 0.15f;
-			params.U_CAL_VAL_MID = 20.0f;
-			params.U_CAL_VAL_MAX = 38.0f;
-			params.U_CURR_CAL = 20.0f;
-		}
+		params.U_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCP505 ? 50.0f : 40.0f;
+		params.U_CAL_NUM_POINTS = 2;
+		params.U_CAL_POINTS = U_CAL_POINTS;
 
 		params.U_MIN_STEP = 0.01f;
 		params.U_DEF_STEP = 0.1f;
 		params.U_MAX_STEP = 5.0f;
 
-		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP505) {
-			params.U_CAL_VAL_MIN = 0.15f;
-			params.U_CAL_VAL_MID = 24.1f;
-			params.U_CAL_VAL_MAX = 48.0f;
-		} else {
-			params.U_CAL_VAL_MIN = 0.15f;
-			params.U_CAL_VAL_MID = 20.0f;
-			params.U_CAL_VAL_MAX = 38.0f;
-		}
-		params.I_VOLT_CAL = 0.1f;
+		U_CAL_POINTS[0] = 0.15f;
+		U_CAL_POINTS[1] = slot.moduleInfo->moduleType == MODULE_TYPE_DCP505 ? 48.0f : 38.0f;
+		params.U_CAL_NUM_POINTS = 2;
+		params.U_CAL_POINTS = U_CAL_POINTS;
+		params.U_CAL_I_SET = 0.1f;
 
 		params.I_MIN = 0.0f;
 		params.I_DEF = 0.0f;
@@ -123,10 +109,17 @@ struct Channel : ChannelInterface {
 		params.I_DEF_STEP = 0.01f;
 		params.I_MAX_STEP = 1.0f; 
 		
-		params.I_CAL_VAL_MIN = 0.05f;
-		params.I_CAL_VAL_MID = 2.425f;
-		params.I_CAL_VAL_MAX = 4.8f;
-		params.U_CURR_CAL = 30.0f;
+		I_CAL_POINTS[0] = 0.05f;
+		I_CAL_POINTS[1] = 4.8f;
+		params.I_CAL_NUM_POINTS = 2;
+		params.I_CAL_POINTS = I_CAL_POINTS;
+		params.I_CAL_U_SET = 30.0f;
+
+		I_LOW_RANGE_CAL_POINTS[0] = I_CAL_POINTS[0] / 100;
+		I_LOW_RANGE_CAL_POINTS[1] = I_CAL_POINTS[1] / 100;
+		params.I_LOW_RANGE_CAL_NUM_POINTS = 2;
+		params.I_LOW_RANGE_CAL_POINTS = I_LOW_RANGE_CAL_POINTS;
+		params.I_LOW_RANGE_CAL_U_SET = 30.0f;
 
 		params.OVP_DEFAULT_STATE = false;
 		params.OVP_MIN_DELAY = 0.0f;
@@ -148,15 +141,14 @@ struct Channel : ChannelInterface {
 		params.PTOT = 155.0f;
 
 		params.U_RESOLUTION = 0.005f;
+		params.U_RESOLUTION_DURING_CALIBRATION = 0.0001f;
 		params.I_RESOLUTION = 0.0005f;
+		params.I_RESOLUTION_DURING_CALIBRATION = 0.00001f;
 		params.I_LOW_RESOLUTION = 0.000005f;
+		params.I_LOW_RESOLUTION_DURING_CALIBRATION = 0.0000001f;
 		params.P_RESOLUTION = 0.001f;
 
-		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP505) {
-			params.VOLTAGE_GND_OFFSET = 1.05f;
-		} else {
-			params.VOLTAGE_GND_OFFSET = 0.86f;
-		}
+		params.VOLTAGE_GND_OFFSET = slot.moduleInfo->moduleType == MODULE_TYPE_DCP505 ? 1.05f : 0.86f;
 		params.CURRENT_GND_OFFSET = 0.11f;
 
 		params.CALIBRATION_DATA_TOLERANCE_PERCENT = 10.0f;
@@ -801,22 +793,25 @@ struct Channel : ChannelInterface {
 		strcpy(text, "N/A");
 	}
 
-    void getVoltageStepValues(StepValues *stepValues) {
+    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) {
         static float values[] = { 1.0f, 0.1f, 0.01f, 0.005f };
-        stepValues->values = values;
+		static float calibrationModeValues[] = { 1.0f, 0.1f, 0.01f, 0.001f };
+        stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_VOLT;
 	}
     
-	void getCurrentStepValues(StepValues *stepValues) {
+	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) {
         static float lowRangeValues[] = { 0.001f, 0.0001f, 0.00001f, 0.000005f };
+		static float calibrationModeLowRangeValues[] = { 0.001f, 0.0001f, 0.00001f, 0.000001f };
         static float highRangeValues[] = { 0.1f, 0.01f, 0.001f, 0.0005f }; 
+		static float calibrationModeHighRangeValues[] = { 0.1f, 0.01f, 0.001f, 0.0001f }; 
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 		if (channel.flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
-        	stepValues->values = lowRangeValues;
+        	stepValues->values = calibrationMode ? calibrationModeLowRangeValues : lowRangeValues;
         	stepValues->count = sizeof(lowRangeValues) / sizeof(float);
 		} else {
-        	stepValues->values = highRangeValues;
+        	stepValues->values = calibrationMode ? calibrationModeHighRangeValues : highRangeValues;
 			stepValues->count = sizeof(highRangeValues) / sizeof(float);
 		}
 		stepValues->unit = UNIT_AMPER;

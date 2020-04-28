@@ -574,8 +574,15 @@ void SysSettingsTemperaturePage::pageAlloc() {
     defaultDelay = OTP_CH_DEFAULT_DELAY;
 
     origFanMode = fanMode = persist_conf::devConf.fanMode;
-    origFanSpeedPercentage = fanSpeedPercentage = MakeValue(fanMode == FAN_MODE_AUTO ? 100.0f : 1.0f * persist_conf::devConf.fanSpeedPercentage, UNIT_PERCENT);
-    fanSpeedPWM = persist_conf::devConf.fanSpeedPWM;
+
+    if (fanMode == FAN_MODE_MANUAL) {
+        origFanSpeedPercentage = fanSpeedPercentage = MakeValue(1.0f * persist_conf::devConf.fanSpeedPercentage, UNIT_PERCENT);
+        fanSpeedPWM = persist_conf::devConf.fanSpeedPWM;
+    } else {
+        origFanSpeedPercentage = fanSpeedPercentage = MakeValue(100.0f, UNIT_PERCENT);
+        fanSpeedPWM = 255;
+    }
+
     fanPWMMeasuringInProgress = false;
 }
 

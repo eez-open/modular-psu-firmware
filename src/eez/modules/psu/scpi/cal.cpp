@@ -34,8 +34,8 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_choice_def_t calibration_current_range_choice[] = {
-    { "HIGH", calibration::CURRENT_RANGE_HIGH },
-    { "LOW", calibration::CURRENT_RANGE_LOW },
+    { "HIGH", CURRENT_RANGE_HIGH },
+    { "LOW", CURRENT_RANGE_LOW },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
@@ -58,7 +58,7 @@ static scpi_result_t calibration_level(scpi_t *context, calibration::Value &cali
     }
 
     float dacValue;
-    if (calibrationValue.isVoltage()) {
+    if (calibrationValue.type == calibration::CALIBRATION_VALUE_U) {
         if (!get_voltage_param(context, dacValue, &calibration::getCalibrationChannel(), 0)) {
             return SCPI_RES_ERR;
         }
@@ -90,7 +90,7 @@ static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calib
     }
 
     if (param.unit != SCPI_UNIT_NONE &&
-        param.unit != (calibrationValue.isVoltage() ? SCPI_UNIT_VOLT : SCPI_UNIT_AMPER)) {
+        param.unit != (calibrationValue.type == calibration::CALIBRATION_VALUE_U ? SCPI_UNIT_VOLT : SCPI_UNIT_AMPER)) {
         SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
         return SCPI_RES_ERR;
     }
@@ -199,7 +199,7 @@ scpi_result_t scpi_cmd_calibrationCurrentRange(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!calibration::hasSupportForCurrentDualRange()) {
+    if (!calibration::getCalibrationChannel().hasSupportForCurrentDualRange()) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }

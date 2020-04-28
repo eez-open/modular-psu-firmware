@@ -225,8 +225,8 @@ EnumItem g_enumDefinition_DLOG_VIEW_LEGEND_VIEW_OPTION[] = {
 
 EnumItem g_enumDefinition_CALIBRATION_VALUE_TYPE_DUAL_RANGE[] = {
     { calibration::CALIBRATION_VALUE_U, "Voltage" },
-    { calibration::CALIBRATION_VALUE_I_HI_RANGE, "Current [0 - 5 A]" },
     { calibration::CALIBRATION_VALUE_I_LOW_RANGE, "Current [0 - 50 mA]" },
+    { calibration::CALIBRATION_VALUE_I_HI_RANGE, "Current [0 - 5 A]" },
     { 0, 0 }
 };
 
@@ -1211,7 +1211,7 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
         channel.getVoltageStepValues(value.getStepValues());
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
-        if (!between(value.getFloat(), channel_dispatcher::getUMin(channel), channel_dispatcher::getUMax(channel))) {
+        if (!channel.isVoltageWithinRange(value.getFloat())) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
         } else if (channel.isVoltageLimitExceeded(value.getFloat())) {
             g_errorChannelIndex = channel.channelIndex;
@@ -1221,11 +1221,6 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {
             channel_dispatcher::setVoltage(channel, value.getFloat());
-
-            auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-            if (page) {
-                page->onSetValueChanged(DATA_ID_CHANNEL_U_EDIT);
-            }
         }
     }
 }
@@ -1329,7 +1324,7 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
         channel.getCurrentStepValues(value.getStepValues());
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
-        if (!between(value.getFloat(), channel_dispatcher::getIMin(channel), channel_dispatcher::getIMax(channel))) {
+        if (!channel.isCurrentWithinRange(value.getFloat())) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
         } else if (channel.isCurrentLimitExceeded(value.getFloat())) {
             g_errorChannelIndex = channel.channelIndex;
@@ -1339,11 +1334,6 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
             value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
         } else {
             channel_dispatcher::setCurrent(channel, value.getFloat());
-
-            auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-            if (page) {
-                page->onSetValueChanged(DATA_ID_CHANNEL_I_EDIT);
-            }
         }
     }
 }
@@ -1968,11 +1958,11 @@ void data_edit_steps(DataOperationEnum operation, Cursor cursor, Value &value) {
 void data_firmware_info(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         static const char FIRMWARE_LABEL[] = "Firmware: ";
-        static char firmware_info[sizeof(FIRMWARE_LABEL) - 1 + sizeof(FIRMWARE) - 1 + 1];
+        static char firmware_info[sizeof(FIRMWARE_LABEL) - 1 + sizeof(MCU_FIRMWARE) - 1 + 1];
 
         if (*firmware_info == 0) {
             strcat(firmware_info, FIRMWARE_LABEL);
-            strcat(firmware_info, FIRMWARE);
+            strcat(firmware_info, MCU_FIRMWARE);
         }
 
         value = firmware_info;
@@ -2240,193 +2230,184 @@ void data_channel_calibration_remark(DataOperationEnum operation, Cursor cursor,
     }
 }
 
-void data_cal_ch_u_min(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_is_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        if (channel.cal_conf.u.numPoints > 0) {
-            value = MakeValue(channel.cal_conf.u.points[0].value, UNIT_VOLT);
-        }
+        value = calibration::isEnabled();
     }
 }
 
-void data_cal_ch_u_mid(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        if (channel.cal_conf.u.numPoints > 1) {
-            value = MakeValue(channel.cal_conf.u.points[1].value, UNIT_VOLT);
-        }
-    }
-}
-
-void data_cal_ch_u_max(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        if (channel.cal_conf.u.numPoints > 2) {
-            value = MakeValue(channel.cal_conf.u.points[2].value, UNIT_VOLT);
-        }
-    }
-}
-
-void data_cal_ch_i0_min(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        if (channel.cal_conf.i[0].numPoints > 0) {
-            value = MakeValue(channel.cal_conf.i[0].points[0].value, UNIT_VOLT);
-        }
-    }
-}
-
-void data_cal_ch_i0_mid(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        if (channel.cal_conf.i[0].numPoints > 1) {
-            value = MakeValue(channel.cal_conf.i[0].points[1].value, UNIT_VOLT);
-        }
-    }
-}
-
-void data_cal_ch_i0_max(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        if (channel.cal_conf.i[0].numPoints > 2) {
-            value = MakeValue(channel.cal_conf.i[0].points[2].value, UNIT_VOLT);
-        }
-    }
-}
-
-void data_cal_ch_i1_min(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        if (channel.hasSupportForCurrentDualRange()) {
-            if (channel.cal_conf.i[1].numPoints > 0) {
-                value = MakeValue(channel.cal_conf.i[1].points[0].value, UNIT_VOLT);
-            }
-        } else {
-            value = Value("");
-        }
-    }
-}
-
-void data_cal_ch_i1_mid(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        if (channel.hasSupportForCurrentDualRange()) {
-            if (channel.cal_conf.i[1].numPoints > 1) {
-                value = MakeValue(channel.cal_conf.i[1].points[1].value, UNIT_VOLT);
-            }
-        } else {
-            value = Value("");
-        }
-    }
-}
-
-void data_cal_ch_i1_max(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        if (channel.hasSupportForCurrentDualRange()) {
-            if (channel.cal_conf.i[1].numPoints > 2) {
-                value = MakeValue(channel.cal_conf.i[1].points[2].value, UNIT_VOLT);
-            }
-        } else {
-            value = Value("");
-        }
-    }
-}
 
 void data_channel_calibration_value_type(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-        if (calibration::getCalibrationChannel().hasSupportForCurrentDualRange()) {
-            value = MakeEnumDefinitionValue(page->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE);
+        auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+        if (editPage) {
+            if (calibration::getCalibrationChannel().hasSupportForCurrentDualRange()) {
+                value = MakeEnumDefinitionValue(editPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE);
+            } else {
+                value = MakeEnumDefinitionValue(editPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE);
+            }
         } else {
-            value = MakeEnumDefinitionValue(page->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE);
+            auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+            if (g_channel->hasSupportForCurrentDualRange()) {
+                value = MakeEnumDefinitionValue(viewPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE);
+            } else {
+                value = MakeEnumDefinitionValue(viewPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE);
+            }
         }
     }
 }
 
 void data_channel_calibration_value_is_voltage(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+        auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         value = page->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U;
+    }
+}
+
+void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    Channel &channel = *g_channel;
+
+    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+    if (editPage) {
+        if (operation == DATA_OPERATION_GET) {
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
+                data_keypad_text(operation, cursor, value);
+            } else {
+                if (editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
+                    value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
+                } else {
+                    value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER);
+                }
+            }
+        } else if (operation == DATA_OPERATION_GET_MIN) {
+            if (editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
+                value = MakeValue(0, UNIT_VOLT);
+            } else {
+                value = MakeValue(0, UNIT_AMPER);
+            }
+        } else if (operation == DATA_OPERATION_GET_MAX) {
+            if (editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
+                value = MakeValue(channel_dispatcher::getUMax(channel), UNIT_VOLT);
+            } else {
+                value = MakeValue(channel_dispatcher::getIMaxLimit(channel), UNIT_AMPER);
+            }
+        } else if (operation == DATA_OPERATION_GET_NAME) {
+            value = editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? "Voltage" : "Current";
+        } else if (operation == DATA_OPERATION_GET_UNIT) {
+            value = editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER;
+        } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+            value = 1;
+        } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+            if (editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
+                channel.getVoltageStepValues(value.getStepValues(), true);
+            } else {
+                channel.getCurrentStepValues(value.getStepValues(), true);
+            }
+        } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
+            if (editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
+                value = MakeValue(channel.getVoltageResolution() / 10, UNIT_VOLT);
+            } else {
+                value = MakeValue(channel.getCurrentResolution(0) / 10, UNIT_AMPER);
+            }
+        } else if (operation == DATA_OPERATION_SET) {
+            editPage->setDacValue(value.getFloat());
+        }
+    } else {
+        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+        if (operation == DATA_OPERATION_GET) {
+            value = MakeValue(viewPage->getDacValue(), viewPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER);
+        }
     }
 }
 
 void data_calibration_point_measured_value(DataOperationEnum operation, Cursor cursor, Value &value) {
     Channel &channel = *g_channel;
-    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);    
-    if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
-            value = g_focusEditValue;
-        } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-            data_keypad_text(operation, cursor, value);
-        } else {
-            value = MakeValue(page->getMeasuredValue(), page->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER);
+
+    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+    if (editPage) {
+        if (operation == DATA_OPERATION_GET) {
+            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
+                data_keypad_text(operation, cursor, value);
+            } else {
+                value = MakeValue(editPage->getMeasuredValue(), editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER);
+            }
+        } else if (operation == DATA_OPERATION_GET_MIN) {
+            if (editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
+                value = MakeValue(0 - channel_dispatcher::getUMax(channel) * 1.0f, UNIT_VOLT);
+            } else {
+                value = MakeValue(0 - channel_dispatcher::getIMaxLimit(channel) * 1.0f, UNIT_AMPER);
+            }
+        } else if (operation == DATA_OPERATION_GET_MAX) {
+            if (editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
+                value = MakeValue(channel_dispatcher::getUMax(channel) * 2.0f, UNIT_VOLT);
+            } else {
+                value = MakeValue(channel_dispatcher::getIMaxLimit(channel) * 2.0f, UNIT_AMPER);
+            }
+        } else if (operation == DATA_OPERATION_GET_NAME) {
+            value = editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? "Voltage" : "Current";
+        } else if (operation == DATA_OPERATION_GET_UNIT) {
+            value = editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER;
+        } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+            value = 1;
+        } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+            static float values[] = { 1.0f, 0.1f, 0.01f, 0.001f };
+            auto stepValues = value.getStepValues();
+            stepValues->values = values;
+            stepValues->count = sizeof(values) / sizeof(float);
+            stepValues->unit = UNIT_UNKNOWN;
+        } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
+            value = MakeValue(1E-4f, UNIT_UNKNOWN);
+        } else if (operation == DATA_OPERATION_SET) {
+            editPage->setMeasuredValue(value.getFloat());
         }
-    } else if (operation == DATA_OPERATION_GET_MIN) {
-        if (page->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
-            value = MakeValue(channel_dispatcher::getUMin(channel) - channel_dispatcher::getUMax(channel) * 0.1f, UNIT_VOLT);
-        } else {
-            value = MakeValue(channel_dispatcher::getIMin(channel) - channel_dispatcher::getIMaxLimit(channel) * 0.1f, UNIT_AMPER);
+    } else {
+        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+        if (operation == DATA_OPERATION_GET) {
+            value = MakeValue(viewPage->getMeasuredValue(), viewPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER);
         }
-    } else if (operation == DATA_OPERATION_GET_MAX) {
-        if (page->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
-            value = MakeValue(channel_dispatcher::getUMax(channel) * 1.1f, UNIT_VOLT);
-        } else {
-            value = MakeValue(channel_dispatcher::getIMaxLimit(channel) * 1.1f, UNIT_AMPER);
-        }
-    } else if (operation == DATA_OPERATION_GET_NAME) {
-        value = page->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? "Voltage" : "Current";
-    } else if (operation == DATA_OPERATION_GET_UNIT) {
-        value = page->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER;
-    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
-        value = 0;
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static float values[] = { 1.0f, 0.1f, 0.01f, 0.001f };
-        auto stepValues = value.getStepValues();
-        stepValues->values = values;
-        stepValues->count = sizeof(values) / sizeof(float);
-        stepValues->unit = UNIT_UNKNOWN;
-    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
-        value = MakeValue(1E-4f, UNIT_UNKNOWN);
-    } else if (operation == DATA_OPERATION_SET) {
-        page->setMeasuredValue(value.getFloat());
     }
 }
 
 void data_channel_calibration_point_can_move_to_previous(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-        value = page->canMoveToPreviousPoint();
+        auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+        if (editPage) {
+            value = editPage->canMoveToPreviousPoint();
+        } else {
+            auto editPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+            value = editPage->canMoveToPreviousPoint();
+        }
     }
 }
 
 void data_channel_calibration_point_can_move_to_next(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-        value = page->canMoveToNextPoint();
+        auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+        if (editPage) {
+            value = editPage->canMoveToNextPoint();
+        } else {
+            auto editPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+            value = editPage->canMoveToNextPoint();
+        }
     }
 }
 
 void data_channel_calibration_point_can_save(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+        auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         value = page->canSavePoint();
     }
 }
 
 void data_channel_calibration_point_can_delete(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+        auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         value = page->canDeletePoint();
     }
 }
@@ -2441,24 +2422,39 @@ Value MakeCalibrationPointInfoValue(int8_t currentPointIndex, int8_t numPoints) 
 
 void data_channel_calibration_point_info(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-        value = MakeCalibrationPointInfoValue(page->getCurrentPointIndex(), page->getNumPoints());
+        auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+        if (editPage) {
+            value = MakeCalibrationPointInfoValue(editPage->getCurrentPointIndex(), editPage->getNumPoints());
+        } else {
+            auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+            value = MakeCalibrationPointInfoValue(viewPage->getCurrentPointIndex(), viewPage->getNumPoints());
+        }        
     }
 }
 
 void data_channel_calibration_chart(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-        value = page->getChartVersion();
+        auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+        if (editPage) {
+            value = editPage->getChartVersion();
+        } else {
+            auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+            value = viewPage->getChartVersion();
+        }
     } else if (operation == DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION) {
-        value = Value((void *)ChSettingsCalibrationPage::drawChart, VALUE_TYPE_POINTER);
+        value = Value((void *)drawCalibrationChart, VALUE_TYPE_POINTER);
     }
 }
 
 void data_channel_calibration_chart_zoom(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-        value = Value(page->getChartZoom(), VALUE_TYPE_ZOOM);
+        auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+        if (editPage) {
+            value = Value(editPage->getChartZoom(), VALUE_TYPE_ZOOM);
+        } else {
+            auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+            value = Value(viewPage->getChartZoom(), VALUE_TYPE_ZOOM);
+        }
     }
 }
 
@@ -3282,7 +3278,7 @@ void data_sys_settings_has_error(DataOperationEnum operation, Cursor cursor, Val
 
 void data_sys_info_firmware_ver(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(FIRMWARE);
+        value = Value(MCU_FIRMWARE);
     }
 }
 
@@ -3300,7 +3296,7 @@ void data_sys_info_scpi_ver(DataOperationEnum operation, Cursor cursor, Value &v
 
 void data_sys_info_cpu(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(getCpuModelAndVersion());
+        value = Value(0, VALUE_TYPE_MASTER_INFO);
     }
 }
 

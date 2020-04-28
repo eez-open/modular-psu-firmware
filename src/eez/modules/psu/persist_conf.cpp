@@ -283,6 +283,7 @@ static bool moduleConfRead(int slotIndex, uint8_t *buffer, uint16_t bufferSize, 
 			continue;
         }
 
+
         return true;
     }
 
@@ -304,7 +305,7 @@ static bool moduleConfWrite(int slotIndex, const uint8_t *buffer, uint16_t buffe
         	continue;
         }
 
-		uint8_t verifyBuffer[512];
+		uint8_t verifyBuffer[1024];
 		assert(sizeof(verifyBuffer) >= bufferSize);
 		if (!moduleConfRead(slotIndex, verifyBuffer, bufferSize, address, -1)) {
 			continue;
@@ -1253,7 +1254,7 @@ static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 6
 static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE = 64;
 
 static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = 128;
-static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 512;
+static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 780;
 
 ModuleConfiguration g_moduleConf[NUM_SLOTS];
 
@@ -1327,7 +1328,7 @@ void loadChannelCalibration(Channel &channel) {
         channel.slotIndex,
         (uint8_t *)&channel.cal_conf,
         sizeof(Channel::CalibrationConfiguration),
-        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE,
+        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * (((MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
         CH_CAL_CONF_VERSION
     )) {
         channel.clearCalibrationConf();
@@ -1339,7 +1340,7 @@ bool saveChannelCalibration(Channel &channel) {
         channel.slotIndex,
         (BlockHeader *)&channel.cal_conf,
         sizeof(Channel::CalibrationConfiguration),
-        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE,
+        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * (((MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
         CH_CAL_CONF_VERSION
     );
 }

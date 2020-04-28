@@ -592,7 +592,7 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
 
         if (widget->action == ACTION_ID_EDIT || widget->action == ACTION_ID_EDIT_NO_FOCUS) {
             if (widgetCursor.widget->data == DATA_ID_CALIBRATION_POINT_MEASURED_VALUE) {
-                auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+                auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
                 return page->canEditMeasuredValue();
             }
             return channel_dispatcher::isEditEnabled(widgetCursor);
@@ -1930,7 +1930,8 @@ static ChSettingsAdvRangesPage g_ChSettingsAdvRangesPage;
 static ChSettingsAdvViewPage g_ChSettingsAdvViewPage;
 static ChSettingsTriggerPage g_ChSettingsTriggerPage;
 static ChSettingsListsPage g_ChSettingsListsPage;
-static ChSettingsCalibrationPage g_ChSettingsCalibrationPage;
+static ChSettingsCalibrationEditPage g_ChSettingsCalibrationEditPage;
+static ChSettingsCalibrationViewPage g_ChSettingsCalibrationViewPage;
 static SysSettingsDateTimePage g_SysSettingsDateTimePage;
 #if OPTION_ETHERNET
 static SysSettingsEthernetPage g_SysSettingsEthernetPage;
@@ -1993,8 +1994,11 @@ Page *getPageFromIdHook(int pageId) {
     case PAGE_ID_CH_SETTINGS_LISTS:
         page = &g_ChSettingsListsPage;
         break;
-    case PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS:
-        page = &g_ChSettingsCalibrationPage;
+    case PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT:
+        page = &g_ChSettingsCalibrationEditPage;
+        break;
+    case PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW:
+        page = &g_ChSettingsCalibrationViewPage;
         break;
     case PAGE_ID_SYS_SETTINGS_DATE_TIME:
         page = &g_SysSettingsDateTimePage;

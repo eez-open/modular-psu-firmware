@@ -59,45 +59,36 @@ Value::Value(CalibrationValueType type_)
 void Value::reset() {
     currentPointIndex = -1;
 
-    numPoints = 2;
-
-    points[0].set = true;
-    points[1].set = true;
+    float *points;
 
     if (type == CALIBRATION_VALUE_U) {
-        points[0].dac = g_channel->params.U_CAL_VAL_MIN;
-        points[1].dac = g_channel->params.U_CAL_VAL_MAX;
+        configuration.numPoints = g_channel->params.U_CAL_NUM_POINTS;
+        points = g_channel->params.U_CAL_POINTS;
     } else if (type == CALIBRATION_VALUE_I_HI_RANGE) {
-        points[0].dac = g_channel->params.I_CAL_VAL_MIN;
-        points[1].dac = g_channel->params.I_CAL_VAL_MAX;
+        configuration.numPoints = g_channel->params.I_CAL_NUM_POINTS;
+        points = g_channel->params.I_CAL_POINTS;
     } else {
-        points[0].dac = g_channel->params.I_CAL_VAL_MIN / 100;
-        points[1].dac = g_channel->params.I_CAL_VAL_MAX / 100;
+        configuration.numPoints = g_channel->params.I_LOW_RANGE_CAL_NUM_POINTS;
+        points = g_channel->params.I_LOW_RANGE_CAL_POINTS;
     }
 
-    for (int i = 0; i < numPoints; i++) {
-        points[i].value = points[i].adc = points[i].dac;
+    for (unsigned int i = 0; i < configuration.numPoints; i++) {
+        isPointSet[i] = true;
+        configuration.points[i].dac = points[i];
+        configuration.points[i].value = points[i];
+        configuration.points[i].adc = points[i];
     }
 }
 
-bool Value::isCalibrated() {
-    for (int i = 0; i < numPoints; i++) {
-        if (!points[i].set) {
-            return false;
-        }
-    }
-    return true;
-}
-
-void Value::setCurrentPointIndex(int8_t currentPointIndex_) {
+void Value::setCurrentPointIndex(int currentPointIndex_) {
     if (currentPointIndex_ < MAX_CALIBRATION_POINTS) {
         currentPointIndex = currentPointIndex_;
-        while (currentPointIndex >= numPoints) {
-            points[numPoints].set = false;
-            points[numPoints].dac = 0;
-            points[numPoints].value = 0;
-            points[numPoints].adc = 0;
-            numPoints++;
+        while (currentPointIndex >= (int)configuration.numPoints) {
+            isPointSet[configuration.numPoints] = false;
+            configuration.points[configuration.numPoints].dac = 0;
+            configuration.points[configuration.numPoints].value = 0;
+            configuration.points[configuration.numPoints].adc = 0;
+            configuration.numPoints++;
         }
     }
 }
@@ -107,14 +98,18 @@ void Value::setDacValue(float value) {
         return;
     }
 
-    points[currentPointIndex].dac = value;
+    configuration.points[currentPointIndex].dac = value;
 
     if (type == CALIBRATION_VALUE_U) {
         g_channel->setVoltage(value);
-        g_channel->setCurrent(g_channel->params.I_VOLT_CAL);
+        g_channel->setCurrent(g_channel->params.U_CAL_I_SET);
     } else {
         g_channel->setCurrent(value);
-        g_channel->setVoltage(g_channel->params.U_CURR_CAL);
+        if (type == CALIBRATION_VALUE_I_HI_RANGE) {
+            g_channel->setVoltage(g_channel->params.I_CAL_U_SET);
+        } else {
+            g_channel->setVoltage(g_channel->params.I_LOW_RANGE_CAL_U_SET);
+        }
     }
 }
 
@@ -123,7 +118,7 @@ float Value::getDacValue() {
         return NAN;
     }
 
-    return points[currentPointIndex].dac;
+    return configuration.points[currentPointIndex].dac;
 }
 
 float Value::readAdcValue() {
@@ -135,20 +130,11 @@ bool Value::checkValueAndAdc(float value, float adc) {
         return false;
     }
 
-    float range;
-    if (type == CALIBRATION_VALUE_U) {
-        range = g_channel->params.U_CAL_VAL_MAX - g_channel->params.U_CAL_VAL_MIN;
-    } else {
-        range = g_channel->params.I_CAL_VAL_MAX - g_channel->params.I_CAL_VAL_MIN;
-        if (type == CALIBRATION_VALUE_I_LOW_RANGE) {
-        	range /= 25; // 50mA
-        }
-    }
-
+    float range = configuration.points[configuration.numPoints - 1].dac - configuration.points[0].dac;
     float allowedDiff = range * g_channel->params.CALIBRATION_DATA_TOLERANCE_PERCENT / 100;
     float diff;
 
-    float dac = points[currentPointIndex].dac;
+    float dac = configuration.points[currentPointIndex].dac;
 
     diff = fabsf(dac - value);
     if (diff > allowedDiff) {
@@ -172,9 +158,9 @@ void Value::setValueAndAdc(float value, float adc) {
         return;
     }
 
-    points[currentPointIndex].set = true;
-    points[currentPointIndex].value = value;
-    points[currentPointIndex].adc = adc;
+    isPointSet[currentPointIndex] = true;
+    configuration.points[currentPointIndex].value = value;
+    configuration.points[currentPointIndex].adc = adc;
 }
 
 bool Value::checkPoints() {
@@ -221,6 +207,10 @@ void start(Channel &channel) {
     if (g_enabled)
         return;
 
+    channel_dispatcher::outputEnable(channel, false);
+    channel_dispatcher::setVoltage(channel, 0);
+    channel_dispatcher::setCurrent(channel, 0);
+
     profile::saveToLocation(10);
     profile::setFreezeState(true);
 
@@ -232,9 +222,10 @@ void start(Channel &channel) {
 
     g_voltage.reset();
     g_currents[0].reset();
-    if (hasSupportForCurrentDualRange()) {
+    if (g_channel->hasSupportForCurrentDualRange()) {
         g_currents[1].reset();
     }
+    
     g_remarkSet = false;
     g_remark[0] = 0;
 
@@ -268,12 +259,12 @@ void stop() {
 }
 
 void copyValueFromChannel(Channel::CalibrationValueConfiguration &channelValue, Value &value) {
-    value.numPoints = channelValue.numPoints;
+    value.configuration.numPoints = channelValue.numPoints;
     for (unsigned int i = 0; i < channelValue.numPoints; i++) {
-        value.points[i].set = true;
-        value.points[i].dac = channelValue.points[i].dac;
-        value.points[i].value = channelValue.points[i].value;
-        value.points[i].adc = channelValue.points[i].adc;
+        value.isPointSet[i] = true;
+        value.configuration.points[i].dac = channelValue.points[i].dac;
+        value.configuration.points[i].value = channelValue.points[i].value;
+        value.configuration.points[i].adc = channelValue.points[i].adc;
     }
 }
 
@@ -286,15 +277,11 @@ void copyValuesFromChannel() {
         copyValueFromChannel(g_channel->cal_conf.i[0], g_currents[0]);
     }
 
-    if (hasSupportForCurrentDualRange()) {
+    if (g_channel->hasSupportForCurrentDualRange()) {
         if (g_channel->isCurrentCalibrationExists(1)) {
             copyValueFromChannel(g_channel->cal_conf.i[1], g_currents[1]);
         }
     }
-}
-
-bool hasSupportForCurrentDualRange() {
-    return g_channel->hasSupportForCurrentDualRange();
 }
 
 void selectCurrentRange(int8_t range) {
@@ -334,12 +321,13 @@ static bool checkCalibrationValue(calibration::Value &calibrationValue, int16_t 
     return true;
 }
 
-bool isVoltageCalibrated() {
-    return g_voltage.isCalibrated();
-}
-
-bool isCurrentCalibrated(Value &current) {
-    return current.isCalibrated();
+bool isCalibrated(Value &value) {
+    for (unsigned int i = 0; i < value.configuration.numPoints; i++) {
+        if (!value.isPointSet[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool canSave(int16_t &scpiErr, int16_t *uiErr) {
@@ -354,7 +342,7 @@ bool canSave(int16_t &scpiErr, int16_t *uiErr) {
     // at least one value should be calibrated
     bool valueCalibrated = false;
 
-    if (isVoltageCalibrated()) {
+    if (isCalibrated(g_voltage)) {
         if (!checkCalibrationValue(calibration::g_voltage, scpiErr)) {
             if (uiErr) {
                 *uiErr = SCPI_ERROR_CALIBRATION_INVALID_VOLTAGE_CAL_DATA;
@@ -364,18 +352,18 @@ bool canSave(int16_t &scpiErr, int16_t *uiErr) {
         valueCalibrated = true;
     }
 
-    if (isCurrentCalibrated(g_currents[0])) {
+    if (isCalibrated(g_currents[0])) {
         if (!checkCalibrationValue(g_currents[0], scpiErr)) {
             if (uiErr) {
-                *uiErr = hasSupportForCurrentDualRange() ? SCPI_ERROR_CALIBRATION_INVALID_CURRENT_H_CAL_DATA : SCPI_ERROR_CALIBRATION_INVALID_CURRENT_CAL_DATA;
+                *uiErr = g_channel->hasSupportForCurrentDualRange() ? SCPI_ERROR_CALIBRATION_INVALID_CURRENT_H_CAL_DATA : SCPI_ERROR_CALIBRATION_INVALID_CURRENT_CAL_DATA;
             }
             return false;
         }
         valueCalibrated = true;
     }
 
-    if (hasSupportForCurrentDualRange()) {
-        if (isCurrentCalibrated(g_currents[1])) {
+    if (g_channel->hasSupportForCurrentDualRange()) {
+        if (isCalibrated(g_currents[1])) {
             if (!checkCalibrationValue(g_currents[1], scpiErr)) {
                 if (uiErr) {
                     *uiErr = SCPI_ERROR_CALIBRATION_INVALID_CURRENT_L_CAL_DATA;
@@ -411,31 +399,16 @@ bool save() {
     memset(&g_channel->cal_conf.calibrationRemark, 0, sizeof(g_channel->cal_conf.calibrationRemark));
     strcpy(g_channel->cal_conf.calibrationRemark, g_remark);
 
-    if (isVoltageCalibrated()) {
-        g_channel->cal_conf.u.numPoints = g_voltage.numPoints;
-        for (int i = 0; i < g_voltage.numPoints; i++) {
-            g_channel->cal_conf.u.points[i].dac = g_voltage.points[i].dac;
-            g_channel->cal_conf.u.points[i].value = g_voltage.points[i].value;
-            g_channel->cal_conf.u.points[i].adc = g_voltage.points[i].adc;
-        }
+    if (isCalibrated(g_voltage)) {
+        memcpy(&g_channel->cal_conf.u, &g_voltage.configuration, sizeof(Channel::CalibrationValueConfiguration));
     }
 
-    if (isCurrentCalibrated(g_currents[0])) {
-        g_channel->cal_conf.i[0].numPoints = g_currents[0].numPoints;
-        for (int i = 0; i < g_currents[0].numPoints; i++) {
-            g_channel->cal_conf.i[0].points[i].dac = g_currents[0].points[i].dac;
-            g_channel->cal_conf.i[0].points[i].value = g_currents[0].points[i].value;
-            g_channel->cal_conf.i[0].points[i].adc = g_currents[0].points[i].adc;
-        }
+    if (isCalibrated(g_currents[0])) {
+        memcpy(&g_channel->cal_conf.i[0], &g_currents[0].configuration, sizeof(Channel::CalibrationValueConfiguration));
     }
 
-    if (hasSupportForCurrentDualRange() && isCurrentCalibrated(g_currents[1])) {
-        g_channel->cal_conf.i[1].numPoints = g_currents[1].numPoints;
-        for (int i = 0; i < g_currents[1].numPoints; i++) {
-            g_channel->cal_conf.i[1].points[i].dac = g_currents[1].points[i].dac;
-            g_channel->cal_conf.i[1].points[i].value = g_currents[1].points[i].value;
-            g_channel->cal_conf.i[1].points[i].adc = g_currents[1].points[i].adc;
-        }
+    if (g_channel->hasSupportForCurrentDualRange() && isCalibrated(g_currents[1])) {
+        memcpy(&g_channel->cal_conf.i[1], &g_currents[1].configuration, sizeof(Channel::CalibrationValueConfiguration));
     }
 
     // TODO move this to scpi thread

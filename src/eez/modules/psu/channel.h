@@ -479,8 +479,10 @@ class Channel {
     /// Change power limit, it will adjust U_SET or I_SET if necessary.
     void setPowerLimit(float limit);
 
+    bool isVoltageWithinRange(float u);
     bool isVoltageLimitExceeded(float u);
 
+    bool isCurrentWithinRange(float i);
     bool isCurrentLimitExceeded(float i);
 
     bool isPowerLimitExceeded(float u, float i) {
@@ -545,8 +547,8 @@ class Channel {
     const char *getBrand();
     void getSerial(char *text);
 
-    void getVoltageStepValues(StepValues *stepValues);
-    void getCurrentStepValues(StepValues *stepValues);
+    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode = false);
+    void getCurrentStepValues(StepValues *stepValues, bool calibrationMode = false);
     void getPowerStepValues(StepValues *stepValues);
 
 private:

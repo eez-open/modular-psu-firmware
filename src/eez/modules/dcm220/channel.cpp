@@ -168,6 +168,9 @@ struct Channel : ChannelInterface {
 
 	float I_MAX_FOR_REMAP;
 
+	float U_CAL_POINTS[2];
+	float I_CAL_POINTS[2];
+
     Channel(int slotIndex_)
 		: ChannelInterface(slotIndex_)
 #if defined(EEZ_PLATFORM_STM32)
@@ -192,25 +195,27 @@ struct Channel : ChannelInterface {
 		params.U_DEF_STEP = 0.1f;
 		params.U_MAX_STEP = 5.0f;
 
-		params.U_CAL_VAL_MIN = 2.0f;
-		params.U_CAL_VAL_MID = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 12.0f : 10.0f;
-		params.U_CAL_VAL_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 22.0f : 18.0f;
-		params.I_VOLT_CAL = 1.0f;
+		U_CAL_POINTS[0] = 2.0f;
+		U_CAL_POINTS[1] = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 22.0f : 18.0f;
+		params.U_CAL_NUM_POINTS = 2;
+		params.U_CAL_POINTS = U_CAL_POINTS;
+		params.U_CAL_I_SET = 1.0f;
 
-		params.I_MIN = 0.3f;
-		params.I_DEF = 0.3f;
+		params.I_MIN = 0.25f;
+		params.I_DEF = 0.0f;
 		params.I_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.9f : 4.0f;
 
-    	params.I_MON_MIN = 0.3f;
+    	params.I_MON_MIN = 0.25f;
 
 		params.I_MIN_STEP = 0.01f;
 		params.I_DEF_STEP = 0.01f;
 		params.I_MAX_STEP = 1.0f; 
 
-		params.I_CAL_VAL_MIN = 0.5f;
-		params.I_CAL_VAL_MID = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 2.5f : 2.0f;
-		params.I_CAL_VAL_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.5f : 3.5f;
-		params.U_CURR_CAL = 20.0f;
+		I_CAL_POINTS[0] = 0.5f;
+		I_CAL_POINTS[1] = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.5f : 3.5f;
+		params.I_CAL_NUM_POINTS = 2;
+		params.I_CAL_POINTS = I_CAL_POINTS;
+		params.I_CAL_U_SET = 20.0f;
 
 		params.OVP_DEFAULT_STATE = false;
 		params.OVP_MIN_DELAY = 0.0f;
@@ -232,8 +237,11 @@ struct Channel : ChannelInterface {
 		params.PTOT = MIN(params.U_MAX * params.I_MAX, 155.0f);
 
 		params.U_RESOLUTION = 0.01f;
-		params.I_RESOLUTION = 0.02f;
-		params.I_LOW_RESOLUTION = 0;
+		params.U_RESOLUTION_DURING_CALIBRATION = 0.001f;
+		params.I_RESOLUTION = 0.01f;
+		params.I_RESOLUTION_DURING_CALIBRATION = 0.001f;
+		params.I_LOW_RESOLUTION = 0.0f;
+		params.I_LOW_RESOLUTION_DURING_CALIBRATION = 0.0f;
 		params.P_RESOLUTION = 0.001f;
 
 		params.VOLTAGE_GND_OFFSET = 0;
@@ -581,16 +589,18 @@ struct Channel : ChannelInterface {
 #endif
 	}
 
-    void getVoltageStepValues(StepValues *stepValues) {
+    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) {
         static float values[] = { 1.0f, 0.5f, 0.1f, 0.01f };
-        stepValues->values = values;
+		static float calibrationModeValues[] = { 1.0f, 0.1f, 0.01f, 0.001f };
+        stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_VOLT;
 	}
     
-	void getCurrentStepValues(StepValues *stepValues) {
-        static float values[] = { 0.5f, 0.25f, 0.1f,  0.02f };
-        stepValues->values = values;
+	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) {
+        static float values[] = { 0.5f, 0.25f, 0.1f,  0.01f };
+		static float calibrationModeValues[] = { 0.05f, 0.01f, 0.005f,  0.001f };
+        stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_AMPER;
 	}

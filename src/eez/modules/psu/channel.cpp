@@ -803,28 +803,18 @@ float Channel::getValuePrecision(Unit unit, float value) const {
 }
 
 float Channel::getVoltageResolution() const {
-    float precision = params.U_RESOLUTION;
-
-    if (calibration::isEnabled()) {
-        precision /= 10;
-    }
-
-    return precision;
+    return calibration::isEnabled() ? params.U_RESOLUTION_DURING_CALIBRATION : params.U_RESOLUTION;
 }
 
 float Channel::getCurrentResolution(float value) const {
-    float precision = params.I_RESOLUTION; // 0.5mA
+    float precision = calibration::isEnabled() ? params.I_RESOLUTION_DURING_CALIBRATION : params.I_RESOLUTION; // 0.5mA
 
     if (hasSupportForCurrentDualRange()) {
         if (!isNaN(value) && value <= 0.05f && isMicroAmperAllowed()) {
-            precision = params.I_LOW_RESOLUTION; // 5uA
+            precision = calibration::isEnabled() ? params.I_LOW_RESOLUTION_DURING_CALIBRATION : params.I_LOW_RESOLUTION; // 5uA
         }
     }
     
-    if (calibration::isEnabled()) {
-        precision /= 10;
-    }
-
     return precision;
 }
 
@@ -1256,7 +1246,9 @@ void Channel::doSetVoltage(float value) {
 }
 
 void Channel::setVoltage(float value) {
-    value = roundPrec(value, getVoltageResolution());
+    if (!calibration::isEnabled()) {
+        value = roundPrec(value, getVoltageResolution());
+    }
 
     doSetVoltage(value);
 }
@@ -1287,7 +1279,9 @@ void Channel::doSetCurrent(float value) {
 }
 
 void Channel::setCurrent(float value) {
-    value = roundPrec(value, getCurrentResolution(value));
+    if (!calibration::isEnabled()) {
+        value = roundPrec(value, getCurrentResolution(value));
+    }
 
     doSetCurrent(value);
 }
@@ -1466,9 +1460,23 @@ void Channel::setPowerLimit(float limit) {
     }
 }
 
+bool Channel::isVoltageWithinRange(float u) {
+    u = channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, u);
+    float min =channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, channel_dispatcher::getUMin(*this));
+    float max =channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, channel_dispatcher::getUMax(*this));
+    return u >= min && u <= max;
+}
+
 bool Channel::isVoltageLimitExceeded(float u) {
     return channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, u) >
         channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, channel_dispatcher::getULimit(*this));
+}
+
+bool Channel::isCurrentWithinRange(float i) {
+    i = channel_dispatcher::getValuePrecision(*this, UNIT_AMPER, i);
+    float min =channel_dispatcher::getValuePrecision(*this, UNIT_AMPER, channel_dispatcher::getIMin(*this));
+    float max =channel_dispatcher::getValuePrecision(*this, UNIT_AMPER, channel_dispatcher::getIMax(*this));
+    return i >= min && i <= max;
 }
 
 bool Channel::isCurrentLimitExceeded(float i) {
@@ -1638,12 +1646,12 @@ void Channel::getSerial(char *text) {
     channelInterface->getSerial(text);
 }
 
-void Channel::getVoltageStepValues(StepValues *stepValues) {
-    channelInterface->getVoltageStepValues(stepValues);
+void Channel::getVoltageStepValues(StepValues *stepValues, bool calibrationMode) {
+    channelInterface->getVoltageStepValues(stepValues, calibrationMode);
 }
 
-void Channel::getCurrentStepValues(StepValues *stepValues) {
-    channelInterface->getCurrentStepValues(stepValues);
+void Channel::getCurrentStepValues(StepValues *stepValues, bool calibrationMode) {
+    channelInterface->getCurrentStepValues(stepValues, calibrationMode);
 }
 
 void Channel::getPowerStepValues(StepValues *stepValues) {

@@ -306,12 +306,17 @@ private:
     static void onTriggerOnListStopSet(uint16_t value);
 };
 
-class ChSettingsCalibrationPage : public SetPage {
+void drawCalibrationChart(const WidgetCursor &widgetCursor);
+float remapDacValue(Channel &channel, Channel::CalibrationValueConfiguration &configuration, Unit unit, float value);
+
+class ChSettingsCalibrationEditPage : public SetPage {
+    friend void drawCalibrationChart(const WidgetCursor &widgetCursor);
+
 public:
     static void start();
-    static void toggleEnable();
 
     void pageAlloc();
+    void pageFree();
 
     int getDirty();
     void set();
@@ -323,12 +328,12 @@ public:
     calibration::CalibrationValueType getCalibrationValueType();
     void setCalibrationValueType(calibration::CalibrationValueType type);
 
+    void setDacValue(float value);
+
     // get and set value measured with external instrument
     float getMeasuredValue();
     void setMeasuredValue(float value);
     bool canEditMeasuredValue();
-
-    static void drawChart(const WidgetCursor &widgetCursor);
 
     bool canMoveToPreviousPoint();
     void moveToPreviousPoint();
@@ -342,32 +347,65 @@ public:
     bool canDeletePoint();
     void deletePoint();
 
-    int8_t getCurrentPointIndex();
-    int8_t getNumPoints();
-
-    void onSetValueChanged(int16_t dataId);
+    int getCurrentPointIndex();
+    unsigned int getNumPoints();
 
 private:
     uint32_t m_version;
     calibration::CalibrationValueType m_calibrationValueType;
     float m_measuredValue;
+    bool m_measuredValueChanged;
     uint32_t m_chartVersion;
     uint16_t m_chartZoom;
 
-    static void doStart();
     static void onStartPasswordOk();
 
     static void onSetRemarkOk(char *remark);
 
-    void doDrawChart(const WidgetCursor &widgetCursor);
-
     calibration::Value &getCalibrationValue();
+
     float getChannelDacValue();
     float getChannelAdcValue();
     int compareDacValues(float dac1, float dac2);
     void selectPointAtIndex(int8_t i);
+};
 
-    float remapDacValue(float value);
+class ChSettingsCalibrationViewPage : public Page {
+    friend void drawCalibrationChart(const WidgetCursor &widgetCursor);
+
+public:
+    static void start();
+
+    void pageAlloc();
+
+    int getChartVersion() { return m_chartVersion; }
+    int getChartZoom() { return m_chartZoom; }
+    void zoomChart();
+
+    calibration::CalibrationValueType getCalibrationValueType();
+    void setCalibrationValueType(calibration::CalibrationValueType type);
+
+    float getDacValue();
+    float getMeasuredValue();
+
+    bool canMoveToPreviousPoint();
+    void moveToPreviousPoint();
+
+    bool canMoveToNextPoint();
+    void moveToNextPoint();
+
+    int getCurrentPointIndex();
+    unsigned int getNumPoints();
+
+private:
+    calibration::CalibrationValueType m_calibrationValueType;
+    int m_selectedPointIndex;
+    uint32_t m_chartVersion;
+    uint16_t m_chartZoom;
+
+    Channel::CalibrationValueConfiguration &getCalibrationValueConfiguration();
+
+    void selectPointAtIndex(int i);
 };
 
 } // namespace gui

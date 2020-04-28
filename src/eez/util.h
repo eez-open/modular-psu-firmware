@@ -75,8 +75,6 @@ float roundPrec(float a, float prec);
 float floorPrec(float a, float prec);
 float ceilPrec(float a, float prec);
 
-bool between(float x, float a, float b);
-
 bool isNaN(float x);
 
 bool isDigit(char ch);

@@ -369,7 +369,7 @@
     {
       "name": "firmware_info",
       "type": "string",
-      "defaultValue": "Firmware: M1"
+      "defaultValue": "Firmware: 1.00"
     },
     {
       "name": "keypad_text",
@@ -481,51 +481,6 @@
       "name": "channel_calibration_remark",
       "type": "string",
       "defaultValue": "<remark>"
-    },
-    {
-      "name": "cal_ch_u_min",
-      "type": "float",
-      "defaultValue": "0.12V"
-    },
-    {
-      "name": "cal_ch_u_mid",
-      "type": "float",
-      "defaultValue": "24.81V"
-    },
-    {
-      "name": "cal_ch_u_max",
-      "type": "float",
-      "defaultValue": "48.12V"
-    },
-    {
-      "name": "cal_ch_i0_min",
-      "type": "float",
-      "defaultValue": "0.02A"
-    },
-    {
-      "name": "cal_ch_i0_mid",
-      "type": "float",
-      "defaultValue": "1.42A"
-    },
-    {
-      "name": "cal_ch_i0_max",
-      "type": "float",
-      "defaultValue": "3.01A"
-    },
-    {
-      "name": "cal_ch_i1_min",
-      "type": "float",
-      "defaultValue": "2mA"
-    },
-    {
-      "name": "cal_ch_i1_mid",
-      "type": "float",
-      "defaultValue": "142mA"
-    },
-    {
-      "name": "cal_ch_i1_max",
-      "type": "float",
-      "defaultValue": "301mA"
     },
     {
       "name": "channel_protection_status",
@@ -2329,10 +2284,14 @@
       "defaultValue": "2.43 A"
     },
     {
+      "name": "calibration_point_set_value",
+      "defaultValue": "2.43 A"
+    },
+    {
       "name": "channel_calibration_value_type",
       "type": "enum",
-      "enumItems": "[\n    \"Voltage\",\n    \"Current\",\n    \"Current 0-5A\",\n    \"Current 0-50mA\"\n]",
-      "defaultValue": "Current 0-50mA"
+      "enumItems": "[\n    \"Voltage\",\n    \"Current\",\n    \"Current [0 - 5 A]\",\n    \"Current [0 - 50 mA]\"\n]",
+      "defaultValue": "Current [0 - 50 mA]"
     },
     {
       "name": "channel_calibration_value_is_voltage",
@@ -2568,7 +2527,7 @@
       "name": "edit_calibration_password"
     },
     {
-      "name": "ch_settings_calibration_wiz_start"
+      "name": "ch_settings_calibration_start_calibration"
     },
     {
       "name": "ch_settings_calibration_toggle_enable"
@@ -3067,6 +3026,9 @@
     },
     {
       "name": "channel_calibration_chart_zoom"
+    },
+    {
+      "name": "ch_settings_calibration_view_points"
     }
   ],
   "gui": {
@@ -14628,10 +14590,10 @@
               "inheritFrom": "default"
             },
             "data": "channel_is_par_ser_coupled_or_tracked",
-            "left": 8,
-            "top": 8,
-            "width": 464,
-            "height": 224,
+            "left": 10,
+            "top": 10,
+            "width": 460,
+            "height": 220,
             "widgets": [
               {
                 "type": "Select",
@@ -14641,8 +14603,8 @@
                 "data": "channel_calibration_status",
                 "left": 0,
                 "top": 0,
-                "width": 464,
-                "height": 224,
+                "width": 460,
+                "height": 220,
                 "widgets": [
                   {
                     "type": "Container",
@@ -14651,16 +14613,16 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 464,
-                    "height": 224,
+                    "width": 460,
+                    "height": 220,
                     "widgets": [
                       {
                         "type": "Text",
                         "style": {
                           "inheritFrom": "edit_value_M_left"
                         },
-                        "left": 115,
-                        "top": 96,
+                        "left": 113,
+                        "top": 94,
                         "width": 234,
                         "height": 32,
                         "text": "Channel is not calibrated"
@@ -14670,11 +14632,11 @@
                         "style": {
                           "inheritFrom": "edit_value_active_M_center"
                         },
-                        "action": "ch_settings_calibration_wiz_start",
-                        "left": 335,
-                        "top": 183,
-                        "width": 120,
-                        "height": 32,
+                        "action": "ch_settings_calibration_start_calibration",
+                        "left": 310,
+                        "top": 180,
+                        "width": 150,
+                        "height": 40,
                         "text": "Calibrate"
                       }
                     ]
@@ -14686,8 +14648,8 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 464,
-                    "height": 224,
+                    "width": 460,
+                    "height": 220,
                     "widgets": [
                       {
                         "type": "Text",
@@ -14718,7 +14680,7 @@
                           "inheritFrom": "edit_value_M_left"
                         },
                         "left": 0,
-                        "top": 36,
+                        "top": 40,
                         "width": 86,
                         "height": 32,
                         "text": "Remark:"
@@ -14729,9 +14691,9 @@
                           "inheritFrom": "value_M_left"
                         },
                         "data": "channel_calibration_remark",
-                        "left": 86,
-                        "top": 36,
-                        "width": 377,
+                        "left": 160,
+                        "top": 40,
+                        "width": 300,
                         "height": 32,
                         "text": ""
                       },
@@ -14741,7 +14703,7 @@
                           "inheritFrom": "edit_value_M_left"
                         },
                         "left": 0,
-                        "top": 72,
+                        "top": 80,
                         "width": 142,
                         "height": 32,
                         "text": "Calib. enabled:"
@@ -14753,9 +14715,9 @@
                         },
                         "data": "channel_calibration_state",
                         "action": "",
-                        "left": 142,
-                        "top": 72,
-                        "width": 117,
+                        "left": 160,
+                        "top": 80,
+                        "width": 120,
                         "height": 32,
                         "widgets": [
                           {
@@ -14766,7 +14728,7 @@
                             "action": "ch_settings_calibration_toggle_enable",
                             "left": 0,
                             "top": 0,
-                            "width": 117,
+                            "width": 120,
                             "height": 32,
                             "text": "No"
                           },
@@ -14778,140 +14740,9 @@
                             "action": "ch_settings_calibration_toggle_enable",
                             "left": 0,
                             "top": 0,
-                            "width": 117,
+                            "width": 120,
                             "height": 32,
                             "text": "Yes"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Container",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "left": 0,
-                        "top": 113,
-                        "width": 304,
-                        "height": 111,
-                        "widgets": [
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "edit_value_S_left"
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 189,
-                            "height": 30,
-                            "text": "Calibration parameters:"
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "value_S_left"
-                            },
-                            "data": "cal_ch_u_min",
-                            "left": 16,
-                            "top": 30,
-                            "width": 90,
-                            "height": 26,
-                            "text": ""
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "value_S_left"
-                            },
-                            "data": "cal_ch_u_mid",
-                            "left": 106,
-                            "top": 30,
-                            "width": 90,
-                            "height": 26,
-                            "text": ""
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "value_S_left"
-                            },
-                            "data": "cal_ch_u_max",
-                            "left": 196,
-                            "top": 30,
-                            "width": 90,
-                            "height": 26,
-                            "text": ""
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "value_S_left"
-                            },
-                            "data": "cal_ch_i0_min",
-                            "left": 16,
-                            "top": 56,
-                            "width": 90,
-                            "height": 26,
-                            "text": ""
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "value_S_left"
-                            },
-                            "data": "cal_ch_i0_mid",
-                            "left": 106,
-                            "top": 56,
-                            "width": 90,
-                            "height": 26,
-                            "text": ""
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "value_S_left"
-                            },
-                            "data": "cal_ch_i0_max",
-                            "left": 196,
-                            "top": 56,
-                            "width": 90,
-                            "height": 26,
-                            "text": ""
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "value_S_left"
-                            },
-                            "data": "cal_ch_i1_min",
-                            "left": 16,
-                            "top": 82,
-                            "width": 90,
-                            "height": 26,
-                            "text": ""
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "value_S_left"
-                            },
-                            "data": "cal_ch_i1_mid",
-                            "left": 106,
-                            "top": 82,
-                            "width": 90,
-                            "height": 26,
-                            "text": ""
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "value_S_left"
-                            },
-                            "data": "cal_ch_i1_max",
-                            "left": 196,
-                            "top": 82,
-                            "width": 90,
-                            "height": 26,
-                            "text": ""
                           }
                         ]
                       },
@@ -14920,11 +14751,23 @@
                         "style": {
                           "inheritFrom": "edit_value_active_M_center"
                         },
-                        "action": "ch_settings_calibration_wiz_start",
-                        "left": 335,
-                        "top": 183,
-                        "width": 120,
+                        "action": "ch_settings_calibration_view_points",
+                        "left": 0,
+                        "top": 128,
+                        "width": 280,
                         "height": 32,
+                        "text": "View Calibration Points"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_M_center"
+                        },
+                        "action": "ch_settings_calibration_start_calibration",
+                        "left": 310,
+                        "top": 180,
+                        "width": 150,
+                        "height": 40,
                         "text": "Recalibrate"
                       }
                     ]
@@ -14938,8 +14781,8 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 464,
-                "height": 224,
+                "width": 460,
+                "height": 220,
                 "widgets": []
               }
             ]
@@ -15101,140 +14944,125 @@
         "height": 272
       },
       {
-        "name": "ch_settings_calibration_points",
+        "name": "ch_settings_calibration_edit",
         "description": "Channel calibration wizard steps",
         "style": "default",
         "widgets": [
           {
-            "type": "Select",
+            "type": "Container",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "channel_calibration_value_is_voltage",
-            "left": 84,
-            "top": 85,
-            "width": 105,
-            "height": 32,
+            "left": 10,
+            "top": 8,
+            "width": 220,
+            "height": 224,
             "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_M_center"
+                },
+                "data": "channel_calibration_value_type",
+                "action": "select_channel_calibration_value_type",
+                "left": 0,
+                "top": 0,
+                "width": 219,
+                "height": 38,
+                "text": ""
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 43,
+                "width": 220,
+                "height": 1
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left",
+                  "alignHorizontal": "right"
+                },
+                "left": 0,
+                "top": 49,
+                "width": 96,
+                "height": 38,
+                "text": "Set:"
+              },
               {
                 "type": "DisplayData",
                 "style": {
-                  "inheritFrom": "encoder_cursor_14_enabled"
+                  "inheritFrom": "encoder_cursor_17_enabled"
                 },
-                "data": "channel_i_edit",
+                "data": "calibration_point_measured_value",
                 "action": "edit",
-                "left": 0,
-                "top": 0,
-                "width": 105,
-                "height": 32,
+                "left": 100,
+                "top": 93,
+                "width": 120,
+                "height": 38,
                 "displayOption": 0
               },
               {
                 "type": "DisplayData",
                 "style": {
-                  "inheritFrom": "encoder_cursor_14_enabled"
+                  "inheritFrom": "encoder_cursor_17_enabled"
                 },
-                "data": "channel_u_edit",
+                "data": "calibration_point_set_value",
                 "action": "edit",
-                "left": 0,
-                "top": 0,
-                "width": 105,
-                "height": 32,
+                "left": 100,
+                "top": 49,
+                "width": 120,
+                "height": 38,
                 "displayOption": 0
-              }
-            ]
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "edit_value_active_S_center"
-            },
-            "data": "channel_calibration_value_type",
-            "action": "select_channel_calibration_value_type",
-            "left": 5,
-            "top": 5,
-            "width": 230,
-            "height": 32,
-            "text": ""
-          },
-          {
-            "type": "Select",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "channel_calibration_value_is_voltage",
-            "left": 5,
-            "top": 41,
-            "width": 230,
-            "height": 32,
-            "widgets": [
+              },
               {
-                "type": "Container",
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left",
+                  "alignHorizontal": "right"
+                },
+                "left": 0,
+                "top": 93,
+                "width": 96,
+                "height": 38,
+                "text": "Measured:"
+              },
+              {
+                "type": "Select",
                 "style": {
                   "inheritFrom": "default"
                 },
+                "data": "channel_calibration_value_is_voltage",
                 "left": 0,
-                "top": 0,
-                "width": 230,
-                "height": 32,
+                "top": 137,
+                "width": 54,
+                "height": 38,
                 "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 20,
-                    "height": 30,
-                    "text": "U:"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "encoder_cursor_14_enabled"
-                    },
-                    "data": "channel_u_edit",
-                    "action": "edit",
-                    "left": 20,
-                    "top": 0,
-                    "width": 82,
-                    "height": 32,
-                    "displayOption": 0
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "mon_value_14_center"
-                    },
-                    "data": "channel_u_mon",
-                    "action": "",
-                    "left": 102,
-                    "top": 0,
-                    "width": 82,
-                    "height": 32,
-                    "displayOption": 0
-                  },
                   {
                     "type": "Select",
                     "style": {
                       "inheritFrom": "default"
                     },
                     "data": "channel_is_cc",
-                    "left": 184,
+                    "left": 0,
                     "top": 0,
-                    "width": 46,
-                    "height": 32,
+                    "width": 54,
+                    "height": 38,
                     "widgets": [
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "default_S_warning"
+                          "inheritFrom": "default_M_warning",
+                          "blink": true
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 46,
-                        "height": 32,
+                        "width": 54,
+                        "height": 38,
                         "text": "\\u0081CV"
                       },
                       {
@@ -15244,60 +15072,11 @@
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 46,
-                        "height": 32,
+                        "width": 54,
+                        "height": 38,
                         "invertColors": true
                       }
                     ]
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 230,
-                "height": 32,
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 20,
-                    "height": 30,
-                    "text": "I:"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "encoder_cursor_14_enabled"
-                    },
-                    "data": "channel_i_edit",
-                    "action": "edit",
-                    "left": 20,
-                    "top": 0,
-                    "width": 82,
-                    "height": 32,
-                    "displayOption": 0
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "mon_value_14_center"
-                    },
-                    "data": "channel_i_mon",
-                    "action": "",
-                    "left": 102,
-                    "top": 0,
-                    "width": 82,
-                    "height": 32,
-                    "displayOption": 0
                   },
                   {
                     "type": "Select",
@@ -15305,20 +15084,21 @@
                       "inheritFrom": "default"
                     },
                     "data": "channel_is_cv",
-                    "left": 184,
+                    "left": 0,
                     "top": 0,
-                    "width": 46,
-                    "height": 32,
+                    "width": 54,
+                    "height": 38,
                     "widgets": [
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "default_S_warning"
+                          "inheritFrom": "default_M_warning",
+                          "blink": true
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 46,
-                        "height": 32,
+                        "width": 54,
+                        "height": 38,
                         "text": "\\u0081CC"
                       },
                       {
@@ -15328,206 +15108,102 @@
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 46,
-                        "height": 32,
+                        "width": 54,
+                        "height": 38,
                         "invertColors": true
                       }
                     ]
                   }
                 ]
-              }
-            ]
-          },
-          {
-            "type": "Rectangle",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 78,
-            "width": 240,
-            "height": 1
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_S_left"
-            },
-            "left": 5,
-            "top": 85,
-            "width": 79,
-            "height": 32,
-            "text": "Set:"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_S_left"
-            },
-            "left": 5,
-            "top": 121,
-            "width": 79,
-            "height": 32,
-            "text": "Mon:"
-          },
-          {
-            "type": "Select",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "channel_calibration_value_is_voltage",
-            "left": 84,
-            "top": 121,
-            "width": 105,
-            "height": 32,
-            "widgets": [
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "mon_value_14_center"
-                },
-                "data": "channel_i_mon",
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 105,
-                "height": 32,
-                "displayOption": 0
               },
               {
-                "type": "DisplayData",
+                "type": "Button",
                 "style": {
-                  "inheritFrom": "mon_value_14_center"
+                  "inheritFrom": "button_M",
+                  "blink": true
                 },
-                "data": "channel_u_mon",
-                "action": "",
+                "action": "channel_calibration_point_save",
+                "left": 164,
+                "top": 137,
+                "width": 55,
+                "height": 38,
+                "text": "\\u0086",
+                "enabled": "channel_calibration_point_can_save",
+                "disabledStyle": {
+                  "inheritFrom": "button_M_disabled"
+                }
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
                 "left": 0,
-                "top": 0,
-                "width": 105,
-                "height": 32,
-                "displayOption": 0
+                "top": 180,
+                "width": 220,
+                "height": 1
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left"
+                },
+                "data": "channel_calibration_point_info",
+                "left": 0,
+                "top": 186,
+                "width": 80,
+                "height": 38,
+                "text": ""
+              },
+              {
+                "type": "Button",
+                "style": {
+                  "inheritFrom": "button_S"
+                },
+                "action": "channel_calibration_point_previous",
+                "left": 84,
+                "top": 186,
+                "width": 40,
+                "height": 38,
+                "text": "\\u008f",
+                "enabled": "channel_calibration_point_can_move_to_previous",
+                "disabledStyle": {
+                  "inheritFrom": "button_S_disabled"
+                }
+              },
+              {
+                "type": "Button",
+                "style": {
+                  "inheritFrom": "button_S"
+                },
+                "action": "channel_calibration_point_next",
+                "left": 132,
+                "top": 186,
+                "width": 40,
+                "height": 38,
+                "text": "\\u0090",
+                "enabled": "channel_calibration_point_can_move_to_next",
+                "disabledStyle": {
+                  "inheritFrom": "button_S_disabled"
+                }
+              },
+              {
+                "type": "Button",
+                "style": {
+                  "inheritFrom": "button_S"
+                },
+                "action": "channel_calibration_point_delete",
+                "left": 180,
+                "top": 186,
+                "width": 40,
+                "height": 38,
+                "text": "\\u00b6",
+                "enabled": "channel_calibration_point_can_delete",
+                "disabledStyle": {
+                  "inheritFrom": "button_S_disabled"
+                }
               }
             ]
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_S_left"
-            },
-            "left": 5,
-            "top": 157,
-            "width": 79,
-            "height": 32,
-            "text": "Measured:"
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "encoder_cursor_14_enabled"
-            },
-            "data": "calibration_point_measured_value",
-            "action": "edit",
-            "left": 84,
-            "top": 157,
-            "width": 105,
-            "height": 32,
-            "displayOption": 0
-          },
-          {
-            "type": "Button",
-            "style": {
-              "inheritFrom": "button_S"
-            },
-            "action": "channel_calibration_point_save",
-            "left": 195,
-            "top": 157,
-            "width": 40,
-            "height": 32,
-            "text": "\\u0086",
-            "enabled": "channel_calibration_point_can_save",
-            "disabledStyle": {
-              "inheritFrom": "button_S_disabled"
-            }
-          },
-          {
-            "type": "Rectangle",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 195,
-            "width": 240,
-            "height": 1
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_S_left"
-            },
-            "data": "channel_calibration_point_info",
-            "left": 5,
-            "top": 201,
-            "width": 79,
-            "height": 32,
-            "text": ""
-          },
-          {
-            "type": "Button",
-            "style": {
-              "inheritFrom": "button_S"
-            },
-            "action": "channel_calibration_point_previous",
-            "left": 84,
-            "top": 201,
-            "width": 40,
-            "height": 32,
-            "text": "\\u008f",
-            "enabled": "channel_calibration_point_can_move_to_previous",
-            "disabledStyle": {
-              "inheritFrom": "button_S_disabled"
-            }
-          },
-          {
-            "type": "Button",
-            "style": {
-              "inheritFrom": "button_S"
-            },
-            "action": "channel_calibration_point_next",
-            "left": 130,
-            "top": 201,
-            "width": 40,
-            "height": 32,
-            "text": "\\u0090",
-            "enabled": "channel_calibration_point_can_move_to_next",
-            "disabledStyle": {
-              "inheritFrom": "button_S_disabled"
-            }
-          },
-          {
-            "type": "Button",
-            "style": {
-              "inheritFrom": "button_S"
-            },
-            "action": "channel_calibration_point_delete",
-            "left": 195,
-            "top": 201,
-            "width": 40,
-            "height": 32,
-            "text": "\\u00b6",
-            "enabled": "channel_calibration_point_can_delete",
-            "disabledStyle": {
-              "inheritFrom": "button_S_disabled"
-            }
-          },
-          {
-            "type": "Rectangle",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 239,
-            "top": 0,
-            "width": 1,
-            "height": 240
           },
           {
             "type": "Canvas",
@@ -15677,6 +15353,245 @@
                     ]
                   }
                 ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
+      },
+      {
+        "name": "ch_settings_calibration_view",
+        "description": "Channel calibration wizard steps",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 10,
+            "top": 8,
+            "width": 220,
+            "height": 224,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_M_center"
+                },
+                "data": "channel_calibration_value_type",
+                "action": "select_channel_calibration_value_type",
+                "left": 0,
+                "top": 0,
+                "width": 219,
+                "height": 38,
+                "text": ""
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 43,
+                "width": 220,
+                "height": 1
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left",
+                  "alignHorizontal": "right"
+                },
+                "left": 0,
+                "top": 72,
+                "width": 96,
+                "height": 38,
+                "text": "Set:"
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "encoder_cursor_17_enabled"
+                },
+                "data": "calibration_point_set_value",
+                "action": "",
+                "left": 100,
+                "top": 72,
+                "width": 120,
+                "height": 38,
+                "displayOption": 0
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left",
+                  "alignHorizontal": "right"
+                },
+                "left": 0,
+                "top": 116,
+                "width": 96,
+                "height": 38,
+                "text": "Measured:"
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "encoder_cursor_17_enabled"
+                },
+                "data": "calibration_point_measured_value",
+                "action": "",
+                "left": 100,
+                "top": 116,
+                "width": 120,
+                "height": 38,
+                "displayOption": 0
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 180,
+                "width": 220,
+                "height": 1
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left"
+                },
+                "data": "channel_calibration_point_info",
+                "left": 0,
+                "top": 186,
+                "width": 96,
+                "height": 38,
+                "text": ""
+              },
+              {
+                "type": "Button",
+                "style": {
+                  "inheritFrom": "button_S"
+                },
+                "action": "channel_calibration_point_previous",
+                "left": 100,
+                "top": 186,
+                "width": 40,
+                "height": 38,
+                "text": "\\u008f",
+                "enabled": "channel_calibration_point_can_move_to_previous",
+                "disabledStyle": {
+                  "inheritFrom": "button_S_disabled"
+                }
+              },
+              {
+                "type": "Button",
+                "style": {
+                  "inheritFrom": "button_S"
+                },
+                "action": "channel_calibration_point_next",
+                "left": 148,
+                "top": 186,
+                "width": 40,
+                "height": 38,
+                "text": "\\u0090",
+                "enabled": "channel_calibration_point_can_move_to_next",
+                "disabledStyle": {
+                  "inheritFrom": "button_S_disabled"
+                }
+              }
+            ]
+          },
+          {
+            "type": "Canvas",
+            "style": {
+              "inheritFrom": "yt_graph"
+            },
+            "data": "channel_calibration_chart",
+            "left": 240,
+            "top": 0,
+            "width": 240,
+            "height": 240
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "channel1"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left"
+                },
+                "data": "channel_short_label",
+                "left": 41,
+                "top": 0,
+                "width": 36,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left"
+                },
+                "left": 78,
+                "top": 0,
+                "width": 162,
+                "height": 32,
+                "text": "Calibration points"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 0 0 4"
+                },
+                "data": "channel_calibration_chart_zoom",
+                "action": "channel_calibration_chart_zoom",
+                "left": 240,
+                "top": 0,
+                "width": 60,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1"
+                },
+                "action": "ch_settings_calibration_start_calibration",
+                "left": 330,
+                "top": 0,
+                "width": 150,
+                "height": 32,
+                "text": "Recalibrate"
               }
             ]
           }
@@ -53141,7 +53056,7 @@
           {
             "encoding": 128,
             "x": 0,
-            "y": 0,
+            "y": -2,
             "width": 24,
             "height": 24,
             "dx": 24,
@@ -53159,7 +53074,7 @@
           {
             "encoding": 129,
             "x": 0,
-            "y": 0,
+            "y": -2,
             "width": 24,
             "height": 22,
             "dx": 24,
@@ -53177,7 +53092,7 @@
           {
             "encoding": 130,
             "x": 0,
-            "y": 0,
+            "y": -2,
             "width": 24,
             "height": 24,
             "dx": 24,
@@ -53249,7 +53164,7 @@
           {
             "encoding": 134,
             "x": 1,
-            "y": 0,
+            "y": -1,
             "width": 21,
             "height": 21,
             "dx": 24,
@@ -68447,7 +68362,7 @@
           "#777dfb",
           "#fcef2e",
           "#c41036",
-          "#0000ff",
+          "#80ff80",
           "#d3d3d3",
           "#404040",
           "#202020",
@@ -68507,9 +68422,9 @@
           "#181e8a",
           "#f0f0f0",
           "#909090",
-          "#008080",
+          "#717100",
           "#c41036",
-          "#0000ff",
+          "#008000",
           "#d3d3d3",
           "#202020",
           "#202020",
@@ -68571,7 +68486,7 @@
           "#808080",
           "#fcef2e",
           "#c41036",
-          "#0000ff",
+          "#80ff80",
           "#202020",
           "#d0d0d0",
           "#202020",
@@ -73103,7 +73018,15 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": "quoted-string"
+            }
+          },
+          {
+            "name": "SYSTem:CPU:FIRMware?",
+            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
+            "parameters": [],
+            "response": {
+              "type": "quoted-string"
             }
           },
           {

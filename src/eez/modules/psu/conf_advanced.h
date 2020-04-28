@@ -22,8 +22,8 @@
 
 #pragma once
 
-/// Firmware version.
-#define FIRMWARE "M1 0.3"
+/// MCU firmware version.
+#define MCU_FIRMWARE "1.0"
 
 /// Manufacturer description text used for *IDN?
 #define IDN_MANUFACTURER "Envox"
@@ -36,7 +36,7 @@
 #endif
 
 #define MCU_NAME "STM32"
-#define MCU_REVISION "R1B6"
+#define MCU_REVISION "R2B4"
 
 /// SCPI TCP server port.
 #define TCP_PORT 5025
@@ -264,4 +264,4 @@
 #define CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD 5 // 5 seconds
 #define CONF_RAMP_COUNDOWN_DISPLAY_THRESHOLD 5 // 5 seconds
 
-#define MAX_CALIBRATION_POINTS 10
+#define MAX_CALIBRATION_POINTS 20

@@ -210,10 +210,6 @@ float ceilPrec(float a, float prec) {
     return ceilf(a * r) / r;
 }
 
-bool between(float x, float a, float b) {
-    return x >= a && x <= b;
-}
-
 bool isNaN(float x) {
     return x != x;
 }

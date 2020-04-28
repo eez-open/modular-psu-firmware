@@ -39,7 +39,10 @@ DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.enabled = get(widgetCursor.cursor, button_widget->enabled).getInt() ? 1 : 0;
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
+
+    const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : button_widget->disabledStyle);
+
+    widgetCursor.currentState->flags.blinking = g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style));
     widgetCursor.currentState->data = widget->data ? get(widgetCursor.cursor, widget->data) : 0;
 
     bool refresh =
@@ -50,7 +53,6 @@ DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->data != widgetCursor.currentState->data;
 
     if (refresh) {
-        const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : button_widget->disabledStyle);
         if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
                 drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,

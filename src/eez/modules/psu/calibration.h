@@ -23,17 +23,6 @@ namespace psu {
 /// Channel calibration procedure.
 namespace calibration {
 
-enum Level { LEVEL_NONE, LEVEL_MIN, LEVEL_MID, LEVEL_MAX };
-
-enum CurrentRange { CURRENT_RANGE_HIGH, CURRENT_RANGE_LOW };
-
-struct ValuePoint {
-    bool set;
-    float dac;
-    float value;
-    float adc;
-};
-
 enum CalibrationValueType {
     CALIBRATION_VALUE_U,
     CALIBRATION_VALUE_I_HI_RANGE,
@@ -43,19 +32,15 @@ enum CalibrationValueType {
 /// Calibration parameters for the voltage or current during calibration procedure.
 struct Value {
     CalibrationValueType type;
-    int8_t numPoints;
-    int8_t currentPointIndex;
-    ValuePoint points[MAX_CALIBRATION_POINTS];
+    int currentPointIndex;
+    bool isPointSet[MAX_CALIBRATION_POINTS];
+    Channel::CalibrationValueConfiguration configuration;
 
     Value(CalibrationValueType type);
 
-    bool isVoltage() { return type == CALIBRATION_VALUE_U; }
-
-    bool isCalibrated();
-
     void reset();
 
-    void setCurrentPointIndex(int8_t currentPointIndex);
+    void setCurrentPointIndex(int currentPointIndex);
 
     void setDacValue(float value);
     float getDacValue();
@@ -80,7 +65,6 @@ void stop();
 
 void copyValuesFromChannel();
 
-bool hasSupportForCurrentDualRange();
 void selectCurrentRange(int8_t range);
 
 Value &getVoltage();

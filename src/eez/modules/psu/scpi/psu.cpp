@@ -47,7 +47,7 @@ void init(scpi_t &scpi_context, scpi_psu_t &scpi_psu_context, scpi_interface_t *
           char *input_buffer, size_t input_buffer_length, scpi_error_t *error_queue_data,
           int16_t error_queue_size) {
     SCPI_Init(&scpi_context, scpi_commands, interface, scpi_units_def, IDN_MANUFACTURER, IDN_MODEL,
-              getSerialNumber(), FIRMWARE, input_buffer, input_buffer_length,
+              getSerialNumber(), MCU_FIRMWARE, input_buffer, input_buffer_length,
               error_queue_data, error_queue_size);
 
     scpi_psu_context.selectedChannels = 1 << 0; // first channel is selected by default

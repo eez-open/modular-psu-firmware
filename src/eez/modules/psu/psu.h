@@ -109,10 +109,6 @@ void tick();
 void setQuesBits(int bit_mask, bool on);
 void setOperBits(int bit_mask, bool on);
 
-const char *getCpuModelAndVersion();
-const char *getCpuType();
-const char *getCpuVersion();
-
 bool isMaxCurrentLimited();
 MaxCurrentLimitCause getMaxCurrentLimitCause();
 void limitMaxCurrent(MaxCurrentLimitCause cause);

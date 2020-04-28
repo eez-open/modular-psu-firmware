@@ -400,52 +400,89 @@ void action_ch_settings_copy() {
     pushSelectFromEnumPage(channelsEnumDefinition, -1, nullptr, onChannelCopyDestinationSelected, false, false);
 }
 
-void action_ch_settings_calibration_wiz_start() {
-    ChSettingsCalibrationPage::start();
+void action_ch_settings_calibration_start_calibration() {
+    ChSettingsCalibrationEditPage::start();
 }
 
 void action_ch_settings_calibration_toggle_enable() {
-    ChSettingsCalibrationPage::toggleEnable();
+    Channel &channel = g_channel ? *g_channel : Channel::get(getFoundWidgetAtDown().cursor);
+    channel.calibrationEnable(!channel.isCalibrationEnabled());
+}
+
+void action_ch_settings_calibration_view_points() {
+    ChSettingsCalibrationViewPage::start();
 }
 
 void onSetChannelCalibrationValueType(uint16_t value) {
     popPage();
-    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-    page->setCalibrationValueType((calibration::CalibrationValueType)value);
-}
-
-void action_select_channel_calibration_value_type() {
-    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-    if (calibration::getCalibrationChannel().hasSupportForCurrentDualRange()) {
-        pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE, page->getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
+    
+    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+    if (editPage) {
+        editPage->setCalibrationValueType((calibration::CalibrationValueType)value);
     } else {
-        pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE, page->getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
+        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+        if (viewPage) {
+            viewPage->setCalibrationValueType((calibration::CalibrationValueType)value);
+        }
     }
 }
 
+void action_select_channel_calibration_value_type() {
+    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+    if (editPage) {
+        if (calibration::getCalibrationChannel().hasSupportForCurrentDualRange()) {
+            pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE, editPage->getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
+        } else {
+            pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE, editPage->getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
+        }
+    } else {
+        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+        if (g_channel->hasSupportForCurrentDualRange()) {
+            pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE, viewPage->getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
+        } else {
+            pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE, viewPage->getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
+        }
+    }    
+}
+
 void action_channel_calibration_point_previous() {
-    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-    page->moveToPreviousPoint();
+    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+    if (editPage) {
+        editPage->moveToPreviousPoint();
+    } else {
+        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+        viewPage->moveToPreviousPoint();
+    }        
 }
 
 void action_channel_calibration_point_next() {
-    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-    page->moveToNextPoint();
+    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+    if (editPage) {
+        editPage->moveToNextPoint();
+    } else {
+        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+        viewPage->moveToNextPoint();
+    }        
 }
 
 void action_channel_calibration_point_save() {
-    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+    auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
     page->savePoint();
 }
 
 void action_channel_calibration_point_delete() {
-    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
+    auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
     page->deletePoint();
 }
 
 void action_channel_calibration_chart_zoom() {
-    auto page = (ChSettingsCalibrationPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_POINTS);
-    page->zoomChart();
+    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+    if (editPage) {
+        editPage->zoomChart();
+    } else {
+        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+        viewPage->zoomChart();
+    }
 }
 
 void action_ch_settings_prot_clear() {

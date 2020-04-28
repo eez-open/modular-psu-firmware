@@ -346,6 +346,8 @@ bool testChannels() {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool psuReset() {
+    channel_dispatcher::disableOutputForAllChannels();
+
     // *ESE 0
     scpi_reg_set(SCPI_REG_ESE, 0);
 
@@ -723,26 +725,6 @@ void setOperBits(int bit_mask, bool on) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-const char *getCpuModelAndVersion() {
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    return "Simulator, " FIRMWARE;
-#elif defined(EEZ_PLATFORM_STM32)
-    return "STM32F7, " FIRMWARE;
-#endif
-}
-
-const char *getCpuType() {
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    return "Simulator";
-#elif defined(EEZ_PLATFORM_STM32)
-    return "STM32F7";
-#endif
-}
-
-const char *getCpuVersion() {
-    return FIRMWARE;
-}
 
 bool isMaxCurrentLimited() {
     return g_maxCurrentLimitCause != MAX_CURRENT_LIMIT_CAUSE_NONE;

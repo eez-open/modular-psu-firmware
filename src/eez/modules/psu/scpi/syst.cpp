@@ -569,11 +569,6 @@ scpi_result_t scpi_cmd_systemChannelSlotQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemCpuInformationTypeQ(scpi_t *context) {
-    SCPI_ResultText(context, getCpuType());
-    return SCPI_RES_OK;
-}
-
 scpi_result_t scpi_cmd_systemCpuInformationOntimeTotalQ(scpi_t *context) {
     outputOnTime(context, ontime::g_mcuCounter.getTotalTime());
     return SCPI_RES_OK;
@@ -585,12 +580,21 @@ scpi_result_t scpi_cmd_systemCpuInformationOntimeLastQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCpuModelQ(scpi_t *context) {
-    SCPI_ResultText(context, getCpuType());
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    SCPI_ResultText(context, "Simulator");
+#elif defined(EEZ_PLATFORM_STM32)
+    SCPI_ResultText(context, "STM32F7");
+#endif
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemCpuVersionQ(scpi_t *context) {
-    SCPI_ResultText(context, getCpuVersion());
+    SCPI_ResultText(context, MCU_REVISION);
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCpuFirmwareQ(scpi_t *context) {
+    SCPI_ResultText(context, MCU_FIRMWARE);
     return SCPI_RES_OK;
 }
 

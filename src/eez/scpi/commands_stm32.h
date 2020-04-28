@@ -296,6 +296,7 @@
     SCPI_COMMAND("SYSTem:CPU:INFOrmation:ONTime:TOTal?", scpi_cmd_systemCpuInformationOntimeTotalQ) \
     SCPI_COMMAND("SYSTem:CPU:MODel?", scpi_cmd_systemCpuModelQ) \
     SCPI_COMMAND("SYSTem:CPU:VERSion?", scpi_cmd_systemCpuVersionQ) \
+    SCPI_COMMAND("SYSTem:CPU:FIRMware?", scpi_cmd_systemCpuFirmwareQ) \
     SCPI_COMMAND("SYSTem:DATE", scpi_cmd_systemDate) \
     SCPI_COMMAND("SYSTem:DATE?", scpi_cmd_systemDateQ) \
     SCPI_COMMAND("SYSTem:FORMat:DATE", scpi_cmd_systemFormatDate) \

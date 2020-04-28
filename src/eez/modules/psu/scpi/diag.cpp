@@ -40,10 +40,8 @@ namespace scpi {
 
 static void printCalibrationValue(scpi_t *context, calibration::Value &value) {
     const char *prefix;
-    void (*strcat_value)(char *str, float value);
     if (value.type == calibration::CALIBRATION_VALUE_U) {
         prefix = "u";
-        strcat_value = strcatVoltage;
     } else {
         if (calibration::getCalibrationChannel().hasSupportForCurrentDualRange()) {
             if (value.type == calibration::CALIBRATION_VALUE_I_HI_RANGE) {
@@ -54,20 +52,19 @@ static void printCalibrationValue(scpi_t *context, calibration::Value &value) {
         } else {
             prefix = "i";
         }
-        strcat_value = strcatCurrent;
     }
 
     char buffer[128] = { 0 };
 
-    for (int i = 0; i < value.numPoints; i++) {
-        if (value.points[i].set) {
-            sprintf(buffer, "%s_point%d_dac=%f", prefix, i + 1, value.points[i].dac);
+    for (unsigned int i = 0; i < value.configuration.numPoints; i++) {
+        if (value.isPointSet[i]) {
+            sprintf(buffer, "%s_point%d_dac=%f", prefix, i + 1, value.configuration.points[i].dac);
             SCPI_ResultText(context, buffer);
 
-            sprintf(buffer, "%s_point%d_data=%f", prefix, i + 1, value.points[i].value);
+            sprintf(buffer, "%s_point%d_data=%f", prefix, i + 1, value.configuration.points[i].value);
             SCPI_ResultText(context, buffer);
 
-            sprintf(buffer, "%s_point%d_adc=%f", prefix, i + 1, value.points[i].adc);
+            sprintf(buffer, "%s_point%d_adc=%f", prefix, i + 1, value.configuration.points[i].adc);
             SCPI_ResultText(context, buffer);
         }
     }

@@ -105,7 +105,7 @@ void init() {
 
 #ifdef EEZ_PLATFORM_SIMULATOR
         Serial.print("EEZ BB3 software simulator ver. ");
-        Serial.println(FIRMWARE);
+        Serial.println(MCU_FIRMWARE);
 #endif
 
         g_testResult = TEST_OK;

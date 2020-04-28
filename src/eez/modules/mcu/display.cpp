@@ -62,7 +62,7 @@ uint32_t color16to32(uint16_t color, uint8_t opacity) {
 
 uint16_t color32to16(uint32_t color) {
     auto pcolor = (uint8_t *)&color;
-    return RGB_TO_COLOR(pcolor[0], pcolor[1], pcolor[2]);
+    return RGB_TO_COLOR(pcolor[2], pcolor[1], pcolor[0]);
 }
 
 uint32_t blendColor(uint32_t fgColor, uint32_t bgColor) {
