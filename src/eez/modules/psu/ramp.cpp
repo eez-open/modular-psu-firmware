@@ -47,7 +47,7 @@ static void setActive(bool active, bool forceUpdate = false);
 void executionStart(Channel &channel) {
     g_execution[channel.channelIndex].state = 1;
 
-    if (channel.outputDelayDuration < OUTPUT_DELAY_DURATION_MIN_VALUE && channel.u.rampDuration < RAMP_DURATION_MIN_VALUE) {
+    if (channel.outputDelayDuration < OUTPUT_DELAY_DURATION_MIN_VALUE && channel.u.rampDuration < channel.params.U_RAMP_DURATION_MIN_VALUE) {
         channel_dispatcher::setVoltage(channel, channel.u.triggerLevel);
         g_execution[channel.channelIndex].voltageRampDone = true;
     } else {

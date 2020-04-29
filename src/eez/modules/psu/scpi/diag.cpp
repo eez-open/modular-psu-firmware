@@ -72,10 +72,8 @@ static void printCalibrationValue(scpi_t *context, calibration::Value &value) {
 
 void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange, bool calParamsExists, Channel::CalibrationValueConfiguration &calibrationValue) {
     const char *prefix;
-    void (*strcat_value)(char *str, float value);
     if (unit == UNIT_VOLT) {
         prefix = "u";
-        strcat_value = strcatVoltage;
     } else {
         if (currentRange == 0) {
             prefix = "i_5A";
@@ -84,7 +82,6 @@ void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange
         } else {
             prefix = "i";
         }
-        strcat_value = strcatCurrent;
     }
 
     char buffer[128] = { 0 };

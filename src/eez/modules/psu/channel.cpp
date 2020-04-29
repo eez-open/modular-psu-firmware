@@ -1461,27 +1461,27 @@ void Channel::setPowerLimit(float limit) {
 }
 
 bool Channel::isVoltageWithinRange(float u) {
-    u = channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, u);
-    float min =channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, channel_dispatcher::getUMin(*this));
-    float max =channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, channel_dispatcher::getUMax(*this));
+    u = channel_dispatcher::roundChannelValue(*this, UNIT_VOLT, u);
+    float min = channel_dispatcher::roundChannelValue(*this, UNIT_VOLT, channel_dispatcher::getUMin(*this));
+    float max = channel_dispatcher::roundChannelValue(*this, UNIT_VOLT, channel_dispatcher::getUMax(*this));
     return u >= min && u <= max;
 }
 
 bool Channel::isVoltageLimitExceeded(float u) {
-    return channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, u) >
-        channel_dispatcher::getValuePrecision(*this, UNIT_VOLT, channel_dispatcher::getULimit(*this));
+    return channel_dispatcher::roundChannelValue(*this, UNIT_VOLT, u) >
+        channel_dispatcher::roundChannelValue(*this, UNIT_VOLT, channel_dispatcher::getULimit(*this));
 }
 
 bool Channel::isCurrentWithinRange(float i) {
-    i = channel_dispatcher::getValuePrecision(*this, UNIT_AMPER, i);
-    float min =channel_dispatcher::getValuePrecision(*this, UNIT_AMPER, channel_dispatcher::getIMin(*this));
-    float max =channel_dispatcher::getValuePrecision(*this, UNIT_AMPER, channel_dispatcher::getIMax(*this));
+    i = channel_dispatcher::roundChannelValue(*this, UNIT_AMPER, i);
+    float min =channel_dispatcher::roundChannelValue(*this, UNIT_AMPER, channel_dispatcher::getIMin(*this));
+    float max =channel_dispatcher::roundChannelValue(*this, UNIT_AMPER, channel_dispatcher::getIMax(*this));
     return i >= min && i <= max;
 }
 
 bool Channel::isCurrentLimitExceeded(float i) {
-    return channel_dispatcher::getValuePrecision(*this, UNIT_AMPER, i) >
-        channel_dispatcher::getValuePrecision(*this, UNIT_AMPER, channel_dispatcher::getILimit(*this));
+    return channel_dispatcher::roundChannelValue(*this, UNIT_AMPER, i) >
+        channel_dispatcher::roundChannelValue(*this, UNIT_AMPER, channel_dispatcher::getILimit(*this));
 }
 
 

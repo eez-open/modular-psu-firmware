@@ -140,6 +140,8 @@ struct ChannelParams {
 
     uint32_t DAC_MAX;
     uint32_t ADC_MAX;
+
+    float U_RAMP_DURATION_MIN_VALUE;
 };
 
 struct ChannelInterface {
@@ -219,6 +221,7 @@ static const uint16_t MODULE_TYPE_DCM224  = 224;
 static const uint16_t MODULE_REVISION_DCP405_R1B1  = 0x0101;
 static const uint16_t MODULE_REVISION_DCP405_R2B5  = 0x0205;
 static const uint16_t MODULE_REVISION_DCP405_R2B7  = 0x0207;
+static const uint16_t MODULE_REVISION_DCP405_R2B11 = 0x020B;
 static const uint16_t MODULE_REVISION_DCP405_R3B1  = 0x0301;
 
 static const uint16_t MODULE_REVISION_DCP405B_R2B7 = 0x0207;

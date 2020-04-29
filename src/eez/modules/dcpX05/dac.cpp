@@ -27,6 +27,7 @@
 #endif
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/ramp.h>
 
 #include <eez/modules/dcpX05/dac.h>
 #include <eez/modules/dcpX05/adc.h>
@@ -46,6 +47,8 @@ static const uint8_t DATA_BUFFER_B = 0B00100100;
 extern float g_uSet[CH_MAX];
 extern float g_iSet[CH_MAX];
 #endif
+
+static const uint32_t CONF_DCP405_R2B11_RAMP_DURATION = 4000; // 4 ms
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -114,13 +117,31 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
     return g_testResult != TEST_FAILED;
 }
 
+void DigitalAnalogConverter::tick(uint32_t tickCount) {
+#if defined(EEZ_PLATFORM_STM32)
+    if (m_isRampActive) {
+        uint16_t value;
+
+        uint32_t diff = tickCount - m_rampStartTime;
+        if (diff >= CONF_DCP405_R2B11_RAMP_DURATION) {
+            value = m_rampTargetValue;
+            m_isRampActive = false;
+        } else {
+            value = m_rampStartValue + (m_rampTargetValue - m_rampStartValue) * diff / CONF_DCP405_R2B11_RAMP_DURATION;
+        }
+        
+        set(DATA_BUFFER_B, value, FROM_RAMP);
+    }
+#endif
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
-void DigitalAnalogConverter::setVoltage(float value) {
+void DigitalAnalogConverter::setVoltage(float value, RampOption rampOption) {
     Channel &channel = Channel::getBySlotIndex(slotIndex);
 
 #if defined(EEZ_PLATFORM_STM32)
-    set(DATA_BUFFER_B, remap(value, channel.params.U_MIN, (float)DAC_MIN, channel.params.U_MAX, (float)DAC_MAX));
+    set(DATA_BUFFER_B, remap(value, channel.params.U_MIN, (float)DAC_MIN, channel.params.U_MAX, (float)DAC_MAX), rampOption);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -166,16 +187,37 @@ void DigitalAnalogConverter::setDacCurrent(uint16_t value) {
 
 #if defined(EEZ_PLATFORM_STM32)
 
-void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value) {
+void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption rampOption) {
     Channel &channel = Channel::getBySlotIndex(slotIndex);
 
-#ifdef DEBUG
     if (buffer == DATA_BUFFER_B) {
+        if (
+            rampOption == WITH_RAMP && 
+            g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405 && 
+            g_slots[slotIndex].moduleRevision <= MODULE_REVISION_DCP405_R2B11 && 
+            !ramp::isActive(channel)
+        ) {
+            m_isRampActive = true;
+            m_rampStartValue = m_rampLastValue;
+            m_rampTargetValue = value;
+            m_rampStartTime = micros();
+            return;
+        }
+        
+        m_rampLastValue = value;
+
+        if (rampOption != FROM_RAMP) {
+            m_isRampActive = false;
+        }
+
+#ifdef DEBUG
         debug::g_uDac[channel.channelIndex].set(value);
-    } else {
-        debug::g_iDac[channel.channelIndex].set(value);
-    }
 #endif
+    } else {
+#ifdef DEBUG
+        debug::g_iDac[channel.channelIndex].set(value);
+#endif
+    }
 
     uint8_t data[3];
     uint8_t result[3];

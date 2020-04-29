@@ -61,6 +61,7 @@
 #include <eez/modules/mcu/battery.h>
 #include <eez/modules/mcu/eeprom.h>
 
+#include <eez/modules/dcpX05/channel.h>
 #include <eez/modules/dcpX05/ioexp.h>
 #include <eez/modules/dcpX05/dac.h>
 #include <eez/modules/dcpX05/adc.h>
@@ -182,14 +183,16 @@ osMessageQId g_psuMessageQueueId;
 } // namespacee eez::psu
 
 #if defined(EEZ_PLATFORM_STM32)
+
 extern "C" void PSU_IncTick() {
     g_tickCount++;
 
     using namespace eez::psu;
-    if (ramp::isActive()) {
+    if (ramp::isActive() || eez::dcpX05::isDacRampActive()) {
         osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_TICK, 0), 0);
     }
 }
+
 #endif
 
 namespace eez {
@@ -243,8 +246,13 @@ void oneIter() {
 
         if (type == PSU_QUEUE_MESSAGE_TYPE_TICK) {
 #if defined(EEZ_PLATFORM_STM32)
+        	uint32_t tickCount = micros();
+
+        	ramp::tick(tickCount);
+
+        	dcpX05::tickDacRamp(tickCount);
+
             if (g_tickCount % 5) {
-                ramp::tick(micros());
                 return;
             }
 #endif

@@ -208,8 +208,8 @@ void start(Channel &channel) {
         return;
 
     channel_dispatcher::outputEnable(channel, false);
-    channel_dispatcher::setVoltage(channel, 0);
-    channel_dispatcher::setCurrent(channel, 0);
+    channel_dispatcher::setVoltage(channel, channel.u.min);
+    channel_dispatcher::setCurrent(channel, channel.i.min);
 
     profile::saveToLocation(10);
     profile::setFreezeState(true);

@@ -1187,7 +1187,7 @@ scpi_result_t scpi_cmd_sourceVoltageRampDuration(scpi_t *context) {
     float duration;
     if (param.special) {
         if (param.content.tag == SCPI_NUM_MIN) {
-            duration = RAMP_DURATION_MIN_VALUE;
+            duration = channel->params.U_RAMP_DURATION_MIN_VALUE;
         } else if (param.content.tag == SCPI_NUM_MAX) {
             duration = RAMP_DURATION_MAX_VALUE;
         } else if (param.content.tag == SCPI_NUM_DEF) {
@@ -1216,7 +1216,7 @@ scpi_result_t scpi_cmd_sourceVoltageRampDurationQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_SECOND, channel->u.rampDuration, RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE_U);
+    return get_source_value(context, *channel, UNIT_SECOND, channel->u.rampDuration, channel->params.U_RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE_U);
 }
 
 } // namespace scpi

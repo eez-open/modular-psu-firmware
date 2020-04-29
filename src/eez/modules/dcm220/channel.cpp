@@ -57,6 +57,8 @@ static const uint16_t ADC_MAX = 65535;
 
 static const float PTOT = 155.0f;
 
+static const float I_MON_RESOLUTION = 0.02f;
+
 #if defined(EEZ_PLATFORM_STM32)
 
 #define REG0_CC1_MASK     (1 << 1)
@@ -169,7 +171,7 @@ struct Channel : ChannelInterface {
 	float I_MAX_FOR_REMAP;
 
 	float U_CAL_POINTS[2];
-	float I_CAL_POINTS[2];
+	float I_CAL_POINTS[6];
 
     Channel(int slotIndex_)
 		: ChannelInterface(slotIndex_)
@@ -197,7 +199,7 @@ struct Channel : ChannelInterface {
 
 		U_CAL_POINTS[0] = 2.0f;
 		U_CAL_POINTS[1] = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 22.0f : 18.0f;
-		params.U_CAL_NUM_POINTS = 2;
+		params.U_CAL_NUM_POINTS = sizeof(U_CAL_POINTS) / sizeof(float);
 		params.U_CAL_POINTS = U_CAL_POINTS;
 		params.U_CAL_I_SET = 1.0f;
 
@@ -211,9 +213,13 @@ struct Channel : ChannelInterface {
 		params.I_DEF_STEP = 0.01f;
 		params.I_MAX_STEP = 1.0f; 
 
-		I_CAL_POINTS[0] = 0.5f;
-		I_CAL_POINTS[1] = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.5f : 3.5f;
-		params.I_CAL_NUM_POINTS = 2;
+		I_CAL_POINTS[0] = 0.1f;
+		I_CAL_POINTS[1] = 0.2f;
+		I_CAL_POINTS[2] = 0.3f;
+		I_CAL_POINTS[3] = 0.4f;
+		I_CAL_POINTS[4] = 0.5f;
+		I_CAL_POINTS[5] = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.5f : 3.5f;
+		params.I_CAL_NUM_POINTS = sizeof(I_CAL_POINTS) / sizeof(float);
 		params.I_CAL_POINTS = I_CAL_POINTS;
 		params.I_CAL_U_SET = 20.0f;
 
@@ -259,6 +265,8 @@ struct Channel : ChannelInterface {
 		params.ADC_MAX = ADC_MAX;
 
 		I_MAX_FOR_REMAP = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 5.0f : 4.1667f;
+
+		params.U_RAMP_DURATION_MIN_VALUE = 0.002f;
 	}
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -445,6 +453,7 @@ struct Channel : ChannelInterface {
 			const float FULL_SCALE = 2.0F;
 			const float U_REF = 2.5F;
         	float iMon = remap(iMonAdc, (float)ADC_MIN, 0, FULL_SCALE * ADC_MAX / U_REF, /*channel.params.I_MAX*/ I_MAX_FOR_REMAP);
+        	iMon = roundPrec(iMon, I_MON_RESOLUTION);
         	channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon);
 
 #ifdef DEBUG

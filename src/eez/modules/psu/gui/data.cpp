@@ -2339,15 +2339,15 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
             }
         } else if (operation == DATA_OPERATION_GET_MIN) {
             if (editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
-                value = MakeValue(0 - channel_dispatcher::getUMax(channel) * 1.0f, UNIT_VOLT);
+                value = MakeValue(-1.0f, UNIT_VOLT);
             } else {
-                value = MakeValue(0 - channel_dispatcher::getIMaxLimit(channel) * 1.0f, UNIT_AMPER);
+                value = MakeValue(-0.5f, UNIT_AMPER);
             }
         } else if (operation == DATA_OPERATION_GET_MAX) {
             if (editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U) {
-                value = MakeValue(channel_dispatcher::getUMax(channel) * 2.0f, UNIT_VOLT);
+                value = MakeValue(channel_dispatcher::getUMax(channel) + 1.0f, UNIT_VOLT);
             } else {
-                value = MakeValue(channel_dispatcher::getIMaxLimit(channel) * 2.0f, UNIT_AMPER);
+                value = MakeValue(channel_dispatcher::getIMaxLimit(channel) + 0.5f, UNIT_AMPER);
             }
         } else if (operation == DATA_OPERATION_GET_NAME) {
             value = editPage->getCalibrationValueType() == calibration::CALIBRATION_VALUE_U ? "Voltage" : "Current";
@@ -6045,7 +6045,7 @@ void data_channel_voltage_ramp_duration(DataOperationEnum operation, Cursor curs
     } else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = MakeValue(RAMP_DURATION_MIN_VALUE, UNIT_SECOND);
+        value = MakeValue(Channel::get(cursor).params.U_RAMP_DURATION_MIN_VALUE, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(RAMP_DURATION_MAX_VALUE, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_LIMIT) {

@@ -782,6 +782,9 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
             }
 
             channel.u.rampDuration = profile.channels[i].u_rampDuration;
+            if (channel.u.rampDuration > 0 && channel.u.rampDuration < channel.params.U_RAMP_DURATION_MIN_VALUE) {
+                channel.u.rampDuration = channel.params.U_RAMP_DURATION_MIN_VALUE;
+            }
             channel.i.rampDuration = profile.channels[i].i_rampDuration;
 
             channel.outputDelayDuration = profile.channels[i].outputDelayDuration;

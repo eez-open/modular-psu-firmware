@@ -172,6 +172,12 @@ struct Channel : ChannelInterface {
 
 		params.DAC_MAX = DigitalAnalogConverter::DAC_MAX;
 		params.ADC_MAX = AnalogDigitalConverter::ADC_MAX;
+
+		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 && slot.moduleRevision <= MODULE_REVISION_DCP405_R2B11) {
+			params.U_RAMP_DURATION_MIN_VALUE = 0.004f;
+		} else {
+			params.U_RAMP_DURATION_MIN_VALUE = 0.002f;
+		}
 	}
 
 	void init(int subchannelIndex) {
@@ -462,7 +468,7 @@ struct Channel : ChannelInterface {
 
 			// DAC
 			if (tasks & OUTPUT_ENABLE_TASK_DAC) {
-				dac.setVoltage(uSet);
+				dac.setVoltage(uSet, DigitalAnalogConverter::WITH_RAMP);
 			}
 
 			// Current range
@@ -834,6 +840,24 @@ static Channel g_channel0(0);
 static Channel g_channel1(1);
 static Channel g_channel2(2);
 ChannelInterface *g_channelInterfaces[NUM_SLOTS] = { &g_channel0, &g_channel1, &g_channel2 };
+
+bool isDacRampActive() {
+	return g_channel0.dac.m_isRampActive || g_channel1.dac.m_isRampActive || g_channel2.dac.m_isRampActive;
+}
+
+void tickDacRamp(uint32_t tickCount) {
+	if (g_channel0.dac.m_isRampActive) {
+		g_channel0.dac.tick(tickCount);
+	}
+
+	if (g_channel1.dac.m_isRampActive) {
+		g_channel1.dac.tick(tickCount);
+	}
+
+	if (g_channel2.dac.m_isRampActive) {
+		g_channel2.dac.tick(tickCount);
+	}
+}
 
 } // namespace dcpX05
 } // namespace eez

@@ -32,12 +32,22 @@ public:
 
     uint8_t slotIndex;
     TestResult g_testResult;
+    bool m_isRampActive = false;
 
     void init();
     bool test(IOExpander &ioexp, AnalogDigitalConverter &adc);
 
-    void setVoltage(float voltage);
+    void tick(uint32_t tickCount);
+
+    enum RampOption {
+        NO_RAMP,
+        WITH_RAMP,
+        FROM_RAMP
+    };
+
+    void setVoltage(float voltage, RampOption rampOption = NO_RAMP);
     void setDacVoltage(uint16_t voltage);
+
     void setCurrent(float voltage);
     void setDacCurrent(uint16_t current);
 
@@ -45,11 +55,17 @@ public:
         return m_testing;
     }
 
-  private:
+private:
     bool m_testing;
 
+    // ramp
+    uint16_t m_rampLastValue;
+    uint16_t m_rampStartValue = 0;
+    uint16_t m_rampTargetValue;
+    uint32_t m_rampStartTime;
+
 #if defined(EEZ_PLATFORM_STM32)
-    void set(uint8_t buffer, uint16_t value);
+    void set(uint8_t buffer, uint16_t value, RampOption rampOption = NO_RAMP);
     void set(uint8_t buffer, float value);
 #endif
 };

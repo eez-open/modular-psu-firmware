@@ -25,5 +25,8 @@ namespace dcpX05 {
 
 extern ChannelInterface *g_channelInterfaces[NUM_SLOTS];
 
+bool isDacRampActive();
+void tickDacRamp(uint32_t tickCount);
+
 } // namespace dcpX05
 } // namespace eez
