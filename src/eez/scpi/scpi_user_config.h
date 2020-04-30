@@ -87,6 +87,7 @@ extern "C" {
     X(SCPI_ERROR_CAL_OUTPUT_DISABLED,                        108, "Cal output disabled")                          \
     X(SCPI_ERROR_INVALID_CAL_DATA,                           109, "Invalid cal data")                             \
     X(SCPI_ERROR_CAL_PARAMS_MISSING,                         110, "Cal params missing or corrupted")              \
+    X(SCPI_ERROR_TOO_FEW_CAL_POINTS,                         111, "To few calibration points")                    \
     X(SCPI_ERROR_POWER_LIMIT_EXCEEDED,                       150, "Power limit exceeded")                         \
 	X(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED,                     151, "Voltage limit exceeded")                       \
 	X(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED,                     152, "Current limit exceeded")                       \
@@ -97,6 +98,10 @@ extern "C" {
     X(SCPI_ERROR_CALIBRATION_INVALID_CURRENT_L_CAL_DATA,     157, "Invalid current (low range) calibration data") \
     X(SCPI_ERROR_CALIBRATION_NO_CAL_DATA,                    158, "Incomplete calibration data")                  \
     X(SCPI_ERROR_MODULE_TOTAL_POWER_LIMIT_EXCEEDED,          159, "Module total power limit exceeded")            \
+    X(SCPI_ERROR_CALIBRATION_TOO_FEW_VOLTAGE_CAL_POINTS,     160, "To few voltage calibration points")            \
+    X(SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_CAL_POINTS,     161, "To few current calibration points")            \
+    X(SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_H_CAL_POINTS,   162, "To few current (high range) calibration points")\
+    X(SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_L_CAL_POINTS,   163, "To few current (low range) calibration points")\
     X(SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION,  201, "Cannot execute before clearing protection")    \
     X(SCPI_ERROR_CANNOT_INIT_TRIGGER_WHILE_RPROG_IS_ENABLED, 202, "Cannot init trigger while Rprog is enabled")   \
     X(SCPI_ERROR_CH1_IOEXP_TEST_FAILED,                      210, "CH1 IOEXP test failed")                        \

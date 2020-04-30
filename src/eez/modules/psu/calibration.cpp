@@ -314,7 +314,7 @@ void setRemark(const char *value, size_t len) {
 
 static bool checkCalibrationValue(calibration::Value &calibrationValue, int16_t &scpiErr) {
     if (calibrationValue.configuration.numPoints < 2) {
-        scpiErr = SCPI_ERROR_INVALID_CAL_DATA;
+        scpiErr = SCPI_ERROR_TOO_FEW_CAL_POINTS;
         return false;
     }
 
@@ -351,7 +351,11 @@ bool canSave(int16_t &scpiErr, int16_t *uiErr) {
     if (isCalibrated(g_voltage)) {
         if (!checkCalibrationValue(calibration::g_voltage, scpiErr)) {
             if (uiErr) {
-                *uiErr = SCPI_ERROR_CALIBRATION_INVALID_VOLTAGE_CAL_DATA;
+                if (scpiErr == SCPI_ERROR_TOO_FEW_CAL_POINTS) {
+                    *uiErr = SCPI_ERROR_CALIBRATION_TOO_FEW_VOLTAGE_CAL_POINTS;
+                } else {
+                    *uiErr = SCPI_ERROR_CALIBRATION_INVALID_VOLTAGE_CAL_DATA;
+                }
             }
             return false;
         }
@@ -361,7 +365,11 @@ bool canSave(int16_t &scpiErr, int16_t *uiErr) {
     if (isCalibrated(g_currents[0])) {
         if (!checkCalibrationValue(g_currents[0], scpiErr)) {
             if (uiErr) {
-                *uiErr = g_channel->hasSupportForCurrentDualRange() ? SCPI_ERROR_CALIBRATION_INVALID_CURRENT_H_CAL_DATA : SCPI_ERROR_CALIBRATION_INVALID_CURRENT_CAL_DATA;
+                if (scpiErr == SCPI_ERROR_TOO_FEW_CAL_POINTS) {
+                    *uiErr = g_channel->hasSupportForCurrentDualRange() ? SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_H_CAL_POINTS : SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_CAL_POINTS;
+                } else {
+                    *uiErr = g_channel->hasSupportForCurrentDualRange() ? SCPI_ERROR_CALIBRATION_INVALID_CURRENT_H_CAL_DATA : SCPI_ERROR_CALIBRATION_INVALID_CURRENT_CAL_DATA;
+                }
             }
             return false;
         }
@@ -372,7 +380,11 @@ bool canSave(int16_t &scpiErr, int16_t *uiErr) {
         if (isCalibrated(g_currents[1])) {
             if (!checkCalibrationValue(g_currents[1], scpiErr)) {
                 if (uiErr) {
-                    *uiErr = SCPI_ERROR_CALIBRATION_INVALID_CURRENT_L_CAL_DATA;
+                    if (scpiErr == SCPI_ERROR_TOO_FEW_CAL_POINTS) {
+                        *uiErr = SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_L_CAL_POINTS;
+                    } else {
+                        *uiErr = SCPI_ERROR_CALIBRATION_INVALID_CURRENT_L_CAL_DATA;
+                    }
                 }
                 return false;
             }
