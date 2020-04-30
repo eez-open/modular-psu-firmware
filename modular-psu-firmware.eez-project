@@ -3029,6 +3029,9 @@
     },
     {
       "name": "ch_settings_calibration_view_points"
+    },
+    {
+      "name": "show_touch_calibration_intro"
     }
   ],
   "gui": {

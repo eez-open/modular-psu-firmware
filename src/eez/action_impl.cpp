@@ -173,6 +173,10 @@ void action_enter_touch_calibration() {
     psu::gui::enterTouchCalibration();
 }
 
+void action_show_touch_calibration_intro() {
+    showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
+}
+
 void action_yes() {
     dialogYes();
 }

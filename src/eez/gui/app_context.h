@@ -78,6 +78,7 @@ public:
     void updateAppView(WidgetCursor &widgetCursor);
 
     virtual int getLongTouchActionHook(const WidgetCursor &widgetCursor);
+    virtual int getExtraLongTouchActionHook(const WidgetCursor &widgetCursor);
 
 protected:
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];

@@ -402,6 +402,10 @@ int AppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {
     return ACTION_ID_NONE;
 }
 
+int AppContext::getExtraLongTouchActionHook(const WidgetCursor &widgetCursor) {
+    return ACTION_ID_NONE;
+}
+
 } // namespace gui
 } // namespace eez
 

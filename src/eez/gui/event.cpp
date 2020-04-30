@@ -28,7 +28,7 @@
 #define CONF_GUI_LONG_TOUCH_TIMEOUT              1000000L // 1s
 #define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY   300000L // 300ms
 #define CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY     50000L // 50ms
-#define CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT       15000000L // 30s
+#define CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT       15000000L // 15s
 
 namespace eez {
 namespace gui {
@@ -170,6 +170,12 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
     } else if (touchEvent.type == EVENT_TYPE_LONG_TOUCH) {
         m_touchActionExecuted = true;
         int action = widgetCursor.appContext->getLongTouchActionHook(widgetCursor);
+        if (action != ACTION_ID_NONE) {
+            executeAction(action);
+        }
+    } else if (touchEvent.type == EVENT_TYPE_EXTRA_LONG_TOUCH) {
+        m_touchActionExecuted = true;
+        int action = widgetCursor.appContext->getExtraLongTouchActionHook(widgetCursor);
         if (action != ACTION_ID_NONE) {
             executeAction(action);
         }

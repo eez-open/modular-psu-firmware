@@ -221,6 +221,8 @@ public:
     void (*m_dialogCancelCallback)();
     void (*m_dialogLaterCallback)();
 
+    int getExtraLongTouchActionHook(const WidgetCursor &widgetCursor) override;
+
 protected:
     bool m_pushProgressPage;
     const char *m_progressMessage;

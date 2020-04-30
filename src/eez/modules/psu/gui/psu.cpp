@@ -927,6 +927,10 @@ void PsuAppContext::dialogClose() {
     }
 }
 
+int PsuAppContext::getExtraLongTouchActionHook(const WidgetCursor &widgetCursor) {
+    return ACTION_ID_SHOW_TOUCH_CALIBRATION_INTRO;
+}
+
 void MenuInputParams::onSet(int value) {
     popPage();
 

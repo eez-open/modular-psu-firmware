@@ -1045,7 +1045,8 @@ enum ActionsEnum {
     ACTION_ID_CHANNEL_CALIBRATION_POINT_DELETE = 217,
     ACTION_ID_CHANNEL_CALIBRATION_POINT_SAVE = 218,
     ACTION_ID_CHANNEL_CALIBRATION_CHART_ZOOM = 219,
-    ACTION_ID_CH_SETTINGS_CALIBRATION_VIEW_POINTS = 220
+    ACTION_ID_CH_SETTINGS_CALIBRATION_VIEW_POINTS = 220,
+    ACTION_ID_SHOW_TOUCH_CALIBRATION_INTRO = 221
 };
 
 void action_channel_toggle_output();
@@ -1268,6 +1269,7 @@ void action_channel_calibration_point_delete();
 void action_channel_calibration_point_save();
 void action_channel_calibration_chart_zoom();
 void action_ch_settings_calibration_view_points();
+void action_show_touch_calibration_intro();
 
 extern ActionExecFunc g_actionExecFunctions[];
 

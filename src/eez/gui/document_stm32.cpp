@@ -631,7 +631,8 @@ ActionExecFunc g_actionExecFunctions[] = {
     action_channel_calibration_point_delete,
     action_channel_calibration_point_save,
     action_channel_calibration_chart_zoom,
-    action_ch_settings_calibration_view_points
+    action_ch_settings_calibration_view_points,
+    action_show_touch_calibration_intro
 };
 
 // ASSETS DEFINITION
