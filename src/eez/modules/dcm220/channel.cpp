@@ -199,7 +199,7 @@ struct Channel : ChannelInterface {
 
 		U_CAL_POINTS[0] = 2.0f;
 		U_CAL_POINTS[1] = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 22.0f : 18.0f;
-		params.U_CAL_NUM_POINTS = sizeof(U_CAL_POINTS) / sizeof(float);
+		params.U_CAL_NUM_POINTS = 2;
 		params.U_CAL_POINTS = U_CAL_POINTS;
 		params.U_CAL_I_SET = 1.0f;
 
@@ -213,13 +213,19 @@ struct Channel : ChannelInterface {
 		params.I_DEF_STEP = 0.01f;
 		params.I_MAX_STEP = 1.0f; 
 
-		I_CAL_POINTS[0] = 0.1f;
-		I_CAL_POINTS[1] = 0.2f;
-		I_CAL_POINTS[2] = 0.3f;
-		I_CAL_POINTS[3] = 0.4f;
-		I_CAL_POINTS[4] = 0.5f;
-		I_CAL_POINTS[5] = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.5f : 3.5f;
-		params.I_CAL_NUM_POINTS = sizeof(I_CAL_POINTS) / sizeof(float);
+		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
+			I_CAL_POINTS[0] = 0.1f;
+			I_CAL_POINTS[1] = 4.5f;
+			params.I_CAL_NUM_POINTS = 2;
+		} else {
+			I_CAL_POINTS[0] = 0.1f;
+			I_CAL_POINTS[1] = 0.2f;
+			I_CAL_POINTS[2] = 0.3f;
+			I_CAL_POINTS[3] = 0.4f;
+			I_CAL_POINTS[4] = 0.5f;
+			I_CAL_POINTS[5] = 3.5f;
+			params.I_CAL_NUM_POINTS = 6;
+		}
 		params.I_CAL_POINTS = I_CAL_POINTS;
 		params.I_CAL_U_SET = 20.0f;
 
