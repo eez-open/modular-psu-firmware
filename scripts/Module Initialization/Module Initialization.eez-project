@@ -38,7 +38,7 @@
     {
       "name": "slot2_model",
       "type": "string",
-      "defaultValue": "DCP405B"
+      "defaultValue": "DCP405"
     },
     {
       "name": "slot2_version_r",

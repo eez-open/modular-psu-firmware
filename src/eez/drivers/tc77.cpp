@@ -22,7 +22,7 @@
 #include <eez/platform/stm32/spi.h>
 
 #include <eez/modules/psu/psu.h>
-#include <eez/modules/dcpX05/ioexp.h>
+#include <eez/modules/dcp405/ioexp.h>
 
 // TC77 Thermal Sensor with SPI Interface
 // http://www.ti.com/lit/ds/symlink/tmp1075.pdf

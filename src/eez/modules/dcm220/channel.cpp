@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #endif
 
-#include <eez/modules/dcpX05/channel.h>
+#include <eez/modules/dcp405/channel.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>

@@ -210,7 +210,6 @@ EnumItem g_enumDefinition_QUEUE_FILTER[] = {
 EnumItem g_enumDefinition_MODULE_TYPE[] = {
     { MODULE_TYPE_NONE, "None" },
     { MODULE_TYPE_DCP405, "DCP405" },
-    { MODULE_TYPE_DCP405B, "DCP405B" },
     { MODULE_TYPE_DCM220, "DCM220" },
     { MODULE_TYPE_DCM224, "DCM224" },
     { 0, 0 }
@@ -2901,8 +2900,6 @@ void data_module_specific_ch_settings(DataOperationEnum operation, Cursor cursor
         auto modulType = g_slots[channel.slotIndex].moduleInfo->moduleType;
         if (modulType == MODULE_TYPE_DCP405) {
             value = PAGE_ID_CH_SETTINGS_DCP405_SPECIFIC;
-        } else if (modulType == MODULE_TYPE_DCP405B) {
-            value = PAGE_ID_CH_SETTINGS_DCP405B_SPECIFIC;
         } else if (modulType == MODULE_TYPE_DCM220 || modulType == MODULE_TYPE_DCM224) {
             value = PAGE_ID_CH_SETTINGS_DCM220_SPECIFIC;
         } else {

@@ -309,5 +309,5 @@ if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
             scpi("DISP:DIALog:CLOSe")
             break
 else:
-    scpi('DISP:INPUT? "Requires DCP405 or DCP405B on Ch1 and Ch2", MENU, BUTTON, "Close"')
+    scpi('DISP:INPUT? "Requires DCP405 on Ch1 and Ch2", MENU, BUTTON, "Close"')
 

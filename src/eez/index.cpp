@@ -22,7 +22,7 @@
 #include <eez/modules/mcu/ethernet.h>
 #endif
 
-#include <eez/modules/dcpX05/channel.h>
+#include <eez/modules/dcp405/channel.h>
 #include <eez/modules/dcm220/channel.h>
 
 #include <eez/modules/psu/psu.h>
@@ -101,21 +101,7 @@ static ModuleInfo g_modules[] = {
         "DCP405",
         MODULE_REVISION_DCP405_R2B7,
         1,
-        dcpX05::g_channelInterfaces
-    },
-    {
-        MODULE_TYPE_DCP405B,
-        "DCP405B",
-        MODULE_REVISION_DCP405B_R2B7,
-        1,
-        dcpX05::g_channelInterfaces
-    },
-    {
-        MODULE_TYPE_DCP505, 
-        "DCP505",
-        MODULE_REVISION_DCP505_R1B3,
-        1,
-        dcpX05::g_channelInterfaces
+        dcp405::g_channelInterfaces
     },
     {
         MODULE_TYPE_DCM220, 

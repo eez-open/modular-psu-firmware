@@ -34,33 +34,20 @@ public:
     static const uint8_t IO_BIT_OUT_REMOTE_SENSE = 10;
     static const uint8_t IO_BIT_OUT_REMOTE_PROGRAMMING = 11;
 
-    // DPC505
-    static const uint8_t DCP505_IO_BIT_IN_OVP_FAULT = 4;
-
-    static const uint8_t DCP505_IO_BIT_OUT_OVP_ENABLE = 5;
-    static const uint8_t DCP505_IO_BIT_OUT_OE_UNCOUPLED_LED = 6;
-    static const uint8_t DCP505_IO_BIT_OUT_OE_COUPLED_LED = 7;
-
-    static const uint8_t DCP505_IO_BIT_IN_CURRENT_RANGE_5A = 12;
-    static const uint8_t DCP505_IO_BIT_IN_CURRENT_RANGE_500MA = 13;
-    static const uint8_t DCP505_IO_BIT_IN_CURRENT_RANGE_50MA = 14;
-
-    static const uint8_t DCP505_IO_BIT_IN_ADC_DRDY = 15;
-
     // DPC405
-    static const uint8_t DCP405_IO_BIT_IN_ADC_DRDY = 4;
+    static const uint8_t IO_BIT_IN_ADC_DRDY = 4;
 
-    static const uint8_t DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA = 5;
-    static const uint8_t DCP405_IO_BIT_OUT_CURRENT_RANGE_500MA = 6;
+    static const uint8_t IO_BIT_OUT_CURRENT_RANGE_50MA = 5;
+    static const uint8_t IO_BIT_OUT_CURRENT_RANGE_500MA = 6;
     
-    static const uint8_t DCP405_R2B5_IO_BIT_IN_OVP_FAULT = 5; // active low
-    static const uint8_t DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA = 6;
+    static const uint8_t R2B5_IO_BIT_IN_OVP_FAULT = 5; // active low
+    static const uint8_t R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA = 6;
     
-    static const uint8_t DCP405_IO_BIT_OUT_CURRENT_RANGE_5A = 7;
+    static const uint8_t IO_BIT_OUT_CURRENT_RANGE_5A = 7;
 
-    static const uint8_t DCP405_IO_BIT_OUT_OVP_ENABLE = 12;
-    static const uint8_t DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED = 14;
-    static const uint8_t DCP405_IO_BIT_OUT_OE_COUPLED_LED = 15;
+    static const uint8_t IO_BIT_OUT_OVP_ENABLE = 12;
+    static const uint8_t IO_BIT_OUT_OE_UNCOUPLED_LED = 14;
+    static const uint8_t IO_BIT_OUT_OE_COUPLED_LED = 15;
 
     uint8_t slotIndex;
     TestResult g_testResult;

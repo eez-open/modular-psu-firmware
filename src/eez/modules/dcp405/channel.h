@@ -21,12 +21,12 @@
 #include <eez/index.h>
 
 namespace eez {
-namespace dcpX05 {
+namespace dcp405 {
 
 extern ChannelInterface *g_channelInterfaces[NUM_SLOTS];
 
 bool isDacRampActive();
 void tickDacRamp(uint32_t tickCount);
 
-} // namespace dcpX05
+} // namespace dcp405
 } // namespace eez

@@ -300,7 +300,7 @@ scpi_result_t scpi_cmd_diagnosticInformationRegsQ(scpi_t *context) {
     for (int i = 0; i < CH_MAX; i++) {
         Channel& channel = Channel::get(i);
         if (channel.isInstalled()) {
-            if (g_slots[channel.slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405 || g_slots[channel.slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
+            if (g_slots[channel.slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405) {
                 sprintf(buffer + strlen(buffer), "CH%d:\n", i + 1);
 
                 sprintf(buffer + strlen(buffer), "\tIOEXP:\n");

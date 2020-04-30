@@ -29,5 +29,5 @@ extern ChannelInterface *g_channelInterfaces[NUM_SLOTS];
 float readTemperature(int channelIndex);
 #endif
 
-} // namespace dcpX05
+} // namespace dcm220
 } // namespace eez

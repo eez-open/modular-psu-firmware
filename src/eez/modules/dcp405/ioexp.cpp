@@ -18,7 +18,7 @@
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
-#include <eez/modules/dcpX05/ioexp.h>
+#include <eez/modules/dcp405/ioexp.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <scpi/scpi.h>
@@ -56,49 +56,34 @@ static const uint8_t REG_INTCAPB = 0x11;
 static const uint8_t REG_GPIOA = 0x12;
 static const uint8_t REG_GPIOB = 0x13;
 
-static const uint8_t DCP505_REG_VALUE_IODIRA   = 0B00011111; // pins 0, 1, 2, 3, 4, 12, 13 and 14 are inputs (set to 1)
-static const uint8_t DCP505_REG_VALUE_IODIRB   = 0B11110000; //
-
-static const uint8_t DCP405_REG_VALUE_IODIRA   = 0B00011111; // pins 0, 1, 2, 3 and 4 are inputs (set to 1)
-static const uint8_t DCP405_R2B5_REG_VALUE_IODIRA = 0B00111111; // pins 0, 1, 2, 3, 4 and 5 are inputs (set to 1)
-static const uint8_t DCP405_REG_VALUE_IODIRB   = 0B00000000; //
-
-static const uint8_t DCP405B_REG_VALUE_IODIRA   = 0B00011111; // pins 0, 1, 2, 3 and 4 are inputs (set to 1)
-static const uint8_t DCP405B_REG_VALUE_IODIRB   = 0B00000000; //
+static const uint8_t REG_VALUE_IODIRA   = 0B00011111; // pins 0, 1, 2, 3 and 4 are inputs (set to 1)
+static const uint8_t R2B5_REG_VALUE_IODIRA = 0B00111111; // pins 0, 1, 2, 3, 4 and 5 are inputs (set to 1)
+static const uint8_t REG_VALUE_IODIRB   = 0B00000000; //
 
 static const uint8_t REG_VALUE_IPOLA    = 0B00000000; // no pin is inverted
 static const uint8_t REG_VALUE_IPOLB    = 0B00000000; // no pin is inverted
 
-static const uint8_t REG_VALUE_GPINTENA = 0B00000000; // no interrupts
-static const uint8_t DCP405_REG_VALUE_GPINTENA = 0B00100000; // enable interrupt for HW OVP Fault
+static const uint8_t REG_VALUE_GPINTENA = 0B00100000; // enable interrupt for HW OVP Fault
 static const uint8_t REG_VALUE_GPINTENB = 0B00000000; // no interrupts
 
-static const uint8_t REG_VALUE_DEFVALA  = 0B00000000; //
-static const uint8_t DCP405_REG_VALUE_DEFVALA  = 0B00100000; // default value for HW OVP Fault is 1
+static const uint8_t REG_VALUE_DEFVALA  = 0B00100000; // default value for HW OVP Fault is 1
 static const uint8_t REG_VALUE_DEFVALB  = 0B00000000; //
 
-static const uint8_t REG_VALUE_INTCONA  = 0B00000000;
-static const uint8_t DCP405_REG_VALUE_INTCONA  = 0B00100000; // compare HW OVP Fault value with default value
+static const uint8_t REG_VALUE_INTCONA  = 0B00100000; // compare HW OVP Fault value with default value
 static const uint8_t REG_VALUE_INTCONB  = 0B00000000; //
 
 static const uint8_t REG_VALUE_IOCON    = 0B00100000; // sequential operation disabled, hw addressing disabled
 static const uint8_t REG_VALUE_GPPUA    = 0B00100001; // pull up with 100K
 static const uint8_t REG_VALUE_GPPUB    = 0B00000000; //
 
-static const uint8_t DCP505_REG_VALUE_GPIOA = 0B00100000; // disable OVP
-static const uint8_t DCP505_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
+static const uint8_t REG_VALUE_GPIOA = 0B00000000; //
+static const uint8_t REG_VALUE_GPIOB = 0B00000001; // DP is OFF
 
-static const uint8_t DCP405_REG_VALUE_GPIOA = 0B00000000; //
-static const uint8_t DCP405_REG_VALUE_GPIOB = 0B00000001; // DP is OFF
-
-static const uint8_t DCP405_R3B1_REG_VALUE_GPIOB = 0B00010001; // DP is OFF, OVP is OFF
-
-static const uint8_t DCP405B_REG_VALUE_GPIOA = 0B00000000; //
-static const uint8_t DCP405B_REG_VALUE_GPIOB = 0B00000000; //
+static const uint8_t R3B1_REG_VALUE_GPIOB = 0B00010001; // DP is OFF, OVP is OFF
 
 static const uint8_t REG_VALUES[] = {
-    REG_IODIRA,   DCP505_REG_VALUE_IODIRA, 1,
-    REG_IODIRB,   DCP505_REG_VALUE_IODIRB, 1,
+    REG_IODIRA,   REG_VALUE_IODIRA, 1,
+    REG_IODIRB,   REG_VALUE_IODIRB, 1,
     REG_IPOLA,    REG_VALUE_IPOLA,    1,
     REG_IPOLB,    REG_VALUE_IPOLB,    1,
     REG_GPINTENA, REG_VALUE_GPINTENA, 1,
@@ -110,8 +95,8 @@ static const uint8_t REG_VALUES[] = {
     REG_IOCON,    REG_VALUE_IOCON,    1,
     REG_GPPUA,    REG_VALUE_GPPUA,    1,
     REG_GPPUB,    REG_VALUE_GPPUB,    1,
-    REG_GPIOA,    DCP505_REG_VALUE_GPIOA, 0,
-    REG_GPIOB,    DCP505_REG_VALUE_GPIOB, 0,
+    REG_GPIOA,    REG_VALUE_GPIOA, 0,
+    REG_GPIOB,    REG_VALUE_GPIOB, 0,
 };
 
 static const int REG_IODIRA_INDEX = 0;
@@ -127,40 +112,28 @@ uint8_t IOExpander::getRegValue(int i) {
 
     auto &slot = g_slots[slotIndex];
 
-    if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
-        if (reg == REG_IODIRA) {
-            if (slot.moduleRevision < MODULE_REVISION_DCP405_R2B5) {
-                value = DCP405_REG_VALUE_IODIRA;
-            } else {
-                value = DCP405_R2B5_REG_VALUE_IODIRA;
-            }
-        } else if (reg == REG_IODIRB) {
-            value = DCP405_REG_VALUE_IODIRB;
-        } else if (reg == REG_GPIOA) {
-            value = DCP405_REG_VALUE_GPIOA;
-        } else if (reg == REG_GPIOB) {
-            if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
-                value = DCP405_R3B1_REG_VALUE_GPIOB;
-            } else {
-                value = DCP405_REG_VALUE_GPIOB;
-            }
-        } else if (reg == REG_GPINTENA) {
-            value = DCP405_REG_VALUE_GPINTENA;
-        } else if (reg == REG_DEFVALA) {
-            value = DCP405_REG_VALUE_DEFVALA;
-        } else if (reg == REG_INTCONA) {
-            value = DCP405_REG_VALUE_INTCONA;
+    if (reg == REG_IODIRA) {
+        if (slot.moduleRevision < MODULE_REVISION_DCP405_R2B5) {
+            value = REG_VALUE_IODIRA;
+        } else {
+            value = R2B5_REG_VALUE_IODIRA;
         }
-    } else if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
-        if (reg == REG_IODIRA) {
-            value = DCP405B_REG_VALUE_IODIRA;
-        } else if (reg == REG_IODIRB) {
-            value = DCP405B_REG_VALUE_IODIRB;
-        } else if (reg == REG_GPIOA) {
-            value = DCP405B_REG_VALUE_GPIOA;
-        } else if (reg == REG_GPIOB) {
-            value = DCP405B_REG_VALUE_GPIOB;
+    } else if (reg == REG_IODIRB) {
+        value = REG_VALUE_IODIRB;
+    } else if (reg == REG_GPIOA) {
+        value = REG_VALUE_GPIOA;
+    } else if (reg == REG_GPIOB) {
+        if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
+            value = R3B1_REG_VALUE_GPIOB;
+        } else {
+            value = REG_VALUE_GPIOB;
         }
+    } else if (reg == REG_GPINTENA) {
+        value = REG_VALUE_GPINTENA;
+    } else if (reg == REG_DEFVALA) {
+        value = REG_VALUE_DEFVALA;
+    } else if (reg == REG_INTCONA) {
+        value = REG_VALUE_INTCONA;
     }
 
     return value;
@@ -173,42 +146,23 @@ void IOExpander::init() {
 
     gpioOutputPinsMask = 0;
 
-    if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405) {
-        gpioOutputPinsMask |= 1 << IO_BIT_OUT_DP_ENABLE;
-        gpioOutputPinsMask |= 1 << IO_BIT_OUT_OUTPUT_ENABLE;
-        gpioOutputPinsMask |= 1 << IO_BIT_OUT_REMOTE_SENSE;
-        gpioOutputPinsMask |= 1 << IO_BIT_OUT_REMOTE_PROGRAMMING;
+    gpioOutputPinsMask |= 1 << IO_BIT_OUT_DP_ENABLE;
+    gpioOutputPinsMask |= 1 << IO_BIT_OUT_OUTPUT_ENABLE;
+    gpioOutputPinsMask |= 1 << IO_BIT_OUT_REMOTE_SENSE;
+    gpioOutputPinsMask |= 1 << IO_BIT_OUT_REMOTE_PROGRAMMING;
 
-        if (slot.moduleRevision < MODULE_REVISION_DCP405_R2B5) {
-            gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_50MA;
-            gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_500MA;
-        } else {
-            gpioOutputPinsMask |= 1 << DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA;
-        }
-
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_5A;
-
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OVP_ENABLE;
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED;
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_COUPLED_LED;
-    } else if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
-        gpioOutputPinsMask |= 1 << IO_BIT_OUT_OUTPUT_ENABLE;
-
-        gpioOutputPinsMask |= 1 << DCP405_R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA;
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_CURRENT_RANGE_5A;
-
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_UNCOUPLED_LED;
-        gpioOutputPinsMask |= 1 << DCP405_IO_BIT_OUT_OE_COUPLED_LED;
+    if (slot.moduleRevision < MODULE_REVISION_DCP405_R2B5) {
+        gpioOutputPinsMask |= 1 << IO_BIT_OUT_CURRENT_RANGE_50MA;
+        gpioOutputPinsMask |= 1 << IO_BIT_OUT_CURRENT_RANGE_500MA;
     } else {
-        // DCP505
-        gpioOutputPinsMask |= 1 << IO_BIT_OUT_DP_ENABLE;
-        gpioOutputPinsMask |= 1 << IO_BIT_OUT_OUTPUT_ENABLE;
-        gpioOutputPinsMask |= 1 << IO_BIT_OUT_REMOTE_SENSE;
-        gpioOutputPinsMask |= 1 << IO_BIT_OUT_REMOTE_PROGRAMMING;
-        gpioOutputPinsMask |= 1 << DCP505_IO_BIT_OUT_OVP_ENABLE;
-        gpioOutputPinsMask |= 1 << DCP505_IO_BIT_OUT_OE_UNCOUPLED_LED;
-        gpioOutputPinsMask |= 1 << DCP505_IO_BIT_OUT_OE_COUPLED_LED;
+        gpioOutputPinsMask |= 1 << R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA;
     }
+
+    gpioOutputPinsMask |= 1 << IO_BIT_OUT_CURRENT_RANGE_5A;
+
+    gpioOutputPinsMask |= 1 << IO_BIT_OUT_OVP_ENABLE;
+    gpioOutputPinsMask |= 1 << IO_BIT_OUT_OE_UNCOUPLED_LED;
+    gpioOutputPinsMask |= 1 << IO_BIT_OUT_OE_COUPLED_LED;
 
     const uint8_t N_REGS = sizeof(REG_VALUES) / 3;
     for (int i = 0; i < N_REGS; i++) {
@@ -364,7 +318,7 @@ bool IOExpander::testBit(int io_bit) {
 
     auto &slot = g_slots[slotIndex];
     if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
-        if (io_bit == DCP405_IO_BIT_OUT_OVP_ENABLE) {
+        if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
             result = !result;
         }
     }
@@ -376,7 +330,7 @@ bool IOExpander::isAdcReady() {
 #if defined(EEZ_PLATFORM_STM32)
     // ready = !HAL_GPIO_ReadPin(SPI2_IRQ_GPIO_Port, SPI2_IRQ_Pin);
 	auto &slot = g_slots[slotIndex];
-    return !testBit(slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 || slot.moduleInfo->moduleType == MODULE_TYPE_DCP405B ? DCP405_IO_BIT_IN_ADC_DRDY : DCP505_IO_BIT_IN_ADC_DRDY);
+    return !testBit(IO_BIT_IN_ADC_DRDY);
 #else
     return true;
 #endif
@@ -385,7 +339,7 @@ bool IOExpander::isAdcReady() {
 void IOExpander::changeBit(int io_bit, bool set) {
 	auto &slot = g_slots[slotIndex];
     if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
-        if (io_bit == DCP405_IO_BIT_OUT_OVP_ENABLE) {
+        if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
             set = !set;
         }
     }

@@ -99,15 +99,13 @@ float TempSensor::doRead() {
 		int slotIndex = Channel::get(channelIndex).slotIndex;
 		auto &slot = g_slots[slotIndex];
 
-		if ((slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 && slot.moduleRevision >= MODULE_REVISION_DCP405_R1B1) || slot.moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
-			return drivers::tc77::readTemperature(slotIndex);
-		}
-
-		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 || slot.moduleInfo->moduleType == MODULE_TYPE_DCP505) {
-			return drivers::tmp1075::readTemperature(slotIndex);
-		}
-
-		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220 || slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
+		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+            if (slot.moduleRevision >= MODULE_REVISION_DCP405_R1B1) {
+			    return drivers::tc77::readTemperature(slotIndex);
+            } else {
+                return drivers::tmp1075::readTemperature(slotIndex);
+            }
+		} else if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220 || slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
 			return dcm220::readTemperature(channelIndex);
 		}
 	}

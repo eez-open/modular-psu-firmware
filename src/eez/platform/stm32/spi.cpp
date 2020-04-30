@@ -98,7 +98,7 @@ void select(uint8_t slotIndex, int chip) {
 
 	// __HAL_SPI_ENABLE(spiHandle[slotIndex]);
 
-    if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 || slot.moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
+    if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
     	if (chip == CHIP_DAC) {
 			// 00
     		selectA(slotIndex);
@@ -117,21 +117,6 @@ void select(uint8_t slotIndex, int chip) {
     		deselectA(slotIndex);
     		deselectB(slotIndex);
     	}
-    } else {
-    	if (chip == CHIP_DAC) {
-			// 00
-    		selectA(slotIndex);
-    		selectB(slotIndex);
-		} else if (chip == CHIP_ADC) {
-    		// 01
-    		deselectA(slotIndex);
-    		selectB(slotIndex);
-    	} else {
-    		// IOEXP
-    		// 11
-    		deselectA(slotIndex);
-    		deselectB(slotIndex);
-    	}
     }
 }
 
@@ -139,14 +124,10 @@ void deselect(uint8_t slotIndex) {
 	auto &slot = g_slots[slotIndex];
 	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220 || slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
 		deselectA(slotIndex);
-	} else if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 || slot.moduleInfo->moduleType == MODULE_TYPE_DCP405B) {
+	} else if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
 		// 01 ADC
 		deselectA(slotIndex);
 		selectB(slotIndex);
-	} else {
-		// 10
-		selectA(slotIndex);
-		deselectB(slotIndex);
 	}
 
 	taskEXIT_CRITICAL();

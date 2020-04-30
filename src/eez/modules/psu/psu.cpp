@@ -61,10 +61,10 @@
 #include <eez/modules/mcu/battery.h>
 #include <eez/modules/mcu/eeprom.h>
 
-#include <eez/modules/dcpX05/channel.h>
-#include <eez/modules/dcpX05/ioexp.h>
-#include <eez/modules/dcpX05/dac.h>
-#include <eez/modules/dcpX05/adc.h>
+#include <eez/modules/dcp405/channel.h>
+#include <eez/modules/dcp405/ioexp.h>
+#include <eez/modules/dcp405/dac.h>
+#include <eez/modules/dcp405/adc.h>
 
 #include <eez/modules/bp3c/io_exp.h>
 #include <eez/modules/bp3c/eeprom.h>
@@ -188,7 +188,7 @@ extern "C" void PSU_IncTick() {
     g_tickCount++;
 
     using namespace eez::psu;
-    if (ramp::isActive() || eez::dcpX05::isDacRampActive()) {
+    if (ramp::isActive() || eez::dcp405::isDacRampActive()) {
         osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_TICK, 0), 0);
     }
 }
@@ -250,7 +250,7 @@ void oneIter() {
 
         	ramp::tick(tickCount);
 
-        	dcpX05::tickDacRamp(tickCount);
+        	dcp405::tickDacRamp(tickCount);
 
             if (g_tickCount % 5) {
                 return;

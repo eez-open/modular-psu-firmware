@@ -38,11 +38,6 @@
 //   32-Kbit serial I²C bus EEPROM
 //   https://www.st.com/resource/en/datasheet/cd00001012.pdf
 
-// DCP505:
-//   EEPROM AT24C04D
-//   4-Kbit (512 x 8) I²C-Compatible (2-wire) Serial EEPROM
-//   https://www.st.com/resource/en/datasheet/cd00001012.pdf
-
 namespace eez {
 namespace bp3c {
 namespace eeprom {
