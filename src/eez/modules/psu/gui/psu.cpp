@@ -1277,7 +1277,7 @@ void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)()) {
                 errorMessageWithAction(value, changeCurrentLimit, "Change current limit", iChannel);
                 return;
             }
-        } else if (value.getScpiError() == SCPI_ERROR_POWER_LIMIT_EXCEEDED) {
+        } else if (value.getScpiError() == SCPI_ERROR_POWER_LIMIT_EXCEEDED || value.getScpiError() == SCPI_ERROR_MODULE_TOTAL_POWER_LIMIT_EXCEEDED) {
             if (channel_dispatcher::getPowerLimit(channel) < channel_dispatcher::getPowerMaxLimit(channel)) {
                 if (ok_callback) {
                     ok_callback();

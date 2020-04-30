@@ -210,9 +210,10 @@ int checkLimits(int iChannel) {
             return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
         }
 
-        if (channel.isPowerLimitExceeded(voltage, current)) {
+        int err;
+        if (channel.isPowerLimitExceeded(voltage, current, &err)) {
             g_errorChannelIndex = channel.channelIndex;
-            return SCPI_ERROR_POWER_LIMIT_EXCEEDED;
+            return err;
         }
     }
 
@@ -561,9 +562,8 @@ bool setListValue(Channel &channel, int16_t it, int *err) {
         return false;
     }
 
-    if (channel.isPowerLimitExceeded(voltage, current)) {
+    if (channel.isPowerLimitExceeded(voltage, current, err)) {
         g_errorChannelIndex = channel.channelIndex;
-        *err = SCPI_ERROR_POWER_LIMIT_EXCEEDED;
         return false;
     }
 

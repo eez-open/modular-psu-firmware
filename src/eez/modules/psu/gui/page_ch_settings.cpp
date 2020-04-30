@@ -1426,23 +1426,26 @@ int ChSettingsCalibrationEditPage::getDirty() {
 
 void ChSettingsCalibrationEditPage::onSetRemarkOk(char *remark) {
     calibration::setRemark(remark, strlen(remark));
+    
     popPage();
 
-    int16_t scpiErr;
-    if (calibration::canSave(scpiErr)) {
-        if (calibration::save()) {
-            popPage();
-            infoMessage("Calibration data saved!");
-        } else {
-            errorMessage("Save failed!");
-        }
+    if (calibration::save()) {
+        popPage();
+        infoMessage("Calibration data saved!");
     } else {
-        generateError(scpiErr);
+        errorMessage("Save failed!");
     }
 }
 
 void ChSettingsCalibrationEditPage::set() {
-    Keypad::startPush("Remark: ", 0, 0, CALIBRATION_REMARK_MAX_LENGTH, false, onSetRemarkOk, popPage);
+    int16_t scpiErr;
+    int16_t uiErr;
+    bool result = calibration::canSave(scpiErr, &uiErr);
+    if (result || uiErr == SCPI_ERROR_CALIBRATION_REMARK_NOT_SET) {
+        Keypad::startPush("Remark: ", calibration::getRemark(), 0, CALIBRATION_REMARK_MAX_LENGTH, false, onSetRemarkOk, popPage);
+    } else {
+        generateError(uiErr);
+    }
 }
 
 void ChSettingsCalibrationEditPage::zoomChart() {

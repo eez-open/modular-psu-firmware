@@ -247,9 +247,10 @@ int checkTrigger() {
                     return SCPI_ERROR_CURRENT_LIMIT_EXCEEDED;
                 }
 
-                if (channel.isPowerLimitExceeded(channel.u.triggerLevel, channel.i.triggerLevel)) {
+                int err;
+                if (channel.isPowerLimitExceeded(channel.u.triggerLevel, channel.i.triggerLevel, &err)) {
                     g_errorChannelIndex = channel.channelIndex;
-                    return SCPI_ERROR_POWER_LIMIT_EXCEEDED;
+                    return err;
                 }
             }
 

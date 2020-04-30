@@ -26,6 +26,8 @@
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/dlog_record.h>
 
+#include <scpi/scpi.h>
+
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4200)
@@ -99,8 +101,9 @@ mp_obj_t modeez_setU(mp_obj_t channelIndexObj, mp_obj_t value) {
         mp_raise_ValueError("Voltage limit exceeded");
     }
 
-    if (channel.isPowerLimitExceeded(voltage, channel_dispatcher::getISetUnbalanced(channel))) {
-        mp_raise_ValueError("Power limit exceeded");
+    int err;
+    if (channel.isPowerLimitExceeded(voltage, channel_dispatcher::getISetUnbalanced(channel), &err)) {
+        mp_raise_ValueError(SCPI_ErrorTranslate(err));
     }
 
     channel_dispatcher::setVoltage(channel, voltage);
@@ -135,8 +138,9 @@ mp_obj_t modeez_setI(mp_obj_t channelIndexObj, mp_obj_t value) {
         mp_raise_ValueError("Current limit exceeded");
     }
 
-    if (channel.isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(channel), current)) {
-        mp_raise_ValueError("Power limit exceeded");
+    int err;
+    if (channel.isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(channel), current, &err)) {
+        mp_raise_ValueError(SCPI_ErrorTranslate(err));
     }
 
     channel_dispatcher::setCurrent(channel, current);

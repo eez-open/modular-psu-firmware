@@ -313,6 +313,11 @@ void setRemark(const char *value, size_t len) {
 }
 
 static bool checkCalibrationValue(calibration::Value &calibrationValue, int16_t &scpiErr) {
+    if (calibrationValue.configuration.numPoints < 2) {
+        scpiErr = SCPI_ERROR_INVALID_CAL_DATA;
+        return false;
+    }
+
     if (!calibrationValue.checkPoints()) {
         scpiErr = SCPI_ERROR_INVALID_CAL_DATA;
         return false;
@@ -327,6 +332,7 @@ bool isCalibrated(Value &value) {
             return false;
         }
     }
+
     return true;
 }
 

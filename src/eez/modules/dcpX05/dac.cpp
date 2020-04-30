@@ -141,7 +141,7 @@ void DigitalAnalogConverter::setVoltage(float value, RampOption rampOption) {
     Channel &channel = Channel::getBySlotIndex(slotIndex);
 
 #if defined(EEZ_PLATFORM_STM32)
-    set(DATA_BUFFER_B, remap(value, channel.params.U_MIN, (float)DAC_MIN, channel.params.U_MAX, (float)DAC_MAX), rampOption);
+    set(DATA_BUFFER_B, clamp(remap(value, channel.params.U_MIN, (float)DAC_MIN, channel.params.U_MAX, (float)DAC_MAX), (float)DAC_MIN, (float)DAC_MAX), rampOption);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -164,7 +164,7 @@ void DigitalAnalogConverter::setCurrent(float value) {
     Channel &channel = Channel::getBySlotIndex(slotIndex);
 
 #if defined(EEZ_PLATFORM_STM32)
-    set(DATA_BUFFER_A, remap(value, channel.params.I_MIN, (float)DAC_MIN, channel.getDualRangeMax(), (float)DAC_MAX));
+    set(DATA_BUFFER_A, clamp(remap(value, channel.params.I_MIN, (float)DAC_MIN, channel.getDualRangeMax(), (float)DAC_MAX), (float)DAC_MIN, (float)DAC_MAX));
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

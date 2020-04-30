@@ -830,9 +830,15 @@ struct Channel : ChannelInterface {
 		stepValues->unit = UNIT_WATT;
 	}	
 
-	bool isPowerLimitExceeded(int subchannelIndex, float u, float i) {
+	bool isPowerLimitExceeded(int subchannelIndex, float u, float i, int *err) {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, 0);
-		return u * i > channel_dispatcher::getPowerLimit(channel);
+		if (u * i > channel_dispatcher::getPowerLimit(channel)) {
+			if (err) {
+				*err = SCPI_ERROR_POWER_LIMIT_EXCEEDED;
+			}
+			return true;
+		}
+		return false;
 	}
 };
 

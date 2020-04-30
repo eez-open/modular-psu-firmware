@@ -203,11 +203,11 @@ struct Channel : ChannelInterface {
 		params.U_CAL_POINTS = U_CAL_POINTS;
 		params.U_CAL_I_SET = 1.0f;
 
-		params.I_MIN = 0.25f;
+		params.I_MIN = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 0.0f : 0.25f;
 		params.I_DEF = 0.0f;
 		params.I_MAX = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 4.9f : 4.0f;
 
-    	params.I_MON_MIN = 0.25f;
+    	params.I_MON_MIN = slot.moduleInfo->moduleType == MODULE_TYPE_DCM224 ? 0.0f : 0.25f;
 
 		params.I_MIN_STEP = 0.01f;
 		params.I_DEF_STEP = 0.01f;
@@ -621,16 +621,22 @@ struct Channel : ChannelInterface {
 		stepValues->unit = UNIT_WATT;
 	}
 	
-	bool isPowerLimitExceeded(int subchannelIndex, float u, float i) {
+	bool isPowerLimitExceeded(int subchannelIndex, float u, float i, int *err) {
 		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
 		float power = u * i;
 		if (power > channel_dispatcher::getPowerLimit(channel)) {
+			if (err) {
+				*err = SCPI_ERROR_POWER_LIMIT_EXCEEDED;
+			}
 			return true;
 		}
 
 		psu::Channel &otherChannel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex == 0 ? 1 : 0);
 		float powerOtherChannel = channel_dispatcher::getUSet(otherChannel) * channel_dispatcher::getISet(otherChannel);
 		if (power + powerOtherChannel > PTOT) {
+			if (err) {
+				*err = SCPI_ERROR_MODULE_TOTAL_POWER_LIMIT_EXCEEDED;
+			}
 			return true;
 		}
 

@@ -161,8 +161,9 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitude(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel->isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(*channel), current)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_POWER_LIMIT_EXCEEDED);
+    int err;
+    if (channel->isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(*channel), current, &err)) {
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
@@ -210,8 +211,9 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitude(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel->isPowerLimitExceeded(voltage, channel_dispatcher::getISetUnbalanced(*channel))) {
-        SCPI_ErrorPush(context, SCPI_ERROR_POWER_LIMIT_EXCEEDED);
+    int err;
+    if (channel->isPowerLimitExceeded(voltage, channel_dispatcher::getISetUnbalanced(*channel), &err)) {
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
@@ -961,8 +963,9 @@ scpi_result_t scpi_cmd_sourceListCurrentLevel(scpi_t *context) {
         }
 
         if (voltageListLength > 0) {
-            if (current * voltageList[i % voltageListLength] > channel_dispatcher::getPowerMaxLimit(*channel)) {
-                SCPI_ErrorPush(context, SCPI_ERROR_POWER_LIMIT_EXCEEDED);
+            int err;
+            if (channel->isPowerLimitExceeded(voltageList[i % voltageListLength], current, &err)) {
+                SCPI_ErrorPush(context, err);
                 return SCPI_RES_ERR;
             }
         }
@@ -1092,8 +1095,9 @@ scpi_result_t scpi_cmd_sourceListVoltageLevel(scpi_t *context) {
         }
 
         if (currentListLength > 0) {
-            if (voltage * currentList[i % currentListLength] > channel_dispatcher::getPowerMaxLimit(*channel)) {
-                SCPI_ErrorPush(context, SCPI_ERROR_POWER_LIMIT_EXCEEDED);
+            int err;
+            if (channel->isPowerLimitExceeded(voltage, currentList[i % currentListLength], &err)) {
+                SCPI_ErrorPush(context, err);
                 return SCPI_RES_ERR;
             }
         }

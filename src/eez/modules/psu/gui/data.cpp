@@ -1211,14 +1211,15 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
         channel.getVoltageStepValues(value.getStepValues());
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
+        int err;
         if (!channel.isVoltageWithinRange(value.getFloat())) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
         } else if (channel.isVoltageLimitExceeded(value.getFloat())) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
-        } else if (channel.isPowerLimitExceeded(value.getFloat(), channel_dispatcher::getISetUnbalanced(channel))) {
+        } else if (channel.isPowerLimitExceeded(value.getFloat(), channel_dispatcher::getISetUnbalanced(channel), &err)) {
             g_errorChannelIndex = channel.channelIndex;
-            value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
+            value = MakeScpiErrorValue(err);
         } else {
             channel_dispatcher::setVoltage(channel, value.getFloat());
         }
@@ -1324,14 +1325,15 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
         channel.getCurrentStepValues(value.getStepValues());
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
+        int err;
         if (!channel.isCurrentWithinRange(value.getFloat())) {
             value = MakeScpiErrorValue(SCPI_ERROR_DATA_OUT_OF_RANGE);
         } else if (channel.isCurrentLimitExceeded(value.getFloat())) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
-        } else if (channel.isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(channel), value.getFloat())) {
+        } else if (channel.isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(channel), value.getFloat(), &err)) {
             g_errorChannelIndex = channel.channelIndex;
-            value = MakeScpiErrorValue(SCPI_ERROR_POWER_LIMIT_EXCEEDED);
+            value = MakeScpiErrorValue(err);
         } else {
             channel_dispatcher::setCurrent(channel, value.getFloat());
         }

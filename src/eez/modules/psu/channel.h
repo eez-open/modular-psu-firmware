@@ -485,8 +485,8 @@ class Channel {
     bool isCurrentWithinRange(float i);
     bool isCurrentLimitExceeded(float i);
 
-    bool isPowerLimitExceeded(float u, float i) {
-        return channelInterface->isPowerLimitExceeded(subchannelIndex, u, i);
+    bool isPowerLimitExceeded(float u, float i, int *err) {
+        return channelInterface->isPowerLimitExceeded(subchannelIndex, u, i, err);
     }
 
     bool isVoltageBalanced();
