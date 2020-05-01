@@ -653,7 +653,13 @@ struct Channel : ChannelInterface {
 static Channel g_channel0(0);
 static Channel g_channel1(1);
 static Channel g_channel2(2);
-ChannelInterface *g_channelInterfaces[NUM_SLOTS] = { &g_channel0, &g_channel1, &g_channel2 };
+static ChannelInterface *g_channelInterfaces[NUM_SLOTS] = { &g_channel0, &g_channel1, &g_channel2 };
+
+static PsuChannelModuleInfo g_dcm220PsuChannelModuleInfo(MODULE_TYPE_DCM220, "DCM220", MODULE_REVISION_DCM220_R2B4, 2, g_channelInterfaces);
+static PsuChannelModuleInfo g_dcm224PsuChannelModuleInfo(MODULE_TYPE_DCM224, "DCM224", MODULE_REVISION_DCM224_R1B1, 2, g_channelInterfaces);
+
+ModuleInfo *g_dcm220ModuleInfo = &g_dcm220PsuChannelModuleInfo;
+ModuleInfo *g_dcm224ModuleInfo = &g_dcm224PsuChannelModuleInfo;
 
 #if defined(EEZ_PLATFORM_STM32)
 

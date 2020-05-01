@@ -18,130 +18,44 @@
 
 #include <eez/index.h>
 
-#if OPTION_ETHERNET
-#include <eez/modules/mcu/ethernet.h>
-#endif
-
 #include <eez/modules/dcp405/channel.h>
 #include <eez/modules/dcm220/channel.h>
 
-#include <eez/modules/psu/psu.h>
-
 namespace eez {
 
-////////////////////////////////////////////////////////////////////////////////
-
-ChannelInterface::ChannelInterface(int slotIndex_) 
-    : slotIndex(slotIndex_) 
+ModuleInfo::ModuleInfo(uint16_t moduleType_, uint16_t moduleCategory_, const char *moduleName_, uint16_t latestModuleRevision_)
+    : moduleType(moduleType_)
+    , moduleCategory(moduleCategory_)
+    , moduleName(moduleName_)
+    , latestModuleRevision(latestModuleRevision_)
 {
 }
 
-unsigned ChannelInterface::getRPol(int subchannelIndex) {
-    return 0;
-}
-
-void ChannelInterface::setRemoteSense(int subchannelIndex, bool enable) {
-}
-
-void ChannelInterface::setRemoteProgramming(int subchannelIndex, bool enable) {
-}
-
-void ChannelInterface::setCurrentRange(int subchannelIndex) {
-}
-
-bool ChannelInterface::isVoltageBalanced(int subchannelIndex) {
-	return false;
-}
-
-bool ChannelInterface::isCurrentBalanced(int subchannelIndex) {
-	return false;
-}
-
-float ChannelInterface::getUSetUnbalanced(int subchannelIndex) {
-    psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-    return channel.u.set;
-}
-
-float ChannelInterface::getISetUnbalanced(int subchannelIndex) {
-    psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-    return channel.i.set;
-}
-
-void ChannelInterface::readAllRegisters(int subchannelIndex, uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
-}
-
-void ChannelInterface::onSpiIrq() {
-}
-
-#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
-int ChannelInterface::getIoExpBitDirection(int subchannelIndex, int io_bit) {
-	return 0;
-}
-
-bool ChannelInterface::testIoExpBit(int subchannelIndex, int io_bit) {
-	return false;
-}
-
-void ChannelInterface::changeIoExpBit(int subchannelIndex, int io_bit, bool set) {
-}
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 
-static ModuleInfo g_modules[] = {
-    { 
-        MODULE_TYPE_NONE,
-        "None",
-        0,
-        1,
-        nullptr
-    },
-    {
-        MODULE_TYPE_DCP405,
-        "DCP405",
-        MODULE_REVISION_DCP405_R2B7,
-        1,
-        dcp405::g_channelInterfaces
-    },
-    {
-        MODULE_TYPE_DCM220, 
-        "DCM220",
-        MODULE_REVISION_DCM220_R2B4,
-        2,
-        dcm220::g_channelInterfaces
-    },
-    {
-        MODULE_TYPE_DCM224, 
-        "DCM224",
-        MODULE_REVISION_DCM224_R1B1,
-        2,
-        dcm220::g_channelInterfaces
-    }
+ModuleInfo noneModuleInfo(MODULE_TYPE_NONE, MODULE_CATEGORY_NONE, "None", 0);
+
+static ModuleInfo *g_modules[] = {
+    dcp405::g_moduleInfo,
+    dcm220::g_dcm220ModuleInfo,
+    dcm220::g_dcm224ModuleInfo
 };
 
 ModuleInfo *getModuleInfo(uint16_t moduleType) {
-    for (size_t i = 0; i < sizeof(g_modules) / sizeof(ModuleInfo); i++) {
-        if (g_modules[i].moduleType == moduleType) {
-            return &g_modules[i];
+    for (unsigned int i = 0; i < sizeof(g_modules) / sizeof(ModuleInfo *); i++) {
+        if (g_modules[i]->moduleType == moduleType) {
+            return g_modules[i];
         }
     }
-    return &g_modules[0];
+    return &noneModuleInfo;
 }
 
 SlotInfo g_slots[NUM_SLOTS + 1] = {
-    {
-        &g_modules[0]
-    },
-    {
-        &g_modules[0]
-    },
-    {
-        &g_modules[0]
-    },
+    { &noneModuleInfo },
+    { &noneModuleInfo },
+    { &noneModuleInfo },
     // invalid slot
-    {
-        &g_modules[0]
-    }
+    { &noneModuleInfo }
 };
 
 } // namespace eez

@@ -170,7 +170,8 @@ void initDefaultDevConf() {
     // block 6
     g_defaultDevConf.displayState = 1;
     g_defaultDevConf.channelsViewMode = 0;
-    g_defaultDevConf.maxChannel = 0;
+    g_defaultDevConf.maxSlotIndex = 0;
+    g_defaultDevConf.maxSubchannelIndex = 0;
     g_defaultDevConf.channelsViewModeInMax = 0;
 
     g_defaultDevConf.ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCROLL;
@@ -668,52 +669,60 @@ void setChannelsViewModeInMax(unsigned int channelsViewModeInMax) {
 }
 
 void toggleChannelsViewMode() {
-    if (isMaxChannelView()) {
+    if (isMaxView()) {
         setChannelsViewModeInMax(g_devConf.channelsViewModeInMax + 1);
     } else {
         setChannelsViewMode(g_devConf.channelsViewMode + 1);
     }
 }
 
-bool isMaxChannelView() {
-    return getMaxChannelIndex() >= 0;
+bool isMaxView() {
+    return getMaxSlotIndex() >= 0;
+}
+
+int getMaxSlotIndex() {
+    return g_devConf.maxSlotIndex - 1;
+}
+
+int getMin1SlotIndex() {
+    if (getMaxSlotIndex() == 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+int getMin2SlotIndex() {
+    if (getMaxSlotIndex() == 2) {
+        return 1;
+    } else {
+        return 2;
+    }
 }
 
 int getMaxChannelIndex() {
-    int channelIndex = g_devConf.maxChannel - 1;
-    if (channelIndex < CH_NUM) {
-        return channelIndex;
-    }
-    return -1;
+    return Channel::getBySlotIndex(getMaxSlotIndex()).channelIndex + g_devConf.maxSubchannelIndex;
 }
 
 int getMin1ChannelIndex() {
-    int maxChannelSlotIndex = Channel::get(getMaxChannelIndex()).slotIndex;
-    if (maxChannelSlotIndex == 0) {
-        return Channel::getBySlotIndex(1).channelIndex;
-    } else {
-        return Channel::getBySlotIndex(0).channelIndex;
-    }
+    return Channel::getBySlotIndex(getMin1SlotIndex()).channelIndex;
 }
 
 int getMin2ChannelIndex() {
-    int maxChannelSlotIndex = Channel::get(getMaxChannelIndex()).slotIndex;
-    if (maxChannelSlotIndex == 2) {
-        return Channel::getBySlotIndex(1).channelIndex;
-    } else {
-        return Channel::getBySlotIndex(2).channelIndex;
-    }
+    return Channel::getBySlotIndex(getMin2SlotIndex()).channelIndex;
 }
 
 void setMaxChannelIndex(int channelIndex) {
-    g_devConf.maxChannel = channelIndex + 1;
+    auto &channel = Channel::get(channelIndex);
+    g_devConf.maxSlotIndex = channel.slotIndex + 1;
+    g_devConf.maxSubchannelIndex = channel.subchannelIndex;
 }
 
 void toggleMaxChannelIndex(int channelIndex) {
-    if (isMaxChannelView() && channelIndex == getMaxChannelIndex()) {
-        g_devConf.maxChannel = 0;
+    if (isMaxView() && channelIndex == getMaxChannelIndex()) {
+        g_devConf.maxSlotIndex = 0;
     } else {
-        g_devConf.maxChannel = channelIndex + 1;
+        setMaxChannelIndex(channelIndex);
     }
 }
 

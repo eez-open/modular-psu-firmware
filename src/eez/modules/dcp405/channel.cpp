@@ -430,8 +430,6 @@ struct Channel : ChannelInterface {
 	}
 
 	void setDpEnable(bool enable) {
-		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-
 		// DP bit is active low
 		ioexp.changeBit(IOExpander::IO_BIT_OUT_DP_ENABLE, !enable);
 
@@ -815,6 +813,10 @@ static Channel g_channel0(0);
 static Channel g_channel1(1);
 static Channel g_channel2(2);
 ChannelInterface *g_channelInterfaces[NUM_SLOTS] = { &g_channel0, &g_channel1, &g_channel2 };
+
+static PsuChannelModuleInfo g_psuChannelModuleInfo(MODULE_TYPE_DCP405, "DCP405", MODULE_REVISION_DCP405_R2B7, 1, g_channelInterfaces);
+
+ModuleInfo *g_moduleInfo = &g_psuChannelModuleInfo;
 
 bool isDacRampActive() {
 	return g_channel0.dac.m_isRampActive || g_channel1.dac.m_isRampActive || g_channel2.dac.m_isRampActive;

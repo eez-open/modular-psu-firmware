@@ -88,6 +88,8 @@ enum {
 
 bool measureAllAdcValuesOnChannel(int channelIndex);
 
+void enumChannels();
+
 void initChannels();
 bool testChannels();
 

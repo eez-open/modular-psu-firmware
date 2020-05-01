@@ -172,7 +172,8 @@ struct DeviceConfiguration {
 
     unsigned displayState : 1; // 0: display is OFF, 1: display is ON
     unsigned channelsViewMode : 3;
-    unsigned maxChannel : 3; // 0: default view, 1: Ch1 maxed, 2: Ch2 maxed, ...
+    unsigned maxSlotIndex : 2; // 0: default view, 1: slot 1 maxed, 2: slot 2 maxed, 3: slot 3 maxed
+    unsigned maxSubchannelIndex : 1; // 
     unsigned channelsViewModeInMax : 3;
     unsigned isInhibitedByUser : 1;
 
@@ -244,7 +245,10 @@ void setChannelsViewModeInMax(unsigned int viewModeInMax);
 
 void toggleChannelsViewMode();
 
-bool isMaxChannelView();
+bool isMaxView();
+int getMaxSlotIndex();
+int getMin1SlotIndex();
+int getMin2SlotIndex();
 int getMaxChannelIndex();
 int getMin1ChannelIndex();
 int getMin2ChannelIndex();

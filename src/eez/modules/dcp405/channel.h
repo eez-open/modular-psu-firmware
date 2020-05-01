@@ -23,7 +23,7 @@
 namespace eez {
 namespace dcp405 {
 
-extern ChannelInterface *g_channelInterfaces[NUM_SLOTS];
+extern ModuleInfo *g_moduleInfo;
 
 bool isDacRampActive();
 void tickDacRamp(uint32_t tickCount);

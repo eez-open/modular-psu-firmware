@@ -49,6 +49,72 @@ namespace psu {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+PsuChannelModuleInfo::PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision, uint8_t numChannels_, ChannelInterface **channelInterfaces_)
+    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, latestModuleRevision)
+    , numChannels(numChannels_)
+    , channelInterfaces(channelInterfaces_)
+{
+}
+    
+////////////////////////////////////////////////////////////////////////////////
+
+ChannelInterface::ChannelInterface(int slotIndex_) 
+    : slotIndex(slotIndex_) 
+{
+}
+
+unsigned ChannelInterface::getRPol(int subchannelIndex) {
+    return 0;
+}
+
+void ChannelInterface::setRemoteSense(int subchannelIndex, bool enable) {
+}
+
+void ChannelInterface::setRemoteProgramming(int subchannelIndex, bool enable) {
+}
+
+void ChannelInterface::setCurrentRange(int subchannelIndex) {
+}
+
+bool ChannelInterface::isVoltageBalanced(int subchannelIndex) {
+	return false;
+}
+
+bool ChannelInterface::isCurrentBalanced(int subchannelIndex) {
+	return false;
+}
+
+float ChannelInterface::getUSetUnbalanced(int subchannelIndex) {
+    psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    return channel.u.set;
+}
+
+float ChannelInterface::getISetUnbalanced(int subchannelIndex) {
+    psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    return channel.i.set;
+}
+
+void ChannelInterface::readAllRegisters(int subchannelIndex, uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
+}
+
+void ChannelInterface::onSpiIrq() {
+}
+
+#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
+int ChannelInterface::getIoExpBitDirection(int subchannelIndex, int io_bit) {
+	return 0;
+}
+
+bool ChannelInterface::testIoExpBit(int subchannelIndex, int io_bit) {
+	return false;
+}
+
+void ChannelInterface::changeIoExpBit(int subchannelIndex, int io_bit, bool set) {
+}
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+
 int CH_NUM = 0;
 Channel Channel::g_channels[CH_MAX];
 
@@ -390,7 +456,8 @@ void Channel::set(uint8_t slotIndex_, uint8_t subchannelIndex_) {
 	slotIndex = slotIndex_;
     subchannelIndex = subchannelIndex_;
 
-    channelInterface = slot.moduleInfo->channelInterfaces ? slot.moduleInfo->channelInterfaces[slotIndex] : nullptr;
+    auto psuChannelModuleInfo = (PsuChannelModuleInfo *)slot.moduleInfo;
+    channelInterface = psuChannelModuleInfo->channelInterfaces[slotIndex];
 
     if (!channelInterface) {
         return;

@@ -244,17 +244,17 @@
       "defaultValue": "slot_min_1ch_off"
     },
     {
-      "name": "slot_micro1_view",
+      "name": "slot1_micro_view",
       "type": "string",
       "defaultValue": "slot_micro_1ch_on"
     },
     {
-      "name": "slot_micro2_view",
+      "name": "slot2_micro_view",
       "type": "string",
       "defaultValue": "slot_micro_1ch_off"
     },
     {
-      "name": "slot_micro3_view",
+      "name": "slot3_micro_view",
       "type": "string",
       "defaultValue": "slot_micro_2ch"
     },
@@ -1437,17 +1437,17 @@
       "defaultValue": "2"
     },
     {
-      "name": "slot_default1_view",
+      "name": "slot1_default_view",
       "type": "string",
       "defaultValue": "slot_def_1ch_num_on"
     },
     {
-      "name": "slot_default2_view",
+      "name": "slot2_default_view",
       "type": "string",
       "defaultValue": "slot_def_1ch_vbar_on"
     },
     {
-      "name": "slot_default3_view",
+      "name": "slot3_default_view",
       "type": "string",
       "defaultValue": "slot_def_1ch_vert_off"
     },
@@ -27191,7 +27191,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_micro1_view",
+            "data": "slot1_micro_view",
             "left": 0,
             "top": 0,
             "width": 160,
@@ -27203,7 +27203,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_micro2_view",
+            "data": "slot2_micro_view",
             "left": 160,
             "top": 0,
             "width": 160,
@@ -27215,7 +27215,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_micro3_view",
+            "data": "slot3_micro_view",
             "left": 320,
             "top": 0,
             "width": 160,
@@ -27236,7 +27236,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_default1_view",
+            "data": "slot1_default_view",
             "left": 0,
             "top": 0,
             "width": 160,
@@ -27249,7 +27249,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_default2_view",
+            "data": "slot2_default_view",
             "left": 160,
             "top": 0,
             "width": 160,
@@ -27262,7 +27262,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_default3_view",
+            "data": "slot3_default_view",
             "left": 320,
             "top": 0,
             "width": 160,
@@ -29267,7 +29267,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_default1_view",
+            "data": "slot1_default_view",
             "left": 0,
             "top": 0,
             "width": 480,
@@ -29280,7 +29280,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_default2_view",
+            "data": "slot2_default_view",
             "left": 0,
             "top": 80,
             "width": 480,
@@ -29293,7 +29293,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_default3_view",
+            "data": "slot3_default_view",
             "left": 0,
             "top": 160,
             "width": 480,
@@ -45261,17 +45261,6 @@
         "color": "Action color",
         "activeBackgroundColor": "Action color",
         "padding": 0
-      },
-      {
-        "name": "option_toggle_L",
-        "inheritFrom": "default",
-        "font": "Oswald24",
-        "alignHorizontal": "left",
-        "alignVertical": "center",
-        "color": "Action color",
-        "backgroundColor": "text_enable_background",
-        "activeColor": "text_enable_background",
-        "activeBackgroundColor": "Action color"
       },
       {
         "id": 5,

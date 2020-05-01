@@ -23,7 +23,8 @@
 namespace eez {
 namespace dcm220 {
 
-extern ChannelInterface *g_channelInterfaces[NUM_SLOTS];
+extern ModuleInfo *g_dcm220ModuleInfo;
+extern ModuleInfo *g_dcm224ModuleInfo;
 
 #if defined(EEZ_PLATFORM_STM32)
 float readTemperature(int channelIndex);

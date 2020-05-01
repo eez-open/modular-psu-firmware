@@ -31,9 +31,9 @@ enum DataEnum {
     DATA_ID_SLOT_MIN1_VIEW = 29,
     DATA_ID_SLOT_MIN2_CHANNEL_INDEX = 30,
     DATA_ID_SLOT_MIN2_VIEW = 31,
-    DATA_ID_SLOT_MICRO1_VIEW = 32,
-    DATA_ID_SLOT_MICRO2_VIEW = 33,
-    DATA_ID_SLOT_MICRO3_VIEW = 34,
+    DATA_ID_SLOT1_MICRO_VIEW = 32,
+    DATA_ID_SLOT2_MICRO_VIEW = 33,
+    DATA_ID_SLOT3_MICRO_VIEW = 34,
     DATA_ID_CHANNEL_DISPLAY_VALUE1 = 35,
     DATA_ID_CHANNEL_DISPLAY_VALUE2 = 36,
     DATA_ID_OVP = 37,
@@ -234,9 +234,9 @@ enum DataEnum {
     DATA_ID_SLOT1_TEST_RESULT = 232,
     DATA_ID_SLOT2_TEST_RESULT = 233,
     DATA_ID_SLOT3_TEST_RESULT = 234,
-    DATA_ID_SLOT_DEFAULT1_VIEW = 235,
-    DATA_ID_SLOT_DEFAULT2_VIEW = 236,
-    DATA_ID_SLOT_DEFAULT3_VIEW = 237,
+    DATA_ID_SLOT1_DEFAULT_VIEW = 235,
+    DATA_ID_SLOT2_DEFAULT_VIEW = 236,
+    DATA_ID_SLOT3_DEFAULT_VIEW = 237,
     DATA_ID_SLOT1_CHANNEL_INDEX = 238,
     DATA_ID_SLOT2_CHANNEL_INDEX = 239,
     DATA_ID_SLOT3_CHANNEL_INDEX = 240,
@@ -442,9 +442,9 @@ void data_slot_min1_channel_index(DataOperationEnum operation, Cursor cursor, Va
 void data_slot_min1_view(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot_min2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot_min2_view(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_slot_micro1_view(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_slot_micro2_view(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_slot_micro3_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot1_micro_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot2_micro_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot3_micro_view(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channel_display_value1(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channel_display_value2(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_ovp(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -645,9 +645,9 @@ void data_slot3_info(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot1_test_result(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot2_test_result(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot3_test_result(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_slot_default1_view(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_slot_default2_view(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_slot_default3_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot1_default_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot2_default_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot3_default_view(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot3_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);

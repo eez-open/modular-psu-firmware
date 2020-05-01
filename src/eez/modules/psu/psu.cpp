@@ -265,12 +265,12 @@ void oneIter() {
             } else if (type == PSU_QUEUE_MESSAGE_TYPE_TEST) {
                 test();
             } else if (type == PSU_QUEUE_MESSAGE_SPI_IRQ) {
-                auto channelInterface = eez::psu::Channel::getBySlotIndex(param).channelInterface;
+                auto channelInterface = Channel::getBySlotIndex(param).channelInterface;
                 if (channelInterface) {
                     channelInterface->onSpiIrq();
                 }
             } else if (type == PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL) {
-                eez::psu::Channel::get(param).adcMeasureAll();
+                Channel::get(param).adcMeasureAll();
                 g_adcMeasureAllFinished = true;
             } else if (type == PSU_QUEUE_TRIGGER_START_IMMEDIATELY) {
                 trigger::startImmediatelyInPsuThread();
@@ -315,7 +315,7 @@ bool measureAllAdcValuesOnChannel(int channelIndex) {
 	}
 
     g_adcMeasureAllFinished = false;
-    osMessagePut(eez::psu::g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL, channelIndex), 0);
+    osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL, channelIndex), 0);
 
     int i;
     for (i = 0; i < 100 && !g_adcMeasureAllFinished; ++i) {
@@ -326,6 +326,26 @@ bool measureAllAdcValuesOnChannel(int channelIndex) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+void enumChannels() {
+    CH_NUM = 0;
+
+    for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        auto& slot = g_slots[slotIndex];
+        if (slot.moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
+            auto psuChannelModuleInfo = (PsuChannelModuleInfo *)slot.moduleInfo;
+
+            slot.channelIndex = CH_NUM;
+
+            for (uint8_t subchannelIndex = 0; subchannelIndex < psuChannelModuleInfo->numChannels; subchannelIndex++) {
+                Channel::get(CH_NUM++).set(slotIndex, subchannelIndex);
+            }
+
+            persist_conf::loadModuleConf(slotIndex);
+            ontime::g_moduleCounters[slotIndex].init();
+        }
+    }
+}
 
 void initChannels() {
     for (int i = 0; i < CH_NUM; ++i) {

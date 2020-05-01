@@ -622,14 +622,14 @@ void action_toggle_channels_max_view() {
         persist_conf::setMaxChannelIndex(g_channel->channelIndex);
         animateFromMicroViewToMaxView();
     } else {
-        auto isMaxChannelViewBefore = persist_conf::isMaxChannelView();
+        auto isMaxViewBefore = persist_conf::isMaxView();
         auto maxChannelIndexBefore = persist_conf::getMaxChannelIndex();
 
         persist_conf::toggleMaxChannelIndex(g_channel->channelIndex);
         
-        if (!isMaxChannelViewBefore && persist_conf::isMaxChannelView()) {
+        if (!isMaxViewBefore && persist_conf::isMaxView()) {
             animateFromDefaultViewToMaxView();
-        } else if (isMaxChannelViewBefore && !persist_conf::isMaxChannelView()) {
+        } else if (isMaxViewBefore && !persist_conf::isMaxView()) {
             animateFromMaxViewToDefaultView();
         } else {
             animateFromMinViewToMaxView(maxChannelIndexBefore);
@@ -1122,7 +1122,7 @@ void action_user_switch_clicked() {
             action_show_previous_page();
         } else if (getActivePageId() != PAGE_ID_MAIN) {
             showMainPage();
-        } else if (persist_conf::isMaxChannelView()) {
+        } else if (persist_conf::isMaxView()) {
             action_toggle_channels_max_view();
         }
         break;

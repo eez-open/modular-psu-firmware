@@ -124,7 +124,7 @@ void animateFromMaxViewToDefaultView() {
 
 void animateFromMinViewToMaxView(int maxChannelIndexBefore) {
     int iMaxBefore = Channel::get(maxChannelIndexBefore).slotIndex + 1;
-    int iMax = Channel::get(psu::persist_conf::getMaxChannelIndex()).slotIndex + 1;
+    int iMax = psu::persist_conf::getMaxSlotIndex() + 1;
 
     int i = 0;
 

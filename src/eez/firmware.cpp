@@ -138,10 +138,8 @@ void boot() {
 
     psu::ontime::g_mcuCounter.init();
 
-    int channelIndex = 0;
-    int uninstalledChannelIndex = CH_MAX - 1;
     for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        auto& slot = g_slots[slotIndex];
+        auto &slot = g_slots[slotIndex];
 
         static const uint16_t ADDRESS = 0;
         uint16_t value[2];
@@ -155,27 +153,9 @@ void boot() {
 
         slot.moduleInfo = getModuleInfo(moduleType);
         slot.moduleRevision = moduleRevision;
-
-        if (slot.moduleInfo->moduleType != MODULE_TYPE_NONE) {
-            slot.channelIndex = channelIndex;
-
-            for (uint8_t subchannelIndex = 0; subchannelIndex < slot.moduleInfo->numChannels; subchannelIndex++) {
-                psu::Channel::get(channelIndex++).set(slotIndex, subchannelIndex);
-            }
-
-            psu::persist_conf::loadModuleConf(slotIndex);
-            psu::ontime::g_moduleCounters[slotIndex].init();
-            psu::CH_NUM = channelIndex;
-        } else {
-            slot.channelIndex = uninstalledChannelIndex;
-            psu::Channel::get(uninstalledChannelIndex).set(slotIndex, 0);
-            uninstalledChannelIndex--;
-        }
     }
 
-    for (int i = psu::CH_NUM; i < CH_MAX; i++) {
-        psu::Channel::get(i).slotIndex = INVALID_SLOT_INDEX;
-    }
+    psu::enumChannels();
 
     psu::persist_conf::init();
 

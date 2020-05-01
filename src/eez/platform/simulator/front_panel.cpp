@@ -63,9 +63,7 @@ void data_main_app_view(DataOperationEnum operation, Cursor cursor, Value &value
     }
 }
 
-int getSlotView(int channelIndex) {
-    int slotIndex = psu::Channel::get(channelIndex).slotIndex;
-
+int getSlotView(int slotIndex, Cursor cursor) {
     if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405) {
         return PAGE_ID_DCP405_FRONT_PANEL;
     } else if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCM220) {
@@ -79,19 +77,19 @@ int getSlotView(int channelIndex) {
 
 void data_front_panel_slot1_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getSlotView(cursor);
+        value = getSlotView(0, cursor);
     }
 }
 
 void data_front_panel_slot2_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getSlotView(cursor);
+        value = getSlotView(1, cursor);
     }
 }
 
 void data_front_panel_slot3_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getSlotView(cursor);
+        value = getSlotView(2, cursor);
     }
 }
 
