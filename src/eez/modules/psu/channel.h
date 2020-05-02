@@ -28,6 +28,9 @@
 #define IS_OPP_VALUE(channel, cpv) (&cpv == &channel->opp)
 
 namespace eez {
+
+struct StepValues;
+   
 namespace psu {
 
 enum MaxCurrentLimitCause {
@@ -243,6 +246,8 @@ struct PsuChannelModuleInfo : public ModuleInfo {
     ChannelInterface **channelInterfaces;
 
     PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision, uint8_t numChannels, ChannelInterface **channelInterfaces);
+
+    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override;
 };
 
 /// Runtime protection binary flags (alarmed, tripped)
@@ -513,9 +518,6 @@ class Channel {
 
     /// Test the channel.
     bool test();
-
-    /// Is channel installed?
-    bool isInstalled();
 
     /// Is channel power ok (state of PWRGOOD bit in IO Expander)?
     bool isPowerOk();

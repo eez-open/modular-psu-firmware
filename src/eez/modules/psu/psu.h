@@ -31,6 +31,7 @@
 #include <eez/modules/psu/conf_user.h>
 
 #include <eez/index.h>
+#include <eez/firmware.h>
 #include <eez/util.h>
 
 #include <eez/modules/psu/channel.h>

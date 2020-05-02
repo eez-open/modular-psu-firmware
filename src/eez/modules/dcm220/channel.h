@@ -20,6 +20,9 @@
 
 #include <eez/index.h>
 
+static const uint16_t MODULE_REVISION_DCM220_R2B4  = 0x0204;
+static const uint16_t MODULE_REVISION_DCM224_R1B1  = 0x0101;
+
 namespace eez {
 namespace dcm220 {
 

@@ -402,9 +402,7 @@ void init() {
 
     // load channels calibration parameters
     for (int i = 0; i < CH_NUM; ++i) {
-        if (Channel::get(i).isInstalled()) {
-            persist_conf::loadChannelCalibration(Channel::get(i));
-        }
+        persist_conf::loadChannelCalibration(Channel::get(i));
     }
 }
 
@@ -721,6 +719,7 @@ void setMaxChannelIndex(int channelIndex) {
 void toggleMaxChannelIndex(int channelIndex) {
     if (isMaxView() && channelIndex == getMaxChannelIndex()) {
         g_devConf.maxSlotIndex = 0;
+        g_devConf.maxSubchannelIndex = 0;
     } else {
         setMaxChannelIndex(channelIndex);
     }

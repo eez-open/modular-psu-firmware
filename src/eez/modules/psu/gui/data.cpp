@@ -212,6 +212,9 @@ EnumItem g_enumDefinition_MODULE_TYPE[] = {
     { MODULE_TYPE_DCP405, "DCP405" },
     { MODULE_TYPE_DCM220, "DCM220" },
     { MODULE_TYPE_DCM224, "DCM224" },
+    { MODULE_TYPE_DIB_MIO168, "MIO168" },
+    { MODULE_TYPE_DIB_PREL6, "PREL6" },
+    { MODULE_TYPE_DIB_SMX46, "SMX46" },
     { 0, 0 }
 };
 
@@ -835,8 +838,7 @@ bool compare_SLOT_INFO_value(const Value &a, const Value &b) {
 void SLOT_INFO_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = g_slots[slotIndex];
-    psu::Channel &channel = psu::Channel::get(slot.channelIndex);
-    if (channel.isInstalled()) {
+    if (slot.moduleInfo->moduleType != MODULE_TYPE_NONE) {
         snprintf(text, count - 1, "%s R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     } else {
         strncpy(text, "Not installed", count - 1);
@@ -851,9 +853,13 @@ bool compare_SLOT_INFO2_value(const Value &a, const Value &b) {
 void SLOT_INFO2_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = g_slots[slotIndex];
-    psu::Channel &channel = psu::Channel::get(slot.channelIndex);
-    if (channel.isInstalled()) {
-        snprintf(text, count - 1, "%s_R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+    if (slot.moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        psu::Channel &channel = psu::Channel::get(slot.channelIndex);
+        if (slot.moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
+            snprintf(text, count - 1, "%s_R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+        } else {
+            strncpy(text, "TODO ???", count - 1);
+        }
     } else {
         strncpy(text, "None", count - 1);
     }
@@ -1087,8 +1093,7 @@ void data_channel_status(DataOperationEnum operation, Cursor cursor, Value &valu
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        int channelStatus = channel.isInstalled() ? (channel.isOk() ? 1 : 2) : 0;
-        value = channelStatus;
+        value = channel.isOk() ? 1 : 0;
     }
 }
 
@@ -1407,145 +1412,8 @@ void data_channels_view_mode_in_max(DataOperationEnum operation, Cursor cursor, 
     }
 }
 
-int getDefaultView(int slotIndex, Cursor cursor) {
-    int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
-
-    if (g_slots[slotIndex].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-        Channel &channel = Channel::get(cursor);
-        if (channel.isInstalled()) {
-            if (channel.isOk()) {
-                int numChannels = ((PsuChannelModuleInfo *)g_slots[slotIndex].moduleInfo)->numChannels;
-                if (numChannels == 1) {
-                    if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
-                        if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
-                            return PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_SERIES;
-                        } else {
-                            return PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_SERIES;
-                        }
-                    } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
-                        if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
-                            return PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_PARALLEL;
-                        } else {
-                            return PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_PARALLEL;
-                        }
-                    } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
-                        return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_NUM_ON : PAGE_ID_SLOT_DEF_1CH_VERT_OFF;
-                    } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
-                        return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_VBAR_ON : PAGE_ID_SLOT_DEF_1CH_VERT_OFF;
-                    } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
-                        return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_HBAR_ON : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF;
-                    } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_YT) {
-                        return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_YT_ON : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF;
-                    } else {
-                        return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
-                    }
-                } else if (numChannels == 2) {
-                    return isVert ? PAGE_ID_SLOT_DEF_2CH_VERT : PAGE_ID_SLOT_DEF_2CH_HORZ;
-                } else {
-                    return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
-                }
-            } else {
-                return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
-            }
-        } else {
-            return isVert ? PAGE_ID_SLOT_DEF_VERT_NOT_INSTALLED : PAGE_ID_SLOT_DEF_HORZ_NOT_INSTALLED;
-        }
-    } else {
-        return isVert ? PAGE_ID_SLOT_DEF_VERT_NOT_INSTALLED : PAGE_ID_SLOT_DEF_HORZ_NOT_INSTALLED;
-    }
-}
-
-int getMaxView(int slotIndex, Cursor cursor) {
-    if (g_slots[slotIndex].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-        Channel &channel = Channel::get(cursor);
-        if (channel.isInstalled()) {
-            if (channel.isOk()) {
-                int numChannels = ((PsuChannelModuleInfo *)g_slots[slotIndex].moduleInfo)->numChannels;
-                if (numChannels == 1) {
-                    if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
-                        return channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_NUM_ON : PAGE_ID_SLOT_MAX_1CH_NUM_OFF;
-                    } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
-                        return channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_HBAR_ON : PAGE_ID_SLOT_MAX_1CH_HBAR_OFF;
-                    } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT) {
-                        return channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_YT_ON : PAGE_ID_SLOT_MAX_1CH_YT_OFF;
-                    } else {
-                        return PAGE_ID_SLOT_MAX_ERROR;
-                    }
-                } else if (numChannels == 2) {
-                    return PAGE_ID_SLOT_MAX_2CH;
-                } else {
-                    return PAGE_ID_SLOT_MAX_ERROR;
-                }
-            } else {
-                return PAGE_ID_SLOT_MAX_ERROR;
-            }
-        } else {
-            return PAGE_ID_SLOT_MAX_NOT_INSTALLED;
-        }
-    } else {
-        return PAGE_ID_SLOT_MAX_NOT_INSTALLED;
-    }
-}
-
-int getMinView(int slotIndex, Cursor cursor) {
-    if (g_slots[slotIndex].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-        Channel &channel = Channel::get(cursor);
-        if (channel.isInstalled()) {
-            if (channel.isOk()) {
-                int numChannels = ((PsuChannelModuleInfo *)g_slots[slotIndex].moduleInfo)->numChannels;
-                if (numChannels == 1) {
-                    if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
-                        return PAGE_ID_SLOT_MIN_1CH_COUPLED_SERIES;
-                    } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
-                        return PAGE_ID_SLOT_MIN_1CH_COUPLED_PARALLEL;
-                    } else {
-                        return channel.isOutputEnabled() ? PAGE_ID_SLOT_MIN_1CH_ON : PAGE_ID_SLOT_MIN_1CH_OFF;
-                    }
-                } else if (numChannels == 2) {
-                    return PAGE_ID_SLOT_MIN_2CH;
-                } else {
-                    return PAGE_ID_SLOT_MIN_ERROR;
-                }
-            } else {
-                return PAGE_ID_SLOT_MIN_ERROR;
-            }
-        } else {
-            return PAGE_ID_SLOT_MIN_NOT_INSTALLED;
-        }
-    } else {
-        return PAGE_ID_SLOT_MIN_NOT_INSTALLED;
-    }
-}
-
-int getMicroView(int slotIndex, Cursor cursor) {
-    if (g_slots[slotIndex].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-        int channelIndex = cursor;
-        Channel &channel = Channel::get(channelIndex);
-        if (channel.isInstalled()) {
-            if (channel.isOk()) {
-                int numChannels = ((PsuChannelModuleInfo *)g_slots[slotIndex].moduleInfo)->numChannels;
-                if (numChannels == 1) {
-                    if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
-                        return PAGE_ID_SLOT_MICRO_1CH_COUPLED_SERIES;
-                    } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
-                        return PAGE_ID_SLOT_MICRO_1CH_COUPLED_PARALLEL;
-                    } else {
-                        return channel.isOutputEnabled() ? PAGE_ID_SLOT_MICRO_1CH_ON : PAGE_ID_SLOT_MICRO_1CH_OFF;
-                    }
-                } else if (numChannels == 2) {
-                    return PAGE_ID_SLOT_MICRO_2CH;
-                } else {
-                    return PAGE_ID_SLOT_MICRO_ERROR;
-                }
-            } else {
-                return PAGE_ID_SLOT_MICRO_ERROR;
-            }
-        } else {
-            return PAGE_ID_SLOT_MICRO_NOT_INSTALLED;
-        }
-    } else {
-        return PAGE_ID_SLOT_MICRO_NOT_INSTALLED;
-    }
+int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
+    return g_slots[slotIndex].moduleInfo->getSlotView(slotViewType, slotIndex, cursor);
 }
 
 void data_channel_index(Channel &channel, DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -1599,7 +1467,7 @@ void data_slot_min2_channel_index(DataOperationEnum operation, Cursor cursor, Va
 
 void data_slot_default_view(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getDefaultView(slotIndex, cursor);
+        value = getSlotView(SLOT_VIEW_TYPE_DEFAULT, slotIndex, cursor);
     }
 }
 
@@ -1617,25 +1485,25 @@ void data_slot3_default_view(DataOperationEnum operation, Cursor cursor, Value &
 
 void data_slot_max_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getMaxView(persist_conf::getMaxSlotIndex(), cursor);
+        value = getSlotView(SLOT_VIEW_TYPE_MAX, persist_conf::getMaxSlotIndex(), cursor);
     }
 }
 
 void data_slot_min1_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getMinView(persist_conf::getMin1SlotIndex(), cursor);
+        value = getSlotView(SLOT_VIEW_TYPE_MIN, persist_conf::getMin1SlotIndex(), cursor);
     }
 }
 
 void data_slot_min2_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getMinView(persist_conf::getMin2SlotIndex(), cursor);
+        value = getSlotView(SLOT_VIEW_TYPE_MIN, persist_conf::getMin2SlotIndex(), cursor);
     }
 }
 
 void data_slot_micro_view(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getMicroView(slotIndex, cursor);
+        value = getSlotView(SLOT_VIEW_TYPE_MICRO, slotIndex, cursor);
     }
 }
 
@@ -1656,7 +1524,7 @@ void data_slot_2ch_ch1_index(DataOperationEnum operation, Cursor cursor, Value &
 }
 
 void data_slot_2ch_ch2_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_channel_index(Channel::get(cursor == persist_conf::getMaxChannelIndex() && Channel::get(cursor).subchannelIndex == 1 ? cursor - 1 : cursor + 1), operation, cursor, value);
+    data_channel_index(Channel::get(persist_conf::isMaxView() && cursor == persist_conf::getMaxChannelIndex() && Channel::get(cursor).subchannelIndex == 1 ? cursor - 1 : cursor + 1), operation, cursor, value);
 }
 
 void data_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -5810,10 +5678,16 @@ void data_slot1_info(DataOperationEnum operation, Cursor cursor, Value &value) {
     }
 }
 
-void data_slot1_test_result (DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = Value((int)psu::Channel::getBySlotIndex(0).getTestResult(), VALUE_TYPE_TEST_RESULT);
+void data_slot_test_result(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (g_slots[slotIndex].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
+        if (operation == DATA_OPERATION_GET) {
+            value = Value((int)psu::Channel::getBySlotIndex(slotIndex).getTestResult(), VALUE_TYPE_TEST_RESULT);
+        }
     }
+}
+
+void data_slot1_test_result (DataOperationEnum operation, Cursor cursor, Value &value) {
+    data_slot_test_result(0, operation, cursor, value);
 }
 
 void data_slot2_info(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -5823,9 +5697,7 @@ void data_slot2_info(DataOperationEnum operation, Cursor cursor, Value &value) {
 }
 
 void data_slot2_test_result(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = Value((int)psu::Channel::getBySlotIndex(1).getTestResult(), VALUE_TYPE_TEST_RESULT);
-    }
+    data_slot_test_result(1, operation, cursor, value);
 }
 
 void data_slot3_info(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -5835,9 +5707,7 @@ void data_slot3_info(DataOperationEnum operation, Cursor cursor, Value &value) {
 }
 
 void data_slot3_test_result(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = Value((int)psu::Channel::getBySlotIndex(2).getTestResult(), VALUE_TYPE_TEST_RESULT);
-    }
+    data_slot_test_result(2, operation, cursor, value);
 }
 
 void data_is_reset_by_iwdg(DataOperationEnum operation, Cursor cursor, Value &value) {

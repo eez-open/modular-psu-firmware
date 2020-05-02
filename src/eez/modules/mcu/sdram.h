@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/index.h>
+#include <eez/firmware.h>
 
 namespace eez {
 namespace mcu {

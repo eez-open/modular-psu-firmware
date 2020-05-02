@@ -513,12 +513,8 @@ scpi_result_t scpi_cmd_systemChannelModelQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel->isInstalled()) {
-        auto &slot = g_slots[channel->slotIndex];
-        SCPI_ResultText(context, slot.moduleInfo->moduleName);
-    } else {
-        SCPI_ResultText(context, "None");
-    }
+    auto &slot = g_slots[channel->slotIndex];
+    SCPI_ResultText(context, slot.moduleInfo->moduleName);
 
     return SCPI_RES_OK;
 }
@@ -529,14 +525,10 @@ scpi_result_t scpi_cmd_systemChannelVersionQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel->isInstalled()) {
-        auto &slot = g_slots[channel->slotIndex];
-        char text[50];
-        sprintf(text, "R%dB%d", (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
-        SCPI_ResultText(context, text);
-    } else {
-        SCPI_ResultText(context, "None");
-    }
+    auto &slot = g_slots[channel->slotIndex];
+    char text[50];
+    sprintf(text, "R%dB%d", (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+    SCPI_ResultText(context, text);
 
     return SCPI_RES_OK;
 }
@@ -547,13 +539,9 @@ scpi_result_t scpi_cmd_systemChannelSnoQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel->isInstalled()) {
-        char text[50];
-        channel->getSerial(text);
-        SCPI_ResultText(context, text);
-    } else {
-        SCPI_ResultText(context, "None");
-    }
+    char text[50];
+    channel->getSerial(text);
+    SCPI_ResultText(context, text);
 
     return SCPI_RES_OK;
 }

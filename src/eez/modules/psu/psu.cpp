@@ -338,6 +338,7 @@ void enumChannels() {
             slot.channelIndex = CH_NUM;
 
             for (uint8_t subchannelIndex = 0; subchannelIndex < psuChannelModuleInfo->numChannels; subchannelIndex++) {
+                Channel::get(CH_NUM).setChannelIndex(CH_NUM);
                 Channel::get(CH_NUM++).set(slotIndex, subchannelIndex);
             }
 

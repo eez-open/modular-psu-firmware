@@ -924,7 +924,7 @@ int SysSettingsTrackingPage::getDirty() {
 void SysSettingsTrackingPage::set() {
     if (getDirty()) {
         int n = 0;
-        for (int i = 0; i < CH_MAX; i++) {
+        for (int i = 0; i < CH_NUM; i++) {
             if (m_trackingEnabled & (1 << i)) {
                 n++;
             }
@@ -949,7 +949,7 @@ void SysSettingsTrackingPage::set() {
 
 int SysSettingsTrackingPage::getNumTrackingChannels() {
     int count = 0;
-    for (int i = 0; i < CH_MAX; i++) {
+    for (int i = 0; i < CH_NUM; i++) {
         if (m_trackingEnabled & (1 << i)) {
             ++count;
         }

@@ -586,7 +586,7 @@ static void saveState(Parameters &profile, List *lists) {
     profile.flags.couplingType = channel_dispatcher::getCouplingType();
     profile.flags.powerIsUp = isPowerUp();
 
-    for (int i = 0; i < CH_MAX; ++i) {
+    for (int i = 0; i < CH_NUM; ++i) {
         if (i < CH_NUM) {
             Channel &channel = Channel::get(i);
 

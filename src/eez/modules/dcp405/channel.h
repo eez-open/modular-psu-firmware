@@ -20,6 +20,12 @@
 
 #include <eez/index.h>
 
+static const uint16_t MODULE_REVISION_DCP405_R1B1  = 0x0101;
+static const uint16_t MODULE_REVISION_DCP405_R2B5  = 0x0205;
+static const uint16_t MODULE_REVISION_DCP405_R2B7  = 0x0207;
+static const uint16_t MODULE_REVISION_DCP405_R2B11 = 0x020B;
+static const uint16_t MODULE_REVISION_DCP405_R3B1  = 0x0301;
+
 namespace eez {
 namespace dcp405 {
 

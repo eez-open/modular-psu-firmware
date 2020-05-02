@@ -20,43 +20,26 @@
 
 #include <stdint.h>
 
-#include <eez/unit.h>
-
 namespace eez {
 
-struct StepValues {
-    int count;
-    const float *values;
-    Unit unit;
-};
-
-enum TestResult {
-    TEST_NONE,
-    TEST_FAILED,
-    TEST_OK,
-    TEST_CONNECTING,
-    TEST_SKIPPED,
-    TEST_WARNING
-};
-
-static const uint16_t MODULE_TYPE_NONE    = 0;
-static const uint16_t MODULE_TYPE_DCP405  = 405;
-static const uint16_t MODULE_TYPE_DCM220  = 220;
-static const uint16_t MODULE_TYPE_DCM224  = 224;
+static const uint16_t MODULE_TYPE_NONE = 0;
+static const uint16_t MODULE_TYPE_DCP405 = 405;
+static const uint16_t MODULE_TYPE_DCM220 = 220;
+static const uint16_t MODULE_TYPE_DCM224 = 224;
+static const uint16_t MODULE_TYPE_DIB_MIO168 = 168;
+static const uint16_t MODULE_TYPE_DIB_PREL6 = 6;
+static const uint16_t MODULE_TYPE_DIB_SMX46 = 46;
 
 static const uint16_t MODULE_CATEGORY_NONE = 0;
 static const uint16_t MODULE_CATEGORY_DCPSUPPLY = 1;
 static const uint16_t MODULE_CATEGORY_OTHER = 2;
 
-static const uint16_t MODULE_REVISION_DCP405_R1B1  = 0x0101;
-static const uint16_t MODULE_REVISION_DCP405_R2B5  = 0x0205;
-static const uint16_t MODULE_REVISION_DCP405_R2B7  = 0x0207;
-static const uint16_t MODULE_REVISION_DCP405_R2B11 = 0x020B;
-static const uint16_t MODULE_REVISION_DCP405_R3B1  = 0x0301;
-
-static const uint16_t MODULE_REVISION_DCM220_R2B4  = 0x0204;
-
-static const uint16_t MODULE_REVISION_DCM224_R1B1  = 0x0101;
+enum SlotViewType {
+    SLOT_VIEW_TYPE_DEFAULT,
+    SLOT_VIEW_TYPE_MAX,
+    SLOT_VIEW_TYPE_MIN,
+    SLOT_VIEW_TYPE_MICRO,
+};
 
 struct ModuleInfo {
     uint16_t moduleType;
@@ -65,6 +48,8 @@ struct ModuleInfo {
     uint16_t latestModuleRevision;
 
     ModuleInfo(uint16_t moduleType, uint16_t moduleCategory, const char *moduleName, uint16_t latestModuleRevision);
+
+    virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);
 };
 
 ModuleInfo *getModuleInfo(uint16_t moduleType);
@@ -76,7 +61,6 @@ struct SlotInfo {
 };
 
 static const int NUM_SLOTS = 3;
-static const int INVALID_SLOT_INDEX = NUM_SLOTS;
-extern SlotInfo g_slots[NUM_SLOTS + 1]; // one more for invalid slot
+extern SlotInfo g_slots[NUM_SLOTS];
 
 } // namespace eez

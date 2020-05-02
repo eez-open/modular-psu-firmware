@@ -191,7 +191,7 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
             channel.resetHistory();
         }
 
-        if (persist_conf::getMaxChannelIndex() ==  1) {
+        if (persist_conf::isMaxView() && persist_conf::getMaxChannelIndex() == 1) {
             persist_conf::setMaxChannelIndex(0);
         }
 

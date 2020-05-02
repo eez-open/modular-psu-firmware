@@ -55,7 +55,7 @@ PsuChannelModuleInfo::PsuChannelModuleInfo(uint16_t moduleType, const char *modu
     , channelInterfaces(channelInterfaces_)
 {
 }
-    
+
 ////////////////////////////////////////////////////////////////////////////////
 
 ChannelInterface::ChannelInterface(int slotIndex_) 
@@ -607,17 +607,10 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Channel::init() {
-    if (!isInstalled()) {
-        return;
-    }
     channelInterface->init(subchannelIndex);
 }
 
 void Channel::onPowerDown() {
-    if (!isInstalled()) {
-        return;
-    }
-
     doRemoteSensingEnable(false);
     doRemoteProgrammingEnable(false);
 
@@ -627,10 +620,6 @@ void Channel::onPowerDown() {
 }
 
 void Channel::reset() {
-    if (!isInstalled()) {
-        return;
-    }
-
     flags.outputEnabled = 0;
     flags.senseEnabled = 0;
     flags.rprogEnabled = 0;
@@ -765,10 +754,6 @@ void Channel::clearProtectionConf() {
 }
 
 bool Channel::test() {
-    if (!isInstalled()) {
-        return true;
-    }
-
     flags.powerOk = 0;
 
     doRemoteSensingEnable(false);
@@ -779,18 +764,11 @@ bool Channel::test() {
     return isOk();
 }
 
-bool Channel::isInstalled() {
-    return channelInterface != nullptr;
-}
-
 bool Channel::isPowerOk() {
     return flags.powerOk;
 }
 
 TestResult Channel::getTestResult() {
-    if (!isInstalled()) {
-        return TEST_SKIPPED;
-    }
     return channelInterface->getTestResult(subchannelIndex);
 }
 
@@ -1553,30 +1531,18 @@ bool Channel::isCurrentLimitExceeded(float i) {
 
 
 bool Channel::isVoltageBalanced() {
-	if (!isInstalled()) {
-		return false;
-	}
     return channelInterface->isVoltageBalanced(subchannelIndex);
 }
 
 bool Channel::isCurrentBalanced() {
-	if (!isInstalled()) {
-		return false;
-	}
     return channelInterface->isCurrentBalanced(subchannelIndex);
 }
 
 float Channel::getUSetUnbalanced() {
-	if (!isInstalled()) {
-		return 0;
-	}
     return channelInterface->getUSetUnbalanced(subchannelIndex);
 }
 
 float Channel::getISetUnbalanced() {
-	if (!isInstalled()) {
-		return 0;
-	}
     return channelInterface->getISetUnbalanced(subchannelIndex);
 }
 

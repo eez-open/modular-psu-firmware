@@ -113,10 +113,6 @@ void boot() {
 
     // INIT
 
-    for (int i = 0; i < CH_MAX; i++) {
-        psu::Channel::get(i).setChannelIndex(i);
-    }
-
     psu::rtc::init();
     psu::datetime::init();
 

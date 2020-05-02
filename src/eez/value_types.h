@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <eez/unit.h>
+
 #define VALUE_TYPES \
     VALUE_TYPE(NONE) \
     VALUE_TYPE(INT) \

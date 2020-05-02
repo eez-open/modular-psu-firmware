@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-#include <eez/index.h> // TestResult
+#include <eez/firmware.h>
 
 #define FAN_MODE_AUTO 0
 #define FAN_MODE_MANUAL 1

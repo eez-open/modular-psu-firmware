@@ -45,7 +45,7 @@
       "name": "channel_status",
       "description": "0: not installed\n1: installed and ok\n2: installed and error",
       "type": "enum",
-      "enumItems": "[\n\"Not installed\",\n\"OK\",\n\"Error\"\n]",
+      "enumItems": "[\n\"Error\",\n\"OK\"\n]",
       "defaultValue": "1"
     },
     {
@@ -23357,49 +23357,6 @@
                               ]
                             }
                           ]
-                        },
-                        {
-                          "type": "Container",
-                          "style": {
-                            "inheritFrom": "default"
-                          },
-                          "left": 0,
-                          "top": 0,
-                          "width": 60,
-                          "height": 30,
-                          "widgets": [
-                            {
-                              "type": "Text",
-                              "style": {
-                                "inheritFrom": "default",
-                                "font": "Oswald14",
-                                "alignHorizontal": "left",
-                                "color": "status_line_text_disabled",
-                                "activeBackgroundColor": "status_line_text_disabled"
-                              },
-                              "left": 0,
-                              "top": 0,
-                              "width": 26,
-                              "height": 30,
-                              "text": "\\u00a0"
-                            },
-                            {
-                              "type": "Text",
-                              "style": {
-                                "inheritFrom": "default",
-                                "font": "Oswald14",
-                                "alignHorizontal": "left",
-                                "color": "status_line_text_disabled",
-                                "activeBackgroundColor": "status_line_text_disabled"
-                              },
-                              "data": "channel_short_title_without_tracking_icon",
-                              "left": 26,
-                              "top": 0,
-                              "width": 34,
-                              "height": 30,
-                              "text": ""
-                            }
-                          ]
                         }
                       ]
                     },
@@ -26826,21 +26783,9 @@
                       "height": 28,
                       "widgets": [
                         {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "value_S_left"
-                          },
-                          "data": "",
-                          "left": 0,
-                          "top": 0,
-                          "width": 122,
-                          "height": 28,
-                          "text": "Not installed"
-                        },
-                        {
                           "type": "DisplayData",
                           "style": {
-                            "inheritFrom": "value_S_left"
+                            "inheritFrom": "event_error"
                           },
                           "data": "channel_board_info_revision",
                           "left": 0,
@@ -26852,7 +26797,7 @@
                         {
                           "type": "DisplayData",
                           "style": {
-                            "inheritFrom": "event_error"
+                            "inheritFrom": "value_S_left"
                           },
                           "data": "channel_board_info_revision",
                           "left": 0,
@@ -27607,11 +27552,11 @@
         "height": 240
       },
       {
-        "name": "slot_def_mio168",
+        "name": "dib_mio168_slot_view_def",
         "style": "default",
         "widgets": [
           {
-            "type": "LayoutView",
+            "type": "Container",
             "style": {
               "inheritFrom": "default"
             },
@@ -27619,7 +27564,35 @@
             "top": 0,
             "width": 160,
             "height": 32,
-            "layout": "slot_def_vert_title"
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "",
+                "left": 1,
+                "top": 0,
+                "width": 133,
+                "height": 32,
+                "text": "???"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "toggle_channels_max_view",
+                "left": 134,
+                "top": 0,
+                "width": 25,
+                "height": 32,
+                "text": "e"
+              }
+            ]
           },
           {
             "type": "Container",
@@ -28144,7 +28117,141 @@
         "height": 240
       },
       {
-        "name": "slot_def_smx46",
+        "name": "dib_mio168_slot_view_max",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 32,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Oswald14",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "",
+                "left": 0,
+                "top": 0,
+                "width": 430,
+                "height": 32,
+                "text": "???"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "toggle_channels_max_view",
+                "left": 430,
+                "top": 0,
+                "width": 50,
+                "height": 32,
+                "text": "E"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 168
+      },
+      {
+        "name": "dib_mio168_slot_view_min",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 238,
+            "height": 24,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "",
+                "left": 0,
+                "top": 0,
+                "width": 193,
+                "height": 24,
+                "text": "???"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "alignVertical": "bottom"
+                },
+                "data": "",
+                "action": "toggle_channels_max_view",
+                "left": 193,
+                "top": 0,
+                "width": 45,
+                "height": 24,
+                "text": "e"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 238,
+        "height": 72
+      },
+      {
+        "name": "dib_mio168_slot_view_micro",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 24,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "",
+                "left": 0,
+                "top": 0,
+                "width": 158,
+                "height": 24,
+                "text": "???"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 72
+      },
+      {
+        "name": "dib_prel6_slot_view_def",
         "style": "default",
         "widgets": [
           {
@@ -28442,6 +28549,426 @@
         "top": 0,
         "width": 160,
         "height": 240
+      },
+      {
+        "name": "dib_prel6_slot_view_max",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 32,
+            "layout": "slot_max_1ch_title"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 168
+      },
+      {
+        "name": "dib_prel6_slot_view_min",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 238,
+            "height": 24,
+            "layout": "slot_min_1ch_title"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 238,
+        "height": 72
+      },
+      {
+        "name": "dib_prel6_slot_view_micro",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 24,
+            "layout": "slot_micro_1ch_title"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 72
+      },
+      {
+        "name": "dib_smx46_slot_view_def",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 160,
+            "height": 32,
+            "layout": "slot_def_vert_title"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 32,
+            "width": 160,
+            "height": 186,
+            "name": "Dout",
+            "widgets": [
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 1,
+            "top": 218,
+            "width": 79,
+            "height": 22,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 81,
+            "top": 218,
+            "width": 78,
+            "height": 22,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 160,
+        "height": 240
+      },
+      {
+        "name": "dib_smx46_slot_view_max",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 32,
+            "layout": "slot_max_1ch_title"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 168
+      },
+      {
+        "name": "dib_smx46_slot_view_min",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 238,
+            "height": 24,
+            "layout": "slot_min_1ch_title"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 238,
+        "height": 72
+      },
+      {
+        "name": "dib_smx46_slot_view_micro",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 24,
+            "layout": "slot_micro_1ch_title"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 72
       },
       {
         "name": "slot_def_1ch_vbar_on",
@@ -40429,60 +40956,6 @@
                               ]
                             }
                           ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Container",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "left": 0,
-                      "top": 0,
-                      "width": 40,
-                      "height": 96,
-                      "widgets": [
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "default",
-                            "font": "Oswald14",
-                            "color": "status_line_text_disabled",
-                            "activeBackgroundColor": "status_line_text_disabled"
-                          },
-                          "left": 0,
-                          "top": 0,
-                          "width": 40,
-                          "height": 32,
-                          "text": "\\u00a0"
-                        },
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "default",
-                            "font": "Oswald14",
-                            "color": "status_line_text_disabled",
-                            "activeBackgroundColor": "status_line_text_disabled"
-                          },
-                          "left": 0,
-                          "top": 32,
-                          "width": 40,
-                          "height": 32,
-                          "text": "\\u00a0"
-                        },
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "default",
-                            "font": "Oswald14",
-                            "color": "status_line_text_disabled",
-                            "activeBackgroundColor": "status_line_text_disabled"
-                          },
-                          "left": 0,
-                          "top": 64,
-                          "width": 40,
-                          "height": 32,
-                          "text": "\\u00a0"
                         }
                       ]
                     }

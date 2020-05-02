@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-#include <eez/index.h>
+#include <eez/firmware.h>
 
 namespace eez {
 namespace mcu {

@@ -20,19 +20,24 @@
 
 namespace eez {
 
+enum TestResult {
+    TEST_NONE,
+    TEST_FAILED,
+    TEST_OK,
+    TEST_CONNECTING,
+    TEST_SKIPPED,
+    TEST_WARNING
+};
+
 extern bool g_isBooted;
 extern bool g_bootTestSuccess;
-    
-void boot();
-
 extern bool g_shutdownInProgress;
 extern bool g_shutdown;
-
+    
+void boot();
 bool test();
 bool testMaster();
-
 bool reset();
-
 void standBy();
 void restart();
 void shutdown();

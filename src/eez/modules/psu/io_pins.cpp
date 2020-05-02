@@ -24,6 +24,9 @@
 #include <tim.h>
 #endif
 
+#include <eez/firmware.h>
+#include <eez/system.h>
+
 #include <eez/modules/psu/psu.h>
 
 #if OPTION_FAN
@@ -33,7 +36,6 @@
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/trigger.h>
-#include <eez/system.h>
 
 #if defined EEZ_PLATFORM_STM32
 #include <eez/modules/bp3c/flash_slave.h>

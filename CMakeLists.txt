@@ -452,6 +452,36 @@ set(header_eez_modules_dcm220
 list (APPEND header_files ${header_eez_modules_dcm220})
 source_group("eez\\modules\\dcm220" FILES ${src_eez_modules_dcm220} ${header_eez_modules_dcm220})
 
+set(src_eez_modules_dib_mio168
+    src/eez/modules/dib-mio168/dib-mio168.cpp
+) 
+list (APPEND src_files ${src_eez_modules_dib_mio168})
+set(header_eez_modules_dib_mio168
+    src/eez/modules/dib-mio168/dib-mio168.h
+) 
+list (APPEND header_files ${header_eez_modules_dib_mio168})
+source_group("eez\\modules\\dib-mio168" FILES ${src_eez_modules_dib_mio168} ${header_eez_modules_dib_mio168})
+
+set(src_eez_modules_dib_prel6
+    src/eez/modules/dib-prel6/dib-prel6.cpp
+) 
+list (APPEND src_files ${src_eez_modules_dib_prel6})
+set(header_eez_modules_dib_prel6
+    src/eez/modules/dib-prel6/dib-prel6.h
+) 
+list (APPEND header_files ${header_eez_modules_dib_prel6})
+source_group("eez\\modules\\dib-prel6" FILES ${src_eez_modules_dib_prel6} ${header_eez_modules_dib_prel6})
+
+set(src_eez_modules_dib_smx46
+    src/eez/modules/dib-smx46/dib-smx46.cpp
+) 
+list (APPEND src_files ${src_eez_modules_dib_smx46})
+set(header_eez_modules_dib_smx46
+    src/eez/modules/dib-smx46/dib-smx46.h
+) 
+list (APPEND header_files ${header_eez_modules_dib_smx46})
+source_group("eez\\modules\\dib-smx46" FILES ${src_eez_modules_dib_smx46} ${header_eez_modules_dib_smx46})
+
 set(src_eez_platform_simulator
     src/eez/platform/simulator/cmsis_os.cpp
     src/eez/platform/simulator/events.cpp

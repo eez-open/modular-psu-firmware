@@ -623,7 +623,7 @@ void action_toggle_channels_max_view() {
         animateFromMicroViewToMaxView();
     } else {
         auto isMaxViewBefore = persist_conf::isMaxView();
-        auto maxChannelIndexBefore = persist_conf::getMaxChannelIndex();
+        auto maxChannelIndexBefore = isMaxViewBefore ? persist_conf::getMaxChannelIndex() : -1;
 
         persist_conf::toggleMaxChannelIndex(g_channel->channelIndex);
         

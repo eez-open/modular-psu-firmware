@@ -354,10 +354,6 @@ scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
     if (!channel) {
         return SCPI_RES_ERR;
     }
-    if (!channel->isInstalled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-        return SCPI_RES_ERR;
-    }
 
     int32_t bit;
     if (!SCPI_ParamInt(context, &bit, TRUE)) {
@@ -396,10 +392,6 @@ scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
     Channel *channel = getSelectedChannel(context);
     if (!channel) {
-        return SCPI_RES_ERR;
-    }
-    if (!channel->isInstalled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
 
