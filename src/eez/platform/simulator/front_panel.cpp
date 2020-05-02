@@ -66,13 +66,29 @@ void data_main_app_view(DataOperationEnum operation, Cursor cursor, Value &value
 int getSlotView(int slotIndex, Cursor cursor) {
     if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405) {
         return PAGE_ID_DCP405_FRONT_PANEL;
-    } else if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCM220) {
-        return PAGE_ID_DCM220_FRONT_PANEL;
-    } else if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCM224) {
-        return PAGE_ID_DCM224_FRONT_PANEL;
-    } else {
-        return PAGE_ID_FRONT_PANEL_EMPTY_SLOT;
     }
+    
+    if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCM220) {
+        return PAGE_ID_DCM220_FRONT_PANEL;
+    }
+    
+    if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCM224) {
+        return PAGE_ID_DCM224_FRONT_PANEL;
+    }
+    
+    if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DIB_MIO168) {
+        return PAGE_ID_MIO168_FRONT_PANEL;
+    }
+    
+    if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DIB_PREL6) {
+        return PAGE_ID_PREL6_FRONT_PANEL;
+    }
+    
+    if (g_slots[slotIndex].moduleInfo->moduleType == MODULE_TYPE_DIB_SMX46) {
+        return PAGE_ID_SMX46_FRONT_PANEL;
+    }
+
+    return PAGE_ID_FRONT_PANEL_EMPTY_SLOT;
 }
 
 void data_front_panel_slot1_view(DataOperationEnum operation, Cursor cursor, Value &value) {

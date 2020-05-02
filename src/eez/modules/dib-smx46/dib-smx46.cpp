@@ -16,13 +16,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
+
 #include "./dib-smx46.h"
+
+#include "eez/gui/document.h"
 
 namespace eez {
 namespace dib_smx46 {
 
-static ModuleInfo g_thisModuleInfo(MODULE_TYPE_DIB_SMX46, MODULE_CATEGORY_OTHER, "smx46", MODULE_REVISION_R1B2);
-ModuleInfo *g_moduleInfo = &g_thisModuleInfo;
+struct Smx46ModuleInfo : public ModuleInfo {
+public:
+    Smx46ModuleInfo() 
+        : ModuleInfo(MODULE_TYPE_DIB_SMX46, MODULE_CATEGORY_OTHER, "SMX46", MODULE_REVISION_R1B2)
+    {}
+    
+    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
+            return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF;
+        }
+        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
+            return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_MAX;
+        }
+        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
+            return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_MIN;
+        }
+        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
+        return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_MICRO;
+    }
+};
+
+static Smx46ModuleInfo g_smx46ModuleInfo;
+ModuleInfo *g_moduleInfo = &g_smx46ModuleInfo;
 
 } // namespace dib_smx46
 } // namespace eez

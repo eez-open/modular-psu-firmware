@@ -381,7 +381,7 @@ public:
 #endif // EEZ_PLATFORM_SIMULATOR
 
     static Channel *g_channels[CH_MAX];
-    static uint8_t g_slotIndexToChannelIndex[NUM_SLOTS];
+    static int8_t g_slotIndexToChannelIndex[NUM_SLOTS];
 
     static void enumChannels();
 
@@ -392,8 +392,9 @@ public:
         return *g_channels[channelIndex];
     } 
 
-    static inline Channel &getBySlotIndex(uint8_t slotIndex, uint8_t subchannelIndex = 0) {
-        return *g_channels[g_slotIndexToChannelIndex[slotIndex] + subchannelIndex];
+    static inline Channel *getBySlotIndex(uint8_t slotIndex, uint8_t subchannelIndex = 0) {
+        int channelIndex = g_slotIndexToChannelIndex[slotIndex];
+        return channelIndex != -1 ? g_channels[channelIndex + subchannelIndex] : nullptr;
     }
 
     /// Save and disable OE for all the channels.

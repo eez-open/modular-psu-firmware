@@ -89,7 +89,7 @@ bool isCouplingTypeAllowed(CouplingType couplingType, int *err) {
             return false;
         }
     } else {
-        if (CH_NUM < 2) {
+        if (CH_NUM < 2 || Channel::get(0).slotIndex != 0 || Channel::get(1).slotIndex != 1) {
             if (err) {
                 *err = SCPI_ERROR_HARDWARE_MISSING;
             }
@@ -191,8 +191,8 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
             channel.resetHistory();
         }
 
-        if (persist_conf::isMaxView() && persist_conf::getMaxChannelIndex() == 1) {
-            persist_conf::setMaxChannelIndex(0);
+        if (persist_conf::isMaxView() && persist_conf::getMaxSlotIndex() == Channel::get(1).slotIndex) {
+            persist_conf::setMaxSlotIndex(Channel::get(0).slotIndex);
         }
 
         // disable tracking if only 1 channel left in tracking mode

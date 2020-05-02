@@ -122,8 +122,8 @@ void animateFromMaxViewToDefaultView() {
     animateRects(&g_psuAppContext, BUFFER_OLD, i);
 }
 
-void animateFromMinViewToMaxView(int maxChannelIndexBefore) {
-    int iMaxBefore = Channel::get(maxChannelIndexBefore).slotIndex + 1;
+void animateFromMinViewToMaxView(int maxSlotIndexBefore) {
+    int iMaxBefore = maxSlotIndexBefore + 1;
     int iMax = psu::persist_conf::getMaxSlotIndex() + 1;
 
     int i = 0;

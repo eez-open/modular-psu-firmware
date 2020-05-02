@@ -265,7 +265,10 @@ void oneIter() {
             } else if (type == PSU_QUEUE_MESSAGE_TYPE_TEST) {
                 test();
             } else if (type == PSU_QUEUE_MESSAGE_SPI_IRQ) {
-                Channel::getBySlotIndex(param).onSpiIrq();
+                auto channel = Channel::getBySlotIndex(param);
+                if (channel) {
+                    channel->onSpiIrq();
+                }
             } else if (type == PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL) {
                 Channel::get(param).adcMeasureAll();
                 g_adcMeasureAllFinished = true;

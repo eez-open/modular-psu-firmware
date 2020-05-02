@@ -698,16 +698,33 @@ int getMin2SlotIndex() {
     }
 }
 
+void setMaxSlotIndex(int slotIndex) {
+    g_devConf.maxSlotIndex = slotIndex + 1;
+    g_devConf.maxSubchannelIndex = 0;
+}
+
+void toggleMaxSlotIndex(int slotIndex) {
+    if (isMaxView() && slotIndex == getMaxSlotIndex()) {
+        g_devConf.maxSlotIndex = 0;
+        g_devConf.maxSubchannelIndex = 0;
+    } else {
+        setMaxSlotIndex(slotIndex);
+    }
+}
+
 int getMaxChannelIndex() {
-    return Channel::getBySlotIndex(getMaxSlotIndex()).channelIndex + g_devConf.maxSubchannelIndex;
+    auto channel = Channel::getBySlotIndex(getMaxSlotIndex());
+    return channel ? channel->channelIndex + g_devConf.maxSubchannelIndex : -1;
 }
 
 int getMin1ChannelIndex() {
-    return Channel::getBySlotIndex(getMin1SlotIndex()).channelIndex;
+    auto channel = Channel::getBySlotIndex(getMin1SlotIndex());
+    return channel ? channel->channelIndex : -1;
 }
 
 int getMin2ChannelIndex() {
-    return Channel::getBySlotIndex(getMin2SlotIndex()).channelIndex;
+    auto channel = Channel::getBySlotIndex(getMin2SlotIndex());
+    return channel ? channel->channelIndex : -1;
 }
 
 void setMaxChannelIndex(int channelIndex) {

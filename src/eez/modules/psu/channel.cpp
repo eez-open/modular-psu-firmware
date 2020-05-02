@@ -158,7 +158,7 @@ void Channel::Value::addMonDacValue(float value, float prec) {
 
 int CH_NUM = 0;
 Channel *Channel::g_channels[CH_MAX];
-uint8_t Channel::g_slotIndexToChannelIndex[NUM_SLOTS];
+int8_t Channel::g_slotIndexToChannelIndex[NUM_SLOTS];
 
 int g_errorChannelIndex = -1;
 
@@ -182,6 +182,8 @@ void Channel::enumChannels() {
 
             persist_conf::loadModuleConf(slotIndex);
             ontime::g_moduleCounters[slotIndex].init();
+        } else {
+            Channel::g_slotIndexToChannelIndex[slotIndex] = -1;
         }
     }
 }

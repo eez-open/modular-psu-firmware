@@ -945,7 +945,7 @@ void FOLDER_INFO_value_to_text(const Value &value, char *text, int count) {
     if (value.getUInt32() == 1) {
         strncpy(text, "1 item", count - 1);
     } else {
-        snprintf(text, count - 1, "%lu items ", value.getUInt32());
+        snprintf(text, count - 1, "%u items ", value.getUInt32());
     }
     text[count - 1] = 0;
 }
@@ -1428,39 +1428,60 @@ void data_channel_index(Channel &channel, DataOperationEnum operation, Cursor cu
     }
 }
 
-void data_slot1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (g_slots[0].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-        data_channel_index(Channel::getBySlotIndex(0), operation, cursor, value);
+void data_no_channel_index(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_SET_CONTEXT) {
+        value = Value(g_channel, VALUE_TYPE_POINTER);
+        g_channel = nullptr;
+    } else if (operation == DATA_OPERATION_GET_CONTEXT) {
+        value = Value((Channel *)nullptr, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
+        value = slotIndex;
+    } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
+        selectChannel((Channel *)value.getVoidPointer());
     }
+}
+
+void data_slot_channel_index(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (g_slots[slotIndex].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
+        data_channel_index(*Channel::getBySlotIndex(slotIndex), operation, cursor, value);
+    } else {
+        data_no_channel_index(slotIndex, operation, cursor, value);
+    }
+}
+
+void data_slot1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    data_slot_channel_index(0, operation, cursor, value);
 }
 
 void data_slot2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (g_slots[1].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-        data_channel_index(Channel::getBySlotIndex(1), operation, cursor, value);
-    }
+    data_slot_channel_index(1, operation, cursor, value);
 }
 
 void data_slot3_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (g_slots[2].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-        data_channel_index(Channel::getBySlotIndex(2), operation, cursor, value);
-    }
+    data_slot_channel_index(2, operation, cursor, value);
 }
 
 void data_slot_max_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (g_slots[persist_conf::getMaxSlotIndex()].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
         data_channel_index(Channel::get(persist_conf::getMaxChannelIndex()), operation, cursor, value);
+    } else {
+        data_no_channel_index(persist_conf::getMaxSlotIndex(), operation, cursor, value);
     }
 }
 
 void data_slot_min1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (g_slots[persist_conf::getMin1SlotIndex()].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
         data_channel_index(Channel::get(persist_conf::getMin1ChannelIndex()), operation, cursor, value);
+    } else {
+        data_no_channel_index(persist_conf::getMin1SlotIndex(), operation, cursor, value);
     }
 }
 
 void data_slot_min2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (g_slots[persist_conf::getMin2SlotIndex()].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
         data_channel_index(Channel::get(persist_conf::getMin2ChannelIndex()), operation, cursor, value);
+    } else {
+        data_no_channel_index(persist_conf::getMin2SlotIndex(), operation, cursor, value);
     }
 }
 
@@ -3081,12 +3102,16 @@ void data_sys_info_has_error(DataOperationEnum operation, Cursor cursor, Value &
 
 void data_sys_settings_has_error(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
+#if OPTION_ETHERNET
         value = (getSysInfoHasError() ||
             // Ethernet
             ethernet::g_testResult == TEST_FAILED ||
             // Mqtt
             (persist_conf::devConf.mqttEnabled && mqtt::g_connectionState == mqtt::CONNECTION_STATE_ERROR)
         ) ? 1 : 0;
+#else
+        value = 0;
+#endif
     }
 }
 
@@ -5680,7 +5705,7 @@ void data_slot1_info(DataOperationEnum operation, Cursor cursor, Value &value) {
 void data_slot_test_result(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
     if (g_slots[slotIndex].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
         if (operation == DATA_OPERATION_GET) {
-            value = Value((int)psu::Channel::getBySlotIndex(slotIndex).getTestResult(), VALUE_TYPE_TEST_RESULT);
+            value = Value((int)psu::Channel::getBySlotIndex(slotIndex)->getTestResult(), VALUE_TYPE_TEST_RESULT);
         }
     }
 }
@@ -6106,6 +6131,13 @@ void data_debug_i_adc_amper(DataOperationEnum operation, Cursor cursor, Value &v
         value = MakeValue(roundPrec(remap(1.0f * psu::debug::g_iMon[channel.channelIndex].get(), 0.0f, 0.0f, 1.0f * channel.params.ADC_MAX, channel.params.I_MAX), channel.params.I_RESOLUTION), UNIT_AMPER);
     } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
         value = Value(500, VALUE_TYPE_UINT32);
+    }
+}
+
+void data_dummy(DataOperationEnum operation, Cursor cursor, Value &value) {
+    Channel &channel = Channel::get(cursor);
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(10.0f, UNIT_VOLT);
     }
 }
 

@@ -623,7 +623,7 @@ void action_toggle_channels_max_view() {
         animateFromMicroViewToMaxView();
     } else {
         auto isMaxViewBefore = persist_conf::isMaxView();
-        auto maxChannelIndexBefore = isMaxViewBefore ? persist_conf::getMaxChannelIndex() : -1;
+        auto maxSlotIndexBefore = isMaxViewBefore ? persist_conf::getMaxSlotIndex() : -1;
 
         persist_conf::toggleMaxChannelIndex(g_channel->channelIndex);
         
@@ -632,7 +632,30 @@ void action_toggle_channels_max_view() {
         } else if (isMaxViewBefore && !persist_conf::isMaxView()) {
             animateFromMaxViewToDefaultView();
         } else {
-            animateFromMinViewToMaxView(maxChannelIndexBefore);
+            animateFromMinViewToMaxView(maxSlotIndexBefore);
+        }
+    }
+}
+
+void action_toggle_slot_max_view() {
+    auto slotIndex = getFoundWidgetAtDown().cursor;
+
+    if (getActivePageId() != PAGE_ID_MAIN) {
+        showMainPage();
+        persist_conf::setMaxSlotIndex(slotIndex);
+        animateFromMicroViewToMaxView();
+    } else {
+        auto isMaxViewBefore = persist_conf::isMaxView();
+        auto maxSlotIndexBefore = isMaxViewBefore ? persist_conf::getMaxSlotIndex() : -1;
+
+        persist_conf::toggleMaxSlotIndex(slotIndex);
+        
+        if (!isMaxViewBefore && persist_conf::isMaxView()) {
+            animateFromDefaultViewToMaxView();
+        } else if (isMaxViewBefore && !persist_conf::isMaxView()) {
+            animateFromMaxViewToDefaultView();
+        } else {
+            animateFromMinViewToMaxView(maxSlotIndexBefore);
         }
     }
 }

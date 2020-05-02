@@ -60,7 +60,6 @@ namespace eez {
 namespace gui {
 namespace file_manager {
 
-static const int CONF_FILE_DESCRIPTION_WIDTH_PX = 243;
 static const size_t MAX_FILE_DESCRIPTION_LENGTH = 80;
 
 static State g_state;

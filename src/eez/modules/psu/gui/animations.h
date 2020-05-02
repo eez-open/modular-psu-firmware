@@ -24,7 +24,7 @@ namespace gui {
 
 void animateFromDefaultViewToMaxView();
 void animateFromMaxViewToDefaultView();
-void animateFromMinViewToMaxView(int maxChannelIndexBefore);
+void animateFromMinViewToMaxView(int maxSlotIndexBefore);
 void animateFromMicroViewToMaxView();
 void animateShowSysSettings();
 void animateHideSysSettings();

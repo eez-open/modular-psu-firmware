@@ -407,7 +407,8 @@ enum DataEnum {
     DATA_ID_CHANNEL_CALIBRATION_POINT_INFO = 405,
     DATA_ID_CHANNEL_CALIBRATION_CHART = 406,
     DATA_ID_CHANNEL_CALIBRATION_POINT_CAN_SAVE = 407,
-    DATA_ID_CHANNEL_CALIBRATION_CHART_ZOOM = 408
+    DATA_ID_CHANNEL_CALIBRATION_CHART_ZOOM = 408,
+    DATA_ID_DUMMY = 409
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -819,6 +820,7 @@ void data_channel_calibration_point_info(DataOperationEnum operation, Cursor cur
 void data_channel_calibration_chart(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channel_calibration_point_can_save(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channel_calibration_chart_zoom(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dummy(DataOperationEnum operation, Cursor cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor cursor, Value &value);
 
@@ -1046,7 +1048,8 @@ enum ActionsEnum {
     ACTION_ID_CHANNEL_CALIBRATION_POINT_SAVE = 218,
     ACTION_ID_CHANNEL_CALIBRATION_CHART_ZOOM = 219,
     ACTION_ID_CH_SETTINGS_CALIBRATION_VIEW_POINTS = 220,
-    ACTION_ID_SHOW_TOUCH_CALIBRATION_INTRO = 221
+    ACTION_ID_SHOW_TOUCH_CALIBRATION_INTRO = 221,
+    ACTION_ID_TOGGLE_SLOT_MAX_VIEW = 222
 };
 
 void action_channel_toggle_output();
@@ -1270,6 +1273,7 @@ void action_channel_calibration_point_save();
 void action_channel_calibration_chart_zoom();
 void action_ch_settings_calibration_view_points();
 void action_show_touch_calibration_intro();
+void action_toggle_slot_max_view();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -1840,4 +1844,4 @@ enum PagesEnum {
     PAGE_ID_DEBUG_POWER_CHANNELS = 173
 };
 
-extern const uint8_t assets[309674];
+extern const uint8_t assets[309540];

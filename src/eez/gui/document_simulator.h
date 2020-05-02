@@ -415,7 +415,8 @@ enum DataEnum {
     DATA_ID_CHANNEL_CALIBRATION_POINT_INFO = 413,
     DATA_ID_CHANNEL_CALIBRATION_CHART = 414,
     DATA_ID_CHANNEL_CALIBRATION_POINT_CAN_SAVE = 415,
-    DATA_ID_CHANNEL_CALIBRATION_CHART_ZOOM = 416
+    DATA_ID_CHANNEL_CALIBRATION_CHART_ZOOM = 416,
+    DATA_ID_DUMMY = 417
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -835,6 +836,7 @@ void data_channel_calibration_point_info(DataOperationEnum operation, Cursor cur
 void data_channel_calibration_chart(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channel_calibration_point_can_save(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channel_calibration_chart_zoom(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dummy(DataOperationEnum operation, Cursor cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor cursor, Value &value);
 
@@ -1066,7 +1068,8 @@ enum ActionsEnum {
     ACTION_ID_CHANNEL_CALIBRATION_POINT_SAVE = 222,
     ACTION_ID_CHANNEL_CALIBRATION_CHART_ZOOM = 223,
     ACTION_ID_CH_SETTINGS_CALIBRATION_VIEW_POINTS = 224,
-    ACTION_ID_SHOW_TOUCH_CALIBRATION_INTRO = 225
+    ACTION_ID_SHOW_TOUCH_CALIBRATION_INTRO = 225,
+    ACTION_ID_TOGGLE_SLOT_MAX_VIEW = 226
 };
 
 void action_channel_toggle_output();
@@ -1294,6 +1297,7 @@ void action_channel_calibration_point_save();
 void action_channel_calibration_chart_zoom();
 void action_ch_settings_calibration_view_points();
 void action_show_touch_calibration_intro();
+void action_toggle_slot_max_view();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -1330,7 +1334,10 @@ enum BitmapsEnum {
     BITMAP_ID_FRONT_PANEL = 14,
     BITMAP_ID_DCP405 = 15,
     BITMAP_ID_DCM220 = 16,
-    BITMAP_ID_DCM224 = 17
+    BITMAP_ID_DCM224 = 17,
+    BITMAP_ID_MIO168 = 18,
+    BITMAP_ID_PREL6 = 19,
+    BITMAP_ID_SMX46 = 20
 };
 
 enum StylesEnum {
@@ -1607,7 +1614,7 @@ enum StylesEnum {
     STYLE_ID_INLINE270 = 270,
     STYLE_ID_INLINE271 = 271,
     STYLE_ID_INLINE272 = 272,
-    STYLE_ID_INLINE273 = 273,
+    STYLE_ID_FRONT_PANEL_MODULE = 273,
     STYLE_ID_INLINE274 = 274,
     STYLE_ID_INLINE275 = 275,
     STYLE_ID_INLINE276 = 276,
@@ -1875,16 +1882,19 @@ enum PagesEnum {
     PAGE_ID_DCM220_FRONT_PANEL = 166,
     PAGE_ID_DCM220_FRONT_PANEL_LED = 167,
     PAGE_ID_DCM224_FRONT_PANEL = 168,
-    PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD = 169,
-    PAGE_ID_FILE_MANAGER_DETAILS_VIEW = 170,
-    PAGE_ID_FILE_MANAGER_SCRIPTS_VIEW = 171,
-    PAGE_ID_FILE_MANAGER_SCRIPTS_ALTER_VIEW = 172,
-    PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW = 173,
-    PAGE_ID_TOUCH_TEST = 174,
-    PAGE_ID_DEBUG_VARIABLES = 175,
-    PAGE_ID_FOCUS_VALUE_OVERLAY = 176,
-    PAGE_ID_OVP_TYPE = 177,
-    PAGE_ID_DEBUG_POWER_CHANNELS = 178
+    PAGE_ID_MIO168_FRONT_PANEL = 169,
+    PAGE_ID_PREL6_FRONT_PANEL = 170,
+    PAGE_ID_SMX46_FRONT_PANEL = 171,
+    PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD = 172,
+    PAGE_ID_FILE_MANAGER_DETAILS_VIEW = 173,
+    PAGE_ID_FILE_MANAGER_SCRIPTS_VIEW = 174,
+    PAGE_ID_FILE_MANAGER_SCRIPTS_ALTER_VIEW = 175,
+    PAGE_ID_FILE_MANAGER_LARGE_ICONS_VIEW = 176,
+    PAGE_ID_TOUCH_TEST = 177,
+    PAGE_ID_DEBUG_VARIABLES = 178,
+    PAGE_ID_FOCUS_VALUE_OVERLAY = 179,
+    PAGE_ID_OVP_TYPE = 180,
+    PAGE_ID_DEBUG_POWER_CHANNELS = 181
 };
 
-extern const uint8_t assets[427590];
+extern const uint8_t assets[452442];
