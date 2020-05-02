@@ -185,7 +185,7 @@ void IOExpander::init() {
 
 bool IOExpander::test() {
 #if defined(EEZ_PLATFORM_STM32)    
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
+    Channel &channel = Channel::get(channelIndex);
     auto &slot = g_slots[slotIndex];
 
     channel.flags.powerOk = 1;
@@ -224,7 +224,7 @@ bool IOExpander::test() {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
+    Channel &channel = Channel::get(channelIndex);
     g_testResult = TEST_OK;
     channel.flags.powerOk = 1;
 #endif
@@ -271,7 +271,7 @@ void IOExpander::tick(uint32_t tick_usec) {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
+    Channel &channel = Channel::get(channelIndex);
 
     if (simulator::getPwrgood(channel.channelIndex)) {
         gpio |= 1 << IOExpander::IO_BIT_IN_PWRGOOD;
@@ -280,20 +280,20 @@ void IOExpander::tick(uint32_t tick_usec) {
     }
 
     if (channel.params.features & CH_FEATURE_RPOL) {
-        if (!simulator::getRPol(channel.channelIndex)) {
+        if (!simulator::getRPol(channelIndex)) {
             gpio |= 1 << IOExpander::IO_BIT_IN_RPOL;
         } else {
             gpio &= ~(1 << IOExpander::IO_BIT_IN_RPOL);
         }
     }
 
-    if (simulator::getCV(channel.channelIndex)) {
+    if (simulator::getCV(channelIndex)) {
         gpio |= 1 << IOExpander::IO_BIT_IN_CV_ACTIVE;
     } else {
         gpio &= ~(1 << IOExpander::IO_BIT_IN_CV_ACTIVE);
     }
 
-    if (simulator::getCC(channel.channelIndex)) {
+    if (simulator::getCC(channelIndex)) {
         gpio |= 1 << IOExpander::IO_BIT_IN_CC_ACTIVE;
     } else {
         gpio &= ~(1 << IOExpander::IO_BIT_IN_CC_ACTIVE);
@@ -330,7 +330,6 @@ bool IOExpander::testBit(int io_bit) {
 bool IOExpander::isAdcReady() {
 #if defined(EEZ_PLATFORM_STM32)
     // ready = !HAL_GPIO_ReadPin(SPI2_IRQ_GPIO_Port, SPI2_IRQ_Pin);
-	auto &slot = g_slots[slotIndex];
     return !testBit(IO_BIT_IN_ADC_DRDY);
 #else
     return true;

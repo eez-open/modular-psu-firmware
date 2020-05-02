@@ -29,6 +29,7 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/ramp.h>
 
+#include <eez/modules/dcp405/channel.h>
 #include <eez/modules/dcp405/dac.h>
 #include <eez/modules/dcp405/adc.h>
 #include <eez/modules/dcp405/ioexp.h>
@@ -57,21 +58,19 @@ void DigitalAnalogConverter::init() {
 
 bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc) {
 #if defined(EEZ_PLATFORM_STM32)
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
-
     if (ioexp.g_testResult != TEST_OK) {
-        // DebugTrace("Ch%d DAC test skipped because of IO expander", channel.channelIndex + 1);
         g_testResult = TEST_SKIPPED;
         return true;
     }
 
     if (adc.g_testResult != TEST_OK) {
-        // DebugTrace("Ch%d DAC test skipped because of ADC", channel.channelIndex + 1);
         g_testResult = TEST_SKIPPED;
         return true;
     }
 
     m_testing = true;
+
+    auto &channel = Channel::get(channelIndex);
 
     channel.calibrationEnableNoEvent(false);
 
@@ -138,7 +137,7 @@ void DigitalAnalogConverter::tick(uint32_t tickCount) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void DigitalAnalogConverter::setVoltage(float value, RampOption rampOption) {
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
+    Channel &channel = Channel::get(channelIndex);
 
 #if defined(EEZ_PLATFORM_STM32)
     set(DATA_BUFFER_B, clamp(remap(value, channel.params.U_MIN, (float)DAC_MIN, channel.params.U_MAX, (float)DAC_MAX), (float)DAC_MIN, (float)DAC_MAX), rampOption);
@@ -155,13 +154,13 @@ void DigitalAnalogConverter::setDacVoltage(uint16_t value) {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
+    Channel &channel = Channel::get(channelIndex);
     g_uSet[channel.channelIndex] = remap(value, (float)DAC_MIN, channel.params.U_MIN, (float)DAC_MAX, channel.params.U_MAX);
 #endif
 }
 
 void DigitalAnalogConverter::setCurrent(float value) {
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
+    Channel &channel = Channel::get(channelIndex);
 
 #if defined(EEZ_PLATFORM_STM32)
     set(DATA_BUFFER_A, clamp(remap(value, channel.params.I_MIN, (float)DAC_MIN, channel.getDualRangeMax(), (float)DAC_MAX), (float)DAC_MIN, (float)DAC_MAX));
@@ -178,7 +177,7 @@ void DigitalAnalogConverter::setDacCurrent(uint16_t value) {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
+    Channel &channel = Channel::get(channelIndex);
     g_iSet[channel.channelIndex] = remap(value, (float)DAC_MIN, channel.params.I_MIN, (float)DAC_MAX, channel.getDualRangeMax());
 #endif
 }
@@ -188,7 +187,7 @@ void DigitalAnalogConverter::setDacCurrent(uint16_t value) {
 #if defined(EEZ_PLATFORM_STM32)
 
 void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption rampOption) {
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
+    Channel &channel = Channel::get(channelIndex);
 
     if (buffer == DATA_BUFFER_B) {
         if (
@@ -225,9 +224,9 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
     data[1] = value >> 8;
     data[2] = value & 0xFF;
 
-    spi::select(channel.slotIndex, spi::CHIP_DAC);
-    spi::transfer(channel.slotIndex, data, result, 3);
-    spi::deselect(channel.slotIndex);
+    spi::select(slotIndex, spi::CHIP_DAC);
+    spi::transfer(slotIndex, data, result, 3);
+    spi::deselect(slotIndex);
 }
 
 void DigitalAnalogConverter::set(uint8_t buffer, float value) {

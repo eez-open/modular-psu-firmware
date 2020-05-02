@@ -41,6 +41,8 @@
 #include <eez/modules/bp3c/flash_slave.h>
 #include <eez/modules/bp3c/io_exp.h>
 
+#include <eez/modules/dcp405/channel.h>
+
 namespace eez {
 namespace psu {
 
@@ -173,7 +175,7 @@ scpi_result_t scpi_cmd_debugVoltage(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    channel->channelInterface->setDacVoltage(channel->subchannelIndex, (uint16_t)value);
+    channel->setDacVoltage((uint16_t)value);
 
     return SCPI_RES_OK;
 #else
@@ -194,7 +196,7 @@ scpi_result_t scpi_cmd_debugCurrent(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    channel->channelInterface->setDacCurrent(channel->subchannelIndex, (uint16_t)value);
+    channel->setDacCurrent((uint16_t)value);
 
     return SCPI_RES_OK;
 #else
@@ -223,7 +225,7 @@ scpi_result_t scpi_cmd_debugMeasureVoltage(scpi_t *context) {
         aux_ps::fan::tick(tickCount);
 #endif
 
-        channel->channelInterface->adcMeasureUMon(channel->subchannelIndex);
+        channel->adcMeasureUMon();
 
         Serial.print((int)debug::g_uMon[channel->channelIndex].get());
         Serial.print(" ");
@@ -263,7 +265,7 @@ scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
         aux_ps::fan::tick(tickCount);
 #endif
 
-        channel->channelInterface->adcMeasureIMon(channel->subchannelIndex);
+        channel->adcMeasureIMon();
 
         Serial.print((int)debug::g_iMon[channel->channelIndex].get());
         Serial.print(" ");
@@ -369,7 +371,7 @@ scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (direction != channel->channelInterface->getIoExpBitDirection(channel->subchannelIndex, bit)) {
+    if (direction != channel->getIoExpBitDirection(bit)) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }
@@ -379,7 +381,7 @@ scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    channel->channelInterface->changeIoExpBit(channel->subchannelIndex, bit, state);
+    channel->changeIoExpBit(bit, state);
 
     return SCPI_RES_OK;
 #else
@@ -409,12 +411,12 @@ scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (direction != channel->channelInterface->getIoExpBitDirection(channel->subchannelIndex, bit)) {
+    if (direction != channel->getIoExpBitDirection(bit)) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }
 
-    bool state = channel->channelInterface->testIoExpBit(channel->subchannelIndex, bit);
+    bool state = channel->testIoExpBit(bit);
 
     SCPI_ResultBool(context, state);
 

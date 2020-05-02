@@ -55,7 +55,7 @@ bool isHwOvpEnabled(Channel &channel) {
 	return channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type;
 }
 
-struct Channel : ChannelInterface {
+struct DcpChannel : public Channel {
 	AnalogDigitalConverter adc;
 	DigitalAnalogConverter dac;
 	IOExpander ioexp;
@@ -65,7 +65,7 @@ struct Channel : ChannelInterface {
 	bool dpOn;
 	uint32_t dpNegMonitoringTime;
 
-    float uSet;
+    float uSet = 0;
 
 	float uBeforeBalancing = NAN;
 	float iBeforeBalancing = NAN;
@@ -77,10 +77,13 @@ struct Channel : ChannelInterface {
 	float U_CAL_POINTS[2];
 	float I_CAL_POINTS[2];
 	float I_LOW_RANGE_CAL_POINTS[2];
-	
-	Channel(int slotIndex_) : ChannelInterface(slotIndex_), uSet(0) {}
 
-	void getParams(int subchannelIndex, ChannelParams &params) {
+    DcpChannel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex)
+        : Channel(slotIndex, channelIndex, subchannelIndex)
+    {
+    }
+	
+	void getParams() override {
 		auto slot = g_slots[slotIndex];
 
 		params.U_MIN = 0.0f;
@@ -171,33 +174,41 @@ struct Channel : ChannelInterface {
 		}
 	}
 
-	void init(int subchannelIndex) {
+	void init() override {
 		ioexp.slotIndex = slotIndex;
+		ioexp.channelIndex = channelIndex;
+		
 		adc.slotIndex = slotIndex;
+		adc.channelIndex = channelIndex;
+		
 		dac.slotIndex = slotIndex;
+		dac.channelIndex = channelIndex;
 
 		ioexp.init();
 		adc.init();
 		dac.init();
 	}
 
-	void onPowerDown(int subchannelIndex) {
-	}
+	void reset() {
+		Channel::reset();
 
-	void reset(int subchannelIndex) {
 		uSet = 0;
         dpOn = false;
 		uBeforeBalancing = NAN;
 		iBeforeBalancing = NAN;
 	}
 
-	void test(int subchannelIndex) {
+	bool test() {
+		Channel::test();
+
 		ioexp.test();
 		adc.test();
 		dac.test(ioexp, adc);
+
+		return isOk();
 	}
 
-	TestResult getTestResult(int subchannelIndex) {
+	TestResult getTestResult() {
 		if (ioexp.g_testResult == TEST_NONE || adc.g_testResult == TEST_NONE || dac.g_testResult == TEST_NONE) {
 			return TEST_NONE;
 		}
@@ -214,44 +225,41 @@ struct Channel : ChannelInterface {
 			return ADC_DATA_TYPE_I_MON;
 		}
 
-		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-		if (adcDataType == ADC_DATA_TYPE_I_MON && channel.isRemoteProgrammingEnabled()) {
+		if (adcDataType == ADC_DATA_TYPE_I_MON && isRemoteProgrammingEnabled()) {
 			return ADC_DATA_TYPE_U_MON_DAC;
 		}
 
 		return ADC_DATA_TYPE_U_MON;
 	}
 
-	void tick(int subchannelIndex, uint32_t tickCount) {
-		if (isDacTesting(subchannelIndex)) {
+	void tickSpecific(uint32_t tickCount) {
+		if (isDacTesting()) {
 			return;
 		}
-
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
 
 		ioexp.tick(tickCount);
 
 #if !CONF_SKIP_PWRGOOD_TEST
 		if (!ioexp.testBit(IOExpander::IO_BIT_IN_PWRGOOD)) {
-			// DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d", channel.channelIndex + 1, (int)ioexp.gpio);
-			channel.flags.powerOk = 0;
-			generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channel.channelIndex);
+			// DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d", channelIndex + 1, (int)ioexp.gpio);
+			flags.powerOk = 0;
+			generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channelIndex);
 			powerDownBySensor();
 			return;
 		}
 #endif
 
-		if (channel.isOutputEnabled() && ioexp.isAdcReady()) {
+		if (isOutputEnabled() && ioexp.isAdcReady()) {
 			auto adcDataType = adc.adcDataType;
-			float value = adc.read(channel);
+			float value = adc.read();
 			adc.start(getNextAdcDataType(adcDataType));
-			channel.onAdcData(adcDataType, value);
+			onAdcData(adcDataType, value);
 #ifdef DEBUG
 			psu::debug::g_adcCounter.inc();
 #endif
 		}
 
-		if (channel.flags.dprogState == DPROG_STATE_ON) {
+		if (flags.dprogState == DPROG_STATE_ON) {
 			// turn off DP after delay
 			if (delayed_dp_off && (millis() - delayed_dp_off_start) >= DP_OFF_DELAY_PERIOD) {
 				delayed_dp_off = false;
@@ -263,29 +271,29 @@ struct Channel : ChannelInterface {
 		/// that is negative value in Watts (default -1 W),
 		/// and that condition lasts more then DP_NEG_DELAY seconds (default 5 s),
 		/// down-programmer circuit has to be switched off.
-		if (channel.isOutputEnabled()) {
-			if (channel.u.mon_last * channel.i.mon_last >= DP_NEG_LEV || tickCount < dpNegMonitoringTime) {
+		if (isOutputEnabled()) {
+			if (u.mon_last * i.mon_last >= DP_NEG_LEV || tickCount < dpNegMonitoringTime) {
 				dpNegMonitoringTime = tickCount;
 			} else {
 				if (tickCount - dpNegMonitoringTime > DP_NEG_DELAY * 1000000UL) {
 					if (dpOn) {
-						// DebugTrace("CH%d, neg. P, DP off: %f", channel.channelIndex + 1, channel.u.mon_last * channel.i.mon_last);
+						// DebugTrace("CH%d, neg. P, DP off: %f", channelIndex + 1, u.mon_last * i.mon_last);
 						dpNegMonitoringTime = tickCount;
-						generateError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF + channel.channelIndex);
+						generateError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF + channelIndex);
 						setDpEnable(false);
 					} else {
-						// DebugTrace("CH%d, neg. P, output off: %f", channel.channelIndex + 1, channel.u.mon_last * channel.i.mon_last);
-						generateError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED - channel.channelIndex);
-						channel_dispatcher::outputEnable(channel, false);
+						// DebugTrace("CH%d, neg. P, output off: %f", channelIndex + 1, u.mon_last * i.mon_last);
+						generateError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED - channelIndex);
+						channel_dispatcher::outputEnable(*this, false);
 					}
 				} else if (tickCount - dpNegMonitoringTime > 500 * 1000UL) {
-					if (dpOn && channel.channelIndex < 2) {
+					if (dpOn && channelIndex < 2) {
 						if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
-							psu::Channel &channel2 = psu::Channel::get(channel.channelIndex == 0 ? 1 : 0);
+							psu::Channel &channel2 = psu::Channel::get(channelIndex == 0 ? 1 : 0);
 							voltageBalancing(channel2);
 							dpNegMonitoringTime = tickCount;
 						} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
-							psu::Channel &channel2 = psu::Channel::get(channel.channelIndex == 0 ? 1 : 0);
+							psu::Channel &channel2 = psu::Channel::get(channelIndex == 0 ? 1 : 0);
 							currentBalancing(channel2);
 							dpNegMonitoringTime = tickCount;
 						}
@@ -294,58 +302,58 @@ struct Channel : ChannelInterface {
 			}
 		}
 
-        if (channel.channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
-            unsigned cvMode = isCvMode(subchannelIndex) ? 1 : 0;
-            if (cvMode != channel.flags.cvMode) {
-                restoreVoltageToValueBeforeBalancing(psu::Channel::get(channel.channelIndex == 0 ? 1 : 0));
+        if (channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+            unsigned cvMode = isInCvMode() ? 1 : 0;
+            if (cvMode != flags.cvMode) {
+                restoreVoltageToValueBeforeBalancing(psu::Channel::get(channelIndex == 0 ? 1 : 0));
             }
         }
 
-        if (channel.channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
-            unsigned ccMode = isCcMode(subchannelIndex) ? 1 : 0;
-		    if (ccMode != channel.flags.ccMode) {
-				restoreCurrentToValueBeforeBalancing(psu::Channel::get(channel.channelIndex == 0 ? 1 : 0));
+        if (channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+            unsigned ccMode = isInCcMode() ? 1 : 0;
+		    if (ccMode != flags.ccMode) {
+				restoreCurrentToValueBeforeBalancing(psu::Channel::get(channelIndex == 0 ? 1 : 0));
 			}
 		}
 
 		if (fallingEdge) {
 			fallingEdge =
 				(int32_t(fallingEdgeTimeout - millis()) > 0) ||
-				(fallingEdgePreviousUMonAdc > channel.u.mon_adc) ||
-				(channel.u.mon_adc > uSet * (1.0f + CONF_FALLING_EDGE_OVP_PERCENTAGE / 100.0f));
+				(fallingEdgePreviousUMonAdc > u.mon_adc) ||
+				(u.mon_adc > uSet * (1.0f + CONF_FALLING_EDGE_OVP_PERCENTAGE / 100.0f));
 
 			if (fallingEdge) {
-				fallingEdgePreviousUMonAdc = channel.u.mon_adc;
+				fallingEdgePreviousUMonAdc = u.mon_adc;
 			}
 		}
 
 		// HW OVP handling
 		if (ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE)) {
-			if (!fallingEdge && isHwOvpEnabled(channel) && !ioexp.testBit(IOExpander::IO_BIT_OUT_OVP_ENABLE)) {
-				if (channel.u.set > CONF_OVP_HW_VOLTAGE_THRESHOLD) {
+			if (!fallingEdge && isHwOvpEnabled(*this) && !ioexp.testBit(IOExpander::IO_BIT_OUT_OVP_ENABLE)) {
+				if (u.set > CONF_OVP_HW_VOLTAGE_THRESHOLD) {
 					// activate HW OVP
-					channel.prot_conf.flags.u_hwOvpDeactivated = 0;
+					prot_conf.flags.u_hwOvpDeactivated = 0;
 					ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, true);
 				} else {
-					channel.prot_conf.flags.u_hwOvpDeactivated = 1;
+					prot_conf.flags.u_hwOvpDeactivated = 1;
 				}
-			} else if ((fallingEdge || !isHwOvpEnabled(channel)) && ioexp.testBit(IOExpander::IO_BIT_OUT_OVP_ENABLE)) {
+			} else if ((fallingEdge || !isHwOvpEnabled(*this)) && ioexp.testBit(IOExpander::IO_BIT_OUT_OVP_ENABLE)) {
 				// deactivate HW OVP
-				channel.prot_conf.flags.u_hwOvpDeactivated = fallingEdge ? 0 : 1;
+				prot_conf.flags.u_hwOvpDeactivated = fallingEdge ? 0 : 1;
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
 			}
 		}
 	}
 
-	unsigned getRPol(int subchannelIndex) {
+	unsigned getRPol() {
 		return !ioexp.testBit(IOExpander::IO_BIT_IN_RPOL);
 	}
 
-	bool isCcMode(int subchannelIndex) {
+	bool isInCcMode() {
 		return ioexp.testBit(IOExpander::IO_BIT_IN_CC_ACTIVE);
 	}
 
-	bool isCvMode(int subchannelIndex) {
+	bool isInCvMode() {
 		return ioexp.testBit(IOExpander::IO_BIT_IN_CV_ACTIVE);
 	}
 
@@ -363,68 +371,60 @@ struct Channel : ChannelInterface {
 #endif
     }
 
-	void adcMeasureUMon(int subchannelIndex) {
-		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-
+	void adcMeasureUMon() {
 		adc.start(ADC_DATA_TYPE_U_MON);
 		waitConversionEnd();
-		channel.onAdcData(ADC_DATA_TYPE_U_MON, adc.read(channel));
+		onAdcData(ADC_DATA_TYPE_U_MON, adc.read());
 
-		if (channel.isOutputEnabled()) {
+		if (isOutputEnabled()) {
 			adc.start(ADC_DATA_TYPE_U_MON);
 		}
 	}
 
-	void adcMeasureIMon(int subchannelIndex) {
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-
+	void adcMeasureIMon() {
 		adc.start(ADC_DATA_TYPE_U_MON);
 		waitConversionEnd();
-		channel.onAdcData(ADC_DATA_TYPE_U_MON, adc.read(channel));
+		onAdcData(ADC_DATA_TYPE_U_MON, adc.read());
 
-		if (channel.isOutputEnabled()) {
+		if (isOutputEnabled()) {
 			adc.start(ADC_DATA_TYPE_U_MON);
 		}
 	}
 
-	void adcMeasureMonDac(int subchannelIndex) {
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-
-		if (channel.isOk() || isDacTesting(subchannelIndex)) {
+	void adcMeasureMonDac() {
+		if (isOk() || isDacTesting()) {
 			adc.start(ADC_DATA_TYPE_U_MON_DAC);
 			waitConversionEnd();
-			channel.onAdcData(ADC_DATA_TYPE_U_MON_DAC, adc.read(channel));
+			onAdcData(ADC_DATA_TYPE_U_MON_DAC, adc.read());
 
 			adc.start(ADC_DATA_TYPE_I_MON_DAC);
 			waitConversionEnd();
-			channel.onAdcData(ADC_DATA_TYPE_I_MON_DAC, adc.read(channel));
+			onAdcData(ADC_DATA_TYPE_I_MON_DAC, adc.read());
 
-			if (channel.isOutputEnabled()) {
+			if (isOutputEnabled()) {
 				adc.start(ADC_DATA_TYPE_U_MON);
 			}
 		}
 	}
 
-	void adcMeasureAll(int subchannelIndex) {
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-
+	void adcMeasureAll() {
 		adc.start(ADC_DATA_TYPE_U_MON);
 		waitConversionEnd();
-		channel.onAdcData(ADC_DATA_TYPE_U_MON, adc.read(channel));
+		onAdcData(ADC_DATA_TYPE_U_MON, adc.read());
 
 		adc.start(ADC_DATA_TYPE_I_MON);
 		waitConversionEnd();
-		channel.onAdcData(ADC_DATA_TYPE_I_MON, adc.read(channel));
+		onAdcData(ADC_DATA_TYPE_I_MON, adc.read());
 
 		adc.start(ADC_DATA_TYPE_U_MON_DAC);
 		waitConversionEnd();
-		channel.onAdcData(ADC_DATA_TYPE_U_MON_DAC, adc.read(channel));
+		onAdcData(ADC_DATA_TYPE_U_MON_DAC, adc.read());
 
 		adc.start(ADC_DATA_TYPE_I_MON_DAC);
 		waitConversionEnd();
-		channel.onAdcData(ADC_DATA_TYPE_I_MON_DAC, adc.read(channel));
+		onAdcData(ADC_DATA_TYPE_I_MON_DAC, adc.read());
 
-		if (channel.isOutputEnabled()) {
+		if (isOutputEnabled()) {
 			adc.start(ADC_DATA_TYPE_U_MON);
 		}
 	}
@@ -441,9 +441,7 @@ struct Channel : ChannelInterface {
 		}
 	}
 
-	void setOutputEnable(int subchannelIndex, bool enable, uint16_t tasks) {
-		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-
+	void setOutputEnable(bool enable, uint16_t tasks) {
 		if (enable) {
 			// OE
 			if (tasks & OUTPUT_ENABLE_TASK_OE) {
@@ -457,15 +455,15 @@ struct Channel : ChannelInterface {
 
 			// Current range
 			if (tasks & OUTPUT_ENABLE_TASK_CURRENT_RANGE) {
-				setCurrentRange(subchannelIndex);
+				doSetCurrentRange();
 			}
 
 			// OVP
 			if (tasks & OUTPUT_ENABLE_TASK_OVP) {
-				if (isHwOvpEnabled(channel)) {
-					if (channel.u.set > CONF_OVP_HW_VOLTAGE_THRESHOLD) {
+				if (isHwOvpEnabled(*this)) {
+					if (u.set > CONF_OVP_HW_VOLTAGE_THRESHOLD) {
 						// OVP has to be enabled after OE activation
-						channel.prot_conf.flags.u_hwOvpDeactivated = 0;
+						prot_conf.flags.u_hwOvpDeactivated = 0;
 						ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, true);
 					}
 				}
@@ -473,7 +471,7 @@ struct Channel : ChannelInterface {
 
 			// DP
 			if (tasks & OUTPUT_ENABLE_TASK_DP) {
-				if (channel.flags.dprogState == DPROG_STATE_ON) {
+				if (flags.dprogState == DPROG_STATE_ON) {
 					// enable DP
 					dpNegMonitoringTime = micros();
 					delayed_dp_off = false;
@@ -487,9 +485,9 @@ struct Channel : ChannelInterface {
 		} else {
 			// OVP
 			if (tasks & OUTPUT_ENABLE_TASK_OVP) {
-				if (isHwOvpEnabled(channel)) {
+				if (isHwOvpEnabled(*this)) {
 					// OVP has to be disabled before OE deactivation
-					channel.prot_conf.flags.u_hwOvpDeactivated = 1;
+					prot_conf.flags.u_hwOvpDeactivated = 1;
 					ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
 				}
 			}
@@ -503,18 +501,18 @@ struct Channel : ChannelInterface {
 			if (tasks & OUTPUT_ENABLE_TASK_OE) {
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, false);
 
-				channel.u.resetMonValues();
-				channel.i.resetMonValues();
+				u.resetMonValues();
+				i.resetMonValues();
 			}
 
 			// Current range
 			if (tasks & OUTPUT_ENABLE_TASK_CURRENT_RANGE) {
-				setCurrentRange(subchannelIndex);
+				doSetCurrentRange();
 			}
 
 			// DP
 			if (tasks & OUTPUT_ENABLE_TASK_DP) {
-				if (channel.flags.dprogState == DPROG_STATE_ON) {
+				if (flags.dprogState == DPROG_STATE_ON) {
 					// turn off DP after some delay
 					delayed_dp_off = true;
 					delayed_dp_off_start = millis();
@@ -523,19 +521,19 @@ struct Channel : ChannelInterface {
 		}
 
 		if (tasks & OUTPUT_ENABLE_TASK_FINALIZE) {
-			if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+			if (channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OE_UNCOUPLED_LED, false);
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OE_COUPLED_LED, enable);
-			} else if (channel.channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+			} else if (channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OE_UNCOUPLED_LED, false);
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OE_COUPLED_LED, false);
-			} else if (channel.channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+			} else if (channelIndex == 0 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OE_UNCOUPLED_LED, false);
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OE_COUPLED_LED, enable);
-			} else if (channel.channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+			} else if (channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OE_UNCOUPLED_LED, false);
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OE_COUPLED_LED, false);
-			} else if (channel.channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
+			} else if (channelIndex < 2 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OE_UNCOUPLED_LED, false);
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OE_COUPLED_LED, enable);
 			} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_COMMON_GND) {
@@ -546,96 +544,94 @@ struct Channel : ChannelInterface {
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OE_COUPLED_LED, false);
 			}
 
-			restoreVoltageToValueBeforeBalancing(channel);
-			restoreCurrentToValueBeforeBalancing(channel);
+			restoreVoltageToValueBeforeBalancing(*this);
+			restoreCurrentToValueBeforeBalancing(*this);
 		}
 	}
 
     void setDprogState(DprogState dprogState) {
-		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
+		Channel::setDprogState(dprogState);
+
 		if (dprogState == DPROG_STATE_OFF) {
 			setDpEnable(false);
 		} else {
-			setDpEnable(channel.isOk() && ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE));
+			setDpEnable(isOk() && ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE));
 		}
 		delayed_dp_off = false;
     }
     
-    void setRemoteSense(int subchannelIndex, bool enable) {
+    void setRemoteSense(bool enable) {
 		ioexp.changeBit(IOExpander::IO_BIT_OUT_REMOTE_SENSE, enable);
 	}
 
-	void setRemoteProgramming(int subchannelIndex, bool enable) {
+	void setRemoteProgramming(bool enable) {
 		ioexp.changeBit(IOExpander::IO_BIT_OUT_REMOTE_PROGRAMMING, enable);
 	}
 
-	void setDacVoltage(int subchannelIndex, uint16_t value) {
+	void setDacVoltage(uint16_t value) {
 		dac.setDacVoltage(value);
 
         uBeforeBalancing = NAN;
-        restoreCurrentToValueBeforeBalancing(psu::Channel::getBySlotIndex(slotIndex));
+        restoreCurrentToValueBeforeBalancing(*this);
     }
 
-	void setDacVoltageFloat(int subchannelIndex, float value) {
-		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-
+	void setDacVoltageFloat(float value) {
 		float previousUSet = uSet;
 
 		uSet = value;
 
-		if (channel.isOutputEnabled()) {
-			bool belowThreshold = channel.u.set <= CONF_OVP_HW_VOLTAGE_THRESHOLD;
+		if (isOutputEnabled()) {
+			bool belowThreshold = u.set <= CONF_OVP_HW_VOLTAGE_THRESHOLD;
 
 			if (value < previousUSet) {
 				fallingEdge = true;
-				fallingEdgePreviousUMonAdc = channel.u.mon_adc;
+				fallingEdgePreviousUMonAdc = u.mon_adc;
 				fallingEdgeTimeout = millis() + (belowThreshold ? CONF_FALLING_EDGE_SW_OVP_DELAY_MS : CONF_FALLING_EDGE_HW_OVP_DELAY_MS);
-				if (isHwOvpEnabled(channel)) {
+				if (isHwOvpEnabled(*this)) {
 					// deactivate HW OVP
-					channel.prot_conf.flags.u_hwOvpDeactivated = 0; // this flag should be 0 while fallingEdge is true
+					prot_conf.flags.u_hwOvpDeactivated = 0; // this flag should be 0 while fallingEdge is true
 					ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
 				}
 			} else if (belowThreshold) {
-				if (isHwOvpEnabled(channel)) {
+				if (isHwOvpEnabled(*this)) {
 					// deactivate HW OVP
-					channel.prot_conf.flags.u_hwOvpDeactivated = 1;
+					prot_conf.flags.u_hwOvpDeactivated = 1;
 					ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
 				}
 			}
 		}
 
-        if (ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE) || isDacTesting(subchannelIndex)) {
+        if (ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE) || isDacTesting()) {
 			dac.setVoltage(value);
 		} else {
 			dac.setDacVoltage(0);
 		}
 
 		uBeforeBalancing = NAN;
-		restoreCurrentToValueBeforeBalancing(psu::Channel::getBySlotIndex(slotIndex));
+		restoreCurrentToValueBeforeBalancing(*this);
 	}
 
-	void setDacCurrent(int subchannelIndex, uint16_t value) {
+	void setDacCurrent(uint16_t value) {
 		dac.setDacCurrent(value);
 
 		iBeforeBalancing = NAN;
-		restoreVoltageToValueBeforeBalancing(psu::Channel::getBySlotIndex(slotIndex));
+		restoreVoltageToValueBeforeBalancing(*this);
 	}
 
-	void setDacCurrentFloat(int subchannelIndex, float value) {
+	void setDacCurrentFloat(float value) {
 		dac.setCurrent(value);
 		iBeforeBalancing = NAN;
-		restoreVoltageToValueBeforeBalancing(psu::Channel::getBySlotIndex(slotIndex));
+		restoreVoltageToValueBeforeBalancing(*this);
 	}
 
-	bool isDacTesting(int subchannelIndex) {
+	bool isDacTesting() {
 		return dac.isTesting();
 	}
 
-	void setCurrentRange(int subchannelIndex) {
-        auto &channel = psu::Channel::getBySlotIndex(slotIndex);
+	void doSetCurrentRange() {
 		auto &slot = g_slots[slotIndex];
 
-		if (!channel.hasSupportForCurrentDualRange()) {
+		if (!hasSupportForCurrentDualRange()) {
 			return;
 		}
 
@@ -643,10 +639,10 @@ struct Channel : ChannelInterface {
 			ioexp.changeBit(IOExpander::IO_BIT_OUT_CURRENT_RANGE_500MA, false);
 		}
 
-		if (channel.isOutputEnabled()) {
-			if (channel.flags.currentCurrentRange == 0 || dac.isTesting()) {
+		if (isOutputEnabled()) {
+			if (flags.currentCurrentRange == 0 || dac.isTesting()) {
 				// 5A
-				// DebugTrace("CH%d: Switched to 5A range", channel.channelIndex + 1);
+				// DebugTrace("CH%d: Switched to 5A range", channelIndex + 1);
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_CURRENT_RANGE_5A, true);
 				ioexp.changeBit(slot.moduleRevision == MODULE_REVISION_DCP405_R1B1 ?
 					IOExpander::IO_BIT_OUT_CURRENT_RANGE_50MA :
@@ -654,7 +650,7 @@ struct Channel : ChannelInterface {
 				// calculateNegligibleAdcDiffForCurrent();
 			} else {
 				// 50mA
-				// DebugTrace("CH%d: Switched to 50mA range", channel.channelIndex + 1);
+				// DebugTrace("CH%d: Switched to 50mA range", channelIndex + 1);
 				ioexp.changeBit(slot.moduleRevision == MODULE_REVISION_DCP405_R1B1 ?
 					IOExpander::IO_BIT_OUT_CURRENT_RANGE_50MA :
 					IOExpander::R2B5_IO_BIT_OUT_CURRENT_RANGE_50MA, true);
@@ -669,39 +665,37 @@ struct Channel : ChannelInterface {
 		}
 	}
 
-    bool isVoltageBalanced(int subchannelIndex) {
+    bool isVoltageBalanced() {
         return !isNaN(uBeforeBalancing);
     }
 
-    bool isCurrentBalanced(int subchannelIndex) {
+    bool isCurrentBalanced() {
         return !isNaN(iBeforeBalancing);
     }
 
-    float getUSetUnbalanced(int subchannelIndex) {
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-        return isVoltageBalanced(subchannelIndex) ? uBeforeBalancing : channel.u.set;
+    float getUSetUnbalanced() {
+        return isVoltageBalanced() ? uBeforeBalancing : u.set;
     }
 
-    float getISetUnbalanced(int subchannelIndex) {
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-        return isCurrentBalanced(subchannelIndex) ? iBeforeBalancing : channel.i.set;
+    float getISetUnbalanced() {
+        return isCurrentBalanced() ? iBeforeBalancing : i.set;
     }
 
-	void readAllRegisters(int subchannelIndex, uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
+	void readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
 		ioexp.readAllRegisters(ioexpRegisters);
 		adc.readAllRegisters(adcRegisters);
 	}
 
 	#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
-	int getIoExpBitDirection(int subchannelIndex, int io_bit) {
+	int getIoExpBitDirection(int io_bit) {
 		return ioexp.getBitDirection(io_bit);
 	}
 
-	bool testIoExpBit(int subchannelIndex, int io_bit) {
+	bool testIoExpBit(int io_bit) {
 		return ioexp.testBit(io_bit);
 	}
 
-	void changeIoExpBit(int subchannelIndex, int io_bit, bool set) {
+	void changeIoExpBit(int io_bit, bool set) {
 		ioexp.changeBit(io_bit, set);
 	}
 	#endif
@@ -724,30 +718,29 @@ struct Channel : ChannelInterface {
         channel.doSetCurrent((psu::Channel::get(0).i.mon_last + psu::Channel::get(1).i.mon_last) / 2);
     }
 
-	void restoreVoltageToValueBeforeBalancing(psu::Channel &channel) {
-		if (!isNaN(uBeforeBalancing)) {
-			// DebugTrace("Restore voltage to value before balancing: %f", uBeforeBalancing);
-			channel.setVoltage(uBeforeBalancing);
-			uBeforeBalancing = NAN;
-		}
-	}
+    void restoreVoltageToValueBeforeBalancing(psu::Channel &channel) {
+        if (!isNaN(uBeforeBalancing)) {
+            // DebugTrace("Restore voltage to value before balancing: %f", uBeforeBalancing);
+            channel.setVoltage(uBeforeBalancing);
+            uBeforeBalancing = NAN;
+        }
+    }
 
-	void restoreCurrentToValueBeforeBalancing(psu::Channel &channel) {
-		if (!isNaN(iBeforeBalancing)) {
-			// DebugTrace("Restore current to value before balancing: %f", index, iBeforeBalancing);
+    void restoreCurrentToValueBeforeBalancing(psu::Channel &channel) {
+        if (!isNaN(iBeforeBalancing)) {
+            // DebugTrace("Restore current to value before balancing: %f", index, iBeforeBalancing);
             channel.setCurrent(iBeforeBalancing);
-			iBeforeBalancing = NAN;
-		}
-	}
+            iBeforeBalancing = NAN;
+        }
+    }
 
 #if defined(EEZ_PLATFORM_STM32)
 	void onSpiIrq() {
 		uint8_t intcap = ioexp.readIntcapRegister();
-		// DebugTrace("CH%d INTCAP 0x%02X\n", (int)(channel.channelIndex + 1), (int)intcap);
-		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
+		// DebugTrace("CH%d INTCAP 0x%02X\n", (int)(channelIndex + 1), (int)intcap);
 		if (!(intcap & (1 << IOExpander::R2B5_IO_BIT_IN_OVP_FAULT))) {
-			if (channel.isOutputEnabled()) {
-				channel.enterOvpProtection();
+			if (isOutputEnabled()) {
+				enterOvpProtection();
 			}
 		}
 	}
@@ -779,8 +772,7 @@ struct Channel : ChannelInterface {
 		static float calibrationModeLowRangeValues[] = { 0.001f, 0.0001f, 0.00001f, 0.000001f };
         static float highRangeValues[] = { 0.1f, 0.01f, 0.001f, 0.0005f }; 
 		static float calibrationModeHighRangeValues[] = { 0.1f, 0.01f, 0.001f, 0.0001f }; 
-		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex);
-		if (channel.flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
+		if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
         	stepValues->values = calibrationMode ? calibrationModeLowRangeValues : lowRangeValues;
         	stepValues->count = sizeof(lowRangeValues) / sizeof(float);
 		} else {
@@ -797,9 +789,8 @@ struct Channel : ChannelInterface {
 		stepValues->unit = UNIT_WATT;
 	}	
 
-	bool isPowerLimitExceeded(int subchannelIndex, float u, float i, int *err) {
-		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, 0);
-		if (u * i > channel_dispatcher::getPowerLimit(channel)) {
+	bool isPowerLimitExceeded(float u, float i, int *err) {
+		if (u * i > channel_dispatcher::getPowerLimit(*this)) {
 			if (err) {
 				*err = SCPI_ERROR_POWER_LIMIT_EXCEEDED;
 			}
@@ -809,30 +800,42 @@ struct Channel : ChannelInterface {
 	}
 };
 
-static Channel g_channel0(0);
-static Channel g_channel1(1);
-static Channel g_channel2(2);
-ChannelInterface *g_channelInterfaces[NUM_SLOTS] = { &g_channel0, &g_channel1, &g_channel2 };
+struct DcpChannelModuleInfo : public PsuChannelModuleInfo {
+public:
+	DcpChannelModuleInfo() 
+		: PsuChannelModuleInfo(MODULE_TYPE_DCP405, "DCP405", MODULE_REVISION_DCP405_R2B7, 1)
+	{
+	}
 
-static PsuChannelModuleInfo g_psuChannelModuleInfo(MODULE_TYPE_DCP405, "DCP405", MODULE_REVISION_DCP405_R2B7, 1, g_channelInterfaces);
+	Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
+		return new DcpChannel(slotIndex, channelIndex, subchannelIndex);
+	}
+};
+
+static DcpChannelModuleInfo g_psuChannelModuleInfo;
 
 ModuleInfo *g_moduleInfo = &g_psuChannelModuleInfo;
 
 bool isDacRampActive() {
-	return g_channel0.dac.m_isRampActive || g_channel1.dac.m_isRampActive || g_channel2.dac.m_isRampActive;
+	for (int i = 0; i < CH_NUM; i++) {
+		auto &channel = Channel::get(i);
+		if (g_slots[channel.slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+			if (((DcpChannel&)channel).dac.m_isRampActive) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void tickDacRamp(uint32_t tickCount) {
-	if (g_channel0.dac.m_isRampActive) {
-		g_channel0.dac.tick(tickCount);
-	}
-
-	if (g_channel1.dac.m_isRampActive) {
-		g_channel1.dac.tick(tickCount);
-	}
-
-	if (g_channel2.dac.m_isRampActive) {
-		g_channel2.dac.tick(tickCount);
+	for (int i = 0; i < CH_NUM; i++) {
+		auto &channel = Channel::get(i);
+		if (g_slots[channel.slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+			if (((DcpChannel&)channel).dac.m_isRampActive) {
+				((DcpChannel&)channel).dac.tick(tickCount);
+			}
+		}
 	}
 }
 

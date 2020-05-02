@@ -36,7 +36,7 @@
 namespace eez {
 namespace psu {
 
-class Channel;
+struct Channel;
 
 } // namespace psu
 } // namespace eez

@@ -25,6 +25,7 @@
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/drivers/tmp1075.h>
 #include <eez/drivers/tc77.h>
+#include <eez/modules/dcp405/channel.h>
 #include <eez/modules/dcm220/channel.h>
 #endif
 
@@ -60,9 +61,8 @@ bool TempSensor::isInstalled() {
         return false;
 #endif
     } else if (type >= CH1 && type <= CH6) {
-    	int channelIndex = type - CH1;
-        int slotIndex = Channel::get(channelIndex).slotIndex;
-        return g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE;
+        int channelIndex = type - CH1;
+        return channelIndex < CH_NUM;
     } else {
         return false;
     }

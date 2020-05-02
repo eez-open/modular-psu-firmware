@@ -31,6 +31,7 @@ public:
     static const uint16_t DAC_MAX = (1L << DAC_RES) - 1;
 
     uint8_t slotIndex;
+    uint8_t channelIndex;
     TestResult g_testResult;
     bool m_isRampActive = false;
 

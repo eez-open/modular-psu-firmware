@@ -29,7 +29,7 @@ using namespace eez::gui;
 namespace eez {
 namespace psu {
 
-class Channel;
+struct Channel;
 
 namespace gui {
 

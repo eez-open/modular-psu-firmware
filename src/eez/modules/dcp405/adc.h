@@ -23,7 +23,7 @@
 namespace eez {
 namespace psu {
 
-class Channel;
+struct Channel;
 
 /// Analog to digital converter HW used by the channel.
 class AnalogDigitalConverter {
@@ -31,6 +31,7 @@ public:
     static const uint16_t ADC_MIN = 0;
     static const uint16_t ADC_MAX = (1L << ADC_RES) - 1;
 
+    uint8_t channelIndex;
     uint8_t slotIndex;
     TestResult g_testResult;
     
@@ -40,7 +41,7 @@ public:
     bool test();
 
     void start(AdcDataType adcDataType);
-    float read(Channel& channel);
+    float read();
 
     void readAllRegisters(uint8_t registers[]);
 

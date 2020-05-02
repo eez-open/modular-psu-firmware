@@ -102,9 +102,7 @@ static float g_iMon[CH_MAX];
 float g_uSet[CH_MAX];
 float g_iSet[CH_MAX];
 
-void updateValues(Channel &channel) {
-    int channelIndex = channel.channelIndex;
-
+void updateValues(uint8_t channelIndex) {
     bool series = false;
     bool parallel = false;
     Channel &channel0 = Channel::get(0);
@@ -122,6 +120,8 @@ void updateValues(Channel &channel) {
             return;
         }
     }
+
+    auto &channel = Channel::get(channelIndex);
 
     if (channel.simulator.getLoadEnabled()) {
         float u_set_v;
@@ -148,11 +148,11 @@ void updateValues(Channel &channel) {
             u_mon_v = u_set_v;
             i_mon_a = u_set_v / channel.simulator.load;
 
-            simulator::setCV(channel.channelIndex, true);
-            simulator::setCC(channel.channelIndex, false);
+            simulator::setCV(channelIndex, true);
+            simulator::setCC(channelIndex, false);
         } else {
-            simulator::setCV(channel.channelIndex, false);
-            simulator::setCC(channel.channelIndex, true);
+            simulator::setCV(channelIndex, false);
+            simulator::setCC(channelIndex, true);
         }
 
         if (series) {
@@ -187,11 +187,11 @@ void updateValues(Channel &channel) {
             }
 
             if (g_uSet[channelIndex] > 0 && g_iSet[channelIndex] > 0) {
-                simulator::setCV(channel.channelIndex, true);
-                simulator::setCC(channel.channelIndex, false);
+                simulator::setCV(channelIndex, true);
+                simulator::setCC(channelIndex, false);
             } else {
-                simulator::setCV(channel.channelIndex, false);
-                simulator::setCC(channel.channelIndex, true);
+                simulator::setCV(channelIndex, false);
+                simulator::setCC(channelIndex, true);
             }
             return;
         }
@@ -199,8 +199,8 @@ void updateValues(Channel &channel) {
 
     g_uMon[channelIndex] = 0;
     g_iMon[channelIndex] = 0;
-    simulator::setCV(channel.channelIndex, true);
-    simulator::setCC(channel.channelIndex, false);
+    simulator::setCV(channelIndex, true);
+    simulator::setCC(channelIndex, false);
 }
 #endif
 
@@ -249,25 +249,20 @@ bool AnalogDigitalConverter::test() {
     uint8_t reg2 = result[2];
     uint8_t reg3 = result[3];
 
-    Channel &channel = Channel::getBySlotIndex(slotIndex);
-
 	if (reg1 != getReg1Val()) {
-		// DebugTrace("Ch%d ADC test failed reg1: expected=%d, got=%d", channel.channelIndex + 1, getReg1Val(), reg1);
 		g_testResult = TEST_FAILED;
 	}
 
 	if (reg2 != ADC_REG2_VAL) {
-		// DebugTrace("Ch%d ADC test failed reg2: expected=%d, got=%d", channel.channelIndex + 1, ADC_REG2_VAL, reg2);
 		g_testResult = TEST_FAILED;
 	}
 
 	if (reg3 != ADC_REG3_VAL) {
-	   // DebugTrace("Ch%d ADC test failed reg3: expected=%d, got=%d", channel.channelIndex + 1, ADC_REG3_VAL, reg3);
 	   g_testResult = TEST_FAILED;
 	}
 
     if (g_testResult == TEST_FAILED) {
-		generateError(SCPI_ERROR_CH1_ADC_TEST_FAILED + channel.channelIndex);
+		generateError(SCPI_ERROR_CH1_ADC_TEST_FAILED + channelIndex);
     } else {
     	g_testResult = TEST_OK;
     }
@@ -303,7 +298,7 @@ void AnalogDigitalConverter::start(AdcDataType adcDataType_) {
 #endif
 }
 
-float AnalogDigitalConverter::read(Channel& channel) {
+float AnalogDigitalConverter::read() {
 #if defined(EEZ_PLATFORM_STM32)
     uint8_t data[3];
     uint8_t result[3];
@@ -323,27 +318,29 @@ float AnalogDigitalConverter::read(Channel& channel) {
 
     float value;
 
+    auto &channel = Channel::get(channelIndex);
+
     if (adcDataType == ADC_DATA_TYPE_U_MON) {
         value = remapAdcDataToVoltage(channel, adcDataType, adcValue);
         channel.u.mon_adc = value;
 #ifdef DEBUG
-        debug::g_uMon[channel.channelIndex].set(adcValue);
+        debug::g_uMon[channelIndex].set(adcValue);
 #endif
     } else if (adcDataType == ADC_DATA_TYPE_I_MON) {
         value = remapAdcDataToCurrent(channel, adcDataType, adcValue);
         channel.i.mon_adc = value;
 #ifdef DEBUG
-        debug::g_iMon[channel.channelIndex].set(adcValue);
+        debug::g_iMon[channelIndex].set(adcValue);
 #endif
     } else if (adcDataType == ADC_DATA_TYPE_U_MON_DAC) {
         value = remapAdcDataToVoltage(channel, adcDataType, adcValue);
 #ifdef DEBUG
-        debug::g_uMonDac[channel.channelIndex].set(adcValue);
+        debug::g_uMonDac[channelIndex].set(adcValue);
 #endif
     } else {
         value = remapAdcDataToCurrent(channel, adcDataType, adcValue);
 #ifdef DEBUG
-        debug::g_iMonDac[channel.channelIndex].set(adcValue);
+        debug::g_iMonDac[channelIndex].set(adcValue);
 #endif
     }
 
@@ -351,21 +348,21 @@ float AnalogDigitalConverter::read(Channel& channel) {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    updateValues(channel);
+    updateValues(channelIndex);
 
     if (adcDataType == ADC_DATA_TYPE_U_MON) {
-        return g_uMon[channel.channelIndex];
+        return g_uMon[channelIndex];
     }
 
     if (adcDataType == ADC_DATA_TYPE_I_MON) {
-        return g_iMon[channel.channelIndex];
+        return g_iMon[channelIndex];
     }
 
     if (adcDataType == ADC_DATA_TYPE_U_MON_DAC) {
-        return g_uSet[channel.channelIndex];
+        return g_uSet[channelIndex];
     }
 
-    return g_iSet[channel.channelIndex];
+    return g_iSet[channelIndex];
 #endif
 }
 

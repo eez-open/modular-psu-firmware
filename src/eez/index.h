@@ -57,7 +57,6 @@ ModuleInfo *getModuleInfo(uint16_t moduleType);
 struct SlotInfo {
     ModuleInfo *moduleInfo;
     uint16_t moduleRevision;
-    uint8_t channelIndex;
 };
 
 static const int NUM_SLOTS = 3;

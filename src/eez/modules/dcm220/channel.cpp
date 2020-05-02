@@ -34,6 +34,7 @@
 #include <eez/modules/psu/event_queue.h>
 #include <eez/scpi/regs.h>
 #include <eez/system.h>
+#include <eez/firmware.h>
 
 #define CONF_MASTER_SYNC_TIMEOUT_MS 500
 #define CONF_MASTER_SYNC_IRQ_TIMEOUT_MS 50
@@ -137,8 +138,8 @@ float calcTemperature(uint16_t adcValue) {
 
 #endif
 
-struct Channel : ChannelInterface {
-    bool outputEnable[2];
+struct DcmChannel : public Channel {
+    bool outputEnable;
 
     uint8_t output[BUFFER_SIZE];
 
@@ -147,17 +148,17 @@ struct Channel : ChannelInterface {
 
 	uint8_t input[BUFFER_SIZE];
 
-	uint16_t uSet[2];
-	uint16_t iSet[2];
+	uint16_t uSet;
+	uint16_t iSet;
 
-	float temperature[2];
+	float temperature;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    float uMon[2];
-    float iMon[2];
-    float uSet[2];
-    float iSet[2];
+    float uMon;
+    float iMon;
+    float uSet;
+    float iSet;
 #endif
 
     TestResult testResult;
@@ -173,20 +174,20 @@ struct Channel : ChannelInterface {
 	float U_CAL_POINTS[2];
 	float I_CAL_POINTS[6];
 
-    Channel(int slotIndex_)
-		: ChannelInterface(slotIndex_)
+    DcmChannel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex)
+        : Channel(slotIndex, channelIndex, subchannelIndex)
 #if defined(EEZ_PLATFORM_STM32)
 		, synchronized(false)
 #endif
     	, testResult(TEST_NONE)
-	{
+    {
 #if defined(EEZ_PLATFORM_STM32)
     	memset(output, 0, sizeof(output));
     	memset(input, 0, sizeof(input));
 #endif
     }
 
-	void getParams(int subchannelIndex, ChannelParams &params) {
+	void getParams() override {
 		auto slot = g_slots[slotIndex];
 
 		params.U_MIN = 1.0f;
@@ -298,7 +299,7 @@ struct Channel : ChannelInterface {
 	}
 #endif
 
-	void init(int subchannelIndex) {
+	void init() override {
 #if defined(EEZ_PLATFORM_STM32)
 		if (!synchronized && subchannelIndex == 0) {
 			if (masterSynchro(slotIndex, firmwareMajorVersion, firmwareMinorVersion, idw0, idw1, idw2)) {
@@ -325,24 +326,23 @@ struct Channel : ChannelInterface {
 #endif
     }
 
-	void onPowerDown(int subchannelIndex) {
+	void onPowerDown() {
+		Channel::onPowerDown();
+
 #if defined(EEZ_PLATFORM_STM32)
 		synchronized = false;
 #endif
 	}
 
-	void reset(int subchannelIndex) {
-	}
+	bool test() {
+		Channel::test();
 
-	void test(int subchannelIndex) {
 #if defined(EEZ_PLATFORM_STM32)
 		if (!synchronized) {
 			testResult = TEST_FAILED;
-			return;
+			return false;
 		}
 #endif
-
-		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
 
 #if defined(EEZ_PLATFORM_STM32)
 		if (subchannelIndex == 0) {
@@ -360,22 +360,25 @@ struct Channel : ChannelInterface {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        bool pwrGood = simulator::getPwrgood(channel.channelIndex);
+        bool pwrGood = simulator::getPwrgood(channelIndex);
 #endif
 
-		channel.flags.powerOk = pwrGood ? 1 : 0;
+		flags.powerOk = pwrGood ? 1 : 0;
 
-		testResult = channel.flags.powerOk ? TEST_OK : TEST_FAILED;
+		testResult = flags.powerOk ? TEST_OK : TEST_FAILED;
+
+		return isOk();
 	}
 
-	TestResult getTestResult(int subchannelIndex) {
+	TestResult getTestResult() {
 		return testResult;
 	}
 
-	void tick(int subchannelIndex, uint32_t tickCount) {
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
+	void tickSpecific(uint32_t tickCount) {
         if (subchannelIndex == 0) {
-        	uint8_t output0 = 0x80 | (outputEnable[0] ? REG0_OE1_MASK : 0) | (outputEnable[1] ? REG0_OE2_MASK : 0);
+			DcmChannel &secondChannel = (DcmChannel &)Channel::get(channelIndex + 1);
+
+        	uint8_t output0 = 0x80 | (outputEnable ? REG0_OE1_MASK : 0) | (secondChannel.outputEnable ? REG0_OE2_MASK : 0);
 
             output[0] = output0;
 
@@ -384,16 +387,16 @@ struct Channel : ChannelInterface {
 
         	uint16_t *outputSetValues = (uint16_t *)(output + 2);
 
-        	outputSetValues[0] = uSet[0];
-        	outputSetValues[1] = iSet[0];
-        	outputSetValues[2] = uSet[1];
-        	outputSetValues[3] = iSet[1];
+        	outputSetValues[0] = uSet;
+        	outputSetValues[1] = iSet;
+        	outputSetValues[2] = secondChannel.uSet;
+        	outputSetValues[3] = secondChannel.iSet;
 
 #ifdef DEBUG
-			psu::debug::g_uDac[channel.channelIndex + 0].set(uSet[0]);
-			psu::debug::g_iDac[channel.channelIndex + 0].set(iSet[0]);
-			psu::debug::g_uDac[channel.channelIndex + 1].set(uSet[1]);
-			psu::debug::g_iDac[channel.channelIndex + 1].set(iSet[1]);
+			psu::debug::g_uDac[channelIndex + 0].set(uSet);
+			psu::debug::g_iDac[channelIndex + 0].set(iSet);
+			psu::debug::g_uDac[channelIndex + 1].set(secondChannel.uSet);
+			psu::debug::g_iDac[channelIndex + 1].set(secondChannel.iSet);
 #endif
 
 			transfer();
@@ -401,44 +404,44 @@ struct Channel : ChannelInterface {
 
 #if defined(EEZ_PLATFORM_STM32)
             if (numCrcErrors == 0) {
-		    	temperature[0] = calcTemperature(*((uint16_t *)(input + 10)));
-		    	temperature[1] = calcTemperature(*((uint16_t *)(input + 12)));
+		    	temperature = calcTemperature(*((uint16_t *)(input + 10)));
+		    	secondChannel.temperature = calcTemperature(*((uint16_t *)(input + 12)));
 		    }
 #endif
         }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        if (channel.isOutputEnabled()) {
-            if (channel.simulator.getLoadEnabled()) {
-                float u_set_v = uSet[channel.subchannelIndex];
-                float i_set_a = iSet[channel.subchannelIndex];
+        if (isOutputEnabled()) {
+            if (simulator.getLoadEnabled()) {
+                float u_set_v = uSet;
+                float i_set_a = iSet;
 
-                float u_mon_v = i_set_a * channel.simulator.load;
+                float u_mon_v = i_set_a * simulator.load;
                 float i_mon_a = i_set_a;
                 if (u_mon_v > u_set_v) {
                     u_mon_v = u_set_v;
-                    i_mon_a = u_set_v / channel.simulator.load;
+                    i_mon_a = u_set_v / simulator.load;
 
-                    simulator::setCC(channel.channelIndex, false);
+                    simulator::setCC(channelIndex, false);
                 } else {
-                    simulator::setCC(channel.channelIndex, true);
+                    simulator::setCC(channelIndex, true);
                 }
 
-                uMon[channel.subchannelIndex] = u_mon_v;
-                iMon[channel.subchannelIndex] = i_mon_a;
+                uMon = u_mon_v;
+                iMon = i_mon_a;
             } else {
-                uMon[channel.subchannelIndex] = uSet[channel.subchannelIndex];
-                iMon[channel.subchannelIndex] = 0;
-                if (uSet[channel.subchannelIndex] > 0 && iSet[channel.subchannelIndex] > 0) {
-                    simulator::setCC(channel.channelIndex, false);
+                uMon = uSet;
+                iMon = 0;
+                if (uSet > 0 && iSet > 0) {
+                    simulator::setCC(channelIndex, false);
                 } else {
-                    simulator::setCC(channel.channelIndex, true);
+                    simulator::setCC(channelIndex, true);
                 }
             }
         } else {
-            uMon[channel.subchannelIndex] = 0;
-            iMon[channel.subchannelIndex] = 0;
-            simulator::setCC(channel.channelIndex, false);
+            uMon = 0;
+            iMon = 0;
+            simulator::setCC(channelIndex, false);
         }
 #endif
 
@@ -451,27 +454,27 @@ struct Channel : ChannelInterface {
         	int offset = subchannelIndex * 2;
 
         	uint16_t uMonAdc = inputSetValues[offset];
-        	float uMon = remap(uMonAdc, (float)ADC_MIN, 0, (float)ADC_MAX, channel.params.U_MAX);
-        	channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon);
+        	float uMon = remap(uMonAdc, (float)ADC_MIN, 0, (float)ADC_MAX, params.U_MAX);
+        	onAdcData(ADC_DATA_TYPE_U_MON, uMon);
 
         	uint16_t iMonAdc = inputSetValues[offset + 1];
 
 			const float FULL_SCALE = 2.0F;
 			const float U_REF = 2.5F;
-        	float iMon = remap(iMonAdc, (float)ADC_MIN, 0, FULL_SCALE * ADC_MAX / U_REF, /*channel.params.I_MAX*/ I_MAX_FOR_REMAP);
+        	float iMon = remap(iMonAdc, (float)ADC_MIN, 0, FULL_SCALE * ADC_MAX / U_REF, /*params.I_MAX*/ I_MAX_FOR_REMAP);
         	iMon = roundPrec(iMon, I_MON_RESOLUTION);
-        	channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon);
+        	onAdcData(ADC_DATA_TYPE_I_MON, iMon);
 
 #ifdef DEBUG
-			psu::debug::g_uMon[channel.channelIndex].set(uMonAdc);
-			psu::debug::g_iMon[channel.channelIndex].set(iMonAdc);
+			psu::debug::g_uMon[channelIndex].set(uMonAdc);
+			psu::debug::g_iMon[channelIndex].set(iMonAdc);
 #endif
         }
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon[channel.subchannelIndex]);
-        channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon[channel.subchannelIndex]);
+        onAdcData(ADC_DATA_TYPE_U_MON, uMon);
+        onAdcData(ADC_DATA_TYPE_I_MON, iMon);
 #endif
 
         // PWRGOOD
@@ -486,102 +489,95 @@ struct Channel : ChannelInterface {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        bool pwrGood = simulator::getPwrgood(channel.channelIndex);
+        bool pwrGood = simulator::getPwrgood(channelIndex);
 #endif
 
 #if !CONF_SKIP_PWRGOOD_TEST
 		if (!pwrGood) {
-			channel.flags.powerOk = 0;
-			generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channel.channelIndex);
+			flags.powerOk = 0;
+			generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channelIndex);
 			powerDownBySensor();
 			return;
 		}
 #endif
 	}
 	
-	bool isCcMode(int subchannelIndex) {
+	bool isInCcMode() {
 #if defined(EEZ_PLATFORM_STM32)
         return (input[0] & (subchannelIndex == 0 ? REG0_CC1_MASK : REG0_CC2_MASK)) != 0;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        return simulator::getCC(channel.channelIndex);
+        return simulator::getCC(channelIndex);
 #endif
 	}
 
-	bool isCvMode(int subchannelIndex) {
-		return !isCcMode(subchannelIndex);
+	bool isInCvMode() {
+		return !isCcMode();
 	}
 
-	void adcMeasureUMon(int subchannelIndex) {
+	void adcMeasureUMon() {
 	}
 
-	void adcMeasureIMon(int subchannelIndex) {
+	void adcMeasureIMon() {
 	}
 
-	void adcMeasureMonDac(int subchannelIndex) {
+	void adcMeasureMonDac() {
 	}
 
-	void adcMeasureAll(int subchannelIndex) {
+	void adcMeasureAll() {
 	}
 
-	void setOutputEnable(int subchannelIndex, bool enable, uint16_t tasks) {
-		outputEnable[subchannelIndex] = enable;
+	void setOutputEnable(bool enable, uint16_t tasks) {
+		outputEnable = enable;
 	}
 
-    void setDprogState(DprogState dprogState) {
-    }
-    
-    void setDacVoltage(int subchannelIndex, uint16_t value) {
+    void setDacVoltage(uint16_t value) {
 
 #if defined(EEZ_PLATFORM_STM32)
         value = (uint16_t)clamp((float)value, (float)DAC_MIN, (float)DAC_MAX);
-        uSet[subchannelIndex] = clamp(value, DAC_MIN, DAC_MAX);
+        uSet = clamp(value, DAC_MIN, DAC_MAX);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        uSet[subchannelIndex] = remap(clamp((float)value, (float)DAC_MIN, (float)DAC_MAX), (float)DAC_MIN, 0, (float)DAC_MAX, channel.params.U_MAX);
+        uSet = remap(clamp((float)value, (float)DAC_MIN, (float)DAC_MAX), (float)DAC_MIN, 0, (float)DAC_MAX, params.U_MAX);
 #endif
 	}
 
-	void setDacVoltageFloat(int subchannelIndex, float value) {
+	void setDacVoltageFloat(float value) {
 #if defined(EEZ_PLATFORM_STM32)
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        value = remap(value, 0, (float)DAC_MIN, channel.params.U_MAX, (float)DAC_MAX);
-        uSet[subchannelIndex] = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
+        value = remap(value, 0, (float)DAC_MIN, params.U_MAX, (float)DAC_MAX);
+        uSet = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        uSet[subchannelIndex] = value;
+        uSet = value;
 #endif
 	}
 
-	void setDacCurrent(int subchannelIndex, uint16_t value) {
+	void setDacCurrent(uint16_t value) {
 #if defined(EEZ_PLATFORM_STM32)
         value = (uint16_t)clamp((float)value, (float)DAC_MIN, (float)DAC_MAX);
-        iSet[subchannelIndex] = value;
+        iSet = value;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-        uSet[subchannelIndex] = remap(clamp((float)value, (float)DAC_MIN, (float)DAC_MAX), (float)DAC_MIN, channel.params.I_MIN, (float)DAC_MAX, channel.params.I_MAX);
+        uSet = remap(clamp((float)value, (float)DAC_MIN, (float)DAC_MAX), (float)DAC_MIN, params.I_MIN, (float)DAC_MAX, params.I_MAX);
 #endif
     }
 
-	void setDacCurrentFloat(int subchannelIndex, float value) {
+	void setDacCurrentFloat(float value) {
 #if defined(EEZ_PLATFORM_STM32)
-        value = remap(value, /*channel.params.I_MIN*/ 0, (float)DAC_MIN, /*channel.params.I_MAX*/ I_MAX_FOR_REMAP, (float)DAC_MAX);
-        iSet[subchannelIndex] = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
+        value = remap(value, /*params.I_MIN*/ 0, (float)DAC_MIN, /*params.I_MAX*/ I_MAX_FOR_REMAP, (float)DAC_MAX);
+        iSet = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        iSet[subchannelIndex] = value;
+        iSet = value;
 #endif
 	}
 
-	bool isDacTesting(int subchannelIndex) {
+	bool isDacTesting() {
 		return false;
 	}
 
@@ -627,17 +623,16 @@ struct Channel : ChannelInterface {
 		stepValues->unit = UNIT_WATT;
 	}
 	
-	bool isPowerLimitExceeded(int subchannelIndex, float u, float i, int *err) {
-		psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
+	bool isPowerLimitExceeded(float u, float i, int *err) {
 		float power = u * i;
-		if (power > channel_dispatcher::getPowerLimit(channel)) {
+		if (power > channel_dispatcher::getPowerLimit(*this)) {
 			if (err) {
 				*err = SCPI_ERROR_POWER_LIMIT_EXCEEDED;
 			}
 			return true;
 		}
 
-		psu::Channel &otherChannel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex == 0 ? 1 : 0);
+        auto &otherChannel = Channel::get(channelIndex + (subchannelIndex == 0 ? 1 : -1));
 		float powerOtherChannel = channel_dispatcher::getUSet(otherChannel) * channel_dispatcher::getISet(otherChannel);
 		if (power + powerOtherChannel > PTOT) {
 			if (err) {
@@ -650,13 +645,20 @@ struct Channel : ChannelInterface {
 	}
 };
 
-static Channel g_channel0(0);
-static Channel g_channel1(1);
-static Channel g_channel2(2);
-static ChannelInterface *g_channelInterfaces[NUM_SLOTS] = { &g_channel0, &g_channel1, &g_channel2 };
+struct DcmChannelModuleInfo : public PsuChannelModuleInfo {
+public:
+	DcmChannelModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision) 
+		: PsuChannelModuleInfo(moduleType, moduleName, latestModuleRevision, 2)
+	{
+	}
 
-static PsuChannelModuleInfo g_dcm220PsuChannelModuleInfo(MODULE_TYPE_DCM220, "DCM220", MODULE_REVISION_DCM220_R2B4, 2, g_channelInterfaces);
-static PsuChannelModuleInfo g_dcm224PsuChannelModuleInfo(MODULE_TYPE_DCM224, "DCM224", MODULE_REVISION_DCM224_R1B1, 2, g_channelInterfaces);
+	Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
+		return new DcmChannel(slotIndex, channelIndex, subchannelIndex);
+	}
+};
+
+static DcmChannelModuleInfo g_dcm220PsuChannelModuleInfo(MODULE_TYPE_DCM220, "DCM220", MODULE_REVISION_DCM220_R2B4);
+static DcmChannelModuleInfo g_dcm224PsuChannelModuleInfo(MODULE_TYPE_DCM224, "DCM224", MODULE_REVISION_DCM224_R1B1);
 
 ModuleInfo *g_dcm220ModuleInfo = &g_dcm220PsuChannelModuleInfo;
 ModuleInfo *g_dcm224ModuleInfo = &g_dcm224PsuChannelModuleInfo;
@@ -665,14 +667,12 @@ ModuleInfo *g_dcm224ModuleInfo = &g_dcm224PsuChannelModuleInfo;
 
 float readTemperature(int channelIndex) {
 	psu::Channel& channel = psu::Channel::get(channelIndex);
-	int slotIndex = channel.slotIndex;
-	auto slot = g_slots[slotIndex];
+	auto slot = g_slots[channel.slotIndex];
 	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
 		// TODO this is temporary until module hardware is changed
 		return 25.0f + (channel.isOutputEnabled() ? 5 * channel.i.set : 0.0f);
 	} else {
-		Channel *dcm220Channel = (Channel *)g_channelInterfaces[slotIndex];
-		return dcm220Channel->temperature[channel.subchannelIndex];
+		return ((DcmChannel&)channel).temperature;
 	}
 }
 

@@ -854,7 +854,6 @@ void SLOT_INFO2_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = g_slots[slotIndex];
     if (slot.moduleInfo->moduleType != MODULE_TYPE_NONE) {
-        psu::Channel &channel = psu::Channel::get(slot.channelIndex);
         if (slot.moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
             snprintf(text, count - 1, "%s_R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
         } else {
@@ -1212,7 +1211,7 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        channel.getVoltageStepValues(value.getStepValues());
+        channel.getVoltageStepValues(value.getStepValues(), false);
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
         int err;
@@ -1326,7 +1325,7 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        channel.getCurrentStepValues(value.getStepValues());
+        channel.getCurrentStepValues(value.getStepValues(), false);
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
         int err;
@@ -2427,7 +2426,7 @@ void data_channel_protection_ovp_limit(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        channel.getVoltageStepValues(value.getStepValues());
+        channel.getVoltageStepValues(value.getStepValues(), false);
         value = 1;
     }
 }
@@ -2502,7 +2501,7 @@ void data_channel_protection_ocp_limit(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        channel.getCurrentStepValues(value.getStepValues());
+        channel.getCurrentStepValues(value.getStepValues(), false);
         value = 1;
     }
 }
@@ -2878,7 +2877,7 @@ void data_channel_tracking_is_enabled(DataOperationEnum operation, Cursor cursor
 
 void data_channel_tracking_is_allowed(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto channel = Channel::get(cursor);
+        auto &channel = Channel::get(cursor);
         value = channel_dispatcher::isTrackingAllowed(channel, nullptr) ? 1 : 0;
     }
 }
@@ -6015,7 +6014,7 @@ void data_debug_u_dac(DataOperationEnum operation, Cursor cursor, Value &value) 
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(1.0f * channel.params.DAC_MAX, UNIT_UNKNOWN);
     } else if (operation == DATA_OPERATION_SET) {
-        channel.channelInterface->setDacVoltage(channel.subchannelIndex, (uint16_t)value.getFloat());
+        channel.setDacVoltage((uint16_t)value.getFloat());
     } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "U DAC";
     } else if (operation == DATA_OPERATION_GET_UNIT) {
@@ -6067,7 +6066,7 @@ void data_debug_i_dac(DataOperationEnum operation, Cursor cursor, Value &value) 
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(1.0f * channel.params.DAC_MAX, UNIT_UNKNOWN);
     } else if (operation == DATA_OPERATION_SET) {
-        channel.channelInterface->setDacCurrent(channel.subchannelIndex, (uint16_t)value.getFloat());
+        channel.setDacCurrent((uint16_t)value.getFloat());
     } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "I DAC";
     } else if (operation == DATA_OPERATION_GET_UNIT) {

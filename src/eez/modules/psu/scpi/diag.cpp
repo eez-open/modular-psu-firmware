@@ -281,7 +281,7 @@ static uint8_t g_adcRegisters[CH_MAX][4];
 void diagCallback() {
     for (int i = 0; i < CH_NUM; i++) {
         Channel& channel = Channel::get(i);
-        channel.channelInterface->readAllRegisters(channel.subchannelIndex, &g_ioexpRegisters[i][0], &g_adcRegisters[i][0]);
+        channel.readAllRegisters(&g_ioexpRegisters[i][0], &g_adcRegisters[i][0]);
     }
 }
 

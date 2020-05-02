@@ -50,6 +50,7 @@ public:
     static const uint8_t IO_BIT_OUT_OE_COUPLED_LED = 15;
 
     uint8_t slotIndex;
+    uint8_t channelIndex;
     TestResult g_testResult;
 
     void init();

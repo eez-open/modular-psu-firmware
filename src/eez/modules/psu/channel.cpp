@@ -30,6 +30,7 @@
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/list_program.h>
+#include <eez/modules/psu/ontime.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/ramp.h>
@@ -49,76 +50,11 @@ namespace psu {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-PsuChannelModuleInfo::PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision, uint8_t numChannels_, ChannelInterface **channelInterfaces_)
+PsuChannelModuleInfo::PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision, uint8_t numChannels_)
     : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, latestModuleRevision)
     , numChannels(numChannels_)
-    , channelInterfaces(channelInterfaces_)
 {
 }
-
-////////////////////////////////////////////////////////////////////////////////
-
-ChannelInterface::ChannelInterface(int slotIndex_) 
-    : slotIndex(slotIndex_) 
-{
-}
-
-unsigned ChannelInterface::getRPol(int subchannelIndex) {
-    return 0;
-}
-
-void ChannelInterface::setRemoteSense(int subchannelIndex, bool enable) {
-}
-
-void ChannelInterface::setRemoteProgramming(int subchannelIndex, bool enable) {
-}
-
-void ChannelInterface::setCurrentRange(int subchannelIndex) {
-}
-
-bool ChannelInterface::isVoltageBalanced(int subchannelIndex) {
-	return false;
-}
-
-bool ChannelInterface::isCurrentBalanced(int subchannelIndex) {
-	return false;
-}
-
-float ChannelInterface::getUSetUnbalanced(int subchannelIndex) {
-    psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-    return channel.u.set;
-}
-
-float ChannelInterface::getISetUnbalanced(int subchannelIndex) {
-    psu::Channel &channel = psu::Channel::getBySlotIndex(slotIndex, subchannelIndex);
-    return channel.i.set;
-}
-
-void ChannelInterface::readAllRegisters(int subchannelIndex, uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
-}
-
-void ChannelInterface::onSpiIrq() {
-}
-
-#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
-int ChannelInterface::getIoExpBitDirection(int subchannelIndex, int io_bit) {
-	return 0;
-}
-
-bool ChannelInterface::testIoExpBit(int subchannelIndex, int io_bit) {
-	return false;
-}
-
-void ChannelInterface::changeIoExpBit(int subchannelIndex, int io_bit, bool set) {
-}
-#endif
-
-////////////////////////////////////////////////////////////////////////////////
-
-int CH_NUM = 0;
-Channel Channel::g_channels[CH_MAX];
-
-int g_errorChannelIndex = -1;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -220,6 +156,38 @@ void Channel::Value::addMonDacValue(float value, float prec) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+int CH_NUM = 0;
+Channel *Channel::g_channels[CH_MAX];
+uint8_t Channel::g_slotIndexToChannelIndex[NUM_SLOTS];
+
+int g_errorChannelIndex = -1;
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Channel::enumChannels() {
+    CH_NUM = 0;
+
+    for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        auto& slot = g_slots[slotIndex];
+        if (slot.moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
+            auto psuChannelModuleInfo = (PsuChannelModuleInfo *)slot.moduleInfo;
+
+            Channel::g_slotIndexToChannelIndex[slotIndex] = CH_NUM;
+
+            for (uint8_t subchannelIndex = 0; subchannelIndex < psuChannelModuleInfo->numChannels; subchannelIndex++) {
+                auto channelIndex = CH_NUM++;
+                g_channels[channelIndex] = psuChannelModuleInfo->createChannel(slotIndex, channelIndex, subchannelIndex);
+                g_channels[channelIndex]->initParams();
+            }
+
+            persist_conf::loadModuleConf(slotIndex);
+            ontime::g_moduleCounters[slotIndex].init();
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 static uint16_t g_oeSavedState;
 
 void Channel::saveAndDisableOE() {
@@ -259,7 +227,7 @@ void Channel::restoreOE() {
 ////////////////////////////////////////////////////////////////////////////////
 
 float Channel::getChannel0HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
-    Channel &channel = g_channels[0];
+    Channel &channel = *g_channels[0];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
     
@@ -283,7 +251,7 @@ float Channel::getChannel0HistoryValue(uint32_t rowIndex, uint8_t columnIndex, f
 }
 
 float Channel::getChannel1HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
-    Channel &channel = g_channels[1];
+    Channel &channel = *g_channels[1];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
 
@@ -307,7 +275,7 @@ float Channel::getChannel1HistoryValue(uint32_t rowIndex, uint8_t columnIndex, f
 }
 
 float Channel::getChannel2HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
-    Channel &channel = g_channels[2];
+    Channel &channel = *g_channels[2];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
 
@@ -331,7 +299,7 @@ float Channel::getChannel2HistoryValue(uint32_t rowIndex, uint8_t columnIndex, f
 }
 
 float Channel::getChannel3HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
-    Channel &channel = g_channels[3];
+    Channel &channel = *g_channels[3];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
 
@@ -355,7 +323,7 @@ float Channel::getChannel3HistoryValue(uint32_t rowIndex, uint8_t columnIndex, f
 }
 
 float Channel::getChannel4HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
-    Channel &channel = g_channels[4];
+    Channel &channel = *g_channels[4];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
 
@@ -379,7 +347,7 @@ float Channel::getChannel4HistoryValue(uint32_t rowIndex, uint8_t columnIndex, f
 }
 
 float Channel::getChannel5HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
-    Channel &channel = g_channels[5];
+    Channel &channel = *g_channels[5];
 
     uint32_t position = rowIndex % CHANNEL_HISTORY_SIZE;
 
@@ -450,20 +418,14 @@ float Channel::Simulator::getVoltProgExt() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Channel::set(uint8_t slotIndex_, uint8_t subchannelIndex_) {
-    auto slot = g_slots[slotIndex_];
-
+Channel::Channel(uint8_t slotIndex_, uint8_t channelIndex_, uint8_t subchannelIndex_) {
 	slotIndex = slotIndex_;
+    channelIndex = channelIndex_;
     subchannelIndex = subchannelIndex_;
+}
 
-    auto psuChannelModuleInfo = (PsuChannelModuleInfo *)slot.moduleInfo;
-    channelInterface = psuChannelModuleInfo->channelInterfaces[slotIndex];
-
-    if (!channelInterface) {
-        return;
-    }
-
-    channelInterface->getParams(subchannelIndex, params);
+void Channel::initParams() {
+    getParams();
 
     u.min = roundChannelValue(UNIT_VOLT, params.U_MIN);
     u.max = roundChannelValue(UNIT_VOLT, params.U_MAX);
@@ -490,10 +452,6 @@ void Channel::set(uint8_t slotIndex_, uint8_t subchannelIndex_) {
 
     flags.cvMode = 0;
     flags.ccMode = 0;
-}
-
-void Channel::setChannelIndex(uint8_t channelIndex_) {
-    channelIndex = channelIndex_;
 }
 
 int Channel::reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionValue &cpv) {
@@ -606,17 +564,11 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Channel::init() {
-    channelInterface->init(subchannelIndex);
-}
-
 void Channel::onPowerDown() {
     doRemoteSensingEnable(false);
     doRemoteProgrammingEnable(false);
 
     clearProtection(false);
-
-    channelInterface->onPowerDown(subchannelIndex);
 }
 
 void Channel::reset() {
@@ -700,8 +652,6 @@ void Channel::reset() {
     simulator.setLoadEnabled(false);
     simulator.load = 10;
 #endif
-
-    channelInterface->reset(subchannelIndex);
 }
 
 uint32_t Channel::getCurrentHistoryValuePosition() {
@@ -759,17 +709,11 @@ bool Channel::test() {
     doRemoteSensingEnable(false);
     doRemoteProgrammingEnable(false);
 
-    channelInterface->test(subchannelIndex);
-
     return isOk();
 }
 
 bool Channel::isPowerOk() {
     return flags.powerOk;
-}
-
-TestResult Channel::getTestResult() {
-    return channelInterface->getTestResult(subchannelIndex);
 }
 
 bool Channel::isTestFailed() {
@@ -789,12 +733,12 @@ void Channel::tick(uint32_t tick_usec) {
         return;
     }
 
-    channelInterface->tick(subchannelIndex, tick_usec);
+    tickSpecific(tick_usec);
 
     if (params.features & CH_FEATURE_RPOL) {
         unsigned rpol = 0;
             
-        rpol = channelInterface->getRPol(subchannelIndex);
+        rpol = getRPol();
 
         if (rpol != flags.rpol) {
             flags.rpol = rpol;
@@ -809,8 +753,8 @@ void Channel::tick(uint32_t tick_usec) {
     }
 
     if (!io_pins::isInhibited()) {
-        setCvMode(channelInterface->isCvMode(subchannelIndex));
-        setCcMode(channelInterface->isCcMode(subchannelIndex));
+        setCvMode(isInCvMode());
+        setCcMode(isInCcMode());
     }
 
     // update history values
@@ -961,14 +905,6 @@ void Channel::protectionCheck() {
     protectionCheck(opp);
 }
 
-void Channel::adcMeasureMonDac() {
-    channelInterface->adcMeasureMonDac(subchannelIndex);
-}
-
-void Channel::adcMeasureAll() {
-    channelInterface->adcMeasureAll(subchannelIndex);
-}
-
 void Channel::updateAllChannels() {
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
@@ -1000,7 +936,7 @@ void Channel::updateAllChannels() {
 }
 
 void Channel::executeOutputEnable(bool enable, uint16_t tasks) {
-    channelInterface->setOutputEnable(subchannelIndex, enable, tasks);
+    setOutputEnable(enable, tasks);
 
     if (tasks & OUTPUT_ENABLE_TASK_FINALIZE) {
         setOperBits(OPER_ISUM_OE_OFF, !enable);
@@ -1152,7 +1088,7 @@ void Channel::doRemoteSensingEnable(bool enable) {
         return;
     }
     flags.senseEnabled = enable;
-    channelInterface->setRemoteSense(subchannelIndex, enable);
+    setRemoteSense(enable);
     setOperBits(OPER_ISUM_RSENS_ON, enable);
 }
 
@@ -1181,7 +1117,7 @@ void Channel::doRemoteProgrammingEnable(bool enable) {
     	}
     }
 
-    channelInterface->setRemoteProgramming(subchannelIndex, enable);
+    setRemoteProgramming(enable);
     setOperBits(OPER_ISUM_RPROG_ON, enable);
 }
 
@@ -1287,7 +1223,7 @@ void Channel::doSetVoltage(float value) {
 
 	value = getCalibratedVoltage(value);
 
-    channelInterface->setDacVoltageFloat(subchannelIndex, value);
+    setDacVoltageFloat(value);
 }
 
 void Channel::setVoltage(float value) {
@@ -1320,7 +1256,7 @@ void Channel::doSetCurrent(float value) {
 
     value += getDualRangeGndOffset();
 
-    channelInterface->setDacCurrentFloat(subchannelIndex, value);
+    setDacCurrentFloat(value);
 }
 
 void Channel::setCurrent(float value) {
@@ -1530,23 +1466,6 @@ bool Channel::isCurrentLimitExceeded(float i) {
 }
 
 
-bool Channel::isVoltageBalanced() {
-    return channelInterface->isVoltageBalanced(subchannelIndex);
-}
-
-bool Channel::isCurrentBalanced() {
-    return channelInterface->isCurrentBalanced(subchannelIndex);
-}
-
-float Channel::getUSetUnbalanced() {
-    return channelInterface->getUSetUnbalanced(subchannelIndex);
-}
-
-float Channel::getISetUnbalanced() {
-    return channelInterface->getISetUnbalanced(subchannelIndex);
-}
-
-
 TriggerMode Channel::getVoltageTriggerMode() {
     return (TriggerMode)flags.voltageTriggerMode;
 }
@@ -1623,7 +1542,7 @@ void Channel::setCurrentRange(uint8_t currentCurrentRange) {
     if (hasSupportForCurrentDualRange()) {
         if (currentCurrentRange != flags.currentCurrentRange) {
             flags.currentCurrentRange = currentCurrentRange;
-            channelInterface->setCurrentRange(subchannelIndex);
+            doSetCurrentRange();
         }
     }
 }
@@ -1639,7 +1558,7 @@ void Channel::doAutoSelectCurrentRange(uint32_t tickCount) {
                 if (flags.autoSelectCurrentRange &&
                     flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_USE_BOTH &&
                     hasSupportForCurrentDualRange() && 
-                    !channelInterface->isDacTesting(subchannelIndex) &&
+                    !isDacTesting() &&
                     !calibration::isEnabled()) {
                     if (flags.currentCurrentRange == CURRENT_RANGE_LOW) {
                         if (i.set > 0.05f && isCcMode()) {
@@ -1648,7 +1567,7 @@ void Channel::doAutoSelectCurrentRange(uint32_t tickCount) {
                     } else if (i.mon_measured) {
                         if (i.mon_last < 0.05f) {
                             setCurrentRange(1);
-                            channelInterface->setDacCurrent(subchannelIndex, (uint16_t)65535);
+                            setDacCurrent((uint16_t)65535);
                         }
                     }
                 }
@@ -1664,32 +1583,55 @@ void Channel::doAutoSelectCurrentRange(uint32_t tickCount) {
 
 void Channel::setDprogState(DprogState dprogState) {
     flags.dprogState = dprogState;
-    channelInterface->setDprogState(dprogState);
 }
 
-void Channel::getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) {
-    channelInterface->getFirmwareVersion(majorVersion, minorVersion);
+unsigned Channel::getRPol() {
+    return 0;
 }
 
-const char *Channel::getBrand() {
-    return channelInterface->getBrand();
+void Channel::setRemoteSense(bool enable) {
 }
 
-void Channel::getSerial(char *text) {
-    channelInterface->getSerial(text);
+void Channel::setRemoteProgramming(bool enable) {
 }
 
-void Channel::getVoltageStepValues(StepValues *stepValues, bool calibrationMode) {
-    channelInterface->getVoltageStepValues(stepValues, calibrationMode);
+void Channel::doSetCurrentRange() {
 }
 
-void Channel::getCurrentStepValues(StepValues *stepValues, bool calibrationMode) {
-    channelInterface->getCurrentStepValues(stepValues, calibrationMode);
+bool Channel::isVoltageBalanced() {
+	return false;
 }
 
-void Channel::getPowerStepValues(StepValues *stepValues) {
-    channelInterface->getPowerStepValues(stepValues);
+bool Channel::isCurrentBalanced() {
+	return false;
 }
+
+float Channel::getUSetUnbalanced() {
+    return u.set;
+}
+
+float Channel::getISetUnbalanced() {
+    return i.set;
+}
+
+void Channel::readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
+}
+
+void Channel::onSpiIrq() {
+}
+
+#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
+int Channel::getIoExpBitDirection(int io_bit) {
+	return 0;
+}
+
+bool Channel::testIoExpBit(int io_bit) {
+	return false;
+}
+
+void Channel::changeIoExpBit(int io_bit, bool set) {
+}
+#endif
 
 } // namespace psu
 } // namespace eez

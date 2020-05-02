@@ -174,80 +174,16 @@ struct ChannelParams {
     float U_RAMP_DURATION_MIN_VALUE;
 };
 
-struct ChannelInterface {
-	int slotIndex;
-
-    ChannelInterface(int slotIndex);
-
-    virtual void getParams(int subchannelIndex, ChannelParams &params) = 0;
-
-    virtual void init(int subchannelIndex) = 0;
-    virtual void onPowerDown(int subchannelIndex) = 0;
-    virtual void reset(int subchannelIndex) = 0;
-    virtual void test(int subchannelIndex) = 0;
-    virtual void tick(int subchannelIndex, uint32_t tickCount) = 0;
-
-    virtual TestResult getTestResult(int subchannelIndex) = 0;
-
-    virtual unsigned getRPol(int subchannelIndex);
-
-    virtual bool isCcMode(int subchannelIndex) = 0;
-    virtual bool isCvMode(int subchannelIndex) = 0;
-
-    virtual void adcMeasureUMon(int subchannelIndex) = 0;
-    virtual void adcMeasureIMon(int subchannelIndex) = 0;
-    virtual void adcMeasureMonDac(int subchannelIndex) = 0;
-    virtual void adcMeasureAll(int subchannelIndex) = 0;
-
-    virtual void setOutputEnable(int subchannelIndex, bool enable, uint16_t tasks) = 0;
-
-    virtual void setDprogState(DprogState dprogState) = 0;
-
-    virtual void setDacVoltage(int subchannelIndex, uint16_t value) = 0;
-    virtual void setDacVoltageFloat(int subchannelIndex, float value) = 0;
-    virtual void setDacCurrent(int subchannelIndex, uint16_t value) = 0;
-    virtual void setDacCurrentFloat(int subchannelIndex, float value) = 0;
-
-    virtual bool isDacTesting(int subchannelIndex) = 0;
-
-    virtual void setRemoteSense(int subchannelIndex, bool enable);
-    virtual void setRemoteProgramming(int subchannelIndex, bool enable);
-
-    virtual void setCurrentRange(int subchannelIndex);
-
-    virtual bool isVoltageBalanced(int subchannelIndex);
-    virtual bool isCurrentBalanced(int subchannelIndex);
-    virtual float getUSetUnbalanced(int subchannelIndex);
-    virtual float getISetUnbalanced(int subchannelIndex);
-
-    virtual void readAllRegisters(int subchannelIndex, uint8_t ioexpRegisters[], uint8_t adcRegisters[]);
-
-    virtual void onSpiIrq();
-
-    virtual void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) = 0;
-    virtual const char *getBrand() = 0;
-    virtual void getSerial(char *text) = 0;
-
-    virtual void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) = 0;
-    virtual void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) = 0;
-    virtual void getPowerStepValues(StepValues *stepValues) = 0;
-
-    virtual bool isPowerLimitExceeded(int subchannelIndex, float u, float i, int *err) = 0;
-
-#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
-    virtual int getIoExpBitDirection(int subchannelIndex, int io_bit);
-    virtual bool testIoExpBit(int subchannelIndex, int io_bit);
-    virtual void changeIoExpBit(int subchannelIndex, int io_bit, bool set);
-#endif
-};
+struct Channel;
 
 struct PsuChannelModuleInfo : public ModuleInfo {
     uint8_t numChannels;
-    ChannelInterface **channelInterfaces;
 
-    PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision, uint8_t numChannels, ChannelInterface **channelInterfaces);
+    PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision, uint8_t numChannels);
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override;
+
+    virtual Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) = 0;
 };
 
 /// Runtime protection binary flags (alarmed, tripped)
@@ -280,11 +216,11 @@ static const float RAMP_DURATION_DEF_VALUE_I = 0;
 static const float RAMP_DURATION_PREC = 0.001f;
 
 /// PSU channel.
-class Channel {
+struct Channel {
     friend class DigitalAnalogConverter;
     friend struct calibration::Value;
 
-  public:
+public:
     /// Calibration parameters for the single point.
     struct CalibrationValuePointConfiguration {
         /// Value set on DAC by the calibration module.
@@ -444,17 +380,20 @@ class Channel {
     };
 #endif // EEZ_PLATFORM_SIMULATOR
 
-    static Channel g_channels[CH_MAX];
+    static Channel *g_channels[CH_MAX];
+    static uint8_t g_slotIndexToChannelIndex[NUM_SLOTS];
+
+    static void enumChannels();
 
     /// Get channel instance
     /// \param channel_index Zero based channel index, greater then or equal to 0 and less then
     /// CH_MAX. \returns Reference to channel.
     static inline Channel &get(int channelIndex) {
-        return g_channels[channelIndex];
+        return *g_channels[channelIndex];
     } 
 
     static inline Channel &getBySlotIndex(uint8_t slotIndex, uint8_t subchannelIndex = 0) {
-        return g_channels[g_slots[slotIndex].channelIndex + subchannelIndex];
+        return *g_channels[g_slotIndexToChannelIndex[slotIndex] + subchannelIndex];
     }
 
     /// Save and disable OE for all the channels.
@@ -475,8 +414,6 @@ class Channel {
 
     /// In case when module has multiple channels. Starts from 0
     uint8_t subchannelIndex;
-
-    ChannelInterface *channelInterface;
 
     ChannelParams params;
 
@@ -502,27 +439,15 @@ class Channel {
     Simulator simulator;
 #endif // EEZ_PLATFORM_SIMULATOR
 
-    void set(uint8_t slotIndex, uint8_t subchannelIndex);
+    Channel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex);
 
-    void setChannelIndex(uint8_t channelIndex);
-
-    /// Initialize channel and underlying hardware.
-    /// Makes a required tests, for example ADC, DAC and IO Expander tests.
-    void init();
-
-    /// Reset the channel to default values.
-    void reset();
+    void initParams();
 
     /// Clear channel calibration configuration.
     void clearCalibrationConf();
 
-    /// Test the channel.
-    bool test();
-
     /// Is channel power ok (state of PWRGOOD bit in IO Expander)?
     bool isPowerOk();
-
-    TestResult getTestResult();
 
     /// Is channel test failed?
     bool isTestFailed();
@@ -538,16 +463,6 @@ class Channel {
 
     /// Called from channel driver when ADC data is ready.
     void onAdcData(AdcDataType adcDataType, float value);
-
-    /// Called when device power is turned off, so channel
-    /// can do its own housekeeping.
-    void onPowerDown();
-
-    /// Force ADC to measure u.mon_dac and i.mon_dac.
-    void adcMeasureMonDac();
-
-    /// Force ADC to measure all values: u.mon, u.mon_dac, i.mon and i.mon_dac.
-    void adcMeasureAll();
 
     static void updateAllChannels();
 
@@ -666,15 +581,6 @@ class Channel {
     bool isCurrentWithinRange(float i);
     bool isCurrentLimitExceeded(float i);
 
-    bool isPowerLimitExceeded(float u, float i, int *err) {
-        return channelInterface->isPowerLimitExceeded(subchannelIndex, u, i, err);
-    }
-
-    bool isVoltageBalanced();
-    bool isCurrentBalanced();
-    float getUSetUnbalanced();
-    float getISetUnbalanced();
-
     uint32_t getCurrentHistoryValuePosition();
 
     static void resetHistoryForAllChannels();
@@ -722,15 +628,88 @@ class Channel {
 
     void enterOvpProtection();
 
-    void setDprogState(DprogState dprogState);
+    //
+    // VIRTUAL METHODS
+    //
 
-    void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion);
-    const char *getBrand();
-    void getSerial(char *text);
+    virtual void getParams() = 0;
 
-    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode = false);
-    void getCurrentStepValues(StepValues *stepValues, bool calibrationMode = false);
-    void getPowerStepValues(StepValues *stepValues);
+    /// Initialize channel and underlying hardware.
+    /// Makes a required tests, for example ADC, DAC and IO Expander tests.
+    virtual void init() = 0;
+
+    /// Called when device power is turned off, so channel
+    /// can do its own housekeeping.
+    virtual void onPowerDown();
+
+    /// Reset the channel to default values.
+    virtual void reset();
+
+    /// Test the channel.
+    virtual bool test();
+
+    virtual void tickSpecific(uint32_t tickCount) = 0;
+
+    virtual TestResult getTestResult() = 0;
+
+    virtual unsigned getRPol();
+
+    virtual bool isInCcMode() = 0;
+    virtual bool isInCvMode() = 0;
+
+    virtual void adcMeasureUMon() = 0;
+    virtual void adcMeasureIMon() = 0;
+    
+    /// Force ADC to measure u.mon_dac and i.mon_dac.
+    virtual void adcMeasureMonDac() = 0;
+    
+    /// Force ADC to measure all values: u.mon, u.mon_dac, i.mon and i.mon_dac.
+    virtual void adcMeasureAll() = 0;
+
+    virtual void setOutputEnable(bool enable, uint16_t tasks) = 0;
+
+    virtual void setDprogState(DprogState dprogState);
+
+    virtual void setDacVoltage(uint16_t value) = 0;
+    virtual void setDacVoltageFloat(float value) = 0;
+    virtual void setDacCurrent(uint16_t value) = 0;
+    virtual void setDacCurrentFloat(float value) = 0;
+
+    virtual bool isDacTesting() = 0;
+
+    virtual void setRemoteSense(bool enable);
+    virtual void setRemoteProgramming(bool enable);
+
+    virtual void doSetCurrentRange();
+
+    virtual bool isVoltageBalanced();
+    virtual bool isCurrentBalanced();
+    virtual float getUSetUnbalanced();
+    virtual float getISetUnbalanced();
+
+    virtual void readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]);
+
+    virtual void onSpiIrq();
+
+    virtual void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) = 0;
+    virtual const char *getBrand() = 0;
+    virtual void getSerial(char *text) = 0;
+
+    virtual void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) = 0;
+    virtual void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) = 0;
+    virtual void getPowerStepValues(StepValues *stepValues) = 0;
+
+    virtual bool isPowerLimitExceeded(float u, float i, int *err) = 0;
+
+#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
+    virtual int getIoExpBitDirection(int io_bit);
+    virtual bool testIoExpBit(int io_bit);
+    virtual void changeIoExpBit(int io_bit, bool set);
+#endif
+
+    //
+    //
+    //
 
 private:
     bool delayLowRippleCheck;

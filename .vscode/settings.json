@@ -5,6 +5,7 @@
         "xstring": "cpp",
         "xutility": "cpp",
         "xtr1common": "cpp",
-        "xiosbase": "cpp"
+        "xiosbase": "cpp",
+        "algorithm": "cpp"
     }
 }

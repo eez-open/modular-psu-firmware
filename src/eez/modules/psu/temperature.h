@@ -23,7 +23,7 @@
 namespace eez {
 namespace psu {
 
-class Channel;
+struct Channel;
 
 /// Temperature measurement and protection.
 namespace temperature {

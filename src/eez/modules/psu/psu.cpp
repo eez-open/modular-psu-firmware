@@ -265,10 +265,7 @@ void oneIter() {
             } else if (type == PSU_QUEUE_MESSAGE_TYPE_TEST) {
                 test();
             } else if (type == PSU_QUEUE_MESSAGE_SPI_IRQ) {
-                auto channelInterface = Channel::getBySlotIndex(param).channelInterface;
-                if (channelInterface) {
-                    channelInterface->onSpiIrq();
-                }
+                Channel::getBySlotIndex(param).onSpiIrq();
             } else if (type == PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL) {
                 Channel::get(param).adcMeasureAll();
                 g_adcMeasureAllFinished = true;
@@ -328,24 +325,7 @@ bool measureAllAdcValuesOnChannel(int channelIndex) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void enumChannels() {
-    CH_NUM = 0;
-
-    for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        auto& slot = g_slots[slotIndex];
-        if (slot.moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-            auto psuChannelModuleInfo = (PsuChannelModuleInfo *)slot.moduleInfo;
-
-            slot.channelIndex = CH_NUM;
-
-            for (uint8_t subchannelIndex = 0; subchannelIndex < psuChannelModuleInfo->numChannels; subchannelIndex++) {
-                Channel::get(CH_NUM).setChannelIndex(CH_NUM);
-                Channel::get(CH_NUM++).set(slotIndex, subchannelIndex);
-            }
-
-            persist_conf::loadModuleConf(slotIndex);
-            ontime::g_moduleCounters[slotIndex].init();
-        }
-    }
+    Channel::enumChannels();
 }
 
 void initChannels() {
