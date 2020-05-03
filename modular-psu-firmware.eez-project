@@ -1404,34 +1404,12 @@
       "defaultValue": "250ms"
     },
     {
-      "name": "slot1_info",
+      "name": "slot_info",
       "type": "string",
       "defaultValue": "DCP405 r2B5"
     },
     {
-      "name": "slot2_info",
-      "type": "string",
-      "defaultValue": "DCP405 r2B5"
-    },
-    {
-      "name": "slot3_info",
-      "type": "string",
-      "defaultValue": "DCM220"
-    },
-    {
-      "name": "slot1_test_result",
-      "type": "enum",
-      "enumItems": "[\"None\", \"Failed\", \"OK\", \"Connecting\", \"Skipped\", \"Warning\"]",
-      "defaultValue": "2"
-    },
-    {
-      "name": "slot2_test_result",
-      "type": "enum",
-      "enumItems": "[\"None\", \"Failed\", \"OK\", \"Connecting\", \"Skipped\", \"Warning\"]",
-      "defaultValue": "1"
-    },
-    {
-      "name": "slot3_test_result",
+      "name": "slot_test_result",
       "type": "enum",
       "enumItems": "[\"None\", \"Failed\", \"OK\", \"Connecting\", \"Skipped\", \"Warning\"]",
       "defaultValue": "2"
@@ -2337,6 +2315,36 @@
       "name": "dummy",
       "type": "string",
       "defaultValue": "123"
+    },
+    {
+      "name": "slots",
+      "type": "list",
+      "defaultValue": "[{}, {}, {}]"
+    },
+    {
+      "name": "slot_index",
+      "type": "string",
+      "defaultValue": "Slot #1:"
+    },
+    {
+      "name": "slot_title_def",
+      "type": "string",
+      "defaultValue": "MIO168"
+    },
+    {
+      "name": "slot_title_max",
+      "type": "string",
+      "defaultValue": "MIO168"
+    },
+    {
+      "name": "slot_title_min",
+      "type": "string",
+      "defaultValue": "MIO168"
+    },
+    {
+      "name": "slot_title_micro",
+      "type": "string",
+      "defaultValue": "MIO168"
     }
   ],
   "actions": [
@@ -3040,6 +3048,9 @@
     },
     {
       "name": "toggle_slot_max_view"
+    },
+    {
+      "name": "show_slot_settings"
     }
   ],
   "gui": {
@@ -3198,310 +3209,132 @@
             ]
           },
           {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_S_left"
-            },
-            "left": 135,
-            "top": 146,
-            "width": 64,
-            "height": 25,
-            "text": "Slot #1:"
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "default_S_left"
-            },
-            "data": "slot1_info",
-            "left": 203,
-            "top": 146,
-            "width": 123,
-            "height": 25,
-            "displayOption": 0
-          },
-          {
-            "type": "Select",
+            "type": "List",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot1_test_result",
-            "left": 326,
+            "data": "slots",
+            "left": 135,
             "top": 146,
-            "width": 78,
-            "height": 25,
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
+            "width": 269,
+            "height": 75,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default"
               },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left_warning"
+              "left": 0,
+              "top": 0,
+              "width": 269,
+              "height": 25,
+              "widgets": [
+                {
+                  "type": "Text",
+                  "style": {
+                    "inheritFrom": "default_S_left"
+                  },
+                  "data": "slot_index",
+                  "left": 0,
+                  "top": 0,
+                  "width": 64,
+                  "height": 25,
+                  "text": ""
                 },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "Failed"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left_ok"
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "default_S_left"
+                  },
+                  "data": "slot_info",
+                  "left": 68,
+                  "top": 0,
+                  "width": 123,
+                  "height": 25,
+                  "displayOption": 0
                 },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "OK"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left_warning"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "Warning"
-              }
-            ]
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_S_left"
+                {
+                  "type": "Select",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "data": "slot_test_result",
+                  "left": 191,
+                  "top": 0,
+                  "width": 78,
+                  "height": 25,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 78,
+                      "height": 25,
+                      "text": " "
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left_warning"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 78,
+                      "height": 25,
+                      "text": "Failed"
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left_ok"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 78,
+                      "height": 25,
+                      "text": "OK"
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 78,
+                      "height": 25,
+                      "text": " "
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 78,
+                      "height": 25,
+                      "text": " "
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left_warning"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 78,
+                      "height": 25,
+                      "text": "Warning"
+                    }
+                  ]
+                }
+              ]
             },
-            "left": 135,
-            "top": 171,
-            "width": 64,
-            "height": 25,
-            "text": "Slot #2:"
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "default_S_left"
-            },
-            "data": "slot2_info",
-            "left": 203,
-            "top": 171,
-            "width": 123,
-            "height": 25,
-            "displayOption": 0
-          },
-          {
-            "type": "Select",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "slot2_test_result",
-            "left": 326,
-            "top": 171,
-            "width": 78,
-            "height": 25,
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left_warning"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "Failed"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left_ok"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "OK"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left_warning"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "Warning"
-              }
-            ]
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_S_left"
-            },
-            "left": 135,
-            "top": 196,
-            "width": 64,
-            "height": 25,
-            "text": "Slot #3:"
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "default_S_left"
-            },
-            "data": "slot3_info",
-            "left": 203,
-            "top": 196,
-            "width": 123,
-            "height": 25,
-            "displayOption": 0
-          },
-          {
-            "type": "Select",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "slot3_test_result",
-            "left": 326,
-            "top": 196,
-            "width": 78,
-            "height": 25,
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left_warning"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "Failed"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left_ok"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "OK"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left_warning"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "Warning"
-              }
-            ]
+            "listType": "vertical",
+            "gap": 0
           },
           {
             "type": "DisplayData",
@@ -9365,6 +9198,175 @@
         "top": 16,
         "width": 240,
         "height": 240
+      },
+      {
+        "name": "slot_settings",
+        "description": "Clear, disable and define channel's protection parameters",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 8,
+            "top": 8,
+            "width": 464,
+            "height": 231,
+            "name": "Settings",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_S_left"
+                },
+                "left": 243,
+                "top": 170,
+                "width": 60,
+                "height": 34,
+                "text": "FW ver."
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_S_left"
+                },
+                "data": "channel_firmware_version",
+                "left": 303,
+                "top": 170,
+                "width": 44,
+                "height": 33,
+                "text": ""
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center"
+                },
+                "data": "sys_info_sdcard_status",
+                "left": 350,
+                "top": 170,
+                "width": 114,
+                "height": 34,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_centered"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 34,
+                    "text": "Upgrade"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "channel_update_firmware",
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 34,
+                    "text": "Update"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_centered"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 34,
+                    "text": "Upgrade"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_centered"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 34,
+                    "text": "Upgrade"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_centered"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 34,
+                    "text": "Upgrade"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_centered"
+                    },
+                    "action": "show_file_manager",
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 34,
+                    "text": "Upgrade"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "show_main_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "H"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "slot_title_max",
+                "left": 40,
+                "top": 0,
+                "width": 440,
+                "height": 32,
+                "text": ""
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
       },
       {
         "name": "ch_settings",
@@ -27580,12 +27582,25 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_def",
                 "left": 1,
                 "top": 0,
-                "width": 133,
+                "width": 101,
                 "height": 32,
-                "text": "???"
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_slot_settings",
+                "left": 102,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "D"
               },
               {
                 "type": "Text",
@@ -28145,12 +28160,25 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_max",
                 "left": 0,
                 "top": 0,
-                "width": 430,
+                "width": 380,
                 "height": 32,
-                "text": "???"
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_slot_settings",
+                "left": 380,
+                "top": 0,
+                "width": 50,
+                "height": 32,
+                "text": "D"
               },
               {
                 "type": "Text",
@@ -28193,12 +28221,12 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_min",
                 "left": 0,
                 "top": 0,
                 "width": 193,
                 "height": 24,
-                "text": "???"
+                "text": ""
               },
               {
                 "type": "Text",
@@ -28243,12 +28271,12 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_micro",
                 "left": 0,
                 "top": 0,
                 "width": 158,
                 "height": 24,
-                "text": "???"
+                "text": ""
               }
             ]
           }
@@ -28279,12 +28307,25 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_def",
                 "left": 1,
                 "top": 0,
-                "width": 133,
+                "width": 101,
                 "height": 32,
-                "text": "???"
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_slot_settings",
+                "left": 102,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "D"
               },
               {
                 "type": "Text",
@@ -28584,7 +28625,8 @@
         "left": 0,
         "top": 0,
         "width": 160,
-        "height": 240
+        "height": 240,
+        "dataContextOverrides": "{\"slot_title_def\": \"PREL6\"}"
       },
       {
         "name": "dib_prel6_slot_view_max",
@@ -28607,12 +28649,25 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_max",
                 "left": 0,
                 "top": 0,
-                "width": 430,
+                "width": 380,
                 "height": 32,
-                "text": "???"
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_slot_settings",
+                "left": 380,
+                "top": 0,
+                "width": 50,
+                "height": 32,
+                "text": "D"
               },
               {
                 "type": "Text",
@@ -28633,7 +28688,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 168
+        "height": 168,
+        "dataContextOverrides": "{\"slot_title_max\": \"PREL6\"}"
       },
       {
         "name": "dib_prel6_slot_view_min",
@@ -28655,12 +28711,12 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_min",
                 "left": 0,
                 "top": 0,
                 "width": 193,
                 "height": 24,
-                "text": "???"
+                "text": ""
               },
               {
                 "type": "Text",
@@ -28683,7 +28739,8 @@
         "left": 0,
         "top": 0,
         "width": 238,
-        "height": 72
+        "height": 72,
+        "dataContextOverrides": "{\"slot_title_min\": \"PREL6\"}"
       },
       {
         "name": "dib_prel6_slot_view_micro",
@@ -28705,12 +28762,12 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_micro",
                 "left": 0,
                 "top": 0,
                 "width": 158,
                 "height": 24,
-                "text": "???"
+                "text": ""
               }
             ]
           }
@@ -28718,7 +28775,8 @@
         "left": 0,
         "top": 0,
         "width": 158,
-        "height": 72
+        "height": 72,
+        "dataContextOverrides": "{\"slot_title_micro\": \"PREL6\"}"
       },
       {
         "name": "dib_smx46_slot_view_def",
@@ -28741,12 +28799,25 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_def",
                 "left": 1,
                 "top": 0,
-                "width": 133,
+                "width": 101,
                 "height": 32,
-                "text": "???"
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_slot_settings",
+                "left": 102,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "D"
               },
               {
                 "type": "Text",
@@ -28767,7 +28838,8 @@
         "left": 0,
         "top": 0,
         "width": 160,
-        "height": 240
+        "height": 240,
+        "dataContextOverrides": "{\"slot_title_def\": \"SMX46\"}"
       },
       {
         "name": "dib_smx46_slot_view_max",
@@ -28790,12 +28862,25 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_max",
                 "left": 0,
                 "top": 0,
-                "width": 430,
+                "width": 380,
                 "height": 32,
-                "text": "???"
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_slot_settings",
+                "left": 380,
+                "top": 0,
+                "width": 50,
+                "height": 32,
+                "text": "D"
               },
               {
                 "type": "Text",
@@ -28816,7 +28901,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 168
+        "height": 168,
+        "dataContextOverrides": "{\"slot_title_max\": \"SMX46\"}"
       },
       {
         "name": "dib_smx46_slot_view_min",
@@ -28838,12 +28924,12 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_min",
                 "left": 0,
                 "top": 0,
                 "width": 193,
                 "height": 24,
-                "text": "???"
+                "text": ""
               },
               {
                 "type": "Text",
@@ -28866,7 +28952,8 @@
         "left": 0,
         "top": 0,
         "width": 238,
-        "height": 72
+        "height": 72,
+        "dataContextOverrides": "{\"slot_title_min\": \"SMX46\"}"
       },
       {
         "name": "dib_smx46_slot_view_micro",
@@ -28888,12 +28975,12 @@
                   "alignHorizontal": "left",
                   "padding": "0 5"
                 },
-                "data": "",
+                "data": "slot_title_micro",
                 "left": 0,
                 "top": 0,
                 "width": 158,
                 "height": 24,
-                "text": "???"
+                "text": ""
               }
             ]
           }
@@ -28901,7 +28988,8 @@
         "left": 0,
         "top": 0,
         "width": 158,
-        "height": 72
+        "height": 72,
+        "dataContextOverrides": "{\"slot_title_micro\": \"SMX46\"}"
       },
       {
         "name": "slot_def_1ch_vbar_on",

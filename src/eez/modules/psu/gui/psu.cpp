@@ -81,6 +81,8 @@ static unsigned g_skipChannelCalibrations;
 static unsigned g_skipDateTimeSetup;
 static unsigned g_skipEthernetSetup;
 
+int g_selectedSlotIndex;
+
 static bool g_showSetupWizardQuestionCalled;
 Channel *g_channel;
 int g_channelIndex;
@@ -1862,6 +1864,10 @@ void channelToggleOutput() {
 
         doChannelToggleOutput();
     }
+}
+
+void selectSlot() {
+    g_selectedSlotIndex = getFoundWidgetAtDown().cursor;
 }
 
 void selectChannel(Channel *channel) {

@@ -831,6 +831,15 @@ void FILE_DATE_TIME_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
+bool compare_SLOT_INDEX_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void SLOT_INDEX_value_to_text(const Value &value, char *text, int count) {
+    snprintf(text, count - 1, "Slot #%d:", value.getInt() + 1);
+    text[count - 1] = 0;
+}
+
 bool compare_SLOT_INFO_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -846,22 +855,14 @@ void SLOT_INFO_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
-bool compare_SLOT_INFO2_value(const Value &a, const Value &b) {
+bool compare_SLOT_TITLE_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
 
-void SLOT_INFO2_value_to_text(const Value &value, char *text, int count) {
+void SLOT_TITLE_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = g_slots[slotIndex];
-    if (slot.moduleInfo->moduleType != MODULE_TYPE_NONE) {
-        if (slot.moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-            snprintf(text, count - 1, "%s_R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
-        } else {
-            strncpy(text, "TODO ???", count - 1);
-        }
-    } else {
-        strncpy(text, "None", count - 1);
-    }
+    snprintf(text, count - 1, "%s R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     text[count - 1] = 0;
 }
 
@@ -5696,42 +5697,54 @@ void data_master_test_result(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
-void data_slot1_info(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = Value(0, VALUE_TYPE_SLOT_INFO);
+void data_slots(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = 3;
     }
 }
 
-void data_slot_test_result(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (g_slots[slotIndex].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
+void data_slot_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(cursor, VALUE_TYPE_SLOT_INDEX);
+    }
+}
+
+void data_slot_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(cursor, VALUE_TYPE_SLOT_INFO);
+    }
+}
+
+void data_slot_test_result(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (g_slots[cursor].moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
         if (operation == DATA_OPERATION_GET) {
-            value = Value((int)psu::Channel::getBySlotIndex(slotIndex)->getTestResult(), VALUE_TYPE_TEST_RESULT);
+            value = Value((int)psu::Channel::getBySlotIndex(cursor)->getTestResult(), VALUE_TYPE_TEST_RESULT);
         }
     }
 }
 
-void data_slot1_test_result (DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_test_result(0, operation, cursor, value);
-}
-
-void data_slot2_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_slot_title_def(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(1, VALUE_TYPE_SLOT_INFO);
+        value = Value(cursor, VALUE_TYPE_SLOT_TITLE);
     }
 }
 
-void data_slot2_test_result(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_test_result(1, operation, cursor, value);
-}
-
-void data_slot3_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_slot_title_max(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(2, VALUE_TYPE_SLOT_INFO);
+        value = Value(cursor != -1 ? cursor : g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
     }
 }
 
-void data_slot3_test_result(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_test_result(2, operation, cursor, value);
+void data_slot_title_min(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(cursor, VALUE_TYPE_SLOT_TITLE);
+    }
+}
+
+void data_slot_title_micro(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(cursor, VALUE_TYPE_SLOT_TITLE);
+    }
 }
 
 void data_is_reset_by_iwdg(DataOperationEnum operation, Cursor cursor, Value &value) {

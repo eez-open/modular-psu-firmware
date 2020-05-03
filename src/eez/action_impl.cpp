@@ -298,6 +298,11 @@ void action_show_edit_mode_slider_help() {
     pushPage(PAGE_ID_EDIT_MODE_SLIDER_HELP);
 }
 
+void action_show_slot_settings() {
+    selectSlot();
+    showPage(PAGE_ID_SLOT_SETTINGS);
+}
+
 void action_show_ch_settings() {
     selectChannel();
     showPage(PAGE_ID_CH_SETTINGS);
