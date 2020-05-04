@@ -35,7 +35,6 @@
 #endif
 
 #include <eez/system.h>
-#include <eez/scpi/scpi.h>
 
 namespace eez {
 
@@ -249,8 +248,8 @@ void finishDownloading(int16_t eventId) {
 }
 
 void abortDownloading() {
-    if (osThreadGetId() != g_scpiTaskHandle) {
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_ABORT_DOWNLOADING, 0), osWaitForever);
+    if (!isLowPriorityThread()) {
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_ABORT_DOWNLOADING);
     } else {
         finishDownloading(event_queue::EVENT_WARNING_FILE_DOWNLOAD_ABORTED);
         g_aborted = true;

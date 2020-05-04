@@ -62,7 +62,6 @@ extern ip4_addr_t gw;
 
 #include <eez/firmware.h>
 #include <eez/system.h>
-#include <eez/scpi/scpi.h>
 #include <eez/modules/mcu/ethernet.h>
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/ethernet.h>
@@ -140,7 +139,7 @@ static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t le
 		if (conn == g_tcpListenConnection) {
 			osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_ACCEPT_CLIENT, osWaitForever);
 		} else if (conn == g_tcpClientConnection) {
-			osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_INPUT_AVAILABLE, 0), osWaitForever);
+			sendMessageToLowPriorityThread(ETHERNET_INPUT_AVAILABLE);
 		}
 		break;
 
@@ -172,7 +171,7 @@ static void dhcpStart() {
         while(!dhcp_supplied_address(&gnetif)) {
             if ((millis() - connectStart) >= CONF_CONNECT_TIMEOUT) {
                 g_connectionState = CONNECTION_STATE_CONNECT_ERROR;
-                osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 0), osWaitForever);
+                sendMessageToLowPriorityThread(ETHERNET_CONNECTED);
                 return;
             }
             osDelay(10);
@@ -180,7 +179,7 @@ static void dhcpStart() {
     }
 
     g_connectionState = CONNECTION_STATE_CONNECTED;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 1), osWaitForever);
+    sendMessageToLowPriorityThread(ETHERNET_CONNECTED, 1);
     return;
 }
 
@@ -221,7 +220,7 @@ static void onEvent(uint8_t eventType) {
                 // When the netif link is down this function must be called
                 netif_set_down(&gnetif);
                 g_connectionState = CONNECTION_STATE_CONNECT_ERROR;
-                osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 0), osWaitForever);
+                sendMessageToLowPriorityThread(ETHERNET_CONNECTED);
             }
 
 		}
@@ -261,7 +260,7 @@ static void onEvent(uint8_t eventType) {
 				} else {
 					// connection with the client established
 					g_tcpClientConnection = newConnection;
-					osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_CONNECTED, 0), osWaitForever);
+					sendMessageToLowPriorityThread(ETHERNET_CLIENT_CONNECTED);
 				}
 			}
 		}
@@ -288,7 +287,7 @@ void onIdle() {
 			/* network cable is dis-connected */
 			netif_set_link_down(&gnetif);
             g_connectionState = CONNECTION_STATE_CONNECT_ERROR;
-            osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 0), osWaitForever);
+            sendMessageToLowPriorityThread(ETHERNET_CONNECTED);
 		}
 	}
 }
@@ -628,7 +627,7 @@ void stop() {
 void onEvent(uint8_t eventType) {
     switch (eventType) {
     case QUEUE_MESSAGE_CONNECT:
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CONNECTED, 1), osWaitForever);
+        sendMessageToLowPriorityThread(ETHERNET_CONNECTED, 1);
         break;
 
     case QUEUE_MESSAGE_CREATE_TCP_SERVER:
@@ -656,16 +655,16 @@ void onIdle() {
         if (connected()) {
             if (!g_inputBufferLength && available()) {
                 g_inputBufferLength = read(g_inputBuffer, INPUT_BUFFER_SIZE);
-                osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_INPUT_AVAILABLE, 0), osWaitForever);
+                sendMessageToLowPriorityThread(ETHERNET_INPUT_AVAILABLE);
             }
         } else {
-            osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_DISCONNECTED, 0), osWaitForever);
+            sendMessageToLowPriorityThread(ETHERNET_CLIENT_DISCONNECTED);
             wasConnected = false;
         }
     } else {
         if (client_available()) {
             wasConnected = true;
-            osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_CONNECTED, 0), osWaitForever);
+            sendMessageToLowPriorityThread(ETHERNET_CLIENT_CONNECTED);
         }
     }
 }
@@ -787,7 +786,7 @@ fail1:
 	netconn_close(g_tcpClientConnection);
 	netconn_delete(g_tcpClientConnection);
 	g_tcpClientConnection = nullptr;
-	osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_ETHERNET_MESSAGE(ETHERNET_CLIENT_DISCONNECTED, 0), osWaitForever);
+	sendMessageToLowPriorityThread(ETHERNET_CLIENT_DISCONNECTED);
 
 	*buffer = nullptr;
 	length = 0;

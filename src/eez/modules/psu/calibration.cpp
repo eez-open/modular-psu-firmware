@@ -199,8 +199,8 @@ Channel &getCalibrationChannel() {
 }
 
 void start(Channel &channel) {
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_CALIBRATION_START, channel.channelIndex), osWaitForever);
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_CALIBRATION_START, channel.channelIndex);
         return;
     }
 
@@ -238,8 +238,8 @@ void start(Channel &channel) {
 }
 
 void stop() {
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_CALIBRATION_STOP, 0), osWaitForever);
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_CALIBRATION_STOP);
         return;
     }
 

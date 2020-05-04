@@ -46,8 +46,6 @@ extern "C" {
 #include <eez/mqtt.h>
 #include <eez/system.h>
 
-#include <eez/scpi/scpi.h>
-
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ethernet.h>
@@ -219,7 +217,7 @@ void onIncomingPublish(const char *topic, const char *payload) {
             int location = strtol(payload, &endptr, 10);
             if (endptr > payload) {
                 using namespace eez::scpi;
-                osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_RECALL_PROFILE, location), 0);
+                sendMessageToLowPriorityThread(THREAD_MESSAGE_RECALL_PROFILE, location, 0);
             }
         } else if (strcmp(p, "initiate") == 0) {
             trigger::initiate();

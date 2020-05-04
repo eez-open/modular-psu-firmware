@@ -30,13 +30,6 @@ extern scpi_t g_scpiContext;
 void init();
 bool test();
 
-enum {
-    ETHERNET_CONNECTED,
-    ETHERNET_CLIENT_CONNECTED,
-    ETHERNET_CLIENT_DISCONNECTED,
-    ETHERNET_INPUT_AVAILABLE
-};
-
 void onQueueMessage(uint32_t type, uint32_t param);
 
 uint32_t getIpAddress();

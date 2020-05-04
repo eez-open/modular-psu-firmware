@@ -29,9 +29,6 @@ extern scpi_t g_scpiContext;
 
 void init();
 
-#define SERIAL_INPUT_AVAILABLE 1
-#define SERIAL_LINE_STATE_CHANGED 2
-
 void onQueueMessage(uint32_t type, uint32_t param);
 
 bool isConnected();

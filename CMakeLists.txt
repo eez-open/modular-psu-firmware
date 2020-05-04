@@ -97,6 +97,7 @@ set(src_eez
     src/eez/mqtt.cpp
     src/eez/sound.cpp
     src/eez/system.cpp
+    src/eez/tasks.cpp
     src/eez/unit.cpp
     src/eez/util.cpp
 )
@@ -112,6 +113,7 @@ set(header_eez
     src/eez/mqtt.h
     src/eez/sound.h
     src/eez/system.h
+    src/eez/tasks.h
     src/eez/unit.h
     src/eez/util.h
     src/eez/value_types.h

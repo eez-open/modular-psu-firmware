@@ -193,8 +193,8 @@ void Channel::enumChannels() {
 static uint16_t g_oeSavedState;
 
 void Channel::saveAndDisableOE() {
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_TRIGGER_CHANNEL_SAVE_AND_DISABLE_OE, 0), 0);
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_TRIGGER_CHANNEL_SAVE_AND_DISABLE_OE, 0, 0);
     } else {
         if (!g_oeSavedState) {
             for (int i = 0; i < CH_NUM; i++)  {
@@ -211,8 +211,8 @@ void Channel::saveAndDisableOE() {
 }
 
 void Channel::restoreOE() {
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_TRIGGER_CHANNEL_RESTORE_OE, 0), 0);
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_TRIGGER_CHANNEL_RESTORE_OE, 0, 0);
     } else {
         if (g_oeSavedState) {
             for (int i = 0; i < CH_NUM; i++)  {

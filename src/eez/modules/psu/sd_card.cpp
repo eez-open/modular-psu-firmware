@@ -30,7 +30,6 @@
 #include <eez/modules/psu/psu.h>
 
 #include <scpi/scpi.h>
-#include <eez/scpi/scpi.h>
 
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/event_queue.h>
@@ -125,8 +124,8 @@ void tick() {
 
 #if defined(EEZ_PLATFORM_STM32)
 void onSdDetectInterrupt() {
-	// push message into SCPI thread queue so onSdDetectInterruptHandler is called inside SCPI thread
-	osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SD_DETECT_IRQ, 0), 0);
+	// push message into low priority thread queue so onSdDetectInterruptHandler is called inside that thread
+	sendMessageToLowPriorityThread(THREAD_MESSAGE_SD_DETECT_IRQ, 0, 0);
 }
 
 void onSdDetectInterruptHandler() {

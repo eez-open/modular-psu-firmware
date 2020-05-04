@@ -43,8 +43,7 @@
 #endif
 
 #include <eez/firmware.h>
-
-#include <eez/scpi/scpi.h>
+#include <eez/tasks.h>
 
 #include <eez/modules/mcu/encoder.h>
 
@@ -204,16 +203,16 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     }
 
     if (slotIndex != -1) {
-    	using namespace eez::psu;
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_SPI_IRQ, slotIndex), 0);
+    	using namespace eez;
+        sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, slotIndex, 0);
     }
 }
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
 void consoleInputTask(const void *) {
-    using namespace eez::scpi;
-    osMessagePut(eez::scpi::g_scpiMessageQueueId, SCPI_QUEUE_SERIAL_MESSAGE(SERIAL_LINE_STATE_CHANGED, 1), osWaitForever);
+    using namespace eez;
+    sendMessageToLowPriorityThread(SERIAL_LINE_STATE_CHANGED, 1);
 
     while (1) {
         int ch = getchar();

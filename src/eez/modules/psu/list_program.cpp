@@ -24,7 +24,6 @@
 
 #include <eez/system.h>
 #include <eez/firmware.h>
-#include <eez/scpi/scpi.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -42,7 +41,7 @@
 
 namespace eez {
 
-using namespace scpi;
+extern char g_listFilePath[CH_MAX][MAX_PATH_LENGTH];
 
 namespace psu {
 namespace list {
@@ -491,9 +490,9 @@ bool saveList(
 }
 
 bool saveList(int iChannel, const char *filePath, int *err) {
-    if (!g_shutdownInProgress && osThreadGetId() != g_scpiTaskHandle) {
+    if (!g_shutdownInProgress && !isLowPriorityThread()) {
         strcpy(&g_listFilePath[iChannel][0], filePath);
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SAVE_LIST, iChannel), osWaitForever);
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_SAVE_LIST, iChannel);
         return true;
     }
 

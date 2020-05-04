@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 namespace eez {
 namespace mcu {
 namespace encoder {

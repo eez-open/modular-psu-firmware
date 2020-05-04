@@ -22,8 +22,6 @@
 
 #include <eez/system.h>
 
-#include <eez/scpi/scpi.h>
-
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/datetime.h>
@@ -1022,8 +1020,7 @@ void ChSettingsListsPage::onImportListFileSelected(const char *listFilePath) {
 
     showProgressPageWithoutAbort("Import list...");
 
-    using namespace eez::scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST, 0), osWaitForever);
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_LISTS_PAGE_IMPORT_LIST);
 }
 
 void ChSettingsListsPage::doImportList() {
@@ -1073,8 +1070,7 @@ void ChSettingsListsPage::onExportListFileSelected(const char *listFilePath) {
     
     showProgressPageWithoutAbort("Exporting list...");
 
-    using namespace eez::scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST, 0), osWaitForever);
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_LISTS_PAGE_EXPORT_LIST);
 }
 
 void ChSettingsListsPage::doExportList() {

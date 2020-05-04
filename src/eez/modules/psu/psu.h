@@ -24,7 +24,7 @@
 #define EEZ_PLATFORM_STM32
 #endif
 
-#include <eez/system.h>
+#include <eez/tasks.h>
 
 #include <eez/modules/psu/conf.h>
 #include <eez/modules/psu/conf_advanced.h>
@@ -54,38 +54,9 @@ void onSdCardFileChangeHook(const char *filePath1, const char *filePath2 = nullp
 /// PSU firmware.
 namespace psu {
 
-void startThread();
+void init();
 
-extern osThreadId g_psuTaskHandle;
-extern osMessageQId g_psuMessageQueueId;
-
-enum {
-    PSU_QUEUE_MESSAGE_TYPE_TICK,
-    PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE,
-    PSU_QUEUE_MESSAGE_TYPE_RESET,
-    PSU_QUEUE_MESSAGE_TYPE_TEST,
-    PSU_QUEUE_MESSAGE_SPI_IRQ,
-    PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL,
-    PSU_QUEUE_TRIGGER_START_IMMEDIATELY,
-    PSU_QUEUE_TRIGGER_ABORT,
-    PSU_QUEUE_TRIGGER_CHANNEL_SAVE_AND_DISABLE_OE,
-    PSU_QUEUE_TRIGGER_CHANNEL_RESTORE_OE,
-    PSU_QUEUE_SET_COUPLING_TYPE,
-    PSU_QUEUE_SET_TRACKING_CHANNELS,
-    PSU_QUEUE_CHANNEL_OUTPUT_ENABLE,
-    PSU_QUEUE_SYNC_OUTPUT_ENABLE,
-    PSU_QUEUE_MESSAGE_TYPE_HARD_RESET,
-    PSU_QUEUE_MESSAGE_TYPE_SHUTDOWN,
-    PSU_QUEUE_MESSAGE_TYPE_SET_VOLTAGE,
-    PSU_QUEUE_MESSAGE_TYPE_SET_CURRENT,
-    PSU_QUEUE_RESET_CHANNELS_HISTORY,
-    PSU_QUEUE_MESSAGE_TYPE_CALIBRATION_START,
-    PSU_QUEUE_MESSAGE_TYPE_CALIBRATION_STOP,
-};
-
-#define PSU_QUEUE_MESSAGE(type, param) (((param) << 8) | (type))
-#define PSU_QUEUE_MESSAGE_TYPE(message) ((message) & 0xFF)
-#define PSU_QUEUE_MESSAGE_PARAM(param) ((message) >> 8)
+void onThreadMessage(uint8_t type, uint32_t param);
 
 bool measureAllAdcValuesOnChannel(int channelIndex);
 

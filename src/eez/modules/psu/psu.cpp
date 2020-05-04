@@ -151,34 +151,6 @@ namespace psu {
 
 using namespace scpi;
 
-////////////////////////////////////////////////////////////////////////////////
-
-void mainLoop(const void *);
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#endif
-
-osThreadDef(g_psuTask, mainLoop, osPriorityAboveNormal, 0, 2048);
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic pop
-#endif
-
-osThreadId g_psuTaskHandle;
-
-#if defined(EEZ_PLATFORM_STM32)
-#define PSU_QUEUE_SIZE 10
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-#define PSU_QUEUE_SIZE 100
-#endif
-
-osMessageQDef(g_psuMessageQueue, PSU_QUEUE_SIZE, uint32_t);
-osMessageQId g_psuMessageQueueId;
-
 }
 } // namespacee eez::psu
 
@@ -187,9 +159,10 @@ osMessageQId g_psuMessageQueueId;
 extern "C" void PSU_IncTick() {
     g_tickCount++;
 
+    using namespace eez;
     using namespace eez::psu;
     if (ramp::isActive() || eez::dcp405::isDacRampActive()) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_TICK, 0), 0);
+        sendMessageToPsu(PSU_MESSAGE_TICK, 0, 0);
     }
 }
 
@@ -214,99 +187,68 @@ void (*g_diagCallback)();
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void startThread() {
-    g_psuMessageQueueId = osMessageCreate(osMessageQ(g_psuMessageQueue), NULL);
-    g_psuTaskHandle = osThreadCreate(osThread(g_psuTask), nullptr);
+bool g_adcMeasureAllFinished = false;
 
+void init() {
 #if defined(EEZ_PLATFORM_STM32)
     MX_TIM7_Init();
     HAL_TIM_Base_Start_IT(&htim7);
 #endif
 }
 
-void oneIter();
-
-void mainLoop(const void *) {
-#ifdef __EMSCRIPTEN__
-    oneIter();
-#else
-    while (1) {
-        oneIter();
-    }
-#endif
-}
-
-bool g_adcMeasureAllFinished = false;
-
-void oneIter() {
-    osEvent event = osMessageGet(g_psuMessageQueueId, 1);
-    if (event.status == osEventMessage) {
-    	uint32_t message = event.value.v;
-    	uint32_t type = PSU_QUEUE_MESSAGE_TYPE(message);
-
-        if (type == PSU_QUEUE_MESSAGE_TYPE_TICK) {
+void onThreadMessage(uint8_t type, uint32_t param) {
+    if (type == PSU_MESSAGE_TICK) {
 #if defined(EEZ_PLATFORM_STM32)
-        	uint32_t tickCount = micros();
-
-        	ramp::tick(tickCount);
-
-        	dcp405::tickDacRamp(tickCount);
-
-            if (g_tickCount % 5) {
-                return;
-            }
-#endif
-        } else {
-            uint32_t param = PSU_QUEUE_MESSAGE_PARAM(message);
-            if (type == PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE) {
-                changePowerState(param ? true : false);
-            } else if (type == PSU_QUEUE_MESSAGE_TYPE_RESET) {
-                reset();
-            } else if (type == PSU_QUEUE_MESSAGE_TYPE_TEST) {
-                test();
-            } else if (type == PSU_QUEUE_MESSAGE_SPI_IRQ) {
-                auto channel = Channel::getBySlotIndex(param);
-                if (channel) {
-                    channel->onSpiIrq();
-                }
-            } else if (type == PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL) {
-                Channel::get(param).adcMeasureAll();
-                g_adcMeasureAllFinished = true;
-            } else if (type == PSU_QUEUE_TRIGGER_START_IMMEDIATELY) {
-                trigger::startImmediatelyInPsuThread();
-            } else if (type == PSU_QUEUE_TRIGGER_ABORT) {
-                trigger::abort();
-            } else if (type == PSU_QUEUE_TRIGGER_CHANNEL_SAVE_AND_DISABLE_OE) {
-                Channel::saveAndDisableOE();
-            } else if (type == PSU_QUEUE_TRIGGER_CHANNEL_RESTORE_OE) {
-                Channel::restoreOE();
-            } else if (type == PSU_QUEUE_SET_COUPLING_TYPE) {
-                channel_dispatcher::setCouplingTypeInPsuThread((channel_dispatcher::CouplingType)param);
-            } else if (type == PSU_QUEUE_SET_TRACKING_CHANNELS) {
-                channel_dispatcher::setTrackingChannels((uint16_t)param);
-            } else if (type == PSU_QUEUE_CHANNEL_OUTPUT_ENABLE) {
-                channel_dispatcher::outputEnable(Channel::get((param >> 8) & 0xFF), param & 0xFF ? true : false);
-            } else if (type == PSU_QUEUE_SYNC_OUTPUT_ENABLE) {
-                channel_dispatcher::syncOutputEnable();
-            } else if (type == PSU_QUEUE_MESSAGE_TYPE_HARD_RESET) {
-                restart();
-            } else if (type == PSU_QUEUE_MESSAGE_TYPE_SHUTDOWN) {
-                shutdown();
-            } else if (type == PSU_QUEUE_MESSAGE_TYPE_SET_VOLTAGE) {
-                channel_dispatcher::setVoltageInPsuThread((int)param);
-            } else if (type == PSU_QUEUE_MESSAGE_TYPE_SET_CURRENT) {
-                channel_dispatcher::setCurrentInPsuThread((int)param);
-            } else if (type == PSU_QUEUE_MESSAGE_TYPE_CALIBRATION_START) {
-                calibration::start(Channel::get((int)param));
-            } else if (type == PSU_QUEUE_MESSAGE_TYPE_CALIBRATION_STOP) {
-                calibration::stop();
-            }
+        uint32_t tickCount = micros();
+        ramp::tick(tickCount);
+        dcp405::tickDacRamp(tickCount);
+        if (g_tickCount % 5 == 0) {
+            tick();
         }
-    } 
-    
-    if (g_isBooted) {
-        tick();
-    }
+#endif
+    } if (type == PSU_MESSAGE_CHANGE_POWER_STATE) {
+        changePowerState(param ? true : false);
+    } else if (type == PSU_MESSAGE_RESET) {
+        reset();
+    } else if (type == PSU_MESSAGE_TEST) {
+        test();
+    } else if (type == PSU_MESSAGE_SPI_IRQ) {
+        auto channel = Channel::getBySlotIndex(param);
+        if (channel) {
+            channel->onSpiIrq();
+        }
+    } else if (type == PSU_MESSAGE_ADC_MEASURE_ALL) {
+        Channel::get(param).adcMeasureAll();
+        g_adcMeasureAllFinished = true;
+    } else if (type == PSU_MESSAGE_TRIGGER_START_IMMEDIATELY) {
+        trigger::startImmediatelyInPsuThread();
+    } else if (type == PSU_MESSAGE_TRIGGER_ABORT) {
+        trigger::abort();
+    } else if (type == PSU_MESSAGE_TRIGGER_CHANNEL_SAVE_AND_DISABLE_OE) {
+        Channel::saveAndDisableOE();
+    } else if (type == PSU_MESSAGE_TRIGGER_CHANNEL_RESTORE_OE) {
+        Channel::restoreOE();
+    } else if (type == PSU_MESSAGE_SET_COUPLING_TYPE) {
+        channel_dispatcher::setCouplingTypeInPsuThread((channel_dispatcher::CouplingType)param);
+    } else if (type == PSU_MESSAGE_SET_TRACKING_CHANNELS) {
+        channel_dispatcher::setTrackingChannels((uint16_t)param);
+    } else if (type == PSU_MESSAGE_CHANNEL_OUTPUT_ENABLE) {
+        channel_dispatcher::outputEnable(Channel::get((param >> 8) & 0xFF), param & 0xFF ? true : false);
+    } else if (type == PSU_MESSAGE_SYNC_OUTPUT_ENABLE) {
+        channel_dispatcher::syncOutputEnable();
+    } else if (type == PSU_MESSAGE_HARD_RESET) {
+        restart();
+    } else if (type == PSU_MESSAGE_SHUTDOWN) {
+        shutdown();
+    } else if (type == PSU_MESSAGE_SET_VOLTAGE) {
+        channel_dispatcher::setVoltageInPsuThread((int)param);
+    } else if (type == PSU_MESSAGE_SET_CURRENT) {
+        channel_dispatcher::setCurrentInPsuThread((int)param);
+    } else if (type == PSU_MESSAGE_CALIBRATION_START) {
+        calibration::start(Channel::get((int)param));
+    } else if (type == PSU_MESSAGE_CALIBRATION_STOP) {
+        calibration::stop();
+    }    
 }
 
 bool measureAllAdcValuesOnChannel(int channelIndex) {
@@ -315,7 +257,7 @@ bool measureAllAdcValuesOnChannel(int channelIndex) {
 	}
 
     g_adcMeasureAllFinished = false;
-    osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_ADC_MEASURE_ALL, channelIndex), 0);
+    sendMessageToPsu(PSU_MESSAGE_ADC_MEASURE_ALL, channelIndex, 0);
 
     int i;
     for (i = 0; i < 100 && !g_adcMeasureAllFinished; ++i) {
@@ -633,8 +575,8 @@ void changePowerState(bool up) {
         g_testPowerUpDelay = false;
     }
 
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_CHANGE_POWER_STATE, up ? 1 : 0), osWaitForever);
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_CHANGE_POWER_STATE, up ? 1 : 0);
         return;
     }
 
@@ -701,6 +643,10 @@ static int g_tickFuncIndex = 0;
 
 void tick() {
     WATCHDOG_RESET();
+
+    if (!g_isBooted) {
+        return;
+    }
 
     uint32_t tickCount = micros();
 

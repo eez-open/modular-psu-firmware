@@ -21,8 +21,6 @@
 #include <eez/file_type.h>
 #include <eez/idle.h>
 
-#include <eez/scpi/scpi.h>
-
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/datetime.h>
@@ -399,14 +397,14 @@ void setFreezeState(bool value) {
 void loadProfileParametersToCache(int location) {
     using namespace eez::scpi;
 
-    if (osThreadGetId() != g_scpiTaskHandle) {
+    if (!isLowPriorityThread()) {
         if (g_profilesCache[location].loadStatus == LOAD_STATUS_LOADING) {
             return;
         }
        
         g_profilesCache[location].loadStatus = LOAD_STATUS_LOADING;
         
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_LOAD_PROFILE, location), osWaitForever);
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_LOAD_PROFILE, location);
     } else {
         char filePath[MAX_PATH_LENGTH];
         getProfileFilePath(location, filePath);

@@ -23,8 +23,6 @@
 
 #include <eez/system.h>
 
-#include <eez/scpi/scpi.h>
-
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/dlog_view.h>
@@ -265,7 +263,7 @@ float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
         g_blockIndexToLoad = blockIndex;
         g_loadScale = g_recording.xAxisDiv / g_recording.xAxisDivMin;
 
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_LOAD_BLOCK, 0), osWaitForever);
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_LOAD_BLOCK);
     }
 
     uint32_t blockElementIndex = (blockElementAddress % BLOCK_SIZE) / sizeof(BlockElement);
@@ -562,14 +560,14 @@ void scaleToFit(Recording &recording) {
 }
 
 bool openFile(const char *filePath, int *err) {
-    if (osThreadGetId() != g_scpiTaskHandle) {
+    if (!isLowPriorityThread()) {
         g_state = STATE_LOADING;
         g_loadingStartTickCount = millis();
 
         strcpy(g_filePath, filePath);
         memset(&g_recording, 0, sizeof(Recording));
 
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_SHOW_FILE, 0), osWaitForever);
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_SHOW_FILE);
         return true;
     }
 
@@ -786,8 +784,8 @@ float roundValue(float value) {
 }
 
 void uploadFile() {
-    if (osThreadGetId() != g_scpiTaskHandle) {
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_DLOG_UPLOAD_FILE, 0), osWaitForever);
+    if (!isLowPriorityThread()) {
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_UPLOAD_FILE);
         return;
     }
 

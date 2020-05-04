@@ -281,8 +281,8 @@ int startImmediately() {
 
     io_pins::onTrigger();
 
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_TRIGGER_START_IMMEDIATELY, 0), 0);
+    if (!isPsuThread()) {
+    	sendMessageToPsu(PSU_MESSAGE_TRIGGER_START_IMMEDIATELY, 0, 0);
     } else {
         startImmediatelyInPsuThread();
     }
@@ -374,8 +374,8 @@ bool isActive() {
 }
 
 void abort() {
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_TRIGGER_ABORT, 0), 0);
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_TRIGGER_ABORT, 0, 0);
     } else {
         list::abort();
         ramp::abort();

@@ -26,11 +26,10 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
+#include <eez/tasks.h>
 #include <eez/mp.h>
 #include <eez/sound.h>
 #include <eez/memory.h>
-
-#include <eez/scpi/scpi.h>
 
 #include <eez/gui/gui.h>
 
@@ -107,11 +106,12 @@ void boot() {
 #if OPTION_ETHERNET
     mcu::ethernet::initMessageQueue();
 #endif
-    scpi::initMessageQueue();
+    initLowPriorityMessageQueue();
 
-    psu::startThread();
+    startHighPriorityThread();
 
     // INIT
+    psu::init();
 
     psu::rtc::init();
     psu::datetime::init();
@@ -213,7 +213,7 @@ void boot() {
 #if OPTION_ETHERNET
     mcu::ethernet::startThread();
 #endif
-    scpi::startThread();
+    startLowPriorityThread();
 
     mp::initMessageQueue();
     mp::startThread();
@@ -275,10 +275,10 @@ bool test() {
     static bool g_testResult;
     static bool g_testFinished;
 
-    if (osThreadGetId() != g_psuTaskHandle) {
+    if (!isPsuThread()) {
         g_testFinished = false;
         
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_TEST, 0), osWaitForever);
+        sendMessageToPsu(PSU_MESSAGE_TEST);
         
         while (!g_testFinished) {
             osDelay(10);
@@ -295,8 +295,8 @@ bool test() {
 bool reset() {
     using namespace psu;
 
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_RESET, 0), osWaitForever);
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_RESET);
         return true;
     }
 
@@ -317,9 +317,9 @@ void restart() {
 void shutdown() {
     using namespace psu;
 
-    if (osThreadGetId() != g_psuTaskHandle) {
+    if (!isPsuThread()) {
         psu::gui::showSavingPage();
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_SHUTDOWN, 0), osWaitForever);
+        sendMessageToPsu(PSU_MESSAGE_SHUTDOWN);
         return;
     }
 
@@ -332,10 +332,10 @@ void shutdown() {
 #if !defined(__EMSCRIPTEN__)
     // shutdown SCPI thread
     using namespace eez::scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SHUTDOWN, 0), osWaitForever);
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_SHUTDOWN);
     do {
         osDelay(10);
-    } while (isThreadAlive());
+    } while (isLowPriorityThreadAlive());
 #endif
 
     profile::shutdownSave();

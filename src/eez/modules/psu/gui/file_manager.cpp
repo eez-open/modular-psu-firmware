@@ -28,8 +28,6 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/container.h>
 
-#include <eez/scpi/scpi.h>
-
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/serial_psu.h>
 #if OPTION_ETHERNET
@@ -303,9 +301,9 @@ void loadDirectory() {
     g_filesStartPosition = 0;
     g_loadingStartTickCount = millis();
 
-    if (osThreadGetId() != scpi::g_scpiTaskHandle) {
+    if (!isLowPriorityThread()) {
         using namespace scpi;
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_LOAD_DIRECTORY, 0), osWaitForever);
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_LOAD_DIRECTORY);
     } else {
         doLoadDirectory();
     }
@@ -689,7 +687,7 @@ void openFile() {
         pushPage(gui::PAGE_ID_IMAGE_VIEW);
 
         using namespace scpi;
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_OPEN_IMAGE_FILE, 0), osWaitForever);
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE);
     } else if (fileItem->type == FILE_TYPE_MICROPYTHON) {
         mp::startScript(filePath);
     }
@@ -731,10 +729,10 @@ bool isUploadFileEnabled() {
 }
 
 void uploadFile() {
-    if (osThreadGetId() != scpi::g_scpiTaskHandle) {
+    if (!isLowPriorityThread()) {
         popPage();
         using namespace scpi;
-        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_UPLOAD_FILE, 0), osWaitForever);
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_UPLOAD_FILE);
         return;
     }
 
@@ -786,10 +784,10 @@ static char g_fileNameWithoutExtension[MAX_PATH_LENGTH + 1];
 void onRenameFileOk(char *fileNameWithoutExtension) {
     strcpy(g_fileNameWithoutExtension, fileNameWithoutExtension);
 
-    if (osThreadGetId() != scpi::g_scpiTaskHandle) {
+    if (!isLowPriorityThread()) {
         popPage();
         using namespace scpi;
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_RENAME_FILE, 0), osWaitForever);
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_RENAME_FILE);
     } else {
         doRenameFile();
     }
@@ -858,10 +856,10 @@ bool isDeleteFileEnabled() {
 }
 
 void deleteFile() {
-    if (osThreadGetId() != scpi::g_scpiTaskHandle) {
+    if (!isLowPriorityThread()) {
         popPage();
         using namespace scpi;
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_FILE_MANAGER_DELETE_FILE, 0), osWaitForever);
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_DELETE_FILE);
         return;
     }
 

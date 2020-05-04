@@ -118,8 +118,8 @@ bool setCouplingType(CouplingType couplingType, int *err) {
             return false;
         }
 
-        if (osThreadGetId() != g_psuTaskHandle) {
-            osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SET_COUPLING_TYPE, couplingType), osWaitForever);
+        if (!isPsuThread()) {
+            sendMessageToPsu(PSU_MESSAGE_SET_COUPLING_TYPE, couplingType);
         } else {
             setCouplingTypeInPsuThread(couplingType);
         }
@@ -245,8 +245,8 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
 }
 
 void setTrackingChannels(uint16_t trackingEnabled) {
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SET_TRACKING_CHANNELS, trackingEnabled), osWaitForever);
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_SET_TRACKING_CHANNELS, trackingEnabled);
     } else {
         bool resetTrackingChannels = false;
         for (int i = 0; i < CH_NUM; i++) {
@@ -554,9 +554,9 @@ void setVoltageInPsuThread(int channelIndex) {
 }
 
 void setVoltage(Channel &channel, float voltage) {
-    if (osThreadGetId() != g_psuTaskHandle) {
+    if (!isPsuThread()) {
         g_setVoltageValues[channel.channelIndex] = voltage;
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_SET_VOLTAGE, channel.channelIndex), osWaitForever);
+        sendMessageToPsu(PSU_MESSAGE_SET_VOLTAGE, channel.channelIndex);
         return;
     }
 
@@ -855,9 +855,9 @@ void setCurrentInPsuThread(int channelIndex) {
 }
 
 void setCurrent(Channel &channel, float current) {
-    if (osThreadGetId() != g_psuTaskHandle) {
+    if (!isPsuThread()) {
         g_setCurrentValues[channel.channelIndex] = current;
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_MESSAGE_TYPE_SET_CURRENT, channel.channelIndex), osWaitForever);
+        sendMessageToPsu(PSU_MESSAGE_SET_CURRENT, channel.channelIndex);
         return;
     }
 
@@ -1217,8 +1217,8 @@ void outputEnableOnNextSync(Channel &channel, bool enable) {
 }
 
 void syncOutputEnable() {
-    if (osThreadGetId() != g_psuTaskHandle) {
-        osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_SYNC_OUTPUT_ENABLE, 0), osWaitForever);
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_SYNC_OUTPUT_ENABLE);
     } else {
         Channel::syncOutputEnable();
     }
@@ -1573,8 +1573,8 @@ void setDisplayViewSettings(Channel &channel, int displayValue1, int displayValu
     }
     
     if (resetHistory) {
-        if (osThreadGetId() != g_psuTaskHandle) {
-            osMessagePut(g_psuMessageQueueId, PSU_QUEUE_MESSAGE(PSU_QUEUE_RESET_CHANNELS_HISTORY, 0), osWaitForever);
+        if (!isPsuThread()) {
+            sendMessageToPsu(PSU_MESSAGE_RESET_CHANNELS_HISTORY);
         } else {
             Channel::resetHistoryForAllChannels();
         }

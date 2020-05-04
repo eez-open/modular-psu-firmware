@@ -26,12 +26,10 @@
 #endif
 
 #include <eez/system.h>
+#include <eez/tasks.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/serial_psu.h>
-
-#include <eez/scpi/scpi.h>
-using namespace eez::scpi;
 
 UARTClass Serial;
 
@@ -41,7 +39,7 @@ uint32_t g_length;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-uint8_t g_serialInputChars[SCPI_QUEUE_SIZE + 1];
+uint8_t g_serialInputChars[LOW_PRIORITY_THREAD_QUEUE_SIZE + 1];
 int g_serialInputCharPosition = 0;
 #endif
 
@@ -49,13 +47,15 @@ int g_serialInputCharPosition = 0;
 
 #if defined(EEZ_PLATFORM_STM32)
 extern "C" void notifySerialLineStateChanged(uint8_t serialLineState) {
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_SERIAL_MESSAGE(SERIAL_LINE_STATE_CHANGED, serialLineState), osWaitForever);
+	using namespace eez;
+    sendMessageToLowPriorityThread(SERIAL_LINE_STATE_CHANGED, serialLineState);
 }
 
 extern "C" void notifySerialInput(uint8_t *buffer, uint32_t length) {
 	g_buffer = buffer;
 	g_length = length;
-	osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_SERIAL_MESSAGE(SERIAL_INPUT_AVAILABLE, 0), osWaitForever);
+	using namespace eez;
+	sendMessageToLowPriorityThread(SERIAL_INPUT_AVAILABLE);
 	return;
 }
 #endif
@@ -70,9 +70,10 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 void UARTClass::put(int ch) {
     g_serialInputChars[g_serialInputCharPosition] = ch;
     
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_SERIAL_MESSAGE(SERIAL_INPUT_AVAILABLE, g_serialInputCharPosition), osWaitForever);
+    using namespace eez;
+    sendMessageToLowPriorityThread(SERIAL_INPUT_AVAILABLE, g_serialInputCharPosition);
     
-    g_serialInputCharPosition = (g_serialInputCharPosition + 1) % (SCPI_QUEUE_SIZE + 1);
+    g_serialInputCharPosition = (g_serialInputCharPosition + 1) % (LOW_PRIORITY_THREAD_QUEUE_SIZE + 1);
 }
 #endif
 

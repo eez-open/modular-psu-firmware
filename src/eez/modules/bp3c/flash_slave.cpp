@@ -35,8 +35,6 @@
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
-#include <eez/scpi/scpi.h>
-
 #ifdef EEZ_PLATFORM_STM32
 
 #include <memory.h>
@@ -470,7 +468,7 @@ bool start(int slotIndex, const char *hexFilePath, int *err) {
 	g_slotIndex = slotIndex;
 	strcpy(g_hexFilePath, hexFilePath);
 
-	osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE, 0), osWaitForever);
+	sendMessageToLowPriorityThread(THREAD_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE);
 
 	return true;
 }

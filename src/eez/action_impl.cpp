@@ -22,11 +22,10 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
+#include <eez/tasks.h>
 #include <eez/sound.h>
 #include <eez/index.h>
 #include <eez/mqtt.h>
-
-#include <eez/scpi/scpi.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -1126,7 +1125,7 @@ void action_user_switch_clicked() {
         using namespace scpi;
         if (!g_screenshotGenerating) {
             g_screenshotGenerating = true;
-            osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_SCREENSHOT, 0), osWaitForever);
+            sendMessageToLowPriorityThread(THREAD_MESSAGE_SCREENSHOT);
         }
         break;
 

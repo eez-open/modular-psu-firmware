@@ -22,7 +22,6 @@
 #include <eez/firmware.h>
 #include <eez/mp.h>
 #include <eez/system.h>
-#include <eez/scpi/scpi.h>
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
@@ -230,17 +229,12 @@ void oneIter() {
     }
 }
 
-enum {
-    LOAD_SCRIPT,
-    EXECUTE_SCPI
-};
-
 void startScript(const char *filePath) {
     if (g_state == STATE_IDLE) {
         g_state = STATE_EXECUTING;
         strcpy(g_scriptPath, filePath);
         //DebugTrace("T1 %d\n", millis());
-        osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MP_MESSAGE(LOAD_SCRIPT, 0), osWaitForever);
+        sendMessageToLowPriorityThread(MP_LOAD_SCRIPT);
 
         psu::gui::showAsyncOperationInProgress();
     }
@@ -292,9 +286,9 @@ ErrorNoClose:
 static const char *g_commandOrQueryText;
 
 void onQueueMessage(uint32_t type, uint32_t param) {
-    if (type == LOAD_SCRIPT) {
+    if (type == MP_LOAD_SCRIPT) {
         loadScript();
-    } else if (type == EXECUTE_SCPI) {
+    } else if (type == MP_EXECUTE_SCPI) {
         input(g_scpiContext, (const char *)g_commandOrQueryText, strlen(g_commandOrQueryText));
         input(g_scpiContext, "\r\n", 2);
 
@@ -308,7 +302,7 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
     g_scpiDataLen = 0;
 
     // g_commandOrQueryText = commandOrQueryText;
-    // osMessagePut(scpi::g_scpiMessageQueueId, SCPI_QUEUE_MP_MESSAGE(EXECUTE_SCPI, 0), osWaitForever);
+    // sendMessageToLowPriorityThread(MP_EXECUTE_SCPI);
 
     // while (true) {
     //    osEvent event = osMessageGet(g_mpMessageQueueId, osWaitForever);

@@ -41,7 +41,6 @@
 #include <eez/memory.h>
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/persist_conf.h>
-#include <eez/scpi/scpi.h>
 
 #define NOTE_B0 31.0f
 #define NOTE_C1 33.0f
@@ -1618,15 +1617,14 @@ static void playTune(int iTune) {
 	if (iTune > g_playNextTuneIndex && iTune > g_currentTuneIndex) {
 		g_playNextTuneIndex = iTune;
     	if (
-			osThreadGetId() == scpi::g_scpiTaskHandle ||
-			osThreadGetId() == psu::g_psuTaskHandle ||
+			isLowPriorityThread() ||
+			isPsuThread() ||
 			g_playNextTuneIndex == POWER_UP_TUNE ||
 			(g_playNextTuneIndex == BEEP_TUNE && !g_isBooted)
 		) {
 			tick();
 		} else {
-			using namespace scpi;
-			osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_SOUND_TICK, 0), osWaitForever);
+			sendMessageToLowPriorityThread(THREAD_MESSAGE_SOUND_TICK);
 		}
 	}
 }

@@ -22,7 +22,6 @@
 #include <math.h>
 
 #include <eez/index.h>
-#include <eez/scpi/scpi.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -675,8 +674,8 @@ int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePa
 void stateTransition(int event, int* perr) {
     g_inStateTransition = true;
 
-    if (osThreadGetId() != g_scpiTaskHandle) {
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_DLOG_STATE_TRANSITION, event), osWaitForever);
+    if (!isLowPriorityThread()) {
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_STATE_TRANSITION, event);
         if (perr) {
             *perr = SCPI_RES_OK;
         }

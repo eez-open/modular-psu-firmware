@@ -20,8 +20,6 @@
 
 #include <string.h>
 
-#include <eez/scpi/scpi.h>
-
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 
@@ -111,8 +109,7 @@ void UserProfilesPage::onSaveFinish(char *remark, void (*callback)()) {
 
     showProgressPageWithoutAbort("Saving profile...");
 
-    using namespace eez::scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_SAVE, 0), osWaitForever);
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_USER_PROFILES_PAGE_SAVE);
 }
 
 void UserProfilesPage::doSaveProfile() {
@@ -128,8 +125,7 @@ void UserProfilesPage::recallProfile() {
     if (g_selectedProfileLocation > 0 && profile::isValid(g_selectedProfileLocation)) {
         showProgressPageWithoutAbort("Recalling profile...");
 
-        using namespace eez::scpi;
-        osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_RECALL, 0), osWaitForever);
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_USER_PROFILES_PAGE_RECALL);
     }
 }
 
@@ -154,8 +150,7 @@ void UserProfilesPage::onImportProfileFileSelected(const char *profileFilePath) 
     
     showProgressPageWithoutAbort("Importing profile...");
 
-    using namespace eez::scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_IMPORT, 0), osWaitForever);
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_USER_PROFILES_PAGE_IMPORT);
 }
 
 void UserProfilesPage::doImportProfile() {
@@ -181,8 +176,7 @@ void UserProfilesPage::onExportProfileFileSelected(const char *profileFilePath) 
     
     showProgressPageWithoutAbort("Exporting profile...");
 
-    using namespace eez::scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EXPORT, 0), osWaitForever);
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_USER_PROFILES_PAGE_EXPORT);
 }
 
 void UserProfilesPage::doExportProfile() {
@@ -205,8 +199,7 @@ void UserProfilesPage::deleteProfile() {
 void UserProfilesPage::onDeleteProfileYes() {
     showProgressPageWithoutAbort("Deleting profile...");
 
-    using namespace eez::scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_DELETE, 0), osWaitForever);
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_USER_PROFILES_PAGE_DELETE);
 }
 
 void UserProfilesPage::doDeleteProfile() {
@@ -233,8 +226,7 @@ void UserProfilesPage::onEditRemarkOk(char *newRemark) {
 
     showProgressPageWithoutAbort("Saving profile remark...");
 
-    using namespace eez::scpi;
-    osMessagePut(g_scpiMessageQueueId, SCPI_QUEUE_MESSAGE(SCPI_QUEUE_MESSAGE_TARGET_NONE, SCPI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_EDIT_REMARK, 0), osWaitForever);
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_USER_PROFILES_PAGE_EDIT_REMARK);
 }
 
 void UserProfilesPage::doEditRemark() {

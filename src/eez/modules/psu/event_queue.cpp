@@ -24,8 +24,6 @@
 #include <eez/system.h>
 #include <eez/sound.h>
 
-#include <eez/scpi/scpi.h>
-
 #include <eez/modules/mcu/eeprom.h>
 
 #include <eez/modules/psu/datetime.h>
@@ -370,7 +368,7 @@ static void addEventToWriteQueue(int16_t eventId, char *message) {
         osMutexRelease(g_writeQueueMutexId);
     }
 
-    if (osThreadGetId() == eez::scpi::g_scpiTaskHandle) {
+    if (isLowPriorityThread()) {
         tick();
     }
 }
