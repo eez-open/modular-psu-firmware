@@ -73,45 +73,6 @@ static const float I_MON_RESOLUTION = 0.02f;
 static GPIO_TypeDef *SPI_IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
 static const uint16_t SPI_IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
 
-bool masterSynchro(int slotIndex, uint8_t &firmwareMajorVersion, uint8_t &firmwareMinorVersion, uint32_t &idw0, uint32_t &idw1, uint32_t &idw2) {
-	uint32_t start = millis();
-
-    uint8_t txBuffer[15] = { SPI_MASTER_SYNBYTE, 0, 0 };
-    uint8_t rxBuffer[15] = { 0, 0, 0 };
-
-	while (true) {
-		WATCHDOG_RESET();
-
-	    spi::select(slotIndex, spi::CHIP_DCM220);
-	    spi::transfer(slotIndex, txBuffer, rxBuffer, sizeof(rxBuffer));
-	    spi::deselect(slotIndex);
-
-	    if (rxBuffer[0] == SPI_SLAVE_SYNBYTE) {
-			uint32_t startIrq = millis();
-			while (true) {
-				if (HAL_GPIO_ReadPin(SPI_IRQ_GPIO_Port[slotIndex], SPI_IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
-					firmwareMajorVersion = rxBuffer[1];
-					firmwareMinorVersion = rxBuffer[2];
-					idw0 = (rxBuffer[3] << 24) | (rxBuffer[4] << 16) | (rxBuffer[5] << 8) | rxBuffer[6];
-					idw1 = (rxBuffer[7] << 24) | (rxBuffer[8] << 16) | (rxBuffer[9] << 8) | rxBuffer[10];
-					idw2 = (rxBuffer[11] << 24) | (rxBuffer[12] << 16) | (rxBuffer[13] << 8) | rxBuffer[14];
-					return true;
-				}
-
-				int32_t diff = millis() - startIrq;
-				if (diff > CONF_MASTER_SYNC_IRQ_TIMEOUT_MS) {
-					break;
-				}
-			}
-	    }
-
-	    int32_t diff = millis() - start;
-	    if (diff > CONF_MASTER_SYNC_TIMEOUT_MS) {
-	    	return false;
-	    }
-	}
-}
-
 float calcTemperature(uint16_t adcValue) {
 	if (adcValue == 65535) {
 		// not measured yet
@@ -139,14 +100,72 @@ float calcTemperature(uint16_t adcValue) {
 
 #endif
 
+bool masterSynchro(int slotIndex) {
+	auto &slot = g_slots[slotIndex];
+
+#if defined(EEZ_PLATFORM_STM32)
+	uint32_t start = millis();
+
+    uint8_t txBuffer[15] = { SPI_MASTER_SYNBYTE, 0, 0 };
+    uint8_t rxBuffer[15] = { 0, 0, 0 };
+
+	while (true) {
+		WATCHDOG_RESET();
+
+	    spi::select(slotIndex, spi::CHIP_DCM220);
+	    spi::transfer(slotIndex, txBuffer, rxBuffer, sizeof(rxBuffer));
+	    spi::deselect(slotIndex);
+
+	    if (rxBuffer[0] == SPI_SLAVE_SYNBYTE) {
+			uint32_t startIrq = millis();
+			while (true) {
+				if (HAL_GPIO_ReadPin(SPI_IRQ_GPIO_Port[slotIndex], SPI_IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
+					slot.firmwareMajorVersion = rxBuffer[1];
+					slot.firmwareMinorVersion = rxBuffer[2];
+					slot.idw0 = (rxBuffer[3] << 24) | (rxBuffer[4] << 16) | (rxBuffer[5] << 8) | rxBuffer[6];
+					slot.idw1 = (rxBuffer[7] << 24) | (rxBuffer[8] << 16) | (rxBuffer[9] << 8) | rxBuffer[10];
+					slot.idw2 = (rxBuffer[11] << 24) | (rxBuffer[12] << 16) | (rxBuffer[13] << 8) | rxBuffer[14];
+					return true;
+				}
+
+				int32_t diff = millis() - startIrq;
+				if (diff > CONF_MASTER_SYNC_IRQ_TIMEOUT_MS) {
+					break;
+				}
+			}
+	    }
+
+	    int32_t diff = millis() - start;
+	    if (diff > CONF_MASTER_SYNC_TIMEOUT_MS) {
+			slot.firmwareMajorVersion = 0;
+			slot.firmwareMinorVersion = 0;
+			slot.idw0 = 0;
+			slot.idw1 = 0;
+			slot.idw2 = 0;
+	    	return false;
+	    }
+	}
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	slot.firmwareMajorVersion = 1;
+	slot.firmwareMinorVersion = 0;
+	slot.idw0 = 0;
+	slot.idw1 = 0;
+	slot.idw2 = 0;
+	return true;
+#endif
+
+}
+
 struct DcmChannel : public Channel {
     bool outputEnable;
 
     uint8_t output[BUFFER_SIZE];
 
-#if defined(EEZ_PLATFORM_STM32)
 	bool synchronized;
 
+#if defined(EEZ_PLATFORM_STM32)
 	uint8_t input[BUFFER_SIZE];
 
 	uint16_t uSet;
@@ -163,12 +182,6 @@ struct DcmChannel : public Channel {
 #endif
 
     TestResult testResult;
-
-	uint8_t firmwareMajorVersion = 0;
-	uint8_t firmwareMinorVersion = 0;
-	uint32_t idw0 = 0;
-	uint32_t idw1 = 0;
-	uint32_t idw2 = 0;
 
 	float I_MAX_FOR_REMAP;
 
@@ -303,40 +316,17 @@ struct DcmChannel : public Channel {
 #endif
 
 	void init() override {
-#if defined(EEZ_PLATFORM_STM32)
 		if (!synchronized && subchannelIndex == 0) {
-			if (masterSynchro(slotIndex, firmwareMajorVersion, firmwareMinorVersion, idw0, idw1, idw2)) {
+			if (masterSynchro(slotIndex)) {
 	    		//DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)firmwareMajorVersion, (int)firmwareMinorVersion);
 				synchronized = true;
+#if defined(EEZ_PLATFORM_STM32)
 				numCrcErrors = 0;
+#endif
 			} else {
 				event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
-			    firmwareMinorVersion = 0;
-			    firmwareMajorVersion = 0;
-				idw0 = 0;
-				idw1 = 0;
-				idw2 = 0;
 			}
 		}
-
-		if (subchannelIndex == 1) {
-			auto& firstChannel = (DcmChannel &)Channel::get(channelIndex - 1);
-
-		    firmwareMinorVersion = firstChannel.firmwareMinorVersion;
-		    firmwareMajorVersion = firstChannel.firmwareMajorVersion;
-			idw0 = firstChannel.idw0;
-			idw1 = firstChannel.idw1;
-			idw2 = firstChannel.idw2;
-		}
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        firmwareMajorVersion = 1;
-		firmwareMinorVersion = 0;
-		idw0 = 0;
-		idw1 = 0;
-		idw2 = 0;
-#endif
     }
 
 	void onPowerDown() {
@@ -589,25 +579,6 @@ struct DcmChannel : public Channel {
 		return false;
 	}
 
-	void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) {
-		majorVersion = firmwareMajorVersion;
-		minorVersion = firmwareMinorVersion;
-	}
-
-    const char *getBrand() {
-		return "Envox";
-	}
-    
-	void getSerial(char *text) {
-#if defined(EEZ_PLATFORM_STM32)		
-		sprintf(text, "%08X", (unsigned int)idw0);
-		sprintf(text + 8, "%08X", (unsigned int)idw1);
-		sprintf(text + 16, "%08X", (unsigned int)idw2);
-#else
-		strcpy(text, "N/A");
-#endif
-	}
-
     void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) {
         static float values[] = { 1.0f, 0.5f, 0.1f, 0.01f };
 		static float calibrationModeValues[] = { 1.0f, 0.1f, 0.01f, 0.001f };
@@ -656,7 +627,7 @@ struct DcmChannel : public Channel {
 struct DcmChannelModuleInfo : public PsuChannelModuleInfo {
 public:
 	DcmChannelModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision) 
-		: PsuChannelModuleInfo(moduleType, moduleName, latestModuleRevision, 2)
+		: PsuChannelModuleInfo(moduleType, moduleName, "Envox", latestModuleRevision, 2)
 	{
 	}
 

@@ -28,7 +28,7 @@ namespace dib_mio168 {
 struct Mio168ModuleInfo : public ModuleInfo {
 public:
     Mio168ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_MIO168, MODULE_CATEGORY_OTHER, "MIO168", MODULE_REVISION_R1B2)
+        : ModuleInfo(MODULE_TYPE_DIB_MIO168, MODULE_CATEGORY_OTHER, "MIO168", "Envox", MODULE_REVISION_R1B2)
     {}
     
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {

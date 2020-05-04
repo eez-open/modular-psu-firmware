@@ -28,7 +28,7 @@ namespace dib_smx46 {
 struct Smx46ModuleInfo : public ModuleInfo {
 public:
     Smx46ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_SMX46, MODULE_CATEGORY_OTHER, "SMX46", MODULE_REVISION_R1B2)
+        : ModuleInfo(MODULE_TYPE_DIB_SMX46, MODULE_CATEGORY_OTHER, "SMX46", "Envox", MODULE_REVISION_R1B2)
     {}
     
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {

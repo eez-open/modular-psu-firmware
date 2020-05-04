@@ -17,6 +17,8 @@
 */
 
 #include <assert.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <eez/index.h>
 
@@ -32,10 +34,11 @@
 
 namespace eez {
 
-ModuleInfo::ModuleInfo(uint16_t moduleType_, uint16_t moduleCategory_, const char *moduleName_, uint16_t latestModuleRevision_)
+ModuleInfo::ModuleInfo(uint16_t moduleType_, uint16_t moduleCategory_, const char *moduleName_, const char *moduleBrand_, uint16_t latestModuleRevision_)
     : moduleType(moduleType_)
     , moduleCategory(moduleCategory_)
     , moduleName(moduleName_)
+    , moduleBrand(moduleBrand_)
     , latestModuleRevision(latestModuleRevision_)
 {
 }
@@ -78,7 +81,7 @@ int ModuleInfo::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor
 
 ////////////////////////////////////////////////////////////////////////////////
 
-ModuleInfo noneModuleInfo(MODULE_TYPE_NONE, MODULE_CATEGORY_NONE, "None", 0);
+ModuleInfo noneModuleInfo(MODULE_TYPE_NONE, MODULE_CATEGORY_NONE, "None", "None", 0);
 
 static ModuleInfo *g_modules[] = {
     dcp405::g_moduleInfo,
@@ -89,6 +92,14 @@ static ModuleInfo *g_modules[] = {
     dib_smx46::g_moduleInfo
 };
 
+SlotInfo g_slots[NUM_SLOTS] = {
+    { &noneModuleInfo },
+    { &noneModuleInfo },
+    { &noneModuleInfo }
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 ModuleInfo *getModuleInfo(uint16_t moduleType) {
     for (unsigned int i = 0; i < sizeof(g_modules) / sizeof(ModuleInfo *); i++) {
         if (g_modules[i]->moduleType == moduleType) {
@@ -98,10 +109,14 @@ ModuleInfo *getModuleInfo(uint16_t moduleType) {
     return &noneModuleInfo;
 }
 
-SlotInfo g_slots[NUM_SLOTS] = {
-    { &noneModuleInfo },
-    { &noneModuleInfo },
-    { &noneModuleInfo }
-};
+void getSlotSerialInfo(SlotInfo &slotInfo, char *text) {
+    if (slotInfo.idw0 != 0 || slotInfo.idw1 != 0 || slotInfo.idw2 != 0) {
+        sprintf(text, "%08X", (unsigned int)slotInfo.idw0);
+        sprintf(text + 8, "%08X", (unsigned int)slotInfo.idw1);
+        sprintf(text + 16, "%08X", (unsigned int)slotInfo.idw2);
+    } else {
+        strcpy(text, "N/A");
+    }
+}
 
 } // namespace eez

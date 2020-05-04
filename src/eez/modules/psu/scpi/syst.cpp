@@ -540,7 +540,7 @@ scpi_result_t scpi_cmd_systemChannelSnoQ(scpi_t *context) {
     }
 
     char text[50];
-    channel->getSerial(text);
+    getSlotSerialInfo(g_slots[channel->slotIndex], text);
     SCPI_ResultText(context, text);
 
     return SCPI_RES_OK;

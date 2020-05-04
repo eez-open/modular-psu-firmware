@@ -45,21 +45,29 @@ struct ModuleInfo {
     uint16_t moduleType;
     uint16_t moduleCategory;
     const char *moduleName;
+    const char *moduleBrand;
     uint16_t latestModuleRevision;
 
-    ModuleInfo(uint16_t moduleType, uint16_t moduleCategory, const char *moduleName, uint16_t latestModuleRevision);
+    ModuleInfo(uint16_t moduleType, uint16_t moduleCategory, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision);
 
     virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);
 };
 
-ModuleInfo *getModuleInfo(uint16_t moduleType);
-
 struct SlotInfo {
     ModuleInfo *moduleInfo;
     uint16_t moduleRevision;
+	uint8_t firmwareMajorVersion;
+	uint8_t firmwareMinorVersion;
+	uint32_t idw0;
+	uint32_t idw1;
+	uint32_t idw2;
 };
 
 static const int NUM_SLOTS = 3;
 extern SlotInfo g_slots[NUM_SLOTS];
+
+ModuleInfo *getModuleInfo(uint16_t moduleType);
+
+void getSlotSerialInfo(SlotInfo &slotInfo, char *text);
 
 } // namespace eez

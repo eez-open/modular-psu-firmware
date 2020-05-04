@@ -179,7 +179,7 @@ struct Channel;
 struct PsuChannelModuleInfo : public ModuleInfo {
     uint8_t numChannels;
 
-    PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision, uint8_t numChannels);
+    PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, uint8_t numChannels);
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override;
 
@@ -691,10 +691,6 @@ public:
     virtual void readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]);
 
     virtual void onSpiIrq();
-
-    virtual void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) = 0;
-    virtual const char *getBrand() = 0;
-    virtual void getSerial(char *text) = 0;
 
     virtual void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) = 0;
     virtual void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) = 0;

@@ -28,7 +28,7 @@ namespace dib_prel6 {
 struct Prel6ModuleInfo : public ModuleInfo {
 public:
     Prel6ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_PREL6, MODULE_CATEGORY_OTHER, "PREL6", MODULE_REVISION_R1B2)
+        : ModuleInfo(MODULE_TYPE_DIB_PREL6, MODULE_CATEGORY_OTHER, "PREL6", "Envox", MODULE_REVISION_R1B2)
     {}
     
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {

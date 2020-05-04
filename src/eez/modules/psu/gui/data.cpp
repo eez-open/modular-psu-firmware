@@ -946,7 +946,7 @@ void FOLDER_INFO_value_to_text(const Value &value, char *text, int count) {
     if (value.getUInt32() == 1) {
         strncpy(text, "1 item", count - 1);
     } else {
-        snprintf(text, count - 1, "%u items ", value.getUInt32());
+        snprintf(text, count - 1, "%u items ", (unsigned int)value.getUInt32());
     }
     text[count - 1] = 0;
 }
@@ -957,7 +957,7 @@ bool compare_CHANNEL_INFO_SERIAL_value(const Value &a, const Value &b) {
 
 void CHANNEL_INFO_SERIAL_value_to_text(const Value &value, char *text, int count) {
     auto &channel = Channel::get(value.getInt());
-    channel.getSerial(text);
+    getSlotSerialInfo(g_slots[channel.slotIndex], text);
 }
 
 bool compare_DEBUG_VARIABLE_value(const Value &a, const Value &b) {
@@ -1974,9 +1974,8 @@ void data_channel_long_title(DataOperationEnum operation, Cursor cursor, Value &
 
 void data_channel_info_brand(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        auto &channel = Channel::get(iChannel);
-        value = channel.getBrand();
+        auto &slot = g_slots[g_channel ? g_channel->slotIndex : g_selectedSlotIndex];
+        value = slot.moduleInfo->moduleBrand;
     }
 }
 
@@ -2767,10 +2766,8 @@ void data_channel_settings_page(DataOperationEnum operation, Cursor cursor, Valu
         } else {
             auto modulType = g_slots[channel.slotIndex].moduleInfo->moduleType;
             if (modulType == MODULE_TYPE_DCM220 || modulType == MODULE_TYPE_DCM224) {
-            	uint8_t firmwareMajorVersion;
-            	uint8_t firmwareMinorVersion;
-            	channel.getFirmwareVersion(firmwareMajorVersion, firmwareMinorVersion);
-            	if (!bp3c::flash_slave::g_bootloaderMode || (firmwareMajorVersion == 0 && firmwareMinorVersion == 0)) {
+                auto &slot = g_slots[channel.slotIndex];
+            	if (!bp3c::flash_slave::g_bootloaderMode || (slot.firmwareMajorVersion == 0 && slot.firmwareMinorVersion == 0)) {
             		value = PAGE_ID_CH_SETTINGS_ERROR_DCM220;
             	} else {
             		value = PAGE_ID_CH_SETTINGS_OK;
@@ -2784,12 +2781,8 @@ void data_channel_settings_page(DataOperationEnum operation, Cursor cursor, Valu
 
 void data_channel_firmware_version(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        uint8_t majorVersion;
-        uint8_t minorVersion;
-        channel.getFirmwareVersion(majorVersion, minorVersion);
-        value = MakeFirmwareVersionValue(majorVersion, minorVersion);
+        auto &slot = g_slots[g_channel ? g_channel->slotIndex : g_selectedSlotIndex];
+        value = MakeFirmwareVersionValue(slot.firmwareMajorVersion, slot.firmwareMinorVersion);
     }
 }
 

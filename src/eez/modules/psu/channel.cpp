@@ -50,8 +50,8 @@ namespace psu {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-PsuChannelModuleInfo::PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision, uint8_t numChannels_)
-    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, latestModuleRevision)
+PsuChannelModuleInfo::PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, uint8_t numChannels_)
+    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision)
     , numChannels(numChannels_)
 {
 }

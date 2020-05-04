@@ -1874,7 +1874,7 @@ void selectChannel(Channel *channel) {
     if (channel) {
         g_channel = channel;
     } else {
-        if (getFoundWidgetAtDown().cursor >= 0) {
+        if (getFoundWidgetAtDown().cursor >= 0 && getFoundWidgetAtDown().cursor < CH_NUM) {
             g_channel = &Channel::get(getFoundWidgetAtDown().cursor);
         } else if (!g_channel) {
             g_channel = &Channel::get(0);

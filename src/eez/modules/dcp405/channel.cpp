@@ -747,19 +747,6 @@ struct DcpChannel : public Channel {
 	}
 #endif
 
-	void getFirmwareVersion(uint8_t &majorVersion, uint8_t &minorVersion) {
-		majorVersion = 0;
-		minorVersion = 0;
-	}
-
-    const char *getBrand() {
-		return "Envox";
-	}
-    
-	void getSerial(char *text) {
-		strcpy(text, "N/A");
-	}
-
     void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) {
         static float values[] = { 1.0f, 0.1f, 0.01f, 0.005f };
 		static float calibrationModeValues[] = { 1.0f, 0.1f, 0.01f, 0.001f };
@@ -804,7 +791,7 @@ struct DcpChannel : public Channel {
 struct DcpChannelModuleInfo : public PsuChannelModuleInfo {
 public:
 	DcpChannelModuleInfo() 
-		: PsuChannelModuleInfo(MODULE_TYPE_DCP405, "DCP405", MODULE_REVISION_DCP405_R2B7, 1)
+		: PsuChannelModuleInfo(MODULE_TYPE_DCP405, "DCP405", "Envox", MODULE_REVISION_DCP405_R2B7, 1)
 	{
 	}
 
