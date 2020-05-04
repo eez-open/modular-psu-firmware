@@ -186,7 +186,6 @@ void IOExpander::init() {
 bool IOExpander::test() {
 #if defined(EEZ_PLATFORM_STM32)    
     Channel &channel = Channel::get(channelIndex);
-    auto &slot = g_slots[slotIndex];
 
     channel.flags.powerOk = 1;
 
@@ -197,7 +196,7 @@ bool IOExpander::test() {
             uint8_t value = read(reg);
             uint8_t expectedValue = getRegValue(i);
             if (value != expectedValue) {
-                DebugTrace("Ch%d IO expander reg check failure: reg=%d, expected=%d, got=%d", slot.channelIndex + 1, (int)REG_VALUES[3 * i], (int)expectedValue, (int)value);
+                DebugTrace("Ch%d IO expander reg check failure: reg=%d, expected=%d, got=%d", channel.channelIndex + 1, (int)REG_VALUES[3 * i], (int)expectedValue, (int)value);
 
                 g_testResult = TEST_FAILED;
                 break;
@@ -208,7 +207,7 @@ bool IOExpander::test() {
     readGpio();
 
     if (g_testResult == TEST_FAILED) {
-		 generateError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED + slot.channelIndex);
+		 generateError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED + channel.channelIndex);
 		 channel.flags.powerOk = 0;
     } else {
     	g_testResult = TEST_OK;
@@ -216,8 +215,8 @@ bool IOExpander::test() {
 #if !CONF_SKIP_PWRGOOD_TEST
         channel.flags.powerOk = testBit(IO_BIT_IN_PWRGOOD);
         if (!channel.flags.powerOk) {
-            DebugTrace("Ch%d power fault", slot.channelIndex + 1);
-            generateError(SCPI_ERROR_CH1_FAULT_DETECTED + slot.channelIndex);
+            DebugTrace("Ch%d power fault", channel.channelIndex + 1);
+            generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channel.channelIndex);
         }
 #endif
 	}
@@ -251,17 +250,17 @@ void IOExpander::reinit() {
 #endif
 
 void IOExpander::tick(uint32_t tick_usec) {
-#if defined(EEZ_PLATFORM_STM32)    
-    auto &slot = g_slots[slotIndex];
+    Channel &channel = Channel::get(channelIndex);
 
+#if defined(EEZ_PLATFORM_STM32)    
 	readGpio();
 
     uint8_t iodira = read(REG_IODIRA);
     if (iodira == 0xFF || (gpio & gpioOutputPinsMask) != gpioWritten) {
         if (iodira == 0xFF) {
-            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_RESET_DETECTED + slot.channelIndex);
+            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_RESET_DETECTED + channel.channelIndex);
         } else {
-            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_FAULT_MATCH_DETECTED + slot.channelIndex);
+            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_FAULT_MATCH_DETECTED + channel.channelIndex);
         }
 
         reinit();
@@ -271,8 +270,6 @@ void IOExpander::tick(uint32_t tick_usec) {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    Channel &channel = Channel::get(channelIndex);
-
     if (simulator::getPwrgood(channel.channelIndex)) {
         gpio |= 1 << IOExpander::IO_BIT_IN_PWRGOOD;
     } else {

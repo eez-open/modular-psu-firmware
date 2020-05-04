@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <new>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
@@ -174,6 +175,8 @@ struct DcmChannel : public Channel {
 	float U_CAL_POINTS[2];
 	float I_CAL_POINTS[6];
 
+	bool ccMode = false;
+
     DcmChannel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex)
         : Channel(slotIndex, channelIndex, subchannelIndex)
 #if defined(EEZ_PLATFORM_STM32)
@@ -315,6 +318,16 @@ struct DcmChannel : public Channel {
 				idw2 = 0;
 			}
 		}
+
+		if (subchannelIndex == 1) {
+			auto& firstChannel = (DcmChannel &)Channel::get(channelIndex - 1);
+
+		    firmwareMinorVersion = firstChannel.firmwareMinorVersion;
+		    firmwareMajorVersion = firstChannel.firmwareMajorVersion;
+			idw0 = firstChannel.idw0;
+			idw1 = firstChannel.idw1;
+			idw2 = firstChannel.idw2;
+		}
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -335,6 +348,13 @@ struct DcmChannel : public Channel {
 	}
 
 	bool test() {
+		if (subchannelIndex == 1) {
+			auto& firstChannel = (DcmChannel &)Channel::get(channelIndex - 1);
+			testResult = firstChannel.testResult;
+			flags.powerOk = firstChannel.flags.powerOk;
+			return isOk();
+		}
+
 		Channel::test();
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -345,11 +365,9 @@ struct DcmChannel : public Channel {
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
-		if (subchannelIndex == 0) {
 			output[0] = 0;
 
 			transfer();
-		}
 
 		bool pwrGood;
 		if (numCrcErrors == 0) {
@@ -375,6 +393,7 @@ struct DcmChannel : public Channel {
 	}
 
 	void tickSpecific(uint32_t tickCount) {
+#if defined(EEZ_PLATFORM_STM32)
         if (subchannelIndex == 0) {
 			DcmChannel &secondChannel = (DcmChannel &)Channel::get(channelIndex + 1);
 
@@ -382,7 +401,6 @@ struct DcmChannel : public Channel {
 
             output[0] = output0;
 
-#if defined(EEZ_PLATFORM_STM32)
         	output[1] = 0;
 
         	uint16_t *outputSetValues = (uint16_t *)(output + 2);
@@ -400,15 +418,47 @@ struct DcmChannel : public Channel {
 #endif
 
 			transfer();
-#endif
 
-#if defined(EEZ_PLATFORM_STM32)
             if (numCrcErrors == 0) {
 		    	temperature = calcTemperature(*((uint16_t *)(input + 10)));
 		    	secondChannel.temperature = calcTemperature(*((uint16_t *)(input + 12)));
+
+				uint16_t *inputSetValues = (uint16_t *)(input + 2);
+
+				for (int subchannelIndex = 0; subchannelIndex < 2; subchannelIndex++) {
+					auto &channel = (DcmChannel &)Channel::get(channelIndex + subchannelIndex);
+					int offset = subchannelIndex * 2;
+
+					channel.ccMode = (input[0] & (subchannelIndex == 0 ? REG0_CC1_MASK : REG0_CC2_MASK)) != 0;
+
+					uint16_t uMonAdc = inputSetValues[offset];
+					float uMon = remap(uMonAdc, (float)ADC_MIN, 0, (float)ADC_MAX, params.U_MAX);
+					channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon);
+
+					uint16_t iMonAdc = inputSetValues[offset + 1];
+					const float FULL_SCALE = 2.0F;
+					const float U_REF = 2.5F;
+					float iMon = remap(iMonAdc, (float)ADC_MIN, 0, FULL_SCALE * ADC_MAX / U_REF, /*params.I_MAX*/ I_MAX_FOR_REMAP);
+					iMon = roundPrec(iMon, I_MON_RESOLUTION);
+					channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon);
+
+#if !CONF_SKIP_PWRGOOD_TEST
+					bool pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
+					if (!pwrGood) {
+						channel.flags.powerOk = 0;
+						generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channel.channelIndex);
+						powerDownBySensor();
 		    }
 #endif
+
+#ifdef DEBUG
+					psu::debug::g_uMon[channelIndex + subchannelIndex].set(uMonAdc);
+					psu::debug::g_iMon[channelIndex + subchannelIndex].set(iMonAdc);
+#endif
+				}
         }
+        }
+#endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
         if (isOutputEnabled()) {
@@ -443,56 +493,12 @@ struct DcmChannel : public Channel {
             iMon = 0;
             simulator::setCC(channelIndex, false);
         }
-#endif
 
-        //
-
-#if defined(EEZ_PLATFORM_STM32)
-        if (numCrcErrors == 0) {
-        	uint16_t *inputSetValues = (uint16_t *)(input + 2);
-
-        	int offset = subchannelIndex * 2;
-
-        	uint16_t uMonAdc = inputSetValues[offset];
-        	float uMon = remap(uMonAdc, (float)ADC_MIN, 0, (float)ADC_MAX, params.U_MAX);
         	onAdcData(ADC_DATA_TYPE_U_MON, uMon);
-
-        	uint16_t iMonAdc = inputSetValues[offset + 1];
-
-			const float FULL_SCALE = 2.0F;
-			const float U_REF = 2.5F;
-        	float iMon = remap(iMonAdc, (float)ADC_MIN, 0, FULL_SCALE * ADC_MAX / U_REF, /*params.I_MAX*/ I_MAX_FOR_REMAP);
-        	iMon = roundPrec(iMon, I_MON_RESOLUTION);
         	onAdcData(ADC_DATA_TYPE_I_MON, iMon);
 
-#ifdef DEBUG
-			psu::debug::g_uMon[channelIndex].set(uMonAdc);
-			psu::debug::g_iMon[channelIndex].set(iMonAdc);
-#endif
-        }
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        onAdcData(ADC_DATA_TYPE_U_MON, uMon);
-        onAdcData(ADC_DATA_TYPE_I_MON, iMon);
-#endif
-
-        // PWRGOOD
-
-#if defined(EEZ_PLATFORM_STM32)
-		bool pwrGood;
-		if (numCrcErrors == 0) {
-			pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
-		} else{
-			pwrGood = true;
-		}
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        bool pwrGood = simulator::getPwrgood(channelIndex);
-#endif
-
 #if !CONF_SKIP_PWRGOOD_TEST
+        bool pwrGood = simulator::getPwrgood(channelIndex);
 		if (!pwrGood) {
 			flags.powerOk = 0;
 			generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channelIndex);
@@ -500,11 +506,13 @@ struct DcmChannel : public Channel {
 			return;
 		}
 #endif
+
+#endif
 	}
 	
 	bool isInCcMode() {
 #if defined(EEZ_PLATFORM_STM32)
-        return (input[0] & (subchannelIndex == 0 ? REG0_CC1_MASK : REG0_CC2_MASK)) != 0;
+        return ccMode;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -653,7 +661,9 @@ public:
 	}
 
 	Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
-		return new DcmChannel(slotIndex, channelIndex, subchannelIndex);
+        void *buffer = malloc(sizeof(DcmChannel));
+        memset(buffer, 0, sizeof(DcmChannel));
+		return new (buffer) DcmChannel(slotIndex, channelIndex, subchannelIndex);
 	}
 };
 

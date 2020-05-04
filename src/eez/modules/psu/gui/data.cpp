@@ -6148,7 +6148,6 @@ void data_debug_i_adc_amper(DataOperationEnum operation, Cursor cursor, Value &v
 }
 
 void data_dummy(DataOperationEnum operation, Cursor cursor, Value &value) {
-    Channel &channel = Channel::get(cursor);
     if (operation == DATA_OPERATION_GET) {
         value = Value(10.0f, UNIT_VOLT);
     }

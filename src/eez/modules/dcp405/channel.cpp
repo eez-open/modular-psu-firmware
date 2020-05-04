@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <new>
+
 #include <eez/modules/dcp405/channel.h>
 #include <eez/modules/dcp405/adc.h>
 #include <eez/modules/dcp405/dac.h>
@@ -81,6 +83,14 @@ struct DcpChannel : public Channel {
     DcpChannel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex)
         : Channel(slotIndex, channelIndex, subchannelIndex)
     {
+		ioexp.slotIndex = slotIndex;
+		ioexp.channelIndex = channelIndex;
+		
+		adc.slotIndex = slotIndex;
+		adc.channelIndex = channelIndex;
+		
+		dac.slotIndex = slotIndex;
+		dac.channelIndex = channelIndex;
     }
 	
 	void getParams() override {
@@ -175,15 +185,6 @@ struct DcpChannel : public Channel {
 	}
 
 	void init() override {
-		ioexp.slotIndex = slotIndex;
-		ioexp.channelIndex = channelIndex;
-		
-		adc.slotIndex = slotIndex;
-		adc.channelIndex = channelIndex;
-		
-		dac.slotIndex = slotIndex;
-		dac.channelIndex = channelIndex;
-
 		ioexp.init();
 		adc.init();
 		dac.init();
@@ -808,7 +809,9 @@ public:
 	}
 
 	Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
-		return new DcpChannel(slotIndex, channelIndex, subchannelIndex);
+        void *buffer = malloc(sizeof(DcpChannel));
+        memset(buffer, 0, sizeof(DcpChannel));
+		return new (buffer) DcpChannel(slotIndex, channelIndex, subchannelIndex);
 	}
 };
 
