@@ -475,32 +475,36 @@ int updateFanSpeed() {
         	}
         }
     } else {
-        // adjust fan speed depending on max. channel temperature
-        float maxChannelTemperature = psu::temperature::getMaxChannelTemperature();
+		if (psu::CH_NUM > 0) {
+			// adjust fan speed depending on max. channel temperature
+			float maxChannelTemperature = psu::temperature::getMaxChannelTemperature();
 
-        float iMonMax, iMax;
-        getIMonMax(iMonMax, iMax);
-        float Ki = roundPrec(remap(iMonMax * iMonMax, 0, FAN_PID_KI_MIN, iMax * iMax, FAN_PID_KI_MAX), 0.05f);
-        if (Ki != g_Ki) {
-            g_Ki = Ki;
-            g_fanPID.SetTunings(g_Kp, g_Ki, g_Kd, g_POn);
-            g_pidTarget = FAN_MIN_TEMP - 2.0 * iMonMax;
-        }
+			float iMonMax, iMax;
+			getIMonMax(iMonMax, iMax);
+			float Ki = roundPrec(remap(iMonMax * iMonMax, 0, FAN_PID_KI_MIN, iMax * iMax, FAN_PID_KI_MAX), 0.05f);
+			if (Ki != g_Ki) {
+				g_Ki = Ki;
+				g_fanPID.SetTunings(g_Kp, g_Ki, g_Kd, g_POn);
+				g_pidTarget = FAN_MIN_TEMP - 2.0 * iMonMax;
+			}
 
-        g_pidTemp = maxChannelTemperature;
-        if (g_fanPID.Compute()) {
-            newFanSpeedPWM = (int)round(g_pidDuty);
+			g_pidTemp = maxChannelTemperature;
+			if (g_fanPID.Compute()) {
+				newFanSpeedPWM = (int)round(g_pidDuty);
 
-            if (newFanSpeedPWM <= 0) {
-                newFanSpeedPWM = 0;
-            } else {
-                newFanSpeedPWM += FAN_MIN_PWM;
-            }
+				if (newFanSpeedPWM <= 0) {
+					newFanSpeedPWM = 0;
+				} else {
+					newFanSpeedPWM += FAN_MIN_PWM;
+				}
 
-            if (newFanSpeedPWM > FAN_MAX_PWM) {
-                newFanSpeedPWM = FAN_MAX_PWM;
-            }
-        }
+				if (newFanSpeedPWM > FAN_MAX_PWM) {
+					newFanSpeedPWM = FAN_MAX_PWM;
+				}
+			}
+		} else {
+			newFanSpeedPWM = 0;
+		}
     }
 
 	return newFanSpeedPWM;

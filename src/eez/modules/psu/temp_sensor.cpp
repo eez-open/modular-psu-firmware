@@ -69,10 +69,10 @@ bool TempSensor::isInstalled() {
 }
 
 Channel *TempSensor::getChannel() {
-    if (type >= CH1 && type <= CH6) {
+    if (type >= CH1 && type < CH1 + CH_NUM) {
         return &Channel::get(type - CH1);
     }
-    return NULL;
+    return nullptr;
 }
 
 void TempSensor::init() {
