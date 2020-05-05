@@ -36,9 +36,10 @@ namespace gui {
 void channelToggleOutput();
 
 extern int g_selectedSlotIndex;
-void selectSlot();
+void selectSlot(int slotIndex);
 
-void selectChannel(Channel *channel = nullptr);
+void selectChannel(Channel *channel);
+void selectChannelByCursor();
 extern Channel *g_channel;
 extern int g_channelIndex;
 

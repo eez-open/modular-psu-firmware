@@ -6,6 +6,7 @@
         "xutility": "cpp",
         "xtr1common": "cpp",
         "xiosbase": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "system_error": "cpp"
     }
 }

@@ -28,9 +28,11 @@ namespace dib_smx46 {
 struct Smx46ModuleInfo : public ModuleInfo {
 public:
     Smx46ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_SMX46, MODULE_CATEGORY_OTHER, "SMX46", "Envox", MODULE_REVISION_R1B2)
+        : ModuleInfo(MODULE_TYPE_DIB_SMX46, MODULE_CATEGORY_OTHER, "SMX46", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART)
     {}
     
+    Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
+
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
             return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF;
@@ -45,6 +47,18 @@ public:
         return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_MICRO;
     }
 };
+
+struct Smx46Module : public Module {
+public:
+    Smx46Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
+        : Module(slotIndex, moduleInfo, moduleRevision)
+    {
+    }
+};
+
+Module *Smx46ModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision) {
+    return new Smx46Module(slotIndex, this, moduleRevision);
+}
 
 static Smx46ModuleInfo g_smx46ModuleInfo;
 ModuleInfo *g_moduleInfo = &g_smx46ModuleInfo;

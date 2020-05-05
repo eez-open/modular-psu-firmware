@@ -84,8 +84,8 @@ static unsigned g_skipEthernetSetup;
 int g_selectedSlotIndex;
 
 static bool g_showSetupWizardQuestionCalled;
-Channel *g_channel;
-int g_channelIndex;
+Channel *g_channel = nullptr;
+int g_channelIndex = -1;
 static WidgetCursor g_toggleOutputWidgetCursor;
 
 #if EEZ_PLATFORM_STM32
@@ -1849,7 +1849,7 @@ void channelCalibrationsNo() {
 }
 
 void channelToggleOutput() {
-    selectChannel();
+    selectChannelByCursor();
     Channel &channel = *g_channel;
     if (channel_dispatcher::isTripped(channel)) {
         errorMessageWithAction("Channel is tripped!", clearTrip, "Clear", channel.channelIndex);
@@ -1866,22 +1866,20 @@ void channelToggleOutput() {
     }
 }
 
-void selectSlot() {
-    g_selectedSlotIndex = getFoundWidgetAtDown().cursor;
+void selectSlot(int slotIndex) {
+    g_selectedSlotIndex = slotIndex;
+}
+
+void selectChannelByCursor() {
+    if (getFoundWidgetAtDown().cursor >= 0 && getFoundWidgetAtDown().cursor < CH_NUM) {
+        selectChannel(&Channel::get(getFoundWidgetAtDown().cursor));
+    }
 }
 
 void selectChannel(Channel *channel) {
-    if (channel) {
-        g_channel = channel;
-    } else {
-        if (getFoundWidgetAtDown().cursor >= 0 && getFoundWidgetAtDown().cursor < CH_NUM) {
-            g_channel = &Channel::get(getFoundWidgetAtDown().cursor);
-        } else if (!g_channel) {
-            g_channel = &Channel::get(0);
-        }
-    }
-
+    g_channel = channel;
     if (g_channel) {
+        g_selectedSlotIndex = g_channel->slotIndex;
         g_channelIndex = g_channel->channelIndex;
     } else {
         g_channelIndex = -1;
@@ -1897,7 +1895,7 @@ static int getDefaultView(int slotIndex, Cursor cursor) {
 
     Channel &channel = Channel::get(cursor);
     if (channel.isOk()) {
-        int numChannels = ((PsuChannelModuleInfo *)g_slots[slotIndex].moduleInfo)->numChannels;
+        int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
         if (numChannels == 1) {
             if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
                 if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
@@ -1935,7 +1933,7 @@ static int getDefaultView(int slotIndex, Cursor cursor) {
 static int getMaxView(int slotIndex, Cursor cursor) {
     Channel &channel = Channel::get(cursor);
     if (channel.isOk()) {
-        int numChannels = ((PsuChannelModuleInfo *)g_slots[slotIndex].moduleInfo)->numChannels;
+        int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
         if (numChannels == 1) {
             if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
                 return channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_NUM_ON : PAGE_ID_SLOT_MAX_1CH_NUM_OFF;
@@ -1959,7 +1957,7 @@ static int getMaxView(int slotIndex, Cursor cursor) {
 static int getMinView(int slotIndex, Cursor cursor) {
     Channel &channel = Channel::get(cursor);
     if (channel.isOk()) {
-        int numChannels = ((PsuChannelModuleInfo *)g_slots[slotIndex].moduleInfo)->numChannels;
+        int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
         if (numChannels == 1) {
             if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
                 return PAGE_ID_SLOT_MIN_1CH_COUPLED_SERIES;
@@ -1982,7 +1980,7 @@ static int getMicroView(int slotIndex, Cursor cursor) {
     int channelIndex = cursor;
     Channel &channel = Channel::get(channelIndex);
     if (channel.isOk()) {
-        int numChannels = ((PsuChannelModuleInfo *)g_slots[slotIndex].moduleInfo)->numChannels;
+        int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
         if (numChannels == 1) {
             if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
                 return PAGE_ID_SLOT_MICRO_1CH_COUPLED_SERIES;
@@ -2001,7 +1999,7 @@ static int getMicroView(int slotIndex, Cursor cursor) {
     }
 }
 
-int PsuChannelModuleInfo::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
+int PsuModuleInfo::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
     if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
         return getDefaultView(slotIndex, cursor);
     }

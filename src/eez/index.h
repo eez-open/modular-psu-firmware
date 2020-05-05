@@ -41,33 +41,50 @@ enum SlotViewType {
     SLOT_VIEW_TYPE_MICRO,
 };
 
+enum FlashMethod {
+    FLASH_METHOD_NONE,
+    FLASH_METHOD_STM32_BOOTLOADER_UART,
+    FLASH_METHOD_STM32_BOOTLOADER_SPI
+};
+
+struct Module;
+
 struct ModuleInfo {
     uint16_t moduleType;
     uint16_t moduleCategory;
     const char *moduleName;
     const char *moduleBrand;
     uint16_t latestModuleRevision;
+    FlashMethod flashMethod;
 
-    ModuleInfo(uint16_t moduleType, uint16_t moduleCategory, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision);
+    ModuleInfo(uint16_t moduleType, uint16_t moduleCategory, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod);
 
+    virtual Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) = 0;
     virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);
 };
 
-struct SlotInfo {
+struct Module {
+    uint8_t slotIndex;
+
     ModuleInfo *moduleInfo;
     uint16_t moduleRevision;
+
 	uint8_t firmwareMajorVersion;
 	uint8_t firmwareMinorVersion;
 	uint32_t idw0;
 	uint32_t idw1;
 	uint32_t idw2;
+
+    Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision);
+
+    virtual void initChannels();
 };
 
 static const int NUM_SLOTS = 3;
-extern SlotInfo g_slots[NUM_SLOTS];
+extern Module *g_slots[NUM_SLOTS];
 
 ModuleInfo *getModuleInfo(uint16_t moduleType);
 
-void getSlotSerialInfo(SlotInfo &slotInfo, char *text);
+void getModuleSerialInfo(uint8_t slotIndex, char *text);
 
 } // namespace eez

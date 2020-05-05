@@ -93,9 +93,7 @@ struct DcpChannel : public Channel {
 		dac.channelIndex = channelIndex;
     }
 	
-	void getParams() override {
-		auto slot = g_slots[slotIndex];
-
+	void getParams(uint16_t moduleRevision) override {
 		params.U_MIN = 0.0f;
 		params.U_DEF = 0.0f;
 		params.U_MAX = 40.0f;
@@ -177,11 +175,7 @@ struct DcpChannel : public Channel {
 		params.DAC_MAX = DigitalAnalogConverter::DAC_MAX;
 		params.ADC_MAX = AnalogDigitalConverter::ADC_MAX;
 
-		if (slot.moduleRevision <= MODULE_REVISION_DCP405_R2B11) {
-			params.U_RAMP_DURATION_MIN_VALUE = 0.004f;
-		} else {
-			params.U_RAMP_DURATION_MIN_VALUE = 0.002f;
-		}
+		params.U_RAMP_DURATION_MIN_VALUE = moduleRevision <= MODULE_REVISION_DCP405_R2B11 ? 0.004f : 0.002f;
 	}
 
 	void init() override {
@@ -200,7 +194,10 @@ struct DcpChannel : public Channel {
 	}
 
 	bool test() {
-		Channel::test();
+        flags.powerOk = 0;
+
+        doRemoteSensingEnable(false);
+        doRemoteProgrammingEnable(false);
 
 		ioexp.test();
 		adc.test();
@@ -630,7 +627,7 @@ struct DcpChannel : public Channel {
 	}
 
 	void doSetCurrentRange() {
-		auto &slot = g_slots[slotIndex];
+		auto &slot = *g_slots[slotIndex];
 
 		if (!hasSupportForCurrentDualRange()) {
 			return;
@@ -788,12 +785,14 @@ struct DcpChannel : public Channel {
 	}
 };
 
-struct DcpChannelModuleInfo : public PsuChannelModuleInfo {
+struct DcpModuleInfo : public PsuModuleInfo {
 public:
-	DcpChannelModuleInfo() 
-		: PsuChannelModuleInfo(MODULE_TYPE_DCP405, "DCP405", "Envox", MODULE_REVISION_DCP405_R2B7, 1)
+	DcpModuleInfo() 
+		: PsuModuleInfo(MODULE_TYPE_DCP405, "DCP405", "Envox", MODULE_REVISION_DCP405_R2B7, FLASH_METHOD_NONE, 1)
 	{
 	}
+
+	Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
 
 	Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
         void *buffer = malloc(sizeof(DcpChannel));
@@ -802,14 +801,26 @@ public:
 	}
 };
 
-static DcpChannelModuleInfo g_psuChannelModuleInfo;
+struct DcpModule : public PsuModule {
+public:
+    DcpModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
+        : PsuModule(slotIndex, moduleInfo, moduleRevision)
+    {
+    }
+};
 
-ModuleInfo *g_moduleInfo = &g_psuChannelModuleInfo;
+Module *DcpModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision) {
+    return new DcpModule(slotIndex, this, moduleRevision);
+}
+
+
+static DcpModuleInfo g_dcpModuleInfo;
+ModuleInfo *g_moduleInfo = &g_dcpModuleInfo;
 
 bool isDacRampActive() {
 	for (int i = 0; i < CH_NUM; i++) {
 		auto &channel = Channel::get(i);
-		if (g_slots[channel.slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+		if (g_slots[channel.slotIndex]->moduleInfo->moduleType == MODULE_TYPE_DCP405) {
 			if (((DcpChannel&)channel).dac.m_isRampActive) {
 				return true;
 			}
@@ -821,7 +832,7 @@ bool isDacRampActive() {
 void tickDacRamp(uint32_t tickCount) {
 	for (int i = 0; i < CH_NUM; i++) {
 		auto &channel = Channel::get(i);
-		if (g_slots[channel.slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+		if (g_slots[channel.slotIndex]->moduleInfo->moduleType == MODULE_TYPE_DCP405) {
 			if (((DcpChannel&)channel).dac.m_isRampActive) {
 				((DcpChannel&)channel).dac.tick(tickCount);
 			}

@@ -88,7 +88,7 @@ void enter(int tabIndex, bool setFocus) {
 #endif
 
     if (tabIndex == -1) {
-        gui::selectChannel();
+        gui::selectChannelByCursor();
         Cursor newDataCursor = getFoundWidgetAtDown().cursor;
         int16_t newDataId = getFoundWidgetAtDown().widget->data;
         setFocusCursor(newDataCursor, newDataId);

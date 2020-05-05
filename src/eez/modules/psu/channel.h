@@ -176,14 +176,21 @@ struct ChannelParams {
 
 struct Channel;
 
-struct PsuChannelModuleInfo : public ModuleInfo {
+struct PsuModuleInfo : public ModuleInfo {
     uint8_t numChannels;
 
-    PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, uint8_t numChannels);
+    PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint8_t numChannels);
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override;
 
     virtual Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) = 0;
+};
+
+struct PsuModule : public Module {
+public:
+    PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision);
+
+    void initChannels() override;
 };
 
 /// Runtime protection binary flags (alarmed, tripped)
@@ -383,8 +390,6 @@ public:
     static Channel *g_channels[CH_MAX];
     static int8_t g_slotIndexToChannelIndex[NUM_SLOTS];
 
-    static void enumChannels();
-
     /// Get channel instance
     /// \param channel_index Zero based channel index, greater then or equal to 0 and less then
     /// CH_MAX. \returns Reference to channel.
@@ -442,7 +447,7 @@ public:
 
     Channel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex);
 
-    void initParams();
+    void initParams(uint16_t moduleRevision);
 
     /// Clear channel calibration configuration.
     void clearCalibrationConf();
@@ -633,7 +638,7 @@ public:
     // VIRTUAL METHODS
     //
 
-    virtual void getParams() = 0;
+    virtual void getParams(uint16_t moduleRevision) = 0;
 
     /// Initialize channel and underlying hardware.
     /// Makes a required tests, for example ADC, DAC and IO Expander tests.
@@ -647,7 +652,7 @@ public:
     virtual void reset();
 
     /// Test the channel.
-    virtual bool test();
+    virtual bool test() = 0;
 
     virtual void tickSpecific(uint32_t tickCount) = 0;
 
@@ -708,6 +713,10 @@ public:
     //
     //
 
+protected:
+    void doRemoteSensingEnable(bool enable);
+    void doRemoteProgrammingEnable(bool enable);
+
 private:
     bool delayLowRippleCheck;
     uint32_t outputEnableStartTime;
@@ -750,9 +759,6 @@ private:
 
     void executeOutputEnable(bool enable, uint16_t tasks);
     static void executeOutputEnable(bool inhibited);
-
-    void doRemoteSensingEnable(bool enable);
-    void doRemoteProgrammingEnable(bool enable);
 
     uint32_t autoRangeCheckLastTickCount;
     void doAutoSelectCurrentRange(uint32_t tickCount);

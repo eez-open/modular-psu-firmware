@@ -60,8 +60,6 @@ void onThreadMessage(uint8_t type, uint32_t param);
 
 bool measureAllAdcValuesOnChannel(int channelIndex);
 
-void enumChannels();
-
 void initChannels();
 bool testChannels();
 

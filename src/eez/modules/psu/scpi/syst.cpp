@@ -513,8 +513,7 @@ scpi_result_t scpi_cmd_systemChannelModelQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    auto &slot = g_slots[channel->slotIndex];
-    SCPI_ResultText(context, slot.moduleInfo->moduleName);
+    SCPI_ResultText(context, g_slots[channel->slotIndex]->moduleInfo->moduleName);
 
     return SCPI_RES_OK;
 }
@@ -525,7 +524,7 @@ scpi_result_t scpi_cmd_systemChannelVersionQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    auto &slot = g_slots[channel->slotIndex];
+    auto &slot = *g_slots[channel->slotIndex];
     char text[50];
     sprintf(text, "R%dB%d", (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     SCPI_ResultText(context, text);
@@ -540,7 +539,7 @@ scpi_result_t scpi_cmd_systemChannelSnoQ(scpi_t *context) {
     }
 
     char text[50];
-    getSlotSerialInfo(g_slots[channel->slotIndex], text);
+    getModuleSerialInfo(channel->slotIndex, text);
     SCPI_ResultText(context, text);
 
     return SCPI_RES_OK;

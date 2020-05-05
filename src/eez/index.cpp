@@ -34,12 +34,13 @@
 
 namespace eez {
 
-ModuleInfo::ModuleInfo(uint16_t moduleType_, uint16_t moduleCategory_, const char *moduleName_, const char *moduleBrand_, uint16_t latestModuleRevision_)
+ModuleInfo::ModuleInfo(uint16_t moduleType_, uint16_t moduleCategory_, const char *moduleName_, const char *moduleBrand_, uint16_t latestModuleRevision_, FlashMethod flashMethod_)
     : moduleType(moduleType_)
     , moduleCategory(moduleCategory_)
     , moduleName(moduleName_)
     , moduleBrand(moduleBrand_)
     , latestModuleRevision(latestModuleRevision_)
+    , flashMethod(flashMethod_)
 {
 }
 
@@ -81,7 +82,48 @@ int ModuleInfo::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor
 
 ////////////////////////////////////////////////////////////////////////////////
 
-ModuleInfo noneModuleInfo(MODULE_TYPE_NONE, MODULE_CATEGORY_NONE, "None", "None", 0);
+Module::Module(uint8_t slotIndex_, ModuleInfo *moduleInfo_, uint16_t moduleRevision_) 
+    : slotIndex(slotIndex_)
+    , moduleInfo(moduleInfo_)
+    , moduleRevision(moduleRevision_)
+    , firmwareMajorVersion(0)
+    , firmwareMinorVersion(0)
+    , idw0(0)
+    , idw1(0)
+    , idw2(0)
+{
+}
+
+void Module::initChannels() {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+struct NoneModuleInfo : public ModuleInfo {
+public:
+    NoneModuleInfo()
+        : ModuleInfo(MODULE_TYPE_NONE, MODULE_CATEGORY_NONE, "None", "None", 0, FLASH_METHOD_NONE)
+    {
+    }
+
+    Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
+};
+
+struct NoneModule : public Module {
+public:
+    NoneModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
+        : Module(slotIndex, moduleInfo, moduleRevision)
+    {
+    }
+};
+
+Module *NoneModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision) {
+    return new NoneModule(slotIndex, this, moduleRevision);
+}
+
+static NoneModuleInfo noneModuleInfo;
+
+////////////////////////////////////////////////////////////////////////////////
 
 static ModuleInfo *g_modules[] = {
     dcp405::g_moduleInfo,
@@ -92,11 +134,7 @@ static ModuleInfo *g_modules[] = {
     dib_smx46::g_moduleInfo
 };
 
-SlotInfo g_slots[NUM_SLOTS] = {
-    { &noneModuleInfo },
-    { &noneModuleInfo },
-    { &noneModuleInfo }
-};
+Module *g_slots[NUM_SLOTS];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -109,11 +147,12 @@ ModuleInfo *getModuleInfo(uint16_t moduleType) {
     return &noneModuleInfo;
 }
 
-void getSlotSerialInfo(SlotInfo &slotInfo, char *text) {
-    if (slotInfo.idw0 != 0 || slotInfo.idw1 != 0 || slotInfo.idw2 != 0) {
-        sprintf(text, "%08X", (unsigned int)slotInfo.idw0);
-        sprintf(text + 8, "%08X", (unsigned int)slotInfo.idw1);
-        sprintf(text + 16, "%08X", (unsigned int)slotInfo.idw2);
+void getModuleSerialInfo(uint8_t slotIndex, char *text) {
+    auto &module = *g_slots[slotIndex];
+    if (module.idw0 != 0 || module.idw1 != 0 || module.idw2 != 0) {
+        sprintf(text, "%08X", (unsigned int)module.idw0);
+        sprintf(text + 8, "%08X", (unsigned int)module.idw1);
+        sprintf(text + 16, "%08X", (unsigned int)module.idw2);
     } else {
         strcpy(text, "N/A");
     }

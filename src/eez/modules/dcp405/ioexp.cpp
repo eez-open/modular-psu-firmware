@@ -111,7 +111,7 @@ uint8_t IOExpander::getRegValue(int i) {
     uint8_t reg = REG_VALUES[3 * i];
     uint8_t value = REG_VALUES[3 * i + 1];
 
-    auto &slot = g_slots[slotIndex];
+    auto &slot = *g_slots[slotIndex];
 
     if (reg == REG_IODIRA) {
         if (slot.moduleRevision < MODULE_REVISION_DCP405_R2B5) {
@@ -143,7 +143,7 @@ uint8_t IOExpander::getRegValue(int i) {
 
 void IOExpander::init() {
 #if defined(EEZ_PLATFORM_STM32)
-    auto &slot = g_slots[slotIndex];
+    auto &slot = *g_slots[slotIndex];
 
     gpioOutputPinsMask = 0;
 
@@ -314,7 +314,7 @@ int IOExpander::getBitDirection(int bit) {
 bool IOExpander::testBit(int io_bit) {
     auto result = (gpio & (1 << io_bit)) ? true : false;
 
-    auto &slot = g_slots[slotIndex];
+    auto &slot = *g_slots[slotIndex];
     if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
         if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
             result = !result;
@@ -334,7 +334,7 @@ bool IOExpander::isAdcReady() {
 }
 
 void IOExpander::changeBit(int io_bit, bool set) {
-	auto &slot = g_slots[slotIndex];
+	auto &slot = *g_slots[slotIndex];
     if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
         if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
             set = !set;

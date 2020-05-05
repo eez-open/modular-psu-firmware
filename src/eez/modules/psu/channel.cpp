@@ -50,10 +50,26 @@ namespace psu {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-PsuChannelModuleInfo::PsuChannelModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, uint8_t numChannels_)
-    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision)
+PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, FlashMethod flashMethod, uint8_t numChannels_)
+    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision, flashMethod)
     , numChannels(numChannels_)
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+PsuModule::PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
+    : Module(slotIndex, moduleInfo, moduleRevision)
+{
+}
+
+void PsuModule::initChannels() {
+    Channel::g_slotIndexToChannelIndex[slotIndex] = CH_NUM;
+    for (int subchannelIndex = 0; subchannelIndex < ((PsuModuleInfo *)moduleInfo)->numChannels; subchannelIndex++) {
+        Channel::g_channels[CH_NUM] = ((PsuModuleInfo *)moduleInfo)->createChannel(slotIndex, CH_NUM, subchannelIndex);
+        Channel::g_channels[CH_NUM]->initParams(moduleRevision);
+        CH_NUM++;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,35 +174,9 @@ void Channel::Value::addMonDacValue(float value, float prec) {
 
 int CH_NUM = 0;
 Channel *Channel::g_channels[CH_MAX];
-int8_t Channel::g_slotIndexToChannelIndex[NUM_SLOTS];
+int8_t Channel::g_slotIndexToChannelIndex[NUM_SLOTS] = { -1, -1, -1 };
 
 int g_errorChannelIndex = -1;
-
-////////////////////////////////////////////////////////////////////////////////
-
-void Channel::enumChannels() {
-    CH_NUM = 0;
-
-    for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        auto& slot = g_slots[slotIndex];
-        if (slot.moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-            auto psuChannelModuleInfo = (PsuChannelModuleInfo *)slot.moduleInfo;
-
-            Channel::g_slotIndexToChannelIndex[slotIndex] = CH_NUM;
-
-            for (uint8_t subchannelIndex = 0; subchannelIndex < psuChannelModuleInfo->numChannels; subchannelIndex++) {
-                auto channelIndex = CH_NUM++;
-                g_channels[channelIndex] = psuChannelModuleInfo->createChannel(slotIndex, channelIndex, subchannelIndex);
-                g_channels[channelIndex]->initParams();
-            }
-
-            persist_conf::loadModuleConf(slotIndex);
-            ontime::g_moduleCounters[slotIndex].init();
-        } else {
-            Channel::g_slotIndexToChannelIndex[slotIndex] = -1;
-        }
-    }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -426,8 +416,8 @@ Channel::Channel(uint8_t slotIndex_, uint8_t channelIndex_, uint8_t subchannelIn
     subchannelIndex = subchannelIndex_;
 }
 
-void Channel::initParams() {
-    getParams();
+void Channel::initParams(uint16_t moduleRevision) {
+    getParams(moduleRevision);
 
     u.min = roundChannelValue(UNIT_VOLT, params.U_MIN);
     u.max = roundChannelValue(UNIT_VOLT, params.U_MAX);
@@ -703,15 +693,6 @@ void Channel::clearProtectionConf() {
     temperature::sensors[temp_sensor::CH1 + channelIndex].prot_conf.state = OTP_CH_DEFAULT_STATE;
     temperature::sensors[temp_sensor::CH1 + channelIndex].prot_conf.level = OTP_CH_DEFAULT_LEVEL;
     temperature::sensors[temp_sensor::CH1 + channelIndex].prot_conf.delay = OTP_CH_DEFAULT_DELAY;
-}
-
-bool Channel::test() {
-    flags.powerOk = 0;
-
-    doRemoteSensingEnable(false);
-    doRemoteProgrammingEnable(false);
-
-    return isOk();
 }
 
 bool Channel::isPowerOk() {

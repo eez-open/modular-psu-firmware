@@ -135,23 +135,23 @@ void boot() {
     psu::ontime::g_mcuCounter.init();
 
     for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        auto &slot = g_slots[slotIndex];
-
         static const uint16_t ADDRESS = 0;
         uint16_t value[2];
         if (!bp3c::eeprom::read(slotIndex, (uint8_t *)&value, sizeof(value), ADDRESS)) {
             value[0] = MODULE_TYPE_NONE;
             value[1] = 0;
         }
-
         uint16_t moduleType = value[0];
         uint16_t moduleRevision = value[1];
-
-        slot.moduleInfo = getModuleInfo(moduleType);
-        slot.moduleRevision = moduleRevision;
+        
+        g_slots[slotIndex] = getModuleInfo(moduleType)->createModule(slotIndex, moduleRevision);
+        g_slots[slotIndex]->initChannels();
+        
+        if (moduleType != MODULE_TYPE_NONE) {
+            psu::persist_conf::loadModuleConf(slotIndex);
+            psu::ontime::g_moduleCounters[slotIndex].init();
+        }
     }
-
-    psu::enumChannels();
 
     psu::persist_conf::init();
 
@@ -355,7 +355,7 @@ void shutdown() {
     // save on-time counters
     persist_conf::writeTotalOnTime(ontime::g_mcuCounter.getType(), ontime::g_mcuCounter.getTotalTime());
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
             persist_conf::writeTotalOnTime(ontime::g_moduleCounters[slotIndex].getType(), ontime::g_moduleCounters[slotIndex].getTotalTime());
         }
     }

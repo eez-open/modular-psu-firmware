@@ -192,7 +192,7 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
     if (buffer == DATA_BUFFER_B) {
         if (
             rampOption == WITH_RAMP && 
-            g_slots[slotIndex].moduleRevision <= MODULE_REVISION_DCP405_R2B11 && 
+            g_slots[slotIndex]->moduleRevision <= MODULE_REVISION_DCP405_R2B11 &&
             !ramp::isActive(channel)
         ) {
             m_isRampActive = true;

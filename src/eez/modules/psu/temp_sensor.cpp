@@ -97,7 +97,7 @@ float TempSensor::doRead() {
 	if (type >= CH1 && type <= CH6) {
 		int channelIndex = type - CH1;
 		int slotIndex = Channel::get(channelIndex).slotIndex;
-		auto &slot = g_slots[slotIndex];
+		auto &slot = *g_slots[slotIndex];
 
 		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
             if (slot.moduleRevision >= MODULE_REVISION_DCP405_R1B1) {

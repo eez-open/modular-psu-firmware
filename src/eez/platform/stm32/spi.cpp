@@ -85,7 +85,7 @@ void deselectB(uint8_t slotIndex) {
 void select(uint8_t slotIndex, int chip) {
 	taskENTER_CRITICAL();
 
-	auto &slot = g_slots[slotIndex];
+	auto &slot = *g_slots[slotIndex];
 
 	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220 || slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
 		selectA(slotIndex);
@@ -121,7 +121,7 @@ void select(uint8_t slotIndex, int chip) {
 }
 
 void deselect(uint8_t slotIndex) {
-	auto &slot = g_slots[slotIndex];
+	auto &slot = *g_slots[slotIndex];
 	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220 || slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
 		deselectA(slotIndex);
 	} else if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {

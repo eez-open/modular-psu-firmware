@@ -252,7 +252,7 @@ void onThreadMessage(uint8_t type, uint32_t param) {
 }
 
 bool measureAllAdcValuesOnChannel(int channelIndex) {
-	if (g_slots[Channel::get(channelIndex).slotIndex].moduleInfo->moduleType == MODULE_TYPE_NONE) {
+	if (g_slots[Channel::get(channelIndex).slotIndex]->moduleInfo->moduleType == MODULE_TYPE_NONE) {
 		return true;
 	}
 
@@ -268,10 +268,6 @@ bool measureAllAdcValuesOnChannel(int channelIndex) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-void enumChannels() {
-    Channel::enumChannels();
-}
 
 void initChannels() {
     for (int i = 0; i < CH_NUM; ++i) {
@@ -471,7 +467,7 @@ bool powerUp() {
 
     ontime::g_mcuCounter.start();
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
             ontime::g_moduleCounters[slotIndex].start();
         }
     }
@@ -540,7 +536,7 @@ void powerDown() {
 
     ontime::g_mcuCounter.stop();
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
             ontime::g_moduleCounters[slotIndex].stop();
         }
     }

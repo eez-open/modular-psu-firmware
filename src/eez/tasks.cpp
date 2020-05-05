@@ -356,7 +356,7 @@ void lowPriorityThreadOneIter() {
 
             ontime::g_mcuCounter.tick(tickCount);
             for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-                if (g_slots[slotIndex].moduleInfo->moduleType != MODULE_TYPE_NONE) {
+                if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
                     ontime::g_moduleCounters[slotIndex].tick(tickCount);
                 }
             }

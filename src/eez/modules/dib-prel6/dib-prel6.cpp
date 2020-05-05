@@ -28,9 +28,11 @@ namespace dib_prel6 {
 struct Prel6ModuleInfo : public ModuleInfo {
 public:
     Prel6ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_PREL6, MODULE_CATEGORY_OTHER, "PREL6", "Envox", MODULE_REVISION_R1B2)
+        : ModuleInfo(MODULE_TYPE_DIB_PREL6, MODULE_CATEGORY_OTHER, "PREL6", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART)
     {}
     
+    Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
+
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
             return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF;
@@ -45,6 +47,18 @@ public:
         return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MICRO;
     }
 };
+
+struct Prel6Module : public Module {
+public:
+    Prel6Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
+        : Module(slotIndex, moduleInfo, moduleRevision)
+    {
+    }
+};
+
+Module *Prel6ModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision) {
+    return new Prel6Module(slotIndex, this, moduleRevision);
+}
 
 static Prel6ModuleInfo g_prel6ModuleInfo;
 ModuleInfo *g_moduleInfo = &g_prel6ModuleInfo;

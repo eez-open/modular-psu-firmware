@@ -297,7 +297,7 @@ scpi_result_t scpi_cmd_diagnosticInformationRegsQ(scpi_t *context) {
 
     for (int i = 0; i < CH_NUM; i++) {
         Channel& channel = Channel::get(i);
-        if (g_slots[channel.slotIndex].moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+        if (g_slots[channel.slotIndex]->moduleInfo->moduleType == MODULE_TYPE_DCP405) {
             sprintf(buffer + strlen(buffer), "CH%d:\n", i + 1);
 
             sprintf(buffer + strlen(buffer), "\tIOEXP:\n");

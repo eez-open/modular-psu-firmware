@@ -298,42 +298,42 @@ void action_show_edit_mode_slider_help() {
 }
 
 void action_show_slot_settings() {
-    selectSlot();
+    selectSlot(getFoundWidgetAtDown().cursor);
     showPage(PAGE_ID_SLOT_SETTINGS);
 }
 
 void action_show_ch_settings() {
-    selectChannel();
+    selectChannelByCursor();
     showPage(PAGE_ID_CH_SETTINGS);
 }
 
 void action_show_ch_settings_prot_clear() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_CH_SETTINGS_PROT_CLEAR);
 }
 
 void action_show_ch_settings_prot_ocp() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_CH_SETTINGS_PROT_OCP);
 }
 
 void action_show_ch_settings_prot_ovp() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
 }
 
 void action_show_ch_settings_prot_opp() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
 }
 
 void action_show_ch_settings_prot_otp() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_CH_SETTINGS_PROT_OTP);
 }
 
 void action_show_ch_settings_trigger() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_CH_SETTINGS_TRIGGER);
 }
 
@@ -346,37 +346,36 @@ void action_show_ch_settings_lists() {
 }
 
 void action_show_ch_settings_adv_options() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_CH_SETTINGS_ADV_OPTIONS);
 }
 
 void action_show_ch_settings_adv_ranges() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_CH_SETTINGS_ADV_RANGES);
 }
 
 void action_show_sys_settings_tracking() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_SYS_SETTINGS_TRACKING);
 }
 
 void action_show_sys_settings_coupling() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_SYS_SETTINGS_COUPLING);
 }
 
 void action_show_ch_settings_adv_view() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_CH_SETTINGS_ADV_VIEW);
 }
 
 void action_show_ch_settings_info() {
-    selectChannel();
+    selectChannelByCursor();
     pushPage(PAGE_ID_CH_SETTINGS_INFO);
 }
 
 void action_show_ch_settings_cal() {
-    selectChannel();
     pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
 }
 
@@ -509,7 +508,7 @@ void action_ch_settings_prot_toggle_type() {
     if (getActivePageId() == PAGE_ID_CH_SETTINGS_PROT_OVP) {
         ((ChSettingsProtectionSetPage *)getActivePage())->toggleType();
     } else {
-        selectChannel();
+        selectChannelByCursor();
         channel_dispatcher::setOvpType(*g_channel, g_channel->prot_conf.flags.u_type ? 0 : 1);
     }
 }
@@ -619,7 +618,7 @@ void action_toggle_channels_view_mode() {
 }
 
 void action_toggle_channels_max_view() {
-    selectChannel();
+    selectChannelByCursor();
 
     if (getActivePageId() != PAGE_ID_MAIN) {
         showMainPage();
@@ -750,7 +749,7 @@ void action_toggle_enable_tracking_mode_in_coupling() {
 }
 
 void action_toggle_channel_tracking() {
-    selectChannel();
+    selectChannelByCursor();
     auto page = (SysSettingsTrackingPage *)getActivePage();
     page->toggleChannelTracking(g_channel->channelIndex);
 }
@@ -1180,12 +1179,10 @@ void action_select_user_switch_action() {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 
-static int g_slotIndex;
-
 void onSetModuleType(uint16_t moduleType) {
     g_frontPanelAppContext.popPage();
 
-    bp3c::eeprom::writeModuleType(g_slotIndex, moduleType);
+    bp3c::eeprom::writeModuleType(g_selectedSlotIndex, moduleType);
 
 #ifdef __EMSCRIPTEN__
     infoMessage("Reload page to apply change!");
@@ -1194,21 +1191,21 @@ void onSetModuleType(uint16_t moduleType) {
 #endif
 }
 
-void selectSlot(int slotIndex) {
-    g_slotIndex = slotIndex;
-    pushSelectFromEnumPage(&g_frontPanelAppContext, ENUM_DEFINITION_MODULE_TYPE, g_slots[slotIndex].moduleInfo->moduleType, NULL, onSetModuleType);
+void selectSlotModuleType(int slotIndex) {
+    selectSlot(slotIndex);
+    pushSelectFromEnumPage(&g_frontPanelAppContext, ENUM_DEFINITION_MODULE_TYPE, g_slots[slotIndex]->moduleInfo->moduleType, NULL, onSetModuleType);
 }
 
 void action_front_panel_select_slot1() {
-    selectSlot(0);
+    selectSlotModuleType(0);
 }
 
 void action_front_panel_select_slot2() {
-    selectSlot(1);
+    selectSlotModuleType(1);
 }
 
 void action_front_panel_select_slot3() {
-    selectSlot(2);
+    selectSlotModuleType(2);
 }
 
 #endif
@@ -1380,7 +1377,7 @@ void action_mqtt_edit_period() {
 
 void onFirmwareSelected(const char *filePath) {
     int err;
-    if (!bp3c::flash_slave::start(g_channel->slotIndex, filePath, &err)) {
+    if (!bp3c::flash_slave::start(g_selectedSlotIndex, filePath, &err)) {
 		errorMessage("Failed to start update!");
     }
 }

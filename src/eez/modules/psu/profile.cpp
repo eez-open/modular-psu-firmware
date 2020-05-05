@@ -491,7 +491,7 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
         Channel &channel = Channel::get(i);
         if (
             profile.channels[i].flags.parameters_are_valid &&
-            profile.channels[i].moduleType == g_slots[channel.slotIndex].moduleInfo->moduleType
+            profile.channels[i].moduleType == g_slots[channel.slotIndex]->moduleInfo->moduleType
         ) {
             profileChannelAlreadyUsed[i] = true;
             channelsMap[i] = i;
@@ -507,7 +507,7 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
                 if (
                     !profileChannelAlreadyUsed[j] &&
                     profile.channels[j].flags.parameters_are_valid &&
-                    profile.channels[j].moduleType == g_slots[channel.slotIndex].moduleInfo->moduleType
+                    profile.channels[j].moduleType == g_slots[channel.slotIndex]->moduleInfo->moduleType
                 ) {
                     profileChannelAlreadyUsed[j] = true;
                     channelsMap[i] = j;
@@ -588,8 +588,8 @@ static void saveState(Parameters &profile, List *lists) {
         if (i < CH_NUM) {
             Channel &channel = Channel::get(i);
 
-            profile.channels[i].moduleType = g_slots[channel.slotIndex].moduleInfo->moduleType;
-            profile.channels[i].moduleRevision = g_slots[channel.slotIndex].moduleRevision;
+            profile.channels[i].moduleType = g_slots[channel.slotIndex]->moduleInfo->moduleType;
+            profile.channels[i].moduleRevision = g_slots[channel.slotIndex]->moduleRevision;
 
             profile.channels[i].flags.parameters_are_valid = 1;
 
