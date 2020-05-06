@@ -114,6 +114,10 @@ static void processTouchEvent(EventType type) {
 
 OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {
     if (widgetCursor) {
+        if (widgetCursor.widget->action && !widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
+            return nullptr;
+        }
+
         if (*g_onTouchWidgetFunctions[widgetCursor.widget->type]) {
             return *g_onTouchWidgetFunctions[widgetCursor.widget->type];
         }
