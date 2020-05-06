@@ -459,11 +459,11 @@ void setPinFunction(int pin, unsigned function) {
                 dlog_record::setTriggerSource(triggerSource);
             }
         } else {
-            if (pin == 0 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN1 || pin == 1 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN2) {
+            if ((pin == 0 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN1) || (pin == 1 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN2)) {
                 dlog_record::setTriggerSource(trigger::SOURCE_IMMEDIATE);
             }
 
-            if (pin == 0 && trigger::g_triggerSource == trigger::SOURCE_PIN1 || pin == 1 && trigger::g_triggerSource == trigger::SOURCE_PIN2) {
+            if ((pin == 0 && trigger::g_triggerSource == trigger::SOURCE_PIN1) || (pin == 1 && trigger::g_triggerSource == trigger::SOURCE_PIN2)) {
                 trigger::setSource(trigger::SOURCE_IMMEDIATE);
             }
         }
