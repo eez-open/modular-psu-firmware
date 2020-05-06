@@ -42,14 +42,14 @@ namespace psu {
 #if defined(EEZ_PLATFORM_STM32)
 static const uint8_t DATA_BUFFER_A = 0B00010000;
 static const uint8_t DATA_BUFFER_B = 0B00100100;
+
+static const uint32_t CONF_DCP405_R2B11_RAMP_DURATION = 4000; // 4 ms
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 extern float g_uSet[CH_MAX];
 extern float g_iSet[CH_MAX];
 #endif
-
-static const uint32_t CONF_DCP405_R2B11_RAMP_DURATION = 4000; // 4 ms
 
 ////////////////////////////////////////////////////////////////////////////////
 
