@@ -75359,12 +75359,16 @@
             "value": "5"
           },
           {
-            "name": "TINP",
+            "name": "SYSTrig",
             "value": "6"
           },
           {
             "name": "TOUT",
             "value": "7"
+          },
+          {
+            "name": "DLOGTrig",
+            "value": "8"
           }
         ]
       },

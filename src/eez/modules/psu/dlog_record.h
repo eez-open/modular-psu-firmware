@@ -56,6 +56,8 @@ inline bool isExecuting() { return g_state == STATE_EXECUTING; }
 inline bool isTraceExecuting() { return g_state == STATE_EXECUTING && g_traceInitiated; }
 inline bool isInStateTransition() { return g_inStateTransition; }
 
+void setTriggerSource(trigger::Source source);
+
 int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePath, bool forTraceUsage);
 
 int initiate();

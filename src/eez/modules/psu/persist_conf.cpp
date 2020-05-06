@@ -26,6 +26,7 @@
 #include <eez/modules/mcu/eeprom.h>
 #include <eez/modules/bp3c/eeprom.h>
 
+#include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/serial_psu.h>
 
@@ -44,9 +45,7 @@ using namespace eez::mcu::display;
 #endif
 
 #include <eez/modules/psu/datetime.h>
-#include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ontime.h>
-#include <eez/modules/psu/io_pins.h>
 
 #include <eez/gui/widgets/yt_graph.h>
 
@@ -89,7 +88,7 @@ static DevConfBlock g_devConfBlocks[] = {
     { offsetof(DeviceConfiguration, dateYear), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, profileAutoRecallLocation), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, startOfBlock4), 1, false, 0, 0, 0 },
-    { offsetof(DeviceConfiguration, triggerSource), 1, false, 0, 0, 0 },
+    { offsetof(DeviceConfiguration, reserved51), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, ytGraphUpdateMethod), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, userSwitchAction), 1, false, 0, 60 * 1000, 0 },
     { offsetof(DeviceConfiguration, ethernetHostName), 1, false, 0, 0, 0 },
@@ -162,10 +161,6 @@ void initDefaultDevConf() {
     g_defaultDevConf.encoderMovingSpeedUp = mcu::encoder::DEFAULT_MOVING_UP_SPEED;
 
     // block 5
-    g_defaultDevConf.triggerContinuousInitializationEnabled = 0;
-
-    g_defaultDevConf.triggerSource = trigger::SOURCE_IMMEDIATE;
-    g_defaultDevConf.triggerDelay = 0;
 
     // block 6
     g_defaultDevConf.displayState = 1;
@@ -1205,36 +1200,8 @@ void setDateTimeFormat(unsigned dateTimeFormat) {
     g_devConf.dateTimeFormat = dateTimeFormat;
 }
 
-void setIoPinPolarity(int pin, unsigned polarity) {
-    g_devConf.ioPins[pin].polarity = polarity;
-    io_pins::refresh();
-}
-
-void setIoPinFunction(int pin, unsigned function) {
-    g_devConf.ioPins[pin].function = function;
-    io_pins::refresh();
-}
-
 void setSelectedThemeIndex(uint8_t selectedThemeIndex) {
     g_devConf.selectedThemeIndex = selectedThemeIndex;
-}
-
-void resetTrigger() {
-    g_devConf.triggerDelay = trigger::DELAY_DEFAULT;
-    g_devConf.triggerSource = trigger::SOURCE_IMMEDIATE;
-    g_devConf.triggerContinuousInitializationEnabled = 0;
-}
-
-void setTriggerContinuousInitializationEnabled(unsigned triggerContinuousInitializationEnabled) {
-    g_devConf.triggerContinuousInitializationEnabled = triggerContinuousInitializationEnabled;
-}
-
-void setTriggerDelay(float triggerDelay) {
-    g_devConf.triggerDelay = triggerDelay;
-}
-
-void setTriggerSource(uint8_t triggerSource) {
-    g_devConf.triggerSource = triggerSource;
 }
 
 void setSkipChannelCalibrations(unsigned skipChannelCalibrations) {

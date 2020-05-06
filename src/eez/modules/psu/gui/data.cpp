@@ -138,7 +138,16 @@ EnumItem g_enumDefinition_IO_PINS_INPUT_FUNCTION[] = {
     { io_pins::FUNCTION_NONE, "None" },
     { io_pins::FUNCTION_INPUT, "Input" },
     { io_pins::FUNCTION_INHIBIT, "Inhibit" },
-    { io_pins::FUNCTION_TINPUT, "Trigger input", "Tinput" },
+    { io_pins::FUNCTION_SYSTRIG, "System trigger", "SysTrig" },
+    { 0, 0 }
+};
+
+EnumItem g_enumDefinition_IO_PINS_INPUT_FUNCTION_WITH_DLOG_TRIGGER[] = {
+    { io_pins::FUNCTION_NONE, "None" },
+    { io_pins::FUNCTION_INPUT, "Input" },
+    { io_pins::FUNCTION_INHIBIT, "Inhibit" },
+    { io_pins::FUNCTION_SYSTRIG, "System trigger", "SysTrig" },
+    { io_pins::FUNCTION_DLOGTRIG, "DLOG trigger", "DlogTrig" },
     { 0, 0 }
 };
 
@@ -4279,7 +4288,7 @@ void data_trigger_is_initiated(DataOperationEnum operation, Cursor cursor, Value
 
 void data_trigger_is_manual(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = trigger::getSource() == trigger::SOURCE_MANUAL && !trigger::isTriggered();
+        value = trigger::g_triggerSource == trigger::SOURCE_MANUAL && !trigger::isTriggered();
     }
 }
 
@@ -4353,8 +4362,8 @@ void data_io_pins_inhibit_state(DataOperationEnum operation, Cursor cursor, Valu
         if (io_pins::isInhibited()) {
             value = 1;
         } else {
-            const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
-            const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
+            const io_pins::IOPin &inputPin1 = io_pins::g_ioPins[0];
+            const io_pins::IOPin &inputPin2 = io_pins::g_ioPins[1];
             if (inputPin1.function == io_pins::FUNCTION_INHIBIT || inputPin2.function == io_pins::FUNCTION_INHIBIT) {
                 value = 0;
             } else {
@@ -4399,7 +4408,7 @@ void data_io_pin_function_name(DataOperationEnum operation, Cursor cursor, Value
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page) {
             if (cursor < DOUT1) {
-                value = MakeEnumDefinitionValue(page->m_function[cursor], ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION);
+                value = MakeEnumDefinitionValue(page->m_function[cursor], ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION_WITH_DLOG_TRIGGER);
             } else if (cursor == DOUT2) {
                 value = MakeEnumDefinitionValue(page->m_function[cursor], ENUM_DEFINITION_IO_PINS_OUTPUT2_FUNCTION);
             } else {
@@ -4419,11 +4428,11 @@ void data_io_pin_state(DataOperationEnum operation, Cursor cursor, Value &value)
             } else {
                 int state = io_pins::getPinState(cursor);
 
-                if (page->m_polarity[pin] != persist_conf::devConf.ioPins[pin].polarity) {
+                if (page->m_polarity[pin] != io_pins::g_ioPins[pin].polarity) {
                     state = state ? 0 : 1;
                 }
 
-                if (pin >= 2 && page->m_function[pin] == io_pins::FUNCTION_OUTPUT && persist_conf::devConf.ioPins[pin].function == io_pins::FUNCTION_OUTPUT) {
+                if (pin >= 2 && page->m_function[pin] == io_pins::FUNCTION_OUTPUT && io_pins::g_ioPins[pin].function == io_pins::FUNCTION_OUTPUT) {
                     if (state) {
                         value = 3; // Active_Changeable
                     } else {

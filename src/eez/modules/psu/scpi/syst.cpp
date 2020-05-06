@@ -1252,7 +1252,7 @@ scpi_result_t scpi_cmd_systemDigitalInputDataQ(scpi_t *context) {
 
     pin--;
 
-    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_INPUT) {
+    if (io_pins::g_ioPins[pin].function != io_pins::FUNCTION_INPUT) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
@@ -1275,7 +1275,7 @@ scpi_result_t scpi_cmd_systemDigitalOutputData(scpi_t *context) {
 
     pin--;
 
-    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_OUTPUT) {
+    if (io_pins::g_ioPins[pin].function != io_pins::FUNCTION_OUTPUT) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
@@ -1303,7 +1303,7 @@ scpi_result_t scpi_cmd_systemDigitalOutputDataQ(scpi_t *context) {
 
     pin--;
 
-    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_OUTPUT) {
+    if (io_pins::g_ioPins[pin].function != io_pins::FUNCTION_OUTPUT) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
@@ -1319,9 +1319,10 @@ static scpi_choice_def_t functionChoice[] = { { "NONE", io_pins::FUNCTION_NONE }
                                               { "FAULt", io_pins::FUNCTION_FAULT },
                                               { "INHibit", io_pins::FUNCTION_INHIBIT },
                                               { "ONCouple", io_pins::FUNCTION_ON_COUPLE },
-                                              { "TINPut", io_pins::FUNCTION_TINPUT },
+                                              { "SYSTrig", io_pins::FUNCTION_SYSTRIG },
                                               { "TOUTput", io_pins::FUNCTION_TOUTPUT },
                                               { "PWM", io_pins::FUNCTION_PWM },
+                                              { "DLOGTrig", io_pins::FUNCTION_DLOGTRIG },
                                               SCPI_CHOICE_LIST_END };
 
 scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
@@ -1340,21 +1341,31 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
     pin--;
 
     if (pin < 2) {
-        if (function != io_pins::FUNCTION_NONE && function != io_pins::FUNCTION_INPUT &&
-            function != io_pins::FUNCTION_INHIBIT && function != io_pins::FUNCTION_TINPUT) {
+        if (
+            function != io_pins::FUNCTION_NONE &&
+            function != io_pins::FUNCTION_INPUT &&
+            function != io_pins::FUNCTION_INHIBIT &&
+            function != io_pins::FUNCTION_SYSTRIG &&
+            function != io_pins::FUNCTION_DLOGTRIG
+        ) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
         }
     } else {
-        if (function != io_pins::FUNCTION_NONE && function != io_pins::FUNCTION_OUTPUT &&
-            function != io_pins::FUNCTION_FAULT && function != io_pins::FUNCTION_ON_COUPLE &&
-            function != io_pins::FUNCTION_TOUTPUT && !(pin == DOUT2 && function == io_pins::FUNCTION_PWM)) {
+        if (
+            function != io_pins::FUNCTION_NONE &&
+            function != io_pins::FUNCTION_OUTPUT &&
+            function != io_pins::FUNCTION_FAULT &&
+            function != io_pins::FUNCTION_ON_COUPLE &&
+            function != io_pins::FUNCTION_TOUTPUT &&
+            !(pin == DOUT2 && function == io_pins::FUNCTION_PWM)
+        ) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
         }
     }
 
-    persist_conf::setIoPinFunction(pin, function);
+    io_pins::setPinFunction(pin, function);
 
     return SCPI_RES_OK;
 }
@@ -1369,7 +1380,7 @@ scpi_result_t scpi_cmd_systemDigitalPinFunctionQ(scpi_t *context) {
 
     pin--;
 
-    resultChoiceName(context, functionChoice, persist_conf::devConf.ioPins[pin].function);
+    resultChoiceName(context, functionChoice, io_pins::g_ioPins[pin].function);
 
     return SCPI_RES_OK;
 }
@@ -1393,7 +1404,7 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarity(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    persist_conf::setIoPinPolarity(pin, polarity);
+    io_pins::setPinPolarity(pin, polarity);
 
     return SCPI_RES_OK;
 }
@@ -1408,7 +1419,7 @@ scpi_result_t scpi_cmd_systemDigitalPinPolarityQ(scpi_t *context) {
 
     pin--;
 
-    resultChoiceName(context, polarityChoice, persist_conf::devConf.ioPins[pin].polarity);
+    resultChoiceName(context, polarityChoice, io_pins::g_ioPins[pin].polarity);
 
     return SCPI_RES_OK;
 }
@@ -1426,7 +1437,7 @@ scpi_result_t scpi_cmd_systemDigitalOutputPwmFrequency(scpi_t *context) {
 
     pin--;
 
-    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_PWM) {
+    if (io_pins::g_ioPins[pin].function != io_pins::FUNCTION_PWM) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
@@ -1480,7 +1491,7 @@ scpi_result_t scpi_cmd_systemDigitalOutputPwmFrequencyQ(scpi_t *context) {
 
     pin--;
 
-    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_PWM) {
+    if (io_pins::g_ioPins[pin].function != io_pins::FUNCTION_PWM) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
@@ -1503,7 +1514,7 @@ scpi_result_t scpi_cmd_systemDigitalOutputPwmDuty(scpi_t *context) {
 
     pin--;
 
-    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_PWM) {
+    if (io_pins::g_ioPins[pin].function != io_pins::FUNCTION_PWM) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }
@@ -1557,7 +1568,7 @@ scpi_result_t scpi_cmd_systemDigitalOutputPwmDutyQ(scpi_t *context) {
 
     pin--;
 
-    if (persist_conf::devConf.ioPins[pin].function != io_pins::FUNCTION_PWM) {
+    if (io_pins::g_ioPins[pin].function != io_pins::FUNCTION_PWM) {
         SCPI_ErrorPush(context, SCPI_ERROR_DIGITAL_PIN_FUNCTION_MISMATCH);
         return SCPI_RES_ERR;
     }

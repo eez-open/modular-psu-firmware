@@ -677,6 +677,12 @@ static void saveState(Parameters &profile, List *lists) {
         }
     }
 
+    profile.flags.triggerContinuousInitializationEnabled = trigger::g_triggerContinuousInitializationEnabled;
+    profile.triggerSource = trigger::g_triggerSource;
+    profile.triggerDelay = trigger::g_triggerDelay;
+
+    memcpy(profile.ioPins, io_pins::g_ioPins, sizeof(profile.ioPins));
+
     profile.flags.isValid = true;
 }
 
@@ -805,6 +811,13 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
     }
 
     Channel::updateAllChannels();
+
+    trigger::g_triggerContinuousInitializationEnabled = profile.flags.triggerContinuousInitializationEnabled;
+    trigger::g_triggerSource = (trigger::Source)profile.triggerSource;
+    trigger::g_triggerDelay = profile.triggerDelay;
+
+    memcpy(io_pins::g_ioPins, profile.ioPins, sizeof(profile.ioPins));
+    io_pins::refresh();
 
     return true;
 }
@@ -1083,6 +1096,17 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
             psu::gui::updateProgressPage(processedSoFar, totalSize);
         }
 #endif
+    }
+
+    ctx.group("trigger");
+    WRITE_PROPERTY("continuousInitializationEnabled", parameters.flags.triggerContinuousInitializationEnabled);
+    WRITE_PROPERTY("source", parameters.triggerSource);
+    WRITE_PROPERTY("delay", parameters.triggerDelay);
+
+    for (int i = 0; i < 4; ++i) {
+        ctx.group("io_pin", i + 1);
+        WRITE_PROPERTY("function", parameters.ioPins[i].function);
+        WRITE_PROPERTY("polarity", parameters.ioPins[i].polarity);
     }
 
     return true;
@@ -1460,6 +1484,22 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
         READ_PROPERTY(delay, tempSensorProt.delay);
         READ_PROPERTY(level, tempSensorProt.level);
         READ_PROPERTY(state, tempSensorProt.state);
+    }
+
+    if (ctx.matchGroup("trigger")) {
+        READ_FLAG(continuousInitializationEnabled, parameters.flags.triggerContinuousInitializationEnabled);
+        READ_PROPERTY(source, parameters.triggerSource);
+        READ_PROPERTY(delay, parameters.triggerDelay);
+    }
+
+    int ioPinIndex;
+    if (ctx.matchGroup("io_pin", ioPinIndex)) {
+        --ioPinIndex;
+
+        auto &ioPin = parameters.ioPins[ioPinIndex];
+
+        READ_FLAG(function, ioPin.function);
+        READ_FLAG(polarity, ioPin.polarity);
     }
 
     return false;

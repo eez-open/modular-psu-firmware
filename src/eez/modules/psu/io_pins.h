@@ -40,10 +40,18 @@ enum Function {
     FUNCTION_FAULT,
     FUNCTION_INHIBIT,
     FUNCTION_ON_COUPLE,
-    FUNCTION_TINPUT,
+    FUNCTION_SYSTRIG,
     FUNCTION_TOUTPUT,
-    FUNCTION_PWM
+    FUNCTION_PWM,
+    FUNCTION_DLOGTRIG
 };
+
+struct IOPin {
+    unsigned polarity : 1;
+    unsigned function : 7;
+};
+
+extern IOPin g_ioPins[4];
 
 void init();
 void tick(uint32_t tickCount);
@@ -52,6 +60,9 @@ void refresh();
 
 // When PSU is in inhibited state all outputs are disabled and execution of LIST on channels is stopped.
 bool isInhibited();
+
+void setPinPolarity(int pin, unsigned polarity);
+void setPinFunction(int pin, unsigned function);
 
 void setPinState(int pin, bool state);
 bool getPinState(int pin);

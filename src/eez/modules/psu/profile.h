@@ -19,6 +19,7 @@
 #pragma once
 
 #include <eez/modules/psu/temperature.h>
+#include <eez/modules/psu/io_pins.h>
 
 #define PROFILE_EXT ".profile"
 
@@ -85,7 +86,8 @@ struct ProfileFlags {
     unsigned isValid: 1;
     unsigned powerIsUp: 1;
     unsigned couplingType : 3;
-    unsigned reserverd : 11;
+    unsigned triggerContinuousInitializationEnabled: 1;
+    unsigned reserverd : 10;
 };
 
 enum LoadStatus {
@@ -101,6 +103,9 @@ struct Parameters {
     char name[PROFILE_NAME_MAX_LENGTH + 1];
     ChannelParameters channels[CH_MAX];
     temperature::ProtectionConfiguration tempProt[temp_sensor::MAX_NUM_TEMP_SENSORS];
+    uint16_t triggerSource;
+    float triggerDelay;
+    io_pins::IOPin ioPins[4];
 };
 
 void init();

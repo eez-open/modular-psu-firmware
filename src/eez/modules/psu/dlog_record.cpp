@@ -16,22 +16,24 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <eez/modules/psu/psu.h>
-#include <eez/libs/sd_fat/sd_fat.h>
-
 #include <math.h>
 
 #include <eez/index.h>
+#include <eez/system.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/datetime.h>
-#include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/sd_card.h>
-#include <eez/system.h>
+#include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/event_queue.h>
+
+#include <eez/modules/psu/scpi/psu.h>
+
 #include <eez/gui/widgets/yt_graph.h>
+
+#include <eez/libs/sd_fat/sd_fat.h>
 
 #include <eez/memory.h>
 
@@ -609,7 +611,7 @@ static void resetParameters() {
     memset(&g_parameters, 0, sizeof(g_parameters));
     g_parameters.period = PERIOD_DEFAULT;
     g_parameters.time = TIME_DEFAULT;
-    g_parameters.triggerSource = trigger::SOURCE_IMMEDIATE;
+    setTriggerSource(trigger::SOURCE_IMMEDIATE);
 }
 
 static void doFinish(bool afterError) {
@@ -619,6 +621,29 @@ static void doFinish(bool afterError) {
     }
     resetParameters();
     setState(STATE_IDLE);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+void setTriggerSource(trigger::Source source) {
+    g_parameters.triggerSource = source;
+
+    if (source == trigger::SOURCE_PIN1) {
+        if (io_pins::g_ioPins[0].function != io_pins::FUNCTION_DLOGTRIG) {
+            io_pins::setPinFunction(0, io_pins::FUNCTION_DLOGTRIG);
+        }
+    } else if (source == trigger::SOURCE_PIN2) {
+        if (io_pins::g_ioPins[1].function != io_pins::FUNCTION_DLOGTRIG) {
+            io_pins::setPinFunction(1, io_pins::FUNCTION_DLOGTRIG);
+        }
+    } else {
+        if (io_pins::g_ioPins[0].function == io_pins::FUNCTION_DLOGTRIG) {
+            io_pins::setPinFunction(0, io_pins::FUNCTION_NONE);
+        } else if (io_pins::g_ioPins[1].function == io_pins::FUNCTION_DLOGTRIG) {
+            io_pins::setPinFunction(1, io_pins::FUNCTION_NONE);
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -34,14 +34,16 @@ enum Source {
     SOURCE_PIN2
 };
 
+extern Source g_triggerSource;
+extern float g_triggerDelay;
+extern bool g_triggerContinuousInitializationEnabled;
+
 void init();
 void reset();
 
 void setDelay(float delay);
-float getDelay();
 
 void setSource(Source source);
-Source getSource();
 
 void setVoltage(Channel &channel, float value);
 float getVoltage(Channel &channel);
@@ -54,7 +56,6 @@ int startImmediately();
 void startImmediatelyInPsuThread();
 int initiate();
 int enableInitiateContinuous(bool enable);
-bool isContinuousInitializationEnabled();
 void setTriggerFinished(Channel &channel);
 bool isIdle();
 bool isInitiated();

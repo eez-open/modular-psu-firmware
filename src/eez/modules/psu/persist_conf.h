@@ -52,11 +52,6 @@ struct BlockHeader {
     uint16_t version;
 };
 
-struct IOPin {
-    unsigned polarity : 1;
-    unsigned function : 7;
-};
-
 enum UserSwitchAction {
 	USER_SWITCH_ACTION_NONE,
     USER_SWITCH_ACTION_ENCODER_STEP,
@@ -156,12 +151,15 @@ struct DeviceConfiguration {
     unsigned isClickSoundEnabled : 1;
 
     // block 5
-    uint8_t triggerSource;
-    float triggerDelay;
+    uint8_t reserved51; // was triggerSource
+    float reserved52; // was triggerDelay
 
-    IOPin ioPins[4];
+    struct {
+        unsigned reserved1 : 1;
+        unsigned reserved2 : 7;
+    } reserved53[4]; // was ioPins
 
-    unsigned triggerContinuousInitializationEnabled : 1;
+    unsigned reserved54 : 1; // was triggerContinuousInitializationEnabled
 
     unsigned isFrontPanelLocked : 1;
 
@@ -321,15 +319,7 @@ void setTimeZone(int16_t time_zone);
 void setDstRule(uint8_t dstRule);
 void setDateTimeFormat(unsigned dstRule);
 
-void setIoPinPolarity(int pin, unsigned polarity);
-void setIoPinFunction(int pin, unsigned function);
-
 void setSelectedThemeIndex(uint8_t selectedThemeIndex);
-
-void resetTrigger();
-void setTriggerContinuousInitializationEnabled(unsigned triggerContinuousInitializationEnabled);
-void setTriggerDelay(float triggerDelay);
-void setTriggerSource(uint8_t triggerSource);
 
 void setSkipChannelCalibrations(unsigned skipChannelCalibrations);
 void setSkipDateTimeSetup(unsigned skipDateTimeSetup);

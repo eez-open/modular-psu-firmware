@@ -757,10 +757,9 @@ void SysSettingsEncoderPage::set() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void SysSettingsTriggerPage::pageAlloc() {
-    m_sourceOrig = m_source = trigger::getSource();
-    m_delayOrig = m_delay = trigger::getDelay();
-    m_initiateContinuouslyOrig = m_initiateContinuously =
-        trigger::isContinuousInitializationEnabled();
+    m_sourceOrig = m_source = trigger::g_triggerSource;
+    m_delayOrig = m_delay = trigger::g_triggerDelay;
+    m_initiateContinuouslyOrig = m_initiateContinuously = trigger::g_triggerContinuousInitializationEnabled;
 }
 
 void SysSettingsTriggerPage::onTriggerSourceSet(uint16_t value) {
@@ -791,7 +790,7 @@ void SysSettingsTriggerPage::editDelay() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, MakeValue(trigger::getDelay(), UNIT_SECOND), options, onDelaySet, 0, 0);
+    NumericKeypad::start(0, MakeValue(trigger::g_triggerDelay, UNIT_SECOND), options, onDelaySet, 0, 0);
 }
 
 void SysSettingsTriggerPage::toggleInitiateContinuously() {
@@ -809,12 +808,6 @@ void SysSettingsTriggerPage::set() {
         trigger::setDelay(m_delay);
         trigger::enableInitiateContinuous(m_initiateContinuously);
 
-        if (m_source == trigger::SOURCE_PIN1) {
-            persist_conf::setIoPinFunction(0, io_pins::FUNCTION_TINPUT);
-        } else if (m_source == trigger::SOURCE_PIN2) {
-            persist_conf::setIoPinFunction(1, io_pins::FUNCTION_TINPUT);
-        }
-
         popPage();
         
         // infoMessage("Trigger settings saved!");
@@ -825,8 +818,8 @@ void SysSettingsTriggerPage::set() {
 
 void SysSettingsIOPinsPage::pageAlloc() {
     for (int i = 0; i < NUM_IO_PINS; i++) {
-        m_polarityOrig[i] = m_polarity[i] = (io_pins::Polarity)persist_conf::devConf.ioPins[i].polarity;
-        m_functionOrig[i] = m_function[i] = (io_pins::Function)persist_conf::devConf.ioPins[i].function;
+        m_polarityOrig[i] = m_polarity[i] = (io_pins::Polarity)io_pins::g_ioPins[i].polarity;
+        m_functionOrig[i] = m_function[i] = (io_pins::Function)io_pins::g_ioPins[i].function;
         if (i >= DOUT1) {
             g_pwmFrequencyOrig[i - DOUT1] = g_pwmFrequency[i - DOUT1] = io_pins::getPwmFrequency(i);
             g_pwmDutyOrig[i - DOUT1] = g_pwmDuty[i - DOUT1] = io_pins::getPwmDuty(i);
@@ -844,6 +837,12 @@ void SysSettingsIOPinsPage::onFunctionSet(uint16_t value) {
     popPage();
     SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getActivePage();
     page->m_function[page->pinNumber] = (io_pins::Function)value;
+    if (value == io_pins::FUNCTION_SYSTRIG) {
+        int otherPin = page->pinNumber == 0 ? 1 : 0;
+        if (page->m_function[otherPin] == io_pins::FUNCTION_SYSTRIG) {
+            page->m_function[otherPin] = io_pins::FUNCTION_NONE;
+        }
+    }
 }
 
 void SysSettingsIOPinsPage::selectFunction() {
@@ -890,8 +889,8 @@ int SysSettingsIOPinsPage::getDirty() {
 void SysSettingsIOPinsPage::set() {
     if (getDirty()) {
         for (int i = 0; i < NUM_IO_PINS; i++) {
-            persist_conf::setIoPinPolarity(i, m_polarity[i]);
-            persist_conf::setIoPinFunction(i, m_function[i]);
+            io_pins::setPinPolarity(i, m_polarity[i]);
+            io_pins::setPinFunction(i, m_function[i]);
             if (i >= DOUT1) {
                 if (g_pwmFrequencyOrig[i - DOUT1] != g_pwmFrequency[i - DOUT1]) {
                     io_pins::setPwmFrequency(i, g_pwmFrequency[i - DOUT1]);

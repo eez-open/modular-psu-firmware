@@ -63,7 +63,7 @@ scpi_result_t scpi_cmd_triggerSequenceDelay(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_triggerSequenceDelayQ(scpi_t *context) {
-    SCPI_ResultFloat(context, trigger::getDelay());
+    SCPI_ResultFloat(context, trigger::g_triggerDelay);
     return SCPI_RES_OK;
 }
 
@@ -75,19 +75,11 @@ scpi_result_t scpi_cmd_triggerSequenceSource(scpi_t *context) {
 
     trigger::setSource((trigger::Source)source);
 
-    if (source == trigger::SOURCE_PIN1) {
-        persist_conf::setIoPinFunction(0, io_pins::FUNCTION_TINPUT);
-    }
-
-    if (source == trigger::SOURCE_PIN2) {
-        persist_conf::setIoPinFunction(1, io_pins::FUNCTION_TINPUT);
-    }
-
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_triggerSequenceSourceQ(scpi_t *context) {
-    resultChoiceName(context, sourceChoice, trigger::getSource());
+    resultChoiceName(context, sourceChoice, trigger::g_triggerSource);
     return SCPI_RES_OK;
 }
 
@@ -159,7 +151,7 @@ scpi_result_t scpi_cmd_initiateContinuous(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_initiateContinuousQ(scpi_t *context) {
-    SCPI_ResultBool(context, trigger::isContinuousInitializationEnabled() ? 1 : 0);
+    SCPI_ResultBool(context, trigger::g_triggerContinuousInitializationEnabled);
     return SCPI_RES_OK;
 }
 
@@ -193,15 +185,7 @@ scpi_result_t scpi_cmd_triggerDlogSource(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog_record::g_parameters.triggerSource = (trigger::Source)source;
-
-    if (source == trigger::SOURCE_PIN1) {
-        persist_conf::setIoPinFunction(0, io_pins::FUNCTION_TINPUT);
-    }
-
-    if (source == trigger::SOURCE_PIN2) {
-        persist_conf::setIoPinFunction(1, io_pins::FUNCTION_TINPUT);
-    }
+    dlog_record::setTriggerSource((trigger::Source)source);
 
     return SCPI_RES_OK;
 }

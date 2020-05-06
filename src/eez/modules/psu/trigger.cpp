@@ -34,6 +34,10 @@ namespace eez {
 namespace psu {
 namespace trigger {
 
+Source g_triggerSource;
+float g_triggerDelay;
+bool g_triggerContinuousInitializationEnabled;
+
 enum State { STATE_IDLE, STATE_INITIATED, STATE_TRIGGERED, STATE_EXECUTING };
 static State g_state;
 static uint32_t g_triggeredTime;
@@ -61,7 +65,9 @@ void setState(State newState) {
 }
 
 void reset() {
-    persist_conf::resetTrigger();
+    g_triggerDelay = trigger::DELAY_DEFAULT;
+    setSource(trigger::SOURCE_IMMEDIATE);
+    g_triggerContinuousInitializationEnabled = 0;
 
     setState(STATE_IDLE);
 }
@@ -69,35 +75,43 @@ void reset() {
 void init() {
     setState(STATE_IDLE);
 
-    if (isContinuousInitializationEnabled()) {
+    if (g_triggerContinuousInitializationEnabled) {
         initiate();
     }
 }
 
 void setDelay(float delay) {
-    persist_conf::setTriggerDelay(delay);
+    g_triggerDelay = delay;
 }
 
-float getDelay() {
-    return persist_conf::devConf.triggerDelay;
-}
+void setSource(Source triggerSource) {
+    g_triggerSource = triggerSource;
 
-void setSource(Source source) {
-    persist_conf::setTriggerSource(source);
-}
-
-Source getSource() {
-    return (Source)persist_conf::devConf.triggerSource;
+    if (triggerSource == trigger::SOURCE_PIN1) {
+        if (io_pins::g_ioPins[0].function != io_pins::FUNCTION_SYSTRIG) {
+            io_pins::setPinFunction(0, io_pins::FUNCTION_SYSTRIG);
+        }
+    } else if (triggerSource == trigger::SOURCE_PIN2) {
+        if (io_pins::g_ioPins[1].function != io_pins::FUNCTION_SYSTRIG) {
+            io_pins::setPinFunction(1, io_pins::FUNCTION_SYSTRIG);
+        }
+    } else {
+        if (io_pins::g_ioPins[0].function == io_pins::FUNCTION_SYSTRIG) {
+            io_pins::setPinFunction(0, io_pins::FUNCTION_NONE);
+        } else if (io_pins::g_ioPins[1].function == io_pins::FUNCTION_SYSTRIG) {
+            io_pins::setPinFunction(1, io_pins::FUNCTION_NONE);
+        }
+    }
 }
 
 void check(uint32_t currentTime) {
-    if (currentTime - g_triggeredTime > persist_conf::devConf.triggerDelay * 1000L) {
+    if (currentTime - g_triggeredTime > g_triggerDelay * 1000L) {
         startImmediately();
     }
 }
 
 int generateTrigger(Source source, bool checkImmediatelly) {
-    bool seqTriggered = persist_conf::devConf.triggerSource == source && g_state == STATE_INITIATED;
+    bool seqTriggered = g_triggerSource == source && g_state == STATE_INITIATED;
 
     bool dlogTriggered = dlog_record::g_parameters.triggerSource == source && dlog_record::isInitiated();
 
@@ -132,7 +146,7 @@ bool isTriggerFinishedOnAllChannels() {
 }
 
 void triggerFinished() {
-    if (persist_conf::devConf.triggerContinuousInitializationEnabled) {
+    if (g_triggerContinuousInitializationEnabled) {
         setState(STATE_INITIATED);
     } else {
         setState(STATE_IDLE);
@@ -337,7 +351,7 @@ int initiate() {
 
     setState(STATE_INITIATED);
 
-    if (persist_conf::devConf.triggerSource == SOURCE_IMMEDIATE) {
+    if (g_triggerSource == SOURCE_IMMEDIATE) {
         return trigger::generateTrigger(trigger::SOURCE_IMMEDIATE);
     }
 
@@ -345,16 +359,12 @@ int initiate() {
 }
 
 int enableInitiateContinuous(bool enable) {
-    persist_conf::setTriggerContinuousInitializationEnabled(enable);
+    g_triggerContinuousInitializationEnabled = enable;
     if (enable) {
         return initiate();
     } else {
         return SCPI_RES_OK;
     }
-}
-
-bool isContinuousInitializationEnabled() {
-    return persist_conf::devConf.triggerContinuousInitializationEnabled;
 }
 
 bool isIdle() {

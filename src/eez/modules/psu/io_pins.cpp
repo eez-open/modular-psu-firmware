@@ -36,6 +36,7 @@
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/trigger.h>
+#include <eez/modules/psu/dlog_record.h>
 
 #if defined EEZ_PLATFORM_STM32
 #include <eez/modules/bp3c/flash_slave.h>
@@ -44,6 +45,8 @@
 namespace eez {
 namespace psu {
 namespace io_pins {
+
+IOPin g_ioPins[4];
 
 static struct {
     unsigned outputFault : 2;
@@ -144,7 +147,7 @@ void initInputPin(int pin) {
     if (!bp3c::flash_slave::g_bootloaderMode || pin != 0) {
         GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-        const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
+        const IOPin &ioPin = g_ioPins[pin];
 
         GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
         GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -266,7 +269,7 @@ void initOutputPin(int pin) {
         }
 #endif
     } else if (pin == DOUT2) {
-        const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
+        const IOPin &ioPin = g_ioPins[pin];
         if (ioPin.function == io_pins::FUNCTION_PWM) {
             updatePwmFrequency(pin);
         } else {
@@ -281,11 +284,11 @@ void init() {
 
 void tick(uint32_t tickCount) {
     // execute input pins function
-    const persist_conf::IOPin &inputPin1 = persist_conf::devConf.ioPins[0];
+    const IOPin &inputPin1 = g_ioPins[0];
     int inputPin1Value = ioPinRead(EXT_TRIG1);
     bool inputPin1State = (inputPin1Value && inputPin1.polarity == io_pins::POLARITY_POSITIVE) || (!inputPin1Value && inputPin1.polarity == io_pins::POLARITY_NEGATIVE);
 
-    const persist_conf::IOPin &inputPin2 = persist_conf::devConf.ioPins[1];
+    const IOPin &inputPin2 = g_ioPins[1];
     int inputPin2Value = ioPinRead(EXT_TRIG2);
     bool inputPin2State = (inputPin2Value && inputPin2.polarity == io_pins::POLARITY_POSITIVE) || (!inputPin2Value && inputPin2.polarity == io_pins::POLARITY_NEGATIVE);
 
@@ -306,11 +309,11 @@ void tick(uint32_t tickCount) {
         Channel::onInhibitedChanged(inhibited);
     }
 
-    if (inputPin1.function == io_pins::FUNCTION_TINPUT && inputPin1State && !g_pinState[0]) {
+    if ((inputPin1.function == io_pins::FUNCTION_SYSTRIG || inputPin1.function == io_pins::FUNCTION_DLOGTRIG) && inputPin1State && !g_pinState[0]) {
         trigger::generateTrigger(trigger::SOURCE_PIN1);
     }
 
-    if (inputPin2.function == io_pins::FUNCTION_TINPUT && inputPin2State && !g_pinState[1]) {
+    if ((inputPin2.function == io_pins::FUNCTION_SYSTRIG || inputPin2.function == io_pins::FUNCTION_DLOGTRIG) && inputPin2State && !g_pinState[1]) {
         trigger::generateTrigger(trigger::SOURCE_PIN2);
     }
 
@@ -322,7 +325,7 @@ void tick(uint32_t tickCount) {
         int32_t diff = tickCount - g_toutputPulseStartTickCount;
         if (diff > CONF_TOUTPUT_PULSE_WIDTH_MS * 1000L) {
             for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
-                const persist_conf::IOPin &outputPin = persist_conf::devConf.ioPins[pin];
+                const IOPin &outputPin = g_ioPins[pin];
                 if (outputPin.function == io_pins::FUNCTION_TOUTPUT) {
                     setPinState(pin, false);
                 }
@@ -336,7 +339,7 @@ void tick(uint32_t tickCount) {
 
     // execute output pins function
     for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
-        const persist_conf::IOPin &outputPin = persist_conf::devConf.ioPins[pin];
+        const IOPin &outputPin = g_ioPins[pin];
 
         if (outputPin.function == io_pins::FUNCTION_FAULT) {
             if (trippedState == UNKNOWN) {
@@ -373,7 +376,7 @@ void tick(uint32_t tickCount) {
 void onTrigger() {
     // start trigger output pulse
     for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
-        const persist_conf::IOPin &outputPin = persist_conf::devConf.ioPins[pin];
+        const IOPin &outputPin = g_ioPins[pin];
         if (outputPin.function == io_pins::FUNCTION_TOUTPUT) {
             setPinState(pin, true);
             g_lastState.toutputPulse = 1;
@@ -390,7 +393,7 @@ void refresh() {
         } else {
             initOutputPin(pin);
 
-            const persist_conf::IOPin &ioPin = persist_conf::devConf.ioPins[pin];
+            const IOPin &ioPin = g_ioPins[pin];
             if (ioPin.function == io_pins::FUNCTION_NONE) {
                 setPinState(pin, false);
             } else if (ioPin.function == io_pins::FUNCTION_OUTPUT) {
@@ -416,11 +419,64 @@ bool isInhibited() {
     return g_lastState.inhibited;
 }
 
+void setPinPolarity(int pin, unsigned polarity) {
+    g_ioPins[pin].polarity = polarity;
+    refresh();
+}
+
+void setPinFunction(int pin, unsigned function) {
+    g_ioPins[pin].function = function;
+
+    if (pin == 0 || pin == 1) {
+        int otherPin = pin == 0 ? 1 : 0;
+
+        if (function == io_pins::FUNCTION_SYSTRIG) {
+            if (g_ioPins[otherPin].function == io_pins::FUNCTION_SYSTRIG) {
+                g_ioPins[otherPin].function = io_pins::FUNCTION_NONE;
+            }
+
+            trigger::Source triggerSource = pin == 0 ? trigger::SOURCE_PIN1 : trigger::SOURCE_PIN2;
+
+            if (dlog_record::g_parameters.triggerSource == triggerSource) {
+                dlog_record::setTriggerSource(trigger::SOURCE_IMMEDIATE);
+            }
+
+            if (trigger::g_triggerSource != triggerSource) {
+                trigger::setSource(triggerSource);
+            }
+        } else if (function == io_pins::FUNCTION_DLOGTRIG) {
+            if (g_ioPins[otherPin].function == io_pins::FUNCTION_DLOGTRIG) {
+                g_ioPins[otherPin].function = io_pins::FUNCTION_NONE;
+            }
+
+            trigger::Source triggerSource = pin == 0 ? trigger::SOURCE_PIN1 : trigger::SOURCE_PIN2;
+
+            if (trigger::g_triggerSource == triggerSource) {
+                trigger::setSource(trigger::SOURCE_IMMEDIATE);
+            }
+
+            if (dlog_record::g_parameters.triggerSource != triggerSource) {
+                dlog_record::setTriggerSource(triggerSource);
+            }
+        } else {
+            if (pin == 0 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN1 || pin == 1 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN2) {
+                dlog_record::setTriggerSource(trigger::SOURCE_IMMEDIATE);
+            }
+
+            if (pin == 0 && trigger::g_triggerSource == trigger::SOURCE_PIN1 || pin == 1 && trigger::g_triggerSource == trigger::SOURCE_PIN2) {
+                trigger::setSource(trigger::SOURCE_IMMEDIATE);
+            }
+        }
+    }
+
+    io_pins::refresh();
+}
+
 void setPinState(int pin, bool state) {
     if (pin >= 2) {
         g_pinState[pin] = state;
 
-        if (persist_conf::devConf.ioPins[pin].polarity == io_pins::POLARITY_NEGATIVE) {
+        if (g_ioPins[pin].polarity == io_pins::POLARITY_NEGATIVE) {
             state = !state;
         }
 
@@ -433,12 +489,12 @@ bool getPinState(int pin) {
         bool state;
         if (pin == 0) {
             state = ioPinRead(EXT_TRIG1) ? true : false;
-            if (persist_conf::devConf.ioPins[0].polarity == io_pins::POLARITY_NEGATIVE) {
+            if (g_ioPins[0].polarity == io_pins::POLARITY_NEGATIVE) {
                 state = !state;
             }
         } else {
             state = ioPinRead(EXT_TRIG2) ? true : false;
-            if (persist_conf::devConf.ioPins[1].polarity == io_pins::POLARITY_NEGATIVE) {
+            if (g_ioPins[1].polarity == io_pins::POLARITY_NEGATIVE) {
                 state = !state;
             }
         }
