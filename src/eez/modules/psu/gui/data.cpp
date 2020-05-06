@@ -2357,7 +2357,7 @@ void data_channel_protection_ovp_type(DataOperationEnum operation, Cursor cursor
                 value = page->type ? 0 : 1;
             } else {
                 if (channel.prot_conf.flags.u_type) {
-                    if (channel.isOutputEnabled() && channel.prot_conf.flags.u_hwOvpDeactivated) {
+                    if (channel.prot_conf.flags.u_state && channel.isOutputEnabled() && channel.prot_conf.flags.u_hwOvpDeactivated) {
                         value = 3;
                     } else {
                         value = 0;

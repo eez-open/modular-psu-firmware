@@ -126,12 +126,19 @@ void DigitalAnalogConverter::tick(uint32_t tickCount) {
             value = m_rampTargetValue;
             m_isRampActive = false;
         } else {
-            value = m_rampStartValue + (m_rampTargetValue - m_rampStartValue) * diff / CONF_DCP405_R2B11_RAMP_DURATION;
+            value = m_rampTargetValue * diff / CONF_DCP405_R2B11_RAMP_DURATION;
         }
         
         set(DATA_BUFFER_B, value, FROM_RAMP);
     }
 #endif
+}
+
+bool DigitalAnalogConverter::isOverHwOvpThreshold() {
+    static const float CONF_OVP_HW_VOLTAGE_THRESHOLD = 1.0f;
+    Channel &channel = Channel::get(channelIndex);
+    float u_set = remap(m_rampLastValue, (float)DAC_MIN, channel.params.U_MIN, (float)DAC_MAX, channel.params.U_MAX);
+    return u_set > channel.getCalibratedVoltage(CONF_OVP_HW_VOLTAGE_THRESHOLD);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -196,14 +203,13 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
             !ramp::isActive(channel)
         ) {
             m_isRampActive = true;
-            m_rampStartValue = m_rampLastValue;
             m_rampTargetValue = value;
-            m_rampStartTime = micros();
-            return;
+            value = 0;
+            rampOption = FROM_RAMP;
         }
-        
-        m_rampLastValue = value;
 
+        m_rampLastValue = value;
+        
         if (rampOption != FROM_RAMP) {
             m_isRampActive = false;
         }

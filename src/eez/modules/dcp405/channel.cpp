@@ -45,8 +45,6 @@
 #define CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD 1.2f
 #define CONF_OVP_SW_OVP_AT_START_U_PROTECTION_LEVEL 1.55f
 
-#define CONF_OVP_HW_VOLTAGE_THRESHOLD 1.0f
-
 namespace eez {
 
 using namespace psu;
@@ -328,7 +326,7 @@ struct DcpChannel : public Channel {
 		// HW OVP handling
 		if (ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE)) {
 			if (!fallingEdge && isHwOvpEnabled(*this) && !ioexp.testBit(IOExpander::IO_BIT_OUT_OVP_ENABLE)) {
-				if (u.set > CONF_OVP_HW_VOLTAGE_THRESHOLD) {
+				if (dac.isOverHwOvpThreshold()) {
 					// activate HW OVP
 					prot_conf.flags.u_hwOvpDeactivated = 0;
 					ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, true);
@@ -459,7 +457,7 @@ struct DcpChannel : public Channel {
 			// OVP
 			if (tasks & OUTPUT_ENABLE_TASK_OVP) {
 				if (isHwOvpEnabled(*this)) {
-					if (u.set > CONF_OVP_HW_VOLTAGE_THRESHOLD) {
+					if (dac.isOverHwOvpThreshold()) {
 						// OVP has to be enabled after OE activation
 						prot_conf.flags.u_hwOvpDeactivated = 0;
 						ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, true);
@@ -579,7 +577,7 @@ struct DcpChannel : public Channel {
 		uSet = value;
 
 		if (isOutputEnabled()) {
-			bool belowThreshold = u.set <= CONF_OVP_HW_VOLTAGE_THRESHOLD;
+			bool belowThreshold = !dac.isOverHwOvpThreshold();
 
 			if (value < previousUSet) {
 				fallingEdge = true;

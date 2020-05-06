@@ -56,12 +56,13 @@ public:
         return m_testing;
     }
 
+    bool isOverHwOvpThreshold();
+
 private:
     bool m_testing;
 
     // ramp
     uint16_t m_rampLastValue;
-    uint16_t m_rampStartValue = 0;
     uint16_t m_rampTargetValue;
     uint32_t m_rampStartTime;
 
