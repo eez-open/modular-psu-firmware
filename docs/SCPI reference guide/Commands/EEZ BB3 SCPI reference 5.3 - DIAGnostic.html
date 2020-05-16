@@ -330,53 +330,94 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DIAGnostic[:INFOrmation]:TEST?</p>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">DIAGnostic[:INFOrmation]:TEST? [&lt;resource&gt;]</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Description</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This query returns results of the most recent self-test (see <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-common-command-reference.html#tst"><span style="text-decoration: underline;">*TST?</span></a> command).</p>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 87%;">
+					<p>This query returns results of the most recent self-test (see <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-common-command-reference.html#tst"><span style="text-decoration: underline;">*TST?</span></a> Command) for all or specified resource.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 17%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 17%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 36%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 17%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 17%;">
+					<p>&lt;resource&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 17%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 36%;">
+					<p style="text-align: center;">EEProm|SDCard|ETHernet|RTC|</p>
+					<p style="text-align: center;">DATEtime|FAN|AUXTemp|</p>
+					<p style="text-align: center;">CH1Temp|CH2Temp|CH3Temp|</p>
+					<p style="text-align: center;">CH4Temp|CH5Temp|CH6Temp|</p>
+					<p style="text-align: center;">CH1|CH2|CH3|CH4|CH5|CH6</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 17%;">
+					<p style="text-align: center;">–</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Return</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>The information will be returned in the following format: &quot;&lt;return code, device name, installed, return message&gt;&quot; where the return code could be one of the following values:</p>
 					<ul>
-						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">0 – failed</li>
-						<li class="List_1" style="text-indent: 0; list-style-type: disc;">1 – passed</li>
-						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">2 – skipped</li>
+						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">0 – not installed or recognized</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc;">1 – failed</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc;">2 – passed</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc;">3 – testing</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc;">4 – skipped</li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">5 – warning</li>
 					</ul>
-					<p>This information format will repeat with as many iterations as the number of devices found in configuration parameters of the BB3. While in the standby mode this command will returns only test results for the MCU board peripherals.</p>
+					<p>This information format will repeat with as many iterations as the number of devices found in configuration parameters of the BB3.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>Return self-test results when SD card is not found:</p>
 					<p class="cmd_code_Start">DIAG:TEST?</p>
 					<p class="cmd_code_Start">&quot;2, EEPROM, installed, passed&quot;, &quot;2, SD card, installed, passed&quot;, &quot;2, Ethernet, installed, passed&quot;, &quot;2, RTC, installed, passed&quot;, &quot;2, DateTime, installed, passed&quot;, &quot;2, Fan, installed, passed&quot;, &quot;2, AUX temp, installed, passed&quot;, &quot;2, CH1 temp, installed, passed&quot;, &quot;2, CH2 temp, installed, passed&quot;, &quot;2, CH3 temp, installed, passed&quot;, &quot;2, CH4 temp, installed, passed&quot;</p>
+					<p>&#160;</p>
+					<p>Check status of specified device, e.g. channel 2:</p>
+					<p class="cmd_code_single">DIAG:TEST? CH2</p>
+					<p class="cmd_code">2</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Related Commands</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>*TST?</p>
-					<p>SYSTem:POWer</p>
+					<p>SYSTem:CHANnel:OPTion?</p>
 				</td>
 			</tr>
 		</table>
-		<p>&#160;</p>
 		<p>&#160;</p>
 	</body>
 </html>

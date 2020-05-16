@@ -9,9 +9,21 @@ To report an issue, use the [EEZ modular-psu-firmware issue](https://github.com/
 
 ## Introduction
 
-Work in progress ... 
+Firmare for STM32F7 MCU used in [EEZ BB3](https://github.com/eez-open/modular-psu) Test & Measurement chassis. 
+Currently supported modules:
 
-_For existing Programmable Power supply (EEZ H24005) firmware visit [psu-firmware](https://github.com/eez-open/psu-firmware) repository._
+* [DCP405](https://github.com/eez-open/modular-psu/tree/master/dcp405) 0 - 40 V / 5 A programmable power source
+* [DCM220](https://github.com/eez-open/modular-psu/tree/master/dcm220) dual 1 - 20 V / 4 A auxiliary power source
+
+Under development:
+
+* [MIO168](https://github.com/eez-open/dib-mio168) mixed I/O module
+* [PREL6](https://github.com/eez-open/dib-prel6) 6 power relays module
+* [SMX46](https://github.com/eez-open/dib-smx46) 4 x 6 programmable switch matrix 
+
+---
+
+_For EEZ H24005 firmware visit [psu-firmware](https://github.com/eez-open/psu-firmware) repository._
 
 ## Build
 

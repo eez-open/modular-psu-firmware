@@ -13,18 +13,21 @@
 			.Default_nt2 { text-align: left; font-size: 10.0pt; font-weight: bold; }
 			.Heading_2 { margin-left: 7.62mm; margin-top: 4.5mm; margin-bottom: 2.5mm; text-indent: -7.62mm; font-size: 12.0pt; font-weight: bold; font-style: italic; color: #0066cc; }
 			.Heading_3 { margin-left: 7.62mm; margin-top: 4.5mm; margin-bottom: 2.5mm; text-indent: -7.62mm; font-size: 11.0pt; font-weight: bold; color: #0066cc; }
+			.List_1 { text-align: left; margin-left: 10mm; margin-right: 1.99mm; text-indent: -6mm; }
+			.List_1_End { text-align: left; margin-left: 10mm; margin-right: 1.99mm; margin-bottom: 3mm; text-indent: -6mm; }
+			.List_1_Start { text-align: left; margin-left: 10mm; margin-right: 1.99mm; margin-top: 3mm; text-indent: -6mm; }
 			p { text-align: justify; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; text-indent: 0; background: transparent; font-family: "Arial"; font-size: 10.5pt; font-weight: normal; font-style: normal; }
 			li { text-align: justify; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; text-indent: 0; background: transparent; font-family: "Arial"; font-size: 10.5pt; font-weight: normal; font-style: normal; }
 			.cmd_code { text-align: left; font-family: "Courier New"; }
+			.cmd_code_End { text-align: left; margin-bottom: 1.99mm; font-family: "Courier New"; }
 			.cmd_code_Start { text-align: left; margin-top: 1.99mm; font-family: "Courier New"; }
+			.cmd_code_single { text-align: left; margin-top: 1.99mm; margin-bottom: 1.99mm; font-family: "Courier New"; }
 			.cmd_root { text-align: left; color: #0066cc; }
 			.scpi0 { text-align: left; }
 			.scpi1 { text-align: left; margin-left: 4.99mm; }
 			.scpi2 { text-align: left; margin-left: 10mm; }
+			.scpi3 { text-align: left; margin-left: 14.99mm; }
 			.table_header { text-align: center; }
-			.DCM220 { font-family: "Arial"; font-size: 12.0pt; font-weight: bold; font-style: normal; background-color: #66ccff; color: #ffffff; }
-			.DCP405 { font-family: "Arial"; font-size: 12.0pt; font-weight: bold; font-style: normal; background-color: #ff6600; color: #ffffff; }
-			.DCP405B { font-family: "Arial"; font-size: 12.0pt; font-weight: bold; font-style: normal; background-color: #cc9900; color: #ffffff; }
 			
 			/* Footnotes & endnotes */
 			#webpub_footnotes_divider { clear: both; margin-top: 2em; width: 25%; border-top: 1px solid black; }
@@ -74,7 +77,15 @@
 					<p class="scpi2"><a href="#init_dlog"><span style="text-decoration: underline;">:DLOG {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
-					<p>Enables internal data log session</p>
+					<p>Initiates automated internal data log session</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
+					<p class="scpi3"><a href="#init_dlog_trac"><span style="text-decoration: underline;">:TRACe {&lt;filename&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
+					<p>&#160;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -143,31 +154,29 @@
 			</tr>
 		</table>
 		<p class="Heading_3">5.7.2. <a name="init_dlog"></a>INITiate:DLOG</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+		<table style="border-collapse: collapse; background: transparent; width: 169.77mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
-				<td colspan="7" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+				<td colspan="9" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">INITiate:DLOG {&lt;filename&gt;}</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="7" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220</span><span class="DCM220">&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Description</p>
 				</td>
-				<td colspan="7" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>The command starts the internal data logging session. All selected measurements defined with SENSe:DLOG:FUNCtion:CURRent and SENSe:DLOG:FUNCtion:VOLTage commands will be saved periodically in the specified filename. The data logging session will last until time specified with the SENSe:DLOG:TIME not expired or is interrupted prematurely (e.g. using the ABORt:DLOG or *RST command).  </p>
+				<td colspan="9" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The command starts automated internal data logging session. All selected measurements defined with SENSe:DLOG:FUNCtion:CURRent, SENSe:DLOG:FUNCtion:POWer and SENSe:DLOG:FUNCtion:VOLTage commands will be recorded periodically in the specified log filename that is formatted as described below. The data logging session will last until time specified with the SENSe:DLOG:TIME not expired or is not interrupted prematurely using the e.g.  ABORt:DLOG, SYSTem:REStart or *RST command.  </p>
 					<p>&#160;</p>
-					<p>Data log file contains header and data section. The header is 28 bytes long and include the following information in little-endian format, i.e. the least significant byte (LSB) value is at the lowest address:</p>
+					<p style="font-weight: bold;">Log file format</p>
+					<p>&#160;</p>
+					<p>Data log structure allows recording of multiple values simultaneously that can be also viewed simultaneously on the same X-Y graph as in case of e.g. curve tracer when each Y-axis data set (column) represents one trace. This minimizes the required size of the data log file because the X-axis content is common for multiple values to be displayed on the Y-axis. </p>
+					<p>Data log file contains fixed header, flexible header and data section. </p>
+					<p>&#160;</p>
+					<p style="font-weight: bold;">Fixed header</p>
+					<p>The fixed header includes the following information in little-endian format, i.e. the least significant byte (LSB) value is at the lowest address:</p>
 					<p>&#160;</p>
 				</td>
 			</tr>
@@ -175,13 +184,13 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
+				<td style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 13%;">
 					<p style="text-align: center; font-weight: bold;">Position</p>
 				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p style="text-align: center; font-weight: bold;">Name</p>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 10%;">
+					<p style="text-align: center; font-weight: bold;">Type</p>
 				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
+				<td colspan="6" style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 64%;">
 					<p style="text-align: center; font-weight: bold;">Description</p>
 				</td>
 			</tr>
@@ -189,240 +198,89 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p style="text-align: center;">0 – 7</p>
 				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>FILE_ID</p>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
+					<p>ASCII</p>
 				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>Always contains 0x45 0x45 0x5a 0x2d 0x44 0x4c 0x4f 0x47 (i.e. EEZ-DLOG text in ASCII format)</p>
+				<td colspan="6" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 64%;">
+					<p>Always contains “EEZ-DLOG” text in ASCII format</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p style="text-align: center;">8 – 9</p>
 				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>VERSION</p>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
+					<p>UINT16</p>
 				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>File format version (e.g. 0x01 0x00)</p>
+				<td colspan="6" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 64%;">
+					<p>File format version (e.g. 0x00 0x02)</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p style="text-align: center;">10 – 11</p>
 				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>FLAGS</p>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
+					<p>UINT16</p>
 				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>0 – jitter column not included</p>
-					<p>1 – jitter column included</p>
+				<td colspan="6" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 64%;">
+					<p>Number of columns</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p style="text-align: center;">12 – 15</p>
 				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>COLUMNS</p>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
+					<p>UINT32</p>
 				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>Information about measured values that will be stored. A four bits per channel are used in the following manner (up to 8 channels can be supported):</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 5%;">
-					<p style="text-align: center; font-style: italic;">Bit</p>
-				</td>
-				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 57%;">
-					<p style="font-style: italic;">Output value</p>
+				<td colspan="6" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 64%;">
+					<p>File offset to data rows</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
+				<td colspan="9" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 5%;">
-					<p style="text-align: center;">0</p>
-				</td>
-				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 57%;">
-					<p>Channel 1 Voltage</p>
+					<p style="font-weight: bold;">Flexible header</p>
+					<p>The flexible header contains meta information about data that follows. The number of fields defined in the flexible header is arbitrary (hence the name flexible header) formatted as follows:</p>
+					<p>&#160;</p>
+					<p style="font-style: italic;">&lt;Field 1 length&gt;&lt;Field 1 ID&gt;&lt;Field 1 data&gt;</p>
+					<p style="font-style: italic;">&lt;Field 2 length&gt;&lt;Field 2 ID&gt;&lt;Field 2 data&gt;</p>
+					<p style="font-style: italic;">&lt;Field 3 length&gt;&lt;Field 3 ID&gt;&lt;Field 3 data&gt;</p>
+					<p style="font-style: italic;">...</p>
+					<p style="font-style: italic;">&lt;Field N length&gt;&lt;Field N ID&gt;&lt;Field N data&gt;</p>
+					<p style="text-align: left; font-weight: bold;">&#160;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">&#160;</p>
+				<td style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center; font-weight: bold;">Name</p>
 				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>&#160;</p>
+				<td colspan="5" style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 34%;">
+					<p style="text-align: center; font-weight: bold;">Length</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 5%;">
-					<p style="text-align: center;">1</p>
+				<td style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 2%;">
+					<p style="text-align: center; font-weight: bold;">&#160;</p>
 				</td>
-				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 57%;">
-					<p>Channel 1 Current</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 5%;">
-					<p style="text-align: center;">2</p>
-				</td>
-				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 57%;">
-					<p>Channel 1 Power</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 5%;">
-					<p style="text-align: center;">3</p>
-				</td>
-				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 57%;">
-					<p>Channel 1 Reserved for future use</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 5%;">
-					<p style="text-align: center;">4</p>
-				</td>
-				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 57%;">
-					<p>Channel 2 Voltage</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 5%;">
-					<p style="text-align: center;">...</p>
-				</td>
-				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 57%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">16 – 19</p>
-				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>PERIOD</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>Sampling frequency as specified with the SENSe:DLOG:PERiod command written as float (e.g. IEEE-754 32-bit floating point number in little-endian format)</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">20 – 23</p>
-				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>DURATION</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>Internal data logging duration as defined with the SENSe:DLOG:TIME command. If data logging is interrupted prematurely (e.g. using the ABORt:DLOG or *RST command) recorded duration can be calculated from the log file size:</p>
-					<p>&#160;</p>
-					<p>(FILE_SIZE - HEADER_SIZE) / (1 + NUM_COLUMNS) * PERIOD</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">24 – 27</p>
-				</td>
-				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
-					<p>START_TIME</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>Date and time when internal data logging session started written using the <a href="https://en.wikipedia.org/wiki/Unix_time" target="_blank"><span style="text-decoration: underline;">Unix time</span></a> format.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td colspan="7" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p style="text-align: left;">&#160;</p>
-					<p style="text-align: left;">The Log file data section contains multiple rows recorded with sampling frequency (every PERIOD) for the max. duration specified in DURATION field in the header. Number of recorded columns in each row depends of selected values for data logging as specify in COLUMNS and FLAGS fields in the header. For example:</p>
-					<p style="text-align: left;">&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center; font-weight: bold;">Position</p>
-				</td>
-				<td colspan="6" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 77%;">
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 38%;">
 					<p style="text-align: center; font-weight: bold;">Description</p>
 				</td>
 			</tr>
@@ -430,43 +288,70 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">0 – 3</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: left;">Field length</p>
 				</td>
-				<td colspan="6" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 77%;">
-					<p style="text-align: left;">Jitter (if Jitter flag is set in FLAG field)</p>
+				<td colspan="5" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 34%;">
+					<p>UINT16</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 2%;">
+					<p>&#160;</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p>Total length of the field.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">4 – 7</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: left;">Field ID</p>
 				</td>
-				<td colspan="6" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 77%;">
-					<p style="text-align: left;">First value (e.g. output voltage on Channel 1)</p>
+				<td colspan="5" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 34%;">
+					<p>UINT8</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 2%;">
+					<p>&#160;</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p>Field unique identification number (see below the list of currently supported fields).</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">8 – 11</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: left;">Field data</p>
 				</td>
-				<td colspan="6" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 77%;">
-					<p style="text-align: left;">Second value (e.g. output current on Channel 2)</p>
+				<td colspan="5" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 34%;">
+					<p>For example if the &lt;Field ID&gt; is 14 or &quot;X-axis label&quot;, then the field is of type String. Text string begins with UINT16 that contains its length, followed by length * UINT8 data.</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 2%;">
+					<p>&#160;</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p>Field data as specified below in the list of currently supported fields.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">...</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center; font-weight: bold;">&#160;</p>
 				</td>
-				<td colspan="6" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 77%;">
+				<td colspan="8" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 75%;">
+					<p style="text-align: center; font-weight: bold;">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td colspan="9" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p style="text-align: left;">List of currently supported fields:</p>
 					<p style="text-align: left;">&#160;</p>
 				</td>
 			</tr>
@@ -474,11 +359,336 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 10%;">
-					<p style="text-align: center;">&#160;</p>
+				<td style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center; font-weight: bold;">ID</p>
 				</td>
-				<td colspan="6" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 77%;">
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: center; font-weight: bold;">Name</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center; font-weight: bold;">Data type</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: center; font-weight: bold;">Description</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">1</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">Comment</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">String</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">Data log user comment. Max. length is 128 characters.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">10</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">Unit</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">UINT8</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">0 – Unknown</p>
+					<p style="text-align: left;">1 – Volt</p>
+					<p style="text-align: left;">3 – Ampere</p>
+					<p style="text-align: left;">6 – Watt</p>
+					<p style="text-align: left;">8 – Second</p>
+					<p style="text-align: left;">12 – Ohm</p>
+					<p style="text-align: left;">16 – Hertz</p>
+					<p style="text-align: left;">17 – Joule/Ws</p>
+					<p style="text-align: left;">21 – Farad</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">11</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">X-axis step</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">Float</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">X-axis resolution in units as specified in ID10. For example, if X-axis unit is 8 (seconds), when period of data logger is set to 20 ms this field will contains 0.02.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">12</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">X-axis range min value</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">Float</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">X-axis minimal or starting value which is 0 in most of the cases.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">13</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">X-axis range max value</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">Float</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">X-axis maximal or ending value.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">14</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">X-axis label</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">String</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">X-axis data description</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">15</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">X-axis scale</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">UINT8</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">0 – Linear</p>
+					<p style="text-align: left;">1 – Logarithmic</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">30</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">Y-axis unit</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">UINT8 + UINT8</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">First UINT8 value specifies column number and second UINT8 contains Y-axis unit similar as X-axis unit specified under ID10.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">32</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">Y-axis range min value</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">UINT8 + Float</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">UINT8 value specifies column number followed by minimum recorded value.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">33</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">Y-axis range max value</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">UINT8 + Float</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">UINT8 value specifies column number followed by maximum recorded value. For example for uncoupled DCP405 module that will be 40&#160;V and 5&#160;A or for coupled in series or parallel 80&#160;V or 10&#160;A. This parameter is used by Auto-scale option in BB3 built-in log viewer.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">34</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">Y-axis label</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">UINT8 + String</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">UINT8 value specifies column number followed by Y-axis data description. This field is optional and if its value is not defined, the data log viewer (e.g. BB3 built-in viewer) could generate it from the channel number and unit symbol, for example: U1 for recorded voltage on the channel 1.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">35</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">Y-axis channel</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">UINT8 + UINT8</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">First UINT8 value specifies column number and second UINT8 contains instrument channel that is recorded </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">36</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">Y-axis scale</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">UINT8 + UINT8</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">Similar to X-axis scale: first UINT8 value specifies column number and second UINT8 can contains:</p>
+					<p style="text-align: left;">0 – Linear</p>
+					<p style="text-align: left;">1 – Logarithmic</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">50</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">Channel module type</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">UINT8 + UINT16</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">UINT8 value specifies channel number, and UINT16 contains module type ID as follows:</p>
+					<p style="text-align: left;">220 – DCM220</p>
+					<p style="text-align: left;">405 – DCP405</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">51</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: left;">Channel revision</p>
+				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">UINT8 + UINT16</p>
+				</td>
+				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">UINT8 value specifies channel number, and UINT16 contains module version number, for example 0x0206 for “R2B6”. </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td colspan="9" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p style="text-align: left; font-weight: bold;">Logged data</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td colspan="9" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p style="text-align: left;">For the each X-axis step the series of Y values (columns) are recorded. All Y values are of type float.</p>
 					<p style="text-align: left;">&#160;</p>
+					<p style="text-align: left;"><span style="font-style: italic;">&lt;Y1 value&gt;&lt;Y2 value&gt;...&lt;Yn value&gt;</span>  </p>
+					<p style="text-align: left;"><span style="font-style: italic;">&lt;Y1 value&gt;&lt;Y2 value&gt;...&lt;Yn value&gt;</span> </p>
+					<p style="text-align: left;">...</p>
+					<p style="text-align: left;">&#160;</p>
+					<p style="text-align: left;">This command will automatically set the following fields:</p>
+					<ul>
+						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc; font-style: italic;">X-axis unit = 8</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">X-axis step = SENSe:DLOG:PERiod?</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">X-axis range min = 0</li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc; font-style: italic;">X-axis range max = SENSe:DLOG:TIME?</li>
+					</ul>
+					<p style="text-align: left;">For example when voltage and current are logged for channel 1 and 2 on two DCP405 modules, additional fields will be populated as follows:</p>
+					<ul>
+						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y1-axis unit = &lt;1&gt;&lt;1&gt;</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y1-axis range min = 1 + SOUR1:VOLT? MIN</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y1-axis range max = 1 + SOUR1:VOLT? MAX</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y1-axis channel index = 1</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y2-axis unit = &lt;2&gt;&lt;3&gt;</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y2-axis range min = 2 + SOUR1:CURR? MIN</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y2-axis range max = 2 + SOUR1:CURR? MAX</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y2-axis channel index = 1</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y3-axis unit = &lt;3&gt;&lt;1&gt;</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y3-axis range min = 3 + SOUR2:VOLT? MIN</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y3-axis range max = 3 + SOUR2:VOLT? MAX</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y3-axis channel index = 2</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y4-axis unit = &lt;4&gt;&lt;3&gt;</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y4-axis range min = 4 + SOUR2:CURR? MIN</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y4-axis range max = 4 + SOUR2:CURR? MAX</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Y4-axis channel index = 2</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Channel 1 module type = “405”</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Channel 1 module revision = “207”</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc; font-style: italic;">Channel 2 module type = “405”</li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc; font-style: italic;">Channel 2 module revision = “207”</li>
+					</ul>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -491,7 +701,7 @@
 				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 19%;">
 					<p style="text-align: center;">Type</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 38%;">
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 38%;">
 					<p style="text-align: center;">Range</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 13%;">
@@ -508,6 +718,89 @@
 				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
 					<p style="text-align: center;">Quoted string</p>
 				</td>
+				<td colspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: left;">File name, either / (slash) or \ (backslash) can be used as the path separator. 1 to 255 characters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="9" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Start data logging of channel 1 voltage and current with resolution of 0.1 seconds that lasts 60 seconds:</p>
+					<p class="cmd_code_Start">SENS:DLOG:PER 0.1</p>
+					<p class="cmd_code">SENS:DLOG:TIME 60</p>
+					<p class="cmd_code">SENS:DLOG:FUNC:VOLT ON, CH1</p>
+					<p class="cmd_code">SENS:DLOG:FUNC:CURR ON, CH1</p>
+					<p class="cmd_code">INIT:DLOG &quot;Recordings/test_log.dlog&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="9" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>*RST</p>
+					<p>ABORt:DLOG</p>
+					<p>DISPlay[:WINdow]:DLOG</p>
+					<p>INITiate:DLOG:TRACe</p>
+					<p>MMEMory:INFOrmation?</p>
+					<p>SENSe:DLOG:FUNCtion:CURRent</p>
+					<p>SENSe:DLOG:FUNCtion:POWer</p>
+					<p>SENSe:DLOG:FUNCtion:VOLTage</p>
+					<p>SENSe:DLOG:PERiod</p>
+					<p>SENSe:DLOG:TIME</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.7.3. <a name="init_dlog_trac"></a>INITiate:DLOG:TRACe</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">INITiate:DLOG:TRACe {&lt;filename&gt;}</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The command starts internal data logging session. Single X-axis and multiple Y-axis are allowed as in case on the INITiate:DLOG:TRACe command, but offering more flexibility in defining recording parameters. The duration of data logging is not defined in advance and new data can be added until termination command is not executed e.g.  ABORt:DLOG, SYSTem:REStart or *RST command.  </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 38%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 13%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p>&lt;filename&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
+					<p style="text-align: center;">Quoted string</p>
+				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
 					<p style="text-align: left;">File name, either / (slash) or \ (backslash) can be used as the path separator. 1 to 255 characters</p>
 				</td>
@@ -519,26 +812,54 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
-				<td colspan="7" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">INIT:DLOG &quot;test_log.dlog&quot;</p>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Data logging is a four step process as follows:</p>
+					<p>&#160;</p>
+					<p>1. Define X- and Y-axis parameters. Number of Y-axis is arbitrary and two is used in this example. Data log file remark is not mandatory.</p>
+					<p class="cmd_code_Start">SENS:DLOG:TRAC:X:UNIT SECO </p>
+					<p class="cmd_code">SENS:DLOG:TRAC:X:STEP 0.01</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:X:RANG:MIN 0</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:X:RANG:MAX 20</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:X:LAB &quot;t&quot;</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:Y1:UNIT VOLT</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:Y1:LAB &quot;U&quot;</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:Y1:RANG:MIN 0</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:Y1:RANG:MAX 40</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:Y2:UNIT AMPE</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:Y2:LAB &quot;I&quot;</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:Y2:RANG:MIN 0</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:Y2:RANG:MAX 5</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:X:SCAL LIN</p>
+					<p class="cmd_code_End">SENS:DLOG:TRAC:Y:SCAL LIN</p>
+					<p>2. Define data log filename and comment/description.</p>
+					<p class="cmd_code_Start">SENS:DLOG:TRAC:REM &quot;data log test&quot;</p>
+					<p class="cmd_code_End">INIT:DLOG:TRAC &quot;Recordings/test_log.dlog&quot;</p>
+					<p>3. Add arbitrary number of recordings:</p>
+					<p class="cmd_code_Start">SENS:DLOG:TRAC:DATA 10.1,2.55</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 12.0,2.66</p>
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 16.34,3.63</p>
+					<p class="cmd_code_End">…</p>
+					<p>4. Close data logging session.</p>
+					<p class="cmd_code_single">ABOR:DLOG</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Related Commands</p>
 				</td>
-				<td colspan="7" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>*RST</p>
 					<p>ABORt:DLOG</p>
+					<p>DISPlay[:WINdow]:DLOG</p>
+					<p>INITiate:DLOG</p>
 					<p>MMEMory:INFOrmation?</p>
-					<p>SENSe:DLOG:FUNCtion:CURRent</p>
-					<p>SENSe:DLOG:FUNCtion:VOLTage</p>
-					<p>SENSe:DLOG:PERiod</p>
-					<p>SENSe:DLOG:TIME</p>
+					<p>SENSe:DLOG:TRACe:REMark</p>
+					<p>SYSTem:REStart</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.7.3. <a name="init_cont"></a>INITiate:CONTinuous</p>
+		<p>&#160;</p>
+		<p class="Heading_3">5.7.4. <a name="init_cont"></a>INITiate:CONTinuous</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">

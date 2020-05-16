@@ -13,8 +13,6 @@
 			.Default_nt2 { text-align: left; font-size: 10.0pt; font-weight: bold; }
 			.Heading_2 { margin-left: 7.62mm; margin-top: 4.5mm; margin-bottom: 2.5mm; text-indent: -7.62mm; font-size: 12.0pt; font-weight: bold; font-style: italic; color: #0066cc; }
 			.Heading_3 { margin-left: 7.62mm; margin-top: 4.5mm; margin-bottom: 2.5mm; text-indent: -7.62mm; font-size: 11.0pt; font-weight: bold; color: #0066cc; }
-			.List_1_End { text-align: left; margin-left: 10mm; margin-right: 1.99mm; margin-bottom: 3mm; text-indent: -6mm; }
-			.List_1_Start { text-align: left; margin-left: 10mm; margin-right: 1.99mm; margin-top: 3mm; text-indent: -6mm; }
 			p { text-align: justify; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; text-indent: 0; background: transparent; font-family: "Arial"; font-size: 10.5pt; font-weight: normal; font-style: normal; }
 			li { text-align: justify; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; text-indent: 0; background: transparent; font-family: "Arial"; font-size: 10.5pt; font-weight: normal; font-style: normal; }
 			.cmd_code { text-align: left; font-family: "Courier New"; }
@@ -27,9 +25,7 @@
 			.scpi1 { text-align: left; margin-left: 4.99mm; }
 			.scpi2 { text-align: left; margin-left: 10mm; }
 			.table_header { text-align: center; }
-			.DCM220 { font-family: "Arial"; font-size: 12.0pt; font-weight: bold; font-style: normal; background-color: #66ccff; color: #ffffff; }
 			.DCP405 { font-family: "Arial"; font-size: 12.0pt; font-weight: bold; font-style: normal; background-color: #ff6600; color: #ffffff; }
-			.DCP405B { font-family: "Arial"; font-size: 12.0pt; font-weight: bold; font-style: normal; background-color: #cc9900; color: #ffffff; }
 			
 			/* Footnotes & endnotes */
 			#webpub_footnotes_divider { clear: both; margin-top: 2em; width: 25%; border-top: 1px solid black; }
@@ -47,8 +43,9 @@
 	</head>
 	<body>
 		<p class="Heading_2">5.2. <a name="_calibrate"></a>CALibration</p>
-		<p>This subsystem provides commands for the power modules calibration. Only one channel can be calibrated at a time. If calibration mode has not been enabled with CALibration:STATe, the calibration commands will generate an error. Use CALibration:SAVE to save any changes, otherwise all changes will be lost on exit from calibration mode. Within the same calibration session both output voltage and current can be calibrated for the currently selected channel. </p>
-		<p>Calibration cannot start if channel output is not enabled (OUTPut[:STATe] ON). During calibration process three points has to be entered: MIN, MID and MAX. But in practice two point calibration is performed to re-scale the output programmed and measured values by correcting both slope and offset errors. MID point is used only as an additional validation that between entered MIN and MAX values it’s possible to “draw” a line within allowed minor tolerance.</p>
+		<p>This subsystem provides commands for the module output calibration. Only one channel can be calibrated at a time. If calibration mode has not been enabled with CALibration:STATe, the calibration commands will generate an error. Use CALibration:SAVE to save any changes, otherwise all changes will be lost on exit from calibration mode. Within the same calibration session both output voltage and current can be calibrated for the currently selected channel. </p>
+		<p>Calibration cannot start if channel output is not enabled (OUTPut[:STATe] ON). </p>
+		<p>During calibration process up to 20 measurement points can be entered within range for selected module and value (e.g. 0 to 40&#160;V for DCP405 power module). The minimum recommended number of measurement points is two to compensate slope and offset errors.</p>
 		<p>&#160;</p>
 		<table style="border-collapse: collapse; background: transparent; width: 175.02mm;">
 			<tr style="background: transparent;">
@@ -85,15 +82,15 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 46%;">
-					<p class="scpi2"><a href="#cal_curr"><span style="text-decoration: underline;">[:DATA] {&lt;new value&gt;}</span></a></p>
+					<p class="scpi2"><a href="#cal_curr"><span style="text-decoration: underline;">[:DATA] {&lt;value&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 54%;">
-					<p>Enters the calibration value</p>
+					<p>Enters the calibration value for set point</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 46%;">
-					<p class="scpi2"><a href="#cal_curr_lev"><span style="text-decoration: underline;">:LEVel {&lt;level&gt;}</span></a></p>
+					<p class="scpi2"><a href="#cal_curr_lev"><span style="text-decoration: underline;">:LEVel {&lt;point&gt;, &lt;level&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 54%;">
 					<p>Calibrates the output current programming</p>
@@ -165,15 +162,15 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 46%;">
-					<p class="scpi2"><a href="#cal_volt"><span style="text-decoration: underline;">[:DATA] {&lt;new value&gt;}</span></a></p>
+					<p class="scpi2"><a href="#cal_volt"><span style="text-decoration: underline;">[:DATA] {&lt;value&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 54%;">
-					<p>Enters the calibration value</p>
+					<p>Enters the calibration value for set point</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 46%;">
-					<p class="scpi2"><a href="#cal_volt_lev"><span style="text-decoration: underline;">:LEVel {&lt;level&gt;}</span></a></p>
+					<p class="scpi2"><a href="#cal_volt_lev"><span style="text-decoration: underline;">:LEVel {&lt;point&gt;, &lt;level&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 54%;">
 					<p>Calibrates the output voltage programming</p>
@@ -189,14 +186,6 @@
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">CALibration[:MODE] {&lt;bool&gt;}, {&lt;password&gt;}</p>
 					<p class="cmd_root">CALibration[:MODE]?</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;</span><span class="DCP405">DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220</span><span class="DCM220">&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -307,18 +296,10 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Clear all calibration parameters stored in the non-volatile memory for the currently selected channel. After successful execution of this command CALibration:STATe will be set to OFF (0) and further usage of the calibration data will be disabled. This command will be also filled calibration remark with the date and note that calibration data has been cleared. </p>
+					<p>Clear all calibration parameters stored in the module non-volatile memory for the currently selected channel. After successful execution of this command CALibration:STATe will be set to OFF (0) and further usage of the calibration data will be disabled. This command will be also filled calibration remark with the date and note that calibration data has been cleared. </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -365,15 +346,38 @@
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="Default_nt2">DIAG:CAL?</p>
-					<p class="cmd_code_single">&quot;remark=20170331 new cal&quot;,&quot;u_cal_params_exists=1&quot;,&quot;u_min_level=0.150V&quot;,&quot;u_min_data=0.1<br>06V&quot;,&quot;u_min_adc=0.165V&quot;,&quot;u_mid_level=19.100V&quot;,&quot;u_mid_data=19.056V<br>&quot;,&quot;u_mid_adc=18.500V&quot;,&quot;u_max_level=38.000V&quot;,&quot;u_max_data=37.956V&quot;,<br>&quot;u_max_adc=36.791V&quot;,&quot;u_min_range=0.000V&quot;,&quot;u_max_range=40.000V&quot;,&quot;i<br>_5A_cal_params_exists=1&quot;,&quot;i_5A_min_level=0.050A&quot;,&quot;i_5A_min_data=0<br>.057A&quot;,&quot;i_5A_min_adc=0.050A&quot;,&quot;i_5A_mid_level=2.425A&quot;,&quot;i_5A_mid_da<br>ta=2.438A&quot;,&quot;i_5A_mid_adc=2.368A&quot;,&quot;i_5A_max_level=4.800A&quot;,&quot;i_5A_ma<br>x_data=4.811A&quot;,&quot;i_5A_max_adc=4.686A&quot;,&quot;i_5A_min_range=0.000A&quot;,&quot;i_5<br>A_max_range=5.000A&quot;,&quot;i_500mA_cal_params_exists=1&quot;,&quot;i_500mA_min_le<br>vel=0.0050A&quot;,&quot;i_500mA_min_data=0.0060A&quot;,&quot;i_500mA_min_adc=0.0051A&quot;<br>,&quot;i_500mA_mid_level=0.2425A&quot;,&quot;i_500mA_mid_data=0.2617A&quot;,&quot;i_500mA_<br>mid_adc=0.2368A&quot;,&quot;i_500mA_max_level=0.4800A&quot;,&quot;i_500mA_max_data=0.<br>5170A&quot;,&quot;i_500mA_max_adc=0.4686A&quot;,&quot;i_500mA_min_range=0.0000A&quot;,&quot;i_5<br>00mA_max_range=0.0000A&quot;</p>
+					<p class="cmd_code_Start">DIAG:CAL?</p>
+					<p class="cmd_code">&quot;remark=2020-04-28 new cal&quot;,</p>
+					<p class="cmd_code">&quot;u_cal_params_exists=1&quot;,</p>
+					<p class="cmd_code">&quot;u_point1_dac=0.150000&quot;,</p>
+					<p class="cmd_code">&quot;u_point1_data=0.145000&quot;,</p>
+					<p class="cmd_code">&quot;u_point1_adc=0.178900&quot;,</p>
+					<p class="cmd_code">&quot;u_point2_dac=38.000000&quot;,</p>
+					<p class="cmd_code">&quot;u_point2_data=39.292000&quot;,</p>
+					<p class="cmd_code">&quot;u_point2_adc=38.032799&quot;,</p>
+					<p class="cmd_code">&quot;i_5A_cal_params_exists=1&quot;,</p>
+					<p class="cmd_code">&quot;i_5A_point1_dac=0.050000&quot;,</p>
+					<p class="cmd_code">&quot;i_5A_point1_data=0.060100&quot;,</p>
+					<p class="cmd_code">&quot;i_5A_point1_adc=0.059840&quot;,</p>
+					<p class="cmd_code">&quot;i_5A_point2_dac=4.800000&quot;,</p>
+					<p class="cmd_code">&quot;i_5A_point2_data=5.072900&quot;,</p>
+					<p class="cmd_code">&quot;i_5A_point2_adc=4.810040&quot;,</p>
+					<p class="cmd_code">&quot;i_50mA_cal_params_exists=1&quot;,</p>
+					<p class="cmd_code">&quot;i_50mA_point1_dac=0.000500&quot;,</p>
+					<p class="cmd_code">&quot;i_50mA_point1_data=0.000591&quot;,</p>
+					<p class="cmd_code">&quot;i_50mA_point1_adc=0.000600&quot;,</p>
+					<p class="cmd_code">&quot;i_50mA_point2_dac=0.048000&quot;,</p>
+					<p class="cmd_code">&quot;i_50mA_point2_data=0.049897&quot;,</p>
+					<p class="cmd_code">&quot;i_50mA_point2_adc=0.048100&quot;</p>
 					<p class="cmd_code_Start">CAL:STAT?</p>
 					<p class="cmd_code_single">1</p>
-					<p class="cmd_code">CAL:CLE “eezbb3”</p>
+					<p class="cmd_code">CAL:CLE &quot;eezbb3&quot;</p>
 					<p class="cmd_code">CAL:STAT?</p>
 					<p class="cmd_code_Start">0</p>
 					<p class="cmd_code_single">DIAG:CAL?</p>
-					<p class="cmd_code">&quot;remark= Not calibrated&quot;,&quot;u_cal_params_exists=0&quot;,&quot;i_cal_params_exists=0&quot; </p>
+					<p class="cmd_code">&quot;remark= Not calibrated&quot;,</p>
+					<p class="cmd_code">&quot;u_cal_params_exists=0&quot;,</p>
+					<p class="cmd_code_End">&quot;i_cal_params_exists=0&quot; </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -401,15 +405,7 @@
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">CALibration:CURRent[:DATA] {&lt;new value&gt;}</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
+					<p class="cmd_root">CALibration:CURRent[:DATA] {&lt;value&gt;}</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -417,7 +413,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This command can only be used when calibration is enabled and the output state of the currently selected channel is ON. It enters a current value that is obtained by reading an external meter. The minimum calibration level (CAL:CURR:LEV MIN) has to be selected first for the value being entered, then the middle and maximum calibration levels (CAL:CURR:LEV MID and CAL:CURR:LEV MAX) for the value being entered. Three successive values must be selected and entered. Data values are expressed in base units – either volts or amperes, depending on which function is being calibrated.</p>
+					<p>This command can only be used when calibration is enabled and the output state of the currently selected channel is ON. It enters a current value that is obtained by reading an external meter. The calibration level (CALibration:CURRent:LEVel {&lt;point&gt;, &lt;level&gt;}) has to be selected first for the value being entered. The BB3 then computes new current calibration constants. These constants has to be stored in non-volatile memory with CALibration:SAVE command.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -439,13 +435,13 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
-					<p>&lt;new value&gt;</p>
+					<p>&lt;value&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 20%;">
 					<p style="text-align: center;">NR2</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 32%;">
-					<p style="text-align: left;">-0.2&#160;A to MAX + 0.2&#160;A</p>
+					<p style="text-align: left;">-0.5&#160;A to MAX +0.5&#160;A</p>
 					<p style="text-align: left;">The maximum value is dependent on the power module current rating. See <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-parameters-and-settings.html#programming_parameters"><span style="text-decoration: underline;">Section 8.1</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
@@ -477,6 +473,14 @@
 					<p class="cmd_code">107,&quot;Cal value out of range&quot;</p>
 				</td>
 			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>CALibration:CURRent:LEVel</p>
+				</td>
+			</tr>
 		</table>
 		<p class="Heading_3">5.2.4. <a name="cal_curr_lev"></a>CALibration:CURRent:LEVel</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
@@ -485,15 +489,7 @@
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">CALibration:CURRent:LEVel {&lt;level&gt;}</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
+					<p class="cmd_root">CALibration:CURRent:LEVel {&lt;point&gt;, &lt;level&gt;}</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -501,15 +497,11 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This command can only be used when calibration is enabled and the output state of the currently selected channel is ON. It sets the power module to a calibration point that is entered with the CAL:CURR command. During calibration, three points must be entered and the low-end point (MIN) must be selected and entered first.</p>
-					<p>&#160;</p>
-					<p class="note">This command will set output voltage to MAXimum / 2 (for example 20&#160;V for the DCP405 power module that provides 0&#160;–&#160;40&#160;V).</p>
-					<p class="note">&#160;</p>
-					<p class="note">When calibration LEVel is set it’s possible to override its default value using the CURRent command. That could be especially useful when LOW range is calibrating with average 3½-digit multimeter with full scale of 200&#160;mA that is not enough to measure MID and MAX level. Therefore instead of predefined 242.5&#160;mA and 480&#160;mA one can set e.g. 100&#160;mA and 200&#160;mA to stay within multimeter’s low current range (next one is usually 10&#160;A or 20&#160;A that cannot be used to get satisfactory results).</p>
+					<p>This command can only be used when calibration is enabled and the output state of the currently selected channel is ON. It sets the power module to a calibration point that is entered with the CAL:CURR[:DATA] command. </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
-				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+				<td rowspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Parameters</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 31%;">
@@ -527,13 +519,27 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 31%;">
+					<p>&lt;point&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 20%;">
+					<p style="text-align: center;">1 – 20</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 31%;">
 					<p>&lt;level&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
-					<p style="text-align: center;">Discrete</p>
+					<p style="text-align: center;">NR2</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 20%;">
-					<p>MIN|MID|MAX (see also <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-parameters-and-settings.html#programming_parameters"><span style="text-decoration: underline;">Section 8.1</span></a>)</p>
+					<p style="text-align: left;">0 to MAX (see also <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-parameters-and-settings.html#programming_parameters"><span style="text-decoration: underline;">Section 8.1</span></a>)</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
 					<p style="text-align: center;">–</p>
@@ -569,6 +575,7 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>CALibration:CURRent[:DATA]</p>
 					<p>CALibration:STATe</p>
 					<p>INSTrument:NSELect</p>
 					<p>INSTrument[:SELect]</p>
@@ -591,7 +598,7 @@
 					<p class="Default_nt2">Modules</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;</p>
+					<p><span class="DCP405">&#160;DCP405&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -779,12 +786,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Record calibration information about the power module. The calibration message is consist of two parts:</p>
-					<ul>
-						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">datetime stamp in format <span style="font-style: italic;">yyyymmdd</span> and</li>
-						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">up to 32 characters. </li>
-					</ul>
-					<p>The BB3 should be in calibration mode before sending a calibration message. </p>
+					<p>Record calibration information about the power module. The BB3 should be in calibration mode before sending a calibration message. </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -831,10 +833,9 @@
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>When CAL:REM with text &quot;Calibrated by EEZ&quot; is executed at 2015-09-14:</p>
 					<p class="cmd_code_Start">CAL:REM &quot;Calibrated by EEZ&quot;</p>
 					<p class="cmd_code_Start">CAL:REM?</p>
-					<p class="cmd_code_End">&quot;20150904 Calibrated by EEZ&quot;</p>
+					<p class="cmd_code_End">&quot;Calibrated by EEZ&quot;</p>
 					<p>See also <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-programming-examples.html#calibration"><span style="text-decoration: underline;">Section 10.2</span></a></p>
 				</td>
 			</tr>
@@ -920,7 +921,7 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>Use this command to initiate calibration procedure when touchscreen calibration data are lost or corrupted. Calibration has to be performed locally on the BB3.</p>
 					<p>&#160;</p>
-					<p class="note">New calibration procedure can be initiated also by touching the screen and hold for more then 30 seconds.</p>
+					<p class="note">New calibration procedure can be initiated also by touching the screen and hold for more then 15 seconds.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -949,14 +950,6 @@
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_root">CALibration:STATe {&lt;bool&gt;}</p>
 					<p class="cmd_root">CALibration:STATe?</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1038,15 +1031,7 @@
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">CALibration:VOLTage[:DATA] {&lt;new value&gt;}</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
+					<p class="cmd_root">CALibration:VOLTage[:DATA] {&lt;value&gt;}</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1054,7 +1039,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This command can only be used when calibration is enabled and the output state of the currently selected channel is ON. It enters a voltage value that you obtained by reading an external meter. You must first select the minimum calibration level (CAL:VOLT:LEV MIN) for the value being entered. You must then select the middle and maximum calibration levels (CAL:VOLT:LEV MID and CAL:VOLT:LEV MAX) for the value being entered. Three successive values must be selected and entered. The BB3 then computes new voltage calibration constants. These constants has to be stored in non-volatile memory with CALibration:SAVE command.</p>
+					<p>This command can only be used when calibration is enabled and the output state of the currently selected channel is ON. It enters a voltage value that you obtained by reading an external meter. The calibration level (see CALibration:VOLTage:LEVel {&lt;point&gt;, &lt;level&gt;}) for the value being entered. The BB3 then computes new voltage calibration constants. These constants has to be stored in non-volatile memory with CALibration:SAVE command.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1076,14 +1061,14 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
-					<p>&lt;new value&gt;</p>
+					<p>&lt;value&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
 					<p style="text-align: center;">NR2</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 31%;">
-					<p style="text-align: left;">-0.5&#160;V to MAX + 0.5&#160;V</p>
-					<p style="text-align: left;">The maximum value is dependent on the power module voltage rating. See <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-parameters-and-settings.html#programming_parameters"><span style="text-decoration: underline;">Section 8.1</span></a></p>
+					<p style="text-align: left;">-1&#160;V to MAX +1&#160;V</p>
+					<p style="text-align: left;">The maximum value is dependent on the power module voltage rating. See <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-parameters-and-settings.html#programming_parameters"><span style="text-decoration: underline;">Section </span></a><a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-parameters-and-settings.html#programming_parameters"><span style="text-decoration: underline;">8.1</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 16%;">
 					<p style="text-align: center;">–</p>
@@ -1121,6 +1106,7 @@
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>CALibration:SAVE</p>
 					<p>CALibration:STATe</p>
+					<p>CALibration:VOLTage:LEVel</p>
 					<p>INSTrument:NSELect</p>
 					<p>INSTrument[:SELect]</p>
 				</td>
@@ -1133,15 +1119,7 @@
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">CALibration:VOLTage:LEVel {&lt;level&gt;}</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Modules</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405">&#160;DCP405&#160;</span>&#160;<span class="DCP405B">&#160;DCP405B&#160;</span>&#160;<span class="DCM220">&#160;DCM220&#160;</span></p>
+					<p class="cmd_root">CALibration:VOLTage:LEVel {&lt;point&gt;, &lt;level&gt;}</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1149,15 +1127,11 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This command can only be used when calibration is enabled and the output state of the currently selected channel is ON. It sets the power module to a calibration point that is entered with the CAL:VOLT[:DATA] command. During calibration, three points must be entered and the low-end point (MIN) must be selected and entered first. </p>
-					<p>&#160;</p>
-					<p class="note">This command will set output current to 50&#160;mA.</p>
-					<p class="note">&#160;</p>
-					<p class="note">When calibration LEVel is set it’s possible to override its default value using the VOLTage command.</p>
+					<p>This command can only be used when calibration is enabled and the output state of the currently selected channel is ON. It sets the power module to a calibration point that is entered with the CAL:VOLT[:DATA] command.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
-				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+				<td rowspan="3" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Parameters</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 29%;">
@@ -1175,13 +1149,27 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 29%;">
+					<p>&lt;point&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 15%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">1 – 20</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 29%;">
 					<p>&lt;level&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 15%;">
-					<p style="text-align: center;">Discrete</p>
+					<p style="text-align: center;">NR2</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p>MIN|MID|MAX (see also <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-parameters-and-settings.html#programming_parameters"><span style="text-decoration: underline;">Section 8.1</span></a>)</p>
+					<p style="text-align: left;">0 to MAX (see also <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-parameters-and-settings.html#programming_parameters"><span style="text-decoration: underline;">Section 8.1</span></a>)</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
 					<p style="text-align: center;">–</p>
@@ -1218,6 +1206,7 @@
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>CALibration:STATe</p>
+					<p>CALibration:VOLTage[:DATA]</p>
 					<p>INSTrument:NSELect</p>
 					<p>INSTrument[:SELect]</p>
 					<p>[SOURce[&lt;n&gt;]]:VOLTage</p>

@@ -651,7 +651,7 @@
 					<p class="cmd_code">&#160;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">For voltage calibration, connect a digital voltmeter (DVM) across the power module’s output terminals.</p>
+					<p class="table_body">For voltage calibration, connect a voltmeter across the power module’s output terminals.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -659,10 +659,10 @@
 					<p style="text-align: center;">7</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
-					<p class="cmd_code">CAL:VOLT:LEV MIN</p>
+					<p class="cmd_code">CAL:VOLT:LEV 1,0.15</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">Set the channel to the low-end (MIN) calibration point.</p>
+					<p class="table_body">Set the channel to the first calibration point and output voltage to 150&#160;mV</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -670,10 +670,10 @@
 					<p style="text-align: center;">8</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
-					<p class="cmd_code">CAL:VOLT 81.8MV</p>
+					<p class="cmd_code">CAL:VOLT 0.1455</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">Enter the reading you obtained from the external DVM.</p>
+					<p class="table_body">Enter the reading you obtained from the external voltmeter.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -681,10 +681,10 @@
 					<p style="text-align: center;">9</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
-					<p class="cmd_code">CAL:VOLT:LEV MID</p>
+					<p class="cmd_code">CAL:VOLT:LEV 2,38</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">Set the channel to the middle (MID) calibration point.</p>
+					<p class="table_body">Set the channel to the second calibration point and output voltage 38&#160;V</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -692,10 +692,10 @@
 					<p style="text-align: center;">10</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
-					<p class="cmd_code">CAL:VOLT 19.68</p>
+					<p class="cmd_code">CAL:VOLT 39.292</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">Enter the reading you obtained from the DVM.</p>
+					<p class="table_body">Enter the reading you obtained from the voltmeter.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -703,10 +703,10 @@
 					<p style="text-align: center;">11</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
-					<p class="cmd_code">CAL:VOLT:LEV MAX</p>
+					<p class="cmd_code">&#160;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">Set the channel to the high (MAX) calibration point.</p>
+					<p class="table_body">For current calibration, connect current monitoring resistor (shunt) across the output terminals and connect the ammeter across the shunt resistor. Its resistance has to be less then 5&#160;Ω and rated for 25&#160;W or more for measuring MAX current level. </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -714,10 +714,10 @@
 					<p style="text-align: center;">12</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
-					<p class="cmd_code">CAL:VOLT 39.2</p>
+					<p class="cmd_code">CAL:CURR:RANG LOW</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">Enter the reading you obtained from the DVM.</p>
+					<p class="table_body">Set low current range (i.e. 0&#160;–&#160;50&#160;mA).</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -725,10 +725,10 @@
 					<p style="text-align: center;">13</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
-					<p class="cmd_code">&#160;</p>
+					<p class="cmd_code">CAL:CURR:LEV 1,0.0005</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">For current calibration, connect current monitoring resistor (shunt) across the output terminals and connect the DVM across the shunt resistor. Its resistance has to be less then 5&#160;Ω and rated for 25&#160;W or more for measuring MAX current level. </p>
+					<p class="table_body">Set the channel to the first calibration point and output current to 0.5&#160;mA.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -736,10 +736,10 @@
 					<p style="text-align: center;">14</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
-					<p class="cmd_code">&#160;</p>
+					<p class="cmd_code">CAL:CURR 0.000592</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">Repeat step 7 through step 12 by substituting CURR for VOLT for current calibration. For example, CAL:CURR:LEV MIN.</p>
+					<p class="table_body">Enter the reading you obtained from the external ammeter.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -747,27 +747,93 @@
 					<p style="text-align: center;">15</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
-					<p class="cmd_code">CAL_CURR:RANG LOW</p>
+					<p class="cmd_code">CAL:CURR:LEV 2,0.048</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">For low current range (i.e. 0&#160;–&#160;50&#160;mA) calibration use this command to change the range and repeat once again procedure mentioned in step 14.</p>
+					<p class="table_body">Set the channel to the second calibration point and output current to 48&#160;mA.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 6%;">
 					<p style="text-align: center;">16</p>
-					<p style="text-align: center;">&#160;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
-					<p class="cmd_code">CAL:REM &quot;&lt;string&gt;&quot;</p>
+					<p class="cmd_code">CAL:CURR 0.049863</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">Record calibration information such as next calibration due date for future reference. The calibration string may contain up to 40 characters. You don’t need to enter current date and time since that information will be recorded automatically.</p>
+					<p class="table_body">Enter the reading you obtained from the ammeter.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 6%;">
 					<p style="text-align: center;">17</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
+					<p class="cmd_code">CAL:CURR:RANG HIGH</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
+					<p class="table_body">Set high current range (i.e. 0&#160;–&#160;5&#160;A).</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 6%;">
+					<p style="text-align: center;">18</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
+					<p class="cmd_code">CAL:CURR:LEV 1,0.005</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
+					<p class="table_body">Set the channel to the first calibration point and output current to 50&#160;mA.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 6%;">
+					<p style="text-align: center;">19</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
+					<p class="cmd_code">CAL:CURR 0.00603</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
+					<p class="table_body">Enter the reading you obtained from the external ammeter.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 6%;">
+					<p style="text-align: center;">20</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
+					<p class="cmd_code">CAL:CURR:LEV 2,4.8</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
+					<p class="table_body">Set the channel to the second calibration point and output current to 4.8&#160;A.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 6%;">
+					<p style="text-align: center;">21</p>
+					<p style="text-align: center;">&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
+					<p class="cmd_code">CAL:CURR 5.0731</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
+					<p class="table_body">Enter the reading you obtained from the ammeter.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 6%;">
+					<p style="text-align: center;">22</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
+					<p class="cmd_code">CAL:REM &quot;&lt;string&gt;&quot;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
+					<p class="table_body">Record calibration information such as next calibration due date for future reference. The calibration string may contain up to 32 characters. You don’t need to enter current date and time since that information will be recorded automatically.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 6%;">
+					<p style="text-align: center;">23</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
 					<p class="cmd_code">CAL:SAVE</p>
@@ -778,7 +844,7 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 6%;">
-					<p style="text-align: center;">18</p>
+					<p style="text-align: center;">24</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
 					<p class="cmd_code">CAL OFF, &quot;&lt;password&gt;&quot;</p>
@@ -789,7 +855,7 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 6%;">
-					<p style="text-align: center;">19</p>
+					<p style="text-align: center;">25</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 28%;">
 					<p class="cmd_code">SYST:REM</p>

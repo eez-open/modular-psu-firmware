@@ -20,8 +20,8 @@
 			li { text-align: justify; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; text-indent: 0; background: transparent; font-family: "Arial"; font-size: 10.5pt; font-weight: normal; font-style: normal; }
 			.cmd_code { text-align: left; font-family: "Courier New"; }
 			.cmd_code_Start { text-align: left; margin-top: 1.99mm; font-family: "Courier New"; }
+			.cmd_code_single { text-align: left; margin-top: 1.99mm; margin-bottom: 1.99mm; font-family: "Courier New"; }
 			.cmd_root { text-align: left; color: #0066cc; }
-			.note { font-style: italic; }
 			.scpi0 { text-align: left; }
 			.scpi1 { text-align: left; margin-left: 4.99mm; }
 			.scpi2 { text-align: left; margin-left: 10mm; }
@@ -73,30 +73,6 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 40%;">
-					<p class="scpi1"><a href="#disp_cmap"><span style="text-decoration: underline;">:CMAP {&lt;palette&gt;}</span></a></p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
-					<p>Sets color palette (theme)</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 40%;">
-					<p class="scpi1"><a href="#disp_cmap_col_cat"><span style="text-decoration: underline;">:CMAP:COLor:CATalog?</span></a></p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
-					<p>Returns names and RGB values of all available colors</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 40%;">
-					<p class="scpi1"><a href="#disp_cmap_col_rgb"><span style="text-decoration: underline;">:CMAP:COLor[:RGB] {&lt;name&gt;, &lt;red&gt;, &lt;green&gt;, &lt;blue&gt;}</span></a></p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
-					<p>Sets RGB value for the selected color</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 40%;">
 					<p class="scpi1"><a href="#disp_data"><span style="text-decoration: underline;">:DATA?</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
@@ -137,18 +113,18 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 40%;">
-					<p class="scpi3"><a href="#disp_dial"><span style="text-decoration: underline;">[:OPEN]</span></a></p>
+					<p class="scpi3"><a href="#disp_dial"><span style="text-decoration: underline;">[:OPEN] {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
-					<p>&#160;</p>
+					<p>Displays content of the resource file</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 40%;">
-					<p class="scpi3"><a href="#disp_dial_acti"><span style="text-decoration: underline;">:ACTIon?</span></a></p>
+					<p class="scpi3"><a href="#disp_dial_acti"><span style="text-decoration: underline;">:ACTIon? [&lt;timeout&gt;]</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
-					<p>&#160;</p>
+					<p>Returns information about selected item</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -156,20 +132,20 @@
 					<p class="scpi3">:<a href="#disp_dial_clos"><span style="text-decoration: underline;">CLOSe</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
-					<p>&#160;</p>
+					<p>Closes last opened dialog window</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 40%;">
-					<p class="scpi3"><a href="#disp_dial_data"><span style="text-decoration: underline;">:DATA</span></a></p>
+					<p class="scpi3"><a href="#disp_dial_data"><span style="text-decoration: underline;">:DATA {&lt;name&gt;}, {&lt;type&gt;}, [{&lt;unit&gt;}], {&lt;value&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
-					<p>&#160;</p>
+					<p>Sets the value of the dialog data item</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 40%;">
-					<p class="scpi2"><a href="#disp_dlog"><span style="text-decoration: underline;">:DLOG</span></a></p>
+					<p class="scpi2"><a href="#disp_dlog"><span style="text-decoration: underline;">:DLOG [&lt;filename&gt;]</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
 					<p>Opens DLOG viewer</p>
@@ -177,26 +153,26 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 40%;">
-					<p class="scpi2"><a href="#disp_err"><span style="text-decoration: underline;">:ERRor</span></a></p>
+					<p class="scpi2"><a href="#disp_err"><span style="text-decoration: underline;">:ERRor {&lt;message&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
-					<p>&#160;</p>
+					<p>Displays message box and generates error beep tone</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 40%;">
-					<p class="scpi2"><a href="#disp_inpu"><span style="text-decoration: underline;">:</span></a><a href="#disp_inpu"><span style="text-decoration: underline;">INPUt? {&lt;label&gt;}, {&lt;type&gt;} [, &lt;min&gt;, &lt;max&gt;, &lt;value&gt;]</span></a></p>
+					<p class="scpi2"><a href="#disp_inpu"><span style="text-decoration: underline;">:INPUt? {&lt;label&gt;}, {&lt;type&gt;} [, &lt;min&gt;, &lt;max&gt;, &lt;value&gt;]</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
-					<p>Displays entry form and wait for input on the front panel TFT display</p>
+					<p>Displays entry form and waits for input on the front panel TFT display</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 40%;">
-					<p class="scpi2"><a href="#disp_sel"><span style="text-decoration: underline;">:SELect?</span></a></p>
+					<p class="scpi2"><a href="#disp_sel"><span style="text-decoration: underline;">:SELect? {&lt;defaultSelection&gt;, {&lt;optionText&gt;}[, ...]</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 60%;">
-					<p>&#160;</p>
+					<p>Displays pop-up display with multiple radio buttons</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -292,274 +268,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.4.2. <a name="disp_cmap"></a>DISPlay:CMAP</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DISPlay:CMAP {&lt;palette&gt;}</p>
-					<p class="cmd_root">DISPlay:CMAP?</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="note">Not implemented yet</p>
-					<p class="note">&#160;</p>
-					<p>Use this command to set any of predefined or custom color palette (theme) of the front panel TFT display.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Parameters</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 23%;">
-					<p style="text-align: center;">Name</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">Type</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">Range</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">Default</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
-					<p>&lt;palette&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">Discrete</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p>CUSTom|DEFault|DARK|LIGHt</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">DEFault</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Return</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This query returns selected front panel's TFT display color palette.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">DISP:CMAP?</p>
-					<p class="cmd_code_Start">&quot;DEF&quot;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>DISPlay:CMAP:CATalog?</p>
-					<p>DISPlay:CMAP:COLor[:RGB]</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.4.3. <a name="disp_cmap_col_cat"></a>DISPlay:CMAP:COLor:CATalog?</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DISPlay:CMAP:COLor:CATalog?</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="note">Not implemented yet</p>
-					<p class="note">&#160;</p>
-					<p>This query requests a list of defined color names and their RGB values.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Return</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Returns a comma separated list of all currently available color names (as quoted string) that follows three NR1 values for red, green and blue color components.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">DISP:CMAP:COL:CAT?</p>
-					<p class="cmd_code_Start">&quot;background&quot;, 0, 0, 0, &quot;foreground&quot;, 255, 255, 255</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>DISPlay:CMAP</p>
-					<p>DISPlay:CMAP:COLor[:RGB]</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.4.4. <a name="disp_cmap_col_rgb"></a>DISPlay:CMAP:COLor[:RGB]</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DISPlay:CMAP {&lt;name&gt;, &lt;red&gt;, &lt;green&gt;, &lt;blue&gt;} [, &lt;name&gt;, &lt;red&gt;, &lt;green&gt;, &lt;blue&gt;]</p>
-					<p class="cmd_root">DISPlay:CMAP:COLor[:RGB]? {&lt;name&gt;}</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="note">Not implemented yet</p>
-					<p class="note">&#160;</p>
-					<p>Use this command to define RGB values of one or more colors specified by their &lt;name&gt; of the CUSTom palette (use DISPlay:CMAP command to set and query currently selected palette). Error -221 will be generated If other the CUSTom palette is selected.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Parameters</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 23%;">
-					<p style="text-align: center;">Name</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">Type</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">Range</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">Default</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
-					<p>&lt;name&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">Quoted string</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">4 to 16 characters </p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">–</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
-					<p>&lt;red&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">NR1</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">0 – 255</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">–</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
-					<p>&lt;green&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">NR1</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">0 – 255</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">–</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
-					<p>&lt;blue&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">NR1</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">0 – 255</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">–</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Return</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This query returns specified front panel's TFT display color.</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">DISP:CMAP:COL &quot;background&quot;, 255, 0, 0 </p>
-					<p class="cmd_code">DISP:CMAP:COL? &quot;background&quot; </p>
-					<p class="cmd_code_Start">255, 0, 0</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Errors</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">-221,&quot;Settings conflict&quot; </p>
-					<p class="cmd_code">-222,&quot;Data out of range&quot; </p>
-					<p class="cmd_code">-223,&quot;Too much data&quot;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>DISPlay:CMAP</p>
-					<p>DISPlay:CMAP:CATalog?</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.4.5. <a name="disp_data"></a>DISPlay:DATA?</p>
+		<p class="Heading_3">5.4.2. <a name="disp_data"></a>DISPlay:DATA?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -606,7 +315,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.4.6. <a name="disp_view"></a>DISPlay:VIEW</p>
+		<p class="Heading_3">5.4.3. <a name="disp_view"></a>DISPlay:VIEW</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -688,7 +397,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.4.7. <a name="disp_stat"></a>DISPlay[:WINdow][:STATe]</p>
+		<p class="Heading_3">5.4.4. <a name="disp_stat"></a>DISPlay[:WINdow][:STATe]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -765,224 +474,14 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.4.8. <a name="disp_dial"></a>DISPlay[:WINdow]:DIALog[:OPEN]</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DISPlay[:WINdow]:DIALog[:OPEN]</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">DISP:DIAL</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.4.9. <a name="disp_dial_acti"></a>DISPlay[:WINdow]:DIALog:ACTIon</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DISPlay[:WINdow]:DIALog:ACTIon?</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">DISP:ACTI</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.4.10. <a name="disp_dial_clos"></a>DISPlay[:WINdow]:DIALog:CLOSe</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DISPlay[:WINdow]:DIALog:CLOSe</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">DISP:CLOS</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.4.11. <a name="disp_dial_data"></a>DISPlay[:WINdow]:DIALog:DATA</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DISPlay[:WINdow]:DIALog:DATA</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">DISP:DATA</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.4.12. <a name="disp_dlog"></a>DISPlay[:WINdow]:DLOG</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DISPlay[:WINdow]:DLOG</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">DISP:DLOG</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.4.13. <a name="disp_err"></a>DISPlay[:WINdow]:ERRor</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Syntax</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DISPlay[:WINdow]:ERRor</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Description</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">DISP:ERR</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-		</table>
-		<p class="Heading_3">5.4.14. <a name="disp_inpu"></a>DISPlay[:WINdow]:INPUt </p>
+		<p class="Heading_3">5.4.5. <a name="disp_dial"></a>DISPlay[:WINdow]:DIALog[:OPEN]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DISPlay[:WINdow]:INPUt? {&lt;label&gt;}, {&lt;type&gt;} [, &lt;min&gt;, &lt;max&gt;, &lt;value&gt;]</p>
+					<p class="cmd_root">DISPlay[:WINdow]:DIALog[:OPEN] {&lt;filename&gt;}</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -990,7 +489,8 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
+					<p>Use this command to draw new page defined with resource file created in EEZ Studio and contains page widgets, actions and data items. The resource file has to be located on the SD card (see MMEMory subsystem) and the full path to the file must be specified. </p>
+					<p>The new displayed page can be closed (removed) by using the DISPlay[:WINdow]:DIALog:CLOSe to close the page.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1012,15 +512,372 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p>&lt;filename&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Quoted string</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">DISP:DIAL &quot;/Scripts/Diode Tester.res&quot;</p>
+					<p class="cmd_code">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>DISPlay[:WINdow]:DIALog:CLOSe</p>
+					<p>DISPlay[:WINdow]:DIALog:DATA</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.4.6. <a name="disp_dial_acti"></a>DISPlay[:WINdow]:DIALog:ACTIon</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">DISPlay[:WINdow]:DIALog:ACTIon? [&lt;timeout&gt;]</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>This command waits for timeout (in seconds) to get information about what action item is selected on the currently displayed page as defined in resource file activated with the DISPlay[:WINdow]:DIALog[:OPEN] command. The default timeout value is 0 and command will wait until user select one of the action items.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p>&lt;timeout&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">0</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Returns name of the latest action item selected by user. 0 will be returned if currently opened page does not contain any action dialog. 1 is returned when timeout parameter is used and set time expired without user action.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">DISP:DIAL:ACTI?</p>
+					<p class="cmd_code_Start">&quot;input_diode_name&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>DISPlay[:WINdow]:DIALog[:OPEN]</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.4.7. <a name="disp_dial_clos"></a>DISPlay[:WINdow]:DIALog:CLOSe</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">DISPlay[:WINdow]:DIALog:CLOSe</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to close last dialog window opened with the DISPlay[:WINdow]:DIALog[:OPEN] command.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">DISP:DIAL:CLOS</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>DISPlay[:WINdow]:DIALog[:OPEN]</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.4.8. <a name="disp_dial_data"></a>DISPlay[:WINdow]:DIALog:DATA</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">DISPlay[:WINdow]:DIALog:DATA {&lt;name&gt;}, {&lt;type&gt;}, [{&lt;unit&gt;}], {&lt;value&gt;}</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to set the value of the dialog data item defined as &lt;name&gt;. The list of possible data items is defined within the dialog resource file created in the EEZ Studio and specified with the DISPlay[:WINdow]:DIALog:OPEN command.</p>
+					<p>&#160;</p>
+					<p>If &lt;type&gt; is FLOat then &lt;unit&gt; has to be specified, too.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 15%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 24%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 32%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 17%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 15%;">
+					<p>&lt;name&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 24%;">
+					<p style="text-align: center;">Quoted string</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 32%;">
+					<p style="text-align: center;">&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 17%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 15%;">
+					<p>&lt;type&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 24%;">
+					<p style="text-align: center;">NR1|NR3|Quoted string</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 32%;">
+					<p style="text-align: center;">INTeger|FLOat|STRing</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 17%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 15%;">
+					<p>&lt;unit&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 24%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 32%;">
+					<p style="text-align: center;">UNKNown|VOLT| AMPEr|WATT|JOULe|SECOnd|OHM|FARAd|HERTz</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 17%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">DISP:DIAL:DATA &quot;test&quot;, INT</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>DISPlay[:WINdow]:DIALog:OPEN</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.4.9. <a name="disp_dlog"></a>DISPlay[:WINdow]:DLOG</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">DISPlay[:WINdow]:DLOG [&lt;filename&gt;]</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>This command opens DLOG viewer and displays specified by filename. If filename is omitted it displays the last log file during or after recording is finished.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">DISP:DLOG &quot;Recording/test_log.dlog&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>INITiate:DLOG</p>
+					<p>INITiate:DLOG:TRACe</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.4.10. <a name="disp_err"></a>DISPlay[:WINdow]:ERRor</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">DISPlay[:WINdow]:ERRor {&lt;message&gt;}</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to display message box and generates error beep tone.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">DISP:ERR &quot;Test message!&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>DISPlay[:WINdow]:TEXT</p>
+					<p>SYSTem:BEEPer[:IMMediate]</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.4.11. <a name="disp_inpu"></a>DISPlay[:WINdow]:INPut </p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">DISPlay[:WINdow]:INPut? {&lt;label&gt;}, {&lt;type&gt;} [, &lt;min&gt;, &lt;max&gt;, &lt;value&gt;]</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to define input field on the display that can returns a value of type &lt;type&gt; which can be TEXT | NUMBer | INTeger | MENU. The following variants are possible:</p>
+					<ul>
+						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">DISPlay[:WINdow]:INPut? {&lt;label&gt;}, TEXT, &lt;min_length&gt;, &lt;max_length&gt;, &lt;value&gt;</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc;">DISPlay[:WINdow]:INPut? {&lt;label&gt;}, NUMBer, &lt;unit&gt;, &lt;min&gt;, &lt;max&gt;, &lt;value&gt;</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc;">DISPlay[:WINdow]:INPut? {&lt;label&gt;}, INTeger, &lt;min&gt;, &lt;max&gt;, &lt;value&gt;</li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">DISPlay[:WINdow]:INPut? {&lt;label&gt;}, MENU, &lt;menu_type&gt;, &lt;menu_item&gt;, [… &lt;menu_item&gt;]</li>
+					</ul>
+					<p>&lt;min&gt; and &lt;max&gt; values should be defined for TEXT, NUMBer and INTeger. </p>
+					<p>For NUMBer and INTeger this is the minimum and maximum allowable value, and for STRing it is the minimum and maximum allowable text length. NUMBer should also be set to &lt;unit&gt; (see above which units are allowed). </p>
+					<p>If &lt;type&gt; is MENU then you should set &lt;menu_type&gt; (which can only be BUTTon) and up to max. 4 menu items (button texts) to be offered for selection. </p>
+					<p>A numeric keypad will be open for NUMBer and INTeger, and a full keypad will be open for TEXT. The default &lt;label&gt; (quoted string) will be displayed on the screen. </p>
+					<p>In all variants except MENU (where no need to be specified), the &lt;value&gt; parameter is the initial (or default) value.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 29%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 18%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
 					<p>&lt;label&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
+					<p style="text-align: center;">Quoted string</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 29%;">
 					<p style="text-align: center;">–</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
 					<p style="text-align: center;">–</p>
 				</td>
 			</tr>
@@ -1028,67 +885,16 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
 					<p>&lt;type&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
+					<p style="text-align: center;">Discrete</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 29%;">
+					<p style="text-align: center;">TEXT|NUMBer|MENU</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
-					<p>&lt;min&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
-					<p>&lt;max&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
-					<p>&lt;value&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
 					<p style="text-align: center;">&#160;</p>
 				</td>
 			</tr>
@@ -1097,7 +903,7 @@
 					<p class="Default_nt2">Return</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
+					<p>This query returns value of defined type.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1105,46 +911,107 @@
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p style="font-family: &quot;Courier New&quot;;">&#160;</p>
+					<p style="font-family: &quot;Courier New&quot;;">DISP:INP? &quot;Enter you text&quot;, TEXT, 2, 10, &quot;Hello&quot;</p>
+					<p class="cmd_code_Start">&quot;Test&quot;</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.4.15. <a name="disp_sel"></a>DISPlay[:WINdow]:DIALog:SELect?</p>
+		<p class="Heading_3">5.4.12. <a name="disp_sel"></a>DISPlay[:WINdow]:SELect?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">DISPlay[:WINdow]:DIALog:SELect?</p>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">DISPlay[:WINdow]:SELect? {&lt;defaultSelection&gt;, {&lt;optionText&gt;}[, ...]</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Description</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Display pop-up display with multiple radio buttons. The &lt;defaultSelection&gt; specify which of the presented option will be selected by default.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p>&lt;defaultSelection&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">1 to the total number of options</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p>&lt;optionText&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Quoted string</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query returns NR1 value of the selected option.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">DISP:SEL?</p>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Default option is 2 and query returns 3 when &quot;Option 3&quot; is selected:</p>
+					<p class="cmd_code_single">DISP:SEL? 2, &quot;Option 1&quot;, &quot;Option 2&quot;, &quot;Option 3&quot;</p>
+					<p class="cmd_code">3</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Related Commands</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>DISPlay[:WINdow]:DIALog:CLOSe</p>
+					<p>DISPlay[:WINdow]:DIALog:DATA</p>
+					<p>DISPlay[:WINdow]:INPut</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.4.16. <a name="disp_text"></a>DISPlay[:WINdow]:TEXT </p>
+		<p class="Heading_3">5.4.13. <a name="disp_text"></a>DISPlay[:WINdow]:TEXT </p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1211,8 +1078,16 @@
 					<p class="cmd_code_Start">DISP:TEXT &quot;Hello world&quot;</p>
 				</td>
 			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>DISPlay[:WINdow]:TEXT:CLEar</p>
+				</td>
+			</tr>
 		</table>
-		<p class="Heading_3">5.4.17. <a name="disp_text_cle"></a>DISPlay[:WINdow]:TEXT:CLEar</p>
+		<p class="Heading_3">5.4.14. <a name="disp_text_cle"></a>DISPlay[:WINdow]:TEXT:CLEar</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1244,6 +1119,14 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_code">DISP:TEXT:CLE</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>DISPlay[:WINdow]:TEXT </p>
 				</td>
 			</tr>
 		</table>

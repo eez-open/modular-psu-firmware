@@ -270,7 +270,7 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
 					<p>Command or query could not be executed because of missing BB3 hardware.</p>
 					<p>&#160;</p>
-					<p>Example (remote sense cannot be activated on the DCP405B power module):</p>
+					<p>Example (remote sense cannot be activated on the DCM220 power module):</p>
 					<p class="cmd_code_single">OUTP:SENS ON</p>
 				</td>
 			</tr>
@@ -610,41 +610,54 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
-					<p class="cmd_code">201,&quot;Cannot execute before clearing protection&quot;</p>
+					<p class="cmd_code">159, &quot;Module total power limit exceeded&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>Example:  a command such as OUTP ON cannot be executed on a channel where one or more protections will be tripped.</p>
+					<p>Set power on module with multiple channels exceeds total power limitation. </p>
+					<p>&#160;</p>
+					<p>Example, an attempt to set 80&#160;W (160&#160;W in total) on both channels while module total power limit is 155&#160;W:</p>
+					<p>&#160;</p>
+					<p class="cmd_code">APPL CH1, 20, 4</p>
+					<p class="cmd_code">APPL CH2, 20, 4</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
-					<p class="cmd_code">270,&quot;CH1 ADC timeout detected&quot;</p>
+					<p class="cmd_code">201,&quot;Cannot execute before clearing protection&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
-					<p>Channel 1 has been switched off after 3 consecutive ADC timeouts were detected.</p>
+					<p>A command such as OUTP ON cannot be executed on a channel where one or more protections tripped.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
-					<p class="cmd_code">304,&quot;Incompatible transient modes&quot;</p>
+					<p class="cmd_code">202,&quot;Cannot init trigger while Rprog is enabled&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
+					<p>Trigger initialization failed because remote programming option is active on one or more channels (see [SOURce[&lt;n&gt;]]:VOLTage:PROGram[:SOURce])</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
+					<p class="cmd_code">304,&quot;Incompatible transient modes&quot;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
 					<p>For example, VOLTage and CURRent cannot be in both STEP and LIST modes at the same time (see [SOURce[&lt;n&gt;]]:CURRent:MODE and [SOURce[&lt;n&gt;]]:VOLTage:MODE)</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
 					<p class="cmd_code">306,&quot;Too many list points&quot;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
 					<p>Too many list points have been specified.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
 					<p class="cmd_code">307,&quot;List lengths are not equivalent&quot;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
 					<p>One or more lists are not the same length. </p>
 					<p>&#160;</p>
 					<p>For example, number of CURRent steps is not equal to one or number of VOLTage steps</p>
@@ -653,53 +666,61 @@
 				</td>
 			</tr>
 			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
 					<p class="cmd_code">308,&quot;Cannot be changed while transient trigger is initiated&quot;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
 					<p>An attempt to change a setting which cannot be changed while the instrument is waiting for or executing a trigger sequence.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
 					<p class="cmd_code">309,&quot;Cannot initiate while in fixed mode&quot;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
 					<p>Cannot initiate transient generator. Either the VOLTage or CURRent function is set to FIXed mode.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
-					<p class="cmd_code">310,&quot;List not found&quot;</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p class="cmd_code">310,&quot;File not found&quot;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
-					<p>A list cannot be found on the SD card.</p>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
+					<p>A file cannot be found on the SD card.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
 					<p class="cmd_code">311,&quot;List is empty&quot;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
 					<p>A list cannot be started because it’s empty.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
 					<p class="cmd_code">312,&quot;Cannot execute when the channels are coupled&quot;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
 					<p>Cannot execute a command when the channel outputs are coupled. Example (an attempt to set remote sensing on the channel that is coupled in series):</p>
 					<p class="cmd_code_Start">INST:COUP:TRAC SER</p>
 					<p class="cmd_code">VOLT:SENS EXT</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
 					<p class="cmd_code">313,&quot;Cannot execute in tracking mode&quot;</p>
 				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
 					<p>Cannot execute a command when the tracking mode is active.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p class="cmd_code">314,&quot;Cannot set list value&quot;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
+					<p>List include one or more values that cannot be set on target instrument. For example, DCM220 dual output DC source output current can be set in 20&#160;mA increments. Setting current to 22&#160;mA will generate this error.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -787,7 +808,7 @@
 					<p class="cmd_code">511,&quot;External voltage on CH2 detected&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
-					<p>An external voltage has been measured (e.g., from a battery or other power source intentionally or mistakenly left connected) on Channel 2 while output is switched from off to on.  (<span style="font-style: italic;">Not im</span><span style="font-style: italic;">plemented yet</span>).</p>
+					<p>An external voltage has been measured (e.g., from a battery or other power source intentionally or mistakenly left connected) on Channel 2 while output is switched from off to on.  (<span style="font-style: italic;">Not implemented yet</span>).</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
