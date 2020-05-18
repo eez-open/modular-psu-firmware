@@ -182,7 +182,7 @@ struct DcpChannel : public Channel {
 		dac.init();
 	}
 
-	void reset() {
+	void reset() override {
 		Channel::reset();
 
 		uSet = 0;
@@ -191,7 +191,7 @@ struct DcpChannel : public Channel {
 		iBeforeBalancing = NAN;
 	}
 
-	bool test() {
+	bool test() override {
         flags.powerOk = 0;
 
         doRemoteSensingEnable(false);
@@ -204,7 +204,7 @@ struct DcpChannel : public Channel {
 		return isOk();
 	}
 
-	TestResult getTestResult() {
+	TestResult getTestResult() override {
 		if (ioexp.g_testResult == TEST_NONE || adc.g_testResult == TEST_NONE || dac.g_testResult == TEST_NONE) {
 			return TEST_NONE;
 		}
@@ -228,7 +228,7 @@ struct DcpChannel : public Channel {
 		return ADC_DATA_TYPE_U_MON;
 	}
 
-	void tickSpecific(uint32_t tickCount) {
+	void tickSpecific(uint32_t tickCount) override {
 		if (isDacTesting()) {
 			return;
 		}
@@ -341,15 +341,15 @@ struct DcpChannel : public Channel {
 		}
 	}
 
-	unsigned getRPol() {
+	unsigned getRPol() override {
 		return !ioexp.testBit(IOExpander::IO_BIT_IN_RPOL);
 	}
 
-	bool isInCcMode() {
+	bool isInCcMode() override {
 		return ioexp.testBit(IOExpander::IO_BIT_IN_CC_ACTIVE);
 	}
 
-	bool isInCvMode() {
+	bool isInCvMode() override {
 		return ioexp.testBit(IOExpander::IO_BIT_IN_CV_ACTIVE);
 	}
 
@@ -367,7 +367,7 @@ struct DcpChannel : public Channel {
 #endif
     }
 
-	void adcMeasureUMon() {
+	void adcMeasureUMon() override {
 		adc.start(ADC_DATA_TYPE_U_MON);
 		waitConversionEnd();
 		onAdcData(ADC_DATA_TYPE_U_MON, adc.read());
@@ -377,7 +377,7 @@ struct DcpChannel : public Channel {
 		}
 	}
 
-	void adcMeasureIMon() {
+	void adcMeasureIMon() override {
 		adc.start(ADC_DATA_TYPE_U_MON);
 		waitConversionEnd();
 		onAdcData(ADC_DATA_TYPE_U_MON, adc.read());
@@ -387,7 +387,7 @@ struct DcpChannel : public Channel {
 		}
 	}
 
-	void adcMeasureMonDac() {
+	void adcMeasureMonDac() override {
 		if (isOk() || isDacTesting()) {
 			adc.start(ADC_DATA_TYPE_U_MON_DAC);
 			waitConversionEnd();
@@ -403,7 +403,7 @@ struct DcpChannel : public Channel {
 		}
 	}
 
-	void adcMeasureAll() {
+	void adcMeasureAll() override {
 		adc.start(ADC_DATA_TYPE_U_MON);
 		waitConversionEnd();
 		onAdcData(ADC_DATA_TYPE_U_MON, adc.read());
@@ -437,7 +437,7 @@ struct DcpChannel : public Channel {
 		}
 	}
 
-	void setOutputEnable(bool enable, uint16_t tasks) {
+	void setOutputEnable(bool enable, uint16_t tasks) override {
 		if (enable) {
 			// OE
 			if (tasks & OUTPUT_ENABLE_TASK_OE) {
@@ -545,7 +545,7 @@ struct DcpChannel : public Channel {
 		}
 	}
 
-    void setDprogState(DprogState dprogState) {
+    void setDprogState(DprogState dprogState) override {
 		Channel::setDprogState(dprogState);
 
 		if (dprogState == DPROG_STATE_OFF) {
@@ -556,22 +556,22 @@ struct DcpChannel : public Channel {
 		delayed_dp_off = false;
     }
     
-    void setRemoteSense(bool enable) {
+    void setRemoteSense(bool enable) override {
 		ioexp.changeBit(IOExpander::IO_BIT_OUT_REMOTE_SENSE, enable);
 	}
 
-	void setRemoteProgramming(bool enable) {
+	void setRemoteProgramming(bool enable) override {
 		ioexp.changeBit(IOExpander::IO_BIT_OUT_REMOTE_PROGRAMMING, enable);
 	}
 
-	void setDacVoltage(uint16_t value) {
+	void setDacVoltage(uint16_t value) override {
 		dac.setDacVoltage(value);
 
         uBeforeBalancing = NAN;
         restoreCurrentToValueBeforeBalancing(*this);
     }
 
-	void setDacVoltageFloat(float value) {
+	void setDacVoltageFloat(float value) override {
 		float previousUSet = uSet;
 
 		uSet = value;
@@ -607,24 +607,24 @@ struct DcpChannel : public Channel {
 		restoreCurrentToValueBeforeBalancing(*this);
 	}
 
-	void setDacCurrent(uint16_t value) {
+	void setDacCurrent(uint16_t value) override {
 		dac.setDacCurrent(value);
 
 		iBeforeBalancing = NAN;
 		restoreVoltageToValueBeforeBalancing(*this);
 	}
 
-	void setDacCurrentFloat(float value) {
+	void setDacCurrentFloat(float value) override {
 		dac.setCurrent(value);
 		iBeforeBalancing = NAN;
 		restoreVoltageToValueBeforeBalancing(*this);
 	}
 
-	bool isDacTesting() {
+	bool isDacTesting() override {
 		return dac.isTesting();
 	}
 
-	void doSetCurrentRange() {
+	void doSetCurrentRange() override {
 		auto &slot = *g_slots[slotIndex];
 
 		if (!hasSupportForCurrentDualRange()) {
@@ -661,23 +661,23 @@ struct DcpChannel : public Channel {
 		}
 	}
 
-    bool isVoltageBalanced() {
+    bool isVoltageBalanced() override {
         return !isNaN(uBeforeBalancing);
     }
 
-    bool isCurrentBalanced() {
+    bool isCurrentBalanced() override {
         return !isNaN(iBeforeBalancing);
     }
 
-    float getUSetUnbalanced() {
+    float getUSetUnbalanced() override {
         return isVoltageBalanced() ? uBeforeBalancing : u.set;
     }
 
-    float getISetUnbalanced() {
+    float getISetUnbalanced() override {
         return isCurrentBalanced() ? iBeforeBalancing : i.set;
     }
 
-	void readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
+	void readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]) override {
 		ioexp.readAllRegisters(ioexpRegisters);
 		adc.readAllRegisters(adcRegisters);
 	}
@@ -742,7 +742,7 @@ struct DcpChannel : public Channel {
 	}
 #endif
 
-    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) {
+    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) override {
         static float values[] = { 1.0f, 0.1f, 0.01f, 0.005f };
 		static float calibrationModeValues[] = { 1.0f, 0.1f, 0.01f, 0.001f };
         stepValues->values = calibrationMode ? calibrationModeValues : values;
@@ -750,7 +750,7 @@ struct DcpChannel : public Channel {
 		stepValues->unit = UNIT_VOLT;
 	}
     
-	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) {
+	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
         static float lowRangeValues[] = { 0.001f, 0.0001f, 0.00001f, 0.000005f };
 		static float calibrationModeLowRangeValues[] = { 0.001f, 0.0001f, 0.00001f, 0.000001f };
         static float highRangeValues[] = { 0.1f, 0.01f, 0.001f, 0.0005f }; 
@@ -765,14 +765,14 @@ struct DcpChannel : public Channel {
 		stepValues->unit = UNIT_AMPER;
 	}
 
-    void getPowerStepValues(StepValues *stepValues) {
+    void getPowerStepValues(StepValues *stepValues) override {
         static float values[] = { 10.0f, 1.0f, 0.1f, 0.01f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_WATT;
 	}	
 
-	bool isPowerLimitExceeded(float u, float i, int *err) {
+	bool isPowerLimitExceeded(float u, float i, int *err) override {
 		if (u * i > channel_dispatcher::getPowerLimit(*this)) {
 			if (err) {
 				*err = SCPI_ERROR_POWER_LIMIT_EXCEEDED;
@@ -786,7 +786,7 @@ struct DcpChannel : public Channel {
 struct DcpModuleInfo : public PsuModuleInfo {
 public:
 	DcpModuleInfo() 
-		: PsuModuleInfo(MODULE_TYPE_DCP405, "DCP405", "Envox", MODULE_REVISION_DCP405_R2B7, FLASH_METHOD_NONE, 1)
+		: PsuModuleInfo(MODULE_TYPE_DCP405, "DCP405", "Envox", MODULE_REVISION_DCP405_R2B11, FLASH_METHOD_NONE, 1)
 	{
 	}
 

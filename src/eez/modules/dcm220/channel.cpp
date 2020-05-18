@@ -186,12 +186,12 @@ struct DcmChannel : public Channel {
 	}
 
     void init() override;
-    void onPowerDown();
-    bool test();
-    TestResult getTestResult();
-    void tickSpecific(uint32_t tickCount);
+    void onPowerDown() override;
+    bool test() override;
+    TestResult getTestResult() override;
+    void tickSpecific(uint32_t tickCount) override;
 	
-	bool isInCcMode() {
+	bool isInCcMode() override {
 #if defined(EEZ_PLATFORM_STM32)
         return ccMode;
 #endif
@@ -201,27 +201,27 @@ struct DcmChannel : public Channel {
 #endif
 	}
 
-	bool isInCvMode() {
+	bool isInCvMode() override {
 		return !isInCcMode();
 	}
 
-	void adcMeasureUMon() {
+	void adcMeasureUMon() override {
 	}
 
-	void adcMeasureIMon() {
+	void adcMeasureIMon() override {
 	}
 
-	void adcMeasureMonDac() {
+	void adcMeasureMonDac() override {
 	}
 
-	void adcMeasureAll() {
+	void adcMeasureAll() override {
 	}
 
-	void setOutputEnable(bool enable, uint16_t tasks) {
+	void setOutputEnable(bool enable, uint16_t tasks) override {
 		outputEnable = enable;
 	}
 
-    void setDacVoltage(uint16_t value) {
+    void setDacVoltage(uint16_t value) override {
 
 #if defined(EEZ_PLATFORM_STM32)
         value = (uint16_t)clamp((float)value, (float)DAC_MIN, (float)DAC_MAX);
@@ -233,7 +233,7 @@ struct DcmChannel : public Channel {
 #endif
 	}
 
-	void setDacVoltageFloat(float value) {
+	void setDacVoltageFloat(float value) override {
 #if defined(EEZ_PLATFORM_STM32)
         value = remap(value, 0, (float)DAC_MIN, params.U_MAX, (float)DAC_MAX);
         uSet = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
@@ -244,7 +244,7 @@ struct DcmChannel : public Channel {
 #endif
 	}
 
-	void setDacCurrent(uint16_t value) {
+	void setDacCurrent(uint16_t value) override {
 #if defined(EEZ_PLATFORM_STM32)
         value = (uint16_t)clamp((float)value, (float)DAC_MIN, (float)DAC_MAX);
         iSet = value;
@@ -255,7 +255,7 @@ struct DcmChannel : public Channel {
 #endif
     }
 
-	void setDacCurrentFloat(float value) {
+	void setDacCurrentFloat(float value) override {
 #if defined(EEZ_PLATFORM_STM32)
         value = remap(value, /*params.I_MIN*/ 0, (float)DAC_MIN, /*params.I_MAX*/ I_MAX_FOR_REMAP, (float)DAC_MAX);
         iSet = (uint16_t)clamp(round(value), DAC_MIN, DAC_MAX);
@@ -266,11 +266,11 @@ struct DcmChannel : public Channel {
 #endif
 	}
 
-	bool isDacTesting() {
+	bool isDacTesting() override {
 		return false;
 	}
 
-    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) {
+    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) override {
         static float values[] = { 1.0f, 0.5f, 0.1f, 0.01f };
 		static float calibrationModeValues[] = { 1.0f, 0.1f, 0.01f, 0.001f };
         stepValues->values = calibrationMode ? calibrationModeValues : values;
@@ -278,7 +278,7 @@ struct DcmChannel : public Channel {
 		stepValues->unit = UNIT_VOLT;
 	}
     
-	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) {
+	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
         static float values[] = { 0.5f, 0.25f, 0.1f,  0.01f };
 		static float calibrationModeValues[] = { 0.05f, 0.01f, 0.005f,  0.001f };
         stepValues->values = calibrationMode ? calibrationModeValues : values;
@@ -286,14 +286,14 @@ struct DcmChannel : public Channel {
 		stepValues->unit = UNIT_AMPER;
 	}
 
-    void getPowerStepValues(StepValues *stepValues) {
+    void getPowerStepValues(StepValues *stepValues) override {
         static float values[] = { 10.0f, 1.0f, 0.1f, 0.01f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_WATT;
 	}
 	
-	bool isPowerLimitExceeded(float u, float i, int *err) {
+	bool isPowerLimitExceeded(float u, float i, int *err) override {
 		float power = u * i;
 		if (power > channel_dispatcher::getPowerLimit(*this)) {
 			if (err) {

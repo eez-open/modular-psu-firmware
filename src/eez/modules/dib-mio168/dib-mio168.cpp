@@ -76,11 +76,11 @@ public:
         memset(output, 0, sizeof(output));
     }
 
-    TestResult getTestResult() {
+    TestResult getTestResult() override {
         return testResult;
     }
 
-    void initChannels() {
+    void initChannels() override {
         if (!synchronized) {
             if (bp3c::comm::masterSynchro(slotIndex)) {
                 synchronized = true;
