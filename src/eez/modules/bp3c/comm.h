@@ -1,6 +1,6 @@
 /*
  * EEZ Modular Firmware
- * Copyright (C) 2015-present, Envox d.o.o.
+ * Copyright (C) 2020-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,27 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 #include <stdint.h>
 
+#pragma once
+
 namespace eez {
-namespace spi {
+namespace bp3c {
+namespace comm {
 
-static const int CHIP_DAC = 0;
-static const int CHIP_ADC = 1;
-static const int CHIP_IOEXP = 2;
-static const int CHIP_TEMP_SENSOR = 3;
-static const int CHIP_SLAVE_MCU = 4;
+bool masterSynchro(int slotIndex);
 
-void init(uint8_t slotIndex, int chip);
+bool transfer(int slotIndex, uint8_t *output, uint8_t *input, uint32_t bufferSize);
 
-void select(uint8_t slotIndex, int chip);
-void deselect(uint8_t slotIndex);
-
-void transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size);
-void transmit(uint8_t slotIndex, uint8_t *input, uint16_t size);
-void receive(uint8_t slotIndex, uint8_t *output, uint16_t size);
-
-} // namespace spi
+} // namespace comm
+} // namespace bp3c
 } // namespace eez

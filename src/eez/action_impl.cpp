@@ -26,6 +26,7 @@
 #include <eez/sound.h>
 #include <eez/index.h>
 #include <eez/mqtt.h>
+#include <eez/hmi.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -298,7 +299,7 @@ void action_show_edit_mode_slider_help() {
 }
 
 void action_show_slot_settings() {
-    selectSlot(getFoundWidgetAtDown().cursor);
+    hmi::selectSlot(getFoundWidgetAtDown().cursor);
     showPage(PAGE_ID_SLOT_SETTINGS);
 }
 
@@ -1182,7 +1183,7 @@ void action_select_user_switch_action() {
 void onSetModuleType(uint16_t moduleType) {
     g_frontPanelAppContext.popPage();
 
-    bp3c::eeprom::writeModuleType(g_selectedSlotIndex, moduleType);
+    bp3c::eeprom::writeModuleType(hmi::g_selectedSlotIndex, moduleType);
 
 #ifdef __EMSCRIPTEN__
     infoMessage("Reload page to apply change!");
@@ -1192,7 +1193,7 @@ void onSetModuleType(uint16_t moduleType) {
 }
 
 void selectSlotModuleType(int slotIndex) {
-    selectSlot(slotIndex);
+    hmi::selectSlot(slotIndex);
     pushSelectFromEnumPage(&g_frontPanelAppContext, ENUM_DEFINITION_MODULE_TYPE, g_slots[slotIndex]->moduleInfo->moduleType, NULL, onSetModuleType);
 }
 
@@ -1377,7 +1378,7 @@ void action_mqtt_edit_period() {
 
 void onFirmwareSelected(const char *filePath) {
     int err;
-    if (!bp3c::flash_slave::start(g_selectedSlotIndex, filePath, &err)) {
+    if (!bp3c::flash_slave::start(hmi::g_selectedSlotIndex, filePath, &err)) {
 		errorMessage("Failed to start update!");
     }
 }

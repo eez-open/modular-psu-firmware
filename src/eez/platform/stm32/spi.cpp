@@ -24,7 +24,6 @@
 #include <eez/index.h>
 
 namespace eez {
-namespace psu {
 namespace spi {
 
 static SPI_HandleTypeDef *spiHandle[] = { &hspi2, &hspi4, &hspi5 };
@@ -36,29 +35,8 @@ static const uint16_t SPI_CSA_Pin[] = { SPI2_CSA_Pin, SPI4_CSA_Pin, SPI5_CSA_Pin
 static const uint16_t SPI_CSB_Pin[] = { SPI2_CSB_Pin, SPI4_CSB_Pin, SPI5_CSB_Pin };
 
 void init(uint8_t slotIndex, int chip) {
-    // if (chip == CHIP_IOEXP ) {
-    // 	spiHandle[slotIndex]->Init.Direction = SPI_DIRECTION_2LINES;
-    //     WRITE_REG(spiHandle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
-
-	// 	spiHandle[slotIndex]->Init.DataSize = SPI_DATASIZE_8BIT;
-  	// 	WRITE_REG(spiHandle[slotIndex]->Instance->CR2, (((SPI_NSS_SOFT >> 16U) & SPI_CR2_SSOE) | SPI_TIMODE_DISABLE | SPI_NSS_PULSE_ENABLE | SPI_DATASIZE_8BIT) | SPI_RXFIFO_THRESHOLD_QF);
-    // } else if (chip == CHIP_TEMP_SENSOR) {
-    // 	spiHandle[slotIndex]->Init.Direction = SPI_DIRECTION_1LINE;
-    //     WRITE_REG(spiHandle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_1LINE  | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_32 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
-
-	// 	spiHandle[slotIndex]->Init.DataSize = SPI_DATASIZE_16BIT;
-  	// 	WRITE_REG(spiHandle[slotIndex]->Instance->CR2, (((SPI_NSS_SOFT >> 16U) & SPI_CR2_SSOE) | SPI_TIMODE_DISABLE | SPI_NSS_PULSE_ENABLE | SPI_DATASIZE_16BIT) | SPI_RXFIFO_THRESHOLD_HF);
-	// } else {
-	// 	// ADC & DAC
-	// 	spiHandle[slotIndex]->Init.Direction = SPI_DIRECTION_2LINES;
-    //     WRITE_REG(spiHandle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_2EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
-
-	// 	spiHandle[slotIndex]->Init.DataSize = SPI_DATASIZE_8BIT;
-  	// 	WRITE_REG(spiHandle[slotIndex]->Instance->CR2, (((SPI_NSS_SOFT >> 16U) & SPI_CR2_SSOE) | SPI_TIMODE_DISABLE | SPI_NSS_PULSE_ENABLE | SPI_DATASIZE_8BIT) | SPI_RXFIFO_THRESHOLD_QF);
-    // }
-
-    if (chip == CHIP_DCM220) {
-    	WRITE_REG(spiHandle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_64 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+    if (chip == CHIP_SLAVE_MCU) {
+    	WRITE_REG(spiHandle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
     } else if (chip == CHIP_IOEXP || chip == CHIP_TEMP_SENSOR) {
         WRITE_REG(spiHandle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
     } else {
@@ -87,16 +65,16 @@ void select(uint8_t slotIndex, int chip) {
 
 	auto &slot = *g_slots[slotIndex];
 
-	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220 || slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
-		selectA(slotIndex);
-		return;
-	}
-
 	__HAL_SPI_DISABLE(spiHandle[slotIndex]);
 
 	init(slotIndex, chip);
 
 	// __HAL_SPI_ENABLE(spiHandle[slotIndex]);
+
+	if (chip == CHIP_SLAVE_MCU) {
+		selectA(slotIndex);
+		return;
+	}
 
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
     	if (chip == CHIP_DAC) {
@@ -122,12 +100,12 @@ void select(uint8_t slotIndex, int chip) {
 
 void deselect(uint8_t slotIndex) {
 	auto &slot = *g_slots[slotIndex];
-	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220 || slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
-		deselectA(slotIndex);
-	} else if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
 		// 01 ADC
 		deselectA(slotIndex);
 		selectB(slotIndex);
+	} else {
+		deselectA(slotIndex);
 	}
 
 	taskEXIT_CRITICAL();
@@ -146,5 +124,4 @@ void receive(uint8_t slotIndex, uint8_t *output, uint16_t size) {
 }
 
 } // namespace spi
-} // namespace psu
 } // namespace eez

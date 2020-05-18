@@ -126,12 +126,6 @@ void boot() {
 
     bp3c::io_exp::init();
 
-    // inst:memo 1,0,2,406
-    // 1: slot no. (1, 2 or 3)
-    // 0: address
-    // 2: size of value (1 byte or 2 bytes)
-    // 406: value
-
     psu::ontime::g_mcuCounter.init();
 
     for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
@@ -145,7 +139,7 @@ void boot() {
         uint16_t moduleRevision = value[1];
         
         g_slots[slotIndex] = getModuleInfo(moduleType)->createModule(slotIndex, moduleRevision);
-        g_slots[slotIndex]->initChannels();
+        g_slots[slotIndex]->boot();
         
         if (moduleType != MODULE_TYPE_NONE) {
             psu::persist_conf::loadModuleConf(slotIndex);

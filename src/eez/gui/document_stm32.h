@@ -410,7 +410,13 @@ enum DataEnum {
     DATA_ID_SLOT_TITLE_DEF = 408,
     DATA_ID_SLOT_TITLE_MAX = 409,
     DATA_ID_SLOT_TITLE_MIN = 410,
-    DATA_ID_SLOT_TITLE_MICRO = 411
+    DATA_ID_SLOT_TITLE_MICRO = 411,
+    DATA_ID_MIO168_INPUTS = 412,
+    DATA_ID_MIO168_INPUT_NO = 413,
+    DATA_ID_MIO168_INPUT_STATE = 414,
+    DATA_ID_MIO168_OUTPUTS = 415,
+    DATA_ID_MIO168_OUTPUT_NO = 416,
+    DATA_ID_MIO168_OUTPUT_STATE = 417
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -825,6 +831,12 @@ void data_slot_title_def(DataOperationEnum operation, Cursor cursor, Value &valu
 void data_slot_title_max(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot_title_min(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot_title_micro(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mio168_inputs(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mio168_input_no(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mio168_input_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mio168_outputs(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mio168_output_no(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_mio168_output_state(DataOperationEnum operation, Cursor cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor cursor, Value &value);
 
@@ -1054,7 +1066,8 @@ enum ActionsEnum {
     ACTION_ID_CH_SETTINGS_CALIBRATION_VIEW_POINTS = 220,
     ACTION_ID_SHOW_TOUCH_CALIBRATION_INTRO = 221,
     ACTION_ID_TOGGLE_SLOT_MAX_VIEW = 222,
-    ACTION_ID_SHOW_SLOT_SETTINGS = 223
+    ACTION_ID_SHOW_SLOT_SETTINGS = 223,
+    ACTION_ID_MIO168_TOGGLE_OUTPUT_STATE = 224
 };
 
 void action_channel_toggle_output();
@@ -1280,6 +1293,7 @@ void action_ch_settings_calibration_view_points();
 void action_show_touch_calibration_intro();
 void action_toggle_slot_max_view();
 void action_show_slot_settings();
+void action_mio168_toggle_output_state();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -1853,4 +1867,4 @@ enum PagesEnum {
     PAGE_ID_DEBUG_POWER_CHANNELS = 174
 };
 
-extern const uint8_t assets[310122];
+extern const uint8_t assets[309946];

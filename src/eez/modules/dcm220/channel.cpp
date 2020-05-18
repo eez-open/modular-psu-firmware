@@ -28,17 +28,18 @@
 #include <stdlib.h>
 #endif
 
-#include <eez/modules/dcm220/channel.h>
+#include <eez/firmware.h>
+#include <eez/system.h>
+
+#include <eez/scpi/regs.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
-#include <eez/scpi/regs.h>
-#include <eez/system.h>
-#include <eez/firmware.h>
 
-#define CONF_MASTER_SYNC_TIMEOUT_MS 500
-#define CONF_MASTER_SYNC_IRQ_TIMEOUT_MS 50
+#include <eez/modules/bp3c/comm.h>
+
+#include <eez/modules/dcm220/channel.h>
 
 namespace eez {
 
@@ -64,14 +65,6 @@ static const float I_MON_RESOLUTION = 0.02f;
 #define REG0_CC1_MASK     (1 << 1)
 #define REG0_CC2_MASK     (1 << 3)
 #define REG0_PWRGOOD_MASK (1 << 4)
-
-#define SPI_SLAVE_SYNBYTE         0x53
-#define SPI_MASTER_SYNBYTE        0xAC
-
-#if defined(EEZ_PLATFORM_STM32)
-static GPIO_TypeDef *SPI_IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
-static const uint16_t SPI_IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
-#endif
 
 struct DcmChannel : public Channel {
     bool isDcm224;
@@ -338,77 +331,16 @@ public:
 	}
 };
 
-bool masterSynchro(int slotIndex) {
-    auto &slot = *g_slots[slotIndex];
-
-#if defined(EEZ_PLATFORM_STM32)
-    uint32_t start = millis();
-
-    uint8_t txBuffer[15] = { SPI_MASTER_SYNBYTE, 0, 0 };
-    uint8_t rxBuffer[15] = { 0, 0, 0 };
-
-    while (true) {
-        WATCHDOG_RESET();
-
-        spi::select(slotIndex, spi::CHIP_DCM220);
-        spi::transfer(slotIndex, txBuffer, rxBuffer, sizeof(rxBuffer));
-        spi::deselect(slotIndex);
-
-        if (rxBuffer[0] == SPI_SLAVE_SYNBYTE) {
-            uint32_t startIrq = millis();
-            while (true) {
-                if (HAL_GPIO_ReadPin(SPI_IRQ_GPIO_Port[slotIndex], SPI_IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
-                    slot.firmwareMajorVersion = rxBuffer[1];
-                    slot.firmwareMinorVersion = rxBuffer[2];
-                    slot.idw0 = (rxBuffer[3] << 24) | (rxBuffer[4] << 16) | (rxBuffer[5] << 8) | rxBuffer[6];
-                    slot.idw1 = (rxBuffer[7] << 24) | (rxBuffer[8] << 16) | (rxBuffer[9] << 8) | rxBuffer[10];
-                    slot.idw2 = (rxBuffer[11] << 24) | (rxBuffer[12] << 16) | (rxBuffer[13] << 8) | rxBuffer[14];
-                    return true;
-                }
-
-                int32_t diff = millis() - startIrq;
-                if (diff > CONF_MASTER_SYNC_IRQ_TIMEOUT_MS) {
-                    break;
-                }
-            }
-        }
-
-        int32_t diff = millis() - start;
-        if (diff > CONF_MASTER_SYNC_TIMEOUT_MS) {
-            slot.firmwareMajorVersion = 0;
-            slot.firmwareMinorVersion = 0;
-            slot.idw0 = 0;
-            slot.idw1 = 0;
-            slot.idw2 = 0;
-            return false;
-        }
-    }
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    slot.firmwareMajorVersion = 1;
-    slot.firmwareMinorVersion = 0;
-    slot.idw0 = 0;
-    slot.idw1 = 0;
-    slot.idw2 = 0;
-    return true;
-#endif
-}
 struct DcmModule : public PsuModule {
 public:
-    TestResult testResult;
-    
-    bool synchronized;
-    int numCrcErrors;
-
+    TestResult testResult = TEST_NONE;
+    bool synchronized = false;
+    int numCrcErrors = 0;
     uint8_t input[BUFFER_SIZE];
     uint8_t output[BUFFER_SIZE];
 
     DcmModule(uint8_t slotIndex, DcmModuleInfo *moduleInfo, uint16_t moduleRevision)
         : PsuModule(slotIndex, moduleInfo, moduleRevision)
-        , testResult(TEST_NONE)
-        , synchronized(false)
-        , numCrcErrors(0)
     {
     	memset(output, 0, sizeof(output));
     	memset(input, 0, sizeof(input));
@@ -416,7 +348,7 @@ public:
 
     void init() {
         if (!synchronized) {
-            if (masterSynchro(slotIndex)) {
+            if (bp3c::comm::masterSynchro(slotIndex)) {
                 //DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)firmwareMajorVersion, (int)firmwareMinorVersion);
                 synchronized = true;
                 numCrcErrors = 0;
@@ -464,13 +396,7 @@ public:
 
 #if defined(EEZ_PLATFORM_STM32)
     void transfer() {
-        spi::select(slotIndex, spi::CHIP_DCM220);
-        spi::transfer(slotIndex, output, input, BUFFER_SIZE);
-        spi::deselect(slotIndex);
-
-        uint32_t crc = HAL_CRC_Calculate(&hcrc, (uint32_t *)input, BUFFER_SIZE - 4);
-
-        if (crc == *((uint32_t *)(input + BUFFER_SIZE - 4))) {
+        if (bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE)) {
             numCrcErrors = 0;
         } else {
             if (++numCrcErrors >= 4) {
@@ -478,7 +404,7 @@ public:
                 synchronized = false;
                 testResult = TEST_FAILED;
             } else {
-                DebugTrace("CRC %d\n", numCrcErrors);
+                DebugTrace("Slot %d CRC %d\n", slotIndex + 1, numCrcErrors);
             }
         }
     }

@@ -1322,7 +1322,7 @@ static scpi_choice_def_t functionChoice[] = { { "NONE", io_pins::FUNCTION_NONE }
                                               { "SYSTrig", io_pins::FUNCTION_SYSTRIG },
                                               { "TOUTput", io_pins::FUNCTION_TOUTPUT },
                                               { "PWM", io_pins::FUNCTION_PWM },
-                                              { "DLOGTrig", io_pins::FUNCTION_DLOGTRIG },
+                                              { "DLOGtrig", io_pins::FUNCTION_DLOGTRIG },
                                               SCPI_CHOICE_LIST_END };
 
 scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {

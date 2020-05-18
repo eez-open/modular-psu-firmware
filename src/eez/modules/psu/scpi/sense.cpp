@@ -112,53 +112,6 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpperQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_senseCurrentDcRangeAuto(scpi_t *context) {
-    bool enable;
-    if (!SCPI_ParamBool(context, &enable, TRUE)) {
-        return SCPI_RES_ERR;
-    }
-
-    Channel *channel = param_channel(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    if (!channel->hasSupportForCurrentDualRange()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-        return SCPI_RES_ERR;
-    }
-
-    if (channel->flags.trackingEnabled) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
-
-    channel_dispatcher::enableAutoSelectCurrentRange(*channel, enable);
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_senseCurrentDcRangeAutoQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    if (!channel->hasSupportForCurrentDualRange()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-        return SCPI_RES_ERR;
-    }
-
-    if (channel->flags.trackingEnabled) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
-
-    SCPI_ResultBool(context, channel->isAutoSelectCurrentRangeEnabled());
-
-    return SCPI_RES_OK;
-}
-
 } // namespace scpi
 } // namespace psu
 } // namespace eez

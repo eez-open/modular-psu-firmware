@@ -174,25 +174,6 @@ struct ChannelParams {
     float U_RAMP_DURATION_MIN_VALUE;
 };
 
-struct Channel;
-
-struct PsuModuleInfo : public ModuleInfo {
-    uint8_t numChannels;
-
-    PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint8_t numChannels);
-
-    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override;
-
-    virtual Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) = 0;
-};
-
-struct PsuModule : public Module {
-public:
-    PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision);
-
-    void initChannels() override;
-};
-
 /// Runtime protection binary flags (alarmed, tripped)
 struct ProtectionFlags {
     unsigned alarmed : 1;

@@ -21,14 +21,15 @@
 #include <stdint.h>
 
 namespace eez {
-namespace idle {
+namespace hmi {
 
 void tick(uint32_t tickCount);
 
-void noteHmiActivity();
-void noteHmiActivity();
+void noteActivity();
+uint32_t getInactivityPeriod();
 
-uint32_t getHmiInactivityPeriod();
+extern int g_selectedSlotIndex;
+void selectSlot(int slotIndex);
 
 }
-} // namespace eez::idle
+} // namespace eez::hmi

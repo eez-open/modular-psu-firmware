@@ -21,7 +21,7 @@
 #include <eez/tasks.h>
 #include <eez/mp.h>
 #include <eez/sound.h>
-#include <eez/idle.h>
+#include <eez/hmi.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/datetime.h>
@@ -142,6 +142,16 @@ void highPriorityThreadOneIter() {
         uint32_t param = QUEUE_MESSAGE_PARAM(message);
         psu::onThreadMessage(type, param);
     } else {
+        WATCHDOG_RESET();
+
+        if (!g_isBooted) {
+            return;
+        }
+
+        for (int i = 0; i < NUM_SLOTS; i++) {
+            g_slots[i]->tick();
+        }
+
         psu::tick();
     }
 }
@@ -370,7 +380,7 @@ void lowPriorityThreadOneIter() {
 
         eez::psu::dlog_record::fileWrite();
 
-        eez::idle::tick(tickCount);
+        eez::hmi::tick(tickCount);
 
 #ifdef DEBUG
         psu::debug::tick(tickCount);

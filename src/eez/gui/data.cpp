@@ -457,7 +457,10 @@ int count(int16_t id) {
 }
 
 void select(Cursor &cursor, int16_t id, int index, Value &oldValue) {
-    cursor = index;
+    Value cursorValue = index;
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_CURSOR_VALUE, cursor, cursorValue);
+    cursor = cursorValue.getInt();
+
     Value indexValue = index;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_SELECT, cursor, indexValue);
     if (index == 0) {

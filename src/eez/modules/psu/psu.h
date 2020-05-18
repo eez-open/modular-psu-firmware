@@ -54,6 +54,25 @@ void onSdCardFileChangeHook(const char *filePath1, const char *filePath2 = nullp
 /// PSU firmware.
 namespace psu {
 
+struct Channel;
+
+struct PsuModuleInfo : public ModuleInfo {
+    uint8_t numChannels;
+
+    PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint8_t numChannels);
+
+    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override;
+
+    virtual Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) = 0;
+};
+
+struct PsuModule : public Module {
+public:
+    PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision);
+
+    void boot() override;
+};
+
 void init();
 
 void onThreadMessage(uint8_t type, uint32_t param);

@@ -17,10 +17,15 @@
  */
 
 #include <assert.h>
+#include <stdlib.h>
+
+#include "eez/debug.h"
+#include "eez/firmware.h"
+#include "eez/gui/document.h"
+#include "eez/modules/psu/event_queue.h"
+#include "eez/modules/bp3c/comm.h"
 
 #include "./dib-prel6.h"
-
-#include "eez/gui/document.h"
 
 namespace eez {
 namespace dib_prel6 {
@@ -48,11 +53,77 @@ public:
     }
 };
 
+#define BUFFER_SIZE 20
+
 struct Prel6Module : public Module {
 public:
+    TestResult testResult = TEST_NONE;
+    bool synchronized = false;
+    int numCrcErrors = 0;
+    uint8_t input[BUFFER_SIZE];
+    uint8_t output[BUFFER_SIZE];
+
     Prel6Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
         : Module(slotIndex, moduleInfo, moduleRevision)
     {
+    }
+
+    TestResult getTestResult() {
+        return testResult;
+    }
+
+    void initChannels() {
+        if (!synchronized) {
+            if (bp3c::comm::masterSynchro(slotIndex)) {
+                synchronized = true;
+                numCrcErrors = 0;
+                testResult = TEST_OK;
+            } else {
+                psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                testResult = TEST_FAILED;
+            }
+        }
+    }
+
+    int cnt1 = 0;
+    int cnt2 = 0;
+
+    void tick() override {
+        if (!synchronized) {
+            return;
+        }
+
+        cnt1++;
+
+        if (cnt1 % 1000) {
+            cnt2++;
+            return;
+        }
+
+        if (bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE)) {
+            cnt2++;
+
+            if (cnt2 % 10000 == 0) {
+                uint32_t scnt1 = *(uint32_t *)(input + 0);
+                uint32_t scnt2 = *(uint32_t *)(input + 4);
+                uint32_t scnt3 = *(uint32_t *)(input + 8);
+                DebugTrace("%d, %d, %d, %d, %d\n", cnt1, cnt2, scnt1, scnt2, scnt3);
+            }
+
+            numCrcErrors = 0;
+        } else {
+            if (++numCrcErrors >= 4) {
+                psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
+                synchronized = false;
+                testResult = TEST_FAILED;
+            } else {
+                DebugTrace("Slot %d CRC %d\n", slotIndex + 1, numCrcErrors);
+            }
+        }
+    }
+
+    void onPowerDown() override {
+        synchronized = false;
     }
 };
 

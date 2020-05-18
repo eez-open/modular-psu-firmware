@@ -94,7 +94,20 @@ Module::Module(uint8_t slotIndex_, ModuleInfo *moduleInfo_, uint16_t moduleRevis
 {
 }
 
+TestResult Module::getTestResult() {
+    return TEST_SKIPPED;
+}
+
+void Module::boot() {
+}
+
 void Module::initChannels() {
+}
+
+void Module::tick() {
+}
+
+void Module::onPowerDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////

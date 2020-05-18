@@ -67,6 +67,7 @@
     SCPI_COMMAND("INSTrument:COUPle:TRIGger", scpi_cmd_instrumentCoupleTrigger) \
     SCPI_COMMAND("INSTrument:COUPle:TRIGger?", scpi_cmd_instrumentCoupleTriggerQ) \
     SCPI_COMMAND("INSTrument:DISPlay:TRACe:SWAP", scpi_cmd_instrumentDisplayTraceSwap) \
+    SCPI_COMMAND("INSTrument:DISPlay:TRACe#", scpi_cmd_instrumentDisplayTrace) \
     SCPI_COMMAND("INSTrument:DISPlay:TRACe#?", scpi_cmd_instrumentDisplayTraceQ) \
     SCPI_COMMAND("INSTrument:DISPlay:YT:RATE", scpi_cmd_instrumentDisplayYtRate) \
     SCPI_COMMAND("INSTrument:DISPlay:YT:RATE?", scpi_cmd_instrumentDisplayYtRateQ) \
@@ -123,13 +124,11 @@
     SCPI_COMMAND("OUTPut:TRACk[:STATe]", scpi_cmd_outputTrackState) \
     SCPI_COMMAND("OUTPut:TRACk[:STATe]?", scpi_cmd_outputTrackStateQ) \
     SCPI_COMMAND("OUTPut[:STATe]", scpi_cmd_outputState) \
+    SCPI_COMMAND("OUTPut[:STATe]?", scpi_cmd_outputStateQ) \
     SCPI_COMMAND("OUTPut[:STATe]:TRIGgered", scpi_cmd_outputStateTriggered) \
     SCPI_COMMAND("OUTPut[:STATe]:TRIGgered?", scpi_cmd_outputStateTriggeredQ) \
-    SCPI_COMMAND("OUTPut[:STATe]?", scpi_cmd_outputStateQ) \
     SCPI_COMMAND("OUTPut:DELay:DURation", scpi_cmd_outputDelayDuration) \
     SCPI_COMMAND("OUTPut:DELay:DURation?", scpi_cmd_outputDelayDurationQ) \
-    SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe:AUTO", scpi_cmd_senseCurrentDcRangeAuto) \
-    SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe:AUTO?", scpi_cmd_senseCurrentDcRangeAutoQ) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe[:UPPer]", scpi_cmd_senseCurrentDcRangeUpper) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe[:UPPer]?", scpi_cmd_senseCurrentDcRangeUpperQ) \
     SCPI_COMMAND("SENSe:DLOG:FUNCtion:CURRent", scpi_cmd_senseDlogFunctionCurrent) \
@@ -301,6 +300,8 @@
     SCPI_COMMAND("SYSTem:DATE?", scpi_cmd_systemDateQ) \
     SCPI_COMMAND("SYSTem:FORMat:DATE", scpi_cmd_systemFormatDate) \
     SCPI_COMMAND("SYSTem:FORMat:DATE?", scpi_cmd_systemFormatDateQ) \
+    SCPI_COMMAND("SYSTem:FORMat:TIME", scpi_cmd_systemFormatTime) \
+    SCPI_COMMAND("SYSTem:FORMat:TIME?", scpi_cmd_systemFormatTimeQ) \
     SCPI_COMMAND("SYSTem:DIGital:INPut:DATA?", scpi_cmd_systemDigitalInputDataQ) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:DATA", scpi_cmd_systemDigitalOutputData) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:DATA?", scpi_cmd_systemDigitalOutputDataQ) \
@@ -308,10 +309,10 @@
     SCPI_COMMAND("SYSTem:DIGital:PIN#:FUNCtion?", scpi_cmd_systemDigitalPinFunctionQ) \
     SCPI_COMMAND("SYSTem:DIGital:PIN#:POLarity", scpi_cmd_systemDigitalPinPolarity) \
     SCPI_COMMAND("SYSTem:DIGital:PIN#:POLarity?", scpi_cmd_systemDigitalPinPolarityQ) \
-    SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:FREQuency", scpi_cmd_systemDigitalOutputPwmFrequency) \
-    SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:FREQuency?", scpi_cmd_systemDigitalOutputPwmFrequencyQ) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:DUTY", scpi_cmd_systemDigitalOutputPwmDuty) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:DUTY?", scpi_cmd_systemDigitalOutputPwmDutyQ) \
+    SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:FREQuency", scpi_cmd_systemDigitalOutputPwmFrequency) \
+    SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:FREQuency?", scpi_cmd_systemDigitalOutputPwmFrequencyQ) \
     SCPI_COMMAND("SYSTem:ERRor:COUNt?", scpi_cmd_systemErrorCountQ) \
     SCPI_COMMAND("SYSTem:ERRor[:NEXT]?", scpi_cmd_systemErrorNextQ) \
     SCPI_COMMAND("SYSTem:INHibit?", scpi_cmd_systemInhibitQ) \
@@ -343,13 +344,12 @@
     SCPI_COMMAND("SYSTem:TIME:ZONE", scpi_cmd_systemTimeZone) \
     SCPI_COMMAND("SYSTem:TIME:ZONE?", scpi_cmd_systemTimeZoneQ) \
     SCPI_COMMAND("SYSTem:TIME?", scpi_cmd_systemTimeQ) \
-    SCPI_COMMAND("SYSTem:FORMat:TIME", scpi_cmd_systemFormatTime) \
-    SCPI_COMMAND("SYSTem:FORMat:TIME?", scpi_cmd_systemFormatTimeQ) \
     SCPI_COMMAND("SYSTem:VERSion?", scpi_cmd_systemVersionQ) \
     SCPI_COMMAND("SYSTem:FAN:STATus?", scpi_cmd_systemFanStatusQ) \
     SCPI_COMMAND("SYSTem:FAN:SPEed?", scpi_cmd_systemFanSpeedQ) \
     SCPI_COMMAND("SYSTem:MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]?", scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ) \
     SCPI_COMMAND("SYSTem:MEASure[:SCALar][:VOLTage][:DC]?", scpi_cmd_systemMeasureScalarVoltageDcQ) \
+    SCPI_COMMAND("SYSTem:CPU:SNO?", scpi_cmd_systemCpuSnoQ) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce", scpi_cmd_triggerDlogSource) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce?", scpi_cmd_triggerDlogSourceQ) \
     SCPI_COMMAND("TRIGger:DLOG[:IMMediate]", scpi_cmd_triggerDlogImmediate) \
@@ -399,5 +399,4 @@
     SCPI_COMMAND("DEBUg:DOWNload:FIRMware", scpi_cmd_debugDownloadFirmware) \
     SCPI_COMMAND("DEBUg:EVENt", scpi_cmd_debugEvent) \
     SCPI_COMMAND("SYSTem:DATE:CLEar", scpi_cmd_systemDateClear) \
-    SCPI_COMMAND("SYSTem:TIME:CLEar", scpi_cmd_systemTimeClear) \
-    SCPI_COMMAND("SYSTem:CPU:SNO?", scpi_cmd_systemCpuSnoQ)
+    SCPI_COMMAND("SYSTem:TIME:CLEar", scpi_cmd_systemTimeClear)

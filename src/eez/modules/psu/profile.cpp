@@ -19,7 +19,7 @@
 #include <stdio.h>
 
 #include <eez/file_type.h>
-#include <eez/idle.h>
+#include <eez/hmi.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>

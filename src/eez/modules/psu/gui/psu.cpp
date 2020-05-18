@@ -23,7 +23,7 @@
 #include <eez/firmware.h>
 #include <eez/sound.h>
 #include <eez/system.h>
-#include <eez/idle.h>
+#include <eez/hmi.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/calibration.h>
@@ -81,8 +81,6 @@ static unsigned g_skipChannelCalibrations;
 static unsigned g_skipDateTimeSetup;
 static unsigned g_skipEthernetSetup;
 
-int g_selectedSlotIndex;
-
 static bool g_showSetupWizardQuestionCalled;
 Channel *g_channel = nullptr;
 int g_channelIndex = -1;
@@ -135,7 +133,7 @@ void PsuAppContext::stateManagment() {
     }
 
     // remove alert message after period of time
-    uint32_t inactivityPeriod = eez::idle::getHmiInactivityPeriod();
+    uint32_t inactivityPeriod = eez::hmi::getInactivityPeriod();
     if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
         ToastMessagePage *page = (ToastMessagePage *)getActivePage();
         if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
@@ -234,13 +232,13 @@ void PsuAppContext::stateManagment() {
     // TODO move this to some other place
 #if OPTION_ENCODER
     if (counter != 0 || clicked) {
-        eez::idle::noteHmiActivity();
+        eez::hmi::noteActivity();
     }
     onEncoder(counter, clicked);
 #endif
 
 #if GUI_BACK_TO_MAIN_ENABLED
-    uint32_t inactivityPeriod = eez::idle::getHmiInactivityPeriod();
+    uint32_t inactivityPeriod = eez::idle::getInactivityPeriod();
 
     if (
         activePageId == PAGE_ID_EVENT_QUEUE ||
@@ -1866,10 +1864,6 @@ void channelToggleOutput() {
     }
 }
 
-void selectSlot(int slotIndex) {
-    g_selectedSlotIndex = slotIndex;
-}
-
 void selectChannelByCursor() {
     if (getFoundWidgetAtDown().cursor >= 0 && getFoundWidgetAtDown().cursor < CH_NUM) {
         selectChannel(&Channel::get(getFoundWidgetAtDown().cursor));
@@ -1879,7 +1873,7 @@ void selectChannelByCursor() {
 void selectChannel(Channel *channel) {
     g_channel = channel;
     if (g_channel) {
-        g_selectedSlotIndex = g_channel->slotIndex;
+        hmi::selectSlot(g_channel->slotIndex);
         g_channelIndex = g_channel->channelIndex;
     } else {
         g_channelIndex = -1;

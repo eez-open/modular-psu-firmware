@@ -89,7 +89,7 @@ set(src_eez
     src/eez/firmware.cpp
     src/eez/debug.cpp
     src/eez/file_type.cpp
-    src/eez/idle.cpp
+    src/eez/hmi.cpp
     src/eez/index.cpp
     src/eez/main.cpp
     src/eez/memory.cpp
@@ -106,7 +106,7 @@ set(header_eez
     src/eez/firmware.h
     src/eez/debug.h
     src/eez/file_type.h
-    src/eez/idle.h
+    src/eez/hmi.h
     src/eez/index.h
     src/eez/memory.h
     src/eez/mp.h
@@ -389,13 +389,16 @@ list (APPEND header_files ${header_eez_modules_aux_ps})
 source_group("eez\\modules\\aux_ps" FILES ${src_eez_modules_aux_ps} ${header_eez_modules_aux_ps})
 
 set(src_eez_modules_bp3c
+    src/eez/modules/bp3c/comm.cpp
     src/eez/modules/bp3c/eeprom.cpp
     src/eez/modules/bp3c/io_exp.cpp
     src/eez/modules/bp3c/flash_slave.cpp
 ) 
 list (APPEND src_files ${src_eez_modules_bp3c})
 set(header_eez_modules_bp3c
+    src/eez/modules/bp3c/comm.h
     src/eez/modules/bp3c/eeprom.h
+    src/eez/modules/bp3c/io_exp.h
     src/eez/modules/bp3c/flash_slave.h
 ) 
 list (APPEND header_files ${header_eez_modules_bp3c})

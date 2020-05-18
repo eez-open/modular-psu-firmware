@@ -1,0 +1,93 @@
+[
+    {
+        "name": "Curve Tracer",
+        "description": "Plot output characteristic for BJTs and MOSFETs",
+        "versions": [
+            {
+                "version": "1.0",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Curve%20Tracer/Curve%20Tracer.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Curve%20Tracer/Curve%20Tracer.res"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Diode Tester",
+        "description": "Determines diode reverse breakdown voltage",
+        "versions": [
+            {
+                "version": "1.0",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Diode%20Tester/Diode%20Tester.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Diode%20Tester/Diode%20Tester.res"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Hello World",
+        "description": "Hello world script",
+        "versions": [
+            {
+                "version": "1.0",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Hello%20World/Hello%20World.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Hello%20World/Hello%20World.res"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Module Initialization",
+        "description": "Module initialization utility",
+        "versions": [
+            {
+                "version": "1.0",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Module%20Initialization/Module%20Initialization.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Module%20Initialization/Module%20Initialization.res"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Op-Amp Calculator",
+        "description": "This calculator helps calculate values of the op-amp configured as inverting, non-inverting or differential amplifier",
+        "versions": [
+            {
+                "version": "1.0",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Op-Amp%20Calculator/Op-Amp%20Calculator.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Op-Amp%20Calculator/Op-Amp%20Calculator.res"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Parallel and Series Calculator",
+        "description": "Calculate parallel resistance/inductance or capacitance is series",
+        "versions": [
+            {
+                "version": "1.0",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Parallel%20and%20Series%20Calculator/Parallel%20and%20Series%20Calculator.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Parallel%20and%20Series%20Calculator/Parallel%20and%20Series%20Calculator.res"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Voltage divider calculator",
+        "description": "This calculator helps calculate values of resistive voltage divider",
+        "versions": [
+            {
+                "version": "1.0",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Voltage%20divider%20calculator/Voltage%20divider%20calculator.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Voltage%20divider%20calculator/Voltage%20divider%20calculator.res"
+                ]
+            }
+        ]
+    }
+]

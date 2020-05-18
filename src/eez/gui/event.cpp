@@ -20,7 +20,7 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
-#include <eez/idle.h>
+#include <eez/hmi.h>
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
@@ -55,7 +55,7 @@ void eventHandling() {
     auto eventType = touch::getEventType();
 
     if (eventType != EVENT_TYPE_TOUCH_NONE) {
-        eez::idle::noteHmiActivity();
+        eez::hmi::noteActivity();
 
         uint32_t tickCount = micros();
 

@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <eez/idle.h>
+#include <eez/hmi.h>
 #include <eez/system.h>
 
 #include <eez/modules/psu/psu.h>
@@ -25,42 +25,40 @@
 #include <eez/modules/psu/scpi/psu.h>
 
 namespace eez {
-namespace idle {
-
-enum ActivityType {
-    ACTIVITY_TYPE_NONE,
-    ACTIVITY_TYPE_HMI
-};
-static ActivityType g_lastActivityType = ACTIVITY_TYPE_NONE;
-static uint32_t g_timeOfLastActivity;
+namespace hmi {
 
 #define MAX_GUI_OR_ENCODER_INACTIVITY_TIME 60 * 1000
-static bool g_hmiInactivityTimeMaxed = true;
-static uint32_t g_timeOfLastHmiActivity;
+
+static uint32_t g_timeOfLastActivity;
+static bool g_inactivityTimeMaxed = true;
+
+int g_selectedSlotIndex;
 
 void tick(uint32_t tickCount) {
-    if (!g_hmiInactivityTimeMaxed) {
-        uint32_t hmiInactivityPeriod = getHmiInactivityPeriod();
-        if (hmiInactivityPeriod >= MAX_GUI_OR_ENCODER_INACTIVITY_TIME) {
-            g_hmiInactivityTimeMaxed = true;
+    if (!g_inactivityTimeMaxed) {
+        uint32_t inactivityPeriod = getInactivityPeriod();
+        if (inactivityPeriod >= MAX_GUI_OR_ENCODER_INACTIVITY_TIME) {
+            g_inactivityTimeMaxed = true;
         }
     }
 }
 
-void noteHmiActivity() {
-    g_lastActivityType = ACTIVITY_TYPE_HMI;
+void noteActivity() {
     g_timeOfLastActivity = micros();
-    g_hmiInactivityTimeMaxed = false;
-    g_timeOfLastHmiActivity = g_timeOfLastActivity;
+    g_inactivityTimeMaxed = false;
 }
 
-uint32_t getHmiInactivityPeriod() {
-    if (g_hmiInactivityTimeMaxed) {
+uint32_t getInactivityPeriod() {
+    if (g_inactivityTimeMaxed) {
         return MAX_GUI_OR_ENCODER_INACTIVITY_TIME;
     } else {
-        return (micros() - g_timeOfLastHmiActivity) / 1000;
+        return (micros() - g_timeOfLastActivity) / 1000;
     }
 }
 
-} // namespace idle
+void selectSlot(int slotIndex) {
+    g_selectedSlotIndex = slotIndex;
+}
+
+} // namespace hmi
 } // namespace eez

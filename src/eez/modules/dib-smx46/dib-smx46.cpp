@@ -17,10 +17,15 @@
  */
 
 #include <assert.h>
+#include <stdlib.h>
+
+#include "eez/debug.h"
+#include "eez/firmware.h"
+#include "eez/gui/document.h"
+#include "eez/modules/psu/event_queue.h"
+#include "eez/modules/bp3c/comm.h"
 
 #include "./dib-smx46.h"
-
-#include "eez/gui/document.h"
 
 namespace eez {
 namespace dib_smx46 {
@@ -48,11 +53,67 @@ public:
     }
 };
 
+#define BUFFER_SIZE 20
+
 struct Smx46Module : public Module {
 public:
+    TestResult testResult = TEST_NONE;
+    bool synchronized = false;
+    int numCrcErrors = 0;
+    uint8_t input[BUFFER_SIZE];
+    uint8_t output[BUFFER_SIZE];
+
     Smx46Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
         : Module(slotIndex, moduleInfo, moduleRevision)
     {
+    }
+
+    TestResult getTestResult() {
+        return testResult;
+    }
+
+    void initChannels() {
+        if (!synchronized) {
+            if (bp3c::comm::masterSynchro(slotIndex)) {
+                synchronized = true;
+                numCrcErrors = 0;
+                testResult = TEST_OK;
+            } else {
+                psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                testResult = TEST_FAILED;
+            }
+        }
+    }
+
+    int cnt = 0;
+
+    void tick() override {
+        if (!synchronized) {
+            return;
+        }
+
+        if (cnt < 1000) {
+        	cnt++;
+        	return;
+        }
+
+        cnt = 0;
+
+        if (bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE)) {
+            numCrcErrors = 0;
+        } else {
+            if (++numCrcErrors >= 4) {
+                psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
+                synchronized = false;
+                testResult = TEST_FAILED;
+            } else {
+                DebugTrace("Slot %d CRC %d\n", slotIndex + 1, numCrcErrors);
+            }
+        }
+    }
+
+    void onPowerDown() override {
+        synchronized = false;
     }
 };
 

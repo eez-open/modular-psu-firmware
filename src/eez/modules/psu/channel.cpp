@@ -48,32 +48,6 @@ using namespace scpi;
 
 namespace psu {
 
-////////////////////////////////////////////////////////////////////////////////
-
-PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, FlashMethod flashMethod, uint8_t numChannels_)
-    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision, flashMethod)
-    , numChannels(numChannels_)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-PsuModule::PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
-    : Module(slotIndex, moduleInfo, moduleRevision)
-{
-}
-
-void PsuModule::initChannels() {
-    Channel::g_slotIndexToChannelIndex[slotIndex] = CH_NUM;
-    for (int subchannelIndex = 0; subchannelIndex < ((PsuModuleInfo *)moduleInfo)->numChannels; subchannelIndex++) {
-        Channel::g_channels[CH_NUM] = ((PsuModuleInfo *)moduleInfo)->createChannel(slotIndex, CH_NUM, subchannelIndex);
-        Channel::g_channels[CH_NUM]->initParams(moduleRevision);
-        CH_NUM++;
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void Channel::Value::init(float set_, float step_, float limit_) {
     set = set_;
     step = step_;
@@ -807,16 +781,51 @@ float Channel::roundChannelValue(Unit unit, float value) const {
 }
 
 float remapAdcValue(float value, Channel::CalibrationValueConfiguration &cal) {
-    unsigned int i;
-    
-    for (i = 1; i < cal.numPoints - 1 && value > cal.points[i].adc; i++) {
+    unsigned i;
+    unsigned j;
+
+    if (cal.numPoints == 2) {
+        i = 0;
+        j = 1;
+    } else {
+        for (j = 1; j < cal.numPoints - 1 && value > cal.points[j].adc; j++) {
+        }
+        i = j - 1;
+    }
+
+    if (cal.points[i].adc == cal.points[j].adc) {
+    	return value;
     }
 
     return remap(value,
-        cal.points[i - 1].adc,
-        cal.points[i - 1].value,
         cal.points[i].adc,
-        cal.points[i].value);
+        cal.points[i].value,
+        cal.points[j].adc,
+        cal.points[j].value);
+}
+
+float remapValue(float value, Channel::CalibrationValueConfiguration &cal) {
+    unsigned i;
+    unsigned j;
+
+    if (cal.numPoints == 2) {
+        i = 0;
+        j = 1;
+    } else {
+        for (j = 1; j < cal.numPoints - 1 && value > cal.points[j].value; j++) {
+        }
+        i = j - 1;
+    }
+
+    if (cal.points[i].value == cal.points[j].value) {
+    	return value;
+    }
+
+    return remap(value,
+        cal.points[i].value,
+        cal.points[i].dac,
+        cal.points[j].value,
+        cal.points[j].dac);
 }
 
 void Channel::addUMonAdcValue(float value) {
@@ -919,6 +928,8 @@ void Channel::updateAllChannels() {
 }
 
 void Channel::executeOutputEnable(bool enable, uint16_t tasks) {
+    u.resetMonValues();
+    i.resetMonValues();
     setOutputEnable(enable, tasks);
 
     if (tasks & OUTPUT_ENABLE_TASK_FINALIZE) {
@@ -1169,19 +1180,6 @@ void Channel::remoteProgrammingEnable(bool enable) {
 
 bool Channel::isRemoteProgrammingEnabled() {
     return flags.rprogEnabled;
-}
-
-float remapValue(float value, Channel::CalibrationValueConfiguration &cal) {
-    unsigned int i;
-
-    for (i = 1; i < cal.numPoints - 1 && value > cal.points[i].value; i++) {
-    }
-
-    return remap(value,
-        cal.points[i - 1].value,
-        cal.points[i - 1].dac,
-        cal.points[i].value,
-        cal.points[i].dac);
 }
 
 float Channel::getCalibratedVoltage(float value) {

@@ -7,6 +7,8 @@
         "xtr1common": "cpp",
         "xiosbase": "cpp",
         "algorithm": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "iosfwd": "cpp",
+        "xlocale": "cpp"
     }
 }

@@ -25,7 +25,7 @@
 #include <eez/index.h>
 #include <eez/sound.h>
 #include <eez/system.h>
-#include <eez/idle.h>
+#include <eez/hmi.h>
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
@@ -96,7 +96,7 @@ int AppContext::getPreviousPageId() {
 
 void AppContext::onPageChanged(int previousPageId, int activePageId) {
     eez::mcu::display::turnOn();
-    eez::idle::noteHmiActivity();
+    eez::hmi::noteActivity();
 }
 
 void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {

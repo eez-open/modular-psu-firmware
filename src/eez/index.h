@@ -20,6 +20,8 @@
 
 #include <stdint.h>
 
+#include <eez/firmware.h>
+
 namespace eez {
 
 static const uint16_t MODULE_TYPE_NONE = 0;
@@ -77,7 +79,12 @@ struct Module {
 
     Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision);
 
+    virtual TestResult getTestResult();
+
+    virtual void boot();
     virtual void initChannels();
+    virtual void tick();
+    virtual void onPowerDown();
 };
 
 static const int NUM_SLOTS = 3;

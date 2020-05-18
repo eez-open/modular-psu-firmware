@@ -185,9 +185,34 @@ bool g_rprogAlarm = false;
 
 void (*g_diagCallback)();
 
+bool g_adcMeasureAllFinished = false;
+
 ////////////////////////////////////////////////////////////////////////////////
 
-bool g_adcMeasureAllFinished = false;
+PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, FlashMethod flashMethod, uint8_t numChannels_)
+    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision, flashMethod)
+    , numChannels(numChannels_)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+PsuModule::PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
+    : Module(slotIndex, moduleInfo, moduleRevision)
+{
+}
+
+void PsuModule::boot() {
+    Channel::g_slotIndexToChannelIndex[slotIndex] = CH_NUM;
+
+    for (int subchannelIndex = 0; subchannelIndex < ((PsuModuleInfo *)moduleInfo)->numChannels; subchannelIndex++) {
+        Channel::g_channels[CH_NUM] = ((PsuModuleInfo *)moduleInfo)->createChannel(slotIndex, CH_NUM, subchannelIndex);
+        Channel::g_channels[CH_NUM]->initParams(moduleRevision);
+        CH_NUM++;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 void init() {
 #if defined(EEZ_PLATFORM_STM32)
@@ -273,6 +298,10 @@ void initChannels() {
     for (int i = 0; i < CH_NUM; ++i) {
         Channel::get(i).init();
     }
+
+    for (int i = 0; i < NUM_SLOTS; ++i) {
+    	g_slots[i]->initChannels();
+    }    
 }
 
 bool testChannels() {
@@ -554,6 +583,10 @@ void powerDownChannels() {
     for (int i = 0; i < CH_NUM; ++i) {
         Channel::get(i).onPowerDown();
     }
+
+    for (int i = 0; i < NUM_SLOTS; ++i) {
+        g_slots[i]->onPowerDown();
+    }
 }
 
 bool isPowerUp() {
@@ -638,12 +671,6 @@ static const int NUM_TICK_FUNCS = sizeof(g_tickFuncs) / sizeof(TickFunc);
 static int g_tickFuncIndex = 0;
 
 void tick() {
-    WATCHDOG_RESET();
-
-    if (!g_isBooted) {
-        return;
-    }
-
     uint32_t tickCount = micros();
 
     trigger::tick(tickCount);

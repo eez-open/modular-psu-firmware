@@ -27,6 +27,7 @@
 #include <eez/file_type.h>
 #include <eez/mp.h>
 #include <eez/memory.h>
+#include <eez/hmi.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/container.h>
@@ -1429,7 +1430,7 @@ void data_channel_index(Channel &channel, DataOperationEnum operation, Cursor cu
     if (operation == DATA_OPERATION_SET_CONTEXT) {
         // save currently selected channel and slot index
         value.pairOfInt16_.first = g_channelIndex;
-        value.pairOfInt16_.second = g_selectedSlotIndex;
+        value.pairOfInt16_.second = hmi::g_selectedSlotIndex;
         value.type_ = VALUE_TYPE_UINT32;
 
         selectChannel(&channel);
@@ -1442,7 +1443,7 @@ void data_channel_index(Channel &channel, DataOperationEnum operation, Cursor cu
         auto channelIndex = value.pairOfInt16_.first;
         auto slotIndex = value.pairOfInt16_.second;
         selectChannel(channelIndex != -1 ? &Channel::get(channelIndex) : nullptr);
-        selectSlot(slotIndex);
+        hmi::selectSlot(slotIndex);
     }
 }
 
@@ -1450,11 +1451,11 @@ void data_no_channel_index(int slotIndex, DataOperationEnum operation, Cursor cu
     if (operation == DATA_OPERATION_SET_CONTEXT) {
         // save currently selected channel and slot index
         value.pairOfInt16_.first = g_channelIndex;
-        value.pairOfInt16_.second = g_selectedSlotIndex;
+        value.pairOfInt16_.second = hmi::g_selectedSlotIndex;
         value.type_ = VALUE_TYPE_UINT32;
 
         selectChannel(nullptr);
-        g_selectedSlotIndex = slotIndex;
+        hmi::g_selectedSlotIndex = slotIndex;
     } else if (operation == DATA_OPERATION_GET_CONTEXT) {
         value = Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
@@ -1464,7 +1465,7 @@ void data_no_channel_index(int slotIndex, DataOperationEnum operation, Cursor cu
         auto channelIndex = value.pairOfInt16_.first;
         auto slotIndex = value.pairOfInt16_.second;
         selectChannel(channelIndex != -1 ? &Channel::get(channelIndex) : nullptr);
-        selectSlot(slotIndex);
+        hmi::selectSlot(slotIndex);
     }
 }
 
@@ -2000,7 +2001,7 @@ void data_channel_long_title(DataOperationEnum operation, Cursor cursor, Value &
 
 void data_channel_info_brand(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto &slot = *g_slots[g_selectedSlotIndex];
+        auto &slot = *g_slots[hmi::g_selectedSlotIndex];
         value = slot.moduleInfo->moduleBrand;
     }
 }
@@ -2807,7 +2808,7 @@ void data_channel_settings_page(DataOperationEnum operation, Cursor cursor, Valu
 
 void data_channel_firmware_version(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto &slot = *g_slots[g_selectedSlotIndex];
+        auto &slot = *g_slots[hmi::g_selectedSlotIndex];
         value = MakeFirmwareVersionValue(slot.firmwareMajorVersion, slot.firmwareMinorVersion);
     }
 }
@@ -5739,6 +5740,10 @@ void data_slot_test_result(DataOperationEnum operation, Cursor cursor, Value &va
         if (operation == DATA_OPERATION_GET) {
             value = Value((int)psu::Channel::getBySlotIndex(cursor)->getTestResult(), VALUE_TYPE_TEST_RESULT);
         }
+    } else {
+        if (operation == DATA_OPERATION_GET) {
+            value = Value((int)g_slots[cursor]->getTestResult(), VALUE_TYPE_TEST_RESULT);
+        }
     }
 }
 
@@ -5750,7 +5755,7 @@ void data_slot_title_def(DataOperationEnum operation, Cursor cursor, Value &valu
 
 void data_slot_title_max(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(cursor != -1 ? cursor : g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
+        value = Value(cursor != -1 ? cursor : hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
     }
 }
 
