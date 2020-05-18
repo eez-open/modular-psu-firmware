@@ -101,7 +101,7 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size) 
     }
 
     // max. 10 characters
-    static const char *scpiTypeName = getFileTypeScpiName(type);
+    const char *scpiTypeName = getFileTypeScpiName(type);
 
     buffer[position++] = ',';
     strcpy(buffer + position, scpiTypeName);
