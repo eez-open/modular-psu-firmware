@@ -489,7 +489,7 @@ int updateFanSpeed() {
 				auto &channel = Channel::get(i);
 				auto &slot = *g_slots[channel.slotIndex];
 				if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 && slot.moduleRevision == MODULE_REVISION_DCP405_R3B1) {
-					if (channel.isOutputEnabled() && channel.i.set >= 3.0f) {
+					if (channel.isOutputEnabled() && channel.i.mon >= 3.0f) {
 						setMaxPwm = true;
 					}
 				}
@@ -530,7 +530,7 @@ int updateFanSpeed() {
 	return newFanSpeedPWM;
 }
 
-void tick(uint32_t tickCount, bool forceUpdate) {
+void tick(uint32_t tickCount) {
 #if defined(EEZ_PLATFORM_STM32)
     if (g_testResult == TEST_NONE) {
     	// still testing
@@ -544,7 +544,7 @@ void tick(uint32_t tickCount, bool forceUpdate) {
 
 #if defined(EEZ_PLATFORM_STM32)
 	int32_t diff = tickCount - g_fanSpeedLastMeasuredTick;
-	if (forceUpdate || diff >= FAN_SPEED_MEASURMENT_INTERVAL * 1000L) {
+	if (diff >= FAN_SPEED_MEASURMENT_INTERVAL * 1000L) {
 	    g_fanSpeedLastMeasuredTick = tickCount;
 
 	    if (g_fanSpeedPWM != 0) {

@@ -64,8 +64,8 @@ bool test() {
     return success;
 }
 
-void tick(uint32_t tickCount, bool forceUpdate) {
-    if (forceUpdate || tickCount - g_lastMeasuredTick >= TEMP_SENSOR_READ_EVERY_MS * 1000L) {
+void tick(uint32_t tickCount) {
+    if (tickCount - g_lastMeasuredTick >= TEMP_SENSOR_READ_EVERY_MS * 1000L) {
         g_lastMeasuredTick = tickCount;
 
         for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
