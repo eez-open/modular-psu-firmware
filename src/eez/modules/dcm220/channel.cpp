@@ -313,6 +313,17 @@ struct DcmChannel : public Channel {
 
 		return false;
 	}
+
+#if defined(EEZ_PLATFORM_STM32)
+    float readTemperature() override {
+        if (g_slots[slotIndex]->moduleInfo->moduleType == MODULE_TYPE_DCM224) {
+            // TODO this is temporary until module hardware is changed
+            return 25.0f + (isOutputEnabled() ? 5 * i.set : 0.0f);
+        } else {
+            return temperature;
+        }
+    }
+#endif
 };
 
 struct DcmModuleInfo : public PsuModuleInfo {
@@ -588,21 +599,6 @@ static DcmModuleInfo g_dcm224ModuleInfo_(MODULE_TYPE_DCM224, "DCM224", MODULE_RE
 
 ModuleInfo *g_dcm220ModuleInfo = &g_dcm220ModuleInfo_;
 ModuleInfo *g_dcm224ModuleInfo = &g_dcm224ModuleInfo_;
-
-#if defined(EEZ_PLATFORM_STM32)
-
-float readTemperature(int channelIndex) {
-	psu::Channel& channel = psu::Channel::get(channelIndex);
-	auto slot = *g_slots[channel.slotIndex];
-	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
-		// TODO this is temporary until module hardware is changed
-		return 25.0f + (channel.isOutputEnabled() ? 5 * channel.i.set : 0.0f);
-	} else {
-		return ((DcmChannel&)channel).temperature;
-	}
-}
-
-#endif
 
 } // namespace dcm220
 } // namespace eez

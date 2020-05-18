@@ -22,13 +22,6 @@
 #include <eez/scpi/regs.h>
 #include <eez/modules/psu/temp_sensor.h>
 
-#if defined(EEZ_PLATFORM_STM32)
-#include <eez/drivers/tmp1075.h>
-#include <eez/drivers/tc77.h>
-#include <eez/modules/dcp405/channel.h>
-#include <eez/modules/dcm220/channel.h>
-#endif
-
 #if OPTION_AUX_TEMP_SENSOR
 #include <eez/modules/aux_ps/fan.h>
 #endif
@@ -95,19 +88,7 @@ float TempSensor::doRead() {
 #endif
 
 	if (type >= CH1 && type <= CH6) {
-		int channelIndex = type - CH1;
-		int slotIndex = Channel::get(channelIndex).slotIndex;
-		auto &slot = *g_slots[slotIndex];
-
-		if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
-            if (slot.moduleRevision >= MODULE_REVISION_DCP405_R1B1) {
-			    return drivers::tc77::readTemperature(slotIndex);
-            } else {
-                return drivers::tmp1075::readTemperature(slotIndex);
-            }
-		} else if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220 || slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
-			return dcm220::readTemperature(channelIndex);
-		}
+        return Channel::get(type - CH1).readTemperature();
 	}
 #endif
 

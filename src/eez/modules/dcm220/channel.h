@@ -29,9 +29,5 @@ namespace dcm220 {
 extern ModuleInfo *g_dcm220ModuleInfo;
 extern ModuleInfo *g_dcm224ModuleInfo;
 
-#if defined(EEZ_PLATFORM_STM32)
-float readTemperature(int channelIndex);
-#endif
-
 } // namespace dcm220
 } // namespace eez

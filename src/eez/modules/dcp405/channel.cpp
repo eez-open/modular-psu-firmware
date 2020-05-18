@@ -33,6 +33,11 @@
 #include <eez/system.h>
 #include <eez/index.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <eez/drivers/tmp1075.h>
+#include <eez/drivers/tc77.h>
+#endif
+
 /// ADC conversion should be finished after ADC_CONVERSION_MAX_TIME_MS milliseconds.
 #define CONF_ADC_CONVERSION_MAX_TIME_MS 10
 
@@ -682,7 +687,7 @@ struct DcpChannel : public Channel {
 		adc.readAllRegisters(adcRegisters);
 	}
 
-	#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
+#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
 	int getIoExpBitDirection(int io_bit) {
 		return ioexp.getBitDirection(io_bit);
 	}
@@ -694,7 +699,7 @@ struct DcpChannel : public Channel {
 	void changeIoExpBit(int io_bit, bool set) {
 		ioexp.changeBit(io_bit, set);
 	}
-	#endif
+#endif
 
     void voltageBalancing(psu::Channel &channel) {
         // DebugTrace("Channel voltage balancing: CH1_Umon=%f, CH2_Umon=%f",
@@ -781,6 +786,17 @@ struct DcpChannel : public Channel {
 		}
 		return false;
 	}
+
+#if defined(EEZ_PLATFORM_STM32)
+	float readTemperature() override {
+		auto &slot = *g_slots[slotIndex];
+		if (slot.moduleRevision >= MODULE_REVISION_DCP405_R1B1) {
+			return drivers::tc77::readTemperature(slotIndex);
+		} else {
+			return drivers::tmp1075::readTemperature(slotIndex);
+		}
+	}
+#endif
 };
 
 struct DcpModuleInfo : public PsuModuleInfo {

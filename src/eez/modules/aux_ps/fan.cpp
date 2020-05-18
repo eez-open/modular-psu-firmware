@@ -22,9 +22,12 @@
 #include <eez/modules/aux_ps/pid.h>
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/channel.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/persist_conf.h>
+
+#include <eez/modules/dcp405/channel.h>
 
 #include <eez/system.h>
 
@@ -479,6 +482,19 @@ int updateFanSpeed() {
 			// adjust fan speed depending on max. channel temperature
 			float maxChannelTemperature = psu::temperature::getMaxChannelTemperature();
 
+			// TODO remove this after DCP405 R3B1 is fixed
+			bool setMaxPwm = false;
+            using namespace eez::psu;
+			for (int i = 0; i < CH_NUM; i++) {
+				auto &channel = Channel::get(i);
+				auto &slot = *g_slots[channel.slotIndex];
+				if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 && slot.moduleRevision == MODULE_REVISION_DCP405_R3B1) {
+					if (channel.isOutputEnabled() && channel.i.set >= 3.0f) {
+						setMaxPwm = true;
+					}
+				}
+			}
+
 			float iMonMax, iMax;
 			getIMonMax(iMonMax, iMax);
 			float Ki = roundPrec(remap(iMonMax * iMonMax, 0, FAN_PID_KI_MIN, iMax * iMax, FAN_PID_KI_MAX), 0.05f);
@@ -488,7 +504,7 @@ int updateFanSpeed() {
 				g_pidTarget = FAN_MIN_TEMP - 2.0 * iMonMax;
 			}
 
-			g_pidTemp = maxChannelTemperature;
+			g_pidTemp = setMaxPwm ? TEMP_SENSOR_MAX_VALID_TEMPERATURE : maxChannelTemperature;
 			if (g_fanPID.Compute()) {
 				newFanSpeedPWM = (int)round(g_pidDuty);
 
@@ -502,6 +518,10 @@ int updateFanSpeed() {
 					newFanSpeedPWM = FAN_MAX_PWM;
 				}
 			}
+
+			if (setMaxPwm) {
+				newFanSpeedPWM = FAN_MAX_PWM;
+			}
 		} else {
 			newFanSpeedPWM = 0;
 		}
@@ -510,7 +530,7 @@ int updateFanSpeed() {
 	return newFanSpeedPWM;
 }
 
-void tick(uint32_t tickCount) {
+void tick(uint32_t tickCount, bool forceUpdate) {
 #if defined(EEZ_PLATFORM_STM32)
     if (g_testResult == TEST_NONE) {
     	// still testing
@@ -524,7 +544,7 @@ void tick(uint32_t tickCount) {
 
 #if defined(EEZ_PLATFORM_STM32)
 	int32_t diff = tickCount - g_fanSpeedLastMeasuredTick;
-	if (diff >= FAN_SPEED_MEASURMENT_INTERVAL * 1000L) {
+	if (forceUpdate || diff >= FAN_SPEED_MEASURMENT_INTERVAL * 1000L) {
 	    g_fanSpeedLastMeasuredTick = tickCount;
 
 	    if (g_fanSpeedPWM != 0) {

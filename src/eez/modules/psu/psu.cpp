@@ -221,6 +221,14 @@ void init() {
 #endif
 }
 
+static void updateTemperatureAndFanImmediately() {
+    uint32_t tickCount = micros();
+    temperature::tick(tickCount, true);
+#if OPTION_FAN
+    aux_ps::fan::tick(tickCount, true);
+#endif
+}
+
 void onThreadMessage(uint8_t type, uint32_t param) {
     if (type == PSU_MESSAGE_TICK) {
 #if defined(EEZ_PLATFORM_STM32)
@@ -259,8 +267,10 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         channel_dispatcher::setTrackingChannels((uint16_t)param);
     } else if (type == PSU_MESSAGE_CHANNEL_OUTPUT_ENABLE) {
         channel_dispatcher::outputEnable(Channel::get((param >> 8) & 0xFF), param & 0xFF ? true : false);
+        updateTemperatureAndFanImmediately();
     } else if (type == PSU_MESSAGE_SYNC_OUTPUT_ENABLE) {
         channel_dispatcher::syncOutputEnable();
+        updateTemperatureAndFanImmediately();
     } else if (type == PSU_MESSAGE_HARD_RESET) {
         restart();
     } else if (type == PSU_MESSAGE_SHUTDOWN) {
@@ -269,6 +279,7 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         channel_dispatcher::setVoltageInPsuThread((int)param);
     } else if (type == PSU_MESSAGE_SET_CURRENT) {
         channel_dispatcher::setCurrentInPsuThread((int)param);
+        updateTemperatureAndFanImmediately();
     } else if (type == PSU_MESSAGE_CALIBRATION_START) {
         calibration::start(Channel::get((int)param));
     } else if (type == PSU_MESSAGE_CALIBRATION_STOP) {
@@ -659,11 +670,21 @@ void onProtectionTripped() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static void temperatureTick(uint32_t tickCount) {
+    temperature::tick(tickCount);
+}
+
+#if OPTION_FAN
+static void fanTick(uint32_t tickCount) {
+    aux_ps::fan::tick(tickCount);
+}
+#endif
+
 typedef void (*TickFunc)(uint32_t tickCount);
 static TickFunc g_tickFuncs[] = {
-    temperature::tick,
+    temperatureTick,
 #if OPTION_FAN
-    aux_ps::fan::tick,
+    fanTick,
 #endif
     datetime::tick
 };
