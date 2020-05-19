@@ -84,8 +84,8 @@
             {
                 "version": "1.0",
                 "files": [
-                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Voltage%20divider%20calculator/Voltage%20divider%20calculator.py",
-                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Voltage%20divider%20calculator/Voltage%20divider%20calculator.res"
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Voltage%20Divider%20Calculator/Voltage%20Divider%20Calculator.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Voltage%20Divider%20Calculator/Voltage%20Divider%20Calculator.res"
                 ]
             }
         ]
