@@ -78,7 +78,7 @@
         ]
     },
     {
-        "name": "Voltage divider calculator",
+        "name": "Voltage Divider Calculator",
         "description": "This calculator helps calculate values of resistive voltage divider",
         "versions": [
             {
