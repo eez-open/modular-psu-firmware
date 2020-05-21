@@ -106,7 +106,7 @@ public:
 
             inputPinStates = input[0];
         } else {
-            if (++numCrcErrors >= 4) {
+            if (++numCrcErrors >= 100) {
                 psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                 synchronized = false;
                 testResult = TEST_FAILED;
@@ -158,7 +158,7 @@ void data_mio168_inputs(DataOperationEnum operation, Cursor cursor, Value &value
 
 void data_mio168_input_no(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = cursor % 8;
+        value = cursor % 8 + 1;
     }
 }
 
@@ -179,7 +179,7 @@ void data_mio168_outputs(DataOperationEnum operation, Cursor cursor, Value &valu
 
 void data_mio168_output_no(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = cursor % 8;
+        value = cursor % 8 + 1;
     }
 }
 
