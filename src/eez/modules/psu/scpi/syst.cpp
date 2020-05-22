@@ -403,6 +403,55 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighTrippedQ(scpi_t *context) 
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_systemSlotCountQ(scpi_t *context) {
+    SCPI_ResultInt(context, NUM_SLOTS);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemSlotModelQ(scpi_t *context) {
+    int32_t slotIndex;
+    if (!SCPI_ParamInt(context, &slotIndex, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    if (slotIndex < 0 && slotIndex > NUM_SLOTS) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    slotIndex--;
+
+    if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        SCPI_ResultText(context, g_slots[slotIndex]->moduleInfo->moduleName);
+    } else {
+        SCPI_ResultText(context, "");
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemSlotVersionQ(scpi_t *context) {
+    int32_t slotIndex;
+    if (!SCPI_ParamInt(context, &slotIndex, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    if (slotIndex < 0 && slotIndex > NUM_SLOTS) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    slotIndex--;
+
+    auto slot = g_slots[slotIndex];
+    if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        char text[50];
+        sprintf(text, "R%dB%d", (int)(slot->moduleRevision >> 8), (int)(slot->moduleRevision & 0xFF));
+        SCPI_ResultText(context, text);
+    } else {
+        SCPI_ResultText(context, "");
+    }
+
+    return SCPI_RES_OK;
+}
+
 scpi_result_t scpi_cmd_systemChannelCountQ(scpi_t *context) {
     SCPI_ResultInt(context, CH_NUM);
 

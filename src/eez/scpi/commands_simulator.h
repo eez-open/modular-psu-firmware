@@ -256,6 +256,9 @@
     SCPI_COMMAND("SYSTem:BEEPer:STATe?", scpi_cmd_systemBeeperStateQ) \
     SCPI_COMMAND("SYSTem:BEEPer[:IMMediate]", scpi_cmd_systemBeeperImmediate) \
     SCPI_COMMAND("SYSTem:CAPability?", scpi_cmd_systemCapabilityQ) \
+    SCPI_COMMAND("SYSTem:SLOT[:COUNt]?", scpi_cmd_systemSlotCountQ) \
+    SCPI_COMMAND("SYSTem:SLOT:MODel?", scpi_cmd_systemSlotModelQ) \
+    SCPI_COMMAND("SYSTem:SLOT:VERSion?", scpi_cmd_systemSlotVersionQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:CURRent?", scpi_cmd_systemChannelInformationCurrentQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:ONTime:LAST?", scpi_cmd_systemChannelInformationOntimeLastQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:ONTime:TOTal?", scpi_cmd_systemChannelInformationOntimeTotalQ) \
