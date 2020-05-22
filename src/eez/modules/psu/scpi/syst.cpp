@@ -409,19 +409,26 @@ scpi_result_t scpi_cmd_systemSlotCountQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_systemSlotModelQ(scpi_t *context) {
+Module *getModuleFromSlotIndexParam(scpi_t *context) {
     int32_t slotIndex;
     if (!SCPI_ParamInt(context, &slotIndex, TRUE)) {
-        return SCPI_RES_ERR;
+        return nullptr;
     }
     if (slotIndex < 0 && slotIndex > NUM_SLOTS) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return nullptr;
+    }
+    return g_slots[slotIndex - 1];
+}
+
+scpi_result_t scpi_cmd_systemSlotModelQ(scpi_t *context) {
+    auto module = getModuleFromSlotIndexParam(context);
+    if (!module) {
         return SCPI_RES_ERR;
     }
-    slotIndex--;
 
-    if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
-        SCPI_ResultText(context, g_slots[slotIndex]->moduleInfo->moduleName);
+    if (module->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        SCPI_ResultText(context, module->moduleInfo->moduleName);
     } else {
         SCPI_ResultText(context, "");
     }
@@ -430,20 +437,31 @@ scpi_result_t scpi_cmd_systemSlotModelQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemSlotVersionQ(scpi_t *context) {
-    int32_t slotIndex;
-    if (!SCPI_ParamInt(context, &slotIndex, TRUE)) {
+    auto module = getModuleFromSlotIndexParam(context);
+    if (!module) {
         return SCPI_RES_ERR;
     }
-    if (slotIndex < 0 && slotIndex > NUM_SLOTS) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-        return SCPI_RES_ERR;
-    }
-    slotIndex--;
 
-    auto slot = g_slots[slotIndex];
-    if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+    if (module->moduleInfo->moduleType != MODULE_TYPE_NONE) {
         char text[50];
-        sprintf(text, "R%dB%d", (int)(slot->moduleRevision >> 8), (int)(slot->moduleRevision & 0xFF));
+        sprintf(text, "R%dB%d", (int)(module->moduleRevision >> 8), (int)(module->moduleRevision & 0xFF));
+        SCPI_ResultText(context, text);
+    } else {
+        SCPI_ResultText(context, "");
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemSlotFirmwareQ(scpi_t *context) {
+    auto module = getModuleFromSlotIndexParam(context);
+    if (!module) {
+        return SCPI_RES_ERR;
+    }
+
+    if (module->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        char text[50];
+        sprintf(text, "%d.%d", (int)(module->firmwareMajorVersion), (int)(module->firmwareMinorVersion));
         SCPI_ResultText(context, text);
     } else {
         SCPI_ResultText(context, "");

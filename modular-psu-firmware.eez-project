@@ -72647,6 +72647,23 @@
             }
           },
           {
+            "name": "SYSTem:SLOT:FIRMware?",
+            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
+            "parameters": [
+              {
+                "name": "slot_index",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": "quoted-string"
+            }
+          },
+          {
             "name": "SYSTem:CHANnel:INFOrmation:CURRent?",
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_chan_curr",
             "parameters": [
