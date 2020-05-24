@@ -584,16 +584,17 @@ struct DcpChannel : public Channel {
 		if (isOutputEnabled()) {
 			bool belowThreshold = !dac.isOverHwOvpThreshold();
 
-			if (value < previousUSet) {
-				fallingEdge = true;
-				fallingEdgePreviousUMonAdc = u.mon_adc;
-				fallingEdgeTimeout = millis() + (belowThreshold ? CONF_FALLING_EDGE_SW_OVP_DELAY_MS : CONF_FALLING_EDGE_HW_OVP_DELAY_MS);
-				if (isHwOvpEnabled(*this)) {
-					// deactivate HW OVP
-					prot_conf.flags.u_hwOvpDeactivated = 0; // this flag should be 0 while fallingEdge is true
-					ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
-				}
-			} else if (belowThreshold) {
+			// if (value < previousUSet) {
+			// 	fallingEdge = true;
+			// 	fallingEdgePreviousUMonAdc = u.mon_adc;
+			// 	fallingEdgeTimeout = millis() + (belowThreshold ? CONF_FALLING_EDGE_SW_OVP_DELAY_MS : CONF_FALLING_EDGE_HW_OVP_DELAY_MS);
+			// 	if (isHwOvpEnabled(*this)) {
+			// 		// deactivate HW OVP
+			// 		prot_conf.flags.u_hwOvpDeactivated = 0; // this flag should be 0 while fallingEdge is true
+			// 		ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
+			// 	}
+			// } else 
+			if (belowThreshold) {
 				if (isHwOvpEnabled(*this)) {
 					// deactivate HW OVP
 					prot_conf.flags.u_hwOvpDeactivated = 1;

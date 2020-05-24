@@ -124,11 +124,12 @@ uint8_t IOExpander::getRegValue(int i) {
     } else if (reg == REG_GPIOA) {
         value = REG_VALUE_GPIOA;
     } else if (reg == REG_GPIOB) {
-        if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
-            value = R3B1_REG_VALUE_GPIOB;
-        } else {
-            value = REG_VALUE_GPIOB;
-        }
+        // if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
+        //     value = R3B1_REG_VALUE_GPIOB;
+        // } else {
+        //     value = REG_VALUE_GPIOB;
+        // }
+        value = REG_VALUE_GPIOB;
     } else if (reg == REG_GPINTENA) {
         value = REG_VALUE_GPINTENA;
     } else if (reg == REG_DEFVALA) {
@@ -315,11 +316,11 @@ bool IOExpander::testBit(int io_bit) {
     auto result = (gpio & (1 << io_bit)) ? true : false;
 
     auto &slot = *g_slots[slotIndex];
-    if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
-        if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
-            result = !result;
-        }
-    }
+    // if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
+    //     if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
+    //         result = !result;
+    //     }
+    // }
 
     return result;
 }
@@ -335,11 +336,20 @@ bool IOExpander::isAdcReady() {
 
 void IOExpander::changeBit(int io_bit, bool set) {
 	auto &slot = *g_slots[slotIndex];
-    if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
-        if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
-            set = !set;
+
+    if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
+        if (set) {
+            write(REG_GPINTENA, REG_VALUE_GPINTENA);
+        } else {
+            write(REG_GPINTENA, 0);
         }
     }
+
+    // if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
+    //     if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
+    //         set = !set;
+    //     }
+    // }
 
 #if defined(EEZ_PLATFORM_STM32)
     if (io_bit < 8) {
