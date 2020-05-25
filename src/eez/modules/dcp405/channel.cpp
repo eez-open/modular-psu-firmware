@@ -741,7 +741,7 @@ struct DcpChannel : public Channel {
 		uint8_t intcap = ioexp.readIntcapRegister();
 		// DebugTrace("CH%d INTCAP 0x%02X\n", (int)(channelIndex + 1), (int)intcap);
 		if (!(intcap & (1 << IOExpander::R2B5_IO_BIT_IN_OVP_FAULT))) {
-			if (isOutputEnabled()) {
+			if (isOutputEnabled() && isHwOvpEnabled(*this)) {
 				enterOvpProtection();
 			}
 		}
