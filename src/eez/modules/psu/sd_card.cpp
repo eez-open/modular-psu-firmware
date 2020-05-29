@@ -558,10 +558,6 @@ void getDateTime(FileInfo &fileInfo, uint8_t *resultYear, uint8_t *resultMonth, 
     int minute = fileInfo.getModifiedMinute();
     int second = fileInfo.getModifiedSecond();
 
-    uint32_t utc = datetime::makeTime(year, month, day, hour, minute, second);
-    uint32_t local = datetime::utcToLocal(utc, persist_conf::devConf.timeZone, (datetime::DstRule)persist_conf::devConf.dstRule);
-    datetime::breakTime(local, year, month, day, hour, minute, second);
-
     if (resultYear) {
         *resultYear = (uint8_t)(year - 2000);
         *resultMonth = (uint8_t)month;
