@@ -231,8 +231,12 @@ SdFatResult Directory::findFirst(const char *path, const char *pattern, FileInfo
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
     m_handle = FindFirstFileA(temp.c_str(), &fileInfo.m_ffd);
     if (m_handle == INVALID_HANDLE_VALUE) {
-        // TODO check FatFs what he returns
-        return SD_FAT_RESULT_NO_PATH;
+        temp = getRealPath(path);
+        m_handle = FindFirstFileA(temp.c_str(), &fileInfo.m_ffd);
+        if (m_handle == INVALID_HANDLE_VALUE) {
+            // TODO check FatFs what he returns
+            return SD_FAT_RESULT_NO_PATH;
+        }
     }
 #else
     m_handle = opendir(temp.c_str());
