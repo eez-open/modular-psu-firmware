@@ -478,14 +478,15 @@ void Channel::enterOvpProtection() {
 
 float Channel::getSwOvpProtectionLevel() {
     if (prot_conf.flags.u_type) {
-        return channel_dispatcher::getUSet(*this) * 1.03f; // 3%
+    	const float CONF_MIN_SW_OVP_PROTECTION_LEVEL = 0.35f; // 350 mV
+        return MAX(channel_dispatcher::getUSet(*this) * 1.03f, CONF_MIN_SW_OVP_PROTECTION_LEVEL); // 3%
     }
     return channel_dispatcher::getUProtectionLevel(*this);
 }
 
 bool Channel::checkSwOvpCondition() {
     float uProtectionLevel = getSwOvpProtectionLevel();
-    return channel_dispatcher::getUMonLast(*this) >= uProtectionLevel || (flags.rprogEnabled && channel_dispatcher::getUMonDacLast(*this) >= uProtectionLevel);
+    return channel_dispatcher::getUMonLast(*this) > uProtectionLevel || (flags.rprogEnabled && channel_dispatcher::getUMonDacLast(*this) > uProtectionLevel);
 }
 
 void Channel::protectionCheck(ProtectionValue &cpv) {
