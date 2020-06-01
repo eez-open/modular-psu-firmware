@@ -336,6 +336,7 @@ bool IOExpander::isAdcReady() {
 void IOExpander::changeBit(int io_bit, bool set) {
 	auto &slot = *g_slots[slotIndex];
 
+#if defined(EEZ_PLATFORM_STM32)
     if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
         if (set) {
             write(REG_GPINTENA, REG_VALUE_GPINTENA);
@@ -343,6 +344,7 @@ void IOExpander::changeBit(int io_bit, bool set) {
             write(REG_GPINTENA, 0);
         }
     }
+#endif
 
 	if (slot.moduleRevision >= MODULE_REVISION_DCP405_R3B1) {
 		if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
