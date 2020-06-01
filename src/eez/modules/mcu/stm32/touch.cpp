@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory.h>
+
 #include <eez/modules/mcu/touch.h>
 #include <stdint.h>
 #include <i2c.h>
@@ -23,9 +25,16 @@
 #include <eez/debug.h>
 #include <eez/gui/gui.h>
 
-// TSC2007IPW - Touch Screen Controller
+#define TSC2007IPW
+//#define AR1021
 
+#if defined(TSC2007IPW)
 const uint16_t TOUCH_DEVICE_ADDRESS = 0x90;
+#endif
+
+#if defined(AR1021)
+const uint16_t TOUCH_DEVICE_ADDRESS = 0x9A;
+#endif
 
 namespace eez {
 namespace mcu {
@@ -61,8 +70,9 @@ static int16_t g_lastYData = -1;
 static int16_t g_lastZ1Data = 0;
 
 void touchMeasure() {
+#if defined(TSC2007IPW)
     taskENTER_CRITICAL();
-    
+
     uint8_t result[4];
 
     HAL_I2C_Master_Transmit(&hi2c1, TOUCH_DEVICE_ADDRESS, (uint8_t *)&Z1_DATA_ID, 1, 5);
@@ -84,6 +94,23 @@ void touchMeasure() {
         g_lastXData  = (((int16_t)result[0]) << 3) | ((int16_t)result[1]);
         g_lastYData  = (((int16_t)result[2]) << 3) | ((int16_t)result[3]);
     }
+#endif
+
+#if defined(AR1021)
+    taskENTER_CRITICAL();
+
+    uint8_t result[5];
+    memset(result, 0, 5);
+    HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result, 5, 100);
+    
+    taskEXIT_CRITICAL();
+
+    g_lastZ1Data = result[0] & 1 ? CONF_TOUCH_Z1_THRESHOLD + 1 : 0;
+    if (g_lastZ1Data > CONF_TOUCH_Z1_THRESHOLD) {
+        g_lastXData = ((int16_t)result[1]) | (((int16_t)result[2]) << 7);
+        g_lastYData = ((int16_t)result[3]) | (((int16_t)result[4]) << 7);
+    }
+#endif
 }
 
 static void setTimeout(uint32_t &timeout, uint32_t timeoutDuration) {
