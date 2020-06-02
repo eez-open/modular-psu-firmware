@@ -27,6 +27,7 @@
 #include <eez/system.h>
 #include <eez/hmi.h>
 #include <eez/util.h>
+#include <eez/memory.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/button.h>
@@ -100,6 +101,11 @@ void AppContext::onPageChanged(int previousPageId, int activePageId) {
 }
 
 void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
+    if (DISPLAY_WIDTH == 1024 || DISPLAY_WIDTH == 1396) {
+        pageId = PAGE_ID_BIG_WELCOME;
+        page = nullptr;
+    }
+
     page = page ? page : getPageFromIdHook(pageId);
 
     m_pageNavigationStack[m_pageNavigationStackPointer].page = page;
