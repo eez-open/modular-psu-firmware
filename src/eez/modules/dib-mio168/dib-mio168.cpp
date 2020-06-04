@@ -148,7 +148,7 @@ ModuleInfo *g_moduleInfo = &g_mio168ModuleInfo;
 
 namespace gui {
 
-void data_mio168_inputs(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_inputs(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 8;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -156,20 +156,20 @@ void data_mio168_inputs(DataOperationEnum operation, Cursor cursor, Value &value
     }
 }
 
-void data_mio168_input_no(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_input_no(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 8 + 1;
     }
 }
 
-void data_mio168_input_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_input_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto mio168Module = (dib_mio168::Mio168Module *)g_slots[cursor / 8];
         value = mio168Module->getInputPinState(cursor % 8);
     }
 }
 
-void data_mio168_outputs(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_outputs(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 8;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -177,20 +177,20 @@ void data_mio168_outputs(DataOperationEnum operation, Cursor cursor, Value &valu
     }
 }
 
-void data_mio168_output_no(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_output_no(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 8 + 1;
     }
 }
 
-void data_mio168_output_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_output_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto mio168Module = (dib_mio168::Mio168Module *)g_slots[cursor / 8];
         value = mio168Module->getOutputPinState(cursor % 8);
     }
 }
 
-void action_mio168_toggle_output_state() {
+void action_dib_mio168_toggle_output_state() {
     int cursor = getFoundWidgetAtDown().cursor;
     auto mio168Module = (dib_mio168::Mio168Module *)g_slots[cursor / 8];
     mio168Module->setOutputPinState(cursor % 8, !mio168Module->getOutputPinState(cursor % 8));
