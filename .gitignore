@@ -6,4 +6,5 @@ src/third_party/micropython/ports/bare-arm/build
 src/third_party/stm32_cubeide/Debug
 src/third_party/stm32_truestudio/Debug
 *.eez-project-ui-state
-.settings/language.settings.xml
+src/eez/third_party/stm32_truestudio/.settings/language.settings.xml
+src/eez/third_party/stm32_cubeide/.settings/language.settings.xml
