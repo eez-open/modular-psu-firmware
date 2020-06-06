@@ -2762,9 +2762,9 @@ void data_module_specific_ch_settings(DataOperationEnum operation, Cursor cursor
         Channel &channel = Channel::get(iChannel);
         auto modulType = g_slots[channel.slotIndex]->moduleInfo->moduleType;
         if (modulType == MODULE_TYPE_DCP405) {
-            value = PAGE_ID_CH_SETTINGS_DCP405_SPECIFIC;
+            value = PAGE_ID_DIB_DCP405_CH_SETTINGS_SPECIFIC;
         } else if (modulType == MODULE_TYPE_DCM220 || modulType == MODULE_TYPE_DCM224) {
-            value = PAGE_ID_CH_SETTINGS_DCM220_SPECIFIC;
+            value = PAGE_ID_DIB_DCM220_CH_SETTINGS_SPECIFIC;
         } else {
             value = PAGE_ID_NONE;
         }
@@ -2795,7 +2795,7 @@ void data_channel_settings_page(DataOperationEnum operation, Cursor cursor, Valu
             auto modulType = slot.moduleInfo->moduleType;
             if (modulType == MODULE_TYPE_DCM220 || modulType == MODULE_TYPE_DCM224) {
             	if (!bp3c::flash_slave::g_bootloaderMode || (slot.firmwareMajorVersion == 0 && slot.firmwareMinorVersion == 0)) {
-            		value = PAGE_ID_CH_SETTINGS_ERROR_DCM220;
+            		value = PAGE_ID_DIB_DCM220_CH_SETTINGS_ERROR;
             	} else {
             		value = PAGE_ID_CH_SETTINGS_OK;
             	}

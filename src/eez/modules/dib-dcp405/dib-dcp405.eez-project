@@ -7,7 +7,7 @@
           "projectFilePath": "..\\..\\..\\..\\modular-psu-firmware.eez-project"
         },
         {
-          "projectFilePath": "..\\..\\platform\\simulator\\simulator.eez-project"
+          "projectFilePath": "..\\simulator\\simulator.eez-project"
         }
       ]
     },
@@ -390,6 +390,39 @@
         "top": 0,
         "width": 168,
         "height": 484
+      },
+      {
+        "name": "ch_settings_specific",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 234,
+            "height": 60,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center"
+                },
+                "action": "show_ch_settings_adv_options",
+                "left": 0,
+                "top": 8,
+                "width": 234,
+                "height": 34,
+                "text": "Advanced options"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 234,
+        "height": 60
       }
     ],
     "styles": [],

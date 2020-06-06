@@ -7,7 +7,7 @@
           "projectFilePath": "..\\..\\..\\..\\modular-psu-firmware.eez-project"
         },
         {
-          "projectFilePath": "..\\..\\platform\\simulator\\simulator.eez-project"
+          "projectFilePath": "..\\simulator\\simulator.eez-project"
         }
       ]
     },
@@ -68,6 +68,498 @@
         "top": 0,
         "width": 168,
         "height": 484
+      },
+      {
+        "name": "slot_view_def",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 160,
+            "height": 32,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "slot_title_def",
+                "left": 1,
+                "top": 0,
+                "width": 101,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_slot_settings",
+                "left": 102,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "D"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "toggle_slot_max_view",
+                "left": 134,
+                "top": 0,
+                "width": 25,
+                "height": 32,
+                "text": "e"
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 32,
+            "width": 160,
+            "height": 186,
+            "name": "Dout",
+            "widgets": [
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 0,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 31,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 62,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 93,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 124,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 1,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 41,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 81,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 121,
+                "top": 155,
+                "width": 39,
+                "height": 30
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "",
+            "left": 1,
+            "top": 218,
+            "width": 79,
+            "height": 22,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "",
+            "left": 81,
+            "top": 218,
+            "width": 78,
+            "height": 22,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 160,
+        "height": 240,
+        "dataContextOverrides": "{\"slot_title_def\": \"PREL6\"}"
+      },
+      {
+        "name": "slot_view_max",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 32,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Oswald14",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "slot_title_max",
+                "left": 0,
+                "top": 0,
+                "width": 380,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_slot_settings",
+                "left": 380,
+                "top": 0,
+                "width": 50,
+                "height": 32,
+                "text": "D"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "toggle_slot_max_view",
+                "left": 430,
+                "top": 0,
+                "width": 50,
+                "height": 32,
+                "text": "E"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 168,
+        "dataContextOverrides": "{\"slot_title_max\": \"PREL6\"}"
+      },
+      {
+        "name": "slot_view_min",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 238,
+            "height": 24,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "slot_title_min",
+                "left": 0,
+                "top": 0,
+                "width": 193,
+                "height": 24,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "alignVertical": "bottom"
+                },
+                "data": "",
+                "action": "toggle_slot_max_view",
+                "left": 193,
+                "top": 0,
+                "width": 45,
+                "height": 24,
+                "text": "e"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 238,
+        "height": 72,
+        "dataContextOverrides": "{\"slot_title_min\": \"PREL6\"}"
+      },
+      {
+        "name": "slot_view_micro",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 24,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "slot_title_micro",
+                "left": 0,
+                "top": 0,
+                "width": 158,
+                "height": 24,
+                "text": ""
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 72,
+        "dataContextOverrides": "{\"slot_title_micro\": \"PREL6\"}"
       }
     ],
     "styles": [],

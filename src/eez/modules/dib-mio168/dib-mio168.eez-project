@@ -7,7 +7,7 @@
           "projectFilePath": "..\\..\\..\\..\\modular-psu-firmware.eez-project"
         },
         {
-          "projectFilePath": "..\\..\\platform\\simulator\\simulator.eez-project"
+          "projectFilePath": "..\\simulator\\simulator.eez-project"
         }
       ]
     },
