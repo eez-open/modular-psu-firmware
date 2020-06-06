@@ -16,13 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(EEZ_PLATFORM_STM32)
+
 #include <eez/drivers/tc77.h>
 
 #include <main.h>
 #include <eez/platform/stm32/spi.h>
 
 #include <eez/modules/psu/psu.h>
-#include <eez/modules/dcp405/ioexp.h>
+#include <eez/modules/dib-dcp405/ioexp.h>
 
 // TC77 Thermal Sensor with SPI Interface
 // http://www.ti.com/lit/ds/symlink/tmp1075.pdf
@@ -57,3 +59,5 @@ float readTemperature(uint8_t slotIndex) {
 } // namespace tc77
 } // namespace drivers
 } // namespace eez
+
+#endif // EEZ_PLATFORM_STM32

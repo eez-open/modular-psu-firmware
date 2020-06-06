@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(EEZ_PLATFORM_STM32)
+
 #include <stdio.h>
 #include <string.h>
 
@@ -391,3 +393,5 @@ bool SdFat::getInfo(uint64_t &usedSpace, uint64_t &freeSpace) {
 }
 
 } // namespace eez
+
+#endif // EEZ_PLATFORM_STM32

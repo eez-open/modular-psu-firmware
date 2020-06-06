@@ -61,10 +61,10 @@
 #include <eez/modules/mcu/battery.h>
 #include <eez/modules/mcu/eeprom.h>
 
-#include <eez/modules/dcp405/channel.h>
-#include <eez/modules/dcp405/ioexp.h>
-#include <eez/modules/dcp405/dac.h>
-#include <eez/modules/dcp405/adc.h>
+#include <eez/modules/dib-dcp405/channel.h>
+#include <eez/modules/dib-dcp405/ioexp.h>
+#include <eez/modules/dib-dcp405/dac.h>
+#include <eez/modules/dib-dcp405/adc.h>
 
 #include <eez/modules/bp3c/io_exp.h>
 #include <eez/modules/bp3c/eeprom.h>

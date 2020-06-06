@@ -19,7 +19,7 @@
 #include <eez/modules/psu/psu.h>
 
 #include <eez/modules/psu/channel_dispatcher.h>
-#include <eez/modules/dcp405/adc.h>
+#include <eez/modules/dib-dcp405/adc.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/platform/stm32/spi.h>

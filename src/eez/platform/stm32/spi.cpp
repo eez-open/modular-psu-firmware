@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(EEZ_PLATFORM_STM32)
+
 #include <spi.h>
 #include <cmsis_os.h>
 
@@ -125,3 +127,5 @@ void receive(uint8_t slotIndex, uint8_t *output, uint16_t size) {
 
 } // namespace spi
 } // namespace eez
+
+#endif // EEZ_PLATFORM_STM32

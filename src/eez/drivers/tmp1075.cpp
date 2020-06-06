@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(EEZ_PLATFORM_STM32)
+
 #include <math.h>
 #include <i2c.h>
 #include <cmsis_os.h>
@@ -68,3 +70,5 @@ float readTemperature(uint8_t slotIndex) {
 } // namespace tmp1075
 } // namespace drivers
 } // namespace eez
+
+#endif // EEZ_PLATFORM_STM32

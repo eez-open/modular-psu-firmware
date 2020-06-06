@@ -67,15 +67,15 @@ int getSlotView(int slotIndex, Cursor cursor) {
     auto &slot = *g_slots[slotIndex];
     
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
-        return PAGE_ID_DCP405_FRONT_PANEL;
+        return PAGE_ID_DIB_DCP405_SIMULATOR_FRONT_PANEL_MASK;
     }
     
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220) {
-        return PAGE_ID_DCM220_FRONT_PANEL;
+        return PAGE_ID_DIB_DCM220_SIMULATOR_FRONT_PANEL_MASK_DCM220;
     }
     
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
-        return PAGE_ID_DCM224_FRONT_PANEL;
+        return PAGE_ID_DIB_DCM220_SIMULATOR_FRONT_PANEL_MASK_DCM224;
     }
     
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DIB_MIO168) {
@@ -83,11 +83,11 @@ int getSlotView(int slotIndex, Cursor cursor) {
     }
     
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DIB_PREL6) {
-        return PAGE_ID_PREL6_FRONT_PANEL;
+        return PAGE_ID_DIB_PREL6_SIMULATOR_FRONT_PANEL_MASK;
     }
     
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DIB_SMX46) {
-        return PAGE_ID_SMX46_FRONT_PANEL;
+        return PAGE_ID_DIB_SMX46_SIMULATOR_FRONT_PANEL_MASK;
     }
 
     return PAGE_ID_FRONT_PANEL_EMPTY_SLOT;

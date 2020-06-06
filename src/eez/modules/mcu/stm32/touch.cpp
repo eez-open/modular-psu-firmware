@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(EEZ_PLATFORM_STM32)
+
 #include <memory.h>
 
 #include <eez/modules/mcu/touch.h>
@@ -212,3 +214,5 @@ void data_touch_raw_pressed(DataOperationEnum operation, Cursor cursor, Value &v
 
 
 } // namespace eez
+
+#endif // EEZ_PLATFORM_STM32

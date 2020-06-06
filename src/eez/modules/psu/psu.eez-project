@@ -1,0 +1,37 @@
+{
+  "settings": {
+    "general": {
+      "namespace": "",
+      "imports": [
+        {
+          "projectFilePath": "..\\..\\..\\..\\modular-psu-firmware.eez-project"
+        }
+      ]
+    },
+    "build": {
+      "configurations": [
+        {
+          "name": "stm32",
+          "description": "",
+          "properties": ""
+        },
+        {
+          "name": "simulator",
+          "description": "",
+          "properties": ""
+        }
+      ],
+      "files": []
+    }
+  },
+  "data": [],
+  "actions": [],
+  "gui": {
+    "pages": [],
+    "styles": [],
+    "fonts": [],
+    "bitmaps": [],
+    "colors": [],
+    "themes": []
+  }
+}

@@ -39,7 +39,7 @@
 
 #include <eez/modules/bp3c/comm.h>
 
-#include <eez/modules/dcm220/channel.h>
+#include <eez/modules/dib-dcm220/channel.h>
 
 namespace eez {
 

@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(EEZ_PLATFORM_STM32)
+
 #include <assert.h>
 #include <math.h>
 #include <memory.h>
@@ -698,3 +700,5 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
 } // namespace display
 } // namespace mcu
 } // namespace eez
+
+#endif // EEZ_PLATFORM_STM32

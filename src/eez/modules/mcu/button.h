@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(EEZ_PLATFORM_STM32)
+
 #pragma once
 
 #include <main.h>
@@ -43,3 +45,5 @@ private:
 
 } // namespace mcu
 } // namespace eez
+
+#endif // EEZ_PLATFORM_STM32

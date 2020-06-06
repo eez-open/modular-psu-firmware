@@ -431,31 +431,31 @@ set(src_eez_modules_mcu_simulator
 list (APPEND src_files ${src_eez_modules_mcu_simulator})
 source_group("eez\\modules\\mcu\\simulator" FILES ${src_eez_modules_mcu_simulator})
 
-set(src_eez_modules_dcp405
-    src/eez/modules/dcp405/adc.cpp
-    src/eez/modules/dcp405/channel.cpp
-    src/eez/modules/dcp405/dac.cpp
-    src/eez/modules/dcp405/ioexp.cpp
+set(src_eez_modules_dib_dcp405
+    src/eez/modules/dib-dcp405/adc.cpp
+    src/eez/modules/dib-dcp405/channel.cpp
+    src/eez/modules/dib-dcp405/dac.cpp
+    src/eez/modules/dib-dcp405/ioexp.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_dcp405})
-set(header_eez_modules_dcp405
-    src/eez/modules/dcp405/adc.h
-    src/eez/modules/dcp405/channel.h
-    src/eez/modules/dcp405/dac.h
-    src/eez/modules/dcp405/ioexp.h
+list (APPEND src_files ${src_eez_modules_dib_dcp405})
+set(header_eez_modules_dib_dcp405
+    src/eez/modules/dib-dcp405/adc.h
+    src/eez/modules/dib-dcp405/channel.h
+    src/eez/modules/dib-dcp405/dac.h
+    src/eez/modules/dib-dcp405/ioexp.h
 ) 
-list (APPEND header_files ${header_eez_modules_dcp405})
-source_group("eez\\modules\\dcp405" FILES ${src_eez_modules_dcp405} ${header_eez_modules_dcp405})
+list (APPEND header_files ${header_eez_modules_dib_dcp405})
+source_group("eez\\modules\\dib-dcp405" FILES ${src_eez_modules_dib_dcp405} ${header_eez_modules_dib_dcp405})
 
-set(src_eez_modules_dcm220
-    src/eez/modules/dcm220/channel.cpp
+set(src_eez_modules_dib_dcm220
+    src/eez/modules/dib-dcm220/channel.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_dcm220})
-set(header_eez_modules_dcm220
-    src/eez/modules/dcm220/channel.h
+list (APPEND src_files ${src_eez_modules_dib_dcm220})
+set(header_eez_modules_dib_dcm220
+    src/eez/modules/dib-dcm220/channel.h
 ) 
-list (APPEND header_files ${header_eez_modules_dcm220})
-source_group("eez\\modules\\dcm220" FILES ${src_eez_modules_dcm220} ${header_eez_modules_dcm220})
+list (APPEND header_files ${header_eez_modules_dib_dcm220})
+source_group("eez\\modules\\dib-dcm220" FILES ${src_eez_modules_dib_dcm220} ${header_eez_modules_dib_dcm220})
 
 set(src_eez_modules_dib_mio168
     src/eez/modules/dib-mio168/dib-mio168.cpp
