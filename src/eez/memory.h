@@ -66,8 +66,8 @@ static uint8_t * const SCREENSHOOT_BUFFER_START_ADDRESS = VRAM_SCREENSHOOT_JPEG_
 static const uint32_t SCREENSHOOT_BUFFER_SIZE = 480 * 272 * 3;
 
 #if defined(EEZ_PLATFORM_STM32)
-static const uint32_t DISPLAY_WIDTH = 1024;
-static const uint32_t DISPLAY_HEIGHT = 576;
+static const uint32_t DISPLAY_WIDTH = 640;
+static const uint32_t DISPLAY_HEIGHT = 480;
 static const uint32_t VRAM_BUFFER_SIZE = DISPLAY_WIDTH * DISPLAY_HEIGHT * 2; // RGB565
 #endif
 

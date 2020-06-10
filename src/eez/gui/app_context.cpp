@@ -106,6 +106,11 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
         page = nullptr;
     }
 
+    if (DISPLAY_WIDTH == 640 || DISPLAY_WIDTH == 480) {
+        pageId = PAGE_ID_MEDIUM_WELCOME;
+        page = nullptr;
+    }
+
     page = page ? page : getPageFromIdHook(pageId);
 
     m_pageNavigationStack[m_pageNavigationStackPointer].page = page;
