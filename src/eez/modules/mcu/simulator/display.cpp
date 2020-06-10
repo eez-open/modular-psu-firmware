@@ -161,7 +161,7 @@ void turnOn() {
         g_buffer = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
 
         g_buffers[0].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER1_START_ADDRESS;
-        g_buffers[1].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER2_START_ADDRESS;
+        //g_buffers[1].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER2_START_ADDRESS;
         //g_buffers[2].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER3_START_ADDRESS;
         //g_buffers[3].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER4_START_ADDRESS;
         //g_buffers[4].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER5_START_ADDRESS;

@@ -79,7 +79,7 @@ int getSlotView(int slotIndex, Cursor cursor) {
     }
     
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DIB_MIO168) {
-        return PAGE_ID_MIO168_FRONT_PANEL;
+        return PAGE_ID_DIB_MIO168_FRONT_PANEL;
     }
     
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DIB_PREL6) {

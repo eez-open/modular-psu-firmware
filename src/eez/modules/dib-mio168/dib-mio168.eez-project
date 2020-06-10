@@ -1,6 +1,7 @@
 {
   "settings": {
     "general": {
+      "namespace": "dib_mio168",
       "imports": [
         {
           "projectFilePath": "..\\..\\..\\..\\modular-psu-firmware.eez-project"
@@ -25,45 +26,45 @@
   },
   "data": [
     {
-      "name": "mio168_inputs",
+      "name": "inputs",
       "type": "list",
       "defaultValue": "[\n  { \"mio168_input_no\": 1, \"mio168_input_state\": 0 },\n  { \"mio168_input_no\": 2, \"mio168_input_state\": 1 },\n  { \"mio168_input_no\": 3, \"mio168_input_state\": 1 },\n  { \"mio168_input_no\": 4, \"mio168_input_state\": 1 },\n  { \"mio168_input_no\": 5, \"mio168_input_state\": 0 },\n  { \"mio168_input_no\": 6, \"mio168_input_state\": 1 },\n  { \"mio168_input_no\": 7, \"mio168_input_state\": 0 },\n  { \"mio168_input_no\": 8, \"mio168_input_state\": 1 }\n]"
     },
     {
-      "name": "mio168_input_no",
+      "name": "input_no",
       "type": "string",
       "defaultValue": "1"
     },
     {
-      "name": "mio168_input_state",
+      "name": "input_state",
       "type": "boolean",
       "defaultValue": "1"
     },
     {
-      "name": "mio168_outputs",
+      "name": "outputs",
       "type": "list",
       "defaultValue": "[\n  { \"mio168_output_no\": 1, \"mio168_output_state\": 1 },\n  { \"mio168_output_no\": 2, \"mio168_output_state\": 1 },\n  { \"mio168_output_no\": 3, \"mio168_output_state\": 0 },\n  { \"mio168_output_no\": 4, \"mio168_output_state\": 0 },\n  { \"mio168_output_no\": 5, \"mio168_output_state\": 1 },\n  { \"mio168_output_no\": 6, \"mio168_output_state\": 1 },\n  { \"mio168_output_no\": 7, \"mio168_output_state\": 0 },\n  { \"mio168_output_no\": 8, \"mio168_output_state\": 1 }\n]"
     },
     {
-      "name": "mio168_output_no",
+      "name": "output_no",
       "type": "string",
       "defaultValue": "1"
     },
     {
-      "name": "mio168_output_state",
+      "name": "output_state",
       "type": "boolean",
       "defaultValue": "1"
     }
   ],
   "actions": [
     {
-      "name": "mio168_toggle_output_state"
+      "name": "toggle_output_state"
     }
   ],
   "gui": {
     "pages": [
       {
-        "name": "dib_mio168_slot_view_def",
+        "name": "slot_view_def",
         "style": "default",
         "widgets": [
           {
@@ -123,7 +124,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "mio168_inputs",
+            "data": "inputs",
             "left": 0,
             "top": 33,
             "width": 160,
@@ -133,7 +134,7 @@
               "style": {
                 "inheritFrom": "default"
               },
-              "data": "mio168_input_state",
+              "data": "input_state",
               "left": 0,
               "top": 0,
               "width": 20,
@@ -155,7 +156,7 @@
                         "inheritFrom": "default",
                         "font": "RobotoCondensed-Regular"
                       },
-                      "data": "mio168_input_no",
+                      "data": "input_no",
                       "left": 0,
                       "top": 0,
                       "width": 19,
@@ -180,7 +181,7 @@
                         "inheritFrom": "default_inverse",
                         "font": "RobotoCondensed-Regular"
                       },
-                      "data": "mio168_input_no",
+                      "data": "input_no",
                       "left": 0,
                       "top": 0,
                       "width": 19,
@@ -199,7 +200,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "mio168_outputs",
+            "data": "outputs",
             "left": 0,
             "top": 54,
             "width": 160,
@@ -209,7 +210,7 @@
               "style": {
                 "inheritFrom": "default"
               },
-              "data": "mio168_output_state",
+              "data": "output_state",
               "action": "",
               "left": 0,
               "top": 0,
@@ -233,8 +234,8 @@
                         "font": "Oswald17",
                         "alignVertical": "center"
                       },
-                      "data": "mio168_output_no",
-                      "action": "mio168_toggle_output_state",
+                      "data": "output_no",
+                      "action": "toggle_output_state",
                       "left": 0,
                       "top": 0,
                       "width": 39,
@@ -260,8 +261,8 @@
                         "font": "Oswald17",
                         "alignVertical": "center"
                       },
-                      "data": "mio168_output_no",
-                      "action": "mio168_toggle_output_state",
+                      "data": "output_no",
+                      "action": "toggle_output_state",
                       "left": 0,
                       "top": 0,
                       "width": 39,
@@ -410,7 +411,7 @@
         "height": 240
       },
       {
-        "name": "dib_mio168_slot_view_max",
+        "name": "slot_view_max",
         "widgets": [
           {
             "type": "Container",
@@ -472,7 +473,7 @@
         "height": 168
       },
       {
-        "name": "dib_mio168_slot_view_min",
+        "name": "slot_view_min",
         "widgets": [
           {
             "type": "Container",
@@ -522,7 +523,7 @@
         "height": 72
       },
       {
-        "name": "dib_mio168_slot_view_micro",
+        "name": "slot_view_micro",
         "widgets": [
           {
             "type": "Container",
@@ -557,7 +558,7 @@
         "height": 72
       },
       {
-        "name": "mio168_front_panel",
+        "name": "front_panel",
         "style": "",
         "widgets": [
           {
