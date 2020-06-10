@@ -19,6 +19,10 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <spi.h>
+#endif
+
 #include "eez/debug.h"
 #include "eez/firmware.h"
 #include "eez/gui/document.h"
@@ -33,7 +37,13 @@ namespace dib_smx46 {
 struct Smx46ModuleInfo : public ModuleInfo {
 public:
     Smx46ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_SMX46, MODULE_CATEGORY_OTHER, "SMX46", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART)
+        : ModuleInfo(MODULE_TYPE_DIB_SMX46, MODULE_CATEGORY_OTHER, "SMX46", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART, 0,
+#if defined(EEZ_PLATFORM_STM32)
+            SPI_BAUDRATEPRESCALER_64
+#else
+            0
+#endif
+        )
     {}
     
     Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
@@ -85,24 +95,26 @@ public:
         }
     }
 
-    int cnt = 0;
-
     void tick() override {
         if (!synchronized) {
             return;
         }
 
-        if (cnt < 1000) {
-        	cnt++;
-        	return;
+        static int cnt = 0;
+        if (++cnt < 250) {
+            return;
         }
-
         cnt = 0;
+
+
+
 
         if (bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE)) {
             numCrcErrors = 0;
+
+
         } else {
-            if (++numCrcErrors >= 4) {
+            if (++numCrcErrors >= 10) {
                 psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                 synchronized = false;
                 testResult = TEST_FAILED;

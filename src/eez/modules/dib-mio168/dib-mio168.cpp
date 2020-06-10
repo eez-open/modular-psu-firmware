@@ -20,6 +20,10 @@
 #include <stdlib.h>
 #include <memory.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <spi.h>
+#endif
+
 #include "eez/debug.h"
 #include "eez/firmware.h"
 #include "eez/index.h"
@@ -36,7 +40,13 @@ namespace dib_mio168 {
 struct Mio168ModuleInfo : public ModuleInfo {
 public:
     Mio168ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_MIO168, MODULE_CATEGORY_OTHER, "MIO168", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_SPI)
+        : ModuleInfo(MODULE_TYPE_DIB_MIO168, MODULE_CATEGORY_OTHER, "MIO168", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_SPI, 10000,
+#if defined(EEZ_PLATFORM_STM32)
+            SPI_BAUDRATEPRESCALER_4
+#else
+            0
+#endif
+        )
     {}
 
     Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
@@ -98,6 +108,12 @@ public:
             return;
         }
 
+        static int cnt = 0;
+        if (++cnt < 2) {
+            return;
+        }
+        cnt = 0;
+
         output[0] = inputPinStates;
         output[1] = outputPinStates;
 
@@ -106,7 +122,7 @@ public:
 
             inputPinStates = input[0];
         } else {
-            if (++numCrcErrors >= 100) {
+            if (++numCrcErrors >= 10) {
                 psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                 synchronized = false;
                 testResult = TEST_FAILED;

@@ -802,7 +802,7 @@ struct DcpChannel : public Channel {
 struct DcpModuleInfo : public PsuModuleInfo {
 public:
 	DcpModuleInfo() 
-		: PsuModuleInfo(MODULE_TYPE_DCP405, "DCP405", "Envox", MODULE_REVISION_DCP405_R2B11, FLASH_METHOD_NONE, 1)
+		: PsuModuleInfo(MODULE_TYPE_DCP405, "DCP405", "Envox", MODULE_REVISION_DCP405_R2B11, FLASH_METHOD_NONE, 0, 0, 1)
 	{
 	}
 

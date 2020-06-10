@@ -59,7 +59,7 @@ struct Channel;
 struct PsuModuleInfo : public ModuleInfo {
     uint8_t numChannels;
 
-    PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint8_t numChannels);
+    PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration, uint32_t spiBaudRatePrescaler, uint8_t numChannels);
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override;
 
@@ -71,6 +71,7 @@ public:
     PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision);
 
     void boot() override;
+    TestResult getTestResult() override;
 };
 
 void init();

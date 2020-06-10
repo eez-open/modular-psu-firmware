@@ -18,6 +18,7 @@
 
 #if OPTION_DISPLAY
 
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 
@@ -1423,7 +1424,26 @@ void data_channels_view_mode_in_max(DataOperationEnum operation, Cursor cursor, 
 }
 
 int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
-    return g_slots[slotIndex]->moduleInfo->getSlotView(slotViewType, slotIndex, cursor);
+    auto testResult = g_slots[slotIndex]->getTestResult();
+    if (testResult == TEST_OK || testResult == TEST_SKIPPED) {
+        return g_slots[slotIndex]->moduleInfo->getSlotView(slotViewType, slotIndex, cursor);
+    } else {
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
+            int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;        
+            return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
+            return PAGE_ID_SLOT_MAX_ERROR;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
+            return PAGE_ID_SLOT_MIN_ERROR;
+        }
+
+        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
+        return PAGE_ID_SLOT_MICRO_ERROR;
+    }
 }
 
 void data_channel_index(Channel &channel, DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2758,9 +2778,7 @@ void data_channel_protection_otp_delay(DataOperationEnum operation, Cursor curso
 
 void data_module_specific_ch_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        auto modulType = g_slots[channel.slotIndex]->moduleInfo->moduleType;
+        auto modulType = g_slots[hmi::g_selectedSlotIndex]->moduleInfo->moduleType;
         if (modulType == MODULE_TYPE_DCP405) {
             value = PAGE_ID_DIB_DCP405_CH_SETTINGS_SPECIFIC;
         } else if (modulType == MODULE_TYPE_DCM220 || modulType == MODULE_TYPE_DCM224) {
@@ -2773,10 +2791,8 @@ void data_module_specific_ch_settings(DataOperationEnum operation, Cursor cursor
 
 void data_channel_has_error_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        auto modulType = g_slots[channel.slotIndex]->moduleInfo->moduleType;
-        if (modulType == MODULE_TYPE_DCM220 || modulType == MODULE_TYPE_DCM224) {
+        auto modulType = g_slots[hmi::g_selectedSlotIndex]->moduleInfo->moduleType;
+        if (modulType != MODULE_TYPE_DCP405) {
             value = 1;
         } else {
             value = 0;
@@ -2786,14 +2802,13 @@ void data_channel_has_error_settings(DataOperationEnum operation, Cursor cursor,
 
 void data_channel_settings_page(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        if (channel.isOk()) {
+    	auto temp = hmi::g_selectedSlotIndex;
+        auto &slot = *g_slots[temp];
+        if (slot.getTestResult() == TEST_OK) {
             value = PAGE_ID_CH_SETTINGS_OK;
         } else {
-            auto &slot = *g_slots[channel.slotIndex];
             auto modulType = slot.moduleInfo->moduleType;
-            if (modulType == MODULE_TYPE_DCM220 || modulType == MODULE_TYPE_DCM224) {
+            if (modulType != MODULE_TYPE_DCP405) {
             	if (!bp3c::flash_slave::g_bootloaderMode || (slot.firmwareMajorVersion == 0 && slot.firmwareMinorVersion == 0)) {
             		value = PAGE_ID_DIB_DCM220_CH_SETTINGS_ERROR;
             	} else {

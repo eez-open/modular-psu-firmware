@@ -9,6 +9,9 @@
         "algorithm": "cpp",
         "system_error": "cpp",
         "iosfwd": "cpp",
-        "xlocale": "cpp"
+        "xlocale": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "type_traits": "cpp"
     }
 }

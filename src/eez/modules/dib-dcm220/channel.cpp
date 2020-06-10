@@ -329,7 +329,13 @@ struct DcmChannel : public Channel {
 struct DcmModuleInfo : public PsuModuleInfo {
 public:
 	DcmModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision) 
-		: PsuModuleInfo(moduleType, moduleName, "Envox", latestModuleRevision, FLASH_METHOD_STM32_BOOTLOADER_UART, 2)
+		: PsuModuleInfo(moduleType, moduleName, "Envox", latestModuleRevision, FLASH_METHOD_STM32_BOOTLOADER_UART, 0,
+#if defined(EEZ_PLATFORM_STM32)
+            SPI_BAUDRATEPRESCALER_16
+#else
+            0
+#endif
+            , 2)
 	{
 	}
 

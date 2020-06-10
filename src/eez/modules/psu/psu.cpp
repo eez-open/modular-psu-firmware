@@ -189,8 +189,8 @@ bool g_adcMeasureAllFinished = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, FlashMethod flashMethod, uint8_t numChannels_)
-    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision, flashMethod)
+PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration, uint32_t spiBaudRatePrescaler, uint8_t numChannels_)
+    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision, flashMethod, flashDuration, spiBaudRatePrescaler)
     , numChannels(numChannels_)
 {
 }
@@ -210,6 +210,10 @@ void PsuModule::boot() {
         Channel::g_channels[CH_NUM]->initParams(moduleRevision);
         CH_NUM++;
     }
+}
+
+TestResult PsuModule::getTestResult() {
+    return Channel::getBySlotIndex(slotIndex)->isOk() ? TEST_OK : TEST_FAILED;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

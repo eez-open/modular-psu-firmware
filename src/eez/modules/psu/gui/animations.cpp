@@ -18,6 +18,7 @@
 
 #if OPTION_DISPLAY
 
+#include <eez/hmi.h>
 #include <eez/gui/gui.h>
 
 #include <eez/modules/psu/psu.h>
@@ -77,7 +78,7 @@ namespace psu {
 namespace gui {
 
 void animateFromDefaultViewToMaxView() {
-    int iMax = g_channel->slotIndex;
+    int iMax = hmi::g_selectedSlotIndex;
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 
@@ -100,7 +101,7 @@ void animateFromDefaultViewToMaxView() {
 }
 
 void animateFromMaxViewToDefaultView() {
-    int iMax = g_channel->slotIndex;
+    int iMax = hmi::g_selectedSlotIndex;
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 
@@ -177,7 +178,7 @@ void animateFromMinViewToMaxView(int maxSlotIndexBefore) {
 }
 
 void animateFromMicroViewToMaxView() {
-    int iMax = g_channel->slotIndex;
+    int iMax = hmi::g_selectedSlotIndex;
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 

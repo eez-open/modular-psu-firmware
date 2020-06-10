@@ -28006,12 +28006,12 @@
                     "style": {
                       "inheritFrom": "channel1",
                       "font": "Heydings14",
-                      "color": "inst_max_header_text",
+                      "color": "inst_min_header_text",
                       "backgroundColor": "inst_min_header_bgnd",
                       "activeColor": "inst_min_header_bgnd",
-                      "activeBackgroundColor": "inst_max_header_text"
+                      "activeBackgroundColor": "inst_min_header_text"
                     },
-                    "action": "show_ch_settings",
+                    "action": "show_slot_settings",
                     "left": 108,
                     "top": 0,
                     "width": 50,
@@ -29041,6 +29041,72 @@
             "top": 0,
             "width": 52,
             "height": 78
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "channel_has_error_settings",
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 78,
+            "widgets": [
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "inst_min_header_bgnd",
+                  "activeBackgroundColor": "inst_min_header_bgnd"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 78
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 78,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "channel1",
+                      "font": "Heydings14",
+                      "color": "inst_min_header_text",
+                      "backgroundColor": "inst_min_header_bgnd",
+                      "activeColor": "inst_min_header_bgnd",
+                      "activeBackgroundColor": "inst_min_header_text"
+                    },
+                    "action": "show_slot_settings",
+                    "left": 0,
+                    "top": 0,
+                    "width": 52,
+                    "height": 39,
+                    "text": "D"
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "inst_min_header_bgnd",
+                      "activeBackgroundColor": "inst_min_header_bgnd"
+                    },
+                    "left": 0,
+                    "top": 39,
+                    "width": 52,
+                    "height": 39
+                  }
+                ]
+              }
+            ]
           },
           {
             "type": "Text",
@@ -35848,7 +35914,7 @@
                       "activeColor": "inst_max_header_bgnd",
                       "activeBackgroundColor": "inst_max_header_text"
                     },
-                    "action": "show_ch_settings",
+                    "action": "show_slot_settings",
                     "left": 380,
                     "top": 0,
                     "width": 50,

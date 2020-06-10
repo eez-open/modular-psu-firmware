@@ -19,6 +19,10 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <spi.h>
+#endif
+
 #include "eez/debug.h"
 #include "eez/firmware.h"
 #include "eez/gui/document.h"
@@ -33,7 +37,13 @@ namespace dib_prel6 {
 struct Prel6ModuleInfo : public ModuleInfo {
 public:
     Prel6ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_PREL6, MODULE_CATEGORY_OTHER, "PREL6", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART)
+        : ModuleInfo(MODULE_TYPE_DIB_PREL6, MODULE_CATEGORY_OTHER, "PREL6", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART, 0, 
+#if defined(EEZ_PLATFORM_STM32)
+            SPI_BAUDRATEPRESCALER_64
+#else
+            0
+#endif
+        )
     {}
     
     Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
@@ -85,34 +95,26 @@ public:
         }
     }
 
-    int cnt1 = 0;
-    int cnt2 = 0;
-
     void tick() override {
         if (!synchronized) {
             return;
         }
 
-        cnt1++;
-
-        if (cnt1 % 1000) {
-            cnt2++;
+        static int cnt = 0;
+        if (++cnt < 250) {
             return;
         }
+        cnt = 0;
+
+
+
 
         if (bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE)) {
-            cnt2++;
-
-            if (cnt2 % 10000 == 0) {
-                uint32_t scnt1 = *(uint32_t *)(input + 0);
-                uint32_t scnt2 = *(uint32_t *)(input + 4);
-                uint32_t scnt3 = *(uint32_t *)(input + 8);
-                DebugTrace("%d, %d, %d, %d, %d\n", cnt1, cnt2, scnt1, scnt2, scnt3);
-            }
-
             numCrcErrors = 0;
+
+
         } else {
-            if (++numCrcErrors >= 4) {
+            if (++numCrcErrors >= 10) {
                 psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                 synchronized = false;
                 testResult = TEST_FAILED;

@@ -616,6 +616,7 @@ void PsuAppContext::showProgressPage(const char *message, void (*abortCallback)(
     m_progressWithoutAbort = false;
     m_progressAbortCallback = abortCallback;
     m_pushProgressPage = true;
+    g_progress = Value();
 
     if (osThreadGetId() == g_guiTaskHandle) {
     	doShowProgressPage();
@@ -626,6 +627,7 @@ void PsuAppContext::showProgressPageWithoutAbort(const char *message) {
     m_progressMessage = message;
     m_progressWithoutAbort = true;
     m_pushProgressPage = true;
+    g_progress = Value();
 
     if (osThreadGetId() == g_guiTaskHandle) {
     	doShowProgressPage();
@@ -1886,108 +1888,91 @@ void selectChannel(Channel *channel) {
 
 static int getDefaultView(int slotIndex, Cursor cursor) {
     int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
-
-    Channel &channel = Channel::get(cursor);
-    if (channel.isOk()) {
-        int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
-        if (numChannels == 1) {
-            if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
-                if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
-                    return PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_SERIES;
-                } else {
-                    return PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_SERIES;
-                }
-            } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
-                if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
-                    return PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_PARALLEL;
-                } else {
-                    return PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_PARALLEL;
-                }
-            } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
-                return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_NUM_ON : PAGE_ID_SLOT_DEF_1CH_VERT_OFF;
-            } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
-                return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_VBAR_ON : PAGE_ID_SLOT_DEF_1CH_VERT_OFF;
-            } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
-                return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_HBAR_ON : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF;
-            } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_YT) {
-                return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_YT_ON : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF;
+    int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
+    if (numChannels == 1) {
+        Channel &channel = Channel::get(cursor);
+        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
+            if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+                return PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_SERIES;
             } else {
-                return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
+                return PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_SERIES;
             }
-        } else if (numChannels == 2) {
-            return isVert ? PAGE_ID_SLOT_DEF_2CH_VERT : PAGE_ID_SLOT_DEF_2CH_HORZ;
+        } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
+            if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+                return PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_PARALLEL;
+            } else {
+                return PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_PARALLEL;
+            }
+        } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_NUM_ON : PAGE_ID_SLOT_DEF_1CH_VERT_OFF;
+        } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_VBAR_ON : PAGE_ID_SLOT_DEF_1CH_VERT_OFF;
+        } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_HBAR_ON : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF;
+        } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_YT) {
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_YT_ON : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF;
         } else {
             return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
         }
+    } else if (numChannels == 2) {
+        return isVert ? PAGE_ID_SLOT_DEF_2CH_VERT : PAGE_ID_SLOT_DEF_2CH_HORZ;
     } else {
         return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
     }
 }
 
 static int getMaxView(int slotIndex, Cursor cursor) {
-    Channel &channel = Channel::get(cursor);
-    if (channel.isOk()) {
-        int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
-        if (numChannels == 1) {
-            if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
-                return channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_NUM_ON : PAGE_ID_SLOT_MAX_1CH_NUM_OFF;
-            } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
-                return channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_HBAR_ON : PAGE_ID_SLOT_MAX_1CH_HBAR_OFF;
-            } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT) {
-                return channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_YT_ON : PAGE_ID_SLOT_MAX_1CH_YT_OFF;
-            } else {
-                return PAGE_ID_SLOT_MAX_ERROR;
-            }
-        } else if (numChannels == 2) {
-            return PAGE_ID_SLOT_MAX_2CH;
+    int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
+    if (numChannels == 1) {
+        Channel &channel = Channel::get(cursor);
+        if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_NUM_ON : PAGE_ID_SLOT_MAX_1CH_NUM_OFF;
+        } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_HBAR_ON : PAGE_ID_SLOT_MAX_1CH_HBAR_OFF;
+        } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT) {
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_1CH_YT_ON : PAGE_ID_SLOT_MAX_1CH_YT_OFF;
         } else {
             return PAGE_ID_SLOT_MAX_ERROR;
         }
+    } else if (numChannels == 2) {
+        return PAGE_ID_SLOT_MAX_2CH;
     } else {
         return PAGE_ID_SLOT_MAX_ERROR;
     }
 }
 
 static int getMinView(int slotIndex, Cursor cursor) {
-    Channel &channel = Channel::get(cursor);
-    if (channel.isOk()) {
-        int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
-        if (numChannels == 1) {
-            if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
-                return PAGE_ID_SLOT_MIN_1CH_COUPLED_SERIES;
-            } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
-                return PAGE_ID_SLOT_MIN_1CH_COUPLED_PARALLEL;
-            } else {
-                return channel.isOutputEnabled() ? PAGE_ID_SLOT_MIN_1CH_ON : PAGE_ID_SLOT_MIN_1CH_OFF;
-            }
-        } else if (numChannels == 2) {
-            return PAGE_ID_SLOT_MIN_2CH;
+    int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
+    if (numChannels == 1) {
+        Channel &channel = Channel::get(cursor);
+        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
+            return PAGE_ID_SLOT_MIN_1CH_COUPLED_SERIES;
+        } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
+            return PAGE_ID_SLOT_MIN_1CH_COUPLED_PARALLEL;
         } else {
-            return PAGE_ID_SLOT_MIN_ERROR;
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_MIN_1CH_ON : PAGE_ID_SLOT_MIN_1CH_OFF;
         }
+    } else if (numChannels == 2) {
+        return PAGE_ID_SLOT_MIN_2CH;
     } else {
         return PAGE_ID_SLOT_MIN_ERROR;
     }
 }
 
 static int getMicroView(int slotIndex, Cursor cursor) {
-    int channelIndex = cursor;
-    Channel &channel = Channel::get(channelIndex);
-    if (channel.isOk()) {
-        int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
-        if (numChannels == 1) {
-            if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
-                return PAGE_ID_SLOT_MICRO_1CH_COUPLED_SERIES;
-            } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
-                return PAGE_ID_SLOT_MICRO_1CH_COUPLED_PARALLEL;
-            } else {
-                return channel.isOutputEnabled() ? PAGE_ID_SLOT_MICRO_1CH_ON : PAGE_ID_SLOT_MICRO_1CH_OFF;
-            }
-        } else if (numChannels == 2) {
-            return PAGE_ID_SLOT_MICRO_2CH;
+    int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
+    if (numChannels == 1) {
+        int channelIndex = cursor;
+        Channel &channel = Channel::get(channelIndex);
+        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
+            return PAGE_ID_SLOT_MICRO_1CH_COUPLED_SERIES;
+        } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
+            return PAGE_ID_SLOT_MICRO_1CH_COUPLED_PARALLEL;
         } else {
-            return PAGE_ID_SLOT_MICRO_ERROR;
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_MICRO_1CH_ON : PAGE_ID_SLOT_MICRO_1CH_OFF;
         }
+    } else if (numChannels == 2) {
+        return PAGE_ID_SLOT_MICRO_2CH;
     } else {
         return PAGE_ID_SLOT_MICRO_ERROR;
     }

@@ -34,13 +34,15 @@
 
 namespace eez {
 
-ModuleInfo::ModuleInfo(uint16_t moduleType_, uint16_t moduleCategory_, const char *moduleName_, const char *moduleBrand_, uint16_t latestModuleRevision_, FlashMethod flashMethod_)
+ModuleInfo::ModuleInfo(uint16_t moduleType_, uint16_t moduleCategory_, const char *moduleName_, const char *moduleBrand_, uint16_t latestModuleRevision_, FlashMethod flashMethod_, uint32_t flashDuration_, uint32_t spiBaudRatePrescaler_)
     : moduleType(moduleType_)
     , moduleCategory(moduleCategory_)
     , moduleName(moduleName_)
     , moduleBrand(moduleBrand_)
     , latestModuleRevision(latestModuleRevision_)
     , flashMethod(flashMethod_)
+    , flashDuration(flashDuration_)
+    , spiBaudRatePrescaler(spiBaudRatePrescaler_)
 {
 }
 
@@ -115,7 +117,7 @@ void Module::onPowerDown() {
 struct NoneModuleInfo : public ModuleInfo {
 public:
     NoneModuleInfo()
-        : ModuleInfo(MODULE_TYPE_NONE, MODULE_CATEGORY_NONE, "None", "None", 0, FLASH_METHOD_NONE)
+        : ModuleInfo(MODULE_TYPE_NONE, MODULE_CATEGORY_NONE, "None", "None", 0, FLASH_METHOD_NONE, 0, 0)
     {
     }
 
