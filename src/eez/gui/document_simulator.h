@@ -417,14 +417,16 @@ enum DataEnum {
     DATA_ID_DIB_MIO168_OUTPUTS = 415,
     DATA_ID_DIB_MIO168_OUTPUT_NO = 416,
     DATA_ID_DIB_MIO168_OUTPUT_STATE = 417,
-    DATA_ID_FRONT_PANEL_SLOT1_VIEW = 418,
-    DATA_ID_SIMULATOR_LOAD_STATE = 419,
-    DATA_ID_SIMULATOR_LOAD_STATE2 = 420,
-    DATA_ID_SIMULATOR_LOAD = 421,
-    DATA_ID_SIMULATOR_LOAD2 = 422,
-    DATA_ID_MAIN_APP_VIEW = 423,
-    DATA_ID_FRONT_PANEL_SLOT2_VIEW = 424,
-    DATA_ID_FRONT_PANEL_SLOT3_VIEW = 425
+    DATA_ID_DIB_MIO168_ANALOG_INPUTS = 418,
+    DATA_ID_DIB_MIO168_ANALOG_INPUT_VALUE = 419,
+    DATA_ID_FRONT_PANEL_SLOT1_VIEW = 420,
+    DATA_ID_SIMULATOR_LOAD_STATE = 421,
+    DATA_ID_SIMULATOR_LOAD_STATE2 = 422,
+    DATA_ID_SIMULATOR_LOAD = 423,
+    DATA_ID_SIMULATOR_LOAD2 = 424,
+    DATA_ID_MAIN_APP_VIEW = 425,
+    DATA_ID_FRONT_PANEL_SLOT2_VIEW = 426,
+    DATA_ID_FRONT_PANEL_SLOT3_VIEW = 427
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -845,6 +847,8 @@ void data_dib_mio168_input_state(DataOperationEnum operation, Cursor cursor, Val
 void data_dib_mio168_outputs(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_output_no(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_output_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mio168_analog_inputs(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mio168_analog_input_value(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_front_panel_slot1_view(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_simulator_load_state(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_simulator_load_state2(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -1918,4 +1922,4 @@ enum PagesEnum {
     PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD = 182
 };
 
-extern const uint8_t assets[517845];
+extern const uint8_t assets[517829];

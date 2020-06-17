@@ -57,6 +57,16 @@
       "name": "output_state",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "analog_inputs",
+      "type": "list",
+      "defaultValue": "[\n  { \"analog_input_value\": 42 },\n  { \"analog_input_value\": 43 },\n  { \"analog_input_value\": 44 },\n  { \"analog_input_value\": 45 }\n]"
+    },
+    {
+      "name": "analog_input_value",
+      "type": "integer",
+      "defaultValue": "42"
     }
   ],
   "actions": [
@@ -278,30 +288,40 @@
             }
           },
           {
-            "type": "DisplayData",
+            "type": "Grid",
             "style": {
-              "inheritFrom": "default",
-              "font": "Oswald14"
+              "inheritFrom": "default"
             },
-            "data": "dummy",
-            "left": 0,
-            "top": 121,
-            "width": 78,
-            "height": 24,
-            "displayOption": 0
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "default",
-              "font": "Oswald14"
-            },
-            "data": "dummy",
-            "left": 82,
-            "top": 121,
-            "width": 78,
-            "height": 24,
-            "displayOption": 0
+            "data": "analog_inputs",
+            "left": 1,
+            "top": 119,
+            "width": 158,
+            "height": 48,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "left": 0,
+              "top": 0,
+              "width": 79,
+              "height": 24,
+              "widgets": [
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "default",
+                    "font": "Oswald14"
+                  },
+                  "data": "analog_input_value",
+                  "left": 0,
+                  "top": 0,
+                  "width": 79,
+                  "height": 24,
+                  "displayOption": 0
+                }
+              ]
+            }
           },
           {
             "type": "DisplayData",
@@ -325,32 +345,6 @@
             "action": "edit",
             "left": 82,
             "top": 169,
-            "width": 78,
-            "height": 24,
-            "displayOption": 0
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "default",
-              "font": "Oswald14"
-            },
-            "data": "dummy",
-            "left": 0,
-            "top": 145,
-            "width": 78,
-            "height": 24,
-            "displayOption": 0
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "default",
-              "font": "Oswald14"
-            },
-            "data": "dummy",
-            "left": 82,
-            "top": 145,
             "width": 78,
             "height": 24,
             "displayOption": 0

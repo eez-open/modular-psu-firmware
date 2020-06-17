@@ -79,6 +79,8 @@ public:
     uint8_t inputPinStates = 0;
     uint8_t outputPinStates = 0;
 
+    uint16_t analogInputValues[4];
+
     Mio168Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
         : Module(slotIndex, moduleInfo, moduleRevision)
     {
@@ -121,6 +123,12 @@ public:
             numCrcErrors = 0;
 
             inputPinStates = input[0];
+
+            uint16_t *inputU16 = (uint16_t *)(input + 2);
+            analogInputValues[0] = inputU16[0];
+            analogInputValues[1] = inputU16[1];
+            analogInputValues[2] = inputU16[2];
+            analogInputValues[3] = inputU16[3];
         } else {
             if (++numCrcErrors >= 10) {
                 psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
@@ -211,6 +219,22 @@ void action_dib_mio168_toggle_output_state() {
     auto mio168Module = (dib_mio168::Mio168Module *)g_slots[cursor / 8];
     mio168Module->setOutputPinState(cursor % 8, !mio168Module->getOutputPinState(cursor % 8));
 }
+
+void data_dib_mio168_analog_inputs(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = 4;
+    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+        value = hmi::g_selectedSlotIndex * 4 + value.getInt();
+    }
+}
+
+void data_dib_mio168_analog_input_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        auto mio168Module = (dib_mio168::Mio168Module *)g_slots[cursor / 4];
+        value = mio168Module->analogInputValues[cursor % 4];
+    }
+}
+
 
 } // namespace gui
 

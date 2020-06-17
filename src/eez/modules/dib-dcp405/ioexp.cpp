@@ -326,7 +326,6 @@ bool IOExpander::testBit(int io_bit) {
 
 bool IOExpander::isAdcReady() {
 #if defined(EEZ_PLATFORM_STM32)
-    // ready = !HAL_GPIO_ReadPin(SPI2_IRQ_GPIO_Port, SPI2_IRQ_Pin);
     return !testBit(IO_BIT_IN_ADC_DRDY);
 #else
     return true;

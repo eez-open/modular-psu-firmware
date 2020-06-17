@@ -416,7 +416,9 @@ enum DataEnum {
     DATA_ID_DIB_MIO168_INPUT_STATE = 414,
     DATA_ID_DIB_MIO168_OUTPUTS = 415,
     DATA_ID_DIB_MIO168_OUTPUT_NO = 416,
-    DATA_ID_DIB_MIO168_OUTPUT_STATE = 417
+    DATA_ID_DIB_MIO168_OUTPUT_STATE = 417,
+    DATA_ID_DIB_MIO168_ANALOG_INPUTS = 418,
+    DATA_ID_DIB_MIO168_ANALOG_INPUT_VALUE = 419
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -837,6 +839,8 @@ void data_dib_mio168_input_state(DataOperationEnum operation, Cursor cursor, Val
 void data_dib_mio168_outputs(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_output_no(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_output_state(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mio168_analog_inputs(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mio168_analog_input_value(DataOperationEnum operation, Cursor cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor cursor, Value &value);
 
@@ -1859,4 +1863,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM220_CH_SETTINGS_SPECIFIC = 172
 };
 
-extern const uint8_t assets[309946];
+extern const uint8_t assets[309944];
