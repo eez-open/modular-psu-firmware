@@ -60,8 +60,9 @@ struct ModuleInfo {
     FlashMethod flashMethod;
     uint32_t flashDuration;
     uint32_t spiBaudRatePrescaler;
+    bool spiCrcCalculationEnable;
 
-    ModuleInfo(uint16_t moduleType, uint16_t moduleCategory, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration_, uint32_t spiBaudRatePrescaler_);
+    ModuleInfo(uint16_t moduleType, uint16_t moduleCategory, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration_, uint32_t spiBaudRatePrescaler_, bool spiCrcCalculationEnable_);
 
     virtual Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) = 0;
     virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);
@@ -87,6 +88,7 @@ struct Module {
     virtual void initChannels();
     virtual void tick();
     virtual void onPowerDown();
+    virtual void onSpiIrq();
 };
 
 static const int NUM_SLOTS = 3;

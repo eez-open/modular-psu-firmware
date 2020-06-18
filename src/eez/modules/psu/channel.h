@@ -676,8 +676,6 @@ public:
 
     virtual void readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]);
 
-    virtual void onSpiIrq();
-
     virtual void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) = 0;
     virtual void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) = 0;
     virtual void getPowerStepValues(StepValues *stepValues) = 0;

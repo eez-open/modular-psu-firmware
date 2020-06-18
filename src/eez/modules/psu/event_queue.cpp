@@ -465,7 +465,6 @@ static void refreshEvents() {
         g_filter = EVENT_TYPE_INFO;
     }
 
-    g_numEvents = 0;
     g_displayFromPosition = 0;
     g_previousDisplayFromPosition = -1;
     g_selectedEventIndex = -1;
@@ -482,6 +481,7 @@ static void refreshEvents() {
 
         g_refreshEvents = false;
     } else {
+        g_numEvents = 0;
         if (osMutexWait(g_writeQueueMutexId, 5) == osOK) {
             if (g_writeQueueFull || g_writeQueueTail != g_writeQueueHead) {
                 int i = g_writeQueueFull ? (g_writeQueueHead + 1) % WRITE_QUEUE_MAX_SIZE : g_writeQueueHead;

@@ -26,7 +26,15 @@ namespace comm {
 
 bool masterSynchro(int slotIndex);
 
-bool transfer(int slotIndex, uint8_t *output, uint8_t *input, uint32_t bufferSize);
+enum TransferResult {
+    TRANSFER_STATUS_OK,
+    TRANSFER_STATUS_ERROR,
+    TRANSFER_STATUS_BUSY,
+    TRANSFER_STATUS_TIMEOUT,
+    TRANSFER_STATUS_CRC_ERROR
+};
+
+TransferResult transfer(int slotIndex, uint8_t *output, uint8_t *input, uint32_t bufferSize);
 
 } // namespace comm
 } // namespace bp3c

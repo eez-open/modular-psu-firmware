@@ -331,11 +331,13 @@ public:
 	DcmModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision) 
 		: PsuModuleInfo(moduleType, moduleName, "Envox", latestModuleRevision, FLASH_METHOD_STM32_BOOTLOADER_UART, 0,
 #if defined(EEZ_PLATFORM_STM32)
-            SPI_BAUDRATEPRESCALER_16
+            SPI_BAUDRATEPRESCALER_16,
+            false,
 #else
-            0
+            0,
+            false,
 #endif
-            , 2)
+            2)
 	{
 	}
 
@@ -413,15 +415,20 @@ public:
 
 #if defined(EEZ_PLATFORM_STM32)
     void transfer() {
-        if (bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE)) {
+        auto status = bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE);
+        if (status == bp3c::comm::TRANSFER_STATUS_OK) {
             numCrcErrors = 0;
         } else {
-            if (++numCrcErrors >= 4) {
-                event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
-                synchronized = false;
-                testResult = TEST_FAILED;
+            if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
+                if (++numCrcErrors >= 4) {
+                    event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
+                    synchronized = false;
+                    testResult = TEST_FAILED;
+                } else {
+                    DebugTrace("Slot %d CRC %d\n", slotIndex + 1, numCrcErrors);
+                }
             } else {
-                DebugTrace("Slot %d CRC %d\n", slotIndex + 1, numCrcErrors);
+                DebugTrace("Slot %d SPI transfer error %d\n", slotIndex + 1, status);
             }
         }
     }

@@ -42,7 +42,7 @@ void MX_SPI2_Init(void)
   hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_ENABLE;
   hspi2.Init.CRCPolynomial = 7;
   hspi2.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
   hspi2.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
@@ -66,7 +66,7 @@ void MX_SPI4_Init(void)
   hspi4.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   hspi4.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi4.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi4.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi4.Init.CRCCalculation = SPI_CRCCALCULATION_ENABLE;
   hspi4.Init.CRCPolynomial = 7;
   hspi4.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
   hspi4.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
@@ -90,7 +90,7 @@ void MX_SPI5_Init(void)
   hspi5.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   hspi5.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi5.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi5.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi5.Init.CRCCalculation = SPI_CRCCALCULATION_ENABLE;
   hspi5.Init.CRCPolynomial = 7;
   hspi5.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
   hspi5.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;

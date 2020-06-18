@@ -21,6 +21,7 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <spi.h>
+#include <eez/platform/stm32/spi.h>
 #endif
 
 #include "eez/debug.h"
@@ -39,9 +40,11 @@ public:
     Smx46ModuleInfo() 
         : ModuleInfo(MODULE_TYPE_DIB_SMX46, MODULE_CATEGORY_OTHER, "SMX46", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART, 0,
 #if defined(EEZ_PLATFORM_STM32)
-            SPI_BAUDRATEPRESCALER_64
+            SPI_BAUDRATEPRESCALER_64,
+            true
 #else
-            0
+            0,
+            false
 #endif
         )
     {}
@@ -63,7 +66,7 @@ public:
     }
 };
 
-#define BUFFER_SIZE 20
+#define BUFFER_SIZE 16
 
 struct Smx46Module : public Module {
 public:
@@ -72,6 +75,7 @@ public:
     int numCrcErrors = 0;
     uint8_t input[BUFFER_SIZE];
     uint8_t output[BUFFER_SIZE];
+    bool spiReady;
 
     Smx46Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
         : Module(slotIndex, moduleInfo, moduleRevision)
@@ -101,25 +105,40 @@ public:
         }
 
         static int cnt = 0;
-        if (++cnt < 250) {
+        if (++cnt < 25) {
             return;
         }
         cnt = 0;
 
+#if defined(EEZ_PLATFORM_STM32)
+        if (spiReady) {
+            spiReady = false;
+            transfer();
+        }
+#endif
+    }
 
+#if defined(EEZ_PLATFORM_STM32)
+    void onSpiIrq() {
+        spiReady = true;
+    }
+#endif
 
-
-        if (bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE)) {
+    void transfer() {
+        auto status = bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE);
+        if (status == bp3c::comm::TRANSFER_STATUS_OK) {
             numCrcErrors = 0;
-
-
         } else {
-            if (++numCrcErrors >= 10) {
-                psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
-                synchronized = false;
-                testResult = TEST_FAILED;
+            if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
+                if (++numCrcErrors >= 10) {
+                    psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
+                    synchronized = false;
+                    testResult = TEST_FAILED;
+                } else {
+                    DebugTrace("Slot %d CRC %d\n", slotIndex + 1, numCrcErrors);
+                }
             } else {
-                DebugTrace("Slot %d CRC %d\n", slotIndex + 1, numCrcErrors);
+                DebugTrace("Slot %d SPI transfer error %d\n", slotIndex + 1, status);
             }
         }
     }

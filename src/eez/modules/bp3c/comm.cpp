@@ -36,11 +36,6 @@
 #define CONF_MASTER_SYNC_TIMEOUT_MS 500
 #define CONF_MASTER_SYNC_IRQ_TIMEOUT_MS 50
 
-#if defined(EEZ_PLATFORM_STM32)
-static GPIO_TypeDef *SPI_IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
-static const uint16_t SPI_IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
-#endif
-
 namespace eez {
 namespace bp3c {
 namespace comm {
@@ -64,7 +59,7 @@ bool masterSynchro(int slotIndex) {
         if (rxBuffer[0] == SPI_SLAVE_SYNBYTE) {
             uint32_t startIrq = millis();
             while (true) {
-                if (HAL_GPIO_ReadPin(SPI_IRQ_GPIO_Port[slotIndex], SPI_IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
+                if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
                     slot.firmwareMajorVersion = rxBuffer[1];
                     slot.firmwareMinorVersion = rxBuffer[2];
                     slot.idw0 = (rxBuffer[3] << 24) | (rxBuffer[4] << 16) | (rxBuffer[5] << 8) | rxBuffer[6];
@@ -104,18 +99,32 @@ bool masterSynchro(int slotIndex) {
 #endif
 }
 
-bool transfer(int slotIndex, uint8_t *output, uint8_t *input, uint32_t bufferSize) {
+TransferResult transfer(int slotIndex, uint8_t *output, uint8_t *input, uint32_t bufferSize) {
 #if defined(EEZ_PLATFORM_STM32)
+    spi::handle[slotIndex]->ErrorCode = 0;
+
     spi::select(slotIndex, spi::CHIP_SLAVE_MCU);
-    spi::transfer(slotIndex, output, input, bufferSize);
+    auto result = spi::transfer(slotIndex, output, input, bufferSize);
     spi::deselect(slotIndex);
 
-    uint32_t crc = HAL_CRC_Calculate(&hcrc, (uint32_t *)input, bufferSize - 4);
-    return crc == *((uint32_t *)(input + bufferSize - 4));
+    if (g_slots[slotIndex]->moduleInfo->spiCrcCalculationEnable) {
+        if (spi::handle[slotIndex]->ErrorCode == HAL_SPI_ERROR_CRC) {
+            return TRANSFER_STATUS_CRC_ERROR;
+        } else {
+            return (TransferResult)result;
+        }
+    } else {
+        if (result == HAL_OK) {
+            uint32_t crc = HAL_CRC_Calculate(&hcrc, (uint32_t *)input, bufferSize - 4);
+            return crc == *((uint32_t *)(input + bufferSize - 4)) ? TRANSFER_STATUS_OK : TRANSFER_STATUS_CRC_ERROR;
+        } else {
+            return (TransferResult)result;
+        }
+    }
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    return true;
+    return TRANSFER_STATUS_OK;
 #endif
 }
 

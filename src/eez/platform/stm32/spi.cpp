@@ -28,7 +28,7 @@
 namespace eez {
 namespace spi {
 
-static SPI_HandleTypeDef *spiHandle[NUM_SLOTS] = { &hspi2, &hspi4, &hspi5 };
+SPI_HandleTypeDef *handle[] = { &hspi2, &hspi4, &hspi5 };
 
 static GPIO_TypeDef *SPI_CSA_GPIO_Port[] = { SPI2_CSA_GPIO_Port, SPI4_CSA_GPIO_Port, SPI5_CSA_GPIO_Port };
 static GPIO_TypeDef *SPI_CSB_GPIO_Port[] = { SPI2_CSB_GPIO_Port, SPI4_CSB_GPIO_Port, SPI5_CSB_GPIO_Port };
@@ -36,7 +36,10 @@ static GPIO_TypeDef *SPI_CSB_GPIO_Port[] = { SPI2_CSB_GPIO_Port, SPI4_CSB_GPIO_P
 static const uint16_t SPI_CSA_Pin[] = { SPI2_CSA_Pin, SPI4_CSA_Pin, SPI5_CSA_Pin };
 static const uint16_t SPI_CSB_Pin[] = { SPI2_CSB_Pin, SPI4_CSB_Pin, SPI5_CSB_Pin };
 
-static int g_chip[NUM_SLOTS] = { -1, -1, -1 };
+static int g_chip[] = { -1, -1, -1 };
+
+GPIO_TypeDef *IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
+const uint16_t IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
 
 void select(uint8_t slotIndex, int chip) {
 	taskENTER_CRITICAL();
@@ -44,19 +47,27 @@ void select(uint8_t slotIndex, int chip) {
 	auto &slot = *g_slots[slotIndex];
 
 	if (g_chip[slotIndex] != chip) {
-		__HAL_SPI_DISABLE(spiHandle[slotIndex]);
+		__HAL_SPI_DISABLE(handle[slotIndex]);
 
 		if (chip == CHIP_SLAVE_MCU) {
-			WRITE_REG(spiHandle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | slot.moduleInfo->spiBaudRatePrescaler | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+			uint32_t crcCalculation = (slot.moduleInfo->spiCrcCalculationEnable ? SPI_CRCCALCULATION_ENABLE : SPI_CRCCALCULATION_DISABLE);
+			WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | slot.moduleInfo->spiBaudRatePrescaler | SPI_FIRSTBIT_MSB | crcCalculation);
+			handle[slotIndex]->Init.CRCCalculation = crcCalculation;
+		} else if (chip == CHIP_SLAVE_MCU_BOOTLOADER) {
+			// CRC calculation should be always disabled for bootloader
+			WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | slot.moduleInfo->spiBaudRatePrescaler | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+			handle[slotIndex]->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
 		} else if (chip == CHIP_IOEXP || chip == CHIP_TEMP_SENSOR) {
-			WRITE_REG(spiHandle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+			WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+			handle[slotIndex]->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
 		} else {
-			WRITE_REG(spiHandle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_2EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+			WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_2EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+			handle[slotIndex]->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
 		}
 
 		g_chip[slotIndex] = chip;
 
-		// __HAL_SPI_ENABLE(spiHandle[slotIndex]);
+		// __HAL_SPI_ENABLE(handle[slotIndex]);
 	}
 
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
@@ -97,16 +108,16 @@ void deselect(uint8_t slotIndex) {
 	taskEXIT_CRITICAL();
 }
 
-void transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size) {
-    HAL_SPI_TransmitReceive(spiHandle[slotIndex], input, output, size, 100);
+HAL_StatusTypeDef transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size) {
+    return HAL_SPI_TransmitReceive(handle[slotIndex], input, output, size, 100);
 }
 
-void transmit(uint8_t slotIndex, uint8_t *input, uint16_t size) {
-    HAL_SPI_Transmit(spiHandle[slotIndex], input, size, 100);
+HAL_StatusTypeDef transmit(uint8_t slotIndex, uint8_t *input, uint16_t size) {
+    return HAL_SPI_Transmit(handle[slotIndex], input, size, 100);
 }
 
-void receive(uint8_t slotIndex, uint8_t *output, uint16_t size) {
-    HAL_SPI_Receive(spiHandle[slotIndex], output, size, 100);
+HAL_StatusTypeDef receive(uint8_t slotIndex, uint8_t *output, uint16_t size) {
+    return HAL_SPI_Receive(handle[slotIndex], output, size, 100);
 }
 
 } // namespace spi

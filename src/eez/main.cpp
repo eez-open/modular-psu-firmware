@@ -187,24 +187,17 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *p
 }
 
 extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    int slotIndex = -1;
-
-    if (GPIO_Pin == SPI2_IRQ_Pin) {
-        slotIndex = 0;
+    using namespace eez;
+	if (GPIO_Pin == SPI2_IRQ_Pin) {
+        sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 0, 0);
     } else if (GPIO_Pin == SPI4_IRQ_Pin) {
-        slotIndex = 1;
+        sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 1, 0);
     } else if (GPIO_Pin == SPI5_IRQ_Pin) {
-        slotIndex = 2;
+        sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 2, 0);
     } else if (GPIO_Pin == SD_DETECT_Pin) {
         eez::psu::sd_card::onSdDetectInterrupt();
-        return;
     } else if (GPIO_Pin == ENC_A_Pin || GPIO_Pin == ENC_B_Pin) {
         eez::mcu::encoder::onPinInterrupt();
-    }
-
-    if (slotIndex != -1) {
-    	using namespace eez;
-        sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, slotIndex, 0);
     }
 }
 #endif

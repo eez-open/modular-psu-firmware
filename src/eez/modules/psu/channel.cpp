@@ -1599,9 +1599,6 @@ float Channel::getISetUnbalanced() {
 void Channel::readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
 }
 
-void Channel::onSpiIrq() {
-}
-
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
 int Channel::getIoExpBitDirection(int io_bit) {
 	return 0;

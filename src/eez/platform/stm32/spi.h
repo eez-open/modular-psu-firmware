@@ -23,20 +23,26 @@
 namespace eez {
 namespace spi {
 
+extern SPI_HandleTypeDef *handle[];
+
+extern GPIO_TypeDef *IRQ_GPIO_Port[];
+extern const uint16_t IRQ_Pin[];
+
 static const int CHIP_DAC = 0;
 static const int CHIP_ADC = 1;
 static const int CHIP_IOEXP = 2;
 static const int CHIP_TEMP_SENSOR = 3;
 static const int CHIP_SLAVE_MCU = 4;
+static const int CHIP_SLAVE_MCU_BOOTLOADER = 5;
 
 void init(uint8_t slotIndex, int chip);
 
 void select(uint8_t slotIndex, int chip);
 void deselect(uint8_t slotIndex);
 
-void transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size);
-void transmit(uint8_t slotIndex, uint8_t *input, uint16_t size);
-void receive(uint8_t slotIndex, uint8_t *output, uint16_t size);
+HAL_StatusTypeDef transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size);
+HAL_StatusTypeDef transmit(uint8_t slotIndex, uint8_t *input, uint16_t size);
+HAL_StatusTypeDef receive(uint8_t slotIndex, uint8_t *output, uint16_t size);
 
 } // namespace spi
 } // namespace eez

@@ -189,8 +189,8 @@ bool g_adcMeasureAllFinished = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration, uint32_t spiBaudRatePrescaler, uint8_t numChannels_)
-    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision, flashMethod, flashDuration, spiBaudRatePrescaler)
+PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration, uint32_t spiBaudRatePrescaler, bool spiCrcCalculationEnable, uint8_t numChannels_)
+    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision, flashMethod, flashDuration, spiBaudRatePrescaler, spiCrcCalculationEnable)
     , numChannels(numChannels_)
 {
 }
@@ -242,10 +242,7 @@ void onThreadMessage(uint8_t type, uint32_t param) {
     } else if (type == PSU_MESSAGE_TEST) {
         test();
     } else if (type == PSU_MESSAGE_SPI_IRQ) {
-        auto channel = Channel::getBySlotIndex(param);
-        if (channel) {
-            channel->onSpiIrq();
-        }
+        g_slots[param]->onSpiIrq();
     } else if (type == PSU_MESSAGE_ADC_MEASURE_ALL) {
         Channel::get(param).adcMeasureAll();
         g_adcMeasureAllFinished = true;

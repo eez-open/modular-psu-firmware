@@ -22,6 +22,7 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <spi.h>
+#include <eez/platform/stm32/spi.h>
 #endif
 
 #include "eez/debug.h"
@@ -31,6 +32,7 @@
 #include "eez/gui/gui.h"
 #include "eez/modules/psu/event_queue.h"
 #include "eez/modules/bp3c/comm.h"
+#include <eez/modules/bp3c/flash_slave.h>
 
 #include "./dib-mio168.h"
 
@@ -42,9 +44,11 @@ public:
     Mio168ModuleInfo() 
         : ModuleInfo(MODULE_TYPE_DIB_MIO168, MODULE_CATEGORY_OTHER, "MIO168", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_SPI, 10000,
 #if defined(EEZ_PLATFORM_STM32)
-            SPI_BAUDRATEPRESCALER_4
+            SPI_BAUDRATEPRESCALER_4,
+            true
 #else
-            0
+            0,
+            false
 #endif
         )
     {}
@@ -66,7 +70,7 @@ public:
     }
 };
 
-#define BUFFER_SIZE 20
+#define BUFFER_SIZE 16
 
 struct Mio168Module : public Module {
 public:
@@ -75,11 +79,10 @@ public:
     int numCrcErrors = 0;
     uint8_t input[BUFFER_SIZE];
     uint8_t output[BUFFER_SIZE];
-
     uint8_t inputPinStates = 0;
     uint8_t outputPinStates = 0;
-
     uint16_t analogInputValues[4];
+    bool spiReady;
 
     Mio168Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
         : Module(slotIndex, moduleInfo, moduleRevision)
@@ -110,16 +113,32 @@ public:
             return;
         }
 
-        static int cnt = 0;
-        if (++cnt < 2) {
-            return;
-        }
-        cnt = 0;
+        // static int cnt = 0;
+        // if (++cnt < 2) {
+        //     return;
+        // }
+        // cnt = 0;
 
+#if defined(EEZ_PLATFORM_STM32)
+        if (spiReady) {
+            spiReady = false;
+            transfer();
+        }
+#endif
+    }
+
+#if defined(EEZ_PLATFORM_STM32)
+    void onSpiIrq() {
+        spiReady = true;
+    }
+#endif
+
+    void transfer() {
         output[0] = inputPinStates;
         output[1] = outputPinStates;
 
-        if (bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE)) {
+        auto status = bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE);
+        if (status == bp3c::comm::TRANSFER_STATUS_OK) {
             numCrcErrors = 0;
 
             inputPinStates = input[0];
@@ -130,12 +149,16 @@ public:
             analogInputValues[2] = inputU16[2];
             analogInputValues[3] = inputU16[3];
         } else {
-            if (++numCrcErrors >= 10) {
-                psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
-                synchronized = false;
-                testResult = TEST_FAILED;
+            if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
+                if (++numCrcErrors >= 10) {
+                    psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
+                    synchronized = false;
+                    testResult = TEST_FAILED;
+                } else {
+                    DebugTrace("Slot %d CRC %d\n", slotIndex + 1, numCrcErrors);
+                }
             } else {
-                DebugTrace("Slot %d CRC %d\n", slotIndex + 1, numCrcErrors);
+                DebugTrace("Slot %d SPI transfer error %d\n", slotIndex + 1, status);
             }
         }
     }
