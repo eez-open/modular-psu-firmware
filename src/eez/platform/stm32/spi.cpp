@@ -21,9 +21,9 @@
 #include <spi.h>
 #include <cmsis_os.h>
 
-#include <eez/platform/stm32/spi.h>
-
 #include <eez/index.h>
+#include <eez/platform/stm32/spi.h>
+#include <eez/modules/bp3c/comm.h>
 
 namespace eez {
 namespace spi {
@@ -41,8 +41,10 @@ static int g_chip[] = { -1, -1, -1 };
 GPIO_TypeDef *IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
 const uint16_t IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
 
-void select(uint8_t slotIndex, int chip) {
-	taskENTER_CRITICAL();
+void select(uint8_t slotIndex, int chip, bool critical) {
+	if (critical) {
+		taskENTER_CRITICAL();
+	}
 
 	auto &slot = *g_slots[slotIndex];
 
@@ -94,7 +96,7 @@ void select(uint8_t slotIndex, int chip) {
 	}
 }
 
-void deselect(uint8_t slotIndex) {
+void deselect(uint8_t slotIndex, bool critical) {
 	auto &slot = *g_slots[slotIndex];
 
 	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
@@ -105,7 +107,9 @@ void deselect(uint8_t slotIndex) {
 		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_SET);
 	}
 
-	taskEXIT_CRITICAL();
+	if (critical) {
+		taskEXIT_CRITICAL();
+	}
 }
 
 HAL_StatusTypeDef transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size) {
@@ -120,7 +124,57 @@ HAL_StatusTypeDef receive(uint8_t slotIndex, uint8_t *output, uint16_t size) {
     return HAL_SPI_Receive(handle[slotIndex], output, size, 100);
 }
 
+HAL_StatusTypeDef transferDMA(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size) {
+    return HAL_SPI_TransmitReceive_DMA(handle[slotIndex], input, output, size);
+}
+
 } // namespace spi
 } // namespace eez
+
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
+	using namespace eez;
+	using namespace eez::spi;
+	using namespace eez::bp3c::comm;
+
+	uint8_t slotIndex;
+	if (hspi == handle[0]) {
+		slotIndex = 0;
+	} else if (hspi == handle[1]) {
+		slotIndex = 1;
+	} else {
+		slotIndex = 2;
+	}
+
+	deselect(slotIndex, false);
+
+	auto &slot = *g_slots[slotIndex];
+
+	slot.onSpiDmaTransferCompleted(TRANSFER_STATUS_OK);
+}
+
+void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
+	using namespace eez;
+	using namespace eez::spi;
+	using namespace eez::bp3c::comm;
+
+	uint8_t slotIndex;
+	if (hspi == handle[0]) {
+		slotIndex = 0;
+	} else if (hspi == handle[1]) {
+		slotIndex = 1;
+	} else {
+		slotIndex = 2;
+	}
+
+	deselect(slotIndex, false);
+
+	auto &slot = *g_slots[slotIndex];
+
+	if (spi::handle[slotIndex]->ErrorCode == HAL_SPI_ERROR_CRC) {
+		slot.onSpiDmaTransferCompleted(TRANSFER_STATUS_CRC_ERROR);
+	} else {
+		slot.onSpiDmaTransferCompleted(TRANSFER_STATUS_ERROR);
+	}
+}
 
 #endif // EEZ_PLATFORM_STM32

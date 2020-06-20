@@ -219,10 +219,6 @@ TestResult PsuModule::getTestResult() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
-#if defined(EEZ_PLATFORM_STM32)
-    MX_TIM7_Init();
-    HAL_TIM_Base_Start_IT(&htim7);
-#endif
 }
 
 void onThreadMessage(uint8_t type, uint32_t param) {

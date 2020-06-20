@@ -89,6 +89,7 @@ struct Module {
     virtual void tick();
     virtual void onPowerDown();
     virtual void onSpiIrq();
+    virtual void onSpiDmaTransferCompleted(int status);
 };
 
 static const int NUM_SLOTS = 3;

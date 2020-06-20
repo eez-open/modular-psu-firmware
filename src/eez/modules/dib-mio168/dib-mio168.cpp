@@ -25,13 +25,13 @@
 #include <eez/platform/stm32/spi.h>
 #endif
 
-#include "eez/debug.h"
-#include "eez/firmware.h"
-#include "eez/index.h"
-#include "eez/hmi.h"
-#include "eez/gui/gui.h"
-#include "eez/modules/psu/event_queue.h"
-#include "eez/modules/bp3c/comm.h"
+#include <eez/debug.h>
+#include <eez/firmware.h>
+#include <eez/index.h>
+#include <eez/hmi.h>
+#include <eez/gui/gui.h>
+#include <eez/modules/psu/event_queue.h>
+#include <eez/modules/bp3c/comm.h>
 #include <eez/modules/bp3c/flash_slave.h>
 
 #include "./dib-mio168.h"
@@ -70,7 +70,7 @@ public:
     }
 };
 
-#define BUFFER_SIZE 16
+#define BUFFER_SIZE 1024
 
 struct Mio168Module : public Module {
 public:
@@ -137,17 +137,33 @@ public:
         output[0] = inputPinStates;
         output[1] = outputPinStates;
 
-        auto status = bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE);
+        auto status = bp3c::comm::transferDMA(slotIndex, output, input, BUFFER_SIZE);
+        if (status != bp3c::comm::TRANSFER_STATUS_OK) {
+        	auto &slot = *g_slots[slotIndex];
+        	slot.onSpiDmaTransferCompleted(status);
+        }
+    }
+
+    void onSpiDmaTransferCompleted(int status) override {
         if (status == bp3c::comm::TRANSFER_STATUS_OK) {
             numCrcErrors = 0;
 
             inputPinStates = input[0];
 
-            uint16_t *inputU16 = (uint16_t *)(input + 2);
-            analogInputValues[0] = inputU16[0];
-            analogInputValues[1] = inputU16[1];
-            analogInputValues[2] = inputU16[2];
-            analogInputValues[3] = inputU16[3];
+            static uint32_t totalSamples = 0;
+
+            uint16_t *inputU16 = (uint16_t *)(input + 24);
+
+            uint16_t numSamples = inputU16[-1];
+
+            analogInputValues[(totalSamples + 0) % 4] = inputU16[0];
+            analogInputValues[(totalSamples + 1) % 4] = inputU16[1];
+            analogInputValues[(totalSamples + 2) % 4] = inputU16[2];
+            analogInputValues[(totalSamples + 3) % 4] = inputU16[3];
+
+            analogInputValues[3] = numSamples;
+
+            totalSamples += numSamples;
         } else {
             if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
                 if (++numCrcErrors >= 10) {

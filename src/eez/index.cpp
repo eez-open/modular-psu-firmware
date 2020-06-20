@@ -116,6 +116,11 @@ void Module::onPowerDown() {
 void Module::onSpiIrq() {
 }
 
+void Module::onSpiDmaTransferCompleted(int status) {
+
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct NoneModuleInfo : public ModuleInfo {

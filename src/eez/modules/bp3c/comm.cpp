@@ -72,6 +72,8 @@ bool masterSynchro(int slotIndex) {
                 if (diff > CONF_MASTER_SYNC_IRQ_TIMEOUT_MS) {
                     break;
                 }
+
+                osDelay(1);
             }
         } else {
             // DebugTrace("Slot %d: %02X\n", slotIndex + 1, rxBuffer[0]);
@@ -86,6 +88,8 @@ bool masterSynchro(int slotIndex) {
             slot.idw2 = 0;
             return false;
         }
+
+        osDelay(1);
     }
 #endif
 
@@ -121,6 +125,20 @@ TransferResult transfer(int slotIndex, uint8_t *output, uint8_t *input, uint32_t
             return (TransferResult)result;
         }
     }
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    return TRANSFER_STATUS_OK;
+#endif
+}
+
+TransferResult transferDMA(int slotIndex, uint8_t *output, uint8_t *input, uint32_t bufferSize) {
+#if defined(EEZ_PLATFORM_STM32)
+    spi::handle[slotIndex]->ErrorCode = 0;
+
+    spi::select(slotIndex, spi::CHIP_SLAVE_MCU, false);
+    auto result = spi::transferDMA(slotIndex, output, input, bufferSize);
+    return (TransferResult)result;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
