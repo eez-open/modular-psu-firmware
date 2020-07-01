@@ -136,7 +136,7 @@ TransferResult transferDMA(int slotIndex, uint8_t *output, uint8_t *input, uint3
 #if defined(EEZ_PLATFORM_STM32)
     spi::handle[slotIndex]->ErrorCode = 0;
 
-    spi::select(slotIndex, spi::CHIP_SLAVE_MCU, false);
+    spi::select(slotIndex, spi::CHIP_SLAVE_MCU);
     auto result = spi::transferDMA(slotIndex, output, input, bufferSize);
     return (TransferResult)result;
 #endif

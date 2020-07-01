@@ -41,7 +41,7 @@ float readTemperature(uint8_t slotIndex) {
     uint8_t result[2];
 
     spi::select(slotIndex, spi::CHIP_TEMP_SENSOR);
-    spi::transfer(slotIndex, output, result, 2);
+    spi::transfer2(slotIndex, output, result);
     spi::deselect(slotIndex);
 
     uint16_t adc = (((uint16_t)result[0]) << 8) | result[1];

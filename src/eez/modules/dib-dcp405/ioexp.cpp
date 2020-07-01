@@ -385,7 +385,7 @@ uint8_t IOExpander::read(uint8_t reg) {
     uint8_t result[3];
 
     spi::select(slotIndex, spi::CHIP_IOEXP);
-    spi::transfer(slotIndex, data, result, 3);
+    spi::transfer3(slotIndex, data, result);
     spi::deselect(slotIndex);
 
     return result[2];
@@ -400,7 +400,7 @@ void IOExpander::write(uint8_t reg, uint8_t val) {
 
     spi::select(slotIndex, spi::CHIP_IOEXP);
 
-    spi::transfer(slotIndex, data, result, 3);
+    spi::transfer3(slotIndex, data, result);
 
     if (reg == REG_GPIOA) {
         gpioWritten = (gpioWritten & 0xFF00) | val;

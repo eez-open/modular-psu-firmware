@@ -41,11 +41,7 @@ static int g_chip[] = { -1, -1, -1 };
 GPIO_TypeDef *IRQ_GPIO_Port[] = { SPI2_IRQ_GPIO_Port, SPI4_IRQ_GPIO_Port, SPI5_IRQ_GPIO_Port };
 const uint16_t IRQ_Pin[] = { SPI2_IRQ_Pin, SPI4_IRQ_Pin, SPI5_IRQ_Pin };
 
-void select(uint8_t slotIndex, int chip, bool critical) {
-	if (critical) {
-		taskENTER_CRITICAL();
-	}
-
+void select(uint8_t slotIndex, int chip) {
 	auto &slot = *g_slots[slotIndex];
 
 	if (g_chip[slotIndex] != chip) {
@@ -75,53 +71,187 @@ void select(uint8_t slotIndex, int chip, bool critical) {
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
     	if (chip == CHIP_DAC) {
 			// 00
-    		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_RESET);
-    		HAL_GPIO_WritePin(SPI_CSB_GPIO_Port[slotIndex], SPI_CSB_Pin[slotIndex], GPIO_PIN_RESET);
+    		SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
+    		SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
 		} else if (chip == CHIP_ADC) {
     		// 01
-    		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_SET);
-    		HAL_GPIO_WritePin(SPI_CSB_GPIO_Port[slotIndex], SPI_CSB_Pin[slotIndex], GPIO_PIN_RESET);
+    		SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
+    		SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
     	} else if (chip == CHIP_IOEXP) {
     		// 10
-    		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_RESET);
-    		HAL_GPIO_WritePin(SPI_CSB_GPIO_Port[slotIndex], SPI_CSB_Pin[slotIndex], GPIO_PIN_SET);
+    		SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
+    		SPI_CSB_GPIO_Port[slotIndex]->BSRR = SPI_CSB_Pin[slotIndex]; // SET CSA
     	} else {
     		// TEMP_SENSOR
     		// 11
-    		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_SET);
-    		HAL_GPIO_WritePin(SPI_CSB_GPIO_Port[slotIndex], SPI_CSB_Pin[slotIndex], GPIO_PIN_SET);
+    		SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
+    		SPI_CSB_GPIO_Port[slotIndex]->BSRR = SPI_CSB_Pin[slotIndex]; // SET CSA
     	}
     } else {
-		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_RESET);
+		SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
 	}
 }
 
-void deselect(uint8_t slotIndex, bool critical) {
+void deselect(uint8_t slotIndex) {
 	auto &slot = *g_slots[slotIndex];
 
 	if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
 		// 01 ADC
-		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_SET);
-		HAL_GPIO_WritePin(SPI_CSB_GPIO_Port[slotIndex], SPI_CSB_Pin[slotIndex], GPIO_PIN_RESET);
+		SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
+		SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
 	} else {
-		HAL_GPIO_WritePin(SPI_CSA_GPIO_Port[slotIndex], SPI_CSA_Pin[slotIndex], GPIO_PIN_SET);
-	}
-
-	if (critical) {
-		taskEXIT_CRITICAL();
+		SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
 	}
 }
 
+HAL_StatusTypeDef transfer1(uint8_t slotIndex, uint8_t *input, uint8_t *output) {
+	auto hspi = handle[slotIndex];
+	auto spi = hspi->Instance;
+	
+	/* Check if the SPI is already enabled */
+	if ((spi->CR1 & SPI_CR1_SPE) != SPI_CR1_SPE) {
+		/* Enable SPI peripheral */
+		__HAL_SPI_ENABLE(hspi);
+	}	
+
+	SET_BIT(spi->CR2, SPI_RXFIFO_THRESHOLD);
+
+	__IO uint8_t *pDR = (__IO uint8_t *)&spi->DR;
+
+	while (!(spi->SR & SPI_SR_TXE));
+	*pDR = *input;
+	while (!(spi->SR & SPI_SR_RXNE));
+	*output = *pDR;
+
+	return HAL_OK;
+}
+
+HAL_StatusTypeDef transfer2(uint8_t slotIndex, uint8_t *input, uint8_t *output) {
+	auto hspi = handle[slotIndex];
+	auto spi = hspi->Instance;
+	
+	/* Check if the SPI is already enabled */
+	if ((spi->CR1 & SPI_CR1_SPE) != SPI_CR1_SPE) {
+		/* Enable SPI peripheral */
+		__HAL_SPI_ENABLE(hspi);
+	}	
+
+	CLEAR_BIT(spi->CR2, SPI_RXFIFO_THRESHOLD);
+
+	__IO uint16_t *pDR = (__IO uint16_t *)&spi->DR;
+
+	while (!(spi->SR & SPI_SR_TXE));
+	*pDR = *(uint16_t *)input;
+
+	while (!(spi->SR & SPI_SR_RXNE));
+	*(uint16_t *)output = *pDR;
+
+	return HAL_OK;
+}
+
+HAL_StatusTypeDef transfer3(uint8_t slotIndex, uint8_t *input, uint8_t *output) {
+	auto hspi = handle[slotIndex];
+	auto spi = hspi->Instance;
+	
+	/* Check if the SPI is already enabled */
+	if ((spi->CR1 & SPI_CR1_SPE) != SPI_CR1_SPE) {
+		/* Enable SPI peripheral */
+		__HAL_SPI_ENABLE(hspi);
+	}	
+
+	CLEAR_BIT(spi->CR2, SPI_RXFIFO_THRESHOLD);
+
+	__IO uint16_t *pDR = (__IO uint16_t *)&spi->DR;
+
+	while (!(spi->SR & SPI_SR_TXE));
+	*pDR = *(uint16_t *)input;
+
+	while (!(spi->SR & SPI_SR_RXNE));
+	*(uint16_t *)output = *pDR;
+
+	SET_BIT(spi->CR2, SPI_RXFIFO_THRESHOLD);
+
+	while (!(spi->SR & SPI_SR_TXE));
+	*(__IO uint8_t *)pDR = input[2];
+
+	while (!(spi->SR & SPI_SR_RXNE));
+	output[2] = *(__IO uint8_t *)pDR;
+
+	return HAL_OK;
+}
+
+HAL_StatusTypeDef transfer4(uint8_t slotIndex, uint8_t *input, uint8_t *output) {
+	auto hspi = handle[slotIndex];
+	auto spi = hspi->Instance;
+	
+	/* Check if the SPI is already enabled */
+	if ((spi->CR1 & SPI_CR1_SPE) != SPI_CR1_SPE) {
+		/* Enable SPI peripheral */
+		__HAL_SPI_ENABLE(hspi);
+	}	
+
+	CLEAR_BIT(spi->CR2, SPI_RXFIFO_THRESHOLD);
+
+	__IO uint16_t *pDR = (__IO uint16_t *)&spi->DR;
+
+	while (!(spi->SR & SPI_SR_TXE));
+	*pDR = ((uint16_t *)input)[0];
+	
+	while (!(spi->SR & SPI_SR_RXNE));
+	((uint16_t *)output)[0] = *pDR;
+	
+	while (!(spi->SR & SPI_SR_TXE));
+	*pDR = ((uint16_t *)input)[1];
+	
+	while (!(spi->SR & SPI_SR_RXNE));
+	((uint16_t *)output)[1] = *pDR;
+
+	return HAL_OK;
+}
+
+HAL_StatusTypeDef transfer5(uint8_t slotIndex, uint8_t *input, uint8_t *output) {
+	auto hspi = handle[slotIndex];
+	auto spi = hspi->Instance;
+	
+	/* Check if the SPI is already enabled */
+	if ((spi->CR1 & SPI_CR1_SPE) != SPI_CR1_SPE) {
+		/* Enable SPI peripheral */
+		__HAL_SPI_ENABLE(hspi);
+	}	
+
+	CLEAR_BIT(spi->CR2, SPI_RXFIFO_THRESHOLD);
+
+	__IO uint16_t *pDR = (__IO uint16_t *)&spi->DR;
+
+	while (!(spi->SR & SPI_SR_TXE));
+	*pDR = ((uint16_t *)input)[0];
+	
+	while (!(spi->SR & SPI_SR_RXNE));
+	((uint16_t *)output)[0] = *pDR;
+	
+	while (!(spi->SR & SPI_SR_TXE));
+	*pDR = ((uint16_t *)input)[1];
+	
+	while (!(spi->SR & SPI_SR_RXNE));
+	((uint16_t *)output)[1] = *pDR;
+
+	SET_BIT(spi->CR2, SPI_RXFIFO_THRESHOLD);
+
+	while (!(spi->SR & SPI_SR_TXE));
+	*(__IO uint8_t *)pDR = input[4];
+
+	while (!(spi->SR & SPI_SR_RXNE));
+	output[4] = *(__IO uint8_t *)pDR;
+
+	return HAL_OK;
+}
+
 HAL_StatusTypeDef transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size) {
-    return HAL_SPI_TransmitReceive(handle[slotIndex], input, output, size, 100);
+	return HAL_SPI_TransmitReceive(handle[slotIndex], input, output, size, 100);
 }
 
 HAL_StatusTypeDef transmit(uint8_t slotIndex, uint8_t *input, uint16_t size) {
     return HAL_SPI_Transmit(handle[slotIndex], input, size, 100);
-}
-
-HAL_StatusTypeDef receive(uint8_t slotIndex, uint8_t *output, uint16_t size) {
-    return HAL_SPI_Receive(handle[slotIndex], output, size, 100);
 }
 
 HAL_StatusTypeDef transferDMA(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size) {
@@ -145,7 +275,7 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 		slotIndex = 2;
 	}
 
-	deselect(slotIndex, false);
+	deselect(slotIndex);
 
 	auto &slot = *g_slots[slotIndex];
 
@@ -166,7 +296,7 @@ void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
 		slotIndex = 2;
 	}
 
-	deselect(slotIndex, false);
+	deselect(slotIndex);
 
 	auto &slot = *g_slots[slotIndex];
 

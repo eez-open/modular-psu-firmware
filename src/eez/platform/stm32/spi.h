@@ -37,12 +37,18 @@ static const int CHIP_SLAVE_MCU_BOOTLOADER = 5;
 
 void init(uint8_t slotIndex, int chip);
 
-void select(uint8_t slotIndex, int chip, bool critical = true);
-void deselect(uint8_t slotIndex, bool critical = true);
+void select(uint8_t slotIndex, int chip);
+void deselect(uint8_t slotIndex);
+
+HAL_StatusTypeDef transfer1(uint8_t slotIndex, uint8_t *input, uint8_t *output);
+HAL_StatusTypeDef transfer2(uint8_t slotIndex, uint8_t *input, uint8_t *output);
+HAL_StatusTypeDef transfer3(uint8_t slotIndex, uint8_t *input, uint8_t *output);
+HAL_StatusTypeDef transfer4(uint8_t slotIndex, uint8_t *input, uint8_t *output);
+HAL_StatusTypeDef transfer5(uint8_t slotIndex, uint8_t *input, uint8_t *output);
 
 HAL_StatusTypeDef transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size);
+
 HAL_StatusTypeDef transmit(uint8_t slotIndex, uint8_t *input, uint16_t size);
-HAL_StatusTypeDef receive(uint8_t slotIndex, uint8_t *output, uint16_t size);
 
 HAL_StatusTypeDef transferDMA(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size);
 

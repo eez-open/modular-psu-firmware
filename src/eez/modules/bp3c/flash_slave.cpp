@@ -121,7 +121,7 @@ bool waitForAck(int slotIndex) {
 		spi::deselect(slotIndex);
 
 		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_BOOTLOADER);
-		spi::transfer(slotIndex, &txData, &rxData, 1);
+		spi::transfer1(slotIndex, &txData, &rxData);
 		spi::deselect(slotIndex);
 
     	if (rxData == ACK) {

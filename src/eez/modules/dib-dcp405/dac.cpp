@@ -231,7 +231,7 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
     data[2] = value & 0xFF;
 
     spi::select(slotIndex, spi::CHIP_DAC);
-    spi::transfer(slotIndex, data, result, 3);
+    spi::transfer3(slotIndex, data, result);
     spi::deselect(slotIndex);
 }
 

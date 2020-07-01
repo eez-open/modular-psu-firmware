@@ -213,7 +213,7 @@ void AnalogDigitalConverter::init() {
 
     // Send RESET command
     data[0] = ADC_RESET;
-    spi::transfer(slotIndex, data, result, 1);
+    spi::transfer1(slotIndex, data, result);
 
     delay(1);
 
@@ -221,7 +221,7 @@ void AnalogDigitalConverter::init() {
     data[1] = getReg1Val();
     data[2] = ADC_REG2_VAL;
     data[3] = ADC_REG3_VAL;
-    spi::transfer(slotIndex, data, result, 4);
+    spi::transfer4(slotIndex, data, result);
 
     spi::deselect(slotIndex);
 #endif
@@ -242,7 +242,7 @@ bool AnalogDigitalConverter::test() {
     data[3] = 0;
 
     spi::select(slotIndex, spi::CHIP_ADC);
-    spi::transfer(slotIndex, data, result, 4);
+    spi::transfer4(slotIndex, data, result);
     spi::deselect(slotIndex);
 
     uint8_t reg1 = result[1];
@@ -293,7 +293,7 @@ void AnalogDigitalConverter::start(AdcDataType adcDataType_) {
 	data[2] = ADC_START;
 
 	spi::select(slotIndex, spi::CHIP_ADC);
-	spi::transfer(slotIndex, data, result, 3);
+	spi::transfer3(slotIndex, data, result);
 	spi::deselect(slotIndex);
 #endif
 }
@@ -308,7 +308,7 @@ float AnalogDigitalConverter::read() {
     data[2] = 0;
 
     spi::select(slotIndex, spi::CHIP_ADC);
-    spi::transfer(slotIndex, data, result, 3);
+    spi::transfer3(slotIndex, data, result);
     spi::deselect(slotIndex);
 
     uint16_t dmsb = result[1];
@@ -378,7 +378,7 @@ void AnalogDigitalConverter::readAllRegisters(uint8_t registers[]) {
     data[4] = 0;
 
     spi::select(slotIndex, spi::CHIP_ADC);
-    spi::transfer(slotIndex, data, result, 5);
+    spi::transfer5(slotIndex, data, result);
     spi::deselect(slotIndex);
 
     registers[0] = result[1];
