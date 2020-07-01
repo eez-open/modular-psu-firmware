@@ -34,7 +34,7 @@ scpi_result_t scpi_cmd_measureScalarCurrentDcQ(scpi_t *context) {
     }
 
     char buffer[256] = { 0 };
-    strcatCurrent(buffer, channel_dispatcher::getIMonLast(*channel));
+    strcatFloat(buffer, channel_dispatcher::getIMonLast(*channel));
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
