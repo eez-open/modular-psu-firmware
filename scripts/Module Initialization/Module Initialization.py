@@ -28,6 +28,9 @@ slots_orig = []
 
 can_restart = 0
 
+def error(message):
+    scpi('DISP:ERROR "' + message + '"')
+
 def update_model_and_version(slot_index):
     scpi("DISP:DIALog:DATA \"slot" + str(slot_index + 1) + "_model\",STR,\"" + MODELS[slots[slot_index]["model"]]["name"] + "\"")
     scpi("DISP:DIALog:DATA \"slot" + str(slot_index + 1) + "_version_r\",INT," + str(slots[slot_index]["version_r"]))
@@ -69,8 +72,12 @@ def to_hex_str(num):
     return "0" + hex_str if len(hex_str) == 1 else hex_str
 
 def slot_init(slot_index):
-    scpi("INST:MEMO " + str(slot_index + 1) + ",0,2," + str(MODELS[slots[slot_index]["model"]]["id"]))
-    scpi("INST:MEMO " + str(slot_index + 1) + ",2,2,#H" + to_hex_str(slots[slot_index]["version_r"]) + to_hex_str(slots[slot_index]["version_b"]))
+    try:
+        scpi("INST:MEMO " + str(slot_index + 1) + ",0,2," + str(MODELS[slots[slot_index]["model"]]["id"]))
+        scpi("INST:MEMO " + str(slot_index + 1) + ",2,2,#H" + to_hex_str(slots[slot_index]["version_r"]) + to_hex_str(slots[slot_index]["version_b"]))
+    except:
+        error("Failed to write to module EEPROM.")
+        return
     
     slots_orig[slot_index]["model"] = slots[slot_index]["model"]
     slots_orig[slot_index]["version_r"] = slots[slot_index]["version_r"]
@@ -84,16 +91,13 @@ def slot_init(slot_index):
         scpi("DISP:DIALog:DATA \"can_restart\",INT,1")
 
 def get_slots_info():
-    num_channels = scpi("SYSTem:CHANnel?")
-    for channel_index in range(num_channels):
-        slot_index = scpi("SYST:CHAN:SLOT? CH" + str(channel_index + 1)) - 1
-
-        model = scpi("SYST:CHAN:MOD? CH" + str(channel_index + 1))
+    for slot_index in range(3):
+        model = scpi("SYST:SLOT:MOD? " + str(slot_index + 1))
         for i in range(len(MODELS)):
             if MODELS[i]["name"] == model:
                 slots[slot_index]["model"] = i
 
-                version = scpi("SYST:CHAN:VERS? CH" + str(channel_index + 1))
+                version = scpi("SYST:SLOT:VERS? " + str(slot_index + 1))
                 i = version.index('R')
                 j = version.index('B')
                 slots[slot_index]["version_r"] = int(version[i+1:j])
