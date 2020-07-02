@@ -75,9 +75,6 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             } else {
                 psu::gui::showPage(PAGE_ID_MAIN);
             }
-        // } else if (cmd == 26) {
-        //     Channel::get(0).enterOvpProtection();
-        // 
         } else if (cmd == 26) {
         	psu::gui::showPage(PAGE_ID_DEBUG_VARIABLES);
         } else if (cmd == 27) {

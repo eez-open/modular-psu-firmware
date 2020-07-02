@@ -613,8 +613,6 @@ public:
 
     float getDualRangeGndOffset();
 
-    void enterOvpProtection();
-
     //
     // VIRTUAL METHODS
     //
@@ -699,6 +697,7 @@ public:
 protected:
     void doRemoteSensingEnable(bool enable);
     void doRemoteProgrammingEnable(bool enable);
+    void protectionEnter(ProtectionValue &cpv, bool hwOvp);
 
 private:
     bool delayLowRippleCheck;
@@ -721,7 +720,6 @@ private:
     static float getChannel5HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
 
     void clearProtectionConf();
-    void protectionEnter(ProtectionValue &cpv);
     void protectionCheck(ProtectionValue &cpv);
     void protectionCheck();
 

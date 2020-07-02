@@ -428,12 +428,16 @@ int Channel::reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionV
     return QUES_ISUM_OPP;
 }
 
-void Channel::protectionEnter(ProtectionValue &cpv) {
+void Channel::protectionEnter(ProtectionValue &cpv, bool hwOvp) {
     if (IS_OVP_VALUE(this, cpv)) {
-        if (flags.rprogEnabled) {
-            DebugTrace("OVP condition: %f (U_MON_DAC) > %f (OVP level)\n", channel_dispatcher::getUMonDacLast(*this), getSwOvpProtectionLevel());
+        if (hwOvp) {
+            DebugTrace("HW OVP detected\n");
         } else {
-            DebugTrace("OVP condition: %f (U_MON) > %f (OVP level)\n", channel_dispatcher::getUMonLast(*this), getSwOvpProtectionLevel());
+            if (flags.rprogEnabled) {
+                DebugTrace("OVP condition: %f (U_MON_DAC) > %f (OVP level)\n", channel_dispatcher::getUMonDacLast(*this), getSwOvpProtectionLevel());
+            } else {
+                DebugTrace("OVP condition: %f (U_MON) > %f (OVP level)\n", channel_dispatcher::getUMonLast(*this), getSwOvpProtectionLevel());
+            }
         }
     } else if (IS_OCP_VALUE(this, cpv)) {
         DebugTrace("OCP condition: %f (I_MON) > %f (I_SET)\n", channel_dispatcher::getIMonLast(*this), channel_dispatcher::getISet(*this));
@@ -470,10 +474,6 @@ void Channel::protectionEnter(ProtectionValue &cpv) {
     event_queue::pushEvent(eventId);
 
     onProtectionTripped();
-}
-
-void Channel::enterOvpProtection() {
-   protectionEnter(ovp);
 }
 
 float Channel::getSwOvpProtectionLevel() {
@@ -515,14 +515,14 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
             if (cpv.flags.alarmed) {
                 if (micros() - cpv.alarm_started >= delay * 1000000UL) {
                     cpv.flags.alarmed = 0;
-                    protectionEnter(cpv);
+                    protectionEnter(cpv, false);
                 }
             } else {
                 cpv.flags.alarmed = 1;
                 cpv.alarm_started = micros();
             }
         } else {
-            protectionEnter(cpv);
+            protectionEnter(cpv, false);
         }
     } else {
         cpv.flags.alarmed = 0;
