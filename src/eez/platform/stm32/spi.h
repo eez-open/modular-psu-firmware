@@ -33,7 +33,7 @@ static const int CHIP_ADC = 1;
 static const int CHIP_IOEXP = 2;
 static const int CHIP_TEMP_SENSOR = 3;
 static const int CHIP_SLAVE_MCU = 4;
-static const int CHIP_SLAVE_MCU_BOOTLOADER = 5;
+static const int CHIP_SLAVE_MCU_NO_CRC = 5;
 
 void init(uint8_t slotIndex, int chip);
 

@@ -116,11 +116,11 @@ bool waitForAck(int slotIndex) {
 		uint8_t txData = 0;
 		uint8_t rxData;
 
-		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_BOOTLOADER);
+		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, &txData, 1);
 		spi::deselect(slotIndex);
 
-		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_BOOTLOADER);
+		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transfer1(slotIndex, &txData, &rxData);
 		spi::deselect(slotIndex);
 
@@ -128,7 +128,7 @@ bool waitForAck(int slotIndex) {
 			// received ACK
 			txData = ACK;
 
-			spi::select(slotIndex, spi::CHIP_SLAVE_MCU_BOOTLOADER);
+			spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 			spi::transmit(slotIndex, &txData, 1);
 			spi::deselect(slotIndex);
 
@@ -153,7 +153,7 @@ bool syncWithSlave(int slotIndex) {
 
 		txData = BL_SPI_SOF;
 
-		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_BOOTLOADER);
+		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, &txData, 1);
 		spi::deselect(slotIndex);
 
@@ -190,7 +190,7 @@ bool eraseAll(int slotIndex) {
 		txData[1] = CMD_EXTENDED_ERASE;
 		txData[2] = CRC_MASK ^ CMD_EXTENDED_ERASE;
 
-		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_BOOTLOADER);
+		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, txData, 3);
 		spi::deselect(slotIndex);
 
@@ -198,7 +198,7 @@ bool eraseAll(int slotIndex) {
 			return false;
 		}
 
-		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_BOOTLOADER);
+		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, buffer, 3);
 		spi::deselect(slotIndex);
 
@@ -259,7 +259,7 @@ bool writeMemory(int slotIndex, uint32_t address, const uint8_t *buffer, uint32_
 		txData[1] = CMD_WRITE_MEMORY;
 		txData[2] = CRC_MASK ^ CMD_WRITE_MEMORY;
 
-		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_BOOTLOADER);
+		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, txData, 3);
 		spi::deselect(slotIndex);
 
@@ -267,7 +267,7 @@ bool writeMemory(int slotIndex, uint32_t address, const uint8_t *buffer, uint32_
 			return false;
 		}
 
-		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_BOOTLOADER);
+		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, addressAndCrc, 5);
 		spi::deselect(slotIndex);
 
@@ -275,7 +275,7 @@ bool writeMemory(int slotIndex, uint32_t address, const uint8_t *buffer, uint32_
 			return false;
 		}
 
-		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_BOOTLOADER);
+		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, &numBytes, 1);
 		spi::transmit(slotIndex, (uint8_t *)buffer, bufferSize);
 		spi::transmit(slotIndex, &crc, 1);

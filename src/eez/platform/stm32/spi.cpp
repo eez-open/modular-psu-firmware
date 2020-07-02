@@ -51,8 +51,7 @@ void select(uint8_t slotIndex, int chip) {
             uint32_t crcCalculation = (slot.moduleInfo->spiCrcCalculationEnable ? SPI_CRCCALCULATION_ENABLE : SPI_CRCCALCULATION_DISABLE);
             WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | slot.moduleInfo->spiBaudRatePrescaler | SPI_FIRSTBIT_MSB | crcCalculation);
             handle[slotIndex]->Init.CRCCalculation = crcCalculation;
-        } else if (chip == CHIP_SLAVE_MCU_BOOTLOADER) {
-            // CRC calculation should be always disabled for bootloader
+        } else if (chip == CHIP_SLAVE_MCU_NO_CRC) {
             WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | slot.moduleInfo->spiBaudRatePrescaler | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
             handle[slotIndex]->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
         } else if (chip == CHIP_IOEXP || chip == CHIP_TEMP_SENSOR) {
@@ -136,7 +135,7 @@ HAL_StatusTypeDef SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData,
             pTxBuffPtr += 2;
             TxXferCount -= 2;
         } else {
-            *(__IO uint8_t *)&hspi->Instance->DR = (*pTxBuffPtr);
+            *(__IO uint8_t *)&hspi->Instance->DR = *pTxBuffPtr;
             pTxBuffPtr++;
             TxXferCount--;
         }
@@ -150,7 +149,7 @@ HAL_StatusTypeDef SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData,
                 pTxBuffPtr += 2;
                 TxXferCount -= 2;
             } else {
-                *(__IO uint8_t *)&hspi->Instance->DR = (*pTxBuffPtr);
+                *(__IO uint8_t *)&hspi->Instance->DR = *pTxBuffPtr;
                 pTxBuffPtr++;
                 TxXferCount--;
             }
@@ -184,13 +183,23 @@ HAL_StatusTypeDef SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData,
     // Check the end of the transaction
     
     // Control if the TX fifo is empty
-    while ((hspi->Instance->SR & SPI_FLAG_FTLVL) != SPI_FTLVL_EMPTY);
+    while ((hspi->Instance->SR & SPI_FLAG_FTLVL) != SPI_FTLVL_EMPTY) {
+        if (SPI_FLAG_FTLVL == SPI_SR_FRLVL) {
+            /* Read 8bit CRC to flush Data Register */
+            READ_REG(*((__IO uint8_t *)&hspi->Instance->DR));
+        }
+    }
     
     // Control the BSY flag
     while (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_BSY));
 
     // Control if the RX fifo is empty
-    while ((hspi->Instance->SR & SPI_FLAG_FRLVL) != SPI_FTLVL_EMPTY);
+    while ((hspi->Instance->SR & SPI_FLAG_FRLVL) != SPI_FTLVL_EMPTY) {
+        if (SPI_FLAG_FRLVL == SPI_SR_FRLVL) {
+            /* Read 8bit CRC to flush Data Register */
+            READ_REG(*((__IO uint8_t *)&hspi->Instance->DR));
+        }
+    }
 
     return HAL_OK;
 }
@@ -216,7 +225,7 @@ HAL_StatusTypeDef transfer5(uint8_t slotIndex, uint8_t *input, uint8_t *output) 
 }
 
 HAL_StatusTypeDef transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size) {
-	return SPI_TransmitReceive(handle[slotIndex], input, output, size);
+	return HAL_SPI_TransmitReceive(handle[slotIndex], input, output, size, 100);
 }
 
 HAL_StatusTypeDef transmit(uint8_t slotIndex, uint8_t *input, uint16_t size) {
