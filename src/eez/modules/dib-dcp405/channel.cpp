@@ -145,7 +145,7 @@ struct DcpChannel : public Channel {
 		params.OCP_DEFAULT_DELAY = 0.02f;
 		params.OCP_MAX_DELAY = 10.0f;
 
-		params.OPP_DEFAULT_STATE = true;
+		params.OPP_DEFAULT_STATE = false;
 		params.OPP_MIN_DELAY = 1.0f;
 		params.OPP_DEFAULT_DELAY = 10.0f;
 		params.OPP_MAX_DELAY = 300.0f;
