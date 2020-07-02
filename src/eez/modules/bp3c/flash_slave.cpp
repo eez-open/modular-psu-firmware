@@ -18,19 +18,19 @@
 
 #include <assert.h>
 
-#include "eez/firmware.h"
-#include "eez/system.h"
+#include <eez/firmware.h>
+#include <eez/system.h>
 
-#include "eez/modules/psu/psu.h"
-#include "eez/modules/psu/io_pins.h"
-#include "eez/modules/psu/datetime.h"
-#include "eez/modules/psu/profile.h"
-#include "eez/modules/psu/channel_dispatcher.h"
-#include "eez/modules/psu/sd_card.h"
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/io_pins.h>
+#include <eez/modules/psu/datetime.h>
+#include <eez/modules/psu/profile.h>
+#include <eez/modules/psu/channel_dispatcher.h>
+#include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/gui/psu.h>
 
-#include "eez/modules/bp3c/flash_slave.h"
+#include <eez/modules/bp3c/flash_slave.h>
 #include <eez/modules/bp3c/io_exp.h>
 
 #include <eez/libs/sd_fat/sd_fat.h>
