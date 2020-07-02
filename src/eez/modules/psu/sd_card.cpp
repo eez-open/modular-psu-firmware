@@ -108,6 +108,7 @@ void init() {
 
 bool test() {
     if (g_testResult == TEST_FAILED) {
+        g_lastError = SCPI_ERROR_MISSING_MASS_MEDIA;
         generateError(SCPI_ERROR_MISSING_MASS_MEDIA);
     }
 

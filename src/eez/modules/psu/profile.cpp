@@ -100,7 +100,7 @@ void tick() {
     auto tick = millis();
     if (tick - g_lastAutoSaveTime > CONF_AUTO_SAVE_TIMEOUT_MS) {
         g_lastAutoSaveTime = tick;
-        if (isTickSaveAllowed() && isAutoSaveAllowed() && isProfile0Dirty()) {
+        if (isTickSaveAllowed() && isAutoSaveAllowed() && isProfile0Dirty() && sd_card::isMounted(nullptr)) {
             saveStateToProfile0(true);
         }
     }

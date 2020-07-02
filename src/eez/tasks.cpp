@@ -241,6 +241,7 @@ void lowPriorityThreadOneIter() {
             } else if (type == THREAD_MESSAGE_SCREENSHOT) {
                 if (!sd_card::isMounted(nullptr)) {
                     g_screenshotGenerating = false;
+                    generateError(SCPI_ERROR_MISSING_MASS_MEDIA);
                     return;
                 }
 

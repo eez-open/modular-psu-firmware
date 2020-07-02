@@ -455,17 +455,19 @@ bool psuReset() {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool autoRecall(int recallOptions) {
-    if (persist_conf::isProfileAutoRecallEnabled()) {
-        int location = persist_conf::getProfileAutoRecallLocation();
-        int err;
-        auto forceDisableOutput = persist_conf::isForceDisablingAllOutputsOnPowerUpEnabled() || !g_bootTestSuccess;
-        if (profile::recallFromLocation(location, recallOptions | (forceDisableOutput ? profile::RECALL_OPTION_FORCE_DISABLE_OUTPUT : 0), false, &err)) {
-            return true;
-        }
-        if (err != SCPI_ERROR_FILE_NOT_FOUND) {
-            generateError(err);
-        }
-    }
+	if (sd_card::isMounted(nullptr)) {
+		if (persist_conf::isProfileAutoRecallEnabled()) {
+			int location = persist_conf::getProfileAutoRecallLocation();
+			int err;
+			auto forceDisableOutput = persist_conf::isForceDisablingAllOutputsOnPowerUpEnabled() || !g_bootTestSuccess;
+			if (profile::recallFromLocation(location, recallOptions | (forceDisableOutput ? profile::RECALL_OPTION_FORCE_DISABLE_OUTPUT : 0), false, &err)) {
+				return true;
+			}
+			if (err != SCPI_ERROR_FILE_NOT_FOUND) {
+				generateError(err);
+			}
+		}
+	}
 
     return false;
 }
