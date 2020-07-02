@@ -1752,7 +1752,7 @@ void onEncoder(int counter, bool clicked) {
 #endif
         else if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
             edit_mode_step::onEncoder(counter);
-        } else if (activePageId == PAGE_ID_FILE_MANAGER) {
+        } else if (activePageId == PAGE_ID_FILE_MANAGER || activePageId == PAGE_ID_FILE_BROWSER) {
             file_manager::onEncoder(counter);
         } else if (activePage) {
             activePage->onEncoder(counter);
