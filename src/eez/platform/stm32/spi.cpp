@@ -105,12 +105,6 @@ void deselect(uint8_t slotIndex) {
 }
 
 HAL_StatusTypeDef SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size) {
-    /* Process Locked */
-    __HAL_LOCK(hspi);
-    if (hspi->State != HAL_SPI_STATE_BUSY_RX) {
-        hspi->State = HAL_SPI_STATE_BUSY_TX_RX;
-    }
-
     // Variable used to alternate Rx and Tx during transfer
     bool txAllowed = true;
 
@@ -197,9 +191,6 @@ HAL_StatusTypeDef SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData,
 
     // Control if the RX fifo is empty
     while ((hspi->Instance->SR & SPI_FLAG_FRLVL) != SPI_FTLVL_EMPTY);
-    
-    hspi->State = HAL_SPI_STATE_READY;
-    __HAL_UNLOCK(hspi);
 
     return HAL_OK;
 }

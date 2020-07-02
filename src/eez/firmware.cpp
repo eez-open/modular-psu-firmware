@@ -106,9 +106,8 @@ void boot() {
 #if OPTION_ETHERNET
     mcu::ethernet::initMessageQueue();
 #endif
+    initHighPriorityMessageQueue();
     initLowPriorityMessageQueue();
-
-    startHighPriorityThread();
 
     // INIT
     psu::init();
@@ -207,6 +206,8 @@ void boot() {
 #if OPTION_ETHERNET
     mcu::ethernet::startThread();
 #endif
+
+    startHighPriorityThread();
     startLowPriorityThread();
 
     mp::initMessageQueue();

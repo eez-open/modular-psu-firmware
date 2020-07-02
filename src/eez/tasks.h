@@ -97,6 +97,7 @@ enum LowPriorityThreadMessage {
 
 extern bool g_screenshotGenerating;
 
+void initHighPriorityMessageQueue();
 void startHighPriorityThread();
 
 bool isPsuThread();

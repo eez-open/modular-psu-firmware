@@ -77,7 +77,7 @@ osThreadDef(g_highPriorityThread, highPriorityThreadMainLoop, osPriorityAboveNor
 osThreadId g_highPriorityThreadHandle;
 
 #if defined(EEZ_PLATFORM_STM32)
-#define HIGH_PRIORITY_QUEUE_SIZE 10
+#define HIGH_PRIORITY_QUEUE_SIZE 50
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -117,9 +117,12 @@ static uint32_t g_timer1LastTickCount;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void startHighPriorityThread() {
+void initHighPriorityMessageQueue() {
     g_highPriorityMessageQueueId = osMessageCreate(osMessageQ(g_highPriorityMessageQueue), NULL);
-    g_highPriorityThreadHandle = osThreadCreate(osThread(g_highPriorityThread), nullptr);
+}
+
+void startHighPriorityThread() {
+	g_highPriorityThreadHandle = osThreadCreate(osThread(g_highPriorityThread), nullptr);
 }
 
 void highPriorityThreadOneIter();
@@ -128,6 +131,8 @@ void highPriorityThreadMainLoop(const void *) {
 #ifdef __EMSCRIPTEN__
     highPriorityThreadOneIter();
 #else
+    g_highPriorityThreadHandle = osThreadGetId();
+
     while (1) {
         highPriorityThreadOneIter();
     }
@@ -143,11 +148,6 @@ void highPriorityThreadOneIter() {
         psu::onThreadMessage(type, param);
     } else {
         WATCHDOG_RESET();
-
-        if (!g_isBooted) {
-            return;
-        }
-
         for (int i = 0; i < NUM_SLOTS; i++) {
             g_slots[i]->tick();
         }
@@ -157,7 +157,7 @@ void highPriorityThreadOneIter() {
 }
 
 bool isPsuThread() {
-    return osThreadGetId() == g_highPriorityThreadHandle;
+    return !g_isBooted || osThreadGetId() == g_highPriorityThreadHandle;
 }
 
 void sendMessageToPsu(HighPriorityThreadMessage messageType, uint32_t messageParam, uint32_t timeoutMillisec) {
@@ -184,6 +184,8 @@ void lowPriorityThreadMainLoop(const void *) {
         lowPriorityThreadOneIter();
     }
 #else
+    g_lowPriorityTaskHandle = osThreadGetId();
+
     while (g_isLowPriorityThreadAlive) {
     	lowPriorityThreadOneIter();
     }
