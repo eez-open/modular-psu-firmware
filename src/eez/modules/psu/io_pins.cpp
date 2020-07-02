@@ -236,7 +236,7 @@ void updatePwmFrequency(int pin) {
 
     updatePwmDuty(pin);
 
-    if (frequency > 0) {
+    if (isPowerUp() && frequency > 0) {
         if (!m_gPwmStarted) {
             HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
             m_gPwmStarted = true;

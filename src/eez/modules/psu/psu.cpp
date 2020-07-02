@@ -531,6 +531,8 @@ bool powerUp() {
 
     g_bootTestSuccess &= testSuccess;
 
+    io_pins::refresh();
+
     return true;
 }
 
@@ -572,6 +574,7 @@ void powerDown() {
     event_queue::pushEvent(event_queue::EVENT_INFO_POWER_DOWN);
 
     io_pins::tick(micros());
+    io_pins::refresh();
 
     sound::playPowerDown();
 }
