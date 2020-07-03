@@ -465,16 +465,6 @@ void doStart() {
 
 	enterBootloaderMode(g_slotIndex);
 
-	if (!syncWithSlave(g_slotIndex)) {
-#if OPTION_DISPLAY
-    	psu::gui::hideProgressPage();
-#endif
-
-		DebugTrace("Failed to sync with slave\n");
-
-		psu::gui::errorMessage("Failed to start update!");
-	}
-
 	sendMessageToLowPriorityThread(THREAD_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE);
 }
 
@@ -490,63 +480,73 @@ void start(int slotIndex, const char *hexFilePath) {
 }
 
 void uploadHexFile() {
-	bool eofReached = false;
-    File file;
-    psu::sd_card::BufferedFileRead bufferedFile(file);
-    size_t totalSize = 0;
-	HexRecord hexRecord;
-	uint32_t addressUpperBits = 0;
+	if (syncWithSlave(g_slotIndex)) {
+		bool eofReached = false;
+	    File file;
+	    psu::sd_card::BufferedFileRead bufferedFile(file);
+	    size_t totalSize = 0;
+		HexRecord hexRecord;
+		uint32_t addressUpperBits = 0;
 
-    if (!eraseAll(g_slotIndex)) {
-		DebugTrace("Failed to erase all!\n");
-		goto Exit;
-	}
-
-    if (!file.open(g_hexFilePath, FILE_OPEN_EXISTING | FILE_READ)) {
-		DebugTrace("Can't open firmware hex file!\n");
-		goto Exit;
-    }
-
-#if OPTION_DISPLAY
-    totalSize = file.size();
-#endif
-
-	while (!eofReached && readHexRecord(bufferedFile, hexRecord)) {
-#if OPTION_DISPLAY
-		updateProgress(g_slotIndex, file.tell(), totalSize);
-#endif
-
-		if (hexRecord.recordType == 0x04) {
-			addressUpperBits = ((hexRecord.data[0] << 8) + hexRecord.data[1]) << 16;
-		} else if (hexRecord.recordType == 0x00) {
-			uint32_t address = addressUpperBits | hexRecord.address;
-			if (!writeMemory(g_slotIndex, address, hexRecord.data, hexRecord.recordLength)) {
-				DebugTrace("Failed to write memory at address %08x\n", address);
-				break;
-			}
-		} else if (hexRecord.recordType == 0x01) {
-			eofReached = true;
+	    if (!eraseAll(g_slotIndex)) {
+			DebugTrace("Failed to erase all!\n");
+			goto Exit;
 		}
-	}
 
-	// uint8_t hour, minute, second;
-	// psu::datetime::getTime(hour, minute, second);
-	// DebugTrace("[%02d:%02d:%02d] Flash finished\n", hour, minute, second);
+	    if (!file.open(g_hexFilePath, FILE_OPEN_EXISTING | FILE_READ)) {
+			DebugTrace("Can't open firmware hex file!\n");
+			goto Exit;
+	    }
 
-	file.close();
+	#if OPTION_DISPLAY
+	    totalSize = file.size();
+	#endif
+
+		while (!eofReached && readHexRecord(bufferedFile, hexRecord)) {
+	#if OPTION_DISPLAY
+			updateProgress(g_slotIndex, file.tell(), totalSize);
+	#endif
+
+			if (hexRecord.recordType == 0x04) {
+				addressUpperBits = ((hexRecord.data[0] << 8) + hexRecord.data[1]) << 16;
+			} else if (hexRecord.recordType == 0x00) {
+				uint32_t address = addressUpperBits | hexRecord.address;
+				if (!writeMemory(g_slotIndex, address, hexRecord.data, hexRecord.recordLength)) {
+					DebugTrace("Failed to write memory at address %08x\n", address);
+					break;
+				}
+			} else if (hexRecord.recordType == 0x01) {
+				eofReached = true;
+			}
+		}
+
+		// uint8_t hour, minute, second;
+		// psu::datetime::getTime(hour, minute, second);
+		// DebugTrace("[%02d:%02d:%02d] Flash finished\n", hour, minute, second);
+
+		file.close();
 
 Exit:
 
+	#if OPTION_DISPLAY
+		psu::gui::hideProgressPage();
+	#endif
+
+		if (eofReached) {
+			uint16_t value = 0xA5A5;
+			bp3c::eeprom::write(g_slotIndex, (const uint8_t *)&value, 2, 4);
+			g_slots[g_slotIndex]->firmwareInstalled = true;
+		} else {
+			psu::gui::errorMessage("Downloading failed!");
+		}
+	} else {
 #if OPTION_DISPLAY
-    psu::gui::hideProgressPage();
+    	psu::gui::hideProgressPage();
 #endif
 
-	if (eofReached) {
-		uint16_t value = 0xA5A5;
-		bp3c::eeprom::write(g_slotIndex, (const uint8_t *)&value, 2, 4);
-		g_slots[g_slotIndex]->firmwareInstalled = true;
-	} else {
-		psu::gui::errorMessage("Downloading failed!");
+		DebugTrace("Failed to sync with slave\n");
+
+		psu::gui::errorMessage("Failed to start update!");
 	}
 
 	sendMessageToPsu(PSU_MESSAGE_FLASH_SLAVE_LEAVE_BOOTLOADER_MODE);
