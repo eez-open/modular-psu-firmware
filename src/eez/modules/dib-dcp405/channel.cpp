@@ -806,7 +806,7 @@ public:
 	{
 	}
 
-	Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
+	Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) override;
 
 	Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
         void *buffer = malloc(sizeof(DcpChannel));
@@ -818,7 +818,7 @@ public:
 struct DcpModule : public PsuModule {
 public:
     DcpModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
-        : PsuModule(slotIndex, moduleInfo, moduleRevision)
+        : PsuModule(slotIndex, moduleInfo, moduleRevision, true)
     {
     }
 
@@ -830,7 +830,7 @@ public:
 #endif
 };
 
-Module *DcpModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision) {
+Module *DcpModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
     return new DcpModule(slotIndex, this, moduleRevision);
 }
 

@@ -64,7 +64,7 @@ struct ModuleInfo {
 
     ModuleInfo(uint16_t moduleType, uint16_t moduleCategory, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration_, uint32_t spiBaudRatePrescaler_, bool spiCrcCalculationEnable_);
 
-    virtual Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) = 0;
+    virtual Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) = 0;
     virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);
 };
 
@@ -73,6 +73,7 @@ struct Module {
 
     ModuleInfo *moduleInfo;
     uint16_t moduleRevision;
+    bool firmwareInstalled;
 
 	uint8_t firmwareMajorVersion;
 	uint8_t firmwareMinorVersion;
@@ -80,7 +81,7 @@ struct Module {
 	uint32_t idw1;
 	uint32_t idw2;
 
-    Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision);
+    Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled);
 
     virtual TestResult getTestResult();
 

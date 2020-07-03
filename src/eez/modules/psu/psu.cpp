@@ -197,8 +197,8 @@ PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-PsuModule::PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
-    : Module(slotIndex, moduleInfo, moduleRevision)
+PsuModule::PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled)
+    : Module(slotIndex, moduleInfo, moduleRevision, firmwareInstalled)
 {
 }
 

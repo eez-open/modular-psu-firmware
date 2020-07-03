@@ -75,6 +75,7 @@ def slot_init(slot_index):
     try:
         scpi("INST:MEMO " + str(slot_index + 1) + ",0,2," + str(MODELS[slots[slot_index]["model"]]["id"]))
         scpi("INST:MEMO " + str(slot_index + 1) + ",2,2,#H" + to_hex_str(slots[slot_index]["version_r"]) + to_hex_str(slots[slot_index]["version_b"]))
+        scpi("INST:MEMO " + str(slot_index + 1) + ",4,2,#HFFFF") # firmware is not installed
     except:
         error("Failed to write to module EEPROM.")
         return

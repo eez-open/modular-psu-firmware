@@ -53,7 +53,7 @@ public:
         )
     {}
 
-    Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
+    Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) override;
     
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
@@ -84,8 +84,8 @@ public:
     uint16_t analogInputValues[4];
     bool spiReady;
 
-    Mio168Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
-        : Module(slotIndex, moduleInfo, moduleRevision)
+    Mio168Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled)
+        : Module(slotIndex, moduleInfo, moduleRevision, firmwareInstalled)
     {
         memset(input, 0, sizeof(input));
         memset(output, 0, sizeof(output));
@@ -102,7 +102,9 @@ public:
                 numCrcErrors = 0;
                 testResult = TEST_OK;
             } else {
-                psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                if (g_slots[slotIndex]->firmwareInstalled) {
+                    psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                }
                 testResult = TEST_FAILED;
             }
         }
@@ -200,8 +202,8 @@ public:
     }
 };
 
-Module *Mio168ModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision) {
-    return new Mio168Module(slotIndex, this, moduleRevision);
+Module *Mio168ModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
+    return new Mio168Module(slotIndex, this, moduleRevision, firmwareInstalled);
 }
 
 static Mio168ModuleInfo g_mio168ModuleInfo;

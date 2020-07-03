@@ -25,6 +25,8 @@
 |Address|Size|Description                               |
 |-------|----|------------------------------------------|
 |0      |   2|Module type                               |
+|2      |   2|Module revision                           |
+|4      |   2|0xA5A5 if firmware is installed           |
 |40     |  24|[ON-time counter](#ontime-counter)        |
 |64     |  64|[Module configuration](#module-congiguration)|
 |128    | 144|CH1 [calibration parameters](#calibration)|

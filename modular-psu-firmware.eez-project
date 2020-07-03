@@ -2301,6 +2301,11 @@
       "name": "slot_title_micro",
       "type": "string",
       "defaultValue": "MIO168"
+    },
+    {
+      "name": "slot_error_message",
+      "type": "string",
+      "defaultValue": "Error"
     }
   ],
   "actions": [
@@ -28029,11 +28034,12 @@
               "color": "status_warning",
               "activeBackgroundColor": "status_warning"
             },
+            "data": "slot_error_message",
             "left": 0,
             "top": 32,
             "width": 160,
             "height": 208,
-            "text": "Error"
+            "text": ""
           }
         ],
         "left": 0,
@@ -29115,11 +29121,12 @@
               "color": "status_warning",
               "activeBackgroundColor": "status_warning"
             },
+            "data": "slot_error_message",
             "left": 52,
             "top": 0,
             "width": 428,
             "height": 78,
-            "text": "Error"
+            "text": ""
           }
         ],
         "left": 0,
@@ -35947,11 +35954,12 @@
               "color": "status_warning",
               "activeBackgroundColor": "status_warning"
             },
+            "data": "slot_error_message",
             "left": 0,
             "top": 32,
             "width": 480,
             "height": 136,
-            "text": "Error"
+            "text": ""
           }
         ],
         "left": 0,
@@ -36817,11 +36825,12 @@
               "color": "status_warning",
               "activeBackgroundColor": "status_warning"
             },
+            "data": "slot_error_message",
             "left": 0,
             "top": 24,
             "width": 238,
             "height": 48,
-            "text": "Error"
+            "text": ""
           }
         ],
         "left": 0,
@@ -37543,11 +37552,12 @@
               "color": "status_warning",
               "activeBackgroundColor": "status_warning"
             },
+            "data": "slot_error_message",
             "left": 0,
             "top": 24,
             "width": 158,
             "height": 48,
-            "text": "Error"
+            "text": ""
           }
         ],
         "left": 0,

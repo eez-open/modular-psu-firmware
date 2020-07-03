@@ -85,10 +85,11 @@ int ModuleInfo::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Module::Module(uint8_t slotIndex_, ModuleInfo *moduleInfo_, uint16_t moduleRevision_) 
+Module::Module(uint8_t slotIndex_, ModuleInfo *moduleInfo_, uint16_t moduleRevision_, bool firmwareInstalled_) 
     : slotIndex(slotIndex_)
     , moduleInfo(moduleInfo_)
     , moduleRevision(moduleRevision_)
+    , firmwareInstalled(firmwareInstalled_)
     , firmwareMajorVersion(0)
     , firmwareMinorVersion(0)
     , idw0(0)
@@ -130,19 +131,19 @@ public:
     {
     }
 
-    Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
+    Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) override;
 };
 
 struct NoneModule : public Module {
 public:
-    NoneModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
-        : Module(slotIndex, moduleInfo, moduleRevision)
+    NoneModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled)
+        : Module(slotIndex, moduleInfo, moduleRevision, firmwareInstalled)
     {
     }
 };
 
-Module *NoneModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision) {
-    return new NoneModule(slotIndex, this, moduleRevision);
+Module *NoneModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
+    return new NoneModule(slotIndex, this, moduleRevision, firmwareInstalled);
 }
 
 static NoneModuleInfo noneModuleInfo;

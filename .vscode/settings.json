@@ -12,6 +12,7 @@
         "xlocale": "cpp",
         "deque": "cpp",
         "string": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "*.rh": "cpp"
     }
 }

@@ -341,7 +341,7 @@ public:
 	{
 	}
 
-	Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
+	Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) override;
 
 	Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
         void *buffer = malloc(sizeof(DcmChannel));
@@ -358,8 +358,8 @@ public:
     uint8_t input[BUFFER_SIZE];
     uint8_t output[BUFFER_SIZE];
 
-    DcmModule(uint8_t slotIndex, DcmModuleInfo *moduleInfo, uint16_t moduleRevision)
-        : PsuModule(slotIndex, moduleInfo, moduleRevision)
+    DcmModule(uint8_t slotIndex, DcmModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled)
+        : PsuModule(slotIndex, moduleInfo, moduleRevision, firmwareInstalled)
     {
     	memset(output, 0, sizeof(output));
     	memset(input, 0, sizeof(input));
@@ -372,7 +372,9 @@ public:
                 synchronized = true;
                 numCrcErrors = 0;
             } else {
-                event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                if (g_slots[slotIndex]->firmwareInstalled) {
+                    event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                }
             }
         }
     }
@@ -384,6 +386,7 @@ public:
     void test() {
         if (!synchronized) {
             testResult = TEST_FAILED;
+            return;
         }
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -522,8 +525,8 @@ public:
 #endif
 };
 
-Module *DcmModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision) {
-	return new DcmModule(slotIndex, this, moduleRevision);
+Module *DcmModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
+	return new DcmModule(slotIndex, this, moduleRevision, firmwareInstalled);
 }
 
 void DcmChannel::init() {

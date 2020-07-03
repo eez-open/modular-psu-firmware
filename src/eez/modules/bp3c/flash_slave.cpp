@@ -32,6 +32,7 @@
 
 #include <eez/modules/bp3c/flash_slave.h>
 #include <eez/modules/bp3c/io_exp.h>
+#include <eez/modules/bp3c/eeprom.h>
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
@@ -540,7 +541,11 @@ Exit:
 
 	leaveBootloaderMode();
 
-	if (!eofReached) {
+	if (eofReached) {
+		uint16_t value = 0xA5A5;
+		bp3c::eeprom::write(g_slotIndex, (const uint8_t *)&value, 2, 4);
+		g_slots[g_slotIndex]->firmwareInstalled = true;
+	} else {
 		psu::gui::errorMessage("Downloading failed!");
 	}
 }

@@ -129,15 +129,17 @@ void boot() {
 
     for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         static const uint16_t ADDRESS = 0;
-        uint16_t value[2];
+        uint16_t value[3];
         if (!bp3c::eeprom::read(slotIndex, (uint8_t *)&value, sizeof(value), ADDRESS)) {
             value[0] = MODULE_TYPE_NONE;
             value[1] = 0;
+            value[2] = 0;
         }
         uint16_t moduleType = value[0];
         uint16_t moduleRevision = value[1];
+        bool firmwareInstalled = value[2] == 0xA5A5;
         
-        g_slots[slotIndex] = getModuleInfo(moduleType)->createModule(slotIndex, moduleRevision);
+        g_slots[slotIndex] = getModuleInfo(moduleType)->createModule(slotIndex, moduleRevision, firmwareInstalled);
         g_slots[slotIndex]->boot();
         
         if (moduleType != MODULE_TYPE_NONE) {

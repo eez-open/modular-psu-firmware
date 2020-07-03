@@ -68,7 +68,7 @@ struct PsuModuleInfo : public ModuleInfo {
 
 struct PsuModule : public Module {
 public:
-    PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision);
+    PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled);
 
     void boot() override;
     TestResult getTestResult() override;

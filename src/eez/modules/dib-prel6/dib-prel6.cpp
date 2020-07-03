@@ -49,7 +49,7 @@ public:
         )
     {}
     
-    Module *createModule(uint8_t slotIndex, uint16_t moduleRevision) override;
+    Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) override;
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
@@ -77,8 +77,8 @@ public:
     uint8_t output[BUFFER_SIZE];
     bool spiReady;
 
-    Prel6Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
-        : Module(slotIndex, moduleInfo, moduleRevision)
+    Prel6Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled)
+        : Module(slotIndex, moduleInfo, moduleRevision, firmwareInstalled)
     {
     }
 
@@ -93,7 +93,9 @@ public:
                 numCrcErrors = 0;
                 testResult = TEST_OK;
             } else {
-                psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                if (g_slots[slotIndex]->firmwareInstalled) {
+                    psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                }
                 testResult = TEST_FAILED;
             }
         }
@@ -148,8 +150,8 @@ public:
     }
 };
 
-Module *Prel6ModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision) {
-    return new Prel6Module(slotIndex, this, moduleRevision);
+Module *Prel6ModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
+    return new Prel6Module(slotIndex, this, moduleRevision, firmwareInstalled);
 }
 
 static Prel6ModuleInfo g_prel6ModuleInfo;
