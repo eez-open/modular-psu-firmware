@@ -68,6 +68,7 @@
 
 #include <eez/modules/bp3c/io_exp.h>
 #include <eez/modules/bp3c/eeprom.h>
+#include <eez/modules/bp3c/flash_slave.h>
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 
@@ -270,7 +271,11 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         calibration::start(Channel::get((int)param));
     } else if (type == PSU_MESSAGE_CALIBRATION_STOP) {
         calibration::stop();
-    }    
+    } else if (type == PSU_MESSAGE_FLASH_SLAVE_START) {
+        bp3c::flash_slave::doStart();
+    } else if (type == PSU_MESSAGE_FLASH_SLAVE_LEAVE_BOOTLOADER_MODE) {
+        bp3c::flash_slave::leaveBootloaderMode();
+    }
 }
 
 bool measureAllAdcValuesOnChannel(int channelIndex) {

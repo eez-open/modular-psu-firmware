@@ -145,6 +145,8 @@ void IOExpander::init() {
 #if defined(EEZ_PLATFORM_STM32)
     auto &slot = *g_slots[slotIndex];
 
+    gpio = 0;
+    gpioWritten = 0;
     gpioOutputPinsMask = 0;
 
     gpioOutputPinsMask |= 1 << IO_BIT_OUT_DP_ENABLE;

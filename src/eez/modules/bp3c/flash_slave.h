@@ -24,7 +24,9 @@ namespace flash_slave {
 
 extern bool g_bootloaderMode;
 
-bool start(int slotIndex, const char *hexFilePath, int *err);
+void start(int slotIndex, const char *hexFilePath);
+void doStart();
+void leaveBootloaderMode();
 
 void uploadHexFile();
 

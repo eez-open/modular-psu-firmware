@@ -1377,10 +1377,7 @@ void action_mqtt_edit_period() {
 }
 
 void onFirmwareSelected(const char *filePath) {
-    int err;
-    if (!bp3c::flash_slave::start(hmi::g_selectedSlotIndex, filePath, &err)) {
-		errorMessage("Failed to start update!");
-    }
+    bp3c::flash_slave::start(hmi::g_selectedSlotIndex, filePath);
 }
 
 void onSelectFirmware() {

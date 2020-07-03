@@ -453,11 +453,7 @@ scpi_result_t scpi_cmd_debugDownloadFirmware(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    int err;
-    if (!bp3c::flash_slave::start(slotIndex - 1, hexFilePath, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
+    bp3c::flash_slave::start(slotIndex - 1, hexFilePath);
 
     return SCPI_RES_OK;
 #else

@@ -455,7 +455,7 @@ bool readHexRecord(psu::sd_card::BufferedFileRead &file, HexRecord &hexRecord) {
 	return true;
 }
 
-bool start(int slotIndex, const char *hexFilePath, int *err) {
+void doStart() {
 #if OPTION_DISPLAY
     psu::gui::showProgressPageWithoutAbort("Downloading firmware...");
 #endif
@@ -463,28 +463,30 @@ bool start(int slotIndex, const char *hexFilePath, int *err) {
 
 	psu::channel_dispatcher::disableOutputForAllChannels();
 
-	enterBootloaderMode(slotIndex);
+	enterBootloaderMode(g_slotIndex);
 
-	if (!syncWithSlave(slotIndex)) {
+	if (!syncWithSlave(g_slotIndex)) {
 #if OPTION_DISPLAY
     	psu::gui::hideProgressPage();
 #endif
 
 		DebugTrace("Failed to sync with slave\n");
-		
-		if (err) {
-			*err = SCPI_ERROR_EXECUTION_ERROR;
-		}
-		
-		return false;
+
+		psu::gui::errorMessage("Failed to start update!");
 	}
 
+	sendMessageToLowPriorityThread(THREAD_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE);
+}
+
+void start(int slotIndex, const char *hexFilePath) {
 	g_slotIndex = slotIndex;
 	strcpy(g_hexFilePath, hexFilePath);
 
-	sendMessageToLowPriorityThread(THREAD_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE);
-
-	return true;
+	if (isPsuThread()) {
+		doStart();
+	} else {
+		sendMessageToPsu(PSU_MESSAGE_FLASH_SLAVE_START);
+	}
 }
 
 void uploadHexFile() {
@@ -539,8 +541,6 @@ Exit:
     psu::gui::hideProgressPage();
 #endif
 
-	leaveBootloaderMode();
-
 	if (eofReached) {
 		uint16_t value = 0xA5A5;
 		bp3c::eeprom::write(g_slotIndex, (const uint8_t *)&value, 2, 4);
@@ -548,6 +548,8 @@ Exit:
 	} else {
 		psu::gui::errorMessage("Downloading failed!");
 	}
+
+	sendMessageToPsu(PSU_MESSAGE_FLASH_SLAVE_LEAVE_BOOTLOADER_MODE);
 }
 
 } // namespace flash_slave
