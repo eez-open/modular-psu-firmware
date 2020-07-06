@@ -293,7 +293,7 @@ __weak uint8_t BSP_SD_IsDetected(void)
 
   /* USER CODE BEGIN 1 */
   if (!g_sdCardIsPresent) {
-	  g_sdCardIsPresent = SD_NOT_PRESENT;
+	  status = SD_NOT_PRESENT;
   }
   /* USER CODE END 1 */
 

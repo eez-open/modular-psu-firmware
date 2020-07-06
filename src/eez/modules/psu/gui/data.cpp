@@ -249,6 +249,13 @@ EnumItem g_enumDefinition_CALIBRATION_VALUE_TYPE[] = {
     { 0, 0 }
 };
 
+EnumItem g_enumDefinition_USB_MODE[] = {
+    { USB_MODE_DISABLED, "Disabled" },
+    { USB_MODE_VIRTUAL_COM_PORT, "Virtual COM Port" },
+    { USB_MODE_MASS_STORAGE_CLIENT, "Mass Storage Device" },
+    { 0, 0 }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Value MakeValue(float value, Unit unit) {
@@ -4359,12 +4366,6 @@ void data_serial_status(DataOperationEnum operation, Cursor cursor, Value &value
     }
 }
 
-void data_serial_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = persist_conf::isSerialEnabled();
-    }
-}
-
 void data_serial_is_connected(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(serial::isConnected());
@@ -6204,6 +6205,12 @@ void data_slot_error_message(DataOperationEnum operation, Cursor cursor, Value &
         } else {
             value = "No firmware";
         }
+    }
+}
+
+void data_usb_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_usbMode;
     }
 }
 

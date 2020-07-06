@@ -1274,11 +1274,6 @@
       "defaultValue": "2"
     },
     {
-      "name": "serial_enabled",
-      "type": "boolean",
-      "defaultValue": "1"
-    },
-    {
       "name": "serial_is_connected",
       "type": "boolean",
       "defaultValue": "1"
@@ -2306,6 +2301,12 @@
       "name": "slot_error_message",
       "type": "string",
       "defaultValue": "Error"
+    },
+    {
+      "name": "usb_mode",
+      "type": "enum",
+      "enumItems": "[\"Disabled\", \"Virtual COM port\", \"Mass storage device\"]",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -2732,9 +2733,6 @@
       "name": "io_pin_select_function"
     },
     {
-      "name": "serial_toggle"
-    },
-    {
       "name": "ntp_toggle"
     },
     {
@@ -2988,6 +2986,9 @@
     },
     {
       "name": "show_slot_settings"
+    },
+    {
+      "name": "select_usb_mode"
     }
   ],
   "gui": {
@@ -20445,182 +20446,208 @@
         "style": "default",
         "widgets": [
           {
-            "type": "Container",
+            "type": "Text",
             "style": {
-              "inheritFrom": "default"
+              "inheritFrom": "edit_value_S_left",
+              "font": "Oswald17"
             },
             "left": 10,
             "top": 10,
-            "width": 460,
-            "height": 148,
-            "name": "Content",
+            "width": 58,
+            "height": 32,
+            "text": "Mode:"
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "usb_mode",
+            "left": 80,
+            "top": 10,
+            "width": 220,
+            "height": 32,
             "widgets": [
               {
-                "type": "Select",
+                "type": "Text",
                 "style": {
-                  "inheritFrom": "default"
+                  "inheritFrom": "edit_value_active_S_center",
+                  "font": "Oswald17"
                 },
-                "data": "serial_enabled",
-                "action": "serial_toggle",
+                "data": "usb_mode",
+                "action": "select_usb_mode",
                 "left": 0,
                 "top": 0,
-                "width": 150,
+                "width": 220,
                 "height": 32,
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_M_center"
-                    },
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 150,
-                    "height": 32,
-                    "text": "Enable Serial"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_M_center"
-                    },
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 150,
-                    "height": 32,
-                    "text": "Disable Serial"
-                  }
-                ]
+                "text": "Disabled"
               },
               {
-                "type": "Select",
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "font": "Oswald17"
+                },
+                "data": "usb_mode",
+                "action": "select_usb_mode",
+                "left": 0,
+                "top": 0,
+                "width": 220,
+                "height": 32,
+                "text": "Virtual COM Port"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "font": "Oswald17"
+                },
+                "data": "usb_mode",
+                "action": "select_usb_mode",
+                "left": 0,
+                "top": 0,
+                "width": 220,
+                "height": 32,
+                "text": "Mass Storage Device"
+              }
+            ]
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "usb_mode",
+            "left": 10,
+            "top": 50,
+            "width": 460,
+            "height": 116,
+            "widgets": [
+              {
+                "type": "Rectangle",
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "serial_enabled",
-                "action": "",
                 "left": 0,
-                "top": 32,
+                "top": 0,
+                "width": 460,
+                "height": 116,
+                "invertColors": true
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
                 "width": 460,
                 "height": 116,
                 "widgets": [
                   {
-                    "type": "Rectangle",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "edit_value_S_left",
+                      "font": "Oswald17"
                     },
-                    "left": 0,
-                    "top": 0,
-                    "width": 460,
-                    "height": 116,
-                    "invertColors": true
+                    "left": 15,
+                    "top": 16,
+                    "width": 80,
+                    "height": 28,
+                    "text": "Baud:"
                   },
                   {
-                    "type": "Container",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "value_M_left"
                     },
-                    "left": 0,
-                    "top": 0,
-                    "width": 460,
-                    "height": 116,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_S_left",
-                          "font": "Oswald17"
-                        },
-                        "left": 15,
-                        "top": 16,
-                        "width": 80,
-                        "height": 28,
-                        "text": "Baud:"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "value_M_left"
-                        },
-                        "left": 95,
-                        "top": 16,
-                        "width": 122,
-                        "height": 28,
-                        "text": "115200"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_S_left",
-                          "font": "Oswald17"
-                        },
-                        "left": 15,
-                        "top": 52,
-                        "width": 80,
-                        "height": 28,
-                        "text": "Parity:"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "value_M_left"
-                        },
-                        "left": 95,
-                        "top": 52,
-                        "width": 122,
-                        "height": 28,
-                        "text": "None"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_S_left",
-                          "font": "Oswald17"
-                        },
-                        "left": 217,
-                        "top": 16,
-                        "width": 100,
-                        "height": 28,
-                        "text": "Bits:"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "value_M_left"
-                        },
-                        "left": 321,
-                        "top": 16,
-                        "width": 122,
-                        "height": 28,
-                        "text": "8"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_S_left",
-                          "font": "Oswald17"
-                        },
-                        "left": 217,
-                        "top": 52,
-                        "width": 100,
-                        "height": 28,
-                        "text": "Stop bits:"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "value_M_left"
-                        },
-                        "left": 321,
-                        "top": 52,
-                        "width": 122,
-                        "height": 28,
-                        "text": "1"
-                      }
-                    ]
+                    "left": 95,
+                    "top": 16,
+                    "width": 122,
+                    "height": 28,
+                    "text": "115200"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left",
+                      "font": "Oswald17"
+                    },
+                    "left": 15,
+                    "top": 52,
+                    "width": 80,
+                    "height": 28,
+                    "text": "Parity:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "value_M_left"
+                    },
+                    "left": 95,
+                    "top": 52,
+                    "width": 122,
+                    "height": 28,
+                    "text": "None"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left",
+                      "font": "Oswald17"
+                    },
+                    "left": 217,
+                    "top": 16,
+                    "width": 100,
+                    "height": 28,
+                    "text": "Bits:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "value_M_left"
+                    },
+                    "left": 321,
+                    "top": 16,
+                    "width": 122,
+                    "height": 28,
+                    "text": "8"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left",
+                      "font": "Oswald17"
+                    },
+                    "left": 217,
+                    "top": 52,
+                    "width": 100,
+                    "height": 28,
+                    "text": "Stop bits:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "value_M_left"
+                    },
+                    "left": 321,
+                    "top": 52,
+                    "width": 122,
+                    "height": 28,
+                    "text": "1"
                   }
                 ]
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 460,
+                "height": 116,
+                "invertColors": true
               }
             ]
           },

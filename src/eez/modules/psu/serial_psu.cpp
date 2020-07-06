@@ -18,6 +18,10 @@
 
 #include <stdio.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <usb_device.h>
+#endif
+
 #include <eez/firmware.h>
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/serial_psu.h>
@@ -148,6 +152,22 @@ void initScpi() {
     scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer, SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
 }
 
+void selectUsbMode(int usbMode) {
+#if defined(EEZ_PLATFORM_STM32)
+    MX_USB_DEVICE_DeInit();
+#endif
+
+    g_usbMode = usbMode;
+
+#if defined(EEZ_PLATFORM_STM32)
+    MX_USB_DEVICE_Init();
+#endif
+
+    persist_conf::enableSerial(g_usbMode != USB_MODE_DISABLED);
+}
+
 } // namespace serial
 } // namespace psu
 } // namespace eez
+
+int g_usbMode = USB_MODE_VIRTUAL_COM_PORT;

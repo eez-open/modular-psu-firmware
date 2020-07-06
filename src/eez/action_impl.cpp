@@ -988,10 +988,6 @@ void action_io_pin_select_function() {
     ((SysSettingsIOPinsPage *)getActivePage())->selectFunction();
 }
 
-void action_serial_toggle() {
-    persist_conf::enableSerial(!persist_conf::isSerialEnabled());
-}
-
 void action_ntp_toggle() {
     ((SysSettingsDateTimePage *)getActivePage())->toggleNtp();
 }
@@ -1401,6 +1397,15 @@ void action_channel_toggle_ramp_state() {
     if (page) {
         page->toggleRampState(getFoundWidgetAtDown().cursor);
     }
+}
+
+void onSetUsbMode(uint16_t value) {
+	popPage();
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_MODE, value);
+}
+
+void action_select_usb_mode() {
+    pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, g_usbMode, nullptr, onSetUsbMode);
 }
 
 } // namespace gui

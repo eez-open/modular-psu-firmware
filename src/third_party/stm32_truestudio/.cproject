@@ -66,6 +66,8 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/ports/bb3&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/platform/stm32/STM32_USB_Device_Library/Class/MSC/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/platform/stm32/usbd_storage&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bb3/Middlewares/Third_Party/FatFs/src}&quot;"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src"/>
@@ -197,6 +199,8 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/ports/bb3&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/scpi&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/platform/stm32/STM32_USB_Device_Library/Class/MSC/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/platform/stm32/usbd_storage&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bb3/Middlewares/Third_Party/FatFs/src}&quot;"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src"/>

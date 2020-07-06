@@ -35,6 +35,14 @@ bool isConnected();
 
 void update();
 
+void selectUsbMode(int usbMode);
+
 }
 }
 } // namespace eez::psu::serial
+
+#define USB_MODE_DISABLED 0
+#define USB_MODE_VIRTUAL_COM_PORT 1
+#define USB_MODE_MASS_STORAGE_CLIENT 2
+
+extern "C" int g_usbMode;

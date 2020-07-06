@@ -348,6 +348,8 @@ void lowPriorityThreadOneIter() {
                 psu::gui::UserProfilesPage::doEditRemark();
             } else if (type == THREAD_MESSAGE_SOUND_TICK) {
                 sound::tick();
+            } else if (type == THREAD_MESSAGE_SELECT_USB_MODE) {
+                psu::serial::selectUsbMode(param);
             }
         }
     } else {
