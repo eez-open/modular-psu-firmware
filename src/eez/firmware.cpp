@@ -95,10 +95,6 @@ void boot() {
     gui::startThread();
 #endif
 
-#if defined(EEZ_PLATFORM_STM32)
-    MX_USB_DEVICE_Init();
-#endif
-
 #ifdef EEZ_PLATFORM_SIMULATOR
     eez::psu::simulator::init();
 #endif

@@ -17234,7 +17234,7 @@
                 "top": 56,
                 "width": 114,
                 "height": 54,
-                "text": "\\u0094 Serial (via USB)",
+                "text": "\\u0094 USB settings",
                 "firstLineIndent": 0,
                 "hangingIndent": 24
               },
@@ -20695,7 +20695,7 @@
                 "top": 0,
                 "width": 439,
                 "height": 32,
-                "text": "Serial settings"
+                "text": "USB settings"
               }
             ]
           }

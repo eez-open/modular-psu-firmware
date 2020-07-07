@@ -1865,4 +1865,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM220_CH_SETTINGS_SPECIFIC = 172
 };
 
-extern const uint8_t assets[309990];
+extern const uint8_t assets[309984];

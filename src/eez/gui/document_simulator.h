@@ -1924,4 +1924,4 @@ enum PagesEnum {
     PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD = 182
 };
 
-extern const uint8_t assets[518005];
+extern const uint8_t assets[518038];

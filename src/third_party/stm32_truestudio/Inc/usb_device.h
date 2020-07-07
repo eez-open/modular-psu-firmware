@@ -64,7 +64,8 @@
  * -- Insert your variables declaration here --
  */
 /* USER CODE BEGIN VARIABLES */
-
+extern int g_mxUsbOpertationUsbdResult;
+extern int g_mxUsbOpertationResult;
 /* USER CODE END VARIABLES */
 /**
   * @}

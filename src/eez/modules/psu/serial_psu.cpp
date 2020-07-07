@@ -105,6 +105,8 @@ static void initScpi();
 
 void init() {
     if (persist_conf::isSerialEnabled()) {
+        selectUsbMode(USB_MODE_VIRTUAL_COM_PORT);
+
         initScpi();
 
 #ifdef EEZ_PLATFORM_SIMULATOR
@@ -153,15 +155,33 @@ void initScpi() {
 }
 
 void selectUsbMode(int usbMode) {
+    taskENTER_CRITICAL();
+
 #if defined(EEZ_PLATFORM_STM32)
-    MX_USB_DEVICE_DeInit();
+	for (int i = 0; i < 3; i++) {
+		MX_USB_DEVICE_DeInit();
+		if (g_mxUsbOpertationResult == 0) {
+			break;
+		}
+		DebugTrace("MX_USB_DEVICE_DeInit returned %d, %d\n", g_mxUsbOpertationResult, g_mxUsbOpertationUsbdResult);
+		osDelay(5);
+	}
 #endif
 
     g_usbMode = usbMode;
 
 #if defined(EEZ_PLATFORM_STM32)
-    MX_USB_DEVICE_Init();
+	for (int i = 0; i < 3; i++) {
+		MX_USB_DEVICE_Init();
+		if (g_mxUsbOpertationResult == 0) {
+			break;
+		}
+		DebugTrace("MX_USB_DEVICE_Init returned %d, %d\n", g_mxUsbOpertationResult, g_mxUsbOpertationUsbdResult);
+		osDelay(5);
+	}
 #endif
+
+    taskEXIT_CRITICAL();
 
     persist_conf::enableSerial(g_usbMode != USB_MODE_DISABLED);
 }
@@ -170,4 +190,4 @@ void selectUsbMode(int usbMode) {
 } // namespace psu
 } // namespace eez
 
-int g_usbMode = USB_MODE_VIRTUAL_COM_PORT;
+int g_usbMode = USB_MODE_DISABLED;

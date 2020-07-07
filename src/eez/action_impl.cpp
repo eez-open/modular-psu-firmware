@@ -1399,13 +1399,17 @@ void action_channel_toggle_ramp_state() {
     }
 }
 
+bool isUsbModeDisabled(uint16_t value) {
+    return value == USB_MODE_MASS_STORAGE_CLIENT && dlog_record::isExecuting();
+}
+
 void onSetUsbMode(uint16_t value) {
 	popPage();
     sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_MODE, value);
 }
 
 void action_select_usb_mode() {
-    pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, g_usbMode, nullptr, onSetUsbMode);
+    pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, g_usbMode, isUsbModeDisabled, onSetUsbMode);
 }
 
 } // namespace gui
