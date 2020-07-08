@@ -121,6 +121,8 @@ void Error_Handler(void);
 #define SPI2_IRQ_Pin GPIO_PIN_8
 #define SPI2_IRQ_GPIO_Port GPIOA
 #define SPI2_IRQ_EXTI_IRQn EXTI9_5_IRQn
+#define USB_OTG_FS_ID_Pin GPIO_PIN_10
+#define USB_OTG_FS_ID_GPIO_Port GPIOA
 #define SPI5_IRQ_Pin GPIO_PIN_15
 #define SPI5_IRQ_GPIO_Port GPIOA
 #define SPI5_IRQ_EXTI_IRQn EXTI15_10_IRQn

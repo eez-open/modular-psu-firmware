@@ -907,11 +907,7 @@ void setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep)
 }
 
 bool enableSerial(bool enable) {
-    unsigned serialEnabled = enable ? 1 : 0;
-    if (g_devConf.serialEnabled != serialEnabled) {
-        g_devConf.serialEnabled = serialEnabled;
-        serial::update();
-    }
+    g_devConf.serialEnabled = enable ? 1 : 0;
     return true;
 }
 

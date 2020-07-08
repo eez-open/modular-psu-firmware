@@ -46,37 +46,36 @@
 
 /* USB Device Core handle declaration. */
 USBD_HandleTypeDef hUsbDeviceFS;
-int g_mxUsbOpertationUsbdResult;
-int g_mxUsbOpertationResult;
+
 /*
  * -- Insert your variables declaration here --
  */
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 
 /*
  * -- Insert your external function declaration here --
  */
 /* USER CODE BEGIN 1 */
+int g_mxUsbDeviceOperationUsbResult;
+int g_mxUsbDeviceOperationResult;
+
 extern USBD_DescriptorsTypeDef FS_Desc_MSC;
 extern int g_usbMode;
 
 void MX_USB_DEVICE_DeInit(void) {
-  g_mxUsbOpertationUsbdResult = USBD_Stop(&hUsbDeviceFS);
-  if (g_mxUsbOpertationUsbdResult != USBD_OK){
-    g_mxUsbOpertationResult = -1;
-    return;
+  g_mxUsbDeviceOperationUsbResult = USBD_Stop(&hUsbDeviceFS);
+  if (g_mxUsbDeviceOperationUsbResult != USBD_OK){
+    g_mxUsbDeviceOperationResult = -1;
   }
 
-  g_mxUsbOpertationUsbdResult = USBD_DeInit(&hUsbDeviceFS);
-  if (g_mxUsbOpertationUsbdResult != USBD_OK){
-    g_mxUsbOpertationResult = -2;
-    return;
+  g_mxUsbDeviceOperationUsbResult = USBD_DeInit(&hUsbDeviceFS);
+  if (g_mxUsbDeviceOperationUsbResult != USBD_OK){
+    g_mxUsbDeviceOperationResult = -2;
   }
 
-  g_mxUsbOpertationUsbdResult = USBD_OK;
-  g_mxUsbOpertationResult = 0;
+  g_mxUsbDeviceOperationUsbResult = USBD_OK;
+  g_mxUsbDeviceOperationResult = 0;
 }
 /* USER CODE END 1 */
 
@@ -89,55 +88,55 @@ void MX_USB_DEVICE_Init(void)
   /* USER CODE BEGIN USB_DEVICE_Init_PreTreatment */
   if (g_usbMode == 1) {
     /* Init Device Library, add supported class and start the library. */
-    g_mxUsbOpertationUsbdResult = USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS);
-    if (g_mxUsbOpertationUsbdResult != USBD_OK) {
-      g_mxUsbOpertationResult = -1;
+    g_mxUsbDeviceOperationUsbResult = USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -1;
       return;
     }
 
-    g_mxUsbOpertationUsbdResult = USBD_RegisterClass(&hUsbDeviceFS, &USBD_CDC);
-    if (g_mxUsbOpertationUsbdResult != USBD_OK) {
-      g_mxUsbOpertationResult = -2;
+    g_mxUsbDeviceOperationUsbResult = USBD_RegisterClass(&hUsbDeviceFS, &USBD_CDC);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -2;
       return;
     }
 
-    g_mxUsbOpertationUsbdResult = USBD_CDC_RegisterInterface(&hUsbDeviceFS, &USBD_Interface_fops_FS);
-    if (g_mxUsbOpertationUsbdResult != USBD_OK) {
-      g_mxUsbOpertationResult = -3;
+    g_mxUsbDeviceOperationUsbResult = USBD_CDC_RegisterInterface(&hUsbDeviceFS, &USBD_Interface_fops_FS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -3;
       return;
     }
 
-    g_mxUsbOpertationUsbdResult = USBD_Start(&hUsbDeviceFS);
-    if (g_mxUsbOpertationUsbdResult != USBD_OK) {
-      g_mxUsbOpertationResult = -4;
+    g_mxUsbDeviceOperationUsbResult = USBD_Start(&hUsbDeviceFS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -4;
       return;
     }
   } else if (g_usbMode == 2) {
     /* Init Device Library, add supported class and start the library. */
-    g_mxUsbOpertationUsbdResult = USBD_Init(&hUsbDeviceFS, &FS_Desc_MSC, DEVICE_FS);
-    if (g_mxUsbOpertationUsbdResult != USBD_OK) {
-      g_mxUsbOpertationResult = -1;
+    g_mxUsbDeviceOperationUsbResult = USBD_Init(&hUsbDeviceFS, &FS_Desc_MSC, DEVICE_FS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -1;
       return;
     }
-    g_mxUsbOpertationUsbdResult = USBD_RegisterClass(&hUsbDeviceFS, &USBD_MSC);
-    if (g_mxUsbOpertationUsbdResult != USBD_OK) {
-      g_mxUsbOpertationResult = -2;
-      return;
-    }
-
-    g_mxUsbOpertationUsbdResult = USBD_MSC_RegisterStorage(&hUsbDeviceFS, &USBD_Storage_Interface_fops_FS);
-    if (g_mxUsbOpertationUsbdResult != USBD_OK) {
-      g_mxUsbOpertationResult = -3;
+    g_mxUsbDeviceOperationUsbResult = USBD_RegisterClass(&hUsbDeviceFS, &USBD_MSC);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -2;
       return;
     }
 
-    g_mxUsbOpertationUsbdResult = USBD_Start(&hUsbDeviceFS);
-    if (g_mxUsbOpertationUsbdResult != USBD_OK) {
-      g_mxUsbOpertationResult = -4;
+    g_mxUsbDeviceOperationUsbResult = USBD_MSC_RegisterStorage(&hUsbDeviceFS, &USBD_Storage_Interface_fops_FS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -3;
+      return;
+    }
+
+    g_mxUsbDeviceOperationUsbResult = USBD_Start(&hUsbDeviceFS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -4;
       return;
     }
   }
-  #if 0
+#if 0
   /* USER CODE END USB_DEVICE_Init_PreTreatment */
   
   /* Init Device Library, add supported class and start the library. */
@@ -159,10 +158,10 @@ void MX_USB_DEVICE_Init(void)
   }
 
   /* USER CODE BEGIN USB_DEVICE_Init_PostTreatment */
-  #endif
+#endif
 
-  g_mxUsbOpertationUsbdResult = USBD_OK;
-  g_mxUsbOpertationResult = 0;
+  g_mxUsbDeviceOperationUsbResult = USBD_OK;
+  g_mxUsbDeviceOperationResult = 0;
   /* USER CODE END USB_DEVICE_Init_PostTreatment */
 }
 

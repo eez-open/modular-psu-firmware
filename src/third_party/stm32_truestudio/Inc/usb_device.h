@@ -64,8 +64,8 @@
  * -- Insert your variables declaration here --
  */
 /* USER CODE BEGIN VARIABLES */
-extern int g_mxUsbOpertationUsbdResult;
-extern int g_mxUsbOpertationResult;
+extern int g_mxUsbDeviceOperationUsbResult;
+extern int g_mxUsbDeviceOperationResult;
 /* USER CODE END VARIABLES */
 /**
   * @}

@@ -6210,7 +6210,13 @@ void data_slot_error_message(DataOperationEnum operation, Cursor cursor, Value &
 
 void data_usb_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = g_usbMode;
+        value = g_usbMode == USB_MODE_HOST_HID ? 0 : g_usbMode;
+    }
+}
+
+void data_is_usb_host_hid(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_usbMode == USB_MODE_HOST_HID ? 1 : 0;
     }
 }
 

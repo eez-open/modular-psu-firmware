@@ -387,6 +387,8 @@ void lowPriorityThreadOneIter() {
 
         eez::hmi::tick(tickCount);
 
+        serial::tick(tickCount);
+
 #ifdef DEBUG
         psu::debug::tick(tickCount);
 #endif
