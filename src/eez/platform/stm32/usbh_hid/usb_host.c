@@ -72,6 +72,16 @@ void MX_USB_HOST_DeInit(void) {
     g_mxUsbHostOperationResult = -2;
   }
 
+  if (hUsbHostFS.thread) {
+    osThreadTerminate(hUsbHostFS.thread);
+    hUsbHostFS.thread = 0;
+  }
+
+  if (hUsbHostFS.os_event != 0) {
+    osMessageDelete(hUsbHostFS.os_event);
+    hUsbHostFS.os_event = 0;
+  }
+
   g_mxUsbHostOperationUsbResult = USBH_OK;
   g_mxUsbHostOperationResult = 0;
 }
