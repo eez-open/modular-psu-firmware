@@ -151,10 +151,12 @@ void init() {
 }
 
 void tick(uint32_t tickCount) {
+#if defined(EEZ_PLATFORM_STM32)
     stateTransition(HAL_GPIO_ReadPin(USB_OTG_FS_OC_GPIO_Port, USB_OTG_FS_OC_Pin) ? EVENT_OTG_OC_HI : EVENT_OTG_OC_LOW);
     stateTransition(HAL_GPIO_ReadPin(USB_OTG_FS_ID_GPIO_Port, USB_OTG_FS_ID_Pin) ? EVENT_OTG_ID_HI : EVENT_OTG_ID_LOW);
 
     testTimeoutEvent(g_debounceTimeout, EVENT_DEBOUNCE_TIMEOUT);
+#endif
 }
 
 void onQueueMessage(uint32_t type, uint32_t param) {
@@ -320,6 +322,7 @@ void selectUsbDeviceClass(int usbDeviceClass) {
     }
     
     if (g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) {
+#if defined(EEZ_PLATFORM_STM32)
         taskENTER_CRITICAL();
 
         MX_USB_DEVICE_DeInit();
@@ -329,6 +332,7 @@ void selectUsbDeviceClass(int usbDeviceClass) {
         MX_USB_DEVICE_Init();
 
         taskEXIT_CRITICAL();
+#endif
 
         if (g_usbDeviceClass == USB_DEVICE_CLASS_VIRTUAL_COM_PORT) {
             initScpi();
@@ -363,6 +367,7 @@ uint8_t g_keyboardRAlt;
 uint8_t g_keyboardRGui;
 uint8_t g_keyboardKeys[6];
 
+#if defined(EEZ_PLATFORM_STM32)
 extern "C" void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
 	HID_HandleTypeDef *HID_Handle = (HID_HandleTypeDef *)phost->pActiveClass->pData;
 	if (HID_Handle->Init == USBH_HID_KeybdInit) {
@@ -383,3 +388,4 @@ extern "C" void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
 		memcpy(g_keyboardKeys, info->keys, 6);
 	}
 }
+#endif
