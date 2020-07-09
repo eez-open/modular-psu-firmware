@@ -2305,13 +2305,25 @@
     {
       "name": "usb_mode",
       "type": "enum",
-      "enumItems": "[\"Disabled\", \"Virtual COM port\", \"Mass storage device\"]",
+      "enumItems": "[\"Disabled\", \"Device\", \"Host\", \"OTG\"]",
       "defaultValue": "1"
     },
     {
-      "name": "is_usb_host_hid",
-      "type": "boolean",
+      "name": "usb_current_mode",
+      "type": "enum",
+      "enumItems": "[\"Disabled\", \"Device\", \"Host\", \"OTG\"]",
+      "defaultValue": "1"
+    },
+    {
+      "name": "usb_device_class",
+      "type": "enum",
+      "enumItems": "[\"Virtual COM port\", \"Mass storage device\"]",
       "defaultValue": "0"
+    },
+    {
+      "name": "usb_keyboard_state",
+      "type": "string",
+      "defaultValue": "CTRL A"
     }
   ],
   "actions": [
@@ -2994,6 +3006,9 @@
     },
     {
       "name": "select_usb_mode"
+    },
+    {
+      "name": "select_usb_device_class"
     }
   ],
   "gui": {
@@ -20451,15 +20466,97 @@
         "style": "default",
         "widgets": [
           {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "edit_value_S_left",
+              "font": "Oswald17"
+            },
+            "left": 10,
+            "top": 10,
+            "width": 58,
+            "height": 32,
+            "text": "Mode:"
+          },
+          {
             "type": "Select",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "is_usb_host_hid",
-            "left": 10,
+            "data": "usb_mode",
+            "action": "select_usb_mode",
+            "left": 80,
             "top": 10,
+            "width": 120,
+            "height": 32,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "font": "Oswald17"
+                },
+                "data": "",
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 120,
+                "height": 32,
+                "text": "Disabled"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "font": "Oswald17"
+                },
+                "data": "",
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 120,
+                "height": 32,
+                "text": "Device"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "font": "Oswald17"
+                },
+                "data": "",
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 120,
+                "height": 32,
+                "text": "Host"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "font": "Oswald17"
+                },
+                "data": "",
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 120,
+                "height": 32,
+                "text": "OTG"
+              }
+            ]
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "usb_current_mode",
+            "left": 10,
+            "top": 50,
             "width": 460,
-            "height": 156,
+            "height": 116,
             "widgets": [
               {
                 "type": "Container",
@@ -20469,7 +20566,18 @@
                 "left": 0,
                 "top": 0,
                 "width": 460,
-                "height": 156,
+                "height": 116,
+                "widgets": []
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 460,
+                "height": 116,
                 "widgets": [
                   {
                     "type": "Text",
@@ -20481,15 +20589,16 @@
                     "top": 0,
                     "width": 58,
                     "height": 32,
-                    "text": "Mode:"
+                    "text": "Class:"
                   },
                   {
                     "type": "Select",
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "usb_mode",
-                    "left": 70,
+                    "data": "usb_device_class",
+                    "action": "select_usb_device_class",
+                    "left": 69,
                     "top": 0,
                     "width": 220,
                     "height": 32,
@@ -20500,22 +20609,8 @@
                           "inheritFrom": "edit_value_active_S_center",
                           "font": "Oswald17"
                         },
-                        "data": "usb_mode",
-                        "action": "select_usb_mode",
-                        "left": 0,
-                        "top": 0,
-                        "width": 220,
-                        "height": 32,
-                        "text": "Disabled"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_active_S_center",
-                          "font": "Oswald17"
-                        },
-                        "data": "usb_mode",
-                        "action": "select_usb_mode",
+                        "data": "",
+                        "action": "",
                         "left": 0,
                         "top": 0,
                         "width": 220,
@@ -20528,8 +20623,8 @@
                           "inheritFrom": "edit_value_active_S_center",
                           "font": "Oswald17"
                         },
-                        "data": "usb_mode",
-                        "action": "select_usb_mode",
+                        "data": "",
+                        "action": "",
                         "left": 0,
                         "top": 0,
                         "width": 220,
@@ -20543,23 +20638,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "usb_mode",
-                    "left": 0,
+                    "data": "usb_device_class",
+                    "left": 69,
                     "top": 40,
-                    "width": 460,
-                    "height": 116,
+                    "width": 366,
+                    "height": 64,
                     "widgets": [
-                      {
-                        "type": "Rectangle",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 460,
-                        "height": 116,
-                        "invertColors": true
-                      },
                       {
                         "type": "Container",
                         "style": {
@@ -20567,8 +20651,8 @@
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 460,
-                        "height": 116,
+                        "width": 366,
+                        "height": 64,
                         "widgets": [
                           {
                             "type": "Text",
@@ -20576,9 +20660,9 @@
                               "inheritFrom": "edit_value_S_left",
                               "font": "Oswald17"
                             },
-                            "left": 15,
-                            "top": 16,
-                            "width": 80,
+                            "left": 0,
+                            "top": 0,
+                            "width": 72,
                             "height": 28,
                             "text": "Baud:"
                           },
@@ -20587,9 +20671,9 @@
                             "style": {
                               "inheritFrom": "value_M_left"
                             },
-                            "left": 95,
-                            "top": 16,
-                            "width": 122,
+                            "left": 72,
+                            "top": 0,
+                            "width": 82,
                             "height": 28,
                             "text": "115200"
                           },
@@ -20599,9 +20683,9 @@
                               "inheritFrom": "edit_value_S_left",
                               "font": "Oswald17"
                             },
-                            "left": 15,
-                            "top": 52,
-                            "width": 80,
+                            "left": 0,
+                            "top": 36,
+                            "width": 72,
                             "height": 28,
                             "text": "Parity:"
                           },
@@ -20610,9 +20694,9 @@
                             "style": {
                               "inheritFrom": "value_M_left"
                             },
-                            "left": 95,
-                            "top": 52,
-                            "width": 122,
+                            "left": 72,
+                            "top": 36,
+                            "width": 82,
                             "height": 28,
                             "text": "None"
                           },
@@ -20622,8 +20706,8 @@
                               "inheritFrom": "edit_value_S_left",
                               "font": "Oswald17"
                             },
-                            "left": 217,
-                            "top": 16,
+                            "left": 154,
+                            "top": 0,
                             "width": 100,
                             "height": 28,
                             "text": "Bits:"
@@ -20633,9 +20717,9 @@
                             "style": {
                               "inheritFrom": "value_M_left"
                             },
-                            "left": 321,
-                            "top": 16,
-                            "width": 122,
+                            "left": 254,
+                            "top": 0,
+                            "width": 60,
                             "height": 28,
                             "text": "8"
                           },
@@ -20645,8 +20729,8 @@
                               "inheritFrom": "edit_value_S_left",
                               "font": "Oswald17"
                             },
-                            "left": 217,
-                            "top": 52,
+                            "left": 154,
+                            "top": 36,
                             "width": 100,
                             "height": 28,
                             "text": "Stop bits:"
@@ -20656,9 +20740,9 @@
                             "style": {
                               "inheritFrom": "value_M_left"
                             },
-                            "left": 321,
-                            "top": 52,
-                            "width": 122,
+                            "left": 254,
+                            "top": 36,
+                            "width": 60,
                             "height": 28,
                             "text": "1"
                           }
@@ -20671,8 +20755,8 @@
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 460,
-                        "height": 116,
+                        "width": 366,
+                        "height": 64,
                         "invertColors": true
                       }
                     ]
@@ -20687,7 +20771,58 @@
                 "left": 0,
                 "top": 0,
                 "width": 460,
-                "height": 156,
+                "height": 116,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left",
+                      "font": "Oswald17"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 58,
+                    "height": 32,
+                    "text": "Class:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left",
+                      "font": "Oswald17"
+                    },
+                    "left": 70,
+                    "top": 0,
+                    "width": 58,
+                    "height": 32,
+                    "text": "HID"
+                  },
+                  {
+                    "type": "MultilineText",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald17"
+                    },
+                    "data": "usb_keyboard_state",
+                    "left": 0,
+                    "top": 32,
+                    "width": 460,
+                    "height": 84,
+                    "text": "",
+                    "firstLineIndent": 0,
+                    "hangingIndent": 0
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 460,
+                "height": 116,
                 "widgets": []
               }
             ]

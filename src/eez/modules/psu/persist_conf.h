@@ -128,8 +128,8 @@ struct DeviceConfiguration {
     char ntpServer[32 + 1];
     uint8_t ethernetMacAddress[6];
 
-    uint8_t reserved4;
-    uint8_t reserved5;
+    uint8_t reserved41;
+    uint8_t usbMode;
 
     uint8_t encoderMovingSpeedDown;
     uint8_t encoderMovingSpeedUp;
@@ -139,7 +139,7 @@ struct DeviceConfiguration {
     uint8_t selectedThemeIndex;
     float animationsDuration;
 
-    unsigned serialEnabled : 1;
+    unsigned reserved42 : 1;
 
     unsigned ethernetEnabled : 1;
     unsigned ntpEnabled : 1;
@@ -279,8 +279,8 @@ void setDisplayState(unsigned state);
 void setDisplayBrightness(uint8_t displayBrightness);
 void setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep);
 
-bool enableSerial(bool enable);
-bool isSerialEnabled();
+void setUsbMode(int usbMode);
+int getUsbMode();
 
 bool enableEthernetDhcp(bool enable);
 bool isEthernetDhcpEnabled();

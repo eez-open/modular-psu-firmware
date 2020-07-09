@@ -412,15 +412,17 @@ enum DataEnum {
     DATA_ID_SLOT_TITLE_MICRO = 410,
     DATA_ID_SLOT_ERROR_MESSAGE = 411,
     DATA_ID_USB_MODE = 412,
-    DATA_ID_IS_USB_HOST_HID = 413,
-    DATA_ID_DIB_MIO168_INPUTS = 414,
-    DATA_ID_DIB_MIO168_INPUT_NO = 415,
-    DATA_ID_DIB_MIO168_INPUT_STATE = 416,
-    DATA_ID_DIB_MIO168_OUTPUTS = 417,
-    DATA_ID_DIB_MIO168_OUTPUT_NO = 418,
-    DATA_ID_DIB_MIO168_OUTPUT_STATE = 419,
-    DATA_ID_DIB_MIO168_ANALOG_INPUTS = 420,
-    DATA_ID_DIB_MIO168_ANALOG_INPUT_VALUE = 421
+    DATA_ID_USB_CURRENT_MODE = 413,
+    DATA_ID_USB_DEVICE_CLASS = 414,
+    DATA_ID_USB_KEYBOARD_STATE = 415,
+    DATA_ID_DIB_MIO168_INPUTS = 416,
+    DATA_ID_DIB_MIO168_INPUT_NO = 417,
+    DATA_ID_DIB_MIO168_INPUT_STATE = 418,
+    DATA_ID_DIB_MIO168_OUTPUTS = 419,
+    DATA_ID_DIB_MIO168_OUTPUT_NO = 420,
+    DATA_ID_DIB_MIO168_OUTPUT_STATE = 421,
+    DATA_ID_DIB_MIO168_ANALOG_INPUTS = 422,
+    DATA_ID_DIB_MIO168_ANALOG_INPUT_VALUE = 423
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -836,7 +838,9 @@ void data_slot_title_min(DataOperationEnum operation, Cursor cursor, Value &valu
 void data_slot_title_micro(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot_error_message(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_usb_mode(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_is_usb_host_hid(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_usb_current_mode(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_usb_device_class(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_usb_keyboard_state(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_inputs(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_input_no(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_input_state(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -1075,7 +1079,8 @@ enum ActionsEnum {
     ACTION_ID_TOGGLE_SLOT_MAX_VIEW = 221,
     ACTION_ID_SHOW_SLOT_SETTINGS = 222,
     ACTION_ID_SELECT_USB_MODE = 223,
-    ACTION_ID_DIB_MIO168_TOGGLE_OUTPUT_STATE = 224
+    ACTION_ID_SELECT_USB_DEVICE_CLASS = 224,
+    ACTION_ID_DIB_MIO168_TOGGLE_OUTPUT_STATE = 225
 };
 
 void action_channel_toggle_output();
@@ -1301,6 +1306,7 @@ void action_show_touch_calibration_intro();
 void action_toggle_slot_max_view();
 void action_show_slot_settings();
 void action_select_usb_mode();
+void action_select_usb_device_class();
 void action_dib_mio168_toggle_output_state();
 
 extern ActionExecFunc g_actionExecFunctions[];
@@ -1525,58 +1531,58 @@ enum StylesEnum {
     STYLE_ID_INLINE184 = 184,
     STYLE_ID_INLINE185 = 185,
     STYLE_ID_INLINE186 = 186,
-    STYLE_ID_EVENT_WARNING = 187,
-    STYLE_ID_DISPLAY_OFF = 188,
-    STYLE_ID_DISPLAY_OFF_S = 189,
-    STYLE_ID_INLINE190 = 190,
+    STYLE_ID_INLINE187 = 187,
+    STYLE_ID_EVENT_WARNING = 188,
+    STYLE_ID_DISPLAY_OFF = 189,
+    STYLE_ID_DISPLAY_OFF_S = 190,
     STYLE_ID_INLINE191 = 191,
-    STYLE_ID_MON_VALUE_48_RIGHT = 192,
-    STYLE_ID_INLINE193 = 193,
-    STYLE_ID_MON_VALUE_20_LEFT = 194,
-    STYLE_ID_BAR_GRAPH_U_DEFAULT = 195,
-    STYLE_ID_BAR_GRAPH_TEXT = 196,
-    STYLE_ID_BAR_GRAPH_SET_LINE = 197,
-    STYLE_ID_BAR_GRAPH_LIMIT_LINE = 198,
-    STYLE_ID_BAR_GRAPH_I_DEFAULT = 199,
-    STYLE_ID_INLINE200 = 200,
+    STYLE_ID_INLINE192 = 192,
+    STYLE_ID_MON_VALUE_48_RIGHT = 193,
+    STYLE_ID_INLINE194 = 194,
+    STYLE_ID_MON_VALUE_20_LEFT = 195,
+    STYLE_ID_BAR_GRAPH_U_DEFAULT = 196,
+    STYLE_ID_BAR_GRAPH_TEXT = 197,
+    STYLE_ID_BAR_GRAPH_SET_LINE = 198,
+    STYLE_ID_BAR_GRAPH_LIMIT_LINE = 199,
+    STYLE_ID_BAR_GRAPH_I_DEFAULT = 200,
     STYLE_ID_INLINE201 = 201,
-    STYLE_ID_TRIGGER_BUTTON_24 = 202,
-    STYLE_ID_INLINE203 = 203,
+    STYLE_ID_INLINE202 = 202,
+    STYLE_ID_TRIGGER_BUTTON_24 = 203,
     STYLE_ID_INLINE204 = 204,
-    STYLE_ID_MON_VALUE_14_RIGHT = 205,
-    STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED = 206,
-    STYLE_ID_CHANNEL_OFF_BUTTON_20 = 207,
-    STYLE_ID_TRIGGER_BUTTON_14 = 208,
-    STYLE_ID_INLINE209 = 209,
+    STYLE_ID_INLINE205 = 205,
+    STYLE_ID_MON_VALUE_14_RIGHT = 206,
+    STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED = 207,
+    STYLE_ID_CHANNEL_OFF_BUTTON_20 = 208,
+    STYLE_ID_TRIGGER_BUTTON_14 = 209,
     STYLE_ID_INLINE210 = 210,
     STYLE_ID_INLINE211 = 211,
     STYLE_ID_INLINE212 = 212,
     STYLE_ID_INLINE213 = 213,
-    STYLE_ID_CHANNEL_OFF_BUTTON_38 = 214,
-    STYLE_ID_INST_SELECTED = 215,
-    STYLE_ID_MON_VALUE_38_RIGHT = 216,
-    STYLE_ID_INLINE217 = 217,
-    STYLE_ID_CH_PROT_OFF = 218,
-    STYLE_ID_CH_PROT_ON = 219,
-    STYLE_ID_CH_PROT_TRIPPED = 220,
-    STYLE_ID_INLINE221 = 221,
-    STYLE_ID_MON_VALUE_24_RIGHT = 222,
-    STYLE_ID_MON_VALUE_14_CENTER = 223,
-    STYLE_ID_INLINE224 = 224,
+    STYLE_ID_INLINE214 = 214,
+    STYLE_ID_CHANNEL_OFF_BUTTON_38 = 215,
+    STYLE_ID_INST_SELECTED = 216,
+    STYLE_ID_MON_VALUE_38_RIGHT = 217,
+    STYLE_ID_INLINE218 = 218,
+    STYLE_ID_CH_PROT_OFF = 219,
+    STYLE_ID_CH_PROT_ON = 220,
+    STYLE_ID_CH_PROT_TRIPPED = 221,
+    STYLE_ID_INLINE222 = 222,
+    STYLE_ID_MON_VALUE_24_RIGHT = 223,
+    STYLE_ID_MON_VALUE_14_CENTER = 224,
     STYLE_ID_INLINE225 = 225,
     STYLE_ID_INLINE226 = 226,
     STYLE_ID_INLINE227 = 227,
     STYLE_ID_INLINE228 = 228,
-    STYLE_ID_MON_VALUE_20_RIGHT = 229,
-    STYLE_ID_MON_VALUE_14_LEFT = 230,
-    STYLE_ID_CHANNEL_OFF_BUTTON_14 = 231,
-    STYLE_ID_INLINE232 = 232,
+    STYLE_ID_INLINE229 = 229,
+    STYLE_ID_MON_VALUE_20_RIGHT = 230,
+    STYLE_ID_MON_VALUE_14_LEFT = 231,
+    STYLE_ID_CHANNEL_OFF_BUTTON_14 = 232,
     STYLE_ID_INLINE233 = 233,
     STYLE_ID_INLINE234 = 234,
-    STYLE_ID_STATUS_LINE_SMALL_TITLE = 235,
-    STYLE_ID_EDIT_VALUE_S_CENTERED_STATUS_LINE = 236,
-    STYLE_ID_SCROLLBAR_TRACK = 237,
-    STYLE_ID_INLINE238 = 238,
+    STYLE_ID_INLINE235 = 235,
+    STYLE_ID_STATUS_LINE_SMALL_TITLE = 236,
+    STYLE_ID_EDIT_VALUE_S_CENTERED_STATUS_LINE = 237,
+    STYLE_ID_SCROLLBAR_TRACK = 238,
     STYLE_ID_INLINE239 = 239,
     STYLE_ID_INLINE240 = 240,
     STYLE_ID_INLINE241 = 241,
@@ -1868,4 +1874,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM220_CH_SETTINGS_SPECIFIC = 172
 };
 
-extern const uint8_t assets[310055];
+extern const uint8_t assets[310180];

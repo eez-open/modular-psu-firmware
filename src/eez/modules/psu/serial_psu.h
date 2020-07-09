@@ -34,16 +34,36 @@ void onQueueMessage(uint32_t type, uint32_t param);
 
 bool isConnected();
 
-void selectUsbMode(int usbMode);
+extern int g_usbMode;
+extern int g_otgMode;
+
+void selectUsbMode(int usbMode, int otgMode);
+void selectUsbDeviceClass(int usbDeviceClass);
+
+bool isVirtualComPortActive();
+bool isMassStorageActive();
 
 }
 }
 } // namespace eez::psu::serial
 
-#define USB_MODE_UNKNOWN -1
 #define USB_MODE_DISABLED 0
-#define USB_MODE_VIRTUAL_COM_PORT 1
-#define USB_MODE_MASS_STORAGE_CLIENT 2
-#define USB_MODE_HOST_HID 3
+#define USB_MODE_DEVICE 1
+#define USB_MODE_HOST 2
+#define USB_MODE_OTG 3
 
-extern "C" int g_usbMode;
+#define USB_DEVICE_CLASS_VIRTUAL_COM_PORT 0
+#define USB_DEVICE_CLASS_MASS_STORAGE_CLIENT 1
+
+extern "C" int g_usbDeviceClass;
+
+extern "C" uint8_t g_keyboardState;
+extern "C" uint8_t g_keyboardLCtrl;
+extern "C" uint8_t g_keyboardLShift;
+extern "C" uint8_t g_keyboardLAlt;
+extern "C" uint8_t g_keyboardLGui;
+extern "C" uint8_t g_keyboardRCtrl;
+extern "C" uint8_t g_keyboardRShift;
+extern "C" uint8_t g_keyboardRAlt;
+extern "C" uint8_t g_keyboardRGui;
+extern "C" uint8_t g_keyboardKeys[6];

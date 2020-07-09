@@ -129,7 +129,7 @@ void initDefaultDevConf() {
     g_defaultDevConf.profileAutoRecallLocation = 0;
 
     // block 4
-    g_defaultDevConf.serialEnabled = 1;
+    g_defaultDevConf.usbMode = USB_MODE_DEVICE;
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     g_defaultDevConf.ethernetEnabled = 1;
@@ -906,13 +906,12 @@ void setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep)
 #endif
 }
 
-bool enableSerial(bool enable) {
-    g_devConf.serialEnabled = enable ? 1 : 0;
-    return true;
+void setUsbMode(int usbMode) {
+    g_devConf.usbMode = usbMode;
 }
 
-bool isSerialEnabled() {
-    return g_devConf.serialEnabled ? true : false;
+int getUsbMode() {
+    return g_devConf.usbMode;
 }
 
 bool enableEthernet(bool enable) {

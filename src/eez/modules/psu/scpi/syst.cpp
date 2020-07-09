@@ -860,7 +860,7 @@ scpi_result_t scpi_cmd_systemCommunicateEnable(scpi_t *context) {
     }
 
     if (commInterface == 1) {
-        persist_conf::enableSerial(enable);
+        persist_conf::setUsbMode(enable ? USB_MODE_DEVICE : USB_MODE_DISABLED);
     } else if (commInterface == 2) {
 #if OPTION_ETHERNET
         persist_conf::enableEthernet(enable);
@@ -884,7 +884,7 @@ scpi_result_t scpi_cmd_systemCommunicateEnableQ(scpi_t *context) {
     }
 
     if (commInterface == 1) {
-        SCPI_ResultBool(context, persist_conf::isSerialEnabled());
+        SCPI_ResultBool(context, persist_conf::getUsbMode() != USB_MODE_DISABLED);
     } else if (commInterface == 2) {
 #if OPTION_ETHERNET
         SCPI_ResultBool(context, persist_conf::isEthernetEnabled());

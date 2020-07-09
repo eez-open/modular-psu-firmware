@@ -104,45 +104,54 @@ static bool g_isConnected;
 
 static void initScpi();
 
+int g_usbMode;
+
 enum Event {
     EVENT_OTG_ID_HI,
     EVENT_OTG_ID_LOW,
+    EVENT_OTG_OC_HI,
+    EVENT_OTG_OC_LOW,
     EVENT_DEBOUNCE_TIMEOUT
 };
 
 enum State {
-    STATE_INITIAL,
+    STATE_UNKNOWN_MODE,
     STATE_DEVICE_MODE,
     STATE_HOST_MODE,
     STATE_DEBOUNCE_DEVICE_MODE,
-    STATE_DEBOUNCE_HOST_MODE
+    STATE_DEBOUNCE_HOST_MODE,
+	STATE_FAULT_DETECTED
 };
 
 static const int CONF_OTG_ID_DEBOUNCE_TIMEOUT_MS = 100;
 
-State g_state = STATE_INITIAL;
+State g_state = STATE_UNKNOWN_MODE;
 static uint32_t g_debounceTimeout;
 
 static void testTimeoutEvent(uint32_t &timeout, Event timeoutEvent);
 static void stateTransition(Event event);
+static void setState(State state);
+
+int g_otgMode = USB_MODE_DISABLED;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
+    g_testResult = TEST_SKIPPED;
 	initScpi();
 
-	if (persist_conf::isSerialEnabled()) {
-		g_testResult = TEST_OK;
+    selectUsbMode(persist_conf::getUsbMode(), g_otgMode);
+
 #ifdef EEZ_PLATFORM_SIMULATOR
+    if (isVirtualComPortActive()) {
         Serial.print("EEZ BB3 software simulator ver. ");
         Serial.println(MCU_FIRMWARE);
-#endif
-    } else {
-    	g_testResult = TEST_SKIPPED;
     }
+#endif
 }
 
 void tick(uint32_t tickCount) {
+    stateTransition(HAL_GPIO_ReadPin(USB_OTG_FS_OC_GPIO_Port, USB_OTG_FS_OC_Pin) ? EVENT_OTG_OC_HI : EVENT_OTG_OC_LOW);
     stateTransition(HAL_GPIO_ReadPin(USB_OTG_FS_ID_GPIO_Port, USB_OTG_FS_ID_Pin) ? EVENT_OTG_ID_HI : EVENT_OTG_ID_LOW);
 
     testTimeoutEvent(g_debounceTimeout, EVENT_DEBOUNCE_TIMEOUT);
@@ -192,44 +201,52 @@ static void testTimeoutEvent(uint32_t &timeout, Event timeoutEvent) {
 }
 
 static void setState(State state) {
-    static int g_savedUsbMode;
-    
     if (state != g_state) {
         g_state = state;
 
         if (g_state == STATE_DEVICE_MODE) {
-            if (g_usbMode == USB_MODE_HOST_HID) {
-                selectUsbMode(g_savedUsbMode);
-            } else if (g_usbMode == USB_MODE_UNKNOWN) {
-                selectUsbMode(persist_conf::isSerialEnabled() ? USB_MODE_VIRTUAL_COM_PORT : USB_MODE_DISABLED);
+            if (g_usbMode == USB_MODE_OTG) {
+                selectUsbMode(g_usbMode, USB_MODE_DEVICE);
+            } else {
+                g_otgMode = USB_MODE_DEVICE;
             }
         } else if (g_state == STATE_HOST_MODE) {
-            if (g_usbMode != USB_MODE_HOST_HID) {
-                g_savedUsbMode = g_usbMode == USB_MODE_UNKNOWN ? (persist_conf::isSerialEnabled() ? USB_MODE_VIRTUAL_COM_PORT : USB_MODE_DISABLED) : g_usbMode;
-                selectUsbMode(USB_MODE_HOST_HID);
+            if (g_usbMode == USB_MODE_OTG) {
+                selectUsbMode(g_usbMode, USB_MODE_HOST);
+            } else {
+                g_otgMode = USB_MODE_HOST;
             }
         }
     }
 }
 
 static void stateTransition(Event event) {
-    if (g_state == STATE_INITIAL) {
+    if (g_state == STATE_UNKNOWN_MODE) {
         if (event == EVENT_OTG_ID_LOW) {
             setState(STATE_DEBOUNCE_HOST_MODE);
-            setTimeout(g_debounceTimeout, CONF_OTG_ID_DEBOUNCE_TIMEOUT_MS);
+            setTimeout(g_debounceTimeout, 1500);
         } else if (event == EVENT_OTG_ID_HI) {
             setState(STATE_DEBOUNCE_DEVICE_MODE);
+            setTimeout(g_debounceTimeout, 1500);
+        } else if (event == EVENT_OTG_OC_LOW) {
             setTimeout(g_debounceTimeout, CONF_OTG_ID_DEBOUNCE_TIMEOUT_MS);
+            setState(STATE_FAULT_DETECTED);
         }
     } else if (g_state == STATE_DEVICE_MODE) {
         if (event == EVENT_OTG_ID_LOW) {
             setState(STATE_DEBOUNCE_HOST_MODE);
             setTimeout(g_debounceTimeout, CONF_OTG_ID_DEBOUNCE_TIMEOUT_MS);
+        } else if (event == EVENT_OTG_OC_LOW) {
+            setTimeout(g_debounceTimeout, CONF_OTG_ID_DEBOUNCE_TIMEOUT_MS);
+            setState(STATE_FAULT_DETECTED);
         }
     } else if (g_state == STATE_HOST_MODE) {
         if (event == EVENT_OTG_ID_HI) {
             setState(STATE_DEBOUNCE_DEVICE_MODE);
             setTimeout(g_debounceTimeout, CONF_OTG_ID_DEBOUNCE_TIMEOUT_MS);
+        } else if (event == EVENT_OTG_OC_LOW) {
+            setTimeout(g_debounceTimeout, CONF_OTG_ID_DEBOUNCE_TIMEOUT_MS);
+            setState(STATE_FAULT_DETECTED);
         }
     } else if (g_state == STATE_DEBOUNCE_DEVICE_MODE) {
         if (event == EVENT_OTG_ID_LOW) {
@@ -237,6 +254,9 @@ static void stateTransition(Event event) {
             clearTimeout(g_debounceTimeout);
         } else if (event == EVENT_DEBOUNCE_TIMEOUT) {
             setState(STATE_DEVICE_MODE);
+        } else if (event == EVENT_OTG_OC_LOW) {
+            setTimeout(g_debounceTimeout, CONF_OTG_ID_DEBOUNCE_TIMEOUT_MS);
+            setState(STATE_FAULT_DETECTED);
         }
     } else if (g_state == STATE_DEBOUNCE_HOST_MODE) {
         if (event == EVENT_OTG_ID_HI) {
@@ -244,62 +264,122 @@ static void stateTransition(Event event) {
             clearTimeout(g_debounceTimeout);
         } else if (event == EVENT_DEBOUNCE_TIMEOUT) {
             setState(STATE_HOST_MODE);
+        } else if (event == EVENT_OTG_OC_LOW) {
+            setTimeout(g_debounceTimeout, CONF_OTG_ID_DEBOUNCE_TIMEOUT_MS);
+            setState(STATE_FAULT_DETECTED);
+        }
+    } else if (g_state == STATE_FAULT_DETECTED) {
+        if (event == EVENT_OTG_OC_LOW) {
+            setTimeout(g_debounceTimeout, CONF_OTG_ID_DEBOUNCE_TIMEOUT_MS);
+        } else if (event == EVENT_DEBOUNCE_TIMEOUT) {
+            setState(STATE_HOST_MODE);
         }
     }
 }
 
-void selectUsbMode(int usbMode) {
-    if (g_usbMode == usbMode) {
+void selectUsbMode(int usbMode, int otgMode) {
+    if (g_usbMode == usbMode && g_otgMode == otgMode) {
         return;
     }
 
 #if defined(EEZ_PLATFORM_STM32)
     taskENTER_CRITICAL();
 
-    if (g_usbMode == USB_MODE_VIRTUAL_COM_PORT || g_usbMode == USB_MODE_MASS_STORAGE_CLIENT) {
+    if (g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) {
         MX_USB_DEVICE_DeInit();
-    } else if (g_usbMode == USB_MODE_HOST_HID) {
+    } else if (g_usbMode == USB_MODE_HOST || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_HOST)) {
         MX_USB_HOST_DeInit();
     }
-
-    taskEXIT_CRITICAL();
 #endif
 
     g_usbMode = usbMode;
+    g_otgMode = otgMode;
 
 #if defined(EEZ_PLATFORM_STM32)
-    taskENTER_CRITICAL();
-
-    if (g_usbMode == USB_MODE_VIRTUAL_COM_PORT || g_usbMode == USB_MODE_MASS_STORAGE_CLIENT) {
+    if (g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) {
         MX_USB_DEVICE_Init();
-    } else if (g_usbMode == USB_MODE_HOST_HID) {
+    } else if (g_usbMode == USB_MODE_HOST || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_HOST)) {
         MX_USB_HOST_Init();
     }
 
     taskEXIT_CRITICAL();
 #endif
 
-    persist_conf::enableSerial(g_usbMode != USB_MODE_DISABLED);
+    persist_conf::setUsbMode(g_usbMode);
 
-    if (g_usbMode == USB_MODE_VIRTUAL_COM_PORT) {
+    if ((g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) && g_usbDeviceClass == USB_DEVICE_CLASS_VIRTUAL_COM_PORT) {
         initScpi();
     }
 
     g_testResult = g_usbMode != USB_MODE_DISABLED ? TEST_OK : TEST_SKIPPED;
 }
 
+void selectUsbDeviceClass(int usbDeviceClass) {
+    if (g_usbDeviceClass == usbDeviceClass) {
+        return;
+    }
+    
+    if (g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) {
+        taskENTER_CRITICAL();
+
+        MX_USB_DEVICE_DeInit();
+
+        g_usbDeviceClass = usbDeviceClass;
+
+        MX_USB_DEVICE_Init();
+
+        taskEXIT_CRITICAL();
+
+        if (g_usbDeviceClass == USB_DEVICE_CLASS_VIRTUAL_COM_PORT) {
+            initScpi();
+        }
+    } else {
+        g_usbDeviceClass = usbDeviceClass;
+    }
+}
+
+bool isVirtualComPortActive() {
+    return (g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) && g_usbDeviceClass == USB_DEVICE_CLASS_VIRTUAL_COM_PORT;
+}
+
+bool isMassStorageActive() {
+    return (g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) && g_usbDeviceClass == USB_DEVICE_CLASS_MASS_STORAGE_CLIENT;
+}
+
 } // namespace serial
 } // namespace psu
 } // namespace eez
 
-int g_usbMode = USB_MODE_UNKNOWN;
+int g_usbDeviceClass = USB_DEVICE_CLASS_VIRTUAL_COM_PORT;
+
+uint8_t g_keyboardState;
+uint8_t g_keyboardLCtrl;
+uint8_t g_keyboardLShift;
+uint8_t g_keyboardLAlt;
+uint8_t g_keyboardLGui;
+uint8_t g_keyboardRCtrl;
+uint8_t g_keyboardRShift;
+uint8_t g_keyboardRAlt;
+uint8_t g_keyboardRGui;
+uint8_t g_keyboardKeys[6];
 
 extern "C" void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
 	HID_HandleTypeDef *HID_Handle = (HID_HandleTypeDef *)phost->pActiveClass->pData;
 	if (HID_Handle->Init == USBH_HID_KeybdInit) {
 		HID_KEYBD_Info_TypeDef *info = USBH_HID_GetKeybdInfo(phost);
-        DebugTrace("state=%d, lctrl=%d,lshift=%d,lalt=%d,lgui=%d, rctrl=%d,rshift=%d,ralt=%d,rgui=%d, keys=[%d,%d,%d,%d,%d,%d]\n",
-            info->state, info->lctrl, info->lshift, info->lalt, info->lgui, info->rctrl, info->rshift, info->ralt, info->rgui,
-            info->keys[0], info->keys[1], info->keys[2], info->keys[3], info->keys[4], info->keys[5]);
+
+		g_keyboardState = info->state;
+
+		g_keyboardLCtrl = info->lctrl;
+		g_keyboardLShift = info->lshift;
+		g_keyboardLAlt = info->lalt;
+		g_keyboardLGui = info->lgui;
+
+		g_keyboardRCtrl = info->rctrl;
+		g_keyboardRShift = info->rshift;
+		g_keyboardRAlt = info->ralt;
+		g_keyboardRGui = info->rgui;
+
+		memcpy(g_keyboardKeys, info->keys, 6);
 	}
 }

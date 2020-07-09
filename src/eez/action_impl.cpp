@@ -1399,17 +1399,26 @@ void action_channel_toggle_ramp_state() {
     }
 }
 
-bool isUsbModeDisabled(uint16_t value) {
-    return value == USB_MODE_MASS_STORAGE_CLIENT && dlog_record::isExecuting();
-}
-
 void onSetUsbMode(uint16_t value) {
 	popPage();
     sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_MODE, value);
 }
 
 void action_select_usb_mode() {
-    pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, g_usbMode, isUsbModeDisabled, onSetUsbMode);
+    pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, psu::serial::g_usbMode, nullptr, onSetUsbMode);
+}
+
+bool isUsbDeviceClassDisabled(uint16_t value) {
+    return value == USB_DEVICE_CLASS_MASS_STORAGE_CLIENT && dlog_record::isExecuting();
+}
+
+void onSetUsbDeviceClass(uint16_t value) {
+	popPage();
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_DEVICE_CLASS, value);
+}
+
+void action_select_usb_device_class() {
+    pushSelectFromEnumPage(ENUM_DEFINITION_USB_DEVICE_CLASS, g_usbDeviceClass, isUsbDeviceClassDisabled, onSetUsbDeviceClass);
 }
 
 } // namespace gui

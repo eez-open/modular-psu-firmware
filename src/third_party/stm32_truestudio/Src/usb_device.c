@@ -61,7 +61,7 @@ int g_mxUsbDeviceOperationUsbResult;
 int g_mxUsbDeviceOperationResult;
 
 extern USBD_DescriptorsTypeDef FS_Desc_MSC;
-extern int g_usbMode;
+extern int g_usbDeviceClass;
 
 void MX_USB_DEVICE_DeInit(void) {
   g_mxUsbDeviceOperationUsbResult = USBD_Stop(&hUsbDeviceFS);
@@ -86,7 +86,7 @@ void MX_USB_DEVICE_DeInit(void) {
 void MX_USB_DEVICE_Init(void)
 {
   /* USER CODE BEGIN USB_DEVICE_Init_PreTreatment */
-  if (g_usbMode == 1) {
+  if (g_usbDeviceClass == 0) {
     /* Init Device Library, add supported class and start the library. */
     g_mxUsbDeviceOperationUsbResult = USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS);
     if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
@@ -111,7 +111,7 @@ void MX_USB_DEVICE_Init(void)
       g_mxUsbDeviceOperationResult = -4;
       return;
     }
-  } else if (g_usbMode == 2) {
+  } else {
     /* Init Device Library, add supported class and start the library. */
     g_mxUsbDeviceOperationUsbResult = USBD_Init(&hUsbDeviceFS, &FS_Desc_MSC, DEVICE_FS);
     if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {

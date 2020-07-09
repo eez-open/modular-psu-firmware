@@ -251,8 +251,15 @@ EnumItem g_enumDefinition_CALIBRATION_VALUE_TYPE[] = {
 
 EnumItem g_enumDefinition_USB_MODE[] = {
     { USB_MODE_DISABLED, "Disabled" },
-    { USB_MODE_VIRTUAL_COM_PORT, "Virtual COM Port" },
-    { USB_MODE_MASS_STORAGE_CLIENT, "Mass Storage Device" },
+    { USB_MODE_DEVICE, "Device" },
+    { USB_MODE_HOST, "Host" },
+    { USB_MODE_OTG, "OTG" },
+    { 0, 0 }
+};
+
+EnumItem g_enumDefinition_USB_DEVICE_CLASS[] = {
+    { USB_DEVICE_CLASS_VIRTUAL_COM_PORT, "Virtual COM Port" },
+    { USB_DEVICE_CLASS_MASS_STORAGE_CLIENT, "Mass Storage Device" },
     { 0, 0 }
 };
 
@@ -6210,13 +6217,140 @@ void data_slot_error_message(DataOperationEnum operation, Cursor cursor, Value &
 
 void data_usb_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = g_usbMode == USB_MODE_HOST_HID ? 0 : g_usbMode;
+        value = psu::serial::g_usbMode;
     }
 }
 
-void data_is_usb_host_hid(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_usb_current_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = g_usbMode == USB_MODE_HOST_HID ? 1 : 0;
+        value = psu::serial::g_usbMode == USB_MODE_OTG ? psu::serial::g_otgMode : psu::serial::g_usbMode;
+    }
+}
+
+void data_usb_device_class(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_usbDeviceClass;
+    }
+}
+
+void data_usb_keyboard_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        static char keyboardStateStr[2][256] = { 0 };
+        static uint8_t keyboardState;
+        static uint8_t keyboardLCtrl;
+        static uint8_t keyboardLShift;
+        static uint8_t keyboardLAlt;
+        static uint8_t keyboardLGui;
+        static uint8_t keyboardRCtrl;
+        static uint8_t keyboardRShift;
+        static uint8_t keyboardRAlt;
+        static uint8_t keyboardRGui;
+        static uint8_t keyboardKeys[6];
+        static int i = 0;
+
+        char *str = &keyboardStateStr[i][0];
+
+        if (
+            keyboardState != g_keyboardState ||
+            keyboardLCtrl != g_keyboardLCtrl ||
+            keyboardLShift != g_keyboardLShift ||
+            keyboardLAlt != g_keyboardLAlt ||
+            keyboardLGui != g_keyboardLGui ||
+            keyboardRCtrl != g_keyboardRCtrl ||
+            keyboardRShift != g_keyboardRShift ||
+            keyboardRAlt != g_keyboardRAlt ||
+            keyboardRGui != g_keyboardRGui ||
+            keyboardKeys[0] != g_keyboardKeys[0] ||
+            keyboardKeys[1] != g_keyboardKeys[1] ||
+            keyboardKeys[2] != g_keyboardKeys[2] ||
+            keyboardKeys[3] != g_keyboardKeys[3] ||
+            keyboardKeys[4] != g_keyboardKeys[4] ||
+            keyboardKeys[5] != g_keyboardKeys[5]
+        ) {
+            keyboardState = g_keyboardState;
+			keyboardLCtrl = g_keyboardLCtrl;
+			keyboardLShift = g_keyboardLShift;
+			keyboardLAlt = g_keyboardLAlt;
+			keyboardLGui = g_keyboardLGui;
+			keyboardRCtrl = g_keyboardRCtrl;
+			keyboardRShift = g_keyboardRShift;
+			keyboardRAlt = g_keyboardRAlt;
+			keyboardRGui = g_keyboardRGui;
+			keyboardKeys[0] = g_keyboardKeys[0];
+			keyboardKeys[1] = g_keyboardKeys[1];
+			keyboardKeys[2] = g_keyboardKeys[2];
+			keyboardKeys[3] = g_keyboardKeys[3];
+			keyboardKeys[4] = g_keyboardKeys[4];
+			keyboardKeys[5] = g_keyboardKeys[5];
+
+            i = (i + 1) % 2;
+
+            str = &keyboardStateStr[i][0];
+
+            str[0] = 0;
+
+            if (g_keyboardState != 0) {
+                sprintf(str, "State=0x%02X", g_keyboardState);
+            }
+
+            if (g_keyboardLCtrl) {
+                strcat(str, " LCTRL");
+            }
+
+            if (g_keyboardLShift) {
+                strcat(str, " LSHIFT");
+            }
+
+            if (g_keyboardLAlt) {
+                strcat(str, " LALT");
+            }
+
+            if (g_keyboardLGui) {
+                strcat(str, " LGUI");
+            }
+
+            if (g_keyboardRCtrl) {
+                strcat(str, " RCTRL");
+            }
+
+            if (g_keyboardRShift) {
+                strcat(str, " RSHIFT");
+            }
+
+            if (g_keyboardRAlt) {
+                strcat(str, " RALT");
+            }
+
+            if (g_keyboardRGui) {
+                strcat(str, " RGUI");
+            }
+
+            if (g_keyboardKeys[0]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[0]);
+            }
+
+            if (g_keyboardKeys[1]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[1]);
+            }
+
+            if (g_keyboardKeys[2]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[2]);
+            }
+
+            if (g_keyboardKeys[3]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[3]);
+            }
+
+            if (g_keyboardKeys[4]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[4]);
+            }
+
+            if (g_keyboardKeys[5]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[5]);
+            }
+        }
+
+        value = (const char *)str;
     }
 }
 

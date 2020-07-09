@@ -349,7 +349,9 @@ void lowPriorityThreadOneIter() {
             } else if (type == THREAD_MESSAGE_SOUND_TICK) {
                 sound::tick();
             } else if (type == THREAD_MESSAGE_SELECT_USB_MODE) {
-                psu::serial::selectUsbMode(param);
+                psu::serial::selectUsbMode(param, psu::serial::g_otgMode);
+            } else if (type == THREAD_MESSAGE_SELECT_USB_DEVICE_CLASS) {
+                psu::serial::selectUsbDeviceClass(param);
             }
         }
     } else {
