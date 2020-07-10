@@ -26,6 +26,7 @@
 #endif
 
 #include <eez/firmware.h>
+#include <eez/usb.h>
 
 #include <eez/modules/psu/psu.h>
 
@@ -36,7 +37,6 @@
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/sd_card.h>
-#include <eez/modules/psu/serial_psu.h>
 #include <eez/modules/psu/scpi/psu.h>
 
 #if OPTION_DISPLAY
@@ -99,7 +99,7 @@ void init() {
 #if defined(EEZ_PLATFORM_STM32)
     MX_SDMMC1_SD_Init();
 	g_sdCardIsPresent = HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin) == GPIO_PIN_RESET ? 1 : 0;
-    stateTransition(!psu::serial::isMassStorageActive() && g_sdCardIsPresent ? EVENT_CARD_PRESENT : EVENT_CARD_NOT_PRESENT);
+    stateTransition(!usb::isMassStorageActive() && g_sdCardIsPresent ? EVENT_CARD_PRESENT : EVENT_CARD_NOT_PRESENT);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -119,7 +119,7 @@ bool test() {
 void tick() {
 #if defined(EEZ_PLATFORM_STM32)
 	g_sdCardIsPresent = HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin) == GPIO_PIN_RESET ? 1 : 0;
-    stateTransition(!psu::serial::isMassStorageActive() && g_sdCardIsPresent ? EVENT_CARD_PRESENT : EVENT_CARD_NOT_PRESENT);
+    stateTransition(!usb::isMassStorageActive() && g_sdCardIsPresent ? EVENT_CARD_PRESENT : EVENT_CARD_NOT_PRESENT);
     testTimeoutEvent(g_debounceTimeout, EVENT_DEBOUNCE_TIMEOUT);
 #endif
 }
@@ -132,7 +132,7 @@ void onSdDetectInterrupt() {
 
 void onSdDetectInterruptHandler() {
     g_sdCardIsPresent = HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin) == GPIO_PIN_RESET ? 1 : 0;
-    stateTransition(!psu::serial::isMassStorageActive() && g_sdCardIsPresent ? EVENT_CARD_PRESENT : EVENT_CARD_NOT_PRESENT);
+    stateTransition(!usb::isMassStorageActive() && g_sdCardIsPresent ? EVENT_CARD_PRESENT : EVENT_CARD_NOT_PRESENT);
 }
 #endif
 

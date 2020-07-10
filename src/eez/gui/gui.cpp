@@ -62,10 +62,16 @@ osThreadId g_guiTaskHandle;
 osMessageQDef(g_guiMessageQueue, GUI_QUEUE_SIZE, uint32_t);
 osMessageQId g_guiMessageQueueId;
 
+#define GUI_QUEUE_MESSAGE(type, param) ((((uint32_t)(uint16_t)(int16_t)param) << 8) | (type))
+#define GUI_QUEUE_MESSAGE_TYPE(message) ((message) & 0xFF)
+#define GUI_QUEUE_MESSAGE_PARAM(param) ((int16_t)(message >> 8))
+
 void startThread() {
     decompressAssets();
     mcu::display::onThemeChanged();
     touch::init();
+    g_mouseCursorX = mcu::display::getDisplayWidth() / 2;
+    g_mouseCursorY = mcu::display::getDisplayHeight() / 2;
     g_guiMessageQueueId = osMessageCreate(osMessageQ(g_guiMessageQueue), NULL);
     g_guiTaskHandle = osThreadCreate(osThread(g_guiTask), nullptr);
 }
@@ -87,6 +93,14 @@ void onGuiQueueMessage(uint8_t type, int16_t param) {
         getAppContextFromId(param)->doShowPage();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE) {
         getAppContextFromId(param)->doPushPage();
+    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_MOVE) {
+        onMouseMove((int8_t)((uint16_t)param >> 8), (int8_t)((uint16_t)param & 0xFF));
+    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN) {
+        onMouseButtonDown(param);
+    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP) {
+        onMouseButtonUp(param);
+    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED) {
+        onMouseDisconnected();
     } else {
         onGuiQueueMessageHook(type, param);
     }
@@ -157,6 +171,10 @@ void oneIter() {
     if (wasOn || mcu::display::isOn()) {
         mcu::display::endBuffersDrawing();
     }
+}
+
+void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam, uint32_t timeoutMillisec) {
+    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(messageType, messageParam), timeoutMillisec);
 }
 
 #endif

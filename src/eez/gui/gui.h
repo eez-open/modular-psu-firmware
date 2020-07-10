@@ -56,12 +56,17 @@ void startThread();
 extern osThreadId g_guiTaskHandle;
 extern osMessageQId g_guiMessageQueueId;
 
-#define GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE 1
-#define GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE 2
+enum {
+    GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE = 1,
+    GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE,
 
-#define GUI_QUEUE_MESSAGE(type, param) ((((uint32_t)(uint16_t)(int16_t)param) << 8) | (type))
-#define GUI_QUEUE_MESSAGE_TYPE(message) ((message) & 0xFF)
-#define GUI_QUEUE_MESSAGE_PARAM(param) ((int16_t)(message >> 8))
+    GUI_QUEUE_MESSAGE_MOUSE_MOVE,
+    GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN,
+    GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP,
+    GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED
+};
+
+void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam = 0, uint32_t timeoutMillisec = osWaitForever);
 
 void onGuiQueueMessageHook(uint8_t type, int16_t param);
 

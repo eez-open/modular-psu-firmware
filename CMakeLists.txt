@@ -99,6 +99,7 @@ set(src_eez
     src/eez/system.cpp
     src/eez/tasks.cpp
     src/eez/unit.cpp
+    src/eez/usb.cpp
     src/eez/util.cpp
 )
 list (APPEND src_files ${src_eez})
@@ -115,6 +116,7 @@ set(header_eez
     src/eez/system.h
     src/eez/tasks.h
     src/eez/unit.h
+    src/eez/usb.h
     src/eez/util.h
     src/eez/value_types.h
 )

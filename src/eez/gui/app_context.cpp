@@ -148,7 +148,7 @@ void AppContext::pushPage(int pageId, Page *page) {
     if (osThreadGetId() != g_guiTaskHandle) {
         m_pageIdToSetOnNextIter = pageId;
         m_pageToSetOnNextIter = page;
-        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE, getAppContextId(this)), osWaitForever);
+        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE, getAppContextId(this));
         return;
     }
 #endif
@@ -233,7 +233,7 @@ void AppContext::showPage(int pageId) {
     if (osThreadGetId() != g_guiTaskHandle) {
         m_pageIdToSetOnNextIter = pageId;
         m_pageToSetOnNextIter = nullptr;
-        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE, getAppContextId(this)), osWaitForever);
+        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE, getAppContextId(this));
         return;
     }
 #endif

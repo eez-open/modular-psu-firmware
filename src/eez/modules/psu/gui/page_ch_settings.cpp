@@ -1036,7 +1036,7 @@ void ChSettingsListsPage::doImportList() {
         &err
     );
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST_FINISHED, err), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST_FINISHED, err);
 }
 
 void ChSettingsListsPage::onImportListFinished(int16_t err) {
@@ -1086,7 +1086,7 @@ void ChSettingsListsPage::doExportList() {
         &err
     );
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST_FINISHED, err), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST_FINISHED, err);
 }
 
 void ChSettingsListsPage::onExportListFinished(int16_t err) {

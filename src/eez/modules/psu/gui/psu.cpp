@@ -672,7 +672,7 @@ void PsuAppContext::showAsyncOperationInProgress(const char *message, void (*che
     if (osThreadGetId() == g_guiTaskHandle) {
         doShowAsyncOperationInProgress();
     } else {
-        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_ASYNC_OPERATION_IN_PROGRESS, 0), osWaitForever);
+        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_SHOW_ASYNC_OPERATION_IN_PROGRESS);
     }
 }
 
@@ -689,7 +689,7 @@ void PsuAppContext::hideAsyncOperationInProgress() {
     if (osThreadGetId() == g_guiTaskHandle) {
         doHideAsyncOperationInProgress();
     } else {
-        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_HIDE_ASYNC_OPERATION_IN_PROGRESS, 0), osWaitForever);
+        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_HIDE_ASYNC_OPERATION_IN_PROGRESS);
     }
 }
 
@@ -746,7 +746,7 @@ const char *PsuAppContext::textInput(const char *label, size_t minChars, size_t 
 
     m_inputReady = false;
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_TEXT_INPUT, 0), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_SHOW_TEXT_INPUT);
 
     while (!m_inputReady) {
         osDelay(5);
@@ -787,7 +787,7 @@ float PsuAppContext::numberInput(const char *label, Unit unit, float min, float 
     m_numberInputParams.m_input = value;
 
     m_inputReady = false;
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT, 0), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_SHOW_NUMBER_INPUT);
 
     while (!m_inputReady) {
         osDelay(5);
@@ -829,7 +829,7 @@ bool PsuAppContext::integerInput(const char *label, int32_t min, int32_t max, in
     m_integerInputParams.m_input = value;
 
     m_inputReady = false;
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_INTEGER_INPUT, 0), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_SHOW_INTEGER_INPUT);
 
     while (!m_inputReady) {
         osDelay(5);
@@ -854,7 +854,7 @@ bool PsuAppContext::dialogOpen(int *err) {
             pushPage(getExternalAssetsFirstPageId());
         }
     } else {
-        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN, 0), osWaitForever);
+        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN);
         do {
             osDelay(1);
         } while (!isPageOnStack(getExternalAssetsFirstPageId()));
@@ -927,7 +927,7 @@ void PsuAppContext::dialogClose() {
             removePageFromStack(getExternalAssetsFirstPageId());
         }
     } else {
-        osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE, 0), osWaitForever);
+        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE);
     }
 }
 
@@ -949,7 +949,7 @@ int PsuAppContext::menuInput(const char *label, MenuType menuType, const char **
     m_menuInputParams.m_items = menuItems;
 
     m_inputReady = false;
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT, 0), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_SHOW_MENU_INPUT);
 
     while (!m_inputReady) {
         osDelay(5);
@@ -967,7 +967,7 @@ int PsuAppContext::select(const char **options, int defaultSelection) {
     m_selectParams.m_defaultSelection = defaultSelection;
 
     m_inputReady = false;
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_SHOW_SELECT, 0), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_SHOW_SELECT);
     do {
         osDelay(1);
     } while (!isPageOnStack(INTERNAL_PAGE_ID_SELECT_FROM_ENUM));

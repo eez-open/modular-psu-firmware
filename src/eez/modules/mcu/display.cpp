@@ -324,6 +324,10 @@ void clearDirty() {
 //     }
 // }
 
+static bool g_lastMouseCursorVisible;
+static int g_lastMouseCursorX;
+static int g_lastMouseCursorY;
+
 bool isDirty() {
     // g_dirtyX1 = MIN(g_prevDirtyX1, g_nextDirtyX1);
     // g_dirtyY1 = MIN(g_prevDirtyY1, g_nextDirtyY1);
@@ -338,7 +342,6 @@ bool isDirty() {
     // }
 
     // return false;
-
     return g_dirty;
 }
 
@@ -496,6 +499,13 @@ void beginBuffersDrawing() {
 void endBuffersDrawing() {
     setBufferPointer(g_bufferPointer);
 
+    if (g_lastMouseCursorVisible != gui::g_mouseCursorVisible || g_lastMouseCursorX != gui::g_mouseCursorX || g_lastMouseCursorY != gui::g_mouseCursorY) {
+    	g_lastMouseCursorVisible = gui::g_mouseCursorVisible;
+    	g_lastMouseCursorX = gui::g_mouseCursorX;
+    	g_lastMouseCursorY = gui::g_mouseCursorY;
+    	g_dirty = true;
+    }
+
     if (isDirty()) {
         for (int i = 0; i < g_numBuffersToDraw; i++) {
             int bufferIndex = g_bufferToDrawIndexes[i];
@@ -543,6 +553,12 @@ void endBuffersDrawing() {
             // }
 
             bitBlt(buffer.bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, buffer.opacity);
+        }
+
+        if (g_lastMouseCursorVisible) {
+            setColor16(RGB_TO_COLOR(255, 0, 0));
+            drawHLine(0, g_lastMouseCursorY, getDisplayWidth());
+            drawVLine(g_lastMouseCursorX, 0, getDisplayHeight());
         }
     }
 

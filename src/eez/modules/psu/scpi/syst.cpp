@@ -18,6 +18,7 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
+#include <eez/usb.h>
 
 #include <eez/modules/psu/psu.h>
 

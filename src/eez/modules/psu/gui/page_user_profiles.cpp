@@ -116,7 +116,7 @@ void UserProfilesPage::doSaveProfile() {
     int err;
     profile::saveToLocation(g_selectedProfileLocation, g_remark, true, &err);
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ void UserProfilesPage::doRecallProfile() {
     int err;
     profile::recallFromLocation(g_selectedProfileLocation, 0, true, &err);
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +159,7 @@ void UserProfilesPage::doImportProfile() {
     int err;
     profile::importFileToLocation(page->m_profileFilePath, g_selectedProfileLocation, true, &err);
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ void UserProfilesPage::doExportProfile() {
     int err;
     profile::exportLocationToFile(g_selectedProfileLocation, page->m_profileFilePath, true, &err);
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -206,7 +206,7 @@ void UserProfilesPage::doDeleteProfile() {
     int err;
     profile::deleteLocation(g_selectedProfileLocation, true, &err);
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -233,7 +233,7 @@ void UserProfilesPage::doEditRemark() {
     int err;
     profile::setName(g_selectedProfileLocation, g_remark, true, &err);
 
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err), osWaitForever);
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_USER_PROFILES_PAGE_ASYNC_OPERATION_FINISHED, err);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -30,6 +30,7 @@
 #include <eez/mp.h>
 #include <eez/sound.h>
 #include <eez/memory.h>
+#include <eez/usb.h>
 
 #include <eez/gui/gui.h>
 
@@ -151,6 +152,8 @@ void boot() {
 #endif
 
     sound::init();
+
+    usb::init();
 
     psu::serial::init();
 

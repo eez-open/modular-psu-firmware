@@ -22,6 +22,7 @@
 #include <eez/mp.h>
 #include <eez/sound.h>
 #include <eez/hmi.h>
+#include <eez/usb.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/datetime.h>
@@ -349,9 +350,9 @@ void lowPriorityThreadOneIter() {
             } else if (type == THREAD_MESSAGE_SOUND_TICK) {
                 sound::tick();
             } else if (type == THREAD_MESSAGE_SELECT_USB_MODE) {
-                psu::serial::selectUsbMode(param, psu::serial::g_otgMode);
+                usb::selectUsbMode(param, usb::g_otgMode);
             } else if (type == THREAD_MESSAGE_SELECT_USB_DEVICE_CLASS) {
-                psu::serial::selectUsbDeviceClass(param);
+                usb::selectUsbDeviceClass(param);
             }
         }
     } else {
@@ -389,7 +390,7 @@ void lowPriorityThreadOneIter() {
 
         eez::hmi::tick(tickCount);
 
-        serial::tick(tickCount);
+        usb::tick(tickCount);
 
 #ifdef DEBUG
         psu::debug::tick(tickCount);

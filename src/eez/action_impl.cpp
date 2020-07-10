@@ -27,6 +27,7 @@
 #include <eez/index.h>
 #include <eez/mqtt.h>
 #include <eez/hmi.h>
+#include <eez/usb.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -1405,7 +1406,7 @@ void onSetUsbMode(uint16_t value) {
 }
 
 void action_select_usb_mode() {
-    pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, psu::serial::g_usbMode, nullptr, onSetUsbMode);
+    pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, usb::g_usbMode, nullptr, onSetUsbMode);
 }
 
 bool isUsbDeviceClassDisabled(uint16_t value) {

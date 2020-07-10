@@ -29,6 +29,7 @@
 #include <eez/mp.h>
 #include <eez/memory.h>
 #include <eez/hmi.h>
+#include <eez/usb.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/container.h>
@@ -6217,13 +6218,13 @@ void data_slot_error_message(DataOperationEnum operation, Cursor cursor, Value &
 
 void data_usb_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = psu::serial::g_usbMode;
+        value = usb::g_usbMode;
     }
 }
 
 void data_usb_current_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = psu::serial::g_usbMode == USB_MODE_OTG ? psu::serial::g_otgMode : psu::serial::g_usbMode;
+        value = usb::g_usbMode == USB_MODE_OTG ? usb::g_otgMode : usb::g_usbMode;
     }
 }
 
@@ -6235,118 +6236,99 @@ void data_usb_device_class(DataOperationEnum operation, Cursor cursor, Value &va
 
 void data_usb_keyboard_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        static char keyboardStateStr[2][256] = { 0 };
-        static uint8_t keyboardState;
-        static uint8_t keyboardLCtrl;
-        static uint8_t keyboardLShift;
-        static uint8_t keyboardLAlt;
-        static uint8_t keyboardLGui;
-        static uint8_t keyboardRCtrl;
-        static uint8_t keyboardRShift;
-        static uint8_t keyboardRAlt;
-        static uint8_t keyboardRGui;
-        static uint8_t keyboardKeys[6];
-        static int i = 0;
+        static char g_keyboardInfoStr[2][256] = { 0 };
+        static usb::KeyboardInfo g_keyboardInfo;
+        static usb::MouseInfo g_mouseInfo;
+        static int g_keyboardInfoStrIndex = 0;
 
-        char *str = &keyboardStateStr[i][0];
+        char *str = &g_keyboardInfoStr[g_keyboardInfoStrIndex][0];
 
-        if (
-            keyboardState != g_keyboardState ||
-            keyboardLCtrl != g_keyboardLCtrl ||
-            keyboardLShift != g_keyboardLShift ||
-            keyboardLAlt != g_keyboardLAlt ||
-            keyboardLGui != g_keyboardLGui ||
-            keyboardRCtrl != g_keyboardRCtrl ||
-            keyboardRShift != g_keyboardRShift ||
-            keyboardRAlt != g_keyboardRAlt ||
-            keyboardRGui != g_keyboardRGui ||
-            keyboardKeys[0] != g_keyboardKeys[0] ||
-            keyboardKeys[1] != g_keyboardKeys[1] ||
-            keyboardKeys[2] != g_keyboardKeys[2] ||
-            keyboardKeys[3] != g_keyboardKeys[3] ||
-            keyboardKeys[4] != g_keyboardKeys[4] ||
-            keyboardKeys[5] != g_keyboardKeys[5]
-        ) {
-            keyboardState = g_keyboardState;
-			keyboardLCtrl = g_keyboardLCtrl;
-			keyboardLShift = g_keyboardLShift;
-			keyboardLAlt = g_keyboardLAlt;
-			keyboardLGui = g_keyboardLGui;
-			keyboardRCtrl = g_keyboardRCtrl;
-			keyboardRShift = g_keyboardRShift;
-			keyboardRAlt = g_keyboardRAlt;
-			keyboardRGui = g_keyboardRGui;
-			keyboardKeys[0] = g_keyboardKeys[0];
-			keyboardKeys[1] = g_keyboardKeys[1];
-			keyboardKeys[2] = g_keyboardKeys[2];
-			keyboardKeys[3] = g_keyboardKeys[3];
-			keyboardKeys[4] = g_keyboardKeys[4];
-			keyboardKeys[5] = g_keyboardKeys[5];
+        if (memcmp(&g_keyboardInfo, &usb::g_keyboardInfo, sizeof(usb::KeyboardInfo)) != 0 || memcmp(&g_mouseInfo, &usb::g_mouseInfo, sizeof(usb::MouseInfo)) != 0) {
+            memcpy(&g_keyboardInfo, &usb::g_keyboardInfo, sizeof(usb::KeyboardInfo));
+            memcpy(&g_mouseInfo, &usb::g_mouseInfo, sizeof(usb::MouseInfo));
 
-            i = (i + 1) % 2;
-
-            str = &keyboardStateStr[i][0];
-
+            g_keyboardInfoStrIndex = (g_keyboardInfoStrIndex + 1) % 2;
+            str = &g_keyboardInfoStr[g_keyboardInfoStrIndex][0];
             str[0] = 0;
 
-            if (g_keyboardState != 0) {
-                sprintf(str, "State=0x%02X", g_keyboardState);
+            if (g_keyboardInfo.state != 0) {
+                sprintf(str, "State=0x%02X", g_keyboardInfo.state);
             }
 
-            if (g_keyboardLCtrl) {
+            if (g_keyboardInfo.lctrl) {
                 strcat(str, " LCTRL");
             }
 
-            if (g_keyboardLShift) {
+            if (g_keyboardInfo.lshift) {
                 strcat(str, " LSHIFT");
             }
 
-            if (g_keyboardLAlt) {
+            if (g_keyboardInfo.lalt) {
                 strcat(str, " LALT");
             }
 
-            if (g_keyboardLGui) {
+            if (g_keyboardInfo.lgui) {
                 strcat(str, " LGUI");
             }
 
-            if (g_keyboardRCtrl) {
+            if (g_keyboardInfo.rctrl) {
                 strcat(str, " RCTRL");
             }
 
-            if (g_keyboardRShift) {
+            if (g_keyboardInfo.rshift) {
                 strcat(str, " RSHIFT");
             }
 
-            if (g_keyboardRAlt) {
+            if (g_keyboardInfo.ralt) {
                 strcat(str, " RALT");
             }
 
-            if (g_keyboardRGui) {
+            if (g_keyboardInfo.rgui) {
                 strcat(str, " RGUI");
             }
 
-            if (g_keyboardKeys[0]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[0]);
+            if (g_keyboardInfo.keys[0]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[0]);
             }
 
-            if (g_keyboardKeys[1]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[1]);
+            if (g_keyboardInfo.keys[1]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[1]);
             }
 
-            if (g_keyboardKeys[2]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[2]);
+            if (g_keyboardInfo.keys[2]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[2]);
             }
 
-            if (g_keyboardKeys[3]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[3]);
+            if (g_keyboardInfo.keys[3]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[3]);
             }
 
-            if (g_keyboardKeys[4]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[4]);
+            if (g_keyboardInfo.keys[4]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[4]);
             }
 
-            if (g_keyboardKeys[5]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardKeys[5]);
+            if (g_keyboardInfo.keys[5]) {
+                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[5]);
+            }
+
+            if (g_mouseInfo.x != 0) {
+                sprintf(str + strlen(str), " / X=%d", g_mouseInfo.x);
+            }
+
+            if (g_mouseInfo.y != 0) {
+                sprintf(str + strlen(str), " Y=%d", g_mouseInfo.y);
+            }
+
+            if (g_mouseInfo.button1) {
+                strcat(str, " BTN1");
+            }
+
+            if (g_mouseInfo.button2) {
+                strcat(str, " BTN2");
+            }
+
+            if (g_mouseInfo.button3) {
+                strcat(str, " BTN3");
             }
         }
 
