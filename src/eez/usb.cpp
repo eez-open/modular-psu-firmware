@@ -264,6 +264,25 @@ extern "C" void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
 		HID_KEYBD_Info_TypeDef *info = USBH_HID_GetKeybdInfo(phost);
 
         using namespace eez::usb;
+        using namespace eez::gui;
+
+        if (g_keyboardInfo.keys[0] == 0 && info->keys[0] != 0) {
+            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_KEY_DOWN, 
+                (
+                    (
+                        (info->lctrl << 7) |
+                        (info->lshift << 6) |
+                        (info->lalt << 5) |
+                        (info->lgui << 4) |
+                        (info->rctrl << 3) |
+                        (info->rshift << 2) |
+                        (info->ralt << 1) |
+                        (info->rgui << 0)
+                    ) << 8
+                ) | 
+                info->keys[0]
+            );
+        }
 
 		g_keyboardInfo.state = info->state;
 

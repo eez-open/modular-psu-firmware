@@ -556,9 +556,30 @@ void endBuffersDrawing() {
         }
 
         if (g_lastMouseCursorVisible) {
-            setColor16(RGB_TO_COLOR(255, 0, 0));
-            drawHLine(0, g_lastMouseCursorY, getDisplayWidth());
-            drawVLine(g_lastMouseCursorX, 0, getDisplayHeight());
+            // setColor16(RGB_TO_COLOR(255, 0, 0));
+            // drawHLine(0, g_lastMouseCursorY, getDisplayWidth());
+            // drawVLine(g_lastMouseCursorX, 0, getDisplayHeight());
+
+            auto bitmap = getBitmap(BITMAP_ID_MOUSE_CURSOR);
+
+            Image image;
+
+            image.width = bitmap->w;
+            image.height = bitmap->h;
+            image.bpp = bitmap->bpp;
+            image.lineOffset = 0;
+            image.pixels = (uint8_t *)bitmap->pixels;
+
+            if (g_lastMouseCursorX + (int)image.width > getDisplayWidth()) {
+                image.width = getDisplayWidth() - g_lastMouseCursorX;
+                image.lineOffset = bitmap->w - image.width;
+            }
+
+            if (g_lastMouseCursorY + (int)image.height > getDisplayHeight()) {
+                image.height = getDisplayHeight() - g_lastMouseCursorY;
+            }
+
+            drawBitmap(&image, g_lastMouseCursorX, g_lastMouseCursorY);
         }
     }
 

@@ -63,7 +63,9 @@ enum {
     GUI_QUEUE_MESSAGE_MOUSE_MOVE,
     GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN,
     GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP,
-    GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED
+    GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED,
+    
+    GUI_QUEUE_MESSAGE_KEY_DOWN
 };
 
 void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam = 0, uint32_t timeoutMillisec = osWaitForever);

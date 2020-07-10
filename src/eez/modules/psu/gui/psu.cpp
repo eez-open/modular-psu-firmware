@@ -20,6 +20,10 @@
 
 #include <assert.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <usbh_hid_keybd.h>
+#endif
+
 #include <eez/firmware.h>
 #include <eez/sound.h>
 #include <eez/system.h>
@@ -104,6 +108,8 @@ SelectFromEnumPage g_selectFromEnumPage;
 
 bool showSetupWizardQuestion();
 void onEncoder(int counter, bool clicked);
+
+static void moveToNextFocusCursor();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1609,6 +1615,28 @@ void popSelectFromEnumPage() {
     }
 }
 
+void showMainPage() {
+    showPage(PAGE_ID_MAIN);
+}
+
+void goBack() {
+    if (getNumPagesOnStack() > 1) {
+        action_show_previous_page();
+    } else if (getActivePageId() != PAGE_ID_MAIN) {
+        showMainPage();
+    } else if (persist_conf::isMaxView()) {
+        action_toggle_channels_max_view();
+    }    
+}
+
+void takeScreenshot() {
+    using namespace scpi;
+    if (!g_screenshotGenerating) {
+        g_screenshotGenerating = true;
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_SCREENSHOT);
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static int g_findNextFocusCursorState = 0; 
@@ -1635,7 +1663,7 @@ void findNextFocusCursor(const WidgetCursor &widgetCursor) {
     }
 }
 
-void moveToNextFocusCursor() {
+static void moveToNextFocusCursor() {
     g_findNextFocusCursorState = 0;
     enumWidgets(&g_psuAppContext, findNextFocusCursor);
     if (g_findNextFocusCursorState > 0) {
@@ -2317,7 +2345,49 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
         g_psuAppContext.doShowAsyncOperationInProgress();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_HIDE_ASYNC_OPERATION_IN_PROGRESS) {
         g_psuAppContext.doHideAsyncOperationInProgress();
-    }
+    } 
+#if defined(EEZ_PLATFORM_STM32)
+    else if (type == GUI_QUEUE_MESSAGE_KEY_DOWN) {
+    	if (getActivePageId() != PAGE_ID_SYS_SETTINGS_SERIAL) {
+			uint8_t key = (uint16_t)param & 0xFF;
+			uint8_t mod = (uint16_t)param >> 8;
+			if (mod == 0) {
+				if (key == KEY_TAB) {
+					moveToNextFocusCursor();
+				} else if (key == KEY_PRINTSCREEN) {
+					takeScreenshot();
+				} else if (key >= KEY_1_EXCLAMATION_MARK && key <= KEY_0_CPARENTHESIS) {
+					int channelIndex = key - KEY_1_EXCLAMATION_MARK;
+					if (channelIndex < CH_MAX) {
+                        using namespace psu;
+                        auto &channel = Channel::get(channelIndex);
+						selectChannel(&channel);
+                        clearFoundWidgetAtDown();
+						channelToggleOutput();
+					}
+				} else if (key == KEY_UPARROW) {
+                    onEncoder(1, false);
+                } else if (key == KEY_DOWNARROW) {
+                    onEncoder(-1, false);
+                } else if (key == KEY_RIGHTARROW) {
+                    onEncoder(10, false);
+                } else if (key == KEY_LEFTARROW) {
+                    onEncoder(-10, false);
+                } else if (key == KEY_PAGEUP) {
+                    onEncoder(100, false);
+                } else if (key == KEY_PAGEDOWN) {
+                    onEncoder(-100, false);
+                } else if (key == KEY_ENTER) {
+                    onEncoder(0, true);
+                } else if (key == KEY_HOME) {
+                    goBack();
+                } else if (key == KEY_ESCAPE) {
+                    popPage();
+                }
+			}
+    	}
+    } 
+#endif
 }
 
 float getDefaultAnimationDurationHook() {

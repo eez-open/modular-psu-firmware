@@ -207,10 +207,6 @@ void action_show_previous_page() {
     }
 }
 
-void showMainPage() {
-    showPage(PAGE_ID_MAIN);
-}
-
 void action_show_main_page() {
 	Page *page = getActivePage();
 	if (page && page->getDirty()) {
@@ -1119,11 +1115,7 @@ void action_user_switch_clicked() {
         break;
 
     case persist_conf::USER_SWITCH_ACTION_SCREENSHOT:
-        using namespace scpi;
-        if (!g_screenshotGenerating) {
-            g_screenshotGenerating = true;
-            sendMessageToLowPriorityThread(THREAD_MESSAGE_SCREENSHOT);
-        }
+        takeScreenshot();
         break;
 
     case persist_conf::USER_SWITCH_ACTION_MANUAL_TRIGGER:
@@ -1142,13 +1134,7 @@ void action_user_switch_clicked() {
         break;
 
     case persist_conf::USER_SWITCH_ACTION_HOME:
-        if (getNumPagesOnStack() > 1) {
-            action_show_previous_page();
-        } else if (getActivePageId() != PAGE_ID_MAIN) {
-            showMainPage();
-        } else if (persist_conf::isMaxView()) {
-            action_toggle_channels_max_view();
-        }
+        goBack();
         break;
 
     case persist_conf::USER_SWITCH_ACTION_INHIBIT:

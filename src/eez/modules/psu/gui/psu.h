@@ -116,6 +116,10 @@ void pushSelectFromEnumPage(
 const EnumItem *getActiveSelectEnumDefinition();
 void popSelectFromEnumPage();
 
+void showMainPage();
+void goBack();
+void takeScreenshot();
+
 extern Value g_progress;
 
 struct AsyncOperationInProgressParams {
