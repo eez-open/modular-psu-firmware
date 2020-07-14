@@ -481,7 +481,7 @@ HAL_StatusTypeDef USB_FlushTxFifo(USB_OTG_GlobalTypeDef *USBx, uint32_t num)
 
   do
   {
-    if (++count > 200000U)
+    if (++count > 2000U)
     {
       return HAL_TIMEOUT;
     }
