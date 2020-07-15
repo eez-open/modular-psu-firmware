@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <memory.h>
 
 #if OPTION_DISPLAY
 
@@ -327,8 +328,9 @@ void clearDirty() {
 static bool g_lastMouseCursorVisible;
 static int g_lastMouseCursorX;
 static int g_lastMouseCursorY;
-static WidgetCursor m_lastFoundWidgetAtMouse;
-static OnTouchFunctionType m_lastOnTouchFunctionAtMouse;
+static WidgetCursor g_lastFoundWidgetAtMouse;
+static OnTouchFunctionType g_lastOnTouchFunctionAtMouse;
+static WidgetCursor g_lastKeyboardFocusWidgetCursor;
 
 bool isDirty() {
     // g_dirtyX1 = MIN(g_prevDirtyX1, g_nextDirtyX1);
@@ -391,6 +393,25 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
     }
 
     return width;
+}
+
+void drawFocusRect(const WidgetCursor &widgetCursor) {
+    auto x = widgetCursor.x;
+    auto y = widgetCursor.y;
+    auto w = widgetCursor.widget->w;
+    auto h = widgetCursor.widget->h;
+    int W = MIN(MIN(3, w), h);
+
+    auto pStyle = getStyle(widgetCursor.widget->style);
+
+    Style style;
+    memset(&style, 0, sizeof(style));
+    style.color = pStyle->color;
+
+    drawRectangle(x, y, w, W, &style, false, false, false);
+    drawRectangle(x, y + W, W, h - 2 * W, &style, false, false, false);
+    drawRectangle(x + w - W, y + W, W, h - 2 * W, &style, false, false, false);
+    drawRectangle(x, y + h - W, w, W, &style, false, false, false);
 }
 
 Buffer g_buffers[NUM_BUFFERS];
@@ -501,12 +522,14 @@ void beginBuffersDrawing() {
 void endBuffersDrawing() {
     setBufferPointer(g_bufferPointer);
 
-    if (g_lastMouseCursorVisible != gui::g_mouseCursorVisible || g_lastMouseCursorX != gui::g_mouseCursorX || g_lastMouseCursorY != gui::g_mouseCursorY || m_lastFoundWidgetAtMouse != gui::m_foundWidgetAtMouse || m_lastOnTouchFunctionAtMouse != gui::m_onTouchFunctionAtMouse) {
+    if (g_lastMouseCursorVisible != gui::g_mouseCursorVisible || g_lastMouseCursorX != gui::g_mouseCursorX || g_lastMouseCursorY != gui::g_mouseCursorY ||
+        g_lastFoundWidgetAtMouse != gui::m_foundWidgetAtMouse || g_lastOnTouchFunctionAtMouse != gui::m_onTouchFunctionAtMouse || g_lastKeyboardFocusWidgetCursor != gui::g_keyboardFocusWidgetCursor) {
     	g_lastMouseCursorVisible = gui::g_mouseCursorVisible;
     	g_lastMouseCursorX = gui::g_mouseCursorX;
     	g_lastMouseCursorY = gui::g_mouseCursorY;
-        m_lastFoundWidgetAtMouse = gui::m_foundWidgetAtMouse;
-        m_lastOnTouchFunctionAtMouse = gui::m_onTouchFunctionAtMouse;
+        g_lastFoundWidgetAtMouse = gui::m_foundWidgetAtMouse;
+        g_lastOnTouchFunctionAtMouse = gui::m_onTouchFunctionAtMouse;
+        g_lastKeyboardFocusWidgetCursor = gui::g_keyboardFocusWidgetCursor;
     	g_dirty = true;
     }
 
@@ -559,44 +582,40 @@ void endBuffersDrawing() {
             bitBlt(buffer.bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, buffer.opacity);
         }
 
+        if (g_keyboardFocusWidgetCursor) {
+            drawFocusRect(g_keyboardFocusWidgetCursor);
+        }
+
         if (g_lastMouseCursorVisible) {
             // setColor16(RGB_TO_COLOR(255, 0, 0));
             // drawHLine(0, g_lastMouseCursorY, getDisplayWidth());
             // drawVLine(g_lastMouseCursorX, 0, getDisplayHeight());
+            if (g_lastMouseCursorX < getDisplayWidth() && g_lastMouseCursorY < getDisplayHeight()) {
+                auto bitmap = getBitmap(BITMAP_ID_MOUSE_CURSOR);
 
-            auto bitmap = getBitmap(BITMAP_ID_MOUSE_CURSOR);
+                Image image;
 
-            Image image;
+                image.width = bitmap->w;
+                image.height = bitmap->h;
+                image.bpp = bitmap->bpp;
+                image.lineOffset = 0;
+                image.pixels = (uint8_t *)bitmap->pixels;
 
-            image.width = bitmap->w;
-            image.height = bitmap->h;
-            image.bpp = bitmap->bpp;
-            image.lineOffset = 0;
-            image.pixels = (uint8_t *)bitmap->pixels;
+                if (g_lastMouseCursorX + (int)image.width > getDisplayWidth()) {
+                    image.width = getDisplayWidth() - g_lastMouseCursorX;
+                    image.lineOffset = bitmap->w - image.width;
+                }
 
-            if (g_lastMouseCursorX + (int)image.width > getDisplayWidth()) {
-                image.width = getDisplayWidth() - g_lastMouseCursorX;
-                image.lineOffset = bitmap->w - image.width;
+                if (g_lastMouseCursorY + (int)image.height > getDisplayHeight()) {
+                    image.height = getDisplayHeight() - g_lastMouseCursorY;
+                }
+
+                if (m_foundWidgetAtMouse && m_onTouchFunctionAtMouse) {
+                    drawFocusRect(m_foundWidgetAtMouse);
+                }
+
+                drawBitmap(&image, g_lastMouseCursorX, g_lastMouseCursorY);
             }
-
-            if (g_lastMouseCursorY + (int)image.height > getDisplayHeight()) {
-                image.height = getDisplayHeight() - g_lastMouseCursorY;
-            }
-
-            if (m_foundWidgetAtMouse && m_onTouchFunctionAtMouse) {
-                static const int W = 3;
-                auto x = m_foundWidgetAtMouse.x;
-                auto y = m_foundWidgetAtMouse.y;
-                auto w = m_foundWidgetAtMouse.widget->w;
-                auto h = m_foundWidgetAtMouse.widget->h;
-                auto style = getStyle(m_foundWidgetAtMouse.widget->style);
-                drawRectangle(x, y, w, W, style, false, false, false);
-                drawRectangle(x, y + W, W, h - 2 * W, style, false, false, false);
-                drawRectangle(x + w - W, y + W, W, h - 2 * W, style, false, false, false);
-                drawRectangle(x, y + h - W, w, W, style, false, false, false);
-            }
-
-            drawBitmap(&image, g_lastMouseCursorX, g_lastMouseCursorY);
         }
     }
 

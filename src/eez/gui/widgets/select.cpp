@@ -80,6 +80,8 @@ DrawFunctionType SELECT_draw = nullptr;
 
 OnTouchFunctionType SELECT_onTouch = nullptr;
 
+OnKeyboardFunctionType SELECT_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

@@ -49,5 +49,8 @@ extern bool g_mouseCursorVisible;
 extern int g_mouseCursorX;
 extern int g_mouseCursorY;
 
+void moveToNextKeyboardFocusCursor();
+void moveToPreviousKeyboardFocusCursor();
+
 } // namespace gui
 } // namespace eez

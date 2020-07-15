@@ -63,6 +63,7 @@ typedef void (*FixPointersFunctionType)(Widget *widget, Assets *assets);
 typedef void (*EnumFunctionType)(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 typedef void (*DrawFunctionType)(const WidgetCursor &widgetCursor);
 typedef void (*OnTouchFunctionType)(const WidgetCursor &widgetCursor, Event &touchEvent);
+typedef bool (*OnKeyboardFunctionType)(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -291,6 +292,7 @@ void findWidgetStep(const WidgetCursor &widgetCursor);
 WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y, bool clicked = true);
 
 extern OnTouchFunctionType *g_onTouchWidgetFunctions[];
+extern OnKeyboardFunctionType *g_onKeyboardWidgetFunctions[];
 
 WidgetState *nextWidgetState(WidgetState *p);
 void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);

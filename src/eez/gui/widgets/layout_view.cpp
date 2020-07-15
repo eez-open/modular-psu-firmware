@@ -105,6 +105,8 @@ DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {
 
 OnTouchFunctionType LAYOUT_VIEW_onTouch = nullptr;
 
+OnKeyboardFunctionType LAYOUT_VIEW_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

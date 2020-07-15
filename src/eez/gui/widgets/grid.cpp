@@ -139,6 +139,8 @@ DrawFunctionType GRID_draw = nullptr;
 
 OnTouchFunctionType GRID_onTouch = nullptr;
 
+OnKeyboardFunctionType GRID_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

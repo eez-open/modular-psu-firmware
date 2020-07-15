@@ -47,11 +47,13 @@ FixPointersFunctionType NONE_fixPointers = nullptr;
 EnumFunctionType NONE_enum = nullptr;
 DrawFunctionType NONE_draw = nullptr;
 OnTouchFunctionType NONE_onTouch = nullptr;
+OnKeyboardFunctionType NONE_onKeyboard = nullptr;
 
 FixPointersFunctionType RESERVED_fixPointers = nullptr;
 EnumFunctionType RESERVED_enum = nullptr;
 DrawFunctionType RESERVED_draw = nullptr;
 OnTouchFunctionType RESERVED_onTouch = nullptr;
+OnKeyboardFunctionType RESERVED_onKeyboard = nullptr;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -78,6 +80,15 @@ WIDGET_TYPES
 #undef WIDGET_TYPE
 #define WIDGET_TYPE(NAME, ID) &NAME##_onTouch,
 OnTouchFunctionType *g_onTouchWidgetFunctions[] = {
+    WIDGET_TYPES
+};
+#undef WIDGET_TYPE
+
+#define WIDGET_TYPE(NAME, ID) extern OnKeyboardFunctionType NAME##_onKeyboard;
+WIDGET_TYPES
+#undef WIDGET_TYPE
+#define WIDGET_TYPE(NAME, ID) &NAME##_onKeyboard,
+OnKeyboardFunctionType *g_onKeyboardWidgetFunctions[] = {
     WIDGET_TYPES
 };
 #undef WIDGET_TYPE

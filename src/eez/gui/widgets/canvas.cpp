@@ -48,6 +48,8 @@ DrawFunctionType CANVAS_draw = [](const WidgetCursor &widgetCursor) {
 
 OnTouchFunctionType CANVAS_onTouch = nullptr;
 
+OnKeyboardFunctionType CANVAS_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

@@ -65,6 +65,8 @@ DrawFunctionType TOGGLE_BUTTON_draw = [](const WidgetCursor &widgetCursor) {
 
 OnTouchFunctionType TOGGLE_BUTTON_onTouch = nullptr;
 
+OnKeyboardFunctionType TOGGLE_BUTTON_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

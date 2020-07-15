@@ -87,6 +87,8 @@ DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
 
 OnTouchFunctionType BITMAP_onTouch = nullptr;
 
+OnKeyboardFunctionType BITMAP_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

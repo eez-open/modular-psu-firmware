@@ -50,6 +50,8 @@ DrawFunctionType RECTANGLE_draw = [](const WidgetCursor &widgetCursor) {
 
 OnTouchFunctionType RECTANGLE_onTouch = nullptr;
 
+OnKeyboardFunctionType RECTANGLE_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

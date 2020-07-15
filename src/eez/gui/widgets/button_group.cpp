@@ -141,6 +141,8 @@ OnTouchFunctionType BUTTON_GROUP_onTouch = [](const WidgetCursor &widgetCursor, 
     }
 };
 
+OnKeyboardFunctionType BUTTON_GROUP_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

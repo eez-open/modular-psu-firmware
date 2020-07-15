@@ -298,14 +298,14 @@ extern "C" void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
             sendMessageToGuiThread(GUI_QUEUE_MESSAGE_KEY_DOWN, 
                 (
                     (
-                        (info->lctrl << 7) |
-                        (info->lshift << 6) |
-                        (info->lalt << 5) |
-                        (info->lgui << 4) |
-                        (info->rctrl << 3) |
-                        (info->rshift << 2) |
-                        (info->ralt << 1) |
-                        (info->rgui << 0)
+                        (info->lctrl ? KEY_MOD_LCTRL : 0) |
+                        (info->lshift ? KEY_MOD_LSHIFT : 0) |
+                        (info->lalt ? KEY_MOD_LALT : 0) |
+                        (info->lgui ? KEY_MOD_LGUI : 0) |
+                        (info->rctrl ? KEY_MOD_RCTRL : 0) |
+                        (info->rshift ? KEY_MOD_RSHIFT : 0) |
+                        (info->ralt ? KEY_MOD_RALT : 0) |
+                        (info->rgui ? KEY_MOD_RGUI : 0)
                     ) << 8
                 ) | 
                 info->keys[0]

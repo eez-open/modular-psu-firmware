@@ -392,6 +392,8 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 
 OnTouchFunctionType BAR_GRAPH_onTouch = nullptr;
 
+OnKeyboardFunctionType BAR_GRAPH_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

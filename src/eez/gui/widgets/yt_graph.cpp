@@ -582,6 +582,8 @@ OnTouchFunctionType YT_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Even
     }
 };
 
+OnKeyboardFunctionType YT_GRAPH_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

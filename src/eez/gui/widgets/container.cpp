@@ -218,6 +218,8 @@ DrawFunctionType CONTAINER_draw = [](const WidgetCursor &widgetCursor) {
 
 OnTouchFunctionType CONTAINER_onTouch = nullptr;
 
+OnKeyboardFunctionType CONTAINER_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

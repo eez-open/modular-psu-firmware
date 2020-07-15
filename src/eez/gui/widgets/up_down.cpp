@@ -139,6 +139,8 @@ OnTouchFunctionType UP_DOWN_onTouch = [](const WidgetCursor &widgetCursor, Event
     }
 };
 
+OnKeyboardFunctionType UP_DOWN_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

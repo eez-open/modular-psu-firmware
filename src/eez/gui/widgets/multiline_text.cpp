@@ -81,6 +81,8 @@ DrawFunctionType MULTILINE_TEXT_draw = [](const WidgetCursor &widgetCursor) {
 
 OnTouchFunctionType MULTILINE_TEXT_onTouch = nullptr;
 
+OnKeyboardFunctionType MULTILINE_TEXT_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

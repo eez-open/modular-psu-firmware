@@ -266,6 +266,8 @@ OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Ev
     }
 };
 
+OnKeyboardFunctionType LIST_GRAPH_onKeyboard;
+
 } // namespace gui
 } // namespace eez
 

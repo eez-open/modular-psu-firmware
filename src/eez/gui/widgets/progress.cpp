@@ -68,6 +68,8 @@ DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {
 
 OnTouchFunctionType PROGRESS_onTouch = nullptr;
 
+OnKeyboardFunctionType PROGRESS_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

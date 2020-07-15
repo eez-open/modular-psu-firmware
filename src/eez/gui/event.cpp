@@ -18,6 +18,8 @@
 
 #if OPTION_DISPLAY
 
+#include <stdio.h>
+
 #include <eez/firmware.h>
 #include <eez/system.h>
 #include <eez/hmi.h>
@@ -275,8 +277,90 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
 
 ////////////////////////////////////////////////////////////////////////////////
 
+WidgetCursor g_keyboardFocusWidgetCursor;
+
+static int g_findKeyboardFocusCursorState;
+static WidgetCursor g_keyboardFocusWidgetCursorIter;
+
+static bool isKeyboardEnabledForWidget(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.widget->action != ACTION_ID_NONE) {
+        return true;
+    }
+
+    if (*g_onKeyboardWidgetFunctions[widgetCursor.widget->type]) {
+        return true;
+    }
+
+    return false;
+}
+
+void findNextFocusCursor(const WidgetCursor &widgetCursor) {
+    if (isKeyboardEnabledForWidget(widgetCursor)) {
+        if (g_findKeyboardFocusCursorState == 0) {
+            g_keyboardFocusWidgetCursorIter = widgetCursor;
+            g_findKeyboardFocusCursorState = 1;
+        }
+
+        if (g_findKeyboardFocusCursorState == 1) {
+            if (g_keyboardFocusWidgetCursor == widgetCursor) {
+                g_findKeyboardFocusCursorState = 2;
+            }
+        } else if (g_findKeyboardFocusCursorState == 2) {
+            g_keyboardFocusWidgetCursorIter = widgetCursor;
+            g_findKeyboardFocusCursorState = 3;
+        }
+    }
+}
+
+void moveToNextKeyboardFocusCursor() {
+    g_findKeyboardFocusCursorState = 0;
+    g_keyboardFocusWidgetCursorIter = 0;
+    
+    enumWidgets(&getRootAppContext(), findNextFocusCursor);
+    
+    if (g_findKeyboardFocusCursorState > 0) {
+        g_keyboardFocusWidgetCursor = g_keyboardFocusWidgetCursorIter;
+    } else {
+        g_keyboardFocusWidgetCursor = 0;
+    }
+}
+
+void findPreviousFocusCursor(const WidgetCursor &widgetCursor) {
+    if (isKeyboardEnabledForWidget(widgetCursor)) {
+        if (g_findKeyboardFocusCursorState == 0) {
+            g_keyboardFocusWidgetCursorIter = widgetCursor;
+            g_findKeyboardFocusCursorState = 1;
+        } else if (g_findKeyboardFocusCursorState == 1) {
+            if (g_keyboardFocusWidgetCursor == widgetCursor) {
+                g_findKeyboardFocusCursorState = 2;
+            } else {
+                g_keyboardFocusWidgetCursorIter = widgetCursor;
+            }
+        }
+    }
+}
+
+void moveToPreviousKeyboardFocusCursor() {
+    g_findKeyboardFocusCursorState = 0;
+    g_keyboardFocusWidgetCursorIter = 0;
+    
+    enumWidgets(&getRootAppContext(), findPreviousFocusCursor);
+    
+    if (g_findKeyboardFocusCursorState > 0) {
+        g_keyboardFocusWidgetCursor = g_keyboardFocusWidgetCursorIter;
+    } else {
+        g_keyboardFocusWidgetCursor = 0;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 WidgetCursor &getFoundWidgetAtDown() {
     return m_foundWidgetAtDown;
+}
+
+void setFoundWidgetAtDown(WidgetCursor &widgetCursor) {
+    m_foundWidgetAtDown = widgetCursor;
 }
 
 void clearFoundWidgetAtDown() {

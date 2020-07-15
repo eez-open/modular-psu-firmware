@@ -128,6 +128,8 @@ DrawFunctionType LIST_draw = nullptr;
 
 OnTouchFunctionType LIST_onTouch = nullptr;
 
+OnKeyboardFunctionType LIST_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

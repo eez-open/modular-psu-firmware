@@ -83,6 +83,7 @@ extern bool g_isBlinkTime;
 
 void stateManagmentHook();
 WidgetCursor &getFoundWidgetAtDown();
+void setFoundWidgetAtDown(WidgetCursor &widgetCursor);
 void clearFoundWidgetAtDown();
 bool isActiveWidget(const WidgetCursor &widgetCursor);
 bool isFocusWidget(const WidgetCursor &widgetCursor);
@@ -166,6 +167,8 @@ bool activePageHasBackdropHook();
 
 extern WidgetCursor m_foundWidgetAtMouse;
 extern OnTouchFunctionType m_onTouchFunctionAtMouse;
+
+extern WidgetCursor g_keyboardFocusWidgetCursor;
 
 } // namespace gui
 } // namespace eez

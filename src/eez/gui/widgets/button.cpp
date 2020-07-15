@@ -74,6 +74,8 @@ DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
 
 OnTouchFunctionType BUTTON_onTouch = nullptr;
 
+OnKeyboardFunctionType BUTTON_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 

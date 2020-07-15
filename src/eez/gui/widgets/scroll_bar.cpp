@@ -275,6 +275,8 @@ OnTouchFunctionType SCROLL_BAR_onTouch = [](const WidgetCursor &widgetCursor, Ev
     }
 };
 
+OnKeyboardFunctionType SCROLL_BAR_onKeyboard = nullptr;
+
 } // namespace gui
 } // namespace eez
 
