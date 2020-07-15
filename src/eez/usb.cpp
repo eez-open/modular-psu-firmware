@@ -23,6 +23,10 @@
 #include <usbh_hid.h>
 #endif
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+#include <SDL.h>
+#endif
+
 #include <eez/usb.h>
 
 #include <eez/gui/gui.h>
@@ -30,6 +34,8 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/serial_psu.h>
+
+#include <eez/modules/mcu/display.h>
 
 namespace eez {
 namespace usb {
@@ -70,8 +76,6 @@ MouseInfo g_mouseInfo;
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
-    DebugTrace("sizeof KeyboardInfo = %d\n", sizeof(KeyboardInfo));
-
     selectUsbMode(psu::persist_conf::getUsbMode(), g_otgMode);
 }
 
@@ -79,6 +83,13 @@ void tick(uint32_t tickCount) {
 #if defined(EEZ_PLATFORM_STM32)
     stateTransition(HAL_GPIO_ReadPin(USB_OTG_FS_OC_GPIO_Port, USB_OTG_FS_OC_Pin) ? EVENT_OTG_OC_HI : EVENT_OTG_OC_LOW);
     stateTransition(HAL_GPIO_ReadPin(USB_OTG_FS_ID_GPIO_Port, USB_OTG_FS_ID_Pin) ? EVENT_OTG_ID_HI : EVENT_OTG_ID_LOW);
+
+    testTimeoutEvent(g_debounceTimeout, EVENT_DEBOUNCE_TIMEOUT);
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    stateTransition(EVENT_OTG_OC_LOW);
+    stateTransition(EVENT_OTG_ID_HI);
 
     testTimeoutEvent(g_debounceTimeout, EVENT_DEBOUNCE_TIMEOUT);
 #endif
@@ -194,6 +205,13 @@ void selectUsbMode(int usbMode, int otgMode) {
     }
 #endif
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    if (g_usbMode == USB_MODE_HOST || g_usbMode == USB_MODE_OTG) {
+        SDL_ShowCursor(SDL_ENABLE);
+        SDL_CaptureMouse(SDL_FALSE);
+    }
+#endif
+
     g_usbMode = usbMode;
     g_otgMode = otgMode;
 
@@ -207,9 +225,16 @@ void selectUsbMode(int usbMode, int otgMode) {
     taskEXIT_CRITICAL();
 #endif
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    if (g_usbMode == USB_MODE_HOST || g_usbMode == USB_MODE_OTG) {
+        SDL_ShowCursor(SDL_DISABLE);
+        SDL_CaptureMouse(SDL_TRUE);
+    }
+#endif
+
     psu::persist_conf::setUsbMode(g_usbMode);
 
-    if ((g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) && g_usbDeviceClass == USB_DEVICE_CLASS_VIRTUAL_COM_PORT) {
+    if (isVirtualComPortActive()) {
         psu::serial::initScpi();
     }
 
@@ -258,6 +283,9 @@ bool isMassStorageActive() {
 
 int g_usbDeviceClass = USB_DEVICE_CLASS_VIRTUAL_COM_PORT;
 
+static int16_t g_xMouse = -1;
+static int16_t g_yMouse = -1;
+
 #if defined(EEZ_PLATFORM_STM32)
 extern "C" void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
 	if (USBH_HID_GetDeviceType(phost) == HID_KEYBOARD) {
@@ -304,9 +332,34 @@ extern "C" void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
 
         using namespace eez::usb;
         using namespace eez::gui;
+        using namespace eez::mcu::display;
 
-        if (info->x != 0 || info->y != 0) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_MOVE, (info->x << 8) | info->y, 10);
+        if (info->x != 0) {
+            if (g_xMouse == -1) {
+                g_xMouse = getDisplayWidth() / 2;
+            }
+            g_xMouse += (int8_t)info->x;
+            if (g_xMouse < 0) {
+                g_xMouse = 0;
+            }
+            if (g_xMouse >= getDisplayWidth()) {
+                g_xMouse = getDisplayWidth() - 1;
+            }
+            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_X_MOVE, g_xMouse, 10);
+        }
+
+        if (info->y != 0) {
+            if (g_yMouse == -1) {
+            	g_yMouse = getDisplayHeight() / 2;
+            }
+            g_yMouse += (int8_t)info->y;
+            if (g_yMouse < 0) {
+            	g_yMouse = 0;
+            }
+            if (g_yMouse >= getDisplayHeight()) {
+            	g_yMouse = getDisplayHeight() - 1;
+            }
+            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE, g_yMouse, 10);
         }
 
         if (!g_mouseInfo.button1 && info->buttons[0]) {

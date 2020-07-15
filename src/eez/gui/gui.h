@@ -60,7 +60,8 @@ enum {
     GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE = 1,
     GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE,
 
-    GUI_QUEUE_MESSAGE_MOUSE_MOVE,
+    GUI_QUEUE_MESSAGE_MOUSE_X_MOVE,
+    GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE,
     GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN,
     GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP,
     GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED,
@@ -162,6 +163,9 @@ Page *getPageFromIdHook(int pageId);
 void executeInternalActionHook(int actionId);
 
 bool activePageHasBackdropHook();
+
+extern WidgetCursor m_foundWidgetAtMouse;
+extern OnTouchFunctionType m_onTouchFunctionAtMouse;
 
 } // namespace gui
 } // namespace eez

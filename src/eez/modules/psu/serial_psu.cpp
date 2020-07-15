@@ -100,7 +100,6 @@ static bool g_isConnected;
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
-    g_testResult = TEST_SKIPPED;
 	initScpi();
 
 #ifdef EEZ_PLATFORM_SIMULATOR

@@ -39,7 +39,8 @@ struct Event {
 
 void eventHandling();
 
-void onMouseMove(int deltaX, int deltaY);
+void onMouseXMove(int x);
+void onMouseYMove(int y);
 void onMouseButtonDown(int button);
 void onMouseButtonUp(int button);
 void onMouseDisconnected();

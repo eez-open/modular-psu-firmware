@@ -37,6 +37,7 @@ static int g_findWidgetAtX;
 static int g_findWidgetAtY;
 static WidgetCursor g_foundWidget;
 static int g_distanceToFoundWidget;
+static bool g_clicked;
 
 bool g_isActiveWidget;
 
@@ -176,8 +177,10 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
         bool passThrough = internalPage->canClickPassThrough();
 
-        // clicked outside internal page, close internal page
-        appContext->popPage();
+        if (g_clicked) {
+            // clicked outside internal page, close internal page
+            appContext->popPage();
+        }
 
         if (!passThrough) {
             return;
@@ -258,8 +261,9 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
     }
 }
 
-WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y) {
+WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y, bool clicked) {
     g_foundWidget = 0;
+    g_clicked = clicked;
 
     if (appContext->isActivePageInternal()) {
         auto internalPage = ((InternalPage *)appContext->getActivePage());
@@ -267,10 +271,12 @@ WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y) {
         WidgetCursor widgetCursor = internalPage->findWidget(x, y);
 
         if (!widgetCursor) {
-            // clicked outside internal page, close internal page
         	bool passThrough = internalPage->canClickPassThrough();
 
-            appContext->popPage();
+            if (clicked) {
+                // clicked outside internal page, close internal page
+                appContext->popPage();
+            }
 
             if (!passThrough) {
     			return g_foundWidget;

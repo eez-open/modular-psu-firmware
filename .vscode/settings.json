@@ -13,6 +13,10 @@
         "deque": "cpp",
         "string": "cpp",
         "type_traits": "cpp",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "memory": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp",
+        "xmemory0": "cpp"
     }
 }

@@ -327,6 +327,8 @@ void clearDirty() {
 static bool g_lastMouseCursorVisible;
 static int g_lastMouseCursorX;
 static int g_lastMouseCursorY;
+static WidgetCursor m_lastFoundWidgetAtMouse;
+static OnTouchFunctionType m_lastOnTouchFunctionAtMouse;
 
 bool isDirty() {
     // g_dirtyX1 = MIN(g_prevDirtyX1, g_nextDirtyX1);
@@ -499,10 +501,12 @@ void beginBuffersDrawing() {
 void endBuffersDrawing() {
     setBufferPointer(g_bufferPointer);
 
-    if (g_lastMouseCursorVisible != gui::g_mouseCursorVisible || g_lastMouseCursorX != gui::g_mouseCursorX || g_lastMouseCursorY != gui::g_mouseCursorY) {
+    if (g_lastMouseCursorVisible != gui::g_mouseCursorVisible || g_lastMouseCursorX != gui::g_mouseCursorX || g_lastMouseCursorY != gui::g_mouseCursorY || m_lastFoundWidgetAtMouse != gui::m_foundWidgetAtMouse || m_lastOnTouchFunctionAtMouse != gui::m_onTouchFunctionAtMouse) {
     	g_lastMouseCursorVisible = gui::g_mouseCursorVisible;
     	g_lastMouseCursorX = gui::g_mouseCursorX;
     	g_lastMouseCursorY = gui::g_mouseCursorY;
+        m_lastFoundWidgetAtMouse = gui::m_foundWidgetAtMouse;
+        m_lastOnTouchFunctionAtMouse = gui::m_onTouchFunctionAtMouse;
     	g_dirty = true;
     }
 
@@ -577,6 +581,19 @@ void endBuffersDrawing() {
 
             if (g_lastMouseCursorY + (int)image.height > getDisplayHeight()) {
                 image.height = getDisplayHeight() - g_lastMouseCursorY;
+            }
+
+            if (m_foundWidgetAtMouse && m_onTouchFunctionAtMouse) {
+                static const int W = 3;
+                auto x = m_foundWidgetAtMouse.x;
+                auto y = m_foundWidgetAtMouse.y;
+                auto w = m_foundWidgetAtMouse.widget->w;
+                auto h = m_foundWidgetAtMouse.widget->h;
+                auto style = getStyle(m_foundWidgetAtMouse.widget->style);
+                drawRectangle(x, y, w, W, style, false, false, false);
+                drawRectangle(x, y + W, W, h - 2 * W, style, false, false, false);
+                drawRectangle(x + w - W, y + W, W, h - 2 * W, style, false, false, false);
+                drawRectangle(x, y + h - W, w, W, style, false, false, false);
             }
 
             drawBitmap(&image, g_lastMouseCursorX, g_lastMouseCursorY);

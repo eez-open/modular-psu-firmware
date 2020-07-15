@@ -35,6 +35,7 @@
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/debug.h>
 #include <eez/memory.h>
+#include <eez/usb.h>
 #include <eez/gui/gui.h>
 #include <eez/platform/simulator/front_panel.h>
 #include <eez/system.h>
@@ -138,6 +139,12 @@ bool init() {
     }
 
     SDL_ShowWindow(g_mainWindow);
+
+    using namespace eez::usb;
+    if (g_usbMode == USB_MODE_HOST || g_usbMode == USB_MODE_OTG) {
+        SDL_ShowCursor(SDL_DISABLE);
+        SDL_CaptureMouse(SDL_TRUE);
+    }
 
     return true;
 }

@@ -45,7 +45,6 @@ void readEvents() {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
             if (event.button.button == 1) {
-                SDL_GetMouseState(&g_mouseX, &g_mouseY);
                 if (event.type == SDL_MOUSEBUTTONDOWN) {
                     g_mouseButton1DownX = g_mouseX;
                     g_mouseButton1DownY = g_mouseY;
@@ -67,6 +66,8 @@ void readEvents() {
             eez::shutdown();
         }
     }
+
+    SDL_GetMouseState(&g_mouseX, &g_mouseY);
 
     // for web simulator
     if (yMouseWheel >= 100 || yMouseWheel <= -100) {

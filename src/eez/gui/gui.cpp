@@ -93,8 +93,10 @@ void onGuiQueueMessage(uint8_t type, int16_t param) {
         getAppContextFromId(param)->doShowPage();
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE) {
         getAppContextFromId(param)->doPushPage();
-    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_MOVE) {
-        onMouseMove((int8_t)((uint16_t)param >> 8), (int8_t)((uint16_t)param & 0xFF));
+    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_X_MOVE) {
+        onMouseXMove(param);
+    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE) {
+        onMouseYMove(param);
     } else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN) {
         onMouseButtonDown(param);
     } else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP) {

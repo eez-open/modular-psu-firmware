@@ -54,6 +54,9 @@ bool g_mouseWasDown;
 int g_mouseWasCursorX;
 int g_mouseWasCursorY;
 
+WidgetCursor m_foundWidgetAtMouse;
+OnTouchFunctionType m_onTouchFunctionAtMouse;
+
 static void processTouchEvent(EventType type, int x, int y);
 static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
 static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
@@ -86,6 +89,8 @@ void eventHandling() {
     g_mouseWasCursorX = g_mouseCursorX;
     g_mouseWasCursorY = g_mouseCursorY;
 
+    m_foundWidgetAtMouse = findWidget(&getRootAppContext(), g_mouseCursorX, g_mouseCursorY, false);
+    m_onTouchFunctionAtMouse = getWidgetTouchFunction(m_foundWidgetAtMouse);
 
     auto eventType = touch::getEventType();
     
@@ -132,25 +137,16 @@ void eventHandling() {
     }
 }
 
-void onMouseMove(int deltaX, int deltaY) {
+void onMouseXMove(int x) {
+    g_mouseCursorX = x;
     g_mouseCursorVisible = true;
     g_mouseCursorLastActivityTime = micros();
-    
-    g_mouseCursorX += deltaX;
-    if (g_mouseCursorX < 0) {
-        g_mouseCursorX = 0;
-    }
-    if (g_mouseCursorX >= mcu::display::getDisplayWidth()) {
-        g_mouseCursorX = mcu::display::getDisplayWidth() - 1;
-    }
+}
 
-    g_mouseCursorY += deltaY;
-    if (g_mouseCursorY < 0) {
-        g_mouseCursorY = 0;
-    }
-    if (g_mouseCursorY >= mcu::display::getDisplayHeight()) {
-        g_mouseCursorY = mcu::display::getDisplayHeight() - 1;
-    }
+void onMouseYMove(int y) {
+    g_mouseCursorY = y;
+    g_mouseCursorVisible = true;
+    g_mouseCursorLastActivityTime = micros();
 }
 
 void onMouseButtonDown(int button) {
