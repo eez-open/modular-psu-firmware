@@ -89,28 +89,26 @@ void onKeyDown(uint16_t param) {
                 } else if (key == KEY_PRINTSCREEN) {
                     takeScreenshot();
                 } else {
-                    if (!handled) {
-                        if (key >= KEY_1_EXCLAMATION_MARK && key <= KEY_0_CPARENTHESIS) {
-                            if (getActivePageId() == PAGE_ID_MAIN) {
-                                int channelIndex = key - KEY_1_EXCLAMATION_MARK;
-                                if (channelIndex < CH_MAX) {
-                                    using namespace psu;
-                                    auto &channel = Channel::get(channelIndex);
-                                    selectChannel(&channel);
-                                    clearFoundWidgetAtDown();
-                                    channelToggleOutput();
-                                }
+                    if (key >= KEY_1_EXCLAMATION_MARK && key <= KEY_0_CPARENTHESIS) {
+                        if (getActivePageId() == PAGE_ID_MAIN) {
+                            int channelIndex = key - KEY_1_EXCLAMATION_MARK;
+                            if (channelIndex < CH_MAX) {
+                                using namespace psu;
+                                auto &channel = Channel::get(channelIndex);
+                                selectChannel(&channel);
+                                clearFoundWidgetAtDown();
+                                channelToggleOutput();
                             }
-                        } else if (key == KEY_HOME) {
-                            goBack();
-                        } else if (key == KEY_ESCAPE) {
-                            popPage();
-                        } else if (key == KEY_SPACEBAR || key == KEY_ENTER) {
-                            if (g_focusWidgetCursor) {
-                                if (g_focusWidgetCursor.widget->action) {
-                                    setFoundWidgetAtDown(g_focusWidgetCursor);
-                                    executeAction(g_focusWidgetCursor.widget->action);
-                                }
+                        }
+                    } else if (key == KEY_HOME) {
+                        goBack();
+                    } else if (key == KEY_ESCAPE) {
+                        popPage();
+                    } else if (key == KEY_SPACEBAR || key == KEY_ENTER) {
+                        if (g_focusWidgetCursor) {
+                            if (g_focusWidgetCursor.widget->action) {
+                                setFoundWidgetAtDown(g_focusWidgetCursor);
+                                executeAction(g_focusWidgetCursor.widget->action);
                             }
                         }
                     }
