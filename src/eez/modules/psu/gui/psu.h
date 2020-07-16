@@ -323,6 +323,10 @@ inline void popPage() {
     g_psuAppContext.popPage();
 }
 
+inline void removePageFromStack(int pageId) {
+    g_psuAppContext.removePageFromStack(pageId);
+}
+
 inline void replacePage(int pageId, Page *page = nullptr) {
     g_psuAppContext.replacePage(pageId, page);
 }

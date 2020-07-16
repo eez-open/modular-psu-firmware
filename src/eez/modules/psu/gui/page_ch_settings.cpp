@@ -1381,11 +1381,8 @@ float remapDacValue(Channel &channel, Channel::CalibrationValueConfiguration &co
 ////////////////////////////////////////////////////////////////////////////////
 
 void ChSettingsCalibrationEditPage::onStartPasswordOk() {
-    popPage();
-
-    if (getActivePageId() == PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW) {
-        popPage();
-    }
+	removePageFromStack(PAGE_ID_KEYPAD);
+    removePageFromStack(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
 
     calibration::start(*g_channel);
 
