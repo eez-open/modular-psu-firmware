@@ -23,10 +23,8 @@
 #include <usbh_hid.h>
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
-#include <SDL.h>
-#endif
-
+#include <eez/keyboard.h>
+#include <eez/mouse.h>
 #include <eez/usb.h>
 
 #include <eez/gui/gui.h>
@@ -69,9 +67,6 @@ static void stateTransition(Event event);
 static void setState(State state);
 
 int g_otgMode = USB_MODE_DISABLED;
-
-KeyboardInfo g_keyboardInfo;
-MouseInfo g_mouseInfo;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -283,114 +278,13 @@ bool isMassStorageActive() {
 
 int g_usbDeviceClass = USB_DEVICE_CLASS_VIRTUAL_COM_PORT;
 
-static int16_t g_xMouse = -1;
-static int16_t g_yMouse = -1;
-
 #if defined(EEZ_PLATFORM_STM32)
 extern "C" void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
-	if (USBH_HID_GetDeviceType(phost) == HID_KEYBOARD) {
-		HID_KEYBD_Info_TypeDef *info = USBH_HID_GetKeybdInfo(phost);
-
-        using namespace eez::usb;
-        using namespace eez::gui;
-
-        if (g_keyboardInfo.keys[0] == 0 && info->keys[0] != 0) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_KEY_DOWN, 
-                (
-                    (
-                        (info->lctrl ? KEY_MOD_LCTRL : 0) |
-                        (info->lshift ? KEY_MOD_LSHIFT : 0) |
-                        (info->lalt ? KEY_MOD_LALT : 0) |
-                        (info->lgui ? KEY_MOD_LGUI : 0) |
-                        (info->rctrl ? KEY_MOD_RCTRL : 0) |
-                        (info->rshift ? KEY_MOD_RSHIFT : 0) |
-                        (info->ralt ? KEY_MOD_RALT : 0) |
-                        (info->rgui ? KEY_MOD_RGUI : 0)
-                    ) << 8
-                ) | 
-                info->keys[0]
-            );
-        }
-
-		g_keyboardInfo.state = info->state;
-
-		g_keyboardInfo.lctrl = info->lctrl;
-		g_keyboardInfo.lshift = info->lshift;
-		g_keyboardInfo.lalt = info->lalt;
-		g_keyboardInfo.lgui = info->lgui;
-
-		g_keyboardInfo.rctrl = info->rctrl;
-		g_keyboardInfo.rshift = info->rshift;
-		g_keyboardInfo.ralt = info->ralt;
-		g_keyboardInfo.rgui = info->rgui;
-
-		memcpy(g_keyboardInfo.keys, info->keys, 6);
-
-		memset(&g_mouseInfo, 0, sizeof(MouseInfo));
-	} if (USBH_HID_GetDeviceType(phost) == HID_MOUSE) {
-		HID_MOUSE_Info_TypeDef *info = USBH_HID_GetMouseInfo(phost);
-
-        using namespace eez::usb;
-        using namespace eez::gui;
-        using namespace eez::mcu::display;
-
-        if (info->x != 0) {
-            if (g_xMouse == -1) {
-                g_xMouse = getDisplayWidth() / 2;
-            }
-            g_xMouse += (int8_t)info->x;
-            if (g_xMouse < 0) {
-                g_xMouse = 0;
-            }
-            if (g_xMouse >= getDisplayWidth()) {
-                g_xMouse = getDisplayWidth() - 1;
-            }
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_X_MOVE, g_xMouse, 10);
-        }
-
-        if (info->y != 0) {
-            if (g_yMouse == -1) {
-            	g_yMouse = getDisplayHeight() / 2;
-            }
-            g_yMouse += (int8_t)info->y;
-            if (g_yMouse < 0) {
-            	g_yMouse = 0;
-            }
-            if (g_yMouse >= getDisplayHeight()) {
-            	g_yMouse = getDisplayHeight() - 1;
-            }
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE, g_yMouse, 10);
-        }
-
-        if (!g_mouseInfo.button1 && info->buttons[0]) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN, 1, 50);
-        }
-        if (g_mouseInfo.button1 && !info->buttons[0]) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP, 1, 50);
-        }
-
-        if (!g_mouseInfo.button2 && info->buttons[1]) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN, 2, 50);
-        }
-        if (g_mouseInfo.button2 && !info->buttons[1]) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP, 2, 50);
-        }
-
-        if (!g_mouseInfo.button3 && info->buttons[2]) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN, 3, 50);
-        }
-        if (g_mouseInfo.button3 && !info->buttons[2]) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP, 3, 50);
-        }
-
-        g_mouseInfo.x = info->x;
-        g_mouseInfo.y = info->y;
-        
-        g_mouseInfo.button1 = info->buttons[0];
-        g_mouseInfo.button2 = info->buttons[1];
-        g_mouseInfo.button3 = info->buttons[2];
-
-        memset(&g_keyboardInfo, 0, sizeof(KeyboardInfo));
+    auto deviceType = USBH_HID_GetDeviceType(phost);
+	if (deviceType == HID_KEYBOARD) {
+        eez::keyboard::onKeyboardEvent(phost);
+	} if (deviceType == HID_MOUSE) {
+        eez::mouse::onMouseEvent(phost);
 	}
 }
 #endif

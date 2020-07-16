@@ -28,7 +28,7 @@
 #include <eez/sound.h>
 #include <eez/system.h>
 #include <eez/hmi.h>
-#include <eez/usb.h>
+#include <eez/keyboard.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/calibration.h>
@@ -2351,60 +2351,7 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_HIDE_ASYNC_OPERATION_IN_PROGRESS) {
         g_psuAppContext.doHideAsyncOperationInProgress();
     } else if (type == GUI_QUEUE_MESSAGE_KEY_DOWN) {
-    	if (getActivePageId() != PAGE_ID_SYS_SETTINGS_SERIAL) {
-            using namespace eez::usb;
-
-			uint8_t key = (uint16_t)param & 0xFF;
-			uint8_t mod = (uint16_t)param >> 8;
-
-            bool handled = false;
-
-            if (g_keyboardFocusWidgetCursor) {
-                if (*g_onKeyboardWidgetFunctions[g_keyboardFocusWidgetCursor.widget->type]) {
-                    handled = (*g_onKeyboardWidgetFunctions[g_keyboardFocusWidgetCursor.widget->type])(g_keyboardFocusWidgetCursor, key, mod);
-                }
-            }
-
-            if (!handled) {
-                if (mod == 0) {
-                    if (key == KEY_TAB) {
-                        moveToNextKeyboardFocusCursor();
-                    } else if (key == KEY_PRINTSCREEN) {
-                        takeScreenshot();
-                    } else {
-                        if (!handled) {
-                            if (key >= KEY_1_EXCLAMATION_MARK && key <= KEY_0_CPARENTHESIS) {
-                                if (getActivePageId() == PAGE_ID_MAIN) {
-                                    int channelIndex = key - KEY_1_EXCLAMATION_MARK;
-                                    if (channelIndex < CH_MAX) {
-                                        using namespace psu;
-                                        auto &channel = Channel::get(channelIndex);
-                                        selectChannel(&channel);
-                                        clearFoundWidgetAtDown();
-                                        channelToggleOutput();
-                                    }
-                                }
-                            } else if (key == KEY_HOME) {
-                                goBack();
-                            } else if (key == KEY_ESCAPE) {
-                                popPage();
-                            } else if (key == KEY_SPACEBAR || key == KEY_ENTER) {
-                                if (g_keyboardFocusWidgetCursor) {
-                                    if (g_keyboardFocusWidgetCursor.widget->action) {
-                                        setFoundWidgetAtDown(g_keyboardFocusWidgetCursor);
-                                        executeAction(g_keyboardFocusWidgetCursor.widget->action);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else if (mod == KEY_MOD_LSHIFT || mod == KEY_MOD_RSHIFT) {
-                    if (key == KEY_TAB) {
-                        moveToPreviousKeyboardFocusCursor();
-                    }
-                }
-            }
-    	}
+        keyboard::onKeyDown((uint16_t)param);
     } 
 }
 

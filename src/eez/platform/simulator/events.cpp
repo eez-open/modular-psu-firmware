@@ -22,7 +22,7 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
-#include <eez/usb.h>
+#include <eez/keyboard.h>
 
 #include <eez/modules/mcu/encoder.h>
 #include <eez/gui/gui.h>
@@ -64,21 +64,7 @@ void readEvents() {
         } else if (event.type == SDL_MOUSEWHEEL) {
             yMouseWheel += event.wheel.y;
         } else if (event.type == SDL_KEYDOWN) {
-            SDL_KeyboardEvent *key = &event.key;
-
-            using namespace usb;
-
-            uint8_t mod = 
-                (key->keysym.mod & KMOD_LCTRL ? KEY_MOD_LCTRL : 0) |
-                (key->keysym.mod & KMOD_LSHIFT ? KEY_MOD_LSHIFT : 0) |
-                (key->keysym.mod & KMOD_LALT ? KEY_MOD_LALT : 0) |
-                (key->keysym.mod & KMOD_RCTRL ? KEY_MOD_RCTRL : 0) |
-                (key->keysym.mod & KMOD_RSHIFT ? KEY_MOD_RSHIFT : 0) |
-                (key->keysym.mod & KMOD_RALT ? KEY_MOD_RALT : 0);
-
-            uint8_t scancode = key->keysym.scancode;
-
-            gui::sendMessageToGuiThread(gui::GUI_QUEUE_MESSAGE_KEY_DOWN, (mod << 8) | scancode);
+            keyboard::onKeyboardEvent(&event.key);
         }
 
         if (event.type == SDL_QUIT) {

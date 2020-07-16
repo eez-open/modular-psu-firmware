@@ -91,8 +91,10 @@ set(src_eez
     src/eez/file_type.cpp
     src/eez/hmi.cpp
     src/eez/index.cpp
+    src/eez/keyboard.cpp
     src/eez/main.cpp
     src/eez/memory.cpp
+    src/eez/mouse.cpp
     src/eez/mp.cpp
     src/eez/mqtt.cpp
     src/eez/sound.cpp
@@ -109,7 +111,9 @@ set(header_eez
     src/eez/file_type.h
     src/eez/hmi.h
     src/eez/index.h
+    src/eez/keyboard.h
     src/eez/memory.h
+    src/eez/mouse.h
     src/eez/mp.h
     src/eez/mqtt.h
     src/eez/sound.h

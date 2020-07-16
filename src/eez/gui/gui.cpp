@@ -24,6 +24,7 @@
 #if OPTION_GUI_THREAD
 #include <eez/firmware.h>
 #endif
+#include <eez/mouse.h>
 
 #include <eez/sound.h>
 #include <eez/util.h>
@@ -70,8 +71,7 @@ void startThread() {
     decompressAssets();
     mcu::display::onThemeChanged();
     touch::init();
-    g_mouseCursorX = mcu::display::getDisplayWidth() / 2;
-    g_mouseCursorY = mcu::display::getDisplayHeight() / 2;
+    mouse::init();
     g_guiMessageQueueId = osMessageCreate(osMessageQ(g_guiMessageQueue), NULL);
     g_guiTaskHandle = osThreadCreate(osThread(g_guiTask), nullptr);
 }
@@ -94,15 +94,15 @@ void onGuiQueueMessage(uint8_t type, int16_t param) {
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE) {
         getAppContextFromId(param)->doPushPage();
     } else if (type == GUI_QUEUE_MESSAGE_MOUSE_X_MOVE) {
-        onMouseXMove(param);
+        mouse::onMouseXMove(param);
     } else if (type == GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE) {
-        onMouseYMove(param);
+        mouse::onMouseYMove(param);
     } else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN) {
-        onMouseButtonDown(param);
+        mouse::onMouseButtonDown(param);
     } else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP) {
-        onMouseButtonUp(param);
+        mouse::onMouseButtonUp(param);
     } else if (type == GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED) {
-        onMouseDisconnected();
+        mouse::onMouseDisconnected();
     } else {
         onGuiQueueMessageHook(type, param);
     }

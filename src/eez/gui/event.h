@@ -39,18 +39,5 @@ struct Event {
 
 void eventHandling();
 
-void onMouseXMove(int x);
-void onMouseYMove(int y);
-void onMouseButtonDown(int button);
-void onMouseButtonUp(int button);
-void onMouseDisconnected();
-
-extern bool g_mouseCursorVisible;
-extern int g_mouseCursorX;
-extern int g_mouseCursorY;
-
-void moveToNextKeyboardFocusCursor();
-void moveToPreviousKeyboardFocusCursor();
-
 } // namespace gui
 } // namespace eez

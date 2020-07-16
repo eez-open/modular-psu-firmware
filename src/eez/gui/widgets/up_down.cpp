@@ -20,6 +20,7 @@
 
 #include <eez/util.h>
 #include <eez/sound.h>
+#include <eez/keyboard.h>
 
 #include <eez/gui/gui.h>
 
@@ -139,7 +140,20 @@ OnTouchFunctionType UP_DOWN_onTouch = [](const WidgetCursor &widgetCursor, Event
     }
 };
 
-OnKeyboardFunctionType UP_DOWN_onKeyboard = nullptr;
+OnKeyboardFunctionType UP_DOWN_onKeyboard = [](const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) {
+    if (mod == 0) {
+        if (key == KEY_LEFTARROW || key == KEY_DOWNARROW) {
+            upDown(widgetCursor, UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON);
+            sound::playClick();
+            return true;
+        } else if (key == KEY_RIGHTARROW || key == KEY_UPARROW) {
+            upDown(widgetCursor, UP_DOWN_WIDGET_SEGMENT_UP_BUTTON);
+            sound::playClick();
+            return true;
+        }
+    }
+    return false;
+};
 
 } // namespace gui
 } // namespace eez

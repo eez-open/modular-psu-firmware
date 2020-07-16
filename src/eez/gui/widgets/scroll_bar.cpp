@@ -23,6 +23,7 @@
 #include <eez/util.h>
 #include <eez/sound.h>
 #include <eez/debug.h>
+#include <eez/keyboard.h>
 
 #include <eez/gui/gui.h>
 
@@ -275,7 +276,35 @@ OnTouchFunctionType SCROLL_BAR_onTouch = [](const WidgetCursor &widgetCursor, Ev
     }
 };
 
-OnKeyboardFunctionType SCROLL_BAR_onKeyboard = nullptr;
+OnKeyboardFunctionType SCROLL_BAR_onKeyboard = [](const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) {
+    if (mod == 0) {
+        int position = getPosition(widgetCursor);
+        int increment = getPositionIncrement(widgetCursor);
+        int size = getSize(widgetCursor);
+        int pageSize = getPageSize(widgetCursor);
+
+        if (key == KEY_LEFTARROW || key == KEY_UPARROW) {
+            setPosition(widgetCursor, position - increment);
+            return true;
+        } else if (key == KEY_RIGHTARROW || key == KEY_DOWNARROW) {
+            setPosition(widgetCursor, position + increment);
+            return true;
+        } else if (key == KEY_PAGEUP) {
+            setPosition(widgetCursor, position - pageSize);
+            return true;
+        } else if (key == KEY_PAGEDOWN) {
+            setPosition(widgetCursor, position + pageSize);
+            return true;
+        } else if (key == KEY_HOME) {
+            setPosition(widgetCursor, 0);
+            return true;
+        } else if (key == KEY_END1) {
+            setPosition(widgetCursor, position + size - pageSize);
+            return true;
+        }
+    }
+    return false;
+};
 
 } // namespace gui
 } // namespace eez

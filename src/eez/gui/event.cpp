@@ -23,6 +23,7 @@
 #include <eez/firmware.h>
 #include <eez/system.h>
 #include <eez/hmi.h>
+#include <eez/mouse.h>
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
@@ -31,7 +32,6 @@
 #define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY   300000L // 300ms
 #define CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY     50000L // 50ms
 #define CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT       15000000L // 15s
-#define CONF_GUI_MOUSE_TIMEOUT                  10000000L // 10s
 
 namespace eez {
 namespace gui {
@@ -46,19 +46,6 @@ static uint32_t m_lastAutoRepeatEventTime;
 static bool m_longTouchGenerated;
 static bool m_extraLongTouchGenerated;
 
-bool g_mouseCursorVisible;
-int g_mouseCursorX;
-int g_mouseCursorY;
-bool g_mouseDown;
-static uint32_t g_mouseCursorLastActivityTime;
-
-bool g_mouseWasDown;
-int g_mouseWasCursorX;
-int g_mouseWasCursorY;
-
-WidgetCursor m_foundWidgetAtMouse;
-OnTouchFunctionType m_onTouchFunctionAtMouse;
-
 static void processTouchEvent(EventType type, int x, int y);
 static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
 static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
@@ -68,46 +55,28 @@ void eventHandling() {
 		return;
 	}
 
-    uint32_t tickCount = micros();
-
-    if (g_mouseCursorVisible && !g_mouseDown) {
-        int32_t diff = tickCount - g_mouseCursorLastActivityTime;
-        if (diff >= CONF_GUI_MOUSE_TIMEOUT) {
-            g_mouseCursorVisible = false;
-        }
-    }
-
+    bool mouseCursorVisible = false;
     EventType mouseEventType = EVENT_TYPE_TOUCH_NONE;
-    if (!g_mouseWasDown && g_mouseDown) {
-        mouseEventType = EVENT_TYPE_TOUCH_DOWN;
-    } else if (g_mouseWasDown && !g_mouseDown) {
-        mouseEventType = EVENT_TYPE_TOUCH_UP;
-    } else {
-        if (g_mouseDown && (g_mouseWasCursorX != g_mouseCursorX || g_mouseWasCursorY != g_mouseCursorY)) {
-            mouseEventType = EVENT_TYPE_TOUCH_MOVE;
-        }
-    }
-    g_mouseWasDown = g_mouseDown;
-    g_mouseWasCursorX = g_mouseCursorX;
-    g_mouseWasCursorY = g_mouseCursorY;
-
-    m_foundWidgetAtMouse = findWidget(&getRootAppContext(), g_mouseCursorX, g_mouseCursorY, false);
-    m_onTouchFunctionAtMouse = getWidgetTouchFunction(m_foundWidgetAtMouse);
+    int mouseX = 0;
+    int mouseY = 0;
+    mouse::getEvent(mouseCursorVisible, mouseEventType, mouseX, mouseY);
 
     auto eventType = touch::getEventType();
     
     int eventX;
     int eventY;
-    if (eventType == EVENT_TYPE_TOUCH_NONE && g_mouseCursorVisible) {
+    if (eventType == EVENT_TYPE_TOUCH_NONE && mouseCursorVisible) {
         eventType = mouseEventType;
-        eventX = g_mouseCursorX;
-        eventY = g_mouseCursorY;
+        eventX = mouseX;
+        eventY = mouseY;
     } else {
         eventX = touch::getX();
         eventY = touch::getY();
     }
 
     if (eventType != EVENT_TYPE_TOUCH_NONE) {
+        uint32_t tickCount = micros();
+
         eez::hmi::noteActivity();
 
         if (eventType == EVENT_TYPE_TOUCH_DOWN) {
@@ -137,35 +106,6 @@ void eventHandling() {
             processTouchEvent(EVENT_TYPE_TOUCH_UP, eventX, eventY);
         }
     }
-}
-
-void onMouseXMove(int x) {
-    g_mouseCursorX = x;
-    g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTime = micros();
-}
-
-void onMouseYMove(int y) {
-    g_mouseCursorY = y;
-    g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTime = micros();
-}
-
-void onMouseButtonDown(int button) {
-    g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTime = micros();
-    g_mouseDown = true;
-}
-
-void onMouseButtonUp(int button) {
-    g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTime = micros();
-    g_mouseDown = false;
-}
-
-void onMouseDisconnected() {
-    g_mouseCursorVisible = false;
-    g_mouseDown = false;
 }
 
 static void processTouchEvent(EventType type, int x, int y) {
@@ -272,84 +212,6 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
                 }
             }
         }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-WidgetCursor g_keyboardFocusWidgetCursor;
-
-static int g_findKeyboardFocusCursorState;
-static WidgetCursor g_keyboardFocusWidgetCursorIter;
-
-static bool isKeyboardEnabledForWidget(const WidgetCursor &widgetCursor) {
-    if (widgetCursor.widget->action != ACTION_ID_NONE) {
-        return true;
-    }
-
-    if (*g_onKeyboardWidgetFunctions[widgetCursor.widget->type]) {
-        return true;
-    }
-
-    return false;
-}
-
-void findNextFocusCursor(const WidgetCursor &widgetCursor) {
-    if (isKeyboardEnabledForWidget(widgetCursor)) {
-        if (g_findKeyboardFocusCursorState == 0) {
-            g_keyboardFocusWidgetCursorIter = widgetCursor;
-            g_findKeyboardFocusCursorState = 1;
-        }
-
-        if (g_findKeyboardFocusCursorState == 1) {
-            if (g_keyboardFocusWidgetCursor == widgetCursor) {
-                g_findKeyboardFocusCursorState = 2;
-            }
-        } else if (g_findKeyboardFocusCursorState == 2) {
-            g_keyboardFocusWidgetCursorIter = widgetCursor;
-            g_findKeyboardFocusCursorState = 3;
-        }
-    }
-}
-
-void moveToNextKeyboardFocusCursor() {
-    g_findKeyboardFocusCursorState = 0;
-    g_keyboardFocusWidgetCursorIter = 0;
-    
-    enumWidgets(&getRootAppContext(), findNextFocusCursor);
-    
-    if (g_findKeyboardFocusCursorState > 0) {
-        g_keyboardFocusWidgetCursor = g_keyboardFocusWidgetCursorIter;
-    } else {
-        g_keyboardFocusWidgetCursor = 0;
-    }
-}
-
-void findPreviousFocusCursor(const WidgetCursor &widgetCursor) {
-    if (isKeyboardEnabledForWidget(widgetCursor)) {
-        if (g_findKeyboardFocusCursorState == 0) {
-            g_keyboardFocusWidgetCursorIter = widgetCursor;
-            g_findKeyboardFocusCursorState = 1;
-        } else if (g_findKeyboardFocusCursorState == 1) {
-            if (g_keyboardFocusWidgetCursor == widgetCursor) {
-                g_findKeyboardFocusCursorState = 2;
-            } else {
-                g_keyboardFocusWidgetCursorIter = widgetCursor;
-            }
-        }
-    }
-}
-
-void moveToPreviousKeyboardFocusCursor() {
-    g_findKeyboardFocusCursorState = 0;
-    g_keyboardFocusWidgetCursorIter = 0;
-    
-    enumWidgets(&getRootAppContext(), findPreviousFocusCursor);
-    
-    if (g_findKeyboardFocusCursorState > 0) {
-        g_keyboardFocusWidgetCursor = g_keyboardFocusWidgetCursorIter;
-    } else {
-        g_keyboardFocusWidgetCursor = 0;
     }
 }
 

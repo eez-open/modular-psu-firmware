@@ -27,6 +27,8 @@
 #include <eez/system.h>
 #include <eez/hmi.h>
 #include <eez/util.h>
+#include <eez/keyboard.h>
+#include <eez/mouse.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/button.h>
@@ -97,6 +99,8 @@ int AppContext::getPreviousPageId() {
 void AppContext::onPageChanged(int previousPageId, int activePageId) {
     eez::mcu::display::turnOn();
     eez::hmi::noteActivity();
+    eez::mouse::onPageChanged();
+    eez::keyboard::onPageChanged();
 }
 
 void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {

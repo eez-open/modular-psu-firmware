@@ -165,11 +165,6 @@ void executeInternalActionHook(int actionId);
 
 bool activePageHasBackdropHook();
 
-extern WidgetCursor m_foundWidgetAtMouse;
-extern OnTouchFunctionType m_onTouchFunctionAtMouse;
-
-extern WidgetCursor g_keyboardFocusWidgetCursor;
-
 } // namespace gui
 } // namespace eez
 

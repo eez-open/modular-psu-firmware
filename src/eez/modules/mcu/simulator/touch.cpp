@@ -22,6 +22,7 @@
 
 #include <eez/gui/gui.h>
 
+#include <eez/mouse.h>
 #include <eez/usb.h>
 
 using namespace eez::platform::simulator;
@@ -37,38 +38,13 @@ void read(bool &isPressed, int &x, int &y) {
     using namespace eez::gui;
 
     if (g_usbMode == USB_MODE_HOST || g_usbMode == USB_MODE_OTG) {
-        if (g_mouseX != g_mouseInfo.x) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_X_MOVE, (uint32_t)(int16_t)g_mouseX, 10);
-        }
-
-        if (g_mouseY != g_mouseInfo.y) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE, (uint32_t)(int16_t)g_mouseY, 10);
-        }
-
-        if (!g_mouseInfo.button1 && g_mouseButton1IsPressed) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN, 1, 50);
-        }
-
-        if (g_mouseInfo.button1 && !g_mouseButton1IsPressed) {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP, 1, 50);
-        }
-
-        g_mouseInfo.x = g_mouseX;
-        g_mouseInfo.y = g_mouseY;
-        g_mouseInfo.button1 = g_mouseButton1IsPressed;
-        g_mouseInfo.button2 = 0;
-        g_mouseInfo.button3 = 0;
+        mouse::onMouseEvent(g_mouseButton1IsPressed, g_mouseX, g_mouseY);
 
         isPressed = false;
         x = 0;
         y = 0;
     } else {
-        if (g_mouseButton1IsPressed) {
-            isPressed = true;
-        } else {
-            isPressed = false;
-        }
-
+        isPressed = g_mouseButton1IsPressed;
         x = g_mouseX;
         y = g_mouseY;
     }

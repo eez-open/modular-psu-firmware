@@ -93,6 +93,7 @@ bool isDirty();
 void drawPixel(int x, int y);
 void drawPixel(int x, int y, uint8_t opacity);
 void drawRect(int x1, int y1, int x2, int y2);
+void drawFocusFrame(int x, int y, int w, int h);
 void fillRect(int x1, int y1, int x2, int y2, int radius = 0);
 void fillRect(void *dst, int x1, int y1, int x2, int y2);
 void drawHLine(int x, int y, int l);
