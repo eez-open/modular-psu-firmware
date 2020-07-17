@@ -70,7 +70,7 @@ void onPageChanged() {
 }
 
 void onKeyDown(uint16_t param) {
-    if (getActivePageId() != PAGE_ID_SYS_SETTINGS_SERIAL) {
+    if (getActivePageId() != PAGE_ID_SYS_SETTINGS_USB) {
         uint8_t key = param & 0xFF;
         uint8_t mod = param >> 8;
 
@@ -175,6 +175,20 @@ void onKeyboardEvent(SDL_KeyboardEvent *key) {
     uint8_t scancode = key->keysym.scancode;
 
     sendMessageToGuiThread(GUI_QUEUE_MESSAGE_KEY_DOWN, (mod << 8) | scancode);
+
+    g_keyboardInfo.state = 0;
+
+    g_keyboardInfo.lctrl = key->keysym.mod & KMOD_LCTRL;
+    g_keyboardInfo.lshift = key->keysym.mod & KMOD_LSHIFT;
+    g_keyboardInfo.lalt = key->keysym.mod & KMOD_LALT;
+    g_keyboardInfo.lgui = 0;
+
+    g_keyboardInfo.rctrl = key->keysym.mod & KMOD_RCTRL;
+    g_keyboardInfo.rshift = key->keysym.mod & KMOD_RSHIFT;
+    g_keyboardInfo.ralt = key->keysym.mod & KMOD_RALT;
+    g_keyboardInfo.rgui = 0;
+
+    g_keyboardInfo.keys[0] = scancode;
 }
 #endif
 
@@ -271,18 +285,18 @@ namespace gui {
 void data_usb_keyboard_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         static char g_keyboardInfoStr[2][256] = { 0 };
-        static KeyboardInfo g_keyboardInfo;
-        static MouseInfo g_mouseInfo;
+        static KeyboardInfo g_latestKeyboardInfo;
+        static MouseInfo g_latestMouseInfo;
         static int g_keyboardInfoStrIndex = 0;
 
         char *str = &g_keyboardInfoStr[g_keyboardInfoStrIndex][0];
 
         if (
-        	memcmp(&g_keyboardInfo, &g_keyboardInfo, sizeof(KeyboardInfo)) != 0 ||
-			memcmp(&g_mouseInfo, &g_mouseInfo, sizeof(MouseInfo)) != 0
+        	memcmp(&g_latestKeyboardInfo, &g_keyboardInfo, sizeof(KeyboardInfo)) != 0 ||
+			memcmp(&g_latestMouseInfo, &g_mouseInfo, sizeof(MouseInfo)) != 0
 		) {
-            memcpy(&g_keyboardInfo, &g_keyboardInfo, sizeof(KeyboardInfo));
-            memcpy(&g_mouseInfo, &g_mouseInfo, sizeof(MouseInfo));
+            memcpy(&g_latestKeyboardInfo, &g_keyboardInfo, sizeof(KeyboardInfo));
+            memcpy(&g_latestMouseInfo, &g_mouseInfo, sizeof(MouseInfo));
 
             g_keyboardInfoStrIndex = (g_keyboardInfoStrIndex + 1) % 2;
             str = &g_keyboardInfoStr[g_keyboardInfoStrIndex][0];

@@ -339,7 +339,7 @@ bool isSysSettingsSubPage(int pageId) {
         pageId == PAGE_ID_SYS_SETTINGS_IO ||
         pageId == PAGE_ID_SYS_SETTINGS_DATE_TIME ||
         pageId == PAGE_ID_SYS_SETTINGS_ENCODER ||
-        pageId == PAGE_ID_SYS_SETTINGS_SERIAL ||
+        pageId == PAGE_ID_SYS_SETTINGS_USB ||
         pageId == PAGE_ID_SYS_SETTINGS_ETHERNET ||
         pageId == PAGE_ID_SYS_SETTINGS_TRIGGER ||
         pageId == PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY ||

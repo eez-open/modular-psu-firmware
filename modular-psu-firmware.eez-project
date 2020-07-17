@@ -20461,7 +20461,7 @@
         "height": 272
       },
       {
-        "name": "sys_settings_serial",
+        "name": "sys_settings_usb",
         "description": "Serial (via USB) settings",
         "style": "default",
         "widgets": [

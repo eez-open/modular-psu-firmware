@@ -1386,11 +1386,6 @@ void ChSettingsCalibrationEditPage::onStartPasswordOk() {
 
     calibration::start(*g_channel);
 
-    uint32_t timeout = millis() + 100;
-    while (!calibration::isEnabled() && int32_t(timeout - millis()) > 0) {
-        osDelay(5);
-    }
-
     pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
 }
 
@@ -1467,12 +1462,12 @@ void ChSettingsCalibrationEditPage::setCalibrationValueType(calibration::Calibra
         }
 
         if (m_calibrationValueType == calibration::CALIBRATION_VALUE_U) {
-            calibration::getCalibrationChannel().setCurrent(g_channel->params.U_CAL_I_SET);
+            channel_dispatcher::setCurrent(calibration::getCalibrationChannel(), g_channel->params.U_CAL_I_SET);
         } else {
             if (m_calibrationValueType == calibration::CALIBRATION_VALUE_I_HI_RANGE) {
-                calibration::getCalibrationChannel().setVoltage(g_channel->params.I_CAL_U_SET);
+            	channel_dispatcher::setVoltage(calibration::getCalibrationChannel(), g_channel->params.I_CAL_U_SET);
             } else {
-                calibration::getCalibrationChannel().setVoltage(g_channel->params.I_LOW_RANGE_CAL_U_SET);
+            	channel_dispatcher::setVoltage(calibration::getCalibrationChannel(), g_channel->params.I_LOW_RANGE_CAL_U_SET);
             }
         }
     }

@@ -51,7 +51,7 @@ public:
 
     void refresh(const WidgetCursor& widgetCursor);
     void updatePage(const WidgetCursor& widgetCursor);
-    WidgetCursor findWidget(int x, int y);
+    WidgetCursor findWidget(int x, int y, bool clicked);
     bool canClickPassThrough();
 
     bool hasAction() {
@@ -109,7 +109,7 @@ public:
 
     void refresh(const WidgetCursor& widgetCursor);
     void updatePage(const WidgetCursor& widgetCursor);
-    WidgetCursor findWidget(int x, int y);
+    WidgetCursor findWidget(int x, int y, bool clicked);
 
     void selectEnumItem();
 
@@ -167,7 +167,7 @@ public:
 
     void refresh(const WidgetCursor& widgetCursor);
     void updatePage(const WidgetCursor& widgetCursor);
-    WidgetCursor findWidget(int x, int y);
+    WidgetCursor findWidget(int x, int y, bool clicked);
 
     static void executeAction();
 

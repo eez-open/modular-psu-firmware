@@ -285,6 +285,11 @@ void copyValuesFromChannel() {
 }
 
 void selectCurrentRange(int8_t range) {
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_CALIBRATION_SELECT_CURRENT_RANGE, range);
+        return;
+    }
+
     g_currentRangeSelected = range;
     g_channel->setCurrentRange(range);
     g_channel->setCurrentRangeSelectionMode(range == CURRENT_RANGE_LOW ? CURRENT_RANGE_SELECTION_ALWAYS_LOW : CURRENT_RANGE_SELECTION_ALWAYS_HIGH);

@@ -246,7 +246,7 @@ void action_show_sys_settings_display() {
 }
 
 void action_show_sys_settings_serial() {
-    pushPage(PAGE_ID_SYS_SETTINGS_SERIAL);
+    pushPage(PAGE_ID_SYS_SETTINGS_USB);
 }
 
 void action_show_sys_settings_ethernet() {

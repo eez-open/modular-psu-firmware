@@ -282,7 +282,7 @@ void ToastMessagePage::updatePage(const WidgetCursor& widgetCursor) {
     }
 }
 
-WidgetCursor ToastMessagePage::findWidget(int x, int y) {
+WidgetCursor ToastMessagePage::findWidget(int x, int y, bool clicked) {
     if (x >= this->x && x < this->x + width && y >= this->y && y < this->y + height) {
         const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
         font::Font font = styleGetFont(style);
@@ -509,15 +509,18 @@ void SelectFromEnumPage::updatePage(const WidgetCursor& widgetCursor) {
     }
 }
 
-WidgetCursor SelectFromEnumPage::findWidget(int x, int y) {
+WidgetCursor SelectFromEnumPage::findWidget(int x, int y, bool clicked) {
     for (int i = 0; i < numItems; ++i) {
         int xItem, yItem;
         getItemPosition(i, xItem, yItem);
         if (!isDisabled(i)) {
         	if (x >= xItem && x < xItem + itemWidth && y >= yItem && y < yItem + itemHeight) {
-                activeItemIndex = i;
-                currentValue = getValue(i);
-                dirty = true;
+                
+                if (clicked) {
+                    activeItemIndex = i;
+                    currentValue = getValue(i);
+                    dirty = true;
+                }
 
         		widget.action = ACTION_ID_INTERNAL_SELECT_ENUM_ITEM;
         		widget.data = (uint16_t)i;
@@ -689,7 +692,7 @@ void MenuWithButtonsPage::updatePage(const WidgetCursor &widgetCursor) {
     refresh(widgetCursor);
 }
 
-WidgetCursor MenuWithButtonsPage::findWidget(int x, int y) {
+WidgetCursor MenuWithButtonsPage::findWidget(int x, int y, bool clicked) {
     WidgetCursor widgetCursor;
 
     widgetCursor.appContext = m_appContext;

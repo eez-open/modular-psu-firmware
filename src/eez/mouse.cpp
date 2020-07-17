@@ -68,25 +68,40 @@ void getEvent(bool &mouseCursorVisible, EventType &mouseEventType, int &mouseX, 
     }
 
     mouseEventType = EVENT_TYPE_TOUCH_NONE;
-    if (!g_mouseWasDown && g_mouseDown) {
-        mouseEventType = EVENT_TYPE_TOUCH_DOWN;
-    } else if (g_mouseWasDown && !g_mouseDown) {
-        mouseEventType = EVENT_TYPE_TOUCH_UP;
+
+    if (g_mouseCursorVisible) {
+		if (!g_mouseWasDown && g_mouseDown) {
+			mouseEventType = EVENT_TYPE_TOUCH_DOWN;
+		} else if (g_mouseWasDown && !g_mouseDown) {
+			mouseEventType = EVENT_TYPE_TOUCH_UP;
+		} else {
+			if (g_mouseDown && (g_mouseWasCursorX != g_mouseCursorX || g_mouseWasCursorY != g_mouseCursorY)) {
+				mouseEventType = EVENT_TYPE_TOUCH_MOVE;
+			}
+		}
+
+		g_mouseWasDown = g_mouseDown;
+		g_mouseWasCursorX = g_mouseCursorX;
+		g_mouseWasCursorY = g_mouseCursorY;
+
+		m_foundWidgetAtMouse = findWidget(&getRootAppContext(), g_mouseCursorX, g_mouseCursorY, false);
+		m_onTouchFunctionAtMouse = getWidgetTouchFunction(m_foundWidgetAtMouse);
+
+	    mouseCursorVisible = true;
+	    mouseX = g_mouseCursorX;
+	    mouseY = g_mouseCursorY;
     } else {
-        if (g_mouseDown && (g_mouseWasCursorX != g_mouseCursorX || g_mouseWasCursorY != g_mouseCursorY)) {
-            mouseEventType = EVENT_TYPE_TOUCH_MOVE;
-        }
+		g_mouseWasDown = false;
+		g_mouseWasCursorX = 0;
+		g_mouseWasCursorY = 0;
+
+		m_foundWidgetAtMouse = 0;
+		m_onTouchFunctionAtMouse = 0;
+
+	    mouseCursorVisible = false;
+	    mouseX = 0;
+	    mouseY = 0;
     }
-    g_mouseWasDown = g_mouseDown;
-    g_mouseWasCursorX = g_mouseCursorX;
-    g_mouseWasCursorY = g_mouseCursorY;
-
-    m_foundWidgetAtMouse = findWidget(&getRootAppContext(), g_mouseCursorX, g_mouseCursorY, false);
-    m_onTouchFunctionAtMouse = getWidgetTouchFunction(m_foundWidgetAtMouse);
-
-    mouseCursorVisible = g_mouseCursorVisible;
-    mouseX = g_mouseCursorX;
-    mouseY = g_mouseCursorY;
 }
 
 bool isDisplayDirty() {

@@ -60,7 +60,7 @@ class InternalPage : public Page {
 public:
     virtual void refresh(const WidgetCursor& widgetCursor) = 0; // repaint page
     virtual void updatePage(const WidgetCursor& widgetCursor) = 0;
-	  virtual WidgetCursor findWidget(int x, int y) = 0;
+	virtual WidgetCursor findWidget(int x, int y, bool clicked) = 0;
     virtual bool canClickPassThrough();
 
     int x;

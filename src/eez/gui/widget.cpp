@@ -176,7 +176,7 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 
         auto internalPage = ((InternalPage *)appContext->getActivePage());
 
-		const WidgetCursor &foundWidget = internalPage->findWidget(g_findWidgetAtX, g_findWidgetAtY);
+		const WidgetCursor &foundWidget = internalPage->findWidget(g_findWidgetAtX, g_findWidgetAtY, g_clicked);
 		if (foundWidget) {
             g_foundWidget = foundWidget;
             return;
@@ -279,7 +279,7 @@ WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y, bool click
     if (appContext->isActivePageInternal()) {
         auto internalPage = ((InternalPage *)appContext->getActivePage());
 
-        WidgetCursor widgetCursor = internalPage->findWidget(x, y);
+        WidgetCursor widgetCursor = internalPage->findWidget(x, y, clicked);
 
         if (!widgetCursor) {
         	bool passThrough = internalPage->canClickPassThrough();

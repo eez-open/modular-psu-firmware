@@ -269,6 +269,8 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         channel_dispatcher::setCurrentInPsuThread((int)param);
     } else if (type == PSU_MESSAGE_CALIBRATION_START) {
         calibration::start(Channel::get((int)param));
+    } else if (type == PSU_MESSAGE_CALIBRATION_SELECT_CURRENT_RANGE) {
+        calibration::selectCurrentRange((int8_t)param);
     } else if (type == PSU_MESSAGE_CALIBRATION_STOP) {
         calibration::stop();
     } else if (type == PSU_MESSAGE_FLASH_SLAVE_START) {
