@@ -1386,9 +1386,17 @@ void action_channel_toggle_ramp_state() {
     }
 }
 
+void doSetDeviceMode() {
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_MODE, USB_MODE_DEVICE);
+}
+
 void onSetUsbMode(uint16_t value) {
 	popPage();
-    sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_MODE, value);
+    if (value == USB_MODE_DEVICE && usb::isOtgHostModeDetected()) {
+        areYouSureWithMessage("OTG cable detected.", doSetDeviceMode);
+    } else {
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_MODE, value);
+    }
 }
 
 void action_select_usb_mode() {

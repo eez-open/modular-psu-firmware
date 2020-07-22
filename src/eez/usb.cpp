@@ -273,6 +273,10 @@ bool isMassStorageActive() {
     return (g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) && g_usbDeviceClass == USB_DEVICE_CLASS_MASS_STORAGE_CLIENT;
 }
 
+bool isOtgHostModeDetected() {
+    return !HAL_GPIO_ReadPin(USB_OTG_FS_ID_GPIO_Port, USB_OTG_FS_ID_Pin);
+}
+
 } // usb
 } // eez
 

@@ -35,6 +35,8 @@ void selectUsbDeviceClass(int usbDeviceClass);
 bool isVirtualComPortActive();
 bool isMassStorageActive();
 
+bool isOtgHostModeDetected();
+
 } // usb
 } // eez
 
