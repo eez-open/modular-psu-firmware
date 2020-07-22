@@ -70391,6 +70391,62 @@
             }
           },
           {
+            "name": "SYSTem:COMMunicate:USB:MODE",
+            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_ntp",
+            "parameters": [
+              {
+                "name": "mode",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "UsbMode"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": "numeric"
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:USB:MODE?",
+            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_ntp",
+            "parameters": [],
+            "response": {
+              "type": "discrete",
+              "enumeration": "UsbMode"
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:USB:CLAss",
+            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_ntp",
+            "parameters": [
+              {
+                "name": "class",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "UsbClass"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": "numeric"
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:USB:CLAss?",
+            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_ntp",
+            "parameters": [],
+            "response": {
+              "type": "discrete",
+              "enumeration": "UsbClass"
+            }
+          },
+          {
             "name": "SYSTem:CPU:INFOrmation:ONTime:LAST?",
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_ont_last",
             "parameters": [],
@@ -72727,7 +72783,7 @@
         "name": "Interface",
         "members": [
           {
-            "name": "SERial",
+            "name": "USB",
             "value": "1"
           },
           {
@@ -72867,6 +72923,40 @@
           {
             "name": "CH6",
             "value": ""
+          }
+        ]
+      },
+      {
+        "name": "UsbMode",
+        "members": [
+          {
+            "name": "DEVice",
+            "value": "1"
+          },
+          {
+            "name": "HOST",
+            "value": "2"
+          },
+          {
+            "name": "OTG",
+            "value": "3"
+          }
+        ]
+      },
+      {
+        "name": "UsbClass",
+        "members": [
+          {
+            "name": "VCOM",
+            "value": "1"
+          },
+          {
+            "name": "MSTOrage",
+            "value": "2"
+          },
+          {
+            "name": "HID",
+            "value": "3"
           }
         ]
       }

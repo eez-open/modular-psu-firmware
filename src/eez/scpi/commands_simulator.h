@@ -295,6 +295,10 @@
     SCPI_COMMAND("SYSTem:COMMunicate:RLSTate?", scpi_cmd_systemCommunicateRlstateQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:MQTT:SETTings", scpi_cmd_systemCommunicateMqttSettings) \
     SCPI_COMMAND("SYSTem:COMMunicate:MQTT:STATe?", scpi_cmd_systemCommunicateMqttStateQ) \
+    SCPI_COMMAND("SYSTem:COMMunicate:USB:MODE", scpi_cmd_systemCommunicateUsbMode) \
+    SCPI_COMMAND("SYSTem:COMMunicate:USB:MODE?", scpi_cmd_systemCommunicateUsbModeQ) \
+    SCPI_COMMAND("SYSTem:COMMunicate:USB:CLAss", scpi_cmd_systemCommunicateUsbClass) \
+    SCPI_COMMAND("SYSTem:COMMunicate:USB:CLAss?", scpi_cmd_systemCommunicateUsbClassQ) \
     SCPI_COMMAND("SYSTem:CPU:INFOrmation:ONTime:LAST?", scpi_cmd_systemCpuInformationOntimeLastQ) \
     SCPI_COMMAND("SYSTem:CPU:INFOrmation:ONTime:TOTal?", scpi_cmd_systemCpuInformationOntimeTotalQ) \
     SCPI_COMMAND("SYSTem:CPU:MODel?", scpi_cmd_systemCpuModelQ) \

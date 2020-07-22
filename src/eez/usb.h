@@ -45,5 +45,6 @@ bool isMassStorageActive();
 
 #define USB_DEVICE_CLASS_VIRTUAL_COM_PORT 0
 #define USB_DEVICE_CLASS_MASS_STORAGE_CLIENT 1
+#define USB_HOST_CLASS_HID 2
 
 extern "C" int g_usbDeviceClass;

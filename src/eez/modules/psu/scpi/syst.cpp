@@ -810,6 +810,58 @@ scpi_result_t scpi_cmd_systemCommunicateRlstateQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+static scpi_choice_def_t usbModeChoice[] = {
+    { "DEVice", USB_MODE_DEVICE }, 
+    { "HOST", USB_MODE_HOST }, 
+    { "OTG", USB_MODE_OTG }, 
+    SCPI_CHOICE_LIST_END
+};
+
+scpi_result_t scpi_cmd_systemCommunicateUsbMode(scpi_t *context) {
+    int32_t usbMode;
+    if (!SCPI_ParamChoice(context, usbModeChoice, &usbMode, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    usb::selectUsbMode(usbMode, usb::g_otgMode);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCommunicateUsbModeQ(scpi_t *context) {
+    resultChoiceName(context, usbModeChoice, usb::g_usbMode);
+    return SCPI_RES_OK;
+}
+
+static scpi_choice_def_t usbClassChoice[] = {
+    { "VCOM", USB_DEVICE_CLASS_VIRTUAL_COM_PORT }, 
+    { "MSTOrage", USB_DEVICE_CLASS_MASS_STORAGE_CLIENT }, 
+    { "HID", USB_HOST_CLASS_HID }, 
+    SCPI_CHOICE_LIST_END
+};
+
+scpi_result_t scpi_cmd_systemCommunicateUsbClass(scpi_t *context) {
+    int32_t usbClass;
+    if (!SCPI_ParamChoice(context, usbClassChoice, &usbClass, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (usbClass < USB_HOST_CLASS_HID) {
+        usb::selectUsbDeviceClass(usbClass);
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCommunicateUsbClassQ(scpi_t *context) {
+    resultChoiceName(context, usbClassChoice, 
+        usb::isVirtualComPortActive() ? USB_DEVICE_CLASS_VIRTUAL_COM_PORT : 
+        usb::isMassStorageActive() ? USB_DEVICE_CLASS_MASS_STORAGE_CLIENT :
+        USB_HOST_CLASS_HID);
+        
+    return SCPI_RES_OK;
+}
+
 scpi_result_t scpi_cmd_systemLocal(scpi_t *context) {
     g_rlState = RL_STATE_LOCAL;
 
@@ -840,9 +892,8 @@ scpi_result_t scpi_cmd_systemRwlock(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-// NONE|ODD|EVEN
 static scpi_choice_def_t commInterfaceChoice[] = {
-    { "SERial", 1 }, 
+    { "USB", 1 }, 
     { "ETHernet", 2 }, 
     { "NTP", 3 }, 
     { "MQTT", 4 }, 
@@ -861,7 +912,15 @@ scpi_result_t scpi_cmd_systemCommunicateEnable(scpi_t *context) {
     }
 
     if (commInterface == 1) {
-        persist_conf::setUsbMode(enable ? USB_MODE_DEVICE : USB_MODE_DISABLED);
+        if (enable) {
+            if (usb::g_usbMode == USB_MODE_DISABLED) {
+                usb::selectUsbMode(USB_MODE_DEVICE, usb::g_otgMode);
+            }
+        } else {
+            if (usb::g_usbMode != USB_MODE_DISABLED) {
+                usb::selectUsbMode(USB_MODE_DISABLED, usb::g_otgMode);
+            }
+        }
     } else if (commInterface == 2) {
 #if OPTION_ETHERNET
         persist_conf::enableEthernet(enable);
@@ -885,7 +944,7 @@ scpi_result_t scpi_cmd_systemCommunicateEnableQ(scpi_t *context) {
     }
 
     if (commInterface == 1) {
-        SCPI_ResultBool(context, persist_conf::getUsbMode() != USB_MODE_DISABLED);
+        SCPI_ResultBool(context, usb::g_usbMode != USB_MODE_DISABLED);
     } else if (commInterface == 2) {
 #if OPTION_ETHERNET
         SCPI_ResultBool(context, persist_conf::isEthernetEnabled());
