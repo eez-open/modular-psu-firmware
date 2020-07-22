@@ -68,6 +68,9 @@ public:
 
 private:
     float doRead();
+
+	uint32_t m_timeOfFirstInvalidValue;
+	void testTemperatureValidity(float value);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
