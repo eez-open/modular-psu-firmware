@@ -1420,15 +1420,9 @@ void data_channels_is_max_view(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
-bool is2ColMode() {
-    return g_slots[0]->moduleInfo->moduleType != MODULE_TYPE_NONE &&
-        g_slots[1]->moduleInfo->moduleType != MODULE_TYPE_NONE &&
-        g_slots[2]->moduleInfo->moduleType == MODULE_TYPE_NONE;
-}
-
 void data_channels_is_2col_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = is2ColMode();
+        value = g_isCol2Mode;
     }
 }
 
@@ -1531,15 +1525,15 @@ void data_slot_channel_index(int slotIndex, DataOperationEnum operation, Cursor 
 }
 
 void data_slot1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_channel_index(0, operation, cursor, value);
+    data_slot_channel_index(g_slotIndexes[0], operation, cursor, value);
 }
 
 void data_slot2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_channel_index(1, operation, cursor, value);
+    data_slot_channel_index(g_slotIndexes[1], operation, cursor, value);
 }
 
 void data_slot3_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_channel_index(2, operation, cursor, value);
+    data_slot_channel_index(g_slotIndexes[2], operation, cursor, value);
 }
 
 void data_slot_max_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -1571,20 +1565,20 @@ void data_slot_min2_channel_index(DataOperationEnum operation, Cursor cursor, Va
 
 void data_slot_default_view(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getSlotView(is2ColMode() ? SLOT_VIEW_TYPE_DEFAULT_2COL : SLOT_VIEW_TYPE_DEFAULT, slotIndex, cursor);
+        value = getSlotView(g_isCol2Mode ? SLOT_VIEW_TYPE_DEFAULT_2COL : SLOT_VIEW_TYPE_DEFAULT, slotIndex, cursor);
     }
 }
 
 void data_slot1_default_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_default_view(0, operation, cursor, value);
+    data_slot_default_view(g_slotIndexes[0], operation, cursor, value);
 }
 
 void data_slot2_default_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_default_view(1, operation, cursor, value);
+    data_slot_default_view(g_slotIndexes[1], operation, cursor, value);
 }
 
 void data_slot3_default_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_default_view(2, operation, cursor, value);
+    data_slot_default_view(g_slotIndexes[2], operation, cursor, value);
 }
 
 void data_slot_max_view(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -1635,7 +1629,7 @@ void data_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &v
     if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
         int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
-        if (is2ColMode()) {
+        if (g_isCol2Mode) {
             value = channel.isOutputEnabled() ? 
                 (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_ON_2COL : PAGE_ID_SLOT_DEF_2CH_HORZ_ON_2COL) :
                 (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_OFF_2COL : PAGE_ID_SLOT_DEF_2CH_HORZ_OFF_2COL);

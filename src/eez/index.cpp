@@ -34,6 +34,9 @@
 
 namespace eez {
 
+bool g_isCol2Mode = false;
+int g_slotIndexes[3] = { 0, 1, 2 };
+
 ModuleInfo::ModuleInfo(uint16_t moduleType_, uint16_t moduleCategory_, const char *moduleName_, const char *moduleBrand_, uint16_t latestModuleRevision_, FlashMethod flashMethod_, uint32_t flashDuration_, uint32_t spiBaudRatePrescaler_, bool spiCrcCalculationEnable_)
     : moduleType(moduleType_)
     , moduleCategory(moduleCategory_)

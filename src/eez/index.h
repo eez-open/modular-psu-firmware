@@ -101,4 +101,7 @@ ModuleInfo *getModuleInfo(uint16_t moduleType);
 
 void getModuleSerialInfo(uint8_t slotIndex, char *text);
 
+extern bool g_isCol2Mode;
+extern int g_slotIndexes[NUM_SLOTS];
+
 } // namespace eez

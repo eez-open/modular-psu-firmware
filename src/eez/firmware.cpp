@@ -124,6 +124,7 @@ void boot() {
 
     psu::ontime::g_mcuCounter.init();
 
+    int numInstalledModules = 0;
     for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         static const uint16_t ADDRESS = 0;
         uint16_t value[3];
@@ -142,6 +143,42 @@ void boot() {
         if (moduleType != MODULE_TYPE_NONE) {
             psu::persist_conf::loadModuleConf(slotIndex);
             psu::ontime::g_moduleCounters[slotIndex].init();
+
+            numInstalledModules++;
+        }
+    }
+
+    if (numInstalledModules == 1) {
+        g_isCol2Mode = true;
+
+        if (g_slots[0]->moduleInfo->moduleType == MODULE_TYPE_NONE) {
+            int i;
+            for (i = 1; i < NUM_SLOTS; i++) {
+                if (g_slots[i]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+                    g_slotIndexes[0] = i - 1;
+                    g_slotIndexes[1] = i;
+                    break;
+                }
+            }
+
+            int k = 0;
+            for (int j = 0; j < i - 1; j++) {
+                g_slotIndexes[k++] = j;
+            }
+            for (int j = i + 1; j < NUM_SLOTS; j++) {
+                g_slotIndexes[k++] = j;
+            }
+        }
+    } else if (numInstalledModules == 2)  {
+        g_isCol2Mode = true;
+
+        int j = 0;
+        for (int i = 0; i < NUM_SLOTS; i++) {
+            if (g_slots[i]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+                g_slotIndexes[j++] = i;
+            } else {
+                g_slotIndexes[2] = i;
+            }
         }
     }
 
