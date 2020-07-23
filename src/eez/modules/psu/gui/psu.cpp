@@ -107,6 +107,8 @@ static struct {
 
 SelectFromEnumPage g_selectFromEnumPage;
 
+int g_displayTestColorIndex = 0;
+
 bool showSetupWizardQuestion();
 void onEncoder(int counter, bool clicked);
 
@@ -1479,6 +1481,10 @@ void infoMessage(Value value) {
     pushToastMessage(ToastMessagePage::create(INFO_TOAST, value));
 }
 
+void infoMessage(const char *message, void (*action)(), const char *actionLabel) {
+    pushToastMessage(ToastMessagePage::create(INFO_TOAST, message, action, actionLabel));
+}
+
 void errorMessage(const char *message, bool autoDismiss) {
     pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message, autoDismiss));
     sound::playBeep();
@@ -1711,6 +1717,7 @@ void onEncoder(int counter, bool clicked) {
         moveToNextFocusCursor();
     }
 
+    int activePageId = getActivePageId();
     Page *activePage = getActivePage();
 
     if (counter != 0) {
@@ -1719,7 +1726,7 @@ void onEncoder(int counter, bool clicked) {
         }
 
         if (isEncoderEnabledInActivePage()) {
-            if (g_focusCursor >= 0 && g_focusCursor < CH_NUM) {
+            if (g_focusCursor >= 0 && g_focusCursor < CH_NUM || activePageId != PAGE_ID_MAIN) {
                 Value value;
                 if (persist_conf::devConf.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
                     value = g_focusEditValue;
@@ -1771,8 +1778,6 @@ void onEncoder(int counter, bool clicked) {
             }
         }
 
-        int activePageId = getActivePageId();
-
         if (activePageId == PAGE_ID_EDIT_MODE_KEYPAD || activePageId == PAGE_ID_NUMERIC_KEYPAD) {
             ((NumericKeypad *)getActiveKeypad())->onEncoder(counter);
         }
@@ -1785,13 +1790,20 @@ void onEncoder(int counter, bool clicked) {
             edit_mode_step::onEncoder(counter);
         } else if (activePageId == PAGE_ID_FILE_MANAGER || activePageId == PAGE_ID_FILE_BROWSER) {
             file_manager::onEncoder(counter);
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS_DISPLAY_TEST) {
+            if (counter < 0) {
+                counter = -counter;
+            }
+            g_displayTestColorIndex = (g_displayTestColorIndex + counter) % 4;
         } else if (activePage) {
             activePage->onEncoder(counter);
         }
     }
 
     if (clicked) {
-        if (isEncoderEnabledInActivePage()) {
+        if (activePageId == PAGE_ID_SYS_SETTINGS_DISPLAY_TEST) {
+            popPage();
+        } else if (isEncoderEnabledInActivePage()) {
             if (isFocusChanged()) {
                 // confirmation
                 Value result = set(g_focusCursor, g_focusDataId, g_focusEditValue);

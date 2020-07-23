@@ -1082,6 +1082,11 @@ void action_user_switch_clicked() {
 		return;
 	}
 
+    if (getActivePageId() == PAGE_ID_SYS_SETTINGS_DISPLAY_TEST) {
+        popPage();
+        return;
+    }
+
     if (isFrontPanelLocked()) {
         errorMessage("Front panel is locked!");
         return;
@@ -1414,6 +1419,15 @@ void onSetUsbDeviceClass(uint16_t value) {
 
 void action_select_usb_device_class() {
     pushSelectFromEnumPage(ENUM_DEFINITION_USB_DEVICE_CLASS, g_usbDeviceClass, isUsbDeviceClassDisabled, onSetUsbDeviceClass);
+}
+
+void action_show_display_test_page() {
+    pushPage(PAGE_ID_SYS_SETTINGS_DISPLAY_TEST);
+    infoMessage("Switch colors by screen tap or encoder.\nTo exit push encoder or user switch.", nullptr, "Close");
+}
+
+void action_toggle_display_test_color_index() {
+    psu::gui::g_displayTestColorIndex = (psu::gui::g_displayTestColorIndex + 1) % 4;
 }
 
 } // namespace gui

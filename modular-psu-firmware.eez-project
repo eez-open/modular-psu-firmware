@@ -2329,6 +2329,12 @@
       "name": "channels_is_2col_view",
       "type": "boolean",
       "defaultValue": "0"
+    },
+    {
+      "name": "display_test_color_index",
+      "type": "enum",
+      "enumItems": "[\n    \"white\",\n    \"red\",\n    \"green\",\n    \"blue\"\n]",
+      "defaultValue": "0"
     }
   ],
   "actions": [
@@ -3014,6 +3020,12 @@
     },
     {
       "name": "select_usb_device_class"
+    },
+    {
+      "name": "toggle_display_test_color_index"
+    },
+    {
+      "name": "show_display_test_page"
     }
   ],
   "gui": {
@@ -22633,9 +22645,21 @@
                 "action": "turn_display_off",
                 "left": 12,
                 "top": 128,
-                "width": 200,
+                "width": 122,
                 "height": 28,
-                "text": "Turn display off"
+                "text": "Turn disp. off"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center"
+                },
+                "action": "show_display_test_page",
+                "left": 140,
+                "top": 128,
+                "width": 71,
+                "height": 28,
+                "text": "Test"
               },
               {
                 "type": "Text",
@@ -22874,6 +22898,77 @@
                 "width": 439,
                 "height": 32,
                 "text": "Display settings"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
+      },
+      {
+        "name": "sys_settings_display_test",
+        "widgets": [
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "display_test_color_index",
+            "action": "toggle_display_test_color_index",
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 272,
+            "widgets": [
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "#ffffff",
+                  "activeColor": "#ff0000"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 272
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "#ff0000",
+                  "activeColor": "#00ff00"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 272
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "#00ff00",
+                  "activeColor": "#0000ff"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 272
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "#0000ff",
+                  "activeColor": "#0000ff"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 272
               }
             ]
           }

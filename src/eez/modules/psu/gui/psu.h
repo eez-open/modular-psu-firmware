@@ -78,6 +78,7 @@ extern Value g_alertMessage3;
 
 void infoMessage(const char *message);
 void infoMessage(Value value);
+void infoMessage(const char *message, void (*action)(), const char *actionLabel);
 void errorMessage(const char *message, bool autoDismiss = false);
 void errorMessage(Value value);
 void errorMessageWithAction(Value value, void (*action)(int param), const char *actionLabel, int actionParam);
@@ -414,6 +415,8 @@ enum {
     GUI_QUEUE_MESSAGE_TYPE_SHOW_ASYNC_OPERATION_IN_PROGRESS,
     GUI_QUEUE_MESSAGE_TYPE_HIDE_ASYNC_OPERATION_IN_PROGRESS
 };
+
+extern int g_displayTestColorIndex;
 
 } // namespace gui
 } // namespace psu

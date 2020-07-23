@@ -6251,6 +6251,12 @@ void data_usb_device_class(DataOperationEnum operation, Cursor cursor, Value &va
     }
 }
 
+void data_display_test_color_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = psu::gui::g_displayTestColorIndex;
+    }
+}
+
 } // namespace gui
 } // namespace eez
 
