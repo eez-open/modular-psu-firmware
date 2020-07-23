@@ -274,7 +274,10 @@ bool isMassStorageActive() {
 }
 
 bool isOtgHostModeDetected() {
+#if defined(EEZ_PLATFORM_STM32)
     return !HAL_GPIO_ReadPin(USB_OTG_FS_ID_GPIO_Port, USB_OTG_FS_ID_Pin);
+#endif
+    return false;
 }
 
 } // usb

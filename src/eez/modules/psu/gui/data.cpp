@@ -1420,6 +1420,18 @@ void data_channels_is_max_view(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
+bool is2ColMode() {
+    return g_slots[0]->moduleInfo->moduleType != MODULE_TYPE_NONE &&
+        g_slots[1]->moduleInfo->moduleType != MODULE_TYPE_NONE &&
+        g_slots[2]->moduleInfo->moduleType == MODULE_TYPE_NONE;
+}
+
+void data_channels_is_2col_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = is2ColMode();
+    }
+}
+
 void data_channels_view_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = (int)persist_conf::devConf.channelsViewMode;
@@ -1446,6 +1458,11 @@ int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
             int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;        
             return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+            int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;        
+            return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR_2COL : PAGE_ID_SLOT_DEF_HORZ_ERROR_2COL;
         }
 
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
@@ -1554,7 +1571,7 @@ void data_slot_min2_channel_index(DataOperationEnum operation, Cursor cursor, Va
 
 void data_slot_default_view(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getSlotView(SLOT_VIEW_TYPE_DEFAULT, slotIndex, cursor);
+        value = getSlotView(is2ColMode() ? SLOT_VIEW_TYPE_DEFAULT_2COL : SLOT_VIEW_TYPE_DEFAULT, slotIndex, cursor);
     }
 }
 
@@ -1618,9 +1635,15 @@ void data_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &v
     if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
         int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
-        value = channel.isOutputEnabled() ? 
-            (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_ON : PAGE_ID_SLOT_DEF_2CH_HORZ_ON) :
-            (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_OFF : PAGE_ID_SLOT_DEF_2CH_HORZ_OFF);
+        if (is2ColMode()) {
+            value = channel.isOutputEnabled() ? 
+                (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_ON_2COL : PAGE_ID_SLOT_DEF_2CH_HORZ_ON_2COL) :
+                (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_OFF_2COL : PAGE_ID_SLOT_DEF_2CH_HORZ_OFF_2COL);
+        } else {
+            value = channel.isOutputEnabled() ? 
+                (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_ON : PAGE_ID_SLOT_DEF_2CH_HORZ_ON) :
+                (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_OFF : PAGE_ID_SLOT_DEF_2CH_HORZ_OFF);
+        }
     }
 }
 

@@ -1954,6 +1954,41 @@ static int getDefaultView(int slotIndex, Cursor cursor) {
     }
 }
 
+static int getDefaultView2Col(int slotIndex, Cursor cursor) {
+    int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+    int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
+    if (numChannels == 1) {
+        Channel &channel = Channel::get(cursor);
+        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
+            if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+                return PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_SERIES_2COL;
+            } else {
+                return PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_SERIES_2COL;
+            }
+        } else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
+            if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+                return PAGE_ID_SLOT_DEF_1CH_VERT_COUPLED_PARALLEL_2COL;
+            } else {
+                return PAGE_ID_SLOT_DEF_1CH_HORZ_COUPLED_PARALLEL_2COL;
+            }
+        } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_NUM_ON_2COL : PAGE_ID_SLOT_DEF_1CH_VERT_OFF_2COL;
+        } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_VBAR_ON_2COL : PAGE_ID_SLOT_DEF_1CH_VERT_OFF_2COL;
+        } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_HBAR_ON_2COL : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF_2COL;
+        } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_YT) {
+            return channel.isOutputEnabled() ? PAGE_ID_SLOT_DEF_1CH_YT_ON_2COL : PAGE_ID_SLOT_DEF_1CH_HORZ_OFF_2COL;
+        } else {
+            return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR_2COL : PAGE_ID_SLOT_DEF_HORZ_ERROR_2COL;
+        }
+    } else if (numChannels == 2) {
+        return isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_2COL : PAGE_ID_SLOT_DEF_2CH_HORZ_2COL;
+    } else {
+        return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR_2COL : PAGE_ID_SLOT_DEF_HORZ_ERROR_2COL;
+    }
+}
+
 static int getMaxView(int slotIndex, Cursor cursor) {
     int numChannels = ((PsuModuleInfo *)g_slots[slotIndex]->moduleInfo)->numChannels;
     if (numChannels == 1) {
@@ -2014,6 +2049,10 @@ static int getMicroView(int slotIndex, Cursor cursor) {
 int PsuModuleInfo::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
     if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
         return getDefaultView(slotIndex, cursor);
+    }
+
+    if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+        return getDefaultView2Col(slotIndex, cursor);
     }
 
     if (slotViewType == SLOT_VIEW_TYPE_MAX) {

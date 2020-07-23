@@ -408,6 +408,337 @@
         "height": 240
       },
       {
+        "name": "slot_view_def_2col",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 240,
+            "height": 32,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "slot_title_def",
+                "left": 1,
+                "top": 0,
+                "width": 175,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_slot_settings",
+                "left": 176,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "D"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "toggle_slot_max_view",
+                "left": 208,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "e"
+              }
+            ]
+          },
+          {
+            "type": "List",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "inputs",
+            "left": 0,
+            "top": 33,
+            "width": 240,
+            "height": 20,
+            "itemWidget": {
+              "type": "Select",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "data": "input_state",
+              "left": 0,
+              "top": 0,
+              "width": 30,
+              "height": 20,
+              "widgets": [
+                {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 30,
+                  "height": 20,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default",
+                        "font": "RobotoCondensed-Regular"
+                      },
+                      "data": "input_no",
+                      "left": 0,
+                      "top": 0,
+                      "width": 30,
+                      "height": 20,
+                      "text": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 30,
+                  "height": 20,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_inverse",
+                        "font": "RobotoCondensed-Regular"
+                      },
+                      "data": "input_no",
+                      "left": 0,
+                      "top": 0,
+                      "width": 30,
+                      "height": 20,
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            "listType": "horizontal",
+            "gap": 0
+          },
+          {
+            "type": "Grid",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "outputs",
+            "left": 0,
+            "top": 54,
+            "width": 240,
+            "height": 64,
+            "itemWidget": {
+              "type": "Select",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "data": "output_state",
+              "action": "",
+              "left": 0,
+              "top": 0,
+              "width": 60,
+              "height": 32,
+              "widgets": [
+                {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 60,
+                  "height": 32,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default",
+                        "font": "Oswald17",
+                        "alignVertical": "center"
+                      },
+                      "data": "output_no",
+                      "action": "toggle_output_state",
+                      "left": 0,
+                      "top": 0,
+                      "width": 59,
+                      "height": 31,
+                      "text": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 60,
+                  "height": 32,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_inverse",
+                        "font": "Oswald17",
+                        "alignVertical": "center"
+                      },
+                      "data": "output_no",
+                      "action": "toggle_output_state",
+                      "left": 0,
+                      "top": 0,
+                      "width": 59,
+                      "height": 31,
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "type": "Grid",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "analog_inputs",
+            "left": 1,
+            "top": 119,
+            "width": 238,
+            "height": 48,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "left": 0,
+              "top": 0,
+              "width": 119,
+              "height": 24,
+              "widgets": [
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "default",
+                    "font": "Oswald14"
+                  },
+                  "data": "analog_input_value",
+                  "left": 0,
+                  "top": 0,
+                  "width": 119,
+                  "height": 24,
+                  "displayOption": 0
+                }
+              ]
+            }
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "edit",
+            "left": 3,
+            "top": 169,
+            "width": 118,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "edit",
+            "left": 122,
+            "top": 169,
+            "width": 118,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "edit",
+            "left": 3,
+            "top": 193,
+            "width": 118,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "edit",
+            "left": 122,
+            "top": 193,
+            "width": 118,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "edit",
+            "left": 3,
+            "top": 216,
+            "width": 118,
+            "height": 24,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "edit",
+            "left": 122,
+            "top": 216,
+            "width": 118,
+            "height": 24,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
+        "height": 240
+      },
+      {
         "name": "slot_view_max",
         "widgets": [
           {

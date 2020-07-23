@@ -2324,6 +2324,11 @@
       "name": "usb_keyboard_state",
       "type": "string",
       "defaultValue": "CTRL A"
+    },
+    {
+      "name": "channels_is_2col_view",
+      "type": "boolean",
+      "defaultValue": "0"
     }
   ],
   "actions": [
@@ -27092,49 +27097,113 @@
         "name": "slot_def_vert",
         "widgets": [
           {
-            "type": "LayoutView",
+            "type": "Select",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot1_default_view",
+            "data": "channels_is_2col_view",
             "left": 0,
             "top": 0,
-            "width": 160,
+            "width": 480,
             "height": 240,
-            "layout": "",
-            "context": "slot1_channel_index"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "slot2_default_view",
-            "left": 160,
-            "top": 0,
-            "width": 160,
-            "height": 240,
-            "layout": "",
-            "context": "slot2_channel_index"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "slot3_default_view",
-            "left": 320,
-            "top": 0,
-            "width": 160,
-            "height": 240,
-            "layout": "",
-            "context": "slot3_channel_index"
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 240,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot1_default_view",
+                    "left": 0,
+                    "top": 0,
+                    "width": 160,
+                    "height": 240,
+                    "layout": "",
+                    "context": "slot1_channel_index"
+                  },
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot2_default_view",
+                    "left": 160,
+                    "top": 0,
+                    "width": 160,
+                    "height": 240,
+                    "layout": "",
+                    "context": "slot2_channel_index"
+                  },
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot3_default_view",
+                    "left": 320,
+                    "top": 0,
+                    "width": 160,
+                    "height": 240,
+                    "layout": "",
+                    "context": "slot3_channel_index"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 240,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot1_default_view",
+                    "left": 0,
+                    "top": 0,
+                    "width": 240,
+                    "height": 240,
+                    "layout": "",
+                    "context": "slot1_channel_index"
+                  },
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot2_default_view",
+                    "left": 240,
+                    "top": 0,
+                    "width": 240,
+                    "height": 240,
+                    "layout": "",
+                    "context": "slot2_channel_index"
+                  }
+                ]
+              }
+            ]
           }
         ],
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 240
+        "height": 240,
+        "dataContextOverrides": ""
       },
       {
         "name": "slot_def_vert_title",
@@ -27271,6 +27340,143 @@
         "left": 0,
         "top": 0,
         "width": 160,
+        "height": 32
+      },
+      {
+        "name": "slot_def_vert_title_2col",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "padding": "0 5"
+            },
+            "data": "channel_title",
+            "left": 0,
+            "top": 0,
+            "width": 175,
+            "height": 32,
+            "text": ""
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "channel_protection_status",
+            "left": 175,
+            "top": 0,
+            "width": 32,
+            "height": 32,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_ch_settings",
+                "left": 0,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "9"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "show_ch_settings_prot_clear",
+                "left": 0,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "9"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "show_ch_settings_prot_clear",
+                "left": 0,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "9"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "show_ch_settings_prot_clear",
+                "left": 0,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "9"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "show_ch_settings_prot_clear",
+                "left": 0,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "9"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "show_ch_settings_prot_clear",
+                "left": 0,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "9"
+              }
+            ]
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "font": "Heydings14"
+            },
+            "action": "toggle_channels_max_view",
+            "left": 207,
+            "top": 0,
+            "width": 32,
+            "height": 32,
+            "text": "e"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
         "height": 32
       },
       {
@@ -27467,6 +27673,199 @@
         "height": 240
       },
       {
+        "name": "slot_def_1ch_num_on_2col",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 240,
+            "height": 32,
+            "layout": "slot_def_vert_title_2col"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "action": "channel_toggle_output",
+            "left": 0,
+            "top": 32,
+            "width": 240,
+            "height": 136,
+            "name": "mon section",
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 240,
+                "height": 67,
+                "name": "Voltage",
+                "widgets": [
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "mon_value_48_right"
+                    },
+                    "data": "channel_u_mon",
+                    "action": "",
+                    "left": 1,
+                    "top": 0,
+                    "width": 141,
+                    "height": 67,
+                    "displayOption": 1
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "mon_value_20_left",
+                      "padding": "0 4"
+                    },
+                    "data": "channel_u_mon",
+                    "action": "",
+                    "left": 142,
+                    "top": 0,
+                    "width": 98,
+                    "height": 34,
+                    "displayOption": 4
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "mon_value_20_left"
+                    },
+                    "data": "channel_u_mon",
+                    "action": "",
+                    "left": 142,
+                    "top": 34,
+                    "width": 98,
+                    "height": 33,
+                    "displayOption": 3
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 69,
+                "width": 240,
+                "height": 67,
+                "name": "Current",
+                "widgets": [
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "mon_value_48_right"
+                    },
+                    "data": "channel_i_mon",
+                    "action": "",
+                    "left": 17,
+                    "top": 0,
+                    "width": 125,
+                    "height": 67,
+                    "displayOption": 1
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "mon_value_20_left",
+                      "padding": "0 4"
+                    },
+                    "data": "channel_i_mon",
+                    "action": "",
+                    "left": 142,
+                    "top": 0,
+                    "width": 98,
+                    "height": 34,
+                    "displayOption": 4
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "mon_value_20_left"
+                    },
+                    "data": "channel_i_mon",
+                    "action": "",
+                    "left": 142,
+                    "top": 34,
+                    "width": 98,
+                    "height": 33,
+                    "displayOption": 3
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald14"
+            },
+            "data": "channel_p_mon",
+            "left": 1,
+            "top": 206,
+            "width": 118,
+            "height": 32,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 1,
+            "top": 172,
+            "width": 118,
+            "height": 32,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_i_edit",
+            "action": "edit",
+            "left": 121,
+            "top": 172,
+            "width": 118,
+            "height": 32,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_protection_opp_limit",
+            "action": "edit",
+            "left": 121,
+            "top": 206,
+            "width": 118,
+            "height": 32,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
+        "height": 240
+      },
+      {
         "name": "slot_def_1ch_vbar_on",
         "description": "",
         "widgets": [
@@ -27477,7 +27876,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 158,
+            "width": 159,
             "height": 32,
             "layout": "slot_def_vert_title"
           },
@@ -27599,6 +27998,141 @@
         "left": 0,
         "top": 0,
         "width": 160,
+        "height": 240
+      },
+      {
+        "name": "slot_def_1ch_vbar_on_2col",
+        "description": "",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 240,
+            "height": 32,
+            "layout": "slot_def_vert_title_2col"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "action": "channel_toggle_output",
+            "left": 1,
+            "top": 34,
+            "width": 238,
+            "height": 136,
+            "name": "mon section",
+            "widgets": [
+              {
+                "type": "BarGraph",
+                "style": {
+                  "inheritFrom": "bar_graph_U_default"
+                },
+                "data": "channel_display_value1",
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 118,
+                "height": 136,
+                "orientation": "bottom-top",
+                "textStyle": {
+                  "inheritFrom": "bar_graph_text"
+                },
+                "line1Data": "channel_display_value1_set",
+                "line1Style": {
+                  "inheritFrom": "bar_graph_set_line"
+                },
+                "line2Data": "channel_display_value1_limit",
+                "line2Style": {
+                  "inheritFrom": "bar_graph_limit_line"
+                }
+              },
+              {
+                "type": "BarGraph",
+                "style": {
+                  "inheritFrom": "bar_graph_I_default"
+                },
+                "data": "channel_display_value2",
+                "action": "",
+                "left": 120,
+                "top": 0,
+                "width": 118,
+                "height": 136,
+                "orientation": "bottom-top",
+                "textStyle": {
+                  "inheritFrom": "bar_graph_text"
+                },
+                "line1Data": "channel_display_value2_set",
+                "line1Style": {
+                  "inheritFrom": "bar_graph_set_line"
+                },
+                "line2Data": "channel_display_value2_limit",
+                "line2Style": {
+                  "inheritFrom": "bar_graph_limit_line"
+                }
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald14"
+            },
+            "data": "channel_p_mon",
+            "left": 1,
+            "top": 206,
+            "width": 118,
+            "height": 32,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 1,
+            "top": 172,
+            "width": 118,
+            "height": 32,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_i_edit",
+            "action": "edit",
+            "left": 121,
+            "top": 172,
+            "width": 118,
+            "height": 32,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_protection_opp_limit",
+            "action": "edit",
+            "left": 121,
+            "top": 206,
+            "width": 118,
+            "height": 32,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
         "height": 240
       },
       {
@@ -27761,6 +28295,165 @@
         "height": 240
       },
       {
+        "name": "slot_def_1ch_vert_off_2col",
+        "description": "",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 240,
+            "height": 32,
+            "layout": "slot_def_vert_title_2col"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel_off_button_20",
+              "font": "Oswald38"
+            },
+            "data": "channel_off_label",
+            "action": "channel_toggle_output",
+            "left": 1,
+            "top": 34,
+            "width": 238,
+            "height": 136,
+            "text": ""
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "trigger_is_initiated",
+            "left": 1,
+            "top": 172,
+            "width": 238,
+            "height": 66,
+            "widgets": [
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_trigger_mode",
+                "left": 0,
+                "top": 0,
+                "width": 238,
+                "height": 66,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 238,
+                    "height": 66,
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "data": "channel_u_edit",
+                        "action": "edit",
+                        "left": 0,
+                        "top": 0,
+                        "width": 118,
+                        "height": 32,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "data": "channel_i_edit",
+                        "action": "edit",
+                        "left": 120,
+                        "top": 0,
+                        "width": 118,
+                        "height": 32,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "data": "channel_protection_opp_limit",
+                        "action": "edit",
+                        "left": 120,
+                        "top": 34,
+                        "width": 118,
+                        "height": 32,
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled",
+                      "font": "Oswald17"
+                    },
+                    "data": "",
+                    "action": "show_ch_settings_trigger",
+                    "left": 0,
+                    "top": 0,
+                    "width": 238,
+                    "height": 66,
+                    "text": "\\u00a1"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled",
+                      "font": "Oswald17"
+                    },
+                    "data": "",
+                    "action": "show_ch_settings_trigger",
+                    "left": 0,
+                    "top": 0,
+                    "width": 238,
+                    "height": 66,
+                    "text": "\\u00b5"
+                  }
+                ]
+              },
+              {
+                "type": "Button",
+                "style": {
+                  "inheritFrom": "trigger_button_24"
+                },
+                "data": "trigger_is_initiated",
+                "action": "trigger_generate_manual",
+                "left": 0,
+                "top": 0,
+                "width": 238,
+                "height": 66,
+                "text": "\\u00A4 TRG",
+                "enabled": "trigger_is_manual",
+                "disabledStyle": {
+                  "inheritFrom": "trigger_button_24",
+                  "color": "text_regular",
+                  "activeBackgroundColor": "text_regular"
+                }
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
+        "height": 240
+      },
+      {
         "name": "slot_def_1ch_vert_coupled_series",
         "style": "default",
         "widgets": [
@@ -27796,6 +28489,44 @@
         "left": 0,
         "top": 0,
         "width": 160,
+        "height": 240
+      },
+      {
+        "name": "slot_def_1ch_vert_coupled_series_2col",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "padding": "0 5"
+            },
+            "data": "channel_title",
+            "left": 0,
+            "top": 0,
+            "width": 240,
+            "height": 32,
+            "text": ""
+          },
+          {
+            "type": "MultilineText",
+            "style": {
+              "inheritFrom": "default_M",
+              "padding": "4"
+            },
+            "left": 0,
+            "top": 32,
+            "width": 240,
+            "height": 208,
+            "text": "Coupled in series with Ch1",
+            "firstLineIndent": 0,
+            "hangingIndent": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
         "height": 240
       },
       {
@@ -27837,6 +28568,44 @@
         "height": 240
       },
       {
+        "name": "slot_def_1ch_vert_coupled_parallel_2col",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "padding": "0 5"
+            },
+            "data": "channel_title",
+            "left": 0,
+            "top": 0,
+            "width": 240,
+            "height": 32,
+            "text": ""
+          },
+          {
+            "type": "MultilineText",
+            "style": {
+              "inheritFrom": "default_M",
+              "padding": "4"
+            },
+            "left": 0,
+            "top": 32,
+            "width": 240,
+            "height": 208,
+            "text": "Coupled in parallel with Ch1",
+            "firstLineIndent": 0,
+            "hangingIndent": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
+        "height": 240
+      },
+      {
         "name": "slot_def_2ch_vert",
         "widgets": [
           {
@@ -27869,6 +28638,40 @@
         "width": 160,
         "height": 240,
         "dataContextOverrides": "{\n    \"channel_i_mon\": \"< 300 mA\"\n}"
+      },
+      {
+        "name": "slot_def_2ch_vert_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_def_2ch_view",
+            "left": 0,
+            "top": 0,
+            "width": 240,
+            "height": 120,
+            "context": "slot_2ch_ch1_index"
+          },
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_def_2ch_view",
+            "left": 0,
+            "top": 120,
+            "width": 240,
+            "height": 120,
+            "context": "slot_2ch_ch2_index"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
+        "height": 240,
+        "dataContextOverrides": "{\n    \"channel_i_mon\": \"< 300 mA\",\n    \"slot_def_2ch_view\": \"slot_def_2ch_vert_on_2col\"\n}"
       },
       {
         "name": "slot_def_2ch_vert_on",
@@ -27990,6 +28793,128 @@
         "left": 0,
         "top": 0,
         "width": 160,
+        "height": 120
+      },
+      {
+        "name": "slot_def_2ch_vert_on_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 240,
+            "height": 32,
+            "layout": "slot_def_vert_title_2col"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "action": "channel_toggle_output",
+            "left": 1,
+            "top": 34,
+            "width": 118,
+            "height": 84,
+            "name": "mon section",
+            "widgets": [
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "mon_value_14_right"
+                },
+                "data": "channel_u_mon",
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 118,
+                "height": 27,
+                "displayOption": 0
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "mon_value_14_right",
+                  "font": "Oswald14",
+                  "alignHorizontal": "right",
+                  "color": "text_regular",
+                  "activeBackgroundColor": "text_regular",
+                  "opacity": 255
+                },
+                "data": "channel_i_mon",
+                "action": "",
+                "left": 0,
+                "top": 29,
+                "width": 118,
+                "height": 27,
+                "displayOption": 0
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "mon_value_14_right",
+                  "font": "Oswald14",
+                  "alignHorizontal": "right",
+                  "color": "text_regular",
+                  "activeBackgroundColor": "text_regular",
+                  "opacity": 255
+                },
+                "data": "channel_p_mon",
+                "action": "",
+                "left": 0,
+                "top": 58,
+                "width": 118,
+                "height": 26,
+                "displayOption": 0
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_right_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 121,
+            "top": 34,
+            "width": 118,
+            "height": 27,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_right_enabled"
+            },
+            "data": "channel_i_edit",
+            "action": "edit",
+            "left": 121,
+            "top": 63,
+            "width": 118,
+            "height": 27,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_right_enabled"
+            },
+            "data": "channel_protection_opp_limit",
+            "action": "edit",
+            "left": 121,
+            "top": 92,
+            "width": 118,
+            "height": 26,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
         "height": 120
       },
       {
@@ -28162,6 +29087,175 @@
         "height": 120
       },
       {
+        "name": "slot_def_2ch_vert_off_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 240,
+            "height": 32,
+            "layout": "slot_def_vert_title_2col"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel_off_button_20"
+            },
+            "data": "channel_off_label",
+            "action": "channel_toggle_output",
+            "left": 1,
+            "top": 34,
+            "width": 118,
+            "height": 84,
+            "text": ""
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "trigger_is_initiated",
+            "left": 121,
+            "top": 34,
+            "width": 118,
+            "height": 84,
+            "widgets": [
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_trigger_mode",
+                "left": 0,
+                "top": 0,
+                "width": 118,
+                "height": 84,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 118,
+                    "height": 84,
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_right_enabled"
+                        },
+                        "data": "channel_u_edit",
+                        "action": "edit",
+                        "left": 0,
+                        "top": 0,
+                        "width": 118,
+                        "height": 27,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_right_enabled"
+                        },
+                        "data": "channel_i_edit",
+                        "action": "edit",
+                        "left": 0,
+                        "top": 29,
+                        "width": 118,
+                        "height": 27,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_right_enabled"
+                        },
+                        "data": "channel_protection_opp_limit",
+                        "action": "edit",
+                        "left": 0,
+                        "top": 58,
+                        "width": 118,
+                        "height": 26,
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled",
+                      "font": "Oswald17"
+                    },
+                    "data": "",
+                    "action": "show_ch_settings_trigger",
+                    "left": 0,
+                    "top": 0,
+                    "width": 118,
+                    "height": 84,
+                    "text": "\\u00a1"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled",
+                      "font": "Oswald17"
+                    },
+                    "data": "",
+                    "action": "show_ch_settings_trigger",
+                    "left": 0,
+                    "top": 0,
+                    "width": 118,
+                    "height": 84,
+                    "text": "\\u00b5"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 118,
+                "height": 84,
+                "widgets": [
+                  {
+                    "type": "Button",
+                    "style": {
+                      "inheritFrom": "trigger_button_14"
+                    },
+                    "data": "trigger_is_initiated",
+                    "action": "trigger_generate_manual",
+                    "left": 0,
+                    "top": 1,
+                    "width": 118,
+                    "height": 83,
+                    "text": "\\u00A4 TRG",
+                    "enabled": "trigger_is_manual",
+                    "disabledStyle": {
+                      "inheritFrom": "trigger_button_14",
+                      "color": "text_regular",
+                      "activeBackgroundColor": "text_regular"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
+        "height": 120
+      },
+      {
         "name": "slot_def_vert_error",
         "widgets": [
           {
@@ -28252,6 +29346,96 @@
         "height": 240
       },
       {
+        "name": "slot_def_vert_error_2col",
+        "widgets": [
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "channel_has_error_settings",
+            "left": 1,
+            "top": 0,
+            "width": 238,
+            "height": 32,
+            "widgets": [
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "inst_min_header_bgnd",
+                  "activeBackgroundColor": "inst_min_header_bgnd"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 238,
+                "height": 32
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 238,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "inst_min_header_bgnd",
+                      "activeBackgroundColor": "inst_min_header_bgnd"
+                    },
+                    "left": 1,
+                    "top": 0,
+                    "width": 187,
+                    "height": 32
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "channel1",
+                      "font": "Heydings14",
+                      "color": "inst_min_header_text",
+                      "backgroundColor": "inst_min_header_bgnd",
+                      "activeColor": "inst_min_header_bgnd",
+                      "activeBackgroundColor": "inst_min_header_text"
+                    },
+                    "action": "show_slot_settings",
+                    "left": 188,
+                    "top": 0,
+                    "width": 50,
+                    "height": 32,
+                    "text": "D"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald20",
+              "color": "status_warning",
+              "activeBackgroundColor": "status_warning"
+            },
+            "data": "slot_error_message",
+            "left": 0,
+            "top": 32,
+            "width": 240,
+            "height": 208,
+            "text": ""
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
+        "height": 240
+      },
+      {
         "name": "slot_def_vert_not_installed",
         "widgets": [
           {
@@ -28285,53 +29469,149 @@
         "height": 240
       },
       {
+        "name": "slot_def_vert_not_installed_2col",
+        "widgets": [
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "inst_min_header_bgnd",
+              "activeBackgroundColor": "inst_min_header_bgnd"
+            },
+            "left": 1,
+            "top": 0,
+            "width": 239,
+            "height": 32
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald20"
+            },
+            "left": 0,
+            "top": 32,
+            "width": 240,
+            "height": 208,
+            "text": "Not installed"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
+        "height": 240
+      },
+      {
         "name": "slot_def_horz",
         "widgets": [
           {
-            "type": "LayoutView",
+            "type": "Select",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot1_default_view",
+            "data": "channels_is_2col_view",
             "left": 0,
             "top": 0,
             "width": 480,
-            "height": 80,
-            "layout": "",
-            "context": "slot1_channel_index"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "slot2_default_view",
-            "left": 0,
-            "top": 80,
-            "width": 480,
-            "height": 80,
-            "layout": "",
-            "context": "slot2_channel_index"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "slot3_default_view",
-            "left": 0,
-            "top": 160,
-            "width": 480,
-            "height": 80,
-            "layout": "",
-            "context": "slot3_channel_index"
+            "height": 240,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 240,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot1_default_view",
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 80,
+                    "layout": "",
+                    "context": "slot1_channel_index"
+                  },
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot2_default_view",
+                    "left": 0,
+                    "top": 80,
+                    "width": 480,
+                    "height": 80,
+                    "layout": "",
+                    "context": "slot2_channel_index"
+                  },
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot3_default_view",
+                    "left": 0,
+                    "top": 160,
+                    "width": 480,
+                    "height": 80,
+                    "layout": "",
+                    "context": "slot3_channel_index"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 240,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot1_default_view",
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 120,
+                    "layout": "",
+                    "context": "slot1_channel_index"
+                  },
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot2_default_view",
+                    "left": 0,
+                    "top": 120,
+                    "width": 480,
+                    "height": 120,
+                    "layout": "",
+                    "context": "slot2_channel_index"
+                  }
+                ]
+              }
+            ]
           }
         ],
         "left": 0,
         "top": 0,
         "width": 480,
         "height": 240,
-        "dataContextOverrides": "{\n    \"slot_default1_view\": \"slot_def_1ch_hbar_on\",\n    \"slot_default2_view\": \"slot_def_1ch_yt_on\",\n    \"slot_default3_view\": \"slot_def_1ch_horz_off\"\n}"
+        "dataContextOverrides": "{\n    \"slot1_default_view\": \"slot_def_1ch_hbar_on\",\n    \"slot2_default_view\": \"slot_def_1ch_yt_on\",\n    \"slot3_default_view\": \"slot_def_1ch_horz_off\"\n}"
       },
       {
         "name": "slot_def_horz_title",
@@ -28474,6 +29754,146 @@
         "height": 80
       },
       {
+        "name": "slot_def_horz_title_2col",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "alignVertical": "top",
+              "padding": "3 5"
+            },
+            "data": "channel_short_title",
+            "action": "",
+            "left": 0,
+            "top": 1,
+            "width": 28,
+            "height": 59,
+            "text": ""
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "font": "Heydings14",
+              "alignVertical": "top"
+            },
+            "action": "toggle_channels_max_view",
+            "left": 28,
+            "top": 1,
+            "width": 24,
+            "height": 59,
+            "text": "e"
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "channel_protection_status",
+            "left": 0,
+            "top": 60,
+            "width": 52,
+            "height": 59,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_ch_settings",
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 59,
+                "text": "9"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "show_ch_settings_prot_clear",
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 59,
+                "text": "9"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "show_ch_settings_prot_clear",
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 59,
+                "text": "9"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "show_ch_settings_prot_clear",
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 59,
+                "text": "9"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "show_ch_settings_prot_clear",
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 59,
+                "text": "9"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "show_ch_settings_prot_clear",
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 59,
+                "text": "9"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 52,
+        "height": 120
+      },
+      {
         "name": "slot_def_1ch_hbar_on",
         "style": "default",
         "widgets": [
@@ -28581,6 +30001,115 @@
         "top": 0,
         "width": 480,
         "height": 80
+      },
+      {
+        "name": "slot_def_1ch_hbar_on_2col",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 120,
+            "layout": "slot_def_horz_title_2col"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "action": "channel_toggle_output",
+            "left": 54,
+            "top": 1,
+            "width": 346,
+            "height": 118,
+            "name": "mon section",
+            "widgets": [
+              {
+                "type": "BarGraph",
+                "style": {
+                  "inheritFrom": "bar_graph_U_default"
+                },
+                "data": "channel_display_value1",
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 346,
+                "height": 58,
+                "orientation": "left-right",
+                "textStyle": {
+                  "inheritFrom": "bar_graph_text"
+                },
+                "line1Data": "channel_display_value1_set",
+                "line1Style": {
+                  "inheritFrom": "bar_graph_set_line"
+                },
+                "line2Data": "channel_display_value1_limit",
+                "line2Style": {
+                  "inheritFrom": "bar_graph_limit_line"
+                }
+              },
+              {
+                "type": "BarGraph",
+                "style": {
+                  "inheritFrom": "bar_graph_I_default"
+                },
+                "data": "channel_display_value2",
+                "action": "",
+                "left": 0,
+                "top": 60,
+                "width": 346,
+                "height": 58,
+                "orientation": "left-right",
+                "textStyle": {
+                  "inheritFrom": "bar_graph_text"
+                },
+                "line1Data": "channel_display_value2_set",
+                "line1Style": {
+                  "inheritFrom": "bar_graph_set_line"
+                },
+                "line2Data": "channel_display_value2_limit",
+                "line2Style": {
+                  "inheritFrom": "bar_graph_limit_line"
+                }
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 402,
+            "top": 1,
+            "width": 76,
+            "height": 58,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_i_edit",
+            "action": "edit",
+            "left": 402,
+            "top": 61,
+            "width": 76,
+            "height": 58,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 120
       },
       {
         "name": "slot_def_1ch_yt_on",
@@ -28697,6 +30226,122 @@
         "top": 0,
         "width": 480,
         "height": 80
+      },
+      {
+        "name": "slot_def_1ch_yt_on_2col",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 120,
+            "layout": "slot_def_horz_title_2col"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "action": "channel_toggle_output",
+            "left": 54,
+            "top": 1,
+            "width": 346,
+            "height": 118,
+            "name": "mon section",
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "yt_graph"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 76,
+                "height": 118,
+                "widgets": [
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "yt_graph_U_default"
+                    },
+                    "data": "channel_display_value1",
+                    "left": 0,
+                    "top": 0,
+                    "width": 76,
+                    "height": 58,
+                    "displayOption": 0
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "yt_graph_I_default"
+                    },
+                    "data": "channel_display_value2",
+                    "left": 0,
+                    "top": 60,
+                    "width": 76,
+                    "height": 58,
+                    "displayOption": 0
+                  }
+                ]
+              },
+              {
+                "type": "YTGraph",
+                "style": {
+                  "inheritFrom": "yt_graph"
+                },
+                "data": "channel_history_values",
+                "action": "channel_toggle_output",
+                "left": 76,
+                "top": 0,
+                "width": 270,
+                "height": 118,
+                "y1Style": {
+                  "inheritFrom": "yt_graph_U_default"
+                },
+                "y2Data": "channel_display_value2",
+                "y2Style": {
+                  "inheritFrom": "yt_graph_I_default"
+                }
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 402,
+            "top": 1,
+            "width": 76,
+            "height": 58,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_i_edit",
+            "action": "edit",
+            "left": 402,
+            "top": 61,
+            "width": 76,
+            "height": 58,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 120
       },
       {
         "name": "slot_def_1ch_horz_off",
@@ -28856,6 +30501,163 @@
         "height": 80
       },
       {
+        "name": "slot_def_1ch_horz_off_2col",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 120,
+            "layout": "slot_def_horz_title_2col"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel_off_button_38"
+            },
+            "data": "channel_off_label",
+            "action": "channel_toggle_output",
+            "left": 54,
+            "top": 1,
+            "width": 346,
+            "height": 118,
+            "text": ""
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "trigger_is_initiated",
+            "left": 402,
+            "top": 1,
+            "width": 76,
+            "height": 118,
+            "widgets": [
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_trigger_mode",
+                "left": 0,
+                "top": 0,
+                "width": 76,
+                "height": 118,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 76,
+                    "height": 118,
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "data": "channel_u_edit",
+                        "action": "edit",
+                        "left": 0,
+                        "top": 0,
+                        "width": 76,
+                        "height": 58,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "data": "channel_i_edit",
+                        "action": "edit",
+                        "left": 0,
+                        "top": 60,
+                        "width": 76,
+                        "height": 58,
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled",
+                      "font": "Oswald17"
+                    },
+                    "data": "",
+                    "action": "show_ch_settings_trigger",
+                    "left": 0,
+                    "top": 0,
+                    "width": 76,
+                    "height": 118,
+                    "text": "\\u00a1"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled",
+                      "font": "Oswald17"
+                    },
+                    "data": "",
+                    "action": "show_ch_settings_trigger",
+                    "left": 0,
+                    "top": 0,
+                    "width": 76,
+                    "height": 118,
+                    "text": "\\u00b5"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 76,
+                "height": 118,
+                "widgets": [
+                  {
+                    "type": "Button",
+                    "style": {
+                      "inheritFrom": "trigger_button_14"
+                    },
+                    "data": "trigger_is_initiated",
+                    "action": "trigger_generate_manual",
+                    "left": 0,
+                    "top": 0,
+                    "width": 76,
+                    "height": 118,
+                    "text": "\\u00a4 TRG",
+                    "enabled": "trigger_is_manual",
+                    "disabledStyle": {
+                      "inheritFrom": "trigger_button_14",
+                      "color": "text_regular",
+                      "activeBackgroundColor": "text_regular"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 120
+      },
+      {
         "name": "slot_def_1ch_horz_coupled_series",
         "widgets": [
           {
@@ -28892,6 +30694,44 @@
         "top": 0,
         "width": 480,
         "height": 80
+      },
+      {
+        "name": "slot_def_1ch_horz_coupled_series_2col",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "alignVertical": "top",
+              "padding": "3 5"
+            },
+            "data": "channel_short_title",
+            "action": "",
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 120,
+            "text": ""
+          },
+          {
+            "type": "MultilineText",
+            "style": {
+              "inheritFrom": "default_M"
+            },
+            "left": 52,
+            "top": 0,
+            "width": 428,
+            "height": 120,
+            "text": "Coupled in series with Ch1",
+            "firstLineIndent": 0,
+            "hangingIndent": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 120
       },
       {
         "name": "slot_def_1ch_horz_coupled_parallel",
@@ -28932,6 +30772,44 @@
         "height": 80
       },
       {
+        "name": "slot_def_1ch_horz_coupled_parallel_2col",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "alignVertical": "top",
+              "padding": "3 5"
+            },
+            "data": "channel_short_title",
+            "action": "",
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 120,
+            "text": ""
+          },
+          {
+            "type": "MultilineText",
+            "style": {
+              "inheritFrom": "default_M"
+            },
+            "left": 52,
+            "top": 0,
+            "width": 428,
+            "height": 120,
+            "text": "Coupled in parallel with Ch1",
+            "firstLineIndent": 0,
+            "hangingIndent": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 120
+      },
+      {
         "name": "slot_def_2ch_horz",
         "widgets": [
           {
@@ -28964,6 +30842,40 @@
         "width": 480,
         "height": 80,
         "dataContextOverrides": "{\n    \"slot_def_2ch_view\": \"slot_def_2ch_horz_on\"\n}"
+      },
+      {
+        "name": "slot_def_2ch_horz_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_def_2ch_view",
+            "left": 0,
+            "top": 0,
+            "width": 240,
+            "height": 120,
+            "context": "slot_2ch_ch1_index"
+          },
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_def_2ch_view",
+            "left": 240,
+            "top": 0,
+            "width": 240,
+            "height": 120,
+            "context": "slot_2ch_ch2_index"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 120,
+        "dataContextOverrides": "{\n    \"slot_def_2ch_view\": \"slot_def_2ch_horz_on_2col\"\n}"
       },
       {
         "name": "slot_def_2ch_horz_on",
@@ -29080,6 +30992,122 @@
         "top": 0,
         "width": 240,
         "height": 80
+      },
+      {
+        "name": "slot_def_2ch_horz_on_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 120,
+            "layout": "slot_def_horz_title_2col"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "action": "channel_toggle_output",
+            "left": 54,
+            "top": 1,
+            "width": 106,
+            "height": 118,
+            "name": "mon section",
+            "widgets": [
+              {
+                "type": "BarGraph",
+                "style": {
+                  "inheritFrom": "bar_graph_U_default",
+                  "font": "Oswald14",
+                  "color": "bar_graph_voltage",
+                  "backgroundColor": "bar_graph_background",
+                  "activeColor": "bar_graph_background",
+                  "activeBackgroundColor": "bar_graph_voltage"
+                },
+                "data": "channel_display_value1",
+                "left": 0,
+                "top": 0,
+                "width": 106,
+                "height": 58,
+                "orientation": "left-right",
+                "textStyle": {
+                  "inheritFrom": "bar_graph_text"
+                },
+                "line1Data": "channel_display_value1_set",
+                "line1Style": {
+                  "inheritFrom": "bar_graph_set_line"
+                },
+                "line2Data": "channel_display_value1_limit",
+                "line2Style": {
+                  "inheritFrom": "bar_graph_limit_line"
+                }
+              },
+              {
+                "type": "BarGraph",
+                "style": {
+                  "inheritFrom": "bar_graph_I_default",
+                  "font": "Oswald14",
+                  "color": "bar_graph_current",
+                  "backgroundColor": "bar_graph_background",
+                  "activeColor": "bar_graph_background",
+                  "activeBackgroundColor": "bar_graph_current"
+                },
+                "data": "channel_display_value2",
+                "left": 0,
+                "top": 60,
+                "width": 106,
+                "height": 58,
+                "orientation": "left-right",
+                "textStyle": {
+                  "inheritFrom": "bar_graph_text"
+                },
+                "line1Data": "channel_display_value2_set",
+                "line1Style": {
+                  "inheritFrom": "bar_graph_set_line"
+                },
+                "line2Data": "channel_display_value2_limit",
+                "line2Style": {
+                  "inheritFrom": "bar_graph_limit_line"
+                }
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 162,
+            "top": 1,
+            "width": 76,
+            "height": 58,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_i_edit",
+            "action": "edit",
+            "left": 162,
+            "top": 61,
+            "width": 76,
+            "height": 58,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
+        "height": 120
       },
       {
         "name": "slot_def_2ch_horz_off",
@@ -29238,6 +31266,162 @@
         "height": 80
       },
       {
+        "name": "slot_def_2ch_horz_off_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 120,
+            "layout": "slot_def_horz_title_2col"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel_off_button_20"
+            },
+            "data": "channel_off_label",
+            "action": "channel_toggle_output",
+            "left": 54,
+            "top": 1,
+            "width": 106,
+            "height": 118,
+            "text": ""
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "trigger_is_initiated",
+            "left": 162,
+            "top": 1,
+            "width": 76,
+            "height": 118,
+            "widgets": [
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_trigger_mode",
+                "left": 0,
+                "top": 0,
+                "width": 76,
+                "height": 118,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 76,
+                    "height": 118,
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "data": "channel_u_edit",
+                        "action": "edit",
+                        "left": 0,
+                        "top": 0,
+                        "width": 76,
+                        "height": 58,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "data": "channel_i_edit",
+                        "action": "edit",
+                        "left": 0,
+                        "top": 60,
+                        "width": 76,
+                        "height": 58,
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled",
+                      "font": "Oswald17"
+                    },
+                    "data": "",
+                    "action": "show_ch_settings_trigger",
+                    "left": 0,
+                    "top": 0,
+                    "width": 76,
+                    "height": 118,
+                    "text": "\\u00a1"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled",
+                      "font": "Oswald17"
+                    },
+                    "data": "",
+                    "action": "show_ch_settings_trigger",
+                    "left": 0,
+                    "top": 0,
+                    "width": 76,
+                    "height": 118,
+                    "text": "\\u00b5"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 76,
+                "height": 118,
+                "widgets": [
+                  {
+                    "type": "Button",
+                    "style": {
+                      "inheritFrom": "trigger_button_14"
+                    },
+                    "data": "trigger_is_initiated",
+                    "action": "trigger_generate_manual",
+                    "left": 0,
+                    "top": 0,
+                    "width": 76,
+                    "height": 118,
+                    "text": "\\u00a4 TRG",
+                    "enabled": "trigger_is_manual",
+                    "disabledStyle": {
+                      "inheritFrom": "trigger_button_14",
+                      "color": "text_regular",
+                      "activeBackgroundColor": "text_regular"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
+        "height": 120
+      },
+      {
         "name": "slot_def_horz_error",
         "widgets": [
           {
@@ -29339,6 +31523,107 @@
         "height": 78
       },
       {
+        "name": "slot_def_horz_error_2col",
+        "widgets": [
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "inst_min_header_bgnd",
+              "activeBackgroundColor": "inst_min_header_bgnd"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 118
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "channel_has_error_settings",
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 118,
+            "widgets": [
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "inst_min_header_bgnd",
+                  "activeBackgroundColor": "inst_min_header_bgnd"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 118
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 118,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "channel1",
+                      "font": "Heydings14",
+                      "color": "inst_min_header_text",
+                      "backgroundColor": "inst_min_header_bgnd",
+                      "activeColor": "inst_min_header_bgnd",
+                      "activeBackgroundColor": "inst_min_header_text"
+                    },
+                    "action": "show_slot_settings",
+                    "left": 0,
+                    "top": 0,
+                    "width": 52,
+                    "height": 39,
+                    "text": "D"
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "inst_min_header_bgnd",
+                      "activeBackgroundColor": "inst_min_header_bgnd"
+                    },
+                    "left": 0,
+                    "top": 39,
+                    "width": 52,
+                    "height": 79
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default",
+              "color": "status_warning",
+              "activeBackgroundColor": "status_warning"
+            },
+            "data": "slot_error_message",
+            "left": 52,
+            "top": 0,
+            "width": 428,
+            "height": 118,
+            "text": ""
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 118
+      },
+      {
         "name": "slot_def_horz_not_installed",
         "widgets": [
           {
@@ -29370,6 +31655,39 @@
         "top": 0,
         "width": 480,
         "height": 78
+      },
+      {
+        "name": "slot_def_horz_not_installed_2col",
+        "widgets": [
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "inst_min_header_bgnd",
+              "activeBackgroundColor": "inst_min_header_bgnd"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 118
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald20"
+            },
+            "left": 52,
+            "top": 0,
+            "width": 428,
+            "height": 118,
+            "text": "Not installed"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 118
       },
       {
         "name": "slot_max_1ch_title",

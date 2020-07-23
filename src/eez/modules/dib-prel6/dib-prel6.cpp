@@ -55,6 +55,9 @@ public:
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
             return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF;
         }
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+            return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF_2COL;
+        }
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
             return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MAX;
         }

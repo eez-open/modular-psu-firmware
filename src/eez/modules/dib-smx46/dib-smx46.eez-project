@@ -27,7 +27,13 @@
       "files": []
     }
   },
-  "data": [],
+  "data": [
+    {
+      "name": "outputs",
+      "type": "list",
+      "defaultValue": "[\n  { \"output_no\": 1, \"output_state\": 1 },\n  { \"output_no\": 2, \"output_state\": 1 },\n  { \"output_no\": 3, \"output_state\": 0 },\n  { \"output_no\": 4, \"output_state\": 0 },\n  { \"output_no\": 5, \"output_state\": 1 },\n  { \"output_no\": 6, \"output_state\": 1 },\n  { \"output_no\": 7, \"output_state\": 0 },\n  { \"output_no\": 8, \"output_state\": 1 },\n  { \"output_no\": 9, \"output_state\": 1 },\n  { \"output_no\": 10, \"output_state\": 1 },\n  { \"output_no\": 11, \"output_state\": 0 },\n  { \"output_no\": 12, \"output_state\": 0 },\n  { \"output_no\": 13, \"output_state\": 1 },\n  { \"output_no\": 14, \"output_state\": 1 },\n  { \"output_no\": 15, \"output_state\": 0 },\n  { \"output_no\": 16, \"output_state\": 1 },\n  { \"output_no\": 17, \"output_state\": 1 },\n  { \"output_no\": 18, \"output_state\": 1 },\n  { \"output_no\": 19, \"output_state\": 0 },\n  { \"output_no\": 20, \"output_state\": 0 },\n  { \"output_no\": 21, \"output_state\": 1 },\n  { \"output_no\": 22, \"output_state\": 1 },\n  { \"output_no\": 23, \"output_state\": 0 },\n  { \"output_no\": 24, \"output_state\": 1 }\n]"
+    }
+  ],
   "actions": [],
   "gui": {
     "pages": [
@@ -124,11 +130,192 @@
                 "text": "e"
               }
             ]
+          },
+          {
+            "type": "Grid",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "outputs",
+            "left": 0,
+            "top": 32,
+            "width": 160,
+            "height": 180,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "left": 0,
+              "top": 0,
+              "width": 40,
+              "height": 30,
+              "widgets": [
+                {
+                  "type": "Rectangle",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 1,
+                  "top": 0,
+                  "width": 39,
+                  "height": 29
+                }
+              ]
+            }
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "",
+            "left": 1,
+            "top": 212,
+            "width": 79,
+            "height": 28,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "",
+            "left": 81,
+            "top": 212,
+            "width": 78,
+            "height": 28,
+            "displayOption": 0
           }
         ],
         "left": 0,
         "top": 0,
         "width": 160,
+        "height": 240,
+        "dataContextOverrides": "{\"slot_title_def\": \"SMX46\"}"
+      },
+      {
+        "name": "slot_view_def_2col",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 240,
+            "height": 32,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "slot_title_def",
+                "left": 1,
+                "top": 0,
+                "width": 175,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "show_slot_settings",
+                "left": 176,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "D"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14"
+                },
+                "action": "toggle_slot_max_view",
+                "left": 208,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "e"
+              }
+            ]
+          },
+          {
+            "type": "Grid",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "outputs",
+            "left": 0,
+            "top": 32,
+            "width": 240,
+            "height": 180,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "left": 0,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "widgets": [
+                {
+                  "type": "Rectangle",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 1,
+                  "top": 0,
+                  "width": 59,
+                  "height": 29
+                }
+              ]
+            }
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "",
+            "left": 1,
+            "top": 212,
+            "width": 119,
+            "height": 28,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dummy",
+            "action": "",
+            "left": 121,
+            "top": 212,
+            "width": 118,
+            "height": 28,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 240,
         "height": 240,
         "dataContextOverrides": "{\"slot_title_def\": \"SMX46\"}"
       },

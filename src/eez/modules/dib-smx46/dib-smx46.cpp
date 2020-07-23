@@ -26,6 +26,7 @@
 
 #include "eez/debug.h"
 #include "eez/firmware.h"
+#include "eez/hmi.h"
 #include "eez/gui/document.h"
 #include "eez/modules/psu/event_queue.h"
 #include "eez/modules/bp3c/comm.h"
@@ -54,6 +55,9 @@ public:
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
             return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF;
+        }
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+            return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF_2COL;
         }
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
             return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_MAX;
@@ -158,4 +162,17 @@ static Smx46ModuleInfo g_smx46ModuleInfo;
 ModuleInfo *g_moduleInfo = &g_smx46ModuleInfo;
 
 } // namespace dib_smx46
+
+namespace gui {
+
+void data_dib_smx46_outputs(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = 24;
+    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+        value = hmi::g_selectedSlotIndex * 24 + value.getInt();
+    }
+}
+
+} // gui
+
 } // namespace eez

@@ -49,38 +49,27 @@ ModuleInfo::ModuleInfo(uint16_t moduleType_, uint16_t moduleCategory_, const cha
 
 using namespace gui;
 
-static int getDefaultView(int slotIndex, int cursor) {
-    int isVert = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
-    return isVert ? PAGE_ID_SLOT_DEF_VERT_NOT_INSTALLED : PAGE_ID_SLOT_DEF_HORZ_NOT_INSTALLED;
-}
-
-static int getMaxView(int slotIndex, int cursor) {
-    return PAGE_ID_SLOT_MAX_NOT_INSTALLED;
-}
-
-static int getMinView(int slotIndex, int cursor) {
-    return PAGE_ID_SLOT_MIN_NOT_INSTALLED;
-}
-
-static int getMicroView(int slotIndex, int cursor) {
-    return PAGE_ID_SLOT_MICRO_NOT_INSTALLED;
-}
-
 int ModuleInfo::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
     if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-        return getDefaultView(slotIndex, cursor);
+        int isVert = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+        return isVert ? PAGE_ID_SLOT_DEF_VERT_NOT_INSTALLED : PAGE_ID_SLOT_DEF_HORZ_NOT_INSTALLED;
+    }
+
+    if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+        int isVert = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+        return isVert ? PAGE_ID_SLOT_DEF_VERT_NOT_INSTALLED_2COL : PAGE_ID_SLOT_DEF_HORZ_NOT_INSTALLED_2COL;
     }
 
     if (slotViewType == SLOT_VIEW_TYPE_MAX) {
-        return getMaxView(slotIndex, cursor);
+        return PAGE_ID_SLOT_MAX_NOT_INSTALLED;
     }
 
     if (slotViewType == SLOT_VIEW_TYPE_MIN) {
-        return getMinView(slotIndex, cursor);
+    return PAGE_ID_SLOT_MIN_NOT_INSTALLED;
     }
 
     assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-    return getMicroView(slotIndex, cursor);
+    return PAGE_ID_SLOT_MICRO_NOT_INSTALLED;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
