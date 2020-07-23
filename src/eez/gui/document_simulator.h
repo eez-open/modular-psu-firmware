@@ -1695,7 +1695,8 @@ enum StylesEnum {
     STYLE_ID_INLINE306 = 306,
     STYLE_ID_INLINE307 = 307,
     STYLE_ID_INLINE308 = 308,
-    STYLE_ID_INLINE309 = 309
+    STYLE_ID_INLINE309 = 309,
+    STYLE_ID_INLINE310 = 310
 };
 
 enum ThemesEnum {
@@ -1976,4 +1977,4 @@ enum PagesEnum {
     PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD = 208
 };
 
-extern const uint8_t assets[522476];
+extern const uint8_t assets[522375];

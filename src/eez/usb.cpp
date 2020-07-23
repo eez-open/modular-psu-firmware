@@ -71,6 +71,7 @@ int g_otgMode = USB_MODE_DISABLED;
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
+    psu::serial::g_testResult = TEST_SKIPPED;
     selectUsbMode(psu::persist_conf::getUsbMode(), g_otgMode);
 }
 

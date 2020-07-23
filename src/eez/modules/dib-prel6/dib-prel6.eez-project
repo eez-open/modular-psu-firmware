@@ -129,75 +129,75 @@
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald20"
+              "font": "Oswald17"
             },
             "left": 6,
             "top": 38,
             "width": 72,
             "height": 62,
-            "text": "1"
+            "text": "1: ON"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald20"
+              "font": "Oswald17"
             },
             "left": 83,
             "top": 38,
             "width": 73,
             "height": 62,
-            "text": "2"
+            "text": "2: ON"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald20"
+              "font": "Oswald17"
             },
             "left": 6,
             "top": 105,
             "width": 72,
             "height": 62,
-            "text": "3"
+            "text": "3: ON"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default",
-              "font": "Oswald20",
+              "font": "Oswald17",
               "borderSize": "2"
             },
             "left": 83,
             "top": 105,
             "width": 73,
             "height": 62,
-            "text": "4"
+            "text": "4: OFF"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default",
-              "font": "Oswald20",
+              "font": "Oswald17",
               "borderSize": "2"
             },
             "left": 6,
             "top": 172,
             "width": 72,
             "height": 62,
-            "text": "5"
+            "text": "5: OFF"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald20"
+              "font": "Oswald17"
             },
             "left": 83,
             "top": 172,
             "width": 73,
             "height": 62,
-            "text": "6"
+            "text": "6: ON"
           }
         ],
         "left": 0,

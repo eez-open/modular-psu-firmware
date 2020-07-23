@@ -1646,7 +1646,8 @@ enum StylesEnum {
     STYLE_ID_INLINE288 = 288,
     STYLE_ID_INLINE289 = 289,
     STYLE_ID_INLINE290 = 290,
-    STYLE_ID_INLINE291 = 291
+    STYLE_ID_INLINE291 = 291,
+    STYLE_ID_INLINE292 = 292
 };
 
 enum ThemesEnum {
@@ -1917,4 +1918,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM220_CH_SETTINGS_SPECIFIC = 198
 };
 
-extern const uint8_t assets[314413];
+extern const uint8_t assets[314496];
