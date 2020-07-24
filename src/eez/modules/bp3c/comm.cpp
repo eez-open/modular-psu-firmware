@@ -46,7 +46,7 @@ bool masterSynchro(int slotIndex) {
 #if defined(EEZ_PLATFORM_STM32)
     uint32_t start = millis();
 
-    uint8_t txBuffer[15] = { SPI_MASTER_SYNBYTE };
+    uint8_t txBuffer[15] = { SPI_MASTER_SYNBYTE, (uint8_t)(slot.moduleRevision >> 8), (uint8_t)(slot.moduleRevision & 0xFF) };
     uint8_t rxBuffer[15];
 
     while (true) {
