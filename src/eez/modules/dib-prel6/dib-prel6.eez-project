@@ -129,36 +129,39 @@
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald17"
+              "font": "Oswald17",
+              "borderSize": "0"
             },
-            "left": 6,
-            "top": 38,
-            "width": 72,
-            "height": 62,
+            "left": 1,
+            "top": 33,
+            "width": 78,
+            "height": 68,
             "text": "1: ON"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald17"
+              "font": "Oswald17",
+              "borderSize": "0"
             },
-            "left": 83,
-            "top": 38,
-            "width": 73,
-            "height": 62,
+            "left": 80,
+            "top": 33,
+            "width": 79,
+            "height": 68,
             "text": "2: ON"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald17"
+              "font": "Oswald17",
+              "borderSize": "0"
             },
-            "left": 6,
-            "top": 105,
-            "width": 72,
-            "height": 62,
+            "left": 1,
+            "top": 102,
+            "width": 78,
+            "height": 68,
             "text": "3: ON"
           },
           {
@@ -166,12 +169,12 @@
             "style": {
               "inheritFrom": "default",
               "font": "Oswald17",
-              "borderSize": "2"
+              "borderSize": "0"
             },
-            "left": 83,
-            "top": 105,
-            "width": 73,
-            "height": 62,
+            "left": 80,
+            "top": 102,
+            "width": 79,
+            "height": 68,
             "text": "4: OFF"
           },
           {
@@ -179,24 +182,25 @@
             "style": {
               "inheritFrom": "default",
               "font": "Oswald17",
-              "borderSize": "2"
+              "borderSize": "0"
             },
-            "left": 6,
-            "top": 172,
-            "width": 72,
-            "height": 62,
+            "left": 1,
+            "top": 171,
+            "width": 78,
+            "height": 68,
             "text": "5: OFF"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald17"
+              "font": "Oswald17",
+              "borderSize": "0"
             },
-            "left": 83,
-            "top": 172,
-            "width": 73,
-            "height": 62,
+            "left": 80,
+            "top": 171,
+            "width": 79,
+            "height": 68,
             "text": "6: ON"
           }
         ],
@@ -266,74 +270,78 @@
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald20"
+              "font": "Oswald17",
+              "borderSize": "0"
             },
-            "left": 6,
-            "top": 38,
-            "width": 112,
-            "height": 62,
+            "left": 1,
+            "top": 33,
+            "width": 118,
+            "height": 68,
             "text": "1: ON"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald20"
+              "font": "Oswald17",
+              "borderSize": "0"
             },
-            "left": 123,
-            "top": 38,
-            "width": 112,
-            "height": 62,
+            "left": 120,
+            "top": 33,
+            "width": 119,
+            "height": 68,
             "text": "2: ON"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald20"
+              "font": "Oswald17",
+              "borderSize": "0"
             },
-            "left": 6,
-            "top": 105,
-            "width": 112,
-            "height": 62,
+            "left": 1,
+            "top": 102,
+            "width": 118,
+            "height": 68,
             "text": "3: ON"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default",
-              "font": "Oswald20",
-              "borderSize": "2"
+              "font": "Oswald17",
+              "borderSize": "0"
             },
-            "left": 123,
-            "top": 105,
-            "width": 112,
-            "height": 62,
+            "left": 120,
+            "top": 102,
+            "width": 119,
+            "height": 68,
             "text": "4: OFF"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default",
-              "font": "Oswald20",
-              "borderSize": "2"
+              "font": "Oswald17",
+              "borderSize": "0"
             },
-            "left": 6,
-            "top": 172,
-            "width": 112,
-            "height": 62,
+            "left": 1,
+            "top": 171,
+            "width": 118,
+            "height": 68,
             "text": "5: OFF"
           },
           {
             "type": "Text",
             "style": {
               "inheritFrom": "default_inverse",
-              "font": "Oswald20"
+              "font": "Oswald17",
+              "borderSize": "0"
             },
-            "left": 123,
-            "top": 172,
-            "width": 112,
-            "height": 62,
+            "left": 120,
+            "top": 171,
+            "width": 119,
+            "height": 68,
             "text": "6: ON"
           }
         ],

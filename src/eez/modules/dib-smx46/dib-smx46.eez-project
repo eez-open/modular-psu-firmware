@@ -138,7 +138,7 @@
             },
             "data": "outputs",
             "left": 0,
-            "top": 32,
+            "top": 33,
             "width": 160,
             "height": 180,
             "itemWidget": {
@@ -260,7 +260,7 @@
             },
             "data": "outputs",
             "left": 0,
-            "top": 32,
+            "top": 33,
             "width": 240,
             "height": 180,
             "itemWidget": {
