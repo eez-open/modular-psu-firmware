@@ -65,6 +65,8 @@ struct DcpChannel : public Channel {
 	DigitalAnalogConverter dac;
 	IOExpander ioexp;
 
+	TestResult tempSensorTestResult = TEST_NONE;
+
     bool delayed_dp_off;
 	uint32_t delayed_dp_off_start;
 	bool dpOn;
@@ -206,15 +208,17 @@ struct DcpChannel : public Channel {
 		adc.test();
 		dac.test(ioexp, adc);
 
+		tempSensorTestResult = temp_sensor::sensors[temp_sensor::CH1 + channelIndex].test() ? TEST_OK : TEST_FAILED;
+
 		return isOk();
 	}
 
 	TestResult getTestResult() override {
-		if (ioexp.g_testResult == TEST_NONE || adc.g_testResult == TEST_NONE || dac.g_testResult == TEST_NONE) {
+		if (ioexp.g_testResult == TEST_NONE || adc.g_testResult == TEST_NONE || dac.g_testResult == TEST_NONE || tempSensorTestResult == TEST_NONE) {
 			return TEST_NONE;
 		}
 
-		if (ioexp.g_testResult == TEST_OK && adc.g_testResult == TEST_OK && dac.g_testResult == TEST_OK) {
+		if (ioexp.g_testResult == TEST_OK && adc.g_testResult == TEST_OK && dac.g_testResult == TEST_OK && tempSensorTestResult == TEST_OK) {
 			return TEST_OK;
 		}
 
@@ -242,7 +246,7 @@ struct DcpChannel : public Channel {
 
 #if !CONF_SKIP_PWRGOOD_TEST
 		if (!ioexp.testBit(IOExpander::IO_BIT_IN_PWRGOOD)) {
-			// DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d", channelIndex + 1, (int)ioexp.gpio);
+			DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d\n", channelIndex + 1, (int)ioexp.gpio);
 			flags.powerOk = 0;
 			generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channelIndex);
 			powerDownBySensor();

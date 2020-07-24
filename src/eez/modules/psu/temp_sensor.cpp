@@ -26,8 +26,6 @@
 #include <eez/modules/aux_ps/fan.h>
 #endif
 
-#define CONF_DECLARE_TEMP_SENSOR_FAILED_THRESHOLD_MS 2000
-
 namespace eez {
 namespace psu {
 
@@ -45,7 +43,7 @@ TempSensor sensors[NUM_TEMP_SENSORS] = { TEMP_SENSORS };
 ////////////////////////////////////////////////////////////////////////////////
 
 TempSensor::TempSensor(Type type_, const char *name_, int ques_bit_, int scpi_error_)
-    : type(type_), name(name_), ques_bit(ques_bit_), scpi_error(scpi_error_), m_timeOfFirstInvalidValue(0) {
+    : type(type_), name(name_), ques_bit(ques_bit_), scpi_error(scpi_error_) {
 }
 
 bool TempSensor::isInstalled() {
@@ -103,28 +101,17 @@ void TempSensor::testTemperatureValidity(float value) {
     bool isTemperatureValueInvalid = isNaN(value) || value < TEMP_SENSOR_MIN_VALID_TEMPERATURE || value > TEMP_SENSOR_MAX_VALID_TEMPERATURE;
     if (isTemperatureValueInvalid) {
         if (g_testResult == TEST_OK) {
-            if (m_timeOfFirstInvalidValue != 0) {
-                int32_t diff = millis() - m_timeOfFirstInvalidValue;
-                if (diff > CONF_DECLARE_TEMP_SENSOR_FAILED_THRESHOLD_MS) {
-                    g_testResult = TEST_FAILED;
+            g_testResult = TEST_FAILED;
 
-                    if (channel) {
-                        // set channel current max. limit to ERR_MAX_CURRENT if sensor is faulty
-                        channel->limitMaxCurrent(MAX_CURRENT_LIMIT_CAUSE_TEMPERATURE);
-                    }
-
-                    generateError(scpi_error);
-                }
-            } else {
-                m_timeOfFirstInvalidValue = millis();
-                if (m_timeOfFirstInvalidValue == 0) {
-                    m_timeOfFirstInvalidValue = 1;
-                }
+            if (channel) {
+                // set channel current max. limit to ERR_MAX_CURRENT if sensor is faulty
+                channel->limitMaxCurrent(MAX_CURRENT_LIMIT_CAUSE_TEMPERATURE);
             }
+
+            generateError(scpi_error);
         }
     } else {
         g_testResult = TEST_OK;
-        m_timeOfFirstInvalidValue = 0;
 
         if (channel) {
             channel->unlimitMaxCurrent();
@@ -134,7 +121,6 @@ void TempSensor::testTemperatureValidity(float value) {
 
 bool TempSensor::test() {
     if (isInstalled()) {
-        g_testResult = TEST_OK;
         float temperature = doRead();
         testTemperatureValidity(temperature);
     } else {

@@ -414,6 +414,12 @@ public:
         }
 
         testResult = pwrGood ? TEST_OK : TEST_FAILED;
+
+        // test temp. sensors
+		for (int subchannelIndex = 0; testResult == TEST_OK && subchannelIndex < 2; subchannelIndex++) {
+			auto &channel = *Channel::getBySlotIndex(slotIndex, subchannelIndex);
+			testResult = temp_sensor::sensors[temp_sensor::CH1 + channel.channelIndex].test() ? TEST_OK : TEST_FAILED;
+		}
     }
 
 #if defined(EEZ_PLATFORM_STM32)

@@ -55,13 +55,7 @@ void init() {
 }
 
 bool test() {
-    bool success = true;
-
-    for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-        success &= temp_sensor::sensors[i].test();
-    }
-
-    return success;
+    return temp_sensor::sensors[temp_sensor::AUX].test();
 }
 
 void tick(uint32_t tickCount) {
