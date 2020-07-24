@@ -198,7 +198,7 @@ bool IOExpander::test() {
             uint8_t value = read(reg);
             uint8_t expectedValue = getRegValue(i);
             if (value != expectedValue) {
-                DebugTrace("Ch%d IO expander reg check failure: reg=%d, expected=%d, got=%d", channel.channelIndex + 1, (int)REG_VALUES[3 * i], (int)expectedValue, (int)value);
+                DebugTrace("Ch%d IO expander reg check failure: reg=%d, expected=%d, got=%d\n", channel.channelIndex + 1, (int)REG_VALUES[3 * i], (int)expectedValue, (int)value);
 
                 g_testResult = TEST_FAILED;
                 break;
@@ -212,12 +212,13 @@ bool IOExpander::test() {
 		 generateError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED + channel.channelIndex);
 		 channel.flags.powerOk = 0;
     } else {
-    	g_testResult = TEST_OK;
-
 #if !CONF_SKIP_PWRGOOD_TEST
         channel.flags.powerOk = testBit(IO_BIT_IN_PWRGOOD);
-        if (!channel.flags.powerOk) {
-            DebugTrace("Ch%d power fault", channel.channelIndex + 1);
+        if (channel.flags.powerOk) {
+    	    g_testResult = TEST_OK;            
+        } else {
+            g_testResult = TEST_FAILED;
+            DebugTrace("Ch%d power fault\n", channel.channelIndex + 1);
             generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channel.channelIndex);
         }
 #endif
