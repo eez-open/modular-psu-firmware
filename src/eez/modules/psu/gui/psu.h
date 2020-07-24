@@ -418,6 +418,8 @@ enum {
 
 extern int g_displayTestColorIndex;
 
+bool isDefaultViewVertical();
+
 } // namespace gui
 } // namespace psu
 } // namespace eez

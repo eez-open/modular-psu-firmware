@@ -1726,7 +1726,7 @@ void onEncoder(int counter, bool clicked) {
         }
 
         if (isEncoderEnabledInActivePage()) {
-            if (g_focusCursor >= 0 && g_focusCursor < CH_NUM || activePageId != PAGE_ID_MAIN) {
+            if ((g_focusCursor >= 0 && g_focusCursor < CH_NUM) || activePageId != PAGE_ID_MAIN) {
                 Value value;
                 if (persist_conf::devConf.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
                     value = g_focusEditValue;
@@ -1925,6 +1925,10 @@ void selectChannel(Channel *channel) {
     } else {
         g_channelIndex = -1;
     }
+}
+
+bool isDefaultViewVertical() {
+    return persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
 }
 
 } // namespace gui

@@ -28,6 +28,7 @@
 #include "eez/firmware.h"
 #include "eez/gui/document.h"
 #include "eez/modules/psu/event_queue.h"
+#include "eez/modules/psu/gui/psu.h"
 #include "eez/modules/bp3c/comm.h"
 
 #include "./dib-prel6.h"
@@ -53,10 +54,10 @@ public:
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-            return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF;
+            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
         }
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
-            return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF_2COL;
+            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF_2COL : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
         }
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
             return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MAX;

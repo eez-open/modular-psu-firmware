@@ -31785,6 +31785,58 @@
         "height": 118
       },
       {
+        "name": "slot_def_horz_empty",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "alignVertical": "top",
+              "padding": "3 5"
+            },
+            "data": "",
+            "action": "",
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 80,
+            "text": " "
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 80
+      },
+      {
+        "name": "slot_def_horz_empty_2col",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "alignVertical": "top",
+              "padding": "3 5"
+            },
+            "data": "",
+            "action": "",
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 120,
+            "text": " "
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 120
+      },
+      {
         "name": "slot_max_1ch_title",
         "widgets": [
           {

@@ -31,6 +31,7 @@
 #include <eez/hmi.h>
 #include <eez/gui/gui.h>
 #include <eez/modules/psu/event_queue.h>
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/bp3c/comm.h>
 #include <eez/modules/bp3c/flash_slave.h>
 
@@ -57,10 +58,10 @@ public:
     
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-            return gui::PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF;
+            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
         }
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
-            return gui::PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF_2COL;
+            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF_2COL : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY_2COL;
         }
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
             return gui::PAGE_ID_DIB_MIO168_SLOT_VIEW_MAX;
