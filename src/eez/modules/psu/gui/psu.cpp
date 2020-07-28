@@ -1036,7 +1036,7 @@ void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
     if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
         auto eventType = touch::getEventType();
-        if (eventType != EVENT_TYPE_TOUCH_DOWN || eventType != EVENT_TYPE_TOUCH_MOVE) {
+        if (eventType == EVENT_TYPE_TOUCH_DOWN || eventType == EVENT_TYPE_TOUCH_MOVE) {
             mcu::display::selectBuffer(m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex);
             int x = MIN(MAX(touch::getX(), 1), eez::mcu::display::getDisplayWidth() - 2);
             int y = MIN(MAX(touch::getY(), 1), eez::mcu::display::getDisplayHeight() - 2);
