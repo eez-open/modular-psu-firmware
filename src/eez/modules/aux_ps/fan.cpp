@@ -482,19 +482,6 @@ int updateFanSpeed() {
 			// adjust fan speed depending on max. channel temperature
 			float maxChannelTemperature = psu::temperature::getMaxChannelTemperature();
 
-			// TODO remove this after DCP405 R3B1 is fixed
-			bool setMaxPwm = false;
-            using namespace eez::psu;
-			for (int i = 0; i < CH_NUM; i++) {
-				auto &channel = Channel::get(i);
-				auto &slot = *g_slots[channel.slotIndex];
-				if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405 && slot.moduleRevision == MODULE_REVISION_DCP405_R3B1) {
-					if (channel.isOutputEnabled() && channel.i.mon >= 3.0f) {
-						setMaxPwm = true;
-					}
-				}
-			}
-
 			float iMonMax, iMax;
 			getIMonMax(iMonMax, iMax);
 			float Ki = roundPrec(remap(iMonMax * iMonMax, 0, FAN_PID_KI_MIN, iMax * iMax, FAN_PID_KI_MAX), 0.05f);
@@ -503,6 +490,8 @@ int updateFanSpeed() {
 				g_fanPID.SetTunings(g_Kp, g_Ki, g_Kd, g_POn);
 				g_pidTarget = FAN_MIN_TEMP - 2.0 * iMonMax;
 			}
+
+			bool setMaxPwm = false;
 
 			g_pidTemp = setMaxPwm ? TEMP_SENSOR_MAX_VALID_TEMPERATURE : maxChannelTemperature;
 			if (g_fanPID.Compute()) {

@@ -588,7 +588,7 @@ struct DcpChannel : public Channel {
 		if (isOutputEnabled()) {
 			bool belowThreshold = !dac.isOverHwOvpThreshold();
 
-			if (value < previousUSet && g_slots[slotIndex]->moduleRevision < MODULE_REVISION_DCP405_R3B1) {
+			if (value < previousUSet) {
 				fallingEdge = true;
 				fallingEdgePreviousUMonAdc = u.mon_adc;
 				fallingEdgeTimeout = millis() + (belowThreshold ? CONF_FALLING_EDGE_SW_OVP_DELAY_MS : CONF_FALLING_EDGE_HW_OVP_DELAY_MS);
