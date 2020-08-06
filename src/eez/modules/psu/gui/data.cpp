@@ -4944,7 +4944,7 @@ void data_is_show_live_recording(DataOperationEnum operation, Cursor cursor, Val
 
 void data_channel_history_values(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC) {
-        value = Channel::getChannelHistoryValueFuncs(cursor);
+        value = ChannelHistory::getChannelHistoryValueFuncs(cursor);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
         value = Value(0, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {

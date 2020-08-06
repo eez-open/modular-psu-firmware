@@ -96,6 +96,10 @@ struct DcpChannel : public Channel {
 		
 		dac.slotIndex = slotIndex;
 		dac.channelIndex = channelIndex;
+
+		channelHistory = new ChannelHistory(*this);
+
+		DebugTrace("DcpChannel %d\n", sizeof(DcpChannel));
     }
 	
 	void getParams(uint16_t moduleRevision) override {

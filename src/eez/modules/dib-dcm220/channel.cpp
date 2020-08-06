@@ -95,6 +95,9 @@ struct DcmChannel : public Channel {
         : Channel(slotIndex, channelIndex, subchannelIndex)
         , isDcm224(isDcm224_)
     {
+        channelHistory = new ChannelHistory(*this);
+
+        DebugTrace("DcmChannel %d\n", sizeof(DcmChannel));
     }
 
 	void getParams(uint16_t moduleRevision) override {

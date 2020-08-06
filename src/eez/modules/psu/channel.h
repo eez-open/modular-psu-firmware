@@ -203,10 +203,41 @@ static const float RAMP_DURATION_DEF_VALUE_U = 0.01f;
 static const float RAMP_DURATION_DEF_VALUE_I = 0;
 static const float RAMP_DURATION_PREC = 0.001f;
 
+typedef float(*YtDataGetValueFunctionPointer)(uint32_t rowIndex, uint8_t columnIndex, float *max);
+
+struct ChannelHistory {
+    friend struct Channel;
+
+    ChannelHistory(Channel& channel_) : channel(channel_) {}
+
+    void reset();
+    void update(uint32_t tickCount);
+
+    static YtDataGetValueFunctionPointer getChannelHistoryValueFuncs(int channelIndex);
+
+protected:
+    bool historyStarted;
+    float uHistory[CHANNEL_HISTORY_SIZE];
+    float iHistory[CHANNEL_HISTORY_SIZE];
+    uint32_t historyPosition;
+    uint32_t historyLastTick;
+
+private: 
+    Channel& channel;
+
+    static float getChannel0HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
+    static float getChannel1HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
+    static float getChannel2HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
+    static float getChannel3HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
+    static float getChannel4HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
+    static float getChannel5HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
+};
+
 /// PSU channel.
 struct Channel {
     friend class DigitalAnalogConverter;
     friend struct calibration::Value;
+    friend struct ChannelHistory;
 
 public:
     /// Calibration parameters for the single point.
@@ -281,14 +312,14 @@ public:
         unsigned outputEnabled : 1;
         unsigned doOutputEnableOnNextSync: 1;
         unsigned outputEnabledValueOnNextSync: 1;
-        unsigned historyStarted : 1;
+        unsigned reserved1 : 1;
         unsigned senseEnabled : 1;
         unsigned cvMode : 1;
         unsigned ccMode : 1;
         unsigned powerOk : 1;
         unsigned calEnabled : 1;
         unsigned rprogEnabled : 1;
-        unsigned reserved : 1;
+        unsigned reserved2 : 1;
         unsigned rpol : 1; // remote sense reverse polarity is detected
         unsigned displayValue1 : 2;
         unsigned displayValue2 : 2;
@@ -388,10 +419,6 @@ public:
 
     /// Restore previously saved OE state for all the channels.
     static void restoreOE();
-
-    typedef float(*YtDataGetValueFunctionPointer)(uint32_t rowIndex, uint8_t columnIndex, float *max);
-
-    static YtDataGetValueFunctionPointer getChannelHistoryValueFuncs(int channelIndex);
 
     // Slot index. Starts from 0.
     uint8_t slotIndex;
@@ -699,25 +726,15 @@ protected:
     void doRemoteProgrammingEnable(bool enable);
     void protectionEnter(ProtectionValue &cpv, bool hwOvp);
 
+    ChannelHistory *channelHistory;
+
 private:
     bool delayLowRippleCheck;
     uint32_t outputEnableStartTime;
     
     MaxCurrentLimitCause maxCurrentLimitCause;
 
-    float uHistory[CHANNEL_HISTORY_SIZE];
-    float iHistory[CHANNEL_HISTORY_SIZE];
-    uint32_t historyPosition;
-    uint32_t historyLastTick;
-
     int reg_get_ques_isum_bit_mask_for_channel_protection_value(ProtectionValue &cpv);
-
-    static float getChannel0HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
-    static float getChannel1HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
-    static float getChannel2HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
-    static float getChannel3HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
-    static float getChannel4HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
-    static float getChannel5HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
 
     void clearProtectionConf();
     void protectionCheck(ProtectionValue &cpv);
