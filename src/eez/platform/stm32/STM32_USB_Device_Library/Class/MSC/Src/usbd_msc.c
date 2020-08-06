@@ -471,6 +471,9 @@ uint8_t USBD_MSC_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
   return (uint8_t)ret;
 }
 
+extern void Call_USBD_MSC_DataIn_InLowPriorityThread(USBD_HandleTypeDef *pdev, uint8_t epnum);
+extern void Call_MSC_BOT_DataOut_InLowPriorityThread(USBD_HandleTypeDef *pdev, uint8_t epnum);
+
 /**
 * @brief  USBD_MSC_DataIn
 *         handle data IN Stage
@@ -480,7 +483,8 @@ uint8_t USBD_MSC_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 */
 uint8_t USBD_MSC_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
-  MSC_BOT_DataIn(pdev, epnum);
+  Call_USBD_MSC_DataIn_InLowPriorityThread(pdev, epnum);
+  // MSC_BOT_DataIn(pdev, epnum);
 
   return (uint8_t)USBD_OK;
 }
@@ -494,7 +498,8 @@ uint8_t USBD_MSC_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum)
 */
 uint8_t USBD_MSC_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
-  MSC_BOT_DataOut(pdev, epnum);
+  Call_MSC_BOT_DataOut_InLowPriorityThread(pdev, epnum);
+  // MSC_BOT_DataOut(pdev, epnum);
 
   return (uint8_t)USBD_OK;
 }

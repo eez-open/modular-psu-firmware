@@ -18,6 +18,10 @@
 
 #include <stdio.h> // sprintf
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <usbd_msc_bot.h>
+#endif
+
 #include <eez/tasks.h>
 #include <eez/mp.h>
 #include <eez/sound.h>
@@ -49,6 +53,26 @@
 
 #include <eez/libs/sd_fat/sd_fat.h>
 #include <eez/libs/image/jpeg.h>
+
+////////////////////////////////////////////////////////////////////////////////
+
+#if defined(EEZ_PLATFORM_STM32)
+
+#include <usbd_msc_bot.h>
+
+USBD_HandleTypeDef *g_pdev;
+
+extern "C" void Call_USBD_MSC_DataIn_InLowPriorityThread(USBD_HandleTypeDef *pdev, uint8_t epnum) {
+    g_pdev = pdev;
+    eez::sendMessageToLowPriorityThread(eez::THREAD_MESSAGE_USBD_MSC_DATAIN, epnum);
+}
+
+extern "C" void Call_MSC_BOT_DataOut_InLowPriorityThread(USBD_HandleTypeDef *pdev, uint8_t epnum) {
+    g_pdev = pdev;
+    eez::sendMessageToLowPriorityThread(eez::THREAD_MESSAGE_USBD_MSC_DATAOUT, epnum);
+}
+
+#endif
 
 namespace eez {
 
@@ -353,7 +377,14 @@ void lowPriorityThreadOneIter() {
                 usb::selectUsbMode(param, usb::g_otgMode);
             } else if (type == THREAD_MESSAGE_SELECT_USB_DEVICE_CLASS) {
                 usb::selectUsbDeviceClass(param);
+            } 
+#if defined(EEZ_PLATFORM_STM32)
+            else if (type == THREAD_MESSAGE_USBD_MSC_DATAIN) {
+                MSC_BOT_DataIn(g_pdev, param);
+            } else if (type == THREAD_MESSAGE_USBD_MSC_DATAOUT) {
+                MSC_BOT_DataOut(g_pdev, param);
             }
+#endif
         }
     } else {
         if (g_shutingDown) {
