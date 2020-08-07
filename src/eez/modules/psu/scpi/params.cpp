@@ -194,17 +194,19 @@ void param_channels(scpi_t *context, scpi_parameter_t *parameter, int &numChanne
                         channels[numChannels++] = value;
                     }
                 } else {
+                    int value = valueFrom;
+
                     if (numChannels == MAX_NUM_CH_IN_CH_LIST) {
                         numChannels = 0;
                         return;
                     }
 
-                    if (!channelNumberToChannelIndex(valueFrom)) {
+                    if (!channelNumberToChannelIndex(value)) {
                         numChannels = 0;
                         return;
                     }
 
-                    channels[numChannels++] = valueFrom;
+                    channels[numChannels++] = value;
                 }
             } else if (result == SCPI_EXPR_NO_MORE) {
                 break;

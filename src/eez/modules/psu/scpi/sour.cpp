@@ -1229,7 +1229,7 @@ scpi_result_t scpi_cmd_sourceDigitalDataByte(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (!(channel->params.features & CH_FEATURE_DINPUT)) {
+    if (!(channel->params.features & CH_FEATURE_DOUTPUT)) {
         return SCPI_RES_ERR;
     }
 
@@ -1246,7 +1246,7 @@ scpi_result_t scpi_cmd_sourceDigitalDataByte(scpi_t *context) {
 
     channel->setDigitalOutputData(data);
 
-    return SCPI_RES_ERR;
+    return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_sourceDigitalDataByteQ(scpi_t *context) {
@@ -1262,7 +1262,7 @@ scpi_result_t scpi_cmd_sourceDigitalDataByteQ(scpi_t *context) {
 
     SCPI_ResultUInt8(context, channel->getDigitalOutputData());
 
-    return SCPI_RES_ERR;
+    return SCPI_RES_OK;
 }
 
 } // namespace scpi

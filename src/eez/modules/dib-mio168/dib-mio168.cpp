@@ -53,16 +53,22 @@ static const int DOUT_SUBCHANNEL_INDEX = 1;
 struct Mio168DinChannel : public Channel {
     Mio168DinChannel(int slotIndex, int channelIndex)
         : Channel(slotIndex, channelIndex, DIN_SUBCHANNEL_INDEX) 
-    {}
+    {
+        flags.powerOk = 1;
+    }
+
+    TestResult getTestResult() override;
 
     void getParams(uint16_t moduleRevision) override {
         params.features = CH_FEATURE_DINPUT;
     }
-    
+
+    uint8_t getDigitalInputData() override;
+
+    // defaults
     virtual void init() override {}
     bool test() override { return true;  }
     void tickSpecific(uint32_t tickCount) override {}
-    TestResult getTestResult() override { return TEST_OK; }
     bool isInCcMode() override { return false;  }
     bool isInCvMode() override { return false;  }
     void adcMeasureUMon() override {}
@@ -80,23 +86,28 @@ struct Mio168DinChannel : public Channel {
     void getPowerStepValues(StepValues *stepValues) override {}
     bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
     float readTemperature() override { return 25.0f; }
-
-    uint8_t getDigitalInputData() override;
 };
 
 struct Mio168DoutChannel : public Channel {
     Mio168DoutChannel(int slotIndex, int channelIndex)
         : Channel(slotIndex, channelIndex, DOUT_SUBCHANNEL_INDEX) 
-    {}
+    {
+        flags.powerOk = 1;
+    }
 
     void getParams(uint16_t moduleRevision) override {
         params.features = CH_FEATURE_DOUTPUT;
     }
 
+    TestResult getTestResult() override;
+
+    uint8_t getDigitalOutputData() override;
+    void setDigitalOutputData(uint8_t data) override;
+
+    // defaults
     virtual void init() override {}
     bool test() override { return true; }
     void tickSpecific(uint32_t tickCount) override {}
-    TestResult getTestResult() override { return TEST_OK; }
     bool isInCcMode() override { return false; }
     bool isInCvMode() override { return false; }
     void adcMeasureUMon() override {}
@@ -114,9 +125,6 @@ struct Mio168DoutChannel : public Channel {
     void getPowerStepValues(StepValues *stepValues) override {}
     bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
     float readTemperature() override { return 25.0f; }
-
-    uint8_t getDigitalOutputData() override;
-    void setDigitalOutputData(uint8_t data) override;
 };
 
 struct Mio168ModuleInfo : public ModuleInfo {
@@ -308,9 +316,19 @@ Channel *Mio168ModuleInfo::createChannel(int slotIndex, int channelIndex, int su
 static Mio168ModuleInfo g_mio168ModuleInfo;
 ModuleInfo *g_moduleInfo = &g_mio168ModuleInfo;
 
+TestResult Mio168DinChannel::getTestResult() {
+    auto mio168Module = (dib_mio168::Mio168Module *)g_slots[slotIndex];
+    return mio168Module->testResult;
+}
+
 uint8_t Mio168DinChannel::getDigitalInputData() {
     auto mio168Module = (dib_mio168::Mio168Module *)g_slots[slotIndex];
     return mio168Module->inputPinStates;
+}
+
+TestResult Mio168DoutChannel::getTestResult() {
+    auto mio168Module = (dib_mio168::Mio168Module *)g_slots[slotIndex];
+    return mio168Module->testResult;
 }
 
 uint8_t Mio168DoutChannel::getDigitalOutputData() {
