@@ -96,8 +96,6 @@ struct DcmChannel : public Channel {
         , isDcm224(isDcm224_)
     {
         channelHistory = new ChannelHistory(*this);
-
-        DebugTrace("DcmChannel %d\n", sizeof(DcmChannel));
     }
 
 	void getParams(uint16_t moduleRevision) override {
@@ -317,16 +315,17 @@ struct DcmChannel : public Channel {
 		return false;
 	}
 
-#if defined(EEZ_PLATFORM_STM32)
     float readTemperature() override {
+#if defined(EEZ_PLATFORM_STM32)
         if (g_slots[slotIndex]->moduleInfo->moduleType == MODULE_TYPE_DCM224) {
             // TODO this is temporary until module hardware is changed
             return 25.0f + (isOutputEnabled() ? 5 * i.set : 0.0f);
         } else {
             return temperature;
         }
-    }
 #endif
+        return NAN;
+    }
 };
 
 struct DcmModuleInfo : public PsuModuleInfo {

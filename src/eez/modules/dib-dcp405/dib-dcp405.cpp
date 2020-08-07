@@ -98,8 +98,6 @@ struct DcpChannel : public Channel {
 		dac.channelIndex = channelIndex;
 
 		channelHistory = new ChannelHistory(*this);
-
-		DebugTrace("DcpChannel %d\n", sizeof(DcpChannel));
     }
 	
 	void getParams(uint16_t moduleRevision) override {
@@ -795,16 +793,17 @@ struct DcpChannel : public Channel {
 		return false;
 	}
 
-#if defined(EEZ_PLATFORM_STM32)
 	float readTemperature() override {
+#if defined(EEZ_PLATFORM_STM32)
 		auto &slot = *g_slots[slotIndex];
 		if (slot.moduleRevision >= MODULE_REVISION_DCP405_R1B1) {
 			return drivers::tc77::readTemperature(slotIndex);
 		} else {
 			return drivers::tmp1075::readTemperature(slotIndex);
 		}
-	}
 #endif
+		return NAN;
+	}
 };
 
 struct DcpModuleInfo : public PsuModuleInfo {

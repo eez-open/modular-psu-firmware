@@ -713,9 +713,7 @@ public:
     virtual void changeIoExpBit(int io_bit, bool set);
 #endif
 
-#if defined(EEZ_PLATFORM_STM32)
     virtual float readTemperature() = 0;
-#endif
 
     //
     //

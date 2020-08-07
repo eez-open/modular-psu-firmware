@@ -79,6 +79,7 @@ struct Mio168DinChannel : public Channel {
     void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {}
     void getPowerStepValues(StepValues *stepValues) override {}
     bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
+    float readTemperature() override { return 25.0f; }
 };
 
 struct Mio168DoutChannel : public Channel {
@@ -110,6 +111,7 @@ struct Mio168DoutChannel : public Channel {
     void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {}
     void getPowerStepValues(StepValues *stepValues) override {}
     bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
+    float readTemperature() override { return 25.0f; }
 };
 
 struct Mio168ModuleInfo : public ModuleInfo {
