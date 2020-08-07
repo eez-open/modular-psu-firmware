@@ -1647,5 +1647,16 @@ void Channel::changeIoExpBit(int io_bit, bool set) {
 }
 #endif
 
+uint8_t Channel::getDigitalInputData() {
+    return 0;
+}
+    
+uint8_t Channel::getDigitalOutputData() {
+    return 0;
+}
+
+void Channel::setDigitalOutputData(uint8_t data) {
+}
+
 } // namespace psu
 } // namespace eez

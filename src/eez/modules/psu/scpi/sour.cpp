@@ -1224,10 +1224,44 @@ scpi_result_t scpi_cmd_sourceVoltageRampDurationQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceDigitalDataByte(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (!(channel->params.features & CH_FEATURE_DINPUT)) {
+        return SCPI_RES_ERR;
+    }
+
+    uint32_t data;
+    if (!SCPI_ParamUInt32(context, &data, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    if (data > 255) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    channel->setDigitalOutputData(data);
+
     return SCPI_RES_ERR;
 }
 
 scpi_result_t scpi_cmd_sourceDigitalDataByteQ(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (!(channel->params.features & CH_FEATURE_DOUTPUT)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultUInt8(context, channel->getDigitalOutputData());
+
     return SCPI_RES_ERR;
 }
 

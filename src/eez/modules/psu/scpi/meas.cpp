@@ -67,7 +67,19 @@ scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_measureDigitalByteQ(scpi_t *context) {
-    return SCPI_RES_ERR;
+    Channel *channel = param_channel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    if (!(channel->params.features & CH_FEATURE_DINPUT)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultUInt8(context, channel->getDigitalInputData());
+
+    return SCPI_RES_OK;
 }
 
 } // namespace scpi

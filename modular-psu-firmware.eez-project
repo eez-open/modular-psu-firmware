@@ -72812,21 +72812,13 @@
             }
           },
           {
-            "name": "SOURce:DIGital:DATA[:BYTE] ",
+            "name": "[SOURce[<n>]]:DIGital:DATA[:BYTE]",
             "parameters": [
               {
                 "name": "value",
                 "type": [
                   {
                     "type": "nr1"
-                  }
-                ]
-              },
-              {
-                "name": "ch_list",
-                "type": [
-                  {
-                    "type": "channel-list"
                   }
                 ]
               }
@@ -72838,18 +72830,8 @@
             }
           },
           {
-            "name": "SOURce:DIGital:DATA[:BYTE]?",
-            "parameters": [
-              {
-                "name": "ch_list",
-                "type": [
-                  {
-                    "type": "channel-list"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
+            "name": "[SOURce[<n>]]:DIGital:DATA[:BYTE]?",
+            "parameters": [],
             "response": {
               "type": [
                 {

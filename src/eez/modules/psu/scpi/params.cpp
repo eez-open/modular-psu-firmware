@@ -116,48 +116,61 @@ Channel *getSelectedChannel(scpi_t *context) {
 }
 
 Channel *param_channel(scpi_t *context, scpi_bool_t mandatory, scpi_bool_t skip_channel_check) {
-    int32_t channelIndex;
-
-    if (!SCPI_ParamChoice(context, channelChoice, &channelIndex, mandatory)) {
-        if (mandatory || SCPI_ParamErrorOccurred(context)) {
-            return 0;
-        }
-        channelIndex = getSelectedChannelIndex(context);
-        if (channelIndex == -1) {
-            return nullptr;
-        }
-    } else {
-        channelIndex--;
+    int numChannels;
+    uint8_t channels[MAX_NUM_CH_IN_CH_LIST];
+    param_channels(context, numChannels, channels, mandatory, skip_channel_check);
+    if (numChannels == 1) {
+        return &Channel::get(channels[0]);
     }
-
-    if (!skip_channel_check && !check_channel(context, channelIndex)) {
-        return nullptr;
-    }
-
-    return &Channel::get(channelIndex);
+    return nullptr;
 }
 
-uint32_t param_channels(scpi_t *context, scpi_bool_t mandatory, scpi_bool_t skip_channel_check) {
+void param_channels(scpi_t *context, int &numChannels, uint8_t *channels, scpi_bool_t mandatory, scpi_bool_t skip_channel_check) {
     scpi_parameter_t parameter;
     if (!SCPI_Parameter(context, &parameter, mandatory)) {
+        numChannels = 0;
         if (mandatory || SCPI_ParamErrorOccurred(context)) {
-            return 0;
+            return;
         }
         int channelIndex = getSelectedChannelIndex(context);
         if (channelIndex == -1) {
-            return 0;
+            return;
         }
         if (!skip_channel_check && !check_channel(context, channelIndex)) {
-            return 0;
+            return;
         }
-        return 1 << channelIndex;
+        channels[0] = channelIndex;
+        numChannels = 1;
+    } else {
+        param_channels(context, &parameter, numChannels, channels, skip_channel_check);
     }
-    
-    return param_channels(context, &parameter, skip_channel_check);
 }
 
-uint32_t param_channels(scpi_t *context, scpi_parameter_t *parameter, scpi_bool_t skip_channel_check) {
-    uint32_t channels = 0;
+bool channelNumberToChannelIndex(int &value) {
+    if (value >= 101) {
+        int slotIndex = value / 100;
+        if (slotIndex > NUM_SLOTS) {
+            return false;
+        }
+        slotIndex--;
+
+        int subchannelIndex = value % 100 - 1;
+
+        Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+        if (!channel) {
+            return false;
+        }
+
+        value = channel->channelIndex;
+    } else {
+        value--;
+    }
+
+    return true;
+}
+
+void param_channels(scpi_t *context, scpi_parameter_t *parameter, int &numChannels, uint8_t *channels, scpi_bool_t skip_channel_check) {
+    numChannels = 0;
 
     if (parameter->type == SCPI_TOKEN_PROGRAM_EXPRESSION) {
         bool isRange;
@@ -168,39 +181,64 @@ uint32_t param_channels(scpi_t *context, scpi_parameter_t *parameter, scpi_bool_
             if (result == SCPI_EXPR_OK) {
                 if (isRange) {
                     for (int value = valueFrom; value <= valueTo; value++) {
-                        channels |= (1 << (value - 1));
+                        if (numChannels == MAX_NUM_CH_IN_CH_LIST) {
+                            numChannels = 0;
+                            return;
+                        }
+                        
+                        if (!channelNumberToChannelIndex(value)) {
+                            numChannels = 0;
+                            return;
+                        }
+                        
+                        channels[numChannels++] = value;
                     }
                 } else {
-                    channels |= (1 << (valueFrom - 1));
+                    if (numChannels == MAX_NUM_CH_IN_CH_LIST) {
+                        numChannels = 0;
+                        return;
+                    }
+
+                    if (!channelNumberToChannelIndex(valueFrom)) {
+                        numChannels = 0;
+                        return;
+                    }
+
+                    channels[numChannels++] = valueFrom;
                 }
             } else if (result == SCPI_EXPR_NO_MORE) {
                 break;
             } else {
-                return 0;
+                numChannels = 0;
+                return;
             }
         }
     } else {
         int32_t channelIndex;
         if (!SCPI_ParamToChoice(context, parameter, channelChoiceWithAll, &channelIndex)) {
-            return 0;
+            numChannels = 0;
+            return;
         }
         if (channelIndex > 0) {
-            channelIndex--;
-            channels = 1 << channelIndex;
+            channels[0] = channelIndex - 1;
+            numChannels = 1;
         } else {
-            channels = 0xFFFFFFFF; // all channels
+            // all channels
+            for (int i = 0; i < CH_NUM; i++) {
+                channels[i] = i;
+            }
+            numChannels = CH_NUM;
         }
     }
 
     if (!skip_channel_check) {
-        for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-            if ((channels & (1 << channelIndex)) && !check_channel(context, channelIndex)) {
-                return 0;
+        for (int i = 0; i < numChannels; i++) {
+            if (!check_channel(context, channels[i])) {
+                numChannels = 0;
+                return;
             }
         }
     }
-
-    return channels;
 }
 
 Channel *set_channel_from_command_number(scpi_t *context) {

@@ -539,6 +539,14 @@ scpi_result_t scpi_cmd_systemChannelOptionQ(scpi_t *context) {
         SCPI_ResultText(context, "Coupling");
     }
 
+    if (features & CH_FEATURE_DINPUT) {
+        SCPI_ResultText(context, "DInput");
+    }
+
+    if (features & CH_FEATURE_DOUTPUT) {
+        SCPI_ResultText(context, "DOutput");
+    }
+
     return SCPI_RES_OK;
 }
 

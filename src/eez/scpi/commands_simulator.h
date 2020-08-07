@@ -226,8 +226,8 @@
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate][:AMPLitude]?", scpi_cmd_sourceVoltageLevelImmediateAmplitudeQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:RAMP:DURation", scpi_cmd_sourceVoltageRampDuration) \
     SCPI_COMMAND("[SOURce#]:VOLTage:RAMP:DURation?", scpi_cmd_sourceVoltageRampDurationQ) \
-    SCPI_COMMAND("SOURce:DIGital:DATA[:BYTE] ", scpi_cmd_sourceDigitalDataByte) \
-    SCPI_COMMAND("SOURce:DIGital:DATA[:BYTE]?", scpi_cmd_sourceDigitalDataByteQ) \
+    SCPI_COMMAND("[SOURce#]:DIGital:DATA[:BYTE]", scpi_cmd_sourceDigitalDataByte) \
+    SCPI_COMMAND("[SOURce#]:DIGital:DATA[:BYTE]?", scpi_cmd_sourceDigitalDataByteQ) \
     SCPI_COMMAND("STATus:OPERation:CONDition?", scpi_cmd_statusOperationConditionQ) \
     SCPI_COMMAND("STATus:OPERation:ENABle", scpi_cmd_statusOperationEnable) \
     SCPI_COMMAND("STATus:OPERation:ENABle?", scpi_cmd_statusOperationEnableQ) \

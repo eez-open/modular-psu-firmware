@@ -56,7 +56,7 @@ struct Mio168DinChannel : public Channel {
     {}
 
     void getParams(uint16_t moduleRevision) override {
-        params.features = 0;
+        params.features = CH_FEATURE_DINPUT;
     }
     
     virtual void init() override {}
@@ -80,6 +80,8 @@ struct Mio168DinChannel : public Channel {
     void getPowerStepValues(StepValues *stepValues) override {}
     bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
     float readTemperature() override { return 25.0f; }
+
+    uint8_t getDigitalInputData() override;
 };
 
 struct Mio168DoutChannel : public Channel {
@@ -88,7 +90,7 @@ struct Mio168DoutChannel : public Channel {
     {}
 
     void getParams(uint16_t moduleRevision) override {
-        params.features = 0;
+        params.features = CH_FEATURE_DOUTPUT;
     }
 
     virtual void init() override {}
@@ -112,6 +114,9 @@ struct Mio168DoutChannel : public Channel {
     void getPowerStepValues(StepValues *stepValues) override {}
     bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
     float readTemperature() override { return 25.0f; }
+
+    uint8_t getDigitalOutputData() override;
+    void setDigitalOutputData(uint8_t data) override;
 };
 
 struct Mio168ModuleInfo : public ModuleInfo {
@@ -302,6 +307,21 @@ Channel *Mio168ModuleInfo::createChannel(int slotIndex, int channelIndex, int su
 
 static Mio168ModuleInfo g_mio168ModuleInfo;
 ModuleInfo *g_moduleInfo = &g_mio168ModuleInfo;
+
+uint8_t Mio168DinChannel::getDigitalInputData() {
+    auto mio168Module = (dib_mio168::Mio168Module *)g_slots[slotIndex];
+    return mio168Module->inputPinStates;
+}
+
+uint8_t Mio168DoutChannel::getDigitalOutputData() {
+    auto mio168Module = (dib_mio168::Mio168Module *)g_slots[slotIndex];
+    return mio168Module->outputPinStates;
+}
+
+void Mio168DoutChannel::setDigitalOutputData(uint8_t data) {
+    auto mio168Module = (dib_mio168::Mio168Module *)g_slots[slotIndex];
+    mio168Module->outputPinStates = data;
+}
 
 } // namespace dib_mio168
 

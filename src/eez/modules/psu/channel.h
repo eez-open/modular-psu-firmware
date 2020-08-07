@@ -91,7 +91,9 @@ enum ChannelFeatures {
     CH_FEATURE_RPOL = (1 << 6),
     CH_FEATURE_CURRENT_DUAL_RANGE = (1 << 7),
     CH_FEATURE_HW_OVP = (1 << 8),
-    CH_FEATURE_COUPLING = (1 << 9)
+    CH_FEATURE_COUPLING = (1 << 9),
+    CH_FEATURE_DINPUT = (1 << 10),
+    CH_FEATURE_DOUTPUT = (1 << 11)
 };
 
 struct ChannelParams {
@@ -714,6 +716,11 @@ public:
 #endif
 
     virtual float readTemperature() = 0;
+
+    virtual uint8_t getDigitalInputData();
+    
+    virtual uint8_t getDigitalOutputData();
+    virtual void setDigitalOutputData(uint8_t data);
 
     //
     //

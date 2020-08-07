@@ -1263,24 +1263,20 @@ bool testOutputEnable(Channel &channel, bool enable, bool &callTriggerAbort, int
     return true;
 }
 
-bool outputEnable(uint32_t channels, bool enable, int *err) {
+bool outputEnable(int numChannels, uint8_t *channels, bool enable, int *err) {
     bool callTriggerAbort = false;
 
-    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-        if ((channels & (1 << channelIndex)) != 0) {
-            if (!testOutputEnable(Channel::get(channelIndex), enable, callTriggerAbort, err)) {
-                return false;
-            }
+    for (int i = 0; i < numChannels; i++) {
+        if (!testOutputEnable(Channel::get(channels[i]), enable, callTriggerAbort, err)) {
+            return false;
         }
     }
 
     if (callTriggerAbort) {
         trigger::abort();
     } else {
-        for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-            if ((channels & (1 << channelIndex)) != 0) {
-                outputEnableOnNextSync(Channel::get(channelIndex), enable);
-            }
+        for (int i = 0; i < numChannels; i++) {
+            outputEnableOnNextSync(Channel::get(channels[i]), enable);
         }
         syncOutputEnable();
     }
