@@ -203,7 +203,7 @@ PsuModule::PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleR
 }
 
 TestResult PsuModule::getTestResult() {
-    return Channel::getBySlotIndex(slotIndex)->isOk() ? TEST_OK : TEST_FAILED;
+    return Channel::getBySlotIndex(slotIndex)->getTestResult();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
