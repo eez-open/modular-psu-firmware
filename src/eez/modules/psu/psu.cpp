@@ -191,8 +191,7 @@ bool g_adcMeasureAllFinished = false;
 ////////////////////////////////////////////////////////////////////////////////
 
 PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration, uint32_t spiBaudRatePrescaler, bool spiCrcCalculationEnable, uint8_t numChannels_)
-    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision, flashMethod, flashDuration, spiBaudRatePrescaler, spiCrcCalculationEnable)
-    , numChannels(numChannels_)
+    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision, flashMethod, flashDuration, spiBaudRatePrescaler, spiCrcCalculationEnable, numChannels_)
 {
 }
 
@@ -201,16 +200,6 @@ PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const 
 PsuModule::PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled)
     : Module(slotIndex, moduleInfo, moduleRevision, firmwareInstalled)
 {
-}
-
-void PsuModule::boot() {
-    Channel::g_slotIndexToChannelIndex[slotIndex] = CH_NUM;
-
-    for (int subchannelIndex = 0; subchannelIndex < ((PsuModuleInfo *)moduleInfo)->numChannels; subchannelIndex++) {
-        Channel::g_channels[CH_NUM] = ((PsuModuleInfo *)moduleInfo)->createChannel(slotIndex, CH_NUM, subchannelIndex);
-        Channel::g_channels[CH_NUM]->initParams(moduleRevision);
-        CH_NUM++;
-    }
 }
 
 TestResult PsuModule::getTestResult() {

@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <new>
+
 #include <assert.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -30,6 +32,7 @@
 #include <eez/index.h>
 #include <eez/hmi.h>
 #include <eez/gui/gui.h>
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/bp3c/comm.h>
@@ -37,8 +40,77 @@
 
 #include "./dib-mio168.h"
 
+using namespace eez::psu;
+using namespace eez::psu::gui;
+using namespace eez::gui;
+
 namespace eez {
 namespace dib_mio168 {
+
+static const int DIN_SUBCHANNEL_INDEX = 0;
+static const int DOUT_SUBCHANNEL_INDEX = 1;
+
+struct Mio168DinChannel : public Channel {
+    Mio168DinChannel(int slotIndex, int channelIndex)
+        : Channel(slotIndex, channelIndex, DIN_SUBCHANNEL_INDEX) 
+    {}
+
+    void getParams(uint16_t moduleRevision) override {
+        params.features = 0;
+    }
+    
+    virtual void init() override {}
+    bool test() override { return true;  }
+    void tickSpecific(uint32_t tickCount) override {}
+    TestResult getTestResult() override { return TEST_OK; }
+    bool isInCcMode() override { return false;  }
+    bool isInCvMode() override { return false;  }
+    void adcMeasureUMon() override {}
+    void adcMeasureIMon() override {}
+    void adcMeasureMonDac() override {}
+    void adcMeasureAll() override {}
+    void setOutputEnable(bool enable, uint16_t tasks) override {}
+    void setDacVoltage(uint16_t value) override {}
+    void setDacVoltageFloat(float value) override {}
+    void setDacCurrent(uint16_t value) override {}
+    void setDacCurrentFloat(float value) override {}
+    bool isDacTesting() override { return false;  }
+    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getPowerStepValues(StepValues *stepValues) override {}
+    bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
+};
+
+struct Mio168DoutChannel : public Channel {
+    Mio168DoutChannel(int slotIndex, int channelIndex)
+        : Channel(slotIndex, channelIndex, DOUT_SUBCHANNEL_INDEX) 
+    {}
+
+    void getParams(uint16_t moduleRevision) override {
+        params.features = 0;
+    }
+
+    virtual void init() override {}
+    bool test() override { return true; }
+    void tickSpecific(uint32_t tickCount) override {}
+    TestResult getTestResult() override { return TEST_OK; }
+    bool isInCcMode() override { return false; }
+    bool isInCvMode() override { return false; }
+    void adcMeasureUMon() override {}
+    void adcMeasureIMon() override {}
+    void adcMeasureMonDac() override {}
+    void adcMeasureAll() override {}
+    void setOutputEnable(bool enable, uint16_t tasks) override {}
+    void setDacVoltage(uint16_t value) override {}
+    void setDacVoltageFloat(float value) override {}
+    void setDacCurrent(uint16_t value) override {}
+    void setDacCurrentFloat(float value) override {}
+    bool isDacTesting() override { return false; }
+    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getPowerStepValues(StepValues *stepValues) override {}
+    bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
+};
 
 struct Mio168ModuleInfo : public ModuleInfo {
 public:
@@ -46,31 +118,34 @@ public:
         : ModuleInfo(MODULE_TYPE_DIB_MIO168, MODULE_CATEGORY_OTHER, "MIO168", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_SPI, 10000,
 #if defined(EEZ_PLATFORM_STM32)
             SPI_BAUDRATEPRESCALER_4,
-            true
+            true,
 #else
             0,
-            false
+            false,
 #endif
+            2
         )
     {}
 
     Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) override;
     
+    Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override;
+
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
+            return isDefaultViewVertical() ? PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF : PAGE_ID_SLOT_DEF_HORZ_EMPTY;
         }
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
-            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF_2COL : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY_2COL;
+            return isDefaultViewVertical() ? PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF_2COL : PAGE_ID_SLOT_DEF_HORZ_EMPTY_2COL;
         }
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
-            return gui::PAGE_ID_DIB_MIO168_SLOT_VIEW_MAX;
+            return PAGE_ID_DIB_MIO168_SLOT_VIEW_MAX;
         }
         if (slotViewType == SLOT_VIEW_TYPE_MIN) {
-            return gui::PAGE_ID_DIB_MIO168_SLOT_VIEW_MIN;
+            return PAGE_ID_DIB_MIO168_SLOT_VIEW_MIN;
         }
         assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-        return gui::PAGE_ID_DIB_MIO168_SLOT_VIEW_MICRO;
+        return PAGE_ID_DIB_MIO168_SLOT_VIEW_MICRO;
     }
 };
 
@@ -107,7 +182,7 @@ public:
                 testResult = TEST_OK;
             } else {
                 if (g_slots[slotIndex]->firmwareInstalled) {
-                    psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                    event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
                 }
                 testResult = TEST_FAILED;
             }
@@ -173,7 +248,7 @@ public:
         } else {
             if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
                 if (++numCrcErrors >= 10) {
-                    psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
+                    event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                     synchronized = false;
                     testResult = TEST_FAILED;
                 } else {
@@ -208,6 +283,19 @@ public:
 
 Module *Mio168ModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
     return new Mio168Module(slotIndex, this, moduleRevision, firmwareInstalled);
+}
+
+Channel *Mio168ModuleInfo::createChannel(int slotIndex, int channelIndex, int subchannelIndex) {
+    if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+        void *buffer = malloc(sizeof(Mio168DinChannel));
+        memset(buffer, 0, sizeof(Mio168DinChannel));
+        return new (buffer) Mio168DinChannel(slotIndex, channelIndex);
+    } else if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+        void *buffer = malloc(sizeof(Mio168DoutChannel));
+        memset(buffer, 0, sizeof(Mio168DoutChannel));
+        return new (buffer) Mio168DoutChannel(slotIndex, channelIndex);
+    }
+    return nullptr;
 }
 
 static Mio168ModuleInfo g_mio168ModuleInfo;

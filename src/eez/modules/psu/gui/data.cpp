@@ -5781,14 +5781,8 @@ void data_slot_info(DataOperationEnum operation, Cursor cursor, Value &value) {
 }
 
 void data_slot_test_result(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (g_slots[cursor]->moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-        if (operation == DATA_OPERATION_GET) {
-            value = Value((int)psu::Channel::getBySlotIndex(cursor)->getTestResult(), VALUE_TYPE_TEST_RESULT);
-        }
-    } else {
-        if (operation == DATA_OPERATION_GET) {
-            value = Value((int)g_slots[cursor]->getTestResult(), VALUE_TYPE_TEST_RESULT);
-        }
+    if (operation == DATA_OPERATION_GET) {
+        value = Value((int)g_slots[cursor]->getTestResult(), VALUE_TYPE_TEST_RESULT);
     }
 }
 
