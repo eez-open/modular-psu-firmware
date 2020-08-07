@@ -1223,6 +1223,14 @@ scpi_result_t scpi_cmd_sourceVoltageRampDurationQ(scpi_t *context) {
     return get_source_value(context, *channel, UNIT_SECOND, channel->u.rampDuration, channel->params.U_RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE_U);
 }
 
+scpi_result_t scpi_cmd_sourceDigitalDataByte(scpi_t *context) {
+    return SCPI_RES_ERR;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalDataByteQ(scpi_t *context) {
+    return SCPI_RES_ERR;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

@@ -66,6 +66,10 @@ scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_measureDigitalByteQ(scpi_t *context) {
+    return SCPI_RES_ERR;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez
