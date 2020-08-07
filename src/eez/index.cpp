@@ -22,8 +22,8 @@
 
 #include <eez/index.h>
 
-#include <eez/modules/dib-dcp405/channel.h>
-#include <eez/modules/dib-dcm220/channel.h>
+#include <eez/modules/dib-dcp405/dib-dcp405.h>
+#include <eez/modules/dib-dcm220/dib-dcm220.h>
 #include <eez/modules/dib-mio168/dib-mio168.h>
 #include <eez/modules/dib-prel6/dib-prel6.h>
 #include <eez/modules/dib-smx46/dib-smx46.h>
