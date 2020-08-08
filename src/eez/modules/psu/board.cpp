@@ -35,6 +35,8 @@ void powerUp() {
 
     HAL_GPIO_WritePin(PWR_DIRECT_GPIO_Port, PWR_DIRECT_Pin, GPIO_PIN_SET);
     delay(100);
+
+    HAL_GPIO_WritePin(PWR_SSTART_GPIO_Port, PWR_SSTART_Pin, GPIO_PIN_RESET);
 #endif
 }
 
