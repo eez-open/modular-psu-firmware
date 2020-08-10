@@ -317,14 +317,10 @@ struct DcmChannel : public Channel {
 
     float readTemperature() override {
 #if defined(EEZ_PLATFORM_STM32)
-        if (g_slots[slotIndex]->moduleInfo->moduleType == MODULE_TYPE_DCM224) {
-            // TODO this is temporary until module hardware is changed
-            return 25.0f + (isOutputEnabled() ? 5 * i.set : 0.0f);
-        } else {
-            return temperature;
-        }
-#endif
+        return temperature;
+#else
         return NAN;
+#endif
     }
 };
 
