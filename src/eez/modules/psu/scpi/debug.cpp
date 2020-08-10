@@ -41,7 +41,7 @@
 #include <eez/modules/bp3c/flash_slave.h>
 #include <eez/modules/bp3c/io_exp.h>
 
-#include <eez/modules/dib-dcp405/channel.h>
+#include <eez/modules/dib-dcp405/dib-dcp405.h>
 
 namespace eez {
 namespace psu {

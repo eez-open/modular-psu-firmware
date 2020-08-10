@@ -39,14 +39,15 @@ namespace dib_prel6 {
 struct Prel6ModuleInfo : public ModuleInfo {
 public:
     Prel6ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_PREL6, MODULE_CATEGORY_OTHER, "PREL6", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART, 0, 
+        : ModuleInfo(MODULE_TYPE_DIB_PREL6, "PREL6", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART, 0, 
 #if defined(EEZ_PLATFORM_STM32)
             SPI_BAUDRATEPRESCALER_64,
-            true
+            true,
 #else
             0,
-            false
+            false,
 #endif
+            0
         )
     {}
     

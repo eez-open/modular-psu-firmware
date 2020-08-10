@@ -27,7 +27,7 @@
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/persist_conf.h>
 
-#include <eez/modules/dib-dcp405/channel.h>
+#include <eez/modules/dib-dcp405/dib-dcp405.h>
 
 #include <eez/system.h>
 

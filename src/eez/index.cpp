@@ -22,8 +22,8 @@
 
 #include <eez/index.h>
 
-#include <eez/modules/dib-dcp405/channel.h>
-#include <eez/modules/dib-dcm220/channel.h>
+#include <eez/modules/dib-dcp405/dib-dcp405.h>
+#include <eez/modules/dib-dcm220/dib-dcm220.h>
 #include <eez/modules/dib-mio168/dib-mio168.h>
 #include <eez/modules/dib-prel6/dib-prel6.h>
 #include <eez/modules/dib-smx46/dib-smx46.h>
@@ -37,9 +37,8 @@ namespace eez {
 bool g_isCol2Mode = false;
 int g_slotIndexes[3] = { 0, 1, 2 };
 
-ModuleInfo::ModuleInfo(uint16_t moduleType_, uint16_t moduleCategory_, const char *moduleName_, const char *moduleBrand_, uint16_t latestModuleRevision_, FlashMethod flashMethod_, uint32_t flashDuration_, uint32_t spiBaudRatePrescaler_, bool spiCrcCalculationEnable_)
+ModuleInfo::ModuleInfo(uint16_t moduleType_, const char *moduleName_, const char *moduleBrand_, uint16_t latestModuleRevision_, FlashMethod flashMethod_, uint32_t flashDuration_, uint32_t spiBaudRatePrescaler_, bool spiCrcCalculationEnable_, uint8_t numChannels_)
     : moduleType(moduleType_)
-    , moduleCategory(moduleCategory_)
     , moduleName(moduleName_)
     , moduleBrand(moduleBrand_)
     , latestModuleRevision(latestModuleRevision_)
@@ -47,10 +46,15 @@ ModuleInfo::ModuleInfo(uint16_t moduleType_, uint16_t moduleCategory_, const cha
     , flashDuration(flashDuration_)
     , spiBaudRatePrescaler(spiBaudRatePrescaler_)
     , spiCrcCalculationEnable(spiCrcCalculationEnable_)
+    , numChannels(numChannels_)
 {
 }
 
 using namespace gui;
+
+psu::Channel *ModuleInfo::createChannel(int slotIndex, int channelIndex, int subchannelIndex) {
+    return nullptr;
+}
 
 int ModuleInfo::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
     if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
@@ -95,6 +99,15 @@ TestResult Module::getTestResult() {
 }
 
 void Module::boot() {
+    using namespace psu;
+
+    Channel::g_slotIndexToChannelIndex[slotIndex] = CH_NUM;
+
+    for (int subchannelIndex = 0; subchannelIndex < moduleInfo->numChannels; subchannelIndex++) {
+        Channel::g_channels[CH_NUM] = moduleInfo->createChannel(slotIndex, CH_NUM, subchannelIndex);
+        Channel::g_channels[CH_NUM]->initParams(moduleRevision);
+        CH_NUM++;
+    }
 }
 
 void Module::initChannels() {
@@ -119,7 +132,7 @@ void Module::onSpiDmaTransferCompleted(int status) {
 struct NoneModuleInfo : public ModuleInfo {
 public:
     NoneModuleInfo()
-        : ModuleInfo(MODULE_TYPE_NONE, MODULE_CATEGORY_NONE, "None", "None", 0, FLASH_METHOD_NONE, 0, 0, false)
+        : ModuleInfo(MODULE_TYPE_NONE, "None", "None", 0, FLASH_METHOD_NONE, 0, 0, false, 0)
     {
     }
 

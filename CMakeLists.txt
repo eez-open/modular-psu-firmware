@@ -439,14 +439,14 @@ source_group("eez\\modules\\mcu\\simulator" FILES ${src_eez_modules_mcu_simulato
 
 set(src_eez_modules_dib_dcp405
     src/eez/modules/dib-dcp405/adc.cpp
-    src/eez/modules/dib-dcp405/channel.cpp
+    src/eez/modules/dib-dcp405/dib-dcp405.cpp
     src/eez/modules/dib-dcp405/dac.cpp
     src/eez/modules/dib-dcp405/ioexp.cpp
 ) 
 list (APPEND src_files ${src_eez_modules_dib_dcp405})
 set(header_eez_modules_dib_dcp405
     src/eez/modules/dib-dcp405/adc.h
-    src/eez/modules/dib-dcp405/channel.h
+    src/eez/modules/dib-dcp405/dib-dcp405.h
     src/eez/modules/dib-dcp405/dac.h
     src/eez/modules/dib-dcp405/ioexp.h
 ) 
@@ -454,11 +454,11 @@ list (APPEND header_files ${header_eez_modules_dib_dcp405})
 source_group("eez\\modules\\dib-dcp405" FILES ${src_eez_modules_dib_dcp405} ${header_eez_modules_dib_dcp405})
 
 set(src_eez_modules_dib_dcm220
-    src/eez/modules/dib-dcm220/channel.cpp
+    src/eez/modules/dib-dcm220/dib-dcm220.cpp
 ) 
 list (APPEND src_files ${src_eez_modules_dib_dcm220})
 set(header_eez_modules_dib_dcm220
-    src/eez/modules/dib-dcm220/channel.h
+    src/eez/modules/dib-dcm220/dib-dcm220.h
 ) 
 list (APPEND header_files ${header_eez_modules_dib_dcm220})
 source_group("eez\\modules\\dib-dcm220" FILES ${src_eez_modules_dib_dcm220} ${header_eez_modules_dib_dcm220})

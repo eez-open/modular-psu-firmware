@@ -32,10 +32,6 @@ static const uint16_t MODULE_TYPE_DIB_MIO168 = 168;
 static const uint16_t MODULE_TYPE_DIB_PREL6 = 6;
 static const uint16_t MODULE_TYPE_DIB_SMX46 = 46;
 
-static const uint16_t MODULE_CATEGORY_NONE = 0;
-static const uint16_t MODULE_CATEGORY_DCPSUPPLY = 1;
-static const uint16_t MODULE_CATEGORY_OTHER = 2;
-
 enum SlotViewType {
     SLOT_VIEW_TYPE_DEFAULT,
     SLOT_VIEW_TYPE_DEFAULT_2COL,
@@ -52,9 +48,12 @@ enum FlashMethod {
 
 struct Module;
 
+namespace psu {
+    struct Channel;
+}
+
 struct ModuleInfo {
     uint16_t moduleType;
-    uint16_t moduleCategory;
     const char *moduleName;
     const char *moduleBrand;
     uint16_t latestModuleRevision;
@@ -62,10 +61,12 @@ struct ModuleInfo {
     uint32_t flashDuration;
     uint32_t spiBaudRatePrescaler;
     bool spiCrcCalculationEnable;
+    uint8_t numChannels;
 
-    ModuleInfo(uint16_t moduleType, uint16_t moduleCategory, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration_, uint32_t spiBaudRatePrescaler_, bool spiCrcCalculationEnable_);
+    ModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration_, uint32_t spiBaudRatePrescaler_, bool spiCrcCalculationEnable_, uint8_t numChannels_);
 
     virtual Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) = 0;
+    virtual psu::Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex);
     virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);
 };
 

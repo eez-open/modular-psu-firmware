@@ -29,7 +29,7 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/ramp.h>
 
-#include <eez/modules/dib-dcp405/channel.h>
+#include <eez/modules/dib-dcp405/dib-dcp405.h>
 #include <eez/modules/dib-dcp405/dac.h>
 #include <eez/modules/dib-dcp405/adc.h>
 #include <eez/modules/dib-dcp405/ioexp.h>

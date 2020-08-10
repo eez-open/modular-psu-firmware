@@ -18,7 +18,7 @@
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
-#include <eez/modules/dib-dcp405/channel.h>
+#include <eez/modules/dib-dcp405/dib-dcp405.h>
 #include <eez/modules/dib-dcp405/ioexp.h>
 
 #if defined(EEZ_PLATFORM_STM32)

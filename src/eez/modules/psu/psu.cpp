@@ -61,7 +61,7 @@
 #include <eez/modules/mcu/battery.h>
 #include <eez/modules/mcu/eeprom.h>
 
-#include <eez/modules/dib-dcp405/channel.h>
+#include <eez/modules/dib-dcp405/dib-dcp405.h>
 #include <eez/modules/dib-dcp405/ioexp.h>
 #include <eez/modules/dib-dcp405/dac.h>
 #include <eez/modules/dib-dcp405/adc.h>
@@ -191,8 +191,7 @@ bool g_adcMeasureAllFinished = false;
 ////////////////////////////////////////////////////////////////////////////////
 
 PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration, uint32_t spiBaudRatePrescaler, bool spiCrcCalculationEnable, uint8_t numChannels_)
-    : ModuleInfo(moduleType, MODULE_CATEGORY_DCPSUPPLY, moduleName, moduleBrend, latestModuleRevision, flashMethod, flashDuration, spiBaudRatePrescaler, spiCrcCalculationEnable)
-    , numChannels(numChannels_)
+    : ModuleInfo(moduleType, moduleName, moduleBrend, latestModuleRevision, flashMethod, flashDuration, spiBaudRatePrescaler, spiCrcCalculationEnable, numChannels_)
 {
 }
 
@@ -203,18 +202,8 @@ PsuModule::PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleR
 {
 }
 
-void PsuModule::boot() {
-    Channel::g_slotIndexToChannelIndex[slotIndex] = CH_NUM;
-
-    for (int subchannelIndex = 0; subchannelIndex < ((PsuModuleInfo *)moduleInfo)->numChannels; subchannelIndex++) {
-        Channel::g_channels[CH_NUM] = ((PsuModuleInfo *)moduleInfo)->createChannel(slotIndex, CH_NUM, subchannelIndex);
-        Channel::g_channels[CH_NUM]->initParams(moduleRevision);
-        CH_NUM++;
-    }
-}
-
 TestResult PsuModule::getTestResult() {
-    return Channel::getBySlotIndex(slotIndex)->isOk() ? TEST_OK : TEST_FAILED;
+    return Channel::getBySlotIndex(slotIndex)->getTestResult();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

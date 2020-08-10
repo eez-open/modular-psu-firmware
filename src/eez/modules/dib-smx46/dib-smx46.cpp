@@ -40,14 +40,15 @@ namespace dib_smx46 {
 struct Smx46ModuleInfo : public ModuleInfo {
 public:
     Smx46ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_SMX46, MODULE_CATEGORY_OTHER, "SMX46", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART, 0,
+        : ModuleInfo(MODULE_TYPE_DIB_SMX46, "SMX46", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART, 0,
 #if defined(EEZ_PLATFORM_STM32)
             SPI_BAUDRATEPRESCALER_64,
-            true
+            true,
 #else
             0,
-            false
+            false,
 #endif
+            0
         )
     {}
     

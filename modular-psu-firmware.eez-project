@@ -68290,7 +68290,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#cls",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68308,7 +68312,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68316,7 +68324,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#ese",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68324,7 +68336,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#esr",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68332,7 +68348,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#idn",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68340,7 +68360,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#opc",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68348,7 +68372,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#opc",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68366,7 +68394,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68374,7 +68406,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#rst",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68392,7 +68428,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68410,7 +68450,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68418,7 +68462,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#sre",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68426,7 +68474,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#stb",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68434,7 +68486,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#trg",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68442,7 +68498,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#tst",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68450,7 +68510,11 @@
             "helpLink": "EEZ BB3 SCPI reference 4 - common comand reference.html#wai",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           }
         ]
@@ -68464,7 +68528,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.1 - ABORt.html#abor",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68472,7 +68540,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.1 - ABORt.html#abor_dlog",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           }
         ]
@@ -68496,7 +68568,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68515,7 +68591,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68537,7 +68617,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68555,7 +68639,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68582,7 +68670,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68600,7 +68692,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68608,7 +68704,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_rem",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68616,7 +68716,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_save",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68634,7 +68738,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68642,7 +68750,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_stat",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68661,7 +68773,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68679,7 +68795,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68706,7 +68826,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68714,7 +68838,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_mode",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68722,7 +68850,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_scr",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           }
         ]
@@ -68747,7 +68879,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68766,7 +68902,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68774,7 +68914,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.3 - DIAGnostic.html#diag_prot",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68793,14 +68937,22 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "DIAGnostic[:INFOrmation]:REGS?",
             "parameters": [],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           }
         ]
@@ -68824,7 +68976,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68832,7 +68988,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.4 - DISPlay.html#disp_brig",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68854,7 +69014,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68862,7 +69026,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.4 - DISPlay.html#disp_view",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68880,7 +69048,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68888,7 +69060,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.4 - DISPlay.html#disp_text_cle",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68896,7 +69072,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.4 - DISPlay.html#disp_text",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68914,7 +69094,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68922,7 +69106,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.4 - DISPlay.html#disp_stat",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -68930,7 +69118,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.4 - DISPlay.html#disp_data",
             "parameters": [],
             "response": {
-              "type": "data-block"
+              "type": [
+                {
+                  "type": "data-block"
+                }
+              ]
             }
           },
           {
@@ -68947,7 +69139,11 @@
                 "isOptional": true
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "DISPlay[:WINdow]:INPut?",
@@ -69008,7 +69204,11 @@
               }
             ],
             "response": {
-              "type": "any"
+              "type": [
+                {
+                  "type": "any"
+                }
+              ]
             }
           },
           {
@@ -69052,7 +69252,11 @@
               }
             ],
             "response": {
-              "type": "any"
+              "type": [
+                {
+                  "type": "any"
+                }
+              ]
             }
           },
           {
@@ -69069,7 +69273,11 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "DISPlay[:WINdow]:DIALog:ACTIon?",
@@ -69086,7 +69294,11 @@
               }
             ],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -69137,13 +69349,21 @@
                 "isOptional": true
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "DISPlay[:WINdow]:DIALog:CLOSe",
             "helpLink": "EEZ BB3 SCPI reference 5.4 - DISPlay.html#disp_dial_clos",
             "parameters": [],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "DISPlay[:WINdow]:ERRor",
@@ -69159,7 +69379,11 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           }
         ]
       },
@@ -69192,7 +69416,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69200,7 +69428,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.7 - INITiate.html#init_cont",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69218,7 +69450,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69235,14 +69471,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "INITiate[:IMMediate]",
             "helpLink": "EEZ BB3 SCPI reference 5.7 - INITiate.html#init",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           }
         ]
@@ -69256,7 +69500,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_cat_full",
             "parameters": [],
             "response": {
-              "type": "any"
+              "type": [
+                {
+                  "type": "any"
+                }
+              ]
             }
           },
           {
@@ -69264,7 +69512,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_cat",
             "parameters": [],
             "response": {
-              "type": "list-of-quoted-string"
+              "type": [
+                {
+                  "type": "list-of-quoted-string"
+                }
+              ]
             }
           },
           {
@@ -69282,15 +69534,23 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "INSTrument:COUPle:TRACking?",
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_coup",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "Type1"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "Type1"
+                }
+              ]
             }
           },
           {
@@ -69308,22 +69568,34 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "INSTrument:COUPle:TRIGger?",
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_coup_trig",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "Mode2"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "Mode2"
+                }
+              ]
             }
           },
           {
             "name": "INSTrument:DISPlay:TRACe:SWAP",
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_disp_trac_swap",
             "parameters": [],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "INSTrument:DISPlay:TRACe[<n>]",
@@ -69340,15 +69612,23 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "INSTrument:DISPlay:TRACe[<n>]?",
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_disp_trac",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "Value"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "Value"
+                }
+              ]
             }
           },
           {
@@ -69365,14 +69645,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "INSTrument:DISPlay:YT:RATE?",
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_disp_yt_rate",
             "parameters": [],
             "response": {
-              "type": "nr2"
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
             }
           },
           {
@@ -69389,14 +69677,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "INSTrument:NSELect?",
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_nsel",
             "parameters": [],
             "response": {
-              "type": "nr1"
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
             }
           },
           {
@@ -69414,15 +69710,23 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "INSTrument[:SELect]?",
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_sel",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "Channel"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "Channel"
+                }
+              ]
             }
           },
           {
@@ -69465,7 +69769,11 @@
                 "description": "0-255, 0-65535 or 0-4294967295, depending on size"
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           }
         ]
       },
@@ -69489,7 +69797,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69508,7 +69820,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69527,7 +69843,31 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "MEASure:DIGital[:BYTE]?",
+            "parameters": [
+              {
+                "type": [
+                  {
+                    "type": "channel-list"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
             }
           }
         ]
@@ -69541,7 +69881,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.10 - MEMory.html#mem_nst",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69549,7 +69893,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.10 - MEMory.html#mem_stat_cat",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69567,7 +69915,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69575,7 +69927,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.10 - MEMory.html#mem_stat_del",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69602,7 +69958,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69620,7 +69980,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69638,7 +70002,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69646,7 +70014,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.10 - MEMory.html#mem_stat_rec_auto",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69664,7 +70036,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69672,7 +70048,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.10 - MEMory.html#mem_stat_rec_sel",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69690,7 +70070,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69708,7 +70092,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69716,8 +70104,12 @@
             "helpLink": "EEZ BB3 SCPI reference 5.10 - MEMory.html#mem_stat_del",
             "parameters": [],
             "response": {
-              "type": "boolean",
-              "enumeration": "Switch"
+              "type": [
+                {
+                  "type": "boolean",
+                  "enumeration": "Switch"
+                }
+              ]
             }
           }
         ]
@@ -69741,7 +70133,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69759,7 +70155,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69777,7 +70177,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69785,7 +70189,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.11 - MMEMory.html#mmem_cdir",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69812,7 +70220,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69830,7 +70242,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69848,7 +70264,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69856,7 +70276,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.11 - MMEMory.html#mmem_abor",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69874,7 +70298,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69892,7 +70320,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69910,7 +70342,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69918,7 +70354,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.11 - MMEMory.html#mmem_info",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69936,7 +70376,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69954,7 +70398,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69972,7 +70420,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69980,7 +70432,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.11 - MMEMory.html#mmem_lock",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -69998,7 +70454,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70025,7 +70485,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70043,7 +70507,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70061,7 +70529,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70079,7 +70551,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70097,7 +70573,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70115,7 +70595,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           }
         ]
@@ -70139,15 +70623,23 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "OUTPut:DPRog?",
             "helpLink": "EEZ BB3 SCPI reference 5.12 - OUTPut.html#outp_del_on",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "Switch"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "Switch"
+                }
+              ]
             }
           },
           {
@@ -70166,7 +70658,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70185,7 +70681,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70203,7 +70703,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70211,7 +70715,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.12 - OUTPut.html#outp_prot_coup",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70232,7 +70740,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70240,7 +70752,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.12 - OUTPut.html#outp_trac",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70271,7 +70787,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70293,7 +70813,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70321,7 +70845,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70340,7 +70868,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70367,7 +70899,11 @@
                 "isOptional": true
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "OUTPut:DELay:DURation?",
@@ -70385,7 +70921,11 @@
               }
             ],
             "response": {
-              "type": "nr3"
+              "type": [
+                {
+                  "type": "nr3"
+                }
+              ]
             }
           }
         ]
@@ -70412,14 +70952,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:CURRent[:DC]:RANGe[:UPPer]?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_curr_rang",
             "parameters": [],
             "response": {
-              "type": "nr2"
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
             }
           },
           {
@@ -70447,7 +70995,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70466,7 +71018,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70494,7 +71050,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70513,7 +71073,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70541,7 +71105,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70560,7 +71128,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70578,7 +71150,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70586,7 +71162,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_per",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70604,7 +71184,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70612,7 +71196,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_time",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70630,15 +71218,23 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:X:UNIT?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_x_unit",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "Unit"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "Unit"
+                }
+              ]
             }
           },
           {
@@ -70655,14 +71251,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:X:STEP?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_x_step",
             "parameters": [],
             "response": {
-              "type": "nr2"
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
             }
           },
           {
@@ -70679,14 +71283,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:X:LABel?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_x_lab",
             "parameters": [],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -70704,15 +71316,23 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:X:SCALe?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_x_scal",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "ScaleType"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "ScaleType"
+                }
+              ]
             }
           },
           {
@@ -70729,14 +71349,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:X[:RANGe]:MIN?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_x_min",
             "parameters": [],
             "response": {
-              "type": "nr2"
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
             }
           },
           {
@@ -70753,14 +71381,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:X[:RANGe]:MAX?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_x_max",
             "parameters": [],
             "response": {
-              "type": "nr2"
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
             }
           },
           {
@@ -70778,15 +71414,23 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:Y<n>:UNIT?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_y_unit",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "Unit"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "Unit"
+                }
+              ]
             }
           },
           {
@@ -70803,14 +71447,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:Y<n>:LABel?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_y_lab",
             "parameters": [],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -70827,14 +71479,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:Y<n>[:RANGe]:MIN?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_y_min",
             "parameters": [],
             "response": {
-              "type": "nr2"
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
             }
           },
           {
@@ -70851,14 +71511,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:Y<n>[:RANGe]:MAX?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_y_max",
             "parameters": [],
             "response": {
-              "type": "nr2"
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
             }
           },
           {
@@ -70876,15 +71544,23 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:Y:SCALe?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_y_scal",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "ScaleType"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "ScaleType"
+                }
+              ]
             }
           },
           {
@@ -70901,7 +71577,11 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:REMark",
@@ -70917,14 +71597,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SENSe:DLOG:TRACe:REMark?",
             "helpLink": "EEZ BB3 SCPI reference 5.13 - SENSe.html#sens_dlog_trac_rem",
             "parameters": [],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           }
         ]
@@ -70952,7 +71640,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70971,7 +71663,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70990,7 +71686,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -70998,7 +71698,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_curr_mode",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71020,7 +71724,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71039,7 +71747,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71057,7 +71769,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71065,7 +71781,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_curr_prot_stat",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71073,7 +71793,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_curr_prot_trip",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71095,7 +71819,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71114,7 +71842,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71136,7 +71868,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71155,7 +71891,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71177,7 +71917,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71196,7 +71940,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71213,14 +71961,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "[SOURce[<n>]]:CURRent:RAMP:DURation?",
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_curr_ramp_dur",
             "parameters": [],
             "response": {
-              "type": "nr3"
+              "type": [
+                {
+                  "type": "nr3"
+                }
+              ]
             }
           },
           {
@@ -71242,7 +71998,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71250,7 +72010,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_list_count",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71272,7 +72036,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71280,7 +72048,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_list_curr",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71298,7 +72070,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71306,7 +72082,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_list_dwel",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71328,7 +72108,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71336,7 +72120,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_list_volt",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71358,7 +72146,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71377,7 +72169,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71399,7 +72195,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71418,7 +72218,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71436,7 +72240,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71444,7 +72252,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_pow_prot_stat",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71452,7 +72264,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_pow_prot_trip",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71474,7 +72290,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71482,7 +72302,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_pow_prot",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71504,7 +72328,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71523,7 +72351,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71542,7 +72374,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71550,7 +72386,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_volt_mode",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71569,7 +72409,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71577,7 +72421,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_volt_prog",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71599,7 +72447,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71618,7 +72470,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71636,7 +72492,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71644,7 +72504,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_volt_prot_stat",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71652,7 +72516,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_volt_prot_trip",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71671,7 +72539,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71679,8 +72551,12 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_volt_prot_type",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "ProtectionType"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "ProtectionType"
+                }
+              ]
             }
           },
           {
@@ -71702,7 +72578,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71710,7 +72590,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_volt_prot",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71729,7 +72613,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71737,7 +72625,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_volt_sens",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71759,7 +72651,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71778,7 +72674,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71800,7 +72700,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71819,7 +72723,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71841,7 +72749,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71860,7 +72772,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71877,14 +72793,51 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "[SOURce[<n>]]:VOLTage:RAMP:DURation?",
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SOURce.html#sour_volt_ramp_dur",
             "parameters": [],
             "response": {
-              "type": "nr3"
+              "type": [
+                {
+                  "type": "nr3"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:DIGital:DATA[:BYTE]",
+            "parameters": [
+              {
+                "name": "value",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:DIGital:DATA[:BYTE]?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
             }
           }
         ]
@@ -71898,7 +72851,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_oper_cond",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71916,7 +72873,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71924,7 +72885,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_oper_enab",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71932,7 +72897,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_oper_inst_cond",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71950,7 +72919,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71958,7 +72931,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_oper_inst_enab",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71966,7 +72943,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_oper_inst_isum_cond",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71984,7 +72965,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -71992,7 +72977,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_oper_inst_isum_enab",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72000,7 +72989,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_oper_inst_isum",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72008,7 +73001,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_oper_inst",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72016,7 +73013,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_oper",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72024,7 +73025,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_pre",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72032,7 +73037,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_ques_cond",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72050,7 +73059,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72058,7 +73071,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_ques_enab",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72066,7 +73083,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_ques_inst_cond",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72084,7 +73105,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72092,7 +73117,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_ques_inst_enab",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72100,7 +73129,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_ques_inst_isum_cond",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72118,7 +73151,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72126,7 +73163,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_ques_inst_isum_enab",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72134,7 +73175,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_ques_inst_isum",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72142,7 +73187,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_ques_inst",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72150,7 +73199,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.15 - STATus.html#stat_ques",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           }
         ]
@@ -72174,7 +73227,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72182,7 +73239,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_beep_key_stat",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72200,7 +73261,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72208,7 +73273,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_beep_stat",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72216,7 +73285,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_beep",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72224,7 +73297,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cap",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72232,7 +73309,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_chan_coun",
             "parameters": [],
             "response": {
-              "type": "nr1"
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
             }
           },
           {
@@ -72250,7 +73331,11 @@
               }
             ],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -72268,7 +73353,11 @@
               }
             ],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -72285,7 +73374,11 @@
               }
             ],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -72304,7 +73397,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72323,7 +73420,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72342,7 +73443,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72361,7 +73466,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72380,7 +73489,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72399,7 +73512,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72418,7 +73535,11 @@
               }
             ],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -72437,7 +73558,11 @@
               }
             ],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -72456,7 +73581,11 @@
               }
             ],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -72464,7 +73593,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_chan_coun",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72483,7 +73616,11 @@
               }
             ],
             "response": {
-              "type": "nr1"
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
             }
           },
           {
@@ -72511,7 +73648,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72530,7 +73671,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72548,7 +73693,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72556,7 +73705,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_eth_addr",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72574,7 +73727,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72582,7 +73739,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_eth_dhcp",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72600,7 +73761,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72608,7 +73773,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_eth_dns",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72626,7 +73795,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72634,7 +73807,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_eth_gate",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72652,7 +73829,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72660,7 +73841,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_etc_host",
             "parameters": [],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -72678,7 +73863,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72686,7 +73875,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_eth_mac",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72704,7 +73897,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72712,7 +73909,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_eth_port",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72730,7 +73931,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72738,7 +73943,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_eth_smas",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72756,7 +73965,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72764,7 +73977,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_ntp",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72783,7 +74000,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72791,7 +74012,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_rlst",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72844,14 +74069,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SYSTem:COMMunicate:MQTT:STATe?",
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_eth_smas",
             "parameters": [],
             "response": {
-              "type": "nr1",
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ],
               "description": "-1: ERROR\n 0: IDLE\n 1: CONNECTED\n 2: TRANSIENT"
             }
           },
@@ -72871,7 +74104,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72879,8 +74116,12 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_ntp",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "UsbMode"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "UsbMode"
+                }
+              ]
             }
           },
           {
@@ -72899,7 +74140,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72907,8 +74152,12 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_ntp",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "UsbClass"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "UsbClass"
+                }
+              ]
             }
           },
           {
@@ -72916,7 +74165,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_ont_last",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72924,7 +74177,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_ont_tot",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72932,7 +74189,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72940,7 +74201,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
             "parameters": [],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -72948,7 +74213,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
             "parameters": [],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -72984,7 +74253,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -72992,7 +74265,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_date",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73010,15 +74287,23 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SYSTem:FORMat:DATE?",
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_form_date",
             "parameters": [],
             "response": {
-              "type": "discrete",
-              "enumeration": "DateFormat"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "DateFormat"
+                }
+              ]
             }
           },
           {
@@ -73035,14 +74320,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SYSTem:FORMat:TIME?",
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_form_time",
             "parameters": [],
             "response": {
-              "type": "nr1"
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
             }
           },
           {
@@ -73060,7 +74353,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73092,7 +74389,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73114,7 +74415,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73133,7 +74438,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73141,7 +74450,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_dig_pin_func",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73160,7 +74473,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73168,7 +74485,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_dig_pin_pol",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73194,7 +74515,11 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SYSTem:DIGital:OUTPut:PWM:DUTY?",
@@ -73210,7 +74535,11 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SYSTem:DIGital:OUTPut:PWM:FREQuency",
@@ -73235,7 +74564,11 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SYSTem:DIGital:OUTPut:PWM:FREQuency?",
@@ -73251,14 +74584,22 @@
                 "isOptional": false
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SYSTem:ERRor:COUNt?",
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_err_coun",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73266,7 +74607,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#__RefHeading__23078_295952897",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73274,7 +74619,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_inh",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73282,7 +74631,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_kloc",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73290,7 +74643,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_loc",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73298,7 +74655,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_pass_cal_res",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73306,7 +74667,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_pass_fpan_res",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73333,7 +74698,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73351,7 +74720,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73359,7 +74732,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_pon_outp_dis",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73377,7 +74754,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73395,7 +74776,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73403,7 +74788,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_pow_prot_trip",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73411,7 +74800,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_pow",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73419,21 +74812,33 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_rem",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "SYSTem:REStart",
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_res",
             "parameters": [],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SYSTem:RWLock",
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_rwl",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73452,7 +74857,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73480,7 +74889,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73499,7 +74912,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73527,7 +74944,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73546,7 +74967,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73565,7 +74990,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73592,7 +75021,11 @@
                 "isOptional": true
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "SYSTem:TEMPerature:PROTection[:HIGH][:LEVel]?",
@@ -73610,7 +75043,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73646,7 +75083,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73665,7 +75106,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73673,7 +75118,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_time_dst",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73691,7 +75140,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73699,7 +75152,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_time_zone",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73707,7 +75164,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_time",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73715,7 +75176,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_vers",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73724,7 +75189,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_vers",
             "parameters": [],
             "response": {
-              "type": "nr1",
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ],
               "description": "0 - Invalid\n1 - Valid\n2 - Testing\n3 - Not installed"
             }
           },
@@ -73733,7 +75202,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_vers",
             "parameters": [],
             "response": {
-              "type": "nr1"
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
             }
           },
           {
@@ -73752,7 +75225,11 @@
               }
             ],
             "response": {
-              "type": "nr2"
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
             }
           },
           {
@@ -73771,8 +75248,12 @@
               }
             ],
             "response": {
-              "type": "discrete",
-              "enumeration": "SystemMeasureVoltage"
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "SystemMeasureVoltage"
+                }
+              ]
             }
           },
           {
@@ -73780,7 +75261,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_sno",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           }
         ]
@@ -73805,7 +75290,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73813,7 +75302,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.17 - TRIGger.html#trig_dlog_sour",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73821,7 +75314,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.17 - TRIGger.html#trig_dlog",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73843,7 +75340,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73851,7 +75352,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.17 - TRIGger.html#trig_del",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73870,7 +75375,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73878,7 +75387,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.17 - TRIGger.html#trig_exit_cond",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73897,7 +75410,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73905,7 +75422,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.17 - TRIGger.html#trig_sour",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73913,7 +75434,11 @@
             "helpLink": "EEZ BB3 SCPI reference 5.17 - TRIGger.html#trig_imm",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           }
         ]
@@ -73963,7 +75488,11 @@
                 "isOptional": true
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "APPLy?",
@@ -73991,7 +75520,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -73999,7 +75532,11 @@
             "helpLink": "EEZ BB3 SCPI reference 6 - Device-specific commands.html#debug",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           }
         ]
@@ -74026,7 +75563,11 @@
             ],
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74037,7 +75578,11 @@
             ],
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74062,7 +75607,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74083,7 +75632,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74094,7 +75647,11 @@
             ],
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74105,7 +75662,11 @@
             ],
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74126,7 +75687,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74137,7 +75702,11 @@
             ],
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74158,7 +75727,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74169,7 +75742,11 @@
             ],
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74190,7 +75767,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74201,7 +75782,11 @@
             ],
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74212,7 +75797,11 @@
             ],
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74233,7 +75822,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74244,7 +75837,11 @@
             ],
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74275,7 +75872,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74297,7 +75898,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74318,7 +75923,11 @@
               }
             ],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
@@ -74329,7 +75938,11 @@
             ],
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           }
         ]
@@ -74346,77 +75959,121 @@
             "name": "DEBUg",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "DEBUg:ONTime?",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "DEBUg:VOLTage",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "DEBUg:CURRent",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "DEBUg:MEASure:VOLTage",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "DEBUg:MEASure:CURRent",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "DEBUg:FAN",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "DEBUg:FAN?",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "DEBUg:FAN:PID",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "DEBUg:FAN:PID?",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "DEBUg:CSV?",
             "parameters": [],
             "response": {
-              "type": "arbitrary-ascii"
+              "type": [
+                {
+                  "type": "arbitrary-ascii"
+                }
+              ]
             }
           },
           {
@@ -74447,7 +76104,11 @@
                 ]
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "DEBUg:IOEXp?",
@@ -74470,7 +76131,11 @@
               }
             ],
             "response": {
-              "type": "boolean",
+              "type": [
+                {
+                  "type": "boolean"
+                }
+              ],
               "description": "state"
             }
           },
@@ -74478,7 +76143,11 @@
             "name": "DEBUg:DCM220?",
             "parameters": [],
             "response": {
-              "type": "quoted-string"
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
             }
           },
           {
@@ -74502,7 +76171,11 @@
                 ]
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           },
           {
             "name": "DEBUg:EVENt",
@@ -74516,7 +76189,11 @@
                 ]
               }
             ],
-            "response": {}
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           }
         ]
       },
@@ -74527,14 +76204,22 @@
             "name": "SYSTem:DATE:CLEar",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           },
           {
             "name": "SYSTem:TIME:CLEar",
             "parameters": [],
             "response": {
-              "type": "numeric"
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
             }
           }
         ]

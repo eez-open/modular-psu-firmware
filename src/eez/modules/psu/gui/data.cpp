@@ -1515,52 +1515,37 @@ void data_no_channel_index(int slotIndex, DataOperationEnum operation, Cursor cu
     }
 }
 
-void data_slot_channel_index(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_slot_channel_index(int slotIndex, Channel *channel, DataOperationEnum operation, Cursor cursor, Value &value) {
     auto testResult = g_slots[slotIndex]->getTestResult();
-    if (g_slots[slotIndex]->moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
-        data_channel_index(*Channel::getBySlotIndex(slotIndex), operation, cursor, value);
+    if (channel && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
+        data_channel_index(*channel, operation, cursor, value);
     } else {
         data_no_channel_index(slotIndex, operation, cursor, value);
     }
 }
 
 void data_slot1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_channel_index(g_slotIndexes[0], operation, cursor, value);
+    data_slot_channel_index(g_slotIndexes[0], Channel::getBySlotIndex(g_slotIndexes[0]), operation, cursor, value);
 }
 
 void data_slot2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_channel_index(g_slotIndexes[1], operation, cursor, value);
+    data_slot_channel_index(g_slotIndexes[1], Channel::getBySlotIndex(g_slotIndexes[1]), operation, cursor, value);
 }
 
 void data_slot3_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_channel_index(g_slotIndexes[2], operation, cursor, value);
+    data_slot_channel_index(g_slotIndexes[2], Channel::getBySlotIndex(g_slotIndexes[2]), operation, cursor, value);
 }
 
 void data_slot_max_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    auto testResult = g_slots[persist_conf::getMaxSlotIndex()]->getTestResult();
-    if (g_slots[persist_conf::getMaxSlotIndex()]->moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
-        data_channel_index(Channel::get(persist_conf::getMaxChannelIndex()), operation, cursor, value);
-    } else {
-        data_no_channel_index(persist_conf::getMaxSlotIndex(), operation, cursor, value);
-    }
+    data_slot_channel_index(persist_conf::getMaxSlotIndex(), &Channel::get(persist_conf::getMaxChannelIndex()), operation, cursor, value);
 }
 
 void data_slot_min1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    auto testResult = g_slots[persist_conf::getMin1SlotIndex()]->getTestResult();
-    if (g_slots[persist_conf::getMin1SlotIndex()]->moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
-        data_channel_index(Channel::get(persist_conf::getMin1ChannelIndex()), operation, cursor, value);
-    } else {
-        data_no_channel_index(persist_conf::getMin1SlotIndex(), operation, cursor, value);
-    }
+    data_slot_channel_index(persist_conf::getMin1SlotIndex(), &Channel::get(persist_conf::getMin1ChannelIndex()), operation, cursor, value);
 }
 
 void data_slot_min2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    auto testResult = g_slots[persist_conf::getMin2SlotIndex()]->getTestResult();
-    if (g_slots[persist_conf::getMin2SlotIndex()]->moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
-        data_channel_index(Channel::get(persist_conf::getMin2ChannelIndex()), operation, cursor, value);
-    } else {
-        data_no_channel_index(persist_conf::getMin2SlotIndex(), operation, cursor, value);
-    }
+    data_slot_channel_index(persist_conf::getMin2SlotIndex(), &Channel::get(persist_conf::getMin2ChannelIndex()), operation, cursor, value);
 }
 
 void data_slot_default_view(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -4944,7 +4929,7 @@ void data_is_show_live_recording(DataOperationEnum operation, Cursor cursor, Val
 
 void data_channel_history_values(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC) {
-        value = Channel::getChannelHistoryValueFuncs(cursor);
+        value = ChannelHistory::getChannelHistoryValueFuncs(cursor);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
         value = Value(0, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
@@ -5781,14 +5766,8 @@ void data_slot_info(DataOperationEnum operation, Cursor cursor, Value &value) {
 }
 
 void data_slot_test_result(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (g_slots[cursor]->moduleInfo->moduleCategory == MODULE_CATEGORY_DCPSUPPLY) {
-        if (operation == DATA_OPERATION_GET) {
-            value = Value((int)psu::Channel::getBySlotIndex(cursor)->getTestResult(), VALUE_TYPE_TEST_RESULT);
-        }
-    } else {
-        if (operation == DATA_OPERATION_GET) {
-            value = Value((int)g_slots[cursor]->getTestResult(), VALUE_TYPE_TEST_RESULT);
-        }
+    if (operation == DATA_OPERATION_GET) {
+        value = Value((int)g_slots[cursor]->getTestResult(), VALUE_TYPE_TEST_RESULT);
     }
 }
 

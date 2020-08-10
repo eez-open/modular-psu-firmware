@@ -111,7 +111,7 @@ void setOutputDelayDuration(Channel &channel, float duration);
 void outputEnable(Channel &channel, bool enable);
 void outputEnableOnNextSync(Channel &channel, bool enable);
 void syncOutputEnable();
-bool outputEnable(uint32_t channels, bool enable, int *err);
+bool outputEnable(int numChannels, uint8_t *channels, bool enable, int *err);
 void disableOutputForAllChannels();
 void disableOutputForAllTrackingChannels();
 

@@ -79,6 +79,7 @@
     SCPI_COMMAND("MEASure[:SCALar]:CURRent[:DC]?", scpi_cmd_measureScalarCurrentDcQ) \
     SCPI_COMMAND("MEASure[:SCALar]:POWer[:DC]?", scpi_cmd_measureScalarPowerDcQ) \
     SCPI_COMMAND("MEASure[:SCALar][:VOLTage][:DC]?", scpi_cmd_measureScalarVoltageDcQ) \
+    SCPI_COMMAND("MEASure:DIGital[:BYTE]?", scpi_cmd_measureDigitalByteQ) \
     SCPI_COMMAND("MEMory:NSTates?", scpi_cmd_memoryNstatesQ) \
     SCPI_COMMAND("MEMory:STATe:CATalog?", scpi_cmd_memoryStateCatalogQ) \
     SCPI_COMMAND("MEMory:STATe:DELete", scpi_cmd_memoryStateDelete) \
@@ -225,6 +226,8 @@
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate][:AMPLitude]?", scpi_cmd_sourceVoltageLevelImmediateAmplitudeQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:RAMP:DURation", scpi_cmd_sourceVoltageRampDuration) \
     SCPI_COMMAND("[SOURce#]:VOLTage:RAMP:DURation?", scpi_cmd_sourceVoltageRampDurationQ) \
+    SCPI_COMMAND("[SOURce#]:DIGital:DATA[:BYTE]", scpi_cmd_sourceDigitalDataByte) \
+    SCPI_COMMAND("[SOURce#]:DIGital:DATA[:BYTE]?", scpi_cmd_sourceDigitalDataByteQ) \
     SCPI_COMMAND("STATus:OPERation:CONDition?", scpi_cmd_statusOperationConditionQ) \
     SCPI_COMMAND("STATus:OPERation:ENABle", scpi_cmd_statusOperationEnable) \
     SCPI_COMMAND("STATus:OPERation:ENABle?", scpi_cmd_statusOperationEnableQ) \
