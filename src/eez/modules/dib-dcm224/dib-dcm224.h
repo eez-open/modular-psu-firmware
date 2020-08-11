@@ -20,12 +20,13 @@
 
 #include <eez/index.h>
 
-static const uint16_t MODULE_REVISION_DCM220_R2B4  = 0x0204;
+static const uint16_t MODULE_REVISION_DCM224_R3B2  = 0x0302;
 
 namespace eez {
-namespace dcm220 {
+namespace dcm224 {
 
 extern ModuleInfo *g_moduleInfo;
+class ChSettingsAdvOptionsPage;
 
-} // namespace dcm220
+} // namespace dcm224
 } // namespace eez

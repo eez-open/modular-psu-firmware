@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
+
 #if defined(EEZ_PLATFORM_STM32)
 #include <tim.h>
 #endif
@@ -24,6 +26,7 @@
 #include <eez/system.h>
 #include <eez/sound.h>
 #include <eez/index.h>
+#include <eez/util.h>
 
 #include <eez/scpi/scpi.h>
 
@@ -193,6 +196,270 @@ bool g_adcMeasureAllFinished = false;
 PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration, uint32_t spiBaudRatePrescaler, bool spiCrcCalculationEnable, uint8_t numChannels_)
     : ModuleInfo(moduleType, moduleName, moduleBrend, latestModuleRevision, flashMethod, flashDuration, spiBaudRatePrescaler, spiCrcCalculationEnable, numChannels_)
 {
+}
+
+void PsuModuleInfo::getProfileParameters(int channelIndex, uint8_t *buffer) {
+    assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
+
+    auto &channel = Channel::get(channelIndex);
+    auto parameters = (ProfileParameters *)buffer;
+
+    parameters->flags.output_enabled = channel.flags.outputEnabled;
+    parameters->flags.sense_enabled = channel.flags.senseEnabled;
+
+    if (channel.params.features & CH_FEATURE_RPROG) {
+        parameters->flags.rprog_enabled = channel.flags.rprogEnabled;
+    } else {
+        parameters->flags.rprog_enabled = 0;
+    }
+
+    parameters->flags.u_state = channel.prot_conf.flags.u_state;
+    parameters->flags.u_type = channel.prot_conf.flags.u_type;
+    parameters->flags.i_state = channel.prot_conf.flags.i_state;
+    parameters->flags.p_state = channel.prot_conf.flags.p_state;
+
+    parameters->u_set = channel.getUSetUnbalanced();
+    parameters->u_step = channel.u.step;
+    parameters->u_limit = channel.u.limit;
+
+    parameters->i_set = channel.getISetUnbalanced();
+    parameters->i_step = channel.i.step;
+    parameters->i_limit = channel.i.limit;
+
+    parameters->p_limit = channel.p_limit;
+
+    parameters->u_delay = channel.prot_conf.u_delay;
+    parameters->u_level = channel.prot_conf.u_level;
+    parameters->i_delay = channel.prot_conf.i_delay;
+    parameters->p_delay = channel.prot_conf.p_delay;
+    parameters->p_level = channel.prot_conf.p_level;
+
+    parameters->flags.displayValue1 = channel.flags.displayValue1;
+    parameters->flags.displayValue2 = channel.flags.displayValue2;
+    parameters->ytViewRate = channel.ytViewRate;
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+    parameters->load_enabled = channel.simulator.load_enabled;
+    parameters->load = channel.simulator.load;
+    parameters->voltProgExt = channel.simulator.voltProgExt;
+#endif
+
+    parameters->flags.u_triggerMode = channel.flags.voltageTriggerMode;
+    parameters->flags.i_triggerMode = channel.flags.currentTriggerMode;
+    parameters->flags.triggerOutputState = channel.flags.triggerOutputState;
+    parameters->flags.triggerOnListStop = channel.flags.triggerOnListStop;
+    parameters->u_triggerValue = channel.u.triggerLevel;
+    parameters->i_triggerValue = channel.i.triggerLevel;
+    parameters->listCount = list::getListCount(channel);
+
+    parameters->flags.currentRangeSelectionMode = channel.flags.currentRangeSelectionMode;
+    parameters->flags.autoSelectCurrentRange = channel.flags.autoSelectCurrentRange;
+
+    parameters->flags.dprogState = channel.flags.dprogState;
+    parameters->flags.trackingEnabled = channel.flags.trackingEnabled;
+
+    parameters->u_rampDuration = channel.u.rampDuration;
+    parameters->i_rampDuration = channel.i.rampDuration;
+
+    parameters->outputDelayDuration = channel.outputDelayDuration;
+}
+
+void PsuModuleInfo::setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
+    auto &channel = Channel::get(channelIndex);
+    auto parameters = (ProfileParameters *)buffer;
+
+    channel.flags.currentRangeSelectionMode = parameters->flags.currentRangeSelectionMode;
+    channel.flags.autoSelectCurrentRange = parameters->flags.autoSelectCurrentRange;
+
+    channel.u.set = channel.roundChannelValue(UNIT_VOLT, MIN(parameters->u_set, channel.u.max));
+    channel.u.step = channel.roundChannelValue(UNIT_VOLT, parameters->u_step);
+    channel.u.limit = channel.roundChannelValue(UNIT_VOLT, MIN(parameters->u_limit, channel.u.max));
+
+    channel.i.set = channel.roundChannelValue(UNIT_AMPER, MIN(parameters->i_set, channel.i.max));
+    channel.i.step = channel.roundChannelValue(UNIT_AMPER, parameters->i_step);
+
+    channel.p_limit = channel.roundChannelValue(UNIT_WATT, MIN(parameters->p_limit, channel.u.max * channel.i.max));
+
+    channel.prot_conf.u_delay = parameters->u_delay;
+    channel.prot_conf.u_level = parameters->u_level;
+    channel.prot_conf.i_delay = parameters->i_delay;
+    channel.prot_conf.p_delay = parameters->p_delay;
+    channel.prot_conf.p_level = parameters->p_level;
+
+    channel.prot_conf.flags.u_state = parameters->flags.u_state;
+    channel.prot_conf.flags.u_type = parameters->flags.u_type;
+    channel.prot_conf.flags.i_state = parameters->flags.i_state;
+    channel.prot_conf.flags.p_state = parameters->flags.p_state;
+
+    channel.setCurrentLimit(parameters->i_limit);
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+    channel.simulator.load_enabled = parameters->load_enabled;
+    channel.simulator.load = parameters->load;
+    channel.simulator.voltProgExt = parameters->voltProgExt;
+#endif
+
+    channel.flags.outputEnabled = channel.isTripped() || mismatch || (recallOptions & profile::RECALL_OPTION_FORCE_DISABLE_OUTPUT) ? 0 : parameters->flags.output_enabled;
+    channel.flags.senseEnabled = parameters->flags.sense_enabled;
+
+    if (channel.params.features & CH_FEATURE_RPROG) {
+        channel.flags.rprogEnabled = parameters->flags.rprog_enabled;
+    } else {
+        channel.flags.rprogEnabled = 0;
+    }
+
+    channel.flags.displayValue1 = parameters->flags.displayValue1;
+    channel.flags.displayValue2 = parameters->flags.displayValue2;
+    channel.ytViewRate = parameters->ytViewRate;
+    if (channel.flags.displayValue1 == 0 && channel.flags.displayValue2 == 0) {
+        channel.flags.displayValue1 = DISPLAY_VALUE_VOLTAGE;
+        channel.flags.displayValue2 = DISPLAY_VALUE_CURRENT;
+    }
+    if (channel.ytViewRate == 0) {
+        channel.ytViewRate = GUI_YT_VIEW_RATE_DEFAULT;
+    }
+
+    channel.flags.voltageTriggerMode = (TriggerMode)parameters->flags.u_triggerMode;
+    channel.flags.currentTriggerMode = (TriggerMode)parameters->flags.i_triggerMode;
+    channel.flags.triggerOutputState = parameters->flags.triggerOutputState;
+    channel.flags.triggerOnListStop = parameters->flags.triggerOnListStop;
+    channel.u.triggerLevel = channel.roundChannelValue(UNIT_VOLT, parameters->u_triggerValue);
+    channel.i.triggerLevel = channel.roundChannelValue(UNIT_AMPER, parameters->i_triggerValue);
+    list::setListCount(channel, parameters->listCount);
+
+    channel.flags.dprogState = parameters->flags.dprogState;
+
+    channel.flags.trackingEnabled = parameters->flags.trackingEnabled;
+    if (channel.flags.trackingEnabled) {
+        ++numTrackingChannels;
+    }
+
+    channel.u.rampDuration = parameters->u_rampDuration;
+    if (channel.u.rampDuration > 0 && channel.u.rampDuration < channel.params.U_RAMP_DURATION_MIN_VALUE) {
+        channel.u.rampDuration = channel.params.U_RAMP_DURATION_MIN_VALUE;
+    }
+    channel.i.rampDuration = parameters->i_rampDuration;
+
+    channel.outputDelayDuration = parameters->outputDelayDuration;
+}
+
+bool PsuModuleInfo::writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) {
+    auto parameters = (const ProfileParameters *)buffer;
+
+    WRITE_PROPERTY("output_enabled", parameters->flags.output_enabled);
+    WRITE_PROPERTY("sense_enabled", parameters->flags.sense_enabled);
+    WRITE_PROPERTY("u_state", parameters->flags.u_state);
+    WRITE_PROPERTY("i_state", parameters->flags.i_state);
+    WRITE_PROPERTY("p_state", parameters->flags.p_state);
+    WRITE_PROPERTY("rprog_enabled", parameters->flags.rprog_enabled);
+    WRITE_PROPERTY("displayValue1", parameters->flags.displayValue1);
+    WRITE_PROPERTY("displayValue2", parameters->flags.displayValue2);
+    WRITE_PROPERTY("u_triggerMode", parameters->flags.u_triggerMode);
+    WRITE_PROPERTY("i_triggerMode", parameters->flags.i_triggerMode);
+    WRITE_PROPERTY("currentRangeSelectionMode", parameters->flags.currentRangeSelectionMode);
+    WRITE_PROPERTY("autoSelectCurrentRange", parameters->flags.autoSelectCurrentRange);
+    WRITE_PROPERTY("triggerOutputState", parameters->flags.triggerOutputState);
+    WRITE_PROPERTY("triggerOnListStop", parameters->flags.triggerOnListStop);
+    WRITE_PROPERTY("u_type", parameters->flags.u_type);
+    WRITE_PROPERTY("dprogState", parameters->flags.dprogState);
+    WRITE_PROPERTY("trackingEnabled", parameters->flags.trackingEnabled);
+
+    WRITE_PROPERTY("u_set", parameters->u_set);
+    WRITE_PROPERTY("u_step", parameters->u_step);
+    WRITE_PROPERTY("u_limit", parameters->u_limit);
+    WRITE_PROPERTY("u_delay", parameters->u_delay);
+    WRITE_PROPERTY("u_level", parameters->u_level);
+    WRITE_PROPERTY("i_set", parameters->i_set);
+    WRITE_PROPERTY("i_step", parameters->i_step);
+    WRITE_PROPERTY("i_limit", parameters->i_limit);
+    WRITE_PROPERTY("i_delay", parameters->i_delay);
+    WRITE_PROPERTY("p_limit", parameters->p_limit);
+    WRITE_PROPERTY("p_delay", parameters->p_delay);
+    WRITE_PROPERTY("p_level", parameters->p_level);
+    WRITE_PROPERTY("ytViewRate", parameters->ytViewRate);
+    WRITE_PROPERTY("u_triggerValue", parameters->u_triggerValue);
+    WRITE_PROPERTY("i_triggerValue", parameters->i_triggerValue);
+    WRITE_PROPERTY("listCount", parameters->listCount);
+
+    WRITE_PROPERTY("u_rampDuration", parameters->u_rampDuration);
+    WRITE_PROPERTY("i_rampDuration", parameters->i_rampDuration);
+
+    WRITE_PROPERTY("outputDelayDuration", parameters->outputDelayDuration);
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+    WRITE_PROPERTY("load_enabled", parameters->load_enabled);
+    WRITE_PROPERTY("load", parameters->load);
+    WRITE_PROPERTY("voltProgExt", parameters->voltProgExt);
+#endif
+
+    return true;
+}
+
+bool PsuModuleInfo::readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) {
+    auto parameters = (ProfileParameters *)buffer;
+
+    READ_FLAG(output_enabled, parameters->flags.output_enabled);
+    READ_FLAG(sense_enabled, parameters->flags.sense_enabled);
+    READ_FLAG(u_state, parameters->flags.u_state);
+    READ_FLAG(i_state, parameters->flags.i_state);
+    READ_FLAG(p_state, parameters->flags.p_state);
+    READ_FLAG(rprog_enabled, parameters->flags.rprog_enabled);
+    READ_FLAG(displayValue1, parameters->flags.displayValue1);
+    READ_FLAG(displayValue2, parameters->flags.displayValue2);
+    READ_FLAG(u_triggerMode, parameters->flags.u_triggerMode);
+    READ_FLAG(i_triggerMode, parameters->flags.i_triggerMode);
+    READ_FLAG(currentRangeSelectionMode, parameters->flags.currentRangeSelectionMode);
+    READ_FLAG(autoSelectCurrentRange, parameters->flags.autoSelectCurrentRange);
+    READ_FLAG(triggerOutputState, parameters->flags.triggerOutputState);
+    READ_FLAG(triggerOnListStop, parameters->flags.triggerOnListStop);
+    READ_FLAG(u_type, parameters->flags.u_type);
+    READ_FLAG(dprogState, parameters->flags.dprogState);
+    READ_FLAG(trackingEnabled, parameters->flags.trackingEnabled);
+
+    READ_PROPERTY(u_set, parameters->u_set);
+    READ_PROPERTY(u_step, parameters->u_step);
+    READ_PROPERTY(u_limit, parameters->u_limit);
+    READ_PROPERTY(u_delay, parameters->u_delay);
+    READ_PROPERTY(u_level, parameters->u_level);
+    READ_PROPERTY(i_set, parameters->i_set);
+    READ_PROPERTY(i_step, parameters->i_step);
+    READ_PROPERTY(i_limit, parameters->i_limit);
+    READ_PROPERTY(i_delay, parameters->i_delay);
+    READ_PROPERTY(p_limit, parameters->p_limit);
+    READ_PROPERTY(p_delay, parameters->p_delay);
+    READ_PROPERTY(p_level, parameters->p_level);
+    READ_PROPERTY(ytViewRate, parameters->ytViewRate);
+    READ_PROPERTY(u_triggerValue, parameters->u_triggerValue);
+    READ_PROPERTY(i_triggerValue, parameters->i_triggerValue);
+    READ_PROPERTY(listCount, parameters->listCount);
+
+    READ_PROPERTY(u_rampDuration, parameters->u_rampDuration);
+    READ_PROPERTY(i_rampDuration, parameters->i_rampDuration);
+
+    READ_PROPERTY(outputDelayDuration, parameters->outputDelayDuration);
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+    READ_PROPERTY(load_enabled, parameters->load_enabled);
+    READ_PROPERTY(load, parameters->load);
+    READ_PROPERTY(voltProgExt, parameters->voltProgExt);
+#endif
+
+    return false;
+}
+
+bool PsuModuleInfo::getProfileOutputEnable(uint8_t *buffer) {
+    auto parameters = (ProfileParameters *)buffer;
+    return parameters->flags.output_enabled;
+}
+
+float PsuModuleInfo::getProfileUSet(uint8_t *buffer) {
+    auto parameters = (ProfileParameters *)buffer;
+    return parameters->u_set;
+}
+
+float PsuModuleInfo::getProfileISet(uint8_t *buffer) {
+    auto parameters = (ProfileParameters *)buffer;
+    return parameters->i_set;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

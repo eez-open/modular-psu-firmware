@@ -2797,16 +2797,18 @@ void data_channel_protection_otp_delay(DataOperationEnum operation, Cursor curso
     }
 }
 
-void data_module_specific_ch_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_has_advanced_options(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+		Channel &channel = Channel::get(iChannel);
+        value = channel.getAdvancedOptionsPageId() != PAGE_ID_NONE ? 1 : 0;
+    }
+}
+
+void data_channel_has_firmware_update(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto modulType = g_slots[hmi::g_selectedSlotIndex]->moduleInfo->moduleType;
-        if (modulType == MODULE_TYPE_DCP405) {
-            value = PAGE_ID_DIB_DCP405_CH_SETTINGS_SPECIFIC;
-        } else if (modulType == MODULE_TYPE_DCM220 || modulType == MODULE_TYPE_DCM224) {
-            value = PAGE_ID_DIB_DCM220_CH_SETTINGS_SPECIFIC;
-        } else {
-            value = PAGE_ID_NONE;
-        }
+        value = modulType != MODULE_TYPE_DCP405 ? 1 : 0;
     }
 }
 
@@ -3523,7 +3525,7 @@ void data_profile_channel_u_set(DataOperationEnum operation, Cursor cursor, Valu
         if (selectedProfileLocation != -1 && (cursor >= 0 && cursor < CH_MAX)) {
             profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
             if (profile) {
-                value = MakeValue(profile->channels[cursor].u_set, UNIT_VOLT);
+                value = MakeValue(g_slots[Channel::get(cursor).slotIndex]->moduleInfo->getProfileUSet((uint8_t *)profile->channels[cursor].parameters), UNIT_VOLT);
             }
         }
     }
@@ -3535,7 +3537,7 @@ void data_profile_channel_i_set(DataOperationEnum operation, Cursor cursor, Valu
         if (selectedProfileLocation != -1 && (cursor >= 0 && cursor < CH_MAX)) {
             profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
             if (profile) {
-                value = MakeValue(profile->channels[cursor].i_set, UNIT_AMPER);
+                value = MakeValue(g_slots[Channel::get(cursor).slotIndex]->moduleInfo->getProfileISet((uint8_t *)profile->channels[cursor].parameters), UNIT_AMPER);
             }
         }
     }
@@ -3547,7 +3549,7 @@ void data_profile_channel_output_state(DataOperationEnum operation, Cursor curso
         if (selectedProfileLocation != -1 && (cursor >= 0 && cursor < CH_MAX)) {
             profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
             if (profile) {
-                value = (int)profile->channels[cursor].flags.output_enabled;
+                value = (int)g_slots[Channel::get(cursor).slotIndex]->moduleInfo->getProfileOutputEnable((uint8_t *)profile->channels[cursor].parameters);
             }
         }
     }

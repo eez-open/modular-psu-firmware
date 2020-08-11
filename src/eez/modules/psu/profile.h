@@ -20,6 +20,7 @@
 
 #include <eez/modules/psu/temperature.h>
 #include <eez/modules/psu/io_pins.h>
+#include <eez/modules/psu/sd_card.h>
 
 #define PROFILE_EXT ".profile"
 
@@ -28,57 +29,14 @@ namespace psu {
 /// PSU configuration profiles (save, recall, ...).
 namespace profile {
 
-/// Channel binary flags stored in profile.
-struct ChannelFlags {
-    unsigned output_enabled : 1;
-    unsigned sense_enabled : 1;
-    unsigned u_state : 1;
-    unsigned i_state : 1;
-    unsigned p_state : 1;
-    unsigned rprog_enabled : 1;
-    unsigned parameters_are_valid : 1;
-    unsigned displayValue1 : 2;
-    unsigned displayValue2 : 2;
-    unsigned u_triggerMode : 2;
-    unsigned i_triggerMode : 2;
-    unsigned currentRangeSelectionMode: 2;
-    unsigned autoSelectCurrentRange: 1;
-    unsigned triggerOutputState: 1;
-    unsigned triggerOnListStop: 3;
-    unsigned u_type : 1;
-    unsigned dprogState : 2;
-    unsigned trackingEnabled : 1;
-};
+#define MAX_CHANNEL_PARAMETERS_SIZE 200
 
 /// Channel parameters stored in profile.
 struct ChannelParameters {
     uint16_t moduleType;
     uint16_t moduleRevision;
-    ChannelFlags flags;
-    float u_set;
-    float u_step;
-	float u_limit;
-    float u_delay;
-    float u_level;
-    float i_set;
-    float i_step;
-	float i_limit;
-    float i_delay;
-	float p_limit;
-    float p_delay;
-    float p_level;
-    float ytViewRate;
-    float u_triggerValue;
-    float i_triggerValue;
-    uint16_t listCount;
-    float u_rampDuration;
-    float i_rampDuration;
-    float outputDelayDuration;
-#ifdef EEZ_PLATFORM_SIMULATOR
-    bool load_enabled;
-    float load;
-	float voltProgExt;
-#endif
+    bool parametersAreValid;
+    uint32_t parameters[MAX_CHANNEL_PARAMETERS_SIZE  / 4];
 };
 
 /// Channel binary flags stored in profile.
@@ -148,6 +106,89 @@ bool getFreezeState();
 void setFreezeState(bool value);
 
 void loadProfileParametersToCache(int location);
+
+class WriteContext {
+public:
+    WriteContext(File &file_);
+
+    bool group(const char *groupName);
+    bool group(const char *groupNamePrefix, unsigned int index);
+
+    bool property(const char *propertyName, int value);
+    bool property(const char *propertyName, unsigned int value);
+    bool property(const char *propertyName, float value);
+    bool property(const char *propertyName, const char *str);
+    bool property(
+        const char *propertyName,
+        float *dwellList, uint16_t &dwellListLength,
+        float *voltageList, uint16_t &voltageListLength,
+        float *currentList, uint16_t &currentListLength
+        );
+
+    bool flush();
+
+private:
+    sd_card::BufferedFileWrite file;
+};
+
+#define WRITE_GROUP(p) if (!ctx.group(name)) return false
+#define WRITE_PROPERTY(p1, p2) if (!ctx.property(p1, p2)) return false
+#define WRITE_LIST_PROPERTY(p1, p2, p3, p4, p5, p6, p7) if (!ctx.property(p1, p2, p3, p4, p5, p6, p7)) return false
+
+class ReadContext {
+public:
+    ReadContext(File &file_);
+
+    bool doRead(bool(*callback)(ReadContext &ctx, Parameters &parameters, List *lists), Parameters &parameters, List *lists, int options, bool showProgress);
+
+    bool matchGroup(const char *groupName);
+    bool matchGroup(const char *groupNamePrefix, int &index);
+
+    bool property(const char *name, unsigned int &value);
+    bool property(const char *name, uint16_t &value);
+    bool property(const char *name, bool &value);
+
+    bool property(const char *name, float &value);
+    bool property(const char *name, char *str, unsigned int strLength);
+
+    bool listProperty(const char *name, int channelIndex, List *lists);
+
+    void skipPropertyValue();
+
+    bool result;
+
+private:
+    sd_card::BufferedFileRead file;
+    char groupName[100];
+    char propertyName[100];
+};
+
+#define READ_FLAG(name, value) \
+    auto name = value; \
+    if (ctx.property(#name, name)) { \
+        value = name; \
+        return true; \
+    }
+
+#define READ_PROPERTY(name, value) \
+    if (ctx.property(#name, value)) { \
+        return true; \
+    }
+
+#define READ_STRING_PROPERTY(name, str, strLength) \
+    if (ctx.property(#name, str, strLength)) { \
+        return true; \
+    }
+
+#define READ_LIST_PROPERTY(name, channelIndex, lists) \
+    if (ctx.listProperty(#name, channelIndex, lists)) { \
+        return true; \
+    }
+
+#define SKIP_PROPERTY(name) \
+    if (ctx.skipProperty(#name)) { \
+        return true; \
+    }
 
 }
 }

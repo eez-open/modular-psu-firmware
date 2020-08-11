@@ -67,7 +67,6 @@ static const float I_MON_RESOLUTION = 0.02f;
 #define REG0_PWRGOOD_MASK (1 << 4)
 
 struct DcmChannel : public Channel {
-    bool isDcm224;
     bool outputEnable;
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -82,7 +81,7 @@ struct DcmChannel : public Channel {
     float iSet;
 #endif
 
-    float temperature;
+    float temperature = 25.0f;
 
 	float I_MAX_FOR_REMAP;
 
@@ -91,9 +90,8 @@ struct DcmChannel : public Channel {
 
 	bool ccMode = false;
 
-    DcmChannel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex, bool isDcm224_)
+    DcmChannel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex)
         : Channel(slotIndex, channelIndex, subchannelIndex)
-        , isDcm224(isDcm224_)
     {
         channelHistory = new ChannelHistory(*this);
     }
@@ -102,41 +100,35 @@ struct DcmChannel : public Channel {
 
 		params.U_MIN = 1.0f;
 		params.U_DEF = 1.0f;
-		params.U_MAX = isDcm224 ? 24.0f : 20.0f;
+		params.U_MAX = 20.0f;
 
 		params.U_MIN_STEP = 0.01f;
 		params.U_DEF_STEP = 0.1f;
 		params.U_MAX_STEP = 5.0f;
 
 		U_CAL_POINTS[0] = 2.0f;
-		U_CAL_POINTS[1] = isDcm224 ? 22.0f : 18.0f;
+		U_CAL_POINTS[1] = 18.0f;
 		params.U_CAL_NUM_POINTS = 2;
 		params.U_CAL_POINTS = U_CAL_POINTS;
 		params.U_CAL_I_SET = 1.0f;
 
-		params.I_MIN = isDcm224 ? 0.0f : 0.25f;
+		params.I_MIN = 0.25f;
 		params.I_DEF = 0.0f;
-		params.I_MAX = isDcm224 ? 4.9f : 4.0f;
+		params.I_MAX = 4.0f;
 
-    	params.I_MON_MIN = isDcm224 ? 0.0f : 0.25f;
+    	params.I_MON_MIN = 0.25f;
 
 		params.I_MIN_STEP = 0.01f;
 		params.I_DEF_STEP = 0.01f;
 		params.I_MAX_STEP = 1.0f; 
 
-		if (isDcm224) {
-			I_CAL_POINTS[0] = 0.1f;
-			I_CAL_POINTS[1] = 4.5f;
-			params.I_CAL_NUM_POINTS = 2;
-		} else {
-			I_CAL_POINTS[0] = 0.1f;
-			I_CAL_POINTS[1] = 0.2f;
-			I_CAL_POINTS[2] = 0.3f;
-			I_CAL_POINTS[3] = 0.4f;
-			I_CAL_POINTS[4] = 0.5f;
-			I_CAL_POINTS[5] = 3.5f;
-			params.I_CAL_NUM_POINTS = 6;
-		}
+        I_CAL_POINTS[0] = 0.1f;
+        I_CAL_POINTS[1] = 0.2f;
+        I_CAL_POINTS[2] = 0.3f;
+        I_CAL_POINTS[3] = 0.4f;
+        I_CAL_POINTS[4] = 0.5f;
+        I_CAL_POINTS[5] = 3.5f;
+        params.I_CAL_NUM_POINTS = 6;
 		params.I_CAL_POINTS = I_CAL_POINTS;
 		params.I_CAL_U_SET = 20.0f;
 
@@ -181,7 +173,7 @@ struct DcmChannel : public Channel {
 		params.DAC_MAX = DAC_MAX;
 		params.ADC_MAX = ADC_MAX;
 
-		I_MAX_FOR_REMAP = isDcm224 ? 5.0f : 4.1667f;
+		I_MAX_FOR_REMAP = 4.1667f;
 
 		params.U_RAMP_DURATION_MIN_VALUE = 0.002f;
 	}
@@ -344,7 +336,7 @@ public:
 	Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
         void *buffer = malloc(sizeof(DcmChannel));
         memset(buffer, 0, sizeof(DcmChannel));
-		return new (buffer) DcmChannel(slotIndex, channelIndex, subchannelIndex, moduleType == MODULE_TYPE_DCM224);
+		return new (buffer) DcmChannel(slotIndex, channelIndex, subchannelIndex);
 	}
 };
 
@@ -443,7 +435,7 @@ public:
     static float calcTemperature(uint16_t adcValue) {
         if (adcValue == 65535) {
             // not measured yet
-            return 25;
+            return 25.0f;
         }
 
         // http://www.giangrandi.ch/electronics/ntc/ntc.shtml
@@ -614,11 +606,9 @@ void DcmChannel::tickSpecific(uint32_t tickCount) {
 #endif
 }
 
-static DcmModuleInfo g_dcm220ModuleInfo_(MODULE_TYPE_DCM220, "DCM220", MODULE_REVISION_DCM220_R2B4);
-static DcmModuleInfo g_dcm224ModuleInfo_(MODULE_TYPE_DCM224, "DCM224", MODULE_REVISION_DCM224_R1B1);
+static DcmModuleInfo g_moduleInfo_(MODULE_TYPE_DCM220, "DCM220", MODULE_REVISION_DCM220_R2B4);
 
-ModuleInfo *g_dcm220ModuleInfo = &g_dcm220ModuleInfo_;
-ModuleInfo *g_dcm224ModuleInfo = &g_dcm224ModuleInfo_;
+ModuleInfo *g_moduleInfo = &g_moduleInfo_;
 
 } // namespace dcm220
 } // namespace eez

@@ -2262,6 +2262,14 @@ Page *getPageFromIdHook(int pageId) {
     case PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY:
         page = &g_sysSettingsRampAndDelayPage;
         break;
+    default :
+        for (int i = 0; i < NUM_SLOTS; i++) {
+            page = g_slots[i]->getPageFromId(pageId);
+            if (page) {
+                break;
+            }
+        }
+        break;
     }
 
     if (page) {

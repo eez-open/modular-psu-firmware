@@ -24,6 +24,7 @@
 
 #include <eez/modules/dib-dcp405/dib-dcp405.h>
 #include <eez/modules/dib-dcm220/dib-dcm220.h>
+#include <eez/modules/dib-dcm224/dib-dcm224.h>
 #include <eez/modules/dib-mio168/dib-mio168.h>
 #include <eez/modules/dib-prel6/dib-prel6.h>
 #include <eez/modules/dib-smx46/dib-smx46.h>
@@ -79,6 +80,32 @@ int ModuleInfo::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor
     return PAGE_ID_SLOT_MICRO_NOT_INSTALLED;
 }
 
+void ModuleInfo::getProfileParameters(int channelIndex, uint8_t *buffer) {
+}
+
+void ModuleInfo::setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
+}
+
+bool ModuleInfo::writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) {
+    return true; 
+}
+
+bool ModuleInfo::readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) {
+    return false;
+}
+
+bool ModuleInfo::getProfileOutputEnable(uint8_t *buffer) {
+    return false;
+}
+
+float ModuleInfo::getProfileUSet(uint8_t *buffer) {
+    return NAN;
+}
+
+float ModuleInfo::getProfileISet(uint8_t *buffer) {
+    return NAN;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Module::Module(uint8_t slotIndex_, ModuleInfo *moduleInfo_, uint16_t moduleRevision_, bool firmwareInstalled_) 
@@ -123,9 +150,11 @@ void Module::onSpiIrq() {
 }
 
 void Module::onSpiDmaTransferCompleted(int status) {
-
 }
 
+gui::Page *Module::getPageFromId(int pageId) {
+    return nullptr;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -157,8 +186,8 @@ static NoneModuleInfo noneModuleInfo;
 
 static ModuleInfo *g_modules[] = {
     dcp405::g_moduleInfo,
-    dcm220::g_dcm220ModuleInfo,
-    dcm220::g_dcm224ModuleInfo,
+    dcm220::g_moduleInfo,
+    dcm224::g_moduleInfo,
     dib_mio168::g_moduleInfo,
     dib_prel6::g_moduleInfo,
     dib_smx46::g_moduleInfo

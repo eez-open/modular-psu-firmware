@@ -24,6 +24,18 @@
 
 namespace eez {
 
+namespace psu {
+namespace profile {
+class WriteContext;
+class ReadContext;
+struct List;
+}
+}
+
+namespace gui {
+class Page;
+}
+
 static const uint16_t MODULE_TYPE_NONE = 0;
 static const uint16_t MODULE_TYPE_DCP405 = 405;
 static const uint16_t MODULE_TYPE_DCM220 = 220;
@@ -68,6 +80,14 @@ struct ModuleInfo {
     virtual Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) = 0;
     virtual psu::Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex);
     virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);
+
+    virtual void getProfileParameters(int channelIndex, uint8_t *buffer);
+    virtual void setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels);
+    virtual bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer);
+    virtual bool readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer);
+    virtual bool getProfileOutputEnable(uint8_t *buffer);
+    virtual float getProfileUSet(uint8_t *buffer);
+    virtual float getProfileISet(uint8_t *buffer);
 };
 
 struct Module {
@@ -93,6 +113,7 @@ struct Module {
     virtual void onPowerDown();
     virtual void onSpiIrq();
     virtual void onSpiDmaTransferCompleted(int status);
+    virtual gui::Page *getPageFromId(int pageId);
 };
 
 static const int NUM_SLOTS = 3;

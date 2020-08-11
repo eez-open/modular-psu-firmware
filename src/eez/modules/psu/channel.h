@@ -722,6 +722,8 @@ public:
     virtual uint8_t getDigitalOutputData();
     virtual void setDigitalOutputData(uint8_t data);
 
+    virtual int getAdvancedOptionsPageId();
+
     //
     //
     //

@@ -345,7 +345,7 @@ void action_show_ch_settings_lists() {
 
 void action_show_ch_settings_adv_options() {
     selectChannelByCursor();
-    pushPage(PAGE_ID_CH_SETTINGS_ADV_OPTIONS);
+    pushPage(g_channel->getAdvancedOptionsPageId());
 }
 
 void action_show_ch_settings_adv_ranges() {

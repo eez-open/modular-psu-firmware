@@ -60,6 +60,14 @@ struct PsuModuleInfo : public ModuleInfo {
     PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration, uint32_t spiBaudRatePrescaler, bool spiCrcCalculationEnable, uint8_t numChannels);
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override;
+
+    void getProfileParameters(int channelIndex, uint8_t *buffer) override;
+    void setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
+    bool writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;
+    bool readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) override;
+    bool getProfileOutputEnable(uint8_t *buffer) override;
+    float getProfileUSet(uint8_t *buffer) override;
+    float getProfileISet(uint8_t *buffer) override;
 };
 
 struct PsuModule : public Module {
@@ -67,6 +75,55 @@ public:
     PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled);
 
     TestResult getTestResult() override;
+};
+
+/// Channel binary flags stored in profile.
+struct ProfileChannelFlags {
+    unsigned output_enabled : 1;
+    unsigned sense_enabled : 1;
+    unsigned u_state : 1;
+    unsigned i_state : 1;
+    unsigned p_state : 1;
+    unsigned rprog_enabled : 1;
+    unsigned displayValue1 : 2;
+    unsigned displayValue2 : 2;
+    unsigned u_triggerMode : 2;
+    unsigned i_triggerMode : 2;
+    unsigned currentRangeSelectionMode : 2;
+    unsigned autoSelectCurrentRange : 1;
+    unsigned triggerOutputState : 1;
+    unsigned triggerOnListStop : 3;
+    unsigned u_type : 1;
+    unsigned dprogState : 2;
+    unsigned trackingEnabled : 1;
+};
+
+struct ProfileParameters {
+    ProfileChannelFlags flags;
+    float u_set;
+    float u_step;
+    float u_limit;
+    float u_delay;
+    float u_level;
+    float i_set;
+    float i_step;
+    float i_limit;
+    float i_delay;
+    float p_limit;
+    float p_delay;
+    float p_level;
+    float ytViewRate;
+    float u_triggerValue;
+    float i_triggerValue;
+    uint16_t listCount;
+    float u_rampDuration;
+    float i_rampDuration;
+    float outputDelayDuration;
+#ifdef EEZ_PLATFORM_SIMULATOR
+    bool load_enabled;
+    float load;
+    float voltProgExt;
+#endif
 };
 
 void init();

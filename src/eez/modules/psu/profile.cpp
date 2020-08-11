@@ -459,13 +459,6 @@ static void getProfileFilePath(int location, char *filePath) {
 static void resetProfileToDefaults(Parameters &profile) {
     memset(&profile, 0, sizeof(Parameters));
 
-    for (int i = 0; i < CH_MAX; i++) {
-        profile.channels[i].u_rampDuration = RAMP_DURATION_DEF_VALUE_U;
-        profile.channels[i].i_rampDuration = RAMP_DURATION_DEF_VALUE_I;
-
-        profile.channels[i].outputDelayDuration = 0;
-    }
-
     for (int i = 0; i < temp_sensor::MAX_NUM_TEMP_SENSORS; ++i) {
         if (i == temp_sensor::AUX) {
             profile.tempProt[i].delay = OTP_AUX_DEFAULT_DELAY;
@@ -490,7 +483,7 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
     for (int i = 0; i < CH_NUM; i++) {
         Channel &channel = Channel::get(i);
         if (
-            profile.channels[i].flags.parameters_are_valid &&
+            profile.channels[i].parametersAreValid &&
             profile.channels[i].moduleType == g_slots[channel.slotIndex]->moduleInfo->moduleType
         ) {
             profileChannelAlreadyUsed[i] = true;
@@ -506,7 +499,7 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
             for (int j = 0; j < CH_MAX; j++) {
                 if (
                     !profileChannelAlreadyUsed[j] &&
-                    profile.channels[j].flags.parameters_are_valid &&
+                    profile.channels[j].parametersAreValid &&
                     profile.channels[j].moduleType == g_slots[channel.slotIndex]->moduleInfo->moduleType
                 ) {
                     profileChannelAlreadyUsed[j] = true;
@@ -520,7 +513,7 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
     for (int i = 0; i < CH_NUM; i++) {
         if (channelsMap[i] == -1) {
             for (int j = 0; j < CH_MAX; j++) {
-                if (!profileChannelAlreadyUsed[j] && !profile.channels[j].flags.parameters_are_valid) {
+                if (!profileChannelAlreadyUsed[j] && !profile.channels[j].parametersAreValid) {
                     profileChannelAlreadyUsed[j] = true;
                     channelsMap[i] = j;
                     break;
@@ -590,67 +583,10 @@ static void saveState(Parameters &profile, List *lists) {
 
             profile.channels[i].moduleType = g_slots[channel.slotIndex]->moduleInfo->moduleType;
             profile.channels[i].moduleRevision = g_slots[channel.slotIndex]->moduleRevision;
-
-            profile.channels[i].flags.parameters_are_valid = 1;
-
-            profile.channels[i].flags.output_enabled = channel.flags.outputEnabled;
-            profile.channels[i].flags.sense_enabled = channel.flags.senseEnabled;
-
-            if (channel.params.features & CH_FEATURE_RPROG) {
-                profile.channels[i].flags.rprog_enabled = channel.flags.rprogEnabled;
-            } else {
-                profile.channels[i].flags.rprog_enabled = 0;
-            }
-
-            profile.channels[i].flags.u_state = channel.prot_conf.flags.u_state;
-            profile.channels[i].flags.u_type = channel.prot_conf.flags.u_type;
-            profile.channels[i].flags.i_state = channel.prot_conf.flags.i_state;
-            profile.channels[i].flags.p_state = channel.prot_conf.flags.p_state;
-
-            profile.channels[i].u_set = channel.getUSetUnbalanced();
-            profile.channels[i].u_step = channel.u.step;
-            profile.channels[i].u_limit = channel.u.limit;
-
-            profile.channels[i].i_set = channel.getISetUnbalanced();
-            profile.channels[i].i_step = channel.i.step;
-            profile.channels[i].i_limit = channel.i.limit;
-
-            profile.channels[i].p_limit = channel.p_limit;
-
-            profile.channels[i].u_delay = channel.prot_conf.u_delay;
-            profile.channels[i].u_level = channel.prot_conf.u_level;
-            profile.channels[i].i_delay = channel.prot_conf.i_delay;
-            profile.channels[i].p_delay = channel.prot_conf.p_delay;
-            profile.channels[i].p_level = channel.prot_conf.p_level;
-
-            profile.channels[i].flags.displayValue1 = channel.flags.displayValue1;
-            profile.channels[i].flags.displayValue2 = channel.flags.displayValue2;
-            profile.channels[i].ytViewRate = channel.ytViewRate;
-
-#ifdef EEZ_PLATFORM_SIMULATOR
-            profile.channels[i].load_enabled = channel.simulator.load_enabled;
-            profile.channels[i].load = channel.simulator.load;
-            profile.channels[i].voltProgExt = channel.simulator.voltProgExt;
-#endif
-
-            profile.channels[i].flags.u_triggerMode = channel.flags.voltageTriggerMode;
-            profile.channels[i].flags.i_triggerMode = channel.flags.currentTriggerMode;
-            profile.channels[i].flags.triggerOutputState = channel.flags.triggerOutputState;
-            profile.channels[i].flags.triggerOnListStop = channel.flags.triggerOnListStop;
-            profile.channels[i].u_triggerValue = channel.u.triggerLevel;
-            profile.channels[i].i_triggerValue = channel.i.triggerLevel;
-            profile.channels[i].listCount = list::getListCount(channel);
-
-            profile.channels[i].flags.currentRangeSelectionMode = channel.flags.currentRangeSelectionMode;
-            profile.channels[i].flags.autoSelectCurrentRange = channel.flags.autoSelectCurrentRange;
-
-            profile.channels[i].flags.dprogState = channel.flags.dprogState;
-            profile.channels[i].flags.trackingEnabled = channel.flags.trackingEnabled;
-
-            profile.channels[i].u_rampDuration = channel.u.rampDuration;
-            profile.channels[i].i_rampDuration = channel.i.rampDuration;
-
-            profile.channels[i].outputDelayDuration = channel.outputDelayDuration;
+            
+            profile.channels[i].parametersAreValid = 1;
+            
+            g_slots[channel.slotIndex]->moduleInfo->getProfileParameters(i, (uint8_t *)profile.channels[i].parameters);
 
             if (lists) {
                 auto &list = lists[i];
@@ -718,80 +654,8 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
 
-        if (profile.channels[i].flags.parameters_are_valid) {
-            channel.flags.currentRangeSelectionMode = profile.channels[i].flags.currentRangeSelectionMode;
-            channel.flags.autoSelectCurrentRange = profile.channels[i].flags.autoSelectCurrentRange;
-
-            channel.u.set = channel.roundChannelValue(UNIT_VOLT, MIN(profile.channels[i].u_set, channel.u.max));
-            channel.u.step = channel.roundChannelValue(UNIT_VOLT, profile.channels[i].u_step);
-            channel.u.limit = channel.roundChannelValue(UNIT_VOLT, MIN(profile.channels[i].u_limit, channel.u.max));
-
-            channel.i.set = channel.roundChannelValue(UNIT_AMPER, MIN(profile.channels[i].i_set, channel.i.max));
-            channel.i.step = channel.roundChannelValue(UNIT_AMPER, profile.channels[i].i_step);
-
-            channel.p_limit = channel.roundChannelValue(UNIT_WATT, MIN(profile.channels[i].p_limit, channel.u.max * channel.i.max));
-
-            channel.prot_conf.u_delay = profile.channels[i].u_delay;
-            channel.prot_conf.u_level = profile.channels[i].u_level;
-            channel.prot_conf.i_delay = profile.channels[i].i_delay;
-            channel.prot_conf.p_delay = profile.channels[i].p_delay;
-            channel.prot_conf.p_level = profile.channels[i].p_level;
-
-            channel.prot_conf.flags.u_state = profile.channels[i].flags.u_state;
-            channel.prot_conf.flags.u_type = profile.channels[i].flags.u_type;
-            channel.prot_conf.flags.i_state = profile.channels[i].flags.i_state;
-            channel.prot_conf.flags.p_state = profile.channels[i].flags.p_state;
-
-            channel.setCurrentLimit(profile.channels[i].i_limit);
-
-#ifdef EEZ_PLATFORM_SIMULATOR
-            channel.simulator.load_enabled = profile.channels[i].load_enabled;
-            channel.simulator.load = profile.channels[i].load;
-            channel.simulator.voltProgExt = profile.channels[i].voltProgExt;
-#endif
-
-            channel.flags.outputEnabled = channel.isTripped() || mismatch || (recallOptions & RECALL_OPTION_FORCE_DISABLE_OUTPUT) ? 0 : profile.channels[i].flags.output_enabled;
-            channel.flags.senseEnabled = profile.channels[i].flags.sense_enabled;
-
-            if (channel.params.features & CH_FEATURE_RPROG) {
-                channel.flags.rprogEnabled = profile.channels[i].flags.rprog_enabled;
-            } else {
-                channel.flags.rprogEnabled = 0;
-            }
-
-            channel.flags.displayValue1 = profile.channels[i].flags.displayValue1;
-            channel.flags.displayValue2 = profile.channels[i].flags.displayValue2;
-            channel.ytViewRate = profile.channels[i].ytViewRate;
-            if (channel.flags.displayValue1 == 0 && channel.flags.displayValue2 == 0) {
-                channel.flags.displayValue1 = DISPLAY_VALUE_VOLTAGE;
-                channel.flags.displayValue2 = DISPLAY_VALUE_CURRENT;
-            }
-            if (channel.ytViewRate == 0) {
-                channel.ytViewRate = GUI_YT_VIEW_RATE_DEFAULT;
-            }
-
-            channel.flags.voltageTriggerMode = (TriggerMode)profile.channels[i].flags.u_triggerMode;
-            channel.flags.currentTriggerMode = (TriggerMode)profile.channels[i].flags.i_triggerMode;
-            channel.flags.triggerOutputState = profile.channels[i].flags.triggerOutputState;
-            channel.flags.triggerOnListStop = profile.channels[i].flags.triggerOnListStop;
-            channel.u.triggerLevel = channel.roundChannelValue(UNIT_VOLT, profile.channels[i].u_triggerValue);
-            channel.i.triggerLevel = channel.roundChannelValue(UNIT_AMPER, profile.channels[i].i_triggerValue);
-            list::setListCount(channel, profile.channels[i].listCount);
-
-            channel.flags.dprogState = profile.channels[i].flags.dprogState;
-
-            channel.flags.trackingEnabled = profile.channels[i].flags.trackingEnabled;
-            if (channel.flags.trackingEnabled) {
-                ++numTrackingChannels;
-            }
-
-            channel.u.rampDuration = profile.channels[i].u_rampDuration;
-            if (channel.u.rampDuration > 0 && channel.u.rampDuration < channel.params.U_RAMP_DURATION_MIN_VALUE) {
-                channel.u.rampDuration = channel.params.U_RAMP_DURATION_MIN_VALUE;
-            }
-            channel.i.rampDuration = profile.channels[i].i_rampDuration;
-
-            channel.outputDelayDuration = profile.channels[i].outputDelayDuration;
+        if (profile.channels[i].parametersAreValid) {
+            g_slots[channel.slotIndex]->moduleInfo->setProfileParameters(i, (uint8_t *)profile.channels[i].parameters, mismatch, recallOptions, numTrackingChannels);
 
             auto &list = lists[i];
             channel_dispatcher::setDwellList(channel, list.dwellList, list.dwellListLength);
@@ -823,30 +687,6 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-class WriteContext {
-public:
-    WriteContext(File &file_);
-
-    bool group(const char *groupName);
-    bool group(const char *groupNamePrefix, unsigned int index);
-
-    bool property(const char *propertyName, int value);
-    bool property(const char *propertyName, unsigned int value);
-    bool property(const char *propertyName, float value);
-    bool property(const char *propertyName, const char *str);
-    bool property(
-        const char *propertyName,
-        float *dwellList, uint16_t &dwellListLength,
-        float *voltageList, uint16_t &voltageListLength,
-        float *currentList, uint16_t &currentListLength
-    );
-
-    bool flush();
-
-private:
-    sd_card::BufferedFileWrite file;
-};
 
 WriteContext::WriteContext(File &file_)
     : file(file_)
@@ -944,10 +784,6 @@ bool WriteContext::flush() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define WRITE_GROUP(p) if (!ctx.group(name)) return false
-#define WRITE_PROPERTY(p1, p2) if (!ctx.property(p1, p2)) return false
-#define WRITE_LIST_PROPERTY(p1, p2, p3, p4, p5, p6, p7) if (!ctx.property(p1, p2, p3, p4, p5, p6, p7)) return false
-
 static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *lists, bool showProgress) {
 #if OPTION_DISPLAY
     size_t processedSoFar = 0;
@@ -982,51 +818,15 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
 
     for (int channelIndex = 0; channelIndex < CH_MAX; channelIndex++) {
         auto &channel = parameters.channels[channelIndex];
-        if (channel.flags.parameters_are_valid) {
-            ctx.group("dcpsupply.ch", channelIndex + 1);
+        if (channel.parametersAreValid) {
+            ctx.group("ch", channelIndex + 1);
 
             WRITE_PROPERTY("moduleType", channel.moduleType);
             WRITE_PROPERTY("moduleRevision", channel.moduleRevision);
 
-            WRITE_PROPERTY("output_enabled", channel.flags.output_enabled);
-            WRITE_PROPERTY("sense_enabled", channel.flags.sense_enabled);
-            WRITE_PROPERTY("u_state", channel.flags.u_state);
-            WRITE_PROPERTY("i_state", channel.flags.i_state);
-            WRITE_PROPERTY("p_state", channel.flags.p_state);
-            WRITE_PROPERTY("rprog_enabled", channel.flags.rprog_enabled);
-            WRITE_PROPERTY("displayValue1", channel.flags.displayValue1);
-            WRITE_PROPERTY("displayValue2", channel.flags.displayValue2);
-            WRITE_PROPERTY("u_triggerMode", channel.flags.u_triggerMode);
-            WRITE_PROPERTY("i_triggerMode", channel.flags.i_triggerMode);
-            WRITE_PROPERTY("currentRangeSelectionMode", channel.flags.currentRangeSelectionMode);
-            WRITE_PROPERTY("autoSelectCurrentRange", channel.flags.autoSelectCurrentRange);
-            WRITE_PROPERTY("triggerOutputState", channel.flags.triggerOutputState);
-            WRITE_PROPERTY("triggerOnListStop", channel.flags.triggerOnListStop);
-            WRITE_PROPERTY("u_type", channel.flags.u_type);
-            WRITE_PROPERTY("dprogState", channel.flags.dprogState);
-            WRITE_PROPERTY("trackingEnabled", channel.flags.trackingEnabled);
-
-            WRITE_PROPERTY("u_set", channel.u_set);
-            WRITE_PROPERTY("u_step", channel.u_step);
-            WRITE_PROPERTY("u_limit", channel.u_limit);
-            WRITE_PROPERTY("u_delay", channel.u_delay);
-            WRITE_PROPERTY("u_level", channel.u_level);
-            WRITE_PROPERTY("i_set", channel.i_set);
-            WRITE_PROPERTY("i_step", channel.i_step);
-            WRITE_PROPERTY("i_limit", channel.i_limit);
-            WRITE_PROPERTY("i_delay", channel.i_delay);
-            WRITE_PROPERTY("p_limit", channel.p_limit);
-            WRITE_PROPERTY("p_delay", channel.p_delay);
-            WRITE_PROPERTY("p_level", channel.p_level);
-            WRITE_PROPERTY("ytViewRate", channel.ytViewRate);
-            WRITE_PROPERTY("u_triggerValue", channel.u_triggerValue);
-            WRITE_PROPERTY("i_triggerValue", channel.i_triggerValue);
-            WRITE_PROPERTY("listCount", channel.listCount);
-
-            WRITE_PROPERTY("u_rampDuration", channel.u_rampDuration);
-            WRITE_PROPERTY("i_rampDuration", channel.i_rampDuration);
-
-            WRITE_PROPERTY("outputDelayDuration", channel.outputDelayDuration);
+            if (!getModuleInfo(channel.moduleType)->writeProfileProperties(ctx, (uint8_t *)channel.parameters)) {
+                return false;
+            }
 
             if (lists) {
                 WRITE_LIST_PROPERTY(
@@ -1061,13 +861,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
                     currentListLength
                 );
             }
-
-#ifdef EEZ_PLATFORM_SIMULATOR
-            WRITE_PROPERTY("load_enabled", channel.load_enabled);
-            WRITE_PROPERTY("load", channel.load);
-            WRITE_PROPERTY("voltProgExt", channel.voltProgExt);
-#endif
-        }
+       }
 
 #if OPTION_DISPLAY
         if (showProgress) {
@@ -1171,34 +965,6 @@ static void saveStateToProfile0(bool merge) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-class ReadContext {
-public:
-    ReadContext(File &file_);
-
-    bool doRead(bool (*callback)(ReadContext &ctx, Parameters &parameters, List *lists), Parameters &parameters, List *lists, int options, bool showProgress);
-
-    bool matchGroup(const char *groupName);
-    bool matchGroup(const char *groupNamePrefix, int &index);
-
-    bool property(const char *name, unsigned int &value);
-    bool property(const char *name, uint16_t &value);
-    bool property(const char *name, bool &value);
-
-    bool property(const char *name, float &value);
-    bool property(const char *name, char *str, unsigned int strLength);
-
-    bool listProperty(const char *name, int channelIndex, List *lists);
-
-    void skipPropertyValue();
-
-    bool result;
-
-private:
-    sd_card::BufferedFileRead file;
-    char groupName[100];
-    char propertyName[100];
-};
 
 ReadContext::ReadContext(File &file_)
     : result(true)
@@ -1374,33 +1140,6 @@ void ReadContext::skipPropertyValue() {
     }
 }
 
-#define READ_FLAG(name, value) \
-    auto name = value; \
-    if (ctx.property(#name, name)) { \
-        value = name; \
-        return true; \
-    }
-
-#define READ_PROPERTY(name, value) \
-    if (ctx.property(#name, value)) { \
-        return true; \
-    }
-
-#define READ_STRING_PROPERTY(name, str, strLength) \
-    if (ctx.property(#name, str, strLength)) { \
-        return true; \
-    }
-
-#define READ_LIST_PROPERTY(name, channelIndex, lists) \
-    if (ctx.listProperty(#name, channelIndex, lists)) { \
-        return true; \
-    }
-
-#define SKIP_PROPERTY(name) \
-    if (ctx.skipProperty(#name)) { \
-        return true; \
-    }
-
 ////////////////////////////////////////////////////////////////////////////////
 
 static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *lists) {
@@ -1414,65 +1153,23 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
     }
 
     int channelIndex;
-    if (ctx.matchGroup("dcpsupply.ch", channelIndex)) {
+    if (ctx.matchGroup("dcpsupply.ch", channelIndex) || ctx.matchGroup("ch", channelIndex)) {
         --channelIndex;
 
         auto &channel = parameters.channels[channelIndex];
         
-        channel.flags.parameters_are_valid = 1;
+        channel.parametersAreValid = 1;
 
         READ_PROPERTY(moduleType, channel.moduleType);
         READ_PROPERTY(moduleRevision, channel.moduleRevision);
 
-        READ_FLAG(output_enabled, channel.flags.output_enabled);
-        READ_FLAG(sense_enabled, channel.flags.sense_enabled);
-        READ_FLAG(u_state, channel.flags.u_state);
-        READ_FLAG(i_state, channel.flags.i_state);
-        READ_FLAG(p_state, channel.flags.p_state);
-        READ_FLAG(rprog_enabled, channel.flags.rprog_enabled);
-        READ_FLAG(displayValue1, channel.flags.displayValue1);
-        READ_FLAG(displayValue2, channel.flags.displayValue2);
-        READ_FLAG(u_triggerMode, channel.flags.u_triggerMode);
-        READ_FLAG(i_triggerMode, channel.flags.i_triggerMode);
-        READ_FLAG(currentRangeSelectionMode, channel.flags.currentRangeSelectionMode);
-        READ_FLAG(autoSelectCurrentRange, channel.flags.autoSelectCurrentRange);
-        READ_FLAG(triggerOutputState, channel.flags.triggerOutputState);
-        READ_FLAG(triggerOnListStop, channel.flags.triggerOnListStop);
-        READ_FLAG(u_type, channel.flags.u_type);
-        READ_FLAG(dprogState, channel.flags.dprogState);
-        READ_FLAG(trackingEnabled, channel.flags.trackingEnabled);
-
-        READ_PROPERTY(u_set, channel.u_set);
-        READ_PROPERTY(u_step, channel.u_step);
-        READ_PROPERTY(u_limit, channel.u_limit);
-        READ_PROPERTY(u_delay, channel.u_delay);
-        READ_PROPERTY(u_level, channel.u_level);
-        READ_PROPERTY(i_set, channel.i_set);
-        READ_PROPERTY(i_step, channel.i_step);
-        READ_PROPERTY(i_limit, channel.i_limit);
-        READ_PROPERTY(i_delay, channel.i_delay);
-        READ_PROPERTY(p_limit, channel.p_limit);
-        READ_PROPERTY(p_delay, channel.p_delay);
-        READ_PROPERTY(p_level, channel.p_level);
-        READ_PROPERTY(ytViewRate, channel.ytViewRate);
-        READ_PROPERTY(u_triggerValue, channel.u_triggerValue);
-        READ_PROPERTY(i_triggerValue, channel.i_triggerValue);
-        READ_PROPERTY(listCount, channel.listCount);
-
-        READ_PROPERTY(u_rampDuration, channel.u_rampDuration);
-        READ_PROPERTY(i_rampDuration, channel.i_rampDuration);
-
-        READ_PROPERTY(outputDelayDuration, channel.outputDelayDuration);
+        if (getModuleInfo(channel.moduleType)->readProfileProperties(ctx, (uint8_t *)channel.parameters)) {
+            return true;
+        }
 
         if (lists) {
             READ_LIST_PROPERTY(list, channelIndex, lists);
         }
-
-#ifdef EEZ_PLATFORM_SIMULATOR
-        READ_PROPERTY(load_enabled, channel.load_enabled);
-        READ_PROPERTY(load, channel.load);
-        READ_PROPERTY(voltProgExt, channel.voltProgExt);
-#endif
     }
 
     int tempSensorIndex;

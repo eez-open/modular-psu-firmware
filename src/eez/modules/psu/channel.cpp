@@ -38,6 +38,7 @@
 #include <eez/scpi/regs.h>
 #include <eez/sound.h>
 #include <eez/index.h>
+#include <eez/gui/gui.h>
 
 #include <eez/modules/bp3c/io_exp.h>
 #include <eez/modules/bp3c/flash_slave.h>
@@ -1656,6 +1657,10 @@ uint8_t Channel::getDigitalOutputData() {
 }
 
 void Channel::setDigitalOutputData(uint8_t data) {
+}
+
+int Channel::getAdvancedOptionsPageId() {
+    return gui::PAGE_ID_NONE;
 }
 
 } // namespace psu

@@ -71,11 +71,11 @@ int getSlotView(int slotIndex, Cursor cursor) {
     }
     
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220) {
-        return PAGE_ID_DIB_DCM220_SIMULATOR_FRONT_PANEL_MASK_DCM220;
+        return PAGE_ID_DIB_DCM220_SIMULATOR_FRONT_PANEL_MASK;
     }
     
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
-        return PAGE_ID_DIB_DCM220_SIMULATOR_FRONT_PANEL_MASK_DCM224;
+        return PAGE_ID_DIB_DCM224_SIMULATOR_FRONT_PANEL_MASK;
     }
     
     if (slot.moduleInfo->moduleType == MODULE_TYPE_DIB_MIO168) {

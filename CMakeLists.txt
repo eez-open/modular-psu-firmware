@@ -463,6 +463,16 @@ set(header_eez_modules_dib_dcm220
 list (APPEND header_files ${header_eez_modules_dib_dcm220})
 source_group("eez\\modules\\dib-dcm220" FILES ${src_eez_modules_dib_dcm220} ${header_eez_modules_dib_dcm220})
 
+set(src_eez_modules_dib_dcm224
+    src/eez/modules/dib-dcm224/dib-dcm224.cpp
+) 
+list (APPEND src_files ${src_eez_modules_dib_dcm224})
+set(header_eez_modules_dib_dcm224
+    src/eez/modules/dib-dcm224/dib-dcm224.h
+) 
+list (APPEND header_files ${header_eez_modules_dib_dcm224})
+source_group("eez\\modules\\dib-dcm224" FILES ${src_eez_modules_dib_dcm224} ${header_eez_modules_dib_dcm224})
+
 set(src_eez_modules_dib_mio168
     src/eez/modules/dib-mio168/dib-mio168.cpp
 ) 

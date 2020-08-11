@@ -33,6 +33,8 @@
 #include <eez/system.h>
 #include <eez/index.h>
 
+#include <eez/gui/gui.h>
+
 #if defined(EEZ_PLATFORM_STM32)
 #include <eez/drivers/tmp1075.h>
 #include <eez/drivers/tc77.h>
@@ -803,6 +805,10 @@ struct DcpChannel : public Channel {
 		}
 #endif
 		return NAN;
+	}
+
+	int getAdvancedOptionsPageId() override {
+		return gui::PAGE_ID_CH_SETTINGS_ADV_OPTIONS;
 	}
 };
 

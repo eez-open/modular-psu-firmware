@@ -103,6 +103,61 @@ bool masterSynchro(int slotIndex) {
 #endif
 }
 
+bool masterSynchroV2(int slotIndex) {
+    auto &slot = *g_slots[slotIndex];
+
+#if defined(EEZ_PLATFORM_STM32)
+    uint32_t start = millis();
+
+    uint8_t txBuffer[15] = { SPI_MASTER_SYNBYTE, (uint8_t)(slot.moduleRevision >> 8), (uint8_t)(slot.moduleRevision & 0xFF) };
+    uint8_t rxBuffer[15];
+
+    while (true) {
+        WATCHDOG_RESET();
+
+        if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
+            spi::select(slotIndex, spi::CHIP_SLAVE_MCU);
+            spi::transfer(slotIndex, txBuffer, rxBuffer, sizeof(rxBuffer));
+            spi::deselect(slotIndex);
+
+            if (rxBuffer[0] != SPI_SLAVE_SYNBYTE) {
+                break;
+            }
+
+            slot.firmwareMajorVersion = rxBuffer[1];
+            slot.firmwareMinorVersion = rxBuffer[2];
+            slot.idw0 = (rxBuffer[3] << 24) | (rxBuffer[4] << 16) | (rxBuffer[5] << 8) | rxBuffer[6];
+            slot.idw1 = (rxBuffer[7] << 24) | (rxBuffer[8] << 16) | (rxBuffer[9] << 8) | rxBuffer[10];
+            slot.idw2 = (rxBuffer[11] << 24) | (rxBuffer[12] << 16) | (rxBuffer[13] << 8) | rxBuffer[14];
+            return true;
+        }
+
+        int32_t diff = millis() - start;
+        if (diff > CONF_MASTER_SYNC_TIMEOUT_MS) {
+            break;
+        }
+
+        osDelay(1);
+    }
+
+    slot.firmwareMajorVersion = 0;
+    slot.firmwareMinorVersion = 0;
+    slot.idw0 = 0;
+    slot.idw1 = 0;
+    slot.idw2 = 0;
+    return false;
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    slot.firmwareMajorVersion = 1;
+    slot.firmwareMinorVersion = 0;
+    slot.idw0 = 0;
+    slot.idw1 = 0;
+    slot.idw2 = 0;
+    return true;
+#endif
+}
+
 TransferResult transfer(int slotIndex, uint8_t *output, uint8_t *input, uint32_t bufferSize) {
 #if defined(EEZ_PLATFORM_STM32)
     spi::handle[slotIndex]->ErrorCode = 0;
