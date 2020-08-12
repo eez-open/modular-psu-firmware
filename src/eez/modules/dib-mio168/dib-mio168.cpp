@@ -191,7 +191,7 @@ public:
 
     void initChannels() override {
         if (!synchronized) {
-            if (bp3c::comm::masterSynchro(slotIndex)) {
+            if (bp3c::comm::masterSynchroV2(slotIndex)) {
                 synchronized = true;
                 numCrcErrors = 0;
                 testResult = TEST_OK;
@@ -235,8 +235,7 @@ public:
 
         auto status = bp3c::comm::transferDMA(slotIndex, output, input, BUFFER_SIZE);
         if (status != bp3c::comm::TRANSFER_STATUS_OK) {
-        	auto &slot = *g_slots[slotIndex];
-        	slot.onSpiDmaTransferCompleted(status);
+        	onSpiDmaTransferCompleted(status);
         }
     }
 

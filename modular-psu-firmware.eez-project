@@ -73088,6 +73088,95 @@
                 }
               ]
             }
+          },
+          {
+            "name": "[SOURce[<n>]]:MODE",
+            "parameters": [
+              {
+                "name": "mode",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "SourceMode"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:MODE?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "SourceMode"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:RANGe",
+            "parameters": [
+              {
+                "name": "range",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:RANGe?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:RANGe",
+            "parameters": [
+              {
+                "name": "range",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:RANGe?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
           }
         ]
       },
@@ -77356,6 +77445,19 @@
           {
             "name": "HID",
             "value": "3"
+          }
+        ]
+      },
+      {
+        "name": "SourceMode",
+        "members": [
+          {
+            "name": "CURRent",
+            "value": "1"
+          },
+          {
+            "name": "VOLTage",
+            "value": "2"
           }
         ]
       }
