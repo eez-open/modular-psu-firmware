@@ -110,7 +110,7 @@
                   "inheritFrom": "channel1",
                   "font": "Heydings14"
                 },
-                "action": "show_slot_settings",
+                "action": "show_ch_settings",
                 "left": 102,
                 "top": 0,
                 "width": 32,
@@ -441,7 +441,7 @@
                   "inheritFrom": "channel1",
                   "font": "Heydings14"
                 },
-                "action": "show_slot_settings",
+                "action": "show_ch_settings",
                 "left": 176,
                 "top": 0,
                 "width": 32,
@@ -772,7 +772,7 @@
                   "inheritFrom": "channel1",
                   "font": "Heydings14"
                 },
-                "action": "show_slot_settings",
+                "action": "show_ch_settings",
                 "left": 380,
                 "top": 0,
                 "width": 50,

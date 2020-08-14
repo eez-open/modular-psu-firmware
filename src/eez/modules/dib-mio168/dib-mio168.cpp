@@ -49,21 +49,50 @@ namespace dib_mio168 {
 
 static const int DIN_SUBCHANNEL_INDEX = 0;
 static const int DOUT_SUBCHANNEL_INDEX = 1;
+static const int ADC_1_SUBCHANNEL_INDEX = 2;
+static const int ADC_2_SUBCHANNEL_INDEX = 3;
+static const int ADC_3_SUBCHANNEL_INDEX = 4;
+static const int ADC_4_SUBCHANNEL_INDEX = 5;
+static const int DAC_7760_1_SUBCHANNEL_INDEX = 6;
+static const int DAC_7760_2_SUBCHANNEL_INDEX = 7;
+static const int DAC_7563_1_SUBCHANNEL_INDEX = 8;
+static const int DAC_7563_2_SUBCHANNEL_INDEX = 9;
+static const int PWM_1_SUBCHANNEL_INDEX = 10;
+static const int PWM_2_SUBCHANNEL_INDEX = 11;
 
-struct Mio168DinChannel : public Channel {
-    Mio168DinChannel(int slotIndex, int channelIndex)
-        : Channel(slotIndex, channelIndex, DIN_SUBCHANNEL_INDEX) 
+struct MioChannel : public Channel {
+    MioChannel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex)
+        : Channel(slotIndex, channelIndex, subchannelIndex)
     {
         flags.powerOk = 1;
     }
-
+    
     TestResult getTestResult() override;
+
+    int getChannelSettingsPageId() override {
+		return PAGE_ID_SLOT_SETTINGS;
+	}
+};
+
+struct Mio168DinChannel : public MioChannel {
+    uint8_t pinStates = 0;
+
+    Mio168DinChannel(int slotIndex, int channelIndex)
+        : MioChannel(slotIndex, channelIndex, DIN_SUBCHANNEL_INDEX)
+    {
+    }
 
     void getParams(uint16_t moduleRevision) override {
         params.features = CH_FEATURE_DINPUT;
     }
 
-    uint8_t getDigitalInputData() override;
+    uint8_t getDigitalInputData() override {
+        return pinStates;
+    }
+
+    int getPinState(int pin) {
+        return pinStates & (1 << pin) ? 1 : 0;
+    }
 
     // defaults
     virtual void init() override {}
@@ -88,21 +117,203 @@ struct Mio168DinChannel : public Channel {
     float readTemperature() override { return 25.0f; }
 };
 
-struct Mio168DoutChannel : public Channel {
+struct Mio168DoutChannel : public MioChannel {
+    uint8_t pinStates = 0;
+
     Mio168DoutChannel(int slotIndex, int channelIndex)
-        : Channel(slotIndex, channelIndex, DOUT_SUBCHANNEL_INDEX) 
+        : MioChannel(slotIndex, channelIndex, DOUT_SUBCHANNEL_INDEX)
     {
-        flags.powerOk = 1;
     }
 
     void getParams(uint16_t moduleRevision) override {
         params.features = CH_FEATURE_DOUTPUT;
     }
 
-    TestResult getTestResult() override;
+    uint8_t getDigitalOutputData() override {
+        return pinStates;
+    }
 
-    uint8_t getDigitalOutputData() override;
-    void setDigitalOutputData(uint8_t data) override;
+    void setDigitalOutputData(uint8_t data) override {
+        pinStates = data;
+    }
+
+    int getPinState(int pin) {
+        return pinStates & (1 << pin) ? 1 : 0;
+    }
+
+    void setPinState(int pin, int state) {
+        if (state) {
+            pinStates |= 1 << pin;
+        } else {
+            pinStates &= ~(1 << pin);
+        }
+    }
+
+    // defaults
+    virtual void init() override {}
+    bool test() override { return true; }
+    void tickSpecific(uint32_t tickCount) override {}
+    bool isInCcMode() override { return false; }
+    bool isInCvMode() override { return false; }
+    void adcMeasureUMon() override {}
+    void adcMeasureIMon() override {}
+    void adcMeasureMonDac() override {}
+    void adcMeasureAll() override {}
+    void setOutputEnable(bool enable, uint16_t tasks) override {}
+    void setDacVoltage(uint16_t value) override {}
+    void setDacVoltageFloat(float value) override {}
+    void setDacCurrent(uint16_t value) override {}
+    void setDacCurrentFloat(float value) override {}
+    bool isDacTesting() override { return false; }
+    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getPowerStepValues(StepValues *stepValues) override {}
+    bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
+    float readTemperature() override { return 25.0f; }
+};
+
+struct Mio168AdcChannel : public MioChannel {
+    Mio168AdcChannel(int slotIndex, int channelIndex, int subchannelIndex)
+        : MioChannel(slotIndex, channelIndex, subchannelIndex)
+    {
+    }
+
+    void getParams(uint16_t moduleRevision) override {
+        params.features = 0;
+    }
+
+    // defaults
+    virtual void init() override {}
+    bool test() override { return true; }
+    void tickSpecific(uint32_t tickCount) override {}
+    bool isInCcMode() override { return false; }
+    bool isInCvMode() override { return false; }
+    void adcMeasureUMon() override {}
+    void adcMeasureIMon() override {}
+    void adcMeasureMonDac() override {}
+    void adcMeasureAll() override {}
+    void setOutputEnable(bool enable, uint16_t tasks) override {}
+    void setDacVoltage(uint16_t value) override {}
+    void setDacVoltageFloat(float value) override {}
+    void setDacCurrent(uint16_t value) override {}
+    void setDacCurrentFloat(float value) override {}
+    bool isDacTesting() override { return false; }
+    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getPowerStepValues(StepValues *stepValues) override {}
+    bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
+    float readTemperature() override { return 25.0f; }
+};
+
+struct Mio168Dac7760Channel : public MioChannel {
+    SourceMode m_mode;
+    int8_t m_currentRange;
+    int8_t m_voltageRange;
+
+    Mio168Dac7760Channel(int slotIndex, int channelIndex, int subchannelIndex)
+        : MioChannel(slotIndex, channelIndex, subchannelIndex)
+    {
+    }
+
+    void getParams(uint16_t moduleRevision) override {
+        params.features = 0;
+    }
+
+    bool getMode(SourceMode &mode, int *err) override {
+        mode = m_mode;
+        return true;
+    }
+
+    bool setMode(SourceMode mode, int *err) override {
+        m_mode = mode;
+        return true;
+    }
+
+    bool getCurrentRange(int8_t &range, int *err) override {
+        range = m_currentRange;
+        return true;
+    }
+    
+    bool setCurrentRange(int8_t range, int *err) override {
+        m_currentRange = range;
+        return true;
+    }
+
+    bool getVoltageRange(int8_t &range, int *err) override {
+        range = m_voltageRange;
+        return true;
+    }
+    
+    bool setVoltageRange(int8_t range, int *err) override {
+        m_voltageRange = range;
+        return true;
+    }  
+
+    // defaults
+    virtual void init() override {}
+    bool test() override { return true; }
+    void tickSpecific(uint32_t tickCount) override {}
+    bool isInCcMode() override { return false; }
+    bool isInCvMode() override { return false; }
+    void adcMeasureUMon() override {}
+    void adcMeasureIMon() override {}
+    void adcMeasureMonDac() override {}
+    void adcMeasureAll() override {}
+    void setOutputEnable(bool enable, uint16_t tasks) override {}
+    void setDacVoltage(uint16_t value) override {}
+    void setDacVoltageFloat(float value) override {}
+    void setDacCurrent(uint16_t value) override {}
+    void setDacCurrentFloat(float value) override {}
+    bool isDacTesting() override { return false; }
+    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getPowerStepValues(StepValues *stepValues) override {}
+    bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
+    float readTemperature() override { return 25.0f; }
+};
+
+struct Mio168Dac7563Channel : public MioChannel {
+    Mio168Dac7563Channel(int slotIndex, int channelIndex, int subchannelIndex)
+        : MioChannel(slotIndex, channelIndex, subchannelIndex)
+    {
+    }
+
+    void getParams(uint16_t moduleRevision) override {
+        params.features = 0;
+    }
+
+    // defaults
+    virtual void init() override {}
+    bool test() override { return true; }
+    void tickSpecific(uint32_t tickCount) override {}
+    bool isInCcMode() override { return false; }
+    bool isInCvMode() override { return false; }
+    void adcMeasureUMon() override {}
+    void adcMeasureIMon() override {}
+    void adcMeasureMonDac() override {}
+    void adcMeasureAll() override {}
+    void setOutputEnable(bool enable, uint16_t tasks) override {}
+    void setDacVoltage(uint16_t value) override {}
+    void setDacVoltageFloat(float value) override {}
+    void setDacCurrent(uint16_t value) override {}
+    void setDacCurrentFloat(float value) override {}
+    bool isDacTesting() override { return false; }
+    void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {}
+    void getPowerStepValues(StepValues *stepValues) override {}
+    bool isPowerLimitExceeded(float u, float i, int *err) override { return false; }
+    float readTemperature() override { return 25.0f; }
+};
+
+struct Mio168PwmChannel : public MioChannel {
+    Mio168PwmChannel(int slotIndex, int channelIndex, int subchannelIndex)
+        : MioChannel(slotIndex, channelIndex, subchannelIndex)
+    {
+    }
+
+    void getParams(uint16_t moduleRevision) override {
+        params.features = 0;
+    }
 
     // defaults
     virtual void init() override {}
@@ -138,7 +349,7 @@ public:
             0,
             false,
 #endif
-            2
+            12
         )
     {}
 
@@ -173,8 +384,6 @@ public:
     int numCrcErrors = 0;
     uint8_t input[BUFFER_SIZE];
     uint8_t output[BUFFER_SIZE];
-    uint8_t inputPinStates = 0;
-    uint8_t outputPinStates = 0;
     uint16_t analogInputValues[4];
     bool spiReady;
 
@@ -230,8 +439,40 @@ public:
 #endif
 
     void transfer() {
-        output[0] = inputPinStates;
-        output[1] = outputPinStates;
+        struct Dac7760 {
+            SourceMode mode;
+            int8_t currentRange;
+            float current;
+            int8_t voltageRange;
+            float voltage;
+        };
+        struct TypedOutput {
+            uint8_t inputPinStates;
+            uint8_t outputPinStates;
+            Dac7760 dac7760[2];
+        };
+        TypedOutput typedOutput = (TypedOutput &)*output;
+
+        typedOutput.inputPinStates = ((Mio168DinChannel *)Channel::getBySlotIndex(slotIndex, DIN_SUBCHANNEL_INDEX))->pinStates;
+        typedOutput.outputPinStates = ((Mio168DoutChannel *)Channel::getBySlotIndex(slotIndex, DOUT_SUBCHANNEL_INDEX))->pinStates;
+
+        {
+            auto channel = (Mio168Dac7760Channel *)Channel::getBySlotIndex(slotIndex, DAC_7760_1_SUBCHANNEL_INDEX);
+            typedOutput.dac7760[0].mode = channel->m_mode;
+            typedOutput.dac7760[0].currentRange = channel->m_currentRange;
+            typedOutput.dac7760[0].current = channel->i.set; 
+            typedOutput.dac7760[0].voltageRange = channel->m_voltageRange;
+            typedOutput.dac7760[0].voltage = channel->u.set; 
+        }
+
+        {
+            auto channel = (Mio168Dac7760Channel *)Channel::getBySlotIndex(slotIndex, DAC_7760_2_SUBCHANNEL_INDEX);
+            typedOutput.dac7760[0].mode = channel->m_mode;
+            typedOutput.dac7760[0].currentRange = channel->m_currentRange;
+            typedOutput.dac7760[0].current = channel->i.set; 
+            typedOutput.dac7760[0].voltageRange = channel->m_voltageRange;
+            typedOutput.dac7760[0].voltage = channel->u.set; 
+        }
 
         auto status = bp3c::comm::transferDMA(slotIndex, output, input, BUFFER_SIZE);
         if (status != bp3c::comm::TRANSFER_STATUS_OK) {
@@ -243,7 +484,7 @@ public:
         if (status == bp3c::comm::TRANSFER_STATUS_OK) {
             numCrcErrors = 0;
 
-            inputPinStates = input[0];
+            ((Mio168DinChannel *)Channel::getBySlotIndex(slotIndex, DIN_SUBCHANNEL_INDEX))->pinStates = input[0];
 
             static uint32_t totalSamples = 0;
 
@@ -277,22 +518,6 @@ public:
     void onPowerDown() override {
         synchronized = false;
     }
-
-    int getInputPinState(int pin) {
-        return inputPinStates & (1 << pin) ? 1 : 0;
-    }
-
-    int getOutputPinState(int pin) {
-        return outputPinStates & (1 << pin) ? 1 : 0;
-    }
-
-    void setOutputPinState(int pin, int state) {
-        if (state) {
-            outputPinStates |= 1 << pin;
-        } else {
-            outputPinStates &= ~(1 << pin);
-        }
-    }
 };
 
 Module *Mio168ModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
@@ -308,6 +533,22 @@ Channel *Mio168ModuleInfo::createChannel(int slotIndex, int channelIndex, int su
         void *buffer = malloc(sizeof(Mio168DoutChannel));
         memset(buffer, 0, sizeof(Mio168DoutChannel));
         return new (buffer) Mio168DoutChannel(slotIndex, channelIndex);
+    } else if (subchannelIndex >= ADC_1_SUBCHANNEL_INDEX && subchannelIndex <= ADC_4_SUBCHANNEL_INDEX) {
+        void *buffer = malloc(sizeof(Mio168AdcChannel));
+        memset(buffer, 0, sizeof(Mio168AdcChannel));
+        return new (buffer) Mio168AdcChannel(slotIndex, channelIndex, subchannelIndex);
+    } else if (subchannelIndex >= DAC_7760_1_SUBCHANNEL_INDEX && subchannelIndex <= DAC_7760_2_SUBCHANNEL_INDEX) {
+        void *buffer = malloc(sizeof(Mio168Dac7760Channel));
+        memset(buffer, 0, sizeof(Mio168Dac7760Channel));
+        return new (buffer) Mio168Dac7760Channel(slotIndex, channelIndex, subchannelIndex);
+    } else if (subchannelIndex >= DAC_7563_1_SUBCHANNEL_INDEX && subchannelIndex <= DAC_7563_2_SUBCHANNEL_INDEX) {
+        void *buffer = malloc(sizeof(Mio168Dac7563Channel));
+        memset(buffer, 0, sizeof(Mio168Dac7563Channel));
+        return new (buffer) Mio168Dac7563Channel(slotIndex, channelIndex, subchannelIndex);
+    } else if (subchannelIndex >= PWM_1_SUBCHANNEL_INDEX && subchannelIndex <= PWM_2_SUBCHANNEL_INDEX) {
+        void *buffer = malloc(sizeof(Mio168PwmChannel));
+        memset(buffer, 0, sizeof(Mio168PwmChannel));
+        return new (buffer) Mio168PwmChannel(slotIndex, channelIndex, subchannelIndex);
     }
     return nullptr;
 }
@@ -315,34 +556,16 @@ Channel *Mio168ModuleInfo::createChannel(int slotIndex, int channelIndex, int su
 static Mio168ModuleInfo g_mio168ModuleInfo;
 ModuleInfo *g_moduleInfo = &g_mio168ModuleInfo;
 
-TestResult Mio168DinChannel::getTestResult() {
-    auto mio168Module = (dib_mio168::Mio168Module *)g_slots[slotIndex];
+TestResult MioChannel::getTestResult() {
+    auto mio168Module = (Mio168Module *)g_slots[slotIndex];
     return mio168Module->testResult;
-}
-
-uint8_t Mio168DinChannel::getDigitalInputData() {
-    auto mio168Module = (dib_mio168::Mio168Module *)g_slots[slotIndex];
-    return mio168Module->inputPinStates;
-}
-
-TestResult Mio168DoutChannel::getTestResult() {
-    auto mio168Module = (dib_mio168::Mio168Module *)g_slots[slotIndex];
-    return mio168Module->testResult;
-}
-
-uint8_t Mio168DoutChannel::getDigitalOutputData() {
-    auto mio168Module = (dib_mio168::Mio168Module *)g_slots[slotIndex];
-    return mio168Module->outputPinStates;
-}
-
-void Mio168DoutChannel::setDigitalOutputData(uint8_t data) {
-    auto mio168Module = (dib_mio168::Mio168Module *)g_slots[slotIndex];
-    mio168Module->outputPinStates = data;
 }
 
 } // namespace dib_mio168
 
 namespace gui {
+
+using namespace dib_mio168;
 
 void data_dib_mio168_inputs(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
@@ -360,8 +583,7 @@ void data_dib_mio168_input_no(DataOperationEnum operation, Cursor cursor, Value 
 
 void data_dib_mio168_input_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto mio168Module = (dib_mio168::Mio168Module *)g_slots[cursor / 8];
-        value = mio168Module->getInputPinState(cursor % 8);
+        ((Mio168DinChannel *)Channel::getBySlotIndex(cursor / 8, DIN_SUBCHANNEL_INDEX))->getPinState(cursor % 8);
     }
 }
 
@@ -381,15 +603,15 @@ void data_dib_mio168_output_no(DataOperationEnum operation, Cursor cursor, Value
 
 void data_dib_mio168_output_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto mio168Module = (dib_mio168::Mio168Module *)g_slots[cursor / 8];
-        value = mio168Module->getOutputPinState(cursor % 8);
+        value = ((Mio168DoutChannel *)Channel::getBySlotIndex(cursor / 8, DOUT_SUBCHANNEL_INDEX))->getPinState(cursor % 8);
     }
 }
 
 void action_dib_mio168_toggle_output_state() {
     int cursor = getFoundWidgetAtDown().cursor;
-    auto mio168Module = (dib_mio168::Mio168Module *)g_slots[cursor / 8];
-    mio168Module->setOutputPinState(cursor % 8, !mio168Module->getOutputPinState(cursor % 8));
+    auto channel = ((Mio168DoutChannel *)Channel::getBySlotIndex(cursor / 8, DOUT_SUBCHANNEL_INDEX));
+    int pin = cursor % 8;
+    channel->setPinState(pin, channel->getPinState(pin));
 }
 
 void data_dib_mio168_analog_inputs(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -402,7 +624,7 @@ void data_dib_mio168_analog_inputs(DataOperationEnum operation, Cursor cursor, V
 
 void data_dib_mio168_analog_input_value(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto mio168Module = (dib_mio168::Mio168Module *)g_slots[cursor / 4];
+        auto mio168Module = (Mio168Module *)g_slots[cursor / 4];
         value = mio168Module->analogInputValues[cursor % 4];
     }
 }

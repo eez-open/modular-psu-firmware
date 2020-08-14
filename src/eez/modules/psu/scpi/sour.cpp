@@ -1230,12 +1230,12 @@ scpi_result_t scpi_cmd_sourceDigitalDataByte(scpi_t *context) {
     }
 
     if (!(channel->params.features & CH_FEATURE_DOUTPUT)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
 
     uint32_t data;
     if (!SCPI_ParamUInt32(context, &data, true)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
 
@@ -1261,6 +1261,136 @@ scpi_result_t scpi_cmd_sourceDigitalDataByteQ(scpi_t *context) {
     }
 
     SCPI_ResultUInt8(context, channel->getDigitalOutputData());
+
+    return SCPI_RES_OK;
+}
+
+static scpi_choice_def_t g_sourceModeChoice[] = {
+    { "CURRent", SOURCE_MODE_CURRENT },
+    { "VOLTage", SOURCE_MODE_VOLTAGE },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_sourceMode(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t mode;
+    if (!SCPI_ParamChoice(context, g_sourceModeChoice, &mode, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel->setMode((SourceMode)mode, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceModeQ(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    SourceMode mode;
+    int err;
+    if (!channel->getMode(mode, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_sourceModeChoice, mode);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentRange(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t range;
+    if (!SCPI_ParamInt32(context, &range, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (range < 5 || range > 7) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel->setCurrentRange(range, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentRangeQ(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    int8_t range;
+    int err;
+    if (!channel->getCurrentRange(range, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultInt8(context, range);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageRange(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t range;
+    if (!SCPI_ParamInt32(context, &range, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (range < 0 || range > 3) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel->setVoltageRange(range, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageRangeQ(scpi_t *context) {
+    Channel *channel = set_channel_from_command_number(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    int8_t range;
+    int err;
+    if (!channel->getVoltageRange(range, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultInt8(context, range);
 
     return SCPI_RES_OK;
 }

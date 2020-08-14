@@ -81,6 +81,11 @@ enum DprogState {
     DPROG_STATE_ON = 1
 };
 
+enum SourceMode {
+    SOURCE_MODE_CURRENT = 0,
+    SOURCE_MODE_VOLTAGE = 0
+};
+
 enum ChannelFeatures {
     CH_FEATURE_VOLT = (1 << 0),
     CH_FEATURE_CURRENT = (1 << 1),
@@ -722,7 +727,17 @@ public:
     virtual uint8_t getDigitalOutputData();
     virtual void setDigitalOutputData(uint8_t data);
 
+    virtual int getChannelSettingsPageId();
     virtual int getAdvancedOptionsPageId();
+
+    virtual bool getMode(SourceMode &mode, int *err);
+    virtual bool setMode(SourceMode mode, int *err);
+
+    virtual bool getCurrentRange(int8_t &range, int *err);
+    virtual bool setCurrentRange(int8_t range, int *err);
+
+    virtual bool getVoltageRange(int8_t &range, int *err);
+    virtual bool setVoltageRange(int8_t range, int *err);    
 
     //
     //

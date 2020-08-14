@@ -28,14 +28,40 @@ namespace eez {
 namespace psu {
 namespace debug {
 
+#define CHANNELS \
+    CHANNEL(1),  CHANNEL(2),  CHANNEL(3),  CHANNEL(4),  CHANNEL(5),  CHANNEL(6), \
+    CHANNEL(7),  CHANNEL(8),  CHANNEL(9),  CHANNEL(10), CHANNEL(11), CHANNEL(12),\
+    CHANNEL(13), CHANNEL(14), CHANNEL(15), CHANNEL(16), CHANNEL(17), CHANNEL(18),\
+    CHANNEL(19), CHANNEL(20), CHANNEL(21), CHANNEL(22), CHANNEL(23), CHANNEL(24),\
+    CHANNEL(25), CHANNEL(26), CHANNEL(27), CHANNEL(28), CHANNEL(29), CHANNEL(30),\
+    CHANNEL(31), CHANNEL(32), CHANNEL(33), CHANNEL(34), CHANNEL(35), CHANNEL(36)
+
 DebugCounterVariable g_adcCounter("ADC_COUNTER");
 DebugValueVariable g_encoderCounter("ENC_COUNTER", 100);
-DebugValueVariable g_uDac[CH_MAX] = { DebugValueVariable("CH1 U_DAC"), DebugValueVariable("CH2 U_DAC"), DebugValueVariable("CH3 U_DAC"), DebugValueVariable("CH4 U_DAC"), DebugValueVariable("CH5 U_DAC"), DebugValueVariable("CH6 U_DAC") };
-DebugValueVariable g_uMon[CH_MAX] = { DebugValueVariable("CH1 U_MON"), DebugValueVariable("CH2 U_MON"), DebugValueVariable("CH3 U_MON"), DebugValueVariable("CH4 U_MON"), DebugValueVariable("CH5 U_MON"), DebugValueVariable("CH6 U_MON") };
-DebugValueVariable g_uMonDac[CH_MAX] = { DebugValueVariable("CH1 U_MON_DAC"), DebugValueVariable("CH2 U_MON_DAC"), DebugValueVariable("CH3 U_MON_DAC"), DebugValueVariable("CH4 U_MON_DAC"), DebugValueVariable("CH5 U_MON_DAC"), DebugValueVariable("CH6 U_MON_DAC") };
-DebugValueVariable g_iDac[CH_MAX] = { DebugValueVariable("CH1 I_DAC"), DebugValueVariable("CH2 I_DAC"), DebugValueVariable("CH3 I_DAC"), DebugValueVariable("CH4 I_DAC"), DebugValueVariable("CH5 I_DAC"), DebugValueVariable("CH6 I_DAC") };
-DebugValueVariable g_iMon[CH_MAX] = { DebugValueVariable("CH1 I_MON"), DebugValueVariable("CH2 I_MON"), DebugValueVariable("CH3 I_MON"), DebugValueVariable("CH4 I_MON"), DebugValueVariable("CH5 I_MON"), DebugValueVariable("CH6 I_MON") };
-DebugValueVariable g_iMonDac[CH_MAX] = { DebugValueVariable("CH1 I_MON_DAC"), DebugValueVariable("CH2 I_MON_DAC"), DebugValueVariable("CH3 I_MON_DAC"), DebugValueVariable("CH4 I_MON_DAC"), DebugValueVariable("CH5 I_MON_DAC"), DebugValueVariable("CH6 I_MON_DAC") };
+
+#undef CHANNEL
+#define CHANNEL(N) DebugValueVariable("CH##N U_DAC")
+DebugValueVariable g_uDac[CH_MAX] = { CHANNELS };
+
+#undef CHANNEL
+#define CHANNEL(N) DebugValueVariable("CH##N U_MON")
+DebugValueVariable g_uMon[CH_MAX] = { CHANNELS };
+
+#undef CHANNEL
+#define CHANNEL(N) DebugValueVariable("CH##N U_MON_DAC")
+DebugValueVariable g_uMonDac[CH_MAX] = { CHANNELS };
+
+#undef CHANNEL
+#define CHANNEL(N) DebugValueVariable("CH##N I_DAC")
+DebugValueVariable g_iDac[CH_MAX] = { CHANNELS };
+
+#undef CHANNEL
+#define CHANNEL(N) DebugValueVariable("CH##N I_MON")
+DebugValueVariable g_iMon[CH_MAX] = { CHANNELS };
+
+#undef CHANNEL
+#define CHANNEL(N) DebugValueVariable("CH##N I_MON_DAC")
+DebugValueVariable g_iMonDac[CH_MAX] = { CHANNELS };
 
 DebugVariable *g_variables[] = { 
     &g_adcCounter,

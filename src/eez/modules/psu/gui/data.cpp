@@ -5775,25 +5775,25 @@ void data_slot_test_result(DataOperationEnum operation, Cursor cursor, Value &va
 
 void data_slot_title_def(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(cursor, VALUE_TYPE_SLOT_TITLE);
+        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
     }
 }
 
 void data_slot_title_max(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(cursor != -1 ? cursor : hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
+        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
     }
 }
 
 void data_slot_title_min(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(cursor, VALUE_TYPE_SLOT_TITLE);
+        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
     }
 }
 
 void data_slot_title_micro(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(cursor, VALUE_TYPE_SLOT_TITLE);
+        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
     }
 }
 

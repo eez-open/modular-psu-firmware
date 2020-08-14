@@ -1659,8 +1659,54 @@ uint8_t Channel::getDigitalOutputData() {
 void Channel::setDigitalOutputData(uint8_t data) {
 }
 
+int Channel::getChannelSettingsPageId() {
+    return gui::PAGE_ID_CH_SETTINGS;
+}
+
 int Channel::getAdvancedOptionsPageId() {
     return gui::PAGE_ID_NONE;
+}
+
+bool Channel::getMode(SourceMode &mode, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Channel::setMode(SourceMode mode, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Channel::getCurrentRange(int8_t &range, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Channel::setCurrentRange(int8_t range, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Channel::getVoltageRange(int8_t &range, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Channel::setVoltageRange(int8_t range, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
 }
 
 } // namespace psu

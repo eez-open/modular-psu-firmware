@@ -302,7 +302,7 @@ void action_show_slot_settings() {
 
 void action_show_ch_settings() {
     selectChannelByCursor();
-    showPage(PAGE_ID_CH_SETTINGS);
+    showPage(g_channel->getChannelSettingsPageId());
 }
 
 void action_show_ch_settings_prot_clear() {

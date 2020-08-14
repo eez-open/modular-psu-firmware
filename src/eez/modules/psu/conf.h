@@ -40,7 +40,7 @@ option.
 #define CONF_DEBUG_VARIABLES 0
 
 /// Maximum number of channels existing.
-#define CH_MAX 6
+#define CH_MAX 36
 
 /// Min. delay between power down and power up.
 #define MIN_POWER_UP_DELAY 5
