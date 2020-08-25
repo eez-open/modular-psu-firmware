@@ -74428,10 +74428,10 @@
           },
           {
             "name": "SYSTem:COMMunicate:USB:MODE",
-            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_ntp",
+            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_usb_mode",
             "parameters": [
               {
-                "name": "mode",
+                "name": "usb_mode",
                 "type": [
                   {
                     "type": "discrete",
@@ -74464,10 +74464,10 @@
           },
           {
             "name": "SYSTem:COMMunicate:USB:CLAss",
-            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_ntp",
+            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_comm_usb_cla",
             "parameters": [
               {
-                "name": "class",
+                "name": "usb_class",
                 "type": [
                   {
                     "type": "discrete",
@@ -77660,9 +77660,9 @@
       "idn": "Envox,EEZ BB3 (STM32)",
       "idfName": "EEZ BB3 R2B4",
       "idfShortName": "BB3-R2B4",
-      "idfFirmwareVersion": "1.0",
+      "idfFirmwareVersion": "1.1",
       "idfGuid": "687b6dee-2093-4c36-afb7-cfc7ea2bf262",
-      "idfRevisionNumber": "1.0.9",
+      "idfRevisionNumber": "1.1",
       "idfDescription": "EEZ Bench box 3-module T&M chassis",
       "idfSupportedModels": "BB3 R2B4",
       "idfRevisionComments": "Initial version",
@@ -77680,9 +77680,9 @@
       "idn": "Envox,EEZ BB3 (Simulator)",
       "idfName": "EEZ BB3 Simulator",
       "idfShortName": "BB3-simulator",
-      "idfFirmwareVersion": "1.0",
+      "idfFirmwareVersion": "1.1",
       "idfGuid": "7cab6860-e593-4ba2-ee68-57fe84460fa4",
-      "idfRevisionNumber": "1.0.9",
+      "idfRevisionNumber": "1.1",
       "idfDescription": "EEZ Bench box 3-module T&M chassis firmware simulator",
       "idfSupportedModels": "BB3 R2B4",
       "idfRevisionComments": "Initial version",
