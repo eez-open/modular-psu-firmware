@@ -262,7 +262,7 @@ bool AnalogDigitalConverter::test() {
 	}
 
     if (g_testResult == TEST_FAILED) {
-		generateError(SCPI_ERROR_CH1_ADC_TEST_FAILED + channelIndex);
+		generateChannelError(SCPI_ERROR_CH1_ADC_TEST_FAILED, channelIndex);
     } else {
     	g_testResult = TEST_OK;
     }

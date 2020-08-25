@@ -50,51 +50,16 @@ static const int EVENT_TYPE_ERROR = 4;
     EVENT_SCPI_ERROR(SCPI_ERROR_CH4_OUTPUT_FAULT_DETECTED, "CH4 output fault")                     \
     EVENT_SCPI_ERROR(SCPI_ERROR_CH5_OUTPUT_FAULT_DETECTED, "CH5 output fault")                     \
     EVENT_SCPI_ERROR(SCPI_ERROR_CH6_OUTPUT_FAULT_DETECTED, "CH6 output fault")                     \
-    EVENT_ERROR(CH1_OVP_TRIPPED, 0, "Ch1 OVP tripped")                                             \
-    EVENT_ERROR(CH2_OVP_TRIPPED, 1, "Ch2 OVP tripped")                                             \
-    EVENT_ERROR(CH3_OVP_TRIPPED, 2, "Ch3 OVP tripped")                                             \
-    EVENT_ERROR(CH4_OVP_TRIPPED, 3, "Ch4 OVP tripped")                                             \
-    EVENT_ERROR(CH5_OVP_TRIPPED, 4, "Ch5 OVP tripped")                                             \
-    EVENT_ERROR(CH6_OVP_TRIPPED, 5, "Ch6 OVP tripped")                                             \
-    EVENT_ERROR(CH1_OCP_TRIPPED, 10, "Ch1 OCP tripped")                                            \
-    EVENT_ERROR(CH2_OCP_TRIPPED, 11, "Ch2 OCP tripped")                                            \
-    EVENT_ERROR(CH3_OCP_TRIPPED, 12, "Ch3 OCP tripped")                                            \
-    EVENT_ERROR(CH4_OCP_TRIPPED, 13, "Ch4 OCP tripped")                                            \
-    EVENT_ERROR(CH5_OCP_TRIPPED, 14, "Ch5 OCP tripped")                                            \
-    EVENT_ERROR(CH6_OCP_TRIPPED, 15, "Ch6 OCP tripped")                                            \
-    EVENT_ERROR(CH1_OPP_TRIPPED, 20, "Ch1 OPP tripped")                                            \
-    EVENT_ERROR(CH2_OPP_TRIPPED, 21, "Ch2 OPP tripped")                                            \
-    EVENT_ERROR(CH3_OPP_TRIPPED, 22, "Ch3 OPP tripped")                                            \
-    EVENT_ERROR(CH4_OPP_TRIPPED, 23, "Ch4 OPP tripped")                                            \
-    EVENT_ERROR(CH5_OPP_TRIPPED, 24, "Ch5 OPP tripped")                                            \
-    EVENT_ERROR(CH6_OPP_TRIPPED, 25, "Ch6 OPP tripped")                                            \
+    EVENT_ERROR(CH_OVP_TRIPPED, 0, "Ch%d OVP tripped")                                             \
+    EVENT_ERROR(CH_OCP_TRIPPED, 10, "Ch%d OCP tripped")                                            \
+    EVENT_ERROR(CH_OPP_TRIPPED, 20, "Ch%d OPP tripped")                                            \
     EVENT_ERROR(FILE_UPLOAD_FAILED, 30, "File upload failed")                                      \
     EVENT_ERROR(FILE_DOWNLOAD_FAILED, 31, "File download failed")                                  \
-    EVENT_ERROR(CH1_IOEXP_RESET_DETECTED, 40, "Ch1 IOEXP reset detected")                          \
-    EVENT_ERROR(CH2_IOEXP_RESET_DETECTED, 41, "Ch2 IOEXP reset detected")                          \
-    EVENT_ERROR(CH3_IOEXP_RESET_DETECTED, 42, "Ch3 IOEXP reset detected")                          \
-    EVENT_ERROR(CH4_IOEXP_RESET_DETECTED, 43, "Ch4 IOEXP reset detected")                          \
-    EVENT_ERROR(CH5_IOEXP_RESET_DETECTED, 44, "Ch5 IOEXP reset detected")                          \
-    EVENT_ERROR(CH6_IOEXP_RESET_DETECTED, 45, "Ch6 IOEXP reset detected")                          \
-    EVENT_ERROR(CH1_IOEXP_FAULT_MATCH_DETECTED, 50, "Ch1 IOEXP fault match detected")              \
-    EVENT_ERROR(CH2_IOEXP_FAULT_MATCH_DETECTED, 51, "Ch2 IOEXP fault match detected")              \
-    EVENT_ERROR(CH3_IOEXP_FAULT_MATCH_DETECTED, 52, "Ch3 IOEXP fault match detected")              \
-    EVENT_ERROR(CH4_IOEXP_FAULT_MATCH_DETECTED, 53, "Ch4 IOEXP fault match detected")              \
-    EVENT_ERROR(CH5_IOEXP_FAULT_MATCH_DETECTED, 54, "Ch5 IOEXP fault match detected")              \
-    EVENT_ERROR(CH6_IOEXP_FAULT_MATCH_DETECTED, 55, "Ch6 IOEXP fault match detected")              \
+    EVENT_ERROR(CH_IOEXP_RESET_DETECTED, 40, "Ch%d IOEXP reset detected")                          \
+    EVENT_ERROR(CH_IOEXP_FAULT_MATCH_DETECTED, 50, "Ch%d IOEXP fault match detected")              \
     EVENT_ERROR(AUX_OTP_TRIPPED, 60, "AUX OTP tripped")                                            \
-    EVENT_ERROR(CH1_OTP_TRIPPED, 70, "CH1 OTP tripped")                                            \
-    EVENT_ERROR(CH2_OTP_TRIPPED, 71, "CH2 OTP tripped")                                            \
-    EVENT_ERROR(CH3_OTP_TRIPPED, 72, "CH3 OTP tripped")                                            \
-    EVENT_ERROR(CH4_OTP_TRIPPED, 73, "CH4 OTP tripped")                                            \
-    EVENT_ERROR(CH5_OTP_TRIPPED, 74, "CH5 OTP tripped")                                            \
-    EVENT_ERROR(CH6_OTP_TRIPPED, 75, "CH6 OTP tripped")                                            \
-    EVENT_ERROR(CH1_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, 80, "CH1 rsense reverse polarity detected") \
-    EVENT_ERROR(CH2_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, 81, "CH2 rsense reverse polarity detected") \
-    EVENT_ERROR(CH3_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, 82, "CH3 rsense reverse polarity detected") \
-    EVENT_ERROR(CH4_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, 83, "CH4 rsense reverse polarity detected") \
-    EVENT_ERROR(CH5_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, 84, "CH5 rsense reverse polarity detected") \
-    EVENT_ERROR(CH6_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, 85, "CH6 rsense reverse polarity detected") \
+    EVENT_ERROR(CH_OTP_TRIPPED, 70, "CH%d OTP tripped")                                            \
+    EVENT_ERROR(CH_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, 80, "CH%d rsense reverse polarity detected") \
 	EVENT_ERROR(EEPROM_MCU_READ_ERROR, 86, "EEPROM read error on MCU")                             \
 	EVENT_ERROR(EEPROM_SLOT1_READ_ERROR, 87, "EEPROM read error on module 1")                      \
 	EVENT_ERROR(EEPROM_SLOT2_READ_ERROR, 88, "EEPROM read error on module 2")                      \
@@ -145,18 +110,7 @@ static const int EVENT_TYPE_ERROR = 4;
     EVENT_ERROR(TOO_MANY_LOG_EVENTS, 150, "Too many log events")                                   \
 	EVENT_ERROR(WATCHDOG_RESET, 151, "Watchdog reset")                                             \
     EVENT_ERROR(HIGH_TEMPERATURE, 152, "High temperature")                                         \
-    EVENT_WARNING(CH1_CALIBRATION_DISABLED, 0, "Ch1 calibration disabled")                         \
-    EVENT_WARNING(CH2_CALIBRATION_DISABLED, 1, "Ch2 calibration disabled")                         \
-    EVENT_WARNING(CH3_CALIBRATION_DISABLED, 2, "Ch3 calibration disabled")                         \
-    EVENT_WARNING(CH4_CALIBRATION_DISABLED, 3, "Ch4 calibration disabled")                         \
-    EVENT_WARNING(CH5_CALIBRATION_DISABLED, 4, "Ch5 calibration disabled")                         \
-    EVENT_WARNING(CH6_CALIBRATION_DISABLED, 5, "Ch6 calibration disabled")                         \
-    EVENT_WARNING(CH1_UNKNOWN_PWRGOOD_STATE, 10, "Ch1 unknown PWRGOOD")                            \
-    EVENT_WARNING(CH2_UNKNOWN_PWRGOOD_STATE, 11, "Ch2 unknown PWRGOOD")                            \
-    EVENT_WARNING(CH3_UNKNOWN_PWRGOOD_STATE, 12, "Ch3 unknown PWRGOOD")                            \
-    EVENT_WARNING(CH4_UNKNOWN_PWRGOOD_STATE, 13, "Ch4 unknown PWRGOOD")                            \
-    EVENT_WARNING(CH5_UNKNOWN_PWRGOOD_STATE, 14, "Ch5 unknown PWRGOOD")                            \
-    EVENT_WARNING(CH6_UNKNOWN_PWRGOOD_STATE, 15, "Ch6 unknown PWRGOOD")                            \
+    EVENT_WARNING(CH_CALIBRATION_DISABLED, 0, "Ch%d calibration disabled")                         \
     EVENT_WARNING(ETHERNET_NOT_CONNECTED, 20, "Ethernet not connected")                            \
     EVENT_WARNING(AUTO_RECALL_VALUES_MISMATCH, 21, "Auto-recall values mismatch")                  \
     EVENT_WARNING(NTP_REFRESH_FAILED, 22, "NTP refresh failed")                                    \
@@ -173,43 +127,13 @@ static const int EVENT_TYPE_ERROR = 4;
     EVENT_INFO(ETHERNET_ENABLED, 7, "Ethernet enabled")                                            \
     EVENT_INFO(ETHERNET_DISABLED, 8, "Ethernet disabled")                                          \
     EVENT_INFO(SYSTEM_PASSWORD_CHANGED, 9, "System password changed")                              \
-    EVENT_INFO(CH1_OUTPUT_ENABLED, 10, "Ch1 output on")                                            \
-    EVENT_INFO(CH2_OUTPUT_ENABLED, 11, "Ch2 output on")                                            \
-    EVENT_INFO(CH3_OUTPUT_ENABLED, 12, "Ch3 output on")                                            \
-    EVENT_INFO(CH4_OUTPUT_ENABLED, 13, "Ch4 output on")                                            \
-    EVENT_INFO(CH5_OUTPUT_ENABLED, 14, "Ch5 output on")                                            \
-    EVENT_INFO(CH6_OUTPUT_ENABLED, 15, "Ch6 output on")                                            \
+    EVENT_INFO(CH_OUTPUT_ENABLED, 10, "Ch%d output on")                                            \
     EVENT_INFO(SYSTEM_DATE_TIME_CHANGED_DST, 20, "Date/time changed (DST)")                        \
-    EVENT_INFO(CH1_OUTPUT_DISABLED, 30, "Ch1 output off")                                          \
-    EVENT_INFO(CH2_OUTPUT_DISABLED, 31, "Ch2 output off")                                          \
-    EVENT_INFO(CH3_OUTPUT_DISABLED, 32, "Ch3 output off")                                          \
-    EVENT_INFO(CH4_OUTPUT_DISABLED, 33, "Ch4 output off")                                          \
-    EVENT_INFO(CH5_OUTPUT_DISABLED, 34, "Ch5 output off")                                          \
-    EVENT_INFO(CH6_OUTPUT_DISABLED, 35, "Ch6 output off")                                          \
-    EVENT_INFO(CH1_REMOTE_SENSE_ENABLED, 40, "Ch1 remote sense enabled")                           \
-    EVENT_INFO(CH2_REMOTE_SENSE_ENABLED, 41, "Ch2 remote sense enabled")                           \
-    EVENT_INFO(CH3_REMOTE_SENSE_ENABLED, 42, "Ch3 remote sense enabled")                           \
-    EVENT_INFO(CH4_REMOTE_SENSE_ENABLED, 43, "Ch4 remote sense enabled")                           \
-    EVENT_INFO(CH5_REMOTE_SENSE_ENABLED, 44, "Ch5 remote sense enabled")                           \
-    EVENT_INFO(CH6_REMOTE_SENSE_ENABLED, 45, "Ch6 remote sense enabled")                           \
-    EVENT_INFO(CH1_REMOTE_SENSE_DISABLED, 50, "Ch1 remote sense disabled")                         \
-    EVENT_INFO(CH2_REMOTE_SENSE_DISABLED, 51, "Ch2 remote sense disabled")                         \
-    EVENT_INFO(CH3_REMOTE_SENSE_DISABLED, 52, "Ch3 remote sense disabled")                         \
-    EVENT_INFO(CH4_REMOTE_SENSE_DISABLED, 53, "Ch4 remote sense disabled")                         \
-    EVENT_INFO(CH5_REMOTE_SENSE_DISABLED, 54, "Ch5 remote sense disabled")                         \
-    EVENT_INFO(CH6_REMOTE_SENSE_DISABLED, 55, "Ch6 remote sense disabled")                         \
-    EVENT_INFO(CH1_REMOTE_PROG_ENABLED, 60, "Ch1 remote prog enabled")                             \
-    EVENT_INFO(CH2_REMOTE_PROG_ENABLED, 61, "Ch2 remote prog enabled")                             \
-    EVENT_INFO(CH3_REMOTE_PROG_ENABLED, 62, "Ch3 remote prog enabled")                             \
-    EVENT_INFO(CH4_REMOTE_PROG_ENABLED, 63, "Ch4 remote prog enabled")                             \
-    EVENT_INFO(CH5_REMOTE_PROG_ENABLED, 64, "Ch5 remote prog enabled")                             \
-    EVENT_INFO(CH6_REMOTE_PROG_ENABLED, 65, "Ch6 remote prog enabled")                             \
-    EVENT_INFO(CH1_REMOTE_PROG_DISABLED, 70, "Ch1 remote prog disabled")                           \
-    EVENT_INFO(CH2_REMOTE_PROG_DISABLED, 71, "Ch2 remote prog disabled")                           \
-    EVENT_INFO(CH3_REMOTE_PROG_DISABLED, 72, "Ch3 remote prog disabled")                           \
-    EVENT_INFO(CH4_REMOTE_PROG_DISABLED, 73, "Ch4 remote prog disabled")                           \
-    EVENT_INFO(CH5_REMOTE_PROG_DISABLED, 74, "Ch5 remote prog disabled")                           \
-    EVENT_INFO(CH6_REMOTE_PROG_DISABLED, 75, "Ch6 remote prog disabled")                           \
+    EVENT_INFO(CH_OUTPUT_DISABLED, 30, "Ch%d output off")                                          \
+    EVENT_INFO(CH_REMOTE_SENSE_ENABLED, 40, "Ch%d remote sense enabled")                           \
+    EVENT_INFO(CH_REMOTE_SENSE_DISABLED, 50, "Ch%d remote sense disabled")                         \
+    EVENT_INFO(CH_REMOTE_PROG_ENABLED, 60, "Ch%d remote prog enabled")                             \
+    EVENT_INFO(CH_REMOTE_PROG_DISABLED, 70, "Ch%d remote prog disabled")                           \
     EVENT_INFO(RECALL_FROM_PROFILE_0, 80, "Recall from profile 0")                                 \
     EVENT_INFO(RECALL_FROM_PROFILE_1, 81, "Recall from profile 1")                                 \
     EVENT_INFO(RECALL_FROM_PROFILE_2, 82, "Recall from profile 2")                                 \
@@ -230,12 +154,7 @@ static const int EVENT_TYPE_ERROR = 4;
     EVENT_INFO(DEFAULE_PROFILE_CHANGED_TO_7, 97, "Default profile changed to 7")                   \
     EVENT_INFO(DEFAULE_PROFILE_CHANGED_TO_8, 98, "Default profile changed to 8")                   \
     EVENT_INFO(DEFAULE_PROFILE_CHANGED_TO_9, 99, "Default profile changed to 9")                   \
-    EVENT_INFO(CH1_CALIBRATION_ENABLED, 100, "Ch1 calibration enabled")                            \
-    EVENT_INFO(CH2_CALIBRATION_ENABLED, 101, "Ch2 calibration enabled")                            \
-    EVENT_INFO(CH3_CALIBRATION_ENABLED, 102, "Ch3 calibration enabled")                            \
-    EVENT_INFO(CH4_CALIBRATION_ENABLED, 103, "Ch4 calibration enabled")                            \
-    EVENT_INFO(CH5_CALIBRATION_ENABLED, 104, "Ch5 calibration enabled")                            \
-    EVENT_INFO(CH6_CALIBRATION_ENABLED, 105, "Ch6 calibration enabled")                            \
+    EVENT_INFO(CH_CALIBRATION_ENABLED, 100, "Ch%d calibration enabled")                            \
     EVENT_INFO(COUPLED_IN_PARALLEL, 110, "Coupled in parallel")                                    \
     EVENT_INFO(COUPLED_IN_SERIES, 111, "Coupled in series")                                        \
     EVENT_INFO(CHANNELS_UNCOUPLED, 112, "Channels uncoupled")                                      \
@@ -284,13 +203,15 @@ void tick();
 void shutdownSave();
 
 int16_t getLastErrorEventId();
+int16_t getLastErrorEventChannelIndex();
 
 const char *getEventTypeName(int16_t eventId);
 const char *getEventMessage(int16_t eventId);
 
 void setFilter(int filter);
 
-void pushEvent(int16_t eventId);
+void pushEvent(int16_t eventId, int channelIndex = -1);
+void pushChannelEvent(int16_t eventId, int channelIndex);
 void pushDebugTrace(const char *message, size_t messageLength);
 
 void markAsRead();

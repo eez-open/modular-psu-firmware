@@ -270,7 +270,7 @@ void TempSensorTemperature::protection_enter() {
     if (channel) {
         channel_dispatcher::outputEnable(*channel, false);
 
-        event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_OTP_TRIPPED + channel->channelIndex);
+        event_queue::pushChannelEvent(event_queue::EVENT_ERROR_CH_OTP_TRIPPED, channel->channelIndex);
     } else {
         channel_dispatcher::disableOutputForAllChannels();
 

@@ -151,6 +151,15 @@ void generateError(int16_t error) {
     eez::scpi::generateError(error);
 }
 
+void generateChannelError(int16_t error, int channelIndex) {
+    if (channelIndex < 6) {
+        eez::scpi::generateError(error > 0 ? error + channelIndex : error - channelIndex);
+    } else {
+        // TODO !!??
+        eez::scpi::generateError(error);
+    }
+}
+
 namespace psu {
 
 using namespace scpi;

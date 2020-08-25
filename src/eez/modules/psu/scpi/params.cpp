@@ -79,7 +79,13 @@ bool check_channel(scpi_t *context, int32_t channelIndex) {
     }
 
     if (!Channel::get(channelIndex).isPowerOk()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CH1_FAULT_DETECTED - channelIndex);
+        if (channelIndex < 6) {
+            SCPI_ErrorPush(context, SCPI_ERROR_CH1_FAULT_DETECTED - channelIndex);
+        } else {
+            // TODO !!??
+            SCPI_ErrorPush(context, SCPI_ERROR_CH1_FAULT_DETECTED);
+        }
+
         return false;
     }
 

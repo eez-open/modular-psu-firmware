@@ -48,6 +48,7 @@ char *getConfFilePath(const char *file_name);
 #endif
 
 void generateError(int16_t error);
+void generateChannelError(int16_t error, int channelIndex);
 
 void onSdCardFileChangeHook(const char *filePath1, const char *filePath2 = nullptr);
 

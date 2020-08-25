@@ -1935,4 +1935,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS = 200
 };
 
-extern const uint8_t assets[315899];
+extern const uint8_t assets[315423];

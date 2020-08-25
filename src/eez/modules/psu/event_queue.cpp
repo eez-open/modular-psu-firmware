@@ -77,6 +77,7 @@ static const size_t EVENT_MESSAGE_MAX_SIZE = 256;
 struct QueueEvent {
     uint32_t dateTime;
     int16_t eventId;
+    int16_t channelIndex;
     char message[EVENT_MESSAGE_MAX_SIZE];
 };
 static QueueEvent g_writeQueue[WRITE_QUEUE_MAX_SIZE];
@@ -99,6 +100,7 @@ static uint32_t g_displayFromPosition;
 static uint32_t g_previousDisplayFromPosition = -1;
 
 static int16_t g_lastErrorEventId;
+static int16_t g_lastErrorEventChannelIndex;
 
 struct Event {
     uint32_t dateTime;
@@ -113,7 +115,7 @@ static int g_selectedEventIndex = -1;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void addEventToWriteQueue(int16_t eventId, char *message);
+static void addEventToWriteQueue(int16_t eventId, char *message, int channelIndex);
 static bool getEventFromWriteQueue(QueueEvent *queueEvent);
 
 static void getIndexFilePath(int indexType, char *filePath);
@@ -176,6 +178,10 @@ void shutdownSave() {
 
 int16_t getLastErrorEventId() {
     return g_lastErrorEventId;
+}
+
+int16_t getLastErrorEventChannelIndex() {
+    return g_lastErrorEventChannelIndex;
 }
 
 const char *getEventTypeName(int16_t eventId) {
@@ -250,8 +256,8 @@ const char *getEventMessage(int16_t eventId) {
     return 0;
 }
 
-void pushEvent(int16_t eventId) {
-    addEventToWriteQueue(eventId, nullptr);
+void pushEvent(int16_t eventId, int channelIndex) {
+    addEventToWriteQueue(eventId, nullptr, channelIndex);
 
 #if OPTION_ETHERNET
     eez::mcu::ethernet::pushEvent(eventId);
@@ -259,6 +265,7 @@ void pushEvent(int16_t eventId) {
 
     if (getEventType(eventId) == EVENT_TYPE_ERROR) {
         g_lastErrorEventId = eventId;
+        g_lastErrorEventChannelIndex = channelIndex;
 
         sound::playBeep();
 
@@ -280,6 +287,10 @@ void pushEvent(int16_t eventId) {
     }
 }
 
+void pushChannelEvent(int16_t eventId, int channelIndex) {
+    pushEvent(eventId, channelIndex);
+}
+
 void pushDebugTrace(const char *message, size_t messageLength) {
     static char buffer[EVENT_MESSAGE_MAX_SIZE];
     static int bufferIndex = 0;
@@ -296,7 +307,7 @@ void pushDebugTrace(const char *message, size_t messageLength) {
                 buffer[bufferIndex] = 0;
                 bufferIndex = 0;
 
-                addEventToWriteQueue(EVENT_DEBUG_TRACE, buffer);
+                addEventToWriteQueue(EVENT_DEBUG_TRACE, buffer, -1);
             }
         }
     }
@@ -304,6 +315,7 @@ void pushDebugTrace(const char *message, size_t messageLength) {
 
 void markAsRead() {
     g_lastErrorEventId = EVENT_TYPE_NONE;
+    g_lastErrorEventChannelIndex = -1;
 }
 
 void moveToTop() {
@@ -340,10 +352,11 @@ static bool getEventFromWriteQueue(QueueEvent *queueEvent) {
     return result;
 }
 
-static void addEventToWriteQueue(int16_t eventId, char *message) {
+static void addEventToWriteQueue(int16_t eventId, char *message, int channelIndex) {
     if (osMutexWait(g_writeQueueMutexId, 5) == osOK) {
         g_writeQueue[g_writeQueueHead].dateTime = datetime::now();
         g_writeQueue[g_writeQueueHead].eventId = eventId;
+        g_writeQueue[g_writeQueueHead].channelIndex = channelIndex;
 
         if (message) {
             strcpy(g_writeQueue[g_writeQueueHead].message, message);
@@ -533,7 +546,13 @@ static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {
             result = bufferedFile.write((const uint8_t *)event->message, strlen(event->message));
         } else {
             const char *message = getEventMessage(event->eventId);
-            result = bufferedFile.write((const uint8_t *)message, strlen(message));
+            if (event->channelIndex != -1) {
+                char buffer[128];
+                sprintf(buffer, message, event->channelIndex + 1);
+                result = bufferedFile.write((const uint8_t *)buffer, strlen(buffer));
+            } else {
+                result = bufferedFile.write((const uint8_t *)message, strlen(message));
+            }
         }
 
         if (result) {
@@ -749,7 +768,11 @@ static void readEvents(uint32_t fromPosition) {
                             auto &event = g_events[k];
                             event.dateTime = g_writeQueue[i].dateTime;
                             event.eventType = eventType;
-                            strcpy(event.message, eventType == EVENT_DEBUG_TRACE ? g_writeQueue[i].message : getEventMessage(g_writeQueue[i].eventId));
+                            if (g_writeQueue[i].channelIndex == -1 || g_writeQueue[i].message) {
+                                strcpy(event.message, eventType == EVENT_DEBUG_TRACE ? g_writeQueue[i].message : getEventMessage(g_writeQueue[i].eventId));
+                            } else {
+                                sprintf(event.message, getEventMessage(g_writeQueue[i].eventId), g_writeQueue[i].channelIndex + 1);
+                            }
                             updateIsLongMessageText(event);
                             event.logOffset = i;
                             if (++k == EVENTS_PER_PAGE) {

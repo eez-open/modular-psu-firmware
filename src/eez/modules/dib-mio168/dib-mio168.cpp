@@ -216,7 +216,30 @@ struct Mio168Dac7760Channel : public MioChannel {
     }
 
     void getParams(uint16_t moduleRevision) override {
-        params.features = 0;
+		params.U_MIN = 0.0f;
+		params.U_DEF = 0.0f;
+		params.U_MAX = 10.5f;
+
+		params.U_MIN_STEP = 0.01f;
+		params.U_DEF_STEP = 0.1f;
+		params.U_MAX_STEP = 5.0f;
+
+		params.I_MIN = 0.0f;
+		params.I_DEF = 0.0f;
+		params.I_MAX = 0.024f;
+
+	
+		params.I_MIN_STEP = 0.001f;
+		params.I_DEF_STEP = 0.001f;
+		params.I_MAX_STEP = 0.01f; 
+		
+		params.U_RESOLUTION = 0.005f;
+		params.I_RESOLUTION = 0.0005f;
+
+		params.VOLTAGE_GND_OFFSET = 0;
+		params.CURRENT_GND_OFFSET = 0;
+
+		params.features = CH_FEATURE_VOLT | CH_FEATURE_CURRENT | CH_FEATURE_OE;
     }
 
     bool getMode(SourceMode &mode, int *err) override {

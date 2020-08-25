@@ -209,7 +209,7 @@ bool IOExpander::test() {
     readGpio();
 
     if (g_testResult == TEST_FAILED) {
-		 generateError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED + channel.channelIndex);
+		 generateChannelError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED, channel.channelIndex);
 		 channel.flags.powerOk = 0;
     } else {
 #if !CONF_SKIP_PWRGOOD_TEST
@@ -219,7 +219,7 @@ bool IOExpander::test() {
         } else {
             g_testResult = TEST_FAILED;
             DebugTrace("Ch%d power fault\n", channel.channelIndex + 1);
-            generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channel.channelIndex);
+            generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channel.channelIndex);
         }
 #endif
 	}
@@ -261,10 +261,10 @@ void IOExpander::tick(uint32_t tick_usec) {
     uint8_t iodira = read(REG_IODIRA);
     if (iodira == 0xFF || (gpio & gpioOutputPinsMask) != gpioWritten) {
         if (iodira == 0xFF) {
-            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_RESET_DETECTED + channel.channelIndex);
+            event_queue::pushChannelEvent(event_queue::EVENT_ERROR_CH1_IOEXP_RESET_DETECTED, channel.channelIndex);
         } else {
             DebugTrace("IOEXP read: 0x%04X, expected: 0x%04X\n", (int)(gpio & gpioOutputPinsMask), (int)gpioWritten);
-            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_IOEXP_FAULT_MATCH_DETECTED + channel.channelIndex);
+            event_queue::pushChannelEvent(event_queue::EVENT_ERROR_CH1_IOEXP_FAULT_MATCH_DETECTED, channel.channelIndex);
         }
 
         reinit();

@@ -101,7 +101,7 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
     }
 
     if (g_testResult == TEST_FAILED) {
-        generateError(SCPI_ERROR_CH1_DAC_TEST_FAILED + channel.channelIndex);
+        generateChannelError(SCPI_ERROR_CH1_DAC_TEST_FAILED, channel.channelIndex);
     } else {
         g_testResult = TEST_OK;
     }

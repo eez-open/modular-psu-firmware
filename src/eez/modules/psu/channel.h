@@ -82,8 +82,8 @@ enum DprogState {
 };
 
 enum SourceMode {
-    SOURCE_MODE_CURRENT = 0,
-    SOURCE_MODE_VOLTAGE = 0
+    SOURCE_MODE_CURRENT,
+    SOURCE_MODE_VOLTAGE
 };
 
 enum ChannelFeatures {

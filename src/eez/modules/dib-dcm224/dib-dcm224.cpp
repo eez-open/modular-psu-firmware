@@ -596,7 +596,7 @@ public:
                 bool pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
                 if (!pwrGood) {
                     channel.flags.powerOk = 0;
-                    generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channel.channelIndex);
+                    generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channel.channelIndex);
                     powerDownBySensor();
                 }
 #endif
@@ -691,7 +691,7 @@ void DcmChannel::tickSpecific(uint32_t tickCount) {
     bool pwrGood = simulator::getPwrgood(channelIndex);
     if (!pwrGood) {
         flags.powerOk = 0;
-        generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channelIndex);
+        generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channelIndex);
         powerDownBySensor();
         return;
     }

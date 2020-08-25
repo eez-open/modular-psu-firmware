@@ -515,14 +515,14 @@ void Channel::protectionEnter(ProtectionValue &cpv, bool hwOvp) {
         }
         doRemoteProgrammingEnable(false);
 
-        eventId = event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + channelIndex;
+        eventId = event_queue::EVENT_ERROR_CH_OVP_TRIPPED;
     } else if (IS_OCP_VALUE(this, cpv)) {
-        eventId = event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + channelIndex;
+        eventId = event_queue::EVENT_ERROR_CH_OCP_TRIPPED;
     } else {
-        eventId = event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + channelIndex;
+        eventId = event_queue::EVENT_ERROR_CH_OPP_TRIPPED;
     }
 
-    event_queue::pushEvent(eventId);
+    event_queue::pushChannelEvent(eventId, channelIndex);
 
     onProtectionTripped();
 }
@@ -753,7 +753,7 @@ void Channel::tick(uint32_t tick_usec) {
 
         if (rpol && isOutputEnabled()) {
             channel_dispatcher::outputEnable(*this, false);
-            event_queue::pushEvent(event_queue::EVENT_ERROR_CH1_REMOTE_SENSE_REVERSE_POLARITY_DETECTED + channelIndex);
+            event_queue::pushChannelEvent(event_queue::EVENT_ERROR_CH_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, channelIndex);
             onProtectionTripped();
         }
     }
@@ -1082,7 +1082,7 @@ void Channel::syncOutputEnable() {
                 } else {
                     channel.flags.outputEnabled = channel.flags.outputEnabledValueOnNextSync;
                     if (channel.flags.outputEnabled || g_isBooted) {
-                        event_queue::pushEvent((channel.flags.outputEnabled ? event_queue::EVENT_INFO_CH1_OUTPUT_ENABLED : event_queue::EVENT_INFO_CH1_OUTPUT_DISABLED) + channel.channelIndex);
+                        event_queue::pushChannelEvent((channel.flags.outputEnabled ? event_queue::EVENT_INFO_CH_OUTPUT_ENABLED : event_queue::EVENT_INFO_CH_OUTPUT_DISABLED), channel.channelIndex);
                     }
                 }
             } else {
@@ -1168,7 +1168,7 @@ void Channel::doCalibrationEnable(bool enable) {
 void Channel::calibrationEnable(bool enabled) {
     if (enabled != isCalibrationEnabled()) {
         doCalibrationEnable(enabled);
-        event_queue::pushEvent((enabled ? event_queue::EVENT_INFO_CH1_CALIBRATION_ENABLED : event_queue::EVENT_WARNING_CH1_CALIBRATION_DISABLED) + channelIndex);
+        event_queue::pushChannelEvent((enabled ? event_queue::EVENT_INFO_CH_CALIBRATION_ENABLED : event_queue::EVENT_WARNING_CH_CALIBRATION_DISABLED), channelIndex);
         persist_conf::saveCalibrationEnabledFlag(*this, enabled);
     }
 }
@@ -1197,7 +1197,7 @@ bool Channel::isCurrentCalibrationEnabled() {
 void Channel::remoteSensingEnable(bool enable) {
     if (enable != flags.senseEnabled) {
         doRemoteSensingEnable(enable);
-        event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_REMOTE_SENSE_ENABLED : event_queue::EVENT_INFO_CH1_REMOTE_SENSE_DISABLED) + channelIndex);
+        event_queue::pushChannelEvent((enable ? event_queue::EVENT_INFO_CH_REMOTE_SENSE_ENABLED : event_queue::EVENT_INFO_CH_REMOTE_SENSE_DISABLED), channelIndex);
     }
 }
 
@@ -1211,7 +1211,7 @@ void Channel::remoteProgrammingEnable(bool enable) {
             trigger::abort();
         }
         doRemoteProgrammingEnable(enable);
-        event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH1_REMOTE_PROG_ENABLED : event_queue::EVENT_INFO_CH1_REMOTE_PROG_DISABLED) + channelIndex);
+        event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH_REMOTE_PROG_ENABLED : event_queue::EVENT_INFO_CH_REMOTE_PROG_DISABLED) + channelIndex);
     }
 }
 
@@ -1306,25 +1306,26 @@ bool Channel::isTripped() {
 
 void Channel::clearProtection(bool clearOTP) {
     auto lastErrorEventId = event_queue::getLastErrorEventId();
+    auto lastErrorEventChannelIndex = event_queue::getLastErrorEventChannelIndex();
 
     ovp.flags.tripped = 0;
     ovp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OVP, false);
-    if (lastErrorEventId == event_queue::EVENT_ERROR_CH1_OVP_TRIPPED + channelIndex) {
+    if (lastErrorEventId == event_queue::EVENT_ERROR_CH_OVP_TRIPPED && lastErrorEventChannelIndex == channelIndex) {
         event_queue::markAsRead();
     }
 
     ocp.flags.tripped = 0;
     ocp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OCP, false);
-    if (lastErrorEventId == event_queue::EVENT_ERROR_CH1_OCP_TRIPPED + channelIndex) {
+    if (lastErrorEventId == event_queue::EVENT_ERROR_CH_OCP_TRIPPED && lastErrorEventChannelIndex == channelIndex) {
         event_queue::markAsRead();
     }
 
     opp.flags.tripped = 0;
     opp.flags.alarmed = 0;
     setQuesBits(QUES_ISUM_OPP, false);
-    if (lastErrorEventId == event_queue::EVENT_ERROR_CH1_OPP_TRIPPED + channelIndex) {
+    if (lastErrorEventId == event_queue::EVENT_ERROR_CH_OPP_TRIPPED && lastErrorEventChannelIndex == channelIndex) {
         event_queue::markAsRead();
     }
 

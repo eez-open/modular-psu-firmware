@@ -252,7 +252,7 @@ struct DcpChannel : public Channel {
 		if (!ioexp.testBit(IOExpander::IO_BIT_IN_PWRGOOD)) {
 			DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d\n", channelIndex + 1, (int)ioexp.gpio);
 			flags.powerOk = 0;
-			generateError(SCPI_ERROR_CH1_FAULT_DETECTED - channelIndex);
+			generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channelIndex);
 			powerDownBySensor();
 			return;
 		}
@@ -288,11 +288,11 @@ struct DcpChannel : public Channel {
 					if (dpOn) {
 						// DebugTrace("CH%d, neg. P, DP off: %f", channelIndex + 1, u.mon_last * i.mon_last);
 						dpNegMonitoringTime = tickCount;
-						generateError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF + channelIndex);
+						generateChannelError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF, channelIndex);
 						setDpEnable(false);
 					} else {
 						// DebugTrace("CH%d, neg. P, output off: %f", channelIndex + 1, u.mon_last * i.mon_last);
-						generateError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED - channelIndex);
+						generateChannelError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED, channelIndex);
 						channel_dispatcher::outputEnable(*this, false);
 					}
 				} else if (tickCount - dpNegMonitoringTime > 500 * 1000UL) {
