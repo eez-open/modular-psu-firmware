@@ -568,9 +568,9 @@ public:
         return roundPrec(Tcelsius, 1.0f);
     }
 
-    void tick(uint8_t slotIndex);
-
 #endif // EEZ_PLATFORM_STM32
+
+    void tick(uint8_t slotIndex);
 
     Page *getPageFromId(int pageId) override;
 };
@@ -604,11 +604,9 @@ TestResult DcmChannel::getTestResult() {
 }
 
 void DcmChannel::tickSpecific(uint32_t tickCount) {
-#if defined(EEZ_PLATFORM_STM32)
     if (subchannelIndex == 0) {
         ((DcmModule *)g_slots[slotIndex])->tick(slotIndex);
     }
-#endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
     if (isOutputEnabled()) {
@@ -793,8 +791,6 @@ Page *DcmModule::getPageFromId(int pageId) {
     return nullptr;
 }
 
-#if defined(EEZ_PLATFORM_STM32)
-
 void DcmModule::tick(uint8_t slotIndex) {
     DcmChannel &channel1 = (DcmChannel &)*Channel::getBySlotIndex(slotIndex, 0);
     DcmChannel &channel2 = (DcmChannel &)*Channel::getBySlotIndex(slotIndex, 1);
@@ -830,6 +826,8 @@ void DcmModule::tick(uint8_t slotIndex) {
     }
 
     floatValues[4] = page ? page->m_counterphaseFrequency : counterphaseFrequency;
+
+#if defined(EEZ_PLATFORM_STM32)
 
 #ifdef DEBUG
     psu::debug::g_uDac[channel1.channelIndex].set(channel1.uSet);
@@ -877,9 +875,8 @@ void DcmModule::tick(uint8_t slotIndex) {
 #endif
         }
     }
-}
-
 #endif // EEZ_PLATFORM_STM32
+}
 
 } // namespace dcm224
 
