@@ -299,10 +299,15 @@ struct DcmChannel : public Channel {
 			return true;
 		}
 
+        float powerOtherChannel;
         auto &otherChannel = Channel::get(channelIndex + (subchannelIndex == 0 ? 1 : -1));
-		float powerOtherChannel = channel_dispatcher::getUSet(otherChannel) * channel_dispatcher::getISet(otherChannel);
-		if (power + powerOtherChannel > PTOT) {
-			if (err) {
+        if (flags.trackingEnabled && otherChannel.flags.trackingEnabled) {
+            powerOtherChannel = power;
+        } else {
+            powerOtherChannel = channel_dispatcher::getUSet(otherChannel) * channel_dispatcher::getISet(otherChannel);
+        }
+        if (power + powerOtherChannel > PTOT) {
+            if (err) {
 				*err = SCPI_ERROR_MODULE_TOTAL_POWER_LIMIT_EXCEEDED;
 			}
 			return true;

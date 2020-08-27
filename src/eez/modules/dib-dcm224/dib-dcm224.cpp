@@ -330,9 +330,14 @@ struct DcmChannel : public Channel {
 			return true;
 		}
 
+        float powerOtherChannel;
         auto &otherChannel = Channel::get(channelIndex + (subchannelIndex == 0 ? 1 : -1));
-		float powerOtherChannel = channel_dispatcher::getUSet(otherChannel) * channel_dispatcher::getISet(otherChannel);
-		if (power + powerOtherChannel > PTOT) {
+        if (flags.trackingEnabled && otherChannel.flags.trackingEnabled) {
+            powerOtherChannel = power;
+        } else {
+            powerOtherChannel = channel_dispatcher::getUSet(otherChannel) * channel_dispatcher::getISet(otherChannel);
+        }
+        if (power + powerOtherChannel > PTOT) {
 			if (err) {
 				*err = SCPI_ERROR_MODULE_TOTAL_POWER_LIMIT_EXCEEDED;
 			}
@@ -759,7 +764,21 @@ public:
             channel->pwmEnabled = m_pwmEnabled;
             channel->pwmFrequency = m_pwmFrequency;
             channel->pwmDuty = m_pwmDuty;
-        
+
+            if (channel->flags.trackingEnabled) {
+                for (int i = 0; i < CH_NUM; i++) {
+                    if (i != channel->channelIndex) {
+                        auto &otherChannel = Channel::get(i);
+                        if (g_slots[otherChannel.slotIndex]->moduleInfo->moduleType == MODULE_TYPE_DCM224) {
+                            auto &dcmOtherChannel = (DcmChannel &)otherChannel;
+                            dcmOtherChannel.pwmEnabled = m_pwmEnabled;
+                            dcmOtherChannel.pwmFrequency = m_pwmFrequency;
+                            dcmOtherChannel.pwmDuty = m_pwmDuty;
+                        }
+                    }
+                }
+            }
+
             auto module = (DcmModule *)g_slots[g_selectedSlotIndex];
             module->counterphaseFrequency = m_counterphaseFrequency;
             module->counterphaseDithering = m_counterphaseDithering;
@@ -809,7 +828,7 @@ void DcmModule::tick(uint8_t slotIndex) {
 
     float *floatValues = (float *)(outputSetValues + 4);
 
-    if (page && g_channel == &channel1) {
+    if (page && (g_channel == &channel1 || (g_channel->flags.trackingEnabled && channel1.flags.trackingEnabled))) {
         floatValues[0] = page->m_pwmFrequency;
         floatValues[1] = page->m_pwmEnabled ? page->m_pwmDuty : 100.0f;
     } else {
@@ -817,7 +836,7 @@ void DcmModule::tick(uint8_t slotIndex) {
         floatValues[1] = channel1.pwmEnabled ? channel1.pwmDuty : 100.0f;
     }
 
-    if (page && g_channel == &channel2) {
+    if (page && (g_channel == &channel2 || (g_channel->flags.trackingEnabled && channel2.flags.trackingEnabled))) {
         floatValues[2] = page->m_pwmFrequency;
         floatValues[3] = page->m_pwmEnabled ? page->m_pwmDuty : 100.0f;
     } else {
