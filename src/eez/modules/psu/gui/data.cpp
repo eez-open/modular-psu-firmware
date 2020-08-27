@@ -345,9 +345,10 @@ Value MakeScpiErrorValue(int16_t errorCode) {
     return value;
 }
 
-Value MakeEventMessageValue(int16_t eventId) {
+Value MakeEventMessageValue(int16_t eventId, int channelIndex) {
     Value value;
-    value.int16_ = eventId;
+    value.pairOfInt16_.first = eventId;
+    value.pairOfInt16_.second = channelIndex;
     value.type_ = VALUE_TYPE_EVENT_MESSAGE;
     return value;
 }
@@ -498,11 +499,12 @@ void EVENT_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_EVENT_MESSAGE_value(const Value &a, const Value &b) {
-    return a.getInt16() == b.getInt16();
+    return a.getUInt32() == b.getUInt32();
 }
 
 void EVENT_MESSAGE_value_to_text(const Value &value, char *text, int count) {
     strncpy(text, event_queue::getEventMessage(value.getInt16()), count - 1);
+    snprintf(text, count - 1, event_queue::getEventMessage(value.getFirstInt16()), value.getSecondInt16() + 1);
     text[count - 1] = 0;
 }
 
@@ -1537,15 +1539,18 @@ void data_slot3_channel_index(DataOperationEnum operation, Cursor cursor, Value 
 }
 
 void data_slot_max_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_channel_index(persist_conf::getMaxSlotIndex(), &Channel::get(persist_conf::getMaxChannelIndex()), operation, cursor, value);
+    int channelIndex = persist_conf::getMaxChannelIndex();
+    data_slot_channel_index(persist_conf::getMaxSlotIndex(), channelIndex == -1 ? nullptr : &Channel::get(channelIndex), operation, cursor, value);
 }
 
 void data_slot_min1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_channel_index(persist_conf::getMin1SlotIndex(), &Channel::get(persist_conf::getMin1ChannelIndex()), operation, cursor, value);
+    int channelIndex = persist_conf::getMin1ChannelIndex();
+    data_slot_channel_index(persist_conf::getMin1SlotIndex(), channelIndex == -1 ? nullptr : &Channel::get(channelIndex), operation, cursor, value);
 }
 
 void data_slot_min2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_channel_index(persist_conf::getMin2SlotIndex(), &Channel::get(persist_conf::getMin2ChannelIndex()), operation, cursor, value);
+    int channelIndex = persist_conf::getMin2ChannelIndex();
+    data_slot_channel_index(persist_conf::getMin2SlotIndex(), channelIndex == -1 ? nullptr : &Channel::get(channelIndex), operation, cursor, value);
 }
 
 void data_slot_default_view(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {

@@ -537,7 +537,7 @@ float Channel::getSwOvpProtectionLevel() {
 
 bool Channel::checkSwOvpCondition() {
     float uProtectionLevel = getSwOvpProtectionLevel();
-    return channel_dispatcher::getUMonLast(*this) > uProtectionLevel || (flags.rprogEnabled && channel_dispatcher::getUMonDacLast(*this) > uProtectionLevel);
+    return channel_dispatcher::getUMonLast(*this) + 0.5 > uProtectionLevel || (flags.rprogEnabled && channel_dispatcher::getUMonDacLast(*this) > uProtectionLevel);
 }
 
 void Channel::protectionCheck(ProtectionValue &cpv) {
@@ -1211,7 +1211,7 @@ void Channel::remoteProgrammingEnable(bool enable) {
             trigger::abort();
         }
         doRemoteProgrammingEnable(enable);
-        event_queue::pushEvent((enable ? event_queue::EVENT_INFO_CH_REMOTE_PROG_ENABLED : event_queue::EVENT_INFO_CH_REMOTE_PROG_DISABLED) + channelIndex);
+        event_queue::pushChannelEvent((enable ? event_queue::EVENT_INFO_CH_REMOTE_PROG_ENABLED : event_queue::EVENT_INFO_CH_REMOTE_PROG_DISABLED), channelIndex);
     }
 }
 

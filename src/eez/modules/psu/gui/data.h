@@ -56,7 +56,7 @@ void editValue(int16_t dataId);
 Value MakeEventValue(psu::event_queue::Event *e);
 void eventValueToText(const Value &value, char *text, int count);
 bool compareEventValues(const Value &a, const Value &b);
-Value MakeEventMessageValue(int16_t eventId);
+Value MakeEventMessageValue(int16_t eventId, int channelIndex);
 
 void data_channel_index(psu::Channel &channel, DataOperationEnum operation, Cursor cursor, Value &value);
 

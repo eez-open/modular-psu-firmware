@@ -281,7 +281,7 @@ void pushEvent(int16_t eventId, int channelIndex) {
             activePageId != PAGE_ID_SHUTDOWN &&
             activePageId != PAGE_ID_DISPLAY_OFF
         ) {
-            psuErrorMessage(0, MakeEventMessageValue(eventId));
+            psuErrorMessage(0, MakeEventMessageValue(eventId, channelIndex));
         }
 #endif
     }
