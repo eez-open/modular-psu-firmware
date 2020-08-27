@@ -140,7 +140,7 @@ void boot() {
         g_slots[slotIndex] = getModuleInfo(moduleType)->createModule(slotIndex, moduleRevision, firmwareInstalled);
         g_slots[slotIndex]->boot();
         
-        if (moduleType != MODULE_TYPE_NONE) {
+        if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
             psu::persist_conf::loadModuleConf(slotIndex);
             psu::ontime::g_moduleCounters[slotIndex].init();
 

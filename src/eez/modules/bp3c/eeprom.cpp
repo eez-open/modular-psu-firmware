@@ -216,6 +216,24 @@ void writeModuleType(uint8_t slotIndex, uint16_t moduleType) {
     write(slotIndex, (uint8_t *)buffer, 4, 0);
 }
 
+void resetAllExceptOnTimeCounters(uint8_t slotIndex) {
+    uint8_t buffer[64];
+    
+    memset(buffer, 0xFF, 64);
+
+    uint32_t address;
+
+    for (address = 0; address < EEPROM_ONTIME_START_ADDRESS; address += 64) {
+        WATCHDOG_RESET();
+        write(slotIndex, buffer, MIN(EEPROM_ONTIME_START_ADDRESS - address, 64), (uint16_t)address);
+    }
+
+    for (address = EEPROM_ONTIME_START_ADDRESS + 6 * sizeof(uint32_t); address < EEPROM_SIZE; address += 64) {
+        WATCHDOG_RESET();
+        write(slotIndex, buffer, MIN(EEPROM_SIZE - address, 64), (uint16_t)address);
+    }
+}
+
 } // namespace eeprom
 } // namespace bp3c
 } // namespace eez

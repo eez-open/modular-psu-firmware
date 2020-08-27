@@ -40,6 +40,7 @@
 
 #include <eez/modules/bp3c/flash_slave.h>
 #include <eez/modules/bp3c/io_exp.h>
+#include <eez/modules/bp3c/eeprom.h>
 
 #include <eez/modules/dib-dcp405/dib-dcp405.h>
 
@@ -84,6 +85,29 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             }
         } else if (cmd == 28) {
         	psu::gui::showPage(PAGE_ID_DEBUG_POWER_CHANNELS);
+        } else if (cmd == 29) {
+            int32_t slotIndex;
+            if (!SCPI_ParamInt32(context, &slotIndex, false)) {
+                return SCPI_RES_ERR;
+            }
+
+            if (slotIndex < 1 || slotIndex > 3) {
+                SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+                return SCPI_RES_ERR;
+            }
+
+            slotIndex--;
+
+#if defined(EEZ_PLATFORM_STM32)
+            taskENTER_CRITICAL();
+#endif
+
+            bp3c::eeprom::resetAllExceptOnTimeCounters(slotIndex);
+
+#if defined(EEZ_PLATFORM_STM32)
+            taskEXIT_CRITICAL();
+            restart();
+#endif
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;

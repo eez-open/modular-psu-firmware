@@ -100,6 +100,7 @@ namespace bp3c {
 namespace eeprom {
 
 static const uint16_t EEPROM_ONTIME_START_ADDRESS = 40;
+static const uint16_t EEPROM_SIZE = 4096;
 
 void init();
 bool test();
@@ -110,6 +111,8 @@ bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t buffer_size, uint16_t add
 bool write(uint8_t slotIndex, const uint8_t *buffer, uint16_t buffer_size, uint16_t address);
 
 void writeModuleType(uint8_t slotIndex, uint16_t moduleType);
+
+void resetAllExceptOnTimeCounters(uint8_t slotIndex);
 
 } // namespace eeprom
 } // namespace bp3c
