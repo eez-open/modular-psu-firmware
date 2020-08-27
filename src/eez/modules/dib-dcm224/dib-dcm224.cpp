@@ -125,6 +125,7 @@ struct DcmChannel : public Channel {
 
 	bool ccMode = false;
 
+    bool pwmEnabled = false;
     float pwmFrequency = PWM_DEF_FREQUENCY;
     float pwmDuty = PWM_DEF_DUTY;
 
@@ -377,9 +378,33 @@ public:
 		return new (buffer) DcmChannel(slotIndex, channelIndex, subchannelIndex);
 	}
 
+    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
+        int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
+            return isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+            return isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT_2COL : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ_2COL;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
+            return PAGE_ID_DIB_DCM224_SLOT_MAX_2CH;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
+            return PAGE_ID_DIB_DCM224_SLOT_MIN_2CH;
+        }
+
+        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
+        return PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH;
+    }
+
     struct DcmProfileParameters {
         ProfileParameters baseParameters;
         unsigned int dcmVersion;
+        bool pwmEnabled;
         float pwmFrequency;
         float pwmDuty;
         float counterphaseFrequency;
@@ -486,6 +511,7 @@ public:
     }
 
 #if defined(EEZ_PLATFORM_STM32)
+
     TransferResult transfer() {
         TransferResult result;
         
@@ -542,75 +568,9 @@ public:
         return roundPrec(Tcelsius, 1.0f);
     }
 
-    void tick(uint8_t slotIndex) {
-        DcmChannel &channel1 = (DcmChannel &)*Channel::getBySlotIndex(slotIndex, 0);
-        DcmChannel &channel2 = (DcmChannel &)*Channel::getBySlotIndex(slotIndex, 1);
+    void tick(uint8_t slotIndex);
 
-        output[0] = 0x80 | (channel1.outputEnable ? REG0_OE1_MASK : 0) | (channel2.outputEnable ? REG0_OE2_MASK : 0);
-
-        output[1] = (counterphaseDithering ? COUNTERPHASE_DITHERING_MASK : 0);
-
-        uint16_t *outputSetValues = (uint16_t *)(output + 2);
-        outputSetValues[0] = channel1.uSet;
-        outputSetValues[1] = channel1.iSet;
-        outputSetValues[2] = channel2.uSet;
-        outputSetValues[3] = channel2.iSet;
-
-        float *floatValues = (float *)(outputSetValues + 4);
-        floatValues[0] = channel1.pwmFrequency;
-        floatValues[1] = channel1.pwmDuty;
-        floatValues[2] = channel2.pwmFrequency;
-        floatValues[3] = channel2.pwmDuty;
-        floatValues[4] = counterphaseFrequency;
-
-#ifdef DEBUG
-        psu::debug::g_uDac[channel1.channelIndex].set(channel1.uSet);
-        psu::debug::g_iDac[channel1.channelIndex].set(channel1.iSet);
-        psu::debug::g_uDac[channel2.channelIndex].set(channel2.uSet);
-        psu::debug::g_iDac[channel2.channelIndex].set(channel2.iSet);
-#endif
-
-        auto tranferResult = transfer();
-
-        if (tranferResult == TRANSFER_OK) {
-            uint16_t *inputSetValues = (uint16_t *)(input + 2);
-
-            for (int subchannelIndex = 0; subchannelIndex < 2; subchannelIndex++) {
-                auto &channel = *(DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
-                int offset = subchannelIndex * 2;
-
-                channel.ccMode = (input[0] & (subchannelIndex == 0 ? REG0_CC1_MASK : REG0_CC2_MASK)) != 0;
-
-                uint16_t uMonAdc = inputSetValues[offset];
-                float uMon = remap(uMonAdc, (float)ADC_MIN, 0, (float)ADC_MAX, channel.params.U_MAX);
-                channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon);
-
-                uint16_t iMonAdc = inputSetValues[offset + 1];
-                const float FULL_SCALE = 2.0F;
-                const float U_REF = 2.5F;
-                float iMon = remap(iMonAdc, (float)ADC_MIN, 0, FULL_SCALE * ADC_MAX / U_REF, /*params.I_MAX*/ channel.I_MAX_FOR_REMAP);
-                iMon = roundPrec(iMon, I_MON_RESOLUTION);
-                channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon);
-
-#if !CONF_SKIP_PWRGOOD_TEST
-                bool pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
-                if (!pwrGood) {
-                    channel.flags.powerOk = 0;
-                    generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channel.channelIndex);
-                    powerDownBySensor();
-                }
-#endif
-
-                channel.temperature = calcTemperature(*((uint16_t *)(input + 10 + subchannelIndex * 2)));
-
-#ifdef DEBUG
-                psu::debug::g_uMon[channel.channelIndex].set(uMonAdc);
-                psu::debug::g_iMon[channel.channelIndex].set(iMonAdc);
-#endif
-            }
-        }
-    }
-#endif
+#endif // EEZ_PLATFORM_STM32
 
     Page *getPageFromId(int pageId) override;
 };
@@ -708,6 +668,7 @@ void DcmModuleInfo::getProfileParameters(int channelIndex, uint8_t *buffer) {
     auto &channel = (DcmChannel &)Channel::get(channelIndex);
     auto parameters = (DcmProfileParameters *)buffer;
 
+    parameters->pwmEnabled = channel.pwmEnabled;
     parameters->pwmFrequency = channel.pwmFrequency;
     parameters->pwmDuty = channel.pwmDuty;
 
@@ -723,6 +684,7 @@ void DcmModuleInfo::setProfileParameters(int channelIndex, uint8_t *buffer, bool
     auto parameters = (DcmProfileParameters *)buffer;
 
     if (parameters->dcmVersion > 0) {
+        channel.pwmEnabled = parameters->dcmVersion == 1 ? parameters->pwmDuty != 100.0f : parameters->pwmEnabled;
         channel.pwmFrequency = parameters->pwmFrequency;
         channel.pwmDuty = parameters->pwmDuty;
 
@@ -741,7 +703,8 @@ bool DcmModuleInfo::writeProfileProperties(profile::WriteContext &ctx, const uin
 
     auto parameters = (DcmProfileParameters *)buffer;
 
-    WRITE_PROPERTY("dcmVersion", 1);
+    WRITE_PROPERTY("dcmVersion", 2);
+    WRITE_PROPERTY("pwmEnabled", parameters->pwmEnabled);
     WRITE_PROPERTY("pwmFrequency", parameters->pwmFrequency);
     WRITE_PROPERTY("pwmDuty", parameters->pwmDuty);
     WRITE_PROPERTY("counterphaseFrequency", parameters->counterphaseFrequency);
@@ -758,6 +721,7 @@ bool DcmModuleInfo::readProfileProperties(profile::ReadContext &ctx, uint8_t *bu
     auto parameters = (DcmProfileParameters *)buffer;
 
     READ_PROPERTY(dcmVersion, parameters->dcmVersion);
+    READ_PROPERTY(pwmEnabled, parameters->pwmEnabled);
     READ_PROPERTY(pwmFrequency, parameters->pwmFrequency);
     READ_PROPERTY(pwmDuty, parameters->pwmDuty);
     READ_PROPERTY(counterphaseFrequency, parameters->counterphaseFrequency);
@@ -774,6 +738,7 @@ class ChSettingsAdvOptionsPage : public SetPage {
 public:
     void pageAlloc() {
         auto channel = (DcmChannel *)g_channel;
+        m_pwmEnabled = m_pwmEnabledOrig = channel->pwmEnabled;
         m_pwmFrequency = m_pwmFrequencyOrig = channel->pwmFrequency;
         m_pwmDuty = m_pwmDutyOrig = channel->pwmDuty;
 
@@ -783,7 +748,8 @@ public:
     }
 
     int getDirty() { 
-        return m_pwmFrequency != m_pwmFrequencyOrig || 
+        return m_pwmEnabled != m_pwmEnabledOrig || 
+            m_pwmFrequency != m_pwmFrequencyOrig || 
             m_pwmDuty != m_pwmDutyOrig || 
             m_counterphaseFrequency != m_counterphaseFrequencyOrig || 
             m_counterphaseDithering != m_counterphaseDitheringOrig;
@@ -792,6 +758,7 @@ public:
     void set() {
         if (getDirty()) {
             auto channel = (DcmChannel *)g_channel;
+            channel->pwmEnabled = m_pwmEnabled;
             channel->pwmFrequency = m_pwmFrequency;
             channel->pwmDuty = m_pwmDuty;
         
@@ -803,12 +770,14 @@ public:
         popPage();
     }
 
+    bool m_pwmEnabled;
     float m_pwmFrequency;
     float m_pwmDuty;
     float m_counterphaseFrequency;
     bool m_counterphaseDithering;
 
 private:
+    bool m_pwmEnabledOrig;
     float m_pwmFrequencyOrig;
     float m_pwmDutyOrig;
     float m_counterphaseFrequencyOrig;
@@ -824,9 +793,169 @@ Page *DcmModule::getPageFromId(int pageId) {
     return nullptr;
 }
 
+#if defined(EEZ_PLATFORM_STM32)
+
+void DcmModule::tick(uint8_t slotIndex) {
+    DcmChannel &channel1 = (DcmChannel &)*Channel::getBySlotIndex(slotIndex, 0);
+    DcmChannel &channel2 = (DcmChannel &)*Channel::getBySlotIndex(slotIndex, 1);
+
+    output[0] = 0x80 | (channel1.outputEnable ? REG0_OE1_MASK : 0) | (channel2.outputEnable ? REG0_OE2_MASK : 0);
+
+    ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
+
+    output[1] = (page ? page->m_counterphaseDithering : counterphaseDithering ? COUNTERPHASE_DITHERING_MASK : 0);
+
+    uint16_t *outputSetValues = (uint16_t *)(output + 2);
+    outputSetValues[0] = channel1.uSet;
+    outputSetValues[1] = channel1.iSet;
+    outputSetValues[2] = channel2.uSet;
+    outputSetValues[3] = channel2.iSet;
+
+    float *floatValues = (float *)(outputSetValues + 4);
+
+    if (page && g_channel == &channel1) {
+        floatValues[0] = page->m_pwmFrequency;
+        floatValues[1] = page->m_pwmEnabled ? page->m_pwmDuty : 100.0f;
+    } else {
+        floatValues[0] = channel1.pwmFrequency;
+        floatValues[1] = channel1.pwmEnabled ? channel1.pwmDuty : 100.0f;
+    }
+
+    if (page && g_channel == &channel2) {
+        floatValues[2] = page->m_pwmFrequency;
+        floatValues[3] = page->m_pwmEnabled ? page->m_pwmDuty : 100.0f;
+    } else {
+        floatValues[2] = channel2.pwmFrequency;
+        floatValues[3] = channel2.pwmEnabled ? channel2.pwmDuty : 100.0f;
+    }
+
+    floatValues[4] = page ? page->m_counterphaseFrequency : counterphaseFrequency;
+
+#ifdef DEBUG
+    psu::debug::g_uDac[channel1.channelIndex].set(channel1.uSet);
+    psu::debug::g_iDac[channel1.channelIndex].set(channel1.iSet);
+    psu::debug::g_uDac[channel2.channelIndex].set(channel2.uSet);
+    psu::debug::g_iDac[channel2.channelIndex].set(channel2.iSet);
+#endif
+
+    auto tranferResult = transfer();
+
+    if (tranferResult == TRANSFER_OK) {
+        uint16_t *inputSetValues = (uint16_t *)(input + 2);
+
+        for (int subchannelIndex = 0; subchannelIndex < 2; subchannelIndex++) {
+            auto &channel = *(DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
+            int offset = subchannelIndex * 2;
+
+            channel.ccMode = (input[0] & (subchannelIndex == 0 ? REG0_CC1_MASK : REG0_CC2_MASK)) != 0;
+
+            uint16_t uMonAdc = inputSetValues[offset];
+            float uMon = remap(uMonAdc, (float)ADC_MIN, 0, (float)ADC_MAX, channel.params.U_MAX);
+            channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon);
+
+            uint16_t iMonAdc = inputSetValues[offset + 1];
+            const float FULL_SCALE = 2.0F;
+            const float U_REF = 2.5F;
+            float iMon = remap(iMonAdc, (float)ADC_MIN, 0, FULL_SCALE * ADC_MAX / U_REF, /*params.I_MAX*/ channel.I_MAX_FOR_REMAP);
+            iMon = roundPrec(iMon, I_MON_RESOLUTION);
+            channel.onAdcData(ADC_DATA_TYPE_I_MON, iMon);
+
+#if !CONF_SKIP_PWRGOOD_TEST
+            bool pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
+            if (!pwrGood) {
+                channel.flags.powerOk = 0;
+                generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channel.channelIndex);
+                powerDownBySensor();
+            }
+#endif
+
+            channel.temperature = calcTemperature(*((uint16_t *)(input + 10 + subchannelIndex * 2)));
+
+#ifdef DEBUG
+            psu::debug::g_uMon[channel.channelIndex].set(uMonAdc);
+            psu::debug::g_iMon[channel.channelIndex].set(iMonAdc);
+#endif
+        }
+    }
+}
+
+#endif // EEZ_PLATFORM_STM32
+
 } // namespace dcm224
 
 namespace gui {
+
+void data_dib_dcm224_slot_2ch_ch1_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    data_channel_index(Channel::get(cursor), operation, cursor, value);
+}
+
+void data_dib_dcm224_slot_2ch_ch2_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    data_channel_index(Channel::get(persist_conf::isMaxView() && cursor == persist_conf::getMaxChannelIndex() && Channel::get(cursor).subchannelIndex == 1 ? cursor - 1 : cursor + 1), operation, cursor, value);
+}
+
+void data_dib_dcm224_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor);
+        int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+        if (g_isCol2Mode) {
+            value = channel.isOutputEnabled() ? 
+                (isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT_ON_2COL : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ_ON_2COL) :
+                (isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT_OFF_2COL : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ_OFF_2COL);
+        } else {
+            value = channel.isOutputEnabled() ? 
+                (isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT_ON : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ_ON) :
+                (isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT_OFF : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ_OFF);
+        }
+    }
+}
+
+void data_dib_dcm224_slot_max_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor);
+
+        if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
+            value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_NUM_ON : PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_NUM_OFF;
+        } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
+            value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_HBAR_ON : PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_HBAR_OFF;
+        } else {
+            value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_YT_ON : PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_YT_OFF;
+        }
+    }
+}
+
+void data_dib_dcm224_slot_max_2ch_min_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor);
+        value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_ON : PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_OFF;
+    }
+}
+
+
+void data_dib_dcm224_slot_min_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor);
+        value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM224_SLOT_MIN_2CH_ON : PAGE_ID_DIB_DCM224_SLOT_MIN_2CH_OFF;
+    }
+}
+
+void data_dib_dcm224_slot_micro_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor);
+        value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH_ON : PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH_OFF;
+    }
+}
+
+void data_dib_dcm224_pwm_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
+        if (page) {
+            value = page->m_pwmEnabled;
+        } else {
+            DcmChannel *channel = (DcmChannel *)g_channel;
+            value = channel->pwmEnabled;
+        }
+    }
+}
 
 void data_dib_dcm224_pwm_frequency(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
@@ -1005,6 +1134,11 @@ void data_dib_dcm224_counterphase_dithering(DataOperationEnum operation, Cursor 
 void action_dib_dcm224_ch_settings_adv_toggle_counterphase_dithering() {
     ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
     page->m_counterphaseDithering = !page->m_counterphaseDithering;
+}
+
+void action_dib_dcm224_ch_settings_adv_toggle_pwm_enabled() {
+    ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
+    page->m_pwmEnabled = !page->m_pwmEnabled;
 }
 
 } // namespace gui

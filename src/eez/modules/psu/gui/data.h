@@ -5,6 +5,11 @@
 #include <eez/modules/psu/event_queue.h>
 
 namespace eez {
+
+namespace psu {
+struct Channel;
+}
+
 namespace gui {
 
 #define ENUM_DEFINITIONS \
@@ -52,6 +57,8 @@ Value MakeEventValue(psu::event_queue::Event *e);
 void eventValueToText(const Value &value, char *text, int count);
 bool compareEventValues(const Value &a, const Value &b);
 Value MakeEventMessageValue(int16_t eventId);
+
+void data_channel_index(psu::Channel &channel, DataOperationEnum operation, Cursor cursor, Value &value);
 
 } // namespace gui
 } // namespace eez

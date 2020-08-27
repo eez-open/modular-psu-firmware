@@ -1602,66 +1602,6 @@ void data_slot3_micro_view(DataOperationEnum operation, Cursor cursor, Value &va
     data_slot_micro_view(2, operation, cursor, value);
 }
 
-void data_slot_2ch_ch1_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_channel_index(Channel::get(cursor), operation, cursor, value);
-}
-
-void data_slot_2ch_ch2_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_channel_index(Channel::get(persist_conf::isMaxView() && cursor == persist_conf::getMaxChannelIndex() && Channel::get(cursor).subchannelIndex == 1 ? cursor - 1 : cursor + 1), operation, cursor, value);
-}
-
-void data_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor);
-        int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
-        if (g_isCol2Mode) {
-            value = channel.isOutputEnabled() ? 
-                (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_ON_2COL : PAGE_ID_SLOT_DEF_2CH_HORZ_ON_2COL) :
-                (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_OFF_2COL : PAGE_ID_SLOT_DEF_2CH_HORZ_OFF_2COL);
-        } else {
-            value = channel.isOutputEnabled() ? 
-                (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_ON : PAGE_ID_SLOT_DEF_2CH_HORZ_ON) :
-                (isVert ? PAGE_ID_SLOT_DEF_2CH_VERT_OFF : PAGE_ID_SLOT_DEF_2CH_HORZ_OFF);
-        }
-    }
-}
-
-void data_slot_max_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor);
-
-        if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
-            value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_2CH_NUM_ON : PAGE_ID_SLOT_MAX_2CH_NUM_OFF;
-        } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
-            value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_2CH_HBAR_ON : PAGE_ID_SLOT_MAX_2CH_HBAR_OFF;
-        } else {
-            value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_2CH_YT_ON : PAGE_ID_SLOT_MAX_2CH_YT_OFF;
-        }
-    }
-}
-
-void data_slot_max_2ch_min_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor);
-        value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MAX_2CH_MIN_ON : PAGE_ID_SLOT_MAX_2CH_MIN_OFF;
-    }
-}
-
-
-void data_slot_min_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor);
-        value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MIN_2CH_ON : PAGE_ID_SLOT_MIN_2CH_OFF;
-    }
-}
-
-void data_slot_micro_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor);
-        value = channel.isOutputEnabled() ? PAGE_ID_SLOT_MICRO_2CH_ON : PAGE_ID_SLOT_MICRO_2CH_OFF;
-    }
-}
-
 void data_channel_display_value1(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);

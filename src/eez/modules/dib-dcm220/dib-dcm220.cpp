@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <new>
+#include <assert.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
@@ -33,9 +34,12 @@
 
 #include <eez/scpi/regs.h>
 
+#include <eez/gui/gui.h>
+
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
+#include <eez/modules/psu/gui/psu.h>
 
 #include <eez/modules/bp3c/comm.h>
 
@@ -338,6 +342,29 @@ public:
         memset(buffer, 0, sizeof(DcmChannel));
 		return new (buffer) DcmChannel(slotIndex, channelIndex, subchannelIndex);
 	}
+
+    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
+        int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
+            return isVert ? PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_VERT : PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_HORZ;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+            return isVert ? PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_VERT_2COL : PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_HORZ_2COL;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
+            return PAGE_ID_DIB_DCM220_SLOT_MAX_2CH;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
+            return PAGE_ID_DIB_DCM220_SLOT_MIN_2CH;
+        }
+
+        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
+        return PAGE_ID_DIB_DCM220_SLOT_MICRO_2CH;
+    }
 };
 
 struct DcmModule : public PsuModule {
@@ -611,4 +638,70 @@ static DcmModuleInfo g_moduleInfo_(MODULE_TYPE_DCM220, "DCM220", MODULE_REVISION
 ModuleInfo *g_moduleInfo = &g_moduleInfo_;
 
 } // namespace dcm220
+
+namespace gui {
+
+void data_dib_dcm220_slot_2ch_ch1_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    data_channel_index(Channel::get(cursor), operation, cursor, value);
+}
+
+void data_dib_dcm220_slot_2ch_ch2_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+    data_channel_index(Channel::get(persist_conf::isMaxView() && cursor == persist_conf::getMaxChannelIndex() && Channel::get(cursor).subchannelIndex == 1 ? cursor - 1 : cursor + 1), operation, cursor, value);
+}
+
+void data_dib_dcm220_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor);
+        int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+        if (g_isCol2Mode) {
+            value = channel.isOutputEnabled() ? 
+                (isVert ? PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_VERT_ON_2COL : PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_HORZ_ON_2COL) :
+                (isVert ? PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_VERT_OFF_2COL : PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_HORZ_OFF_2COL);
+        } else {
+            value = channel.isOutputEnabled() ? 
+                (isVert ? PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_VERT_ON : PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_HORZ_ON) :
+                (isVert ? PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_VERT_OFF : PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_HORZ_OFF);
+        }
+    }
+}
+
+void data_dib_dcm220_slot_max_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor);
+
+        if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
+            value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM220_SLOT_MAX_2CH_NUM_ON : PAGE_ID_DIB_DCM220_SLOT_MAX_2CH_NUM_OFF;
+        } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
+            value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM220_SLOT_MAX_2CH_HBAR_ON : PAGE_ID_DIB_DCM220_SLOT_MAX_2CH_HBAR_OFF;
+        } else {
+            value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM220_SLOT_MAX_2CH_YT_ON : PAGE_ID_DIB_DCM220_SLOT_MAX_2CH_YT_OFF;
+        }
+    }
+}
+
+void data_dib_dcm220_slot_max_2ch_min_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor);
+        value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM220_SLOT_MAX_2CH_MIN_ON : PAGE_ID_DIB_DCM220_SLOT_MAX_2CH_MIN_OFF;
+    }
+}
+
+
+void data_dib_dcm220_slot_min_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor);
+        value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM220_SLOT_MIN_2CH_ON : PAGE_ID_DIB_DCM220_SLOT_MIN_2CH_OFF;
+    }
+}
+
+void data_dib_dcm220_slot_micro_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        Channel &channel = Channel::get(cursor);
+        value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM220_SLOT_MICRO_2CH_ON : PAGE_ID_DIB_DCM220_SLOT_MICRO_2CH_OFF;
+    }
+}
+
+} // namespace gui
+
 } // namespace eez
+

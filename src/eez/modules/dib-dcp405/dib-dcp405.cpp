@@ -17,6 +17,7 @@
  */
 
 #include <new>
+#include <assert.h>
 
 #include <eez/modules/dib-dcp405/dib-dcp405.h>
 #include <eez/modules/dib-dcp405/adc.h>
@@ -54,6 +55,7 @@
 
 namespace eez {
 
+using namespace gui;
 using namespace psu;
 
 namespace dcp405 {
@@ -825,6 +827,94 @@ public:
         void *buffer = malloc(sizeof(DcpChannel));
         memset(buffer, 0, sizeof(DcpChannel));
 		return new (buffer) DcpChannel(slotIndex, channelIndex, subchannelIndex);
+	}
+
+	int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
+		int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+		Channel &channel = Channel::get(cursor);
+
+		if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
+			if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
+				if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+					return PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_VERT_COUPLED_SERIES;
+				} else {
+					return PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_HORZ_COUPLED_SERIES;
+				}
+			} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
+				if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+					return PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_VERT_COUPLED_PARALLEL;
+				} else {
+					return PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_HORZ_COUPLED_PARALLEL;
+				}
+			} else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_NUM_ON : PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_VERT_OFF;
+			} else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_VBAR_ON : PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_VERT_OFF;
+			} else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_HBAR_ON : PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_HORZ_OFF;
+			} else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_YT) {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_YT_ON : PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_HORZ_OFF;
+			} else {
+				return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
+			}
+		}
+
+		if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+			if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
+				if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+					return PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_VERT_COUPLED_SERIES_2COL;
+				} else {
+					return PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_HORZ_COUPLED_SERIES_2COL;
+				}
+			} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
+				if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+					return PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_VERT_COUPLED_PARALLEL_2COL;
+				} else {
+					return PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_HORZ_COUPLED_PARALLEL_2COL;
+				}
+			} else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_NUM_ON_2COL : PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_VERT_OFF_2COL;
+			} else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_VBAR_ON_2COL : PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_VERT_OFF_2COL;
+			} else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_HBAR_ON_2COL : PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_HORZ_OFF_2COL;
+			} else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_YT) {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_YT_ON_2COL : PAGE_ID_DIB_DCP405_SLOT_DEF_1CH_HORZ_OFF_2COL;
+			} else {
+				return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR_2COL : PAGE_ID_SLOT_DEF_HORZ_ERROR_2COL;
+			}
+		}
+
+		if (slotViewType == SLOT_VIEW_TYPE_MAX) {
+			if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_NUM_ON : PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_NUM_OFF;
+			} else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_HBAR_ON : PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_HBAR_OFF;
+			} else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT) {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_YT_ON : PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_YT_OFF;
+			} else {
+				return PAGE_ID_SLOT_MAX_ERROR;
+			}
+		}
+
+		if (slotViewType == SLOT_VIEW_TYPE_MIN) {
+			if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
+				return PAGE_ID_DIB_DCP405_SLOT_MIN_1CH_COUPLED_SERIES;
+			} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
+				return PAGE_ID_DIB_DCP405_SLOT_MIN_1CH_COUPLED_PARALLEL;
+			} else {
+				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_MIN_1CH_ON : PAGE_ID_DIB_DCP405_SLOT_MIN_1CH_OFF;
+			}
+		}
+
+		assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
+		if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
+			return PAGE_ID_DIB_DCP405_SLOT_MICRO_1CH_COUPLED_SERIES;
+		} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
+			return PAGE_ID_DIB_DCP405_SLOT_MICRO_1CH_COUPLED_PARALLEL;
+		} else {
+			return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_MICRO_1CH_ON : PAGE_ID_DIB_DCP405_SLOT_MICRO_1CH_OFF;
+		}
 	}
 };
 

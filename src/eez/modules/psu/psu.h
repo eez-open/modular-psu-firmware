@@ -60,8 +60,6 @@ struct Channel;
 struct PsuModuleInfo : public ModuleInfo {
     PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration, uint32_t spiBaudRatePrescaler, bool spiCrcCalculationEnable, uint8_t numChannels);
 
-    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override;
-
     void getProfileParameters(int channelIndex, uint8_t *buffer) override;
     void setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
     bool writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;
