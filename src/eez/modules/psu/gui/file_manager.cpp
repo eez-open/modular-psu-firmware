@@ -1267,11 +1267,7 @@ void action_file_manager_new_file() {
 using namespace gui::file_manager;
 
 void onSdCardFileChangeHook(const char *filePath1, const char *filePath2) {
-	if (g_fileBrowserMode) {
-		return;
-	}
-
-    if (!isPageOnStack(PAGE_ID_FILE_MANAGER)) {
+    if (!isPageOnStack(PAGE_ID_FILE_MANAGER) && !isPageOnStack(PAGE_ID_FILE_BROWSER)) {
         return;
     }
 
