@@ -591,9 +591,12 @@ void tick(uint32_t tick_usec) {
 
             active = true;
 
-            uint32_t tickCount = millis();
-            if (g_execution[i].currentTotalDwellTime <= CONF_COUNTER_THRESHOLD_IN_SECONDS) {
-                tickCount *= 1000;
+            uint32_t tickCount;
+            bool tickCountInMillis = g_execution[i].currentTotalDwellTime > CONF_COUNTER_THRESHOLD_IN_SECONDS;
+            if (tickCountInMillis) {
+                tickCount = millis();
+            } else {
+                tickCount = millis() * 1000;
             }
 
             if (io_pins::isInhibited()) {
@@ -638,9 +641,15 @@ void tick(uint32_t tick_usec) {
                     if (g_execution[i].currentTotalDwellTime > CONF_COUNTER_THRESHOLD_IN_SECONDS) {
                         // ... then count in milliseconds
                         g_execution[i].currentRemainingDwellTime = (uint32_t)round(g_execution[i].currentTotalDwellTime * 1000L);
+                        if (!tickCountInMillis) {
+                            tickCount /= 1000;
+                        }
                     } else {
                         // ... else count in microseconds
                         g_execution[i].currentRemainingDwellTime = (uint32_t)round(g_execution[i].currentTotalDwellTime * 1000000L);
+                        if (tickCountInMillis) {
+                            tickCount *= 1000;
+                        }
                     }
                     g_execution[i].nextPointTime = tickCount + g_execution[i].currentRemainingDwellTime;
                 }

@@ -537,7 +537,7 @@ float Channel::getSwOvpProtectionLevel() {
 
 bool Channel::checkSwOvpCondition() {
     float uProtectionLevel = getSwOvpProtectionLevel();
-    return channel_dispatcher::getUMonLast(*this) + 0.5 > uProtectionLevel || (flags.rprogEnabled && channel_dispatcher::getUMonDacLast(*this) > uProtectionLevel);
+    return channel_dispatcher::getUMonLast(*this) > uProtectionLevel || (flags.rprogEnabled && channel_dispatcher::getUMonDacLast(*this) > uProtectionLevel);
 }
 
 void Channel::protectionCheck(ProtectionValue &cpv) {
