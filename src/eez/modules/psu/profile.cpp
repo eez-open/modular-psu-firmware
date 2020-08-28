@@ -622,7 +622,28 @@ static void saveState(Parameters &profile, List *lists) {
     profile.flags.isValid = true;
 }
 
+static struct {
+    Parameters *profile;
+    List *lists;
+    int recallOptions;
+    int *err;
+    bool result;
+} g_recallStateParams;
+
+void recallStateFromPsuThread() {
+    g_recallStateParams.result = recallState(*g_recallStateParams.profile, g_recallStateParams.lists, g_recallStateParams.recallOptions, g_recallStateParams.err);
+}
+
 static bool recallState(Parameters &profile, List *lists, int recallOptions, int *err) {
+    if (g_isBooted && !isPsuThread()) {
+        g_recallStateParams.profile = &profile;
+        g_recallStateParams.lists = lists;
+        g_recallStateParams.recallOptions = recallOptions;
+        g_recallStateParams.err= err;
+        sendMessageToPsu(PSU_MESSAGE_RECALL_STATE);
+        return g_recallStateParams.result;
+    }
+
     if (!(recallOptions & RECALL_OPTION_IGNORE_POWER)) {
         if (profile.flags.powerIsUp) {
             if (!powerUp()) {

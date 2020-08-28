@@ -84,6 +84,8 @@ bool recallFromLocation(int location);
 bool recallFromLocation(int location, int recallOptions, bool showProgress, int *err);
 bool recallFromFile(const char *filePath, int recallOptions, bool showProgress, int *err);
 
+void recallStateFromPsuThread();
+
 bool saveToLocation(int location);
 bool saveToLocation(int location, const char *name, bool showProgress, int *err);
 bool saveToFile(const char *filePath, bool showProgress, int *err);

@@ -542,6 +542,8 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         bp3c::flash_slave::doStart();
     } else if (type == PSU_MESSAGE_FLASH_SLAVE_LEAVE_BOOTLOADER_MODE) {
         bp3c::flash_slave::leaveBootloaderMode();
+    } else if (type == PSU_MESSAGE_RECALL_STATE) {
+        profile::recallStateFromPsuThread();
     }
 }
 
