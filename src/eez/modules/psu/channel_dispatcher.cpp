@@ -1240,7 +1240,8 @@ bool testOutputEnable(Channel &channel, bool enable, bool &callTriggerAbort, int
                 callTriggerAbort = true;
             }
         } else {
-            if (isTripped(channel)) {
+            int channelIndex;
+            if (isTripped(channel, channelIndex)) {
                 if (err) {
                     *err = SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION;
                 }
@@ -1322,19 +1323,43 @@ void remoteSensingEnable(Channel &channel, bool enable) {
     }
 }
 
-bool isTripped(Channel &channel) {
+bool isTripped(Channel &channel, int &channelIndex) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        return Channel::get(0).isTripped() || Channel::get(1).isTripped();
+        if (Channel::get(0).isTripped()) {
+            channelIndex = 0;
+            return true;
+        }
+        channelIndex = 1;
+        return Channel::get(1).isTripped();
     } else if (channel.flags.trackingEnabled) {
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled && trackingChannel.isTripped()) {
+                channelIndex = i;
                 return true;
             }
         }
         return false;
     } else {
-        return channel.isTripped();
+        if (channel.isTripped()) {
+            channelIndex = channel.channelIndex;
+            return true;
+        }
+
+        bool triggerModeEnabled = getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED;
+        if (triggerModeEnabled) {
+            for (int i = 0; i < CH_NUM; ++i) {
+                if (i != channel.channelIndex) {
+                    Channel &otherChannel = Channel::get(i);
+                    bool triggerModeEnabled = getVoltageTriggerMode(otherChannel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(otherChannel) != TRIGGER_MODE_FIXED;
+                    if (triggerModeEnabled && otherChannel.isTripped()) {
+                        channelIndex = i;
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
 

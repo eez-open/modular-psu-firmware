@@ -1901,11 +1901,12 @@ void channelCalibrationsNo() {
 void channelToggleOutput() {
     selectChannelByCursor();
     Channel &channel = *g_channel;
-    if (channel_dispatcher::isTripped(channel)) {
+    int channelIndex;
+    if (channel_dispatcher::isTripped(channel, channelIndex)) {
         if (temperature::sensors[temp_sensor::AUX].isTripped()) {
-            errorMessageWithAction("AUX temp. sensor is tripped!", clearTrip, "Clear", channel.channelIndex);
+            errorMessageWithAction("AUX temp. sensor is tripped!", clearTrip, "Clear", channelIndex);
         } else {
-            errorMessageWithAction("Channel is tripped!", clearTrip, "Clear", channel.channelIndex);
+            errorMessageWithAction("Channel is tripped!", clearTrip, "Clear", channelIndex);
         }
     } else {
         if (!channel.isOutputEnabled() && !channel.isCalibrationExists()) {

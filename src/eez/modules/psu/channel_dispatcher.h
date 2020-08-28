@@ -117,7 +117,7 @@ void disableOutputForAllTrackingChannels();
 
 void remoteSensingEnable(Channel &channel, bool enable);
 
-bool isTripped(Channel &channel);
+bool isTripped(Channel &channel, int &channelIndex);
 void clearProtection(Channel &channel);
 void disableProtection(Channel &channel);
 
