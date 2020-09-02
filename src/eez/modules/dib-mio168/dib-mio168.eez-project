@@ -329,7 +329,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 3,
             "top": 169,
             "width": 78,
@@ -342,7 +342,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 82,
             "top": 169,
             "width": 78,
@@ -355,7 +355,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 3,
             "top": 193,
             "width": 78,
@@ -368,7 +368,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 82,
             "top": 193,
             "width": 78,
@@ -381,7 +381,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 3,
             "top": 216,
             "width": 78,
@@ -394,7 +394,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 82,
             "top": 216,
             "width": 78,
@@ -660,7 +660,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 3,
             "top": 169,
             "width": 118,
@@ -673,7 +673,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 122,
             "top": 169,
             "width": 118,
@@ -686,7 +686,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 3,
             "top": 193,
             "width": 118,
@@ -699,7 +699,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 122,
             "top": 193,
             "width": 118,
@@ -712,7 +712,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 3,
             "top": 216,
             "width": 118,
@@ -725,7 +725,7 @@
               "inheritFrom": "encoder_cursor_14_enabled"
             },
             "data": "dummy",
-            "action": "edit",
+            "action": "",
             "left": 122,
             "top": 216,
             "width": 118,

@@ -36,7 +36,7 @@ static scpi_choice_def_t current_or_voltage_choice[] = {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_apply(scpi_t *context) {
-    Channel *channel = param_channel(context, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -90,7 +90,7 @@ scpi_result_t scpi_cmd_apply(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_applyQ(scpi_t *context) {
-    Channel *channel = param_channel(context, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }

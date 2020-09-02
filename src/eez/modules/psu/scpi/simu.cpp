@@ -89,7 +89,7 @@ scpi_result_t scpi_cmd_simulatorLoadState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context, FALSE, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -100,7 +100,7 @@ scpi_result_t scpi_cmd_simulatorLoadState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorLoadStateQ(scpi_t *context) {
-    Channel *channel = param_channel(context, FALSE, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -116,7 +116,7 @@ scpi_result_t scpi_cmd_simulatorLoad(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context, FALSE, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -127,7 +127,7 @@ scpi_result_t scpi_cmd_simulatorLoad(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorLoadQ(scpi_t *context) {
-    Channel *channel = param_channel(context, FALSE, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -164,7 +164,7 @@ scpi_result_t scpi_cmd_simulatorVoltageProgramExternal(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context, FALSE, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -185,7 +185,7 @@ scpi_result_t scpi_cmd_simulatorVoltageProgramExternal(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorVoltageProgramExternalQ(scpi_t *context) {
-    Channel *channel = param_channel(context, FALSE, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -209,7 +209,7 @@ scpi_result_t scpi_cmd_simulatorPwrgood(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context, FALSE, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -220,7 +220,7 @@ scpi_result_t scpi_cmd_simulatorPwrgood(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorPwrgoodQ(scpi_t *context) {
-    Channel *channel = param_channel(context, FALSE, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -237,7 +237,7 @@ scpi_result_t scpi_cmd_simulatorRpol(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context, FALSE, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -258,7 +258,7 @@ scpi_result_t scpi_cmd_simulatorRpol(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorRpolQ(scpi_t *context) {
-    Channel *channel = param_channel(context, FALSE, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, FALSE, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }

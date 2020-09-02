@@ -68,6 +68,8 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 	auto savedX = widgetCursor.x;
 	auto savedY = widgetCursor.y;
 
+    auto savedCursor = widgetCursor.cursor;
+
     int xOffset = 0;
     int yOffset = 0;
     int count = eez::gui::count(parentWidget->data);
@@ -120,6 +122,8 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
 	widgetCursor.x = savedX;
 	widgetCursor.y = savedY;
+
+    widgetCursor.cursor = savedCursor;
 
     widgetCursor.widget = savedWidget;
 

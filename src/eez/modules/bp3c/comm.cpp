@@ -166,7 +166,7 @@ TransferResult transfer(int slotIndex, uint8_t *output, uint8_t *input, uint32_t
     auto result = spi::transfer(slotIndex, output, input, bufferSize);
     spi::deselect(slotIndex);
 
-    if (g_slots[slotIndex]->moduleInfo->spiCrcCalculationEnable) {
+    if (g_slots[slotIndex]->spiCrcCalculationEnable) {
         if (spi::handle[slotIndex]->ErrorCode == HAL_SPI_ERROR_CRC) {
             return TRANSFER_STATUS_CRC_ERROR;
         } else {

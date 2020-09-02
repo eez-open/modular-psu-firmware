@@ -53,9 +53,11 @@ scpi_choice_def_t traceValueChoice[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void selectChannel(scpi_t *context, uint8_t channelIndex) {
+static void selectChannel(scpi_t *context, Channel &channel) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-    psu_context->selectedChannels = 1 << channelIndex;
+    psu_context->selectedChannels.numChannels = 1;
+    psu_context->selectedChannels.channels[0].slotIndex = channel.slotIndex;
+    psu_context->selectedChannels.channels[0].subchannelIndex = channel.subchannelIndex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,12 +68,12 @@ scpi_result_t scpi_cmd_instrumentSelect(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context, TRUE);
+    Channel *channel = getPowerChannelFromParam(context, TRUE);
     if (!channel) {
         return SCPI_RES_ERR;
     }
 
-    selectChannel(context, channel->channelIndex);
+    selectChannel(context, *channel);
 
     return SCPI_RES_OK;
 }
@@ -79,12 +81,10 @@ scpi_result_t scpi_cmd_instrumentSelect(scpi_t *context) {
 scpi_result_t scpi_cmd_instrumentSelectQ(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-        if ((psu_context->selectedChannels & (1 << channelIndex)) != 0) {
-            char buffer[10];
-            sprintf(buffer, "CH%d", channelIndex + 1);
-            SCPI_ResultCharacters(context, buffer, strlen(buffer));
-        }
+    for (int i = 0; i < psu_context->selectedChannels.numChannels; i++) {
+        char buffer[20];
+        sprintf(buffer, "(@%d%02d)", psu_context->selectedChannels.channels[i].slotIndex, psu_context->selectedChannels.channels[i].subchannelIndex);
+        SCPI_ResultCharacters(context, buffer, strlen(buffer));
     }
 
     return SCPI_RES_OK;
@@ -100,14 +100,16 @@ scpi_result_t scpi_cmd_instrumentNselect(scpi_t *context) {
     if (!SCPI_ParamInt(context, &channelIndex, TRUE)) {
         return SCPI_RES_ERR;
     }
-    
+
     channelIndex--;
 
-    if (!check_channel(context, channelIndex)) {
+    if (!checkPowerChannel(context, channelIndex)) {
         return SCPI_RES_ERR;
     }
 
-    selectChannel(context, channelIndex);
+    auto &channel = Channel::get(channelIndex);
+
+    selectChannel(context, channel);
 
     return SCPI_RES_OK;
 }
@@ -115,9 +117,12 @@ scpi_result_t scpi_cmd_instrumentNselect(scpi_t *context) {
 scpi_result_t scpi_cmd_instrumentNselectQ(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-        if ((psu_context->selectedChannels & (1 << channelIndex)) != 0) {
-            SCPI_ResultInt(context, channelIndex + 1);
+    for (int i = 0; i < psu_context->selectedChannels.numChannels; i++) {
+        auto channel = Channel::getBySlotIndex(psu_context->selectedChannels.channels[i].slotIndex, psu_context->selectedChannels.channels[i].subchannelIndex);
+        if (channel) {
+            SCPI_ResultInt(context, channel->channelIndex + 1);
+        } else {
+            SCPI_ResultInt(context, 0);
         }
     }
 
@@ -161,7 +166,7 @@ scpi_result_t scpi_cmd_instrumentCoupleTrackingQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentDisplayTrace(scpi_t *context) {
-    Channel *channel = getSelectedChannel(context);
+    Channel *channel = getSelectedPowerChannel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -198,7 +203,7 @@ scpi_result_t scpi_cmd_instrumentDisplayTrace(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentDisplayTraceQ(scpi_t *context) {
-    Channel *channel = getSelectedChannel(context);
+    Channel *channel = getSelectedPowerChannel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -233,7 +238,7 @@ scpi_result_t scpi_cmd_instrumentDisplayTraceQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentDisplayTraceSwap(scpi_t *context) {
-    Channel *channel = getSelectedChannel(context);
+    Channel *channel = getSelectedPowerChannel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -244,7 +249,7 @@ scpi_result_t scpi_cmd_instrumentDisplayTraceSwap(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentDisplayYtRate(scpi_t *context) {
-    Channel *channel = getSelectedChannel(context);
+    Channel *channel = getSelectedPowerChannel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -261,7 +266,7 @@ scpi_result_t scpi_cmd_instrumentDisplayYtRate(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentDisplayYtRateQ(scpi_t *context) {
-    Channel *channel = getSelectedChannel(context);
+    Channel *channel = getSelectedPowerChannel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }

@@ -73,6 +73,8 @@ namespace eez {
 
 namespace dcm224 {
 
+static const uint16_t MODULE_REVISION_DCM224_R3B2  = 0x0302;
+
 static const uint16_t DAC_MIN = 0;
 static const uint16_t DAC_MAX = 4095;
 
@@ -360,68 +362,6 @@ struct DcmChannel : public Channel {
 	}
 };
 
-struct DcmModuleInfo : public PsuModuleInfo {
-public:
-	DcmModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision) 
-		: PsuModuleInfo(moduleType, moduleName, "Envox", latestModuleRevision, FLASH_METHOD_STM32_BOOTLOADER_UART, 0,
-#if defined(EEZ_PLATFORM_STM32)
-            SPI_BAUDRATEPRESCALER_16,
-            false,
-#else
-            0,
-            false,
-#endif
-            2)
-	{
-	}
-
-	Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) override;
-
-	Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
-        void *buffer = malloc(sizeof(DcmChannel));
-        memset(buffer, 0, sizeof(DcmChannel));
-		return new (buffer) DcmChannel(slotIndex, channelIndex, subchannelIndex);
-	}
-
-    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
-        int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
-
-        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-            return isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ;
-        }
-
-        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
-            return isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT_2COL : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ_2COL;
-        }
-
-        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
-            return PAGE_ID_DIB_DCM224_SLOT_MAX_2CH;
-        }
-
-        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
-            return PAGE_ID_DIB_DCM224_SLOT_MIN_2CH;
-        }
-
-        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-        return PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH;
-    }
-
-    struct DcmProfileParameters {
-        ProfileParameters baseParameters;
-        unsigned int dcmVersion;
-        bool pwmEnabled;
-        float pwmFrequency;
-        float pwmDuty;
-        float counterphaseFrequency;
-        bool counterphaseDithering;
-    };
-
-    void getProfileParameters(int channelIndex, uint8_t *buffer) override;
-    void setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
-    bool writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;
-    bool readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) override;
-};
-
 struct DcmModule : public PsuModule {
 public:
     TestResult testResult = TEST_NONE;
@@ -433,17 +373,35 @@ public:
     float counterphaseFrequency = 500000.0f;
     bool counterphaseDithering = false;
 
-    DcmModule(uint8_t slotIndex, DcmModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled)
-        : PsuModule(slotIndex, moduleInfo, moduleRevision, firmwareInstalled)
-    {
+    DcmModule() {
+        moduleType = MODULE_TYPE_DCM224;
+        moduleName = "DCM224";
+        moduleBrand = "Envox";
+        latestModuleRevision = MODULE_REVISION_DCM224_R3B2;
+        flashMethod = FLASH_METHOD_STM32_BOOTLOADER_UART;
+        flashDuration = 0;
+#if defined(EEZ_PLATFORM_STM32)        
+        spiBaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+        spiCrcCalculationEnable = false;
+#else
+        spiBaudRatePrescaler = 0;
+        spiCrcCalculationEnable = false;
+#endif
+        numPowerChannels = 2;
+        numOtherChannels = 0;
+
+
     	memset(output, 0, sizeof(output));
     	memset(input, 0, sizeof(input));
+    }
+
+	Module *createModule() override {
+        return new DcmModule();
     }
 
     void init() {
         if (!synchronized) {
             if (bp3c::comm::masterSynchroV2(slotIndex)) {
-                //DebugTrace("DCM224 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)firmwareMajorVersion, (int)firmwareMinorVersion);
                 synchronized = true;
                 lastTransferTickCount = millis();
                 numConsecutiveTransferErrors = 0;
@@ -454,6 +412,12 @@ public:
             }
         }
     }
+
+	Channel *createPowerChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
+        void *buffer = malloc(sizeof(DcmChannel));
+        memset(buffer, 0, sizeof(DcmChannel));
+		return new (buffer) DcmChannel(slotIndex, channelIndex, subchannelIndex);
+	}
 
     void onPowerDown() {
         synchronized = false;
@@ -578,11 +542,45 @@ public:
     void tick(uint8_t slotIndex);
 
     Page *getPageFromId(int pageId) override;
-};
 
-Module *DcmModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
-	return new DcmModule(slotIndex, this, moduleRevision, firmwareInstalled);
-}
+    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
+        int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
+            return isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+            return isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT_2COL : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ_2COL;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
+            return PAGE_ID_DIB_DCM224_SLOT_MAX_2CH;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
+            return PAGE_ID_DIB_DCM224_SLOT_MIN_2CH;
+        }
+
+        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
+        return PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH;
+    }
+
+    struct DcmProfileParameters {
+        ProfileParameters baseParameters;
+        unsigned int dcmVersion;
+        bool pwmEnabled;
+        float pwmFrequency;
+        float pwmDuty;
+        float counterphaseFrequency;
+        bool counterphaseDithering;
+    };
+
+    void getProfileParameters(int channelIndex, uint8_t *buffer) override;
+    void setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
+    bool writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;
+    bool readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) override;
+};
 
 void DcmChannel::init() {
     if (subchannelIndex == 0) {
@@ -663,10 +661,10 @@ void DcmChannel::tickSpecific(uint32_t tickCount) {
 #endif
 }
 
-void DcmModuleInfo::getProfileParameters(int channelIndex, uint8_t *buffer) {
+void DcmModule::getProfileParameters(int channelIndex, uint8_t *buffer) {
     assert(sizeof(DcmProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
 
-    PsuModuleInfo::getProfileParameters(channelIndex, buffer);
+    PsuModule::getProfileParameters(channelIndex, buffer);
 
     auto &channel = (DcmChannel &)Channel::get(channelIndex);
     auto parameters = (DcmProfileParameters *)buffer;
@@ -675,13 +673,12 @@ void DcmModuleInfo::getProfileParameters(int channelIndex, uint8_t *buffer) {
     parameters->pwmFrequency = channel.pwmFrequency;
     parameters->pwmDuty = channel.pwmDuty;
 
-    auto module = (DcmModule *)g_slots[channel.slotIndex];
-    parameters->counterphaseFrequency = module->counterphaseFrequency;
-    parameters->counterphaseDithering = module->counterphaseDithering;
+    parameters->counterphaseFrequency = counterphaseFrequency;
+    parameters->counterphaseDithering = counterphaseDithering;
 }
 
-void DcmModuleInfo::setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
-    PsuModuleInfo::setProfileParameters(channelIndex, buffer, mismatch, recallOptions, numTrackingChannels);
+void DcmModule::setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
+    PsuModule::setProfileParameters(channelIndex, buffer, mismatch, recallOptions, numTrackingChannels);
 
     auto &channel = (DcmChannel &)Channel::get(channelIndex);
     auto parameters = (DcmProfileParameters *)buffer;
@@ -692,15 +689,14 @@ void DcmModuleInfo::setProfileParameters(int channelIndex, uint8_t *buffer, bool
         channel.pwmDuty = parameters->pwmDuty;
 
         if (channel.subchannelIndex == 0) {
-            auto module = (DcmModule *)g_slots[channel.slotIndex];
-            module->counterphaseFrequency = parameters->counterphaseFrequency;
-            module->counterphaseDithering = parameters->counterphaseDithering;
+            counterphaseFrequency = parameters->counterphaseFrequency;
+            counterphaseDithering = parameters->counterphaseDithering;
         }
     }
 }
 
-bool DcmModuleInfo::writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) {
-    if (!PsuModuleInfo::writeProfileProperties(ctx, buffer)) {
+bool DcmModule::writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) {
+    if (!PsuModule::writeProfileProperties(ctx, buffer)) {
         return false;
     }
 
@@ -716,8 +712,8 @@ bool DcmModuleInfo::writeProfileProperties(profile::WriteContext &ctx, const uin
     return true;
 }
 
-bool DcmModuleInfo::readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) {
-    if (PsuModuleInfo::readProfileProperties(ctx, buffer)) {
+bool DcmModule::readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) {
+    if (PsuModule::readProfileProperties(ctx, buffer)) {
         return true;
     }
 
@@ -733,9 +729,8 @@ bool DcmModuleInfo::readProfileProperties(profile::ReadContext &ctx, uint8_t *bu
     return false;
 }
 
-static DcmModuleInfo g_moduleInfo_(MODULE_TYPE_DCM224, "DCM224", MODULE_REVISION_DCM224_R3B2);
-
-ModuleInfo *g_moduleInfo = &g_moduleInfo_;
+static DcmModule g_dcmModule;
+Module *g_module = &g_dcmModule;
 
 class ChSettingsAdvOptionsPage : public SetPage {
 public:
@@ -769,7 +764,7 @@ public:
                 for (int i = 0; i < CH_NUM; i++) {
                     if (i != channel->channelIndex) {
                         auto &otherChannel = Channel::get(i);
-                        if (g_slots[otherChannel.slotIndex]->moduleInfo->moduleType == MODULE_TYPE_DCM224) {
+                        if (g_slots[otherChannel.slotIndex]->moduleType == MODULE_TYPE_DCM224) {
                             auto &dcmOtherChannel = (DcmChannel &)otherChannel;
                             dcmOtherChannel.pwmEnabled = m_pwmEnabled;
                             dcmOtherChannel.pwmFrequency = m_pwmFrequency;
@@ -821,10 +816,10 @@ void DcmModule::tick(uint8_t slotIndex) {
     output[1] = (page ? page->m_counterphaseDithering : counterphaseDithering ? COUNTERPHASE_DITHERING_MASK : 0);
 
     uint16_t *outputSetValues = (uint16_t *)(output + 2);
-    outputSetValues[0] = channel1.uSet;
-    outputSetValues[1] = channel1.iSet;
-    outputSetValues[2] = channel2.uSet;
-    outputSetValues[3] = channel2.iSet;
+    outputSetValues[0] = (uint16_t)channel1.uSet;
+    outputSetValues[1] = (uint16_t)channel1.iSet;
+    outputSetValues[2] = (uint16_t)channel2.uSet;
+    outputSetValues[3] = (uint16_t)channel2.iSet;
 
     float *floatValues = (float *)(outputSetValues + 4);
 

@@ -2022,6 +2022,42 @@ bool isEditEnabled(const WidgetCursor &widgetCursor) {
     return true;
 }
 
+bool getDigitalInputData(int slotIndex, int subchannelIndex, uint8_t &data, int *err) {
+    return g_slots[slotIndex]->getDigitalInputData(subchannelIndex, data, err);
+}
+
+bool getDigitalOutputData(int slotIndex, int subchannelIndex, uint8_t &data, int *err) {
+    return g_slots[slotIndex]->getDigitalOutputData(subchannelIndex, data, err);
+}
+
+bool setDigitalOutputData(int slotIndex, int subchannelIndex, uint8_t data, int *err) {
+    return g_slots[slotIndex]->setDigitalOutputData(subchannelIndex, data, err);
+}
+
+bool getMode(int slotIndex, int subchannelIndex, SourceMode &mode, int *err) {
+    return g_slots[slotIndex]->getMode(subchannelIndex, mode, err);
+}
+
+bool setMode(int slotIndex, int subchannelIndex, SourceMode mode, int *err) {
+    return g_slots[slotIndex]->setMode(subchannelIndex, mode, err);
+}
+
+bool getCurrentRange(int slotIndex, int subchannelIndex, int8_t &range, int *err) {
+    return g_slots[slotIndex]->getCurrentRange(subchannelIndex, range, err);
+}
+
+bool setCurrentRange(int slotIndex, int subchannelIndex, int8_t range, int *err) {
+    return g_slots[slotIndex]->setCurrentRange(subchannelIndex, range, err);
+}
+
+bool getVoltageRange(int slotIndex, int subchannelIndex, int8_t &range, int *err) {
+    return g_slots[slotIndex]->getVoltageRange(subchannelIndex, range, err);
+}
+
+bool setVoltageRange(int slotIndex, int subchannelIndex, int8_t range, int *err) {
+    return g_slots[slotIndex]->setVoltageRange(subchannelIndex, range, err);
+}
+
 } // namespace channel_dispatcher
 } // namespace psu
 } // namespace eez

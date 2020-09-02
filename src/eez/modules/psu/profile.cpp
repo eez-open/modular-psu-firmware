@@ -484,7 +484,7 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
         Channel &channel = Channel::get(i);
         if (
             profile.channels[i].parametersAreValid &&
-            profile.channels[i].moduleType == g_slots[channel.slotIndex]->moduleInfo->moduleType
+            profile.channels[i].moduleType == g_slots[channel.slotIndex]->moduleType
         ) {
             profileChannelAlreadyUsed[i] = true;
             channelsMap[i] = i;
@@ -500,7 +500,7 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
                 if (
                     !profileChannelAlreadyUsed[j] &&
                     profile.channels[j].parametersAreValid &&
-                    profile.channels[j].moduleType == g_slots[channel.slotIndex]->moduleInfo->moduleType
+                    profile.channels[j].moduleType == g_slots[channel.slotIndex]->moduleType
                 ) {
                     profileChannelAlreadyUsed[j] = true;
                     channelsMap[i] = j;
@@ -581,12 +581,12 @@ static void saveState(Parameters &profile, List *lists) {
         if (i < CH_NUM) {
             Channel &channel = Channel::get(i);
 
-            profile.channels[i].moduleType = g_slots[channel.slotIndex]->moduleInfo->moduleType;
+            profile.channels[i].moduleType = g_slots[channel.slotIndex]->moduleType;
             profile.channels[i].moduleRevision = g_slots[channel.slotIndex]->moduleRevision;
             
             profile.channels[i].parametersAreValid = 1;
             
-            g_slots[channel.slotIndex]->moduleInfo->getProfileParameters(i, (uint8_t *)profile.channels[i].parameters);
+            g_slots[channel.slotIndex]->getProfileParameters(i, (uint8_t *)profile.channels[i].parameters);
 
             if (lists) {
                 auto &list = lists[i];
@@ -676,7 +676,7 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
         Channel &channel = Channel::get(i);
 
         if (profile.channels[i].parametersAreValid) {
-            g_slots[channel.slotIndex]->moduleInfo->setProfileParameters(i, (uint8_t *)profile.channels[i].parameters, mismatch, recallOptions, numTrackingChannels);
+            g_slots[channel.slotIndex]->setProfileParameters(i, (uint8_t *)profile.channels[i].parameters, mismatch, recallOptions, numTrackingChannels);
 
             auto &list = lists[i];
             channel_dispatcher::setDwellList(channel, list.dwellList, list.dwellListLength);
@@ -845,7 +845,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
             WRITE_PROPERTY("moduleType", channel.moduleType);
             WRITE_PROPERTY("moduleRevision", channel.moduleRevision);
 
-            if (!getModuleInfo(channel.moduleType)->writeProfileProperties(ctx, (uint8_t *)channel.parameters)) {
+            if (!getModule(channel.moduleType)->writeProfileProperties(ctx, (uint8_t *)channel.parameters)) {
                 return false;
             }
 
@@ -1184,7 +1184,7 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
         READ_PROPERTY(moduleType, channel.moduleType);
         READ_PROPERTY(moduleRevision, channel.moduleRevision);
 
-        if (getModuleInfo(channel.moduleType)->readProfileProperties(ctx, (uint8_t *)channel.parameters)) {
+        if (getModule(channel.moduleType)->readProfileProperties(ctx, (uint8_t *)channel.parameters)) {
             return true;
         }
 

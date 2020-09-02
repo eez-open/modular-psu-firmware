@@ -714,7 +714,7 @@ void tick() {
                 if (!g_channelStates[channelIndex].modelPublished) {
                     char moduleInfo[50];
                     auto &slot = *g_slots[channel.slotIndex];
-                    sprintf(moduleInfo, "%s_R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+                    sprintf(moduleInfo, "%s_R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
                     if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_MODEL, moduleInfo, true)) {
                         g_channelStates[channelIndex].modelPublished = true;
                     }

@@ -26,12 +26,23 @@
 #endif
 #include <scpi/scpi.h>
 
+using namespace eez::psu;
+
 namespace eez {
 namespace scpi {
 
 void resetContext(scpi_t *context) {
     auto psuContext = (eez::psu::scpi::scpi_psu_t *)context->user_context;
-    psuContext->selectedChannels = 1 << 0; // first channel is selected by default
+
+    if (CH_NUM > 0) {
+        auto &channel = Channel::get(0);
+        psuContext->selectedChannels.numChannels = 1;
+        psuContext->selectedChannels.channels[0].slotIndex = channel.slotIndex;
+        psuContext->selectedChannels.channels[0].subchannelIndex = channel.subchannelIndex;
+    } else {
+        psuContext->selectedChannels.numChannels = 0;
+    }
+
     psuContext->currentDirectory[0] = 0;
     SCPI_ErrorClear(context);
 }

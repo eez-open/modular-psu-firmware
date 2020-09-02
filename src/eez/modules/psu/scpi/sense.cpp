@@ -63,7 +63,7 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpper(scpi_t *context) {
         }
     }
 
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -84,7 +84,7 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpper(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_senseCurrentDcRangeUpperQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }

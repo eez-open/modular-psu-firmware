@@ -186,7 +186,7 @@ scpi_result_t scpi_cmd_debugOntimeQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugVoltage(scpi_t *context) {
 #ifdef DEBUG
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -207,7 +207,7 @@ scpi_result_t scpi_cmd_debugVoltage(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugCurrent(scpi_t *context) {
 #ifdef DEBUG
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -233,7 +233,7 @@ scpi_result_t scpi_cmd_debugMeasureVoltage(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -273,7 +273,7 @@ scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -373,7 +373,7 @@ scpi_result_t scpi_cmd_debugCsvQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
-    Channel *channel = getSelectedChannel(context);
+    Channel *channel = getSelectedPowerChannel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -413,7 +413,7 @@ scpi_result_t scpi_cmd_debugIoexp(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
-    Channel *channel = getSelectedChannel(context);
+    Channel *channel = getSelectedPowerChannel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }

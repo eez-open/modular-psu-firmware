@@ -23,9 +23,7 @@
 namespace eez {
 namespace dib_mio168 {
 
-static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
-
-extern ModuleInfo *g_moduleInfo;
+extern Module *g_module;
 
 } // namespace dib_mio168
 } // namespace eez

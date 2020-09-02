@@ -29,7 +29,7 @@ static const uint16_t MODULE_REVISION_DCP405_R3B1  = 0x0301;
 namespace eez {
 namespace dcp405 {
 
-extern ModuleInfo *g_moduleInfo;
+extern Module *g_module;
 
 bool isDacRampActive();
 void tickDacRamp(uint32_t tickCount);

@@ -31,7 +31,7 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_outputModeQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -42,15 +42,17 @@ scpi_result_t scpi_cmd_outputModeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputProtectionClear(scpi_t *context) {
-    int numChannels;
-    uint8_t channels[MAX_NUM_CH_IN_CH_LIST];
-    param_channels(context, numChannels, channels);
-    if (numChannels == 0) {
+    SelectedChannels selectedChannels;
+    param_channels(context, selectedChannels);
+    if (selectedChannels.numChannels == 0) {
         return SCPI_RES_ERR;
     }
 
-    for (int i = 0; i < numChannels; i++) {
-        channel_dispatcher::clearProtection(Channel::get(channels[i]));
+    for (int i = 0; i < selectedChannels.numChannels; i++) {
+        auto channel = Channel::getBySlotIndex(selectedChannels.channels[i].slotIndex, selectedChannels.channels[i].subchannelIndex);
+        if (channel) {
+            channel_dispatcher::clearProtection(*channel);
+        }
     }
 
     return SCPI_RES_OK;
@@ -63,32 +65,46 @@ scpi_result_t scpi_cmd_outputState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    int numChannels;
-    uint8_t channels[MAX_NUM_CH_IN_CH_LIST];
-    param_channels(context, numChannels, channels);
-    if (numChannels == 0) {
+    SelectedChannels selectedChannels;
+    param_channels(context, selectedChannels);
+    if (selectedChannels.numChannels == 0) {
         return SCPI_RES_ERR;
     }
 
-    int err;
-    if (!channel_dispatcher::outputEnable(numChannels, channels, enable, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
+    int numChannels = 0;
+    uint8_t channels[MAX_NUM_CH_IN_CH_LIST];
+    for (int i = 0; i < selectedChannels.numChannels; i++) {
+        auto channel = Channel::getBySlotIndex(selectedChannels.channels[i].slotIndex, selectedChannels.channels[i].subchannelIndex);
+        if (channel) {
+            channels[numChannels++] = channel->channelIndex;
+        }
+    }
+
+    if (numChannels > 0) {
+        int err;
+        if (!channel_dispatcher::outputEnable(numChannels, channels, enable, &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
     }
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_outputStateQ(scpi_t *context) {
-    int numChannels;
-    uint8_t channels[MAX_NUM_CH_IN_CH_LIST];
-    param_channels(context, numChannels, channels);
-    if (numChannels == 0) {
+    SelectedChannels selectedChannels;
+    param_channels(context, selectedChannels);
+    if (selectedChannels.numChannels == 0) {
         return SCPI_RES_ERR;
     }
 
-    for (int i = 0; i < numChannels; i++) {
-        SCPI_ResultBool(context, Channel::get(channels[i]).isOutputEnabled());
+    for (int i = 0; i < selectedChannels.numChannels; i++) {
+        auto channel = Channel::getBySlotIndex(selectedChannels.channels[i].slotIndex, selectedChannels.channels[i].subchannelIndex);
+        if (channel) {
+            SCPI_ResultBool(context, channel->isOutputEnabled());
+        } else {
+            SCPI_ResultBool(context, false);
+        }
     }
 
     return SCPI_RES_OK;
@@ -112,8 +128,7 @@ scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    int numChannels;
-    uint8_t channels[MAX_NUM_CH_IN_CH_LIST];
+    SelectedChannels selectedChannels;
 
     if (parameter.type == SCPI_TOKEN_DECIMAL_NUMERIC_PROGRAM_DATA || parameter.type == SCPI_TOKEN_PROGRAM_MNEMONIC) {
         int32_t outputTrackChoice;
@@ -135,28 +150,35 @@ scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
             return SCPI_RES_OK;
         }
 
-        // all channels
-        for (int i = 0; i < CH_NUM; i++) {
-            channels[i] = i;
+        // all power channels
+        for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+            auto &channel = Channel::get(channelIndex);
+            selectedChannels.channels[channelIndex].slotIndex = channel.slotIndex;
+            selectedChannels.channels[channelIndex].subchannelIndex = channel.subchannelIndex;
         }
-        numChannels = CH_NUM;
+        selectedChannels.numChannels = CH_NUM;
     } else {
-        param_channels(context, &parameter, numChannels, channels);
+        param_channels(context, &parameter, selectedChannels);
     }
 
-    if (numChannels == 0) {
+    if (selectedChannels.numChannels == 0) {
         return SCPI_RES_ERR;
     }
 
     uint16_t channelsMask = 0;
-    for (int i = 0; i < numChannels; i++) {
-        int err;
-        if (channels[i] >= 16 || !channel_dispatcher::isTrackingAllowed(Channel::get(channels[i]), &err)) {
-            SCPI_ErrorPush(context, err);
-            return SCPI_RES_ERR;
-        }
+    int numChannels = 0;
+    for (int i = 0; i < selectedChannels.numChannels; i++) {
+        auto channel = Channel::getBySlotIndex(selectedChannels.channels[i].slotIndex, selectedChannels.channels[i].subchannelIndex);
+        if (channel) {
+            int err;
+            if (!channel_dispatcher::isTrackingAllowed(*channel, &err)) {
+                SCPI_ErrorPush(context, err);
+                return SCPI_RES_ERR;
+            }
 
-        channelsMask |= (1 << channels[i]);
+            channelsMask |= (1 << channel->channelIndex);
+            numChannels++;
+        }
     }
 
     if (numChannels >= 2) {
@@ -170,15 +192,19 @@ scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputTrackStateQ(scpi_t *context) {
-    int numChannels;
-    uint8_t channels[MAX_NUM_CH_IN_CH_LIST];
-    param_channels(context, numChannels, channels);
-    if (numChannels == 0) {
+    SelectedChannels selectedChannels;
+    param_channels(context, selectedChannels);
+    if (selectedChannels.numChannels == 0) {
         return SCPI_RES_ERR;
     }
 
-    for (int i = 0; i < numChannels; i++) {
-        SCPI_ResultBool(context, Channel::get(channels[i]).flags.trackingEnabled ? true : false);
+    for (int i = 0; i < selectedChannels.numChannels; i++) {
+        auto channel = Channel::getBySlotIndex(selectedChannels.channels[i].slotIndex, selectedChannels.channels[i].subchannelIndex);
+        if (channel) {
+            SCPI_ResultBool(context, channel->flags.trackingEnabled ? true : false);
+        } else {
+            SCPI_ResultBool(context, false);
+        }
     }
 
     return SCPI_RES_OK;
@@ -207,7 +233,7 @@ scpi_result_t scpi_cmd_outputStateTriggered(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -218,7 +244,7 @@ scpi_result_t scpi_cmd_outputStateTriggered(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputStateTriggeredQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -234,7 +260,7 @@ scpi_result_t scpi_cmd_outputDprog(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -250,7 +276,7 @@ scpi_result_t scpi_cmd_outputDprog(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputDprogQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -291,7 +317,7 @@ scpi_result_t scpi_cmd_outputDelayDuration(scpi_t *context) {
         duration = (float)param.content.value;
     }
 
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -302,7 +328,7 @@ scpi_result_t scpi_cmd_outputDelayDuration(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_outputDelayDurationQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }

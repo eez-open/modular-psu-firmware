@@ -51,6 +51,8 @@ using namespace psu;
 
 namespace dcm220 {
 
+static const uint16_t MODULE_REVISION_DCM220_R2B4  = 0x0204;
+
 static const uint16_t DAC_MIN = 0;
 static const uint16_t DAC_MAX = 4095;
 
@@ -325,53 +327,6 @@ struct DcmChannel : public Channel {
     }
 };
 
-struct DcmModuleInfo : public PsuModuleInfo {
-public:
-	DcmModuleInfo(uint16_t moduleType, const char *moduleName, uint16_t latestModuleRevision) 
-		: PsuModuleInfo(moduleType, moduleName, "Envox", latestModuleRevision, FLASH_METHOD_STM32_BOOTLOADER_UART, 0,
-#if defined(EEZ_PLATFORM_STM32)
-            SPI_BAUDRATEPRESCALER_16,
-            false,
-#else
-            0,
-            false,
-#endif
-            2)
-	{
-	}
-
-	Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) override;
-
-	Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
-        void *buffer = malloc(sizeof(DcmChannel));
-        memset(buffer, 0, sizeof(DcmChannel));
-		return new (buffer) DcmChannel(slotIndex, channelIndex, subchannelIndex);
-	}
-
-    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
-        int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
-
-        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-            return isVert ? PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_VERT : PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_HORZ;
-        }
-
-        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
-            return isVert ? PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_VERT_2COL : PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_HORZ_2COL;
-        }
-
-        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
-            return PAGE_ID_DIB_DCM220_SLOT_MAX_2CH;
-        }
-
-        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
-            return PAGE_ID_DIB_DCM220_SLOT_MIN_2CH;
-        }
-
-        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-        return PAGE_ID_DIB_DCM220_SLOT_MICRO_2CH;
-    }
-};
-
 struct DcmModule : public PsuModule {
 public:
     TestResult testResult = TEST_NONE;
@@ -380,11 +335,29 @@ public:
     uint8_t input[BUFFER_SIZE];
     uint8_t output[BUFFER_SIZE];
 
-    DcmModule(uint8_t slotIndex, DcmModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled)
-        : PsuModule(slotIndex, moduleInfo, moduleRevision, firmwareInstalled)
-    {
+    DcmModule() {
+        moduleType = MODULE_TYPE_DCM220;
+        moduleName = "DCM220";
+        moduleBrand = "Envox";
+        latestModuleRevision = MODULE_REVISION_DCM220_R2B4;
+        flashMethod = FLASH_METHOD_STM32_BOOTLOADER_UART;
+        flashDuration = 0;
+#if defined(EEZ_PLATFORM_STM32)        
+        spiBaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+        spiCrcCalculationEnable = false;
+#else
+        spiBaudRatePrescaler = 0;
+        spiCrcCalculationEnable = false;
+#endif
+        numPowerChannels = 2;
+        numOtherChannels = 0;
+
     	memset(output, 0, sizeof(output));
     	memset(input, 0, sizeof(input));
+    }
+
+	Module *createModule() override {
+        return new DcmModule();
     }
 
     void init() {
@@ -400,6 +373,12 @@ public:
             }
         }
     }
+
+	Channel *createPowerChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
+        void *buffer = malloc(sizeof(DcmChannel));
+        memset(buffer, 0, sizeof(DcmChannel));
+		return new (buffer) DcmChannel(slotIndex, channelIndex, subchannelIndex);
+	}
 
     void onPowerDown() {
         synchronized = false;
@@ -551,11 +530,30 @@ public:
         }
     }
 #endif
-};
 
-Module *DcmModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
-	return new DcmModule(slotIndex, this, moduleRevision, firmwareInstalled);
-}
+    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
+        int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
+
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
+            return isVert ? PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_VERT : PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_HORZ;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+            return isVert ? PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_VERT_2COL : PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_HORZ_2COL;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
+            return PAGE_ID_DIB_DCM220_SLOT_MAX_2CH;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
+            return PAGE_ID_DIB_DCM220_SLOT_MIN_2CH;
+        }
+
+        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
+        return PAGE_ID_DIB_DCM220_SLOT_MICRO_2CH;
+    }
+};
 
 void DcmChannel::init() {
     if (subchannelIndex == 0) {
@@ -638,9 +636,8 @@ void DcmChannel::tickSpecific(uint32_t tickCount) {
 #endif
 }
 
-static DcmModuleInfo g_moduleInfo_(MODULE_TYPE_DCM220, "DCM220", MODULE_REVISION_DCM220_R2B4);
-
-ModuleInfo *g_moduleInfo = &g_moduleInfo_;
+static DcmModule g_dcmModule;
+Module *g_module = &g_dcmModule;
 
 } // namespace dcm220
 

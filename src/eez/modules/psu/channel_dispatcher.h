@@ -172,6 +172,20 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex);
 
 bool isEditEnabled(const eez::gui::WidgetCursor &widgetCursor);
 
+bool getDigitalInputData(int slotIndex, int subchannelIndex, uint8_t &data, int *err);
+
+bool getDigitalOutputData(int slotIndex, int subchannelIndex, uint8_t &data, int *err);
+bool setDigitalOutputData(int slotIndex, int subchannelIndex, uint8_t data, int *err);
+
+bool getMode(int slotIndex, int subchannelIndex, SourceMode &mode, int *err);
+bool setMode(int slotIndex, int subchannelIndex, SourceMode mode, int *err);
+
+bool getCurrentRange(int slotIndex, int subchannelIndex, int8_t &range, int *err);
+bool setCurrentRange(int slotIndex, int subchannelIndex, int8_t range, int *err);
+
+bool getVoltageRange(int slotIndex, int subchannelIndex, int8_t &range, int *err);
+bool setVoltageRange(int slotIndex, int subchannelIndex, int8_t range, int *err);
+
 } // namespace channel_dispatcher
 } // namespace psu
 } // namespace eez

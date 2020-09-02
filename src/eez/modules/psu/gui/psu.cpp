@@ -1726,54 +1726,52 @@ void onEncoder(int counter, bool clicked) {
         }
 
         if (isEncoderEnabledInActivePage()) {
-            if ((g_focusCursor >= 0 && g_focusCursor < CH_NUM) || activePageId != PAGE_ID_MAIN) {
-                Value value;
-                if (persist_conf::devConf.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
-                    value = g_focusEditValue;
+            Value value;
+            if (persist_conf::devConf.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                value = g_focusEditValue;
+            } else {
+                value = getEditValue(g_focusCursor, g_focusDataId);
+            }
+
+            float min = getMin(g_focusCursor, g_focusDataId).getFloat();
+            float max = getMax(g_focusCursor, g_focusDataId).getFloat();
+
+            float newValue;
+
+            Value stepValue = getEncoderStep(g_focusCursor, g_focusDataId);
+            if (stepValue.getType() != VALUE_TYPE_NONE) {
+                float step;
+                if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
+                    step = stepValue.getFloat();
                 } else {
-                    value = getEditValue(g_focusCursor, g_focusDataId);
+                    step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
                 }
-
-                float min = getMin(g_focusCursor, g_focusDataId).getFloat();
-                float max = getMax(g_focusCursor, g_focusDataId).getFloat();
-
-                float newValue;
-
-                Value stepValue = getEncoderStep(g_focusCursor, g_focusDataId);
-                if (stepValue.getType() != VALUE_TYPE_NONE) {
-                    float step;
-                    if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
-                        step = stepValue.getFloat();
-                    } else {
-                        step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
-                    }
-                    newValue = roundPrec(value.getFloat() + counter * step, step);
-                    if (getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
-                        newValue = 0;
-                    } else {
-                        newValue = clamp(newValue, min, max);
-                    }
+                newValue = roundPrec(value.getFloat() + counter * step, step);
+                if (getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
+                    newValue = 0;
                 } else {
-                    float precision = getEncoderPrecision(g_focusCursor, g_focusDataId, 0);
-                    newValue = encoderIncrement(value, counter, min, max, g_focusCursor, precision);
+                    newValue = clamp(newValue, min, max);
                 }
+            } else {
+                float precision = getEncoderPrecision(g_focusCursor, g_focusDataId, 0);
+                newValue = encoderIncrement(value, counter, min, max, g_focusCursor, precision);
+            }
 
-                Value limitValue = getLimit(g_focusCursor, g_focusDataId);
-                if (limitValue.getType() != VALUE_TYPE_NONE) {
-                    float limit = limitValue.getFloat();
-                    if (newValue > limit && value.getFloat() < limit) {
-                        newValue = limit;
-                    }
+            Value limitValue = getLimit(g_focusCursor, g_focusDataId);
+            if (limitValue.getType() != VALUE_TYPE_NONE) {
+                float limit = limitValue.getFloat();
+                if (newValue > limit && value.getFloat() < limit) {
+                    newValue = limit;
                 }
+            }
 
-                if (persist_conf::devConf.encoderConfirmationMode) {
-                    g_focusEditValue = MakeValue(newValue, value.getUnit());
-                    g_focusEditValueChangedTime = millis();
-                } else {
-                    Value result = set(g_focusCursor, g_focusDataId, MakeValue(newValue, value.getUnit()));
-                    if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
-                        psuErrorMessage(g_focusCursor, result);
-                    }
+            if (persist_conf::devConf.encoderConfirmationMode) {
+                g_focusEditValue = MakeValue(newValue, value.getUnit());
+                g_focusEditValueChangedTime = millis();
+            } else {
+                Value result = set(g_focusCursor, g_focusDataId, MakeValue(newValue, value.getUnit()));
+                if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
+                    psuErrorMessage(g_focusCursor, result);
                 }
             }
         }

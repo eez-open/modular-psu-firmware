@@ -18,6 +18,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <math.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <spi.h>
@@ -27,52 +28,42 @@
 #include "eez/debug.h"
 #include "eez/firmware.h"
 #include "eez/hmi.h"
+#include "eez/util.h"
 #include "eez/gui/document.h"
 #include "eez/modules/psu/event_queue.h"
 #include "eez/modules/psu/gui/psu.h"
 #include "eez/modules/bp3c/comm.h"
+#include "eez/modules/psu/gui/edit_mode.h"
 
 #include "./dib-smx46.h"
+
+using namespace eez::psu;
+using namespace eez::psu::gui;
+using namespace eez::gui;
 
 namespace eez {
 namespace dib_smx46 {
 
-struct Smx46ModuleInfo : public ModuleInfo {
-public:
-    Smx46ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_SMX46, "SMX46", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART, 0,
-#if defined(EEZ_PLATFORM_STM32)
-            SPI_BAUDRATEPRESCALER_64,
-            true,
-#else
-            0,
-            false,
-#endif
-            0
-        )
-    {}
-    
-    Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) override;
+static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
 
-    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
-        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
-        }
-        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
-            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF_2COL : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
-        }
-        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
-            return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_MAX;
-        }
-        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
-            return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_MIN;
-        }
-        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-        return gui::PAGE_ID_DIB_SMX46_SLOT_VIEW_MICRO;
-    }
+#define BUFFER_SIZE 20
+
+static const int NUM_COLUMNS = 6;
+static const int NUM_ROWS = 4;
+static const int MAX_LABEL_LENGTH = 5;
+
+static float MIN_DAC = 0.0f;
+static float MAX_DAC = 10.0f;
+static float DAC_ENCODER_STEP_VALUES[] = { 0.5f, 0.2f, 0.1f, 0.01f };
+
+struct FromMasterToSlave {
+    uint32_t routes;
+    float dac1;
+    float dac2;
 };
 
-#define BUFFER_SIZE 16
+struct FromSlaveToMaster {
+};
 
 struct Smx46Module : public Module {
 public:
@@ -81,11 +72,51 @@ public:
     int numCrcErrors = 0;
     uint8_t input[BUFFER_SIZE];
     uint8_t output[BUFFER_SIZE];
-    bool spiReady;
+    bool spiReady = false;
 
-    Smx46Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled)
-        : Module(slotIndex, moduleInfo, moduleRevision, firmwareInstalled)
-    {
+    uint32_t routes = 0;
+
+    char xLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
+    char yLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
+
+    float dac1 = 0.0f;
+    float dac2 = 0.0f;
+
+    Smx46Module() {
+        moduleType = MODULE_TYPE_DIB_SMX46;
+        moduleName = "SMX46";
+        moduleBrand = "Envox";
+        latestModuleRevision = MODULE_REVISION_R1B2;
+        flashMethod = FLASH_METHOD_STM32_BOOTLOADER_UART;
+        flashDuration = 0;
+#if defined(EEZ_PLATFORM_STM32)        
+        spiBaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+        spiCrcCalculationEnable = true;
+#else
+        spiBaudRatePrescaler = 0;
+        spiCrcCalculationEnable = false;
+#endif
+        numPowerChannels = 0;
+        numOtherChannels = 0;
+
+        for (int i = 0; i < NUM_COLUMNS; i++) {
+            xLabels[i][0] = 'X';
+            xLabels[i][1] = '1' + i;
+            xLabels[i][2] = 0;
+        }
+
+        for (int i = 0; i < NUM_ROWS; i++) {
+            yLabels[i][0] = 'Y';
+            yLabels[i][1] = '1' + i;
+            yLabels[i][2] = 0;
+        }
+
+        auto data = (FromMasterToSlave *)output;
+        data->routes = 0xFFFFFFFF;
+    }
+
+    Module *createModule() override {
+        return new Smx46Module();
     }
 
     TestResult getTestResult() override {
@@ -100,7 +131,7 @@ public:
                 testResult = TEST_OK;
             } else {
                 if (g_slots[slotIndex]->firmwareInstalled) {
-                    psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                    event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
                 }
                 testResult = TEST_FAILED;
             }
@@ -112,16 +143,13 @@ public:
             return;
         }
 
-        static int cnt = 0;
-        if (++cnt < 25) {
-            return;
-        }
-        cnt = 0;
-
 #if defined(EEZ_PLATFORM_STM32)
         if (spiReady) {
-            spiReady = false;
-            transfer();
+            auto data = (FromMasterToSlave *)output;
+            if (data->routes != routes || data->dac1 != dac1 || data->dac2 != dac2) {
+                spiReady = false;
+                transfer();
+            }
         }
 #endif
     }
@@ -133,6 +161,11 @@ public:
 #endif
 
     void transfer() {
+        auto data = (FromMasterToSlave *)output;
+        data->routes = routes;
+        data->dac1 = dac1;
+        data->dac2 = dac2;
+
         auto status = bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE);
         if (status == bp3c::comm::TRANSFER_STATUS_OK) {
             numCrcErrors = 0;
@@ -154,25 +187,159 @@ public:
     void onPowerDown() override {
         synchronized = false;
     }
+
+    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
+            return isDefaultViewVertical() ? PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF : PAGE_ID_SLOT_DEF_HORZ_EMPTY;
+        }
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+            return isDefaultViewVertical() ? PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF_2COL : PAGE_ID_SLOT_DEF_HORZ_EMPTY;
+        }
+        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
+            return PAGE_ID_DIB_SMX46_SLOT_VIEW_MAX;
+        }
+        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
+            return PAGE_ID_DIB_SMX46_SLOT_VIEW_MIN;
+        }
+        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
+        return PAGE_ID_DIB_SMX46_SLOT_VIEW_MICRO;
+    }
+
+    bool isRouteOpen(int x, int y) {
+        return routes & (1 << (y * NUM_COLUMNS + x));
+    }
+
+    void toggleRoute(int x, int y) {
+        routes ^= 1 << (y * NUM_COLUMNS + x);
+    }
 };
 
-Module *Smx46ModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
-    return new Smx46Module(slotIndex, this, moduleRevision, firmwareInstalled);
-}
-
-static Smx46ModuleInfo g_smx46ModuleInfo;
-ModuleInfo *g_moduleInfo = &g_smx46ModuleInfo;
+static Smx46Module g_smx46Module;
+Module *g_module = &g_smx46Module;
 
 } // namespace dib_smx46
 
 namespace gui {
 
-void data_dib_smx46_outputs(DataOperationEnum operation, Cursor cursor, Value &value) {
+using namespace eez::dib_smx46;
+
+void data_dib_smx46_routes(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
-        value = 24;
+        value = NUM_COLUMNS * NUM_ROWS;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
-        value = hmi::g_selectedSlotIndex * 24 + value.getInt();
+        value = hmi::g_selectedSlotIndex * (NUM_COLUMNS * NUM_ROWS) + value.getInt();
     }
+}
+
+void data_dib_smx46_route_open(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int slotIndex = cursor / (NUM_COLUMNS * NUM_ROWS);
+        int i = cursor % (NUM_COLUMNS * NUM_ROWS);
+        int x = i % NUM_COLUMNS;
+        int y = i / NUM_COLUMNS;
+        value = ((Smx46Module *)g_slots[slotIndex])->isRouteOpen(x, y);
+    }
+}
+
+void data_dib_smx46_x_labels(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = NUM_COLUMNS;
+    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+        value = hmi::g_selectedSlotIndex * NUM_COLUMNS + value.getInt();
+    }
+}
+
+void data_dib_smx46_x_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int slotIndex = cursor / NUM_COLUMNS;
+        int i = cursor % NUM_COLUMNS;
+        value = (const char *)&((Smx46Module *)g_slots[slotIndex])->xLabels[i][0];
+    }
+}
+
+void data_dib_smx46_y_labels(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = NUM_ROWS;
+    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+        value = hmi::g_selectedSlotIndex * NUM_ROWS + value.getInt();
+    }
+}
+
+void data_dib_smx46_y_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int slotIndex = cursor / NUM_ROWS;
+        int i = cursor % NUM_ROWS;
+        value = (const char *)&((Smx46Module *)g_slots[slotIndex])->yLabels[i][0];
+    }
+}
+
+void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_SMX46_DAC1;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
+            data_keypad_text(operation, cursor, value);
+        } else {
+            value = MakeValue(((Smx46Module *)g_slots[cursor])->dac1, UNIT_VOLT);
+        }
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = MakeValue(MIN_DAC, UNIT_VOLT);
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = MakeValue(MAX_DAC, UNIT_VOLT);
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = UNIT_VOLT;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
+        value = Value(0.001f, UNIT_VOLT);
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        StepValues *stepValues = value.getStepValues();
+        stepValues->values = DAC_ENCODER_STEP_VALUES;
+        stepValues->count = sizeof(DAC_ENCODER_STEP_VALUES) / sizeof(float);
+        stepValues->unit = UNIT_VOLT;
+        value = 1;
+    } else if (operation == DATA_OPERATION_SET) {
+        ((Smx46Module *)g_slots[cursor])->dac1 = value.getFloat();
+    }
+}
+
+void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_SMX46_DAC1;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
+            data_keypad_text(operation, cursor, value);
+        } else {
+            value = MakeValue(((Smx46Module *)g_slots[cursor])->dac2, UNIT_VOLT);
+        }
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = MakeValue(MIN_DAC, UNIT_VOLT);
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = MakeValue(MAX_DAC, UNIT_VOLT);
+    } else if (operation == DATA_OPERATION_GET_NAME) {
+        value = "DAC 2";
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = UNIT_VOLT;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
+        value = Value(0.001f, UNIT_VOLT);
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        StepValues *stepValues = value.getStepValues();
+        stepValues->values = DAC_ENCODER_STEP_VALUES;
+        stepValues->count = sizeof(DAC_ENCODER_STEP_VALUES) / sizeof(float);
+        stepValues->unit = UNIT_VOLT;
+        value = 1;
+    } else if (operation == DATA_OPERATION_SET) {
+        ((Smx46Module *)g_slots[cursor])->dac2 = value.getFloat();
+    }
+}
+
+void action_dib_smx46_toggle_route() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    int slotIndex = cursor / (NUM_COLUMNS * NUM_ROWS);
+    int i = cursor % (NUM_COLUMNS * NUM_ROWS);
+    int x = i % NUM_COLUMNS;
+    int y = i / NUM_COLUMNS;
+    ((Smx46Module *)g_slots[slotIndex])->toggleRoute(x, y);
 }
 
 } // gui

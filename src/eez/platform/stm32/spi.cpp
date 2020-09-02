@@ -48,11 +48,11 @@ void select(uint8_t slotIndex, int chip) {
         __HAL_SPI_DISABLE(handle[slotIndex]);
 
         if (chip == CHIP_SLAVE_MCU) {
-            uint32_t crcCalculation = (slot.moduleInfo->spiCrcCalculationEnable ? SPI_CRCCALCULATION_ENABLE : SPI_CRCCALCULATION_DISABLE);
-            WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | slot.moduleInfo->spiBaudRatePrescaler | SPI_FIRSTBIT_MSB | crcCalculation);
+            uint32_t crcCalculation = (slot.spiCrcCalculationEnable ? SPI_CRCCALCULATION_ENABLE : SPI_CRCCALCULATION_DISABLE);
+            WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | slot.spiBaudRatePrescaler | SPI_FIRSTBIT_MSB | crcCalculation);
             handle[slotIndex]->Init.CRCCalculation = crcCalculation;
         } else if (chip == CHIP_SLAVE_MCU_NO_CRC) {
-            WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | slot.moduleInfo->spiBaudRatePrescaler | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+            WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | slot.spiBaudRatePrescaler | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
             handle[slotIndex]->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
         } else if (chip == CHIP_IOEXP || chip == CHIP_TEMP_SENSOR) {
             WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
@@ -67,7 +67,7 @@ void select(uint8_t slotIndex, int chip) {
         // __HAL_SPI_ENABLE(handle[slotIndex]);
     }
 
-    if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+    if (slot.moduleType == MODULE_TYPE_DCP405) {
         if (chip == CHIP_DAC) {
             // 00
             SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
@@ -94,7 +94,7 @@ void select(uint8_t slotIndex, int chip) {
 void deselect(uint8_t slotIndex) {
     auto &slot = *g_slots[slotIndex];
 
-    if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+    if (slot.moduleType == MODULE_TYPE_DCP405) {
         // 01 ADC
         SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
         SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB

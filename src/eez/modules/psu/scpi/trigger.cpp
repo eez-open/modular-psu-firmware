@@ -97,7 +97,7 @@ scpi_result_t scpi_cmd_triggerSequenceExitCondition(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -113,7 +113,7 @@ scpi_result_t scpi_cmd_triggerSequenceExitCondition(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_triggerSequenceExitConditionQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }

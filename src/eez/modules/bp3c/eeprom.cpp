@@ -211,7 +211,7 @@ bool test() {
 void writeModuleType(uint8_t slotIndex, uint16_t moduleType) {
     uint16_t buffer[] = {
         moduleType,
-        getModuleInfo(moduleType)->latestModuleRevision
+        getModule(moduleType)->latestModuleRevision
     };
     write(slotIndex, (uint8_t *)buffer, 4, 0);
 }

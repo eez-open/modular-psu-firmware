@@ -66,27 +66,27 @@ void data_main_app_view(DataOperationEnum operation, Cursor cursor, Value &value
 int getSlotView(int slotIndex, Cursor cursor) {
     auto &slot = *g_slots[slotIndex];
     
-    if (slot.moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+    if (slot.moduleType == MODULE_TYPE_DCP405) {
         return PAGE_ID_DIB_DCP405_SIMULATOR_FRONT_PANEL_MASK;
     }
     
-    if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM220) {
+    if (slot.moduleType == MODULE_TYPE_DCM220) {
         return PAGE_ID_DIB_DCM220_SIMULATOR_FRONT_PANEL_MASK;
     }
     
-    if (slot.moduleInfo->moduleType == MODULE_TYPE_DCM224) {
+    if (slot.moduleType == MODULE_TYPE_DCM224) {
         return PAGE_ID_DIB_DCM224_SIMULATOR_FRONT_PANEL_MASK;
     }
     
-    if (slot.moduleInfo->moduleType == MODULE_TYPE_DIB_MIO168) {
+    if (slot.moduleType == MODULE_TYPE_DIB_MIO168) {
         return PAGE_ID_DIB_MIO168_SIMULATOR_FRONT_PANEL_MASK;
     }
     
-    if (slot.moduleInfo->moduleType == MODULE_TYPE_DIB_PREL6) {
+    if (slot.moduleType == MODULE_TYPE_DIB_PREL6) {
         return PAGE_ID_DIB_PREL6_SIMULATOR_FRONT_PANEL_MASK;
     }
     
-    if (slot.moduleInfo->moduleType == MODULE_TYPE_DIB_SMX46) {
+    if (slot.moduleType == MODULE_TYPE_DIB_SMX46) {
         return PAGE_ID_DIB_SMX46_SIMULATOR_FRONT_PANEL_MASK;
     }
 

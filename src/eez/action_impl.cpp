@@ -302,7 +302,7 @@ void action_show_slot_settings() {
 
 void action_show_ch_settings() {
     selectChannelByCursor();
-    showPage(g_channel->getChannelSettingsPageId());
+    showPage(g_slots[g_channel->slotIndex]->getChannelSettingsPageId());
 }
 
 void action_show_ch_settings_prot_clear() {
@@ -1182,7 +1182,7 @@ void onSetModuleType(uint16_t moduleType) {
 
 void selectSlotModuleType(int slotIndex) {
     hmi::selectSlot(slotIndex);
-    pushSelectFromEnumPage(&g_frontPanelAppContext, ENUM_DEFINITION_MODULE_TYPE, g_slots[slotIndex]->moduleInfo->moduleType, NULL, onSetModuleType);
+    pushSelectFromEnumPage(&g_frontPanelAppContext, ENUM_DEFINITION_MODULE_TYPE, g_slots[slotIndex]->moduleType, NULL, onSetModuleType);
 }
 
 void action_front_panel_select_slot1() {

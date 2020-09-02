@@ -25,15 +25,16 @@
 namespace eez {
 
 namespace psu {
-namespace profile {
-class WriteContext;
-class ReadContext;
-struct List;
-}
+    struct Channel;
+    namespace profile {
+        class WriteContext;
+        class ReadContext;
+        struct List;
+    }
 }
 
 namespace gui {
-class Page;
+    class Page;
 }
 
 static const uint16_t MODULE_TYPE_NONE = 0;
@@ -58,13 +59,12 @@ enum FlashMethod {
     FLASH_METHOD_STM32_BOOTLOADER_SPI
 };
 
-struct Module;
+enum SourceMode {
+    SOURCE_MODE_CURRENT,
+    SOURCE_MODE_VOLTAGE
+};
 
-namespace psu {
-    struct Channel;
-}
-
-struct ModuleInfo {
+struct Module {
     uint16_t moduleType;
     const char *moduleName;
     const char *moduleBrand;
@@ -73,13 +73,32 @@ struct ModuleInfo {
     uint32_t flashDuration;
     uint32_t spiBaudRatePrescaler;
     bool spiCrcCalculationEnable;
-    uint8_t numChannels;
+    uint8_t numPowerChannels;
+    uint8_t numOtherChannels;
 
-    ModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration_, uint32_t spiBaudRatePrescaler_, bool spiCrcCalculationEnable_, uint8_t numChannels_);
+    uint8_t slotIndex = -1;
+    uint16_t moduleRevision = 0;
+    bool firmwareInstalled = false;
+	uint8_t firmwareMajorVersion = 0;
+	uint8_t firmwareMinorVersion = 0;
+	uint32_t idw0 = 0;
+	uint32_t idw1 = 0;
+	uint32_t idw2 = 0;
 
-    virtual Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) = 0;
-    virtual psu::Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex);
+    virtual Module *createModule() = 0;
+
+    virtual TestResult getTestResult();
+
+    virtual void boot();
+    virtual psu::Channel *createPowerChannel(int slotIndex, int channelIndex, int subchannelIndex);
+    virtual void initChannels();
+    virtual void tick();
+    virtual void onPowerDown();
+    virtual void onSpiIrq();
+    virtual void onSpiDmaTransferCompleted(int status);
+    virtual gui::Page *getPageFromId(int pageId);
     virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);
+    virtual int getChannelSettingsPageId();
 
     virtual void getProfileParameters(int channelIndex, uint8_t *buffer);
     virtual void setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels);
@@ -88,38 +107,30 @@ struct ModuleInfo {
     virtual bool getProfileOutputEnable(uint8_t *buffer);
     virtual float getProfileUSet(uint8_t *buffer);
     virtual float getProfileISet(uint8_t *buffer);
-};
 
-struct Module {
-    uint8_t slotIndex;
+    virtual int getNumSubchannels();
+    virtual bool isValidSubchannelIndex(int subchannelIndex);
+    virtual int getSubchannelIndexFromRelativeChannelIndex(int relativeChannelIndex);
 
-    ModuleInfo *moduleInfo;
-    uint16_t moduleRevision;
-    bool firmwareInstalled;
+    virtual bool getDigitalInputData(int subchannelIndex, uint8_t &data, int *err);
 
-	uint8_t firmwareMajorVersion;
-	uint8_t firmwareMinorVersion;
-	uint32_t idw0;
-	uint32_t idw1;
-	uint32_t idw2;
+    virtual bool getDigitalOutputData(int subchannelIndex, uint8_t &data, int *err);
+    virtual bool setDigitalOutputData(int subchannelIndex, uint8_t data, int *err);
 
-    Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled);
+    virtual bool getMode(int subchannelIndex, SourceMode &mode, int *err);
+    virtual bool setMode(int subchannelIndex, SourceMode mode, int *err);
 
-    virtual TestResult getTestResult();
+    virtual bool getCurrentRange(int subchannelIndex, int8_t &range, int *err);
+    virtual bool setCurrentRange(int subchannelIndex, int8_t range, int *err);
 
-    virtual void boot();
-    virtual void initChannels();
-    virtual void tick();
-    virtual void onPowerDown();
-    virtual void onSpiIrq();
-    virtual void onSpiDmaTransferCompleted(int status);
-    virtual gui::Page *getPageFromId(int pageId);
+    virtual bool getVoltageRange(int subchannelIndex, int8_t &range, int *err);
+    virtual bool setVoltageRange(int subchannelIndex, int8_t range, int *err);
 };
 
 static const int NUM_SLOTS = 3;
 extern Module *g_slots[NUM_SLOTS];
 
-ModuleInfo *getModuleInfo(uint16_t moduleType);
+Module *getModule(uint16_t moduleType);
 
 void getModuleSerialInfo(uint8_t slotIndex, char *text);
 

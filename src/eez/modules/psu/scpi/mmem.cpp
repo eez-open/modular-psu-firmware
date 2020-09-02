@@ -545,7 +545,7 @@ scpi_result_t scpi_cmd_mmemoryUnlock(scpi_t *context) {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_mmemoryLoadList(scpi_t *context) {
-    Channel *channel = set_channel_from_command_number(context);
+    Channel *channel = getPowerChannelFromCommandNumber(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -575,7 +575,7 @@ scpi_result_t scpi_cmd_mmemoryStoreList(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = set_channel_from_command_number(context);
+    Channel *channel = getPowerChannelFromCommandNumber(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }

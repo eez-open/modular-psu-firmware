@@ -93,7 +93,7 @@ void sendDataNoCRC(uint8_t data) {
 #if OPTION_DISPLAY
 
 void updateProgress(int slotIndex, size_t currentPosition, size_t totalSize) {
-	auto flashDuration = g_slots[slotIndex]->moduleInfo->flashDuration;
+	auto flashDuration = g_slots[slotIndex]->flashDuration;
 	if (flashDuration != 0) {
 		uint32_t currentPosition = millis() - g_flashStartTime;
 		if (currentPosition > flashDuration) {
@@ -149,7 +149,7 @@ bool waitForAck(int slotIndex) {
 
 bool syncWithSlave(int slotIndex) {
 #if defined(EEZ_PLATFORM_STM32)
-	if (g_slots[slotIndex]->moduleInfo->flashMethod == FLASH_METHOD_STM32_BOOTLOADER_SPI) {
+	if (g_slots[slotIndex]->flashMethod == FLASH_METHOD_STM32_BOOTLOADER_SPI) {
 		uint8_t txData;
 
 		txData = BL_SPI_SOF;
@@ -184,7 +184,7 @@ bool eraseAll(int slotIndex) {
 #if defined(EEZ_PLATFORM_STM32)
 	static uint8_t buffer[3] = { 0xFF, 0xFF, 0x00 };
 
-	if (g_slots[slotIndex]->moduleInfo->flashMethod == FLASH_METHOD_STM32_BOOTLOADER_SPI) {
+	if (g_slots[slotIndex]->flashMethod == FLASH_METHOD_STM32_BOOTLOADER_SPI) {
 		uint8_t txData[3];
 
 		txData[0] = BL_SPI_SOF;
@@ -253,7 +253,7 @@ bool writeMemory(int slotIndex, uint32_t address, const uint8_t *buffer, uint32_
 		crc ^= buffer[i];
 	}
 
-	if (g_slots[slotIndex]->moduleInfo->flashMethod == FLASH_METHOD_STM32_BOOTLOADER_SPI) {
+	if (g_slots[slotIndex]->flashMethod == FLASH_METHOD_STM32_BOOTLOADER_SPI) {
 		uint8_t txData[3];
 
 		txData[0] = BL_SPI_SOF;

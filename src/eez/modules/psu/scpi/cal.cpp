@@ -118,7 +118,7 @@ scpi_result_t scpi_cmd_calibrationClear(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = getSelectedChannel(context);
+    Channel *channel = getSelectedPowerChannel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -151,7 +151,7 @@ scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = getSelectedChannel(context);
+    Channel *channel = getSelectedPowerChannel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -265,7 +265,7 @@ scpi_result_t scpi_cmd_calibrationRemarkQ(scpi_t *context) {
     if (calibration::isEnabled()) {
         remark = calibration::getRemark();
     } else {
-        Channel *channel = getSelectedChannel(context);
+        Channel *channel = getSelectedPowerChannel(context);
         if (!channel) {
             return SCPI_RES_ERR;
         }
@@ -298,7 +298,7 @@ scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = getSelectedChannel(context);
+    Channel *channel = getSelectedPowerChannel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -334,7 +334,7 @@ scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationStateQ(scpi_t *context) {
-    Channel *channel = getSelectedChannel(context);
+    Channel *channel = getSelectedPowerChannel(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }

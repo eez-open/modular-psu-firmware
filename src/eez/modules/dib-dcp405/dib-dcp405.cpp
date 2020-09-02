@@ -814,20 +814,37 @@ struct DcpChannel : public Channel {
 	}
 };
 
-struct DcpModuleInfo : public PsuModuleInfo {
+struct DcpModule : public PsuModule {
 public:
-	DcpModuleInfo() 
-		: PsuModuleInfo(MODULE_TYPE_DCP405, "DCP405", "Envox", MODULE_REVISION_DCP405_R2B11, FLASH_METHOD_NONE, 0, 0, false, 1)
-	{
+    DcpModule() {
+        moduleType = MODULE_TYPE_DCP405;
+        moduleName = "DCP405";
+        moduleBrand = "Envox";
+        latestModuleRevision = MODULE_REVISION_DCP405_R2B11;
+        flashMethod = FLASH_METHOD_NONE;
+        flashDuration = 0;
+        spiBaudRatePrescaler = 0;
+        spiCrcCalculationEnable = false;
+        numPowerChannels = 1;
+        numOtherChannels = 0;		
+    }
+
+	Module *createModule() override {
+		return new DcpModule();
 	}
 
-	Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) override;
-
-	Channel *createChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
+	Channel *createPowerChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
         void *buffer = malloc(sizeof(DcpChannel));
         memset(buffer, 0, sizeof(DcpChannel));
 		return new (buffer) DcpChannel(slotIndex, channelIndex, subchannelIndex);
 	}
+
+#if defined(EEZ_PLATFORM_STM32)
+	void onSpiIrq() {
+		auto dcpChannel = (DcpChannel *)Channel::getBySlotIndex(slotIndex);
+		dcpChannel->onSpiIrq();
+	}
+#endif
 
 	int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
 		int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
@@ -918,33 +935,13 @@ public:
 	}
 };
 
-struct DcpModule : public PsuModule {
-public:
-    DcpModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision)
-        : PsuModule(slotIndex, moduleInfo, moduleRevision, true)
-    {
-    }
-
-#if defined(EEZ_PLATFORM_STM32)
-	void onSpiIrq() {
-		auto dcpChannel = (DcpChannel *)Channel::getBySlotIndex(slotIndex);
-		dcpChannel->onSpiIrq();
-	}
-#endif
-};
-
-Module *DcpModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
-    return new DcpModule(slotIndex, this, moduleRevision);
-}
-
-
-static DcpModuleInfo g_dcpModuleInfo;
-ModuleInfo *g_moduleInfo = &g_dcpModuleInfo;
+static DcpModule g_dcpModule;
+Module *g_module = &g_dcpModule;
 
 bool isDacRampActive() {
 	for (int i = 0; i < CH_NUM; i++) {
 		auto &channel = Channel::get(i);
-		if (g_slots[channel.slotIndex]->moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+		if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCP405) {
 			if (((DcpChannel&)channel).dac.m_isRampActive) {
 				return true;
 			}
@@ -956,7 +953,7 @@ bool isDacRampActive() {
 void tickDacRamp(uint32_t tickCount) {
 	for (int i = 0; i < CH_NUM; i++) {
 		auto &channel = Channel::get(i);
-		if (g_slots[channel.slotIndex]->moduleInfo->moduleType == MODULE_TYPE_DCP405) {
+		if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCP405) {
 			if (((DcpChannel&)channel).dac.m_isRampActive) {
 				((DcpChannel&)channel).dac.tick(tickCount);
 			}

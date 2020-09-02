@@ -28,53 +28,41 @@ namespace eez {
 namespace psu {
 namespace debug {
 
-#define CHANNELS \
-    CHANNEL(1),  CHANNEL(2),  CHANNEL(3),  CHANNEL(4),  CHANNEL(5),  CHANNEL(6), \
-    CHANNEL(7),  CHANNEL(8),  CHANNEL(9),  CHANNEL(10), CHANNEL(11), CHANNEL(12),
-
-/*
-    CHANNEL(13), CHANNEL(14), CHANNEL(15), CHANNEL(16), CHANNEL(17), CHANNEL(18),\
-    CHANNEL(19), CHANNEL(20), CHANNEL(21), CHANNEL(22), CHANNEL(23), CHANNEL(24),\
-    CHANNEL(25), CHANNEL(26), CHANNEL(27), CHANNEL(28), CHANNEL(29), CHANNEL(30),\
-    CHANNEL(31), CHANNEL(32), CHANNEL(33), CHANNEL(34), CHANNEL(35), CHANNEL(36)
-*/
+#define CHANNELS CHANNEL(1),  CHANNEL(2),  CHANNEL(3),  CHANNEL(4),  CHANNEL(5),  CHANNEL(6)
 
 DebugCounterVariable g_adcCounter("ADC_COUNTER");
 DebugValueVariable g_encoderCounter("ENC_COUNTER", 100);
 
 #undef CHANNEL
-#define CHANNEL(N) DebugValueVariable("CH##N U_DAC")
+#define CHANNEL(N) DebugValueVariable("CH"#N" U_DAC")
 DebugValueVariable g_uDac[CH_MAX] = { CHANNELS };
 
 #undef CHANNEL
-#define CHANNEL(N) DebugValueVariable("CH##N U_MON")
+#define CHANNEL(N) DebugValueVariable("CH"#N" U_MON")
 DebugValueVariable g_uMon[CH_MAX] = { CHANNELS };
 
 #undef CHANNEL
-#define CHANNEL(N) DebugValueVariable("CH##N U_MON_DAC")
+#define CHANNEL(N) DebugValueVariable("CH"#N" U_MON_DAC")
 DebugValueVariable g_uMonDac[CH_MAX] = { CHANNELS };
 
 #undef CHANNEL
-#define CHANNEL(N) DebugValueVariable("CH##N I_DAC")
+#define CHANNEL(N) DebugValueVariable("CH"#N" I_DAC")
 DebugValueVariable g_iDac[CH_MAX] = { CHANNELS };
 
 #undef CHANNEL
-#define CHANNEL(N) DebugValueVariable("CH##N I_MON")
+#define CHANNEL(N) DebugValueVariable("CH"#N" I_MON")
 DebugValueVariable g_iMon[CH_MAX] = { CHANNELS };
 
 #undef CHANNEL
-#define CHANNEL(N) DebugValueVariable("CH##N I_MON_DAC")
+#define CHANNEL(N) DebugValueVariable("CH"#N" I_MON_DAC")
 DebugValueVariable g_iMonDac[CH_MAX] = { CHANNELS };
 
+#undef CHANNEL
+#define CHANNEL(N) &g_uDac[N-1], &g_uMon[N-1], &g_uMonDac[N-1], &g_iDac[N-1], &g_iMon[N-1], &g_iMonDac[N-1]
 DebugVariable *g_variables[] = { 
     &g_adcCounter,
     &g_encoderCounter,
-    &g_uDac[0], &g_uMon[0], &g_uMonDac[0], &g_iDac[0], &g_iMon[0], &g_iMonDac[0],
-    &g_uDac[1], &g_uMon[1], &g_uMonDac[1], &g_iDac[1], &g_iMon[1], &g_iMonDac[1],
-    &g_uDac[2], &g_uMon[2], &g_uMonDac[2], &g_iDac[2], &g_iMon[2], &g_iMonDac[2],
-    &g_uDac[3], &g_uMon[3], &g_uMonDac[3], &g_iDac[3], &g_iMon[3], &g_iMonDac[3],
-    &g_uDac[4], &g_uMon[4], &g_uMonDac[4], &g_iDac[4], &g_iMon[4], &g_iMonDac[4],
-    &g_uDac[5], &g_uMon[5], &g_uMonDac[5], &g_iDac[5], &g_iMon[5], &g_iMonDac[5],
+    CHANNELS
 };
 
 static uint32_t g_previousTickCount1sec;

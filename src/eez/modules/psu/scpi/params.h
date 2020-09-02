@@ -26,14 +26,28 @@ extern scpi_choice_def_t temp_sensor_choice[];
 extern scpi_choice_def_t internal_external_choice[];
 extern scpi_choice_def_t unitChoice[];
 
-int getSelectedChannelIndex(scpi_t *context);
-Channel *getSelectedChannel(scpi_t *context);
-Channel *param_channel(scpi_t *context, scpi_bool_t mandatory = FALSE, scpi_bool_t skip_channel_check = FALSE);
 static const int MAX_NUM_CH_IN_CH_LIST = 32;
-void param_channels(scpi_t *context, int &numChannels, uint8_t *channels, scpi_bool_t mandatory = FALSE, scpi_bool_t skip_channel_check = FALSE);
-void param_channels(scpi_t *context, scpi_parameter_t *parameter, int &numChannels, uint8_t *channels, scpi_bool_t skip_channel_check = FALSE);
-bool check_channel(scpi_t *context, int32_t channelIndex);
-Channel *set_channel_from_command_number(scpi_t *context);
+
+struct SlotAndSubchannelIndex {
+    uint8_t slotIndex;
+    uint8_t subchannelIndex;
+};
+
+struct SelectedChannels {
+    int numChannels;
+    SlotAndSubchannelIndex channels[MAX_NUM_CH_IN_CH_LIST];
+};
+
+void param_channels(scpi_t *context, SelectedChannels &selectedChannels, scpi_bool_t mandatory = FALSE, scpi_bool_t skip_channel_check = FALSE);
+void param_channels(scpi_t *context, scpi_parameter_t *parameter, SelectedChannels &selectedChannels, scpi_bool_t skip_channel_check = FALSE);
+
+bool getChannelFromParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex);
+bool getChannelFromCommandNumber(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex);
+
+Channel *getSelectedPowerChannel(scpi_t *context);
+Channel *getPowerChannelFromParam(scpi_t *context, scpi_bool_t mandatory = FALSE, scpi_bool_t skip_channel_check = FALSE);
+Channel *getPowerChannelFromCommandNumber(scpi_t *context);
+bool checkPowerChannel(scpi_t *context, int channelIndex);
 
 bool param_temp_sensor(scpi_t *context, int32_t &sensor);
 

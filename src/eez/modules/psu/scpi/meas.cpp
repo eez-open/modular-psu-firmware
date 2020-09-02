@@ -28,7 +28,7 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_measureScalarCurrentDcQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -41,7 +41,7 @@ scpi_result_t scpi_cmd_measureScalarCurrentDcQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_measureScalarPowerDcQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -54,7 +54,7 @@ scpi_result_t scpi_cmd_measureScalarPowerDcQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -67,18 +67,19 @@ scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_measureDigitalByteQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
-    if (!channel) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
-    if (!(channel->params.features & CH_FEATURE_DINPUT)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    uint8_t data;
+    int err;
+    if (!channel_dispatcher::getDigitalInputData(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, data, &err)) {
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultUInt8(context, channel->getDigitalInputData());
-
+    SCPI_ResultUInt8(context, data);
     return SCPI_RES_OK;
 }
 

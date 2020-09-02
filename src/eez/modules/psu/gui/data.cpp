@@ -733,7 +733,7 @@ void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
     if (channel.flags.trackingEnabled) {
         snprintf(text, count - 1, "\xA2 #%d", channel.channelIndex + 1);
     } else {
-        snprintf(text, count - 1, "%s #%d", g_slots[channel.slotIndex]->moduleInfo->moduleName, channel.channelIndex + 1);
+        snprintf(text, count - 1, "%s #%d", g_slots[channel.slotIndex]->moduleName, channel.channelIndex + 1);
     }
 }
 
@@ -780,11 +780,11 @@ void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count)
     auto &channel = Channel::get(value.getInt());
     auto &slot = *g_slots[channel.slotIndex];
     if (channel.flags.trackingEnabled) {
-        snprintf(text, count - 1, "\xA2 %s #%d: %dV/%dA, R%dB%d", slot.moduleInfo->moduleName, channel.channelIndex + 1, 
+        snprintf(text, count - 1, "\xA2 %s #%d: %dV/%dA, R%dB%d", slot.moduleName, channel.channelIndex + 1, 
             (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
             (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     } else {
-        snprintf(text, count - 1, "%s #%d: %dV/%dA, R%dB%d", slot.moduleInfo->moduleName, channel.channelIndex + 1, 
+        snprintf(text, count - 1, "%s #%d: %dV/%dA, R%dB%d", slot.moduleName, channel.channelIndex + 1, 
             (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
             (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     }
@@ -875,8 +875,8 @@ bool compare_SLOT_INFO_value(const Value &a, const Value &b) {
 void SLOT_INFO_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    if (slot.moduleInfo->moduleType != MODULE_TYPE_NONE) {
-        snprintf(text, count - 1, "%s R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+    if (slot.moduleType != MODULE_TYPE_NONE) {
+        snprintf(text, count - 1, "%s R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     } else {
         strncpy(text, "Not installed", count - 1);
     }
@@ -890,7 +890,7 @@ bool compare_SLOT_TITLE_value(const Value &a, const Value &b) {
 void SLOT_TITLE_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s R%dB%d", slot.moduleInfo->moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+    snprintf(text, count - 1, "%s R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     text[count - 1] = 0;
 }
 
@@ -1449,7 +1449,7 @@ void data_channels_view_mode_in_max(DataOperationEnum operation, Cursor cursor, 
 int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
     auto testResult = g_slots[slotIndex]->getTestResult();
     if (testResult == TEST_OK || testResult == TEST_SKIPPED) {
-        return g_slots[slotIndex]->moduleInfo->getSlotView(slotViewType, slotIndex, cursor);
+        return g_slots[slotIndex]->getSlotView(slotViewType, slotIndex, cursor);
     } else {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
             int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;        
@@ -1988,7 +1988,7 @@ void data_channel_long_title(DataOperationEnum operation, Cursor cursor, Value &
 void data_channel_info_brand(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto &slot = *g_slots[hmi::g_selectedSlotIndex];
-        value = slot.moduleInfo->moduleBrand;
+        value = slot.moduleBrand;
     }
 }
 
@@ -2752,14 +2752,14 @@ void data_channel_has_advanced_options(DataOperationEnum operation, Cursor curso
 
 void data_channel_has_firmware_update(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto modulType = g_slots[hmi::g_selectedSlotIndex]->moduleInfo->moduleType;
+        auto modulType = g_slots[hmi::g_selectedSlotIndex]->moduleType;
         value = modulType != MODULE_TYPE_DCP405 ? 1 : 0;
     }
 }
 
 void data_channel_has_error_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto modulType = g_slots[hmi::g_selectedSlotIndex]->moduleInfo->moduleType;
+        auto modulType = g_slots[hmi::g_selectedSlotIndex]->moduleType;
         if (modulType != MODULE_TYPE_DCP405) {
             value = 1;
         } else {
@@ -2775,7 +2775,7 @@ void data_channel_settings_page(DataOperationEnum operation, Cursor cursor, Valu
         if (slot.getTestResult() == TEST_OK) {
             value = PAGE_ID_CH_SETTINGS_OK;
         } else {
-            auto modulType = slot.moduleInfo->moduleType;
+            auto modulType = slot.moduleType;
             if (modulType != MODULE_TYPE_DCP405) {
             	if (!bp3c::flash_slave::g_bootloaderMode || (slot.firmwareMajorVersion == 0 && slot.firmwareMinorVersion == 0)) {
             		value = PAGE_ID_DIB_DCM220_CH_SETTINGS_ERROR;
@@ -2800,7 +2800,7 @@ void data_channel_rsense_installed(DataOperationEnum operation, Cursor cursor, V
     if (operation == DATA_OPERATION_GET) {
 		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
 		Channel &channel = Channel::get(iChannel);
-        auto modulType = g_slots[channel.slotIndex]->moduleInfo->moduleType;
+        auto modulType = g_slots[channel.slotIndex]->moduleType;
         if (modulType == MODULE_TYPE_DCP405) {
             value = 1;
         } else {
@@ -3470,7 +3470,7 @@ void data_profile_channel_u_set(DataOperationEnum operation, Cursor cursor, Valu
         if (selectedProfileLocation != -1 && (cursor >= 0 && cursor < CH_MAX)) {
             profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
             if (profile) {
-                value = MakeValue(g_slots[Channel::get(cursor).slotIndex]->moduleInfo->getProfileUSet((uint8_t *)profile->channels[cursor].parameters), UNIT_VOLT);
+                value = MakeValue(g_slots[Channel::get(cursor).slotIndex]->getProfileUSet((uint8_t *)profile->channels[cursor].parameters), UNIT_VOLT);
             }
         }
     }
@@ -3482,7 +3482,7 @@ void data_profile_channel_i_set(DataOperationEnum operation, Cursor cursor, Valu
         if (selectedProfileLocation != -1 && (cursor >= 0 && cursor < CH_MAX)) {
             profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
             if (profile) {
-                value = MakeValue(g_slots[Channel::get(cursor).slotIndex]->moduleInfo->getProfileISet((uint8_t *)profile->channels[cursor].parameters), UNIT_AMPER);
+                value = MakeValue(g_slots[Channel::get(cursor).slotIndex]->getProfileISet((uint8_t *)profile->channels[cursor].parameters), UNIT_AMPER);
             }
         }
     }
@@ -3494,7 +3494,7 @@ void data_profile_channel_output_state(DataOperationEnum operation, Cursor curso
         if (selectedProfileLocation != -1 && (cursor >= 0 && cursor < CH_MAX)) {
             profile::Parameters *profile = profile::getProfileParameters(selectedProfileLocation);
             if (profile) {
-                value = (int)g_slots[Channel::get(cursor).slotIndex]->moduleInfo->getProfileOutputEnable((uint8_t *)profile->channels[cursor].parameters);
+                value = (int)g_slots[Channel::get(cursor).slotIndex]->getProfileOutputEnable((uint8_t *)profile->channels[cursor].parameters);
             }
         }
     }

@@ -137,10 +137,13 @@ void boot() {
         uint16_t moduleRevision = value[1];
         bool firmwareInstalled = value[2] == 0xA5A5;
         
-        g_slots[slotIndex] = getModuleInfo(moduleType)->createModule(slotIndex, moduleRevision, firmwareInstalled);
+        g_slots[slotIndex] = getModule(moduleType)->createModule();
+        g_slots[slotIndex]->slotIndex = slotIndex;
+        g_slots[slotIndex]->moduleRevision = moduleRevision;
+        g_slots[slotIndex]->firmwareInstalled = firmwareInstalled;
         g_slots[slotIndex]->boot();
         
-        if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
             psu::persist_conf::loadModuleConf(slotIndex);
             psu::ontime::g_moduleCounters[slotIndex].init();
 
@@ -151,10 +154,10 @@ void boot() {
     if (numInstalledModules == 1) {
         g_isCol2Mode = true;
 
-        if (g_slots[0]->moduleInfo->moduleType == MODULE_TYPE_NONE) {
+        if (g_slots[0]->moduleType == MODULE_TYPE_NONE) {
             int i;
             for (i = 1; i < NUM_SLOTS; i++) {
-                if (g_slots[i]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+                if (g_slots[i]->moduleType != MODULE_TYPE_NONE) {
                     g_slotIndexes[0] = i - 1;
                     g_slotIndexes[1] = i;
                     break;
@@ -174,7 +177,7 @@ void boot() {
 
         int j = 0;
         for (int i = 0; i < NUM_SLOTS; i++) {
-            if (g_slots[i]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+            if (g_slots[i]->moduleType != MODULE_TYPE_NONE) {
                 g_slotIndexes[j++] = i;
             } else {
                 g_slotIndexes[2] = i;
@@ -388,7 +391,7 @@ void shutdown() {
     // save on-time counters
     persist_conf::writeTotalOnTime(ontime::g_mcuCounter.getType(), ontime::g_mcuCounter.getTotalTime());
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
             persist_conf::writeTotalOnTime(ontime::g_moduleCounters[slotIndex].getType(), ontime::g_moduleCounters[slotIndex].getTotalTime());
         }
     }

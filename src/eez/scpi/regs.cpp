@@ -170,54 +170,26 @@ void reg_set(scpi_t *context, scpi_psu_reg_name_t name, scpi_reg_val_t val) {
     case SCPI_PSU_REG_OPER_INST_ENABLE:
         psu_reg_update(context, SCPI_PSU_REG_OPER_INST_EVENT);
         break;
+    }
 
-    case SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1:
-        psu_reg_update_psu_reg(context, val, SCPI_PSU_REG_QUES_INST_COND, QUES_ISUM1);
-        break;
-    case SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1:
-        psu_reg_update_psu_reg(context, val, SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1,
-                               SCPI_PSU_REG_QUES_INST_EVENT, QUES_ISUM1);
-        break;
-    case SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1:
-        psu_reg_update(context, SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1);
-        break;
-
-    case SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1:
-        psu_reg_update_psu_reg(context, val, SCPI_PSU_REG_OPER_INST_COND, OPER_ISUM1);
-        break;
-    case SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1:
-        psu_reg_update_psu_reg(context, val, SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1,
-                               SCPI_PSU_REG_OPER_INST_EVENT, OPER_ISUM1);
-        break;
-    case SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1:
-        psu_reg_update(context, SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1);
-        break;
-
-    case SCPI_PSU_CH_REG_QUES_INST_ISUM_COND2:
-        psu_reg_update_psu_reg(context, val, SCPI_PSU_REG_QUES_INST_COND, QUES_ISUM2);
-        break;
-    case SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT2:
-        psu_reg_update_psu_reg(context, val, SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE2,
-                               SCPI_PSU_REG_QUES_INST_EVENT, QUES_ISUM2);
-        break;
-    case SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE2:
-        psu_reg_update(context, SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT2);
-        break;
-
-    case SCPI_PSU_CH_REG_OPER_INST_ISUM_COND2:
-        psu_reg_update_psu_reg(context, val, SCPI_PSU_REG_OPER_INST_COND, OPER_ISUM2);
-        break;
-    case SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT2:
-        psu_reg_update_psu_reg(context, val, SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2,
-                               SCPI_PSU_REG_OPER_INST_EVENT, OPER_ISUM2);
-        break;
-    case SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2:
-        psu_reg_update(context, SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT2);
-        break;
-
-    default:
-        /* nothing to do */
-        break;
+    if (name >= SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1 && name < SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1 + NUM_REG_INSTRUMENTS) {
+        int instrumentIndex = name - SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1;
+        psu_reg_update_psu_reg(context, val, SCPI_PSU_REG_QUES_INST_COND, QUES_ISUM_N(instrumentIndex));
+    } else if (name >= SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 && name < SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 + NUM_REG_INSTRUMENTS) {
+        int instrumentIndex = name - SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1;
+        psu_reg_update_psu_reg(context, val, (scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1 + instrumentIndex), SCPI_PSU_REG_QUES_INST_EVENT, QUES_ISUM_N(instrumentIndex));
+    } else if (name >= SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1 && name < SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1 + NUM_REG_INSTRUMENTS) {
+        int instrumentIndex = name - SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1;
+        psu_reg_update(context, (scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 + instrumentIndex));
+    } else if (name >= SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1 && name < SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1 + NUM_REG_INSTRUMENTS) {
+        int instrumentIndex = name - SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1;
+        psu_reg_update_psu_reg(context, val, SCPI_PSU_REG_OPER_INST_COND, OPER_ISUM_N(instrumentIndex));
+    } else if (name >= SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1 && name < SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1 + NUM_REG_INSTRUMENTS) {
+        int instrumentIndex = name - SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1;
+        psu_reg_update_psu_reg(context, val, (scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 + instrumentIndex), SCPI_PSU_REG_OPER_INST_EVENT, OPER_ISUM_N(instrumentIndex));
+    } else if (name >= SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 && name < SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 + NUM_REG_INSTRUMENTS) {
+        int instrumentIndex = name - SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1;
+        psu_reg_update(context, (scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1 + instrumentIndex));
     }
 }
 
@@ -272,14 +244,18 @@ void reg_set_ques_bit(int bit_mask, bool on) {
 }
 
 void reg_set_ques_isum_bit(scpi_t *context, int iChannel, int bit_mask, bool on) {
-    scpi_psu_reg_name_t reg_name = iChannel == 0 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_COND2;
+    if (iChannel >= NUM_REG_INSTRUMENTS) {
+        return;
+    }
+
+    scpi_psu_reg_name_t reg_name = (scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1 + iChannel);
     scpi_reg_val_t val = reg_get(context, reg_name);
     if (on) {
         if (!(val & bit_mask)) {
             reg_set(context, reg_name, val | bit_mask);
 
             // set event on raising condition
-            reg_name = iChannel == 0 ? SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 : SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT2;
+            reg_name = (scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 + iChannel);
             val = reg_get(context, reg_name);
             reg_set(context, reg_name, val | bit_mask);
         }
@@ -331,14 +307,18 @@ void reg_set_oper_bit(int bit_mask, bool on) {
 
 
 void reg_set_oper_isum_bit(scpi_t *context, int iChannel, int bit_mask, bool on) {
-    scpi_psu_reg_name_t reg_name = iChannel == 0 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_COND2;
+    if (iChannel >= NUM_REG_INSTRUMENTS) {
+        return;
+    }
+
+    scpi_psu_reg_name_t reg_name = (scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1 + iChannel);
     scpi_reg_val_t val = reg_get(context, reg_name);
     if (on) {
         if (!(val & bit_mask)) {
             reg_set(context, reg_name, val | bit_mask);
 
             // set event on raising condition
-            reg_name = iChannel == 0 ? SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1 : SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT2;
+            reg_name = (scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1 + iChannel);
             val = reg_get(context, reg_name);
             reg_set(context, reg_name, val | bit_mask);
         }

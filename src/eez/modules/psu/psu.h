@@ -57,8 +57,11 @@ namespace psu {
 
 struct Channel;
 
-struct PsuModuleInfo : public ModuleInfo {
-    PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrand, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration, uint32_t spiBaudRatePrescaler, bool spiCrcCalculationEnable, uint8_t numChannels);
+struct PsuModule : public Module {
+public:
+    TestResult getTestResult() override;
+
+	int getChannelSettingsPageId() override;
 
     void getProfileParameters(int channelIndex, uint8_t *buffer) override;
     void setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
@@ -67,13 +70,6 @@ struct PsuModuleInfo : public ModuleInfo {
     bool getProfileOutputEnable(uint8_t *buffer) override;
     float getProfileUSet(uint8_t *buffer) override;
     float getProfileISet(uint8_t *buffer) override;
-};
-
-struct PsuModule : public Module {
-public:
-    PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled);
-
-    TestResult getTestResult() override;
 };
 
 /// Channel binary flags stored in profile.

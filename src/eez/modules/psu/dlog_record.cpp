@@ -445,7 +445,7 @@ static void writeFileHeaderAndMetaFields() {
     for (uint8_t channelIndex = 0; channelIndex < CH_MAX; channelIndex++) {
         if (writeChannelFields[channelIndex]) {
             Channel &channel = Channel::get(channelIndex);
-            writeUint16FieldWithIndex(dlog_view::FIELD_ID_CHANNEL_MODULE_TYPE, g_slots[channel.slotIndex]->moduleInfo->moduleType, channelIndex + 1);
+            writeUint16FieldWithIndex(dlog_view::FIELD_ID_CHANNEL_MODULE_TYPE, g_slots[channel.slotIndex]->moduleType, channelIndex + 1);
             writeUint16FieldWithIndex(dlog_view::FIELD_ID_CHANNEL_MODULE_REVISION, g_slots[channel.slotIndex]->moduleRevision, channelIndex + 1);
         }
     }

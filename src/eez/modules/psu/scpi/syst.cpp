@@ -428,8 +428,8 @@ scpi_result_t scpi_cmd_systemSlotModelQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (module->moduleInfo->moduleType != MODULE_TYPE_NONE) {
-        SCPI_ResultText(context, module->moduleInfo->moduleName);
+    if (module->moduleType != MODULE_TYPE_NONE) {
+        SCPI_ResultText(context, module->moduleName);
     } else {
         SCPI_ResultText(context, "");
     }
@@ -443,7 +443,7 @@ scpi_result_t scpi_cmd_systemSlotVersionQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (module->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+    if (module->moduleType != MODULE_TYPE_NONE) {
         char text[50];
         sprintf(text, "R%dB%d", (int)(module->moduleRevision >> 8), (int)(module->moduleRevision & 0xFF));
         SCPI_ResultText(context, text);
@@ -460,7 +460,7 @@ scpi_result_t scpi_cmd_systemSlotFirmwareQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (module->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+    if (module->moduleType != MODULE_TYPE_NONE) {
         char text[50];
         sprintf(text, "%d.%d", (int)(module->firmwareMajorVersion), (int)(module->firmwareMinorVersion));
         SCPI_ResultText(context, text);
@@ -478,7 +478,7 @@ scpi_result_t scpi_cmd_systemChannelCountQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelInformationCurrentQ(scpi_t *context) {
-    Channel *channel = param_channel(context, false, true);
+    Channel *channel = getPowerChannelFromParam(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -489,7 +489,7 @@ scpi_result_t scpi_cmd_systemChannelInformationCurrentQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelInformationPowerQ(scpi_t *context) {
-    Channel *channel = param_channel(context, false, true);
+    Channel *channel = getPowerChannelFromParam(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -500,7 +500,7 @@ scpi_result_t scpi_cmd_systemChannelInformationPowerQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelOptionQ(scpi_t *context) {
-    Channel *channel = param_channel(context, false, true);
+    Channel *channel = getPowerChannelFromParam(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -551,7 +551,7 @@ scpi_result_t scpi_cmd_systemChannelOptionQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelInformationVoltageQ(scpi_t *context) {
-    Channel *channel = param_channel(context, false, true);
+    Channel *channel = getPowerChannelFromParam(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -562,7 +562,7 @@ scpi_result_t scpi_cmd_systemChannelInformationVoltageQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelInformationOntimeTotalQ(scpi_t *context) {
-    Channel *channel = param_channel(context, false, true);
+    Channel *channel = getPowerChannelFromParam(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -573,7 +573,7 @@ scpi_result_t scpi_cmd_systemChannelInformationOntimeTotalQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelInformationOntimeLastQ(scpi_t *context) {
-    Channel *channel = param_channel(context, false, true);
+    Channel *channel = getPowerChannelFromParam(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -584,18 +584,18 @@ scpi_result_t scpi_cmd_systemChannelInformationOntimeLastQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelModelQ(scpi_t *context) {
-    Channel *channel = param_channel(context, false, true);
+    Channel *channel = getPowerChannelFromParam(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultText(context, g_slots[channel->slotIndex]->moduleInfo->moduleName);
+    SCPI_ResultText(context, g_slots[channel->slotIndex]->moduleName);
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemChannelVersionQ(scpi_t *context) {
-    Channel *channel = param_channel(context, false, true);
+    Channel *channel = getPowerChannelFromParam(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -609,7 +609,7 @@ scpi_result_t scpi_cmd_systemChannelVersionQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelSnoQ(scpi_t *context) {
-    Channel *channel = param_channel(context, false, true);
+    Channel *channel = getPowerChannelFromParam(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -622,7 +622,7 @@ scpi_result_t scpi_cmd_systemChannelSnoQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelSlotQ(scpi_t *context) {
-    Channel *channel = param_channel(context, false, true);
+    Channel *channel = getPowerChannelFromParam(context, false, true);
     if (!channel) {
         return SCPI_RES_ERR;
     }

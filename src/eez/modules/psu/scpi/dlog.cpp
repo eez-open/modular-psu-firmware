@@ -58,7 +58,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltage(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -69,7 +69,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltage(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_senseDlogFunctionVoltageQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -90,7 +90,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrent(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -101,7 +101,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrent(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_senseDlogFunctionCurrentQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -122,7 +122,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionPower(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }
@@ -133,7 +133,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionPower(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_senseDlogFunctionPowerQ(scpi_t *context) {
-    Channel *channel = param_channel(context);
+    Channel *channel = getPowerChannelFromParam(context);
     if (!channel) {
         return SCPI_RES_ERR;
     }

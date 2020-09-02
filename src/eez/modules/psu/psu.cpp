@@ -202,12 +202,15 @@ bool g_adcMeasureAllFinished = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-PsuModuleInfo::PsuModuleInfo(uint16_t moduleType, const char *moduleName, const char *moduleBrend, uint16_t latestModuleRevision, FlashMethod flashMethod, uint32_t flashDuration, uint32_t spiBaudRatePrescaler, bool spiCrcCalculationEnable, uint8_t numChannels_)
-    : ModuleInfo(moduleType, moduleName, moduleBrend, latestModuleRevision, flashMethod, flashDuration, spiBaudRatePrescaler, spiCrcCalculationEnable, numChannels_)
-{
+TestResult PsuModule::getTestResult() {
+    return Channel::getBySlotIndex(slotIndex)->getTestResult();
 }
 
-void PsuModuleInfo::getProfileParameters(int channelIndex, uint8_t *buffer) {
+int PsuModule::getChannelSettingsPageId() {
+    return eez::gui::PAGE_ID_CH_SETTINGS;
+}
+
+void PsuModule::getProfileParameters(int channelIndex, uint8_t *buffer) {
     assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
 
     auto &channel = Channel::get(channelIndex);
@@ -273,7 +276,7 @@ void PsuModuleInfo::getProfileParameters(int channelIndex, uint8_t *buffer) {
     parameters->outputDelayDuration = channel.outputDelayDuration;
 }
 
-void PsuModuleInfo::setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
+void PsuModule::setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
     auto &channel = Channel::get(channelIndex);
     auto parameters = (ProfileParameters *)buffer;
 
@@ -352,7 +355,7 @@ void PsuModuleInfo::setProfileParameters(int channelIndex, uint8_t *buffer, bool
     channel.outputDelayDuration = parameters->outputDelayDuration;
 }
 
-bool PsuModuleInfo::writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) {
+bool PsuModule::writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) {
     auto parameters = (const ProfileParameters *)buffer;
 
     WRITE_PROPERTY("output_enabled", parameters->flags.output_enabled);
@@ -404,7 +407,7 @@ bool PsuModuleInfo::writeProfileProperties(profile::WriteContext &ctx, const uin
     return true;
 }
 
-bool PsuModuleInfo::readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) {
+bool PsuModule::readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) {
     auto parameters = (ProfileParameters *)buffer;
 
     READ_FLAG(output_enabled, parameters->flags.output_enabled);
@@ -456,30 +459,19 @@ bool PsuModuleInfo::readProfileProperties(profile::ReadContext &ctx, uint8_t *bu
     return false;
 }
 
-bool PsuModuleInfo::getProfileOutputEnable(uint8_t *buffer) {
+bool PsuModule::getProfileOutputEnable(uint8_t *buffer) {
     auto parameters = (ProfileParameters *)buffer;
     return parameters->flags.output_enabled;
 }
 
-float PsuModuleInfo::getProfileUSet(uint8_t *buffer) {
+float PsuModule::getProfileUSet(uint8_t *buffer) {
     auto parameters = (ProfileParameters *)buffer;
     return parameters->u_set;
 }
 
-float PsuModuleInfo::getProfileISet(uint8_t *buffer) {
+float PsuModule::getProfileISet(uint8_t *buffer) {
     auto parameters = (ProfileParameters *)buffer;
     return parameters->i_set;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-PsuModule::PsuModule(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled)
-    : Module(slotIndex, moduleInfo, moduleRevision, firmwareInstalled)
-{
-}
-
-TestResult PsuModule::getTestResult() {
-    return Channel::getBySlotIndex(slotIndex)->getTestResult();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -548,7 +540,7 @@ void onThreadMessage(uint8_t type, uint32_t param) {
 }
 
 bool measureAllAdcValuesOnChannel(int channelIndex) {
-	if (g_slots[Channel::get(channelIndex).slotIndex]->moduleInfo->moduleType == MODULE_TYPE_NONE) {
+	if (g_slots[Channel::get(channelIndex).slotIndex]->moduleType == MODULE_TYPE_NONE) {
 		return true;
 	}
 
@@ -628,18 +620,6 @@ bool psuReset() {
     // STAT:OPER:INST:ENAB 0
     reg_set(SCPI_PSU_REG_OPER_INST_ENABLE, 0);
 
-    // STAT:OPER:INST:ISUM[:EVEN] 0
-    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1, 0);
-    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT2, 0);
-
-    // STAT:OPER:INST:ISUM:COND 0
-    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1, 0);
-    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_COND2, 0);
-
-    // STAT:OPER:INST:ISUM:ENAB 0
-    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1, 0);
-    reg_set(SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE2, 0);
-
     // STAT:QUES[:EVEN] 0
     scpi_reg_set(SCPI_REG_QUES, 0);
 
@@ -658,17 +638,25 @@ bool psuReset() {
     // STAT:QUES:INST:ENAB 0
     reg_set(SCPI_PSU_REG_QUES_INST_ENABLE, 0);
 
-    // STAT:QUES:INST:ISUM[:EVEN] 0
-    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1, 0);
-    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT2, 0);
+    for (int i = 0; i < NUM_REG_INSTRUMENTS; i++) {
+        // STAT:QUES:INST:ISUM[:EVEN] 0
+        reg_set((scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 + i), 0);
 
-    // STAT:QUES:INST:ISUM:COND 0
-    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1, 0);
-    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_COND2, 0);
+        // STAT:QUES:INST:ISUM:COND 0
+        reg_set((scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1 + i), 0);
 
-    // STAT:OPER:INST:ISUM:ENAB 0
-    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1, 0);
-    reg_set(SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE2, 0);
+        // STAT:OPER:INST:ISUM:ENAB 0
+        reg_set((scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_QUES_INST_ISUM_ENABLE1 + i), 0);
+
+        // STAT:OPER:INST:ISUM:COND 0
+        reg_set((scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_OPER_INST_ISUM_COND1 + i), 0);
+
+        // STAT:OPER:INST:ISUM[:EVEN] 0
+        reg_set((scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_OPER_INST_ISUM_EVENT1 + i), 0);
+
+        // STAT:OPER:INST:ISUM:ENAB 0
+        reg_set((scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_OPER_INST_ISUM_ENABLE1 + i), 0);
+    }
 
     eez::scpi::resetContext();
 
@@ -771,7 +759,7 @@ bool powerUp() {
 
     ontime::g_mcuCounter.start();
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
             ontime::g_moduleCounters[slotIndex].start();
         }
     }
@@ -842,7 +830,7 @@ void powerDown() {
 
     ontime::g_mcuCounter.stop();
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (g_slots[slotIndex]->moduleInfo->moduleType != MODULE_TYPE_NONE) {
+        if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
             ontime::g_moduleCounters[slotIndex].stop();
         }
     }

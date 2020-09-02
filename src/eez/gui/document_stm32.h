@@ -419,26 +419,33 @@ enum DataEnum {
     DATA_ID_DIB_MIO168_OUTPUT_STATE = 417,
     DATA_ID_DIB_MIO168_ANALOG_INPUTS = 418,
     DATA_ID_DIB_MIO168_ANALOG_INPUT_VALUE = 419,
-    DATA_ID_DIB_SMX46_OUTPUTS = 420,
-    DATA_ID_DIB_DCM220_SLOT_DEF_2CH_VIEW = 421,
-    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_VIEW = 422,
-    DATA_ID_DIB_DCM220_SLOT_MIN_2CH_VIEW = 423,
-    DATA_ID_DIB_DCM220_SLOT_MICRO_2CH_VIEW = 424,
-    DATA_ID_DIB_DCM220_SLOT_2CH_CH1_INDEX = 425,
-    DATA_ID_DIB_DCM220_SLOT_2CH_CH2_INDEX = 426,
-    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_MIN_VIEW = 427,
-    DATA_ID_DIB_DCM224_PWM_FREQUENCY = 428,
-    DATA_ID_DIB_DCM224_PWM_DUTY = 429,
-    DATA_ID_DIB_DCM224_COUNTERPHASE_FREQUENCY = 430,
-    DATA_ID_DIB_DCM224_COUNTERPHASE_DITHERING = 431,
-    DATA_ID_DIB_DCM224_PWM_ENABLED = 432,
-    DATA_ID_DIB_DCM224_SLOT_DEF_2CH_VIEW = 433,
-    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_VIEW = 434,
-    DATA_ID_DIB_DCM224_SLOT_MIN_2CH_VIEW = 435,
-    DATA_ID_DIB_DCM224_SLOT_MICRO_2CH_VIEW = 436,
-    DATA_ID_DIB_DCM224_SLOT_2CH_CH1_INDEX = 437,
-    DATA_ID_DIB_DCM224_SLOT_2CH_CH2_INDEX = 438,
-    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_VIEW = 439
+    DATA_ID_DIB_SMX46_ROUTES = 420,
+    DATA_ID_DIB_SMX46_ROUTE_OPEN = 421,
+    DATA_ID_DIB_SMX46_X_LABELS = 422,
+    DATA_ID_DIB_SMX46_X_LABEL = 423,
+    DATA_ID_DIB_SMX46_Y_LABELS = 424,
+    DATA_ID_DIB_SMX46_Y_LABEL = 425,
+    DATA_ID_DIB_SMX46_DAC1 = 426,
+    DATA_ID_DIB_SMX46_DAC2 = 427,
+    DATA_ID_DIB_DCM220_SLOT_DEF_2CH_VIEW = 428,
+    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_VIEW = 429,
+    DATA_ID_DIB_DCM220_SLOT_MIN_2CH_VIEW = 430,
+    DATA_ID_DIB_DCM220_SLOT_MICRO_2CH_VIEW = 431,
+    DATA_ID_DIB_DCM220_SLOT_2CH_CH1_INDEX = 432,
+    DATA_ID_DIB_DCM220_SLOT_2CH_CH2_INDEX = 433,
+    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_MIN_VIEW = 434,
+    DATA_ID_DIB_DCM224_PWM_FREQUENCY = 435,
+    DATA_ID_DIB_DCM224_PWM_DUTY = 436,
+    DATA_ID_DIB_DCM224_COUNTERPHASE_FREQUENCY = 437,
+    DATA_ID_DIB_DCM224_COUNTERPHASE_DITHERING = 438,
+    DATA_ID_DIB_DCM224_PWM_ENABLED = 439,
+    DATA_ID_DIB_DCM224_SLOT_DEF_2CH_VIEW = 440,
+    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_VIEW = 441,
+    DATA_ID_DIB_DCM224_SLOT_MIN_2CH_VIEW = 442,
+    DATA_ID_DIB_DCM224_SLOT_MICRO_2CH_VIEW = 443,
+    DATA_ID_DIB_DCM224_SLOT_2CH_CH1_INDEX = 444,
+    DATA_ID_DIB_DCM224_SLOT_2CH_CH2_INDEX = 445,
+    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_VIEW = 446
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -861,7 +868,14 @@ void data_dib_mio168_output_no(DataOperationEnum operation, Cursor cursor, Value
 void data_dib_mio168_output_state(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_analog_inputs(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_analog_input_value(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_dib_smx46_outputs(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_smx46_routes(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_smx46_route_open(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_smx46_x_labels(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_smx46_x_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_smx46_y_labels(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_smx46_y_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_dcm220_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_dcm220_slot_max_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_dcm220_slot_min_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -1115,8 +1129,9 @@ enum ActionsEnum {
     ACTION_ID_TOGGLE_DISPLAY_TEST_COLOR_INDEX = 225,
     ACTION_ID_SHOW_DISPLAY_TEST_PAGE = 226,
     ACTION_ID_DIB_MIO168_TOGGLE_OUTPUT_STATE = 227,
-    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_COUNTERPHASE_DITHERING = 228,
-    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_PWM_ENABLED = 229
+    ACTION_ID_DIB_SMX46_TOGGLE_ROUTE = 228,
+    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_COUNTERPHASE_DITHERING = 229,
+    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_PWM_ENABLED = 230
 };
 
 void action_channel_toggle_output();
@@ -1346,6 +1361,7 @@ void action_select_usb_device_class();
 void action_toggle_display_test_color_index();
 void action_show_display_test_page();
 void action_dib_mio168_toggle_output_state();
+void action_dib_smx46_toggle_route();
 void action_dib_dcm224_ch_settings_adv_toggle_counterphase_dithering();
 void action_dib_dcm224_ch_settings_adv_toggle_pwm_enabled();
 
@@ -1650,36 +1666,39 @@ enum StylesEnum {
     STYLE_ID_INLINE262 = 262,
     STYLE_ID_INLINE263 = 263,
     STYLE_ID_INLINE264 = 264,
-    STYLE_ID_MON_VALUE_48_RIGHT = 265,
+    STYLE_ID_INLINE265 = 265,
     STYLE_ID_INLINE266 = 266,
-    STYLE_ID_MON_VALUE_20_LEFT = 267,
-    STYLE_ID_BAR_GRAPH_U_DEFAULT = 268,
-    STYLE_ID_BAR_GRAPH_TEXT = 269,
-    STYLE_ID_BAR_GRAPH_SET_LINE = 270,
-    STYLE_ID_BAR_GRAPH_LIMIT_LINE = 271,
-    STYLE_ID_BAR_GRAPH_I_DEFAULT = 272,
-    STYLE_ID_INLINE273 = 273,
-    STYLE_ID_INLINE274 = 274,
-    STYLE_ID_TRIGGER_BUTTON_24 = 275,
+    STYLE_ID_INLINE267 = 267,
+    STYLE_ID_MON_VALUE_48_RIGHT = 268,
+    STYLE_ID_INLINE269 = 269,
+    STYLE_ID_MON_VALUE_20_LEFT = 270,
+    STYLE_ID_BAR_GRAPH_U_DEFAULT = 271,
+    STYLE_ID_BAR_GRAPH_TEXT = 272,
+    STYLE_ID_BAR_GRAPH_SET_LINE = 273,
+    STYLE_ID_BAR_GRAPH_LIMIT_LINE = 274,
+    STYLE_ID_BAR_GRAPH_I_DEFAULT = 275,
     STYLE_ID_INLINE276 = 276,
     STYLE_ID_INLINE277 = 277,
-    STYLE_ID_CHANNEL_OFF_BUTTON_38 = 278,
-    STYLE_ID_TRIGGER_BUTTON_14 = 279,
-    STYLE_ID_INST_SELECTED = 280,
-    STYLE_ID_MON_VALUE_38_RIGHT = 281,
-    STYLE_ID_INLINE282 = 282,
-    STYLE_ID_CH_PROT_OFF = 283,
-    STYLE_ID_CH_PROT_ON = 284,
-    STYLE_ID_CH_PROT_TRIPPED = 285,
-    STYLE_ID_INLINE286 = 286,
-    STYLE_ID_MON_VALUE_20_RIGHT = 287,
-    STYLE_ID_MON_VALUE_14_LEFT = 288,
-    STYLE_ID_MON_VALUE_14_CENTER = 289,
-    STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED = 290,
-    STYLE_ID_CHANNEL_OFF_BUTTON_20 = 291,
-    STYLE_ID_MON_VALUE_14_RIGHT = 292,
-    STYLE_ID_CHANNEL_OFF_BUTTON_14 = 293,
-    STYLE_ID_MON_VALUE_24_RIGHT = 294
+    STYLE_ID_TRIGGER_BUTTON_24 = 278,
+    STYLE_ID_INLINE279 = 279,
+    STYLE_ID_INLINE280 = 280,
+    STYLE_ID_CHANNEL_OFF_BUTTON_38 = 281,
+    STYLE_ID_TRIGGER_BUTTON_14 = 282,
+    STYLE_ID_INST_SELECTED = 283,
+    STYLE_ID_MON_VALUE_38_RIGHT = 284,
+    STYLE_ID_INLINE285 = 285,
+    STYLE_ID_CH_PROT_OFF = 286,
+    STYLE_ID_CH_PROT_ON = 287,
+    STYLE_ID_CH_PROT_TRIPPED = 288,
+    STYLE_ID_INLINE289 = 289,
+    STYLE_ID_MON_VALUE_20_RIGHT = 290,
+    STYLE_ID_MON_VALUE_14_LEFT = 291,
+    STYLE_ID_MON_VALUE_14_CENTER = 292,
+    STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED = 293,
+    STYLE_ID_CHANNEL_OFF_BUTTON_20 = 294,
+    STYLE_ID_MON_VALUE_14_RIGHT = 295,
+    STYLE_ID_CHANNEL_OFF_BUTTON_14 = 296,
+    STYLE_ID_MON_VALUE_24_RIGHT = 297
 };
 
 enum ThemesEnum {
@@ -1983,4 +2002,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH_OFF = 231
 };
 
-extern const uint8_t assets[321880];
+extern const uint8_t assets[322381];

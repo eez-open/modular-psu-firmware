@@ -50,7 +50,16 @@ void init(scpi_t &scpi_context, scpi_psu_t &scpi_psu_context, scpi_interface_t *
               getSerialNumber(), MCU_FIRMWARE, input_buffer, input_buffer_length,
               error_queue_data, error_queue_size);
 
-    scpi_psu_context.selectedChannels = 1 << 0; // first channel is selected by default
+
+    if (CH_NUM > 0) {
+        auto &channel = Channel::get(0);
+        scpi_psu_context.selectedChannels.numChannels = 1;
+        scpi_psu_context.selectedChannels.channels[0].slotIndex = channel.slotIndex;
+        scpi_psu_context.selectedChannels.channels[0].subchannelIndex = channel.subchannelIndex;
+    } else {
+        scpi_psu_context.selectedChannels.numChannels = 0;
+    }
+
     scpi_psu_context.currentDirectory[0] = 0;
     scpi_psu_context.isBufferOverrun = false;
     scpi_psu_context.bufferOverrunTime = 0;

@@ -36,40 +36,7 @@
 namespace eez {
 namespace dib_prel6 {
 
-struct Prel6ModuleInfo : public ModuleInfo {
-public:
-    Prel6ModuleInfo() 
-        : ModuleInfo(MODULE_TYPE_DIB_PREL6, "PREL6", "Envox", MODULE_REVISION_R1B2, FLASH_METHOD_STM32_BOOTLOADER_UART, 0, 
-#if defined(EEZ_PLATFORM_STM32)
-            SPI_BAUDRATEPRESCALER_64,
-            true,
-#else
-            0,
-            false,
-#endif
-            0
-        )
-    {}
-    
-    Module *createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) override;
-
-    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
-        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
-        }
-        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
-            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF_2COL : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
-        }
-        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
-            return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MAX;
-        }
-        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
-            return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MIN;
-        }
-        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-        return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MICRO;
-    }
-};
+static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
 
 #define BUFFER_SIZE 16
 
@@ -82,9 +49,26 @@ public:
     uint8_t output[BUFFER_SIZE];
     bool spiReady;
 
-    Prel6Module(uint8_t slotIndex, ModuleInfo *moduleInfo, uint16_t moduleRevision, bool firmwareInstalled)
-        : Module(slotIndex, moduleInfo, moduleRevision, firmwareInstalled)
-    {
+    Prel6Module() {
+        moduleType = MODULE_TYPE_DIB_PREL6;
+        moduleName = "PREL6";
+        moduleBrand = "Envox";
+        latestModuleRevision = MODULE_REVISION_R1B2;
+        flashMethod = FLASH_METHOD_STM32_BOOTLOADER_UART;
+        flashDuration = 0;
+#if defined(EEZ_PLATFORM_STM32)        
+        spiBaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+        spiCrcCalculationEnable = true;
+#else
+        spiBaudRatePrescaler = 0;
+        spiCrcCalculationEnable = false;
+#endif
+        numPowerChannels = 0;
+        numOtherChannels = 0;
+    }
+
+    Module *createModule() override {
+        return new Prel6Module();
     }
 
     TestResult getTestResult() override {
@@ -153,14 +137,27 @@ public:
     void onPowerDown() override {
         synchronized = false;
     }
+
+    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
+            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
+        }
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF_2COL : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
+        }
+        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
+            return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MAX;
+        }
+        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
+            return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MIN;
+        }
+        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
+        return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MICRO;
+    }
 };
 
-Module *Prel6ModuleInfo::createModule(uint8_t slotIndex, uint16_t moduleRevision, bool firmwareInstalled) {
-    return new Prel6Module(slotIndex, this, moduleRevision, firmwareInstalled);
-}
-
-static Prel6ModuleInfo g_prel6ModuleInfo;
-ModuleInfo *g_moduleInfo = &g_prel6ModuleInfo;
+static Prel6Module g_prel6Module;
+Module *g_module = &g_prel6Module;
 
 } // namespace dib_prel6
 } // namespace eez
