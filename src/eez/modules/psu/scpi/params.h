@@ -18,6 +18,8 @@
  
 #pragma once
 
+#include <eez/modules/psu/psu.h>
+
 namespace eez {
 namespace psu {
 namespace scpi {
@@ -26,23 +28,13 @@ extern scpi_choice_def_t temp_sensor_choice[];
 extern scpi_choice_def_t internal_external_choice[];
 extern scpi_choice_def_t unitChoice[];
 
-static const int MAX_NUM_CH_IN_CH_LIST = 32;
-
-struct SlotAndSubchannelIndex {
-    uint8_t slotIndex;
-    uint8_t subchannelIndex;
-};
-
-struct SelectedChannels {
-    int numChannels;
-    SlotAndSubchannelIndex channels[MAX_NUM_CH_IN_CH_LIST];
-};
-
-void param_channels(scpi_t *context, SelectedChannels &selectedChannels, scpi_bool_t mandatory = FALSE, scpi_bool_t skip_channel_check = FALSE);
-void param_channels(scpi_t *context, scpi_parameter_t *parameter, SelectedChannels &selectedChannels, scpi_bool_t skip_channel_check = FALSE);
+void param_channels(scpi_t *context, ChannelList &channelList, scpi_bool_t mandatory = FALSE, scpi_bool_t skip_channel_check = FALSE);
+void param_channels(scpi_t *context, scpi_parameter_t *parameter, ChannelList &channelList, scpi_bool_t skip_channel_check = FALSE);
 
 bool getChannelFromParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex);
 bool getChannelFromCommandNumber(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex);
+
+bool absoluteChannelIndexToSlotAndSubchannelIndex(int absoluteChannelIndex, SlotAndSubchannelIndex &slotAndSubchannelIndex);
 
 Channel *getSelectedPowerChannel(scpi_t *context);
 Channel *getPowerChannelFromParam(scpi_t *context, scpi_bool_t mandatory = FALSE, scpi_bool_t skip_channel_check = FALSE);

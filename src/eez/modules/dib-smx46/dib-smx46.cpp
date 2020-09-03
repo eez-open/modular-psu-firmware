@@ -35,6 +35,8 @@
 #include "eez/modules/bp3c/comm.h"
 #include "eez/modules/psu/gui/edit_mode.h"
 
+#include "scpi/scpi.h"
+
 #include "./dib-smx46.h"
 
 using namespace eez::psu;
@@ -60,6 +62,7 @@ struct FromMasterToSlave {
     uint32_t routes;
     float dac1;
     float dac2;
+    uint8_t relayOn;
 };
 
 struct FromSlaveToMaster {
@@ -81,6 +84,8 @@ public:
 
     float dac1 = 0.0f;
     float dac2 = 0.0f;
+
+    bool relayOn = false;
 
     Smx46Module() {
         moduleType = MODULE_TYPE_DIB_SMX46;
@@ -145,11 +150,8 @@ public:
 
 #if defined(EEZ_PLATFORM_STM32)
         if (spiReady) {
-            auto data = (FromMasterToSlave *)output;
-            if (data->routes != routes || data->dac1 != dac1 || data->dac2 != dac2) {
-                spiReady = false;
-                transfer();
-            }
+            transfer();
+            spiReady = false;
         }
 #endif
     }
@@ -165,6 +167,7 @@ public:
         data->routes = routes;
         data->dac1 = dac1;
         data->dac2 = dac2;
+        data->relayOn = relayOn ? 1 : 0;
 
         auto status = bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE);
         if (status == bp3c::comm::TRANSFER_STATUS_OK) {
@@ -203,6 +206,132 @@ public:
         }
         assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
         return PAGE_ID_DIB_SMX46_SLOT_VIEW_MICRO;
+    }
+
+    int getNumSubchannels() override {
+        return 2 + 4 * 6;
+    }
+
+    bool isValidSubchannelIndex(int subchannelIndex) override {
+        subchannelIndex++;
+        return subchannelIndex == 1 || subchannelIndex == 2 || subchannelIndex == 3 ||
+            (subchannelIndex >= 11 && subchannelIndex <= 16) ||
+            (subchannelIndex >= 21 && subchannelIndex <= 26) ||
+            (subchannelIndex >= 31 && subchannelIndex <= 36) ||
+            (subchannelIndex >= 41 && subchannelIndex <= 46);
+    }
+
+    int getSubchannelIndexFromRelativeChannelIndex(int relativeChannelIndex) override {
+        relativeChannelIndex++;
+        int subchannelIndex;
+        if (relativeChannelIndex >= 21) {
+            subchannelIndex = 41 + (relativeChannelIndex - 21);
+        }
+        if (relativeChannelIndex >= 15) {
+            subchannelIndex = 31 + (relativeChannelIndex - 15);
+        }
+        if (relativeChannelIndex >= 9) {
+            subchannelIndex = 21 + (relativeChannelIndex - 9);
+        }
+        if (relativeChannelIndex >= 3) {
+            subchannelIndex = 11 + (relativeChannelIndex - 3);
+        } else {
+            subchannelIndex = relativeChannelIndex;
+        }
+        return subchannelIndex - 1;
+    }
+
+    bool routeOpen(ChannelList channelList, int *err) override {
+        uint32_t tempRoutes = routes;
+        bool tempRelayOn = relayOn;
+        for (int i = 0; i < channelList.numChannels; i++) {
+            int subchannelIndex = channelList.channels[i].subchannelIndex + 1;
+            if (subchannelIndex == 3) {
+                tempRelayOn = true;
+                continue;
+            }
+            if (subchannelIndex < 11) {
+                if (*err) {
+                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                }
+                return false;
+            }
+            int x = subchannelIndex % 10 - 1;
+            int y = subchannelIndex / 10 - 1;
+            tempRoutes |= (1 << (y * NUM_COLUMNS + x));
+        }
+        routes = tempRoutes;
+        relayOn = tempRelayOn;
+        return true;
+    }
+    
+    bool routeClose(ChannelList channelList, int *err) override {
+        uint32_t tempRoutes = routes;
+        bool tempRelayOn = relayOn;
+        for (int i = 0; i < channelList.numChannels; i++) {
+            int subchannelIndex = channelList.channels[i].subchannelIndex + 1;
+            if (subchannelIndex == 3) {
+                tempRelayOn = false;
+                continue;
+            }
+            if (subchannelIndex < 11) {
+                if (*err) {
+                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                }
+                return false;
+            }
+            int x = subchannelIndex % 10 - 1;
+            int y = subchannelIndex / 10 - 1;
+            tempRoutes &= ~(1 << (y * NUM_COLUMNS + x));
+        }
+        routes = tempRoutes;
+        relayOn = tempRelayOn;
+        return true;
+    }
+
+    bool getVoltage(int subchannelIndex, float &value, int *err) {
+        ++subchannelIndex;
+
+        if (subchannelIndex != 1 && subchannelIndex != 2) {
+            if (*err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+
+        if (subchannelIndex == 1) {
+            value = dac1;
+        } else {
+            value = dac2;
+        }
+
+        return true;
+    }
+
+    bool setVoltage(int subchannelIndex, float value, int *err) {
+        ++subchannelIndex;
+
+        if (subchannelIndex != 1 && subchannelIndex != 2) {
+            if (*err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+
+        if (value < MIN_DAC || value > MAX_DAC) {
+            if (*err) {
+                *err = SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
+            }
+            return false;
+        }
+
+        if (subchannelIndex == 1) {
+            dac1 = value;
+        } else {
+            dac2 = value;
+        }
+
+        return true;
     }
 
     bool isRouteOpen(int x, int y) {
@@ -304,7 +433,7 @@ void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &valu
 
 void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_SMX46_DAC1;
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_SMX46_DAC2;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -333,6 +462,12 @@ void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &valu
     }
 }
 
+void data_dib_smx46_relay_on(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = ((Smx46Module *)g_slots[cursor])->relayOn ? 1 : 0;
+    }
+}
+
 void action_dib_smx46_toggle_route() {
     int cursor = getFoundWidgetAtDown().cursor;
     int slotIndex = cursor / (NUM_COLUMNS * NUM_ROWS);
@@ -340,6 +475,12 @@ void action_dib_smx46_toggle_route() {
     int x = i % NUM_COLUMNS;
     int y = i / NUM_COLUMNS;
     ((Smx46Module *)g_slots[slotIndex])->toggleRoute(x, y);
+}
+
+void action_dib_smx46_toggle_relay() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    Smx46Module *module = (Smx46Module *)g_slots[cursor];
+    module->relayOn = !module->relayOn;
 }
 
 } // gui

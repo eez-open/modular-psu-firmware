@@ -427,25 +427,26 @@ enum DataEnum {
     DATA_ID_DIB_SMX46_Y_LABEL = 425,
     DATA_ID_DIB_SMX46_DAC1 = 426,
     DATA_ID_DIB_SMX46_DAC2 = 427,
-    DATA_ID_DIB_DCM220_SLOT_DEF_2CH_VIEW = 428,
-    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_VIEW = 429,
-    DATA_ID_DIB_DCM220_SLOT_MIN_2CH_VIEW = 430,
-    DATA_ID_DIB_DCM220_SLOT_MICRO_2CH_VIEW = 431,
-    DATA_ID_DIB_DCM220_SLOT_2CH_CH1_INDEX = 432,
-    DATA_ID_DIB_DCM220_SLOT_2CH_CH2_INDEX = 433,
-    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_MIN_VIEW = 434,
-    DATA_ID_DIB_DCM224_PWM_FREQUENCY = 435,
-    DATA_ID_DIB_DCM224_PWM_DUTY = 436,
-    DATA_ID_DIB_DCM224_COUNTERPHASE_FREQUENCY = 437,
-    DATA_ID_DIB_DCM224_COUNTERPHASE_DITHERING = 438,
-    DATA_ID_DIB_DCM224_PWM_ENABLED = 439,
-    DATA_ID_DIB_DCM224_SLOT_DEF_2CH_VIEW = 440,
-    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_VIEW = 441,
-    DATA_ID_DIB_DCM224_SLOT_MIN_2CH_VIEW = 442,
-    DATA_ID_DIB_DCM224_SLOT_MICRO_2CH_VIEW = 443,
-    DATA_ID_DIB_DCM224_SLOT_2CH_CH1_INDEX = 444,
-    DATA_ID_DIB_DCM224_SLOT_2CH_CH2_INDEX = 445,
-    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_VIEW = 446
+    DATA_ID_DIB_SMX46_RELAY_ON = 428,
+    DATA_ID_DIB_DCM220_SLOT_DEF_2CH_VIEW = 429,
+    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_VIEW = 430,
+    DATA_ID_DIB_DCM220_SLOT_MIN_2CH_VIEW = 431,
+    DATA_ID_DIB_DCM220_SLOT_MICRO_2CH_VIEW = 432,
+    DATA_ID_DIB_DCM220_SLOT_2CH_CH1_INDEX = 433,
+    DATA_ID_DIB_DCM220_SLOT_2CH_CH2_INDEX = 434,
+    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_MIN_VIEW = 435,
+    DATA_ID_DIB_DCM224_PWM_FREQUENCY = 436,
+    DATA_ID_DIB_DCM224_PWM_DUTY = 437,
+    DATA_ID_DIB_DCM224_COUNTERPHASE_FREQUENCY = 438,
+    DATA_ID_DIB_DCM224_COUNTERPHASE_DITHERING = 439,
+    DATA_ID_DIB_DCM224_PWM_ENABLED = 440,
+    DATA_ID_DIB_DCM224_SLOT_DEF_2CH_VIEW = 441,
+    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_VIEW = 442,
+    DATA_ID_DIB_DCM224_SLOT_MIN_2CH_VIEW = 443,
+    DATA_ID_DIB_DCM224_SLOT_MICRO_2CH_VIEW = 444,
+    DATA_ID_DIB_DCM224_SLOT_2CH_CH1_INDEX = 445,
+    DATA_ID_DIB_DCM224_SLOT_2CH_CH2_INDEX = 446,
+    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_VIEW = 447
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -876,6 +877,7 @@ void data_dib_smx46_y_labels(DataOperationEnum operation, Cursor cursor, Value &
 void data_dib_smx46_y_label(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_smx46_relay_on(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_dcm220_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_dcm220_slot_max_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_dcm220_slot_min_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -1130,8 +1132,9 @@ enum ActionsEnum {
     ACTION_ID_SHOW_DISPLAY_TEST_PAGE = 226,
     ACTION_ID_DIB_MIO168_TOGGLE_OUTPUT_STATE = 227,
     ACTION_ID_DIB_SMX46_TOGGLE_ROUTE = 228,
-    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_COUNTERPHASE_DITHERING = 229,
-    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_PWM_ENABLED = 230
+    ACTION_ID_DIB_SMX46_TOGGLE_RELAY = 229,
+    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_COUNTERPHASE_DITHERING = 230,
+    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_PWM_ENABLED = 231
 };
 
 void action_channel_toggle_output();
@@ -1362,6 +1365,7 @@ void action_toggle_display_test_color_index();
 void action_show_display_test_page();
 void action_dib_mio168_toggle_output_state();
 void action_dib_smx46_toggle_route();
+void action_dib_smx46_toggle_relay();
 void action_dib_dcm224_ch_settings_adv_toggle_counterphase_dithering();
 void action_dib_dcm224_ch_settings_adv_toggle_pwm_enabled();
 
@@ -2002,4 +2006,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH_OFF = 231
 };
 
-extern const uint8_t assets[322381];
+extern const uint8_t assets[322677];

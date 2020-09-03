@@ -64,6 +64,18 @@ enum SourceMode {
     SOURCE_MODE_VOLTAGE
 };
 
+static const int MAX_NUM_CH_IN_CH_LIST = 32;
+
+struct SlotAndSubchannelIndex {
+    uint8_t slotIndex;
+    uint8_t subchannelIndex;
+};
+
+struct ChannelList {
+    int numChannels;
+    SlotAndSubchannelIndex channels[MAX_NUM_CH_IN_CH_LIST];
+};
+
 struct Module {
     uint16_t moduleType;
     const char *moduleName;
@@ -125,6 +137,12 @@ struct Module {
 
     virtual bool getVoltageRange(int subchannelIndex, int8_t &range, int *err);
     virtual bool setVoltageRange(int subchannelIndex, int8_t range, int *err);
+
+    virtual bool routeOpen(ChannelList channelList, int *err);
+    virtual bool routeClose(ChannelList channelList, int *err);
+    
+    virtual bool getVoltage(int subchannelIndex, float &value, int *err);
+    virtual bool setVoltage(int subchannelIndex, float value, int *err);
 };
 
 static const int NUM_SLOTS = 3;

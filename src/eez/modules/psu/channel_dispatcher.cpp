@@ -2058,6 +2058,44 @@ bool setVoltageRange(int slotIndex, int subchannelIndex, int8_t range, int *err)
     return g_slots[slotIndex]->setVoltageRange(subchannelIndex, range, err);
 }
 
+bool routeOpen(ChannelList channelList, int *err) {
+    int slotIndex = channelList.channels[0].slotIndex;
+
+    for (int i = 1; i < channelList.numChannels; i++) {
+        if (channelList.channels[i].slotIndex != channelList.channels[0].slotIndex) {
+            if (err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+    }
+
+    return g_slots[slotIndex]->routeOpen(channelList, err);
+}
+
+bool routeClose(ChannelList channelList, int *err) {
+    int slotIndex = channelList.channels[0].slotIndex;
+
+    for (int i = 1; i < channelList.numChannels; i++) {
+        if (channelList.channels[i].slotIndex != slotIndex) {
+            if (err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+    }
+
+    return g_slots[slotIndex]->routeClose(channelList, err);
+}
+
+bool getVoltage(int slotIndex, int subchannelIndex, float &value, int *err) {
+    return g_slots[slotIndex]->getVoltage(subchannelIndex, value, err);
+}
+
+bool setVoltage(int slotIndex, int subchannelIndex, float value, int *err) {
+    return g_slots[slotIndex]->setVoltage(subchannelIndex, value, err);
+}
+
 } // namespace channel_dispatcher
 } // namespace psu
 } // namespace eez

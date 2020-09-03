@@ -65111,6 +65111,47 @@
             }
           }
         ]
+      },
+      {
+        "name": "ROUTE",
+        "commands": [
+          {
+            "name": "ROUTe:OPEN",
+            "parameters": [
+              {
+                "name": "ch_list",
+                "type": [
+                  {
+                    "type": "channel-list"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "ROUTe:CLOSe",
+            "parameters": [
+              {
+                "name": "ch_list",
+                "type": [
+                  {
+                    "type": "channel-list"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          }
+        ]
       }
     ],
     "enums": [

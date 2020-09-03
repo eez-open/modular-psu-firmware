@@ -71,11 +71,19 @@
       "defaultValue": "3.00 V",
       "defaultMinValue": 8,
       "defaultMaxValue": 40
+    },
+    {
+      "name": "relay_on",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
     {
       "name": "toggle_route"
+    },
+    {
+      "name": "toggle_relay"
     }
   ],
   "gui": {
@@ -859,15 +867,42 @@
             "displayOption": 0
           },
           {
-            "type": "Text",
+            "type": "Select",
             "style": {
               "inheritFrom": "default"
             },
-            "left": 290,
-            "top": 125,
-            "width": 185,
+            "data": "relay_on",
+            "action": "toggle_relay",
+            "left": 342,
+            "top": 124,
+            "width": 131,
             "height": 32,
-            "text": "Relay ON/OFF"
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald17"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 131,
+                "height": 32,
+                "text": "Relay OFF"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald17"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 131,
+                "height": 32,
+                "text": "Relay ON"
+              }
+            ]
           }
         ],
         "left": 0,

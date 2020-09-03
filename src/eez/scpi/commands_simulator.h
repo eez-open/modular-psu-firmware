@@ -416,4 +416,6 @@
     SCPI_COMMAND("DEBUg:DOWNload:FIRMware", scpi_cmd_debugDownloadFirmware) \
     SCPI_COMMAND("DEBUg:EVENt", scpi_cmd_debugEvent) \
     SCPI_COMMAND("SYSTem:DATE:CLEar", scpi_cmd_systemDateClear) \
-    SCPI_COMMAND("SYSTem:TIME:CLEar", scpi_cmd_systemTimeClear)
+    SCPI_COMMAND("SYSTem:TIME:CLEar", scpi_cmd_systemTimeClear) \
+    SCPI_COMMAND("ROUTe:OPEN", scpi_cmd_routeOpen) \
+    SCPI_COMMAND("ROUTe:CLOSe", scpi_cmd_routeClose)

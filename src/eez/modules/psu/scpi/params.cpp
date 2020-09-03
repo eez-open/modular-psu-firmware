@@ -91,10 +91,10 @@ SlotAndSubchannelIndex *getSelectedChannel(scpi_t *context) {
     return nullptr;
 }
 
-void param_channels(scpi_t *context, SelectedChannels &selectedChannels, scpi_bool_t mandatory, scpi_bool_t skip_channel_check) {
+void param_channels(scpi_t *context, ChannelList &channelList, scpi_bool_t mandatory, scpi_bool_t skip_channel_check) {
     scpi_parameter_t parameter;
     if (!SCPI_Parameter(context, &parameter, mandatory)) {
-        selectedChannels.numChannels = 0;
+        channelList.numChannels = 0;
         if (mandatory || SCPI_ParamErrorOccurred(context)) {
             return;
         }
@@ -111,11 +111,11 @@ void param_channels(scpi_t *context, SelectedChannels &selectedChannels, scpi_bo
                 return;
             }
         }
-        selectedChannels.numChannels = 1;
-        selectedChannels.channels[0].slotIndex = selectedChannel->slotIndex;
-        selectedChannels.channels[0].subchannelIndex = selectedChannel->subchannelIndex;
+        channelList.numChannels = 1;
+        channelList.channels[0].slotIndex = selectedChannel->slotIndex;
+        channelList.channels[0].subchannelIndex = selectedChannel->subchannelIndex;
     } else {
-        param_channels(context, &parameter, selectedChannels, skip_channel_check);
+        param_channels(context, &parameter, channelList, skip_channel_check);
     }
 }
 
@@ -168,8 +168,8 @@ bool absoluteChannelIndexToSlotAndSubchannelIndex(int absoluteChannelIndex, Slot
     return false;
 }
 
-void param_channels(scpi_t *context, scpi_parameter_t *parameter, SelectedChannels &selectedChannels, scpi_bool_t skip_channel_check) {
-    selectedChannels.numChannels = 0;
+void param_channels(scpi_t *context, scpi_parameter_t *parameter, ChannelList &channelList, scpi_bool_t skip_channel_check) {
+    channelList.numChannels = 0;
 
     if (parameter->type == SCPI_TOKEN_PROGRAM_EXPRESSION) {
         bool isRange;
@@ -183,52 +183,52 @@ void param_channels(scpi_t *context, scpi_parameter_t *parameter, SelectedChanne
 
                     // from must be valid channel number
                     if (!absoluteChannelIndexToSlotAndSubchannelIndex(valueFrom, slotAndSubchannelIndex)) {
-                        selectedChannels.numChannels = 0;
+                        channelList.numChannels = 0;
                         return;
                     }
 
                     // to must be valid channel number
                     if (!absoluteChannelIndexToSlotAndSubchannelIndex(valueTo, slotAndSubchannelIndex)) {
-                        selectedChannels.numChannels = 0;
+                        channelList.numChannels = 0;
                         return;
                     }
 
                     for (int value = valueFrom; value <= valueTo; value++) {
                         if (absoluteChannelIndexToSlotAndSubchannelIndex(value, slotAndSubchannelIndex)) {
-                            if (selectedChannels.numChannels == MAX_NUM_CH_IN_CH_LIST) {
-                                selectedChannels.numChannels = 0;
+                            if (channelList.numChannels == MAX_NUM_CH_IN_CH_LIST) {
+                                channelList.numChannels = 0;
                                 return;
                             }
-                            selectedChannels.channels[selectedChannels.numChannels] = slotAndSubchannelIndex;
-                            selectedChannels.numChannels++;
+                            channelList.channels[channelList.numChannels] = slotAndSubchannelIndex;
+                            channelList.numChannels++;
                         }
                     }
                 } else {
                     SlotAndSubchannelIndex slotAndSubchannelIndex;
                     if (!absoluteChannelIndexToSlotAndSubchannelIndex(valueFrom, slotAndSubchannelIndex)) {
-                        selectedChannels.numChannels = 0;
+                        channelList.numChannels = 0;
                         return;
                     }
 
-                    if (selectedChannels.numChannels == MAX_NUM_CH_IN_CH_LIST) {
-                        selectedChannels.numChannels = 0;
+                    if (channelList.numChannels == MAX_NUM_CH_IN_CH_LIST) {
+                        channelList.numChannels = 0;
                         return;
                     }
 
-                    selectedChannels.channels[selectedChannels.numChannels] = slotAndSubchannelIndex;
-                    selectedChannels.numChannels++;
+                    channelList.channels[channelList.numChannels] = slotAndSubchannelIndex;
+                    channelList.numChannels++;
                 }
             } else if (result == SCPI_EXPR_NO_MORE) {
                 break;
             } else {
-                selectedChannels.numChannels = 0;
+                channelList.numChannels = 0;
                 return;
             }
         }
     } else {
         int32_t absoluteChannelIndex;
         if (!SCPI_ParamToChoice(context, parameter, channelChoiceWithAll, &absoluteChannelIndex)) {
-            selectedChannels.numChannels = 0;
+            channelList.numChannels = 0;
             return;
         }
 
@@ -237,27 +237,27 @@ void param_channels(scpi_t *context, scpi_parameter_t *parameter, SelectedChanne
 
             SlotAndSubchannelIndex slotAndSubchannelIndex;
             if (!absoluteChannelIndexToSlotAndSubchannelIndex(absoluteChannelIndex, slotAndSubchannelIndex)) {
-                selectedChannels.numChannels = 0;
+                channelList.numChannels = 0;
                 return;
             }
 
-            selectedChannels.channels[0] = slotAndSubchannelIndex;
-            selectedChannels.numChannels = 1;
+            channelList.channels[0] = slotAndSubchannelIndex;
+            channelList.numChannels = 1;
 
         } else {
             // all power channels
             for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
                 auto &channel = Channel::get(channelIndex);
-                selectedChannels.channels[channelIndex].slotIndex = channel.slotIndex;
-                selectedChannels.channels[channelIndex].subchannelIndex = channel.subchannelIndex;
+                channelList.channels[channelIndex].slotIndex = channel.slotIndex;
+                channelList.channels[channelIndex].subchannelIndex = channel.subchannelIndex;
             }
-            selectedChannels.numChannels = CH_NUM;
+            channelList.numChannels = CH_NUM;
         }
     }
 
     if (!skip_channel_check) {
-        for (int i = 0; i < selectedChannels.numChannels; i++) {
-            auto channel = Channel::getBySlotIndex(selectedChannels.channels[i].slotIndex, selectedChannels.channels[i].subchannelIndex);
+        for (int i = 0; i < channelList.numChannels; i++) {
+            auto channel = Channel::getBySlotIndex(channelList.channels[i].slotIndex, channelList.channels[i].subchannelIndex);
             if (!channel) {
                 // skip non-power channels
                 continue;
@@ -271,10 +271,10 @@ void param_channels(scpi_t *context, scpi_parameter_t *parameter, SelectedChanne
 }
 
 bool getChannelFromParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex) {
-    SelectedChannels selectedChannels;
-    param_channels(context, selectedChannels, FALSE, FALSE);
-    if (selectedChannels.numChannels == 1) {
-        slotAndSubchannelIndex = selectedChannels.channels[0];
+    ChannelList channelList;
+    param_channels(context, channelList, FALSE, FALSE);
+    if (channelList.numChannels == 1) {
+        slotAndSubchannelIndex = channelList.channels[0];
         return true;
     }
     return false;
@@ -309,10 +309,10 @@ Channel *getSelectedPowerChannel(scpi_t *context) {
 }
 
 Channel *getPowerChannelFromParam(scpi_t *context, scpi_bool_t mandatory, scpi_bool_t skip_channel_check) {
-    SelectedChannels selectedChannels;
-    param_channels(context, selectedChannels, mandatory, skip_channel_check);
-    if (selectedChannels.numChannels == 1) {
-        return Channel::getBySlotIndex(selectedChannels.channels[0].slotIndex, selectedChannels.channels[0].subchannelIndex);
+    ChannelList channelList;
+    param_channels(context, channelList, mandatory, skip_channel_check);
+    if (channelList.numChannels == 1) {
+        return Channel::getBySlotIndex(channelList.channels[0].slotIndex, channelList.channels[0].subchannelIndex);
     }
     return nullptr;
 }

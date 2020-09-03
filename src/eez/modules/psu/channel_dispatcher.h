@@ -186,6 +186,12 @@ bool setCurrentRange(int slotIndex, int subchannelIndex, int8_t range, int *err)
 bool getVoltageRange(int slotIndex, int subchannelIndex, int8_t &range, int *err);
 bool setVoltageRange(int slotIndex, int subchannelIndex, int8_t range, int *err);
 
+bool routeOpen(ChannelList channelList, int *err);
+bool routeClose(ChannelList channelList, int *err);
+
+bool getVoltage(int slotIndex, int subchannelIndex, float &value, int *err);
+bool setVoltage(int slotIndex, int subchannelIndex, float value, int *err);
+
 } // namespace channel_dispatcher
 } // namespace psu
 } // namespace eez

@@ -240,6 +240,7 @@ set(src_eez_modules_psu_scpi
     src/eez/modules/psu/scpi/outp.cpp
     src/eez/modules/psu/scpi/params.cpp
     src/eez/modules/psu/scpi/psu.cpp
+    src/eez/modules/psu/scpi/route.cpp
     src/eez/modules/psu/scpi/sense.cpp
     src/eez/modules/psu/scpi/simu.cpp
     src/eez/modules/psu/scpi/sour.cpp

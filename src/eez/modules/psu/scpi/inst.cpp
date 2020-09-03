@@ -53,11 +53,10 @@ scpi_choice_def_t traceValueChoice[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void selectChannel(scpi_t *context, Channel &channel) {
+static void selectChannel(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
     psu_context->selectedChannels.numChannels = 1;
-    psu_context->selectedChannels.channels[0].slotIndex = channel.slotIndex;
-    psu_context->selectedChannels.channels[0].subchannelIndex = channel.subchannelIndex;
+    psu_context->selectedChannels.channels[0] = slotAndSubchannelIndex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,12 +67,19 @@ scpi_result_t scpi_cmd_instrumentSelect(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = getPowerChannelFromParam(context, TRUE);
-    if (!channel) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
-    selectChannel(context, *channel);
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (channel) {
+        if (!checkPowerChannel(context, channel->channelIndex)) {
+            return SCPI_RES_ERR;
+        }
+    }
+
+    selectChannel(context, slotAndSubchannelIndex);
 
     return SCPI_RES_OK;
 }
@@ -103,13 +109,19 @@ scpi_result_t scpi_cmd_instrumentNselect(scpi_t *context) {
 
     channelIndex--;
 
-    if (!checkPowerChannel(context, channelIndex)) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!absoluteChannelIndexToSlotAndSubchannelIndex(channelIndex, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
-    auto &channel = Channel::get(channelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (channel) {
+        if (!checkPowerChannel(context, channel->channelIndex)) {
+            return SCPI_RES_ERR;
+        }
+    }
 
-    selectChannel(context, channel);
+    selectChannel(context, slotAndSubchannelIndex);
 
     return SCPI_RES_OK;
 }

@@ -31,7 +31,7 @@ namespace scpi {
 /// EEZ PSU specific SCPI parser context data.
 struct scpi_psu_t {
     scpi_reg_val_t *registers;
-    SelectedChannels selectedChannels;
+    ChannelList selectedChannels;
     char currentDirectory[MAX_PATH_LENGTH + 1];
     bool isBufferOverrun;
     uint32_t bufferOverrunTime;

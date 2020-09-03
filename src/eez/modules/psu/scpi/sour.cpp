@@ -185,15 +185,16 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitudeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitude(scpi_t *context) {
-    Channel *channel = getPowerChannelFromCommandNumber(context);
-    if (!channel) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
-    if (channel_dispatcher::getVoltageTriggerMode(*channel) != TRIGGER_MODE_FIXED &&
-        !trigger::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
-        return SCPI_RES_ERR;
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (channel) {
+        if (!checkPowerChannel(context, channel->channelIndex)) {
+            return SCPI_RES_ERR;
+        }
     }
 
     float voltage;
@@ -201,43 +202,71 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitude(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (channel->isRemoteProgrammingEnabled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    if (channel) {
+        if (channel_dispatcher::getVoltageTriggerMode(*channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
+            SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+            return SCPI_RES_ERR;
+        }
 
-    if (channel->isVoltageLimitExceeded(voltage)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
-        return SCPI_RES_ERR;
-    }
+        if (channel->isRemoteProgrammingEnabled()) {
+            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+            return SCPI_RES_ERR;
+        }
 
-    int err;
-    if (channel->isPowerLimitExceeded(voltage, channel_dispatcher::getISetUnbalanced(*channel), &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
+        if (channel->isVoltageLimitExceeded(voltage)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
+            return SCPI_RES_ERR;
+        }
 
-    channel_dispatcher::setVoltage(*channel, voltage);
+        int err;
+        if (channel->isPowerLimitExceeded(voltage, channel_dispatcher::getISetUnbalanced(*channel), &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
+
+        channel_dispatcher::setVoltage(*channel, voltage);
+    } else {
+        int err;
+        if (!channel_dispatcher::setVoltage(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, voltage, &err)) {
+            SCPI_ErrorPush(context, err);
+        }
+    }
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitudeQ(scpi_t *context) {
-    Channel *channel = getPowerChannelFromCommandNumber(context);
-    if (!channel) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
-    float u;
-    if (channel->isRemoteProgrammingEnabled()) {
-        u = channel->u.mon_dac;
-    } else {
-        u = channel_dispatcher::getUSet(*channel);
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (channel) {
+        if (!checkPowerChannel(context, channel->channelIndex)) {
+            return SCPI_RES_ERR;
+        }
     }
 
-    return get_source_value(context, *channel, UNIT_VOLT, u, channel_dispatcher::getUMin(*channel),
-                            channel_dispatcher::getUMax(*channel),
-                            channel_dispatcher::getUDef(*channel));
+    if (channel) {
+        float u;
+        if (channel->isRemoteProgrammingEnabled()) {
+            u = channel->u.mon_dac;
+        } else {
+            u = channel_dispatcher::getUSet(*channel);
+        }
+
+        return get_source_value(context, *channel, UNIT_VOLT, u, channel_dispatcher::getUMin(*channel),
+                                channel_dispatcher::getUMax(*channel),
+                                channel_dispatcher::getUDef(*channel));
+    } else {
+        int err;
+        float value;
+        if (!channel_dispatcher::getVoltage(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, value, &err)) {
+            SCPI_ErrorPush(context, err);
+        }        
+        return result_float(context, nullptr, value, UNIT_VOLT);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

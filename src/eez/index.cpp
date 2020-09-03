@@ -51,12 +51,14 @@ TestResult Module::getTestResult() {
 void Module::boot() {
     using namespace psu;
 
-    Channel::g_slotIndexToChannelIndex[slotIndex] = CH_NUM;
+    if (numPowerChannels > 0) {
+        Channel::g_slotIndexToChannelIndex[slotIndex] = CH_NUM;
 
-    for (int subchannelIndex = 0; subchannelIndex < numPowerChannels; subchannelIndex++) {
-        Channel::g_channels[CH_NUM] = createPowerChannel(slotIndex, CH_NUM, subchannelIndex);
-        Channel::g_channels[CH_NUM]->initParams(moduleRevision);
-        CH_NUM++;
+        for (int subchannelIndex = 0; subchannelIndex < numPowerChannels; subchannelIndex++) {
+            Channel::g_channels[CH_NUM] = createPowerChannel(slotIndex, CH_NUM, subchannelIndex);
+            Channel::g_channels[CH_NUM]->initParams(moduleRevision);
+            CH_NUM++;
+        }
     }
 }
 
@@ -205,6 +207,34 @@ bool Module::getVoltageRange(int subchannelIndex, int8_t &range, int *err) {
 }
 
 bool Module::setVoltageRange(int subchannelIndex, int8_t range, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::routeOpen(ChannelList channelList, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::routeClose(ChannelList channelList, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::getVoltage(int subchannelIndex, float &value, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::setVoltage(int subchannelIndex, float value, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }
