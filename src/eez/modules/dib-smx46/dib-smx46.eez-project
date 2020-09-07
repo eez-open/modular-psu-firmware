@@ -675,6 +675,20 @@
                         {
                           "type": "Rectangle",
                           "style": {
+                            "inheritFrom": "default",
+                            "color": "Background",
+                            "borderSize": "1",
+                            "borderRadius": 5,
+                            "borderColor": "text_disabled"
+                          },
+                          "left": 13,
+                          "top": 7,
+                          "width": 14,
+                          "height": 14
+                        },
+                        {
+                          "type": "Rectangle",
+                          "style": {
                             "inheritFrom": "default"
                           },
                           "left": 19,
