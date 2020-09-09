@@ -958,7 +958,7 @@ void tick() {
 }
 
 void reconnect() {
-    if (persist_conf::devConf.mqttEnabled) {
+    if (persist_conf::devConf.mqttEnabled && !g_shutdownInProgress) {
         if (g_connectionState == CONNECTION_STATE_IDLE || g_connectionState == CONNECTION_STATE_ERROR) {
             setState(CONNECTION_STATE_CONNECT);
         } else {

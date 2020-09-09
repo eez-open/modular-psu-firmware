@@ -184,7 +184,7 @@ bool isConnected() {
 void update() {
     static TestResult g_testResultAtBoot;
 
-    if (persist_conf::isEthernetEnabled()) {
+    if (persist_conf::isEthernetEnabled() && !g_shutdownInProgress) {
         auto callBeginServer = g_testResult == TEST_SKIPPED && g_testResultAtBoot == TEST_OK;
 
         g_testResult = g_testResultAtBoot;

@@ -365,6 +365,8 @@ void shutdown() {
 
     g_shutdownInProgress = true;
 
+    ethernet::update();
+
 #if !defined(__EMSCRIPTEN__)
     // shutdown SCPI thread
     using namespace eez::scpi;
