@@ -6151,7 +6151,7 @@ void data_dummy(DataOperationEnum operation, Cursor cursor, Value &value) {
 void data_slot_error_message(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto &slot = *g_slots[hmi::g_selectedSlotIndex];
-        if (slot.firmwareInstalled) {
+        if (slot.flashMethod == FLASH_METHOD_NONE || slot.firmwareInstalled) {
             value = "Error";
         } else {
             value = "No firmware";
