@@ -32,7 +32,7 @@ public:
 
     uint8_t slotIndex;
     uint8_t channelIndex;
-    TestResult g_testResult;
+    TestResult testResult;
     bool m_isRampActive = false;
 
     void init();

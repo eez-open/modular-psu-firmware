@@ -186,6 +186,8 @@ void IOExpander::init() {
 }
 
 bool IOExpander::test() {
+    testResult = TEST_OK;
+
 #if defined(EEZ_PLATFORM_STM32)    
     Channel &channel = Channel::get(channelIndex);
 
@@ -200,7 +202,7 @@ bool IOExpander::test() {
             if (value != expectedValue) {
                 DebugTrace("Ch%d IO expander reg check failure: reg=%d, expected=%d, got=%d\n", channel.channelIndex + 1, (int)REG_VALUES[3 * i], (int)expectedValue, (int)value);
 
-                g_testResult = TEST_FAILED;
+                testResult = TEST_FAILED;
                 break;
             }
         }
@@ -208,16 +210,16 @@ bool IOExpander::test() {
 
     readGpio();
 
-    if (g_testResult == TEST_FAILED) {
+    if (testResult == TEST_FAILED) {
 		 generateChannelError(SCPI_ERROR_CH1_IOEXP_TEST_FAILED, channel.channelIndex);
 		 channel.flags.powerOk = 0;
     } else {
 #if !CONF_SKIP_PWRGOOD_TEST
         channel.flags.powerOk = testBit(IO_BIT_IN_PWRGOOD);
         if (channel.flags.powerOk) {
-    	    g_testResult = TEST_OK;            
+    	    testResult = TEST_OK;            
         } else {
-            g_testResult = TEST_FAILED;
+            testResult = TEST_FAILED;
             DebugTrace("Ch%d power fault\n", channel.channelIndex + 1);
             generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channel.channelIndex);
         }
@@ -227,11 +229,11 @@ bool IOExpander::test() {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
     Channel &channel = Channel::get(channelIndex);
-    g_testResult = TEST_OK;
+    testResult = TEST_OK;
     channel.flags.powerOk = 1;
 #endif
 
-	return g_testResult != TEST_FAILED;
+	return testResult != TEST_FAILED;
 }
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -270,7 +272,7 @@ void IOExpander::tick(uint32_t tick_usec) {
         reinit();
         readGpio();
 
-        // g_testResult = TEST_FAILED;
+        // testResult = TEST_FAILED;
     }
 #endif
 

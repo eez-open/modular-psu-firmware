@@ -227,12 +227,14 @@ void AnalogDigitalConverter::init() {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    g_testResult = TEST_OK;
+    testResult = TEST_OK;
 #endif
 }
 
 bool AnalogDigitalConverter::test() {
-#if defined(EEZ_PLATFORM_STM32)    
+    testResult = TEST_OK;
+
+#if defined(EEZ_PLATFORM_STM32)
     uint8_t data[4];
     uint8_t result[4];
 
@@ -250,25 +252,25 @@ bool AnalogDigitalConverter::test() {
     uint8_t reg3 = result[3];
 
 	if (reg1 != getReg1Val()) {
-		g_testResult = TEST_FAILED;
+		testResult = TEST_FAILED;
 	}
 
 	if (reg2 != ADC_REG2_VAL) {
-		g_testResult = TEST_FAILED;
+		testResult = TEST_FAILED;
 	}
 
 	if (reg3 != ADC_REG3_VAL) {
-	   g_testResult = TEST_FAILED;
+	   testResult = TEST_FAILED;
 	}
 
-    if (g_testResult == TEST_FAILED) {
+    if (testResult == TEST_FAILED) {
 		generateChannelError(SCPI_ERROR_CH1_ADC_TEST_FAILED, channelIndex);
     } else {
-    	g_testResult = TEST_OK;
+    	testResult = TEST_OK;
     }
 #endif
 
-    return g_testResult != TEST_FAILED;
+    return testResult != TEST_FAILED;
 }
 
 void AnalogDigitalConverter::start(AdcDataType adcDataType_) {

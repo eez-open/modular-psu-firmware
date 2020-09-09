@@ -205,6 +205,8 @@ struct DcpChannel : public Channel {
 	}
 
 	bool test() override {
+		init();
+
         flags.powerOk = 0;
 
         doRemoteSensingEnable(false);
@@ -220,11 +222,11 @@ struct DcpChannel : public Channel {
 	}
 
 	TestResult getTestResult() override {
-		if (ioexp.g_testResult == TEST_NONE || adc.g_testResult == TEST_NONE || dac.g_testResult == TEST_NONE || tempSensorTestResult == TEST_NONE) {
+		if (ioexp.testResult == TEST_NONE || adc.testResult == TEST_NONE || dac.testResult == TEST_NONE || tempSensorTestResult == TEST_NONE) {
 			return TEST_NONE;
 		}
 
-		if (ioexp.g_testResult == TEST_OK && adc.g_testResult == TEST_OK && dac.g_testResult == TEST_OK && tempSensorTestResult == TEST_OK) {
+		if (ioexp.testResult == TEST_OK && adc.testResult == TEST_OK && dac.testResult == TEST_OK && tempSensorTestResult == TEST_OK) {
 			return TEST_OK;
 		}
 

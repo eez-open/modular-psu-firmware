@@ -57,14 +57,16 @@ void DigitalAnalogConverter::init() {
 }
 
 bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc) {
+    testResult = TEST_OK;
+
 #if defined(EEZ_PLATFORM_STM32)
-    if (ioexp.g_testResult != TEST_OK) {
-        g_testResult = TEST_SKIPPED;
+    if (ioexp.testResult != TEST_OK) {
+        testResult = TEST_SKIPPED;
         return true;
     }
 
-    if (adc.g_testResult != TEST_OK) {
-        g_testResult = TEST_SKIPPED;
+    if (adc.testResult != TEST_OK) {
+        testResult = TEST_SKIPPED;
         return true;
     }
 
@@ -89,31 +91,31 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
     float uMon = channel.u.mon_dac_last;
     float uDiff = uMon - uSet;
     if (fabsf(uDiff) > uSet * DAC_TEST_TOLERANCE / 100) {
-        g_testResult = TEST_FAILED;
+        testResult = TEST_FAILED;
         DebugTrace("Ch%d DAC test, U_set failure: expected=%g, got=%g, abs diff=%g\n", channel.channelIndex + 1, uSet, uMon, uDiff);
     }
 
     float iMon = channel.i.mon_dac_last;
     float iDiff = iMon - iSet;
     if (fabsf(iDiff) > iSet * DAC_TEST_TOLERANCE / 100) {
-        g_testResult = TEST_FAILED;
+        testResult = TEST_FAILED;
         DebugTrace("Ch%d DAC test, I_set failure: expected=%g, got=%g, abs diff=%g\n", channel.channelIndex + 1, iSet, iMon, iDiff);
     }
 
-    if (g_testResult == TEST_FAILED) {
+    if (testResult == TEST_FAILED) {
         generateChannelError(SCPI_ERROR_CH1_DAC_TEST_FAILED, channel.channelIndex);
     } else {
-        g_testResult = TEST_OK;
+        testResult = TEST_OK;
     }
 
     m_testing = false;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    g_testResult = TEST_OK;
+    testResult = TEST_OK;
 #endif
 
-    return g_testResult != TEST_FAILED;
+    return testResult != TEST_FAILED;
 }
 
 void DigitalAnalogConverter::tick(uint32_t tickCount) {

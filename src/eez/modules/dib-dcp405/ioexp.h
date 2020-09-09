@@ -51,7 +51,7 @@ public:
 
     uint8_t slotIndex;
     uint8_t channelIndex;
-    TestResult g_testResult;
+    TestResult testResult;
 
     void init();
     bool test();

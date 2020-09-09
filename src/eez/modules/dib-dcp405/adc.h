@@ -33,7 +33,7 @@ public:
 
     uint8_t channelIndex;
     uint8_t slotIndex;
-    TestResult g_testResult;
+    TestResult testResult;
     
     AdcDataType adcDataType;
 
