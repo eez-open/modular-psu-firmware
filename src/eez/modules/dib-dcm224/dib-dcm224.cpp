@@ -73,7 +73,8 @@ namespace eez {
 
 namespace dcm224 {
 
-static const uint16_t MODULE_REVISION_DCM224_R3B2  = 0x0302;
+static const uint16_t MODULE_REVISION_DCM224_R3B1 = 0x0301;
+static const uint16_t MODULE_REVISION_DCM224_R3B2 = 0x0302;
 
 static const uint16_t DAC_MIN = 0;
 static const uint16_t DAC_MAX = 4095;
@@ -351,6 +352,9 @@ struct DcmChannel : public Channel {
 
     float readTemperature() override {
 #if defined(EEZ_PLATFORM_STM32)
+        if (g_slots[slotIndex]->moduleRevision == MODULE_REVISION_DCM224_R3B1) {
+            return 25.0f + (isOutputEnabled() ? 5 * i.set : 0.0f);
+        }
         return temperature;
 #else
         return NAN;
