@@ -1308,18 +1308,22 @@ void disableOutputForAllTrackingChannels() {
 }
 
 void remoteSensingEnable(Channel &channel, bool enable) {
-    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        Channel::get(0).remoteSensingEnable(enable);
-        Channel::get(1).remoteSensingEnable(enable);
-    } else if (channel.flags.trackingEnabled) {
-        for (int i = 0; i < CH_NUM; ++i) {
-            Channel &trackingChannel = Channel::get(i);
-            if (trackingChannel.flags.trackingEnabled) {
-                trackingChannel.remoteSensingEnable(enable);
-            }
-        }
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_REMOTE_SENSING_EANBLE, (channel.channelIndex << 8) | (enable ? 1 : 0) );
     } else {
-        channel.remoteSensingEnable(enable);
+        if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+            Channel::get(0).remoteSensingEnable(enable);
+            Channel::get(1).remoteSensingEnable(enable);
+        } else if (channel.flags.trackingEnabled) {
+            for (int i = 0; i < CH_NUM; ++i) {
+                Channel &trackingChannel = Channel::get(i);
+                if (trackingChannel.flags.trackingEnabled) {
+                    trackingChannel.remoteSensingEnable(enable);
+                }
+            }
+        } else {
+            channel.remoteSensingEnable(enable);
+        }
     }
 }
 
@@ -1848,11 +1852,15 @@ void setListCount(Channel &channel, uint16_t value) {
 }
 
 void setCurrentRangeSelectionMode(Channel &channel, CurrentRangeSelectionMode mode) {
-    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        Channel::get(0).setCurrentRangeSelectionMode(mode);
-        Channel::get(1).setCurrentRangeSelectionMode(mode);
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_SET_CURRENT_RANGE_SELECTION_MODE, (channel.channelIndex << 8) | mode );
     } else {
-        channel.setCurrentRangeSelectionMode(mode);
+        if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+            Channel::get(0).setCurrentRangeSelectionMode(mode);
+            Channel::get(1).setCurrentRangeSelectionMode(mode);
+        } else {
+            channel.setCurrentRangeSelectionMode(mode);
+        }
     }
 }
 

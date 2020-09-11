@@ -232,7 +232,11 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
     data[1] = value >> 8;
     data[2] = value & 0xFF;
 
-    spi::select(slotIndex, spi::CHIP_DAC);
+	// if (g_isBooted && !isPsuThread()) {
+    //     DebugTrace("wrong thread\n");
+    // }
+
+	spi::select(slotIndex, spi::CHIP_DAC);
     spi::transfer3(slotIndex, data, result);
     spi::deselect(slotIndex);
 }

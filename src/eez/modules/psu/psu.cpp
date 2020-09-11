@@ -574,7 +574,13 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         profile::recallStateFromPsuThread();
     } else if (type == PSU_MESSAGE_SLOT_SET_ENABLED) {
         g_slots[(param >> 8) & 0xFF]->setEnabled(param & 0xFF ? true : false);
-    }
+    } else if (type == PSU_MESSAGE_SET_CURRENT_RANGE_SELECTION_MODE) {
+    	Channel &channel = Channel::get((param >> 8) & 0xFF);
+        channel_dispatcher::setCurrentRangeSelectionMode(channel, (CurrentRangeSelectionMode)(param & 0xFF));
+    } else if (type == PSU_MESSAGE_REMOTE_SENSING_EANBLE) {
+    	Channel &channel = Channel::get((param >> 8) & 0xFF);
+        channel_dispatcher::remoteSensingEnable(channel, param & 0xFF);
+    } 
 }
 
 bool measureAllAdcValuesOnChannel(int channelIndex) {
