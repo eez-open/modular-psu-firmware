@@ -36,6 +36,8 @@ enum ToastType {
 };
 
 class ToastMessagePage : public InternalPage {
+    friend class PsuAppContext;
+
     static ToastMessagePage *findFreePage();
 
 public:

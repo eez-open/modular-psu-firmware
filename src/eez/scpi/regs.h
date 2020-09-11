@@ -116,6 +116,7 @@ void reg_set_esr_bits(int bit_mask);
 
 void reg_set_ques_bit(int bit_mask, bool on);
 void reg_set_ques_isum_bit(int iChannel /* zero based */, int bit_mask, bool on);
+bool is_ques_bit_enabled(int channelIndex, int bit_mask);
 
 void reg_set_oper_bit(int bit_mask, bool on);
 

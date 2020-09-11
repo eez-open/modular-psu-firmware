@@ -30,6 +30,8 @@
 #include <eez/hmi.h>
 #include <eez/keyboard.h>
 
+#include <eez/scpi/regs.h>
+
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -315,6 +317,32 @@ void PsuAppContext::stateManagment() {
     if (getActivePageId() == PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
         if (m_asyncOperationInProgressParams.checkStatus) {
             m_asyncOperationInProgressParams.checkStatus();
+        }
+    }
+
+    //
+    if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
+        ToastMessagePage *page = (ToastMessagePage *)getActivePage();
+        if (page->messageValue.getType() == VALUE_TYPE_EVENT_MESSAGE) {
+
+            int16_t eventId = page->messageValue.getFirstInt16();
+            int channelIndex = page->messageValue.getSecondInt16();
+
+            bool dismissPage = false;
+            
+            if (eventId == event_queue::EVENT_ERROR_CH_OVP_TRIPPED) {
+                dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_OVP);
+            } else if (eventId == event_queue::EVENT_ERROR_CH_OCP_TRIPPED) {
+                dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_OCP);
+            } else if (eventId == event_queue::EVENT_ERROR_CH_OPP_TRIPPED) {
+                dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_OPP);
+            } else if (eventId == event_queue::EVENT_ERROR_CH_REMOTE_SENSE_REVERSE_POLARITY_DETECTED) {
+                dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_RPOL);
+            }
+
+            if (dismissPage) {
+                popPage();
+            }
         }
     }
 }

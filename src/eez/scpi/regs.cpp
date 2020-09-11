@@ -280,6 +280,25 @@ void reg_set_ques_isum_bit(int iChannel, int bit_mask, bool on) {
 #endif
 }
 
+bool is_ques_bit_enabled(int channelIndex, int bit_mask) {
+    if (serial::g_testResult == TEST_OK) {
+        scpi_reg_val_t val = reg_get(&serial::g_scpiContext, (scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 + channelIndex));
+        if (!(val & bit_mask)) {
+            return false;
+        }
+    }
+#if OPTION_ETHERNET
+    if (ethernet::g_testResult == TEST_OK) {
+        scpi_reg_val_t val = reg_get(&ethernet::g_scpiContext, (scpi_psu_reg_name_t)(SCPI_PSU_CH_REG_QUES_INST_ISUM_EVENT1 + channelIndex));
+        if (!(val & bit_mask)) {
+            return false;
+        }
+    }
+#endif
+
+    return true;
+}
+
 void reg_set_oper_bit(scpi_t *context, int bit_mask, bool on) {
     scpi_reg_val_t val = reg_get(context, SCPI_PSU_REG_OPER_COND);
     if (on) {
