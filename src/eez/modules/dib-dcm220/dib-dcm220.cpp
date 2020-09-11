@@ -361,7 +361,7 @@ public:
     }
 
     void init() {
-        if (!synchronized) {
+        if (/*enabled && */!synchronized) {
             if (bp3c::comm::masterSynchro(slotIndex)) {
                 //DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)firmwareMajorVersion, (int)firmwareMinorVersion);
                 synchronized = true;
@@ -385,6 +385,13 @@ public:
     }
 
     void test() {
+        /*
+        if (!enabled) {
+            testResult = TEST_SKIPPED;
+            return;
+        }
+        */
+
         if (!synchronized) {
             testResult = TEST_FAILED;
             return;

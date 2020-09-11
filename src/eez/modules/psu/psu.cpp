@@ -202,6 +202,44 @@ bool g_adcMeasureAllFinished = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void PsuModule::setEnabled(bool value) {
+    if (enabled != value) {
+        int channelIndex = Channel::getBySlotIndex(slotIndex)->channelIndex;
+
+        if (enabled) {
+            for (int i = channelIndex; i < channelIndex + numPowerChannels; i++) {
+                Channel &channel = Channel::get(i);
+
+                if (channel.isOk()) {
+                    if (channel.channelIndex < 2 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL)) {
+                        channel_dispatcher::setCouplingType(channel_dispatcher::COUPLING_TYPE_NONE, nullptr);
+                    }
+
+                    channel.setVoltage(0);
+                    channel.setCurrent(0);
+                    channel_dispatcher::outputEnable(channel, false);
+                    channel.onPowerDown();
+                }
+            }
+        }
+
+        Module::setEnabled(value);
+
+        if (enabled) {
+            for (int i = channelIndex; i < channelIndex + numPowerChannels; i++) {
+                Channel &channel = Channel::get(i);
+                channel.test();
+
+                if (channel.isOk()) {
+                    channel.setVoltage(0);
+                    channel.setCurrent(0);
+                    channel_dispatcher::outputEnable(channel, false);
+                }
+            }
+        }
+    }
+}
+
 TestResult PsuModule::getTestResult() {
     return Channel::getBySlotIndex(slotIndex)->getTestResult();
 }
@@ -512,8 +550,6 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         channel_dispatcher::setCouplingTypeInPsuThread((channel_dispatcher::CouplingType)param);
     } else if (type == PSU_MESSAGE_SET_TRACKING_CHANNELS) {
         channel_dispatcher::setTrackingChannels((uint16_t)param);
-    } else if (type == PSU_MESSAGE_CHANNEL_OUTPUT_ENABLE) {
-        channel_dispatcher::outputEnable(Channel::get((param >> 8) & 0xFF), param & 0xFF ? true : false);
     } else if (type == PSU_MESSAGE_SYNC_OUTPUT_ENABLE) {
         channel_dispatcher::syncOutputEnable();
     } else if (type == PSU_MESSAGE_HARD_RESET) {
@@ -536,6 +572,8 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         bp3c::flash_slave::leaveBootloaderMode();
     } else if (type == PSU_MESSAGE_RECALL_STATE) {
         profile::recallStateFromPsuThread();
+    } else if (type == PSU_MESSAGE_SLOT_SET_ENABLED) {
+        g_slots[(param >> 8) & 0xFF]->setEnabled(param & 0xFF ? true : false);
     }
 }
 

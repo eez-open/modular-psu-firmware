@@ -97,24 +97,25 @@ float TempSensor::doRead() {
 
 void TempSensor::testTemperatureValidity(float value) {
     Channel *channel = getChannel();
+    if (channel->isOk()) {
+        bool isTemperatureValueInvalid = isNaN(value) || value < TEMP_SENSOR_MIN_VALID_TEMPERATURE || value > TEMP_SENSOR_MAX_VALID_TEMPERATURE;
+        if (isTemperatureValueInvalid) {
+            if (g_testResult == TEST_OK) {
+                g_testResult = TEST_FAILED;
 
-    bool isTemperatureValueInvalid = isNaN(value) || value < TEMP_SENSOR_MIN_VALID_TEMPERATURE || value > TEMP_SENSOR_MAX_VALID_TEMPERATURE;
-    if (isTemperatureValueInvalid) {
-        if (g_testResult == TEST_OK) {
-            g_testResult = TEST_FAILED;
+                if (channel) {
+                    // set channel current max. limit to ERR_MAX_CURRENT if sensor is faulty
+                    channel->limitMaxCurrent(MAX_CURRENT_LIMIT_CAUSE_TEMPERATURE);
+                }
+
+                generateError(scpi_error);
+            }
+        } else {
+            g_testResult = TEST_OK;
 
             if (channel) {
-                // set channel current max. limit to ERR_MAX_CURRENT if sensor is faulty
-                channel->limitMaxCurrent(MAX_CURRENT_LIMIT_CAUSE_TEMPERATURE);
+                channel->unlimitMaxCurrent();
             }
-
-            generateError(scpi_error);
-        }
-    } else {
-        g_testResult = TEST_OK;
-
-        if (channel) {
-            channel->unlimitMaxCurrent();
         }
     }
 }

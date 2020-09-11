@@ -61,6 +61,8 @@ struct PsuModule : public Module {
 public:
     TestResult getTestResult() override;
 
+    void setEnabled(bool value) override;
+
 	int getChannelSettingsPageId() override;
 
     void getProfileParameters(int channelIndex, uint8_t *buffer) override;

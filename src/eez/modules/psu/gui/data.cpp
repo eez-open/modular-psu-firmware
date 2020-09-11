@@ -1448,7 +1448,7 @@ void data_channels_view_mode_in_max(DataOperationEnum operation, Cursor cursor, 
 
 int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
     auto testResult = g_slots[slotIndex]->getTestResult();
-    if (testResult == TEST_OK || testResult == TEST_SKIPPED) {
+    if (g_slots[slotIndex]->enabled && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
         return g_slots[slotIndex]->getSlotView(slotViewType, slotIndex, cursor);
     } else {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
@@ -6150,11 +6150,15 @@ void data_dummy(DataOperationEnum operation, Cursor cursor, Value &value) {
 
 void data_slot_error_message(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto &slot = *g_slots[hmi::g_selectedSlotIndex];
-        if (slot.flashMethod == FLASH_METHOD_NONE || slot.firmwareInstalled) {
-            value = "Error";
+        auto slot = g_slots[hmi::g_selectedSlotIndex];
+        if (slot->enabled) {
+            if (slot->flashMethod == FLASH_METHOD_NONE || slot->firmwareInstalled) {
+                value = "Error";
+            } else {
+                value = "No firmware";
+            }
         } else {
-            value = "No firmware";
+            value = "Disabled";
         }
     }
 }

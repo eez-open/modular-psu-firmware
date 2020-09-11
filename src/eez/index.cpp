@@ -44,6 +44,11 @@ using namespace gui;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void Module::setEnabled(bool value) {
+    enabled = value;
+    psu::persist_conf::setSlotEnabled(slotIndex, value);
+}
+
 TestResult Module::getTestResult() {
     return TEST_SKIPPED;
 }

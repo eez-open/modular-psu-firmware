@@ -94,6 +94,7 @@ static DevConfBlock g_devConfBlocks[] = {
     { offsetof(DeviceConfiguration, userSwitchAction), 1, false, 0, 60 * 1000, 0 },
     { offsetof(DeviceConfiguration, ethernetHostName), 1, false, 0, 0, 0 },
     { offsetof(DeviceConfiguration, fanMode), 1, false, 0, 0, 0 },
+    { offsetof(DeviceConfiguration, slotEnabledBits), 1, false, 0, 0, 0 },
     { sizeof(DeviceConfiguration), 1, false, 0, 0, 0 },
 };
 
@@ -190,6 +191,9 @@ void initDefaultDevConf() {
     g_defaultDevConf.fanMode = FAN_MODE_AUTO;
     g_defaultDevConf.fanSpeedPercentage = 100;
     g_defaultDevConf.fanSpeedPWM = FAN_MAX_PWM;
+
+    // block 10
+    g_defaultDevConf.slotEnabledBits = 0xFF;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1234,6 +1238,18 @@ void setDlogViewLegendViewOption(DlogViewLegendViewOption dlogViewLegendViewOpti
 
 void setDlogViewShowLabels(bool showLabels) {
     g_devConf.viewFlags.dlogViewShowLabels = showLabels;
+}
+
+bool isSlotEnabled(int slotIndex) {
+    return (devConf.slotEnabledBits & (1 << slotIndex)) != 0;
+}
+
+void setSlotEnabled(int slotIndex, bool enabled) {
+    if (enabled) {
+        g_devConf.slotEnabledBits |= 1 << slotIndex;
+    } else {
+        g_devConf.slotEnabledBits &= ~(1 << slotIndex);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

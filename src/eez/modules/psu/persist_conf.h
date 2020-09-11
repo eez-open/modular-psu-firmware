@@ -196,6 +196,9 @@ struct DeviceConfiguration {
     uint8_t fanMode;
     uint8_t fanSpeedPercentage;
     uint8_t fanSpeedPWM;
+
+    // block 10
+    uint8_t slotEnabledBits;
 };
 
 extern const DeviceConfiguration &devConf;
@@ -335,6 +338,9 @@ void setIsInhibitedByUser(int isInhibitedByUser);
 
 void setDlogViewLegendViewOption(DlogViewLegendViewOption dlogViewLegendViewOption);
 void setDlogViewShowLabels(bool showLabels);
+
+bool isSlotEnabled(int slotIndex);
+void setSlotEnabled(int slotIndex, bool enabled);
 
 ////////////////////////////////////////////////////////////////////////////////
 

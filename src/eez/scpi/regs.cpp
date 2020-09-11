@@ -170,6 +170,9 @@ void reg_set(scpi_t *context, scpi_psu_reg_name_t name, scpi_reg_val_t val) {
     case SCPI_PSU_REG_OPER_INST_ENABLE:
         psu_reg_update(context, SCPI_PSU_REG_OPER_INST_EVENT);
         break;
+
+    default:
+    	break;
     }
 
     if (name >= SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1 && name < SCPI_PSU_CH_REG_QUES_INST_ISUM_COND1 + NUM_REG_INSTRUMENTS) {

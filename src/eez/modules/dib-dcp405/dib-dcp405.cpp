@@ -190,6 +190,10 @@ struct DcpChannel : public Channel {
 	}
 
 	void init() override {
+        if (!g_slots[slotIndex]->enabled) {
+            return;
+        }
+
 		ioexp.init();
 		adc.init();
 		dac.init();
@@ -205,9 +209,13 @@ struct DcpChannel : public Channel {
 	}
 
 	bool test() override {
-		init();
+        if (!g_slots[slotIndex]->enabled) {
+            return true;
+        }
 
         flags.powerOk = 0;
+
+        init();
 
         doRemoteSensingEnable(false);
         doRemoteProgrammingEnable(false);
@@ -222,7 +230,11 @@ struct DcpChannel : public Channel {
 	}
 
 	TestResult getTestResult() override {
-		if (ioexp.testResult == TEST_NONE || adc.testResult == TEST_NONE || dac.testResult == TEST_NONE || tempSensorTestResult == TEST_NONE) {
+        if (!g_slots[slotIndex]->enabled) {
+            return TEST_SKIPPED;
+        }
+        
+        if (ioexp.testResult == TEST_NONE || adc.testResult == TEST_NONE || dac.testResult == TEST_NONE || tempSensorTestResult == TEST_NONE) {
 			return TEST_NONE;
 		}
 

@@ -404,7 +404,7 @@ public:
     }
 
     void init() {
-        if (!synchronized) {
+        if (/*enabled && */!synchronized) {
             if (bp3c::comm::masterSynchroV2(slotIndex)) {
                 synchronized = true;
                 lastTransferTickCount = millis();
@@ -428,6 +428,11 @@ public:
     }
 
     void test() {
+        if (!enabled) {
+            testResult = TEST_SKIPPED;
+            return;
+        }
+
         if (!synchronized) {
             testResult = TEST_FAILED;
             return;

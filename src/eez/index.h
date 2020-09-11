@@ -89,6 +89,7 @@ struct Module {
     uint8_t numOtherChannels;
 
     uint8_t slotIndex = -1;
+    bool enabled;
     uint16_t moduleRevision = 0;
     bool firmwareInstalled = false;
 	uint8_t firmwareMajorVersion = 0;
@@ -96,6 +97,8 @@ struct Module {
 	uint32_t idw0 = 0;
 	uint32_t idw1 = 0;
 	uint32_t idw2 = 0;
+
+    virtual void setEnabled(bool value);
 
     virtual Module *createModule() = 0;
 

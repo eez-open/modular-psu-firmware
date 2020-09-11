@@ -471,6 +471,33 @@ scpi_result_t scpi_cmd_systemSlotFirmwareQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_systemSlotState(scpi_t *context) {
+    auto module = getModuleFromSlotIndexParam(context);
+    if (!module) {
+        return SCPI_RES_ERR;
+    }
+
+    bool enabled;
+    if (!SCPI_ParamBool(context, &enabled, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    sendMessageToPsu(PSU_MESSAGE_SLOT_SET_ENABLED, (module->slotIndex << 8) | (enabled ? 1 : 0));
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemSlotStateQ(scpi_t *context) {
+    auto module = getModuleFromSlotIndexParam(context);
+    if (!module) {
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultBool(context, module->enabled);
+
+    return SCPI_RES_OK;
+}
+
 scpi_result_t scpi_cmd_systemChannelCountQ(scpi_t *context) {
     SCPI_ResultInt(context, CH_NUM);
 

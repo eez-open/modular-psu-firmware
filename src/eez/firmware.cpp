@@ -124,6 +124,8 @@ void boot() {
 
     psu::ontime::g_mcuCounter.init();
 
+    psu::persist_conf::init();
+
     int numInstalledModules = 0;
     for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         static const uint16_t ADDRESS = 0;
@@ -139,6 +141,7 @@ void boot() {
         
         g_slots[slotIndex] = getModule(moduleType)->createModule();
         g_slots[slotIndex]->slotIndex = slotIndex;
+        g_slots[slotIndex]->enabled = psu::persist_conf::isSlotEnabled(slotIndex);
         g_slots[slotIndex]->moduleRevision = moduleRevision;
         g_slots[slotIndex]->firmwareInstalled = firmwareInstalled;
         g_slots[slotIndex]->boot();
@@ -184,8 +187,6 @@ void boot() {
             }
         }
     }
-
-    psu::persist_conf::init();
 
 #if OPTION_DISPLAY
     psu::gui::showWelcomePage();

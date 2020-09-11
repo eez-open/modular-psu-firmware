@@ -23,7 +23,7 @@
 #pragma once
 
 /// MCU firmware version.
-#define MCU_FIRMWARE "1.2"
+#define MCU_FIRMWARE "1.3"
 
 /// Manufacturer description text used for *IDN?
 #define IDN_MANUFACTURER "Envox"
