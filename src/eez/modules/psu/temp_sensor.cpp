@@ -97,7 +97,7 @@ float TempSensor::doRead() {
 
 void TempSensor::testTemperatureValidity(float value) {
     Channel *channel = getChannel();
-    if (channel->isOk()) {
+    if (!channel || channel->isOk()) {
         bool isTemperatureValueInvalid = isNaN(value) || value < TEMP_SENSOR_MIN_VALID_TEMPERATURE || value > TEMP_SENSOR_MAX_VALID_TEMPERATURE;
         if (isTemperatureValueInvalid) {
             if (g_testResult == TEST_OK) {

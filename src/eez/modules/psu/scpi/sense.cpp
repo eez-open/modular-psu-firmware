@@ -28,31 +28,26 @@ namespace scpi {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static scpi_choice_def_t currentRangeSelection[] = {
+    { "LOW",  CURRENT_RANGE_SELECTION_ALWAYS_LOW },
+    { "HIGH", CURRENT_RANGE_SELECTION_ALWAYS_HIGH },
+    { "BEST", CURRENT_RANGE_SELECTION_USE_BOTH },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
 scpi_result_t scpi_cmd_senseCurrentDcRangeUpper(scpi_t *context) {
     CurrentRangeSelectionMode mode;
 
-    scpi_number_t param;
-    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+    scpi_parameter_t param;
+    if (!SCPI_Parameter(context, &param, true)) {
         return SCPI_RES_ERR;
     }
-    if (param.special) {
-        if (param.content.tag == SCPI_NUM_MIN) {
-            mode = CURRENT_RANGE_SELECTION_ALWAYS_LOW;
-        } else if (param.content.tag == SCPI_NUM_MAX) {
-            mode = CURRENT_RANGE_SELECTION_ALWAYS_HIGH;
-        } else if (param.content.tag == SCPI_NUM_DEF) {
-            mode = CURRENT_RANGE_SELECTION_USE_BOTH;
-        } else {
-            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-            return SCPI_RES_ERR;
-        }
-    } else {
-        if (param.unit != SCPI_UNIT_NONE && param.unit != SCPI_UNIT_AMPER) {
-            SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
-            return SCPI_RES_ERR;
-        }
 
-        float value = (float)param.content.value;
+    if (SCPI_ParamIsNumber(&param, true)) {
+        float value;
+        if (!SCPI_ParamToFloat(context, &param, &value)) {
+            return SCPI_RES_ERR;
+        }
         if (value == 0.05f) {
             mode = CURRENT_RANGE_SELECTION_ALWAYS_LOW;
         } else if (value == 5.0f) {
@@ -61,6 +56,12 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpper(scpi_t *context) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
         }
+    } else {
+        int32_t modeInt;
+        if (!SCPI_ParamToChoice(context, &param, currentRangeSelection, &modeInt)) {
+            return SCPI_RES_ERR;
+        }
+        mode = (CurrentRangeSelectionMode)modeInt;
     }
 
     Channel *channel = getPowerChannelFromParam(context);
@@ -106,7 +107,7 @@ scpi_result_t scpi_cmd_senseCurrentDcRangeUpperQ(scpi_t *context) {
     } else if (mode == CURRENT_RANGE_SELECTION_ALWAYS_HIGH) {
         SCPI_ResultFloat(context, 5);
     } else {
-        SCPI_ResultText(context, "Default");
+        SCPI_ResultText(context, "BEST");
     }
 
     return SCPI_RES_OK;
