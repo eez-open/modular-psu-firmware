@@ -188,6 +188,8 @@ void boot() {
         }
     }
 
+    psu::persist_conf::initChannels();
+
 #if OPTION_DISPLAY
     psu::gui::showWelcomePage();
 #endif
