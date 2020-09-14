@@ -89,7 +89,7 @@ scpi_result_t scpi_cmd_instrumentSelectQ(scpi_t *context) {
 
     for (int i = 0; i < psu_context->selectedChannels.numChannels; i++) {
         char buffer[20];
-        sprintf(buffer, "(@%d%02d)", psu_context->selectedChannels.channels[i].slotIndex, psu_context->selectedChannels.channels[i].subchannelIndex);
+        sprintf(buffer, "(@%d%02d)", psu_context->selectedChannels.channels[i].slotIndex + 1, psu_context->selectedChannels.channels[i].subchannelIndex + 1);
         SCPI_ResultCharacters(context, buffer, strlen(buffer));
     }
 
