@@ -294,9 +294,9 @@ void AnalogDigitalConverter::start(AdcDataType adcDataType_) {
 
 	data[2] = ADC_START;
 
-	// if (g_isBooted && !isPsuThread()) {
-    //     DebugTrace("wrong thread\n");
-    // }
+	if (g_isBooted && !isPsuThread()) {
+        DebugTrace("wrong thread\n");
+    }
 
 	spi::select(slotIndex, spi::CHIP_ADC);
 	spi::transfer3(slotIndex, data, result);
@@ -313,9 +313,9 @@ float AnalogDigitalConverter::read() {
     data[1] = 0;
     data[2] = 0;
 
-	// if (g_isBooted && !isPsuThread()) {
-    //     DebugTrace("wrong thread\n");
-    // }
+	if (g_isBooted && !isPsuThread()) {
+        DebugTrace("wrong thread\n");
+    }
 
 	spi::select(slotIndex, spi::CHIP_ADC);
     spi::transfer3(slotIndex, data, result);
@@ -387,9 +387,9 @@ void AnalogDigitalConverter::readAllRegisters(uint8_t registers[]) {
     data[3] = 0;
     data[4] = 0;
 
-	// if (g_isBooted && !isPsuThread()) {
-    //     DebugTrace("wrong thread\n");
-    // }
+	if (g_isBooted && !isPsuThread()) {
+        DebugTrace("wrong thread\n");
+    }
 
 	spi::select(slotIndex, spi::CHIP_ADC);
     spi::transfer5(slotIndex, data, result);

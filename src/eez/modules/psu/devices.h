@@ -44,6 +44,9 @@ enum DeviceId {
     DEVICE_ID_CH4,
     DEVICE_ID_CH5,
     DEVICE_ID_CH6,
+    DEVICE_ID_SLOT1,
+    DEVICE_ID_SLOT2,
+    DEVICE_ID_SLOT3,
 };
 
 extern scpi_choice_def_t g_deviceChoice[];

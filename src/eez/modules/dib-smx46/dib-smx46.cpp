@@ -27,11 +27,13 @@
 
 #include "eez/debug.h"
 #include "eez/firmware.h"
+#include <eez/system.h>
 #include "eez/hmi.h"
 #include "eez/util.h"
 #include "eez/gui/document.h"
 #include "eez/modules/psu/event_queue.h"
 #include "eez/modules/psu/gui/psu.h"
+#include "eez/modules/psu/gui/animations.h"
 #include "eez/modules/bp3c/comm.h"
 #include "eez/modules/psu/gui/edit_mode.h"
 
@@ -47,6 +49,7 @@ namespace eez {
 namespace dib_smx46 {
 
 static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
+static const int32_t CONF_TRANSFER_TIMEOUT_MS = 1000;
 
 #define BUFFER_SIZE 20
 
@@ -73,6 +76,7 @@ public:
     TestResult testResult = TEST_NONE;
     bool synchronized = false;
     int numCrcErrors = 0;
+    uint32_t lastTransferTickCount;
     uint8_t input[BUFFER_SIZE];
     uint8_t output[BUFFER_SIZE];
     bool spiReady = false;
@@ -133,6 +137,7 @@ public:
             if (bp3c::comm::masterSynchro(slotIndex)) {
                 synchronized = true;
                 numCrcErrors = 0;
+                lastTransferTickCount = millis();
                 testResult = TEST_OK;
             } else {
                 if (g_slots[slotIndex]->firmwareInstalled) {
@@ -152,6 +157,13 @@ public:
         if (spiReady) {
             transfer();
             spiReady = false;
+        } else {
+            int32_t diff = millis() - lastTransferTickCount;
+            if (diff > CONF_TRANSFER_TIMEOUT_MS) {
+                event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                synchronized = false;
+                testResult = TEST_FAILED;
+            }
         }
 #endif
     }
@@ -172,6 +184,7 @@ public:
         auto status = bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE);
         if (status == bp3c::comm::TRANSFER_STATUS_OK) {
             numCrcErrors = 0;
+            lastTransferTickCount = millis();
         } else {
             if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
                 if (++numCrcErrors >= 10) {
@@ -189,6 +202,16 @@ public:
 
     void onPowerDown() override {
         synchronized = false;
+    }
+
+    Page *getPageFromId(int pageId) override;
+
+    void animatePageAppearance(int previousPageId, int activePageId) override {
+        if (previousPageId == PAGE_ID_MAIN && activePageId == PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES) {
+            animateSlideDown();
+        } else if (previousPageId == PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES && activePageId == PAGE_ID_MAIN) {
+            animateSlideUp();
+        }
     }
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
@@ -346,6 +369,68 @@ public:
 static Smx46Module g_smx46Module;
 Module *g_module = &g_smx46Module;
 
+////////////////////////////////////////////////////////////////////////////////
+
+class ConfigureRoutesPage : public SetPage {
+public:
+    void pageAlloc() {
+        Smx46Module *module = (Smx46Module *)g_slots[hmi::g_selectedSlotIndex];
+
+        memcpy(xLabels, module->xLabels, sizeof(xLabels));
+        memcpy(xLabelsOrig, module->xLabels, sizeof(xLabels));
+
+        memcpy(yLabels, module->yLabels, sizeof(yLabels));
+        memcpy(yLabelsOrig, module->yLabels, sizeof(yLabels));
+
+        routes = routesOrig = module->routes;
+    }
+
+    int getDirty() { 
+        return memcmp(xLabels, xLabelsOrig, sizeof(xLabels)) != 0 || 
+            memcmp(yLabels, yLabelsOrig, sizeof(yLabels)) != 0 ||
+            routes != routesOrig;
+    }
+
+    void set() {
+        if (getDirty()) {
+            Smx46Module *module = (Smx46Module *)g_slots[hmi::g_selectedSlotIndex];
+
+            memcpy(module->xLabels, xLabels, sizeof(xLabels));
+            memcpy(module->yLabels, yLabels, sizeof(yLabels));
+            
+            module->routes = routes;
+        }
+
+        popPage();
+    }
+
+    bool isRouteOpen(int x, int y) {
+        return routes & (1 << (y * NUM_COLUMNS + x));
+    }
+
+    void toggleRoute(int x, int y) {
+        routes ^= 1 << (y * NUM_COLUMNS + x);
+    }
+
+    char xLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
+    char yLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
+    uint32_t routes = 0;
+
+private:
+    char xLabelsOrig[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
+    char yLabelsOrig[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
+    uint32_t routesOrig = 0;
+};
+
+static ConfigureRoutesPage g_ConfigureRoutesPage;
+
+Page *Smx46Module::getPageFromId(int pageId) {
+    if (pageId == PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES) {
+        return &g_ConfigureRoutesPage;
+    }
+    return nullptr;
+}
+
 } // namespace dib_smx46
 
 namespace gui {
@@ -366,7 +451,12 @@ void data_dib_smx46_route_open(DataOperationEnum operation, Cursor cursor, Value
         int i = cursor % (NUM_COLUMNS * NUM_ROWS);
         int x = i % NUM_COLUMNS;
         int y = i / NUM_COLUMNS;
-        value = ((Smx46Module *)g_slots[slotIndex])->isRouteOpen(x, y);
+        ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
+        if (page) {
+            value = page->isRouteOpen(x, y);
+        } else {
+            value = ((Smx46Module *)g_slots[slotIndex])->isRouteOpen(x, y);
+        }
     }
 }
 
@@ -382,7 +472,12 @@ void data_dib_smx46_x_label(DataOperationEnum operation, Cursor cursor, Value &v
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / NUM_COLUMNS;
         int i = cursor % NUM_COLUMNS;
-        value = (const char *)&((Smx46Module *)g_slots[slotIndex])->xLabels[i][0];
+        ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
+        if (page) {
+            value = (const char *)&page->xLabels[i][0];
+        } else {
+            value = (const char *)&((Smx46Module *)g_slots[slotIndex])->xLabels[i][0];
+        }
     }
 }
 
@@ -398,7 +493,12 @@ void data_dib_smx46_y_label(DataOperationEnum operation, Cursor cursor, Value &v
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / NUM_ROWS;
         int i = cursor % NUM_ROWS;
-        value = (const char *)&((Smx46Module *)g_slots[slotIndex])->yLabels[i][0];
+        ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
+        if (page) {
+            value = (const char *)&page->yLabels[i][0];
+        } else {
+            value = (const char *)&((Smx46Module *)g_slots[slotIndex])->yLabels[i][0];
+        }
     }
 }
 
@@ -474,7 +574,12 @@ void action_dib_smx46_toggle_route() {
     int i = cursor % (NUM_COLUMNS * NUM_ROWS);
     int x = i % NUM_COLUMNS;
     int y = i / NUM_COLUMNS;
-    ((Smx46Module *)g_slots[slotIndex])->toggleRoute(x, y);
+    ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
+    if (page) {
+        page->toggleRoute(x, y);
+    } else {
+        ((Smx46Module *)g_slots[slotIndex])->toggleRoute(x, y);
+    }
 }
 
 void action_dib_smx46_toggle_relay() {
@@ -482,6 +587,22 @@ void action_dib_smx46_toggle_relay() {
     Smx46Module *module = (Smx46Module *)g_slots[cursor];
     module->relayOn = !module->relayOn;
 }
+
+void action_dib_smx46_show_configure_routes() {
+    hmi::selectSlot(getFoundWidgetAtDown().cursor);
+    pushPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
+}
+
+void action_dib_smx46_close_all_routes() {
+    ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
+    if (page) {
+        page->routes = 0;
+    } else {
+        int slotIndex = getFoundWidgetAtDown().cursor;
+        ((Smx46Module *)g_slots[slotIndex])->routes = 0;
+    }
+}
+
 
 } // gui
 

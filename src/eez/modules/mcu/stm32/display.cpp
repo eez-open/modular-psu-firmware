@@ -636,19 +636,7 @@ void fillRect(int x1, int y1, int x2, int y2, int r) {
     if (r == 0) {
         fillRect(g_buffer, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
     } else {
-        // draw rounded rect
-        fillRect(x1 + r, y1, x2 - r, y1 + r - 1);
-        fillRect(x1, y1 + r, x1 + r - 1, y2 - r);
-        fillRect(x2 + 1 - r, y1 + r, x2, y2 - r);
-        fillRect(x1 + r, y2 - r + 1, x2 - r, y2);
-        fillRect(x1 + r, y1 + r, x2 - r, y2 - r);
-        for (int ry = 0; ry <= r; ry++) {
-            int rx = (int)round(sqrt(r * r - ry * ry));
-            drawHLine(x2 - r, y2 - r + ry, rx);
-            drawHLine(x1 + r - rx, y2 - r + ry, rx);
-            drawHLine(x2 - r, y1 + r - ry, rx);
-            drawHLine(x1 + r - rx, y1 + r - ry, rx);
-        }
+        fillRoundedRect(x1, y1, x2, y2, r);
     }
 
     markDirty(x1, y1, x2, y2);

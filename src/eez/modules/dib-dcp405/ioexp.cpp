@@ -391,9 +391,9 @@ uint8_t IOExpander::read(uint8_t reg) {
     data[2] = 0;
     uint8_t result[3];
 
-    // if (g_isBooted && !isPsuThread()) {
-    //     DebugTrace("wrong thread\n");
-    // }
+    if (g_isBooted && !isPsuThread()) {
+        DebugTrace("wrong thread\n");
+    }
 
     spi::select(slotIndex, spi::CHIP_IOEXP);
     spi::transfer3(slotIndex, data, result);
@@ -409,9 +409,9 @@ void IOExpander::write(uint8_t reg, uint8_t val) {
     data[2] = val;
     uint8_t result[3];
 
-    // if (g_isBooted && !isPsuThread()) {
-    //     DebugTrace("wrong thread\n");
-    // }
+    if (g_isBooted && !isPsuThread()) {
+        DebugTrace("wrong thread\n");
+    }
 
     spi::select(slotIndex, spi::CHIP_IOEXP);
 

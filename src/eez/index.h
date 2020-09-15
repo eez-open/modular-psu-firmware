@@ -112,6 +112,7 @@ struct Module {
     virtual void onSpiIrq();
     virtual void onSpiDmaTransferCompleted(int status);
     virtual gui::Page *getPageFromId(int pageId);
+    virtual void animatePageAppearance(int previousPageId, int activePageId);
     virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);
     virtual int getChannelSettingsPageId();
 

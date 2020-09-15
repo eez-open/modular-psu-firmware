@@ -204,6 +204,7 @@ struct DeviceConfiguration {
 extern const DeviceConfiguration &devConf;
 
 void init();
+void initChannels();
 void tick();
 
 bool saveAllDirtyBlocks(); // returns true if there are still more dirty blocks

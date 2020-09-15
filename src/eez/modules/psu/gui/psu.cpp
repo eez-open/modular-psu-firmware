@@ -402,6 +402,10 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
 
     g_focusEditValue = Value();
 
+    for (int i = 0; i < NUM_SLOTS; i++) {
+        g_slots[i]->animatePageAppearance(previousPageId, activePageId);
+    }
+
     if (previousPageId == PAGE_ID_EVENT_QUEUE) {
         if (getActivePageId() == PAGE_ID_MAIN) {
             animateSlideUp();

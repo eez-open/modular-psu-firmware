@@ -96,6 +96,7 @@ void drawRect(int x1, int y1, int x2, int y2);
 void drawFocusFrame(int x, int y, int w, int h);
 void fillRect(int x1, int y1, int x2, int y2, int radius = 0);
 void fillRect(void *dst, int x1, int y1, int x2, int y2);
+void fillRoundedRect(int x1, int y1, int x2, int y2, int r);
 void drawHLine(int x, int y, int l);
 void drawVLine(int x, int y, int l);
 void bitBlt(int x1, int y1, int x2, int y2, int x, int y);

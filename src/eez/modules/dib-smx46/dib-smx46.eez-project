@@ -84,6 +84,12 @@
     },
     {
       "name": "toggle_relay"
+    },
+    {
+      "name": "show_configure_routes"
+    },
+    {
+      "name": "close_all_routes"
     }
   ],
   "gui": {
@@ -188,7 +194,7 @@
               "inheritFrom": "default"
             },
             "data": "routes",
-            "action": "toggle_slot_max_view",
+            "action": "show_configure_routes",
             "left": 2,
             "top": 34,
             "width": 156,
@@ -412,7 +418,7 @@
               "inheritFrom": "default"
             },
             "data": "routes",
-            "action": "toggle_slot_max_view",
+            "action": "show_configure_routes",
             "left": 0,
             "top": 34,
             "width": 240,
@@ -636,6 +642,7 @@
               "inheritFrom": "default"
             },
             "data": "routes",
+            "action": "show_configure_routes",
             "left": 44,
             "top": 36,
             "width": 240,
@@ -645,7 +652,7 @@
               "style": {
                 "inheritFrom": "default"
               },
-              "action": "toggle_route",
+              "action": "",
               "left": 0,
               "top": 0,
               "width": 40,
@@ -924,6 +931,372 @@
         "width": 480,
         "height": 168,
         "dataContextOverrides": "{\"slot_title_max\": \"SMX46\"}"
+      },
+      {
+        "name": "configure_routes",
+        "description": "Channel trigger settings",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 8,
+            "top": 8,
+            "width": 464,
+            "height": 232,
+            "name": "Body",
+            "widgets": [
+              {
+                "type": "Grid",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "routes",
+                "left": 44,
+                "top": 4,
+                "width": 420,
+                "height": 200,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "action": "toggle_route",
+                  "left": 0,
+                  "top": 0,
+                  "width": 70,
+                  "height": 50,
+                  "widgets": [
+                    {
+                      "type": "Select",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "data": "route_open",
+                      "left": 0,
+                      "top": 0,
+                      "width": 70,
+                      "height": 50,
+                      "widgets": [
+                        {
+                          "type": "Container",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "left": 0,
+                          "top": 0,
+                          "width": 70,
+                          "height": 50,
+                          "widgets": [
+                            {
+                              "type": "Rectangle",
+                              "style": {
+                                "inheritFrom": "default",
+                                "color": "Background",
+                                "borderSize": "1",
+                                "borderRadius": 8,
+                                "borderColor": "text_disabled"
+                              },
+                              "left": 27,
+                              "top": 17,
+                              "width": 16,
+                              "height": 16
+                            },
+                            {
+                              "type": "Rectangle",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 34,
+                              "top": 0,
+                              "width": 2,
+                              "height": 50
+                            },
+                            {
+                              "type": "Rectangle",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 0,
+                              "top": 24,
+                              "width": 70,
+                              "height": 2
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Container",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "left": 0,
+                          "top": 0,
+                          "width": 70,
+                          "height": 50,
+                          "widgets": [
+                            {
+                              "type": "Rectangle",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 34,
+                              "top": 0,
+                              "width": 2,
+                              "height": 50
+                            },
+                            {
+                              "type": "Rectangle",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 0,
+                              "top": 24,
+                              "width": 70,
+                              "height": 2
+                            },
+                            {
+                              "type": "Rectangle",
+                              "style": {
+                                "inheritFrom": "default",
+                                "borderSize": "0",
+                                "borderRadius": 7
+                              },
+                              "left": 28,
+                              "top": 18,
+                              "width": 14,
+                              "height": 14
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "List",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "y_labels",
+                "left": 0,
+                "top": 0,
+                "width": 40,
+                "height": 224,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 40,
+                  "height": 50,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_right_condensed"
+                      },
+                      "data": "y_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 40,
+                      "height": 50,
+                      "text": ""
+                    }
+                  ]
+                },
+                "listType": "vertical",
+                "gap": 0
+              },
+              {
+                "type": "List",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "x_labels",
+                "left": 44,
+                "top": 204,
+                "width": 420,
+                "height": 28,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 70,
+                  "height": 28,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_right_condensed",
+                        "alignHorizontal": "center"
+                      },
+                      "data": "x_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 70,
+                      "height": 28,
+                      "text": ""
+                    }
+                  ]
+                },
+                "listType": "horizontal",
+                "gap": 0
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_bgnd",
+                  "font": "Heydings14",
+                  "alignVertical": "center",
+                  "color": "status_line_text",
+                  "backgroundColor": "status_line_background",
+                  "activeColor": "status_line_background",
+                  "activeBackgroundColor": "status_line_text"
+                },
+                "action": "show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "left": 41,
+                "top": 0,
+                "width": 199,
+                "height": 32,
+                "text": "Configure routes"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "bottom_button_textual_S_left",
+                  "alignHorizontal": "center"
+                },
+                "action": "close_all_routes",
+                "left": 240,
+                "top": 0,
+                "width": 96,
+                "height": 32,
+                "text": "Close all"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "status_bgnd"
+                },
+                "left": 336,
+                "top": 0,
+                "width": 62,
+                "height": 32,
+                "invertColors": true
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "set_page_dirty",
+                "left": 398,
+                "top": 0,
+                "width": 82,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 82,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "status_bgnd"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 82,
+                        "height": 32,
+                        "invertColors": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 82,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "font": "Heydings14"
+                        },
+                        "action": "set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "_"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "font": "Heydings14"
+                        },
+                        "action": "discard",
+                        "left": 41,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "X"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
       },
       {
         "name": "slot_view_min",

@@ -90,6 +90,9 @@ gui::Page *Module::getPageFromId(int pageId) {
     return nullptr;
 }
 
+void Module::animatePageAppearance(int previousPageId, int activePageId) {
+}
+
 int Module::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
     if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
         int isVert = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;

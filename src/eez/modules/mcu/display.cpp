@@ -362,6 +362,41 @@ void drawFocusFrame(int x, int y, int w, int h) {
     fillRect(x, y + h - lineWidth, x + w - 1, y + h - 1);
 }
 
+void fillRoundedRect(int x1, int y1, int x2, int y2, int r) {
+
+    // http://members.chello.at/~easyfilter/bresenham.html
+    int xm = (x1 + x2) / 2;
+    int ym = (y1 + y2) / 2;
+    int x = -r;
+    int y = 0;
+    int err = 2 - 2 * r;
+    do {
+       drawHLine(xm + x, ym + y, -2 * x);
+       drawHLine(xm + x, ym - y, -2 * x);
+
+       r = err;
+       if (r <= y) {
+           err += ++y * 2 + 1;
+       }
+       if (r > x || err > y) {
+           err += ++x * 2 + 1;
+       }
+    } while (x < 0);
+
+    // fillRect(x1 + r, y1, x2 - r, y1 + r - 1);
+    // fillRect(x1, y1 + r, x1 + r - 1, y2 - r);
+    // fillRect(x2 + 1 - r, y1 + r, x2, y2 - r);
+    // fillRect(x1 + r, y2 - r + 1, x2 - r, y2);
+    // fillRect(x1 + r, y1 + r, x2 - r, y2 - r);
+    // for (int ry = 0; ry <= r; ry++) {
+    //     int rx = (int)round(sqrt(r * r - ry * ry));
+    //     drawHLine(x2 - r, y2 - r + ry, rx);
+    //     drawHLine(x1 + r - rx, y2 - r + ry, rx);
+    //     drawHLine(x2 - r, y1 + r - ry, rx);
+    //     drawHLine(x1 + r - rx, y1 + r - ry, rx);
+    // }
+}
+
 static int8_t measureGlyph(uint8_t encoding) {
     gui::font::Glyph glyph;
     g_font.getGlyph(encoding, glyph);

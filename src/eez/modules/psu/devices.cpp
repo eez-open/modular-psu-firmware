@@ -61,6 +61,9 @@ scpi_choice_def_t g_deviceChoice[] = {
     { "CH4", DEVICE_ID_CH4 },
     { "CH5", DEVICE_ID_CH5 },
     { "CH6", DEVICE_ID_CH6 },
+    { "SLOT1", DEVICE_ID_SLOT1 },
+    { "SLOT2", DEVICE_ID_SLOT2 },
+    { "SLOT3", DEVICE_ID_SLOT3 },
     SCPI_CHOICE_LIST_END    
 };
 
@@ -143,22 +146,47 @@ bool getDevice(int deviceIndex, Device &device) {
         return true;
     }
 
-    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+    for (int channelIndex = 0; channelIndex < 6; channelIndex++) {
         if (deviceIndex == i++) {
             device.id = (DeviceId)(DEVICE_ID_CH1_TEMP + channelIndex);
             sprintf(device.name, "CH%d temp", channelIndex + 1);
-            device.installed = true;
-            device.testResult = temp_sensor::sensors[temp_sensor::CH1 + channelIndex].g_testResult;
+            if (channelIndex < CH_NUM) {
+                device.installed = true;
+                device.testResult = temp_sensor::sensors[temp_sensor::CH1 + channelIndex].g_testResult;
+            } else {
+                device.installed = false;
+                device.testResult = TEST_NONE;
+            }
             return true;
         }
     }
 
-    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+    for (int channelIndex = 0; channelIndex < 6; channelIndex++) {
         if (deviceIndex == i++) {
             device.id = (DeviceId)(DEVICE_ID_CH1 + channelIndex);
             sprintf(device.name, "CH%d", channelIndex + 1);
-            device.installed = true;
-            device.testResult = Channel::get(channelIndex).getTestResult();
+            if (channelIndex < CH_NUM) {
+                device.installed = true;
+                device.testResult = Channel::get(channelIndex).getTestResult();
+            } else {
+                device.installed = false;
+                device.testResult = TEST_NONE;
+            }
+            return true;
+        }
+    }
+
+    for (int slotIndex = 0; slotIndex < 3; slotIndex++) {
+        if (deviceIndex == i++) {
+            device.id = (DeviceId)(DEVICE_ID_SLOT1 + slotIndex);
+            sprintf(device.name, "SLOT%d", slotIndex + 1);
+            if (slotIndex < NUM_SLOTS) {
+                device.installed = g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE;
+                device.testResult = g_slots[slotIndex]->getTestResult();
+            } else {
+                device.installed = false;
+                device.testResult = TEST_NONE;
+            }
             return true;
         }
     }

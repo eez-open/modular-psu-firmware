@@ -61,15 +61,21 @@ void resetContext() {
 }
 
 void generateError(int error) {
-    if (psu::serial::g_testResult == TEST_OK) {
-        SCPI_ErrorPush(&psu::serial::g_scpiContext, error);
-    }
+    if (!isLowPriorityThread()) {
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_GENERATE_ERROR, error);
+    } else {
+        if (psu::serial::g_testResult == TEST_OK) {
+            SCPI_ErrorPush(&psu::serial::g_scpiContext, error);
+        }
+
 #if OPTION_ETHERNET
-    if (psu::ethernet::g_testResult == TEST_OK) {
-        SCPI_ErrorPush(&psu::ethernet::g_scpiContext, error);
-    }
+        if (psu::ethernet::g_testResult == TEST_OK) {
+            SCPI_ErrorPush(&psu::ethernet::g_scpiContext, error);
+        }
 #endif
-    psu::event_queue::pushEvent(error);
+
+        psu::event_queue::pushEvent(error);
+    }
 }
 
 }

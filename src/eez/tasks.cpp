@@ -384,7 +384,10 @@ void lowPriorityThreadOneIter() {
             } else if (type == THREAD_MESSAGE_USBD_MSC_DATAOUT) {
                 MSC_BOT_DataOut(g_pdev, param);
             }
-#endif
+#endif 
+            else if (type == THREAD_MESSAGE_GENERATE_ERROR) {
+                generateError(param);
+            }
         }
     } else {
         if (g_shutingDown) {
