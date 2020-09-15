@@ -253,6 +253,91 @@ bool Module::setVoltage(int subchannelIndex, float value, int *err) {
     return false;
 }
 
+void Module::getVoltageStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode) {
+    stepValues->values = nullptr;
+    stepValues->count = 0;
+    stepValues->unit = UNIT_VOLT;
+}
+
+float Module::getVoltageResolution(int subchannelIndex) {
+    return NAN;
+}
+
+float Module::getVoltageMinValue(int subchannelIndex) {
+    return NAN;
+}
+
+float Module::getVoltageMaxValue(int subchannelIndex) {
+    return NAN;
+}
+
+bool Module::isConstantVoltageMode(int subchannelIndex) {
+    return false;
+}
+
+bool Module::isVoltageCalibrationExists(int subchannelIndex) {
+    return false;
+}
+
+bool Module::isVoltageCalibrationEnabled(int subchannelIndex) {
+    return false;
+}
+
+void Module::enableVoltageCalibration(int subchannelIndex, bool enable) {
+}
+
+bool Module::getCurrent(int subchannelIndex, float &value, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::setCurrent(int subchannelIndex, float value, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+void Module::getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode) {
+    stepValues->values = nullptr;
+    stepValues->count = 0;
+    stepValues->unit = UNIT_AMPER;
+}
+
+float Module::getCurrentResolution(int subchannelIndex) {
+    return NAN;
+}
+
+float Module::getCurrentMinValue(int subchannelIndex) {
+    return NAN;
+}
+
+float Module::getCurrentMaxValue(int subchannelIndex) {
+    return NAN;
+}
+
+bool Module::isCurrentCalibrationExists(int subchannelIndex) {
+    return false;
+}
+
+bool Module::isCurrentCalibrationEnabled(int subchannelIndex) {
+    return false;
+}
+
+void Module::enableCurrentCalibration(int subchannelIndex, bool enable) {
+}
+
+void Module::getCalibrationPoints(CalibrationValueType type, unsigned int &numPoints, float *&points) {
+    numPoints = 0;
+    points = nullptr;
+}
+
+CalibrationConfiguration *Module::getCalibrationConfiguration(int subchannelIndex) {
+    return nullptr;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct NoneModule : public Module {

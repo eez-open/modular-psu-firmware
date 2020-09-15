@@ -561,7 +561,14 @@ void onThreadMessage(uint8_t type, uint32_t param) {
     } else if (type == PSU_MESSAGE_SET_CURRENT) {
         channel_dispatcher::setCurrentInPsuThread((int)param);
     } else if (type == PSU_MESSAGE_CALIBRATION_START) {
-        calibration::start(Channel::get((int)param));
+        if (param >= 0 && param < (unsigned)CH_NUM) {
+            calibration::start(Channel::get(param));
+        } else {
+            param -= CH_NUM;
+            int slotIndex = param >> 8;
+            int subchannelIndex = param & 0xFF;
+            calibration::start(slotIndex, subchannelIndex);
+        }
     } else if (type == PSU_MESSAGE_CALIBRATION_SELECT_CURRENT_RANGE) {
         calibration::selectCurrentRange((int8_t)param);
     } else if (type == PSU_MESSAGE_CALIBRATION_STOP) {

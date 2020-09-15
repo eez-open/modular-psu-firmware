@@ -30,6 +30,7 @@
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/serial_psu.h>
+#include <eez/modules/psu/calibration.h>
 
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
@@ -405,6 +406,17 @@ void initChannels() {
     // load channels calibration parameters
     for (int i = 0; i < CH_NUM; ++i) {
         persist_conf::loadChannelCalibration(Channel::get(i));
+    }
+
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        Module *module = g_slots[slotIndex];
+        for (int otherChannelIndex = 0; otherChannelIndex < module->numOtherChannels; otherChannelIndex++) {
+            int subchannelIndex = module->numPowerChannels + otherChannelIndex;
+            CalibrationConfiguration *calConf = module->getCalibrationConfiguration(subchannelIndex);
+            if (calConf) {
+                persist_conf::loadChannelCalibration(slotIndex, subchannelIndex);
+            }
+        }
     }
 }
 
@@ -1327,17 +1339,17 @@ void saveCalibrationEnabledFlag(Channel &channel, bool enabled) {
 }
 
 void loadChannelCalibration(Channel &channel) {
-    auto x = sizeof(Channel::CalibrationConfiguration);
+    auto x = sizeof(CalibrationConfiguration);
 	assert(MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= x);
 
     if (!moduleConfRead(
         channel.slotIndex,
         (uint8_t *)&channel.cal_conf,
-        sizeof(Channel::CalibrationConfiguration),
+        sizeof(CalibrationConfiguration),
         MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * (((MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
         CH_CAL_CONF_VERSION
     )) {
-        channel.clearCalibrationConf();
+        calibration::clearCalibrationConf(&channel.cal_conf);
     }
 }
 
@@ -1345,8 +1357,37 @@ bool saveChannelCalibration(Channel &channel) {
     return moduleSave(
         channel.slotIndex,
         (BlockHeader *)&channel.cal_conf,
-        sizeof(Channel::CalibrationConfiguration),
+        sizeof(CalibrationConfiguration),
         MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * (((MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
+        CH_CAL_CONF_VERSION
+    );
+}
+
+void loadChannelCalibration(int slotIndex, int subchannelIndex) {
+    auto x = sizeof(CalibrationConfiguration);
+	assert(MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= x);
+
+    CalibrationConfiguration *calConf = g_slots[slotIndex]->getCalibrationConfiguration(subchannelIndex);
+
+    if (!moduleConfRead(
+        slotIndex,
+        (uint8_t *)calConf,
+        sizeof(CalibrationConfiguration),
+        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + subchannelIndex * (((MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
+        CH_CAL_CONF_VERSION
+    )) {
+        calibration::clearCalibrationConf(calConf);
+    }
+}
+
+bool saveChannelCalibration(int slotIndex, int subchannelIndex) {
+    CalibrationConfiguration *calConf = g_slots[slotIndex]->getCalibrationConfiguration(subchannelIndex);
+
+    return moduleSave(
+        slotIndex,
+        (BlockHeader *)calConf,
+        sizeof(CalibrationConfiguration),
+        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + subchannelIndex * (((MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
         CH_CAL_CONF_VERSION
     );
 }

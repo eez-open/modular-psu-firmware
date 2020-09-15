@@ -31,5 +31,7 @@ uint32_t getInactivityPeriod();
 extern int g_selectedSlotIndex;
 void selectSlot(int slotIndex);
 
+extern int g_selectedSubchannelIndex;
+
 }
 } // namespace eez::hmi

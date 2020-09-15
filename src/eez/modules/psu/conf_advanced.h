@@ -70,9 +70,6 @@
 /// Password maximum length in number of characters.
 #define PASSWORD_MAX_LENGTH 16
 
-/// Calibration remark maximum length.
-#define CALIBRATION_REMARK_MAX_LENGTH 32
-
 /// Default calibration remark text.
 #define CALIBRATION_REMARK_INIT "Not calibrated"
 
@@ -263,5 +260,3 @@
 
 #define CONF_LIST_COUNDOWN_DISPLAY_THRESHOLD 5 // 5 seconds
 #define CONF_RAMP_COUNDOWN_DISPLAY_THRESHOLD 5 // 5 seconds
-
-#define MAX_CALIBRATION_POINTS 20

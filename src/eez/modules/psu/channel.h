@@ -242,47 +242,6 @@ struct Channel {
     friend struct ChannelHistory;
 
 public:
-    /// Calibration parameters for the single point.
-    struct CalibrationValuePointConfiguration {
-        /// Value set on DAC by the calibration module.
-        float dac;
-        /// Real value, in volts, set by the user who reads it on the instrument (voltmeter and ampermeter).
-        float value;
-        /// Value read from ADC.
-        float adc;
-    };
-
-    /// Calibration parameters for the voltage and current.
-    /// There are three points defined: `min`, `mid` and `max`.
-    /// Only `min` and `max` are used in actual calculations -
-    /// `mid` is only used for the validity checking.
-    /// Here is how `DAC` value is calculated from the `real_value` set by user:
-    /// `DAC = min.dac + (real_value - min.val) * (max.dac - min.dac) / (max.val - min.val);`
-    /// And here is how `real_value` is calculated from the `ADC` value:
-    /// `real_value = min.val + (ADC - min.adc) * (max.val - min.val) / (max.adc - min.adc);`
-    struct CalibrationValueConfiguration {
-        unsigned int numPoints;
-        CalibrationValuePointConfiguration points[MAX_CALIBRATION_POINTS];
-    };
-
-    /// A structure where calibration parameters for the channel are stored.
-    struct CalibrationConfiguration {
-        /// Used by the persist_conf.
-        persist_conf::BlockHeader header;
-
-        /// Calibration parameters for the voltage.
-        CalibrationValueConfiguration u;
-
-        /// Calibration parameters for the currents in both ranges.
-        CalibrationValueConfiguration i[2];
-
-        /// Date when calibration is saved.
-        uint32_t calibrationDate;
-
-        /// Remark about calibration set by user.
-        char calibrationRemark[CALIBRATION_REMARK_MAX_LENGTH + 1];
-    };
-
     /// Binary flags for the channel protection configuration
     struct ProtectionConfigurationFlags {
         /// Is OVP enabled?
@@ -298,7 +257,7 @@ public:
 
     /// Channel OVP, OVP and OPP configuration parameters like level and delay.
     struct ChannelProtectionConfiguration {
-        persist_conf::BlockHeader header;
+        BlockHeader header;
 
         ProtectionConfigurationFlags flags;
 
@@ -458,9 +417,6 @@ public:
     Channel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex);
 
     void initParams(uint16_t moduleRevision);
-
-    /// Clear channel calibration configuration.
-    void clearCalibrationConf();
 
     /// Is channel power ok (state of PWRGOOD bit in IO Expander)?
     bool isPowerOk();

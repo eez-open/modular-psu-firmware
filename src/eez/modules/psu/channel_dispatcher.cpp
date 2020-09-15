@@ -420,6 +420,16 @@ float getUSet(const Channel &channel) {
     return channel.u.set;
 }
 
+float getUSet(const Channel *channel, int slotIndex, int subchannelIndex) {
+    if (channel) {
+        return getUSet(*channel);
+    }
+
+    float value;
+    getVoltage(slotIndex, subchannelIndex, value, nullptr);
+    return value;
+}
+
 float getUSetUnbalanced(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
         return Channel::get(0).getUSetUnbalanced() + Channel::get(1).getUSetUnbalanced();
@@ -527,6 +537,14 @@ float getUMax(const Channel &channel) {
         return value;
     }
     return channel.u.max;
+}
+
+float getUMax(const Channel *channel, int slotIndex, int subchannelIndex) {
+    if (channel) {
+        return getUMax(*channel);
+    }
+
+    return getVoltageMaxValue(slotIndex, subchannelIndex);
 }
 
 float getUMaxOvpLimit(const Channel &channel) {
@@ -746,6 +764,16 @@ float getISet(const Channel &channel) {
     return channel.i.set;
 }
 
+float getISet(const Channel *channel, int slotIndex, int subchannelIndex) {
+    if (channel) {
+        return getISet(*channel);
+    }
+
+    float value;
+    getCurrent(slotIndex, subchannelIndex, value, nullptr);
+    return value;
+}
+
 float getISetUnbalanced(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_PARALLEL) {
         return Channel::get(0).getISetUnbalanced() + Channel::get(1).getISetUnbalanced();
@@ -799,6 +827,14 @@ float getIMaxLimit(const Channel &channel) {
         return value;
     }
     return channel.getMaxCurrentLimit();
+}
+
+float getIMaxLimit(const Channel *channel, int slotIndex, int subchannelIndex) {
+    if (channel) {
+        return getIMaxLimit(*channel);
+    }
+
+    return getCurrentMaxValue(slotIndex, subchannelIndex);
 }
 
 float getIMin(const Channel &channel) {
@@ -2102,6 +2138,70 @@ bool getVoltage(int slotIndex, int subchannelIndex, float &value, int *err) {
 
 bool setVoltage(int slotIndex, int subchannelIndex, float value, int *err) {
     return g_slots[slotIndex]->setVoltage(subchannelIndex, value, err);
+}
+
+void getVoltageStepValues(Channel *channel, int slotIndex, int subchannelIndex, StepValues *stepValues, bool calibrationMode) {
+    if (channel) {
+        channel->getVoltageStepValues(stepValues, calibrationMode);
+    } else {
+        g_slots[slotIndex]->getVoltageStepValues(subchannelIndex, stepValues, calibrationMode);
+    }
+}
+
+float getVoltageResolution(int slotIndex, int subchannelIndex) {
+    return g_slots[slotIndex]->getVoltageResolution(subchannelIndex);
+}
+
+float getVoltageResolution(Channel *channel, int slotIndex, int subchannelIndex) {
+    if (channel) {
+        return channel->getVoltageResolution();
+    } else {
+        return getVoltageResolution(slotIndex, subchannelIndex);
+    }
+}
+
+float getVoltageMinValue(int slotIndex, int subchannelIndex) {
+    return g_slots[slotIndex]->getVoltageMinValue(subchannelIndex);
+}
+
+float getVoltageMaxValue(int slotIndex, int subchannelIndex) {
+    return g_slots[slotIndex]->getVoltageMaxValue(subchannelIndex);
+}
+
+bool getCurrent(int slotIndex, int subchannelIndex, float &value, int *err) {
+    return g_slots[slotIndex]->getCurrent(subchannelIndex, value, err);
+}
+
+bool setCurrent(int slotIndex, int subchannelIndex, float value, int *err) {
+    return g_slots[slotIndex]->setCurrent(subchannelIndex, value, err);
+}
+
+void getCurrentStepValues(Channel *channel, int slotIndex, int subchannelIndex, StepValues *stepValues, bool calibrationMode) {
+    if (channel) {
+        channel->getCurrentStepValues(stepValues, calibrationMode);
+    } else {
+        g_slots[slotIndex]->getCurrentStepValues(subchannelIndex, stepValues, calibrationMode);
+    }
+}
+
+float getCurrentResolution(int slotIndex, int subchannelIndex) {
+    return g_slots[slotIndex]->getCurrentResolution(subchannelIndex);
+}
+
+float getCurrentResolution(Channel *channel, int slotIndex, int subchannelIndex) {
+    if (channel) {
+        return channel->getCurrentResolution();
+    } else {
+        return getCurrentResolution(slotIndex, subchannelIndex);
+    }
+}
+
+float getCurrentMinValue(int slotIndex, int subchannelIndex) {
+    return g_slots[slotIndex]->getCurrentMaxValue(subchannelIndex);
+}
+
+float getCurrentMaxValue(int slotIndex, int subchannelIndex) {
+    return g_slots[slotIndex]->getCurrentMaxValue(subchannelIndex);
 }
 
 } // namespace channel_dispatcher

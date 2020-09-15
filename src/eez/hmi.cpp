@@ -20,9 +20,13 @@
 #include <eez/system.h>
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/rtc.h>
 #include <eez/modules/psu/scpi/psu.h>
+
+using namespace eez::psu;
+using namespace eez::psu::gui;
 
 namespace eez {
 namespace hmi {
@@ -33,6 +37,7 @@ static uint32_t g_timeOfLastActivity;
 static bool g_inactivityTimeMaxed = true;
 
 int g_selectedSlotIndex;
+int g_selectedSubchannelIndex;
 
 void tick(uint32_t tickCount) {
     if (!g_inactivityTimeMaxed) {
@@ -58,6 +63,9 @@ uint32_t getInactivityPeriod() {
 
 void selectSlot(int slotIndex) {
     g_selectedSlotIndex = slotIndex;
+    if (!Channel::getBySlotIndex(slotIndex)) {
+        selectChannel(nullptr);
+    }
 }
 
 } // namespace hmi

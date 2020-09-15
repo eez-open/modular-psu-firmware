@@ -21,6 +21,7 @@
 #include <stdint.h>
 
 #include <eez/firmware.h>
+#include <eez/unit.h>
 
 namespace eez {
 
@@ -74,6 +75,63 @@ struct SlotAndSubchannelIndex {
 struct ChannelList {
     int numChannels;
     SlotAndSubchannelIndex channels[MAX_NUM_CH_IN_CH_LIST];
+};
+
+enum CalibrationValueType {
+    CALIBRATION_VALUE_U,
+    CALIBRATION_VALUE_I_HI_RANGE,
+    CALIBRATION_VALUE_I_LOW_RANGE
+};
+
+/// Header of the every block stored in EEPROM. It contains checksum and version.
+struct BlockHeader {
+    uint32_t checksum;
+    uint16_t version;
+};
+
+/// Calibration parameters for the single point.
+struct CalibrationValuePointConfiguration {
+    /// Value set on DAC by the calibration module.
+    float dac;
+    /// Real value, in volts, set by the user who reads it on the instrument (voltmeter and ampermeter).
+    float value;
+    /// Value read from ADC.
+    float adc;
+};
+
+#define MAX_CALIBRATION_POINTS 20
+/// Calibration remark maximum length.
+#define CALIBRATION_REMARK_MAX_LENGTH 32
+
+/// Calibration parameters for the voltage and current.
+/// There are three points defined: `min`, `mid` and `max`.
+/// Only `min` and `max` are used in actual calculations -
+/// `mid` is only used for the validity checking.
+/// Here is how `DAC` value is calculated from the `real_value` set by user:
+/// `DAC = min.dac + (real_value - min.val) * (max.dac - min.dac) / (max.val - min.val);`
+/// And here is how `real_value` is calculated from the `ADC` value:
+/// `real_value = min.val + (ADC - min.adc) * (max.val - min.val) / (max.adc - min.adc);`
+struct CalibrationValueConfiguration {
+    unsigned int numPoints;
+    CalibrationValuePointConfiguration points[MAX_CALIBRATION_POINTS];
+};
+
+/// A structure where calibration parameters for the channel are stored.
+struct CalibrationConfiguration {
+    /// Used by the persist_conf.
+    BlockHeader header;
+
+    /// Calibration parameters for the voltage.
+    CalibrationValueConfiguration u;
+
+    /// Calibration parameters for the currents in both ranges.
+    CalibrationValueConfiguration i[2];
+
+    /// Date when calibration is saved.
+    uint32_t calibrationDate;
+
+    /// Remark about calibration set by user.
+    char calibrationRemark[CALIBRATION_REMARK_MAX_LENGTH + 1];
 };
 
 struct Module {
@@ -148,6 +206,27 @@ struct Module {
     
     virtual bool getVoltage(int subchannelIndex, float &value, int *err);
     virtual bool setVoltage(int subchannelIndex, float value, int *err);
+    virtual void getVoltageStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode);
+    virtual float getVoltageResolution(int subchannelIndex);
+    virtual float getVoltageMinValue(int subchannelIndex);
+    virtual float getVoltageMaxValue(int subchannelIndex);
+    virtual bool isConstantVoltageMode(int subchannelIndex);
+    virtual bool isVoltageCalibrationExists(int subchannelIndex);
+    virtual bool isVoltageCalibrationEnabled(int subchannelIndex);
+    virtual void enableVoltageCalibration(int subchannelIndex, bool enable);
+
+    virtual bool getCurrent(int subchannelIndex, float &value, int *err);
+    virtual bool setCurrent(int subchannelIndex, float value, int *err);
+    virtual void getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode);
+    virtual float getCurrentResolution(int subchannelIndex);
+    virtual float getCurrentMinValue(int subchannelIndex);
+    virtual float getCurrentMaxValue(int subchannelIndex);
+    virtual bool isCurrentCalibrationExists(int subchannelIndex);
+    virtual bool isCurrentCalibrationEnabled(int subchannelIndex);
+    virtual void enableCurrentCalibration(int subchannelIndex, bool enable);
+
+    virtual void getCalibrationPoints(CalibrationValueType type, unsigned int &numPoints, float *&points);
+    virtual CalibrationConfiguration *getCalibrationConfiguration(int subchannelIndex);
 };
 
 static const int NUM_SLOTS = 3;

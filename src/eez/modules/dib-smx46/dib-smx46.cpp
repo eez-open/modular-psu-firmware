@@ -31,7 +31,9 @@
 #include "eez/hmi.h"
 #include "eez/util.h"
 #include "eez/gui/document.h"
+#include "eez/modules/psu/psu.h"
 #include "eez/modules/psu/event_queue.h"
+#include "eez/modules/psu/calibration.h"
 #include "eez/modules/psu/gui/psu.h"
 #include "eez/modules/psu/gui/animations.h"
 #include "eez/modules/bp3c/comm.h"
@@ -50,6 +52,8 @@ namespace dib_smx46 {
 
 static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
 static const int32_t CONF_TRANSFER_TIMEOUT_MS = 1000;
+
+static float U_CAL_POINTS[2] = { 1.0f, 9.0f };
 
 #define BUFFER_SIZE 20
 
@@ -88,6 +92,8 @@ public:
 
     float dac1 = 0.0f;
     float dac2 = 0.0f;
+    bool calibrationEnabled[2] = { true, true };
+    CalibrationConfiguration calConf[2];
 
     bool relayOn = false;
 
@@ -106,7 +112,7 @@ public:
         spiCrcCalculationEnable = false;
 #endif
         numPowerChannels = 0;
-        numOtherChannels = 0;
+        numOtherChannels = 2 + 1 + NUM_ROWS * NUM_COLUMNS;
 
         for (int i = 0; i < NUM_COLUMNS; i++) {
             xLabels[i][0] = 'X';
@@ -122,6 +128,8 @@ public:
 
         auto data = (FromMasterToSlave *)output;
         data->routes = 0xFFFFFFFF;
+
+        memset(calConf, 0, sizeof(calConf));
     }
 
     Module *createModule() override {
@@ -155,8 +163,18 @@ public:
 
 #if defined(EEZ_PLATFORM_STM32)
         if (spiReady) {
-            transfer();
-            spiReady = false;
+        	FromMasterToSlave data;
+
+            data.routes = routes;
+            data.dac1 = calibrationEnabled[0] && isVoltageCalibrationExists(0) ? calibration::remapValue(dac1, calConf[0].u) : dac1;
+            data.dac2 = calibrationEnabled[1] && isVoltageCalibrationExists(1) ? calibration::remapValue(dac2, calConf[1].u) : dac2;
+            data.relayOn = relayOn ? 1 : 0;
+
+            if (memcmp(output, &data, sizeof(FromMasterToSlave)) != 0) {
+            	memcpy(output, &data, sizeof(FromMasterToSlave));
+            	transfer();
+            	spiReady = false;
+            }
         } else {
             int32_t diff = millis() - lastTransferTickCount;
             if (diff > CONF_TRANSFER_TIMEOUT_MS) {
@@ -165,6 +183,10 @@ public:
                 testResult = TEST_FAILED;
             }
         }
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+        transfer();
 #endif
     }
 
@@ -175,12 +197,7 @@ public:
 #endif
 
     void transfer() {
-        auto data = (FromMasterToSlave *)output;
-        data->routes = routes;
-        data->dac1 = dac1;
-        data->dac2 = dac2;
-        data->relayOn = relayOn ? 1 : 0;
-
+#if defined(EEZ_PLATFORM_STM32)
         auto status = bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE);
         if (status == bp3c::comm::TRANSFER_STATUS_OK) {
             numCrcErrors = 0;
@@ -198,6 +215,7 @@ public:
                 DebugTrace("Slot %d SPI transfer error %d\n", slotIndex + 1, status);
             }
         }
+#endif
     }
 
     void onPowerDown() override {
@@ -233,10 +251,6 @@ public:
 
     int getSlotSettingsPageId() override {
         return getTestResult() == TEST_OK ? PAGE_ID_DIB_SMX46_SETTINGS : PAGE_ID_SLOT_SETTINGS;
-    }
-
-    int getNumSubchannels() override {
-        return 2 + 4 * 6;
     }
 
     bool isValidSubchannelIndex(int subchannelIndex) override {
@@ -316,7 +330,7 @@ public:
         return true;
     }
 
-    bool getVoltage(int subchannelIndex, float &value, int *err) {
+    bool getVoltage(int subchannelIndex, float &value, int *err) override {
         ++subchannelIndex;
 
         if (subchannelIndex != 1 && subchannelIndex != 2) {
@@ -335,7 +349,7 @@ public:
         return true;
     }
 
-    bool setVoltage(int subchannelIndex, float value, int *err) {
+    bool setVoltage(int subchannelIndex, float value, int *err) override {
         ++subchannelIndex;
 
         if (subchannelIndex != 1 && subchannelIndex != 2) {
@@ -359,6 +373,56 @@ public:
         }
 
         return true;
+    }
+
+    void getVoltageStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode) override {
+        stepValues->values = DAC_ENCODER_STEP_VALUES;
+        stepValues->count = sizeof(DAC_ENCODER_STEP_VALUES) / sizeof(float);
+        stepValues->unit = UNIT_VOLT;
+    }
+    
+    float getVoltageResolution(int subchannelIndex) override {
+        return 0.001f;
+    }
+
+    float getVoltageMinValue(int subchannelIndex) override {
+        return 0.0f;
+    }
+
+    float getVoltageMaxValue(int subchannelIndex) override {
+        return 10.0f;
+    }
+
+    bool isConstantVoltageMode(int subchannelIndex) override {
+        return true;
+    }
+
+    bool isVoltageCalibrationExists(int subchannelIndex) override {
+        return subchannelIndex < 2 && calConf[subchannelIndex].u.numPoints > 1;
+    }
+
+    bool isVoltageCalibrationEnabled(int subchannelIndex) override {
+        return subchannelIndex < 2 && calibrationEnabled[subchannelIndex];
+    }
+    
+    void enableVoltageCalibration(int subchannelIndex, bool enable) override {
+        if (subchannelIndex < 2) {
+            calibrationEnabled[subchannelIndex] = enable;
+        }
+    }
+
+    void getCalibrationPoints(CalibrationValueType type, unsigned int &numPoints, float *&points) override {
+        points = U_CAL_POINTS;
+        numPoints = sizeof(U_CAL_POINTS) / sizeof(float);
+    }
+
+    CalibrationConfiguration *getCalibrationConfiguration(int subchannelIndex) override {
+        if (subchannelIndex == 0) {
+            return &calConf[0];
+        } else if (subchannelIndex == 1) {
+            return &calConf[1];
+        }
+        return nullptr;
     }
 
     bool isRouteOpen(int x, int y) {
@@ -608,10 +672,12 @@ void action_dib_smx46_close_all_routes() {
 }
 
 void action_dib_smx46_show_dac1_calibration() {
+    hmi::g_selectedSubchannelIndex = 0;
     pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
 }
 
 void action_dib_smx46_show_dac2_calibration() {
+    hmi::g_selectedSubchannelIndex = 1;
     pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
 }
 

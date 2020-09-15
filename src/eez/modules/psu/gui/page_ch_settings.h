@@ -307,7 +307,7 @@ private:
 };
 
 void drawCalibrationChart(const WidgetCursor &widgetCursor);
-float remapDacValue(Channel &channel, Channel::CalibrationValueConfiguration &configuration, Unit unit, float value);
+float remapDacValue(CalibrationValueConfiguration &configuration, Unit unit, float value);
 
 class ChSettingsCalibrationEditPage : public SetPage {
     friend void drawCalibrationChart(const WidgetCursor &widgetCursor);
@@ -325,8 +325,9 @@ public:
     int getChartZoom() { return m_chartZoom; }
     void zoomChart();
 
-    calibration::CalibrationValueType getCalibrationValueType();
-    void setCalibrationValueType(calibration::CalibrationValueType type);
+    bool isCalibrationValueTypeSelectable();
+    CalibrationValueType getCalibrationValueType();
+    void setCalibrationValueType(CalibrationValueType type);
 
     void setDacValue(float value);
 
@@ -352,7 +353,7 @@ public:
 
 private:
     uint32_t m_version;
-    calibration::CalibrationValueType m_calibrationValueType;
+    CalibrationValueType m_calibrationValueType;
     float m_measuredValue;
     bool m_measuredValueChanged;
     uint32_t m_chartVersion;
@@ -382,8 +383,9 @@ public:
     int getChartZoom() { return m_chartZoom; }
     void zoomChart();
 
-    calibration::CalibrationValueType getCalibrationValueType();
-    void setCalibrationValueType(calibration::CalibrationValueType type);
+    bool isCalibrationValueTypeSelectable();
+    CalibrationValueType getCalibrationValueType();
+    void setCalibrationValueType(CalibrationValueType type);
 
     float getDacValue();
     float getMeasuredValue();
@@ -398,12 +400,12 @@ public:
     unsigned int getNumPoints();
 
 private:
-    calibration::CalibrationValueType m_calibrationValueType;
+    CalibrationValueType m_calibrationValueType;
     int m_selectedPointIndex;
     uint32_t m_chartVersion;
     uint16_t m_chartZoom;
 
-    Channel::CalibrationValueConfiguration &getCalibrationValueConfiguration();
+    CalibrationValueConfiguration &getCalibrationValueConfiguration();
 
     void selectPointAtIndex(int i);
 };

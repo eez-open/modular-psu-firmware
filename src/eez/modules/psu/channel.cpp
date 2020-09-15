@@ -688,15 +688,6 @@ void Channel::resetHistory() {
     }
 }
 
-void Channel::clearCalibrationConf() {
-    cal_conf.u.numPoints = 0;
-    cal_conf.i[0].numPoints = 0;
-    cal_conf.i[1].numPoints = 0;
-    
-    cal_conf.calibrationDate = 0;
-    strcpy(cal_conf.calibrationRemark, CALIBRATION_REMARK_INIT);
-}
-
 void Channel::clearProtectionConf() {
     prot_conf.flags.u_state = params.OVP_DEFAULT_STATE;
     if (params.features & CH_FEATURE_HW_OVP) {
@@ -817,7 +808,7 @@ float Channel::roundChannelValue(Unit unit, float value) const {
     return roundPrec(value, getValuePrecision(unit, value));
 }
 
-float remapAdcValue(float value, Channel::CalibrationValueConfiguration &cal) {
+float remapAdcValue(float value, CalibrationValueConfiguration &cal) {
     unsigned i;
     unsigned j;
 
@@ -839,30 +830,6 @@ float remapAdcValue(float value, Channel::CalibrationValueConfiguration &cal) {
         cal.points[i].value,
         cal.points[j].adc,
         cal.points[j].value);
-}
-
-float remapValue(float value, Channel::CalibrationValueConfiguration &cal) {
-    unsigned i;
-    unsigned j;
-
-    if (cal.numPoints == 2) {
-        i = 0;
-        j = 1;
-    } else {
-        for (j = 1; j < cal.numPoints - 1 && value > cal.points[j].value; j++) {
-        }
-        i = j - 1;
-    }
-
-    if (cal.points[i].value == cal.points[j].value) {
-    	return value;
-    }
-
-    return remap(value,
-        cal.points[i].value,
-        cal.points[i].dac,
-        cal.points[j].value,
-        cal.points[j].dac);
 }
 
 void Channel::addUMonAdcValue(float value) {
@@ -1221,7 +1188,7 @@ bool Channel::isRemoteProgrammingEnabled() {
 
 float Channel::getCalibratedVoltage(float value) {
     if (isVoltageCalibrationEnabled()) {
-        value = remapValue(value, cal_conf.u);
+        value = calibration::remapValue(value, cal_conf.u);
     }
 
 #if !defined(EEZ_PLATFORM_SIMULATOR)
@@ -1269,7 +1236,7 @@ void Channel::doSetCurrent(float value) {
     i.mon_dac = 0;
 
     if (isCurrentCalibrationEnabled()) {
-        value = remapValue(value, cal_conf.i[flags.currentCurrentRange]);
+        value = calibration::remapValue(value, cal_conf.i[flags.currentCurrentRange]);
     }
 
     value += getDualRangeGndOffset();

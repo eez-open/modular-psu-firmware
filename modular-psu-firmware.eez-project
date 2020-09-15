@@ -2308,6 +2308,11 @@
       "name": "channel_has_firmware_update",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "channel_calibration_value_type_is_selectable",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -14855,17 +14860,43 @@
             "height": 224,
             "widgets": [
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "edit_value_active_M_center"
+                  "inheritFrom": "default"
                 },
-                "data": "channel_calibration_value_type",
-                "action": "select_channel_calibration_value_type",
+                "data": "channel_calibration_value_type_is_selectable",
                 "left": 0,
                 "top": 0,
                 "width": 219,
                 "height": 38,
-                "text": ""
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_M_centered"
+                    },
+                    "data": "channel_calibration_value_type",
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 219,
+                    "height": 38,
+                    "text": ""
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "channel_calibration_value_type",
+                    "action": "select_channel_calibration_value_type",
+                    "left": 0,
+                    "top": 0,
+                    "width": 219,
+                    "height": 38,
+                    "text": ""
+                  }
+                ]
               },
               {
                 "type": "Rectangle",
@@ -15274,17 +15305,43 @@
             "height": 224,
             "widgets": [
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "edit_value_active_M_center"
+                  "inheritFrom": "default"
                 },
-                "data": "channel_calibration_value_type",
-                "action": "select_channel_calibration_value_type",
+                "data": "channel_calibration_value_type_is_selectable",
                 "left": 0,
                 "top": 0,
                 "width": 219,
                 "height": 38,
-                "text": ""
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_M_centered"
+                    },
+                    "data": "channel_calibration_value_type",
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 219,
+                    "height": 38,
+                    "text": ""
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "channel_calibration_value_type",
+                    "action": "select_channel_calibration_value_type",
+                    "left": 0,
+                    "top": 0,
+                    "width": 219,
+                    "height": 38,
+                    "text": ""
+                  }
+                ]
               },
               {
                 "type": "Rectangle",

@@ -23,18 +23,12 @@ namespace psu {
 /// Channel calibration procedure.
 namespace calibration {
 
-enum CalibrationValueType {
-    CALIBRATION_VALUE_U,
-    CALIBRATION_VALUE_I_HI_RANGE,
-    CALIBRATION_VALUE_I_LOW_RANGE
-};
-
 /// Calibration parameters for the voltage or current during calibration procedure.
 struct Value {
     CalibrationValueType type;
     int currentPointIndex;
     bool isPointSet[MAX_CALIBRATION_POINTS];
-    Channel::CalibrationValueConfiguration configuration;
+    CalibrationValueConfiguration configuration;
 
     Value(CalibrationValueType type);
 
@@ -54,11 +48,24 @@ struct Value {
 };
 
 bool isEnabled();
-Channel &getCalibrationChannel();
+Channel *getCalibrationChannel();
+Channel *getCalibrationChannel(int &slotIndex, int &subchannelIndex);
+bool hasSupportForCurrentDualRange();
+CalibrationValueType getCalibrationValueType();
+bool isCalibrationExists();
+void getMaxValue(CalibrationValueType valueType, float &value, Unit &unit);
+float roundCalibrationValue(Unit unit, float value);
+bool isCalibrationValueTypeSelectable();
+ChannelMode getChannelMode();
+float getDacValue(CalibrationValueType valueType);
+float getAdcValue(CalibrationValueType valueType);
+void setVoltage(float value);
+void setCurrent(float value);
 
 /// Start calibration procedure on the channel.
 /// /param channel Selected channel
 void start(Channel &channel);
+void start(int slotIndex, int subchannelIndex);
 
 /// Stop calibration procedure.
 void stop();
@@ -88,6 +95,10 @@ bool save();
 /// Clear calibration parameters for the currently selected channel.
 /// /param channel Selected channel
 bool clear(Channel *channel);
+
+void clearCalibrationConf(CalibrationConfiguration *calConf);
+
+float remapValue(float value, CalibrationValueConfiguration &cal);
 
 } // namespace calibration
 } // namespace psu

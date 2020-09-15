@@ -40,11 +40,11 @@ namespace scpi {
 
 static void printCalibrationValue(scpi_t *context, calibration::Value &value) {
     const char *prefix;
-    if (value.type == calibration::CALIBRATION_VALUE_U) {
+    if (value.type == CALIBRATION_VALUE_U) {
         prefix = "u";
     } else {
-        if (calibration::getCalibrationChannel().hasSupportForCurrentDualRange()) {
-            if (value.type == calibration::CALIBRATION_VALUE_I_HI_RANGE) {
+        if (calibration::hasSupportForCurrentDualRange()) {
+            if (value.type == CALIBRATION_VALUE_I_HI_RANGE) {
                 prefix = "i_5A";
             } else {
                 prefix = "i_50mA";
@@ -70,7 +70,7 @@ static void printCalibrationValue(scpi_t *context, calibration::Value &value) {
     }
 }
 
-void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange, bool calParamsExists, Channel::CalibrationValueConfiguration &calibrationValue) {
+void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange, bool calParamsExists, CalibrationValueConfiguration &calibrationValue) {
     const char *prefix;
     if (unit == UNIT_VOLT) {
         prefix = "u";

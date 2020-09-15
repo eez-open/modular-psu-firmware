@@ -46,12 +46,6 @@ namespace psu {
 /// Store/restore of persistent configuration data (device configuration, calibration parameters, ...) using external EEPROM.
 namespace persist_conf {
 
-/// Header of the every block stored in EEPROM. It contains checksum and version.
-struct BlockHeader {
-    uint32_t checksum;
-    uint16_t version;
-};
-
 enum UserSwitchAction {
 	USER_SWITCH_ACTION_NONE,
     USER_SWITCH_ACTION_ENCODER_STEP,
@@ -360,6 +354,9 @@ void saveCalibrationEnabledFlag(Channel &channel, bool enabled);
 
 void loadChannelCalibration(Channel &channel);
 bool saveChannelCalibration(Channel &channel);
+
+void loadChannelCalibration(int slotIndex, int subchannelIndex);
+bool saveChannelCalibration(int slotIndex, int subchannelIndex);
 
 } // namespace persist_conf
 } // namespace psu
