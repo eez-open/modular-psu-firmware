@@ -120,6 +120,10 @@ int Module::getChannelSettingsPageId() {
     return PAGE_ID_NONE;
 }
 
+int Module::getSlotSettingsPageId() {
+    return PAGE_ID_SLOT_SETTINGS;
+}
+
 void Module::getProfileParameters(int channelIndex, uint8_t *buffer) {
 }
 

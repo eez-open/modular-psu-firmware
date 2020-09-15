@@ -90,6 +90,12 @@
     },
     {
       "name": "close_all_routes"
+    },
+    {
+      "name": "show_dac1_calibration"
+    },
+    {
+      "name": "show_dac2_calibration"
     }
   ],
   "gui": {
@@ -931,6 +937,207 @@
         "width": 480,
         "height": 168,
         "dataContextOverrides": "{\"slot_title_max\": \"SMX46\"}"
+      },
+      {
+        "name": "settings",
+        "description": "Clear, disable and define channel's protection parameters",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 8,
+            "top": 8,
+            "width": 464,
+            "height": 231,
+            "name": "Settings",
+            "widgets": [
+              {
+                "type": "MultilineText",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "alignHorizontal": "left",
+                  "alignVertical": "top",
+                  "padding": "3"
+                },
+                "action": "show_dac1_calibration",
+                "left": 232,
+                "top": 108,
+                "width": 114,
+                "height": 50,
+                "text": "\\u0097 DAC1 Calibration",
+                "firstLineIndent": 0,
+                "hangingIndent": 24
+              },
+              {
+                "type": "MultilineText",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "alignHorizontal": "left",
+                  "alignVertical": "top",
+                  "padding": "3"
+                },
+                "action": "show_dac2_calibration",
+                "left": 350,
+                "top": 108,
+                "width": 114,
+                "height": 50,
+                "text": "\\u0097 DAC2 Calibration",
+                "firstLineIndent": 0,
+                "hangingIndent": 24
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_has_firmware_update",
+                "left": 350,
+                "top": 162,
+                "width": 114,
+                "height": 50,
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 50,
+                    "invertColors": true
+                  },
+                  {
+                    "type": "MultilineText",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "alignHorizontal": "left",
+                      "alignVertical": "top",
+                      "padding": "3"
+                    },
+                    "action": "channel_update_firmware",
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 50,
+                    "text": "\\u00bb Firmware update",
+                    "firstLineIndent": 0,
+                    "hangingIndent": 24
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "show_main_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "H"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "slot_title_max",
+                "left": 40,
+                "top": 0,
+                "width": 334,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_has_firmware_update",
+                "left": 374,
+                "top": 0,
+                "width": 106,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "status_line_background"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 106,
+                    "height": 32
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 106,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background",
+                          "activeColor": "status_line_background",
+                          "activeBackgroundColor": "status_line_text"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": "FW ver."
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background"
+                        },
+                        "data": "channel_firmware_version",
+                        "left": 60,
+                        "top": 0,
+                        "width": 46,
+                        "height": 32,
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
       },
       {
         "name": "configure_routes",

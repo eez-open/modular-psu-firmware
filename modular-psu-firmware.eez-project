@@ -9164,110 +9164,43 @@
             "name": "Settings",
             "widgets": [
               {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 243,
-                "top": 170,
-                "width": 60,
-                "height": 34,
-                "text": "FW ver."
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "data": "channel_firmware_version",
-                "left": 303,
-                "top": 170,
-                "width": 44,
-                "height": 33,
-                "text": ""
-              },
-              {
                 "type": "Select",
                 "style": {
-                  "inheritFrom": "edit_value_active_S_center"
+                  "inheritFrom": "default"
                 },
-                "data": "sys_info_sdcard_status",
+                "data": "channel_has_firmware_update",
                 "left": 350,
-                "top": 170,
+                "top": 162,
                 "width": 114,
-                "height": 34,
+                "height": 50,
                 "widgets": [
                   {
-                    "type": "Text",
+                    "type": "Rectangle",
                     "style": {
-                      "inheritFrom": "edit_value_S_centered"
+                      "inheritFrom": "default"
                     },
-                    "action": "",
                     "left": 0,
                     "top": 0,
                     "width": 114,
-                    "height": 34,
-                    "text": "Upgrade"
+                    "height": 50,
+                    "invertColors": true
                   },
                   {
-                    "type": "Text",
+                    "type": "MultilineText",
                     "style": {
-                      "inheritFrom": "edit_value_active_S_center"
+                      "inheritFrom": "edit_value_active_S_center",
+                      "alignHorizontal": "left",
+                      "alignVertical": "top",
+                      "padding": "3"
                     },
                     "action": "channel_update_firmware",
                     "left": 0,
                     "top": 0,
                     "width": 114,
-                    "height": 34,
-                    "text": "Update"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_centered"
-                    },
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 34,
-                    "text": "Upgrade"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_centered"
-                    },
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 34,
-                    "text": "Upgrade"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_centered"
-                    },
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 34,
-                    "text": "Upgrade"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_centered"
-                    },
-                    "action": "show_file_manager",
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 34,
-                    "text": "Upgrade"
+                    "height": 50,
+                    "text": "\\u00bb Firmware update",
+                    "firstLineIndent": 0,
+                    "hangingIndent": 24
                   }
                 ]
               }
@@ -9304,9 +9237,74 @@
                 "data": "slot_title_max",
                 "left": 40,
                 "top": 0,
-                "width": 440,
+                "width": 334,
                 "height": 32,
                 "text": ""
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_has_firmware_update",
+                "left": 374,
+                "top": 0,
+                "width": 106,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "status_line_background"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 106,
+                    "height": 32
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 106,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background",
+                          "activeColor": "status_line_background",
+                          "activeBackgroundColor": "status_line_text"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": "FW ver."
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background"
+                        },
+                        "data": "channel_firmware_version",
+                        "left": 60,
+                        "top": 0,
+                        "width": 46,
+                        "height": 32,
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }

@@ -231,6 +231,10 @@ public:
         return PAGE_ID_DIB_SMX46_SLOT_VIEW_MICRO;
     }
 
+    int getSlotSettingsPageId() override {
+        return getTestResult() == TEST_OK ? PAGE_ID_DIB_SMX46_SETTINGS : PAGE_ID_SLOT_SETTINGS;
+    }
+
     int getNumSubchannels() override {
         return 2 + 4 * 6;
     }
@@ -603,6 +607,13 @@ void action_dib_smx46_close_all_routes() {
     }
 }
 
+void action_dib_smx46_show_dac1_calibration() {
+    pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
+}
+
+void action_dib_smx46_show_dac2_calibration() {
+    pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
+}
 
 } // gui
 

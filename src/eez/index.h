@@ -115,6 +115,7 @@ struct Module {
     virtual void animatePageAppearance(int previousPageId, int activePageId);
     virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);
     virtual int getChannelSettingsPageId();
+    virtual int getSlotSettingsPageId();
 
     virtual void getProfileParameters(int channelIndex, uint8_t *buffer);
     virtual void setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels);
