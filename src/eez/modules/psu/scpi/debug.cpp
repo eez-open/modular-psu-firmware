@@ -108,12 +108,6 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             taskEXIT_CRITICAL();
             restart();
 #endif
-        } else if (cmd == 30) {
-            int32_t delayMs;
-            if (!SCPI_ParamInt32(context, &delayMs, false)) {
-                return SCPI_RES_ERR;
-            }
-            osDelay(delayMs);
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;

@@ -1966,6 +1966,17 @@ scpi_result_t scpi_cmd_systemMeasureScalarVoltageDcQ(scpi_t *context) {
 #endif
 }
 
+scpi_result_t scpi_cmd_systemDelay(scpi_t *context) {
+    int32_t delayMs;
+    if (!SCPI_ParamInt32(context, &delayMs, false)) {
+        return SCPI_RES_ERR;
+    }
+    
+    osDelay(delayMs);
+
+    return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

@@ -369,6 +369,7 @@
     SCPI_COMMAND("SYSTem:MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]?", scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ) \
     SCPI_COMMAND("SYSTem:MEASure[:SCALar][:VOLTage][:DC]?", scpi_cmd_systemMeasureScalarVoltageDcQ) \
     SCPI_COMMAND("SYSTem:CPU:SNO?", scpi_cmd_systemCpuSnoQ) \
+    SCPI_COMMAND("SYSTem:DELay", scpi_cmd_systemDelay) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce", scpi_cmd_triggerDlogSource) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce?", scpi_cmd_triggerDlogSourceQ) \
     SCPI_COMMAND("TRIGger:DLOG[:IMMediate]", scpi_cmd_triggerDlogImmediate) \

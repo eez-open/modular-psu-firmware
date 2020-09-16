@@ -64260,6 +64260,24 @@
                 }
               ]
             }
+          },
+          {
+            "name": "SYSTem:DELay",
+            "parameters": [
+              {
+                "name": "time_ms",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           }
         ]
       },
