@@ -51,19 +51,20 @@ namespace eez {
 namespace dib_smx46 {
 
 static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
+
 static const int32_t CONF_TRANSFER_TIMEOUT_MS = 1000;
 
-static float U_CAL_POINTS[2] = { 1.0f, 9.0f };
+static const uint32_t BUFFER_SIZE = 20;
 
-#define BUFFER_SIZE 20
+static float U_CAL_POINTS[2] = { 1.0f, 9.0f };
+static float DAC_MIN = 0.0f;
+static float DAC_MAX = 10.0f;
+static float DAC_RESOLUTION = 0.01f;
+static float DAC_ENCODER_STEP_VALUES[] = { 0.5f, 0.2f, 0.1f, 0.01f };
 
 static const int NUM_COLUMNS = 6;
 static const int NUM_ROWS = 4;
 static const int MAX_LABEL_LENGTH = 5;
-
-static float MIN_DAC = 0.0f;
-static float MAX_DAC = 10.0f;
-static float DAC_ENCODER_STEP_VALUES[] = { 0.5f, 0.2f, 0.1f, 0.01f };
 
 struct FromMasterToSlave {
     uint32_t routes;
@@ -359,7 +360,7 @@ public:
             return false;
         }
 
-        if (value < MIN_DAC || value > MAX_DAC) {
+        if (value < DAC_MIN || value > DAC_MAX) {
             if (*err) {
                 *err = SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
             }
@@ -382,15 +383,15 @@ public:
     }
     
     float getVoltageResolution(int subchannelIndex) override {
-        return 0.001f;
+        return DAC_RESOLUTION;
     }
 
     float getVoltageMinValue(int subchannelIndex) override {
-        return 0.0f;
+        return DAC_MIN;
     }
 
     float getVoltageMaxValue(int subchannelIndex) override {
-        return 10.0f;
+        return DAC_MAX;
     }
 
     bool isConstantVoltageMode(int subchannelIndex) override {
@@ -581,13 +582,13 @@ void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &valu
             value = MakeValue(((Smx46Module *)g_slots[cursor])->dac1, UNIT_VOLT);
         }
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = MakeValue(MIN_DAC, UNIT_VOLT);
+        value = MakeValue(DAC_MIN, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = MakeValue(MAX_DAC, UNIT_VOLT);
+        value = MakeValue(DAC_MAX, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        value = Value(0.001f, UNIT_VOLT);
+        value = Value(DAC_RESOLUTION, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         StepValues *stepValues = value.getStepValues();
         stepValues->values = DAC_ENCODER_STEP_VALUES;
@@ -610,15 +611,15 @@ void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &valu
             value = MakeValue(((Smx46Module *)g_slots[cursor])->dac2, UNIT_VOLT);
         }
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = MakeValue(MIN_DAC, UNIT_VOLT);
+        value = MakeValue(DAC_MIN, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = MakeValue(MAX_DAC, UNIT_VOLT);
+        value = MakeValue(DAC_MAX, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "DAC 2";
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        value = Value(0.001f, UNIT_VOLT);
+        value = Value(DAC_RESOLUTION, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         StepValues *stepValues = value.getStepValues();
         stepValues->values = DAC_ENCODER_STEP_VALUES;
