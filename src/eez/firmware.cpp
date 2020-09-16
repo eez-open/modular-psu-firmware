@@ -368,7 +368,9 @@ void shutdown() {
 
     g_shutdownInProgress = true;
 
+#if OPTION_ETHERNET
     ethernet::update();
+#endif
 
 #if !defined(__EMSCRIPTEN__)
     // shutdown SCPI thread
