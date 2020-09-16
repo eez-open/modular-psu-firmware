@@ -596,7 +596,7 @@ void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &valu
         stepValues->unit = UNIT_VOLT;
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
-        ((Smx46Module *)g_slots[cursor])->dac1 = value.getFloat();
+        ((Smx46Module *)g_slots[cursor])->dac1 = roundPrec(value.getFloat(), DAC_RESOLUTION);
     }
 }
 
@@ -627,7 +627,7 @@ void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &valu
         stepValues->unit = UNIT_VOLT;
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
-        ((Smx46Module *)g_slots[cursor])->dac2 = value.getFloat();
+        ((Smx46Module *)g_slots[cursor])->dac2 = roundPrec(value.getFloat(), DAC_RESOLUTION);
     }
 }
 
