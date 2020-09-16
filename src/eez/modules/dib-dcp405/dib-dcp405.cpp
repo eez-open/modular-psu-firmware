@@ -575,14 +575,18 @@ struct DcpChannel : public Channel {
 	}
 
     void setDprogState(DprogState dprogState) override {
-		Channel::setDprogState(dprogState);
-
-		if (dprogState == DPROG_STATE_OFF) {
-			setDpEnable(false);
+		if (!isPsuThread()) {
+			sendMessageToPsu(PSU_MESSAGE_SET_DPROG_STATE, (channelIndex << 8) | dprogState);
 		} else {
-			setDpEnable(isOk() && ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE));
+			Channel::setDprogState(dprogState);
+
+			if (dprogState == DPROG_STATE_OFF) {
+				setDpEnable(false);
+			} else {
+				setDpEnable(isOk() && ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE));
+			}
+			delayed_dp_off = false;
 		}
-		delayed_dp_off = false;
     }
     
     void setRemoteSense(bool enable) override {

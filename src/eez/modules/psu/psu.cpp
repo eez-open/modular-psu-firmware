@@ -590,6 +590,12 @@ void onThreadMessage(uint8_t type, uint32_t param) {
     } else if (type == PSU_MESSAGE_READ_CHANNEL_TEMPERATURE) {
         Channel &channel = Channel::get(param);
         channel.readTemperature();
+    } else if (type == PSU_MESSAGE_REMOTE_PROGRAMMING_ENABLE) {
+        Channel &channel = Channel::get((param >> 8) & 0xFF);
+        channel.remoteProgrammingEnable(param & 0xFF);
+    } else if (type == PSU_MESSAGE_SET_DPROG_STATE) {
+        Channel &channel = Channel::get((param >> 8) & 0xFF);
+        channel.setDprogState((DprogState)(param & 0xFF));
     }
 }
 

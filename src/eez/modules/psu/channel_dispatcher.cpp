@@ -1345,7 +1345,7 @@ void disableOutputForAllTrackingChannels() {
 
 void remoteSensingEnable(Channel &channel, bool enable) {
     if (!isPsuThread()) {
-        sendMessageToPsu(PSU_MESSAGE_REMOTE_SENSING_EANBLE, (channel.channelIndex << 8) | (enable ? 1 : 0) );
+        sendMessageToPsu(PSU_MESSAGE_REMOTE_SENSING_EANBLE, (channel.channelIndex << 8) | (enable ? 1 : 0));
     } else {
         if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
             Channel::get(0).remoteSensingEnable(enable);

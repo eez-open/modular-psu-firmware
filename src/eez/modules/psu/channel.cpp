@@ -1173,12 +1173,16 @@ bool Channel::isRemoteSensingEnabled() {
 }
 
 void Channel::remoteProgrammingEnable(bool enable) {
-    if (enable != flags.rprogEnabled) {
-        if (trigger::isActive()) {
-            trigger::abort();
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_REMOTE_PROGRAMMING_ENABLE, (channelIndex << 8) | (enable ? 1 : 0));
+    } else {
+        if (enable != flags.rprogEnabled) {
+            if (trigger::isActive()) {
+                trigger::abort();
+            }
+            doRemoteProgrammingEnable(enable);
+            event_queue::pushChannelEvent((enable ? event_queue::EVENT_INFO_CH_REMOTE_PROG_ENABLED : event_queue::EVENT_INFO_CH_REMOTE_PROG_DISABLED), channelIndex);
         }
-        doRemoteProgrammingEnable(enable);
-        event_queue::pushChannelEvent((enable ? event_queue::EVENT_INFO_CH_REMOTE_PROG_ENABLED : event_queue::EVENT_INFO_CH_REMOTE_PROG_DISABLED), channelIndex);
     }
 }
 
