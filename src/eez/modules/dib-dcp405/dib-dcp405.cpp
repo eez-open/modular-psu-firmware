@@ -811,17 +811,7 @@ struct DcpChannel : public Channel {
 		return false;
 	}
 
-	float readTemperature() override {
-#if defined(EEZ_PLATFORM_STM32)
-		auto &slot = *g_slots[slotIndex];
-		if (slot.moduleRevision >= MODULE_REVISION_DCP405_R1B1) {
-			return drivers::tc77::readTemperature(slotIndex);
-		} else {
-			return drivers::tmp1075::readTemperature(slotIndex);
-		}
-#endif
-		return NAN;
-	}
+	float readTemperature() override;
 
 	int getAdvancedOptionsPageId() override {
 		return gui::PAGE_ID_CH_SETTINGS_ADV_OPTIONS;
@@ -830,6 +820,8 @@ struct DcpChannel : public Channel {
 
 struct DcpModule : public PsuModule {
 public:
+	float temperature = 0;
+
     DcpModule() {
         moduleType = MODULE_TYPE_DCP405;
         moduleName = "DCP405";
@@ -951,6 +943,25 @@ public:
 
 static DcpModule g_dcpModule;
 Module *g_module = &g_dcpModule;
+
+float DcpChannel::readTemperature() {
+#if defined(EEZ_PLATFORM_STM32)
+	DcpModule *module = (DcpModule *)g_slots[slotIndex];
+
+	if (!isPsuThread()) {
+		sendMessageToPsu(PSU_MESSAGE_READ_CHANNEL_TEMPERATURE, channelIndex);
+	} else {
+		if (module->moduleRevision >= MODULE_REVISION_DCP405_R1B1) {
+			module->temperature = drivers::tc77::readTemperature(slotIndex);
+		} else {
+			module->temperature = drivers::tmp1075::readTemperature(slotIndex);
+		}
+	}
+
+	return module->temperature;
+#endif
+	return NAN;
+}
 
 bool isDacRampActive() {
 	for (int i = 0; i < CH_NUM; i++) {

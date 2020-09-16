@@ -388,7 +388,7 @@ void lowPriorityThreadOneIter() {
             else if (type == THREAD_MESSAGE_GENERATE_ERROR) {
                 generateError(param);
             } else if (type == THREAD_MESSAGE_SAVE_CHANNEL_CALIBRATION) {
-                if (param < CH_NUM) {
+                if (param < (unsigned)CH_NUM) {
                     persist_conf::saveChannelCalibration(Channel::get(param));
                 } else {
                     param -= CH_NUM;

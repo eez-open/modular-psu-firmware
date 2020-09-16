@@ -587,7 +587,10 @@ void onThreadMessage(uint8_t type, uint32_t param) {
     } else if (type == PSU_MESSAGE_REMOTE_SENSING_EANBLE) {
     	Channel &channel = Channel::get((param >> 8) & 0xFF);
         channel_dispatcher::remoteSensingEnable(channel, param & 0xFF);
-    } 
+    } else if (type == PSU_MESSAGE_READ_CHANNEL_TEMPERATURE) {
+        Channel &channel = Channel::get(param);
+        channel.readTemperature();
+    }
 }
 
 bool measureAllAdcValuesOnChannel(int channelIndex) {

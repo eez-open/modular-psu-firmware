@@ -243,6 +243,10 @@ bool AnalogDigitalConverter::test() {
     data[2] = 0;
     data[3] = 0;
 
+	if (g_isBooted && !isPsuThread()) {
+        DebugTrace("wrong thread\n");
+    }
+
     spi::select(slotIndex, spi::CHIP_ADC);
     spi::transfer4(slotIndex, data, result);
     spi::deselect(slotIndex);

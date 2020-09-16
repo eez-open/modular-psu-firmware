@@ -40,6 +40,10 @@ float readTemperature(uint8_t slotIndex) {
     uint8_t output[2] = { 0, 0 };
     uint8_t result[2];
 
+	if (g_isBooted && !isPsuThread()) {
+        DebugTrace("wrong thread\n");
+    }
+
     spi::select(slotIndex, spi::CHIP_TEMP_SENSOR);
     spi::transfer2(slotIndex, output, result);
     spi::deselect(slotIndex);
