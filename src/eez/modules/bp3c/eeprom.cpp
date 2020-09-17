@@ -115,9 +115,12 @@ bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t addr
     size_t readBytes = fread(buffer, 1, bufferSize, fp);
     fclose(fp);
 
-    return readBytes == bufferSize;
+    if (readBytes == 4) {
+        readBytes += 2;
+        ((uint16_t *)buffer)[2] = 0xA5A5;
+    }
 
-    return true;
+    return readBytes == bufferSize;
 #endif
 
 }
@@ -211,9 +214,10 @@ bool test() {
 void writeModuleType(uint8_t slotIndex, uint16_t moduleType) {
     uint16_t buffer[] = {
         moduleType,
-        getModule(moduleType)->latestModuleRevision
+        getModule(moduleType)->latestModuleRevision,
+        0xA5A5
     };
-    write(slotIndex, (uint8_t *)buffer, 4, 0);
+    write(slotIndex, (uint8_t *)buffer, sizeof(buffer), 0);
 }
 
 void resetAllExceptOnTimeCounters(uint8_t slotIndex) {
