@@ -248,7 +248,7 @@ int PsuModule::getChannelSettingsPageId() {
     return eez::gui::PAGE_ID_CH_SETTINGS;
 }
 
-void PsuModule::getProfileParameters(int channelIndex, uint8_t *buffer) {
+void PsuModule::getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) {
     assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
 
     auto &channel = Channel::get(channelIndex);
@@ -314,7 +314,7 @@ void PsuModule::getProfileParameters(int channelIndex, uint8_t *buffer) {
     parameters->outputDelayDuration = channel.outputDelayDuration;
 }
 
-void PsuModule::setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
+void PsuModule::setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
     auto &channel = Channel::get(channelIndex);
     auto parameters = (ProfileParameters *)buffer;
 
@@ -393,7 +393,7 @@ void PsuModule::setProfileParameters(int channelIndex, uint8_t *buffer, bool mis
     channel.outputDelayDuration = parameters->outputDelayDuration;
 }
 
-bool PsuModule::writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) {
+bool PsuModule::writePowerChannelProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) {
     auto parameters = (const ProfileParameters *)buffer;
 
     WRITE_PROPERTY("output_enabled", parameters->flags.output_enabled);
@@ -445,53 +445,53 @@ bool PsuModule::writeProfileProperties(profile::WriteContext &ctx, const uint8_t
     return true;
 }
 
-bool PsuModule::readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) {
+bool PsuModule::readPowerChannelProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) {
     auto parameters = (ProfileParameters *)buffer;
 
-    READ_FLAG(output_enabled, parameters->flags.output_enabled);
-    READ_FLAG(sense_enabled, parameters->flags.sense_enabled);
-    READ_FLAG(u_state, parameters->flags.u_state);
-    READ_FLAG(i_state, parameters->flags.i_state);
-    READ_FLAG(p_state, parameters->flags.p_state);
-    READ_FLAG(rprog_enabled, parameters->flags.rprog_enabled);
-    READ_FLAG(displayValue1, parameters->flags.displayValue1);
-    READ_FLAG(displayValue2, parameters->flags.displayValue2);
-    READ_FLAG(u_triggerMode, parameters->flags.u_triggerMode);
-    READ_FLAG(i_triggerMode, parameters->flags.i_triggerMode);
-    READ_FLAG(currentRangeSelectionMode, parameters->flags.currentRangeSelectionMode);
-    READ_FLAG(autoSelectCurrentRange, parameters->flags.autoSelectCurrentRange);
-    READ_FLAG(triggerOutputState, parameters->flags.triggerOutputState);
-    READ_FLAG(triggerOnListStop, parameters->flags.triggerOnListStop);
-    READ_FLAG(u_type, parameters->flags.u_type);
-    READ_FLAG(dprogState, parameters->flags.dprogState);
-    READ_FLAG(trackingEnabled, parameters->flags.trackingEnabled);
+    READ_FLAG("output_enabled", parameters->flags.output_enabled);
+    READ_FLAG("sense_enabled", parameters->flags.sense_enabled);
+    READ_FLAG("u_state", parameters->flags.u_state);
+    READ_FLAG("i_state", parameters->flags.i_state);
+    READ_FLAG("p_state", parameters->flags.p_state);
+    READ_FLAG("rprog_enabled", parameters->flags.rprog_enabled);
+    READ_FLAG("displayValue1", parameters->flags.displayValue1);
+    READ_FLAG("displayValue2", parameters->flags.displayValue2);
+    READ_FLAG("u_triggerMode", parameters->flags.u_triggerMode);
+    READ_FLAG("i_triggerMode", parameters->flags.i_triggerMode);
+    READ_FLAG("currentRangeSelectionMode", parameters->flags.currentRangeSelectionMode);
+    READ_FLAG("autoSelectCurrentRange", parameters->flags.autoSelectCurrentRange);
+    READ_FLAG("triggerOutputState", parameters->flags.triggerOutputState);
+    READ_FLAG("triggerOnListStop", parameters->flags.triggerOnListStop);
+    READ_FLAG("u_type", parameters->flags.u_type);
+    READ_FLAG("dprogState", parameters->flags.dprogState);
+    READ_FLAG("trackingEnabled", parameters->flags.trackingEnabled);
 
-    READ_PROPERTY(u_set, parameters->u_set);
-    READ_PROPERTY(u_step, parameters->u_step);
-    READ_PROPERTY(u_limit, parameters->u_limit);
-    READ_PROPERTY(u_delay, parameters->u_delay);
-    READ_PROPERTY(u_level, parameters->u_level);
-    READ_PROPERTY(i_set, parameters->i_set);
-    READ_PROPERTY(i_step, parameters->i_step);
-    READ_PROPERTY(i_limit, parameters->i_limit);
-    READ_PROPERTY(i_delay, parameters->i_delay);
-    READ_PROPERTY(p_limit, parameters->p_limit);
-    READ_PROPERTY(p_delay, parameters->p_delay);
-    READ_PROPERTY(p_level, parameters->p_level);
-    READ_PROPERTY(ytViewRate, parameters->ytViewRate);
-    READ_PROPERTY(u_triggerValue, parameters->u_triggerValue);
-    READ_PROPERTY(i_triggerValue, parameters->i_triggerValue);
-    READ_PROPERTY(listCount, parameters->listCount);
+    READ_PROPERTY("u_set", parameters->u_set);
+    READ_PROPERTY("u_step", parameters->u_step);
+    READ_PROPERTY("u_limit", parameters->u_limit);
+    READ_PROPERTY("u_delay", parameters->u_delay);
+    READ_PROPERTY("u_level", parameters->u_level);
+    READ_PROPERTY("i_set", parameters->i_set);
+    READ_PROPERTY("i_step", parameters->i_step);
+    READ_PROPERTY("i_limit", parameters->i_limit);
+    READ_PROPERTY("i_delay", parameters->i_delay);
+    READ_PROPERTY("p_limit", parameters->p_limit);
+    READ_PROPERTY("p_delay", parameters->p_delay);
+    READ_PROPERTY("p_level", parameters->p_level);
+    READ_PROPERTY("ytViewRate", parameters->ytViewRate);
+    READ_PROPERTY("u_triggerValue", parameters->u_triggerValue);
+    READ_PROPERTY("i_triggerValue", parameters->i_triggerValue);
+    READ_PROPERTY("listCount", parameters->listCount);
 
-    READ_PROPERTY(u_rampDuration, parameters->u_rampDuration);
-    READ_PROPERTY(i_rampDuration, parameters->i_rampDuration);
+    READ_PROPERTY("u_rampDuration", parameters->u_rampDuration);
+    READ_PROPERTY("i_rampDuration", parameters->i_rampDuration);
 
-    READ_PROPERTY(outputDelayDuration, parameters->outputDelayDuration);
+    READ_PROPERTY("outputDelayDuration", parameters->outputDelayDuration);
 
 #ifdef EEZ_PLATFORM_SIMULATOR
-    READ_PROPERTY(load_enabled, parameters->load_enabled);
-    READ_PROPERTY(load, parameters->load);
-    READ_PROPERTY(voltProgExt, parameters->voltProgExt);
+    READ_PROPERTY("load_enabled", parameters->load_enabled);
+    READ_PROPERTY("load", parameters->load);
+    READ_PROPERTY("voltProgExt", parameters->voltProgExt);
 #endif
 
     return false;
@@ -723,6 +723,10 @@ bool psuReset() {
 #if OPTION_ETHERNET
     ntp::reset();
 #endif
+
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        g_slots[slotIndex]->resetConfiguration();
+    }
 
     // TEMP:PROT[AUX]
     // TEMP:PROT:DEL

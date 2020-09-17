@@ -65,10 +65,10 @@ public:
 
 	int getChannelSettingsPageId() override;
 
-    void getProfileParameters(int channelIndex, uint8_t *buffer) override;
-    void setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
-    bool writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;
-    bool readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) override;
+    void getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) override;
+    void setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
+    bool writePowerChannelProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;
+    bool readPowerChannelProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) override;
     bool getProfileOutputEnable(uint8_t *buffer) override;
     float getProfileUSet(uint8_t *buffer) override;
     float getProfileISet(uint8_t *buffer) override;

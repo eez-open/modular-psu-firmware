@@ -1326,19 +1326,19 @@ bool saveModuleConf(int slotIndex) {
     );
 }
 
-bool isChannelCalibrationEnabled(Channel &channel) {
-    ModuleConfiguration &moduleConf = g_moduleConf[channel.slotIndex];
-    return moduleConf.chCalEnabled & (1 << channel.subchannelIndex);
+bool isChannelCalibrationEnabled(int slotIndex, int subchannelIndex) {
+    ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
+    return moduleConf.chCalEnabled & (1 << subchannelIndex);
 }
 
-void saveCalibrationEnabledFlag(Channel &channel, bool enabled) {
-    ModuleConfiguration &moduleConf = g_moduleConf[channel.slotIndex];
+void saveCalibrationEnabledFlag(int slotIndex, int subchannelIndex, bool enabled) {
+    ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
     if (enabled) {
-        moduleConf.chCalEnabled |= 1 << channel.subchannelIndex;
+        moduleConf.chCalEnabled |= 1 << subchannelIndex;
     } else {
-        moduleConf.chCalEnabled &= ~(1 << channel.subchannelIndex);
+        moduleConf.chCalEnabled &= ~(1 << subchannelIndex);
     }
-    saveModuleConf(channel.slotIndex);
+    saveModuleConf(slotIndex);
 }
 
 void loadChannelCalibration(Channel &channel) {

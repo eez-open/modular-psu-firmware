@@ -472,6 +472,94 @@ static void resetProfileToDefaults(Parameters &profile) {
     }
 }
 
+static bool repositionSlotsInProfileToMatchCurrentSlotsConfiguration(Parameters &profile) {
+    bool profileSlotAlreadyUsed[NUM_SLOTS];
+    int slotsMap[NUM_SLOTS];
+    for (int i = 0; i < NUM_SLOTS; i++) {
+        profileSlotAlreadyUsed[i] = false;
+        slotsMap[i] = -1;
+    }
+
+    for (int i = 0; i < NUM_SLOTS; i++) {
+        Module *module = g_slots[i];
+        if (
+            profile.slots[i].parametersAreValid && 
+            profile.slots[i].moduleType == module->moduleType
+        ) {
+            profileSlotAlreadyUsed[i] = true;
+            slotsMap[i] = i;
+        } else {
+            break;
+        }
+    }
+
+    for (int i = 0; i < NUM_SLOTS; i++) {
+        if (slotsMap[i] == -1) {
+            for (int j = 0; j < NUM_SLOTS; j++) {
+                if (
+                    !profileSlotAlreadyUsed[j] &&
+                    profile.slots[j].parametersAreValid &&
+                    profile.slots[j].moduleType == g_slots[i]->moduleType
+                ) {
+                    profileSlotAlreadyUsed[j] = true;
+                    slotsMap[i] = j;
+                    break;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < NUM_SLOTS; i++) {
+        if (slotsMap[i] == -1) {
+            for (int j = 0; j < CH_MAX; j++) {
+                if (!profileSlotAlreadyUsed[j] && !profile.slots[j].parametersAreValid) {
+                    profileSlotAlreadyUsed[j] = true;
+                    slotsMap[i] = j;
+                    break;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < NUM_SLOTS; i++) {
+        if (slotsMap[i] == -1) {
+            for (int j = 0; j < CH_MAX; j++) {
+                if (!profileSlotAlreadyUsed[j]) {
+                    profileSlotAlreadyUsed[j] = true;
+                    slotsMap[i] = j;
+                    break;
+                }
+            }
+        }
+    }
+
+    bool mismatch = false;
+
+    for (int i = 0; i < NUM_SLOTS - 1; i++) {
+        if (slotsMap[i] != i) {
+            for (int j = i + 1; j < NUM_SLOTS; j++) {
+                if (slotsMap[j] == i) {
+                    mismatch = true;
+
+                    int a = slotsMap[i];
+                    int b = slotsMap[j];
+
+                    SlotParameters slotParameters;
+                    memcpy(&slotParameters, &profile.slots[a], sizeof(ChannelParameters));
+                    memcpy(&profile.slots[a], &profile.slots[b], sizeof(ChannelParameters));
+                    memcpy(&profile.slots[b], &slotParameters, sizeof(ChannelParameters));
+
+                    slotsMap[j] = slotsMap[i];
+                    slotsMap[i] = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    return mismatch;
+}
+
 static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parameters &profile, List *lists) {
     bool profileChannelAlreadyUsed[CH_MAX];
     int channelsMap[CH_MAX];
@@ -577,6 +665,13 @@ static void saveState(Parameters &profile, List *lists) {
     profile.flags.couplingType = channel_dispatcher::getCouplingType();
     profile.flags.powerIsUp = isPowerUp();
 
+    for (int i = 0; i < NUM_SLOTS; ++i) {
+        profile.slots[i].moduleType = g_slots[i]->moduleType;
+        profile.slots[i].moduleRevision = g_slots[i]->moduleRevision;
+        profile.slots[i].parametersAreValid = 1;
+        g_slots[i]->getProfileParameters((uint8_t *)profile.slots[i].parameters);
+    }
+
     for (int i = 0; i < CH_NUM; ++i) {
         if (i < CH_NUM) {
             Channel &channel = Channel::get(i);
@@ -586,7 +681,7 @@ static void saveState(Parameters &profile, List *lists) {
             
             profile.channels[i].parametersAreValid = 1;
             
-            g_slots[channel.slotIndex]->getProfileParameters(i, (uint8_t *)profile.channels[i].parameters);
+            g_slots[channel.slotIndex]->getPowerChannelProfileParameters(i, (uint8_t *)profile.channels[i].parameters);
 
             if (lists) {
                 auto &list = lists[i];
@@ -657,6 +752,16 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
         }
     }
 
+    bool mismatch = false;
+    mismatch = repositionSlotsInProfileToMatchCurrentSlotsConfiguration(profile);
+
+    for (int i = 0; i < NUM_SLOTS; ++i) {
+        if (profile.slots[i].parametersAreValid) {
+            g_slots[i]->setProfileParameters((uint8_t *)profile.slots[i].parameters, mismatch, recallOptions);
+        }
+    }
+
+
     for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
         memcpy(&temperature::sensors[i].prot_conf, profile.tempProt + i, sizeof(temperature::ProtectionConfiguration));
     }
@@ -668,7 +773,7 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
         event_queue::pushEvent(setCouplingTypeErr);
     }
 
-    bool mismatch = repositionChannelsInProfileToMatchCurrentChannelConfiguration(profile, lists);
+    mismatch = repositionChannelsInProfileToMatchCurrentChannelConfiguration(profile, lists);
 
     int numTrackingChannels = 0;
 
@@ -676,7 +781,7 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
         Channel &channel = Channel::get(i);
 
         if (profile.channels[i].parametersAreValid) {
-            g_slots[channel.slotIndex]->setProfileParameters(i, (uint8_t *)profile.channels[i].parameters, mismatch, recallOptions, numTrackingChannels);
+            g_slots[channel.slotIndex]->setPowerChannelProfileParameters(i, (uint8_t *)profile.channels[i].parameters, mismatch, recallOptions, numTrackingChannels);
 
             auto &list = lists[i];
             channel_dispatcher::setDwellList(channel, list.dwellList, list.dwellListLength);
@@ -734,7 +839,7 @@ bool WriteContext::property(const char *propertyName, int value) {
 
 bool WriteContext::property(const char *propertyName, unsigned int value) {
     char line[256 + 1];
-    sprintf(line, "\t%s=%u\n", propertyName, (int)value);
+    sprintf(line, "\t%s=%u\n", propertyName, (unsigned int)value);
     return file.write((uint8_t *)line, strlen(line));
 }
 
@@ -827,6 +932,20 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
     }
 #endif
 
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        auto &slot = parameters.slots[slotIndex];
+        if (slot.parametersAreValid) {
+            ctx.group("slot", slotIndex + 1);
+
+            WRITE_PROPERTY("moduleType", slot.moduleType);
+            WRITE_PROPERTY("moduleRevision", slot.moduleRevision);
+
+            if (!getModule(slot.moduleType)->writeProfileProperties(ctx, (uint8_t *)slot.parameters)) {
+                return false;
+            }
+        }
+    }
+
     ctx.group("dcpsupply");
     WRITE_PROPERTY("couplingType", parameters.flags.couplingType);
 
@@ -845,7 +964,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
             WRITE_PROPERTY("moduleType", channel.moduleType);
             WRITE_PROPERTY("moduleRevision", channel.moduleRevision);
 
-            if (!getModule(channel.moduleType)->writeProfileProperties(ctx, (uint8_t *)channel.parameters)) {
+            if (!getModule(channel.moduleType)->writePowerChannelProfileProperties(ctx, (uint8_t *)channel.parameters)) {
                 return false;
             }
 
@@ -1165,12 +1284,28 @@ void ReadContext::skipPropertyValue() {
 
 static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *lists) {
     if (ctx.matchGroup("system")) {
-        READ_FLAG(powerIsUp, parameters.flags.powerIsUp);
-        READ_STRING_PROPERTY(profileName, parameters.name, PROFILE_NAME_MAX_LENGTH);
+        READ_FLAG("powerIsUp", parameters.flags.powerIsUp);
+        READ_STRING_PROPERTY("profileName", parameters.name, PROFILE_NAME_MAX_LENGTH);
+    }
+
+    int slotIndex;
+    if (ctx.matchGroup("slot", slotIndex)) {
+        --slotIndex;
+
+        auto &slot = parameters.slots[slotIndex];
+        
+        slot.parametersAreValid = 1;
+
+        READ_PROPERTY("moduleType", slot.moduleType);
+        READ_PROPERTY("moduleRevision", slot.moduleRevision);
+
+        if (getModule(slot.moduleType)->readProfileProperties(ctx, (uint8_t *)slot.parameters)) {
+            return true;
+        }
     }
 
     if (ctx.matchGroup("dcpsupply")) {
-        READ_FLAG(couplingType, parameters.flags.couplingType);
+        READ_FLAG("couplingType", parameters.flags.couplingType);
     }
 
     int channelIndex;
@@ -1181,15 +1316,15 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
         
         channel.parametersAreValid = 1;
 
-        READ_PROPERTY(moduleType, channel.moduleType);
-        READ_PROPERTY(moduleRevision, channel.moduleRevision);
+        READ_PROPERTY("moduleType", channel.moduleType);
+        READ_PROPERTY("moduleRevision", channel.moduleRevision);
 
-        if (getModule(channel.moduleType)->readProfileProperties(ctx, (uint8_t *)channel.parameters)) {
+        if (getModule(channel.moduleType)->readPowerChannelProfileProperties(ctx, (uint8_t *)channel.parameters)) {
             return true;
         }
 
         if (lists) {
-            READ_LIST_PROPERTY(list, channelIndex, lists);
+            READ_LIST_PROPERTY("list", channelIndex, lists);
         }
     }
 
@@ -1199,15 +1334,15 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
 
         auto &tempSensorProt = parameters.tempProt[tempSensorIndex];
 
-        READ_PROPERTY(delay, tempSensorProt.delay);
-        READ_PROPERTY(level, tempSensorProt.level);
-        READ_PROPERTY(state, tempSensorProt.state);
+        READ_PROPERTY("delay", tempSensorProt.delay);
+        READ_PROPERTY("level", tempSensorProt.level);
+        READ_PROPERTY("state", tempSensorProt.state);
     }
 
     if (ctx.matchGroup("trigger")) {
-        READ_FLAG(continuousInitializationEnabled, parameters.flags.triggerContinuousInitializationEnabled);
-        READ_PROPERTY(source, parameters.triggerSource);
-        READ_PROPERTY(delay, parameters.triggerDelay);
+        READ_FLAG("continuousInitializationEnabled", parameters.flags.triggerContinuousInitializationEnabled);
+        READ_PROPERTY("source", parameters.triggerSource);
+        READ_PROPERTY("delay", parameters.triggerDelay);
     }
 
     int ioPinIndex;
@@ -1216,8 +1351,8 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
 
         auto &ioPin = parameters.ioPins[ioPinIndex];
 
-        READ_FLAG(function, ioPin.function);
-        READ_FLAG(polarity, ioPin.polarity);
+        READ_FLAG("function", ioPin.function);
+        READ_FLAG("polarity", ioPin.polarity);
     }
 
     return false;

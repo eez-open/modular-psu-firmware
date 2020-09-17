@@ -905,7 +905,7 @@ void Channel::updateAllChannels() {
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
         if (channel.isOk()) {
-            channel.doCalibrationEnable(persist_conf::isChannelCalibrationEnabled(channel) && channel.isCalibrationExists());
+            channel.doCalibrationEnable(persist_conf::isChannelCalibrationEnabled(channel.slotIndex, channel.subchannelIndex) && channel.isCalibrationExists());
             channel.setVoltage(channel.u.set);
             channel.setCurrent(channel.i.set);
         }
@@ -1136,7 +1136,7 @@ void Channel::calibrationEnable(bool enabled) {
     if (enabled != isCalibrationEnabled()) {
         doCalibrationEnable(enabled);
         event_queue::pushChannelEvent((enabled ? event_queue::EVENT_INFO_CH_CALIBRATION_ENABLED : event_queue::EVENT_WARNING_CH_CALIBRATION_DISABLED), channelIndex);
-        persist_conf::saveCalibrationEnabledFlag(*this, enabled);
+        persist_conf::saveCalibrationEnabledFlag(slotIndex, subchannelIndex, enabled);
     }
 }
 

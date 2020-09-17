@@ -127,17 +127,17 @@ int Module::getSlotSettingsPageId() {
     return PAGE_ID_SLOT_SETTINGS;
 }
 
-void Module::getProfileParameters(int channelIndex, uint8_t *buffer) {
+void Module::getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) {
 }
 
-void Module::setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
+void Module::setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
 }
 
-bool Module::writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) {
+bool Module::writePowerChannelProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) {
     return true; 
 }
 
-bool Module::readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) {
+bool Module::readPowerChannelProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) {
     return false;
 }
 
@@ -151,6 +151,23 @@ float Module::getProfileUSet(uint8_t *buffer) {
 
 float Module::getProfileISet(uint8_t *buffer) {
     return NAN;
+}
+
+void Module::getProfileParameters(uint8_t *buffer) {
+}
+
+void Module::setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) {
+}
+
+bool Module::writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) {
+    return true;
+}
+
+bool Module::readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) {
+    return true;
+}
+
+void Module::resetConfiguration() {
 }
 
 int Module::getNumSubchannels() {

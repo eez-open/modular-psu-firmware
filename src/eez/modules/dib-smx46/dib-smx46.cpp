@@ -17,6 +17,7 @@
  */
 
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -33,6 +34,7 @@
 #include "eez/gui/document.h"
 #include <eez/modules/psu/timer.h>
 #include "eez/modules/psu/psu.h"
+#include "eez/modules/psu/profile.h"
 #include "eez/modules/psu/event_queue.h"
 #include "eez/modules/psu/calibration.h"
 #include "eez/modules/psu/gui/psu.h"
@@ -94,7 +96,7 @@ public:
     uint32_t routes = 0;
 
     char xLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
-    char yLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
+    char yLabels[NUM_ROWS][MAX_LABEL_LENGTH + 1];
 
     float dac1 = 0.0f;
     float dac2 = 0.0f;
@@ -127,17 +129,7 @@ public:
         numPowerChannels = 0;
         numOtherChannels = 2 + 1 + NUM_ROWS * NUM_COLUMNS;
 
-        for (int i = 0; i < NUM_COLUMNS; i++) {
-            xLabels[i][0] = 'X';
-            xLabels[i][1] = '1' + i;
-            xLabels[i][2] = 0;
-        }
-
-        for (int i = 0; i < NUM_ROWS; i++) {
-            yLabels[i][0] = 'Y';
-            yLabels[i][1] = '1' + i;
-            yLabels[i][2] = 0;
-        }
+        resetConfiguration();
 
         auto data = (FromMasterToSlave *)output;
         data->routes = 0xFFFFFFFF;
@@ -152,6 +144,9 @@ public:
         Module::boot();
 
         loadRelayCylces();
+        
+        calibrationEnabled[0] = persist_conf::isChannelCalibrationEnabled(slotIndex, 0);
+        calibrationEnabled[1] = persist_conf::isChannelCalibrationEnabled(slotIndex, 1);
     }
 
     Module *createModule() override {
@@ -292,8 +287,114 @@ public:
         return PAGE_ID_DIB_SMX46_SLOT_VIEW_MICRO;
     }
 
+    struct ProfileParameters {
+        uint32_t routes;
+        char xLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
+        char yLabels[NUM_ROWS][MAX_LABEL_LENGTH + 1];
+        float dac1;
+        float dac2;
+        bool relayOn;
+    };
+
     int getSlotSettingsPageId() override {
         return getTestResult() == TEST_OK ? PAGE_ID_DIB_SMX46_SETTINGS : PAGE_ID_SLOT_SETTINGS;
+    }
+
+    void getProfileParameters(uint8_t *buffer) override {
+        assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
+
+        auto parameters = (ProfileParameters *)buffer;
+
+        parameters->routes = routes;
+        memcpy(&parameters->xLabels[0][0], &xLabels[0][0], sizeof(xLabels));
+        memcpy(&parameters->yLabels[0][0], &yLabels[0][0], sizeof(yLabels));
+        parameters->dac1 = dac1;
+        parameters->dac2 = dac2;
+        parameters->relayOn = relayOn;
+    }
+    
+    void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) override {
+        auto parameters = (ProfileParameters *)buffer;
+
+        routes = parameters->routes;
+        memcpy(&xLabels[0][0], &parameters->xLabels[0][0], sizeof(xLabels));
+        memcpy(&yLabels[0][0], &parameters->yLabels[0][0], sizeof(yLabels));
+        dac1 = parameters->dac1;
+        dac2 = parameters->dac2;
+        relayOn = parameters->relayOn;
+    }
+    
+    bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) override {
+        auto parameters = (const ProfileParameters *)buffer;
+        
+        WRITE_PROPERTY("routes", (unsigned int)parameters->routes);
+
+        for (int i = 0; i < NUM_COLUMNS; i++) {
+            char propName[16];
+            sprintf(propName, "xLabel%d", i+1);
+            WRITE_PROPERTY(propName, parameters->xLabels[i]);
+        }
+
+        for (int i = 0; i < NUM_ROWS; i++) {
+            char propName[16];
+            sprintf(propName, "yLabel%d", i+1);
+            WRITE_PROPERTY(propName, parameters->yLabels[i]);
+        }
+
+        WRITE_PROPERTY("dac1", parameters->dac1);
+        WRITE_PROPERTY("dac2", parameters->dac2);
+        
+        WRITE_PROPERTY("relayOn", parameters->relayOn);
+
+        return true;
+    }
+    
+    bool readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) override {
+        auto parameters = (ProfileParameters *)buffer;
+
+        unsigned int routes;
+        READ_PROPERTY("routes", routes);
+        parameters->routes = routes;
+        
+        for (int i = 0; i < NUM_COLUMNS; i++) {
+            char propName[16];
+            sprintf(propName, "xLabel%d", i+1);
+            READ_STRING_PROPERTY(propName, parameters->xLabels[i], MAX_LABEL_LENGTH);
+        }
+
+        for (int i = 0; i < NUM_ROWS; i++) {
+            char propName[16];
+            sprintf(propName, "yLabel%d", i+1);
+            READ_STRING_PROPERTY(propName, parameters->yLabels[i], MAX_LABEL_LENGTH);
+        }
+
+        READ_PROPERTY("dac1", parameters->dac1);
+        READ_PROPERTY("dac2", parameters->dac2);
+
+        READ_PROPERTY("relayOn", parameters->relayOn);
+
+        return true;
+    }
+
+    void resetConfiguration() {
+        routes = 0;
+
+        for (int i = 0; i < NUM_COLUMNS; i++) {
+            xLabels[i][0] = 'X';
+            xLabels[i][1] = '1' + i;
+            xLabels[i][2] = 0;
+        }
+
+        for (int i = 0; i < NUM_ROWS; i++) {
+            yLabels[i][0] = 'Y';
+            yLabels[i][1] = '1' + i;
+            yLabels[i][2] = 0;
+        }
+
+        dac1 = 0.0f;
+        dac2 = 0.0f;
+
+        relayOn = false;
     }
 
     bool isValidSubchannelIndex(int subchannelIndex) override {
@@ -498,9 +599,10 @@ public:
         return subchannelIndex < 2 && calibrationEnabled[subchannelIndex];
     }
     
-    void enableVoltageCalibration(int subchannelIndex, bool enable) override {
+    void enableVoltageCalibration(int subchannelIndex, bool enabled) override {
         if (subchannelIndex < 2) {
-            calibrationEnabled[subchannelIndex] = enable;
+            calibrationEnabled[subchannelIndex] = enabled;
+            persist_conf::saveCalibrationEnabledFlag(slotIndex, subchannelIndex, enabled);
         }
     }
 
@@ -771,7 +873,6 @@ void data_dib_smx46_relay_on(DataOperationEnum operation, Cursor cursor, Value &
 
 void data_dib_smx46_signal_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        int slotIndex = cursor / (NUM_COLUMNS * NUM_ROWS);
         int i = cursor % (NUM_COLUMNS * NUM_ROWS);
         int x = i % NUM_COLUMNS;
         int y = i / NUM_COLUMNS;
@@ -814,7 +915,6 @@ void onSetLabel(char *value) {
 
 void action_dib_smx46_edit_x_label() {
     int cursor = getFoundWidgetAtDown().cursor;
-    int slotIndex = cursor / NUM_COLUMNS;
     int i = cursor % NUM_COLUMNS;
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
     g_labelPointer = &page->xLabels[i][0];
@@ -823,7 +923,6 @@ void action_dib_smx46_edit_x_label() {
 
 void action_dib_smx46_edit_y_label() {
     int cursor = getFoundWidgetAtDown().cursor;
-    int slotIndex = cursor / NUM_ROWS;
     int i = cursor % NUM_ROWS;
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
     g_labelPointer = &page->yLabels[i][0];

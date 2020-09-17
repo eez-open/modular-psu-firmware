@@ -30,6 +30,7 @@ namespace psu {
 namespace profile {
 
 #define MAX_CHANNEL_PARAMETERS_SIZE 200
+#define MAX_SLOT_PARAMETERS_SIZE 200
 
 /// Channel parameters stored in profile.
 struct ChannelParameters {
@@ -38,6 +39,15 @@ struct ChannelParameters {
     bool parametersAreValid;
     uint32_t parameters[MAX_CHANNEL_PARAMETERS_SIZE  / 4];
 };
+
+/// Channel parameters stored in profile.
+struct SlotParameters {
+    uint16_t moduleType;
+    uint16_t moduleRevision;
+    bool parametersAreValid;
+    uint32_t parameters[MAX_CHANNEL_PARAMETERS_SIZE  / 4];
+};
+
 
 /// Channel binary flags stored in profile.
 struct ProfileFlags {
@@ -60,6 +70,7 @@ struct Parameters {
     ProfileFlags flags;
     char name[PROFILE_NAME_MAX_LENGTH + 1];
     ChannelParameters channels[CH_MAX];
+    SlotParameters slots[NUM_SLOTS];
     temperature::ProtectionConfiguration tempProt[temp_sensor::MAX_NUM_TEMP_SENSORS];
     uint16_t triggerSource;
     float triggerDelay;
@@ -166,29 +177,26 @@ private:
 };
 
 #define READ_FLAG(name, value) \
-    auto name = value; \
-    if (ctx.property(#name, name)) { \
-        value = name; \
-        return true; \
+    { \
+        auto temp = value; \
+        if (ctx.property(name, temp)) { \
+            value = temp; \
+            return true; \
+        } \
     }
 
 #define READ_PROPERTY(name, value) \
-    if (ctx.property(#name, value)) { \
+    if (ctx.property(name, value)) { \
         return true; \
     }
 
 #define READ_STRING_PROPERTY(name, str, strLength) \
-    if (ctx.property(#name, str, strLength)) { \
+    if (ctx.property(name, str, strLength)) { \
         return true; \
     }
 
 #define READ_LIST_PROPERTY(name, channelIndex, lists) \
-    if (ctx.listProperty(#name, channelIndex, lists)) { \
-        return true; \
-    }
-
-#define SKIP_PROPERTY(name) \
-    if (ctx.skipProperty(#name)) { \
+    if (ctx.listProperty(name, channelIndex, lists)) { \
         return true; \
     }
 

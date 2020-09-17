@@ -585,10 +585,10 @@ public:
         bool counterphaseDithering;
     };
 
-    void getProfileParameters(int channelIndex, uint8_t *buffer) override;
-    void setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
-    bool writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;
-    bool readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) override;
+    void getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) override;
+    void setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
+    bool writePowerChannelProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;
+    bool readPowerChannelProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) override;
 };
 
 void DcmChannel::init() {
@@ -670,10 +670,10 @@ void DcmChannel::tickSpecific(uint32_t tickCount) {
 #endif
 }
 
-void DcmModule::getProfileParameters(int channelIndex, uint8_t *buffer) {
+void DcmModule::getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) {
     assert(sizeof(DcmProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
 
-    PsuModule::getProfileParameters(channelIndex, buffer);
+    PsuModule::getPowerChannelProfileParameters(channelIndex, buffer);
 
     auto &channel = (DcmChannel &)Channel::get(channelIndex);
     auto parameters = (DcmProfileParameters *)buffer;
@@ -686,8 +686,8 @@ void DcmModule::getProfileParameters(int channelIndex, uint8_t *buffer) {
     parameters->counterphaseDithering = counterphaseDithering;
 }
 
-void DcmModule::setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
-    PsuModule::setProfileParameters(channelIndex, buffer, mismatch, recallOptions, numTrackingChannels);
+void DcmModule::setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
+    PsuModule::setPowerChannelProfileParameters(channelIndex, buffer, mismatch, recallOptions, numTrackingChannels);
 
     auto &channel = (DcmChannel &)Channel::get(channelIndex);
     auto parameters = (DcmProfileParameters *)buffer;
@@ -704,8 +704,8 @@ void DcmModule::setProfileParameters(int channelIndex, uint8_t *buffer, bool mis
     }
 }
 
-bool DcmModule::writeProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) {
-    if (!PsuModule::writeProfileProperties(ctx, buffer)) {
+bool DcmModule::writePowerChannelProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) {
+    if (!PsuModule::writePowerChannelProfileProperties(ctx, buffer)) {
         return false;
     }
 
@@ -721,19 +721,19 @@ bool DcmModule::writeProfileProperties(profile::WriteContext &ctx, const uint8_t
     return true;
 }
 
-bool DcmModule::readProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) {
-    if (PsuModule::readProfileProperties(ctx, buffer)) {
+bool DcmModule::readPowerChannelProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) {
+    if (PsuModule::readPowerChannelProfileProperties(ctx, buffer)) {
         return true;
     }
 
     auto parameters = (DcmProfileParameters *)buffer;
 
-    READ_PROPERTY(dcmVersion, parameters->dcmVersion);
-    READ_PROPERTY(pwmEnabled, parameters->pwmEnabled);
-    READ_PROPERTY(pwmFrequency, parameters->pwmFrequency);
-    READ_PROPERTY(pwmDuty, parameters->pwmDuty);
-    READ_PROPERTY(counterphaseFrequency, parameters->counterphaseFrequency);
-    READ_PROPERTY(counterphaseDithering, parameters->counterphaseDithering);
+    READ_PROPERTY("dcmVersion", parameters->dcmVersion);
+    READ_PROPERTY("pwmEnabled", parameters->pwmEnabled);
+    READ_PROPERTY("pwmFrequency", parameters->pwmFrequency);
+    READ_PROPERTY("pwmDuty", parameters->pwmDuty);
+    READ_PROPERTY("counterphaseFrequency", parameters->counterphaseFrequency);
+    READ_PROPERTY("counterphaseDithering", parameters->counterphaseDithering);
 
     return false;
 }

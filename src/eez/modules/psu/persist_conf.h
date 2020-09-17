@@ -349,8 +349,8 @@ extern ModuleConfiguration g_moduleConf[NUM_SLOTS];
 void loadModuleConf(int slotIndex);
 bool saveModuleConf(int slotIndex);
 
-bool isChannelCalibrationEnabled(Channel &channel);
-void saveCalibrationEnabledFlag(Channel &channel, bool enabled);
+bool isChannelCalibrationEnabled(int slotIndex, int subchannelIndex);
+void saveCalibrationEnabledFlag(int slotIndex, int subchannelIndex, bool enabled);
 
 void loadChannelCalibration(Channel &channel);
 bool saveChannelCalibration(Channel &channel);

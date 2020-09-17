@@ -176,13 +176,20 @@ struct Module {
     virtual int getChannelSettingsPageId();
     virtual int getSlotSettingsPageId();
 
-    virtual void getProfileParameters(int channelIndex, uint8_t *buffer);
-    virtual void setProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels);
-    virtual bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer);
-    virtual bool readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer);
+    virtual void getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer);
+    virtual void setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels);
+    virtual bool writePowerChannelProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer);
+    virtual bool readPowerChannelProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer);
     virtual bool getProfileOutputEnable(uint8_t *buffer);
     virtual float getProfileUSet(uint8_t *buffer);
     virtual float getProfileISet(uint8_t *buffer);
+
+    virtual void getProfileParameters(uint8_t *buffer);
+    virtual void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions);
+    virtual bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer);
+    virtual bool readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer);
+
+    virtual void resetConfiguration();
 
     virtual int getNumSubchannels();
     virtual bool isValidSubchannelIndex(int subchannelIndex);
