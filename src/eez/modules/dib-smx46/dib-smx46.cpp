@@ -37,6 +37,7 @@
 #include "eez/modules/psu/calibration.h"
 #include "eez/modules/psu/gui/psu.h"
 #include "eez/modules/psu/gui/animations.h"
+#include "eez/modules/psu/gui/keypad.h"
 #include "eez/modules/bp3c/comm.h"
 #include "eez/modules/psu/gui/edit_mode.h"
 
@@ -802,6 +803,31 @@ void action_dib_smx46_toggle_relay() {
     int cursor = getFoundWidgetAtDown().cursor;
     Smx46Module *module = (Smx46Module *)g_slots[cursor];
     module->relayOn = !module->relayOn;
+}
+
+static char *g_labelPointer;
+
+void onSetLabel(char *value) {
+    strcpy(g_labelPointer, value);
+    popPage();
+};
+
+void action_dib_smx46_edit_x_label() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    int slotIndex = cursor / NUM_COLUMNS;
+    int i = cursor % NUM_COLUMNS;
+    ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
+    g_labelPointer = &page->xLabels[i][0];
+    Keypad::startPush("Label: ", g_labelPointer, 1, MAX_LABEL_LENGTH, false, onSetLabel, popPage);
+}
+
+void action_dib_smx46_edit_y_label() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    int slotIndex = cursor / NUM_ROWS;
+    int i = cursor % NUM_ROWS;
+    ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
+    g_labelPointer = &page->yLabels[i][0];
+    Keypad::startPush("Label: ", g_labelPointer, 1, MAX_LABEL_LENGTH, false, onSetLabel, popPage);
 }
 
 void action_dib_smx46_show_configure_routes() {
